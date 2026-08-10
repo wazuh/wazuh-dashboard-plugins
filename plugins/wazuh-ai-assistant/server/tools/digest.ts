@@ -17,7 +17,7 @@ export interface Digest {
    * digests stay byte-identical to before it existed. It also lets privacy.ts's field-policy pass
    * attribute each bucket key to the right aggregation field. */
   breakdown?: Array<{ key: string; count: number; agg?: string }>;
-  /** Set in exactly two situations, each a distinct honesty gap the model cannot see on its own:
+  /** Set in exactly three situations, each a distinct honesty gap the model cannot see on its own:
    *
    * 1. `breakdown` was synthesized from the RETURNED page (`buildSyntheticBreakdown`) rather than
    *    a real OpenSearch aggregation over the full matched set (`buildBreakdown`), AND that page
@@ -26,20 +26,28 @@ export interface Digest {
    *    reproduced live (limit:20 on 26 matches synthesizing 13/7 and 11/9 while the true
    *    distribution is 16/8/2 and 13/13). Tells the model `breakdown` is NOT authoritative for
    *    the full result, unlike `samplesNote` (which caveats `samples` only).
-   * 2. `breakdown` came from a REAL terms aggregation whose BUCKET LIST is truncated — the terms
-   *    response's `sum_other_doc_count` > 0 (`sumOtherDocCounts` below). Per-bucket COUNTS are
-   *    still exact and population-true, but the KEY SET is top-N only: presenting 5 agent-name
-   *    buckets as "the agents affected" on a 12-agent deployment reproduces the exact
-   *    sample-narrated-as-population class one layer up, with the digest's own trust-the-
-   *    breakdown wording as warrant. The note states the uncounted remainder explicitly.
+   * 2. `breakdown` came from a REAL terms aggregation whose BUCKET LIST is truncated — either
+   *    OpenSearch's own `sum_other_doc_count` > 0 (a request-side `size` truncation) or this
+   *    digest's own carry cap (`capBreakdownCarry`, `ANSWER_BUCKET_CAP` — issue #8935 item 1, for
+   *    an enumeration-sized aggregation like `get_sca_results`), or both, merged into one figure
+   *    (`mergeTruncation`). Per-bucket COUNTS are still exact and population-true, but the KEY SET
+   *    is top-N only: presenting 5 agent-name buckets as "the agents affected" on a 12-agent
+   *    deployment reproduces the exact sample-narrated-as-population class one layer up, with the
+   *    digest's own trust-the-breakdown wording as warrant. The note states the uncounted
+   *    remainder explicitly, and names the carry cap itself when the digest side trimmed anything.
+   * 3. `breakdown` was synthesized from an UNTRUNCATED page (`returned === total`, so every count
+   *    is exact) but a dimension had more than `BREAKDOWN_BUCKET_CAP` distinct values — the same
+   *    "exact counts, top-N key set" gap as case 2, just arising from a JS `Map` cut instead of an
+   *    OpenSearch `sum_other_doc_count` (#8935's synthetic-breakdown silent-bind fix: the base
+   *    disclosed nothing here, because no request-side `sum_other_doc_count` equivalent exists for
+   *    a page grouped in memory).
    *
-   * Omitted for a real aggregation whose buckets are complete, and for a synthetic one over an
-   * untruncated result (`returned === total`, where grouping every returned row already IS
-   * grouping the full population). `buildSamplesNote`'s "trust the breakdown" variant keys off
-   * the SYNTHETIC-page-scope case only (see `syntheticPageScoped` in `buildDigest`): a real
-   * breakdown with a truncated key set still has exact counts, so pointing the model at
-   * counts/breakdown stays truthful — this note is what tells it the key list is not the
-   * universe. */
+   * Omitted for a real aggregation whose buckets are complete and under the carry cap, and for a
+   * synthetic one over an untruncated result whose every dimension stayed within
+   * `BREAKDOWN_BUCKET_CAP` distinct values. `buildSamplesNote`'s "trust the breakdown" variant keys
+   * off the SYNTHETIC-page-scope case only (see `syntheticPageScoped` in `buildDigest`): both case 2
+   * and case 3 keep exact, population-true counts, so pointing the model at counts/breakdown stays
+   * truthful in either — this note is what tells it the key list is not the universe. */
   breakdownNote?: string;
   /** Set only when `counts.returned` is 0 AND the executed query carried 2+ filter clauses — see
    * `buildZeroRowHint` below. A 0-row result is exactly as consistent with "a wrong field name" or
@@ -803,8 +811,46 @@ function buildZeroRowHint(
  * `buildBreakdown`'s real-aggregation buckets (~40 tokens for a handful of {key,count} pairs).
  * Exported so `catalog/common.ts`'s `FINDING_BREAKDOWN_AGGS` can size the REAL `terms` aggregation
  * it attaches to every finding-hits tool's request identically — the token cost of a breakdown
- * must not change depending on which path (real vs. synthetic) happens to serve a given call. */
+ * must not change depending on which path (real vs. synthetic) happens to serve a given call.
+ *
+ * This is the SIDE-DISCLOSURE budget (a breakdown attached alongside a hits-shaped answer, e.g.
+ * "which agents fired this rule" grouped onto a finding search) — it deliberately stays small.
+ * `ANSWER_BUCKET_CAP` below is the larger budget for when the breakdown itself IS the answer (an
+ * enumeration question, "list every failed check"). */
 export const BREAKDOWN_BUCKET_CAP = 5;
+
+/**
+ * Per-aggregation CARRY cap on a `breakdown` the digest ships to the model — the ceiling that
+ * applies once a request-side aggregation size is itself larger than `BREAKDOWN_BUCKET_CAP` (issue
+ * #8935 item 1). `BREAKDOWN_BUCKET_CAP` sizes every SIDE-DISCLOSURE aggregation in the codebase (the
+ * finding/vuln breakdowns `catalog/common.ts` attaches, plus every other request-side `size:
+ * BREAKDOWN_BUCKET_CAP` terms agg) — an aggregation sized larger than that at the REQUEST layer
+ * (`get_sca_results`' `limit`-driven `policies` agg up to `MAX_AGG_SIZE`; a model-authored
+ * `search_wazuh_data` enumeration agg) is, by that same signal, an ANSWER the model needs in full,
+ * not a side note. `buildDigest` does not re-derive that intent from the tool name or a new per-tool
+ * flag — the aggregation's own requested `size` already carries it (this is the same signal
+ * `population-disclosure-coverage.test.ts`'s `hasRealTermsAggregation` treats as "a distribution":
+ * `size >= BREAKDOWN_BUCKET_CAP`).
+ *
+ * Sizing arithmetic (why 50, not 100 or 20): a realistic SCA/enumeration bucket key runs ~30-70
+ * chars ("Ensure sshd PermitRootLogin is disabled" = 40; CIS benchmark check names are in this
+ * range). A serialized `{"key":"<45 chars>","count":1},` entry is ~66 chars (~86 with an `agg` tag
+ * for a multi-aggregation breakdown). 50 such buckets serialize to roughly 3,300-4,300 chars — 55-
+ * 72% of `DIGEST_CHAR_CAP` (6,000) — leaving 1,700+ chars for counts/columns/notes and the 5 sample
+ * rows (5 SCA sample rows serialize to roughly 500 chars). Worst case — every key at
+ * `MAX_FIELD_VALUE_LENGTH` (500 chars, the ceiling `capFieldValue` enforces per key) — 50 buckets is
+ * ~26,000 chars; `capDigest`'s existing pop loop degrades that gracefully (bounded, never a burst
+ * response), it just cannot happen to a realistic key. 100 buckets at realistic key lengths (~6,600-
+ * 8,600 chars) would ALREADY overflow `DIGEST_CHAR_CAP` on its own and silently pop under the base's
+ * untrimmed `buildBreakdown` — 50 is the largest budget that reliably coexists with `MAX_SAMPLES`
+ * rows without relying on that silent degradation path.
+ *
+ * Every bucket beyond this cap, per aggregation, is DISCLOSED (its count folded into
+ * `breakdownNote`'s remainder), never silently dropped — see `capBreakdownCarry` below. Does not
+ * change `MAX_SAMPLES` (5), `MAX_AGG_SIZE` (100), or any REQUEST-side `size` constant: this is a
+ * digest-carry cap only, applied after the response is already in hand.
+ */
+export const ANSWER_BUCKET_CAP = 50;
 
 /**
  * Synthesizes a `breakdown` from EVERY row the tool call returned (not just the `MAX_SAMPLES`
@@ -818,12 +864,36 @@ export const BREAKDOWN_BUCKET_CAP = 5;
  * `agg: dimension` — the dimension's own field path, not a real OpenSearch aggregation name — so
  * executor.ts can pass privacy.ts's `applyFieldPolicy` an identity map for these dimensions and
  * have the exact same bucket-scrubbing logic apply as for a real aggregation's breakdown.
+ *
+ * Also returns, per dimension, how many DISTINCT VALUES beyond the top `BREAKDOWN_BUCKET_CAP` were
+ * cut and the summed row count they represent (`hiddenPerDimension`) — issue #8935's silent-bind
+ * fix: on the base, when the page is untruncated (`returned === total`, so every count here is
+ * already exact over the full matched set) but a dimension has more than `BREAKDOWN_BUCKET_CAP`
+ * distinct values, the top-5 cut still silently drops the rest with no `sum_other_doc_count`
+ * equivalent to disclose it — unlike a real terms aggregation, which always carries one. The caller
+ * (`buildDigest`) turns this into the same `breakdownNote` wording a real aggregation's bucket-list
+ * truncation gets (`buildBucketTruncationNote`), rather than leaving this case silent because it
+ * happens to arise from a JS `Map`, not an OpenSearch response.
  */
 function buildSyntheticBreakdown(
   rows: Array<Record<string, unknown>>,
   dimensions: string[],
-): Array<{ key: string; count: number; agg: string }> | undefined {
+):
+  | {
+      breakdown: Array<{ key: string; count: number; agg: string }>;
+      hiddenPerDimension: Array<{
+        agg: string;
+        hiddenCount: number;
+        hiddenSum: number;
+      }>;
+    }
+  | undefined {
   const breakdown: Array<{ key: string; count: number; agg: string }> = [];
+  const hiddenPerDimension: Array<{
+    agg: string;
+    hiddenCount: number;
+    hiddenSum: number;
+  }> = [];
   for (const dimension of dimensions) {
     const counts = new Map<string, number>();
     for (const row of rows) {
@@ -833,14 +903,21 @@ function buildSyntheticBreakdown(
       }
       counts.set(value, (counts.get(value) ?? 0) + 1);
     }
-    const topBuckets = [...counts.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, BREAKDOWN_BUCKET_CAP);
+    const sortedEntries = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+    const topBuckets = sortedEntries.slice(0, BREAKDOWN_BUCKET_CAP);
     for (const [key, count] of topBuckets) {
       breakdown.push({ key, count, agg: dimension });
     }
+    const hiddenEntries = sortedEntries.slice(BREAKDOWN_BUCKET_CAP);
+    if (hiddenEntries.length > 0) {
+      hiddenPerDimension.push({
+        agg: dimension,
+        hiddenCount: hiddenEntries.length,
+        hiddenSum: hiddenEntries.reduce((sum, [, count]) => sum + count, 0),
+      });
+    }
   }
-  return breakdown.length > 0 ? breakdown : undefined;
+  return breakdown.length > 0 ? { breakdown, hiddenPerDimension } : undefined;
 }
 
 /** One-sentence caveat attached whenever `samples` is a strict subset of the returned rows: the
@@ -937,28 +1014,156 @@ function perAggOtherDocCounts(
 }
 
 /**
- * Caveat for a REAL breakdown whose bucket LIST is truncated (`sum_other_doc_count` > 0) — see
- * `Digest.breakdownNote`'s doc comment, case 2. Counts stay exact; the key set is what must not be
- * read as complete.
+ * The response's sole top-level aggregation NAME, when there is exactly one. `buildBreakdown` only
+ * tags each entry with `agg` when the response carries MORE than one top-level aggregation (see its
+ * doc comment) — an untagged (single-aggregation) breakdown therefore has no per-entry name to key
+ * a merge off of, but there is never any ambiguity about which real aggregation it came from: with
+ * exactly one top-level key, every breakdown entry can only have come from it. Returns `undefined`
+ * for zero or 2+ top-level keys (the 2+ case is exactly when entries ARE already tagged, so callers
+ * never need this fallback there).
+ */
+function soleAggKey(result: unknown): string | undefined {
+  const aggregations = (
+    result as { aggregations?: Record<string, unknown> } | undefined
+  )?.aggregations;
+  if (!aggregations) {
+    return undefined;
+  }
+  const keys = Object.keys(aggregations);
+  return keys.length === 1 ? keys[0] : undefined;
+}
+
+/**
+ * Per-top-level-aggregation CARRY cap on a REAL breakdown (issue #8935 item 1): trims `breakdown`
+ * to at most `ANSWER_BUCKET_CAP` entries per aggregation (grouped by `entry.agg`; an untagged
+ * single-aggregation breakdown is treated as one group), so an enumeration-sized aggregation
+ * (`get_sca_results`' up-to-`MAX_AGG_SIZE` `policies` agg, a model-authored `search_wazuh_data`
+ * enumeration) reaches the model in full up to that cap instead of riding the char-cap `capDigest`
+ * would otherwise silently pop it against. Buckets beyond the cap are never dropped un-disclosed —
+ * their count and summed `doc_count` are returned in `trimmed` for `buildDigest` to fold into the
+ * same `breakdownNote` a request-side `sum_other_doc_count` already produces (see `mergeTruncation`
+ * below). A no-op (identity trim, no `trimmed` entries) for every breakdown at or under the cap —
+ * every SIDE-DISCLOSURE breakdown in the codebase is request-sized at `BREAKDOWN_BUCKET_CAP` (5),
+ * far under `ANSWER_BUCKET_CAP` (50), so this function changes nothing for any of them.
+ */
+function capBreakdownCarry(
+  breakdown: Array<{ key: string; count: number; agg?: string }>,
+): {
+  carried: Array<{ key: string; count: number; agg?: string }>;
+  trimmed: Array<{ agg: string; hiddenCount: number; hiddenSum: number }>;
+} {
+  const groups = new Map<
+    string,
+    Array<{ key: string; count: number; agg?: string }>
+  >();
+  const groupOrder: string[] = [];
+  for (const entry of breakdown) {
+    const groupKey = entry.agg ?? '';
+    if (!groups.has(groupKey)) {
+      groups.set(groupKey, []);
+      groupOrder.push(groupKey);
+    }
+    groups.get(groupKey)!.push(entry);
+  }
+  const carried: Array<{ key: string; count: number; agg?: string }> = [];
+  const trimmed: Array<{
+    agg: string;
+    hiddenCount: number;
+    hiddenSum: number;
+  }> = [];
+  for (const groupKey of groupOrder) {
+    const entries = groups.get(groupKey)!;
+    if (entries.length <= ANSWER_BUCKET_CAP) {
+      carried.push(...entries);
+      continue;
+    }
+    carried.push(...entries.slice(0, ANSWER_BUCKET_CAP));
+    const hidden = entries.slice(ANSWER_BUCKET_CAP);
+    trimmed.push({
+      agg: groupKey,
+      hiddenCount: hidden.length,
+      hiddenSum: hidden.reduce((sum, entry) => sum + entry.count, 0),
+    });
+  }
+  return { carried, trimmed };
+}
+
+/**
+ * Merges the REQUEST-side truncation (`perAggOtherDocCounts`, OpenSearch's own
+ * `sum_other_doc_count`) with the DIGEST-side carry trim (`capBreakdownCarry`, `ANSWER_BUCKET_CAP`)
+ * into one per-aggregation `other` figure, so a single `breakdownNote` discloses the full uncounted
+ * remainder regardless of which layer did the cutting — the model must never see only one half of a
+ * two-stage trim. Keyed by the real top-level aggregation NAME in both inputs: `perAggOtherDocCounts`
+ * already reports that name; a `capBreakdownCarry` trim group is tagged with the same name only when
+ * `buildBreakdown` saw more than one top-level aggregation (its tagging rule) — for the untagged
+ * single-aggregation case, `soleAgg` supplies the name instead (see `soleAggKey`'s doc comment for
+ * why that resolution is always unambiguous there).
+ */
+function mergeTruncation(
+  requestSideOther: Array<{ agg: string; other: number }>,
+  digestSideTrim: Array<{
+    agg: string;
+    hiddenCount: number;
+    hiddenSum: number;
+  }>,
+  soleAgg: string | undefined,
+): { merged: Array<{ agg: string; other: number }>; digestTrimmed: boolean } {
+  const byAgg = new Map<string, number>();
+  const order: string[] = [];
+  const add = (agg: string, other: number): void => {
+    if (!byAgg.has(agg)) {
+      order.push(agg);
+    }
+    byAgg.set(agg, (byAgg.get(agg) ?? 0) + other);
+  };
+  for (const { agg, other } of requestSideOther) {
+    add(agg, other);
+  }
+  let digestTrimmed = false;
+  for (const { agg, hiddenSum } of digestSideTrim) {
+    digestTrimmed = true;
+    add(agg || soleAgg || '(breakdown)', hiddenSum);
+  }
+  return {
+    merged: order.map(agg => ({ agg, other: byAgg.get(agg)! })),
+    digestTrimmed,
+  };
+}
+
+/**
+ * Caveat for a `breakdown` whose bucket LIST is truncated — either OpenSearch's own
+ * `sum_other_doc_count` (a request-side `size` truncation) or this digest's own `capBreakdownCarry`
+ * (a carry-cap truncation, `digestTrimAt` set), or both, already merged into one per-agg `other`
+ * figure by `mergeTruncation` — see `Digest.breakdownNote`'s doc comment, case 2. Counts stay exact;
+ * the key set is what must not be read as complete.
  *
  * Named per dimension (matching `breakdown[].agg`) so a multi-dimension breakdown attributes each
  * remainder to the dimension it belongs to. Worded as further MATCHES, never as additional ROWS:
  * on a multi-valued keyword field — `wazuh.rule.mitre.technique.id` and `wazuh.rule.tags` are
  * arrays — the remainder can be the SAME documents counted again under other keys, so a row count
  * would be false even for a single aggregation.
+ *
+ * `digestTrimAt`, when set, names the cap this digest itself applied (`ANSWER_BUCKET_CAP` for a real
+ * breakdown, `BREAKDOWN_BUCKET_CAP` for a synthetic one) so the model knows the LISTED keys are
+ * themselves a top-N cut, not just that more exist beyond them.
  */
 function buildBucketTruncationNote(
   truncatedAggs: Array<{ agg: string; other: number }>,
   breakdownIsMultiDimension: boolean,
+  digestTrimAt?: number,
 ): string {
   const remainder = breakdownIsMultiDimension
     ? truncatedAggs.map(({ agg, other }) => `${agg}: ${other}`).join(', ')
     : String(truncatedAggs[0].other);
+  const carryNote =
+    digestTrimAt !== undefined
+      ? ` The breakdown lists the top ${digestTrimAt} buckets by count.`
+      : '';
   return (
     'Per-bucket counts are exact, but the bucket list is top-N only — further matches fall under ' +
-    `keys not listed (${remainder}). On a multi-valued field those may be the same rows counted ` +
-    'under other keys, so do not add them to the row total; do not present the listed keys as the ' +
-    'complete set of values.'
+    `keys not listed (${remainder}).${carryNote} On a multi-valued field those may be the same rows ` +
+    'counted under other keys, so do not add them to the row total; do not present the listed keys ' +
+    'as the complete set of values.'
   );
 }
 
@@ -1020,19 +1225,52 @@ export function buildDigest(
     def.digest.breakdownDimensions &&
     returned > MAX_SAMPLES
   ) {
-    breakdown = buildSyntheticBreakdown(rows, def.digest.breakdownDimensions);
+    const synthetic = buildSyntheticBreakdown(
+      rows,
+      def.digest.breakdownDimensions,
+    );
+    breakdown = synthetic?.breakdown;
     if (breakdown && truncated) {
       breakdownNote = buildBreakdownNote(total, returned);
       syntheticPageScoped = true;
+    } else if (breakdown && synthetic!.hiddenPerDimension.length > 0) {
+      // #8935's silent-bind fix: `returned === total` here (the `truncated` branch above already
+      // claimed the alternative), so every count is exact over the full matched set — but the KEY
+      // LIST per dimension is still a top-`BREAKDOWN_BUCKET_CAP` cut of the distinct values seen,
+      // exactly the same "exact counts, top-N key set" situation a real aggregation's
+      // `sum_other_doc_count` already discloses. `breakdownIsPopulationTrue` in `buildSamplesNote`
+      // below stays true for this case (only `syntheticPageScoped` flips it) — grouping every
+      // returned row IS grouping the population; only which KEYS are shown is truncated.
+      breakdownNote = buildBucketTruncationNote(
+        synthetic!.hiddenPerDimension.map(({ agg, hiddenSum }) => ({
+          agg,
+          other: hiddenSum,
+        })),
+        def.digest.breakdownDimensions.length > 1,
+        BREAKDOWN_BUCKET_CAP,
+      );
     }
   } else if (realBreakdown) {
-    const truncatedAggs = perAggOtherDocCounts(result);
-    if (truncatedAggs.length > 0) {
+    // #8935 item 1: carry an enumeration-sized real breakdown up to `ANSWER_BUCKET_CAP` instead of
+    // shipping it whole (base behavior — see `buildBreakdown`, which is itself unbounded) and
+    // relying on `capDigest`'s char-cap pop to silently degrade it. Any bucket this carry cap hides
+    // is folded into the same disclosure a request-side `sum_other_doc_count` produces, so the
+    // model never sees an unmarked gap regardless of which layer did the trimming.
+    const { carried, trimmed } = capBreakdownCarry(realBreakdown);
+    breakdown = carried;
+    const requestSideOther = perAggOtherDocCounts(result);
+    const { merged, digestTrimmed } = mergeTruncation(
+      requestSideOther,
+      trimmed,
+      soleAggKey(result),
+    );
+    if (merged.length > 0) {
       // `buildBreakdown` tags rows with `agg` only when the response carried more than one
       // aggregation, so that same flag decides whether the note has to name its dimensions.
       breakdownNote = buildBucketTruncationNote(
-        truncatedAggs,
+        merged,
         realBreakdown.some(row => row.agg !== undefined),
+        digestTrimmed ? ANSWER_BUCKET_CAP : undefined,
       );
     }
   }
@@ -1166,6 +1404,20 @@ function truncateLongFieldValues(digest: Digest): void {
  * enforces — measured against the REAL values below — is not automatically still respected after
  * that substitution. digest.ts itself stays privacy-agnostic (see privacy.ts's `extractAggFields`
  * comment for why); it only needs to expose this cap step for the caller to re-apply.
+ *
+ * KNOWN RESIDUAL (issue #8935 item 1): this loop's drops are UNDISCLOSED — a sample or breakdown
+ * entry popped here is not folded into `samplesNote`/`breakdownNote`, both already worded before
+ * this function runs. `capBreakdownCarry`'s `ANSWER_BUCKET_CAP` carry cap (applied earlier, in
+ * `buildDigest`) makes this residual rare by construction rather than eliminating it: per that
+ * cap's own sizing arithmetic, a breakdown at 50 realistic-length buckets sits at 55-72% of
+ * `DIGEST_CHAR_CAP`, so this loop only pops breakdown entries when keys run unusually long
+ * (approaching `MAX_FIELD_VALUE_LENGTH`) or another oversized field (a long sample column, a large
+ * `hint`) has already consumed most of the budget — no longer the routine path an untrimmed
+ * 100-bucket breakdown used to take on the base. Left as a residual rather than re-worded here
+ * because doing so would mean recomputing `samplesNote`/`breakdownNote` inside this loop against
+ * whatever got popped, which this function deliberately does not have the context for (it runs
+ * post-privacy-substitution too, see above, where the original row/bucket counts are no longer at
+ * hand). A future fix would need to move disclosure to run AFTER this cap, not before it.
  */
 export function capDigest(digest: Digest): Digest {
   truncateLongFieldValues(digest);
