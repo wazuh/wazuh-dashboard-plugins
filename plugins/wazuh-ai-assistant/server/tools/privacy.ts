@@ -504,11 +504,13 @@ const ALL_NUMERIC_DOTTED_RE = /^[0-9.]+Z?$/;
  * version grammar rather than the narrower "digit-only labels" shape: an optional leading "v"
  * (semver-style, "v1.2.3"), an all-digit FIRST label, then one-or-more subsequent dot-labels each
  * STARTING with a digit but allowed to carry letters after it (so "118ubuntu5", "1ubuntu2",
- * "20191218" all count as one label each), and an optional final "-revision" suffix whose own
- * characters may include dots/"+"/"~" (so "-1ubuntu1~22.04.3" and "-4+deb11u1" — real Debian NMU/
- * backport revision syntax — match as a unit). `prescanAndMint` leaves these untouched — minting a
- * HOST_n for a version string undermines a `package.version:{allow}`-style query the user is
- * asking about.
+ * "1k", "9p1" all count as one label each), and an optional final "-revision" suffix that may
+ * itself carry dots and MORE hyphens ("-213.224", and the kernel family's "-91-generic"/
+ * "-150-lowlatency" — a second hyphen is the single most common version shape in Wazuh Linux
+ * inventory, via agent.os.kernel/linux-image packages). `prescanAndMint` leaves these untouched —
+ * minting a HOST_n for a version string undermines a `package.version:{allow}`-style query the
+ * user is asking about. Tokens containing "+"/"~" never reach this regex at all (the tokenizer
+ * splits at them) — see `FULL_COMPOUND_VERSION_RE` below for how those are handled.
  *
  * (#8920 item 8): the previous digits-only-label shape rejected "3.118ubuntu5" and
  * "3.20191218.1ubuntu2.3" — real `dpkg -l` versions with letters fused directly into a dot-label,
@@ -526,13 +528,63 @@ const ALL_NUMERIC_DOTTED_RE = /^[0-9.]+Z?$/;
  * case where it isn't ("01server.corp.local", "3com.example.com"), still carries a letter WITHIN
  * that same first label — which fails "first label all-digit" outright, since this is a per-label
  * structural check, not a "starts with a digit" check. The residue that IS excluded (first label
- * pure digits, every later label digit-initial) is exactly the shape Debian policy mandates for an
- * upstream version (`\d[\d.+~A-Za-z-]*`) and no real deployment uses as a hostname; a token of that
- * shape is indistinguishable from a version string by any test that only looks at the token itself.
- * The accepted tradeoff for that pathological residue is fidelity, not privacy: worst case a
- * version-shaped string is (correctly) never minted, never that a real hostname is missed. */
+ * pure digits, every later label digit-initial) is a shape no real deployment uses as a hostname;
+ * a token of that shape is indistinguishable from a version string by any test that only looks
+ * at the token itself. The accepted tradeoff for that pathological residue is fidelity, not
+ * privacy: worst case a version-shaped string is (correctly) never minted, never that a real
+ * hostname is missed.
+ *
+ * KNOWN, DELIBERATE RESIDUE (recorded so it is not mistaken for an oversight): a version label
+ * that starts with a LETTER after a dot — RPM dist tags fused into the version ("4.6.3.el7"),
+ * pre-release labels ("2.0.rc1", "4.0.dev0", "1.0.beta3") — is still minted, because loosening
+ * "every later label digit-initial" to accept letter-initial labels would stop minting real
+ * FQDNs whose first label is all-numeric: "0.pool.ntp.org", "1.gravatar.com",
+ * "2.bp.blogspot.com", "10.corp.local" are common, real hostnames of exactly that shape. That
+ * direction is a privacy regression, so this residue is NOT closable at the token level; the
+ * hostname corpus in privacy.test.ts pins those FQDNs as always-minting to keep it that way.
+ * (Debian policy only constrains the FIRST character of an upstream version, so those residual
+ * shapes are legal versions — the coverage here is structural-but-not-total, by choice.) */
 const VERSION_LIKE_TOKEN_RE =
-  /^v?\d+(?:\.\d[0-9A-Za-z+~]*)+(?:-[0-9A-Za-z.+~]+)?$/i;
+  /^v?\d+(?:\.\d[0-9A-Za-z]*)+(?:-[0-9A-Za-z.-]+)?$/i;
+
+/** Characters a whole (whitespace/quote-delimited) package-version token may carry — used by
+ * `expandToFullToken` to grow an FQDN sub-match back to the full token the tokenizer split.
+ * Includes "+"/"~" (Debian revision separators, at which FQDN_TOKEN_RE splits) and ":" (epoch,
+ * "1:2.4.41-4+deb11u1"). */
+const VERSION_TOKEN_CHAR_RE = /[0-9A-Za-z.+~:-]/;
+
+/**
+ * The WHOLE-token version test for compound Debian/RPM versions that FQDN_TOKEN_RE splits at
+ * "+"/"~": "2.4.37-43.module+el8.5.0+1022+b541f3b1" yields the FQDN-shaped sub-token "el8.5.0",
+ * "1.0+git20200101.abc1234-1" yields "git20200101.abc1234-1", "0.9.8+really0.9.7-1" yields
+ * "really0.9.7-1" — every one previously minted as HOST_n, corrupting the very version value a
+ * `package.version:{allow}` query is about. The rule: when the FULL surrounding token (a) is
+ * strictly larger than the FQDN match, (b) contains a "+" or "~" (the separators that caused the
+ * split — this is the load-bearing restriction), and (c) starts like a version (`v?` + digit)
+ * and stays within the version charset, the sub-token is part of a version string, not a
+ * hostname. Requiring (b) is what keeps "1.gravatar.com"/"0.pool.ntp.org" minting: they contain
+ * no "+"/"~", so they never take this path — only a hostname GLUED to a version by a "+"/"~"
+ * (no real naming scheme does this) could ever be skipped, and that direction is fidelity, not
+ * privacy. */
+const FULL_COMPOUND_VERSION_RE = /^v?\d[0-9A-Za-z.+~:-]*$/i;
+
+/** Grows the FQDN match at `offset` (length `length`) in `text` to the full surrounding token of
+ * version-charset characters — see `FULL_COMPOUND_VERSION_RE`. */
+function expandToFullToken(
+  text: string,
+  offset: number,
+  length: number,
+): string {
+  let start = offset;
+  while (start > 0 && VERSION_TOKEN_CHAR_RE.test(text[start - 1])) {
+    start -= 1;
+  }
+  let end = offset + length;
+  while (end < text.length && VERSION_TOKEN_CHAR_RE.test(text[end])) {
+    end += 1;
+  }
+  return text.slice(start, end);
+}
 
 /** Every dot-path SEGMENT word appearing in a curated Wazuh/ECS field name — drawn from
  * `WAZUH_FIELD`'s values and every plain field in `FIELD_POLICY_DEFAULTS` (a tool-scope
@@ -603,11 +655,23 @@ export function prescanAndMint(
   out = out.replace(IPV6_TOKEN_RE, token =>
     pseudonymizer.pseudonymize(token, 'IP'),
   );
-  out = out.replace(FQDN_TOKEN_RE, token => {
+  out = out.replace(FQDN_TOKEN_RE, (token, offset: number, subject: string) => {
     if (
       ALL_NUMERIC_DOTTED_RE.test(token) ||
       VERSION_LIKE_TOKEN_RE.test(token) ||
       isFieldPathToken(token)
+    ) {
+      return token;
+    }
+    // Compound-version residue: the tokenizer splits at "+"/"~", so a Debian/RPM compound
+    // version yields FQDN-shaped fragments ("el8.5.0", "git20200101.abc1234-1") the per-token
+    // regex above can never see whole. Test the FULL surrounding token instead — see
+    // FULL_COMPOUND_VERSION_RE's doc comment for the rule and its hostname-safety argument.
+    const fullToken = expandToFullToken(subject, offset, token.length);
+    if (
+      fullToken !== token &&
+      /[+~]/.test(fullToken) &&
+      FULL_COMPOUND_VERSION_RE.test(fullToken)
     ) {
       return token;
     }
