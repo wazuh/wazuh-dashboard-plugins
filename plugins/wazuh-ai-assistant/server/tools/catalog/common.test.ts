@@ -5,6 +5,8 @@ import {
   severitiesAtOrAbove,
   severitiesAtOrBelow,
   severityFilterValues,
+  VULN_BREAKDOWN_AGGS,
+  VULN_BREAKDOWN_DIMENSIONS,
 } from './common';
 import { BREAKDOWN_BUCKET_CAP } from '../digest';
 
@@ -143,3 +145,27 @@ test('FINDING_BREAKDOWN_AGGS declares one terms aggregation per FINDING_BREAKDOW
     assert.equal(agg.terms?.size, BREAKDOWN_BUCKET_CAP);
   }
 });
+
+// --- VULN_BREAKDOWN_AGGS: real aggregations attached to the 3 hits-based vulnerability tools ----
+// (issue #8920 item 1: "no high-severity vulnerabilities" on a host that actually has some, just
+// sorted outside the returned page).
+
+test('VULN_BREAKDOWN_AGGS declares one terms aggregation per VULN_BREAKDOWN_DIMENSIONS', () => {
+  assert.equal(
+    Object.keys(VULN_BREAKDOWN_AGGS).length,
+    VULN_BREAKDOWN_DIMENSIONS.length,
+  );
+  for (const field of VULN_BREAKDOWN_DIMENSIONS) {
+    const aggName = field.replace(/\./g, '_');
+    const agg = VULN_BREAKDOWN_AGGS[aggName] as {
+      terms?: { field?: string; size?: number };
+    };
+    assert.ok(
+      agg,
+      `expected an aggregation named "${aggName}" for field "${field}"`,
+    );
+    assert.equal(agg.terms?.field, field);
+    assert.equal(agg.terms?.size, BREAKDOWN_BUCKET_CAP);
+  }
+});
+
