@@ -1563,7 +1563,11 @@ export function buildDigest(
   // is the projection-immune carrier.
   const metrics = extractMetricAggs(result, requestBody);
   const coverage = buildCoverageNote({
-    total,
+    // The MATCHED-SET size, which is not always `total`: on the bucket-rows path `extractRows`
+    // rewrites `total` to the BUCKET COUNT, so using it here claimed "all 1 matching rows" for an
+    // aggregation computed over 5000 documents -- the coverage claim's first false statement, caught
+    // by its own test. `rawHitsTotal` is the population the aggregation actually covered.
+    total: rawHitsTotal ?? total,
     returned,
     sampleCount: samples.length,
     hasRealBreakdown: !!realBreakdown,

@@ -1661,6 +1661,8 @@ test('buildDigest: a truncated bucket list says "top N only" instead of claiming
     },
   };
   const digest = buildDigest('get_top_rules', result, def, { size: 0 });
+  // 5000 is `hits.total` (the matched set the aggregation covered), NOT digest.counts.total, which
+  // the bucket-rows path rewrites to the bucket count -- the distinction this test caught.
   assert.match(digest.coverage!, /all 5000 matching rows/);
   assert.match(digest.coverage!, /top 1 value\(s\) only/);
   assert.doesNotMatch(digest.coverage!, /lists all/);
