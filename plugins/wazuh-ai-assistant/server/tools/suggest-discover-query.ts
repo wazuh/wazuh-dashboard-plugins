@@ -223,6 +223,28 @@ function collectFieldNames(clause: unknown, acc: Set<string>): void {
 }
 
 /**
+ * What `resolveSuggestedDsl` found out about a `suggest_discover_query` call's DSL, as a
+ * discriminated result rather than bare DSL (issue #8920 items 4/9): the caller (chat.ts) needs to
+ * know WHICH kind of "could not fully verify" happened, because the two are handled differently --
+ * `unknown_fields` names field(s) the MODEL chose and can plausibly correct (a bounded
+ * self-correction retry, same contract as every other tool), whereas `unverifiable_index` and
+ * `no_field_filters` are not the model's fault to fix by retrying with different field names.
+ * `strippedDsl` (present on both non-`verified`, non-`no_field_filters` outcomes) is the same
+ * index+time-range-only fallback the old bare-DSL return silently produced -- now paired with
+ * enough information for the caller to also disclose the strip to the user, per this file's SAFETY
+ * DECISION below.
+ */
+export type SuggestedDslResolution =
+  | { outcome: 'verified'; dsl: Record<string, unknown> }
+  | {
+      outcome: 'unknown_fields';
+      unknownFields: string[];
+      strippedDsl: Record<string, unknown>;
+    }
+  | { outcome: 'unverifiable_index'; strippedDsl: Record<string, unknown> }
+  | { outcome: 'no_field_filters'; dsl: Record<string, unknown> };
+
+/**
  * Resolves what DSL a `suggest_discover_query` call's Discover link should actually carry.
  *
  * SAFETY DECISION (this is the load-bearing part of this file — see issue
@@ -245,7 +267,7 @@ export async function resolveSuggestedDsl(
   index: string,
   dsl: Record<string, unknown>,
   logger: Logger,
-): Promise<Record<string, unknown>> {
+): Promise<SuggestedDslResolution> {
   const timeRangeOnlyDsl = buildTimeRangeOnlyDsl(index, dsl);
 
   const allowlistCheck = checkIndexAllowlist(index);
@@ -256,7 +278,7 @@ export async function resolveSuggestedDsl(
         'suggested query to index + time range only rather than widening the allowlist for a ' +
         "metadata read (see suggest-discover-query.ts's resolveSuggestedDsl doc comment).",
     );
-    return timeRangeOnlyDsl;
+    return { outcome: 'unverifiable_index', strippedDsl: timeRangeOnlyDsl };
   }
 
   const fieldNames = new Set<string>();
@@ -264,7 +286,7 @@ export async function resolveSuggestedDsl(
   if (fieldNames.size === 0) {
     // Nothing field-level to verify (e.g. the model already only asked for a time range) -- the
     // original clause is already the same shape resolveSuggestedDsl would otherwise strip TO.
-    return dsl;
+    return { outcome: 'no_field_filters', dsl };
   }
 
   try {
@@ -279,15 +301,29 @@ export async function resolveSuggestedDsl(
           ?.fields ?? {},
       ),
     );
-    const allKnown = [...fieldNames].every(name => knownFields.has(name));
-    return allKnown ? dsl : timeRangeOnlyDsl;
+    const unknownFields = [...fieldNames].filter(
+      name => !knownFields.has(name),
+    );
+    if (unknownFields.length > 0) {
+      return {
+        outcome: 'unknown_fields',
+        unknownFields,
+        strippedDsl: timeRangeOnlyDsl,
+      };
+    }
+    return { outcome: 'verified', dsl };
   } catch (error) {
+    // Same "cannot verify, so strip" treatment as the allowlist-blocked branch above: a
+    // `_field_caps` transport/cluster failure is just as unverifiable as an out-of-reach index, and
+    // just as much NOT the model's fault to fix by retrying with different field names -- so it is
+    // folded into `unverifiable_index` (the non-retryable outcome) rather than given a fifth,
+    // separate outcome.
     logger.debug(
       `wazuhAiAssistant: suggest_discover_query's _field_caps check failed for index "${index}" ` +
         `(${describeError(
           error,
         )}) -- stripping the suggested query to index + time range only.`,
     );
-    return timeRangeOnlyDsl;
+    return { outcome: 'unverifiable_index', strippedDsl: timeRangeOnlyDsl };
   }
 }
