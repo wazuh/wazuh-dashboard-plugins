@@ -267,10 +267,15 @@ test('get_agent_inventory: KIND_BREAKDOWN_EXEMPT names only real kinds (stale-ex
 });
 
 test('get_agent_inventory: every breakdown-agg request passes applySafetyValves + lintDsl', () => {
+  // Without this guard the loop passes vacuously if INVENTORY_KIND_CONFIG ever lost every
+  // breakdownAggs entry (e.g. a refactor that renamed the field) -- same "nothing exempt by
+  // default" standard as agg-representability-coverage.test.ts's indexerTools.length check.
+  let checkedCount = 0;
   for (const [kind, config] of Object.entries(INVENTORY_KIND_CONFIG)) {
     if (!config.breakdownAggs) {
       continue;
     }
+    checkedCount += 1;
     const req = buildIndexer({ agent_id: '003', kind });
     const valved = applySafetyValves(req.body);
     assert.equal(valved.ok, true, valved.ok ? '' : `${kind}: ${valved.reason}`);
@@ -280,6 +285,10 @@ test('get_agent_inventory: every breakdown-agg request passes applySafetyValves 
     const lint = lintDsl(valved.body, req.index);
     assert.equal(lint.ok, true, lint.ok ? '' : `${kind}: ${lint.reason}`);
   }
+  assert.ok(
+    checkedCount > 0,
+    'no INVENTORY_KIND_CONFIG kind declared a breakdownAggs -- this test would pass vacuously',
+  );
 });
 
 test('get_agent_inventory: limit is clamped to [1, 500] for the 3 limit-taking folded-in kinds', () => {
