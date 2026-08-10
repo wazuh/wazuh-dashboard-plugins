@@ -195,6 +195,38 @@ test('lintDsl: steers a "prefix" clause on a vulnerability field away from the f
   }
 });
 
+// Cross-category tool audit (same bug shape as issue #8913): this reason reaches the model via
+// search_wazuh_data/find_document_by_field (`free_search`, always offered), but the four tools it
+// used to name unconditionally live in the separate `vulnerabilities` category, which is not
+// guaranteed to be offered on the same turn. Pins the conditional wording and the explicit
+// no-tools-available fallback so a future edit cannot silently reintroduce an unconditional
+// "use the vulnerability tools" instruction naming a tool set that may not exist this turn.
+test('lintDsl: the vulnerability-field steering reason is conditional on those tools being offered, not unconditional', () => {
+  const body = {
+    query: {
+      bool: {
+        filter: [
+          { range: { '@timestamp': { gte: 'now-1d', lte: 'now' } } },
+          { term: { 'vulnerability.severity': 'Critical' } },
+        ],
+      },
+    },
+    size: 20,
+  };
+  const result = lintDsl(body, 'wazuh-events-v5-*');
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.match(
+      result.reason,
+      /whichever of those is offered to you this\s+turn/,
+    );
+    assert.match(
+      result.reason,
+      /If none of them\s+are available to you this turn, tell the user this assistant cannot check\s+vulnerability data\s+from here/,
+    );
+  }
+});
+
 test('lintDsl: a "prefix" clause on a non-vulnerability field is unaffected by the steering check', () => {
   const body = {
     query: {

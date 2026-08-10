@@ -28,7 +28,9 @@ export const getEventsByAgentTool: ToolDefinition = {
       'Searches the raw normalized event stream, most recent first, optionally scoped to one ' +
       `named agent (host/machine/endpoint). ${EVENTS_SCOPE_NOTE} Use for "everything that ` +
       'happened on/in the last N hours" questions, or to check whether events exist at all when a ' +
-      'findings-tool search returned 0 rows.',
+      'findings-tool search returned 0 rows. Does NOT cover automated actions Wazuh itself took ' +
+      '(active response, blocking, quarantine) -- no tool covers active-response actions, so say ' +
+      'that plainly rather than treating a normalized event as evidence of one.',
     parameters: objectSchema({
       agent_name: {
         type: 'string',

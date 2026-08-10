@@ -354,7 +354,7 @@ const updateBodySchema = schema.object({
  */
 export function registerConversationRoutes(
   router: IRouter,
-  _logger: Logger,
+  logger: Logger,
 ): void {
   // List: summaries only (id/title/updatedAt) — never `messages`, so listing never pulls every
   // saved transcript over the wire just to render a sidebar.
@@ -369,7 +369,10 @@ export function registerConversationRoutes(
       if (owner === undefined) {
         return ownerUnresolvedResponse(response);
       }
-      const assistantSettings = await getOrCreateAssistantSettings(request);
+      const assistantSettings = await getOrCreateAssistantSettings(
+        request,
+        logger,
+      );
       const retentionDays = assistantSettings.conversationRetentionDays;
       const { page, perPage } = resolvePagination(request.query);
 

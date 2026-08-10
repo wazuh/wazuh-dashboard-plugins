@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {
   resolveSuggestedDsl,
+  SUGGEST_DISCOVER_QUERY_TOOL,
   validateSuggestDiscoverQueryArgs,
 } from './suggest-discover-query';
 
@@ -412,4 +413,39 @@ test('resolveSuggestedDsl: a wazuh-states-* index uses state.modified_at for the
       },
     });
   }
+});
+
+// #8915: the tool's own description previously read as one optional capability among several,
+// which measured live traffic showed the model never invoked. Pins the "required final step, not
+// an optional extra" framing and all three trigger conditions so a reword that drops any of them
+// fails loudly.
+
+test('SUGGEST_DISCOVER_QUERY_TOOL: description frames the call as the required final step, not an optional extra', () => {
+  assert.match(
+    SUGGEST_DISCOVER_QUERY_TOOL.description,
+    /The required final step of a turn you cannot fully answer — not an optional extra/,
+  );
+});
+
+test('SUGGEST_DISCOVER_QUERY_TOOL: description names all three #8915 trigger conditions', () => {
+  const { description } = SUGGEST_DISCOVER_QUERY_TOOL;
+  assert.match(
+    description,
+    /no other tool available to you covers what the user asked about\s+at all/,
+  );
+  assert.match(
+    description,
+    /a tool call came back with zero rows and that zero is\s+your whole answer/,
+  );
+  assert.match(
+    description,
+    /the\s+rows you would need were truncated away and the question depends on seeing every row/,
+  );
+});
+
+test('SUGGEST_DISCOVER_QUERY_TOOL: description still states it never fetches data itself', () => {
+  assert.match(
+    SUGGEST_DISCOVER_QUERY_TOOL.description,
+    /nothing here is executed on your behalf/,
+  );
 });

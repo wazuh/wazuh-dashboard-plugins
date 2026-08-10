@@ -40,7 +40,12 @@ export const searchWazuhDataTool: ToolDefinition = {
       '("cardinality"/"avg"/"sum"/"min"/"max"/"value_count") are returned to you in the digest. ' +
       'If "aggs" has more than one top-level aggregation, every aggregation\'s buckets are ' +
       'summarized in the digest text you receive, but the rendered table only shows the first ' +
-      "BUCKET aggregation's buckets.",
+      'aggregation\'s buckets. For a "how many DISTINCT X" question, use a "cardinality" ' +
+      'aggregation on an ALLOWLISTED keyword field such as wazuh.agent.name (for distinct hosts/' +
+      'agents) instead of counting hits -- a hit count overcounts when one host has multiple ' +
+      'documents. Only a fixed set of low-cardinality fields is allowed for this (the allowlist ' +
+      'may grow over time); an arbitrary field like source.user.name or file.path is rejected -- ' +
+      'if the field you need is not accepted, say so rather than retrying variations.',
     parameters: objectSchema(
       {
         index_pattern: {
@@ -106,5 +111,11 @@ export const searchWazuhDataTool: ToolDefinition = {
   tableSpec: { columns: [] },
   digest: { sampleColumns: [] },
   deriveColumns: true,
+  // The genuine escape hatch: the model's own DSL can put ANY finding/event/state field into the
+  // digest, so an unlisted field must fail closed (issue #8917 -- see
+  // `ToolDefinition.failClosedFieldPolicy`'s doc comment, types.ts; this used to be inherited from
+  // `deriveColumns` above, now explicit). Do not set this to `false` -- that would remove the
+  // fail-closed protection this tool has always had.
+  failClosedFieldPolicy: true,
   validateFieldNames: true,
 };
