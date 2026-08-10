@@ -139,6 +139,7 @@
 | [#8920](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8920) | Fixed the AI Assistant silently misreporting narrowed-window and near-miss agent-name queries                                                                                                 |
 | [#8920](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8920) | Fixed AI Assistant privacy mode pseudonymizing package versions and MITRE sub-technique ids as hostnames                                                                                      |
 | [#8920](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8920) | Fixed an empty result table overwriting a populated one at the end of an AI Assistant answer                                                                                                  |
+| [#8935](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8935) | Fixed AI Assistant enumeration answers being silently thinned: the digest now carries aggregation buckets to a char budget with every trim disclosed, SCA topic questions get a scoped check-name enumeration, a deferred single-tool offer is chained in code instead of ending the turn, and an over-wide time window is capped and disclosed instead of rejected |
 
 ### Removed
 

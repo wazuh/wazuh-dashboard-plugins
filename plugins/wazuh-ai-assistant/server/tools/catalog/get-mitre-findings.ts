@@ -1,5 +1,5 @@
 import { ToolDefinition } from '../types';
-import { BREAKDOWN_BUCKET_CAP } from '../digest';
+import { ANSWER_BUCKET_CAP } from '../digest';
 import {
   findingDigestColumns,
   findingRowFields,
@@ -76,9 +76,9 @@ function escapeTechniqueIdForRegexp(id: string): string {
  * buildMitreTechniqueFilter's query-side rollup above, and the fix for a real disclosure loss:
  * `wazuh.rule.mitre.technique.id` is a keyword ARRAY, so one document commonly carries several
  * co-tagged technique ids (live evidence: a single finding tagged with six ids spanning three
- * unrelated tactics). Those co-tags compete for the SAME `BREAKDOWN_BUCKET_CAP` (5) bucket slots
- * as the ids the user actually asked about, so a sufficiently co-tagged population can push a
- * genuine parent/sub-technique pair out of the top 5 entirely -- silently dropping the very
+ * unrelated tactics). Those co-tags compete for the SAME bucket slots as the ids the user
+ * actually asked about, so a sufficiently co-tagged population can push a genuine
+ * parent/sub-technique pair out of the bucket list entirely -- silently dropping the very
  * exact-vs-rolled-up split this aggregation exists to disclose (see this file's header comment).
  * Scoping via `include` removes co-tagged ids from the aggregation's candidate set altogether
  * (they are excluded before bucketing, not merely outranked), so they can no longer crowd out the
@@ -178,8 +178,8 @@ export const getMitreFindingsTool: ToolDefinition = {
         // technique_ids carries an `include` (buildTechniqueIdsAggInclude above) whenever a
         // technique_id was requested: `wazuh.rule.mitre.technique.id` is a keyword ARRAY, so
         // co-tagged ids on the same document compete with the requested id's own buckets for
-        // BREAKDOWN_BUCKET_CAP slots -- without scoping, a co-tag-heavy population can push the
-        // requested id's parent/sub-technique buckets out of the top 5 and silently drop the
+        // the same slots -- without scoping, a co-tag-heavy population can push the
+        // requested id's parent/sub-technique buckets out of the list and silently drop the
         // split disclosure this aggregation exists for. `include` is on `AGG_FIELD_ALLOWLIST`'s
         // TERMS_LIKE_AGG_KEYS path in guardrails.ts, which checks only `field`/`size` -- it does
         // not inspect or restrict `include`, and the near-miss probe in executor.ts already
@@ -190,7 +190,13 @@ export const getMitreFindingsTool: ToolDefinition = {
           technique_ids: {
             terms: {
               field: 'wazuh.rule.mitre.technique.id',
-              size: BREAKDOWN_BUCKET_CAP,
+              // ANSWER_BUCKET_CAP, not BREAKDOWN_BUCKET_CAP (#8935 integration): when an include
+              // scopes this agg to one technique family it IS the answer to "which sub-techniques
+              // fired" -- T1059 alone has ~12 sub-techniques, so a 5-bucket side-disclosure size
+              // silently cut the very split this aggregation exists to disclose (the same class
+              // I2 fixed for SCA check names). Short ~9-char keys keep even the unscoped variant
+              // comfortably inside digest.ts's char-budgeted carry.
+              size: ANSWER_BUCKET_CAP,
               ...(techniqueIdsInclude ? { include: techniqueIdsInclude } : {}),
             },
           },

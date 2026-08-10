@@ -7,7 +7,7 @@ import {
   requireNonEmptyString,
   validateAgentId,
 } from './common';
-import { BREAKDOWN_BUCKET_CAP } from '../digest';
+import { ANSWER_BUCKET_CAP, BREAKDOWN_BUCKET_CAP } from '../digest';
 
 /**
  * Wazuh 5.0 rewrite: the 4.14 Manager endpoint
@@ -28,29 +28,6 @@ const RESULT_VALUE_MAP: Record<string, string> = {
   failed: 'Failed',
   'not applicable': 'Not applicable',
 };
-
-/**
- * Enumeration-answer bucket cap for this tool's `matching_checks` aggregation below -- the size
- * that answers "which checks match" (as opposed to `BREAKDOWN_BUCKET_CAP`, sized for the 3-value
- * Passed/Failed/Not-applicable category breakdown; 5 buckets cannot enumerate a ~10-member "which
- * SSH checks failed" answer).
- *
- * DEFINED LOCALLY rather than imported from `digest.ts`: this item (#8935 I2, branch
- * wf2/scoped-enumeration) was implemented against the `fix/8920-ai-assistant-answer-correctness`
- * base, and the architect's design says this branch STACKS on item I1 (`wf2/bucket-budget`),
- * which is expected to add a shared `ANSWER_BUCKET_CAP` export to digest.ts. At implementation
- * time I1 had not landed (verified: `wf2/bucket-budget` was at the same commit as this base, no
- * such export existed anywhere in the plugin) -- reaching into digest.ts is also outside this
- * item's file list regardless. Value (50) matches the architect's own design note for the
- * unscoped-fallback case ("the unscoped variant degrades honestly -- 50 carried + disclosed
- * remainder via I1").
- *
- * WHEN I1 LANDS: delete this local constant and import `ANSWER_BUCKET_CAP` from `../digest`
- * instead, so this tool's enumeration size and I1's request-size/digest-carry budget agree by
- * construction rather than by two numbers happening to match. Flagged for the human integrator's
- * merge/live-proof pass.
- */
-const ANSWER_BUCKET_CAP = 50;
 
 /**
  * Builds a `terms.include` Lucene-regexp pattern that matches any `check.name` CONTAINING

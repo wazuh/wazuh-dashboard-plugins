@@ -2,7 +2,11 @@ import assert from 'node:assert/strict';
 import { getScaChecksTool } from './get-sca-checks';
 import { IndexerRequest } from '../types';
 import { applySafetyValves, lintDsl } from '../guardrails';
-import { BREAKDOWN_BUCKET_CAP, buildDigest } from '../digest';
+import {
+  ANSWER_BUCKET_CAP,
+  BREAKDOWN_BUCKET_CAP,
+  buildDigest,
+} from '../digest';
 
 /**
  * Unit tests for get_sca_checks (SCA per-check drill-down), rewritten for the Wazuh 5.0 port:
@@ -16,12 +20,6 @@ import { BREAKDOWN_BUCKET_CAP, buildDigest } from '../digest';
  * zero-row hint, and the `check.name` guardrails allowlist entry that makes the new aggregation
  * legal in the first place.
  */
-
-/** Same enumeration cap get-sca-checks.ts defines locally -- see that file's doc comment for why
- * this is not (yet) imported from digest.ts. Duplicated here rather than exported purely for
- * tests, matching this file's existing style of asserting against the real named constant
- * (BREAKDOWN_BUCKET_CAP) wherever one is importable. */
-const ANSWER_BUCKET_CAP = 50;
 
 function buildIndexer(params: Record<string, unknown>): IndexerRequest {
   const req = getScaChecksTool.buildRequest(params);
