@@ -263,9 +263,7 @@ interface ExtractedRows {
  */
 function resolveHitsTotal(result: unknown): number | undefined {
   const total = (
-    result as
-      | { hits?: { total?: number | { value?: number } } }
-      | undefined
+    result as { hits?: { total?: number | { value?: number } } } | undefined
   )?.hits?.total;
   if (typeof total === 'number') {
     return total;
@@ -821,7 +819,9 @@ function capKeyValue(key: unknown): unknown {
   }
   if (key !== null && typeof key === 'object') {
     const out: Record<string, unknown> = {};
-    for (const [prop, value] of Object.entries(key as Record<string, unknown>)) {
+    for (const [prop, value] of Object.entries(
+      key as Record<string, unknown>,
+    )) {
       out[prop] = capKeyValue(value);
     }
     return out;

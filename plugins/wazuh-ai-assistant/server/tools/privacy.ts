@@ -700,9 +700,7 @@ export type AggFieldSpec =
 function resolveMultiTermsSpec(
   aggDef: Record<string, unknown> | undefined,
 ): AggFieldSpec | undefined {
-  const multiTerms = aggDef?.multi_terms as
-    | { terms?: unknown }
-    | undefined;
+  const multiTerms = aggDef?.multi_terms as { terms?: unknown } | undefined;
   if (!multiTerms || !Array.isArray(multiTerms.terms)) {
     return undefined;
   }
@@ -735,9 +733,8 @@ function resolveCompositeSpec(
     for (const [sourceName, sourceSpec] of Object.entries(
       source as Record<string, unknown>,
     )) {
-      const field = (
-        sourceSpec as { terms?: { field?: unknown } } | undefined
-      )?.terms?.field;
+      const field = (sourceSpec as { terms?: { field?: unknown } } | undefined)
+        ?.terms?.field;
       if (typeof field === 'string') {
         fields[sourceName] = field;
       }
@@ -853,7 +850,12 @@ function scrubFieldValue(
       ),
     };
   }
-  if (!entry && isEscapeHatch && typeof value === 'string' && value.length > 0) {
+  if (
+    !entry &&
+    isEscapeHatch &&
+    typeof value === 'string' &&
+    value.length > 0
+  ) {
     // Fail-closed: no explicit policy entry for this field, but the escape hatch can surface any
     // finding field, so an unlisted one is NOT trusted as safe-by-omission here.
     return {

@@ -53,7 +53,9 @@ test('get_top_agents: clamps limit to the [1, 100] range, defaulting to 10', () 
 test('get_top_agents: applies the default 90-day time range when none is given', () => {
   const request = build({});
   assert.deepEqual(request.body.query, {
-    bool: { filter: [{ range: { '@timestamp': { gte: 'now-90d', lte: 'now' } } }] },
+    bool: {
+      filter: [{ range: { '@timestamp': { gte: 'now-90d', lte: 'now' } } }],
+    },
   });
 });
 

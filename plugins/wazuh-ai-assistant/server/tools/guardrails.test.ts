@@ -395,7 +395,11 @@ test('lintDsl: rejects a composite source whose type is not "terms" (e.g. histog
           size: 20,
           sources: [
             { agent: { terms: { field: WAZUH_FIELD.AGENT_ID } } },
-            { bucket: { histogram: { field: 'vulnerability.score.base', interval: 1 } } },
+            {
+              bucket: {
+                histogram: { field: 'vulnerability.score.base', interval: 1 },
+              },
+            },
           ],
         },
       },
@@ -423,7 +427,10 @@ test('lintDsl: rejects a composite source of type date_histogram, naming it in t
           sources: [
             {
               bucket: {
-                date_histogram: { field: '@timestamp', calendar_interval: '1d' },
+                date_histogram: {
+                  field: '@timestamp',
+                  calendar_interval: '1d',
+                },
               },
             },
           ],
@@ -435,7 +442,10 @@ test('lintDsl: rejects a composite source of type date_histogram, naming it in t
   const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
   assert.equal(result.ok, false);
   if (!result.ok) {
-    assert.match(result.reason, /Composite source type "date_histogram" is not allowed/);
+    assert.match(
+      result.reason,
+      /Composite source type "date_histogram" is not allowed/,
+    );
   }
 });
 
@@ -562,14 +572,8 @@ test('lintDsl: passes a terms aggregation on host.os.name and host.os.platform (
     aggs: { by_platform: { terms: { field: 'host.os.platform', size: 20 } } },
     size: 0,
   };
-  assert.equal(
-    lintDsl(byName, 'wazuh-states-inventory-system-*').ok,
-    true,
-  );
-  assert.equal(
-    lintDsl(byPlatform, 'wazuh-states-inventory-system-*').ok,
-    true,
-  );
+  assert.equal(lintDsl(byName, 'wazuh-states-inventory-system-*').ok, true);
+  assert.equal(lintDsl(byPlatform, 'wazuh-states-inventory-system-*').ok, true);
 });
 
 test('lintDsl: passes a terms aggregation on wazuh.agent.id against wazuh-events-v5 (agent pivot, already allowlisted)', () => {

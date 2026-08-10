@@ -909,9 +909,7 @@ test('applyFieldPolicy: composite on source.ip + wazuh.agent.id scrubs each name
   ];
   const p = new Pseudonymizer();
   const digest = baseDigest({
-    breakdown: [
-      { key: { ip: '198.51.100.10', agent: '007' }, count: 12 },
-    ],
+    breakdown: [{ key: { ip: '198.51.100.10', agent: '007' }, count: 12 }],
   });
   const aggFields = {
     by_ip_and_agent: {
