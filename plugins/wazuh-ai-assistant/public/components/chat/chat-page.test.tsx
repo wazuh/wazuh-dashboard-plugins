@@ -1224,8 +1224,11 @@ describe('ChatPage — feedback while a turn runs', () => {
  * Coverage for issue #8920 item 7: a populated result table must never be overwritten by an empty
  * one at end-of-stream. `chat-page.tsx` flushes its held table buffers (`pendingTable`,
  * `pendingEmptyTable`) from three different call sites — `finally`, the `error` branch, and the
- * `auth_expired` branch — and those three do not agree on which buffer they flush first
- * (`finally`/`auth_expired` flush the non-empty one first; `error` flushes the empty one first).
+ * `auth_expired` branch — and they do not all flush in the same order (`finally`/`auth_expired`
+ * flush the non-empty one first; `error` flushes the empty one first). On the unfixed code only
+ * `finally` was reachably broken: `error`'s empty-first order happened to be benign (the later
+ * non-empty commit won) and `auth_expired` fires on the initial POST's 401 before any SSE frame
+ * is read, so it can never hold a table. "Happens to be benign" is still worth pinning.
  * The class fix is an order-INDEPENDENT invariant (see the `pendingEmptyTable` comment above it):
  * an empty spec is refused on arrival once a non-empty table exists for the turn, and
  * `flushPendingEmptyTable` independently yields to any pending/committed non-empty table.
@@ -1325,13 +1328,15 @@ describe('ChatPage — an empty table never clobbers a populated one (issue #892
     );
   });
 
-  it('keeps the populated table when the turn errors before narrating anything', async () => {
-    // Same scenario as the "keeps a held table when the turn errors before narrating anything"
-    // test above, kept in this matrix too so the five orderings this suite is meant to pin are all
-    // visible together: the `error` branch is the one call site that flushes the EMPTY buffer
-    // before the non-empty one (`flushPendingEmptyTable()` then `flushPendingTable()`), the
-    // opposite order from `finally`/`auth_expired` — this is the scenario that proves the fix must
-    // not depend on flush order.
+  it('keeps the populated table when an empty one arrives and the turn then errors', async () => {
+    // The `error` call site's cell of the matrix: rows, THEN an empty table, THEN a mid-stream
+    // provider error. The `error` branch is the one call site that flushes the EMPTY buffer
+    // before the non-empty one (`flushPendingEmptyTable()` then `flushPendingTable()`) — on the
+    // unfixed code that order happened to be benign (the later non-empty commit won), but this
+    // scenario pins the cell so a future reorder of the `error` branch, or a change to which
+    // commit "wins", cannot silently reintroduce the clobber at this call site. With the fix the
+    // empty spec is already refused on arrival, so both halves of the invariant are exercised on
+    // the path that ends in `error` rather than `finally`.
     const stream = createControllableStream();
     mockStreamChat.mockImplementation(
       (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
@@ -1341,6 +1346,7 @@ describe('ChatPage — an empty table never clobbers a populated one (issue #892
     await sendMessage('top agents?');
 
     stream.push({ type: 'table', spec: ROWS_SPEC });
+    stream.push({ type: 'table', spec: EMPTY_SPEC });
     stream.push({ type: 'error', message: 'provider stream failed' });
     stream.end();
 
