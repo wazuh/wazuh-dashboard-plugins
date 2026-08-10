@@ -6,10 +6,12 @@ import {
 } from './executor';
 import { Pseudonymizer } from './privacy';
 import { ToolCall } from '../../common/types';
-import {
-  OpenSearchDashboardsRequest,
-  RequestHandlerContext,
-} from '../../../../src/core/server';
+
+// Derived from executeToolCall's own signature rather than imported from the OSD platform path,
+// so this file stays runnable standalone — the same convention api-host.test.ts documents for
+// the same reason.
+type RequestHandlerContext = Parameters<typeof executeToolCall>[1];
+type OpenSearchDashboardsRequest = Parameters<typeof executeToolCall>[2];
 
 function hit(space: string | undefined): unknown {
   return space === undefined
@@ -84,9 +86,9 @@ function toolCall(name: string, args: Record<string, unknown>): ToolCall {
   return { id: 'call-1', name, arguments: args };
 }
 
-async function parseDigest(
+function parseDigest(
   outcome: Awaited<ReturnType<typeof executeToolCall>>,
-): Promise<Record<string, unknown>> {
+): Record<string, unknown> {
   return JSON.parse(outcome.toolResultContent);
 }
 
@@ -105,7 +107,7 @@ test('narrowed-window recount: 0 rows in the queried window, but rows in the def
     context,
     dummyRequest,
   );
-  const digest = await parseDigest(outcome);
+  const digest = parseDigest(outcome);
   assert.equal(calls.length, 2, 'expected exactly one recount search');
   assert.equal(calls[1].body.size, 0);
   assert.match(
@@ -133,8 +135,12 @@ test('narrowed-window recount: does not fire when the tool call itself returned 
     context,
     dummyRequest,
   );
-  const digest = await parseDigest(outcome);
-  assert.equal(calls.length, 1, 'no recount search should fire on a non-zero result');
+  const digest = parseDigest(outcome);
+  assert.equal(
+    calls.length,
+    1,
+    'no recount search should fire on a non-zero result',
+  );
   assert.equal(digest.hint, undefined);
 });
 
@@ -151,13 +157,15 @@ test('narrowed-window recount: also does not fire when the widened recount itsel
     context,
     dummyRequest,
   );
-  const digest = await parseDigest(outcome);
+  const digest = parseDigest(outcome);
   assert.equal(calls.length, 2, 'the recount search still fires...');
   // ...but since it ALSO found 0 rows, no widen hint is appended (the pre-existing zero-row hint
   // from digest.ts's buildZeroRowHint may still be present -- this only asserts the widen SENTENCE
   // is absent).
   assert.ok(
-    !(digest.hint as string | undefined)?.includes('rows match in the default window'),
+    !(digest.hint as string | undefined)?.includes(
+      'rows match in the default window',
+    ),
   );
 });
 
@@ -187,9 +195,22 @@ test('entity near-miss: a zero-padding near-miss with data is disclosed, in the 
     context,
     dummyRequest,
   );
-  const digest = await parseDigest(outcome);
-  assert.equal(calls.length, 2, 'exactly one entity near-miss probe, no recount (returned > 0)');
+  const digest = parseDigest(outcome);
+  assert.equal(
+    calls.length,
+    2,
+    'exactly one entity near-miss probe, no recount (returned > 0)',
+  );
   assert.equal(calls[1].body.size, 0);
+  // The probe must be candidate-scoped (population-independent): a terms `include` pattern
+  // derived from the requested name, not a bare top-N aggregation that only ever sees the
+  // busiest agents.
+  const probeTerms = (
+    calls[1].body.aggs as {
+      agent_names: { terms: Record<string, unknown> };
+    }
+  ).agent_names.terms;
+  assert.equal(typeof probeTerms.include, 'string');
   const hint = digest.hint as string;
   assert.match(hint, /"wazuh-aio-05"/);
   assert.match(hint, /wazuh-aio-5/);
@@ -223,7 +244,7 @@ test('entity near-miss: agent names in the hint are pseudonymized when privacy m
     dummyRequest,
     privacy,
   );
-  const digest = await parseDigest(outcome);
+  const digest = parseDigest(outcome);
   const hint = digest.hint as string;
   // Neither raw hostname reaches the digest's hint text under privacy mode.
   assert.ok(!hint.includes('wazuh-aio-05'));
@@ -248,8 +269,140 @@ test('entity near-miss: does not fire for a tool call naming no agent at all', a
     context,
     dummyRequest,
   );
-  await parseDigest(outcome);
+  parseDigest(outcome);
   // A narrow window (differing from the plugin default) makes the window-recount fire once (2
   // total calls); no agent_name was supplied, so the entity probe must not fire a THIRD search.
   assert.equal(calls.length, 2);
+});
+
+test('entity near-miss: fires on a states index with NO @timestamp range injected', async () => {
+  // get_agent_inventory reads wazuh-states-inventory-*: no event-time axis, lintDsl requires no
+  // bound there, and a range injected on an unmapped @timestamp field would match NOTHING --
+  // silently disabling the disclosure for exactly the tools issue #8920 item 6 names. The probe
+  // must therefore go out rangeless for a rangeless executed body.
+  const portsHit = {
+    _source: { 'source.port': 22, 'interface.state': 'listen' },
+  };
+  const { context, calls } = fakeContext((_call, index) =>
+    index === 0
+      ? { hits: { hits: [portsHit], total: { value: 1 } } }
+      : {
+          hits: { hits: [], total: { value: 0 } },
+          aggregations: {
+            agent_names: { buckets: [{ key: 'wazuh-aio-5', doc_count: 3 }] },
+          },
+        },
+  );
+  const outcome = await executeToolCall(
+    toolCall('get_agent_inventory', {
+      kind: 'ports',
+      agent_name: 'wazuh-aio-05',
+    }),
+    context,
+    dummyRequest,
+  );
+  const digest = parseDigest(outcome);
+  assert.equal(calls.length, 2, 'the probe must fire for a states-index tool');
+  const probeFilter = (calls[1].body.query as { bool: { filter: unknown[] } })
+    .bool.filter;
+  assert.deepEqual(
+    probeFilter,
+    [{ match_all: {} }],
+    'no @timestamp range may be injected into a states-index probe',
+  );
+  assert.match(digest.hint as string, /wazuh-aio-5/);
+});
+
+test('recount + near-miss combine: a 0-row narrow-window agent query gets both disclosures', async () => {
+  const { context, calls } = fakeContext((call, index) => {
+    if (index === 0) {
+      return { hits: { hits: [], total: { value: 0 } } };
+    }
+    // The widened recount is the size:0 body with NO aggs; the probe carries the terms agg.
+    const isProbe = call.body.aggs !== undefined;
+    return isProbe
+      ? {
+          hits: { hits: [], total: { value: 0 } },
+          aggregations: {
+            agent_names: { buckets: [{ key: 'wazuh-aio-05', doc_count: 1 }] },
+          },
+        }
+      : { hits: { hits: [], total: { value: 66 } } };
+  });
+  const outcome = await executeToolCall(
+    toolCall('search_findings_by_agent', {
+      agent_name: 'wazuh-aio-5',
+      time_range_gte: 'now-24h',
+      time_range_lte: 'now',
+    }),
+    context,
+    dummyRequest,
+  );
+  const digest = parseDigest(outcome);
+  assert.equal(calls.length, 3, 'tool search + recount + near-miss probe');
+  const hint = digest.hint as string;
+  assert.match(hint, /66 rows match in the default window/);
+  assert.match(hint, /wazuh-aio-05/);
+});
+
+test('recount wording: a clamped total (relation "gte") is stated as "at least", never exact', async () => {
+  // applySafetyValves clamps track_total_hits to 10000, so any window with more matches reports
+  // value=10000/relation:'gte' -- an exact "10000 rows match" would be a fabricated count in the
+  // one feature that exists to stop counts being misstated.
+  const { context } = fakeContext((_call, index) =>
+    index === 0
+      ? { hits: { hits: [], total: { value: 0 } } }
+      : { hits: { hits: [], total: { value: 10000, relation: 'gte' } } },
+  );
+  const outcome = await executeToolCall(
+    toolCall('get_mitre_findings', {
+      technique_id: 'T1110',
+      time_range_gte: 'now-1h',
+      time_range_lte: 'now',
+    }),
+    context,
+    dummyRequest,
+  );
+  const digest = parseDigest(outcome);
+  assert.match(
+    digest.hint as string,
+    /at least 10000 rows match in the default window/,
+  );
+});
+
+test('sub-technique split: a breakdown carrying a dotted technique id gains the per-exact-id hint', async () => {
+  // get_mitre_findings' technique_ids terms agg buckets per EXACT id; the hint is what tells the
+  // model a parent bucket does not include its children (issue #8920 item 2's disclosure half,
+  // applied at the digest chokepoint so get_mitre_summary and escape-hatch aggs inherit it too).
+  const findingHit = {
+    _source: {
+      '@timestamp': '2026-08-10T00:00:00Z',
+      'wazuh.rule.mitre.technique.id': ['T1059'],
+    },
+  };
+  const { context } = fakeContext((_call, index) =>
+    index === 0
+      ? {
+          hits: { hits: [findingHit], total: { value: 12 } },
+          aggregations: {
+            technique_ids: {
+              buckets: [
+                { key: 'T1059', doc_count: 3 },
+                { key: 'T1059.001', doc_count: 9 },
+              ],
+            },
+          },
+        }
+      : { hits: { hits: [], total: { value: 0 } } },
+  );
+  const outcome = await executeToolCall(
+    toolCall('get_mitre_findings', { technique_id: 'T1059' }),
+    context,
+    dummyRequest,
+  );
+  const digest = parseDigest(outcome);
+  assert.match(
+    digest.hint as string,
+    /parent technique bucket .* does NOT include its sub-techniques/,
+  );
 });

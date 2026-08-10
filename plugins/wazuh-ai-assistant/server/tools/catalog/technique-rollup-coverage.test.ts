@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { JsonSchemaProperty } from '../../../common/types';
 import { listToolDefinitions } from '../registry';
 import { IndexerRequest } from '../types';
+import { rollUpTechniqueIdFilters } from '../technique-rollup';
 
 /**
  * Class-level guard for issue #8920 item 2 (sub-technique rollup): ANY catalog tool that accepts a
@@ -14,9 +15,13 @@ import { IndexerRequest } from '../types';
  *
  * Driven from `listToolDefinitions()`, not a hardcoded tool-name list -- following this repo's
  * `agg-size-coverage.test.ts`/`field-policy-coverage.test.ts` convention, **nothing is exempt by
- * default**: a future tool that adds a technique-id parameter (get_mitre_findings is the only one
+ * default**: a future tool that adds a technique-id parameter (get_mitre_findings and get_rules
  * today) is checked automatically the moment it lands in the registry, and fails this test until
- * its filter rolls up the same way.
+ * its EXECUTED body rolls up the same way. "Executed" is load-bearing: executor.ts applies
+ * technique-rollup.ts's chokepoint transform to every indexer body (typed tool and the
+ * search_wazuh_data escape hatch alike), so the per-tool assertions below run each built body
+ * through the same transform, and a separate block pins the transform itself against
+ * hand-written escape-hatch shapes.
  */
 
 /** Matches a technique-id-shaped param name regardless of exact spelling ("technique_id",
@@ -156,7 +161,12 @@ test('a bare parent id rolls up to term + sibling prefix, never a bare exact-onl
       );
       continue;
     }
-    const { terms, prefixes } = collectTechniqueIdClauses(request.body);
+    // The EXECUTED body is what matters: executor.ts applies rollUpTechniqueIdFilters to every
+    // indexer body (typed tool or escape hatch), so a tool may either roll up in its own
+    // buildRequest (get_mitre_findings does, for the sake of its description/tests) or inherit
+    // the chokepoint transform (get_rules does) -- both are asserted here exactly as they run.
+    const executedBody = rollUpTechniqueIdFilters(request.body);
+    const { terms, prefixes } = collectTechniqueIdClauses(executedBody);
     if (!terms.includes('T1059') || !prefixes.includes('T1059.')) {
       failures.push(
         `${def.spec.name}: "T1059" must roll up to a term("T1059") AND a sibling ` +
@@ -195,7 +205,9 @@ test('a dotted sub-technique id stays an exact match, never broadened with a pre
       );
       continue;
     }
-    const { terms, prefixes } = collectTechniqueIdClauses(request.body);
+    const { terms, prefixes } = collectTechniqueIdClauses(
+      rollUpTechniqueIdFilters(request.body),
+    );
     if (!terms.includes('T1059.001')) {
       failures.push(
         `${def.spec.name}: "T1059.001" must still produce an exact term("T1059.001") clause -- ` +
@@ -215,4 +227,148 @@ test('a dotted sub-technique id stays an exact match, never broadened with a pre
     'A dotted sub-technique id must stay an exact-only match -- rolling it up further would over-' +
       'broaden past what the caller explicitly asked for.',
   );
+});
+
+// --- the CHOKEPOINT half: executor.ts applies rollUpTechniqueIdFilters to every EXECUTED indexer
+// body, so the class cannot be reproduced through the search_wazuh_data escape hatch's
+// hand-written DSL (which no per-tool test above can see). These pin the transform itself. ---
+
+test('chokepoint rollup: a hand-written bare-parent term on a technique-id field is rolled up', () => {
+  const body = {
+    query: {
+      bool: {
+        filter: [
+          { range: { '@timestamp': { gte: 'now-7d', lte: 'now' } } },
+          { term: { 'wazuh.rule.mitre.technique.id': 'T1059' } },
+        ],
+      },
+    },
+    size: 20,
+  };
+  const rolled = rollUpTechniqueIdFilters(body);
+  const { terms, prefixes } = collectTechniqueIdClauses(rolled);
+  assert.deepEqual(terms, ['T1059']);
+  assert.deepEqual(prefixes, ['T1059.']);
+  // The original body is never mutated.
+  const original = collectTechniqueIdClauses(body);
+  assert.deepEqual(original.prefixes, []);
+});
+
+test('chokepoint rollup: a lowercase id is uppercased (keyword term/prefix are case-sensitive)', () => {
+  const rolled = rollUpTechniqueIdFilters({
+    query: {
+      bool: {
+        filter: [{ term: { 'wazuh.rule.mitre.technique.id': 't1110' } }],
+      },
+    },
+  });
+  const { terms, prefixes } = collectTechniqueIdClauses(rolled);
+  assert.deepEqual(terms, ['T1110']);
+  assert.deepEqual(prefixes, ['T1110.']);
+});
+
+test('chokepoint rollup: a dotted sub-technique id stays exact (case-normalized only)', () => {
+  const rolled = rollUpTechniqueIdFilters({
+    query: {
+      bool: {
+        filter: [{ term: { 'wazuh.rule.mitre.technique.id': 't1059.001' } }],
+      },
+    },
+  });
+  const { terms, prefixes } = collectTechniqueIdClauses(rolled);
+  assert.deepEqual(terms, ['T1059.001']);
+  assert.deepEqual(prefixes, []);
+});
+
+test('chokepoint rollup: non-technique terms and aggregations pass through untouched', () => {
+  const body = {
+    query: {
+      bool: { filter: [{ term: { 'wazuh.agent.name': 'T1059' } }] },
+    },
+    aggs: {
+      technique_ids: {
+        terms: { field: 'wazuh.rule.mitre.technique.id', size: 5 },
+      },
+    },
+  };
+  const rolled = rollUpTechniqueIdFilters(body);
+  assert.deepEqual(rolled.aggs, body.aggs);
+  const filter = (rolled.query as { bool: { filter: unknown[] } }).bool.filter;
+  assert.deepEqual(filter, [{ term: { 'wazuh.agent.name': 'T1059' } }]);
+});
+
+test('chokepoint rollup: idempotent over an already-rolled body', () => {
+  const once = rollUpTechniqueIdFilters({
+    query: {
+      bool: {
+        filter: [{ term: { 'wazuh.rule.mitre.technique.id': 'T1059' } }],
+      },
+    },
+  });
+  const twice = rollUpTechniqueIdFilters(once);
+  assert.deepEqual(twice, once);
+});
+
+// --- the DISCLOSURE half: broadening a match without disclosing the per-exact-id split would let
+// a rolled-up call return rows the model cannot attribute. Every technique-id tool must attach a
+// terms AGGREGATION on a technique-id field alongside the rolled filter, so the digest breakdown
+// carries the exact-vs-sub-technique counts as data. ---
+
+/** Terms AGGREGATION nodes (not query clauses) on a technique-id field: walks only aggs MAPS. */
+function hasTechniqueIdTermsAgg(body: Record<string, unknown>): boolean {
+  let found = false;
+  const walkAggsMap = (aggs: unknown): void => {
+    if (found || !aggs || typeof aggs !== 'object' || Array.isArray(aggs)) {
+      return;
+    }
+    for (const aggDef of Object.values(aggs as Record<string, unknown>)) {
+      if (!aggDef || typeof aggDef !== 'object' || Array.isArray(aggDef)) {
+        continue;
+      }
+      const record = aggDef as Record<string, unknown>;
+      const termsSpec = record.terms as { field?: unknown } | undefined;
+      if (
+        termsSpec &&
+        typeof termsSpec.field === 'string' &&
+        TECHNIQUE_ID_FIELD_RE.test(termsSpec.field)
+      ) {
+        found = true;
+        return;
+      }
+      walkAggsMap(record.aggs ?? record.aggregations);
+    }
+  };
+  walkAggsMap(body.aggs ?? body.aggregations);
+  return found;
+}
+
+test('every technique-id tool attaches a terms agg on the technique-id field (the disclosure)', () => {
+  const failures: string[] = [];
+  for (const def of techniqueIdTools) {
+    const paramName = Object.keys(def.spec.parameters.properties).find(name =>
+      TECHNIQUE_ID_PARAM_RE.test(name),
+    ) as string;
+    const params = sampleParams(def.spec.parameters.properties, {
+      [paramName]: 'T1059',
+    });
+    let request: IndexerRequest;
+    try {
+      request = def.buildRequest(params) as IndexerRequest;
+    } catch {
+      continue; // already reported by the rollup test above
+    }
+    const perRowAttribution = def.digest.sampleColumns.some(column =>
+      TECHNIQUE_ID_FIELD_RE.test(column),
+    );
+    if (!hasTechniqueIdTermsAgg(request.body) && !perRowAttribution) {
+      failures.push(
+        `${def.spec.name}: rolls a technique-id filter up but discloses no per-exact-id split ` +
+          '-- the model gets extra rows it cannot attribute to a sub-technique. Attach a terms ' +
+          'agg on the technique-id field (see get-mitre-findings.ts technique_ids; requires an ' +
+          'AGG_FIELD_ALLOWLIST entry) or carry the technique-id field in digest.sampleColumns ' +
+          'so each row self-identifies.',
+      );
+    }
+  }
+  assert.deepEqual(failures, []);
 });

@@ -83,9 +83,11 @@ function isAlreadyDefaultWindow(range: TimestampRangeClause): boolean {
   );
 }
 
-/** Returns a copy of `clause` with its `@timestamp` range (if any) replaced by the plugin's default
- * window; every other filter clause (and every other key of an `@timestamp` range clause, e.g. a
- * `format`) passes through unchanged. Non-range clauses are returned as-is. */
+/** Returns a copy of `clause` with its `@timestamp` range (if any) replaced by the plugin's
+ * default window; every other filter clause passes through unchanged. The `@timestamp` bounds
+ * object is replaced WHOLE — a `format`/`time_zone` key inside it is deliberately dropped, since
+ * the default bounds are date-math strings that need neither and a leftover `format` for the old
+ * bounds could make the widened query invalid. Non-range clauses are returned as-is. */
 function widenRangeClause(clause: unknown): unknown {
   if (!clause || typeof clause !== 'object' || Array.isArray(clause)) {
     return clause;
@@ -104,16 +106,25 @@ function widenRangeClause(clause: unknown): unknown {
     ...record,
     range: {
       ...range,
-      '@timestamp': { gte: DEFAULT_TIME_RANGE_GTE, lte: DEFAULT_TIME_RANGE_LTE },
+      '@timestamp': {
+        gte: DEFAULT_TIME_RANGE_GTE,
+        lte: DEFAULT_TIME_RANGE_LTE,
+      },
     },
   };
 }
 
 /**
- * Builds a size:0, aggs-free, `track_total_hits:true` copy of `body` with its `@timestamp` range
- * widened to the plugin's own default window (`now-90d`..`now`) -- the recount query executor.ts
- * fires only when a tool call's narrowed window returned 0 rows (see this module's header comment).
- * Never mutates `body` (same convention as `guardrails.ts`'s `applySafetyValves`).
+ * Builds a size:0, aggs-free copy of `body` with its `@timestamp` range widened to the plugin's
+ * own default window (`now-90d`..`now`) -- the recount query executor.ts fires only when a tool
+ * call's narrowed window returned 0 rows (see this module's header comment). Never mutates
+ * `body` (same convention as `guardrails.ts`'s `applySafetyValves`).
+ *
+ * `track_total_hits: true` is set here as intent, but NOTE: `applySafetyValves` unconditionally
+ * clamps it to `MAX_TRACK_TOTAL_HITS` (10000) before execution, so the EXECUTED recount counts
+ * exactly up to 10000 and reports `hits.total.relation: 'gte'` beyond that. The hint wording in
+ * executor.ts reads the relation and says "at least N" in that case -- never an exact figure it
+ * does not have.
  *
  * Returns `undefined` -- "nothing for the caller to run" -- when:
  *  - `body` has no `@timestamp` range at all (`findTimestampRange` found nothing), or
