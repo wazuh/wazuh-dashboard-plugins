@@ -320,6 +320,76 @@ test('entity near-miss: fires on a states index with NO @timestamp range injecte
   assert.match(digest.hint as string, /wazuh-aio-5/);
 });
 
+test("entity near-miss: fires even when the inherited window excludes the sibling's only document", async () => {
+  // Reproduces the reported case verbatim: a prior turn narrowed the conversation to "the last 24
+  // hours" (see window-recount.ts), the typo'd host "wazuh-aio-05" is a real, separate agent whose
+  // ONE document was ingested well outside that window, while "wazuh-aio-5" (the silently
+  // substituted host) has ~1800 documents INSIDE it. The executed body therefore returns rows, so
+  // no recount fires -- the near-miss probe is the only mechanism left that can catch the
+  // substitution. This fake OpenSearch mimics real range filtering: if the probe inherits the
+  // executed body's narrow range (the bug), the sibling's out-of-window document is filtered out
+  // and the aggregation returns no bucket; only a rangeless probe (the fix) finds it.
+  const wrongHostHit = {
+    _source: {
+      '@timestamp': '2026-08-10T00:00:00Z',
+      'wazuh.agent.name': 'wazuh-aio-5',
+      'wazuh.rule.title': 'test rule',
+      'wazuh.rule.level': 'high',
+    },
+  };
+  const { context, calls } = fakeContext((call, index) => {
+    if (index === 0) {
+      // The ~1800 wrong-host findings, all inside the narrowed now-24h window (the tool call
+      // itself returns rows, so `appendWindowRecountHint` never fires).
+      return { hits: { hits: [wrongHostHit], total: { value: 1800 } } };
+    }
+    const filter = (
+      call.body.query as { bool: { filter: Array<Record<string, unknown>> } }
+    ).bool.filter;
+    const hasInheritedRange = filter.some(clause => 'range' in clause);
+    return {
+      hits: { hits: [], total: { value: 0 } },
+      aggregations: {
+        agent_names: {
+          // The sibling's single document lives outside the narrowed window: a real OpenSearch
+          // range filter would exclude it, so simulate that by returning no bucket whenever the
+          // probe (wrongly) carries a range clause at all.
+          buckets: hasInheritedRange
+            ? []
+            : [{ key: 'wazuh-aio-5', doc_count: 1 }],
+        },
+      },
+    };
+  });
+  const outcome = await executeToolCall(
+    toolCall('search_findings_by_agent', {
+      agent_name: 'wazuh-aio-05',
+      time_range_gte: 'now-24h',
+      time_range_lte: 'now',
+    }),
+    context,
+    dummyRequest,
+  );
+  const digest = parseDigest(outcome);
+  assert.equal(
+    calls.length,
+    2,
+    'the executed body returned rows, so no recount -- only the probe',
+  );
+  const probeFilter = (calls[1].body.query as { bool: { filter: unknown[] } })
+    .bool.filter;
+  assert.deepEqual(
+    probeFilter,
+    [{ match_all: {} }],
+    "the probe must never inherit the executed body's @timestamp range",
+  );
+  assert.match(
+    digest.hint as string,
+    /wazuh-aio-5/,
+    'the near-miss disclosure must survive a narrowed inherited window',
+  );
+});
+
 test('recount + near-miss combine: a 0-row narrow-window agent query gets both disclosures', async () => {
   const { context, calls } = fakeContext((call, index) => {
     if (index === 0) {
