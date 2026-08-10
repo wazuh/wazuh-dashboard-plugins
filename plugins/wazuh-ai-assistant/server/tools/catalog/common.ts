@@ -440,7 +440,7 @@ export const FINDING_BREAKDOWN_DIMENSIONS = [
  * itself (rather than reusing the path verbatim as the key) keeps `digest.ts`'s `breakdown[].agg`
  * tag readable and avoids relying on dots surviving unescaped through any future request
  * transform. */
-function aggNameForField(field: string): string {
+export function aggNameForField(field: string): string {
   return field.replace(/\./g, '_');
 }
 
@@ -542,6 +542,37 @@ export const VULN_SOURCE_FIELDS_WITH_AGENT_ID = [
   'wazuh.agent.id',
   ...VULN_SOURCE_FIELDS,
 ];
+
+/**
+ * Dimensions for the vulnerability-listing tools' population-true breakdown (issue #8920 item 1,
+ * "sample narrated as population"): get_vulnerabilities/get_critical_vulnerabilities/
+ * get_vulnerabilities_by_agent only ever ran a plain hits search, so a truncated result -- e.g. "no
+ * high-severity vulnerabilities" on a host with 2 critical + 2 high, all sorted outside the
+ * returned page -- had no population-true view of either dimension. Both fields are already on
+ * `guardrails.ts`'s `AGG_FIELD_ALLOWLIST` (severity: a closed 4-value enum; agent name: shared with
+ * `FINDING_BREAKDOWN_DIMENSIONS` above). `get_vulnerability_by_cve` attaches these same
+ * aggregations too (its own buildRequest): both fields are allowlisted and its index is not
+ * time-based, so the population-true option is free there as well.
+ */
+export const VULN_BREAKDOWN_DIMENSIONS = [
+  'vulnerability.severity',
+  'wazuh.agent.name',
+];
+
+/**
+ * Real `terms` aggregations over `VULN_BREAKDOWN_DIMENSIONS`, attached to the three hits-based
+ * vulnerability tools' request bodies -- same shape and reasoning as `FINDING_BREAKDOWN_AGGS`
+ * above. OpenSearch computes `aggregations` over the FULL matched set regardless of `size`, so this
+ * is population-true even when the tool's own `limit` truncates the returned rows. Sized at
+ * `BREAKDOWN_BUCKET_CAP` for the same token-parity reason as every other breakdown aggregation in
+ * this file.
+ */
+export const VULN_BREAKDOWN_AGGS: Record<string, unknown> = Object.fromEntries(
+  VULN_BREAKDOWN_DIMENSIONS.map(field => [
+    aggNameForField(field),
+    { terms: { field, size: BREAKDOWN_BUCKET_CAP } },
+  ]),
+);
 
 /**
  * Guard shared by ~11 catalog buildRequest sites that require a non-empty string param: validates

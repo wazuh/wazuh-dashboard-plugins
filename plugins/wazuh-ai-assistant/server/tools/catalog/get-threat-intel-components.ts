@@ -213,5 +213,11 @@ export const getThreatIntelComponentsTool: ToolDefinition = {
       'document.index_discarded_events',
       'document.index_unclassified_events',
     ],
+    // Synthetic fallback (issue #8920 item 1): "which pipeline components are enabled / what
+    // categories exist" was answered from 5 sample rows on a limit-truncated page. Both fields
+    // are already in `_source` (getByPath groups the RETURNED rows — no AGG_FIELD_ALLOWLIST entry
+    // or live mapping check needed for the digest-level grouping) and are vendor-curated config
+    // enums, structurally safe under privacy. Page-scoped with `breakdownNote` when truncated.
+    breakdownDimensions: ['document.category', 'document.mode'],
   },
 };

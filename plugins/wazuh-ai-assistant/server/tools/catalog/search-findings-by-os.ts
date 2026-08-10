@@ -4,6 +4,8 @@ import {
   findingArtifactFilterProperties,
   findingDigestColumns,
   findingRowFields,
+  FINDING_BREAKDOWN_AGGS,
+  FINDING_BREAKDOWN_DIMENSIONS,
   clampLimit,
   limitProperty,
   objectSchema,
@@ -110,6 +112,10 @@ export const searchFindingsByOsTool: ToolDefinition = {
         },
         sort: [{ '@timestamp': { order: 'desc' } }],
         size: limit,
+        // Population-true agent/rule-title breakdown over the FULL matched set (issue #8920 item
+        // 1). Same mechanism as the other finding-hits tools (common.ts's FINDING_BREAKDOWN_AGGS
+        // doc comment); this tool was missed when that fix first landed.
+        aggs: FINDING_BREAKDOWN_AGGS,
       },
     };
   },
@@ -117,5 +123,8 @@ export const searchFindingsByOsTool: ToolDefinition = {
     columns: TABLE_COLUMNS,
     rowFields: findingRowFields(TABLE_COLUMNS.map(column => column.field)),
   },
-  digest: { sampleColumns: findingDigestColumns(SAMPLE_COLUMNS) },
+  digest: {
+    sampleColumns: findingDigestColumns(SAMPLE_COLUMNS),
+    breakdownDimensions: FINDING_BREAKDOWN_DIMENSIONS,
+  },
 };
