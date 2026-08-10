@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { getScaChecksTool } from './get-sca-checks';
 import { IndexerRequest } from '../types';
+import { applySafetyValves, lintDsl } from '../guardrails';
+import { BREAKDOWN_BUCKET_CAP } from '../digest';
 
 /**
  * Unit tests for get_sca_checks (SCA per-check drill-down), rewritten for the Wazuh 5.0 port:
@@ -121,6 +123,53 @@ test('get_sca_checks: limit is clamped to [1, 500]', () => {
   assert.equal(over.body.size, 500);
   const under = buildIndexer({ agent_id: '000', policy_id: 'p', limit: 0 });
   assert.equal(under.body.size, 1);
+});
+
+// --- Issue #8920 item 1 (population-disclosure): a plain hits search gave the model no
+// population-true view of the Passed/Failed/Not-applicable distribution, so a `limit`-truncated
+// page was silently narrated as if it were the whole result ("named 2 of 10 failed checks"). ---
+
+test('get_sca_checks: always attaches a population-true check.result breakdown aggregation', () => {
+  const req = buildIndexer({ agent_id: '000', policy_id: 'cis_ubuntu22-04' });
+  assert.deepEqual(req.body.aggs, {
+    results: { terms: { field: 'check.result', size: BREAKDOWN_BUCKET_CAP } },
+  });
+});
+
+test('get_sca_checks: the breakdown aggregation rides along with every filter combination', () => {
+  const withResultAndSearch = buildIndexer({
+    agent_id: '000',
+    policy_id: 'cis_ubuntu22-04',
+    result: 'failed',
+    search: 'Ensure SSH',
+  });
+  assert.deepEqual(withResultAndSearch.body.aggs, {
+    results: { terms: { field: 'check.result', size: BREAKDOWN_BUCKET_CAP } },
+  });
+  const withLimitOnly = buildIndexer({
+    agent_id: '000',
+    policy_id: 'cis_ubuntu22-04',
+    limit: 500,
+  });
+  assert.deepEqual(withLimitOnly.body.aggs, {
+    results: { terms: { field: 'check.result', size: BREAKDOWN_BUCKET_CAP } },
+  });
+});
+
+test('get_sca_checks: the request (with its new aggs clause) passes applySafetyValves + lintDsl', () => {
+  const req = buildIndexer({
+    agent_id: '000',
+    policy_id: 'cis_ubuntu22-04',
+    result: 'failed',
+    search: 'Ensure SSH',
+  });
+  const valved = applySafetyValves(req.body);
+  assert.equal(valved.ok, true, valved.ok ? '' : valved.reason);
+  if (!valved.ok) {
+    return;
+  }
+  const lint = lintDsl(valved.body, req.index);
+  assert.equal(lint.ok, true, lint.ok ? '' : lint.reason);
 });
 
 test('get_sca_checks: tableSpec/digest declare the locked 5.0 columns/rowFields/sampleColumns', () => {

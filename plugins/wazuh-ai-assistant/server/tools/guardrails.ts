@@ -231,6 +231,18 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // low-cardinality — a handful of benchmark policies per agent; mapping live-verified against
   // wazuh-states-sca on 5.0.0-beta3).
   'policy.id',
+  // Issue #8920 item 1 (population-disclosure): the four fields below back the per-kind/per-tool
+  // breakdown aggregations added to close the "sample narrated as population" class ("named 2 of
+  // 10 failed checks" on get_sca_checks; a truncated ports/processes inventory page with no view
+  // of the closed-set field's true distribution). This is a PERFORMANCE guard widening
+  // (aggregation cardinality), not a privacy guard: every field below is a small closed enum, not
+  // analyst/attacker-supplied free text, terms `size` still caps at MAX_AGG_SIZE via checkAggs for
+  // any caller including the escape hatch, and privacy.ts's field policy (a separate boundary) is
+  // unaffected by this list either way.
+  'check.result', // SCA per-check result: "Passed"/"Failed"/"Not applicable" (3-value enum).
+  'interface.state', // syscollector ports: socket state (e.g. "listen"/"established").
+  'network.transport', // syscollector ports: "tcp"/"udp".
+  'process.state', // syscollector processes: single-letter kernel state (e.g. "R"/"S"/"Z").
 ]);
 
 /**

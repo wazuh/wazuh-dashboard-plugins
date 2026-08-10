@@ -7,6 +7,7 @@ import {
   requireNonEmptyString,
   validateAgentId,
 } from './common';
+import { BREAKDOWN_BUCKET_CAP } from '../digest';
 
 /**
  * Wazuh 5.0 rewrite: the 4.14 Manager endpoint
@@ -147,6 +148,16 @@ export const getScaChecksTool: ToolDefinition = {
         ],
         sort: ['_doc'],
         size: limit,
+        // Population-true Passed/Failed/Not-applicable distribution over the FULL matched set
+        // (issue #8920 item 1: "named 2 of 10 failed checks" -- this tool only ever ran a plain
+        // hits search, so a `limit`-truncated page gave the model no view of results outside it).
+        // OpenSearch computes `aggregations` over every matched doc regardless of `size`, so this
+        // stays correct even when `limit` truncates the returned rows. `check.result` is on
+        // guardrails.ts's AGG_FIELD_ALLOWLIST as a closed 3-value enum; digest.ts's `buildBreakdown`
+        // already reads any response's `aggregations` generically, so this needs no digest change.
+        aggs: {
+          results: { terms: { field: 'check.result', size: BREAKDOWN_BUCKET_CAP } },
+        },
       },
     };
   },

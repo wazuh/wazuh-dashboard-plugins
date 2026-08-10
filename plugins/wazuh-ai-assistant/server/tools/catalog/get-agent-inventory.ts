@@ -7,6 +7,7 @@ import {
   optionalStringParam,
   validateAgentId,
 } from './common';
+import { BREAKDOWN_BUCKET_CAP } from '../digest';
 
 /**
  * The 5 kinds this tool implements tonight, out of the 13 real `wazuh-states-inventory-*`
@@ -48,6 +49,21 @@ interface InventoryKindConfig {
    * get-agent-os.ts's original hardcoded `size: 5` (one agent has at most one current OS record;
    * the original tool never exposed a `limit` parameter at all). */
   fixedSize?: number;
+  /**
+   * Real `terms` aggregation(s) attached to `body.aggs` for a kind whose completeness question
+   * ("how many ports are listening vs closed", "how many processes are running vs zombie") needs a
+   * population-true categorical breakdown (issue #8920 item 1: a plain hits search left a
+   * `limit`-truncated page silently narrated as if it were the whole inventory). OpenSearch
+   * computes `aggregations` over the FULL matched set regardless of `size`, so this stays correct
+   * even when `limit` truncates the returned rows; digest.ts's `buildBreakdown` already reads any
+   * response's `aggregations` generically, so this needs no digest change. `os`/`packages`/
+   * `hotfixes` deliberately have NONE: `os` is capped at `fixedSize: 5` (already effectively the
+   * whole population, no truncation to disclose against); `packages`/`hotfixes` have no
+   * low-cardinality categorical field whose completeness a breakdown would add beyond what
+   * `counts.total` (the digest's own population-true row count) already answers -- see
+   * `population-disclosure-coverage.test.ts`'s per-kind exemption reasoning for this tool.
+   */
+  breakdownAggs?: Record<string, unknown>;
 }
 
 /**
@@ -101,6 +117,14 @@ const INVENTORY_KIND_CONFIG: Record<InventoryKind, InventoryKindConfig> = {
       'process.pid',
     ],
     limitRange: [50, 500],
+    breakdownAggs: {
+      interface_state: {
+        terms: { field: 'interface.state', size: BREAKDOWN_BUCKET_CAP },
+      },
+      network_transport: {
+        terms: { field: 'network.transport', size: BREAKDOWN_BUCKET_CAP },
+      },
+    },
   },
   processes: {
     index: 'wazuh-states-inventory-processes*',
@@ -112,6 +136,11 @@ const INVENTORY_KIND_CONFIG: Record<InventoryKind, InventoryKindConfig> = {
       'process.command_line',
     ],
     limitRange: [50, 500],
+    breakdownAggs: {
+      process_state: {
+        terms: { field: 'process.state', size: BREAKDOWN_BUCKET_CAP },
+      },
+    },
   },
   hotfixes: {
     index: 'wazuh-states-inventory-hotfixes*',
@@ -256,6 +285,7 @@ export const getAgentInventoryTool: ToolDefinition = {
         _source: config.source,
         sort: ['_doc'],
         size,
+        ...(config.breakdownAggs ? { aggs: config.breakdownAggs } : {}),
       },
     };
   },
