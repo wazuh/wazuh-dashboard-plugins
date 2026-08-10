@@ -3,6 +3,7 @@ import {
   clampLimit,
   limitProperty,
   objectSchema,
+  VULN_BREAKDOWN_AGGS,
   VULN_CURRENT_STATE_NOTE,
   VULN_DIGEST_SAMPLE_COLUMNS,
   VULN_SOURCE_FIELDS,
@@ -41,6 +42,13 @@ export const getCriticalVulnerabilitiesTool: ToolDefinition = {
         _source: VULN_SOURCE_FIELDS,
         sort: ['_doc'],
         size: limit,
+        // Population-true severity/agent breakdown over the FULL matched set (issue #8920 item 1)
+        // -- see VULN_BREAKDOWN_AGGS's doc comment in common.ts. The severity bucket is
+        // degenerate here (this tool always filters to Critical), but the agent-name bucket still
+        // discloses every affected agent regardless of `limit` truncation, and attaching the same
+        // shared aggs uniformly across all three vulnerability tools keeps the class fix from
+        // silently depending on which of the three the model happened to call.
+        aggs: VULN_BREAKDOWN_AGGS,
       },
     };
   },
