@@ -392,6 +392,17 @@ const TERMS_LIKE_AGG_KEYS = new Set([
 const TIME_BASED_INDEX_RE = /^wazuh-(events|findings)-v5/;
 
 /**
+ * Whether `lintDsl` will REQUIRE a bounded `@timestamp` range for this index — exported so a
+ * caller that hand-builds a body (executor.ts's near-miss probe) can satisfy the rule instead of
+ * being silently rejected by it. A rangeless probe against a findings index fails `lintDsl` and the
+ * caller's early return then swallows the failure, so the feature disappears with no error: exactly
+ * what happened before this was exported.
+ */
+export function requiresBoundedTimeRange(index: string): boolean {
+  return TIME_BASED_INDEX_RE.test(index);
+}
+
+/**
  * Vulnerability STATE lives in wazuh-states-vulnerabilities, not the findings/events timeline — so
  * a bare "data.vulnerability." / "vulnerability." filter on a time-based (findings-v5/events-v5)
  * index is structurally wrong: it steers the model back to the typed vulnerability tools instead

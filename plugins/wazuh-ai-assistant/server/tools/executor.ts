@@ -12,6 +12,7 @@ import {
   clampManagerParams,
   lintDsl,
   MAX_AGG_SIZE,
+  requiresBoundedTimeRange,
 } from './guardrails';
 import { buildDigest, buildTableSpec, capDigest, Digest } from './digest';
 import { validateQueryFields } from './field-validation';
@@ -286,14 +287,36 @@ async function appendEntityNearMissHint(
     // Deliberately NEVER copies the executed body's own @timestamp range (contrast
     // appendWindowRecountHint above, which intentionally widens within the same time axis).
     // Agent-name existence has no time axis: a sibling can have exactly one document, ingested
-    // outside whatever window the current turn inherited, and this probe must still find it. A
-    // states-index body carries no event-time axis at all (lintDsl requires none there), so
-    // match_all is also simply correct there -- this is that same rangeless shape, applied
-    // unconditionally rather than only when the executed body happens to lack a range.
+    // outside whatever window the current turn inherited, and this probe must still find it.
+    //
+    // It cannot be rangeless either, though: `lintDsl` REQUIRES a both-sides-bounded @timestamp
+    // range on the events/findings families and rejects the body otherwise — and the `!lint.ok`
+    // early return below swallows that rejection silently, so a rangeless probe made the whole
+    // disclosure vanish rather than error. So: the WIDEST window the guardrails allow (their span
+    // cap is 90 days) on a time-based index, and genuinely rangeless on `wazuh-states-*`, which is
+    // exempt because a state snapshot has no event-time axis at all.
+    //
+    // Residual, and it is the guardrails' ceiling rather than a choice here: a sibling whose only
+    // document is older than the 90-day cap is still invisible to this probe — the same bound every
+    // findings query in the product carries.
+    const probeFilter: Record<string, unknown>[] = requiresBoundedTimeRange(
+      index,
+    )
+      ? [
+          {
+            range: {
+              '@timestamp': {
+                gte: DEFAULT_TIME_RANGE_GTE,
+                lte: DEFAULT_TIME_RANGE_LTE,
+              },
+            },
+          },
+        ]
+      : [{ match_all: {} }];
     const probeBody: Record<string, unknown> = {
       query: {
         bool: {
-          filter: [{ match_all: {} }],
+          filter: probeFilter,
         },
       },
       size: 0,
