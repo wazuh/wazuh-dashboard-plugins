@@ -548,7 +548,10 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
       // `request` internally (server/routes/settings.ts). The plain route-context client above
       // (`context.core.savedObjects.client`, used for the PROVIDER lookup a few lines up) cannot
       // see the hidden `wazuh-ai-assistant-settings` type at all.
-      const assistantSettings = await getOrCreateAssistantSettings(request);
+      const assistantSettings = await getOrCreateAssistantSettings(
+        request,
+        logger,
+      );
       const privacyEnabled = resolvePrivacyEnabled(
         assistantSettings,
         providerId,

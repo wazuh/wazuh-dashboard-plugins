@@ -109,5 +109,11 @@ export const searchWazuhDataTool: ToolDefinition = {
   tableSpec: { columns: [] },
   digest: { sampleColumns: [] },
   deriveColumns: true,
+  // The genuine escape hatch: the model's own DSL can put ANY finding/event/state field into the
+  // digest, so an unlisted field must fail closed (issue #8917 -- see
+  // `ToolDefinition.failClosedFieldPolicy`'s doc comment, types.ts; this used to be inherited from
+  // `deriveColumns` above, now explicit). Do not set this to `false` -- that would remove the
+  // fail-closed protection this tool has always had.
+  failClosedFieldPolicy: true,
   validateFieldNames: true,
 };
