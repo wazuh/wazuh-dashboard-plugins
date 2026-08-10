@@ -101,60 +101,52 @@ test('validateSuggestDiscoverQueryArgs: rejects a query_dsl that decodes to an a
   assert.equal(result.ok, false);
 });
 
-test(
-  'resolveSuggestedDsl: a disallowed index resolves unverifiable_index, never calls _field_caps',
-  async () => {
-    let called = false;
-    const { logger } = fakeLogger();
-    const context = fakeContext(() => {
-      called = true;
-      return Promise.resolve({ body: { fields: {} } });
+test('resolveSuggestedDsl: a disallowed index resolves unverifiable_index, never calls _field_caps', async () => {
+  let called = false;
+  const { logger } = fakeLogger();
+  const context = fakeContext(() => {
+    called = true;
+    return Promise.resolve({ body: { fields: {} } });
+  });
+  const dsl = { term: { 'some.field': 'value' } };
+  const result = await resolveSuggestedDsl(
+    context,
+    'some-other-index-*',
+    dsl,
+    logger,
+  );
+  assert.equal(
+    called,
+    false,
+    '_field_caps must never be called for a disallowed index',
+  );
+  assert.equal(result.outcome, 'unverifiable_index');
+  if (result.outcome === 'unverifiable_index') {
+    assert.deepEqual(result.strippedDsl, {
+      bool: {
+        filter: [{ range: { '@timestamp': { gte: 'now-24h', lte: 'now' } } }],
+      },
     });
-    const dsl = { term: { 'some.field': 'value' } };
-    const result = await resolveSuggestedDsl(
-      context,
-      'some-other-index-*',
-      dsl,
-      logger,
-    );
-    assert.equal(
-      called,
-      false,
-      '_field_caps must never be called for a disallowed index',
-    );
-    assert.equal(result.outcome, 'unverifiable_index');
-    if (result.outcome === 'unverifiable_index') {
-      assert.deepEqual(result.strippedDsl, {
-        bool: {
-          filter: [
-            { range: { '@timestamp': { gte: 'now-24h', lte: 'now' } } },
-          ],
-        },
-      });
-    }
-  },
-);
+  }
+});
 
-test(
-  'resolveSuggestedDsl: every referenced field confirmed by _field_caps resolves verified',
-  async () => {
-    const { logger } = fakeLogger();
-    const context = fakeContext(() =>
-      Promise.resolve({ body: { fields: { 'wazuh.rule.id': {} } } }),
-    );
-    const dsl = { term: { 'wazuh.rule.id': '100002' } };
-    const result = await resolveSuggestedDsl(
-      context,
-      'wazuh-findings-v5-*',
-      dsl,
-      logger,
-    );
-    assert.equal(result.outcome, 'verified');
-    if (result.outcome === 'verified') {
-      assert.deepEqual(result.dsl, dsl);
-    }
-  },
-);
+test('resolveSuggestedDsl: every referenced field confirmed by _field_caps resolves verified', async () => {
+  const { logger } = fakeLogger();
+  const context = fakeContext(() =>
+    Promise.resolve({ body: { fields: { 'wazuh.rule.id': {} } } }),
+  );
+  const dsl = { term: { 'wazuh.rule.id': '100002' } };
+  const result = await resolveSuggestedDsl(
+    context,
+    'wazuh-findings-v5-*',
+    dsl,
+    logger,
+  );
+  assert.equal(result.outcome, 'verified');
+  if (result.outcome === 'verified') {
+    assert.deepEqual(result.dsl, dsl);
+  }
+});
 
 test(
   'resolveSuggestedDsl: an unknown field resolves unknown_fields with the exact name + stripped ' +
@@ -196,60 +188,184 @@ test(
   },
 );
 
-test(
-  'resolveSuggestedDsl: a failed _field_caps call resolves unverifiable_index and logs why',
-  async () => {
-    const { logger, debugCalls } = fakeLogger();
-    const context = fakeContext(() =>
-      Promise.reject(new Error('cluster unavailable')),
-    );
-    const dsl = { term: { 'wazuh.rule.id': '100002' } };
-    const result = await resolveSuggestedDsl(
-      context,
-      'wazuh-findings-v5-*',
-      dsl,
-      logger,
-    );
-    assert.equal(result.outcome, 'unverifiable_index');
-    if (result.outcome === 'unverifiable_index') {
-      assert.deepEqual(result.strippedDsl, {
-        bool: {
-          filter: [
-            { range: { '@timestamp': { gte: 'now-24h', lte: 'now' } } },
-          ],
-        },
-      });
-    }
-    assert.equal(debugCalls.length, 1);
-  },
-);
-
-test(
-  'resolveSuggestedDsl: a dsl with only a (verified) time range resolves verified, unchanged',
-  async () => {
-    let called = false;
-    const { logger } = fakeLogger();
-    const context = fakeContext(() => {
-      called = true;
-      return Promise.resolve({ body: { fields: { '@timestamp': {} } } });
+test('resolveSuggestedDsl: a failed _field_caps call resolves unverifiable_index and logs why', async () => {
+  const { logger, debugCalls } = fakeLogger();
+  const context = fakeContext(() =>
+    Promise.reject(new Error('cluster unavailable')),
+  );
+  const dsl = { term: { 'wazuh.rule.id': '100002' } };
+  const result = await resolveSuggestedDsl(
+    context,
+    'wazuh-findings-v5-*',
+    dsl,
+    logger,
+  );
+  assert.equal(result.outcome, 'unverifiable_index');
+  if (result.outcome === 'unverifiable_index') {
+    assert.deepEqual(result.strippedDsl, {
+      bool: {
+        filter: [{ range: { '@timestamp': { gte: 'now-24h', lte: 'now' } } }],
+      },
     });
-    const dsl = { range: { '@timestamp': { gte: 'now-1d', lte: 'now' } } };
-    // NOTE: `range`'s field key IS collected by collectFieldNames, so this still calls
-    // _field_caps (unlike the truly-empty-dsl case in the next test) -- it just always passes for
-    // '@timestamp', which every allowlisted index has.
-    const result = await resolveSuggestedDsl(
-      context,
-      'wazuh-findings-v5-*',
-      dsl,
-      logger,
-    );
-    assert.equal(called, true);
-    assert.equal(result.outcome, 'verified');
-    if (result.outcome === 'verified') {
-      assert.deepEqual(result.dsl, dsl);
-    }
-  },
-);
+  }
+  assert.equal(debugCalls.length, 1);
+});
+
+test('resolveSuggestedDsl: a dsl with only a time range resolves no_field_filters, unchanged', async () => {
+  let called = false;
+  const { logger } = fakeLogger();
+  const context = fakeContext(() => {
+    called = true;
+    return Promise.resolve({ body: { fields: { '@timestamp': {} } } });
+  });
+  const dsl = { range: { '@timestamp': { gte: 'now-1d', lte: 'now' } } };
+  // The timestamp field itself does not count as a field-level filter (the stripped fallback
+  // re-emits the range anyway), so there is nothing to verify and no _field_caps round trip.
+  const result = await resolveSuggestedDsl(
+    context,
+    'wazuh-findings-v5-*',
+    dsl,
+    logger,
+  );
+  assert.equal(called, false);
+  assert.equal(result.outcome, 'no_field_filters');
+  if (result.outcome === 'no_field_filters') {
+    assert.deepEqual(result.dsl, dsl);
+  }
+});
+
+test('resolveSuggestedDsl: an unrecognized clause type resolves unsupported_clauses (default-deny)', async () => {
+  let called = false;
+  const { logger } = fakeLogger();
+  const context = fakeContext(() => {
+    called = true;
+    return Promise.resolve({ body: { fields: {} } });
+  });
+  const dsl = {
+    bool: {
+      filter: [
+        { multi_match: { query: 'x', fields: ['made.up.field'] } },
+        { range: { '@timestamp': { gte: 'now-7d', lte: 'now' } } },
+      ],
+    },
+  };
+  const result = await resolveSuggestedDsl(
+    context,
+    'wazuh-findings-v5-*',
+    dsl,
+    logger,
+  );
+  assert.equal(
+    called,
+    false,
+    'an unverifiable clause type strips before any _field_caps round trip',
+  );
+  assert.equal(result.outcome, 'unsupported_clauses');
+  if (result.outcome === 'unsupported_clauses') {
+    assert.deepEqual(result.clauses, ['multi_match']);
+    assert.equal(result.timeRangeDefaulted, false);
+    assert.deepEqual(result.strippedDsl, {
+      bool: {
+        filter: [{ range: { '@timestamp': { gte: 'now-7d', lte: 'now' } } }],
+      },
+    });
+  }
+});
+
+test('resolveSuggestedDsl: timeRangeDefaulted is true only when no readable range existed', async () => {
+  const { logger } = fakeLogger();
+  const context = fakeContext(() => Promise.resolve({ body: { fields: {} } }));
+  const noRange = await resolveSuggestedDsl(
+    context,
+    'wazuh-findings-v5-*',
+    { term: { 'made.up.field': 'x' } },
+    logger,
+  );
+  assert.equal(noRange.outcome, 'unknown_fields');
+  if (noRange.outcome === 'unknown_fields') {
+    assert.equal(noRange.timeRangeDefaulted, true);
+  }
+  const withRange = await resolveSuggestedDsl(
+    context,
+    'wazuh-findings-v5-*',
+    {
+      bool: {
+        filter: [
+          { term: { 'made.up.field': 'x' } },
+          { range: { '@timestamp': { gte: 'now-30d', lte: 'now' } } },
+        ],
+      },
+    },
+    logger,
+  );
+  assert.equal(withRange.outcome, 'unknown_fields');
+  if (withRange.outcome === 'unknown_fields') {
+    assert.equal(withRange.timeRangeDefaulted, false);
+  }
+});
+
+test('resolveSuggestedDsl: a reason naming a REAL unfiltered field is reported for disclosure', async () => {
+  const { logger } = fakeLogger();
+  const context = fakeContext(() =>
+    Promise.resolve({
+      body: {
+        fields: { 'wazuh.rule.id': {}, 'wazuh.threat_intel': {} },
+      },
+    }),
+  );
+  const result = await resolveSuggestedDsl(
+    context,
+    'wazuh-findings-v5-*',
+    { term: { 'wazuh.rule.id': '100002' } },
+    logger,
+    'I could not check wazuh.threat_intel, so open this in Discover.',
+  );
+  assert.equal(result.outcome, 'verified');
+  if (result.outcome === 'verified') {
+    assert.deepEqual(result.reasonFieldsNotFiltered, ['wazuh.threat_intel']);
+  }
+});
+
+test('resolveSuggestedDsl: a reason token that is NOT a real index field is ignored (prose, not a promise)', async () => {
+  const { logger } = fakeLogger();
+  const context = fakeContext(() =>
+    Promise.resolve({ body: { fields: { 'wazuh.rule.id': {} } } }),
+  );
+  const result = await resolveSuggestedDsl(
+    context,
+    'wazuh-findings-v5-*',
+    { term: { 'wazuh.rule.id': '100002' } },
+    logger,
+    'See docs.wazuh.example for details.',
+  );
+  assert.equal(result.outcome, 'verified');
+  if (result.outcome === 'verified') {
+    assert.deepEqual(result.reasonFieldsNotFiltered, []);
+  }
+});
+
+test('resolveSuggestedDsl: a range-only suggestion on a BLOCKED index resolves no_field_filters (nothing stripped)', async () => {
+  // The tool's primary documented use case -- the old behavior disclosed a strip that never
+  // happened. The emitted DSL is the normalized range-only form, carrying the model's own
+  // window.
+  const { logger } = fakeLogger();
+  const context = fakeContext(() => Promise.resolve({ body: { fields: {} } }));
+  const result = await resolveSuggestedDsl(
+    context,
+    'some-other-index-*',
+    {
+      bool: {
+        filter: [{ range: { '@timestamp': { gte: 'now-180d', lte: 'now' } } }],
+      },
+    },
+    logger,
+  );
+  assert.equal(result.outcome, 'no_field_filters');
+  if (result.outcome === 'no_field_filters') {
+    assert.match(JSON.stringify(result.dsl), /now-180d/);
+    assert.deepEqual(result.reasonFieldsNotFiltered, []);
+  }
+});
 
 test(
   'resolveSuggestedDsl: an empty dsl (no clauses to verify) resolves no_field_filters, no ' +
@@ -276,29 +392,24 @@ test(
   },
 );
 
-test(
-  'resolveSuggestedDsl: a wazuh-states-* index uses state.modified_at for the stripped time range',
-  async () => {
-    const { logger } = fakeLogger();
-    const context = fakeContext(() =>
-      Promise.resolve({ body: { fields: {} } }),
-    );
-    const dsl = { term: { 'made.up.field': 'x' } };
-    const result = await resolveSuggestedDsl(
-      context,
-      'wazuh-states-vulnerabilities',
-      dsl,
-      logger,
-    );
-    assert.equal(result.outcome, 'unknown_fields');
-    if (result.outcome === 'unknown_fields') {
-      assert.deepEqual(result.strippedDsl, {
-        bool: {
-          filter: [
-            { range: { 'state.modified_at': { gte: 'now-24h', lte: 'now' } } },
-          ],
-        },
-      });
-    }
-  },
-);
+test('resolveSuggestedDsl: a wazuh-states-* index uses state.modified_at for the stripped time range', async () => {
+  const { logger } = fakeLogger();
+  const context = fakeContext(() => Promise.resolve({ body: { fields: {} } }));
+  const dsl = { term: { 'made.up.field': 'x' } };
+  const result = await resolveSuggestedDsl(
+    context,
+    'wazuh-states-vulnerabilities',
+    dsl,
+    logger,
+  );
+  assert.equal(result.outcome, 'unknown_fields');
+  if (result.outcome === 'unknown_fields') {
+    assert.deepEqual(result.strippedDsl, {
+      bool: {
+        filter: [
+          { range: { 'state.modified_at': { gte: 'now-24h', lte: 'now' } } },
+        ],
+      },
+    });
+  }
+});

@@ -112,6 +112,27 @@ const SUGGESTED_QUERY_FIELDS_STRIPPED_DISCLOSURE =
   ' (Note: the suggested field filters could not be verified against this index, so the link ' +
   'opens with a time-range-only query.)';
 
+/** Appended IN ADDITION to the strip disclosure when the model's DSL carried no readable time
+ * range either, so the stripped link opens the DEFAULT 24-hour window rather than a window the
+ * model chose — without this, the tool's own primary use case ("a time range beyond the 90-day
+ * maximum") could promise a long window while the link silently opens 24 hours. */
+const SUGGESTED_QUERY_WINDOW_DEFAULTED_DISCLOSURE =
+  ' (The suggested time window could not be read either, so the link opens the last 24 hours — ' +
+  'adjust the time picker in Discover.)';
+
+/** Appended when the model's `reason` prose names REAL index fields its own DSL never filters on
+ * (resolveSuggestedDsl's `reasonFieldsNotFiltered`) — the reason and the link must never silently
+ * promise different things, issue #8920 item 9's literal witness ("the field named in the prose
+ * was not filtered on at all"), covered here for the MODEL-authored case that no strip ever
+ * touches. */
+function suggestedQueryReasonMismatchDisclosure(fields: string[]): string {
+  return (
+    ` (Note: the linked query does not itself filter on ${fields.join(
+      ', ',
+    )} — it opens a ` + 'broader view; narrow it in Discover.)'
+  );
+}
+
 interface StoredProviderAttributes {
   name: string;
   type: ProviderConfig['type'];
@@ -1138,11 +1159,21 @@ export async function* orchestrate(
               validation.index,
               validation.dsl,
               logger,
+              validation.reason,
             );
 
+            // ROUND-AWARE retry gate: converting a correctable resolution into a tool error only
+            // helps if a FUTURE tool-bearing round exists to retry in. On the last tool-bearing
+            // round (round === MAX_TOOL_ROUNDS - 1) the next round offers no tools at all, so an
+            // error here would destroy the handoff entirely (a regression against base, which
+            // always showed the stripped link) — fall through to strip-plus-disclose instead.
+            const retryRoundAvailable = round < MAX_TOOL_ROUNDS - 1;
+
             if (
-              resolution.outcome === 'unknown_fields' &&
-              !suggestDiscoverUnknownFieldsRetried
+              (resolution.outcome === 'unknown_fields' ||
+                resolution.outcome === 'unsupported_clauses') &&
+              !suggestDiscoverUnknownFieldsRetried &&
+              retryRoundAvailable
             ) {
               // First unknown-fields failure this turn (issue #8920 item 9): do NOT show the
               // suggestion at all -- an invented field name is the MODEL's mistake, and unlike
@@ -1153,43 +1184,63 @@ export async function* orchestrate(
               suggestDiscoverUnknownFieldsRetried = true;
               toolResultContent = JSON.stringify({
                 error:
-                  'The suggested query references field(s) that do not exist on ' +
-                  `${validation.index}: ${resolution.unknownFields.join(', ')}. Rewrite the ` +
-                  'suggestion with fields that exist there, or describe the limitation without ' +
-                  'naming a field filter.',
+                  resolution.outcome === 'unknown_fields'
+                    ? 'The suggested query references field(s) that do not exist on ' +
+                      `${validation.index}: ${resolution.unknownFields.join(
+                        ', ',
+                      )}. Rewrite the ` +
+                      'suggestion with fields that exist there, or describe the limitation ' +
+                      'without naming a field filter.'
+                    : 'The suggested query uses clause type(s) whose field names cannot be ' +
+                      `verified: ${resolution.clauses.join(
+                        ', ',
+                      )}. Rewrite the suggestion ` +
+                      'using term/terms/match/match_phrase/prefix/range/exists inside a bool ' +
+                      'query.',
               });
             } else {
-              // 'verified' | 'no_field_filters' | 'unverifiable_index' | a SECOND 'unknown_fields'
-              // this turn (the retry above was already spent). Whenever the DSL actually shown lost
+              // 'verified' | 'no_field_filters' | 'unverifiable_index' | an
+              // 'unknown_fields'/'unsupported_clauses' whose retry was already spent this turn
+              // (or for which no tool-bearing round remains). Whenever the DSL actually shown lost
               // field-level filters relative to what the model asked to show, the disclosure is
               // appended to `reason` DETERMINISTICALLY -- the emitted reason must never promise a
               // filter the emitted DSL does not carry (see
               // SUGGESTED_QUERY_FIELDS_STRIPPED_DISCLOSURE's doc comment above). Written as an
               // exhaustive switch (not a ternary on a derived boolean) so TypeScript's
               // discriminated-union narrowing picks the right DSL field per outcome --
-              // 'unverifiable_index'/'unknown_fields' have no `.dsl`, and
-              // 'verified'/'no_field_filters' have no `.strippedDsl`.
+              // the stripped outcomes have no `.dsl`, and 'verified'/'no_field_filters' have no
+              // `.strippedDsl`.
               let dsl: Record<string, unknown>;
-              let fieldsWereStripped: boolean;
+              let disclosure: string;
               switch (resolution.outcome) {
                 case 'verified':
                 case 'no_field_filters':
                   dsl = resolution.dsl;
-                  fieldsWereStripped = false;
+                  // Nothing was stripped — but the model's own prose may still promise a filter
+                  // its own DSL never carried (the issue's literal witness); disclose that.
+                  disclosure =
+                    resolution.reasonFieldsNotFiltered.length > 0
+                      ? suggestedQueryReasonMismatchDisclosure(
+                          resolution.reasonFieldsNotFiltered,
+                        )
+                      : '';
                   break;
                 case 'unverifiable_index':
                 case 'unknown_fields':
+                case 'unsupported_clauses':
                   dsl = resolution.strippedDsl;
-                  fieldsWereStripped = true;
+                  disclosure =
+                    SUGGESTED_QUERY_FIELDS_STRIPPED_DISCLOSURE +
+                    (resolution.timeRangeDefaulted
+                      ? SUGGESTED_QUERY_WINDOW_DEFAULTED_DISCLOSURE
+                      : '');
                   break;
               }
               yield {
                 type: 'suggested_query',
                 index: validation.index,
                 dsl,
-                reason: fieldsWereStripped
-                  ? validation.reason + SUGGESTED_QUERY_FIELDS_STRIPPED_DISCLOSURE
-                  : validation.reason,
+                reason: validation.reason + disclosure,
               };
               toolResultContent = JSON.stringify({
                 shown: true,
