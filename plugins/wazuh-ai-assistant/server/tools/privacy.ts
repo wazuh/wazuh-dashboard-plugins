@@ -519,6 +519,21 @@ const ALL_NUMERIC_DOTTED_RE = /^[0-9.]+Z?$/;
  * exclude a genuine hostname like "backup-vault.internal.corp" (starts with a letter). */
 const VERSION_LIKE_TOKEN_RE = /^v?\d+(?:\.\d+)+(?:-[0-9A-Za-z.]+)?$/i;
 
+/** A dotted token shaped like a MITRE ATT&CK technique id with sub-technique notation
+ * ("T1059.001", "T1548.002.001" would also match) — `prescanAndMint` leaves these untouched.
+ * Without this exclusion the FQDN pass mints them as HOST_n ("T1059" and "001" are both legal
+ * hostname labels), which destroys exactly the exact-vs-sub-technique breakdown issue #8920
+ * item 2's rollup disclosure depends on: the model would receive breakdown keys like
+ * {key: "T1059", ...}, {key: "HOST_1", ...} and could no longer report the split. Safety
+ * argument for the narrowing: the shape requires an initial label of "T" + digits ONLY and
+ * every subsequent label all-digits — a real FQDN needs an alphabetic TLD, so the only hostname
+ * this could ever skip is an internal name like "T123.456" (all-numeric final label), which is
+ * exotic enough to accept in exchange for not corrupting every sub-technique id the digest
+ * carries. The field-policy side already classifies the field itself as 'allow'
+ * (WAZUH_FIELD.RULE_MITRE_TECHNIQUE_ID above); this closes the OUTBOUND free-text/JSON scan
+ * that runs after it. */
+const TECHNIQUE_ID_TOKEN_RE = /^T\d+(?:\.\d+)+$/;
+
 /** Every dot-path SEGMENT word appearing in a curated Wazuh/ECS field name — drawn from
  * `WAZUH_FIELD`'s values and every plain field in `FIELD_POLICY_DEFAULTS` (a tool-scope
  * "toolName/" prefix and the trailing ".*" wildcard are stripped first, since those aren't part of
@@ -564,7 +579,9 @@ function isFieldPathToken(token: string): boolean {
  * The FQDN pass additionally excludes (in order checked): an all-numeric dotted run or ISO
  * timestamp fragment (`ALL_NUMERIC_DOTTED_RE`, pre-existing), a version/package-revision string
  * (`VERSION_LIKE_TOKEN_RE` — e.g. "5.2.5-2ubuntu1" would otherwise undermine a
- * `package.version:{allow}` query), and a field-path-shaped token (`isFieldPathToken` — e.g. the
+ * `package.version:{allow}` query), a MITRE sub-technique id (`TECHNIQUE_ID_TOKEN_RE` — e.g.
+ * "T1059.001", whose minting would corrupt the technique breakdown the rollup disclosure
+ * depends on), and a field-path-shaped token (`isFieldPathToken` — e.g. the
  * user typing "wazuh.agent.name"/"wazuh.rule.id" would otherwise get that mention replaced with a
  * HOST_n, breaking their own query and making the model claim the field doesn't exist).
  *
@@ -592,6 +609,7 @@ export function prescanAndMint(
     if (
       ALL_NUMERIC_DOTTED_RE.test(token) ||
       VERSION_LIKE_TOKEN_RE.test(token) ||
+      TECHNIQUE_ID_TOKEN_RE.test(token) ||
       isFieldPathToken(token)
     ) {
       return token;

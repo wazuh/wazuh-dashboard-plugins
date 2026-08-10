@@ -55,6 +55,35 @@ test('prescanAndMint: leaves an ISO-8601 timestamp fragment untouched (29.000Z)'
   assert.match(out, /29\.000Z/);
 });
 
+test('prescanAndMint: leaves a dotted MITRE sub-technique id untouched (T1059.001)', () => {
+  // Issue #8920 item 2: the technique-id breakdown ("T1059: 3, T1059.001: 9") is the rollup's
+  // disclosure surface. "T1059.001" is FQDN-token-shaped, so without TECHNIQUE_ID_TOKEN_RE the
+  // outbound scan minted it as HOST_n and the model received an unreadable split. A hostname is
+  // NOT newly skipped: the exclusion requires "T"+digits then all-digit labels, which no real
+  // FQDN (alphabetic TLD) satisfies.
+  const p = new Pseudonymizer();
+  const out = prescanAndMint('findings for T1059.001 rose sharply', p);
+  assert.equal(out, 'findings for T1059.001 rose sharply');
+  assert.equal(p.newEntries().length, 0);
+});
+
+test('prescanAndMintToolContent: a technique-id breakdown survives privacy intact', () => {
+  const p = new Pseudonymizer();
+  const digestJson = JSON.stringify({
+    tool: 'get_mitre_findings',
+    counts: { total: 12, returned: 12, truncated: false },
+    breakdown: [
+      { key: 'T1059', count: 3 },
+      { key: 'T1059.001', count: 9 },
+    ],
+    samples: [],
+    columns: ['wazuh.rule.mitre.technique.id'],
+  });
+  const out = prescanAndMintToolContent(digestJson, p);
+  assert.equal(out, digestJson);
+  assert.equal(p.newEntries().length, 0);
+});
+
 // --- prescanAndMint: #8889 dotted-token scanner narrowing --------------------------------------
 
 test('prescanAndMint: leaves a field-path mention (wazuh.agent.name) untouched', () => {
