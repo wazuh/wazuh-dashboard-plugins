@@ -135,6 +135,10 @@
 | [#8775](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8775) | Fixed MITRE ATT&CK Framework tab not applying the date range and fetch filters                                                                                                                |
 | [#8920](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8920) | Fixed the AI Assistant's Discover handoff links silently dropping field filters without disclosing it, invented fields now get a bounded self-correction retry instead                        |
 | [#8920](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8920) | Fixed the AI Assistant claiming a missing product capability after a failed tool call instead of correcting the call or trying another tool                                                   |
+| [#8920](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8920) | Fixed the AI Assistant narrating truncated samples as whole result sets, dropping metric aggregations, and undercounting MITRE parent techniques                                              |
+| [#8920](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8920) | Fixed the AI Assistant silently misreporting narrowed-window and near-miss agent-name queries                                                                                                 |
+| [#8920](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8920) | Fixed AI Assistant privacy mode pseudonymizing package versions and MITRE sub-technique ids as hostnames                                                                                      |
+| [#8920](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8920) | Fixed an empty result table overwriting a populated one at the end of an AI Assistant answer                                                                                                  |
 
 ### Removed
 
