@@ -193,5 +193,15 @@ export const getRulesTool: ToolDefinition = {
       'document.logsource.category',
       'space.name',
     ],
+    // Synthetic fallback (issue #8920 item 1): the ruleset is thousands of docs against a default
+    // limit of 20, so "what log sources / rule levels does the ruleset cover" was being answered
+    // from 5 sample rows. Both fields are already returned in `_source` (getByPath groups the
+    // RETURNED rows — no AGG_FIELD_ALLOWLIST entry or live mapping verification is needed for the
+    // digest-level grouping, unlike a real terms aggregation) and both are vendor-curated enums,
+    // structurally safe under privacy (field-policy-coverage.test.ts's
+    // KNOWN_SAFE_STRUCTURAL_FIELDS). Page-scoped with `breakdownNote` when the result is
+    // limit-truncated — an honest partial view instead of a silent sample-as-population
+    // narration.
+    breakdownDimensions: ['document.level', 'document.logsource.product'],
   },
 };

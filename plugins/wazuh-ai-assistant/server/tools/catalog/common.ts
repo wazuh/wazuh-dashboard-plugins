@@ -440,7 +440,7 @@ export const FINDING_BREAKDOWN_DIMENSIONS = [
  * itself (rather than reusing the path verbatim as the key) keeps `digest.ts`'s `breakdown[].agg`
  * tag readable and avoids relying on dots surviving unescaped through any future request
  * transform. */
-function aggNameForField(field: string): string {
+export function aggNameForField(field: string): string {
   return field.replace(/\./g, '_');
 }
 
@@ -550,9 +550,9 @@ export const VULN_SOURCE_FIELDS_WITH_AGENT_ID = [
  * high-severity vulnerabilities" on a host with 2 critical + 2 high, all sorted outside the
  * returned page -- had no population-true view of either dimension. Both fields are already on
  * `guardrails.ts`'s `AGG_FIELD_ALLOWLIST` (severity: a closed 4-value enum; agent name: shared with
- * `FINDING_BREAKDOWN_DIMENSIONS` above). `get_vulnerability_by_cve` deliberately does NOT use this
- * -- see that tool's own doc comment for why it takes the synthetic `breakdownDimensions` fallback
- * instead.
+ * `FINDING_BREAKDOWN_DIMENSIONS` above). `get_vulnerability_by_cve` attaches these same
+ * aggregations too (its own buildRequest): both fields are allowlisted and its index is not
+ * time-based, so the population-true option is free there as well.
  */
 export const VULN_BREAKDOWN_DIMENSIONS = [
   'vulnerability.severity',
