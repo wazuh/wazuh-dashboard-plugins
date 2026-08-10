@@ -1,5 +1,10 @@
 import assert from 'node:assert/strict';
-import { resolveSecurityAnalyticsSpace } from './executor';
+import { executeToolCall, resolveSecurityAnalyticsSpace } from './executor';
+import { ToolCall } from '../../common/types';
+import {
+  OpenSearchDashboardsRequest,
+  RequestHandlerContext,
+} from '../../../../src/core/server';
 
 function hit(space: string | undefined): unknown {
   return space === undefined
@@ -32,5 +37,121 @@ test('resolveSecurityAnalyticsSpace: falls back to "standard" when no hit carrie
   assert.equal(
     resolveSecurityAnalyticsSpace([hit(undefined), hit(undefined)]),
     'standard',
+  );
+});
+
+// --- issue #8920 item 3: narrowed-window zero-row recount ---------------------------------------
+
+interface SearchCall {
+  index: string;
+  body: Record<string, unknown>;
+}
+
+/** Minimal `context` stub: only `context.core.opensearch.client.asCurrentUser.search` is exercised
+ * by the indexer path this suite drives. `responder` decides each call's OpenSearch response body
+ * from the call's own shape/order, and every call is recorded in the returned `calls` array so a
+ * test can assert exactly how many searches fired (e.g. "no second search when returned > 0"). */
+function fakeContext(
+  responder: (call: SearchCall, callIndex: number) => Record<string, unknown>,
+): { context: RequestHandlerContext; calls: SearchCall[] } {
+  const calls: SearchCall[] = [];
+  const context = {
+    core: {
+      opensearch: {
+        client: {
+          asCurrentUser: {
+            search: (params: SearchCall) => {
+              const index = calls.length;
+              calls.push(params);
+              return Promise.resolve({ body: responder(params, index) });
+            },
+          },
+        },
+      },
+    },
+  } as unknown as RequestHandlerContext;
+  return { context, calls };
+}
+
+const dummyRequest = {} as OpenSearchDashboardsRequest;
+
+function toolCall(name: string, args: Record<string, unknown>): ToolCall {
+  return { id: 'call-1', name, arguments: args };
+}
+
+async function parseDigest(
+  outcome: Awaited<ReturnType<typeof executeToolCall>>,
+): Promise<Record<string, unknown>> {
+  return JSON.parse(outcome.toolResultContent);
+}
+
+test('narrowed-window recount: 0 rows in the queried window, but rows in the default window -> hint carries both counts', async () => {
+  const { context, calls } = fakeContext((_call, index) =>
+    index === 0
+      ? { hits: { hits: [], total: { value: 0 } } }
+      : { hits: { hits: [], total: { value: 5 } } },
+  );
+  const outcome = await executeToolCall(
+    toolCall('get_mitre_findings', {
+      technique_id: 'T1110',
+      time_range_gte: 'now-1h',
+      time_range_lte: 'now',
+    }),
+    context,
+    dummyRequest,
+  );
+  const digest = await parseDigest(outcome);
+  assert.equal(calls.length, 2, 'expected exactly one recount search');
+  assert.equal(calls[1].body.size, 0);
+  assert.match(
+    digest.hint as string,
+    /0 rows in the queried window \(now-1h to now\); 5 rows match in the default window \(now-90d to now\)/,
+  );
+});
+
+test('narrowed-window recount: does not fire when the tool call itself returned rows', async () => {
+  const { context, calls } = fakeContext(() => ({
+    hits: {
+      hits: [
+        {
+          _source: {
+            '@timestamp': '2026-08-10T00:00:00Z',
+            'wazuh.rule.mitre.technique.id': 'T1110',
+          },
+        },
+      ],
+      total: { value: 1 },
+    },
+  }));
+  const outcome = await executeToolCall(
+    toolCall('get_mitre_findings', { technique_id: 'T1110' }),
+    context,
+    dummyRequest,
+  );
+  const digest = await parseDigest(outcome);
+  assert.equal(calls.length, 1, 'no recount search should fire on a non-zero result');
+  assert.equal(digest.hint, undefined);
+});
+
+test('narrowed-window recount: also does not fire when the widened recount itself finds nothing', async () => {
+  const { context, calls } = fakeContext(() => ({
+    hits: { hits: [], total: { value: 0 } },
+  }));
+  const outcome = await executeToolCall(
+    toolCall('get_mitre_findings', {
+      technique_id: 'T1110',
+      time_range_gte: 'now-1h',
+      time_range_lte: 'now',
+    }),
+    context,
+    dummyRequest,
+  );
+  const digest = await parseDigest(outcome);
+  assert.equal(calls.length, 2, 'the recount search still fires...');
+  // ...but since it ALSO found 0 rows, no widen hint is appended (the pre-existing zero-row hint
+  // from digest.ts's buildZeroRowHint may still be present -- this only asserts the widen SENTENCE
+  // is absent).
+  assert.ok(
+    !(digest.hint as string | undefined)?.includes('rows match in the default window'),
   );
 });
