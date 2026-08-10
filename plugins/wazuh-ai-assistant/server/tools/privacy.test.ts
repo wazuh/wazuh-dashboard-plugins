@@ -247,6 +247,65 @@ test('Pseudonymizer: applyToText replaces every known value, longest first', () 
   assert.match(out, /^Traffic from IP_\d+ and IP_\d+ was observed\.$/);
 });
 
+// #8916: applyToText previously did a plain substring replace, so a pseudonymized word could
+// corrupt an unrelated value it merely happened to appear inside of — observed live: "ubuntu"
+// (pseudonymized from host.os.platform) turned the package version "7.81.0-1ubuntu1.14" into
+// "7.81.0-1VAL_21.14". These pin the word-boundary discipline (boundary = any non-alphanumeric
+// character) that fixes it without breaking the cases that must keep working.
+
+test('Pseudonymizer: applyToText leaves a pseudonymized word untouched when it is glued inside a larger alphanumeric run (version string)', () => {
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('ubuntu', 'VAL');
+  const text = 'Installed openssh 7.81.0-1ubuntu1.14 on the host.';
+  const out = p.applyToText(text);
+  assert.equal(out, text, 'the version string must be left byte-identical');
+  assert.ok(!out.includes(pseudonym));
+});
+
+test('Pseudonymizer: applyToText still replaces a standalone occurrence of the same value', () => {
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('ubuntu', 'VAL');
+  const text = 'The agent reports its platform is ubuntu.';
+  const out = p.applyToText(text);
+  assert.equal(out, `The agent reports its platform is ${pseudonym}.`);
+});
+
+test('Pseudonymizer: applyToText still replaces a value glued to a larger token by "-" or "_" (whole token, not the compound)', () => {
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('ubuntu', 'VAL');
+  const hyphenated = p.applyToText(
+    'Image tag myapp-ubuntu-server was deployed.',
+  );
+  assert.equal(hyphenated, `Image tag myapp-${pseudonym}-server was deployed.`);
+  const underscored = p.applyToText(
+    'Image tag myapp_ubuntu_server was deployed.',
+  );
+  assert.equal(
+    underscored,
+    `Image tag myapp_${pseudonym}_server was deployed.`,
+  );
+});
+
+test('Pseudonymizer: applyToText still replaces an embedded IP address', () => {
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('10.0.0.5', 'IP');
+  const out = p.applyToText('Connection refused from 10.0.0.5 on port 22.');
+  assert.equal(out, `Connection refused from ${pseudonym} on port 22.`);
+});
+
+test('Pseudonymizer: applyToText still replaces an embedded FQDN', () => {
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('web01.corp.local', 'HOST');
+  const out = p.applyToText('Alert raised on web01.corp.local just now.');
+  assert.equal(out, `Alert raised on ${pseudonym} just now.`);
+});
+
+test('Pseudonymizer: applyToText skips an empty seeded value instead of matching every position', () => {
+  const p = new Pseudonymizer([{ value: '', pseudonym: 'VAL_1' }]);
+  const text = 'unchanged text';
+  assert.equal(p.applyToText(text), text);
+});
+
 test('Pseudonymizer: applyToObject deep-maps nested structures', () => {
   const p = new Pseudonymizer();
   const pseudonym = p.pseudonymize('web-01.corp', 'HOST');
