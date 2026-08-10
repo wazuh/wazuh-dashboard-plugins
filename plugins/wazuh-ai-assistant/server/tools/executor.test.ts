@@ -1,5 +1,10 @@
 import assert from 'node:assert/strict';
-import { executeToolCall, resolveSecurityAnalyticsSpace } from './executor';
+import {
+  executeToolCall,
+  PrivacyContext,
+  resolveSecurityAnalyticsSpace,
+} from './executor';
+import { Pseudonymizer } from './privacy';
 import { ToolCall } from '../../common/types';
 import {
   OpenSearchDashboardsRequest,
@@ -40,7 +45,7 @@ test('resolveSecurityAnalyticsSpace: falls back to "standard" when no hit carrie
   );
 });
 
-// --- issue #8920 item 3: narrowed-window zero-row recount ---------------------------------------
+// --- issue #8920 items 3 & 6: narrowed-window recount + entity near-miss disclosure ------------
 
 interface SearchCall {
   index: string;
@@ -154,4 +159,97 @@ test('narrowed-window recount: also does not fire when the widened recount itsel
   assert.ok(
     !(digest.hint as string | undefined)?.includes('rows match in the default window'),
   );
+});
+
+test('entity near-miss: a zero-padding near-miss with data is disclosed, in the clear when privacy is off', async () => {
+  const findingHit = {
+    _source: {
+      '@timestamp': '2026-08-10T00:00:00Z',
+      'wazuh.agent.name': 'wazuh-aio-05',
+      'wazuh.rule.title': 'test rule',
+      'wazuh.rule.level': 'high',
+    },
+  };
+  const { context, calls } = fakeContext((_call, index) =>
+    index === 0
+      ? { hits: { hits: [findingHit], total: { value: 1 } } }
+      : {
+          hits: { hits: [], total: { value: 0 } },
+          aggregations: {
+            agent_names: {
+              buckets: [{ key: 'wazuh-aio-5', doc_count: 10 }],
+            },
+          },
+        },
+  );
+  const outcome = await executeToolCall(
+    toolCall('search_findings_by_agent', { agent_name: 'wazuh-aio-05' }),
+    context,
+    dummyRequest,
+  );
+  const digest = await parseDigest(outcome);
+  assert.equal(calls.length, 2, 'exactly one entity near-miss probe, no recount (returned > 0)');
+  assert.equal(calls[1].body.size, 0);
+  const hint = digest.hint as string;
+  assert.match(hint, /"wazuh-aio-05"/);
+  assert.match(hint, /wazuh-aio-5/);
+  assert.match(hint, /never silently substitute one host for another/);
+});
+
+test('entity near-miss: agent names in the hint are pseudonymized when privacy mode is active', async () => {
+  const findingHit = {
+    _source: {
+      '@timestamp': '2026-08-10T00:00:00Z',
+      'wazuh.agent.name': 'wazuh-aio-05',
+    },
+  };
+  const { context } = fakeContext((_call, index) =>
+    index === 0
+      ? { hits: { hits: [findingHit], total: { value: 1 } } }
+      : {
+          hits: { hits: [], total: { value: 0 } },
+          aggregations: {
+            agent_names: { buckets: [{ key: 'wazuh-aio-5', doc_count: 10 }] },
+          },
+        },
+  );
+  const privacy: PrivacyContext = {
+    pseudonymizer: new Pseudonymizer(),
+    fieldPolicy: [],
+  };
+  const outcome = await executeToolCall(
+    toolCall('search_findings_by_agent', { agent_name: 'wazuh-aio-05' }),
+    context,
+    dummyRequest,
+    privacy,
+  );
+  const digest = await parseDigest(outcome);
+  const hint = digest.hint as string;
+  // Neither raw hostname reaches the digest's hint text under privacy mode.
+  assert.ok(!hint.includes('wazuh-aio-05'));
+  assert.ok(!hint.includes('wazuh-aio-5"'));
+  assert.match(hint, /HOST_\d+/);
+  // The same two real values are recoverable from the pseudonymizer's own map (round-trip sanity).
+  const entries = privacy.pseudonymizer.newEntries();
+  const realValues = entries.map(entry => entry.value);
+  assert.ok(realValues.includes('wazuh-aio-05'));
+  assert.ok(realValues.includes('wazuh-aio-5'));
+});
+
+test('entity near-miss: does not fire for a tool call naming no agent at all', async () => {
+  const { context, calls } = fakeContext(() => ({
+    hits: { hits: [], total: { value: 0 } },
+  }));
+  const outcome = await executeToolCall(
+    toolCall('get_events_by_agent', {
+      time_range_gte: 'now-1h',
+      time_range_lte: 'now',
+    }),
+    context,
+    dummyRequest,
+  );
+  await parseDigest(outcome);
+  // A narrow window (differing from the plugin default) makes the window-recount fire once (2
+  // total calls); no agent_name was supplied, so the entity probe must not fire a THIRD search.
+  assert.equal(calls.length, 2);
 });
