@@ -656,7 +656,21 @@ test('buildDigest: a REAL breakdown with a truncated bucket list discloses sum_o
   const digest = buildDigest('get_vulnerabilities', result, def);
   assert.ok(digest.breakdownNote, 'expected the bucket-truncation note');
   assert.match(digest.breakdownNote!, /37 additional/);
-  assert.match(digest.breakdownNote!, /not.*complete set|complete set/i);
+  // `/not.*complete set|complete set/i` (the previous form) collapses to `/complete set/i`: `|`
+  // binds looser than concatenation, so the second alternative alone matches any occurrence of
+  // "complete set" regardless of whether "not" precedes it -- the `not.*` branch was dead and
+  // could never make the assertion fail on its own. Requiring "not" to actually precede the
+  // completeness claim is what the test name always meant. Deliberately loose on the word
+  // "complete" itself (not pinned to the literal phrase "complete set of values") because
+  // digest.ts's per-aggregation reword of this note (in flight elsewhere) may name the truncated
+  // dimension inline; the semantic requirement -- the note must NEGATE completeness, not just
+  // mention it -- holds regardless of that wording.
+  assert.match(
+    digest.breakdownNote!,
+    /not[\s\S]{0,80}complete/i,
+    'the truncation note must actually negate completeness, not merely contain the word ' +
+      '"complete" somewhere unrelated',
+  );
 });
 
 test('buildDigest: a REAL breakdown with a complete bucket list stays note-free (byte-identical)', () => {
@@ -1148,9 +1162,14 @@ const METRIC_FAMILY_WORDS = new Set([
 
 test('description/digest sync: no tool description advertises a metric shape the digest drops', () => {
   const offenders: string[] = [];
+  // Without this guard the loop passes vacuously if AGG_TYPE_WORD_RE ever stopped matching any
+  // registered tool description at all (a wording rewrite, a regex typo) -- same standard as
+  // agg-representability-coverage.test.ts's indexerTools.length guard.
+  let checkedCount = 0;
   for (const def of listToolDefinitions()) {
     const words = def.spec.description.match(AGG_TYPE_WORD_RE) ?? [];
     for (const word of new Set(words)) {
+      checkedCount += 1;
       if (
         METRIC_FAMILY_WORDS.has(word) &&
         !(SUPPORTED_METRIC_AGG_TYPES as readonly string[]).includes(word)
@@ -1159,6 +1178,10 @@ test('description/digest sync: no tool description advertises a metric shape the
       }
     }
   }
+  assert.ok(
+    checkedCount > 0,
+    'no registered tool description matched AGG_TYPE_WORD_RE -- this test would pass vacuously',
+  );
   assert.deepEqual(
     offenders,
     [],

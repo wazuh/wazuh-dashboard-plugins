@@ -190,13 +190,22 @@ test('every breakdownDimensions field is privacy-classified or explicitly allowl
   // dimensions list is static and declared, so there is no reason to leave it to the
   // fail-closed runtime default when it can be reviewed here.
   const failures: string[] = [];
+  // Without this guard the loop passes vacuously if no registered tool declared
+  // breakdownDimensions at all (e.g. the field got renamed) -- same standard as the
+  // registry-sweep guards in agg-representability-coverage.test.ts/window-recount.test.ts.
+  let checkedCount = 0;
   for (const def of listToolDefinitions()) {
     for (const field of def.digest.breakdownDimensions ?? []) {
+      checkedCount += 1;
       if (!isFieldCovered(field, def.spec.name, FIELD_POLICY_DEFAULTS)) {
         failures.push(`${def.spec.name}/${field}`);
       }
     }
   }
+  assert.ok(
+    checkedCount > 0,
+    'no registered tool declared breakdownDimensions -- this test would pass vacuously',
+  );
   assert.deepEqual(
     failures,
     [],
