@@ -141,8 +141,11 @@ interface StoredProviderAttributes {
   apiKey?: string;
 }
 
-/** Bounded tool rounds per turn; a final no-tools round follows to close out the answer. */
-const MAX_TOOL_ROUNDS = 3;
+/** Bounded tool rounds per turn; a final no-tools round follows to close out the answer.
+ * Exported so tests can derive round-budget-dependent scripts from it (see
+ * chat-capability-honesty.test.ts's last-tool-bearing-round test) instead of hardcoding the
+ * round count, which would silently start testing a different round on any budget change. */
+export const MAX_TOOL_ROUNDS = 3;
 
 /**
  * Fallback narration for a turn that used at least one tool but whose model never emitted any

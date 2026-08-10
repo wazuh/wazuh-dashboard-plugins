@@ -217,13 +217,21 @@ test('every breakdownDimensions field is privacy-classified or explicitly allowl
   // FIELD_POLICY_DEFAULTS entry, because omitting one there does not mean "allow", it means
   // "anonymize with nobody having decided that's correct".
   const failures: string[] = [];
+  // Without this guard the loop passes vacuously if no registered tool declared
+  // breakdownDimensions at all (e.g. the field got renamed) -- same standard as the
+  // registry-sweep guards in agg-representability-coverage.test.ts/window-recount.test.ts.
+  let checkedCount = 0;
   for (const def of listToolDefinitions()) {
     for (const field of def.digest.breakdownDimensions ?? []) {
+      checkedCount += 1;
       if (
         !isFieldCovered(
           field,
           def.spec.name,
           FIELD_POLICY_DEFAULTS,
+          // A `deriveColumns` tool takes the fail-closed path, where a test-only
+          // KNOWN_SAFE_STRUCTURAL_FIELDS entry is the OPPOSITE of "will be allowed" — such a field
+          // needs a real policy entry. See isFieldCovered's doc comment.
           !!def.deriveColumns,
         )
       ) {
@@ -231,6 +239,10 @@ test('every breakdownDimensions field is privacy-classified or explicitly allowl
       }
     }
   }
+  assert.ok(
+    checkedCount > 0,
+    'no registered tool declared breakdownDimensions -- this test would pass vacuously',
+  );
   assert.deepEqual(
     failures,
     [],

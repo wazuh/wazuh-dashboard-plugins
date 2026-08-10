@@ -4,7 +4,12 @@ import type {
   OpenSearchDashboardsRequest,
   RequestHandlerContext,
 } from '../../../../src/core/server';
-import { augmentToolError, CAPABILITY_DENIAL_NOTE, orchestrate } from './chat';
+import {
+  augmentToolError,
+  CAPABILITY_DENIAL_NOTE,
+  MAX_TOOL_ROUNDS,
+  orchestrate,
+} from './chat';
 import { ROUTE_QUESTION_TOOL } from '../tools/router';
 import { SUGGEST_DISCOVER_QUERY_TOOL } from '../tools/suggest-discover-query';
 import { listToolDefinitions } from '../tools/registry';
@@ -106,6 +111,16 @@ function textOnlyScript(text: string): StreamEvent[] {
   ];
 }
 
+/** Distinctive sentinel thrown by the default `search` stub below (issue: the registry-wide note
+ * sweep proved only that SOME error reached the model, not that it was the VALIDATION error --
+ * executor.ts's generic "Internal tool execution error." catch-all also carries the note, so a
+ * validation gate that silently stopped rejecting bad arguments would still leave the test green
+ * as long as whatever came after it also failed. Asserting the caught error's text is exactly
+ * this sentinel (never `/Unknown property/`) is what makes that regression visible. */
+const SEARCH_SHOULD_NOT_BE_REACHED =
+  'fakeContext SENTINEL: _search must not be called -- argument validation should have ' +
+  'rejected this call before any context access';
+
 function fakeContext(
   fieldCaps: (params: unknown) => Promise<unknown> = () => {
     throw new Error(
@@ -117,7 +132,14 @@ function fakeContext(
   return {
     core: {
       opensearch: {
-        client: { asCurrentUser: { fieldCaps } },
+        client: {
+          asCurrentUser: {
+            fieldCaps,
+            search: () => {
+              throw new Error(SEARCH_SHOULD_NOT_BE_REACHED);
+            },
+          },
+        },
       },
     },
   } as unknown as RequestHandlerContext;
@@ -204,9 +226,13 @@ test('registry-wide coverage: EVERY catalog tool carries CAPABILITY_DENIAL_NOTE 
   // property unconditionally). Each tool is driven through the REAL orchestrate loop (not by
   // calling augmentToolError inside this test, which would stay green even if chat.ts stopped
   // applying it): what is asserted is the role:'tool' message the NEXT round actually reads --
-  // the chokepoint itself. Validation fails before any context access, so the minimal
-  // fakeContext() is never touched. Nothing here is a per-tool allowlist: a future tool added
-  // to the registry inherits the note automatically or fails this test.
+  // the chokepoint itself. Validation fails before any context access, so fakeContext()'s
+  // fieldCaps/search stubs are never touched -- and the search stub throws
+  // SEARCH_SHOULD_NOT_BE_REACHED specifically so that if validation ever stopped rejecting this
+  // call, execution would fall through to that sentinel instead of silently landing on some OTHER
+  // error that still happens to carry the note (executor.ts's generic catch-all does too) and
+  // keeping this loop green for the wrong reason. Nothing here is a per-tool allowlist: a future
+  // tool added to the registry inherits the note automatically or fails this test.
   const failures: string[] = [];
   for (const def of listToolDefinitions()) {
     // eslint-disable-next-line no-await-in-loop -- short sequential registry scan, not hot code
@@ -238,17 +264,23 @@ test('registry-wide coverage: EVERY catalog tool carries CAPABILITY_DENIAL_NOTE 
     }
     if (
       typeof parsed.error !== 'string' ||
+      !/Unknown property/.test(parsed.error) ||
       parsed.note !== CAPABILITY_DENIAL_NOTE
     ) {
-      failures.push(def.spec.name);
+      failures.push(
+        `${def.spec.name}: ${JSON.stringify(parsed)}` +
+          (typeof parsed.error === 'string' &&
+          parsed.error.includes(SEARCH_SHOULD_NOT_BE_REACHED)
+            ? ' (validation did not reject the call -- execution reached the search stub)'
+            : ''),
+      );
     }
   }
   assert.deepEqual(
     failures,
     [],
-    `tool(s) whose rejected call did not carry the capability-denial note: ${failures.join(
-      ', ',
-    )}`,
+    `tool(s) whose rejected call did not carry a genuine VALIDATION error with the ` +
+      `capability-denial note: ${failures.join(', ')}`,
   );
 });
 
@@ -328,20 +360,18 @@ test('orchestrate: a real tool call rejected by a GUARDRAIL (missing time range)
   );
 });
 
-test('orchestrate: a SUCCESSFUL real tool call is NOT augmented with the capability-denial note', () => {
-  // Sanity check for the shape-driven guard: get_agents with no filters is a well-formed
-  // Manager call this test lets fail at the network layer (no context.wazuh_core set up here),
-  // which executor.ts's own try/catch turns into a `{error: "Manager request failed: ..."}`
-  // outcome -- still an ERROR shape, so it SHOULD carry the note. This test instead proves the
-  // negative on a clean synthetic case: augmentToolError itself (already covered above) is the
-  // actual guarantee for the success path, since standing up a real successful Indexer/Manager
-  // response here would require a fuller OpenSearch/Manager client fake than this route-harness
-  // test is about.
-  assert.equal(
-    augmentToolError(JSON.stringify({ counts: { total: 12 }, sample: [] })),
-    JSON.stringify({ counts: { total: 12 }, sample: [] }),
-  );
-});
+// NOTE (test-integrity pass): a test named 'orchestrate: a SUCCESSFUL real tool call is NOT
+// augmented with the capability-denial note' used to live here. It never called `orchestrate` --
+// it only called `augmentToolError` on a synthetic success-shaped payload, which is byte-for-byte
+// the same exercise as 'augmentToolError: is a no-op for non-error content' above (just a
+// different literal). A misleadingly-named duplicate is worse than no test: a reader (or a future
+// diff) sees "orchestrate" and "SUCCESSFUL real tool call" and believes the success path is
+// covered end-to-end, when it is not. Standing up a genuine successful real-tool call through
+// `orchestrate` would need a much fuller Indexer/Manager client fake than this route-harness file
+// builds elsewhere (the test's own comment already said as much), so rather than bend the name to
+// fit the shallow check, or bolt on a heavier fake under time pressure, it is deleted here. The
+// success-path guarantee remains covered by the two `augmentToolError: ... no-op ...` tests above,
+// which test the actual chokepoint function directly and accurately describe what they check.
 
 // --- (b) an unknown-fields handoff produces a tool error, not a suggested_query event ----------
 
@@ -492,11 +522,19 @@ test('orchestrate: a SECOND unknown_fields resolution emits stripped DSL + discl
     secondFailureToolMessages[secondFailureToolMessages.length - 1].content,
   );
   assert.equal(secondParsed.shown, true);
-  assert.notEqual(
+  // `assert.notEqual(secondParsed.note, CAPABILITY_DENIAL_NOTE)` alone would pass if `note` were
+  // dropped entirely (undefined !== CAPABILITY_DENIAL_NOTE too) -- the opposite of what this
+  // comment claims ("must leave its OWN note field untouched"). Assert the field is actually
+  // present with chat.ts's real acknowledgment text instead of merely differing from the other
+  // note -- this string is chat.ts's own suggest_discover_query success-path literal, unrelated
+  // to digest.ts's breakdown-note wording.
+  assert.equal(
     secondParsed.note,
-    CAPABILITY_DENIAL_NOTE,
-    'the "shown" acknowledgment is not an {error} shape, so augmentToolError must leave its ' +
-      'own (different) note field untouched',
+    'The suggested query was shown to the user as an "Open in Discover" link. Now tell the ' +
+      'user plainly, in your own words, what you could not check and why — do not repeat the ' +
+      'query itself, the link already shows it.',
+    'the "shown" acknowledgment must carry its own explanatory note untouched by ' +
+      'augmentToolError, not merely something different from CAPABILITY_DENIAL_NOTE',
   );
   assert.ok(
     !('error' in secondParsed),
@@ -669,9 +707,14 @@ test('orchestrate: a range-only suggestion on a blocked index is NOT told its fi
 test('orchestrate: an unknown_fields resolution on the LAST tool-bearing round still emits the handoff', async () => {
   // Round-aware retry gate: converting to a tool error on round MAX_TOOL_ROUNDS-1 would leave
   // the final (tools-less) round unable to call suggest_discover_query at all -- the user
-  // would lose the handoff entirely, a regression against base. Rounds 0 and 1 are spent on
-  // ordinary rejected tool calls; the suggest call lands on round 2 (the last tool-bearing
-  // one) and must fall through to strip-plus-disclose.
+  // would lose the handoff entirely, a regression against base. Rounds 0..MAX_TOOL_ROUNDS-2 are
+  // spent on ordinary rejected tool calls; the suggest call must land on round
+  // MAX_TOOL_ROUNDS - 1 (the last tool-bearing one) and fall through to strip-plus-disclose.
+  // The filler-round COUNT is derived from MAX_TOOL_ROUNDS instead of hardcoding 2 script
+  // entries: the old literal `[STAGE1_SCRIPT, rejectedSearchRound, rejectedSearchRound, ...]`
+  // encoded "the budget is 3" purely through array position, so a future round-budget change
+  // would silently start exercising a DIFFERENT round (no longer the last one) while this test
+  // kept passing -- proving nothing.
   const rejectedSearchRound: StreamEvent[] = [
     {
       type: 'tool_call',
@@ -684,11 +727,14 @@ test('orchestrate: an unknown_fields resolution on the LAST tool-bearing round s
     { type: 'done', usage: { inputTokens: 10, outputTokens: 2 } },
   ];
   const context = fakeContext(() => Promise.resolve({ body: { fields: {} } }));
+  const fillerRounds = Array.from(
+    { length: MAX_TOOL_ROUNDS - 1 },
+    () => rejectedSearchRound,
+  );
   const { events } = await runOrchestrate(
     [
       STAGE1_SCRIPT,
-      rejectedSearchRound,
-      rejectedSearchRound,
+      ...fillerRounds,
       [
         {
           type: 'tool_call',
