@@ -1220,6 +1220,135 @@ describe('ChatPage — feedback while a turn runs', () => {
   });
 });
 
+/**
+ * Coverage for issue #8920 item 7: a populated result table must never be overwritten by an empty
+ * one at end-of-stream. `chat-page.tsx` flushes its held table buffers (`pendingTable`,
+ * `pendingEmptyTable`) from three different call sites — `finally`, the `error` branch, and the
+ * `auth_expired` branch — and those three do not agree on which buffer they flush first
+ * (`finally`/`auth_expired` flush the non-empty one first; `error` flushes the empty one first).
+ * The class fix is an order-INDEPENDENT invariant (see the `pendingEmptyTable` comment above it):
+ * an empty spec is refused on arrival once a non-empty table exists for the turn, and
+ * `flushPendingEmptyTable` independently yields to any pending/committed non-empty table.
+ *
+ * This is the UI-layer equivalent of the registry-wide coverage tests elsewhere in this codebase
+ * (see server/tools/catalog/agg-size-coverage.test.ts): the class here is "orderings of table
+ * events within one turn", and the five scenarios below enumerate it exhaustively for the
+ * single-table-per-message model — every place an empty `table` event can land relative to a
+ * non-empty one, plus the one honest-empty case that must still render.
+ */
+describe('ChatPage — an empty table never clobbers a populated one (issue #8920 item 7)', () => {
+  const ROWS_SPEC = {
+    columns: [{ id: 'agent', label: 'Agent' }],
+    rows: [{ agent: 'web-01' }],
+  };
+  const EMPTY_SPEC = { columns: [{ id: 'agent', label: 'Agent' }], rows: [] };
+
+  it('keeps the populated table when an empty one arrives after the answer text (text-flush path)', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('top agents?');
+
+    stream.push({ type: 'table', spec: ROWS_SPEC });
+    // The delta's text releases `pendingTable` into `committedTable` — by the time the empty table
+    // below arrives, the non-empty one is no longer "pending", it is already committed, which is
+    // exactly why `hasNonEmptyTableForTurn` also checks `committedTable`, not just `pendingTable`.
+    stream.push({ type: 'delta', content: 'here they are' });
+    await waitFor(() =>
+      expect(screen.getByText('here they are')).toBeInTheDocument(),
+    );
+    stream.push({ type: 'table', spec: EMPTY_SPEC });
+    stream.push({ type: 'done' });
+    stream.end();
+
+    await waitFor(() => expect(screen.getByText('web-01')).toBeInTheDocument());
+    expect(screen.queryByText('Results (0 rows)')).not.toBeInTheDocument();
+  });
+
+  it('keeps the populated table when an empty one arrives with no answer text (finally-path)', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('top agents?');
+
+    // No delta text this turn: both tables reach `finally` still held (`pendingTable` non-empty,
+    // the empty spec never even makes it into `pendingEmptyTable` — refused on arrival).
+    stream.push({ type: 'table', spec: ROWS_SPEC });
+    stream.push({ type: 'table', spec: EMPTY_SPEC });
+    stream.push({ type: 'done' });
+    stream.end();
+
+    await waitFor(() => expect(screen.getByText('web-01')).toBeInTheDocument());
+    expect(screen.queryByText('Results (0 rows)')).not.toBeInTheDocument();
+  });
+
+  it('shows the retried table when an empty attempt is followed by a real one', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('top agents?');
+
+    // A failed/empty first tool attempt, then a successful retry in the same turn — the suppression
+    // this buffer exists for in the first place must still work in the other direction.
+    stream.push({ type: 'table', spec: EMPTY_SPEC });
+    stream.push({ type: 'table', spec: ROWS_SPEC });
+    stream.push({ type: 'done' });
+    stream.end();
+
+    await waitFor(() => expect(screen.getByText('web-01')).toBeInTheDocument());
+  });
+
+  it('still shows an honest empty table when it is the only table this turn', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('top agents?');
+
+    stream.push({ type: 'table', spec: EMPTY_SPEC });
+    stream.push({ type: 'done' });
+    stream.end();
+
+    await waitFor(() =>
+      expect(screen.getByText('Results (0 rows)')).toBeInTheDocument(),
+    );
+  });
+
+  it('keeps the populated table when the turn errors before narrating anything', async () => {
+    // Same scenario as the "keeps a held table when the turn errors before narrating anything"
+    // test above, kept in this matrix too so the five orderings this suite is meant to pin are all
+    // visible together: the `error` branch is the one call site that flushes the EMPTY buffer
+    // before the non-empty one (`flushPendingEmptyTable()` then `flushPendingTable()`), the
+    // opposite order from `finally`/`auth_expired` — this is the scenario that proves the fix must
+    // not depend on flush order.
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('top agents?');
+
+    stream.push({ type: 'table', spec: ROWS_SPEC });
+    stream.push({ type: 'error', message: 'provider stream failed' });
+    stream.end();
+
+    await waitFor(() => expect(screen.getByText('web-01')).toBeInTheDocument());
+    expect(screen.queryByText('Results (0 rows)')).not.toBeInTheDocument();
+  });
+});
+
 describe('ChatPage — confirming before interrupting a running answer', () => {
   function startGeneratingWithSidebar() {
     const stream = createControllableStream();
