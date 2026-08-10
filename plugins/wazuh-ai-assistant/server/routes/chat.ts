@@ -54,6 +54,53 @@ import {
   validateSuggestDiscoverQueryArgs,
 } from '../tools/suggest-discover-query';
 
+/**
+ * CAPABILITY-DENIAL GUARD, deterministic half (issue #8920 item 4/9 -- see prompts.ts's
+ * buildSystemPrompt for the UNGUARANTEED prompt-level half of this same guard). A failed tool call
+ * is just a `role:'tool'` message the model reads like any other -- nothing stops it from
+ * misreading "this call failed" as "Wazuh/this assistant cannot do this at all", and that
+ * conclusion is wrong far more often than not (a bad argument, a guardrail rejection, a transient
+ * error are all correctable-or-retryable, not evidence of a missing capability). This fixed
+ * sentence is appended to the RESULT itself, at the exact moment a failure enters the model's
+ * context -- a locality no system prompt can give, since the prompt is written once per turn and
+ * this fires per failed call. It is delivery, not obedience: whether the model actually follows the
+ * instruction remains model-side and is NOT guaranteed by this code.
+ */
+export const CAPABILITY_DENIAL_NOTE =
+  'This is a failed query or tool call, not evidence of a missing product capability. Do not ' +
+  'tell the user the product or its tools cannot provide something because of this failure -- ' +
+  'correct the call, try another tool, or use suggest_discover_query.';
+
+/**
+ * Applies CAPABILITY_DENIAL_NOTE to any tool-result content shaped like `{error: string, ...}` --
+ * a no-op for anything else (a successful digest, the suggest_discover_query "shown"
+ * acknowledgment, unparseable content). Kept as ONE shape-driven helper rather than a per-branch
+ * decision so every current and future tool-result error inherits the note automatically,
+ * regardless of which of validation/guardrail-rejection/execution-failure produced it -- they all
+ * resolve to this same `{error}` shape before reaching here (see executor.ts's `executeToolCall`
+ * doc comment: "never throws... resolves to a toolErrorContent string").
+ */
+export function augmentToolError(content: string): string {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    return content;
+  }
+  if (
+    !parsed ||
+    typeof parsed !== 'object' ||
+    Array.isArray(parsed) ||
+    typeof (parsed as Record<string, unknown>).error !== 'string'
+  ) {
+    return content;
+  }
+  return JSON.stringify({
+    ...(parsed as Record<string, unknown>),
+    note: CAPABILITY_DENIAL_NOTE,
+  });
+}
+
 /** Server-appended when a `suggested_query` event's DSL lost field-level filters relative to what
  * the model asked to show (an unverifiable index, a failed `_field_caps` check, or a second
  * unknown-fields failure this turn -- see `resolveSuggestedDsl`'s `SuggestedDslResolution`).
@@ -1161,7 +1208,10 @@ export async function* orchestrate(
             {
               role: 'tool',
               toolCallId: event.toolCall.id,
-              content: toolResultContent,
+              // CAPABILITY-DENIAL GUARD chokepoint (see augmentToolError's doc comment above): a
+              // no-op for the 'shown:true' acknowledgment, applies the note to either the arg-
+              // validation error or the unknown-fields self-correction error above.
+              content: augmentToolError(toolResultContent),
             },
           ];
           continue;
@@ -1210,6 +1260,18 @@ export async function* orchestrate(
           };
         }
 
+        // CAPABILITY-DENIAL GUARD chokepoint (see augmentToolError's doc comment above): applied
+        // ONCE here, then reused for BOTH the digest event below and the role:'tool' message --
+        // never the raw `outcome.toolResultContent` -- so the digest a resumed conversation replays
+        // as history is byte-identical to what the model actually saw in THIS turn. This single
+        // call site is what makes the guard "one code path" (this file's own coverage test):
+        // `outcome.toolResultContent` here already carries every real-tool failure mode --
+        // arg-validation rejection, guardrail rejection, and the last-resort execution-crash
+        // fallback right above -- so all three inherit the note without a per-case branch.
+        const toolResultContentForModel = augmentToolError(
+          outcome.toolResultContent,
+        );
+
         if (outcome.tableEvent) {
           yield outcome.tableEvent;
           if (outcome.tableEvent.spec.rows.length > 0) {
@@ -1230,7 +1292,7 @@ export async function* orchestrate(
           yield {
             type: 'digest',
             toolCallId: event.toolCall.id,
-            content: outcome.toolResultContent,
+            content: toolResultContentForModel,
           };
         }
 
@@ -1241,7 +1303,7 @@ export async function* orchestrate(
           {
             role: 'tool',
             toolCallId: event.toolCall.id,
-            content: outcome.toolResultContent,
+            content: toolResultContentForModel,
           },
         ];
         continue;

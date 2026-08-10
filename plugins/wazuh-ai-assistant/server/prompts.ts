@@ -56,7 +56,10 @@ export function buildSystemPrompt(nowIso: string): string {
     'If no tool matches the question exactly, try search_wazuh_data with a minimal, correct ' +
       'query; if you cannot express it within its rules, say plainly what you can and cannot ' +
       'check with the available tools — never silently answer a narrower question than the one ' +
-      'asked.',
+      'asked. The tools offered to you on any given turn are a routed subset of a larger ' +
+      'catalog. Never tell the user that Wazuh or this assistant lacks a capability or data ' +
+      'source: say what you could not check on this turn instead, and offer the Discover ' +
+      'handoff.',
     'search_wazuh_data is a last resort: bool.filter context only, an explicit "@timestamp" range ' +
       'with both bounds (max 90 days back) on time-based indices, size <= 500, no scripts/regexp/' +
       'leading wildcards, and only wazuh-findings-v5-*/wazuh-events-v5-*/wazuh-states-* indices.',
