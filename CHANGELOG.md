@@ -133,8 +133,6 @@
 | [#8708](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8708)   | Fixed Home KPI's visualization persistent filters                                                                                                                                             |
 | [#8766](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8766) | Fixed Server Management Settings crashing or showing a blank page for users without permission to read the manager configuration                                                              |
 | [#8775](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8775) | Fixed MITRE ATT&CK Framework tab not applying the date range and fetch filters                                                                                                                |
-| [#8910](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8910) | Fixed AI Assistant `get_agent_inventory` tool being unable to answer presence questions (e.g. "is a package/port/process present") by adding an optional `filter` parameter                  |
-| [#8914](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8914) | Fixed AI Assistant `get_agent_inventory` numeric `ports` filter matching every connection touching a port instead of preferring the listening socket(s), by narrowing on the `interface.state` field when present |
 
 ### Removed
 
