@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { getAgentInventoryTool } from './get-agent-inventory';
 import { IndexerRequest } from '../types';
+import { applySafetyValves, lintDsl } from '../guardrails';
+import { BREAKDOWN_BUCKET_CAP } from '../digest';
 
 /**
  * Unit tests for get_agent_inventory (issue: "Consolidate agent inventory into one tool"), which
@@ -148,7 +150,11 @@ test('get_agent_inventory: kind="packages" matches get_agent_packages\'s origina
   });
 });
 
-test('get_agent_inventory: kind="ports" matches get_agent_ports\'s original body exactly', () => {
+// --- Issue #8920 item 1 (population-disclosure): "ports"/"processes" now also carry a real
+// breakdown aggregation, so their body is get_agent_ports'/get_agent_processes' original
+// query/_source/sort/size, PLUS the new `aggs` clause -- everything else stays byte-identical. ---
+
+test('get_agent_inventory: kind="ports" matches get_agent_ports\'s original body, plus the new interface.state/network.transport breakdown aggs', () => {
   const req = buildIndexer({ agent_id: '003', kind: 'ports' });
   assert.deepEqual(req, {
     target: 'indexer',
@@ -167,11 +173,19 @@ test('get_agent_inventory: kind="ports" matches get_agent_ports\'s original body
       ],
       sort: ['_doc'],
       size: 50,
+      aggs: {
+        interface_state: {
+          terms: { field: 'interface.state', size: BREAKDOWN_BUCKET_CAP },
+        },
+        network_transport: {
+          terms: { field: 'network.transport', size: BREAKDOWN_BUCKET_CAP },
+        },
+      },
     },
   });
 });
 
-test('get_agent_inventory: kind="processes" matches get_agent_processes\'s original body exactly', () => {
+test('get_agent_inventory: kind="processes" matches get_agent_processes\'s original body, plus the new process.state breakdown agg', () => {
   const req = buildIndexer({ agent_id: '003', kind: 'processes' });
   assert.deepEqual(req, {
     target: 'indexer',
@@ -187,8 +201,38 @@ test('get_agent_inventory: kind="processes" matches get_agent_processes\'s origi
       ],
       sort: ['_doc'],
       size: 50,
+      aggs: {
+        process_state: {
+          terms: { field: 'process.state', size: BREAKDOWN_BUCKET_CAP },
+        },
+      },
     },
   });
+});
+
+test('get_agent_inventory: kind="os"/"packages"/"hotfixes" deliberately have NO breakdown aggs', () => {
+  for (const kind of ['os', 'packages', 'hotfixes']) {
+    const req = buildIndexer({ agent_id: '003', kind });
+    assert.equal(
+      'aggs' in req.body,
+      false,
+      `kind="${kind}" must not carry a breakdown aggregation -- see INVENTORY_KIND_CONFIG's ` +
+        'breakdownAggs doc comment for the per-kind exemption reasoning',
+    );
+  }
+});
+
+test('get_agent_inventory: the ports/processes breakdown-agg requests pass applySafetyValves + lintDsl', () => {
+  for (const kind of ['ports', 'processes']) {
+    const req = buildIndexer({ agent_id: '003', kind });
+    const valved = applySafetyValves(req.body);
+    assert.equal(valved.ok, true, valved.ok ? '' : valved.reason);
+    if (!valved.ok) {
+      continue;
+    }
+    const lint = lintDsl(valved.body, req.index);
+    assert.equal(lint.ok, true, lint.ok ? '' : lint.reason);
+  }
 });
 
 test('get_agent_inventory: limit is clamped to [1, 500] for the 3 limit-taking folded-in kinds', () => {

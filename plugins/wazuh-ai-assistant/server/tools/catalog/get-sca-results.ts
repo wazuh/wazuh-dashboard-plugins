@@ -22,6 +22,14 @@ import {
  * model computes/narrates the ratio when asked. `check.result` values are confirmed live against
  * a real 5.0 stack to be capitalized -- `"Passed"`/`"Failed"`/`"Not applicable"` -- NOT the
  * lowercase 4.14 values; a lowercase `term` filter here silently matches nothing.
+ *
+ * Population-disclosure note (issue #8920 item 1): unlike get_sca_checks (a plain hits search
+ * until this same issue's fix), this tool already satisfies the invariant by construction --
+ * `size: 0` plus a `terms` aggregation on `policy.id` means every per-policy passed/failed/
+ * not_applicable count digest.ts's `buildBreakdown` surfaces is computed by OpenSearch over the
+ * FULL matched set, never a truncated page. No functional change needed here; see
+ * `population-disclosure-coverage.test.ts`, which recognizes this size:0-plus-terms-agg shape as
+ * satisfying the invariant by construction.
  */
 export const getScaResultsTool: ToolDefinition = {
   spec: {
