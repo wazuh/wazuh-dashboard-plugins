@@ -98,9 +98,22 @@ export function buildSystemPrompt(nowIso: string): string {
       'search_findings_by_rule_tag with a wazuh.rule.tags value, or aggregate by rule first with ' +
       'get_top_rules to discover ids. If a narrowly-filtered query returns 0 rows for activity ' +
       'that plausibly exists, retry once with a broader filter before concluding there were none.',
-    'When the data the user needs is out of reach for every tool available to you — a blocked ' +
-      'index, a filter search_wazuh_data cannot express within its rules, or a time range beyond ' +
-      'the 90-day maximum — call suggest_discover_query with the index, query, and reason, then ' +
-      'say plainly what you could not check.',
+    // #8915: suggest_discover_query is attached to the tool list on every tool-bearing round, but
+    // measured live traffic showed it was NEVER invoked — including on the turns it exists for:
+    // an empty domain, a zero-row result, or a truncated sample. Nothing here named WHEN calling
+    // it is the right move, so it read as one more optional tool competing with the data tools
+    // instead of the required close-out step of an unanswerable turn. Name the trigger conditions
+    // explicitly and make the call itself non-optional whenever one holds — see this tool's own
+    // description (suggest-discover-query.ts) for the matching "required last step" framing.
+    'suggest_discover_query is the required last step of a turn you cannot fully answer, not an ' +
+      'optional extra — call it in every one of these cases before you finish, even if you have ' +
+      'already written an answer: (1) no tool available to you covers what the user asked about ' +
+      'at all; (2) a tool call came back with zero rows (counts.returned is 0) and that zero is ' +
+      'your whole answer; (3) the rows you would need to answer with confidence were truncated ' +
+      'away (counts.truncated is true, or a samplesNote is present) and the question depends on ' +
+      'seeing every row, e.g. "does X ever appear" or "are there any Y". In every case, still ' +
+      'answer first, in your own words, saying plainly what you checked and what you could not ' +
+      'confirm — never invent or assume the missing rows — then call suggest_discover_query so ' +
+      'the user gets a Discover link instead of a dead end.',
   ].join('\n');
 }
