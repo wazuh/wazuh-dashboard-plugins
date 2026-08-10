@@ -72,25 +72,84 @@ test('get_mitre_findings: a non-"T\\d+" shaped id (defensive fallback) stays an 
   });
 });
 
+function techniqueIdsTerms(req: IndexerRequest): Record<string, unknown> {
+  const aggs = req.body.aggs as {
+    technique_ids: { terms: Record<string, unknown> };
+  };
+  return aggs.technique_ids.terms;
+}
+
 test('get_mitre_findings: always attaches a technique_ids terms agg for the exact-vs-rollup disclosure', () => {
-  const withParent = buildIndexer({ technique_id: 'T1059' });
+  const noFilter = buildIndexer({});
   // Alongside FINDING_BREAKDOWN_AGGS (issue #8920 item 1's agent/rule-title distribution) --
   // asserted as a superset, so this test pins the technique disclosure without re-pinning the
   // shared breakdown constant common.test.ts already owns.
-  const aggs = withParent.body.aggs as Record<string, unknown>;
-  assert.deepEqual(aggs.technique_ids, {
-    terms: {
-      field: 'wazuh.rule.mitre.technique.id',
-      size: BREAKDOWN_BUCKET_CAP,
-    },
-  });
+  const aggs = noFilter.body.aggs as Record<string, unknown>;
   for (const [name, def] of Object.entries(FINDING_BREAKDOWN_AGGS)) {
     assert.deepEqual(aggs[name], def);
   }
-  // Also attached with no technique_id at all -- the breakdown is useful for "any MITRE finding"
-  // too, not only a rolled-up call.
-  const noFilter = buildIndexer({});
-  assert.deepEqual(noFilter.body.aggs, withParent.body.aggs);
+});
+
+test('get_mitre_findings: no technique_id leaves the technique_ids agg unscoped ("any MITRE finding")', () => {
+  // The "any MITRE-tagged finding" case must keep its full-population top-N breakdown -- there is
+  // no single requested id to scope buckets to.
+  const req = buildIndexer({});
+  assert.deepEqual(techniqueIdsTerms(req), {
+    field: 'wazuh.rule.mitre.technique.id',
+    size: BREAKDOWN_BUCKET_CAP,
+  });
+});
+
+test('get_mitre_findings: a bare parent id scopes technique_ids via include to itself + sub-techniques', () => {
+  // Issue: wazuh.rule.mitre.technique.id is a keyword ARRAY, so a document commonly carries
+  // several co-tagged ids besides the one the user asked about (live evidence: a single finding
+  // tagged with six ids across three tactics). Those co-tags compete for the same
+  // BREAKDOWN_BUCKET_CAP (5) slots and can silently push the requested id's own parent/sub-
+  // technique buckets out of the top 5 -- this `include` pattern is what stops that by excluding
+  // every other id family from the aggregation's candidate set entirely.
+  const req = buildIndexer({ technique_id: 'T1059' });
+  const terms = techniqueIdsTerms(req);
+  assert.equal(terms.field, 'wazuh.rule.mitre.technique.id');
+  assert.equal(terms.size, BREAKDOWN_BUCKET_CAP);
+  assert.equal(terms.include, 'T1059(\\..*)?');
+});
+
+test('get_mitre_findings: a lowercase parent id is uppercased before building the include pattern', () => {
+  const req = buildIndexer({ technique_id: 't1110' });
+  assert.equal(techniqueIdsTerms(req).include, 'T1110(\\..*)?');
+});
+
+test('get_mitre_findings: a dotted sub-technique id scopes technique_ids to that exact id only', () => {
+  const req = buildIndexer({ technique_id: 'T1059.001' });
+  // The dot must be escaped (`\\.`), not left as a Lucene-regexp "any character" wildcard --
+  // otherwise "T1059X001" (or any other single-char substitution) would also match.
+  assert.equal(techniqueIdsTerms(req).include, 'T1059\\.001');
+});
+
+test('get_mitre_findings: a non-ATT&CK-shaped id (defensive fallback) scopes to that literal string', () => {
+  const req = buildIndexer({ technique_id: 'not-a-real-id' });
+  assert.equal(techniqueIdsTerms(req).include, 'not-a-real-id');
+});
+
+test('get_mitre_findings: co-tagged ids cannot crowd the requested id out of the bucket cap', () => {
+  // The defect this fix closes, made concrete: without `include`, a co-tag-heavy population fills
+  // all BREAKDOWN_BUCKET_CAP (5) slots with OTHER technique families before the requested id's own
+  // buckets are considered, and the sub-technique split silently never appears. With `include`
+  // scoping the aggregation's candidate set to the requested family up front, co-tags can never be
+  // bucketed at all, so they cannot occupy a slot regardless of how many co-tagged documents exist.
+  const req = buildIndexer({ technique_id: 'T1059' });
+  const include = techniqueIdsTerms(req).include as string;
+  const coTaggedIds = ['T1562', 'T1070', 'T1040', 'T1562.002', 'T1070.001'];
+  const pattern = new RegExp(`^(?:${include})$`);
+  for (const id of coTaggedIds) {
+    assert.equal(
+      pattern.test(id),
+      false,
+      `co-tagged id "${id}" must not match the requested id's include pattern`,
+    );
+  }
+  assert.equal(pattern.test('T1059'), true);
+  assert.equal(pattern.test('T1059.001'), true);
 });
 
 test('get_mitre_findings: time range and limit are unaffected by the rollup change', () => {
