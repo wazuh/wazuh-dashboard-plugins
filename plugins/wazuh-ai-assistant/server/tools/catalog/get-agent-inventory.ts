@@ -157,9 +157,10 @@ function parseKind(value: unknown): InventoryKind {
  *   `filter` silently ignored for exactly one of the five kinds would be a worse (surprising)
  *   contract than a uniform, if lower-value, one.
  * - `ports` has no single name field (see `buildInventoryFilterClause`'s own handling): a numeric
- *   filter matches `source.port`/`destination.port`, a non-numeric one matches `process.name` (the
- *   process bound to the port), matching the issue's own worked example ("what process is on port
- *   9200").
+ *   filter matches `source.port`/`destination.port`AND prefers a listening `interface.state`
+ *   (issue #8914 -- see `PORT_LISTENING_STATE_VALUES`'s doc comment below), a non-numeric one
+ *   matches `process.name` (the process bound to the port), matching the issue's own worked
+ *   example ("what process is on port 9200").
  */
 const INVENTORY_FILTER_FIELDS: Partial<Record<InventoryKind, string[]>> = {
   os: ['host.hostname', 'host.os.name'],
@@ -222,6 +223,41 @@ function anyFieldMatches(
 }
 
 /**
+ * `interface.state` value(s) the syscollector ports schema uses for a bound/listening socket.
+ *
+ * Evidence (issue #8914, live query against a real wazuh-indexer deployment): a terms aggregation
+ * over `interface.state` on `wazuh-states-inventory-ports*` (84 docs) returned exactly
+ * `listening` (14), `established` (59), `time_wait` (6), `close_wait` (3) -- lowercase, full
+ * English words, NOT the `LISTEN`/`ESTABLISHED` short forms this constant previously held. That
+ * mismatch was a live wrong-answer bug: a case-sensitive `term: { 'interface.state': 'LISTEN' }`
+ * never matches real `listening` documents, so `get_agent_inventory(kind='ports',
+ * filter='9200')` silently returned zero rows against a live cluster (the "OR field absent"
+ * fallback below never firing either, since real documents DO carry `interface.state`) and the
+ * assistant confidently reported nothing listening on a port that was, live, bound by `java`.
+ *
+ * `plugins/main`'s own `states-inventory-ports` sample-data generator (`server/lib/sample-data/
+ * dataset/states-inventory-ports/main.js`, `random.choice(['LISTEN', 'ESTABLISHED'])`) is
+ * SYNTHETIC test fixture data, not a live-verified schema -- it does not match the real
+ * wazuh-indexer vocabulary above and MUST NOT be treated as authoritative for this field's casing
+ * or wording (this file's previous revision made exactly that mistake). Both `listening` (the
+ * confirmed live value) and `listen` (in case an older/differently-provisioned indexer still
+ * writes the sample-data generator's short form) are matched below, each case-insensitively, so
+ * this survives casing differences in either vocabulary without having to guess which one a given
+ * deployment actually writes.
+ */
+const PORT_LISTENING_STATE_VALUES = ['listening', 'listen'];
+
+/** Case-insensitive exact-value match for one of `PORT_LISTENING_STATE_VALUES` -- `term` (not
+ * `match`) with `case_insensitive: true`, the shape OpenSearch supports for an exact-but-cased-
+ * agnostic match on a `keyword` field ("keyword field" per `_source` company in
+ * `INVENTORY_KIND_CONFIG`'s `ports` entry; a prefix/wildcard match would be wrong here since a
+ * substring like "listening" must not accidentally match some other unrelated state word). Kept as
+ * its own helper so both values in `PORT_LISTENING_STATE_VALUES` build the identical clause shape. */
+function listeningStateClause(value: string): Record<string, unknown> {
+  return { term: { 'interface.state': { value, case_insensitive: true } } };
+}
+
+/**
  * Resolves the optional `filter` param (issue #8910) to zero or one extra `bool.filter` clause,
  * appended by `buildRequest` after the agent clause. Returns `undefined` for an omitted/blank
  * filter (existing callers with no `filter` supplied get exactly the same request body as before
@@ -234,6 +270,25 @@ function anyFieldMatches(
  * `long`, never `keyword`), since neither `source`/`destination` alone is "the" port a caller means
  * by "port 9200". A non-numeric filter ("which process is on port X" asked the other way, "what's
  * using nginx's port") falls back to the same `process.name` prefix match `processes` uses.
+ *
+ * Issue #8910: a numeric filter matched EITHER side of the socket with no state narrowing, so
+ * "what's listening on port 9200" returned every connection touching 9200 (both the listener AND
+ * every established peer connection through it) instead of just the listener(s). Issue #8914
+ * narrows this: the outer clause is `bool.filter` on the port match (unchanged, still both sides --
+ * a `source.port`/`destination.port` OR, since a caller-supplied port can legitimately be either
+ * side of a real socket) AND (via a nested `bool.should`/`minimum_should_match: 1`) either
+ * `interface.state` case-insensitively matches one of `PORT_LISTENING_STATE_VALUES` OR the
+ * `interface.state` field is absent from that document. The "OR absent" arm is the graceful
+ * fallback the issue asks for: `interface.state` is NOT made a hard requirement (a `must`/`filter`
+ * on a listening-state term alone would silently return zero rows for any document that happens to
+ * lack the field -- e.g. an older/partial doc from before the field existed), so a deployment where
+ * some or all `ports` documents never carry `interface.state` still gets its port-only match back
+ * exactly as before this fix, one document at a time, rather than the whole query going empty. A
+ * document that DOES carry `interface.state` and holds a non-listening value (e.g. `established`)
+ * is excluded -- that is the actual narrowing this issue exists for. See
+ * `PORT_LISTENING_STATE_VALUES`'s doc comment for why the match is a case-insensitive `term` (not
+ * an exact-cased one) against two known spellings, not just the live-confirmed `listening` value
+ * alone.
  */
 function buildInventoryFilterClause(
   kind: InventoryKind,
@@ -250,11 +305,21 @@ function buildInventoryFilterClause(
   if (kind === 'ports') {
     if (INTEGER_FILTER_RE.test(value)) {
       const port = Number.parseInt(value, 10);
-      return {
+      const portMatch = {
         bool: {
           should: [
             { term: { 'source.port': port } },
             { term: { 'destination.port': port } },
+          ],
+          minimum_should_match: 1,
+        },
+      };
+      return {
+        bool: {
+          filter: [portMatch],
+          should: [
+            ...PORT_LISTENING_STATE_VALUES.map(listeningStateClause),
+            { bool: { must_not: { exists: { field: 'interface.state' } } } },
           ],
           minimum_should_match: 1,
         },
@@ -367,9 +432,12 @@ export const getAgentInventoryTool: ToolDefinition = {
             "Narrows results to rows matching this value on the kind's primary name field, " +
             'case-insensitive: package name for "packages", hotfix id for "hotfixes", process ' +
             'name/command line for "processes", hostname/OS name for "os". For "ports", a numeric ' +
-            'value matches that port number (source or destination); a non-numeric value matches ' +
-            "the process name bound to the port. Optional -- omit to return the kind's unfiltered " +
-            'rows (existing behavior, subject to "limit").',
+            'value matches that port number (source or destination) and prefers the LISTENING ' +
+            'socket(s) when a row carries the "interface.state" field ("what is listening on port ' +
+            '9200?" -- rows without that field are still returned, unnarrowed, so the port-only ' +
+            'match never goes silently empty); a non-numeric value matches the process name bound ' +
+            "to the port. Optional -- omit to return the kind's unfiltered rows (existing " +
+            'behavior, subject to "limit").',
         },
       },
       ['kind'],
