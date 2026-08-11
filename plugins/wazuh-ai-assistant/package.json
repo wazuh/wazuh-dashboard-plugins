@@ -1,6 +1,6 @@
 {
   "name": "wazuh-ai-assistant",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "revision": "00",
   "description": "Wazuh AI Assistant - provider-agnostic AI chat plugin for the Wazuh dashboard (OpenSearch Dashboards)",
   "license": "GPL-2.0-only",
