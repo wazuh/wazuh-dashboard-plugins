@@ -217,7 +217,96 @@ function assertRegistryConsistency(): void {
   }
 }
 
+/**
+ * Declared chain pairs: a summary/list tool name mapped to the cross-category (or same-category)
+ * DETAIL tools a follow-up question naturally reaches for right after it, surveyed against two
+ * measured consumers:
+ *
+ * Failure A ("not offered"): the detail tool was never in the turn's tool list at all, so the
+ * model could not call it even if it wanted to -- e.g. `get_agents` alone never offers
+ * `get_vulnerabilities_by_agent` (the "what's going on with aio-05" miss), `get_vulnerabilities`
+ * alone never offers `get_agent_inventory` (hotfixes), and a findings/rule-title/tag search never
+ * offers `find_document_by_field` for a specific row.
+ *
+ * Failure B ("nothing compels"): the detail tool WAS offered, but the model gave the summary
+ * numbers and then OFFERED the detail call in prose instead of making it -- measured on
+ * `get_sca_results` -> `get_sca_checks` (see `findOfferedFollowUpTool`'s metadata-fallback branch
+ * in server/routes/chat.ts, which keys off this same map for offers that never name a tool).
+ *
+ * `resolveStage2Tools` below appends every entry's detail tools to stage 2's resolved list
+ * whenever the summary tool is present, closing Failure A; the chat.ts consumer closes Failure B
+ * using the same map so the two never drift apart.
+ *
+ * Kept as tool NAMES (not RouterCategory) since several pairs are same-category refinements
+ * (`get_sca_results` -> `get_sca_checks`, both `sca`) that a category-level co-routing (see
+ * `CO_ROUTED_CATEGORIES` above) cannot express -- that mechanism only ever offers a WHOLE sibling
+ * category's tools, not "this one specific tool given that one specific summary was called".
+ * `assertChainPairsConsistency` below verifies every name (key and value) against the registry at
+ * module load, same pattern as `assertRegistryConsistency`: a typo here must throw at plugin
+ * start, not silently 404 mid-turn.
+ */
+export const CHAIN_PAIRS: Record<string, readonly string[]> = {
+  get_sca_results: ['get_sca_checks'],
+  get_agents: [
+    'get_vulnerabilities_by_agent',
+    'get_sca_results',
+    'get_agent_inventory',
+    'search_findings_by_agent',
+  ],
+  get_top_agents: ['search_findings_by_agent', 'get_events_by_agent'],
+  get_top_rules: [
+    'search_findings_by_rule_title',
+    'search_findings_by_rule_tag',
+  ],
+  get_mitre_summary: ['get_mitre_findings'],
+  get_compliance_summary: ['get_compliance_alerts'],
+  get_security_summary: ['get_findings_by_time'],
+  get_vulnerabilities: [
+    'get_vulnerability_by_cve',
+    'get_vulnerabilities_by_agent',
+    'get_agent_inventory',
+  ],
+  get_critical_vulnerabilities: [
+    'get_vulnerability_by_cve',
+    'get_vulnerabilities_by_agent',
+    'get_agent_inventory',
+  ],
+};
+
+/**
+ * `CHAIN_PAIRS` consistency guard, same rationale/shape as `assertRegistryConsistency` above: every
+ * name it mentions -- both the summary-tool keys and every detail tool in each value array -- must
+ * be a real registry tool name, or a typo here would silently never chain (key side) or throw a
+ * confusing "unknown tool" failure only once a turn actually reaches it (value side), instead of
+ * failing loudly at plugin start.
+ */
+function assertChainPairsConsistency(): void {
+  const registryToolNames = new Set(
+    listToolDefinitions().map(def => def.spec.name),
+  );
+  const unknown = new Set<string>();
+  for (const [summaryTool, detailTools] of Object.entries(CHAIN_PAIRS)) {
+    if (!registryToolNames.has(summaryTool)) {
+      unknown.add(summaryTool);
+    }
+    for (const detailTool of detailTools) {
+      if (!registryToolNames.has(detailTool)) {
+        unknown.add(detailTool);
+      }
+    }
+  }
+  if (unknown.size > 0) {
+    throw new Error(
+      'wazuhAiAssistant router: CHAIN_PAIRS names tool(s) not present in the registry: ' +
+        `${Array.from(unknown).join(
+          ', ',
+        )}. Fix server/tools/router.ts's CHAIN_PAIRS or the registry.`,
+    );
+  }
+}
+
 assertRegistryConsistency();
+assertChainPairsConsistency();
 
 /**
  * Stage-1's single synthetic tool. Internal only: server/routes/chat.ts's orchestration loop must
@@ -357,6 +446,9 @@ export function resolveStage2Tools(categories: string[]): ToolSpec[] {
   if (routed.length === 1 && routed[0] === 'general') {
     // Minimal recovery set (see doc comment above): `general` alone maps to no tool category in
     // `TOOL_CATEGORY`/`CATEGORY_TOOLS`, so without this branch the union below would be empty.
+    // Deliberately NOT run through the chain-pairs expansion below: that minimal set must stay
+    // exactly `{get_security_summary, search_wazuh_data}`, since it is the no-data-path escape
+    // hatch, not a routed category union a follow-up chain should widen.
     toolNames.add('get_security_summary');
   } else {
     for (const category of routed) {
@@ -364,7 +456,19 @@ export function resolveStage2Tools(categories: string[]): ToolSpec[] {
         toolNames.add(toolName);
       }
     }
+    // Chain pairs (see `CHAIN_PAIRS`'s doc comment): append every detail tool whose SUMMARY tool
+    // is already in this turn's resolved category union, so a cross-category (or same-category)
+    // follow-up is reachable in the SAME turn rather than requiring a second stage-1 route.
+    // Iterates a snapshot of `toolNames` (`Array.from`, since the loop body mutates the same Set)
+    // so ordering stays stable for the router's stage-2 cache key -- appending, never reordering
+    // or removing, what the category union above already produced.
+    for (const summaryTool of Array.from(toolNames)) {
+      for (const detailTool of CHAIN_PAIRS[summaryTool] ?? []) {
+        toolNames.add(detailTool);
+      }
+    }
   }
+
   // Always-on escape hatch, deduped via the Set regardless of whether
   // `free_search` was itself one of the routed categories.
   toolNames.add('search_wazuh_data');

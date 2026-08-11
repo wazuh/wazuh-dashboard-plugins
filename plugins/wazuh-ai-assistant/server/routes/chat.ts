@@ -43,6 +43,7 @@ import { getApiKeyCipher, getSavedObjectsStart } from '../plugin-services';
 import { resolveWazuhUsername } from '../identity';
 import {
   buildRoutingPrompt,
+  CHAIN_PAIRS,
   resolveStage2Tools,
   ROUTE_QUESTION_TOOL,
   ROUTER_ENABLED,
@@ -355,17 +356,22 @@ const FORCE_EXEMPT_TOOL_NAMES = new Set(['search_wazuh_data']);
  * exactly one tool. A listing is therefore left alone and the turn terminates normally.
  *
  * Residuals, stated honestly: (a) an offer that never NAMES a tool ("I can query the details
- * further") is undetectable at this layer -- the measured 0/3 failure named `get_sca_checks`
- * verbatim, so this covers the witnessed class, not every conceivable phrasing of "want me to?";
- * (b) `OFFER_MARKER_RE` is a finite vocabulary over the model's own prose, so an unusual offer
- * phrasing simply degrades to base behaviour (the turn ends on the offer) -- the trigger is
- * end-to-end only as deterministic as the text it reads, which is why the DELIVERY half
- * (`toolChoice: {name}`) is the part this item counts as guaranteed.
+ * further") was ORIGINALLY undetectable at this layer -- the measured 0/3 failure named
+ * `get_sca_checks` verbatim, so the name-token gate alone covered only the witnessed class. The
+ * METADATA FALLBACK below (issue #8935's second measured consumer, "nothing compels") narrows that
+ * residual for the specific case where the un-named offer follows a `CHAIN_PAIRS`-declared summary
+ * tool (server/tools/router.ts) -- it still degrades to base behaviour for any offer that names no
+ * tool AND whose preceding summary tool has no chain-pair entry; (b) `OFFER_MARKER_RE` is a finite
+ * vocabulary over the model's own prose, so an unusual offer phrasing simply degrades to base
+ * behaviour (the turn ends on the offer) -- the trigger is end-to-end only as deterministic as the
+ * text it reads, which is why the DELIVERY half (`toolChoice: {name}`) is the part this item
+ * counts as guaranteed.
  */
 export function findOfferedFollowUpTool(
   roundText: string,
   offeredTools: ToolSpec[],
   executedToolNames: ReadonlySet<string>,
+  lastSuccessfulToolName?: string,
 ): string | undefined {
   const offerSentences = roundText
     .split(SENTENCE_SPLIT_RE)
@@ -381,6 +387,33 @@ export function findOfferedFollowUpTool(
     const nameRe = new RegExp(`\\b${tool.name}\\b`);
     return offerSentences.some(sentence => nameRe.test(sentence));
   });
+  if (mentioned.length === 0) {
+    // METADATA FALLBACK (issue #8935 Failure B, "nothing compels"): offer-shaped text exists, but
+    // it names NO tool at all -- e.g. "I can pull the specific failing checks if you'd like" gives
+    // the model no tool token for the name-based gate above to catch. Fall back to
+    // `CHAIN_PAIRS` (server/tools/router.ts), keyed by the LAST tool that succeeded THIS turn: the
+    // measured witness (get_sca_results -> get_sca_checks) is exactly this shape, a summary tool
+    // whose result the round text is narrating right before the vague offer. Still bounded by the
+    // same three gates the name-based path applies -- offered this turn, not the suggest-discover
+    // handoff, not the search_wazuh_data escape hatch, not already executed -- so an un-chained (or
+    // already-run) summary tool degrades to base behaviour exactly like an unrecognized offer
+    // phrasing does.
+    if (!lastSuccessfulToolName) {
+      return undefined;
+    }
+    const offeredNames = new Set(offeredTools.map(tool => tool.name));
+    for (const detailToolName of CHAIN_PAIRS[lastSuccessfulToolName] ?? []) {
+      if (
+        offeredNames.has(detailToolName) &&
+        detailToolName !== SUGGEST_DISCOVER_QUERY_TOOL.name &&
+        !FORCE_EXEMPT_TOOL_NAMES.has(detailToolName) &&
+        !executedToolNames.has(detailToolName)
+      ) {
+        return detailToolName;
+      }
+    }
+    return undefined;
+  }
   if (mentioned.length !== 1) {
     return undefined;
   }
@@ -1184,6 +1217,11 @@ export async function* orchestrate(
   // final narration actually makes good use of the forced tool's result. Those two remain
   // model-side and are not guaranteed by this code.
   const executedToolNames = new Set<string>();
+  // The LAST real tool that executed SUCCESSFULLY this turn (set right alongside
+  // `executedToolNames.add` below, never for a rejected/errored call) -- feeds the metadata
+  // fallback in `findOfferedFollowUpTool` (issue #8935 Failure B) so an offer that names no tool
+  // can still be keyed to `CHAIN_PAIRS` by the summary tool the model is narrating.
+  let lastSuccessfulToolName: string | undefined;
   let forcedFollowUpTool: string | undefined;
   let forcedFollowUpSpent = false;
   // Issue #8911: whole-turn tracking for `shouldEnterFinalRoundEarly` above — `true` once any EARLIER
@@ -1664,6 +1702,7 @@ export async function* orchestrate(
         // risks loops -- recorded as a deliberate bound of this mechanism, not an oversight.
         if (!isToolResultError(outcome.toolResultContent)) {
           executedToolNames.add(event.toolCall.name);
+          lastSuccessfulToolName = event.toolCall.name;
         }
 
         if (outcome.tableEvent) {
@@ -1760,7 +1799,12 @@ export async function* orchestrate(
           !roundHadReasoningFallback
         ) {
           const offeredTool = tools
-            ? findOfferedFollowUpTool(roundText, tools, executedToolNames)
+            ? findOfferedFollowUpTool(
+                roundText,
+                tools,
+                executedToolNames,
+                lastSuccessfulToolName,
+              )
             : undefined;
           if (offeredTool) {
             forcedFollowUpTool = offeredTool;

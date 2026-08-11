@@ -486,6 +486,86 @@ test('findOfferedFollowUpTool: no name mentioned at all -> undefined', () => {
   );
 });
 
+// --- metadata fallback (issue #8935 Failure B, "nothing compels"): CHAIN_PAIRS keyed by the last
+// successful summary tool, for an offer that never names a tool at all -----------------------
+
+test('findOfferedFollowUpTool: metadata fallback -- an offer naming no tool chains via CHAIN_PAIRS', () => {
+  assert.equal(
+    findOfferedFollowUpTool(
+      'CIS Ubuntu: 95 passed, 102 failed. I can pull the specific failing checks if you would ' +
+        'like.',
+      SCA_TOOLS,
+      new Set(),
+      'get_sca_results',
+    ),
+    'get_sca_checks',
+  );
+});
+
+test('findOfferedFollowUpTool: metadata fallback -- no lastSuccessfulToolName -> undefined', () => {
+  assert.equal(
+    findOfferedFollowUpTool(
+      'I can pull more detail if you would like.',
+      SCA_TOOLS,
+      new Set(),
+      undefined,
+    ),
+    undefined,
+  );
+});
+
+test('findOfferedFollowUpTool: metadata fallback -- lastSuccessfulToolName has no CHAIN_PAIRS entry -> undefined', () => {
+  assert.equal(
+    findOfferedFollowUpTool(
+      'I can pull more detail if you would like.',
+      SCA_TOOLS,
+      new Set(),
+      'search_wazuh_data',
+    ),
+    undefined,
+  );
+});
+
+test('findOfferedFollowUpTool: metadata fallback -- the chained detail tool must actually be OFFERED this turn', () => {
+  // get_sca_results chains to get_sca_checks, but this turn's offered list does not include it --
+  // the fallback must not name a tool the model could not have called anyway.
+  assert.equal(
+    findOfferedFollowUpTool(
+      'I can pull more detail if you would like.',
+      [tool('get_sca_results'), tool('search_wazuh_data')],
+      new Set(),
+      'get_sca_results',
+    ),
+    undefined,
+  );
+});
+
+test('findOfferedFollowUpTool: metadata fallback -- the chained detail tool already executed is excluded', () => {
+  assert.equal(
+    findOfferedFollowUpTool(
+      'I can pull more detail if you would like.',
+      SCA_TOOLS,
+      new Set(['get_sca_checks']),
+      'get_sca_results',
+    ),
+    undefined,
+  );
+});
+
+test('findOfferedFollowUpTool: a NON-offer round (no OFFER_MARKER_RE marker) is untouched by the fallback', () => {
+  // No offer-shaped sentence at all -- the metadata fallback must never fire just because a
+  // chained summary tool ran; the offer-shape gate is checked FIRST, same as the name-based path.
+  assert.equal(
+    findOfferedFollowUpTool(
+      'CIS Ubuntu: 95 passed, 102 failed, 10 not applicable.',
+      SCA_TOOLS,
+      new Set(),
+      'get_sca_results',
+    ),
+    undefined,
+  );
+});
+
 // --- registry-wide coverage: nothing exempt by default (same standard as
 // agg-size-coverage.test.ts / field-policy-coverage.test.ts) ------------------------------------
 
@@ -692,6 +772,107 @@ test('orchestrate: an unprompted single-tool offer with rounds remaining is forc
     !hasOfferMessage(callMessages[2]),
     'the offer round itself is authored before its own text exists',
   );
+});
+
+test('orchestrate: an unnamed offer is forced via the CHAIN_PAIRS metadata fallback', async () => {
+  // Failure B's un-named shape: the offer never says "get_sca_checks" at all, so the name-based
+  // gate above sees zero mentions -- only the metadata fallback (keyed by the last SUCCESSFUL
+  // tool this turn, get_sca_results) can force this one.
+  const { context } = scaContext();
+  const { events, callMessages, callOptions } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      [
+        {
+          type: 'tool_call',
+          toolCall: {
+            id: 'call_sca_results',
+            name: 'get_sca_results',
+            arguments: { agent_id: '001' },
+          },
+        },
+        { type: 'done', usage: { inputTokens: 20, outputTokens: 10 } },
+      ],
+      offerScript(
+        'CIS Ubuntu: 95 passed, 102 failed, 10 N/A. I can pull the specific failing checks if ' +
+          'you would like.',
+      ),
+      [
+        {
+          type: 'tool_call',
+          toolCall: {
+            id: 'call_sca_checks',
+            name: 'get_sca_checks',
+            arguments: {
+              agent_id: '001',
+              policy_id: 'cis_ubuntu_2004',
+              result: 'failed',
+            },
+          },
+        },
+        { type: 'done', usage: { inputTokens: 25, outputTokens: 12 } },
+      ],
+      textOnlyScript('The three highest-impact failed checks are listed above.'),
+    ],
+    context,
+  );
+
+  assert.equal(
+    callMessages.length,
+    5,
+    'the un-named offer must still be forced into a chained get_sca_checks round',
+  );
+  assert.deepEqual(callOptions[3]?.toolChoice, { name: 'get_sca_checks' });
+  const toolCallEvents = events.filter(
+    (e): e is Extract<StreamEvent, { type: 'tool_call' }> =>
+      e.type === 'tool_call',
+  );
+  assert.deepEqual(
+    toolCallEvents.map(e => e.toolCall.name),
+    ['get_sca_results', 'get_sca_checks'],
+  );
+  assert.equal(events.filter(e => e.type === 'done').length, 1);
+});
+
+test('orchestrate: an unnamed offer on the LAST tool-bearing round is not forced (round budget respected)', async () => {
+  // Same budget fence as the name-based path's own test, but for the metadata fallback: an
+  // unnamed offer landing on the last tool-bearing round must not spend a round the budget does
+  // not have.
+  const fillerRounds = Array.from(
+    { length: MAX_TOOL_ROUNDS - 1 },
+    () => REJECTED_SEARCH_ROUND,
+  );
+  const { events, callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      ...fillerRounds,
+      offerScript('I can pull the specific failing checks if you would like.'),
+    ],
+    rejectingContext(),
+  );
+
+  assert.equal(callMessages.length, MAX_TOOL_ROUNDS + 1);
+  assert.equal(events.filter(e => e.type === 'done').length, 1);
+});
+
+test('orchestrate: an unnamed offer with no chained summary tool this turn is not forced', async () => {
+  // No tool ran this turn at all (rejected call only), so `lastSuccessfulToolName` is never set --
+  // the metadata fallback must not fire off a stale/absent summary tool.
+  const { events, callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      REJECTED_SCA_RESULTS_ROUND,
+      offerScript('I can pull more detail if you would like.'),
+    ],
+    rejectingContext(),
+  );
+
+  assert.equal(
+    callMessages.length,
+    3,
+    'no chained tool was successfully run this turn, so nothing should be forced',
+  );
+  assert.equal(events.filter(e => e.type === 'done').length, 1);
 });
 
 test('orchestrate: an offer to RETRY a rejected tool IS forced (a failed call must not immunize the tool)', async () => {

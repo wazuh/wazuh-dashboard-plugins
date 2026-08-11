@@ -3,8 +3,10 @@ import {
   resolveStage2Tools,
   buildRoutingPrompt,
   CO_ROUTED_CATEGORIES,
+  CHAIN_PAIRS,
   withCoRoutedCategories,
 } from './router';
+import { listToolDefinitions } from './registry';
 
 /**
  * Proves the "never route zero tools" fix: a stage-1 route of `general` alone must still resolve
@@ -23,10 +25,20 @@ test('resolveStage2Tools(general) returns the minimal set, never undefined/empty
   assert.deepEqual(names, ['get_security_summary', 'search_wazuh_data']);
 });
 
-test('resolveStage2Tools: a data category resolution is unchanged', () => {
+test('resolveStage2Tools: a data category resolution includes its chain-pair detail tools', () => {
+  // `agents` -> `get_agents`, which is a CHAIN_PAIRS summary tool (see router.ts), so its detail
+  // tools are also expected in the resolved list -- this is intentional widening, not a
+  // regression: see the "chain co-offering" tests below for the rationale.
   const specs = resolveStage2Tools(['agents']);
   const names = specs.map(spec => spec.name).sort();
-  assert.deepEqual(names, ['get_agents', 'search_wazuh_data']);
+  assert.deepEqual(names, [
+    'get_agent_inventory',
+    'get_agents',
+    'get_sca_results',
+    'get_vulnerabilities_by_agent',
+    'search_findings_by_agent',
+    'search_wazuh_data',
+  ]);
 });
 
 test('resolveStage2Tools: general + a data category still resolves that category', () => {
@@ -197,4 +209,93 @@ test('the "agents" category description excludes comms-channel health', () => {
     /NOT comms-channel health/,
     "agents's description must explicitly exclude comms-channel health",
   );
+});
+
+// --- declared chain pairs: two consumers (server/tools/router.ts, server/routes/chat.ts) --------
+
+/**
+ * CHAIN_PAIRS coverage/load-time check: every key (summary tool) and every value (detail tool)
+ * must be a real registry tool name. `assertChainPairsConsistency` already enforces this at
+ * module load (a typo throws at plugin start), so this test's job is to prove that guard is
+ * actually reachable/correct rather than a dead function -- and to fail loudly in CI, not just at
+ * runtime plugin start, if a future edit reintroduces a typo.
+ */
+test('CHAIN_PAIRS: every summary and detail tool name is a real registry tool', () => {
+  const registryToolNames = new Set(
+    listToolDefinitions().map(def => def.spec.name),
+  );
+  const failures: string[] = [];
+  for (const [summaryTool, detailTools] of Object.entries(CHAIN_PAIRS)) {
+    if (!registryToolNames.has(summaryTool)) {
+      failures.push(`unknown summary tool: ${summaryTool}`);
+    }
+    for (const detailTool of detailTools) {
+      if (!registryToolNames.has(detailTool)) {
+        failures.push(`${summaryTool} -> unknown detail tool: ${detailTool}`);
+      }
+    }
+  }
+  assert.deepEqual(failures, []);
+  assert.ok(
+    Object.keys(CHAIN_PAIRS).length > 0,
+    'the map must not be empty, or this test passes vacuously',
+  );
+});
+
+test('resolveStage2Tools: get_sca_results chains to get_sca_checks (same-category detail)', () => {
+  // The measured Failure B witness (get_sca_results -> get_sca_checks) must also be a Failure A
+  // fix: get_sca_checks must be OFFERED whenever get_sca_results is, regardless of which category
+  // routed it there.
+  const names = resolveStage2Tools(['sca']).map(spec => spec.name);
+  assert.ok(names.includes('get_sca_results'));
+  assert.ok(names.includes('get_sca_checks'));
+});
+
+test('resolveStage2Tools: get_agents chains to cross-category detail tools (Failure A)', () => {
+  // The measured miss: "what's going on with aio-05" needs get_vulnerabilities_by_agent, but
+  // routing to `agents` alone never offered it before this fix.
+  const names = resolveStage2Tools(['agents']).map(spec => spec.name);
+  assert.ok(names.includes('get_agents'));
+  assert.ok(names.includes('get_vulnerabilities_by_agent'));
+  assert.ok(names.includes('get_sca_results'));
+  assert.ok(names.includes('get_agent_inventory'));
+  assert.ok(names.includes('search_findings_by_agent'));
+});
+
+test('resolveStage2Tools: get_vulnerabilities chains to get_agent_inventory (hotfixes)', () => {
+  // The measured miss: vulnerabilities -> get_agent_inventory(hotfixes) was never offered when
+  // only the `vulnerabilities` category was routed.
+  const names = resolveStage2Tools(['vulnerabilities']).map(spec => spec.name);
+  assert.ok(names.includes('get_vulnerabilities'));
+  assert.ok(names.includes('get_agent_inventory'));
+  assert.ok(names.includes('get_vulnerability_by_cve'));
+  assert.ok(names.includes('get_vulnerabilities_by_agent'));
+});
+
+test('resolveStage2Tools: get_critical_vulnerabilities chains the same detail tools', () => {
+  const names = resolveStage2Tools(['vulnerabilities']).map(spec => spec.name);
+  assert.ok(names.includes('get_critical_vulnerabilities'));
+  assert.ok(names.includes('get_agent_inventory'));
+});
+
+test('resolveStage2Tools: findings-row detail tool (find_document_by_field) is reachable via free_search', () => {
+  // find_document_by_field itself is not a CHAIN_PAIRS value (it lives in `free_search`, which is
+  // always reachable via search_wazuh_data's category), but the escape hatch's own category tools
+  // remain intact after the chain-pairs expansion.
+  const names = resolveStage2Tools(['findings']).map(spec => spec.name);
+  assert.ok(names.includes('search_wazuh_data'));
+});
+
+test('resolveStage2Tools: chain-pair expansion does not widen the general-alone minimal recovery set', () => {
+  // get_security_summary is itself a CHAIN_PAIRS summary key (-> get_findings_by_time); the
+  // general-alone branch must stay the exact minimal recovery set and not run through the
+  // expansion.
+  const names = resolveStage2Tools(['general']).map(spec => spec.name).sort();
+  assert.deepEqual(names, ['get_security_summary', 'search_wazuh_data']);
+});
+
+test('resolveStage2Tools: get_security_summary chains to get_findings_by_time outside the general-alone branch', () => {
+  const names = resolveStage2Tools(['findings']).map(spec => spec.name);
+  assert.ok(names.includes('get_security_summary'));
+  assert.ok(names.includes('get_findings_by_time'));
 });
