@@ -1577,3 +1577,92 @@ describe('ChatPage — welcome-state layout does not clip the composer', () => {
     expect(['0', '0px']).toContain(column.style.minHeight);
   });
 });
+
+describe('ChatPage — transcript reserves space for the sticky composer', () => {
+  /**
+   * Regression guard for the composer-overlap bug: a live measurement caught the sticky composer
+   * (`.wzStickyInputPanel`) covering the bottom few pixels of the transcript's last element (a
+   * table's pagination bar) even once scrolled all the way down — `position: sticky` reserves the
+   * panel's own box in the flow, but not the fade gradient its `::before` paints further upward
+   * (chat-page.scss). The fix measures the panel's actual rendered height and feeds it back as
+   * `paddingBottom` on `.wzChatTranscript`, the flow sibling that sits directly above it, so the
+   * transcript can always scroll fully clear of it.
+   *
+   * jsdom never lays out real boxes, so `.wzStickyInputPanel`'s `offsetHeight` is always 0 there —
+   * no jsdom test can reproduce the real pixel overlap. What this pins instead is the STRUCTURAL
+   * mechanism: the panel is measured via a ref, and that measurement is what actually reaches
+   * `.wzChatTranscript`'s `paddingBottom`, by stubbing `offsetHeight` to a value only the wiring
+   * (not a hardcoded style) could have produced.
+   */
+  it("feeds the sticky composer's measured height back as the transcript's paddingBottom", async () => {
+    const offsetHeightDescriptor = Object.getOwnPropertyDescriptor(
+      HTMLElement.prototype,
+      'offsetHeight',
+    );
+    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+      configurable: true,
+      value: 132,
+    });
+
+    try {
+      renderChatPage();
+      await waitFor(() =>
+        expect(
+          screen.getByText('Ask the AI Assistant something'),
+        ).toBeInTheDocument(),
+      );
+
+      const pane = screen.getByRole('region', { name: 'Chat' });
+      const transcript = pane.querySelector('.wzChatTranscript') as HTMLElement;
+      expect(transcript).not.toBeNull();
+      expect(transcript.style.paddingBottom).toBe('132px');
+    } finally {
+      // Restores jsdom's own descriptor so this stub cannot leak into any test that runs after this
+      // one in the same worker.
+      if (offsetHeightDescriptor) {
+        Object.defineProperty(
+          HTMLElement.prototype,
+          'offsetHeight',
+          offsetHeightDescriptor,
+        );
+      } else {
+        delete (HTMLElement.prototype as unknown as Record<string, unknown>)
+          .offsetHeight;
+      }
+    }
+  });
+
+  it('drops the reserved padding back to zero once the sticky composer unmounts', async () => {
+    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+      configurable: true,
+      value: 132,
+    });
+
+    try {
+      const { rerenderWith } = renderChatPage();
+      await waitFor(() =>
+        expect(
+          screen.getByText('Ask the AI Assistant something'),
+        ).toBeInTheDocument(),
+      );
+
+      // No providers configured: the composer (and the no-provider empty state's own layout)
+      // replaces the transcript entirely, so nothing should be left reserving space for a panel
+      // that is no longer on screen.
+      rerenderWith({ providers: [], selectedProviderId: '' });
+      await waitFor(() =>
+        expect(
+          screen.queryByLabelText('Chat message'),
+        ).not.toBeInTheDocument(),
+      );
+
+      const pane = screen.getByRole('region', { name: 'Chat' });
+      const transcript = pane.querySelector('.wzChatTranscript') as HTMLElement;
+      expect(transcript).not.toBeNull();
+      expect(['0px', '']).toContain(transcript.style.paddingBottom);
+    } finally {
+      delete (HTMLElement.prototype as unknown as Record<string, unknown>)
+        .offsetHeight;
+    }
+  });
+});
