@@ -169,15 +169,18 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
         if (!temperatureWasSent || attemptResponse.status !== 400) {
           return attemptResponse;
         }
-        // Peek at a CLONE so the original response's body is left untouched for
-        // `fetchProviderWithRetry` to consume normally when this turns out not to be a
-        // temperature rejection (a 400 for some other reason must reach it unconsumed).
-        const bodyText = await attemptResponse
-          .clone()
-          .text()
-          .catch(() => '');
+        // Peek by reading the ORIGINAL body — `Response.clone()` is unavailable in some
+        // runtimes (the OSD jest environment's Response polyfill lacks it entirely, throwing
+        // `clone is not a function`), so the peek consumes the body and, when this turns out
+        // NOT to be a temperature rejection, hands `fetchProviderWithRetry` a reconstructed
+        // equivalent Response whose body is intact for its own error-reading path.
+        const bodyText = await attemptResponse.text().catch(() => '');
         if (!looksLikeTemperatureRejection(attemptResponse.status, bodyText)) {
-          return attemptResponse;
+          return new Response(bodyText, {
+            status: attemptResponse.status,
+            statusText: attemptResponse.statusText,
+            headers: attemptResponse.headers,
+          });
         }
         temperatureRejectedByProviderModel.set(cacheKey, true);
         logTemperatureRejectionOnce(config);
