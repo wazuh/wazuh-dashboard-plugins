@@ -8,6 +8,7 @@ const mockService = {
   create: jest.fn().mockResolvedValue({}),
   update: jest.fn().mockResolvedValue({}),
   delete: jest.fn().mockResolvedValue(undefined),
+  remove: jest.fn().mockResolvedValue(undefined),
   test: jest
     .fn()
     .mockResolvedValue({ success: true, latencyMs: 50, message: null }),
@@ -244,6 +245,180 @@ describe('SettingsPage — auto-probe failures do not become permanent banners',
     // the same provider/message — that would be a duplicate.
     expect(
       screen.queryByText(/^my default: invalid api key$/i),
+    ).not.toBeInTheDocument();
+  });
+});
+
+describe('SettingsPage — manual test failure callout is genuinely dismissible', () => {
+  it('renders an explicit close control and clicking it removes the callout', async () => {
+    mockService.list.mockResolvedValue([
+      {
+        id: 'p1',
+        name: 'My OpenAI',
+        type: 'openai_compatible',
+        baseUrl: 'https://api.openai.com/v1',
+        model: 'gpt-4o',
+        isDefault: false,
+      },
+    ]);
+    mockService.test.mockResolvedValue({
+      success: false,
+      latencyMs: 0,
+      message: 'Connection refused',
+    });
+
+    render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
+
+    // Auto-probe must not have produced the callout yet.
+    await waitFor(() => expect(mockService.test).toHaveBeenCalledWith('p1'));
+
+    const testButton = await screen.findByRole('button', { name: 'Test' });
+    fireEvent.click(testButton);
+    await waitFor(() => expect(mockService.test).toHaveBeenCalledTimes(2));
+
+    expect(
+      await screen.findByText(/my openai: connection refused/i),
+    ).toBeInTheDocument();
+
+    // The OUI fork's EuiCallOut renders no dismiss control at all for `onDismiss` — the fix must
+    // provide an explicit, visible close button instead, not rely on that ignored prop.
+    const dismissButton = await screen.findByRole('button', {
+      name: 'Dismiss My OpenAI test failure',
+    });
+    fireEvent.click(dismissButton);
+
+    expect(
+      screen.queryByText(/my openai: connection refused/i),
+    ).not.toBeInTheDocument();
+  });
+
+  it('clears a prior manual failure callout once a later manual test of the same provider succeeds', async () => {
+    mockService.list.mockResolvedValue([
+      {
+        id: 'p1',
+        name: 'My OpenAI',
+        type: 'openai_compatible',
+        baseUrl: 'https://api.openai.com/v1',
+        model: 'gpt-4o',
+        isDefault: false,
+      },
+    ]);
+    mockService.test.mockResolvedValueOnce({
+      success: false,
+      latencyMs: 0,
+      message: 'Connection refused',
+    });
+
+    render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
+
+    await waitFor(() => expect(mockService.test).toHaveBeenCalledWith('p1'));
+
+    const testButton = await screen.findByRole('button', { name: 'Test' });
+    fireEvent.click(testButton);
+    await waitFor(() => expect(mockService.test).toHaveBeenCalledTimes(2));
+
+    expect(
+      await screen.findByText(/my openai: connection refused/i),
+    ).toBeInTheDocument();
+
+    // A later manual test that succeeds must auto-clear the earlier failure callout, without the
+    // user needing to dismiss it first.
+    mockService.test.mockResolvedValueOnce({
+      success: true,
+      latencyMs: 42,
+      message: null,
+    });
+    fireEvent.click(testButton);
+    await waitFor(() => expect(mockService.test).toHaveBeenCalledTimes(3));
+
+    expect(
+      screen.queryByText(/my openai: connection refused/i),
+    ).not.toBeInTheDocument();
+  });
+
+  it('clears a prior manual failure callout once the failing provider is deleted', async () => {
+    mockService.list.mockResolvedValueOnce([
+      {
+        id: 'p1',
+        name: 'My OpenAI',
+        type: 'openai_compatible',
+        baseUrl: 'https://api.openai.com/v1',
+        model: 'gpt-4o',
+        isDefault: false,
+      },
+    ]);
+    mockService.test.mockResolvedValue({
+      success: false,
+      latencyMs: 0,
+      message: 'Connection refused',
+    });
+
+    render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
+
+    await waitFor(() => expect(mockService.test).toHaveBeenCalledWith('p1'));
+
+    const testButton = await screen.findByRole('button', { name: 'Test' });
+    fireEvent.click(testButton);
+    await waitFor(() => expect(mockService.test).toHaveBeenCalledTimes(2));
+
+    expect(
+      await screen.findByText(/my openai: connection refused/i),
+    ).toBeInTheDocument();
+
+    // Deleting the provider removes it from the list entirely, so the callout must disappear too.
+    mockService.list.mockResolvedValueOnce([]);
+    const deleteRowButton = await screen.findByRole('button', {
+      name: 'Delete',
+    });
+    fireEvent.click(deleteRowButton);
+
+    // The confirm modal's own confirm button is also labeled "Delete" — it renders after the row
+    // action button, so it is the last match.
+    const deleteButtons = await screen.findAllByRole('button', {
+      name: 'Delete',
+    });
+    fireEvent.click(deleteButtons[deleteButtons.length - 1]);
+
+    await waitFor(() => expect(mockService.remove).toHaveBeenCalledWith('p1'));
+    await waitFor(() =>
+      expect(
+        screen.queryByText(/my openai: connection refused/i),
+      ).not.toBeInTheDocument(),
+    );
+  });
+});
+
+describe('SettingsPage — default provider failure callout is genuinely dismissible', () => {
+  it('renders an explicit close control and clicking it removes the callout', async () => {
+    mockService.list.mockResolvedValue([
+      {
+        id: 'p1',
+        name: 'My Default',
+        type: 'anthropic',
+        baseUrl: 'https://api.anthropic.com',
+        model: 'claude-3',
+        isDefault: true,
+      },
+    ]);
+    mockService.test.mockResolvedValue({
+      success: false,
+      latencyMs: 0,
+      message: 'Invalid API key',
+    });
+
+    render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
+
+    expect(
+      await screen.findByText(/default provider "my default" is failing/i),
+    ).toBeInTheDocument();
+
+    const dismissButton = await screen.findByRole('button', {
+      name: 'Dismiss default provider failure',
+    });
+    fireEvent.click(dismissButton);
+
+    expect(
+      screen.queryByText(/default provider "my default" is failing/i),
     ).not.toBeInTheDocument();
   });
 });
