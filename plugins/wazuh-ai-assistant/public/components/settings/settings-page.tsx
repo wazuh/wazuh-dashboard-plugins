@@ -806,11 +806,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           isPrimary: true,
           onClick: handleManualTest,
           enabled: (provider: ProviderSummary) => !testingIds.has(provider.id),
-          // Stable per-row query hook: the accessible name of a primary icon action is not a
-          // reliable anchor across re-renders in the test env (a callout rendering below the
-          // table can transiently drop it from the a11y-name query), so tests target this.
-          'data-test-subj': (provider: ProviderSummary) =>
-            `wz-ai-provider-test-${provider.id}`,
+          // Stable query hook: the accessible name of a primary icon action is not a reliable
+          // anchor across re-renders in the test env (a callout rendering below the table can
+          // transiently drop it from the a11y-name query). NOTE: this OUI fork passes the value
+          // through verbatim as a plain attribute, so it must be a STRING — the newer EUI
+          // per-row callback form would reach React as a function and be dropped silently.
+          'data-test-subj': 'wz-ai-provider-test-action',
         },
         {
           name: i18n.translate('wazuhAiAssistant.settings.action.edit', {

@@ -316,7 +316,13 @@ describe('SettingsPage — manual test failure callout is genuinely dismissible'
 
     await waitFor(() => expect(mockService.test).toHaveBeenCalledWith('p1'));
 
-    const testButton = await screen.findByTestId('wz-ai-provider-test-p1');
+    const testButton = await waitFor(() => {
+      const button = document.querySelector(
+        '[data-test-subj="wz-ai-provider-test-action"]',
+      );
+      expect(button).not.toBeNull();
+      return button as HTMLElement;
+    });
     fireEvent.click(testButton);
     await waitFor(() => expect(mockService.test).toHaveBeenCalledTimes(2));
 
@@ -334,9 +340,13 @@ describe('SettingsPage — manual test failure callout is genuinely dismissible'
     // Re-query via the stable per-row data-test-subj: the primary icon action's accessible name
     // is not a reliable anchor once the failure callout has rendered below the table, so target
     // the action's data-test-subj, which is invariant across re-renders.
-    const testButtonAfterFailure = await screen.findByTestId(
-      'wz-ai-provider-test-p1',
-    );
+    const testButtonAfterFailure = await waitFor(() => {
+      const button = document.querySelector(
+        '[data-test-subj="wz-ai-provider-test-action"]',
+      );
+      expect(button).not.toBeNull();
+      return button as HTMLElement;
+    });
     fireEvent.click(testButtonAfterFailure);
     await waitFor(() => expect(mockService.test).toHaveBeenCalledTimes(3));
 
