@@ -1,11 +1,13 @@
 import { AssistantSettingsManager } from './assistant-settings-manager';
 import { IndexSettingsProvider } from './index-settings-provider';
 import { IsmSettingsProvider } from './ism-settings-provider';
+import { AiProvidersClient } from './ai-providers-client';
 
 /**
  * Builds the single `AssistantSettingsManager` for this plugin, with both backends registered
  * (wazuh-dashboard-plugins#8841/#500): `IndexSettingsProvider` for privacy defaults/override/field
- * policy (`.wazuh-ai-assistant-settings` singleton document) and `IsmSettingsProvider` for
+ * policy (the Wazuh indexer's `/_plugins/_setup/ai_assistant/settings` endpoint — see that
+ * provider's doc comment for the OpenAPI spec link) and `IsmSettingsProvider` for
  * `conversationRetentionDays` (an ISM policy — see that provider's doc comment for the policy id).
  *
  * Called once from `server/plugin.ts`'s `setup()`, which hands the instance to
@@ -24,6 +26,7 @@ declare module '../../../../src/core/server' {
   interface RequestHandlerContext {
     wazuh_ai_assistant: {
       assistantSettings: AssistantSettingsManager;
+      aiProviders: AiProvidersClient;
     };
   }
 }

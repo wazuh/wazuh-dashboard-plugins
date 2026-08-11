@@ -2,11 +2,12 @@ import * as crypto from 'crypto';
 import { PROVIDER_API_KEY_AAD_NAMESPACE } from '../../common/constants';
 
 /**
- * Encryption-at-rest for provider API keys (a provider document's `api_key` field, under
- * `ASSISTANT_SETTINGS_INDEX` — see server/settings-store.ts). The value is never returned over the
+ * Encryption-at-rest for provider API keys (a provider's `api_key` field, managed through the
+ * Wazuh indexer's `/_plugins/_setup/ai_assistant/settings/providers*` endpoints — see
+ * server/settings/ai-providers-client.ts). The value is never returned over the
  * public API (server/routes/settings.ts's `toSummary` only ever exposes a `hasApiKey` boolean),
- * but it IS readable in plaintext by anyone with direct read access to that index; this closes that
- * gap using a symmetric key supplied via this plugin's own OSD config
+ * but it IS readable in plaintext by anyone with direct read access to the underlying hidden
+ * index; this closes that gap using a symmetric key supplied via this plugin's own OSD config
  * (`wazuh_ai_assistant.encryptionKey` in opensearch_dashboards.yml — see server/config.ts and
  * server/plugin.ts's setup()), with zero new npm dependencies (Node's builtin `crypto` only).
  *

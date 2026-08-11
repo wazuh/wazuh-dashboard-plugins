@@ -1,119 +1,159 @@
 import assert from 'node:assert/strict';
 import { IndexSettingsProvider } from './index-settings-provider';
+import { WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH } from '../../common/constants';
+import { AssistantSettingsAttributes } from './types';
 
 /**
- * Fakes exactly the OpenSearch client surface `IndexSettingsProvider` calls: `get`/`indices.exists`
- * (internal user, reads/existence-check) and `index`/`update` (current user, writes) — see
- * `opensearch-user.ts` for the read/write split this mirrors.
+ * `IndexSettingsProvider` never touches OpenSearch except through `transport.request` (internal
+ * user for reads/bootstrap, current user for the admin-gated write — same split every other
+ * settings provider follows, see `opensearch-user.ts`), so this fakes exactly that one seam,
+ * mirroring `ism-settings-provider.test.ts`'s style.
  */
 
-type Client = Parameters<IndexSettingsProvider['getSettings']>[0];
+type RequestCall = { method: string; path: string; body?: unknown };
 
-function fakeContext(overrides: {
-  get?: () => Promise<{ body: unknown }>;
-  indicesExists?: () => Promise<{ body: boolean }>;
-  index?: (call: unknown) => Promise<{ body: unknown }>;
-  update?: (call: unknown) => Promise<{ body: unknown }>;
-}): Client {
+function fakeContext(handlers: {
+  internal?: (call: RequestCall) => Promise<{ body: unknown }>;
+  current?: (call: RequestCall) => Promise<{ body: unknown }>;
+}) {
   const notFound = () => Promise.reject({ statusCode: 404 });
   return {
     core: {
       opensearch: {
         client: {
           asInternalUser: {
-            get: overrides.get ?? notFound,
-            indices: {
-              exists:
-                overrides.indicesExists ??
-                (() => Promise.resolve({ body: false })),
-            },
-            index:
-              overrides.index ??
-              (() => Promise.reject(new Error('unexpected index() call'))),
+            transport: { request: handlers.internal ?? notFound },
           },
           asCurrentUser: {
-            update:
-              overrides.update ??
-              (() => Promise.reject(new Error('unexpected update() call'))),
+            transport: { request: handlers.current ?? notFound },
           },
         },
       },
     },
-  } as unknown as Client;
+  } as unknown as Parameters<IndexSettingsProvider['getSettings']>[0];
 }
 
-const storedSettings = {
+const wireResponseBody = {
+  settings: {
+    privacy_default_on: true,
+    privacy_default_per_provider: { p1: true },
+    user_can_override: false,
+  },
+  field_policy: [
+    { field: 'agent.id', action: 'allow' },
+    { field: 'agent.name', action: 'anonymize', kind: 'HOST' },
+  ],
+  // GET also carries providers alongside settings — must be ignored, never surfaced.
+  providers: [{ _id: 'p1', name: 'test', type: 'anthropic' }],
+};
+
+type IndexAttributes = Pick<
+  AssistantSettingsAttributes,
+  | 'privacyDefaultOn'
+  | 'privacyDefaultPerProvider'
+  | 'userCanOverride'
+  | 'fieldPolicy'
+>;
+
+const expectedAttributes: IndexAttributes = {
   privacyDefaultOn: true,
   privacyDefaultPerProvider: { p1: true },
   userCanOverride: false,
-  fieldPolicy: [],
+  fieldPolicy: [
+    { field: 'agent.id', action: 'allow' },
+    { field: 'agent.name', action: 'anonymize', kind: 'HOST' },
+  ],
 };
 
-test('getSettings: returns the stored slice when the singleton document exists', async () => {
+test('getSettings: maps the wire (snake_case) response to camelCase attributes, ignoring providers', async () => {
   const provider = new IndexSettingsProvider();
+  const calls: RequestCall[] = [];
   const context = fakeContext({
-    get: () =>
-      Promise.resolve({ body: { _source: { settings: storedSettings } } }),
+    internal: call => {
+      calls.push(call);
+      return Promise.resolve({ body: wireResponseBody });
+    },
   });
-  assert.deepEqual(await provider.getSettings(context), storedSettings);
+
+  const result = await provider.getSettings(context);
+
+  assert.deepEqual(result, expectedAttributes);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].method, 'GET');
+  assert.equal(calls[0].path, WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH);
 });
 
-test('getSettings: returns undefined when the singleton document is missing', async () => {
+test('getSettings: returns undefined when the endpoint 404s', async () => {
   const provider = new IndexSettingsProvider();
   const context = fakeContext({});
   assert.equal(await provider.getSettings(context), undefined);
 });
 
-test('createDefaults: never creates the index — echoes its own defaults without writing when it is missing', async () => {
+test('getSettings: propagates a non-404 error (e.g. 403 missing permission) rather than treating it as unset', async () => {
   const provider = new IndexSettingsProvider();
-  const indexCalls: unknown[] = [];
   const context = fakeContext({
-    indicesExists: () => Promise.resolve({ body: false }),
-    index: call => {
-      indexCalls.push(call);
-      return Promise.resolve({ body: {} });
+    internal: () => Promise.reject({ statusCode: 403 }),
+  });
+  await assert.rejects(provider.getSettings(context));
+});
+
+test('createDefaults: PUTs its own defaults through the internal user and echoes them back', async () => {
+  const provider = new IndexSettingsProvider();
+  const calls: RequestCall[] = [];
+  const context = fakeContext({
+    internal: call => {
+      calls.push(call);
+      return Promise.resolve({ body: { message: 'ok', status: 200 } });
     },
   });
 
   const result = await provider.createDefaults(context);
 
   assert.deepEqual(result, provider.defaults);
-  assert.equal(indexCalls.length, 0);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].method, 'PUT');
+  assert.equal(calls[0].path, WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH);
+  assert.deepEqual(calls[0].body, {
+    settings: {
+      privacy_default_on: false,
+      privacy_default_per_provider: {},
+      user_can_override: true,
+    },
+    field_policy: provider.defaults.fieldPolicy.map(entry => ({
+      field: entry.field,
+      action: entry.action,
+      ...(entry.kind === undefined ? {} : { kind: entry.kind }),
+    })),
+  });
 });
 
-test('createDefaults: creates the singleton document with its own defaults when the index already exists', async () => {
+test('updateSettings: PUTs the given attributes through the current user and echoes them back (the endpoint never returns the document)', async () => {
   const provider = new IndexSettingsProvider();
-  const indexCalls: unknown[] = [];
+  const calls: RequestCall[] = [];
   const context = fakeContext({
-    indicesExists: () => Promise.resolve({ body: true }),
-    index: call => {
-      indexCalls.push(call);
-      return Promise.resolve({ body: {} });
+    current: call => {
+      calls.push(call);
+      return Promise.resolve({
+        body: { message: 'Settings updated.', status: 200 },
+      });
     },
   });
 
-  const result = await provider.createDefaults(context);
+  const result = await provider.updateSettings(context, expectedAttributes);
 
-  assert.deepEqual(result, provider.defaults);
-  assert.equal(indexCalls.length, 1);
-  assert.deepEqual(
-    (indexCalls[0] as { body: { settings: unknown } }).body.settings,
-    provider.defaults,
-  );
-});
-
-test('updateSettings: writes through the current-user update() call', async () => {
-  const provider = new IndexSettingsProvider();
-  const updateCalls: unknown[] = [];
-  const context = fakeContext({
-    update: call => {
-      updateCalls.push(call);
-      return Promise.resolve({ body: {} });
+  assert.deepEqual(result, expectedAttributes);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].method, 'PUT');
+  assert.equal(calls[0].path, WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH);
+  assert.deepEqual(calls[0].body, {
+    settings: {
+      privacy_default_on: true,
+      privacy_default_per_provider: { p1: true },
+      user_can_override: false,
     },
+    field_policy: [
+      { field: 'agent.id', action: 'allow' },
+      { field: 'agent.name', action: 'anonymize', kind: 'HOST' },
+    ],
   });
-
-  const result = await provider.updateSettings(context, storedSettings);
-
-  assert.deepEqual(result, storedSettings);
-  assert.equal(updateCalls.length, 1);
 });

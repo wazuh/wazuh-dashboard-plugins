@@ -36,23 +36,36 @@ export const API_PATHS = {
  * session heal/retry (public/services/session-heal.ts) — reword only in both directions at once. */
 export const MANAGER_SESSION_EXPIRED_COPY = 'session is missing or expired';
 
-/** Hidden system index holding both provider configuration documents and the plugin-wide settings
- * singleton (privacy defaults/override/field policy — conversation retention now lives in an ISM
- * policy instead, see `CONVERSATION_SESSIONS_ISM_POLICY_ID` below) — provisioned indexer-side
- * (wazuh-indexer-plugins#1422), readable only by admin/wazuh-admin backend roles. Reached only
- * through server/settings-store.ts's (providers) and server/settings/index-settings-provider.ts's
- * (settings singleton) document helpers; see server/settings/opensearch-user.ts's doc comment for
- * the internal-user-for-reads/current-user-for-writes split (wazuh-dashboard-plugins#8841/#500). */
-export const ASSISTANT_SETTINGS_INDEX = '.wazuh-ai-assistant-settings';
-
-/** Fixed id of the settings singleton document within `ASSISTANT_SETTINGS_INDEX` — there is
- * exactly one per deployment; every other document in that index is a provider (random UUID id). */
-export const ASSISTANT_SETTINGS_ID = 'settings';
+/**
+ * Path (relative to the OpenSearch/Wazuh indexer HTTP root) of the Wazuh indexer Setup plugin
+ * endpoint that fronts both the AI Assistant's privacy defaults/override/field policy AND its
+ * configured providers — a REAL, documented contract, not a placeholder: see the `AI Assistant`
+ * tag's `/ai_assistant/settings`{, `/providers`{, `/{id}`}} paths in the OpenAPI spec at
+ * https://github.com/wazuh/wazuh-indexer-plugins/blob/enhancement/1422-create-ai-assistant-indices/plugins/setup/openapi.yml
+ * (`getAiAssistantSettings`/`putAiAssistantSettings`/`createAiAssistantProvider`/
+ * `putAiAssistantProvider`/`deleteAiAssistantProvider` operations).
+ *
+ * Two readers/writers split the paths under this base by concern, neither ever calling
+ * OpenSearch's raw document APIs against the underlying hidden index directly any more
+ * (wazuh-dashboard-plugins#500): `server/settings/index-settings-provider.ts` for `GET`/`PUT`
+ * `{this path}` itself (settings/field policy), `server/settings/ai-providers-client.ts` for
+ * `{this path}/providers`{, `/{id}`} (provider CRUD). Both reach it the same way
+ * `IsmSettingsProvider` reaches `_plugins/_ism/*`: `context.core.opensearch.client.
+ * {asInternalUser, asCurrentUser}.transport.request(...)` — no separate HTTP client, since this is
+ * still an OpenSearch-cluster-local endpoint (the Wazuh indexer plugin runs inside the same
+ * cluster), not an external service.
+ *
+ * `GET {this path}` returns `providers` bundled alongside `settings`/`field_policy` in one
+ * response — there is no standalone list/get-one/count endpoint for providers at all, so
+ * `AiProvidersClient` fetches this SAME response and slices/searches it in memory; see that
+ * class's doc comment.
+ */
+export const WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH =
+  '/_plugins/_setup/ai_assistant/settings';
 
 /** Namespacing label bound into the AAD of every provider API key's ciphertext
  * (server/crypto/api-key-cipher.ts's `buildAad`) — kept as its own named constant purely so that
- * derivation can't silently drift if this string is ever referenced from a second place. This is
- * NOT a saved-object type any more (providers now live in `ASSISTANT_SETTINGS_INDEX`); its
+ * derivation can't silently drift if this string is ever referenced from a second place. Its
  * decrypt-time role only needs its VALUE to stay byte-for-byte identical to what a given ciphertext
  * was encrypted with, so this string itself must never change once anything has been encrypted
  * against it. */

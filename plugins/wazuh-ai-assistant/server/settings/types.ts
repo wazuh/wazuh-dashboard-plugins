@@ -3,7 +3,7 @@ import { FieldPolicyEntry } from '../tools/privacy';
 
 /**
  * Attributes of the AI Assistant's plugin-wide settings, however they're actually stored — some
- * live in the `.wazuh-ai-assistant-settings` singleton document (`index-settings-provider.ts`),
+ * go through the Wazuh indexer's Setup plugin API (`index-settings-provider.ts`),
  * `conversationRetentionDays` lives in an ISM policy instead (`ism-settings-provider.ts`). Nothing
  * outside `server/settings/` and `server/routes/settings.ts` needs to know which is which; see
  * `AssistantSettingsProvider` below and `AssistantSettingsManager`

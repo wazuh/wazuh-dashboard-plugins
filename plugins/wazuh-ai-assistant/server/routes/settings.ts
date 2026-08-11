@@ -17,16 +17,7 @@ import { ProviderConfig, ProviderSummary } from '../../common/types';
 import { describeError } from '../../common/errors';
 import { getProviderAdapter } from '../providers/registry';
 import { assertProviderUrlAllowed } from '../providers/url-guard';
-import {
-  countProviders,
-  createProvider,
-  deleteProvider,
-  getProvider,
-  listProviders,
-  setProviderDefault,
-  StoredProviderAttributes,
-  updateProvider,
-} from '../settings-store';
+import { StoredProviderAttributes } from '../settings/ai-providers-client';
 import { getApiKeyCipher } from '../plugin-services';
 import { isEncrypted } from '../crypto/api-key-cipher';
 import { resolveApiHostId } from '../tools/api-host';
@@ -53,22 +44,30 @@ function toSummary(
 
 /**
  * Clears `isDefault` on every provider except `keepId`. Providers are capped at ~200 (see the
- * `perPage` used for `listProviders` below), so a plain list+update loop is fine here; no bulk
- * update API is used because the index has no partial "update where" primitive of its own.
- * The list read goes through the internal user (`listProviders`); each clearing write goes through
- * the current user (`setProviderDefault`) — see server/settings-store.ts's doc comment.
+ * `perPage` used for `list` below), so a plain list+update loop is fine here; no bulk update API
+ * is used because `AiProvidersClient`'s endpoint has no partial "update where" primitive of its
+ * own — each write below re-sends the FULL attributes of the provider it's clearing, not just the
+ * `isDefault` flag (see that class's doc comment). The list read goes through the internal user,
+ * each clearing write through the current one — see server/settings/opensearch-user.ts's doc
+ * comment.
  */
 async function clearOtherDefaults(
   context: RequestHandlerContext,
   keepId: string,
 ): Promise<void> {
-  const { providers } = await listProviders(context, 1, 200);
+  const { aiProviders } = context.wazuh_ai_assistant;
+  const { providers } = await aiProviders.list(context, 1, 200);
   await Promise.all(
     providers
       .filter(
         provider => provider.id !== keepId && provider.attributes.isDefault,
       )
-      .map(provider => setProviderDefault(context, provider.id, false)),
+      .map(provider =>
+        aiProviders.update(context, provider.id, {
+          ...provider.attributes,
+          isDefault: false,
+        }),
+      ),
   );
 }
 
@@ -264,7 +263,12 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
     { path: API_PATHS.PROVIDERS, validate: { query: paginationQuerySchema } },
     withInternalErrorHandling(async (context, request, response) => {
       const { page, perPage } = resolvePagination(request.query);
-      const { providers, total } = await listProviders(context, page, perPage);
+      const { providers, total } =
+        await context.wazuh_ai_assistant.aiProviders.list(
+          context,
+          page,
+          perPage,
+        );
       return response.ok({
         body: {
           providers: providers.map(provider =>
@@ -318,25 +322,23 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       if (encryptionGate) {
         return encryptionGate;
       }
-      const isFirstProvider = (await countProviders(context)) === 0;
+      const isFirstProvider =
+        (await context.wazuh_ai_assistant.aiProviders.count(context)) === 0;
       const isDefault = isFirstProvider || Boolean(request.body.isDefault);
       // THE CREATE-BEFORE-ID PROBLEM (AAD binding, server/crypto/api-key-cipher.ts): `enc:v1:`
-      // binds the ciphertext to the document's id, but a plain `index` call with no explicit id
-      // would let OpenSearch MINT that id — normally not known until after the call returns.
-      // Rather than create-then-update (two writes, with a real "provider left with no key"
-      // failure window if the second write fails), this pre-generates the id client-side with
-      // `crypto.randomUUID()` and passes it through `createProvider(context, providerId, attrs)`
-      // (`op_type: 'create'` with an explicit id — server/settings-store.ts), the SAME
-      // explicit-id create contract `IndexSettingsProvider.createDefaults` already relies on
-      // elsewhere (it creates the settings singleton with the fixed id `ASSISTANT_SETTINGS_ID`),
-      // so this is a proven-working call shape, not a new assumption.
+      // binds the ciphertext to the id `PUT .../providers/{id}` is called with, but there is no
+      // id to bind against until AFTER a create call that lets the server mint one (`POST
+      // .../providers` per the OpenAPI spec). Rather than create-then-update (two writes, with a
+      // real "provider left with no key" failure window if the second write fails), this
+      // pre-generates the id client-side with `crypto.randomUUID()` and passes it through
+      // `aiProviders.create(context, providerId, attrs)` (`PUT .../providers/{providerId}` — see
+      // server/settings/ai-providers-client.ts), a proven-working call shape, not a new
+      // assumption.
       // This keeps provider creation a SINGLE atomic write: either it fully succeeds (provider
-      // exists, apiKey correctly bound to its own id from birth) or it fully fails (RandomUUID
-      // collision against an existing id — astronomically unlikely — or any other write error)
-      // and NOTHING is created, surfaced to the caller as the same 500
-      // `withInternalErrorHandling` every other failure in this route already produces. There is
-      // no partial/half-written state to reason about: no second write exists that could fail
-      // after the first one succeeded.
+      // exists, apiKey correctly bound to its own id from birth) or it fails outright and NOTHING
+      // is created, surfaced to the caller as the same 500 `withInternalErrorHandling` every
+      // other failure in this route already produces. There is no partial/half-written state to
+      // reason about: no second write exists that could fail after the first one succeeded.
       // Encryption-at-rest (server/crypto/api-key-cipher.ts): the encryption gate above
       // guarantees the cipher is enabled whenever a non-empty apiKey reaches this point.
       // `request.body.apiKey` is `schema.maybe(schema.string())`; an absent/empty value
@@ -349,7 +351,11 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
           : request.body.apiKey,
         isDefault,
       };
-      await createProvider(context, providerId, attributes);
+      await context.wazuh_ai_assistant.aiProviders.create(
+        context,
+        providerId,
+        attributes,
+      );
       if (isDefault) {
         await clearOtherDefaults(context, providerId);
       }
@@ -397,7 +403,10 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       if (encryptionGate) {
         return encryptionGate;
       }
-      const existing = await getProvider(context, request.params.id);
+      const existing = await context.wazuh_ai_assistant.aiProviders.get(
+        context,
+        request.params.id,
+      );
       if (!existing) {
         return response.notFound();
       }
@@ -434,15 +443,20 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
         request.body.isDefault === undefined
           ? Boolean(existing.attributes.isDefault)
           : request.body.isDefault;
-      // The update response only contains changed attributes, not the full object, so build the
-      // summary from what we know was just written instead of re-reading it back.
+      // `PUT .../providers/{id}` never echoes the persisted object back (just `{message, status,
+      // id}` — see server/settings/ai-providers-client.ts), so build the summary from what we
+      // know was just written instead of re-reading it back.
       const nextAttributes: StoredProviderAttributes = {
         ...existing.attributes,
         ...request.body,
         apiKey: nextApiKey,
         isDefault: nextIsDefault,
       };
-      await updateProvider(context, request.params.id, nextAttributes);
+      await context.wazuh_ai_assistant.aiProviders.update(
+        context,
+        request.params.id,
+        nextAttributes,
+      );
       if (nextIsDefault) {
         await clearOtherDefaults(context, request.params.id);
       }
@@ -465,17 +479,22 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       if (gate) {
         return gate;
       }
-      const existing = await getProvider(context, request.params.id);
+      const { aiProviders } = context.wazuh_ai_assistant;
+      const existing = await aiProviders.get(context, request.params.id);
       if (!existing) {
         return response.notFound();
       }
-      await setProviderDefault(context, request.params.id, true);
+      // No partial-update primitive on the new endpoint (see AiProvidersClient's doc comment):
+      // resend the FULL existing attributes with only `isDefault` flipped, rather than the old
+      // `setProviderDefault`'s single-field partial write.
+      const nextAttributes: StoredProviderAttributes = {
+        ...existing.attributes,
+        isDefault: true,
+      };
+      await aiProviders.update(context, request.params.id, nextAttributes);
       await clearOtherDefaults(context, request.params.id);
       return response.ok({
-        body: toSummary(request.params.id, {
-          ...existing.attributes,
-          isDefault: true,
-        }),
+        body: toSummary(request.params.id, nextAttributes),
       });
     },
   );
@@ -493,7 +512,10 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       if (gate) {
         return gate;
       }
-      await deleteProvider(context, request.params.id);
+      await context.wazuh_ai_assistant.aiProviders.delete(
+        context,
+        request.params.id,
+      );
       return response.ok({ body: { deleted: true } });
     }),
   );
@@ -513,7 +535,10 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       if (gate) {
         return gate;
       }
-      const stored = await getProvider(context, request.params.id);
+      const stored = await context.wazuh_ai_assistant.aiProviders.get(
+        context,
+        request.params.id,
+      );
       if (!stored) {
         return response.notFound();
       }

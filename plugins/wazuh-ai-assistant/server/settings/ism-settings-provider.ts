@@ -86,7 +86,7 @@ export class IsmSettingsProvider
   }
 
   /** There is no document for this provider to create: the policy is provisioned indexer-side,
-   * not by this plugin (same reasoning as `ASSISTANT_SETTINGS_INDEX` itself — see
+   * not by this plugin (same reasoning as `WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH` itself — see
    * `common/constants.ts`). On a deployment where the policy hasn't been provisioned yet,
    * `getSettings` keeps returning `undefined` and this simply echoes `this.defaults` back on every
    * read, exactly like the un-refactored code's own fallback for a document field that predates

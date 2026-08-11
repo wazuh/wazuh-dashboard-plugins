@@ -34,7 +34,6 @@ import {
   StreamDepseudonymizer,
 } from '../tools/privacy';
 import { MarkdownTableSuppressor } from '../tools/markdown-table-filter';
-import { getProvider } from '../settings-store';
 import { getApiKeyCipher } from '../plugin-services';
 import { resolveWazuhUsername } from '../identity';
 import {
@@ -469,13 +468,13 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
     async (context, request, response) => {
       const { providerId, messages } = request.body;
 
-      // Reads go through the internal user (server/settings-store.ts's `getProvider`) — see that
-      // module's doc comment for why: `.wazuh-ai-assistant-settings` is DLS-restricted to
-      // admin/wazuh-admin backend roles indexer-side, but any authenticated dashboard user must be
+      // Reads go through the internal user (server/settings/ai-providers-client.ts's `get`) — see
+      // that class's doc comment for why: the underlying endpoint requires
+      // `plugin:wazuh/ai_assistant/settings/read`, but any authenticated dashboard user must be
       // able to chat with whichever provider they select.
-      const stored = await getProvider(context, providerId).catch(
-        () => undefined,
-      );
+      const stored = await context.wazuh_ai_assistant.aiProviders
+        .get(context, providerId)
+        .catch(() => undefined);
       if (!stored) {
         logger.error(`wazuhAiAssistant: unknown provider ${providerId}`);
         return response.notFound({
