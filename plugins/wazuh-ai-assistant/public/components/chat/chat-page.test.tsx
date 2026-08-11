@@ -980,8 +980,7 @@ describe('ChatPage — interrupted turns and failed saves', () => {
     // save implementation — and the conversation it just created becomes this tab's active one,
     // never a second row: the update.mock check confirms this by targeting that id.
     expect(mockConversationsService.create).toHaveBeenCalledTimes(3);
-    const [title, messages] =
-      mockConversationsService.create.mock.calls[2];
+    const [title, messages] = mockConversationsService.create.mock.calls[2];
     expect(title).toBeTruthy();
     expect(messages[messages.length - 1].content).toBe('an answer');
 
@@ -1005,7 +1004,9 @@ describe('ChatPage — interrupted turns and failed saves', () => {
     // turn is still generating; the post-answer save that follows once the stream ends succeeds.
     mockConversationsService.create
       .mockRejectedValueOnce(httpError(500))
-      .mockResolvedValueOnce(conversationRecord({ id: 'conv-new', version: 'v1' }));
+      .mockResolvedValueOnce(
+        conversationRecord({ id: 'conv-new', version: 'v1' }),
+      );
 
     renderChatPage();
     await sendMessage('first question');
