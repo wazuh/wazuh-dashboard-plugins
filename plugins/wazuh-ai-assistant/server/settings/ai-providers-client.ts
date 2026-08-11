@@ -110,14 +110,14 @@ function providerPath(id?: string): string {
  *   now re-sends each affected provider's full attributes with `isDefault: false` via `update`.
  */
 export class AiProvidersClient {
-  private async fetch(
-    { method, path, body }: { method: string; path: string; body?: unknown },
+  private fetch(
+    { method, path, body }: { method: string; path: string; body?: object },
     executor: ReturnType<typeof reader>,
   ) {
     return executor.transport.request({
       method,
       path,
-      body,
+      body: body as Record<string, unknown> | undefined,
     });
   }
 
