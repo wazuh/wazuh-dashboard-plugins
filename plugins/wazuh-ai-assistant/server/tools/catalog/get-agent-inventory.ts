@@ -102,80 +102,81 @@ export interface InventoryKindConfig {
 // Exported for get-agent-inventory.test.ts's per-kind coverage loop only — a 6th kind added to
 // this map is automatically held to "breakdownAggs, breakdownDimensions coverage, or a written
 // reason" by that test, without the test hardcoding kind names.
-export const INVENTORY_KIND_CONFIG: Record<InventoryKind, InventoryKindConfig> = {
-  os: {
-    index: 'wazuh-states-inventory-system*',
-    source: [
-      'host.hostname',
-      'host.os.name',
-      'host.os.version',
-      'host.os.platform',
-      'host.os.full',
-      'host.architecture',
-    ],
-    fixedSize: 5,
-  },
-  packages: {
-    index: 'wazuh-states-inventory-packages*',
-    source: [
-      'package.name',
-      'package.version',
-      'package.architecture',
-      'package.vendor',
-    ],
-    limitRange: [50, 500],
-  },
-  ports: {
-    index: 'wazuh-states-inventory-ports*',
-    // Order (issue #8921's column-budget item): `deriveResultColumns` (digest.ts) takes this
-    // `_source` list, byte-for-byte, as the derived column order -- and the client's
-    // MAX_VISIBLE_COLUMNS budget (result-table.tsx) shows only the first 6 of them as visible
-    // table columns. The issue's 5 highest-value fields lead (source.port, interface.state,
-    // process.name, network.transport, destination.ip), followed by source.ip as the 6th visible
-    // column; destination.port/process.pid are demoted -- NOT deleted, still queried and still in
-    // the row expander -- to positions 7-8. destination.ip stays ahead of them: on an established
-    // connection it carries the peer address, which is more often what a reader wants than the
-    // local source.ip/the numeric process.pid.
-    source: [
-      'source.port',
-      'interface.state',
-      'process.name',
-      'network.transport',
-      'destination.ip',
-      'source.ip',
-      'destination.port',
-      'process.pid',
-    ],
-    limitRange: [50, 500],
-    breakdownAggs: {
-      interface_state: {
-        terms: { field: 'interface.state', size: BREAKDOWN_BUCKET_CAP },
-      },
-      network_transport: {
-        terms: { field: 'network.transport', size: BREAKDOWN_BUCKET_CAP },
+export const INVENTORY_KIND_CONFIG: Record<InventoryKind, InventoryKindConfig> =
+  {
+    os: {
+      index: 'wazuh-states-inventory-system*',
+      source: [
+        'host.hostname',
+        'host.os.name',
+        'host.os.version',
+        'host.os.platform',
+        'host.os.full',
+        'host.architecture',
+      ],
+      fixedSize: 5,
+    },
+    packages: {
+      index: 'wazuh-states-inventory-packages*',
+      source: [
+        'package.name',
+        'package.version',
+        'package.architecture',
+        'package.vendor',
+      ],
+      limitRange: [50, 500],
+    },
+    ports: {
+      index: 'wazuh-states-inventory-ports*',
+      // Order (issue #8921's column-budget item): `deriveResultColumns` (digest.ts) takes this
+      // `_source` list, byte-for-byte, as the derived column order -- and the client's
+      // MAX_VISIBLE_COLUMNS budget (result-table.tsx) shows only the first 6 of them as visible
+      // table columns. The issue's 5 highest-value fields lead (source.port, interface.state,
+      // process.name, network.transport, destination.ip), followed by source.ip as the 6th visible
+      // column; destination.port/process.pid are demoted -- NOT deleted, still queried and still in
+      // the row expander -- to positions 7-8. destination.ip stays ahead of them: on an established
+      // connection it carries the peer address, which is more often what a reader wants than the
+      // local source.ip/the numeric process.pid.
+      source: [
+        'source.port',
+        'interface.state',
+        'process.name',
+        'network.transport',
+        'destination.ip',
+        'source.ip',
+        'destination.port',
+        'process.pid',
+      ],
+      limitRange: [50, 500],
+      breakdownAggs: {
+        interface_state: {
+          terms: { field: 'interface.state', size: BREAKDOWN_BUCKET_CAP },
+        },
+        network_transport: {
+          terms: { field: 'network.transport', size: BREAKDOWN_BUCKET_CAP },
+        },
       },
     },
-  },
-  processes: {
-    index: 'wazuh-states-inventory-processes*',
-    source: [
-      'process.pid',
-      'process.name',
-      'process.state',
-      'process.parent.pid',
-      'process.command_line',
-    ],
-    limitRange: [50, 500],
-    // No breakdownAggs: process.state has no in-repo keyword-mapping evidence (see the
-    // InventoryKindConfig doc comment) — covered by the digest-level breakdownDimensions
-    // fallback instead.
-  },
-  hotfixes: {
-    index: 'wazuh-states-inventory-hotfixes*',
-    source: ['package.hotfix.name'],
-    limitRange: [50, 500],
-  },
-};
+    processes: {
+      index: 'wazuh-states-inventory-processes*',
+      source: [
+        'process.pid',
+        'process.name',
+        'process.state',
+        'process.parent.pid',
+        'process.command_line',
+      ],
+      limitRange: [50, 500],
+      // No breakdownAggs: process.state has no in-repo keyword-mapping evidence (see the
+      // InventoryKindConfig doc comment) — covered by the digest-level breakdownDimensions
+      // fallback instead.
+    },
+    hotfixes: {
+      index: 'wazuh-states-inventory-hotfixes*',
+      source: ['package.hotfix.name'],
+      limitRange: [50, 500],
+    },
+  };
 
 /** Validates `kind` against the 5 implemented values; throws a descriptive Error (turned into a
  * bounded tool_result error for the model to self-correct, same convention as every other
