@@ -1552,4 +1552,27 @@ describe('ChatPage — welcome-state layout does not clip the composer', () => {
     const pane = screen.getByRole('region', { name: 'Chat' });
     expect(pane.style.justifyContent).not.toBe('center');
   });
+
+  /**
+   * Regression guard for the shrink/overlap bug: the welcome column (the pane's direct child) must
+   * never be shrinkable (`flex-shrink: 0`, i.e. a flex-basis of `1 0 auto`). A shrinkable column
+   * (`1 1 auto`, tried and reverted) let the pane squeeze it below its own content's height once
+   * welcome content plus a callout above it overflowed the pane — pushing the cards to render
+   * BEHIND the opaque sticky composer instead of the pane scrolling cleanly. A conversation's own
+   * column already uses `1 0 auto` for the same reason (see its own comment); the welcome state
+   * must match, not diverge.
+   */
+  it('never lets the welcome column shrink below its own content height', async () => {
+    renderChatPage();
+    await waitFor(() =>
+      expect(
+        screen.getByText('Ask the AI Assistant something'),
+      ).toBeInTheDocument(),
+    );
+
+    const pane = screen.getByRole('region', { name: 'Chat' });
+    const column = pane.firstElementChild as HTMLElement;
+    expect(column.style.flex).toBe('1 0 auto');
+    expect(column.style.minHeight).toBe('0px');
+  });
 });
