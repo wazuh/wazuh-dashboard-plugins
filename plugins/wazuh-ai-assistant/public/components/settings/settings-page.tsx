@@ -53,6 +53,7 @@ import {
 
 const FIELD_POLICY_ACTIONS: FieldPolicyAction[] = [
   'allow',
+  'allow-scan',
   'anonymize',
   'never',
 ];
@@ -61,6 +62,13 @@ const FIELD_POLICY_ACTION_LABELS: Record<FieldPolicyAction, string> = {
   allow: i18n.translate('wazuhAiAssistant.settings.privacy.action.allow', {
     defaultMessage: 'Allow',
   }),
+  'allow-scan': i18n.translate(
+    'wazuhAiAssistant.settings.privacy.action.allowScan',
+    {
+      // #8912: value is sent, but scanned first for known identifiers/IPs/hostnames.
+      defaultMessage: 'Allow (scanned)',
+    },
+  ),
   anonymize: i18n.translate(
     'wazuhAiAssistant.settings.privacy.action.anonymize',
     {

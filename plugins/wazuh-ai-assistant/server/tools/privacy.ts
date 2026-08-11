@@ -9,12 +9,21 @@ import { WAZUH_FIELD } from '../../common/wazuh-fields';
  * WHAT THE FIELD POLICY DOES AND DOES NOT DO (issue #8821 was filed because this was not written
  * down anywhere, and the behavior reads like a bug until it is):
  *
- * The policy has exactly ONE boundary — what the AI provider receives — and the three actions differ
+ * The policy has exactly ONE boundary — what the AI provider receives — and the four actions differ
  * only in how much of a field's value get there:
  *
- * - `allow`: the provider receives the real value. Also the default for a field with no entry on a
- *   typed catalog tool (the search_wazuh_data escape hatch flips that default to `anonymize` — see
- *   `applyFieldPolicy`'s `isEscapeHatch`).
+ * - `allow`: the provider receives the real value, completely unscanned. Also the default for a
+ *   field with no entry on a typed catalog tool (the search_wazuh_data escape hatch flips that
+ *   default to `anonymize` — see `applyFieldPolicy`'s `isEscapeHatch`). Reserved for CURATED
+ *   vocabulary (MITRE technique names, compliance ids, `check.id`, rule tags/category/title) whose
+ *   values are not analyst/attacker/third-party-supplied free text — see `scrubKnownEntities`'s doc
+ *   comment for why a field carrying free text should be `allow-scan` instead.
+ * - `allow-scan` (issue #8912): the provider receives the real value, but ONLY after it passes
+ *   through both of allow-by-omission's existing scans: the value-shape scan (`prescanAndMint`,
+ *   IPs/FQDNs) and the new known-entity dictionary scan (`scrubKnownEntities`, bare identifiers the
+ *   pseudonymizer already minted a pseudonym for elsewhere this conversation). For fields whose
+ *   value is free text that a third party (not Wazuh's own curated ruleset) controls — e.g. a
+ *   package name string reported by the OS — but which the analyst still needs to read in full.
  * - `anonymize`: the provider receives a reversible pseudonym (`HOST_1`, `IP_2`) instead.
  * - `never`: the provider receives NOTHING for that field. `applyFieldPolicy` drops it from the
  *   digest's `samples`, drops its aggregation buckets from `breakdown`, and drops its name from the
@@ -36,7 +45,7 @@ import { WAZUH_FIELD } from '../../common/wazuh-fields';
  * provider request body carries.
  */
 
-export type FieldPolicyAction = 'allow' | 'anonymize' | 'never';
+export type FieldPolicyAction = 'allow' | 'allow-scan' | 'anonymize' | 'never';
 
 export interface FieldPolicyEntry {
   /** Either a plain digest field path ("wazuh.agent.name") or a tool-scoped form
@@ -121,13 +130,20 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // covered them silently; folding them into this tool means every field that should
   // stay readable now needs its own explicit 'allow' entry below, or it silently starts arriving
   // at the provider as a VAL_n pseudonym -- making "what packages are installed on X" answer in
-  // meaningless pseudonyms under privacy mode. MOST entries below are software/config IDENTITY,
-  // not a personal or infrastructure identifier -- the contrast with the fields that correctly
-  // stay anonymized (host.hostname, process.command_line, source.ip/destination.ip,
-  // source.user.name/destination.user.name -- all already listed above) is deliberate and must
-  // not be widened without the same scrutiny. `package.vendor` below is the deliberate exception
-  // to "identity, therefore allow" -- see its own comment.
-  { field: 'package.name', action: 'allow' },
+  // meaningless pseudonyms under privacy mode. Each entry below is software/config IDENTITY, not a
+  // personal or infrastructure identifier -- the contrast with the fields that correctly stay
+  // anonymized (host.hostname, process.command_line, source.ip/destination.ip,
+  // source.user.name/destination.user.name -- all already listed above) is deliberate and must not
+  // be widened without the same scrutiny.
+  // #8912: a package name is free text SUPPLIED BY THE THIRD-PARTY VENDOR/PACKAGE MAINTAINER (not
+  // Wazuh's own curated ruleset, unlike rule.category/rule.tags/rule.title above), so it can
+  // legitimately (if rarely) embed an identifier — e.g. a vendor build that stamps a customer's own
+  // hostname into a bundled package's display name. 'allow-scan' keeps the value readable (still
+  // needed verbatim for "what packages are installed" to be useful) while running it through the
+  // same shape scan allow-by-omission fields get PLUS a dictionary lookup against every real
+  // identifier this conversation's pseudonymizer has already minted (see `scrubKnownEntities`) —
+  // catching a bare, dotless identifier the shape scan alone cannot.
+  { field: 'package.name', action: 'allow-scan' },
   { field: 'package.version', action: 'allow' },
   { field: 'package.type', action: 'allow' },
   // NOT 'allow', unlike package.name/architecture/type/version above: a vendor/distributor string
@@ -366,9 +382,11 @@ function deepMapStrings(
 }
 
 /** Escapes every regex metacharacter in `value` so it can be embedded literally inside a
- * dynamically-built `RegExp` — needed by `Pseudonymizer.applyToText` below, which (unlike a plain
- * `split`/`join`) must express a word-boundary condition, and a raw attacker/data-controlled value
- * cannot be interpolated into a regex source without first escaping it. */
+ * dynamically-built `RegExp`, because a raw attacker/data-controlled value cannot be interpolated
+ * into a regex source without first escaping it. Two callers below need it: `Pseudonymizer
+ * .applyToText`, which (unlike a plain `split`/`join`) must express a word-boundary condition, and
+ * `scrubKnownEntities`, which needs actual regex features (case insensitivity, `\b`-style boundary
+ * lookarounds) that only a real `RegExp` gives it. */
 function escapeRegExpLiteral(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -493,6 +511,17 @@ export class Pseudonymizer {
    * through `applyToText`. */
   applyToObject<T>(value: T): T {
     return deepMapStrings(value, text => this.applyToText(text)) as T;
+  }
+
+  /** Read-only snapshot of every REAL value this pseudonymizer currently holds a mapping for
+   * (seeded + minted so far this request) — the "known-entity dictionary" `scrubKnownEntities`
+   * scans against. Deliberately returns a fresh array (not a live view) so a caller can't mutate
+   * the pseudonymizer's internal maps through it. */
+  knownEntities(): PseudonymEntry[] {
+    return [...this.valueToPseudonym.entries()].map(([value, pseudonym]) => ({
+      value,
+      pseudonym,
+    }));
   }
 
   /** Replaces every complete `KIND_n` pseudonym token with its real value. Word-boundary anchored
@@ -891,6 +920,73 @@ export function prescanAndMintToolContent(
   return JSON.stringify(scanValues(parsed));
 }
 
+/**
+ * Known-entity dictionary scan (issue #8912): replaces every EXACT, word-boundary occurrence of an
+ * already-minted real identifier in `text` with its EXISTING pseudonym — never minting a new one.
+ *
+ * WHY shape-scanning cannot close this by construction: `prescanAndMint`'s IPv4/IPv6/FQDN regexes
+ * only match values that look like an address or a dotted hostname on their face. A bare, dotless
+ * identifier — an agent name typed without its domain suffix, a short internal codename, a hostname
+ * style like "DBPRIMARY03" — has no distinguishing shape at all; to a regex it is just another word,
+ * indistinguishable from ordinary prose. The only thing that CAN single it out is having already
+ * seen it minted somewhere else in this same conversation (an agent digest field, a prior turn's
+ * `wazuh.agent.name`, etc.) — i.e. the pseudonymizer's own map. That is what this function scans
+ * against, via `Pseudonymizer.knownEntities()`.
+ *
+ * This is therefore a STRICTLY NARROWER guarantee than the shape scan: an identifier NEVER seen
+ * elsewhere in the conversation (no existing mapping to reuse) still passes through unscrubbed —
+ * there being nothing to reuse and this function being explicitly forbidden from minting a fresh
+ * pseudonym for a dictionary hit (that would let a free-text field silently start inventing
+ * HOST_n/USER_n tokens for values no other part of the digest ever classified as that kind). The
+ * residual (documented, not silently accepted) risk is exactly this: a value that is BOTH shapeless
+ * AND never minted anywhere else. See privacy.test.ts's "unknown identifier" case for the explicit
+ * test of that limitation.
+ *
+ * Boundary rule: a "boundary" is any NON-alphanumeric character (or start/end of string) — NOT the
+ * conventional regex `\b` (which treats `_` as a word character). Real identifiers routinely embed
+ * `-`/`_` as separators (`mysql-server-DBPRIMARY03-config`, `db_primary_03`), and a naive `\b...\b`
+ * match would either fail to isolate the identifier inside such a compound token, or (worse, with
+ * `_` specifically) refuse to treat `foo_DBPRIMARY03_bar` as containing a boundary at all. Using
+ * `(?<![A-Za-z0-9])` / `(?![A-Za-z0-9])` lookarounds instead means only actual alphanumeric
+ * characters count as "part of the same token" — a `-` or `_` immediately beside the identifier is
+ * always a valid boundary, matching how `mysql-server-DBPRIMARY03-config` should scrub to
+ * `mysql-server-{PSEUDONYM}-config`. The flip side (an intentional, accepted trade-off, same spirit
+ * as `applyToText`'s longest-first ordering below): this also means a known identifier that is
+ * merely a substring of a LARGER alphanumeric run (e.g. known value "host1" inside the single token
+ * "host12") correctly does NOT match, because "2" is alphanumeric and therefore not a boundary.
+ *
+ * Case-insensitive: a provider/tool result may re-render an identifier in different casing
+ * (`DBPRIMARY03` vs `dbprimary03`) from where it was first minted; both must resolve to the SAME
+ * existing pseudonym for the map to stay conversation-consistent (see the class-level `pseudonymize`
+ * doc comment on `Pseudonymizer` — reuse, never a second mint for the same real entity).
+ *
+ * Longest-known-value-first, for the same reason as `Pseudonymizer.applyToText`: a shorter known
+ * value that happens to be a boundary-delimited PREFIX/SUFFIX chunk of a longer known value (e.g.
+ * "DB03" and "DB03-PRIMARY" both minted) must not have the shorter one's replacement corrupt the
+ * longer one's match.
+ */
+export function scrubKnownEntities(
+  text: string,
+  pseudonymizer: Pseudonymizer,
+): string {
+  if (!text) {
+    return text;
+  }
+  const entities = pseudonymizer
+    .knownEntities()
+    .filter(entry => entry.value.length > 0)
+    .sort((a, b) => b.value.length - a.value.length);
+  let out = text;
+  for (const { value, pseudonym } of entities) {
+    const pattern = new RegExp(
+      `(?<![A-Za-z0-9])${escapeRegExpLiteral(value)}(?![A-Za-z0-9])`,
+      'gi',
+    );
+    out = out.replace(pattern, pseudonym);
+  }
+  return out;
+}
+
 /** Resolves the policy entry for `field` (optionally scoped to `toolName`). Tool-scoped entries
  * ("toolName/field") are checked first and win over plain ones; plain entries support a trailing
  * `.*` prefix match (e.g. "wazuh.rule.compliance.*" matches "wazuh.rule.compliance" itself and
@@ -1075,12 +1171,32 @@ export function extractAggFields(
  * property, or drop a whole bucket for a positional multi_terms component — see
  * `scrubAggKeyComponent`).
  *
- * Branch order is deliberate — never -> anonymize -> escape-hatch fail-closed -> #8889/#8902
- * allow-by-omission -> explicit allow/passthrough. The #8889/#8902 branch below is the
- * digest-boundary half of that hardening's defense-in-depth (the other half, chat.ts's
- * `scrubMessagesForProvider` running `prescanAndMintToolContent`/`prescanAndMint` over every
- * outbound message, is independent of this function and does not substitute for it) and MUST
- * survive any future refactor of this function — see that branch's own comment.
+ * The #8889/#8902 allow-by-omission branch below is the digest-boundary half of that hardening's
+ * defense-in-depth (the other half, chat.ts's `scrubMessagesForProvider` running
+ * `prescanAndMintToolContent`/`prescanAndMint` over every outbound message, is independent of this
+ * function and does not substitute for it) and MUST survive any future refactor of this function.
+ *
+ * Branch order is deliberate and every branch matters — do not reorder or drop one without
+ * re-checking every FIELD_POLICY_DEFAULTS entry that relies on it:
+ * 1. `never` — drop.
+ * 2. `anonymize` — pseudonymize.
+ * 3. `allow-scan` (#8912) — shape scan (`prescanAndMint`) THEN known-entity dictionary scan
+ *    (`scrubKnownEntities`); see that function's doc comment for why both passes are needed.
+ * 4. escape-hatch fail-closed default for an unlisted field — pseudonymize (kind inferred).
+ * 5. `#8889`/`#8902` allow-BY-OMISSION (typed tool, no explicit entry, not the escape hatch) —
+ *    shape scan only (`prescanAndMint`), no dictionary scan: an unlisted field is trusted
+ *    allow-by-default, but not curated the way an explicit `allow-scan` entry is, so it gets the
+ *    narrower of the two scans. The value still reaches the provider verbatim, but an IP/FQDN
+ *    embedded in otherwise-free text (e.g. a package/process name that happens to mention a
+ *    hostname) gets a secondary scan. Curated entries (agent id, MITRE technique IDs, compliance
+ *    citations, CIS benchmark content, ...) are explicit `allow` (case 6) and skip this — several
+ *    of those values are legitimately FQDN-token-shaped without being hostnames, so scanning them
+ *    here would misfire; they stay covered end-to-end regardless by chat.ts's
+ *    scrubMessagesForProvider, which runs prescanAndMintToolContent over every tool-result string
+ *    value unconditionally.
+ * 6. Explicit `allow` (or a non-string/empty value in any branch above that didn't already return)
+ *    — passthrough, completely unscanned. This is the ONLY branch that skips both scans; every
+ *    other outcome above goes through at least the shape scan.
  */
 function scrubFieldValue(
   field: string,
@@ -1108,6 +1224,23 @@ function scrubFieldValue(
     };
   }
   if (
+    entry?.action === 'allow-scan' &&
+    typeof value === 'string' &&
+    value.length > 0
+  ) {
+    // #8912: value stays readable, but is scrubbed against BOTH the value-shape scan (fresh
+    // IPs/FQDNs) and the known-entity dictionary (bare identifiers already minted elsewhere this
+    // conversation) — see `scrubKnownEntities`'s doc comment for why the dictionary scan exists on
+    // top of the shape scan, and this function's own doc comment for the full branch ordering.
+    return {
+      keep: true,
+      value: scrubKnownEntities(
+        prescanAndMint(value, pseudonymizer),
+        pseudonymizer,
+      ),
+    };
+  }
+  if (
     !entry &&
     isEscapeHatch &&
     typeof value === 'string' &&
@@ -1122,14 +1255,10 @@ function scrubFieldValue(
   }
   if (!entry && typeof value === 'string' && value.length > 0) {
     // #8889/#8902: allow-BY-OMISSION (typed tool, no explicit policy entry — the escape-hatch case
-    // above already handled isEscapeHatch). The value still reaches the provider verbatim, same as
-    // before, but an IP/FQDN embedded in otherwise-free text (e.g. a package/process name that
-    // happens to mention a hostname) gets a secondary scan here. Deliberately narrower than "every
-    // allow-resolved value": an EXPLICIT policy entry (agent id, MITRE technique IDs, compliance
-    // citations, CIS benchmark content, ...) is a reviewed, curated decision and several of those
-    // values are legitimately FQDN-token-shaped without being hostnames; scanning them here too
-    // would misfire, so they fall through to the plain passthrough below instead. This branch must
-    // never be silently dropped by a future refactor — see this function's own doc comment above.
+    // above already handled isEscapeHatch). See this function's doc comment, branch 5, for why
+    // this is shape-scan-only (no dictionary scan) unlike the explicit `allow-scan` branch above,
+    // and for why this branch must never be silently dropped again (it was, once — see the
+    // module-level history in scrubFieldValue's doc comment above).
     return { keep: true, value: prescanAndMint(value, pseudonymizer) };
   }
   return { keep: true, value };
@@ -1291,7 +1420,10 @@ function scrubAggKey(
  *
  * - `samples`: 'never' fields are dropped from the sample object entirely; 'anonymize' string
  *   values are pseudonymized (kind inferred from the field name); an explicit 'allow' field
- *   passes through unchanged. An UNLISTED field's behavior depends on `isEscapeHatch` (see
+ *   passes through unchanged; an explicit 'allow-scan' field (#8912) passes through but is
+ *   scrubbed by BOTH the value-shape scan and the known-entity dictionary scan (see
+ *   `scrubFieldValue`'s doc comment for the full branch ordering and `scrubKnownEntities` for the
+ *   dictionary scan itself). An UNLISTED field's behavior depends on `isEscapeHatch` (see
  *   below) — and, when it stays allowed (the non-escape-hatch default), its string value is
  *   still run through `prescanAndMint`'s IP/FQDN value-shape scan (#8889) so an identifier
  *   embedded in otherwise-readable free text is not missed just because the field itself is
