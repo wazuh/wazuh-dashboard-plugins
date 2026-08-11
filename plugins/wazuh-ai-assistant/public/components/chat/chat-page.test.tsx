@@ -1580,89 +1580,61 @@ describe('ChatPage — welcome-state layout does not clip the composer', () => {
 
 describe('ChatPage — transcript reserves space for the sticky composer', () => {
   /**
-   * Regression guard for the composer-overlap bug: a live measurement caught the sticky composer
-   * (`.wzStickyInputPanel`) covering the bottom few pixels of the transcript's last element (a
-   * table's pagination bar) even once scrolled all the way down — `position: sticky` reserves the
-   * panel's own box in the flow, but not the fade gradient its `::before` paints further upward
-   * (chat-page.scss). The fix measures the panel's actual rendered height and feeds it back as
-   * `paddingBottom` on `.wzChatTranscript`, the flow sibling that sits directly above it, so the
-   * transcript can always scroll fully clear of it.
+   * Regression guard for the composer-overlap bug, and for the over-reservation bug a prior fix
+   * for it introduced. A live measurement caught the sticky composer (`.wzStickyInputPanel`)
+   * covering the bottom few pixels of the transcript's last element (a table's pagination bar)
+   * even once scrolled all the way down — `position: sticky` reserves the panel's own box in the
+   * flow, but not the fade gradient its `::before` paints further upward (chat-page.scss). A prior
+   * fix over-corrected by feeding the panel's FULL measured `offsetHeight` back as the transcript's
+   * `paddingBottom` in JS: that double-reserves space `position: sticky` already accounts for (the
+   * panel is an ordinary flex sibling), leaving a permanent composer-sized gap at the bottom of the
+   * transcript whenever the conversation is scrolled all the way down — which the auto-scroll
+   * effect forces after every turn. The actual fix is a fixed CSS `padding-bottom` on
+   * `.wzChatTranscript` (chat-page.scss) sized to just the `::before` gradient's height via a SCSS
+   * constant shared with the panel's own rule, so the two can never drift apart, and growth of the
+   * composer itself (e.g. multiline input) is left entirely to ordinary flex layout.
    *
-   * jsdom never lays out real boxes, so `.wzStickyInputPanel`'s `offsetHeight` is always 0 there —
-   * no jsdom test can reproduce the real pixel overlap. What this pins instead is the STRUCTURAL
-   * mechanism: the panel is measured via a ref, and that measurement is what actually reaches
-   * `.wzChatTranscript`'s `paddingBottom`, by stubbing `offsetHeight` to a value only the wiring
-   * (not a hardcoded style) could have produced.
+   * jsdom never lays out real boxes and does not evaluate the imported `.scss`, so no jsdom test
+   * can pin the actual pixel values or reproduce the real overlap. What these pin instead is the
+   * STRUCTURAL choice: (1) the component itself no longer computes or sets any `paddingBottom`
+   * inline — reintroducing a JS measurement here is exactly how the over-reservation bug came
+   * back — and (2) the stylesheet reserves the gradient's own fixed height, not an arbitrary or
+   * unrelated pixel figure, by construction (one SCSS variable feeding both rules).
    */
-  it("feeds the sticky composer's measured height back as the transcript's paddingBottom", async () => {
-    const offsetHeightDescriptor = Object.getOwnPropertyDescriptor(
-      HTMLElement.prototype,
-      'offsetHeight',
+  it('never sets an inline paddingBottom on the transcript (no JS height measurement)', async () => {
+    renderChatPage();
+    await waitFor(() =>
+      expect(
+        screen.getByText('Ask the AI Assistant something'),
+      ).toBeInTheDocument(),
     );
-    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
-      configurable: true,
-      value: 132,
-    });
 
-    try {
-      renderChatPage();
-      await waitFor(() =>
-        expect(
-          screen.getByText('Ask the AI Assistant something'),
-        ).toBeInTheDocument(),
-      );
-
-      const pane = screen.getByRole('region', { name: 'Chat' });
-      const transcript = pane.querySelector('.wzChatTranscript') as HTMLElement;
-      expect(transcript).not.toBeNull();
-      expect(transcript.style.paddingBottom).toBe('132px');
-    } finally {
-      // Restores jsdom's own descriptor so this stub cannot leak into any test that runs after this
-      // one in the same worker.
-      if (offsetHeightDescriptor) {
-        Object.defineProperty(
-          HTMLElement.prototype,
-          'offsetHeight',
-          offsetHeightDescriptor,
-        );
-      } else {
-        delete (HTMLElement.prototype as unknown as Record<string, unknown>)
-          .offsetHeight;
-      }
-    }
+    const pane = screen.getByRole('region', { name: 'Chat' });
+    const transcript = pane.querySelector('.wzChatTranscript') as HTMLElement;
+    expect(transcript).not.toBeNull();
+    // A previous fix set this from a `ResizeObserver`-fed `offsetHeight` state; that measurement
+    // (and the double-reservation bug it caused) is gone. Any style on this element now comes
+    // entirely from the `.wzChatTranscript` CSS class in chat-page.scss.
+    expect(transcript.style.paddingBottom).toBe('');
   });
 
-  it('drops the reserved padding back to zero once the sticky composer unmounts', async () => {
-    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
-      configurable: true,
-      value: 132,
-    });
+  it("keeps the transcript's CSS padding tied to the sticky panel's own gradient height", () => {
+    const scssPath = require.resolve('./chat-page.scss');
+    const scssSource = require('fs').readFileSync(scssPath, 'utf8');
 
-    try {
-      const { rerenderWith } = renderChatPage();
-      await waitFor(() =>
-        expect(
-          screen.getByText('Ask the AI Assistant something'),
-        ).toBeInTheDocument(),
-      );
+    const transcriptPadding = scssSource.match(
+      /\.wzChatTranscript\s*{\s*padding-bottom:\s*([^;]+);/,
+    );
+    const gradientHeight = scssSource.match(
+      /&::before\s*{[^}]*height:\s*([^;]+);/,
+    );
 
-      // No providers configured: the composer (and the no-provider empty state's own layout)
-      // replaces the transcript entirely, so nothing should be left reserving space for a panel
-      // that is no longer on screen.
-      rerenderWith({ providers: [], selectedProviderId: '' });
-      await waitFor(() =>
-        expect(
-          screen.queryByLabelText('Chat message'),
-        ).not.toBeInTheDocument(),
-      );
-
-      const pane = screen.getByRole('region', { name: 'Chat' });
-      const transcript = pane.querySelector('.wzChatTranscript') as HTMLElement;
-      expect(transcript).not.toBeNull();
-      expect(['0px', '']).toContain(transcript.style.paddingBottom);
-    } finally {
-      delete (HTMLElement.prototype as unknown as Record<string, unknown>)
-        .offsetHeight;
-    }
+    expect(transcriptPadding).not.toBeNull();
+    expect(gradientHeight).not.toBeNull();
+    // Both rules read from the same SCSS variable, so this equality holds by construction — the
+    // regression this guards against is one side being changed (or hardcoded) without the other,
+    // which would either reopen the overlap or reintroduce a mismatched over-reservation.
+    expect(transcriptPadding![1].trim()).toBe(gradientHeight![1].trim());
+    expect(transcriptPadding![1].trim()).toBe('$wzComposerGradientHeight');
   });
 });

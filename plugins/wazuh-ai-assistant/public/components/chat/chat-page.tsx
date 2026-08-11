@@ -1464,34 +1464,18 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     hasProviders && messages.length === 0 && !showLoadingState;
 
   // The sticky composer (`.wzStickyInputPanel` below) is a real flow sibling of the transcript,
-  // not an absolutely-positioned overlay — but `position: sticky` only reserves ITS OWN box in the
-  // flow, not the fade gradient painted by its `::before` (chat-page.scss), which extends further
-  // upward and is what a live measurement caught actually covering the last few pixels of the
-  // transcript's final element (a table's pagination bar) even once scrolled all the way down.
-  // Measuring the panel's own rendered height and feeding it back as `paddingBottom` on the
-  // transcript container closes that gap outright, however tall the panel gets — including when
-  // the textarea grows with multiline input, or the disabled/no-providers styling changes its own
-  // padding — instead of guessing at a fixed pixel figure that would drift out of sync with it.
-  const stickyPanelRef = useRef<HTMLDivElement | null>(null);
-  const [composerReservedHeight, setComposerReservedHeight] = useState(0);
-  useEffect(() => {
-    const panel = stickyPanelRef.current;
-    if (!panel) {
-      setComposerReservedHeight(0);
-      return undefined;
-    }
-    const measure = () => setComposerReservedHeight(panel.offsetHeight);
-    measure();
-    // jsdom (unit tests) has no ResizeObserver and never lays out real box heights, so the
-    // synchronous `measure()` call above (always 0 there) is all the coverage that environment
-    // can give; real browsers get live updates below as the composer's own height changes.
-    if (typeof ResizeObserver === 'undefined') {
-      return undefined;
-    }
-    const observer = new ResizeObserver(measure);
-    observer.observe(panel);
-    return () => observer.disconnect();
-  }, [hasProviders, showLoadingState]);
+  // not an absolutely-positioned overlay: `position: sticky` reserves its own box in the flow like
+  // any other flex item, so a taller composer (e.g. multiline input) simply shrinks the
+  // transcript's flex-basis — no measurement needed for that. The one thing sticky positioning does
+  // NOT reserve is the fade gradient painted by its `::before` (chat-page.scss), which extends a
+  // fixed amount further upward outside the panel's own box, and is what a live measurement caught
+  // actually covering the last few pixels of the transcript's final element (a table's pagination
+  // bar) even once scrolled all the way down. `.wzChatTranscript`'s `padding-bottom` (chat-page.scss)
+  // reserves exactly that fixed gradient height via a shared SCSS constant, kept in sync with
+  // `::before` so the two can never drift apart. It deliberately does NOT reserve the panel's full
+  // rendered height — `position: sticky` already accounts for that on its own, and reserving it a
+  // second time here would leave a permanent gap the size of the composer at the bottom of every
+  // scroll once the transcript auto-scrolls all the way down.
 
   const privacyBadgeLabel = privacyEnabled
     ? i18n.translate('wazuhAiAssistant.chat.privacy.on', {
@@ -1946,12 +1930,13 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   space — no `justifyContent: 'center'` here either, for the same
                   overflow-centering-bug reason as the pane above.
 
-                  `paddingBottom: composerReservedHeight` is the fix for the composer-overlap bug:
-                  this is the transcript's own container, the one flow sibling that sits directly
-                  above `.wzStickyInputPanel` below, so padding added here — sized to the panel's
-                  own measured height — is what guarantees the transcript's last element (e.g. a
-                  table's pagination bar) can always scroll fully clear of the sticky panel, no
-                  matter how tall that panel is at the time. */}
+                  The composer-overlap fix itself lives in chat-page.scss: `.wzChatTranscript`'s
+                  `padding-bottom` there reserves exactly the sticky panel's `::before` fade-gradient
+                  height (a constant shared with the panel's own rule, see that file), which is what
+                  guarantees the transcript's last element (e.g. a table's pagination bar) can always
+                  scroll fully clear of the sticky panel. It is a fixed CSS reservation, not the
+                  panel's full rendered height — `position: sticky` already reserves that on its own
+                  as an ordinary flex sibling, growing or shrinking with the composer automatically. */}
             <div
               className='wzChatTranscript'
               style={
@@ -1961,12 +1946,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                       minHeight: 0,
                       display: 'flex',
                       flexDirection: 'column',
-                      paddingBottom: composerReservedHeight,
                     }
                   : {
                       flex: '1 1 auto',
                       minHeight: 0,
-                      paddingBottom: composerReservedHeight,
                     }
               }
             >
@@ -2164,7 +2147,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
             {!showLoadingState && !showNoProviderState && (
               <div
-                ref={stickyPanelRef}
                 className={
                   hasProviders
                     ? 'wzStickyInputPanel'

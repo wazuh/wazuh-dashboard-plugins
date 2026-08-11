@@ -16,6 +16,23 @@
   --wz-text-subdued: #{$euiTextSubduedColor};
 }
 
+/* `position: sticky` reserves `.wzStickyInputPanel`'s own box in the flow (it is an ordinary flex
+   sibling of `.wzChatTranscript`, sized by flex layout like any other item — a taller composer,
+   e.g. from multiline input, simply shrinks the transcript's flex-basis, no JS needed for that).
+   The ONE thing sticky positioning does NOT reserve is `::before`'s fade gradient below, which
+   paints `$wzComposerGradientHeight` further up via a negative `top` — outside the panel's own
+   box — and a live measurement caught exactly that strip covering the transcript's last element
+   (a table's pagination bar) even once scrolled all the way down. `.wzChatTranscript`'s
+   `padding-bottom` (below) reserves precisely this one constant, shared with `::before` so the two
+   can never drift apart — NOT the panel's full rendered height, which `position: sticky` already
+   accounts for on its own; reserving the full height on top of that would leave a permanent gap
+   the size of the composer at the bottom of every scroll. */
+$wzComposerGradientHeight: 16px;
+
+.wzChatTranscript {
+  padding-bottom: $wzComposerGradientHeight;
+}
+
 .wzStickyInputPanel {
   position: sticky;
   bottom: 0;
@@ -25,10 +42,10 @@
   &::before {
     content: '';
     position: absolute;
-    top: -16px;
+    top: -$wzComposerGradientHeight;
     left: 0;
     right: 0;
-    height: 16px;
+    height: $wzComposerGradientHeight;
     background: linear-gradient(
       to bottom,
       transparent,
