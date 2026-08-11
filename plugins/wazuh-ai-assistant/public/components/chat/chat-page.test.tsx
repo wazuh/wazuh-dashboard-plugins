@@ -1573,6 +1573,7 @@ describe('ChatPage — welcome-state layout does not clip the composer', () => {
     const pane = screen.getByRole('region', { name: 'Chat' });
     const column = pane.firstElementChild as HTMLElement;
     expect(column.style.flex).toBe('1 0 auto');
-    expect(column.style.minHeight).toBe('0px');
+    // jsdom serializes the numeric `minHeight: 0` style as '0'; real browsers report '0px'.
+    expect(['0', '0px']).toContain(column.style.minHeight);
   });
 });
