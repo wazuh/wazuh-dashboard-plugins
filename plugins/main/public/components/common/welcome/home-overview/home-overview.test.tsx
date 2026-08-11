@@ -6,6 +6,7 @@ import { render, screen } from '@testing-library/react';
 // pull the data-access seam.
 jest.mock('./components/overview', () => ({
   OverviewSection: () => <div data-test-subj='overview-section' />,
+  AiAssistantCta: () => <div data-test-subj='ai-assistant-cta' />,
 }));
 jest.mock('./components/endpoint-security', () => ({
   EndpointSecuritySection: () => (
@@ -58,6 +59,7 @@ describe('HomeOverview shell', () => {
     const { container } = render(<HomeOverview />);
     expect(screen.getByText('Overview')).toBeInTheDocument();
     for (const section of [
+      'ai-assistant-cta',
       'overview-section',
       'endpoint-security-section',
       'threat-hunting-section',
