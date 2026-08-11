@@ -68,10 +68,16 @@ const PROVIDER_TYPE_DESCRIPTIONS: Record<ProviderInput['type'], string> = {
  * shape looks like, so a mismatched key gets caught before the admin clicks Save and hits an
  * opaque "Test connection" failure. `keyPattern` backs a non-blocking shape warning only — the
  * server is the real validator, this is just an early, cheap hint.
+ *
+ * `keyPattern` is deliberately OPTIONAL: it is only well-defined for `anthropic` (Anthropic keys
+ * always start with `sk-ant-`). `openai_compatible` covers OpenAI, Groq (`gsk_...`),
+ * Bedrock-Mantle/gateway tokens (arbitrary shapes), and auth-free Ollama (no key at all) — there
+ * is no single shape to check there, so warning against `/^sk-/` for that type would falsely flag
+ * perfectly valid keys for the exact providers this type's own description advertises.
  */
 const PROVIDER_API_KEY_GUIDANCE: Record<
   ProviderInput['type'],
-  { help: string; keyPattern: RegExp; shapeWarning: string }
+  { help: string; keyPattern?: RegExp; shapeWarning?: string }
 > = {
   anthropic: {
     help: i18n.translate('wazuhAiAssistant.settings.form.apiKeyHelpAnthropic', {
@@ -94,18 +100,11 @@ const PROVIDER_API_KEY_GUIDANCE: Record<
       {
         defaultMessage:
           "Create a key in your provider's console (e.g. OpenAI, Groq). OpenAI keys start " +
-          'with sk-.',
+          'with sk-, Groq keys with gsk_ — other gateways (e.g. Bedrock-Mantle) use their own ' +
+          'format.',
       },
     ),
-    keyPattern: /^sk-/,
-    shapeWarning: i18n.translate(
-      'wazuhAiAssistant.settings.form.apiKeyShapeWarningOpenaiCompatible',
-      {
-        defaultMessage:
-          "This doesn't look like a typical key for this provider type (it should usually " +
-          'start with sk-). If your provider uses a different format, you can ignore this.',
-      },
-    ),
+    // No shape check for this type — see the doc comment above.
   },
 };
 
@@ -353,7 +352,9 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   const modelGuidance = PROVIDER_MODEL_GUIDANCE[form.type];
   const apiKeyGuidance = PROVIDER_API_KEY_GUIDANCE[form.type];
   const apiKeyShapeMismatch = Boolean(
-    form.apiKey?.trim() && !apiKeyGuidance.keyPattern.test(form.apiKey.trim()),
+    apiKeyGuidance.keyPattern &&
+      form.apiKey?.trim() &&
+      !apiKeyGuidance.keyPattern.test(form.apiKey.trim()),
   );
 
   const handleSave = async () => {
@@ -558,11 +559,23 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                       nextType === 'anthropic' &&
                       !baseUrlTouched &&
                       current.baseUrl.trim() === '';
+                    // Mirror image of the prefill above: leaving anthropic for another type
+                    // while the field is still untouched and still holds exactly the value this
+                    // form prefilled clears it again, so a wrong-type URL can't be saved
+                    // unnoticed. A value the admin typed themselves (`baseUrlTouched`) is never
+                    // touched here.
+                    const shouldClearAnthropicPrefill =
+                      current.type === 'anthropic' &&
+                      nextType !== 'anthropic' &&
+                      !baseUrlTouched &&
+                      current.baseUrl === PROVIDER_URL_GUIDANCE.anthropic.placeholder;
                     return {
                       ...current,
                       type: nextType,
                       baseUrl: shouldPrefillAnthropicBaseUrl
                         ? PROVIDER_URL_GUIDANCE.anthropic.placeholder
+                        : shouldClearAnthropicPrefill
+                        ? ''
                         : current.baseUrl,
                     };
                   });
@@ -714,10 +727,12 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 </>
               }
             >
+              {/* Deliberately no `isInvalid` here: a shape mismatch is a non-blocking warning
+                  (see the EuiCallOut below), not a form error — a red-invalid field would read
+                  as blocking to an admin even though Save stays enabled. */}
               <EuiFieldPassword
                 type='dual'
                 value={form.apiKey}
-                isInvalid={apiKeyShapeMismatch}
                 onChange={event =>
                   setForm({ ...form, apiKey: event.target.value })
                 }
@@ -727,7 +742,10 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 copy/paste mistake before the admin hits an opaque "Test connection" failure.
                 Kept outside EuiFormRow (which clones its single child to inject a11y props,
                 so it cannot take a two-element fragment) rather than inside it. */}
-            {apiKeyShapeMismatch && (
+            {/* `apiKeyShapeMismatch` is only ever true for a type with both a `keyPattern` and a
+                `shapeWarning` (currently just anthropic — see PROVIDER_API_KEY_GUIDANCE above),
+                so `shapeWarning` is guaranteed defined here. */}
+            {apiKeyShapeMismatch && apiKeyGuidance.shapeWarning && (
               <>
                 <EuiSpacer size='xs' />
                 <EuiCallOut

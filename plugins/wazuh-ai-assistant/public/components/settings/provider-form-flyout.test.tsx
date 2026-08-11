@@ -421,6 +421,77 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('never marks the API key field itself as invalid (warning stays non-blocking)', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/provider type/i), {
+      target: { value: 'anthropic' },
+    });
+    fireEvent.change(screen.getByLabelText(/^api key$/i), {
+      target: { value: 'not-anthropic-shaped-at-all' },
+    });
+
+    // A shape mismatch must surface only as the warning EuiCallOut above, never as a red-invalid
+    // field — that would read as a blocking error to an admin even though Save stays enabled.
+    expect(screen.getByLabelText(/^api key$/i)).not.toHaveAttribute(
+      'aria-invalid',
+      'true',
+    );
+  });
+
+  it('does not warn on a Groq-shaped key for the openai_compatible type', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    // openai_compatible covers OpenAI, Groq, Bedrock-Mantle and auth-free Ollama — there is no
+    // single key shape to check, so a Groq key (gsk_...) must never trigger the warning meant
+    // for Anthropic's sk-ant- shape.
+    fireEvent.change(screen.getByLabelText(/^api key$/i), {
+      target: { value: 'gsk_totally-valid-groq-key' },
+    });
+
+    expect(
+      screen.queryByText(/doesn't look like/i),
+    ).not.toBeInTheDocument();
+  });
+
+  it('clears an untouched Anthropic prefill when switching to another type', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/provider type/i), {
+      target: { value: 'anthropic' },
+    });
+    expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
+      'https://api.anthropic.com',
+    );
+
+    fireEvent.change(screen.getByLabelText(/provider type/i), {
+      target: { value: 'openai_compatible' },
+    });
+
+    expect(screen.getByLabelText(/endpoint url/i)).toHaveValue('');
+  });
+
+  it('keeps an admin-typed Anthropic URL when switching away from anthropic', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/provider type/i), {
+      target: { value: 'anthropic' },
+    });
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://api.anthropic.com' },
+    });
+
+    fireEvent.change(screen.getByLabelText(/provider type/i), {
+      target: { value: 'openai_compatible' },
+    });
+
+    // The admin explicitly typed this value (even though it happens to match the prefill), so
+    // it must survive the type switch.
+    expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
+      'https://api.anthropic.com',
+    );
+  });
+
   it('shows a numbered getting-started hint for a new provider, not when editing', () => {
     const { rerender } = render(<ProviderFormFlyout {...baseProps} />);
     expect(screen.getByText(/getting started/i)).toBeInTheDocument();
