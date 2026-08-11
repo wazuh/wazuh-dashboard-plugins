@@ -875,9 +875,20 @@ export const ChatPage: React.FC<ChatPageProps> = ({
    * that was never created yet (still `null`) is POSTed once, and one that already has an id is
    * PUT to that SAME row: this can never create a second conversation for what the user sees as one
    * conversation, whether the failing save was the first one or a later one.
+   *
+   * Blocked while `isGenerating`: the in-flight turn (`startTurn`) already holds its OWN
+   * `TurnConversationTarget` in closure (shared between its pre-send save and its post-answer
+   * save — see that target's own doc comment) — a `target` built here from the live refs while
+   * that turn is still streaming is a DIFFERENT object. If the turn's pre-send save has already
+   * failed (raising this very callout) but not yet created the row, firing this handler would
+   * race it: this save creates+adopts the conversation from the live refs, while the turn's own
+   * target still holds `conversationId: null` and later POSTs a second row instead of updating
+   * the one this save just created. The turn's post-answer auto-save runs moments after the
+   * stream ends anyway, so a mid-stream retry is redundant — the button is disabled instead of
+   * queued so the same click is never re-armed into a second attempt when generation finishes.
    */
   const handleRetrySave = () => {
-    if (isRetryingSave) {
+    if (isRetryingSave || isGenerating) {
       return;
     }
     setIsRetryingSave(true);
@@ -1781,7 +1792,12 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     color='warning'
                     onClick={handleRetrySave}
                     isLoading={isRetryingSave}
-                    isDisabled={isRetryingSave}
+                    // Also disabled while a turn is generating: retrying with a target built
+                    // from the live refs while the in-flight turn's OWN target is still
+                    // unresolved (e.g. its pre-send save hasn't created the row yet) would race
+                    // it into creating a second conversation row — see handleRetrySave's doc
+                    // comment. The turn's own post-answer save runs moments after streaming ends.
+                    isDisabled={isRetryingSave || isGenerating}
                   >
                     {i18n.translate(
                       'wazuhAiAssistant.chat.conversations.saveFailed.retryButton',

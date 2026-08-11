@@ -996,6 +996,48 @@ describe('ChatPage — interrupted turns and failed saves', () => {
     expect(mockConversationsService.create).toHaveBeenCalledTimes(3);
   });
 
+  it('disables "Retry now" while a turn is generating, so it cannot double-create the conversation', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+    // The pre-send save (before any streaming starts) fails first, raising the callout while the
+    // turn is still generating; the post-answer save that follows once the stream ends succeeds.
+    mockConversationsService.create
+      .mockRejectedValueOnce(httpError(500))
+      .mockResolvedValueOnce(conversationRecord({ id: 'conv-new', version: 'v1' }));
+
+    renderChatPage();
+    await sendMessage('first question');
+    await waitFor(() =>
+      expect(
+        screen.getByText('This conversation is not being saved'),
+      ).toBeInTheDocument(),
+    );
+    expect(mockConversationsService.create).toHaveBeenCalledTimes(1);
+
+    // The turn is still streaming: clicking "Retry now" here must be a no-op — it is disabled
+    // precisely so this window (the in-flight turn's own target not yet resolved, per
+    // `handleRetrySave`'s doc comment) can never race the turn's own saves into a second create.
+    const retryButton = screen.getByRole('button', { name: 'Retry now' });
+    expect(retryButton).toBeDisabled();
+    fireEvent.click(retryButton);
+    expect(mockConversationsService.create).toHaveBeenCalledTimes(1);
+
+    stream.push({ type: 'delta', content: 'an answer' });
+    stream.push({ type: 'done' });
+    stream.end();
+
+    // Only the turn's own post-answer save creates the row — never a second one from the blocked
+    // retry click.
+    await waitFor(() =>
+      expect(
+        screen.queryByText('This conversation is not being saved'),
+      ).not.toBeInTheDocument(),
+    );
+    expect(mockConversationsService.create).toHaveBeenCalledTimes(2);
+  });
+
   it('does not raise the save notice for a 401, which has its own callout', async () => {
     const stream = createControllableStream();
     mockStreamChat.mockImplementation(
