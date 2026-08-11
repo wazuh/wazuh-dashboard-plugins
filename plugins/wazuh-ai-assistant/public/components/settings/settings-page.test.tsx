@@ -303,7 +303,10 @@ describe('SettingsPage — manual test failure callout is genuinely dismissible'
         isDefault: false,
       },
     ]);
-    mockService.test.mockResolvedValueOnce({
+    // Persistent failure so both the auto-probe (call #1) and the manual click (call #2) fail —
+    // mockResolvedValueOnce would only cover the auto-probe, leaving the manual click to fall
+    // through to the success mock set in beforeEach.
+    mockService.test.mockResolvedValue({
       success: false,
       latencyMs: 0,
       message: 'Connection refused',
