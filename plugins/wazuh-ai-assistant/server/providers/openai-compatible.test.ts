@@ -650,3 +650,198 @@ test('chatStream: buffered reasoning ahead of a finish_reason:"tool_calls" round
     'the buffered reasoning must not leak into a tool round just because usage now arrives later',
   );
 });
+
+// --- temperature rejection: retry-once + per-process cache (issue seen live against a Bedrock
+// `openai_compatible` gateway serving `openai.gpt-oss-120b`, which answers HTTP 400
+// "`temperature` is deprecated for this model" whenever the stage-1 router's `temperature: 0` is
+// forwarded). The fix must retry the SAME turn once without `temperature` instead of dying, and
+// remember the finding for that provider+model so every later call -- including every stage-1
+// router call -- skips straight to omitting it. -------------------------------------------------
+
+/** Builds a fetch mock that returns each entry of `responses` in order (the last entry repeats
+ * once exhausted) and records every outbound request body it was called with. */
+function withFakeFetchSequence<T>(
+  responses: Response[],
+  run: (capturedBodies: Array<Record<string, unknown>>) => Promise<T>,
+): Promise<{ result: T; capturedBodies: Array<Record<string, unknown>> }> {
+  const original = globalThis.fetch;
+  const capturedBodies: Array<Record<string, unknown>> = [];
+  let callIndex = 0;
+  globalThis.fetch = ((_url: string, init?: RequestInit) => {
+    if (typeof init?.body === 'string') {
+      capturedBodies.push(JSON.parse(init.body));
+    }
+    const response = responses[Math.min(callIndex, responses.length - 1)];
+    callIndex += 1;
+    return Promise.resolve(response);
+  }) as unknown as typeof fetch;
+  return run(capturedBodies)
+    .then(result => ({ result, capturedBodies }))
+    .finally(() => {
+      globalThis.fetch = original;
+    });
+}
+
+/** A fresh `ProviderConfig` per test -- the temperature-rejection cache is keyed by
+ * `baseUrl::model`, so reusing `BASE_CONFIG` across these tests would let one test's cached
+ * rejection leak into the next. */
+function uniqueTemperatureTestConfig(id: string): ProviderConfig {
+  return {
+    ...BASE_CONFIG,
+    baseUrl: `https://bedrock-mantle.example.com/${id}/v1`,
+    model: 'openai.gpt-oss-120b',
+  };
+}
+
+test('chatStream: a 400 mentioning temperature is retried once without it and the retry succeeds', async () => {
+  const config = uniqueTemperatureTestConfig('retry-success');
+  const rejection = new Response(
+    JSON.stringify({
+      error: { message: '`temperature` is deprecated for this model.' },
+    }),
+    { status: 400, headers: { 'Content-Type': 'application/json' } },
+  );
+  const success = new Response(
+    sseBody([{ choices: [{ index: 0, delta: { content: 'ok' } }] }]),
+    { status: 200, headers: { 'Content-Type': 'text/event-stream' } },
+  );
+  const { result: events, capturedBodies } = await withFakeFetchSequence(
+    [rejection, success],
+    () => {
+      const adapter = new OpenAiCompatibleAdapter();
+      const controller = new AbortController();
+      return drain(
+        adapter.chatStream(
+          config,
+          [userMessage('route this')],
+          controller.signal,
+          { temperature: 0 },
+        ),
+      );
+    },
+  );
+  assert.equal(capturedBodies.length, 2, 'must have retried exactly once');
+  assert.equal(
+    capturedBodies[0].temperature,
+    0,
+    'the first attempt must still send the configured temperature',
+  );
+  assert.ok(
+    !('temperature' in capturedBodies[1]),
+    'the retry must omit temperature entirely',
+  );
+  assert.deepEqual(
+    events.map(event => event.type),
+    ['delta', 'done'],
+    'the turn must succeed via the retried request, not surface the 400 to the caller',
+  );
+});
+
+test('chatStream: an unrelated 400 does not trigger a temperature retry', async () => {
+  const config = uniqueTemperatureTestConfig('unrelated-400');
+  const rejection = new Response(
+    JSON.stringify({ error: { message: 'Invalid model identifier.' } }),
+    { status: 400, headers: { 'Content-Type': 'application/json' } },
+  );
+  const { result: events, capturedBodies } = await withFakeFetchSequence(
+    [rejection],
+    () => {
+      const adapter = new OpenAiCompatibleAdapter();
+      const controller = new AbortController();
+      return drain(
+        adapter.chatStream(
+          config,
+          [userMessage('route this')],
+          controller.signal,
+          { temperature: 0 },
+        ),
+      );
+    },
+  );
+  assert.equal(
+    capturedBodies.length,
+    1,
+    'an unrelated 400 must not spend a retry attempt',
+  );
+  assert.deepEqual(
+    events.map(event => event.type),
+    ['error'],
+    'the unrelated 400 must still surface as a terminal error',
+  );
+});
+
+test('chatStream: a second call against the same provider+model omits temperature immediately (no repeated 400)', async () => {
+  const config = uniqueTemperatureTestConfig('cached-decision');
+  const rejection = new Response(
+    JSON.stringify({
+      error: { message: '`temperature` is deprecated for this model.' },
+    }),
+    { status: 400, headers: { 'Content-Type': 'application/json' } },
+  );
+  const success = new Response(
+    sseBody([{ choices: [{ index: 0, delta: { content: 'ok' } }] }]),
+    { status: 200, headers: { 'Content-Type': 'text/event-stream' } },
+  );
+  // First call: pays for the discovery (400 then a successful retry).
+  await withFakeFetchSequence([rejection, success], () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(
+        config,
+        [userMessage('first call')],
+        controller.signal,
+        { temperature: 0 },
+      ),
+    );
+  });
+  // Second call against the SAME provider+model: must go straight to a single, temperature-free
+  // request -- no repeated 400 round-trip.
+  const { capturedBodies } = await withFakeFetchSequence([success], () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(
+        config,
+        [userMessage('second call, same provider+model')],
+        controller.signal,
+        { temperature: 0 },
+      ),
+    );
+  });
+  assert.equal(
+    capturedBodies.length,
+    1,
+    'the cached decision must skip straight to the temperature-free request',
+  );
+  assert.ok(
+    !('temperature' in capturedBodies[0]),
+    'temperature must be omitted immediately once cached as rejected',
+  );
+});
+
+test('chatStream: a provider that accepts temperature keeps receiving it (regression)', async () => {
+  const config = uniqueTemperatureTestConfig('accepts-temperature');
+  const success = new Response(
+    sseBody([{ choices: [{ index: 0, delta: { content: 'ok' } }] }]),
+    { status: 200, headers: { 'Content-Type': 'text/event-stream' } },
+  );
+  const { capturedBodies } = await withFakeFetchSequence([success], () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(
+        config,
+        [userMessage('route this')],
+        controller.signal,
+        { temperature: 0 },
+      ),
+    );
+  });
+  assert.equal(capturedBodies.length, 1);
+  assert.equal(
+    capturedBodies[0].temperature,
+    0,
+    'a provider that never rejected temperature must keep receiving it, including a literal 0',
+  );
+});
