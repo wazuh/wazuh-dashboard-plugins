@@ -34,6 +34,55 @@ interface ToolCallAccumulator {
 }
 
 /**
+ * Providers that have already told us, in THIS process, that they reject `temperature` for a
+ * given base URL + model (observed live against a Bedrock `openai_compatible` gateway serving
+ * `openai.gpt-oss-120b`: "`temperature` is deprecated for this model", HTTP 400). Keyed by
+ * `baseUrl::model` rather than the whole `ProviderConfig` so two settings entries pointing at the
+ * same endpoint/model share the finding, and a config with a different model at the same base URL
+ * does not.
+ *
+ * Module-scope, not per-request: the whole point is that every call AFTER the first rejection —
+ * crucially including every stage-1 router call, which unconditionally sends `temperature: 0` —
+ * skips the doomed first attempt instead of re-discovering the same 400 on every turn. Resets on
+ * process restart, which is acceptable: the cost of forgetting is at most one wasted round-trip
+ * per restart, not a functional break.
+ */
+const temperatureRejectedByProviderModel = new Map<string, boolean>();
+
+/** Cache key for `temperatureRejectedByProviderModel` — see its doc comment. */
+function temperatureCacheKey(config: ProviderConfig): string {
+  return `${trimTrailingSlash(config.baseUrl)}::${config.model}`;
+}
+
+/**
+ * Loosely matches a provider telling us, via an HTTP 4xx body, that it will not accept the
+ * `temperature` parameter for this model. Deliberately loose (any 4xx + a case-insensitive
+ * mention of "temperature" anywhere in the body) rather than matching the exact Bedrock wording:
+ * different OpenAI-compatible gateways phrase this differently ("is deprecated for this model",
+ * "is not supported", "unsupported_parameter"...), and the cost of a false positive here is just
+ * one extra harmless retry without `temperature` — not a wrong answer or a dropped turn.
+ */
+function looksLikeTemperatureRejection(status: number, bodyText: string): boolean {
+  return status >= 400 && status < 500 && /temperature/i.test(bodyText);
+}
+
+/**
+ * Logs the temperature-rejection discovery exactly once per provider/model — at the moment it is
+ * first cached, which the caller only reaches once per `temperatureRejectedByProviderModel` key
+ * (every later call for that key short-circuits before re-detecting anything). No `Logger` is
+ * threaded down into `ProviderAdapter.chatStream` from any call site (chat.ts/anthropic.ts/
+ * openai-compatible.ts all construct adapters directly), so this intentionally uses `console.debug`
+ * rather than growing every adapter's signature just for one diagnostic line.
+ */
+function logTemperatureRejectionOnce(config: ProviderConfig): void {
+  // eslint-disable-next-line no-console -- see doc comment: no Logger reaches this layer.
+  console.debug(
+    `[wazuh-ai-assistant] Provider ${config.baseUrl} (model ${config.model}) rejected ` +
+      '`temperature`; retrying once without it and caching the decision for this process.',
+  );
+}
+
+/**
  * Adapter for any server exposing the OpenAI chat-completions wire format: OpenAI itself,
  * Google Gemini's OpenAI-compatible endpoint, Ollama, LM Studio, vLLM, and most local model
  * servers. Provider choice is transport only; the system prompt / message shape is the same
@@ -57,46 +106,77 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
       return;
     }
 
-    const body: Record<string, unknown> = {
-      model: config.model,
-      stream: true,
-      // The OpenAI streaming contract only emits the terminal `usage` frame when this is set.
-      // Groq sends it unprompted, which is why the omission went unnoticed -- every usage number
-      // this plugin has recorded so far came from Groq. Amazon Bedrock's chat-completions endpoint
-      // does not: without this, every turn reports `usage: null` and token accounting (including
-      // the stage-1 router's own spend) reads blank. Providers that don't recognise the field
-      // ignore it, and the `if (parsed.usage)` exit below is unchanged either way -- note that
-      // frame arrives with an EMPTY `choices` array, which the per-choice handling above already
-      // tolerates (`parsed.choices?.[0]` is simply undefined).
-      stream_options: { include_usage: true },
-      messages: messages.map(toOpenAiMessage),
+    // Cache key computed once per call; `includeTemperature` below is recomputed on every
+    // `doFetch()` attempt (not just once here) so a rejection discovered mid-call by the first
+    // attempt is honored by the very next one, without waiting for a fresh `chatStream()` call.
+    const cacheKey = temperatureCacheKey(config);
+
+    const buildBody = (includeTemperature: boolean): Record<string, unknown> => {
+      const nextBody: Record<string, unknown> = {
+        model: config.model,
+        stream: true,
+        // The OpenAI streaming contract only emits the terminal `usage` frame when this is set.
+        // Groq sends it unprompted, which is why the omission went unnoticed -- every usage
+        // number this plugin has recorded so far came from Groq. Amazon Bedrock's
+        // chat-completions endpoint does not: without this, every turn reports `usage: null` and
+        // token accounting (including the stage-1 router's own spend) reads blank. Providers
+        // that don't recognise the field ignore it, and the `if (parsed.usage)` exit below is
+        // unchanged either way -- note that frame arrives with an EMPTY `choices` array, which
+        // the per-choice handling above already tolerates (`parsed.choices?.[0]` is undefined).
+        stream_options: { include_usage: true },
+        messages: messages.map(toOpenAiMessage),
+      };
+      // Checked for `undefined`, not truthiness -- callers deliberately send `temperature: 0` (the
+      // stage-1 router; see ChatStreamOptions's doc comment), which a `if (options?.temperature)`
+      // guard would treat as absent and silently drop. `includeTemperature` additionally gates this
+      // on whether the provider is already known (this process) to reject the parameter entirely --
+      // see `temperatureRejectedByProviderModel`'s doc comment above.
+      if (includeTemperature && options?.temperature !== undefined) {
+        nextBody.temperature = options.temperature;
+      }
+      if (options?.tools?.length) {
+        nextBody.tools = toOpenAiTools(options.tools);
+        nextBody.tool_choice = toOpenAiToolChoice(options.toolChoice ?? 'auto');
+        nextBody.parallel_tool_calls = false;
+      }
+      return nextBody;
     };
-    // Checked for `undefined`, not truthiness -- callers deliberately send `temperature: 0` (the
-    // stage-1 router; see ChatStreamOptions's doc comment), which a `if (options?.temperature)`
-    // guard would treat as absent and silently drop.
-    if (options?.temperature !== undefined) {
-      body.temperature = options.temperature;
-    }
-    if (options?.tools?.length) {
-      body.tools = toOpenAiTools(options.tools);
-      body.tool_choice = toOpenAiToolChoice(options.toolChoice ?? 'auto');
-      body.parallel_tool_calls = false;
-    }
+
+    const doFetch = (requestBody: Record<string, unknown>): Promise<Response> =>
+      fetch(url, {
+        method: 'POST',
+        signal,
+        redirect: PROVIDER_FETCH_REDIRECT_POLICY,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(config.apiKey
+            ? { Authorization: `Bearer ${config.apiKey}` }
+            : {}),
+        },
+        body: JSON.stringify(requestBody),
+      });
 
     const response = yield* fetchProviderWithRetry(
-      () =>
-        fetch(url, {
-          method: 'POST',
-          signal,
-          redirect: PROVIDER_FETCH_REDIRECT_POLICY,
-          headers: {
-            'Content-Type': 'application/json',
-            ...(config.apiKey
-              ? { Authorization: `Bearer ${config.apiKey}` }
-              : {}),
-          },
-          body: JSON.stringify(body),
-        }),
+      async () => {
+        const includeTemperature = !temperatureRejectedByProviderModel.get(cacheKey);
+        const attemptResponse = await doFetch(buildBody(includeTemperature));
+        if (!includeTemperature || attemptResponse.status !== 400) {
+          return attemptResponse;
+        }
+        // Peek at a CLONE so the original response's body is left untouched for
+        // `fetchProviderWithRetry` to consume normally when this turns out not to be a
+        // temperature rejection (a 400 for some other reason must reach it unconsumed).
+        const bodyText = await attemptResponse
+          .clone()
+          .text()
+          .catch(() => '');
+        if (!looksLikeTemperatureRejection(attemptResponse.status, bodyText)) {
+          return attemptResponse;
+        }
+        temperatureRejectedByProviderModel.set(cacheKey, true);
+        logTemperatureRejectionOnce(config);
+        return doFetch(buildBody(false));
+      },
       signal,
       // See server/providers/retry.ts's sanitizeProviderErrorBody doc comment for why the
       // exact configured key is passed through here.
