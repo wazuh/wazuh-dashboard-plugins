@@ -141,8 +141,10 @@ describe('SettingsPage — auto-probe failures do not become permanent banners',
     // The failure must still be visible in the row's status cell (tooltip trigger)...
     expect(await screen.findByText('Connection refused')).toBeInTheDocument();
     // ...but never escalate to a dismissible page-level EuiCallOut, since nobody clicked "Test".
+    // Anchored to the callout's own title text rather than the dismiss button's aria-label, which
+    // is OUI-internal and not something this test should depend on.
     expect(
-      screen.queryByRole('button', { name: /dismiss/i }),
+      screen.queryByText(/my openai: connection refused/i),
     ).not.toBeInTheDocument();
   });
 
@@ -204,6 +206,45 @@ describe('SettingsPage — auto-probe failures do not become permanent banners',
     expect(
       await screen.findByText(/my openai: connection refused/i),
     ).toBeInTheDocument();
+  });
+
+  it('shows only the default-provider callout, not a duplicate manual one, when the default is manually tested and fails', async () => {
+    mockService.list.mockResolvedValue([
+      {
+        id: 'p1',
+        name: 'My Default',
+        type: 'anthropic',
+        baseUrl: 'https://api.anthropic.com',
+        model: 'claude-3',
+        isDefault: true,
+      },
+    ]);
+    mockService.test.mockResolvedValue({
+      success: false,
+      latencyMs: 0,
+      message: 'Invalid API key',
+    });
+
+    render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
+
+    // Auto-probe already renders the default-provider callout.
+    expect(
+      await screen.findByText(/default provider "my default" is failing/i),
+    ).toBeInTheDocument();
+
+    const testButton = await screen.findByRole('button', { name: 'Test' });
+    fireEvent.click(testButton);
+    await waitFor(() => expect(mockService.test).toHaveBeenCalledTimes(2));
+
+    // The default-provider callout still renders...
+    expect(
+      await screen.findByText(/default provider "my default" is failing/i),
+    ).toBeInTheDocument();
+    // ...but the separate manual-failure callout ("{name}: {message}") must NOT also render for
+    // the same provider/message — that would be a duplicate.
+    expect(
+      screen.queryByText(/^my default: invalid api key$/i),
+    ).not.toBeInTheDocument();
   });
 });
 

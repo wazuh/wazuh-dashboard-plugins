@@ -241,14 +241,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   );
   const [isSavingRetention, setIsSavingRetention] = useState(false);
   const [fieldPolicyFilter, setFieldPolicyFilter] = useState('');
-  // Page-level callout #1: a provider the user explicitly clicked "Test" on, which failed.
-  const manualTestFailures = providers.filter(
-    p =>
-      manualTestIds.has(p.id) &&
-      testResults[p.id] &&
-      !testResults[p.id].success &&
-      !dismissedErrorIds.has(p.id),
-  );
   // Page-level callout #2: the default provider is failing (whether the failure came from the
   // silent auto-probe or a manual test) — the one case that breaks chat, so it always surfaces,
   // compact and dismissible, regardless of who triggered the test.
@@ -258,6 +250,18 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       testResults[p.id] &&
       !testResults[p.id].success &&
       !dismissedErrorIds.has(`default:${p.id}`),
+  );
+  // Page-level callout #1: a provider the user explicitly clicked "Test" on, which failed.
+  // A provider that is ALSO the failing default is excluded here — it already gets the
+  // dedicated default-provider callout below, and showing both for the same provider/message
+  // would be duplicative.
+  const manualTestFailures = providers.filter(
+    p =>
+      manualTestIds.has(p.id) &&
+      testResults[p.id] &&
+      !testResults[p.id].success &&
+      !dismissedErrorIds.has(p.id) &&
+      p.id !== failingDefaultProvider?.id,
   );
   const hasEmptyFieldPolicyRow = fieldPolicyDraft.some(
     entry => entry.field.trim() === '',
@@ -588,9 +592,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     }
   };
 
+  // `manual` has no default here on purpose (see the finding this fixed): a future call site
+  // that forgets to pass it should fail to compile rather than silently gain page-level banner
+  // rights. The row action below gets its own thin wrapper (`handleManualTest`) that always
+  // passes `manual: true`; the auto-probe on mount passes `manual: false` explicitly.
   const handleTest = async (
     provider: ProviderSummary,
-    options: { manual: boolean } = { manual: true },
+    options: { manual: boolean },
   ) => {
     setTestingIds(current => new Set(current).add(provider.id));
     if (options.manual) {
@@ -623,6 +631,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       });
     }
   };
+
+  // Row action wrapper: the only call site that should ever pass `manual: true` — see the
+  // no-default rationale on `handleTest` above.
+  const handleManualTest = (provider: ProviderSummary) =>
+    handleTest(provider, { manual: true });
 
   const columns: EuiBasicTableColumn<ProviderSummary>[] = [
     {
@@ -762,14 +775,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           <EuiToolTip content={failureMessage}>
             <EuiHealth color='danger'>
               <span
-                style={{
-                  display: 'inline-block',
-                  maxWidth: '100px',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  verticalAlign: 'bottom',
-                }}
+                className='eui-textTruncate'
+                style={{ display: 'inline-block', maxWidth: '100px' }}
               >
                 {failureMessage}
               </span>
@@ -796,7 +803,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           ),
           icon: 'play',
           type: 'icon' as const,
-          onClick: handleTest,
+          isPrimary: true,
+          onClick: handleManualTest,
           enabled: (provider: ProviderSummary) => !testingIds.has(provider.id),
         },
         {
