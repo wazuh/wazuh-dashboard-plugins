@@ -15,8 +15,17 @@ export interface Digest {
    * finding-hits typed tool (`catalog/common.ts`'s `FINDING_BREAKDOWN_AGGS` always attaches two:
    * by agent name and by rule title) — naming which aggregation a bucket belongs to; single-agg
    * digests stay byte-identical to before it existed. It also lets privacy.ts's field-policy pass
-   * attribute each bucket key to the right aggregation field. */
-  breakdown?: Array<{ key: string; count: number; agg?: string }>;
+   * attribute each bucket key to the right aggregation field.    
+   *
+   * `key` is `unknown`, not `string`: a plain terms/significant_terms/cardinality bucket's key is
+   * always a string (unchanged from before), but a `multi_terms` bucket's key is an ARRAY of
+   * component values and a `composite` bucket's key is an OBJECT of `{sourceName: value}` pairs —
+   * see `buildBreakdown` below. Forcing either through `String()` loses the per-component
+   * structure privacy.ts's field-policy pass needs to scrub each component against its own field
+   * (and, for `composite`, produced the literal string "[object Object]", a separate display
+   * bug). digest.ts stays privacy-agnostic either way: it just stops DESTROYING the structure a
+   * privacy-aware consumer needs, it does not interpret it. */
+  breakdown?: Array<{ key: unknown; count: number; agg?: string }>;
   /** Set in exactly two situations, each a distinct honesty gap the model cannot see on its own:
    *
    * 1. `breakdown` was synthesized from the RETURNED page (`buildSyntheticBreakdown`) rather than
@@ -484,13 +493,32 @@ interface ExtractedRows {
   total?: number;
 }
 
+/**
+ * Reads a `_search` response's `hits.total` in whichever shape it actually arrives in.
+ * `guardrails.ts`'s `applySafetyValves` forces `track_total_hits: true` on every outbound
+ * request, which makes the Indexer (OpenSearch, ES-compatible response shape) always return the
+ * modern object form -- `{value: <exact count>, relation: 'eq'}` -- never the pre-7.x bare-number
+ * form. This function accepts a bare number too anyway: it costs nothing, and it means this
+ * extraction keeps working unchanged if a future call site (or a test fixture) ever hands it the
+ * legacy shape directly, rather than silently reading `undefined` off a plain number's `.value`.
+ * `relation` is not inspected here -- with `track_total_hits: true` it is always `'eq'` (an exact
+ * count, never the capped `'gte'` a numeric `track_total_hits` can produce), so `total` below is
+ * always the true match count, not a lower bound.
+ */
+function resolveHitsTotal(result: unknown): number | undefined {
+  const total = (
+    result as { hits?: { total?: number | { value?: number } } } | undefined
+  )?.hits?.total;
+  if (typeof total === 'number') {
+    return total;
+  }
+  return typeof total?.value === 'number' ? total.value : undefined;
+}
+
 function extractRows(result: unknown): ExtractedRows {
   const hitsRows = hitsToRows(result);
   if (hitsRows) {
-    const total = (
-      result as { hits?: { total?: { value?: number } } } | undefined
-    )?.hits?.total?.value;
-    return { rows: hitsRows, total };
+    return { rows: hitsRows, total: resolveHitsTotal(result) };
   }
   const bucketRows = bucketsToRows(result);
   if (bucketRows) {
@@ -697,9 +725,27 @@ export function buildTableSpec(
  * known limitation in search_wazuh_data.ts's tool description — so this is a digest-only
  * improvement.
  */
+/**
+ * Bucket keys arrive in three shapes: a plain string/number for terms/significant_terms/
+ * cardinality (unchanged: `String()`-coerced same as always), an ARRAY for `multi_terms`, or an
+ * OBJECT (`{sourceName: value}`) for `composite`. The latter two are returned AS-IS rather than
+ * `String()`-coerced -- `String()` on an object produces the literal, useless "[object Object]"
+ * (a display bug on its own) and, more importantly, throws away the per-component structure
+ * privacy.ts's field-policy pass needs to scrub each component against its own field (see
+ * `Digest.breakdown`'s doc comment). `String()` on an array already produces a readable
+ * comma-joined string in JS, so that shape was never the display bug -- it is kept structural here
+ * too, for the same privacy reason, not because it was broken before.
+ */
+function normalizeBucketKey(rawKey: unknown): unknown {
+  if (rawKey !== null && typeof rawKey === 'object') {
+    return rawKey;
+  }
+  return String(rawKey);
+}
+
 function buildBreakdown(
   result: unknown,
-): Array<{ key: string; count: number; agg?: string }> | undefined {
+): Array<{ key: unknown; count: number; agg?: string }> | undefined {
   const aggregations = (
     result as { aggregations?: Record<string, unknown> } | undefined
   )?.aggregations;
@@ -708,7 +754,7 @@ function buildBreakdown(
   }
   const aggKeys = Object.keys(aggregations);
   const multipleAggs = aggKeys.length > 1;
-  const breakdown: Array<{ key: string; count: number; agg?: string }> = [];
+  const breakdown: Array<{ key: unknown; count: number; agg?: string }> = [];
   for (const aggKey of aggKeys) {
     const buckets = (aggregations[aggKey] as { buckets?: unknown } | undefined)
       ?.buckets;
@@ -718,7 +764,7 @@ function buildBreakdown(
     for (const bucket of buckets) {
       const bucketRecord = bucket as Record<string, unknown>;
       breakdown.push({
-        key: String(bucketRecord.key),
+        key: normalizeBucketKey(bucketRecord.key),
         count: Number(bucketRecord.doc_count ?? 0),
         ...(multipleAggs ? { agg: aggKey } : {}),
       });
@@ -1119,12 +1165,40 @@ function capFieldValue(value: string): string {
     : stripped;
 }
 
+/**
+ * `capFieldValue`, generalized to `breakdown[].key`'s three possible shapes (see `Digest.breakdown`
+ * doc comment: `key` widened from `string` to `unknown` when this file learned about `multi_terms`
+ * (array) and `composite` (object) bucket keys — a scalar `terms`/`significant_terms`/`cardinality`
+ * key is still always a plain string, unchanged). Caps every STRING leaf it finds and leaves any
+ * other leaf (a numeric `terms` key component, for instance) untouched; the array/object structure
+ * itself is preserved either way, so this never corrupts a `multi_terms`/`composite` key's shape
+ * the way naively coercing the whole key through `capFieldValue` (which expects a `string`) would.
+ */
+function capKeyValue(key: unknown): unknown {
+  if (typeof key === 'string') {
+    return capFieldValue(key);
+  }
+  if (Array.isArray(key)) {
+    return key.map(capKeyValue);
+  }
+  if (key !== null && typeof key === 'object') {
+    const out: Record<string, unknown> = {};
+    for (const [prop, value] of Object.entries(
+      key as Record<string, unknown>,
+    )) {
+      out[prop] = capKeyValue(value);
+    }
+    return out;
+  }
+  return key;
+}
+
 /** Truncates any sample field's string value longer than `MAX_FIELD_VALUE_LENGTH`, mutating each
  * sample row in place. Runs unconditionally (not gated on the overall char cap) as a cheap
  * preprocessing pass before capDigest's row-drop fallback below, since one oversized field (e.g. a
  * raw log line) shouldn't cost an entire row when trimming just that field is enough. Also caps
- * (length + control-char strip, via `capFieldValue`) the two other previously-unbounded string
- * fields: the Manager `message` and each `breakdown[].key`. */
+ * (length + control-char strip, via `capFieldValue`/`capKeyValue`) the two other previously-
+ * unbounded string fields: the Manager `message` and each `breakdown[].key`. */
 function truncateLongFieldValues(digest: Digest): void {
   for (const sample of digest.samples) {
     for (const key of Object.keys(sample)) {
@@ -1142,7 +1216,7 @@ function truncateLongFieldValues(digest: Digest): void {
   }
   if (digest.breakdown) {
     for (const entry of digest.breakdown) {
-      entry.key = capFieldValue(entry.key);
+      entry.key = capKeyValue(entry.key);
     }
   }
 }
