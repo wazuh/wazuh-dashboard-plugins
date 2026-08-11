@@ -46,15 +46,24 @@ export const getScaResultsTool: ToolDefinition = {
       {
         agent_id: {
           type: 'string',
-          description: 'Numeric Wazuh agent ID, e.g. "003".',
+          description:
+            'Numeric Wazuh agent ID, e.g. "003". Optional: omit this for a deictic host ' +
+            'reference ("this box"/"this server") with no known id -- the call resolves to the ' +
+            'only active agent automatically.',
         },
         limit: aggLimitProperty('SCA policies', 20),
       },
-      ['agent_id'],
+      [],
     ),
   },
   target: 'indexer',
   tier: 'T1',
+  // Issue: generic sole-candidate parameter resolution (template: #8913's
+  // resolveDeicticAgentParams in get-agent-inventory.ts). A strictly-required `agent_id` measured
+  // 0/40 invocations on deictic SCA/compliance questions ("my auditor wants proof of SSH
+  // hardening") -- registry.ts attaches the generic resolver (param-resolution.ts) for this
+  // entry, resolving `agent_id` against the Manager API's active-agent list when omitted.
+  soleCandidateParams: [{ param: 'agent_id', source: { kind: 'manager-agents' } }],
   buildRequest(params) {
     const agentId = validateAgentId(params.agent_id);
     const limit = clampAggLimit(params.limit, 20);

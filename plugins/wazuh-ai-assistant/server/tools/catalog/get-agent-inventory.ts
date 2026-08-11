@@ -3,7 +3,10 @@ import {
   RequestHandlerContext,
 } from '../../../../../src/core/server';
 import { ResolveParamsResult, ToolDefinition } from '../types';
-import { resolveApiHostId } from '../api-host';
+import {
+  fetchActiveManagerAgents,
+  ManagerAgentSummary,
+} from '../param-resolution';
 import {
   clampLimit,
   INVENTORY_CURRENT_STATE_NOTE,
@@ -450,15 +453,6 @@ const MAX_LISTED_AGENT_CANDIDATES = 10;
  * exactly `MAX_LISTED_AGENT_CANDIDATES + 1` active agents is still reported with an accurate
  * "+N more" rather than looking like an exact match for the cap. */
 const AGENT_LOOKUP_LIMIT = MAX_LISTED_AGENT_CANDIDATES + 1;
-/** Same pseudo-agent exclusion `get-agents.ts`'s own "no agent_ids filter" branch applies (its own
- * `q: 'id!=000'`), so a deployment with otherwise zero real active agents cannot silently resolve
- * to the manager's own pseudo-agent "000". */
-const MANAGER_PSEUDO_AGENT_QUERY = 'id!=000';
-
-interface ManagerAgentSummary {
-  id?: unknown;
-  name?: unknown;
-}
 
 /**
  * `ToolDefinition.resolveParams` hook (issue #8913): resolves a deictic agent reference ("this
@@ -509,39 +503,21 @@ async function resolveDeicticAgentParams(
     return { ok: true, resolved: { params } };
   }
 
+  // The actual live-lookup call is shared with param-resolution.ts's generic resolver (both read
+  // the SAME source/filters `get-agents.ts` itself reads) -- see that module's
+  // `fetchActiveManagerAgents` doc comment. Everything below this line (classification, wording,
+  // candidate bounding) stays exactly as it was before that extraction: this tool's own
+  // NO_AGENT_IDENTIFIER_ERROR text and note format are intentionally NOT unified with the generic
+  // resolver's (see that constant's own doc comment for why), so this function's observable
+  // behavior — and every test in get-agent-inventory.test.ts pinning it — is unchanged.
   let agents: ManagerAgentSummary[];
   let totalActive: number;
   try {
-    const apiHostID = await resolveApiHostId(context, request);
-    const response = await context.wazuh_core.api.client.asCurrentUser.request(
-      'GET',
-      '/agents',
-      {
-        params: {
-          status: 'active',
-          q: MANAGER_PSEUDO_AGENT_QUERY,
-          limit: AGENT_LOOKUP_LIMIT,
-        },
-      },
-      { apiHostID },
-    );
-    const data = (
-      response.data as
-        | {
-            data?: {
-              affected_items?: unknown;
-              total_affected_items?: unknown;
-            };
-          }
-        | undefined
-    )?.data;
-    agents = Array.isArray(data?.affected_items)
-      ? (data.affected_items as ManagerAgentSummary[])
-      : [];
-    totalActive =
-      typeof data?.total_affected_items === 'number'
-        ? data.total_affected_items
-        : agents.length;
+    ({ agents, totalActive } = await fetchActiveManagerAgents(
+      context,
+      request,
+      AGENT_LOOKUP_LIMIT,
+    ));
   } catch {
     return { ok: false, reason: NO_AGENT_IDENTIFIER_ERROR };
   }

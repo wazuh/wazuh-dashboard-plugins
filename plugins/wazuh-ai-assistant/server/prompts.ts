@@ -139,55 +139,65 @@ export function buildSystemPrompt(nowIso: string): string {
       'finding tools: their results include source.user.name, destination.user.name, source.ip and ' +
       'process.command_line. If you do use search_wazuh_data for such a question, you MUST ' +
       'include those fields in the "_source" list or your result will not contain them.',
-    'get_sca_checks needs a policy_id from get_sca_results first; use result="failed" for ' +
-      '"which checks fail" questions.',
-    // #8913: a bare deictic reference to the host ("this box/host/machine/server/system") with no
-    // agent named earlier in the conversation left the model asking the user for an agent id
-    // instead of resolving it. get_agent_inventory now resolves this itself, server-side (its
-    // `resolveParams` hook, tools/catalog/get-agent-inventory.ts) whenever it is called with
-    // neither agent_id nor agent_name -- so for THAT tool the right instruction is "call it
-    // directly", not "look the agent up first". A live diagnostic run (branch
-    // diag/8913-router-logging, never shipped) proved stage-1 routing was never the problem --
-    // get_agent_inventory was offered in 5/5 runs of the issue's own worked example ("What
-    // software does this box have installed?") -- but THIS instruction's prior wording told the
-    // model to "call get_agents first", a DIFFERENT tool that the router only offers under the
-    // separate 'agents' category, which stage-1 has no reason to also pick for an inventory-only
-    // question. The model could not obey an instruction naming a tool it had not been given and
-    // fell back to asking the user or improvising with search_wazuh_data -- 0/5 calls to either
-    // get_agents or get_agent_inventory, on that exact worked example, with this exact
-    // (pre-fix) wording in place. No OTHER agent-scoped tool in the catalog has this server-side
-    // resolution (only get_agent_inventory implements `resolveParams`), so the get-agents-first
-    // instruction further below is still needed for every other tool -- BUT (follow-up audit,
-    // never independently reproduced live, caught by inspection before it repeated the same
-    // mistake) it must not repeat the exact bug this whole fix exists for: telling the model to
-    // call a tool the router may not have offered THIS turn. get_agents is its own 'agents'
-    // category; a question that deictically names the host for some OTHER agent-scoped tool
-    // (e.g. "what vulnerabilities does this box have") plausibly routes to that tool's own
-    // category alone (e.g. 'vulnerabilities'), not 'agents' -- so "call get_agents first" can be
-    // just as unreachable here as it was for get_agent_inventory. Made conditional on the tool
-    // actually being available this turn instead of unconditional.
-    'If the user asks about installed software/packages, OS details, open ports, running ' +
-      'processes, or hotfixes for the host deictically ("this box", "this host", "this ' +
-      'machine", "this server", "this system") with no agent named or numbered earlier in the ' +
-      'conversation, call get_agent_inventory directly WITHOUT agent_id or agent_name -- do NOT ' +
-      'call get_agents first for this case. It resolves to the only active agent automatically ' +
-      'and tells you which one it assumed; state that assumption in your answer. If it instead ' +
-      'reports more than one active agent, list the candidates it gives you and ask the user ' +
-      'which one they mean -- never guess among several.',
-    'For any OTHER deictic reference to the host ("this box"/"this host"/"this machine"/"this ' +
-      'server"/"this system") with a tool BESIDES get_agent_inventory that needs an agent_id, ' +
-      'and no agent has been named or numbered earlier in the conversation: if get_agents is ' +
-      'among the tools available to you this turn, call it first. If exactly one ACTIVE agent ' +
-      'exists, proceed with it and state that assumption in your answer (e.g. "Assuming you ' +
-      'mean agent 003 (web-prod-01), the only active agent"). If more than one active agent ' +
-      'exists, do not guess: briefly list the candidates (id and name) and ask the user which ' +
-      'one they mean. If get_agents is NOT among the tools available to you this turn, do not ' +
-      'try to call it -- ask the user which agent they mean instead.',
+    'get_sca_checks prefers a policy_id from a prior get_sca_results call for this agent when you ' +
+      'already have one, or when the agent has more than one SCA policy (it will report the ' +
+      'candidate policy ids if you omit policy_id and more than one exists). If you do not have a ' +
+      'policy_id and have no reason to think there is more than one policy, you may call ' +
+      'get_sca_checks directly without it -- it resolves automatically when the agent has exactly ' +
+      'one SCA policy. Use result="failed" for "which checks fail" questions.',
     'For "how many DISTINCT X" questions (e.g. distinct hosts/agents affected), a plain hit count ' +
       '(hits.total) overcounts when the same host appears in multiple documents -- it is NOT a ' +
       'distinct count. Use search_wazuh_data with a "cardinality" aggregation on an allowlisted ' +
       'keyword field such as wazuh.agent.name instead (the allowlist is fixed and may grow over ' +
       'time; an arbitrary field like source.user.name or file.path will be rejected).',
+    // #8913 + generic sole-candidate parameter resolution: a bare deictic reference to the host
+    // ("this box/host/machine/server/system", or a descriptive one like "my auditor wants proof
+    // of SSH hardening") with no agent named earlier in the conversation used to leave the model
+    // asking the user for an agent id instead of resolving it. get_agent_inventory,
+    // get_sca_results, get_sca_checks, get_vulnerabilities_by_agent, and search_findings_by_agent
+    // ALL now resolve their agent-identifying param themselves, server-side (either
+    // get_agent_inventory's own hand-written `resolveParams` hook, #8913, or the generic
+    // param-resolution.ts resolver every other one of these five declares via
+    // `soleCandidateParams`) whenever that param is omitted -- so for these FIVE tools the right
+    // instruction is "call it directly", never "look the agent up first". A live diagnostic run
+    // (branch diag/8913-router-logging, never shipped) proved stage-1 routing was never the
+    // problem for get_agent_inventory specifically -- it was offered in 5/5 runs of the issue's
+    // own worked example -- but THIS instruction's prior wording told the model to "call
+    // get_agents first", a DIFFERENT tool that the router only offers under the separate 'agents'
+    // category, which stage-1 has no reason to also pick for a single-category question. The
+    // model could not obey an instruction naming a tool it had not been given and fell back to
+    // asking the user or improvising -- 0/5 calls to either tool, on that exact worked example,
+    // with this exact (pre-fix) wording in place. No OTHER agent-scoped tool in the catalog has
+    // this server-side resolution, so the get-agents-first instruction further below is still
+    // needed for every other tool -- BUT (follow-up audit, never independently reproduced live,
+    // caught by inspection before it repeated the same mistake) it must not repeat the exact bug
+    // this whole fix exists for: telling the model to call a tool the router may not have offered
+    // THIS turn. get_agents is its own 'agents' category; a question that deictically names the
+    // host for some OTHER agent-scoped tool (e.g. "what vulnerabilities does this box have",
+    // before this generalization) plausibly routes to that tool's own category alone, not
+    // 'agents' -- so "call get_agents first" can be just as unreachable there. Made conditional on
+    // the tool actually being available this turn instead of unconditional.
+    'If the user asks about installed software/packages, OS details, open ports, running ' +
+      'processes, hotfixes, SCA/compliance results or checks, vulnerabilities, or security ' +
+      'findings for a host referred to deictically ("this box", "this host", "this machine", ' +
+      '"this server", "this system") or descriptively (e.g. "the internet-facing box", "my ' +
+      'auditor wants proof of SSH hardening" -- no exact name or id given) with no agent named or ' +
+      'numbered earlier in the conversation, call the matching tool directly (get_agent_inventory, ' +
+      'get_sca_results, get_sca_checks, get_vulnerabilities_by_agent, or search_findings_by_agent) ' +
+      'WITHOUT its agent-identifying parameter (agent_id/agent_identifier/agent_name) -- do NOT ' +
+      'call get_agents first for these five tools. Each resolves to the only active agent ' +
+      'automatically and tells you which one it assumed; state that assumption in your answer. If ' +
+      'a call instead reports more than one active agent (or, for get_sca_checks\'s policy_id, ' +
+      'more than one policy), list the candidates it gives you and ask the user which one they ' +
+      'mean -- never guess among several.',
+    'For any OTHER deictic or descriptive reference to a host with a tool BESIDES the five listed ' +
+      'above that needs an agent id/name, and no agent has been named or numbered earlier in the ' +
+      'conversation: if get_agents is among the tools available to you this turn, call it first. ' +
+      'If exactly one ACTIVE agent exists, proceed with it and state that assumption in your ' +
+      'answer (e.g. "Assuming you mean agent 003 (web-prod-01), the only active agent"). If more ' +
+      'than one active agent exists, do not guess: briefly list the candidates (id and name) and ' +
+      'ask the user which one they mean. If get_agents is NOT among the tools available to you ' +
+      'this turn, do not try to call it -- ask the user which agent they mean instead.',
     'Never guess rule ids: if you do not know the exact wazuh.rule.id for a kind of finding, use ' +
       'search_findings_by_rule_tag with a wazuh.rule.tags value, or aggregate by rule first with ' +
       'get_top_rules to discover ids. If a narrowly-filtered query returns 0 rows for activity ' +

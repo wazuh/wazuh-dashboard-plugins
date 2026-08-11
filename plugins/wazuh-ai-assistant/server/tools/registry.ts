@@ -1,5 +1,6 @@
 import { ToolSpec } from '../../common/types';
 import { ToolDefinition } from './types';
+import { buildGenericResolveParams } from './param-resolution';
 import { getAgentsTool } from './catalog/get-agents';
 import { getCriticalFindingsTool } from './catalog/get-critical-findings';
 import { searchFindingsByAgentTool } from './catalog/search-findings-by-agent';
@@ -103,8 +104,23 @@ const CATALOG: ToolDefinition[] = [
   searchWazuhDataTool,
 ];
 
+/**
+ * Attaches the generic sole-candidate-param resolver (param-resolution.ts, generalizing issue
+ * #8913's hand-written `resolveDeicticAgentParams`) to any catalog tool that declares
+ * `soleCandidateParams` but no `resolveParams` of its own -- `get_agent_inventory` keeps its
+ * hand-written hook untouched (it already declares `resolveParams` directly, so this leaves it
+ * alone) rather than being re-declared through the generic metadata. Every other tool in
+ * `CATALOG` is unaffected: `undefined` `soleCandidateParams` (the default) means this map is a
+ * no-op identity pass for it.
+ */
+const RESOLVED_CATALOG: ToolDefinition[] = CATALOG.map(tool =>
+  tool.soleCandidateParams && !tool.resolveParams
+    ? { ...tool, resolveParams: buildGenericResolveParams(tool) }
+    : tool,
+);
+
 const registry = new Map<string, ToolDefinition>(
-  CATALOG.map(tool => [tool.spec.name, tool]),
+  RESOLVED_CATALOG.map(tool => [tool.spec.name, tool]),
 );
 
 export function getToolDefinition(name: string): ToolDefinition | undefined {
@@ -112,7 +128,7 @@ export function getToolDefinition(name: string): ToolDefinition | undefined {
 }
 
 export function listToolDefinitions(): ToolDefinition[] {
-  return CATALOG;
+  return RESOLVED_CATALOG;
 }
 
 /**

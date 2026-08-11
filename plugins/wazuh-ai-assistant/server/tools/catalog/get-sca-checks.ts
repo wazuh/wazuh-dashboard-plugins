@@ -101,8 +101,10 @@ export const getScaChecksTool: ToolDefinition = {
       'Lists the individual checks within one Security Configuration Assessment (SCA) policy for ' +
       'one agent — check name, pass/fail result, reason, and (via the row expander) the ' +
       'remediation and rule text for each check. Use for "which SCA checks failed"/"why did this ' +
-      'policy fail" drill-down questions AFTER get_sca_results has given you a policy_id for the ' +
-      'agent — this tool needs that policy_id, it cannot discover one itself. Use ' +
+      'policy fail" drill-down questions. Both agent_id and policy_id may be omitted: agent_id ' +
+      'resolves to the only active agent, and policy_id resolves to the only SCA policy for that ' +
+      'agent, each automatically when unambiguous -- pass an explicit policy_id (e.g. from a ' +
+      'prior get_sca_results call) when the agent has more than one policy. Use ' +
       'result="failed" for "which checks fail" questions. For a TOPIC question ("which SSH ' +
       'checks failed"), pass a topic fragment via search (e.g. "ssh") together with ' +
       'result="failed": the digest breakdown\'s "matching_failed_checks" entries name the ' +
@@ -112,13 +114,18 @@ export const getScaChecksTool: ToolDefinition = {
       {
         agent_id: {
           type: 'string',
-          description: 'Numeric Wazuh agent ID, e.g. "003".',
+          description:
+            'Numeric Wazuh agent ID, e.g. "003". Optional: omit this for a deictic host ' +
+            'reference ("this box"/"this server") with no known id -- the call resolves to the ' +
+            'only active agent automatically.',
         },
         policy_id: {
           type: 'string',
           description:
             'SCA policy id to drill into, obtained from a prior get_sca_results call for this ' +
-            'agent (the summary table’s "Policy ID" column).',
+            'agent (the summary table’s "Policy ID" column). Optional: omit this when the agent ' +
+            'has exactly one SCA policy -- it resolves automatically. If the agent has more than ' +
+            'one policy, this is required (the candidates are reported so you can ask which one).',
         },
         result: {
           type: 'string',
@@ -142,11 +149,29 @@ export const getScaChecksTool: ToolDefinition = {
           'Max number of checks to return (default 20, max 500).',
         ),
       },
-      ['agent_id', 'policy_id'],
+      [],
     ),
   },
   target: 'indexer',
   tier: 'T1',
+  // Issue: generic sole-candidate parameter resolution (template: #8913's
+  // resolveDeicticAgentParams in get-agent-inventory.ts). Both `agent_id` and `policy_id` measured
+  // as blockers on deictic/topic-only SCA questions when strictly required. Order matters:
+  // `agent_id` resolves first (unscoped, against the Manager API), then `policy_id` resolves
+  // against the Indexer's `policy.id` values scoped to whichever `agent_id` is now in `params` --
+  // either the caller's own or the one just resolved.
+  soleCandidateParams: [
+    { param: 'agent_id', source: { kind: 'manager-agents' } },
+    {
+      param: 'policy_id',
+      source: {
+        kind: 'indexer-terms',
+        index: 'wazuh-states-sca*',
+        field: 'policy.id',
+        scopedBy: { param: 'agent_id', field: 'wazuh.agent.id' },
+      },
+    },
+  ],
   buildRequest(params) {
     const agentId = validateAgentId(params.agent_id);
     const policyId = requireNonEmptyString(

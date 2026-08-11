@@ -152,3 +152,38 @@ test('search_findings_by_agent: an empty-string artifact filter value contribute
   const clauses = filters(req);
   assert.equal(clauses.length, 2);
 });
+
+// Generic sole-candidate parameter resolution (template: #8913's resolveDeicticAgentParams in
+// get-agent-inventory.ts): agent_name is schema-OPTIONAL, resolving via the generic resolver
+// (param-resolution.ts) with valueFrom: 'name' since this param is matched as free text against
+// wazuh.agent.name (see buildRequest), not a numeric Manager id.
+
+test('search_findings_by_agent: agent_name is schema-optional, not required', () => {
+  const schema = searchFindingsByAgentTool.spec.parameters as {
+    required?: string[];
+  };
+  assert.ok(
+    !schema.required || !schema.required.includes('agent_name'),
+    'agent_name must not be schema-required -- server-side resolution needs it omittable',
+  );
+});
+
+test('search_findings_by_agent: agent_name\'s description explains server-side resolution on omission', () => {
+  const schema = searchFindingsByAgentTool.spec.parameters as {
+    properties: Record<string, { description?: string }>;
+  };
+  assert.match(
+    schema.properties.agent_name.description ?? '',
+    /Optional: omit this.*resolves to the only active agent automatically/s,
+  );
+});
+
+test('search_findings_by_agent: declares agent_name as a manager-agents sole-candidate param, valueFrom "name"', () => {
+  assert.deepEqual(searchFindingsByAgentTool.soleCandidateParams, [
+    {
+      param: 'agent_name',
+      source: { kind: 'manager-agents' },
+      valueFrom: 'name',
+    },
+  ]);
+});

@@ -483,3 +483,46 @@ test('get_sca_checks: tableSpec/digest declare the locked 5.0 columns/rowFields/
     !getScaChecksTool.digest.sampleColumns.includes('check.description'),
   );
 });
+
+// Generic sole-candidate parameter resolution (template: #8913's resolveDeicticAgentParams in
+// get-agent-inventory.ts): both agent_id and policy_id are schema-OPTIONAL, each resolving via the
+// generic resolver (param-resolution.ts) that registry.ts attaches automatically. policy_id
+// scopes ITS OWN lookup on whichever agent_id resolves first (declared order) -- see
+// param-resolution.test.ts's scopedBy-cascade tests for the resolution mechanics.
+
+test('get_sca_checks: neither agent_id nor policy_id is schema-required', () => {
+  const schema = getScaChecksTool.spec.parameters as { required?: string[] };
+  assert.ok(
+    !schema.required || schema.required.length === 0,
+    'agent_id/policy_id must not be schema-required -- server-side resolution needs both omittable',
+  );
+});
+
+test('get_sca_checks: agent_id/policy_id descriptions explain server-side resolution on omission', () => {
+  const schema = getScaChecksTool.spec.parameters as {
+    properties: Record<string, { description?: string }>;
+  };
+  assert.match(
+    schema.properties.agent_id.description ?? '',
+    /Optional: omit this.*resolves to the only active agent automatically/s,
+  );
+  assert.match(
+    schema.properties.policy_id.description ?? '',
+    /Optional: omit this when the agent has exactly one SCA policy/,
+  );
+});
+
+test('get_sca_checks: declares agent_id (manager-agents) then policy_id (indexer-terms, scoped by agent_id) in that order', () => {
+  assert.deepEqual(getScaChecksTool.soleCandidateParams, [
+    { param: 'agent_id', source: { kind: 'manager-agents' } },
+    {
+      param: 'policy_id',
+      source: {
+        kind: 'indexer-terms',
+        index: 'wazuh-states-sca*',
+        field: 'policy.id',
+        scopedBy: { param: 'agent_id', field: 'wazuh.agent.id' },
+      },
+    },
+  ]);
+});

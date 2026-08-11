@@ -39,7 +39,10 @@ export const searchFindingsByAgentTool: ToolDefinition = {
       {
         agent_name: {
           type: 'string',
-          description: 'Exact agent name to filter by.',
+          description:
+            'Exact agent name to filter by. Optional: omit this for a deictic host reference ' +
+            '("this box"/"this server") with no known name -- the call resolves to the only ' +
+            'active agent automatically.',
         },
         severity: severityProperty(),
         severity_comparison: severityComparisonProperty(),
@@ -49,11 +52,19 @@ export const searchFindingsByAgentTool: ToolDefinition = {
         ...timeRangeProperties(),
         ...findingArtifactFilterProperties(),
       },
-      ['agent_name'],
+      [],
     ),
   },
   target: 'indexer',
   tier: 'T1',
+  // Issue: generic sole-candidate parameter resolution (template: #8913's
+  // resolveDeicticAgentParams in get-agent-inventory.ts). A strictly-required `agent_name`
+  // measured 0/40 invocations on deictic findings questions ("what happened on this host").
+  // `valueFrom: 'name'` since this param is matched as free text against `wazuh.agent.name`
+  // (see buildRequest below), not a numeric Manager id.
+  soleCandidateParams: [
+    { param: 'agent_name', source: { kind: 'manager-agents' }, valueFrom: 'name' },
+  ],
   buildRequest(params) {
     const agentName = requireNonEmptyString(
       params.agent_name,
