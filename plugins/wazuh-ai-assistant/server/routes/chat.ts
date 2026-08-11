@@ -34,7 +34,6 @@ import {
   StreamDepseudonymizer,
 } from '../tools/privacy';
 import { MarkdownTableSuppressor } from '../tools/markdown-table-filter';
-import { getOrCreateAssistantSettings } from './settings';
 import { getProvider } from '../settings-store';
 import { getApiKeyCipher } from '../plugin-services';
 import { resolveWazuhUsername } from '../identity';
@@ -321,7 +320,7 @@ function toSseFrame(event: StreamEvent): string {
 }
 
 /** Minimal shape of the settings singleton this route needs (see
- * server/saved_objects/assistant-settings.ts's `AssistantSettingsAttributes`). */
+ * server/settings/types.ts's `AssistantSettingsAttributes`). */
 interface PrivacySettings {
   privacyDefaultOn: boolean;
   privacyDefaultPerProvider: Record<string, boolean>;
@@ -520,9 +519,14 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
         });
       }
 
-      // getOrCreateAssistantSettings (server/routes/settings.ts) reads through the internal user
-      // (server/settings-store.ts), same as the provider lookup a few lines up.
-      const assistantSettings = await getOrCreateAssistantSettings(context);
+      // context.wazuh_ai_assistant.assistantSettings (server/settings/route-handler-context.ts)
+      // is this plugin's single AssistantSettingsManager; getOrCreateSettings fans out to every
+      // registered provider, each of which reads through the internal user — same split as the
+      // provider lookup a few lines up.
+      const assistantSettings =
+        await context.wazuh_ai_assistant.assistantSettings.getOrCreateSettings(
+          context,
+        );
       const privacyEnabled = resolvePrivacyEnabled(
         assistantSettings,
         providerId,

@@ -37,10 +37,12 @@ export const API_PATHS = {
 export const MANAGER_SESSION_EXPIRED_COPY = 'session is missing or expired';
 
 /** Hidden system index holding both provider configuration documents and the plugin-wide settings
- * singleton (privacy defaults/override/field policy/conversation retention) — provisioned
- * indexer-side (wazuh-indexer-plugins#1422), readable only by admin/wazuh-admin backend roles.
- * Reached only through server/settings-store.ts's document helpers; see that file's doc comment
- * for the internal-user-for-reads/current-user-for-writes split (wazuh-dashboard-plugins#8841). */
+ * singleton (privacy defaults/override/field policy — conversation retention now lives in an ISM
+ * policy instead, see `CONVERSATION_SESSIONS_ISM_POLICY_ID` below) — provisioned indexer-side
+ * (wazuh-indexer-plugins#1422), readable only by admin/wazuh-admin backend roles. Reached only
+ * through server/settings-store.ts's (providers) and server/settings/index-settings-provider.ts's
+ * (settings singleton) document helpers; see server/settings/opensearch-user.ts's doc comment for
+ * the internal-user-for-reads/current-user-for-writes split (wazuh-dashboard-plugins#8841/#500). */
 export const ASSISTANT_SETTINGS_INDEX = '.wazuh-ai-assistant-settings';
 
 /** Fixed id of the settings singleton document within `ASSISTANT_SETTINGS_INDEX` — there is
@@ -63,6 +65,12 @@ export const PROVIDER_API_KEY_AAD_NAMESPACE = 'wazuh-ai-assistant-provider';
  * to. Reached only through server/routes/conversations.ts's owner-scoped CRUD and
  * server/conversation-store.ts's query/document helpers — never a raw client call elsewhere. */
 export const CONVERSATION_SESSIONS_INDEX_ALIAS = 'wazuh-ai-assistant-sessions';
+
+/** Id of the ISM policy governing `CONVERSATION_SESSIONS_INDEX_ALIAS`'s retention, provisioned
+ * indexer-side (wazuh-indexer-plugins#1422) — `server/settings/ism-settings-provider.ts` is the
+ * only reader/writer. */
+export const CONVERSATION_SESSIONS_ISM_POLICY_ID =
+  'ai-assistant-sessions-policy';
 
 /** Sentinel owner value used when the authenticated username cannot be resolved (main plugin/
  * security not ready, or `context.wazuh` absent).

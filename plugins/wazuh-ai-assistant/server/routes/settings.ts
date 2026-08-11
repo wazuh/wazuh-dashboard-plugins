@@ -18,20 +18,15 @@ import { describeError } from '../../common/errors';
 import { getProviderAdapter } from '../providers/registry';
 import { assertProviderUrlAllowed } from '../providers/url-guard';
 import {
-  AssistantSettingsAttributes,
   countProviders,
   createProvider,
-  createSettings,
   deleteProvider,
   getProvider,
-  getSettings,
   listProviders,
   setProviderDefault,
   StoredProviderAttributes,
   updateProvider,
-  updateSettings,
 } from '../settings-store';
-import { FIELD_POLICY_DEFAULTS } from '../tools/privacy';
 import { getApiKeyCipher } from '../plugin-services';
 import { isEncrypted } from '../crypto/api-key-cipher';
 import { resolveApiHostId } from '../tools/api-host';
@@ -40,67 +35,6 @@ import {
   resolvePagination,
   withInternalErrorHandling,
 } from './route-helpers';
-
-/** Keep saved conversations forever unless an admin opts into a retention window. */
-const DEFAULT_CONVERSATION_RETENTION_DAYS = 0;
-
-const DEFAULT_ASSISTANT_SETTINGS: AssistantSettingsAttributes = {
-  privacyDefaultOn: false,
-  privacyDefaultPerProvider: {},
-  userCanOverride: true,
-  fieldPolicy: FIELD_POLICY_DEFAULTS,
-  conversationRetentionDays: DEFAULT_CONVERSATION_RETENTION_DAYS,
-};
-
-/**
- * Fetches the `.wazuh-ai-assistant-settings` singleton document, creating it with defaults on
- * first access (the GET route's documented "create-with-defaults if absent" behavior). Exported so
- * server/routes/chat.ts can resolve the same, always-consistent settings object when deciding
- * whether privacy mode is active for a turn, without duplicating this create-on-miss logic.
- *
- * Takes `context` (not a client): `server/settings-store.ts`'s `getSettings`/`createSettings` read
- * and bootstrap through the INTERNAL user, not the calling dashboard user's own OpenSearch
- * identity — see that module's doc comment for why (this must succeed for every authenticated
- * user, not just admin/wazuh-admin backend roles).
- *
- * Default-fills `conversationRetentionDays` for any document created before that field existed:
- * such a document's `settings.conversationRetentionDays` is simply absent from `_source`, so
- * reading it here yields `undefined` rather than throwing — falling back to
- * `DEFAULT_CONVERSATION_RETENTION_DAYS` (keep forever) keeps every existing deployment behaving
- * exactly as before the field landed. A stored `actions` block from a build that still shipped
- * mutating tools is simply ignored (never read, never re-written).
- */
-export async function getOrCreateAssistantSettings(
-  context: RequestHandlerContext,
-): Promise<AssistantSettingsAttributes> {
-  const found = await getSettings(context);
-  if (found === undefined) {
-    // getSettings() returning undefined on a missing singleton id is the only "not found" case
-    // this store function surfaces (see its own doc comment) — create it with defaults.
-    return createSettings(context, DEFAULT_ASSISTANT_SETTINGS);
-  }
-  // Previously only
-  // `conversationRetentionDays` was defaulted here; the other four fields were read with no
-  // fallback at all, so a document missing any of them (e.g. written by a build predating that
-  // field) would surface `undefined` here. server/routes/chat.ts's `resolvePrivacyEnabled` does
-  // `settings.privacyDefaultPerProvider[providerId]` unconditionally, which would throw on an
-  // `undefined` map (500 on every chat). Currently unreachable via the API (PUT's schema makes
-  // every field mandatory and the route does a full merge update), so this is robustness/defense
-  // in depth, not a live exploit -- but it brings this function in line with its own documented
-  // "default-fill on read" policy for every field, not just one.
-  return {
-    privacyDefaultOn:
-      found.privacyDefaultOn ?? DEFAULT_ASSISTANT_SETTINGS.privacyDefaultOn,
-    privacyDefaultPerProvider:
-      found.privacyDefaultPerProvider ??
-      DEFAULT_ASSISTANT_SETTINGS.privacyDefaultPerProvider,
-    userCanOverride:
-      found.userCanOverride ?? DEFAULT_ASSISTANT_SETTINGS.userCanOverride,
-    fieldPolicy: found.fieldPolicy ?? DEFAULT_ASSISTANT_SETTINGS.fieldPolicy,
-    conversationRetentionDays:
-      found.conversationRetentionDays ?? DEFAULT_CONVERSATION_RETENTION_DAYS,
-  };
-}
 
 function toSummary(
   id: string,
@@ -393,9 +327,9 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       // failure window if the second write fails), this pre-generates the id client-side with
       // `crypto.randomUUID()` and passes it through `createProvider(context, providerId, attrs)`
       // (`op_type: 'create'` with an explicit id — server/settings-store.ts), the SAME
-      // explicit-id create contract this file already relies on elsewhere
-      // (`getOrCreateAssistantSettings` above creates the settings singleton with the fixed id
-      // `ASSISTANT_SETTINGS_ID`), so this is a proven-working call shape, not a new assumption.
+      // explicit-id create contract `IndexSettingsProvider.createDefaults` already relies on
+      // elsewhere (it creates the settings singleton with the fixed id `ASSISTANT_SETTINGS_ID`),
+      // so this is a proven-working call shape, not a new assumption.
       // This keeps provider creation a SINGLE atomic write: either it fully succeeds (provider
       // exists, apiKey correctly bound to its own id from birth) or it fully fails (RandomUUID
       // collision against an existing id — astronomically unlikely — or any other write error)
@@ -668,14 +602,19 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
   );
 
   // Plugin-wide settings singleton: privacy defaults/override/field policy. GET creates the
-  // object with defaults on first access (getOrCreateAssistantSettings above) so the admin UI and
-  // server/routes/chat.ts's resolution logic never have to special-case "not configured yet".
+  // object with defaults on first access (AssistantSettingsManager.getOrCreateSettings, reached
+  // via context.wazuh_ai_assistant.assistantSettings — server/settings/route-handler-context.ts)
+  // so the admin UI and server/routes/chat.ts's resolution logic never have to special-case "not
+  // configured yet".
   router.get(
     { path: API_PATHS.SETTINGS, validate: false },
-    async (context, _request, response) => {
-      const settings = await getOrCreateAssistantSettings(context);
+    withInternalErrorHandling(async (context, _request, response) => {
+      const settings =
+        await context.wazuh_ai_assistant.assistantSettings.getOrCreateSettings(
+          context,
+        );
       return response.ok({ body: settings });
-    },
+    }),
   );
 
   // Pre-flight administrator probe: lets the Settings page warn the user
@@ -750,8 +689,9 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
           ),
           // Mandatory in the PUT body (same "no schema.maybe" convention as every other field
           // here — the Settings UI always sends the full object; a document written BEFORE
-          // this field existed is handled on the READ side instead, getOrCreateAssistantSettings's
-          // default-fill above). `min: 0` — a negative retention window has no meaning.
+          // this field existed is handled on the READ side instead, by
+          // AssistantSettingsManager.getOrCreateSettings's per-field default-fill above).
+          // `min: 0` — a negative retention window has no meaning.
           conversationRetentionDays: schema.number({ min: 0 }),
         }),
       },
@@ -774,12 +714,28 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
         });
       }
 
-      // Ensures the document exists (first-ever PUT with no prior GET) before updating it.
-      // The actual write goes through the CURRENT user (`updateSettings`), unlike the read above
-      // (`getOrCreateAssistantSettings`) — see server/settings-store.ts's doc comment.
-      await getOrCreateAssistantSettings(context);
-      await updateSettings(context, request.body);
-      return response.ok({ body: request.body });
+      // Ensures every provider's backend exists (first-ever PUT with no prior GET) before
+      // updating it. The actual write goes through the CURRENT user for every provider, unlike
+      // the read above (`getOrCreateSettings`) — see server/settings/opensearch-user.ts's doc
+      // comment.
+      const { assistantSettings } = context.wazuh_ai_assistant;
+      await assistantSettings.getOrCreateSettings(context);
+      try {
+        const updated = await assistantSettings.updateSettings(
+          context,
+          request.body,
+        );
+        return response.ok({ body: updated });
+      } catch (error) {
+        // Surfaces `IsmSettingsProvider`'s "policy not found"/"no delete transition" failures
+        // (expected on any deployment where `CONVERSATION_SESSIONS_ISM_POLICY_ID` — see
+        // common/constants.ts — hasn't been provisioned indexer-side yet) as an actionable 503
+        // instead of a bare 500.
+        return response.customError({
+          statusCode: 503,
+          body: { message: describeError(error) },
+        });
+      }
     },
   );
 }

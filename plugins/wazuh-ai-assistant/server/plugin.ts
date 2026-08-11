@@ -10,6 +10,7 @@ import { registerRoutes } from './routes';
 import { setApiKeyCipher } from './plugin-services';
 import { ApiKeyCipher, parseEncryptionKey } from './crypto/api-key-cipher';
 import { WazuhAiAssistantConfigType } from './config';
+import { createAssistantSettingsManager } from './settings/route-handler-context';
 import {
   WazuhAiAssistantPluginSetup,
   WazuhAiAssistantPluginSetupDependencies,
@@ -77,10 +78,20 @@ export class WazuhAiAssistantPlugin
     }
 
     // This plugin registers no saved object types: persisted conversations live in the
-    // `wazuh-ai-assistant-sessions` index alias (server/conversation-store.ts) and provider/
-    // assistant-wide settings live in the `.wazuh-ai-assistant-settings` index
-    // (server/settings-store.ts) — both provisioned indexer-side, not by this plugin
+    // `wazuh-ai-assistant-sessions` index alias (server/conversation-store.ts), AI provider
+    // configuration and most plugin-wide settings live in the `.wazuh-ai-assistant-settings` index
+    // (server/settings-store.ts, server/settings/index-settings-provider.ts), and
+    // `conversationRetentionDays` lives in an ISM policy instead (server/settings/
+    // ism-settings-provider.ts) — all provisioned indexer-side, not by this plugin
     // (wazuh-indexer-plugins#1422, wazuh-dashboard-plugins#8841).
+
+    // Single `AssistantSettingsManager` for the whole plugin, reached by every route handler as
+    // `context.wazuh_ai_assistant.assistantSettings` (see server/settings/route-handler-context.ts)
+    // rather than a module-level singleton imported by whichever file happens to need it.
+    const assistantSettingsManager = createAssistantSettingsManager();
+    core.http.registerRouteHandlerContext('wazuh_ai_assistant', () => ({
+      assistantSettings: assistantSettingsManager,
+    }));
 
     const router = core.http.createRouter();
     registerRoutes(router, this.logger);

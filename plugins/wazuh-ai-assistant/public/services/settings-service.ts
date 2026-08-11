@@ -20,18 +20,20 @@ export interface FieldPolicyEntry {
 }
 
 /**
- * Public-side mirror of server/saved_objects/assistant-settings.ts's `AssistantSettingsAttributes`
- * (a server/ type, out of scope to import here) — this is the exact GET/PUT body shape of
- * `API_PATHS.SETTINGS` (server/routes/settings.ts).
+ * Public-side mirror of server/settings/types.ts's `AssistantSettingsAttributes` (a server/ type,
+ * out of scope to import here) — this is the exact GET/PUT body shape of `API_PATHS.SETTINGS`
+ * (server/routes/settings.ts).
  */
 export interface AssistantSettings {
   privacyDefaultOn: boolean;
   privacyDefaultPerProvider: Record<string, boolean>;
   userCanOverride: boolean;
   fieldPolicy: FieldPolicyEntry[];
-  /** Days to keep a saved conversation before GET /conversations excludes (and best-effort
-   * deletes) it; `0` means keep forever. Mirrors server/saved_objects/assistant-settings.ts's
-   * `AssistantSettingsAttributes.conversationRetentionDays`. */
+  /** Days a saved conversation is kept before the ISM policy governing
+   * `CONVERSATION_SESSIONS_INDEX_ALIAS` deletes its backing index; `0` means keep forever. Backed
+   * by an ISM policy rather than this settings document — see
+   * server/settings/ism-settings-provider.ts — but travels through this same GET/PUT shape.
+   * Mirrors server/settings/types.ts's `AssistantSettingsAttributes.conversationRetentionDays`. */
   conversationRetentionDays: number;
 }
 
@@ -113,8 +115,8 @@ export class SettingsService {
   }
 
   /** Plugin-wide settings singleton: privacy defaults/override/field policy. The GET route
-   * creates it with defaults on first access (server/routes/settings.ts's
-   * `getOrCreateAssistantSettings`), so this never 404s. */
+   * creates it with defaults on first access (server/settings/assistant-settings-manager.ts's
+   * `AssistantSettingsManager.getOrCreateSettings`), so this never 404s. */
   getAssistantSettings(): Promise<AssistantSettings> {
     return this.http.get<AssistantSettings>(API_PATHS.SETTINGS);
   }
