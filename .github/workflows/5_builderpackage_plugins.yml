@@ -22,7 +22,7 @@ on:
       reference:
         required: true
         type: string
-        default: 5.0.0
+        default: main
         description: Source code reference (branch, tag or commit SHA)
       execution_repository:
         required: true
@@ -34,7 +34,7 @@ on:
       reference:
         required: true
         type: string
-        default: 5.0.0
+        default: main
         description: Source code reference (branch, tag or commit SHA)
 
 env:
