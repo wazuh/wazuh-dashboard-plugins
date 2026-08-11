@@ -259,8 +259,14 @@ export function shouldEnterFinalRoundEarly(
 }
 
 /** Picks which of the three no-text fallbacks above fits a turn that ended without any `delta`
- * text — shared by both `!sawAnyDelta` exit points below (the normal per-round `done` branch and
- * the round-budget-exhausted path) so the same three-way decision lives in exactly one place. */
+ * text and does NOT qualify for (or fell through) the forced-synthesis retry below — shared by
+ * every `!sawAnyDelta` exit point in `orchestrate` (via `emitNoTextFallback`) so this decision
+ * lives in exactly one place. The `toolUsedThisTurn && sawNonEmptyTable` case (a real, non-empty
+ * table with no narration) no longer resolves here first: `emitNoTextFallback` intercepts that
+ * case and only falls back to NO_ANALYSIS_TEXT_MESSAGE if forced synthesis produced nothing AND
+ * there was no digest to derive a truthful sentence from either (structurally unreachable in
+ * practice, since a non-empty table always yields a `digest` event — kept as a defensive last
+ * resort, not a live path). Still exported for its own unit test. */
 export function noTextFallbackMessage(
   toolUsedThisTurn: boolean,
   sawNonEmptyTable: boolean,
@@ -283,6 +289,226 @@ export function noTextFallbackMessage(
  * to the client as a normal delta either way; this only affects the tracking flag. */
 function hasMeaningfulText(content: string): boolean {
   return content.trim().length > 0;
+}
+
+/**
+ * FORCED SYNTHESIS (measured design, see the "No additional analysis — see the results above."
+ * live failure this replaces): one executed tool call's digest this turn, recorded right where
+ * `orchestrate`'s real-tool branch already yields the `digest` StreamEvent -- `content` is that
+ * same `outcome.toolResultContent`-derived JSON string (pseudonym-form when privacy is on), so
+ * this carries no new data, only the tool's name alongside it for `summarizeDigestForFallback`
+ * below.
+ */
+export interface DigestRecord {
+  toolName: string;
+  content: string;
+}
+
+/** Narrow shape this module reads out of a digest JSON blob -- see digest.ts's `Digest` for the
+ * full shape; typed narrowly here so a future digest field never needs a matching change in this
+ * unrelated fallback-copy code. */
+type SummarizableDigestForFallback = { counts?: { total?: number; returned: number } };
+
+/**
+ * Truthful, deterministic sentence derived ONLY from a digest's own `counts` -- never invents a
+ * number the digest did not already carry. Used by `synthesizeNoTextFallback` below when the
+ * model-authored retry (case (a)) errors or produces no usable text (case (b)): the turn must
+ * still end with something that does not contradict the non-empty table already on screen, and
+ * unlike NO_ANALYSIS_TEXT_MESSAGE this never claims "no additional analysis" over a real result.
+ */
+export function summarizeDigestForFallback(record: DigestRecord): string {
+  let parsed: SummarizableDigestForFallback | undefined;
+  try {
+    parsed = JSON.parse(record.content) as SummarizableDigestForFallback;
+  } catch {
+    // Should not happen -- `content` is always this same route's own `JSON.stringify`'d digest.
+    // Degrade to a still-truthful, non-contradictory sentence rather than throwing out of a
+    // fallback path whose entire job is to never leave the turn silent or lying.
+    return `The ${record.toolName} results are shown in the table below.`;
+  }
+  const returned = parsed.counts?.returned;
+  const total = parsed.counts?.total;
+  if (typeof returned !== 'number') {
+    return `The ${record.toolName} results are shown in the table below.`;
+  }
+  const rowWord = returned === 1 ? 'row' : 'rows';
+  const totalPhrase =
+    typeof total === 'number' && total !== returned ? ` of ${total} total` : '';
+  return (
+    `The query returned ${returned} ${rowWord}${totalPhrase}; the table below has the details.`
+  );
+}
+
+/**
+ * Appended as a `system` message for the forced-synthesis retry call (case (a) below) only --
+ * never added to `messages` itself, same "outbound copy only" rule as
+ * `withFinalRoundAnswerInstruction`'s FINAL_ROUND_ANSWER_INSTRUCTION. Every clause is load-bearing
+ * for the same reason that instruction's are: "using only the tool results already gathered" and
+ * "Do not state anything the results do not show" keep this from becoming a fabrication prompt;
+ * "Do not call any tools" is redundant with `tools` being omitted from this call's `streamOptions`
+ * but stated anyway so a model that somehow still emits a tool-call-shaped delta reads an explicit
+ * instruction not to; "do not say there is nothing to add" directly targets the measured failure
+ * this whole mechanism exists to replace.
+ */
+export const NO_TEXT_SYNTHESIS_INSTRUCTION =
+  'The tool call(s) above already returned results, but no written answer followed. Using only ' +
+  'the tool results already gathered in this conversation, write 2 to 4 plain sentences stating ' +
+  'the totals and key observations from those results. Do not call any tools. Do not say there ' +
+  'is nothing to add.';
+
+/** What `synthesizeNoTextFallback` reports back to `orchestrate` once it finishes -- mirrors
+ * `Stage1Result`'s shape/reasoning: `usage` is `undefined` on every path that never actually made
+ * the retry call (no digest to synthesize from, or the turn was aborted), so `addUsage` (which
+ * treats `undefined` as zero) never fabricates spend for a call that never happened. */
+export interface NoTextSynthesisResult {
+  usage?: StreamUsage;
+}
+
+/** Picks the digest `summarizeDigestForFallback` should describe: the LAST record whose own
+ * `counts.returned` is a positive number, falling back to the last record overall when none
+ * qualifies (an unparseable/shape-mismatched digest, which `summarizeDigestForFallback` already
+ * degrades gracefully for). Plain "last of the array" would risk describing a LATER zero-row tool
+ * call's digest even though an EARLIER one this same turn produced the non-empty table that got
+ * `sawNonEmptyTable` (and therefore this whole mechanism) triggered in the first place -- a
+ * technically-true-about-the-wrong-tool sentence is still a regression against the honest goal
+ * here. */
+function pickDigestForFallback(digests: DigestRecord[]): DigestRecord | undefined {
+  for (let i = digests.length - 1; i >= 0; i -= 1) {
+    const record = digests[i];
+    try {
+      const parsed = JSON.parse(
+        record.content,
+      ) as SummarizableDigestForFallback;
+      if (
+        typeof parsed.counts?.returned === 'number' &&
+        parsed.counts.returned > 0
+      ) {
+        return record;
+      }
+    } catch {
+      // Unparseable -- not a match, keep scanning further back.
+    }
+  }
+  return digests[digests.length - 1];
+}
+
+/**
+ * Forced synthesis (a): the ONE retry this mechanism is allowed per turn (bound enforced by the
+ * caller's `noTextSynthesisAttempted` flag, not here -- this function itself is stateless and
+ * would happily run again if called again, same division of responsibility as
+ * `shouldConsiderDeferredOffer`/its caller). Called only when `orchestrate` has already
+ * established `toolUsedThisTurn && sawNonEmptyTable` -- i.e. exactly the case the live failure
+ * this replaces used to hand NO_ANALYSIS_TEXT_MESSAGE regardless of whether there was something to
+ * analyze.
+ *
+ * Makes ONE extra `adapter.chatStream` call with NO `tools` offered (structurally unable to
+ * re-enter the tool loop -- (c)'s "cannot re-enter" bound), asking the model to narrate the
+ * results already gathered. Every delta is run through the SAME scrub/depseudonymize/
+ * table-suppression pipeline the turn's own rounds use, so the retry's text is held to the exact
+ * same privacy and duplicate-table guarantees as everything else this turn streamed.
+ *
+ * (b): if the retry call errors, or ends without ever producing meaningful text, this falls back
+ * to `summarizeDigestForFallback` on the LAST digest recorded this turn -- truthful and
+ * deterministic, never the layout-lying NO_ANALYSIS_TEXT_MESSAGE.
+ *
+ * (c) abort-safety: checked before the retry call is even attempted -- an aborted turn gets no
+ * extra provider call and no extra text; the caller's own `!sawAnyDelta` guard chain already
+ * covers the (rare, defensive) case of `digests` being empty despite `sawNonEmptyTable` being
+ * true.
+ */
+export async function* synthesizeNoTextFallback(
+  adapter: ProviderAdapter,
+  providerConfig: ProviderConfig,
+  messages: ChatMessage[],
+  signal: AbortSignal,
+  privacyCtx: PrivacyContext | undefined,
+  digests: DigestRecord[],
+): AsyncGenerator<StreamEvent, NoTextSynthesisResult, void> {
+  const lastDigest = pickDigestForFallback(digests);
+
+  // Abort-safety (c) and the defensive no-digest case: neither attempts the extra call.
+  if (signal.aborted || !lastDigest) {
+    if (lastDigest) {
+      yield { type: 'delta', content: summarizeDigestForFallback(lastDigest) };
+    }
+    return { usage: undefined };
+  }
+
+  const retryMessages: ChatMessage[] = [
+    ...messages,
+    { role: 'system', content: NO_TEXT_SYNTHESIS_INSTRUCTION },
+  ];
+  // Outbound scrub, same as every other adapter.chatStream call this turn makes.
+  const outboundMessages = privacyCtx
+    ? scrubMessagesForProvider(retryMessages, privacyCtx.pseudonymizer)
+    : retryMessages;
+  // Inbound un-scrub and duplicate-table suppression, same pipeline as every round of the main
+  // loop -- a non-empty table is already on screen (this function is only ever called when
+  // `sawNonEmptyTable` is true), so the suppressor starts ACTIVE, not lazily instantiated.
+  const depseudonymizer = privacyCtx
+    ? new StreamDepseudonymizer(privacyCtx.pseudonymizer)
+    : undefined;
+  const tableSuppressor = new MarkdownTableSuppressor();
+
+  let producedText = false;
+  let usage: StreamUsage | undefined;
+
+  try {
+    for await (const event of adapter.chatStream(
+      providerConfig,
+      outboundMessages,
+      signal,
+      {}, // (c): no `tools` offered -- this round cannot re-enter the tool loop.
+    )) {
+      if (signal.aborted) {
+        return { usage };
+      }
+      if (event.type === 'delta') {
+        let content = depseudonymizer
+          ? depseudonymizer.push(event.content)
+          : event.content;
+        if (content) {
+          content = tableSuppressor.push(content);
+        }
+        if (content) {
+          if (hasMeaningfulText(content)) {
+            producedText = true;
+          }
+          yield { type: 'delta', content };
+        }
+        continue;
+      }
+      if (event.type === 'done') {
+        let trailing = depseudonymizer ? depseudonymizer.flush() : '';
+        trailing = tableSuppressor.push(trailing) + tableSuppressor.flush();
+        if (trailing) {
+          if (hasMeaningfulText(trailing)) {
+            producedText = true;
+          }
+          yield { type: 'delta', content: trailing };
+        }
+        usage = event.usage;
+        break;
+      }
+      if (event.type === 'error') {
+        // (b): fall through to the deterministic digest sentence below -- never surfaced to the
+        // client as an 'error' event, since the turn already has a complete, non-empty table on
+        // screen and this retry is purely additive narration, not something the user asked for.
+        break;
+      }
+      // tool_call/status/table/etc. should never occur (no tools were offered) -- ignore
+      // defensively rather than crash a fallback path whose entire job is to never leave the
+      // turn worse off.
+    }
+  } catch {
+    // Same policy as the 'error' branch above: swallow and fall through to (b).
+  }
+
+  if (!producedText) {
+    yield { type: 'delta', content: summarizeDigestForFallback(lastDigest) };
+  }
+
+  return { usage };
 }
 
 /** Sentence boundary for the offer-shape gate: end punctuation followed by whitespace, or a line
@@ -1291,6 +1517,14 @@ export async function* orchestrate(
   // lives in its own dependency-free module.
   let usageTotals = ZERO_USAGE_TOTALS;
 
+  /** Every real tool call's digest yielded this turn, in order -- fed to `synthesizeNoTextFallback`
+   * (`summarizeDigestForFallback` reads the LAST one) so the forced-synthesis mechanism below has
+   * something truthful to fall back to. Pushed alongside the existing `digest` StreamEvent yield
+   * in the real-tool branch, never for the `SUGGEST_DISCOVER_QUERY_TOOL` handoff (which never
+   * yields a `digest` event either -- see that branch's own doc comment on why it does not set
+   * `toolUsedThisTurn`). */
+  const turnDigests: DigestRecord[] = [];
+
   /** Yields a `privacy_map` event for any pseudonym entries minted so far this turn, but only
    * once total ("once per turn... when newEntries() is non-empty") — guarded
    * by this flag since both the stage-1 detour and the main round loop below reach a `done` exit
@@ -1305,6 +1539,47 @@ export async function* orchestrate(
       privacyMapEmitted = true;
       yield { type: 'privacy_map', entries };
     }
+  }
+
+  /** FORCED SYNTHESIS (a)/(b)/(c) -- see `synthesizeNoTextFallback`'s doc comment above for the
+   * mechanism itself. This closure is the single call site every `!sawAnyDelta` exit point below
+   * goes through, and it is what enforces (c)'s "at most one retry per turn" bound: the very first
+   * qualifying call flips `noTextSynthesisAttempted`, so even though three DIFFERENT exit points in
+   * this function each reach `!sawAnyDelta` (only one of which can ever fire per turn, since each
+   * is itself a terminating exit -- but the flag is kept anyway as a structural, not merely
+   * positional, guarantee). Turns that do not qualify (`!toolUsedThisTurn`, or a genuinely empty
+   * table) are untouched -- they still resolve through the original deterministic
+   * `noTextFallbackMessage`, exactly as before this mechanism existed. */
+  let noTextSynthesisAttempted = false;
+  async function* emitNoTextFallback(
+    roundsExhausted: boolean,
+  ): AsyncGenerator<StreamEvent> {
+    if (
+      toolUsedThisTurn &&
+      sawNonEmptyTable &&
+      !noTextSynthesisAttempted &&
+      turnDigests.length > 0
+    ) {
+      noTextSynthesisAttempted = true;
+      const result = yield* synthesizeNoTextFallback(
+        adapter,
+        providerConfig,
+        messages,
+        signal,
+        privacyCtx,
+        turnDigests,
+      );
+      usageTotals = addUsage(usageTotals, result.usage);
+      return;
+    }
+    yield {
+      type: 'delta',
+      content: noTextFallbackMessage(
+        toolUsedThisTurn,
+        sawNonEmptyTable,
+        roundsExhausted,
+      ),
+    };
   }
 
   if (adapter.supportsTools === false) {
@@ -1782,6 +2057,10 @@ export async function* orchestrate(
             toolCallId: event.toolCall.id,
             content: toolResultContentForModel,
           };
+          turnDigests.push({
+            toolName: event.toolCall.name,
+            content: toolResultContentForModel,
+          });
         }
 
         messages = [
@@ -1895,14 +2174,7 @@ export async function* orchestrate(
         // copy fits depends on whether a tool ran earlier this turn; if none did, there is no
         // table and no query to reference, so NO_ANSWER_MESSAGE is used instead.
         if (!sawAnyDelta) {
-          yield {
-            type: 'delta',
-            content: noTextFallbackMessage(
-              toolUsedThisTurn,
-              sawNonEmptyTable,
-              isFinalRound,
-            ),
-          };
+          yield* emitNoTextFallback(isFinalRound);
         }
         yield* emitPrivacyMapOnce();
         // The SUM across every round (and stage 1) this turn made, not this round's own
@@ -1961,10 +2233,7 @@ export async function* orchestrate(
         // strictly worse than base. Emit the clean termination the suppressed 'done' owed the
         // client (same policy as the forced-round 'error' branch above).
         if (!sawAnyDelta) {
-          yield {
-            type: 'delta',
-            content: noTextFallbackMessage(toolUsedThisTurn, sawNonEmptyTable),
-          };
+          yield* emitNoTextFallback(isFinalRound);
         }
         yield* emitPrivacyMapOnce();
         yield { type: 'done', usage: toStreamUsage(usageTotals) };
@@ -1992,10 +2261,7 @@ export async function* orchestrate(
   // main 'done' branch above — a model that never produced text deserves a written answer, not a
   // bare done, regardless of whether a tool ran.
   if (!sawAnyDelta) {
-    yield {
-      type: 'delta',
-      content: noTextFallbackMessage(toolUsedThisTurn, sawNonEmptyTable, true),
-    };
+    yield* emitNoTextFallback(true);
   }
   yield* emitPrivacyMapOnce();
   yield { type: 'done', usage: toStreamUsage(usageTotals) };
