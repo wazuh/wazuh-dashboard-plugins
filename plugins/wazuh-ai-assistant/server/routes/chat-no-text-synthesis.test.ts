@@ -41,9 +41,7 @@ const TURN_MESSAGES: ChatMessage[] = [
   {
     role: 'assistant',
     content: '',
-    toolCalls: [
-      { id: 'call_1', name: 'get_critical_findings', arguments: {} },
-    ],
+    toolCalls: [{ id: 'call_1', name: 'get_critical_findings', arguments: {} }],
   },
   {
     role: 'tool',
@@ -73,7 +71,10 @@ function nonEmptyDigest(overrides: Record<string, unknown> = {}): DigestRecord {
  * instruction), and streams back exactly the given events. */
 function scriptedAdapter(events: StreamEvent[] | (() => never)): {
   adapter: ProviderAdapter;
-  calls: Array<{ messages: ChatMessage[]; options: ChatStreamOptions | undefined }>;
+  calls: Array<{
+    messages: ChatMessage[];
+    options: ChatStreamOptions | undefined;
+  }>;
 } {
   const calls: Array<{
     messages: ChatMessage[];
@@ -155,7 +156,10 @@ test('summarizeDigestForFallback: degrades gracefully on unparseable digest cont
 
 test('synthesizeNoTextFallback: retries with NO tools offered and the synthesis instruction appended', async () => {
   const { adapter, calls } = scriptedAdapter([
-    { type: 'delta', content: '15 critical findings were found across agents.' },
+    {
+      type: 'delta',
+      content: '15 critical findings were found across agents.',
+    },
     { type: 'done', usage: { inputTokens: 40, outputTokens: 12 } },
   ]);
   const controller = new AbortController();
@@ -217,7 +221,9 @@ test('synthesizeNoTextFallback: streams the retry text through the SAME depseudo
   );
 
   const text = events
-    .filter((e): e is Extract<StreamEvent, { type: 'delta' }> => e.type === 'delta')
+    .filter(
+      (e): e is Extract<StreamEvent, { type: 'delta' }> => e.type === 'delta',
+    )
     .map(e => e.content)
     .join('');
   assert.match(
@@ -243,7 +249,11 @@ test('synthesizeNoTextFallback: an adapter error falls back to the truthful dige
       TURN_MESSAGES,
       controller.signal,
       undefined,
-      [nonEmptyDigest({ counts: { total: 15, returned: 15, truncated: false } })],
+      [
+        nonEmptyDigest({
+          counts: { total: 15, returned: 15, truncated: false },
+        }),
+      ],
     ),
   );
 
@@ -272,7 +282,11 @@ test('synthesizeNoTextFallback: a retry that throws mid-stream falls back to the
       TURN_MESSAGES,
       controller.signal,
       undefined,
-      [nonEmptyDigest({ counts: { total: 15, returned: 15, truncated: false } })],
+      [
+        nonEmptyDigest({
+          counts: { total: 15, returned: 15, truncated: false },
+        }),
+      ],
     ),
   );
 
@@ -294,7 +308,11 @@ test('synthesizeNoTextFallback: a retry that ends with only whitespace text fall
       TURN_MESSAGES,
       controller.signal,
       undefined,
-      [nonEmptyDigest({ counts: { total: 15, returned: 15, truncated: false } })],
+      [
+        nonEmptyDigest({
+          counts: { total: 15, returned: 15, truncated: false },
+        }),
+      ],
     ),
   );
 
@@ -307,6 +325,149 @@ test('synthesizeNoTextFallback: a retry that ends with only whitespace text fall
   );
   // Usage is still accounted even though the retry produced nothing usable.
   assert.deepEqual(result, { usage: { inputTokens: 5, outputTokens: 1 } });
+});
+
+test('summarizeDigestForFallback: notes truncation without inventing the missing total', () => {
+  const sentence = summarizeDigestForFallback(
+    nonEmptyDigest({ counts: { returned: 20, truncated: true } }),
+  );
+  assert.match(sentence, /returned 20 rows.*truncated/);
+});
+
+// --- synthesizeNoTextFallback: buffer draining on error/abort (integration-review fix) ---------
+
+test('synthesizeNoTextFallback: flushes held-back text on adapter error instead of losing it', async () => {
+  const { adapter } = scriptedAdapter([
+    // No trailing newline -- MarkdownTableSuppressor holds this in its line buffer until a
+    // flush, exactly the text an unflushed error break used to drop on the floor.
+    {
+      type: 'delta',
+      content: 'Fifteen findings were found across three agents',
+    },
+    { type: 'error', message: 'upstream 500' },
+  ]);
+  const controller = new AbortController();
+
+  const { events } = await drain(
+    synthesizeNoTextFallback(
+      adapter,
+      PROVIDER_CONFIG,
+      TURN_MESSAGES,
+      controller.signal,
+      undefined,
+      [
+        nonEmptyDigest({
+          counts: { total: 15, returned: 15, truncated: false },
+        }),
+      ],
+    ),
+  );
+
+  const text = events
+    .filter(
+      (e): e is Extract<StreamEvent, { type: 'delta' }> => e.type === 'delta',
+    )
+    .map(e => e.content)
+    .join('');
+  assert.match(
+    text,
+    /Fifteen findings were found across three agents/,
+    'held-back text must survive the error break, not be dropped',
+  );
+  assert.doesNotMatch(
+    text,
+    /the table below has the details/,
+    'the flushed model text already produced an answer, so the deterministic digest sentence must not also be appended',
+  );
+});
+
+test('synthesizeNoTextFallback: flushes held-back text on mid-stream abort instead of losing it', async () => {
+  const controller = new AbortController();
+  const adapter: ProviderAdapter = {
+    async *chatStream(): AsyncIterable<StreamEvent> {
+      yield { type: 'delta', content: 'Fifteen findings across three agents' };
+      controller.abort();
+      yield {
+        type: 'delta',
+        content: 'more text that must never reach the client',
+      };
+      yield { type: 'done', usage: { inputTokens: 10, outputTokens: 10 } };
+    },
+  };
+
+  const { events } = await drain(
+    synthesizeNoTextFallback(
+      adapter,
+      PROVIDER_CONFIG,
+      TURN_MESSAGES,
+      controller.signal,
+      undefined,
+      [
+        nonEmptyDigest({
+          counts: { total: 15, returned: 15, truncated: false },
+        }),
+      ],
+    ),
+  );
+
+  const text = events
+    .filter(
+      (e): e is Extract<StreamEvent, { type: 'delta' }> => e.type === 'delta',
+    )
+    .map(e => e.content)
+    .join('');
+  assert.match(
+    text,
+    /Fifteen findings across three agents/,
+    'text already streamed before the abort must not be dropped on the mid-stream-abort return',
+  );
+  assert.doesNotMatch(text, /more text that must never reach the client/);
+});
+
+// --- synthesizeNoTextFallback: reasoning-fallback text must not count as an answer -------------
+
+test('synthesizeNoTextFallback: reasoning-fallback deltas do not suppress the truthful digest sentence', async () => {
+  const { adapter } = scriptedAdapter([
+    {
+      type: 'delta',
+      content: 'Deliberating over which tool would answer this...\n',
+      reasoningFallback: true,
+    },
+    { type: 'done', usage: { inputTokens: 8, outputTokens: 4 } },
+  ]);
+  const controller = new AbortController();
+
+  const { events } = await drain(
+    synthesizeNoTextFallback(
+      adapter,
+      PROVIDER_CONFIG,
+      TURN_MESSAGES,
+      controller.signal,
+      undefined,
+      [
+        nonEmptyDigest({
+          counts: { total: 15, returned: 15, truncated: false },
+        }),
+      ],
+    ),
+  );
+
+  const text = events
+    .filter(
+      (e): e is Extract<StreamEvent, { type: 'delta' }> => e.type === 'delta',
+    )
+    .map(e => e.content)
+    .join('');
+  assert.match(
+    text,
+    /Deliberating over which tool would answer this/,
+    'reasoning-fallback text is still forwarded to the client',
+  );
+  assert.match(
+    text,
+    /returned 15 rows/,
+    'but it must NOT count as the retry producing an answer -- the truthful digest sentence must still be appended',
+  );
 });
 
 // --- synthesizeNoTextFallback: hard bounds (c) -------------------------------------------------
@@ -326,11 +487,19 @@ test('synthesizeNoTextFallback: an already-aborted signal makes NO retry call, o
       TURN_MESSAGES,
       controller.signal,
       undefined,
-      [nonEmptyDigest({ counts: { total: 15, returned: 15, truncated: false } })],
+      [
+        nonEmptyDigest({
+          counts: { total: 15, returned: 15, truncated: false },
+        }),
+      ],
     ),
   );
 
-  assert.equal(calls.length, 0, '(c): no extra adapter call is made once aborted');
+  assert.equal(
+    calls.length,
+    0,
+    '(c): no extra adapter call is made once aborted',
+  );
   assert.equal(events.length, 1);
   assert.match((events[0] as { content: string }).content, /returned 15 rows/);
   assert.deepEqual(
@@ -369,7 +538,10 @@ test('synthesizeNoTextFallback: aborting MID-STREAM stops forwarding further del
     async *chatStream(): AsyncIterable<StreamEvent> {
       yield { type: 'delta', content: 'first sentence. ' };
       controller.abort();
-      yield { type: 'delta', content: 'second sentence should not reach the client.' };
+      yield {
+        type: 'delta',
+        content: 'second sentence should not reach the client.',
+      };
       yield { type: 'done', usage: { inputTokens: 10, outputTokens: 10 } };
     },
   };
@@ -381,12 +553,18 @@ test('synthesizeNoTextFallback: aborting MID-STREAM stops forwarding further del
       TURN_MESSAGES,
       controller.signal,
       undefined,
-      [nonEmptyDigest({ counts: { total: 15, returned: 15, truncated: false } })],
+      [
+        nonEmptyDigest({
+          counts: { total: 15, returned: 15, truncated: false },
+        }),
+      ],
     ),
   );
 
   const text = events
-    .filter((e): e is Extract<StreamEvent, { type: 'delta' }> => e.type === 'delta')
+    .filter(
+      (e): e is Extract<StreamEvent, { type: 'delta' }> => e.type === 'delta',
+    )
     .map(e => e.content)
     .join('');
   assert.doesNotMatch(text, /second sentence/);

@@ -307,7 +307,9 @@ export interface DigestRecord {
 /** Narrow shape this module reads out of a digest JSON blob -- see digest.ts's `Digest` for the
  * full shape; typed narrowly here so a future digest field never needs a matching change in this
  * unrelated fallback-copy code. */
-type SummarizableDigestForFallback = { counts?: { total?: number; returned: number } };
+type SummarizableDigestForFallback = {
+  counts?: { total?: number; returned: number; truncated?: boolean };
+};
 
 /**
  * Truthful, deterministic sentence derived ONLY from a digest's own `counts` -- never invents a
@@ -334,9 +336,11 @@ export function summarizeDigestForFallback(record: DigestRecord): string {
   const rowWord = returned === 1 ? 'row' : 'rows';
   const totalPhrase =
     typeof total === 'number' && total !== returned ? ` of ${total} total` : '';
-  return (
-    `The query returned ${returned} ${rowWord}${totalPhrase}; the table below has the details.`
-  );
+  // `counts.truncated` (digest.ts) is read here too -- the digest already knows the page it
+  // returned was cut short, and staying silent about that would omit data the digest carries
+  // without inventing anything new.
+  const truncatedPhrase = parsed.counts?.truncated ? ' (truncated)' : '';
+  return `The query returned ${returned} ${rowWord}${totalPhrase}${truncatedPhrase}; the table below has the details.`;
 }
 
 /**
@@ -353,8 +357,8 @@ export function summarizeDigestForFallback(record: DigestRecord): string {
 export const NO_TEXT_SYNTHESIS_INSTRUCTION =
   'The tool call(s) above already returned results, but no written answer followed. Using only ' +
   'the tool results already gathered in this conversation, write 2 to 4 plain sentences stating ' +
-  'the totals and key observations from those results. Do not call any tools. Do not say there ' +
-  'is nothing to add.';
+  'the totals and key observations from those results. Do not state anything the results do not ' +
+  'show. Do not call any tools. Do not say there is nothing to add.';
 
 /** What `synthesizeNoTextFallback` reports back to `orchestrate` once it finishes -- mirrors
  * `Stage1Result`'s shape/reasoning: `usage` is `undefined` on every path that never actually made
@@ -372,7 +376,9 @@ export interface NoTextSynthesisResult {
  * `sawNonEmptyTable` (and therefore this whole mechanism) triggered in the first place -- a
  * technically-true-about-the-wrong-tool sentence is still a regression against the honest goal
  * here. */
-function pickDigestForFallback(digests: DigestRecord[]): DigestRecord | undefined {
+function pickDigestForFallback(
+  digests: DigestRecord[],
+): DigestRecord | undefined {
   for (let i = digests.length - 1; i >= 0; i -= 1) {
     const record = digests[i];
     try {
@@ -411,10 +417,11 @@ function pickDigestForFallback(digests: DigestRecord[]): DigestRecord | undefine
  * to `summarizeDigestForFallback` on the LAST digest recorded this turn -- truthful and
  * deterministic, never the layout-lying NO_ANALYSIS_TEXT_MESSAGE.
  *
- * (c) abort-safety: checked before the retry call is even attempted -- an aborted turn gets no
- * extra provider call and no extra text; the caller's own `!sawAnyDelta` guard chain already
- * covers the (rare, defensive) case of `digests` being empty despite `sawNonEmptyTable` being
- * true.
+ * (c) abort-safety: checked before the retry call is even attempted -- an aborted turn makes no
+ * extra provider call, though it still yields the deterministic digest sentence below (never an
+ * extra MODEL-authored answer -- that is the "no extra text" this guarantees); the caller's own
+ * `!sawAnyDelta` guard chain already covers the (rare, defensive) case of `digests` being empty
+ * despite `sawNonEmptyTable` being true.
  */
 export async function* synthesizeNoTextFallback(
   adapter: ProviderAdapter,
@@ -450,6 +457,16 @@ export async function* synthesizeNoTextFallback(
     : undefined;
   const tableSuppressor = new MarkdownTableSuppressor();
 
+  /** Same drain contract as the main loop's `drainRoundBuffers` (this file, ~line 1678): flushes
+   * the depseudonymizer's leftover buffer THROUGH the table suppressor before releasing the table
+   * suppressor's own remainder, so held-back text is never lost on any exit from the loop below --
+   * error, mid-stream abort, or a normal 'done'. */
+  function drainBuffers(): string {
+    let text = depseudonymizer ? depseudonymizer.flush() : '';
+    text = tableSuppressor.push(text) + tableSuppressor.flush();
+    return text;
+  }
+
   let producedText = false;
   let usage: StreamUsage | undefined;
 
@@ -461,9 +478,23 @@ export async function* synthesizeNoTextFallback(
       {}, // (c): no `tools` offered -- this round cannot re-enter the tool loop.
     )) {
       if (signal.aborted) {
+        // Mid-stream abort: still drain whatever the depseudonymizer/table suppressor are
+        // holding back so the client is never left mid-word or mid-table-row -- the same reason
+        // every exit of the main round loop routes through `drainRoundBuffers`.
+        const trailing = drainBuffers();
+        if (trailing) {
+          if (hasMeaningfulText(trailing)) {
+            producedText = true;
+          }
+          yield { type: 'delta', content: trailing };
+        }
         return { usage };
       }
       if (event.type === 'delta') {
+        // Reasoning-channel fallback text (openai-compatible.ts's `reasoningFallback`) is raw
+        // deliberation, not an answer -- same reason the main loop's deferred-offer interception
+        // excludes it (`roundHadReasoningFallback`). Letting it set `producedText` here would let
+        // deliberation displace the truthful digest sentence, which is strictly worse.
         let content = depseudonymizer
           ? depseudonymizer.push(event.content)
           : event.content;
@@ -471,7 +502,7 @@ export async function* synthesizeNoTextFallback(
           content = tableSuppressor.push(content);
         }
         if (content) {
-          if (hasMeaningfulText(content)) {
+          if (hasMeaningfulText(content) && !event.reasoningFallback) {
             producedText = true;
           }
           yield { type: 'delta', content };
@@ -479,8 +510,7 @@ export async function* synthesizeNoTextFallback(
         continue;
       }
       if (event.type === 'done') {
-        let trailing = depseudonymizer ? depseudonymizer.flush() : '';
-        trailing = tableSuppressor.push(trailing) + tableSuppressor.flush();
+        const trailing = drainBuffers();
         if (trailing) {
           if (hasMeaningfulText(trailing)) {
             producedText = true;
@@ -491,9 +521,18 @@ export async function* synthesizeNoTextFallback(
         break;
       }
       if (event.type === 'error') {
-        // (b): fall through to the deterministic digest sentence below -- never surfaced to the
-        // client as an 'error' event, since the turn already has a complete, non-empty table on
-        // screen and this retry is purely additive narration, not something the user asked for.
+        // (b): flush first -- any text already streamed this retry must not be lost -- then fall
+        // through to the deterministic digest sentence below (only if that flush did not already
+        // count as `producedText`). Never surfaced to the client as an 'error' event, since the
+        // turn already has a complete, non-empty table on screen and this retry is purely
+        // additive narration, not something the user asked for.
+        const trailing = drainBuffers();
+        if (trailing) {
+          if (hasMeaningfulText(trailing)) {
+            producedText = true;
+          }
+          yield { type: 'delta', content: trailing };
+        }
         break;
       }
       // tool_call/status/table/etc. should never occur (no tools were offered) -- ignore
@@ -501,7 +540,15 @@ export async function* synthesizeNoTextFallback(
       // turn worse off.
     }
   } catch {
-    // Same policy as the 'error' branch above: swallow and fall through to (b).
+    // Same policy as the 'error' branch above: flush before swallowing so a retry that had
+    // already produced meaningful text does not get truncated mid-word/mid-row.
+    const trailing = drainBuffers();
+    if (trailing) {
+      if (hasMeaningfulText(trailing)) {
+        producedText = true;
+      }
+      yield { type: 'delta', content: trailing };
+    }
   }
 
   if (!producedText) {

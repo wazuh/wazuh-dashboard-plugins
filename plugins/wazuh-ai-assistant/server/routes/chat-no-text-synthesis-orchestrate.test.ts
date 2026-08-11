@@ -98,7 +98,9 @@ const SEARCH_TOOL_CALL_ROUND: StreamEvent[] = [
         query_dsl: JSON.stringify({
           query: {
             bool: {
-              filter: [{ range: { '@timestamp': { gte: 'now-7d', lte: 'now' } } }],
+              filter: [
+                { range: { '@timestamp': { gte: 'now-7d', lte: 'now' } } },
+              ],
             },
           },
           size: 20,
@@ -173,7 +175,9 @@ async function runOrchestrate(
 
 function deltaText(events: StreamEvent[]): string {
   return events
-    .filter((e): e is Extract<StreamEvent, { type: 'delta' }> => e.type === 'delta')
+    .filter(
+      (e): e is Extract<StreamEvent, { type: 'delta' }> => e.type === 'delta',
+    )
     .map(e => e.content)
     .join('');
 }
@@ -182,7 +186,10 @@ function deltaText(events: StreamEvent[]): string {
 
 test('orchestrate: a tool ran and produced a non-empty table with no narration -> ONE extra retry call, no tools offered', async () => {
   const retryScript: StreamEvent[] = [
-    { type: 'delta', content: 'The search returned 1 matching event from the last week.' },
+    {
+      type: 'delta',
+      content: 'The search returned 1 matching event from the last week.',
+    },
     { type: 'done', usage: { inputTokens: 30, outputTokens: 12 } },
   ];
   const { events, callCount, callOptions } = await runOrchestrate(
