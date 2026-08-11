@@ -1,4 +1,7 @@
-import { getAiAssistantUrl, getMitreIntelligenceResourceUrl } from './navigation';
+import {
+  getAiAssistantUrl,
+  getMitreIntelligenceResourceUrl,
+} from './navigation';
 
 jest.mock('../../../../../react-services/navigation-service', () => ({
   __esModule: true,
