@@ -198,6 +198,34 @@ function renderDefaultCell(value: unknown): React.ReactNode {
 }
 
 /**
+ * Same rendering as `renderDefaultCell`, but with a CSS-only overflow safety net for the "long"
+ * (no fixed pixel width) column path below — issue #8921's horizontal-scrollbar item, residual
+ * case: a "short" column's own longest value can be truncated to a known pixel width
+ * (`renderTruncatedCell`), but a long/free-text column deliberately has NO fixed width so normal
+ * multi-word content (a rule title) keeps wrapping at spaces across lines, same as before this
+ * existed. The gap is a single UNBREAKABLE token in that column wider than the browser's word-wrap
+ * can act on — a long IPv6 address, a long path with no spaces — which a plain `renderDefaultCell`
+ * lets overflow the cell and widen the whole table past the pane, recreating the measured
+ * scrollbar. `overflowWrap: anywhere` breaks exactly that pathological case mid-token while leaving
+ * ordinary space-delimited text to keep wrapping at word boundaries as it always did; unlike
+ * `renderTruncatedCell` this never truncates or hides characters, so nothing is lost — only forced
+ * onto another line instead of off the edge of the table.
+ */
+function renderWrappableCell(value: unknown): React.ReactNode {
+  const rendered = renderDefaultCell(value);
+  if (typeof rendered !== 'string' && typeof rendered !== 'number') {
+    // Absent placeholder or already-formatted content (e.g. `formatCellValue`'s comma-joined
+    // array) — none of those can be the single unbreakable token this guards against.
+    return rendered;
+  }
+  return (
+    <span style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+      {rendered}
+    </span>
+  );
+}
+
+/**
  * Same formatting as `renderDefaultCell`, but wrapped so a value that is itself longer than the
  * column's own pixel budget (an IP address, a long process name/path — anything with no spaces
  * for the browser to wrap on) can never force the CELL, and so the whole table, wider than the
@@ -507,7 +535,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
         return {
           field: column.id,
           name: renderColumnHeader(column),
-          render: renderDefaultCell,
+          render: renderWrappableCell,
         };
       }),
     [visibleColumns, spec.severityColumn, spec.rows],

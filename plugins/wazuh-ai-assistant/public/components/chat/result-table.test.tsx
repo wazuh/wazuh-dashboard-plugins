@@ -490,6 +490,42 @@ describe('ResultTable', () => {
     });
   });
 
+  describe('long-column overflow containment (issue #8921 residual: no fixed-width column may widen the table)', () => {
+    it('wraps an unbreakable long value (e.g. an IPv6 address) with overflow-wrap so it cannot widen the table', () => {
+      // Longer than SHORT_COLUMN_MAX_CHARS (24) -- takes the no-fixed-width "long column" path,
+      // not the short-column truncation path covered above. A value this long with no spaces for
+      // the browser to wrap on is exactly the residual case that could still recreate the measured
+      // horizontal scrollbar.
+      const ipv6 = '2001:0db8:85a3:0000:0000:8a2e:0370:7334';
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'destination.ip', label: 'Destination IP' }],
+            rows: [{ 'destination.ip': ipv6 }],
+          })}
+        />,
+      );
+      const cell = screen.getByText(ipv6);
+      expect(cell.style.overflowWrap).toBe('anywhere');
+      expect(cell.style.wordBreak).toBe('break-word');
+    });
+
+    it('still wraps ordinary space-delimited long text at word boundaries, not mid-word', () => {
+      const title =
+        'A long rule title with plenty of spaces to wrap normally across lines';
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'rule.title', label: 'Title' }],
+            rows: [{ 'rule.title': title }],
+          })}
+        />,
+      );
+      const cell = screen.getByText(title);
+      expect(cell.style.overflowWrap).toBe('anywhere');
+    });
+  });
+
   describe('render-error boundary', () => {
     it('degrades to an inline warning instead of crashing when a row cannot be serialized (e.g. a circular reference) once expanded', () => {
       const circular: Record<string, unknown> = { agent: 'web-01' };

@@ -305,6 +305,8 @@ test('buildTableSpec: deriveColumns tools disambiguate a colliding last segment 
       'network.transport',
       'destination.ip',
       'source.ip',
+      'destination.port',
+      'process.pid',
     ],
   };
   const table = buildTableSpec(result, def, requestBody);
@@ -317,6 +319,8 @@ test('buildTableSpec: deriveColumns tools disambiguate a colliding last segment 
       'network.transport': 'Transport',
       'destination.ip': 'Destination IP',
       'source.ip': 'Source IP',
+      'destination.port': 'Destination Port',
+      'process.pid': 'PID',
     },
   );
   // Neither colliding label is ever the bare raw dot-path -- the exact regression this fixes.
