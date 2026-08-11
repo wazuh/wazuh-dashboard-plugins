@@ -1052,7 +1052,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                           aria-label={i18n.translate(
                             'wazuhAiAssistant.settings.defaultProviderFailureCallout.dismiss',
                             {
-                              defaultMessage: 'Dismiss default provider failure',
+                              defaultMessage:
+                                'Dismiss default provider failure',
                             },
                           )}
                           onClick={() =>
