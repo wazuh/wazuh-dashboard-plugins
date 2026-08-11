@@ -969,12 +969,13 @@ test('applyFieldPolicy: a "never" agg field drops only its own buckets', () => {
 });
 
 test('applyFieldPolicy: get_agent_inventory packages breakdown anonymizes package.vendor buckets, not package.architecture', () => {
-  // Reproduces the exact reported defect against the REAL FIELD_POLICY_DEFAULTS + the identity
-  // map executor.ts builds for a breakdownDimensions tool (dimension -> itself, see executor.ts's
-  // `aggFields` fallback) -- before package.vendor had its own entry, this bucket already came out
-  // as an opaque VAL_n (the deriveColumns fail-closed default), but with no reviewed policy behind
-  // it; this pins that the SAME outcome now happens deliberately, and that the sibling
-  // package.architecture dimension (a real 'allow' entry) still reports its real bucket keys.
+  // Reproduces the exact reported defect against the REAL FIELD_POLICY_DEFAULTS + the same shape
+  // of scalar AggFieldSpec map executor.ts builds for a breakdownDimensions tool (dimension ->
+  // {kind: 'scalar', field: dimension}, see executor.ts's `aggFields` fallback) -- before
+  // package.vendor had its own entry, this bucket already came out as an opaque VAL_n (the
+  // deriveColumns fail-closed default), but with no reviewed policy behind it; this pins that the
+  // SAME outcome now happens deliberately, and that the sibling package.architecture dimension (a
+  // real 'allow' entry) still reports its real bucket keys.
   const p = new Pseudonymizer();
   const digest = baseDigest({
     tool: 'get_agent_inventory',
@@ -988,8 +989,11 @@ test('applyFieldPolicy: get_agent_inventory packages breakdown anonymizes packag
     ],
   });
   const aggFields = {
-    'package.architecture': 'package.architecture',
-    'package.vendor': 'package.vendor',
+    'package.architecture': {
+      kind: 'scalar' as const,
+      field: 'package.architecture',
+    },
+    'package.vendor': { kind: 'scalar' as const, field: 'package.vendor' },
   };
   const out = applyFieldPolicy(
     digest,
@@ -1040,7 +1044,11 @@ test('extractAggFields: maps each top-level BUCKET agg name to its terms/signifi
   const fields = extractAggFields(body);
   assert.ok(fields);
   assert.deepEqual(fields!.by_rule, scalarSpec('rule.id'));
-  assert.deepEqual(fields!.by_ip_count, scalarSpec('data.srcip'));
+  // cardinality is a metric agg (returns a NUMBER, produces no buckets) -- deliberately NOT
+  // mapped, see extractAggFields's doc comment on why mapping it would misattribute samples[].key
+  // against a leading metric agg instead of the bucket agg the rows actually came from.
+  assert.equal(fields!.by_ip_count, undefined);
+  assert.ok('by_ip_count' in fields!);
   assert.deepEqual(fields!.by_sig, scalarSpec('rule.description'));
 });
 

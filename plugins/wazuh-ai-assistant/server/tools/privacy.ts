@@ -994,11 +994,11 @@ function resolveCompositeSpec(
 function resolveAggFieldSpec(
   aggDef: Record<string, unknown> | undefined,
 ): AggFieldSpec | undefined {
-  for (const aggType of [
-    'terms',
-    'significant_terms',
-    'cardinality',
-  ] as const) {
+  // Bucket-producing types only -- `cardinality` (and every other metric agg) is deliberately
+  // excluded, see extractAggFields's doc comment above for why mapping it here misattributes
+  // samples[].key against a leading metric agg instead of the bucket agg the rows actually came
+  // from (#8920 item 5).
+  for (const aggType of ['terms', 'significant_terms'] as const) {
     const spec = aggDef?.[aggType] as { field?: unknown } | undefined;
     if (spec && typeof spec.field === 'string') {
       return { kind: 'scalar', field: spec.field };
@@ -1016,7 +1016,7 @@ function resolveAggFieldSpec(
  * iterates, so the two can't drift apart. Breakdown entries name their aggregation (`agg`) only in
  * the multi-agg case; a single-agg entry attributes to the map's first key.
  *
- * Resolves `terms`/`significant_terms`/`cardinality` (a single scalar field), `multi_terms` (an
+ * Resolves `terms`/`significant_terms` (a single scalar field), `multi_terms` (an
  * array of fields, positionally aligned with the bucket key array), and `composite` (a
  * `sourceName -> field` map, aligned with the bucket key object's own keys) — see `AggFieldSpec`.
  * Any OTHER agg shape (date_histogram, histogram, filters, ...) resolves to `undefined`, exactly
@@ -1373,7 +1373,7 @@ export function applyFieldPolicy(
         // so `doc_count`/any other sample field survives a dropped 'key' exactly as before.
         const result = scrubAggKey(
           value,
-          firstAggSpec,
+          firstAggField,
           policy,
           pseudonymizer,
           toolName,
