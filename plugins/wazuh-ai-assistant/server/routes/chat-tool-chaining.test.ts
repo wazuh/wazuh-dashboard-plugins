@@ -552,6 +552,55 @@ test('findOfferedFollowUpTool: metadata fallback -- the chained detail tool alre
   );
 });
 
+test('findOfferedFollowUpTool: metadata fallback -- ordinary closing boilerplate is NOT force-called', () => {
+  // Integration-review fix: "Let me know if you need anything else." matches OFFER_MARKER_RE
+  // ("let me know") and names no tool, so without the relevance gate this force-calls
+  // CHAIN_PAIRS['get_sca_results'][0] (get_sca_checks) on every turn that ran get_sca_results and
+  // ended with this near-universal closer. The sentence has no more/specific/further/detail
+  // vocabulary, so the relevance gate must degrade this to base behaviour.
+  assert.equal(
+    findOfferedFollowUpTool(
+      'CIS Ubuntu: 95 passed, 102 failed. Let me know if you need anything else.',
+      SCA_TOOLS,
+      new Set(),
+      'get_sca_results',
+    ),
+    undefined,
+  );
+});
+
+test('findOfferedFollowUpTool: metadata fallback -- "happy to help with anything else" is NOT force-called', () => {
+  // Same false-positive class, different closer from the same OFFER_MARKER_RE vocabulary
+  // ("happy to"), also lacking any more/specific/further vocabulary.
+  assert.equal(
+    findOfferedFollowUpTool(
+      'CIS Ubuntu: 95 passed, 102 failed. Happy to help with anything else.',
+      SCA_TOOLS,
+      new Set(),
+      'get_sca_results',
+    ),
+    undefined,
+  );
+});
+
+test('findOfferedFollowUpTool: metadata fallback -- a paraphrased search_wazuh_data offer is NOT force-called into an unrelated tool', () => {
+  // Integration-review fix: prompts.ts orders the model to offer search_wazuh_data in prose for a
+  // field a typed result lacks; FORCE_EXEMPT_TOOL_NAMES only protects that offer when it NAMES the
+  // tool. A paraphrase ("a custom query for those fields") matches the detail-vocabulary gate (it
+  // says "those fields") but must still be excluded by the escape-hatch exclusion, or it would be
+  // force-called into get_sca_checks -- a tool the offer was never about.
+  assert.equal(
+    findOfferedFollowUpTool(
+      'CIS Ubuntu: 95 passed, 102 failed. The result does not include the exact remediation ' +
+        'text -- I can run a custom query for those fields if you would like.',
+      SCA_TOOLS,
+      new Set(),
+      'get_sca_results',
+    ),
+    undefined,
+  );
+});
+
 test('findOfferedFollowUpTool: a NON-offer round (no OFFER_MARKER_RE marker) is untouched by the fallback', () => {
   // No offer-shaped sentence at all -- the metadata fallback must never fire just because a
   // chained summary tool ran; the offer-shape gate is checked FIRST, same as the name-based path.
@@ -837,18 +886,37 @@ test('orchestrate: an unnamed offer is forced via the CHAIN_PAIRS metadata fallb
 test('orchestrate: an unnamed offer on the LAST tool-bearing round is not forced (round budget respected)', async () => {
   // Same budget fence as the name-based path's own test, but for the metadata fallback: an
   // unnamed offer landing on the last tool-bearing round must not spend a round the budget does
-  // not have.
+  // not have. Integration-review fix: a script filled entirely with REJECTED_SEARCH_ROUND never
+  // sets `lastSuccessfulToolName` (rejected calls never reach the executed/success site), so that
+  // version of this test would pass identically even with the round-budget gate deleted -- it
+  // never gave the fallback a chance to fire in the first place. The LAST filler round here is
+  // instead a SUCCESSFUL get_sca_results call (a real CHAIN_PAIRS summary key), so the fallback
+  // has a genuine chain to key off and the round-budget gate is what must stop it from firing.
+  const { context } = scaContext();
   const fillerRounds = Array.from(
-    { length: MAX_TOOL_ROUNDS - 1 },
+    { length: MAX_TOOL_ROUNDS - 2 },
     () => REJECTED_SEARCH_ROUND,
   );
   const { events, callMessages } = await runOrchestrate(
     [
       STAGE1_SCA_SCRIPT,
       ...fillerRounds,
+      // The last tool-bearing round: a SUCCESSFUL get_sca_results call, so
+      // `lastSuccessfulToolName` is genuinely set going into the offer round below.
+      [
+        {
+          type: 'tool_call',
+          toolCall: {
+            id: 'call_sca_results',
+            name: 'get_sca_results',
+            arguments: { agent_id: '001' },
+          },
+        },
+        { type: 'done', usage: { inputTokens: 20, outputTokens: 10 } },
+      ],
       offerScript('I can pull the specific failing checks if you would like.'),
     ],
-    rejectingContext(),
+    context,
   );
 
   assert.equal(callMessages.length, MAX_TOOL_ROUNDS + 1);

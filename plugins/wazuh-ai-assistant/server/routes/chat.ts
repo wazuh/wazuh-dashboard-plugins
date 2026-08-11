@@ -312,6 +312,38 @@ const OFFER_MARKER_RE =
 const FORCE_EXEMPT_TOOL_NAMES = new Set(['search_wazuh_data']);
 
 /**
+ * Metadata-fallback RELEVANCE gate (integration-review fix, see the fallback's own doc comment
+ * below): the name-based path's `\bname\b` match is itself the relevance gate that keeps
+ * `OFFER_MARKER_RE`'s near-universal closing vocabulary ("let me know", "happy to", "i can") from
+ * force-calling a tool on ordinary boilerplate -- "Let me know if you need anything else." matches
+ * `OFFER_MARKER_RE` but names no tool, so the name-based path is inert on it. The metadata fallback
+ * has no name to match against, so without an equivalent gate it force-calls
+ * `CHAIN_PAIRS[lastSuccessfulToolName][0]` on THAT EXACT sentence and on every other unnamed
+ * closer, on every turn that ran a `CHAIN_PAIRS`-keyed summary tool. This requires the offer
+ * sentence to actually reference MORE/SPECIFIC/FURTHER data before the fallback may fire --
+ * a generic "let me know if you need anything else" has none of that vocabulary and now degrades
+ * to base behaviour, same as an unrecognized offer phrasing already does.
+ */
+const METADATA_FALLBACK_DETAIL_RE =
+  /\b(more|further|specific|additional|extra|detail|details|breakdown|full list|individual|underlying|exact|failing checks)\b/i;
+
+/**
+ * Metadata-fallback ESCAPE-HATCH exclusion (integration-review fix): `FORCE_EXEMPT_TOOL_NAMES`
+ * only protects the `search_wazuh_data` offer when the offer NAMES it -- prompts.ts's designed
+ * offer ("say so and offer to query it with search_wazuh_data instead of speculating" for a field
+ * a typed result lacks) can be paraphrased without the literal tool name ("I can run a custom
+ * query for those fields if you'd like"), which the name-based exemption cannot see at all. That
+ * paraphrase still matches `METADATA_FALLBACK_DETAIL_RE` above (it says "those fields"), so
+ * without this second gate it would be force-called into whatever `CHAIN_PAIRS` detail tool the
+ * last summary tool happens to declare -- voiding the exemption's intent for exactly the phrasing
+ * class it exists to cover. Matches the field/custom-query vocabulary prompts.ts's own escape-hatch
+ * instruction uses, so an offer shaped like that instruction degrades to base behaviour here
+ * instead of being misattributed to an unrelated chained tool.
+ */
+const METADATA_FALLBACK_ESCAPE_HATCH_RE =
+  /\b(custom quer(?:y|ies)|raw quer(?:y|ies)|those fields|that field|these fields|specific fields|additional fields|missing fields)\b/i;
+
+/**
  * DEFERRED-OFFER INTERCEPTION, detection half (issue #8935 item I3 -- see `orchestrate`'s
  * `forcedFollowUpTool`/`forcedFollowUpSpent` for the delivery half). The measured failure this
  * exists for: a turn correctly summarizes a tool's results, then ends the turn asking permission
@@ -393,12 +425,31 @@ export function findOfferedFollowUpTool(
     // the model no tool token for the name-based gate above to catch. Fall back to
     // `CHAIN_PAIRS` (server/tools/router.ts), keyed by the LAST tool that succeeded THIS turn: the
     // measured witness (get_sca_results -> get_sca_checks) is exactly this shape, a summary tool
-    // whose result the round text is narrating right before the vague offer. Still bounded by the
-    // same three gates the name-based path applies -- offered this turn, not the suggest-discover
-    // handoff, not the search_wazuh_data escape hatch, not already executed -- so an un-chained (or
-    // already-run) summary tool degrades to base behaviour exactly like an unrecognized offer
-    // phrasing does.
+    // whose result the round text is narrating right before the vague offer. Bounded by the same
+    // three gates the name-based path applies -- offered this turn, not the suggest-discover
+    // handoff, not already executed -- PLUS two gates the name-based path does not need because a
+    // named tool IS its own relevance/exemption signal: the offer sentence must reference
+    // more/specific/further data (METADATA_FALLBACK_DETAIL_RE) and must not be the field/
+    // custom-query phrasing the search_wazuh_data escape hatch is designed to produce
+    // (METADATA_FALLBACK_ESCAPE_HATCH_RE) -- so an un-chained (or already-run) summary tool, a
+    // generic closing sentence, or an unnamed search_wazuh_data-shaped offer all degrade to base
+    // behaviour exactly like an unrecognized offer phrasing does.
     if (!lastSuccessfulToolName) {
+      return undefined;
+    }
+    // Relevance gate (see METADATA_FALLBACK_DETAIL_RE/METADATA_FALLBACK_ESCAPE_HATCH_RE's doc
+    // comments above): at least one offer-shaped sentence must ALSO reference more/specific/
+    // further data, and that same sentence must NOT be the field/custom-query phrasing the
+    // search_wazuh_data escape hatch is designed to produce. Without this, every unnamed offer
+    // sentence -- including ordinary closing boilerplate like "Let me know if you need anything
+    // else." -- would force-call CHAIN_PAIRS[lastSuccessfulToolName][0] purely because
+    // OFFER_MARKER_RE's closing-phrase vocabulary matched somewhere in the round.
+    const relevantOfferSentences = offerSentences.filter(
+      sentence =>
+        METADATA_FALLBACK_DETAIL_RE.test(sentence) &&
+        !METADATA_FALLBACK_ESCAPE_HATCH_RE.test(sentence),
+    );
+    if (relevantOfferSentences.length === 0) {
       return undefined;
     }
     const offeredNames = new Set(offeredTools.map(tool => tool.name));

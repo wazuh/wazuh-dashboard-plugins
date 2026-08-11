@@ -271,6 +271,17 @@ export const CHAIN_PAIRS: Record<string, readonly string[]> = {
     'get_vulnerabilities_by_agent',
     'get_agent_inventory',
   ],
+  // Closes the Failure A instance this map's own doc comment above already names ("a
+  // findings/rule-title/tag search never offers find_document_by_field for a specific row") --
+  // these three are the finding-ROW producers (as opposed to the aggregate-only summary tools
+  // like get_top_rules/get_security_summary), so a specific row from any of them is the natural
+  // next lookup. NOT the free_search CATEGORY: resolveStage2Tools only ever appends the single
+  // `search_wazuh_data` name unconditionally (see its doc comment), never the whole free_search
+  // category, so find_document_by_field was previously reachable only when free_search was
+  // itself the routed category -- these entries are what actually closes that gap.
+  search_findings_by_agent: ['find_document_by_field'],
+  search_findings_by_rule_title: ['find_document_by_field'],
+  search_findings_by_rule_tag: ['find_document_by_field'],
 };
 
 /**
@@ -459,13 +470,28 @@ export function resolveStage2Tools(categories: string[]): ToolSpec[] {
     // Chain pairs (see `CHAIN_PAIRS`'s doc comment): append every detail tool whose SUMMARY tool
     // is already in this turn's resolved category union, so a cross-category (or same-category)
     // follow-up is reachable in the SAME turn rather than requiring a second stage-1 route.
-    // Iterates a snapshot of `toolNames` (`Array.from`, since the loop body mutates the same Set)
-    // so ordering stays stable for the router's stage-2 cache key -- appending, never reordering
-    // or removing, what the category union above already produced.
-    for (const summaryTool of Array.from(toolNames)) {
-      for (const detailTool of CHAIN_PAIRS[summaryTool] ?? []) {
-        toolNames.add(detailTool);
+    // Expanded to a FIXED POINT, not just one hop: a detail tool that is ITSELF a `CHAIN_PAIRS`
+    // key (e.g. `get_sca_results`, added here for `agents`, is also a summary key for
+    // `get_sca_checks`) must chain onward too, or the very "what's going on with aio-05" witness
+    // this map cites in its own doc comment (get_agents -> get_sca_results -> get_sca_checks)
+    // would stop one hop short of the SCA detail tool. `frontier` starts as the category union
+    // and each pass only visits NEWLY added names, so no name is expanded twice; termination is
+    // structural (the tool catalog is finite and every name enters the Set at most once), so no
+    // cycle guard is needed even if a future edit introduced a `CHAIN_PAIRS` cycle. Order stays
+    // stable for the router's stage-2 cache key: the loop only ever appends, in a fixed
+    // breadth-first pass order, never reorders or removes what the category union above produced.
+    let frontier = Array.from(toolNames);
+    while (frontier.length > 0) {
+      const nextFrontier: string[] = [];
+      for (const summaryTool of frontier) {
+        for (const detailTool of CHAIN_PAIRS[summaryTool] ?? []) {
+          if (!toolNames.has(detailTool)) {
+            toolNames.add(detailTool);
+            nextFrontier.push(detailTool);
+          }
+        }
       }
+      frontier = nextFrontier;
     }
   }
 

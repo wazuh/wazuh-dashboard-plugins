@@ -28,12 +28,17 @@ test('resolveStage2Tools(general) returns the minimal set, never undefined/empty
 test('resolveStage2Tools: a data category resolution includes its chain-pair detail tools', () => {
   // `agents` -> `get_agents`, which is a CHAIN_PAIRS summary tool (see router.ts), so its detail
   // tools are also expected in the resolved list -- this is intentional widening, not a
-  // regression: see the "chain co-offering" tests below for the rationale.
+  // regression: see the "chain co-offering" tests below for the rationale. The expansion is a
+  // FIXED POINT, not one hop: `get_sca_results` (a get_agents detail tool) is itself a CHAIN_PAIRS
+  // key for `get_sca_checks`, and `search_findings_by_agent` (also a get_agents detail tool) is
+  // itself a CHAIN_PAIRS key for `find_document_by_field`, so both are expected here too.
   const specs = resolveStage2Tools(['agents']);
   const names = specs.map(spec => spec.name).sort();
   assert.deepEqual(names, [
+    'find_document_by_field',
     'get_agent_inventory',
     'get_agents',
+    'get_sca_checks',
     'get_sca_results',
     'get_vulnerabilities_by_agent',
     'search_findings_by_agent',
@@ -220,6 +225,23 @@ test('the "agents" category description excludes comms-channel health', () => {
  * actually reachable/correct rather than a dead function -- and to fail loudly in CI, not just at
  * runtime plugin start, if a future edit reintroduces a typo.
  */
+/**
+ * Pins the declared order of `CHAIN_PAIRS['get_agents']`: chat.ts's metadata fallback
+ * (`findOfferedFollowUpTool`) picks the FIRST eligible detail tool in this array's declared
+ * order when an offer names no tool, so this literal ordering is load-bearing production
+ * behaviour, not just documentation -- reordering it for readability would silently change which
+ * tool an unnamed "what's going on with aio-05"-shaped offer gets forced into. Without this test
+ * that reorder would pass every other suite silently.
+ */
+test('CHAIN_PAIRS: get_agents declares its detail tools in a fixed, pinned order', () => {
+  assert.deepEqual(CHAIN_PAIRS.get_agents, [
+    'get_vulnerabilities_by_agent',
+    'get_sca_results',
+    'get_agent_inventory',
+    'search_findings_by_agent',
+  ]);
+});
+
 test('CHAIN_PAIRS: every summary and detail tool name is a real registry tool', () => {
   const registryToolNames = new Set(
     listToolDefinitions().map(def => def.spec.name),
@@ -260,6 +282,14 @@ test('resolveStage2Tools: get_agents chains to cross-category detail tools (Fail
   assert.ok(names.includes('get_sca_results'));
   assert.ok(names.includes('get_agent_inventory'));
   assert.ok(names.includes('search_findings_by_agent'));
+  // Second-hop witness (the exact pair this map's own doc comment cites as the motivating case):
+  // get_agents -> get_sca_results -> get_sca_checks must all be reachable in ONE turn, not just
+  // the first hop.
+  assert.ok(
+    names.includes('get_sca_checks'),
+    'get_sca_checks must be reachable via the second hop (get_sca_results is itself a ' +
+      'CHAIN_PAIRS key) -- a one-hop-only expansion would drop this',
+  );
 });
 
 test('resolveStage2Tools: get_vulnerabilities chains to get_agent_inventory (hotfixes)', () => {
@@ -278,12 +308,21 @@ test('resolveStage2Tools: get_critical_vulnerabilities chains the same detail to
   assert.ok(names.includes('get_agent_inventory'));
 });
 
-test('resolveStage2Tools: findings-row detail tool (find_document_by_field) is reachable via free_search', () => {
-  // find_document_by_field itself is not a CHAIN_PAIRS value (it lives in `free_search`, which is
-  // always reachable via search_wazuh_data's category), but the escape hatch's own category tools
-  // remain intact after the chain-pairs expansion.
+test('resolveStage2Tools: findings-row detail tool (find_document_by_field) is reachable via CHAIN_PAIRS', () => {
+  // find_document_by_field lives in the `free_search` CATEGORY, which resolveStage2Tools does NOT
+  // widen a routed category into -- it only ever appends the single `search_wazuh_data` NAME
+  // unconditionally (see its doc comment), never the whole free_search category. So without a
+  // CHAIN_PAIRS entry naming it explicitly, find_document_by_field would be offered only when
+  // free_search is itself the routed category. `search_findings_by_agent` /
+  // `search_findings_by_rule_title` / `search_findings_by_rule_tag` (all in `findings`) now chain
+  // to it directly, which is what actually closes the gap.
   const names = resolveStage2Tools(['findings']).map(spec => spec.name);
   assert.ok(names.includes('search_wazuh_data'));
+  assert.ok(
+    names.includes('find_document_by_field'),
+    'find_document_by_field must be reachable from a plain `findings` route via CHAIN_PAIRS, ' +
+      'not only via a separately-routed free_search category',
+  );
 });
 
 test('resolveStage2Tools: chain-pair expansion does not widen the general-alone minimal recovery set', () => {
