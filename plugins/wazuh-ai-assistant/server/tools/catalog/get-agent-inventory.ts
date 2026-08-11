@@ -141,6 +141,197 @@ function parseKind(value: unknown): InventoryKind {
 }
 
 /**
+ * Per-kind primary name field the optional `filter` param (issue #8910) narrows on, keyed the same
+ * as `INVENTORY_KIND_CONFIG`. Picked from that config's own `source` lists -- never a field invented
+ * for this feature -- so every entry here is already a confirmed part of this tool's outbound
+ * `_source`/query contract:
+ * - `packages` -> `package.name` (the field the failing live question, "is openssl installed on
+ *   agent X", is actually asking about).
+ * - `hotfixes` -> `package.hotfix.name`, the one confirmed field for that kind (see
+ *   `INVENTORY_KIND_CONFIG`'s own doc comment above).
+ * - `processes` -> `process.name`; `process.command_line` is matched too (see
+ *   `buildInventoryFilterClause` below) since "which process" questions are answered as often by a
+ *   command-line fragment as by the bare process name.
+ * - `os` matches `host.hostname` OR `host.os.name` -- the two fields that actually identify an OS
+ *   record by name -- even though `kind="os"` already returns at most 5 rows (`fixedSize`): leaving
+ *   `filter` silently ignored for exactly one of the five kinds would be a worse (surprising)
+ *   contract than a uniform, if lower-value, one.
+ * - `ports` has no single name field (see `buildInventoryFilterClause`'s own handling): a numeric
+ *   filter matches `source.port`/`destination.port`AND prefers a listening `interface.state`
+ *   (issue #8914 -- see `PORT_LISTENING_STATE_VALUES`'s doc comment below), a non-numeric one
+ *   matches `process.name` (the process bound to the port), matching the issue's own worked
+ *   example ("what process is on port 9200").
+ */
+const INVENTORY_FILTER_FIELDS: Partial<Record<InventoryKind, string[]>> = {
+  os: ['host.hostname', 'host.os.name'],
+  packages: ['package.name'],
+  processes: ['process.name', 'process.command_line'],
+  hotfixes: ['package.hotfix.name'],
+};
+
+/** Digits only, matching a Wazuh/syscollector port number (`source.port`/`destination.port` are
+ * plain non-negative integers, never signed/floating) -- `parseInt` alone would accept "9200abc" as
+ * 9200, which is not what a caller who typed that meant. */
+const INTEGER_FILTER_RE = /^\d+$/;
+
+/**
+ * A caller-supplied `filter` is meant as a plain substring, not Lucene syntax -- stripping `*`/`?`
+ * before this tool ever builds its own trailing wildcard keeps the outbound value guardrail-safe by
+ * construction (guardrails.ts's `lintDsl` runs on every catalog tool's request with no per-tool
+ * exemption, and rejects a "wildcard" clause whose value has a LEADING `*`/`?` -- a caller who typed
+ * `filter: "*ssl"` would otherwise turn this tool's own `${value}*` into `"*ssl*"` and get a
+ * confusing guardrail rejection instead of the match they asked for).
+ */
+function sanitizeFilterValue(value: string): string {
+  return value.replace(/[*?]/g, '').trim();
+}
+
+/** Case-insensitive PREFIX match on a keyword field: `wildcard` with only a TRAILING `*` (never a
+ * leading one -- see `sanitizeFilterValue`'s doc comment) and `case_insensitive: true`, the shape
+ * this repo's `wazuh-states-*` fields are queried with elsewhere once analyzed matching isn't wanted
+ * (see e.g. `common.ts`'s `findingArtifactFilterClauses`, which uses `term`/exact match for the same
+ * reason: case_insensitive here trades exactness for a prefix substring UX, which the presence
+ * questions this feature exists for need -- "is openssl installed" should still match if the actual
+ * package name has different casing).
+ */
+function caseInsensitivePrefixClause(
+  field: string,
+  value: string,
+): Record<string, unknown> {
+  return {
+    wildcard: { [field]: { value: `${value}*`, case_insensitive: true } },
+  };
+}
+
+/** `bool.should`/`minimum_should_match: 1` wrapper for "match any of these name fields" -- used
+ * whenever a kind's `INVENTORY_FILTER_FIELDS` entry lists more than one field (`os`, `processes`). A
+ * single-field kind skips this wrapper entirely (see `buildInventoryFilterClause` below), so its
+ * outbound clause is unchanged from a bare `caseInsensitivePrefixClause` call. */
+function anyFieldMatches(
+  fields: string[],
+  value: string,
+): Record<string, unknown> {
+  if (fields.length === 1) {
+    return caseInsensitivePrefixClause(fields[0], value);
+  }
+  return {
+    bool: {
+      should: fields.map(field => caseInsensitivePrefixClause(field, value)),
+      minimum_should_match: 1,
+    },
+  };
+}
+
+/**
+ * `interface.state` value(s) the syscollector ports schema uses for a bound/listening socket.
+ *
+ * Evidence (issue #8914, live query against a real wazuh-indexer deployment): a terms aggregation
+ * over `interface.state` on `wazuh-states-inventory-ports*` (84 docs) returned exactly
+ * `listening` (14), `established` (59), `time_wait` (6), `close_wait` (3) -- lowercase, full
+ * English words, NOT the `LISTEN`/`ESTABLISHED` short forms this constant previously held. That
+ * mismatch was a live wrong-answer bug: a case-sensitive `term: { 'interface.state': 'LISTEN' }`
+ * never matches real `listening` documents, so `get_agent_inventory(kind='ports',
+ * filter='9200')` silently returned zero rows against a live cluster (the "OR field absent"
+ * fallback below never firing either, since real documents DO carry `interface.state`) and the
+ * assistant confidently reported nothing listening on a port that was, live, bound by `java`.
+ *
+ * `plugins/main`'s own `states-inventory-ports` sample-data generator (`server/lib/sample-data/
+ * dataset/states-inventory-ports/main.js`, `random.choice(['LISTEN', 'ESTABLISHED'])`) is
+ * SYNTHETIC test fixture data, not a live-verified schema -- it does not match the real
+ * wazuh-indexer vocabulary above and MUST NOT be treated as authoritative for this field's casing
+ * or wording (this file's previous revision made exactly that mistake). Both `listening` (the
+ * confirmed live value) and `listen` (in case an older/differently-provisioned indexer still
+ * writes the sample-data generator's short form) are matched below, each case-insensitively, so
+ * this survives casing differences in either vocabulary without having to guess which one a given
+ * deployment actually writes.
+ */
+const PORT_LISTENING_STATE_VALUES = ['listening', 'listen'];
+
+/** Case-insensitive exact-value match for one of `PORT_LISTENING_STATE_VALUES` -- `term` (not
+ * `match`) with `case_insensitive: true`, the shape OpenSearch supports for an exact-but-cased-
+ * agnostic match on a `keyword` field ("keyword field" per `_source` company in
+ * `INVENTORY_KIND_CONFIG`'s `ports` entry; a prefix/wildcard match would be wrong here since a
+ * substring like "listening" must not accidentally match some other unrelated state word). Kept as
+ * its own helper so both values in `PORT_LISTENING_STATE_VALUES` build the identical clause shape. */
+function listeningStateClause(value: string): Record<string, unknown> {
+  return { term: { 'interface.state': { value, case_insensitive: true } } };
+}
+
+/**
+ * Resolves the optional `filter` param (issue #8910) to zero or one extra `bool.filter` clause,
+ * appended by `buildRequest` after the agent clause. Returns `undefined` for an omitted/blank
+ * filter (existing callers with no `filter` supplied get exactly the same request body as before
+ * this existed) or the sanitized value collapses to '' after `sanitizeFilterValue` strips it.
+ *
+ * `ports` is the one kind with no single name field in `INVENTORY_FILTER_FIELDS` (its `_source` has
+ * `source.port`/`destination.port` instead of one name field) -- handled here directly rather than
+ * added to that map: a filter that parses as a plain non-negative integer (`INTEGER_FILTER_RE`)
+ * matches either port field by NUMERIC equality (`term`, not a string match -- these fields are
+ * `long`, never `keyword`), since neither `source`/`destination` alone is "the" port a caller means
+ * by "port 9200". A non-numeric filter ("which process is on port X" asked the other way, "what's
+ * using nginx's port") falls back to the same `process.name` prefix match `processes` uses.
+ *
+ * Issue #8910: a numeric filter matched EITHER side of the socket with no state narrowing, so
+ * "what's listening on port 9200" returned every connection touching 9200 (both the listener AND
+ * every established peer connection through it) instead of just the listener(s). Issue #8914
+ * narrows this: the outer clause is `bool.filter` on the port match (unchanged, still both sides --
+ * a `source.port`/`destination.port` OR, since a caller-supplied port can legitimately be either
+ * side of a real socket) AND (via a nested `bool.should`/`minimum_should_match: 1`) either
+ * `interface.state` case-insensitively matches one of `PORT_LISTENING_STATE_VALUES` OR the
+ * `interface.state` field is absent from that document. The "OR absent" arm is the graceful
+ * fallback the issue asks for: `interface.state` is NOT made a hard requirement (a `must`/`filter`
+ * on a listening-state term alone would silently return zero rows for any document that happens to
+ * lack the field -- e.g. an older/partial doc from before the field existed), so a deployment where
+ * some or all `ports` documents never carry `interface.state` still gets its port-only match back
+ * exactly as before this fix, one document at a time, rather than the whole query going empty. A
+ * document that DOES carry `interface.state` and holds a non-listening value (e.g. `established`)
+ * is excluded -- that is the actual narrowing this issue exists for. See
+ * `PORT_LISTENING_STATE_VALUES`'s doc comment for why the match is a case-insensitive `term` (not
+ * an exact-cased one) against two known spellings, not just the live-confirmed `listening` value
+ * alone.
+ */
+function buildInventoryFilterClause(
+  kind: InventoryKind,
+  params: Record<string, unknown>,
+): Record<string, unknown> | undefined {
+  const raw = optionalStringParam(params.filter);
+  if (!raw) {
+    return undefined;
+  }
+  const value = sanitizeFilterValue(raw);
+  if (value === '') {
+    return undefined;
+  }
+  if (kind === 'ports') {
+    if (INTEGER_FILTER_RE.test(value)) {
+      const port = Number.parseInt(value, 10);
+      const portMatch = {
+        bool: {
+          should: [
+            { term: { 'source.port': port } },
+            { term: { 'destination.port': port } },
+          ],
+          minimum_should_match: 1,
+        },
+      };
+      return {
+        bool: {
+          filter: [portMatch],
+          should: [
+            ...PORT_LISTENING_STATE_VALUES.map(listeningStateClause),
+            { bool: { must_not: { exists: { field: 'interface.state' } } } },
+          ],
+          minimum_should_match: 1,
+        },
+      };
+    }
+    return caseInsensitivePrefixClause('process.name', value);
+  }
+  const fields = INVENTORY_FILTER_FIELDS[kind];
+  return fields ? anyFieldMatches(fields, value) : undefined;
+}
+
+/**
  * Resolves the agent-identifying filter clause from `agent_id`/`agent_name` (issue #8873: a live
  * 40-question run invoked this tool 0/40 times, including on 3 questions statically targeting it,
  * because `agent_id` was strictly required and numeric while the target personas ask deictically
@@ -205,7 +396,11 @@ export const getAgentInventoryTool: ToolDefinition = {
       'critical vulnerabilities already have a hotfix available"). Identify the agent by ' +
       '"agent_id" (numeric) OR "agent_name" -- if the question refers to "this server"/"the ' +
       'host" without naming or numbering it, and no agent id or name is otherwise known from the ' +
-      `conversation, call get_agents first to look one up. ${INVENTORY_CURRENT_STATE_NOTE}`,
+      `conversation, call get_agents first to look one up. ${INVENTORY_CURRENT_STATE_NOTE} To ` +
+      'check whether one specific package/port/process is present (e.g. "is openssl installed on ' +
+      'this host?", "what is listening on port 9200?"), pass "filter" instead of scanning the ' +
+      'returned rows yourself -- results are truncated well before every row is returned (see ' +
+      '"limit" below), so a specific entry can be absent from the sample even when it exists.',
     parameters: objectSchema(
       {
         agent_id: {
@@ -227,8 +422,23 @@ export const getAgentInventoryTool: ToolDefinition = {
         },
         limit: limitProperty(
           'Max number of rows to return (default 50, max 500). Ignored for kind="os": one agent ' +
-            'has at most one current OS record, so this always returns at most 5 rows regardless.',
+            'has at most one current OS record, so this always returns at most 5 rows regardless. ' +
+            'A large inventory (e.g. hundreds of packages) can exceed this before every row is ' +
+            'returned -- prefer "filter" over raising this for a targeted lookup.',
         ),
+        filter: {
+          type: 'string',
+          description:
+            "Narrows results to rows matching this value on the kind's primary name field, " +
+            'case-insensitive: package name for "packages", hotfix id for "hotfixes", process ' +
+            'name/command line for "processes", hostname/OS name for "os". For "ports", a numeric ' +
+            'value matches that port number (source or destination) and prefers the LISTENING ' +
+            'socket(s) when a row carries the "interface.state" field ("what is listening on port ' +
+            '9200?" -- rows without that field are still returned, unnarrowed, so the port-only ' +
+            'match never goes silently empty); a non-numeric value matches the process name bound ' +
+            "to the port. Optional -- omit to return the kind's unfiltered rows (existing " +
+            'behavior, subject to "limit").',
+        },
       },
       ['kind'],
     ),
@@ -246,12 +456,16 @@ export const getAgentInventoryTool: ToolDefinition = {
         config.limitRange?.[0] ?? 50,
         config.limitRange?.[1] ?? 500,
       );
+    const inventoryFilter = buildInventoryFilterClause(kind, params);
+    const filter = inventoryFilter
+      ? [agentFilter, inventoryFilter]
+      : [agentFilter];
     return {
       target: 'indexer',
       index: config.index,
       body: {
         query: {
-          bool: { filter: [agentFilter] },
+          bool: { filter },
         },
         _source: config.source,
         sort: ['_doc'],
@@ -262,4 +476,11 @@ export const getAgentInventoryTool: ToolDefinition = {
   tableSpec: { columns: [] },
   digest: { sampleColumns: [] },
   deriveColumns: true,
+  // Issue #8917: explicit, not inherited from `deriveColumns` above (see
+  // `ToolDefinition.failClosedFieldPolicy`'s doc comment, types.ts). This tool's 5 kinds each
+  // read a small, fixed, reviewed `_source` list (`INVENTORY_KIND_CONFIG` above) rather than a
+  // genuinely arbitrary caller-supplied field set -- but every one of those fields still needs
+  // its own explicit `FIELD_POLICY_DEFAULTS` entry (privacy.ts) before it is safe to relax this,
+  // so it stays `true` today, same as before this flag existed.
+  failClosedFieldPolicy: true,
 };

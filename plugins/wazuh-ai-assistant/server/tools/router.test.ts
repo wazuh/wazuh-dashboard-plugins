@@ -45,3 +45,36 @@ test('the "general" category description carries the explicit exclusion', () => 
     "general's description must explicitly exclude environment questions",
   );
 });
+
+/**
+ * Out-of-scope regression: M-OOS-01/02 (active-response questions) and M-OOS-05 (agent
+ * comms-channel health) were mis-routed onto adjacent tools (get_brute_force,
+ * get_events_by_agent, get_agents) instead of being declined, because neither category's
+ * stage-1 menu line said what it does NOT cover. These two categories' descriptions must carry
+ * that exclusion so a mismatch is visible before stage 2 ever offers the misleading tool.
+ */
+test('the "findings" category description excludes active-response actions', () => {
+  const prompt = buildRoutingPrompt('2026-01-01T00:00:00.000Z');
+  const findingsLine = prompt
+    .split('\n')
+    .find(line => line.trim().startsWith('- findings:'));
+  assert.ok(findingsLine, 'routing prompt must list a "findings" menu entry');
+  assert.match(
+    findingsLine as string,
+    /NOT automated actions Wazuh took/,
+    "findings's description must explicitly exclude active-response actions",
+  );
+});
+
+test('the "agents" category description excludes comms-channel health', () => {
+  const prompt = buildRoutingPrompt('2026-01-01T00:00:00.000Z');
+  const agentsLine = prompt
+    .split('\n')
+    .find(line => line.trim().startsWith('- agents:'));
+  assert.ok(agentsLine, 'routing prompt must list an "agents" menu entry');
+  assert.match(
+    agentsLine as string,
+    /NOT comms-channel health/,
+    "agents's description must explicitly exclude comms-channel health",
+  );
+});

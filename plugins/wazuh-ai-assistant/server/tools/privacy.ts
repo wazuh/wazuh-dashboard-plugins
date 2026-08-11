@@ -112,12 +112,13 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'vulnerability.score.base', action: 'allow' },
   { field: 'package.architecture', action: 'allow' },
   // get_agent_inventory (issue: "Consolidate agent inventory into one tool") reads
-  // wazuh-states-inventory-* via `deriveColumns: true`, which flips applyFieldPolicy's
+  // wazuh-states-inventory-* and sets `failClosedFieldPolicy: true` (issue #8917 -- see
+  // `ToolDefinition.failClosedFieldPolicy`'s doc comment, types.ts), which flips applyFieldPolicy's
   // unlisted-field default from allow-by-omission to fail-closed anonymize (the same "any finding
   // field" protection search_wazuh_data's escape hatch needed -- see this file's header doc
   // comment on `isEscapeHatch`). The four deleted single-purpose tools it replaced never needed
-  // explicit entries for these because they were NOT deriveColumns tools, so allow-by-omission
-  // covered them silently; folding them into a deriveColumns tool means every field that should
+  // explicit entries for these because they had no such flag, so allow-by-omission
+  // covered them silently; folding them into this tool means every field that should
   // stay readable now needs its own explicit 'allow' entry below, or it silently starts arriving
   // at the provider as a VAL_n pseudonym -- making "what packages are installed on X" answer in
   // meaningless pseudonyms under privacy mode. Each entry below is software/config IDENTITY, not a
@@ -265,6 +266,14 @@ function deepMapStrings(
   return value;
 }
 
+/** Escapes every regex metacharacter in `value` so it can be embedded literally inside a
+ * dynamically-built `RegExp` — needed by `Pseudonymizer.applyToText` below, which (unlike a plain
+ * `split`/`join`) must express a word-boundary condition, and a raw attacker/data-controlled value
+ * cannot be interpolated into a regex source without first escaping it. */
+function escapeRegExpLiteral(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 /**
  * Per-request pseudonymizer (a stateless, conversation-scoped map): the map itself is
  * client-held across turns (the chat request body's `privacy.map`, common/types.ts's
@@ -335,11 +344,31 @@ export class Pseudonymizer {
     return this.minted.slice();
   }
 
-  /** Replaces every known REAL value with its pseudonym, longest-value-first so a shorter value
+  /**
+   * Replaces every known REAL value with its pseudonym, longest-value-first so a shorter value
    * that happens to be a substring of a longer one (e.g. "10.0.0.1" inside "10.0.0.10") is never
-   * substituted first and left corrupting the longer value. Uses plain `split`/`join` rather than
-   * a regex built from the (unescaped, attacker/data-controlled) value — sidesteps regex-escaping
-   * entirely instead of trying to get it right. */
+   * substituted first and left corrupting the longer value.
+   *
+   * #8916: a value is only ever replaced as a WHOLE token, never as a substring embedded inside a
+   * larger alphanumeric run — observed live: the word "ubuntu" (pseudonymized to "VAL_2" from an
+   * earlier `host.os.platform` value) turned the unrelated package version "7.81.0-1ubuntu1.14"
+   * into "7.81.0-1VAL_21.14". A "boundary" here is any NON-ALPHANUMERIC character (or start/end of
+   * string) — deliberately NOT the conventional regex `\b` (which treats "_" as a word character):
+   * real identifiers routinely embed "-"/"_" as separators (e.g. "mysql-server-DBPRIMARY03"), and
+   * requiring only an actual alphanumeric neighbor to disqualify a match means a "-"/"_"-glued
+   * compound identifier still matches as a whole token, exactly like a space- or
+   * punctuation-delimited one. Embedded IP/FQDN values minted by `prescanAndMint`'s shape scan are
+   * unaffected by this tightening: they were already matched (and therefore already delimited) as
+   * whole tokens by their own `\b`-anchored regexes before ever reaching this map, so they still
+   * satisfy this boundary check here — this only ever REJECTS matches the previous plain
+   * `split`/`join` wrongly accepted, never one it correctly accepted.
+   *
+   * This now needs a real `RegExp` (to express the boundary condition) instead of the previous
+   * plain `split`/`join` — every value is escaped first via `escapeRegExpLiteral` since values
+   * here are attacker/data-controlled text, never safe to interpolate into a regex source
+   * unescaped. An empty value is skipped outright: an empty pattern's zero-width match would
+   * otherwise insert a pseudonym at every non-alphanumeric-adjacent position in the text.
+   */
   applyToText(text: string): string {
     if (!text || this.valueToPseudonym.size === 0) {
       return text;
@@ -349,10 +378,14 @@ export class Pseudonymizer {
     );
     let out = text;
     for (const value of values) {
-      if (!out.includes(value)) {
+      if (!value || !out.includes(value)) {
         continue;
       }
-      out = out.split(value).join(this.valueToPseudonym.get(value) as string);
+      const pattern = new RegExp(
+        `(?<![A-Za-z0-9])${escapeRegExpLiteral(value)}(?![A-Za-z0-9])`,
+        'g',
+      );
+      out = out.replace(pattern, this.valueToPseudonym.get(value) as string);
     }
     return out;
   }
@@ -764,17 +797,19 @@ export function extractAggFields(
  *   privacy-on-but-message-absent both stay byte-identical to before this existed.
  *
  * `isEscapeHatch`: typed catalog tools only ever expose the ~10 fields curated in
- * `FIELD_POLICY_DEFAULTS`, so "unlisted = allow" was a safe default — but the search_wazuh_data
- * escape hatch's `deriveColumns` can pick ANY finding field into `samples`/`breakdown` (data.win.*,
+ * `FIELD_POLICY_DEFAULTS`, so "unlisted = allow" was a safe default — but search_wazuh_data's
+ * arbitrary DSL can pick ANY finding field into `samples`/`breakdown` (data.win.*,
  * data.office365.*, data.aws.*, syscheck.path, ...), and every one of those was passing through
  * untouched under privacy mode, defeating the guarantee for the one tool built to reach arbitrary
- * fields. When the caller sets `isEscapeHatch: true` (deriveColumns tools only — threaded from
- * `ToolDefinition.deriveColumns` at the executor.ts call site), an UNLISTED string field's default
- * flips from allow to anonymize (kind inferred from the field name, same as an explicit 'anonymize'
- * entry with no `kind`) — fail-closed: pseudonymize anything not explicitly allow-listed. A field
- * explicitly present in the policy (any action, including 'allow') is unaffected either way — this
- * only changes the *default for an absent entry*. Typed tools (the default, `isEscapeHatch` false
- * or omitted) keep today's allow-by-omission behavior exactly.
+ * fields. When the caller sets `isEscapeHatch: true` (threaded from
+ * `ToolDefinition.failClosedFieldPolicy` at the executor.ts call site — issue #8917; NOT the same
+ * as `deriveColumns`, which only controls how columns are computed and is set on tools of very
+ * different risk profiles, see that flag's own doc comment in types.ts), an UNLISTED string
+ * field's default flips from allow to anonymize (kind inferred from the field name, same as an
+ * explicit 'anonymize' entry with no `kind`) — fail-closed: pseudonymize anything not explicitly
+ * allow-listed. A field explicitly present in the policy (any action, including 'allow') is
+ * unaffected either way — this only changes the *default for an absent entry*. Typed tools (the
+ * default, `isEscapeHatch` false or omitted) keep today's allow-by-omission behavior exactly.
  */
 export function applyFieldPolicy(
   digest: Digest,

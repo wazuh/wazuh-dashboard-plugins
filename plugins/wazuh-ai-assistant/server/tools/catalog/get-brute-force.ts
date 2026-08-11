@@ -45,7 +45,10 @@ export const getBruteForceTool: ToolDefinition = {
     description:
       'Searches security findings for brute-force / repeated authentication-failure findings ' +
       `within a time range (MITRE technique T1110 or its rule tags), most recent first. ` +
-      FINDING_SCOPE_NOTE,
+      `${FINDING_SCOPE_NOTE} Reports only that such a finding fired -- it does NOT indicate ` +
+      'whether Wazuh took any automated action (active response, blocking, quarantine) ' +
+      'afterward; no tool covers active-response actions, so say that plainly instead of ' +
+      'inferring one from this finding.',
     parameters: objectSchema({
       limit: limitProperty(
         'Max number of findings to return (default 20, max 500).',
