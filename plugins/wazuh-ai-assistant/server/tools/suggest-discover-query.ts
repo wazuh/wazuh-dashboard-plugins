@@ -1,6 +1,9 @@
 import { RequestHandlerContext, Logger } from '../../../../src/core/server';
 import { ToolSpec } from '../../common/types';
-import { extractTimeRange } from '../../common/discover-url';
+import {
+  extractTimeRange,
+  hasExplicitTimeRange,
+} from '../../common/discover-url';
 import { describeError } from '../../common/errors';
 import { checkIndexAllowlist } from './guardrails';
 
@@ -209,54 +212,149 @@ const FIELD_KEYED_CLAUSES = [
   'range',
 ] as const;
 
-/**
- * Best-effort walk collecting every field name a query clause references, recursing through
- * `bool.{filter,must,should,must_not}` (each of those may be a single clause object or an array of
- * them) and reading `exists.field` directly. Not a full DSL walker (this is a suggestion shown to
- * the user, never executed by this plugin) — anything this misses simply isn't validated and falls
- * through to the strip-to-time-range fallback below if `_field_caps` then reports it unknown, which
- * is the safe direction for a miss to fail in.
- */
-function collectFieldNames(clause: unknown, acc: Set<string>): void {
-  if (Array.isArray(clause)) {
-    for (const entry of clause) {
-      collectFieldNames(entry, acc);
-    }
-    return;
-  }
-  if (!clause || typeof clause !== 'object') {
-    return;
-  }
-  const obj = clause as Record<string, unknown>;
+/** Clause types that carry no field name at all and need none — recognized so a `match_all`
+ * placeholder or an OpenSearch-document-id lookup (`ids`) does not read as "unrecognized". */
+const FIELDLESS_CLAUSES = new Set(['match_all', 'match_none', 'ids']);
 
-  const bool = obj.bool;
-  if (bool && typeof bool === 'object' && !Array.isArray(bool)) {
-    const boolObj = bool as Record<string, unknown>;
-    for (const key of ['filter', 'must', 'should', 'must_not']) {
-      const value = boolObj[key];
-      if (value !== undefined) {
-        collectFieldNames(value, acc);
-      }
-    }
-  }
-
-  const exists = obj.exists;
-  if (exists && typeof exists === 'object' && !Array.isArray(exists)) {
-    const field = (exists as Record<string, unknown>).field;
-    if (typeof field === 'string') {
-      acc.add(field);
-    }
-  }
-
-  for (const clauseType of FIELD_KEYED_CLAUSES) {
-    const value = obj[clauseType];
-    if (value && typeof value === 'object' && !Array.isArray(value)) {
-      for (const fieldName of Object.keys(value as Record<string, unknown>)) {
-        acc.add(fieldName);
-      }
-    }
-  }
+/** What the default-deny clause walk (`analyzeQueryClauses`) found. */
+interface QueryClauseAnalysis {
+  /** Every field name referenced by a RECOGNIZED clause. */
+  fieldNames: Set<string>;
+  /** Every clause-type key the walk does NOT know how to extract field names from. */
+  unrecognizedClauses: string[];
 }
+
+/**
+ * DEFAULT-DENY walk over a suggested query's clauses, recursing through
+ * `bool.{filter,must,should,must_not}` (each may be a single clause object or an array of them),
+ * reading `exists.field` directly and the `FIELD_KEYED_CLAUSES` by their field keys. Any OTHER
+ * clause-type key is reported in `unrecognizedClauses` rather than silently skipped: an earlier
+ * version of this walk was allowlist-only-with-silent-misses, which meant an invented field
+ * inside `query_string`/`multi_match`/`nested`/`constant_score`/... contributed ZERO field names,
+ * resolved as fully verified, and shipped to Discover with an unmodified reason — the exact
+ * silent-divergence class issue #8920 item 9 is about, through the single most likely clause for
+ * a Discover handoff (Discover's own query bar IS a query string). The caller strips-and-
+ * discloses (or asks the model to rewrite) on any unrecognized clause; nothing falls through
+ * unvalidated.
+ */
+function analyzeQueryClauses(clause: unknown): QueryClauseAnalysis {
+  const analysis: QueryClauseAnalysis = {
+    fieldNames: new Set<string>(),
+    unrecognizedClauses: [],
+  };
+  const walk = (node: unknown): void => {
+    if (Array.isArray(node)) {
+      for (const entry of node) {
+        walk(entry);
+      }
+      return;
+    }
+    if (!node || typeof node !== 'object') {
+      return;
+    }
+    const obj = node as Record<string, unknown>;
+    for (const [key, value] of Object.entries(obj)) {
+      if (key === 'bool') {
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+          const boolObj = value as Record<string, unknown>;
+          for (const boolKey of ['filter', 'must', 'should', 'must_not']) {
+            if (boolObj[boolKey] !== undefined) {
+              walk(boolObj[boolKey]);
+            }
+          }
+          // bool's other keys (minimum_should_match, boost, ...) are scalars, not clauses.
+        }
+        continue;
+      }
+      if (key === 'exists') {
+        const field =
+          value && typeof value === 'object' && !Array.isArray(value)
+            ? (value as Record<string, unknown>).field
+            : undefined;
+        if (typeof field === 'string') {
+          analysis.fieldNames.add(field);
+        }
+        continue;
+      }
+      if ((FIELD_KEYED_CLAUSES as readonly string[]).includes(key)) {
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+          for (const fieldName of Object.keys(
+            value as Record<string, unknown>,
+          )) {
+            analysis.fieldNames.add(fieldName);
+          }
+        }
+        continue;
+      }
+      if (FIELDLESS_CLAUSES.has(key)) {
+        continue;
+      }
+      analysis.unrecognizedClauses.push(key);
+    }
+  };
+  walk(clause);
+  return analysis;
+}
+
+/** Dotted tokens in the model's `reason` prose that could be field paths ("wazuh.threat_intel",
+ * "data.win.eventdata.user") — each segment must start with a letter/underscore (so versions,
+ * IPs and "e.g."-style abbreviations under 6 chars never match), and only tokens `_field_caps`
+ * then confirms as REAL index fields are treated as promised filters. See `resolveSuggestedDsl`:
+ * a reason that names a real field the DSL does not filter on is the issue's literal witness
+ * ("the field named in the prose was not filtered on at all"). */
+const REASON_FIELD_TOKEN_RE = /\b[A-Za-z_@][\w@]*(?:\.[A-Za-z_][\w]*)+\b/g;
+
+function extractReasonFieldTokens(reason: string): string[] {
+  const tokens = reason.match(REASON_FIELD_TOKEN_RE) ?? [];
+  return [...new Set(tokens.filter(token => token.length >= 6))];
+}
+
+/**
+ * What `resolveSuggestedDsl` found out about a `suggest_discover_query` call's DSL, as a
+ * discriminated result rather than bare DSL (issue #8920 items 4/9): the caller (chat.ts) needs to
+ * know WHICH kind of "could not fully verify" happened, because the two are handled differently --
+ * `unknown_fields` names field(s) the MODEL chose and can plausibly correct (a bounded
+ * self-correction retry, same contract as every other tool), whereas `unverifiable_index` and
+ * `no_field_filters` are not the model's fault to fix by retrying with different field names.
+ * `strippedDsl` (present on both non-`verified`, non-`no_field_filters` outcomes) is the same
+ * index+time-range-only fallback the old bare-DSL return silently produced -- now paired with
+ * enough information for the caller to also disclose the strip to the user, per this file's SAFETY
+ * DECISION below.
+ */
+export type SuggestedDslResolution =
+  | {
+      outcome: 'verified';
+      dsl: Record<string, unknown>;
+      /** Real index fields the model's `reason` prose names but the DSL does not filter on —
+       * the issue's literal witness shape when the MODEL authored the divergence (see
+       * `extractReasonFieldTokens`). chat.ts appends a disclosure when non-empty. */
+      reasonFieldsNotFiltered: string[];
+    }
+  | {
+      outcome: 'no_field_filters';
+      dsl: Record<string, unknown>;
+      reasonFieldsNotFiltered: string[];
+    }
+  | {
+      outcome: 'unknown_fields';
+      unknownFields: string[];
+      strippedDsl: Record<string, unknown>;
+      /** True when the model's DSL carried no readable timestamp range, so `strippedDsl` opens
+       * the DEFAULT 24h window rather than a window the model chose — chat.ts's disclosure must
+       * say so, or the strip silently replaces the promised window too. */
+      timeRangeDefaulted: boolean;
+    }
+  | {
+      outcome: 'unsupported_clauses';
+      clauses: string[];
+      strippedDsl: Record<string, unknown>;
+      timeRangeDefaulted: boolean;
+    }
+  | {
+      outcome: 'unverifiable_index';
+      strippedDsl: Record<string, unknown>;
+      timeRangeDefaulted: boolean;
+    };
 
 /**
  * Resolves what DSL a `suggest_discover_query` call's Discover link should actually carry.
@@ -281,33 +379,78 @@ export async function resolveSuggestedDsl(
   index: string,
   dsl: Record<string, unknown>,
   logger: Logger,
-): Promise<Record<string, unknown>> {
+  reason = '',
+): Promise<SuggestedDslResolution> {
   const timeRangeOnlyDsl = buildTimeRangeOnlyDsl(index, dsl);
+  const timeRangeDefaulted = !hasExplicitTimeRange(dsl);
+  const analysis = analyzeQueryClauses(dsl);
+  // The timestamp field itself does not count as a "field-level filter" for strip/no-strip
+  // decisions: `buildTimeRangeOnlyDsl` re-emits (a normalized form of) the range anyway, so a
+  // range-only suggestion on an unverifiable index loses NOTHING and must not be told it did —
+  // that false disclosure fired on the tool's PRIMARY documented use case (a blocked index).
+  const nonTimeFieldNames = [...analysis.fieldNames].filter(
+    name => name !== '@timestamp' && name !== 'timestamp',
+  );
+  const reasonTokens = extractReasonFieldTokens(reason);
 
   const allowlistCheck = checkIndexAllowlist(index);
   if (!allowlistCheck.ok) {
+    if (
+      nonTimeFieldNames.length === 0 &&
+      analysis.unrecognizedClauses.length === 0
+    ) {
+      // Nothing field-level to lose: emit the normalized range-only DSL with NO strip
+      // disclosure. (The reason-vs-DSL check is skipped here — the index is out of reach for
+      // `_field_caps`, so a reason token cannot be confirmed as a real field; documented
+      // residual.)
+      return {
+        outcome: 'no_field_filters',
+        dsl: timeRangeOnlyDsl,
+        reasonFieldsNotFiltered: [],
+      };
+    }
     logger.debug(
       `wazuhAiAssistant: suggest_discover_query targets index "${index}", outside the executor's ` +
         'allowlist, so its field names cannot be verified via _field_caps -- stripping the ' +
         'suggested query to index + time range only rather than widening the allowlist for a ' +
         "metadata read (see suggest-discover-query.ts's resolveSuggestedDsl doc comment).",
     );
-    return timeRangeOnlyDsl;
+    return {
+      outcome: 'unverifiable_index',
+      strippedDsl: timeRangeOnlyDsl,
+      timeRangeDefaulted,
+    };
   }
 
-  const fieldNames = new Set<string>();
-  collectFieldNames(dsl, fieldNames);
-  if (fieldNames.size === 0) {
-    // Nothing field-level to verify (e.g. the model already only asked for a time range) -- the
-    // original clause is already the same shape resolveSuggestedDsl would otherwise strip TO.
-    return dsl;
+  if (analysis.unrecognizedClauses.length > 0) {
+    // DEFAULT-DENY (see analyzeQueryClauses): a clause type this walk cannot extract field names
+    // from (query_string, multi_match, nested, ...) must never ship unvalidated — chat.ts gives
+    // the model one bounded rewrite, then strips-and-discloses.
+    return {
+      outcome: 'unsupported_clauses',
+      clauses: [...new Set(analysis.unrecognizedClauses)],
+      strippedDsl: timeRangeOnlyDsl,
+      timeRangeDefaulted,
+    };
+  }
+
+  if (nonTimeFieldNames.length === 0 && reasonTokens.length === 0) {
+    // Nothing field-level to verify and no field promises in the prose — the original clause is
+    // already the same shape resolveSuggestedDsl would otherwise strip TO.
+    return { outcome: 'no_field_filters', dsl, reasonFieldsNotFiltered: [] };
   }
 
   try {
+    // One `_field_caps` covers both checks: the DSL's own field names AND the reason prose's
+    // candidate tokens (issue #8920 item 9's "validated against its own reason text" half —
+    // only a token that IS a real index field counts as a promised filter).
+    const fieldsToCheck = [
+      ...new Set([...analysis.fieldNames, ...reasonTokens]),
+    ];
     const response =
       await context.core.opensearch.client.asCurrentUser.fieldCaps({
         index,
-        fields: [...fieldNames].join(','),
+        fields: fieldsToCheck.join(','),
       });
     const knownFields = new Set(
       Object.keys(
@@ -315,15 +458,40 @@ export async function resolveSuggestedDsl(
           ?.fields ?? {},
       ),
     );
-    const allKnown = [...fieldNames].every(name => knownFields.has(name));
-    return allKnown ? dsl : timeRangeOnlyDsl;
+    const unknownFields = nonTimeFieldNames.filter(
+      name => !knownFields.has(name),
+    );
+    if (unknownFields.length > 0) {
+      return {
+        outcome: 'unknown_fields',
+        unknownFields,
+        strippedDsl: timeRangeOnlyDsl,
+        timeRangeDefaulted,
+      };
+    }
+    const reasonFieldsNotFiltered = reasonTokens.filter(
+      token => knownFields.has(token) && !analysis.fieldNames.has(token),
+    );
+    if (nonTimeFieldNames.length === 0) {
+      return { outcome: 'no_field_filters', dsl, reasonFieldsNotFiltered };
+    }
+    return { outcome: 'verified', dsl, reasonFieldsNotFiltered };
   } catch (error) {
+    // Same "cannot verify, so strip" treatment as the allowlist-blocked branch above: a
+    // `_field_caps` transport/cluster failure is just as unverifiable as an out-of-reach index, and
+    // just as much NOT the model's fault to fix by retrying with different field names -- so it is
+    // folded into `unverifiable_index` (the non-retryable outcome) rather than given a separate
+    // outcome.
     logger.debug(
       `wazuhAiAssistant: suggest_discover_query's _field_caps check failed for index "${index}" ` +
         `(${describeError(
           error,
         )}) -- stripping the suggested query to index + time range only.`,
     );
-    return timeRangeOnlyDsl;
+    return {
+      outcome: 'unverifiable_index',
+      strippedDsl: timeRangeOnlyDsl,
+      timeRangeDefaulted,
+    };
   }
 }

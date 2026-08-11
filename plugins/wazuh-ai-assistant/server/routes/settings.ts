@@ -845,6 +845,10 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
 
   const fieldPolicyActionSchema = schema.oneOf([
     schema.literal('allow'),
+    // #8912: value passes, but is first run through the shape scan (IPs/FQDNs) AND a
+    // known-entity dictionary scan (already-minted real values) — see privacy.ts's
+    // `FieldPolicyAction` doc comment and `scrubKnownEntities`.
+    schema.literal('allow-scan'),
     schema.literal('anonymize'),
     schema.literal('never'),
   ]);

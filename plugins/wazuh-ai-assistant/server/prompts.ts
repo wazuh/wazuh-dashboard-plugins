@@ -1,3 +1,20 @@
+import { listToolDefinitions } from './tools/registry';
+
+/**
+ * The full catalog's tool names, one compact registry-DERIVED line (issue #8920 item 4's
+ * unrouted-tool half): the per-turn tool list is a routed SUBSET, and the model has repeatedly
+ * concluded "the product cannot check X" for capabilities that simply were not offered that turn
+ * (the issue's headline witness: "CIS compliance checks are not covered by the current tools",
+ * while get_sca_results existed and answered the very next question). A generated list is the
+ * only mechanism that can be held registry-wide by a test (prompts.test.ts asserts every
+ * registered tool name appears here), unlike a hand-written sentence that silently rots as
+ * tools are added. Computed once at module load — the registry is static for the process
+ * lifetime. NOTE: like every prompt line, delivery is guaranteed but obedience is not (#8913).
+ */
+const CAPABILITY_INVENTORY = listToolDefinitions()
+  .map(def => def.spec.name)
+  .join(', ');
+
 /**
  * System prompt for the orchestration loop. Deliberately short:
  * tool schemas already carry the per-tool detail, and every provider pays for this prompt's
@@ -56,7 +73,42 @@ export function buildSystemPrompt(nowIso: string): string {
     'If no tool matches the question exactly, try search_wazuh_data with a minimal, correct ' +
       'query; if you cannot express it within its rules, say plainly what you can and cannot ' +
       'check with the available tools — never silently answer a narrower question than the one ' +
-      'asked.',
+      'asked. The tools offered to you on any given turn are a routed subset of this full ' +
+      `catalog: ${CAPABILITY_INVENTORY}.`,
+    // Issue #8920 item 4 overshot here: an earlier wording made "no tool was offered" and "a
+    // real gap" both collapse to "say you cannot check it", which pushed the model to deny a
+    // capability it could not actually verify was missing. The fix gives it a concrete test it
+    // CAN run: a failed call or an unoffered tool proves nothing about the product (it cannot
+    // see that tool's schema, so it cannot know the schema lacks the data); only a tool it CAN
+    // see this turn, whose own schema has no matching option, is evidence worth stating.
+    'Never present a failed tool call, or a tool that was not offered this turn, as a ' +
+      'missing product capability — you cannot see the parameters of an unoffered tool, so ' +
+      'you cannot know it lacks the data either; say what you could not check on this turn ' +
+      'instead, and offer the Discover handoff. The exception is a REAL, VERIFIABLE gap, ' +
+      'never a guess: a limitation stated plainly in these instructions (e.g. the absence of ' +
+      'a solved-vulnerabilities history), or a tool that WAS offered to you this turn whose ' +
+      'own schema — an enum, a documented field list, visible right now — has no option for ' +
+      'the data asked about. State only one of those two plainly as a fact about the ' +
+      'product; a failed call or an unoffered tool never qualifies.',
+    // Issue #8920 item 6's verbatim-identifier rule (below) originally read as absolute, which
+    // put it at odds with tool behavior this same product deliberately ships: get-vulnerability-
+    // by-cve.ts matches a CVE id case-insensitively, and technique-rollup.ts/get-mitre-findings.ts
+    // case-normalize a technique id AND roll a bare parent id up to its sub-techniques (a "T1059"
+    // search is documented to also return "T1059.001" rows). None of that is the MODEL rewriting
+    // an identifier -- the model still passes the id exactly as given; the tool's own query
+    // construction matches more broadly on that same id. The rule below is scoped to what it was
+    // actually written to stop: the model silently swapping in a different identifier (the
+    // reported case: "wazuh-aio-05" answered with "wazuh-aio-5" data) before ever calling a tool.
+    'Never rewrite, correct, or substitute a user-supplied identifier (agent name, CVE id, ' +
+      'technique id) before calling a tool — pass it exactly as the user wrote it as the tool ' +
+      'call argument. That is separate from what the tool does with the value afterward: ' +
+      'get_vulnerability_by_cve matches a CVE id case-insensitively, and a bare parent ' +
+      'technique id (e.g. "T1059") is documented to also match its sub-techniques (e.g. ' +
+      '"T1059.001") — report every row a tool like that actually returns, since that is the ' +
+      'tool matching more broadly on the id you gave it, not you substituting a different ' +
+      'one. If a tool call for the identifier exactly as given returns no match at all, ' +
+      'report that verbatim identifier as unmatched — never quietly swap in a different one ' +
+      '(e.g. a corrected or renumbered agent name) and answer for it instead.',
     'Some questions have NO tool that can answer them at all, no matter how closely a tool name ' +
       'or a piece of data resembles the topic: whether Wazuh took an automated action (active ' +
       'response, blocking, quarantine) in reply to something; agent communication-channel health ' +
@@ -89,6 +141,48 @@ export function buildSystemPrompt(nowIso: string): string {
       'include those fields in the "_source" list or your result will not contain them.',
     'get_sca_checks needs a policy_id from get_sca_results first; use result="failed" for ' +
       '"which checks fail" questions.',
+    // #8913: a bare deictic reference to the host ("this box/host/machine/server/system") with no
+    // agent named earlier in the conversation left the model asking the user for an agent id
+    // instead of resolving it. get_agent_inventory now resolves this itself, server-side (its
+    // `resolveParams` hook, tools/catalog/get-agent-inventory.ts) whenever it is called with
+    // neither agent_id nor agent_name -- so for THAT tool the right instruction is "call it
+    // directly", not "look the agent up first". A live diagnostic run (branch
+    // diag/8913-router-logging, never shipped) proved stage-1 routing was never the problem --
+    // get_agent_inventory was offered in 5/5 runs of the issue's own worked example ("What
+    // software does this box have installed?") -- but THIS instruction's prior wording told the
+    // model to "call get_agents first", a DIFFERENT tool that the router only offers under the
+    // separate 'agents' category, which stage-1 has no reason to also pick for an inventory-only
+    // question. The model could not obey an instruction naming a tool it had not been given and
+    // fell back to asking the user or improvising with search_wazuh_data -- 0/5 calls to either
+    // get_agents or get_agent_inventory, on that exact worked example, with this exact
+    // (pre-fix) wording in place. No OTHER agent-scoped tool in the catalog has this server-side
+    // resolution (only get_agent_inventory implements `resolveParams`), so the get-agents-first
+    // instruction further below is still needed for every other tool -- BUT (follow-up audit,
+    // never independently reproduced live, caught by inspection before it repeated the same
+    // mistake) it must not repeat the exact bug this whole fix exists for: telling the model to
+    // call a tool the router may not have offered THIS turn. get_agents is its own 'agents'
+    // category; a question that deictically names the host for some OTHER agent-scoped tool
+    // (e.g. "what vulnerabilities does this box have") plausibly routes to that tool's own
+    // category alone (e.g. 'vulnerabilities'), not 'agents' -- so "call get_agents first" can be
+    // just as unreachable here as it was for get_agent_inventory. Made conditional on the tool
+    // actually being available this turn instead of unconditional.
+    'If the user asks about installed software/packages, OS details, open ports, running ' +
+      'processes, or hotfixes for the host deictically ("this box", "this host", "this ' +
+      'machine", "this server", "this system") with no agent named or numbered earlier in the ' +
+      'conversation, call get_agent_inventory directly WITHOUT agent_id or agent_name -- do NOT ' +
+      'call get_agents first for this case. It resolves to the only active agent automatically ' +
+      'and tells you which one it assumed; state that assumption in your answer. If it instead ' +
+      'reports more than one active agent, list the candidates it gives you and ask the user ' +
+      'which one they mean -- never guess among several.',
+    'For any OTHER deictic reference to the host ("this box"/"this host"/"this machine"/"this ' +
+      'server"/"this system") with a tool BESIDES get_agent_inventory that needs an agent_id, ' +
+      'and no agent has been named or numbered earlier in the conversation: if get_agents is ' +
+      'among the tools available to you this turn, call it first. If exactly one ACTIVE agent ' +
+      'exists, proceed with it and state that assumption in your answer (e.g. "Assuming you ' +
+      'mean agent 003 (web-prod-01), the only active agent"). If more than one active agent ' +
+      'exists, do not guess: briefly list the candidates (id and name) and ask the user which ' +
+      'one they mean. If get_agents is NOT among the tools available to you this turn, do not ' +
+      'try to call it -- ask the user which agent they mean instead.',
     'For "how many DISTINCT X" questions (e.g. distinct hosts/agents affected), a plain hit count ' +
       '(hits.total) overcounts when the same host appears in multiple documents -- it is NOT a ' +
       'distinct count. Use search_wazuh_data with a "cardinality" aggregation on an allowlisted ' +

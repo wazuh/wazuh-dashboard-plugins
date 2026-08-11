@@ -54,6 +54,85 @@ import {
   validateSuggestDiscoverQueryArgs,
 } from '../tools/suggest-discover-query';
 
+/**
+ * CAPABILITY-DENIAL GUARD, deterministic half (issue #8920 item 4/9 -- see prompts.ts's
+ * buildSystemPrompt for the UNGUARANTEED prompt-level half of this same guard). A failed tool call
+ * is just a `role:'tool'` message the model reads like any other -- nothing stops it from
+ * misreading "this call failed" as "Wazuh/this assistant cannot do this at all", and that
+ * conclusion is wrong far more often than not (a bad argument, a guardrail rejection, a transient
+ * error are all correctable-or-retryable, not evidence of a missing capability). This fixed
+ * sentence is appended to the RESULT itself, at the exact moment a failure enters the model's
+ * context -- a locality no system prompt can give, since the prompt is written once per turn and
+ * this fires per failed call. It is delivery, not obedience: whether the model actually follows the
+ * instruction remains model-side and is NOT guaranteed by this code.
+ */
+export const CAPABILITY_DENIAL_NOTE =
+  'This is a failed query or tool call, not evidence of a missing product capability. Do not ' +
+  'tell the user the product or its tools cannot provide something because of this failure -- ' +
+  'correct the call, try another tool, or use suggest_discover_query.';
+
+/**
+ * Applies CAPABILITY_DENIAL_NOTE to any tool-result content shaped like `{error: string, ...}` --
+ * a no-op for anything else (a successful digest, the suggest_discover_query "shown"
+ * acknowledgment, unparseable content). Kept as ONE shape-driven helper rather than a per-branch
+ * decision so every current and future tool-result error inherits the note automatically,
+ * regardless of which of validation/guardrail-rejection/execution-failure produced it -- they all
+ * resolve to this same `{error}` shape before reaching here (see executor.ts's `executeToolCall`
+ * doc comment: "never throws... resolves to a toolErrorContent string").
+ */
+export function augmentToolError(content: string): string {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    return content;
+  }
+  if (
+    !parsed ||
+    typeof parsed !== 'object' ||
+    Array.isArray(parsed) ||
+    typeof (parsed as Record<string, unknown>).error !== 'string'
+  ) {
+    return content;
+  }
+  return JSON.stringify({
+    ...(parsed as Record<string, unknown>),
+    note: CAPABILITY_DENIAL_NOTE,
+  });
+}
+
+/** Server-appended when a `suggested_query` event's DSL lost field-level filters relative to what
+ * the model asked to show (an unverifiable index, a failed `_field_caps` check, or a second
+ * unknown-fields failure this turn -- see `resolveSuggestedDsl`'s `SuggestedDslResolution`).
+ * Closes the "prose promises a field filter, DSL carries only @timestamp" dishonesty (issue #8920
+ * item 9): the emitted `reason` must NEVER silently diverge from what the emitted `dsl` actually
+ * contains, so whenever the strip happens, the reason ALWAYS says so, deterministically -- this is
+ * not a prompt instruction the model could omit. */
+const SUGGESTED_QUERY_FIELDS_STRIPPED_DISCLOSURE =
+  ' (Note: the suggested field filters could not be verified against this index, so the link ' +
+  'opens with a time-range-only query.)';
+
+/** Appended IN ADDITION to the strip disclosure when the model's DSL carried no readable time
+ * range either, so the stripped link opens the DEFAULT 24-hour window rather than a window the
+ * model chose — without this, the tool's own primary use case ("a time range beyond the 90-day
+ * maximum") could promise a long window while the link silently opens 24 hours. */
+const SUGGESTED_QUERY_WINDOW_DEFAULTED_DISCLOSURE =
+  ' (The suggested time window could not be read either, so the link opens the last 24 hours — ' +
+  'adjust the time picker in Discover.)';
+
+/** Appended when the model's `reason` prose names REAL index fields its own DSL never filters on
+ * (resolveSuggestedDsl's `reasonFieldsNotFiltered`) — the reason and the link must never silently
+ * promise different things, issue #8920 item 9's literal witness ("the field named in the prose
+ * was not filtered on at all"), covered here for the MODEL-authored case that no strip ever
+ * touches. */
+function suggestedQueryReasonMismatchDisclosure(fields: string[]): string {
+  return (
+    ` (Note: the linked query does not itself filter on ${fields.join(
+      ', ',
+    )} — it opens a ` + 'broader view; narrow it in Discover.)'
+  );
+}
+
 interface StoredProviderAttributes {
   name: string;
   type: ProviderConfig['type'];
@@ -62,8 +141,11 @@ interface StoredProviderAttributes {
   apiKey?: string;
 }
 
-/** Bounded tool rounds per turn; a final no-tools round follows to close out the answer. */
-const MAX_TOOL_ROUNDS = 3;
+/** Bounded tool rounds per turn; a final no-tools round follows to close out the answer.
+ * Exported so tests can derive round-budget-dependent scripts from it (see
+ * chat-capability-honesty.test.ts's last-tool-bearing-round test) instead of hardcoding the
+ * round count, which would silently start testing a different round on any budget change. */
+export const MAX_TOOL_ROUNDS = 3;
 
 /**
  * Fallback narration for a turn that used at least one tool but whose model never emitted any
@@ -150,6 +232,29 @@ export function withFinalRoundAnswerInstruction(
     ...messages,
     { role: 'system', content: FINAL_ROUND_ANSWER_INSTRUCTION },
   ];
+}
+
+/**
+ * Issue #8911: a tool round that produced only rejected/errored calls (no successful digest/table)
+ * is, for round-budget purposes, indistinguishable from a productive one — the loop below just
+ * keeps decrementing the same `MAX_TOOL_ROUNDS` budget either way. When the model is stuck
+ * re-guessing a query shape that can never succeed (e.g. an invented field name field-validation.ts
+ * keeps rejecting), that burns the remaining rounds on doomed retries instead of leaving one for the
+ * final answer. This decides whether the round just finished should make the NEXT round the final
+ * one early — exported (and kept pure, same reasoning as `withFinalRoundAnswerInstruction` above)
+ * so the decision is testable without standing up a fake `orchestrate` run.
+ *
+ * Gated on `hadSuccessfulRoundEarlier`: a first-round total failure keeps its normal retry budget,
+ * since the model may legitimately fix its own call (a genuine typo, a first attempt at the escape
+ * hatch) — only once at least one EARLIER round in the same turn already succeeded is a further
+ * fully-rejected round treated as the model being stuck rather than still converging.
+ */
+export function shouldEnterFinalRoundEarly(
+  roundHadToolCalls: boolean,
+  roundHadSuccess: boolean,
+  hadSuccessfulRoundEarlier: boolean,
+): boolean {
+  return roundHadToolCalls && !roundHadSuccess && hadSuccessfulRoundEarlier;
 }
 
 /** Picks which of the three no-text fallbacks above fits a turn that ended without any `delta`
@@ -841,7 +946,10 @@ export async function* runStage1Routing(
  * run through a `MarkdownTableSuppressor` — before that, there is nothing on-screen yet for a
  * hand-built table to duplicate.
  */
-async function* orchestrate(
+// Exported for unit testing only (chat-capability-honesty.test.ts drives it directly with a fake
+// adapter, same pattern as `runStage1Routing`'s own test) -- not part of this route's HTTP
+// contract.
+export async function* orchestrate(
   adapter: ProviderAdapter,
   providerConfig: ProviderConfig,
   initialMessages: ChatMessage[],
@@ -865,6 +973,19 @@ async function* orchestrate(
   // 02-read-reasoning-delta.md), and it deserves a sentence, not a silently empty bubble.
   let sawAnyDelta = false;
   let toolUsedThisTurn = false;
+  // Bounds the suggest_discover_query self-correction loop to ONE retry per turn (issue #8920 item
+  // 9): the first `unknown_fields` resolution this turn is returned as a tool error instead of a
+  // `suggested_query` event, so the model gets one chance to rewrite the call with real field names
+  // -- see the `SUGGEST_DISCOVER_QUERY_TOOL.name` branch below. A SECOND `unknown_fields` this turn
+  // falls through to the stripped-DSL-plus-disclosure path instead of erroring again: the round
+  // budget (MAX_TOOL_ROUNDS) is what actually bounds the loop from spinning forever, but this flag
+  // stops it from burning more than one of those rounds on the same self-correction.
+  let suggestDiscoverUnknownFieldsRetried = false;
+  // Issue #8911: whole-turn tracking for `shouldEnterFinalRoundEarly` above — `true` once any EARLIER
+  // round in this turn had at least one successful (non-rejected/non-errored) tool call, and set
+  // when the round loop below should make its NEXT iteration the final round early.
+  let hadSuccessfulRoundEarlier = false;
+  let forceFinalRoundEarly = false;
   // Sum of every provider call's `usage` THIS TURN — the stage-1 routing call (if the router ran)
   // plus every round of the loop below, INCLUDING non-final rounds whose `done` is otherwise
   // suppressed (see the round loop's `if (sawToolCall) { break; }`). Without this, only the last
@@ -933,7 +1054,10 @@ async function* orchestrate(
       return;
     }
 
-    const isFinalRound = round === MAX_TOOL_ROUNDS;
+    // Issue #8911: `forceFinalRoundEarly` (set at the end of the PREVIOUS round below) short-circuits
+    // the normal `round === MAX_TOOL_ROUNDS` budget check once a fully-rejected round has already
+    // followed an earlier successful one this turn — see `shouldEnterFinalRoundEarly`'s doc comment.
+    const isFinalRound = round === MAX_TOOL_ROUNDS || forceFinalRoundEarly;
     // Final round: omit `tools` entirely rather than send `{tools, toolChoice: 'none'}`. That hint
     // depends on the model complying with it — Groq's own docs warn some models call a tool anyway
     // and the API then 400s ("Tool choice is none, but model called a tool"), observed on
@@ -1016,6 +1140,14 @@ async function* orchestrate(
 
     let sawToolCall = false;
     let ended = false;
+    // Issue #8911: round-scoped (reset every round, unlike the whole-turn flags above) — feeds
+    // `shouldEnterFinalRoundEarly` once this round finishes. `roundHadRealToolCall` covers only the
+    // real data-tool path below (the one that also sets `toolUsedThisTurn`), deliberately excluding
+    // the `SUGGEST_DISCOVER_QUERY_TOOL` handoff — that tool is never rejected by field-validation and
+    // never produces a `tableEvent` by design, so counting it here would misread its normal success
+    // as a "fully rejected round".
+    let roundHadRealToolCall = false;
+    let roundHadSuccessfulToolCall = false;
 
     // eslint-disable-next-line no-await-in-loop -- provider events must be consumed strictly in stream order
     for await (const event of adapter.chatStream(
@@ -1081,25 +1213,114 @@ async function* orchestrate(
             // why its call was rejected and can retry with corrected arguments.
             toolResultContent = JSON.stringify({ error: validation.reason });
           } else {
-            const resolvedDsl = await resolveSuggestedDsl(
+            const resolution = await resolveSuggestedDsl(
               context,
               validation.index,
               validation.dsl,
               logger,
+              validation.reason,
             );
-            yield {
-              type: 'suggested_query',
-              index: validation.index,
-              dsl: resolvedDsl,
-              reason: validation.reason,
-            };
-            toolResultContent = JSON.stringify({
-              shown: true,
-              note:
-                'The suggested query was shown to the user as an "Open in Discover" link. Now ' +
-                'tell the user plainly, in your own words, what you could not check and why — do ' +
-                'not repeat the query itself, the link already shows it.',
-            });
+
+            // ROUND-AWARE retry gate: converting a correctable resolution into a tool error only
+            // helps if a FUTURE tool-bearing round exists to retry in. On the last tool-bearing
+            // round (round === MAX_TOOL_ROUNDS - 1) the next round offers no tools at all, so an
+            // error here would destroy the handoff entirely (a regression against base, which
+            // always showed the stripped link) — fall through to strip-plus-disclose instead.
+            const retryRoundAvailable = round < MAX_TOOL_ROUNDS - 1;
+
+            if (
+              (resolution.outcome === 'unknown_fields' ||
+                resolution.outcome === 'unsupported_clauses') &&
+              !suggestDiscoverUnknownFieldsRetried &&
+              retryRoundAvailable
+            ) {
+              // First unknown-fields failure this turn (issue #8920 item 9): do NOT show the
+              // suggestion at all -- an invented field name is the MODEL's mistake, and unlike
+              // `unverifiable_index` it is plausibly correctable, so this is a bounded
+              // self-correction tool error instead, same contract as every other tool. Bounded to
+              // ONE retry via `suggestDiscoverUnknownFieldsRetried`: a SECOND unknown-fields
+              // resolution this turn falls through to the `else` below instead of erroring again.
+              suggestDiscoverUnknownFieldsRetried = true;
+              toolResultContent = JSON.stringify({
+                error:
+                  resolution.outcome === 'unknown_fields'
+                    ? 'The suggested query references field(s) that do not exist on ' +
+                      `${validation.index}: ${resolution.unknownFields.join(
+                        ', ',
+                      )}. Rewrite the ` +
+                      'suggestion with fields that exist there, or describe the limitation ' +
+                      'without naming a field filter.'
+                    : 'The suggested query uses clause type(s) whose field names cannot be ' +
+                      `verified: ${resolution.clauses.join(
+                        ', ',
+                      )}. Rewrite the suggestion ` +
+                      'using term/terms/match/match_phrase/prefix/range/exists inside a bool ' +
+                      'query.',
+              });
+            } else {
+              // 'verified' | 'no_field_filters' | 'unverifiable_index' | an
+              // 'unknown_fields'/'unsupported_clauses' whose retry was already spent this turn
+              // (or for which no tool-bearing round remains). Whenever the DSL actually shown lost
+              // field-level filters relative to what the model asked to show, the disclosure is
+              // appended to `reason` DETERMINISTICALLY -- the emitted reason must never promise a
+              // filter the emitted DSL does not carry (see
+              // SUGGESTED_QUERY_FIELDS_STRIPPED_DISCLOSURE's doc comment above). Written as an
+              // exhaustive switch (not a ternary on a derived boolean) so TypeScript's
+              // discriminated-union narrowing picks the right DSL field per outcome --
+              // the stripped outcomes have no `.dsl`, and 'verified'/'no_field_filters' have no
+              // `.strippedDsl`.
+              let dsl: Record<string, unknown>;
+              let disclosure: string;
+              switch (resolution.outcome) {
+                case 'verified':
+                case 'no_field_filters':
+                  dsl = resolution.dsl;
+                  // Nothing was stripped — but the model's own prose may still promise a filter
+                  // its own DSL never carried (the issue's literal witness); disclose that.
+                  disclosure =
+                    resolution.reasonFieldsNotFiltered.length > 0
+                      ? suggestedQueryReasonMismatchDisclosure(
+                          resolution.reasonFieldsNotFiltered,
+                        )
+                      : '';
+                  break;
+                case 'unverifiable_index':
+                case 'unknown_fields':
+                case 'unsupported_clauses':
+                  dsl = resolution.strippedDsl;
+                  disclosure =
+                    SUGGESTED_QUERY_FIELDS_STRIPPED_DISCLOSURE +
+                    (resolution.timeRangeDefaulted
+                      ? SUGGESTED_QUERY_WINDOW_DEFAULTED_DISCLOSURE
+                      : '');
+                  break;
+                default: {
+                  // Unreachable: `resolution.outcome` is a closed union and every member is handled
+                  // above. Present because `default-case` is enforced repo-wide, and typed as
+                  // `never` so ADDING an outcome without handling it here fails the build rather
+                  // than silently falling through with an unassigned `dsl`.
+                  const exhaustive: never = resolution;
+                  throw new Error(
+                    `Unhandled suggested-query resolution outcome: ${JSON.stringify(
+                      exhaustive,
+                    )}`,
+                  );
+                }
+              }
+              yield {
+                type: 'suggested_query',
+                index: validation.index,
+                dsl,
+                reason: validation.reason + disclosure,
+              };
+              toolResultContent = JSON.stringify({
+                shown: true,
+                note:
+                  'The suggested query was shown to the user as an "Open in Discover" link. Now ' +
+                  'tell the user plainly, in your own words, what you could not check and why — ' +
+                  'do not repeat the query itself, the link already shows it.',
+              });
+            }
           }
 
           messages = [
@@ -1109,13 +1330,17 @@ async function* orchestrate(
             {
               role: 'tool',
               toolCallId: event.toolCall.id,
-              content: toolResultContent,
+              // CAPABILITY-DENIAL GUARD chokepoint (see augmentToolError's doc comment above): a
+              // no-op for the 'shown:true' acknowledgment, applies the note to either the arg-
+              // validation error or the unknown-fields self-correction error above.
+              content: augmentToolError(toolResultContent),
             },
           ];
           continue;
         }
 
         toolUsedThisTurn = true;
+        roundHadRealToolCall = true;
 
         // Inbound tool args: the model only ever saw pseudonyms, so `event.toolCall.arguments`
         // is pseudonym-form as emitted — reverse it to real values before validation/execution (the
@@ -1158,7 +1383,23 @@ async function* orchestrate(
           };
         }
 
+        // CAPABILITY-DENIAL GUARD chokepoint (see augmentToolError's doc comment above): applied
+        // ONCE here, then reused for BOTH the digest event below and the role:'tool' message --
+        // never the raw `outcome.toolResultContent` -- so the digest a resumed conversation replays
+        // as history is byte-identical to what the model actually saw in THIS turn. This single
+        // call site is what makes the guard "one code path" (this file's own coverage test):
+        // `outcome.toolResultContent` here already carries every real-tool failure mode --
+        // arg-validation rejection, guardrail rejection, and the last-resort execution-crash
+        // fallback right above -- so all three inherit the note without a per-case branch.
+        const toolResultContentForModel = augmentToolError(
+          outcome.toolResultContent,
+        );
+
         if (outcome.tableEvent) {
+          // Issue #8911: only a successful execution ever sets `tableEvent` (every rejection/error
+          // path above returns `toolResultContent` alone) — this is the round's "did anything
+          // actually succeed" signal `shouldEnterFinalRoundEarly` needs below.
+          roundHadSuccessfulToolCall = true;
           yield outcome.tableEvent;
           if (outcome.tableEvent.spec.rows.length > 0) {
             // Table-suppression activation (markdown-table-filter.ts): from this point on in the
@@ -1178,7 +1419,7 @@ async function* orchestrate(
           yield {
             type: 'digest',
             toolCallId: event.toolCall.id,
-            content: outcome.toolResultContent,
+            content: toolResultContentForModel,
           };
         }
 
@@ -1189,7 +1430,7 @@ async function* orchestrate(
           {
             role: 'tool',
             toolCallId: event.toolCall.id,
-            content: outcome.toolResultContent,
+            content: toolResultContentForModel,
           },
         ];
         continue;
@@ -1261,6 +1502,20 @@ async function* orchestrate(
       // happen per the adapter contract) — don't spin forever.
       return;
     }
+
+    // Issue #8911: decide BEFORE folding this round's own success into `hadSuccessfulRoundEarlier`
+    // — the gate is "an EARLIER round already succeeded", not this one.
+    if (
+      shouldEnterFinalRoundEarly(
+        roundHadRealToolCall,
+        roundHadSuccessfulToolCall,
+        hadSuccessfulRoundEarlier,
+      )
+    ) {
+      forceFinalRoundEarly = true;
+    }
+    hadSuccessfulRoundEarlier =
+      hadSuccessfulRoundEarlier || roundHadSuccessfulToolCall;
   }
 
   // Exhausted the round budget and the forced-final (no-tools) round still didn't end cleanly

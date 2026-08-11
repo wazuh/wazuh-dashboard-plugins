@@ -10,8 +10,10 @@ import {
   EuiFieldText,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiBadge,
   EuiFlyout,
   EuiFlyoutBody,
+  EuiFlyoutFooter,
   EuiFlyoutHeader,
   EuiForm,
   EuiFormRow,
@@ -21,6 +23,7 @@ import {
   EuiSelect,
   EuiSpacer,
   EuiText,
+  EuiTextColor,
   EuiTitle,
   EuiToolTip,
 } from '@elastic/eui';
@@ -90,7 +93,9 @@ const PROVIDER_URL_GUIDANCE: Record<
       {
         label: i18n.translate(
           'wazuhAiAssistant.settings.form.baseUrlDocsOpenai',
-          { defaultMessage: 'OpenAI API reference' },
+          {
+            defaultMessage: 'OpenAI API reference',
+          },
         ),
         url: 'https://platform.openai.com/docs/api-reference',
       },
@@ -106,7 +111,9 @@ const PROVIDER_URL_GUIDANCE: Record<
       {
         label: i18n.translate(
           'wazuhAiAssistant.settings.form.baseUrlDocsOllama',
-          { defaultMessage: 'Ollama API reference' },
+          {
+            defaultMessage: 'Ollama API reference',
+          },
         ),
         url: 'https://github.com/ollama/ollama/blob/main/docs/api.md',
       },
@@ -120,7 +127,9 @@ const PROVIDER_URL_GUIDANCE: Record<
       {
         label: i18n.translate(
           'wazuhAiAssistant.settings.form.baseUrlDocsAnthropic',
-          { defaultMessage: 'Anthropic API reference' },
+          {
+            defaultMessage: 'Anthropic API reference',
+          },
         ),
         url: 'https://docs.anthropic.com/en/api/overview',
       },
@@ -144,7 +153,9 @@ const PROVIDER_MODEL_GUIDANCE: Record<
       {
         label: i18n.translate(
           'wazuhAiAssistant.settings.form.modelDocsOpenai',
-          { defaultMessage: 'OpenAI model list' },
+          {
+            defaultMessage: 'OpenAI model list',
+          },
         ),
         url: 'https://platform.openai.com/docs/models',
       },
@@ -157,7 +168,9 @@ const PROVIDER_MODEL_GUIDANCE: Record<
       {
         label: i18n.translate(
           'wazuhAiAssistant.settings.form.modelDocsOllama',
-          { defaultMessage: 'Ollama model library' },
+          {
+            defaultMessage: 'Ollama model library',
+          },
         ),
         url: 'https://ollama.com/library',
       },
@@ -170,13 +183,24 @@ const PROVIDER_MODEL_GUIDANCE: Record<
       {
         label: i18n.translate(
           'wazuhAiAssistant.settings.form.modelDocsAnthropic',
-          { defaultMessage: 'Anthropic model list' },
+          {
+            defaultMessage: 'Anthropic model list',
+          },
         ),
         url: 'https://docs.anthropic.com/en/docs/about-claude/models/overview',
       },
     ],
   },
 };
+
+const RequiredLabel: React.FC<{ label: string }> = ({ label }) => (
+  <>
+    {label}{' '}
+    <EuiTextColor color='danger' component='span' aria-hidden='true'>
+      *
+    </EuiTextColor>
+  </>
+);
 
 const emptyForm: ProviderInput = {
   name: '',
@@ -187,7 +211,7 @@ const emptyForm: ProviderInput = {
 };
 
 function isValidEndpointUrl(value: string): boolean {
-  return /^https?:\/\//i.test(value.trim());
+  return /^https?:\/\/.+/i.test(value.trim());
 }
 
 /** Collapses the (potentially multi-service, for openai_compatible) docs links behind a single
@@ -402,6 +426,32 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
               <EuiSpacer size='m' />
             </>
           )}
+          {!canSave && (
+            <>
+              <EuiCallOut
+                color='warning'
+                iconType='alert'
+                title={i18n.translate(
+                  'wazuhAiAssistant.settings.form.accessWarningTitle',
+                  {
+                    defaultMessage: 'You cannot save this provider right now',
+                  },
+                )}
+              >
+                <p>
+                  {accessMessage ??
+                    i18n.translate(
+                      'wazuhAiAssistant.settings.access.warningFallback',
+                      {
+                        defaultMessage:
+                          'Administrator privileges are required to change AI Assistant settings.',
+                      },
+                    )}
+                </p>
+              </EuiCallOut>
+              <EuiSpacer size='m' />
+            </>
+          )}
           {error && (
             <>
               <EuiCallOut
@@ -419,12 +469,17 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
           <EuiForm component='div'>
             <EuiFormRow
               id='wz-ai-provider-name'
-              label={i18n.translate('wazuhAiAssistant.settings.form.name', {
-                defaultMessage: 'Name',
-              })}
+              label={
+                <RequiredLabel
+                  label={i18n.translate('wazuhAiAssistant.settings.form.name', {
+                    defaultMessage: 'Name',
+                  })}
+                />
+              }
             >
               <EuiFieldText
                 value={form.name}
+                aria-required='true'
                 onChange={event =>
                   setForm({ ...form, name: event.target.value })
                 }
@@ -432,9 +487,13 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
             </EuiFormRow>
             <EuiFormRow
               id='wz-ai-provider-type'
-              label={i18n.translate('wazuhAiAssistant.settings.form.type', {
-                defaultMessage: 'Provider type',
-              })}
+              label={
+                <RequiredLabel
+                  label={i18n.translate('wazuhAiAssistant.settings.form.type', {
+                    defaultMessage: 'Provider type',
+                  })}
+                />
+              }
             >
               <EuiSelect
                 options={PROVIDER_TYPES.map(type => ({
@@ -442,6 +501,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                   text: PROVIDER_TYPE_FORM_LABELS[type],
                 }))}
                 value={form.type}
+                aria-required='true'
                 onChange={event =>
                   setForm({
                     ...form,
@@ -452,9 +512,16 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
             </EuiFormRow>
             <EuiFormRow
               id='wz-ai-provider-base-url'
-              label={i18n.translate('wazuhAiAssistant.settings.form.baseUrl', {
-                defaultMessage: 'Endpoint URL',
-              })}
+              label={
+                <RequiredLabel
+                  label={i18n.translate(
+                    'wazuhAiAssistant.settings.form.baseUrl',
+                    {
+                      defaultMessage: 'Endpoint URL',
+                    },
+                  )}
+                />
+              }
               isInvalid={Boolean(baseUrlError)}
               error={baseUrlError}
               helpText={
@@ -485,7 +552,9 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     )}
                     title={i18n.translate(
                       'wazuhAiAssistant.settings.form.baseUrlDocsTitle',
-                      { defaultMessage: 'API documentation' },
+                      {
+                        defaultMessage: 'API documentation',
+                      },
                     )}
                     docs={urlGuidance.docs}
                     note={urlGuidance.note}
@@ -497,6 +566,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 value={form.baseUrl}
                 placeholder={urlGuidance.placeholder}
                 isInvalid={Boolean(baseUrlError)}
+                aria-required='true'
                 onChange={event => {
                   setForm({ ...form, baseUrl: event.target.value });
                   if (baseUrlError) {
@@ -507,9 +577,16 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
             </EuiFormRow>
             <EuiFormRow
               id='wz-ai-provider-model'
-              label={i18n.translate('wazuhAiAssistant.settings.form.model', {
-                defaultMessage: 'Model',
-              })}
+              label={
+                <RequiredLabel
+                  label={i18n.translate(
+                    'wazuhAiAssistant.settings.form.model',
+                    {
+                      defaultMessage: 'Model',
+                    },
+                  )}
+                />
+              }
               helpText={
                 <>
                   {i18n.translate('wazuhAiAssistant.settings.form.modelHelp', {
@@ -542,11 +619,15 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                   <DocsPopover
                     triggerLabel={i18n.translate(
                       'wazuhAiAssistant.settings.form.modelDocsButton',
-                      { defaultMessage: 'See available models' },
+                      {
+                        defaultMessage: 'See available models',
+                      },
                     )}
                     title={i18n.translate(
                       'wazuhAiAssistant.settings.form.modelDocsTitle',
-                      { defaultMessage: 'Model documentation' },
+                      {
+                        defaultMessage: 'Model documentation',
+                      },
                     )}
                     docs={modelGuidance.docs}
                     note={modelGuidance.note}
@@ -556,6 +637,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
             >
               <EuiFieldText
                 value={form.model}
+                aria-required='true'
                 onChange={event =>
                   setForm({ ...form, model: event.target.value })
                 }
@@ -566,27 +648,43 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
               label={i18n.translate('wazuhAiAssistant.settings.form.apiKey', {
                 defaultMessage: 'API key',
               })}
-              helpText={
-                editingProvider
-                  ? i18n.translate(
-                      'wazuhAiAssistant.settings.form.apiKeyHelpEditing',
+              labelAppend={
+                editingProvider?.hasApiKey ? (
+                  <EuiBadge color='hollow'>
+                    {i18n.translate(
+                      'wazuhAiAssistant.settings.form.apiKeyStoredBadge',
                       {
-                        defaultMessage:
-                          'Leave empty to keep the current key. Optional for endpoints that ' +
-                          "don't require authentication (e.g. a local Ollama server without " +
-                          'auth) — stored encrypted at rest when an encryption key is ' +
-                          'configured.',
+                        defaultMessage: 'Key stored',
                       },
-                    )
-                  : i18n.translate(
-                      'wazuhAiAssistant.settings.form.apiKeyHelpCreate',
+                    )}
+                  </EuiBadge>
+                ) : undefined
+              }
+              helpText={
+                <>
+                  {editingProvider && (
+                    <p>
+                      {i18n.translate(
+                        'wazuhAiAssistant.settings.form.apiKeyHelpLeaveBlank',
+                        {
+                          defaultMessage:
+                            'Leave empty to keep the current key.',
+                        },
+                      )}
+                    </p>
+                  )}
+                  <p>
+                    {i18n.translate(
+                      'wazuhAiAssistant.settings.form.apiKeyHelpOptional',
                       {
                         defaultMessage:
                           "Optional for endpoints that don't require authentication (e.g. a " +
                           'local Ollama server without auth) — stored encrypted at rest when ' +
                           'an encryption key is configured.',
                       },
-                    )
+                    )}
+                  </p>
+                </>
               }
             >
               <EuiFieldPassword
@@ -597,45 +695,49 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 }
               />
             </EuiFormRow>
-            <EuiSpacer size='m' />
-            <EuiFlexGroup gutterSize='s'>
-              <EuiFlexItem grow={false}>
-                <EuiToolTip
-                  content={
-                    !canSave
-                      ? accessMessage
-                      : apiKeyBlockedByEncryption
-                      ? i18n.translate(
-                          'wazuhAiAssistant.settings.form.encryptionRequiredTooltip',
-                          {
-                            defaultMessage:
-                              'An encryption key must be configured before an API key can be saved.',
-                          },
-                        )
-                      : undefined
-                  }
-                >
-                  <EuiButton
-                    onClick={handleSave}
-                    isDisabled={!canSave || apiKeyBlockedByEncryption}
-                    fill
-                  >
-                    {i18n.translate('wazuhAiAssistant.settings.form.save', {
-                      defaultMessage: 'Save',
-                    })}
-                  </EuiButton>
-                </EuiToolTip>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <EuiButtonEmpty onClick={requestClose}>
-                  {i18n.translate('wazuhAiAssistant.settings.form.cancel', {
-                    defaultMessage: 'Cancel',
-                  })}
-                </EuiButtonEmpty>
-              </EuiFlexItem>
-            </EuiFlexGroup>
           </EuiForm>
         </EuiFlyoutBody>
+        <EuiFlyoutFooter>
+          <EuiFlexGroup justifyContent='spaceBetween'>
+            <EuiFlexItem grow={false}>
+              <EuiButtonEmpty onClick={requestClose} flush='left'>
+                {i18n.translate('wazuhAiAssistant.settings.form.cancel', {
+                  defaultMessage: 'Cancel',
+                })}
+              </EuiButtonEmpty>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiToolTip
+                content={
+                  !canSave
+                    ? accessMessage
+                    : apiKeyBlockedByEncryption
+                    ? i18n.translate(
+                        'wazuhAiAssistant.settings.form.encryptionRequiredTooltip',
+                        {
+                          defaultMessage:
+                            'An encryption key must be configured before an API key can be saved.',
+                        },
+                      )
+                    : undefined
+                }
+              >
+                <EuiButton
+                  onClick={handleSave}
+                  isDisabled={!canSave || apiKeyBlockedByEncryption}
+                  fill
+                >
+                  {i18n.translate(
+                    'wazuhAiAssistant.settings.form.saveAndTest',
+                    {
+                      defaultMessage: 'Save & test',
+                    },
+                  )}
+                </EuiButton>
+              </EuiToolTip>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiFlyoutFooter>
       </EuiFlyout>
       {showCloseConfirm && (
         <EuiConfirmModal
