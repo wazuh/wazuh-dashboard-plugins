@@ -63,7 +63,11 @@ export const searchFindingsByAgentTool: ToolDefinition = {
   // `valueFrom: 'name'` since this param is matched as free text against `wazuh.agent.name`
   // (see buildRequest below), not a numeric Manager id.
   soleCandidateParams: [
-    { param: 'agent_name', source: { kind: 'manager-agents' }, valueFrom: 'name' },
+    {
+      param: 'agent_name',
+      source: { kind: 'manager-agents' },
+      valueFrom: 'name',
+    },
   ],
   buildRequest(params) {
     const agentName = requireNonEmptyString(

@@ -168,7 +168,7 @@ test('search_findings_by_agent: agent_name is schema-optional, not required', ()
   );
 });
 
-test('search_findings_by_agent: agent_name\'s description explains server-side resolution on omission', () => {
+test("search_findings_by_agent: agent_name's description explains server-side resolution on omission", () => {
   const schema = searchFindingsByAgentTool.spec.parameters as {
     properties: Record<string, { description?: string }>;
   };

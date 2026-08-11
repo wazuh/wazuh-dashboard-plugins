@@ -22,8 +22,7 @@ export interface ResolvedToolParams {
 }
 
 export type ResolveParamsResult =
-  | { ok: true; resolved: ResolvedToolParams }
-  | { ok: false; reason: string };
+  { ok: true; resolved: ResolvedToolParams } | { ok: false; reason: string };
 
 /**
  * Declarative "this param resolves to whichever value is the sole live candidate" spec (the

@@ -187,7 +187,7 @@ export function buildSystemPrompt(nowIso: string): string {
       'WITHOUT its agent-identifying parameter (agent_id/agent_identifier/agent_name) -- do NOT ' +
       'call get_agents first for these five tools. Each resolves to the only active agent ' +
       'automatically and tells you which one it assumed; state that assumption in your answer. If ' +
-      'a call instead reports more than one active agent (or, for get_sca_checks\'s policy_id, ' +
+      "a call instead reports more than one active agent (or, for get_sca_checks's policy_id, " +
       'more than one policy), list the candidates it gives you and ask the user which one they ' +
       'mean -- never guess among several.',
     'For any OTHER deictic or descriptive reference to a host with a tool BESIDES the five listed ' +

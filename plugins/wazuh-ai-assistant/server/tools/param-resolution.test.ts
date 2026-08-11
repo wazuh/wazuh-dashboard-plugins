@@ -63,7 +63,10 @@ function fakeContext(options: {
       opensearch: {
         client: {
           asCurrentUser: {
-            search: (call: { index: string; body: Record<string, unknown> }) => {
+            search: (call: {
+              index: string;
+              body: Record<string, unknown>;
+            }) => {
               searchCalls.push(call);
               if (options.termsThrows || options.termBuckets === undefined) {
                 throw new Error('simulated Indexer failure');
@@ -94,7 +97,11 @@ function stubTool(
   soleCandidateParams: NonNullable<ToolDefinition['soleCandidateParams']>,
 ): ToolDefinition {
   return {
-    spec: { name: 'stub_tool', description: '', parameters: { type: 'object', properties: {} } },
+    spec: {
+      name: 'stub_tool',
+      description: '',
+      parameters: { type: 'object', properties: {} },
+    },
     target: 'indexer',
     tier: 'T1',
     buildRequest: () => ({ target: 'indexer', index: 'x', body: {} }),
@@ -119,7 +126,11 @@ test('buildGenericResolveParams: a supplied param passes through unchanged, no l
   if (!result.ok) return;
   assert.equal(result.resolved.params.agent_id, '007');
   assert.equal(result.resolved.note, undefined);
-  assert.equal(managerCalls.length, 0, 'no lookup should fire for a supplied param');
+  assert.equal(
+    managerCalls.length,
+    0,
+    'no lookup should fire for a supplied param',
+  );
 });
 
 // --- contract outcome 2: exactly one candidate -> inject + assumptionNote ----------------------
@@ -306,7 +317,7 @@ test('buildGenericResolveParams (indexer-terms): an Indexer failure degrades to 
 
 // --- scopedBy cascade: a later param scopes its lookup on an earlier one's resolved value ------
 
-test('buildGenericResolveParams: scopedBy narrows the second param\'s lookup to the FIRST param\'s resolved value', async () => {
+test("buildGenericResolveParams: scopedBy narrows the second param's lookup to the FIRST param's resolved value", async () => {
   const tool = stubTool([
     { param: 'agent_id', source: { kind: 'manager-agents' } },
     {
@@ -356,7 +367,11 @@ test('buildGenericResolveParams: scopedBy uses a CALLER-supplied earlier param u
   assert.equal(result.ok, true);
   if (!result.ok) return;
   assert.equal(result.resolved.params.agent_id, '042');
-  assert.equal(managerCalls.length, 0, 'agent_id was supplied, no manager-agents lookup');
+  assert.equal(
+    managerCalls.length,
+    0,
+    'agent_id was supplied, no manager-agents lookup',
+  );
   const filter = (searchCalls[0].body.query as { bool: { filter: unknown[] } })
     .bool.filter;
   assert.deepEqual(filter, [{ term: { 'wazuh.agent.id': '042' } }]);
@@ -382,5 +397,9 @@ test('buildGenericResolveParams: a failed FIRST param short-circuits before the 
   });
   const result = await resolve({}, context, fakeRequest);
   assert.equal(result.ok, false);
-  assert.equal(searchCalls.length, 0, 'policy_id lookup must never fire once agent_id fails');
+  assert.equal(
+    searchCalls.length,
+    0,
+    'policy_id lookup must never fire once agent_id fails',
+  );
 });

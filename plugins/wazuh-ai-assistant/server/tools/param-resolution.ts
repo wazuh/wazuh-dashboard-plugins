@@ -2,9 +2,13 @@ import {
   OpenSearchDashboardsRequest,
   RequestHandlerContext,
 } from '../../../../src/core/server';
-import { ResolveParamsResult, SoleCandidateParamSpec, ToolDefinition } from './types';
+import {
+  ResolveParamsResult,
+  SoleCandidateParamSpec,
+  ToolDefinition,
+} from './types';
 import { resolveApiHostId } from './api-host';
-import { applySafetyValves, lintDsl } from './guardrails';
+import { applySafetyValves, checkIndexAllowlist, lintDsl } from './guardrails';
 
 /**
  * Generic sole-candidate parameter resolution (issue: "generic sole-candidate parameter
@@ -31,6 +35,21 @@ import { applySafetyValves, lintDsl } from './guardrails';
  * already-patched) `params` object the params before it left behind -- this is what lets a later
  * param `scopedBy` an earlier one (e.g. `get_sca_checks`'s `policy_id` narrows its own lookup to
  * whichever `agent_id` was supplied or just resolved).
+ *
+ * PRIVACY DECISION, made explicit rather than left implicit: the assumption notes and "which one?"
+ * candidate lists this module returns embed raw agent names (and, for `indexer-terms`, raw field
+ * values) in free text, with no pseudonymization at construction. `executor.ts` awaits
+ * `def.resolveParams(params, context, request)` -- it does not pass its `PrivacyContext` in, so
+ * this generic hook structurally cannot call `privacy.pseudonymizer.pseudonymize(...)` the way
+ * `executor.ts`'s own `appendEntityNearMissHint` does (issue #8920) before a name reaches free
+ * text. This is exact parity with #8913's hand-written `resolveDeicticAgentParams`, which has the
+ * same gap today -- so this change does not introduce a new hole, but it does widen the SAME gap
+ * from one tool/one name to five tools and up to `MAX_LISTED_CANDIDATES` names per failed call.
+ * The net that still applies is `chat.ts`'s best-effort post-hoc `prescanAndMintToolContent` /
+ * `applyToText` pass over the final tool-result text. Threading `PrivacyContext` into
+ * `resolveParams` so this module (and #8913's hook) can pseudonymize at construction, matching
+ * #8920's convention, is tracked as follow-up rather than done here: it is an `executor.ts` change,
+ * which this task was explicitly scoped to avoid.
  */
 
 /** How many named candidates a "which one?" error lists, for either lookup kind -- bounded so a
@@ -144,6 +163,13 @@ export async function lookupManagerAgentsCandidate(
         id: agent.id,
         name: typeof agent.name === 'string' ? agent.name : agent.id,
       }));
+    // A non-string `id` on every fetched agent (malformed Manager response) would otherwise
+    // reach here with an empty `candidates` list and render a malformed "Candidates: , and N
+    // more." -- degrade to the same plain bounded error a lookup failure gets instead of naming
+    // zero candidates.
+    if (candidates.length === 0) {
+      return { kind: 'error' };
+    }
     return { kind: 'many', candidates, total: totalActive };
   } catch {
     return { kind: 'error' };
@@ -160,9 +186,10 @@ export type IndexerTermsLookupResult =
  * Bounded `terms` aggregation enumerator over an arbitrary Indexer field, the `indexer-terms`
  * counterpart to `lookupManagerAgentsCandidate` above -- for a param whose sole-candidate source
  * is an Indexer field rather than the Manager API's agent list (e.g. `get_sca_checks`'s
- * `policy_id`, scoped to one agent's `wazuh-states-sca*` documents). Same safety-valve/lint
- * pipeline `executor.ts`'s own near-miss probe (`appendEntityNearMissHint`) applies to its own
- * hand-built aggregation: `applySafetyValves` then `lintDsl`, both run on the SAME probe body a
+ * `policy_id`, scoped to one agent's `wazuh-states-sca*` documents). Same allowlist/safety-valve/
+ * lint pipeline `executor.ts`'s own `executeIndexerRequest` applies to every real Indexer call:
+ * `checkIndexAllowlist` first (so a future `soleCandidateParams` declaration can never probe an
+ * off-allowlist index), then `applySafetyValves`, then `lintDsl`, all run on the SAME probe body a
  * real tool call would be guardrailed on, so this can never issue a request the catalog's own
  * tools would be rejected for. `size: 0` (no hits, aggregation only) and `LOOKUP_FETCH_SIZE`
  * (bounded, see this file's own constant doc comment) as the terms `size` -- well under
@@ -183,6 +210,10 @@ export async function lookupIndexerTermsCandidate(
   scopeFilter: Record<string, unknown>[],
 ): Promise<IndexerTermsLookupResult> {
   try {
+    const allowlistCheck = checkIndexAllowlist(index);
+    if (!allowlistCheck.ok) {
+      return { kind: 'error' };
+    }
     const probeBody: Record<string, unknown> = {
       query: {
         bool: {
@@ -208,8 +239,7 @@ export async function lookupIndexerTermsCandidate(
     });
     const buckets = (
       response.body as
-        | { aggregations?: { candidates?: { buckets?: unknown } } }
-        | undefined
+        { aggregations?: { candidates?: { buckets?: unknown } } } | undefined
     )?.aggregations?.candidates?.buckets;
     if (!Array.isArray(buckets)) {
       return { kind: 'error' };
@@ -284,6 +314,16 @@ function buildScopeFilter(
  * `params`. Returns `{status: 'skip'}` when the param was already supplied (no lookup at all) so
  * the caller can leave `params`/`note` untouched, `{status: 'resolved', ...}` on a successful
  * single-candidate resolution, or `{status: 'failed', reason}` on every other outcome.
+ *
+ * The passthrough gate below (`typeof existing === 'string' && existing.trim() !== ''`) is
+ * intentionally looser than `get-agent-inventory.ts`'s own `resolveDeicticAgentParams`, which
+ * passes through on the weaker `params.agent_id !== undefined` and lets a caller-supplied empty
+ * string reach its own "required and must be a non-empty string" bounded error. Here an empty
+ * string instead falls through to live resolution, same as an omitted param -- a deliberate,
+ * documented divergence, not an oversight: `schema-validator.ts` rejects any non-string value
+ * before `resolveParams` ever runs, so this gate only ever sees a string or `undefined`, and
+ * treating a blank string as "not supplied" is arguably the more useful behavior for a caller
+ * that emits `''` instead of omitting the key.
  */
 async function resolveOneParam(
   spec: SoleCandidateParamSpec,
@@ -368,13 +408,19 @@ async function resolveOneParam(
     };
   }
   if (result.kind === 'many') {
-    const remaining = result.total - result.candidates.length;
+    // `result.total` is `keys.length` from a bounded terms-agg fetch (LOOKUP_FETCH_SIZE, see this
+    // file's own constant doc comment) -- an observed floor, not a true cardinality. Unlike the
+    // manager-agents branch above (whose `totalActive` comes from the Manager API's own exact
+    // `total_affected_items`), naming an exact "N more" here would assert a remainder this lookup
+    // cannot back: a 500-policy agent and an 11-policy agent both hit the same cap and would both
+    // read "and 1 more". Hedge instead of asserting a count.
+    const hasMore = result.total > result.candidates.length;
     return {
       status: 'failed',
       reason:
         `${boundedErrorFor(spec.param)} (At least ${result.total} distinct values exist, so ` +
         `which one is meant cannot be assumed. Candidates: ${result.candidates.join(', ')}` +
-        `${remaining > 0 ? `, and ${remaining} more` : ''}.)`,
+        `${hasMore ? ', and possibly more' : ''}.)`,
     };
   }
   return { status: 'failed', reason: boundedErrorFor(spec.param) };

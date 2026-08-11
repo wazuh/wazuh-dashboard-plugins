@@ -38,7 +38,7 @@ test('get_vulnerabilities_by_agent: agent_identifier is schema-optional, not req
   );
 });
 
-test('get_vulnerabilities_by_agent: agent_identifier\'s description explains server-side resolution on omission', () => {
+test("get_vulnerabilities_by_agent: agent_identifier's description explains server-side resolution on omission", () => {
   const schema = getVulnerabilitiesByAgentTool.spec.parameters as {
     properties: Record<string, { description?: string }>;
   };

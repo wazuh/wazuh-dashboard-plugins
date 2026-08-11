@@ -126,7 +126,7 @@ test('get_sca_results: agent_id is schema-optional, not required', () => {
   );
 });
 
-test('get_sca_results: agent_id\'s description explains server-side resolution on omission', () => {
+test("get_sca_results: agent_id's description explains server-side resolution on omission", () => {
   const schema = getScaResultsTool.spec.parameters as {
     properties: Record<string, { description?: string }>;
   };

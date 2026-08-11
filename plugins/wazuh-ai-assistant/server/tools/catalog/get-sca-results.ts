@@ -63,7 +63,9 @@ export const getScaResultsTool: ToolDefinition = {
   // 0/40 invocations on deictic SCA/compliance questions ("my auditor wants proof of SSH
   // hardening") -- registry.ts attaches the generic resolver (param-resolution.ts) for this
   // entry, resolving `agent_id` against the Manager API's active-agent list when omitted.
-  soleCandidateParams: [{ param: 'agent_id', source: { kind: 'manager-agents' } }],
+  soleCandidateParams: [
+    { param: 'agent_id', source: { kind: 'manager-agents' } },
+  ],
   buildRequest(params) {
     const agentId = validateAgentId(params.agent_id);
     const limit = clampAggLimit(params.limit, 20);
