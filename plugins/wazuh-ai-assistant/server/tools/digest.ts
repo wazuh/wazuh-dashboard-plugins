@@ -658,16 +658,50 @@ function deriveResultColumns(
   return columns.slice(0, DERIVED_COLUMN_CAP);
 }
 
-/** Last path segment, capitalized (e.g. "wazuh.rule.title" -> "Title"); falls back to the
- * full path when two derived columns share a last segment (e.g. two differently-nested "id"s). */
+/** Segments whose conventional rendering is an acronym rather than a capitalized word (e.g.
+ * "ip" -> "IP", not "Ip") — issue #8921's inconsistent-labels item: a derived column's label must
+ * read like the hand-written labels the static-column tools use (get_vulnerabilities' "CVE"/
+ * "Architecture"), not like a raw field segment with its first letter capitalized. */
+const LABEL_ACRONYMS: Record<string, string> = {
+  ip: 'IP',
+  id: 'ID',
+  os: 'OS',
+  pid: 'PID',
+  cve: 'CVE',
+};
+
+function capitalizeSegment(segment: string): string {
+  return (
+    LABEL_ACRONYMS[segment.toLowerCase()] ??
+    segment.charAt(0).toUpperCase() + segment.slice(1)
+  );
+}
+
+/**
+ * Last path segment, capitalized (e.g. "wazuh.rule.title" -> "Title"). Issue #8921's
+ * inconsistent-labels item: two derived columns sharing a last segment (e.g. get_agent_inventory's
+ * `ports` kind — "source.port" and "destination.port" both end in "port") used to fall back to the
+ * RAW dot-path for BOTH, so a reader saw friendly labels ("State", "Name", "Transport") sitting
+ * next to un-humanized ones ("source.port", "destination.ip", "source.ip") in the same header row.
+ * A collision is disambiguated with the PARENT segment instead ("Source Port"/"Destination Port"),
+ * which stays a real label rather than degrading to the raw path — the raw path remains one hover
+ * away via the column header's `title` tooltip (result-table.tsx), so nothing about the field's
+ * real dot-path name is lost, only demoted from "always visible" to "on demand".
+ */
 function deriveColumnLabel(path: string, allPaths: string[]): string {
-  const lastSegment = path.split('.').pop() ?? path;
-  const label = lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1);
+  const segments = path.split('.');
+  const lastSegment = segments[segments.length - 1] ?? path;
   const isDuplicate = allPaths.some(
     other =>
       other !== path && (other.split('.').pop() ?? other) === lastSegment,
   );
-  return isDuplicate ? path : label;
+  const label = capitalizeSegment(lastSegment);
+  if (!isDuplicate) {
+    return label;
+  }
+  const parentSegment =
+    segments.length > 1 ? segments[segments.length - 2] : undefined;
+  return parentSegment ? `${capitalizeSegment(parentSegment)} ${label}` : label;
 }
 
 /**
