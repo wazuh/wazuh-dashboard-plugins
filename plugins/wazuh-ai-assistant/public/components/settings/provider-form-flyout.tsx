@@ -549,8 +549,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 }))}
                 value={form.type}
                 onChange={event => {
-                  const nextType = event.target
-                    .value as ProviderInput['type'];
+                  const nextType = event.target.value as ProviderInput['type'];
                   setForm(current => {
                     // Prefill Anthropic's base URL the first time the admin switches to that
                     // type, but only while the endpoint field is still empty/untouched — see
@@ -568,7 +567,8 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                       current.type === 'anthropic' &&
                       nextType !== 'anthropic' &&
                       !baseUrlTouched &&
-                      current.baseUrl === PROVIDER_URL_GUIDANCE.anthropic.placeholder;
+                      current.baseUrl ===
+                        PROVIDER_URL_GUIDANCE.anthropic.placeholder;
                     return {
                       ...current,
                       type: nextType,

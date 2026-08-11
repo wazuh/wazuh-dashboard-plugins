@@ -449,9 +449,7 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
       target: { value: 'gsk_totally-valid-groq-key' },
     });
 
-    expect(
-      screen.queryByText(/doesn't look like/i),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/doesn't look like/i)).not.toBeInTheDocument();
   });
 
   it('clears an untouched Anthropic prefill when switching to another type', () => {
