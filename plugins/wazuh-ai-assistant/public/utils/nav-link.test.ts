@@ -19,8 +19,8 @@ test('the classic-navigation category is the shared Home id, not a dedicated AI 
   assert.equal(
     WAZUH_HOME_CATEGORY_ID,
     'wz-category-home',
-    'must match plugins/main/public/utils/applications.ts\'s Categories entry with the same id, ' +
-      'or the two plugins\' registrations split into two separate groups in the sidebar',
+    "must match plugins/main/public/utils/applications.ts's Categories entry with the same id, " +
+      "or the two plugins' registrations split into two separate groups in the sidebar",
   );
   assert.notEqual(
     WAZUH_HOME_CATEGORY_ID,
@@ -33,11 +33,11 @@ test('the Home category is labelled "Home", matching the main plugin\'s category
   assert.equal(WAZUH_HOME_APP_CATEGORY.label, 'Home');
 });
 
-test('the Home category order matches the main plugin\'s Home category (0)', () => {
+test("the Home category order matches the main plugin's Home category (0)", () => {
   assert.equal(WAZUH_HOME_CATEGORY_ORDER, 0);
   assert.equal(WAZUH_HOME_APP_CATEGORY.order, 0);
 });
 
-test('the Home category icon matches the main plugin\'s Home category', () => {
+test("the Home category icon matches the main plugin's Home category", () => {
   assert.equal(WAZUH_HOME_APP_CATEGORY.euiIconType, 'appSearchApp');
 });

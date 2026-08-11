@@ -62,7 +62,10 @@ function temperatureCacheKey(config: ProviderConfig): string {
  * "is not supported", "unsupported_parameter"...), and the cost of a false positive here is just
  * one extra harmless retry without `temperature` — not a wrong answer or a dropped turn.
  */
-function looksLikeTemperatureRejection(status: number, bodyText: string): boolean {
+function looksLikeTemperatureRejection(
+  status: number,
+  bodyText: string,
+): boolean {
   return status >= 400 && status < 500 && /temperature/i.test(bodyText);
 }
 
@@ -111,7 +114,9 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
     // attempt is honored by the very next one, without waiting for a fresh `chatStream()` call.
     const cacheKey = temperatureCacheKey(config);
 
-    const buildBody = (includeTemperature: boolean): Record<string, unknown> => {
+    const buildBody = (
+      includeTemperature: boolean,
+    ): Record<string, unknown> => {
       const nextBody: Record<string, unknown> = {
         model: config.model,
         stream: true,
@@ -158,7 +163,8 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
 
     const response = yield* fetchProviderWithRetry(
       async () => {
-        const includeTemperature = !temperatureRejectedByProviderModel.get(cacheKey);
+        const includeTemperature =
+          !temperatureRejectedByProviderModel.get(cacheKey);
         const attemptResponse = await doFetch(buildBody(includeTemperature));
         // A "temperature rejection" is only possible when temperature was actually in the
         // request body: without the `options?.temperature !== undefined` gate, a 400 whose

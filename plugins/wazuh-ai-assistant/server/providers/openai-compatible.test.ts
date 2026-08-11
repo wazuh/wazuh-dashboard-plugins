@@ -863,7 +863,10 @@ test('chatStream: a 400 mentioning temperature on a temperature-FREE call is not
     // The body mentions "temperature" but this call never sent the parameter, so treating it
     // as a temperature rejection would spend a byte-identical retry AND poison the cache.
     JSON.stringify({
-      error: { message: 'Model overloaded; try lowering temperature or retrying later.' },
+      error: {
+        message:
+          'Model overloaded; try lowering temperature or retrying later.',
+      },
     }),
     { status: 400, headers: { 'Content-Type': 'application/json' } },
   );
