@@ -33,6 +33,14 @@ export interface AssistantSettings {
    * deletes) it; `0` means keep forever. Mirrors server/saved_objects/assistant-settings.ts's
    * `AssistantSettingsAttributes.conversationRetentionDays`. */
   conversationRetentionDays: number;
+  /** Issue #8917: field keys `getOrCreateAssistantSettings` (server/routes/settings.ts) had to
+   * append to `fieldPolicy` on this read/save because the stored policy predated them -- empty
+   * when the stored policy already matches the shipped defaults. Response-only (GET/PUT always
+   * send it back; optional here only because this same interface also shapes the outgoing PUT
+   * payload, which never needs to set it). Visibility only: this plugin does not currently surface
+   * it in the Settings UI, but any caller of GET/PUT can see whether the effective policy it just
+   * received was patched up from something older than the running build. */
+  fieldPolicyReconciledFields?: string[];
 }
 
 /** Shape of the paginated GET /providers response (server/routes/settings.ts). */

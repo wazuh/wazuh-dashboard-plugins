@@ -11,6 +11,7 @@ import {
   scrubKnownEntities,
   FieldPolicyEntry,
   FIELD_POLICY_DEFAULTS,
+  mergeFieldPolicyWithDefaults,
 } from './privacy';
 import { Digest } from './digest';
 import { WAZUH_FIELD } from '../../common/wazuh-fields';
@@ -253,6 +254,65 @@ test('Pseudonymizer: applyToText replaces every known value, longest first', () 
   assert.ok(!out.includes('10.0.0.10'));
   assert.ok(!out.includes('10.0.0.1'));
   assert.match(out, /^Traffic from IP_\d+ and IP_\d+ was observed\.$/);
+});
+
+// #8916: applyToText previously did a plain substring replace, so a pseudonymized word could
+// corrupt an unrelated value it merely happened to appear inside of — observed live: "ubuntu"
+// (pseudonymized from host.os.platform) turned the package version "7.81.0-1ubuntu1.14" into
+// "7.81.0-1VAL_21.14". These pin the word-boundary discipline (boundary = any non-alphanumeric
+// character) that fixes it without breaking the cases that must keep working.
+
+test('Pseudonymizer: applyToText leaves a pseudonymized word untouched when it is glued inside a larger alphanumeric run (version string)', () => {
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('ubuntu', 'VAL');
+  const text = 'Installed openssh 7.81.0-1ubuntu1.14 on the host.';
+  const out = p.applyToText(text);
+  assert.equal(out, text, 'the version string must be left byte-identical');
+  assert.ok(!out.includes(pseudonym));
+});
+
+test('Pseudonymizer: applyToText still replaces a standalone occurrence of the same value', () => {
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('ubuntu', 'VAL');
+  const text = 'The agent reports its platform is ubuntu.';
+  const out = p.applyToText(text);
+  assert.equal(out, `The agent reports its platform is ${pseudonym}.`);
+});
+
+test('Pseudonymizer: applyToText still replaces a value glued to a larger token by "-" or "_" (whole token, not the compound)', () => {
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('ubuntu', 'VAL');
+  const hyphenated = p.applyToText(
+    'Image tag myapp-ubuntu-server was deployed.',
+  );
+  assert.equal(hyphenated, `Image tag myapp-${pseudonym}-server was deployed.`);
+  const underscored = p.applyToText(
+    'Image tag myapp_ubuntu_server was deployed.',
+  );
+  assert.equal(
+    underscored,
+    `Image tag myapp_${pseudonym}_server was deployed.`,
+  );
+});
+
+test('Pseudonymizer: applyToText still replaces an embedded IP address', () => {
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('10.0.0.5', 'IP');
+  const out = p.applyToText('Connection refused from 10.0.0.5 on port 22.');
+  assert.equal(out, `Connection refused from ${pseudonym} on port 22.`);
+});
+
+test('Pseudonymizer: applyToText still replaces an embedded FQDN', () => {
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('web01.corp.local', 'HOST');
+  const out = p.applyToText('Alert raised on web01.corp.local just now.');
+  assert.equal(out, `Alert raised on ${pseudonym} just now.`);
+});
+
+test('Pseudonymizer: applyToText skips an empty seeded value instead of matching every position', () => {
+  const p = new Pseudonymizer([{ value: '', pseudonym: 'VAL_1' }]);
+  const text = 'unchanged text';
+  assert.equal(p.applyToText(text), text);
 });
 
 test('Pseudonymizer: applyToObject deep-maps nested structures', () => {
@@ -1333,4 +1393,175 @@ test('FIELD_POLICY_DEFAULTS: wazuh.rule.title has an explicit entry, not allow-b
   // Reviewed 'allow' (see the entry's own comment in privacy.ts for the reasoning and the
   // residual risk) -- an intentional decision, not a default.
   assert.equal(entry!.action, 'allow');
+});
+
+// --- mergeFieldPolicyWithDefaults: issue #8917 (persisted policy never reconciled with the ------
+// shipped defaults) -------------------------------------------------------------------------------
+
+test('mergeFieldPolicyWithDefaults: a stored policy missing a newly-shipped entry gets that entry added', () => {
+  const stored: FieldPolicyEntry[] = [
+    { field: 'host.hostname', action: 'anonymize', kind: 'HOST' },
+  ];
+  const defaults: FieldPolicyEntry[] = [
+    { field: 'host.hostname', action: 'anonymize', kind: 'HOST' },
+    { field: 'package.name', action: 'allow' },
+  ];
+  const { merged, added } = mergeFieldPolicyWithDefaults(stored, defaults, []);
+  assert.deepEqual(added, [{ field: 'package.name', action: 'allow' }]);
+  assert.deepEqual(merged, [
+    { field: 'host.hostname', action: 'anonymize', kind: 'HOST' },
+    { field: 'package.name', action: 'allow' },
+  ]);
+});
+
+test('mergeFieldPolicyWithDefaults: a stored entry that differs from the default WINS (admin customization preserved)', () => {
+  // The default says 'allow'; the admin has explicitly overridden it to 'never'.
+  const stored: FieldPolicyEntry[] = [
+    { field: 'package.name', action: 'never' },
+  ];
+  const defaults: FieldPolicyEntry[] = [
+    { field: 'package.name', action: 'allow' },
+  ];
+  const { merged, added } = mergeFieldPolicyWithDefaults(stored, defaults, []);
+  assert.deepEqual(
+    added,
+    [],
+    'a field already present in stored must never be "added"',
+  );
+  assert.deepEqual(merged, [{ field: 'package.name', action: 'never' }]);
+});
+
+test('mergeFieldPolicyWithDefaults: an admin override MORE protective than the default is not downgraded', () => {
+  // The default is 'allow' (package.architecture is reviewed as safe software identity), but this
+  // admin has decided to anonymize it anyway -- their stronger choice must survive the merge.
+  const stored: FieldPolicyEntry[] = [
+    { field: 'package.architecture', action: 'anonymize', kind: 'VAL' },
+  ];
+  const defaults: FieldPolicyEntry[] = [
+    { field: 'package.architecture', action: 'allow' },
+  ];
+  const { merged } = mergeFieldPolicyWithDefaults(stored, defaults, []);
+  assert.deepEqual(merged, [
+    { field: 'package.architecture', action: 'anonymize', kind: 'VAL' },
+  ]);
+});
+
+test('mergeFieldPolicyWithDefaults: a field the admin deliberately deleted (present in knownFields, absent from stored) is NOT re-added', () => {
+  // knownFields records that 'package.name' WAS part of the merged view the admin edited from --
+  // its absence from `stored` now means they used the Settings page's remove control, not that the
+  // field never reached this install.
+  const stored: FieldPolicyEntry[] = [
+    { field: 'host.hostname', action: 'anonymize', kind: 'HOST' },
+  ];
+  const defaults: FieldPolicyEntry[] = [
+    { field: 'host.hostname', action: 'anonymize', kind: 'HOST' },
+    { field: 'package.name', action: 'allow' },
+  ];
+  const { merged, added } = mergeFieldPolicyWithDefaults(stored, defaults, [
+    'host.hostname',
+    'package.name',
+  ]);
+  assert.deepEqual(
+    added,
+    [],
+    'a known-but-removed field must not be resurrected',
+  );
+  assert.deepEqual(merged, stored);
+});
+
+test('mergeFieldPolicyWithDefaults: a legacy object with no knownFields marker catches up on every missing default (issue #8917 exact shape)', () => {
+  // Simulates the deployed lab's saved object: 25 entries, no package.name/package.version, and
+  // (being written before this fix existed) no fieldPolicyKnownFields at all -- callers pass [].
+  const stored = FIELD_POLICY_DEFAULTS.filter(
+    entry =>
+      entry.field !== 'package.name' && entry.field !== 'package.version',
+  );
+  const { merged, added } = mergeFieldPolicyWithDefaults(
+    stored,
+    FIELD_POLICY_DEFAULTS,
+    [],
+  );
+  assert.deepEqual(added.map(entry => entry.field).sort(), [
+    'package.name',
+    'package.version',
+  ]);
+  assert.ok(merged.some(entry => entry.field === 'package.name'));
+  assert.ok(merged.some(entry => entry.field === 'package.version'));
+  // Every other entry that WAS already stored is passed through untouched (same length as
+  // defaults, since only the two missing fields were appended to the 29-entry stored array).
+  assert.equal(merged.length, stored.length + 2);
+});
+
+test('mergeFieldPolicyWithDefaults: an up-to-date stored policy (nothing missing) reports no reconciliation', () => {
+  const { added } = mergeFieldPolicyWithDefaults(
+    FIELD_POLICY_DEFAULTS,
+    FIELD_POLICY_DEFAULTS,
+    FIELD_POLICY_DEFAULTS.map(entry => entry.field),
+  );
+  assert.deepEqual(
+    added,
+    [],
+    'a policy already matching the shipped defaults must never be reported as reconciled',
+  );
+});
+
+// --- End-to-end reproduction of the reported bug: a 25-entry-shaped stored policy missing --------
+// package.name/package.version, run through the REAL applyFieldPolicy pipeline for a fail-closed
+// (deriveColumns) tool. Before the fix, get_agent_inventory's isEscapeHatch fail-closed branch
+// pseudonymized both fields wholesale (the reported "adduser" -> "HOST_3" / "3.118ubuntu5" ->
+// "VAL_6" over-redaction); after reconciling the stored policy up to the shipped defaults, the
+// explicit 'allow' entries FIELD_POLICY_DEFAULTS already carries for both fields resolve normally
+// and the values reach the digest unpseudonymized. ---------------------------------------------
+
+test('end-to-end #8917: get_agent_inventory keeps package.name/package.version readable after reconciling a legacy stored policy', () => {
+  const legacyStoredPolicy = FIELD_POLICY_DEFAULTS.filter(
+    entry =>
+      entry.field !== 'package.name' && entry.field !== 'package.version',
+  );
+  // Sanity check on the fixture itself: this really does reproduce "no entry for either field".
+  assert.equal(
+    legacyStoredPolicy.some(e => e.field === 'package.name'),
+    false,
+  );
+  assert.equal(
+    legacyStoredPolicy.some(e => e.field === 'package.version'),
+    false,
+  );
+
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_agent_inventory',
+    samples: [{ 'package.name': 'adduser', 'package.version': '3.118ubuntu5' }],
+  });
+
+  // BEFORE the fix (raw legacy policy, no reconciliation): reproduces the reported over-redaction.
+  const beforeFix = applyFieldPolicy(
+    digest,
+    legacyStoredPolicy,
+    p,
+    undefined,
+    'get_agent_inventory',
+    true, // isEscapeHatch, matching get_agent_inventory's failClosedFieldPolicy
+  );
+  assert.match(beforeFix.samples[0]['package.name'] as string, /^HOST_\d+$/);
+  assert.match(beforeFix.samples[0]['package.version'] as string, /^VAL_\d+$/);
+
+  // AFTER the fix: getOrCreateAssistantSettings (server/routes/settings.ts) would have reconciled
+  // the stored policy against FIELD_POLICY_DEFAULTS before it ever reaches applyFieldPolicy.
+  const { merged } = mergeFieldPolicyWithDefaults(
+    legacyStoredPolicy,
+    FIELD_POLICY_DEFAULTS,
+    [],
+  );
+  const p2 = new Pseudonymizer();
+  const afterFix = applyFieldPolicy(
+    digest,
+    merged,
+    p2,
+    undefined,
+    'get_agent_inventory',
+    true,
+  );
+  assert.equal(afterFix.samples[0]['package.name'], 'adduser');
+  assert.equal(afterFix.samples[0]['package.version'], '3.118ubuntu5');
 });

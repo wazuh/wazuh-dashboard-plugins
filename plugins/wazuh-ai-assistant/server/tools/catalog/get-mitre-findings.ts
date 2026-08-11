@@ -60,13 +60,19 @@ export const getMitreFindingsTool: ToolDefinition = {
   },
   tableSpec: {
     columns: [
+      // Column order (issue #8921's budget item): the severity badge MUST sit inside the
+      // client's MAX_VISIBLE_RESULT_COLUMNS budget — the issue lists "missing severity" as a
+      // defect, and a severity column demoted past the budget is invisible (enforced
+      // registry-wide by visible-column-budget-coverage.test.ts). Tactic is the column demoted
+      // to the row expander: it is derivable from the technique and the least
+      // decision-relevant of the seven.
       { field: '@timestamp', label: 'Time' },
       { field: 'wazuh.agent.name', label: 'Agent' },
       { field: 'wazuh.rule.title', label: 'Title' },
+      { field: 'wazuh.rule.level', label: 'Level', severity: true },
       { field: 'wazuh.rule.mitre.technique.id', label: 'Technique ID' },
       { field: 'wazuh.rule.mitre.technique.name', label: 'Technique' },
       { field: 'wazuh.rule.mitre.tactic.name', label: 'Tactic' },
-      { field: 'wazuh.rule.level', label: 'Level', severity: true },
     ],
     // Same finding-hits investigation row set as the other finding tools
     // (server/tools/catalog/common.ts). `wazuh.rule.mitre.technique.id` is already a visible column
