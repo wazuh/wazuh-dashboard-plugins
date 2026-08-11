@@ -56,6 +56,15 @@ export interface Digest {
    * when present — some mutation endpoints report an otherwise-silent no-op only through this
    * field, with `affected_items`/`failed_items` both empty. */
   message?: string;
+  /** Set only when a `ToolDefinition.resolveParams` hook (types.ts; issue #8913) inferred a
+   * parameter the caller omitted rather than erroring — e.g. get_agent_inventory resolving "this
+   * server"/"the host" to the one active agent when neither `agent_id` nor `agent_name` was
+   * supplied, because a live run found the model does not reliably call `get_agents` first on its
+   * own even when told to. Surfaced the same way `samplesNote`/`hint` are: a plain sentence the
+   * model is expected to relay to the user as an explicit assumption, never to act on silently.
+   * Omitted for every tool without a `resolveParams` hook, and for a `resolveParams` call that
+   * needed no inference (every relevant param was already supplied). */
+  assumptionNote?: string;
 }
 
 const MAX_SAMPLES = 5;
@@ -699,6 +708,10 @@ export function buildDigest(
   result: unknown,
   def: ToolDefinition,
   requestBody?: Record<string, unknown>,
+  // Issue #8913: threaded through from executor.ts's `executeToolCall`, which is the only place
+  // that knows whether a `resolveParams` hook (types.ts) inferred a parameter -- this function
+  // itself never resolves anything, it just carries the note into the Digest shape unchanged.
+  assumptionNote?: string,
 ): Digest {
   const { rows, total } = extractRows(result);
   const returned = rows.length;
@@ -767,6 +780,7 @@ export function buildDigest(
       ? sampleColumns
       : def.tableSpec.columns.map(column => column.field),
     ...(typeof message === 'string' && message.length > 0 ? { message } : {}),
+    ...(assumptionNote ? { assumptionNote } : {}),
   };
 
   return capDigest(digest);
