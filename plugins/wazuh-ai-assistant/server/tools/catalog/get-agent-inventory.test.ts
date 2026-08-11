@@ -1,6 +1,63 @@
 import assert from 'node:assert/strict';
-import { getAgentInventoryTool } from './get-agent-inventory';
+import {
+  getAgentInventoryTool,
+  INVENTORY_KIND_CONFIG,
+} from './get-agent-inventory';
 import { IndexerRequest } from '../types';
+import { applySafetyValves, lintDsl } from '../guardrails';
+import { BREAKDOWN_BUCKET_CAP } from '../digest';
+
+type ResolveParamsContext = Parameters<
+  NonNullable<typeof getAgentInventoryTool.resolveParams>
+>[1];
+type ResolveParamsRequest = Parameters<
+  NonNullable<typeof getAgentInventoryTool.resolveParams>
+>[2];
+
+/** Minimal `context` stub for `resolveParams` (issue #8913's `resolveDeicticAgentParams`), same
+ * pattern as api-host.test.ts's own `fakeContext`: only the two members that function actually
+ * reads (`wazuh_core.manageHosts.get` -- via `resolveApiHostId` -- and
+ * `wazuh_core.api.client.asCurrentUser.request`) are stubbed. `agents` becomes the Manager API's
+ * `/agents` response shape (`{data: {affected_items, total_affected_items}}`); `undefined` means
+ * "the lookup call itself throws", simulating a Manager API failure. */
+function fakeContext(
+  agents:
+    | { items: Array<{ id: string; name?: string }>; total?: number }
+    | undefined,
+): ResolveParamsContext {
+  return {
+    wazuh_core: {
+      manageHosts: {
+        get: () => Promise.resolve([{ id: 'host-1' }]),
+      },
+      api: {
+        client: {
+          asCurrentUser: {
+            request: () => {
+              if (agents === undefined) {
+                throw new Error('simulated Manager API failure');
+              }
+              return Promise.resolve({
+                status: 200,
+                data: {
+                  data: {
+                    affected_items: agents.items,
+                    total_affected_items: agents.total ?? agents.items.length,
+                  },
+                },
+              });
+            },
+          },
+        },
+      },
+    },
+  } as unknown as ResolveParamsContext;
+}
+
+/** Minimal `request` stub: only `request.headers.cookie` is ever read (via `resolveApiHostId`). */
+function fakeRequest(): ResolveParamsRequest {
+  return { headers: {} } as unknown as ResolveParamsRequest;
+}
 
 /**
  * Unit tests for get_agent_inventory (issue: "Consolidate agent inventory into one tool"), which
@@ -44,6 +101,43 @@ test('get_agent_inventory: an unrecognized kind is rejected', () => {
   assert.throws(
     () => getAgentInventoryTool.buildRequest({ agent_id: '003' }),
     /kind/,
+  );
+});
+
+// --- issue #8913 (diagnostic follow-up): a live diagnostic run (branch diag/8913-router-logging)
+// proved stage-1 routing correctly offered this tool every time for a deictic inventory question,
+// but the tool's OWN description (and the system prompt) told the model to "call get_agents
+// first" -- a tool the router does not also offer for a lone 'inventory' route -- so the model
+// could not comply and never called this tool either. These assertions pin the reworded
+// description/params so a future edit cannot silently reintroduce that dead-end instruction. ---
+
+test('get_agent_inventory: description tells the model to call this tool directly for a deictic reference, not get_agents first', () => {
+  const { description } = getAgentInventoryTool.spec;
+  assert.match(
+    description,
+    /call THIS TOOL DIRECTLY with BOTH\s+omitted -- do not call get_agents first/,
+  );
+  assert.doesNotMatch(description, /call get_agents first to look/);
+});
+
+test('get_agent_inventory: agent_id/agent_name param descriptions document the deictic auto-resolution, not a hard requirement', () => {
+  const { agent_id: agentId, agent_name: agentName } = getAgentInventoryTool
+    .spec.parameters.properties as unknown as {
+    agent_id: { description?: string };
+    agent_name: { description?: string };
+  };
+  assert.match(
+    agentId.description ?? '',
+    /resolves to the only active agent automatically/,
+  );
+  assert.match(
+    agentName.description ?? '',
+    /resolves to the only active agent automatically/,
+  );
+  assert.doesNotMatch(agentId.description ?? '', /is required\.?$/);
+  assert.doesNotMatch(
+    agentName.description ?? '',
+    /^Either this or agent_id is required/,
   );
 });
 
@@ -173,11 +267,19 @@ test('get_agent_inventory: kind="ports" matches get_agent_ports\'s original body
       ],
       sort: ['_doc'],
       size: 50,
+      aggs: {
+        interface_state: {
+          terms: { field: 'interface.state', size: BREAKDOWN_BUCKET_CAP },
+        },
+        network_transport: {
+          terms: { field: 'network.transport', size: BREAKDOWN_BUCKET_CAP },
+        },
+      },
     },
   });
 });
 
-test('get_agent_inventory: kind="processes" matches get_agent_processes\'s original body exactly', () => {
+test('get_agent_inventory: kind="processes" matches get_agent_processes\'s original body exactly (breakdown is digest-level, not an agg)', () => {
   const req = buildIndexer({ agent_id: '003', kind: 'processes' });
   assert.deepEqual(req, {
     target: 'indexer',
@@ -195,6 +297,86 @@ test('get_agent_inventory: kind="processes" matches get_agent_processes\'s origi
       size: 50,
     },
   });
+});
+
+/**
+ * Per-kind population-disclosure coverage, driven from INVENTORY_KIND_CONFIG itself rather than a
+ * hardcoded kind list — a 6th kind added to the map is automatically required to either carry a
+ * real breakdown aggregation, be covered by the tool-level digest.breakdownDimensions fallback
+ * (at least one dimension present in the kind's own _source list), or have a written reason
+ * below. Nothing is exempt by default.
+ */
+const KIND_BREAKDOWN_EXEMPT: Record<string, string> = {
+  os:
+    'fixedSize: 5 — one current OS record per agent, so the returned page is effectively the ' +
+    'whole population; there is no truncation for a breakdown to disclose against.',
+  hotfixes:
+    'single free-text field (package.hotfix.name, the only live-confirmed field for this ' +
+    'index) — there is no categorical dimension to break the population down by; counts.total ' +
+    'is the only population statement this kind can make.',
+};
+
+test('get_agent_inventory: every kind has a real breakdown agg, a reachable synthetic dimension, or a written reason', () => {
+  const dims = getAgentInventoryTool.digest.breakdownDimensions ?? [];
+  const failures: string[] = [];
+  for (const [kind, config] of Object.entries(INVENTORY_KIND_CONFIG)) {
+    if (config.breakdownAggs && Object.keys(config.breakdownAggs).length > 0) {
+      continue;
+    }
+    if (dims.some(dimension => config.source.includes(dimension))) {
+      continue; // digest-level fallback reaches this kind through its own _source.
+    }
+    const reason = KIND_BREAKDOWN_EXEMPT[kind];
+    if (typeof reason === 'string' && reason.length > 0) {
+      continue;
+    }
+    failures.push(
+      `kind="${kind}": no breakdownAggs, no digest.breakdownDimensions entry present in its ` +
+        '_source, and no written reason in KIND_BREAKDOWN_EXEMPT',
+    );
+  }
+  assert.deepEqual(failures, []);
+});
+
+test('get_agent_inventory: KIND_BREAKDOWN_EXEMPT names only real kinds (stale-exemption guard)', () => {
+  for (const kind of Object.keys(KIND_BREAKDOWN_EXEMPT)) {
+    assert.ok(
+      kind in INVENTORY_KIND_CONFIG,
+      `KIND_BREAKDOWN_EXEMPT names unknown kind "${kind}"`,
+    );
+    const config =
+      INVENTORY_KIND_CONFIG[kind as keyof typeof INVENTORY_KIND_CONFIG];
+    assert.equal(
+      config.breakdownAggs,
+      undefined,
+      `kind "${kind}" now has a real breakdown agg — remove its stale exemption`,
+    );
+  }
+});
+
+test('get_agent_inventory: every breakdown-agg request passes applySafetyValves + lintDsl', () => {
+  // Without this guard the loop passes vacuously if INVENTORY_KIND_CONFIG ever lost every
+  // breakdownAggs entry (e.g. a refactor that renamed the field) -- same "nothing exempt by
+  // default" standard as agg-representability-coverage.test.ts's indexerTools.length check.
+  let checkedCount = 0;
+  for (const [kind, config] of Object.entries(INVENTORY_KIND_CONFIG)) {
+    if (!config.breakdownAggs) {
+      continue;
+    }
+    checkedCount += 1;
+    const req = buildIndexer({ agent_id: '003', kind });
+    const valved = applySafetyValves(req.body);
+    assert.equal(valved.ok, true, valved.ok ? '' : `${kind}: ${valved.reason}`);
+    if (!valved.ok) {
+      continue;
+    }
+    const lint = lintDsl(valved.body, req.index);
+    assert.equal(lint.ok, true, lint.ok ? '' : `${kind}: ${lint.reason}`);
+  }
+  assert.ok(
+    checkedCount > 0,
+    'no INVENTORY_KIND_CONFIG kind declared a breakdownAggs -- this test would pass vacuously',
+  );
 });
 
 test('get_agent_inventory: limit is clamped to [1, 500] for the 3 limit-taking folded-in kinds', () => {
@@ -226,6 +408,163 @@ test('get_agent_inventory: deriveColumns is set (no static tableSpec/digest for 
   assert.equal(getAgentInventoryTool.deriveColumns, true);
   assert.deepEqual(getAgentInventoryTool.tableSpec.columns, []);
   assert.deepEqual(getAgentInventoryTool.digest.sampleColumns, []);
+});
+
+// --- issue #8913: a live-verified N=5 run of "What software does this box have installed?" found
+// the system prompt's "call get_agents first" instruction was followed 0/5 times even though the
+// deployed prompt text carried it (4/5 asked the user to name an agent; 1/5 called the wrong tool
+// and found nothing). resolveDeicticAgentParams (this tool's `resolveParams` hook) makes
+// correctness independent of that compliance by resolving the agent server-side whenever neither
+// identifier was supplied. ---
+
+function resolveParams(
+  params: Record<string, unknown>,
+  context: ResolveParamsContext,
+) {
+  return getAgentInventoryTool.resolveParams!(params, context, fakeRequest());
+}
+
+test('get_agent_inventory resolveParams: no identifier + exactly one active agent resolves and surfaces the assumption', async () => {
+  const context = fakeContext({ items: [{ id: '003', name: 'web-prod-01' }] });
+  const result = await resolveParams({ kind: 'packages' }, context);
+  assert.equal(result.ok, true);
+  if (!result.ok) {
+    return;
+  }
+  assert.equal(result.resolved.params.agent_id, '003');
+  // The original params are otherwise untouched -- only agent_id is added.
+  assert.equal(result.resolved.params.kind, 'packages');
+  assert.ok(result.resolved.note, 'expected an assumption note to be attached');
+  assert.match(result.resolved.note!, /web-prod-01/);
+  assert.match(result.resolved.note!, /003/);
+});
+
+test('get_agent_inventory resolveParams: no identifier + zero active agents returns the "which agent?" error', async () => {
+  const context = fakeContext({ items: [] });
+  const result = await resolveParams({ kind: 'packages' }, context);
+  assert.equal(result.ok, false);
+  if (result.ok) {
+    return;
+  }
+  assert.match(result.reason, /agent_id.*agent_name|agent_name.*agent_id/);
+  assert.match(result.reason, /no active agent/i);
+  // Follow-up audit fix (same bug class as #8913's main fix): this LIVE tool_result error must
+  // never tell the model to call get_agents -- stage-1 routing offered get_agent_inventory (its
+  // own 'inventory' category) for this call to have happened at all, but nothing guarantees
+  // 'agents' was ALSO routed this turn, so naming that tool here can be just as unreachable as it
+  // was in the description/system-prompt text this whole fix started from.
+  assert.doesNotMatch(result.reason, /get_agents/);
+  assert.match(result.reason, /ask the user/i);
+});
+
+test('get_agent_inventory resolveParams: no identifier + multiple active agents errors and lists candidates', async () => {
+  const context = fakeContext({
+    items: [
+      { id: '001', name: 'web-prod-01' },
+      { id: '002', name: 'db-prod-01' },
+    ],
+  });
+  const result = await resolveParams({ kind: 'packages' }, context);
+  assert.equal(result.ok, false);
+  if (result.ok) {
+    return;
+  }
+  assert.match(result.reason, /agent_id.*agent_name|agent_name.*agent_id/);
+  assert.match(result.reason, /web-prod-01/);
+  assert.match(result.reason, /db-prod-01/);
+  assert.match(result.reason, /2 active agents/);
+});
+
+test('get_agent_inventory resolveParams: more active agents than the listing cap reports how many more', async () => {
+  const items = Array.from({ length: 15 }, (_, i) => ({
+    id: String(100 + i).padStart(3, '0'),
+    name: `agent-${i}`,
+  }));
+  const context = fakeContext({ items });
+  const result = await resolveParams({ kind: 'packages' }, context);
+  assert.equal(result.ok, false);
+  if (result.ok) {
+    return;
+  }
+  assert.match(result.reason, /15 active agents/);
+  assert.match(result.reason, /and \d+ more/);
+});
+
+test('get_agent_inventory resolveParams: a lookup failure (Manager API unreachable) falls back to the plain "which agent?" error', async () => {
+  const context = fakeContext(undefined);
+  const result = await resolveParams({ kind: 'packages' }, context);
+  assert.equal(result.ok, false);
+  if (result.ok) {
+    return;
+  }
+  assert.match(result.reason, /agent_id.*agent_name|agent_name.*agent_id/);
+  // Same follow-up audit fix as the zero-active-agents case above.
+  assert.doesNotMatch(result.reason, /get_agents/);
+});
+
+test('get_agent_inventory resolveParams: agent_id supplied is returned unchanged, no lookup, no note (regression)', async () => {
+  let lookupCalled = false;
+  const context = {
+    wazuh_core: {
+      manageHosts: {
+        get: () => Promise.reject(new Error('should not be called')),
+      },
+      api: {
+        client: {
+          asCurrentUser: {
+            request: () => {
+              lookupCalled = true;
+              return Promise.reject(new Error('should not be called'));
+            },
+          },
+        },
+      },
+    },
+  } as unknown as ResolveParamsContext;
+  const result = await resolveParams(
+    { agent_id: '003', kind: 'packages' },
+    context,
+  );
+  assert.equal(result.ok, true);
+  if (!result.ok) {
+    return;
+  }
+  assert.deepEqual(result.resolved.params, {
+    agent_id: '003',
+    kind: 'packages',
+  });
+  assert.equal(result.resolved.note, undefined);
+  assert.equal(lookupCalled, false);
+});
+
+test('get_agent_inventory resolveParams: agent_name supplied is returned unchanged, no lookup, no note (regression)', async () => {
+  const context = {
+    wazuh_core: {
+      manageHosts: {
+        get: () => Promise.reject(new Error('should not be called')),
+      },
+      api: {
+        client: {
+          asCurrentUser: {
+            request: () => Promise.reject(new Error('should not be called')),
+          },
+        },
+      },
+    },
+  } as unknown as ResolveParamsContext;
+  const result = await resolveParams(
+    { agent_name: 'web-prod-01', kind: 'packages' },
+    context,
+  );
+  assert.equal(result.ok, true);
+  if (!result.ok) {
+    return;
+  }
+  assert.deepEqual(result.resolved.params, {
+    agent_name: 'web-prod-01',
+    kind: 'packages',
+  });
+  assert.equal(result.resolved.note, undefined);
 });
 
 // Issue #8917: `failClosedFieldPolicy` must be set explicitly and independently of

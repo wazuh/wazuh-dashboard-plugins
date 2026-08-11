@@ -1,10 +1,12 @@
 import { ToolDefinition } from '../types';
 import {
+  aggNameForField,
   clampLimit,
   limitProperty,
   objectSchema,
   validateAgentId,
 } from './common';
+import { BREAKDOWN_BUCKET_CAP } from '../digest';
 
 /**
  * Wazuh 5.0 replacement for the retired get_fim_events: 4.14's FIM tool read the syscheck
@@ -87,6 +89,17 @@ export const getFimFilesTool: ToolDefinition = {
         ],
         sort: [{ 'file.mtime': { order: 'desc' } }],
         size: limit,
+        // Population-true "which agents have monitored files" breakdown over the FULL matched
+        // set (issue #8920 item 1): this tool sorts by file.mtime desc over thousands of FIM
+        // state docs against a default limit of 20, so a page-scoped view of the agent list is
+        // exactly the sample-narrated-as-population defect. wazuh.agent.name is on
+        // AGG_FIELD_ALLOWLIST and wazuh-states-fim-files* is not a time-based index, so this
+        // passes checkAggs/lintDsl unchanged — the population-true option is free here.
+        aggs: {
+          [aggNameForField('wazuh.agent.name')]: {
+            terms: { field: 'wazuh.agent.name', size: BREAKDOWN_BUCKET_CAP },
+          },
+        },
       },
     };
   },
@@ -100,6 +113,11 @@ export const getFimFilesTool: ToolDefinition = {
     ],
     rowFields: ['file.group', 'file.permissions', 'file.hash.sha256'],
   },
+  // No synthetic breakdownDimensions: the REAL wazuh.agent.name aggregation above is
+  // population-true by construction and takes priority in buildDigest, so a page-scoped
+  // fallback here would never fire. The bucket keys are scrubbed the same way as any real
+  // aggregation's (wazuh.agent.name has an anonymize/HOST policy entry in privacy.ts, resolved
+  // via extractAggFields).
   digest: {
     sampleColumns: ['wazuh.agent.name', 'file.path', 'file.mtime', 'file.size'],
   },

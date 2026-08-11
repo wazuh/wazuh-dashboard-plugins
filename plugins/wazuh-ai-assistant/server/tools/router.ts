@@ -144,8 +144,9 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
   mitre:
     'MITRE ATT&CK technique/tactic findings and technique-frequency summaries.',
   inventory:
-    'Syscollector inventory: agent OS, installed packages, open ports, running processes, or ' +
-    'installed hotfixes.',
+    'Syscollector inventory: agent/host OS, installed software or packages, open ports, running ' +
+    'processes, or installed hotfixes -- including "what software/programs are installed" ' +
+    'questions that name the host only vaguely ("this box/server/machine") rather than by ID.',
   compliance:
     'Compliance findings/summaries for any of 10 frameworks (PCI DSS, HIPAA, GDPR, ISO 27001, ' +
     'NIS2, NIST 800-171/800-53, FedRAMP, CMMC, TSC).',

@@ -61,6 +61,39 @@ test('the "findings" category description mentions top/noisiest agents (get_top_
   );
 });
 /**
+ * Issue #8913's own worked example ("What software does this box have installed?") measured
+ * live at 0/5 for `get_agent_inventory` even AFTER the tool learned to self-resolve a missing
+ * agent (see get-agent-inventory.ts's `resolveDeicticAgentParams`) -- because stage 1 never
+ * routed to the `inventory` category in the first place, so the tool was never even offered in
+ * stage 2 (`resolveStage2Tools`). The pre-fix `inventory` description said "installed packages"
+ * but never the word "software", and had no note that a vague host reference ("this box") is
+ * still an inventory-domain question rather than an identity question. Pin both additions here
+ * so a future reword silently regresses this instead of failing loudly.
+ */
+test('the "inventory" category description covers "software" and vague host phrasing', () => {
+  const prompt = buildRoutingPrompt('2026-01-01T00:00:00.000Z');
+  const inventoryLine = prompt
+    .split('\n')
+    .find(line => line.trim().startsWith('- inventory:'));
+  assert.ok(
+    inventoryLine,
+    'routing prompt must list an "inventory" menu entry',
+  );
+  assert.match(
+    inventoryLine as string,
+    /\bsoftware\b/i,
+    'inventory description must literally say "software", not just "installed packages", to ' +
+      "match #8913's exact worked-example phrasing",
+  );
+  assert.match(
+    inventoryLine as string,
+    /this box\/server\/machine/,
+    'inventory description must call out vague host references as still in-scope, not just ' +
+      'named/numbered agents',
+  );
+});
+
+/**
  * Out-of-scope regression: M-OOS-01/02 (active-response questions) and M-OOS-05 (agent
  * comms-channel health) were mis-routed onto adjacent tools (get_brute_force,
  * get_events_by_agent, get_agents) instead of being declined, because neither category's
