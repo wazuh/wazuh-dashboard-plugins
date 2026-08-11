@@ -477,18 +477,20 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
     fireEvent.change(screen.getByLabelText(/provider type/i), {
       target: { value: 'anthropic' },
     });
+    // A value the admin actually TYPED must survive the switch. Note it must differ from the
+    // prefill already in the field: React deduplicates controlled-input change events whose
+    // value is identical to the current one, so firing a change with the prefill's own value
+    // dispatches nothing at all -- no onChange, no touched flag, no user action to preserve.
     fireEvent.change(screen.getByLabelText(/endpoint url/i), {
-      target: { value: 'https://api.anthropic.com' },
+      target: { value: 'https://claude.internal-proxy.example' },
     });
 
     fireEvent.change(screen.getByLabelText(/provider type/i), {
       target: { value: 'openai_compatible' },
     });
 
-    // The admin explicitly typed this value (even though it happens to match the prefill), so
-    // it must survive the type switch.
     expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
-      'https://api.anthropic.com',
+      'https://claude.internal-proxy.example',
     );
   });
 
