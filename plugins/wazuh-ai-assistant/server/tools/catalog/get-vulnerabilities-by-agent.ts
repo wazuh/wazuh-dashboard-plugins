@@ -73,15 +73,21 @@ export const getVulnerabilitiesByAgentTool: ToolDefinition = {
     };
   },
   tableSpec: {
+    // Column order (issue #8921's budget item): this is a single-agent tool, so `wazuh.agent.id`
+    // is constant across every row of one call -- a redundant leading identifier once the
+    // human-readable Agent name is shown. The 6 columns that earn visibility under the client's
+    // MAX_VISIBLE_COLUMNS budget (result-table.tsx) lead with Agent instead; Architecture and the
+    // now-redundant Agent ID are demoted -- NOT deleted, still queried and still in the row
+    // expander -- to positions 7-8.
     columns: [
-      { field: 'wazuh.agent.id', label: 'Agent ID' },
       { field: 'wazuh.agent.name', label: 'Agent' },
       { field: 'vulnerability.id', label: 'CVE' },
       { field: 'vulnerability.severity', label: 'Severity', severity: true },
       { field: 'package.name', label: 'Package' },
       { field: 'package.version', label: 'Version' },
-      { field: 'package.architecture', label: 'Architecture' },
       { field: 'vulnerability.score.base', label: 'CVSS Score' },
+      { field: 'package.architecture', label: 'Architecture' },
+      { field: 'wazuh.agent.id', label: 'Agent ID' },
     ],
   },
   digest: { sampleColumns: VULN_DIGEST_SAMPLE_COLUMNS },
