@@ -1,5 +1,11 @@
 import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import {
+  render,
+  screen,
+  waitFor,
+  fireEvent,
+  within,
+} from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // SettingsService is instantiated internally — mock the module before importing the component.
@@ -331,10 +337,11 @@ describe('SettingsPage — manual test failure callout is genuinely dismissible'
       latencyMs: 42,
       message: null,
     });
-    // Re-query rather than reuse the `testButton` handle captured before the first click: the
-    // failure callout mounting above the table re-renders the action column, and clicking a
-    // stale reference to the pre-callout button element is a silent no-op — the second click
-    // never reaches the handler, so the call count sticks at 2.
+    // Re-query rather than reuse the `testButton` handle captured before the first click. This is
+    // defensive, not load-bearing: the callout renders below the table, so React reconciles the
+    // action cell to the same DOM node and a stale reference would still work today. Re-querying
+    // guards against a future layout change moving the action column, and matches the pattern
+    // used by the other tests in this file.
     const testButtonAfterFailure = await screen.findByRole('button', {
       name: 'Test',
     });
@@ -347,7 +354,10 @@ describe('SettingsPage — manual test failure callout is genuinely dismissible'
   });
 
   it('clears a prior manual failure callout once the failing provider is deleted', async () => {
-    mockService.list.mockResolvedValueOnce([
+    // Persistent (not Once) so a stray extra `list` call — from this test or a retry — can never
+    // leak an unconsumed queued value into a later test via jest.clearAllMocks(), which does not
+    // drain mockResolvedValueOnce queues.
+    mockService.list.mockResolvedValue([
       {
         id: 'p1',
         name: 'My OpenAI',
@@ -376,28 +386,32 @@ describe('SettingsPage — manual test failure callout is genuinely dismissible'
     ).toBeInTheDocument();
 
     // Deleting the provider removes it from the list entirely, so the callout must disappear too.
-    mockService.list.mockResolvedValueOnce([]);
+    mockService.list.mockResolvedValue([]);
     // Test is isPrimary and claims one of the row's two always-visible action slots, so Delete
-    // (the second non-primary action, after Edit) collapses behind the row's overflow popover —
-    // open it by its icon rather than by aria-label text, since no other test in this suite
-    // asserts on the OUI fork's wording for that trigger.
-    const moreRowActionsButton = document
-      .querySelector('[data-euiicon-type="boxesVertical"]')
-      ?.closest('button');
-    if (moreRowActionsButton) {
-      fireEvent.click(moreRowActionsButton);
-    }
+    // (the second non-primary action, after Edit) collapses behind the row's overflow popover.
+    // Open it by its accessible name, not by icon type — EuiBasicTable's CollapsedItemActions
+    // trigger is an EuiButtonIcon with iconType "boxesHorizontal" and aria-label "All actions";
+    // "boxesVertical" belongs to an unrelated component. Querying by role/name also fails loudly
+    // (instead of a silent no-op) if the markup ever changes again.
+    const moreRowActionsButton = screen.getByRole('button', {
+      name: 'All actions',
+    });
+    fireEvent.click(moreRowActionsButton);
+
+    // The popover's own context-menu item and the confirm modal's button are both labeled
+    // "Delete" — scope to the popover first to trigger the confirm modal.
     const deleteRowButton = await screen.findByRole('button', {
       name: 'Delete',
     });
     fireEvent.click(deleteRowButton);
 
-    // The confirm modal's own confirm button is also labeled "Delete" — it renders after the row
-    // action button, so it is the last match.
-    const deleteButtons = await screen.findAllByRole('button', {
+    // Scope the confirm click to the modal dialog so it can't accidentally match a leftover
+    // popover item regardless of portal ordering.
+    const confirmDialog = await screen.findByRole('dialog');
+    const confirmDeleteButton = within(confirmDialog).getByRole('button', {
       name: 'Delete',
     });
-    fireEvent.click(deleteButtons[deleteButtons.length - 1]);
+    fireEvent.click(confirmDeleteButton);
 
     await waitFor(() => expect(mockService.remove).toHaveBeenCalledWith('p1'));
     await waitFor(() =>
@@ -428,6 +442,9 @@ describe('SettingsPage — default provider failure callout is genuinely dismiss
 
     render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
 
+    // Wait for the auto-probe itself before asserting on its callout, so a slow mount doesn't
+    // race findByText's own timeout and this test stays independent of prior tests' mock state.
+    await waitFor(() => expect(mockService.test).toHaveBeenCalledWith('p1'));
     expect(
       await screen.findByText(/default provider "my default" is failing/i),
     ).toBeInTheDocument();
