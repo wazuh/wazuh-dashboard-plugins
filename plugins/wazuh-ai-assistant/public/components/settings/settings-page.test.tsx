@@ -77,7 +77,7 @@ describe('SettingsPage — wazuh_brain hidden from provider type dropdown', () =
     fireEvent.click(addButton);
 
     // Wait for the form to be visible (Name field is present)
-    await screen.findByLabelText(/^name$/i);
+    await screen.findByLabelText(/^name/i);
 
     const optionValues = screen
       .getAllByRole('option')
