@@ -117,6 +117,96 @@ describe('SettingsPage — auto-test on load', () => {
   });
 });
 
+describe('SettingsPage — auto-probe failures do not become permanent banners', () => {
+  it('does not render a page-level callout for a non-default provider the auto-probe failed', async () => {
+    mockService.list.mockResolvedValue([
+      {
+        id: 'p1',
+        name: 'My OpenAI',
+        type: 'openai_compatible',
+        baseUrl: 'https://api.openai.com/v1',
+        model: 'gpt-4o',
+        isDefault: false,
+      },
+    ]);
+    mockService.test.mockResolvedValue({
+      success: false,
+      latencyMs: 0,
+      message: 'Connection refused',
+    });
+
+    render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
+
+    await waitFor(() => expect(mockService.test).toHaveBeenCalledWith('p1'));
+    // The failure must still be visible in the row's status cell (tooltip trigger)...
+    expect(await screen.findByText('Connection refused')).toBeInTheDocument();
+    // ...but never escalate to a dismissible page-level EuiCallOut, since nobody clicked "Test".
+    expect(
+      screen.queryByRole('button', { name: /dismiss/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders a single dismissible callout when the DEFAULT provider auto-probe fails', async () => {
+    mockService.list.mockResolvedValue([
+      {
+        id: 'p1',
+        name: 'My Default',
+        type: 'anthropic',
+        baseUrl: 'https://api.anthropic.com',
+        model: 'claude-3',
+        isDefault: true,
+      },
+    ]);
+    mockService.test.mockResolvedValue({
+      success: false,
+      latencyMs: 0,
+      message: 'Invalid API key',
+    });
+
+    render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
+
+    await waitFor(() => expect(mockService.test).toHaveBeenCalledWith('p1'));
+    expect(
+      await screen.findByText(/default provider "my default" is failing/i),
+    ).toBeInTheDocument();
+  });
+
+  it('renders a dismissible callout for a provider the user manually tested and failed', async () => {
+    mockService.list.mockResolvedValue([
+      {
+        id: 'p1',
+        name: 'My OpenAI',
+        type: 'openai_compatible',
+        baseUrl: 'https://api.openai.com/v1',
+        model: 'gpt-4o',
+        isDefault: false,
+      },
+    ]);
+    mockService.test.mockResolvedValue({
+      success: false,
+      latencyMs: 0,
+      message: 'Connection refused',
+    });
+
+    render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
+
+    // Wait for the silent auto-probe to finish first — its own failure must not have produced a
+    // callout yet.
+    await waitFor(() => expect(mockService.test).toHaveBeenCalledWith('p1'));
+    expect(
+      screen.queryByText(/my openai: connection refused/i),
+    ).not.toBeInTheDocument();
+
+    const testButton = await screen.findByRole('button', { name: 'Test' });
+    fireEvent.click(testButton);
+
+    await waitFor(() => expect(mockService.test).toHaveBeenCalledTimes(2));
+    expect(
+      await screen.findByText(/my openai: connection refused/i),
+    ).toBeInTheDocument();
+  });
+});
+
 describe('SettingsPage — field policy filter', () => {
   it('shows filter input and hides non-matching fields', async () => {
     mockService.getAssistantSettings.mockResolvedValue({
