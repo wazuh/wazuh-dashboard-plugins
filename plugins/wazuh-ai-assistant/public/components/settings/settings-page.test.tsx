@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  render,
-  screen,
-  waitFor,
-  fireEvent,
-  within,
-} from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // SettingsService is instantiated internally — mock the module before importing the component.
@@ -405,11 +399,17 @@ describe('SettingsPage — manual test failure callout is genuinely dismissible'
     });
     fireEvent.click(deleteRowButton);
 
-    // Scope the confirm click to the modal dialog so it can't accidentally match a leftover
-    // popover item regardless of portal ordering.
-    const confirmDialog = await screen.findByRole('dialog');
-    const confirmDeleteButton = within(confirmDialog).getByRole('button', {
-      name: 'Delete',
+    // Target the confirm modal's own button via its data-test-subj rather than
+    // role='dialog': the OUI fork this repo tests against forked from EUI before
+    // EuiModal gained role="dialog", so a role query is unverifiable here — while
+    // confirmModalConfirmButton is the selector already proven in this codebase
+    // (plugins/main's unsaved-changes-guard tests).
+    const confirmDeleteButton = await waitFor(() => {
+      const button = document.querySelector(
+        '[data-test-subj="confirmModalConfirmButton"]',
+      );
+      expect(button).not.toBeNull();
+      return button as HTMLElement;
     });
     fireEvent.click(confirmDeleteButton);
 
