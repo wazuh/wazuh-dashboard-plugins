@@ -948,67 +948,120 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
               {manualTestFailures.map(p => (
                 <React.Fragment key={p.id}>
                   <EuiSpacer size='s' />
-                  <EuiCallOut
-                    color='danger'
-                    iconType='alert'
-                    size='s'
-                    title={i18n.translate(
-                      'wazuhAiAssistant.settings.testFailureCallout',
-                      {
-                        defaultMessage: '{name}: {message}',
-                        values: {
-                          name: p.name,
-                          message:
-                            testResults[p.id].message ??
-                            i18n.translate(
-                              'wazuhAiAssistant.settings.testFailureUnknown',
-                              { defaultMessage: 'Connection failed.' },
-                            ),
-                        },
-                      },
-                    )}
-                    onDismiss={() =>
-                      setDismissedErrorIds(prev => new Set([...prev, p.id]))
-                    }
-                  />
+                  {/* The installed OUI fork's EuiCallOut renders no dismiss control at all when
+                      given `onDismiss` (verified live: zero buttons, no close icon) — so the
+                      close affordance below is an explicit EuiButtonIcon wired directly to
+                      `dismissedErrorIds`, not a prop the fork is free to silently ignore. */}
+                  <EuiCallOut color='danger' iconType='alert' size='s'>
+                    <EuiFlexGroup
+                      gutterSize='s'
+                      alignItems='center'
+                      justifyContent='spaceBetween'
+                      responsive={false}
+                    >
+                      <EuiFlexItem>
+                        <EuiText size='s'>
+                          <p>
+                            {i18n.translate(
+                              'wazuhAiAssistant.settings.testFailureCallout',
+                              {
+                                defaultMessage: '{name}: {message}',
+                                values: {
+                                  name: p.name,
+                                  message:
+                                    testResults[p.id].message ??
+                                    i18n.translate(
+                                      'wazuhAiAssistant.settings.testFailureUnknown',
+                                      { defaultMessage: 'Connection failed.' },
+                                    ),
+                                },
+                              },
+                            )}
+                          </p>
+                        </EuiText>
+                      </EuiFlexItem>
+                      <EuiFlexItem grow={false}>
+                        <EuiButtonIcon
+                          iconType='cross'
+                          color='danger'
+                          aria-label={i18n.translate(
+                            'wazuhAiAssistant.settings.testFailureCallout.dismiss',
+                            {
+                              defaultMessage: 'Dismiss {name} test failure',
+                              values: { name: p.name },
+                            },
+                          )}
+                          onClick={() =>
+                            setDismissedErrorIds(
+                              prev => new Set([...prev, p.id]),
+                            )
+                          }
+                        />
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  </EuiCallOut>
                 </React.Fragment>
               ))}
               {/* The one auto-probe failure that still gets a banner: the default provider is
                   what the chat actually calls, so a broken default is surfaced even when nobody
-                  clicked "Test" — kept single and dismissible, unlike the old permanent banners. */}
+                  clicked "Test" — kept single and dismissible, unlike the old permanent banners.
+                  Same explicit-close-button caveat as the manual-failure callout above applies. */}
               {failingDefaultProvider && (
                 <>
                   <EuiSpacer size='s' />
-                  <EuiCallOut
-                    color='danger'
-                    iconType='alert'
-                    size='s'
-                    title={i18n.translate(
-                      'wazuhAiAssistant.settings.defaultProviderFailureCallout',
-                      {
-                        defaultMessage:
-                          'Default provider "{name}" is failing: {message}',
-                        values: {
-                          name: failingDefaultProvider.name,
-                          message:
-                            testResults[failingDefaultProvider.id].message ??
-                            i18n.translate(
-                              'wazuhAiAssistant.settings.testFailureUnknown',
-                              { defaultMessage: 'Connection failed.' },
-                            ),
-                        },
-                      },
-                    )}
-                    onDismiss={() =>
-                      setDismissedErrorIds(
-                        prev =>
-                          new Set([
-                            ...prev,
-                            `default:${failingDefaultProvider.id}`,
-                          ]),
-                      )
-                    }
-                  />
+                  <EuiCallOut color='danger' iconType='alert' size='s'>
+                    <EuiFlexGroup
+                      gutterSize='s'
+                      alignItems='center'
+                      justifyContent='spaceBetween'
+                      responsive={false}
+                    >
+                      <EuiFlexItem>
+                        <EuiText size='s'>
+                          <p>
+                            {i18n.translate(
+                              'wazuhAiAssistant.settings.defaultProviderFailureCallout',
+                              {
+                                defaultMessage:
+                                  'Default provider "{name}" is failing: {message}',
+                                values: {
+                                  name: failingDefaultProvider.name,
+                                  message:
+                                    testResults[failingDefaultProvider.id]
+                                      .message ??
+                                    i18n.translate(
+                                      'wazuhAiAssistant.settings.testFailureUnknown',
+                                      { defaultMessage: 'Connection failed.' },
+                                    ),
+                                },
+                              },
+                            )}
+                          </p>
+                        </EuiText>
+                      </EuiFlexItem>
+                      <EuiFlexItem grow={false}>
+                        <EuiButtonIcon
+                          iconType='cross'
+                          color='danger'
+                          aria-label={i18n.translate(
+                            'wazuhAiAssistant.settings.defaultProviderFailureCallout.dismiss',
+                            {
+                              defaultMessage: 'Dismiss default provider failure',
+                            },
+                          )}
+                          onClick={() =>
+                            setDismissedErrorIds(
+                              prev =>
+                                new Set([
+                                  ...prev,
+                                  `default:${failingDefaultProvider.id}`,
+                                ]),
+                            )
+                          }
+                        />
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  </EuiCallOut>
                 </>
               )}
             </EuiPanel>
