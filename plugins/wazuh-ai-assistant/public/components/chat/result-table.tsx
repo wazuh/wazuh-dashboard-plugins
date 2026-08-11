@@ -110,6 +110,11 @@ const SHORT_COLUMN_MIN_WIDTH = 92;
  * columns up to 200px left the rule title ~225px and wrapping onto three lines, which made row
  * heights alternate between one and three lines down the page. */
 const SHORT_COLUMN_MAX_WIDTH = 132;
+/** Left+right cell padding a short column's truncating wrapper must yield back to the cell itself
+ * (issue #8921's horizontal-scrollbar item): the wrapper's own `max-width` must be smaller than
+ * the column's pixel width, or the wrapper's border box is exactly as wide as the cell and has no
+ * room left to actually be "inside" it once EuiBasicTable's own cell padding is added on top. */
+const SHORT_COLUMN_CELL_INSET = 24;
 
 /**
  * Column-count budget (issue #8921's "no table may need a horizontal scrollbar" item): a
@@ -190,6 +195,63 @@ function renderDefaultCell(value: unknown): React.ReactNode {
     return value as React.ReactNode;
   }
   return formatCellValue(value);
+}
+
+/**
+ * Same formatting as `renderDefaultCell`, but wrapped so a value that is itself longer than the
+ * column's own pixel budget (an IP address, a long process name/path — anything with no spaces
+ * for the browser to wrap on) can never force the CELL, and so the whole table, wider than the
+ * column's assigned width (issue #8921's horizontal-scrollbar item: a real 15px scrollbar was
+ * measured on a 6-short-column table at the default ~772px pane width). `overflow: hidden` on a
+ * block box with its own explicit `max-width` is what actually holds the line — unlike the column's
+ * own `width` (a layout hint EuiBasicTable's fixed table layout applies to the CELL, not to an
+ * unbreakable run of characters inside it) — so the value is ellipsized instead of leaking past the
+ * cell edge. The full, untruncated value stays one hover away via `title` (never lost, same
+ * "demoted to on-demand, not deleted" treatment as the hidden-column note and the row expander),
+ * and is still what's compared byte-for-byte in the expanded row's JSON view.
+ */
+function renderTruncatedCell(
+  value: unknown,
+  maxWidthPx: number,
+): React.ReactNode {
+  if (isAbsentValue(value)) {
+    return renderAbsentPlaceholder();
+  }
+  const text =
+    typeof value === 'string' || typeof value === 'number'
+      ? String(value)
+      : formatCellValue(value);
+  return (
+    <span
+      title={text}
+      style={{
+        display: 'inline-block',
+        maxWidth: maxWidthPx,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+        verticalAlign: 'bottom',
+      }}
+    >
+      {text}
+    </span>
+  );
+}
+
+/**
+ * Every visible column's header renders its friendly `label` with the underlying raw dot-path
+ * (`column.id`, e.g. "source.port") as a hover `title` — issue #8921's inconsistent-labels item.
+ * A derived column whose label collides on its last path segment (result-table's sibling fix,
+ * digest.ts's `deriveColumnLabel`) now gets a real label instead of falling back to the raw path,
+ * but the raw path is still worth keeping reachable for an analyst who wants to know the exact
+ * field a friendly label like "Source Port" or "Level" maps to — the same "nothing is deleted,
+ * only demoted to on-demand" treatment this file already gives hidden columns and long values.
+ */
+function renderColumnHeader(column: {
+  id: string;
+  label: string;
+}): React.ReactNode {
+  return <span title={column.id}>{column.label}</span>;
 }
 
 /** Length of the longest rendered value in a column (header included, so a short column never
@@ -388,7 +450,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
         if (column.id === spec.severityColumn) {
           return {
             field: column.id,
-            name: column.label,
+            name: renderColumnHeader(column),
             width: SEVERITY_COLUMN_WIDTH,
             render: (value: unknown) =>
               isAbsentValue(value)
@@ -399,7 +461,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
         if (isTimestampColumn(spec.rows, column.id)) {
           return {
             field: column.id,
-            name: column.label,
+            name: renderColumnHeader(column),
             width: TIMESTAMP_COLUMN_WIDTH,
             render: (value: unknown) => {
               if (isAbsentValue(value)) {
@@ -431,14 +493,20 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
           );
           return {
             field: column.id,
-            name: column.label,
+            name: renderColumnHeader(column),
             width: `${width}px`,
-            render: renderDefaultCell,
+            // A truncating render (not the plain `renderDefaultCell` fast path) — a short column's
+            // pixel width is sized to fit ITS OWN longest value, but a value belonging to a
+            // DIFFERENT row on a later page (pagination slices `spec.rows`, `longestValueLength`
+            // measures all of them) or a value at exactly the SHORT_COLUMN_MAX_WIDTH ceiling can
+            // still be wider than the column — see this function's doc comment.
+            render: (value: unknown) =>
+              renderTruncatedCell(value, width - SHORT_COLUMN_CELL_INSET),
           };
         }
         return {
           field: column.id,
-          name: column.label,
+          name: renderColumnHeader(column),
           render: renderDefaultCell,
         };
       }),

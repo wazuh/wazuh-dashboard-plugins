@@ -287,6 +287,43 @@ test("buildTableSpec: deriveColumns tools prefer the request body's explicit _so
   );
 });
 
+// Issue #8921's inconsistent-labels item: get_agent_inventory's `ports` kind derives its columns
+// from its `_source` list (byte-for-byte, get-agent-inventory.ts's own doc comment) -- "source.port"
+// and "destination.port" collide on last segment ("port"), same as "destination.ip"/"source.ip"
+// colliding on "ip". Before this fix both members of a collision fell back to the RAW dot-path
+// label, sitting inconsistently next to non-colliding columns' friendly labels ("State"/"Name"/
+// "Transport" in the same header row). Now every column gets a real label -- a collision is
+// disambiguated with its parent segment instead of degrading to the raw path.
+test('buildTableSpec: deriveColumns tools disambiguate a colliding last segment with the parent segment, never the raw path', () => {
+  const def = buildToolDef({ deriveColumns: true });
+  const result = { hits: { hits: [{ _source: {} }] } };
+  const requestBody = {
+    _source: [
+      'source.port',
+      'interface.state',
+      'process.name',
+      'network.transport',
+      'destination.ip',
+      'source.ip',
+    ],
+  };
+  const table = buildTableSpec(result, def, requestBody);
+  assert.deepEqual(
+    Object.fromEntries(table.columns.map(c => [c.id, c.label])),
+    {
+      'source.port': 'Source Port',
+      'interface.state': 'State',
+      'process.name': 'Name',
+      'network.transport': 'Transport',
+      'destination.ip': 'Destination IP',
+      'source.ip': 'Source IP',
+    },
+  );
+  // Neither colliding label is ever the bare raw dot-path -- the exact regression this fixes.
+  assert.ok(!table.columns.map(c => c.label).includes('source.port'));
+  assert.ok(!table.columns.map(c => c.label).includes('destination.ip'));
+});
+
 // --- capDigest -------------------------------------------------------------------------------------
 
 function makeDigest(samples: Array<Record<string, unknown>>): Digest {

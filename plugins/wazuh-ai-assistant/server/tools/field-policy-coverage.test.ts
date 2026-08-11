@@ -42,6 +42,7 @@ const KNOWN_SAFE_STRUCTURAL_FIELDS = new Set<string>([
   // counters over already-classified fields (wazuh.rule.title/wazuh.rule.level), never
   // analyst/attacker-supplied free text themselves.
   'distinct_titles',
+  'distinct_levels',
   'high_or_critical',
   // os.* / architecture / vendor / version: OS/package metadata, not identifiers.
   'wazuh.agent.host.os.name',

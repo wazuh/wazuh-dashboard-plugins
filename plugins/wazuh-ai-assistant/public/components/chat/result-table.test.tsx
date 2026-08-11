@@ -439,6 +439,57 @@ describe('ResultTable', () => {
     });
   });
 
+  describe('column header tooltip (issue #8921: raw field name stays reachable)', () => {
+    it('sets the raw column id as the header title attribute, alongside the friendly label text', () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'source.port', label: 'Source Port' }],
+            rows: [{ 'source.port': 52341 }],
+          })}
+        />,
+      );
+      const header = screen.getByRole('columnheader', { name: 'Source Port' });
+      expect(header.querySelector('[title="source.port"]')).not.toBeNull();
+      expect(header.textContent).toBe('Source Port');
+    });
+  });
+
+  describe('long-value truncation in short columns (issue #8921: no table may need a horizontal scrollbar)', () => {
+    it('wraps a value in a bounded, ellipsizing span with the full value as its title', () => {
+      // A realistic case of the measured defect: an IPv4 address is well inside
+      // SHORT_COLUMN_MAX_CHARS (short-column path applies) but, combined with a friendly label,
+      // was enough to push the ports table's total column width past the pane width.
+      const ip = '192.168.100.254';
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'destination.ip', label: 'Destination IP' }],
+            rows: [{ 'destination.ip': ip }],
+          })}
+        />,
+      );
+      const truncated = screen.getByTitle(ip);
+      expect(truncated).toBeInTheDocument();
+      expect(truncated).toHaveTextContent(ip);
+      expect(truncated.style.overflow).toBe('hidden');
+      expect(truncated.style.whiteSpace).toBe('nowrap');
+      expect(truncated.style.maxWidth).not.toBe('');
+    });
+
+    it('still renders the absent-value placeholder for a short column, not an empty truncation span', () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'source.port', label: 'Source Port' }],
+            rows: [{ 'source.port': undefined }],
+          })}
+        />,
+      );
+      expect(screen.getByText('—')).toBeInTheDocument();
+    });
+  });
+
   describe('render-error boundary', () => {
     it('degrades to an inline warning instead of crashing when a row cannot be serialized (e.g. a circular reference) once expanded', () => {
       const circular: Record<string, unknown> = { agent: 'web-01' };
