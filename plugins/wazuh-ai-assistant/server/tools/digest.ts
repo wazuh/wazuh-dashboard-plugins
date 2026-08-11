@@ -15,7 +15,7 @@ export interface Digest {
    * finding-hits typed tool (`catalog/common.ts`'s `FINDING_BREAKDOWN_AGGS` always attaches two:
    * by agent name and by rule title) — naming which aggregation a bucket belongs to; single-agg
    * digests stay byte-identical to before it existed. It also lets privacy.ts's field-policy pass
-   * attribute each bucket key to the right aggregation field.    
+   * attribute each bucket key to the right aggregation field.
    *
    * `key` is `unknown`, not `string`: a plain terms/significant_terms/cardinality bucket's key is
    * always a string (unchanged from before), but a `multi_terms` bucket's key is an ARRAY of
@@ -1144,6 +1144,7 @@ export function buildDigest(
       : def.tableSpec.columns.map(column => column.field),
     ...(typeof message === 'string' && message.length > 0 ? { message } : {}),
     ...(assumptionNote ? { assumptionNote } : {}),
+    ...(metrics ? { metrics } : {}),
   };
 
   return capDigest(digest);
