@@ -781,24 +781,114 @@ function resolveFieldEntry(
 }
 
 /**
- * Reads the field name driving each of a digest's `breakdown` aggregations (a terms/
- * significant_terms/cardinality aggregation's bucket keys), from the EXECUTED request body — the
- * response's `aggregations` tree only carries bucket keys/counts, never which field produced them,
- * so this must read the query side. Returns a map of top-level aggregation name → field (an entry
- * is `undefined` for an agg with no extractable field, e.g. a date_histogram), in the body's key
- * order — the same order digest.ts's `buildBreakdown` iterates, so the two can't drift apart.
- * Breakdown entries name their aggregation (`agg`) only in the multi-agg case; a single-agg
- * entry attributes to the map's first key.
+ * Which field(s) drive an aggregation's bucket key, and how the key is shaped as a result:
+ * - `scalar`: terms/significant_terms/cardinality -- the bucket key is a single string, the value
+ *   of `field`.
+ * - `multi`: `multi_terms` -- the bucket key is an ARRAY, positionally aligned with `fields`
+ *   (`fields[i]` names the field `key[i]` is a value of). Position is the ONLY thing that ties a
+ *   component to its field, unlike `composite` below -- there is no per-component name to key off.
+ * - `composite`: `composite` -- the bucket key is an OBJECT, `{sourceName: value}`; `fields` maps
+ *   each `sourceName` (the composite `sources[]` entry's own key, a caller-chosen label, NOT a
+ *   field path) to the field path that source's `terms.field` aggregates on.
+ */
+export type AggFieldSpec =
+  | { kind: 'scalar'; field: string }
+  | { kind: 'multi'; fields: string[] }
+  | { kind: 'composite'; fields: Record<string, string> };
+
+/** `resolveAggFieldSpec`'s `multi_terms` branch: `{terms: [{field}, {field}, ...]}` -- mirrors the
+ * shape `guardrails.ts`'s `checkAggs` already validates for this same agg type. */
+function resolveMultiTermsSpec(
+  aggDef: Record<string, unknown> | undefined,
+): AggFieldSpec | undefined {
+  const multiTerms = aggDef?.multi_terms as { terms?: unknown } | undefined;
+  if (!multiTerms || !Array.isArray(multiTerms.terms)) {
+    return undefined;
+  }
+  const fields = multiTerms.terms
+    .map(spec => (spec as { field?: unknown } | undefined)?.field)
+    .filter((field): field is string => typeof field === 'string');
+  // Positional: a `multi_terms` bucket key's array length matches `terms.length`, INCLUDING any
+  // entry this loop couldn't resolve to a string field (silently dropped by `filter` above would
+  // desync position i in `fields` from position i in the bucket key array) -- so an incomplete
+  // resolution is reported as no spec at all (`undefined`) rather than a partial, misaligned one.
+  return fields.length > 0 && fields.length === multiTerms.terms.length
+    ? { kind: 'multi', fields }
+    : undefined;
+}
+
+/** `resolveAggFieldSpec`'s `composite` branch: `{sources: [{sourceName: {terms: {field}}}, ...]}`
+ * -- mirrors the shape `guardrails.ts`'s `checkAggs` already validates for this same agg type. */
+function resolveCompositeSpec(
+  aggDef: Record<string, unknown> | undefined,
+): AggFieldSpec | undefined {
+  const composite = aggDef?.composite as { sources?: unknown } | undefined;
+  if (!composite || !Array.isArray(composite.sources)) {
+    return undefined;
+  }
+  const fields: Record<string, string> = {};
+  for (const source of composite.sources) {
+    if (!source || typeof source !== 'object' || Array.isArray(source)) {
+      continue;
+    }
+    for (const [sourceName, sourceSpec] of Object.entries(
+      source as Record<string, unknown>,
+    )) {
+      const field = (sourceSpec as { terms?: { field?: unknown } } | undefined)
+        ?.terms?.field;
+      if (typeof field === 'string') {
+        fields[sourceName] = field;
+      }
+    }
+  }
+  return Object.keys(fields).length > 0
+    ? { kind: 'composite', fields }
+    : undefined;
+}
+
+function resolveAggFieldSpec(
+  aggDef: Record<string, unknown> | undefined,
+): AggFieldSpec | undefined {
+  for (const aggType of [
+    'terms',
+    'significant_terms',
+    'cardinality',
+  ] as const) {
+    const spec = aggDef?.[aggType] as { field?: unknown } | undefined;
+    if (spec && typeof spec.field === 'string') {
+      return { kind: 'scalar', field: spec.field };
+    }
+  }
+  return resolveMultiTermsSpec(aggDef) ?? resolveCompositeSpec(aggDef);
+}
+
+/**
+ * Reads the field(s) driving each of a digest's `breakdown` aggregations' bucket keys, from the
+ * EXECUTED request body — the response's `aggregations` tree only carries bucket keys/counts,
+ * never which field(s) produced them, so this must read the query side. Returns a map of
+ * top-level aggregation name → `AggFieldSpec` (`undefined` for an agg with no extractable field,
+ * e.g. a date_histogram), in the body's key order — the same order digest.ts's `buildBreakdown`
+ * iterates, so the two can't drift apart. Breakdown entries name their aggregation (`agg`) only in
+ * the multi-agg case; a single-agg entry attributes to the map's first key.
+ *
+ * Resolves `terms`/`significant_terms`/`cardinality` (a single scalar field), `multi_terms` (an
+ * array of fields, positionally aligned with the bucket key array), and `composite` (a
+ * `sourceName -> field` map, aligned with the bucket key object's own keys) — see `AggFieldSpec`.
+ * Any OTHER agg shape (date_histogram, histogram, filters, ...) resolves to `undefined`, exactly
+ * as before this file learned about `multi_terms`/`composite`; `applyFieldPolicy`'s fail-closed
+ * backstop for an `undefined` spec (see its own doc comment) is what now covers whatever agg shape
+ * this function does not yet parse, rather than this function trying to enumerate every possible
+ * future shape.
  *
  * This is intentionally NOT threaded through `Digest` itself beyond the `agg` name: adding the
- * FIELD to every digest object would change buildDigest's output even when privacy is off,
+ * FIELD(S) to every digest object would change buildDigest's output even when privacy is off,
  * breaking the "privacy OFF is byte-identical to today" requirement. Computing it as a sibling
  * value in executor.ts (from the same `valved.body` it already has on hand) keeps digest.ts
  * privacy-agnostic.
  */
 export function extractAggFields(
   body: Record<string, unknown> | undefined,
-): Record<string, string | undefined> | undefined {
+): Record<string, AggFieldSpec | undefined> | undefined {
   // Both spellings must be read: OpenSearch accepts `aggregations` as a synonym for `aggs`, and
   // the escape hatch passes the model's raw body through. Reading only `aggs` would leave the
   // breakdown of an `aggregations`-spelled query unattributed, and therefore unscrubbed.
@@ -812,24 +902,229 @@ export function extractAggFields(
   if (aggKeys.length === 0) {
     return undefined;
   }
-  const fields: Record<string, string | undefined> = {};
+  const fields: Record<string, AggFieldSpec | undefined> = {};
   for (const aggKey of aggKeys) {
-    const aggDef = aggs[aggKey] as Record<string, unknown> | undefined;
-    let field: string | undefined;
-    for (const aggType of [
-      'terms',
-      'significant_terms',
-      'cardinality',
-    ] as const) {
-      const spec = aggDef?.[aggType] as { field?: unknown } | undefined;
-      if (spec && typeof spec.field === 'string') {
-        field = spec.field;
-        break;
-      }
-    }
-    fields[aggKey] = field;
+    fields[aggKey] = resolveAggFieldSpec(
+      aggs[aggKey] as Record<string, unknown> | undefined,
+    );
   }
   return fields;
+}
+
+/**
+ * Applies one field's policy to one scalar value — the single-field decision shared by the
+ * `samples` loop's regular (non-aggregation-key) fields below and every "scalar" case of
+ * `scrubAggKeyComponent`. `keep: false` means "field is 'never': omit it"; a caller decides for
+ * itself what "omit" means at its own granularity (drop one sample field, drop one composite
+ * property, or drop a whole bucket for a positional multi_terms component — see
+ * `scrubAggKeyComponent`).
+ *
+ * Branch order is deliberate — never -> anonymize -> escape-hatch fail-closed -> #8889/#8902
+ * allow-by-omission -> explicit allow/passthrough. The #8889/#8902 branch below is the
+ * digest-boundary half of that hardening's defense-in-depth (the other half, chat.ts's
+ * `scrubMessagesForProvider` running `prescanAndMintToolContent`/`prescanAndMint` over every
+ * outbound message, is independent of this function and does not substitute for it) and MUST
+ * survive any future refactor of this function — see that branch's own comment.
+ */
+function scrubFieldValue(
+  field: string,
+  value: unknown,
+  policy: FieldPolicyEntry[],
+  pseudonymizer: Pseudonymizer,
+  toolName: string | undefined,
+  isEscapeHatch: boolean,
+): { keep: boolean; value: unknown } {
+  const entry = resolveFieldEntry(field, policy, toolName);
+  if (entry?.action === 'never') {
+    return { keep: false, value: undefined };
+  }
+  if (
+    entry?.action === 'anonymize' &&
+    typeof value === 'string' &&
+    value.length > 0
+  ) {
+    return {
+      keep: true,
+      value: pseudonymizer.pseudonymize(
+        value,
+        entry.kind ?? inferPseudonymKind(field),
+      ),
+    };
+  }
+  if (
+    !entry &&
+    isEscapeHatch &&
+    typeof value === 'string' &&
+    value.length > 0
+  ) {
+    // Fail-closed: no explicit policy entry for this field, but the escape hatch can surface any
+    // finding field, so an unlisted one is NOT trusted as safe-by-omission here.
+    return {
+      keep: true,
+      value: pseudonymizer.pseudonymize(value, inferPseudonymKind(field)),
+    };
+  }
+  if (!entry && typeof value === 'string' && value.length > 0) {
+    // #8889/#8902: allow-BY-OMISSION (typed tool, no explicit policy entry — the escape-hatch case
+    // above already handled isEscapeHatch). The value still reaches the provider verbatim, same as
+    // before, but an IP/FQDN embedded in otherwise-free text (e.g. a package/process name that
+    // happens to mention a hostname) gets a secondary scan here. Deliberately narrower than "every
+    // allow-resolved value": an EXPLICIT policy entry (agent id, MITRE technique IDs, compliance
+    // citations, CIS benchmark content, ...) is a reviewed, curated decision and several of those
+    // values are legitimately FQDN-token-shaped without being hostnames; scanning them here too
+    // would misfire, so they fall through to the plain passthrough below instead. This branch must
+    // never be silently dropped by a future refactor — see this function's own doc comment above.
+    return { keep: true, value: prescanAndMint(value, pseudonymizer) };
+  }
+  return { keep: true, value };
+}
+
+/**
+ * Scrubs one aggregation bucket's `key`, whatever shape it is, against `spec` (from
+ * `extractAggFields` — `undefined` when the agg's field couldn't be determined, e.g. a
+ * date_histogram). Returns `{drop: true}` when the ENTIRE bucket must be dropped (a scalar/
+ * positional-multi 'never' — see below), otherwise `{drop: false, value}` with `value` the
+ * (possibly scrubbed) replacement key.
+ *
+ * - `scalar` (terms/significant_terms/cardinality): the existing single-field decision, unchanged
+ *   in behavior — 'never' drops the whole bucket (every bucket key IS a value of that one field,
+ *   so there is nothing left to keep), 'anonymize' pseudonymizes the string key.
+ * - `multi` (multi_terms — key is an ARRAY, `spec.fields[i]` names index `i`'s field): scrubbed
+ *   per-component, BUT if ANY component's field is 'never', the WHOLE bucket is dropped rather
+ *   than only that array slot — a positional array has no per-slot label the way `composite`'s
+ *   object does, so removing one slot would silently shift the remaining values out of alignment
+ *   with their own fields, which is worse than dropping the bucket outright.
+ * - `composite` (key is an OBJECT, `{sourceName: value}`, `spec.fields[sourceName]` names that
+ *   source's field): scrubbed per-component, and a 'never' component IS safely omittable here —
+ *   each property is independently labeled by its own `sourceName`, so dropping one leaves the
+ *   rest correctly attributable, unlike `multi` above. The bucket itself is only dropped if that
+ *   leaves NO properties at all.
+ * - `undefined` spec (no field could be determined — date_histogram, histogram, filters, or any
+ *   agg shape this file does not parse): typed catalog tools never see an aggregation shape they
+ *   did not build themselves, so a spec-less bucket here is trusted as non-field-bearing (the
+ *   date_histogram case this default was written for) and passed through untouched. The
+ *   `search_wazuh_data` escape hatch's arbitrary DSL, though, can put ANY agg shape here —
+ *   including one this file does not yet parse but that DOES carry a real field — so it fails
+ *   CLOSED instead: a string key is pseudonymized generically (no field name to infer a kind
+ *   from), anything else (object/array/number) is dropped outright rather than risk shipping an
+ *   unrecognized structured value verbatim.
+ */
+function scrubAggKey(
+  rawKey: unknown,
+  spec: AggFieldSpec | undefined,
+  policy: FieldPolicyEntry[],
+  pseudonymizer: Pseudonymizer,
+  toolName: string | undefined,
+  isEscapeHatch: boolean,
+): { drop: boolean; value?: unknown } {
+  if (!spec) {
+    if (!isEscapeHatch) {
+      return { drop: false, value: rawKey };
+    }
+    if (typeof rawKey === 'string' && rawKey.length > 0) {
+      return {
+        drop: false,
+        value: pseudonymizer.pseudonymize(rawKey, inferPseudonymKind('key')),
+      };
+    }
+    // An object/array of genuinely unknown shape cannot be safely component-scrubbed (no field
+    // mapping exists for it), so the whole bucket is dropped rather than risk shipping raw
+    // structured data. A harmless scalar (number, empty string) is not structured data worth
+    // dropping over -- pass it through unchanged, same as the non-escape-hatch branch above.
+    if (rawKey !== null && typeof rawKey === 'object') {
+      return { drop: true };
+    }
+    return { drop: false, value: rawKey };
+  }
+
+  if (spec.kind === 'scalar') {
+    const result = scrubFieldValue(
+      spec.field,
+      rawKey,
+      policy,
+      pseudonymizer,
+      toolName,
+      isEscapeHatch,
+    );
+    return result.keep ? { drop: false, value: result.value } : { drop: true };
+  }
+
+  if (spec.kind === 'multi') {
+    if (!Array.isArray(rawKey) || rawKey.length !== spec.fields.length) {
+      // Shape mismatch: not reachable through `extractAggFields` today (it only ever produces a
+      // `multi` spec whose `fields.length` already matches the source `multi_terms.terms.length`,
+      // and a well-formed OpenSearch response's bucket key array length always matches that same
+      // `terms` count) -- but the escape hatch's arbitrary DSL is this file's only caller that
+      // doesn't go through `extractAggFields`'s own validation on the way in, so this branch is
+      // still the last fail-open path on that route. Symmetric with the `!spec` structured-key
+      // branch above: an unrecognized/mismatched shape is dropped rather than trusted as safe.
+      return { drop: true };
+    }
+    const out: unknown[] = [];
+    for (let i = 0; i < rawKey.length; i += 1) {
+      const result = scrubFieldValue(
+        spec.fields[i],
+        rawKey[i],
+        policy,
+        pseudonymizer,
+        toolName,
+        isEscapeHatch,
+      );
+      if (!result.keep) {
+        return { drop: true }; // Any 'never' component drops the whole positional bucket.
+      }
+      out.push(result.value);
+    }
+    return { drop: false, value: out };
+  }
+
+  // composite
+  if (!rawKey || typeof rawKey !== 'object' || Array.isArray(rawKey)) {
+    return { drop: false, value: rawKey }; // Shape mismatch -- leave alone defensively.
+  }
+  const out: Record<string, unknown> = {};
+  for (const [sourceName, componentValue] of Object.entries(
+    rawKey as Record<string, unknown>,
+  )) {
+    const field = spec.fields[sourceName];
+    if (!field) {
+      // No resolved field for this named source (e.g. a composite source type `extractAggFields`
+      // does not map to a field, like `histogram`/`date_histogram`/`geotile_grid` -- as of this
+      // change `guardrails.ts`'s `checkAggs` REJECTS a non-`terms` composite source outright, so a
+      // typed tool or a guardrail-checked escape-hatch query can no longer reach this branch with
+      // one; kept as defense in depth for anything upstream of that check anyway). Typed catalog
+      // tools keep today's pass-through (same rationale as the top-level `undefined`-spec branch
+      // above: nothing curated is being bypassed). The escape hatch fails CLOSED instead: a string
+      // component is pseudonymized generically, a structured one is omitted outright rather than
+      // risk shipping an unrecognized value verbatim.
+      if (!isEscapeHatch) {
+        out[sourceName] = componentValue;
+      } else if (
+        typeof componentValue === 'string' &&
+        componentValue.length > 0
+      ) {
+        out[sourceName] = pseudonymizer.pseudonymize(
+          componentValue,
+          inferPseudonymKind(sourceName),
+        );
+      }
+      // else (escape hatch + non-string/empty component): omit the property entirely.
+      continue;
+    }
+    const result = scrubFieldValue(
+      field,
+      componentValue,
+      policy,
+      pseudonymizer,
+      toolName,
+      isEscapeHatch,
+    );
+    if (result.keep) {
+      out[sourceName] = result.value;
+    }
+    // else: 'never' on this one named component -- omit just that property, unlike `multi` above.
+  }
+  return { drop: Object.keys(out).length === 0, value: out };
 }
 
 /**
@@ -850,13 +1145,23 @@ export function extractAggFields(
  *   AGGREGATED field, not of a field literally called "key". Resolving it by name matched no policy
  *   entry, so a top-agents/top-rules aggregation sent its real bucket values to the provider under
  *   `samples[].key` while `breakdown` — the same values, one key over — was correctly scrubbed.
- *   `key` is therefore resolved against `aggFields`' first aggregation field whenever there is one.
- * - `breakdown`: a bucket key's field can't be read from the digest alone (see `extractAggFields`
- *   above) — each bucket is attributed to its aggregation (the entry's `agg` name, or the first
- *   aggregation when unset — the single-agg case) and that aggregation's field is resolved against
- *   the same policy ("a top-agents terms agg leaks hostnames otherwise"). A 'never' field
- *   drops that aggregation's buckets entirely, since every bucket key IS a value of that field; a
- *   bucket whose aggregation has no extractable field (e.g. date_histogram) passes through.
+ *   `key` is therefore resolved via `scrubAggKey` against `aggFields`' first aggregation spec
+ *   whenever there is one — including `multi_terms`/`composite` shapes now, not just a scalar
+ *   field, per-component (see `scrubAggKey`'s doc comment). A sample whose 'key' bucket resolves
+ *   to `{drop: true}` (a scalar/positional-multi 'never') has its ENTIRE 'key' entry omitted, same
+ *   as any other 'never' field — 'doc_count' and any other sample field are unaffected, matching
+ *   the samples loop's existing per-field (not per-row) drop granularity.
+ * - `breakdown`: a bucket key's field(s) can't be read from the digest alone (see
+ *   `extractAggFields` above) — each bucket is attributed to its aggregation (the entry's `agg`
+ *   name, or the first aggregation when unset — the single-agg case) and that aggregation's
+ *   spec is resolved against the same policy via `scrubAggKey` ("a top-agents terms agg leaks
+ *   hostnames otherwise"). A spec that resolves to `{drop: true}` drops that WHOLE bucket (a
+ *   breakdown entry has no other field to fall back to, unlike a sample row's 'doc_count'); a
+ *   bucket whose aggregation has no extractable field (e.g. date_histogram) passes through
+ *   unscrubbed for typed tools, and fails closed for the escape hatch — see `scrubAggKey`'s
+ *   `undefined`-spec branch (this inverted default, plus `multi_terms`/`composite` support, is
+ *   what closed the gap where an escape-hatch multi_terms/composite bucket used to bypass the
+ *   field policy entirely by falling through this same "no field" branch unconditionally).
  * - `message`: the Manager top-level `message` field is free text from the API, not a
  *   structured field a per-field policy entry can target — it is run through the pseudonymizer's
  *   whole-text scrub (`applyToText`, the same pass the outbound tool-call-argument scrub in
@@ -883,67 +1188,53 @@ export function applyFieldPolicy(
   digest: Digest,
   policy: FieldPolicyEntry[],
   pseudonymizer: Pseudonymizer,
-  aggFields?: Record<string, string | undefined>,
+  aggFields?: Record<string, AggFieldSpec | undefined>,
   toolName?: string,
   isEscapeHatch = false,
 ): Digest {
-  // The field a bucket row's `key` holds the values OF — see the `samples` note above. `undefined`
+  // The spec a bucket row's `key` holds values against — see the `samples` note above. `undefined`
   // for a non-aggregation digest, or for an aggregation with no extractable field (e.g. a
   // date_histogram), in which case `key` resolves by its own name like any other sample field.
-  const firstAggField = aggFields
+  const firstAggSpec = aggFields
     ? aggFields[Object.keys(aggFields)[0]]
     : undefined;
+  const isAggDigest = aggFields !== undefined;
 
   const samples = digest.samples.map(sample => {
     const out: Record<string, unknown> = {};
     for (const [sampleKey, value] of Object.entries(sample)) {
-      // `sampleKey` is what the digest stays KEYED by (never rewritten — the model's view of the
-      // digest shape must not change); `field` is only what the policy is resolved against.
-      const field =
-        sampleKey === 'key' && firstAggField ? firstAggField : sampleKey;
-      const entry = resolveFieldEntry(field, policy, toolName);
-      if (entry?.action === 'never') {
+      if (sampleKey === 'key' && isAggDigest) {
+        // `scrubAggKey`'s `drop: true` means "omit the 'key' entry" HERE, at sample granularity —
+        // matching this loop's existing per-field (not per-row) drop behavior. It means something
+        // stricter ("drop the whole bucket") in the `breakdown` loop below, which has no sibling
+        // field like `doc_count` to preserve once the identity itself is gone; a sample row does,
+        // so `doc_count`/any other sample field survives a dropped 'key' exactly as before.
+        const result = scrubAggKey(
+          value,
+          firstAggSpec,
+          policy,
+          pseudonymizer,
+          toolName,
+          isEscapeHatch,
+        );
+        if (!result.drop) {
+          out[sampleKey] = result.value;
+        }
         continue;
       }
-      if (
-        entry?.action === 'anonymize' &&
-        typeof value === 'string' &&
-        value.length > 0
-      ) {
-        out[sampleKey] = pseudonymizer.pseudonymize(
-          value,
-          entry.kind ?? inferPseudonymKind(field),
-        );
-      } else if (
-        !entry &&
-        isEscapeHatch &&
-        typeof value === 'string' &&
-        value.length > 0
-      ) {
-        // Fail-closed: no explicit policy entry for this field, but the escape hatch can
-        // surface any finding field, so an unlisted one is NOT trusted as safe-by-omission here.
-        out[sampleKey] = pseudonymizer.pseudonymize(
-          value,
-          inferPseudonymKind(field),
-        );
-      } else if (!entry && typeof value === 'string' && value.length > 0) {
-        // #8889: allow-BY-OMISSION (typed tool, no explicit policy entry — the escape-hatch case
-        // above already handled isEscapeHatch). The value still reaches the provider verbatim,
-        // same as before, but an IP/FQDN embedded in otherwise-free text (e.g. a package/process
-        // name that happens to mention a hostname) previously had no secondary scan at all.
-        // Deliberately narrower than "every allow-resolved value": an EXPLICIT policy entry
-        // (agent id, MITRE technique IDs — which use dotted sub-technique notation like
-        // "T1059.001" —, compliance citations, CIS benchmark content, ...) is a reviewed, curated
-        // decision (see FIELD_POLICY_DEFAULTS' comments above) and several of those values are
-        // legitimately FQDN-token-shaped without being hostnames; scanning them here too would
-        // misfire. Those stay covered end-to-end regardless: chat.ts's scrubMessagesForProvider
-        // runs prescanAndMintToolContent over every tool-result string value, regardless of field
-        // policy, right before the request leaves the server. Bare single-word identifiers are
-        // still not caught here (see prescanAndMint's own doc comment) — only the
-        // embedded-IP/FQDN case closes.
-        out[sampleKey] = prescanAndMint(value, pseudonymizer);
-      } else {
-        out[sampleKey] = value;
+      // `sampleKey` is what the digest stays KEYED by (never rewritten — the model's view of
+      // the digest shape must not change); `field` is only what the policy is resolved against
+      // (`scrubFieldValue` resolves it via `resolveFieldEntry`, same as every other caller).
+      const result = scrubFieldValue(
+        sampleKey,
+        value,
+        policy,
+        pseudonymizer,
+        toolName,
+        isEscapeHatch,
+      );
+      if (result.keep) {
+        out[sampleKey] = result.value;
       }
     }
     return out;
@@ -954,41 +1245,19 @@ export function applyFieldPolicy(
     const firstAggName = Object.keys(aggFields)[0];
     const scrubbed: NonNullable<Digest['breakdown']> = [];
     for (const bucket of breakdown) {
-      const field = aggFields[bucket.agg ?? firstAggName];
-      if (!field) {
-        scrubbed.push(bucket);
+      const spec = aggFields[bucket.agg ?? firstAggName];
+      const result = scrubAggKey(
+        bucket.key,
+        spec,
+        policy,
+        pseudonymizer,
+        toolName,
+        isEscapeHatch,
+      );
+      if (result.drop) {
         continue;
       }
-      const entry = resolveFieldEntry(field, policy, toolName);
-      if (entry?.action === 'never') {
-        continue;
-      }
-      if (entry?.action === 'anonymize') {
-        const kind = entry.kind ?? inferPseudonymKind(field);
-        scrubbed.push({
-          ...bucket,
-          key: pseudonymizer.pseudonymize(bucket.key, kind),
-        });
-      } else if (!entry && isEscapeHatch) {
-        // Same fail-closed default as the samples loop above, applied to bucket keys.
-        scrubbed.push({
-          ...bucket,
-          key: pseudonymizer.pseudonymize(
-            bucket.key,
-            inferPseudonymKind(field),
-          ),
-        });
-      } else if (!entry) {
-        // #8889: same allow-by-omission value-shape scan as the samples loop above (see that
-        // branch's comment), applied to bucket keys — each bucket key IS a value of the
-        // aggregated field.
-        scrubbed.push({
-          ...bucket,
-          key: prescanAndMint(bucket.key, pseudonymizer),
-        });
-      } else {
-        scrubbed.push(bucket);
-      }
+      scrubbed.push({ ...bucket, key: result.value });
     }
     // Assigned unconditionally, empty result included: an empty array means a 'never' entry
     // dropped every bucket, and the caller must then see NO breakdown at all. Falling back to

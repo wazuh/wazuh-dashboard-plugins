@@ -199,6 +199,57 @@ test('buildDigest: a null hits element is skipped, not thrown', () => {
   assert.equal(digest.counts.returned, 2);
 });
 
+test('buildDigest: exact-count hits.total ({value, relation: "eq"}, track_total_hits: true shape) is used as-is', () => {
+  // guardrails.ts's applySafetyValves forces track_total_hits: true on every outbound request, so
+  // the Indexer always returns this object shape with relation 'eq' (an exact count) -- never the
+  // capped 'gte' shape a numeric track_total_hits produces. `relation` itself is not read; this
+  // just confirms `.value` is picked up regardless of which relation string accompanies it.
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'a', label: 'A' }] },
+    digest: { sampleColumns: ['a'] },
+  });
+  const result = {
+    hits: {
+      total: { value: 12345, relation: 'eq' },
+      hits: [{ _source: { a: 1 } }],
+    },
+  };
+  const digest = buildDigest('search_wazuh_data', result, def);
+  assert.equal(digest.counts.total, 12345);
+  assert.equal(digest.counts.returned, 1);
+  assert.equal(digest.counts.truncated, true);
+});
+
+test('buildDigest: a bare-number hits.total (legacy/defensive shape) is also accepted', () => {
+  // Not the shape OpenSearch actually sends today (see digest.ts's resolveHitsTotal doc comment),
+  // but resolveHitsTotal accepts it defensively -- this pins that behavior rather than leaving it
+  // untested.
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'a', label: 'A' }] },
+    digest: { sampleColumns: ['a'] },
+  });
+  const result = {
+    hits: {
+      total: 7,
+      hits: [{ _source: { a: 1 } }],
+    },
+  };
+  const digest = buildDigest('search_wazuh_data', result, def);
+  assert.equal(digest.counts.total, 7);
+  assert.equal(digest.counts.truncated, true);
+});
+
+test('buildDigest: hits.total missing entirely (track_total_hits: false-equivalent) leaves total undefined and truncated false', () => {
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'a', label: 'A' }] },
+    digest: { sampleColumns: ['a'] },
+  });
+  const result = { hits: { hits: [{ _source: { a: 1 } }] } };
+  const digest = buildDigest('search_wazuh_data', result, def);
+  assert.equal(digest.counts.total, undefined);
+  assert.equal(digest.counts.truncated, false);
+});
+
 // --- deriveResultColumns / deriveColumns tools -----------------------------------------------------
 
 test('buildTableSpec: deriveColumns tools union keys across sample rows, capped and preferred-first', () => {
@@ -671,7 +722,9 @@ test('buildDigest: breakdown "key" values are stripped of control characters and
     },
   };
   const digest = buildDigest('get_top_rules', result, def);
-  const key = digest.breakdown![0].key;
+  // `key` is `unknown` (multi_terms/composite widened the type -- see Digest's doc comment), but a
+  // plain terms/significant_terms/cardinality bucket (this test's shape) is always a string.
+  const key = digest.breakdown![0].key as string;
   assert.ok(
     !hasControlChar(key),
     'control characters must be stripped from the key',

@@ -46,6 +46,20 @@ test('the "general" category description carries the explicit exclusion', () => 
   );
 });
 
+test('the "findings" category description mentions top/noisiest agents (get_top_agents routing)', () => {
+  // Pins get_top_agents' routing hint in TOOL_CATEGORY/CATEGORY_DESCRIPTIONS -- with no test, this
+  // line has no guard against silently disappearing in a future three-way merge of router.ts.
+  const prompt = buildRoutingPrompt('2026-01-01T00:00:00.000Z');
+  const findingsLine = prompt
+    .split('\n')
+    .find(line => line.trim().startsWith('- findings:'));
+  assert.ok(findingsLine, 'routing prompt must list a "findings" menu entry');
+  assert.match(
+    findingsLine as string,
+    /top\/noisiest agents/,
+    "findings' description must mention top/noisiest agents so get_top_agents-shaped questions route here",
+  );
+});
 /**
  * Out-of-scope regression: M-OOS-01/02 (active-response questions) and M-OOS-05 (agent
  * comms-channel health) were mis-routed onto adjacent tools (get_brute_force,
