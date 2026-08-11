@@ -1619,7 +1619,11 @@ describe('ChatPage — transcript reserves space for the sticky composer', () =>
   });
 
   it("keeps the transcript's CSS padding tied to the sticky panel's own gradient height", () => {
-    const scssPath = require.resolve('./chat-page.scss');
+    // `require.resolve` goes through Jest's own module resolution, which this project's
+    // moduleNameMapper points at `style_mock.js` for every `.scss` import — reading through
+    // that would read the mock's content, not this file's real rules. `path.join` against
+    // `__dirname` sidesteps Jest's resolver entirely and reads the actual SCSS off disk.
+    const scssPath = require('path').join(__dirname, 'chat-page.scss');
     const scssSource = require('fs').readFileSync(scssPath, 'utf8');
 
     const transcriptPadding = scssSource.match(
