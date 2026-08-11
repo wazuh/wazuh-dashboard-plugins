@@ -331,7 +331,14 @@ describe('SettingsPage — manual test failure callout is genuinely dismissible'
       latencyMs: 42,
       message: null,
     });
-    fireEvent.click(testButton);
+    // Re-query rather than reuse the `testButton` handle captured before the first click: the
+    // failure callout mounting above the table re-renders the action column, and clicking a
+    // stale reference to the pre-callout button element is a silent no-op — the second click
+    // never reaches the handler, so the call count sticks at 2.
+    const testButtonAfterFailure = await screen.findByRole('button', {
+      name: 'Test',
+    });
+    fireEvent.click(testButtonAfterFailure);
     await waitFor(() => expect(mockService.test).toHaveBeenCalledTimes(3));
 
     expect(
@@ -370,6 +377,16 @@ describe('SettingsPage — manual test failure callout is genuinely dismissible'
 
     // Deleting the provider removes it from the list entirely, so the callout must disappear too.
     mockService.list.mockResolvedValueOnce([]);
+    // Test is isPrimary and claims one of the row's two always-visible action slots, so Delete
+    // (the second non-primary action, after Edit) collapses behind the row's overflow popover —
+    // open it by its icon rather than by aria-label text, since no other test in this suite
+    // asserts on the OUI fork's wording for that trigger.
+    const moreRowActionsButton = document
+      .querySelector('[data-euiicon-type="boxesVertical"]')
+      ?.closest('button');
+    if (moreRowActionsButton) {
+      fireEvent.click(moreRowActionsButton);
+    }
     const deleteRowButton = await screen.findByRole('button', {
       name: 'Delete',
     });
