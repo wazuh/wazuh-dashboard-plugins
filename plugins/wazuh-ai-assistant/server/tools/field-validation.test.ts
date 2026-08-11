@@ -1,5 +1,9 @@
 import assert from 'node:assert/strict';
-import { extractFieldNames, validateQueryFields } from './field-validation';
+import {
+  extractFieldNames,
+  FIELD_REJECTION_RECOVERY_GUIDANCE,
+  validateQueryFields,
+} from './field-validation';
 
 type Context = Parameters<typeof validateQueryFields>[0];
 
@@ -132,6 +136,30 @@ test('validateQueryFields: rejects a field not present in the live mapping, nami
     assert.match(result.reason, /"agent\.name\.keyword" does not exist/);
     assert.match(result.reason, /"agent\.name"/);
     assert.match(result.reason, /"wazuh\.agent\.name"/);
+  }
+});
+
+test('validateQueryFields: rejection carries recovery guidance (issue #8911) — no-retry, answer-from-gathered, and honest-cannot-check', async () => {
+  // Guards the anti-fabrication/anti-retry-loop property against a well-meaning future reword,
+  // the same way chat.ts's FINAL_ROUND_ANSWER_INSTRUCTION test pins its own three clauses.
+  const context = fakeContext(['agent.name', 'wazuh.agent.name', '@timestamp']);
+  const body = {
+    aggs: { top_agents: { terms: { field: 'agent.name.keyword', size: 5 } } },
+  };
+  const result = await validateQueryFields(
+    context,
+    'wazuh-findings-v5*-guidance',
+    body,
+  );
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.match(result.reason, /do not retry this query/i);
+    assert.match(result.reason, /using only the results already gathered/i);
+    assert.match(
+      result.reason,
+      /state plainly that this could not be checked/i,
+    );
+    assert.ok(result.reason.endsWith(FIELD_REJECTION_RECOVERY_GUIDANCE));
   }
 });
 

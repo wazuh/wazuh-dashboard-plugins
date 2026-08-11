@@ -1,4 +1,9 @@
-import { ToolDefinition } from '../types';
+import {
+  OpenSearchDashboardsRequest,
+  RequestHandlerContext,
+} from '../../../../../src/core/server';
+import { ResolveParamsResult, ToolDefinition } from '../types';
+import { resolveApiHostId } from '../api-host';
 import {
   clampLimit,
   INVENTORY_CURRENT_STATE_NOTE,
@@ -191,6 +196,22 @@ function parseKind(value: unknown): InventoryKind {
     )}; got ${JSON.stringify(value)}.`,
   );
 }
+
+/** Shared by `resolveAgentFilter`'s own throw (a direct `buildRequest` call with neither
+ * identifier, e.g. from a unit test) and `resolveDeicticAgentParams`'s failure paths below (issue
+ * #8913) so the two can never drift into different wording for the same underlying situation.
+ *
+ * Deliberately does NOT name `get_agents` (follow-up audit fix, same class of bug this whole
+ * file exists to fix): `resolveDeicticAgentParams`'s zero-active-agents and lookup-failure
+ * branches return exactly this text as a LIVE tool_result error, at a point where get_agent_inventory
+ * has already been called -- which only happens when stage-1 routing offered the 'inventory'
+ * category. Nothing guarantees 'agents' (the category get_agents lives in) was ALSO routed that
+ * turn, so telling the model to "call get_agents" here can name a tool it does not have, same
+ * failure mode as the tool description/system prompt text this file was reworded to fix. Asking
+ * the user is always a safe next step regardless of which tools this turn happens to have. */
+const NO_AGENT_IDENTIFIER_ERROR =
+  'Either "agent_id" (numeric Wazuh agent ID, e.g. "003") or "agent_name" (the agent\'s name) ' +
+  'is required and could not be resolved automatically. Ask the user which agent/host they mean.';
 
 /**
  * Per-kind primary name field the optional `filter` param (issue #8910) narrows on, keyed the same
@@ -398,6 +419,13 @@ function buildInventoryFilterClause(
  * descriptive Error naming both options, same self-correction convention as `validateAgentId`
  * and `parseKind` below (the orchestration loop turns a thrown Error into a bounded tool_result
  * the model reads and can retry from).
+ *
+ * In normal (non-test) operation this "neither supplied" branch is no longer actually reachable
+ * for get_agent_inventory specifically: `resolveDeicticAgentParams` below always runs first (as
+ * this tool's `resolveParams` hook) and either injects an `agent_id` or fails the call itself
+ * before `buildRequest` -- see that function's doc comment for why (issue #8913). Left in place,
+ * unchanged, as defense in depth and because a direct unit-level `buildRequest` call (this file's
+ * own tests) bypasses `resolveParams` entirely.
  */
 function resolveAgentFilter(
   params: Record<string, unknown>,
@@ -409,10 +437,154 @@ function resolveAgentFilter(
   if (agentName && agentName.trim() !== '') {
     return { match: { 'wazuh.agent.name': agentName } };
   }
-  throw new Error(
-    'Either "agent_id" (numeric Wazuh agent ID, e.g. "003") or "agent_name" (the agent\'s ' +
-      'name) is required. If neither is known, call get_agents first to look it up.',
-  );
+  throw new Error(NO_AGENT_IDENTIFIER_ERROR);
+}
+
+/** How many active-agent candidates `resolveDeicticAgentParams` lists in its "which agent?" error
+ * when more than one is found -- bounded so a deployment with hundreds of active agents doesn't
+ * blow the bounded tool-result error budget. The Manager API's own `total_affected_items` still
+ * tells the model the true count even when the listed names are a prefix of it. */
+const MAX_LISTED_AGENT_CANDIDATES = 10;
+/** Fetch size for the active-agent lookup -- one more than the cap above purely so a result of
+ * exactly `MAX_LISTED_AGENT_CANDIDATES + 1` active agents is still reported with an accurate
+ * "+N more" rather than looking like an exact match for the cap. */
+const AGENT_LOOKUP_LIMIT = MAX_LISTED_AGENT_CANDIDATES + 1;
+/** Same pseudo-agent exclusion `get-agents.ts`'s own "no agent_ids filter" branch applies (its own
+ * `q: 'id!=000'`), so a deployment with otherwise zero real active agents cannot silently resolve
+ * to the manager's own pseudo-agent "000". */
+const MANAGER_PSEUDO_AGENT_QUERY = 'id!=000';
+
+interface ManagerAgentSummary {
+  id?: unknown;
+  name?: unknown;
+}
+
+/**
+ * `ToolDefinition.resolveParams` hook (issue #8913): resolves a deictic agent reference ("this
+ * server", "the host") server-side instead of relying on the model to call `get_agents` first --
+ * the system prompt used to instruct exactly that, but a live-verified N=5 run of the issue's own
+ * worked example ("What software does this box have installed?") found the model followed it 0/5
+ * times (4/5 asked the user to name an agent instead of looking one up; 1/5 called
+ * `search_wazuh_data` and found nothing) -- a live diagnostic later traced this to `get_agents`
+ * (its own 'agents' category) not even being offered alongside a lone 'inventory' route, so the
+ * model could not have obeyed that instruction regardless of compliance. The system prompt's
+ * get_agent_inventory-specific instruction (prompts.ts) was rewritten accordingly to say "call
+ * this tool directly" instead of "call get_agents first". This hook is what makes that reworded
+ * instruction actually correct rather than just differently wrong: prompt compliance alone can
+ * never be guaranteed, so resolution happens here, server-side, independent of it.
+ *
+ * Only runs when NEITHER `agent_id` NOR `agent_name` was supplied -- a call that supplies either
+ * returns `params` unchanged (`ok: true`, no note), so `resolveAgentFilter`'s existing validation
+ * for an explicitly-identified call is completely untouched by this hook, and this branch can
+ * never weaken it.
+ *
+ * Queries the SAME source `get_agents` reads (`GET /agents`, Manager API) with the SAME "active"
+ * status filter and pseudo-agent exclusion `catalog/get-agents.ts` itself applies -- not a new or
+ * different notion of "the agent" than what the model would have found by calling `get_agents`.
+ *
+ * - Exactly one active agent: proceeds with it (`agent_id` injected into the returned params) and
+ *   attaches a `note` naming which agent was assumed -- surfaced to the model via
+ *   `Digest.assumptionNote` (digest.ts/executor.ts), so the assumption is visible and the model is
+ *   expected to STATE it, not silently act on it as if the user had named that agent.
+ * - Zero or more than one active agent: returns the existing "which agent?" error text
+ *   (`NO_AGENT_IDENTIFIER_ERROR`), extended with the candidate list when there is more than one,
+ *   so the model can ask a narrower, informed follow-up instead of a bare "which agent do you
+ *   mean".
+ * - The lookup call itself failing (Manager API unreachable, auth failure, ...) falls back to the
+ *   same plain `NO_AGENT_IDENTIFIER_ERROR` rather than surfacing a raw lookup failure -- the model
+ *   still gets a bounded, actionable message instead of a confusing secondary error layered on top
+ *   of the original ambiguity.
+ */
+async function resolveDeicticAgentParams(
+  params: Record<string, unknown>,
+  context: RequestHandlerContext,
+  request: OpenSearchDashboardsRequest,
+): Promise<ResolveParamsResult> {
+  if (params.agent_id !== undefined) {
+    return { ok: true, resolved: { params } };
+  }
+  const agentName = optionalStringParam(params.agent_name);
+  if (agentName && agentName.trim() !== '') {
+    return { ok: true, resolved: { params } };
+  }
+
+  let agents: ManagerAgentSummary[];
+  let totalActive: number;
+  try {
+    const apiHostID = await resolveApiHostId(context, request);
+    const response = await context.wazuh_core.api.client.asCurrentUser.request(
+      'GET',
+      '/agents',
+      {
+        params: {
+          status: 'active',
+          q: MANAGER_PSEUDO_AGENT_QUERY,
+          limit: AGENT_LOOKUP_LIMIT,
+        },
+      },
+      { apiHostID },
+    );
+    const data = (
+      response.data as
+        | {
+            data?: {
+              affected_items?: unknown;
+              total_affected_items?: unknown;
+            };
+          }
+        | undefined
+    )?.data;
+    agents = Array.isArray(data?.affected_items)
+      ? (data.affected_items as ManagerAgentSummary[])
+      : [];
+    totalActive =
+      typeof data?.total_affected_items === 'number'
+        ? data.total_affected_items
+        : agents.length;
+  } catch {
+    return { ok: false, reason: NO_AGENT_IDENTIFIER_ERROR };
+  }
+
+  if (agents.length === 0) {
+    return {
+      ok: false,
+      reason:
+        `${NO_AGENT_IDENTIFIER_ERROR} (No active agent was found to assume by default -- the ` +
+        'intended agent may be pending/disconnected/never_connected.)',
+    };
+  }
+
+  if (agents.length === 1 && typeof agents[0].id === 'string') {
+    const resolvedId = agents[0].id;
+    const resolvedName =
+      typeof agents[0].name === 'string' ? agents[0].name : resolvedId;
+    return {
+      ok: true,
+      resolved: {
+        params: { ...params, agent_id: resolvedId },
+        note:
+          'No "agent_id"/"agent_name" was given, so this call was resolved to the only active ' +
+          `agent, "${resolvedName}" (id ${resolvedId}). State this assumption to the user rather ` +
+          'than presenting the result as if a specific agent had been named.',
+      },
+    };
+  }
+
+  const candidates = agents
+    .slice(0, MAX_LISTED_AGENT_CANDIDATES)
+    .map(agent =>
+      typeof agent.name === 'string' && typeof agent.id === 'string'
+        ? `"${agent.name}" (id ${agent.id})`
+        : `id ${String(agent.id)}`,
+    );
+  const remaining = totalActive - candidates.length;
+  return {
+    ok: false,
+    reason:
+      `${NO_AGENT_IDENTIFIER_ERROR} (${totalActive} active agents exist, so which one is meant ` +
+      `cannot be assumed. Candidates: ${candidates.join(', ')}` +
+      `${remaining > 0 ? `, and ${remaining} more` : ''}.)`,
+  };
 }
 
 /**
@@ -446,9 +618,13 @@ export const getAgentInventoryTool: ToolDefinition = {
       'ports), "processes" (running processes), or "hotfixes" (installed Windows hotfixes/KBs -- ' +
       'pairs with the vulnerability tools for patch-management questions, e.g. "which of these ' +
       'critical vulnerabilities already have a hotfix available"). Identify the agent by ' +
-      '"agent_id" (numeric) OR "agent_name" -- if the question refers to "this server"/"the ' +
-      'host" without naming or numbering it, and no agent id or name is otherwise known from the ' +
-      `conversation, call get_agents first to look one up. ${INVENTORY_CURRENT_STATE_NOTE} To ` +
+      '"agent_id" (numeric) OR "agent_name" if either is already known. If the question refers ' +
+      'to "this server"/"the host"/"this box" without naming or numbering it, and no agent id ' +
+      'or name is otherwise known from the conversation, call THIS TOOL DIRECTLY with BOTH ' +
+      'omitted -- do not call get_agents first. It resolves to the only active agent ' +
+      'automatically (stating that assumption is your job, from the note this call returns), or ' +
+      'reports the active-agent candidates for you to ask about if there is more than one. ' +
+      `${INVENTORY_CURRENT_STATE_NOTE} To ` +
       'check whether one specific package/port/process is present (e.g. "is openssl installed on ' +
       'this host?", "what is listening on port 9200?"), pass "filter" instead of scanning the ' +
       'returned rows yourself -- results are truncated well before every row is returned (see ' +
@@ -458,13 +634,17 @@ export const getAgentInventoryTool: ToolDefinition = {
         agent_id: {
           type: 'string',
           description:
-            'Numeric Wazuh agent ID, e.g. "003". Either this or agent_name is required.',
+            'Numeric Wazuh agent ID, e.g. "003". Optional: omit this AND agent_name for a ' +
+            'deictic host reference ("this box"/"this server") with no known id or name -- the ' +
+            'call resolves to the only active agent automatically.',
         },
         agent_name: {
           type: 'string',
           description:
-            'Agent name, e.g. "web-prod-01" -- use this when the id is not known. Either this ' +
-            'or agent_id is required; if both are given, agent_id wins.',
+            'Agent name, e.g. "web-prod-01" -- use this when the id is not known but the name ' +
+            'is. Optional: omit this AND agent_id for a deictic host reference with neither ' +
+            'known -- the call resolves to the only active agent automatically. If both are ' +
+            'given, agent_id wins.',
         },
         kind: {
           type: 'string',
@@ -556,6 +736,7 @@ export const getAgentInventoryTool: ToolDefinition = {
     ],
   },
   deriveColumns: true,
+  resolveParams: resolveDeicticAgentParams,
   // Issue #8917: explicit, not inherited from `deriveColumns` above (see
   // `ToolDefinition.failClosedFieldPolicy`'s doc comment, types.ts). This tool's 5 kinds each
   // read a small, fixed, reviewed `_source` list (`INVENTORY_KIND_CONFIG` above) rather than a
