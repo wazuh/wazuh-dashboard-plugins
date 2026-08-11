@@ -12,6 +12,7 @@ import {
   optionalStringParam,
   validateAgentId,
 } from './common';
+import { BREAKDOWN_BUCKET_CAP } from '../digest';
 
 /**
  * The 5 kinds this tool implements tonight, out of the 13 real `wazuh-states-inventory-*`
@@ -25,7 +26,7 @@ import {
  * they can be added the same way `hotfixes` was tonight -- see this file's own doc comment on
  * `INVENTORY_KIND_CONFIG` for what "verified" means in practice.
  */
-const INVENTORY_KINDS = [
+export const INVENTORY_KINDS = [
   'os',
   'packages',
   'ports',
@@ -34,7 +35,7 @@ const INVENTORY_KINDS = [
 ] as const;
 type InventoryKind = (typeof INVENTORY_KINDS)[number];
 
-interface InventoryKindConfig {
+export interface InventoryKindConfig {
   /** The concrete `wazuh-states-inventory-*` index this kind reads. `os` is the one naming
    * exception carried over from get-agent-os.ts: it reads the `system` sub-index, not a literal
    * `os` one. */
@@ -53,6 +54,34 @@ interface InventoryKindConfig {
    * get-agent-os.ts's original hardcoded `size: 5` (one agent has at most one current OS record;
    * the original tool never exposed a `limit` parameter at all). */
   fixedSize?: number;
+  /**
+   * Real `terms` aggregation(s) attached to `body.aggs` for a kind whose completeness question
+   * ("how many ports are listening vs closed") needs a population-true categorical breakdown
+   * (issue #8920 item 1: a plain hits search left a `limit`-truncated page silently narrated as
+   * if it were the whole inventory). OpenSearch computes `aggregations` over the FULL matched set
+   * regardless of `size`, so this stays correct even when `limit` truncates the returned rows;
+   * digest.ts's `buildBreakdown` already reads any response's `aggregations` generically, so this
+   * needs no digest change.
+   *
+   * A real aggregation requires an AGG_FIELD_ALLOWLIST entry AND live keyword-mapping evidence
+   * for its field (a `terms` agg on a text-mapped field is a hard 400, turning a fidelity gap
+   * into a broken tool for that kind — worse than the disclosure gap it fixes). Only `ports`
+   * meets that bar today: this repo's own IT Hygiene dashboards already run terms aggregations
+   * on `interface.state` (plugins/main/.../it-hygiene/dashboards/dashboard-panels.ts) and
+   * aggregate `network.transport` in the services/traffic panels, which is live proof both are
+   * aggregatable keywords. Kinds WITHOUT that evidence take the digest-level
+   * `breakdownDimensions` fallback instead (see `digest` below): it groups the RETURNED rows via
+   * getByPath, so it needs no mapping guarantee and can never hard-fail — page-scoped (with
+   * `breakdownNote`) when the result is limit-truncated, exact otherwise. `processes` uses that
+   * fallback for `process.state` (only a KQL filter exists in-repo, not an aggregation — no
+   * keyword-mapping proof; promote to a real agg here once a live `terms` agg on
+   * wazuh-states-inventory-processes is verified) and `packages` for
+   * `package.architecture`/`package.vendor`. `os` (fixedSize: 5 — effectively the whole
+   * population) and `hotfixes` (single free-text name field, no categorical dimension) carry
+   * neither; the per-kind coverage test in get-agent-inventory.test.ts enumerates every kind
+   * against exactly this map, so a 6th kind cannot ship without a breakdown or a written reason.
+   */
+  breakdownAggs?: Record<string, unknown>;
 }
 
 /**
@@ -70,69 +99,84 @@ interface InventoryKindConfig {
  * no checked-in evidence either way, this stays to the one field actually confirmed. The other 8
  * uncovered kinds each need this same standard of evidence before being added.
  */
-const INVENTORY_KIND_CONFIG: Record<InventoryKind, InventoryKindConfig> = {
-  os: {
-    index: 'wazuh-states-inventory-system*',
-    source: [
-      'host.hostname',
-      'host.os.name',
-      'host.os.version',
-      'host.os.platform',
-      'host.os.full',
-      'host.architecture',
-    ],
-    fixedSize: 5,
-  },
-  packages: {
-    index: 'wazuh-states-inventory-packages*',
-    source: [
-      'package.name',
-      'package.version',
-      'package.architecture',
-      'package.vendor',
-    ],
-    limitRange: [50, 500],
-  },
-  ports: {
-    index: 'wazuh-states-inventory-ports*',
-    // Order (issue #8921's column-budget item): `deriveResultColumns` (digest.ts) takes this
-    // `_source` list, byte-for-byte, as the derived column order -- and the client's
-    // MAX_VISIBLE_COLUMNS budget (result-table.tsx) shows only the first 6 of them as visible
-    // table columns. The issue's 5 highest-value fields lead (source.port, interface.state,
-    // process.name, network.transport, destination.ip), followed by source.ip as the 6th visible
-    // column; destination.port/process.pid are demoted -- NOT deleted, still queried and still in
-    // the row expander -- to positions 7-8. destination.ip stays ahead of them: on an established
-    // connection it carries the peer address, which is more often what a reader wants than the
-    // local source.ip/the numeric process.pid.
-    source: [
-      'source.port',
-      'interface.state',
-      'process.name',
-      'network.transport',
-      'destination.ip',
-      'source.ip',
-      'destination.port',
-      'process.pid',
-    ],
-    limitRange: [50, 500],
-  },
-  processes: {
-    index: 'wazuh-states-inventory-processes*',
-    source: [
-      'process.pid',
-      'process.name',
-      'process.state',
-      'process.parent.pid',
-      'process.command_line',
-    ],
-    limitRange: [50, 500],
-  },
-  hotfixes: {
-    index: 'wazuh-states-inventory-hotfixes*',
-    source: ['package.hotfix.name'],
-    limitRange: [50, 500],
-  },
-};
+// Exported for get-agent-inventory.test.ts's per-kind coverage loop only — a 6th kind added to
+// this map is automatically held to "breakdownAggs, breakdownDimensions coverage, or a written
+// reason" by that test, without the test hardcoding kind names.
+export const INVENTORY_KIND_CONFIG: Record<InventoryKind, InventoryKindConfig> =
+  {
+    os: {
+      index: 'wazuh-states-inventory-system*',
+      source: [
+        'host.hostname',
+        'host.os.name',
+        'host.os.version',
+        'host.os.platform',
+        'host.os.full',
+        'host.architecture',
+      ],
+      fixedSize: 5,
+    },
+    packages: {
+      index: 'wazuh-states-inventory-packages*',
+      source: [
+        'package.name',
+        'package.version',
+        'package.architecture',
+        'package.vendor',
+      ],
+      limitRange: [50, 500],
+    },
+    ports: {
+      index: 'wazuh-states-inventory-ports*',
+      // Order (issue #8921's column-budget item): `deriveResultColumns` (digest.ts) takes this
+      // `_source` list, byte-for-byte, as the derived column order -- and the client's
+      // MAX_VISIBLE_COLUMNS budget (result-table.tsx) shows only the first 6 of them as visible
+      // table columns. The issue's 5 highest-value fields lead (source.port, interface.state,
+      // process.name, network.transport, destination.ip), followed by source.ip as the 6th visible
+      // column; destination.port/process.pid are demoted -- NOT deleted, still queried and still in
+      // the row expander -- to positions 7-8. destination.ip stays ahead of them: on an established
+      // connection it carries the peer address, which is more often what a reader wants than the
+      // local source.ip/the numeric process.pid.
+      source: [
+        'source.port',
+        'interface.state',
+        'process.name',
+        'network.transport',
+        'destination.ip',
+        'source.ip',
+        'destination.port',
+        'process.pid',
+      ],
+      limitRange: [50, 500],
+      breakdownAggs: {
+        interface_state: {
+          terms: { field: 'interface.state', size: BREAKDOWN_BUCKET_CAP },
+        },
+        network_transport: {
+          terms: { field: 'network.transport', size: BREAKDOWN_BUCKET_CAP },
+        },
+      },
+    },
+    processes: {
+      index: 'wazuh-states-inventory-processes*',
+      source: [
+        'process.pid',
+        'process.name',
+        'process.state',
+        'process.parent.pid',
+        'process.command_line',
+      ],
+      limitRange: [50, 500],
+      // No breakdownAggs: process.state has no in-repo keyword-mapping evidence (see the
+      // InventoryKindConfig doc comment) — covered by the digest-level breakdownDimensions
+      // fallback instead.
+    },
+    hotfixes: {
+      index: 'wazuh-states-inventory-hotfixes*',
+      source: ['package.hotfix.name'],
+      limitRange: [50, 500],
+    },
+  };
 
 /** Validates `kind` against the 5 implemented values; throws a descriptive Error (turned into a
  * bounded tool_result error for the model to self-correct, same convention as every other
@@ -659,11 +703,39 @@ export const getAgentInventoryTool: ToolDefinition = {
         _source: config.source,
         sort: ['_doc'],
         size,
+        ...(config.breakdownAggs ? { aggs: config.breakdownAggs } : {}),
       },
     };
   },
   tableSpec: { columns: [] },
-  digest: { sampleColumns: [] },
+  digest: {
+    sampleColumns: [],
+    // Digest-level fallback for the kinds with no real breakdown aggregation (see
+    // InventoryKindConfig.breakdownAggs' doc comment for the per-kind split and why): groups the
+    // RETURNED rows via getByPath, so a dimension simply produces no buckets for kinds whose rows
+    // don't carry it — one tool-level list covers `packages` (architecture/vendor: textbook
+    // closed-set dimensions on a kind whose real hosts carry 500-2000 docs against a default
+    // limit of 50, the most truncation-prone kind in this tool) and `processes` (process.state)
+    // at zero cost to the other kinds. All three fields have their own EXPLICIT
+    // FIELD_POLICY_DEFAULTS entry (package.architecture and process.state 'allow'; package.vendor
+    // 'anonymize' -- a vendor/distributor string routinely embeds a maintainer email address, see
+    // privacy.ts's comment on that entry for why 'allow' is wrong for it specifically). That is a
+    // deliberate correction from an earlier version of this comment, which called `package.vendor`
+    // a "known-safe structural field" -- that phrase describes ONLY
+    // field-policy-coverage.test.ts's `KNOWN_SAFE_STRUCTURAL_FIELDS`, a test-only allowlist for
+    // "this field needs no entry under the ALLOW-by-omission default". This tool sets
+    // `deriveColumns: true`, which flips that default to FAIL-CLOSED anonymize (see this file's
+    // `deriveColumns` doc comment and privacy.ts's `isEscapeHatch`) -- so "needs no policy entry"
+    // and "is safe to send to the provider" are OPPOSITES here, not synonyms, and a field's mere
+    // presence in that structural-shape allowlist proves neither. executor.ts's identity-map path
+    // scrubs synthetic breakdown keys through the same applyFieldPolicy pass as a real
+    // aggregation's, so each dimension above needs, and now has, its own reviewed entry.
+    breakdownDimensions: [
+      'package.architecture',
+      'package.vendor',
+      'process.state',
+    ],
+  },
   deriveColumns: true,
   resolveParams: resolveDeicticAgentParams,
   // Issue #8917: explicit, not inherited from `deriveColumns` above (see

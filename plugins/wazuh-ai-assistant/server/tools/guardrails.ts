@@ -105,6 +105,45 @@ export function checkIndexAllowlist(index: string): GuardrailCheck {
  * for pagination deeper than the plugin allows (deep pagination must go through search_after/PIT,
  * plugin-driven only, never LLM-driven — not implemented in this slice, so it's simply refused).
  */
+/** The largest `precision_threshold` OpenSearch honours for a `cardinality` aggregation. Below the
+ * threshold a distinct count is EXACT; above it, HyperLogLog++ returns an estimate. */
+export const MAX_CARDINALITY_PRECISION_THRESHOLD = 40000;
+
+/**
+ * Raises every `cardinality` aggregation's `precision_threshold` to the engine maximum, recursively
+ * (a cardinality can sit under a bucket agg as a sub-aggregation).
+ *
+ * Distinct counts are the one supported metric that is an ESTIMATE rather than a count, and the
+ * default threshold is only 3000 — so "how many distinct hosts/rules/CVEs" silently became
+ * approximate on any real fleet while looking exactly as authoritative as an exact count. Raising it
+ * costs a bounded amount of memory per aggregation and buys exactness across the whole range any
+ * Wazuh deployment plausibly reaches. Above it, `Digest.metrics[].approximate` marks the number so
+ * the caveat travels with the value instead of being lost.
+ *
+ * Deliberately raises rather than REJECTS a high-cardinality request: refusing to answer, or
+ * answering with an unmarked estimate, are both worse than answering exactly wherever the engine
+ * can.
+ */
+function raiseCardinalityPrecision(aggs: unknown): void {
+  if (!aggs || typeof aggs !== 'object') {
+    return;
+  }
+  for (const aggBody of Object.values(aggs as Record<string, unknown>)) {
+    if (!aggBody || typeof aggBody !== 'object') {
+      continue;
+    }
+    const agg = aggBody as Record<string, unknown>;
+    const cardinality = agg.cardinality;
+    if (cardinality && typeof cardinality === 'object') {
+      (cardinality as Record<string, unknown>).precision_threshold =
+        MAX_CARDINALITY_PRECISION_THRESHOLD;
+    }
+    // Sub-aggregations: a cardinality under a terms/date_histogram bucket is the common "distinct X
+    // per Y" shape and needs the same treatment.
+    raiseCardinalityPrecision(agg.aggs ?? agg.aggregations);
+  }
+}
+
 export function applySafetyValves(
   body: Record<string, unknown>,
 ): { ok: true; body: Record<string, unknown> } | { ok: false; reason: string } {
@@ -162,6 +201,7 @@ export function applySafetyValves(
   // call's own 10s timeout -- worth revisiting if this valve's cost profile turns out to matter in
   // practice.
   next.track_total_hits = true;
+  raiseCardinalityPrecision(next.aggs ?? next.aggregations);
   // allow_partial_search_results is deliberately NOT set here: it is a transport/URL parameter,
   // not a body field (a body key would 400 the whole search), and the cluster default is already
   // `true`, which is the behavior we want.
@@ -275,6 +315,34 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // low-cardinality — a handful of benchmark policies per agent; mapping live-verified against
   // wazuh-states-sca on 5.0.0-beta3).
   'policy.id',
+  // Issue #8920 item 1 (population-disclosure): the three fields below back the per-kind/per-tool
+  // breakdown aggregations added to close the "sample narrated as population" class ("named 2 of
+  // 10 failed checks" on get_sca_checks; a truncated ports inventory page with no view of the
+  // closed-set field's true distribution). This is a PERFORMANCE guard widening (aggregation
+  // cardinality), not a privacy guard: every field below is a small closed enum, not
+  // analyst/attacker-supplied free text, terms `size` still caps at MAX_AGG_SIZE via checkAggs
+  // for any caller including the escape hatch, and privacy.ts's field policy (a separate
+  // boundary) is unaffected by this list either way. Each entry cites in-repo aggregation
+  // evidence, per the standard `policy.id` (above) set — a terms agg on a text-mapped field is a
+  // hard 400 ("Fielddata is disabled"), so "probably keyword" is not enough. `process.state` is
+  // deliberately NOT here: its only in-repo use is a KQL filter
+  // (plugins/main/public/components/overview/it-hygiene/processes/dashboard.ts), which a text
+  // mapping would also satisfy — get_agent_inventory covers it with the digest-level
+  // breakdownDimensions fallback (no mapping requirement) until a live terms agg on
+  // wazuh-states-inventory-processes is verified.
+  //
+  // SCA per-check result — a closed enum ("Passed"/"Failed"/"Not applicable");
+  // get-sca-results.ts's own capitalized `term` filters on this field are checked-in proof it is
+  // keyword-mapped (a `term` filter with those exact capitalized values on a text mapping would
+  // never match).
+  'check.result',
+  // Syscollector ports: this repo's IT Hygiene network dashboard runs a real terms agg on it
+  // (plugins/main/public/components/overview/it-hygiene/dashboards/dashboard-panels.ts) — live
+  // values include "Inactive"/"Unknown".
+  'interface.state',
+  // Syscollector ports: aggregated by the IT Hygiene services/traffic dashboards; live values
+  // are uppercase ("TCP"/"UDP").
+  'network.transport',
   // Entity-pivot fields for "noisiest/top X" questions (GA benchmark gap: this allowlist only
   // ever listed wazuh-findings-v5 field names, so a terms/composite/multi_terms agg on the
   // wazuh-events-v5 and wazuh-states-* families' own entity fields was rejected even though
@@ -458,6 +526,17 @@ const TERMS_LIKE_AGG_KEYS = new Set([
  * inventory, vulnerabilities) have no meaningful event-time axis to bound (their time field,
  * state.modified_at, is a write time, not an event time). */
 const TIME_BASED_INDEX_RE = /^wazuh-(events|findings)-v5/;
+
+/**
+ * Whether `lintDsl` will REQUIRE a bounded `@timestamp` range for this index — exported so a
+ * caller that hand-builds a body (executor.ts's near-miss probe) can satisfy the rule instead of
+ * being silently rejected by it. A rangeless probe against a findings index fails `lintDsl` and the
+ * caller's early return then swallows the failure, so the feature disappears with no error: exactly
+ * what happened before this was exported.
+ */
+export function requiresBoundedTimeRange(index: string): boolean {
+  return TIME_BASED_INDEX_RE.test(index);
+}
 
 /**
  * Vulnerability STATE lives in wazuh-states-vulnerabilities, not the findings/events timeline — so

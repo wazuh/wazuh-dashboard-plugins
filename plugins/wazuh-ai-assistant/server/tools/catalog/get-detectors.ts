@@ -137,5 +137,12 @@ export const getDetectorsTool: ToolDefinition = {
       'detector.enabled',
       'detector.source',
     ],
+    // Synthetic fallback (issue #8920 item 1): "what detector types are configured" was answered
+    // from 5 sample rows. The field is already in `_source` and already populates samples today
+    // (i.e. getByPath resolves it on the returned rows), so the digest-level grouping needs no
+    // nested-aggregation wrapper, no AGG_FIELD_ALLOWLIST entry, and no live mapping check —
+    // unlike the real terms aggregation this tool was previously exempted for lacking.
+    // Page-scoped with `breakdownNote` when the result is limit-truncated.
+    breakdownDimensions: ['detector.detector_type'],
   },
 };

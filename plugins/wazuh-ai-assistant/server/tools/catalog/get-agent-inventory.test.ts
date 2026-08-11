@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
-import { getAgentInventoryTool } from './get-agent-inventory';
+import {
+  getAgentInventoryTool,
+  INVENTORY_KIND_CONFIG,
+} from './get-agent-inventory';
 import { IndexerRequest } from '../types';
+import { applySafetyValves, lintDsl } from '../guardrails';
+import { BREAKDOWN_BUCKET_CAP } from '../digest';
 
 type ResolveParamsContext = Parameters<
   NonNullable<typeof getAgentInventoryTool.resolveParams>
@@ -262,11 +267,19 @@ test('get_agent_inventory: kind="ports" matches get_agent_ports\'s original body
       ],
       sort: ['_doc'],
       size: 50,
+      aggs: {
+        interface_state: {
+          terms: { field: 'interface.state', size: BREAKDOWN_BUCKET_CAP },
+        },
+        network_transport: {
+          terms: { field: 'network.transport', size: BREAKDOWN_BUCKET_CAP },
+        },
+      },
     },
   });
 });
 
-test('get_agent_inventory: kind="processes" matches get_agent_processes\'s original body exactly', () => {
+test('get_agent_inventory: kind="processes" matches get_agent_processes\'s original body exactly (breakdown is digest-level, not an agg)', () => {
   const req = buildIndexer({ agent_id: '003', kind: 'processes' });
   assert.deepEqual(req, {
     target: 'indexer',
@@ -284,6 +297,86 @@ test('get_agent_inventory: kind="processes" matches get_agent_processes\'s origi
       size: 50,
     },
   });
+});
+
+/**
+ * Per-kind population-disclosure coverage, driven from INVENTORY_KIND_CONFIG itself rather than a
+ * hardcoded kind list — a 6th kind added to the map is automatically required to either carry a
+ * real breakdown aggregation, be covered by the tool-level digest.breakdownDimensions fallback
+ * (at least one dimension present in the kind's own _source list), or have a written reason
+ * below. Nothing is exempt by default.
+ */
+const KIND_BREAKDOWN_EXEMPT: Record<string, string> = {
+  os:
+    'fixedSize: 5 — one current OS record per agent, so the returned page is effectively the ' +
+    'whole population; there is no truncation for a breakdown to disclose against.',
+  hotfixes:
+    'single free-text field (package.hotfix.name, the only live-confirmed field for this ' +
+    'index) — there is no categorical dimension to break the population down by; counts.total ' +
+    'is the only population statement this kind can make.',
+};
+
+test('get_agent_inventory: every kind has a real breakdown agg, a reachable synthetic dimension, or a written reason', () => {
+  const dims = getAgentInventoryTool.digest.breakdownDimensions ?? [];
+  const failures: string[] = [];
+  for (const [kind, config] of Object.entries(INVENTORY_KIND_CONFIG)) {
+    if (config.breakdownAggs && Object.keys(config.breakdownAggs).length > 0) {
+      continue;
+    }
+    if (dims.some(dimension => config.source.includes(dimension))) {
+      continue; // digest-level fallback reaches this kind through its own _source.
+    }
+    const reason = KIND_BREAKDOWN_EXEMPT[kind];
+    if (typeof reason === 'string' && reason.length > 0) {
+      continue;
+    }
+    failures.push(
+      `kind="${kind}": no breakdownAggs, no digest.breakdownDimensions entry present in its ` +
+        '_source, and no written reason in KIND_BREAKDOWN_EXEMPT',
+    );
+  }
+  assert.deepEqual(failures, []);
+});
+
+test('get_agent_inventory: KIND_BREAKDOWN_EXEMPT names only real kinds (stale-exemption guard)', () => {
+  for (const kind of Object.keys(KIND_BREAKDOWN_EXEMPT)) {
+    assert.ok(
+      kind in INVENTORY_KIND_CONFIG,
+      `KIND_BREAKDOWN_EXEMPT names unknown kind "${kind}"`,
+    );
+    const config =
+      INVENTORY_KIND_CONFIG[kind as keyof typeof INVENTORY_KIND_CONFIG];
+    assert.equal(
+      config.breakdownAggs,
+      undefined,
+      `kind "${kind}" now has a real breakdown agg — remove its stale exemption`,
+    );
+  }
+});
+
+test('get_agent_inventory: every breakdown-agg request passes applySafetyValves + lintDsl', () => {
+  // Without this guard the loop passes vacuously if INVENTORY_KIND_CONFIG ever lost every
+  // breakdownAggs entry (e.g. a refactor that renamed the field) -- same "nothing exempt by
+  // default" standard as agg-representability-coverage.test.ts's indexerTools.length check.
+  let checkedCount = 0;
+  for (const [kind, config] of Object.entries(INVENTORY_KIND_CONFIG)) {
+    if (!config.breakdownAggs) {
+      continue;
+    }
+    checkedCount += 1;
+    const req = buildIndexer({ agent_id: '003', kind });
+    const valved = applySafetyValves(req.body);
+    assert.equal(valved.ok, true, valved.ok ? '' : `${kind}: ${valved.reason}`);
+    if (!valved.ok) {
+      continue;
+    }
+    const lint = lintDsl(valved.body, req.index);
+    assert.equal(lint.ok, true, lint.ok ? '' : `${kind}: ${lint.reason}`);
+  }
+  assert.ok(
+    checkedCount > 0,
+    'no INVENTORY_KIND_CONFIG kind declared a breakdownAggs -- this test would pass vacuously',
+  );
 });
 
 test('get_agent_inventory: limit is clamped to [1, 500] for the 3 limit-taking folded-in kinds', () => {

@@ -121,14 +121,35 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // covered them silently; folding them into this tool means every field that should
   // stay readable now needs its own explicit 'allow' entry below, or it silently starts arriving
   // at the provider as a VAL_n pseudonym -- making "what packages are installed on X" answer in
-  // meaningless pseudonyms under privacy mode. Each entry below is software/config IDENTITY, not a
-  // personal or infrastructure identifier -- the contrast with the fields that correctly stay
-  // anonymized (host.hostname, process.command_line, source.ip/destination.ip,
-  // source.user.name/destination.user.name -- all already listed above) is deliberate and must not
-  // be widened without the same scrutiny.
+  // meaningless pseudonyms under privacy mode. MOST entries below are software/config IDENTITY,
+  // not a personal or infrastructure identifier -- the contrast with the fields that correctly
+  // stay anonymized (host.hostname, process.command_line, source.ip/destination.ip,
+  // source.user.name/destination.user.name -- all already listed above) is deliberate and must
+  // not be widened without the same scrutiny. `package.vendor` below is the deliberate exception
+  // to "identity, therefore allow" -- see its own comment.
   { field: 'package.name', action: 'allow' },
   { field: 'package.version', action: 'allow' },
   { field: 'package.type', action: 'allow' },
+  // NOT 'allow', unlike package.name/architecture/type/version above: a vendor/distributor string
+  // ("Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>", "Debian Sysadmin Team
+  // <debian-admin@lists.debian.org>") routinely embeds a maintainer/team EMAIL ADDRESS -- personal
+  // contact information, not software identity, and the one field in this deriveColumns group that
+  // actually needs review rather than a rubber-stamp 'allow'. This repo has no `allow-scan` action
+  // yet (issue #8912, branch fix/8912-privacy-allow-scan(-v2), not merged as of this fix) that
+  // could keep the distributor NAME readable while still catching the embedded address the way
+  // package.name does there for a bundled hostname -- with only allow/anonymize/never available
+  // today, 'anonymize' is the only choice that does not ship a real email address to the provider.
+  // This ALSO makes explicit (rather than accidental) the protection get_agent_inventory's
+  // deriveColumns fail-closed default already applied here silently: before this entry existed,
+  // field-policy-coverage.test.ts treated `package.vendor` as "covered" purely because it sat in
+  // that test's KNOWN_SAFE_STRUCTURAL_FIELDS allowlist (a structural-shape guess, never a reviewed
+  // privacy decision) -- which said nothing about what the runtime actually does with an unlisted
+  // field on a deriveColumns tool, and would have silently stopped protecting this field the
+  // moment it was ever read by a non-deriveColumns tool (allow-by-omission there means real value,
+  // untouched). See field-policy-coverage.test.ts's `requireExplicitEntry` for the coverage-test
+  // fix that closes that gap. Revisit this to 'allow-scan' once #8912 lands, to preserve the
+  // distributor name while still catching the embedded address.
+  { field: 'package.vendor', action: 'anonymize', kind: 'VAL' },
   // A hotfix/KB identifier (e.g. "KB5034441"), not a person or a network address.
   { field: 'package.hotfix.name', action: 'allow' },
   // OS identity -- NOT host.hostname (above), which is the agent's network identity and stays
@@ -140,6 +161,16 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // paths/arguments (a username in a home directory path, a secret passed as a CLI flag) and must
   // keep being anonymized.
   { field: 'process.name', action: 'allow' },
+  // Kernel process-state code (a closed enum, not an identifier) -- added for issue #8920 item
+  // 1's get_agent_inventory "processes" SYNTHETIC breakdown (digest.breakdownDimensions, which
+  // groups returned rows and so needs no aggregation-mapping evidence -- see
+  // get-agent-inventory.ts's InventoryKindConfig doc comment). Without this entry,
+  // deriveColumns:true's fail-closed default (see this file's header doc comment on
+  // `isEscapeHatch`) would pseudonymize the breakdown's bucket keys into meaningless VAL_n,
+  // making "how many processes are running vs zombie" unanswerable under privacy mode.
+  // interface.state/network.transport/check.result (the fields newly added to guardrails.ts's
+  // AGG_FIELD_ALLOWLIST for the same issue) already have 'allow' entries in this list.
+  { field: 'process.state', action: 'allow' },
   // Open-port inventory mechanics (protocol, listen state, the two bare port numbers) -- NOT
   // source.ip/destination.ip (above), which correctly stay anonymized: a port number alone
   // identifies nothing without the IP it's paired with.
@@ -600,15 +631,107 @@ const FQDN_TOKEN_RE = new RegExp(
  * two-label FQDN shape. `prescanAndMint` leaves these untouched. */
 const ALL_NUMERIC_DOTTED_RE = /^[0-9.]+Z?$/;
 
-/** A dotted token shaped like a package/software version string: an optional leading "v" (common
- * in semver, e.g. "v1.2.3"), then one-or-more digit-only labels, optionally followed by a single
- * "-suffix" (a Debian/Ubuntu-style package revision, e.g. the "-2ubuntu1" in "5.2.5-2ubuntu1").
- * `prescanAndMint` leaves these untouched — otherwise minting a HOST_n for a version string
- * undermines a `package.version:{allow}`-style query the user is asking about. Deliberately
- * requires the token to START with (optional "v" +) a digit: a real hostname's first label is
- * essentially never digits-only immediately followed by more dotted digit labels, so this can't
- * exclude a genuine hostname like "backup-vault.internal.corp" (starts with a letter). */
-const VERSION_LIKE_TOKEN_RE = /^v?\d+(?:\.\d+)+(?:-[0-9A-Za-z.]+)?$/i;
+/**
+ * A dotted token shaped like a package/software version string, covering the FULL Debian/RPM
+ * version grammar rather than the narrower "digit-only labels" shape: an optional leading "v"
+ * (semver-style, "v1.2.3"), an all-digit FIRST label, then one-or-more subsequent dot-labels each
+ * STARTING with a digit but allowed to carry letters after it (so "118ubuntu5", "1ubuntu2",
+ * "1k", "9p1" all count as one label each), and an optional final "-revision" suffix that may
+ * itself carry dots and MORE hyphens ("-213.224", and the kernel family's "-91-generic"/
+ * "-150-lowlatency" — a second hyphen is the single most common version shape in Wazuh Linux
+ * inventory, via agent.os.kernel/linux-image packages). `prescanAndMint` leaves these untouched —
+ * minting a HOST_n for a version string undermines a `package.version:{allow}`-style query the
+ * user is asking about. Tokens containing "+"/"~" never reach this regex at all (the tokenizer
+ * splits at them) — see `FULL_COMPOUND_VERSION_RE` below for how those are handled.
+ *
+ * (#8920 item 8): the previous digits-only-label shape rejected "3.118ubuntu5" and
+ * "3.20191218.1ubuntu2.3" — real `dpkg -l` versions with letters fused directly into a dot-label,
+ * no leading "-" — so they fell through to `FQDN_TOKEN_RE` and were minted as HOST_n. Rather than
+ * add those two shapes as special cases, the discriminator is rewritten as the STRUCTURAL property
+ * above, which covers the grammar by construction instead of by enumeration.
+ *
+ * Hostname-safety proof (why loosening this can only ever REDUCE minting, never open a leak): this
+ * regex is only ever consulted, inside `prescanAndMint`'s FQDN pass, for a token that already
+ * matched `FQDN_TOKEN_RE` — i.e. something already shaped like `label.label[.label]+`. A token is
+ * excluded from minting here ONLY when its first label is all-digit AND every subsequent label
+ * begins with a digit. Any genuine FQDN fails that test: a public hostname's last label is an
+ * alphabetic TLD ("...corp", "...com", "...local"), and an internal hostname's leading label is
+ * essentially always letter-initial ("web1.corp", "backup-vault.internal.corp") or, in the rarer
+ * case where it isn't ("01server.corp.local", "3com.example.com"), still carries a letter WITHIN
+ * that same first label — which fails "first label all-digit" outright, since this is a per-label
+ * structural check, not a "starts with a digit" check. The residue that IS excluded (first label
+ * pure digits, every later label digit-initial) is a shape no real deployment uses as a hostname;
+ * a token of that shape is indistinguishable from a version string by any test that only looks
+ * at the token itself. The accepted tradeoff for that pathological residue is fidelity, not
+ * privacy: worst case a version-shaped string is (correctly) never minted, never that a real
+ * hostname is missed.
+ *
+ * KNOWN, DELIBERATE RESIDUE (recorded so it is not mistaken for an oversight): a version label
+ * that starts with a LETTER after a dot — RPM dist tags fused into the version ("4.6.3.el7"),
+ * pre-release labels ("2.0.rc1", "4.0.dev0", "1.0.beta3") — is still minted, because loosening
+ * "every later label digit-initial" to accept letter-initial labels would stop minting real
+ * FQDNs whose first label is all-numeric: "0.pool.ntp.org", "1.gravatar.com",
+ * "2.bp.blogspot.com", "10.corp.local" are common, real hostnames of exactly that shape. That
+ * direction is a privacy regression, so this residue is NOT closable at the token level; the
+ * hostname corpus in privacy.test.ts pins those FQDNs as always-minting to keep it that way.
+ * (Debian policy only constrains the FIRST character of an upstream version, so those residual
+ * shapes are legal versions — the coverage here is structural-but-not-total, by choice.) */
+const VERSION_LIKE_TOKEN_RE =
+  /^v?\d+(?:\.\d[0-9A-Za-z]*)+(?:-[0-9A-Za-z.-]+)?$/i;
+
+/** Characters a whole (whitespace/quote-delimited) package-version token may carry — used by
+ * `expandToFullToken` to grow an FQDN sub-match back to the full token the tokenizer split.
+ * Includes "+"/"~" (Debian revision separators, at which FQDN_TOKEN_RE splits) and ":" (epoch,
+ * "1:2.4.41-4+deb11u1"). */
+const VERSION_TOKEN_CHAR_RE = /[0-9A-Za-z.+~:-]/;
+
+/**
+ * The WHOLE-token version test for compound Debian/RPM versions that FQDN_TOKEN_RE splits at
+ * "+"/"~": "2.4.37-43.module+el8.5.0+1022+b541f3b1" yields the FQDN-shaped sub-token "el8.5.0",
+ * "1.0+git20200101.abc1234-1" yields "git20200101.abc1234-1", "0.9.8+really0.9.7-1" yields
+ * "really0.9.7-1" — every one previously minted as HOST_n, corrupting the very version value a
+ * `package.version:{allow}` query is about. The rule: when the FULL surrounding token (a) is
+ * strictly larger than the FQDN match, (b) contains a "+" or "~" (the separators that caused the
+ * split — this is the load-bearing restriction), and (c) starts like a version (`v?` + digit)
+ * and stays within the version charset, the sub-token is part of a version string, not a
+ * hostname. Requiring (b) is what keeps "1.gravatar.com"/"0.pool.ntp.org" minting: they contain
+ * no "+"/"~", so they never take this path — only a hostname GLUED to a version by a "+"/"~"
+ * (no real naming scheme does this) could ever be skipped, and that direction is fidelity, not
+ * privacy. */
+const FULL_COMPOUND_VERSION_RE = /^v?\d[0-9A-Za-z.+~:-]*$/i;
+
+/** Grows the FQDN match at `offset` (length `length`) in `text` to the full surrounding token of
+ * version-charset characters — see `FULL_COMPOUND_VERSION_RE`. */
+function expandToFullToken(
+  text: string,
+  offset: number,
+  length: number,
+): string {
+  let start = offset;
+  while (start > 0 && VERSION_TOKEN_CHAR_RE.test(text[start - 1])) {
+    start -= 1;
+  }
+  let end = offset + length;
+  while (end < text.length && VERSION_TOKEN_CHAR_RE.test(text[end])) {
+    end += 1;
+  }
+  return text.slice(start, end);
+}
+
+/** A dotted token shaped like a MITRE ATT&CK technique id with sub-technique notation
+ * ("T1059.001", "T1548.002.001" would also match) — `prescanAndMint` leaves these untouched.
+ * Without this exclusion the FQDN pass mints them as HOST_n ("T1059" and "001" are both legal
+ * hostname labels), which destroys exactly the exact-vs-sub-technique breakdown issue #8920
+ * item 2's rollup disclosure depends on: the model would receive breakdown keys like
+ * {key: "T1059", ...}, {key: "HOST_1", ...} and could no longer report the split. Safety
+ * argument for the narrowing: the shape requires an initial label of "T" + digits ONLY and
+ * every subsequent label all-digits — a real FQDN needs an alphabetic TLD, so the only hostname
+ * this could ever skip is an internal name like "T123.456" (all-numeric final label), which is
+ * exotic enough to accept in exchange for not corrupting every sub-technique id the digest
+ * carries. The field-policy side already classifies the field itself as 'allow'
+ * (WAZUH_FIELD.RULE_MITRE_TECHNIQUE_ID above); this closes the OUTBOUND free-text/JSON scan
+ * that runs after it. */
+const TECHNIQUE_ID_TOKEN_RE = /^T\d+(?:\.\d+)+$/;
 
 /** Every dot-path SEGMENT word appearing in a curated Wazuh/ECS field name — drawn from
  * `WAZUH_FIELD`'s values and every plain field in `FIELD_POLICY_DEFAULTS` (a tool-scope
@@ -655,7 +778,9 @@ function isFieldPathToken(token: string): boolean {
  * The FQDN pass additionally excludes (in order checked): an all-numeric dotted run or ISO
  * timestamp fragment (`ALL_NUMERIC_DOTTED_RE`, pre-existing), a version/package-revision string
  * (`VERSION_LIKE_TOKEN_RE` — e.g. "5.2.5-2ubuntu1" would otherwise undermine a
- * `package.version:{allow}` query), and a field-path-shaped token (`isFieldPathToken` — e.g. the
+ * `package.version:{allow}` query), a MITRE sub-technique id (`TECHNIQUE_ID_TOKEN_RE` — e.g.
+ * "T1059.001", whose minting would corrupt the technique breakdown the rollup disclosure
+ * depends on), and a field-path-shaped token (`isFieldPathToken` — e.g. the
  * user typing "wazuh.agent.name"/"wazuh.rule.id" would otherwise get that mention replaced with a
  * HOST_n, breaking their own query and making the model claim the field doesn't exist).
  *
@@ -679,11 +804,24 @@ export function prescanAndMint(
   out = out.replace(IPV6_TOKEN_RE, token =>
     pseudonymizer.pseudonymize(token, 'IP'),
   );
-  out = out.replace(FQDN_TOKEN_RE, token => {
+  out = out.replace(FQDN_TOKEN_RE, (token, offset: number, subject: string) => {
     if (
       ALL_NUMERIC_DOTTED_RE.test(token) ||
       VERSION_LIKE_TOKEN_RE.test(token) ||
+      TECHNIQUE_ID_TOKEN_RE.test(token) ||
       isFieldPathToken(token)
+    ) {
+      return token;
+    }
+    // Compound-version residue: the tokenizer splits at "+"/"~", so a Debian/RPM compound
+    // version yields FQDN-shaped fragments ("el8.5.0", "git20200101.abc1234-1") the per-token
+    // regex above can never see whole. Test the FULL surrounding token instead — see
+    // FULL_COMPOUND_VERSION_RE's doc comment for the rule and its hostname-safety argument.
+    const fullToken = expandToFullToken(subject, offset, token.length);
+    if (
+      fullToken !== token &&
+      /[+~]/.test(fullToken) &&
+      FULL_COMPOUND_VERSION_RE.test(fullToken)
     ) {
       return token;
     }
@@ -707,8 +845,15 @@ export function prescanAndMint(
  * PATHS (e.g. "wazuh.agent.name"), not data — the same labels `applyFieldPolicy` deliberately
  * leaves untouched — and are FQDN-shaped, so scanning them would mint the same garbage HOST_n
  * this fix exists to prevent.
+ *
+ * `metrics` is likewise unscanned: its `value` is a computed NUMBER, its `agg` is the
+ * aggregation's own (model-chosen) name, and its `value_as_string` is OpenSearch's own date/
+ * number formatting of that numeric value (a min/max on a date field) — never indexed
+ * hostnames/IPs. Scanning `value_as_string` would misfire: the "00.000Z" tail of an ISO
+ * timestamp is FQDN-token-shaped and would be minted as a garbage HOST_n, corrupting the one
+ * human-readable form the field exists to carry. See digest.ts's `Digest.metrics` doc comment.
  */
-const UNSCANNED_DIGEST_KEYS = new Set(['columns']);
+const UNSCANNED_DIGEST_KEYS = new Set(['columns', 'metrics']);
 
 export function prescanAndMintToolContent(
   text: string,
@@ -849,11 +994,11 @@ function resolveCompositeSpec(
 function resolveAggFieldSpec(
   aggDef: Record<string, unknown> | undefined,
 ): AggFieldSpec | undefined {
-  for (const aggType of [
-    'terms',
-    'significant_terms',
-    'cardinality',
-  ] as const) {
+  // Bucket-producing types only -- `cardinality` (and every other metric agg) is deliberately
+  // excluded, see extractAggFields's doc comment above for why mapping it here misattributes
+  // samples[].key against a leading metric agg instead of the bucket agg the rows actually came
+  // from (#8920 item 5).
+  for (const aggType of ['terms', 'significant_terms'] as const) {
     const spec = aggDef?.[aggType] as { field?: unknown } | undefined;
     if (spec && typeof spec.field === 'string') {
       return { kind: 'scalar', field: spec.field };
@@ -871,7 +1016,7 @@ function resolveAggFieldSpec(
  * iterates, so the two can't drift apart. Breakdown entries name their aggregation (`agg`) only in
  * the multi-agg case; a single-agg entry attributes to the map's first key.
  *
- * Resolves `terms`/`significant_terms`/`cardinality` (a single scalar field), `multi_terms` (an
+ * Resolves `terms`/`significant_terms` (a single scalar field), `multi_terms` (an
  * array of fields, positionally aligned with the bucket key array), and `composite` (a
  * `sourceName -> field` map, aligned with the bucket key object's own keys) — see `AggFieldSpec`.
  * Any OTHER agg shape (date_histogram, histogram, filters, ...) resolves to `undefined`, exactly
@@ -879,6 +1024,17 @@ function resolveAggFieldSpec(
  * backstop for an `undefined` spec (see its own doc comment) is what now covers whatever agg shape
  * this function does not yet parse, rather than this function trying to enumerate every possible
  * future shape.
+ *
+ * Only BUCKET-producing aggregation types carry a field here, deliberately: a metric aggregation
+ * (`cardinality`/`avg`/`sum`/`min`/`max`/`value_count`) returns a NUMBER, so no string value of
+ * its field ever leaves through the digest, and mapping its field would misattribute the `key`
+ * sample column — since #8920 item 5, digest.ts's `bucketsToRows` sources rows from the first agg
+ * WITH BUCKETS, skipping over a leading metric agg, so `applyFieldPolicy` below must resolve
+ * `samples[].key` against the first agg with an extractable BUCKET field (the same skip), not
+ * against whatever agg happens to be declared first. Mapping `cardinality` here (as this function
+ * once did) would break exactly that: `aggs: {distinct_ids: {cardinality: wazuh.agent.id},
+ * by_agent: {terms: wazuh.agent.name}}` resolved `key` — which holds HOSTNAMES from `by_agent` —
+ * against `wazuh.agent.id`'s 'allow' policy and sent them to the provider verbatim.
  *
  * This is intentionally NOT threaded through `Digest` itself beyond the `agg` name: adding the
  * FIELD(S) to every digest object would change buildDigest's output even when privacy is off,
@@ -1192,11 +1348,17 @@ export function applyFieldPolicy(
   toolName?: string,
   isEscapeHatch = false,
 ): Digest {
-  // The spec a bucket row's `key` holds values against — see the `samples` note above. `undefined`
-  // for a non-aggregation digest, or for an aggregation with no extractable field (e.g. a
-  // date_histogram), in which case `key` resolves by its own name like any other sample field.
-  const firstAggSpec = aggFields
-    ? aggFields[Object.keys(aggFields)[0]]
+  // The field a bucket row's `key` holds the values OF — see the `samples` note above. The first
+  // agg with an extractable BUCKET field, not the first DECLARED agg: since #8920 item 5,
+  // digest.ts's `bucketsToRows` sources rows from the first agg with buckets, skipping a leading
+  // metric agg, and `extractAggFields` above maps only bucket-producing types — so "first defined
+  // entry" here walks in the exact same declaration order and lands on the same aggregation the
+  // rows came from. `undefined` for a non-aggregation digest, or when no aggregation has an
+  // extractable field (e.g. only a date_histogram — whose bucket keys are NUMBERS and never reach
+  // the string-scrub branches anyway), in which case `key` resolves by its own name like any
+  // other sample field.
+  const firstAggField = aggFields
+    ? Object.values(aggFields).find(field => field !== undefined)
     : undefined;
   const isAggDigest = aggFields !== undefined;
 
@@ -1211,7 +1373,7 @@ export function applyFieldPolicy(
         // so `doc_count`/any other sample field survives a dropped 'key' exactly as before.
         const result = scrubAggKey(
           value,
-          firstAggSpec,
+          firstAggField,
           policy,
           pseudonymizer,
           toolName,

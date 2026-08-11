@@ -4,6 +4,7 @@ import {
   limitProperty,
   objectSchema,
   optionalStringParam,
+  VULN_BREAKDOWN_AGGS,
   VULN_CURRENT_STATE_NOTE,
   VULN_DIGEST_SAMPLE_COLUMNS,
   VULN_SOURCE_FIELDS,
@@ -57,6 +58,9 @@ export const getVulnerabilitiesTool: ToolDefinition = {
         _source: VULN_SOURCE_FIELDS,
         sort: ['_doc'],
         size: limit,
+        // Population-true severity/agent breakdown over the FULL matched set (issue #8920 item 1)
+        // -- see VULN_BREAKDOWN_AGGS's doc comment in common.ts.
+        aggs: VULN_BREAKDOWN_AGGS,
       },
     };
   },

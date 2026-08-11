@@ -64,6 +64,35 @@ test('prescanAndMint: leaves an ISO-8601 timestamp fragment untouched (29.000Z)'
   assert.match(out, /29\.000Z/);
 });
 
+test('prescanAndMint: leaves a dotted MITRE sub-technique id untouched (T1059.001)', () => {
+  // Issue #8920 item 2: the technique-id breakdown ("T1059: 3, T1059.001: 9") is the rollup's
+  // disclosure surface. "T1059.001" is FQDN-token-shaped, so without TECHNIQUE_ID_TOKEN_RE the
+  // outbound scan minted it as HOST_n and the model received an unreadable split. A hostname is
+  // NOT newly skipped: the exclusion requires "T"+digits then all-digit labels, which no real
+  // FQDN (alphabetic TLD) satisfies.
+  const p = new Pseudonymizer();
+  const out = prescanAndMint('findings for T1059.001 rose sharply', p);
+  assert.equal(out, 'findings for T1059.001 rose sharply');
+  assert.equal(p.newEntries().length, 0);
+});
+
+test('prescanAndMintToolContent: a technique-id breakdown survives privacy intact', () => {
+  const p = new Pseudonymizer();
+  const digestJson = JSON.stringify({
+    tool: 'get_mitre_findings',
+    counts: { total: 12, returned: 12, truncated: false },
+    breakdown: [
+      { key: 'T1059', count: 3 },
+      { key: 'T1059.001', count: 9 },
+    ],
+    samples: [],
+    columns: ['wazuh.rule.mitre.technique.id'],
+  });
+  const out = prescanAndMintToolContent(digestJson, p);
+  assert.equal(out, digestJson);
+  assert.equal(p.newEntries().length, 0);
+});
+
 // --- prescanAndMint: #8889 dotted-token scanner narrowing --------------------------------------
 
 test('prescanAndMint: leaves a field-path mention (wazuh.agent.name) untouched', () => {
@@ -96,6 +125,135 @@ test('prescanAndMint: still mints a real hostname that is not field-path or vers
   const out = prescanAndMint('connect to backup-vault.internal.corp now', p);
   assert.match(out, /HOST_\d+/);
   assert.doesNotMatch(out, /backup-vault\.internal\.corp/);
+});
+
+// --- prescanAndMint / prescanAndMintToolContent: #8920 item 8 version-grammar coverage --------
+//
+// The reported instances were two Ubuntu `dpkg -l` versions ("3.118ubuntu5",
+// "3.20191218.1ubuntu2.3") that got minted as HOST_n because VERSION_LIKE_TOKEN_RE only recognized
+// digit-only dot-labels, not the full Debian/RPM grammar (letters fused into a label, "~"/"+" in a
+// revision suffix). The class is the whole grammar, not those two strings, so these two corpora are
+// data-driven tables: a newly observed version scheme or hostname shape is a one-line addition, and
+// what's asserted per row never changes (never-minted vs always-minted, both directions pinned via
+// `newEntries()` so a silent partial mint can't pass). Each corpus is run through BOTH the flat-text
+// scanner (`prescanAndMint`, this section) and the JSON-aware one (`prescanAndMintToolContent`,
+// below) since the two boundaries have independent code paths.
+
+/** Real Debian/RPM/semver version strings. Every one of these must reach the model UNCHANGED —
+ * minting a HOST_n for a version string breaks a `package.version:{allow}`-style query. Includes
+ * the two previously-leaking wire-capture tokens (letters fused into a dot-label with no leading
+ * "-") and the two previously-passing ones (plain "-suffix" and a "~"-broken compound token), so a
+ * regression in either direction shows up here. */
+const VERSION_GRAMMAR_CORPUS = [
+  '3.118ubuntu5', // previously leaked: letter-fused label, no "-" prefix
+  '3.20191218.1ubuntu2.3', // previously leaked: same shape, 4 labels
+  '1.1.1k', // NON-Ubuntu letter-fused label (openssl) -- blocks a distro-hardcoded reversion
+  '1.1.1k-9.el8', // openssl on RHEL8: letter-fused label + dist-tag revision
+  '1.9.9p1', // sudo's patchlevel notation
+  '0.21-4ubuntu4', // previously passing: plain digit labels + "-suffix"
+  '11.4.0-1ubuntu1~22.04.3', // "~" splits it; residues are version/all-numeric shaped
+  '5.2.5-2ubuntu1',
+  '1.21.1-1ubuntu2~22.04.2',
+  '2.4.41-4+deb11u1', // Debian NMU/backport revision ("+deb11u1")
+  'v1.2.3',
+  '4.15.0-213.224', // kernel-style dotted revision
+  '5.15.0-91-generic', // previously leaked: SECOND hyphen (kernel/linux-image family --
+  // agent.os.kernel carries exactly this string for every Ubuntu agent)
+  '5.4.0-150-generic',
+  '5.15.0-91-lowlatency',
+  '2.4.37-43.module+el8.5.0+1022+b541f3b1', // previously leaked: RHEL modular build, "+" splits
+  // off the FQDN-shaped "el8.5.0" -- covered by the whole-token compound check
+  '1.0+git20200101.abc1234-1', // previously leaked: git snapshot version
+  '1.0.0+build.5', // previously leaked: semver build metadata
+  '0.9.8+really0.9.7-1', // previously leaked: Debian "+really" convention
+  // NOTE: '1.2.3' never reaches VERSION_LIKE_TOKEN_RE at all -- ALL_NUMERIC_DOTTED_RE catches it
+  // first. Kept as an anchor that the two exclusions do not fight each other.
+  '1.2.3',
+];
+
+/** Real hostnames that must ALWAYS mint a HOST_n; if any of them stopped minting, the fix would
+ * have widened a privacy hole instead of just narrowing a fidelity one. The load-bearing rows are
+ * the all-numeric-first-label FQDNs (0.pool.ntp.org and friends): they are the exact shape a
+ * future "accept letter-initial version labels" loosening would stop minting, which is why that
+ * loosening is forbidden (see VERSION_LIKE_TOKEN_RE's KNOWN, DELIBERATE RESIDUE note).
+ * 3com/01server are NOT boundary cases — each fails the version test twice over (letters within
+ * the first label AND an alphabetic final label) — they are here as ordinary regression rows. */
+const HOSTNAME_BOUNDARY_CORPUS = [
+  'wazuh-aio-05.internal.corp',
+  'web-prod-01.example.com',
+  '0.pool.ntp.org', // all-numeric FIRST label: the guard against loosening subsequent labels
+  '1.gravatar.com',
+  '2.bp.blogspot.com',
+  '10.corp.local',
+  '3com.example.com', // digit-initial first label, but a letter WITHIN that same label
+  '01server.corp.local', // same: digit-initial first label, letters fused in
+  'ns1.google.com',
+  'backup-vault.internal.corp',
+  'web1.corp',
+];
+
+test('prescanAndMint (#8920 item 8): version-grammar corpus passes through verbatim, never minted', () => {
+  const failures: string[] = [];
+  for (const token of VERSION_GRAMMAR_CORPUS) {
+    const p = new Pseudonymizer();
+    const input = `installed version ${token} today`;
+    const out = prescanAndMint(input, p);
+    if (out !== input) {
+      failures.push(`${token}: expected verbatim, got "${out}"`);
+    }
+    if (p.newEntries().length !== 0) {
+      failures.push(
+        `${token}: expected no pseudonym entries, minted ${
+          p.newEntries().length
+        }`,
+      );
+    }
+  }
+  assert.deepEqual(failures, []);
+});
+
+test('prescanAndMint (#8920 item 8): hostname corpus at the boundary still mints HOST_n', () => {
+  const failures: string[] = [];
+  for (const token of HOSTNAME_BOUNDARY_CORPUS) {
+    const p = new Pseudonymizer();
+    const out = prescanAndMint(`connect to ${token} now`, p);
+    if (!/HOST_\d+/.test(out)) {
+      failures.push(`${token}: expected a HOST_n pseudonym, got "${out}"`);
+    }
+    if (out.includes(token)) {
+      failures.push(`${token}: real value leaked into output "${out}"`);
+    }
+  }
+  assert.deepEqual(failures, []);
+});
+
+test('prescanAndMint (#8920 item 8): newly version-excluded shapes are pinned as NON-minting', () => {
+  // The tokens whose minting behaviour this fix actually CHANGED on the hostname side: digit-run
+  // labels with trailing letters. None is a plausible hostname; each is a plausible version
+  // fragment, and this pins the accepted direction of the change so it cannot silently flip.
+  for (const token of ['10.0.2c', '01.2srv', '2.6prod', '123.4abc.5x']) {
+    const p = new Pseudonymizer();
+    const input = `value ${token} seen`;
+    assert.equal(prescanAndMint(input, p), input, `${token} must not mint`);
+    assert.equal(p.newEntries().length, 0);
+  }
+});
+
+test('prescanAndMint (#8920 item 8): letter-initial version labels are the KNOWN residue and still mint', () => {
+  // Deliberate residue (see VERSION_LIKE_TOKEN_RE's doc comment): "4.6.3.el7"/"2.0.rc1"-style
+  // labels are legal versions, but excluding them would require accepting letter-initial
+  // subsequent labels — which would stop minting 0.pool.ntp.org-shaped REAL hostnames. This test
+  // pins the residue as minting so a future "fix" cannot take the privacy-regressing direction
+  // without tripping over it and reading why.
+  for (const token of ['4.6.3.el7', '2.0.rc1', '4.0.dev0']) {
+    const p = new Pseudonymizer();
+    const out = prescanAndMint(`version ${token} installed`, p);
+    assert.match(
+      out,
+      /HOST_\d+/,
+      `${token} is the documented fidelity residue`,
+    );
+  }
 });
 
 // --- prescanAndMintToolContent (JSON-aware digest pre-scan) -----------------------------------
@@ -162,6 +320,54 @@ test('prescanAndMintToolContent: a digest with no scannable values round-trips u
   const out = prescanAndMintToolContent(digest, p);
   assert.equal(out, digest);
   assert.equal(p.newEntries().length, 0);
+});
+
+// --- prescanAndMintToolContent: #8920 item 8 version-grammar coverage (JSON boundary) ----------
+// Same two corpora as the `prescanAndMint` section above, run through the JSON-aware digest path
+// instead, since a tool result reaches privacy scanning through `prescanAndMintToolContent`, not
+// the flat scanner directly — the class fix (one shared regex) has to hold on both boundaries.
+
+test('prescanAndMintToolContent (#8920 item 8): version-grammar corpus stays verbatim in a JSON value', () => {
+  const failures: string[] = [];
+  for (const token of VERSION_GRAMMAR_CORPUS) {
+    const p = new Pseudonymizer();
+    const digest = JSON.stringify({
+      message: `installed version ${token} today`,
+    });
+    const out = prescanAndMintToolContent(digest, p);
+    if (out !== digest) {
+      failures.push(`${token}: expected byte-identical JSON, got "${out}"`);
+    }
+    if (p.newEntries().length !== 0) {
+      failures.push(
+        `${token}: expected no pseudonym entries, minted ${
+          p.newEntries().length
+        }`,
+      );
+    }
+  }
+  assert.deepEqual(failures, []);
+});
+
+test('prescanAndMintToolContent (#8920 item 8): hostname corpus at the boundary still mints in a JSON value', () => {
+  const failures: string[] = [];
+  for (const token of HOSTNAME_BOUNDARY_CORPUS) {
+    const p = new Pseudonymizer();
+    const digest = JSON.stringify({ message: `connect to ${token} now` });
+    const out = prescanAndMintToolContent(digest, p);
+    const parsed = JSON.parse(out) as { message: string };
+    if (!/HOST_\d+/.test(parsed.message)) {
+      failures.push(
+        `${token}: expected a HOST_n pseudonym, got "${parsed.message}"`,
+      );
+    }
+    if (parsed.message.includes(token)) {
+      failures.push(
+        `${token}: real value leaked into output "${parsed.message}"`,
+      );
+    }
+  }
+  assert.deepEqual(failures, []);
 });
 
 function baseDigest(overrides: Partial<Digest> = {}): Digest {
@@ -529,6 +735,41 @@ test('applyFieldPolicy: a packages-kind get_agent_inventory digest keeps package
   assert.equal(out.samples[0]['package.architecture'], 'amd64');
 });
 
+test('applyFieldPolicy: a packages-kind get_agent_inventory digest anonymizes package.vendor while keeping name/version/architecture readable', () => {
+  // package.vendor is the deliberate exception in this group (see privacy.ts's comment on its
+  // entry): a distributor string ("Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>")
+  // routinely embeds a maintainer email address, unlike the pure software-identity fields above,
+  // so it stays 'anonymize' even though it sits right next to three 'allow' entries reading the
+  // exact same index. This also pins the OUTCOME the field-policy-coverage.test.ts fix protects:
+  // before `package.vendor` had this explicit entry, it reached this exact result only by
+  // accident (the deriveColumns fail-closed default), with no reviewed decision behind it.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_agent_inventory',
+    samples: [
+      {
+        'package.name': 'openssl',
+        'package.version': '3.0.2',
+        'package.architecture': 'amd64',
+        'package.vendor':
+          'Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    'get_agent_inventory',
+    true, // isEscapeHatch: true, matching get_agent_inventory's deriveColumns: true
+  );
+  assert.equal(out.samples[0]['package.name'], 'openssl');
+  assert.equal(out.samples[0]['package.version'], '3.0.2');
+  assert.equal(out.samples[0]['package.architecture'], 'amd64');
+  assert.match(out.samples[0]['package.vendor'] as string, /^VAL_\d+$/);
+});
+
 test('applyFieldPolicy: a ports-kind get_agent_inventory digest still anonymizes source.ip/destination.ip', () => {
   const p = new Pseudonymizer();
   const digest = baseDigest({
@@ -727,6 +968,50 @@ test('applyFieldPolicy: a "never" agg field drops only its own buckets', () => {
   assert.equal(out.breakdown![0].agg, 'by_rule');
 });
 
+test('applyFieldPolicy: get_agent_inventory packages breakdown anonymizes package.vendor buckets, not package.architecture', () => {
+  // Reproduces the exact reported defect against the REAL FIELD_POLICY_DEFAULTS + the same shape
+  // of scalar AggFieldSpec map executor.ts builds for a breakdownDimensions tool (dimension ->
+  // {kind: 'scalar', field: dimension}, see executor.ts's `aggFields` fallback) -- before
+  // package.vendor had its own entry, this bucket already came out as an opaque VAL_n (the
+  // deriveColumns fail-closed default), but with no reviewed policy behind it; this pins that the
+  // SAME outcome now happens deliberately, and that the sibling package.architecture dimension (a
+  // real 'allow' entry) still reports its real bucket keys.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_agent_inventory',
+    breakdown: [
+      { key: 'amd64', count: 40, agg: 'package.architecture' },
+      {
+        key: 'Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>',
+        count: 12,
+        agg: 'package.vendor',
+      },
+    ],
+  });
+  const aggFields = {
+    'package.architecture': {
+      kind: 'scalar' as const,
+      field: 'package.architecture',
+    },
+    'package.vendor': { kind: 'scalar' as const, field: 'package.vendor' },
+  };
+  const out = applyFieldPolicy(
+    digest,
+    FIELD_POLICY_DEFAULTS,
+    p,
+    aggFields,
+    'get_agent_inventory',
+    true, // isEscapeHatch: true, matching get_agent_inventory's deriveColumns: true
+  );
+  assert.ok(out.breakdown);
+  const arch = out.breakdown!.find(b => b.agg === 'package.architecture')!;
+  const vendor = out.breakdown!.find(b => b.agg === 'package.vendor')!;
+  assert.equal(arch.key, 'amd64');
+  assert.match(vendor.key, /^VAL_\d+$/);
+  // The real vendor STRING (email address included) never appears in the scrubbed digest.
+  assert.doesNotMatch(JSON.stringify(out), /lists\.ubuntu\.com/);
+});
+
 test('applyFieldPolicy: message field is run through the whole-text scrub', () => {
   const policy: FieldPolicyEntry[] = [];
   const p = new Pseudonymizer();
@@ -748,7 +1033,7 @@ test('applyFieldPolicy: absent message stays absent (no message key added)', () 
 
 // --- extractAggFields ----------------------------------------------------------------------------
 
-test('extractAggFields: maps each top-level agg name to its terms/significant_terms/cardinality field', () => {
+test('extractAggFields: maps each top-level BUCKET agg name to its terms/significant_terms field', () => {
   const body = {
     aggs: {
       by_rule: { terms: { field: 'rule.id', size: 20 } },
@@ -759,7 +1044,11 @@ test('extractAggFields: maps each top-level agg name to its terms/significant_te
   const fields = extractAggFields(body);
   assert.ok(fields);
   assert.deepEqual(fields!.by_rule, scalarSpec('rule.id'));
-  assert.deepEqual(fields!.by_ip_count, scalarSpec('data.srcip'));
+  // cardinality is a metric agg (returns a NUMBER, produces no buckets) -- deliberately NOT
+  // mapped, see extractAggFields's doc comment on why mapping it would misattribute samples[].key
+  // against a leading metric agg instead of the bucket agg the rows actually came from.
+  assert.equal(fields!.by_ip_count, undefined);
+  assert.ok('by_ip_count' in fields!);
   assert.deepEqual(fields!.by_sig, scalarSpec('rule.description'));
 });
 
@@ -802,6 +1091,65 @@ test('extractAggFields: resolves composite to a "composite" spec keyed by source
     kind: 'composite',
     fields: { ip: 'source.ip', agent: 'wazuh.agent.id' },
   });
+});
+
+// --- applyFieldPolicy: samples[].key attribution with a leading metric agg (#8920 item 5) --------
+
+/**
+ * Since digest.ts's `bucketsToRows` sources rows from the first agg WITH BUCKETS (skipping a
+ * leading metric agg), the `key` sample column must be resolved against that same aggregation's
+ * field — not the first DECLARED one. These two pin both directions of the misattribution a
+ * declaration-order lookup would reintroduce.
+ */
+test('applyFieldPolicy: "key" resolves against the BUCKET agg, not a leading cardinality agg', () => {
+  // cardinality on an 'allow' field (wazuh.agent.id) declared FIRST; terms on an 'anonymize'
+  // field (wazuh.agent.name) second. The rows/samples come from the terms agg, so the hostnames
+  // under samples[].key MUST be pseudonymized — resolving against wazuh.agent.id's 'allow' entry
+  // would send them to the provider verbatim.
+  const policy: FieldPolicyEntry[] = [
+    { field: 'wazuh.agent.id', action: 'allow' },
+    { field: 'wazuh.agent.name', action: 'anonymize', kind: 'HOST' },
+  ];
+  const p = new Pseudonymizer();
+  const out = applyFieldPolicy(
+    baseDigest({ samples: [{ key: 'web-prod-01', doc_count: 42 }] }),
+    policy,
+    p,
+    extractAggFields({
+      aggs: {
+        distinct_ids: { cardinality: { field: 'wazuh.agent.id' } },
+        by_agent: { terms: { field: 'wazuh.agent.name', size: 10 } },
+      },
+    }),
+  );
+  assert.deepEqual(out.samples, [{ key: 'HOST_1', doc_count: 42 }]);
+});
+
+test('applyFieldPolicy: a leading fieldless metric agg does not blanket-pseudonymize bucket keys', () => {
+  // Mirror direction: an avg/sum/min/max agg has no extractable field at all. If it won the
+  // attribution, `key` would resolve by its own literal name, find no policy entry, and the
+  // escape hatch's fail-closed default would mint VAL_n for every bucket key — real rule ids
+  // arriving at the model as pseudonyms while breakdown carries them verbatim. The terms agg's
+  // 'allow' field must win instead.
+  const policy: FieldPolicyEntry[] = [
+    { field: 'wazuh.rule.id', action: 'allow' },
+  ];
+  const p = new Pseudonymizer();
+  const out = applyFieldPolicy(
+    baseDigest({ samples: [{ key: '5710', doc_count: 66 }] }),
+    policy,
+    p,
+    extractAggFields({
+      aggs: {
+        avg_level: { avg: { field: 'wazuh.rule.level' } },
+        by_rule: { terms: { field: 'wazuh.rule.id', size: 10 } },
+      },
+    }),
+    'search_wazuh_data',
+    true, // isEscapeHatch — the fail-closed default is exactly what must NOT fire here
+  );
+  assert.deepEqual(out.samples, [{ key: '5710', doc_count: 66 }]);
+  assert.equal(p.newEntries().length, 0);
 });
 
 test('extractAggFields: date_histogram (no field-bearing key) maps to undefined', () => {

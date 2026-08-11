@@ -4,6 +4,7 @@ import {
   limitProperty,
   objectSchema,
   requireNonEmptyString,
+  VULN_BREAKDOWN_AGGS,
   VULN_CURRENT_STATE_NOTE,
   VULN_DIGEST_SAMPLE_COLUMNS,
   VULN_SOURCE_FIELDS_WITH_AGENT_ID,
@@ -64,6 +65,10 @@ export const getVulnerabilitiesByAgentTool: ToolDefinition = {
         _source: VULN_SOURCE_FIELDS_WITH_AGENT_ID,
         sort: ['_doc'],
         size: limit,
+        // Population-true severity/agent breakdown over the FULL matched set (issue #8920 item 1:
+        // "no high-severity vulnerabilities" on a host that actually has some, just sorted outside
+        // the returned page) -- see VULN_BREAKDOWN_AGGS's doc comment in common.ts.
+        aggs: VULN_BREAKDOWN_AGGS,
       },
     };
   },
