@@ -566,9 +566,13 @@ export const getAgentInventoryTool: ToolDefinition = {
       'ports), "processes" (running processes), or "hotfixes" (installed Windows hotfixes/KBs -- ' +
       'pairs with the vulnerability tools for patch-management questions, e.g. "which of these ' +
       'critical vulnerabilities already have a hotfix available"). Identify the agent by ' +
-      '"agent_id" (numeric) OR "agent_name" -- if the question refers to "this server"/"the ' +
-      'host" without naming or numbering it, and no agent id or name is otherwise known from the ' +
-      `conversation, call get_agents first to look one up. ${INVENTORY_CURRENT_STATE_NOTE} To ` +
+      '"agent_id" (numeric) OR "agent_name" if either is already known. If the question refers ' +
+      'to "this server"/"the host"/"this box" without naming or numbering it, and no agent id ' +
+      'or name is otherwise known from the conversation, call THIS TOOL DIRECTLY with BOTH ' +
+      'omitted -- do not call get_agents first. It resolves to the only active agent ' +
+      'automatically (stating that assumption is your job, from the note this call returns), or ' +
+      'reports the active-agent candidates for you to ask about if there is more than one. ' +
+      `${INVENTORY_CURRENT_STATE_NOTE} To ` +
       'check whether one specific package/port/process is present (e.g. "is openssl installed on ' +
       'this host?", "what is listening on port 9200?"), pass "filter" instead of scanning the ' +
       'returned rows yourself -- results are truncated well before every row is returned (see ' +
