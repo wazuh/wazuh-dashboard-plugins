@@ -316,7 +316,7 @@ describe('SettingsPage — manual test failure callout is genuinely dismissible'
 
     await waitFor(() => expect(mockService.test).toHaveBeenCalledWith('p1'));
 
-    const testButton = await screen.findByRole('button', { name: 'Test' });
+    const testButton = await screen.findByTestId('wz-ai-provider-test-p1');
     fireEvent.click(testButton);
     await waitFor(() => expect(mockService.test).toHaveBeenCalledTimes(2));
 
@@ -331,14 +331,12 @@ describe('SettingsPage — manual test failure callout is genuinely dismissible'
       latencyMs: 42,
       message: null,
     });
-    // Re-query rather than reuse the `testButton` handle captured before the first click. This is
-    // defensive, not load-bearing: the callout renders below the table, so React reconciles the
-    // action cell to the same DOM node and a stale reference would still work today. Re-querying
-    // guards against a future layout change moving the action column, and matches the pattern
-    // used by the other tests in this file.
-    const testButtonAfterFailure = await screen.findByRole('button', {
-      name: 'Test',
-    });
+    // Re-query via the stable per-row data-test-subj: the primary icon action's accessible name
+    // is not a reliable anchor once the failure callout has rendered below the table, so target
+    // the action's data-test-subj, which is invariant across re-renders.
+    const testButtonAfterFailure = await screen.findByTestId(
+      'wz-ai-provider-test-p1',
+    );
     fireEvent.click(testButtonAfterFailure);
     await waitFor(() => expect(mockService.test).toHaveBeenCalledTimes(3));
 

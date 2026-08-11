@@ -806,6 +806,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           isPrimary: true,
           onClick: handleManualTest,
           enabled: (provider: ProviderSummary) => !testingIds.has(provider.id),
+          // Stable per-row query hook: the accessible name of a primary icon action is not a
+          // reliable anchor across re-renders in the test env (a callout rendering below the
+          // table can transiently drop it from the a11y-name query), so tests target this.
+          'data-test-subj': (provider: ProviderSummary) =>
+            `wz-ai-provider-test-${provider.id}`,
         },
         {
           name: i18n.translate('wazuhAiAssistant.settings.action.edit', {
