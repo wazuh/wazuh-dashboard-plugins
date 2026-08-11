@@ -1644,17 +1644,16 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             } as React.CSSProperties
           }
         >
-          {/* Column flex is state-dependent: in the WELCOME state it is now '1 1 auto' — it fills
-            the pane's available height (so the internal centering spacers below have room to work
-            with) and can shrink below its own content size (`minHeight: 0`) rather than force the
-            pane to grow past it, which is what lets the pane's `overflowY: 'auto'` take over and
-            scroll instead of clipping once the content no longer fits.
-            In a CONVERSATION it is '1 0 auto': grow fills the pane when short (input rests at the
-            bottom), and shrink 0 stops flex from SQUEEZING this column when the conversation
-            outgrows the pane — the old default shrink made the middle section collapse and the
-            messages visibly spill past the input, mid-thread. With shrink 0 the column simply
-            grows and the PANE scrolls (edge scrollbar), while the sticky input keeps itself in
-            view. */}
+          {/* Column flex is '1 0 auto' in BOTH states: grow fills the pane's available height when
+            content is short (so the WELCOME state's internal centering spacers below have room to
+            work with, and a CONVERSATION's input rests at the bottom), and shrink 0 stops flex
+            from SQUEEZING this column when its content — welcome cards plus a saveFailed/error/
+            session-expired callout above them, or a long conversation — outgrows the pane. A
+            shrinkable '1 1 auto' here (tried and reverted) let the column be squeezed below its
+            own content's height, which pushed the welcome prompt/cards to overflow BEHIND the
+            opaque sticky composer instead of the pane scrolling cleanly — the exact "spill past
+            the input" bug shrink 0 exists to prevent. With shrink 0 the column simply grows and
+            the PANE scrolls (edge scrollbar), while the sticky input keeps itself in view. */}
           {/* Pane-centered in BOTH states (the earlier
             welcome-only viewport-centering transform read as "leaning left with an empty right
             band" on wide monitors — removed; the pane's alignItems centering is the only
@@ -1665,7 +1664,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               width: '100%',
               display: 'flex',
               flexDirection: 'column',
-              flex: showWelcomeState ? '1 1 auto' : '1 0 auto',
+              flex: '1 0 auto',
               minHeight: 0,
               padding: '16px 24px 0',
             }}
