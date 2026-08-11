@@ -239,7 +239,8 @@ export async function lookupIndexerTermsCandidate(
     });
     const buckets = (
       response.body as
-        { aggregations?: { candidates?: { buckets?: unknown } } } | undefined
+        | { aggregations?: { candidates?: { buckets?: unknown } } }
+        | undefined
     )?.aggregations?.candidates?.buckets;
     if (!Array.isArray(buckets)) {
       return { kind: 'error' };
@@ -357,7 +358,9 @@ async function resolveOneParam(
       return {
         status: 'failed',
         reason:
-          `${boundedErrorFor(spec.param)} (No active agent was found to assume by default -- ` +
+          `${boundedErrorFor(
+            spec.param,
+          )} (No active agent was found to assume by default -- ` +
           'the intended agent may be pending/disconnected/never_connected.)',
       };
     }
@@ -369,7 +372,9 @@ async function resolveOneParam(
       return {
         status: 'failed',
         reason:
-          `${boundedErrorFor(spec.param)} (${result.total} active agents exist, so which one ` +
+          `${boundedErrorFor(spec.param)} (${
+            result.total
+          } active agents exist, so which one ` +
           `is meant cannot be assumed. Candidates: ${named.join(', ')}` +
           `${remaining > 0 ? `, and ${remaining} more` : ''}.)`,
       };
@@ -404,7 +409,9 @@ async function resolveOneParam(
   if (result.kind === 'none') {
     return {
       status: 'failed',
-      reason: `${boundedErrorFor(spec.param)} (No matching value was found to assume by default.)`,
+      reason: `${boundedErrorFor(
+        spec.param,
+      )} (No matching value was found to assume by default.)`,
     };
   }
   if (result.kind === 'many') {
@@ -418,8 +425,12 @@ async function resolveOneParam(
     return {
       status: 'failed',
       reason:
-        `${boundedErrorFor(spec.param)} (At least ${result.total} distinct values exist, so ` +
-        `which one is meant cannot be assumed. Candidates: ${result.candidates.join(', ')}` +
+        `${boundedErrorFor(spec.param)} (At least ${
+          result.total
+        } distinct values exist, so ` +
+        `which one is meant cannot be assumed. Candidates: ${result.candidates.join(
+          ', ',
+        )}` +
         `${hasMore ? ', and possibly more' : ''}.)`,
     };
   }
