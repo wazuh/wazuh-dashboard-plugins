@@ -274,6 +274,171 @@ describe('ResultTable', () => {
     });
   });
 
+  describe('column budget (issue #8921: no table may need a horizontal scrollbar)', () => {
+    function eightColumnSpec(): TableSpec {
+      return {
+        columns: [
+          { id: 'c1', label: 'One' },
+          { id: 'c2', label: 'Two' },
+          { id: 'c3', label: 'Three' },
+          { id: 'c4', label: 'Four' },
+          { id: 'c5', label: 'Five' },
+          { id: 'c6', label: 'Six' },
+          { id: 'c7', label: 'Seven' },
+          { id: 'c8', label: 'Eight' },
+        ],
+        rows: [
+          {
+            c1: 'v1',
+            c2: 'v2',
+            c3: 'v3',
+            c4: 'v4',
+            c5: 'v5',
+            c6: 'v6',
+            c7: 'v7',
+            c8: 'v8',
+          },
+        ],
+      };
+    }
+
+    it('renders exactly the first 6 spec columns as visible table columns', () => {
+      render(<ResultTable spec={eightColumnSpec()} />);
+      // Assert on the HEADER cells, not on text anywhere in the table: EUI renders every column
+      // label twice -- once in the desktop `<th>` and once per row as a mobile header
+      // (`euiTableRowCell__mobileHeader`) -- so `getByText(label)` throws "found multiple
+      // elements". Header cells are also the honest expression of this invariant, which is about
+      // how many columns the table SHOWS.
+      const headerTexts = screen
+        .getAllByRole('columnheader')
+        .map(header => header.textContent ?? '');
+      for (const label of ['One', 'Two', 'Three', 'Four', 'Five', 'Six']) {
+        expect(headerTexts).toContain(label);
+      }
+      // Columns 7+ are demoted from visibility, not deleted -- see the next test for where they
+      // actually went.
+      expect(headerTexts).not.toContain('Seven');
+      expect(headerTexts).not.toContain('Eight');
+      expect(screen.queryByText('Seven')).toBeNull();
+      expect(screen.queryByText('Eight')).toBeNull();
+    });
+
+    it('keeps hidden columns 7+ reachable in the row expander JSON (demoted, not deleted)', () => {
+      render(<ResultTable spec={eightColumnSpec()} />);
+      fireEvent.click(screen.getByRole('button', { name: 'Expand row' }));
+      expect(screen.getByText(/"c7": "v7"/)).toBeInTheDocument();
+      expect(screen.getByText(/"c8": "v8"/)).toBeInTheDocument();
+    });
+
+    it('appends a "+N more fields" note to the accordion summary when columns are hidden', () => {
+      render(<ResultTable spec={eightColumnSpec()} />);
+      expect(
+        screen.getByText(
+          'Results (1 rows) (+2 more fields per row — expand a row to see them)',
+        ),
+      ).toBeInTheDocument();
+    });
+
+    it('adds no hidden-columns note when the spec has 6 or fewer columns', () => {
+      render(<ResultTable spec={spec()} />);
+      expect(screen.getByText('Results (1 rows)')).toBeInTheDocument();
+    });
+  });
+
+  describe('absent-value placeholder (issue #8921: absent is rendered as absent)', () => {
+    it('renders undefined/null/empty-string as a subdued "—" in a default (non-severity, non-timestamp) column', () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'a', label: 'A' },
+              { id: 'b', label: 'B' },
+              { id: 'c', label: 'C' },
+            ],
+            rows: [{ a: undefined, b: null, c: '' }],
+          })}
+        />,
+      );
+      expect(screen.getAllByText('—')).toHaveLength(3);
+    });
+
+    it('renders an absent severity value as "—", not an empty badge', () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'agent', label: 'Agent' },
+              { id: 'severity', label: 'Severity' },
+            ],
+            rows: [{ agent: 'a', severity: undefined }],
+            severityColumn: 'severity',
+          })}
+        />,
+      );
+      expect(screen.getByText('—')).toBeInTheDocument();
+      expect(document.querySelector('.euiBadge')).toBeNull();
+    });
+
+    it('renders an absent value in an otherwise-timestamp column as "—"', () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'ts', label: 'Time' }],
+            rows: [{ ts: '2026-07-26T05:58:38.000Z' }, { ts: undefined }],
+          })}
+        />,
+      );
+      expect(screen.getByText('—')).toBeInTheDocument();
+    });
+
+    it('does NOT render 0 or false as the absent placeholder', () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'count', label: 'Count' },
+              { id: 'flag', label: 'Flag' },
+            ],
+            rows: [{ count: 0, flag: false }],
+          })}
+        />,
+      );
+      expect(screen.getByText('0')).toBeInTheDocument();
+      // `false` must render a VISIBLE "No" — asserting only the absence of the placeholder would
+      // pass on a blank cell too (React renders a boolean child as nothing), which is exactly the
+      // regression replacing EUI's default formatter could introduce.
+      expect(screen.getByText('No')).toBeInTheDocument();
+      expect(screen.queryByText('—')).toBeNull();
+    });
+
+    it('renders booleans as Yes/No, never as blank cells', () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'document.enabled', label: 'Enabled' }],
+            rows: [{ 'document.enabled': true }, { 'document.enabled': false }],
+          })}
+        />,
+      );
+      expect(screen.getByText('Yes')).toBeInTheDocument();
+      expect(screen.getByText('No')).toBeInTheDocument();
+    });
+
+    it('renders array values comma-joined, never concatenated', () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'document.tags', label: 'Tags' }],
+            rows: [{ 'document.tags': ['informational', 'wazuh-generic'] }],
+          })}
+        />,
+      );
+      expect(
+        screen.getByText('informational, wazuh-generic'),
+      ).toBeInTheDocument();
+    });
+  });
+
   describe('render-error boundary', () => {
     it('degrades to an inline warning instead of crashing when a row cannot be serialized (e.g. a circular reference) once expanded', () => {
       const circular: Record<string, unknown> = { agent: 'web-01' };

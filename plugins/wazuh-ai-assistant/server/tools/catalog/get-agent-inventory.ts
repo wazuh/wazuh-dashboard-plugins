@@ -90,14 +90,23 @@ const INVENTORY_KIND_CONFIG: Record<InventoryKind, InventoryKindConfig> = {
   },
   ports: {
     index: 'wazuh-states-inventory-ports*',
+    // Order (issue #8921's column-budget item): `deriveResultColumns` (digest.ts) takes this
+    // `_source` list, byte-for-byte, as the derived column order -- and the client's
+    // MAX_VISIBLE_COLUMNS budget (result-table.tsx) shows only the first 6 of them as visible
+    // table columns. The issue's 5 highest-value fields lead (source.port, interface.state,
+    // process.name, network.transport, destination.ip), followed by source.ip as the 6th visible
+    // column; destination.port/process.pid are demoted -- NOT deleted, still queried and still in
+    // the row expander -- to positions 7-8. destination.ip stays ahead of them: on an established
+    // connection it carries the peer address, which is more often what a reader wants than the
+    // local source.ip/the numeric process.pid.
     source: [
-      'source.ip',
       'source.port',
-      'destination.ip',
-      'destination.port',
-      'network.transport',
       'interface.state',
       'process.name',
+      'network.transport',
+      'destination.ip',
+      'source.ip',
+      'destination.port',
       'process.pid',
     ],
     limitRange: [50, 500],
