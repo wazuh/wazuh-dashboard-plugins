@@ -27,10 +27,13 @@ function resolveIndexFamily(value: unknown): IndexFamily {
  * Same shape as `get-top-rules.ts`: a `terms` aggregation on `wazuh.agent.id` (on the guardrail's
  * bounded-bucket-safe allowlist -- see `WAZUH_FIELD.AGENT_ID` in `guardrails.ts`) with a `top_hits`
  * sub-aggregation sampling one `wazuh.agent.name` per bucket, `size: 0` (aggregation-only, no hit
- * documents fetched). `index` selects which timeline family to rank agents over: `findings`
- * (rule-matched detections, the default -- "which agents are triggering the most alerts") or
- * `events` (the raw normalized event stream -- "which agents are generating the most traffic/
- * telemetry", matched or not; see `get-events-by-agent.ts`'s `EVENTS_SCOPE_NOTE` for that
+ * documents fetched) -- and, like that tool's `distinct_titles`, a sibling `cardinality` sub-agg
+ * (`distinct_names`) whose value is DISPLAYED, because the sampled name is one of possibly several
+ * for a given agent id (rename/re-enrollment) and that spread must be disclosed rather than hidden
+ * behind one arbitrary sample. `index` selects which timeline family to rank agents over:
+ * `findings` (rule-matched detections, the default -- "which agents are triggering the most
+ * alerts") or `events` (the raw normalized event stream -- "which agents are generating the most
+ * traffic/telemetry", matched or not; see `get-events-by-agent.ts`'s `EVENTS_SCOPE_NOTE` for that
  * distinction). Both families use the identical `wazuh.agent.id`/`wazuh.agent.name` field pair
  * (confirmed in `get-events-by-agent.ts`), so no per-family field branching is needed beyond the
  * index pattern itself. `wazuh-states-*` (package/OS pivots) is intentionally out of scope here:
@@ -88,6 +91,12 @@ export const getTopAgentsTool: ToolDefinition = {
               sample_doc: {
                 top_hits: { size: 1, _source: ['wazuh.agent.name'] },
               },
+              // Spread disclosure for the sampled name above, the same instrument
+              // `get-top-rules.ts` uses for `distinct_titles` (see sampled-label-coverage.test.ts).
+              // `wazuh.agent.id` -> `wazuh.agent.name` is NOT 1:1 over a time range: an agent can
+              // be renamed, or re-enrolled under a reused id, so one id's bucket can span several
+              // names and `sample_doc` shows only one. Displaying the count makes that visible
+              // instead of presenting one arbitrary name as if it were the bucket's only one.
               distinct_names: {
                 cardinality: { field: 'wazuh.agent.name' },
               },

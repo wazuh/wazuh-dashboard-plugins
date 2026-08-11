@@ -329,6 +329,57 @@ function hitsToRows(
  * form travels via `Digest.metrics` (see its doc comment), which is also populated alongside the
  * bucket rows when a bucket agg IS present, so a sibling metric is never dropped either way.
  */
+/**
+ * Picks the element that belongs to a bucket out of a sampled document's PARALLEL multi-value
+ * arrays (UI run 2026-08-14, finding 7). get_mitre_summary buckets on
+ * `wazuh.rule.mitre.technique.id`, and its `top_hits` sample carries the id, name and tactic
+ * arrays of one document — arrays that are parallel by construction, which is precisely why that
+ * tool adds the id itself to its `_source` (see get-mitre-summary.ts's column-design comment:
+ * "a consumer can zip them and pick the name whose index matches the bucket key"). Nothing ever
+ * did the zip: `Object.assign` merged the arrays whole, so a document co-tagged with two
+ * techniques displayed BOTH names on BOTH rows — T1190 and T1068 rendered the identical name
+ * pair, and a seven-technique document rendered all seven names against one id, none of them
+ * attributable.
+ *
+ * Generic and shape-driven, not tool-specific: find an array field of the sample that CONTAINS
+ * the bucket key, then project every other array field of the SAME length down to that index.
+ * Arrays of a different length are not parallel and are left whole rather than guessed at; a
+ * sample with no matching array (every other tool's single-value `top_hits`) returns unchanged,
+ * so this is a no-op everywhere it does not apply.
+ */
+function alignParallelArrays(
+  sampleSource: Record<string, unknown>,
+  bucketKey: unknown,
+): Record<string, unknown> {
+  if (typeof bucketKey !== 'string' && typeof bucketKey !== 'number') {
+    return sampleSource;
+  }
+  let matchIndex = -1;
+  let matchLength = -1;
+  for (const value of Object.values(sampleSource)) {
+    if (!Array.isArray(value)) {
+      continue;
+    }
+    const index = value.indexOf(bucketKey);
+    if (index !== -1) {
+      matchIndex = index;
+      matchLength = value.length;
+      break;
+    }
+  }
+  if (matchIndex === -1) {
+    return sampleSource;
+  }
+  const aligned: Record<string, unknown> = {};
+  for (const [field, value] of Object.entries(sampleSource)) {
+    aligned[field] =
+      Array.isArray(value) && value.length === matchLength
+        ? value[matchIndex]
+        : value;
+  }
+  return aligned;
+}
+
 function bucketsToRows(
   result: unknown,
 ): Array<Record<string, unknown>> | undefined {
@@ -380,7 +431,7 @@ function bucketsToRows(
       const sampleSource = (subAggValue as TopHitsShape | undefined)?.hits
         ?.hits?.[0]?._source;
       if (sampleSource) {
-        Object.assign(row, sampleSource);
+        Object.assign(row, alignParallelArrays(sampleSource, row.key));
         continue;
       }
       if (isMetricAggValue(subAggValue)) {

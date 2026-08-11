@@ -118,6 +118,90 @@ test('buildTableSpec: one resolving declared column keeps the declared shape (no
   assert.equal(table.rows[0]['check.id'], '28500');
 });
 
+// UI run 2026-08-14 (finding 7): get_mitre_summary buckets on technique id and samples a
+// document whose id/name/tactic arrays are parallel. Object.assign merged them whole, so T1190
+// and T1068 both displayed the identical name pair and a seven-technique document showed all
+// seven names against one id. The tool's own design comment says a consumer should zip the
+// arrays and pick the index matching the bucket key -- nothing did.
+test('bucketsToRows: a bucket key inside a parallel array picks the matching element from its siblings', () => {
+  const def = buildToolDef({
+    tableSpec: {
+      columns: [
+        { field: 'key', label: 'Technique ID' },
+        { field: 'wazuh.rule.mitre.technique.name', label: 'Technique' },
+      ],
+    },
+  });
+  const result = {
+    aggregations: {
+      technique_ids: {
+        buckets: [
+          {
+            key: 'T1068',
+            doc_count: 796,
+            sample: {
+              hits: {
+                hits: [
+                  {
+                    _source: {
+                      'wazuh.rule.mitre.technique.id': ['T1190', 'T1068'],
+                      'wazuh.rule.mitre.technique.name': [
+                        'Exploit Public-Facing Application',
+                        'Exploitation for Privilege Escalation',
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      },
+    },
+  };
+  const table = buildTableSpec(result, def);
+  assert.equal(
+    table.rows[0]['wazuh.rule.mitre.technique.name'],
+    'Exploitation for Privilege Escalation',
+    'the name at the SAME index as the bucket key, not the whole array',
+  );
+});
+
+test('bucketsToRows: arrays of a different length are left whole, never guessed at', () => {
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'key', label: 'ID' }] },
+  });
+  const result = {
+    aggregations: {
+      ids: {
+        buckets: [
+          {
+            key: 'T1078',
+            doc_count: 3,
+            sample: {
+              hits: {
+                hits: [
+                  {
+                    _source: {
+                      'technique.id': ['T1078'],
+                      // A technique can belong to two tactics: NOT parallel to the id array.
+                      'tactic.name': ['Persistence', 'Initial Access'],
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      },
+    },
+  };
+  const table = buildTableSpec(result, def);
+  const row = table.rows[0] as Record<string, unknown>;
+  assert.equal(row['technique.id'], 'T1078');
+  assert.deepEqual(row['tactic.name'], ['Persistence', 'Initial Access']);
+});
+
 test('buildTableSpec: bare-string affected_items also normalize to {item} rows in the table', () => {
   const def = buildToolDef({
     tableSpec: { columns: [{ field: 'item', label: 'Item' }] },
