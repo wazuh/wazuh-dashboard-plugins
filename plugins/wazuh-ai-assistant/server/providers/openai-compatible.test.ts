@@ -688,9 +688,21 @@ function withFakeFetchSequence<T>(
 function uniqueTemperatureTestConfig(id: string): ProviderConfig {
   return {
     ...BASE_CONFIG,
-    baseUrl: `https://bedrock-mantle.example.com/${id}/v1`,
+    // Literal loopback address, NOT a real hostname: the provider-URL guard resolves real
+    // hostnames via live DNS on first sight (see BASE_CONFIG's own comment), and these tests
+    // must not depend on the network. Unique per test via the path segment only.
+    baseUrl: `http://127.0.0.1:19999/${id}/v1`,
     model: 'openai.gpt-oss-120b',
   };
+}
+
+/** A fresh streaming success Response per use — Response bodies are one-shot streams, so
+ * sharing a single object across fetch-mock sequences leaves later reads on a consumed body. */
+function freshSuccessResponse(): Response {
+  return new Response(
+    sseBody([{ choices: [{ index: 0, delta: { content: 'ok' } }] }]),
+    { status: 200, headers: { 'Content-Type': 'text/event-stream' } },
+  );
 }
 
 test('chatStream: a 400 mentioning temperature is retried once without it and the retry succeeds', async () => {
@@ -778,12 +790,8 @@ test('chatStream: a second call against the same provider+model omits temperatur
     }),
     { status: 400, headers: { 'Content-Type': 'application/json' } },
   );
-  const success = new Response(
-    sseBody([{ choices: [{ index: 0, delta: { content: 'ok' } }] }]),
-    { status: 200, headers: { 'Content-Type': 'text/event-stream' } },
-  );
   // First call: pays for the discovery (400 then a successful retry).
-  await withFakeFetchSequence([rejection, success], () => {
+  await withFakeFetchSequence([rejection, freshSuccessResponse()], () => {
     const adapter = new OpenAiCompatibleAdapter();
     const controller = new AbortController();
     return drain(
@@ -797,18 +805,21 @@ test('chatStream: a second call against the same provider+model omits temperatur
   });
   // Second call against the SAME provider+model: must go straight to a single, temperature-free
   // request -- no repeated 400 round-trip.
-  const { capturedBodies } = await withFakeFetchSequence([success], () => {
-    const adapter = new OpenAiCompatibleAdapter();
-    const controller = new AbortController();
-    return drain(
-      adapter.chatStream(
-        config,
-        [userMessage('second call, same provider+model')],
-        controller.signal,
-        { temperature: 0 },
-      ),
-    );
-  });
+  const { capturedBodies } = await withFakeFetchSequence(
+    [freshSuccessResponse()],
+    () => {
+      const adapter = new OpenAiCompatibleAdapter();
+      const controller = new AbortController();
+      return drain(
+        adapter.chatStream(
+          config,
+          [userMessage('second call, same provider+model')],
+          controller.signal,
+          { temperature: 0 },
+        ),
+      );
+    },
+  );
   assert.equal(
     capturedBodies.length,
     1,
@@ -843,5 +854,64 @@ test('chatStream: a provider that accepts temperature keeps receiving it (regres
     capturedBodies[0].temperature,
     0,
     'a provider that never rejected temperature must keep receiving it, including a literal 0',
+  );
+});
+
+test('chatStream: a 400 mentioning temperature on a temperature-FREE call is not retried and not cached', async () => {
+  const config = uniqueTemperatureTestConfig('no-temperature-sent');
+  const rejection = new Response(
+    // The body mentions "temperature" but this call never sent the parameter, so treating it
+    // as a temperature rejection would spend a byte-identical retry AND poison the cache.
+    JSON.stringify({
+      error: { message: 'Model overloaded; try lowering temperature or retrying later.' },
+    }),
+    { status: 400, headers: { 'Content-Type': 'application/json' } },
+  );
+  const { result: events, capturedBodies } = await withFakeFetchSequence(
+    [rejection],
+    () => {
+      const adapter = new OpenAiCompatibleAdapter();
+      const controller = new AbortController();
+      return drain(
+        adapter.chatStream(
+          config,
+          [userMessage('route this')],
+          controller.signal,
+          // no options.temperature at all
+        ),
+      );
+    },
+  );
+  assert.equal(
+    capturedBodies.length,
+    1,
+    'a temperature-free call must never spend a temperature retry',
+  );
+  assert.deepEqual(
+    events.map(event => event.type),
+    ['error'],
+    'the 400 must surface as a terminal error, untouched',
+  );
+  // And the cache must NOT have been poisoned: a follow-up call that DOES send temperature
+  // must still include it on its first attempt.
+  const { capturedBodies: followUpBodies } = await withFakeFetchSequence(
+    [freshSuccessResponse()],
+    () => {
+      const adapter = new OpenAiCompatibleAdapter();
+      const controller = new AbortController();
+      return drain(
+        adapter.chatStream(
+          config,
+          [userMessage('follow-up with temperature')],
+          controller.signal,
+          { temperature: 0 },
+        ),
+      );
+    },
+  );
+  assert.equal(
+    followUpBodies[0].temperature,
+    0,
+    'the earlier temperature-free 400 must not have cached a rejection for this provider+model',
   );
 });

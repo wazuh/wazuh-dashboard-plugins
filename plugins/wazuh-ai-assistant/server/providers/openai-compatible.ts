@@ -160,7 +160,13 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
       async () => {
         const includeTemperature = !temperatureRejectedByProviderModel.get(cacheKey);
         const attemptResponse = await doFetch(buildBody(includeTemperature));
-        if (!includeTemperature || attemptResponse.status !== 400) {
+        // A "temperature rejection" is only possible when temperature was actually in the
+        // request body: without the `options?.temperature !== undefined` gate, a 400 whose
+        // body merely mentions "temperature" on a temperature-free call would trigger a
+        // pointless byte-identical retry AND cache a rejection for a parameter never sent.
+        const temperatureWasSent =
+          includeTemperature && options?.temperature !== undefined;
+        if (!temperatureWasSent || attemptResponse.status !== 400) {
           return attemptResponse;
         }
         // Peek at a CLONE so the original response's body is left untouched for
