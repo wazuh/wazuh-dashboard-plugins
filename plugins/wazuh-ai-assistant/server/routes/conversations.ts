@@ -507,9 +507,12 @@ export function registerConversationRoutes(
         return ownerUnresolvedResponse(response);
       }
       try {
-        const found = await conversationClient(request).get<
-          ConversationAttributes
-        >(CONVERSATION_SAVED_OBJECT_TYPE, request.params.id);
+        const found = await conversationClient(
+          request,
+        ).get<ConversationAttributes>(
+          CONVERSATION_SAVED_OBJECT_TYPE,
+          request.params.id,
+        );
         if (found.attributes.owner !== owner) {
           return response.notFound();
         }
