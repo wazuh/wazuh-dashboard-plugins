@@ -31,6 +31,53 @@ interface ToolCallAccumulator {
   id?: string;
   name?: string;
   args: string;
+  /** Vendor-extra fields seen on the `tool_calls[index]` entry itself -- see
+   * `ToolCall.vendorExtras`. */
+  extras: Record<string, unknown>;
+  /** Vendor-extra fields seen inside that entry's `function` object -- see
+   * `ToolCall.functionVendorExtras`. */
+  functionExtras: Record<string, unknown>;
+}
+
+/** Known keys on a streamed `tool_calls[]` delta entry; anything else is a vendor extra. */
+const KNOWN_TOOL_CALL_DELTA_KEYS = new Set(['index', 'id', 'type', 'function']);
+/** Known keys inside a `tool_calls[].function` delta; anything else is a vendor extra. */
+const KNOWN_TOOL_CALL_FUNCTION_DELTA_KEYS = new Set(['name', 'arguments']);
+/**
+ * Known keys on `choice.delta`; anything else is a message-level vendor extra. Deliberately
+ * includes standard OpenAI-wire fields this adapter doesn't otherwise read, not just the ones it
+ * does -- `reasoning_content` (DeepSeek/vLLM) is the sharpest example: DeepSeek REJECTS a request
+ * that echoes it back, so a field like that must never be swept into `vendorExtras` just because
+ * this adapter has no other use for it.
+ */
+const KNOWN_MESSAGE_DELTA_KEYS = new Set([
+  'role',
+  'content',
+  'reasoning',
+  'reasoning_content',
+  'channel',
+  'tool_calls',
+  'refusal',
+  'annotations',
+  'function_call',
+  'audio',
+]);
+
+/** Copies every key of `source` NOT in `knownKeys` into a fresh object (empty if none). */
+function extractExtras(
+  source: Record<string, unknown> | undefined,
+  knownKeys: Set<string>,
+): Record<string, unknown> {
+  const extras: Record<string, unknown> = {};
+  if (!source) {
+    return extras;
+  }
+  for (const [key, value] of Object.entries(source)) {
+    if (!knownKeys.has(key)) {
+      extras[key] = value;
+    }
+  }
+  return extras;
 }
 
 /**
@@ -202,6 +249,14 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
     }
 
     const toolCalls = new Map<number, ToolCallAccumulator>();
+    // Vendor-extra fields seen on `choice.delta` itself (message-level, not tied to one specific
+    // tool call -- see `ChatMessage.vendorExtras`), merged across every chunk of ONE round the
+    // same way `reasoningBuffer` accumulates text, and threaded into `finalizeToolCalls` below so
+    // its first emitted `tool_call` StreamEvent this round can carry it back up to chat.ts, the
+    // only place that ever constructs a `ChatMessage` from these events. Reassigned to `{}`
+    // (rather than only mutated) right after every `finalizeToolCalls` call: this is round-scoped,
+    // not call-scoped, so a stage-1/multi-round call must not let round 2 inherit round 1's extras.
+    let messageExtras: Record<string, unknown> = {};
 
     // Reasoning-channel fallback (see the `parsed` type below and issue
     // 02-read-reasoning-delta.md): some reasoning models (gpt-oss, qwen3.x) stream their entire
@@ -289,7 +344,10 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
         if (payload === '[DONE]') {
           if (!toolCallsFinalized) {
             yield* flushInlineMarkupFilter();
-            const finalized = finalizeToolCalls(toolCalls);
+            const finalized = finalizeToolCalls(toolCalls, messageExtras);
+            // A later round in the same call must start its own message-level extras from
+            // scratch, not inherit this round's (`messageExtras`'s own doc comment above).
+            messageExtras = {};
             yield* finalized;
             if (hasToolCallError(finalized)) {
               return;
@@ -356,6 +414,19 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
         if (choice?.delta?.reasoning) {
           reasoningBuffer += choice.delta.reasoning;
         }
+        // Vendor passthrough (generic -- see `ChatMessage.vendorExtras`'s doc comment): any key on
+        // `choice.delta` this adapter doesn't otherwise recognize is captured verbatim and merged
+        // across the round, exactly like `reasoningBuffer` above. `choice.delta` is typed above
+        // without these fields since no *known* provider defines them, but the raw JSON frame
+        // still carries whatever the provider actually sent -- this reads that raw shape, not the
+        // typed one.
+        Object.assign(
+          messageExtras,
+          extractExtras(
+            choice?.delta as Record<string, unknown> | undefined,
+            KNOWN_MESSAGE_DELTA_KEYS,
+          ),
+        );
         accumulateToolCallDeltas(toolCalls, choice?.delta?.tool_calls);
 
         if (choice?.finish_reason === 'tool_calls' && !toolCallsFinalized) {
@@ -363,7 +434,10 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
           // `drainRoundBuffers()` follows: whatever text preceded the call must be fully resolved
           // (and, if it was markup, dropped) before the round moves on.
           yield* flushInlineMarkupFilter();
-          const finalized = finalizeToolCalls(toolCalls);
+          const finalized = finalizeToolCalls(toolCalls, messageExtras);
+          // A later round in the same call must start its own message-level extras from
+          // scratch, not inherit this round's (`messageExtras`'s own doc comment above).
+          messageExtras = {};
           yield* finalized;
           if (hasToolCallError(finalized)) {
             return;
@@ -376,7 +450,10 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
         if (parsed.usage) {
           if (!toolCallsFinalized) {
             yield* flushInlineMarkupFilter();
-            const finalized = finalizeToolCalls(toolCalls);
+            const finalized = finalizeToolCalls(toolCalls, messageExtras);
+            // A later round in the same call must start its own message-level extras from
+            // scratch, not inherit this round's (`messageExtras`'s own doc comment above).
+            messageExtras = {};
             yield* finalized;
             if (hasToolCallError(finalized)) {
               return;
@@ -396,7 +473,10 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
       }
       if (!toolCallsFinalized) {
         yield* flushInlineMarkupFilter();
-        const finalized = finalizeToolCalls(toolCalls);
+        const finalized = finalizeToolCalls(toolCalls, messageExtras);
+        // A later round in the same call must start its own message-level extras from
+        // scratch, not inherit this round's (`messageExtras`'s own doc comment above).
+        messageExtras = {};
         yield* finalized;
         if (hasToolCallError(finalized)) {
           return;
@@ -427,12 +507,23 @@ function toOpenAiMessage(message: ChatMessage): Record<string, unknown> {
     return {
       role: 'assistant',
       content: message.content || null,
+      // `...(message.vendorExtras ?? {})` is a deliberate no-op for every provider that never set
+      // it (OpenAI, Groq, Bedrock, Ollama, ...) — spreading an empty object adds no keys. Only
+      // Gemini's OpenAI-compatible endpoint currently populates it (message-level
+      // `thought_signature` sightings, if any -- see `ChatMessage.vendorExtras`'s doc comment).
+      ...(message.vendorExtras ?? {}),
       tool_calls: message.toolCalls.map(call => ({
         id: call.id,
         type: 'function',
+        // Same no-op-by-default spread as above, but per call: this is where Gemini's
+        // `thought_signature` actually lands in practice (see `ToolCall.vendorExtras`'s doc
+        // comment) — REQUIRED to be echoed back verbatim on the next request or the call is
+        // rejected with "Function call is missing a thought_signature in functionCall parts".
+        ...(call.vendorExtras ?? {}),
         function: {
           name: call.name,
           arguments: JSON.stringify(call.arguments),
+          ...(call.functionVendorExtras ?? {}),
         },
       })),
     };
@@ -477,7 +568,11 @@ function accumulateToolCallDeltas(
   }
   deltas.forEach((delta, position) => {
     const index = delta.index ?? position;
-    const entry = accumulator.get(index) ?? { args: '' };
+    const entry = accumulator.get(index) ?? {
+      args: '',
+      extras: {},
+      functionExtras: {},
+    };
     if (delta.id) {
       entry.id = delta.id;
     }
@@ -487,6 +582,25 @@ function accumulateToolCallDeltas(
     if (delta.function?.arguments) {
       entry.args += delta.function.arguments;
     }
+    // Vendor passthrough (see `ToolCall.vendorExtras`/`functionVendorExtras`'s doc comments):
+    // `delta`/`delta.function` are typed above without these fields since no *known* provider
+    // defines them, but the raw JSON frame still carries whatever Gemini (or any future provider)
+    // actually sent on either level — merged across chunks exactly like `args` above, since a
+    // single-shot field like `thought_signature` can arrive on any chunk of the accumulation.
+    Object.assign(
+      entry.extras,
+      extractExtras(
+        delta as unknown as Record<string, unknown>,
+        KNOWN_TOOL_CALL_DELTA_KEYS,
+      ),
+    );
+    Object.assign(
+      entry.functionExtras,
+      extractExtras(
+        delta.function as unknown as Record<string, unknown> | undefined,
+        KNOWN_TOOL_CALL_FUNCTION_DELTA_KEYS,
+      ),
+    );
     accumulator.set(index, entry);
   });
 }
@@ -498,9 +612,11 @@ function accumulateToolCallDeltas(
  */
 function finalizeToolCalls(
   accumulator: Map<number, ToolCallAccumulator>,
+  messageExtras: Record<string, unknown>,
 ): StreamEvent[] {
   const indices = [...accumulator.keys()].sort((left, right) => left - right);
   const events: StreamEvent[] = [];
+  const hasMessageExtras = Object.keys(messageExtras).length > 0;
   for (const index of indices) {
     const entry = accumulator.get(index) as ToolCallAccumulator;
     const name = entry.name ?? '';
@@ -519,8 +635,26 @@ function finalizeToolCalls(
       id: entry.id ?? randomUUID(),
       name,
       arguments: parsedArguments,
+      // Omitted (rather than set to `{}`) when nothing was captured -- see toOpenAiMessage's
+      // no-op-by-default spread, which relies on these being genuinely absent for a
+      // provider that never sent any.
+      ...(Object.keys(entry.extras).length ? { vendorExtras: entry.extras } : {}),
+      ...(Object.keys(entry.functionExtras).length
+        ? { functionVendorExtras: entry.functionExtras }
+        : {}),
     };
-    events.push({ type: 'tool_call', toolCall });
+    events.push({
+      type: 'tool_call',
+      toolCall,
+      // Attached to the FIRST tool_call event of this batch only: `messageExtras` belongs to the
+      // one assistant message chat.ts builds around ALL of this round's calls (message-level, not
+      // per-call), so a round with N parallel calls must not fan it out into N separate assistant
+      // messages each independently claiming to carry it -- `events.length === 0` is exactly "this
+      // is the first call finalized so far in this batch".
+      ...(hasMessageExtras && events.length === 0
+        ? { messageVendorExtras: messageExtras }
+        : {}),
+    });
   }
   return events;
 }

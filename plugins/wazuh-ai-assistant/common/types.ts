@@ -74,6 +74,24 @@ export interface ToolCall {
   id: string;
   name: string;
   arguments: Record<string, unknown>;
+  /**
+   * Vendor-specific fields the provider attached to the tool-call entry itself (sibling to
+   * `id`/`type`/`function` on the wire), captured verbatim so a later round can echo them back.
+   * Gemini's OpenAI-compatible endpoint is the motivating case: it requires `thought_signature`
+   * to be replayed on the next request's `tool_calls[]` entry or the call is rejected with
+   * "Function call is missing a thought_signature in functionCall parts" — but this is generic
+   * passthrough, not a Gemini special case. Absent for every provider that doesn't send extras
+   * (OpenAI, Groq, Bedrock, Ollama, ...), so re-serializing is a no-op for them.
+   */
+  vendorExtras?: Record<string, unknown>;
+  /**
+   * Same passthrough as `vendorExtras`, but for fields nested inside the tool call's `function`
+   * object (name/arguments' sibling) rather than the tool-call entry itself — some providers
+   * (Gemini included, depending on the exact wire revision) put their extra field there instead
+   * of at the outer level, so both locations are captured independently and replayed back to
+   * whichever one they came from.
+   */
+  functionVendorExtras?: Record<string, unknown>;
 }
 
 export type CanonicalToolChoice =
@@ -89,6 +107,21 @@ export interface ChatMessage {
   toolCalls?: ToolCall[];
   /** Set on role:'tool' messages: which ToolCall.id this result answers. */
   toolCallId?: string;
+  /**
+   * Vendor-specific fields the provider attached to the assistant message itself (not to a
+   * specific tool call — see `ToolCall.vendorExtras` for that), captured verbatim so a LATER
+   * ROUND WITHIN THE SAME TURN can echo them back (server/routes/chat.ts rebuilds its own
+   * in-process `messages` accumulator from these while a multi-round turn is in flight).
+   * Deliberately does NOT survive a turn boundary: `ToolExchange` (common/chat-history.ts), the
+   * only thing that persists a tool call across turns/conversation reloads, has no field for it,
+   * so a message-level extra is lost the moment the turn ends. That is an accepted limitation, not
+   * a gap needing a fix -- every known case of a *required* extra (Gemini's `thought_signature`)
+   * is a `ToolCall`-level field, not a message-level one, and `ToolCall.vendorExtras`/
+   * `functionVendorExtras` DO survive the turn boundary (see their own doc comments above and
+   * `ToolExchange`). Generic passthrough: absent, and therefore a no-op, for every provider that
+   * never sends message-level extras.
+   */
+  vendorExtras?: Record<string, unknown>;
 }
 
 /** One client-held pseudonym mapping entry: a real value and
@@ -182,8 +215,13 @@ export type StreamEvent =
    */
   | { type: 'delta'; content: string; reasoningFallback?: true }
   | { type: 'table'; spec: TableSpec }
-  /** Emitted once per call, fully assembled server-side; the browser never sees partial JSON. */
-  | { type: 'tool_call'; toolCall: ToolCall }
+  /**
+   * Emitted once per call, fully assembled server-side; the browser never sees partial JSON.
+   * `messageVendorExtras`, when present, belongs on the assistant message this call is part of
+   * (see `ChatMessage.vendorExtras`) rather than on the call itself — carried here because the
+   * adapter never constructs a `ChatMessage` directly, only `StreamEvent`s.
+   */
+  | { type: 'tool_call'; toolCall: ToolCall; messageVendorExtras?: Record<string, unknown> }
   /**
    * Transient progress line (e.g. "querying Wazuh") shown between deltas while the engine works.
    */
