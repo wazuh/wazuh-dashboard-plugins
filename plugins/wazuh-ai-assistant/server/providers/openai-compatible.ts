@@ -25,6 +25,7 @@ import {
   PROVIDER_FETCH_REDIRECT_POLICY,
 } from './url-guard';
 import { InlineReasoningMarkupFilter } from './inline-reasoning-markup-filter';
+import { fetchWithTemperatureFallback } from './temperature-fallback';
 
 /** Per-index accumulation of a streamed `tool_calls` delta until the provider closes it out. */
 interface ToolCallAccumulator {
@@ -57,46 +58,63 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
       return;
     }
 
-    const body: Record<string, unknown> = {
-      model: config.model,
-      stream: true,
-      // The OpenAI streaming contract only emits the terminal `usage` frame when this is set.
-      // Groq sends it unprompted, which is why the omission went unnoticed -- every usage number
-      // this plugin has recorded so far came from Groq. Amazon Bedrock's chat-completions endpoint
-      // does not: without this, every turn reports `usage: null` and token accounting (including
-      // the stage-1 router's own spend) reads blank. Providers that don't recognise the field
-      // ignore it, and the `if (parsed.usage)` exit below is unchanged either way -- note that
-      // frame arrives with an EMPTY `choices` array, which the per-choice handling above already
-      // tolerates (`parsed.choices?.[0]` is simply undefined).
-      stream_options: { include_usage: true },
-      messages: messages.map(toOpenAiMessage),
+    const buildBody = (
+      includeTemperature: boolean,
+    ): Record<string, unknown> => {
+      const nextBody: Record<string, unknown> = {
+        model: config.model,
+        stream: true,
+        // The OpenAI streaming contract only emits the terminal `usage` frame when this is set.
+        // Groq sends it unprompted, which is why the omission went unnoticed -- every usage
+        // number this plugin has recorded so far came from Groq. Amazon Bedrock's
+        // chat-completions endpoint does not: without this, every turn reports `usage: null` and
+        // token accounting (including the stage-1 router's own spend) reads blank. Providers
+        // that don't recognise the field ignore it, and the `if (parsed.usage)` exit below is
+        // unchanged either way -- note that frame arrives with an EMPTY `choices` array, which
+        // the per-choice handling above already tolerates (`parsed.choices?.[0]` is undefined).
+        stream_options: { include_usage: true },
+        messages: messages.map(toOpenAiMessage),
+      };
+      // Checked for `undefined`, not truthiness -- callers deliberately send `temperature: 0` (the
+      // stage-1 router; see ChatStreamOptions's doc comment), which a `if (options?.temperature)`
+      // guard would treat as absent and silently drop. `includeTemperature` additionally gates this
+      // on whether the provider is already known (this process) to reject the parameter entirely --
+      // see `temperatureRejectedByProviderModel`'s doc comment above.
+      if (includeTemperature && options?.temperature !== undefined) {
+        nextBody.temperature = options.temperature;
+      }
+      if (options?.tools?.length) {
+        nextBody.tools = toOpenAiTools(options.tools);
+        nextBody.tool_choice = toOpenAiToolChoice(options.toolChoice ?? 'auto');
+        nextBody.parallel_tool_calls = false;
+      }
+      return nextBody;
     };
-    // Checked for `undefined`, not truthiness -- callers deliberately send `temperature: 0` (the
-    // stage-1 router; see ChatStreamOptions's doc comment), which a `if (options?.temperature)`
-    // guard would treat as absent and silently drop.
-    if (options?.temperature !== undefined) {
-      body.temperature = options.temperature;
-    }
-    if (options?.tools?.length) {
-      body.tools = toOpenAiTools(options.tools);
-      body.tool_choice = toOpenAiToolChoice(options.toolChoice ?? 'auto');
-      body.parallel_tool_calls = false;
-    }
+
+    const doFetch = (requestBody: Record<string, unknown>): Promise<Response> =>
+      fetch(url, {
+        method: 'POST',
+        signal,
+        redirect: PROVIDER_FETCH_REDIRECT_POLICY,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(config.apiKey
+            ? { Authorization: `Bearer ${config.apiKey}` }
+            : {}),
+        },
+        body: JSON.stringify(requestBody),
+      });
 
     const response = yield* fetchProviderWithRetry(
+      // The `temperature`-rejection fallback lives in temperature-fallback.ts because the native
+      // Anthropic adapter needs exactly the same recovery (see that module's doc comment), and the
+      // rejection cache is deliberately shared between the two.
       () =>
-        fetch(url, {
-          method: 'POST',
-          signal,
-          redirect: PROVIDER_FETCH_REDIRECT_POLICY,
-          headers: {
-            'Content-Type': 'application/json',
-            ...(config.apiKey
-              ? { Authorization: `Bearer ${config.apiKey}` }
-              : {}),
-          },
-          body: JSON.stringify(body),
-        }),
+        fetchWithTemperatureFallback(
+          config,
+          options?.temperature,
+          includeTemperature => doFetch(buildBody(includeTemperature)),
+        ),
       signal,
       // See server/providers/retry.ts's sanitizeProviderErrorBody doc comment for why the
       // exact configured key is passed through here.
