@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ResultTable, ResultTableProvenanceChip } from './result-table';
 import { TableSpec } from '../../../common/types';
@@ -199,7 +199,7 @@ describe('ResultTable', () => {
       expect(screen.getByText('Critical findings · 90d')).toBeInTheDocument();
     });
 
-    it('opens a popover with the tool name and raw JSON arguments on click, closing on a second click', () => {
+    it('opens a popover with the tool name and raw JSON arguments on click, closing on a second click', async () => {
       render(<ResultTable spec={spec()} provenanceChips={[chip()]} />);
 
       expect(
@@ -210,9 +210,11 @@ describe('ResultTable', () => {
       expect(
         screen.getByText(/"index_pattern": "wazuh-findings-v5-\*"/),
       ).toBeInTheDocument();
-      expect(
-        document.querySelector('.euiPopover__panel-isOpen'),
-      ).not.toBeNull();
+      // EUI stamps the open-state modifier once it has positioned the panel, which happens a tick
+      // after the click rather than synchronously with it — hence waitFor rather than a bare read.
+      await waitFor(() =>
+        expect(document.querySelector('.euiPopover__panel-isOpen')).not.toBeNull(),
+      );
 
       fireEvent.click(screen.getByText('Critical findings · 90d'));
       // EUI keeps a closed popover's panel MOUNTED (it fades out via CSS and is only hidden from
@@ -220,7 +222,9 @@ describe('ResultTable', () => {
       // state that actually flips is the panel's `-isOpen` modifier, which is what this asserts —
       // querying for the text instead would pass while open and fail while closed for the wrong
       // reason. Verified against the bundled EUI build, whose stylesheet defines the class.
-      expect(document.querySelector('.euiPopover__panel-isOpen')).toBeNull();
+      await waitFor(() =>
+        expect(document.querySelector('.euiPopover__panel-isOpen')).toBeNull(),
+      );
     });
 
     it('renders no chip at all when provenanceChips is omitted', () => {

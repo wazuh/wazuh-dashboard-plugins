@@ -1900,7 +1900,7 @@ describe('ChatPage — conversation rail display mode (layout contract §5/§6)'
       // renders affordances (new conversation, search, expand) and nothing else. Asserting the
       // absence is the point — a strip that still painted 22-character truncated titles would be
       // the "undense rail" the redesign is removing, just narrower.
-      expect(conversationRow('Older conversation')).toBeNull();
+      expect(screen.queryByText('Older conversation')).toBeNull();
     } finally {
       stub.restore();
     }
