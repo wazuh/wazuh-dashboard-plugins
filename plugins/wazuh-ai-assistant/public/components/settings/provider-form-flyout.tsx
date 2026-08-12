@@ -592,12 +592,13 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
             </EuiFormRow>
             <EuiFormRow
               id='wz-ai-provider-type'
-              label={                
+              label={
                 <RequiredLabel
                   label={i18n.translate('wazuhAiAssistant.settings.form.type', {
                     defaultMessage: 'Provider type',
                   })}
-                />}
+                />
+              }
               helpText={PROVIDER_TYPE_DESCRIPTIONS[form.type]}
             >
               <EuiSelect
