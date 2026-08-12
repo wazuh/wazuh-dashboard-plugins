@@ -12,6 +12,7 @@
 - [Run from Sources](dev/run-sources.md)
 - [Get external resouces](dev/get-external-resources.md)
 - [Run Tests](dev/run-tests.md)
+  - [Paraphrase routing gate](dev/paraphrase-routing-gate.md)
 - [Pull Requests](dev/pull-requests.md)
 - [Repository Bumper](dev/bumper-repository.md)
 - [Modules](dev/modules/index.md)
