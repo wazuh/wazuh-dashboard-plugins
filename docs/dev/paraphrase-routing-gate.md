@@ -64,7 +64,7 @@ its existing pattern, or a similar standalone script.
 - Provider: Bedrock-hosted `gpt-oss-120b`.
 - Result: 60/60 paraphrases routed to their canonical's expected category.
 - Wall time: approximately 4.5 minutes for the full 60-question run.
-- Cost: approximately $0.06 total for the run.
+- Cost: approximately \$0.06 total for the run.
 
 Treat this as the reference point for future runs, not a hard pass/fail threshold — a different
 provider/model may have a different accuracy profile; that is exactly what this gate is meant to
@@ -72,14 +72,14 @@ surface.
 
 ## Interpreting a failure
 
-- **Functional metric**: did the *expected* category appear anywhere in the categories stage 1
+- **Functional metric**: did the _expected_ category appear anywhere in the categories stage 1
   returned for that question? Stage 1 can return up to two categories
   (`ROUTE_QUESTION_TOOL.parameters.properties.categories`, `maxItems: 2`), and
   `resolveStage2Tools` unions every routed category's tools before adding the always-on
   `search_wazuh_data` escape hatch. So if the expected category is present in the returned set at
   all, stage 2 still has the right tools available — this is the failure mode that actually matters
   for users.
-- **Primary-position ordering** (whether the expected category came back *first* rather than
+- **Primary-position ordering** (whether the expected category came back _first_ rather than
   second) is a **stability canary only** — useful for spotting drift in the model's confidence or
   prompt sensitivity between runs — but it has **no runtime effect**, since stage 2 always resolves
   the union of every returned category's tools regardless of order. Do not fail a release over an
