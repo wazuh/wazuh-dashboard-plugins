@@ -22,7 +22,6 @@ import WzConfigurationRegistrationService from './registration-service/registrat
 import WzConfigurationCluster from './cluster/cluster';
 import WzConfigurationIndexer from './indexer/indexer-configuration';
 import WzConfigurationClient from './client/client';
-import WzConfigurationClientBuffer from './client-buffer/client-buffer';
 import { WzConfigurationAlertsLabelsAgent } from './alerts/alerts-labels';
 import WzConfigurationPolicyMonitoring from './policy-monitoring/policy-monitoring';
 import WzConfigurationVulnerabilities from './vulnerabilities/vulnerabilities';
@@ -41,6 +40,7 @@ import WzRefreshClusterInfoButton from './util-components/refresh-cluster-info-b
 import { withUserAuthorizationPrompt } from '../../../../../components/common/hocs';
 
 import { clusterNodes as requestClusterNodes } from './utils/wz-fetch';
+import { clearAgentReportedConfigurationCache } from './utils/agent-config-service';
 import {
   updateClusterNodes,
   updateClusterNodeSelected,
@@ -83,6 +83,9 @@ class WzConfigurationSwitch extends Component {
 
   componentWillUnmount() {
     this.resetClusterState();
+    /* The sections of a visit share one read of the agent's report. Leaving
+    ends the visit, so coming back reads the report again. */
+    clearAgentReportedConfigurationCache();
   }
 
   updateConfigurationSection = (view, title, description) => {
@@ -142,6 +145,7 @@ class WzConfigurationSwitch extends Component {
 
   async componentDidUpdate(prevProps) {
     if (this.props.agent?.id !== prevProps.agent?.id) {
+      clearAgentReportedConfigurationCache();
       this.updateClusterInformation('componentDidUpdate');
 
       // Reset view if switching between manager/agent contexts
@@ -271,15 +275,6 @@ class WzConfigurationSwitch extends Component {
                     </WzViewSelectorSwitch>
                     <WzViewSelectorSwitch view='client'>
                       <WzConfigurationClient
-                        clusterNodeSelected={this.props.clusterNodeSelected}
-                        agent={agent}
-                        updateConfigurationSection={
-                          this.updateConfigurationSection
-                        }
-                      />
-                    </WzViewSelectorSwitch>
-                    <WzViewSelectorSwitch view='client-buffer'>
-                      <WzConfigurationClientBuffer
                         clusterNodeSelected={this.props.clusterNodeSelected}
                         agent={agent}
                         updateConfigurationSection={

@@ -25,12 +25,12 @@ const columnsSregex = [{ field: 'sregex', name: 'Sregex' }];
 
 const columnsEntryArch = [
   { field: 'entry', name: 'Entry' },
-  { field: 'arch', name: 'Arch' }
+  { field: 'arch', name: 'Arch' },
 ];
 
 const columnsEntryArchSRegex = [
   { field: 'entry', name: 'Entry Sregex' },
-  { field: 'arch', name: 'Arch' }
+  { field: 'arch', name: 'Arch' },
 ];
 
 class WzConfigurationMonitoringIgnored extends Component {
@@ -43,39 +43,39 @@ class WzConfigurationMonitoringIgnored extends Component {
       <Fragment>
         {((agent || {}).os || {}).platform !== 'windows' &&
         currentConfig &&
-        currentConfig['syscheck-syscheck'] &&
-        currentConfig['syscheck-syscheck'].syscheck &&
-        !currentConfig['syscheck-syscheck'].syscheck.ignore &&
-        !currentConfig['syscheck-syscheck'].syscheck.ignore_sregex ? (
-          <WzNoConfig error="not-present" help={helpLinks} />
+        currentConfig.fim &&
+        currentConfig.fim.syscheck &&
+        !currentConfig.fim.syscheck.ignore &&
+        !currentConfig.fim.syscheck.ignore_sregex ? (
+          <WzNoConfig error='not-present' help={helpLinks} />
         ) : null}
         {((agent || {}).os || {}).platform !== 'windows' &&
         currentConfig &&
-        currentConfig['syscheck-syscheck'] &&
-        currentConfig['syscheck-syscheck'].syscheck &&
-        (currentConfig['syscheck-syscheck'].syscheck.ignore ||
-        currentConfig['syscheck-syscheck'].syscheck.ignore_sregex ) ? (
+        currentConfig.fim &&
+        currentConfig.fim.syscheck &&
+        (currentConfig.fim.syscheck.ignore ||
+          currentConfig.fim.syscheck.ignore_sregex) ? (
           <Fragment>
             <WzConfigurationSettingsHeader
-              title="Ignored files and directories"
-              description="These files and directories are ignored from the integrity scan"
+              title='Ignored files and directories'
+              description='These files and directories are ignored from the integrity scan'
               help={helpLinks}
             >
-              {currentConfig['syscheck-syscheck'].syscheck.ignore && (
+              {currentConfig.fim.syscheck.ignore && (
                 <EuiBasicTable
-                  items={currentConfig['syscheck-syscheck'].syscheck.ignore.map(
-                    item => ({ path: item })
-                  )}
+                  items={currentConfig.fim.syscheck.ignore.map(item => ({
+                    path: item,
+                  }))}
                   columns={columnsPath}
                 />
               )}
-              {currentConfig['syscheck-syscheck'].syscheck.ignore_sregex && (
+              {currentConfig.fim.syscheck.ignore_sregex && (
                 <Fragment>
-                  {currentConfig['syscheck-syscheck'].syscheck.ignore && <EuiSpacer size="s" />}
+                  {currentConfig.fim.syscheck.ignore && <EuiSpacer size='s' />}
                   <EuiBasicTable
-                    items={currentConfig[
-                      'syscheck-syscheck'
-                    ].syscheck.ignore_sregex.map(item => ({ sregex: item }))}
+                    items={currentConfig.fim.syscheck.ignore_sregex.map(
+                      item => ({ sregex: item }),
+                    )}
                     columns={columnsSregex}
                   />
                 </Fragment>
@@ -85,70 +85,68 @@ class WzConfigurationMonitoringIgnored extends Component {
         ) : null}
         {((agent || {}).os || {}).platform === 'windows' &&
           currentConfig &&
-          currentConfig['syscheck-syscheck'] &&
-          currentConfig['syscheck-syscheck'].syscheck &&
-          !currentConfig['syscheck-syscheck'].syscheck.ignore &&
-          !currentConfig['syscheck-syscheck'].syscheck.ignore_sregex &&
-          !currentConfig['syscheck-syscheck'].syscheck.registry_ignore &&
-          !currentConfig['syscheck-syscheck'].syscheck.registry_ignore_sregex && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+          currentConfig.fim &&
+          currentConfig.fim.syscheck &&
+          !currentConfig.fim.syscheck.ignore &&
+          !currentConfig.fim.syscheck.ignore_sregex &&
+          !currentConfig.fim.syscheck.registry_ignore &&
+          !currentConfig.fim.syscheck.registry_ignore_sregex && (
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {((agent || {}).os || {}).platform === 'windows' &&
           currentConfig &&
-          currentConfig['syscheck-syscheck'] &&
-          currentConfig['syscheck-syscheck'].syscheck &&
-          (currentConfig['syscheck-syscheck'].syscheck.ignore ||
-            currentConfig['syscheck-syscheck'].syscheck.ignore_sregex ||
-            currentConfig['syscheck-syscheck'].syscheck.registry_ignore ||
-            currentConfig['syscheck-syscheck'].syscheck.registry_ignore_sregex) && (
+          currentConfig.fim &&
+          currentConfig.fim.syscheck &&
+          (currentConfig.fim.syscheck.ignore ||
+            currentConfig.fim.syscheck.ignore_sregex ||
+            currentConfig.fim.syscheck.registry_ignore ||
+            currentConfig.fim.syscheck.registry_ignore_sregex) && (
             <WzConfigurationSettingsHeader
-              title="Ignored"
-              description="A list of registry entries that will be ignored"
+              title='Ignored'
+              description='A list of registry entries that will be ignored'
               help={helpLinks}
             >
-              {currentConfig['syscheck-syscheck'].syscheck.registry_ignore && (
+              {currentConfig.fim.syscheck.registry_ignore && (
                 <EuiBasicTable
-                  items={
-                    currentConfig['syscheck-syscheck'].syscheck.registry_ignore
-                  }
+                  items={currentConfig.fim.syscheck.registry_ignore}
                   columns={columnsEntryArch}
                 />
               )}
-              {currentConfig['syscheck-syscheck'].syscheck
-                .registry_ignore_sregex && (
-                  <Fragment>
-                    {(currentConfig['syscheck-syscheck'].syscheck.registry_ignore) && <EuiSpacer />}
-                    <EuiBasicTable
-                      items={
-                        currentConfig['syscheck-syscheck'].syscheck.registry_ignore_sregex
-                      }
-                      columns={columnsEntryArchSRegex}
-                    />
-                  </Fragment>
+              {currentConfig.fim.syscheck.registry_ignore_sregex && (
+                <Fragment>
+                  {currentConfig.fim.syscheck.registry_ignore && <EuiSpacer />}
+                  <EuiBasicTable
+                    items={currentConfig.fim.syscheck.registry_ignore_sregex}
+                    columns={columnsEntryArchSRegex}
+                  />
+                </Fragment>
               )}
-              {currentConfig['syscheck-syscheck'].syscheck
-                .ignore && (
-                  <Fragment>
-                    {(currentConfig['syscheck-syscheck'].syscheck.registry_ignore || currentConfig['syscheck-syscheck'].syscheck.registry_ignore_sregex ) && <EuiSpacer />}
-                    <EuiBasicTable
-                      items={
-                        currentConfig['syscheck-syscheck'].syscheck.ignore.map(item => ({ path: item }))
-                      }
-                      columns={columnsPath}
-                    />
-                  </Fragment>
+              {currentConfig.fim.syscheck.ignore && (
+                <Fragment>
+                  {(currentConfig.fim.syscheck.registry_ignore ||
+                    currentConfig.fim.syscheck.registry_ignore_sregex) && (
+                    <EuiSpacer />
+                  )}
+                  <EuiBasicTable
+                    items={currentConfig.fim.syscheck.ignore.map(item => ({
+                      path: item,
+                    }))}
+                    columns={columnsPath}
+                  />
+                </Fragment>
               )}
-              {currentConfig['syscheck-syscheck'].syscheck
-                .ignore_sregex && (
-                  <Fragment>
-                    {(currentConfig['syscheck-syscheck'].syscheck.registry_ignore || currentConfig['syscheck-syscheck'].syscheck.registry_ignore_sregex || currentConfig['syscheck-syscheck'].syscheck.ignore) && <EuiSpacer />}
-                    <EuiBasicTable
-                      items={
-                        currentConfig['syscheck-syscheck'].syscheck.ignore_sregex.map(item => ({ sregex: item }))
-                      }
-                      columns={columnsSregex}
-                    />
-                  </Fragment>
+              {currentConfig.fim.syscheck.ignore_sregex && (
+                <Fragment>
+                  {(currentConfig.fim.syscheck.registry_ignore ||
+                    currentConfig.fim.syscheck.registry_ignore_sregex ||
+                    currentConfig.fim.syscheck.ignore) && <EuiSpacer />}
+                  <EuiBasicTable
+                    items={currentConfig.fim.syscheck.ignore_sregex.map(
+                      item => ({ sregex: item }),
+                    )}
+                    columns={columnsSregex}
+                  />
+                </Fragment>
               )}
             </WzConfigurationSettingsHeader>
           )}
@@ -157,8 +155,9 @@ class WzConfigurationMonitoringIgnored extends Component {
   }
 }
 
-WzConfigurationMonitoringIgnored.proptTypes = {
-  agent: PropTypes.object
+WzConfigurationMonitoringIgnored.propTypes = {
+  agent: PropTypes.object,
+  currentConfig: PropTypes.object,
 };
 
 export default WzConfigurationMonitoringIgnored;

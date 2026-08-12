@@ -25,14 +25,32 @@ const securitySettings = [
   {
     field: 'enabled',
     label: 'Security configuration assessment status',
-    render: renderValueYesThenEnabled
+    render: renderValueYesThenEnabled,
   },
   { field: 'interval', label: 'Interval' },
   { field: 'scan_on_start', label: 'Scan on start' },
-  { field: 'skip_nfs', label: 'Skip nfs' }
+  { field: 'skip_nfs', label: 'Skip nfs' },
 ];
 
 const columns = [{ field: 'policy', name: 'Name' }];
+
+/**
+ * Build the table rows from the reported policies.
+ *
+ * A policy is reported as `{ policy: <path> }`, and the block is absent
+ * altogether when no policy is enabled. Bare paths are still accepted so a
+ * report that carries them renders instead of breaking the tab.
+ */
+const buildPolicyItems = policies => {
+  const reported = Array.isArray(policies)
+    ? policies
+    : policies
+    ? [policies]
+    : [];
+  return reported.map(entry =>
+    typeof entry === 'string' ? { policy: entry } : entry,
+  );
+};
 
 class WzPolicyMonitoringSCA extends Component {
   constructor(props) {
@@ -40,26 +58,29 @@ class WzPolicyMonitoringSCA extends Component {
     this.wodleConfig = wodleBuilder(this.props.currentConfig, 'sca');
   }
   render() {
+    if (!this.wodleConfig.sca) {
+      return <WzNoConfig error='not-present' help={helpLinks} />;
+    }
+
+    const policyItems = buildPolicyItems(this.wodleConfig.sca.policies);
+
     return (
       <Fragment>
-        {!this.wodleConfig.sca ? (
-          <WzNoConfig error="not-present" help={helpLinks} />
-        ) : (
-          <WzConfigurationSettingsHeader
-            title="Security configuration assessment status"
-            help={helpLinks}
-          >
-            <WzConfigurationSettingsGroup
-              config={this.wodleConfig.sca}
-              items={securitySettings}
-            />
-            <WzConfigurationSettingsHeader title="Policies" />
-            <EuiBasicTable
-              items={this.wodleConfig.sca.policies.map(policy => ({ policy }))}
-              columns={columns}
-            />
-          </WzConfigurationSettingsHeader>
-        )}
+        <WzConfigurationSettingsHeader
+          title='Security configuration assessment status'
+          help={helpLinks}
+        >
+          <WzConfigurationSettingsGroup
+            config={this.wodleConfig.sca}
+            items={securitySettings}
+          />
+          {policyItems.length > 0 && (
+            <Fragment>
+              <WzConfigurationSettingsHeader title='Policies' />
+              <EuiBasicTable items={policyItems} columns={columns} />
+            </Fragment>
+          )}
+        </WzConfigurationSettingsHeader>
       </Fragment>
     );
   }

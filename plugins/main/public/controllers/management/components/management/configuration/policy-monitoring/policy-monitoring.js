@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
 import withWzConfig from '../util-hocs/wz-config';
 import WzTabSelector, {
@@ -30,10 +31,10 @@ class WzPolicyMonitoring extends Component {
   }
   badgeEnabled() {
     return (
-      this.props.currentConfig['syscheck-rootcheck'] &&
-      this.props.currentConfig['syscheck-rootcheck'].rootcheck &&
-      this.props.currentConfig['syscheck-rootcheck'].rootcheck.disabled &&
-      this.props.currentConfig['syscheck-rootcheck'].rootcheck.disabled === 'no'
+      this.props.currentConfig.fim &&
+      this.props.currentConfig.fim.rootcheck &&
+      this.props.currentConfig.fim.rootcheck.disabled &&
+      this.props.currentConfig.fim.rootcheck.disabled === 'no'
     );
   }
   render() {
@@ -53,9 +54,8 @@ class WzPolicyMonitoring extends Component {
   }
 }
 
-const sections = [
-  { component: 'syscheck', configuration: 'rootcheck' },
-  { component: 'wmodules', configuration: 'wmodules' },
-];
+WzPolicyMonitoring.propTypes = {
+  currentConfig: PropTypes.object,
+};
 
-export default withWzConfig(sections)(WzPolicyMonitoring);
+export default withWzConfig()(WzPolicyMonitoring);

@@ -21,6 +21,7 @@ import { getAgentsService, upgradeAgentsService } from '../../../services';
 import { Agent, ResponseUpgradeAgents } from '../../../types';
 import { UpgradeAgentsModalResult } from './result';
 import { ErrorAgent } from '../../../services/paginated-agents-request';
+import { upgradeStatusState } from '../../../services/upgrade-status-state';
 
 export type Result = {
   successAgents?: ResponseUpgradeAgents[];
@@ -35,7 +36,6 @@ interface UpgradeAgentsModalProps {
   filters: any;
   onClose: () => void;
   reloadAgents: () => void;
-  setIsUpgradePanelClosed: (isUpgradePanelClosed: boolean) => void;
 }
 
 export const UpgradeAgentsModal = compose(withErrorBoundary)(
@@ -45,7 +45,6 @@ export const UpgradeAgentsModal = compose(withErrorBoundary)(
     filters,
     onClose,
     reloadAgents,
-    setIsUpgradePanelClosed,
   }: UpgradeAgentsModalProps) => {
     const getUpgradeErrorMessage = (error: any) => {
       const apiMessage = error?.response?.data?.message;
@@ -120,12 +119,7 @@ export const UpgradeAgentsModal = compose(withErrorBoundary)(
         const response = await upgradeAgentsService({ agentIds });
 
         const { data, message } = response.data;
-        const {
-          affected_items,
-          failed_items,
-          total_affected_items,
-          total_failed_items,
-        } = data;
+        const { affected_items, failed_items, total_failed_items } = data;
         setResult({
           successAgents: affected_items,
           errorAgents: failed_items,
@@ -133,9 +127,11 @@ export const UpgradeAgentsModal = compose(withErrorBoundary)(
           totalErrorAgents: total_failed_items,
         });
 
-        if (total_affected_items) {
-          setIsUpgradePanelClosed(false);
-        }
+        const acceptedIds = new Set(affected_items);
+        const upgradedAgents = agents
+          .filter(agent => acceptedIds.has(agent.id) && agent.version)
+          .map(agent => ({ id: agent.id, version: agent.version }));
+        upgradeStatusState.trackUpgrade(upgradedAgents);
 
         setSaveChangesStatus('complete');
       } catch (error: any) {
@@ -148,6 +144,7 @@ export const UpgradeAgentsModal = compose(withErrorBoundary)(
               id: agentIds,
             },
           ],
+          totalErrorAgents: 1,
         });
         setSaveChangesStatus('danger');
         const options = {

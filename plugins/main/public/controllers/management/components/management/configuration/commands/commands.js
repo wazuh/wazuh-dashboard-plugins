@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
@@ -23,8 +24,10 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 const helpLinks = [
   {
     text: 'Command module reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/wodle-command.html')
-  }
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/wodle-command.html',
+    ),
+  },
 ];
 
 const mainSettings = [
@@ -38,59 +41,85 @@ const mainSettings = [
   { field: 'verify_md5', label: 'Verify MD5 sum' },
   { field: 'verify_sha1', label: 'Verify SHA1 sum' },
   { field: 'verify_sha256', label: 'Verify SHA256 sum' },
-  { field: 'skip_verification', label: 'Ignore checksum verification' }
+  { field: 'skip_verification', label: 'Ignore checksum verification' },
 ];
+
+/**
+ * Collect every defined command from either shape `currentConfig` can take:
+ * the manager returns all the wodles inside a single `wmodules-wmodules`
+ * section, while an agent reports its configuration keyed by module name, with
+ * one entry per command or a single one when only one is defined.
+ */
+const getCommands = currentConfig => {
+  if (!currentConfig) {
+    return [];
+  }
+
+  const managerWodles = currentConfig['wmodules-wmodules'];
+
+  if (managerWodles) {
+    return isString(managerWodles)
+      ? []
+      : managerWodles.wmodules
+          .filter(item => item['command'])
+          .map(item => item.command);
+  }
+
+  const reportedCommands = currentConfig['command'];
+
+  if (!reportedCommands || isString(reportedCommands)) {
+    return [];
+  }
+  return Array.isArray(reportedCommands)
+    ? reportedCommands
+    : [reportedCommands];
+};
 
 class WzConfigurationCommands extends Component {
   constructor(props) {
     super(props);
-    this.wodleConfig =
-      this.props.currentConfig &&
-      !isString(this.props.currentConfig['wmodules-wmodules'])
-        ? this.props.currentConfig['wmodules-wmodules'].wmodules.filter(
-            item => item['command']
-          )
-        : [];
+    this.wodleConfig = getCommands(this.props.currentConfig);
   }
   render() {
     const { currentConfig } = this.props;
-    const items =
-      this.wodleConfig && this.wodleConfig.length
-        ? settingsListBuilder(this.wodleConfig.map(item => item.command), ['tag','command'])
-        : false;
+    const error =
+      currentConfig &&
+      [currentConfig['wmodules-wmodules'], currentConfig['command']].find(
+        section => isString(section),
+      );
+    const items = this.wodleConfig.length
+      ? settingsListBuilder(this.wodleConfig, ['tag', 'command'])
+      : false;
+
+    if (error) {
+      return <WzNoConfig error={error} help={helpLinks} />;
+    }
+
+    if (!items) {
+      return <WzNoConfig error='not-present' help={helpLinks} />;
+    }
+
     return (
       <Fragment>
-        {currentConfig['wmodules-wmodules'] &&
-          isString(currentConfig['wmodules-wmodules']) && (
-            <WzNoConfig
-              error={currentConfig['wmodules-wmodules']}
-              help={helpLinks}
-            />
-          )}
-        {currentConfig &&
-          !items &&
-          !isString(currentConfig['wmodules-wmodules']) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
-          )}
-        {currentConfig &&
-        items &&
-        !isString(currentConfig['wmodules-wmodules']) ? (
-          <WzConfigurationSettingsHeader
-            title="Command definitions"
-            description="Find here all the currently defined commands"
-            help={helpLinks}
-          >
-            <WzConfigurationSettingsListSelector
-              items={items}
-              settings={mainSettings}
-            />
-          </WzConfigurationSettingsHeader>
-        ) : null}
+        <WzConfigurationSettingsHeader
+          title='Command definitions'
+          description='Find here all the currently defined commands'
+          help={helpLinks}
+        >
+          <WzConfigurationSettingsListSelector
+            items={items}
+            settings={mainSettings}
+          />
+        </WzConfigurationSettingsHeader>
       </Fragment>
     );
   }
 }
 
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
+
+WzConfigurationCommands.propTypes = {
+  currentConfig: PropTypes.object,
+};
 
 export default withWzConfig(sections)(WzConfigurationCommands);

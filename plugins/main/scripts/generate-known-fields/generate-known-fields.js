@@ -359,6 +359,13 @@ const TEMPLATE_SOURCES = {
       ),
     ],
     outputFile: 'agent-stats.json',
+  'agent-config': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/states/agent-config.json',
+      ),
+    ],
+    outputFile: 'agent-config.json',
   },
   'active-responses': {
     urls: [

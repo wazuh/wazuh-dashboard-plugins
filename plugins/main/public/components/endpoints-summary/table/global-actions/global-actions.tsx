@@ -19,8 +19,6 @@ export interface AgentsTableGlobalActionsProps {
   allAgentsCount: number;
   filters: unknown;
   reloadAgents: () => void;
-  setIsUpgradeTasksModalVisible: (isModalVisible: boolean) => void;
-  setIsUpgradePanelClosed: (isUpgradePanelClosed: boolean) => void;
 }
 
 export const AgentsTableGlobalActions = ({
@@ -29,8 +27,6 @@ export const AgentsTableGlobalActions = ({
   allAgentsCount,
   filters,
   reloadAgents,
-  setIsUpgradeTasksModalVisible,
-  setIsUpgradePanelClosed,
 }: AgentsTableGlobalActionsProps) => {
   const [isPopoverOpen, setPopover] = useState(false);
   const [isEditGroupsVisible, setIsEditGroupsVisible] = useState(false);
@@ -142,16 +138,6 @@ export const AgentsTableGlobalActions = ({
               </span>
             )}
           </EuiContextMenuItem>
-          <EuiContextMenuItem
-            icon='eye'
-            disabled={!totalAgents}
-            onClick={() => {
-              closePopover();
-              setIsUpgradeTasksModalVisible(true);
-            }}
-          >
-            <span>Upgrade task details</span>
-          </EuiContextMenuItem>
           <EuiHorizontalRule margin='xs' />
           <EuiContextMenuItem
             icon='trash'
@@ -193,7 +179,6 @@ export const AgentsTableGlobalActions = ({
           onClose={() => {
             setIsUpgradeAgentsVisible(false);
           }}
-          setIsUpgradePanelClosed={setIsUpgradePanelClosed}
         />
       ) : null}
       {isRemoveAgentsModalVisible && (
