@@ -49,7 +49,6 @@ Basic usage:
             { label: 'lastKeepAline', description: 'Date add' },
             { label: 'manager', description: 'Manager' },
             { label: 'name', description: 'Agent name' },
-            { label: 'node_name', description: 'Node name' },
             { label: 'os.platform', description: 'Operating system platform' },
             { label: 'status', description: 'Status' },
             { label: 'version', description: 'Version' },

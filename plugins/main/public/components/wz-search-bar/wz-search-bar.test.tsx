@@ -55,13 +55,6 @@ const suggestions: IWzSuggestItem[] = [
   },
   {
     type: 'q',
-    label: 'node_name',
-    description: 'Filter by node name',
-    operators: ['=', '!='],
-    values: async value => getSuggestionsFilters('node_name', value, { q: '' }),
-  },
-  {
-    type: 'q',
     label: 'manager',
     description: 'Filter by manager',
     operators: ['=', '!='],

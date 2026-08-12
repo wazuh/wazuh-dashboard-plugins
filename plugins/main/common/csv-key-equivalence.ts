@@ -52,7 +52,6 @@ export const KeyEquivalence: { [key: string]: string } = {
   vendor: 'Vendor',
   type: 'Type',
   architecture: 'Architecture',
-  node_name: 'Node',
   dateAdd: 'Registration date',
   manager: 'Manager',
   lastKeepAlive: 'Last keep alive',
