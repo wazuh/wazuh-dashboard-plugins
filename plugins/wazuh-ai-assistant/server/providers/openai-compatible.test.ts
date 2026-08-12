@@ -49,13 +49,13 @@ function withFakeFetch<T>(
   run: () => Promise<T>,
 ): Promise<T> {
   const original = globalThis.fetch;
-  globalThis.fetch = ((() =>
+  globalThis.fetch = (() =>
     Promise.resolve(
       new Response(responseBody, {
         status: 200,
         headers: { 'Content-Type': 'text/event-stream' },
       }),
-    )) as unknown) as typeof fetch;
+    )) as unknown as typeof fetch;
   return run().finally(() => {
     globalThis.fetch = original;
   });
@@ -69,7 +69,7 @@ function withFakeFetchCapturingBody(
 ): Promise<Array<Record<string, unknown>>> {
   const original = globalThis.fetch;
   const capturedBodies: Array<Record<string, unknown>> = [];
-  globalThis.fetch = (((_url: string, init?: RequestInit) => {
+  globalThis.fetch = ((_url: string, init?: RequestInit) => {
     if (typeof init?.body === 'string') {
       capturedBodies.push(JSON.parse(init.body));
     }
@@ -79,7 +79,7 @@ function withFakeFetchCapturingBody(
         headers: { 'Content-Type': 'text/event-stream' },
       }),
     );
-  }) as unknown) as typeof fetch;
+  }) as unknown as typeof fetch;
   // Resolves with the CAPTURED BODIES, not `run`'s own result: every caller writes
   // `const capturedBodies = await withFakeFetchCapturingBody(...)` and asserts on the outbound
   // request bodies. (An earlier version resolved with run()'s drained events instead, which made
@@ -107,13 +107,13 @@ function sseResponse(lines: string[]): Response {
       controller.close();
     },
   });
-  return ({
+  return {
     ok: true,
     status: 200,
     body,
-    headers: ({ get: () => null } as unknown) as Headers,
+    headers: { get: () => null } as unknown as Headers,
     text: () => Promise.resolve(''),
-  } as unknown) as Response;
+  } as unknown as Response;
 }
 
 const IN_STREAM_ERROR_CONFIG: ProviderConfig = {
@@ -127,10 +127,10 @@ test('OpenAiCompatibleAdapter: an in-stream error frame containing failed_genera
   const rawMessage =
     "Failed to call a function. Please adjust your prompt. See 'failed_generation' for more details.";
   const originalFetch = global.fetch;
-  global.fetch = ((() =>
+  global.fetch = (() =>
     Promise.resolve(
       sseResponse([JSON.stringify({ error: { message: rawMessage } })]),
-    )) as unknown) as typeof fetch;
+    )) as unknown as typeof fetch;
   try {
     const controller = new AbortController();
     const events = await drain(
@@ -151,10 +151,10 @@ test('OpenAiCompatibleAdapter: an in-stream error frame with no marker passes th
   const adapter = new OpenAiCompatibleAdapter();
   const rawMessage = 'rate limit exceeded';
   const originalFetch = global.fetch;
-  global.fetch = ((() =>
+  global.fetch = (() =>
     Promise.resolve(
       sseResponse([JSON.stringify({ error: { message: rawMessage } })]),
-    )) as unknown) as typeof fetch;
+    )) as unknown as typeof fetch;
   try {
     const controller = new AbortController();
     const events = await drain(
@@ -667,14 +667,14 @@ function withFakeFetchSequence<T>(
   const original = globalThis.fetch;
   const capturedBodies: Array<Record<string, unknown>> = [];
   let callIndex = 0;
-  globalThis.fetch = (((_url: string, init?: RequestInit) => {
+  globalThis.fetch = ((_url: string, init?: RequestInit) => {
     if (typeof init?.body === 'string') {
       capturedBodies.push(JSON.parse(init.body));
     }
     const response = responses[Math.min(callIndex, responses.length - 1)];
     callIndex += 1;
     return Promise.resolve(response);
-  }) as unknown) as typeof fetch;
+  }) as unknown as typeof fetch;
   return run(capturedBodies)
     .then(result => ({ result, capturedBodies }))
     .finally(() => {

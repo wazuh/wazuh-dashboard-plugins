@@ -356,9 +356,11 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   onSubmit,
   onClose,
 }) => {
-  const { value: form, setValue: setForm, isDirty } = useDirtyFormState<
-    ProviderInput
-  >(
+  const {
+    value: form,
+    setValue: setForm,
+    isDirty,
+  } = useDirtyFormState<ProviderInput>(
     editingProvider
       ? {
           name: editingProvider.name,

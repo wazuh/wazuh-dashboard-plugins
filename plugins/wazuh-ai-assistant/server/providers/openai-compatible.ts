@@ -505,14 +505,14 @@ function accumulateToolCallDeltas(
     Object.assign(
       entry.extras,
       extractExtras(
-        (delta as unknown) as Record<string, unknown>,
+        delta as unknown as Record<string, unknown>,
         KNOWN_TOOL_CALL_DELTA_KEYS,
       ),
     );
     Object.assign(
       entry.functionExtras,
       extractExtras(
-        (delta.function as unknown) as Record<string, unknown> | undefined,
+        delta.function as unknown as Record<string, unknown> | undefined,
         KNOWN_TOOL_CALL_FUNCTION_DELTA_KEYS,
       ),
     );
