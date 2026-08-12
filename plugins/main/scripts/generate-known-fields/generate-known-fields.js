@@ -352,6 +352,14 @@ const TEMPLATE_SOURCES = {
     ],
     outputFile: 'states-sca.json',
   },
+  'agent-stats': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/states/agent-stats.json',
+      ),
+    ],
+    outputFile: 'agent-stats.json',
+  },
   'agent-config': {
     urls: [
       wazuhUrl(

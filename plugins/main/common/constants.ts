@@ -114,6 +114,9 @@ export const WAZUH_FIM_REGISTRY_VALUES_PATTERN =
 // SCA
 export const WAZUH_SCA_PATTERN = 'wazuh-states-sca*';
 
+// Agent statistics reported by the agent and persisted by the server
+export const WAZUH_AGENT_STATS_PATTERN = 'wazuh-agent-stats*';
+
 // System inventory
 export const WAZUH_IT_HYGIENE_PATTERN = 'wazuh-states-inventory*';
 export const WAZUH_IT_HYGIENE_HARDWARE_PATTERN =
@@ -241,6 +244,7 @@ export const WAZUH_SAMPLE_VULNERABILITIES = 'wazuh-vulnerabilities';
 export const WAZUH_SAMPLE_METRICS_AGENTS = 'metrics-agents';
 export const WAZUH_SAMPLE_METRICS_COMMS = 'metrics-comms';
 export const WAZUH_SAMPLE_METRICS_NORMALIZATION = 'metrics-normalization';
+export const WAZUH_SAMPLE_AGENT_STATS = 'agent-stats';
 export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS = 1500;
 export const WAZUH_SETTING_ALERTS_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_EVENTS_PATTERN.replace('*', ''),
@@ -333,6 +337,10 @@ export const WAZUH_SETTING_METRICS_COMMS_SAMPLE_PREFIX = {
 export const WAZUH_SETTING_METRICS_NORMALIZATION_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_METRICS_NORMALIZATION_PATTERN.replace('*', ''),
   dataSet: 'metrics-normalization',
+};
+export const WAZUH_SETTING_AGENT_STATS_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_AGENT_STATS_PATTERN.replace('*', ''),
+  dataSet: 'agent-stats',
 };
 
 export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
@@ -536,6 +544,16 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
       indexPatternPrefix:
         WAZUH_SETTING_METRICS_NORMALIZATION_SAMPLE_PREFIX.indexPatternPrefix,
       dataSet: WAZUH_SETTING_METRICS_NORMALIZATION_SAMPLE_PREFIX.dataSet,
+    },
+  ],
+  [WAZUH_SAMPLE_AGENT_STATS]: [
+    {
+      // The index keeps the latest report of each agent, so a document per
+      // agent is enough to cover the agents of a development environment
+      count: 100,
+      indexPatternPrefix:
+        WAZUH_SETTING_AGENT_STATS_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_AGENT_STATS_SAMPLE_PREFIX.dataSet,
     },
   ],
   [WAZUH_SAMPLE_VULNERABILITIES]: [
@@ -991,6 +1009,9 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_VALUES_STATES =
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES =
   'index-pattern:states-sca';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_AGENT_STATS =
+  'index-pattern:agent-stats';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERNS = 'saved-objects:index-patterns';
 
