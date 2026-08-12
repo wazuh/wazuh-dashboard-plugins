@@ -13,7 +13,7 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
-import { EuiBasicTable, EuiCallOut } from '@elastic/eui';
+import { EuiBasicTable, EuiCallOut, EuiSpacer } from '@elastic/eui';
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
@@ -136,6 +136,7 @@ class WzConfigurationClient extends Component {
           )}
           {clientConfig.batch && (
             <Fragment>
+              <EuiSpacer size='m' />
               <WzConfigurationSettingsHeader
                 title='Batch settings'
                 description='These settings determine how the agent batches the events it sends'
