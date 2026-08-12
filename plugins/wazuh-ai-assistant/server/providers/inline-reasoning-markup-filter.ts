@@ -49,8 +49,7 @@
  */
 
 /** Tag families this filter recognizes as reasoning/tool-call-as-text markup, never as prose. */
-const OPEN_TAG_RE =
-  /<think>|<tool_call>|<function(?:=[^<>]*)?>|<parameter(?:=[^<>]*)?>/;
+const OPEN_TAG_RE = /<think>|<tool_call>|<function(?:=[^<>]*)?>|<parameter(?:=[^<>]*)?>/;
 const CLOSE_TAG_RE = /<\/think>|<\/tool_call>|<\/function>|<\/parameter>/;
 
 /** DeepSeek's fixed marker prefix (FULLWIDTH VERTICAL LINE, U+FF5C, on both sides of `DSML`). */
@@ -198,8 +197,8 @@ export class InlineReasoningMarkupFilter {
           openMatch && (!dsmlMatch || openMatch.index <= dsmlMatch.index)
             ? { match: openMatch, isDsml: false }
             : dsmlMatch
-              ? { match: dsmlMatch, isDsml: true }
-              : null;
+            ? { match: dsmlMatch, isDsml: true }
+            : null;
         if (earliest) {
           const { match, isDsml } = earliest;
           out += this.buffer.slice(0, match.index);

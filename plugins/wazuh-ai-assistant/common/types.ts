@@ -213,7 +213,11 @@ export type StreamEvent =
    * (see `ChatMessage.vendorExtras`) rather than on the call itself — carried here because the
    * adapter never constructs a `ChatMessage` directly, only `StreamEvent`s.
    */
-  | { type: 'tool_call'; toolCall: ToolCall; messageVendorExtras?: Record<string, unknown> }
+  | {
+      type: 'tool_call';
+      toolCall: ToolCall;
+      messageVendorExtras?: Record<string, unknown>;
+    }
   /**
    * Transient progress line (e.g. "querying Wazuh") shown between deltas while the engine works.
    */

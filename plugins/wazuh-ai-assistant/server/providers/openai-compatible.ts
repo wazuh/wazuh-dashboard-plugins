@@ -505,14 +505,14 @@ function accumulateToolCallDeltas(
     Object.assign(
       entry.extras,
       extractExtras(
-        delta as unknown as Record<string, unknown>,
+        (delta as unknown) as Record<string, unknown>,
         KNOWN_TOOL_CALL_DELTA_KEYS,
       ),
     );
     Object.assign(
       entry.functionExtras,
       extractExtras(
-        delta.function as unknown as Record<string, unknown> | undefined,
+        (delta.function as unknown) as Record<string, unknown> | undefined,
         KNOWN_TOOL_CALL_FUNCTION_DELTA_KEYS,
       ),
     );
@@ -553,7 +553,9 @@ function finalizeToolCalls(
       // Omitted (rather than set to `{}`) when nothing was captured -- see toOpenAiMessage's
       // no-op-by-default spread, which relies on these being genuinely absent for a
       // provider that never sent any.
-      ...(Object.keys(entry.extras).length ? { vendorExtras: entry.extras } : {}),
+      ...(Object.keys(entry.extras).length
+        ? { vendorExtras: entry.extras }
+        : {}),
       ...(Object.keys(entry.functionExtras).length
         ? { functionVendorExtras: entry.functionExtras }
         : {}),
