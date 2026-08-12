@@ -115,15 +115,23 @@ function providerPath(id?: string): string {
  *   now re-sends each affected provider's full attributes with `isDefault: false` via `update`.
  */
 export class AiProvidersClient {
-  private fetch(
+  private async fetch(
     { method, path, body }: { method: string; path: string; body?: object },
     executor: ReturnType<typeof reader>,
   ) {
-    return executor.transport.request({
-      method,
-      path,
-      body: body as Record<string, unknown> | undefined,
-    });
+    try {
+      return await executor.transport.request({
+        method,
+        path,
+        body: body as Record<string, unknown> | undefined,
+      });
+    } catch (error) {
+      if (typeof error?.meta?.body?.error === 'string') {
+        // This catches error related to missing endpoint that is returned in error.meta.body.error as string
+        throw new Error(error?.meta?.body?.error);
+      }
+      throw error;
+    }
   }
 
   /** Reads through the INTERNAL user — see server/settings/opensearch-user.ts's doc comment for

@@ -140,8 +140,8 @@ export class IndexSettingsProvider
       });
       return toAttributes(response.body as GetSettingsResponseWire);
     } catch (error) {
-      if (isNotFoundError(error)) {
-        return undefined;
+      if (typeof error?.meta?.body?.error === 'string') {
+        throw new Error(error?.meta?.body?.error);
       }
       throw error;
     }
