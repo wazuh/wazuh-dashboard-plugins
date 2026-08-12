@@ -1,0 +1,45 @@
+/**
+ * Conversation rail (layout contract §5 — AI/design/redesign-v2-spec.md, "Screen 1"). Row
+ * highlighting/motion (`.wzConvoRow`) stays defined in chat-page.scss (this component only
+ * consumes that class, it does not own that stylesheet); everything below is new markup this
+ * redesign introduces on top of it.
+ */
+@import '../redesign';
+
+.wzConvoRailHeader {
+  padding-bottom: 4px;
+}
+
+/** Uppercase group label treatment (design language, "Navigation" / "Micro-labels"), reused for
+ * both the rail's own "CONVERSATIONS" title and its per-date group headers below — the underlying
+ * translated strings stay natural-case (see conversation-list.tsx's `dateBucketLabel` doc
+ * comment); this is what actually renders them uppercase. */
+.wzConvoRailTitle {
+  @include wzMicroLabel;
+  margin: 0;
+}
+
+.wzConvoRailGroupHeader {
+  @include wzMicroLabel;
+  padding: 10px 4px 4px;
+}
+
+.wzConvoRailCollapseControl {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.wzConvoRailCollapsed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding-top: 4px;
+  width: $wzRailCollapsedWidth;
+}
+
+/** Pushes the "expand" affordance to the bottom of the 48px strip, mirroring the expanded rail's
+ * own pinned-at-the-bottom "‹ Collapse" control. */
+.wzConvoRailCollapsedSpacer {
+  flex: 1 1 auto;
+}

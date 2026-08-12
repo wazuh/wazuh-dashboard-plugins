@@ -16,6 +16,21 @@ export interface ChatInputHandle {
 }
 
 /**
+ * Composer floor and ceiling (redesign-v2-spec.md layout contract §2): the field autogrows past its
+ * one-line floor (`rows={1}` below) up to `MAX_ROWS`, then scrolls internally instead of growing
+ * further. Kept as a plain numeric constant rather than read from `$wzComposerMaxRows`
+ * (public/components/_redesign.scss) — there is no SCSS-to-TS bridge in this build, so the two have
+ * to be kept equal by hand. This is a SEPARATE, smaller ceiling than `.wzComposerRow`'s own
+ * `max-height: $wzComposerMaxHeight` (chat-page.scss), which caps the WHOLE composer (field +
+ * controls + disclaimer), not just the field.
+ */
+const MAX_ROWS = 5;
+/** Fallback line height (px) for the rare case `getComputedStyle` reports something
+ * `parseFloat` can't read (e.g. a unitless/`normal` line-height, which is what jsdom's computed
+ * style always returns) — without it a NaN would collapse the autogrow cap to 0. */
+const FALLBACK_LINE_HEIGHT = 20;
+
+/**
  * Controlled input: the parent (ChatPage) owns the text value so example-question chips in the
  * welcome state can prefill it without this component needing an imperative handle.
  */
@@ -55,14 +70,28 @@ export const ChatInput = React.forwardRef<ChatInputHandle, ChatInputProps>(
       }
     }, [disabled]);
 
-    // Auto-expand: reset to auto so shrinking works, then grow to fit content.
+    // Autogrow, capped at MAX_ROWS then scrolling internally (contract §2: "autogrow to 5 rows then
+    // internal scroll"). `lineHeight`/padding are read from the field's OWN computed style rather
+    // than assumed, so the cap tracks whatever EUI's own type scale renders at instead of a guessed
+    // pixel figure that could drift from it.
     useEffect(() => {
       const el = textAreaRef.current;
       if (!el) {
         return;
       }
+      const computed = window.getComputedStyle(el);
+      const lineHeight =
+        parseFloat(computed.lineHeight) || FALLBACK_LINE_HEIGHT;
+      const paddingTop = parseFloat(computed.paddingTop) || 0;
+      const paddingBottom = parseFloat(computed.paddingBottom) || 0;
+      const maxHeight = lineHeight * MAX_ROWS + paddingTop + paddingBottom;
+
       el.style.height = 'auto';
-      el.style.height = `${el.scrollHeight}px`;
+      const nextHeight = Math.min(el.scrollHeight, maxHeight);
+      el.style.height = `${nextHeight}px`;
+      // Past the cap the field scrolls internally rather than growing further; below it there is
+      // nothing to scroll, so overflow stays hidden (no phantom scrollbar on a two-line field).
+      el.style.overflowY = el.scrollHeight > maxHeight ? 'auto' : 'hidden';
     }, [value]);
 
     return (
@@ -71,17 +100,18 @@ export const ChatInput = React.forwardRef<ChatInputHandle, ChatInputProps>(
           textAreaRef.current = node;
         }}
         fullWidth
-        rows={2}
-        // isGenerating is folded in here (not just at the parent's `disabled` prop) so typing
-        // or pressing Enter mid-stream can't be silently swallowed by sendRef's own
-        // isGenerating early-return below.
+        // One full line box is the floor (contract §2) — autogrow only ever adds height from here.
+        rows={1}
+        // Height transition (reduced-motion-guarded, chat-page.scss) lives on this class; the
+        // overflow toggle above still applies inline since it depends on this field's own measured
+        // content, not something a stylesheet can express.
+        className='wzComposerTextarea'
         disabled={disabled || isGenerating}
         value={value}
         style={{
           border: 'none',
           boxShadow: 'none',
           resize: 'none',
-          overflow: 'hidden',
           backgroundColor: 'inherit',
         }}
         placeholder={i18n.translate('wazuhAiAssistant.chat.inputPlaceholder', {

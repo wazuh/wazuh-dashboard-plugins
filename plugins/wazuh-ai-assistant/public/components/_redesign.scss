@@ -1,0 +1,114 @@
+/**
+ * Shared design tokens for the AI Assistant redesign (see AI/design/redesign-v2-spec.md).
+ *
+ * Every component's own `.scss` imports THIS file rather than restating a value, so the four
+ * screens cannot drift apart. Values here are the design's, expressed through EUI's own SASS
+ * variables wherever one exists: the reference's flat `#E7EAEF` hairline IS `$euiBorderColor` in
+ * the light theme, and spelling it as the EUI variable is what makes the dark theme correct for
+ * free. A raw hex belongs here only when EUI genuinely has no equivalent.
+ *
+ * Usage: `@import '../redesign';` (partial, so it emits nothing on its own).
+ */
+
+/* --- Depth, radius, padding -------------------------------------------------------------------
+   The reference is flat: a 1px hairline and nothing else. Shadow is reserved for things that
+   genuinely float — popovers, the flyout, and the composer's top edge. Panels take a scoped 12px
+   while controls keep EUI's 8px, because the felt difference between the reference and today is
+   padding, not radius. */
+$wzPanelRadius: 12px;
+$wzCardPadding: 20px;
+$wzCardPaddingRoomy: 24px;
+
+/* --- Measure and gutters (layout contract §5) --------------------------------------------------
+   Prose and the composer share one centred column so they stay optically locked as the window
+   grows; only tables may break out. Extra width at 1920 goes to the rail and gutters, never to
+   line length. */
+$wzContentMaxWidth: 1060px;
+$wzTableMaxWidth: 1300px;
+$wzProseMeasure: 68ch;
+
+/* --- Composer floor and ceiling (layout contract §2) ------------------------------------------- */
+$wzComposerMaxHeight: 30dvh;
+$wzComposerMaxRows: 5;
+
+/* --- Results card (layout contract §4) ---------------------------------------------------------
+   Header and pagination are pinned card rows; only the body scrolls. */
+$wzResultsMaxHeight: min(460px, 52dvh);
+
+/* --- Conversation rail (layout contract §5) ----------------------------------------------------
+   Pane width, NOT window width: the rail reacts to the space it actually has. */
+$wzRailWidth: 260px;
+$wzRailCollapsedWidth: 48px;
+$wzRailCollapseAt: 1100px;
+$wzRailFlyoutAt: 900px;
+
+/* --- Motion (120–200ms ease-out, nothing loops) ------------------------------------------------
+   Always used inside a `prefers-reduced-motion: no-preference` block. */
+$wzMotionFast: 120ms;
+$wzMotionBase: 160ms;
+$wzMotionSlow: 200ms;
+$wzEase: ease-out;
+
+/**
+ * The token block every redesigned surface roots itself in. Compiled once per theme by OSD, so no
+ * component hardcodes a hex or branches on `theme:darkMode` itself; custom properties inherit
+ * through the whole subtree, so nothing downstream needs a dark-mode prop threaded into it.
+ */
+@mixin wzSurfaceTokens {
+  --wz-hairline: #{$euiBorderColor};
+  --wz-accent: #{$euiColorPrimary};
+  --wz-accent-soft: #{rgba($euiColorPrimary, 0.1)};
+  --wz-accent-hover: #{rgba($euiColorPrimary, 0.06)};
+  --wz-surface: #{$euiColorEmptyShade};
+  --wz-surface-sunken: #{$euiColorLightestShade};
+  --wz-text-subdued: #{$euiTextSubduedColor};
+  --wz-panel-radius: #{$wzPanelRadius};
+}
+
+/** A bordered, shadowless panel — the one container idiom the whole redesign uses. */
+@mixin wzPanel($padding: $wzCardPadding) {
+  background-color: var(--wz-surface);
+  border: 1px solid var(--wz-hairline);
+  border-radius: var(--wz-panel-radius, #{$wzPanelRadius});
+  box-shadow: none;
+  padding: $padding;
+}
+
+/**
+ * 11px uppercase muted label, used for section headers and table column heads. The reference sets
+ * these in small caps above the value; `letter-spacing` is what keeps 11px uppercase legible.
+ */
+@mixin wzMicroLabel {
+  color: var(--wz-text-subdued);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/**
+ * Status chip: tinted fill, NO border, fully round, 11px semibold. This is `EuiBadge` with a custom
+ * color — deliberately not a fork. `$tint` is the role color; the fill is that color at low alpha
+ * so the chip reads as a state, not as a solid button.
+ */
+@mixin wzStatusChip($tint) {
+  background-color: rgba($tint, 0.12);
+  border: none;
+  border-radius: 999px;
+  color: $tint;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+  padding: 0 8px;
+}
+
+/**
+ * Any grid/flex child that scrolls needs this. The automatic minimum size of a flex/grid item is
+ * its content size, so without it the transcript refuses to shrink and pushes the composer
+ * off-screen — Safari surfaces this earlier than Chrome, and it is the first of the six Safari
+ * rules in the spec.
+ */
+@mixin wzScrollChild {
+  min-height: 0;
+  overflow-y: auto;
+}

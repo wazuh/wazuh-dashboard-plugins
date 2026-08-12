@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { ResultTable } from './result-table';
+import { ResultTable, ResultTableProvenanceChip } from './result-table';
 import { TableSpec } from '../../../common/types';
 
 function spec(overrides: Partial<TableSpec> = {}): TableSpec {
@@ -88,25 +88,139 @@ describe('ResultTable', () => {
     expect(screen.queryByText('agent-29')).toBeNull();
   });
 
-  // The page size is what keeps the table a readable height now that the body has no inner
-  // scroller, so "no max-height on the table body" is a behavior worth pinning: a scrollbar
-  // reappearing here would put one scrolling box inside another.
-  it('does not cap the table body height (no scroll-within-scroll)', () => {
+  // Layout contract §4: the card is a 3-row structure (header / scrolling body / pinned
+  // pagination footer) — the max-height and scroll live on `.wzResultsCardBody` alone (via
+  // result-table.scss's `wzScrollChild` mixin), never as an inline style on any element, and the
+  // header/footer are its SIBLINGS, not its descendants — so neither can ever be scrolled out of
+  // view underneath the body.
+  it('keeps the header and pagination footer as siblings of the scrolling body, not nested inside it', () => {
+    const thirtyRows = Array.from({ length: 30 }, (_unused, i) => ({
+      agent: `agent-${i}`,
+    }));
     const { container } = render(
       <ResultTable
         spec={spec({
           columns: [{ id: 'agent', label: 'Agent' }],
-          rows: Array.from({ length: 4 }, (_unused, i) => ({
-            agent: `agent-${i}`,
-          })),
+          rows: thirtyRows,
         })}
       />,
     );
+    fireEvent.click(screen.getByText('Results (30 rows)'));
 
-    const scrollBoxes = [...container.querySelectorAll('div')].filter(element =>
-      (element.getAttribute('style') ?? '').includes('max-height'),
-    );
-    expect(scrollBoxes).toHaveLength(0);
+    const body = container.querySelector('.wzResultsCardBody');
+    const header = container.querySelector('.wzResultsCardHeader');
+    const footer = container.querySelector('.wzResultsCardFooter');
+    expect(body).not.toBeNull();
+    expect(header).not.toBeNull();
+    expect(footer).not.toBeNull();
+    expect(body?.contains(header as Node)).toBe(false);
+    expect(body?.contains(footer as Node)).toBe(false);
+  });
+
+  // The BREAKING bug this whole card rewrite exists for: "page 2 of 6 unreachable without
+  // resizing the window". Pinning the pagination footer as its own grid row (rather than letting
+  // it flow after an unbounded table body) means it is always present and clickable regardless of
+  // how tall the body's own content is.
+  describe('pagination stays inside the card and reachable', () => {
+    function thirtyRowSpec(): TableSpec {
+      return spec({
+        columns: [{ id: 'agent', label: 'Agent' }],
+        rows: Array.from({ length: 30 }, (_unused, i) => ({
+          agent: `agent-${i}`,
+        })),
+      });
+    }
+
+    it('shows a working "next page" control that reveals the next slice of rows', () => {
+      render(<ResultTable spec={thirtyRowSpec()} />);
+      fireEvent.click(screen.getByText('Results (30 rows)'));
+
+      expect(screen.getByText('Page 1 of 6')).toBeInTheDocument();
+      expect(screen.getByText('agent-0')).toBeInTheDocument();
+      expect(screen.queryByText('agent-5')).toBeNull();
+
+      fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+
+      expect(screen.getByText('Page 2 of 6')).toBeInTheDocument();
+      expect(screen.getByText('agent-5')).toBeInTheDocument();
+      expect(screen.queryByText('agent-0')).toBeNull();
+    });
+
+    it('disables "previous page" on the first page and "next page" on the last page', () => {
+      render(<ResultTable spec={thirtyRowSpec()} />);
+      fireEvent.click(screen.getByText('Results (30 rows)'));
+
+      expect(screen.getByRole('button', { name: 'Previous page' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Next page' })).not.toBeDisabled();
+
+      for (let clickCount = 0; clickCount < 5; clickCount += 1) {
+        fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+      }
+
+      expect(screen.getByText('Page 6 of 6')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Next page' })).toBeDisabled();
+    });
+
+    it('changing rows-per-page resets back to page 1', () => {
+      render(<ResultTable spec={thirtyRowSpec()} />);
+      fireEvent.click(screen.getByText('Results (30 rows)'));
+
+      fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+      expect(screen.getByText('Page 2 of 6')).toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole('button', { name: '10' }));
+      expect(screen.getByText('Page 1 of 3')).toBeInTheDocument();
+      expect(screen.getByText('agent-9')).toBeInTheDocument();
+      expect(screen.queryByText('agent-10')).toBeNull();
+    });
+
+    it('renders no pagination footer for an empty result set', () => {
+      const { container } = render(<ResultTable spec={spec({ rows: [] })} />);
+      expect(container.querySelector('.wzResultsCardFooter')).toBeNull();
+    });
+  });
+
+  describe('provenance chips (layout contract §4: "provenance moves UP here")', () => {
+    function chip(
+      overrides: Partial<ResultTableProvenanceChip> = {},
+    ): ResultTableProvenanceChip {
+      return {
+        id: 't1',
+        shortLabel: 'Critical findings · 90d',
+        fullLabel: 'get_critical_findings · wazuh-findings-v5-* · now-90d → now',
+        toolName: 'get_critical_findings',
+        argumentsJson: { index_pattern: 'wazuh-findings-v5-*' },
+        ...overrides,
+      };
+    }
+
+    it('renders a header chip for each supplied provenance entry', () => {
+      render(<ResultTable spec={spec()} provenanceChips={[chip()]} />);
+      expect(screen.getByText('Critical findings · 90d')).toBeInTheDocument();
+    });
+
+    it('opens a popover with the tool name and raw JSON arguments on click, closing on a second click', () => {
+      render(<ResultTable spec={spec()} provenanceChips={[chip()]} />);
+
+      expect(
+        screen.queryByText(/"index_pattern": "wazuh-findings-v5-\*"/),
+      ).toBeNull();
+
+      fireEvent.click(screen.getByText('Critical findings · 90d'));
+      expect(
+        screen.getByText(/"index_pattern": "wazuh-findings-v5-\*"/),
+      ).toBeInTheDocument();
+
+      fireEvent.click(screen.getByText('Critical findings · 90d'));
+      expect(
+        screen.queryByText(/"index_pattern": "wazuh-findings-v5-\*"/),
+      ).toBeNull();
+    });
+
+    it('renders no chip at all when provenanceChips is omitted', () => {
+      const { container } = render(<ResultTable spec={spec()} />);
+      expect(container.querySelector('.euiBadge[title]')).toBeNull();
+    });
   });
 
   describe('severity badge rendering', () => {

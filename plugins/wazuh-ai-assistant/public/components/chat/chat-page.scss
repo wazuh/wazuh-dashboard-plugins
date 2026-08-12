@@ -1,90 +1,119 @@
+@import '../redesign';
+
 /**
  * Chat surface tokens. Compiled once per theme by OSD (unlike an inline React style, which reads
- * whatever value JS computed at render time) — a `--wz-*` custom-property block sourced from
- * EUI's own `$eui*` SASS variables is the single place this plugin's components read color/border
- * roles from, so no component ever hardcodes a hex literal or branches on `theme:darkMode` itself.
- * Custom properties inherit through the whole DOM subtree regardless of component boundaries, so
- * nothing downstream needs its own dark-mode prop threaded down to it.
+ * whatever value JS computed at render time) — the `--wz-*` custom-property block is sourced from
+ * EUI's own `$eui*` SASS variables via `wzSurfaceTokens` (public/components/_redesign.scss), the
+ * single place this plugin's components read color/border roles from, so no component ever
+ * hardcodes a hex literal or branches on `theme:darkMode` itself. Custom properties inherit through
+ * the whole DOM subtree regardless of component boundaries, so nothing downstream needs its own
+ * dark-mode prop threaded down to it.
  */
 .wzAiChat {
-  --wz-hairline: #{$euiBorderColor};
-  --wz-accent: #{$euiColorPrimary};
-  --wz-accent-soft: #{rgba($euiColorPrimary, 0.1)};
-  --wz-accent-hover: #{rgba($euiColorPrimary, 0.06)};
-  --wz-surface: #{$euiColorEmptyShade};
-  --wz-surface-sunken: #{$euiColorLightestShade};
-  --wz-text-subdued: #{$euiTextSubduedColor};
+  @include wzSurfaceTokens;
 }
 
-/* `position: sticky` reserves `.wzStickyInputPanel`'s own box in the flow (it is an ordinary flex
-   sibling of `.wzChatTranscript`, sized by flex layout like any other item — a taller composer,
-   e.g. from multiline input, simply shrinks the transcript's flex-basis, no JS needed for that).
-   The ONE thing sticky positioning does NOT reserve is `::before`'s fade gradient below, which
-   paints `$wzComposerGradientHeight` further up via a negative `top` — outside the panel's own
-   box — and a live measurement caught exactly that strip covering the transcript's last element
-   (a table's pagination bar) even once scrolled all the way down. `.wzChatTranscript`'s
-   `padding-bottom` (below) reserves precisely this one constant, shared with `::before` so the two
-   can never drift apart — NOT the panel's full rendered height, which `position: sticky` already
-   accounts for on its own; reserving the full height on top of that would leave a permanent gap
-   the size of the composer at the bottom of every scroll. */
-$wzComposerGradientHeight: 16px;
+/**
+ * Layout contract §1 (AI/design/redesign-v2-spec.md): the chat pane is a two-row CSS grid —
+ * `1fr` for the transcript, `auto` for the composer. This is what makes the composer/welcome
+ * overlap structurally impossible instead of something tuned per breakpoint: there is no
+ * `position: sticky`, no `::before` fade gradient, and no transcript `padding-bottom` kept in sync
+ * with it — the grid row boundary is the only thing keeping transcript and composer apart. A
+ * taller composer (multiline input, up to `$wzComposerMaxHeight`) simply takes more of its own
+ * `auto` row; the `1fr` row yields the difference automatically, no JS measurement involved.
+ */
+.wzChatPane {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  height: 100%;
+  min-height: 0;
+}
 
+/** The transcript is the ONLY thing that scrolls (layout contract §1). `wzScrollChild`
+ * (public/components/_redesign.scss) is `min-height: 0; overflow-y: auto` — the Safari/high-res
+ * rule that every scrolling grid/flex child needs, since a grid row's automatic minimum size is
+ * its content size, which would otherwise refuse to shrink and push the composer row off-screen. */
 .wzChatTranscript {
-  padding-bottom: $wzComposerGradientHeight;
+  @include wzScrollChild;
+  overflow-anchor: none;
 }
 
-.wzStickyInputPanel {
-  position: sticky;
-  bottom: 0;
-  background-color: $euiPageBackgroundColor;
-  margin-top: 16px;
+/**
+ * Composer floor and ceiling (contract §2). The row itself is the grid's `auto` row — it grows
+ * with its content (field + controls + disclaimer) up to `$wzComposerMaxHeight`, then scrolls
+ * internally rather than pushing the transcript row any further, since the two rows are otherwise
+ * independent. The textarea's own 5-row autogrow cap is a SEPARATE, smaller ceiling that lives in
+ * chat-input.tsx (it needs the field's own `scrollHeight`, which CSS alone cannot read).
+ */
+.wzComposerRow {
+  max-height: $wzComposerMaxHeight;
+  overflow-y: auto;
+  border-top: 1px solid var(--wz-hairline);
+  background-color: var(--wz-surface);
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: -$wzComposerGradientHeight;
-    left: 0;
-    right: 0;
-    height: $wzComposerGradientHeight;
-    background: linear-gradient(
-      to bottom,
-      transparent,
-      $euiPageBackgroundColor
-    );
-    pointer-events: none;
+  /* Disabled state (no providers configured yet) dims the whole composer instead of leaving it
+     visually identical to the enabled one. */
+  &.wzComposerRow-isDisabled .euiPanel {
+    opacity: 0.6;
   }
 
   /* Focus-within ring is the ONE box-shadow this surface allows (a focus indicator, not
-     decoration) — the textarea itself is intentionally chromeless (chat-input.tsx), so the dock
-     panel is what shows focus has landed inside it. Disabled state (no providers configured yet)
-     dims the whole dock instead of leaving it visually identical to the enabled state. */
+     decoration) — the textarea itself is intentionally chromeless (chat-input.tsx), so the
+     composer panel is what shows focus has landed inside it. */
   .euiPanel:focus-within {
     border-color: var(--wz-accent);
     box-shadow: 0 0 0 1px var(--wz-accent);
   }
 
-  &.wzStickyInputPanel-isDisabled .euiPanel {
-    opacity: 0.6;
-  }
-
   /* EUI draws a form control's underline with a `background-image` gradient, not a border, so the
-     textarea's own inline `border: none` never removed it: the dock ended up with a focus ring
-     around the panel AND a dark rule under the text, two competing borders on one control. The
-     dock's ring is the single focus affordance. */
+     textarea's own inline `border: none` never removed it: the composer ended up with a focus
+     ring around the panel AND a dark rule under the text, two competing borders on one control.
+     The panel's ring is the single focus affordance. */
   .euiTextArea {
     background-image: none;
   }
 }
 
-/* result-table.tsx's header row (row count on the left, "Open in Discover" on the right): restyles
-   EUI's own accordion trigger wrapper rather than inventing markup to replace its built-in, already
-   keyboard-accessible toggle. A hairline underneath is the whole treatment — no fill and no frame
-   around the table, because a tinted strip inside a bordered box made the table read as a widget
-   bolted into the reply instead of as the reply's own data, and it was the third nested container
-   the reader was looking inside. */
-.wzResultTableAccordion > .euiAccordion__triggerWrapper {
-  border-bottom: 1px solid var(--wz-hairline);
-  padding: 4px 2px;
+/**
+ * One measure, one gutter (contract §5): transcript prose and the composer share this single
+ * centred column so they stay optically locked as the window grows — extra width at 1920 goes to
+ * the rail and gutters, never to line length. Reads `$wzContentMaxWidth`
+ * (public/components/_redesign.scss) instead of a locally-restated pixel figure, replacing the old
+ * `CONVERSATION_MAX_WIDTH = 860` constant chat-page.tsx used to keep in parallel with it.
+ */
+.wzContentMeasure {
+  max-width: $wzContentMaxWidth;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/**
+ * Welcome centres only when there is room (contract §3): `min-height: 100%` resolves against this
+ * element's containing block, which is a definite height here because `.wzChatPane`'s grid gives
+ * the transcript row (this element's ancestor) a real size. A tall viewport centres the welcome
+ * cluster (hero + example cards); a short one has nowhere to grow into, so this collapses to the
+ * content's own height and `.wzChatTranscript`'s own scroll (above) takes over — no flex-grow
+ * spacer arithmetic needed to fake it, and nothing here can ever reach the composer, which is a
+ * grid sibling of the transcript, never a descendant of it.
+ */
+.wzWelcomeCenter {
+  min-height: 100%;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  width: 100%;
+}
+
+/**
+ * Welcome cards (variation 1a, contract §3): `auto-fit`/`minmax` is what makes the row go 3-up,
+ * then 2-up, then 1-up with no fixed pixel card widths — the whole reason horizontal scroll can
+ * never appear here regardless of viewport width.
+ */
+.wzExampleCardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  width: 100%;
 }
 
 /**
@@ -94,33 +123,13 @@ $wzComposerGradientHeight: 16px;
  * `rgba(var(--wzAccentRgb), ...)` computed in JS from a `theme:darkMode` read).
  *
  * Motion is entirely opt-in: every animation/transition/transform lives inside the
- * `prefers-reduced-motion: no-preference` block. Outside it (i.e. for a reduced-motion user), the
- * hero cards and message rows simply render at their final `opacity: 1` state with no movement —
- * the ONE exception is the hover/focus border-color rule, which is an instant state change (no
- * transition, no transform) even for reduced-motion users, since EUI's own hover affordances work
- * the same way.
- *
- * `.wzHeroIconWrap` / `.wzHeroIcon` are deliberately absent: the welcome screen no longer renders
- * a Wazuh mark at all (the app chrome already brands the page), so those rules would style markup
- * that does not exist.
+ * `prefers-reduced-motion: no-preference` block. Outside it (i.e. for a reduced-motion user), rows
+ * simply render at their final state with no movement — the ONE exception is the hover/focus
+ * border-color rule, which is an instant state change (no transition, no transform) even for
+ * reduced-motion users, since EUI's own hover affordances work the same way.
  */
 
-/* No transform, no box-shadow "glow" on hover — a plain border-color change is the only feedback
-   an example card gives, matching the Home Overview's "no hover lift/glow" surface language while
-   still giving SOME affordance for what is, unlike their cards, a real interactive control. */
-.wzHeroCard:hover,
-.wzHeroCard:focus-visible {
-  border-color: var(--wz-accent) !important;
-}
-
 @media (prefers-reduced-motion: no-preference) {
-  .wzHeroCard {
-    opacity: 0;
-    animation: wzFadeUp 420ms ease-out both;
-    animation-delay: var(--wzCardDelay, 0ms);
-    transition: border-color 150ms ease-out;
-  }
-
   .wzConvoRow {
     transition: background-color 120ms ease-out, border-color 120ms ease-out;
   }
@@ -128,6 +137,14 @@ $wzComposerGradientHeight: 16px;
   .wzMsgRow {
     opacity: 0;
     animation: wzFadeUp 260ms ease-out both;
+  }
+
+  /** Composer floor and ceiling (contract §2): "reduced-motion disables the composer height
+   * transition" — the transition only exists inside this block in the first place, so a
+   * reduced-motion user simply never gets it; the field still grows/shrinks, just without the
+   * animated step. */
+  .wzComposerTextarea {
+    transition: height $wzMotionBase $wzEase;
   }
 
   @keyframes wzFadeUp {

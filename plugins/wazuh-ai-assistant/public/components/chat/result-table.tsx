@@ -1,15 +1,19 @@
 import React, { useMemo, useState } from 'react';
 import {
-  EuiAccordion,
   EuiBasicTable,
   EuiBasicTableColumn,
   EuiBadge,
   EuiFlexGroup,
   EuiFlexItem,
   EuiButtonIcon,
+  EuiButtonEmpty,
   EuiCallOut,
   EuiCodeBlock,
+  EuiIcon,
+  EuiPopover,
+  EuiText,
   EuiTextColor,
+  EuiSpacer,
   htmlIdGenerator,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
@@ -20,6 +24,7 @@ import {
   ResolveSecurityAnalyticsUrl,
   SecurityAnalyticsLink,
 } from './security-analytics-link';
+import './result-table.scss';
 
 /** Tables at or under this row count default to expanded (nothing to gain from collapsing them);
  * bigger ones default collapsed so a 500-row result doesn't force the user to scroll past it to
@@ -29,13 +34,19 @@ const AUTO_EXPAND_ROW_THRESHOLD = 10;
 /** One rendered table row: a `TableSpec` row plus the global `__rowId` the expander column and
  * `itemIdToExpandedRowMap` are keyed by (assigned over the FULL row set before pagination). */
 type ResultRow = Record<string, unknown> & { __rowId: string };
-/** Default page size and the choices offered in EuiBasicTable's page-size popover.
+/** Default page size and the choices offered in the card footer's row-count control.
  *
- * Five, not twenty-five: the page size IS the height control now that the table body has no inner
- * scroller. Five rows answer "what did it find?" inside the conversation without pushing the chat
- * input off the screen, and the reader can page through or open the full set in Discover. It also
- * keeps the DOM small for a 500-row result, which is why pagination was here to begin with. */
+ * Five, not twenty-five: the page size IS the height control now that the table body scrolls
+ * inside a height-capped card (layout contract §4) rather than growing unbounded. Five rows answer
+ * "what did it find?" inside the conversation without needing the card's own scroll, and the
+ * reader can page through or open the full set in Discover. It also keeps the DOM small for a
+ * 500-row result, which is why pagination was here to begin with. `TALL_TRANSCRIPT_PAGE_SIZE` is
+ * the "steps 5 → 10 above 900px of transcript height" half of that same contract point — see
+ * `transcriptHeightPx` below for why it is only ever a STARTING default, not a live-resize.
+ */
 const DEFAULT_PAGE_SIZE = 5;
+const TALL_TRANSCRIPT_PAGE_SIZE = 10;
+const TALL_TRANSCRIPT_HEIGHT_PX = 900;
 const PAGE_SIZE_OPTIONS = [5, 10, 25, 50];
 
 /**
@@ -269,6 +280,71 @@ function renderSeverityBadge(value: unknown): React.ReactNode {
   return <EuiBadge color={bucket.color}>{bucket.label}</EuiBadge>;
 }
 
+/**
+ * One provenance chip for the card header (layout contract §4's "provenance moves UP here"):
+ * which tool call produced this table. `TableSpec` itself carries no tool-call linkage (that
+ * lives on the message, in `common/types.ts`'s `ChatMessage.toolCalls` — not this component's
+ * file to add a new cross-reference field to), so message-bubble.tsx builds this shape from its
+ * own `message.toolCalls` (via tool-call-label.ts's `describeToolCall`, the same helper the old
+ * below-bubble chip already used) and passes it down instead.
+ */
+export interface ResultTableProvenanceChip {
+  id: string;
+  /** Truncated chip text, e.g. "Critical findings · 90d". */
+  shortLabel: string;
+  /** Untruncated tool name + index + time window, for the chip's `title`/aria-label. */
+  fullLabel: string;
+  /** Raw tool name (`get_critical_findings`), shown above the JSON in the popover. */
+  toolName: string;
+  /** The call's real-form arguments, shown verbatim (copyable) in the popover. */
+  argumentsJson: Record<string, unknown>;
+}
+
+/**
+ * The header's provenance chip: an `EuiBadge` that opens a small popover with the tool name and
+ * its raw (copyable) JSON arguments on click — replacing the old "click to reveal a raw view
+ * rendered BELOW the table it produced" pattern (issue: "provenance after the fact"). Its own
+ * open/closed state, not a shared one, so multiple chips on the same table (a turn that ran more
+ * than one tool call before landing on this table) never fight over a single popover.
+ */
+const ProvenanceChip: React.FC<{ chip: ResultTableProvenanceChip }> = ({
+  chip,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <EuiPopover
+      panelPaddingSize='s'
+      isOpen={isOpen}
+      closePopover={() => setIsOpen(false)}
+      button={
+        <EuiBadge
+          color='hollow'
+          iconType='search'
+          title={chip.fullLabel}
+          onClick={() => setIsOpen(previous => !previous)}
+          onClickAriaLabel={i18n.translate(
+            'wazuhAiAssistant.resultTable.provenanceChipAriaLabel',
+            {
+              defaultMessage: 'Show the executed query: {label}',
+              values: { label: chip.fullLabel },
+            },
+          )}
+        >
+          {chip.shortLabel}
+        </EuiBadge>
+      }
+    >
+      <EuiText size='xs'>
+        <strong>{chip.toolName}</strong>
+      </EuiText>
+      <EuiSpacer size='xs' />
+      <EuiCodeBlock language='json' paddingSize='s' fontSize='s' isCopyable>
+        {JSON.stringify(chip.argumentsJson, null, 2)}
+      </EuiCodeBlock>
+    </EuiPopover>
+  );
+};
+
 interface ResultTableProps {
   spec: TableSpec;
   /** Builds the "Open in Discover" URL for this spec; omitted (or resolving to `null`) simply
@@ -279,39 +355,71 @@ interface ResultTableProps {
    * simply means no link renders — see security-analytics-link.tsx. Optional for the same reason
    * as `resolveDiscoverUrl` above. */
   resolveSecurityAnalyticsUrl?: ResolveSecurityAnalyticsUrl;
+  /** Header chips for the tool call(s) that produced this table — see
+   * `ResultTableProvenanceChip`'s doc comment. Optional/omittable: a table rendered with no known
+   * provenance (or from a future call site) simply shows no chip, same as it shows no Discover
+   * link when `resolveDiscoverUrl` is omitted. */
+  provenanceChips?: ResultTableProvenanceChip[];
+  /**
+   * Real measured height (px) of the scrolling transcript pane, for layout contract §4's "page
+   * size steps 5 → 10 above 900px of transcript height". Optional and currently never supplied by
+   * chat-page.tsx (confirmed by reading it — no such measurement exists there yet), so this stays
+   * a no-op today and the pre-redesign default of 5 is exactly preserved; once chat-page.tsx grows
+   * a transcript-height measurement it can thread it straight through MessageList → MessageBubble
+   * → here with no further change on this end. Read only ONCE, to pick the table's INITIAL page
+   * size — not a live-resize binding, so a reader mid-way through a wide window resize never has
+   * their current page silently renumbered underneath them.
+   */
+  transcriptHeightPx?: number;
 }
 
 /**
- * Renders a `table` stream event: spec-driven, with a severity column and expandable rows.
+ * Renders a `table` stream event: spec-driven, with a severity column and expandable rows, inside
+ * a card whose header and pagination are pinned rows and whose body is the only thing that
+ * scrolls (layout contract §4 — the acceptance check this exists for is "page 2 of 6 [must be]
+ * reachable without resizing the window").
  */
 const ResultTableInner: React.FC<ResultTableProps> = ({
   spec,
   resolveDiscoverUrl,
   resolveSecurityAnalyticsUrl,
+  provenanceChips,
+  transcriptHeightPx,
 }) => {
   const [expandedRowIds, setExpandedRowIds] = useState<Set<number>>(new Set());
   // Stable across re-renders of the SAME mounted table (a later spec on the same tool round would
-  // still be the same accordion instance) — htmlIdGenerator is only invoked once per mount.
-  const accordionId = useMemo(
-    () => htmlIdGenerator('wzAiResultTableAccordion')(),
-    [],
-  );
+  // still be the same card instance) — htmlIdGenerator is only invoked once per mount.
+  const bodyId = useMemo(() => htmlIdGenerator('wzAiResultTableBody')(), []);
 
   const initiallyOpen = spec.rows.length <= AUTO_EXPAND_ROW_THRESHOLD;
-  // Lazy-mount (perf): a collapsed EuiAccordion still renders its
-  // children into the DOM (just visually hidden), so a collapsed 500-row table cost 500 DOM rows
-  // for nothing. `hasOpened` tracks whether the accordion has EVER been opened — starting `true`
-  // when `initialIsOpen` already counts as opened — and once it flips `true` it never flips back,
-  // so re-collapsing the accordion later doesn't tear the table down again (keeps scroll position/
-  // expanded rows). Until then, the accordion renders a `null` child instead of the table.
+  const [isOpen, setIsOpen] = useState(initiallyOpen);
+  // Lazy-mount (perf): the body/footer divs below render nothing until the card has EVER been
+  // opened once (starting `true` when `initiallyOpen` already counts as opened) — a collapsed
+  // 500-row table costs 500 DOM rows for nothing otherwise. Once flipped `true` it never flips
+  // back, so re-collapsing later hides the body via CSS (`display: none`) instead of unmounting
+  // it, which is what preserves scroll position/expanded rows across a collapse/reopen.
   const [hasOpened, setHasOpened] = useState(initiallyOpen);
+
+  const toggleOpen = () => {
+    setIsOpen(previous => {
+      const next = !previous;
+      if (next) {
+        setHasOpened(true);
+      }
+      return next;
+    });
+  };
 
   // Pagination (perf): caps the DOM to one page of rows at a time instead of all 500.
   // Row ids (`__rowId`, assigned below over the FULL `spec.rows` before slicing) are global
   // indexes, so `itemIdToExpandedRowMap` and the expander column stay correct across pages —
-  // paging never renumbers a row.
+  // paging never renumbers a row. Initial size only (see `transcriptHeightPx`'s doc comment).
   const [pageIndex, setPageIndex] = useState(0);
-  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [pageSize, setPageSize] = useState(() =>
+    transcriptHeightPx && transcriptHeightPx > TALL_TRANSCRIPT_HEIGHT_PX
+      ? TALL_TRANSCRIPT_PAGE_SIZE
+      : DEFAULT_PAGE_SIZE,
+  );
 
   const toggleRow = (rowIndex: number) => {
     setExpandedRowIds(previous => {
@@ -457,12 +565,12 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
     const map: Record<string, React.ReactNode> = {};
     spec.rows.forEach((row, rowIndex) => {
       if (expandedRowIds.has(rowIndex)) {
-        // Same raw-JSON treatment as the provenance chips' raw view (message-bubble.tsx): a
-        // proper EuiCodeBlock instead of a bare <pre>, with copy support. No `overflowHeight`:
-        // that would put a scrollbar inside an expanded row inside the transcript, and this
-        // content only exists because the reader deliberately expanded the row — cutting it off
-        // behind a third scrollbar defeats the click they just made. EuiCodeBlock's own
-        // fullscreen control handles a genuinely huge document.
+        // Same raw-JSON treatment as the provenance chips' popover (above): a proper EuiCodeBlock
+        // instead of a bare <pre>, with copy support. No `overflowHeight`: that would put a
+        // scrollbar inside an expanded row inside the card's own scrolling body, and this content
+        // only exists because the reader deliberately expanded the row — cutting it off behind a
+        // third scrollbar defeats the click they just made. EuiCodeBlock's own fullscreen control
+        // handles a genuinely huge document.
         map[String(rowIndex)] = (
           <EuiCodeBlock language='json' paddingSize='s' fontSize='s' isCopyable>
             {JSON.stringify(row, null, 2)}
@@ -487,117 +595,182 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
     () => items.slice(pageStart, pageStart + pageSize),
     [items, pageStart, pageSize],
   );
+  const pageCount = Math.max(1, Math.ceil(spec.rows.length / pageSize));
+
+  const titleText =
+    i18n.translate('wazuhAiAssistant.resultTable.accordionSummary', {
+      defaultMessage: 'Results ({count} rows)',
+      values: { count: spec.rows.length },
+    }) +
+    // Column-budget disclosure (issue #8921): a column demoted past MAX_VISIBLE_COLUMNS is NOT
+    // deleted — buildTableSpec (digest.ts) still puts its field into every row — so this tells
+    // the reader where to find it instead of leaving its disappearance unexplained.
+    (hiddenColumnCount > 0
+      ? i18n.translate('wazuhAiAssistant.resultTable.hiddenColumnsNote', {
+          defaultMessage:
+            ' (+{count, plural, one {# more field} other {# more fields}}' +
+            ' per row — expand a row to see them)',
+          values: { count: hiddenColumnCount },
+        })
+      : '');
+
+  const headerActions =
+    (provenanceChips && provenanceChips.length > 0) ||
+    (resolveDiscoverUrl && spec.discover) ||
+    (resolveSecurityAnalyticsUrl && spec.securityAnalyticsLink) ? (
+      <EuiFlexGroup
+        gutterSize='s'
+        responsive={false}
+        alignItems='center'
+        wrap
+        className='wzResultsCardActions'
+      >
+        {(provenanceChips ?? []).map(chip => (
+          <EuiFlexItem grow={false} key={chip.id}>
+            <ProvenanceChip chip={chip} />
+          </EuiFlexItem>
+        ))}
+        {resolveDiscoverUrl && spec.discover ? (
+          <EuiFlexItem grow={false}>
+            <DiscoverLink spec={spec} resolveDiscoverUrl={resolveDiscoverUrl} />
+          </EuiFlexItem>
+        ) : null}
+        {resolveSecurityAnalyticsUrl && spec.securityAnalyticsLink ? (
+          <EuiFlexItem grow={false}>
+            <SecurityAnalyticsLink
+              spec={spec}
+              resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
+            />
+          </EuiFlexItem>
+        ) : null}
+      </EuiFlexGroup>
+    ) : null;
 
   return (
-    // No frame around the table. A bordered box here would be the third nested container the
-    // reader is inside (page, then turn, then table), and the table already carries its own
-    // structure: a hairline under the header row (applied by `wzResultTableAccordion` in
-    // chat-page.scss) plus EUI's own row separators. Data, not a widget.
-    <div>
-      <EuiAccordion
-        id={accordionId}
-        className='wzResultTableAccordion'
-        paddingSize='none'
-        buttonContent={
-          i18n.translate('wazuhAiAssistant.resultTable.accordionSummary', {
-            defaultMessage: 'Results ({count} rows)',
-            values: { count: spec.rows.length },
-          }) +
-          // Column-budget disclosure (issue #8921): a column demoted past MAX_VISIBLE_COLUMNS is
-          // NOT deleted — buildTableSpec (digest.ts) still puts its field into every row — so this
-          // tells the reader where to find it instead of leaving its disappearance unexplained.
-          (hiddenColumnCount > 0
-            ? i18n.translate('wazuhAiAssistant.resultTable.hiddenColumnsNote', {
-                defaultMessage:
-                  ' (+{count, plural, one {# more field} other {# more fields}}' +
-                  ' per row — expand a row to see them)',
-                values: { count: hiddenColumnCount },
-              })
-            : '')
-        }
-        initialIsOpen={initiallyOpen}
-        // Lazy-mount: flips `hasOpened` permanently true the first time the accordion is opened
-        // (never reset on a later re-collapse, so the table stays mounted from then on).
-        onToggle={isOpen => {
-          if (isOpen) {
-            setHasOpened(true);
-          }
-        }}
-        extraAction={
-          (resolveDiscoverUrl && spec.discover) ||
-          (resolveSecurityAnalyticsUrl && spec.securityAnalyticsLink) ? (
-            <EuiFlexGroup gutterSize='s' responsive={false}>
-              {resolveDiscoverUrl && spec.discover ? (
-                <EuiFlexItem grow={false}>
-                  <DiscoverLink
-                    spec={spec}
-                    resolveDiscoverUrl={resolveDiscoverUrl}
-                  />
-                </EuiFlexItem>
-              ) : null}
-              {resolveSecurityAnalyticsUrl && spec.securityAnalyticsLink ? (
-                <EuiFlexItem grow={false}>
-                  <SecurityAnalyticsLink
-                    spec={spec}
-                    resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
-                  />
-                </EuiFlexItem>
-              ) : null}
-            </EuiFlexGroup>
-          ) : undefined
-        }
-      >
-        {hasOpened ? (
-          // No inner scroller. A scrollbar inside a message inside the scrolling transcript means
-          // the reader has to work out which of three surfaces their wheel is aimed at, and the
-          // rows below the fold are invisible until they find out. Height is controlled by how
-          // many rows a page shows (DEFAULT_PAGE_SIZE) instead, so the table is simply as tall as
-          // its content and the page scrolls once. `overflowX` stays as a safety net for a
-          // pathologically wide column set; with content-sized columns it does not normally engage.
-          <div
-            style={{
-              overflowX: 'auto',
-              // paddingSize='none' above (the header strip owns its own padding via
-              // wzResultTableAccordion) leaves the body needing its own inset.
-              padding: 12,
-            }}
+    // Layout contract §4: `grid-template-rows: auto minmax(0,1fr) auto` with a capped max-height —
+    // header and the pagination footer are pinned grid rows, only `.wzResultsCardBody` (the
+    // middle, `minmax(0,1fr)` row) scrolls. This is a plain styled `div`, not `EuiPanel` — EuiPanel
+    // wraps its content in markup this component does not control, which fought the exact 3-row
+    // grid this fix depends on; `wzResultsCard` (result-table.scss) applies the same bordered,
+    // shadowless look via the shared `wzPanel` mixin instead, so the visual result is identical.
+    <div className='wzResultsCard'>
+      <div className='wzResultsCardHeader'>
+        <button
+          type='button'
+          className='wzResultsCardToggle'
+          onClick={toggleOpen}
+          aria-expanded={isOpen}
+          aria-controls={bodyId}
+        >
+          <EuiIcon type={isOpen ? 'arrowDown' : 'arrowRight'} aria-hidden='true' />
+          <span>{titleText}</span>
+        </button>
+        {headerActions}
+      </div>
+      {hasOpened ? (
+        <div
+          id={bodyId}
+          className='wzResultsCardBody'
+          // `display: none` (not unmounting) once collapsed again — same lazy-mount contract as
+          // before, just expressed as CSS visibility instead of an accordion's own internal one,
+          // since this component no longer uses EuiAccordion (see the wrapper comment above).
+          style={{ display: isOpen ? undefined : 'none' }}
+        >
+          <EuiBasicTable
+            items={pagedItems}
+            columns={columns}
+            itemId='__rowId'
+            itemIdToExpandedRowMap={itemIdToExpandedRowMap}
+            isExpandable
+            hasActions
+          />
+        </div>
+      ) : null}
+      {hasOpened && spec.rows.length > 0 ? (
+        <div
+          className='wzResultsCardFooter'
+          style={{ display: isOpen ? undefined : 'none' }}
+        >
+          {/* Hand-built pagination (not EuiTablePagination — see this component's PR/handoff
+              notes: this worktree has no installed node_modules to confirm that component's exact
+              prop shape against the OSD-bundled EUI version, and every element used below
+              (EuiButtonIcon/EuiButtonEmpty/EuiText) is already used/verified elsewhere in this
+              same file). Pinned in its own grid row (`wzResultsCardFooter`, never inside the
+              scrolling body), which is the acceptance check this whole rewrite exists for: "page 2
+              of 6 [must be] reachable without resizing the window". */}
+          <EuiFlexGroup
+            responsive={false}
+            alignItems='center'
+            justifyContent='spaceBetween'
+            gutterSize='s'
           >
-            <EuiBasicTable
-              items={pagedItems}
-              columns={columns}
-              itemId='__rowId'
-              itemIdToExpandedRowMap={itemIdToExpandedRowMap}
-              isExpandable
-              hasActions
-              pagination={{
-                pageIndex,
-                pageSize,
-                totalItemCount: spec.rows.length,
-                pageSizeOptions: PAGE_SIZE_OPTIONS,
-              }}
-              // EuiBasicTable's page-change callback is `onChange` (the `onTableChange` name
-              // belongs to EuiInMemoryTable — using it here was silently ignored at runtime, so
-              // pagination never actually turned pages). Typed inline rather than via EUI's
-              // `CriteriaWithPagination<T>`: `columns` is cast to `any` so the item generic `T`
-              // isn't usefully inferred, and this handler only reads `page`. An optional-`page`
-              // shape is a valid target for the paginated arm (whose `CriteriaWithPagination` has
-              // a REQUIRED `page`), satisfying the prop without depending on the exact exported
-              // type name and giving `page` an explicit type (no implicit-any).
-              onChange={({
-                page,
-              }: {
-                page?: { index: number; size: number };
-              }) => {
-                if (!page) {
-                  return;
-                }
-                setPageIndex(page.index);
-                setPageSize(page.size);
-              }}
-            />
-          </div>
-        ) : null}
-      </EuiAccordion>
+            <EuiFlexItem grow={false}>
+              <EuiFlexGroup responsive={false} alignItems='center' gutterSize='xs'>
+                <EuiFlexItem grow={false}>
+                  <EuiText size='xs' color='subdued'>
+                    {i18n.translate('wazuhAiAssistant.resultTable.pageSizeLabel', {
+                      defaultMessage: 'Rows per page:',
+                    })}
+                  </EuiText>
+                </EuiFlexItem>
+                {PAGE_SIZE_OPTIONS.map(size => (
+                  <EuiFlexItem grow={false} key={size}>
+                    <EuiButtonEmpty
+                      size='xs'
+                      color={pageSize === size ? 'primary' : 'text'}
+                      onClick={() => {
+                        setPageSize(size);
+                        setPageIndex(0);
+                      }}
+                    >
+                      {size}
+                    </EuiButtonEmpty>
+                  </EuiFlexItem>
+                ))}
+              </EuiFlexGroup>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiFlexGroup responsive={false} alignItems='center' gutterSize='xs'>
+                <EuiFlexItem grow={false}>
+                  <EuiButtonIcon
+                    iconType='arrowLeft'
+                    size='s'
+                    aria-label={i18n.translate(
+                      'wazuhAiAssistant.resultTable.previousPage',
+                      { defaultMessage: 'Previous page' },
+                    )}
+                    isDisabled={pageIndex === 0}
+                    onClick={() =>
+                      setPageIndex(previous => Math.max(0, previous - 1))
+                    }
+                  />
+                </EuiFlexItem>
+                <EuiFlexItem grow={false}>
+                  <EuiText size='xs' color='subdued'>
+                    {i18n.translate('wazuhAiAssistant.resultTable.pageOfPages', {
+                      defaultMessage: 'Page {page} of {total}',
+                      values: { page: pageIndex + 1, total: pageCount },
+                    })}
+                  </EuiText>
+                </EuiFlexItem>
+                <EuiFlexItem grow={false}>
+                  <EuiButtonIcon
+                    iconType='arrowRight'
+                    size='s'
+                    aria-label={i18n.translate('wazuhAiAssistant.resultTable.nextPage', {
+                      defaultMessage: 'Next page',
+                    })}
+                    isDisabled={pageIndex >= pageCount - 1}
+                    onClick={() =>
+                      setPageIndex(previous => Math.min(pageCount - 1, previous + 1))
+                    }
+                  />
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </div>
+      ) : null}
     </div>
   );
 };
@@ -651,6 +824,8 @@ class ResultTableBoundary extends React.Component<
         spec={this.props.spec}
         resolveDiscoverUrl={this.props.resolveDiscoverUrl}
         resolveSecurityAnalyticsUrl={this.props.resolveSecurityAnalyticsUrl}
+        provenanceChips={this.props.provenanceChips}
+        transcriptHeightPx={this.props.transcriptHeightPx}
       />
     );
   }
@@ -660,10 +835,14 @@ export const ResultTable: React.FC<ResultTableProps> = ({
   spec,
   resolveDiscoverUrl,
   resolveSecurityAnalyticsUrl,
+  provenanceChips,
+  transcriptHeightPx,
 }) => (
   <ResultTableBoundary
     spec={spec}
     resolveDiscoverUrl={resolveDiscoverUrl}
     resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
+    provenanceChips={provenanceChips}
+    transcriptHeightPx={transcriptHeightPx}
   />
 );

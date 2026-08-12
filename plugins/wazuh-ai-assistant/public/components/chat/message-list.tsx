@@ -20,6 +20,15 @@ interface MessageListProps {
    * is generating.
    */
   onRetryLastTurn?: () => void;
+  /**
+   * Real measured height (px) of the scrolling transcript pane — layout contract §4's "page size
+   * steps 5 → 10 above 900px of transcript height". Threaded straight through to every
+   * MessageBubble/ResultTable; see result-table.tsx's own doc comment on the same-named prop for
+   * why this is optional and, as of this redesign pass, never actually supplied by chat-page.tsx
+   * (no such measurement exists there yet). Kept here so chat-page.tsx only needs to start passing
+   * it, once it measures the pane, with no further prop-plumbing change on this end.
+   */
+  transcriptHeightPx?: number;
 }
 
 /**
@@ -40,6 +49,8 @@ interface MessageListProps {
  *  - `resolveDiscoverUrl`: ChatPage holds it via `useState(() => createDiscoverUrlResolver(core))`
  *    (the lazy-initializer form, run once on mount), so it is the exact same function instance for
  *    the component's whole lifetime, not just "equal" — confirmed by reading chat-page.tsx.
+ *  - `transcriptHeightPx`: a plain number (or `undefined`), so it is trivially shallow-equal across
+ *    a keystroke re-render regardless of how/whether chat-page.tsx ever starts measuring it.
  * Default (shallow) React.memo comparison is therefore sufficient; no custom comparator needed.
  */
 export const MessageList = React.memo<MessageListProps>(function MessageList({
@@ -47,6 +58,7 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
   resolveDiscoverUrl,
   resolveSecurityAnalyticsUrl,
   onRetryLastTurn,
+  transcriptHeightPx,
 }) {
   const lastMessage = messages[messages.length - 1];
   return (
@@ -60,6 +72,7 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
             onRetry={
               index === messages.length - 1 ? onRetryLastTurn : undefined
             }
+            transcriptHeightPx={transcriptHeightPx}
           />
           {/* One turn = one 24px breath (EuiSpacer size='l'), matching the rhythm the conversation
               header and welcome state also use — intra-turn spacing inside a bubble stays 's'. */}

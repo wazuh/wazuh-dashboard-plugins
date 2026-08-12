@@ -184,17 +184,20 @@ const App: React.FC<{
               settingsEverOpenedRef.current = true;
             }
             return (
-              // Full-height frame so the Chat tab can fill the viewport (its internal layout uses
-              // height:100%, which is only meaningful against a bounded ancestor). `100vh - 49px`
-              // subtracts the OSD global header (the stable ~49px chrome bar this app mounts
-              // beneath); the tab bar + spacer below live INSIDE this frame and consume their own
-              // natural height via flex, so they don't need to be in the calc. The content row is
-              // `flex:1` with `overflow:auto` so the Chat tab fills exactly (its own panes scroll
-              // internally) while the Settings tab, which is taller than the viewport, scrolls
-              // normally.
+              // Full-height frame so the Chat tab can fill the space it is given (its internal
+              // layout uses height:100%, which is only meaningful against a bounded ancestor).
+              // This deliberately takes its height from the ancestor chain — `renderApp` sizes the
+              // mount element below — rather than from the viewport: the previous
+              // `calc(100vh - 49px)` broke twice over. `100vh` on Safari first excludes then
+              // includes the browser toolbar, which is the classic "the composer moved" report, and
+              // the hardcoded 49px is a standing bet on the OSD global header's height that any
+              // chrome change silently loses. The tab bar + spacer below live INSIDE this frame and
+              // consume their own natural height via flex. The content row is `flex:1` with
+              // `overflow:auto` so the Chat tab fills exactly (its own panes scroll internally)
+              // while the Settings tab, which is taller than the viewport, scrolls normally.
               <div
                 style={{
-                  height: 'calc(100vh - 49px)',
+                  height: '100%',
                   display: 'flex',
                   flexDirection: 'column',
                   minHeight: 0,
@@ -308,6 +311,16 @@ export const renderApp = (
   // Proactive session heal on every app mount: establishes the Manager API cookies
   // before any tab issues Manager-gated requests; pages' own calls share this in-flight execution.
   void ensureManagerSession(core.http);
+
+  // The app's own frame sizes itself with `height: 100%`, which is only meaningful if every
+  // ancestor up to a height-constrained one also has a definite height. OSD hands us a plain mount
+  // node inside its (already height-constrained) application wrapper, so this one assignment is
+  // what closes the chain — and is what lets the frame below drop `calc(100vh - 49px)`, whose `vh`
+  // unit is unreliable on Safari and whose 49px was a hardcoded bet on the chrome bar's height.
+  element.style.height = '100%';
+  // A grid/flex child's automatic minimum size is its content size; without this the mount node
+  // refuses to shrink and pushes the composer off-screen, which Safari surfaces before Chrome.
+  element.style.minHeight = '0';
 
   const history = createHashHistory();
   const root = createRoot(element);
