@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   EuiPage,
+  EuiBadge,
   EuiPageBody,
   EuiPageContent,
   EuiPageContentBody,
