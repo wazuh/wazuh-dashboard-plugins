@@ -18,8 +18,12 @@ import { getAiAssistantUrl } from '../../utils/navigation';
  * metric tile, so it renders unconditionally with no loading/error state of its own.
  */
 export const AiAssistantCta: React.FC = () => (
-  <RedirectAppLinks application={getCore().application}>
+  <RedirectAppLinks
+    application={getCore().application}
+    className='eui-fullHeight'
+  >
     <EuiCard
+      className='eui-fullHeight'
       layout='horizontal'
       icon={<EuiIcon size='xl' type='machineLearningApp' />}
       title={i18n.translate('wazuh.homeOverview.aiAssistantCard.title', {
