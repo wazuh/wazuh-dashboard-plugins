@@ -36,7 +36,7 @@ describe('ProviderFormFlyout — create mode', () => {
     expect(
       screen.getByRole('heading', { name: /add provider/i }),
     ).toBeInTheDocument();
-    expect(screen.getByLabelText(/^name$/i)).toHaveValue('');
+    expect(screen.getByLabelText(/^name/i)).toHaveValue('');
   });
 
   it('clarifies the API key is optional for auth-free endpoints and encrypted at rest', () => {
@@ -56,7 +56,7 @@ describe('ProviderFormFlyout — create mode', () => {
     fireEvent.change(screen.getByLabelText(/endpoint url/i), {
       target: { value: 'not-a-url' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /^save$/i }));
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
 
     expect(
       await screen.findByText(/valid URL starting with http/i),
@@ -67,16 +67,16 @@ describe('ProviderFormFlyout — create mode', () => {
   it('submits trimmed values', async () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    fireEvent.change(screen.getByLabelText(/^name$/i), {
+    fireEvent.change(screen.getByLabelText(/^name/i), {
       target: { value: '  Groq  ' },
     });
     fireEvent.change(screen.getByLabelText(/endpoint url/i), {
       target: { value: ' https://api.groq.com/openai/v1 ' },
     });
-    fireEvent.change(screen.getByLabelText(/^model$/i), {
+    fireEvent.change(screen.getByLabelText(/^model/i), {
       target: { value: 'llama-3.3-70b-versatile' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /^save$/i }));
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
 
     await waitFor(() => {
       expect(baseProps.onSubmit).toHaveBeenCalledWith({
@@ -107,11 +107,11 @@ describe('ProviderFormFlyout — edit mode', () => {
     expect(
       screen.getByRole('heading', { name: /edit provider/i }),
     ).toBeInTheDocument();
-    expect(screen.getByLabelText(/^name$/i)).toHaveValue('My OpenAI');
+    expect(screen.getByLabelText(/^name/i)).toHaveValue('My OpenAI');
     expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
       'https://api.openai.com/v1',
     );
-    expect(screen.getByLabelText(/^model$/i)).toHaveValue('gpt-4o');
+    expect(screen.getByLabelText(/^model/i)).toHaveValue('gpt-4o');
     expect(
       screen.getByText(/leave empty to keep the current key/i),
     ).toBeInTheDocument();
@@ -141,13 +141,13 @@ describe('ProviderFormFlyout — submit error and RBAC', () => {
       />,
     );
 
-    expect(screen.getByRole('button', { name: /^save$/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /save & test/i })).toBeDisabled();
   });
 });
 
 describe('ProviderFormFlyout — unsaved changes confirmation', () => {
   const dirtyTheForm = () => {
-    fireEvent.change(screen.getByLabelText(/^name$/i), {
+    fireEvent.change(screen.getByLabelText(/^name/i), {
       target: { value: 'Draft name' },
     });
   };
@@ -181,14 +181,14 @@ describe('ProviderFormFlyout — unsaved changes confirmation', () => {
 
     expect(screen.queryByText(/unsubmitted changes/i)).not.toBeInTheDocument();
     expect(baseProps.onClose).not.toHaveBeenCalled();
-    expect(screen.getByLabelText(/^name$/i)).toHaveValue('Draft name');
+    expect(screen.getByLabelText(/^name/i)).toHaveValue('Draft name');
   });
 
   it('closes directly again once edits are reverted to the initial values', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
     dirtyTheForm();
-    fireEvent.change(screen.getByLabelText(/^name$/i), {
+    fireEvent.change(screen.getByLabelText(/^name/i), {
       target: { value: '' },
     });
     fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
@@ -202,7 +202,7 @@ describe('ProviderFormFlyout — unsaved changes confirmation', () => {
       <ProviderFormFlyout {...baseProps} editingProvider={editingProvider} />,
     );
 
-    fireEvent.change(screen.getByLabelText(/^model$/i), {
+    fireEvent.change(screen.getByLabelText(/^model/i), {
       target: { value: 'gpt-4.1' },
     });
     fireEvent.click(
@@ -232,7 +232,7 @@ describe('ProviderFormFlyout — API key encryption gate', () => {
       <ProviderFormFlyout {...baseProps} apiKeyEncryptionEnabled={false} />,
     );
 
-    const saveButton = screen.getByRole('button', { name: /^save$/i });
+    const saveButton = screen.getByRole('button', { name: /save & test/i });
     expect(saveButton).toBeEnabled();
 
     fireEvent.change(screen.getByLabelText(/^api key$/i), {
@@ -254,7 +254,7 @@ describe('ProviderFormFlyout — API key encryption gate', () => {
     fireEvent.change(screen.getByLabelText(/^api key$/i), {
       target: { value: 'sk-secret' },
     });
-    expect(screen.getByRole('button', { name: /^save$/i })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /save & test/i })).toBeEnabled();
   });
 });
 

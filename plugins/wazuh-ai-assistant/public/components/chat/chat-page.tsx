@@ -952,6 +952,24 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     // later, real one. Flushed (shown) if the stream ends before anything replaces it — "keep a
     // single empty table if it's the only one" (honest-empty stays correct). A plain local
     // variable, not a ref/state: scoped to this one stream's sequential event loop only.
+    //
+    // INVARIANT: within one turn, an empty table may NEVER replace — or outlive alongside — a
+    // non-empty one. The suppression above is one-directional: real rows always win over an empty
+    // spec, never the other way. This buffer and `pendingTable` are flushed together from three
+    // different call sites below (`finally`, the `error` branch, the `auth_expired` branch), and
+    // the sites do not all use the same flush order (`finally`/`auth_expired` flush the non-empty
+    // buffer first, `error` flushes the empty one first). On the unfixed code only `finally` was
+    // reachably broken: `error`'s empty-first order happened to be benign (the later non-empty
+    // commit won), and `auth_expired` can never hold content at all — chat-service.ts emits it
+    // only on the initial POST's 401, before any SSE frame (so no `table` event) has been read.
+    // But "happens to be benign" and "currently unreachable" are exactly the properties a future
+    // reorder or a new terminal path silently breaks. The invariant is therefore enforced
+    // independently at BOTH ends of this buffer's lifecycle instead of relying on flush order:
+    // `hasNonEmptyTableForTurn` (below) gates
+    // both the `table` event handler's empty branch (refuses to queue an empty spec once a
+    // non-empty one exists for this turn) and `flushPendingEmptyTable` itself (yields to a
+    // pending-or-committed non-empty table instead of committing). With both ends covered, no
+    // future call-site addition or reordering can reintroduce the clobber.
     let pendingEmptyTable: TableSpec | undefined;
     /**
      * A non-empty `table` event held back until the answer's first text arrives. The server emits
@@ -969,8 +987,35 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     /** The table this turn will be remembered with — mirrors what the flushes below commit to
      * React state, so the abandoned path can rebuild the turn without reading that state. */
     let committedTable: TableSpec | undefined;
+    /**
+     * Whether this turn already has, or is about to have, a table with rows in it — the single
+     * predicate both ends of the empty-table invariant above check, so they can never disagree.
+     * Checks `pendingTable` (a non-empty table not yet committed, e.g. still waiting on the first
+     * delta) as well as `committedTable` (already committed, by whichever flush ran first this
+     * turn). `rows.length > 0`, not mere truthiness, matters on BOTH arms: a previously-committed
+     * HONEST-empty table (this turn's only table so far) must still be superseded by a later
+     * non-empty one — the existing empty→rows retry path — so this only starts refusing once
+     * something with actual rows exists. (Today only the non-empty `table` branch ever assigns
+     * `pendingTable`, so its arm could be plain truthiness — but the explicit row check keeps the
+     * predicate correct even if a future refactor parks an empty spec there, instead of silently
+     * turning honest-empty turns into no-table turns.)
+     */
+    const hasNonEmptyTableForTurn = () =>
+      (pendingTable !== undefined && pendingTable.rows.length > 0) ||
+      (committedTable !== undefined && committedTable.rows.length > 0);
     const flushPendingEmptyTable = () => {
       if (!pendingEmptyTable) {
+        return;
+      }
+      // Yield to a non-empty table regardless of which flush call site got here first this turn —
+      // see the invariant comment on `pendingEmptyTable`. Drop the stale empty spec rather than
+      // committing it. NOTE: with the arrival-side guard below in place this branch is currently
+      // unreachable by construction (an empty spec is never queued once a non-empty table exists,
+      // and every later writer that could make the predicate true also clears this buffer). It is
+      // kept as defence-in-depth for a future writer of `pendingEmptyTable`, not because any
+      // event sequence reaches it today — do not count it as a tested code path.
+      if (hasNonEmptyTableForTurn()) {
+        pendingEmptyTable = undefined;
         return;
       }
       const spec = pendingEmptyTable;
@@ -1102,7 +1147,14 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           scheduleFlush();
         } else if (event.type === 'table') {
           if (event.spec.rows.length === 0) {
-            pendingEmptyTable = event.spec;
+            // Arrival-side half of the invariant on `pendingEmptyTable`: refuse to queue an empty
+            // spec at all once a non-empty table already exists for this turn, rather than queuing
+            // it and relying on flush order to sort it out later. If a non-empty table has not
+            // arrived (or committed) yet, this is either the honest-empty case or a retry's first
+            // (failed) attempt, and is held exactly as before.
+            if (!hasNonEmptyTableForTurn()) {
+              pendingEmptyTable = event.spec;
+            }
           } else {
             pendingEmptyTable = undefined;
             // Held rather than committed — see `pendingTable`. `committedTable` is deliberately NOT

@@ -198,6 +198,25 @@ function findNearMisses(
 }
 
 /**
+ * Appended to every field-validation rejection (issue #8911). Left alone, the reason above tells
+ * the model WHAT was wrong but not what to do next — and a rejected field-existence check consumes
+ * a tool round exactly like a productive one, so nothing stops the model from spending its whole
+ * bounded round budget on cosmetic variations of a field name that will never exist. Every clause
+ * is load-bearing, same care as chat.ts's `FINAL_ROUND_ANSWER_INSTRUCTION`:
+ *  - "Do not retry this query with a different field name guess" heads off exactly that failure
+ *    mode instead of leaving the model to rediscover it one rejected round at a time.
+ *  - "answer using only the results already gathered this turn" scopes the redirect to what the
+ *    model can actually support — it must not invent an answer the gathered results do not show,
+ *    the same anti-fabrication property `FINAL_ROUND_ANSWER_INSTRUCTION` protects.
+ *  - "or state plainly that this could not be checked" keeps the honest "I don't know" reachable,
+ *    rather than pressuring the model toward a fabricated answer just because it was told to
+ *    answer something.
+ */
+export const FIELD_REJECTION_RECOVERY_GUIDANCE =
+  ' Do not retry this query with a different field name guess. Answer using only the results ' +
+  'already gathered this turn, or state plainly that this could not be checked.';
+
+/**
  * Validates every field name `extractFieldNames` can find in `body` against `indexPattern`'s live
  * mapping, returning the same `GuardrailCheck` shape guardrails.ts's own checks return so
  * executor.ts can handle a rejection identically either way (bounded tool_result error, the
@@ -230,7 +249,8 @@ export async function validateQueryFields(
         `Field "${field}" does not exist on "${indexPattern}"` +
         (alternatives.length > 0
           ? `; available: ${alternatives.map(f => `"${f}"`).join(', ')}.`
-          : '.'),
+          : '.') +
+        FIELD_REJECTION_RECOVERY_GUIDANCE,
     };
   }
   return { ok: true };
