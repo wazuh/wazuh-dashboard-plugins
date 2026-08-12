@@ -403,7 +403,9 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
       screen.getByText(/doesn't look like an anthropic key/i),
     ).toBeInTheDocument();
     // Non-blocking: Save must stay enabled despite the shape warning.
-    expect(screen.getByRole('button', { name: /save & test/i })).toBeEnabled();
+    expect(
+      screen.getByRole('button', { name: /^save & test$/i }),
+    ).toBeEnabled();
   });
 
   it('shows no shape warning for a well-formed Anthropic key', () => {
