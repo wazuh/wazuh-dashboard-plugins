@@ -1,6 +1,9 @@
 /* eslint-disable camelcase -- the fixtures reproduce the index and
 Server API field names verbatim. */
-import { getAgentReportedConfiguration } from './agent-config-service';
+import {
+  clearAgentReportedConfigurationCache,
+  getAgentReportedConfiguration,
+} from './agent-config-service';
 import { getDataPlugin } from '../../../../../../kibana-services';
 
 jest.mock('../../../../../../kibana-services', () => ({
@@ -39,6 +42,8 @@ const mockDataPlugin = (fetchResult: unknown) => {
 describe('getAgentReportedConfiguration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    /* The cache outlives a test, so each one starts from an unread report. */
+    clearAgentReportedConfigurationCache();
   });
 
   it('returns the reported configuration keyed by module', async () => {
@@ -136,5 +141,90 @@ describe('getAgentReportedConfiguration', () => {
     await expect(getAgentReportedConfiguration('001')).rejects.toThrow(
       'Index pattern not found',
     );
+  });
+
+  describe('caching', () => {
+    const document = {
+      hits: {
+        hits: [
+          {
+            _source: {
+              wazuh: {
+                agent: {
+                  configuration: { modules: ['fim'], content: { fim: {} } },
+                },
+              },
+            },
+          },
+        ],
+      },
+    };
+
+    it('reads the report once for every section of the same agent', async () => {
+      const { searchSource } = mockDataPlugin(document);
+
+      const first = await getAgentReportedConfiguration('001');
+      const second = await getAgentReportedConfiguration('001');
+
+      expect(searchSource.fetch).toHaveBeenCalledTimes(1);
+      expect(second).toEqual(first);
+    });
+
+    it('joins the read already in flight instead of starting another', async () => {
+      const { searchSource } = mockDataPlugin(document);
+
+      await Promise.all([
+        getAgentReportedConfiguration('001'),
+        getAgentReportedConfiguration('001'),
+        getAgentReportedConfiguration('001'),
+      ]);
+
+      expect(searchSource.fetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('reads again for a different agent', async () => {
+      const { searchSource } = mockDataPlugin(document);
+
+      await getAgentReportedConfiguration('001');
+      await getAgentReportedConfiguration('002');
+
+      expect(searchSource.fetch).toHaveBeenCalledTimes(2);
+      expect(searchSource.setField).toHaveBeenLastCalledWith('query', {
+        language: 'lucene',
+        query: { term: { 'wazuh.agent.id': '002' } },
+      });
+    });
+
+    it('reads again once the cache is cleared', async () => {
+      const { searchSource } = mockDataPlugin(document);
+
+      await getAgentReportedConfiguration('001');
+      clearAgentReportedConfigurationCache();
+      await getAgentReportedConfiguration('001');
+
+      expect(searchSource.fetch).toHaveBeenCalledTimes(2);
+    });
+
+    it('retries after a failed read rather than caching the failure', async () => {
+      const { searchSource } = mockDataPlugin(document);
+      searchSource.fetch.mockRejectedValueOnce(new Error('Forbidden'));
+
+      await expect(getAgentReportedConfiguration('001')).rejects.toThrow(
+        'Forbidden',
+      );
+      const result = await getAgentReportedConfiguration('001');
+
+      expect(searchSource.fetch).toHaveBeenCalledTimes(2);
+      expect(result?.modules).toEqual(['fim']);
+    });
+
+    it('caches an agent that has never reported', async () => {
+      const { searchSource } = mockDataPlugin({ hits: { hits: [] } });
+
+      await expect(getAgentReportedConfiguration('001')).resolves.toBeNull();
+      await expect(getAgentReportedConfiguration('001')).resolves.toBeNull();
+
+      expect(searchSource.fetch).toHaveBeenCalledTimes(1);
+    });
   });
 });

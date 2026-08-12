@@ -40,6 +40,7 @@ import WzRefreshClusterInfoButton from './util-components/refresh-cluster-info-b
 import { withUserAuthorizationPrompt } from '../../../../../components/common/hocs';
 
 import { clusterNodes as requestClusterNodes } from './utils/wz-fetch';
+import { clearAgentReportedConfigurationCache } from './utils/agent-config-service';
 import {
   updateClusterNodes,
   updateClusterNodeSelected,
@@ -82,6 +83,9 @@ class WzConfigurationSwitch extends Component {
 
   componentWillUnmount() {
     this.resetClusterState();
+    /* The sections of a visit share one read of the agent's report. Leaving
+    ends the visit, so coming back reads the report again. */
+    clearAgentReportedConfigurationCache();
   }
 
   updateConfigurationSection = (view, title, description) => {
@@ -141,6 +145,7 @@ class WzConfigurationSwitch extends Component {
 
   async componentDidUpdate(prevProps) {
     if (this.props.agent?.id !== prevProps.agent?.id) {
+      clearAgentReportedConfigurationCache();
       this.updateClusterInformation('componentDidUpdate');
 
       // Reset view if switching between manager/agent contexts

@@ -42,19 +42,7 @@ const toArray = (value: unknown): string[] => {
   return value ? [value as string] : [];
 };
 
-/**
- * Get the configuration an agent last reported.
- *
- * Returns `null` when the agent has no document in the index. That is not an
- * error: reporting is an opt-in `ossec.conf` toggle that is disabled by
- * default, so an agent that has never reported is the expected case.
- *
- * Throws when the index pattern is missing, which is a real misconfiguration
- * rather than an absence of data.
- *
- * @param agentId Agent ID
- */
-export const getAgentReportedConfiguration = async (
+const readAgentReportedConfiguration = async (
   agentId: string,
 ): Promise<AgentReportedConfiguration | null> => {
   const indexPattern = await getDataPlugin().indexPatterns.get(
@@ -88,4 +76,65 @@ export const getAgentReportedConfiguration = async (
     modules: toArray(configuration.modules),
     modifiedAt: source?.state?.modified_at,
   };
+};
+
+/**
+ * The report read for the agent currently being looked at.
+ *
+ * Every configuration section asks for the same thing: the report is a single
+ * document holding every module, so the section a view renders is picked out of
+ * it rather than requested. Caching it means the sections of one visit share
+ * one read, and one snapshot -- eight separate reads could straddle a new
+ * report and show two generations of the same configuration side by side.
+ *
+ * The promise is cached rather than its value so that callers arriving while
+ * the read is in flight join it instead of starting another.
+ */
+let cachedRead: {
+  agentId: string;
+  configuration: Promise<AgentReportedConfiguration | null>;
+} | null = null;
+
+/**
+ * Discard the cached report. Called when the visit that owns it ends, so
+ * coming back to the configuration reads the agent's current report.
+ */
+export const clearAgentReportedConfigurationCache = () => {
+  cachedRead = null;
+};
+
+/**
+ * Get the configuration an agent last reported.
+ *
+ * Returns `null` when the agent has no document in the index. That is not an
+ * error: reporting is an opt-in `ossec.conf` toggle that is disabled by
+ * default, so an agent that has never reported is the expected case.
+ *
+ * Throws when the index pattern is missing, which is a real misconfiguration
+ * rather than an absence of data.
+ *
+ * @param agentId Agent ID
+ */
+export const getAgentReportedConfiguration = (
+  agentId: string,
+): Promise<AgentReportedConfiguration | null> => {
+  if (cachedRead?.agentId === agentId) {
+    return cachedRead.configuration;
+  }
+
+  const configuration = readAgentReportedConfiguration(agentId);
+  const read = { agentId, configuration };
+
+  cachedRead = read;
+
+  /* A failed read is not an answer, so it is not kept: the next section
+  retries instead of inheriting the error for the rest of the visit. `null` is
+  kept -- an agent that has never reported is a valid answer. */
+  configuration.catch(() => {
+    if (cachedRead === read) {
+      cachedRead = null;
+    }
+  });
+
+  return configuration;
 };
