@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { getMitreFindingsTool } from './get-mitre-findings';
 import { IndexerRequest } from '../types';
-import { ANSWER_BUCKET_CAP } from '../digest';
+import { BREAKDOWN_BUCKET_CAP } from '../digest';
 import { FINDING_BREAKDOWN_AGGS } from './common';
 
 /**
@@ -96,21 +96,21 @@ test('get_mitre_findings: no technique_id leaves the technique_ids agg unscoped 
   const req = buildIndexer({});
   assert.deepEqual(techniqueIdsTerms(req), {
     field: 'wazuh.rule.mitre.technique.id',
-    size: ANSWER_BUCKET_CAP,
+    size: BREAKDOWN_BUCKET_CAP,
   });
 });
 
 test('get_mitre_findings: a bare parent id scopes technique_ids via include to itself + sub-techniques', () => {
   // Issue: wazuh.rule.mitre.technique.id is a keyword ARRAY, so a document commonly carries
   // several co-tagged ids besides the one the user asked about (live evidence: a single finding
-  // tagged with six ids across three tactics). Those co-tags compete for the same bucket slots
-  // and can silently push the requested id's own parent/sub-technique buckets out of the list
-  // -- this `include` pattern is what stops that by excluding
+  // tagged with six ids across three tactics). Those co-tags compete for the same
+  // BREAKDOWN_BUCKET_CAP (5) slots and can silently push the requested id's own parent/sub-
+  // technique buckets out of the top 5 -- this `include` pattern is what stops that by excluding
   // every other id family from the aggregation's candidate set entirely.
   const req = buildIndexer({ technique_id: 'T1059' });
   const terms = techniqueIdsTerms(req);
   assert.equal(terms.field, 'wazuh.rule.mitre.technique.id');
-  assert.equal(terms.size, ANSWER_BUCKET_CAP);
+  assert.equal(terms.size, BREAKDOWN_BUCKET_CAP);
   assert.equal(terms.include, 'T1059(\\..*)?');
 });
 
@@ -133,7 +133,7 @@ test('get_mitre_findings: a non-ATT&CK-shaped id (defensive fallback) scopes to 
 
 test('get_mitre_findings: co-tagged ids cannot crowd the requested id out of the bucket cap', () => {
   // The defect this fix closes, made concrete: without `include`, a co-tag-heavy population fills
-  // every bucket slot with OTHER technique families before the requested id's own
+  // all BREAKDOWN_BUCKET_CAP (5) slots with OTHER technique families before the requested id's own
   // buckets are considered, and the sub-technique split silently never appears. With `include`
   // scoping the aggregation's candidate set to the requested family up front, co-tags can never be
   // bucketed at all, so they cannot occupy a slot regardless of how many co-tagged documents exist.

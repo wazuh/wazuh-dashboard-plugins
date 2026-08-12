@@ -7,6 +7,58 @@ import { IndexerRequest } from '../types';
 import { applySafetyValves, lintDsl } from '../guardrails';
 import { BREAKDOWN_BUCKET_CAP } from '../digest';
 
+type ResolveParamsContext = Parameters<
+  NonNullable<typeof getAgentInventoryTool.resolveParams>
+>[1];
+type ResolveParamsRequest = Parameters<
+  NonNullable<typeof getAgentInventoryTool.resolveParams>
+>[2];
+
+/** Minimal `context` stub for `resolveParams` (issue #8913's `resolveDeicticAgentParams`), same
+ * pattern as api-host.test.ts's own `fakeContext`: only the two members that function actually
+ * reads (`wazuh_core.manageHosts.get` -- via `resolveApiHostId` -- and
+ * `wazuh_core.api.client.asCurrentUser.request`) are stubbed. `agents` becomes the Manager API's
+ * `/agents` response shape (`{data: {affected_items, total_affected_items}}`); `undefined` means
+ * "the lookup call itself throws", simulating a Manager API failure. */
+function fakeContext(
+  agents:
+    | { items: Array<{ id: string; name?: string }>; total?: number }
+    | undefined,
+): ResolveParamsContext {
+  return {
+    wazuh_core: {
+      manageHosts: {
+        get: () => Promise.resolve([{ id: 'host-1' }]),
+      },
+      api: {
+        client: {
+          asCurrentUser: {
+            request: () => {
+              if (agents === undefined) {
+                throw new Error('simulated Manager API failure');
+              }
+              return Promise.resolve({
+                status: 200,
+                data: {
+                  data: {
+                    affected_items: agents.items,
+                    total_affected_items: agents.total ?? agents.items.length,
+                  },
+                },
+              });
+            },
+          },
+        },
+      },
+    },
+  } as unknown as ResolveParamsContext;
+}
+
+/** Minimal `request` stub: only `request.headers.cookie` is ever read (via `resolveApiHostId`). */
+function fakeRequest(): ResolveParamsRequest {
+  return { headers: {} } as unknown as ResolveParamsRequest;
+}
+
 /**
  * Unit tests for get_agent_inventory (issue: "Consolidate agent inventory into one tool"), which
  * replaces get_agent_os/get_agent_packages/get_agent_ports/get_agent_processes. The regression
@@ -49,6 +101,43 @@ test('get_agent_inventory: an unrecognized kind is rejected', () => {
   assert.throws(
     () => getAgentInventoryTool.buildRequest({ agent_id: '003' }),
     /kind/,
+  );
+});
+
+// --- issue #8913 (diagnostic follow-up): a live diagnostic run (branch diag/8913-router-logging)
+// proved stage-1 routing correctly offered this tool every time for a deictic inventory question,
+// but the tool's OWN description (and the system prompt) told the model to "call get_agents
+// first" -- a tool the router does not also offer for a lone 'inventory' route -- so the model
+// could not comply and never called this tool either. These assertions pin the reworded
+// description/params so a future edit cannot silently reintroduce that dead-end instruction. ---
+
+test('get_agent_inventory: description tells the model to call this tool directly for a deictic reference, not get_agents first', () => {
+  const { description } = getAgentInventoryTool.spec;
+  assert.match(
+    description,
+    /call THIS TOOL DIRECTLY with BOTH\s+omitted -- do not call get_agents first/,
+  );
+  assert.doesNotMatch(description, /call get_agents first to look/);
+});
+
+test('get_agent_inventory: agent_id/agent_name param descriptions document the deictic auto-resolution, not a hard requirement', () => {
+  const { agent_id: agentId, agent_name: agentName } = getAgentInventoryTool
+    .spec.parameters.properties as unknown as {
+    agent_id: { description?: string };
+    agent_name: { description?: string };
+  };
+  assert.match(
+    agentId.description ?? '',
+    /resolves to the only active agent automatically/,
+  );
+  assert.match(
+    agentName.description ?? '',
+    /resolves to the only active agent automatically/,
+  );
+  assert.doesNotMatch(agentId.description ?? '', /is required\.?$/);
+  assert.doesNotMatch(
+    agentName.description ?? '',
+    /^Either this or agent_id is required/,
   );
 });
 
@@ -153,14 +242,13 @@ test('get_agent_inventory: kind="packages" matches get_agent_packages\'s origina
   });
 });
 
-// --- Issue #8920 item 1 (population-disclosure): "ports" now also carries a real breakdown
-// aggregation, so its body is get_agent_ports's original query/_source/sort/size PLUS the new
-// `aggs` clause -- everything else stays byte-identical. "processes"/"packages" take the
-// digest-level breakdownDimensions fallback instead (no aggregation-mapping evidence for their
-// fields -- see InventoryKindConfig.breakdownAggs' doc comment), so their bodies stay exactly
-// the folded-in originals. ---
-
-test('get_agent_inventory: kind="ports" matches get_agent_ports\'s original body, plus the new interface.state/network.transport breakdown aggs', () => {
+test('get_agent_inventory: kind="ports" matches get_agent_ports\'s original body, field CONTENTS unchanged, order intentionally reordered', () => {
+  // The original assertion pinned get_agent_ports's order; issue #8921's column-budget item
+  // deliberately re-ordered `_source` (its order drives digest.ts's deriveResultColumns, which
+  // decides which 6 of these 8 fields the client's visible-column budget shows without a
+  // row-expander click). NOTE: assert.deepEqual on an array is still ORDER-SENSITIVE — this
+  // test pins the NEW exact order (contents unchanged from the original set), it has not been
+  // relaxed to an order-insensitive check.
   const req = buildIndexer({ agent_id: '003', kind: 'ports' });
   assert.deepEqual(req, {
     target: 'indexer',
@@ -168,13 +256,13 @@ test('get_agent_inventory: kind="ports" matches get_agent_ports\'s original body
     body: {
       query: { bool: { filter: [{ term: { 'wazuh.agent.id': '003' } }] } },
       _source: [
-        'source.ip',
         'source.port',
-        'destination.ip',
-        'destination.port',
-        'network.transport',
         'interface.state',
         'process.name',
+        'network.transport',
+        'destination.ip',
+        'source.ip',
+        'destination.port',
         'process.pid',
       ],
       sort: ['_doc'],
@@ -320,4 +408,497 @@ test('get_agent_inventory: deriveColumns is set (no static tableSpec/digest for 
   assert.equal(getAgentInventoryTool.deriveColumns, true);
   assert.deepEqual(getAgentInventoryTool.tableSpec.columns, []);
   assert.deepEqual(getAgentInventoryTool.digest.sampleColumns, []);
+});
+
+// --- issue #8913: a live-verified N=5 run of "What software does this box have installed?" found
+// the system prompt's "call get_agents first" instruction was followed 0/5 times even though the
+// deployed prompt text carried it (4/5 asked the user to name an agent; 1/5 called the wrong tool
+// and found nothing). resolveDeicticAgentParams (this tool's `resolveParams` hook) makes
+// correctness independent of that compliance by resolving the agent server-side whenever neither
+// identifier was supplied. ---
+
+function resolveParams(
+  params: Record<string, unknown>,
+  context: ResolveParamsContext,
+) {
+  return getAgentInventoryTool.resolveParams!(params, context, fakeRequest());
+}
+
+test('get_agent_inventory resolveParams: no identifier + exactly one active agent resolves and surfaces the assumption', async () => {
+  const context = fakeContext({ items: [{ id: '003', name: 'web-prod-01' }] });
+  const result = await resolveParams({ kind: 'packages' }, context);
+  assert.equal(result.ok, true);
+  if (!result.ok) {
+    return;
+  }
+  assert.equal(result.resolved.params.agent_id, '003');
+  // The original params are otherwise untouched -- only agent_id is added.
+  assert.equal(result.resolved.params.kind, 'packages');
+  assert.ok(result.resolved.note, 'expected an assumption note to be attached');
+  assert.match(result.resolved.note!, /web-prod-01/);
+  assert.match(result.resolved.note!, /003/);
+});
+
+test('get_agent_inventory resolveParams: no identifier + zero active agents returns the "which agent?" error', async () => {
+  const context = fakeContext({ items: [] });
+  const result = await resolveParams({ kind: 'packages' }, context);
+  assert.equal(result.ok, false);
+  if (result.ok) {
+    return;
+  }
+  assert.match(result.reason, /agent_id.*agent_name|agent_name.*agent_id/);
+  assert.match(result.reason, /no active agent/i);
+  // Follow-up audit fix (same bug class as #8913's main fix): this LIVE tool_result error must
+  // never tell the model to call get_agents -- stage-1 routing offered get_agent_inventory (its
+  // own 'inventory' category) for this call to have happened at all, but nothing guarantees
+  // 'agents' was ALSO routed this turn, so naming that tool here can be just as unreachable as it
+  // was in the description/system-prompt text this whole fix started from.
+  assert.doesNotMatch(result.reason, /get_agents/);
+  assert.match(result.reason, /ask the user/i);
+});
+
+test('get_agent_inventory resolveParams: no identifier + multiple active agents errors and lists candidates', async () => {
+  const context = fakeContext({
+    items: [
+      { id: '001', name: 'web-prod-01' },
+      { id: '002', name: 'db-prod-01' },
+    ],
+  });
+  const result = await resolveParams({ kind: 'packages' }, context);
+  assert.equal(result.ok, false);
+  if (result.ok) {
+    return;
+  }
+  assert.match(result.reason, /agent_id.*agent_name|agent_name.*agent_id/);
+  assert.match(result.reason, /web-prod-01/);
+  assert.match(result.reason, /db-prod-01/);
+  assert.match(result.reason, /2 active agents/);
+});
+
+test('get_agent_inventory resolveParams: more active agents than the listing cap reports how many more', async () => {
+  const items = Array.from({ length: 15 }, (_, i) => ({
+    id: String(100 + i).padStart(3, '0'),
+    name: `agent-${i}`,
+  }));
+  const context = fakeContext({ items });
+  const result = await resolveParams({ kind: 'packages' }, context);
+  assert.equal(result.ok, false);
+  if (result.ok) {
+    return;
+  }
+  assert.match(result.reason, /15 active agents/);
+  assert.match(result.reason, /and \d+ more/);
+});
+
+test('get_agent_inventory resolveParams: a lookup failure (Manager API unreachable) falls back to the plain "which agent?" error', async () => {
+  const context = fakeContext(undefined);
+  const result = await resolveParams({ kind: 'packages' }, context);
+  assert.equal(result.ok, false);
+  if (result.ok) {
+    return;
+  }
+  assert.match(result.reason, /agent_id.*agent_name|agent_name.*agent_id/);
+  // Same follow-up audit fix as the zero-active-agents case above.
+  assert.doesNotMatch(result.reason, /get_agents/);
+});
+
+test('get_agent_inventory resolveParams: agent_id supplied is returned unchanged, no lookup, no note (regression)', async () => {
+  let lookupCalled = false;
+  const context = {
+    wazuh_core: {
+      manageHosts: {
+        get: () => Promise.reject(new Error('should not be called')),
+      },
+      api: {
+        client: {
+          asCurrentUser: {
+            request: () => {
+              lookupCalled = true;
+              return Promise.reject(new Error('should not be called'));
+            },
+          },
+        },
+      },
+    },
+  } as unknown as ResolveParamsContext;
+  const result = await resolveParams(
+    { agent_id: '003', kind: 'packages' },
+    context,
+  );
+  assert.equal(result.ok, true);
+  if (!result.ok) {
+    return;
+  }
+  assert.deepEqual(result.resolved.params, {
+    agent_id: '003',
+    kind: 'packages',
+  });
+  assert.equal(result.resolved.note, undefined);
+  assert.equal(lookupCalled, false);
+});
+
+test('get_agent_inventory resolveParams: agent_name supplied is returned unchanged, no lookup, no note (regression)', async () => {
+  const context = {
+    wazuh_core: {
+      manageHosts: {
+        get: () => Promise.reject(new Error('should not be called')),
+      },
+      api: {
+        client: {
+          asCurrentUser: {
+            request: () => Promise.reject(new Error('should not be called')),
+          },
+        },
+      },
+    },
+  } as unknown as ResolveParamsContext;
+  const result = await resolveParams(
+    { agent_name: 'web-prod-01', kind: 'packages' },
+    context,
+  );
+  assert.equal(result.ok, true);
+  if (!result.ok) {
+    return;
+  }
+  assert.deepEqual(result.resolved.params, {
+    agent_name: 'web-prod-01',
+    kind: 'packages',
+  });
+  assert.equal(result.resolved.note, undefined);
+});
+
+// Issue #8917: `failClosedFieldPolicy` must be set explicitly and independently of
+// `deriveColumns` -- see that flag's doc comment in types.ts. This tool needs `deriveColumns` for
+// column derivation across its 5 kinds, and separately opts into fail-closed field policy because
+// every field any kind can surface still needs its own explicit FIELD_POLICY_DEFAULTS entry.
+test('get_agent_inventory: failClosedFieldPolicy is explicitly true, independent of deriveColumns', () => {
+  assert.equal(getAgentInventoryTool.failClosedFieldPolicy, true);
+});
+
+// --- issue #8910: an optional "filter" narrows results on the kind's primary name field, so
+// presence questions ("is openssl installed?", "what's on port 9200?") no longer depend on the
+// answer sorting into the first `limit` rows of a possibly much larger inventory. ---
+
+test('get_agent_inventory: "filter" is an optional string param in the schema', () => {
+  const filterProperty = getAgentInventoryTool.spec.parameters.properties
+    .filter as unknown as { type?: string };
+  assert.equal(filterProperty.type, 'string');
+  assert.ok(
+    !(getAgentInventoryTool.spec.parameters.required ?? []).includes('filter'),
+    'filter must not be required',
+  );
+});
+
+test('get_agent_inventory: omitting "filter" leaves the request body unchanged (regression)', () => {
+  const req = buildIndexer({ agent_id: '003', kind: 'packages' });
+  assert.deepEqual(req.body.query, {
+    bool: { filter: [{ term: { 'wazuh.agent.id': '003' } }] },
+  });
+});
+
+test('get_agent_inventory: kind="packages" filter narrows on package.name, case-insensitive prefix', () => {
+  const req = buildIndexer({
+    agent_id: '003',
+    kind: 'packages',
+    filter: 'openssl',
+  });
+  assert.deepEqual(req.body.query, {
+    bool: {
+      filter: [
+        { term: { 'wazuh.agent.id': '003' } },
+        {
+          wildcard: {
+            'package.name': { value: 'openssl*', case_insensitive: true },
+          },
+        },
+      ],
+    },
+  });
+});
+
+test('get_agent_inventory: kind="hotfixes" filter narrows on package.hotfix.name', () => {
+  const req = buildIndexer({
+    agent_id: '003',
+    kind: 'hotfixes',
+    filter: 'KB5001',
+  });
+  assert.deepEqual(req.body.query, {
+    bool: {
+      filter: [
+        { term: { 'wazuh.agent.id': '003' } },
+        {
+          wildcard: {
+            'package.hotfix.name': {
+              value: 'KB5001*',
+              case_insensitive: true,
+            },
+          },
+        },
+      ],
+    },
+  });
+});
+
+test('get_agent_inventory: kind="processes" filter matches either process.name or process.command_line', () => {
+  const req = buildIndexer({
+    agent_id: '003',
+    kind: 'processes',
+    filter: 'nginx',
+  });
+  assert.deepEqual(req.body.query, {
+    bool: {
+      filter: [
+        { term: { 'wazuh.agent.id': '003' } },
+        {
+          bool: {
+            should: [
+              {
+                wildcard: {
+                  'process.name': { value: 'nginx*', case_insensitive: true },
+                },
+              },
+              {
+                wildcard: {
+                  'process.command_line': {
+                    value: 'nginx*',
+                    case_insensitive: true,
+                  },
+                },
+              },
+            ],
+            minimum_should_match: 1,
+          },
+        },
+      ],
+    },
+  });
+});
+
+test('get_agent_inventory: kind="os" filter matches either host.hostname or host.os.name', () => {
+  const req = buildIndexer({
+    agent_id: '003',
+    kind: 'os',
+    filter: 'web-prod-01',
+  });
+  assert.deepEqual(req.body.query, {
+    bool: {
+      filter: [
+        { term: { 'wazuh.agent.id': '003' } },
+        {
+          bool: {
+            should: [
+              {
+                wildcard: {
+                  'host.hostname': {
+                    value: 'web-prod-01*',
+                    case_insensitive: true,
+                  },
+                },
+              },
+              {
+                wildcard: {
+                  'host.os.name': {
+                    value: 'web-prod-01*',
+                    case_insensitive: true,
+                  },
+                },
+              },
+            ],
+            minimum_should_match: 1,
+          },
+        },
+      ],
+    },
+  });
+});
+
+// #8914: a numeric ports filter matched EITHER side of the socket with no state narrowing, so
+// "what's listening on port 9200" returned every connection touching 9200 instead of just the
+// listener(s). The outer clause narrowed here: still a port match on EITHER side (`bool.filter`
+// unchanged in spirit), AND (via a nested `bool.should`/`minimum_should_match: 1`) either
+// `interface.state` case-insensitively matches "listening"/"listen" or the field is absent from
+// that document -- the graceful fallback so a deployment/document without `interface.state` still
+// gets the plain port match back instead of the query going silently empty.
+//
+// The exact clause shape (`term` with `{value, case_insensitive: true}`, not a bare string) is
+// pinned here on purpose: a live query against a real wazuh-indexer deployment (issue #8914)
+// found the actual `interface.state` vocabulary is lowercase full words ("listening",
+// "established", "time_wait", "close_wait") -- NOT the "LISTEN"/"ESTABLISHED" short forms
+// plugins/main's synthetic sample-data generator uses. An exact-cased `term: {'interface.state':
+// 'LISTEN'}` (this file's previous revision) never matches real "listening" documents, so this
+// test's assertion on the case-insensitive shape is what would catch a future regression back to
+// an exact-cased term.
+test('get_agent_inventory: kind="ports" numeric filter matches the port on either side AND prefers the listening state', () => {
+  const req = buildIndexer({
+    agent_id: '003',
+    kind: 'ports',
+    filter: '9200',
+  });
+  assert.deepEqual(req.body.query, {
+    bool: {
+      filter: [
+        { term: { 'wazuh.agent.id': '003' } },
+        {
+          bool: {
+            filter: [
+              {
+                bool: {
+                  should: [
+                    { term: { 'source.port': 9200 } },
+                    { term: { 'destination.port': 9200 } },
+                  ],
+                  minimum_should_match: 1,
+                },
+              },
+            ],
+            should: [
+              {
+                term: {
+                  'interface.state': {
+                    value: 'listening',
+                    case_insensitive: true,
+                  },
+                },
+              },
+              {
+                term: {
+                  'interface.state': {
+                    value: 'listen',
+                    case_insensitive: true,
+                  },
+                },
+              },
+              { bool: { must_not: { exists: { field: 'interface.state' } } } },
+            ],
+            minimum_should_match: 1,
+          },
+        },
+      ],
+    },
+  });
+});
+
+// Pins the case-insensitivity specifically (issue #8914's live-verified defect): the live
+// `wazuh-states-inventory-ports*` vocabulary is lowercase ("listening"), so a `term` clause
+// without `case_insensitive: true` -- or one restored to an exact-cased literal like "LISTEN" or
+// "Listening" -- must fail this assertion loudly rather than silently reintroducing the bug.
+test('get_agent_inventory: kind="ports" listening-state match is case-insensitive, not an exact-cased literal', () => {
+  const req = buildIndexer({
+    agent_id: '003',
+    kind: 'ports',
+    filter: '9200',
+  });
+  const portFilterClause = (req.body.query as { bool: { filter: unknown[] } })
+    .bool.filter[1] as {
+    bool: {
+      should: Array<Record<string, unknown>>;
+      minimum_should_match: number;
+    };
+  };
+  const stateClauses = portFilterClause.bool.should.filter(
+    clause => 'term' in clause,
+  ) as Array<{
+    term: { 'interface.state': { value: string; case_insensitive: boolean } };
+  }>;
+  assert.ok(
+    stateClauses.length > 0,
+    'expected at least one "term" clause on interface.state',
+  );
+  for (const clause of stateClauses) {
+    const termValue = clause.term['interface.state'];
+    assert.equal(
+      typeof termValue,
+      'object',
+      'interface.state term clause must use the {value, case_insensitive} object form, not a bare string',
+    );
+    assert.equal(termValue.case_insensitive, true);
+  }
+  const matchedValues = stateClauses.map(
+    clause => clause.term['interface.state'].value,
+  );
+  assert.ok(
+    matchedValues.includes('listening'),
+    'must match the live-confirmed "listening" value',
+  );
+});
+
+test('get_agent_inventory: kind="ports" numeric filter still returns a document lacking "interface.state" (fallback)', () => {
+  // Same request as above -- this test documents the query SHAPE's fallback behavior (a document
+  // with no "interface.state" field satisfies the "must_not: exists" should-clause, so it is not
+  // excluded by the state narrowing), since this is a static request-building test with no live
+  // Indexer to execute the query against.
+  const req = buildIndexer({
+    agent_id: '003',
+    kind: 'ports',
+    filter: '9200',
+  });
+  const portFilterClause = (req.body.query as { bool: { filter: unknown[] } })
+    .bool.filter[1] as {
+    bool: { should: unknown[]; minimum_should_match: number };
+  };
+  assert.deepEqual(
+    portFilterClause.bool.should[portFilterClause.bool.should.length - 1],
+    {
+      bool: { must_not: { exists: { field: 'interface.state' } } },
+    },
+  );
+  assert.equal(portFilterClause.bool.minimum_should_match, 1);
+});
+
+test('get_agent_inventory: kind="ports" a non-numeric filter falls back to a process.name match', () => {
+  const req = buildIndexer({
+    agent_id: '003',
+    kind: 'ports',
+    filter: 'nginx',
+  });
+  assert.deepEqual(req.body.query, {
+    bool: {
+      filter: [
+        { term: { 'wazuh.agent.id': '003' } },
+        {
+          wildcard: {
+            'process.name': { value: 'nginx*', case_insensitive: true },
+          },
+        },
+      ],
+    },
+  });
+});
+
+test('get_agent_inventory: filter value is sanitized so a caller-supplied "*"/"?" cannot produce a leading wildcard', () => {
+  const req = buildIndexer({
+    agent_id: '003',
+    kind: 'packages',
+    filter: '*ssl?',
+  });
+  assert.deepEqual(req.body.query, {
+    bool: {
+      filter: [
+        { term: { 'wazuh.agent.id': '003' } },
+        {
+          wildcard: {
+            'package.name': { value: 'ssl*', case_insensitive: true },
+          },
+        },
+      ],
+    },
+  });
+});
+
+test('get_agent_inventory: a blank/whitespace-only filter is treated as omitted', () => {
+  const req = buildIndexer({
+    agent_id: '003',
+    kind: 'packages',
+    filter: '   ',
+  });
+  assert.deepEqual(req.body.query, {
+    bool: { filter: [{ term: { 'wazuh.agent.id': '003' } }] },
+  });
+});
+
+test('get_agent_inventory: description advertises "filter" for presence questions (routing guidance)', () => {
+  assert.match(
+    getAgentInventoryTool.spec.description,
+    /check whether one specific package\/port\/process is present.*pass "filter"/,
+  );
 });

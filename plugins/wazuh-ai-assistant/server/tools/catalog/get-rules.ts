@@ -168,11 +168,14 @@ export const getRulesTool: ToolDefinition = {
       { field: 'document.status', label: 'Status' },
       { field: 'document.enabled', label: 'Enabled' },
       { field: 'document.mitre.technique.id', label: 'Technique' },
-      { field: 'document.tags', label: 'Tags' },
       // Content is namespaced across draft/test/custom/standard spaces (confirmed live) -- shown
-      // as its own column so a mixed-space result set is visibly mixed, which matters directly for
-      // `buildSecurityAnalyticsLink`'s single-space-per-table link.
+      // as its own column so a mixed-space result set is visibly mixed, which matters directly
+      // for `buildSecurityAnalyticsLink`'s single-space-per-table link. Under the client's
+      // MAX_VISIBLE_RESULT_COLUMNS budget (issue #8921) Space must therefore sit INSIDE the
+      // visible 6; Tags — a long multi-value array better read in the row expander anyway — is
+      // the column demoted to position 7 (not deleted: still queried, still in every row).
       { field: 'space.name', label: 'Space' },
+      { field: 'document.tags', label: 'Tags' },
     ],
     // document.detection (the raw Sigma detection tree) is `object,enabled:false` in the live
     // mapping: not indexed, so it can never be filtered/sorted/aggregated, only retrieved as an

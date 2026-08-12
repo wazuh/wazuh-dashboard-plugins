@@ -165,10 +165,9 @@ test('get_sca_checks: always attaches a population-true check.result breakdown a
   });
 });
 
-test('get_sca_checks: the breakdown aggregation rides along with a bare (no result/search) call', () => {
-  // Regression pin: this is the ONE call shape #8935 item I2 must leave byte-identical --
-  // no `result` and no `search` means no `matching_checks` agg at all, same two-key `aggs` as
-  // before this item existed.
+test('get_sca_checks: the breakdown aggregation rides along with limit alone', () => {
+  // result+search together are covered by the #8935 scoped-enumeration tests below, which
+  // deliberately replace this agg with a scoped enumeration in that case.
   const withLimitOnly = buildIndexer({
     agent_id: '000',
     policy_id: 'cis_ubuntu22-04',

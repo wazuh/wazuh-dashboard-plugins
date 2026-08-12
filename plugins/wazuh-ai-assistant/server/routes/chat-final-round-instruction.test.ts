@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { ChatMessage } from '../../common/types';
 import {
   FINAL_ROUND_ANSWER_INSTRUCTION,
+  shouldEnterFinalRoundEarly,
   withFinalRoundAnswerInstruction,
 } from './chat';
 
@@ -88,6 +89,60 @@ test('withFinalRoundAnswerInstruction: never mutates the caller array', () => {
   assert.ok(
     !messages.some(m => m.content === FINAL_ROUND_ANSWER_INSTRUCTION),
     'the instruction must not end up in the source-of-truth array',
+  );
+});
+
+// --- shouldEnterFinalRoundEarly (issue #8911) --------------------------------------------------
+//
+// A tool round with only rejected/errored calls burns the same round budget as a productive one.
+// `shouldEnterFinalRoundEarly` decides whether the round that just finished should make the NEXT
+// round the final one early, instead of letting the model keep re-guessing a query shape that can
+// never succeed. Kept pure, same reasoning as `withFinalRoundAnswerInstruction` above, so these
+// three scenarios are testable without a fake `orchestrate` run.
+
+test('shouldEnterFinalRoundEarly: an all-rejected round that follows an earlier successful round enters the final round early', () => {
+  assert.equal(
+    shouldEnterFinalRoundEarly(
+      /* roundHadToolCalls */ true,
+      /* roundHadSuccess */ false,
+      /* hadSuccessfulRoundEarlier */ true,
+    ),
+    true,
+  );
+});
+
+test('shouldEnterFinalRoundEarly: an all-rejected FIRST round keeps its retry budget (no earlier success yet)', () => {
+  // The model may legitimately be fixing its own call on the very next round — only a fully-rejected
+  // round AFTER an earlier success is treated as "stuck", not a turn's opening attempt.
+  assert.equal(
+    shouldEnterFinalRoundEarly(
+      /* roundHadToolCalls */ true,
+      /* roundHadSuccess */ false,
+      /* hadSuccessfulRoundEarlier */ false,
+    ),
+    false,
+  );
+});
+
+test('shouldEnterFinalRoundEarly: a mixed round (at least one success) never forces the final round early', () => {
+  assert.equal(
+    shouldEnterFinalRoundEarly(
+      /* roundHadToolCalls */ true,
+      /* roundHadSuccess */ true,
+      /* hadSuccessfulRoundEarlier */ true,
+    ),
+    false,
+  );
+});
+
+test('shouldEnterFinalRoundEarly: a round with no tool calls at all never forces the final round early', () => {
+  assert.equal(
+    shouldEnterFinalRoundEarly(
+      /* roundHadToolCalls */ false,
+      /* roundHadSuccess */ false,
+      /* hadSuccessfulRoundEarlier */ true,
+    ),
+    false,
   );
 });
 

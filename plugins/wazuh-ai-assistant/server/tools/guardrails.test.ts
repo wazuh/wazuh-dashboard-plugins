@@ -196,6 +196,38 @@ test('lintDsl: steers a "prefix" clause on a vulnerability field away from the f
   }
 });
 
+// Cross-category tool audit (same bug shape as issue #8913): this reason reaches the model via
+// search_wazuh_data/find_document_by_field (`free_search`, always offered), but the four tools it
+// used to name unconditionally live in the separate `vulnerabilities` category, which is not
+// guaranteed to be offered on the same turn. Pins the conditional wording and the explicit
+// no-tools-available fallback so a future edit cannot silently reintroduce an unconditional
+// "use the vulnerability tools" instruction naming a tool set that may not exist this turn.
+test('lintDsl: the vulnerability-field steering reason is conditional on those tools being offered, not unconditional', () => {
+  const body = {
+    query: {
+      bool: {
+        filter: [
+          { range: { '@timestamp': { gte: 'now-1d', lte: 'now' } } },
+          { term: { 'vulnerability.severity': 'Critical' } },
+        ],
+      },
+    },
+    size: 20,
+  };
+  const result = lintDsl(body, 'wazuh-events-v5-*');
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.match(
+      result.reason,
+      /whichever of those is offered to you this\s+turn/,
+    );
+    assert.match(
+      result.reason,
+      /If none of them\s+are available to you this turn, tell the user this assistant cannot check\s+vulnerability data\s+from here/,
+    );
+  }
+});
+
 test('lintDsl: a "prefix" clause on a non-vulnerability field is unaffected by the steering check', () => {
   const body = {
     query: {
@@ -649,6 +681,93 @@ test('lintDsl: rejects composite.size over 100', () => {
   }
 });
 
+test('lintDsl: passes composite with only "terms" sources on allowlisted fields', () => {
+  const wrapped = {
+    query: timeBoundedFilter(),
+    aggs: {
+      c: {
+        composite: {
+          size: 20,
+          sources: [
+            { agent: { terms: { field: WAZUH_FIELD.AGENT_ID } } },
+            { ip: { terms: { field: 'source.ip' } } },
+          ],
+        },
+      },
+    },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, true);
+});
+
+test('lintDsl: rejects a composite source whose type is not "terms" (e.g. histogram)', () => {
+  // Closes a gap: only a `terms` composite source was ever field/allowlist-checked, so a
+  // `histogram`/`date_histogram`/`geotile_grid` source's field was never checked against
+  // AGG_FIELD_ALLOWLIST at all -- rejected outright now, rather than silently letting an
+  // unchecked-cardinality field's bucket component through.
+  const wrapped = {
+    query: timeBoundedFilter(),
+    aggs: {
+      c: {
+        composite: {
+          size: 20,
+          sources: [
+            { agent: { terms: { field: WAZUH_FIELD.AGENT_ID } } },
+            {
+              bucket: {
+                histogram: { field: 'vulnerability.score.base', interval: 1 },
+              },
+            },
+          ],
+        },
+      },
+    },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.equal(
+      result.reason,
+      'Composite source type "histogram" is not allowed; only "terms" composite ' +
+        'sources are supported.',
+    );
+  }
+});
+
+test('lintDsl: rejects a composite source of type date_histogram, naming it in the reason', () => {
+  const wrapped = {
+    query: timeBoundedFilter(),
+    aggs: {
+      c: {
+        composite: {
+          size: 20,
+          sources: [
+            {
+              bucket: {
+                date_histogram: {
+                  field: '@timestamp',
+                  calendar_interval: '1d',
+                },
+              },
+            },
+          ],
+        },
+      },
+    },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.match(
+      result.reason,
+      /Composite source type "date_histogram" is not allowed/,
+    );
+  }
+});
+
 // top_hits had no size cap at all -- a nested
 // `{aggs:{sample:{top_hits:{size:10000}}}}` passed every other check and asked the cluster to
 // materialize up to (outer terms size) x 10000 documents.
@@ -743,6 +862,103 @@ test("lintDsl: passes a terms aggregation on wazuh.integration.category (get_sec
   };
   const result = lintDsl(wrapped, 'wazuh-findings-v5*');
   assert.equal(result.ok, true);
+});
+
+test('lintDsl: passes a terms aggregation on package.name (states inventory-packages pivot)', () => {
+  // Regression: entity-pivot allowlist extension for get_top_agents-adjacent "top package"
+  // questions -- package.name is wazuh-states-inventory-packages-only (not on findings-v5/
+  // events-v5 at all), see get-agent-packages.ts's `_source` list. wazuh-states-* is exempt from
+  // the mandatory time-range check, so no time filter is needed here.
+  const wrapped = {
+    query: { match_all: {} },
+    aggs: { by_package: { terms: { field: 'package.name', size: 20 } } },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-states-inventory-packages-*');
+  assert.equal(result.ok, true);
+});
+
+test('lintDsl: passes a terms aggregation on host.os.name and host.os.platform (states OS pivot)', () => {
+  // Regression: entity-pivot allowlist extension for "top OS/platform" questions -- both fields
+  // are wazuh-states-inventory-system-only, see get-agent-os.ts's `_source` list.
+  const byName = {
+    query: { match_all: {} },
+    aggs: { by_os: { terms: { field: 'host.os.name', size: 20 } } },
+    size: 0,
+  };
+  const byPlatform = {
+    query: { match_all: {} },
+    aggs: { by_platform: { terms: { field: 'host.os.platform', size: 20 } } },
+    size: 0,
+  };
+  assert.equal(lintDsl(byName, 'wazuh-states-inventory-system-*').ok, true);
+  assert.equal(lintDsl(byPlatform, 'wazuh-states-inventory-system-*').ok, true);
+});
+
+test('lintDsl: passes a terms aggregation on wazuh.agent.id against wazuh-events-v5 (agent pivot, already allowlisted)', () => {
+  // Regression: confirms the agent pivot is reachable on events-v5 too -- WAZUH_FIELD.AGENT_ID is
+  // a flat, non-index-scoped allowlist entry (checkAggs has no `index` argument), and
+  // wazuh.agent.id/wazuh.agent.name are the same field names on events-v5 as on findings-v5 (see
+  // get-events-by-agent.ts), so no new allowlist entry was needed for this pivot specifically.
+  const wrapped = {
+    query: timeBoundedFilter({ gte: 'now-1d', lte: 'now' }),
+    aggs: {
+      by_agent: { terms: { field: WAZUH_FIELD.AGENT_ID, size: 10 } },
+    },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-events-v5-*');
+  assert.equal(result.ok, true);
+});
+
+test('lintDsl: still rejects a non-allowlisted events-v5 field (e.g. a hand-built high-cardinality pivot)', () => {
+  // Negative counterpart to the allowlist extension above: a field genuinely absent from
+  // AGG_FIELD_ALLOWLIST must still be rejected on events-v5, proving the extension did not widen
+  // the check into a blanket "any field on this index family" pass.
+  const wrapped = {
+    query: timeBoundedFilter({ gte: 'now-1d', lte: 'now' }),
+    aggs: {
+      by_action: { terms: { field: 'event.action', size: 10 } },
+    },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-events-v5-*');
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.match(
+      result.reason,
+      /not on the allowed low-cardinality field list/,
+    );
+  }
+});
+
+test('lintDsl: passes a terms aggregation on source.ip within the size cap (top attacking-IP pivot)', () => {
+  // Positive case for the source.ip allowlist entry (high-cardinality-but-bounded-bucket-safe --
+  // see guardrails.ts's AGG_FIELD_ALLOWLIST comment): a terms agg on source.ip at or under
+  // MAX_AGG_SIZE (100) passes exactly like any other allowlisted field.
+  const wrapped = {
+    query: timeBoundedFilter({ gte: 'now-7d', lte: 'now' }),
+    aggs: { top_source_ips: { terms: { field: 'source.ip', size: 100 } } },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, true);
+});
+
+test('lintDsl: still rejects a source.ip terms agg size over the 100 cap', () => {
+  // Negative case: source.ip's allowlisting does not exempt it from the same size cap every other
+  // allowlisted field is subject to -- being allowlisted only permits the FIELD, never an
+  // oversized bucket count.
+  const wrapped = {
+    query: timeBoundedFilter({ gte: 'now-7d', lte: 'now' }),
+    aggs: { top_source_ips: { terms: { field: 'source.ip', size: 500 } } },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.match(result.reason, /exceeds the maximum/);
+  }
 });
 
 test('lintDsl: rejects a terms agg on a non-allowlisted (high-cardinality) field', () => {
@@ -944,15 +1160,30 @@ test('applySafetyValves: clamps size to <= 500', () => {
   }
 });
 
-test('applySafetyValves: forces track_total_hits regardless of input', () => {
+test('applySafetyValves: forces track_total_hits to true (exact count) regardless of input', () => {
   const result = applySafetyValves({
     query: timeBoundedFilter(),
-    track_total_hits: true,
+    track_total_hits: 100,
     size: 20,
   });
   assert.equal(result.ok, true);
   if (result.ok) {
-    assert.equal(result.body.track_total_hits, 10000);
+    assert.equal(result.body.track_total_hits, true);
+  }
+});
+
+test('applySafetyValves: forces track_total_hits to true even when the query_dsl disables it', () => {
+  // A search_wazuh_data query_dsl setting track_total_hits: false must not be honored -- the
+  // enforced exact-count value always wins, same precedence as every other valve in this
+  // function (size/timeout/etc).
+  const result = applySafetyValves({
+    query: timeBoundedFilter(),
+    track_total_hits: false,
+    size: 20,
+  });
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.equal(result.body.track_total_hits, true);
   }
 });
 

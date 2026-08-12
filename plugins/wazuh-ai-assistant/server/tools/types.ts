@@ -1,4 +1,29 @@
+import {
+  OpenSearchDashboardsRequest,
+  RequestHandlerContext,
+} from '../../../../src/core/server';
 import { ToolSpec } from '../../common/types';
+
+/**
+ * Outcome of an optional `ToolDefinition.resolveParams` hook (see that field's doc comment below;
+ * added for issue #8913). Not itself a `ToolRequest` -- exactly one outbound request still
+ * executes per tool call (`executor.ts`'s `executeToolCall`); this is the result of a live lookup
+ * that happens BEFORE that request is built, used to patch/validate `params`.
+ */
+export interface ResolvedToolParams {
+  /** Params to hand to `buildRequest`, including every original param unchanged plus whatever this
+   * hook resolved (e.g. an inferred `agent_id`). */
+  params: Record<string, unknown>;
+  /** Surfaced to the model via `Digest.assumptionNote` (digest.ts) when a value was inferred
+   * rather than supplied by the caller -- e.g. "no agent was specified; assumed the only active
+   * agent". Omitted when nothing was inferred (every param the hook cared about was already
+   * supplied), so a call that needed no resolution produces no note. */
+  note?: string;
+}
+
+export type ResolveParamsResult =
+  | { ok: true; resolved: ResolvedToolParams }
+  | { ok: false; reason: string };
 
 /**
  * A search executed against the Wazuh Indexer (`context.core.opensearch.client.asCurrentUser`).
@@ -51,6 +76,24 @@ export interface ToolDefinition {
    * orchestration loop turns that into a bounded tool_result error for the model to self-correct.
    */
   buildRequest(params: Record<string, unknown>): ToolRequest;
+  /**
+   * Opt-in async pre-`buildRequest` hook (currently only get_agent_inventory, issue #8913):
+   * resolves/validates params against a live source (e.g. the Manager API's active-agent list)
+   * BEFORE `buildRequest` runs, for a caller that omitted a param `buildRequest` alone has no way
+   * to infer (it is purely synchronous and has no execution context). `executor.ts`'s
+   * `executeToolCall` awaits this immediately after schema validation and before `buildRequest`;
+   * an `{ok:false}` result short-circuits to a bounded tool-result error exactly like a
+   * `buildRequest` throw, and `resolved.note` (when set) is surfaced to the model via
+   * `Digest.assumptionNote`. `undefined` (every other tool) skips this step entirely — params flow
+   * into `buildRequest` unchanged, byte-identical to before this hook existed. Deliberately
+   * separate from `buildRequest` rather than making that async: every other catalog tool's
+   * `buildRequest` stays a pure, synchronous, context-free function.
+   */
+  resolveParams?(
+    params: Record<string, unknown>,
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest,
+  ): Promise<ResolveParamsResult>;
   tableSpec: {
     columns: ToolTableColumnSpec[];
     /**
@@ -97,13 +140,43 @@ export interface ToolDefinition {
     space: string,
   ): { label: string; url: string } | undefined;
   /**
-   * Opt-in escape hatch (currently only `search_wazuh_data`): when true, `tableSpec.columns` and
+   * Opt-in per-kind/arbitrary-shape rendering (currently `search_wazuh_data`,
+   * `find_document_by_field`, and `get_agent_inventory`): when true, `tableSpec.columns` and
    * `digest.sampleColumns` above are ignored (kept as `[]` for type validity — no per-tool schema
    * exists to declare them statically) and digest.ts derives columns per-response instead: from the
    * request's `_source` list, else a capped union of the sample rows' flattened dot-paths. Every
    * other catalog tool leaves this unset, so their static-column path in digest.ts is untouched.
+   *
+   * This flag is ONLY about how columns are computed for the table/digest shape — it says nothing
+   * about how RISKY the tool's field surface is for privacy purposes. See `failClosedFieldPolicy`
+   * below, which used to be silently derived from this one (issue #8917) and must be set
+   * independently.
    */
   deriveColumns?: boolean;
+  /**
+   * Privacy-mode field-policy default for a field with NO `FIELD_POLICY_DEFAULTS` entry (issue
+   * #8917): `true` fails closed (server/tools/privacy.ts's `applyFieldPolicy`, this file's
+   * `isEscapeHatch` argument) pseudonymizes an unlisted string field, kind inferred from its name)
+   * instead of the normal allow-by-omission default every other typed tool gets. `undefined`/
+   * `false` (the default) reproduces today's allow-by-omission behavior.
+   *
+   * Deliberately a SEPARATE flag from `deriveColumns` above, not derived from it. Before #8917
+   * this was `def.deriveColumns` itself, threaded straight into `applyFieldPolicy`'s
+   * `isEscapeHatch` argument at executor.ts's call site — which conflated two unrelated
+   * questions: "does this tool need per-response column derivation" and "can this tool's fields
+   * be an arbitrary, uncurated set that must fail closed by default". `get_agent_inventory` needs
+   * `deriveColumns: true` purely because one `ToolDefinition` cannot declare a single static
+   * column list that is correct for its 5 different `kind`s — but each kind's field list is
+   * itself small, fixed, and fully reviewed (`INVENTORY_KIND_CONFIG` in
+   * catalog/get-agent-inventory.ts), unlike `search_wazuh_data`'s genuinely arbitrary
+   * caller-supplied DSL. Both still set this to `true` today (every field either tool can surface
+   * needs an explicit, reviewed `FIELD_POLICY_DEFAULTS` entry or it fails closed) — the point of
+   * splitting the flag is that a FUTURE `deriveColumns` tool with a truly bounded/curated field
+   * set is no longer forced into fail-closed just by needing per-kind column derivation, and a
+   * future risky tool that does NOT need column derivation can still opt into fail-closed. Set
+   * explicitly per tool; never inferred.
+   */
+  failClosedFieldPolicy?: boolean;
   /**
    * Opt-in (currently only `search_wazuh_data`): when true, executor.ts's `executeIndexerRequest`
    * validates every field name it can extract from the executed body against the target index

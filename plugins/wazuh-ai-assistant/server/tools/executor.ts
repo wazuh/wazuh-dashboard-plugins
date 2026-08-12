@@ -19,6 +19,7 @@ import { buildDigest, buildTableSpec, capDigest, Digest } from './digest';
 import { validateQueryFields } from './field-validation';
 import { IndexerRequest, ManagerRequest, ToolDefinition } from './types';
 import {
+  AggFieldSpec,
   applyFieldPolicy,
   extractAggFields,
   FieldPolicyEntry,
@@ -62,10 +63,14 @@ function finalizeDigest(
   digest: Digest,
   privacy: PrivacyContext | undefined,
   toolName: string,
-  aggFields?: Record<string, string | undefined>,
-  // The escape hatch's deriveColumns can put ARBITRARY finding fields into
-  // the digest, so its unlisted-field default must be fail-closed (anonymize) instead of the
-  // curated typed tools' allow-by-omission — see privacy.ts's applyFieldPolicy.
+  aggFields?: Record<string, AggFieldSpec | undefined>,
+  // Issue #8917: this used to be the calling tool's `deriveColumns` flag, which conflated "needs
+  // per-response column derivation" with "field surface is uncurated enough to fail closed by
+  // default" — see `ToolDefinition.failClosedFieldPolicy`'s doc comment (types.ts) for why the two
+  // are now separate. A tool whose fields can be ARBITRARY (search_wazuh_data,
+  // find_document_by_field) or that folds several kinds' worth of fields into one digest
+  // (get_agent_inventory) sets this so its unlisted-field default is fail-closed (anonymize)
+  // instead of the curated typed tools' allow-by-omission — see privacy.ts's applyFieldPolicy.
   isEscapeHatch = false,
 ): Digest {
   if (!privacy) {
@@ -416,13 +421,16 @@ export function buildDiscoverDsl(
     : query;
 }
 
-/** Executes a validated, guardrail-passed Indexer search and builds its digest + table. */
+/** Executes a validated, guardrail-passed Indexer search and builds its digest + table.
+ * `assumptionNote` (issue #8913) is threaded straight into `buildDigest` -- see that function and
+ * `ToolDefinition.resolveParams`'s doc comments (types.ts) for where it comes from. */
 async function executeIndexerRequest(
   toolName: string,
   indexerRequest: IndexerRequest,
   params: Record<string, unknown>,
   context: RequestHandlerContext,
   privacy?: PrivacyContext,
+  assumptionNote?: string,
 ): Promise<ToolExecutionOutcome> {
   const allowlistCheck = checkIndexAllowlist(indexerRequest.index);
   if (!allowlistCheck.ok) {
@@ -516,7 +524,7 @@ async function executeIndexerRequest(
     // Static-column tools ignore the extra argument entirely. It is ALSO the only place the
     // aggregation fields driving `breakdown` (if any) can be read from — see privacy.ts's
     // `extractAggFields` doc comment — so it is reused for that below when privacy is active.
-    const digest = buildDigest(toolName, result, def, body);
+    const digest = buildDigest(toolName, result, def, body, assumptionNote);
     // Issue #8935 item I4: appended FIRST, before items 3/6 below, so the capped-window fact
     // (when present) precedes any longer window-recount/near-miss probe hint under
     // `MAX_HINT_LENGTH` -- a disclosure that got truncated away by a later, lower-priority hint
@@ -557,19 +565,31 @@ async function executeIndexerRequest(
     // silently letting a hint-inflated digest slip past the cap whenever privacy mode is off.
     capDigest(digest);
     // A `breakdownDimensions`-opted-in tool's synthesized breakdown (digest.ts's
-    // `buildSyntheticBreakdown`) tags each bucket `agg: <dimension field path>` — an IDENTITY map
-    // (dimension -> itself) lets `applyFieldPolicy` below resolve those buckets' field policy the
-    // exact same way it resolves a REAL aggregation's buckets, rather than silently skipping the
-    // scrub because `extractAggFields(body)` (which only ever reads a REAL `aggs` clause) has
-    // nothing to report for a tool — every one of these — that never sends one.
-    const aggFields =
+    // `buildSyntheticBreakdown`) tags each bucket `agg: <dimension field path>` — a map from each
+    // dimension to a SCALAR `AggFieldSpec` naming that same field (a synthesized breakdown is
+    // always one bucket key per dimension, never multi/composite — each dimension in
+    // `breakdownDimensions` is independent) lets `applyFieldPolicy` below resolve those buckets'
+    // field policy the exact same way it resolves a REAL aggregation's buckets, rather than
+    // silently skipping the scrub because `extractAggFields(body)` (which only ever reads a REAL
+    // `aggs` clause) has nothing to report for a tool — every one of these — that never sends one.
+    // NOTE: every current `breakdownDimensions` tool (the 8 finding-hits tools in
+    // catalog/common.ts) ALSO unconditionally attaches a real `aggs` clause
+    // (`FINDING_BREAKDOWN_AGGS`), so `extractAggFields(body)` always resolves first in practice and
+    // this fallback is not exercised today — kept as the documented, type-correct contract for any
+    // future tool that opts into `breakdownDimensions` without a matching real `aggs` clause. A
+    // bare `{dimension: dimension}` STRING identity map here does not satisfy
+    // `Record<string, AggFieldSpec | undefined>` and is a type error the moment this fallback is
+    // actually live.
+    const aggFields: Record<string, AggFieldSpec | undefined> | undefined =
       extractAggFields(body) ??
       (def.digest.breakdownDimensions
         ? Object.fromEntries(
-            def.digest.breakdownDimensions.map(dimension => [
-              dimension,
-              dimension,
-            ]),
+            def.digest.breakdownDimensions.map(
+              (dimension): [string, AggFieldSpec] => [
+                dimension,
+                { kind: 'scalar', field: dimension },
+              ],
+            ),
           )
         : undefined);
     const finalDigest = finalizeDigest(
@@ -577,7 +597,9 @@ async function executeIndexerRequest(
       privacy,
       toolName,
       aggFields,
-      def.deriveColumns,
+      // Issue #8917: was `def.deriveColumns` -- see `ToolDefinition.failClosedFieldPolicy`'s doc
+      // comment (types.ts) for why this must be its own, explicitly-set flag instead.
+      def.failClosedFieldPolicy,
     );
     // "Open in Discover" support (common/types.ts's `TableSpec.discover` doc comment): only this
     // Indexer path has an index/DSL to attach — see buildDiscoverDsl for why a `post_filter` is
@@ -615,13 +637,15 @@ async function executeIndexerRequest(
   }
 }
 
-/** Executes a validated Manager API call and builds its digest + table. */
+/** Executes a validated Manager API call and builds its digest + table. `assumptionNote` (issue
+ * #8913) is threaded straight into `buildDigest` -- see `executeIndexerRequest`'s doc comment. */
 async function executeManagerRequest(
   toolName: string,
   managerRequest: ManagerRequest,
   context: RequestHandlerContext,
   request: OpenSearchDashboardsRequest,
   privacy?: PrivacyContext,
+  assumptionNote?: string,
 ): Promise<ToolExecutionOutcome> {
   const def = getToolDefinition(toolName);
   if (!def) {
@@ -650,7 +674,13 @@ async function executeManagerRequest(
     );
     const result = response.data;
     // Manager API list responses have no aggregation concept, so there is no `aggField` to pass.
-    const digest = buildDigest(toolName, result, def);
+    const digest = buildDigest(
+      toolName,
+      result,
+      def,
+      undefined,
+      assumptionNote,
+    );
     const finalDigest = finalizeDigest(digest, privacy, toolName);
     return {
       toolResultContent: JSON.stringify(finalDigest),
@@ -695,14 +725,25 @@ export type BuildValidatedRequestResult =
   | { ok: true; built: BuiltToolCall }
   | { ok: false; toolResultContent: string };
 
+interface ValidatedCall {
+  def: ToolDefinition;
+  /** Schema-validated (coerced/defaulted) params. */
+  params: Record<string, unknown>;
+}
+
+type ValidateCallResult =
+  | { ok: true; validated: ValidatedCall }
+  | { ok: false; toolResultContent: string };
+
 /**
- * Validates a model-issued tool call's arguments and builds its outbound request, WITHOUT
- * executing anything. Kept separate from `executeToolCall` below so validation/build failures
- * resolve to a bounded tool-result error the model can self-correct from.
+ * Schema-validates a model-issued tool call's arguments against its `ToolDefinition`, WITHOUT
+ * building or executing anything yet. Split out from `buildValidatedRequest` (below) so
+ * `executeToolCall` can run a tool's optional async `resolveParams` hook (types.ts; issue #8913)
+ * on the validated params BEFORE `buildRequest` ever sees them -- `buildRequest` itself stays
+ * synchronous and gets whatever params `resolveParams` (when present) resolved to, not the raw
+ * validated ones. A tool with no `resolveParams` is unaffected either way.
  */
-export function buildValidatedRequest(
-  call: ToolCall,
-): BuildValidatedRequestResult {
+function validateCall(call: ToolCall): ValidateCallResult {
   const def = getToolDefinition(call.name);
   if (!def) {
     return {
@@ -721,9 +762,15 @@ export function buildValidatedRequest(
     };
   }
 
+  return { ok: true, validated: { def, params: validation.value } };
+}
+
+function buildRequestFromValidated(
+  validated: ValidatedCall,
+): BuildValidatedRequestResult {
   let builtRequest: IndexerRequest | ManagerRequest;
   try {
-    builtRequest = def.buildRequest(validation.value);
+    builtRequest = validated.def.buildRequest(validated.params);
   } catch (error) {
     return {
       ok: false,
@@ -733,36 +780,92 @@ export function buildValidatedRequest(
 
   return {
     ok: true,
-    built: { def, params: validation.value, request: builtRequest },
+    built: {
+      def: validated.def,
+      params: validated.params,
+      request: builtRequest,
+    },
   };
 }
 
 /**
- * Validates, guardrails, and executes one model-issued tool call end to end. Never throws: every
- * failure mode (unknown tool, schema validation, guardrail rejection, execution error) resolves to
- * a `toolErrorContent` string so the orchestration loop can always append a `role:'tool'` message
- * and continue — bounded self-correction, never a crashed turn. The catalog is read-only by
- * construction (types.ts's `tier: 'T1'`), so there is no confirmation/tier gate here.
+ * Validates a model-issued tool call's arguments and builds its outbound request, WITHOUT
+ * executing anything. Kept separate from `executeToolCall` below so validation/build failures
+ * resolve to a bounded tool-result error the model can self-correct from. Deliberately does NOT
+ * run a tool's `resolveParams` hook (see `validateCall`'s doc comment) -- `executeToolCall` is the
+ * only caller that needs the async step, and it calls `validateCall`/`buildRequestFromValidated`
+ * directly instead of going through this synchronous helper.
  */
-export function executeToolCall(
+export function buildValidatedRequest(
+  call: ToolCall,
+): BuildValidatedRequestResult {
+  const validated = validateCall(call);
+  if (!validated.ok) {
+    return validated;
+  }
+  return buildRequestFromValidated(validated.validated);
+}
+
+/**
+ * Validates, guardrails, and executes one model-issued tool call end to end. Never throws: every
+ * failure mode (unknown tool, schema validation, resolveParams rejection, guardrail rejection,
+ * execution error) resolves to a `toolErrorContent` string so the orchestration loop can always
+ * append a `role:'tool'` message and continue — bounded self-correction, never a crashed turn. The
+ * catalog is read-only by construction (types.ts's `tier: 'T1'`), so there is no confirmation/tier
+ * gate here.
+ */
+export async function executeToolCall(
   call: ToolCall,
   context: RequestHandlerContext,
   request: OpenSearchDashboardsRequest,
   privacy?: PrivacyContext,
 ): Promise<ToolExecutionOutcome> {
-  const built = buildValidatedRequest(call);
-  if (!built.ok) {
-    return Promise.resolve({ toolResultContent: built.toolResultContent });
+  const validated = validateCall(call);
+  if (!validated.ok) {
+    return { toolResultContent: validated.toolResultContent };
   }
-  const { request: builtRequest, params } = built.built;
+  let { params } = validated.validated;
+  const { def } = validated.validated;
+
+  // Issue #8913: an opt-in async pre-buildRequest step (currently only get_agent_inventory) that
+  // resolves a param the model omitted (e.g. "this server" with no agent named) against a live
+  // source, instead of relying on the model to have called a lookup tool first -- a live-verified
+  // system-prompt-only instruction to do that was found NOT to work (0/5 runs complied). Wrapped
+  // in try/catch (unlike `buildRequest`'s own try/catch below, `resolveParams` is async and a
+  // rejected promise would otherwise become an unhandled rejection, breaking this function's
+  // documented "never throws" contract).
+  let assumptionNote: string | undefined;
+  if (def.resolveParams) {
+    try {
+      const resolved = await def.resolveParams(params, context, request);
+      if (!resolved.ok) {
+        return { toolResultContent: toolErrorContent(resolved.reason) };
+      }
+      params = resolved.resolved.params;
+      assumptionNote = resolved.resolved.note;
+    } catch (error) {
+      return {
+        toolResultContent: toolErrorContent(
+          `Parameter resolution failed: ${sanitizeError(error)}`,
+        ),
+      };
+    }
+  }
+
+  const built = buildRequestFromValidated({ def, params });
+  if (!built.ok) {
+    return { toolResultContent: built.toolResultContent };
+  }
+  const { request: builtRequest, params: finalParams } = built.built;
 
   if (builtRequest.target === 'indexer') {
     return executeIndexerRequest(
       call.name,
       builtRequest,
-      params,
+      finalParams,
       context,
       privacy,
+      assumptionNote,
     );
   }
   return executeManagerRequest(
@@ -771,5 +874,6 @@ export function executeToolCall(
     context,
     request,
     privacy,
+    assumptionNote,
   );
 }

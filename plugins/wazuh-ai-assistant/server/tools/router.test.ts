@@ -119,3 +119,82 @@ test('every general-alone turn still gets the minimal recovery set, unchanged by
   const names = resolveStage2Tools(['general']).map(spec => spec.name);
   assert.deepEqual(names.sort(), ['get_security_summary', 'search_wazuh_data']);
 });
+test('the "findings" category description mentions top/noisiest agents (get_top_agents routing)', () => {
+  // Pins get_top_agents' routing hint in TOOL_CATEGORY/CATEGORY_DESCRIPTIONS -- with no test, this
+  // line has no guard against silently disappearing in a future three-way merge of router.ts.
+  const prompt = buildRoutingPrompt('2026-01-01T00:00:00.000Z');
+  const findingsLine = prompt
+    .split('\n')
+    .find(line => line.trim().startsWith('- findings:'));
+  assert.ok(findingsLine, 'routing prompt must list a "findings" menu entry');
+  assert.match(
+    findingsLine as string,
+    /top\/noisiest agents/,
+    "findings' description must mention top/noisiest agents so get_top_agents-shaped questions route here",
+  );
+});
+/**
+ * Issue #8913's own worked example ("What software does this box have installed?") measured
+ * live at 0/5 for `get_agent_inventory` even AFTER the tool learned to self-resolve a missing
+ * agent (see get-agent-inventory.ts's `resolveDeicticAgentParams`) -- because stage 1 never
+ * routed to the `inventory` category in the first place, so the tool was never even offered in
+ * stage 2 (`resolveStage2Tools`). The pre-fix `inventory` description said "installed packages"
+ * but never the word "software", and had no note that a vague host reference ("this box") is
+ * still an inventory-domain question rather than an identity question. Pin both additions here
+ * so a future reword silently regresses this instead of failing loudly.
+ */
+test('the "inventory" category description covers "software" and vague host phrasing', () => {
+  const prompt = buildRoutingPrompt('2026-01-01T00:00:00.000Z');
+  const inventoryLine = prompt
+    .split('\n')
+    .find(line => line.trim().startsWith('- inventory:'));
+  assert.ok(
+    inventoryLine,
+    'routing prompt must list an "inventory" menu entry',
+  );
+  assert.match(
+    inventoryLine as string,
+    /\bsoftware\b/i,
+    'inventory description must literally say "software", not just "installed packages", to ' +
+      "match #8913's exact worked-example phrasing",
+  );
+  assert.match(
+    inventoryLine as string,
+    /this box\/server\/machine/,
+    'inventory description must call out vague host references as still in-scope, not just ' +
+      'named/numbered agents',
+  );
+});
+
+/**
+ * Out-of-scope regression: M-OOS-01/02 (active-response questions) and M-OOS-05 (agent
+ * comms-channel health) were mis-routed onto adjacent tools (get_brute_force,
+ * get_events_by_agent, get_agents) instead of being declined, because neither category's
+ * stage-1 menu line said what it does NOT cover. These two categories' descriptions must carry
+ * that exclusion so a mismatch is visible before stage 2 ever offers the misleading tool.
+ */
+test('the "findings" category description excludes active-response actions', () => {
+  const prompt = buildRoutingPrompt('2026-01-01T00:00:00.000Z');
+  const findingsLine = prompt
+    .split('\n')
+    .find(line => line.trim().startsWith('- findings:'));
+  assert.ok(findingsLine, 'routing prompt must list a "findings" menu entry');
+  assert.match(
+    findingsLine as string,
+    /NOT automated actions Wazuh took/,
+    "findings's description must explicitly exclude active-response actions",
+  );
+});
+
+test('the "agents" category description excludes comms-channel health', () => {
+  const prompt = buildRoutingPrompt('2026-01-01T00:00:00.000Z');
+  const agentsLine = prompt
+    .split('\n')
+    .find(line => line.trim().startsWith('- agents:'));
+  assert.ok(agentsLine, 'routing prompt must list an "agents" menu entry');
+  assert.match(
+    agentsLine as string,
+    /NOT comms-channel health/,
+    "agents's description must explicitly exclude comms-channel health",
+  );
+});

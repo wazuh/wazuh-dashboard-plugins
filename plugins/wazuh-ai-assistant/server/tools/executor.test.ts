@@ -5,7 +5,7 @@ import {
   PrivacyContext,
   resolveSecurityAnalyticsSpace,
 } from './executor';
-import { Pseudonymizer } from './privacy';
+import { FIELD_POLICY_DEFAULTS, Pseudonymizer } from './privacy';
 import { ToolCall } from '../../common/types';
 
 // Derived from executeToolCall's own signature rather than imported from the OSD platform path,
@@ -19,6 +19,202 @@ function hit(space: string | undefined): unknown {
     ? { _source: {} }
     : { _source: { space: { name: space } } };
 }
+
+type ExecContext = Parameters<typeof executeToolCall>[1];
+type ExecRequest = Parameters<typeof executeToolCall>[2];
+
+/** Minimal `context`/`request` stubs for `executeToolCall`'s Indexer path: only
+ * `context.core.opensearch.client.asCurrentUser.search` is read (get_agent_inventory's
+ * `buildRequest` needs only `agent_id`/`kind` from `params`, no async lookup). `request` is
+ * unused on this path and can be an empty object. */
+function fakeSearchContext(hits: Array<Record<string, unknown>>): ExecContext {
+  return {
+    core: {
+      opensearch: {
+        client: {
+          asCurrentUser: {
+            search: () =>
+              Promise.resolve({
+                body: {
+                  hits: {
+                    total: { value: hits.length },
+                    hits: hits.map(_source => ({ _source })),
+                  },
+                },
+              }),
+          },
+        },
+      },
+    },
+  } as unknown as ExecContext;
+}
+const fakeRequest = {} as ExecRequest;
+
+// --- Issue #8917: end-to-end (executeToolCall, not just applyFieldPolicy in isolation) proof that
+// the executor threads a deriveColumns tool's OWN `failClosedFieldPolicy` flag into field policy,
+// not `deriveColumns` itself -- and that an explicit FIELD_POLICY_DEFAULTS entry wins over the
+// fail-closed default for a real get_agent_inventory call. ---------------------------------------
+
+test('executeToolCall: get_agent_inventory keeps package.name/package.version readable under privacy mode, still anonymizing package.vendor', async () => {
+  const context = fakeSearchContext([
+    {
+      package: {
+        name: 'adduser',
+        version: '3.118ubuntu5',
+        vendor: 'Ubuntu Developers',
+        architecture: 'all',
+      },
+    },
+  ]);
+  const privacy = {
+    pseudonymizer: new Pseudonymizer([]),
+    fieldPolicy: FIELD_POLICY_DEFAULTS,
+  };
+  const outcome = await executeToolCall(
+    {
+      id: 'call-1',
+      name: 'get_agent_inventory',
+      arguments: { agent_id: '001', kind: 'packages' },
+    },
+    context,
+    fakeRequest,
+    privacy,
+  );
+  const digest = JSON.parse(outcome.toolResultContent) as {
+    samples: Array<Record<string, unknown>>;
+  };
+  assert.equal(digest.samples[0]['package.name'], 'adduser');
+  assert.equal(digest.samples[0]['package.version'], '3.118ubuntu5');
+  assert.equal(digest.samples[0]['package.architecture'], 'all');
+  // package.vendor has an explicit 'anonymize' FIELD_POLICY_DEFAULTS entry (a vendor/distributor
+  // string routinely embeds a maintainer email address -- see privacy.ts's comment on that entry)
+  // -- it comes back pseudonymized on that explicit basis, not via
+  // get_agent_inventory's `failClosedFieldPolicy: true` unlisted-field default (see the dedicated
+  // decoupling-proof test below for that case, which uses a genuinely unlisted field instead).
+  assert.match(
+    digest.samples[0]['package.vendor'] as string,
+    /^(HOST|IP|USER|URL|VAL)_\d+$/,
+  );
+});
+
+test('executeToolCall: privacy off leaves get_agent_inventory digest completely unscrubbed', async () => {
+  const context = fakeSearchContext([
+    { package: { name: 'adduser', version: '3.118ubuntu5' } },
+  ]);
+  const outcome = await executeToolCall(
+    {
+      id: 'call-1',
+      name: 'get_agent_inventory',
+      arguments: { agent_id: '001', kind: 'packages' },
+    },
+    context,
+    fakeRequest,
+    undefined,
+  );
+  const digest = JSON.parse(outcome.toolResultContent) as {
+    samples: Array<Record<string, unknown>>;
+  };
+  assert.equal(digest.samples[0]['package.name'], 'adduser');
+  assert.equal(digest.samples[0]['package.version'], '3.118ubuntu5');
+});
+
+test('executeToolCall: unlisted-field fail-closed tracks failClosedFieldPolicy, not deriveColumns (decoupling proof)', async () => {
+  // Flips ONLY `failClosedFieldPolicy` on the real, registered get_agent_inventory tool --
+  // `deriveColumns` stays `true` throughout. If the executor still keyed off `deriveColumns` (the
+  // pre-#8917 bug this test guards against), this would have no effect and the unlisted field
+  // would still come back fail-closed.
+  //
+  // Uses `kind: 'os'` / `host.os.full` rather than `kind: 'packages'` / `package.vendor` (this
+  // test's original target): `package.vendor` gained its own explicit FIELD_POLICY_DEFAULTS
+  // 'anonymize' entry (see privacy.ts's comment on that entry), so it is no longer unlisted and
+  // would stay anonymized regardless of this flag -- that entry, not the flag, was masking this
+  // test's own regression signal. `host.os.full` has no FIELD_POLICY_DEFAULTS entry of its own
+  // (unlike its siblings host.os.name/version/platform above it in INVENTORY_KIND_CONFIG's `os`
+  // source list), so it stays a genuine unlisted field for this proof.
+  const { getAgentInventoryTool } = await import(
+    './catalog/get-agent-inventory'
+  );
+  const original = getAgentInventoryTool.failClosedFieldPolicy;
+  assert.equal(getAgentInventoryTool.deriveColumns, true);
+  try {
+    getAgentInventoryTool.failClosedFieldPolicy = false;
+    const context = fakeSearchContext([
+      {
+        host: {
+          os: { full: 'Ubuntu 22.04.1 LTS' },
+        },
+      },
+    ]);
+    const privacy = {
+      pseudonymizer: new Pseudonymizer([]),
+      fieldPolicy: FIELD_POLICY_DEFAULTS,
+    };
+    const outcome = await executeToolCall(
+      {
+        id: 'call-1',
+        name: 'get_agent_inventory',
+        arguments: { agent_id: '001', kind: 'os' },
+      },
+      context,
+      fakeRequest,
+      privacy,
+    );
+    const digest = JSON.parse(outcome.toolResultContent) as {
+      samples: Array<Record<string, unknown>>;
+    };
+    // With failClosedFieldPolicy: false, host.os.full (no FIELD_POLICY_DEFAULTS entry) now falls
+    // under plain allow-by-omission instead of failing closed -- proving the executor reads this
+    // flag, and only this flag, to decide.
+    assert.equal(digest.samples[0]['host.os.full'], 'Ubuntu 22.04.1 LTS');
+  } finally {
+    getAgentInventoryTool.failClosedFieldPolicy = original;
+  }
+});
+
+// --- Issue #8913: end-to-end (executeToolCall, not just resolveDeicticAgentParams in isolation)
+// proof that a resolveParams-minted assumption note reaches the digest the model sees. A merge
+// regression once dropped `assumptionNote` from `executeIndexerRequest`'s call to `buildDigest`
+// (`executeManagerRequest`'s sibling call already threaded it through) -- silently discarding the
+// note for every Indexer-backed tool while keeping it for Manager-API-backed ones. -------------
+
+test('executeToolCall: a resolveParams-minted assumption note reaches the digest for an Indexer-backed tool', async () => {
+  const context = {
+    ...fakeSearchContext([{ package: { name: 'adduser', version: '1' } }]),
+    wazuh_core: {
+      manageHosts: { get: () => Promise.resolve([{ id: 'host-1' }]) },
+      api: {
+        client: {
+          asCurrentUser: {
+            request: () =>
+              Promise.resolve({
+                status: 200,
+                data: {
+                  data: {
+                    affected_items: [{ id: '001', name: 'agent-one' }],
+                    total_affected_items: 1,
+                  },
+                },
+              }),
+          },
+        },
+      },
+    },
+  } as unknown as ExecContext;
+  const outcome = await executeToolCall(
+    {
+      id: 'call-1',
+      name: 'get_agent_inventory',
+      arguments: { kind: 'packages' },
+    },
+    context,
+    fakeRequest,
+    undefined,
+  );
+  const digest = JSON.parse(outcome.toolResultContent) as {
+    assumptionNote?: string;
+  };
+  assert.match(digest.assumptionNote ?? '', /agent-one/);
+});
 
 test('resolveSecurityAnalyticsSpace: a single distinct space across all hits is used as-is', () => {
   assert.equal(

@@ -224,6 +224,29 @@ export function withFinalRoundAnswerInstruction(
   ];
 }
 
+/**
+ * Issue #8911: a tool round that produced only rejected/errored calls (no successful digest/table)
+ * is, for round-budget purposes, indistinguishable from a productive one — the loop below just
+ * keeps decrementing the same `MAX_TOOL_ROUNDS` budget either way. When the model is stuck
+ * re-guessing a query shape that can never succeed (e.g. an invented field name field-validation.ts
+ * keeps rejecting), that burns the remaining rounds on doomed retries instead of leaving one for the
+ * final answer. This decides whether the round just finished should make the NEXT round the final
+ * one early — exported (and kept pure, same reasoning as `withFinalRoundAnswerInstruction` above)
+ * so the decision is testable without standing up a fake `orchestrate` run.
+ *
+ * Gated on `hadSuccessfulRoundEarlier`: a first-round total failure keeps its normal retry budget,
+ * since the model may legitimately fix its own call (a genuine typo, a first attempt at the escape
+ * hatch) — only once at least one EARLIER round in the same turn already succeeded is a further
+ * fully-rejected round treated as the model being stuck rather than still converging.
+ */
+export function shouldEnterFinalRoundEarly(
+  roundHadToolCalls: boolean,
+  roundHadSuccess: boolean,
+  hadSuccessfulRoundEarlier: boolean,
+): boolean {
+  return roundHadToolCalls && !roundHadSuccess && hadSuccessfulRoundEarlier;
+}
+
 /** Picks which of the three no-text fallbacks above fits a turn that ended without any `delta`
  * text — shared by both `!sawAnyDelta` exit points below (the normal per-round `done` branch and
  * the round-budget-exhausted path) so the same three-way decision lives in exactly one place. */
@@ -783,7 +806,10 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
       // `request` internally (server/routes/settings.ts). The plain route-context client above
       // (`context.core.savedObjects.client`, used for the PROVIDER lookup a few lines up) cannot
       // see the hidden `wazuh-ai-assistant-settings` type at all.
-      const assistantSettings = await getOrCreateAssistantSettings(request);
+      const assistantSettings = await getOrCreateAssistantSettings(
+        request,
+        logger,
+      );
       const privacyEnabled = resolvePrivacyEnabled(
         assistantSettings,
         providerId,
@@ -1124,6 +1150,11 @@ export async function* orchestrate(
   const executedToolNames = new Set<string>();
   let forcedFollowUpTool: string | undefined;
   let forcedFollowUpSpent = false;
+  // Issue #8911: whole-turn tracking for `shouldEnterFinalRoundEarly` above — `true` once any EARLIER
+  // round in this turn had at least one successful (non-rejected/non-errored) tool call, and set
+  // when the round loop below should make its NEXT iteration the final round early.
+  let hadSuccessfulRoundEarlier = false;
+  let forceFinalRoundEarly = false;
   // Sum of every provider call's `usage` THIS TURN — the stage-1 routing call (if the router ran)
   // plus every round of the loop below, INCLUDING non-final rounds whose `done` is otherwise
   // suppressed (see the round loop's `if (sawToolCall) { break; }`). Without this, only the last
@@ -1192,13 +1223,16 @@ export async function* orchestrate(
       return;
     }
 
-    const isFinalRound = round === MAX_TOOL_ROUNDS;
     // TRUE for exactly the round a deferred-offer interception forced (issue #8935 item I3):
     // read by the 'error' branch and the loop-bottom dead-stream guard below, because a FORCED
     // round must never end the turn worse than the clean termination the suppressed offer-round
     // 'done' would have produced on base -- same recorded policy as stage 1 ("a stage-1 failure
     // must not produce a dead turn").
     const forcedRound = forcedFollowUpTool !== undefined;
+    // Issue #8911: `forceFinalRoundEarly` (set at the end of the PREVIOUS round below) short-circuits
+    // the normal `round === MAX_TOOL_ROUNDS` budget check once a fully-rejected round has already
+    // followed an earlier successful one this turn — see `shouldEnterFinalRoundEarly`'s doc comment.
+    const isFinalRound = round === MAX_TOOL_ROUNDS || forceFinalRoundEarly;
     // Final round: omit `tools` entirely rather than send `{tools, toolChoice: 'none'}`. That hint
     // depends on the model complying with it — Groq's own docs warn some models call a tool anyway
     // and the API then 400s ("Tool choice is none, but model called a tool"), observed on
@@ -1309,6 +1343,14 @@ export async function* orchestrate(
     // routinely names exactly one tool the model decided NOT to call -- the interception below
     // must never read it as an offer (issue #8935 integration review).
     let roundHadReasoningFallback = false;
+    // Issue #8911: round-scoped (reset every round, unlike the whole-turn flags above) — feeds
+    // `shouldEnterFinalRoundEarly` once this round finishes. `roundHadRealToolCall` covers only the
+    // real data-tool path below (the one that also sets `toolUsedThisTurn`), deliberately excluding
+    // the `SUGGEST_DISCOVER_QUERY_TOOL` handoff — that tool is never rejected by field-validation and
+    // never produces a `tableEvent` by design, so counting it here would misread its normal success
+    // as a "fully rejected round".
+    let roundHadRealToolCall = false;
+    let roundHadSuccessfulToolCall = false;
 
     // eslint-disable-next-line no-await-in-loop -- provider events must be consumed strictly in stream order
     for await (const event of adapter.chatStream(
@@ -1511,6 +1553,7 @@ export async function* orchestrate(
         }
 
         toolUsedThisTurn = true;
+        roundHadRealToolCall = true;
 
         // Inbound tool args: the model only ever saw pseudonyms, so `event.toolCall.arguments`
         // is pseudonym-form as emitted — reverse it to real values before validation/execution (the
@@ -1579,6 +1622,10 @@ export async function* orchestrate(
         }
 
         if (outcome.tableEvent) {
+          // Issue #8911: only a successful execution ever sets `tableEvent` (every rejection/error
+          // path above returns `toolResultContent` alone) — this is the round's "did anything
+          // actually succeed" signal `shouldEnterFinalRoundEarly` needs below.
+          roundHadSuccessfulToolCall = true;
           yield outcome.tableEvent;
           if (outcome.tableEvent.spec.rows.length > 0) {
             // Table-suppression activation (markdown-table-filter.ts): from this point on in the
@@ -1771,6 +1818,20 @@ export async function* orchestrate(
       }
       return;
     }
+
+    // Issue #8911: decide BEFORE folding this round's own success into `hadSuccessfulRoundEarlier`
+    // — the gate is "an EARLIER round already succeeded", not this one.
+    if (
+      shouldEnterFinalRoundEarly(
+        roundHadRealToolCall,
+        roundHadSuccessfulToolCall,
+        hadSuccessfulRoundEarlier,
+      )
+    ) {
+      forceFinalRoundEarly = true;
+    }
+    hadSuccessfulRoundEarlier =
+      hadSuccessfulRoundEarlier || roundHadSuccessfulToolCall;
   }
 
   // Exhausted the round budget and the forced-final (no-tools) round still didn't end cleanly

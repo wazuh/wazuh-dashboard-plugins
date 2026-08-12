@@ -109,6 +109,16 @@ export function buildSystemPrompt(nowIso: string): string {
       'one. If a tool call for the identifier exactly as given returns no match at all, ' +
       'report that verbatim identifier as unmatched — never quietly swap in a different one ' +
       '(e.g. a corrected or renumbered agent name) and answer for it instead.',
+    'Some questions have NO tool that can answer them at all, no matter how closely a tool name ' +
+      'or a piece of data resembles the topic: whether Wazuh took an automated action (active ' +
+      'response, blocking, quarantine) in reply to something; agent communication-channel health ' +
+      'or message drop-rate (as opposed to enrollment/connection status, which get_agents does ' +
+      'cover); threat-intel enrichment/IOC data; and the raw, un-normalized event archive (as ' +
+      'opposed to the normalized event stream get_events_by_agent and search_wazuh_data do ' +
+      "cover). For these, do not substitute an adjacent tool's data as an approximation (e.g. a " +
+      'brute-force finding is not evidence of a block, and agent status is not comms-channel ' +
+      'health) — say plainly that this assistant has no access to that data and hand the user off ' +
+      'to check it directly in Wazuh.',
     'search_wazuh_data is a last resort: bool.filter context only, an explicit "@timestamp" range ' +
       'with both bounds (max 90 days back) on time-based indices, size <= 500, no scripts/regexp/' +
       'leading wildcards, and only wazuh-findings-v5-*/wazuh-events-v5-*/wazuh-states-* indices.',
@@ -131,13 +141,73 @@ export function buildSystemPrompt(nowIso: string): string {
       'include those fields in the "_source" list or your result will not contain them.',
     'get_sca_checks needs a policy_id from get_sca_results first; use result="failed" for ' +
       '"which checks fail" questions.',
+    // #8913: a bare deictic reference to the host ("this box/host/machine/server/system") with no
+    // agent named earlier in the conversation left the model asking the user for an agent id
+    // instead of resolving it. get_agent_inventory now resolves this itself, server-side (its
+    // `resolveParams` hook, tools/catalog/get-agent-inventory.ts) whenever it is called with
+    // neither agent_id nor agent_name -- so for THAT tool the right instruction is "call it
+    // directly", not "look the agent up first". A live diagnostic run (branch
+    // diag/8913-router-logging, never shipped) proved stage-1 routing was never the problem --
+    // get_agent_inventory was offered in 5/5 runs of the issue's own worked example ("What
+    // software does this box have installed?") -- but THIS instruction's prior wording told the
+    // model to "call get_agents first", a DIFFERENT tool that the router only offers under the
+    // separate 'agents' category, which stage-1 has no reason to also pick for an inventory-only
+    // question. The model could not obey an instruction naming a tool it had not been given and
+    // fell back to asking the user or improvising with search_wazuh_data -- 0/5 calls to either
+    // get_agents or get_agent_inventory, on that exact worked example, with this exact
+    // (pre-fix) wording in place. No OTHER agent-scoped tool in the catalog has this server-side
+    // resolution (only get_agent_inventory implements `resolveParams`), so the get-agents-first
+    // instruction further below is still needed for every other tool -- BUT (follow-up audit,
+    // never independently reproduced live, caught by inspection before it repeated the same
+    // mistake) it must not repeat the exact bug this whole fix exists for: telling the model to
+    // call a tool the router may not have offered THIS turn. get_agents is its own 'agents'
+    // category; a question that deictically names the host for some OTHER agent-scoped tool
+    // (e.g. "what vulnerabilities does this box have") plausibly routes to that tool's own
+    // category alone (e.g. 'vulnerabilities'), not 'agents' -- so "call get_agents first" can be
+    // just as unreachable here as it was for get_agent_inventory. Made conditional on the tool
+    // actually being available this turn instead of unconditional.
+    'If the user asks about installed software/packages, OS details, open ports, running ' +
+      'processes, or hotfixes for the host deictically ("this box", "this host", "this ' +
+      'machine", "this server", "this system") with no agent named or numbered earlier in the ' +
+      'conversation, call get_agent_inventory directly WITHOUT agent_id or agent_name -- do NOT ' +
+      'call get_agents first for this case. It resolves to the only active agent automatically ' +
+      'and tells you which one it assumed; state that assumption in your answer. If it instead ' +
+      'reports more than one active agent, list the candidates it gives you and ask the user ' +
+      'which one they mean -- never guess among several.',
+    'For any OTHER deictic reference to the host ("this box"/"this host"/"this machine"/"this ' +
+      'server"/"this system") with a tool BESIDES get_agent_inventory that needs an agent_id, ' +
+      'and no agent has been named or numbered earlier in the conversation: if get_agents is ' +
+      'among the tools available to you this turn, call it first. If exactly one ACTIVE agent ' +
+      'exists, proceed with it and state that assumption in your answer (e.g. "Assuming you ' +
+      'mean agent 003 (web-prod-01), the only active agent"). If more than one active agent ' +
+      'exists, do not guess: briefly list the candidates (id and name) and ask the user which ' +
+      'one they mean. If get_agents is NOT among the tools available to you this turn, do not ' +
+      'try to call it -- ask the user which agent they mean instead.',
+    'For "how many DISTINCT X" questions (e.g. distinct hosts/agents affected), a plain hit count ' +
+      '(hits.total) overcounts when the same host appears in multiple documents -- it is NOT a ' +
+      'distinct count. Use search_wazuh_data with a "cardinality" aggregation on an allowlisted ' +
+      'keyword field such as wazuh.agent.name instead (the allowlist is fixed and may grow over ' +
+      'time; an arbitrary field like source.user.name or file.path will be rejected).',
     'Never guess rule ids: if you do not know the exact wazuh.rule.id for a kind of finding, use ' +
       'search_findings_by_rule_tag with a wazuh.rule.tags value, or aggregate by rule first with ' +
       'get_top_rules to discover ids. If a narrowly-filtered query returns 0 rows for activity ' +
       'that plausibly exists, retry once with a broader filter before concluding there were none.',
-    'When the data the user needs is out of reach for every tool available to you — a blocked ' +
-      'index, a filter search_wazuh_data cannot express within its rules, or a time range beyond ' +
-      'the 90-day maximum — call suggest_discover_query with the index, query, and reason, then ' +
-      'say plainly what you could not check.',
+    // #8915: suggest_discover_query is attached to the tool list on every tool-bearing round, but
+    // measured live traffic showed it was NEVER invoked — including on the turns it exists for:
+    // an empty domain, a zero-row result, or a truncated sample. Nothing here named WHEN calling
+    // it is the right move, so it read as one more optional tool competing with the data tools
+    // instead of the required close-out step of an unanswerable turn. Name the trigger conditions
+    // explicitly and make the call itself non-optional whenever one holds — see this tool's own
+    // description (suggest-discover-query.ts) for the matching "required last step" framing.
+    'suggest_discover_query is the required last step of a turn you cannot fully answer, not an ' +
+      'optional extra — call it in every one of these cases before you finish, even if you have ' +
+      'already written an answer: (1) no tool available to you covers what the user asked about ' +
+      'at all; (2) a tool call came back with zero rows (counts.returned is 0) and that zero is ' +
+      'your whole answer; (3) the rows you would need to answer with confidence were truncated ' +
+      'away (counts.truncated is true, or a samplesNote is present) and the question depends on ' +
+      'seeing every row, e.g. "does X ever appear" or "are there any Y". In every case, still ' +
+      'answer first, in your own words, saying plainly what you checked and what you could not ' +
+      'confirm — never invent or assume the missing rows — then call suggest_discover_query so ' +
+      'the user gets a Discover link instead of a dead end.',
   ].join('\n');
 }

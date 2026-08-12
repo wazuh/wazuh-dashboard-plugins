@@ -54,14 +54,18 @@ export const getCriticalVulnerabilitiesTool: ToolDefinition = {
   },
   tableSpec: {
     columns: [
+      // Column order (issue #8921's budget item): identical treatment to its three siblings
+      // (get-vulnerabilities.ts et al.) — this is the 4th tool with the same 8-column set, and
+      // leaving it un-reordered would show Architecture in the visible 6 while hiding Description
+      // and CVSS, the exact ordering the sibling files' comments argue against.
       { field: 'wazuh.agent.name', label: 'Agent' },
       { field: 'vulnerability.id', label: 'CVE' },
       { field: 'vulnerability.severity', label: 'Severity', severity: true },
       { field: 'package.name', label: 'Package' },
       { field: 'package.version', label: 'Version' },
+      { field: 'vulnerability.description', label: 'Description' },
       { field: 'package.architecture', label: 'Architecture' },
       { field: 'vulnerability.score.base', label: 'CVSS Score' },
-      { field: 'vulnerability.description', label: 'Description' },
     ],
   },
   digest: { sampleColumns: VULN_DIGEST_SAMPLE_COLUMNS },
