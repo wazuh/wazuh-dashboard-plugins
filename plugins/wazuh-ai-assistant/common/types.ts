@@ -121,6 +121,18 @@ export interface TableColumn {
   label: string;
 }
 
+/**
+ * Client-side column-count budget for rendered result tables (issue #8921: no table may need a
+ * horizontal scrollbar): only the first MAX_VISIBLE_RESULT_COLUMNS of a `TableSpec.columns` list
+ * render as visible table columns; the rest stay reachable through the row expander, since
+ * buildTableSpec (server/tools/digest.ts) puts every spec-column field into each row object
+ * regardless of visibility. Lives in common/ because BOTH sides consult it: result-table.tsx
+ * applies it, and server/tools/catalog/visible-column-budget-coverage.test.ts asserts every
+ * tool's severity column sits INSIDE it — a severity badge demoted past the budget is invisible,
+ * which is the exact "missing severity" defect the issue lists.
+ */
+export const MAX_VISIBLE_RESULT_COLUMNS = 6;
+
 export interface TableSpec {
   columns: TableColumn[];
   rows: Array<Record<string, unknown>>;
@@ -193,7 +205,10 @@ export type StreamEvent =
    * already have its field-level filters stripped down to index + time range only when their field
    * names could not be verified against the target index (see suggest-discover-query.ts's
    * `resolveSuggestedDsl` doc comment for why). `reason` is the model's own plain-language
-   * explanation of what it could not check, shown to the user verbatim next to the link.
+   * explanation of what it could not check, shown to the user next to the link — but NOT always
+   * verbatim: whenever `dsl` above lost field-level filters relative to what the model asked to
+   * show, chat.ts appends a fixed disclosure sentence to `reason` so the two can never silently
+   * diverge (the link would otherwise promise a filter it does not carry — issue #8920 item 9).
    */
   | {
       type: 'suggested_query';

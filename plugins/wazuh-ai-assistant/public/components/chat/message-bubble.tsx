@@ -72,7 +72,10 @@ export interface UiChatMessage {
    * 13-suggested-query-discover-handoff.md): set from a `suggested_query` stream event instead of
    * `table` when the model determined the data asked about is out of its reach for every tool it
    * has, and offered a query the user can run themselves in Discover instead of guessing.
-   * `reason` is the model's own plain-language explanation, shown verbatim next to the link.
+   * `reason` is the model's own plain-language explanation, shown next to the link — not always
+   * verbatim: chat.ts appends a fixed disclosure sentence whenever the emitted `dsl` lost
+   * field-level filters (or its time window) relative to what the model asked to show, so the
+   * two can never silently diverge (see common/types.ts's `suggested_query` doc comment).
    */
   suggestedQuery?: {
     index: string;

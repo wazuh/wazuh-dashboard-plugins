@@ -30,6 +30,7 @@ import {
   EuiHorizontalRule,
   EuiFieldSearch,
   EuiAccordion,
+  EuiEmptyPrompt,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { CoreStart } from '../../../../../src/core/public';
@@ -43,9 +44,16 @@ import { ensureManagerSession } from '../../services/session-heal';
 import { ProviderInput, ProviderSummary } from '../../../common/types';
 import { useDirtyFormState } from '../../hooks/use-dirty-form-state';
 import { ProviderFormFlyout } from './provider-form-flyout';
+import {
+  ProviderTestOutcome,
+  describeHttpError,
+  outcomeFromTestError,
+  outcomeFromTestResult,
+} from './provider-status';
 
 const FIELD_POLICY_ACTIONS: FieldPolicyAction[] = [
   'allow',
+  'allow-scan',
   'anonymize',
   'never',
 ];
@@ -54,6 +62,13 @@ const FIELD_POLICY_ACTION_LABELS: Record<FieldPolicyAction, string> = {
   allow: i18n.translate('wazuhAiAssistant.settings.privacy.action.allow', {
     defaultMessage: 'Allow',
   }),
+  'allow-scan': i18n.translate(
+    'wazuhAiAssistant.settings.privacy.action.allowScan',
+    {
+      // #8912: value is sent, but scanned first for known identifiers/IPs/hostnames.
+      defaultMessage: 'Allow (scanned)',
+    },
+  ),
   anonymize: i18n.translate(
     'wazuhAiAssistant.settings.privacy.action.anonymize',
     {
@@ -93,30 +108,6 @@ type PrivacyDraft = Pick<
 > & {
   fieldPolicy: Array<FieldPolicyEntry & { _isNew?: true }>;
 };
-
-/**
- * OSD's HttpFetchError puts the server's JSON body on `error.body` (the raw fetch Response is
- * otherwise opaque to callers) — an admin-gated rejection lands here as a bare "Forbidden"
- * `error.message` with no explanation, while the actual reason the server rejected the request is
- * `error.body.message`. Preferring that first (falling back to `error.message`, then to a
- * caller-supplied i18n fallback) is what makes the real server explanation reach the admin instead
- * of a generic callout.
- */
-function describeHttpError(error: unknown, fallback: string): string {
-  if (error && typeof error === 'object') {
-    const body = (error as { body?: unknown }).body;
-    if (body && typeof body === 'object') {
-      const message = (body as { message?: unknown }).message;
-      if (typeof message === 'string' && message.trim().length > 0) {
-        return message;
-      }
-    }
-  }
-  if (error instanceof Error && error.message) {
-    return error.message;
-  }
-  return fallback;
-}
 
 /**
  * Full PUT /settings payload from the last successful load plus the one slice a section's Save
@@ -191,15 +182,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [testResults, setTestResults] = useState<
-    Record<string, { success: boolean; latencyMs: number; message?: string }>
+    Record<string, ProviderTestOutcome>
   >({});
   const [testingIds, setTestingIds] = useState<Set<string>>(new Set());
-  const [dismissedErrorIds, setDismissedErrorIds] = useState<Set<string>>(
-    new Set(),
-  );
   const [deleteTarget, setDeleteTarget] = useState<ProviderSummary | null>(
     null,
   );
+  const [providersLoaded, setProvidersLoaded] = useState(false);
 
   // Privacy settings: loaded once on mount; edited locally and only written back on an explicit
   // "Save privacy settings" click, mirroring the provider form's own edit-then-save pattern
@@ -238,12 +227,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   );
   const [isSavingRetention, setIsSavingRetention] = useState(false);
   const [fieldPolicyFilter, setFieldPolicyFilter] = useState('');
-  const failedProviders = providers.filter(
-    p =>
-      testResults[p.id] &&
-      !testResults[p.id].success &&
-      !dismissedErrorIds.has(p.id),
-  );
   const hasEmptyFieldPolicyRow = fieldPolicyDraft.some(
     entry => entry.field.trim() === '',
   );
@@ -456,7 +439,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             defaultMessage: 'Could not load providers.',
           }),
         ),
-      );
+      )
+      .finally(() => setProvidersLoaded(true));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -494,15 +478,24 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   const handleSubmit = async (input: ProviderInput) => {
     setError(null);
     try {
-      if (editingProvider) {
-        await service.update(editingProvider.id, input);
-        clearTestResult(editingProvider.id);
-      } else {
-        await service.create(input);
-      }
+      const saved = editingProvider
+        ? await service.update(editingProvider.id, input)
+        : await service.create(input);
       setIsFormOpen(false);
       reload();
       onProvidersChanged();
+      handleTest(saved);
+      core.notifications.toasts.addSuccess(
+        editingProvider
+          ? i18n.translate('wazuhAiAssistant.settings.updateSuccess', {
+              defaultMessage: 'Provider "{name}" updated.',
+              values: { name: saved.name },
+            })
+          : i18n.translate('wazuhAiAssistant.settings.createSuccess', {
+              defaultMessage: 'Provider "{name}" added.',
+              values: { name: saved.name },
+            }),
+      );
     } catch (submitError) {
       setError(
         describeHttpError(
@@ -558,6 +551,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       await service.setDefault(provider.id);
       reload();
       onProvidersChanged();
+      core.notifications.toasts.addSuccess(
+        i18n.translate('wazuhAiAssistant.settings.setDefaultSuccess', {
+          defaultMessage: '"{name}" is now the default provider.',
+          values: { name: provider.name },
+        }),
+      );
     } catch (setDefaultError) {
       setError(
         describeHttpError(
@@ -572,22 +571,16 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
 
   const handleTest = async (provider: ProviderSummary) => {
     setTestingIds(current => new Set(current).add(provider.id));
-    setDismissedErrorIds(current => {
-      const next = new Set(current);
-      next.delete(provider.id);
-      return next;
-    });
     try {
       const result = await service.test(provider.id);
-      setTestResults(current => ({ ...current, [provider.id]: result }));
+      setTestResults(current => ({
+        ...current,
+        [provider.id]: outcomeFromTestResult(result),
+      }));
     } catch (testError) {
       setTestResults(current => ({
         ...current,
-        [provider.id]: {
-          success: false,
-          latencyMs: 0,
-          message: describeHttpError(testError, String(testError)),
-        },
+        [provider.id]: outcomeFromTestError(testError),
       }));
     } finally {
       setTestingIds(current => {
@@ -717,7 +710,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             </EuiText>
           );
         }
-        if (result.success) {
+        if (result.status === 'ok') {
           return (
             <EuiBadge color='success'>
               {i18n.translate('wazuhAiAssistant.settings.testSuccessBadge', {
@@ -727,12 +720,35 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             </EuiBadge>
           );
         }
+        const isCouldNotVerify = result.status === 'could-not-verify';
         return (
-          <EuiBadge color='danger'>
-            {i18n.translate('wazuhAiAssistant.settings.testFailureBadge', {
-              defaultMessage: 'Failed',
-            })}
-          </EuiBadge>
+          <EuiFlexGroup gutterSize='xs' alignItems='center' responsive={false}>
+            <EuiFlexItem grow={false}>
+              <EuiBadge color={isCouldNotVerify ? 'hollow' : 'danger'}>
+                {isCouldNotVerify
+                  ? i18n.translate(
+                      'wazuhAiAssistant.settings.testCouldNotVerifyBadge',
+                      {
+                        defaultMessage: 'Could not verify',
+                      },
+                    )
+                  : i18n.translate(
+                      'wazuhAiAssistant.settings.testFailureBadge',
+                      {
+                        defaultMessage: 'Failed',
+                      },
+                    )}
+              </EuiBadge>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiIconTip
+                type={isCouldNotVerify ? 'questionInCircle' : 'alert'}
+                color={isCouldNotVerify ? 'subdued' : 'danger'}
+                content={result.message}
+                aria-label={result.message}
+              />
+            </EuiFlexItem>
+          </EuiFlexGroup>
         );
       },
     },
@@ -891,35 +907,50 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 </>
               )}
 
-              <EuiBasicTable items={providers} columns={columns} itemId='id' />
-              {failedProviders.map(p => (
-                <React.Fragment key={p.id}>
-                  <EuiSpacer size='s' />
-                  <EuiCallOut
-                    color='danger'
-                    iconType='alert'
-                    size='s'
-                    title={i18n.translate(
-                      'wazuhAiAssistant.settings.testFailureCallout',
-                      {
-                        defaultMessage: '{name}: {message}',
-                        values: {
-                          name: p.name,
-                          message:
-                            testResults[p.id].message ??
-                            i18n.translate(
-                              'wazuhAiAssistant.settings.testFailureUnknown',
-                              { defaultMessage: 'Connection failed.' },
-                            ),
+              {providersLoaded && providers.length === 0 ? (
+                <EuiEmptyPrompt
+                  iconType='machineLearningApp'
+                  title={
+                    <h2>
+                      {i18n.translate(
+                        'wazuhAiAssistant.settings.providers.emptyTitle',
+                        {
+                          defaultMessage: 'No AI provider configured',
                         },
-                      },
-                    )}
-                    onDismiss={() =>
-                      setDismissedErrorIds(prev => new Set([...prev, p.id]))
-                    }
-                  />
-                </React.Fragment>
-              ))}
+                      )}
+                    </h2>
+                  }
+                  body={
+                    <p>
+                      {i18n.translate(
+                        'wazuhAiAssistant.settings.providers.emptyBody',
+                        {
+                          defaultMessage:
+                            'The AI Assistant needs at least one connected provider ' +
+                            '(OpenAI-compatible or Anthropic) before it can answer questions. ' +
+                            'Add one to get started.',
+                        },
+                      )}
+                    </p>
+                  }
+                  actions={
+                    <EuiButton color='primary' fill onClick={openCreateForm}>
+                      {i18n.translate(
+                        'wazuhAiAssistant.settings.providers.emptyAction',
+                        {
+                          defaultMessage: 'Add a provider',
+                        },
+                      )}
+                    </EuiButton>
+                  }
+                />
+              ) : (
+                <EuiBasicTable
+                  items={providers}
+                  columns={columns}
+                  itemId='id'
+                />
+              )}
             </EuiPanel>
 
             <EuiSpacer size='xl' />
@@ -1090,7 +1121,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                           <strong>
                             {i18n.translate(
                               'wazuhAiAssistant.settings.privacy.fieldColumnHeader',
-                              { defaultMessage: 'Field' },
+                              {
+                                defaultMessage: 'Field',
+                              },
                             )}
                           </strong>
                         </EuiText>
@@ -1190,7 +1223,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                     >
                       {i18n.translate(
                         'wazuhAiAssistant.settings.privacy.addField',
-                        { defaultMessage: 'Add field' },
+                        {
+                          defaultMessage: 'Add field',
+                        },
                       )}
                     </EuiButton>
                   </EuiAccordion>
@@ -1206,7 +1241,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                     >
                       {i18n.translate(
                         'wazuhAiAssistant.settings.privacy.addField',
-                        { defaultMessage: 'Add field' },
+                        {
+                          defaultMessage: 'Add field',
+                        },
                       )}
                     </EuiButton>
                   </>

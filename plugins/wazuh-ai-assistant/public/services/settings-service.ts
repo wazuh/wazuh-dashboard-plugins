@@ -11,7 +11,7 @@ import { SettingsAccess, withManagerSessionRetry } from './session-heal';
 /** Mirrors server/tools/privacy.ts's `FieldPolicyAction` — that file lives under server/ (out of
  * scope to import from public/), so this is a hand-kept public-side copy of the same wire values
  * (server/routes/settings.ts's `fieldPolicyActionSchema` is the source of truth). */
-export type FieldPolicyAction = 'allow' | 'anonymize' | 'never';
+export type FieldPolicyAction = 'allow' | 'allow-scan' | 'anonymize' | 'never';
 
 /** Mirrors server/tools/privacy.ts's `FieldPolicyEntry`. */
 export interface FieldPolicyEntry {

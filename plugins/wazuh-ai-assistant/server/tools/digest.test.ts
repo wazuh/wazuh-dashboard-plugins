@@ -1,6 +1,14 @@
 import assert from 'node:assert/strict';
-import { buildDigest, buildTableSpec, capDigest, Digest } from './digest';
+import {
+  buildDigest,
+  buildTableSpec,
+  capDigest,
+  Digest,
+  isMetricAggValue,
+  SUPPORTED_METRIC_AGG_TYPES,
+} from './digest';
 import { ToolDefinition } from './types';
+import { listToolDefinitions } from './registry';
 
 function buildToolDef(overrides: Partial<ToolDefinition> = {}): ToolDefinition {
   return {
@@ -197,6 +205,57 @@ test('buildDigest: a null hits element is skipped, not thrown', () => {
   const digest = buildDigest('search_wazuh_data', result, def);
   assert.deepEqual(digest.samples, [{ a: 1 }, { b: 2 }]);
   assert.equal(digest.counts.returned, 2);
+});
+
+test('buildDigest: exact-count hits.total ({value, relation: "eq"}, track_total_hits: true shape) is used as-is', () => {
+  // guardrails.ts's applySafetyValves forces track_total_hits: true on every outbound request, so
+  // the Indexer always returns this object shape with relation 'eq' (an exact count) -- never the
+  // capped 'gte' shape a numeric track_total_hits produces. `relation` itself is not read; this
+  // just confirms `.value` is picked up regardless of which relation string accompanies it.
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'a', label: 'A' }] },
+    digest: { sampleColumns: ['a'] },
+  });
+  const result = {
+    hits: {
+      total: { value: 12345, relation: 'eq' },
+      hits: [{ _source: { a: 1 } }],
+    },
+  };
+  const digest = buildDigest('search_wazuh_data', result, def);
+  assert.equal(digest.counts.total, 12345);
+  assert.equal(digest.counts.returned, 1);
+  assert.equal(digest.counts.truncated, true);
+});
+
+test('buildDigest: a bare-number hits.total (legacy/defensive shape) is also accepted', () => {
+  // Not the shape OpenSearch actually sends today (see digest.ts's resolveHitsTotal doc comment),
+  // but resolveHitsTotal accepts it defensively -- this pins that behavior rather than leaving it
+  // untested.
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'a', label: 'A' }] },
+    digest: { sampleColumns: ['a'] },
+  });
+  const result = {
+    hits: {
+      total: 7,
+      hits: [{ _source: { a: 1 } }],
+    },
+  };
+  const digest = buildDigest('search_wazuh_data', result, def);
+  assert.equal(digest.counts.total, 7);
+  assert.equal(digest.counts.truncated, true);
+});
+
+test('buildDigest: hits.total missing entirely (track_total_hits: false-equivalent) leaves total undefined and truncated false', () => {
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'a', label: 'A' }] },
+    digest: { sampleColumns: ['a'] },
+  });
+  const result = { hits: { hits: [{ _source: { a: 1 } }] } };
+  const digest = buildDigest('search_wazuh_data', result, def);
+  assert.equal(digest.counts.total, undefined);
+  assert.equal(digest.counts.truncated, false);
 });
 
 // --- deriveResultColumns / deriveColumns tools -----------------------------------------------------
@@ -620,6 +679,98 @@ test('buildDigest: a synthetic breakdown over a truncated page is labeled page-o
   assert.equal(/Use counts\/breakdown/.test(digest.samplesNote!), false);
 });
 
+test('buildDigest: a REAL breakdown with a truncated bucket list discloses sum_other_doc_count', () => {
+  // A terms agg sized 5 on a 12-agent deployment: OpenSearch returns the top 5 buckets plus
+  // sum_other_doc_count for the rest. Without the note, the digest certified a top-5 agent list
+  // as the population — the sample-narrated-as-population class one layer up, with the digest's
+  // own "use counts/breakdown" wording as warrant.
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'wazuh.agent.name', label: 'Agent' }] },
+    digest: { sampleColumns: ['wazuh.agent.name'] },
+  });
+  const result = {
+    hits: { total: { value: 120 }, hits: [] },
+    aggregations: {
+      wazuh_agent_name: {
+        doc_count_error_upper_bound: 0,
+        sum_other_doc_count: 37,
+        buckets: [
+          { key: 'web-prod-01', doc_count: 40 },
+          { key: 'web-prod-02', doc_count: 25 },
+          { key: 'db-01', doc_count: 10 },
+          { key: 'db-02', doc_count: 5 },
+          { key: 'mail-01', doc_count: 3 },
+        ],
+      },
+    },
+  };
+  const digest = buildDigest('get_vulnerabilities', result, def);
+  assert.ok(digest.breakdownNote, 'expected the bucket-truncation note');
+  // The count must appear, but NOT as "37 additional rows": the note is worded per dimension and in
+  // terms of further MATCHES, because on a multi-valued keyword field the remainder can be the same
+  // documents counted again under other keys (see buildBucketTruncationNote).
+  assert.match(digest.breakdownNote!, /\b37\b/);
+  assert.doesNotMatch(digest.breakdownNote!, /37 additional rows/);
+  // `/not.*complete set|complete set/i` (the previous form) collapses to `/complete set/i`: `|`
+  // binds looser than concatenation, so the second alternative alone matches any occurrence of
+  // "complete set" regardless of whether "not" precedes it -- the `not.*` branch was dead and
+  // could never make the assertion fail on its own. Requiring "not" to actually precede the
+  // completeness claim is what the test name always meant. Deliberately loose on the word
+  // "complete" itself (not pinned to the literal phrase "complete set of values") because
+  // digest.ts's per-aggregation reword of this note (in flight elsewhere) may name the truncated
+  // dimension inline; the semantic requirement -- the note must NEGATE completeness, not just
+  // mention it -- holds regardless of that wording.
+  assert.match(
+    digest.breakdownNote!,
+    /not[\s\S]{0,80}complete/i,
+    'the truncation note must actually negate completeness, not merely contain the word ' +
+      '"complete" somewhere unrelated',
+  );
+});
+
+test('buildDigest: a REAL breakdown with a complete bucket list stays note-free (byte-identical)', () => {
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'wazuh.agent.name', label: 'Agent' }] },
+    digest: { sampleColumns: ['wazuh.agent.name'] },
+  });
+  const result = {
+    aggregations: {
+      wazuh_agent_name: {
+        sum_other_doc_count: 0,
+        buckets: [{ key: 'web-prod-01', doc_count: 40 }],
+      },
+    },
+  };
+  const digest = buildDigest('get_vulnerabilities', result, def);
+  assert.ok(!('breakdownNote' in digest));
+});
+
+test('buildDigest: samplesNote still points at a REAL breakdown whose counts are exact, even with a truncated key set', () => {
+  // The key-set truncation note (case 2) must NOT flip samplesNote into its distrust variant —
+  // that wording ("ALSO scoped to only these returned rows") is specific to the synthetic
+  // page-scope case and would be false for a real aggregation.
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'wazuh.agent.name', label: 'Agent' }] },
+    digest: { sampleColumns: ['wazuh.agent.name'] },
+  });
+  const rows = Array.from({ length: 8 }, () =>
+    findingRow('web-prod-01', 'Rule X', '2026-01-01T00:00:00Z'),
+  );
+  const result = {
+    hits: { total: { value: 120 }, hits: rows },
+    aggregations: {
+      wazuh_agent_name: {
+        sum_other_doc_count: 37,
+        buckets: [{ key: 'web-prod-01', doc_count: 83 }],
+      },
+    },
+  };
+  const digest = buildDigest('get_vulnerabilities', result, def);
+  assert.ok(digest.breakdownNote);
+  assert.ok(digest.samplesNote);
+  assert.match(digest.samplesNote!, /Use counts\/breakdown/);
+});
+
 // --- message / breakdown[].key hardening (#8890) ---------------------------------------------
 
 /** Regex control-character classes (e.g. /[\x00-\x1F]/) are themselves flagged by
@@ -671,7 +822,9 @@ test('buildDigest: breakdown "key" values are stripped of control characters and
     },
   };
   const digest = buildDigest('get_top_rules', result, def);
-  const key = digest.breakdown![0].key;
+  // `key` is `unknown` (multi_terms/composite widened the type -- see Digest's doc comment), but a
+  // plain terms/significant_terms/cardinality bucket (this test's shape) is always a string.
+  const key = digest.breakdown![0].key as string;
   assert.ok(
     !hasControlChar(key),
     'control characters must be stripped from the key',
@@ -695,5 +848,448 @@ test('capDigest: an oversized "columns" list forces the Manager message to be dr
   assert.ok(
     !('message' in capped),
     'message is dropped as the last-resort step once nothing else remains to trim',
+  );
+});
+
+// --- #8920 item 5: top-level metric aggregations are no longer dropped -------------------------
+
+test('isMetricAggValue: accepts {value: number|null}, rejects buckets/hits/non-object shapes', () => {
+  assert.equal(isMetricAggValue({ value: 6 }), true);
+  assert.equal(isMetricAggValue({ value: null }), true);
+  assert.equal(isMetricAggValue({ value: 6, buckets: [] }), false);
+  assert.equal(isMetricAggValue({ value: 6, hits: { hits: [] } }), false);
+  assert.equal(
+    isMetricAggValue({ buckets: [{ key: 'a', doc_count: 1 }] }),
+    false,
+  );
+  assert.equal(isMetricAggValue({ value: '6' }), false);
+  assert.equal(isMetricAggValue(null), false);
+  assert.equal(isMetricAggValue(undefined), false);
+  assert.equal(isMetricAggValue([1, 2]), false);
+  assert.equal(isMetricAggValue('x'), false);
+});
+
+/**
+ * One REAL OpenSearch response shape per supported metric type — not a shared synthetic
+ * `{value: 6}` for all of them, which would let a type whose real response is NOT `{value}`
+ * (percentiles, stats) be added to SUPPORTED_METRIC_AGG_TYPES and pass anyway. min/max include
+ * the `value_as_string` a date-field aggregation returns; the sync test below fails if a type is
+ * added to SUPPORTED_METRIC_AGG_TYPES without a real fixture here.
+ */
+const REAL_METRIC_AGG_RESPONSES: Record<string, Record<string, unknown>> = {
+  cardinality: { value: 6 },
+  value_count: { value: 4812 },
+  avg: { value: 7.32 },
+  sum: { value: 120 },
+  min: {
+    value: 1704067200000,
+    value_as_string: '2026-01-01T00:00:00.000Z',
+  },
+  max: {
+    value: 1786000000000,
+    value_as_string: '2026-08-09T12:26:40.000Z',
+  },
+};
+
+test('every SUPPORTED_METRIC_AGG_TYPES entry has a real response fixture in this file', () => {
+  // The per-type loop below is only as strong as this sync: a type added to the list without a
+  // REAL response shape here would otherwise be tested against nothing.
+  for (const type of SUPPORTED_METRIC_AGG_TYPES) {
+    assert.ok(
+      REAL_METRIC_AGG_RESPONSES[type],
+      `${type}: add its real OpenSearch response shape to REAL_METRIC_AGG_RESPONSES`,
+    );
+  }
+});
+
+test('buildDigest: a metric-only response synthesizes ONE row per SUPPORTED_METRIC_AGG_TYPES entry, not returned:0', () => {
+  const def = buildToolDef({
+    deriveColumns: true,
+    digest: { sampleColumns: [] },
+  });
+  for (const type of SUPPORTED_METRIC_AGG_TYPES) {
+    const aggKey = `${type}_result`;
+    const response = REAL_METRIC_AGG_RESPONSES[type];
+    const result = { aggregations: { [aggKey]: response } };
+    const digest = buildDigest('search_wazuh_data', result, def);
+    assert.equal(
+      digest.counts.returned,
+      1,
+      `${type}: expected returned:1, not the pre-fix returned:0`,
+    );
+    // counts.total is pinned as 1 too: the synthesized row IS the result set here — there is no
+    // hits row set to count (size:0, metric-only), and inventing hits.total would flip
+    // `truncated` for a result that is not truncated.
+    assert.equal(digest.counts.total, 1, `${type}: synthesized-row total`);
+    assert.deepEqual(
+      digest.samples,
+      [{ [aggKey]: response.value }],
+      `${type}: expected the computed value to reach samples`,
+    );
+    // The projection-immune carrier is ALSO populated (see Digest.metrics doc comment), with
+    // value_as_string carried through when the response provides it (min/max on a date field).
+    assert.deepEqual(
+      digest.metrics,
+      [
+        {
+          agg: aggKey,
+          value: response.value,
+          ...(typeof response.value_as_string === 'string'
+            ? { value_as_string: response.value_as_string }
+            : {}),
+        },
+      ],
+      `${type}: expected a metrics entry`,
+    );
+    assert.equal(
+      digest.hint,
+      undefined,
+      `${type}: a fully-represented response must not carry the unrepresentable-agg hint`,
+    );
+  }
+});
+
+/**
+ * The negative half of the class guard: aggregation shapes this digest CANNOT represent must not
+ * silently serialize as a bare `returned: 0` — they get no rows, but the hint must name them so
+ * the model can re-query instead of reporting "no data" for a query OpenSearch answered. Each
+ * fixture is that aggregation's REAL response shape.
+ */
+const UNREPRESENTABLE_AGG_RESPONSES: Record<string, Record<string, unknown>> = {
+  stats: { count: 10, min: 1, max: 12, avg: 6.6, sum: 66 },
+  extended_stats: {
+    count: 10,
+    min: 1,
+    max: 12,
+    avg: 6.6,
+    sum: 66,
+    sum_of_squares: 506,
+    variance: 12.04,
+    std_deviation: 3.47,
+  },
+  percentiles: { values: { '95.0': 11.2, '99.0': 12 } },
+  top_metrics: { top: [{ sort: [3], metrics: { 'wazuh.rule.level': 12 } }] },
+  // `filters` with NAMED filters / range with keyed:true — buckets is an OBJECT, not an array.
+  keyed_filters: {
+    buckets: { high: { doc_count: 37 }, low: { doc_count: 29 } },
+  },
+  keyed_range: {
+    buckets: { '*-100.0': { doc_count: 2 }, '100.0-*': { doc_count: 4 } },
+  },
+};
+
+test('buildDigest: an unrepresentable aggregation shape yields 0 rows PLUS a hint naming it', () => {
+  const def = buildToolDef({
+    deriveColumns: true,
+    digest: { sampleColumns: [] },
+  });
+  for (const [name, response] of Object.entries(
+    UNREPRESENTABLE_AGG_RESPONSES,
+  )) {
+    const result = { aggregations: { [name]: response } };
+    const digest = buildDigest('search_wazuh_data', result, def);
+    assert.equal(digest.counts.returned, 0, `${name}: no row can be built`);
+    assert.ok(digest.hint, `${name}: the terminal guard hint must fire`);
+    assert.ok(
+      digest.hint!.includes(name),
+      `${name}: the hint must name the unrepresentable aggregation`,
+    );
+    assert.equal(
+      digest.metrics,
+      undefined,
+      `${name}: no metrics entry can be fabricated for it`,
+    );
+  }
+});
+
+test('buildDigest: a top-level single-bucket filter agg reports its doc_count, not returned:0', () => {
+  // {doc_count} with no buckets/hits/value — filter/global/missing/nested. bucketsToRows already
+  // merged this exact shape for SUB-aggregations; the top level must not be the one place it is
+  // silently dropped.
+  const def = buildToolDef({
+    deriveColumns: true,
+    digest: { sampleColumns: [] },
+  });
+  const result = { aggregations: { criticals: { doc_count: 37 } } };
+  const digest = buildDigest('search_wazuh_data', result, def);
+  assert.equal(digest.counts.returned, 1);
+  assert.deepEqual(digest.samples, [{ criticals: 37 }]);
+  assert.deepEqual(digest.metrics, [{ agg: 'criticals', value: 37 }]);
+  assert.equal(digest.hint, undefined);
+});
+
+test('buildDigest: a metric-only response with a _source list is NOT projected into empty samples', () => {
+  // deriveResultColumns' priority 1 returns `_source` verbatim; the synthesized metric row's keys
+  // are aggregation NAMES, so that projection produced samples:[{}] with returned:1 — a row that
+  // asserts it exists and carries nothing. The agg-name row must win column derivation instead.
+  const def = buildToolDef({
+    deriveColumns: true,
+    digest: { sampleColumns: [] },
+  });
+  const body = {
+    size: 0,
+    _source: ['wazuh.rule.id'],
+    aggs: { distinct_agents: { cardinality: { field: 'wazuh.agent.id' } } },
+  };
+  const result = { aggregations: { distinct_agents: { value: 6 } } };
+  const digest = buildDigest('search_wazuh_data', result, def, body);
+  assert.deepEqual(digest.samples, [{ distinct_agents: 6 }]);
+  assert.deepEqual(digest.columns, ['distinct_agents']);
+});
+
+test('buildDigest: a NON-deriveColumns tool with a metric-only response still carries the answer in metrics', () => {
+  // A typed tool's static sampleColumns can never name a model-chosen agg, so the synthesized
+  // row projects to an empty sample — `metrics` is the projection-immune carrier that must hold
+  // the computed value regardless.
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'wazuh.rule.id', label: 'Rule' }] },
+    digest: { sampleColumns: ['wazuh.rule.id'] },
+  });
+  const result = { aggregations: { distinct_agents: { value: 6 } } };
+  const digest = buildDigest('get_some_tool', result, def);
+  assert.deepEqual(digest.metrics, [{ agg: 'distinct_agents', value: 6 }]);
+});
+
+test('buildDigest: a metric agg with value:null passes through as null, not dropped', () => {
+  const def = buildToolDef({
+    deriveColumns: true,
+    digest: { sampleColumns: [] },
+  });
+  const result = { aggregations: { avg_level: { value: null } } };
+  const digest = buildDigest('search_wazuh_data', result, def);
+  assert.equal(digest.counts.returned, 1);
+  assert.deepEqual(digest.samples, [{ avg_level: null }]);
+});
+
+test('buildDigest: a metric-only response carries metrics AND the synthesized row', () => {
+  // Deliberately double-represented: the row feeds the rendered table and is subject to column
+  // projection, `metrics` is the projection-immune carrier — see Digest.metrics' doc comment.
+  const def = buildToolDef({
+    deriveColumns: true,
+    digest: { sampleColumns: [] },
+  });
+  const result = { aggregations: { distinct_agents: { value: 6 } } };
+  const digest = buildDigest('search_wazuh_data', result, def);
+  assert.deepEqual(digest.samples, [{ distinct_agents: 6 }]);
+  assert.deepEqual(digest.metrics, [{ agg: 'distinct_agents', value: 6 }]);
+});
+
+test('buildDigest: a metric agg BEFORE a bucket agg in key order no longer masks the bucket rows', () => {
+  // Reproduces the exact pre-fix defect: Object.keys(aggregations)[0] was "distinct_agents" (no
+  // .buckets), so bucketsToRows used to bail out to `undefined` before ever looking at "by_rule".
+  const def = buildToolDef({
+    tableSpec: {
+      columns: [
+        { field: 'key', label: 'Key' },
+        { field: 'doc_count', label: 'Count' },
+      ],
+    },
+    digest: { sampleColumns: ['key', 'doc_count'] },
+  });
+  const result = {
+    aggregations: {
+      distinct_agents: { value: 6 },
+      by_rule: { buckets: [{ key: '100', doc_count: 5 }] },
+    },
+  };
+  const digest = buildDigest('search_wazuh_data', result, def);
+  assert.equal(digest.counts.returned, 1, 'the bucket agg must still be found');
+  assert.deepEqual(digest.samples, [{ key: '100', doc_count: 5 }]);
+  assert.deepEqual(digest.metrics, [{ agg: 'distinct_agents', value: 6 }]);
+});
+
+test('buildTableSpec: a metric agg BEFORE a bucket agg in key order does not blank out the table', () => {
+  const def = buildToolDef({ deriveColumns: true });
+  const result = {
+    aggregations: {
+      distinct_agents: { value: 6 },
+      by_rule: { buckets: [{ key: '100', doc_count: 5 }] },
+    },
+  };
+  const table = buildTableSpec(result, def);
+  assert.deepEqual(table.rows, [{ key: '100', doc_count: 5 }]);
+});
+
+test('buildDigest: a metric agg AFTER a bucket agg carries digest.metrics alongside the bucket rows', () => {
+  const def = buildToolDef({
+    tableSpec: {
+      columns: [
+        { field: 'key', label: 'Key' },
+        { field: 'doc_count', label: 'Count' },
+      ],
+    },
+    digest: { sampleColumns: ['key', 'doc_count'] },
+  });
+  const result = {
+    aggregations: {
+      by_rule: { buckets: [{ key: '100', doc_count: 5 }] },
+      distinct_agents: { value: 6 },
+    },
+  };
+  const digest = buildDigest('search_wazuh_data', result, def);
+  assert.deepEqual(digest.samples, [{ key: '100', doc_count: 5 }]);
+  assert.deepEqual(digest.metrics, [{ agg: 'distinct_agents', value: 6 }]);
+});
+
+test('buildDigest: digest.metrics carries a null metric value through unchanged when mixed with a bucket agg', () => {
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'key', label: 'Key' }] },
+    digest: { sampleColumns: ['key'] },
+  });
+  const result = {
+    aggregations: {
+      by_rule: { buckets: [{ key: '100', doc_count: 5 }] },
+      avg_level: { value: null },
+    },
+  };
+  const digest = buildDigest('search_wazuh_data', result, def);
+  assert.deepEqual(digest.metrics, [{ agg: 'avg_level', value: null }]);
+});
+
+test('buildDigest: a metric agg alongside HITS rows (not a bucket agg) also carries digest.metrics', () => {
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'a', label: 'A' }] },
+    digest: { sampleColumns: ['a'] },
+  });
+  const result = {
+    hits: { total: { value: 1 }, hits: [{ _source: { a: 1 } }] },
+    aggregations: { distinct_agents: { value: 6 } },
+  };
+  const digest = buildDigest('search_wazuh_data', result, def);
+  assert.deepEqual(digest.samples, [{ a: 1 }]);
+  assert.deepEqual(digest.metrics, [{ agg: 'distinct_agents', value: 6 }]);
+});
+
+test('buildDigest: a single terms-agg digest carries no "metrics" field (regression, unchanged fixture)', () => {
+  // Exact fixture from "buildDigest: single aggregation buckets become a breakdown without an
+  // 'agg' tag" above -- a bucket-only response must stay byte-identical, no new field appears.
+  const def = buildToolDef({ digest: { sampleColumns: ['key'] } });
+  const result = {
+    aggregations: {
+      top_rules: {
+        buckets: [
+          { key: '100', doc_count: 5 },
+          { key: '200', doc_count: 3 },
+        ],
+      },
+    },
+  };
+  const digest = buildDigest('get_top_rules', result, def);
+  assert.ok(
+    !('metrics' in digest),
+    'a bucket-only response must not gain a metrics field',
+  );
+});
+
+test('buildDigest: a manager-response digest (no aggregations at all) carries no "metrics" field', () => {
+  const def = buildToolDef();
+  const result = { data: { affected_items: ['001'], total_affected_items: 1 } };
+  const digest = buildDigest('get_active_agents', result, def);
+  assert.ok(!('metrics' in digest));
+});
+
+// --- registry-wide sync: no tool description advertises a metric shape the digest can't hold ----
+
+/**
+ * Coverage test for #8920 item 5's class fix: iterates EVERY tool spec description (not just
+ * search_wazuh_data's) and extracts aggregation-type words. `top_hits`/`terms` are BUCKET-family
+ * words (already handled by `bucketsToRows`' per-bucket sub-agg merge / real-bucket scan) and are
+ * deliberately not checked against `SUPPORTED_METRIC_AGG_TYPES` here — only the METRIC-family
+ * words are, since those are the ones whose response shape `isMetricAggValue` must recognize.
+ * `percentiles`/`stats`/`extended_stats` are real OpenSearch metric aggregations this digest
+ * pipeline does NOT support (see `SUPPORTED_METRIC_AGG_TYPES`'s doc comment: their response is a
+ * multi-value object, not `{value}`) — a tool description that ever advertises one of those would
+ * repeat the exact silent-drop defect this cluster fixes, just for a shape `isMetricAggValue`
+ * cannot represent, so this test fails on that too. Nothing is exempt by default: a new tool
+ * registered later, or a wording change to an existing one, is checked automatically.
+ */
+const AGG_TYPE_WORD_RE =
+  /\b(cardinality|avg|sum|min|max|value_count|percentiles|stats|extended_stats|top_hits|terms)\b/g;
+const METRIC_FAMILY_WORDS = new Set([
+  'cardinality',
+  'avg',
+  'sum',
+  'min',
+  'max',
+  'value_count',
+  'percentiles',
+  'stats',
+  'extended_stats',
+]);
+
+test('description/digest sync: no tool description advertises a metric shape the digest drops', () => {
+  const offenders: string[] = [];
+  // Without this guard the loop passes vacuously if AGG_TYPE_WORD_RE ever stopped matching any
+  // registered tool description at all (a wording rewrite, a regex typo) -- same standard as
+  // agg-representability-coverage.test.ts's indexerTools.length guard.
+  let checkedCount = 0;
+  for (const def of listToolDefinitions()) {
+    const words = def.spec.description.match(AGG_TYPE_WORD_RE) ?? [];
+    for (const word of new Set(words)) {
+      checkedCount += 1;
+      if (
+        METRIC_FAMILY_WORDS.has(word) &&
+        !(SUPPORTED_METRIC_AGG_TYPES as readonly string[]).includes(word)
+      ) {
+        offenders.push(`${def.spec.name}: advertises "${word}"`);
+      }
+    }
+  }
+  assert.ok(
+    checkedCount > 0,
+    'no registered tool description matched AGG_TYPE_WORD_RE -- this test would pass vacuously',
+  );
+  assert.deepEqual(
+    offenders,
+    [],
+    'A tool description names a metric aggregation type digest.ts cannot represent as {value} -- ' +
+      'either add it to SUPPORTED_METRIC_AGG_TYPES (only if its response really is {value: ' +
+      'number|null}) or remove the claim from the description.',
+  );
+});
+
+test('description/digest sync mechanism: SUPPORTED_METRIC_AGG_TYPES is exactly the METRIC_FAMILY_WORDS the digest supports', () => {
+  // Sanity check for the test above's own logic: every SUPPORTED_METRIC_AGG_TYPES entry must
+  // itself be one of the words this file's regex/word-family split can even recognize as
+  // "metric-family" -- otherwise a typo in SUPPORTED_METRIC_AGG_TYPES would silently make the sync
+  // test above pass for the wrong reason (the word never being extracted at all).
+  for (const type of SUPPORTED_METRIC_AGG_TYPES) {
+    assert.ok(
+      METRIC_FAMILY_WORDS.has(type),
+      `${type}: must be present in this test file's METRIC_FAMILY_WORDS too`,
+    );
+  }
+});
+
+test('buildDigest: a cardinality metric is marked approximate; a count metric is not', () => {
+  // The response shape is `{value: N}` for EVERY metric type, so only the REQUEST can say whether a
+  // number is a count or an HLL++ estimate. Item 5 made metric aggregations answerable at all, so an
+  // unmarked distinct count would be a NEW confidently-exact-looking answer in the very issue that
+  // exists to remove confidently-wrong ones.
+  const def = buildToolDef();
+  const requestBody = {
+    size: 0,
+    aggs: {
+      distinct_hosts: { cardinality: { field: 'wazuh.agent.name' } },
+      total_rows: { value_count: { field: 'wazuh.agent.name' } },
+    },
+  };
+  const result = {
+    hits: { hits: [], total: { value: 0 } },
+    aggregations: {
+      distinct_hosts: { value: 6 },
+      total_rows: { value: 918 },
+    },
+  };
+  const digest = buildDigest('search_wazuh_data', result, def, requestBody);
+  const distinct = digest.metrics?.find(m => m.agg === 'distinct_hosts');
+  const counted = digest.metrics?.find(m => m.agg === 'total_rows');
+  assert.equal(distinct?.value, 6);
+  assert.equal(distinct?.approximate, true, 'cardinality must be flagged');
+  assert.equal(counted?.value, 918);
+  assert.equal(
+    counted?.approximate,
+    undefined,
+    'value_count is exact and must NOT be flagged',
   );
 });

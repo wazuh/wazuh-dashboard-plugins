@@ -4,6 +4,7 @@ import { getAgentsTool } from './catalog/get-agents';
 import { getCriticalFindingsTool } from './catalog/get-critical-findings';
 import { searchFindingsByAgentTool } from './catalog/search-findings-by-agent';
 import { getTopRulesTool } from './catalog/get-top-rules';
+import { getTopAgentsTool } from './catalog/get-top-agents';
 import { getCriticalVulnerabilitiesTool } from './catalog/get-critical-vulnerabilities';
 import { getFindingsByTimeTool } from './catalog/get-findings-by-time';
 import { getEventsByAgentTool } from './catalog/get-events-by-agent';
@@ -49,6 +50,9 @@ const CATALOG: ToolDefinition[] = [
   searchFindingsByAgentTool,
   getTopRulesTool,
   getCriticalVulnerabilitiesTool,
+  // Entity-pivot counterpart to get_top_rules above -- "which agents are noisiest" (GA benchmark
+  // gap). Kept adjacent to get_top_rules since both are the same "aggregate and rank" shape.
+  getTopAgentsTool,
 
   // General finding search / summary
   getFindingsByTimeTool,

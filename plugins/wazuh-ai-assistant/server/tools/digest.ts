@@ -15,19 +15,40 @@ export interface Digest {
    * finding-hits typed tool (`catalog/common.ts`'s `FINDING_BREAKDOWN_AGGS` always attaches two:
    * by agent name and by rule title) — naming which aggregation a bucket belongs to; single-agg
    * digests stay byte-identical to before it existed. It also lets privacy.ts's field-policy pass
-   * attribute each bucket key to the right aggregation field. */
-  breakdown?: Array<{ key: string; count: number; agg?: string }>;
-  /** Set only when `breakdown` was synthesized from the RETURNED page (`buildSyntheticBreakdown`)
-   * rather than a real OpenSearch aggregation over the full matched set (`buildBreakdown`), AND
-   * that page is not the whole matched set (`counts.truncated`) — i.e. an entity whose rows sort
-   * outside the page is invisible to `breakdown`, the exact defect #8870's validation update
-   * reproduced live (limit:20 on 26 matches synthesizing 13/7 and 11/9 while the true distribution
-   * is 16/8/2 and 13/13). Tells the model `breakdown` is NOT authoritative for the full result,
-   * unlike `samplesNote` (which caveats `samples` only) — see `buildSamplesNote`'s own updated
-   * wording for how the two combine. Omitted whenever `breakdown` is a real aggregation (always
-   * population-true: OpenSearch computes `aggregations` over every matched doc regardless of
-   * `size`) or a synthetic one over an untruncated result (`returned === total`, where grouping
-   * every returned row already IS grouping the full population). */
+   * attribute each bucket key to the right aggregation field.
+   *
+   * `key` is `unknown`, not `string`: a plain terms/significant_terms/cardinality bucket's key is
+   * always a string (unchanged from before), but a `multi_terms` bucket's key is an ARRAY of
+   * component values and a `composite` bucket's key is an OBJECT of `{sourceName: value}` pairs —
+   * see `buildBreakdown` below. Forcing either through `String()` loses the per-component
+   * structure privacy.ts's field-policy pass needs to scrub each component against its own field
+   * (and, for `composite`, produced the literal string "[object Object]", a separate display
+   * bug). digest.ts stays privacy-agnostic either way: it just stops DESTROYING the structure a
+   * privacy-aware consumer needs, it does not interpret it. */
+  breakdown?: Array<{ key: unknown; count: number; agg?: string }>;
+  /** Set in exactly two situations, each a distinct honesty gap the model cannot see on its own:
+   *
+   * 1. `breakdown` was synthesized from the RETURNED page (`buildSyntheticBreakdown`) rather than
+   *    a real OpenSearch aggregation over the full matched set (`buildBreakdown`), AND that page
+   *    is not the whole matched set (`counts.truncated`) — i.e. an entity whose rows sort outside
+   *    the page is invisible to `breakdown`, the exact defect #8870's validation update
+   *    reproduced live (limit:20 on 26 matches synthesizing 13/7 and 11/9 while the true
+   *    distribution is 16/8/2 and 13/13). Tells the model `breakdown` is NOT authoritative for
+   *    the full result, unlike `samplesNote` (which caveats `samples` only).
+   * 2. `breakdown` came from a REAL terms aggregation whose BUCKET LIST is truncated — the terms
+   *    response's `sum_other_doc_count` > 0 (`sumOtherDocCounts` below). Per-bucket COUNTS are
+   *    still exact and population-true, but the KEY SET is top-N only: presenting 5 agent-name
+   *    buckets as "the agents affected" on a 12-agent deployment reproduces the exact
+   *    sample-narrated-as-population class one layer up, with the digest's own trust-the-
+   *    breakdown wording as warrant. The note states the uncounted remainder explicitly.
+   *
+   * Omitted for a real aggregation whose buckets are complete, and for a synthetic one over an
+   * untruncated result (`returned === total`, where grouping every returned row already IS
+   * grouping the full population). `buildSamplesNote`'s "trust the breakdown" variant keys off
+   * the SYNTHETIC-page-scope case only (see `syntheticPageScoped` in `buildDigest`): a real
+   * breakdown with a truncated key set still has exact counts, so pointing the model at
+   * counts/breakdown stays truthful — this note is what tells it the key list is not the
+   * universe. */
   breakdownNote?: string;
   /** Set only when `counts.returned` is 0 AND the executed query carried 2+ filter clauses — see
    * `buildZeroRowHint` below. A 0-row result is exactly as consistent with "a wrong field name" or
@@ -41,12 +62,168 @@ export interface Digest {
    * caveat that the sample is the newest-N of the result, not a representative cut, so the model
    * does not read an entity's absence from `samples` as a fact about the whole result set. */
   samplesNote?: string;
-  /** Schema hint: the column ids of the table already rendered to the user. */
+  /** Schema hint: the column ids of the table SPEC sent to the client — i.e. the field set each
+   * row object carries. Deliberately NOT "the columns the user sees": the client may cap how
+   * many spec columns render as visible table columns (its own budget), with the rest reachable
+   * through the row expander — so the model must treat this as the row schema, never as proof a
+   * particular column is on screen. */
   columns: string[];
   /** The Manager response's top-level `message` (e.g. "AR command was not sent to any agent"),
    * when present — some mutation endpoints report an otherwise-silent no-op only through this
    * field, with `affected_items`/`failed_items` both empty. */
   message?: string;
+  /** Set only when a `ToolDefinition.resolveParams` hook (types.ts; issue #8913) inferred a
+   * parameter the caller omitted rather than erroring — e.g. get_agent_inventory resolving "this
+   * server"/"the host" to the one active agent when neither `agent_id` nor `agent_name` was
+   * supplied, because a live run found the model does not reliably call `get_agents` first on its
+   * own even when told to. Surfaced the same way `samplesNote`/`hint` are: a plain sentence the
+   * model is expected to relay to the user as an explicit assumption, never to act on silently.
+   * Omitted for every tool without a `resolveParams` hook, and for a `resolveParams` call that
+   * needed no inference (every relevant param was already supplied). */
+  assumptionNote?: string;
+  /**
+   * Every metric-shaped (`isMetricAggValue`) or single-bucket-count (`isSingleBucketDocCount`)
+   * TOP-LEVEL aggregation, keyed by the model's own agg name — populated UNCONDITIONALLY whenever
+   * at least one such aggregation is in the response (issue #8920 item 5, e.g. `aggs: {by_rule:
+   * {terms...}, distinct_agents: {cardinality...}}`). It is deliberately populated even for a
+   * metric-ONLY response, where `bucketsToRows`' synthesized row (see its doc comment) already
+   * carries the same numbers: the synthesized row exists for the rendered table and is subject to
+   * column projection (`deriveResultColumns`' `_source` priority, or a typed tool's static
+   * `sampleColumns` that cannot name a model-chosen agg), either of which can silently drop the
+   * value from `samples` — `metrics` is the projection-immune carrier, so the computed answer can
+   * never be lost to a column mismatch. `value_as_string` is carried when OpenSearch provides it
+   * (min/max on a date field return `{value: <epoch millis>, value_as_string: <ISO date>}`), so
+   * the model is never left to interpret a bare epoch integer.
+   * Three facts about how this interacts with the rest of the pipeline, recorded here since none
+   * of them needed structural changes elsewhere:
+   *  1. Privacy: `value` is always a NUMBER (a computed statistic), never analyst/attacker-supplied
+   *     data, so it needs no field-policy classification. `applyFieldPolicy`'s `{...digest}` spread
+   *     (privacy.ts) carries `metrics` through to the scrubbed digest untouched — it is never
+   *     enumerated there, same as `columns`.
+   *  2. `prescanAndMintToolContent`'s JSON-aware scan (privacy.ts) skips this key via
+   *     `UNSCANNED_DIGEST_KEYS`: `value_as_string` is OpenSearch's own date/number formatting of a
+   *     numeric statistic (never a hostname/IP), and scanning it would misfire on timestamp
+   *     fragments ("00.000Z" is FQDN-token-shaped); `agg` is the aggregation's own name (chosen by
+   *     the model, not indexed data).
+   *  3. Size: `capDigest` needs no new drop stage for this field — `guardrails.ts`'s
+   *     `MAX_TOP_LEVEL_AGGS` (5) already bounds how many top-level aggregations any request can
+   *     declare, which bounds `metrics.length` to the same ceiling before this field exists.
+   */
+  metrics?: Array<{
+    agg: string;
+    value: number | null;
+    value_as_string?: string;
+    /**
+     * Set when the aggregation that produced `value` is a `cardinality` — the ONLY supported metric
+     * type whose result is an estimate rather than a count. OpenSearch computes distinct counts with
+     * HyperLogLog++: exact up to `precision_threshold` (guardrails.ts raises every cardinality agg to
+     * the maximum the engine accepts), an approximation above it.
+     *
+     * Carried as a field on the metric itself rather than as prose, so the caveat cannot be
+     * separated from the number it qualifies (the same reason `metrics` exists at all — see this
+     * interface's doc comment). Item 5 made metric aggregations answerable for the first time, so
+     * without this flag "how many distinct hosts" would be the one NEW confidently-exact-looking
+     * answer shipped by an issue whose whole purpose is removing confidently-wrong ones.
+     */
+    approximate?: true;
+  }>;
+}
+
+/**
+ * Metric aggregation types this digest pipeline can represent — the single source of truth both
+ * `isMetricAggValue` (below) and this file's tests key off. NOT an exhaustive list of every metric
+ * aggregation OpenSearch supports: `percentiles`/`stats`/`extended_stats` return a multi-value
+ * object (`{values: {...}}`, `{avg, min, max, sum, count}`) that does not fit the `{value}` shape
+ * `isMetricAggValue` checks for, so they are deliberately excluded here rather than silently
+ * mis-handled — `search-wazuh-data.ts`'s tool description must never advertise one of those as
+ * available (see this file's registry-wide sync test).
+ */
+export const SUPPORTED_METRIC_AGG_TYPES = [
+  'cardinality',
+  'avg',
+  'sum',
+  'min',
+  'max',
+  'value_count',
+] as const;
+
+/**
+ * Shape predicate for a metric aggregation's response value: `{value: number | null}` with no
+ * `buckets` (a bucket agg) or `hits` (a `top_hits` agg) of its own. Deliberately shape-based, not
+ * keyed off the aggregation's TYPE name (which the response never carries) — every entry of
+ * `SUPPORTED_METRIC_AGG_TYPES` above produces exactly this shape, and this is the one place that
+ * checks it, so `bucketsToRows`' synthesized row, `extractMetricAggs`, and this file's tests all
+ * agree on what "metric-shaped" means.
+ */
+export function isMetricAggValue(
+  v: unknown,
+): v is { value: number | null; value_as_string?: string } {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) {
+    return false;
+  }
+  const record = v as Record<string, unknown>;
+  const value = record.value;
+  if (typeof value !== 'number' && value !== null) {
+    return false;
+  }
+  return record.buckets === undefined && record.hits === undefined;
+}
+
+/**
+ * Shape predicate for a SINGLE-BUCKET aggregation's response value — `filter`, `global`,
+ * `missing`, `nested`, `sampler` all return `{doc_count: number}` with no `buckets`/`hits`/`value`
+ * of their own. `bucketsToRows` already merges exactly this shape for SUB-aggregations (a
+ * `filter` sub-agg's count column, e.g. get_sca_results' pass/fail counters); recognizing it at
+ * the TOP level too means `aggs: {criticals: {filter: {...}}}` reports the computed count instead
+ * of the pre-fix `returned: 0` — the same silent-drop class as the metric shape above, one key
+ * over.
+ */
+export function isSingleBucketDocCount(v: unknown): v is { doc_count: number } {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) {
+    return false;
+  }
+  const record = v as Record<string, unknown>;
+  return (
+    typeof record.doc_count === 'number' &&
+    record.buckets === undefined &&
+    record.hits === undefined &&
+    record.value === undefined
+  );
+}
+
+/**
+ * Names every top-level aggregation in the response whose shape NONE of this file's extractors
+ * can represent: not a bucket agg with an ARRAY of buckets (`bucketsToRows`), not a `{value}`
+ * metric (`isMetricAggValue`), not a `{doc_count}` single-bucket count (`isSingleBucketDocCount`).
+ * The remaining shapes — multi-value metrics (`stats`/`extended_stats`/`percentiles`/
+ * `top_metrics`), OBJECT-keyed buckets (`filters` with named filters, `range`/`date_range` with
+ * `keyed: true`), and a top-level `top_hits` — are reachable through the search_wazuh_data escape
+ * hatch today (guardrails.ts's `checkAggs` restricts aggregation FIELDS and SIZES, never TYPES),
+ * and used to serialize as a bare `returned: 0`: a silent lie about a query OpenSearch fully
+ * answered. `buildDigest` turns this list into an explicit hint instead, so an unrepresentable
+ * shape degrades to a disclosed gap the model can react to (rerun with a supported shape), never
+ * to a fabricated "no data".
+ */
+function findUnrepresentableAggs(result: unknown): string[] {
+  const aggregations = (
+    result as { aggregations?: Record<string, unknown> } | undefined
+  )?.aggregations;
+  if (!aggregations) {
+    return [];
+  }
+  const unrepresentable: string[] = [];
+  for (const [aggKey, aggValue] of Object.entries(aggregations)) {
+    if (
+      Array.isArray((aggValue as { buckets?: unknown } | undefined)?.buckets)
+    ) {
+      continue;
+    }
+    if (isMetricAggValue(aggValue) || isSingleBucketDocCount(aggValue)) {
+      continue;
+    }
+    unrepresentable.push(aggKey);
+  }
+  return unrepresentable;
 }
 
 const MAX_SAMPLES = 5;
@@ -60,6 +237,13 @@ const DIGEST_CHAR_CAP = 6000;
  * rows are dropped. Also the cap applied to the Manager `message` field and each
  * `breakdown[].key` — see `capFieldValue` below. */
 const MAX_FIELD_VALUE_LENGTH = 500;
+/** Hard length cap on `Digest.hint`. The hint accumulates by concatenation (this file's zero-row
+ * hint + unrepresentable-aggregation note, plus executor.ts's window-recount and near-miss
+ * disclosures), and `capDigest`'s drop stages deliberately never remove it — an unbounded hint
+ * could therefore evict every sample row and still bust `DIGEST_CHAR_CAP`. Wide enough for all
+ * current writers combined (each is one bounded sentence); anything longer is trimmed rather
+ * than allowed to crowd out the data it annotates. */
+const MAX_HINT_LENGTH = 1000;
 
 function getByPath(source: Record<string, unknown>, path: string): unknown {
   return path.split('.').reduce<unknown>((acc, segment) => {
@@ -105,12 +289,31 @@ function hitsToRows(
  * Rows from an aggregation-only response (`size:0`, `aggs.<name>.buckets[]`), e.g. get_top_rules.
  * Any `top_hits` sub-aggregation's sampled `_source` is merged into the row (still nested, not
  * flattened) so a tool's tableSpec/digest columns can dot-path into it (e.g. "wazuh.rule.title").
- * A metric sub-aggregation (avg/sum/min/max/cardinality — shaped `{value: number|null}`) merges as
- * `row[subAggName] = value`. A `filter` sub-aggregation (shaped `{doc_count: number}` with no
- * `buckets`/`hits` of its own — e.g. get_sca_results' passed/failed/not_applicable counters)
- * merges as `row[subAggName] = doc_count`. A nested bucket sub-aggregation (its own
- * `{buckets:[...]}`) matches none of these shapes and is left unmerged rather than breaking.
- * Generic across any single terms-style aggregation — no per-tool bucket-shaping code needed.
+ * A metric sub-aggregation (avg/sum/min/max/cardinality — shaped `{value: number|null}`, see
+ * `isMetricAggValue`) merges as `row[subAggName] = value`. A `filter` sub-aggregation (shaped
+ * `{doc_count: number}` with no `buckets`/`hits` of its own — e.g. get_sca_results'
+ * passed/failed/not_applicable counters) merges as `row[subAggName] = doc_count`. A nested bucket
+ * sub-aggregation (its own `{buckets:[...]}`) matches none of these shapes and is left unmerged
+ * rather than breaking. Generic across any single terms-style aggregation — no per-tool
+ * bucket-shaping code needed.
+ *
+ * Which TOP-LEVEL aggregation supplies the buckets is resolved by scanning every top-level key IN
+ * ORDER for the first one whose `.buckets` is an array — not just `Object.keys(aggregations)[0]`
+ * (issue #8920 item 5). The escape hatch lets the model declare more than one top-level
+ * aggregation in any order, so a metric agg (`aggs: {distinct_agents: {cardinality...}, by_rule:
+ * {terms...}}`) that happens to sort first must not mask a bucket agg that comes after it — the
+ * defect this fixes silently reported `returned: 0`/an empty table for that exact shape, even
+ * though `by_rule`'s buckets were right there in the response.
+ *
+ * When NO top-level aggregation has an ARRAY of buckets at all (a metric-only query, e.g. a bare
+ * "how many distinct X" `cardinality` aggregation, or a bare `filter` count), a single row is
+ * synthesized instead — `{ [aggName]: value }` for every metric-shaped (`isMetricAggValue`)
+ * top-level aggregation and `{ [aggName]: doc_count }` for every single-bucket
+ * (`isSingleBucketDocCount`) one — so `extractRows`/`buildTableSpec` carry the computed answer
+ * (`returned: 1`) rather than reporting 0 rows for a query OpenSearch actually answered. The row
+ * keeps the NUMERIC value even when the response carries a `value_as_string`; the human-readable
+ * form travels via `Digest.metrics` (see its doc comment), which is also populated alongside the
+ * bucket rows when a bucket agg IS present, so a sibling metric is never dropped either way.
  */
 function bucketsToRows(
   result: unknown,
@@ -121,16 +324,32 @@ function bucketsToRows(
   if (!aggregations) {
     return undefined;
   }
-  const firstAggKey = Object.keys(aggregations)[0];
-  if (!firstAggKey) {
-    return undefined;
+  const aggKeys = Object.keys(aggregations);
+
+  let buckets: unknown;
+  for (const aggKey of aggKeys) {
+    const candidate = (
+      aggregations[aggKey] as { buckets?: unknown } | undefined
+    )?.buckets;
+    if (Array.isArray(candidate)) {
+      buckets = candidate;
+      break;
+    }
   }
-  const buckets = (
-    aggregations[firstAggKey] as { buckets?: unknown } | undefined
-  )?.buckets;
+
   if (!Array.isArray(buckets)) {
-    return undefined;
+    const metricRow: Record<string, unknown> = {};
+    for (const aggKey of aggKeys) {
+      const aggValue = aggregations[aggKey];
+      if (isMetricAggValue(aggValue)) {
+        metricRow[aggKey] = aggValue.value;
+      } else if (isSingleBucketDocCount(aggValue)) {
+        metricRow[aggKey] = aggValue.doc_count;
+      }
+    }
+    return Object.keys(metricRow).length > 0 ? [metricRow] : undefined;
   }
+
   return buckets.map(bucket => {
     const bucketRecord = bucket as Record<string, unknown>;
     const row: Record<string, unknown> = {
@@ -150,19 +369,18 @@ function bucketsToRows(
         Object.assign(row, sampleSource);
         continue;
       }
+      if (isMetricAggValue(subAggValue)) {
+        row[subAggKey] = subAggValue.value;
+        continue;
+      }
       if (
         subAggValue &&
         typeof subAggValue === 'object' &&
         !Array.isArray(subAggValue)
       ) {
-        const metricValue = (subAggValue as { value?: unknown }).value;
-        if (typeof metricValue === 'number' || metricValue === null) {
-          row[subAggKey] = metricValue;
-          continue;
-        }
         // `filter` sub-aggregation: a bare filtered doc count (no own buckets/hits) — see doc
-        // comment above. Checked AFTER top_hits (has `hits`) and metrics (has `value`) so neither
-        // of those shapes can fall through to here.
+        // comment above. Checked AFTER top_hits (has `hits`) and metrics (`isMetricAggValue`) so
+        // neither of those shapes can fall through to here.
         const subAgg = subAggValue as {
           doc_count?: unknown;
           buckets?: unknown;
@@ -179,6 +397,50 @@ function bucketsToRows(
     }
     return row;
   });
+}
+
+/** Every top-level agg in `result.aggregations` that is metric-shaped (`isMetricAggValue`) or a
+ * single-bucket count (`isSingleBucketDocCount` — surfaced as `{agg, value: doc_count}`, the same
+ * "one computed number" reading), regardless of whether the response also carries hits or a
+ * bucket agg — see `Digest.metrics`'s doc comment for why this is attached unconditionally.
+ * `value_as_string` is carried when present so a min/max on a date field ships its ISO form, not
+ * only epoch millis. */
+function extractMetricAggs(
+  result: unknown,
+  requestBody?: Record<string, unknown>,
+): Digest['metrics'] {
+  const aggregations = (
+    result as { aggregations?: Record<string, unknown> } | undefined
+  )?.aggregations;
+  if (!aggregations) {
+    return undefined;
+  }
+  // A metric response is `{value: N}` for EVERY metric type, so the response alone cannot say
+  // whether a number is a count or an estimate — only the REQUEST names the aggregation type. That
+  // is why the request body is read here rather than inferring from the value.
+  const requestAggs = requestBody?.aggs as
+    | Record<string, Record<string, unknown>>
+    | undefined;
+  const isCardinality = (aggKey: string): boolean =>
+    requestAggs?.[aggKey] !== undefined && 'cardinality' in requestAggs[aggKey];
+  const metrics: NonNullable<Digest['metrics']> = [];
+  for (const [aggKey, aggValue] of Object.entries(aggregations)) {
+    if (isMetricAggValue(aggValue)) {
+      const valueAsString = (aggValue as { value_as_string?: unknown })
+        .value_as_string;
+      metrics.push({
+        agg: aggKey,
+        value: aggValue.value,
+        ...(typeof valueAsString === 'string'
+          ? { value_as_string: valueAsString }
+          : {}),
+        ...(isCardinality(aggKey) ? { approximate: true as const } : {}),
+      });
+    } else if (isSingleBucketDocCount(aggValue)) {
+      metrics.push({ agg: aggKey, value: aggValue.doc_count });
+    }
+  }
+  return metrics.length > 0 ? metrics : undefined;
 }
 
 /** Rows from a Wazuh Manager API response. The common shape is a list under
@@ -240,13 +502,32 @@ interface ExtractedRows {
   total?: number;
 }
 
+/**
+ * Reads a `_search` response's `hits.total` in whichever shape it actually arrives in.
+ * `guardrails.ts`'s `applySafetyValves` forces `track_total_hits: true` on every outbound
+ * request, which makes the Indexer (OpenSearch, ES-compatible response shape) always return the
+ * modern object form -- `{value: <exact count>, relation: 'eq'}` -- never the pre-7.x bare-number
+ * form. This function accepts a bare number too anyway: it costs nothing, and it means this
+ * extraction keeps working unchanged if a future call site (or a test fixture) ever hands it the
+ * legacy shape directly, rather than silently reading `undefined` off a plain number's `.value`.
+ * `relation` is not inspected here -- with `track_total_hits: true` it is always `'eq'` (an exact
+ * count, never the capped `'gte'` a numeric `track_total_hits` can produce), so `total` below is
+ * always the true match count, not a lower bound.
+ */
+function resolveHitsTotal(result: unknown): number | undefined {
+  const total = (
+    result as { hits?: { total?: number | { value?: number } } } | undefined
+  )?.hits?.total;
+  if (typeof total === 'number') {
+    return total;
+  }
+  return typeof total?.value === 'number' ? total.value : undefined;
+}
+
 function extractRows(result: unknown): ExtractedRows {
   const hitsRows = hitsToRows(result);
   if (hitsRows) {
-    const total = (
-      result as { hits?: { total?: { value?: number } } } | undefined
-    )?.hits?.total?.value;
-    return { rows: hitsRows, total };
+    return { rows: hitsRows, total: resolveHitsTotal(result) };
   }
   const bucketRows = bucketsToRows(result);
   if (bucketRows) {
@@ -308,6 +589,25 @@ function deriveResultColumns(
   rows: Array<Record<string, unknown>>,
   requestBody: Record<string, unknown> | undefined,
 ): string[] {
+  // Synthesized metric row (`bucketsToRows`' metric-only fallback): its keys are the request's
+  // own top-level aggregation NAMES, not document fields, so neither `_source` (priority 1 below,
+  // which would project the row to `{}` — a "returned: 1" sample carrying nothing) nor a flattened
+  // field scan applies. Detected exactly: one row whose every key is a declared top-level agg
+  // name — a hits/manager row can never satisfy that, since its keys are document fields/_id.
+  if (rows.length === 1 && requestBody) {
+    const declaredAggs = (requestBody.aggs ?? requestBody.aggregations) as
+      | Record<string, unknown>
+      | undefined;
+    const rowKeys = Object.keys(rows[0]);
+    if (
+      declaredAggs &&
+      rowKeys.length > 0 &&
+      rowKeys.every(key => key in declaredAggs)
+    ) {
+      return rowKeys.slice(0, DERIVED_COLUMN_CAP);
+    }
+  }
+
   const source = requestBody?._source;
   if (
     Array.isArray(source) &&
@@ -429,12 +729,32 @@ export function buildTableSpec(
  * aggregation's name) so the model can tell which aggregation a count belongs to — and so
  * privacy.ts's `applyFieldPolicy` can resolve each bucket key against the RIGHT aggregation's
  * field policy rather than only the first's. The rendered `table` event (buildTableSpec) still
- * only reflects the first aggregation — documented as a known limitation in search_wazuh_data.ts's
- * tool description — so this is a digest-only improvement.
+ * only reflects the first BUCKET aggregation (`bucketsToRows`'s scan, since #8920 item 5 — a
+ * metric agg ahead of it in key order is skipped over rather than masking it) — documented as a
+ * known limitation in search_wazuh_data.ts's tool description — so this is a digest-only
+ * improvement.
  */
+/**
+ * Bucket keys arrive in three shapes: a plain string/number for terms/significant_terms/
+ * cardinality (unchanged: `String()`-coerced same as always), an ARRAY for `multi_terms`, or an
+ * OBJECT (`{sourceName: value}`) for `composite`. The latter two are returned AS-IS rather than
+ * `String()`-coerced -- `String()` on an object produces the literal, useless "[object Object]"
+ * (a display bug on its own) and, more importantly, throws away the per-component structure
+ * privacy.ts's field-policy pass needs to scrub each component against its own field (see
+ * `Digest.breakdown`'s doc comment). `String()` on an array already produces a readable
+ * comma-joined string in JS, so that shape was never the display bug -- it is kept structural here
+ * too, for the same privacy reason, not because it was broken before.
+ */
+function normalizeBucketKey(rawKey: unknown): unknown {
+  if (rawKey !== null && typeof rawKey === 'object') {
+    return rawKey;
+  }
+  return String(rawKey);
+}
+
 function buildBreakdown(
   result: unknown,
-): Array<{ key: string; count: number; agg?: string }> | undefined {
+): Array<{ key: unknown; count: number; agg?: string }> | undefined {
   const aggregations = (
     result as { aggregations?: Record<string, unknown> } | undefined
   )?.aggregations;
@@ -443,7 +763,7 @@ function buildBreakdown(
   }
   const aggKeys = Object.keys(aggregations);
   const multipleAggs = aggKeys.length > 1;
-  const breakdown: Array<{ key: string; count: number; agg?: string }> = [];
+  const breakdown: Array<{ key: unknown; count: number; agg?: string }> = [];
   for (const aggKey of aggKeys) {
     const buckets = (aggregations[aggKey] as { buckets?: unknown } | undefined)
       ?.buckets;
@@ -453,7 +773,7 @@ function buildBreakdown(
     for (const bucket of buckets) {
       const bucketRecord = bucket as Record<string, unknown>;
       breakdown.push({
-        key: String(bucketRecord.key),
+        key: normalizeBucketKey(bucketRecord.key),
         count: Number(bucketRecord.doc_count ?? 0),
         ...(multipleAggs ? { agg: aggKey } : {}),
       });
@@ -640,6 +960,64 @@ function buildBreakdownNote(
 }
 
 /**
+ * `sum_other_doc_count` PER top-level bucket aggregation, for every aggregation whose bucket list
+ * OpenSearch truncated by `size`. Non-terms bucket aggs (date_histogram etc.) lack the field and
+ * are skipped.
+ *
+ * Deliberately NOT summed across aggregations. `buildBreakdown` emits buckets from EVERY top-level
+ * agg (tagging each with `agg` when there is more than one), so each DIMENSION has its own
+ * truncated key set and the remainders are not addable. Summing produced a number with no
+ * referent: on a finding-hits call over this lab's own data — 918 matched rows, an agent dimension
+ * truncating ~20 and a rule-title dimension truncating ~908 (772 distinct titles) — the summed
+ * note claimed "~928 additional rows" for a 918-row result.
+ */
+function perAggOtherDocCounts(
+  result: unknown,
+): Array<{ agg: string; other: number }> {
+  const aggregations = (
+    result as { aggregations?: Record<string, unknown> } | undefined
+  )?.aggregations;
+  if (!aggregations) {
+    return [];
+  }
+  const truncated: Array<{ agg: string; other: number }> = [];
+  for (const [aggKey, aggValue] of Object.entries(aggregations)) {
+    const other = (aggValue as { sum_other_doc_count?: unknown } | undefined)
+      ?.sum_other_doc_count;
+    if (typeof other === 'number' && other > 0) {
+      truncated.push({ agg: aggKey, other });
+    }
+  }
+  return truncated;
+}
+
+/**
+ * Caveat for a REAL breakdown whose bucket LIST is truncated (`sum_other_doc_count` > 0) — see
+ * `Digest.breakdownNote`'s doc comment, case 2. Counts stay exact; the key set is what must not be
+ * read as complete.
+ *
+ * Named per dimension (matching `breakdown[].agg`) so a multi-dimension breakdown attributes each
+ * remainder to the dimension it belongs to. Worded as further MATCHES, never as additional ROWS:
+ * on a multi-valued keyword field — `wazuh.rule.mitre.technique.id` and `wazuh.rule.tags` are
+ * arrays — the remainder can be the SAME documents counted again under other keys, so a row count
+ * would be false even for a single aggregation.
+ */
+function buildBucketTruncationNote(
+  truncatedAggs: Array<{ agg: string; other: number }>,
+  breakdownIsMultiDimension: boolean,
+): string {
+  const remainder = breakdownIsMultiDimension
+    ? truncatedAggs.map(({ agg, other }) => `${agg}: ${other}`).join(', ')
+    : String(truncatedAggs[0].other);
+  return (
+    'Per-bucket counts are exact, but the bucket list is top-N only — further matches fall under ' +
+    `keys not listed (${remainder}). On a multi-valued field those may be the same rows counted ` +
+    'under other keys, so do not add them to the row total; do not present the listed keys as the ' +
+    'complete set of values.'
+  );
+}
+
+/**
  * PRIVACY SEAM: the field-level pseudonymizer
  * (server/tools/privacy.ts's `applyFieldPolicy`) wraps this function's output, not its inside.
  * server/tools/executor.ts calls `buildDigest` then, immediately before serializing the result as
@@ -653,6 +1031,10 @@ export function buildDigest(
   result: unknown,
   def: ToolDefinition,
   requestBody?: Record<string, unknown>,
+  // Issue #8913: threaded through from executor.ts's `executeToolCall`, which is the only place
+  // that knows whether a `resolveParams` hook (types.ts) inferred a parameter -- this function
+  // itself never resolves anything, it just carries the note into the Digest shape unchanged.
+  assumptionNote?: string,
 ): Digest {
   const { rows, total } = extractRows(result);
   const returned = rows.length;
@@ -687,6 +1069,11 @@ export function buildDigest(
   const realBreakdown = buildBreakdown(result);
   let breakdown = realBreakdown;
   let breakdownNote: string | undefined;
+  // Distinguishes the two breakdownNote cases (see its doc comment): only the SYNTHETIC
+  // page-scope case makes the breakdown untrustworthy as a whole — a real breakdown with a
+  // truncated key set still has exact, population-true counts, so `buildSamplesNote` must not
+  // tell the model to distrust it.
+  let syntheticPageScoped = false;
   if (
     !realBreakdown &&
     def.digest.breakdownDimensions &&
@@ -695,6 +1082,17 @@ export function buildDigest(
     breakdown = buildSyntheticBreakdown(rows, def.digest.breakdownDimensions);
     if (breakdown && truncated) {
       breakdownNote = buildBreakdownNote(total, returned);
+      syntheticPageScoped = true;
+    }
+  } else if (realBreakdown) {
+    const truncatedAggs = perAggOtherDocCounts(result);
+    if (truncatedAggs.length > 0) {
+      // `buildBreakdown` tags rows with `agg` only when the response carried more than one
+      // aggregation, so that same flag decides whether the note has to name its dimensions.
+      breakdownNote = buildBucketTruncationNote(
+        truncatedAggs,
+        realBreakdown.some(row => row.agg !== undefined),
+      );
     }
   }
   const hint = buildZeroRowHint(requestBody, returned);
@@ -702,17 +1100,41 @@ export function buildDigest(
     returned,
     samples.length,
     !!breakdown,
-    !!breakdown && !breakdownNote,
+    !!breakdown && !syntheticPageScoped,
   );
   // Manager responses carry a top-level `message` alongside `data` (e.g. an active-response no-op:
   // error:0, affected_items/failed_items both empty, message:"AR command was not sent to any
   // agent") — surfaced here so a silent no-op is still visible to the model. Indexer responses
   // never carry this field, so the check is a no-op for every T1 search tool.
   const message = (result as { message?: unknown } | undefined)?.message;
+  // See `Digest.metrics`'s doc comment: attached UNCONDITIONALLY whenever a metric-shaped or
+  // single-bucket-count top-level agg is in the response — even when `bucketsToRows`' synthesized
+  // row carries the same numbers, because that row is subject to column projection and `metrics`
+  // is the projection-immune carrier.
+  const metrics = extractMetricAggs(result, requestBody);
+  // Terminal class guard (#8920 item 5): an aggregation OpenSearch computed but no extractor in
+  // this file can represent must never be silently absent — a bare `returned: 0` (or a digest
+  // missing a sibling agg's answer) reads as "no data" for a query that WAS answered. Named
+  // explicitly in the hint so the model can rerun with a supported shape instead of fabricating
+  // an empty result. See `findUnrepresentableAggs` for which shapes land here and why they are
+  // reachable (checkAggs never restricts aggregation types).
+  const unrepresentableAggs = findUnrepresentableAggs(result);
+  const unrepresentableNote =
+    unrepresentableAggs.length > 0
+      ? `Aggregation(s) ${unrepresentableAggs.join(
+          ', ',
+        )} returned a shape this digest cannot ` +
+        'represent (multi-value metrics such as stats/percentiles, keyed buckets, or top_hits ' +
+        'at the top level); their results are NOT included above — do not read their absence ' +
+        'as 0. Re-query with terms buckets, a single-value metric, or a filter count instead.'
+      : undefined;
+  const combinedHint = [hint, unrepresentableNote]
+    .filter((part): part is string => !!part)
+    .join(' ');
   const digest: Digest = {
     tool: toolName,
     counts: { total, returned, truncated },
-    ...(hint ? { hint } : {}),
+    ...(combinedHint ? { hint: combinedHint } : {}),
     ...(breakdown ? { breakdown } : {}),
     ...(breakdownNote ? { breakdownNote } : {}),
     samples,
@@ -721,6 +1143,8 @@ export function buildDigest(
       ? sampleColumns
       : def.tableSpec.columns.map(column => column.field),
     ...(typeof message === 'string' && message.length > 0 ? { message } : {}),
+    ...(assumptionNote ? { assumptionNote } : {}),
+    ...(metrics ? { metrics } : {}),
   };
 
   return capDigest(digest);
@@ -755,12 +1179,40 @@ function capFieldValue(value: string): string {
     : stripped;
 }
 
+/**
+ * `capFieldValue`, generalized to `breakdown[].key`'s three possible shapes (see `Digest.breakdown`
+ * doc comment: `key` widened from `string` to `unknown` when this file learned about `multi_terms`
+ * (array) and `composite` (object) bucket keys — a scalar `terms`/`significant_terms`/`cardinality`
+ * key is still always a plain string, unchanged). Caps every STRING leaf it finds and leaves any
+ * other leaf (a numeric `terms` key component, for instance) untouched; the array/object structure
+ * itself is preserved either way, so this never corrupts a `multi_terms`/`composite` key's shape
+ * the way naively coercing the whole key through `capFieldValue` (which expects a `string`) would.
+ */
+function capKeyValue(key: unknown): unknown {
+  if (typeof key === 'string') {
+    return capFieldValue(key);
+  }
+  if (Array.isArray(key)) {
+    return key.map(capKeyValue);
+  }
+  if (key !== null && typeof key === 'object') {
+    const out: Record<string, unknown> = {};
+    for (const [prop, value] of Object.entries(
+      key as Record<string, unknown>,
+    )) {
+      out[prop] = capKeyValue(value);
+    }
+    return out;
+  }
+  return key;
+}
+
 /** Truncates any sample field's string value longer than `MAX_FIELD_VALUE_LENGTH`, mutating each
  * sample row in place. Runs unconditionally (not gated on the overall char cap) as a cheap
  * preprocessing pass before capDigest's row-drop fallback below, since one oversized field (e.g. a
  * raw log line) shouldn't cost an entire row when trimming just that field is enough. Also caps
- * (length + control-char strip, via `capFieldValue`) the two other previously-unbounded string
- * fields: the Manager `message` and each `breakdown[].key`. */
+ * (length + control-char strip, via `capFieldValue`/`capKeyValue`) the two other previously-
+ * unbounded string fields: the Manager `message` and each `breakdown[].key`. */
 function truncateLongFieldValues(digest: Digest): void {
   for (const sample of digest.samples) {
     for (const key of Object.keys(sample)) {
@@ -773,9 +1225,12 @@ function truncateLongFieldValues(digest: Digest): void {
   if (digest.message !== undefined) {
     digest.message = capFieldValue(digest.message);
   }
+  if (digest.hint !== undefined && digest.hint.length > MAX_HINT_LENGTH) {
+    digest.hint = `${digest.hint.slice(0, MAX_HINT_LENGTH)}…`;
+  }
   if (digest.breakdown) {
     for (const entry of digest.breakdown) {
-      entry.key = capFieldValue(entry.key);
+      entry.key = capKeyValue(entry.key);
     }
   }
 }
