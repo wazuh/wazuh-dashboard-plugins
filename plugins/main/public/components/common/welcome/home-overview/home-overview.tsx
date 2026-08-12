@@ -1,5 +1,6 @@
 import React from 'react';
 import { EuiPage, EuiPageBody, EuiSpacer } from '@elastic/eui';
+import './home-overview.scss';
 import { SectionHeader } from './components/common';
 import { QuickAccessMenu } from './components/quick-access';
 import { OverviewSection } from './components/overview';
@@ -80,7 +81,7 @@ const HomeOverviewBody: React.FC = () => {
 
 export const HomeOverview = withErrorBoundary(
   withGlobalBreadcrumb(() => [{ text: overview.breadcrumbLabel }])(() => (
-    <EuiPage paddingSize='l'>
+    <EuiPage paddingSize='l' className='wzHomeOverview'>
       <EuiPageBody>
         <HomeOverviewBody />
       </EuiPageBody>
