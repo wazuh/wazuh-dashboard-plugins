@@ -11,6 +11,7 @@
  */
 
 import { WzRequest } from '../../../../../../react-services/wz-request';
+import { getAgentReportedConfiguration } from './agent-config-service';
 import { replaceIllegalXML } from './xml';
 import { delayAsPromise } from '../../../../../../../common/utils';
 
@@ -56,21 +57,29 @@ const getFullEndpointConfig = async (
 };
 
 /**
- * Get configuration for an agent of request sections.
+ * Get the configuration of a manager node or of an agent.
+ *
+ * Manager context (`node` is set): fetches the requested sections from the
+ * Server API and returns them keyed by `component-configuration`.
  *
  * Supports two section formats:
  *  - Standard:      { component: string, configuration: string }
  *    Calls /cluster/{node}/configuration/{component}/{configuration}
- *    or    /agents/{agentId}/config/{component}/{configuration}
  *
  *  - Full endpoint: { useFullEndpoint: true, key: string }
  *    Delegates to getFullEndpointConfig which calls
  *    /cluster/{node}/configuration once and extracts the requested
  *    keys. Only valid in manager context (node must be set).
  *
+ * Agent context (`node` is false): the Server API no longer exposes an agent
+ * configuration endpoint. The agent pushes its effective configuration to the
+ * manager, which keeps the latest report per agent in the wazuh-agent-config
+ * index, so the whole report is read at once and returned keyed by module name
+ * (`agent`, `fim`, `logcollector`, ...). `sections` does not apply.
+ *
  * @param {string} agentId Agent ID
- * @param {array} sections Sections
- * @param {false} [node=false] Node
+ * @param {array} sections Sections. Manager context only
+ * @param {false|string} [node=false] Node
  */
 export const getCurrentConfig = async (
   agentId,
@@ -78,85 +87,70 @@ export const getCurrentConfig = async (
   node = false,
   updateWazuhNotReadyYet,
 ) => {
-  try {
+  if (!agentId || typeof agentId !== 'string') {
+    throw new Error('Invalid parameters');
+  }
+
+  if (!node) {
+    /* An agent with no document has never reported. That is the expected case
+    rather than an error: reporting is an ossec.conf toggle disabled by
+    default, so the views render their own empty state. */
+    const reportedConfiguration = await getAgentReportedConfiguration(agentId);
+
+    return reportedConfiguration ? reportedConfiguration.content : {};
+  }
+
+  if (!sections || !Array.isArray(sections) || !sections.length) {
+    throw new Error('Invalid parameters');
+  }
+
+  const result = {};
+
+  const fullEndpointSections = sections.filter(s => s.useFullEndpoint);
+  const regularSections = sections.filter(s => !s.useFullEndpoint);
+
+  if (fullEndpointSections.length > 0) {
+    Object.assign(
+      result,
+      await getFullEndpointConfig(
+        node,
+        fullEndpointSections,
+        updateWazuhNotReadyYet,
+      ),
+    );
+  }
+
+  for (const section of regularSections) {
+    const { component, configuration } = section;
     if (
-      !agentId ||
-      typeof agentId !== 'string' ||
-      !sections ||
-      !sections.length ||
-      typeof sections !== 'object' ||
-      !Array.isArray(sections)
+      !component ||
+      typeof component !== 'string' ||
+      !configuration ||
+      typeof configuration !== 'string'
     ) {
-      throw new Error('Invalid parameters');
+      throw new Error('Invalid section');
     }
+    try {
+      const partialResult = await WzRequest.apiReq(
+        'GET',
+        `/cluster/${node}/configuration/${component}/${configuration}`,
+        {},
+      );
 
-    const result = {};
-
-    const fullEndpointSections = sections.filter(s => s.useFullEndpoint);
-    const regularSections = sections.filter(s => !s.useFullEndpoint);
-
-    if (fullEndpointSections.length > 0 && node) {
-      Object.assign(
-        result,
-        await getFullEndpointConfig(
-          node,
-          fullEndpointSections,
-          updateWazuhNotReadyYet,
-        ),
+      result[`${component}-${configuration}`] =
+        partialResult.data.data.total_affected_items !== 0
+          ? partialResult.data.data.affected_items[0]
+          : {};
+    } catch (error) {
+      result[`${component}-${configuration}`] = await handleError(
+        error,
+        'Fetch configuration',
+        updateWazuhNotReadyYet,
+        node,
       );
     }
-
-    for (const section of regularSections) {
-      const { component, configuration } = section;
-      if (
-        !component ||
-        typeof component !== 'string' ||
-        !configuration ||
-        typeof configuration !== 'string'
-      ) {
-        throw new Error('Invalid section');
-      }
-      try {
-        const url = node
-          ? `/cluster/${node}/configuration/${component}/${configuration}`
-          : `/agents/${agentId}/config/${component}/${configuration}`;
-
-        const partialResult = await WzRequest.apiReq('GET', url, {});
-
-        if (node) {
-          result[`${component}-${configuration}`] =
-            partialResult.data.data.total_affected_items !== 0
-              ? partialResult.data.data.affected_items[0]
-              : {};
-        } else {
-          /*
-           * I need to check the amount of properties and use the first one in case there's only one
-           * because the /agents/{agent_id}/config/logcollector/socket response has property named "target" instead of "socket" in versions before Wazuh 4.9.0
-           * this allows to interprete any property name in the response
-           */
-          const configKeys = Object.keys(partialResult.data.data);
-          const configPropertyName =
-            configKeys.length === 1 ? configKeys[0] : configuration;
-
-          result[`${component}-${configuration}`] = partialResult.data.data[
-            configPropertyName
-          ]
-            ? partialResult.data.data
-            : {};
-        }
-      } catch (error) {
-        result[`${component}-${configuration}`] = await handleError(
-          error,
-          'Fetch configuration',
-          updateWazuhNotReadyYet,
-          node,
-        );
-      }
-    }
-    return result;
-  } catch (error) {
-    throw error;
   }
+  return result;
 };
 
 /**

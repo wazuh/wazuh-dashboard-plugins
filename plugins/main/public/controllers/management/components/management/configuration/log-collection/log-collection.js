@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
 import WzTabSelector, {
   WzTabSelectorTab,
@@ -27,7 +28,7 @@ import {
   LOCALFILE_COMMANDS_PROP,
   LOCALFILE_LOGS_PROP,
   LOCALFILE_WINDOWSEVENT_PROP,
-  LOGCOLLECTOR_LOCALFILE_PROP,
+  LOGCOLLECTOR_PROP,
   LOCALFILE_MACOSEVENT_PROP,
   LOCALFILE_JOURNALDT_PROP,
 } from './types';
@@ -38,32 +39,36 @@ class WzConfigurationLogCollection extends Component {
   }
   render() {
     let { currentConfig, agent } = this.props;
+    const logcollector = currentConfig[LOGCOLLECTOR_PROP];
+    /* An agent with a single localfile block reports it as an object instead
+    of a list. */
+    const localfiles = Array.isArray(logcollector?.localfile)
+      ? logcollector.localfile
+      : logcollector?.localfile
+      ? [logcollector.localfile]
+      : [];
+
     currentConfig =
-      currentConfig[LOGCOLLECTOR_LOCALFILE_PROP] &&
-      !isString(currentConfig[LOGCOLLECTOR_LOCALFILE_PROP])
+      logcollector && !isString(logcollector)
         ? {
             ...currentConfig,
-            [LOGCOLLECTOR_LOCALFILE_PROP]: {
-              ...currentConfig[LOGCOLLECTOR_LOCALFILE_PROP],
-              [LOCALFILE_LOGS_PROP]: currentConfig[
-                LOGCOLLECTOR_LOCALFILE_PROP
-              ].localfile.filter(item => typeof item.file !== 'undefined'), // TODO: it needs to be defined to support localfile as `eventchannel`. These doesn't have file property.
-              [LOCALFILE_WINDOWSEVENT_PROP]: currentConfig[
-                LOGCOLLECTOR_LOCALFILE_PROP
-              ].localfile.filter(
+            [LOGCOLLECTOR_PROP]: {
+              ...logcollector,
+              [LOCALFILE_LOGS_PROP]: localfiles.filter(
+                item => typeof item.file !== 'undefined',
+              ), // TODO: it needs to be defined to support localfile as `eventchannel`. These doesn't have file property.
+              [LOCALFILE_WINDOWSEVENT_PROP]: localfiles.filter(
                 item =>
                   item.logformat === 'eventchannel' ||
                   item.logformat === 'eventlog',
               ),
-              [LOCALFILE_MACOSEVENT_PROP]: currentConfig[
-                LOGCOLLECTOR_LOCALFILE_PROP
-              ].localfile.filter(item => item.logformat === 'macos'),
-              [LOCALFILE_JOURNALDT_PROP]: currentConfig[
-                LOGCOLLECTOR_LOCALFILE_PROP
-              ].localfile.filter(item => item.logformat === 'journald'),
-              [LOCALFILE_COMMANDS_PROP]: currentConfig[
-                LOGCOLLECTOR_LOCALFILE_PROP
-              ].localfile.filter(
+              [LOCALFILE_MACOSEVENT_PROP]: localfiles.filter(
+                item => item.logformat === 'macos',
+              ),
+              [LOCALFILE_JOURNALDT_PROP]: localfiles.filter(
+                item => item.logformat === 'journald',
+              ),
+              [LOCALFILE_COMMANDS_PROP]: localfiles.filter(
                 item =>
                   item.logformat === 'command' ||
                   item.logformat === 'full_command',
@@ -75,9 +80,8 @@ class WzConfigurationLogCollection extends Component {
     const tabsToRender = [
       {
         condition:
-          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP] &&
-          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_LOGS_PROP]
-            ?.length > 0,
+          currentConfig[LOGCOLLECTOR_PROP] &&
+          currentConfig[LOGCOLLECTOR_PROP][LOCALFILE_LOGS_PROP]?.length > 0,
         component: (
           <WzTabSelectorTab label='Logs'>
             <WzConfigurationLogCollectionLogs
@@ -89,10 +93,9 @@ class WzConfigurationLogCollection extends Component {
       },
       {
         condition:
-          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP] &&
-          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][
-            LOCALFILE_WINDOWSEVENT_PROP
-          ]?.length > 0,
+          currentConfig[LOGCOLLECTOR_PROP] &&
+          currentConfig[LOGCOLLECTOR_PROP][LOCALFILE_WINDOWSEVENT_PROP]
+            ?.length > 0,
         component: (
           <WzTabSelectorTab label='Windows Events'>
             <WzConfigurationLogCollectionWindowsEvents
@@ -104,9 +107,9 @@ class WzConfigurationLogCollection extends Component {
       },
       {
         condition:
-          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP] &&
-          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_MACOSEVENT_PROP]
-            ?.length > 0,
+          currentConfig[LOGCOLLECTOR_PROP] &&
+          currentConfig[LOGCOLLECTOR_PROP][LOCALFILE_MACOSEVENT_PROP]?.length >
+            0,
         component: (
           <WzTabSelectorTab label='macOS Events'>
             <WzConfigurationLogCollectionMacOSEvents
@@ -118,9 +121,9 @@ class WzConfigurationLogCollection extends Component {
       },
       {
         condition:
-          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP] &&
-          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_JOURNALDT_PROP]
-            ?.length > 0,
+          currentConfig[LOGCOLLECTOR_PROP] &&
+          currentConfig[LOGCOLLECTOR_PROP][LOCALFILE_JOURNALDT_PROP]?.length >
+            0,
         component: (
           <WzTabSelectorTab label='Journald'>
             <WzConfigurationLogCollectionJournald
@@ -132,9 +135,8 @@ class WzConfigurationLogCollection extends Component {
       },
       {
         condition:
-          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP] &&
-          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_COMMANDS_PROP]
-            ?.length > 0,
+          currentConfig[LOGCOLLECTOR_PROP] &&
+          currentConfig[LOGCOLLECTOR_PROP][LOCALFILE_COMMANDS_PROP]?.length > 0,
         component: (
           <WzTabSelectorTab label='Commands'>
             <WzConfigurationLogCollectionCommands
@@ -173,9 +175,8 @@ class WzConfigurationLogCollection extends Component {
   }
 }
 
-const sections = [
-  { component: 'logcollector', configuration: 'localfile' },
-  { component: 'logcollector', configuration: 'socket' },
-];
+WzConfigurationLogCollection.propTypes = {
+  currentConfig: PropTypes.object,
+};
 
-export default withWzConfig(sections)(WzConfigurationLogCollection);
+export default withWzConfig()(WzConfigurationLogCollection);

@@ -130,7 +130,9 @@ import {
   WAZUH_METRICS_NORMALIZATION_PATTERN,
   WAZUH_VULNERABILITIES_PATTERN,
   WAZUH_ACTIVE_RESPONSES_PATTERN,
+  WAZUH_AGENT_CONFIG_PATTERN,
   HEALTH_CHECK_TASK_INDEX_PATTERN_ACTIVE_RESPONSES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_AGENT_CONFIG,
   HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_NORMALIZATION,
   WAZUH_DISABLED_SETTING_INDEX_RAW_EVENTS,
 } from '../common/constants';
@@ -218,6 +220,15 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
       fieldsNoIndicesFilePath: knownFieldsFilePath(
         'states-vulnerabilities.json',
       ),
+    },
+  },
+  {
+    // The agent configuration document has no time field: state.modified_at
+    // records when the agent last reported, not when an event happened.
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_AGENT_CONFIG,
+    indexPatternID: WAZUH_AGENT_CONFIG_PATTERN,
+    options: {
+      fieldsNoIndicesFilePath: knownFieldsFilePath('agent-config.json'),
     },
   },
   {

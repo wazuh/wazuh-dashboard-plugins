@@ -30,8 +30,6 @@ jest.mock('./cluster/cluster', () => () => <></>);
 
 jest.mock('./client/client', () => () => <></>);
 
-jest.mock('./client-buffer/client-buffer', () => () => <></>);
-
 jest.mock('./alerts/alerts-labels', () => ({
   WzConfigurationAlertsLabelsAgent: () => <></>,
   __esModule: true,

@@ -140,6 +140,9 @@ export const WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN =
   'wazuh-states-inventory-browser-extensions*';
 export const WAZUH_ACTIVE_RESPONSES_PATTERN = 'wazuh-active-responses*';
 
+// Agent configuration reported by the agent through the manager's /config endpoint
+export const WAZUH_AGENT_CONFIG_PATTERN = 'wazuh-agent-config*';
+
 // Index patterns - Events
 export const WAZUH_EVENTS_SYSTEM_ACTIVITY_PATTERN =
   'wazuh-events-v5-system-activity*';
@@ -931,6 +934,9 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_NORMALIZATION =
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_STATES =
   'index-pattern:states-inventory';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_AGENT_CONFIG =
+  'index-pattern:agent-config';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_GROUPS_STATES =
   'index-pattern:states-inventory-groups';

@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
@@ -43,21 +44,17 @@ class WzConfigurationPolicyMonitoringGeneral extends Component {
     const { currentConfig } = this.props;
     return (
       <Fragment>
-        {currentConfig['syscheck-rootcheck'] &&
-          isString(currentConfig['syscheck-rootcheck']) && (
-            <WzNoConfig
-              error={currentConfig['syscheck-rootcheck']}
-              help={helpLinks}
-            />
-          )}
-        {currentConfig['syscheck-rootcheck'] &&
-          !isString(currentConfig['syscheck-rootcheck']) &&
-          !currentConfig['syscheck-rootcheck'].rootcheck && (
+        {currentConfig.fim && isString(currentConfig.fim) && (
+          <WzNoConfig error={currentConfig.fim} help={helpLinks} />
+        )}
+        {currentConfig.fim &&
+          !isString(currentConfig.fim) &&
+          !currentConfig.fim.rootcheck && (
             <WzNoConfig error='not-present' help={helpLinks} />
           )}
-        {((currentConfig['syscheck-rootcheck'] &&
-          !isString(currentConfig['syscheck-rootcheck']) &&
-          currentConfig['syscheck-rootcheck'].rootcheck) ||
+        {((currentConfig.fim &&
+          !isString(currentConfig.fim) &&
+          currentConfig.fim.rootcheck) ||
           currentConfig['sca']) && (
           <WzConfigurationSettingsHeader
             title='All settings'
@@ -65,7 +62,7 @@ class WzConfigurationPolicyMonitoringGeneral extends Component {
             help={helpLinks}
           >
             <WzConfigurationSettingsGroup
-              config={currentConfig['syscheck-rootcheck'].rootcheck}
+              config={currentConfig.fim.rootcheck}
               items={allSettings}
             />
           </WzConfigurationSettingsHeader>
@@ -74,5 +71,9 @@ class WzConfigurationPolicyMonitoringGeneral extends Component {
     );
   }
 }
+
+WzConfigurationPolicyMonitoringGeneral.propTypes = {
+  currentConfig: PropTypes.object,
+};
 
 export default WzConfigurationPolicyMonitoringGeneral;

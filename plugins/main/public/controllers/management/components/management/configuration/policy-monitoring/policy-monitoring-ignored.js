@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
 import { EuiBasicTable, EuiSpacer } from '@elastic/eui';
 
@@ -31,51 +32,44 @@ class WzConfigurationPolicyMonitoringSystemAudit extends Component {
     const { currentConfig } = this.props;
     return (
       <Fragment>
-        {currentConfig['syscheck-rootcheck'] &&
-          isString(currentConfig['syscheck-rootcheck']) && (
-            <WzNoConfig
-              error={currentConfig['syscheck-rootcheck']}
-              help={helpLinks}
-            />
+        {currentConfig.fim && isString(currentConfig.fim) && (
+          <WzNoConfig error={currentConfig.fim} help={helpLinks} />
+        )}
+        {currentConfig &&
+          currentConfig.fim &&
+          currentConfig.fim.rootcheck &&
+          (!currentConfig.fim.rootcheck.ignore ||
+            (currentConfig.fim.rootcheck.ignore &&
+              !currentConfig.fim.rootcheck.ignore.length)) && (
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig &&
-          currentConfig['syscheck-rootcheck'] &&
-          currentConfig['syscheck-rootcheck'].rootcheck &&
-          (!currentConfig['syscheck-rootcheck'].rootcheck.ignore ||
-            (currentConfig['syscheck-rootcheck'].rootcheck.ignore &&
-              !currentConfig['syscheck-rootcheck'].rootcheck.ignore
-                .length)) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
-          )}
-        {currentConfig &&
-        currentConfig['syscheck-rootcheck'] &&
-        currentConfig['syscheck-rootcheck'].rootcheck &&
-        currentConfig['syscheck-rootcheck'].rootcheck.ignore &&
-        currentConfig['syscheck-rootcheck'].rootcheck.ignore.length ? (
+        currentConfig.fim &&
+        currentConfig.fim.rootcheck &&
+        currentConfig.fim.rootcheck.ignore &&
+        currentConfig.fim.rootcheck.ignore.length ? (
           <WzConfigurationSettingsHeader
-            title="Ignored files and directories"
-            description="These files and directories are ignored from the rootcheck scan"
+            title='Ignored files and directories'
+            description='These files and directories are ignored from the rootcheck scan'
             help={helpLinks}
           >
-            {(currentConfig['syscheck-rootcheck'].rootcheck.ignore || {})
-              .length && (
+            {(currentConfig.fim.rootcheck.ignore || {}).length && (
               <Fragment>
                 <EuiBasicTable
-                  items={currentConfig[
-                    'syscheck-rootcheck'
-                  ].rootcheck.ignore.map(item => ({ path: item }))}
+                  items={currentConfig.fim.rootcheck.ignore.map(item => ({
+                    path: item,
+                  }))}
                   columns={columnsIgnore}
                 />
-                <EuiSpacer size="m" />
+                <EuiSpacer size='m' />
               </Fragment>
             )}
-            {(currentConfig['syscheck-rootcheck'].rootcheck.ignore_sregex || {})
-              .length && (
+            {(currentConfig.fim.rootcheck.ignore_sregex || {}).length && (
               <Fragment>
                 <EuiBasicTable
-                  items={currentConfig[
-                    'syscheck-rootcheck'
-                  ].rootcheck.ignore_sregex.map(item => ({ sreg: item }))}
+                  items={currentConfig.fim.rootcheck.ignore_sregex.map(
+                    item => ({ sreg: item }),
+                  )}
                   columns={columnsIgnoreSregex}
                 />
               </Fragment>
@@ -86,5 +80,9 @@ class WzConfigurationPolicyMonitoringSystemAudit extends Component {
     );
   }
 }
+
+WzConfigurationPolicyMonitoringSystemAudit.propTypes = {
+  currentConfig: PropTypes.object,
+};
 
 export default WzConfigurationPolicyMonitoringSystemAudit;
