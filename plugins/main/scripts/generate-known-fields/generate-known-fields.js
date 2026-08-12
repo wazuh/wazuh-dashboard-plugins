@@ -359,6 +359,7 @@ const TEMPLATE_SOURCES = {
       ),
     ],
     outputFile: 'agent-stats.json',
+  },
   'agent-config': {
     urls: [
       wazuhUrl(
