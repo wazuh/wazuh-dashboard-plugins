@@ -69,8 +69,8 @@ beforeEach(() => {
   });
 });
 
-describe('SettingsPage — wazuh_brain hidden from provider type dropdown', () => {
-  it('does not include wazuh_brain in the provider type select when the form is open', async () => {
+describe('SettingsPage — wazuh_brain hidden from provider type choices', () => {
+  it('does not offer wazuh_brain among the provider type cards when the form is open', async () => {
     render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
 
     const addButton = await screen.findByRole('button', {
@@ -81,13 +81,16 @@ describe('SettingsPage — wazuh_brain hidden from provider type dropdown', () =
     // Wait for the form to be visible (Name field is present)
     await screen.findByLabelText(/^name/i);
 
-    const optionValues = screen
-      .getAllByRole('option')
-      .map(o => (o as HTMLOptionElement).value);
-
-    expect(optionValues).not.toContain('wazuh_brain');
-    expect(optionValues).toContain('openai_compatible');
-    expect(optionValues).toContain('anthropic');
+    // Provider type (screen 4, variation 4a) is now two EuiCheckableCard radios instead of a
+    // <select>/<option> pair — assert on those directly rather than on <option> elements.
+    expect(screen.getAllByRole('radio')).toHaveLength(2);
+    expect(
+      screen.getByLabelText(
+        /openai-compatible \(openai, bedrock gateway, ollama, lm studio, vllm\.\.\.\)/i,
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText(/anthropic \(claude\)/i)).toBeInTheDocument();
+    expect(screen.queryByText(/wazuh_brain/i)).not.toBeInTheDocument();
   });
 });
 
@@ -275,8 +278,11 @@ describe('SettingsPage — auto-open create-provider flyout (?addProvider=true)'
       />,
     );
 
-    // The row's actions collapse into a single "All actions" menu in this narrow jsdom viewport.
-    fireEvent.click(await screen.findByRole('button', { name: 'All actions' }));
+    // Row actions are a single ⋯ popover (screen 3: "Row actions become EuiPopover +
+    // EuiContextMenu") rather than EUI's own collapsed "All actions" button.
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Actions for My OpenAI' }),
+    );
     fireEvent.click(await screen.findByRole('button', { name: 'Edit' }));
     expect(await screen.findByLabelText(/^name\s*\*?$/i)).toBeInTheDocument();
 

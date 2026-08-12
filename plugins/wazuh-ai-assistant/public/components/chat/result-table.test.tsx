@@ -210,11 +210,17 @@ describe('ResultTable', () => {
       expect(
         screen.getByText(/"index_pattern": "wazuh-findings-v5-\*"/),
       ).toBeInTheDocument();
+      expect(
+        document.querySelector('.euiPopover__panel-isOpen'),
+      ).not.toBeNull();
 
       fireEvent.click(screen.getByText('Critical findings · 90d'));
-      expect(
-        screen.queryByText(/"index_pattern": "wazuh-findings-v5-\*"/),
-      ).toBeNull();
+      // EUI keeps a closed popover's panel MOUNTED (it fades out via CSS and is only hidden from
+      // assistive tech), so the JSON node is still findable in jsdom after the second click. The
+      // state that actually flips is the panel's `-isOpen` modifier, which is what this asserts —
+      // querying for the text instead would pass while open and fail while closed for the wrong
+      // reason. Verified against the bundled EUI build, whose stylesheet defines the class.
+      expect(document.querySelector('.euiPopover__panel-isOpen')).toBeNull();
     });
 
     it('renders no chip at all when provenanceChips is omitted', () => {

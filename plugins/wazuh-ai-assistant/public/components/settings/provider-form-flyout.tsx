@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import './provider-form-flyout.scss';
 import {
   EuiButton,
   EuiButtonEmpty,
   EuiCallOut,
+  EuiCheckableCard,
   EuiCode,
   EuiCodeBlock,
   EuiConfirmModal,
@@ -16,11 +18,11 @@ import {
   EuiFlyoutFooter,
   EuiFlyoutHeader,
   EuiForm,
+  EuiFormFieldset,
   EuiFormRow,
   EuiLink,
   EuiPopover,
   EuiPopoverTitle,
-  EuiSelect,
   EuiSpacer,
   EuiText,
   EuiTextColor,
@@ -32,13 +34,14 @@ import { FormattedMessage } from '@osd/i18n/react';
 import { ProviderInput, ProviderSummary } from '../../../common/types';
 import { PROVIDER_TYPES } from '../../../common/constants';
 import { useDirtyFormState } from '../../hooks/use-dirty-form-state';
+import { ProviderTestOutcome } from './provider-status';
 
 const PROVIDER_TYPE_FORM_LABELS: Record<string, string> = {
   openai_compatible: i18n.translate(
     'wazuhAiAssistant.settings.type.openaiCompatible',
     {
       defaultMessage:
-        'OpenAI-compatible (OpenAI, Gemini, Ollama, LM Studio, vLLM...)',
+        'OpenAI-compatible (OpenAI, Bedrock gateway, Ollama, LM Studio, vLLM...)',
     },
   ),
   anthropic: i18n.translate('wazuhAiAssistant.settings.type.anthropic', {
@@ -117,9 +120,10 @@ interface ProviderUrlDoc {
 }
 
 /** Note shown under the docs links for openai_compatible: that type's label (see
- * PROVIDER_TYPE_FORM_LABELS above) advertises more services (Gemini, LM Studio, vLLM...) than this
- * file has room to keep a maintained doc link for — pointing the admin at their own provider's
- * docs is more reliable than us trying to enumerate every compatible gateway. */
+ * PROVIDER_TYPE_FORM_LABELS above) advertises more services (Bedrock gateway, LM Studio,
+ * vLLM...) than this file has room to keep a maintained doc link for — pointing the admin at
+ * their own provider's docs is more reliable than us trying to enumerate every compatible
+ * gateway. */
 const OTHER_OPENAI_COMPATIBLE_PROVIDERS_NOTE = i18n.translate(
   'wazuhAiAssistant.settings.form.otherProvidersNote',
   {
@@ -213,7 +217,7 @@ const PROVIDER_MODEL_GUIDANCE: Record<
   { examples: string[]; docs: ProviderUrlDoc[]; note?: string }
 > = {
   openai_compatible: {
-    examples: ['gpt-4o', 'gpt-4o-mini', 'openai/gpt-oss-120b'],
+    examples: ['openai.gpt-oss-120b', 'mistral.mistral-large-3-675b-instruct'],
     docs: [
       {
         label: i18n.translate(
@@ -243,7 +247,7 @@ const PROVIDER_MODEL_GUIDANCE: Record<
     note: OTHER_OPENAI_COMPATIBLE_PROVIDERS_NOTE,
   },
   anthropic: {
-    examples: ['claude-sonnet-4-5', 'claude-opus-4-1'],
+    examples: ['claude-opus-4-8', 'claude-haiku-4-5'],
     docs: [
       {
         label: i18n.translate(
@@ -257,6 +261,78 @@ const PROVIDER_MODEL_GUIDANCE: Record<
     ],
   },
 };
+
+/**
+ * Curated model suggestions keyed by a substring of the endpoint URL — shown as clickable chips
+ * under the Model field so the admin can pick a known-good model without leaving the form, while
+ * the field itself stays free text (providers add models faster than this list could track).
+ * Order matters: the first substring match wins.
+ *
+ * `forType` gates the entry to the provider type it actually works with: api.anthropic.com only
+ * makes sense for the `anthropic` type (an `openai_compatible` provider pointed at that URL would
+ * be a guaranteed-broken config), and every other entry is an OpenAI-compatible-only
+ * gateway/service, so it is gated to `openai_compatible`.
+ */
+const VENDOR_MODEL_SUGGESTIONS: Array<{
+  match: string;
+  forType: ProviderInput['type'];
+  models: string[];
+}> = [
+  {
+    match: 'api.anthropic.com',
+    forType: 'anthropic',
+    models: ['claude-opus-4-8', 'claude-haiku-4-5', 'claude-sonnet-5'],
+  },
+  {
+    match: 'api.openai.com',
+    forType: 'openai_compatible',
+    models: ['gpt-4o', 'gpt-4o-mini'],
+  },
+  {
+    match: 'bedrock-mantle',
+    forType: 'openai_compatible',
+    models: [
+      'openai.gpt-oss-120b',
+      'mistral.mistral-large-3-675b-instruct',
+      'qwen.qwen3-32b',
+      'deepseek.v3.2',
+    ],
+  },
+  {
+    match: 'openrouter.ai',
+    forType: 'openai_compatible',
+    models: ['openai/gpt-oss-20b:free'],
+  },
+  {
+    match: 'generativelanguage',
+    forType: 'openai_compatible',
+    models: ['gemini-flash-latest', 'gemini-3-flash-preview'],
+  },
+  {
+    match: 'localhost:11434',
+    forType: 'openai_compatible',
+    models: ['llama3.3', 'qwen3', 'mistral'],
+  },
+  {
+    match: '127.0.0.1:11434',
+    forType: 'openai_compatible',
+    models: ['llama3.3', 'qwen3', 'mistral'],
+  },
+];
+
+function getVendorModelSuggestions(
+  baseUrl: string,
+  type: ProviderInput['type'],
+): string[] {
+  const normalized = baseUrl.trim().toLowerCase();
+  if (!normalized) {
+    return [];
+  }
+  const vendor = VENDOR_MODEL_SUGGESTIONS.find(
+    ({ match, forType }) => forType === type && normalized.includes(match),
+  );
+  return vendor?.models ?? [];
+}
 
 const RequiredLabel: React.FC<{ label: string }> = ({ label }) => (
   <>
@@ -335,6 +411,13 @@ interface ProviderFormFlyoutProps {
   canSave: boolean;
   accessMessage: string | null;
   apiKeyEncryptionEnabled: boolean | null;
+  /** True while a save (+ the connection test it triggers) is in flight. Optional/absent behaves
+   * exactly as before this prop existed: the Save button is never shown as loading. */
+  isSaving?: boolean;
+  /** Result of the connection test the LAST "Save & test" click kicked off, or `null` before one
+   * has completed (screen 4: "Save & test gains a result panel"). Optional/absent — and `null` —
+   * both mean "no result panel", which is how every pre-existing caller/test behaves. */
+  testOutcome?: ProviderTestOutcome | null;
   onSubmit: (input: ProviderInput) => Promise<void>;
   onClose: () => void;
 }
@@ -345,6 +428,8 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   canSave,
   accessMessage,
   apiKeyEncryptionEnabled,
+  isSaving = false,
+  testOutcome = null,
   onSubmit,
   onClose,
 }) => {
@@ -378,6 +463,51 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
       form.apiKey?.trim() &&
       !apiKeyGuidance.keyPattern.test(form.apiKey.trim()),
   );
+  const vendorModelSuggestions = getVendorModelSuggestions(
+    form.baseUrl,
+    form.type,
+  );
+
+  const fillBaseUrl = (value: string) => {
+    setForm({ ...form, baseUrl: value });
+    setBaseUrlTouched(true);
+    if (baseUrlError) {
+      setBaseUrlError(null);
+    }
+  };
+
+  const fillModel = (value: string) => setForm({ ...form, model: value });
+
+  // Group 1 (Provider type) onChange: same prefill/clear logic the old EuiSelect's onChange had,
+  // just taking the next type directly instead of reading it off a native <select> change event.
+  const handleTypeChange = (nextType: ProviderInput['type']) => {
+    setForm(current => {
+      // Prefill Anthropic's base URL the first time the admin switches to that type, but only
+      // while the endpoint field is still empty/untouched — see `baseUrlTouched` above.
+      const shouldPrefillAnthropicBaseUrl =
+        nextType === 'anthropic' &&
+        !baseUrlTouched &&
+        current.baseUrl.trim() === '';
+      // Mirror image of the prefill above: leaving anthropic for another type while the field is
+      // still untouched and still holds exactly the value this form prefilled clears it again, so
+      // a wrong-type URL can't be saved unnoticed. A value the admin typed themselves
+      // (`baseUrlTouched`) is never touched here.
+      const shouldClearAnthropicPrefill =
+        current.type === 'anthropic' &&
+        nextType !== 'anthropic' &&
+        !baseUrlTouched &&
+        current.baseUrl === PROVIDER_URL_GUIDANCE.anthropic.placeholder;
+      return {
+        ...current,
+        type: nextType,
+        baseUrl: shouldPrefillAnthropicBaseUrl
+          ? PROVIDER_URL_GUIDANCE.anthropic.placeholder
+          : shouldClearAnthropicPrefill
+          ? ''
+          : current.baseUrl,
+      };
+    });
+  };
 
   const handleSave = async () => {
     const trimmedForm: ProviderInput = {
@@ -404,7 +534,10 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
     apiKeyEncryptionEnabled === false && Boolean(form.apiKey?.trim());
 
   const requestClose = () => {
-    if (isDirty) {
+    // Once a save has produced a test result, there is nothing left to discard — the provider is
+    // already persisted — so the close button (and the X in the header) close directly instead of
+    // asking about unsaved changes.
+    if (isDirty && !testOutcome) {
       setShowCloseConfirm(true);
     } else {
       onClose();
@@ -431,7 +564,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
     <>
       <EuiFlyout
         onClose={requestClose}
-        size='s'
+        size='m'
         aria-labelledby='wz-ai-provider-flyout-title'
       >
         <EuiFlyoutHeader hasBorder>
@@ -565,331 +698,541 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     },
                   )}
                 </p>
+                <p>
+                  {i18n.translate(
+                    'wazuhAiAssistant.settings.form.gettingStartedTestCaveat',
+                    {
+                      defaultMessage:
+                        'A green test confirms connection and key — it does not guarantee ' +
+                        'every chat request will succeed.',
+                    },
+                  )}
+                </p>
               </EuiCallOut>
               <EuiSpacer size='m' />
             </>
           )}
-          <EuiForm component='div'>
-            <EuiFormRow
-              id='wz-ai-provider-name'
-              label={
-                <RequiredLabel
-                  label={i18n.translate('wazuhAiAssistant.settings.form.name', {
-                    defaultMessage: 'Name',
-                  })}
-                />
-              }
+          <EuiForm component='div' className='wzProviderFlyout'>
+            <EuiFormFieldset
+              className='wzProviderFlyout__group'
+              legend={{
+                children: i18n.translate(
+                  'wazuhAiAssistant.settings.form.providerTypeGroupLegend',
+                  { defaultMessage: '1 Provider type' },
+                ),
+              }}
             >
-              <EuiFieldText
-                value={form.name}
-                aria-required='true'
-                onChange={event =>
-                  setForm({ ...form, name: event.target.value })
-                }
-              />
-            </EuiFormRow>
-            <EuiFormRow
-              id='wz-ai-provider-type'
-              label={
-                <RequiredLabel
-                  label={i18n.translate('wazuhAiAssistant.settings.form.type', {
-                    defaultMessage: 'Provider type',
-                  })}
-                />
-              }
-              helpText={PROVIDER_TYPE_DESCRIPTIONS[form.type]}
+              <EuiFlexGroup gutterSize='m' responsive={false}>
+                {PROVIDER_TYPES.map(type => (
+                  <EuiFlexItem key={type}>
+                    <EuiCheckableCard
+                      id={`wz-ai-provider-type-${type}`}
+                      label={PROVIDER_TYPE_FORM_LABELS[type]}
+                      name='wz-ai-provider-type'
+                      value={type}
+                      checkableType='radio'
+                      checked={form.type === type}
+                      onChange={() => handleTypeChange(type)}
+                    />
+                  </EuiFlexItem>
+                ))}
+              </EuiFlexGroup>
+              <EuiSpacer size='s' />
+              <EuiText size='s' color='subdued'>
+                <p>{PROVIDER_TYPE_DESCRIPTIONS[form.type]}</p>
+              </EuiText>
+            </EuiFormFieldset>
+
+            <EuiFormFieldset
+              className='wzProviderFlyout__group'
+              legend={{
+                children: i18n.translate(
+                  'wazuhAiAssistant.settings.form.connectionGroupLegend',
+                  { defaultMessage: '2 Connection' },
+                ),
+              }}
             >
-              <EuiSelect
-                options={PROVIDER_TYPES.map(type => ({
-                  value: type,
-                  text: PROVIDER_TYPE_FORM_LABELS[type],
-                }))}
-                value={form.type}
-                aria-required='true'
-                onChange={event => {
-                  const nextType = event.target.value as ProviderInput['type'];
-                  setForm(current => {
-                    // Prefill Anthropic's base URL the first time the admin switches to that
-                    // type, but only while the endpoint field is still empty/untouched — see
-                    // `baseUrlTouched` above.
-                    const shouldPrefillAnthropicBaseUrl =
-                      nextType === 'anthropic' &&
-                      !baseUrlTouched &&
-                      current.baseUrl.trim() === '';
-                    // Mirror image of the prefill above: leaving anthropic for another type
-                    // while the field is still untouched and still holds exactly the value this
-                    // form prefilled clears it again, so a wrong-type URL can't be saved
-                    // unnoticed. A value the admin typed themselves (`baseUrlTouched`) is never
-                    // touched here.
-                    const shouldClearAnthropicPrefill =
-                      current.type === 'anthropic' &&
-                      nextType !== 'anthropic' &&
-                      !baseUrlTouched &&
-                      current.baseUrl ===
-                        PROVIDER_URL_GUIDANCE.anthropic.placeholder;
-                    return {
-                      ...current,
-                      type: nextType,
-                      baseUrl: shouldPrefillAnthropicBaseUrl
-                        ? PROVIDER_URL_GUIDANCE.anthropic.placeholder
-                        : shouldClearAnthropicPrefill
-                        ? ''
-                        : current.baseUrl,
-                    };
-                  });
-                }}
-              />
-            </EuiFormRow>
-            <EuiFormRow
-              id='wz-ai-provider-base-url'
-              label={
-                <RequiredLabel
-                  label={i18n.translate(
-                    'wazuhAiAssistant.settings.form.baseUrl',
-                    {
-                      defaultMessage: 'Endpoint URL',
-                    },
-                  )}
-                />
-              }
-              isInvalid={Boolean(baseUrlError)}
-              error={baseUrlError}
-              helpText={
-                <>
-                  <FormattedMessage
-                    id='wazuhAiAssistant.settings.form.baseUrlExample'
-                    defaultMessage='{header}: {example}'
-                    values={{
-                      header:
-                        urlGuidance.examples.length > 1
-                          ? 'Examples'
-                          : 'Example',
-                      example: <EuiCode>{urlGuidance.examples[0]}</EuiCode>,
-                    }}
-                  />
-                  {urlGuidance.examples.slice(1).map(example => (
-                    <React.Fragment key={example}>
-                      {', '}
-                      <EuiCode>{example}</EuiCode>
-                    </React.Fragment>
-                  ))}
-                  {'. '}
-                  <EuiSpacer size='xs' />
-                  <DocsPopover
-                    triggerLabel={i18n.translate(
-                      'wazuhAiAssistant.settings.form.baseUrlDocsButton',
-                      { defaultMessage: 'API documentation' },
-                    )}
-                    title={i18n.translate(
-                      'wazuhAiAssistant.settings.form.baseUrlDocsTitle',
-                      {
-                        defaultMessage: 'API documentation',
-                      },
-                    )}
-                    docs={urlGuidance.docs}
-                    note={urlGuidance.note}
-                  />
-                </>
-              }
-            >
-              <EuiFieldText
-                value={form.baseUrl}
-                placeholder={urlGuidance.placeholder}
-                isInvalid={Boolean(baseUrlError)}
-                aria-required='true'
-                onChange={event => {
-                  setForm({ ...form, baseUrl: event.target.value });
-                  setBaseUrlTouched(true);
-                  if (baseUrlError) {
-                    setBaseUrlError(null);
-                  }
-                }}
-              />
-            </EuiFormRow>
-            <EuiFormRow
-              id='wz-ai-provider-model'
-              label={
-                <RequiredLabel
-                  label={i18n.translate(
-                    'wazuhAiAssistant.settings.form.model',
-                    {
-                      defaultMessage: 'Model',
-                    },
-                  )}
-                />
-              }
-              helpText={
-                <>
-                  {i18n.translate('wazuhAiAssistant.settings.form.modelHelp', {
-                    defaultMessage:
-                      'Tool calling needs a model with solid function-calling support ' +
-                      '(e.g. GPT-4o, Claude Sonnet) — small or lightweight models often ' +
-                      "fail. Check your provider's model list for current availability, " +
-                      'as models are periodically retired. A free-tier API key with a ' +
-                      "low rate limit may fail regardless of the model's capability.",
-                  })}{' '}
-                  <FormattedMessage
-                    id='wazuhAiAssistant.settings.form.modelExample'
-                    defaultMessage='{header}: {example}'
-                    values={{
-                      header:
-                        modelGuidance.examples.length > 1
-                          ? 'Examples'
-                          : 'Example',
-                      example: <EuiCode>{modelGuidance.examples[0]}</EuiCode>,
-                    }}
-                  />
-                  {modelGuidance.examples.slice(1).map(example => (
-                    <React.Fragment key={example}>
-                      {', '}
-                      <EuiCode>{example}</EuiCode>
-                    </React.Fragment>
-                  ))}
-                  {'. '}
-                  <EuiSpacer size='xs' />
-                  <DocsPopover
-                    triggerLabel={i18n.translate(
-                      'wazuhAiAssistant.settings.form.modelDocsButton',
-                      {
-                        defaultMessage: 'See available models',
-                      },
-                    )}
-                    title={i18n.translate(
-                      'wazuhAiAssistant.settings.form.modelDocsTitle',
-                      {
-                        defaultMessage: 'Model documentation',
-                      },
-                    )}
-                    docs={modelGuidance.docs}
-                    note={modelGuidance.note}
-                  />
-                </>
-              }
-            >
-              <EuiFieldText
-                value={form.model}
-                aria-required='true'
-                onChange={event =>
-                  setForm({ ...form, model: event.target.value })
-                }
-              />
-            </EuiFormRow>
-            <EuiFormRow
-              id='wz-ai-provider-api-key'
-              label={i18n.translate('wazuhAiAssistant.settings.form.apiKey', {
-                defaultMessage: 'API key',
-              })}
-              labelAppend={
-                editingProvider?.hasApiKey ? (
-                  <EuiBadge color='hollow'>
-                    {i18n.translate(
-                      'wazuhAiAssistant.settings.form.apiKeyStoredBadge',
-                      {
-                        defaultMessage: 'Key stored',
-                      },
-                    )}
-                  </EuiBadge>
-                ) : undefined
-              }
-              helpText={
-                <>
-                  <p>
-                    {editingProvider
-                      ? i18n.translate(
-                          'wazuhAiAssistant.settings.form.apiKeyHelpEditing',
-                          {
-                            defaultMessage:
-                              'Leave empty to keep the current key. Optional for endpoints ' +
-                              "that don't require authentication (e.g. a local Ollama " +
-                              'server without auth) — stored encrypted at rest when an ' +
-                              'encryption key is configured.',
-                          },
-                        )
-                      : i18n.translate(
-                          'wazuhAiAssistant.settings.form.apiKeyHelpCreate',
-                          {
-                            defaultMessage:
-                              "Optional for endpoints that don't require authentication " +
-                              '(e.g. a local Ollama server without auth) — stored encrypted ' +
-                              'at rest when an encryption key is configured.',
-                          },
+              <EuiFlexGroup gutterSize='m' responsive={false}>
+                <EuiFlexItem>
+                  <EuiFormRow
+                    id='wz-ai-provider-name'
+                    label={
+                      <RequiredLabel
+                        label={i18n.translate(
+                          'wazuhAiAssistant.settings.form.name',
+                          { defaultMessage: 'Name' },
                         )}
-                  </p>
-                  <p>{apiKeyGuidance.help}</p>
+                      />
+                    }
+                  >
+                    <EuiFieldText
+                      value={form.name}
+                      aria-required='true'
+                      onChange={event =>
+                        setForm({ ...form, name: event.target.value })
+                      }
+                    />
+                  </EuiFormRow>
+                </EuiFlexItem>
+                <EuiFlexItem>
+                  <EuiFormRow
+                    id='wz-ai-provider-api-key'
+                    label={i18n.translate(
+                      'wazuhAiAssistant.settings.form.apiKey',
+                      { defaultMessage: 'API key' },
+                    )}
+                    labelAppend={
+                      editingProvider?.hasApiKey ? (
+                        <EuiBadge color='hollow'>
+                          {i18n.translate(
+                            'wazuhAiAssistant.settings.form.apiKeyStoredBadge',
+                            { defaultMessage: 'Key stored' },
+                          )}
+                        </EuiBadge>
+                      ) : undefined
+                    }
+                    helpText={
+                      <>
+                        <p>
+                          {editingProvider
+                            ? i18n.translate(
+                                'wazuhAiAssistant.settings.form.apiKeyHelpEditing',
+                                {
+                                  defaultMessage:
+                                    'Leave empty to keep the current key. Optional for endpoints ' +
+                                    "that don't require authentication (e.g. a local Ollama " +
+                                    'server without auth) — stored encrypted at rest when an ' +
+                                    'encryption key is configured.',
+                                },
+                              )
+                            : i18n.translate(
+                                'wazuhAiAssistant.settings.form.apiKeyHelpCreate',
+                                {
+                                  defaultMessage:
+                                    "Optional for endpoints that don't require authentication " +
+                                    '(e.g. a local Ollama server without auth) — stored encrypted ' +
+                                    'at rest when an encryption key is configured.',
+                                },
+                              )}
+                        </p>
+                        <p>{apiKeyGuidance.help}</p>
+                      </>
+                    }
+                  >
+                    {/* Deliberately no `isInvalid` here: a shape mismatch is a non-blocking
+                        warning (below), not a form error — a red-invalid field would read as
+                        blocking even though Save stays enabled. */}
+                    <EuiFieldPassword
+                      type='dual'
+                      value={form.apiKey}
+                      onChange={event =>
+                        setForm({ ...form, apiKey: event.target.value })
+                      }
+                    />
+                  </EuiFormRow>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+              {/* Non-blocking: a shape mismatch never stops Save, it only flags a likely
+                  copy/paste mistake before the admin hits an opaque "Test connection" failure.
+                  `apiKeyShapeMismatch` is only ever true for a type with both a `keyPattern` and a
+                  `shapeWarning` (currently just anthropic — see PROVIDER_API_KEY_GUIDANCE above),
+                  so `shapeWarning` is guaranteed defined here. */}
+              {apiKeyShapeMismatch && apiKeyGuidance.shapeWarning && (
+                <>
+                  <EuiSpacer size='xs' />
+                  <EuiCallOut
+                    size='s'
+                    color='warning'
+                    iconType='alert'
+                    title={apiKeyGuidance.shapeWarning}
+                  />
                 </>
-              }
-            >
-              {/* Deliberately no `isInvalid` here: a shape mismatch is a non-blocking warning
-                  (see the EuiCallOut below), not a form error — a red-invalid field would read
-                  as blocking to an admin even though Save stays enabled. */}
-              <EuiFieldPassword
-                type='dual'
-                value={form.apiKey}
-                onChange={event =>
-                  setForm({ ...form, apiKey: event.target.value })
+              )}
+              <EuiSpacer size='m' />
+              <EuiFormRow
+                id='wz-ai-provider-base-url'
+                label={
+                  <RequiredLabel
+                    label={i18n.translate(
+                      'wazuhAiAssistant.settings.form.baseUrl',
+                      { defaultMessage: 'Endpoint URL' },
+                    )}
+                  />
                 }
-              />
-            </EuiFormRow>
-            {/* Non-blocking: a shape mismatch never stops Save, it only flags a likely
-                copy/paste mistake before the admin hits an opaque "Test connection" failure.
-                Kept outside EuiFormRow (which clones its single child to inject a11y props,
-                so it cannot take a two-element fragment) rather than inside it. */}
-            {/* `apiKeyShapeMismatch` is only ever true for a type with both a `keyPattern` and a
-                `shapeWarning` (currently just anthropic — see PROVIDER_API_KEY_GUIDANCE above),
-                so `shapeWarning` is guaranteed defined here. */}
-            {apiKeyShapeMismatch && apiKeyGuidance.shapeWarning && (
+                isInvalid={Boolean(baseUrlError)}
+                error={baseUrlError}
+                helpText={
+                  <>
+                    <EuiText
+                      size='xs'
+                      color='subdued'
+                      id='wz-ai-provider-baseurl-examples-label'
+                    >
+                      <FormattedMessage
+                        id='wazuhAiAssistant.settings.form.baseUrlExample'
+                        defaultMessage='{header}:'
+                        values={{
+                          header:
+                            urlGuidance.examples.length > 1
+                              ? 'Examples'
+                              : 'Example',
+                        }}
+                      />
+                    </EuiText>
+                    <EuiSpacer size='xs' />
+                    <EuiFlexGroup
+                      wrap
+                      gutterSize='xs'
+                      responsive={false}
+                      role='group'
+                      aria-labelledby='wz-ai-provider-baseurl-examples-label'
+                    >
+                      {urlGuidance.examples.map(example => (
+                        <EuiFlexItem grow={false} key={example}>
+                          <EuiBadge
+                            color='hollow'
+                            onClick={() => fillBaseUrl(example)}
+                            onClickAriaLabel={i18n.translate(
+                              'wazuhAiAssistant.settings.form.baseUrlExampleAriaLabel',
+                              {
+                                defaultMessage: 'Use endpoint {example}',
+                                values: { example },
+                              },
+                            )}
+                          >
+                            {example}
+                          </EuiBadge>
+                        </EuiFlexItem>
+                      ))}
+                    </EuiFlexGroup>
+                    <EuiSpacer size='xs' />
+                    <DocsPopover
+                      triggerLabel={i18n.translate(
+                        'wazuhAiAssistant.settings.form.baseUrlDocsButton',
+                        { defaultMessage: 'API documentation' },
+                      )}
+                      title={i18n.translate(
+                        'wazuhAiAssistant.settings.form.baseUrlDocsTitle',
+                        {
+                          defaultMessage: 'API documentation',
+                        },
+                      )}
+                      docs={urlGuidance.docs}
+                      note={urlGuidance.note}
+                    />
+                  </>
+                }
+              >
+                <EuiFieldText
+                  value={form.baseUrl}
+                  placeholder={urlGuidance.placeholder}
+                  isInvalid={Boolean(baseUrlError)}
+                  aria-required='true'
+                  onChange={event => {
+                    setForm({ ...form, baseUrl: event.target.value });
+                    setBaseUrlTouched(true);
+                    if (baseUrlError) {
+                      setBaseUrlError(null);
+                    }
+                  }}
+                />
+              </EuiFormRow>
+            </EuiFormFieldset>
+
+            <EuiFormFieldset
+              className='wzProviderFlyout__group'
+              legend={{
+                children: i18n.translate(
+                  'wazuhAiAssistant.settings.form.modelGroupLegend',
+                  { defaultMessage: '3 Model' },
+                ),
+              }}
+            >
+              <EuiFormRow
+                id='wz-ai-provider-model'
+                label={
+                  <RequiredLabel
+                    label={i18n.translate(
+                      'wazuhAiAssistant.settings.form.model',
+                      { defaultMessage: 'Model' },
+                    )}
+                  />
+                }
+                helpText={
+                  <>
+                    <EuiText
+                      size='xs'
+                      color='subdued'
+                      id='wz-ai-provider-model-examples-label'
+                    >
+                      <FormattedMessage
+                        id='wazuhAiAssistant.settings.form.modelExample'
+                        defaultMessage='{header}:'
+                        values={{
+                          header:
+                            modelGuidance.examples.length > 1
+                              ? 'Examples'
+                              : 'Example',
+                        }}
+                      />
+                    </EuiText>
+                    <EuiSpacer size='xs' />
+                    <EuiFlexGroup
+                      wrap
+                      gutterSize='xs'
+                      responsive={false}
+                      role='group'
+                      aria-labelledby='wz-ai-provider-model-examples-label'
+                    >
+                      {modelGuidance.examples.map(example => (
+                        <EuiFlexItem grow={false} key={example}>
+                          <EuiBadge
+                            color='hollow'
+                            onClick={() => fillModel(example)}
+                            onClickAriaLabel={i18n.translate(
+                              'wazuhAiAssistant.settings.form.modelExampleAriaLabel',
+                              {
+                                defaultMessage: 'Use model {example}',
+                                values: { example },
+                              },
+                            )}
+                          >
+                            {example}
+                          </EuiBadge>
+                        </EuiFlexItem>
+                      ))}
+                    </EuiFlexGroup>
+                    <EuiSpacer size='xs' />
+                    <DocsPopover
+                      triggerLabel={i18n.translate(
+                        'wazuhAiAssistant.settings.form.modelDocsButton',
+                        {
+                          defaultMessage: 'See available models',
+                        },
+                      )}
+                      title={i18n.translate(
+                        'wazuhAiAssistant.settings.form.modelDocsTitle',
+                        {
+                          defaultMessage: 'Model documentation',
+                        },
+                      )}
+                      docs={modelGuidance.docs}
+                      note={modelGuidance.note}
+                    />
+                  </>
+                }
+              >
+                <EuiFieldText
+                  value={form.model}
+                  aria-required='true'
+                  onChange={event =>
+                    setForm({ ...form, model: event.target.value })
+                  }
+                />
+              </EuiFormRow>
+              {/* Curated per-vendor suggestions, shown once the endpoint URL matches a known
+                  vendor — clicking a chip fills the (still free-text) Model field. Kept outside
+                  the EuiFormRow above for the same reason as the API key shape warning: EuiFormRow
+                  clones its single child to inject a11y props, so it cannot take a sibling. */}
+              {vendorModelSuggestions.length > 0 && (
+                <>
+                  <EuiSpacer size='xs' />
+                  <EuiText
+                    size='xs'
+                    color='subdued'
+                    id='wz-ai-provider-model-suggestions-label'
+                  >
+                    {i18n.translate(
+                      'wazuhAiAssistant.settings.form.modelSuggestionsLabel',
+                      { defaultMessage: 'Suggested models:' },
+                    )}
+                  </EuiText>
+                  <EuiSpacer size='xs' />
+                  <EuiFlexGroup
+                    gutterSize='xs'
+                    wrap
+                    responsive={false}
+                    role='group'
+                    aria-labelledby='wz-ai-provider-model-suggestions-label'
+                  >
+                    {vendorModelSuggestions.map(suggestedModel => (
+                      <EuiFlexItem key={suggestedModel} grow={false}>
+                        <EuiBadge
+                          color='hollow'
+                          onClick={() => fillModel(suggestedModel)}
+                          onClickAriaLabel={i18n.translate(
+                            'wazuhAiAssistant.settings.form.modelSuggestionAriaLabel',
+                            {
+                              defaultMessage: 'Use model {suggestedModel}',
+                              values: { suggestedModel },
+                            },
+                          )}
+                        >
+                          {suggestedModel}
+                        </EuiBadge>
+                      </EuiFlexItem>
+                    ))}
+                  </EuiFlexGroup>
+                </>
+              )}
+            </EuiFormFieldset>
+
+            <EuiSpacer size='m' />
+            {/* The five-line tool-calling paragraph, moved verbatim (screen 4: "Guidance is a
+                five-line paragraph") into its own warning callout so it reads as a caution rather
+                than ordinary field help. The model name inside it is a clickable chip; the
+                wording around it is untouched. */}
+            <EuiCallOut
+              size='s'
+              color='warning'
+              iconType='alert'
+              title={i18n.translate(
+                'wazuhAiAssistant.settings.form.toolCallingWarningTitle',
+                { defaultMessage: 'Tool calling requirement' },
+              )}
+            >
+              <p>
+                <FormattedMessage
+                  id='wazuhAiAssistant.settings.form.modelHelp'
+                  defaultMessage={
+                    'Tool calling needs a model with solid function-calling support ' +
+                    '(e.g. {model}). The model must support tool (function) calling. ' +
+                    'Models without tool support may fabricate answers instead of ' +
+                    "failing visibly. Check your provider's model list for current " +
+                    'availability, as models are periodically retired. A free-tier API ' +
+                    "key with a low rate limit may fail regardless of the model's " +
+                    'capability.'
+                  }
+                  values={{
+                    model: (
+                      <EuiBadge
+                        color='hollow'
+                        onClick={() => fillModel('gpt-4o')}
+                        onClickAriaLabel={i18n.translate(
+                          'wazuhAiAssistant.settings.form.toolCallingModelChipAriaLabel',
+                          { defaultMessage: 'Use model gpt-4o' },
+                        )}
+                      >
+                        GPT-4o
+                      </EuiBadge>
+                    ),
+                  }}
+                />
+              </p>
+            </EuiCallOut>
+
+            {testOutcome && (
               <>
-                <EuiSpacer size='xs' />
+                <EuiSpacer size='m' />
                 <EuiCallOut
                   size='s'
-                  color='warning'
-                  iconType='alert'
-                  title={apiKeyGuidance.shapeWarning}
-                />
+                  color={
+                    testOutcome.status === 'ok'
+                      ? 'success'
+                      : testOutcome.status === 'failed'
+                      ? 'danger'
+                      : 'warning'
+                  }
+                  iconType={testOutcome.status === 'ok' ? 'check' : 'alert'}
+                  title={
+                    testOutcome.status === 'ok'
+                      ? i18n.translate(
+                          'wazuhAiAssistant.settings.form.testResultSuccessTitle',
+                          {
+                            defaultMessage:
+                              'Connection test succeeded ({latencyMs} ms)',
+                            values: { latencyMs: testOutcome.latencyMs },
+                          },
+                        )
+                      : testOutcome.status === 'failed'
+                      ? i18n.translate(
+                          'wazuhAiAssistant.settings.form.testResultFailureTitle',
+                          { defaultMessage: 'Connection test failed' },
+                        )
+                      : i18n.translate(
+                          'wazuhAiAssistant.settings.form.testResultCouldNotVerifyTitle',
+                          {
+                            defaultMessage: 'Could not verify the connection',
+                          },
+                        )
+                  }
+                >
+                  {testOutcome.status === 'ok' ? (
+                    <p>
+                      {i18n.translate(
+                        'wazuhAiAssistant.settings.form.gettingStartedTestCaveat',
+                        {
+                          defaultMessage:
+                            'A green test confirms connection and key — it does not guarantee ' +
+                            'every chat request will succeed.',
+                        },
+                      )}
+                    </p>
+                  ) : (
+                    <p>{testOutcome.message}</p>
+                  )}
+                </EuiCallOut>
               </>
             )}
           </EuiForm>
         </EuiFlyoutBody>
         <EuiFlyoutFooter>
-          <EuiFlexGroup justifyContent='spaceBetween'>
-            <EuiFlexItem grow={false}>
-              <EuiButtonEmpty onClick={requestClose} flush='left'>
-                {i18n.translate('wazuhAiAssistant.settings.form.cancel', {
-                  defaultMessage: 'Cancel',
-                })}
-              </EuiButtonEmpty>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <EuiToolTip
-                content={
-                  !canSave
-                    ? accessMessage
-                    : apiKeyBlockedByEncryption
-                    ? i18n.translate(
-                        'wazuhAiAssistant.settings.form.encryptionRequiredTooltip',
-                        {
-                          defaultMessage:
-                            'An encryption key must be configured before an API key can be saved.',
-                        },
-                      )
-                    : undefined
-                }
-              >
-                <EuiButton
-                  onClick={handleSave}
-                  isDisabled={!canSave || apiKeyBlockedByEncryption}
-                  fill
-                >
-                  {i18n.translate(
-                    'wazuhAiAssistant.settings.form.saveAndTest',
-                    {
-                      defaultMessage: 'Save & test',
-                    },
-                  )}
+          {testOutcome ? (
+            // A result is already showing: the save happened, so there is nothing left to
+            // Cancel — a single "Done" replaces the Cancel/Save & test pair.
+            <EuiFlexGroup justifyContent='flexEnd' responsive={false}>
+              <EuiFlexItem grow={false}>
+                <EuiButton onClick={onClose} fill>
+                  {i18n.translate('wazuhAiAssistant.settings.form.done', {
+                    defaultMessage: 'Done',
+                  })}
                 </EuiButton>
-              </EuiToolTip>
-            </EuiFlexItem>
-          </EuiFlexGroup>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          ) : (
+            <EuiFlexGroup justifyContent='spaceBetween'>
+              <EuiFlexItem grow={false}>
+                <EuiButtonEmpty onClick={requestClose} flush='left'>
+                  {i18n.translate('wazuhAiAssistant.settings.form.cancel', {
+                    defaultMessage: 'Cancel',
+                  })}
+                </EuiButtonEmpty>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <EuiToolTip
+                  content={
+                    !canSave
+                      ? accessMessage
+                      : apiKeyBlockedByEncryption
+                      ? i18n.translate(
+                          'wazuhAiAssistant.settings.form.encryptionRequiredTooltip',
+                          {
+                            defaultMessage:
+                              'An encryption key must be configured before an API key can be saved.',
+                          },
+                        )
+                      : undefined
+                  }
+                >
+                  <EuiButton
+                    onClick={handleSave}
+                    isDisabled={
+                      !canSave || apiKeyBlockedByEncryption || isSaving
+                    }
+                    isLoading={isSaving}
+                    fill
+                  >
+                    {i18n.translate(
+                      'wazuhAiAssistant.settings.form.saveAndTest',
+                      {
+                        defaultMessage: 'Save & test',
+                      },
+                    )}
+                  </EuiButton>
+                </EuiToolTip>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          )}
         </EuiFlyoutFooter>
       </EuiFlyout>
       {showCloseConfirm && (

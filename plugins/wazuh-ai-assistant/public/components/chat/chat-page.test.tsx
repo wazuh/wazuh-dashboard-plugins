@@ -1747,14 +1747,20 @@ describe('ChatPage — two-row grid pane (contract §1)', () => {
     // version of this test did to pin the mechanism it was checking.
     const scssPath = require('path').join(__dirname, 'chat-page.scss');
     const scssSource = require('fs').readFileSync(scssPath, 'utf8');
+    // Comments are stripped before matching: this file DOCUMENTS the removed mechanism by name
+    // ("there is no `position: sticky` ..."), so asserting against the raw source would fail on the
+    // very prose that explains why the rule is gone. Only real declarations are interesting here.
+    const scssRules = scssSource
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/^\s*\/\/.*$/gm, '');
 
-    expect(scssSource).not.toMatch(/position:\s*sticky/);
-    expect(scssSource).not.toMatch(/wzComposerGradientHeight/);
-    expect(scssSource).not.toMatch(/::before/);
+    expect(scssRules).not.toMatch(/position:\s*sticky/);
+    expect(scssRules).not.toMatch(/wzComposerGradientHeight/);
+    expect(scssRules).not.toMatch(/::before/);
     // The replacement mechanism is in place instead: a two-row grid pane, and a shared measure
     // class reading the redesign token rather than restating a pixel figure.
-    expect(scssSource).toMatch(/grid-template-rows:\s*1fr auto/);
-    expect(scssSource).toMatch(/max-width:\s*\$wzContentMaxWidth/);
+    expect(scssRules).toMatch(/grid-template-rows:\s*1fr auto/);
+    expect(scssRules).toMatch(/max-width:\s*\$wzContentMaxWidth/);
   });
 });
 
@@ -1886,13 +1892,15 @@ describe('ChatPage — conversation rail display mode (layout contract §5/§6)'
         { id: 'conv-b', title: 'Older conversation', updatedAt: '2024-01-01' },
       ]);
       renderChatPage();
-      await waitFor(() =>
-        expect(conversationRow('Older conversation')).toBeInTheDocument(),
-      );
-      const rail = screen.getByRole('region', {
+      const rail = await screen.findByRole('region', {
         name: 'Saved conversations',
       });
       expect(rail.style.width).toBe('48px');
+      // The strip is icon-only by design: at this width there is no room for titles, so the rail
+      // renders affordances (new conversation, search, expand) and nothing else. Asserting the
+      // absence is the point — a strip that still painted 22-character truncated titles would be
+      // the "undense rail" the redesign is removing, just narrower.
+      expect(conversationRow('Older conversation')).toBeNull();
     } finally {
       stub.restore();
     }

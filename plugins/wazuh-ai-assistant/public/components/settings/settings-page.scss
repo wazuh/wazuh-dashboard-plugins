@@ -1,0 +1,96 @@
+/**
+ * Settings page (Screen 3 of the redesign — see AI/design/redesign-v2-spec.md). Sections become
+ * bordered, shadowless cards under a centred pill title (the Home overview idiom), replacing the
+ * plain heading + panel pair the page used before. Tokens come from the shared `_redesign.scss`
+ * partial (see its own file-level doc comment) so this page never restates a value it already
+ * defines.
+ */
+@import '../redesign';
+
+.wzSettingsPage {
+  @include wzSurfaceTokens;
+}
+
+/**
+ * Section card: a centred, bordered pill straddling the panel's own top border by half its own
+ * height — exactly the idiom Home's overview cards already use. `pillRow` sits ABOVE the panel in
+ * normal flow; the pill's `transform: translateY(50%)` is what pulls it down to overlap the
+ * panel's hairline, and the panel's extra top padding is what reserves the room the pill's other
+ * half needs so the first row of real content never collides with it.
+ */
+.wzSettingsCard {
+  &__pillRow {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  &__pill {
+    background-color: var(--wz-surface);
+    transform: translateY(50%);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 2px 14px;
+  }
+
+  &__panel {
+    @include wzPanel($wzCardPaddingRoomy);
+    padding-top: $wzCardPaddingRoomy + 10px;
+  }
+}
+
+/**
+ * Status chip (screen 3, variation 3a — "one chip, four states"): tinted fill, no border, fully
+ * round, colour alone carries the state. Replaces the table's earlier three status languages
+ * (EuiHealth dot, plain danger badge, spinner+text). `provider-status.ts` already models these
+ * states (PR #8936) — this only restyles their presentation, it never re-derives them.
+ */
+.wzStatusChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  &--ok {
+    // This OUI fork predates EUI's success/secondary rename (see wz-stat/_stat.scss's own
+    // $euiColorSecondaryText) — $euiColorSecondary is the green brand color here, not
+    // $euiColorSuccess, which this fork does not define.
+    @include wzStatusChip($euiColorSecondary);
+  }
+
+  &--failed {
+    @include wzStatusChip($euiColorDanger);
+  }
+
+  &--testing {
+    @include wzStatusChip($euiColorPrimary);
+  }
+
+  &--could-not-verify {
+    @include wzStatusChip($euiColorWarning);
+  }
+
+  /* Not one of the design's four test-outcome states — a provider simply hasn't been tested yet.
+     Same pill shape for visual consistency, a neutral tint since there is no outcome to carry. */
+  &--pending {
+    @include wzStatusChip($euiColorMediumShade);
+  }
+
+  &__spinner {
+    margin-right: 2px;
+  }
+}
+
+/* Endpoint column (screen 3 gap: "Endpoints dominate the row"): the cell itself only needs to
+   respect the column's own width — `middleTruncate` (settings-page.tsx) already does the
+   character-level truncation, this just keeps the truncated string from wrapping. */
+.wzSettingsEndpointCell {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}

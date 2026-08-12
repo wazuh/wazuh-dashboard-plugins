@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
+import './settings-page.scss';
 import {
   EuiPage,
   EuiBadge,
   EuiPageBody,
-  EuiPageContent,
-  EuiPageContentBody,
-  EuiBadge,
-  EuiBasicTable,
+  EuiPageHeader,
+  EuiInMemoryTable,
   EuiBasicTableColumn,
   EuiButton,
+  EuiButtonIcon,
   EuiFlexGroup,
   EuiFlexItem,
   EuiFormRow,
@@ -16,17 +16,17 @@ import {
   EuiSelect,
   EuiCallOut,
   EuiSpacer,
-  EuiHealth,
   EuiText,
-  EuiTitle,
+  EuiTextColor,
   EuiConfirmModal,
-  EuiButtonIcon,
   EuiToolTip,
   EuiLoadingSpinner,
   EuiSwitch,
   EuiPanel,
+  EuiPopover,
+  EuiContextMenuPanel,
+  EuiContextMenuItem,
   EuiFieldNumber,
-  EuiIcon,
   EuiIconTip,
   EuiHorizontalRule,
   EuiFieldSearch,
@@ -51,13 +51,6 @@ import {
   outcomeFromTestError,
   outcomeFromTestResult,
 } from './provider-status';
-
-// Narrows the discriminated `ProviderTestOutcome` union for the page-level failure callouts
-// below, which only ever render for a non-'ok' outcome but read `testResults[id]` by key again
-// rather than the already-narrowed value the `.filter`/`.find` above checked.
-function outcomeMessage(outcome: ProviderTestOutcome): string | undefined {
-  return outcome.status === 'ok' ? undefined : outcome.message;
-}
 
 const FIELD_POLICY_ACTIONS: FieldPolicyAction[] = [
   'allow',
@@ -141,43 +134,150 @@ function buildSettingsPayload(
   };
 }
 
-/** Shared header for each settings section below: a leading icon + title, a one-line subdued
- * description, and an optional right-aligned action (e.g. the providers section's "Add provider"
- * button) — keeps the sections (Providers, Privacy, Conversation history) visually consistent. */
-const SectionHeader: React.FC<{
-  // Matches EuiIcon's own `type` prop exactly, so only icon names EuiIcon actually accepts compile.
-  icon: React.ComponentProps<typeof EuiIcon>['type'];
-  title: string;
-  description: string;
-  action?: React.ReactNode;
-}> = ({ icon, title, description, action }) => (
-  <>
-    <EuiFlexGroup
-      justifyContent='spaceBetween'
-      alignItems='flexStart'
-      responsive={false}
-      gutterSize='s'
+/**
+ * Middle-truncates a long value (e.g. an endpoint URL) so the tail — usually the most
+ * distinguishing part of a URL path — stays visible instead of being clipped by a trailing
+ * ellipsis. The full value is still available via the `EuiToolTip` wrapping the caller's render,
+ * so nothing is actually lost, only compacted (screen 3 gap: "Endpoints dominate the row").
+ */
+function middleTruncate(value: string, maxLength = 42): string {
+  if (value.length <= maxLength) {
+    return value;
+  }
+  const keep = maxLength - 1; // reserve one character for the ellipsis
+  const headLength = Math.ceil(keep * 0.6);
+  const tailLength = keep - headLength;
+  return `${value.slice(0, headLength)}…${value.slice(
+    value.length - tailLength,
+  )}`;
+}
+
+/** Renders every column of a section's own centred pill title over a bordered, shadowless panel
+ * — the Home overview idiom (screen 3 gap: "Sections are headings, not cards"). `pillLabel` is
+ * displayed uppercase via CSS only (`settings-page.scss`), so the underlying translated string
+ * itself is never altered. */
+const SectionCard: React.FC<{
+  pillLabel: string;
+  description?: string;
+  children: React.ReactNode;
+}> = ({ pillLabel, description, children }) => (
+  <div className='wzSettingsCard'>
+    <div className='wzSettingsCard__pillRow'>
+      <EuiBadge className='wzSettingsCard__pill' color='hollow'>
+        {pillLabel}
+      </EuiBadge>
+    </div>
+    <EuiPanel
+      hasShadow={false}
+      hasBorder
+      paddingSize='none'
+      className='wzSettingsCard__panel'
     >
+      {description && (
+        <>
+          <EuiText size='s' color='subdued'>
+            <p>{description}</p>
+          </EuiText>
+          <EuiSpacer size='m' />
+        </>
+      )}
+      {children}
+    </EuiPanel>
+  </div>
+);
+
+const STATUS_CHIP_TINT_CLASS: Record<
+  'ok' | 'failed' | 'testing' | 'could-not-verify' | 'pending',
+  string
+> = {
+  ok: 'wzStatusChip--ok',
+  failed: 'wzStatusChip--failed',
+  testing: 'wzStatusChip--testing',
+  'could-not-verify': 'wzStatusChip--could-not-verify',
+  pending: 'wzStatusChip--pending',
+};
+
+/** One status chip, four states (screen 3, variation 3a): same shape and position regardless of
+ * outcome, colour alone carries the state. `provider-status.ts` already models these states (PR
+ * #8936) — this only restyles their presentation. A hover/detail `reason` is optional: `ok` and
+ * `pending` never have one. */
+const ProviderStatusChip: React.FC<{
+  status: 'ok' | 'failed' | 'testing' | 'could-not-verify' | 'pending';
+  label: string;
+  reason?: string;
+}> = ({ status, label, reason }) => {
+  const chip = (
+    <EuiBadge
+      color='hollow'
+      className={`wzStatusChip ${STATUS_CHIP_TINT_CLASS[status]}`}
+    >
+      {status === 'testing' && (
+        <EuiLoadingSpinner size='s' className='wzStatusChip__spinner' />
+      )}
+      {label}
+    </EuiBadge>
+  );
+  return reason ? (
+    <EuiToolTip content={reason}>
+      <span>{chip}</span>
+    </EuiToolTip>
+  ) : (
+    chip
+  );
+};
+
+/** Expandable row detail (screen 3, variation 3a: "reason on hover and in the expandable row
+ * detail"): the untruncated endpoint plus, when a test has run, the full outcome message —
+ * latency on success, the failure/could-not-verify reason otherwise. */
+const ProviderRowDetail: React.FC<{
+  provider: ProviderSummary;
+  outcome?: ProviderTestOutcome;
+}> = ({ provider, outcome }) => (
+  <EuiFlexGroup direction='column' gutterSize='s' responsive={false}>
+    <EuiFlexItem>
+      <EuiText size='s'>
+        <strong>
+          {i18n.translate('wazuhAiAssistant.settings.rowDetail.endpoint', {
+            defaultMessage: 'Endpoint',
+          })}
+          :
+        </strong>{' '}
+        {provider.baseUrl}
+      </EuiText>
+    </EuiFlexItem>
+    {outcome && outcome.status === 'ok' && (
       <EuiFlexItem>
-        <EuiFlexGroup gutterSize='s' alignItems='center' responsive={false}>
-          <EuiFlexItem grow={false}>
-            <EuiIcon type={icon} size='m' />
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiTitle size='s'>
-              <h2>{title}</h2>
-            </EuiTitle>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiSpacer size='xs' />
-        <EuiText size='s' color='subdued'>
-          <p>{description}</p>
+        <EuiText size='s'>
+          {i18n.translate('wazuhAiAssistant.settings.rowDetail.latency', {
+            defaultMessage: 'Last test responded in {latencyMs} ms.',
+            values: { latencyMs: outcome.latencyMs },
+          })}
         </EuiText>
       </EuiFlexItem>
-      {action && <EuiFlexItem grow={false}>{action}</EuiFlexItem>}
-    </EuiFlexGroup>
-    <EuiSpacer size='s' />
-  </>
+    )}
+    {outcome && outcome.status !== 'ok' && (
+      <EuiFlexItem>
+        <EuiText size='s' color='danger'>
+          <strong>
+            {i18n.translate('wazuhAiAssistant.settings.rowDetail.reason', {
+              defaultMessage: 'Reason',
+            })}
+            :
+          </strong>{' '}
+          {outcome.message}
+        </EuiText>
+      </EuiFlexItem>
+    )}
+    {!outcome && (
+      <EuiFlexItem>
+        <EuiText size='s' color='subdued'>
+          {i18n.translate('wazuhAiAssistant.settings.rowDetail.noResult', {
+            defaultMessage: 'This provider has not been tested yet.',
+          })}
+        </EuiText>
+      </EuiFlexItem>
+    )}
+  </EuiFlexGroup>
 );
 
 export const SettingsPage: React.FC<SettingsPageProps> = ({
@@ -199,10 +299,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   >({});
   const [testingIds, setTestingIds] = useState<Set<string>>(new Set());
   // Ids of providers whose *last* test was explicitly triggered by the user (table row "Test"
-  // action), as opposed to the silent auto-probe run once on mount for every loaded provider.
-  // Only a manual failure (or the default provider failing, handled separately below) earns a
-  // page-level callout — the auto-probe's result still lands in the table's per-row status cell,
-  // it just never escalates to a banner on its own. See `manualTestFailures` below.
+  // action, or the header's "Test all"), as opposed to the silent auto-probe run once on mount
+  // for every loaded provider. Only a manual failure (or the default provider failing, handled
+  // separately below) earns a page-level callout — the auto-probe's result still lands in the
+  // table's per-row status cell, it just never escalates to a banner on its own. See
+  // `manualTestFailures` below.
   const [manualTestIds, setManualTestIds] = useState<Set<string>>(new Set());
   // Dismissal is keyed per callout: a manual-test failure dismisses under the bare provider id;
   // the default-provider-failing callout dismisses under a separate `default:${id}` key so
@@ -214,6 +315,17 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     null,
   );
   const [providersLoaded, setProvidersLoaded] = useState(false);
+  // Which row's ⋯ actions popover is open — at most one at a time (screen 3: "Row actions become
+  // EuiPopover + EuiContextMenu").
+  const [openMenuRowId, setOpenMenuRowId] = useState<string | null>(null);
+  // Which rows are expanded (screen 3: "expandable row detail").
+  const [expandedRowIds, setExpandedRowIds] = useState<Set<string>>(new Set());
+  // Result of the connection test the flyout's own "Save & test" kicked off, surfaced back INSIDE
+  // the flyout (screen 4: "Save & test gains a result panel") rather than only in the table once
+  // it has already closed. `null` while no save has completed yet in this flyout session.
+  const [flyoutTestOutcome, setFlyoutTestOutcome] =
+    useState<ProviderTestOutcome | null>(null);
+  const [isSubmittingProvider, setIsSubmittingProvider] = useState(false);
 
   // Privacy settings: loaded once on mount; edited locally and only written back on an explicit
   // "Save privacy settings" click, mirroring the provider form's own edit-then-save pattern
@@ -254,7 +366,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     p =>
       p.isDefault &&
       testResults[p.id] &&
-      testResults[p.id].status !== 'ok' &&
+      !testResults[p.id].success &&
       !dismissedErrorIds.has(`default:${p.id}`),
   );
   // Page-level callout #1: a provider the user explicitly clicked "Test" on, which failed.
@@ -265,7 +377,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     p =>
       manualTestIds.has(p.id) &&
       testResults[p.id] &&
-      testResults[p.id].status !== 'ok' &&
+      !testResults[p.id].success &&
       !dismissedErrorIds.has(p.id) &&
       p.id !== failingDefaultProvider?.id,
   );
@@ -492,6 +604,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   const openCreateForm = () => {
     setEditingProvider(null);
     setError(null);
+    setFlyoutTestOutcome(null);
     setIsFormOpen(true);
     onCreateFormOpenChange?.(true);
   };
@@ -499,6 +612,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   const openEditForm = (provider: ProviderSummary) => {
     setEditingProvider(provider);
     setError(null);
+    setFlyoutTestOutcome(null);
     setIsFormOpen(true);
   };
 
@@ -539,14 +653,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   // `privacyDefaultPerProvider: loadedAssistantSettings.privacyDefaultPerProvider` passthrough).
   const handleSubmit = async (input: ProviderInput) => {
     setError(null);
+    setIsSubmittingProvider(true);
     try {
       const saved = editingProvider
         ? await service.update(editingProvider.id, input)
         : await service.create(input);
-      setIsFormOpen(false);
       reload();
       onProvidersChanged();
-      handleTest(saved, { manual: true });
       core.notifications.toasts.addSuccess(
         editingProvider
           ? i18n.translate('wazuhAiAssistant.settings.updateSuccess', {
@@ -558,6 +671,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
               values: { name: saved.name },
             }),
       );
+      // The flyout no longer closes itself on a successful save — it stays open to surface the
+      // connection-test result (screen 4: "Save & test gains a result panel"). Once
+      // `flyoutTestOutcome` is set, the flyout's footer swaps Cancel/Save & test for a single
+      // "Done" button; the admin dismisses it explicitly.
+      const outcome = await handleTest(saved, { manual: true });
+      setFlyoutTestOutcome(outcome);
     } catch (submitError) {
       setError(
         describeHttpError(
@@ -567,6 +686,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           }),
         ),
       );
+    } finally {
+      setIsSubmittingProvider(false);
     }
   };
 
@@ -634,11 +755,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   // `manual` has no default here on purpose (see the finding this fixed): a future call site
   // that forgets to pass it should fail to compile rather than silently gain page-level banner
   // rights. The row action below gets its own thin wrapper (`handleManualTest`) that always
-  // passes `manual: true`; the auto-probe on mount passes `manual: false` explicitly.
+  // passes `manual: true`; the auto-probe on mount passes `manual: false` explicitly. Returns the
+  // outcome (not just void) so `handleSubmit` above can feed it straight into the flyout's result
+  // panel without re-reading state that may not have flushed yet.
   const handleTest = async (
     provider: ProviderSummary,
     options: { manual: boolean },
-  ) => {
+  ): Promise<ProviderTestOutcome> => {
     setTestingIds(current => new Set(current).add(provider.id));
     if (options.manual) {
       setManualTestIds(current => new Set(current).add(provider.id));
@@ -650,30 +773,47 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       next.delete(`default:${provider.id}`);
       return next;
     });
+    let outcome: ProviderTestOutcome;
     try {
       const result = await service.test(provider.id);
-      setTestResults(current => ({
-        ...current,
-        [provider.id]: outcomeFromTestResult(result),
-      }));
+      outcome = outcomeFromTestResult(result);
     } catch (testError) {
-      setTestResults(current => ({
-        ...current,
-        [provider.id]: outcomeFromTestError(testError),
-      }));
-    } finally {
-      setTestingIds(current => {
-        const next = new Set(current);
-        next.delete(provider.id);
-        return next;
-      });
+      outcome = outcomeFromTestError(testError);
     }
+    setTestResults(current => ({
+      ...current,
+      [provider.id]: outcome,
+    }));
+    setTestingIds(current => {
+      const next = new Set(current);
+      next.delete(provider.id);
+      return next;
+    });
+    return outcome;
   };
 
   // Row action wrapper: the only call site that should ever pass `manual: true` — see the
   // no-default rationale on `handleTest` above.
   const handleManualTest = (provider: ProviderSummary) =>
     handleTest(provider, { manual: true });
+
+  // Providers card header action (screen 3: "Test all"): re-tests every currently loaded
+  // provider, each counted as a manual test like the per-row action above.
+  const handleTestAll = () => {
+    providers.forEach(provider => handleManualTest(provider));
+  };
+
+  const toggleRowExpanded = (providerId: string) => {
+    setExpandedRowIds(current => {
+      const next = new Set(current);
+      if (next.has(providerId)) {
+        next.delete(providerId);
+      } else {
+        next.add(providerId);
+      }
+      return next;
+    });
+  };
 
   const columns: EuiBasicTableColumn<ProviderSummary>[] = [
     {
@@ -726,9 +866,17 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       name: i18n.translate('wazuhAiAssistant.settings.column.baseUrl', {
         defaultMessage: 'Endpoint',
       }),
-      width: '25%',
-      truncateText: true,
-      render: (baseUrl: string) => <span title={baseUrl}>{baseUrl}</span>,
+      width: '20%',
+      // Endpoints middle-truncate with a tooltip carrying the full URL (screen 3 gap: "Endpoints
+      // dominate the row") — `truncateText` is deliberately left off: EUI's own end-truncation
+      // would hide the path/host tail, which is usually the part that tells two endpoints apart.
+      render: (baseUrl: string) => (
+        <EuiToolTip content={baseUrl}>
+          <span className='wzSettingsEndpointCell'>
+            {middleTruncate(baseUrl)}
+          </span>
+        </EuiToolTip>
+      ),
     },
     {
       field: 'model',
@@ -746,7 +894,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       }),
       width: '110px',
       render: (hasApiKey: boolean) => (
-        <EuiHealth color={hasApiKey ? 'success' : 'subdued'}>
+        <EuiText size='s' color={hasApiKey ? 'default' : 'subdued'}>
           {hasApiKey
             ? i18n.translate('wazuhAiAssistant.settings.apiKeySet', {
                 defaultMessage: 'Configured',
@@ -754,7 +902,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             : i18n.translate('wazuhAiAssistant.settings.apiKeyMissing', {
                 defaultMessage: 'Not set',
               })}
-        </EuiHealth>
+        </EuiText>
       ),
     },
     {
@@ -762,46 +910,41 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       name: i18n.translate('wazuhAiAssistant.settings.column.status', {
         defaultMessage: 'Status',
       }),
-      width: '130px',
+      width: '150px',
       render: (providerId: string) => {
         if (testingIds.has(providerId)) {
           return (
-            <EuiFlexGroup
-              gutterSize='xs'
-              alignItems='center'
-              responsive={false}
-            >
-              <EuiFlexItem grow={false}>
-                <EuiLoadingSpinner size='s' />
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <EuiText size='s' color='subdued'>
-                  {i18n.translate('wazuhAiAssistant.settings.testing', {
-                    defaultMessage: 'Testing...',
-                  })}
-                </EuiText>
-              </EuiFlexItem>
-            </EuiFlexGroup>
+            <ProviderStatusChip
+              status='testing'
+              label={i18n.translate('wazuhAiAssistant.settings.testing', {
+                defaultMessage: 'Testing...',
+              })}
+            />
           );
         }
         const result = testResults[providerId];
         if (!result) {
           return (
-            <EuiText size='s' color='subdued'>
-              {i18n.translate('wazuhAiAssistant.settings.testNotRun', {
+            <ProviderStatusChip
+              status='pending'
+              label={i18n.translate('wazuhAiAssistant.settings.testNotRun', {
                 defaultMessage: 'Not tested',
               })}
-            </EuiText>
+            />
           );
         }
         if (result.status === 'ok') {
           return (
-            <EuiHealth color='success'>
-              {i18n.translate('wazuhAiAssistant.settings.testSuccessBadge', {
-                defaultMessage: 'OK ({latency} ms)',
-                values: { latency: result.latencyMs },
-              })}
-            </EuiHealth>
+            <ProviderStatusChip
+              status='ok'
+              label={i18n.translate(
+                'wazuhAiAssistant.settings.testSuccessBadge',
+                {
+                  defaultMessage: 'OK ({latency} ms)',
+                  values: { latency: result.latencyMs },
+                },
+              )}
+            />
           );
         }
         const isCouldNotVerify = result.status === 'could-not-verify';
@@ -811,41 +954,25 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             defaultMessage: 'Connection failed.',
           });
         return (
-          <EuiFlexGroup gutterSize='xs' alignItems='center' responsive={false}>
-            <EuiFlexItem grow={false}>
-              <EuiBadge color={isCouldNotVerify ? 'hollow' : 'danger'}>
-                {isCouldNotVerify
-                  ? i18n.translate(
-                      'wazuhAiAssistant.settings.testCouldNotVerifyBadge',
-                      {
-                        defaultMessage: 'Could not verify',
-                      },
-                    )
-                  : i18n.translate(
-                      'wazuhAiAssistant.settings.testFailureBadge',
-                      {
-                        defaultMessage: 'Failed',
-                      },
-                    )}
-              </EuiBadge>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <EuiToolTip content={failureMessage}>
-                <span
-                  style={{
-                    display: 'inline-block',
-                    maxWidth: '100px',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    verticalAlign: 'bottom',
-                  }}
-                >
-                  {failureMessage}
-                </span>
-              </EuiToolTip>
-            </EuiFlexItem>
-          </EuiFlexGroup>
+          <ProviderStatusChip
+            status={isCouldNotVerify ? 'could-not-verify' : 'failed'}
+            label={
+              isCouldNotVerify
+                ? i18n.translate(
+                    'wazuhAiAssistant.settings.testCouldNotVerifyBadge',
+                    {
+                      defaultMessage: 'Could not verify',
+                    },
+                  )
+                : i18n.translate(
+                    'wazuhAiAssistant.settings.testFailureBadge',
+                    {
+                      defaultMessage: 'Failed',
+                    },
+                  )
+            }
+            reason={failureMessage}
+          />
         );
       },
     },
@@ -854,787 +981,712 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         defaultMessage: 'Actions',
       }),
       width: '60px',
-      actions: [
-        {
-          name: i18n.translate('wazuhAiAssistant.settings.action.test', {
-            defaultMessage: 'Test',
-          }),
-          description: i18n.translate(
-            'wazuhAiAssistant.settings.action.testDescription',
-            {
-              defaultMessage: 'Test connection',
-            },
-          ),
-          icon: 'play',
-          type: 'icon' as const,
-          isPrimary: true,
-          onClick: handleManualTest,
-          enabled: (provider: ProviderSummary) => !testingIds.has(provider.id),
-          // Stable query hook: the accessible name of a primary icon action is not a reliable
-          // anchor across re-renders in the test env (a callout rendering below the table can
-          // transiently drop it from the a11y-name query). NOTE: this OUI fork passes the value
-          // through verbatim as a plain attribute, so it must be a STRING — the newer EUI
-          // per-row callback form would reach React as a function and be dropped silently.
-          'data-test-subj': 'wz-ai-provider-test-action',
-        },
-        {
-          name: i18n.translate('wazuhAiAssistant.settings.action.edit', {
-            defaultMessage: 'Edit',
-          }),
-          description: i18n.translate(
-            'wazuhAiAssistant.settings.action.editDescription',
-            {
-              defaultMessage: 'Edit provider',
-            },
-          ),
-          icon: 'pencil',
-          type: 'icon' as const,
-          onClick: openEditForm,
-        },
-        {
-          name: i18n.translate('wazuhAiAssistant.settings.action.delete', {
-            defaultMessage: 'Delete',
-          }),
-          description: i18n.translate(
-            'wazuhAiAssistant.settings.action.deleteDescription',
-            {
-              defaultMessage: 'Delete provider',
-            },
-          ),
-          icon: 'trash',
-          color: 'danger' as const,
-          type: 'icon' as const,
-          onClick: requestDelete,
-        },
-      ],
+      align: 'center' as const,
+      render: (provider: ProviderSummary) => (
+        <EuiPopover
+          button={
+            <EuiButtonIcon
+              iconType='boxesHorizontal'
+              color='text'
+              aria-label={i18n.translate(
+                'wazuhAiAssistant.settings.action.rowMenu',
+                {
+                  defaultMessage: 'Actions for {name}',
+                  values: { name: provider.name },
+                },
+              )}
+              onClick={() =>
+                setOpenMenuRowId(current =>
+                  current === provider.id ? null : provider.id,
+                )
+              }
+            />
+          }
+          isOpen={openMenuRowId === provider.id}
+          closePopover={() => setOpenMenuRowId(null)}
+          panelPaddingSize='none'
+          anchorPosition='downRight'
+        >
+          <EuiContextMenuPanel size='s'>
+            <EuiContextMenuItem
+              key='test'
+              icon='play'
+              disabled={testingIds.has(provider.id)}
+              onClick={() => {
+                setOpenMenuRowId(null);
+                handleManualTest(provider);
+              }}
+            >
+              {i18n.translate('wazuhAiAssistant.settings.action.test', {
+                defaultMessage: 'Test',
+              })}
+            </EuiContextMenuItem>
+            <EuiContextMenuItem
+              key='edit'
+              icon='pencil'
+              onClick={() => {
+                setOpenMenuRowId(null);
+                openEditForm(provider);
+              }}
+            >
+              {i18n.translate('wazuhAiAssistant.settings.action.edit', {
+                defaultMessage: 'Edit',
+              })}
+            </EuiContextMenuItem>
+            <EuiContextMenuItem
+              key='delete'
+              icon='trash'
+              onClick={() => {
+                setOpenMenuRowId(null);
+                requestDelete(provider);
+              }}
+            >
+              <EuiTextColor color='danger'>
+                {i18n.translate('wazuhAiAssistant.settings.action.delete', {
+                  defaultMessage: 'Delete',
+                })}
+              </EuiTextColor>
+            </EuiContextMenuItem>
+          </EuiContextMenuPanel>
+        </EuiPopover>
+      ),
+    },
+    {
+      align: 'right' as const,
+      width: '40px',
+      isExpander: true,
+      name: '',
+      render: (provider: ProviderSummary) => (
+        <EuiButtonIcon
+          onClick={() => toggleRowExpanded(provider.id)}
+          aria-label={
+            expandedRowIds.has(provider.id)
+              ? i18n.translate('wazuhAiAssistant.settings.rowDetail.collapse', {
+                  defaultMessage: 'Collapse row',
+                })
+              : i18n.translate('wazuhAiAssistant.settings.rowDetail.expand', {
+                  defaultMessage: 'Expand row',
+                })
+          }
+          iconType={expandedRowIds.has(provider.id) ? 'arrowUp' : 'arrowDown'}
+        />
+      ),
     },
   ];
 
-  return (
-    <EuiPage>
-      <EuiPageBody>
-        <EuiPageContent
-          hasShadow={false}
-          hasBorder={false}
-          color='transparent'
-          paddingSize='none'
-        >
-          <EuiPageContentBody>
-            <EuiTitle size='l'>
-              <h1>
-                {i18n.translate('wazuhAiAssistant.settings.pageTitle', {
-                  defaultMessage: 'AI Assistant settings',
-                })}
-              </h1>
-            </EuiTitle>
-            <EuiSpacer size='xs' />
-            <EuiText size='s' color='subdued'>
-              <p>
-                {i18n.translate('wazuhAiAssistant.settings.pageDescription', {
-                  defaultMessage:
-                    'Manage AI providers, privacy and conversation history.',
-                })}
-              </p>
-            </EuiText>
-            <EuiSpacer size='l' />
+  const itemIdToExpandedRowMap = Object.fromEntries(
+    providers
+      .filter(provider => expandedRowIds.has(provider.id))
+      .map(provider => [
+        provider.id,
+        <ProviderRowDetail
+          key={provider.id}
+          provider={provider}
+          outcome={testResults[provider.id]}
+        />,
+      ]),
+  );
 
-            {!canSave && (
-              <>
-                <EuiCallOut
-                  color='warning'
-                  iconType='alert'
-                  title={i18n.translate(
-                    'wazuhAiAssistant.settings.access.warningTitle',
+  const providersSearch = {
+    box: {
+      incremental: true,
+      placeholder: i18n.translate(
+        'wazuhAiAssistant.settings.providers.filterPlaceholder',
+        { defaultMessage: 'Filter providers' },
+      ),
+    },
+    toolsRight: [
+      <EuiButton
+        key='test-all'
+        size='s'
+        iconType='play'
+        onClick={handleTestAll}
+        isDisabled={providers.length === 0}
+      >
+        {i18n.translate('wazuhAiAssistant.settings.providers.testAll', {
+          defaultMessage: 'Test all',
+        })}
+      </EuiButton>,
+    ],
+  };
+
+  return (
+    <EuiPage className='wzSettingsPage'>
+      <EuiPageBody>
+        <EuiPageHeader
+          pageTitle={i18n.translate('wazuhAiAssistant.settings.pageTitle', {
+            defaultMessage: 'AI Assistant settings',
+          })}
+          description={i18n.translate(
+            'wazuhAiAssistant.settings.pageDescription',
+            {
+              defaultMessage:
+                'Manage AI providers, privacy and conversation history.',
+            },
+          )}
+          rightSideItems={[
+            <EuiButton
+              key='add-provider'
+              onClick={openCreateForm}
+              iconType='plusInCircle'
+              fill
+            >
+              {i18n.translate('wazuhAiAssistant.settings.addProvider', {
+                defaultMessage: 'Add provider',
+              })}
+            </EuiButton>,
+          ]}
+        />
+        <EuiSpacer size='l' />
+
+        {!canSave && (
+          <>
+            <EuiCallOut
+              color='warning'
+              iconType='alert'
+              title={i18n.translate(
+                'wazuhAiAssistant.settings.access.warningTitle',
+                {
+                  defaultMessage: 'You cannot save settings right now',
+                },
+              )}
+            >
+              <p>
+                {accessMessage ??
+                  i18n.translate(
+                    'wazuhAiAssistant.settings.access.warningFallback',
                     {
-                      defaultMessage: 'You cannot save settings right now',
+                      defaultMessage:
+                        'Administrator privileges are required to change AI Assistant settings.',
                     },
                   )}
-                >
-                  <p>
-                    {accessMessage ??
-                      i18n.translate(
-                        'wazuhAiAssistant.settings.access.warningFallback',
-                        {
-                          defaultMessage:
-                            'Administrator privileges are required to change AI Assistant settings.',
-                        },
-                      )}
-                  </p>
-                </EuiCallOut>
-                <EuiSpacer size='l' />
-              </>
-            )}
+              </p>
+            </EuiCallOut>
+            <EuiSpacer size='l' />
+          </>
+        )}
 
-            <SectionHeader
-              icon='gear'
-              title={i18n.translate(
-                'wazuhAiAssistant.settings.providers.title',
-                {
-                  defaultMessage: 'Providers',
-                },
-              )}
-              description={i18n.translate(
-                'wazuhAiAssistant.settings.providers.description',
-                {
-                  defaultMessage:
-                    'Connect and manage the AI providers available to the chat.',
-                },
-              )}
-              action={
-                <EuiButton
-                  onClick={openCreateForm}
-                  iconType='plusInCircle'
-                  size='s'
-                >
-                  {i18n.translate('wazuhAiAssistant.settings.addProvider', {
-                    defaultMessage: 'Add provider',
-                  })}
+        <SectionCard
+          pillLabel={i18n.translate('wazuhAiAssistant.settings.providers.title', {
+            defaultMessage: 'Providers',
+          })}
+          description={i18n.translate(
+            'wazuhAiAssistant.settings.providers.description',
+            {
+              defaultMessage:
+                'Connect and manage the AI providers available to the chat.',
+            },
+          )}
+        >
+          {error && !isFormOpen && (
+            <>
+              <EuiCallOut
+                title={i18n.translate('wazuhAiAssistant.settings.errorTitle', {
+                  defaultMessage: 'Something went wrong',
+                })}
+                color='danger'
+                iconType='alert'
+              >
+                <p>{error}</p>
+              </EuiCallOut>
+              <EuiSpacer size='m' />
+            </>
+          )}
+
+          {providersLoaded && providers.length === 0 ? (
+            <EuiEmptyPrompt
+              iconType='machineLearningApp'
+              title={
+                <h2>
+                  {i18n.translate(
+                    'wazuhAiAssistant.settings.providers.emptyTitle',
+                    {
+                      defaultMessage: 'No AI provider configured',
+                    },
+                  )}
+                </h2>
+              }
+              body={
+                <p>
+                  {i18n.translate(
+                    'wazuhAiAssistant.settings.providers.emptyBody',
+                    {
+                      defaultMessage:
+                        'The AI Assistant needs at least one connected provider ' +
+                        '(OpenAI-compatible or Anthropic) before it can answer questions. ' +
+                        'Add one to get started.',
+                    },
+                  )}
+                </p>
+              }
+              actions={
+                <EuiButton color='primary' fill onClick={openCreateForm}>
+                  {i18n.translate(
+                    'wazuhAiAssistant.settings.providers.emptyAction',
+                    {
+                      defaultMessage: 'Add a provider',
+                    },
+                  )}
                 </EuiButton>
               }
             />
-            <EuiPanel hasShadow={false} hasBorder paddingSize='m'>
-              {error && !isFormOpen && (
+          ) : (
+            <EuiInMemoryTable
+              items={providers}
+              columns={columns}
+              itemId='id'
+              search={providersSearch}
+              itemIdToExpandedRowMap={itemIdToExpandedRowMap}
+            />
+          )}
+        </SectionCard>
+
+        <EuiSpacer size='xl' />
+
+        <SectionCard
+          pillLabel={i18n.translate('wazuhAiAssistant.settings.privacy.title', {
+            defaultMessage: 'Privacy',
+          })}
+          description={i18n.translate(
+            'wazuhAiAssistant.settings.privacy.description',
+            {
+              defaultMessage:
+                'Control whether finding data is anonymized before reaching the configured AI provider. When privacy mode is off, hostnames, IP addresses, usernames, process command lines, and finding/rule text leave the cluster as-is.',
+            },
+          )}
+        >
+          {privacyLoadError && (
+            <>
+              <EuiCallOut
+                color='danger'
+                iconType='alert'
+                title={privacyLoadError}
+                size='s'
+              />
+              <EuiSpacer size='m' />
+            </>
+          )}
+
+          {!privacyDraft && !privacyLoadError && (
+            <>
+              <EuiLoadingSpinner
+                size='m'
+                aria-label={i18n.translate('wazuhAiAssistant.common.loading', {
+                  defaultMessage: 'Loading...',
+                })}
+              />
+              <EuiSpacer size='m' />
+            </>
+          )}
+
+          {privacyDraft && (
+            <>
+              {privacySaveError && (
                 <>
                   <EuiCallOut
-                    title={i18n.translate(
-                      'wazuhAiAssistant.settings.errorTitle',
-                      {
-                        defaultMessage: 'Something went wrong',
-                      },
-                    )}
                     color='danger'
                     iconType='alert'
-                  >
-                    <p>{error}</p>
-                  </EuiCallOut>
+                    title={privacySaveError}
+                    size='s'
+                  />
                   <EuiSpacer size='m' />
                 </>
               )}
 
-              {providersLoaded && providers.length === 0 ? (
-                <EuiEmptyPrompt
-                  iconType='machineLearningApp'
-                  title={
-                    <h2>
-                      {i18n.translate(
-                        'wazuhAiAssistant.settings.providers.emptyTitle',
-                        {
-                          defaultMessage: 'No AI provider configured',
-                        },
-                      )}
-                    </h2>
-                  }
-                  body={
-                    <p>
-                      {i18n.translate(
-                        'wazuhAiAssistant.settings.providers.emptyBody',
-                        {
-                          defaultMessage:
-                            'The AI Assistant needs at least one connected provider ' +
-                            '(OpenAI-compatible or Anthropic) before it can answer questions. ' +
-                            'Add one to get started.',
-                        },
-                      )}
-                    </p>
-                  }
-                  actions={
-                    <EuiButton color='primary' fill onClick={openCreateForm}>
-                      {i18n.translate(
-                        'wazuhAiAssistant.settings.providers.emptyAction',
-                        {
-                          defaultMessage: 'Add a provider',
-                        },
-                      )}
-                    </EuiButton>
-                  }
-                />
-              ) : (
-                <EuiBasicTable
-                  items={providers}
-                  columns={columns}
-                  itemId='id'
-                />
-              )}
-              {/* Only a test the user explicitly clicked earns a page-level callout — the
-                  silent auto-probe's result lives solely in the per-row status cell above, so it
-                  never reappears as a banner on every visit. */}
-              {manualTestFailures.map(p => (
-                <React.Fragment key={p.id}>
-                  <EuiSpacer size='s' />
-                  {/* The installed OUI fork's EuiCallOut renders no dismiss control at all when
-                      given `onDismiss` (verified live: zero buttons, no close icon) — so the
-                      close affordance below is an explicit EuiButtonIcon wired directly to
-                      `dismissedErrorIds`, not a prop the fork is free to silently ignore. */}
-                  <EuiCallOut color='danger' iconType='alert' size='s'>
-                    <EuiFlexGroup
-                      gutterSize='s'
-                      alignItems='center'
-                      justifyContent='spaceBetween'
-                      responsive={false}
-                    >
-                      <EuiFlexItem>
-                        <EuiText size='s'>
-                          <p>
-                            {i18n.translate(
-                              'wazuhAiAssistant.settings.testFailureCallout',
-                              {
-                                defaultMessage: '{name}: {message}',
-                                values: {
-                                  name: p.name,
-                                  message:
-                                    outcomeMessage(testResults[p.id]) ??
-                                    i18n.translate(
-                                      'wazuhAiAssistant.settings.testFailureUnknown',
-                                      { defaultMessage: 'Connection failed.' },
-                                    ),
-                                },
-                              },
-                            )}
-                          </p>
-                        </EuiText>
-                      </EuiFlexItem>
-                      <EuiFlexItem grow={false}>
-                        <EuiButtonIcon
-                          iconType='cross'
-                          color='danger'
-                          aria-label={i18n.translate(
-                            'wazuhAiAssistant.settings.testFailureCallout.dismiss',
-                            {
-                              defaultMessage: 'Dismiss {name} test failure',
-                              values: { name: p.name },
-                            },
-                          )}
-                          onClick={() =>
-                            setDismissedErrorIds(
-                              prev => new Set([...prev, p.id]),
-                            )
-                          }
-                        />
-                      </EuiFlexItem>
-                    </EuiFlexGroup>
-                  </EuiCallOut>
-                </React.Fragment>
-              ))}
-              {/* The one auto-probe failure that still gets a banner: the default provider is
-                  what the chat actually calls, so a broken default is surfaced even when nobody
-                  clicked "Test" — kept single and dismissible, unlike the old permanent banners.
-                  Same explicit-close-button caveat as the manual-failure callout above applies. */}
-              {failingDefaultProvider && (
-                <>
-                  <EuiSpacer size='s' />
-                  <EuiCallOut color='danger' iconType='alert' size='s'>
-                    <EuiFlexGroup
-                      gutterSize='s'
-                      alignItems='center'
-                      justifyContent='spaceBetween'
-                      responsive={false}
-                    >
-                      <EuiFlexItem>
-                        <EuiText size='s'>
-                          <p>
-                            {i18n.translate(
-                              'wazuhAiAssistant.settings.defaultProviderFailureCallout',
-                              {
-                                defaultMessage:
-                                  'Default provider "{name}" is failing: {message}',
-                                values: {
-                                  name: failingDefaultProvider.name,
-                                  message:
-                                    outcomeMessage(
-                                      testResults[failingDefaultProvider.id],
-                                    ) ??
-                                    i18n.translate(
-                                      'wazuhAiAssistant.settings.testFailureUnknown',
-                                      { defaultMessage: 'Connection failed.' },
-                                    ),
-                                },
-                              },
-                            )}
-                          </p>
-                        </EuiText>
-                      </EuiFlexItem>
-                      <EuiFlexItem grow={false}>
-                        <EuiButtonIcon
-                          iconType='cross'
-                          color='danger'
-                          aria-label={i18n.translate(
-                            'wazuhAiAssistant.settings.defaultProviderFailureCallout.dismiss',
-                            {
-                              defaultMessage:
-                                'Dismiss default provider failure',
-                            },
-                          )}
-                          onClick={() =>
-                            setDismissedErrorIds(
-                              prev =>
-                                new Set([
-                                  ...prev,
-                                  `default:${failingDefaultProvider.id}`,
-                                ]),
-                            )
-                          }
-                        />
-                      </EuiFlexItem>
-                    </EuiFlexGroup>
-                  </EuiCallOut>
-                </>
-              )}
-            </EuiPanel>
-
-            <EuiSpacer size='xl' />
-
-            <SectionHeader
-              icon='lock'
-              title={i18n.translate('wazuhAiAssistant.settings.privacy.title', {
-                defaultMessage: 'Privacy',
-              })}
-              description={i18n.translate(
-                'wazuhAiAssistant.settings.privacy.description',
-                {
-                  defaultMessage:
-                    'Control whether finding data is anonymized before reaching the configured AI provider. When privacy mode is off, hostnames, IP addresses, usernames, process command lines, and finding/rule text leave the cluster as-is.',
-                },
-              )}
-            />
-
-            {privacyLoadError && (
-              <>
-                <EuiCallOut
-                  color='danger'
-                  iconType='alert'
-                  title={privacyLoadError}
-                  size='s'
-                />
-                <EuiSpacer size='m' />
-              </>
-            )}
-
-            {!privacyDraft && !privacyLoadError && (
-              <>
-                <EuiLoadingSpinner
-                  size='m'
-                  aria-label={i18n.translate(
-                    'wazuhAiAssistant.common.loading',
-                    {
-                      defaultMessage: 'Loading...',
-                    },
-                  )}
-                />
-                <EuiSpacer size='m' />
-              </>
-            )}
-
-            {privacyDraft && (
-              <EuiPanel hasShadow={false} hasBorder paddingSize='m'>
-                {privacySaveError && (
-                  <>
-                    <EuiCallOut
-                      color='danger'
-                      iconType='alert'
-                      title={privacySaveError}
-                      size='s'
-                    />
-                    <EuiSpacer size='m' />
-                  </>
-                )}
-
-                <EuiFormRow>
-                  <EuiSwitch
-                    label={i18n.translate(
-                      'wazuhAiAssistant.settings.privacy.defaultOnLabel',
-                      {
-                        defaultMessage: 'Enable privacy mode by default',
-                      },
-                    )}
-                    checked={privacyDraft.privacyDefaultOn}
-                    onChange={event => {
-                      privacy.setValue({
-                        ...privacyDraft,
-                        privacyDefaultOn: event.target.checked,
-                      });
-                    }}
-                  />
-                </EuiFormRow>
-                <EuiSpacer size='s' />
-                <EuiFormRow>
-                  <EuiSwitch
-                    label={i18n.translate(
-                      'wazuhAiAssistant.settings.privacy.userCanOverrideLabel',
-                      {
-                        defaultMessage:
-                          'Allow users to override privacy mode from the chat page',
-                      },
-                    )}
-                    checked={privacyDraft.userCanOverride}
-                    onChange={event => {
-                      privacy.setValue({
-                        ...privacyDraft,
-                        userCanOverride: event.target.checked,
-                      });
-                    }}
-                  />
-                </EuiFormRow>
-
-                <EuiSpacer size='l' />
-                {/* The full explanation lives in the tooltip rather than inline: it is long enough
-                    to dominate the section, and it only matters the first time an admin configures
-                    a rule (or when one surprises them). */}
-                <EuiFlexGroup
-                  gutterSize='xs'
-                  alignItems='center'
-                  responsive={false}
-                >
-                  <EuiFlexItem grow={false}>
-                    <EuiText size='s'>
-                      <strong>
-                        {i18n.translate(
-                          'wazuhAiAssistant.settings.privacy.fieldPolicyTitle',
-                          {
-                            defaultMessage: 'Field policy',
-                          },
-                        )}
-                      </strong>
-                    </EuiText>
-                  </EuiFlexItem>
-                  <EuiFlexItem grow={false}>
-                    <EuiIconTip
-                      type='questionInCircle'
-                      color='subdued'
-                      content={i18n.translate(
-                        'wazuhAiAssistant.settings.privacy.fieldPolicyHelp',
-                        {
-                          defaultMessage:
-                            'What the AI provider gets per field: real value (Allow), pseudonym (Anonymize), or nothing (Never send).',
-                        },
-                      )}
-                    />
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-                <EuiSpacer size='s' />
-
-                {fieldPolicyDraft.length > 0 && (
-                  <EuiAccordion
-                    id='field-policy-accordion'
-                    // Collapsed by default: the rule list is long (the curated defaults alone are
-                    // ~25 rows) and it is not what an admin comes to this section for — the two
-                    // privacy switches above it are. The button content carries the rule count, so
-                    // the section still reports its size without being expanded.
-                    buttonContent={i18n.translate(
-                      'wazuhAiAssistant.settings.privacy.fieldPolicyAccordion',
-                      {
-                        defaultMessage: 'Field rules ({count})',
-                        values: { count: fieldPolicyDraft.length },
-                      },
-                    )}
-                    paddingSize='s'
-                  >
-                    <EuiFieldSearch
-                      compressed
-                      placeholder={i18n.translate(
-                        'wazuhAiAssistant.settings.privacy.filterFields',
-                        { defaultMessage: 'Filter fields' },
-                      )}
-                      value={fieldPolicyFilter}
-                      onChange={e => setFieldPolicyFilter(e.target.value)}
-                      isClearable
-                    />
-                    <EuiSpacer size='s' />
-                    <EuiFlexGroup
-                      gutterSize='s'
-                      alignItems='center'
-                      responsive={false}
-                    >
-                      <EuiFlexItem>
-                        <EuiText size='xs' color='subdued'>
-                          <strong>
-                            {i18n.translate(
-                              'wazuhAiAssistant.settings.privacy.fieldColumnHeader',
-                              {
-                                defaultMessage: 'Field',
-                              },
-                            )}
-                          </strong>
-                        </EuiText>
-                      </EuiFlexItem>
-                      <EuiFlexItem grow={false} style={{ minWidth: 160 }}>
-                        <EuiText size='xs' color='subdued'>
-                          <strong>
-                            {i18n.translate(
-                              'wazuhAiAssistant.settings.privacy.actionColumnHeader',
-                              { defaultMessage: 'Action' },
-                            )}
-                          </strong>
-                        </EuiText>
-                      </EuiFlexItem>
-                      <EuiFlexItem grow={false} style={{ width: 24 }} />
-                    </EuiFlexGroup>
-                    <EuiSpacer size='xs' />
-                    {fieldPolicyDraft
-                      .map((entry, index) => ({ entry, index }))
-                      .filter(
-                        ({ entry }) =>
-                          !fieldPolicyFilter ||
-                          entry._isNew ||
-                          entry.field
-                            .toLowerCase()
-                            .includes(fieldPolicyFilter.toLowerCase()),
-                      )
-                      .map(({ entry, index }) => (
-                        <React.Fragment key={index}>
-                          <EuiFlexGroup
-                            gutterSize='s'
-                            alignItems='center'
-                            responsive={false}
-                          >
-                            <EuiFlexItem>
-                              <EuiFieldText
-                                fullWidth
-                                compressed
-                                placeholder={i18n.translate(
-                                  'wazuhAiAssistant.settings.privacy.fieldPlaceholder',
-                                  { defaultMessage: 'e.g. agent.name' },
-                                )}
-                                aria-label={i18n.translate(
-                                  'wazuhAiAssistant.settings.privacy.fieldColumnLabel',
-                                  { defaultMessage: 'Field' },
-                                )}
-                                value={entry.field}
-                                onChange={event =>
-                                  handleFieldPolicyChange(index, {
-                                    field: event.target.value,
-                                  })
-                                }
-                              />
-                            </EuiFlexItem>
-                            <EuiFlexItem grow={false} style={{ minWidth: 160 }}>
-                              <EuiSelect
-                                compressed
-                                aria-label={i18n.translate(
-                                  'wazuhAiAssistant.settings.privacy.actionColumnLabel',
-                                  { defaultMessage: 'Action' },
-                                )}
-                                options={FIELD_POLICY_ACTIONS.map(action => ({
-                                  value: action,
-                                  text: FIELD_POLICY_ACTION_LABELS[action],
-                                }))}
-                                value={entry.action}
-                                onChange={event =>
-                                  handleFieldPolicyChange(index, {
-                                    action: event.target
-                                      .value as FieldPolicyAction,
-                                  })
-                                }
-                              />
-                            </EuiFlexItem>
-                            <EuiFlexItem grow={false}>
-                              <EuiButtonIcon
-                                iconType='trash'
-                                color='danger'
-                                aria-label={i18n.translate(
-                                  'wazuhAiAssistant.settings.privacy.removeField',
-                                  { defaultMessage: 'Remove field' },
-                                )}
-                                onClick={() =>
-                                  handleRemoveFieldPolicyRow(index)
-                                }
-                              />
-                            </EuiFlexItem>
-                          </EuiFlexGroup>
-                          <EuiSpacer size='xs' />
-                        </React.Fragment>
-                      ))}
-                    <EuiSpacer size='s' />
-                    <EuiButton
-                      size='s'
-                      iconType='plusInCircle'
-                      onClick={handleAddFieldPolicyRow}
-                    >
-                      {i18n.translate(
-                        'wazuhAiAssistant.settings.privacy.addField',
-                        {
-                          defaultMessage: 'Add field',
-                        },
-                      )}
-                    </EuiButton>
-                  </EuiAccordion>
-                )}
-
-                {fieldPolicyDraft.length === 0 && (
-                  <>
-                    <EuiSpacer size='s' />
-                    <EuiButton
-                      size='s'
-                      iconType='plusInCircle'
-                      onClick={handleAddFieldPolicyRow}
-                    >
-                      {i18n.translate(
-                        'wazuhAiAssistant.settings.privacy.addField',
-                        {
-                          defaultMessage: 'Add field',
-                        },
-                      )}
-                    </EuiButton>
-                  </>
-                )}
-
-                <EuiHorizontalRule margin='m' />
-                <EuiToolTip content={!canSave ? accessMessage : undefined}>
-                  <EuiButton
-                    onClick={handleSavePrivacySettings}
-                    isLoading={isSavingPrivacy}
-                    isDisabled={
-                      !canSave || hasEmptyFieldPolicyRow || !privacy.isDirty
-                    }
-                    fill
-                  >
-                    {i18n.translate('wazuhAiAssistant.settings.privacy.save', {
-                      defaultMessage: 'Save privacy settings',
-                    })}
-                  </EuiButton>
-                </EuiToolTip>
-              </EuiPanel>
-            )}
-
-            <EuiSpacer size='xl' />
-
-            <SectionHeader
-              icon='clock'
-              title={i18n.translate(
-                'wazuhAiAssistant.settings.retention.title',
-                {
-                  defaultMessage: 'Conversation history',
-                },
-              )}
-              description={i18n.translate(
-                'wazuhAiAssistant.settings.retention.description',
-                {
-                  defaultMessage:
-                    'Control how long saved conversations are kept.',
-                },
-              )}
-            />
-
-            {retention.value === null && !privacyLoadError && (
-              <>
-                <EuiLoadingSpinner
-                  size='m'
-                  aria-label={i18n.translate(
-                    'wazuhAiAssistant.common.loading',
-                    {
-                      defaultMessage: 'Loading...',
-                    },
-                  )}
-                />
-                <EuiSpacer size='m' />
-              </>
-            )}
-
-            {retention.value !== null && (
-              <EuiPanel hasShadow={false} hasBorder paddingSize='m'>
-                {retentionSaveError && (
-                  <>
-                    <EuiCallOut
-                      color='danger'
-                      iconType='alert'
-                      title={retentionSaveError}
-                      size='s'
-                    />
-                    <EuiSpacer size='m' />
-                  </>
-                )}
-
-                <EuiFormRow
+              <EuiFormRow>
+                <EuiSwitch
                   label={i18n.translate(
-                    'wazuhAiAssistant.settings.retention.daysLabel',
+                    'wazuhAiAssistant.settings.privacy.defaultOnLabel',
                     {
-                      defaultMessage: 'Keep saved conversations for (days)',
+                      defaultMessage: 'Enable privacy mode by default',
                     },
                   )}
-                  helpText={i18n.translate(
-                    'wazuhAiAssistant.settings.retention.daysHelp',
+                  checked={privacyDraft.privacyDefaultOn}
+                  onChange={event => {
+                    privacy.setValue({
+                      ...privacyDraft,
+                      privacyDefaultOn: event.target.checked,
+                    });
+                  }}
+                />
+              </EuiFormRow>
+              <EuiSpacer size='s' />
+              <EuiFormRow>
+                <EuiSwitch
+                  label={i18n.translate(
+                    'wazuhAiAssistant.settings.privacy.userCanOverrideLabel',
                     {
                       defaultMessage:
-                        '0 keeps every saved conversation forever. Enforcement happens only when the conversation list is loaded — there is no scheduled background cleanup.',
+                        'Allow users to override privacy mode from the chat page',
                     },
                   )}
-                >
-                  <EuiFieldNumber
-                    min={0}
-                    value={retention.value}
-                    onChange={event => {
-                      const parsed = Number(event.target.value);
-                      retention.setValue(
-                        Number.isNaN(parsed) ? 0 : Math.max(0, parsed),
-                      );
-                    }}
-                  />
-                </EuiFormRow>
+                  checked={privacyDraft.userCanOverride}
+                  onChange={event => {
+                    privacy.setValue({
+                      ...privacyDraft,
+                      userCanOverride: event.target.checked,
+                    });
+                  }}
+                />
+              </EuiFormRow>
 
-                <EuiHorizontalRule margin='m' />
-                <EuiToolTip content={!canSave ? accessMessage : undefined}>
+              <EuiSpacer size='l' />
+              {/* The full explanation lives in the tooltip rather than inline: it is long enough
+                  to dominate the section, and it only matters the first time an admin configures
+                  a rule (or when one surprises them). */}
+              <EuiFlexGroup
+                gutterSize='xs'
+                alignItems='center'
+                responsive={false}
+              >
+                <EuiFlexItem grow={false}>
+                  <EuiText size='s'>
+                    <strong>
+                      {i18n.translate(
+                        'wazuhAiAssistant.settings.privacy.fieldPolicyTitle',
+                        {
+                          defaultMessage: 'Field policy',
+                        },
+                      )}
+                    </strong>
+                  </EuiText>
+                </EuiFlexItem>
+                <EuiFlexItem grow={false}>
+                  <EuiIconTip
+                    type='questionInCircle'
+                    color='subdued'
+                    content={i18n.translate(
+                      'wazuhAiAssistant.settings.privacy.fieldPolicyHelp',
+                      {
+                        defaultMessage:
+                          'What the AI provider gets per field: real value (Allow), pseudonym (Anonymize), or nothing (Never send).',
+                      },
+                    )}
+                  />
+                </EuiFlexItem>
+              </EuiFlexGroup>
+              <EuiSpacer size='s' />
+
+              {fieldPolicyDraft.length > 0 && (
+                <EuiAccordion
+                  id='field-policy-accordion'
+                  // Collapsed by default: the rule list is long (the curated defaults alone are
+                  // ~25 rows) and it is not what an admin comes to this section for — the two
+                  // privacy switches above it are. The button content carries the rule count, so
+                  // the section still reports its size without being expanded.
+                  buttonContent={i18n.translate(
+                    'wazuhAiAssistant.settings.privacy.fieldPolicyAccordion',
+                    {
+                      defaultMessage: 'Field rules ({count})',
+                      values: { count: fieldPolicyDraft.length },
+                    },
+                  )}
+                  paddingSize='s'
+                >
+                  <EuiFieldSearch
+                    compressed
+                    placeholder={i18n.translate(
+                      'wazuhAiAssistant.settings.privacy.filterFields',
+                      { defaultMessage: 'Filter fields' },
+                    )}
+                    value={fieldPolicyFilter}
+                    onChange={e => setFieldPolicyFilter(e.target.value)}
+                    isClearable
+                  />
+                  <EuiSpacer size='s' />
+                  <EuiFlexGroup
+                    gutterSize='s'
+                    alignItems='center'
+                    responsive={false}
+                  >
+                    <EuiFlexItem>
+                      <EuiText size='xs' color='subdued'>
+                        <strong>
+                          {i18n.translate(
+                            'wazuhAiAssistant.settings.privacy.fieldColumnHeader',
+                            {
+                              defaultMessage: 'Field',
+                            },
+                          )}
+                        </strong>
+                      </EuiText>
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false} style={{ minWidth: 160 }}>
+                      <EuiText size='xs' color='subdued'>
+                        <strong>
+                          {i18n.translate(
+                            'wazuhAiAssistant.settings.privacy.actionColumnHeader',
+                            { defaultMessage: 'Action' },
+                          )}
+                        </strong>
+                      </EuiText>
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false} style={{ width: 24 }} />
+                  </EuiFlexGroup>
+                  <EuiSpacer size='xs' />
+                  {fieldPolicyDraft
+                    .map((entry, index) => ({ entry, index }))
+                    .filter(
+                      ({ entry }) =>
+                        !fieldPolicyFilter ||
+                        entry._isNew ||
+                        entry.field
+                          .toLowerCase()
+                          .includes(fieldPolicyFilter.toLowerCase()),
+                    )
+                    .map(({ entry, index }) => (
+                      <React.Fragment key={index}>
+                        <EuiFlexGroup
+                          gutterSize='s'
+                          alignItems='center'
+                          responsive={false}
+                        >
+                          <EuiFlexItem>
+                            <EuiFieldText
+                              fullWidth
+                              compressed
+                              placeholder={i18n.translate(
+                                'wazuhAiAssistant.settings.privacy.fieldPlaceholder',
+                                { defaultMessage: 'e.g. agent.name' },
+                              )}
+                              aria-label={i18n.translate(
+                                'wazuhAiAssistant.settings.privacy.fieldColumnLabel',
+                                { defaultMessage: 'Field' },
+                              )}
+                              value={entry.field}
+                              onChange={event =>
+                                handleFieldPolicyChange(index, {
+                                  field: event.target.value,
+                                })
+                              }
+                            />
+                          </EuiFlexItem>
+                          <EuiFlexItem grow={false} style={{ minWidth: 160 }}>
+                            <EuiSelect
+                              compressed
+                              aria-label={i18n.translate(
+                                'wazuhAiAssistant.settings.privacy.actionColumnLabel',
+                                { defaultMessage: 'Action' },
+                              )}
+                              options={FIELD_POLICY_ACTIONS.map(action => ({
+                                value: action,
+                                text: FIELD_POLICY_ACTION_LABELS[action],
+                              }))}
+                              value={entry.action}
+                              onChange={event =>
+                                handleFieldPolicyChange(index, {
+                                  action: event.target
+                                    .value as FieldPolicyAction,
+                                })
+                              }
+                            />
+                          </EuiFlexItem>
+                          <EuiFlexItem grow={false}>
+                            <EuiButtonIcon
+                              iconType='trash'
+                              color='danger'
+                              aria-label={i18n.translate(
+                                'wazuhAiAssistant.settings.privacy.removeField',
+                                { defaultMessage: 'Remove field' },
+                              )}
+                              onClick={() =>
+                                handleRemoveFieldPolicyRow(index)
+                              }
+                            />
+                          </EuiFlexItem>
+                        </EuiFlexGroup>
+                        <EuiSpacer size='xs' />
+                      </React.Fragment>
+                    ))}
+                  <EuiSpacer size='s' />
                   <EuiButton
-                    onClick={handleSaveRetentionSettings}
-                    isLoading={isSavingRetention}
-                    isDisabled={!canSave || !retention.isDirty}
-                    fill
+                    size='s'
+                    iconType='plusInCircle'
+                    onClick={handleAddFieldPolicyRow}
                   >
                     {i18n.translate(
-                      'wazuhAiAssistant.settings.retention.save',
+                      'wazuhAiAssistant.settings.privacy.addField',
                       {
-                        defaultMessage: 'Save conversation history settings',
+                        defaultMessage: 'Add field',
                       },
                     )}
                   </EuiButton>
-                </EuiToolTip>
-              </EuiPanel>
-            )}
-          </EuiPageContentBody>
-        </EuiPageContent>
-        {isFormOpen && (
-          <ProviderFormFlyout
-            editingProvider={editingProvider}
-            error={error}
-            canSave={canSave}
-            accessMessage={accessMessage}
-            apiKeyEncryptionEnabled={apiKeyEncryptionEnabled}
-            onSubmit={handleSubmit}
-            onClose={closeForm}
-          />
-        )}
-        {deleteTarget && (
-          <EuiConfirmModal
-            title={i18n.translate(
-              'wazuhAiAssistant.settings.deleteConfirm.title',
-              {
-                defaultMessage: 'Delete provider',
-              },
-            )}
-            onCancel={cancelDelete}
-            onConfirm={confirmDelete}
-            cancelButtonText={i18n.translate(
-              'wazuhAiAssistant.settings.deleteConfirm.cancel',
-              {
-                defaultMessage: 'Cancel',
-              },
-            )}
-            confirmButtonText={i18n.translate(
-              'wazuhAiAssistant.settings.deleteConfirm.confirm',
-              {
-                defaultMessage: 'Delete',
-              },
-            )}
-            buttonColor='danger'
-          >
-            <p>
-              {i18n.translate('wazuhAiAssistant.settings.deleteConfirm.body', {
-                defaultMessage:
-                  'This will permanently delete the provider "{name}". This action cannot be undone.',
-                values: { name: deleteTarget.name },
-              })}
-            </p>
-          </EuiConfirmModal>
-        )}
+                </EuiAccordion>
+              )}
+
+              {fieldPolicyDraft.length === 0 && (
+                <>
+                  <EuiSpacer size='s' />
+                  <EuiButton
+                    size='s'
+                    iconType='plusInCircle'
+                    onClick={handleAddFieldPolicyRow}
+                  >
+                    {i18n.translate(
+                      'wazuhAiAssistant.settings.privacy.addField',
+                      {
+                        defaultMessage: 'Add field',
+                      },
+                    )}
+                  </EuiButton>
+                </>
+              )}
+
+              <EuiHorizontalRule margin='m' />
+              <EuiToolTip content={!canSave ? accessMessage : undefined}>
+                <EuiButton
+                  onClick={handleSavePrivacySettings}
+                  isLoading={isSavingPrivacy}
+                  isDisabled={
+                    !canSave || hasEmptyFieldPolicyRow || !privacy.isDirty
+                  }
+                  fill
+                >
+                  {i18n.translate('wazuhAiAssistant.settings.privacy.save', {
+                    defaultMessage: 'Save privacy settings',
+                  })}
+                </EuiButton>
+              </EuiToolTip>
+            </>
+          )}
+        </SectionCard>
+
+        <EuiSpacer size='xl' />
+
+        <SectionCard
+          pillLabel={i18n.translate(
+            'wazuhAiAssistant.settings.retention.title',
+            {
+              defaultMessage: 'Conversation history',
+            },
+          )}
+          description={i18n.translate(
+            'wazuhAiAssistant.settings.retention.description',
+            {
+              defaultMessage:
+                'Control how long saved conversations are kept.',
+            },
+          )}
+        >
+          {retention.value === null && !privacyLoadError && (
+            <>
+              <EuiLoadingSpinner
+                size='m'
+                aria-label={i18n.translate('wazuhAiAssistant.common.loading', {
+                  defaultMessage: 'Loading...',
+                })}
+              />
+              <EuiSpacer size='m' />
+            </>
+          )}
+
+          {retention.value !== null && (
+            <>
+              {retentionSaveError && (
+                <>
+                  <EuiCallOut
+                    color='danger'
+                    iconType='alert'
+                    title={retentionSaveError}
+                    size='s'
+                  />
+                  <EuiSpacer size='m' />
+                </>
+              )}
+
+              <EuiFormRow
+                label={i18n.translate(
+                  'wazuhAiAssistant.settings.retention.daysLabel',
+                  {
+                    defaultMessage: 'Keep saved conversations for (days)',
+                  },
+                )}
+                helpText={i18n.translate(
+                  'wazuhAiAssistant.settings.retention.daysHelp',
+                  {
+                    defaultMessage:
+                      '0 keeps every saved conversation forever. Enforcement happens only when the conversation list is loaded — there is no scheduled background cleanup.',
+                  },
+                )}
+              >
+                <EuiFieldNumber
+                  min={0}
+                  value={retention.value}
+                  onChange={event => {
+                    const parsed = Number(event.target.value);
+                    retention.setValue(
+                      Number.isNaN(parsed) ? 0 : Math.max(0, parsed),
+                    );
+                  }}
+                />
+              </EuiFormRow>
+
+              <EuiHorizontalRule margin='m' />
+              <EuiToolTip content={!canSave ? accessMessage : undefined}>
+                <EuiButton
+                  onClick={handleSaveRetentionSettings}
+                  isLoading={isSavingRetention}
+                  isDisabled={!canSave || !retention.isDirty}
+                  fill
+                >
+                  {i18n.translate(
+                    'wazuhAiAssistant.settings.retention.save',
+                    {
+                      defaultMessage: 'Save conversation history settings',
+                    },
+                  )}
+                </EuiButton>
+              </EuiToolTip>
+            </>
+          )}
+        </SectionCard>
       </EuiPageBody>
+      {isFormOpen && (
+        <ProviderFormFlyout
+          editingProvider={editingProvider}
+          error={error}
+          canSave={canSave}
+          accessMessage={accessMessage}
+          apiKeyEncryptionEnabled={apiKeyEncryptionEnabled}
+          isSaving={isSubmittingProvider}
+          testOutcome={flyoutTestOutcome}
+          onSubmit={handleSubmit}
+          onClose={closeForm}
+        />
+      )}
+      {deleteTarget && (
+        <EuiConfirmModal
+          title={i18n.translate(
+            'wazuhAiAssistant.settings.deleteConfirm.title',
+            {
+              defaultMessage: 'Delete provider',
+            },
+          )}
+          onCancel={cancelDelete}
+          onConfirm={confirmDelete}
+          cancelButtonText={i18n.translate(
+            'wazuhAiAssistant.settings.deleteConfirm.cancel',
+            {
+              defaultMessage: 'Cancel',
+            },
+          )}
+          confirmButtonText={i18n.translate(
+            'wazuhAiAssistant.settings.deleteConfirm.confirm',
+            {
+              defaultMessage: 'Delete',
+            },
+          )}
+          buttonColor='danger'
+        >
+          <p>
+            {i18n.translate('wazuhAiAssistant.settings.deleteConfirm.body', {
+              defaultMessage:
+                'This will permanently delete the provider "{name}". This action cannot be undone.',
+              values: { name: deleteTarget.name },
+            })}
+          </p>
+        </EuiConfirmModal>
+      )}
     </EuiPage>
   );
 };
