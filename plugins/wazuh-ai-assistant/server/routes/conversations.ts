@@ -293,7 +293,7 @@ export const tableSpecSchema = schema.object({
  *
  * `createdAt` and `table` are BOTH optional, so a client that predates them — or a conversation
  * saved by one — is accepted unchanged. */
-const chatMessageSchema = schema.object({
+export const chatMessageSchema = schema.object({
   role: schema.oneOf([
     schema.literal('system'),
     schema.literal('user'),
@@ -307,6 +307,17 @@ const chatMessageSchema = schema.object({
         id: schema.string(),
         name: schema.string(),
         arguments: schema.recordOf(schema.string(), schema.any()),
+        // Mirrors server/routes/chat.ts's inline `messages` body schema (see that file's own
+        // comment on this pair of fields): a persisted conversation was built from the same
+        // `exchange.toolCall` objects (common/chat-history.ts's `toPersistedMessages`), so a
+        // vendor extra captured mid-conversation (e.g. Gemini's `thought_signature`) must be
+        // accepted back here too, or saving/reloading that conversation 400s.
+        vendorExtras: schema.maybe(
+          schema.recordOf(schema.string(), schema.any()),
+        ),
+        functionVendorExtras: schema.maybe(
+          schema.recordOf(schema.string(), schema.any()),
+        ),
       }),
     ),
   ),
