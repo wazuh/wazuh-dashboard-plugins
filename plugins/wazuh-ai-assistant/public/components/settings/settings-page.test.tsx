@@ -200,7 +200,13 @@ describe('SettingsPage — auto-probe failures do not become permanent banners',
       screen.queryByText(/my openai: connection refused/i),
     ).not.toBeInTheDocument();
 
-    const testButton = await screen.findByRole('button', { name: 'Test' });
+    const testButton = await waitFor(() => {
+      const button = document.querySelector(
+        '[data-test-subj="wz-ai-provider-test-action"]',
+      );
+      expect(button).not.toBeNull();
+      return button as HTMLElement;
+    });
     fireEvent.click(testButton);
 
     await waitFor(() => expect(mockService.test).toHaveBeenCalledTimes(2));
@@ -233,7 +239,13 @@ describe('SettingsPage — auto-probe failures do not become permanent banners',
       await screen.findByText(/default provider "my default" is failing/i),
     ).toBeInTheDocument();
 
-    const testButton = await screen.findByRole('button', { name: 'Test' });
+    const testButton = await waitFor(() => {
+      const button = document.querySelector(
+        '[data-test-subj="wz-ai-provider-test-action"]',
+      );
+      expect(button).not.toBeNull();
+      return button as HTMLElement;
+    });
     fireEvent.click(testButton);
     await waitFor(() => expect(mockService.test).toHaveBeenCalledTimes(2));
 
@@ -272,7 +284,13 @@ describe('SettingsPage — manual test failure callout is genuinely dismissible'
     // Auto-probe must not have produced the callout yet.
     await waitFor(() => expect(mockService.test).toHaveBeenCalledWith('p1'));
 
-    const testButton = await screen.findByRole('button', { name: 'Test' });
+    const testButton = await waitFor(() => {
+      const button = document.querySelector(
+        '[data-test-subj="wz-ai-provider-test-action"]',
+      );
+      expect(button).not.toBeNull();
+      return button as HTMLElement;
+    });
     fireEvent.click(testButton);
     await waitFor(() => expect(mockService.test).toHaveBeenCalledTimes(2));
 
@@ -379,7 +397,13 @@ describe('SettingsPage — manual test failure callout is genuinely dismissible'
 
     await waitFor(() => expect(mockService.test).toHaveBeenCalledWith('p1'));
 
-    const testButton = await screen.findByRole('button', { name: 'Test' });
+    const testButton = await waitFor(() => {
+      const button = document.querySelector(
+        '[data-test-subj="wz-ai-provider-test-action"]',
+      );
+      expect(button).not.toBeNull();
+      return button as HTMLElement;
+    });
     fireEvent.click(testButton);
     await waitFor(() => expect(mockService.test).toHaveBeenCalledTimes(2));
 

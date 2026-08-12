@@ -850,43 +850,6 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 />
               </>
             )}
-            <EuiSpacer size='m' />
-            <EuiFlexGroup gutterSize='s'>
-              <EuiFlexItem grow={false}>
-                <EuiToolTip
-                  content={
-                    !canSave
-                      ? accessMessage
-                      : apiKeyBlockedByEncryption
-                      ? i18n.translate(
-                          'wazuhAiAssistant.settings.form.encryptionRequiredTooltip',
-                          {
-                            defaultMessage:
-                              'An encryption key must be configured before an API key can be saved.',
-                          },
-                        )
-                      : undefined
-                  }
-                >
-                  <EuiButton
-                    onClick={handleSave}
-                    isDisabled={!canSave || apiKeyBlockedByEncryption}
-                    fill
-                  >
-                    {i18n.translate('wazuhAiAssistant.settings.form.save', {
-                      defaultMessage: 'Save',
-                    })}
-                  </EuiButton>
-                </EuiToolTip>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <EuiButtonEmpty onClick={requestClose}>
-                  {i18n.translate('wazuhAiAssistant.settings.form.cancel', {
-                    defaultMessage: 'Cancel',
-                  })}
-                </EuiButtonEmpty>
-              </EuiFlexItem>
-            </EuiFlexGroup>
           </EuiForm>
         </EuiFlyoutBody>
         <EuiFlyoutFooter>
