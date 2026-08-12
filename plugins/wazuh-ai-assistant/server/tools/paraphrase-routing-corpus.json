@@ -1,0 +1,441 @@
+{
+  "_meta": {
+    "description": "Paraphrase routing corpus for the stage-1 router (server/tools/router.ts). 12 canonical questions x 4-5 paraphrases across registers (canonical/terse/verbose/jargon/non-native), one 'expect_category' per canonical group. Metric: STAGE-1 CATEGORY AGREEMENT - every paraphrase of a canonical question must route to the same category as its canonical form. 'expect_category' is the category the canonical form should reach, taken from the router's own category map (see paraphrase-routing-corpus.test.ts, which asserts every value here is a real ROUTE_QUESTION_TOOL category so a router category rename cannot silently make this corpus stale).",
+    "audit_note": "Every expect_category value has been checked against router.ts's live category enum and the tool that actually answers each canonical question; no mismatches were found across all 12 canonicals.",
+    "sanitization_note": "The P06 (inventory) group originally referenced a real test-VM hostname; it has been replaced with the neutral placeholder 'agent-01' throughout. No other entries reference environment-specific hosts, IPs, or identifiers.",
+    "manual_run_note": "This file is evaluated for structural coherence only by the colocated jest test (no LLM call). The full stage-1 routing run against a real provider is a manual per-release procedure — see docs/dev/paraphrase-routing-gate.md."
+  },
+  "questions": [
+    {
+      "id": "P01a",
+      "canonical": "P01",
+      "register": "canonical",
+      "expect_category": "findings",
+      "q": "Which agents have critical findings?"
+    },
+    {
+      "id": "P01b",
+      "canonical": "P01",
+      "register": "terse",
+      "expect_category": "findings",
+      "q": "critical by agent"
+    },
+    {
+      "id": "P01c",
+      "canonical": "P01",
+      "register": "verbose",
+      "expect_category": "findings",
+      "q": "Can you tell me which of our machines currently have findings at the critical severity level?"
+    },
+    {
+      "id": "P01d",
+      "canonical": "P01",
+      "register": "jargon",
+      "expect_category": "findings",
+      "q": "crit sev breakdown per endpoint"
+    },
+    {
+      "id": "P01e",
+      "canonical": "P01",
+      "register": "non-native",
+      "expect_category": "findings",
+      "q": "wich agents hav critcal findings"
+    },
+
+    {
+      "id": "P02a",
+      "canonical": "P02",
+      "register": "canonical",
+      "expect_category": "vulnerabilities",
+      "q": "Do we have any critical vulnerabilities?"
+    },
+    {
+      "id": "P02b",
+      "canonical": "P02",
+      "register": "terse",
+      "expect_category": "vulnerabilities",
+      "q": "crit vulns?"
+    },
+    {
+      "id": "P02c",
+      "canonical": "P02",
+      "register": "verbose",
+      "expect_category": "vulnerabilities",
+      "q": "I would like to know whether any of the vulnerabilities detected across our infrastructure are rated critical."
+    },
+    {
+      "id": "P02d",
+      "canonical": "P02",
+      "register": "jargon",
+      "expect_category": "vulnerabilities",
+      "q": "any CVEs 9.0+ in the estate"
+    },
+    {
+      "id": "P02e",
+      "canonical": "P02",
+      "register": "non-native",
+      "expect_category": "vulnerabilities",
+      "q": "we have vulnerabilitys critical yes or no"
+    },
+
+    {
+      "id": "P03a",
+      "canonical": "P03",
+      "register": "canonical",
+      "expect_category": "agents",
+      "q": "How many agents are connected right now?"
+    },
+    {
+      "id": "P03b",
+      "canonical": "P03",
+      "register": "terse",
+      "expect_category": "agents",
+      "q": "agent count"
+    },
+    {
+      "id": "P03c",
+      "canonical": "P03",
+      "register": "verbose",
+      "expect_category": "agents",
+      "q": "Could you check how many of our monitoring agents are currently reporting in as active?"
+    },
+    {
+      "id": "P03d",
+      "canonical": "P03",
+      "register": "jargon",
+      "expect_category": "agents",
+      "q": "endpoints online?"
+    },
+    {
+      "id": "P03e",
+      "canonical": "P03",
+      "register": "non-native",
+      "expect_category": "agents",
+      "q": "how many agent conected now"
+    },
+
+    {
+      "id": "P04a",
+      "canonical": "P04",
+      "register": "canonical",
+      "expect_category": "sca",
+      "q": "Which SCA checks are failing?"
+    },
+    {
+      "id": "P04b",
+      "canonical": "P04",
+      "register": "terse",
+      "expect_category": "sca",
+      "q": "failed benchmark checks"
+    },
+    {
+      "id": "P04c",
+      "canonical": "P04",
+      "register": "verbose",
+      "expect_category": "sca",
+      "q": "Please show me the security configuration assessment checks that are currently not passing on our systems."
+    },
+    {
+      "id": "P04d",
+      "canonical": "P04",
+      "register": "jargon",
+      "expect_category": "sca",
+      "q": "CIS hardening fails"
+    },
+    {
+      "id": "P04e",
+      "canonical": "P04",
+      "register": "non-native",
+      "expect_category": "sca",
+      "q": "what configuration check is fail"
+    },
+
+    {
+      "id": "P05a",
+      "canonical": "P05",
+      "register": "canonical",
+      "expect_category": "mitre",
+      "q": "Which MITRE ATT&CK techniques are we seeing most?"
+    },
+    {
+      "id": "P05b",
+      "canonical": "P05",
+      "register": "terse",
+      "expect_category": "mitre",
+      "q": "top ATT&CK techniques"
+    },
+    {
+      "id": "P05c",
+      "canonical": "P05",
+      "register": "verbose",
+      "expect_category": "mitre",
+      "q": "Can you give me an overview of which adversary techniques from the MITRE framework appear most often in our detections?"
+    },
+    {
+      "id": "P05d",
+      "canonical": "P05",
+      "register": "jargon",
+      "expect_category": "mitre",
+      "q": "TTP frequency"
+    },
+    {
+      "id": "P05e",
+      "canonical": "P05",
+      "register": "non-native",
+      "expect_category": "mitre",
+      "q": "what mitre tecnique we see more"
+    },
+
+    {
+      "id": "P06a",
+      "canonical": "P06",
+      "register": "canonical",
+      "expect_category": "inventory",
+      "q": "What packages are installed on agent-01?"
+    },
+    {
+      "id": "P06b",
+      "canonical": "P06",
+      "register": "terse",
+      "expect_category": "inventory",
+      "q": "pkgs on agent-01"
+    },
+    {
+      "id": "P06c",
+      "canonical": "P06",
+      "register": "verbose",
+      "expect_category": "inventory",
+      "q": "Could you list the software packages that are currently installed on the host called agent-01?"
+    },
+    {
+      "id": "P06d",
+      "canonical": "P06",
+      "register": "jargon",
+      "expect_category": "inventory",
+      "q": "software inventory agent-01"
+    },
+    {
+      "id": "P06e",
+      "canonical": "P06",
+      "register": "non-native",
+      "expect_category": "inventory",
+      "q": "what program is install in agent-01"
+    },
+
+    {
+      "id": "P07a",
+      "canonical": "P07",
+      "register": "canonical",
+      "expect_category": "compliance",
+      "q": "Are we meeting PCI DSS requirements?"
+    },
+    {
+      "id": "P07b",
+      "canonical": "P07",
+      "register": "terse",
+      "expect_category": "compliance",
+      "q": "PCI status"
+    },
+    {
+      "id": "P07c",
+      "canonical": "P07",
+      "register": "verbose",
+      "expect_category": "compliance",
+      "q": "I need to understand our current standing against the PCI DSS compliance framework - where are we falling short?"
+    },
+    {
+      "id": "P07d",
+      "canonical": "P07",
+      "register": "jargon",
+      "expect_category": "compliance",
+      "q": "PCI DSS gaps"
+    },
+    {
+      "id": "P07e",
+      "canonical": "P07",
+      "register": "non-native",
+      "expect_category": "compliance",
+      "q": "we are complying PCI?"
+    },
+
+    {
+      "id": "P08a",
+      "canonical": "P08",
+      "register": "canonical",
+      "expect_category": "findings",
+      "q": "Show me the brute force attempts."
+    },
+    {
+      "id": "P08b",
+      "canonical": "P08",
+      "register": "terse",
+      "expect_category": "findings",
+      "q": "brute force?"
+    },
+    {
+      "id": "P08c",
+      "canonical": "P08",
+      "register": "verbose",
+      "expect_category": "findings",
+      "q": "Could you pull up any evidence of password guessing or repeated failed login attempts against our servers?"
+    },
+    {
+      "id": "P08d",
+      "canonical": "P08",
+      "register": "jargon",
+      "expect_category": "findings",
+      "q": "credential stuffing / T1110 activity"
+    },
+    {
+      "id": "P08e",
+      "canonical": "P08",
+      "register": "non-native",
+      "expect_category": "findings",
+      "q": "someone try to force password?"
+    },
+
+    {
+      "id": "P09a",
+      "canonical": "P09",
+      "register": "canonical",
+      "expect_category": "security_analytics",
+      "q": "Which detection rules are enabled?"
+    },
+    {
+      "id": "P09b",
+      "canonical": "P09",
+      "register": "terse",
+      "expect_category": "security_analytics",
+      "q": "active ruleset"
+    },
+    {
+      "id": "P09c",
+      "canonical": "P09",
+      "register": "verbose",
+      "expect_category": "security_analytics",
+      "q": "Can you show me which of the detection rules in our security analytics pipeline are currently turned on?"
+    },
+    {
+      "id": "P09d",
+      "canonical": "P09",
+      "register": "jargon",
+      "expect_category": "security_analytics",
+      "q": "enabled sigma-style rules"
+    },
+    {
+      "id": "P09e",
+      "canonical": "P09",
+      "register": "non-native",
+      "expect_category": "security_analytics",
+      "q": "what rules is enable for detect"
+    },
+
+    {
+      "id": "P10a",
+      "canonical": "P10",
+      "register": "canonical",
+      "expect_category": "fim",
+      "q": "Which monitored files changed recently?"
+    },
+    {
+      "id": "P10b",
+      "canonical": "P10",
+      "register": "terse",
+      "expect_category": "fim",
+      "q": "FIM changes"
+    },
+    {
+      "id": "P10c",
+      "canonical": "P10",
+      "register": "verbose",
+      "expect_category": "fim",
+      "q": "Could you check the file integrity monitoring data and tell me what tracked files have been modified?"
+    },
+    {
+      "id": "P10d",
+      "canonical": "P10",
+      "register": "jargon",
+      "expect_category": "fim",
+      "q": "syscheck deltas"
+    },
+    {
+      "id": "P10e",
+      "canonical": "P10",
+      "register": "non-native",
+      "expect_category": "fim",
+      "q": "what file is change in the monitoring"
+    },
+
+    {
+      "id": "P11a",
+      "canonical": "P11",
+      "register": "canonical",
+      "expect_category": "findings",
+      "q": "What should I look at first this morning?"
+    },
+    {
+      "id": "P11b",
+      "canonical": "P11",
+      "register": "terse",
+      "expect_category": "findings",
+      "q": "anything urgent?"
+    },
+    {
+      "id": "P11c",
+      "canonical": "P11",
+      "register": "verbose",
+      "expect_category": "findings",
+      "q": "I just started my shift - what security issues in our environment need my attention before anything else?"
+    },
+    {
+      "id": "P11d",
+      "canonical": "P11",
+      "register": "jargon",
+      "expect_category": "findings",
+      "q": "triage queue top items"
+    },
+    {
+      "id": "P11e",
+      "canonical": "P11",
+      "register": "non-native",
+      "expect_category": "findings",
+      "q": "what i must look first today"
+    },
+
+    {
+      "id": "P12a",
+      "canonical": "P12",
+      "register": "canonical",
+      "expect_category": "general",
+      "q": "What can you help me with?"
+    },
+    {
+      "id": "P12b",
+      "canonical": "P12",
+      "register": "terse",
+      "expect_category": "general",
+      "q": "help"
+    },
+    {
+      "id": "P12c",
+      "canonical": "P12",
+      "register": "verbose",
+      "expect_category": "general",
+      "q": "Before I ask anything - could you explain what kinds of questions you are able to answer?"
+    },
+    {
+      "id": "P12d",
+      "canonical": "P12",
+      "register": "jargon",
+      "expect_category": "general",
+      "q": "capabilities?"
+    },
+    {
+      "id": "P12e",
+      "canonical": "P12",
+      "register": "non-native",
+      "expect_category": "general",
+      "q": "hello what you can do"
+    }
+  ]
+}

@@ -43,3 +43,11 @@ Jest will execute all `.test.ts` and `.test.tsx` files in the plugin and display
 - The container includes all necessary Node.js dependencies and Jest for unit testing.
 - Some test suites may produce warnings or console messages that do not affect test results (e.g., "Browserslist: caniuse-lite is outdated", prop validation warnings).
 - **Note:** Other test scripts listed in `package.json` (e.g., `test:server`, `test:browser`, `test:ui:runner`) are not available in the Docker development environment as they require additional OpenSearch Dashboards infrastructure not included in the dev setup. For comprehensive testing, use the CI/CD pipeline or a production-like environment setup.
+
+## AI Assistant: paraphrase routing gate
+
+`plugins/wazuh-ai-assistant` has an additional gate for its stage-1 tool router: a paraphrase
+corpus checked for internal coherence by `yarn test:jest` (no LLM call), plus a manual, per-release
+run of that corpus against a real provider. See
+[Paraphrase routing gate](paraphrase-routing-gate.md) for what it measures, how to run the manual
+part, and how to interpret a failure.
