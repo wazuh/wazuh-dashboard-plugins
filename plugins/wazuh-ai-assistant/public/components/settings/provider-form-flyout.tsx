@@ -38,7 +38,7 @@ const PROVIDER_TYPE_FORM_LABELS: Record<string, string> = {
     'wazuhAiAssistant.settings.type.openaiCompatible',
     {
       defaultMessage:
-        'OpenAI-compatible (OpenAI, Gemini, Ollama, LM Studio, vLLM...)',
+        'OpenAI-compatible (OpenAI, Bedrock gateway, Ollama, LM Studio, vLLM...)',
     },
   ),
   anthropic: i18n.translate('wazuhAiAssistant.settings.type.anthropic', {
@@ -52,9 +52,10 @@ interface ProviderUrlDoc {
 }
 
 /** Note shown under the docs links for openai_compatible: that type's label (see
- * PROVIDER_TYPE_FORM_LABELS above) advertises more services (Gemini, LM Studio, vLLM...) than this
- * file has room to keep a maintained doc link for — pointing the admin at their own provider's
- * docs is more reliable than us trying to enumerate every compatible gateway. */
+ * PROVIDER_TYPE_FORM_LABELS above) advertises more services (Bedrock gateway, LM Studio,
+ * vLLM...) than this file has room to keep a maintained doc link for — pointing the admin at
+ * their own provider's docs is more reliable than us trying to enumerate every compatible
+ * gateway. */
 const OTHER_OPENAI_COMPATIBLE_PROVIDERS_NOTE = i18n.translate(
   'wazuhAiAssistant.settings.form.otherProvidersNote',
   {
@@ -148,7 +149,7 @@ const PROVIDER_MODEL_GUIDANCE: Record<
   { examples: string[]; docs: ProviderUrlDoc[]; note?: string }
 > = {
   openai_compatible: {
-    examples: ['gpt-4o', 'gpt-4o-mini', 'openai/gpt-oss-120b'],
+    examples: ['openai.gpt-oss-120b', 'mistral.mistral-large-3-675b-instruct'],
     docs: [
       {
         label: i18n.translate(
@@ -178,7 +179,7 @@ const PROVIDER_MODEL_GUIDANCE: Record<
     note: OTHER_OPENAI_COMPATIBLE_PROVIDERS_NOTE,
   },
   anthropic: {
-    examples: ['claude-sonnet-4-5', 'claude-opus-4-1'],
+    examples: ['claude-opus-4-8', 'claude-haiku-4-5'],
     docs: [
       {
         label: i18n.translate(
@@ -192,6 +193,78 @@ const PROVIDER_MODEL_GUIDANCE: Record<
     ],
   },
 };
+
+/**
+ * Curated model suggestions keyed by a substring of the endpoint URL — shown as clickable chips
+ * under the Model field so the admin can pick a known-good model without leaving the form, while
+ * the field itself stays free text (providers add models faster than this list could track).
+ * Order matters: the first substring match wins.
+ *
+ * `forType` gates the entry to the provider type it actually works with: api.anthropic.com only
+ * makes sense for the `anthropic` type (an `openai_compatible` provider pointed at that URL would
+ * be a guaranteed-broken config), and every other entry is an OpenAI-compatible-only
+ * gateway/service, so it is gated to `openai_compatible`.
+ */
+const VENDOR_MODEL_SUGGESTIONS: Array<{
+  match: string;
+  forType: ProviderInput['type'];
+  models: string[];
+}> = [
+  {
+    match: 'api.anthropic.com',
+    forType: 'anthropic',
+    models: ['claude-opus-4-8', 'claude-haiku-4-5', 'claude-sonnet-5'],
+  },
+  {
+    match: 'api.openai.com',
+    forType: 'openai_compatible',
+    models: ['gpt-4o', 'gpt-4o-mini'],
+  },
+  {
+    match: 'bedrock-mantle',
+    forType: 'openai_compatible',
+    models: [
+      'openai.gpt-oss-120b',
+      'mistral.mistral-large-3-675b-instruct',
+      'qwen.qwen3-32b',
+      'deepseek.v3.2',
+    ],
+  },
+  {
+    match: 'openrouter.ai',
+    forType: 'openai_compatible',
+    models: ['openai/gpt-oss-20b:free'],
+  },
+  {
+    match: 'generativelanguage',
+    forType: 'openai_compatible',
+    models: ['gemini-flash-latest', 'gemini-3-flash-preview'],
+  },
+  {
+    match: 'localhost:11434',
+    forType: 'openai_compatible',
+    models: ['llama3.3', 'qwen3', 'mistral'],
+  },
+  {
+    match: '127.0.0.1:11434',
+    forType: 'openai_compatible',
+    models: ['llama3.3', 'qwen3', 'mistral'],
+  },
+];
+
+function getVendorModelSuggestions(
+  baseUrl: string,
+  type: ProviderInput['type'],
+): string[] {
+  const normalized = baseUrl.trim().toLowerCase();
+  if (!normalized) {
+    return [];
+  }
+  const vendor = VENDOR_MODEL_SUGGESTIONS.find(
+    ({ match, forType }) => forType === type && normalized.includes(match),
+  );
+  return vendor?.models ?? [];
+}
 
 const RequiredLabel: React.FC<{ label: string }> = ({ label }) => (
   <>
@@ -302,6 +375,10 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const urlGuidance = PROVIDER_URL_GUIDANCE[form.type];
   const modelGuidance = PROVIDER_MODEL_GUIDANCE[form.type];
+  const vendorModelSuggestions = getVendorModelSuggestions(
+    form.baseUrl,
+    form.type,
+  );
 
   const handleSave = async () => {
     const trimmedForm: ProviderInput = {
@@ -466,6 +543,43 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
               <EuiSpacer size='m' />
             </>
           )}
+          {/* Only shown for a brand-new provider — an admin editing an existing one already
+              knows how to fill this form in. CEO feedback was specifically that signing up an
+              Anthropic key was confusing; this is the shortest possible map of the four steps. */}
+          {!editingProvider && (
+            <>
+              <EuiCallOut
+                size='s'
+                iconType='iInCircle'
+                title={i18n.translate(
+                  'wazuhAiAssistant.settings.form.gettingStartedTitle',
+                  { defaultMessage: 'Getting started' },
+                )}
+              >
+                <p>
+                  {i18n.translate(
+                    'wazuhAiAssistant.settings.form.gettingStartedSteps',
+                    {
+                      defaultMessage:
+                        '1. Pick a provider type. 2. Paste its API key. 3. Pick a model. ' +
+                        '4. Test the connection.',
+                    },
+                  )}
+                </p>
+                <p>
+                  {i18n.translate(
+                    'wazuhAiAssistant.settings.form.gettingStartedTestCaveat',
+                    {
+                      defaultMessage:
+                        'A green test confirms connection and key — it does not guarantee ' +
+                        'every chat request will succeed.',
+                    },
+                  )}
+                </p>
+              </EuiCallOut>
+              <EuiSpacer size='m' />
+            </>
+          )}
           <EuiForm component='div'>
             <EuiFormRow
               id='wz-ai-provider-name'
@@ -592,10 +706,12 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                   {i18n.translate('wazuhAiAssistant.settings.form.modelHelp', {
                     defaultMessage:
                       'Tool calling needs a model with solid function-calling support ' +
-                      '(e.g. GPT-4o, Claude Sonnet) — small or lightweight models often ' +
-                      "fail. Check your provider's model list for current availability, " +
-                      'as models are periodically retired. A free-tier API key with a ' +
-                      "low rate limit may fail regardless of the model's capability.",
+                      '(e.g. GPT-4o). The model must support tool (function) calling. ' +
+                      'Models without tool support may fabricate answers instead of ' +
+                      "failing visibly. Check your provider's model list for current " +
+                      'availability, as models are periodically retired. A free-tier API ' +
+                      "key with a low rate limit may fail regardless of the model's " +
+                      'capability.',
                   })}{' '}
                   <FormattedMessage
                     id='wazuhAiAssistant.settings.form.modelExample'
@@ -643,6 +759,54 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 }
               />
             </EuiFormRow>
+            {/* Curated per-vendor suggestions, shown once the endpoint URL matches a known
+                vendor — clicking a chip fills the (still free-text) Model field. Kept outside
+                the EuiFormRow above for the same reason as the API key shape warning: EuiFormRow
+                clones its single child to inject a11y props, so it cannot take a sibling. */}
+            {vendorModelSuggestions.length > 0 && (
+              <>
+                <EuiSpacer size='xs' />
+                <EuiText
+                  size='xs'
+                  color='subdued'
+                  id='wz-ai-provider-model-suggestions-label'
+                >
+                  {i18n.translate(
+                    'wazuhAiAssistant.settings.form.modelSuggestionsLabel',
+                    { defaultMessage: 'Suggested models:' },
+                  )}
+                </EuiText>
+                <EuiSpacer size='xs' />
+                <EuiFlexGroup
+                  gutterSize='xs'
+                  wrap
+                  responsive={false}
+                  role='group'
+                  aria-labelledby='wz-ai-provider-model-suggestions-label'
+                >
+                  {vendorModelSuggestions.map(suggestedModel => (
+                    <EuiFlexItem key={suggestedModel} grow={false}>
+                      <EuiBadge
+                        color='hollow'
+                        onClick={() =>
+                          setForm({ ...form, model: suggestedModel })
+                        }
+                        onClickAriaLabel={i18n.translate(
+                          'wazuhAiAssistant.settings.form.modelSuggestionAriaLabel',
+                          {
+                            defaultMessage: 'Use model {suggestedModel}',
+                            values: { suggestedModel },
+                          },
+                        )}
+                      >
+                        {suggestedModel}
+                      </EuiBadge>
+                    </EuiFlexItem>
+                  ))}
+                </EuiFlexGroup>
+                <EuiSpacer size='s' />
+              </>
+            )}
             <EuiFormRow
               id='wz-ai-provider-api-key'
               label={i18n.translate('wazuhAiAssistant.settings.form.apiKey', {

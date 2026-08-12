@@ -321,6 +321,18 @@ describe('ProviderFormFlyout — endpoint URL guidance', () => {
   });
 });
 
+describe('ProviderFormFlyout — getting-started onboarding', () => {
+  it('shows a numbered getting-started hint for a new provider, not when editing', () => {
+    const { rerender } = render(<ProviderFormFlyout {...baseProps} />);
+    expect(screen.getByText(/getting started/i)).toBeInTheDocument();
+
+    rerender(
+      <ProviderFormFlyout {...baseProps} editingProvider={editingProvider} />,
+    );
+    expect(screen.queryByText(/getting started/i)).not.toBeInTheDocument();
+  });
+});
+
 describe('ProviderFormFlyout — model help text does not recommend retiring models', () => {
   it('does not recommend llama-3.3-70b-versatile or llama-3.1-8b-instant', () => {
     render(<ProviderFormFlyout {...baseProps} />);
@@ -345,7 +357,7 @@ describe('ProviderFormFlyout — model help text does not recommend retiring mod
     ).not.toBeInTheDocument();
     // Anchored to the CHIP specifically — it renders the bare id in its own <code>.
     const chips = screen
-      .getAllByText(/^openai\/gpt-oss-120b$/)
+      .getAllByText(/^openai\.gpt-oss-120b$/)
       .filter(node => node.tagName.toLowerCase() === 'code');
     expect(chips.length).toBeGreaterThan(0);
   });
@@ -355,12 +367,10 @@ describe('ProviderFormFlyout — Model field guidance', () => {
   it('shows OpenAI-compatible model examples and one docs link per covered service by default', async () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    // Anchored to the example CHIP's own <code>: the updated model help text (issue 09) also names
-    // GPT-4o-mini in its prose, so an unanchored getByText now matches two nodes and throws. This
-    // test is about the example chips, not the help paragraph.
+    // Anchored to the example CHIP's own <code>.
     expect(
       screen
-        .getAllByText(/^gpt-4o-mini$/i)
+        .getAllByText(/^mistral\.mistral-large-3-675b-instruct$/i)
         .filter(node => node.tagName.toLowerCase() === 'code').length,
     ).toBeGreaterThan(0);
 
@@ -388,8 +398,19 @@ describe('ProviderFormFlyout — Model field guidance', () => {
     fireEvent.change(screen.getByLabelText(/provider type/i), {
       target: { value: 'anthropic' },
     });
+    // No auto-prefill of the endpoint URL on type switch here -- type the Anthropic endpoint
+    // explicitly so the curated model-suggestion chips (keyed off the base URL) surface below.
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://api.anthropic.com' },
+    });
 
-    expect(screen.getByText(/claude-sonnet-4-5/i)).toBeInTheDocument();
+    // Anchored to the example CHIP's own <code>: an unanchored getByText would match both the
+    // chip and the plain-text model example rendered elsewhere on the form.
+    expect(
+      screen
+        .getAllByText(/^claude-opus-4-8$/i)
+        .filter(node => node.tagName.toLowerCase() === 'code').length,
+    ).toBeGreaterThan(0);
 
     fireEvent.click(
       screen.getByRole('button', { name: /^see available models$/i }),
@@ -404,5 +425,146 @@ describe('ProviderFormFlyout — Model field guidance', () => {
     expect(
       screen.queryByRole('link', { name: /groq model list/i }),
     ).not.toBeInTheDocument();
+  });
+});
+
+describe('ProviderFormFlyout — type label and tool-support copy corrections', () => {
+  it('does not headline Gemini support under the OpenAI-compatible type', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    expect(
+      screen.getByRole('option', {
+        name: /openai-compatible \(openai, bedrock gateway, ollama, lm studio, vllm\.\.\.\)/i,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('option', { name: /gemini/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('requires tool-calling support and warns about fabricated answers, without naming Claude Sonnet', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    expect(
+      screen.getByText(/the model must support tool \(function\) calling/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /models without tool support may fabricate answers instead of failing visibly/i,
+      ),
+    ).toBeInTheDocument();
+
+    const helpText = screen.getByText(
+      /tool calling needs a model with solid function-calling support/i,
+    );
+    expect(helpText.textContent).not.toMatch(/claude sonnet/i);
+  });
+
+  it('caveats that a green test does not guarantee every chat request will succeed', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    expect(
+      screen.getByText(
+        /a green test confirms connection and key — it does not guarantee every chat request will succeed/i,
+      ),
+    ).toBeInTheDocument();
+  });
+});
+
+describe('ProviderFormFlyout — curated per-vendor model suggestions', () => {
+  it('shows no suggestion chips for an unrecognized endpoint URL', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://my-custom-gateway.example.com' },
+    });
+
+    expect(screen.queryByText('claude-opus-4-8')).not.toBeInTheDocument();
+  });
+
+  it('suggests Anthropic models for api.anthropic.com on the anthropic type and fills the model field on click', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    // Suggestions are gated by provider type: api.anthropic.com only makes sense for the
+    // `anthropic` type (an openai_compatible provider pointed at it is a guaranteed-broken
+    // config), so switch type and type the endpoint explicitly.
+    fireEvent.change(screen.getByLabelText(/provider type/i), {
+      target: { value: 'anthropic' },
+    });
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://api.anthropic.com' },
+    });
+
+    const chip = screen
+      .getAllByText('claude-haiku-4-5')
+      .find(node => node.closest('[role="group"]'));
+    expect(chip).toBeDefined();
+    fireEvent.click(chip as HTMLElement);
+
+    expect(screen.getByLabelText(/^model/i)).toHaveValue('claude-haiku-4-5');
+  });
+
+  it('does not suggest Anthropic models when api.anthropic.com is used with the openai_compatible type', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://api.anthropic.com' },
+    });
+
+    expect(screen.queryByText('claude-haiku-4-5')).not.toBeInTheDocument();
+  });
+
+  it('suggests OpenAI models for api.openai.com', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://api.openai.com/v1' },
+    });
+
+    expect(screen.getByText('gpt-4o-mini')).toBeInTheDocument();
+  });
+
+  it('suggests Bedrock-gateway models for a bedrock-mantle endpoint', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://bedrock-mantle.internal.example.com' },
+    });
+
+    expect(screen.getByText('qwen.qwen3-32b')).toBeInTheDocument();
+    expect(screen.getByText('deepseek.v3.2')).toBeInTheDocument();
+  });
+
+  it('suggests a free OpenRouter model for an openrouter.ai endpoint', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://openrouter.ai/api/v1' },
+    });
+
+    expect(screen.getByText('openai/gpt-oss-20b:free')).toBeInTheDocument();
+  });
+
+  it('suggests Gemini models for a generativelanguage endpoint', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://generativelanguage.googleapis.com/v1beta' },
+    });
+
+    expect(screen.getByText('gemini-flash-latest')).toBeInTheDocument();
+    expect(screen.getByText('gemini-3-flash-preview')).toBeInTheDocument();
+  });
+
+  it('suggests local Ollama models for a localhost:11434 endpoint', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'http://localhost:11434/v1' },
+    });
+
+    expect(screen.getByText('llama3.3')).toBeInTheDocument();
+    expect(screen.getByText('qwen3')).toBeInTheDocument();
+    expect(screen.getByText('mistral')).toBeInTheDocument();
   });
 });
