@@ -1,5 +1,8 @@
 import { RequestHandlerContext } from '../../../../src/core/server';
-import { WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH } from '../../common/constants';
+import {
+  WAZUH_INDEXER_AI_ASSISTANT_PROVIDERS_PATH,
+  WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH,
+} from '../../common/constants';
 import { ProviderConfig } from '../../common/types';
 import { isNotFoundError, reader, writer } from './opensearch-user';
 
@@ -21,7 +24,7 @@ export interface StoredProvider {
   attributes: StoredProviderAttributes;
 }
 
-/** Wire shape of one entry in `GET {WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH}`'s `providers`
+/** Wire shape of one entry in `GET {WAZUH_INDEXER_AI_ASSISTANT_PROVIDERS_PATH}`'s `providers`
  * array (the OpenAPI spec's `AiAssistantProvider` schema) — snake_case, `_id` at the top level
  * rather than an OpenSearch document `_id`. Mapped to/from `StoredProvider`/
  * `StoredProviderAttributes` at the boundary (`toStoredProvider`/`toRequestWire` below) so the
@@ -36,13 +39,15 @@ interface ProviderWire {
   is_default?: boolean;
 }
 
-/** Only the `providers` key is read here — the same response also carries `settings`/
- * `field_policy`, `server/settings/index-settings-provider.ts`'s own concern. */
-interface GetSettingsResponseWire {
+/** The spec's `AiAssistantProviderListResponse` schema — `GET {WAZUH_INDEXER_AI_ASSISTANT_PROVIDERS_PATH}`'s
+ * entire body, a standalone endpoint with no `settings`/`field_policy` mixed in (those live under
+ * `WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH`, `server/settings/index-settings-provider.ts`'s own
+ * concern). */
+interface ProviderListResponseWire {
   providers: ProviderWire[];
 }
 
-/** Body of `PUT {WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH}/providers/{id}` (the spec's
+/** Body of `PUT {WAZUH_INDEXER_AI_ASSISTANT_PROVIDERS_PATH}/{id}` (the spec's
  * `AiAssistantProviderRequest`) — no `_id` (the id is the URL path segment, not part of the body). */
 interface ProviderRequestWire {
   name: string;
@@ -82,28 +87,28 @@ function toRequestWire(
 
 function providerPath(id?: string): string {
   return [
-    `${WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH}/providers`,
+    `${WAZUH_INDEXER_AI_ASSISTANT_PROVIDERS_PATH}`,
     ...(id ? [`${encodeURIComponent(id)}`] : []),
   ].join('/');
 }
 
 /**
  * AI provider (OpenAI/Anthropic endpoint) configuration, sourced from — and, on write, pushed
- * back into — the Wazuh indexer's `/_plugins/_setup/ai_assistant/settings/providers*` endpoints
- * (see `WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH`'s doc comment, common/constants.ts, for the
+ * back into — the Wazuh indexer's `/_plugins/_setup/ai_assistant/providers*` endpoints (see
+ * `WAZUH_INDEXER_AI_ASSISTANT_PROVIDERS_PATH`'s doc comment, common/constants.ts, for the
  * OpenAPI spec link). Replaces the direct `.wazuh-ai-assistant-settings` index access
  * `server/settings-store.ts` used before this endpoint existed (wazuh-dashboard-plugins#500).
  *
  * Two contract gaps versus the raw index access this replaces, both handled below rather than
  * papered over:
  *
- * - No standalone list/get-one/count endpoint: the only read is the bundled
- *   `GET {WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH}`, which returns `providers` alongside
- *   `settings`/`field_policy` in one response with no pagination or query capability of its own.
- *   `list`/`count`/`get` below all fetch that SAME full response (`fetchAll`) and slice/search it
- *   in memory — one full round trip per call, same as the raw-index code this replaces made one
- *   `.search()`/`.get()` call per read. Providers are capped at ~200 (see `list`'s `perPage` in
- *   server/routes/settings.ts), so the response size is bounded and this is not a scaling concern.
+ * - No get-one/count endpoint: `GET {WAZUH_INDEXER_AI_ASSISTANT_PROVIDERS_PATH}` is a standalone
+ *   list with no pagination or query capability of its own, and no per-id `GET` exists at all
+ *   (only `PUT`/`DELETE` under `.../providers/{id}`). `list`/`count`/`get` below all fetch that
+ *   SAME full response (`fetchAll`) and slice/search it in memory — one full round trip per call,
+ *   same as the raw-index code this replaces made one `.search()`/`.get()` call per read.
+ *   Providers are capped at ~200 (see `list`'s `perPage` in server/routes/settings.ts), so the
+ *   response size is bounded and this is not a scaling concern.
  * - No partial-update primitive: `PUT .../providers/{id}` is a full create-or-update, unlike the
  *   old `.update({doc: {...}})` this replaces. Every write below sends the COMPLETE provider body;
  *   server/routes/settings.ts's `clearOtherDefaults` (previously a partial `is_default`-only flip)
@@ -131,10 +136,10 @@ export class AiProvidersClient {
   ): Promise<StoredProvider[]> {
     try {
       const response = await this.fetch(
-        { method: 'GET', path: WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH },
+        { method: 'GET', path: WAZUH_INDEXER_AI_ASSISTANT_PROVIDERS_PATH },
         reader(context),
       );
-      const body = response.body as GetSettingsResponseWire;
+      const body = response.body as ProviderListResponseWire;
       return body.providers.map(toStoredProvider);
     } catch (error) {
       if (isNotFoundError(error)) {
@@ -160,6 +165,8 @@ export class AiProvidersClient {
     return (await this.fetchAll(context)).length;
   }
 
+  /** No per-id `GET` exists on the spec (only `PUT`/`DELETE` under `.../providers/{id}`), so this
+   * still goes through the same bundled `fetchAll` as `list`/`count` and searches in memory. */
   async get(
     context: RequestHandlerContext,
     id: string,
@@ -167,11 +174,10 @@ export class AiProvidersClient {
     return (await this.fetchAll(context)).find(provider => provider.id === id);
   }
 
-  /** `op_type: 'create'`'s old fail-loud-on-id-collision guarantee has no equivalent here: `PUT
-   * .../providers/{id}` is an unconditional upsert per the spec, so a (practically impossible)
-   * `crypto.randomUUID()` collision would now silently overwrite instead of failing loudly. Kept
-   * as its own method — rather than folding into `update` — purely to keep that intent documented
-   * at each call site, even though the two send an identical request. */
+  /** `POST .../providers` (the spec's `AiAssistantProviderCreateRequest`) is the dedicated create
+   * endpoint: it requires `id` in the body (validated server-side as a UUID, 400 otherwise) rather
+   * than taking it from the URL like `update` does. Kept as its own method — rather than folding
+   * into `update` — since the two now hit different HTTP methods/paths with different bodies. */
   async create(
     context: RequestHandlerContext,
     id: string,
@@ -179,9 +185,12 @@ export class AiProvidersClient {
   ): Promise<void> {
     await this.fetch(
       {
-        method: 'PUT',
-        path: providerPath(id),
-        body: toRequestWire(attributes),
+        method: 'POST',
+        path: providerPath(),
+        body: {
+          ...toRequestWire(attributes),
+          id,
+        },
       },
       writer(context),
     );

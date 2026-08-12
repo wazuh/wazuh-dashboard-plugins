@@ -44,9 +44,9 @@ interface FieldPolicyEntryWire {
   kind?: PseudonymKind;
 }
 
-/** `GET`'s response additionally carries a `providers` array — `server/settings/
- * ai-providers-client.ts`'s concern, deliberately typed out of this interface and never read
- * here; see `WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH`'s doc comment for the split. */
+/** Providers are a separate resource entirely — `GET {WAZUH_INDEXER_AI_ASSISTANT_PROVIDERS_PATH}`,
+ * `server/settings/ai-providers-client.ts`'s concern — and never appear in this response; see
+ * `WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH`'s doc comment for the split. */
 interface GetSettingsResponseWire {
   settings: SettingsWire;
   field_policy: FieldPolicyEntryWire[];

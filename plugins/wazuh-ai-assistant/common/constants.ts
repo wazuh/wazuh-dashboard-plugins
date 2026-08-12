@@ -37,31 +37,34 @@ export const API_PATHS = {
 export const MANAGER_SESSION_EXPIRED_COPY = 'session is missing or expired';
 
 /**
- * Path (relative to the OpenSearch/Wazuh indexer HTTP root) of the Wazuh indexer Setup plugin
- * endpoint that fronts both the AI Assistant's privacy defaults/override/field policy AND its
- * configured providers — a REAL, documented contract, not a placeholder: see the `AI Assistant`
- * tag's `/ai_assistant/settings`{, `/providers`{, `/{id}`}} paths in the OpenAPI spec at
+ * Paths (relative to the OpenSearch/Wazuh indexer HTTP root) of the Wazuh indexer Setup plugin's
+ * `AI Assistant` endpoints — a REAL, documented contract, not a placeholder: see the `AI
+ * Assistant` tag's `/ai_assistant/settings` and `/ai_assistant/providers`{, `/{id}`} paths in the
+ * OpenAPI spec at
  * https://github.com/wazuh/wazuh-indexer-plugins/blob/enhancement/1422-create-ai-assistant-indices/plugins/setup/openapi.yml
- * (`getAiAssistantSettings`/`putAiAssistantSettings`/`createAiAssistantProvider`/
- * `putAiAssistantProvider`/`deleteAiAssistantProvider` operations).
+ * (`getAiAssistantSettings`/`putAiAssistantSettings`/`listAiAssistantProviders`/
+ * `createAiAssistantProvider`/`putAiAssistantProvider`/`deleteAiAssistantProvider` operations).
  *
- * Two readers/writers split the paths under this base by concern, neither ever calling
- * OpenSearch's raw document APIs against the underlying hidden index directly any more
- * (wazuh-dashboard-plugins#500): `server/settings/index-settings-provider.ts` for `GET`/`PUT`
- * `{this path}` itself (settings/field policy), `server/settings/ai-providers-client.ts` for
- * `{this path}/providers`{, `/{id}`} (provider CRUD). Both reach it the same way
- * `IsmSettingsProvider` reaches `_plugins/_ism/*`: `context.core.opensearch.client.
+ * The two are genuinely separate resources on the indexer side, each with its own reader/writer
+ * here, neither ever calling OpenSearch's raw document APIs against the underlying hidden index
+ * directly any more (wazuh-dashboard-plugins#500): `server/settings/index-settings-provider.ts`
+ * for `GET`/`PUT {WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH}` (privacy defaults/override/field
+ * policy only — no providers in that response), `server/settings/ai-providers-client.ts` for
+ * `{WAZUH_INDEXER_AI_ASSISTANT_PROVIDERS_PATH}`{, `/{id}`} (provider CRUD). Both reach it the same
+ * way `IsmSettingsProvider` reaches `_plugins/_ism/*`: `context.core.opensearch.client.
  * {asInternalUser, asCurrentUser}.transport.request(...)` — no separate HTTP client, since this is
  * still an OpenSearch-cluster-local endpoint (the Wazuh indexer plugin runs inside the same
  * cluster), not an external service.
- *
- * `GET {this path}` returns `providers` bundled alongside `settings`/`field_policy` in one
- * response — there is no standalone list/get-one/count endpoint for providers at all, so
- * `AiProvidersClient` fetches this SAME response and slices/searches it in memory; see that
- * class's doc comment.
  */
 export const WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH =
   '/_plugins/_setup/ai_assistant/settings';
+
+/** `GET` lists every provider (no pagination/query of its own — `AiProvidersClient` fetches this
+ * whole list and slices/searches it in memory, see that class's doc comment); `POST` creates one
+ * (id supplied in the body, validated server-side as a UUID); `PUT`/`DELETE {this path}/{id}`
+ * update/delete one. There is no per-id `GET`. */
+export const WAZUH_INDEXER_AI_ASSISTANT_PROVIDERS_PATH =
+  '/_plugins/_setup/ai_assistant/providers';
 
 /** Namespacing label bound into the AAD of every provider API key's ciphertext
  * (server/crypto/api-key-cipher.ts's `buildAad`) — kept as its own named constant purely so that
