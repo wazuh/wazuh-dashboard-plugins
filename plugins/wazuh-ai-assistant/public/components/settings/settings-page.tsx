@@ -212,7 +212,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   // policy row closures below far more reliably than repeated `privacy.value` member accesses.
   const privacyDraft = privacy.value;
   const fieldPolicyDraft = privacyDraft?.fieldPolicy ?? [];
-  const [privacyLoadError, setPrivacyLoadError] = useState<string | null>(null);
+  // Shared between the Privacy and Conversation history sections below — both are populated by
+  // the same `getAssistantSettings()` round-trip in `reloadPrivacySettings`, so a single failure
+  // there means neither section has data to show.
+  const [settingsLoadError, setSettingsLoadError] = useState<string | null>(
+    null,
+  );
   const [privacySaveError, setPrivacySaveError] = useState<string | null>(null);
   const [isSavingPrivacy, setIsSavingPrivacy] = useState(false);
   // Kept alongside the drafts above so "Save" can PUT the full AssistantSettings body (the route
@@ -268,12 +273,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           fieldPolicy: loaded.fieldPolicy,
         });
         retention.commit(loaded.conversationRetentionDays);
-        setPrivacyLoadError(null);
+        setSettingsLoadError(null);
       })
       .catch(() =>
-        setPrivacyLoadError(
-          i18n.translate('wazuhAiAssistant.settings.privacy.loadError', {
-            defaultMessage: 'Could not load privacy settings.',
+        setSettingsLoadError(
+          i18n.translate('wazuhAiAssistant.settings.loadError', {
+            defaultMessage: 'Could not load settings.',
           }),
         ),
       );
@@ -431,7 +436,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       .then(setProviders)
       .catch(() =>
         setError(
-          i18n.translate('wazuhAiAssistant.settings.loadError', {
+          i18n.translate('wazuhAiAssistant.settings.providers.loadError', {
             defaultMessage: 'Could not load providers.',
           }),
         ),
@@ -447,7 +452,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       })
       .catch(() =>
         setError(
-          i18n.translate('wazuhAiAssistant.settings.loadError', {
+          i18n.translate('wazuhAiAssistant.settings.providers.loadError', {
             defaultMessage: 'Could not load providers.',
           }),
         ),
@@ -933,19 +938,19 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
               )}
             />
 
-            {privacyLoadError && (
+            {settingsLoadError && (
               <>
                 <EuiCallOut
                   color='danger'
                   iconType='alert'
-                  title={privacyLoadError}
+                  title={settingsLoadError}
                   size='s'
                 />
                 <EuiSpacer size='m' />
               </>
             )}
 
-            {!privacyDraft && !privacyLoadError && (
+            {!privacyDraft && !settingsLoadError && (
               <>
                 <EuiLoadingSpinner
                   size='m'
@@ -1244,7 +1249,19 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
               )}
             />
 
-            {retention.value === null && !privacyLoadError && (
+            {settingsLoadError && (
+              <>
+                <EuiCallOut
+                  color='danger'
+                  iconType='alert'
+                  title={settingsLoadError}
+                  size='s'
+                />
+                <EuiSpacer size='m' />
+              </>
+            )}
+
+            {retention.value === null && !settingsLoadError && (
               <>
                 <EuiLoadingSpinner
                   size='m'
