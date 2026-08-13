@@ -23,6 +23,8 @@ import WzConfigurationLogCollectionMacOSEvents from './log-collection-macosevent
 import WzConfigurationLogCollectionSockets from './log-collection-sockets';
 import WzConfigurationLogCollectionJournald from './log-collection-journald';
 import withWzConfig from '../util-hocs/wz-config';
+import WzNoConfig from '../util-components/no-config';
+import helpLinks from './help-links';
 import { isString } from '../utils/utils';
 import {
   LOCALFILE_COMMANDS_PROP,
@@ -39,7 +41,21 @@ class WzConfigurationLogCollection extends Component {
   }
   render() {
     let { currentConfig, agent } = this.props;
-    const logcollector = currentConfig[LOGCOLLECTOR_PROP];
+    const logcollector = currentConfig?.[LOGCOLLECTOR_PROP];
+
+    if (isString(logcollector)) {
+      return <WzNoConfig error={logcollector} help={helpLinks} />;
+    }
+
+    /* The report only carries the modules the agent runs, so an absent
+    logcollector is a module that reported nothing. Without this the tabs below
+    all resolve to false except Sockets, which renders unconditionally, and the
+    view claims the agent monitors no socket rather than saying the module
+    reported nothing at all. */
+    if (!logcollector) {
+      return <WzNoConfig error='not-present' help={helpLinks} />;
+    }
+
     /* An agent with a single localfile block reports it as an object instead
     of a list. */
     const localfiles = Array.isArray(logcollector?.localfile)
@@ -48,34 +64,29 @@ class WzConfigurationLogCollection extends Component {
       ? [logcollector.localfile]
       : [];
 
-    currentConfig =
-      logcollector && !isString(logcollector)
-        ? {
-            ...currentConfig,
-            [LOGCOLLECTOR_PROP]: {
-              ...logcollector,
-              [LOCALFILE_LOGS_PROP]: localfiles.filter(
-                item => typeof item.file !== 'undefined',
-              ), // TODO: it needs to be defined to support localfile as `eventchannel`. These doesn't have file property.
-              [LOCALFILE_WINDOWSEVENT_PROP]: localfiles.filter(
-                item =>
-                  item.logformat === 'eventchannel' ||
-                  item.logformat === 'eventlog',
-              ),
-              [LOCALFILE_MACOSEVENT_PROP]: localfiles.filter(
-                item => item.logformat === 'macos',
-              ),
-              [LOCALFILE_JOURNALDT_PROP]: localfiles.filter(
-                item => item.logformat === 'journald',
-              ),
-              [LOCALFILE_COMMANDS_PROP]: localfiles.filter(
-                item =>
-                  item.logformat === 'command' ||
-                  item.logformat === 'full_command',
-              ),
-            },
-          }
-        : currentConfig;
+    currentConfig = {
+      ...currentConfig,
+      [LOGCOLLECTOR_PROP]: {
+        ...logcollector,
+        [LOCALFILE_LOGS_PROP]: localfiles.filter(
+          item => typeof item.file !== 'undefined',
+        ), // TODO: it needs to be defined to support localfile as `eventchannel`. These doesn't have file property.
+        [LOCALFILE_WINDOWSEVENT_PROP]: localfiles.filter(
+          item =>
+            item.logformat === 'eventchannel' || item.logformat === 'eventlog',
+        ),
+        [LOCALFILE_MACOSEVENT_PROP]: localfiles.filter(
+          item => item.logformat === 'macos',
+        ),
+        [LOCALFILE_JOURNALDT_PROP]: localfiles.filter(
+          item => item.logformat === 'journald',
+        ),
+        [LOCALFILE_COMMANDS_PROP]: localfiles.filter(
+          item =>
+            item.logformat === 'command' || item.logformat === 'full_command',
+        ),
+      },
+    };
 
     const tabsToRender = [
       {

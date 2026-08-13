@@ -17,7 +17,11 @@ import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import withWzConfig from '../util-hocs/wz-config';
-import { isString, renderValueNoThenEnabled } from '../utils/utils';
+import {
+  isString,
+  renderValueNoThenEnabled,
+  reportedEnabled,
+} from '../utils/utils';
 import { wodleBuilder } from '../utils/builders';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
@@ -70,11 +74,7 @@ class WzConfigurationInventory extends Component {
     this.props.updateBadge(this.badgeEnabled());
   }
   badgeEnabled() {
-    return (
-      this.wodleConfig &&
-      this.wodleConfig.syscollector &&
-      this.wodleConfig.syscollector.disabled === 'no'
-    );
+    return reportedEnabled(this.wodleConfig?.syscollector?.disabled, 'no');
   }
   render() {
     const { currentConfig } = this.props;

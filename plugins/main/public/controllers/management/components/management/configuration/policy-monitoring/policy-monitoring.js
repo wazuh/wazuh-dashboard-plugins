@@ -10,10 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import withWzConfig from '../util-hocs/wz-config';
+import { reportedEnabled } from '../utils/utils';
 import WzTabSelector, {
   WzTabSelectorTab,
 } from '../util-components/tab-selector';
@@ -30,11 +31,9 @@ class WzPolicyMonitoring extends Component {
     this.props.updateBadge(this.badgeEnabled());
   }
   badgeEnabled() {
-    return (
-      this.props.currentConfig.fim &&
-      this.props.currentConfig.fim.rootcheck &&
-      this.props.currentConfig.fim.rootcheck.disabled &&
-      this.props.currentConfig.fim.rootcheck.disabled === 'no'
+    return reportedEnabled(
+      this.props.currentConfig?.fim?.rootcheck?.disabled,
+      'no',
     );
   }
   render() {

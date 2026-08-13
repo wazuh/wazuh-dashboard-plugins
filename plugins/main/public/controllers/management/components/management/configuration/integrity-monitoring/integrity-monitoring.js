@@ -10,12 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import withWzConfig from '../util-hocs/wz-config';
 import WzNoConfig from '../util-components/no-config';
-import { isString } from '../utils/utils';
+import { isString, reportedEnabled } from '../utils/utils';
 import WzTabSelector, {
   WzTabSelectorTab,
 } from '../util-components/tab-selector';
@@ -38,61 +38,57 @@ class WzConfigurationIntegrityMonitoring extends Component {
     this.props.updateBadge(this.badgeEnabled());
   }
   badgeEnabled() {
-    return this.props.currentConfig?.fim?.syscheck?.disabled === 'no';
+    return reportedEnabled(
+      this.props.currentConfig?.fim?.syscheck?.disabled,
+      'no',
+    );
   }
 
   render() {
     const { currentConfig, agent } = this.props;
     const agentPlatform = ((agent || {}).os || {}).platform;
+
+    if (isString(currentConfig?.fim)) {
+      return <WzNoConfig error={currentConfig.fim} help={helpLinks} />;
+    }
+
+    /* The report only carries the modules the agent runs, so an absent `fim`
+    is a module that reported nothing, not a fetch that went wrong. */
+    if (!currentConfig?.fim?.syscheck) {
+      return <WzNoConfig error='not-present' help={helpLinks} />;
+    }
+
     return (
-      <Fragment>
-        {currentConfig.fim && isString(currentConfig.fim) && (
-          <WzNoConfig error={currentConfig.fim} help={helpLinks} />
+      <WzTabSelector>
+        <WzTabSelectorTab label='General'>
+          <WzConfigurationIntegrityMonitoringGeneral {...this.props} />
+        </WzTabSelectorTab>
+        <WzTabSelectorTab label='Monitored'>
+          <WzConfigurationIntegrityMonitoringMonitored {...this.props} />
+        </WzTabSelectorTab>
+        <WzTabSelectorTab label='Ignored'>
+          <WzConfigurationIntegrityMonitoringIgnored {...this.props} />
+        </WzTabSelectorTab>
+        <WzTabSelectorTab label='No diff'>
+          <WzConfigurationIntegrityMonitoringNoDiff {...this.props} />
+        </WzTabSelectorTab>
+        {agentPlatform !== 'windows' && (
+          <WzTabSelectorTab label='Who-data'>
+            <WzConfigurationIntegrityMonitoringWhoData {...this.props} />
+          </WzTabSelectorTab>
         )}
-        {currentConfig.fim &&
-          !isString(currentConfig.fim) &&
-          !currentConfig.fim.syscheck && (
-            <WzNoConfig error='not-present' help={helpLinks} />
-          )}
-        {currentConfig.fim &&
-          !isString(currentConfig.fim) &&
-          currentConfig.fim.syscheck && (
-            <WzTabSelector>
-              <WzTabSelectorTab label='General'>
-                <WzConfigurationIntegrityMonitoringGeneral {...this.props} />
-              </WzTabSelectorTab>
-              <WzTabSelectorTab label='Monitored'>
-                <WzConfigurationIntegrityMonitoringMonitored {...this.props} />
-              </WzTabSelectorTab>
-              <WzTabSelectorTab label='Ignored'>
-                <WzConfigurationIntegrityMonitoringIgnored {...this.props} />
-              </WzTabSelectorTab>
-              <WzTabSelectorTab label='No diff'>
-                <WzConfigurationIntegrityMonitoringNoDiff {...this.props} />
-              </WzTabSelectorTab>
-              {agentPlatform !== 'windows' && (
-                <WzTabSelectorTab label='Who-data'>
-                  <WzConfigurationIntegrityMonitoringWhoData {...this.props} />
-                </WzTabSelectorTab>
-              )}
-              <WzTabSelectorTab label='Synchronization'>
-                <WzConfigurationIntegrityMonitoringSynchronization
-                  {...this.props}
-                />
-              </WzTabSelectorTab>
-              <WzTabSelectorTab label='Files limit'>
-                <WzConfigurationIntegrityMonitoringFileLimit {...this.props} />
-              </WzTabSelectorTab>
-              {agentPlatform === 'windows' && (
-                <WzTabSelectorTab label='Registries limit'>
-                  <WzConfigurationIntegrityMonitoringRegistryLimit
-                    {...this.props}
-                  />
-                </WzTabSelectorTab>
-              )}
-            </WzTabSelector>
-          )}
-      </Fragment>
+        <WzTabSelectorTab label='Synchronization'>
+          <WzConfigurationIntegrityMonitoringSynchronization {...this.props} />
+        </WzTabSelectorTab>
+        <WzTabSelectorTab label='Files limit'>
+          <WzConfigurationIntegrityMonitoringFileLimit {...this.props} />
+        </WzTabSelectorTab>
+        {agentPlatform === 'windows' && (
+          <WzTabSelectorTab label='Registries limit'>
+            <WzConfigurationIntegrityMonitoringRegistryLimit {...this.props} />
+          </WzTabSelectorTab>
+        )}
+      </WzTabSelector>
     );
   }
 }

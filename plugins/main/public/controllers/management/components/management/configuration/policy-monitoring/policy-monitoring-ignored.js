@@ -24,59 +24,57 @@ const columnsIgnore = [{ field: 'path', name: 'Path' }];
 
 const columnsIgnoreSregex = [{ field: 'sreg', name: 'Sregex' }];
 
+/* A block declared once is reported as a bare value rather than as a list of
+one, so both shapes have to render. */
+const toList = value => (Array.isArray(value) ? value : value ? [value] : []);
+
 class WzConfigurationPolicyMonitoringSystemAudit extends Component {
   constructor(props) {
     super(props);
   }
   render() {
     const { currentConfig } = this.props;
+    const rootcheck = currentConfig?.fim?.rootcheck;
+
+    if (isString(currentConfig?.fim)) {
+      return <WzNoConfig error={currentConfig.fim} help={helpLinks} />;
+    }
+
+    /* The report only carries the modules the agent runs, so an absent `fim`
+    is a module that reported nothing, not a fetch that went wrong. */
+    if (!rootcheck) {
+      return <WzNoConfig error='not-present' help={helpLinks} />;
+    }
+
+    const ignore = toList(rootcheck.ignore);
+    const ignoreSregex = toList(rootcheck.ignore_sregex);
+
+    if (!ignore.length && !ignoreSregex.length) {
+      return <WzNoConfig error='not-present' help={helpLinks} />;
+    }
+
     return (
-      <Fragment>
-        {currentConfig.fim && isString(currentConfig.fim) && (
-          <WzNoConfig error={currentConfig.fim} help={helpLinks} />
+      <WzConfigurationSettingsHeader
+        title='Ignored files and directories'
+        description='These files and directories are ignored from the rootcheck scan'
+        help={helpLinks}
+      >
+        {ignore.length > 0 && (
+          <Fragment>
+            <EuiBasicTable
+              items={ignore.map(item => ({ path: item }))}
+              columns={columnsIgnore}
+            />
+            <EuiSpacer size='m' />
+          </Fragment>
         )}
-        {currentConfig &&
-          currentConfig.fim &&
-          currentConfig.fim.rootcheck &&
-          (!currentConfig.fim.rootcheck.ignore ||
-            (currentConfig.fim.rootcheck.ignore &&
-              !currentConfig.fim.rootcheck.ignore.length)) && (
-            <WzNoConfig error='not-present' help={helpLinks} />
-          )}
-        {currentConfig &&
-        currentConfig.fim &&
-        currentConfig.fim.rootcheck &&
-        currentConfig.fim.rootcheck.ignore &&
-        currentConfig.fim.rootcheck.ignore.length ? (
-          <WzConfigurationSettingsHeader
-            title='Ignored files and directories'
-            description='These files and directories are ignored from the rootcheck scan'
-            help={helpLinks}
-          >
-            {(currentConfig.fim.rootcheck.ignore || {}).length && (
-              <Fragment>
-                <EuiBasicTable
-                  items={currentConfig.fim.rootcheck.ignore.map(item => ({
-                    path: item,
-                  }))}
-                  columns={columnsIgnore}
-                />
-                <EuiSpacer size='m' />
-              </Fragment>
-            )}
-            {(currentConfig.fim.rootcheck.ignore_sregex || {}).length && (
-              <Fragment>
-                <EuiBasicTable
-                  items={currentConfig.fim.rootcheck.ignore_sregex.map(
-                    item => ({ sreg: item }),
-                  )}
-                  columns={columnsIgnoreSregex}
-                />
-              </Fragment>
-            )}
-          </WzConfigurationSettingsHeader>
-        ) : null}
-      </Fragment>
+        {ignoreSregex.length > 0 && (
+          <EuiBasicTable
+            items={ignoreSregex.map(item => ({ sreg: item }))}
+            columns={columnsIgnoreSregex}
+          />
+        )}
+      </WzConfigurationSettingsHeader>
     );
   }
 }

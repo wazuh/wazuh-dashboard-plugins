@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
 import { EuiTitle, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 
@@ -18,13 +19,13 @@ import WzConfigurationOverviewTable from './util-components/configuration-overvi
 import WzHelpButtonPopover from './util-components/help-button-popover';
 import WzClusterSelect from './util-components/configuration-cluster-selector';
 import WzRefreshClusterInfoButton from './util-components/refresh-cluster-info-button';
+import { AgentReportBadge } from './util-components/agent-report-badge';
 
 import configurationSettingsGroup from './configuration-settings';
 
 import { connect } from 'react-redux';
 import { isString, isFunction } from './utils/utils';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
-import { API_NAME_AGENT_STATUS } from '../../../../../../common/constants';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 
 const columns = [
@@ -98,7 +99,14 @@ class WzConfigurationOverview extends Component {
             </EuiTitle>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiFlexGroup gutterSize='s'>
+            <EuiFlexGroup gutterSize='s' alignItems='center'>
+              {!isManager && (
+                <EuiFlexItem grow={false}>
+                  <AgentReportBadge
+                    modifiedAt={this.props.report?.modifiedAt}
+                  />
+                </EuiFlexItem>
+              )}
               <EuiFlexItem grow={false}>
                 <WzHelpButtonPopover links={helpLinks} />
               </EuiFlexItem>
@@ -161,6 +169,14 @@ class WzConfigurationOverview extends Component {
     );
   }
 }
+
+WzConfigurationOverview.propTypes = {
+  agent: PropTypes.object,
+  report: PropTypes.object,
+  clusterNodes: PropTypes.oneOfType([PropTypes.array, PropTypes.bool]),
+  clusterNodeSelected: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+  updateConfigurationSection: PropTypes.func,
+};
 
 const mapStateToProps = state => ({
   clusterNodes: state.configurationReducers.clusterNodes,

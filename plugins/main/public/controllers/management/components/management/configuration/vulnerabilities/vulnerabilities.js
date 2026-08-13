@@ -19,7 +19,11 @@ import { wodleBuilder } from '../utils/builders';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzNoConfig from '../util-components/no-config';
-import { isString, renderValueYesThenEnabled } from '../utils/utils';
+import {
+  isString,
+  renderValueYesThenEnabled,
+  reportedEnabled,
+} from '../utils/utils';
 import helpLinks from './help-links';
 import { withUserAuthorizationPrompt } from '../../../../../../components/common/hocs';
 
@@ -47,10 +51,9 @@ class WzConfigurationVulnerabilities extends Component {
     this.props.updateBadge(this.badgeEnabled());
   }
   badgeEnabled() {
-    return (
-      this.wodleConfig &&
-      this.wodleConfig['vulnerability-detection'] &&
-      this.wodleConfig['vulnerability-detection'].enabled === 'yes'
+    return reportedEnabled(
+      this.wodleConfig?.['vulnerability-detection']?.enabled,
+      'yes',
     );
   }
 

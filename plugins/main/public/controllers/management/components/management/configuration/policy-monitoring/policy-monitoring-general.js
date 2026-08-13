@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
@@ -40,34 +40,31 @@ class WzConfigurationPolicyMonitoringGeneral extends Component {
   constructor(props) {
     super(props);
   }
+
   render() {
     const { currentConfig } = this.props;
+    const rootcheck = currentConfig?.fim?.rootcheck;
+
+    if (isString(currentConfig?.fim)) {
+      return <WzNoConfig error={currentConfig.fim} help={helpLinks} />;
+    }
+
+    /* The report only carries the modules the agent runs, so an absent `fim`
+    is a module that reported nothing, not a fetch that went wrong. It used to
+    be enough to check that the section was empty, because the Server API
+    answered for every section that was asked for. */
+    if (!rootcheck) {
+      return <WzNoConfig error='not-present' help={helpLinks} />;
+    }
+
     return (
-      <Fragment>
-        {currentConfig.fim && isString(currentConfig.fim) && (
-          <WzNoConfig error={currentConfig.fim} help={helpLinks} />
-        )}
-        {currentConfig.fim &&
-          !isString(currentConfig.fim) &&
-          !currentConfig.fim.rootcheck && (
-            <WzNoConfig error='not-present' help={helpLinks} />
-          )}
-        {((currentConfig.fim &&
-          !isString(currentConfig.fim) &&
-          currentConfig.fim.rootcheck) ||
-          currentConfig['sca']) && (
-          <WzConfigurationSettingsHeader
-            title='All settings'
-            description='General settings for the rootcheck daemon'
-            help={helpLinks}
-          >
-            <WzConfigurationSettingsGroup
-              config={currentConfig.fim.rootcheck}
-              items={allSettings}
-            />
-          </WzConfigurationSettingsHeader>
-        )}
-      </Fragment>
+      <WzConfigurationSettingsHeader
+        title='All settings'
+        description='General settings for the rootcheck daemon'
+        help={helpLinks}
+      >
+        <WzConfigurationSettingsGroup config={rootcheck} items={allSettings} />
+      </WzConfigurationSettingsHeader>
     );
   }
 }
