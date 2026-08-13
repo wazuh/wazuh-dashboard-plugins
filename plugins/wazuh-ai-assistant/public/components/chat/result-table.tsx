@@ -363,9 +363,21 @@ const ProvenanceChip: React.FC<{ chip: ResultTableProvenanceChip }> = ({
         <strong>{chip.toolName}</strong>
       </EuiText>
       <EuiSpacer size='xs' />
-      <EuiCodeBlock language='json' paddingSize='s' fontSize='s' isCopyable>
-        {JSON.stringify(chip.argumentsJson, null, 2)}
-      </EuiCodeBlock>
+      {/* A tool called with no arguments is a real, common case (`get_agents` with no filter means
+          "every agent"), and rendering it as a bare `{}` reads as a failure to capture the query
+          rather than as the query itself — it was reported as a bug on sight. Say it in words; the
+          code block stays for the case where there is something to read and copy. */}
+      {Object.keys(chip.argumentsJson).length === 0 ? (
+        <EuiText size='xs' color='subdued'>
+          {i18n.translate('wazuhAiAssistant.resultTable.provenanceNoArguments', {
+            defaultMessage: 'Called with no parameters.',
+          })}
+        </EuiText>
+      ) : (
+        <EuiCodeBlock language='json' paddingSize='s' fontSize='s' isCopyable>
+          {JSON.stringify(chip.argumentsJson, null, 2)}
+        </EuiCodeBlock>
+      )}
     </EuiPopover>
   );
 };

@@ -280,6 +280,36 @@ describe('ResultTable', () => {
       );
     });
 
+    it('says a parameterless call had no parameters, instead of showing a bare {}', async () => {
+      // A tool called with no arguments is a real and common case: `get_agents` with no filter
+      // means "every agent", and the model issues exactly that. Rendering it as `{}` looked like
+      // the query had failed to be captured rather than like the query itself, and was reported
+      // as a bug the first time it was seen in the UI.
+      render(
+        <ResultTable
+          spec={spec()}
+          provenanceChips={[
+            chip({
+              shortLabel: 'Agents · 90d',
+              toolName: 'get_agents',
+              argumentsJson: {},
+            }),
+          ]}
+        />,
+      );
+
+      fireEvent.click(screen.getByText('Agents · 90d'));
+
+      await waitFor(() =>
+        expect(
+          document.querySelector('.euiPopover__panel-isOpen'),
+        ).not.toBeNull(),
+      );
+      expect(screen.getByText('get_agents')).toBeInTheDocument();
+      expect(screen.getByText(/called with no parameters/i)).toBeInTheDocument();
+      expect(document.querySelector('.euiCodeBlock')).toBeNull();
+    });
+
     it('renders no chip at all when provenanceChips is omitted', () => {
       const { container } = render(<ResultTable spec={spec()} />);
       expect(container.querySelector('.euiBadge[title]')).toBeNull();

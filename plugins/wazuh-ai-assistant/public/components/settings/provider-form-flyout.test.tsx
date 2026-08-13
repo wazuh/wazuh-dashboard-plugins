@@ -605,15 +605,61 @@ describe('ProviderFormFlyout — Model field guidance', () => {
 });
 
 describe('ProviderFormFlyout — type label and tool-support copy corrections', () => {
-  it('does not headline Gemini support under the OpenAI-compatible type', () => {
+  it('names only providers this build actually supports, and separates hosted from local', () => {
+    // Naming a service here is a support claim: it sends an admin off to configure it.
+    //
+    // This assertion previously required that Gemini NOT be named, from a time when Gemini's
+    // OpenAI-compatible endpoint 400'd on every tool round-trip ("Function call is missing a
+    // thought_signature"). That adapter fix has since landed — `vendorExtras` round-trips in
+    // server/providers/openai-compatible.ts, common/types.ts and both route schemas — so the
+    // reason for excluding it is gone and it is named again.
+    //
+    // Groq goes the other way: it was named as a recommended example and was measured returning
+    // 413 across its whole tier, so the UI was sending admins to a provider we knew failed.
+    // "Bedrock-Mantle" is an internal gateway name that should never have shipped in a product
+    // string.
     render(<ProviderFormFlyout {...baseProps} />);
 
-    expect(
-      screen.getByLabelText(
-        /openai-compatible \(openai, bedrock gateway, ollama, lm studio, vllm\.\.\.\)/i,
-      ),
-    ).toBeInTheDocument();
-    expect(screen.queryByLabelText(/gemini/i)).not.toBeInTheDocument();
+    const label = screen.getByLabelText(/openai-compatible/i);
+    expect(label).toBeInTheDocument();
+
+    const description = screen.getByText(/any endpoint that exposes/i);
+    expect(description).toHaveTextContent(/OpenAI/);
+    expect(description).toHaveTextContent(/Gemini/);
+    expect(description).toHaveTextContent(/AWS Bedrock gateway/);
+    // Hosted services and local runtimes are called out as different things, rather than run
+    // together in one comma list where "Ollama" reads like a service you sign up for.
+    expect(description).toHaveTextContent(/local runtimes/i);
+    expect(description).toHaveTextContent(/Ollama/);
+
+    // Scoped to the RECOMMENDATION, not the whole form. Groq is still named in the key-shape hint
+    // ("Groq keys with gsk_") and in two documentation links, and that is deliberate: those are
+    // reference for someone who has already chosen Groq, not an invitation to choose it. The 413
+    // finding was measured on one tier with tool-heavy prompts, which is enough to stop leading
+    // with it and not enough to erase it.
+    expect(description).not.toHaveTextContent(/Groq/);
+    expect(description).not.toHaveTextContent(/Bedrock-Mantle/);
+    expect(screen.queryByText(/Bedrock-Mantle/)).toBeNull();
+  });
+
+  it('offers a tool-calling example model the SELECTED provider can actually serve', () => {
+    // The callout's example was a hardcoded `gpt-4o` chip, shown on every provider type — so an
+    // admin configuring Claude was told GPT-4o was the kind of model to use, and one click filled
+    // the Model field with a value Anthropic cannot serve. The per-type example list two fields
+    // above already had the right answer.
+    render(<ProviderFormFlyout {...baseProps} />);
+    const callout = screen
+      .getByText(/tool calling needs a model/i)
+      .closest('.euiCallOut') as HTMLElement;
+    expect(callout).toHaveTextContent('openai.gpt-oss-120b');
+
+    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
+
+    const anthropicCallout = screen
+      .getByText(/tool calling needs a model/i)
+      .closest('.euiCallOut') as HTMLElement;
+    expect(anthropicCallout).toHaveTextContent('claude-opus-4-8');
+    expect(anthropicCallout).not.toHaveTextContent(/gpt-4o/i);
   });
 
   it('requires tool-calling support and warns about fabricated answers, without naming Claude Sonnet', () => {

@@ -37,12 +37,19 @@ import { PROVIDER_TYPES } from '../../../common/constants';
 import { useDirtyFormState } from '../../hooks/use-dirty-form-state';
 import { ProviderTestOutcome } from './provider-status';
 
+/**
+ * Provider names in this file are a support claim, not decoration: naming a service here sends an
+ * admin off to configure it. Groq and "Bedrock-Mantle" used to appear in the card's description —
+ * Groq was measured failing with a 413 across its whole tier, and Bedrock-Mantle is an internal
+ * gateway name that does not belong in a product string. The enumeration now lives in the
+ * description below (which has room for it) rather than in this label, which was wrapping to two
+ * lines inside the card.
+ */
 const PROVIDER_TYPE_FORM_LABELS: Record<string, string> = {
   openai_compatible: i18n.translate(
     'wazuhAiAssistant.settings.type.openaiCompatible',
     {
-      defaultMessage:
-        'OpenAI-compatible (OpenAI, Bedrock gateway, Ollama, LM Studio, vLLM...)',
+      defaultMessage: 'OpenAI-compatible',
     },
   ),
   anthropic: i18n.translate('wazuhAiAssistant.settings.type.anthropic', {
@@ -64,8 +71,9 @@ const PROVIDER_TYPE_DESCRIPTIONS: Record<ProviderInput['type'], string> = {
     'wazuhAiAssistant.settings.type.openaiCompatibleDescription',
     {
       defaultMessage:
-        'Choose this for OpenAI, Groq, Bedrock-Mantle, or any other provider that exposes ' +
-        'a /chat/completions endpoint.',
+        'For hosted services such as OpenAI, Gemini or an AWS Bedrock gateway, and for local ' +
+        'runtimes such as Ollama, LM Studio or vLLM. Any endpoint that exposes ' +
+        '/chat/completions works.',
     },
   ),
 };
@@ -488,6 +496,9 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   const modelGuidance =
     PROVIDER_MODEL_GUIDANCE[form.type] ??
     PROVIDER_MODEL_GUIDANCE.openai_compatible;
+  // The model the tool-calling callout offers as its clickable example. Falls back only if a type
+  // ever ships with no examples at all; every current type has some.
+  const toolCallingExampleModel = modelGuidance.examples[0] ?? 'gpt-4o';
   const apiKeyGuidance =
     PROVIDER_API_KEY_GUIDANCE[form.type] ??
     PROVIDER_API_KEY_GUIDANCE.openai_compatible;
@@ -1180,16 +1191,24 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     'capability.'
                   }
                   values={{
+                    // The example follows the SELECTED provider type. It used to be a hardcoded
+                    // `gpt-4o`, so an admin configuring Claude was shown a GPT model as the
+                    // tool-calling example and one click filled the Model field with a value that
+                    // provider cannot serve. `modelGuidance.examples` is the same per-type list
+                    // the Examples chips two fields above already use.
                     model: (
                       <EuiBadge
                         color='hollow'
-                        onClick={() => fillModel('gpt-4o')}
+                        onClick={() => fillModel(toolCallingExampleModel)}
                         onClickAriaLabel={i18n.translate(
                           'wazuhAiAssistant.settings.form.toolCallingModelChipAriaLabel',
-                          { defaultMessage: 'Use model gpt-4o' },
+                          {
+                            defaultMessage: 'Use model {model}',
+                            values: { model: toolCallingExampleModel },
+                          },
                         )}
                       >
-                        GPT-4o
+                        {toolCallingExampleModel}
                       </EuiBadge>
                     ),
                   }}
