@@ -633,7 +633,6 @@ describe('ProviderFormFlyout — type label and tool-support copy corrections', 
     );
     expect(helpText.textContent).not.toMatch(/claude sonnet/i);
   });
-
 });
 
 describe('ProviderFormFlyout — curated per-vendor model suggestions', () => {
