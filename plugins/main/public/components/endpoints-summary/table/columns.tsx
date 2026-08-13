@@ -74,13 +74,6 @@ export const agentsTableColumns = (
     searchable: true,
   },
   {
-    field: 'node_name',
-    name: 'Cluster node',
-    sortable: true,
-    show: true,
-    searchable: true,
-  },
-  {
     field: 'version',
     name: 'Version',
     sortable: true,

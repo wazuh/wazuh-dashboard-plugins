@@ -20,7 +20,6 @@ export type Agent = {
   registerIP: string;
   status: string;
   version: string;
-  node_name: string;
   status_code: number;
 };
 

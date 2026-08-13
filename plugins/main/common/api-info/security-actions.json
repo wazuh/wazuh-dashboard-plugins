@@ -20,7 +20,6 @@
     "related_endpoints": [
       "GET /agents",
       "GET /agents/{agent_id}/key",
-      "GET /agents/{agent_id}/daemons/stats",
       "GET /agents/no_group",
       "GET /agents/outdated",
       "GET /agents/stats/distinct",

@@ -254,9 +254,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
               return {
                 ...item,
                 ...(item.ip ? { ip: item.ip } : { ip: '-' }),
-                ...(item.node_name !== 'unknown'
-                  ? { node_name: item.node_name }
-                  : { node_name: '-' }),
                 /*
                   The agent version contains the Wazuh word, this gets the string starting with
                   v<NUMBER><ANYTHING>
@@ -290,10 +287,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                     },
                     { label: 'manager', description: 'filter by manager' },
                     { label: 'name', description: 'filter by name' },
-                    {
-                      label: 'node_name',
-                      description: 'filter by cluster name',
-                    },
                     {
                       label: 'os.name',
                       description: 'filter by operating system name',

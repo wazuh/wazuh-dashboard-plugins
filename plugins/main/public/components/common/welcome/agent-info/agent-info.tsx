@@ -131,15 +131,6 @@ export class AgentInfo extends Component<AgentInfoProps> {
           ),
         },
         {
-          key: 'cluster-node',
-          value:
-            agent.node_name && agent.node_name !== 'unknown'
-              ? agent.node_name
-              : '-',
-          label: 'Cluster node',
-          style: { maxWidth: 100 },
-        },
-        {
           key: 'registration-date',
           value: formatUIDate(agent.dateAdd),
           label: 'Registration date',

@@ -22,7 +22,6 @@ function generateDocument(params) {
     manager: `server${random.int(0, 1000)}`,
     ip: '192.168.1.140',
     id: '001',
-    node_name: 'node01',
     name: `agent${random.int(0, 1000)}`,
     lastKeepAlive: '2025-04-14T17:25:03+00:00',
     status_code: 0,

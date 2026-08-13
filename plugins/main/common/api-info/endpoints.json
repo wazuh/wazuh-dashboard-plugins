@@ -84,14 +84,6 @@
             }
           },
           {
-            "name": "node_name",
-            "description": "Filter by node name",
-            "schema": {
-              "type": "string",
-              "format": "names"
-            }
-          },
-          {
             "name": "offset",
             "description": "First element to return in the collection",
             "schema": {
@@ -233,55 +225,6 @@
             "schema": {
               "type": "string",
               "format": "alphanumeric"
-            }
-          },
-          {
-            "name": "wait_for_complete",
-            "description": "Disable timeout response",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
-        ]
-      },
-      {
-        "name": "/agents/:agent_id/daemons/stats",
-        "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_daemon_stats",
-        "description": "Return Server statistical information from specified daemons in a specified agent",
-        "summary": "Get Server daemon stats from an agent",
-        "tags": ["Agents"],
-        "args": [
-          {
-            "name": ":agent_id",
-            "description": "Agent ID",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 3,
-              "description": "Agent ID",
-              "format": "numbers"
-            }
-          }
-        ],
-        "query": [
-          {
-            "name": "daemons_list",
-            "description": "List of daemon names (separated by comma), all daemons selected by default if not specified",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "enum": ["wazuh-manager-analysisd", "wazuh-manager-remoted"]
-              }
-            }
-          },
-          {
-            "name": "pretty",
-            "description": "Show results in human-readable format",
-            "schema": {
-              "type": "boolean",
-              "default": false
             }
           },
           {
@@ -3501,14 +3444,6 @@
             }
           },
           {
-            "name": "node_name",
-            "description": "Filter by node name",
-            "schema": {
-              "type": "string",
-              "format": "names"
-            }
-          },
-          {
             "name": "os.arch",
             "description": "Filter by OS architecture",
             "schema": {
@@ -3698,14 +3633,6 @@
             "schema": {
               "type": "string",
               "format": "alphanumeric"
-            }
-          },
-          {
-            "name": "node_name",
-            "description": "Filter by node name",
-            "schema": {
-              "type": "string",
-              "format": "names"
             }
           },
           {
@@ -4911,14 +4838,6 @@
             "schema": {
               "type": "string",
               "format": "alphanumeric"
-            }
-          },
-          {
-            "name": "node_name",
-            "description": "Filter by node name",
-            "schema": {
-              "type": "string",
-              "format": "names"
             }
           },
           {
