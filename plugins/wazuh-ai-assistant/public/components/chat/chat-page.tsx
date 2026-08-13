@@ -1740,7 +1740,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             hasShadow={false}
             hasBorder={false}
             borderRadius='none'
-            paddingSize={railDisplayMode === 'collapsed' ? 'xs' : 'm'}
+            paddingSize={railDisplayMode === 'collapsed' ? 's' : 'm'}
             // EuiPanel's `grow` prop DEFAULTS TO TRUE (flex-grow:1), which in this flex-row parent
             // overrode the fixed width below and let the sidebar swallow half the page. A
             // fixed-width pane must explicitly opt out.
