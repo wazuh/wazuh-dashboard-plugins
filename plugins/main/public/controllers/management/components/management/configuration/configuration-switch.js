@@ -61,6 +61,7 @@ import {
   EuiButtonEmpty,
   EuiFlexItem,
   EuiPageBody,
+  EuiProgress,
 } from '@elastic/eui';
 
 import { WzRequest } from '../../../../../react-services/wz-request';
@@ -211,7 +212,7 @@ class WzConfigurationSwitch extends Component {
     const isManager = !agent; // If no agent, it's manager configuration
 
     if (loadingAgentReport) {
-      return <WzLoading />;
+      return <EuiProgress size='xs' color='primary' />;
     }
 
     /* An agent that has never reported has no configuration to page through,
