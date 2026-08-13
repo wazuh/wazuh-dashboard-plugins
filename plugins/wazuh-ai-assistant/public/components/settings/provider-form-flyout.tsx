@@ -1069,7 +1069,9 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 <EuiComboBox
                   placeholder={i18n.translate(
                     'wazuhAiAssistant.settings.form.modelPlaceholder',
-                    { defaultMessage: 'Pick a suggestion or type any model id' },
+                    {
+                      defaultMessage: 'Pick a suggestion or type any model id',
+                    },
                   )}
                   // `asPlainText` keeps this looking and behaving like the free-text field it
                   // replaces (no removable "pill" for the single selected value) — the model id

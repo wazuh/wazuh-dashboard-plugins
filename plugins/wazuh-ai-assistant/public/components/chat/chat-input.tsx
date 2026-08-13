@@ -85,7 +85,8 @@ export const ChatInput = React.forwardRef<ChatInputHandle, ChatInputProps>(
           parseFloat(computed.lineHeight) || FALLBACK_LINE_HEIGHT;
         const paddingTop = parseFloat(computed.paddingTop) || 0;
         const paddingBottom = parseFloat(computed.paddingBottom) || 0;
-        const maxHeight = lineHeight * WZ_COMPOSER_MAX_ROWS + paddingTop + paddingBottom;
+        const maxHeight =
+          lineHeight * WZ_COMPOSER_MAX_ROWS + paddingTop + paddingBottom;
 
         el.style.height = 'auto';
         // A hidden field measures zero. ChatPage stays MOUNTED behind `display: none` while the

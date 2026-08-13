@@ -71,9 +71,7 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
         <React.Fragment key={message.id}>
           <div
             className={
-              message.table
-                ? 'wzMessageRow wzMessageRow--wide'
-                : 'wzMessageRow'
+              message.table ? 'wzMessageRow wzMessageRow--wide' : 'wzMessageRow'
             }
           >
             <MessageBubble
