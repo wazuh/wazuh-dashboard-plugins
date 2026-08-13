@@ -52,7 +52,9 @@ describe('ConversationList', () => {
     expect(
       screen.getByText('How many critical alerts today?'),
     ).toBeInTheDocument();
-    expect(screen.getByText('5 minutes ago')).toBeInTheDocument();
+    // Compact stamp (design: `17h`, `Mon`) — the rail spends this on every row, and the long
+    // form was eating the width the title needs.
+    expect(screen.getByText('5m')).toBeInTheDocument();
 
     jest.restoreAllMocks();
   });

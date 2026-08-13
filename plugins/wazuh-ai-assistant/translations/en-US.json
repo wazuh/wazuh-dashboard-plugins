@@ -190,6 +190,9 @@
     "wazuhAiAssistant.settings.rowDetail.noResult": "This provider has not been tested yet.",
     "wazuhAiAssistant.settings.rowDetail.reason": "Reason",
     "wazuhAiAssistant.settings.form.modelPlaceholder": "Pick a suggestion or type any model id",
-    "wazuhAiAssistant.settings.form.modelCustomOptionText": "Add {token} as a custom model"
+    "wazuhAiAssistant.settings.form.modelCustomOptionText": "Add {token} as a custom model",
+    "wazuhAiAssistant.chat.conversations.justNow": "now",
+    "wazuhAiAssistant.chat.conversations.minutesShort": "{count}m",
+    "wazuhAiAssistant.chat.conversations.hoursShort": "{count}h"
   }
 }

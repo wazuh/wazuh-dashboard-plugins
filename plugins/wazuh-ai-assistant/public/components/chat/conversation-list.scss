@@ -43,6 +43,19 @@
   flex-direction: column;
   height: 100%;
   min-height: 0;
+  /* The rail itself never scrolls in either axis: its list child does (below). Horizontal scroll in
+     particular was pure noise — a row overflowed its 260px column by a few pixels and earned a
+     second scrollbar for it, against a design whose whole point is that the rail is dense and
+     quiet. */
+  overflow: hidden;
+}
+
+/** The one scrolling region in the rail, so the header (new conversation + search) and the pinned
+  * Collapse control stay put while a long history scrolls between them. */
+.wzConvoRailScroll {
+  @include wzScrollChild;
+  flex: 1 1 auto;
+  overflow-x: hidden;
 }
 
 .wzConvoRailCollapsed {

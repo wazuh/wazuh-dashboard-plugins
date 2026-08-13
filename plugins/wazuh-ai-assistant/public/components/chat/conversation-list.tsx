@@ -52,40 +52,50 @@ interface ConversationListProps {
  * this API).
  */
 function formatRelativeTime(iso: string): string {
-  const target = new Date(iso).getTime();
-  if (Number.isNaN(target)) {
+  const target = new Date(iso);
+  if (Number.isNaN(target.getTime())) {
     return '';
   }
-  const diffSeconds = Math.round((target - Date.now()) / 1000);
-  const absSeconds = Math.abs(diffSeconds);
+  const diffSeconds = Math.round((Date.now() - target.getTime()) / 1000);
 
-  const units: Array<{ unit: Intl.RelativeTimeFormatUnit; seconds: number }> = [
-    { unit: 'year', seconds: 31536000 },
-    { unit: 'month', seconds: 2592000 },
-    { unit: 'day', seconds: 86400 },
-    { unit: 'hour', seconds: 3600 },
-    { unit: 'minute', seconds: 60 },
-  ];
-
-  let chosenUnit: Intl.RelativeTimeFormatUnit = 'second';
-  let value = diffSeconds;
-  for (const { unit, seconds } of units) {
-    if (absSeconds >= seconds) {
-      chosenUnit = unit;
-      value = Math.round(diffSeconds / seconds);
-      break;
-    }
+  // Compact by design: the rail spends this stamp on EVERY row, and a full "21 hours ago" ate so
+  // much of a 260px rail that titles truncated to about ten characters — the "undense rail" gap
+  // this redesign exists to close. The reference writes them as `17h`, `Mon`, `Jul 26`, which is
+  // the same information in a quarter of the width, so the title gets the rest.
+  if (diffSeconds < 60) {
+    return i18n.translate('wazuhAiAssistant.chat.conversations.justNow', {
+      defaultMessage: 'now',
+    });
+  }
+  if (diffSeconds < 3600) {
+    return i18n.translate('wazuhAiAssistant.chat.conversations.minutesShort', {
+      defaultMessage: '{count}m',
+      values: { count: Math.floor(diffSeconds / 60) },
+    });
+  }
+  if (diffSeconds < 86400) {
+    return i18n.translate('wazuhAiAssistant.chat.conversations.hoursShort', {
+      defaultMessage: '{count}h',
+      values: { count: Math.floor(diffSeconds / 3600) },
+    });
   }
 
+  const locale =
+    typeof i18n.getLocale === 'function' ? i18n.getLocale() : undefined;
   try {
-    const locale =
-      typeof i18n.getLocale === 'function' ? i18n.getLocale() : undefined;
-    return new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(
-      value,
-      chosenUnit,
-    );
+    // Inside a week a weekday name is more useful than "6d" (an analyst thinks in "Monday"), past
+    // that a weekday is ambiguous, so it becomes a date — mirroring the date-group headers above.
+    if (diffSeconds < 7 * 86400) {
+      return new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(
+        target,
+      );
+    }
+    return new Intl.DateTimeFormat(locale, {
+      month: 'short',
+      day: 'numeric',
+    }).format(target);
   } catch {
-    return new Date(iso).toLocaleString();
+    return target.toLocaleDateString();
   }
 }
 
@@ -424,7 +434,11 @@ export const ConversationList: React.FC<ConversationListProps> = ({
       />
       <EuiSpacer size='m' />
 
-      {filteredConversations.length === 0 ? (
+      {/* Only this section scrolls (`.wzConvoRailScroll`): with the whole rail scrolling instead,
+          a long history pushed the pinned "Collapse" control below the fold and put a second
+          scrollbar around the search field that never needed one. */}
+      <div className='wzConvoRailScroll'>
+        {filteredConversations.length === 0 ? (
         <EuiText size='xs' color='subdued'>
           <p>
             {searchTerm.trim()
@@ -560,7 +574,8 @@ export const ConversationList: React.FC<ConversationListProps> = ({
             })}
           </React.Fragment>
         ))
-      )}
+        )}
+      </div>
 
       {displayMode === 'expanded' && (
         <>

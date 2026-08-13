@@ -1815,7 +1815,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   ? RAIL_COLLAPSED_WIDTH
                   : CONVERSATION_SIDEBAR_WIDTH,
               flexShrink: 0,
-              overflowY: 'auto',
+              minWidth: 0,
+              // `.wzConvoRail`'s own list child scrolls (conversation-list.scss); the panel
+              // scrolling too is what produced a second, horizontal scrollbar and pushed the
+              // pinned Collapse control below the fold.
+              overflow: 'hidden',
               // `--wz-hairline` (chat-page.scss, sourced from `$euiBorderColor`) replaces the old
               // hardcoded `#D3DAE6` — that hex was EUI's light-theme `lightShade` token with no
               // dark-mode counterpart, so it rendered as the brightest edge on the page in dark mode.

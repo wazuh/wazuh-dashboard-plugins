@@ -182,9 +182,17 @@
      transcript's own scroll rather than pushing into the composer". */
   flex: 1 1 auto;
   min-height: 0;
-  display: grid;
-  place-content: center;
-  justify-items: center;
+  /* Flex column, NOT `display: grid; place-content: center`. On a grid container `place-content`
+     also sets `justify-content: center`, which packs the column track at its CONTENT width instead
+     of stretching it — measured live at 441px inside a 1060px measure, which collapsed the example
+     cards' own `auto-fit` grid to a single column. That is why the welcome read as variation 1c
+     (a prompt list) rather than the 1a card group that was chosen: the cards never had the width to
+     sit 3-up. Vertical centring is `justify-content` here; `align-items: stretch` keeps the group
+     at the full measure. */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
   width: 100%;
 }
 
