@@ -1,9 +1,10 @@
+import { API_NAME_AGENT_STATUS } from '../../../../../../common/constants';
+
 /**
- * Theme-aware replacements for `UI_COLOR_STATUS` (`common/constants.ts`), scoped to the
- * home-overview visualizations. Each value is a CSS custom property defined on `.wzHomeOverview`
- * (see `../home-overview.scss`) rather than a frozen hex literal, so it resolves to the correct
- * light/dark color per OSD's `theme:darkMode` setting instead of staying fixed regardless of
- * theme.
+ * Theme-aware replacements for `UI_COLOR_STATUS` (`common/constants.ts`). Each value is a CSS
+ * custom property defined on `:root` (see `public/styles/theme-colors.scss`) rather than a
+ * frozen hex literal, so it resolves to the correct light/dark color per OSD's `theme:darkMode`
+ * setting instead of staying fixed regardless of theme.
  */
 export const HOME_OVERVIEW_COLOR = {
   success: 'var(--wz-ho-success)',
@@ -39,4 +40,16 @@ export const HOME_OVERVIEW_COLOR_TINT = {
 export const HOME_OVERVIEW_CHROME = {
   trackBackground: 'var(--wz-ho-track-background)',
   hairline: `1px solid var(--wz-ho-hairline)`,
+} as const;
+
+/**
+ * Agent-status colors, aligned with the "Findings (last 24 hours)" severity colors so both
+ * visualizations read as one palette: Active↔Low, Disconnected↔Critical, Pending↔High. Used by
+ * both the Home page "Agents by status" bar and the Endpoint Summary "Agents by status" chart.
+ */
+export const HOME_OVERVIEW_AGENT_STATUS_COLOR = {
+  [API_NAME_AGENT_STATUS.ACTIVE]: HOME_OVERVIEW_COLOR.success,
+  [API_NAME_AGENT_STATUS.DISCONNECTED]: HOME_OVERVIEW_COLOR.danger,
+  [API_NAME_AGENT_STATUS.PENDING]: HOME_OVERVIEW_COLOR.warning,
+  [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: HOME_OVERVIEW_COLOR.disabled,
 } as const;

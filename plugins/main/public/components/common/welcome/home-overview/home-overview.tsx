@@ -1,6 +1,5 @@
 import React from 'react';
 import { EuiPage, EuiPageBody, EuiSpacer } from '@elastic/eui';
-import './home-overview.scss';
 import { SectionHeader } from './components/common';
 import { QuickAccessMenu } from './components/quick-access';
 import { OverviewSection } from './components/overview';

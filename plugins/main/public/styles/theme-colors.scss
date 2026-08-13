@@ -1,16 +1,19 @@
 /**
- * Theme-aware color tokens for the home-overview visualizations (score gauges, severity bars,
- * bar lists, status tiles). Every value below is a `$oui*` SASS variable, so OSD's per-theme
+ * App-wide theme-aware color tokens (score gauges, severity bars, bar lists, status tiles,
+ * agent-status visualizations). Every value below is a `$oui*` SASS variable, so OSD's per-theme
  * style compile (it builds each plugin's stylesheet once per theme tag) resolves this block to
  * the right light/dark hex automatically — no JS branch on `theme:darkMode` needed. Components
- * read the custom properties through `lib/theme-colors.ts` instead of the frozen hex literals in
- * `common/constants.ts`'s `UI_COLOR_STATUS`.
+ * read the custom properties through `components/common/welcome/home-overview/lib/theme-colors.ts`
+ * instead of the frozen hex literals in `common/constants.ts`'s `UI_COLOR_STATUS`.
  *
  * `*-text` variants use OUI's own `makeHighContrastColor`-derived tokens (`$ouiColor*Text`),
  * boosted for AA contrast against the page background — used wherever a status color renders as
  * text rather than a bar/tile fill.
+ *
+ * Declared on `:root` (rather than scoped to a single page's wrapper class) so any page can
+ * consume these tokens, not just the Home Overview page.
  */
-.wzHomeOverview {
+:root {
   --wz-ho-success: #{$ouiColorSuccess};
   --wz-ho-danger: #{$ouiColorDanger};
   --wz-ho-warning: #{$ouiColorWarning};
