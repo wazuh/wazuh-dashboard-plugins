@@ -84,12 +84,24 @@ const PROVIDER_TYPE_DESCRIPTIONS: Record<ProviderInput['type'], string> = {
  */
 const PROVIDER_API_KEY_GUIDANCE: Record<
   ProviderInput['type'],
-  { help: string; keyPattern?: RegExp; shapeWarning?: string }
+  {
+    requirement: string;
+    help: string;
+    keyPattern?: RegExp;
+    shapeWarning?: string;
+  }
 > = {
   anthropic: {
+    requirement: i18n.translate(
+      'wazuhAiAssistant.settings.form.apiKeyRequirementAnthropic',
+      {
+        defaultMessage:
+          'Required. Stored encrypted at rest if an encryption key is configured.',
+      },
+    ),
     help: i18n.translate('wazuhAiAssistant.settings.form.apiKeyHelpAnthropic', {
       defaultMessage:
-        'Create a key at console.anthropic.com -> API Keys. Anthropic keys start with sk-ant-.',
+        'Create a key at console.anthropic.com, under API Keys. Anthropic keys start with sk-ant-.',
     }),
     keyPattern: /^sk-ant-/,
     shapeWarning: i18n.translate(
@@ -102,13 +114,20 @@ const PROVIDER_API_KEY_GUIDANCE: Record<
     ),
   },
   openai_compatible: {
+    requirement: i18n.translate(
+      'wazuhAiAssistant.settings.form.apiKeyRequirementOpenaiCompatible',
+      {
+        defaultMessage:
+          'Optional. A local endpoint without authentication, such as Ollama, needs no key. ' +
+          'Stored encrypted at rest if an encryption key is configured.',
+      },
+    ),
     help: i18n.translate(
       'wazuhAiAssistant.settings.form.apiKeyHelpOpenaiCompatible',
       {
         defaultMessage:
-          "Create a key in your provider's console (e.g. OpenAI, Groq). OpenAI keys start " +
-          'with sk-, Groq keys with gsk_ — other gateways (e.g. Bedrock-Mantle) use their own ' +
-          'format.',
+          'Create a key in your provider console. OpenAI keys start with sk-, Groq keys with ' +
+          'gsk_. Other gateways use their own format.',
       },
     ),
     // No shape check for this type — see the doc comment above.
@@ -742,16 +761,6 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     },
                   )}
                 </p>
-                <p>
-                  {i18n.translate(
-                    'wazuhAiAssistant.settings.form.gettingStartedTestCaveat',
-                    {
-                      defaultMessage:
-                        'A green test confirms connection and key — it does not guarantee ' +
-                        'every chat request will succeed.',
-                    },
-                  )}
-                </p>
               </EuiCallOut>
               <EuiSpacer size='m' />
             </>
@@ -837,27 +846,22 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     }
                     helpText={
                       <>
+                        {/* Editing shares one line across both types (the only thing that matters
+                            then is that an empty field keeps the stored key); creating takes the
+                            per-type line, because "optional" is true for openai_compatible and
+                            false for anthropic, and the old shared copy told an admin adding a
+                            Claude provider that the key was optional and cited Ollama at them. */}
                         <p>
                           {editingProvider
                             ? i18n.translate(
                                 'wazuhAiAssistant.settings.form.apiKeyHelpEditing',
                                 {
                                   defaultMessage:
-                                    'Leave empty to keep the current key. Optional for endpoints ' +
-                                    "that don't require authentication (e.g. a local Ollama " +
-                                    'server without auth) — stored encrypted at rest when an ' +
-                                    'encryption key is configured.',
+                                    'Leave empty to keep the current key. Stored encrypted at ' +
+                                    'rest if an encryption key is configured.',
                                 },
                               )
-                            : i18n.translate(
-                                'wazuhAiAssistant.settings.form.apiKeyHelpCreate',
-                                {
-                                  defaultMessage:
-                                    "Optional for endpoints that don't require authentication " +
-                                    '(e.g. a local Ollama server without auth) — stored encrypted ' +
-                                    'at rest when an encryption key is configured.',
-                                },
-                              )}
+                            : apiKeyGuidance.requirement}
                         </p>
                         <p>{apiKeyGuidance.help}</p>
                       </>
@@ -1229,20 +1233,9 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                         )
                   }
                 >
-                  {testOutcome.status === 'ok' ? (
-                    <p>
-                      {i18n.translate(
-                        'wazuhAiAssistant.settings.form.gettingStartedTestCaveat',
-                        {
-                          defaultMessage:
-                            'A green test confirms connection and key — it does not guarantee ' +
-                            'every chat request will succeed.',
-                        },
-                      )}
-                    </p>
-                  ) : (
-                    <p>{testOutcome.message}</p>
-                  )}
+                  {/* Success needs no body: the title already carries the latency, which is the
+                      whole result. Only a failure has something more to say. */}
+                  {testOutcome.status !== 'ok' && <p>{testOutcome.message}</p>}
                 </EuiCallOut>
               </>
             )}

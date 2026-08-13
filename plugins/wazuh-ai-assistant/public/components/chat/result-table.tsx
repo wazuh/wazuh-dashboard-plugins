@@ -660,7 +660,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
       ? i18n.translate('wazuhAiAssistant.resultTable.hiddenColumnsNote', {
           defaultMessage:
             ' (+{count, plural, one {# more field} other {# more fields}}' +
-            ' per row — expand a row to see them)',
+            ' per row. Expand a row to see them.)',
           values: { count: hiddenColumnCount },
         })
       : '');

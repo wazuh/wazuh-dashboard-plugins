@@ -1636,7 +1636,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   'wazuhAiAssistant.settings.retention.daysHelp',
                   {
                     defaultMessage:
-                      '0 keeps every saved conversation forever. Enforcement happens only when the conversation list is loaded — there is no scheduled background cleanup.',
+                      '0 keeps every saved conversation forever. Enforcement happens when the conversation list is loaded. There is no scheduled background cleanup.',
                   },
                 )}
               >

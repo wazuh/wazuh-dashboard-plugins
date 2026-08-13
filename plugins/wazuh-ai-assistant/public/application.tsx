@@ -97,13 +97,27 @@ const App: React.FC<{
     };
     measure();
     window.addEventListener('resize', measure);
-    // The global header changes height when it expands, which moves the frame without resizing the
-    // window. Guarded because jsdom has no ResizeObserver: there the initial measure is enough.
+    // Guarded because jsdom has no ResizeObserver: there the initial measure is enough.
     const observer =
       typeof ResizeObserver === 'undefined'
         ? null
         : new ResizeObserver(() => measure());
-    observer?.observe(document.body);
+    // The whole ancestor chain, NOT just `document.body`. Anything that appears above the app after
+    // mount — a global banner, `wazuh-check-updates`' own update notice, which renders when its
+    // async check returns — pushes the frame down without changing body's box at all, so a
+    // body-only observer never fires and the height stays at whatever it was measured as on mount.
+    // Measured live: 60px of extra chrome moved the frame's top from 49 to 109 while the height
+    // stayed `calc(100dvh - 49px)`, putting the composer 60px BELOW the bottom of the screen. Some
+    // ancestor's box grows in any layout where a banner actually pushes content down, so observing
+    // the chain is what turns that into a re-measure. The loop reaches `document.body` and
+    // `documentElement` on its way up, so they need no separate registration.
+    for (
+      let ancestor: HTMLElement | null = node.parentElement;
+      ancestor;
+      ancestor = ancestor.parentElement
+    ) {
+      observer?.observe(ancestor);
+    }
     return () => {
       window.removeEventListener('resize', measure);
       observer?.disconnect();

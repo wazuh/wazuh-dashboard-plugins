@@ -2142,7 +2142,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                       'wazuhAiAssistant.chat.conversations.mergedNotice.body',
                       {
                         defaultMessage:
-                          'This conversation was also updated in another tab — the versions were merged.',
+                          'This conversation was also updated in another tab. The versions were merged.',
                       },
                     )}
                   />

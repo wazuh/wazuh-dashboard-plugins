@@ -193,6 +193,9 @@
     "wazuhAiAssistant.settings.form.modelCustomOptionText": "Añadir {token} como modelo personalizado",
     "wazuhAiAssistant.chat.conversations.justNow": "ahora",
     "wazuhAiAssistant.chat.conversations.minutesShort": "{count} min",
-    "wazuhAiAssistant.chat.conversations.hoursShort": "{count} h"
+    "wazuhAiAssistant.chat.conversations.hoursShort": "{count} h",
+    "wazuhAiAssistant.settings.form.apiKeyRequirementAnthropic": "Obligatoria. Se almacena cifrada si hay una clave de cifrado configurada.",
+    "wazuhAiAssistant.settings.form.apiKeyRequirementOpenaiCompatible": "Opcional. Un endpoint local sin autenticación, como Ollama, no necesita clave. Se almacena cifrada si hay una clave de cifrado configurada.",
+    "wazuhAiAssistant.settings.form.apiKeyHelpEditing": "Déjalo vacío para conservar la clave actual. Se almacena cifrada si hay una clave de cifrado configurada."
   }
 }

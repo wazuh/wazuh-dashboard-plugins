@@ -51,14 +51,24 @@ describe('ProviderFormFlyout — create mode', () => {
     expect(screen.getByLabelText(/^name/i)).toHaveValue('');
   });
 
-  it('clarifies the API key is optional for auth-free endpoints and encrypted at rest', () => {
+  it('states the key requirement for the SELECTED provider type, not one line for both', () => {
+    // One shared line used to serve both types, so an admin adding a Claude provider was told the
+    // key was "optional for endpoints that don't require authentication (e.g. a local Ollama
+    // server without auth)": three claims, none of them true of Anthropic, on the very form the
+    // CEO already found confusing to sign an Anthropic key up on.
     render(<ProviderFormFlyout {...baseProps} />);
 
-    expect(
-      screen.getByText(
-        /optional for endpoints that don't require authentication/i,
-      ),
-    ).toBeInTheDocument();
+    // openai_compatible is the default selection: optional, and Ollama is a real example here.
+    expect(screen.getByText(/^Optional\./)).toBeInTheDocument();
+    expect(screen.getByText(/stored encrypted at rest/i)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
+
+    expect(screen.getByText(/^Required\./)).toBeInTheDocument();
+    expect(screen.queryByText(/^Optional\./)).toBeNull();
+    // Matched on a phrase unique to the requirement line: a bare /Ollama/ would also hit the
+    // openai_compatible TYPE CARD's own label, which stays on screen in both selections.
+    expect(screen.queryByText(/such as Ollama, needs no key/i)).toBeNull();
     expect(screen.getByText(/stored encrypted at rest/i)).toBeInTheDocument();
   });
 
@@ -392,7 +402,7 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
     fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
 
     expect(
-      screen.getByText(/console\.anthropic\.com -> api keys/i),
+      screen.getByText(/console\.anthropic\.com, under api keys/i),
     ).toBeInTheDocument();
     expect(screen.getByText(/sk-ant-/)).toBeInTheDocument();
   });
@@ -624,15 +634,6 @@ describe('ProviderFormFlyout — type label and tool-support copy corrections', 
     expect(helpText.textContent).not.toMatch(/claude sonnet/i);
   });
 
-  it('caveats that a green test does not guarantee every chat request will succeed', () => {
-    render(<ProviderFormFlyout {...baseProps} />);
-
-    expect(
-      screen.getByText(
-        /a green test confirms connection and key — it does not guarantee every chat request will succeed/i,
-      ),
-    ).toBeInTheDocument();
-  });
 });
 
 describe('ProviderFormFlyout — curated per-vendor model suggestions', () => {

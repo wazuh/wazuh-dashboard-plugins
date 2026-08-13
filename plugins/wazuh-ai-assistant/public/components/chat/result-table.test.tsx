@@ -511,7 +511,7 @@ describe('ResultTable', () => {
       render(<ResultTable spec={eightColumnSpec()} />);
       expect(
         screen.getByText(
-          'Results (1 rows) (+2 more fields per row — expand a row to see them)',
+          'Results (1 rows) (+2 more fields per row. Expand a row to see them.)',
         ),
       ).toBeInTheDocument();
     });
