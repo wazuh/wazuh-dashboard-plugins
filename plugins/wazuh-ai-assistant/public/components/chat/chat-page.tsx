@@ -1905,31 +1905,31 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 changes no layout. */}
               <div className='wzConvoRailFlyout'>
                 <EuiFlyoutBody>
-                <ConversationList
-                  conversations={conversations}
-                  isLoading={isLoadingConversations}
-                  activeConversationId={activeConversationId}
-                  onSelect={id => {
-                    if (id === activeConversationIdRef.current) {
-                      setIsRailFlyoutOpen(false);
-                      return;
+                  <ConversationList
+                    conversations={conversations}
+                    isLoading={isLoadingConversations}
+                    activeConversationId={activeConversationId}
+                    onSelect={id => {
+                      if (id === activeConversationIdRef.current) {
+                        setIsRailFlyoutOpen(false);
+                        return;
+                      }
+                      void confirmIfGenerating(() => {
+                        void handleSelectConversation(id);
+                        setIsRailFlyoutOpen(false);
+                      });
+                    }}
+                    onNewConversation={() =>
+                      void confirmIfGenerating(() => {
+                        handleNewConversation();
+                        setIsRailFlyoutOpen(false);
+                      })
                     }
-                    void confirmIfGenerating(() => {
-                      void handleSelectConversation(id);
-                      setIsRailFlyoutOpen(false);
-                    });
-                  }}
-                  onNewConversation={() =>
-                    void confirmIfGenerating(() => {
-                      handleNewConversation();
-                      setIsRailFlyoutOpen(false);
-                    })
-                  }
-                  onDelete={handleDeleteConversation}
-                  displayMode='flyout'
-                  onCollapse={handleRailCollapse}
-                  onExpand={handleRailExpand}
-                />
+                    onDelete={handleDeleteConversation}
+                    displayMode='flyout'
+                    onCollapse={handleRailCollapse}
+                    onExpand={handleRailExpand}
+                  />
                 </EuiFlyoutBody>
               </div>
             </EuiFlyout>

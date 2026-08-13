@@ -103,7 +103,6 @@ $wzSettingsCardPillHeight: $wzSettingsCardPillLineHeight +
   &--pending {
     @include wzStatusChip($euiColorMediumShade, $euiColorDarkShade);
   }
-
 }
 
 /* Deliberately NOT nested in the block above: the spinner is a CHILD of the badge and carries only
