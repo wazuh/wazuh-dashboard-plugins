@@ -260,6 +260,9 @@ const App: React.FC<{
                     >
                       <SettingsPage
                         core={core}
+                        // The hidden tab must not keep a portalled flyout on screen — see the
+                        // prop's own doc comment.
+                        isActive={isSettings}
                         onProvidersChanged={refreshProviders}
                         autoOpenCreateForm={autoOpenCreateProvider}
                         onCreateFormOpenChange={open => {

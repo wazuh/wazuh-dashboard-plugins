@@ -380,3 +380,30 @@ describe('SettingsPage — auto-open create-provider flyout (?addProvider=true)'
     expect(onOpenChange).not.toHaveBeenCalled();
   });
 });
+
+describe('SettingsPage — the hidden tab must not keep a flyout on screen', () => {
+  it('does not render the provider flyout while the Chat tab is the visible one', async () => {
+    // The page stays mounted behind `display: none` so it keeps its state, but EuiFlyout portals to
+    // document.body where no ancestor's `display: none` can reach it — so the flyout floated over
+    // the chat surface after switching tabs with it open.
+    const { rerender } = render(
+      <SettingsPage
+        core={coreMock}
+        onProvidersChanged={jest.fn()}
+        autoOpenCreateForm={true}
+      />,
+    );
+    expect(await screen.findByLabelText(/^name\s*\*?$/i)).toBeInTheDocument();
+
+    rerender(
+      <SettingsPage
+        core={coreMock}
+        onProvidersChanged={jest.fn()}
+        autoOpenCreateForm={true}
+        isActive={false}
+      />,
+    );
+
+    expect(screen.queryByLabelText(/^name\s*\*?$/i)).toBeNull();
+  });
+});

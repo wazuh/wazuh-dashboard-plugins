@@ -85,6 +85,14 @@ interface SettingsPageProps {
   core: CoreStart;
   /** Lets the top-level app shell refresh its own provider list/selection after a CRUD action. */
   onProvidersChanged: () => void;
+  /**
+   * False while the Chat tab is the visible one. This page stays MOUNTED behind `display: none`
+   * (application.tsx) so it keeps its state across tab switches — but an `EuiFlyout` renders through
+   * a PORTAL attached to document.body, which no ancestor's `display: none` can hide. Without this,
+   * opening the provider flyout and switching to Chat left the flyout floating over the chat
+   * surface. Defaults to true so every other call site is unaffected.
+   */
+  isActive?: boolean;
   /** True while the URL carries `?addProvider=true`: opens the create-provider flyout. */
   autoOpenCreateForm?: boolean;
   onCreateFormOpenChange?: (open: boolean) => void;
@@ -283,6 +291,7 @@ const ProviderRowDetail: React.FC<{
 export const SettingsPage: React.FC<SettingsPageProps> = ({
   core,
   onProvidersChanged,
+  isActive = true,
   autoOpenCreateForm,
   onCreateFormOpenChange,
 }) => {
@@ -1660,7 +1669,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           )}
         </SectionCard>
       </EuiPageBody>
-      {isFormOpen && (
+      {isFormOpen && isActive && (
         <ProviderFormFlyout
           editingProvider={editingProvider}
           error={error}
