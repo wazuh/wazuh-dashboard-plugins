@@ -348,6 +348,26 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   // attached its "is the user near the bottom" listener to the wrong element and could fight
   // this one).
   const scrollPaneRef = useRef<HTMLDivElement | null>(null);
+
+  // Height of the transcript pane, published so ResultTable can step its page size 5 -> 10 above
+  // 900px (layout contract §4). MessageList/MessageBubble already thread this down; nothing was
+  // measuring it, so the taller page size was unreachable. Measured rather than derived from the
+  // window: the pane is what the rows have to fit inside, and it changes with the composer's own
+  // height, not just with the viewport. Guarded because jsdom has no ResizeObserver — there the
+  // value stays 0 and the default page size applies, which is what the existing tests expect.
+  const [transcriptHeightPx, setTranscriptHeightPx] = useState(0);
+  useEffect(() => {
+    const pane = scrollPaneRef.current;
+    if (!pane || typeof ResizeObserver === 'undefined') {
+      return;
+    }
+    const observer = new ResizeObserver(() =>
+      setTranscriptHeightPx(pane.clientHeight),
+    );
+    observer.observe(pane);
+    setTranscriptHeightPx(pane.clientHeight);
+    return () => observer.disconnect();
+  }, []);
   const pinnedToBottomRef = useRef(true);
   const handleScrollPane = () => {
     const pane = scrollPaneRef.current;
@@ -1732,6 +1752,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 defaultMessage: 'Saved conversations',
               },
             )}
+            // `wzConvoRail` (conversation-list.scss) makes this panel a full-height flex column,
+            // which is what lets the rail's "Collapse" control pin itself to the bottom instead of
+            // simply following the last conversation.
+            className='wzConvoRail'
             style={{
               width:
                 railDisplayMode === 'collapsed'
@@ -2209,6 +2233,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
               {!showLoadingState && !showNoProviderState && !showWelcomeState && (
                 <MessageList
+                  transcriptHeightPx={transcriptHeightPx}
                   messages={messages}
                   resolveDiscoverUrl={resolveDiscoverUrl}
                   resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}

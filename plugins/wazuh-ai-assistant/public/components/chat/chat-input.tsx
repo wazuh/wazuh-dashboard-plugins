@@ -79,19 +79,44 @@ export const ChatInput = React.forwardRef<ChatInputHandle, ChatInputProps>(
       if (!el) {
         return;
       }
-      const computed = window.getComputedStyle(el);
-      const lineHeight =
-        parseFloat(computed.lineHeight) || FALLBACK_LINE_HEIGHT;
-      const paddingTop = parseFloat(computed.paddingTop) || 0;
-      const paddingBottom = parseFloat(computed.paddingBottom) || 0;
-      const maxHeight = lineHeight * MAX_ROWS + paddingTop + paddingBottom;
+      const resize = () => {
+        const computed = window.getComputedStyle(el);
+        const lineHeight =
+          parseFloat(computed.lineHeight) || FALLBACK_LINE_HEIGHT;
+        const paddingTop = parseFloat(computed.paddingTop) || 0;
+        const paddingBottom = parseFloat(computed.paddingBottom) || 0;
+        const maxHeight = lineHeight * MAX_ROWS + paddingTop + paddingBottom;
 
-      el.style.height = 'auto';
-      const nextHeight = Math.min(el.scrollHeight, maxHeight);
-      el.style.height = `${nextHeight}px`;
-      // Past the cap the field scrolls internally rather than growing further; below it there is
-      // nothing to scroll, so overflow stays hidden (no phantom scrollbar on a two-line field).
-      el.style.overflowY = el.scrollHeight > maxHeight ? 'auto' : 'hidden';
+        el.style.height = 'auto';
+        // A hidden field measures zero. ChatPage stays MOUNTED behind `display: none` while the
+        // Settings tab is visible (application.tsx), so landing on `#/settings` and switching to
+        // Chat would otherwise write `height: 0px` here and leave it there — the field renders as a
+        // padding-only sliver with the placeholder clipped, until the first keystroke changes
+        // `value` and re-runs this. Restoring the floor and bailing keeps `rows={1}` in charge until
+        // the field is really laid out. (jsdom reports 0 for every element, so this is also the
+        // branch every unit test takes.)
+        if (el.scrollHeight === 0) {
+          el.style.height = '';
+          return;
+        }
+        const nextHeight = Math.min(el.scrollHeight, maxHeight);
+        el.style.height = `${nextHeight}px`;
+        // Past the cap the field scrolls internally rather than growing further; below it there is
+        // nothing to scroll, so overflow stays hidden (no phantom scrollbar on a two-line field).
+        el.style.overflowY = el.scrollHeight > maxHeight ? 'auto' : 'hidden';
+      };
+
+      resize();
+      // Wrapped-line count depends on WIDTH, which changes without `value` changing: the rail
+      // collapses at 1100px, the window resizes, the user zooms. Without this the inline height and
+      // the overflow flag both go stale, and a message that has grown to five lines gets clipped
+      // under `overflow: hidden`. Guarded because jsdom has no ResizeObserver.
+      if (typeof ResizeObserver === 'undefined') {
+        return;
+      }
+      const observer = new ResizeObserver(() => resize());
+      observer.observe(el);
+      return () => observer.disconnect();
     }, [value]);
 
     return (

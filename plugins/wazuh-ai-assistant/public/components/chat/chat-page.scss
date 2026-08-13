@@ -88,6 +88,19 @@
 }
 
 /**
+ * `.wzWelcomeCenter`'s `min-height: 100%` resolves against its containing block, which is this
+ * column — NOT the transcript row. A percentage height against an `auto`-height containing block
+ * resolves to zero, so without these two rules `place-content: center` had nothing to centre in and
+ * the welcome sat at the top of the pane at every viewport height. Only the transcript's own direct
+ * child gets the full height (a conversation's column must stay content-sized so it can scroll).
+ */
+.wzChatTranscript > .wzContentMeasure {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+/**
  * Welcome centres only when there is room (contract §3): `min-height: 100%` resolves against this
  * element's containing block, which is a definite height here because `.wzChatPane`'s grid gives
  * the transcript row (this element's ancestor) a real size. A tall viewport centres the welcome
@@ -97,7 +110,13 @@
  * grid sibling of the transcript, never a descendant of it.
  */
 .wzWelcomeCenter {
-  min-height: 100%;
+  /* `flex: 1 1 auto` + `min-height: 0` rather than `min-height: 100%`: the parent column above is
+     now a flex column with the transcript row's full height, so growing into the leftover space is
+     what centres this — and, when the content is taller than the row, the box simply stops at its
+     own height and `.wzChatTranscript` scrolls, which is contract §3's "short viewport uses the
+     transcript's own scroll rather than pushing into the composer". */
+  flex: 1 1 auto;
+  min-height: 0;
   display: grid;
   place-content: center;
   justify-items: center;

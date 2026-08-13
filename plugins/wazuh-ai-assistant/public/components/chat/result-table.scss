@@ -16,6 +16,10 @@
   @include wzPanel(0);
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
+  /* Fallback first: `dvh` only shipped in Safari 15.4, and a browser that drops the line
+     below would lose the cap entirely — which is exactly how the "pagination below the
+     fold" bug returns, on the browser family this redesign was written for. */
+  max-height: 460px;
   max-height: $wzResultsMaxHeight;
   // The card's own border/radius (from wzPanel) needs the grid to respect it instead of letting a
   // tall body row bleed past the rounded corners.

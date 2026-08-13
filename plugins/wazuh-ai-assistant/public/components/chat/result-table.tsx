@@ -26,10 +26,12 @@ import {
 } from './security-analytics-link';
 import './result-table.scss';
 
-/** Tables at or under this row count default to expanded (nothing to gain from collapsing them);
- * bigger ones default collapsed so a 500-row result doesn't force the user to scroll past it to
- * get back to the chat input. */
-const AUTO_EXPAND_ROW_THRESHOLD = 10;
+/** Tables at or under this row count default to expanded. The threshold used to be 10, from a time
+ * when a big result really did push the chat input off screen; the card now caps its own height
+ * (`$wzResultsMaxHeight`) and scrolls internally, so length no longer costs the reader anything —
+ * and the design's canonical Screen 2 is a 26-row table shown OPEN. Kept as a ceiling rather than
+ * removed so a pathological result still opens collapsed instead of rendering thousands of rows. */
+const AUTO_EXPAND_ROW_THRESHOLD = 200;
 
 /** One rendered table row: a `TableSpec` row plus the global `__rowId` the expander column and
  * `itemIdToExpandedRowMap` are keyed by (assigned over the FULL row set before pagination). */
@@ -590,12 +592,18 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   // Pagination slice: `items` carries GLOBAL `__rowId`s assigned above (before slicing), so
   // `itemIdToExpandedRowMap` (keyed the same way) and the expander column's `expandedRowIds`
   // lookup stay correct for whichever page is currently sliced into view.
-  const pageStart = pageIndex * pageSize;
+  const pageCount = Math.max(1, Math.ceil(spec.rows.length / pageSize));
+  // `pageIndex` is component state, and this component SURVIVES a spec swap: chat-page.tsx replaces
+  // `message.table` on the same message id at the same tree position (a refined re-run of the same
+  // question), so a reader sitting on page 6 of a 26-row result would otherwise slice past the end
+  // of a new 8-row one — an empty body under "Page 6 of 2", with Next disabled.
+  const safePageIndex = Math.min(pageIndex, pageCount - 1);
+  const pageStart = safePageIndex * pageSize;
   const pagedItems = useMemo(
     () => items.slice(pageStart, pageStart + pageSize),
     [items, pageStart, pageSize],
   );
-  const pageCount = Math.max(1, Math.ceil(spec.rows.length / pageSize));
+
 
   const titleText =
     i18n.translate('wazuhAiAssistant.resultTable.accordionSummary', {
@@ -739,7 +747,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
                       'wazuhAiAssistant.resultTable.previousPage',
                       { defaultMessage: 'Previous page' },
                     )}
-                    isDisabled={pageIndex === 0}
+                    isDisabled={safePageIndex === 0}
                     onClick={() =>
                       setPageIndex(previous => Math.max(0, previous - 1))
                     }
@@ -749,7 +757,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
                   <EuiText size='xs' color='subdued'>
                     {i18n.translate('wazuhAiAssistant.resultTable.pageOfPages', {
                       defaultMessage: 'Page {page} of {total}',
-                      values: { page: pageIndex + 1, total: pageCount },
+                      values: { page: safePageIndex + 1, total: pageCount },
                     })}
                   </EuiText>
                 </EuiFlexItem>
@@ -760,7 +768,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
                     aria-label={i18n.translate('wazuhAiAssistant.resultTable.nextPage', {
                       defaultMessage: 'Next page',
                     })}
-                    isDisabled={pageIndex >= pageCount - 1}
+                    isDisabled={safePageIndex >= pageCount - 1}
                     onClick={() =>
                       setPageIndex(previous => Math.min(pageCount - 1, previous + 1))
                     }

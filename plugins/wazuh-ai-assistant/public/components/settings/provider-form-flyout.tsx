@@ -455,9 +455,20 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   const [baseUrlTouched, setBaseUrlTouched] = useState(
     Boolean(editingProvider),
   );
-  const urlGuidance = PROVIDER_URL_GUIDANCE[form.type];
-  const modelGuidance = PROVIDER_MODEL_GUIDANCE[form.type];
-  const apiKeyGuidance = PROVIDER_API_KEY_GUIDANCE[form.type];
+  // Falling back rather than indexing straight in: these three records are keyed by the CURRENT
+  // `ProviderInput['type']` union, but `form.type` can arrive from a stored provider written by an
+  // older build (or a hand-edited saved object) whose type is no longer in that union — and every
+  // consumer below reads `.examples` / `.keyPattern` off the result, so a miss white-screens the
+  // whole flyout on the one path an admin uses to FIX such a provider. settings-page.tsx already
+  // guards its own label lookup the same way.
+  const urlGuidance =
+    PROVIDER_URL_GUIDANCE[form.type] ?? PROVIDER_URL_GUIDANCE.openai_compatible;
+  const modelGuidance =
+    PROVIDER_MODEL_GUIDANCE[form.type] ??
+    PROVIDER_MODEL_GUIDANCE.openai_compatible;
+  const apiKeyGuidance =
+    PROVIDER_API_KEY_GUIDANCE[form.type] ??
+    PROVIDER_API_KEY_GUIDANCE.openai_compatible;
   const apiKeyShapeMismatch = Boolean(
     apiKeyGuidance.keyPattern &&
       form.apiKey?.trim() &&

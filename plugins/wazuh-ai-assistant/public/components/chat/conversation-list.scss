@@ -24,10 +24,27 @@
   padding: 10px 4px 4px;
 }
 
+/**
+ * Pinned at the bottom of the rail (design: "a collapse chevron pinned at the bottom"). `margin-top:
+ * auto` only pins if the rail column actually fills the pane's height — `.wzConvoRail` below is what
+ * supplies that. Without the pair, the control simply followed the last conversation, so a long list
+ * pushed it out of view: the mechanism existed but was inert.
+ */
 .wzConvoRailCollapseControl {
   width: 100%;
   justify-content: flex-start;
+  margin-top: auto;
 }
+
+/** The expanded rail is a full-height flex column so the collapse control above can be pinned and
+  * the conversation list itself is the part that scrolls. */
+.wzConvoRail {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
 
 .wzConvoRailCollapsed {
   display: flex;
@@ -36,6 +53,9 @@
   gap: 8px;
   padding-top: 4px;
   width: $wzRailCollapsedWidth;
+  /* Same reason as `.wzConvoRail`: the spacer below can only push the expand affordance down if
+     this column has the pane's height to spread across. */
+  height: 100%;
 }
 
 /** Pushes the "expand" affordance to the bottom of the 48px strip, mirroring the expanded rail's

@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { createRoot } from 'react-dom/client';
 import {
   Router,
@@ -13,13 +19,12 @@ import { EuiTabs, EuiTab, EuiSpacer } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { ChatPage } from './components/chat/chat-page';
 import { SettingsPage } from './components/settings/settings-page';
-import { SettingsService } from './services/settings-service';
 import { ensureManagerSession } from './services/session-heal';
 import {
   interruptConfirmationText,
   interruptConfirmationTitle,
 } from './services/interrupt-confirm';
-import { ProviderSummary } from '../common/types';
+import { useProviders } from './hooks/use-providers';
 import { createHashHistory } from 'history';
 
 type Tab = 'chat' | 'settings';
@@ -32,18 +37,15 @@ export const ADD_PROVIDER_PARAM = 'addProvider';
 export const routeFromPathname = (pathname: string): Tab =>
   pathname.replace(/\/+$/, '') === SETTINGS_PATH ? 'settings' : 'chat';
 
-/** How long the first provider load may take before the app stops waiting on it — see
- * `refreshProviders`. Generous for a slow cluster, short enough that no one stares at a spinner. */
-const PROVIDERS_LOAD_TIMEOUT_MS = 20_000;
-
 /**
  * Provider list/selection is owned here (not by ChatPage) so a tab switch away from Chat and back
  * never loses the selection, and so SettingsPage can report back through onProvidersChanged
  * whenever it creates/edits/deletes/re-defaults a provider and keep this list (and the Chat tab's
- * selection) in sync without needing a full remount. The actual provider <select> control now
- * renders inside ChatPage's own header row (next to the privacy chip) rather than up here, so it
- * reads as part of the chat surface instead of a separate floating control — see
- * `onProviderChange` passed to ChatPage below.
+ * selection) in sync without needing a full remount. The state itself lives in the `useProviders`
+ * hook (hooks/use-providers.ts), shared with the header-button flyout. The actual provider
+ * <select> control renders inside ChatPage's own header row (next to the privacy chip) rather
+ * than up here, so it reads as part of the chat surface instead of a separate floating control —
+ * see `onProviderChange` passed to ChatPage below.
  */
 /**
  * `onAppLeave` is the platform's one hook for "the user is leaving this app": OSD calls it both for
@@ -65,11 +67,56 @@ const App: React.FC<{
   const settingsEverOpenedRef = useRef(
     routeFromPathname(history.location.pathname) === 'settings',
   );
-  const [providers, setProviders] = useState<ProviderSummary[]>([]);
-  const [providersLoaded, setProvidersLoaded] = useState(false);
-  const [selectedProviderId, setSelectedProviderId] = useState('');
-  const [providersError, setProvidersError] = useState<string | null>(null);
-  const [settingsService] = useState(() => new SettingsService(core.http));
+
+  // Height of the app frame, as a definite pixel value rather than a percentage.
+  //
+  // The frame's children (the Chat pane's `grid-template-rows: 1fr auto`, the transcript's own
+  // scroll) are only meaningful against a definite height, and `height: 100%` cannot supply one
+  // here: OSD's `.app-wrapper` sets only `min-height`, so a percentage height has nothing to
+  // resolve against and collapses to `auto`. The previous `calc(100vh - 49px)` did produce a
+  // definite height, but paid for it twice — Safari's `vh` flips as the toolbar hides (the classic
+  // "the composer moved" report) and the 49px was a standing bet on the chrome bar's height.
+  //
+  // So: measure where the frame actually starts and subtract exactly that from `100dvh`. `dvh`
+  // tracks the *dynamic* viewport, which is the unit Safari gets right, and the offset is measured
+  // rather than assumed, so a taller or shorter global header needs no change here. The offset is
+  // taken document-relative (`+ scrollY`) so a scrolled page cannot feed a negative rect back in.
+  const frameRef = useRef<HTMLDivElement | null>(null);
+  const [frameHeight, setFrameHeight] = useState('100dvh');
+  useLayoutEffect(() => {
+    const node = frameRef.current;
+    if (!node) {
+      return;
+    }
+    const measure = () => {
+      const offset = Math.max(
+        0,
+        Math.round(node.getBoundingClientRect().top + window.scrollY),
+      );
+      setFrameHeight(`calc(100dvh - ${offset}px)`);
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    // The global header changes height when it expands, which moves the frame without resizing the
+    // window. Guarded because jsdom has no ResizeObserver: there the initial measure is enough.
+    const observer =
+      typeof ResizeObserver === 'undefined'
+        ? null
+        : new ResizeObserver(() => measure());
+    observer?.observe(document.body);
+    return () => {
+      window.removeEventListener('resize', measure);
+      observer?.disconnect();
+    };
+  }, []);
+  const {
+    providers,
+    providersLoaded,
+    providersError,
+    selectedProviderId,
+    setSelectedProviderId,
+    refreshProviders,
+  } = useProviders(core.http);
   // Read by the leave handler below, which is registered ONCE and must always see the current value
   // — hence a ref rather than state (a stale closure here would silently stop warning anyone).
   const isGeneratingRef = useRef(false);
@@ -99,53 +146,6 @@ const App: React.FC<{
       );
     });
   }, [onAppLeave]);
-
-  const refreshProviders = useCallback(() => {
-    // Deadline for the FIRST load. `providersLoaded` gates the Chat tab's whole rendering — until it
-    // flips, the tab shows a spinner and nothing else — so a request that never settles (a hung
-    // proxy, a dropped connection) left the chat spinning forever with no explanation and no way
-    // out. On expiry the app renders its normal "could not load providers" state instead, and a
-    // later successful response still takes effect.
-    const deadline = setTimeout(() => {
-      setProvidersError(
-        i18n.translate('wazuhAiAssistant.chat.providersLoadTimeout', {
-          defaultMessage:
-            'Loading the configured providers timed out. Reload the page, or check the Settings tab.',
-        }),
-      );
-      setProvidersLoaded(true);
-    }, PROVIDERS_LOAD_TIMEOUT_MS);
-
-    settingsService
-      .list()
-      .then(list => {
-        clearTimeout(deadline);
-        setProviders(list);
-        setProvidersError(null);
-        setSelectedProviderId(current => {
-          if (current && list.some(provider => provider.id === current)) {
-            return current;
-          }
-          const defaultProvider =
-            list.find(provider => provider.isDefault) ?? list[0];
-          return defaultProvider ? defaultProvider.id : '';
-        });
-      })
-      .catch(() => {
-        clearTimeout(deadline);
-        setProvidersError(
-          i18n.translate('wazuhAiAssistant.chat.providersLoadError', {
-            defaultMessage:
-              'Could not load configured providers. Check the Settings tab.',
-          }),
-        );
-      })
-      .finally(() => setProvidersLoaded(true));
-  }, [settingsService]);
-
-  useEffect(() => {
-    refreshProviders();
-  }, [refreshProviders]);
 
   return (
     <I18nProvider>
@@ -184,20 +184,15 @@ const App: React.FC<{
               settingsEverOpenedRef.current = true;
             }
             return (
-              // Full-height frame so the Chat tab can fill the space it is given (its internal
-              // layout uses height:100%, which is only meaningful against a bounded ancestor).
-              // This deliberately takes its height from the ancestor chain — `renderApp` sizes the
-              // mount element below — rather than from the viewport: the previous
-              // `calc(100vh - 49px)` broke twice over. `100vh` on Safari first excludes then
-              // includes the browser toolbar, which is the classic "the composer moved" report, and
-              // the hardcoded 49px is a standing bet on the OSD global header's height that any
-              // chrome change silently loses. The tab bar + spacer below live INSIDE this frame and
-              // consume their own natural height via flex. The content row is `flex:1` with
-              // `overflow:auto` so the Chat tab fills exactly (its own panes scroll internally)
-              // while the Settings tab, which is taller than the viewport, scrolls normally.
+              // Full-height frame: `frameHeight` is a measured `calc(100dvh - <offset>px)` (see the
+              // hook above) so the Chat pane's grid always has a definite height to divide. The tab
+              // bar + spacer live INSIDE this frame and take their own natural height via flex. The
+              // content row is `flex:1` with `overflow:auto` so the Chat tab fills exactly (its own
+              // panes scroll internally) while Settings, which is taller than the viewport, scrolls.
               <div
+                ref={frameRef}
                 style={{
-                  height: '100%',
+                  height: frameHeight,
                   display: 'flex',
                   flexDirection: 'column',
                   minHeight: 0,
@@ -317,9 +312,10 @@ export const renderApp = (
   // node inside its (already height-constrained) application wrapper, so this one assignment is
   // what closes the chain — and is what lets the frame below drop `calc(100vh - 49px)`, whose `vh`
   // unit is unreliable on Safari and whose 49px was a hardcoded bet on the chrome bar's height.
-  element.style.height = '100%';
   // A grid/flex child's automatic minimum size is its content size; without this the mount node
   // refuses to shrink and pushes the composer off-screen, which Safari surfaces before Chrome.
+  // The frame inside sizes itself from a measured `100dvh` offset (see `App`), so no height is
+  // asserted here — OSD's wrapper only sets `min-height`, which a percentage cannot resolve.
   element.style.minHeight = '0';
 
   const history = createHashHistory();
