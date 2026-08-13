@@ -215,7 +215,11 @@
  * so the hero must not also centre itself.
  */
 .wzWelcomeCenter > .euiEmptyPrompt {
-  margin: 0;
+  /* Only the BLOCK margins are the problem. Zeroing all four also removed the horizontal `auto`
+     that keeps the hero centred over the cards — it then sat flush left of a centred card group,
+     which reads as two misaligned things. */
+  margin-block: 0;
+  margin-inline: auto;
 }
 
 .wzExampleCardsGrid {
