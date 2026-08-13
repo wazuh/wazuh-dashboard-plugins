@@ -126,7 +126,7 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
       // stage-1 router; see ChatStreamOptions's doc comment), which a `if (options?.temperature)`
       // guard would treat as absent and silently drop. `includeTemperature` additionally gates this
       // on whether the provider is already known (this process) to reject the parameter entirely --
-      // see `temperatureRejectedByProviderModel`'s doc comment above.
+      // see temperature-fallback.ts's doc comment.
       if (includeTemperature && options?.temperature !== undefined) {
         nextBody.temperature = options.temperature;
       }
@@ -250,7 +250,15 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
      *    source available, so it is used exactly as it already was pre-issue-18. */
     function* reasoningFallback(hadToolCalls: boolean): Generator<StreamEvent> {
       if (!sawContent && !hadToolCalls && reasoningBuffer) {
-        yield { type: 'delta', content: reasoningBuffer };
+        // Flagged so chat.ts can tell this delta apart from real answer content (issue #8935
+        // item I3): the buffer is raw deliberation, and deliberation routinely names a tool the
+        // model decided AGAINST -- the deferred-offer interception must never read it as an
+        // offer. Display behaviour is unchanged; the flag is additive.
+        yield {
+          type: 'delta',
+          content: reasoningBuffer,
+          reasoningFallback: true,
+        };
       }
     }
 

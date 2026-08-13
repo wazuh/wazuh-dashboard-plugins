@@ -276,6 +276,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   // swallow every failure silently, so a user could keep chatting for an hour believing their
   // history was being kept when it had stopped being saved after the first rejection.
   const [saveFailed, setSaveFailed] = useState(false);
+  // Drives the saveFailed callout's "Retry now" button: true only for the duration of a
+  // manually-triggered retry, so the button shows a spinner and cannot be double-clicked into a
+  // second concurrent save. `persistConversationTurn` itself is already queued/serialized
+  // (`saveQueueRef`), so this is purely a button-affordance guard, not a correctness one.
+  const [isRetryingSave, setIsRetryingSave] = useState(false);
 
   // Conversation restore (common/conversation-location.ts): true while the conversation named by the
   // URL hash / this tab's stored pointer is being fetched on mount, so the chat shows a spinner
@@ -856,6 +861,47 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     // `task` handles its own errors, so the queue can never be poisoned by a rejected link.
     saveQueueRef.current = saveQueueRef.current.then(task, task);
     return saveQueueRef.current;
+  };
+
+  /**
+   * "Retry now" on the saveFailed callout. Re-invokes `persistConversationTurn` — the SAME
+   * persistence path every auto-save already goes through — instead of a second save
+   * implementation, so success clears `saveFailed` exactly like the auto path does (that function's
+   * own `setSaveFailed(false)` on a successful `adoptAsActive` save) and a failure re-sets it exactly
+   * the same way too.
+   *
+   * `target` is built from this tab's live `activeConversationIdRef`/`conversationVersionRef` —
+   * the same pair `startTurn` reads when it constructs a fresh turn's target — so a conversation
+   * that was never created yet (still `null`) is POSTed once, and one that already has an id is
+   * PUT to that SAME row: this can never create a second conversation for what the user sees as one
+   * conversation, whether the failing save was the first one or a later one.
+   *
+   * Blocked while `isGenerating`: the in-flight turn (`startTurn`) already holds its OWN
+   * `TurnConversationTarget` in closure (shared between its pre-send save and its post-answer
+   * save — see that target's own doc comment) — a `target` built here from the live refs while
+   * that turn is still streaming is a DIFFERENT object. If the turn's pre-send save has already
+   * failed (raising this very callout) but not yet created the row, firing this handler would
+   * race it: this save creates+adopts the conversation from the live refs, while the turn's own
+   * target still holds `conversationId: null` and later POSTs a second row instead of updating
+   * the one this save just created. The turn's post-answer auto-save runs moments after the
+   * stream ends anyway, so a mid-stream retry is redundant — the button is disabled instead of
+   * queued so the same click is never re-armed into a second attempt when generation finishes.
+   */
+  const handleRetrySave = () => {
+    if (isRetryingSave || isGenerating) {
+      return;
+    }
+    setIsRetryingSave(true);
+    const target: TurnConversationTarget = {
+      conversationId: activeConversationIdRef.current,
+      version: conversationVersionRef.current,
+    };
+    void persistConversationTurn({
+      adoptAsActive: true,
+      target,
+      messages: messagesRef.current,
+      turnRecords: turnHistoryRef.current,
+    }).finally(() => setIsRetryingSave(false));
   };
 
   /**
@@ -1469,6 +1515,20 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const showWelcomeState =
     hasProviders && messages.length === 0 && !showLoadingState;
 
+  // The sticky composer (`.wzStickyInputPanel` below) is a real flow sibling of the transcript,
+  // not an absolutely-positioned overlay: `position: sticky` reserves its own box in the flow like
+  // any other flex item, so a taller composer (e.g. multiline input) simply shrinks the
+  // transcript's flex-basis — no measurement needed for that. The one thing sticky positioning does
+  // NOT reserve is the fade gradient painted by its `::before` (chat-page.scss), which extends a
+  // fixed amount further upward outside the panel's own box, and is what a live measurement caught
+  // actually covering the last few pixels of the transcript's final element (a table's pagination
+  // bar) even once scrolled all the way down. `.wzChatTranscript`'s `padding-bottom` (chat-page.scss)
+  // reserves exactly that fixed gradient height via a shared SCSS constant, kept in sync with
+  // `::before` so the two can never drift apart. It deliberately does NOT reserve the panel's full
+  // rendered height — `position: sticky` already accounts for that on its own, and reserving it a
+  // second time here would leave a permanent gap the size of the composer at the bottom of every
+  // scroll once the transcript auto-scrolls all the way down.
+
   const privacyBadgeLabel = privacyEnabled
     ? i18n.translate('wazuhAiAssistant.chat.privacy.on', {
         defaultMessage: 'On',
@@ -1632,24 +1692,34 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              // Welcome state: the column stays content-sized (see its flex below) and THIS centers
-              // the whole compact cluster (hero + cards + input) vertically.
-              justifyContent: showWelcomeState ? 'center' : 'flex-start',
+              // Always flex-start, in BOTH states. This used to be `center` for the welcome state,
+              // which centered the whole (hero + cards + input) cluster vertically by giving the
+              // PANE ITSELF — the one thing here with `overflowY: 'auto'` — a `justifyContent:
+              // 'center'`. That is the classic flexbox overflow-centering bug: when the centered
+              // content is taller than the pane (a saveFailed/error/session-expired callout above
+              // it, or just a short viewport with OSD chrome banners eating into it), a plain
+              // `center` distributes the overflow EQUALLY above and below, and scrollTop can never
+              // go negative — so the top of the overflow is simply unreachable, while the composer
+              // at the bottom renders past the visible edge, or mid-render is truncated. The
+              // welcome cluster now centers itself inside its own flex-grow spacers below instead
+              // (which collapse to 0 rather than going negative), so this container never needs to
+              // do it and never re-triggers the bug at any height >= ~600px.
+              justifyContent: 'flex-start',
               overflowY: 'auto',
               overflowAnchor: 'none',
             } as React.CSSProperties
           }
         >
-          {/* Column flex is state-dependent: in the WELCOME state it is
-            content-sized ('0 0 auto') so the hero/cards/input read as one compact centered
-            cluster (the pane's justifyContent above does the vertical centering) — growing it
-            stretched the cards and dropped the input to the screen bottom.
-            In a CONVERSATION it is '1 0 auto': grow fills the pane when short (input rests at the
-            bottom), and shrink 0 stops flex from SQUEEZING this column when the conversation
-            outgrows the pane — the old default shrink made the middle section collapse and the
-            messages visibly spill past the input, mid-thread. With shrink 0 the column simply
-            grows and the PANE scrolls (edge scrollbar), while the sticky input keeps itself in
-            view. */}
+          {/* Column flex is '1 0 auto' in BOTH states: grow fills the pane's available height when
+            content is short (so the WELCOME state's internal centering spacers below have room to
+            work with, and a CONVERSATION's input rests at the bottom), and shrink 0 stops flex
+            from SQUEEZING this column when its content — welcome cards plus a saveFailed/error/
+            session-expired callout above them, or a long conversation — outgrows the pane. A
+            shrinkable '1 1 auto' here (tried and reverted) let the column be squeezed below its
+            own content's height, which pushed the welcome prompt/cards to overflow BEHIND the
+            opaque sticky composer instead of the pane scrolling cleanly — the exact "spill past
+            the input" bug shrink 0 exists to prevent. With shrink 0 the column simply grows and
+            the PANE scrolls (edge scrollbar), while the sticky input keeps itself in view. */}
           {/* Pane-centered in BOTH states (the earlier
             welcome-only viewport-centering transform read as "leaning left with an empty right
             band" on wide monitors — removed; the pane's alignItems centering is the only
@@ -1660,7 +1730,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               width: '100%',
               display: 'flex',
               flexDirection: 'column',
-              flex: showWelcomeState ? '0 0 auto' : '1 0 auto',
+              flex: '1 0 auto',
               minHeight: 0,
               padding: '16px 24px 0',
             }}
@@ -1759,8 +1829,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
             {/* A failed auto-save is surfaced instead of swallowed: the conversation on screen is
                 ahead of what is stored, which the user cannot infer from anything else. Not
-                dismissible and not an action — the next turn's save retries on its own, and clears
-                this as soon as one succeeds. */}
+                dismissible — this reports real data-loss risk — but no longer purely passive: the
+                next turn's save still retries on its own, and "Retry now" (handleRetrySave) lets
+                the user clear it immediately once whatever blocked the save (e.g. a read-only
+                index) is fixed, instead of waiting on the next answer. Either path clears this the
+                same way, via persistConversationTurn's own setSaveFailed(false) on success. */}
             {saveFailed && (
               <StatusCallout
                 title={i18n.translate(
@@ -1778,6 +1851,25 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                       'The latest messages could not be saved, so they may be missing if you reload. The chat still works, and saving is retried after each answer.',
                   },
                 )}
+                action={
+                  <EuiButton
+                    size='s'
+                    color='warning'
+                    onClick={handleRetrySave}
+                    isLoading={isRetryingSave}
+                    // Also disabled while a turn is generating: retrying with a target built
+                    // from the live refs while the in-flight turn's OWN target is still
+                    // unresolved (e.g. its pre-send save hasn't created the row yet) would race
+                    // it into creating a second conversation row — see handleRetrySave's doc
+                    // comment. The turn's own post-answer save runs moments after streaming ends.
+                    isDisabled={isRetryingSave || isGenerating}
+                  >
+                    {i18n.translate(
+                      'wazuhAiAssistant.chat.conversations.saveFailed.retryButton',
+                      { defaultMessage: 'Retry now' },
+                    )}
+                  </EuiButton>
+                }
               />
             )}
 
@@ -1885,9 +1977,20 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   this div) is the scroll container, so no scrollbar ever renders inside the chat
                   column (the column's own flex '1 0 auto' shrink-lock is
                   what prevents the old spill-past-the-input bug, see its comment above). In the
-                  welcome state it becomes a centered flex column so the empty prompt sits in the
-                  vertical middle of the available space. */}
+                  welcome state it becomes a flex column so the two spacers just inside it (below)
+                  can position the empty prompt slightly above the vertical middle of the available
+                  space — no `justifyContent: 'center'` here either, for the same
+                  overflow-centering-bug reason as the pane above.
+
+                  The composer-overlap fix itself lives in chat-page.scss: `.wzChatTranscript`'s
+                  `padding-bottom` there reserves exactly the sticky panel's `::before` fade-gradient
+                  height (a constant shared with the panel's own rule, see that file), which is what
+                  guarantees the transcript's last element (e.g. a table's pagination bar) can always
+                  scroll fully clear of the sticky panel. It is a fixed CSS reservation, not the
+                  panel's full rendered height — `position: sticky` already reserves that on its own
+                  as an ordinary flex sibling, growing or shrinking with the composer automatically. */}
             <div
+              className='wzChatTranscript'
               style={
                 showWelcomeState
                   ? {
@@ -1895,13 +1998,30 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                       minHeight: 0,
                       display: 'flex',
                       flexDirection: 'column',
-                      justifyContent: 'center',
                     }
-                  : { flex: '1 1 auto', minHeight: 0 }
+                  : {
+                      flex: '1 1 auto',
+                      minHeight: 0,
+                    }
               }
             >
               {showWelcomeState && (
                 <>
+                  {/* Centering spacer, top. A flex-GROW spacer (not `justifyContent: 'center'` on
+                        the parent) is what makes this degrade safely: when the welcome cluster is
+                        shorter than the available space, these two spacers split the leftover room
+                        4:5 so the cluster sits slightly ABOVE center rather than dead in the middle
+                        (Task: "should sit slightly above center, not float in dead space"). When
+                        the cluster is TALLER than the available space (a callout pushed it down, a
+                        short viewport, extra OSD chrome), both spacers have flex-basis 0 and
+                        nowhere to shrink to but 0 — so they simply vanish instead of going
+                        negative, and the content starts flush at the top and the pane scrolls
+                        normally. That is what a plain `center` on an overflowing scroll container
+                        cannot do (see the pane's own comment above). */}
+                  <div
+                    aria-hidden='true'
+                    style={{ flex: '4 0 0', minHeight: 0 }}
+                  />
                   <EuiEmptyPrompt
                     // No `icon`: this chat already lives inside the Wazuh app chrome, so a Wazuh
                     // mark on the welcome screen only repeated branding the user can already see.
@@ -1921,7 +2041,12 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                       </EuiTitle>
                     }
                     body={
-                      <EuiText size='m'>
+                      // `color='subdued'`: the title alone should carry the visual weight — a
+                      // same-weight subtitle right under it was competing with it instead of
+                      // reading as a second, lighter tier of the same heading (the "clear heading
+                      // hierarchy" half of the welcome-screen polish pass). Text itself is
+                      // unchanged, so the i18n id stays stable.
+                      <EuiText size='m' color='subdued'>
                         <p>
                           {i18n.translate(
                             'wazuhAiAssistant.chat.welcome.subtitle',
@@ -2046,6 +2171,14 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     ))}
                   </EuiFlexGroup>
                   <EuiSpacer size='l' />
+                  {/* Centering spacer, bottom — the 5 half of the 4:5 split described on the top
+                        spacer above; consistent spacing down to the composer is the `EuiSpacer`
+                        right above this, which stays fixed regardless of how much extra room this
+                        spacer ends up absorbing. */}
+                  <div
+                    aria-hidden='true'
+                    style={{ flex: '5 0 0', minHeight: 0 }}
+                  />
                 </>
               )}
 

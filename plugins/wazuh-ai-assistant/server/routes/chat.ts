@@ -161,6 +161,16 @@ const NO_ANALYSIS_TEXT_MESSAGE =
 const NO_MATCHING_RESULTS_MESSAGE =
   'No matching results were found for that query.';
 /**
+ * Variant of NO_ANALYSIS_TEXT_MESSAGE for a turn that exhausted its tool-round budget (a serial
+ * chain deeper than MAX_TOOL_ROUNDS) and still produced no text even after
+ * FINAL_ROUND_ANSWER_INSTRUCTION asked for one. Named explicitly rather than folded into the
+ * generic copy above: the results table IS non-empty here, but it reflects only as far as the
+ * chain got, not the full answer, so the user should know a step was left unreached.
+ */
+const NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE =
+  'The tool-round budget for this turn ran out before a full answer could be written. See the ' +
+  'results above for what was found so far — a follow-up question can continue from there.';
+/**
  * Sibling fallback for a `general`-routed (no-tool) turn that still ends with no text at all —
  * e.g. a reasoning model streaming its entire answer on a channel nothing reads (issue
  * 02-read-reasoning-delta.md's `openai-compatible.ts` fix is the known cause; this is the
@@ -250,16 +260,20 @@ export function shouldEnterFinalRoundEarly(
 /** Picks which of the three no-text fallbacks above fits a turn that ended without any `delta`
  * text — shared by both `!sawAnyDelta` exit points below (the normal per-round `done` branch and
  * the round-budget-exhausted path) so the same three-way decision lives in exactly one place. */
-function noTextFallbackMessage(
+export function noTextFallbackMessage(
   toolUsedThisTurn: boolean,
   sawNonEmptyTable: boolean,
+  roundsExhausted: boolean,
 ): string {
   if (!toolUsedThisTurn) {
     return NO_ANSWER_MESSAGE;
   }
-  return sawNonEmptyTable
-    ? NO_ANALYSIS_TEXT_MESSAGE
-    : NO_MATCHING_RESULTS_MESSAGE;
+  if (!sawNonEmptyTable) {
+    return NO_MATCHING_RESULTS_MESSAGE;
+  }
+  return roundsExhausted
+    ? NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE
+    : NO_ANALYSIS_TEXT_MESSAGE;
 }
 
 /** Whitespace-only delta content (e.g. a lone "\n\n" some models emit as priming/formatting
@@ -268,6 +282,159 @@ function noTextFallbackMessage(
  * to the client as a normal delta either way; this only affects the tracking flag. */
 function hasMeaningfulText(content: string): boolean {
   return content.trim().length > 0;
+}
+
+/** Sentence boundary for the offer-shape gate: end punctuation followed by whitespace, or a line
+ * break. Coarse on purpose -- the gate only needs the offer marker and the tool name to share ONE
+ * sentence-ish span, not a full sentence parse. */
+const SENTENCE_SPLIT_RE = /(?<=[.!?])\s+|\n+/;
+
+/**
+ * Offer-shaped phrasing vocabulary for `findOfferedFollowUpTool` below -- deterministic given the
+ * text (a fixed regex over a closed marker list), though the TEXT is model prose, so this narrows
+ * false positives rather than proving intent (see the detector's "Residuals" note). Grown from
+ * the measured failure ("I can run get_sca_checks ... — want me to?") plus the obvious first-
+ * person-offer variants; a miss here degrades to base behaviour, a false hit is what the
+ * detector's exclusion gates bound.
+ */
+const OFFER_MARKER_RE =
+  /\b(want me to|should i|shall i|would you like|do you want|i can|i could|i'm happy to|i am happy to|happy to|let me know|say the word|if you(?:'d| would) like)\b/i;
+
+/**
+ * Tools `findOfferedFollowUpTool` must never force-call, beyond the suggest-discover pseudo-tool:
+ * the free-DSL escape hatch. prompts.ts explicitly instructs the model to OFFER it in prose for
+ * fields a typed result lacks, so its name appearing in an offer sentence is designed product
+ * behaviour -- see the detector's doc comment. Kept as a Set so a future exemption is one line
+ * with its own justification, and pinned by chat-tool-chaining.test.ts (both that the exemption
+ * holds and that the name still exists in the registry, so a rename cannot silently void it).
+ */
+const FORCE_EXEMPT_TOOL_NAMES = new Set(['search_wazuh_data']);
+
+/**
+ * DEFERRED-OFFER INTERCEPTION, detection half (issue #8935 item I3 -- see `orchestrate`'s
+ * `forcedFollowUpTool`/`forcedFollowUpSpent` for the delivery half). The measured failure this
+ * exists for: a turn correctly summarizes a tool's results, then ends the turn asking permission
+ * to run an obvious next tool ("I can run get_sca_checks to list the failing checks — want me
+ * to?") instead of just running it, even though tool rounds remain unspent. Round-budget answer
+ * fixes at the PROMPT layer measured 0/3 on this exact class (see this file's own
+ * FINAL_ROUND_ANSWER_INSTRUCTION precedent and issue #8935's cap table) -- this is the
+ * deterministic, CODE-level alternative: detect the offer mechanically and force the call via
+ * `toolChoice:{name}` rather than ask the model to stop offering.
+ *
+ * Returns a tool name ONLY when EXACTLY ONE candidate out of `offeredTools` satisfies every gate:
+ *  - its bare name appears as a whole word (`\bname\b`) in an OFFER-SHAPED SENTENCE of
+ *    `roundText` (a sentence matching `OFFER_MARKER_RE`) -- tool names are the closed `[a-z_]+`
+ *    shape every catalog/router tool spec uses (pinned by the registry-name-shape test in
+ *    chat-tool-chaining.test.ts), so this is privacy-safe static-vocabulary matching: no
+ *    user/Wazuh data ever flows into this regex, only the model's own round text checked against
+ *    a fixed list of tool names. Word boundaries are what keep "get_sca_checks_v2" from matching
+ *    a search for "get_sca_checks" -- underscore is a `\w` character, so `\b` only matches at an
+ *    actual name boundary. The sentence-level offer gate (issue #8935 integration review) is what
+ *    keeps a DISMISSIVE mention ("get_vulnerabilities_by_agent would not answer a hardening
+ *    question, so I am reporting only SCA") or a bare capability recitation from being
+ *    force-called: the measured failure is an offer, and only offer-shaped text may trigger.
+ *  - it is one of THIS TURN's offered `tools` (the stage-1-routed, fixed-for-the-turn list) --
+ *    never a tool outside that set, which the model could not call anyway.
+ *  - it is NOT `SUGGEST_DISCOVER_QUERY_TOOL` -- that tool exists to carry the model's OWN
+ *    reasoning about what it could not verify (server/tools/suggest-discover-query.ts); a handoff
+ *    link forced without genuine model intent behind it is junk, not a graceful fallback.
+ *  - it is NOT the `search_wazuh_data` escape hatch (`FORCE_EXEMPT_TOOL_NAMES`) -- prompts.ts
+ *    ORDERS the model to name that exact tool in prose ("offer to query it with
+ *    search_wazuh_data instead of speculating"), so an offer naming it is prompt-mandated
+ *    behaviour, not a deferred chain; and it is the strictest-guardrail surface, where a call the
+ *    model was compelled into is the likeliest to be rejected on the last tool-bearing round.
+ *  - it was NOT already SUCCESSFULLY executed this turn (`executedToolNames`) -- naming a tool
+ *    that already produced a result is the model summarizing its own prior work, not deferring a
+ *    new one. A REJECTED/errored call deliberately does not exclude (see the add site in
+ *    `orchestrate`): "I can retry get_sca_checks with the right policy_id -- want me to?" is the
+ *    retry sibling of the measured failure and must stay forceable.
+ * The EXACTLY-ONE gate is what makes this deterministic and false-positive-resistant: a model
+ * reciting its available capabilities in one offer sentence ("I can also run get_sca_checks,
+ * get_agent_vulnerabilities, or search_wazuh_data") names several tools in one breath and must
+ * NOT be force-called into an arbitrary one of them -- the measured failure this fixes named
+ * exactly one tool. A listing is therefore left alone and the turn terminates normally.
+ *
+ * Residuals, stated honestly: (a) an offer that never NAMES a tool ("I can query the details
+ * further") is undetectable at this layer -- the measured 0/3 failure named `get_sca_checks`
+ * verbatim, so this covers the witnessed class, not every conceivable phrasing of "want me to?";
+ * (b) `OFFER_MARKER_RE` is a finite vocabulary over the model's own prose, so an unusual offer
+ * phrasing simply degrades to base behaviour (the turn ends on the offer) -- the trigger is
+ * end-to-end only as deterministic as the text it reads, which is why the DELIVERY half
+ * (`toolChoice: {name}`) is the part this item counts as guaranteed.
+ */
+export function findOfferedFollowUpTool(
+  roundText: string,
+  offeredTools: ToolSpec[],
+  executedToolNames: ReadonlySet<string>,
+): string | undefined {
+  const offerSentences = roundText
+    .split(SENTENCE_SPLIT_RE)
+    .filter(sentence => OFFER_MARKER_RE.test(sentence));
+  if (offerSentences.length === 0) {
+    return undefined;
+  }
+  // The EXACTLY-ONE gate counts MENTIONS before any exclusion applies: "I can run get_sca_checks
+  // or search_wazuh_data" is a capability LISTING even though one of the two is exempt from
+  // forcing -- filtering first and counting second would have collapsed that listing to one
+  // "candidate" and force-called it (integration review of this ordering).
+  const mentioned = offeredTools.filter(tool => {
+    const nameRe = new RegExp(`\\b${tool.name}\\b`);
+    return offerSentences.some(sentence => nameRe.test(sentence));
+  });
+  if (mentioned.length !== 1) {
+    return undefined;
+  }
+  const candidate = mentioned[0];
+  if (
+    candidate.name === SUGGEST_DISCOVER_QUERY_TOOL.name ||
+    FORCE_EXEMPT_TOOL_NAMES.has(candidate.name) ||
+    executedToolNames.has(candidate.name)
+  ) {
+    return undefined;
+  }
+  return candidate.name;
+}
+
+/**
+ * Whether a tool-result payload is the bounded error contract (`{error: ...}`) rather than a real
+ * result -- the same shape test `augmentToolError` keys on. Used to decide whether a call counts
+ * as "executed" for the deferred-offer exclusion; failures must stay forceable (see the doc
+ * comment at the `executedToolNames` add site).
+ */
+function isToolResultError(content: string): boolean {
+  try {
+    const parsed: unknown = JSON.parse(content);
+    return (
+      !!parsed &&
+      typeof parsed === 'object' &&
+      !Array.isArray(parsed) &&
+      typeof (parsed as Record<string, unknown>).error === 'string'
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * The deferred-offer interception's round-level gate, extracted as a pure function so it is
+ * testable without scripting a whole turn (issue #8935 integration review: `forcedFollowUpSpent`
+ * is unreachable-as-true under MAX_TOOL_ROUNDS=3 -- only round 1 can ever intercept, and only
+ * once -- so no orchestrate-level script can exercise it; as a pure function its bound is pinned
+ * directly, and it becomes load-bearing the day the round budget is raised).
+ */
+export function shouldConsiderDeferredOffer(gate: {
+  isFinalRound: boolean;
+  round: number;
+  maxRounds: number;
+  toolUsedThisTurn: boolean;
+  forcedFollowUpSpent: boolean;
+}): boolean {
+  return (
+    !gate.isFinalRound &&
+    gate.round < gate.maxRounds - 1 &&
+    gate.toolUsedThisTurn &&
+    !gate.forcedFollowUpSpent
+  );
 }
 
 /**
@@ -989,6 +1156,36 @@ export async function* orchestrate(
   // budget (MAX_TOOL_ROUNDS) is what actually bounds the loop from spinning forever, but this flag
   // stops it from burning more than one of those rounds on the same self-correction.
   let suggestDiscoverUnknownFieldsRetried = false;
+  // DEFERRED-OFFER INTERCEPTION state (issue #8935 item I3; detection half is
+  // `findOfferedFollowUpTool` above). `executedToolNames` is every REAL tool this turn ran
+  // SUCCESSFULLY (added after execution in the real-tool branch below -- never for a
+  // rejected/errored call, never for the routing/suggest_discover_query pseudo-tools) -- it is
+  // what lets the detector tell "the model is naming a tool it already used" apart from "the
+  // model is deferring a NEW one", including the retry case where the earlier attempt failed.
+  // `forcedFollowUpTool`, when set, is consumed by exactly the NEXT round's `streamOptions`
+  // (forcing `toolChoice:{name:...}` instead of `'auto'`) and cleared immediately after — so a
+  // forced call can only ever happen once per detected offer. `forcedFollowUpSpent` bounds this
+  // to ONE forced round per WHOLE TURN (not per offer). HONESTY NOTE (integration review): under
+  // the current MAX_TOOL_ROUNDS=3 this flag is redundant with the round-budget gate -- only
+  // round 1 can ever intercept, so no turn can reach the check twice -- which is why its bound is
+  // pinned through the pure `shouldConsiderDeferredOffer` helper rather than an orchestrate-level
+  // script; it becomes load-bearing the day the round budget is raised, mirroring
+  // `suggestDiscoverUnknownFieldsRetried` right above.
+  //
+  // DETERMINISTIC vs NOT (state this honestly, per issue #8935's measured lesson that every
+  // code-level fix passed 3/3 while every prompt-level fix failed 0/3): the DETECTION
+  // (name-token ∧ offered ∧ unexecuted ∧ exactly-one ∧ round-budget-remaining ∧ once-per-turn) and
+  // the DELIVERY (`toolChoice:{name}` is a first-class CanonicalToolChoice already exercised by
+  // `runStage1Routing` above -- it forces the provider to emit a call to that exact tool, it
+  // cannot instead answer in prose) are both deterministic, code-level guarantees. NOT
+  // deterministic: the ARGUMENTS the model fills in for the forced call (it has the policy_id in
+  // context from the digest it just summarized, but a bad fill degrades to the ordinary bounded
+  // tool-error contract and the turn continues rather than crashing), and whether the model's
+  // final narration actually makes good use of the forced tool's result. Those two remain
+  // model-side and are not guaranteed by this code.
+  const executedToolNames = new Set<string>();
+  let forcedFollowUpTool: string | undefined;
+  let forcedFollowUpSpent = false;
   // Issue #8911: whole-turn tracking for `shouldEnterFinalRoundEarly` above — `true` once any EARLIER
   // round in this turn had at least one successful (non-rejected/non-errored) tool call, and set
   // when the round loop below should make its NEXT iteration the final round early.
@@ -1062,6 +1259,12 @@ export async function* orchestrate(
       return;
     }
 
+    // TRUE for exactly the round a deferred-offer interception forced (issue #8935 item I3):
+    // read by the 'error' branch and the loop-bottom dead-stream guard below, because a FORCED
+    // round must never end the turn worse than the clean termination the suppressed offer-round
+    // 'done' would have produced on base -- same recorded policy as stage 1 ("a stage-1 failure
+    // must not produce a dead turn").
+    const forcedRound = forcedFollowUpTool !== undefined;
     // Issue #8911: `forceFinalRoundEarly` (set at the end of the PREVIOUS round below) short-circuits
     // the normal `round === MAX_TOOL_ROUNDS` budget check once a fully-rejected round has already
     // followed an earlier successful one this turn — see `shouldEnterFinalRoundEarly`'s doc comment.
@@ -1078,7 +1281,15 @@ export async function* orchestrate(
       ? {}
       : {
           tools,
-          toolChoice: 'auto',
+          // DEFERRED-OFFER INTERCEPTION delivery (issue #8935 item I3): when the PREVIOUS round's
+          // 'done' was suppressed because it offered exactly one unexecuted tool by name, this
+          // round forces a call to that specific tool instead of leaving the choice to `'auto'` --
+          // see `forcedFollowUpTool`'s doc comment above for why this is the deterministic half of
+          // the mechanism. Consumed (cleared) immediately below so it can only ever apply to this
+          // one round.
+          toolChoice: forcedFollowUpTool
+            ? { name: forcedFollowUpTool }
+            : 'auto',
           // Tool-bearing round: keep sampling low, per Groq's tool-use guidance (0.0-0.5), since a
           // high default temperature (Groq's is 1.0) is a documented contributing cause of
           // malformed tool calls (issue 05-set-temperature-for-tool-calls.md). Only set when this
@@ -1087,6 +1298,11 @@ export async function* orchestrate(
           // deviate from the provider's own default.
           ...(tools?.length ? { temperature: 0.2 } : {}),
         };
+    // Cleared immediately after building this round's options: a forced follow-up must apply to
+    // EXACTLY ONE round, never linger into a later one this variable's own presence didn't cause.
+    if (forcedFollowUpTool) {
+      forcedFollowUpTool = undefined;
+    }
 
     // Outbound scrub: a fresh transformed COPY per round — `messages` itself keeps
     // accumulating unscrubbed below so later rounds re-scrub from the same source of truth.
@@ -1148,6 +1364,21 @@ export async function* orchestrate(
 
     let sawToolCall = false;
     let ended = false;
+    // Deferred-offer interception, per-round state (issue #8935 item I3): `roundText` is every
+    // delta this round actually yielded to the client (main deltas plus both trailing-buffer
+    // flushes), reset fresh each round so a PRIOR round's text can never be mistaken for THIS
+    // round's offer. `forcedFollowUp` is set only when this round's 'done' is suppressed to force
+    // a follow-up call next round -- it exists solely so the loop-bottom guard below (which
+    // otherwise treats any `!sawToolCall` round as a dead adapter stream) does not return early on
+    // the ONE round type that legitimately ends with no tool call yet still has a next round.
+    let roundText = '';
+    let forcedFollowUp = false;
+    // TRUE when any delta this round was the adapter's reasoning-channel fallback
+    // (openai-compatible.ts's `reasoningFallback`, flagged on the event): that text is raw
+    // deliberation shown to the user only because no real answer arrived, and deliberation
+    // routinely names exactly one tool the model decided NOT to call -- the interception below
+    // must never read it as an offer (issue #8935 integration review).
+    let roundHadReasoningFallback = false;
     // Issue #8911: round-scoped (reset every round, unlike the whole-turn flags above) — feeds
     // `shouldEnterFinalRoundEarly` once this round finishes. `roundHadRealToolCall` covers only the
     // real data-tool path below (the one that also sets `toolUsedThisTurn`), deliberately excluding
@@ -1165,6 +1396,14 @@ export async function* orchestrate(
       streamOptions,
     )) {
       if (event.type === 'delta') {
+        if (event.reasoningFallback) {
+          // See `roundHadReasoningFallback`'s declaration: reasoning-channel fallback text still
+          // reaches the user (below) but disqualifies this round's text from the deferred-offer
+          // interception. Round-level (not per-delta) on purpose: the depseudonymizer/table
+          // filters can hold back and later drain parts of a delta, and a drained fragment no
+          // longer carries the event flag.
+          roundHadReasoningFallback = true;
+        }
         let content = depseudonymizer
           ? depseudonymizer.push(event.content)
           : event.content;
@@ -1175,6 +1414,7 @@ export async function* orchestrate(
           if (hasMeaningfulText(content)) {
             sawAnyDelta = true;
           }
+          roundText += content;
           yield { type: 'delta', content };
         }
         continue;
@@ -1193,6 +1433,7 @@ export async function* orchestrate(
             if (hasMeaningfulText(trailing)) {
               sawAnyDelta = true;
             }
+            roundText += trailing;
             yield { type: 'delta', content: trailing };
           }
         }
@@ -1412,6 +1653,19 @@ export async function* orchestrate(
           outcome.toolResultContent,
         );
 
+        // Deferred-offer interception (issue #8935 item I3): only a SUCCESSFUL call marks this
+        // tool as executed for the exclusion in findOfferedFollowUpTool. A rejected/errored call
+        // must stay forceable -- "that call needs a policy_id; I can retry get_sca_checks, want
+        // me to?" is the retry sibling of the measured failure, and keying the exclusion on the
+        // ATTEMPT rather than the outcome structurally immunized it (integration review). A
+        // successful earlier call still excludes by NAME, not name+arguments: an offer naming a
+        // tool that already produced a result is far more often the model summarizing its own
+        // work than proposing a genuinely different call, and force-repeating succeeding tools
+        // risks loops -- recorded as a deliberate bound of this mechanism, not an oversight.
+        if (!isToolResultError(outcome.toolResultContent)) {
+          executedToolNames.add(event.toolCall.name);
+        }
+
         if (outcome.tableEvent) {
           // Issue #8911: only a successful execution ever sets `tableEvent` (every rejection/error
           // path above returns `toolResultContent` alone) — this is the round's "did anything
@@ -1469,6 +1723,7 @@ export async function* orchestrate(
             if (hasMeaningfulText(trailing)) {
               sawAnyDelta = true;
             }
+            roundText += trailing;
             yield { type: 'delta', content: trailing };
           }
         }
@@ -1482,6 +1737,64 @@ export async function* orchestrate(
           // round with the grown message history instead of ending the SSE stream here.
           break;
         }
+
+        // DEFERRED-OFFER INTERCEPTION (issue #8935 item I3): this round made no tool call AND
+        // streamed text -- the exact shape of "summary, then ask permission for an obvious next
+        // tool". Fires only when a next TOOL-BEARING round genuinely exists to force the call
+        // into, only on a turn that is actually gathering data, and only ONCE per turn -- see
+        // shouldConsiderDeferredOffer (the pure, testable form of that gate). When `tools` is
+        // `undefined` (an adapter with `supportsTools === false`, or -- structurally impossible
+        // here since `toolUsedThisTurn` implies a tool round already offered tools -- a
+        // `general`-routed no-tool turn) there is nothing to force a call into, so the detector
+        // is not even asked. `roundHadReasoningFallback` (integration review): a round whose text
+        // came from the adapter's reasoning-channel fallback is raw deliberation, which routinely
+        // names a tool it decided AGAINST -- never intercept it.
+        if (
+          shouldConsiderDeferredOffer({
+            isFinalRound,
+            round,
+            maxRounds: MAX_TOOL_ROUNDS,
+            toolUsedThisTurn,
+            forcedFollowUpSpent,
+          }) &&
+          !roundHadReasoningFallback
+        ) {
+          const offeredTool = tools
+            ? findOfferedFollowUpTool(roundText, tools, executedToolNames)
+            : undefined;
+          if (offeredTool) {
+            forcedFollowUpTool = offeredTool;
+            forcedFollowUpSpent = true;
+            forcedFollowUp = true;
+            // The offer text the user has ALREADY READ becomes part of the provider-bound
+            // history (integration review): without this, the forced round and the final round
+            // are authored blind of the summary-plus-offer on screen, and the turn ships two
+            // independently-authored summaries that can contradict each other. `roundText` is
+            // the depseudonymized client-visible text; scrubMessagesForProvider re-applies the
+            // pseudonym map to assistant content on every outbound call, so known entities go
+            // back out as the same pseudonyms the model produced.
+            messages = [...messages, { role: 'assistant', content: roundText }];
+            // Suppress this 'done' exactly like the sawToolCall branch above: no privacy_map, no
+            // no-text fallback, no client-visible 'done' -- the turn is NOT over, it is being
+            // redirected into one more forced tool round.
+            //
+            // CONSENT CONTRACT, recorded (integration review asked for the decision, not an
+            // omission): the streamed sentence asks permission ("want me to?") and this code then
+            // acts without an answer. That is deliberate. The product decision behind #8935 item
+            // I3 is that a turn with rounds remaining must not END on a permission question the
+            // user cannot see the cost of (the measured 0/3 failure); holding the offer sentence
+            // back until the forced call resolves (the StreamDepseudonymizer/
+            // MarkdownTableSuppressor holdback precedents) was considered and rejected because
+            // the offer is also the SUMMARY sentence in the measured transcripts -- suppressing
+            // it would hide the one correct summary the round produced if the forced call then
+            // failed. prompts.ts's "End with at most one short follow-up offer" instruction is
+            // left in place on purpose: when the model phrases that offer concretely enough to
+            // name one runnable tool, this mechanism converts the offer into the action, and
+            // when it does not, base behaviour is unchanged.
+            break;
+          }
+        }
+
         // The turn is genuinely over (this round made no tool call) and the model never produced
         // any text at all — see NO_ANALYSIS_TEXT_MESSAGE/NO_ANSWER_MESSAGE's doc comments. Which
         // copy fits depends on whether a tool ran earlier this turn; if none did, there is no
@@ -1489,7 +1802,11 @@ export async function* orchestrate(
         if (!sawAnyDelta) {
           yield {
             type: 'delta',
-            content: noTextFallbackMessage(toolUsedThisTurn, sawNonEmptyTable),
+            content: noTextFallbackMessage(
+              toolUsedThisTurn,
+              sawNonEmptyTable,
+              isFinalRound,
+            ),
           };
         }
         yield* emitPrivacyMapOnce();
@@ -1507,6 +1824,22 @@ export async function* orchestrate(
             yield { type: 'delta', content: trailing };
           }
         }
+        // A FORCED round's provider error must not reach the client (issue #8935 item I3,
+        // integration review): the interception suppressed a CLEAN 'done' to buy this round, so
+        // on base the user already had a complete summary-plus-offer and a clean termination --
+        // an internally-initiated extra call the user never asked for must never end the turn
+        // worse than that. Same recorded policy as stage 1's "a stage-1 failure must not produce
+        // a dead turn": swallow, log, terminate cleanly with the accumulated usage.
+        if (forcedRound) {
+          logger.error(
+            `wazuhAiAssistant: forced follow-up round failed (${event.message}); ` +
+              'ending the turn with the already-streamed answer instead',
+          );
+          yield* emitPrivacyMapOnce();
+          yield { type: 'done', usage: toStreamUsage(usageTotals) };
+          ended = true;
+          break;
+        }
         yield event;
         ended = true;
         break;
@@ -1519,9 +1852,28 @@ export async function* orchestrate(
     if (ended) {
       return;
     }
-    if (!sawToolCall) {
+    if (!sawToolCall && !forcedFollowUp) {
       // Defensive: the adapter's stream ended without a 'done'/'error'/tool_call (shouldn't
-      // happen per the adapter contract) — don't spin forever.
+      // happen per the adapter contract) — don't spin forever. `forcedFollowUp` is the one
+      // legitimate exception (issue #8935 item I3): that round's 'done' had no tool call either,
+      // but it was deliberately suppressed above to redirect into a forced next round, not a dead
+      // stream — without this exemption this guard would return right after the `break` above and
+      // silently undo the interception.
+      if (forcedRound) {
+        // The FORCED round dead-streamed (issue #8935 item I3, integration review): on base the
+        // turn had already terminated cleanly on the offer round's 'done' that the interception
+        // suppressed -- returning bare here would close the SSE stream with no terminating frame,
+        // strictly worse than base. Emit the clean termination the suppressed 'done' owed the
+        // client (same policy as the forced-round 'error' branch above).
+        if (!sawAnyDelta) {
+          yield {
+            type: 'delta',
+            content: noTextFallbackMessage(toolUsedThisTurn, sawNonEmptyTable),
+          };
+        }
+        yield* emitPrivacyMapOnce();
+        yield { type: 'done', usage: toStreamUsage(usageTotals) };
+      }
       return;
     }
 
@@ -1547,7 +1899,7 @@ export async function* orchestrate(
   if (!sawAnyDelta) {
     yield {
       type: 'delta',
-      content: noTextFallbackMessage(toolUsedThisTurn, sawNonEmptyTable),
+      content: noTextFallbackMessage(toolUsedThisTurn, sawNonEmptyTable, true),
     };
   }
   yield* emitPrivacyMapOnce();

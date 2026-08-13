@@ -321,7 +321,177 @@ describe('ProviderFormFlyout — endpoint URL guidance', () => {
   });
 });
 
-describe('ProviderFormFlyout — getting-started onboarding', () => {
+describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
+  it('labels the type options self-explanatorily and describes each one', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    expect(
+      screen.getByRole('option', { name: /anthropic \(claude\)/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /choose this for openai, groq, bedrock-mantle, or any other provider/i,
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('prefills the Anthropic base URL when switching type while the field is untouched', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/provider type/i), {
+      target: { value: 'anthropic' },
+    });
+
+    expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
+      'https://api.anthropic.com',
+    );
+  });
+
+  it('does not overwrite an endpoint URL the admin already typed', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://my-custom-gateway.example.com' },
+    });
+    fireEvent.change(screen.getByLabelText(/provider type/i), {
+      target: { value: 'anthropic' },
+    });
+
+    expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
+      'https://my-custom-gateway.example.com',
+    );
+  });
+
+  it('does not prefill the base URL for an existing provider being edited', () => {
+    render(
+      <ProviderFormFlyout {...baseProps} editingProvider={editingProvider} />,
+    );
+
+    fireEvent.change(screen.getByLabelText(/provider type/i), {
+      target: { value: 'anthropic' },
+    });
+
+    expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
+      'https://api.openai.com/v1',
+    );
+  });
+
+  it('shows where to create an Anthropic key and its expected shape under the API key field', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/provider type/i), {
+      target: { value: 'anthropic' },
+    });
+
+    expect(
+      screen.getByText(/console\.anthropic\.com -> api keys/i),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/sk-ant-/)).toBeInTheDocument();
+  });
+
+  it('shows a non-blocking warning when the key shape does not match the Anthropic type', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/provider type/i), {
+      target: { value: 'anthropic' },
+    });
+    fireEvent.change(screen.getByLabelText(/^api key$/i), {
+      target: { value: 'sk-not-anthropic-shaped' },
+    });
+
+    expect(
+      screen.getByText(/doesn't look like an anthropic key/i),
+    ).toBeInTheDocument();
+    // Non-blocking: Save must stay enabled despite the shape warning.
+    expect(screen.getByRole('button', { name: /save & test/i })).toBeEnabled();
+  });
+
+  it('shows no shape warning for a well-formed Anthropic key', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/provider type/i), {
+      target: { value: 'anthropic' },
+    });
+    fireEvent.change(screen.getByLabelText(/^api key$/i), {
+      target: { value: 'sk-ant-abc123' },
+    });
+
+    expect(
+      screen.queryByText(/doesn't look like an anthropic key/i),
+    ).not.toBeInTheDocument();
+  });
+
+  it('never marks the API key field itself as invalid (warning stays non-blocking)', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/provider type/i), {
+      target: { value: 'anthropic' },
+    });
+    fireEvent.change(screen.getByLabelText(/^api key$/i), {
+      target: { value: 'not-anthropic-shaped-at-all' },
+    });
+
+    // A shape mismatch must surface only as the warning EuiCallOut above, never as a red-invalid
+    // field — that would read as a blocking error to an admin even though Save stays enabled.
+    expect(screen.getByLabelText(/^api key$/i)).not.toHaveAttribute(
+      'aria-invalid',
+      'true',
+    );
+  });
+
+  it('does not warn on a Groq-shaped key for the openai_compatible type', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    // openai_compatible covers OpenAI, Groq, Bedrock-Mantle and auth-free Ollama — there is no
+    // single key shape to check, so a Groq key (gsk_...) must never trigger the warning meant
+    // for Anthropic's sk-ant- shape.
+    fireEvent.change(screen.getByLabelText(/^api key$/i), {
+      target: { value: 'gsk_totally-valid-groq-key' },
+    });
+
+    expect(screen.queryByText(/doesn't look like/i)).not.toBeInTheDocument();
+  });
+
+  it('clears an untouched Anthropic prefill when switching to another type', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/provider type/i), {
+      target: { value: 'anthropic' },
+    });
+    expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
+      'https://api.anthropic.com',
+    );
+
+    fireEvent.change(screen.getByLabelText(/provider type/i), {
+      target: { value: 'openai_compatible' },
+    });
+
+    expect(screen.getByLabelText(/endpoint url/i)).toHaveValue('');
+  });
+
+  it('keeps an admin-typed Anthropic URL when switching away from anthropic', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/provider type/i), {
+      target: { value: 'anthropic' },
+    });
+    // A value the admin actually TYPED must survive the switch. Note it must differ from the
+    // prefill already in the field: React deduplicates controlled-input change events whose
+    // value is identical to the current one, so firing a change with the prefill's own value
+    // dispatches nothing at all -- no onChange, no touched flag, no user action to preserve.
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://claude.internal-proxy.example' },
+    });
+
+    fireEvent.change(screen.getByLabelText(/provider type/i), {
+      target: { value: 'openai_compatible' },
+    });
+
+    expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
+      'https://claude.internal-proxy.example',
+    );
+  });
+
   it('shows a numbered getting-started hint for a new provider, not when editing', () => {
     const { rerender } = render(<ProviderFormFlyout {...baseProps} />);
     expect(screen.getByText(/getting started/i)).toBeInTheDocument();

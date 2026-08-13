@@ -4,6 +4,7 @@ import {
   EuiPageBody,
   EuiPageContent,
   EuiPageContentBody,
+  EuiBadge,
   EuiBasicTable,
   EuiBasicTableColumn,
   EuiButton,
@@ -20,7 +21,6 @@ import {
   EuiConfirmModal,
   EuiButtonIcon,
   EuiToolTip,
-  EuiBadge,
   EuiLoadingSpinner,
   EuiSwitch,
   EuiPanel,
@@ -50,6 +50,13 @@ import {
   outcomeFromTestError,
   outcomeFromTestResult,
 } from './provider-status';
+
+// Narrows the discriminated `ProviderTestOutcome` union for the page-level failure callouts
+// below, which only ever render for a non-'ok' outcome but read `testResults[id]` by key again
+// rather than the already-narrowed value the `.filter`/`.find` above checked.
+function outcomeMessage(outcome: ProviderTestOutcome): string | undefined {
+  return outcome.status === 'ok' ? undefined : outcome.message;
+}
 
 const FIELD_POLICY_ACTIONS: FieldPolicyAction[] = [
   'allow',
@@ -185,6 +192,18 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     Record<string, ProviderTestOutcome>
   >({});
   const [testingIds, setTestingIds] = useState<Set<string>>(new Set());
+  // Ids of providers whose *last* test was explicitly triggered by the user (table row "Test"
+  // action), as opposed to the silent auto-probe run once on mount for every loaded provider.
+  // Only a manual failure (or the default provider failing, handled separately below) earns a
+  // page-level callout — the auto-probe's result still lands in the table's per-row status cell,
+  // it just never escalates to a banner on its own. See `manualTestFailures` below.
+  const [manualTestIds, setManualTestIds] = useState<Set<string>>(new Set());
+  // Dismissal is keyed per callout: a manual-test failure dismisses under the bare provider id;
+  // the default-provider-failing callout dismisses under a separate `default:${id}` key so
+  // dismissing one never silently dismisses the other for the same provider.
+  const [dismissedErrorIds, setDismissedErrorIds] = useState<Set<string>>(
+    new Set(),
+  );
   const [deleteTarget, setDeleteTarget] = useState<ProviderSummary | null>(
     null,
   );
@@ -222,6 +241,28 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   );
   const [isSavingRetention, setIsSavingRetention] = useState(false);
   const [fieldPolicyFilter, setFieldPolicyFilter] = useState('');
+  // Page-level callout #2: the default provider is failing (whether the failure came from the
+  // silent auto-probe or a manual test) — the one case that breaks chat, so it always surfaces,
+  // compact and dismissible, regardless of who triggered the test.
+  const failingDefaultProvider = providers.find(
+    p =>
+      p.isDefault &&
+      testResults[p.id] &&
+      testResults[p.id].status !== 'ok' &&
+      !dismissedErrorIds.has(`default:${p.id}`),
+  );
+  // Page-level callout #1: a provider the user explicitly clicked "Test" on, which failed.
+  // A provider that is ALSO the failing default is excluded here — it already gets the
+  // dedicated default-provider callout below, and showing both for the same provider/message
+  // would be duplicative.
+  const manualTestFailures = providers.filter(
+    p =>
+      manualTestIds.has(p.id) &&
+      testResults[p.id] &&
+      testResults[p.id].status !== 'ok' &&
+      !dismissedErrorIds.has(p.id) &&
+      p.id !== failingDefaultProvider?.id,
+  );
   const hasEmptyFieldPolicyRow = fieldPolicyDraft.some(
     entry => entry.field.trim() === '',
   );
@@ -426,7 +467,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       .list()
       .then(loaded => {
         setProviders(loaded);
-        loaded.forEach(p => handleTest(p));
+        // Silent auto-probe: populates the per-row status cell so the table itself shows
+        // green/red at a glance, but never marked as "manual" — see `manualTestFailures` above,
+        // it must not spawn a page-level callout on its own on every visit.
+        loaded.forEach(p => handleTest(p, { manual: false }));
       })
       .catch(() =>
         setError(
@@ -479,7 +523,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       setIsFormOpen(false);
       reload();
       onProvidersChanged();
-      handleTest(saved);
+      handleTest(saved, { manual: true });
       core.notifications.toasts.addSuccess(
         editingProvider
           ? i18n.translate('wazuhAiAssistant.settings.updateSuccess', {
@@ -564,8 +608,25 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     }
   };
 
-  const handleTest = async (provider: ProviderSummary) => {
+  // `manual` has no default here on purpose (see the finding this fixed): a future call site
+  // that forgets to pass it should fail to compile rather than silently gain page-level banner
+  // rights. The row action below gets its own thin wrapper (`handleManualTest`) that always
+  // passes `manual: true`; the auto-probe on mount passes `manual: false` explicitly.
+  const handleTest = async (
+    provider: ProviderSummary,
+    options: { manual: boolean },
+  ) => {
     setTestingIds(current => new Set(current).add(provider.id));
+    if (options.manual) {
+      setManualTestIds(current => new Set(current).add(provider.id));
+    }
+    // A fresh test result deserves a fresh chance to show its callout, whichever kind applies.
+    setDismissedErrorIds(current => {
+      const next = new Set(current);
+      next.delete(provider.id);
+      next.delete(`default:${provider.id}`);
+      return next;
+    });
     try {
       const result = await service.test(provider.id);
       setTestResults(current => ({
@@ -585,6 +646,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       });
     }
   };
+
+  // Row action wrapper: the only call site that should ever pass `manual: true` — see the
+  // no-default rationale on `handleTest` above.
+  const handleManualTest = (provider: ProviderSummary) =>
+    handleTest(provider, { manual: true });
 
   const columns: EuiBasicTableColumn<ProviderSummary>[] = [
     {
@@ -707,15 +773,20 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         }
         if (result.status === 'ok') {
           return (
-            <EuiBadge color='success'>
+            <EuiHealth color='success'>
               {i18n.translate('wazuhAiAssistant.settings.testSuccessBadge', {
                 defaultMessage: 'OK ({latency} ms)',
                 values: { latency: result.latencyMs },
               })}
-            </EuiBadge>
+            </EuiHealth>
           );
         }
         const isCouldNotVerify = result.status === 'could-not-verify';
+        const failureMessage =
+          result.message ??
+          i18n.translate('wazuhAiAssistant.settings.testFailureUnknown', {
+            defaultMessage: 'Connection failed.',
+          });
         return (
           <EuiFlexGroup gutterSize='xs' alignItems='center' responsive={false}>
             <EuiFlexItem grow={false}>
@@ -736,12 +807,20 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
               </EuiBadge>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
-              <EuiIconTip
-                type={isCouldNotVerify ? 'questionInCircle' : 'alert'}
-                color={isCouldNotVerify ? 'subdued' : 'danger'}
-                content={result.message}
-                aria-label={result.message}
-              />
+              <EuiToolTip content={failureMessage}>
+                <span
+                  style={{
+                    display: 'inline-block',
+                    maxWidth: '100px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    verticalAlign: 'bottom',
+                  }}
+                >
+                  {failureMessage}
+                </span>
+              </EuiToolTip>
             </EuiFlexItem>
           </EuiFlexGroup>
         );
@@ -765,8 +844,15 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           ),
           icon: 'play',
           type: 'icon' as const,
-          onClick: handleTest,
+          isPrimary: true,
+          onClick: handleManualTest,
           enabled: (provider: ProviderSummary) => !testingIds.has(provider.id),
+          // Stable query hook: the accessible name of a primary icon action is not a reliable
+          // anchor across re-renders in the test env (a callout rendering below the table can
+          // transiently drop it from the a11y-name query). NOTE: this OUI fork passes the value
+          // through verbatim as a plain attribute, so it must be a STRING — the newer EUI
+          // per-row callback form would reach React as a function and be dropped silently.
+          'data-test-subj': 'wz-ai-provider-test-action',
         },
         {
           name: i18n.translate('wazuhAiAssistant.settings.action.edit', {
@@ -945,6 +1031,130 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   columns={columns}
                   itemId='id'
                 />
+              )}
+              {/* Only a test the user explicitly clicked earns a page-level callout — the
+                  silent auto-probe's result lives solely in the per-row status cell above, so it
+                  never reappears as a banner on every visit. */}
+              {manualTestFailures.map(p => (
+                <React.Fragment key={p.id}>
+                  <EuiSpacer size='s' />
+                  {/* The installed OUI fork's EuiCallOut renders no dismiss control at all when
+                      given `onDismiss` (verified live: zero buttons, no close icon) — so the
+                      close affordance below is an explicit EuiButtonIcon wired directly to
+                      `dismissedErrorIds`, not a prop the fork is free to silently ignore. */}
+                  <EuiCallOut color='danger' iconType='alert' size='s'>
+                    <EuiFlexGroup
+                      gutterSize='s'
+                      alignItems='center'
+                      justifyContent='spaceBetween'
+                      responsive={false}
+                    >
+                      <EuiFlexItem>
+                        <EuiText size='s'>
+                          <p>
+                            {i18n.translate(
+                              'wazuhAiAssistant.settings.testFailureCallout',
+                              {
+                                defaultMessage: '{name}: {message}',
+                                values: {
+                                  name: p.name,
+                                  message:
+                                    outcomeMessage(testResults[p.id]) ??
+                                    i18n.translate(
+                                      'wazuhAiAssistant.settings.testFailureUnknown',
+                                      { defaultMessage: 'Connection failed.' },
+                                    ),
+                                },
+                              },
+                            )}
+                          </p>
+                        </EuiText>
+                      </EuiFlexItem>
+                      <EuiFlexItem grow={false}>
+                        <EuiButtonIcon
+                          iconType='cross'
+                          color='danger'
+                          aria-label={i18n.translate(
+                            'wazuhAiAssistant.settings.testFailureCallout.dismiss',
+                            {
+                              defaultMessage: 'Dismiss {name} test failure',
+                              values: { name: p.name },
+                            },
+                          )}
+                          onClick={() =>
+                            setDismissedErrorIds(
+                              prev => new Set([...prev, p.id]),
+                            )
+                          }
+                        />
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  </EuiCallOut>
+                </React.Fragment>
+              ))}
+              {/* The one auto-probe failure that still gets a banner: the default provider is
+                  what the chat actually calls, so a broken default is surfaced even when nobody
+                  clicked "Test" — kept single and dismissible, unlike the old permanent banners.
+                  Same explicit-close-button caveat as the manual-failure callout above applies. */}
+              {failingDefaultProvider && (
+                <>
+                  <EuiSpacer size='s' />
+                  <EuiCallOut color='danger' iconType='alert' size='s'>
+                    <EuiFlexGroup
+                      gutterSize='s'
+                      alignItems='center'
+                      justifyContent='spaceBetween'
+                      responsive={false}
+                    >
+                      <EuiFlexItem>
+                        <EuiText size='s'>
+                          <p>
+                            {i18n.translate(
+                              'wazuhAiAssistant.settings.defaultProviderFailureCallout',
+                              {
+                                defaultMessage:
+                                  'Default provider "{name}" is failing: {message}',
+                                values: {
+                                  name: failingDefaultProvider.name,
+                                  message:
+                                    outcomeMessage(
+                                      testResults[failingDefaultProvider.id],
+                                    ) ??
+                                    i18n.translate(
+                                      'wazuhAiAssistant.settings.testFailureUnknown',
+                                      { defaultMessage: 'Connection failed.' },
+                                    ),
+                                },
+                              },
+                            )}
+                          </p>
+                        </EuiText>
+                      </EuiFlexItem>
+                      <EuiFlexItem grow={false}>
+                        <EuiButtonIcon
+                          iconType='cross'
+                          color='danger'
+                          aria-label={i18n.translate(
+                            'wazuhAiAssistant.settings.defaultProviderFailureCallout.dismiss',
+                            {
+                              defaultMessage:
+                                'Dismiss default provider failure',
+                            },
+                          )}
+                          onClick={() =>
+                            setDismissedErrorIds(
+                              prev =>
+                                new Set([
+                                  ...prev,
+                                  `default:${failingDefaultProvider.id}`,
+                                ]),
+                            )
+                          }
+                        />
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  </EuiCallOut>
+                </>
               )}
             </EuiPanel>
 

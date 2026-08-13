@@ -225,6 +225,20 @@ const SECURITY_ANALYTICS_APP_IDS = {
   kvdbs: 'kvdbs',
 };
 
+/**
+ * The AI Assistant app id, owned by the separate `wazuh-ai-assistant` plugin's
+ * `common/constants.ts` (`PLUGIN_ID`). Kept as a literal here rather than imported: a cross-plugin
+ * VALUE import does not resolve in this plugin's own build/test tree (a sibling plugin's source is
+ * not present there) — the same constraint documented in
+ * `plugins/wazuh-ai-assistant/common/nav-categories.ts`'s doc comment, which is why that plugin
+ * also duplicates the `Home` category literal it joins rather than importing it from here.
+ */
+const AI_ASSISTANT_APP_ID = 'wazuhAiAssistant';
+
+/** Opens the AI Assistant app from its Home overview card (see
+ * `../components/overview/ai-assistant-cta.tsx`). */
+export const getAiAssistantUrl = () => getUrlForApp(AI_ASSISTANT_APP_ID);
+
 export const getRulesUrl = () => getUrlForApp(SECURITY_ANALYTICS_APP_IDS.rules);
 export const getDecodersUrl = () =>
   getUrlForApp(SECURITY_ANALYTICS_APP_IDS.decoders);
