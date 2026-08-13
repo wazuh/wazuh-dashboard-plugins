@@ -48,6 +48,11 @@
 .wzComposerRow {
   max-height: $wzComposerMaxHeight;
   overflow-y: auto;
+  /* This row scrolls without being a `wzScrollChild` (it is the grid's `auto` row, so it has no
+     automatic-minimum-size problem to solve), so it takes the scrollbar treatment on its own —
+     otherwise a composer at its ceiling would be the one place on the surface still drawing the
+     platform's default bar. */
+  @include wzQuietScrollbar;
   border-top: 1px solid var(--wz-hairline);
   background-color: var(--wz-surface);
 
@@ -71,6 +76,9 @@
      The panel's ring is the single focus affordance. */
   .euiTextArea {
     background-image: none;
+    /* The field scrolls internally once autogrow hits its 5-row cap (chat-input.tsx), inside a row
+       that is itself only 10px wider than the text — the default bar there is unmistakable. */
+    @include wzQuietScrollbar;
   }
 }
 

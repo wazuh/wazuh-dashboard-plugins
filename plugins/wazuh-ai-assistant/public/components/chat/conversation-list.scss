@@ -19,9 +19,30 @@
   margin: 0;
 }
 
+/**
+ * Date-group header ("TODAY" / "YESTERDAY" / "TUESDAY").
+ *
+ * The label's TYPE was never the problem — 11px uppercase muted is already a shade darker than the
+ * reference's own #98A2B3 — but its SPACING was: 10px of lead against rows that sit 4px apart is
+ * not enough contrast to read as a section break, so a day header scanned as one more list item.
+ * The reference solves this with air alone (14px above a group, 6px above the first). This adds the
+ * air AND a hairline, because a rail that can hold a week of conversations has more rows between
+ * two headers than the mockup's three, and by the third group the gap alone stops registering.
+ */
 .wzConvoRailGroupHeader {
   @include wzMicroLabel;
-  padding: 10px 4px 4px;
+  margin-top: 10px;
+  padding: 8px 4px 4px;
+  border-top: 1px solid var(--wz-hairline, #{$euiBorderColor});
+
+  /* The first group opens the list, so a rule above it would read as a divider hanging off the
+     search field rather than as the start of a section. React fragments emit no DOM, so the first
+     group's header genuinely is `.wzConvoRailScroll`'s first element child. */
+  &:first-child {
+    margin-top: 0;
+    padding-top: 2px;
+    border-top: none;
+  }
 }
 
 /**

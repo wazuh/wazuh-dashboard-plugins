@@ -46,6 +46,21 @@ $wzResultsMaxHeight: min(460px, 52dvh);
    as unconsumed duplicates. */
 $wzRailCollapsedWidth: 48px;
 
+/* --- Scrollbars --------------------------------------------------------------------------------
+   The reference draws no scrollbar chrome at all: its rail mockup is `overflow: hidden` and the
+   whole design bundle contains zero scrollbar rules. Windows Chrome, meanwhile, defaults to a 15px
+   opaque bar over a full-height grey track — measured against a 260px rail that is 6% of the rail's
+   width spent on chrome, and visually the loudest object on a surface whose entire premise is
+   "quiet and dense". These two make ours an overlay instead: a 4px thumb floating in a 10px gutter
+   with no track, darkening only while its region is hovered or focused.
+
+   Deliberately NOT transparent at rest. A scroll region whose only affordance appears on hover is
+   undiscoverable for a pointer user and absent entirely for anyone who never hovers, so the resting
+   thumb stays visible — just quiet enough to read as an edge rather than as a control. */
+$wzScrollGutter: 10px;
+$wzScrollThumb: rgba($euiColorDarkShade, 0.3);
+$wzScrollThumbHover: rgba($euiColorDarkShade, 0.55);
+
 /* --- Motion (120–200ms ease-out, nothing loops) ------------------------------------------------
    Always used inside a `prefers-reduced-motion: no-preference` block. */
 $wzMotionFast: 120ms;
@@ -112,6 +127,51 @@ $wzEase: ease-out;
 }
 
 /**
+ * The quiet overlay scrollbar described by the `$wzScroll*` tokens above. Applied to every scroll
+ * region this redesign owns — via `wzScrollChild` below for the ones that are also layout children,
+ * and directly for the two that are not (the composer row and its textarea).
+ *
+ * Both vendor surfaces are covered because they are disjoint: Firefox reads `scrollbar-width` /
+ * `scrollbar-color` and ignores the pseudo-elements, WebKit/Blink the reverse. Styling only one
+ * leaves the other browser on the platform default, which is the bar this exists to remove.
+ */
+@mixin wzQuietScrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: $wzScrollThumb transparent;
+
+  &::-webkit-scrollbar {
+    width: $wzScrollGutter;
+    height: $wzScrollGutter;
+  }
+
+  /* No track, so the bar reads as a floating thumb rather than as a channel cut down the edge of
+     the pane — the track is what makes the platform default look like furniture. */
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: $wzScrollThumb;
+    border-radius: 999px;
+    /* Transparent border + `content-box` clip is what paints a 4px thumb inside a 10px gutter
+       WITHOUT shrinking the grab target: the border area still hit-tests as the thumb, so the
+       pointer target stays the full 10px even though only 4px of it is visible. */
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+
+  &:hover,
+  &:focus-within {
+    scrollbar-color: $wzScrollThumbHover transparent;
+  }
+
+  &:hover::-webkit-scrollbar-thumb,
+  &:focus-within::-webkit-scrollbar-thumb {
+    background-color: $wzScrollThumbHover;
+  }
+}
+
+/**
  * Any grid/flex child that scrolls needs this. The automatic minimum size of a flex/grid item is
  * its content size, so without it the transcript refuses to shrink and pushes the composer
  * off-screen — Safari surfaces this earlier than Chrome, and it is the first of the six Safari
@@ -120,4 +180,5 @@ $wzEase: ease-out;
 @mixin wzScrollChild {
   min-height: 0;
   overflow-y: auto;
+  @include wzQuietScrollbar;
 }
