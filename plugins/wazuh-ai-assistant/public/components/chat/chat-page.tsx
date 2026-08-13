@@ -2277,7 +2277,17 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                         one-truncated-line cards that floated on the page background with no
                         grouping container. Clicking a card still only fills the input (unchanged
                         `setInputText` call), never auto-sends. */}
-                    <EuiPanel hasBorder hasShadow={false} paddingSize='l'>
+                    {/* `grow={false}`: EuiPanel's `grow` DEFAULTS TO TRUE (flex-grow: 1), and
+                        this panel is a flex item of the welcome's centring column — left at
+                        the default it stretched to the full transcript height, so the cards
+                        sat at the top of a tall empty box instead of the cluster sitting
+                        centred. Same trap as the conversation rail's own panel above. */}
+                    <EuiPanel
+                      hasBorder
+                      hasShadow={false}
+                      paddingSize='l'
+                      grow={false}
+                    >
                       <EuiFlexGroup
                         gutterSize='none'
                         justifyContent='center'
