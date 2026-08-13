@@ -132,7 +132,13 @@
 .wzContentMeasure--stretch {
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  /* `flex: 1 1 auto`, NOT `min-height: 100%`: the parent `.wzTranscriptContent` is a flex column
+     whose own height comes from ITS min-height, so its `height` property is `auto` — and a
+     percentage min-height against an auto-height parent resolves to nothing. Measured live: this
+     column came out 330px tall inside a 658px transcript, which is why the welcome sat high
+     instead of centred. Growing as a flex item takes the real height with no percentage involved. */
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 /**
