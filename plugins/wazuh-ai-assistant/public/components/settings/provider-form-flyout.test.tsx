@@ -356,7 +356,7 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
     expect(screen.getByLabelText(/anthropic \(claude\)/i)).toBeInTheDocument();
     expect(
       screen.getByText(
-        /choose this for openai, groq, bedrock-mantle, or any other provider/i,
+        /for hosted services such as openai, gemini or an aws bedrock gateway/i,
       ),
     ).toBeInTheDocument();
   });
@@ -521,7 +521,9 @@ describe('ProviderFormFlyout — model help text does not recommend retiring mod
 
     expect(helpText.textContent).not.toMatch(/llama-3\.3-70b-versatile/);
     expect(helpText.textContent).not.toMatch(/llama-3\.1-8b-instant/);
-    expect(helpText.textContent).toMatch(/GPT-4o/);
+    // The example follows the selected provider type rather than being a fixed GPT-4o, which is
+    // what this line used to assert — see the per-type example test above.
+    expect(helpText.textContent).toMatch(/openai\.gpt-oss-120b/);
     expect(helpText.textContent).not.toMatch(
       /small or base models often fail/i,
     );
@@ -797,8 +799,14 @@ describe('ProviderFormFlyout — Model field is an editable EuiComboBox', () => 
     });
 
     // claude-opus-4-8 is listed in both PROVIDER_MODEL_GUIDANCE (examples) and
-    // VENDOR_MODEL_SUGGESTIONS (suggested models) for this endpoint — it must render once.
-    expect(screen.getAllByText('claude-opus-4-8')).toHaveLength(1);
+    // VENDOR_MODEL_SUGGESTIONS (suggested models) for this endpoint — it must render once across
+    // the two LISTS. The tool-calling callout names the same model as its inline example and is
+    // excluded deliberately: the invariant here is "the two lists do not repeat each other", not
+    // "this string appears once on the form". Prose naming a model a list also offers is normal.
+    const inTheLists = screen
+      .getAllByText('claude-opus-4-8')
+      .filter(node => !node.closest('.euiCallOut'));
+    expect(inTheLists).toHaveLength(1);
     // claude-sonnet-5 only exists in the vendor suggestion list — the dedupe must not drop it.
     expect(screen.getByText('claude-sonnet-5')).toBeInTheDocument();
   });

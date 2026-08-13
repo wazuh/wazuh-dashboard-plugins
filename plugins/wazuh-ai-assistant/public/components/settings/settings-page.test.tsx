@@ -84,11 +84,9 @@ describe('SettingsPage — wazuh_brain hidden from provider type choices', () =>
     // Provider type (screen 4, variation 4a) is now two EuiCheckableCard radios instead of a
     // <select>/<option> pair — assert on those directly rather than on <option> elements.
     expect(screen.getAllByRole('radio')).toHaveLength(2);
-    expect(
-      screen.getByLabelText(
-        /openai-compatible \(openai, bedrock gateway, ollama, lm studio, vllm\.\.\.\)/i,
-      ),
-    ).toBeInTheDocument();
+    // The label is the type name alone now; the list of services it covers moved down into the
+    // card's own description, which had the room for it (provider-form-flyout.tsx).
+    expect(screen.getByLabelText(/openai-compatible/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/anthropic \(claude\)/i)).toBeInTheDocument();
     expect(screen.queryByText(/wazuh_brain/i)).not.toBeInTheDocument();
   });
