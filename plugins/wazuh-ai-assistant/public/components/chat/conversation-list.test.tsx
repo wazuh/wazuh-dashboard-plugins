@@ -349,7 +349,12 @@ describe('ConversationList', () => {
       expect(screen.queryByText('Today')).toBeNull();
       expect(screen.queryByText('Yesterday')).toBeNull();
       // Formatted month/day, not a bare weekday name like "Friday" — the >= 7-day-old branch.
-      expect(screen.getByText(/Dec 1/)).toBeInTheDocument();
+      // Scoped to the GROUP HEADER: past a week the row's own compact stamp also falls back to a
+      // month/day ("Dec 1"), so an unscoped match now finds both and cannot say which one it
+      // checked. This test is about the bucket, so it reads the bucket.
+      expect(
+        document.querySelector('.wzConvoRailGroupHeader')?.textContent,
+      ).toMatch(/Dec 1/);
     });
   });
 
