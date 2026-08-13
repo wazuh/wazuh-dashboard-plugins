@@ -250,7 +250,10 @@ describe('ResultTable', () => {
       }));
       render(
         <ResultTable
-          spec={spec({ columns: [{ id: 'agent', label: 'Agent' }], rows: sixRows })}
+          spec={spec({
+            columns: [{ id: 'agent', label: 'Agent' }],
+            rows: sixRows,
+          })}
         />,
       );
       expect(screen.getByText(/rows per page/i)).toBeInTheDocument();
