@@ -810,6 +810,16 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     },
                   )}
                 </p>
+                <p>
+                  {i18n.translate(
+                    'wazuhAiAssistant.settings.form.gettingStartedTestCaveat',
+                    {
+                      defaultMessage:
+                        'A green test confirms connection and key — it does not guarantee ' +
+                        'every chat request will succeed.',
+                    },
+                  )}
+                </p>
               </EuiCallOut>
               <EuiSpacer size='m' />
             </>

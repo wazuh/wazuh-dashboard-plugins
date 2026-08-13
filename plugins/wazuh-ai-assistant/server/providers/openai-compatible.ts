@@ -25,6 +25,7 @@ import {
   PROVIDER_FETCH_REDIRECT_POLICY,
 } from './url-guard';
 import { InlineReasoningMarkupFilter } from './inline-reasoning-markup-filter';
+import { fetchWithTemperatureFallback } from './temperature-fallback';
 
 /** Per-index accumulation of a streamed `tool_calls` delta until the provider closes it out. */
 interface ToolCallAccumulator {
@@ -81,58 +82,6 @@ function extractExtras(
 }
 
 /**
- * Providers that have already told us, in THIS process, that they reject `temperature` for a
- * given base URL + model (observed live against a Bedrock `openai_compatible` gateway serving
- * `openai.gpt-oss-120b`: "`temperature` is deprecated for this model", HTTP 400). Keyed by
- * `baseUrl::model` rather than the whole `ProviderConfig` so two settings entries pointing at the
- * same endpoint/model share the finding, and a config with a different model at the same base URL
- * does not.
- *
- * Module-scope, not per-request: the whole point is that every call AFTER the first rejection —
- * crucially including every stage-1 router call, which unconditionally sends `temperature: 0` —
- * skips the doomed first attempt instead of re-discovering the same 400 on every turn. Resets on
- * process restart, which is acceptable: the cost of forgetting is at most one wasted round-trip
- * per restart, not a functional break.
- */
-const temperatureRejectedByProviderModel = new Map<string, boolean>();
-
-/** Cache key for `temperatureRejectedByProviderModel` — see its doc comment. */
-function temperatureCacheKey(config: ProviderConfig): string {
-  return `${trimTrailingSlash(config.baseUrl)}::${config.model}`;
-}
-
-/**
- * Loosely matches a provider telling us, via an HTTP 4xx body, that it will not accept the
- * `temperature` parameter for this model. Deliberately loose (any 4xx + a case-insensitive
- * mention of "temperature" anywhere in the body) rather than matching the exact Bedrock wording:
- * different OpenAI-compatible gateways phrase this differently ("is deprecated for this model",
- * "is not supported", "unsupported_parameter"...), and the cost of a false positive here is just
- * one extra harmless retry without `temperature` — not a wrong answer or a dropped turn.
- */
-function looksLikeTemperatureRejection(
-  status: number,
-  bodyText: string,
-): boolean {
-  return status >= 400 && status < 500 && /temperature/i.test(bodyText);
-}
-
-/**
- * Logs the temperature-rejection discovery exactly once per provider/model — at the moment it is
- * first cached, which the caller only reaches once per `temperatureRejectedByProviderModel` key
- * (every later call for that key short-circuits before re-detecting anything). No `Logger` is
- * threaded down into `ProviderAdapter.chatStream` from any call site (chat.ts/anthropic.ts/
- * openai-compatible.ts all construct adapters directly), so this intentionally uses `console.debug`
- * rather than growing every adapter's signature just for one diagnostic line.
- */
-function logTemperatureRejectionOnce(config: ProviderConfig): void {
-  // eslint-disable-next-line no-console -- see doc comment: no Logger reaches this layer.
-  console.debug(
-    `[wazuh-ai-assistant] Provider ${config.baseUrl} (model ${config.model}) rejected ` +
-      '`temperature`; retrying once without it and caching the decision for this process.',
-  );
-}
-
-/**
  * Adapter for any server exposing the OpenAI chat-completions wire format: OpenAI itself,
  * Google Gemini's OpenAI-compatible endpoint, Ollama, LM Studio, vLLM, and most local model
  * servers. Provider choice is transport only; the system prompt / message shape is the same
@@ -156,11 +105,6 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
       return;
     }
 
-    // Cache key computed once per call; `includeTemperature` below is recomputed on every
-    // `doFetch()` attempt (not just once here) so a rejection discovered mid-call by the first
-    // attempt is honored by the very next one, without waiting for a fresh `chatStream()` call.
-    const cacheKey = temperatureCacheKey(config);
-
     const buildBody = (
       includeTemperature: boolean,
     ): Record<string, unknown> => {
@@ -182,7 +126,7 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
       // stage-1 router; see ChatStreamOptions's doc comment), which a `if (options?.temperature)`
       // guard would treat as absent and silently drop. `includeTemperature` additionally gates this
       // on whether the provider is already known (this process) to reject the parameter entirely --
-      // see `temperatureRejectedByProviderModel`'s doc comment above.
+      // see temperature-fallback.ts's doc comment.
       if (includeTemperature && options?.temperature !== undefined) {
         nextBody.temperature = options.temperature;
       }
@@ -209,36 +153,15 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
       });
 
     const response = yield* fetchProviderWithRetry(
-      async () => {
-        const includeTemperature =
-          !temperatureRejectedByProviderModel.get(cacheKey);
-        const attemptResponse = await doFetch(buildBody(includeTemperature));
-        // A "temperature rejection" is only possible when temperature was actually in the
-        // request body: without the `options?.temperature !== undefined` gate, a 400 whose
-        // body merely mentions "temperature" on a temperature-free call would trigger a
-        // pointless byte-identical retry AND cache a rejection for a parameter never sent.
-        const temperatureWasSent =
-          includeTemperature && options?.temperature !== undefined;
-        if (!temperatureWasSent || attemptResponse.status !== 400) {
-          return attemptResponse;
-        }
-        // Peek by reading the ORIGINAL body — `Response.clone()` is unavailable in some
-        // runtimes (the OSD jest environment's Response polyfill lacks it entirely, throwing
-        // `clone is not a function`), so the peek consumes the body and, when this turns out
-        // NOT to be a temperature rejection, hands `fetchProviderWithRetry` a reconstructed
-        // equivalent Response whose body is intact for its own error-reading path.
-        const bodyText = await attemptResponse.text().catch(() => '');
-        if (!looksLikeTemperatureRejection(attemptResponse.status, bodyText)) {
-          return new Response(bodyText, {
-            status: attemptResponse.status,
-            statusText: attemptResponse.statusText,
-            headers: attemptResponse.headers,
-          });
-        }
-        temperatureRejectedByProviderModel.set(cacheKey, true);
-        logTemperatureRejectionOnce(config);
-        return doFetch(buildBody(false));
-      },
+      // The `temperature`-rejection fallback lives in temperature-fallback.ts because the native
+      // Anthropic adapter needs exactly the same recovery (see that module's doc comment), and the
+      // rejection cache is deliberately shared between the two.
+      () =>
+        fetchWithTemperatureFallback(
+          config,
+          options?.temperature,
+          includeTemperature => doFetch(buildBody(includeTemperature)),
+        ),
       signal,
       // See server/providers/retry.ts's sanitizeProviderErrorBody doc comment for why the
       // exact configured key is passed through here.

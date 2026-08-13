@@ -681,6 +681,16 @@ describe('ProviderFormFlyout — type label and tool-support copy corrections', 
     );
     expect(helpText.textContent).not.toMatch(/claude sonnet/i);
   });
+
+  it('caveats that a green test does not guarantee every chat request will succeed', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    expect(
+      screen.getByText(
+        /a green test confirms connection and key — it does not guarantee every chat request will succeed/i,
+      ),
+    ).toBeInTheDocument();
+  });
 });
 
 describe('ProviderFormFlyout — curated per-vendor model suggestions', () => {
