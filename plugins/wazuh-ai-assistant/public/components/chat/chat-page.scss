@@ -207,6 +207,17 @@
  * then 2-up, then 1-up with no fixed pixel card widths — the whole reason horizontal scroll can
  * never appear here regardless of viewport width.
  */
+/**
+ * EUI's `.euiEmptyPrompt` centres ITSELF with `margin: auto`. Inside this flex column that auto
+ * margin absorbs every pixel of free space (measured live: 156px above and below the hero), so the
+ * hero floated mid-pane while the card group was pushed flush against the composer — the cluster
+ * read as two separate things instead of one. The column already centres the cluster as a whole,
+ * so the hero must not also centre itself.
+ */
+.wzWelcomeCenter > .euiEmptyPrompt {
+  margin: 0;
+}
+
 .wzExampleCardsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
