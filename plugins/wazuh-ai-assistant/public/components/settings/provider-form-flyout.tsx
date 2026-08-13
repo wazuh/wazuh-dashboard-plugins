@@ -1084,10 +1084,15 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                   customOptionText={i18n.translate(
                     'wazuhAiAssistant.settings.form.modelCustomOptionText',
                     {
-                      // ICU-escaped so the literal "{searchValue}" token survives translation —
-                      // EuiComboBox does its own plain-string substitution of that token, this is
-                      // not an i18n interpolation placeholder.
-                      defaultMessage: "Add '{searchValue}' as a custom model",
+                      // The literal "{searchValue}" token has to survive i18n and reach
+                      // EuiComboBox, which does its own plain-string substitution of it. ICU
+                      // apostrophe-escaping does NOT achieve that here — @osd/i18n's formatter
+                      // parses '{searchValue}' as a real placeholder and throws "context variable
+                      // not provided", which crashes the whole flyout. Passing the token as a
+                      // VALUE is the portable way: i18n substitutes {token}, and what lands in the
+                      // output is the brace form EUI expects.
+                      defaultMessage: 'Add {token} as a custom model',
+                      values: { token: '{searchValue}' },
                     },
                   )}
                 />

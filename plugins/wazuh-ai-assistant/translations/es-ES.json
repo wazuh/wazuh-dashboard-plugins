@@ -190,6 +190,6 @@
     "wazuhAiAssistant.settings.rowDetail.noResult": "Este proveedor todavía no se ha probado.",
     "wazuhAiAssistant.settings.rowDetail.reason": "Motivo",
     "wazuhAiAssistant.settings.form.modelPlaceholder": "Elige una sugerencia o escribe cualquier id de modelo",
-    "wazuhAiAssistant.settings.form.modelCustomOptionText": "Añadir '{searchValue}' como modelo personalizado"
+    "wazuhAiAssistant.settings.form.modelCustomOptionText": "Añadir {token} como modelo personalizado"
   }
 }
