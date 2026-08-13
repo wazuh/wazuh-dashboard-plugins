@@ -48,17 +48,18 @@ In general, the environment consist of:
 
 5.  Save the paths to your plugin repositories as environment variables, so you can reference them easily when running the scripts.
 
-        Our development workflow consists of a hybrid model: this repository contains some plugins (currently `main`, `wazuh-core`, `wazuh-check-updates`) while other plugins live in independent external Git repositories (e.g. `wazuh-dashboard-reporting`, `wazuh-security-dashboards-plugin`, etc.). The Docker helper scripts therefore support BOTH layouts:
+        Our development workflow consists of a hybrid model: this repository contains some plugins (currently `main`, `wazuh-core`, `wazuh-check-updates`, `wazuh-ai-assistant`) while other plugins live in independent external Git repositories (e.g. `wazuh-dashboard-reporting`, `wazuh-security-dashboards-plugin`, etc.). The Docker helper scripts therefore support BOTH layouts:
 
         - Single checkout (all plugins under one root folder)
         - Multiple separate checkouts (each plugin cloned in its own folder anywhere in your filesystem)
 
     You can tell the scripts where your repositories are in two ways:
 
-    1. Provide a base path ( `<default_repo_root>` argument ) so the script auto-detects INTERNAL repositories (`main`, `wazuh-core`, `wazuh-check-updates`) under `<base>`, `<base>/plugins`, or `<base>/<repo>`. If you omit a base path it will attempt to infer it (two levels up) when running from inside this repo.
+    1. Provide a base path ( `<default_repo_root>` argument ) so the script auto-detects INTERNAL repositories (`main`, `wazuh-core`, `wazuh-check-updates`,
+       `wazuh-ai-assistant`) under `<base>`, `<base>/plugins`, or `<base>/<repo>`. If you omit a base path it will attempt to infer it (two levels up) when running from inside this repo.
     2. Use one or more `-r <repo>=<absolute_path>` flags ONLY for EXTERNAL plugin repositories that are not part of this repository. Internal plugins do NOT require `-r` and will be picked up automatically.
 
-    Supported internal repository keys today: `main`, `wazuh-core`, `wazuh-check-updates`. External repositories you pass with `-r` will be dynamically mounted into the `osd` container via an auto-generated `dev.override.generated.yml` compose file (ignored by git). Adding a new internal repo requires extending the script.
+    Supported internal repository keys today: `main`, `wazuh-core`, `wazuh-check-updates`, `wazuh-ai-assistant`. External repositories you pass with `-r` will be dynamically mounted into the `osd` container via an auto-generated `dev.override.generated.yml` compose file (ignored by git). Adding a new internal repo requires extending the script.
 
         Quick example (adding an external plugin):
         ```bash
