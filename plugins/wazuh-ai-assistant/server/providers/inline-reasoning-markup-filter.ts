@@ -49,7 +49,8 @@
  */
 
 /** Tag families this filter recognizes as reasoning/tool-call-as-text markup, never as prose. */
-const OPEN_TAG_RE = /<think>|<tool_call>|<function(?:=[^<>]*)?>|<parameter(?:=[^<>]*)?>/;
+const OPEN_TAG_RE =
+  /<think>|<tool_call>|<function(?:=[^<>]*)?>|<parameter(?:=[^<>]*)?>/;
 const CLOSE_TAG_RE = /<\/think>|<\/tool_call>|<\/function>|<\/parameter>/;
 
 /** DeepSeek's fixed marker prefix (FULLWIDTH VERTICAL LINE, U+FF5C, on both sides of `DSML`). */

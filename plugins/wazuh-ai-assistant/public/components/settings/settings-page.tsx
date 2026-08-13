@@ -576,6 +576,31 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       );
   };
 
+  // Returns the outcome (not just void) so `handleSubmit` below can feed it straight into the
+  // flyout's result panel without re-reading state that may not have flushed yet.
+  const handleTest = async (
+    provider: ProviderSummary,
+  ): Promise<ProviderTestOutcome> => {
+    setTestingIds(current => new Set(current).add(provider.id));
+    let outcome: ProviderTestOutcome;
+    try {
+      const result = await service.test(provider.id);
+      outcome = outcomeFromTestResult(result);
+    } catch (testError) {
+      outcome = outcomeFromTestError(testError);
+    }
+    setTestResults(current => ({
+      ...current,
+      [provider.id]: outcome,
+    }));
+    setTestingIds(current => {
+      const next = new Set(current);
+      next.delete(provider.id);
+      return next;
+    });
+    return outcome;
+  };
+
   useEffect(() => {
     service
       .list()
@@ -745,31 +770,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         ),
       );
     }
-  };
-
-  // Returns the outcome (not just void) so `handleSubmit` above can feed it straight into the
-  // flyout's result panel without re-reading state that may not have flushed yet.
-  const handleTest = async (
-    provider: ProviderSummary,
-  ): Promise<ProviderTestOutcome> => {
-    setTestingIds(current => new Set(current).add(provider.id));
-    let outcome: ProviderTestOutcome;
-    try {
-      const result = await service.test(provider.id);
-      outcome = outcomeFromTestResult(result);
-    } catch (testError) {
-      outcome = outcomeFromTestError(testError);
-    }
-    setTestResults(current => ({
-      ...current,
-      [provider.id]: outcome,
-    }));
-    setTestingIds(current => {
-      const next = new Set(current);
-      next.delete(provider.id);
-      return next;
-    });
-    return outcome;
   };
 
   // Row action wrapper: kept as its own named function so call sites (row "Test" action, the

@@ -1,3 +1,5 @@
+import path from 'path';
+import fs from 'fs';
 import React from 'react';
 import {
   act,
@@ -1745,8 +1747,8 @@ describe('ChatPage — two-row grid pane (contract §1)', () => {
     // `path.join` against `__dirname` sidesteps Jest's `moduleNameMapper` (which points `.scss`
     // imports at `style_mock.js`) and reads the actual SCSS off disk, the same way the previous
     // version of this test did to pin the mechanism it was checking.
-    const scssPath = require('path').join(__dirname, 'chat-page.scss');
-    const scssSource = require('fs').readFileSync(scssPath, 'utf8');
+    const scssPath = path.join(__dirname, 'chat-page.scss');
+    const scssSource = fs.readFileSync(scssPath, 'utf8');
     // Comments are stripped before matching: this file DOCUMENTS the removed mechanism by name
     // ("there is no `position: sticky` ..."), so asserting against the raw source would fail on the
     // very prose that explains why the rule is gone. Only real declarations are interesting here.

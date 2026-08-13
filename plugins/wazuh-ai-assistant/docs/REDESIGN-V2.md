@@ -47,6 +47,7 @@ BELOW it with the privacy pill (`⚿ Off`) and `Provider: … ▾`, send button,
 height, scales past three prompts, least visual welcome). Design recommends **1a**.
 
 **Gap to Home, ranked**
+
 - BREAKING — **Anchored composer**: floats over the scroll region rather than owning a row, so it
   lands on the welcome cards at ~620px height. Home has no absolutely positioned content.
 - BREAKING — **Clipped placeholder**: same cause; the controls row overlays the textarea instead of
@@ -78,6 +79,7 @@ both bugs — fragile) · 2c inline at end of transcript (no overlap, but the in
 after a long answer). Design recommends **2a**.
 
 **Gap to Home, ranked**
+
 - BREAKING — **Pagination is covered**: page 2 of 6 unreachable without resizing the window.
 - HIGH — **Table has no container**: sits directly on the transcript with a floating collapse caret.
 - HIGH — **Unbounded measure**: at 1920 the answer runs past 200 characters per line.
@@ -117,6 +119,7 @@ after a long answer). Design recommends **2a**.
    an `EuiFlyout` below 900px.
 
 **Acceptance checks**
+
 - At 1280×620 with the composer at max height, the pagination row is fully visible without page
   scroll.
 - No horizontal scrollbar between 1024 and 2560px of window width.
@@ -124,6 +127,7 @@ after a long answer). Design recommends **2a**.
 - Welcome cards never overlap the composer; below 540px of transcript height the welcome scrolls.
 
 **Safari / high-resolution robustness**
+
 - No `vh` for pane height (Safari's 100vh excludes then includes the toolbar). Use `100%` from a
   height-constrained ancestor, or `100dvh` at the outermost element only.
 - Every flex/grid child that scrolls gets `min-height:0`.
@@ -145,6 +149,7 @@ shape, same position, colour carries state; reason on hover and in the row detai
 visible without hover — `401 · invalid key` — costs ~140px of width). Design recommends **3a**.
 
 **Gap to Home, ranked**
+
 - HIGH — **Sections are headings, not cards** → three bordered cards under centred pills.
 - HIGH — **Three status languages** → one chip, four states.
 - MED — **Endpoints dominate the row**: middle-truncate with a tooltip; all eight columns stay.
@@ -171,6 +176,7 @@ field) · 4c vendor preset first (fastest path, but adds a vendor list the backe
 Design recommends **4a**.
 
 **Problems, ranked**
+
 - HIGH — **The deciding field is a dropdown, second**: provider type determines endpoint, key format
   and model list. It comes first, as visible options, and prefills the rest.
 - HIGH — **Guidance is a five-line paragraph**: the text stays word for word but moves into a

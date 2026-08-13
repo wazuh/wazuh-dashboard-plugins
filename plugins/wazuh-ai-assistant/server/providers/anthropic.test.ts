@@ -12,13 +12,13 @@ function sseResponse(lines: string[]): Response {
       controller.close();
     },
   });
-  return ({
+  return {
     ok: true,
     status: 200,
     body,
-    headers: ({ get: () => null } as unknown) as Headers,
+    headers: { get: () => null } as unknown as Headers,
     text: () => Promise.resolve(''),
-  } as unknown) as Response;
+  } as unknown as Response;
 }
 
 async function drain(gen: AsyncIterable<StreamEvent>): Promise<StreamEvent[]> {
@@ -39,12 +39,12 @@ test('AnthropicAdapter: an in-stream error frame containing tool_use_failed yiel
   const adapter = new AnthropicAdapter();
   const rawMessage = 'tool_use_failed: model produced an invalid call';
   const originalFetch = global.fetch;
-  global.fetch = ((() =>
+  global.fetch = (() =>
     Promise.resolve(
       sseResponse([
         JSON.stringify({ type: 'error', error: { message: rawMessage } }),
       ]),
-    )) as unknown) as typeof fetch;
+    )) as unknown as typeof fetch;
   try {
     const controller = new AbortController();
     const events = await drain(
@@ -65,12 +65,12 @@ test('AnthropicAdapter: an in-stream error frame with no marker passes through u
   const adapter = new AnthropicAdapter();
   const rawMessage = 'authentication failed';
   const originalFetch = global.fetch;
-  global.fetch = ((() =>
+  global.fetch = (() =>
     Promise.resolve(
       sseResponse([
         JSON.stringify({ type: 'error', error: { message: rawMessage } }),
       ]),
-    )) as unknown) as typeof fetch;
+    )) as unknown as typeof fetch;
   try {
     const controller = new AbortController();
     const events = await drain(
@@ -97,12 +97,12 @@ test('AnthropicAdapter: an in-stream error frame with no marker passes through u
 /** A rejected (non-streaming) Response whose body is readable exactly once, like the real thing. */
 function rejectedResponse(status: number, body: unknown): Response {
   let consumed = false;
-  return ({
+  return {
     ok: false,
     status,
     statusText: 'Bad Request',
     body: null,
-    headers: ({ get: () => null } as unknown) as Headers,
+    headers: { get: () => null } as unknown as Headers,
     text: () => {
       if (consumed) {
         return Promise.reject(new Error('body already consumed'));
@@ -110,7 +110,7 @@ function rejectedResponse(status: number, body: unknown): Response {
       consumed = true;
       return Promise.resolve(JSON.stringify(body));
     },
-  } as unknown) as Response;
+  } as unknown as Response;
 }
 
 /** Anthropic's real wording when a removed parameter is sent to a model that dropped it. */
@@ -146,14 +146,14 @@ test('AnthropicAdapter: a 400 rejecting temperature is retried once without it, 
   const adapter = new AnthropicAdapter();
   const bodies: Array<Record<string, unknown>> = [];
   const originalFetch = global.fetch;
-  global.fetch = (((_url: string, init: { body: string }) => {
+  global.fetch = ((_url: string, init: { body: string }) => {
     bodies.push(JSON.parse(init.body));
     return Promise.resolve(
       bodies.length === 1
         ? rejectedResponse(400, ANTHROPIC_TEMPERATURE_400)
         : sseResponse(OK_STREAM),
     );
-  }) as unknown) as typeof fetch;
+  }) as unknown as typeof fetch;
   try {
     const controller = new AbortController();
     const events = await drain(
@@ -180,7 +180,7 @@ test('AnthropicAdapter: a second turn on the same provider+model omits temperatu
   const config = freshConfig('claude-sonnet-5');
   const bodies: Array<Record<string, unknown>> = [];
   const originalFetch = global.fetch;
-  global.fetch = (((_url: string, init: { body: string }) => {
+  global.fetch = ((_url: string, init: { body: string }) => {
     bodies.push(JSON.parse(init.body));
     const isRejection =
       bodies.length === 1 && 'temperature' in bodies[bodies.length - 1];
@@ -189,7 +189,7 @@ test('AnthropicAdapter: a second turn on the same provider+model omits temperatu
         ? rejectedResponse(400, ANTHROPIC_TEMPERATURE_400)
         : sseResponse(OK_STREAM),
     );
-  }) as unknown) as typeof fetch;
+  }) as unknown as typeof fetch;
   try {
     const controller = new AbortController();
     await drain(
@@ -216,7 +216,7 @@ test('AnthropicAdapter: an unrelated 400 is not treated as a temperature rejecti
   const adapter = new AnthropicAdapter();
   const bodies: Array<Record<string, unknown>> = [];
   const originalFetch = global.fetch;
-  global.fetch = (((_url: string, init: { body: string }) => {
+  global.fetch = ((_url: string, init: { body: string }) => {
     bodies.push(JSON.parse(init.body));
     return Promise.resolve(
       rejectedResponse(400, {
@@ -227,7 +227,7 @@ test('AnthropicAdapter: an unrelated 400 is not treated as a temperature rejecti
         },
       }),
     );
-  }) as unknown) as typeof fetch;
+  }) as unknown as typeof fetch;
   try {
     const controller = new AbortController();
     const events = await drain(

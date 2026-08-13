@@ -1,3 +1,4 @@
+import rison from 'rison-node';
 import NavigationService from '../../../../../react-services/navigation-service';
 import {
   threatHunting,
@@ -11,7 +12,6 @@ import {
   regulatoryCompliance,
   endpointSummary,
 } from '../../../../../utils/applications';
-import rison from 'rison-node';
 import {
   FILTER_OPERATOR,
   PatternDataSourceFilterManager,

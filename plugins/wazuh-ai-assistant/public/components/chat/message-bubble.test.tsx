@@ -1,3 +1,5 @@
+import path from 'path';
+import fs from 'fs';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -278,8 +280,8 @@ describe('MessageBubble', () => {
       // is the shared token and not a second literal free to drift from it. It has to read the
       // source directly because jest maps `.scss` to a style mock, so no rendered assertion can
       // ever observe a value that came from a stylesheet.
-      const scssSource = require('fs').readFileSync(
-        require('path').join(__dirname, 'chat-page.scss'),
+      const scssSource = fs.readFileSync(
+        path.join(__dirname, 'chat-page.scss'),
         'utf8',
       );
       expect(scssSource).toMatch(
