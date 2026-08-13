@@ -51,8 +51,6 @@
     "wazuhAiAssistant.resultTable.severity.informational": "Informational",
     "wazuhAiAssistant.settings.pageTitle": "AI Assistant settings",
     "wazuhAiAssistant.settings.pageDescription": "Manage AI providers, privacy and conversation history.",
-    "wazuhAiAssistant.settings.access.warningTitle": "You cannot save settings right now",
-    "wazuhAiAssistant.settings.access.warningFallback": "Administrator privileges are required to change AI Assistant settings.",
     "wazuhAiAssistant.settings.providers.title": "Providers",
     "wazuhAiAssistant.settings.providers.description": "Connect and manage the AI providers available to the chat.",
     "wazuhAiAssistant.settings.addProvider": "Add provider",

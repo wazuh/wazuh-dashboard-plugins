@@ -47,9 +47,8 @@ function toSummary(
  * `perPage` used for `list` below), so a plain list+update loop is fine here; no bulk update API
  * is used because `AiProvidersClient`'s endpoint has no partial "update where" primitive of its
  * own — each write below re-sends the FULL attributes of the provider it's clearing, not just the
- * `isDefault` flag (see that class's doc comment). The list read goes through the internal user,
- * each clearing write through the current one — see server/settings/opensearch-user.ts's doc
- * comment.
+ * `isDefault` flag (see that class's doc comment). Both the list read and each clearing write run
+ * as the calling user — see server/settings/opensearch-user.ts's doc comment.
  */
 async function clearOtherDefaults(
   context: RequestHandlerContext,
@@ -84,94 +83,59 @@ const providerTypeSchema: Type<ProviderConfig['type']> = schema.oneOf(
 );
 
 /**
- * Maps the reference plugin's `administratorRequirements` string (server/wazuh-core.d.ts's
- * `isAdministratorUser`) to a message that tells the user what to DO, not just that they were
- * rejected. The real-world failure for a genuine admin is almost always "opened this app without
- * the main Wazuh app ever running its /api/login in this browser session" — no `wz-token` cookie
- * yet — rather than an actual permissions problem, so that family of reasons gets its own,
- * actionable copy; a real permissions problem gets different, equally actionable copy; anything
- * else falls back to a generic administrator-required message with the raw reason appended so it
- * is never silently swallowed. The raw `administratorRequirements` string is always included in
- * parentheses so a report from a user still carries the exact reference-plugin reason.
+ * Distinguishes a missing/expired `wz-token` from every other `administrator_requirements` reason
+ * (server/wazuh-core.d.ts's `isAdministratorUser`). Matches the three exact literals
+ * `isAdministratorUser` returns for "no token" cases, plus the two observed shapes of its own live
+ * Manager probe surfacing as a bare 401 (opening this app directly, without ever visiting the main
+ * Wazuh app in this browser session, leaves no `wz-token` cookie at all): a bare "status code 401",
+ * or "could not check" paired with "401" anywhere in the string (case-sensitive, matching the
+ * reference plugin's own casing).
  */
-function tokenMissingOrExpiredMessage(
-  administratorRequirements: string | null,
-): string {
+function isTokenMissingOrExpiredReason(
+  administratorRequirements: string,
+): boolean {
   return (
-    // Built from MANAGER_SESSION_EXPIRED_COPY so the client-side heal/retry trigger
-    `Your Wazuh Manager API ${MANAGER_SESSION_EXPIRED_COPY}. Open any page of the main Wazuh ` +
-    'app (or reload and log in again) to establish it, then retry saving. ' +
-    `(${administratorRequirements})`
-  );
-}
-
-/**
- * Catch-all: opening this app directly (without ever visiting the main
- * Wazuh app in this browser session) makes `isAdministratorUser`'s own live Manager probe 401 —
- * the reference plugin then surfaces that as a free-form string like "It could not check if the
- * current user is administrator due to: Request failed with status code 401", which is NOT one of
- * the three exact literals the switch above matches, so without this it falls into the generic
- * message despite being the same "no/expired wz-token" situation. Matches
- * on the two observed shapes of that family: a bare "status code 401", or "could not check" paired
- * with "401" anywhere in the string (case-sensitive, matching the reference plugin's own casing).
- */
-function isTokenMissingOr401(administratorRequirements: string): boolean {
-  return (
+    administratorRequirements === 'No token provider' ||
+    administratorRequirements === 'Token is not valid' ||
+    administratorRequirements === 'No API id provided' ||
     administratorRequirements.includes('status code 401') ||
     (administratorRequirements.includes('could not check') &&
       administratorRequirements.includes('401'))
   );
 }
 
-/** Exported for unit testing only — every other caller in this file uses it directly. */
-export function describeAdministratorRequirement(
-  administratorRequirements: string | null,
+/** Actionable copy for a missing/expired Manager session, built from `MANAGER_SESSION_EXPIRED_COPY`
+ * so the client-side heal/retry trigger (public/services/session-heal.ts) keeps matching it. The
+ * raw `administratorRequirements` string is always included in parentheses so a report from a user
+ * still carries the exact reference-plugin reason. */
+function managerSessionExpiredMessage(
+  administratorRequirements: string,
 ): string {
-  switch (administratorRequirements) {
-    case 'No token provider':
-    case 'Token is not valid':
-    case 'No API id provided':
-      return tokenMissingOrExpiredMessage(administratorRequirements);
-    case 'No administrator role':
-    case 'No permissions in token':
-      return (
-        'Your Wazuh Manager API user does not have the administrator role, which is required to ' +
-        `change AI Assistant settings. (${administratorRequirements})`
-      );
-    default:
-      if (
-        administratorRequirements &&
-        isTokenMissingOr401(administratorRequirements)
-      ) {
-        return tokenMissingOrExpiredMessage(administratorRequirements);
-      }
-      return (
-        'Administrator privileges are required to change AI Assistant settings.' +
-        (administratorRequirements ? ` (${administratorRequirements})` : '')
-      );
-  }
+  return (
+    `Your Wazuh Manager API ${MANAGER_SESSION_EXPIRED_COPY}. Open any page of the main Wazuh ` +
+    'app (or reload and log in again) to establish it, then retry. ' +
+    `(${administratorRequirements})`
+  );
 }
 
 /**
- * Runs the reference plugin's administrator check and ALWAYS resolves — never throws — a
- * `{administrator: true}` or `{administrator: false, message}` pair, where `message` is the
- * actionable text from `describeAdministratorRequirement` above.
- * Shared by:
- *  - the PUT /settings admin gate below, which turns a `false` into a 403 response;
- *  - GET /settings/access (pre-flight probe), which the Settings page calls on mount so it
- *    can warn the user and disable Save buttons BEFORE they attempt (and get rejected by) the real
- *    PUT.
- * Fails CLOSED like the original inline try/catch did: any throw from `isAdministratorUser` itself
- * (wazuh_core context drift, not a real admin-vs-not-admin answer) is treated as "not an
- * administrator", but with a message that says the CHECK failed, not that the user lacks
- * privileges — those are different problems and deserve different copy.
+ * Resolves whether the caller's Wazuh Manager session (`wz-token`) is alive — NOT whether they are
+ * an administrator. AI Assistant settings and providers are no longer gated on the Manager's
+ * administrator role: every read/write against them runs as the calling user against the Wazuh
+ * indexer's own `/_plugins/_setup/ai_assistant/...` endpoints (server/settings/opensearch-user.ts's
+ * `asCurrentUser`), so the indexer's own `plugin:wazuh/ai_assistant/settings/{read,write}`
+ * permissions are the real authorization boundary now (see
+ * docs/ref/modules/ai-assistant/security.md). `isAdministratorUser` remains the only
+ * session-liveness probe `wazuh-core` exposes, so this reuses it but discards its role verdict:
+ * "No administrator role"/"No permissions in token" mean the check itself SUCCEEDED — the session
+ * is fine, this account simply isn't a Manager admin, which no longer matters here. Only a
+ * token-missing/expired-shaped reason means the session itself has a problem.
+ * Exported for unit testing only — every other caller in this file uses it directly.
  */
-async function checkAdministrator(
+export async function checkManagerSession(
   context: RequestHandlerContext,
   request: OpenSearchDashboardsRequest,
-): Promise<
-  { administrator: true } | { administrator: false; message: string }
-> {
+): Promise<{ ok: true } | { ok: false; message: string }> {
   try {
     const {
       administrator,
@@ -180,53 +144,23 @@ async function checkAdministrator(
       context,
       request,
     );
-    // The upstream contract
-    // types `administrator` as boolean but enforces nothing about it at runtime -- a plain JS
-    // truthiness check (`if (administrator)`) would grant admin for ANY truthy value, including a
-    // non-boolean like the string "false" (truthy in JS despite its name). Require the literal
-    // value `true` so only an actual boolean true grants access.
-    if (administrator === true) {
-      return { administrator: true };
+    if (
+      administrator !== true &&
+      administratorRequirements &&
+      isTokenMissingOrExpiredReason(administratorRequirements)
+    ) {
+      return {
+        ok: false,
+        message: managerSessionExpiredMessage(administratorRequirements),
+      };
     }
-    return {
-      administrator: false,
-      message: describeAdministratorRequirement(administratorRequirements),
-    };
+    return { ok: true };
   } catch {
-    return {
-      administrator: false,
-      message:
-        'The administrator check itself could not be performed (the Wazuh core plugin did not ' +
-        'respond as expected), so this request was rejected as a precaution. Try again, and ' +
-        'contact your Wazuh administrator if this persists.',
-    };
+    // This is only a liveness probe; the indexer enforces the real permission check on the
+    // actual read/write, so an unexpected failure here just means "can't tell", which fails OPEN
+    // (no needless heal attempt) rather than closed.
+    return { ok: true };
   }
-}
-
-/**
- * Shared admin gate for the five provider mutation/test routes:
- * resolves to the same `response.forbidden(...)` value PUT /settings's own inline gate below
- * returns when the caller is not an administrator, or `null` when the caller may proceed. Every
- * gated route calls this as the very FIRST thing in its handler, before any store work — mirroring
- * PUT /settings's inline `checkAdministrator` + `forbidden` pattern exactly, just
- * centralized once so five call sites can't drift from each other.
- * Fails CLOSED like `checkAdministrator` itself: any unexpected/thrown result is never treated as
- * "proceed".
- * Exported for unit testing only (same convention as `describeAdministratorRequirement` above);
- * every other caller in this file uses it directly. There is no request/response mocking harness
- * for full route-level HTTP tests in this plugin, and this single gate is the smallest seam that
- * proves all five routes reject a non-administrator and admit an administrator.
- */
-export async function requireAdministrator(
-  context: RequestHandlerContext,
-  request: OpenSearchDashboardsRequest,
-  response: OpenSearchDashboardsResponseFactory,
-): Promise<IOpenSearchDashboardsResponse | null> {
-  const result = await checkAdministrator(context, request);
-  if (!result.administrator) {
-    return response.forbidden({ body: { message: result.message } });
-  }
-  return null;
 }
 
 /** Backstop for direct API calls — the UI blocks these writes first (see the access probe's
@@ -299,12 +233,6 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       },
     },
     withInternalErrorHandling(async (context, request, response) => {
-      // Administrator-only, gated before any store work: creating a provider
-      // sets the endpoint the server itself will call.
-      const gate = await requireAdministrator(context, request, response);
-      if (gate) {
-        return gate;
-      }
       // SSRF fail-fast. The fetch-time guard inside each adapter remains the security-critical
       // check — it re-validates on every request, including configs saved by an earlier version —
       // but rejecting an obviously-bad baseUrl at save time gives the admin an immediate,
@@ -381,14 +309,10 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       },
     },
     withInternalErrorHandling(async (context, request, response) => {
-      // Administrator-only, gated before any client work. This is the most sensitive mutation on
-      // the route: omitting `apiKey` from the body keeps the stored key, so an unprivileged caller
-      // able to change `baseUrl` alone would redirect the existing credential to a host of their
-      // choosing.
-      const gate = await requireAdministrator(context, request, response);
-      if (gate) {
-        return gate;
-      }
+      // This is the most sensitive mutation on the route: omitting `apiKey` from the body keeps
+      // the stored key, so a caller without the indexer's own write permission on this endpoint —
+      // rejected by `aiProviders.update`'s `asCurrentUser` call below — could otherwise redirect
+      // an existing credential to a host of their choosing just by changing `baseUrl`.
       // SSRF fail-fast: see the identical comment on POST /providers above.
       try {
         await assertProviderUrlAllowed(request.body.baseUrl);
@@ -473,12 +397,6 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       validate: { params: schema.object({ id: schema.string() }) },
     },
     async (context, request, response) => {
-      // Administrator-only, gated before any client work: the default provider applies to every
-      // user of the deployment, so this setting is not the caller's own to change.
-      const gate = await requireAdministrator(context, request, response);
-      if (gate) {
-        return gate;
-      }
       const { aiProviders } = context.wazuh_ai_assistant;
       const existing = await aiProviders.get(context, request.params.id);
       if (!existing) {
@@ -506,12 +424,6 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       validate: { params: schema.object({ id: schema.string() }) },
     },
     withInternalErrorHandling(async (context, request, response) => {
-      // Administrator-only, gated before any store work: provider configuration is
-      // deployment-wide state.
-      const gate = await requireAdministrator(context, request, response);
-      if (gate) {
-        return gate;
-      }
       await context.wazuh_ai_assistant.aiProviders.delete(
         context,
         request.params.id,
@@ -528,13 +440,9 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       validate: { params: schema.object({ id: schema.string() }) },
     },
     async (context, request, response) => {
-      // Administrator-only, gated before any client work: this route returns the provider's own
-      // response to the caller, which makes it a read-capable SSRF primitive on top of the
-      // url-guard's network restrictions.
-      const gate = await requireAdministrator(context, request, response);
-      if (gate) {
-        return gate;
-      }
+      // This route returns the provider's own response to the caller, which makes it a
+      // read-capable SSRF primitive on top of the url-guard's network restrictions — the
+      // indexer's own write permission on this endpoint is what actually authorizes it.
       const stored = await context.wazuh_ai_assistant.aiProviders.get(
         context,
         request.params.id,
@@ -642,25 +550,22 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
     }),
   );
 
-  // Pre-flight administrator probe: lets the Settings page warn the user
-  // and disable Save buttons BEFORE they attempt (and get rejected by) the real PUT below. Never
-  // 403s — always 200 with the same {administrator, message} shape `checkAdministrator` produces,
-  // using the SAME check/message mapping as the PUT gate so the two surfaces never disagree.
+  // Manager-session liveness probe, called on app mount and before Manager-path work
+  // (public/services/session-heal.ts's `ensureManagerSession`) so a missing/expired `wz-token` can
+  // be healed before it causes a confusing failure elsewhere (see `checkManagerSession` above).
+  // Always 200.
   //
-  // `defaultApiHostId` (client-side session auto-heal): the Manager host id the client
-  // should pass to the main Wazuh plugin's POST {basePath}/api/login to (re)establish a wz-token
-  // cookie when `administrator` came back false for token reasons. Resolved via the SAME
-  // `resolveApiHostId` every Manager-path tool call already uses (server/tools/api-host.ts), so this
-  // never disagrees with which host the rest of the plugin would actually call. Wrapped in its own
-  // try/catch -> null: an unresolvable host (no Wazuh manager host configured at all) must not turn
-  // this always-200 probe into a 500, and `null` is a perfectly meaningful answer for the client
-  // (nothing to heal against).
+  // `defaultApiHostId` (client-side session auto-heal): the Manager host id the client should pass
+  // to the main Wazuh plugin's POST {basePath}/api/login to (re)establish a wz-token cookie when
+  // `managerSessionOk` came back false. Resolved via the SAME `resolveApiHostId` every Manager-path
+  // tool call already uses (server/tools/api-host.ts), so this never disagrees with which host the
+  // rest of the plugin would actually call. Wrapped in its own try/catch -> null: an unresolvable
+  // host (no Wazuh manager host configured at all) must not turn this always-200 probe into a 500,
+  // and `null` is a perfectly meaningful answer for the client (nothing to heal against).
   router.get(
     { path: API_PATHS.SETTINGS_ACCESS, validate: false },
     async (context, request, response) => {
-      const result = await checkAdministrator(context, request);
-      const { administrator } = result;
-      const message = result.administrator ? null : result.message;
+      const sessionCheck = await checkManagerSession(context, request);
       let defaultApiHostId: string | null;
       try {
         defaultApiHostId = await resolveApiHostId(context, request);
@@ -669,8 +574,8 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       }
       return response.ok({
         body: {
-          administrator,
-          message,
+          managerSessionOk: sessionCheck.ok,
+          message: sessionCheck.ok ? null : sessionCheck.message,
           defaultApiHostId,
           apiKeyEncryptionEnabled: getApiKeyCipher().enabled,
         },
@@ -726,23 +631,6 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       },
     },
     async (context, request, response) => {
-      // Administrator-only gate: without this, any authenticated dashboard user could
-      // rewrite the plugin's privacy defaults and field policy (e.g. blanket-'allow' every field,
-      // silently defeating pseudonymization for every other user). Same mechanism the reference
-      // plugin uses for its own administrator-only routes (v4.14.6
-      // main/controllers/decorators.ts's `routeDecoratorProtectedAdministrator`; see
-      // server/wazuh-core.d.ts). Fails CLOSED: any throw here is treated as "not an administrator",
-      // never as "proceed" — the GET route above stays open (clients need to read defaults; it
-      // never returns an apiKey), only this mutating PUT is gated.
-      const result = await checkAdministrator(context, request);
-      if (!result.administrator) {
-        return response.forbidden({
-          body: {
-            message: result.message,
-          },
-        });
-      }
-
       // Ensures every provider's backend exists (first-ever PUT with no prior GET) before
       // updating it. The actual write goes through the CURRENT user for every provider, unlike
       // the read above (`getOrCreateSettings`) — see server/settings/opensearch-user.ts's doc

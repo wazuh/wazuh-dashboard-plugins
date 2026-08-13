@@ -18,13 +18,15 @@ is bounded by the same fact: the worst it can trigger is another read the user w
 allowed to perform. Answers are rendered through EUI's markdown component with raw HTML disabled
 (verified against stored-XSS probes).
 
-## Admin gating
+## Settings and providers: authorized by indexer RBAC
 
 Provider management (`POST/PUT/DELETE /providers`, set-default, connection test) and settings
-writes are gated on `wazuh-core`'s `dashboardSecurity.isAdministratorUser` check.
-`GET /providers` stays readable by any user because the Chat view needs the provider list — it
-never returns a key, only `hasApiKey`. The Settings page probes `GET /settings/access` on mount
-to warn non-admins up front instead of failing on save.
+writes run as the calling user (`asCurrentUser`) against the Wazuh indexer's own
+`/_plugins/_setup/ai_assistant/...` endpoints — the indexer's own
+`plugin:wazuh/ai_assistant/settings/{read,write}` permissions on that identity's backend role are
+what authorize each request (see [Required indexer permissions](#required-indexer-permissions)
+below). `GET /providers` stays readable by any authenticated user regardless, because the Chat
+view needs the provider list — it never returns a key, only `hasApiKey`.
 
 ## Required indexer permissions
 
@@ -67,9 +69,9 @@ Settings and providers live in two backends: the indexer's settings API, and the
 | `cluster:admin/opendistro/ism/policy/write`, `cluster:admin/opendistro/ism/managedindex/change`                    | Cluster | Edit `ai-assistant-sessions-policy` when an user changes the retention window.          |
 | `indices:admin/opensearch/ism/managedindex` on `wazuh-ai-assistant-sessions*`, `.ds-wazuh-ai-assistant-sessions-*` | Index   | Re-apply the edited policy to the sessions data stream's backing indices.               |
 
-The dashboard-level admin gate above decides who _sees_ working save controls in the Settings UI;
-these are the indexer-side permissions that make the write itself succeed once an admin's own
-backend role is checked.
+The Settings UI's save controls are always interactive for any authenticated user; the indexer's
+own permission check on the calling user's backend role is what makes each write actually succeed
+or fail.
 
 ## SSRF guard on outbound provider traffic
 

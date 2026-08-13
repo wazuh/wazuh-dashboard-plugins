@@ -1,13 +1,11 @@
-import {
-  API_PATHS,
-  MANAGER_SESSION_EXPIRED_COPY,
-} from '../../common/constants';
-import { resetManagerSessionStateForTesting } from './session-heal';
 import { SettingsService } from './settings-service';
 
 /**
- * Integration of the service with the REAL session-heal module (not mocked): a first admin-gated
- * rejection carrying the session-expired copy must trigger probe → /api/login → replay, once.
+ * Provider/settings writes run directly against the Wazuh indexer as the current user
+ * (server/settings/opensearch-user.ts) — no Manager/wz-token involved, so unlike before there is
+ * no session heal/retry wrapping on these calls anymore (session-heal.test.ts covers that
+ * machinery, which chat's Manager-path calls still use). These cases prove a write just
+ * resolves/rejects straight through to the underlying `http` call, with no `/api/login` side call.
  */
 
 const httpGet = jest.fn();
@@ -21,98 +19,52 @@ const http = {
   delete: httpDelete,
 } as never;
 
-const BROKEN_ACCESS = {
-  administrator: false,
-  message: `Your Wazuh Manager API ${MANAGER_SESSION_EXPIRED_COPY}. (No token provider)`,
-  defaultApiHostId: 'default',
-  apiKeyEncryptionEnabled: true,
-};
-const HEALTHY_ACCESS = {
-  administrator: true,
-  message: null,
-  defaultApiHostId: 'default',
-  apiKeyEncryptionEnabled: true,
-};
-
-function sessionExpiredError(): Error & { body: { message: string } } {
-  return Object.assign(new Error('Forbidden'), {
-    body: {
-      message: `Your Wazuh Manager API ${MANAGER_SESSION_EXPIRED_COPY}. (Token is not valid)`,
-    },
-  });
-}
-
 beforeEach(() => {
   jest.clearAllMocks();
-  resetManagerSessionStateForTesting();
-  httpGet
-    .mockResolvedValueOnce(BROKEN_ACCESS)
-    .mockResolvedValue(HEALTHY_ACCESS);
 });
 
-describe('SettingsService — session retry on admin-gated writes', () => {
-  it('create() heals and replays once after a session-expired 403', async () => {
+describe('SettingsService — provider/settings writes run unwrapped', () => {
+  it('create() resolves directly from the POST call', async () => {
     const provider = { id: 'p1' };
-    httpPost.mockImplementation((path: string) => {
-      if (path === '/api/login') {
-        return Promise.resolve({});
-      }
-      return httpPost.mock.calls.filter(([p]) => p === API_PATHS.PROVIDERS)
-        .length === 1
-        ? Promise.reject(sessionExpiredError())
-        : Promise.resolve(provider);
-    });
+    httpPost.mockResolvedValue(provider);
 
     const service = new SettingsService(http);
     await expect(service.create({} as never)).resolves.toBe(provider);
-
-    const providerPosts = httpPost.mock.calls.filter(
-      ([path]) => path === API_PATHS.PROVIDERS,
-    );
-    const loginPosts = httpPost.mock.calls.filter(
-      ([path]) => path === '/api/login',
-    );
-    expect(providerPosts).toHaveLength(2);
-    expect(loginPosts).toHaveLength(1);
+    expect(httpPost).toHaveBeenCalledTimes(1);
   });
 
-  it('updateAssistantSettings() heals and replays once after a session-expired 403', async () => {
+  it('updateAssistantSettings() resolves directly from the PUT call', async () => {
     const saved = { privacyDefaultOn: true };
-    httpPost.mockResolvedValue({});
-    httpPut
-      .mockRejectedValueOnce(sessionExpiredError())
-      .mockResolvedValueOnce(saved);
+    httpPut.mockResolvedValue(saved);
 
     const service = new SettingsService(http);
     await expect(service.updateAssistantSettings({} as never)).resolves.toBe(
       saved,
     );
-
-    expect(httpPut).toHaveBeenCalledTimes(2);
-    expect(httpPost).toHaveBeenCalledWith('/api/login', expect.anything());
+    expect(httpPut).toHaveBeenCalledTimes(1);
+    expect(httpPost).not.toHaveBeenCalled();
   });
 
-  it('remove() rejects without retry on a non-session error', async () => {
-    const unrelated = Object.assign(new Error('boom'), {
-      body: { message: 'Internal server error' },
+  it('a real 403 from the indexer surfaces as-is, with no heal/retry', async () => {
+    const forbidden = Object.assign(new Error('Forbidden'), {
+      body: { message: 'missing plugin:wazuh/ai_assistant/settings/write' },
     });
-    httpDelete.mockRejectedValue(unrelated);
+    httpDelete.mockRejectedValue(forbidden);
 
     const service = new SettingsService(http);
-    await expect(service.remove('p1')).rejects.toBe(unrelated);
+    await expect(service.remove('p1')).rejects.toBe(forbidden);
     expect(httpDelete).toHaveBeenCalledTimes(1);
     expect(httpPost).not.toHaveBeenCalled();
   });
 
-  it('list() (read-only) is not wrapped: a session-copy failure surfaces unretried', async () => {
-    httpGet.mockReset();
-    httpGet.mockRejectedValue(sessionExpiredError());
+  it('list() surfaces a rejection unretried, same as every other read', async () => {
+    const unrelated = Object.assign(new Error('boom'), {
+      body: { message: 'Internal server error' },
+    });
+    httpGet.mockRejectedValue(unrelated);
 
     const service = new SettingsService(http);
-    await expect(service.list()).rejects.toMatchObject({
-      body: { message: expect.stringContaining(MANAGER_SESSION_EXPIRED_COPY) },
-    });
-    expect(httpGet).toHaveBeenCalledTimes(1);
+    await expect(service.list()).rejects.toBe(unrelated);
     expect(httpPost).not.toHaveBeenCalled();
   });
 });

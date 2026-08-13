@@ -1,7 +1,9 @@
 # Providers
 
-A **provider** is a configured AI endpoint the assistant talks to. Providers are managed by
-administrators in **AI Assistant → Settings → Providers** and stored as
+A **provider** is a configured AI endpoint the assistant talks to. Providers are managed in
+**AI Assistant → Settings → Providers** — authorized by the Wazuh indexer's own RBAC on the
+calling user (see
+[Security](./security.md#settings-and-providers-authorized-by-indexer-rbac)) — and stored as
 `wazuh-ai-assistant-provider` saved objects. Multiple providers can coexist; one is marked as the
 default, and the chat header lets the user pick among the configured ones.
 
@@ -47,8 +49,9 @@ Every outbound provider fetch goes through `server/providers/url-guard.ts`:
 - Loopback and RFC 1918 ranges stay reachable **on purpose**: self-hosted gateways (Ollama,
   vLLM, LiteLLM) are the primary deployment target and live on private networks.
 
-Combined with the admin gate on provider management, this bounds who can point the dashboard at a
-new URL and where that URL is allowed to reach.
+Combined with the indexer's own write permission required to manage providers (see
+[Security](./security.md#required-indexer-permissions)), this bounds who can point the dashboard
+at a new URL and where that URL is allowed to reach.
 
 ## API keys
 

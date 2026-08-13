@@ -4,10 +4,11 @@ import { WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH } from '../../common/constants
 import { AssistantSettingsAttributes } from './types';
 
 /**
- * `IndexSettingsProvider` never touches OpenSearch except through `transport.request` (internal
- * user for reads/bootstrap, current user for the admin-gated write — same split every other
- * settings provider follows, see `opensearch-user.ts`), so this fakes exactly that one seam,
- * mirroring `ism-settings-provider.test.ts`'s style.
+ * `IndexSettingsProvider` never touches OpenSearch except through `transport.request`, always as
+ * the current user (reads, bootstrap, and writes alike — see `opensearch-user.ts`), so this fakes
+ * exactly that one seam, mirroring `ism-settings-provider.test.ts`'s style. The `fakeContext`
+ * helper still keeps an `internal` slot separate from `current` so a future re-introduction of
+ * that split would be caught here too, but every case below drives the provider through `current`.
  */
 
 type RequestCall = { method: string; path: string; body?: unknown };
@@ -34,11 +35,9 @@ function fakeContext(handlers: {
 }
 
 const wireResponseBody = {
-  settings: {
-    privacy_default_on: true,
-    privacy_default_per_provider: { p1: true },
-    user_can_override: false,
-  },
+  privacy_default_on: true,
+  privacy_default_per_provider: { p1: true },
+  user_can_override: false,
   field_policy: [
     { field: 'agent.id', action: 'allow' },
     { field: 'agent.name', action: 'anonymize', kind: 'HOST' },
@@ -69,7 +68,7 @@ test('getSettings: maps the wire (snake_case) response to camelCase attributes, 
   const provider = new IndexSettingsProvider();
   const calls: RequestCall[] = [];
   const context = fakeContext({
-    internal: call => {
+    current: call => {
       calls.push(call);
       return Promise.resolve({ body: wireResponseBody });
     },
@@ -92,16 +91,16 @@ test('getSettings: returns undefined when the endpoint 404s', async () => {
 test('getSettings: propagates a non-404 error (e.g. 403 missing permission) rather than treating it as unset', async () => {
   const provider = new IndexSettingsProvider();
   const context = fakeContext({
-    internal: () => Promise.reject({ statusCode: 403 }),
+    current: () => Promise.reject({ statusCode: 403 }),
   });
   await assert.rejects(provider.getSettings(context));
 });
 
-test('createDefaults: PUTs its own defaults through the internal user and echoes them back', async () => {
+test('createDefaults: PUTs its own defaults through the current user and echoes them back', async () => {
   const provider = new IndexSettingsProvider();
   const calls: RequestCall[] = [];
   const context = fakeContext({
-    internal: call => {
+    current: call => {
       calls.push(call);
       return Promise.resolve({ body: { message: 'ok', status: 200 } });
     },
@@ -114,11 +113,9 @@ test('createDefaults: PUTs its own defaults through the internal user and echoes
   assert.equal(calls[0].method, 'PUT');
   assert.equal(calls[0].path, WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH);
   assert.deepEqual(calls[0].body, {
-    settings: {
-      privacy_default_on: false,
-      privacy_default_per_provider: {},
-      user_can_override: true,
-    },
+    privacy_default_on: false,
+    privacy_default_per_provider: {},
+    user_can_override: true,
     field_policy: provider.defaults.fieldPolicy.map(entry => ({
       field: entry.field,
       action: entry.action,
@@ -146,11 +143,9 @@ test('updateSettings: PUTs the given attributes through the current user and ech
   assert.equal(calls[0].method, 'PUT');
   assert.equal(calls[0].path, WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH);
   assert.deepEqual(calls[0].body, {
-    settings: {
-      privacy_default_on: true,
-      privacy_default_per_provider: { p1: true },
-      user_can_override: false,
-    },
+    privacy_default_on: true,
+    privacy_default_per_provider: { p1: true },
+    user_can_override: false,
     field_policy: [
       { field: 'agent.id', action: 'allow' },
       { field: 'agent.name', action: 'anonymize', kind: 'HOST' },

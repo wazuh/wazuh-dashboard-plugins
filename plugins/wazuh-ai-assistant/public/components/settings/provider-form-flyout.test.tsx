@@ -8,8 +8,6 @@ import { ProviderSummary } from '../../../common/types';
 const baseProps = {
   editingProvider: null,
   error: null,
-  canSave: true,
-  accessMessage: null,
   apiKeyEncryptionEnabled: true,
   onSubmit: jest.fn().mockResolvedValue(undefined),
   onClose: jest.fn(),
@@ -118,7 +116,7 @@ describe('ProviderFormFlyout — edit mode', () => {
   });
 });
 
-describe('ProviderFormFlyout — submit error and RBAC', () => {
+describe('ProviderFormFlyout — submit error', () => {
   it('renders the parent-reported error inside the flyout', () => {
     render(
       <ProviderFormFlyout
@@ -130,18 +128,6 @@ describe('ProviderFormFlyout — submit error and RBAC', () => {
     expect(
       screen.getByText('Could not save the provider.'),
     ).toBeInTheDocument();
-  });
-
-  it('disables Save when the user cannot save', () => {
-    render(
-      <ProviderFormFlyout
-        {...baseProps}
-        canSave={false}
-        accessMessage='Administrator role required.'
-      />,
-    );
-
-    expect(screen.getByRole('button', { name: /save & test/i })).toBeDisabled();
   });
 });
 

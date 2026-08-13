@@ -1,18 +1,13 @@
 import { RequestHandlerContext } from '../../../../src/core/server';
 
 /**
- * Shared READ/WRITE user split for every settings provider under `server/settings/`: reads go
- * through the INTERNAL user, writes through the CURRENT one.
- *
- * The underlying Wazuh indexer endpoints (and, before them, the raw `.wazuh-ai-assistant-settings`
- * index they replaced) are readable only by admin/wazuh-admin backend roles indexer-side, but
- * privacy defaults and the resolved default provider must be readable by EVERY authenticated
- * dashboard user for a normal chat turn to work (server/routes/chat.ts), not just admins — so
- * reads cannot depend on the calling user's own OpenSearch identity carrying an admin backend
- * role. Every write instead goes through the current user: the dashboard's own
- * `requireAdministrator` gate (server/routes/settings.ts) is what actually authorizes a mutation,
- * and running the write as the current user keeps it attributable to a real identity rather than
- * the internal/system one.
+ * Shared READ/WRITE user for every settings provider under `server/settings/`: both run as the
+ * CURRENT user against the Wazuh indexer's own `/_plugins/_setup/ai_assistant/...` endpoints. The
+ * indexer's own `plugin:wazuh/ai_assistant/settings/{read,write}` permissions on the calling
+ * user's backend role authorize each read and write (see
+ * docs/ref/modules/ai-assistant/security.md), so running both as the current user keeps every
+ * request attributable to a real identity and correctly scoped to what that identity is
+ * indexer-side permitted to do.
  */
 
 export type OpenSearchClient =

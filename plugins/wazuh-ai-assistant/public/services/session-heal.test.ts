@@ -1,13 +1,9 @@
-import {
-  API_PATHS,
-  MANAGER_SESSION_EXPIRED_COPY,
-} from '../../common/constants';
+import { API_PATHS } from '../../common/constants';
 import {
   SettingsAccess,
   ensureManagerSession,
   healManagerSession,
   resetManagerSessionStateForTesting,
-  withManagerSessionRetry,
 } from './session-heal';
 
 const httpGet = jest.fn();
@@ -16,7 +12,7 @@ const http = { get: httpGet, post: httpPost } as never;
 
 function access(overrides: Partial<SettingsAccess> = {}): SettingsAccess {
   return {
-    administrator: true,
+    managerSessionOk: true,
     message: null,
     defaultApiHostId: 'default',
     apiKeyEncryptionEnabled: true,
@@ -27,18 +23,10 @@ function access(overrides: Partial<SettingsAccess> = {}): SettingsAccess {
 /** The exact broken-session shape GET /settings/access reports for a missing/expired wz-token. */
 function brokenAccess(overrides: Partial<SettingsAccess> = {}): SettingsAccess {
   return access({
-    administrator: false,
-    message: `Your Wazuh Manager API ${MANAGER_SESSION_EXPIRED_COPY}. (No token provider)`,
+    managerSessionOk: false,
+    message:
+      'Your Wazuh Manager API session is missing or expired. (No token provider)',
     ...overrides,
-  });
-}
-
-/** An OSD http rejection shaped like an admin-gated 403 carrying the session copy. */
-function sessionExpiredError(): Error & { body: { message: string } } {
-  return Object.assign(new Error('Forbidden'), {
-    body: {
-      message: `Your Wazuh Manager API ${MANAGER_SESSION_EXPIRED_COPY}. (Token is not valid)`,
-    },
   });
 }
 
@@ -93,18 +81,6 @@ describe('ensureManagerSession', () => {
     expect(httpPost).not.toHaveBeenCalled();
   });
 
-  it('does not heal a genuine non-administrator (different copy)', async () => {
-    const nonAdmin = access({
-      administrator: false,
-      message:
-        'Your Wazuh Manager API user does not have the administrator role.',
-    });
-    httpGet.mockResolvedValue(nonAdmin);
-
-    await expect(ensureManagerSession(http)).resolves.toBe(nonAdmin);
-    expect(httpPost).not.toHaveBeenCalled();
-  });
-
   it('resolves null (never rejects) when the probe itself fails', async () => {
     httpGet.mockRejectedValue(new Error('network down'));
     await expect(ensureManagerSession(http)).resolves.toBeNull();
@@ -148,44 +124,5 @@ describe('ensureManagerSession', () => {
     // Without maxAgeMs the memo is ignored and the probe runs again.
     await ensureManagerSession(http);
     expect(httpGet).toHaveBeenCalledTimes(2);
-  });
-});
-
-describe('withManagerSessionRetry', () => {
-  it('heals and replays exactly once on a session-expired rejection', async () => {
-    httpGet
-      .mockResolvedValueOnce(brokenAccess())
-      .mockResolvedValueOnce(access());
-    httpPost.mockResolvedValue({});
-    const fn = jest
-      .fn()
-      .mockRejectedValueOnce(sessionExpiredError())
-      .mockResolvedValueOnce('saved');
-
-    await expect(withManagerSessionRetry(http, fn)).resolves.toBe('saved');
-    expect(fn).toHaveBeenCalledTimes(2);
-    expect(httpPost).toHaveBeenCalledWith('/api/login', expect.anything());
-  });
-
-  it('rethrows unrelated errors without healing or retrying', async () => {
-    const unrelated = Object.assign(new Error('boom'), {
-      body: { message: 'Internal server error' },
-    });
-    const fn = jest.fn().mockRejectedValue(unrelated);
-
-    await expect(withManagerSessionRetry(http, fn)).rejects.toBe(unrelated);
-    expect(fn).toHaveBeenCalledTimes(1);
-    expect(httpPost).not.toHaveBeenCalled();
-  });
-
-  it('propagates the second rejection — never more than one replay', async () => {
-    httpGet.mockResolvedValue(brokenAccess());
-    httpPost.mockResolvedValue({});
-    const fn = jest.fn().mockRejectedValue(sessionExpiredError());
-
-    await expect(withManagerSessionRetry(http, fn)).rejects.toMatchObject({
-      body: { message: expect.stringContaining(MANAGER_SESSION_EXPIRED_COPY) },
-    });
-    expect(fn).toHaveBeenCalledTimes(2);
   });
 });

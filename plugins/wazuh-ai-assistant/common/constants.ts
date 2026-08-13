@@ -17,10 +17,12 @@ export const API_PATHS = {
   /** Singleton settings resource — privacy defaults/override/field
    * policy today; GET creates the object with defaults on first access. */
   SETTINGS: `${API_ROOT}/settings`,
-  /** Pre-flight administrator probe: `{administrator: boolean, message: string |
-   * null}`, using the SAME isAdministratorUser check and message mapping as PUT SETTINGS's own
-   * admin gate but never 403ing. The Settings page calls this on mount to show an actionable
-   * warning and disable Save buttons before a non-admin's PUT would be rejected anyway. */
+  /** Manager-session liveness probe: `{managerSessionOk: boolean, message: string | null,
+   * defaultApiHostId: string | null, apiKeyEncryptionEnabled: boolean}`, never 403ing. NOT an
+   * authorization check — settings/providers are authorized by the Wazuh indexer's own RBAC on
+   * the calling user (see docs/ref/modules/ai-assistant/security.md), not by this probe. Called on
+   * app mount and before Manager-path work (public/services/session-heal.ts's
+   * `ensureManagerSession`) so a missing/expired `wz-token` can be healed proactively. */
   SETTINGS_ACCESS: `${API_ROOT}/settings/access`,
   /** Persistent conversations: owner-scoped CRUD over the
    * `wazuh-ai-assistant-sessions` index alias (server/routes/conversations.ts,
@@ -32,8 +34,9 @@ export const API_PATHS = {
   CONVERSATION_BY_ID: (id: string) => `${API_ROOT}/conversations/${id}`,
 } as const;
 
-/** Substring contract between server/routes/settings.ts's token-failure copy and the client-side
- * session heal/retry (public/services/session-heal.ts) — reword only in both directions at once. */
+/** Substring contract between server/routes/settings.ts's Manager-session-expired copy and the
+ * client-side session heal/retry (public/services/session-heal.ts) — reword only in both
+ * directions at once. */
 export const MANAGER_SESSION_EXPIRED_COPY = 'session is missing or expired';
 
 /**

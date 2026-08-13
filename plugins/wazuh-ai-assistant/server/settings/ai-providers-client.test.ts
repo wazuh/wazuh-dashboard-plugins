@@ -3,10 +3,11 @@ import { AiProvidersClient } from './ai-providers-client';
 import { WAZUH_INDEXER_AI_ASSISTANT_PROVIDERS_PATH } from '../../common/constants';
 
 /**
- * `AiProvidersClient` never touches OpenSearch except through `transport.request` (internal user
- * for the list read, current user for the provider writes — same split every other settings
- * provider follows, see `opensearch-user.ts`), so this fakes exactly that one seam, mirroring
- * `index-settings-provider.test.ts`'s style.
+ * `AiProvidersClient` never touches OpenSearch except through `transport.request`, always as the
+ * current user (reads and writes alike — see `opensearch-user.ts`), so this fakes exactly that one
+ * seam, mirroring `index-settings-provider.test.ts`'s style. The `fakeContext` helper still keeps
+ * an `internal` slot separate from `current` so a future re-introduction of that split would be
+ * caught here too, but every case below drives the client through `current`.
  */
 
 type RequestCall = { method: string; path: string; body?: unknown };
@@ -50,7 +51,7 @@ test('list: fetches the providers list once and paginates the array in memory', 
   const client = new AiProvidersClient();
   const calls: RequestCall[] = [];
   const context = fakeContext({
-    internal: call => {
+    current: call => {
       calls.push(call);
       return Promise.resolve({
         body: providerListResponseBody([
@@ -77,7 +78,7 @@ test('list: fetches the providers list once and paginates the array in memory', 
 test('count: returns the full providers length', async () => {
   const client = new AiProvidersClient();
   const context = fakeContext({
-    internal: () =>
+    current: () =>
       Promise.resolve({
         body: providerListResponseBody([
           providerWire('p1', 'one'),
@@ -91,7 +92,7 @@ test('count: returns the full providers length', async () => {
 test('get: finds a provider by id and maps snake_case to camelCase', async () => {
   const client = new AiProvidersClient();
   const context = fakeContext({
-    internal: () =>
+    current: () =>
       Promise.resolve({
         body: providerListResponseBody([providerWire('p1', 'one', true)]),
       }),
@@ -115,7 +116,7 @@ test('get: finds a provider by id and maps snake_case to camelCase', async () =>
 test('get: returns undefined when no provider matches the id', async () => {
   const client = new AiProvidersClient();
   const context = fakeContext({
-    internal: () =>
+    current: () =>
       Promise.resolve({
         body: providerListResponseBody([providerWire('p1', 'one')]),
       }),

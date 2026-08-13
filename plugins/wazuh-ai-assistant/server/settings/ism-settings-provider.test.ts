@@ -3,9 +3,11 @@ import { IsmSettingsProvider } from './ism-settings-provider';
 import { CONVERSATION_SESSIONS_ISM_POLICY_ID } from '../../common/constants';
 
 /**
- * `IsmSettingsProvider` never touches OpenSearch except through
- * `transport.request` (internal user for reads, current user for writes — same split every other
- * settings provider follows, see `opensearch-user.ts`), so this fakes exactly that one seam.
+ * `IsmSettingsProvider` never touches OpenSearch except through `transport.request`, always as
+ * the current user (reads and writes alike — see `opensearch-user.ts`), so this fakes exactly
+ * that one seam. The `fakeContext` helper still keeps an `internal` slot separate from `current`
+ * so a future re-introduction of that split would be caught here too, but every case below drives
+ * the provider through `current`.
  */
 
 type RequestCall = { method: string; path: string; body?: unknown };
@@ -50,7 +52,7 @@ const policyBody = (minIndexAge: string) => ({
 test('getSettings: extracts conversationRetentionDays from the fetched policy', async () => {
   const provider = new IsmSettingsProvider();
   const context = fakeContext({
-    internal: () => Promise.resolve({ body: policyBody('7d') }),
+    current: () => Promise.resolve({ body: policyBody('7d') }),
   });
   assert.deepEqual(await provider.getSettings(context), {
     conversationRetentionDays: 7,
@@ -81,9 +83,11 @@ test('updateSettings: PUTs the updated policy with concurrency tokens, then move
   const provider = new IsmSettingsProvider();
   const calls: RequestCall[] = [];
   const context = fakeContext({
-    internal: () => Promise.resolve({ body: policyBody('7d') }),
     current: call => {
       calls.push(call);
+      if (call.method === 'GET') {
+        return Promise.resolve({ body: policyBody('7d') });
+      }
       return Promise.resolve({ body: {} });
     },
   });
@@ -93,9 +97,10 @@ test('updateSettings: PUTs the updated policy with concurrency tokens, then move
   });
 
   assert.deepEqual(result, { conversationRetentionDays: 30 });
-  assert.equal(calls.length, 2);
+  assert.equal(calls.length, 3);
 
-  const [putCall, changePolicyCall] = calls;
+  const [getCall, putCall, changePolicyCall] = calls;
+  assert.equal(getCall.method, 'GET');
   assert.equal(putCall.method, 'PUT');
   assert.match(
     putCall.path,

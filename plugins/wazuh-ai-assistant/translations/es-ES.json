@@ -51,8 +51,6 @@
     "wazuhAiAssistant.resultTable.severity.informational": "Informativo",
     "wazuhAiAssistant.settings.pageTitle": "Configuración de AI Assistant",
     "wazuhAiAssistant.settings.pageDescription": "Gestiona los proveedores de IA, la privacidad y el historial de conversaciones.",
-    "wazuhAiAssistant.settings.access.warningTitle": "No puedes guardar la configuración en este momento",
-    "wazuhAiAssistant.settings.access.warningFallback": "Se requieren privilegios de administrador para cambiar la configuración de AI Assistant.",
     "wazuhAiAssistant.settings.providers.title": "Proveedores",
     "wazuhAiAssistant.settings.providers.description": "Conecta y gestiona los proveedores de IA disponibles para el chat.",
     "wazuhAiAssistant.settings.addProvider": "Agregar proveedor",

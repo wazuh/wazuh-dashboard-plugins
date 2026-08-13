@@ -19,7 +19,6 @@ import {
   EuiTitle,
   EuiConfirmModal,
   EuiButtonIcon,
-  EuiToolTip,
   EuiBadge,
   EuiLoadingSpinner,
   EuiSwitch,
@@ -40,7 +39,6 @@ import {
   FieldPolicyEntry,
   SettingsService,
 } from '../../services/settings-service';
-import { ensureManagerSession } from '../../services/session-heal';
 import { ProviderInput, ProviderSummary } from '../../../common/types';
 import { useDirtyFormState } from '../../hooks/use-dirty-form-state';
 import { ProviderFormFlyout } from './provider-form-flyout';
@@ -231,17 +229,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     entry => entry.field.trim() === '',
   );
 
-  // Pre-flight administrator probe: a live check (GET /settings/access),
-  // not a stored setting — loaded once on mount, independent of the settings save/load cycle above.
-  // `canSave` starts `true` (optimistic) so the page never blocks anything until the probe actually
-  // comes back `false`; if the probe request itself fails, `.catch` below deliberately leaves
-  // `canSave` untouched (fail OPEN on the client — the server still enforces the real
-  // gate on every PUT regardless of what this banner shows).
-  const [canSave, setCanSave] = useState(true);
-  const [accessMessage, setAccessMessage] = useState<string | null>(null);
-  // Tri-state, fail-open like `canSave`: `null` = probe pending/failed → no callout and no Save
-  // block; only a confirmed server `false` gates the form. The server's 503 gate still refuses
-  // plaintext key writes regardless.
+  // Tri-state: `null` = probe pending/failed → no callout, no block. The server's 503 gate still
+  // refuses plaintext key writes regardless of what this warns about.
   const [apiKeyEncryptionEnabled, setApiKeyEncryptionEnabled] = useState<
     boolean | null
   >(null);
@@ -269,19 +258,18 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
 
   useEffect(() => {
     reloadPrivacySettings();
-    // The probe→heal→re-probe choreography lives in ensureManagerSession now (it shares the
-    // execution renderApp already started, so a /settings deep link gets the healed answer on
-    // first paint). A `null` result means the probe itself failed: fail OPEN — `canSave` stays at
-    // its optimistic default and the server still enforces the real gate on every PUT regardless.
-    void ensureManagerSession(core.http).then(access => {
-      if (!access) {
-        return;
-      }
-      // `!== false` stays fail-open when older servers omit the field.
-      setApiKeyEncryptionEnabled(access.apiKeyEncryptionEnabled !== false);
-      setCanSave(access.administrator);
-      setAccessMessage(access.administrator ? null : access.message);
-    });
+    // Capability probe only (encryption-at-rest availability) — settings/providers are authorized
+    // by the Wazuh indexer's own RBAC on the calling user, not by anything this page checks, so a
+    // failed probe just leaves `apiKeyEncryptionEnabled` at its fail-open `null` default.
+    void service
+      .getSettingsAccess()
+      .then(access => {
+        // `!== false` stays fail-open when older servers omit the field.
+        setApiKeyEncryptionEnabled(access.apiKeyEncryptionEnabled !== false);
+      })
+      .catch(() => {
+        // Fail open: leave `apiKeyEncryptionEnabled` at its `null` default.
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -834,33 +822,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             </EuiText>
             <EuiSpacer size='l' />
 
-            {!canSave && (
-              <>
-                <EuiCallOut
-                  color='warning'
-                  iconType='alert'
-                  title={i18n.translate(
-                    'wazuhAiAssistant.settings.access.warningTitle',
-                    {
-                      defaultMessage: 'You cannot save settings right now',
-                    },
-                  )}
-                >
-                  <p>
-                    {accessMessage ??
-                      i18n.translate(
-                        'wazuhAiAssistant.settings.access.warningFallback',
-                        {
-                          defaultMessage:
-                            'Administrator privileges are required to change AI Assistant settings.',
-                        },
-                      )}
-                  </p>
-                </EuiCallOut>
-                <EuiSpacer size='l' />
-              </>
-            )}
-
             <SectionHeader
               icon='gear'
               title={i18n.translate(
@@ -1250,20 +1211,16 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 )}
 
                 <EuiHorizontalRule margin='m' />
-                <EuiToolTip content={!canSave ? accessMessage : undefined}>
-                  <EuiButton
-                    onClick={handleSavePrivacySettings}
-                    isLoading={isSavingPrivacy}
-                    isDisabled={
-                      !canSave || hasEmptyFieldPolicyRow || !privacy.isDirty
-                    }
-                    fill
-                  >
-                    {i18n.translate('wazuhAiAssistant.settings.privacy.save', {
-                      defaultMessage: 'Save privacy settings',
-                    })}
-                  </EuiButton>
-                </EuiToolTip>
+                <EuiButton
+                  onClick={handleSavePrivacySettings}
+                  isLoading={isSavingPrivacy}
+                  isDisabled={hasEmptyFieldPolicyRow || !privacy.isDirty}
+                  fill
+                >
+                  {i18n.translate('wazuhAiAssistant.settings.privacy.save', {
+                    defaultMessage: 'Save privacy settings',
+                  })}
+                </EuiButton>
               </EuiPanel>
             )}
 
@@ -1355,21 +1312,16 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 </EuiFormRow>
 
                 <EuiHorizontalRule margin='m' />
-                <EuiToolTip content={!canSave ? accessMessage : undefined}>
-                  <EuiButton
-                    onClick={handleSaveRetentionSettings}
-                    isLoading={isSavingRetention}
-                    isDisabled={!canSave || !retention.isDirty}
-                    fill
-                  >
-                    {i18n.translate(
-                      'wazuhAiAssistant.settings.retention.save',
-                      {
-                        defaultMessage: 'Save conversation history settings',
-                      },
-                    )}
-                  </EuiButton>
-                </EuiToolTip>
+                <EuiButton
+                  onClick={handleSaveRetentionSettings}
+                  isLoading={isSavingRetention}
+                  isDisabled={!retention.isDirty}
+                  fill
+                >
+                  {i18n.translate('wazuhAiAssistant.settings.retention.save', {
+                    defaultMessage: 'Save conversation history settings',
+                  })}
+                </EuiButton>
               </EuiPanel>
             )}
           </EuiPageContentBody>
@@ -1378,8 +1330,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           <ProviderFormFlyout
             editingProvider={editingProvider}
             error={error}
-            canSave={canSave}
-            accessMessage={accessMessage}
             apiKeyEncryptionEnabled={apiKeyEncryptionEnabled}
             onSubmit={handleSubmit}
             onClose={closeForm}

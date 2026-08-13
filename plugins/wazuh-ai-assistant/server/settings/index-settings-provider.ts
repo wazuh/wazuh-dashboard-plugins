@@ -111,10 +111,10 @@ export class IndexSettingsProvider
     fieldPolicy: FIELD_POLICY_DEFAULTS,
   };
 
-  /** Reads through the INTERNAL user — see server/settings/opensearch-user.ts's doc comment for
-   * why: privacy defaults and the resolved default provider must be readable by every
-   * authenticated dashboard user for a normal chat turn to work, not just admins. The spec
-   * documents only `200`/`403` for this GET; `404` is handled defensively anyway (same stance
+  /** Reads through the current user (server/settings/opensearch-user.ts's doc comment) — the
+   * indexer's own `plugin:wazuh/ai_assistant/settings/read` permission on the calling user's
+   * backend role is what authorizes this. The spec documents only
+   * `200`/`403` for this GET; `404` is handled defensively anyway (same stance
    * `IsmSettingsProvider.fetchPolicy` takes toward its own endpoint) in case an installation is
    * reached before the indexer plugin has finished provisioning. A `403` (missing
    * `plugin:wazuh/ai_assistant/settings/read`) is a real authorization failure, not a "nothing
@@ -127,8 +127,11 @@ export class IndexSettingsProvider
         method: 'GET',
         path: WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH,
       });
-      return toAttributes(response.body as GetSettingsResponseWire);
+      return toAttributes(response.body as SettingsWire);
     } catch (error) {
+      if (isNotFoundError(error)) {
+        return undefined;
+      }
       if (typeof error?.meta?.body?.error === 'string') {
         throw new Error(error?.meta?.body?.error);
       }
@@ -136,14 +139,16 @@ export class IndexSettingsProvider
     }
   }
 
-  /** Bootstraps the singleton on first access, through the INTERNAL user — same reasoning as
-   * `getSettings`: populating a deployment-wide default is infrastructure bootstrap, not a
-   * user-attributable mutation, and must succeed regardless of whether the first-ever caller's own
-   * OpenSearch identity holds `plugin:wazuh/ai_assistant/settings/write`. `PUT` being a documented
-   * upsert (this file's class doc comment) is what makes calling it here safe: unlike the old raw
-   * `index()` call it replaced, there is no risk of silently auto-creating a hidden index with the
-   * wrong mapping as a side effect — that risk lived in the transport this provider no longer
-   * uses, not in the concept of upserting defaults itself. */
+  /** Bootstraps the singleton on first access, through the same current-user client as
+   * `getSettings` (`reader(context)` — reader and writer are the same client now, see
+   * server/settings/opensearch-user.ts's doc comment). This PUT therefore needs the calling user's
+   * own backend role to additionally hold `plugin:wazuh/ai_assistant/settings/write`, not just
+   * `.../read`, the very first time this singleton is read on a fresh deployment — a read-only
+   * caller hitting an unprovisioned deployment first will 403 here instead of bootstrapping it;
+   * an admin should create the singleton once (e.g. via a Settings save) before relying on
+   * read-only roles. `PUT` being a documented upsert (this file's class doc comment) is what makes
+   * calling it here safe: unlike the old raw `index()` call it replaced, there is no risk of
+   * silently auto-creating a hidden index with the wrong mapping as a side effect. */
   async createDefaults(
     context: RequestHandlerContext,
   ): Promise<Pick<AssistantSettingsAttributes, IndexField>> {
@@ -155,12 +160,10 @@ export class IndexSettingsProvider
     return this.defaults;
   }
 
-  /** The one deliberate write that goes through the CURRENT user rather than the internal one —
-   * the dashboard's own `requireAdministrator` gate (server/routes/settings.ts) is what actually
-   * authorizes this mutation, and running it as the current user keeps it attributable to a real
-   * identity (and gives the indexer's own `plugin:wazuh/ai_assistant/settings/write` permission
-   * check a real identity to evaluate, as defense in depth). The endpoint's success response is
-   * just `{message, status}` — it never echoes the persisted document back — so this returns
+  /** Runs as the current user (like every call here — see server/settings/opensearch-user.ts's
+   * doc comment): the indexer's own `plugin:wazuh/ai_assistant/settings/write` permission check on
+   * that identity is what authorizes this mutation. The endpoint's success response is just
+   * `{message, status}` — it never echoes the persisted document back — so this returns
    * `attributes` itself rather than re-parsing a response body that doesn't carry it. */
   async updateSettings(
     context: RequestHandlerContext,

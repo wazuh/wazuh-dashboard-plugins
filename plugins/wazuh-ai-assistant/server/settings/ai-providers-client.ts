@@ -1,8 +1,5 @@
 import { RequestHandlerContext } from '../../../../src/core/server';
-import {
-  WAZUH_INDEXER_AI_ASSISTANT_PROVIDERS_PATH,
-  WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH,
-} from '../../common/constants';
+import { WAZUH_INDEXER_AI_ASSISTANT_PROVIDERS_PATH } from '../../common/constants';
 import { ProviderConfig } from '../../common/types';
 import { isNotFoundError, reader, writer } from './opensearch-user';
 
@@ -134,10 +131,10 @@ export class AiProvidersClient {
     }
   }
 
-  /** Reads through the INTERNAL user — see server/settings/opensearch-user.ts's doc comment for
-   * why: resolving the default provider for a chat turn must work for every authenticated
-   * dashboard user, not just admins. A `404` (deployment reached before the indexer plugin has
-   * finished provisioning) is treated as "no providers yet" rather than an error, matching
+  /** Reads through the current user (server/settings/opensearch-user.ts's doc comment) — the
+   * indexer's own `plugin:wazuh/ai_assistant/settings/read` permission on the calling user's
+   * backend role is what authorizes this. A `404` (deployment reached before the indexer plugin
+   * has finished provisioning) is treated as "no providers yet" rather than an error, matching
    * `IndexSettingsProvider.getSettings`'s stance toward the same endpoint. */
   private async fetchAll(
     context: RequestHandlerContext,
@@ -204,11 +201,9 @@ export class AiProvidersClient {
     );
   }
 
-  /** The one deliberate write reached through the CURRENT user rather than the internal one — the
-   * dashboard's own `requireAdministrator` gate (server/routes/settings.ts) is what actually
-   * authorizes this mutation, and running it as the current user keeps it attributable to a real
-   * identity (and gives the indexer's own `plugin:wazuh/ai_assistant/settings/write` permission
-   * check a real identity to evaluate, as defense in depth). */
+  /** Runs as the current user (like every write here — see server/settings/opensearch-user.ts's
+   * doc comment): the indexer's own `plugin:wazuh/ai_assistant/settings/write` permission check on
+   * that identity is what authorizes this mutation. */
   async update(
     context: RequestHandlerContext,
     id: string,
