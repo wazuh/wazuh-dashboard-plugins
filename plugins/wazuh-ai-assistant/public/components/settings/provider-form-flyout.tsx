@@ -42,8 +42,73 @@ const PROVIDER_TYPE_FORM_LABELS: Record<string, string> = {
     },
   ),
   anthropic: i18n.translate('wazuhAiAssistant.settings.type.anthropic', {
-    defaultMessage: 'Anthropic',
+    defaultMessage: 'Anthropic (Claude)',
   }),
+};
+
+/** One-line description shown under the provider type selector so the choice is self-explanatory
+ * without opening either form label's parenthetical — CEO feedback was specifically that signing
+ * up an Anthropic key was confusing, and part of that was not knowing which type to pick. */
+const PROVIDER_TYPE_DESCRIPTIONS: Record<ProviderInput['type'], string> = {
+  anthropic: i18n.translate(
+    'wazuhAiAssistant.settings.type.anthropicDescription',
+    {
+      defaultMessage: "Anthropic's own API (Claude models).",
+    },
+  ),
+  openai_compatible: i18n.translate(
+    'wazuhAiAssistant.settings.type.openaiCompatibleDescription',
+    {
+      defaultMessage:
+        'Choose this for OpenAI, Groq, Bedrock-Mantle, or any other provider that exposes ' +
+        'a /chat/completions endpoint.',
+    },
+  ),
+};
+
+/**
+ * Per-type API key guidance shown under the API key field: where to create a key and what its
+ * shape looks like, so a mismatched key gets caught before the admin clicks Save and hits an
+ * opaque "Test connection" failure. `keyPattern` backs a non-blocking shape warning only — the
+ * server is the real validator, this is just an early, cheap hint.
+ *
+ * `keyPattern` is deliberately OPTIONAL: it is only well-defined for `anthropic` (Anthropic keys
+ * always start with `sk-ant-`). `openai_compatible` covers OpenAI, Groq (`gsk_...`),
+ * Bedrock-Mantle/gateway tokens (arbitrary shapes), and auth-free Ollama (no key at all) — there
+ * is no single shape to check there, so warning against `/^sk-/` for that type would falsely flag
+ * perfectly valid keys for the exact providers this type's own description advertises.
+ */
+const PROVIDER_API_KEY_GUIDANCE: Record<
+  ProviderInput['type'],
+  { help: string; keyPattern?: RegExp; shapeWarning?: string }
+> = {
+  anthropic: {
+    help: i18n.translate('wazuhAiAssistant.settings.form.apiKeyHelpAnthropic', {
+      defaultMessage:
+        'Create a key at console.anthropic.com -> API Keys. Anthropic keys start with sk-ant-.',
+    }),
+    keyPattern: /^sk-ant-/,
+    shapeWarning: i18n.translate(
+      'wazuhAiAssistant.settings.form.apiKeyShapeWarningAnthropic',
+      {
+        defaultMessage:
+          "This doesn't look like an Anthropic key (it should start with sk-ant-). " +
+          'Double-check it was copied from console.anthropic.com -> API Keys.',
+      },
+    ),
+  },
+  openai_compatible: {
+    help: i18n.translate(
+      'wazuhAiAssistant.settings.form.apiKeyHelpOpenaiCompatible',
+      {
+        defaultMessage:
+          "Create a key in your provider's console (e.g. OpenAI, Groq). OpenAI keys start " +
+          'with sk-, Groq keys with gsk_ — other gateways (e.g. Bedrock-Mantle) use their own ' +
+          'format.',
+      },
+    ),
+    // No shape check for this type — see the doc comment above.
+  },
 };
 
 interface ProviderUrlDoc {
@@ -296,8 +361,21 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   );
   const [baseUrlError, setBaseUrlError] = useState<string | null>(null);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+  // Tracks whether the admin has typed into the endpoint URL field themselves, so switching
+  // provider type to anthropic only prefills its base URL while the field is still
+  // empty/untouched — never overwriting a value the admin already entered. An existing
+  // provider being edited already has a real baseUrl, so it starts "touched".
+  const [baseUrlTouched, setBaseUrlTouched] = useState(
+    Boolean(editingProvider),
+  );
   const urlGuidance = PROVIDER_URL_GUIDANCE[form.type];
   const modelGuidance = PROVIDER_MODEL_GUIDANCE[form.type];
+  const apiKeyGuidance = PROVIDER_API_KEY_GUIDANCE[form.type];
+  const apiKeyShapeMismatch = Boolean(
+    apiKeyGuidance.keyPattern &&
+      form.apiKey?.trim() &&
+      !apiKeyGuidance.keyPattern.test(form.apiKey.trim()),
+  );
 
   const handleSave = async () => {
     const trimmedForm: ProviderInput = {
@@ -436,6 +514,33 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
               <EuiSpacer size='m' />
             </>
           )}
+          {/* Only shown for a brand-new provider — an admin editing an existing one already
+              knows how to fill this form in. CEO feedback was specifically that signing up an
+              Anthropic key was confusing; this is the shortest possible map of the four steps. */}
+          {!editingProvider && (
+            <>
+              <EuiCallOut
+                size='s'
+                iconType='iInCircle'
+                title={i18n.translate(
+                  'wazuhAiAssistant.settings.form.gettingStartedTitle',
+                  { defaultMessage: 'Getting started' },
+                )}
+              >
+                <p>
+                  {i18n.translate(
+                    'wazuhAiAssistant.settings.form.gettingStartedSteps',
+                    {
+                      defaultMessage:
+                        '1. Pick a provider type. 2. Paste its API key. 3. Pick a model. ' +
+                        '4. Test the connection.',
+                    },
+                  )}
+                </p>
+              </EuiCallOut>
+              <EuiSpacer size='m' />
+            </>
+          )}
           <EuiForm component='div'>
             <EuiFormRow
               id='wz-ai-provider-name'
@@ -464,6 +569,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                   })}
                 />
               }
+              helpText={PROVIDER_TYPE_DESCRIPTIONS[form.type]}
             >
               <EuiSelect
                 options={PROVIDER_TYPES.map(type => ({
@@ -472,12 +578,38 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 }))}
                 value={form.type}
                 aria-required='true'
-                onChange={event =>
-                  setForm({
-                    ...form,
-                    type: event.target.value as ProviderInput['type'],
-                  })
-                }
+                onChange={event => {
+                  const nextType = event.target.value as ProviderInput['type'];
+                  setForm(current => {
+                    // Prefill Anthropic's base URL the first time the admin switches to that
+                    // type, but only while the endpoint field is still empty/untouched — see
+                    // `baseUrlTouched` above.
+                    const shouldPrefillAnthropicBaseUrl =
+                      nextType === 'anthropic' &&
+                      !baseUrlTouched &&
+                      current.baseUrl.trim() === '';
+                    // Mirror image of the prefill above: leaving anthropic for another type
+                    // while the field is still untouched and still holds exactly the value this
+                    // form prefilled clears it again, so a wrong-type URL can't be saved
+                    // unnoticed. A value the admin typed themselves (`baseUrlTouched`) is never
+                    // touched here.
+                    const shouldClearAnthropicPrefill =
+                      current.type === 'anthropic' &&
+                      nextType !== 'anthropic' &&
+                      !baseUrlTouched &&
+                      current.baseUrl ===
+                        PROVIDER_URL_GUIDANCE.anthropic.placeholder;
+                    return {
+                      ...current,
+                      type: nextType,
+                      baseUrl: shouldPrefillAnthropicBaseUrl
+                        ? PROVIDER_URL_GUIDANCE.anthropic.placeholder
+                        : shouldClearAnthropicPrefill
+                        ? ''
+                        : current.baseUrl,
+                    };
+                  });
+                }}
               />
             </EuiFormRow>
             <EuiFormRow
@@ -539,6 +671,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 aria-required='true'
                 onChange={event => {
                   setForm({ ...form, baseUrl: event.target.value });
+                  setBaseUrlTouched(true);
                   if (baseUrlError) {
                     setBaseUrlError(null);
                   }
@@ -632,31 +765,35 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
               }
               helpText={
                 <>
-                  {editingProvider && (
-                    <p>
-                      {i18n.translate(
-                        'wazuhAiAssistant.settings.form.apiKeyHelpLeaveBlank',
-                        {
-                          defaultMessage:
-                            'Leave empty to keep the current key.',
-                        },
-                      )}
-                    </p>
-                  )}
                   <p>
-                    {i18n.translate(
-                      'wazuhAiAssistant.settings.form.apiKeyHelpOptional',
-                      {
-                        defaultMessage:
-                          "Optional for endpoints that don't require authentication (e.g. a " +
-                          'local Ollama server without auth) — stored encrypted at rest when ' +
-                          'an encryption key is configured.',
-                      },
-                    )}
+                    {editingProvider
+                      ? i18n.translate(
+                          'wazuhAiAssistant.settings.form.apiKeyHelpEditing',
+                          {
+                            defaultMessage:
+                              'Leave empty to keep the current key. Optional for endpoints ' +
+                              "that don't require authentication (e.g. a local Ollama " +
+                              'server without auth) — stored encrypted at rest when an ' +
+                              'encryption key is configured.',
+                          },
+                        )
+                      : i18n.translate(
+                          'wazuhAiAssistant.settings.form.apiKeyHelpCreate',
+                          {
+                            defaultMessage:
+                              "Optional for endpoints that don't require authentication " +
+                              '(e.g. a local Ollama server without auth) — stored encrypted ' +
+                              'at rest when an encryption key is configured.',
+                          },
+                        )}
                   </p>
+                  <p>{apiKeyGuidance.help}</p>
                 </>
               }
             >
+              {/* Deliberately no `isInvalid` here: a shape mismatch is a non-blocking warning
+                  (see the EuiCallOut below), not a form error — a red-invalid field would read
+                  as blocking to an admin even though Save stays enabled. */}
               <EuiFieldPassword
                 type='dual'
                 value={form.apiKey}
@@ -665,6 +802,24 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 }
               />
             </EuiFormRow>
+            {/* Non-blocking: a shape mismatch never stops Save, it only flags a likely
+                copy/paste mistake before the admin hits an opaque "Test connection" failure.
+                Kept outside EuiFormRow (which clones its single child to inject a11y props,
+                so it cannot take a two-element fragment) rather than inside it. */}
+            {/* `apiKeyShapeMismatch` is only ever true for a type with both a `keyPattern` and a
+                `shapeWarning` (currently just anthropic — see PROVIDER_API_KEY_GUIDANCE above),
+                so `shapeWarning` is guaranteed defined here. */}
+            {apiKeyShapeMismatch && apiKeyGuidance.shapeWarning && (
+              <>
+                <EuiSpacer size='xs' />
+                <EuiCallOut
+                  size='s'
+                  color='warning'
+                  iconType='alert'
+                  title={apiKeyGuidance.shapeWarning}
+                />
+              </>
+            )}
           </EuiForm>
         </EuiFlyoutBody>
         <EuiFlyoutFooter>

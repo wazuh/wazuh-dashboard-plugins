@@ -1,19 +1,23 @@
 import { i18n } from '@osd/i18n';
 import { CoreSetup, DEFAULT_NAV_GROUPS } from '../../../../src/core/public';
 import { PLUGIN_ID } from '../../common/constants';
-import {
-  WAZUH_AI_NAV_CATEGORY,
-  WAZUH_AI_NAV_GROUP_ORDER,
-} from '../../common/nav-categories';
 
 /**
- * New-navigation registration for the AI Assistant (issue #8895).
+ * New-navigation registration for the AI Assistant.
  *
  * There are TWO independent navigation systems, and the `category` passed to
  * `application.register()` only drives the CLASSIC one. The newer navigation — active when the
  * `home:useNewHomePage` advanced setting is enabled — is populated by nav-group registration
  * instead, so an app that sets only its `category` is placed correctly in one navigation and left
  * ungrouped in the other. That asymmetry is why this file exists.
+ *
+ * Deliberately registered with NO `category` (CEO direction supersedes issue #8895 — see
+ * `common/nav-categories.ts`'s doc comment): the new navigation's own category mapping
+ * (`CATEGORY_TO_NAV_CATEGORY` in `plugins/main/public/utils/nav-groups.ts`) does not map the
+ * classic `wz-category-home` category this app now joins (see `plugin.ts`) to any nav-group
+ * category either — the main plugin's own Overview/Home app surfaces ungrouped in the new
+ * navigation for the same reason. Matching that treatment here, rather than inventing a new
+ * nav-group category, keeps the app out of any dedicated AI section in BOTH navigations.
  *
  * Mirrors how the main `wazuh` plugin registers its own applications (`main/public/utils/
  * nav-groups.ts`): same API, same `DEFAULT_NAV_GROUPS.all` target, and the same `setup()` lifecycle
@@ -32,7 +36,8 @@ interface NavLinkConfig {
 }
 
 /**
- * Adds the AI Assistant to the new navigation under the shared `AI` category.
+ * Adds the AI Assistant to the new navigation, ungrouped — see the file doc comment above for why
+ * no category is set here.
  *
  * No-op when the new navigation is disabled — matching the main plugin's guard, so nothing is
  * registered against a navigation the deployment is not using.
@@ -52,8 +57,9 @@ export function registerAiNavLink(core: CoreSetup): void {
     title: i18n.translate('wazuhAiAssistant.app.title', {
       defaultMessage: 'AI Assistant',
     }),
-    order: WAZUH_AI_NAV_GROUP_ORDER,
-    category: WAZUH_AI_NAV_CATEGORY,
+    // No `category` — see this function's doc comment: the app now joins Home in the classic
+    // navigation, and Home itself is registered ungrouped in this newer one, so this link matches
+    // that same ungrouped treatment rather than inventing a nav-group category of its own.
   };
 
   navGroup.addNavLinksToGroup(DEFAULT_NAV_GROUPS.all, [navLink]);

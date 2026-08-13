@@ -172,7 +172,15 @@ export interface StreamUsage {
 }
 
 export type StreamEvent =
-  | { type: 'delta'; content: string }
+  /**
+   * `reasoningFallback` (issue #8935 item I3): set by openai-compatible.ts's reasoning-channel
+   * fallback ONLY — the one path where a provider's raw deliberation text is surfaced as the
+   * answer because no real `content` ever arrived. The client renders it like any delta;
+   * server-side orchestration (chat.ts) uses the flag to keep deliberation text — which routinely
+   * names a tool the model decided NOT to call — out of the deferred-offer interception. Optional
+   * and absent everywhere else, so every other producer/consumer is untouched.
+   */
+  | { type: 'delta'; content: string; reasoningFallback?: true }
   | { type: 'table'; spec: TableSpec }
   /** Emitted once per call, fully assembled server-side; the browser never sees partial JSON. */
   | { type: 'tool_call'; toolCall: ToolCall }

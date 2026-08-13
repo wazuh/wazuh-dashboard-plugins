@@ -148,7 +148,7 @@
     "wazuhAiAssistant.settings.retention.saveError": "No se pudo guardar la configuración del historial de conversaciones.",
     "wazuhAiAssistant.settings.retention.saveSuccess": "Configuración del historial de conversaciones guardada.",
     "wazuhAiAssistant.settings.retention.daysLabel": "Conservar las conversaciones guardadas durante (días)",
-    "wazuhAiAssistant.settings.retention.daysHelp": "0 conserva todas las conversaciones guardadas para siempre. Esto solo se aplica al cargar la lista de conversaciones; no hay limpieza programada en segundo plano.",
+    "wazuhAiAssistant.settings.retention.daysHelp": "0 conserva todas las conversaciones guardadas para siempre. Se aplica según su propio calendario, mediante una política ISM sobre el flujo de datos subyacente.",
     "wazuhAiAssistant.settings.retention.save": "Guardar configuración del historial de conversaciones"
   }
 }

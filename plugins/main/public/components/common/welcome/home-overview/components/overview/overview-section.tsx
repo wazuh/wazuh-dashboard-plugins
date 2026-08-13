@@ -23,6 +23,7 @@ import {
 } from '../../utils/navigation';
 import { FINDING_SEVERITY_FIELD } from '../../lib/fields';
 import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
+import { AiAssistantCta } from './ai-assistant-cta';
 
 export interface OverviewSectionProps {
   /** Owned by the page shell so Threat Hunting reuses the same on-mount search. */
@@ -37,7 +38,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
   return (
     <div>
       <EuiFlexGroup>
-        <EuiFlexItem>
+        <EuiFlexItem style={{ minWidth: 0 }}>
           <WidgetGroup
             status={agents.status}
             errorLabel={agents.error?.message}
@@ -56,7 +57,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             )}
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem>
+        <EuiFlexItem style={{ minWidth: 0 }}>
           <WidgetGroup
             status={findings.status}
             errorLabel={findings.error?.message}
@@ -90,29 +91,38 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
 
       <EuiSpacer size='m' />
 
-      <WidgetGroup
-        status={findings.status}
-        errorLabel={findings.error?.message}
-        showManageIndexPatternsLink={
-          findings.error?.kind === 'index-pattern-missing'
-        }
-        isPermissionDenied={findings.error?.kind === 'permission-denied'}
-        title='MITRE ATT&CK top tactics'
-        caption='Last 24 hours'
-        headerLink={{ label: 'MITRE ATT&CK', href: getMitreUrl() }}
-        loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
-        data-test-subj='home-overview-mitre-tactics'
-      >
-        {findings.data && (
-          <BarList
-            items={findings.data.topTactics}
-            emptyMessage='No MITRE ATT&CK tactics observed'
-            getHref={item => getMitreIntelligenceResourceUrl('tactics', item)}
-            data-test-subj='mitre-top-tactics'
-            barColor={UI_COLOR_STATUS.success}
-          />
-        )}
-      </WidgetGroup>
+      <EuiFlexGroup>
+        <EuiFlexItem style={{ minWidth: 0 }}>
+          <WidgetGroup
+            status={findings.status}
+            errorLabel={findings.error?.message}
+            showManageIndexPatternsLink={
+              findings.error?.kind === 'index-pattern-missing'
+            }
+            isPermissionDenied={findings.error?.kind === 'permission-denied'}
+            title='MITRE ATT&CK top tactics'
+            caption='Last 24 hours'
+            headerLink={{ label: 'MITRE ATT&CK', href: getMitreUrl() }}
+            loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
+            data-test-subj='home-overview-mitre-tactics'
+          >
+            {findings.data && (
+              <BarList
+                items={findings.data.topTactics}
+                emptyMessage='No MITRE ATT&CK tactics observed'
+                getHref={item =>
+                  getMitreIntelligenceResourceUrl('tactics', item)
+                }
+                data-test-subj='mitre-top-tactics'
+                barColor={UI_COLOR_STATUS.success}
+              />
+            )}
+          </WidgetGroup>
+        </EuiFlexItem>
+        <EuiFlexItem style={{ minWidth: 0 }}>
+          <AiAssistantCta />
+        </EuiFlexItem>
+      </EuiFlexGroup>
     </div>
   );
 };

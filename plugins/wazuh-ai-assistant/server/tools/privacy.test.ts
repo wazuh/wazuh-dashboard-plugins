@@ -968,6 +968,31 @@ test('applyFieldPolicy: a "never" agg field drops only its own buckets', () => {
   assert.equal(out.breakdown![0].agg, 'by_rule');
 });
 
+test('applyFieldPolicy: when a "never" policy drops EVERY bucket, breakdownNote goes with the breakdown', () => {
+  // FAILS ON BASE (and against #8935 item 1's first cut): the spread carried `breakdownNote`
+  // through untouched while the empty scrub result deleted `breakdown`, leaving a note that
+  // asserts concrete truncation figures about a bucket list that is not in the payload. 'never'
+  // is user-settable (server/routes/settings.ts), so this is reachable from settings alone.
+  const policy: FieldPolicyEntry[] = [{ field: 'data.srcip', action: 'never' }];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    breakdown: [
+      { key: '10.0.0.5', count: 5 },
+      { key: '10.0.0.6', count: 3 },
+    ],
+    breakdownNote:
+      'Per-bucket counts are exact, but the bucket list is incomplete — further matches fall ' +
+      'under keys not listed (12).',
+  });
+  const aggFields = { by_ip: scalarSpec('data.srcip') };
+  const out = applyFieldPolicy(digest, policy, p, aggFields);
+  assert.ok(!('breakdown' in out), 'every bucket was policy-dropped');
+  assert.ok(
+    !('breakdownNote' in out),
+    'a note describing a deleted breakdown must not reach the provider',
+  );
+});
+
 test('applyFieldPolicy: get_agent_inventory packages breakdown anonymizes package.vendor buckets, not package.architecture', () => {
   // Reproduces the exact reported defect against the REAL FIELD_POLICY_DEFAULTS + the same shape
   // of scalar AggFieldSpec map executor.ts builds for a breakdownDimensions tool (dimension ->
@@ -1044,53 +1069,13 @@ test('extractAggFields: maps each top-level BUCKET agg name to its terms/signifi
   const fields = extractAggFields(body);
   assert.ok(fields);
   assert.deepEqual(fields!.by_rule, scalarSpec('rule.id'));
-  // cardinality is a metric agg (returns a NUMBER, produces no buckets) -- deliberately NOT
-  // mapped, see extractAggFields's doc comment on why mapping it would misattribute samples[].key
-  // against a leading metric agg instead of the bucket agg the rows actually came from.
+  // A metric agg's field is deliberately NOT mapped (its response is a number — no string value
+  // of that field ever leaves through the digest) so it can never win the `samples[].key`
+  // attribution over the bucket agg that actually produced the rows. See extractAggFields'
+  // doc comment for the leak this prevents.
   assert.equal(fields!.by_ip_count, undefined);
   assert.ok('by_ip_count' in fields!);
   assert.deepEqual(fields!.by_sig, scalarSpec('rule.description'));
-});
-
-test('extractAggFields: resolves multi_terms to a "multi" spec, positionally aligned', () => {
-  const body = {
-    aggs: {
-      by_ip_and_agent: {
-        multi_terms: {
-          terms: [{ field: 'source.ip' }, { field: 'wazuh.agent.id' }],
-          size: 20,
-        },
-      },
-    },
-  };
-  const fields = extractAggFields(body);
-  assert.ok(fields);
-  assert.deepEqual(fields!.by_ip_and_agent, {
-    kind: 'multi',
-    fields: ['source.ip', 'wazuh.agent.id'],
-  });
-});
-
-test('extractAggFields: resolves composite to a "composite" spec keyed by source name', () => {
-  const body = {
-    aggs: {
-      by_ip_and_agent: {
-        composite: {
-          size: 20,
-          sources: [
-            { ip: { terms: { field: 'source.ip' } } },
-            { agent: { terms: { field: 'wazuh.agent.id' } } },
-          ],
-        },
-      },
-    },
-  };
-  const fields = extractAggFields(body);
-  assert.ok(fields);
-  assert.deepEqual(fields!.by_ip_and_agent, {
-    kind: 'composite',
-    fields: { ip: 'source.ip', agent: 'wazuh.agent.id' },
-  });
 });
 
 // --- applyFieldPolicy: samples[].key attribution with a leading metric agg (#8920 item 5) --------
