@@ -1932,6 +1932,37 @@ describe('ChatPage — conversation rail display mode (layout contract §5/§6)'
     }
   });
 
+  it('gives the rail flyout its own design-token block, since it renders outside the chat surface', async () => {
+    // `EuiFlyout` portals into document.body, so NOTHING in the chat surface's ancestor chain
+    // reaches it — including `.wzAiChat`, the element that defines every `--wz-*` custom property.
+    // Without a token block of its own the rows' selected/hover pills (`var(--wz-accent-soft)` /
+    // `var(--wz-accent-hover)`) failed substitution and computed to transparent, so on a narrow
+    // pane the open conversation had no highlight at all and hover did nothing. Same portal trap
+    // the provider flyout already carried its own token block for.
+    const stub = stubResizeObserver(700);
+    try {
+      mockConversationsService.list.mockResolvedValue([
+        { id: 'conv-b', title: 'Older conversation', updatedAt: '2024-01-01' },
+      ]);
+      renderChatPage();
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Show conversations' }),
+      );
+
+      await waitFor(() =>
+        expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      );
+      // Asserted as an ANCESTOR of the rows rather than on the flyout element by name: what the
+      // pills need is for the token block to sit somewhere above them in the tree, which is the
+      // precise thing portalling broke.
+      expect(
+        screen.getByText('Older conversation').closest('.wzConvoRailFlyout'),
+      ).not.toBeNull();
+    } finally {
+      stub.restore();
+    }
+  });
+
   it('re-expands the rail when the pane grows back past the collapse threshold', async () => {
     const stub = stubResizeObserver(1000);
     try {

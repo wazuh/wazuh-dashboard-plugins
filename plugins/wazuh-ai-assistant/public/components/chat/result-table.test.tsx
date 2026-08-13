@@ -94,10 +94,10 @@ describe('ResultTable', () => {
   });
 
   // Layout contract §4: the card is a 3-row structure (header / scrolling body / pinned
-  // pagination footer) — the max-height and scroll live on `.wzResultsCardBody` alone (via
-  // result-table.scss's `wzScrollChild` mixin), never as an inline style on any element, and the
-  // header/footer are its SIBLINGS, not its descendants — so neither can ever be scrolled out of
-  // view underneath the body.
+  // pagination footer). The SCROLL lives on `.wzResultsCardBody` alone (via result-table.scss's
+  // `wzScrollChild` mixin) and the header/footer are its SIBLINGS, not its descendants — so
+  // neither can ever be scrolled out of view underneath the body. (The card's own height ceiling
+  // is a different thing and does arrive inline, measured — see the describe block below.)
   it('keeps the header and pagination footer as siblings of the scrolling body, not nested inside it', () => {
     const thirtyRows = Array.from({ length: 30 }, (_unused, i) => ({
       agent: `agent-${i}`,
@@ -120,6 +120,50 @@ describe('ResultTable', () => {
     expect(footer).not.toBeNull();
     expect(body?.contains(header as Node)).toBe(false);
     expect(body?.contains(footer as Node)).toBe(false);
+  });
+
+  // The card's height ceiling has to come from the TRANSCRIPT, not from the viewport. The
+  // stylesheet's `min(460px, 52dvh)` reads `dvh` against the window, which ignores the app frame's
+  // offset, the tab bar, and above all the composer row's own 30dvh of the same window: at the
+  // spec's 1280x620 acceptance size that leaves a ~345px transcript while the card alone still
+  // claims 322px, so the pinned footer lands below the transcript's fold — the very bug this card
+  // exists to kill, one level down from where it was fixed.
+  describe('height ceiling comes from the measured transcript, not the viewport', () => {
+    it('caps the card well inside a mid-height transcript, leaving room for the prose above it', () => {
+      const { container } = render(
+        <ResultTable spec={spec()} transcriptHeightPx={500} />,
+      );
+      const card = container.querySelector('.wzResultsCard') as HTMLElement;
+      // 500 - 140 reserved for the avatar row, the answer prose and the turn's spacing.
+      expect(card.style.maxHeight).toBe('360px');
+    });
+
+    it('stops shrinking at a card that can still show header, rows and footer', () => {
+      // 1280x620, the spec's tightest acceptance size: a ~345px transcript. The subtraction alone
+      // would give 205px, but below the floor a shorter cap helps nobody — the transcript's own
+      // full-pane scroll is the better answer than a card too short to use.
+      const { container } = render(
+        <ResultTable spec={spec()} transcriptHeightPx={345} />,
+      );
+      const card = container.querySelector('.wzResultsCard') as HTMLElement;
+      expect(card.style.maxHeight).toBe('240px');
+    });
+
+    it('never exceeds the design ceiling however tall the transcript gets', () => {
+      const { container } = render(
+        <ResultTable spec={spec()} transcriptHeightPx={2000} />,
+      );
+      const card = container.querySelector('.wzResultsCard') as HTMLElement;
+      expect(card.style.maxHeight).toBe('460px');
+    });
+
+    it('leaves the cap to the stylesheet when nothing has been measured', () => {
+      // jsdom has no ResizeObserver, so `transcriptHeightPx` stays 0 in the app's own tests too —
+      // an inline `0px` there would collapse the card to nothing.
+      const { container } = render(<ResultTable spec={spec()} />);
+      const card = container.querySelector('.wzResultsCard') as HTMLElement;
+      expect(card.style.maxHeight).toBe('');
+    });
   });
 
   // The BREAKING bug this whole card rewrite exists for: "page 2 of 6 unreachable without

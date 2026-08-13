@@ -255,7 +255,7 @@ describe('MessageBubble', () => {
   // Layout contract §5 ("one measure, one gutter"): prose is held to a fixed reading measure;
   // only block content (a result table) is allowed to break out past it, up to $wzTableMaxWidth.
   describe('prose measure vs. table breakout (layout contract §5)', () => {
-    it('caps a prose-only assistant answer to the 68ch reading measure', () => {
+    it('holds a prose-only assistant answer to the shared reading measure', () => {
       render(
         <MessageBubble
           message={baseMessage({ role: 'assistant', content: 'Six today.' })}
@@ -267,10 +267,27 @@ describe('MessageBubble', () => {
       const bubbleItem = screen
         .getByText('Six today.')
         .closest('.euiFlexItem') as HTMLElement;
-      expect(bubbleItem.style.maxWidth).toBe('68ch');
+      // The measure arrives by CLASS, not as an inline `68ch` restated inside message-bubble.tsx:
+      // the figure's single home is `$wzProseMeasure`, which the next test pins to the stylesheet.
+      expect(bubbleItem).toHaveClass('wzProseMeasure');
+      expect(bubbleItem.style.maxWidth).not.toBe('68ch');
     });
 
-    it('lets a table-carrying answer break out past the prose measure, up to 1300px', () => {
+    it('defines the prose measure once, in the stylesheet, from $wzProseMeasure', () => {
+      // The test above proves the bubble opts INTO the measure; this proves the thing it opts into
+      // is the shared token and not a second literal free to drift from it. It has to read the
+      // source directly because jest maps `.scss` to a style mock, so no rendered assertion can
+      // ever observe a value that came from a stylesheet.
+      const scssSource = require('fs').readFileSync(
+        require('path').join(__dirname, 'chat-page.scss'),
+        'utf8',
+      );
+      expect(scssSource).toMatch(
+        /\.wzProseMeasure\s*\{[^}]*max-width:\s*\$wzProseMeasure/,
+      );
+    });
+
+    it('lets a table-carrying answer break out past the prose measure', () => {
       const table: TableSpec = {
         columns: [{ id: 'agent', label: 'Agent' }],
         rows: [{ agent: 'web-01' }],
@@ -290,8 +307,12 @@ describe('MessageBubble', () => {
       const bubbleItem = screen
         .getByText('Results (1 rows)')
         .closest('.euiFlexItem') as HTMLElement;
-      expect(bubbleItem.style.maxWidth).toBe('min(100%, 1300px)');
-      expect(bubbleItem.style.maxWidth).not.toBe('68ch');
+      // Breaking out means declining the prose measure and filling whatever the ROW allows. The
+      // 1300px ceiling itself is `.wzMessageRow--wide`'s (chat-page.scss), applied one level up and
+      // asserted in message-list.test.tsx — restating it inline here was a second copy of that
+      // number with nothing keeping the two in step.
+      expect(bubbleItem).not.toHaveClass('wzProseMeasure');
+      expect(bubbleItem.style.maxWidth).toBe('100%');
     });
   });
 
