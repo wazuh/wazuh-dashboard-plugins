@@ -39,7 +39,7 @@ export const PromptAgentConfigNotReported = () => {
     <EuiEmptyPrompt
       iconType='reportingApp'
       style={{ marginTop: 20 }}
-      title={<h2>Agent has not reported its configuration</h2>}
+      title={<h2>Agent configuration not available</h2>}
       body={
         <Fragment>
           {/* Deliberately says nothing about which setting turns reporting on,
@@ -49,9 +49,8 @@ export const PromptAgentConfigNotReported = () => {
         observe -- no configuration reported -- with the documentation carrying
         the how. */}
           <p>
-            This section shows what an agent reports about its own
-            configuration. Configuration reporting must be enabled on the agent
-            for it to appear here.
+            The agent hasn't reported its configuration yet. Check that
+            configuration reporting is enabled in the agent settings.
           </p>
           <EuiLink
             href={documentationLink}
