@@ -1890,6 +1890,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             <EuiFlyout
               size='s'
               ownFocus
+              // EuiFlyout portals into document.body, past every ancestor that defines the `--wz-*`
+              // tokens, so it has to carry its own block or the rail's selected/hover pills inside
+              // it resolve to nothing (conversation-list.scss `.wzConvoRailFlyout`).
+              className='wzConvoRailFlyout'
               onClose={() => setIsRailFlyoutOpen(false)}
               aria-label={i18n.translate(
                 'wazuhAiAssistant.chat.conversations.sidebarRegionLabel',
@@ -2221,13 +2225,14 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 )}
 
                 {/* Welcome centres only when there is room (contract §3): `.wzWelcomeCenter`
-                    (chat-page.scss) is `min-height:100%; display:grid; place-content:center`
-                    against THIS row's own content box — a definite height because `.wzChatPane`'s
-                    grid gives the transcript row (`.wzChatTranscript`, the scroll container above)
-                    a real size. A tall viewport centres the cluster; a short one has nowhere to
-                    grow into, so this collapses to the content's own height and the transcript's
-                    own `overflow-y: auto` takes over — no flex-grow-spacer arithmetic needed to
-                    fake it, and nothing here can ever reach the composer, which is a grid sibling
+                    (chat-page.scss) is a `flex: 1 1 auto` column with `justify-content: center`,
+                    growing into whatever the transcript row leaves it. NOT the
+                    `display:grid; place-content:center` this comment used to describe — on a grid
+                    container `place-content` also sets `justify-content`, which packed the column
+                    track at its content width and collapsed the example cards to one per row. A
+                    tall viewport centres the cluster; a short one has nowhere to grow into, so this
+                    stops at the content's own height and the transcript's own `overflow-y: auto`
+                    takes over — nothing here can ever reach the composer, which is a grid sibling
                     of the transcript, never a descendant of it. */}
                 {showWelcomeState && (
                   <div className='wzWelcomeCenter'>

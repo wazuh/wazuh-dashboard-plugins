@@ -390,17 +390,17 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   const bubble = (
     <EuiFlexItem
       grow={false}
+      // The assistant's prose measure comes from the CLASS, not from a restated `68ch` — this file
+      // is not where `$wzProseMeasure` lives, and the comment above PROSE_MEASURE_CLASS already
+      // claimed the figure had exactly one home while an inline copy sat right here. A
+      // table-bearing turn takes no class: `.wzMessageRow--wide` (chat-page.scss) already caps the
+      // row at `min(100%, $wzTableMaxWidth)` one level up, so the `min(100%, 1300px)` that used to
+      // be inlined here was a second copy of that same number with nothing keeping the two in step.
+      className={!isUser && !message.table ? PROSE_MEASURE_CLASS : undefined}
       style={{
-        // The user turn keeps its 75% share (a question is always prose); the assistant turn
-        // gets the 68ch prose measure EXCEPT when it carries a result table, which may break out
-        // up to `$wzTableMaxWidth` (1300px, layout contract §5) instead — a wide table squeezed
-        // into 75% of an already-narrow column forced a horizontal scrollbar inside the table's
-        // own scroller. This "100%" resolves against the row's OWN measure (message-list.tsx's
-        // `.wzMessageRow`/`.wzMessageRow--wide`, chat-page.scss) — it used to resolve against the
-        // whole transcript's shared 1060px column instead, back when every row (table-bearing or
-        // not) rendered as a descendant of that single measure, which is what silently capped every
-        // table at ~1012px regardless of window width.
-        maxWidth: isUser ? '75%' : message.table ? 'min(100%, 1300px)' : '68ch',
+        // The user turn keeps its 75% share — a question is always prose, and the figure is
+        // genuinely local to this decision, with no token or class behind it to drift from.
+        maxWidth: isUser ? '75%' : '100%',
         minWidth: 180,
       }}
     >

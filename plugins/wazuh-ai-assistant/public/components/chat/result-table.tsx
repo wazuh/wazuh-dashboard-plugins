@@ -52,6 +52,29 @@ const TALL_TRANSCRIPT_HEIGHT_PX = 900;
 const PAGE_SIZE_OPTIONS = [5, 10, 25, 50];
 
 /**
+ * The card's height ceiling, in the only frame of reference that is actually correct: the
+ * TRANSCRIPT's measured height.
+ *
+ * `$wzResultsMaxHeight` (result-table.scss) reads `min(460px, 52dvh)`, and `dvh` resolves against
+ * the VIEWPORT — ignoring the app frame's own offset, the tab bar, and above all the composer row,
+ * which takes up to 30dvh of the same window. At the spec's own 1280x620 acceptance size that
+ * arithmetic runs: frame 571 -> pane ~531 -> composer at its ceiling 186 -> transcript ~345, while
+ * the card alone would still claim min(460, 322) = 322px. Twenty-three pixels left for the avatar
+ * row, the answer prose and the turn's spacing, so the pinned pagination footer lands below the
+ * transcript's fold — which is precisely the "page 2 of 6 unreachable" bug §4 exists to kill,
+ * returning one level down from where it was fixed. `transcriptHeightPx` was already measured and
+ * threaded all the way here for the page-size step; this makes the height use it too.
+ *
+ * The reserve is what the turn needs ABOVE the card: an avatar/label row plus two or three lines of
+ * answer prose plus the row's own spacing. The floor is a card that can still show its header, two
+ * rows and its footer — below that a shorter cap helps nobody, and the transcript's own scroll
+ * (which is a full-pane scroll, not a nested one) is the better answer.
+ */
+const RESULTS_CARD_MAX_HEIGHT_PX = 460;
+const RESULTS_CARD_MIN_HEIGHT_PX = 240;
+const RESULTS_CARD_TRANSCRIPT_RESERVE_PX = 140;
+
+/**
  * Badge color + localized label for each `SeverityLevel` word. Colors mirror the platform's own
  * mapping — plugins/main/common/constants.ts's `UI_COLOR_STATUS` (critical: '#BD271E', high:
  * '#FEC514', medium/info: '#6092C0', low/success: '#007871', informational/disabled: '#646A77') —
@@ -423,6 +446,27 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
       : DEFAULT_PAGE_SIZE,
   );
 
+  // Unlike the page size above, this one IS a live binding: re-capping the card as the transcript
+  // resizes costs the reader nothing (the body simply scrolls), whereas re-paginating under them
+  // would silently renumber the page they are reading. Left `undefined` when nothing has been
+  // measured (jsdom has no ResizeObserver, so `transcriptHeightPx` stays 0 there) — the stylesheet's
+  // own `min(460px, 52dvh)` then applies exactly as before.
+  const measuredCardMaxHeight = useMemo<React.CSSProperties | undefined>(
+    () =>
+      transcriptHeightPx
+        ? {
+            maxHeight: Math.max(
+              RESULTS_CARD_MIN_HEIGHT_PX,
+              Math.min(
+                RESULTS_CARD_MAX_HEIGHT_PX,
+                transcriptHeightPx - RESULTS_CARD_TRANSCRIPT_RESERVE_PX,
+              ),
+            ),
+          }
+        : undefined,
+    [transcriptHeightPx],
+  );
+
   const toggleRow = (rowIndex: number) => {
     setExpandedRowIds(previous => {
       const next = new Set(previous);
@@ -660,7 +704,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
     // wraps its content in markup this component does not control, which fought the exact 3-row
     // grid this fix depends on; `wzResultsCard` (result-table.scss) applies the same bordered,
     // shadowless look via the shared `wzPanel` mixin instead, so the visual result is identical.
-    <div className='wzResultsCard'>
+    <div className='wzResultsCard' style={measuredCardMaxHeight}>
       <div className='wzResultsCardHeader'>
         <button
           type='button'

@@ -38,7 +38,10 @@ $wzSettingsCardPillHeight: $wzSettingsCardPillLineHeight +
     // 11px uppercase muted label — the same idiom `wzMicroLabel` already names for table column
     // heads, so this restates nothing of its own.
     @include wzMicroLabel;
-    background-color: var(--wz-surface);
+    // Fallback matters more here than anywhere else: this fill is the only thing masking the
+    // panel's own top border behind the pill, so a failed substitution does not merely lose a
+    // background — it draws the hairline straight through the label.
+    background-color: var(--wz-surface, #{$euiColorEmptyShade});
     transform: translateY(50%);
     padding: $wzSettingsCardPillPaddingBlock 14px;
     line-height: $wzSettingsCardPillLineHeight;
@@ -61,7 +64,12 @@ $wzSettingsCardPillHeight: $wzSettingsCardPillLineHeight +
  * (EuiHealth dot, plain danger badge, spinner+text). `provider-status.ts` already models these
  * states (PR #8936) — this only restyles their presentation, it never re-derives them.
  */
-.wzStatusChip {
+/* Qualified with `.euiBadge` deliberately. Every rule this block overrides lives on EUI's own
+   `.euiBadge--hollow`, also a single class — a 0,1,0 vs 0,1,0 tie decided purely by which
+   stylesheet the browser loaded last. Compounding the two classes the element already carries
+   makes these 0,2,0 and takes bundle order out of it; without that, a future load-order change
+   silently reverts every chip to a hollow badge and variation 3a disappears from Screen 3. */
+.euiBadge.wzStatusChip {
   display: inline-flex;
   align-items: center;
   // No `gap` here: EuiBadge wraps its children in `.euiBadge__content > .euiBadge__text`, so this
@@ -71,30 +79,38 @@ $wzSettingsCardPillHeight: $wzSettingsCardPillLineHeight +
     // This OUI fork predates EUI's success/secondary rename (see wz-stat/_stat.scss's own
     // $euiColorSecondaryText) — $euiColorSecondary is the green brand color here, not
     // $euiColorSuccess, which this fork does not define.
-    @include wzStatusChip($euiColorSecondary);
+    @include wzStatusChip($euiColorSecondary, $euiColorSecondaryText);
   }
 
   &--failed {
-    @include wzStatusChip($euiColorDanger);
+    @include wzStatusChip($euiColorDanger, $euiColorDangerText);
   }
 
+  /* No `*Text` twin passed: $euiColorPrimary already measures ~4.6:1 over its own 12% wash, and
+     this fork has no $euiColorPrimaryText to reach for. */
   &--testing {
     @include wzStatusChip($euiColorPrimary);
   }
 
   &--could-not-verify {
-    @include wzStatusChip($euiColorWarning);
+    @include wzStatusChip($euiColorWarning, $euiColorWarningText);
   }
 
   /* Not one of the design's four test-outcome states — a provider simply hasn't been tested yet.
-     Same pill shape for visual consistency, a neutral tint since there is no outcome to carry. */
+     Same pill shape for visual consistency, a neutral tint since there is no outcome to carry.
+     $euiColorMediumShade is a border/divider role, far too light to read as 11px text: the fill
+     keeps it, the label steps down to the next shade that was built to be read. */
   &--pending {
-    @include wzStatusChip($euiColorMediumShade);
+    @include wzStatusChip($euiColorMediumShade, $euiColorDarkShade);
   }
 
-  &__spinner {
-    margin-right: 2px;
-  }
+}
+
+/* Deliberately NOT nested in the block above: the spinner is a CHILD of the badge and carries only
+   this one class, so compounding it with `.euiBadge` (which the block above does to every nested
+   selector) would demand a class the element never has and the rule would simply never match. */
+.wzStatusChip__spinner {
+  margin-right: 2px;
 }
 
 /* Endpoint column (screen 3 gap: "Endpoints dominate the row"): `middleTruncate` (settings-

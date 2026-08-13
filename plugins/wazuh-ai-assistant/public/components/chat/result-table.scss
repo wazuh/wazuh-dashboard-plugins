@@ -33,7 +33,7 @@
   flex-wrap: wrap;
   gap: 8px;
   padding: 8px 12px;
-  border-bottom: 1px solid var(--wz-hairline);
+  border-bottom: 1px solid var(--wz-hairline, #{$euiBorderColor});
 }
 
 .wzResultsCardToggle {
@@ -52,7 +52,7 @@
 
   &:hover,
   &:focus-visible {
-    background-color: var(--wz-accent-hover);
+    background-color: var(--wz-accent-hover, #{rgba($euiColorPrimary, 0.06)});
   }
 }
 
@@ -62,7 +62,7 @@
 }
 
 .wzResultsCardFooter {
-  border-top: 1px solid var(--wz-hairline);
+  border-top: 1px solid var(--wz-hairline, #{$euiBorderColor});
   padding: 4px 8px;
 }
 

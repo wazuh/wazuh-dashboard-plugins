@@ -55,6 +55,12 @@
   width: 100%;
   justify-content: flex-start;
   margin-top: auto;
+  /* The reference rules this control off from the list above it (measured: a 1px #F0F2F5 top
+     border on the "‹ Collapse" row). Without it the control reads as one more list row that
+     happens to sit last, rather than as the rail's own footer — and once the list scrolls under a
+     pinned control, a boundary is what tells you the scrolling stopped. */
+  border-top: 1px solid var(--wz-hairline, #{$euiBorderColor});
+  padding-top: 2px;
 }
 
 /** The expanded rail is a full-height flex column so the collapse control above can be pinned and
@@ -79,13 +85,31 @@
   overflow-x: hidden;
 }
 
+/**
+ * The rail's own flyout rendering (chat-page.tsx, below `RAIL_FLYOUT_AT`). `EuiFlyout` portals into
+ * `document.body`, so NOTHING in the chat surface's ancestor chain reaches it — including
+ * `.wzAiChat`, the element that defines every `--wz-*` token. Without this the rows' selected/hover
+ * pills (`var(--wz-accent-soft)` / `var(--wz-accent-hover)`, conversation-list.tsx) failed
+ * substitution and computed to transparent, so on a narrow pane the open conversation had no
+ * highlight at all and hover did nothing. The provider flyout already carried its own token block
+ * for exactly this reason; this rail never got one.
+ */
+.wzConvoRailFlyout {
+  @include wzSurfaceTokens;
+}
+
 .wzConvoRailCollapsed {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
   padding-top: 4px;
-  width: $wzRailCollapsedWidth;
+  /* 100%, NOT a restated 48px. The panel already applies `RAIL_COLLAPSED_WIDTH` (chat-page.tsx) as
+     its own border-box width with `paddingSize='s'` inside it, leaving a 32px content box — a
+     second 48px here made this strip overflow by 16px on the cross axis of a column flex container
+     (where it cannot shrink), which pushed the icons off-centre and let `.wzConvoRail`'s
+     `overflow: hidden` clip their focus rings. */
+  width: 100%;
   /* Same reason as `.wzConvoRail`: the spacer below can only push the expand affordance down if
      this column has the pane's height to spread across. */
   height: 100%;
