@@ -2,7 +2,7 @@ import React from 'react';
 import { EuiPage, EuiPageBody, EuiSpacer } from '@elastic/eui';
 import { SectionHeader } from './components/common';
 import { QuickAccessMenu } from './components/quick-access';
-import { OverviewSection, AiAssistantCta } from './components/overview';
+import { OverviewSection } from './components/overview';
 import { EndpointSecuritySection } from './components/endpoint-security';
 import { ThreatHuntingSection } from './components/threat-hunting';
 import { SecurityOperationsSection } from './components/security-operations';
