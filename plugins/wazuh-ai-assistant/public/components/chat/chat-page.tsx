@@ -1890,17 +1890,21 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             <EuiFlyout
               size='s'
               ownFocus
-              // EuiFlyout portals into document.body, past every ancestor that defines the `--wz-*`
-              // tokens, so it has to carry its own block or the rail's selected/hover pills inside
-              // it resolve to nothing (conversation-list.scss `.wzConvoRailFlyout`).
-              className='wzConvoRailFlyout'
               onClose={() => setIsRailFlyoutOpen(false)}
               aria-label={i18n.translate(
                 'wazuhAiAssistant.chat.conversations.sidebarRegionLabel',
                 { defaultMessage: 'Saved conversations' },
               )}
             >
-              <EuiFlyoutBody>
+              {/* EuiFlyout portals into document.body, past every ancestor that defines the
+                `--wz-*` tokens — including `.wzAiChat` — so without a block of its own the rail's
+                selected/hover row pills resolve to nothing inside it. Carried by a plain wrapper
+                rather than by EuiFlyout's own `className`: that prop does not reach an element
+                that ends up ancestral to this content in this EUI build, which a regression test
+                caught. `.wzConvoRailFlyout` sets custom properties only, so an extra div here
+                changes no layout. */}
+              <div className='wzConvoRailFlyout'>
+                <EuiFlyoutBody>
                 <ConversationList
                   conversations={conversations}
                   isLoading={isLoadingConversations}
@@ -1926,7 +1930,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   onCollapse={handleRailCollapse}
                   onExpand={handleRailExpand}
                 />
-              </EuiFlyoutBody>
+                </EuiFlyoutBody>
+              </div>
             </EuiFlyout>
           )}
 
