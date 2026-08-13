@@ -4,7 +4,7 @@ import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { StatTile, TabNumber } from '../common';
 import { ScaTilesData } from '../../interfaces/types';
-import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
+import { HOME_OVERVIEW_COLOR } from '../../lib/theme-colors';
 import { getConfigurationAssessmentByStatusUrl } from '../../utils/navigation';
 import { CheckResult } from '../../../../../overview/sca/utils/constants';
 
@@ -26,21 +26,21 @@ const TILES: ScaTileDef[] = [
   {
     key: 'passed',
     label: 'Passed',
-    color: UI_COLOR_STATUS.success,
+    color: HOME_OVERVIEW_COLOR.success,
     status: CheckResult.Passed,
     testSubj: 'sca-tile-passed',
   },
   {
     key: 'failed',
     label: 'Failed',
-    color: UI_COLOR_STATUS.failed,
+    color: HOME_OVERVIEW_COLOR.failed,
     status: CheckResult.Failed,
     testSubj: 'sca-tile-failed',
   },
   {
     key: 'notApplicable',
     label: 'N/A',
-    color: UI_COLOR_STATUS.info,
+    color: HOME_OVERVIEW_COLOR.info,
     status: CheckResult.NotApplicable,
     testSubj: 'sca-tile-not-applicable',
   },

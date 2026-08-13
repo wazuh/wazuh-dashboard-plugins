@@ -7,10 +7,8 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { WzRequest } from '../../../react-services/wz-request';
 import { getColorPaletteByIndex } from './get-color-palette-by-index';
-import {
-  agentStatusLabelByAgentStatus,
-  agentStatusColorByAgentStatus,
-} from '../../../../common/services/wz_agent_status';
+import { agentStatusLabelByAgentStatus } from '../../../../common/services/wz_agent_status';
+import { HOME_OVERVIEW_AGENT_STATUS_COLOR } from '../../common/welcome/home-overview/lib/theme-colors';
 
 /* eslint-enable */
 export interface IAgentsSummaryResponse {
@@ -63,7 +61,7 @@ export const getAgentsInfo = async (): Promise<AgentsInfoResult> => {
     const AGENT_STATUS = UI_ORDER_AGENT_STATUS.map(agentStatus => ({
       status: agentStatus,
       label: agentStatusLabelByAgentStatus(agentStatus),
-      color: agentStatusColorByAgentStatus(agentStatus),
+      color: HOME_OVERVIEW_AGENT_STATUS_COLOR[agentStatus],
     }));
 
     Object.entries(agentSummaryData.os || {}).forEach(
