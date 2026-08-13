@@ -224,6 +224,39 @@ describe('ResultTable', () => {
       expect(screen.queryByText('agent-10')).toBeNull();
     });
 
+    it('renders no pagination footer when every offered page size already fits the result', () => {
+      // A one-row table used to get the full "Rows per page: 5 10 25 50" control plus
+      // "Page 1 of 1" — four controls that cannot change anything on screen, since 5 (the smallest
+      // offered size) already holds the whole result. Reported from the UI as looking broken.
+      const { container } = render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'agent', label: 'Agent' }],
+            rows: [{ agent: 'web-01' }],
+          })}
+        />,
+      );
+      expect(container.querySelector('.wzResultsCardFooter')).toBeNull();
+      expect(screen.queryByText(/rows per page/i)).toBeNull();
+      expect(screen.queryByText(/page 1 of 1/i)).toBeNull();
+      // The table itself is unaffected — this hides a control that had nothing to control.
+      expect(screen.getByText('web-01')).toBeInTheDocument();
+    });
+
+    it('renders the footer as soon as a smaller page size would split the result', () => {
+      // Six rows: the current size (5) already pages it, and even if it did not, choosing 5 would.
+      const sixRows = Array.from({ length: 6 }, (_unused, i) => ({
+        agent: `agent-${i}`,
+      }));
+      render(
+        <ResultTable
+          spec={spec({ columns: [{ id: 'agent', label: 'Agent' }], rows: sixRows })}
+        />,
+      );
+      expect(screen.getByText(/rows per page/i)).toBeInTheDocument();
+      expect(screen.getByText('Page 1 of 2')).toBeInTheDocument();
+    });
+
     it('renders no pagination footer for an empty result set', () => {
       const { container } = render(<ResultTable spec={spec({ rows: [] })} />);
       expect(container.querySelector('.wzResultsCardFooter')).toBeNull();

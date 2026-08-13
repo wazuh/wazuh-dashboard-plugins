@@ -482,6 +482,19 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
     [transcriptHeightPx],
   );
 
+  /**
+   * Whether the pagination footer has anything to offer. The footer used to render for ANY
+   * non-empty result, so a one-row table still got "Rows per page: 5 10 25 50" and "Page 1 of 1":
+   * four controls that cannot change what is on screen, since every offered size already holds the
+   * whole result. Only the empty case was suppressed.
+   *
+   * Compared against the SMALLEST offered size rather than the current one: at or below it, no
+   * choice of page size produces a second page, so there is nothing to page and nothing to resize.
+   * Above it, the footer earns its row even when the current size happens to fit everything —
+   * picking a smaller size is then a real action.
+   */
+  const needsPagination = spec.rows.length > PAGE_SIZE_OPTIONS[0];
+
   const toggleRow = (rowIndex: number) => {
     setExpandedRowIds(previous => {
       const next = new Set(previous);
@@ -755,7 +768,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
           />
         </div>
       ) : null}
-      {hasOpened && spec.rows.length > 0 ? (
+      {hasOpened && needsPagination ? (
         <div
           className='wzResultsCardFooter'
           style={{ display: isOpen ? undefined : 'none' }}

@@ -179,13 +179,33 @@ const PROVIDER_URL_GUIDANCE: Record<
 > = {
   openai_compatible: {
     placeholder: 'https://api.openai.com/v1',
+    /**
+     * One example per service the description names, each taken verbatim from that vendor's own
+     * documentation rather than written from memory:
+     *
+     * - OpenAI      https://platform.openai.com/docs/api-reference
+     * - Gemini      https://ai.google.dev/gemini-api/docs/openai (documented WITH a trailing
+     *               slash; omitted here because `chatStream` calls `trimTrailingSlash(baseUrl)`
+     *               before appending its own path, so the two are identical and the list stays
+     *               visually consistent)
+     * - Bedrock     https://docs.aws.amazon.com/bedrock/latest/userguide/inference-chat-completions-mantle.html
+     *               (`bedrock-mantle` is AWS's own recommended endpoint; `{region}` is theirs to
+     *               substitute, so a real region is shown rather than a placeholder token an
+     *               admin might paste literally)
+     * - Ollama      default port 11434 with its OpenAI-compatibility layer at /v1
+     *
+     * Groq's endpoint is deliberately NOT an example any more. Its documentation link below stays:
+     * a link is reference for someone who has already chosen Groq, whereas an example is a
+     * suggestion, and Groq was measured returning 413 across its whole tier.
+     */
     examples: [
       'https://api.openai.com/v1',
-      'https://api.groq.com/openai/v1',
+      'https://generativelanguage.googleapis.com/v1beta/openai',
+      'https://bedrock-mantle.us-east-1.api.aws/v1',
       'http://localhost:11434/v1',
     ],
-    // One link per actual service this type covers (see PROVIDER_TYPE_FORM_LABELS above) — a
-    // single "OpenAI API reference" link would be misleading for a Groq/Ollama/etc endpoint.
+    // One link per actual service this type covers — a single "OpenAI API reference" link would be
+    // misleading for a Gemini/Bedrock/Ollama endpoint.
     docs: [
       {
         label: i18n.translate(
@@ -195,6 +215,24 @@ const PROVIDER_URL_GUIDANCE: Record<
           },
         ),
         url: 'https://platform.openai.com/docs/api-reference',
+      },
+      {
+        label: i18n.translate(
+          'wazuhAiAssistant.settings.form.baseUrlDocsGemini',
+          {
+            defaultMessage: 'Gemini OpenAI compatibility',
+          },
+        ),
+        url: 'https://ai.google.dev/gemini-api/docs/openai',
+      },
+      {
+        label: i18n.translate(
+          'wazuhAiAssistant.settings.form.baseUrlDocsBedrock',
+          {
+            defaultMessage: 'Amazon Bedrock Chat Completions',
+          },
+        ),
+        url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/inference-chat-completions-mantle.html',
       },
       {
         label: i18n.translate(
