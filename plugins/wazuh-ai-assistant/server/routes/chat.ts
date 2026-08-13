@@ -697,6 +697,52 @@ function scrubMessagesForProvider(
   });
 }
 
+/**
+ * One entry of the `POST /chat` body's `messages` array. Exported (rather than left inline in
+ * `registerChatRoutes` below) purely so a schema-drift regression test can validate it directly --
+ * same rationale as conversations.ts's own exported `chatMessageSchema`.
+ */
+export const chatRequestMessageSchema = schema.object({
+  role: schema.oneOf([
+    schema.literal('system'),
+    schema.literal('user'),
+    schema.literal('assistant'),
+    schema.literal('tool'),
+  ]),
+  content: schema.string(),
+  // Present on assistant messages that invoked tools -- ECHOED BACK by the client on later turns:
+  // common/chat-history.ts's `buildOutgoingMessages` resends a prior turn's `exchange.toolCall`
+  // objects verbatim as history (required for any provider that validates tool_call/tool_result
+  // pairing), so this is not a per-request-only round-trip.
+  toolCalls: schema.maybe(
+    schema.arrayOf(
+      schema.object({
+        id: schema.string(),
+        name: schema.string(),
+        arguments: schema.recordOf(schema.string(), schema.any()),
+        // Vendor passthrough (common/types.ts's `ToolCall.vendorExtras`/
+        // `functionVendorExtras` — the Gemini `thought_signature` fix): the client
+        // replays a prior turn's tool call verbatim (common/chat-history.ts's
+        // `buildOutgoingMessages`/`toPersistedMessages`, both resend
+        // `exchange.toolCall` whole), so whatever an adapter captured here MUST be
+        // accepted back or every replayed call 400s on the very next turn.
+        // `@osd/config-schema` rejects unknown keys by default, so these need an
+        // explicit (optional) place in the schema even though the server never reads
+        // them itself -- only the provider adapter that emitted them does, when this
+        // same message round-trips back into `toOpenAiMessage`.
+        vendorExtras: schema.maybe(
+          schema.recordOf(schema.string(), schema.any()),
+        ),
+        functionVendorExtras: schema.maybe(
+          schema.recordOf(schema.string(), schema.any()),
+        ),
+      }),
+    ),
+  ),
+  // Present on role:'tool' messages: which toolCalls[].id this result answers.
+  toolCallId: schema.maybe(schema.string()),
+});
+
 export function registerChatRoutes(router: IRouter, logger: Logger): void {
   router.post(
     {
@@ -704,31 +750,7 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
       validate: {
         body: schema.object({
           providerId: schema.string({ minLength: 1 }),
-          messages: schema.arrayOf(
-            schema.object({
-              role: schema.oneOf([
-                schema.literal('system'),
-                schema.literal('user'),
-                schema.literal('assistant'),
-                schema.literal('tool'),
-              ]),
-              content: schema.string(),
-              // Present on assistant messages that invoked tools; round-trips the orchestration
-              // loop below appends are per-request only and never echoed back by the client today
-              // (chat-page.tsx only sends {role, content}), but the wire contract carries them.
-              toolCalls: schema.maybe(
-                schema.arrayOf(
-                  schema.object({
-                    id: schema.string(),
-                    name: schema.string(),
-                    arguments: schema.recordOf(schema.string(), schema.any()),
-                  }),
-                ),
-              ),
-              // Present on role:'tool' messages: which toolCalls[].id this result answers.
-              toolCallId: schema.maybe(schema.string()),
-            }),
-          ),
+          messages: schema.arrayOf(chatRequestMessageSchema),
           // Privacy mode (common/types.ts's
           // `ChatRequest['privacy']`): the pseudonym map is client-held and stateless
           // server-side — `map` reseeds this request's Pseudonymizer, `enabled` is honored only
@@ -1553,7 +1575,16 @@ export async function* orchestrate(
           messages = [
             ...messages,
             // ORIGINAL (pseudonym-form) toolCall — wire consistency, same as the real-tool path.
-            { role: 'assistant', content: '', toolCalls: [event.toolCall] },
+            // `vendorExtras` (e.g. Gemini's `thought_signature`) is spread only when the adapter
+            // actually captured one this round — see StreamEvent's `tool_call` doc comment.
+            {
+              role: 'assistant',
+              content: '',
+              toolCalls: [event.toolCall],
+              ...(event.messageVendorExtras
+                ? { vendorExtras: event.messageVendorExtras }
+                : {}),
+            },
             {
               role: 'tool',
               toolCallId: event.toolCall.id,
@@ -1666,7 +1697,16 @@ export async function* orchestrate(
         messages = [
           ...messages,
           // ORIGINAL (pseudonym-form) toolCall, not toolCallForClient — wire consistency.
-          { role: 'assistant', content: '', toolCalls: [event.toolCall] },
+          // `vendorExtras` (e.g. Gemini's `thought_signature`) is spread only when the adapter
+          // actually captured one this round — see StreamEvent's `tool_call` doc comment.
+          {
+            role: 'assistant',
+            content: '',
+            toolCalls: [event.toolCall],
+            ...(event.messageVendorExtras
+              ? { vendorExtras: event.messageVendorExtras }
+              : {}),
+          },
           {
             role: 'tool',
             toolCallId: event.toolCall.id,

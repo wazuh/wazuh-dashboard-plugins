@@ -104,3 +104,40 @@ test('InlineReasoningMarkupFilter: a <think> close tag split across three tiny c
   const out = run(filter, ['<think>hidden', '</th', 'in', 'k>Answer.']);
   assert.equal(out, 'Answer.');
 });
+
+test('InlineReasoningMarkupFilter: a DeepSeek <｜DSML｜function_calls> marker is stripped, real answer after it is kept', () => {
+  const filter = new InlineReasoningMarkupFilter();
+  // Verbatim shape from a live capture (provider-matrix-bedrock-deepseek-v3-2.jsonl): no closing
+  // tag ever appears, and the real answer runs on immediately, same line.
+  const input =
+    "I'll search for critical-severity findings from the last 24 hours across the entire fleet.\n\n<｜DSML｜function_callsThere were no critical findings in the last 24 hours.";
+  const out = run(filter, [input]);
+  assert.equal(
+    out,
+    "I'll search for critical-severity findings from the last 24 hours across the entire fleet.\n\nThere were no critical findings in the last 24 hours.",
+  );
+  assert.equal(filter.didStrip, true);
+});
+
+test('InlineReasoningMarkupFilter: a <｜DSML｜> marker split across chunks is still stripped', () => {
+  const filter = new InlineReasoningMarkupFilter();
+  const out = run(filter, [
+    "I'll check the current active agent status for you.\n\n<｜DS",
+    'ML｜function_calls',
+    'There is 1 active agent currently enrolled.',
+  ]);
+  assert.equal(
+    out,
+    "I'll check the current active agent status for you.\n\nThere is 1 active agent currently enrolled.",
+  );
+  assert.equal(filter.didStrip, true);
+});
+
+test('InlineReasoningMarkupFilter: does not suppress text after an unclosed <｜DSML｜> marker (zero-width, not a container)', () => {
+  const filter = new InlineReasoningMarkupFilter();
+  const out = run(filter, [
+    '<｜DSML｜function_calls',
+    'The answer continues normally and must not be dropped.',
+  ]);
+  assert.equal(out, 'The answer continues normally and must not be dropped.');
+});

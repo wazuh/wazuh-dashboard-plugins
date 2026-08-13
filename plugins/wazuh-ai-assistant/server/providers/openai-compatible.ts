@@ -25,64 +25,60 @@ import {
   PROVIDER_FETCH_REDIRECT_POLICY,
 } from './url-guard';
 import { InlineReasoningMarkupFilter } from './inline-reasoning-markup-filter';
+import { fetchWithTemperatureFallback } from './temperature-fallback';
 
 /** Per-index accumulation of a streamed `tool_calls` delta until the provider closes it out. */
 interface ToolCallAccumulator {
   id?: string;
   name?: string;
   args: string;
+  /** Vendor-extra fields seen on the `tool_calls[index]` entry itself -- see
+   * `ToolCall.vendorExtras`. */
+  extras: Record<string, unknown>;
+  /** Vendor-extra fields seen inside that entry's `function` object -- see
+   * `ToolCall.functionVendorExtras`. */
+  functionExtras: Record<string, unknown>;
 }
 
+/** Known keys on a streamed `tool_calls[]` delta entry; anything else is a vendor extra. */
+const KNOWN_TOOL_CALL_DELTA_KEYS = new Set(['index', 'id', 'type', 'function']);
+/** Known keys inside a `tool_calls[].function` delta; anything else is a vendor extra. */
+const KNOWN_TOOL_CALL_FUNCTION_DELTA_KEYS = new Set(['name', 'arguments']);
 /**
- * Providers that have already told us, in THIS process, that they reject `temperature` for a
- * given base URL + model (observed live against a Bedrock `openai_compatible` gateway serving
- * `openai.gpt-oss-120b`: "`temperature` is deprecated for this model", HTTP 400). Keyed by
- * `baseUrl::model` rather than the whole `ProviderConfig` so two settings entries pointing at the
- * same endpoint/model share the finding, and a config with a different model at the same base URL
- * does not.
- *
- * Module-scope, not per-request: the whole point is that every call AFTER the first rejection —
- * crucially including every stage-1 router call, which unconditionally sends `temperature: 0` —
- * skips the doomed first attempt instead of re-discovering the same 400 on every turn. Resets on
- * process restart, which is acceptable: the cost of forgetting is at most one wasted round-trip
- * per restart, not a functional break.
+ * Known keys on `choice.delta`; anything else is a message-level vendor extra. Deliberately
+ * includes standard OpenAI-wire fields this adapter doesn't otherwise read, not just the ones it
+ * does -- `reasoning_content` (DeepSeek/vLLM) is the sharpest example: DeepSeek REJECTS a request
+ * that echoes it back, so a field like that must never be swept into `vendorExtras` just because
+ * this adapter has no other use for it.
  */
-const temperatureRejectedByProviderModel = new Map<string, boolean>();
+const KNOWN_MESSAGE_DELTA_KEYS = new Set([
+  'role',
+  'content',
+  'reasoning',
+  'reasoning_content',
+  'channel',
+  'tool_calls',
+  'refusal',
+  'annotations',
+  'function_call',
+  'audio',
+]);
 
-/** Cache key for `temperatureRejectedByProviderModel` — see its doc comment. */
-function temperatureCacheKey(config: ProviderConfig): string {
-  return `${trimTrailingSlash(config.baseUrl)}::${config.model}`;
-}
-
-/**
- * Loosely matches a provider telling us, via an HTTP 4xx body, that it will not accept the
- * `temperature` parameter for this model. Deliberately loose (any 4xx + a case-insensitive
- * mention of "temperature" anywhere in the body) rather than matching the exact Bedrock wording:
- * different OpenAI-compatible gateways phrase this differently ("is deprecated for this model",
- * "is not supported", "unsupported_parameter"...), and the cost of a false positive here is just
- * one extra harmless retry without `temperature` — not a wrong answer or a dropped turn.
- */
-function looksLikeTemperatureRejection(
-  status: number,
-  bodyText: string,
-): boolean {
-  return status >= 400 && status < 500 && /temperature/i.test(bodyText);
-}
-
-/**
- * Logs the temperature-rejection discovery exactly once per provider/model — at the moment it is
- * first cached, which the caller only reaches once per `temperatureRejectedByProviderModel` key
- * (every later call for that key short-circuits before re-detecting anything). No `Logger` is
- * threaded down into `ProviderAdapter.chatStream` from any call site (chat.ts/anthropic.ts/
- * openai-compatible.ts all construct adapters directly), so this intentionally uses `console.debug`
- * rather than growing every adapter's signature just for one diagnostic line.
- */
-function logTemperatureRejectionOnce(config: ProviderConfig): void {
-  // eslint-disable-next-line no-console -- see doc comment: no Logger reaches this layer.
-  console.debug(
-    `[wazuh-ai-assistant] Provider ${config.baseUrl} (model ${config.model}) rejected ` +
-      '`temperature`; retrying once without it and caching the decision for this process.',
-  );
+/** Copies every key of `source` NOT in `knownKeys` into a fresh object (empty if none). */
+function extractExtras(
+  source: Record<string, unknown> | undefined,
+  knownKeys: Set<string>,
+): Record<string, unknown> {
+  const extras: Record<string, unknown> = {};
+  if (!source) {
+    return extras;
+  }
+  for (const [key, value] of Object.entries(source)) {
+    if (!knownKeys.has(key)) {
+      extras[key] = value;
+    }
+  }
+  return extras;
 }
 
 /**
@@ -109,11 +105,6 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
       return;
     }
 
-    // Cache key computed once per call; `includeTemperature` below is recomputed on every
-    // `doFetch()` attempt (not just once here) so a rejection discovered mid-call by the first
-    // attempt is honored by the very next one, without waiting for a fresh `chatStream()` call.
-    const cacheKey = temperatureCacheKey(config);
-
     const buildBody = (
       includeTemperature: boolean,
     ): Record<string, unknown> => {
@@ -135,7 +126,7 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
       // stage-1 router; see ChatStreamOptions's doc comment), which a `if (options?.temperature)`
       // guard would treat as absent and silently drop. `includeTemperature` additionally gates this
       // on whether the provider is already known (this process) to reject the parameter entirely --
-      // see `temperatureRejectedByProviderModel`'s doc comment above.
+      // see temperature-fallback.ts's doc comment.
       if (includeTemperature && options?.temperature !== undefined) {
         nextBody.temperature = options.temperature;
       }
@@ -162,36 +153,15 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
       });
 
     const response = yield* fetchProviderWithRetry(
-      async () => {
-        const includeTemperature =
-          !temperatureRejectedByProviderModel.get(cacheKey);
-        const attemptResponse = await doFetch(buildBody(includeTemperature));
-        // A "temperature rejection" is only possible when temperature was actually in the
-        // request body: without the `options?.temperature !== undefined` gate, a 400 whose
-        // body merely mentions "temperature" on a temperature-free call would trigger a
-        // pointless byte-identical retry AND cache a rejection for a parameter never sent.
-        const temperatureWasSent =
-          includeTemperature && options?.temperature !== undefined;
-        if (!temperatureWasSent || attemptResponse.status !== 400) {
-          return attemptResponse;
-        }
-        // Peek by reading the ORIGINAL body — `Response.clone()` is unavailable in some
-        // runtimes (the OSD jest environment's Response polyfill lacks it entirely, throwing
-        // `clone is not a function`), so the peek consumes the body and, when this turns out
-        // NOT to be a temperature rejection, hands `fetchProviderWithRetry` a reconstructed
-        // equivalent Response whose body is intact for its own error-reading path.
-        const bodyText = await attemptResponse.text().catch(() => '');
-        if (!looksLikeTemperatureRejection(attemptResponse.status, bodyText)) {
-          return new Response(bodyText, {
-            status: attemptResponse.status,
-            statusText: attemptResponse.statusText,
-            headers: attemptResponse.headers,
-          });
-        }
-        temperatureRejectedByProviderModel.set(cacheKey, true);
-        logTemperatureRejectionOnce(config);
-        return doFetch(buildBody(false));
-      },
+      // The `temperature`-rejection fallback lives in temperature-fallback.ts because the native
+      // Anthropic adapter needs exactly the same recovery (see that module's doc comment), and the
+      // rejection cache is deliberately shared between the two.
+      () =>
+        fetchWithTemperatureFallback(
+          config,
+          options?.temperature,
+          includeTemperature => doFetch(buildBody(includeTemperature)),
+        ),
       signal,
       // See server/providers/retry.ts's sanitizeProviderErrorBody doc comment for why the
       // exact configured key is passed through here.
@@ -202,6 +172,14 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
     }
 
     const toolCalls = new Map<number, ToolCallAccumulator>();
+    // Vendor-extra fields seen on `choice.delta` itself (message-level, not tied to one specific
+    // tool call -- see `ChatMessage.vendorExtras`), merged across every chunk of ONE round the
+    // same way `reasoningBuffer` accumulates text, and threaded into `finalizeToolCalls` below so
+    // its first emitted `tool_call` StreamEvent this round can carry it back up to chat.ts, the
+    // only place that ever constructs a `ChatMessage` from these events. Reassigned to `{}`
+    // (rather than only mutated) right after every `finalizeToolCalls` call: this is round-scoped,
+    // not call-scoped, so a stage-1/multi-round call must not let round 2 inherit round 1's extras.
+    let messageExtras: Record<string, unknown> = {};
 
     // Reasoning-channel fallback (see the `parsed` type below and issue
     // 02-read-reasoning-delta.md): some reasoning models (gpt-oss, qwen3.x) stream their entire
@@ -289,7 +267,10 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
         if (payload === '[DONE]') {
           if (!toolCallsFinalized) {
             yield* flushInlineMarkupFilter();
-            const finalized = finalizeToolCalls(toolCalls);
+            const finalized = finalizeToolCalls(toolCalls, messageExtras);
+            // A later round in the same call must start its own message-level extras from
+            // scratch, not inherit this round's (`messageExtras`'s own doc comment above).
+            messageExtras = {};
             yield* finalized;
             if (hasToolCallError(finalized)) {
               return;
@@ -356,6 +337,19 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
         if (choice?.delta?.reasoning) {
           reasoningBuffer += choice.delta.reasoning;
         }
+        // Vendor passthrough (generic -- see `ChatMessage.vendorExtras`'s doc comment): any key on
+        // `choice.delta` this adapter doesn't otherwise recognize is captured verbatim and merged
+        // across the round, exactly like `reasoningBuffer` above. `choice.delta` is typed above
+        // without these fields since no *known* provider defines them, but the raw JSON frame
+        // still carries whatever the provider actually sent -- this reads that raw shape, not the
+        // typed one.
+        Object.assign(
+          messageExtras,
+          extractExtras(
+            choice?.delta as Record<string, unknown> | undefined,
+            KNOWN_MESSAGE_DELTA_KEYS,
+          ),
+        );
         accumulateToolCallDeltas(toolCalls, choice?.delta?.tool_calls);
 
         if (choice?.finish_reason === 'tool_calls' && !toolCallsFinalized) {
@@ -363,7 +357,10 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
           // `drainRoundBuffers()` follows: whatever text preceded the call must be fully resolved
           // (and, if it was markup, dropped) before the round moves on.
           yield* flushInlineMarkupFilter();
-          const finalized = finalizeToolCalls(toolCalls);
+          const finalized = finalizeToolCalls(toolCalls, messageExtras);
+          // A later round in the same call must start its own message-level extras from
+          // scratch, not inherit this round's (`messageExtras`'s own doc comment above).
+          messageExtras = {};
           yield* finalized;
           if (hasToolCallError(finalized)) {
             return;
@@ -376,7 +373,10 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
         if (parsed.usage) {
           if (!toolCallsFinalized) {
             yield* flushInlineMarkupFilter();
-            const finalized = finalizeToolCalls(toolCalls);
+            const finalized = finalizeToolCalls(toolCalls, messageExtras);
+            // A later round in the same call must start its own message-level extras from
+            // scratch, not inherit this round's (`messageExtras`'s own doc comment above).
+            messageExtras = {};
             yield* finalized;
             if (hasToolCallError(finalized)) {
               return;
@@ -396,7 +396,10 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
       }
       if (!toolCallsFinalized) {
         yield* flushInlineMarkupFilter();
-        const finalized = finalizeToolCalls(toolCalls);
+        const finalized = finalizeToolCalls(toolCalls, messageExtras);
+        // A later round in the same call must start its own message-level extras from
+        // scratch, not inherit this round's (`messageExtras`'s own doc comment above).
+        messageExtras = {};
         yield* finalized;
         if (hasToolCallError(finalized)) {
           return;
@@ -427,12 +430,23 @@ function toOpenAiMessage(message: ChatMessage): Record<string, unknown> {
     return {
       role: 'assistant',
       content: message.content || null,
+      // `...(message.vendorExtras ?? {})` is a deliberate no-op for every provider that never set
+      // it (OpenAI, Groq, Bedrock, Ollama, ...) — spreading an empty object adds no keys. Only
+      // Gemini's OpenAI-compatible endpoint currently populates it (message-level
+      // `thought_signature` sightings, if any -- see `ChatMessage.vendorExtras`'s doc comment).
+      ...(message.vendorExtras ?? {}),
       tool_calls: message.toolCalls.map(call => ({
         id: call.id,
         type: 'function',
+        // Same no-op-by-default spread as above, but per call: this is where Gemini's
+        // `thought_signature` actually lands in practice (see `ToolCall.vendorExtras`'s doc
+        // comment) — REQUIRED to be echoed back verbatim on the next request or the call is
+        // rejected with "Function call is missing a thought_signature in functionCall parts".
+        ...(call.vendorExtras ?? {}),
         function: {
           name: call.name,
           arguments: JSON.stringify(call.arguments),
+          ...(call.functionVendorExtras ?? {}),
         },
       })),
     };
@@ -477,7 +491,11 @@ function accumulateToolCallDeltas(
   }
   deltas.forEach((delta, position) => {
     const index = delta.index ?? position;
-    const entry = accumulator.get(index) ?? { args: '' };
+    const entry = accumulator.get(index) ?? {
+      args: '',
+      extras: {},
+      functionExtras: {},
+    };
     if (delta.id) {
       entry.id = delta.id;
     }
@@ -487,6 +505,25 @@ function accumulateToolCallDeltas(
     if (delta.function?.arguments) {
       entry.args += delta.function.arguments;
     }
+    // Vendor passthrough (see `ToolCall.vendorExtras`/`functionVendorExtras`'s doc comments):
+    // `delta`/`delta.function` are typed above without these fields since no *known* provider
+    // defines them, but the raw JSON frame still carries whatever Gemini (or any future provider)
+    // actually sent on either level — merged across chunks exactly like `args` above, since a
+    // single-shot field like `thought_signature` can arrive on any chunk of the accumulation.
+    Object.assign(
+      entry.extras,
+      extractExtras(
+        delta as unknown as Record<string, unknown>,
+        KNOWN_TOOL_CALL_DELTA_KEYS,
+      ),
+    );
+    Object.assign(
+      entry.functionExtras,
+      extractExtras(
+        delta.function as unknown as Record<string, unknown> | undefined,
+        KNOWN_TOOL_CALL_FUNCTION_DELTA_KEYS,
+      ),
+    );
     accumulator.set(index, entry);
   });
 }
@@ -498,9 +535,11 @@ function accumulateToolCallDeltas(
  */
 function finalizeToolCalls(
   accumulator: Map<number, ToolCallAccumulator>,
+  messageExtras: Record<string, unknown>,
 ): StreamEvent[] {
   const indices = [...accumulator.keys()].sort((left, right) => left - right);
   const events: StreamEvent[] = [];
+  const hasMessageExtras = Object.keys(messageExtras).length > 0;
   for (const index of indices) {
     const entry = accumulator.get(index) as ToolCallAccumulator;
     const name = entry.name ?? '';
@@ -519,8 +558,28 @@ function finalizeToolCalls(
       id: entry.id ?? randomUUID(),
       name,
       arguments: parsedArguments,
+      // Omitted (rather than set to `{}`) when nothing was captured -- see toOpenAiMessage's
+      // no-op-by-default spread, which relies on these being genuinely absent for a
+      // provider that never sent any.
+      ...(Object.keys(entry.extras).length
+        ? { vendorExtras: entry.extras }
+        : {}),
+      ...(Object.keys(entry.functionExtras).length
+        ? { functionVendorExtras: entry.functionExtras }
+        : {}),
     };
-    events.push({ type: 'tool_call', toolCall });
+    events.push({
+      type: 'tool_call',
+      toolCall,
+      // Attached to the FIRST tool_call event of this batch only: `messageExtras` belongs to the
+      // one assistant message chat.ts builds around ALL of this round's calls (message-level, not
+      // per-call), so a round with N parallel calls must not fan it out into N separate assistant
+      // messages each independently claiming to carry it -- `events.length === 0` is exactly "this
+      // is the first call finalized so far in this batch".
+      ...(hasMessageExtras && events.length === 0
+        ? { messageVendorExtras: messageExtras }
+        : {}),
+    });
   }
   return events;
 }

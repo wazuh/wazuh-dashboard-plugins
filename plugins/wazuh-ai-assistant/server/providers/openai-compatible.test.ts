@@ -918,3 +918,289 @@ test('chatStream: a 400 mentioning temperature on a temperature-FREE call is not
     'the earlier temperature-free 400 must not have cached a rejection for this provider+model',
   );
 });
+
+// --- Gemini `thought_signature` passthrough (generic vendor-extras mechanism) -------------------
+// Gemini's OpenAI-compatible endpoint attaches a `thought_signature` field to assistant tool-call
+// messages and REQUIRES it echoed back on the next request's `tool_calls[]` entry, or the follow-up
+// 400s with "Function call is missing a thought_signature in functionCall parts". This adapter
+// rebuilds `messages` from canonical `ChatMessage[]` on every request (`toOpenAiMessage`), which
+// previously dropped any field it didn't explicitly know about. The fix is generic passthrough
+// (`ToolCall.vendorExtras`/`functionVendorExtras`, `ChatMessage.vendorExtras`), not a Gemini
+// special-case -- these tests exercise the mechanism directly against `toOpenAiMessage`'s output
+// (the outbound request body), independent of which provider happened to populate the fields.
+
+function uniqueVendorExtrasConfig(id: string): ProviderConfig {
+  return {
+    ...BASE_CONFIG,
+    baseUrl: `http://127.0.0.1:19999/${id}/v1`,
+    model: `vendor-extras-${id}`,
+  };
+}
+
+test('chatStream: a tool_call-level thought_signature is echoed back', async () => {
+  const config = uniqueVendorExtrasConfig('call-level');
+  const { capturedBodies } = await withFakeFetchSequence(
+    [freshSuccessResponse()],
+    () => {
+      const adapter = new OpenAiCompatibleAdapter();
+      const controller = new AbortController();
+      const history: ChatMessage[] = [
+        userMessage('list the agents'),
+        {
+          role: 'assistant',
+          content: '',
+          toolCalls: [
+            {
+              id: 'call-1',
+              name: 'list_agents',
+              arguments: {},
+              vendorExtras: { thought_signature: 'sig-on-the-call' },
+            },
+          ],
+        },
+        { role: 'tool', toolCallId: 'call-1', content: '{"agents":[]}' },
+      ];
+      return drain(adapter.chatStream(config, history, controller.signal));
+    },
+  );
+  const messages = capturedBodies[0].messages as Array<Record<string, unknown>>;
+  const assistantMessage = messages[1];
+  const toolCalls = assistantMessage.tool_calls as Array<
+    Record<string, unknown>
+  >;
+  assert.equal(
+    toolCalls[0].thought_signature,
+    'sig-on-the-call',
+    'the tool_call-level extra must be spread back verbatim onto the re-serialized entry',
+  );
+});
+
+test('chatStream: a message-level vendor extra is echoed back on the follow-up body', async () => {
+  const config = uniqueVendorExtrasConfig('message-level');
+  const { capturedBodies } = await withFakeFetchSequence(
+    [freshSuccessResponse()],
+    () => {
+      const adapter = new OpenAiCompatibleAdapter();
+      const controller = new AbortController();
+      const history: ChatMessage[] = [
+        userMessage('list the agents'),
+        {
+          role: 'assistant',
+          content: '',
+          toolCalls: [{ id: 'call-1', name: 'list_agents', arguments: {} }],
+          vendorExtras: { thought_signature: 'sig-on-the-message' },
+        },
+        { role: 'tool', toolCallId: 'call-1', content: '{"agents":[]}' },
+      ];
+      return drain(adapter.chatStream(config, history, controller.signal));
+    },
+  );
+  const messages = capturedBodies[0].messages as Array<Record<string, unknown>>;
+  assert.equal(
+    messages[1].thought_signature,
+    'sig-on-the-message',
+    'the message-level extra must be spread back verbatim onto the re-serialized message',
+  );
+});
+
+test('chatStream: no vendor extras produces a byte-equivalent body (no new keys)', async () => {
+  const config = uniqueVendorExtrasConfig('no-extras');
+  const { capturedBodies } = await withFakeFetchSequence(
+    [freshSuccessResponse()],
+    () => {
+      const adapter = new OpenAiCompatibleAdapter();
+      const controller = new AbortController();
+      const history: ChatMessage[] = [
+        userMessage('list the agents'),
+        {
+          role: 'assistant',
+          content: '',
+          toolCalls: [
+            { id: 'call-1', name: 'list_agents', arguments: { limit: 5 } },
+          ],
+        },
+        { role: 'tool', toolCallId: 'call-1', content: '{"agents":[]}' },
+      ];
+      return drain(adapter.chatStream(config, history, controller.signal));
+    },
+  );
+  const messages = capturedBodies[0].messages as Array<Record<string, unknown>>;
+  assert.deepEqual(
+    messages[1],
+    {
+      role: 'assistant',
+      content: null,
+      tool_calls: [
+        {
+          id: 'call-1',
+          type: 'function',
+          function: { name: 'list_agents', arguments: '{"limit":5}' },
+        },
+      ],
+    },
+    'a provider/history that never carried vendor extras must produce the exact same shape as ' +
+      'before this fix -- no stray keys added anywhere',
+  );
+});
+
+test('chatStream: a streamed thought_signature is captured onto the ToolCall', async () => {
+  const config = uniqueVendorExtrasConfig('stream-capture');
+  const adapter = new OpenAiCompatibleAdapter();
+  const controller = new AbortController();
+  const events = await withFakeFetch(
+    sseBody([
+      {
+        choices: [
+          {
+            index: 0,
+            delta: {
+              tool_calls: [
+                {
+                  index: 0,
+                  id: 'call-1',
+                  // Gemini-shaped extras: one on the tool_calls[] entry itself, one nested inside
+                  // its `function` object -- the fix captures both locations independently (see
+                  // ToolCall.vendorExtras / functionVendorExtras doc comments).
+                  thought_signature: 'sig-on-delta',
+                  function: {
+                    name: 'list_agents',
+                    arguments: '{}',
+                    thought_signature: 'sig-on-function',
+                  },
+                },
+              ],
+            },
+            finish_reason: 'tool_calls',
+          },
+        ],
+      },
+    ]),
+    () =>
+      drain(
+        adapter.chatStream(
+          config,
+          [userMessage('list the agents')],
+          controller.signal,
+        ),
+      ),
+  );
+  const toolCallEvent = events.find(
+    event => event.type === 'tool_call',
+  ) as Extract<StreamEvent, { type: 'tool_call' }>;
+  assert.ok(toolCallEvent, 'a tool_call event must have been emitted');
+  assert.deepEqual(
+    toolCallEvent.toolCall.vendorExtras,
+    { thought_signature: 'sig-on-delta' },
+    'the extra field on the tool_calls[] entry itself must be captured as vendorExtras',
+  );
+  assert.deepEqual(
+    toolCallEvent.toolCall.functionVendorExtras,
+    { thought_signature: 'sig-on-function' },
+    'the extra field nested inside the function object must be captured as functionVendorExtras',
+  );
+});
+
+test('chatStream: reasoning_content is NOT captured as a message-level vendor extra', async () => {
+  // DeepSeek/vLLM-style reasoning models send `reasoning_content` on `choice.delta` -- and
+  // DeepSeek specifically REJECTS a follow-up request that echoes it back. It must stay a plain
+  // known/ignored key, never swept into `messageVendorExtras`.
+  const config = uniqueVendorExtrasConfig('reasoning-content-excluded');
+  const adapter = new OpenAiCompatibleAdapter();
+  const controller = new AbortController();
+  const events = await withFakeFetch(
+    sseBody([
+      {
+        choices: [
+          {
+            index: 0,
+            delta: {
+              reasoning_content: 'thinking...',
+              tool_calls: [
+                {
+                  index: 0,
+                  id: 'call-1',
+                  function: { name: 'list_agents', arguments: '{}' },
+                },
+              ],
+            },
+            finish_reason: 'tool_calls',
+          },
+        ],
+      },
+    ]),
+    () =>
+      drain(
+        adapter.chatStream(
+          config,
+          [userMessage('list the agents')],
+          controller.signal,
+        ),
+      ),
+  );
+  const toolCallEvent = events.find(
+    event => event.type === 'tool_call',
+  ) as Extract<StreamEvent, { type: 'tool_call' }>;
+  assert.ok(toolCallEvent, 'a tool_call event must have been emitted');
+  assert.equal(
+    toolCallEvent.messageVendorExtras,
+    undefined,
+    'reasoning_content is a known key and must never be captured as a vendor extra',
+  );
+});
+
+test('chatStream: a message-level extra attaches only to a round’s first tool_call', async () => {
+  const config = uniqueVendorExtrasConfig('message-extra-first-only');
+  const adapter = new OpenAiCompatibleAdapter();
+  const controller = new AbortController();
+  const events = await withFakeFetch(
+    sseBody([
+      {
+        choices: [
+          {
+            index: 0,
+            delta: {
+              // Message-level extra, unknown to this adapter -- must land on only ONE of the two
+              // tool_call events this round produces (parallel calls), not both.
+              extra_content: { signature: 'sig-on-message' },
+              tool_calls: [
+                {
+                  index: 0,
+                  id: 'call-1',
+                  function: { name: 'list_agents', arguments: '{}' },
+                },
+                {
+                  index: 1,
+                  id: 'call-2',
+                  function: { name: 'get_agent', arguments: '{}' },
+                },
+              ],
+            },
+            finish_reason: 'tool_calls',
+          },
+        ],
+      },
+    ]),
+    () =>
+      drain(
+        adapter.chatStream(
+          config,
+          [userMessage('list then get an agent')],
+          controller.signal,
+        ),
+      ),
+  );
+  const toolCallEvents = events.filter(
+    event => event.type === 'tool_call',
+  ) as Array<Extract<StreamEvent, { type: 'tool_call' }>>;
+  assert.equal(toolCallEvents.length, 2, 'both parallel calls must be emitted');
+  assert.deepEqual(
+    toolCallEvents[0].messageVendorExtras,
+    { extra_content: { signature: 'sig-on-message' } },
+    'the FIRST tool_call event of the round must carry the message-level extra',
+  );
+  assert.equal(
+    toolCallEvents[1].messageVendorExtras,
+    undefined,
+    'the SECOND tool_call event of the same round must not also carry it (no fan-out)',
+  );
+});

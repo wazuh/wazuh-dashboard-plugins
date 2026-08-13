@@ -29,15 +29,40 @@
  * multi-paragraph prose with no delimiter of its own.
  *
  * Deliberately narrow, per the issue's "prefer explicit known tag names over a generic
- * `<[^>]+>` sweep" instruction: only the four known tag families below are ever treated as
+ * `<[^>]+>` sweep" instruction: only the known tag families below are ever treated as
  * markup. A legitimate answer mentioning `<script>` or comparing `size < 500` is untouched --
  * neither is a prefix of any recognized tag, so both fall straight through as plain text.
+ *
+ * Also strips DeepSeek's `<｜DSML｜...｜>` gateway markup (note: those are FULLWIDTH VERTICAL LINE,
+ * U+FF5C, not ASCII `|`). Measured live on `deepseek.v3.2` through an OpenAI-compatible gateway
+ * (provider-matrix-bedrock-deepseek-v3-2.jsonl): unlike `<think>`/`<tool_call>`, this marker never
+ * showed a closing tag in any captured sample -- real answer text runs on immediately after it,
+ * same line, e.g. `...\n\n<｜DSML｜function_callsThere were no critical findings...`. Treating it as
+ * a depth-incrementing opener (like `<think>`) would therefore suppress the entire rest of the
+ * answer as if it were still-open reasoning, which is wrong: it is a zero-width glitch token, not a
+ * container. It is matched and deleted in place instead, without touching `depth`.
+ *
+ * One captured turn also leaked a verbatim fragment of our own system prompt immediately after this
+ * marker ("Stop after you answer the question; do not preemptively continue..."). That is the model
+ * parroting its instructions as prose, not a delimited tag -- there is no markup to match, so it
+ * cannot be stripped by this filter (or any regex). Left as a known residual gap; see the issue.
  */
 
 /** Tag families this filter recognizes as reasoning/tool-call-as-text markup, never as prose. */
 const OPEN_TAG_RE =
   /<think>|<tool_call>|<function(?:=[^<>]*)?>|<parameter(?:=[^<>]*)?>/;
 const CLOSE_TAG_RE = /<\/think>|<\/tool_call>|<\/function>|<\/parameter>/;
+
+/** DeepSeek's fixed marker prefix (FULLWIDTH VERTICAL LINE, U+FF5C, on both sides of `DSML`). */
+const DSML_PREFIX = '｜DSML｜';
+/** The literal identifier every captured sample used after the prefix. Matched as a fixed string
+ * rather than an open-ended `[A-Za-z_]*` sweep: the marker is glued directly onto the real answer
+ * text with no delimiter (`...｜DSML｜function_callsThere were no critical findings...`), so a
+ * greedy identifier match would swallow the start of the answer itself (`There`) along with it. */
+const DSML_IDENTIFIER = 'function_calls';
+/** The marker as observed live: prefix + identifier, never a closing tag -- matched and deleted as
+ * a zero-width glitch, not treated as a suppressing opener (see doc comment above). */
+const DSML_MARKER_RE = new RegExp(`<${DSML_PREFIX}${DSML_IDENTIFIER}`);
 
 /** Fixed-text tag keywords (no `=name` suffix) whose PREFIXES must be recognized at a buffer's
  * trailing edge so a tag split across two `push()` calls (e.g. "<thi" + "nk>") is never emitted
@@ -60,7 +85,18 @@ function isPossibleTagPrefix(tail: string): boolean {
   if (FIXED_KEYWORDS.some(keyword => keyword.startsWith(tail))) {
     return true;
   }
-  return /^function(=.*)?$/.test(tail) || /^parameter(=.*)?$/.test(tail);
+  if (/^function(=.*)?$/.test(tail) || /^parameter(=.*)?$/.test(tail)) {
+    return true;
+  }
+  if (DSML_PREFIX.startsWith(tail)) {
+    return true; // Still building up to "｜DSML｜" itself.
+  }
+  if (tail.startsWith(DSML_PREFIX)) {
+    // Past the prefix: only a strict prefix of the fixed identifier can still complete the
+    // marker (never a superset of it -- that's the whole point of using a fixed string here).
+    return DSML_IDENTIFIER.startsWith(tail.slice(DSML_PREFIX.length));
+  }
+  return false;
 }
 
 /** Finds the index of a trailing '<' whose tag is still ambiguous (no closing '>' seen yet, and
@@ -157,13 +193,23 @@ export class InlineReasoningMarkupFilter {
     while (true) {
       if (this.depth === 0) {
         const openMatch = OPEN_TAG_RE.exec(this.buffer);
-        if (openMatch) {
-          out += this.buffer.slice(0, openMatch.index);
-          this.buffer = this.buffer.slice(
-            openMatch.index + openMatch[0].length,
-          );
-          this.depth = 1;
+        const dsmlMatch = DSML_MARKER_RE.exec(this.buffer);
+        const earliest =
+          openMatch && (!dsmlMatch || openMatch.index <= dsmlMatch.index)
+            ? { match: openMatch, isDsml: false }
+            : dsmlMatch
+            ? { match: dsmlMatch, isDsml: true }
+            : null;
+        if (earliest) {
+          const { match, isDsml } = earliest;
+          out += this.buffer.slice(0, match.index);
+          this.buffer = this.buffer.slice(match.index + match[0].length);
           this.stripped = true;
+          if (!isDsml) {
+            this.depth = 1;
+          }
+          // DSML marker is a zero-width glitch token, not a container: depth stays 0 and
+          // whatever follows on the same line (the real answer) is emitted normally.
           continue;
         }
         if (isFinal) {
