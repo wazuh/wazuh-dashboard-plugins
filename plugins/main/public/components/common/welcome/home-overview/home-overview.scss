@@ -18,6 +18,10 @@
   --wz-ho-disabled: #{$ouiColorDarkShade};
   --wz-ho-failed: #{$ouiColorDanger};
 
+  /* Matches EuiLink's `color="text"` exactly, so EuiStat tiles without an explicit
+     status color (StatTile's default) read the same as the linked KPI numbers next to them. */
+  --wz-ho-text: #{$ouiTextColor};
+
   --wz-ho-success-text: #{$ouiColorSuccessText};
   --wz-ho-danger-text: #{$ouiColorDangerText};
   --wz-ho-warning-text: #{$ouiColorWarningText};

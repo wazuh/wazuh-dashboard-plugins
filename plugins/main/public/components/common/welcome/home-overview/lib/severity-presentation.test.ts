@@ -1,5 +1,5 @@
 import { SEVERITY_PRESENTATION } from './severity-presentation';
-import { HOME_OVERVIEW_COLOR } from './theme-colors';
+import { HOME_OVERVIEW_COLOR, HOME_OVERVIEW_TEXT_COLOR } from './theme-colors';
 
 describe('SEVERITY_PRESENTATION', () => {
   it('gives every band a theme-aware CSS custom property, not a frozen hex literal', () => {
@@ -23,6 +23,6 @@ describe('SEVERITY_PRESENTATION', () => {
     ).toBe(HOME_OVERVIEW_COLOR.success);
     expect(
       SEVERITY_PRESENTATION.find(({ band }) => band === 'informational')?.color,
-    ).toBe(HOME_OVERVIEW_COLOR.disabled);
+    ).toBe(HOME_OVERVIEW_TEXT_COLOR.text);
   });
 });

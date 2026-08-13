@@ -1,5 +1,5 @@
 import { SeverityBand } from '../interfaces/types';
-import { HOME_OVERVIEW_COLOR } from './theme-colors';
+import { HOME_OVERVIEW_COLOR, HOME_OVERVIEW_TEXT_COLOR } from './theme-colors';
 
 export interface SeverityPresentation {
   band: SeverityBand;
@@ -24,6 +24,6 @@ export const SEVERITY_PRESENTATION: SeverityPresentation[] = [
   {
     band: 'informational',
     label: 'Informational',
-    color: HOME_OVERVIEW_COLOR.disabled,
+    color: HOME_OVERVIEW_TEXT_COLOR.text,
   },
 ];
