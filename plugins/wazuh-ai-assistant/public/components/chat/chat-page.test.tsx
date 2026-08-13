@@ -1958,4 +1958,57 @@ describe('ChatPage — conversation rail display mode (layout contract §5/§6)'
       stub.restore();
     }
   });
+
+  it('ignores a zero-width measurement instead of collapsing into flyout and wiping a manual override', async () => {
+    // A hidden pane (`display: none`) measures 0 — the app shell (application.tsx) keeps ChatPage
+    // MOUNTED behind that while the Settings tab is showing, so a Chat<->Settings round-trip used
+    // to run the resize callback against a width of 0. Before the fix that flipped the mode to
+    // 'flyout' AND cleared `railManualOverrideRef`, so a rail the user had collapsed/expanded by
+    // hand silently reverted to the resize-driven default on every trip back from Settings.
+    const stub = stubResizeObserver(1000);
+    try {
+      mockConversationsService.list.mockResolvedValue([
+        { id: 'conv-b', title: 'Older conversation', updatedAt: '2024-01-01' },
+      ]);
+      renderChatPage();
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('48px');
+      });
+
+      // Manually expand, at a width that would otherwise default to 'collapsed'.
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Expand conversation list' }),
+      );
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('260px');
+      });
+
+      // Pane hidden (e.g. behind the Settings tab): must not change anything.
+      stub.resize(0);
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('260px');
+      });
+
+      // Pane shown again, still narrow: the manual override is still respected, proving the
+      // zero-width tick never wiped it.
+      stub.resize(1000);
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('260px');
+      });
+    } finally {
+      stub.restore();
+    }
+  });
 });

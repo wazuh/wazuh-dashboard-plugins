@@ -288,6 +288,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
 }) => {
   const [service] = useState(() => new SettingsService(core.http));
   const [providers, setProviders] = useState<ProviderSummary[]>([]);
+  // Raw text typed into the Providers card's "Filter providers" search box, mirrored out of
+  // EuiInMemoryTable's own (uncontrolled) search box via `search.onChange` below — kept only so
+  // "Test all" can compute which rows are CURRENTLY visible (screen 3 gap: "Test all tests the
+  // wrong set"); the table itself keeps filtering on its own regardless of this state.
+  const [providersFilterText, setProvidersFilterText] = useState('');
+  // "Test all" busy state: disables/spins the button for the duration of its own throttled run
+  // (see `handleTestAll` below), instead of letting a second click pile on more concurrent runs.
+  const [isTestingAll, setIsTestingAll] = useState(false);
   // Provider whose values seed the flyout form (null = creating); `isFormOpen` is separate so a
   // create form (no provider) can be open too.
   const [editingProvider, setEditingProvider] =
@@ -298,19 +306,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     Record<string, ProviderTestOutcome>
   >({});
   const [testingIds, setTestingIds] = useState<Set<string>>(new Set());
-  // Ids of providers whose *last* test was explicitly triggered by the user (table row "Test"
-  // action, or the header's "Test all"), as opposed to the silent auto-probe run once on mount
-  // for every loaded provider. Only a manual failure (or the default provider failing, handled
-  // separately below) earns a page-level callout — the auto-probe's result still lands in the
-  // table's per-row status cell, it just never escalates to a banner on its own. See
-  // `manualTestFailures` below.
-  const [manualTestIds, setManualTestIds] = useState<Set<string>>(new Set());
-  // Dismissal is keyed per callout: a manual-test failure dismisses under the bare provider id;
-  // the default-provider-failing callout dismisses under a separate `default:${id}` key so
-  // dismissing one never silently dismisses the other for the same provider.
-  const [dismissedErrorIds, setDismissedErrorIds] = useState<Set<string>>(
-    new Set(),
-  );
   const [deleteTarget, setDeleteTarget] = useState<ProviderSummary | null>(
     null,
   );
@@ -359,31 +354,23 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   );
   const [isSavingRetention, setIsSavingRetention] = useState(false);
   const [fieldPolicyFilter, setFieldPolicyFilter] = useState('');
-  // Page-level callout #2: the default provider is failing (whether the failure came from the
-  // silent auto-probe or a manual test) — the one case that breaks chat, so it always surfaces,
-  // compact and dismissible, regardless of who triggered the test.
-  const failingDefaultProvider = providers.find(
-    p =>
-      p.isDefault &&
-      testResults[p.id] &&
-      !testResults[p.id].success &&
-      !dismissedErrorIds.has(`default:${p.id}`),
-  );
-  // Page-level callout #1: a provider the user explicitly clicked "Test" on, which failed.
-  // A provider that is ALSO the failing default is excluded here — it already gets the
-  // dedicated default-provider callout below, and showing both for the same provider/message
-  // would be duplicative.
-  const manualTestFailures = providers.filter(
-    p =>
-      manualTestIds.has(p.id) &&
-      testResults[p.id] &&
-      !testResults[p.id].success &&
-      !dismissedErrorIds.has(p.id) &&
-      p.id !== failingDefaultProvider?.id,
-  );
   const hasEmptyFieldPolicyRow = fieldPolicyDraft.some(
     entry => entry.field.trim() === '',
   );
+  // Approximates EuiInMemoryTable's own (uncontrolled) default search — a case-insensitive
+  // substring match against every column's own text — closely enough to know which rows "Test
+  // all" should act on. Only used for that; the table keeps filtering itself independently.
+  const visibleProviders = (() => {
+    const query = providersFilterText.trim().toLowerCase();
+    if (!query) {
+      return providers;
+    }
+    return providers.filter(provider =>
+      [provider.name, provider.type, provider.baseUrl, provider.model].some(
+        field => field.toLowerCase().includes(query),
+      ),
+    );
+  })();
 
   // Pre-flight administrator probe: a live check (GET /settings/access),
   // not a stored setting — loaded once on mount, independent of the settings save/load cycle above.
@@ -586,9 +573,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       .then(loaded => {
         setProviders(loaded);
         // Silent auto-probe: populates the per-row status cell so the table itself shows
-        // green/red at a glance, but never marked as "manual" — see `manualTestFailures` above,
-        // it must not spawn a page-level callout on its own on every visit.
-        loaded.forEach(p => handleTest(p, { manual: false }));
+        // green/red at a glance on every visit, without any user action.
+        loaded.forEach(p => handleTest(p));
       })
       .catch(() =>
         setError(
@@ -675,7 +661,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       // connection-test result (screen 4: "Save & test gains a result panel"). Once
       // `flyoutTestOutcome` is set, the flyout's footer swaps Cancel/Save & test for a single
       // "Done" button; the admin dismisses it explicitly.
-      const outcome = await handleTest(saved, { manual: true });
+      const outcome = await handleTest(saved);
       setFlyoutTestOutcome(outcome);
     } catch (submitError) {
       setError(
@@ -752,27 +738,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     }
   };
 
-  // `manual` has no default here on purpose (see the finding this fixed): a future call site
-  // that forgets to pass it should fail to compile rather than silently gain page-level banner
-  // rights. The row action below gets its own thin wrapper (`handleManualTest`) that always
-  // passes `manual: true`; the auto-probe on mount passes `manual: false` explicitly. Returns the
-  // outcome (not just void) so `handleSubmit` above can feed it straight into the flyout's result
-  // panel without re-reading state that may not have flushed yet.
+  // Returns the outcome (not just void) so `handleSubmit` above can feed it straight into the
+  // flyout's result panel without re-reading state that may not have flushed yet.
   const handleTest = async (
     provider: ProviderSummary,
-    options: { manual: boolean },
   ): Promise<ProviderTestOutcome> => {
     setTestingIds(current => new Set(current).add(provider.id));
-    if (options.manual) {
-      setManualTestIds(current => new Set(current).add(provider.id));
-    }
-    // A fresh test result deserves a fresh chance to show its callout, whichever kind applies.
-    setDismissedErrorIds(current => {
-      const next = new Set(current);
-      next.delete(provider.id);
-      next.delete(`default:${provider.id}`);
-      return next;
-    });
     let outcome: ProviderTestOutcome;
     try {
       const result = await service.test(provider.id);
@@ -792,15 +763,51 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     return outcome;
   };
 
-  // Row action wrapper: the only call site that should ever pass `manual: true` — see the
-  // no-default rationale on `handleTest` above.
-  const handleManualTest = (provider: ProviderSummary) =>
-    handleTest(provider, { manual: true });
+  // Row action wrapper: kept as its own named function so call sites (row "Test" action, the
+  // header's "Test all" below) read as an explicit user-triggered test, even though it is
+  // currently a plain alias for `handleTest`.
+  const handleManualTest = (provider: ProviderSummary) => handleTest(provider);
 
-  // Providers card header action (screen 3: "Test all"): re-tests every currently loaded
-  // provider, each counted as a manual test like the per-row action above.
-  const handleTestAll = () => {
-    providers.forEach(provider => handleManualTest(provider));
+  // How many "Test all" probes run at once (screen 3 gap: "No filter or bulk test" fix — the
+  // previous version fired every provider's test unthrottled). Small and fixed rather than
+  // provider-count-scaled: this is an admin-triggered connectivity check against third-party
+  // APIs, not a bulk data operation, so a handful of concurrent requests is plenty to feel fast
+  // without hammering rate-limited providers (e.g. free-tier keys) all at once.
+  const TEST_ALL_CONCURRENCY = 3;
+
+  // Providers card header action (screen 3: "Test all"): re-tests only the providers the
+  // "Filter providers" search box is currently showing (`visibleProviders` above), not the full
+  // loaded list, and throttles the run to `TEST_ALL_CONCURRENCY` in flight rather than firing
+  // every request at once.
+  const handleTestAll = async () => {
+    if (isTestingAll) {
+      return;
+    }
+    setIsTestingAll(true);
+    try {
+      const queue = [...visibleProviders];
+      // Each worker drains the shared queue one item at a time — sequential WITHIN a worker is
+      // the point (it is what keeps at most `TEST_ALL_CONCURRENCY` requests in flight); the
+      // concurrency comes from running several workers at once via Promise.all below.
+      const worker = async () => {
+        for (;;) {
+          const next = queue.shift();
+          if (!next) {
+            return;
+          }
+          // eslint-disable-next-line no-await-in-loop -- deliberately serial within one worker
+          await handleManualTest(next);
+        }
+      };
+      await Promise.all(
+        Array.from(
+          { length: Math.min(TEST_ALL_CONCURRENCY, queue.length) },
+          worker,
+        ),
+      );
+    } finally {
+      setIsTestingAll(false);
+    }
   };
 
   const toggleRowExpanded = (providerId: string) => {
@@ -815,13 +822,18 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     });
   };
 
+  // Proportional (%) column widths, not fixed px, so no column carries a hard pixel floor that
+  // could force a horizontal scrollbar between 1024 and 2560px of window width (layout contract
+  // acceptance check; screen 3 gap: "Fixed pixel column widths"). Percentages sum to 100 across
+  // the whole set below (star 5 + name 15 + type 12 + endpoint 20 + model 15 + API key 9 +
+  // status 14 + actions 6 + collapse 4), sized roughly to each column's own typical content.
   const columns: EuiBasicTableColumn<ProviderSummary>[] = [
     {
       field: 'isDefault',
       name: i18n.translate('wazuhAiAssistant.settings.column.default', {
         defaultMessage: 'Default',
       }),
-      width: '70px',
+      width: '5%',
       align: 'center' as const,
       render: (isDefault: boolean, provider: ProviderSummary) => (
         <EuiButtonIcon
@@ -858,7 +870,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       name: i18n.translate('wazuhAiAssistant.settings.column.type', {
         defaultMessage: 'Type',
       }),
-      width: '15%',
+      width: '12%',
       render: (type: string) => PROVIDER_TYPE_SHORT_LABELS[type] ?? type,
     },
     {
@@ -892,7 +904,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       name: i18n.translate('wazuhAiAssistant.settings.column.apiKey', {
         defaultMessage: 'API key',
       }),
-      width: '110px',
+      width: '9%',
       render: (hasApiKey: boolean) => (
         <EuiText size='s' color={hasApiKey ? 'default' : 'subdued'}>
           {hasApiKey
@@ -910,7 +922,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       name: i18n.translate('wazuhAiAssistant.settings.column.status', {
         defaultMessage: 'Status',
       }),
-      width: '150px',
+      width: '14%',
       render: (providerId: string) => {
         if (testingIds.has(providerId)) {
           return (
@@ -977,7 +989,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       name: i18n.translate('wazuhAiAssistant.settings.column.actions', {
         defaultMessage: 'Actions',
       }),
-      width: '60px',
+      width: '6%',
       align: 'center' as const,
       render: (provider: ProviderSummary) => (
         <EuiPopover
@@ -1050,7 +1062,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     },
     {
       align: 'right' as const,
-      width: '40px',
+      width: '4%',
       isExpander: true,
       name: '',
       render: (provider: ProviderSummary) => (
@@ -1092,13 +1104,21 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         { defaultMessage: 'Filter providers' },
       ),
     },
+    // Purely a notification: without a controlled `query` prop alongside it, this does not
+    // override EuiInMemoryTable's own filtering — it only mirrors the current search text out to
+    // `providersFilterText` so "Test all" (visibleProviders, above) knows which rows are shown.
+    onChange: ({ queryText }: { queryText: string }) => {
+      setProvidersFilterText(queryText ?? '');
+      return true;
+    },
     toolsRight: [
       <EuiButton
         key='test-all'
         size='s'
         iconType='play'
         onClick={handleTestAll}
-        isDisabled={providers.length === 0}
+        isLoading={isTestingAll}
+        isDisabled={visibleProviders.length === 0 || isTestingAll}
       >
         {i18n.translate('wazuhAiAssistant.settings.providers.testAll', {
           defaultMessage: 'Test all',
@@ -1237,6 +1257,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
               itemId='id'
               search={providersSearch}
               itemIdToExpandedRowMap={itemIdToExpandedRowMap}
+              // Enforces the proportional column widths above as real caps (screen 3 gap: "Fixed
+              // pixel column widths") — without it, auto table layout lets a column's content grow
+              // the whole table past its container, which is exactly the horizontal-scroll failure
+              // those percentages exist to prevent.
+              tableLayout='fixed'
             />
           )}
         </SectionCard>

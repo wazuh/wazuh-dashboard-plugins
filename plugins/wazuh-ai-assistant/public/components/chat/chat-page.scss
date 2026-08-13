@@ -80,6 +80,13 @@
  * the rail and gutters, never to line length. Reads `$wzContentMaxWidth`
  * (public/components/_redesign.scss) instead of a locally-restated pixel figure, replacing the old
  * `CONVERSATION_MAX_WIDTH = 860` constant chat-page.tsx used to keep in parallel with it.
+ *
+ * A table-bearing message row is deliberately NOT inside this element (see `.wzMessageRow` below):
+ * this used to wrap the whole transcript, including `MessageList`, which capped every row's own
+ * "may break out to `min(100%, $wzTableMaxWidth)`" (message-bubble.tsx) against THIS column's own
+ * 1060px box — so it could never resolve past ~1012px (1060 minus this element's own padding) at
+ * any window width. `$wzTableMaxWidth` had zero consumers for the same reason: nothing could
+ * actually reach it while every row lived inside this cap.
  */
 .wzContentMeasure {
   max-width: $wzContentMaxWidth;
@@ -88,16 +95,74 @@
 }
 
 /**
- * `.wzWelcomeCenter`'s `min-height: 100%` resolves against its containing block, which is this
- * column — NOT the transcript row. A percentage height against an `auto`-height containing block
- * resolves to zero, so without these two rules `place-content: center` had nothing to centre in and
- * the welcome sat at the top of the pane at every viewport height. Only the transcript's own direct
- * child gets the full height (a conversation's column must stay content-sized so it can scroll).
+ * `.wzWelcomeCenter`'s `min-height: 100%` resolves against its containing block. A percentage
+ * height against an `auto`-height containing block resolves to zero, so without this chain
+ * `place-content: center` had nothing to centre in and the welcome sat at the top of the pane at
+ * every viewport height. `.wzTranscriptContent` (the transcript's actual direct child now — see its
+ * own comment) establishes the real height from `.wzChatTranscript`; `--stretch` passes that height
+ * one level further down to whichever `.wzContentMeasure` instance is holding the welcome state, so
+ * `.wzWelcomeCenter`'s `flex: 1 1 auto` below has something definite to grow into.
  */
-.wzChatTranscript > .wzContentMeasure {
+.wzChatTranscript > .wzTranscriptContent {
   display: flex;
   flex-direction: column;
   min-height: 100%;
+}
+
+/**
+ * Full-width transcript wrapper (contract §5): owns the one shared `16px 24px 0` gutter so a
+ * table-bearing row can widen past `.wzContentMeasure`'s 1060px measure without the padding being
+ * applied twice. Holds two possible children: `.wzContentMeasure` (header, status callouts, and the
+ * welcome state — always at the shared 1060px measure) and, once a conversation has messages,
+ * `MessageList`'s own rows — each of which decides its OWN measure via `.wzMessageRow` below,
+ * independent of this wrapper's full width.
+ */
+.wzTranscriptContent {
+  width: 100%;
+}
+
+/**
+ * Applied to `.wzContentMeasure` only while it holds the welcome state (chat-page.tsx) — see the
+ * `.wzChatTranscript > .wzTranscriptContent` comment above for why the stretch chain lives here
+ * instead of unconditionally on `.wzContentMeasure` itself: the ordinary message-list case must
+ * stay a plain flow box, or an (uncommon) status callout with no welcome/messages beside it would
+ * claim the transcript's FULL height for itself and push `MessageList`'s sibling row below the
+ * pane's fold instead of letting it follow directly underneath.
+ */
+.wzContentMeasure--stretch {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+/**
+ * Per-turn measure (contract §5): each transcript row centres itself independently instead of the
+ * whole transcript sharing one column — this is what actually lets a table-bearing turn reach
+ * `min(100%, $wzTableMaxWidth)` (message-bubble.tsx's own bubble-level cap resolves against THIS
+ * row's width, not `.wzContentMeasure`'s 1060px one, now that `MessageList` is `.wzTranscriptContent`'s
+ * sibling rather than `.wzContentMeasure`'s descendant).
+ */
+.wzMessageRow {
+  max-width: $wzContentMaxWidth;
+  width: 100%;
+  margin: 0 auto;
+
+  /* A turn carrying a result table is allowed the wider measure; every other turn keeps the same
+     column prose and the composer share. */
+  &.wzMessageRow--wide {
+    max-width: min(100%, $wzTableMaxWidth);
+  }
+}
+
+/**
+ * Assistant prose measure (contract §5, "prose is held to 68ch"): message-bubble.tsx has no
+ * colocated `.scss` of its own to import `$wzProseMeasure` from directly, but this plugin's whole
+ * stylesheet loads once, globally, from THIS file's own import in chat-page.tsx — so a class defined
+ * here is reachable from any component in the plugin without a separate import, the same way
+ * message-bubble.tsx already consumes `.wzMsgRow` below without importing this file itself.
+ */
+.wzProseMeasure {
+  max-width: $wzProseMeasure;
 }
 
 /**

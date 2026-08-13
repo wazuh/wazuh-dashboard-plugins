@@ -122,6 +122,88 @@ describe('SettingsPage — auto-test on load', () => {
   });
 });
 
+describe('SettingsPage — Test all tests only the filtered set, throttled', () => {
+  const threeProviders = [
+    {
+      id: 'p1',
+      name: 'Alpha',
+      type: 'openai_compatible',
+      baseUrl: 'https://api.openai.com/v1',
+      model: 'gpt-4o',
+      isDefault: true,
+    },
+    {
+      id: 'p2',
+      name: 'Beta',
+      type: 'openai_compatible',
+      baseUrl: 'https://api.groq.com/openai/v1',
+      model: 'llama3.3',
+      isDefault: false,
+    },
+    {
+      id: 'p3',
+      name: 'Gamma-matched',
+      type: 'anthropic',
+      baseUrl: 'https://api.anthropic.com',
+      model: 'claude-opus-4-8',
+      isDefault: false,
+    },
+  ];
+
+  it('only re-tests the providers the "Filter providers" box is currently showing', async () => {
+    mockService.list.mockResolvedValue(threeProviders);
+
+    render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
+
+    // Let the silent auto-probe (one call per loaded provider) finish before clearing, so it
+    // cannot be mistaken for "Test all"'s own calls below.
+    await waitFor(() => expect(mockService.test).toHaveBeenCalledTimes(3));
+    mockService.test.mockClear();
+
+    fireEvent.change(screen.getByPlaceholderText(/filter providers/i), {
+      target: { value: 'matched' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /test all/i }));
+
+    await waitFor(() => expect(mockService.test).toHaveBeenCalledWith('p3'));
+    expect(mockService.test).not.toHaveBeenCalledWith('p1');
+    expect(mockService.test).not.toHaveBeenCalledWith('p2');
+  });
+
+  it('disables "Test all" while its own run is in flight, then re-enables it', async () => {
+    mockService.list.mockResolvedValue(threeProviders);
+    // A single shared pending promise: every `service.test` call (auto-probe and "Test all"
+    // alike) resolves together on one explicit `resolveAll` call below, keeping the button
+    // reliably disabled until then regardless of how many probes are in flight.
+    let resolveAll: (value: {
+      success: boolean;
+      latencyMs: number;
+      message: null;
+    }) => void = () => {};
+    const pending = new Promise<{
+      success: boolean;
+      latencyMs: number;
+      message: null;
+    }>(resolve => {
+      resolveAll = resolve;
+    });
+    mockService.test.mockImplementation(() => pending);
+
+    render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
+
+    const testAllButton = await screen.findByRole('button', {
+      name: /test all/i,
+    });
+    fireEvent.click(testAllButton);
+
+    await waitFor(() => expect(testAllButton).toBeDisabled());
+
+    resolveAll({ success: true, latencyMs: 12, message: null });
+
+    await waitFor(() => expect(testAllButton).toBeEnabled());
+  });
+});
+
 describe('SettingsPage — field policy filter', () => {
   it('shows filter input and hides non-matching fields', async () => {
     mockService.getAssistantSettings.mockResolvedValue({

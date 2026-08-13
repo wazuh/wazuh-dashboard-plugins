@@ -11,6 +11,14 @@
   @include wzSurfaceTokens;
 }
 
+// The pill's own vertical padding and line-height, pinned explicitly rather than left to
+// EuiBadge's default — so its total rendered height is a value THIS file controls, not one it
+// would otherwise have to guess at from the outside (see $wzSettingsCardPillHeight below).
+$wzSettingsCardPillPaddingBlock: 2px;
+$wzSettingsCardPillLineHeight: 16px;
+$wzSettingsCardPillHeight: $wzSettingsCardPillLineHeight +
+  (2 * $wzSettingsCardPillPaddingBlock);
+
 /**
  * Section card: a centred, bordered pill straddling the panel's own top border by half its own
  * height — exactly the idiom Home's overview cards already use. `pillRow` sits ABOVE the panel in
@@ -27,18 +35,21 @@
   }
 
   &__pill {
+    // 11px uppercase muted label — the same idiom `wzMicroLabel` already names for table column
+    // heads, so this restates nothing of its own.
+    @include wzMicroLabel;
     background-color: var(--wz-surface);
     transform: translateY(50%);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    padding: 2px 14px;
+    padding: $wzSettingsCardPillPaddingBlock 14px;
+    line-height: $wzSettingsCardPillLineHeight;
   }
 
   &__panel {
     @include wzPanel($wzCardPaddingRoomy);
-    padding-top: $wzCardPaddingRoomy + 10px;
+    // Reserves exactly half the pill's own height ($wzSettingsCardPillHeight above) rather than a
+    // hand-picked pixel guess, so the two values cannot silently drift apart. `calc()` (not Sass
+    // `/`) does the division, since plain `/` on two Sass numbers is deprecated.
+    padding-top: calc(#{$wzCardPaddingRoomy} + #{$wzSettingsCardPillHeight} / 2);
   }
 }
 
@@ -51,8 +62,9 @@
 .wzStatusChip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-
+  // No `gap` here: EuiBadge wraps its children in `.euiBadge__content > .euiBadge__text`, so this
+  // element's own direct children never include both the spinner and the text for `gap` to space
+  // — `&__spinner`'s own margin below is the one mechanism that actually does that job.
   &--ok {
     // This OUI fork predates EUI's success/secondary rename (see wz-stat/_stat.scss's own
     // $euiColorSecondaryText) — $euiColorSecondary is the green brand color here, not
@@ -83,14 +95,18 @@
   }
 }
 
-/* Endpoint column (screen 3 gap: "Endpoints dominate the row"): the cell itself only needs to
-   respect the column's own width — `middleTruncate` (settings-page.tsx) already does the
-   character-level truncation, this just keeps the truncated string from wrapping. */
+/* Endpoint column (screen 3 gap: "Endpoints dominate the row"): `middleTruncate` (settings-
+   page.tsx) is the ONLY truncation mechanism — it already bounds the string length and keeps the
+   distinguishing tail visible, which a second, competing `text-overflow: ellipsis` here used to
+   throw away by re-truncating from the end at narrow widths. `overflow: hidden` stays as a plain
+   layout safety net (no ellipsis of its own), not a second truncation: with the table's
+   `tableLayout="fixed"` (settings-page.tsx) capping this column's width, it just silently clips
+   the rare case where even the already-bounded string doesn't fit, instead of visually bleeding
+   into the next cell. */
 .wzSettingsEndpointCell {
   display: inline-block;
   max-width: 100%;
   overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
   vertical-align: bottom;
 }

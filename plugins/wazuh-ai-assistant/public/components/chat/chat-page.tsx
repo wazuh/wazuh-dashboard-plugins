@@ -101,6 +101,19 @@ interface ChatPageProps {
   /** Whether to render the saved-conversations sidebar (default true). The docked header panel
    * (assistant-chat-panel.tsx) hides it while the panel is too narrow for both panes. */
   showConversationSidebar?: boolean;
+  /**
+   * Whether the rail is allowed to escalate to an `EuiFlyout` below `RAIL_FLYOUT_AT` (default
+   * true). `EuiFlyout` is a `position: fixed` overlay that covers the WHOLE screen it's rendered
+   * into — fine for the app shell's own full-page ChatPage, but the header's docked sidecar
+   * (assistant-chat-panel.tsx, `SIDEBAR_MIN_PANEL_WIDTH = 600`) renders ChatPage inside a panel that
+   * can itself be anywhere from 600 to 900+px wide, i.e. squarely inside the flyout band — which
+   * turned "the rail is a bit narrow" into "a full-screen overlay just opened from the right to show
+   * a LEFT-hand rail", covering the entire dashboard out of a sidecar the user never asked to leave.
+   * An explicit prop (rather than this component sniffing its own embedding context, e.g. via
+   * `showConversationSidebar` or some other side channel) is what keeps that decision the caller's
+   * to make, the same way `showConversationSidebar` already is.
+   */
+  allowRailFlyout?: boolean;
 }
 
 /**
@@ -113,19 +126,24 @@ interface TurnConversationTarget {
   version: string | undefined;
 }
 
-/** Fixed width of the EXPANDED saved-conversations rail (conversation-list.tsx). Kept equal to
- * `$wzRailWidth` in `public/components/_redesign.scss` — there is no SCSS-to-TS bridge in this
- * build, so the two literals have to be updated together by hand. The transcript/composer measure
- * itself no longer has a JS-side twin: both now read `.wzContentMeasure` (chat-page.scss), which is
- * the single place `$wzContentMaxWidth` is spent, replacing the old competing
- * `CONVERSATION_MAX_WIDTH = 860` constant this file used to keep in parallel. */
+/** Fixed width of the EXPANDED saved-conversations rail (conversation-list.tsx), asserted as an
+ * exact inline pixel value by this file's own display-mode tests. There is genuinely no SCSS
+ * counterpart for this one (unlike `$wzContentMaxWidth`, which chat-page.scss owns outright): the
+ * rail's width switches on a value this component measures off its own DOM node at runtime, which
+ * no CSS media/container query in this build can react to, so `$wzRailWidth` was deleted from
+ * `public/components/_redesign.scss` rather than kept as an unconsumed duplicate of this number. */
 const CONVERSATION_SIDEBAR_WIDTH = 260;
-/** Collapsed rail strip width (contract §5 / §6) — mirrors `$wzRailCollapsedWidth`. */
+/** Collapsed rail strip width (contract §5 / §6) — mirrors `$wzRailCollapsedWidth`
+ * (conversation-list.scss's `.wzConvoRailCollapsed` is the real SCSS consumer of that token; this
+ * is the same number applied to the OUTER panel this file renders, which has no CSS class of its
+ * own to read it from — same "measured at runtime" reasoning as `CONVERSATION_SIDEBAR_WIDTH`). */
 const RAIL_COLLAPSED_WIDTH = 48;
-/** Pane-width breakpoints for the rail's own display mode (contract §5 / §6) — mirror
- * `$wzRailCollapseAt` / `$wzRailFlyoutAt` in `public/components/_redesign.scss`. Measured against
- * the PANE (this component's own root), not the window, so an embedding context that gives this
- * component less room (e.g. the docked header panel) collapses the rail on its own. */
+/** Pane-width breakpoints for the rail's own display mode (contract §5 / §6). JS-only for the same
+ * reason as the widths above — these gate an imperative branch over a measured `offsetWidth`, not a
+ * CSS rule, so `$wzRailCollapseAt`/`$wzRailFlyoutAt` were deleted from `_redesign.scss` rather than
+ * left as tokens nothing could ever consume. Measured against the PANE (this component's own root),
+ * not the window, so an embedding context that gives this component less room (e.g. the docked
+ * header panel) collapses the rail on its own. */
 const RAIL_COLLAPSE_AT = 1100;
 const RAIL_FLYOUT_AT = 900;
 /** Window event announcing a conversation create/update/delete; every mounted ChatPage listens
@@ -220,6 +238,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   onGeneratingChange,
   isActive = true,
   showConversationSidebar = true,
+  allowRailFlyout = true,
 }) => {
   // `useSyncedState` (public/hooks/use-synced-state.ts) is the `[value, setValue, ref]` pattern
   // used for `messages`, `inputText`, and `activeConversationId` below — see that hook's own doc
@@ -397,6 +416,15 @@ export const ChatPage: React.FC<ChatPageProps> = ({
    * reports 0, which would collapse every existing test's sidebar into 'flyout' mode. Every
    * environment without `ResizeObserver` instead keeps the rail 'expanded', exactly how this
    * component behaved before the rail became width-responsive.
+   *
+   * A width of exactly 0 IS observed in a real browser too — a hidden (`display: none`) pane, e.g.
+   * this component staying mounted behind the Settings tab (application.tsx) — and is ignored the
+   * same way for the same reason: see the `!width` guard inside the effect below.
+   *
+   * `allowRailFlyout` (default true, see this component's own prop doc comment) caps the mode at
+   * 'collapsed' instead of ever reaching 'flyout' — the docked header panel (assistant-chat-panel.tsx)
+   * passes `false` because its own panel routinely sits inside the flyout band, where an `EuiFlyout`
+   * would cover the whole dashboard from within a sidecar the user never asked to leave.
    */
   const chatRootRef = useRef<HTMLDivElement | null>(null);
   const [railDisplayMode, setRailDisplayMode] = useState<
@@ -416,7 +444,28 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     }
     const update = () => {
       const width = element.offsetWidth;
+      // A hidden pane (`display: none`) measures 0 — the app shell (application.tsx) keeps ChatPage
+      // MOUNTED behind that while the Settings tab is showing, so every Chat<->Settings round-trip
+      // used to run this callback against a width of 0. Treating that as "very narrow" flipped the
+      // mode to 'flyout' AND (via the branch below) wiped `railManualOverrideRef`, so a rail the
+      // user had collapsed by hand silently re-expanded on every trip back from Settings. A width of
+      // 0 carries no real information about the pane's actual size, so it is ignored outright —
+      // whatever mode/override is already in state stays exactly as it was until a genuine
+      // measurement arrives.
+      if (!width) {
+        return;
+      }
       if (width < RAIL_FLYOUT_AT) {
+        if (!allowRailFlyout) {
+          // The docked header panel (assistant-chat-panel.tsx) passes `allowRailFlyout={false}`:
+          // its own panel routinely sits inside this band (600–900px), and an `EuiFlyout` there
+          // would cover the whole dashboard from within a sidecar the user never asked to leave —
+          // see this prop's own doc comment. Capping at 'collapsed' is what removes the escalation
+          // instead of merely mitigating it.
+          railManualOverrideRef.current = null;
+          setRailDisplayMode('collapsed');
+          return;
+        }
         railManualOverrideRef.current = null;
         setRailDisplayMode('flyout');
         return;
@@ -430,7 +479,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     const observer = new ResizeObserver(update);
     observer.observe(element);
     return () => observer.disconnect();
-  }, []);
+  }, [allowRailFlyout]);
 
   const handleRailCollapse = () => {
     railManualOverrideRef.current = 'collapsed';
@@ -1896,13 +1945,28 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             )}
             className='wzChatTranscript'
           >
-            {/* `.wzContentMeasure` (chat-page.scss): the ONE centred column transcript prose and
+            {/* `.wzTranscriptContent` (chat-page.scss): the full-width wrapper that owns the ONE
+              shared `16px 24px 0` gutter — `.wzContentMeasure` below (header/callouts/welcome) and
+              `MessageList` (rendered as ITS sibling further down, not its descendant) both sit
+              inside it, which is what lets a table-bearing turn's own row measure past
+              `.wzContentMeasure`'s 1060px cap instead of being clipped to it (layout contract §5). */}
+            <div
+              className='wzTranscriptContent'
+              style={{ padding: '16px 24px 0' }}
+            >
+              {/* `.wzContentMeasure` (chat-page.scss): the ONE centred column transcript prose and
               the composer share (layout contract §5) — reads `$wzContentMaxWidth` off the shared
               `_redesign.scss` token instead of restating it, which is what this file's old
-              `CONVERSATION_MAX_WIDTH = 860` constant used to do in parallel. */}
+              `CONVERSATION_MAX_WIDTH = 860` constant used to do in parallel. `--stretch` only while
+              this holds the welcome state (see chat-page.scss's own comment on that modifier) — the
+              ordinary message-list case stays a plain flow box so it never claims the whole
+              transcript height for itself and pushes `MessageList`'s sibling row out of view. */}
             <div
-              className='wzContentMeasure'
-              style={{ padding: '16px 24px 0' }}
+              className={
+                showWelcomeState
+                  ? 'wzContentMeasure wzContentMeasure--stretch'
+                  : 'wzContentMeasure'
+              }
             >
               {/* The view's `<h1>`, for assistive tech only. The chat column had no heading at all,
                     which left screen-reader users without a name for the thing they are reading and
@@ -2249,21 +2313,26 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   </EuiPanel>
                 </div>
               )}
-
-              {!showLoadingState &&
-                !showNoProviderState &&
-                !showWelcomeState && (
-                  <MessageList
-                    transcriptHeightPx={transcriptHeightPx}
-                    messages={messages}
-                    resolveDiscoverUrl={resolveDiscoverUrl}
-                    resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
-                    // Withheld while generating: retrying would abandon the turn already running.
-                    onRetryLastTurn={
-                      isGenerating ? undefined : handleRetryLastTurn
-                    }
-                  />
-                )}
+            </div>
+            {/* `MessageList` is `.wzContentMeasure`'s SIBLING inside `.wzTranscriptContent`, not its
+              descendant — see this file's `.wzTranscriptContent` doc comment above. Nesting it
+              inside `.wzContentMeasure` (the pre-fix shape) capped every row's own breakout width
+              against that element's 1060px measure, which is why a table-bearing turn could never
+              actually reach `min(100%, $wzTableMaxWidth)` regardless of window width. */}
+            {!showLoadingState &&
+              !showNoProviderState &&
+              !showWelcomeState && (
+                <MessageList
+                  transcriptHeightPx={transcriptHeightPx}
+                  messages={messages}
+                  resolveDiscoverUrl={resolveDiscoverUrl}
+                  resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
+                  // Withheld while generating: retrying would abandon the turn already running.
+                  onRetryLastTurn={
+                    isGenerating ? undefined : handleRetryLastTurn
+                  }
+                />
+              )}
             </div>
           </div>
 

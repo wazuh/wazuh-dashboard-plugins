@@ -36,11 +36,15 @@ $wzComposerMaxRows: 5;
 $wzResultsMaxHeight: min(460px, 52dvh);
 
 /* --- Conversation rail (layout contract §5) ----------------------------------------------------
-   Pane width, NOT window width: the rail reacts to the space it actually has. */
-$wzRailWidth: 260px;
+   Pane width, NOT window width: the rail reacts to the space it actually has. Only the collapsed
+   strip's width is spent here (conversation-list.scss's `.wzConvoRailCollapsed`) — the EXPANDED
+   width and both breakpoints are read imperatively off the pane's own measured `offsetWidth` in
+   chat-page.tsx (`CONVERSATION_SIDEBAR_WIDTH`, `RAIL_COLLAPSE_AT`, `RAIL_FLYOUT_AT`), which is also
+   what the display-mode tests assert on as an exact inline pixel value — there is no CSS
+   media/container query in this build that can react to a component's own measured width the same
+   way, so those three never had a real SCSS token to begin with and were deleted rather than kept
+   as unconsumed duplicates. */
 $wzRailCollapsedWidth: 48px;
-$wzRailCollapseAt: 1100px;
-$wzRailFlyoutAt: 900px;
 
 /* --- Motion (120–200ms ease-out, nothing loops) ------------------------------------------------
    Always used inside a `prefers-reduced-motion: no-preference` block. */
@@ -68,7 +72,12 @@ $wzEase: ease-out;
 /** A bordered, shadowless panel — the one container idiom the whole redesign uses. */
 @mixin wzPanel($padding: $wzCardPadding) {
   background-color: var(--wz-surface);
-  border: 1px solid var(--wz-hairline);
+  // A `var()` with no fallback that fails to resolve makes the ENTIRE shorthand declaration
+  // invalid (not just that one value), so an environment where `--wz-hairline` is unset — before
+  // `wzSurfaceTokens` runs, or a consumer that forgets to apply it — silently drew no border at
+  // all instead of degrading to something visible. `border-radius` right below already carried a
+  // fallback for the same reason; this brings `border` in line with it.
+  border: 1px solid var(--wz-hairline, #{$euiBorderColor});
   border-radius: var(--wz-panel-radius, #{$wzPanelRadius});
   box-shadow: none;
   padding: $padding;

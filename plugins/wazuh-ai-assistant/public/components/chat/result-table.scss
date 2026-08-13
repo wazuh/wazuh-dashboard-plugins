@@ -66,6 +66,15 @@
   padding: 4px 8px;
 }
 
+/** Provenance/Discover/Security-Analytics chip cluster in the header (result-table.tsx). Header's
+ * own `justify-content: space-between` already separates it from the toggle button; `flex-shrink: 0`
+ * is what this class actually needs to add — without it a long titleText (a wide table plus the
+ * "+N more fields" note) could squeeze the chips down to nothing instead of wrapping onto their own
+ * line the way `flex-wrap: wrap` above intends. */
+.wzResultsCardActions {
+  flex-shrink: 0;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .wzResultsCardToggle {
     transition: background-color $wzMotionFast $wzEase;

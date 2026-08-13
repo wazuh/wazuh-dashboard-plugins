@@ -289,13 +289,12 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   // answer's sentences inherited that width and ran to ~117 characters a line — roughly 60% past
   // the point where the eye reliably finds the next line, which reads as a wall of text. Only
   // block content (the table, the raw query view) is allowed to use the extra width.
-  // '68ch', not a pixel figure: mirrors `$wzProseMeasure` in _redesign.scss (layout contract §5,
-  // "one measure, one gutter") — this component has no colocated .scss file of its own to import
-  // the token from directly, so the literal value is restated here with this comment as the
-  // pointer back to the source of truth; ch scales with the font's own average character width,
-  // unlike a fixed px figure.
-  const PROSE_MEASURE = '68ch';
-  const proseStyle: React.CSSProperties = { maxWidth: PROSE_MEASURE };
+  // `.wzProseMeasure` (chat-page.scss) reads `$wzProseMeasure` — this component has no colocated
+  // .scss file of its own, but the plugin's whole stylesheet loads once, globally, from
+  // chat-page.tsx's own import, so this global class is reachable here without a separate import
+  // (the same way `wzMsgRow` below already is). Kept as a class rather than an inline style so this
+  // 68ch figure has exactly one home instead of a second copy restated in this file.
+  const PROSE_MEASURE_CLASS = 'wzProseMeasure';
 
   const bubbleContent = (
     <>
@@ -304,7 +303,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
         // branch also covers): announces incoming delta tokens to screen readers, which
         // otherwise stay silent for the whole stream since nothing else here changes focus.
         <div
-          style={proseStyle}
+          className={PROSE_MEASURE_CLASS}
           {...(!isUser
             ? {
                 'aria-live': 'polite' as const,
@@ -335,7 +334,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           </EuiText>
         </div>
       ) : (
-        <div style={proseStyle}>
+        <div className={PROSE_MEASURE_CLASS}>
           <EuiText size='s'>
             {/* sanitizeAssistantMarkdown (#8890): the finished answer is model output built
                   from tool results that can carry attacker-influenced text — see that
@@ -396,7 +395,11 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
         // gets the 68ch prose measure EXCEPT when it carries a result table, which may break out
         // up to `$wzTableMaxWidth` (1300px, layout contract §5) instead — a wide table squeezed
         // into 75% of an already-narrow column forced a horizontal scrollbar inside the table's
-        // own scroller.
+        // own scroller. This "100%" resolves against the row's OWN measure (message-list.tsx's
+        // `.wzMessageRow`/`.wzMessageRow--wide`, chat-page.scss) — it used to resolve against the
+        // whole transcript's shared 1060px column instead, back when every row (table-bearing or
+        // not) rendered as a descendant of that single measure, which is what silently capped every
+        // table at ~1012px regardless of window width.
         maxWidth: isUser ? '75%' : message.table ? 'min(100%, 1300px)' : '68ch',
         minWidth: 180,
       }}
@@ -495,7 +498,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
             <div
               key={toolCall.id}
               id={`${rawViewId}-${toolCall.id}`}
-              style={proseStyle}
+              className={PROSE_MEASURE_CLASS}
             >
               <EuiSpacer size='xs' />
               <EuiText size='xs'>

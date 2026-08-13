@@ -11,12 +11,14 @@ jest.mock('../chat/chat-page', () => ({
     onGeneratingChange?: (generating: boolean) => void;
     onNavigateToSettings: () => void;
     showConversationSidebar?: boolean;
+    allowRailFlyout?: boolean;
   }) =>
     mockReact.createElement(
       'div',
       {
         'data-test-subj': 'chat-page-stub',
         'data-sidebar': String(props.showConversationSidebar),
+        'data-allow-rail-flyout': String(props.allowRailFlyout),
       },
       mockReact.createElement(
         'button',
@@ -90,6 +92,16 @@ describe('AssistantChatPanel', () => {
       document.querySelector('[data-test-subj="wzAiAssistantPanel"]'),
     ).toBeInTheDocument();
     expect(chatPageStub()).toBeInTheDocument();
+  });
+
+  it('never lets the rail escalate to a full-screen flyout inside this docked panel', () => {
+    // This panel's own width (SIDEBAR_MIN_PANEL_WIDTH = 600) routinely sits inside ChatPage's
+    // flyout band (600-900px) — an EuiFlyout there would cover the whole dashboard from within a
+    // sidecar the user never asked to leave. `allowRailFlyout={false}` is what caps it at the
+    // collapsed strip instead; see ChatPage's own `allowRailFlyout` prop doc comment.
+    renderPanel();
+
+    expect(chatPageStub()).toHaveAttribute('data-allow-rail-flyout', 'false');
   });
 
   it('routes the close button through the interrupt gate', () => {

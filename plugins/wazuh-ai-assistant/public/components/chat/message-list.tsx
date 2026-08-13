@@ -62,18 +62,30 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
 }) {
   const lastMessage = messages[messages.length - 1];
   return (
+    // `.wzTranscriptContent` (chat-page.scss/chat-page.tsx): this component is now that wrapper's
+    // sibling, not `.wzContentMeasure`'s descendant — each row below centres itself independently
+    // via `.wzMessageRow`/`.wzMessageRow--wide`, which is what actually lets a table-bearing turn
+    // reach past the shared 1060px measure (layout contract §5).
     <div>
       {messages.map((message, index) => (
         <React.Fragment key={message.id}>
-          <MessageBubble
-            message={message}
-            resolveDiscoverUrl={resolveDiscoverUrl}
-            resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
-            onRetry={
-              index === messages.length - 1 ? onRetryLastTurn : undefined
+          <div
+            className={
+              message.table
+                ? 'wzMessageRow wzMessageRow--wide'
+                : 'wzMessageRow'
             }
-            transcriptHeightPx={transcriptHeightPx}
-          />
+          >
+            <MessageBubble
+              message={message}
+              resolveDiscoverUrl={resolveDiscoverUrl}
+              resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
+              onRetry={
+                index === messages.length - 1 ? onRetryLastTurn : undefined
+              }
+              transcriptHeightPx={transcriptHeightPx}
+            />
+          </div>
           {/* One turn = one 24px breath (EuiSpacer size='l'), matching the rhythm the conversation
               header and welcome state also use — intra-turn spacing inside a bubble stays 's'. */}
           {index < messages.length - 1 && <EuiSpacer size='l' />}
@@ -87,7 +99,9 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
       {lastMessage?.role === 'user' && (
         <>
           <EuiSpacer size='s' />
-          <InterruptedTurnNotice onRetry={onRetryLastTurn} />
+          <div className='wzMessageRow'>
+            <InterruptedTurnNotice onRetry={onRetryLastTurn} />
+          </div>
         </>
       )}
     </div>

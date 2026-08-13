@@ -228,6 +228,12 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
             onNavigateToSettings={openSettingsToAddProvider}
             onGeneratingChange={handleGeneratingChange}
             showConversationSidebar={sidebarOpen}
+            // This panel's own width (`SIDEBAR_MIN_PANEL_WIDTH` above) routinely sits inside
+            // ChatPage's flyout band (600-900px) — an `EuiFlyout` there would cover the WHOLE
+            // dashboard, opening from the right, just to show a left-hand rail, out of a docked
+            // sidecar the user never asked to leave. Capped at the collapsed strip instead; see
+            // ChatPage's own `allowRailFlyout` doc comment.
+            allowRailFlyout={false}
           />
         </div>
       </div>

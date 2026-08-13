@@ -73,9 +73,13 @@ describe('ProviderFormFlyout — create mode', () => {
     fireEvent.change(screen.getByLabelText(/endpoint url/i), {
       target: { value: ' https://api.groq.com/openai/v1 ' },
     });
-    fireEvent.change(screen.getByLabelText(/^model/i), {
+    const modelField = screen.getByLabelText(/^model/i);
+    fireEvent.change(modelField, {
       target: { value: 'llama-3.3-70b-versatile' },
     });
+    // The Model field is now an EuiComboBox (customOptionText): typing a value not in the
+    // suggestion list needs Enter to commit it as a custom option, same as any combobox.
+    fireEvent.keyDown(modelField, { key: 'Enter', code: 'Enter' });
     fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
 
     await waitFor(() => {
@@ -202,9 +206,13 @@ describe('ProviderFormFlyout — unsaved changes confirmation', () => {
       <ProviderFormFlyout {...baseProps} editingProvider={editingProvider} />,
     );
 
-    fireEvent.change(screen.getByLabelText(/^model/i), {
+    const modelField = screen.getByLabelText(/^model/i);
+    fireEvent.change(modelField, {
       target: { value: 'gpt-4.1' },
     });
+    // The Model field is now an EuiComboBox (customOptionText): typing a value not in the
+    // suggestion list needs Enter to commit it as a custom option, same as any combobox.
+    fireEvent.keyDown(modelField, { key: 'Enter', code: 'Enter' });
     fireEvent.click(
       document.querySelector(
         '[data-test-subj="euiFlyoutCloseButton"]',
@@ -708,5 +716,32 @@ describe('ProviderFormFlyout — curated per-vendor model suggestions', () => {
     expect(screen.getByText('llama3.3')).toBeInTheDocument();
     expect(screen.getByText('qwen3')).toBeInTheDocument();
     expect(screen.getByText('mistral')).toBeInTheDocument();
+  });
+});
+
+describe('ProviderFormFlyout — Model field is an editable EuiComboBox', () => {
+  it('accepts a typed model id that is in neither list, via Enter (customOptionText)', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    const modelField = screen.getByLabelText(/^model/i);
+    fireEvent.change(modelField, { target: { value: 'my-custom-fine-tune' } });
+    fireEvent.keyDown(modelField, { key: 'Enter', code: 'Enter' });
+
+    expect(modelField).toHaveValue('my-custom-fine-tune');
+  });
+
+  it('does not render the same model id under both "Examples:" and "Suggested models:"', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://api.anthropic.com' },
+    });
+
+    // claude-opus-4-8 is listed in both PROVIDER_MODEL_GUIDANCE (examples) and
+    // VENDOR_MODEL_SUGGESTIONS (suggested models) for this endpoint — it must render once.
+    expect(screen.getAllByText('claude-opus-4-8')).toHaveLength(1);
+    // claude-sonnet-5 only exists in the vendor suggestion list — the dedupe must not drop it.
+    expect(screen.getByText('claude-sonnet-5')).toBeInTheDocument();
   });
 });

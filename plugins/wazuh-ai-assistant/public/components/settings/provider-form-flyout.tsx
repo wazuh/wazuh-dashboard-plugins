@@ -7,6 +7,7 @@ import {
   EuiCheckableCard,
   EuiCode,
   EuiCodeBlock,
+  EuiComboBox,
   EuiConfirmModal,
   EuiFieldPassword,
   EuiFieldText,
@@ -480,6 +481,20 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
     form.baseUrl,
     form.type,
   );
+  // The "Suggested models:" chip row must not repeat an id already shown under "Examples:" above
+  // — PROVIDER_MODEL_GUIDANCE (curated per-type examples) and VENDOR_MODEL_SUGGESTIONS (curated
+  // per-endpoint suggestions) are maintained independently and can legitimately list the same
+  // model id (e.g. Anthropic's claude-opus-4-8/claude-haiku-4-5 appear in both tables), which used
+  // to render the same chip twice under two different labels. An id that only ONE of the two
+  // tables carries (e.g. claude-sonnet-5, vendor-only) is kept here untouched.
+  const suggestedModelChips = vendorModelSuggestions.filter(
+    model => !modelGuidance.examples.includes(model),
+  );
+  // Feeds the Model EuiComboBox's dropdown `options` — deliberately the RAW (non-deduplicated)
+  // vendor list: the Examples chips below are a separate, always-typeable affordance and are not
+  // part of this dropdown, so there is nothing for them to collide with here.
+  const modelOptions = vendorModelSuggestions.map(model => ({ label: model }));
+  const selectedModelOption = form.model ? [{ label: form.model }] : [];
 
   const fillBaseUrl = (value: string) => {
     setForm({ ...form, baseUrl: value });
@@ -490,6 +505,22 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   };
 
   const fillModel = (value: string) => setForm({ ...form, model: value });
+
+  const handleModelChange = (selected: Array<{ label: string }>) => {
+    fillModel(selected[0]?.label ?? '');
+  };
+
+  // Any model id must remain typeable even when it is not (or no longer) in the suggestion
+  // lists above — vendors retire/rename models faster than a curated list can track. Returning
+  // `false` for a blank search rejects the create (nothing to commit); any other return lets
+  // EuiComboBox commit the typed value, which `fillModel` reflects back as the field's value.
+  const handleModelCreateOption = (searchValue: string): boolean | void => {
+    const trimmed = searchValue.trim();
+    if (!trimmed) {
+      return false;
+    }
+    fillModel(trimmed);
+  };
 
   // Group 1 (Provider type) onChange: same prefill/clear logic the old EuiSelect's onChange had,
   // just taking the next type directly instead of reading it off a native <select> change event.
@@ -1035,19 +1066,40 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                   </>
                 }
               >
-                <EuiFieldText
-                  value={form.model}
-                  aria-required='true'
-                  onChange={event =>
-                    setForm({ ...form, model: event.target.value })
-                  }
+                <EuiComboBox
+                  placeholder={i18n.translate(
+                    'wazuhAiAssistant.settings.form.modelPlaceholder',
+                    { defaultMessage: 'Pick a suggestion or type any model id' },
+                  )}
+                  // `asPlainText` keeps this looking and behaving like the free-text field it
+                  // replaces (no removable "pill" for the single selected value) — the model id
+                  // must stay directly editable, since vendor suggestion lists go stale as models
+                  // are retired (screen 4 EUI mapping: "EuiComboBox singleSelection
+                  // customOptionText").
+                  singleSelection={{ asPlainText: true }}
+                  options={modelOptions}
+                  selectedOptions={selectedModelOption}
+                  onChange={handleModelChange}
+                  onCreateOption={handleModelCreateOption}
+                  customOptionText={i18n.translate(
+                    'wazuhAiAssistant.settings.form.modelCustomOptionText',
+                    {
+                      // ICU-escaped so the literal "{searchValue}" token survives translation —
+                      // EuiComboBox does its own plain-string substitution of that token, this is
+                      // not an i18n interpolation placeholder.
+                      defaultMessage: "Add '{searchValue}' as a custom model",
+                    },
+                  )}
                 />
               </EuiFormRow>
               {/* Curated per-vendor suggestions, shown once the endpoint URL matches a known
-                  vendor — clicking a chip fills the (still free-text) Model field. Kept outside
-                  the EuiFormRow above for the same reason as the API key shape warning: EuiFormRow
-                  clones its single child to inject a11y props, so it cannot take a sibling. */}
-              {vendorModelSuggestions.length > 0 && (
+                  vendor — clicking a chip fills the model (still freely re-typeable in the
+                  EuiComboBox above). Kept outside the EuiFormRow above for the same reason as the
+                  API key shape warning: EuiFormRow clones its single child to inject a11y props,
+                  so it cannot take a sibling. Deduplicated against the "Examples:" chips above
+                  (`suggestedModelChips`, not the raw `vendorModelSuggestions`) so an id shared by
+                  both curated lists (e.g. Anthropic's claude-opus-4-8) isn't rendered twice. */}
+              {suggestedModelChips.length > 0 && (
                 <>
                   <EuiSpacer size='xs' />
                   <EuiText
@@ -1068,7 +1120,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     role='group'
                     aria-labelledby='wz-ai-provider-model-suggestions-label'
                   >
-                    {vendorModelSuggestions.map(suggestedModel => (
+                    {suggestedModelChips.map(suggestedModel => (
                       <EuiFlexItem key={suggestedModel} grow={false}>
                         <EuiBadge
                           color='hollow'

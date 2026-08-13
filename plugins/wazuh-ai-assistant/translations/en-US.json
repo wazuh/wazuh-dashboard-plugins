@@ -188,6 +188,8 @@
     "wazuhAiAssistant.settings.rowDetail.expand": "Expand row",
     "wazuhAiAssistant.settings.rowDetail.latency": "Last test responded in {latencyMs} ms.",
     "wazuhAiAssistant.settings.rowDetail.noResult": "This provider has not been tested yet.",
-    "wazuhAiAssistant.settings.rowDetail.reason": "Reason"
+    "wazuhAiAssistant.settings.rowDetail.reason": "Reason",
+    "wazuhAiAssistant.settings.form.modelPlaceholder": "Pick a suggestion or type any model id",
+    "wazuhAiAssistant.settings.form.modelCustomOptionText": "Add '{searchValue}' as a custom model"
   }
 }
