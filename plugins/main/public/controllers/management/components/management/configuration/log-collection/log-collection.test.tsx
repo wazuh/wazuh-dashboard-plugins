@@ -342,4 +342,23 @@ describe('Log Collection Section', () => {
       });
     });
   });
+
+  /* The configuration is read from an index document that only carries the
+  modules the agent reported, so an agent that does not run logcollector has no
+  `logcollector` key at all. */
+  describe('Agent that did not report logcollector', () => {
+    it('reports the module as not configured instead of showing only Sockets', () => {
+      const { getByText, queryByRole } = render(
+        <Provider store={store}>
+          <WzConfigurationLogCollection
+            agent={linuxAgentMocked}
+            currentConfig={{}}
+          />
+        </Provider>,
+      );
+
+      getByText(/not present on the configuration file/i);
+      expect(queryByRole('tab', { name: 'Sockets' })).not.toBeInTheDocument();
+    });
+  });
 });
