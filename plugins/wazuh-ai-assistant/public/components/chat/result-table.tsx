@@ -133,19 +133,6 @@ const ISO_TIMESTAMP_RE =
 const TIMESTAMP_COLUMN_WIDTH = '118px';
 /** Column width for the severity column: a badge plus its longest label ("Informational"). */
 const SEVERITY_COLUMN_WIDTH = '104px';
-/** Approximate advance width of one character at the table's font size, used only to turn a
- * column's longest value into a pixel width. Deliberately rough — it decides how much room a
- * short column reserves, not whether anything is readable. */
-const APPROX_CHAR_WIDTH = 7.5;
-/** A column whose longest value is no longer than this is treated as a "short" column and gets a
- * width sized to its content, leaving the remaining width to the free-text column(s). */
-const SHORT_COLUMN_MAX_CHARS = 24;
-const SHORT_COLUMN_MIN_WIDTH = 92;
-/** Deliberately tight. Every pixel a one-word column reserves is a pixel the free-text column
- * does not get, and the free-text column is the only one whose content wraps: allowing short
- * columns up to 200px left the rule title ~225px and wrapping onto three lines, which made row
- * heights alternate between one and three lines down the page. */
-const SHORT_COLUMN_MAX_WIDTH = 132;
 
 /**
  * Column-count budget (issue #8921's "no table may need a horizontal scrollbar" item): a
@@ -226,27 +213,6 @@ function renderDefaultCell(value: unknown): React.ReactNode {
     return value as React.ReactNode;
   }
   return formatCellValue(value);
-}
-
-/** Length of the longest rendered value in a column (header included, so a short column never
- * ends up narrower than its own label). */
-function longestValueLength(
-  rows: Array<Record<string, unknown>>,
-  field: string,
-  label: string,
-): number {
-  let longest = label.length;
-  for (const row of rows) {
-    const value = row[field];
-    if (value === null || value === undefined) {
-      continue;
-    }
-    const length = String(value).length;
-    if (length > longest) {
-      longest = length;
-    }
-  }
-  return longest;
 }
 
 /**
@@ -597,27 +563,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
             },
           };
         }
-        // EuiBasicTable's default fixed layout splits the leftover width EQUALLY between every
-        // column that has no explicit width, so a one-word "Category" column claimed exactly as
-        // much room as a sentence-long rule title and the title wrapped onto four lines. Sizing
-        // the short columns to their content leaves the remainder to the free-text column(s) —
-        // the only ones that can actually use it.
-        const longest = longestValueLength(spec.rows, column.id, column.label);
-        if (longest <= SHORT_COLUMN_MAX_CHARS) {
-          const width = Math.min(
-            SHORT_COLUMN_MAX_WIDTH,
-            Math.max(
-              SHORT_COLUMN_MIN_WIDTH,
-              Math.round(longest * APPROX_CHAR_WIDTH) + 32,
-            ),
-          );
-          return {
-            field: column.id,
-            name: column.label,
-            width: `${width}px`,
-            render: renderDefaultCell,
-          };
-        }
+
         return {
           field: column.id,
           name: column.label,
@@ -830,7 +776,9 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
                     size='s'
                     aria-label={i18n.translate(
                       'wazuhAiAssistant.resultTable.previousPage',
-                      { defaultMessage: 'Previous page' },
+                      {
+                        defaultMessage: 'Previous page',
+                      },
                     )}
                     isDisabled={safePageIndex === 0}
                     onClick={() =>
