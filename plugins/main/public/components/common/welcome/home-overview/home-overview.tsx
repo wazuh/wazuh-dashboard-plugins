@@ -41,8 +41,6 @@ const HomeOverviewBody: React.FC = () => {
         description='Fleet health, findings, and MITRE ATT&CK activity across your environment.'
         actions={<QuickAccessMenu />}
       />
-      <AiAssistantCta />
-      <EuiSpacer size='l' />
       <OverviewSection findings={findings} />
       <EuiSpacer size='l' />
       <div ref={enrichmentsRef}>
