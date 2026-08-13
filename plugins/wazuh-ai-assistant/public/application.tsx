@@ -83,19 +83,30 @@ const App: React.FC<{
   // taken document-relative (`+ scrollY`) so a scrolled page cannot feed a negative rect back in.
   const frameRef = useRef<HTMLDivElement | null>(null);
   const [frameHeight, setFrameHeight] = useState('100dvh');
+  const measure = useCallback(() => {
+    const node = frameRef.current;
+    if (!node) {
+      return;
+    }
+    const offset = Math.max(
+      0,
+      Math.round(node.getBoundingClientRect().top + window.scrollY),
+    );
+    setFrameHeight(`calc(100dvh - ${offset}px)`);
+  }, []);
+  // Re-measure after EVERY commit, not only when the observer or a window resize says so.
+  // Applying a new height CHANGES this element's own box, which changes its ancestors' boxes, which
+  // is a second-order settle the observer only learns about a frame (or several) later: measured
+  // live, removing 60px of chrome left the frame stuck at the taller offset for over 1.5s, so the
+  // composer sat 60px short of the bottom until a later notification finally landed. Reading here,
+  // post-layout, converges in the same commit. There is no loop risk: `setFrameHeight` writes the
+  // same string once the offset is stable and React bails out of an identical state update.
+  useLayoutEffect(measure);
   useLayoutEffect(() => {
     const node = frameRef.current;
     if (!node) {
       return;
     }
-    const measure = () => {
-      const offset = Math.max(
-        0,
-        Math.round(node.getBoundingClientRect().top + window.scrollY),
-      );
-      setFrameHeight(`calc(100dvh - ${offset}px)`);
-    };
-    measure();
     window.addEventListener('resize', measure);
     // Guarded because jsdom has no ResizeObserver: there the initial measure is enough.
     const observer =
@@ -122,7 +133,7 @@ const App: React.FC<{
       window.removeEventListener('resize', measure);
       observer?.disconnect();
     };
-  }, []);
+  }, [measure]);
   const {
     providers,
     providersLoaded,
