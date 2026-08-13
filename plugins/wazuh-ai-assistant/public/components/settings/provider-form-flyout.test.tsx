@@ -5,6 +5,18 @@ import '@testing-library/jest-dom';
 import { ProviderFormFlyout } from './provider-form-flyout';
 import { ProviderSummary } from '../../../common/types';
 
+/**
+ * The model field is an `EuiComboBox`, so the CURRENT selection is not the input's `value` — with
+ * `singleSelection={{ asPlainText: true }}` EUI renders it as a plain-text pill beside the search
+ * input, which keeps its own (usually empty) value. Reading the input would therefore report "no
+ * model" for a provider that plainly shows one, so these assertions read the selection where it
+ * actually lives.
+ */
+function selectedModel(): string {
+  const input = document.querySelector('[data-test-subj="comboBoxInput"]');
+  return input?.textContent?.trim() ?? '';
+}
+
 const baseProps = {
   editingProvider: null,
   error: null,
@@ -115,7 +127,7 @@ describe('ProviderFormFlyout — edit mode', () => {
     expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
       'https://api.openai.com/v1',
     );
-    expect(screen.getByLabelText(/^model/i)).toHaveValue('gpt-4o');
+    expect(selectedModel()).toBe('gpt-4o');
     expect(
       screen.getByText(/leave empty to keep the current key/i),
     ).toBeInTheDocument();
@@ -651,7 +663,7 @@ describe('ProviderFormFlyout — curated per-vendor model suggestions', () => {
     expect(chip).toBeDefined();
     fireEvent.click(chip as HTMLElement);
 
-    expect(screen.getByLabelText(/^model/i)).toHaveValue('claude-haiku-4-5');
+    expect(selectedModel()).toBe('claude-haiku-4-5');
   });
 
   it('does not suggest Anthropic models when api.anthropic.com is used with the openai_compatible type', () => {
@@ -727,7 +739,7 @@ describe('ProviderFormFlyout — Model field is an editable EuiComboBox', () => 
     fireEvent.change(modelField, { target: { value: 'my-custom-fine-tune' } });
     fireEvent.keyDown(modelField, { key: 'Enter', code: 'Enter' });
 
-    expect(modelField).toHaveValue('my-custom-fine-tune');
+    expect(selectedModel()).toBe('my-custom-fine-tune');
   });
 
   it('does not render the same model id under both "Examples:" and "Suggested models:"', () => {
