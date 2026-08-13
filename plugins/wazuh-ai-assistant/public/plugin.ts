@@ -7,7 +7,7 @@ import {
 } from '../../../src/core/public';
 import { i18n } from '@osd/i18n';
 import { PLUGIN_ID } from '../common/constants';
-import { WAZUH_AI_APP_CATEGORY } from '../common/nav-categories';
+import { WAZUH_HOME_APP_CATEGORY } from '../common/nav-categories';
 import { registerAiNavLink } from './utils/nav-link';
 import {
   WazuhAiAssistantPluginSetup,
@@ -37,15 +37,16 @@ export class WazuhAiAssistantPlugin
       // UI glyph, leaving the assistant the only visually inconsistent entry. `machineLearningApp`
       // is the clearest AI glyph available inside that family in the bundled EUI.
       euiIconType: 'machineLearningApp',
-      // Sole app in its own category, so the intra-category order is not contested; what positions
-      // the entry in the sidebar is the CATEGORY order (see common/nav-categories.ts).
-      // The previous 9070 only ever meant "late within Explore".
-      order: 100,
-      // Own top-level category instead of the framework's generic `Explore` (issue #8895). The
-      // assistant answers across findings, vulnerabilities, agents, configuration assessment, file
-      // integrity, MITRE ATT&CK and inventory, so no single existing Wazuh category fits it without
-      // presenting it as a sub-feature of that one domain.
-      category: WAZUH_AI_APP_CATEGORY,
+      // Ordered directly after the main plugin's Overview app (order `1`) within the shared `Home`
+      // category — see common/nav-categories.ts's doc comment for why this app joins that category
+      // instead of the top-level `AI` one issue #8895 had given it.
+      order: 2,
+      // Joins the main `wazuh` plugin's existing `Home` category rather than a dedicated top-level
+      // one (CEO direction supersedes issue #8895: "Meter el AI assistant mejor en la home, no
+      // pongáis una sección AI solo para esto" — put the assistant into Home instead of carving out
+      // an AI-only section for it). See common/nav-categories.ts's doc comment for the full
+      // rationale and for why this category is duplicated here rather than imported cross-plugin.
+      category: WAZUH_HOME_APP_CATEGORY,
       navLinkStatus: AppNavLinkStatus.default,
       mount: async (params: AppMountParameters) => {
         const [coreStart] = await core.getStartServices();
