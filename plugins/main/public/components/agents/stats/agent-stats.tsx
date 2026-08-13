@@ -13,12 +13,16 @@ import React, { useState, useEffect } from 'react';
 import semver from 'semver';
 import { get } from 'lodash';
 import {
+  EuiButton,
+  EuiEmptyPrompt,
   EuiFlexGroup,
   EuiFlexItem,
   EuiPage,
   EuiPageBody,
+  EuiProgress,
   EuiSpacer,
 } from '@elastic/eui';
+import { useDispatch } from 'react-redux';
 import {
   withGlobalBreadcrumb,
   withGuard,
@@ -34,6 +38,7 @@ import {
   PromptNoActiveAgentWithoutSelect,
   PromptAgentFeatureVersion,
 } from '../prompts';
+import { showExploreAgentModalGlobal } from '../../../redux/actions/appStateActions';
 import {
   UIErrorLog,
   UI_ERROR_SEVERITIES,
@@ -116,6 +121,11 @@ interface AgentStatistics {
     status?: string;
     last_keepalive?: string;
     messages?: { count?: number };
+    tasks?: {
+      dispatched?: { total?: number };
+      failed?: { total?: number };
+      discarded_duplicate?: { total?: number };
+    };
   };
   logcollector?: {
     global?: AgentStatsLogcollectorWindow;
@@ -138,6 +148,18 @@ const statsAgents: {
     key: 'messages_count',
     title: 'Messages count',
     path: 'agent.messages.count',
+    render: formatUINumber,
+  },
+  {
+    key: 'tasks_dispatched',
+    title: 'Tasks dispatched',
+    path: 'agent.tasks.dispatched.total',
+    render: formatUINumber,
+  },
+  {
+    key: 'tasks_failed',
+    title: 'Tasks failed',
+    path: 'agent.tasks.failed.total',
     render: formatUINumber,
   },
   {
@@ -196,52 +218,110 @@ interface AgentStatsBodyProps {
   statistics?: AgentStatistics;
 }
 
+/** Statistics for a given agent, kept together so a stale fetch result or a
+ * still-in-flight one can never be mistaken for the currently viewed agent's
+ * data once `agent.id` changes. */
+interface AgentStatisticsForAgent {
+  agentID: string;
+  statistics?: AgentStatistics;
+}
+
 const AgentStatsBody = withDataSourceInitiated({})(
-  ({ agentID, loading, statistics }: AgentStatsBodyProps) => (
-    <>
-      <WzRibbon
-        items={statsAgents.map(stat => ({
-          key: stat.key,
-          label: stat.title,
-          isLoading: loading,
-          value: stat.render
-            ? stat.render(get(statistics, stat.path))
-            : get(statistics, stat.path),
-        }))}
-      />
-      <EuiSpacer size='xxl' />
-      <EuiFlexGroup>
-        <EuiFlexItem>
-          <AgentStatTable
-            columns={tableColumns}
-            loading={loading}
-            title='Global'
-            start={statistics?.logcollector?.global?.start}
-            end={statistics?.logcollector?.global?.end}
-            items={toList(statistics?.logcollector?.global?.files)}
-            exportCSVFilename={`agent-stats-${agentID}-logcollector-global`}
+  ({ agentID, loading, statistics }: AgentStatsBodyProps) => {
+    const dispatch = useDispatch();
+    const openAgentSelector = () => dispatch(showExploreAgentModalGlobal(true));
+
+    // Keep showing the last settled view while a fetch is in flight, to avoid
+    // flickering to a different layout before the new data is ready.
+    const [settled, setSettled] = useState<AgentStatisticsForAgent | undefined>(
+      loading ? undefined : { agentID, statistics },
+    );
+    useEffect(() => {
+      if (!loading) {
+        setSettled({ agentID, statistics });
+      }
+    }, [loading, agentID, statistics]);
+
+    if (!settled) {
+      return null;
+    }
+
+    return (
+      <>
+        {!settled.statistics ? (
+          <EuiEmptyPrompt
+            iconType='watchesApp'
+            title={<h2>No statistics reported</h2>}
+            body={
+              <p>
+                Statistics are not available for this agent. Confirm that
+                statistics collection is enabled in its configuration file.
+              </p>
+            }
+            actions={
+              <EuiButton color='primary' fill onClick={openAgentSelector}>
+                Select agent
+              </EuiButton>
+            }
           />
-        </EuiFlexItem>
-        <EuiFlexItem>
-          <AgentStatTable
-            columns={tableColumns}
-            loading={loading}
-            title='Interval'
-            start={statistics?.logcollector?.interval?.start}
-            end={statistics?.logcollector?.interval?.end}
-            items={toList(statistics?.logcollector?.interval?.files)}
-            exportCSVFilename={`agent-stats-${agentID}-logcollector-interval`}
-          />
-        </EuiFlexItem>
-      </EuiFlexGroup>
-    </>
-  ),
+        ) : (
+          <>
+            <WzRibbon
+              items={statsAgents.map(stat => ({
+                key: stat.key,
+                label: stat.title,
+                isLoading: false,
+                value: stat.render
+                  ? stat.render(get(settled.statistics, stat.path))
+                  : get(settled.statistics, stat.path),
+              }))}
+            />
+            <EuiSpacer size='xxl' />
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <AgentStatTable
+                  columns={tableColumns}
+                  loading={false}
+                  title='Global'
+                  start={settled.statistics?.logcollector?.global?.start}
+                  end={settled.statistics?.logcollector?.global?.end}
+                  items={toList(
+                    settled.statistics?.logcollector?.global?.files,
+                  )}
+                  exportCSVFilename={`agent-stats-${settled.agentID}-logcollector-global`}
+                />
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <AgentStatTable
+                  columns={tableColumns}
+                  loading={false}
+                  title='Interval'
+                  start={settled.statistics?.logcollector?.interval?.start}
+                  end={settled.statistics?.logcollector?.interval?.end}
+                  items={toList(
+                    settled.statistics?.logcollector?.interval?.files,
+                  )}
+                  exportCSVFilename={`agent-stats-${settled.agentID}-logcollector-interval`}
+                />
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </>
+        )}
+      </>
+    );
+  },
 );
+
+// Keeps the loading progress bar visible for at least this long. Real fetches
+// resolve almost instantly against local/sample data, so without this floor the
+// bar never gets to paint a single frame before the view swaps.
+const MIN_LOADING_DURATION_MS = 400;
 
 export function AgentStats(props: AgentStatsProps) {
   const { agent } = props;
   const [loading, setLoading] = useState(true);
-  const [statistics, setStatistics] = useState<AgentStatistics>();
+  const [statisticsForAgent, setStatisticsForAgent] =
+    useState<AgentStatisticsForAgent>();
   const dataSource = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: AgentStatsDataSource,
     repository: new AgentStatsDataSourceRepository(),
@@ -252,6 +332,7 @@ export function AgentStats(props: AgentStatsProps) {
     }
     (async function () {
       setLoading(true);
+      const startedAt = Date.now();
       try {
         const response = await dataSource.fetchData({
           query: {
@@ -262,9 +343,11 @@ export function AgentStats(props: AgentStatsProps) {
           // previous one, so there is only one document per agent
           pagination: { pageIndex: 0, pageSize: 1 },
         });
-        setStatistics(
-          response?.hits?.hits?.[0]?._source?.wazuh?.agent?.statistics,
-        );
+        setStatisticsForAgent({
+          agentID: agent.id,
+          statistics:
+            response?.hits?.hits?.[0]?._source?.wazuh?.agent?.statistics,
+        });
       } catch (error) {
         const options: UIErrorLog = {
           context: `${AgentStats.name}.useEffect`,
@@ -278,20 +361,36 @@ export function AgentStats(props: AgentStatsProps) {
         };
         getErrorOrchestrator().handleError(options);
       } finally {
+        const elapsedMs = Date.now() - startedAt;
+        if (elapsedMs < MIN_LOADING_DURATION_MS) {
+          await new Promise(resolve =>
+            setTimeout(resolve, MIN_LOADING_DURATION_MS - elapsedMs),
+          );
+        }
         setLoading(false);
       }
     })();
   }, [dataSource.isLoading, dataSource.fetchFilters, agent.id]);
+  const hasCurrentAgentStatistics = statisticsForAgent?.agentID === agent.id;
+  const isLoading =
+    loading || dataSource.isLoading || !hasCurrentAgentStatistics;
   return (
-    <EuiPage>
-      <EuiPageBody>
-        <AgentStatsBody
-          agentID={agent.id}
-          loading={loading || dataSource.isLoading}
-          statistics={statistics}
-          dataSource={dataSource}
-        />
-      </EuiPageBody>
-    </EuiPage>
+    <>
+      {isLoading && <EuiProgress size='xs' color='primary' />}
+      <EuiPage>
+        <EuiPageBody>
+          <AgentStatsBody
+            agentID={agent.id}
+            loading={isLoading}
+            statistics={
+              hasCurrentAgentStatistics
+                ? statisticsForAgent?.statistics
+                : undefined
+            }
+            dataSource={dataSource}
+          />
+        </EuiPageBody>
+      </EuiPage>
+    </>
   );
 }

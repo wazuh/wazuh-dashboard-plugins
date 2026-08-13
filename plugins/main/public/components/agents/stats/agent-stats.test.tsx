@@ -9,14 +9,24 @@ import { AgentStatTable } from './table';
 const agent002 = '002';
 const agent001 = '001';
 
+// The component enforces a minimum loading duration (real setTimeout) so the
+// progress bar has time to paint before swapping views -- fake timers let the
+// tests fast-forward through it deterministically instead of waiting for real time.
+const MIN_LOADING_DURATION_MS = 400;
+
 const useDataSourceMock = useDataSource as jest.Mock;
 const AgentStatTableMock = AgentStatTable as jest.Mock;
-
-const fetchDataMock = jest.fn().mockResolvedValue(undefined);
 
 const statisticsResponse = (statistics: any) => ({
   hits: { hits: [{ _source: { wazuh: { agent: { statistics } } } }] },
 });
+
+const noDocumentResponse = { hits: { hits: [] } };
+
+// Default: an empty-but-present statistics document (not "no data at all" -- see
+// `noDocumentResponse` for that case), so every test below exercises the normal
+// ribbon/table rendering unless it opts into a specific fixture.
+const fetchDataMock = jest.fn().mockResolvedValue(statisticsResponse({}));
 
 jest.mock('../../common/data-source', () => ({
   useDataSource: jest.fn(),
@@ -49,8 +59,20 @@ jest.mock('../prompts', () => ({
   __esModule: true,
 }));
 
+jest.mock('react-redux', () => ({
+  useDispatch: () => jest.fn(),
+  __esModule: true,
+}));
+
+jest.mock('../../../redux/actions/appStateActions', () => ({
+  showExploreAgentModalGlobal: (value: boolean) => ({
+    type: 'SHOW_EXPLORE_AGENT_MODAL_GLOBAL',
+    payload: value,
+  }),
+}));
+
 jest.mock('../../../utils/applications', () => ({
-  endpointsSummary: {
+  endpointSummary: {
     id: 'endpoints-summary',
     breadcrumbLabel: 'Endpoints',
   },
@@ -69,8 +91,9 @@ jest.mock('./table', () => ({
 
 describe('AgentStats', () => {
   beforeEach(() => {
+    jest.useFakeTimers();
     fetchDataMock.mockClear();
-    fetchDataMock.mockResolvedValue(undefined);
+    fetchDataMock.mockResolvedValue(statisticsResponse({}));
     AgentStatTableMock.mockClear();
     useDataSourceMock.mockReturnValue({
       isLoading: false,
@@ -81,55 +104,78 @@ describe('AgentStats', () => {
     });
   });
 
-  it('should not render agent info ribbon', async () => {
-    await act(async () => {
-      const { container } = render(
-        <AgentStats
-          agent={{
-            id: '002',
-          }}
-        />,
-      );
+  afterEach(() => {
+    jest.useRealTimers();
+  });
 
-      const agentInfoRibbon = container.querySelector(
-        queryDataTestAttr('agent-info'),
-      );
-      expect(agentInfoRibbon).toBeFalsy();
+  // Renders/re-renders and then fast-forwards past the minimum loading duration,
+  // so the assertions run against the settled (post-fetch) view.
+  const renderAndSettle = async (agent: { id: string }) => {
+    let result: RenderResult;
+    await act(async () => {
+      result = render(<AgentStats agent={agent} />);
     });
+    await act(async () => {
+      jest.advanceTimersByTime(MIN_LOADING_DURATION_MS);
+    });
+    return result!;
+  };
+
+  const rerenderAndSettle = async (
+    rerender: RenderResult['rerender'],
+    agent: { id: string },
+  ) => {
+    await act(async () => {
+      rerender(<AgentStats agent={agent} />);
+    });
+    await act(async () => {
+      jest.advanceTimersByTime(MIN_LOADING_DURATION_MS);
+    });
+  };
+
+  it('should not render agent info ribbon', async () => {
+    const { container } = await renderAndSettle({ id: '002' });
+
+    const agentInfoRibbon = container.querySelector(
+      queryDataTestAttr('agent-info'),
+    );
+    expect(agentInfoRibbon).toBeFalsy();
   });
 
   it('should render stats info ribbon', async () => {
-    let container: HTMLElement;
-
-    await act(async () => {
-      ({ container } = render(<AgentStats agent={{ id: '002' }} />));
-    });
+    const { container } = await renderAndSettle({ id: '002' });
 
     expect(
-      container!.querySelector(queryDataTestAttr('ribbon-item-status')),
+      container.querySelector(queryDataTestAttr('ribbon-item-status')),
     ).toBeTruthy();
 
     expect(
-      container!.querySelector(queryDataTestAttr('ribbon-item-messages_count')),
+      container.querySelector(queryDataTestAttr('ribbon-item-messages_count')),
     ).toBeTruthy();
 
     expect(
-      container!.querySelector(queryDataTestAttr('ribbon-item-last_keepalive')),
+      container.querySelector(queryDataTestAttr('ribbon-item-last_keepalive')),
     ).toBeTruthy();
 
     expect(
-      container!.querySelectorAll(
+      container.querySelector(
+        queryDataTestAttr('ribbon-item-tasks_dispatched'),
+      ),
+    ).toBeTruthy();
+
+    expect(
+      container.querySelector(queryDataTestAttr('ribbon-item-tasks_failed')),
+    ).toBeTruthy();
+
+    expect(
+      container.querySelectorAll(
         queryDataTestAttr('ribbon-item-', CSS.Attribute.Substring),
       ),
-    ).toHaveLength(3);
+    ).toHaveLength(5);
   });
 
   it('should query the agent statistics index scoped to the agent', async () => {
-    let rerender: RenderResult['rerender'];
-
-    await act(async () => {
-      ({ rerender } = render(<AgentStats agent={{ id: agent002 }} />));
-    });
+    const { rerender } = await renderAndSettle({ id: agent002 });
 
     expect(fetchDataMock).toHaveBeenCalledTimes(1);
     expect(fetchDataMock.mock.calls[0][0]).toEqual({
@@ -142,9 +188,7 @@ describe('AgentStats', () => {
 
     fetchDataMock.mockClear();
 
-    await act(async () => {
-      rerender(<AgentStats agent={{ id: agent001 }} />);
-    });
+    await rerenderAndSettle(rerender, { id: agent001 });
 
     expect(fetchDataMock).toHaveBeenCalledTimes(1);
     expect(fetchDataMock.mock.calls[0][0].query.query).toEqual(
@@ -161,9 +205,7 @@ describe('AgentStats', () => {
       error: null,
     });
 
-    await act(async () => {
-      render(<AgentStats agent={{ id: agent002 }} />);
-    });
+    await renderAndSettle({ id: agent002 });
 
     expect(fetchDataMock).not.toHaveBeenCalled();
   });
@@ -175,18 +217,18 @@ describe('AgentStats', () => {
           status: 'connected',
           last_keepalive: '2026-08-02T10:06:50Z',
           messages: { count: 12543 },
+          tasks: {
+            dispatched: { total: 4820 },
+            failed: { total: 3 },
+          },
         },
       }),
     );
 
-    let container: HTMLElement;
-
-    await act(async () => {
-      ({ container } = render(<AgentStats agent={{ id: agent002 }} />));
-    });
+    const { container } = await renderAndSettle({ id: agent002 });
 
     const ribbonItemValue = (key: string) =>
-      container!.querySelector(queryDataTestAttr(`ribbon-item-${key}`))
+      container.querySelector(queryDataTestAttr(`ribbon-item-${key}`))
         ?.textContent;
 
     expect(ribbonItemValue('status')).toContain('connected');
@@ -194,17 +236,28 @@ describe('AgentStats', () => {
     expect(ribbonItemValue('last_keepalive')).toContain(
       'formatted-2026-08-02T10:06:50Z',
     );
+    expect(ribbonItemValue('tasks_dispatched')).toContain('4,820');
+    expect(ribbonItemValue('tasks_failed')).toContain('3');
+  });
+
+  it('should show an empty state instead of the ribbon/tables when the agent has no statistics document', async () => {
+    fetchDataMock.mockResolvedValue(noDocumentResponse);
+
+    const { container } = await renderAndSettle({ id: agent002 });
+
+    expect(
+      container.querySelectorAll(
+        queryDataTestAttr('ribbon-item-', CSS.Attribute.Substring),
+      ),
+    ).toHaveLength(0);
+    expect(container.textContent).toContain('No statistics reported');
   });
 
   it('should render - in the stats without value', async () => {
-    let container: HTMLElement;
-
-    await act(async () => {
-      ({ container } = render(<AgentStats agent={{ id: agent002 }} />));
-    });
+    const { container } = await renderAndSettle({ id: agent002 });
 
     expect(
-      container!.querySelector(queryDataTestAttr('ribbon-item-status'))
+      container.querySelector(queryDataTestAttr('ribbon-item-status'))
         ?.textContent,
     ).toContain('-');
   });
@@ -228,20 +281,14 @@ describe('AgentStats', () => {
       },
     ];
 
-    let rerender: RenderResult['rerender'];
-
-    await act(async () => {
-      ({ rerender } = render(<AgentStats agent={{ id: agent002 }} />));
-    });
+    const { rerender } = await renderAndSettle({ id: agent002 });
 
     expect(AgentStatTableMock.mock.calls[0][0].columns).toEqual(mockColumns);
     expect(AgentStatTableMock.mock.calls[1][0].columns).toEqual(mockColumns);
 
     AgentStatTableMock.mockClear();
 
-    await act(async () => {
-      rerender(<AgentStats agent={{ id: agent001 }} />);
-    });
+    await rerenderAndSettle(rerender, { id: agent001 });
 
     expect(AgentStatTableMock.mock.calls[0][0].columns).toEqual(mockColumns);
     expect(AgentStatTableMock.mock.calls[1][0].columns).toEqual(mockColumns);
@@ -251,11 +298,7 @@ describe('AgentStats', () => {
     const mockDataStatLogcollectorTitle = 'Global';
     const mockDataStatAgentTitle = 'Interval';
 
-    let rerender: RenderResult['rerender'];
-
-    await act(async () => {
-      ({ rerender } = render(<AgentStats agent={{ id: agent002 }} />));
-    });
+    const { rerender } = await renderAndSettle({ id: agent002 });
 
     expect(AgentStatTableMock.mock.calls[0][0].title).toEqual(
       mockDataStatLogcollectorTitle,
@@ -266,9 +309,7 @@ describe('AgentStats', () => {
 
     AgentStatTableMock.mockClear();
 
-    await act(async () => {
-      rerender(<AgentStats agent={{ id: agent001 }} />);
-    });
+    await rerenderAndSettle(rerender, { id: agent001 });
 
     expect(AgentStatTableMock.mock.calls[0][0].title).toEqual(
       mockDataStatLogcollectorTitle,
@@ -299,9 +340,7 @@ describe('AgentStats', () => {
       }),
     );
 
-    await act(async () => {
-      render(<AgentStats agent={{ id: agent002 }} />);
-    });
+    await renderAndSettle({ id: agent002 });
 
     const lastCallProps = (title: string) =>
       AgentStatTableMock.mock.calls
@@ -332,9 +371,7 @@ describe('AgentStats', () => {
       }),
     );
 
-    await act(async () => {
-      render(<AgentStats agent={{ id: agent002 }} />);
-    });
+    await renderAndSettle({ id: agent002 });
 
     const globalProps = AgentStatTableMock.mock.calls
       .map(([props]) => props)
@@ -350,29 +387,33 @@ describe('AgentStats', () => {
       suffix: 'global' | 'interval',
     ) => `agent-stats-${agentID}-logcollector-${suffix}`;
 
-    let rerender: RenderResult['rerender'];
+    // The previous agent's view stays rendered while the new one loads (by
+    // design, to avoid flickering), so intermediate calls can still carry the
+    // outgoing agent's filename -- only the last call per table is guaranteed
+    // to reflect the agent that ends up settled.
+    const lastExportCSVFilename = (title: string) =>
+      AgentStatTableMock.mock.calls
+        .map(([props]) => props)
+        .filter(props => props.title === title)
+        .pop()?.exportCSVFilename;
 
-    await act(async () => {
-      ({ rerender } = render(<AgentStats agent={{ id: agent002 }} />));
-    });
+    const { rerender } = await renderAndSettle({ id: agent002 });
 
-    expect(AgentStatTableMock.mock.calls[0][0].exportCSVFilename).toEqual(
+    expect(lastExportCSVFilename('Global')).toEqual(
       mockExportCSVFilename(agent002, 'global'),
     );
-    expect(AgentStatTableMock.mock.calls[1][0].exportCSVFilename).toEqual(
+    expect(lastExportCSVFilename('Interval')).toEqual(
       mockExportCSVFilename(agent002, 'interval'),
     );
 
     AgentStatTableMock.mockClear();
 
-    await act(async () => {
-      rerender(<AgentStats agent={{ id: agent001 }} />);
-    });
+    await rerenderAndSettle(rerender, { id: agent001 });
 
-    expect(AgentStatTableMock.mock.calls[0][0].exportCSVFilename).toEqual(
+    expect(lastExportCSVFilename('Global')).toEqual(
       mockExportCSVFilename(agent001, 'global'),
     );
-    expect(AgentStatTableMock.mock.calls[1][0].exportCSVFilename).toEqual(
+    expect(lastExportCSVFilename('Interval')).toEqual(
       mockExportCSVFilename(agent001, 'interval'),
     );
   });
