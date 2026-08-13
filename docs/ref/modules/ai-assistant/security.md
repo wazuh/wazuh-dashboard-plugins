@@ -26,6 +26,51 @@ writes are gated on `wazuh-core`'s `dashboardSecurity.isAdministratorUser` check
 never returns a key, only `hasApiKey`. The Settings page probes `GET /settings/access` on mount
 to warn non-admins up front instead of failing on save.
 
+## Required indexer permissions
+
+The RBAC boundary above is enforced by the calling user's own indexer backend role, not by this
+plugin — the tables below are a practical breakdown of which permissions a role needs for each use
+case, cross-referenced against the current storage backend: the
+`wazuh-ai-assistant-sessions` conversation data stream, the indexer's own settings/providers API
+(`/_plugins/_setup/ai_assistant/...`), and the `ai-assistant-sessions-policy` ISM policy that backs
+conversation retention. The `cluster:admin/opendistro/ism/...` and
+`indices:admin/opensearch/ism/...` action names belong to the indexer's own ISM plugin — they
+aren't defined in this repo but are required all the same.
+
+### Minimal access to the dashboard
+
+| Permission                 | Type    | Why                                                                                                                      |
+| -------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `cluster_composite_ops_ro` | Cluster | Baseline read access every user's backend role needs against the indexer before reaching any app, AI Assistant included. |
+
+### AI chat
+
+Chat reads run `asCurrentUser`, never a privileged internal identity, so every permission below is
+checked against the chatting user's own backend role, not just an admin's.
+
+| Permission                                                                                                                                                                                                                                       | Type    | Why                                                                                                                                                                   |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Index `read` (dls: `{"term": {"user": "${user.name}"}}`) + `write` (dsl: `{"term": {"user": "${user.name}"}}`) on `wazuh-ai-assistant-sessions*`, `.ds-wazuh-ai-assistant-sessions-*` — or a bundled `wazuh_ai_assitant` role providing the same | Index   | Persist and retrieve the caller's own conversation turns. Enforced twice: indexer document-level security (a `{"term": {"user": "${user.name}"}}` filter on the role) |
+| `plugin:wazuh/ai_assistant/settings/read`                                                                                                                                                                                                        | Cluster | Resolve the default provider and privacy settings needed to start or continue a turn (`GET /_plugins/_setup/ai_assistant/settings`).                                  |
+| `cluster:admin/opendistro/ism/policy/get`                                                                                                                                                                                                        | Cluster | Read the `ai-assistant-sessions-policy` ISM policy — extract the value for `conversationsRetentionDays` setting                                                       |
+
+### Manage settings (providers, privacy, conversation history)
+
+Settings and providers live in two backends: the indexer's settings API, and the
+`ai-assistant-sessions-policy` ISM policy (conversation retention only).
+
+| Permission                                                                                                         | Type    | Why                                                                                     |
+| ------------------------------------------------------------------------------------------------------------------ | ------- | --------------------------------------------------------------------------------------- |
+| `plugin:wazuh/ai_assistant/settings/read`                                                                          | Cluster | Read providers and settings (`GET /_plugins/_setup/ai_assistant/{settings,providers}`). |
+| `plugin:wazuh/ai_assistant/settings/write`                                                                         | Cluster | Create, update, or delete providers, and write settings, on the same endpoints.         |
+| `cluster:admin/opendistro/ism/policy/get`                                                                          | Cluster | Read `ai-assistant-sessions-policy` to display the current retention window.            |
+| `cluster:admin/opendistro/ism/policy/write`, `cluster:admin/opendistro/ism/managedindex/change`                    | Cluster | Edit `ai-assistant-sessions-policy` when an user changes the retention window.          |
+| `indices:admin/opensearch/ism/managedindex` on `wazuh-ai-assistant-sessions*`, `.ds-wazuh-ai-assistant-sessions-*` | Index   | Re-apply the edited policy to the sessions data stream's backing indices.               |
+
+The dashboard-level admin gate above decides who _sees_ working save controls in the Settings UI;
+these are the indexer-side permissions that make the write itself succeed once an admin's own
+backend role is checked.
+
 ## SSRF guard on outbound provider traffic
 
 Described in [Providers](./providers.md#outbound-url-guard-ssrf): scheme restrictions, blocked
