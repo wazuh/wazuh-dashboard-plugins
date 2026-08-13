@@ -16,8 +16,11 @@ function spec(overrides: Partial<TableSpec> = {}): TableSpec {
 }
 
 describe('ResultTable', () => {
-  it('shows a collapsed accordion for tables with more than 10 rows, mounting no table rows until opened', () => {
-    const manyRows = Array.from({ length: 11 }, (_unused, i) => ({
+  it('shows a collapsed accordion for a pathological row count, mounting no table rows until opened', () => {
+    // Above AUTO_EXPAND_ROW_THRESHOLD. The ceiling moved from 10 to 200 once the card gained its
+    // own height cap and internal scroll: length no longer costs the reader anything, and the
+    // design's canonical Screen 2 is a 26-row table shown open.
+    const manyRows = Array.from({ length: 201 }, (_unused, i) => ({
       agent: `agent-${i}`,
     }));
     const { container } = render(
@@ -29,12 +32,12 @@ describe('ResultTable', () => {
       />,
     );
 
-    expect(screen.getByText('Results (11 rows)')).toBeInTheDocument();
+    expect(screen.getByText('Results (201 rows)')).toBeInTheDocument();
     // Lazy-mount: nothing beneath the (collapsed) accordion header yet.
     expect(container.querySelector('table')).toBeNull();
   });
 
-  it('auto-expands (and mounts the table) for 10 rows or fewer', () => {
+  it('auto-expands (and mounts the table) at or below the threshold', () => {
     const { container } = render(
       <ResultTable
         spec={spec({
@@ -48,8 +51,10 @@ describe('ResultTable', () => {
     expect(screen.getByText('web-01')).toBeInTheDocument();
   });
 
-  it('mounts the table once a previously-collapsed accordion (>10 rows) is opened', () => {
-    const manyRows = Array.from({ length: 12 }, (_unused, i) => ({
+  it('mounts the table once a previously-collapsed accordion is opened', () => {
+    // 201 rows: above the threshold, so this mounts collapsed and the click below is what proves
+    // the body is lazily mounted rather than merely hidden.
+    const manyRows = Array.from({ length: 201 }, (_unused, i) => ({
       agent: `agent-${i}`,
     }));
     const { container } = render(
@@ -62,7 +67,7 @@ describe('ResultTable', () => {
     );
 
     expect(container.querySelector('table')).toBeNull();
-    fireEvent.click(screen.getByText('Results (12 rows)'));
+    fireEvent.click(screen.getByText('Results (201 rows)'));
     expect(container.querySelector('table')).not.toBeNull();
     expect(screen.getByText('agent-0')).toBeInTheDocument();
   });
@@ -133,7 +138,6 @@ describe('ResultTable', () => {
 
     it('shows a working "next page" control that reveals the next slice of rows', () => {
       render(<ResultTable spec={thirtyRowSpec()} />);
-      fireEvent.click(screen.getByText('Results (30 rows)'));
 
       expect(screen.getByText('Page 1 of 6')).toBeInTheDocument();
       expect(screen.getByText('agent-0')).toBeInTheDocument();
@@ -148,7 +152,6 @@ describe('ResultTable', () => {
 
     it('disables "previous page" on the first page and "next page" on the last page', () => {
       render(<ResultTable spec={thirtyRowSpec()} />);
-      fireEvent.click(screen.getByText('Results (30 rows)'));
 
       expect(
         screen.getByRole('button', { name: 'Previous page' }),
@@ -167,7 +170,6 @@ describe('ResultTable', () => {
 
     it('changing rows-per-page resets back to page 1', () => {
       render(<ResultTable spec={thirtyRowSpec()} />);
-      fireEvent.click(screen.getByText('Results (30 rows)'));
 
       fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
       expect(screen.getByText('Page 2 of 6')).toBeInTheDocument();
