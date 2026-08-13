@@ -369,9 +369,12 @@ const ProvenanceChip: React.FC<{ chip: ResultTableProvenanceChip }> = ({
           code block stays for the case where there is something to read and copy. */}
       {Object.keys(chip.argumentsJson).length === 0 ? (
         <EuiText size='xs' color='subdued'>
-          {i18n.translate('wazuhAiAssistant.resultTable.provenanceNoArguments', {
-            defaultMessage: 'Called with no parameters.',
-          })}
+          {i18n.translate(
+            'wazuhAiAssistant.resultTable.provenanceNoArguments',
+            {
+              defaultMessage: 'Called with no parameters.',
+            },
+          )}
         </EuiText>
       ) : (
         <EuiCodeBlock language='json' paddingSize='s' fontSize='s' isCopyable>

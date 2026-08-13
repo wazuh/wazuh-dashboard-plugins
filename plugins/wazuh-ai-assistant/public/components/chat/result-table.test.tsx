@@ -306,7 +306,9 @@ describe('ResultTable', () => {
         ).not.toBeNull(),
       );
       expect(screen.getByText('get_agents')).toBeInTheDocument();
-      expect(screen.getByText(/called with no parameters/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/called with no parameters/i),
+      ).toBeInTheDocument();
       expect(document.querySelector('.euiCodeBlock')).toBeNull();
     });
 
