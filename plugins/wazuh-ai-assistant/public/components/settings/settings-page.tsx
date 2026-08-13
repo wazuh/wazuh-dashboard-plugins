@@ -462,28 +462,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       );
   };
 
-  const handleTest = async (provider: ProviderSummary) => {
-    setTestingIds(current => new Set(current).add(provider.id));
-    try {
-      const result = await service.test(provider.id);
-      setTestResults(current => ({
-        ...current,
-        [provider.id]: outcomeFromTestResult(result),
-      }));
-    } catch (testError) {
-      setTestResults(current => ({
-        ...current,
-        [provider.id]: outcomeFromTestError(testError),
-      }));
-    } finally {
-      setTestingIds(current => {
-        const next = new Set(current);
-        next.delete(provider.id);
-        return next;
-      });
-    }
-  };
-
   useEffect(() => {
     service
       .list()
@@ -545,7 +523,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       setIsFormOpen(false);
       reload();
       onProvidersChanged();
-      handleTest(saved);
+      handleTest(saved, { manual: true });
       core.notifications.toasts.addSuccess(
         editingProvider
           ? i18n.translate('wazuhAiAssistant.settings.updateSuccess', {
