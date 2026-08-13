@@ -152,9 +152,11 @@ function toRecord(
 }
 
 /**
- * Version-conflict detection for the optimistic-concurrency PUT below: when the request carries
- * `expectedVersion` and it no longer matches what is stored, `updateConversation`'s `occ` option
- * makes OpenSearch reject the write with a `ResponseError` instead of applying it. That error's
+ * Version-conflict detection for the optimistic-concurrency PUT below: `updateConversation`'s
+ * required `occ` argument (the client's `expectedVersion` when present, otherwise the PUT route's
+ * own just-fetched version — see that route's doc comment) makes OpenSearch reject the write with
+ * a `ResponseError` instead of applying it whenever the checked pair no longer matches what is
+ * stored. That error's
  * `.statusCode` getter reads the response body's numeric `status` (see
  * `@opensearch-project/opensearch`'s `lib/errors.js`), which is 409 for a real
  * `version_conflict_engine_exception`. Duck-typed rather than importing that error class, purely
@@ -287,11 +289,13 @@ const updateBodySchema = schema.object({
   messages: schema.arrayOf(chatMessageSchema, {
     maxSize: MAX_MESSAGES_PER_CONVERSATION,
   }),
-  /** When present and decodable (`conversation-store.ts`'s `decodeVersion`), forwarded to
-   * `updateConversation` as `occ` so a write against a since-changed document 409s instead of
-   * applying (`isVersionConflictError` above translates that into the response). When absent (or
-   * undecodable), the update is unconditional — the exact pre-fix call shape — so an older client
-   * that has never heard of `expectedVersion` keeps its current last-write-wins behavior unchanged. */
+  /** When present and decodable (`conversation-store.ts`'s `decodeVersion`), checked against the
+   * stored document so a write since the CLIENT's own last load 409s instead of applying
+   * (`isVersionConflictError` above translates that into the response). When absent (or
+   * undecodable) — an older client that predates this field, or one that simply omits it — the
+   * PUT route falls back to the version it just read for itself: the data stream requires SOME
+   * optimistic-concurrency pair on every write to a backing index (see `updateConversation`'s doc
+   * comment), so there is no unconditional-overwrite option available at all any more. */
   expectedVersion: schema.maybe(schema.string()),
 });
 
@@ -382,6 +386,9 @@ export function registerConversationRoutes(
         user: owner,
         title: request.body.title,
         created_at: nowIso,
+        // Same value as created_at — see ConversationDocument's doc comment in
+        // conversation-store.ts for why the data stream requires this field at all.
+        '@timestamp': nowIso,
         updated_at: nowIso,
         messages: request.body.messages as PersistedChatMessage[],
       };
@@ -420,11 +427,15 @@ export function registerConversationRoutes(
   // thing every time" convention); `created_at`/`user` are carried over untouched, `updated_at` is
   // always server-recomputed (never trusts a client-sent timestamp).
   //
-  // Optimistic concurrency (same conversation open in two tabs previously last-write-wins,
-  // silently erasing the faster tab's turns). Old-client-vs-new-server is fully backward
-  // compatible: `expectedVersion` is `schema.maybe(...)`, so a client built before this fix that
-  // never sends it gets the exact pre-fix call shape (unconditional overwrite) — nothing here
-  // changes for it.
+  // Optimistic concurrency is not optional here, in either sense of the word: a data stream
+  // rejects an unconditional `index` request sent directly against one of its backing indices
+  // outright (see `updateConversation`'s doc comment), so `if_seq_no`/`if_primary_term` are always
+  // sent below. When the client supplied `expectedVersion` (same conversation open in two tabs;
+  // this catches a write since the client's own last load, not just since this request started),
+  // that is the pair checked. When it did not (an older client that predates `expectedVersion`, or
+  // this request simply not carrying one), this request's own just-fetched `existing.seqNo`/
+  // `primaryTerm` is used instead — there is no client version to honor, but the platform still
+  // requires SOME pair, and either way a genuine conflict gets the same 409 below.
   router.put(
     {
       path: API_PATHS.CONVERSATION_BY_ID(`{id}`),
@@ -449,25 +460,42 @@ export function registerConversationRoutes(
       const updatedAt = new Date().toISOString();
       const messages = request.body.messages as PersistedChatMessage[];
       const { expectedVersion } = request.body;
-      const occ = expectedVersion ? decodeVersion(expectedVersion) : undefined;
+      const requestedOcc = expectedVersion
+        ? decodeVersion(expectedVersion)
+        : undefined;
+      // Falls back to this request's own just-fetched version when the client sent no (decodable)
+      // expectedVersion — see the router.put doc comment above for why this fallback exists at
+      // all (the platform, not client opt-in, is what requires SOME pair here).
+      const occ = requestedOcc ?? {
+        seqNo: existing.seqNo,
+        primaryTerm: existing.primaryTerm,
+      };
+
+      // updateConversation writes this as a FULL overwrite, not a partial patch (see that
+      // function's doc comment for why: DLS on this alias unconditionally rejects the partial
+      // `_update` API) — carry over every field this request isn't changing (user, created_at,
+      // @timestamp) from the already-resolved `existing.source` rather than omitting them.
+      const nextDocument: ConversationDocument = {
+        ...existing.source,
+        title: request.body.title,
+        messages,
+        updated_at: updatedAt,
+      };
 
       let written;
       try {
-        written = await updateConversation(
-          context,
-          existing,
-          { title: request.body.title, messages, updated_at: updatedAt },
-          occ
-            ? { ifSeqNo: occ.seqNo, ifPrimaryTerm: occ.primaryTerm }
-            : undefined,
-        );
+        written = await updateConversation(context, existing, nextDocument, {
+          ifSeqNo: occ.seqNo,
+          ifPrimaryTerm: occ.primaryTerm,
+        });
       } catch (error) {
-        // Only a request that OPTED IN (sent a decodable expectedVersion) can ever hit this —
-        // without it, updateConversation above is called with no occ option at all, i.e. no
-        // version check. Any other failure (network/mapping/etc.) is not this route's problem to
-        // discriminate further; it falls through to withInternalErrorHandling's 500, same as
-        // every other unexpected error in this file.
-        if (occ && isVersionConflictError(error)) {
+        // A conflict is meaningful here regardless of which pair triggered it (the client's own
+        // `expectedVersion`, or this request's own fallback read) — either way, something else
+        // wrote to this conversation after the version being checked against, so the same
+        // actionable 409 applies. Any other failure (network/mapping/etc.) is not this route's
+        // problem to discriminate further; it falls through to withInternalErrorHandling's 500,
+        // same as every other unexpected error in this file.
+        if (isVersionConflictError(error)) {
           return response.customError({
             statusCode: 409,
             body: {
@@ -482,12 +510,7 @@ export function registerConversationRoutes(
       return response.ok({
         body: toRecord(
           request.params.id,
-          {
-            ...existing.source,
-            title: request.body.title,
-            messages,
-            updated_at: updatedAt,
-          },
+          nextDocument,
           encodeVersion(written.seqNo, written.primaryTerm),
         ),
       });
