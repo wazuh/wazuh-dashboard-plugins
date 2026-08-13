@@ -101,7 +101,11 @@ const MS_PER_DAY = 86400000;
  * the time-of-day component — a conversation updated at 23:59 and one updated the next day at
  * 00:01 must land in different buckets even though under two hours separate them. */
 function startOfLocalDay(date: Date): number {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+  return new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+  ).getTime();
 }
 
 interface ConversationGroup {
@@ -143,9 +147,12 @@ function dateBucketKey(iso: string, now: Date): string {
  * so this never bakes locale-insensitive uppercasing into the translated string itself. */
 function dateBucketLabel(key: string, iso: string, now: Date): string {
   if (key === 'today') {
-    return i18n.translate('wazuhAiAssistant.chat.conversations.dateGroup.today', {
-      defaultMessage: 'Today',
-    });
+    return i18n.translate(
+      'wazuhAiAssistant.chat.conversations.dateGroup.today',
+      {
+        defaultMessage: 'Today',
+      },
+    );
   }
   if (key === 'yesterday') {
     return i18n.translate(
@@ -154,9 +161,12 @@ function dateBucketLabel(key: string, iso: string, now: Date): string {
     );
   }
   if (key === 'unknown') {
-    return i18n.translate('wazuhAiAssistant.chat.conversations.dateGroup.unknown', {
-      defaultMessage: 'Earlier',
-    });
+    return i18n.translate(
+      'wazuhAiAssistant.chat.conversations.dateGroup.unknown',
+      {
+        defaultMessage: 'Earlier',
+      },
+    );
   }
   const target = new Date(iso);
   const locale =
@@ -321,9 +331,12 @@ export const ConversationList: React.FC<ConversationListProps> = ({
       <div className='wzConvoRailCollapsed'>
         <EuiButtonIcon
           iconType='plusInCircle'
-          aria-label={i18n.translate('wazuhAiAssistant.chat.conversations.new', {
-            defaultMessage: 'New conversation',
-          })}
+          aria-label={i18n.translate(
+            'wazuhAiAssistant.chat.conversations.new',
+            {
+              defaultMessage: 'New conversation',
+            },
+          )}
           onClick={onNewConversation}
         />
         <EuiButtonIcon

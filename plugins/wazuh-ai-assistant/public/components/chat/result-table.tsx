@@ -604,7 +604,6 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
     [items, pageStart, pageSize],
   );
 
-
   const titleText =
     i18n.translate('wazuhAiAssistant.resultTable.accordionSummary', {
       defaultMessage: 'Results ({count} rows)',
@@ -670,7 +669,10 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
           aria-expanded={isOpen}
           aria-controls={bodyId}
         >
-          <EuiIcon type={isOpen ? 'arrowDown' : 'arrowRight'} aria-hidden='true' />
+          <EuiIcon
+            type={isOpen ? 'arrowDown' : 'arrowRight'}
+            aria-hidden='true'
+          />
           <span>{titleText}</span>
         </button>
         {headerActions}
@@ -713,12 +715,19 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
             gutterSize='s'
           >
             <EuiFlexItem grow={false}>
-              <EuiFlexGroup responsive={false} alignItems='center' gutterSize='xs'>
+              <EuiFlexGroup
+                responsive={false}
+                alignItems='center'
+                gutterSize='xs'
+              >
                 <EuiFlexItem grow={false}>
                   <EuiText size='xs' color='subdued'>
-                    {i18n.translate('wazuhAiAssistant.resultTable.pageSizeLabel', {
-                      defaultMessage: 'Rows per page:',
-                    })}
+                    {i18n.translate(
+                      'wazuhAiAssistant.resultTable.pageSizeLabel',
+                      {
+                        defaultMessage: 'Rows per page:',
+                      },
+                    )}
                   </EuiText>
                 </EuiFlexItem>
                 {PAGE_SIZE_OPTIONS.map(size => (
@@ -738,7 +747,11 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
               </EuiFlexGroup>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
-              <EuiFlexGroup responsive={false} alignItems='center' gutterSize='xs'>
+              <EuiFlexGroup
+                responsive={false}
+                alignItems='center'
+                gutterSize='xs'
+              >
                 <EuiFlexItem grow={false}>
                   <EuiButtonIcon
                     iconType='arrowLeft'
@@ -755,22 +768,30 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
                   <EuiText size='xs' color='subdued'>
-                    {i18n.translate('wazuhAiAssistant.resultTable.pageOfPages', {
-                      defaultMessage: 'Page {page} of {total}',
-                      values: { page: safePageIndex + 1, total: pageCount },
-                    })}
+                    {i18n.translate(
+                      'wazuhAiAssistant.resultTable.pageOfPages',
+                      {
+                        defaultMessage: 'Page {page} of {total}',
+                        values: { page: safePageIndex + 1, total: pageCount },
+                      },
+                    )}
                   </EuiText>
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
                   <EuiButtonIcon
                     iconType='arrowRight'
                     size='s'
-                    aria-label={i18n.translate('wazuhAiAssistant.resultTable.nextPage', {
-                      defaultMessage: 'Next page',
-                    })}
+                    aria-label={i18n.translate(
+                      'wazuhAiAssistant.resultTable.nextPage',
+                      {
+                        defaultMessage: 'Next page',
+                      },
+                    )}
                     isDisabled={safePageIndex >= pageCount - 1}
                     onClick={() =>
-                      setPageIndex(previous => Math.min(pageCount - 1, previous + 1))
+                      setPageIndex(previous =>
+                        Math.min(pageCount - 1, previous + 1),
+                      )
                     }
                   />
                 </EuiFlexItem>

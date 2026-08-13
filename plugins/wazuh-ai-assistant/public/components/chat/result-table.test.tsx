@@ -150,8 +150,12 @@ describe('ResultTable', () => {
       render(<ResultTable spec={thirtyRowSpec()} />);
       fireEvent.click(screen.getByText('Results (30 rows)'));
 
-      expect(screen.getByRole('button', { name: 'Previous page' })).toBeDisabled();
-      expect(screen.getByRole('button', { name: 'Next page' })).not.toBeDisabled();
+      expect(
+        screen.getByRole('button', { name: 'Previous page' }),
+      ).toBeDisabled();
+      expect(
+        screen.getByRole('button', { name: 'Next page' }),
+      ).not.toBeDisabled();
 
       for (let clickCount = 0; clickCount < 5; clickCount += 1) {
         fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
@@ -187,7 +191,8 @@ describe('ResultTable', () => {
       return {
         id: 't1',
         shortLabel: 'Critical findings · 90d',
-        fullLabel: 'get_critical_findings · wazuh-findings-v5-* · now-90d → now',
+        fullLabel:
+          'get_critical_findings · wazuh-findings-v5-* · now-90d → now',
         toolName: 'get_critical_findings',
         argumentsJson: { index_pattern: 'wazuh-findings-v5-*' },
         ...overrides,
@@ -213,7 +218,9 @@ describe('ResultTable', () => {
       // EUI stamps the open-state modifier once it has positioned the panel, which happens a tick
       // after the click rather than synchronously with it — hence waitFor rather than a bare read.
       await waitFor(() =>
-        expect(document.querySelector('.euiPopover__panel-isOpen')).not.toBeNull(),
+        expect(
+          document.querySelector('.euiPopover__panel-isOpen'),
+        ).not.toBeNull(),
       );
 
       fireEvent.click(screen.getByText('Critical findings · 90d'));

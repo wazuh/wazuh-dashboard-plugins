@@ -1900,7 +1900,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               the composer share (layout contract §5) — reads `$wzContentMaxWidth` off the shared
               `_redesign.scss` token instead of restating it, which is what this file's old
               `CONVERSATION_MAX_WIDTH = 860` constant used to do in parallel. */}
-            <div className='wzContentMeasure' style={{ padding: '16px 24px 0' }}>
+            <div
+              className='wzContentMeasure'
+              style={{ padding: '16px 24px 0' }}
+            >
               {/* The view's `<h1>`, for assistive tech only. The chat column had no heading at all,
                     which left screen-reader users without a name for the thing they are reading and
                     the page without a document outline. A VISIBLE header was tried and dropped: a
@@ -1931,162 +1934,162 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     and nothing in this file ever calls setSessionExpired(false) except starting a
                     fresh send) until the user reloads, per this fix's brief. */}
               {sessionExpired && (
-              <StatusCallout
-                title={i18n.translate(
-                  'wazuhAiAssistant.chat.sessionExpired.title',
-                  {
-                    defaultMessage: 'Your session expired',
-                  },
-                )}
-                color='danger'
-                iconType='lock'
-                body={i18n.translate(
-                  'wazuhAiAssistant.chat.sessionExpired.body',
-                  {
-                    defaultMessage:
-                      'Reload the page to sign in again. Your unsent message has been saved and will be restored automatically.',
-                  },
-                )}
-                action={
-                  <EuiButton
-                    size='s'
-                    color='danger'
-                    onClick={() => window.location.reload()}
-                  >
-                    {i18n.translate(
-                      'wazuhAiAssistant.chat.sessionExpired.reloadButton',
-                      {
-                        defaultMessage: 'Reload page',
-                      },
-                    )}
-                  </EuiButton>
-                }
-              />
-            )}
+                <StatusCallout
+                  title={i18n.translate(
+                    'wazuhAiAssistant.chat.sessionExpired.title',
+                    {
+                      defaultMessage: 'Your session expired',
+                    },
+                  )}
+                  color='danger'
+                  iconType='lock'
+                  body={i18n.translate(
+                    'wazuhAiAssistant.chat.sessionExpired.body',
+                    {
+                      defaultMessage:
+                        'Reload the page to sign in again. Your unsent message has been saved and will be restored automatically.',
+                    },
+                  )}
+                  action={
+                    <EuiButton
+                      size='s'
+                      color='danger'
+                      onClick={() => window.location.reload()}
+                    >
+                      {i18n.translate(
+                        'wazuhAiAssistant.chat.sessionExpired.reloadButton',
+                        {
+                          defaultMessage: 'Reload page',
+                        },
+                      )}
+                    </EuiButton>
+                  }
+                />
+              )}
 
-            {(error || providersError) && (
-              <StatusCallout
-                title={i18n.translate('wazuhAiAssistant.chat.errorTitle', {
-                  defaultMessage: 'Something went wrong',
-                })}
-                color='danger'
-                iconType='alert'
-                body={error ?? providersError}
-              />
-            )}
+              {(error || providersError) && (
+                <StatusCallout
+                  title={i18n.translate('wazuhAiAssistant.chat.errorTitle', {
+                    defaultMessage: 'Something went wrong',
+                  })}
+                  color='danger'
+                  iconType='alert'
+                  body={error ?? providersError}
+                />
+              )}
 
-            {managerAuthHint && (
-              <StatusCallout
-                title={i18n.translate(
-                  'wazuhAiAssistant.chat.managerAuthHint.title',
-                  {
-                    defaultMessage: 'Your Wazuh session may have expired',
-                  },
-                )}
-                color='warning'
-                iconType='alert'
-                body={i18n.translate(
-                  'wazuhAiAssistant.chat.managerAuthHint.body',
-                  {
-                    defaultMessage:
-                      'A request to the Wazuh manager failed, which can happen when your dashboard session token has expired. Reload the page and sign in again, then retry your question.',
-                  },
-                )}
-              />
-            )}
+              {managerAuthHint && (
+                <StatusCallout
+                  title={i18n.translate(
+                    'wazuhAiAssistant.chat.managerAuthHint.title',
+                    {
+                      defaultMessage: 'Your Wazuh session may have expired',
+                    },
+                  )}
+                  color='warning'
+                  iconType='alert'
+                  body={i18n.translate(
+                    'wazuhAiAssistant.chat.managerAuthHint.body',
+                    {
+                      defaultMessage:
+                        'A request to the Wazuh manager failed, which can happen when your dashboard session token has expired. Reload the page and sign in again, then retry your question.',
+                    },
+                  )}
+                />
+              )}
 
-            {/* A failed auto-save is surfaced instead of swallowed: the conversation on screen is
+              {/* A failed auto-save is surfaced instead of swallowed: the conversation on screen is
                 ahead of what is stored, which the user cannot infer from anything else. Not
                 dismissible — this reports real data-loss risk — but no longer purely passive: the
                 next turn's save still retries on its own, and "Retry now" (handleRetrySave) lets
                 the user clear it immediately once whatever blocked the save (e.g. a read-only
                 index) is fixed, instead of waiting on the next answer. Either path clears this the
                 same way, via persistConversationTurn's own setSaveFailed(false) on success. */}
-            {saveFailed && (
-              <StatusCallout
-                title={i18n.translate(
-                  'wazuhAiAssistant.chat.conversations.saveFailed.title',
-                  {
-                    defaultMessage: 'This conversation is not being saved',
-                  },
-                )}
-                color='warning'
-                iconType='alert'
-                body={i18n.translate(
-                  'wazuhAiAssistant.chat.conversations.saveFailed.body',
-                  {
-                    defaultMessage:
-                      'The latest messages could not be saved, so they may be missing if you reload. The chat still works, and saving is retried after each answer.',
-                  },
-                )}
-                action={
-                  <EuiButton
-                    size='s'
-                    color='warning'
-                    onClick={handleRetrySave}
-                    isLoading={isRetryingSave}
-                    // Also disabled while a turn is generating: retrying with a target built
-                    // from the live refs while the in-flight turn's OWN target is still
-                    // unresolved (e.g. its pre-send save hasn't created the row yet) would race
-                    // it into creating a second conversation row — see handleRetrySave's doc
-                    // comment. The turn's own post-answer save runs moments after streaming ends.
-                    isDisabled={isRetryingSave || isGenerating}
-                  >
-                    {i18n.translate(
-                      'wazuhAiAssistant.chat.conversations.saveFailed.retryButton',
-                      { defaultMessage: 'Retry now' },
-                    )}
-                  </EuiButton>
-                }
-              />
-            )}
+              {saveFailed && (
+                <StatusCallout
+                  title={i18n.translate(
+                    'wazuhAiAssistant.chat.conversations.saveFailed.title',
+                    {
+                      defaultMessage: 'This conversation is not being saved',
+                    },
+                  )}
+                  color='warning'
+                  iconType='alert'
+                  body={i18n.translate(
+                    'wazuhAiAssistant.chat.conversations.saveFailed.body',
+                    {
+                      defaultMessage:
+                        'The latest messages could not be saved, so they may be missing if you reload. The chat still works, and saving is retried after each answer.',
+                    },
+                  )}
+                  action={
+                    <EuiButton
+                      size='s'
+                      color='warning'
+                      onClick={handleRetrySave}
+                      isLoading={isRetryingSave}
+                      // Also disabled while a turn is generating: retrying with a target built
+                      // from the live refs while the in-flight turn's OWN target is still
+                      // unresolved (e.g. its pre-send save hasn't created the row yet) would race
+                      // it into creating a second conversation row — see handleRetrySave's doc
+                      // comment. The turn's own post-answer save runs moments after streaming ends.
+                      isDisabled={isRetryingSave || isGenerating}
+                    >
+                      {i18n.translate(
+                        'wazuhAiAssistant.chat.conversations.saveFailed.retryButton',
+                        { defaultMessage: 'Retry now' },
+                      )}
+                    </EuiButton>
+                  }
+                />
+              )}
 
-            {/* Optimistic-concurrency notice: shown after persistConversationAfterTurn's
+              {/* Optimistic-concurrency notice: shown after persistConversationAfterTurn's
                   auto-save hit a 409 on the last completed turn — see saveConversationWithMerge's
                   own doc comment for exactly when each variant fires. Non-blocking: the chat itself
                   is fully usable either way, this is purely informational. */}
-            {mergeNotice === 'merged' && (
-              <StatusCallout
-                title={i18n.translate(
-                  'wazuhAiAssistant.chat.conversations.mergedNotice.title',
-                  {
-                    defaultMessage: 'Conversation merged',
-                  },
-                )}
-                // A successful merge is a good outcome, not a warning — the conflict variant
-                // right below keeps 'warning'/'alert', so the two are no longer visually
-                // identical for opposite results.
-                color='success'
-                iconType='check'
-                body={i18n.translate(
-                  'wazuhAiAssistant.chat.conversations.mergedNotice.body',
-                  {
-                    defaultMessage:
-                      'This conversation was also updated in another tab — the versions were merged.',
-                  },
-                )}
-              />
-            )}
+              {mergeNotice === 'merged' && (
+                <StatusCallout
+                  title={i18n.translate(
+                    'wazuhAiAssistant.chat.conversations.mergedNotice.title',
+                    {
+                      defaultMessage: 'Conversation merged',
+                    },
+                  )}
+                  // A successful merge is a good outcome, not a warning — the conflict variant
+                  // right below keeps 'warning'/'alert', so the two are no longer visually
+                  // identical for opposite results.
+                  color='success'
+                  iconType='check'
+                  body={i18n.translate(
+                    'wazuhAiAssistant.chat.conversations.mergedNotice.body',
+                    {
+                      defaultMessage:
+                        'This conversation was also updated in another tab — the versions were merged.',
+                    },
+                  )}
+                />
+              )}
 
-            {mergeNotice === 'conflict' && (
-              <StatusCallout
-                title={i18n.translate(
-                  'wazuhAiAssistant.chat.conversations.mergeConflictNotice.title',
-                  {
-                    defaultMessage: 'Could not merge automatically',
-                  },
-                )}
-                color='warning'
-                iconType='alert'
-                body={i18n.translate(
-                  'wazuhAiAssistant.chat.conversations.mergeConflictNotice.body',
-                  {
-                    defaultMessage:
-                      'This conversation is being edited in another tab and the changes could not be merged automatically. Your latest messages are still shown here, but they may not be saved.',
-                  },
-                )}
-              />
-            )}
+              {mergeNotice === 'conflict' && (
+                <StatusCallout
+                  title={i18n.translate(
+                    'wazuhAiAssistant.chat.conversations.mergeConflictNotice.title',
+                    {
+                      defaultMessage: 'Could not merge automatically',
+                    },
+                  )}
+                  color='warning'
+                  iconType='alert'
+                  body={i18n.translate(
+                    'wazuhAiAssistant.chat.conversations.mergeConflictNotice.body',
+                    {
+                      defaultMessage:
+                        'This conversation is being edited in another tab and the changes could not be merged automatically. Your latest messages are still shown here, but they may not be saved.',
+                    },
+                  )}
+                />
+              )}
 
               {showLoadingState && (
                 <EuiFlexGroup
@@ -2130,10 +2133,17 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     </p>
                   }
                   actions={
-                    <EuiButton color='primary' fill onClick={onNavigateToSettings}>
-                      {i18n.translate('wazuhAiAssistant.chat.noProvider.action', {
-                        defaultMessage: 'Add a provider',
-                      })}
+                    <EuiButton
+                      color='primary'
+                      fill
+                      onClick={onNavigateToSettings}
+                    >
+                      {i18n.translate(
+                        'wazuhAiAssistant.chat.noProvider.action',
+                        {
+                          defaultMessage: 'Add a provider',
+                        },
+                      )}
                     </EuiButton>
                   }
                 />
@@ -2203,9 +2213,12 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     >
                       <EuiFlexItem grow={false}>
                         <EuiBadge color='hollow'>
-                          {i18n.translate('wazuhAiAssistant.chat.welcome.body', {
-                            defaultMessage: 'Try one of these',
-                          })}
+                          {i18n.translate(
+                            'wazuhAiAssistant.chat.welcome.body',
+                            {
+                              defaultMessage: 'Try one of these',
+                            },
+                          )}
                         </EuiBadge>
                       </EuiFlexItem>
                     </EuiFlexGroup>
@@ -2220,7 +2233,13 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                           layout='horizontal'
                           display='plain'
                           hasBorder
-                          icon={<EuiIcon type={card.icon} size='l' color='primary' />}
+                          icon={
+                            <EuiIcon
+                              type={card.icon}
+                              size='l'
+                              color='primary'
+                            />
+                          }
                           title={card.title}
                           description={card.question}
                           onClick={() => setInputText(card.question)}
@@ -2231,16 +2250,20 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 </div>
               )}
 
-              {!showLoadingState && !showNoProviderState && !showWelcomeState && (
-                <MessageList
-                  transcriptHeightPx={transcriptHeightPx}
-                  messages={messages}
-                  resolveDiscoverUrl={resolveDiscoverUrl}
-                  resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
-                  // Withheld while generating: retrying would abandon the turn already running.
-                  onRetryLastTurn={isGenerating ? undefined : handleRetryLastTurn}
-                />
-              )}
+              {!showLoadingState &&
+                !showNoProviderState &&
+                !showWelcomeState && (
+                  <MessageList
+                    transcriptHeightPx={transcriptHeightPx}
+                    messages={messages}
+                    resolveDiscoverUrl={resolveDiscoverUrl}
+                    resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
+                    // Withheld while generating: retrying would abandon the turn already running.
+                    onRetryLastTurn={
+                      isGenerating ? undefined : handleRetryLastTurn
+                    }
+                  />
+                )}
             </div>
           </div>
 

@@ -323,9 +323,7 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
   it('labels the type options self-explanatorily and describes each one', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    expect(
-      screen.getByLabelText(/anthropic \(claude\)/i),
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText(/anthropic \(claude\)/i)).toBeInTheDocument();
     expect(
       screen.getByText(
         /choose this for openai, groq, bedrock-mantle, or any other provider/i,
@@ -391,7 +389,9 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
       screen.getByText(/doesn't look like an anthropic key/i),
     ).toBeInTheDocument();
     // Non-blocking: Save must stay enabled despite the shape warning.
-    expect(screen.getByRole('button', { name: /^save & test$/i })).toBeEnabled();
+    expect(
+      screen.getByRole('button', { name: /^save & test$/i }),
+    ).toBeEnabled();
   });
 
   it('shows no shape warning for a well-formed Anthropic key', () => {
@@ -467,7 +467,6 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
       'https://claude.internal-proxy.example',
     );
   });
-
 });
 
 describe('ProviderFormFlyout — getting-started onboarding', () => {
@@ -584,9 +583,7 @@ describe('ProviderFormFlyout — type label and tool-support copy corrections', 
         /openai-compatible \(openai, bedrock gateway, ollama, lm studio, vllm\.\.\.\)/i,
       ),
     ).toBeInTheDocument();
-    expect(
-      screen.queryByLabelText(/gemini/i),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/gemini/i)).not.toBeInTheDocument();
   });
 
   it('requires tool-calling support and warns about fabricated answers, without naming Claude Sonnet', () => {

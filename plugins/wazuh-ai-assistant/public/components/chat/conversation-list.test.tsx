@@ -381,16 +381,14 @@ describe('ConversationList', () => {
         />,
       );
 
-      expect(
-        screen.queryByPlaceholderText('Search conversations'),
-      ).toBeNull();
+      expect(screen.queryByPlaceholderText('Search conversations')).toBeNull();
       expect(screen.queryByText('Should not render')).toBeNull();
       expect(
         screen.getByRole('button', { name: 'New conversation' }),
       ).toBeInTheDocument();
     });
 
-    it('calls onExpand when the collapsed strip\'s search or expand icon is clicked', () => {
+    it("calls onExpand when the collapsed strip's search or expand icon is clicked", () => {
       const onExpand = jest.fn();
       render(
         <ConversationList

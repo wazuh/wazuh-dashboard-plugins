@@ -964,12 +964,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                       defaultMessage: 'Could not verify',
                     },
                   )
-                : i18n.translate(
-                    'wazuhAiAssistant.settings.testFailureBadge',
-                    {
-                      defaultMessage: 'Failed',
-                    },
-                  )
+                : i18n.translate('wazuhAiAssistant.settings.testFailureBadge', {
+                    defaultMessage: 'Failed',
+                  })
             }
             reason={failureMessage}
           />
@@ -1167,9 +1164,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         )}
 
         <SectionCard
-          pillLabel={i18n.translate('wazuhAiAssistant.settings.providers.title', {
-            defaultMessage: 'Providers',
-          })}
+          pillLabel={i18n.translate(
+            'wazuhAiAssistant.settings.providers.title',
+            {
+              defaultMessage: 'Providers',
+            },
+          )}
           description={i18n.translate(
             'wazuhAiAssistant.settings.providers.description',
             {
@@ -1489,9 +1489,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                                 'wazuhAiAssistant.settings.privacy.removeField',
                                 { defaultMessage: 'Remove field' },
                               )}
-                              onClick={() =>
-                                handleRemoveFieldPolicyRow(index)
-                              }
+                              onClick={() => handleRemoveFieldPolicyRow(index)}
                             />
                           </EuiFlexItem>
                         </EuiFlexGroup>
@@ -1563,8 +1561,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           description={i18n.translate(
             'wazuhAiAssistant.settings.retention.description',
             {
-              defaultMessage:
-                'Control how long saved conversations are kept.',
+              defaultMessage: 'Control how long saved conversations are kept.',
             },
           )}
         >
@@ -1629,12 +1626,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   isDisabled={!canSave || !retention.isDirty}
                   fill
                 >
-                  {i18n.translate(
-                    'wazuhAiAssistant.settings.retention.save',
-                    {
-                      defaultMessage: 'Save conversation history settings',
-                    },
-                  )}
+                  {i18n.translate('wazuhAiAssistant.settings.retention.save', {
+                    defaultMessage: 'Save conversation history settings',
+                  })}
                 </EuiButton>
               </EuiToolTip>
             </>

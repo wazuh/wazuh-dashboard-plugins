@@ -215,18 +215,19 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   // chip must still appear from `toolCalls` alone at that point, since `message.table` is not yet
   // set on the message).
   const metaRowToolCalls = message.table ? [] : toolCalls;
-  const tableProvenanceChips: ResultTableProvenanceChip[] | undefined = message.table
-    ? toolCalls.map(toolCall => {
-        const { short, full } = describeToolCall(toolCall, message.table);
-        return {
-          id: toolCall.id,
-          shortLabel: short,
-          fullLabel: full,
-          toolName: toolCall.name,
-          argumentsJson: toolCall.arguments,
-        };
-      })
-    : undefined;
+  const tableProvenanceChips: ResultTableProvenanceChip[] | undefined =
+    message.table
+      ? toolCalls.map(toolCall => {
+          const { short, full } = describeToolCall(toolCall, message.table);
+          return {
+            id: toolCall.id,
+            shortLabel: short,
+            fullLabel: full,
+            toolName: toolCall.name,
+            argumentsJson: toolCall.arguments,
+          };
+        })
+      : undefined;
   // Only the finished-assistant branch below renders through EuiMarkdownFormat (the user bubble
   // and the streaming branch both render message.content as plain text/JSX, which React already
   // escapes), so this is only ever read there — memoized on message.content since re-sanitizing
