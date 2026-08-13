@@ -21,6 +21,16 @@ const FIELDS = [
 
 type IndexField = (typeof FIELDS)[number];
 
+/** The spec's `action` enum only lists `allow`/`anonymize` — this plugin's own `FieldPolicyAction`
+ * additionally allows `'never'` (server/tools/privacy.ts), which the indexer side does not yet
+ * document. Passed through as-is rather than narrowed here: this boundary's job is transport, not
+ * silently dropping a business-logic value the spec simply hasn't caught up to. */
+interface FieldPolicyEntryWire {
+  field: string;
+  action: FieldPolicyAction;
+  kind?: PseudonymKind;
+}
+
 /** Wire shapes of the Wazuh indexer's `/_plugins/_setup/ai_assistant/settings` endpoint — see
  * `WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH`'s doc comment (common/constants.ts) for the spec
  * link. snake_case, matching the OpenAPI schemas `AiAssistantSettings`/
@@ -32,39 +42,20 @@ interface SettingsWire {
   privacy_default_on: boolean;
   privacy_default_per_provider: Record<string, boolean>;
   user_can_override: boolean;
-}
-
-/** The spec's `action` enum only lists `allow`/`anonymize` — this plugin's own `FieldPolicyAction`
- * additionally allows `'never'` (server/tools/privacy.ts), which the indexer side does not yet
- * document. Passed through as-is rather than narrowed here: this boundary's job is transport, not
- * silently dropping a business-logic value the spec simply hasn't caught up to. */
-interface FieldPolicyEntryWire {
-  field: string;
-  action: FieldPolicyAction;
-  kind?: PseudonymKind;
-}
-
-/** Providers are a separate resource entirely — `GET {WAZUH_INDEXER_AI_ASSISTANT_PROVIDERS_PATH}`,
- * `server/settings/ai-providers-client.ts`'s concern — and never appear in this response; see
- * `WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH`'s doc comment for the split. */
-interface GetSettingsResponseWire {
-  settings: SettingsWire;
-  field_policy: FieldPolicyEntryWire[];
-}
-
-interface PutSettingsRequestWire {
-  settings: SettingsWire;
   field_policy: FieldPolicyEntryWire[];
 }
 
 function toAttributes(
-  wire: GetSettingsResponseWire,
+  wire: SettingsWire,
 ): Pick<AssistantSettingsAttributes, IndexField> {
+  // The settings documents could not exist on the index, so the aacessing
+  // to the fields should be uing optional chainin operator
   return {
-    privacyDefaultOn: wire.settings.privacy_default_on,
-    privacyDefaultPerProvider: wire.settings.privacy_default_per_provider,
-    userCanOverride: wire.settings.user_can_override,
-    fieldPolicy: wire.field_policy.map(
+    privacyDefaultOn: wire.privacy_default_on,
+    privacyDefaultPerProvider: wire.privacy_default_per_provider,
+    userCanOverride: wire.user_can_override,
+    fieldPolicy: wire.field_policy?.map(
+      // The field could not exist
       (entry): FieldPolicyEntry => ({
         field: entry.field,
         action: entry.action,
@@ -76,13 +67,11 @@ function toAttributes(
 
 function toWireRequest(
   attributes: Pick<AssistantSettingsAttributes, IndexField>,
-): PutSettingsRequestWire {
+): SettingsWire {
   return {
-    settings: {
-      privacy_default_on: attributes.privacyDefaultOn,
-      privacy_default_per_provider: attributes.privacyDefaultPerProvider,
-      user_can_override: attributes.userCanOverride,
-    },
+    privacy_default_on: attributes.privacyDefaultOn,
+    privacy_default_per_provider: attributes.privacyDefaultPerProvider,
+    user_can_override: attributes.userCanOverride,
     field_policy: attributes.fieldPolicy.map(
       (entry): FieldPolicyEntryWire => ({
         field: entry.field,

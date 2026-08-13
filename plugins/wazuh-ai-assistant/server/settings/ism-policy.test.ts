@@ -99,8 +99,30 @@ test('applyRetentionDays: 0 only strips min_index_age when other conditions shar
   });
 });
 
-test('applyRetentionDays: throws when growing retention with no delete transition to attach to', () => {
-  const policy: IsmPolicy = { states: [{ name: 'hot', transitions: [] }] };
+test('applyRetentionDays: reattaches a delete transition to the sole non-delete state when growing retention back up', () => {
+  const policy: IsmPolicy = {
+    states: [
+      { name: 'hot', transitions: [] },
+      { name: 'delete', transitions: [] },
+    ],
+  };
+  const next = applyRetentionDays(policy, 30);
+  assert.equal(extractRetentionDays(next), 30);
+  const hotState = next.states.find(state => state.name === 'hot');
+  assert.deepEqual(hotState?.transitions, [
+    { state_name: 'delete', conditions: { min_index_age: '30d' } },
+  ]);
+  // Round-trips: 0 again removes it, back to "keep forever".
+  assert.equal(extractRetentionDays(applyRetentionDays(next, 0)), 0);
+});
+
+test('applyRetentionDays: throws when growing retention with no delete transition and no unambiguous state to attach to', () => {
+  const policy: IsmPolicy = {
+    states: [
+      { name: 'hot', transitions: [] },
+      { name: 'warm', transitions: [] },
+    ],
+  };
   assert.throws(
     () => applyRetentionDays(policy, 30),
     /no transition into a "delete" state/,

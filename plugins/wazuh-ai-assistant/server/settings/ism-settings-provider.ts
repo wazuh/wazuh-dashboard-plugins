@@ -30,7 +30,7 @@ interface GetIsmPolicyResponse {
 const AFFECTED_INDEX_PATTERN = `${CONVERSATION_SESSIONS_INDEX_ALIAS}*`;
 
 /** Keep saved conversations forever unless an admin opts into a retention window. */
-const DEFAULT_CONVERSATION_RETENTION_DAYS = 0;
+const DEFAULT_CONVERSATION_RETENTION_DAYS = 7;
 
 function policyPath(): string {
   return `/_plugins/_ism/policies/${encodeURIComponent(

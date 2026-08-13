@@ -20,8 +20,8 @@ export type OpenSearchClient =
 
 export function reader(
   context: RequestHandlerContext,
-): OpenSearchClient['asInternalUser'] {
-  return context.core.opensearch.client.asInternalUser;
+): OpenSearchClient['asCurrentUser'] {
+  return context.core.opensearch.client.asCurrentUser;
 }
 
 export function writer(

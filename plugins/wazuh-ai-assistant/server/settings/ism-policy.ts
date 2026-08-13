@@ -53,15 +53,26 @@ export function extractRetentionDays(policy: IsmPolicy): number {
   return match ? Number(match[1]) : 0;
 }
 
+/** The state a fresh transition into `delete` should be attached to when growing retention back up
+ * from "forever" (see `applyRetentionDays`) — only knowable unambiguously when the policy has
+ * exactly one non-`delete` state, matching every policy this plugin actually provisions/reads
+ * (a single working state feeding into `delete`). */
+function findSoleAttachmentState(policy: IsmPolicy): IsmState | undefined {
+  const nonDeleteStates = (policy.states ?? []).filter(
+    state => state.name.toLowerCase() !== 'delete',
+  );
+  return nonDeleteStates.length === 1 ? nonDeleteStates[0] : undefined;
+}
+
 /**
  * Returns a new policy (the input is never mutated) with the delete-transition's `min_index_age`
  * set to `${days}d`, or, when `days` is `0`, the delete-transition condition removed entirely so
  * an index never ages into `delete` at all — an empty `conditions: {}` would instead transition
  * unconditionally the very next time ISM evaluates it, which is the opposite of "keep forever".
  *
- * Throws if `days > 0` and the policy has no transition into `delete` anywhere: unlike shrinking an
- * existing window to "forever", growing "forever" back into a concrete window requires knowing
- * which state should gain that transition, which this policy's shape doesn't tell us.
+ * Growing "forever" back into a concrete window (`days > 0` with no existing transition into
+ * `delete`) reattaches a fresh transition to the policy's sole non-`delete` state. Throws only when
+ * that's ambiguous — multiple non-`delete` states, none of which we can pick over the others.
  */
 export function applyRetentionDays(policy: IsmPolicy, days: number): IsmPolicy {
   const next = JSON.parse(JSON.stringify(policy)) as IsmPolicy;
@@ -85,15 +96,24 @@ export function applyRetentionDays(policy: IsmPolicy, days: number): IsmPolicy {
     return next;
   }
 
-  if (!found) {
+  if (found) {
+    found.transition.conditions = {
+      ...found.transition.conditions,
+      min_index_age: `${days}d`,
+    };
+    return next;
+  }
+
+  const attachmentState = findSoleAttachmentState(next);
+  if (!attachmentState) {
     throw new Error(
       'Cannot set conversation retention: the ISM policy has no transition into a "delete" ' +
         'state to attach a min_index_age condition to.',
     );
   }
-  found.transition.conditions = {
-    ...found.transition.conditions,
-    min_index_age: `${days}d`,
-  };
+  attachmentState.transitions = [
+    ...(attachmentState.transitions ?? []),
+    { state_name: 'delete', conditions: { min_index_age: `${days}d` } },
+  ];
   return next;
 }
