@@ -12,11 +12,16 @@ const agent001 = '001';
 const useDataSourceMock = useDataSource as jest.Mock;
 const AgentStatTableMock = AgentStatTable as jest.Mock;
 
-const fetchDataMock = jest.fn().mockResolvedValue(undefined);
-
 const statisticsResponse = (statistics: any) => ({
   hits: { hits: [{ _source: { wazuh: { agent: { statistics } } } }] },
 });
+
+const noDocumentResponse = { hits: { hits: [] } };
+
+// Default: an empty-but-present statistics document (not "no data at all" -- see
+// `noDocumentResponse` for that case), so every test below exercises the normal
+// ribbon/table rendering unless it opts into a specific fixture.
+const fetchDataMock = jest.fn().mockResolvedValue(statisticsResponse({}));
 
 jest.mock('../../common/data-source', () => ({
   useDataSource: jest.fn(),
@@ -49,8 +54,20 @@ jest.mock('../prompts', () => ({
   __esModule: true,
 }));
 
+jest.mock('react-redux', () => ({
+  useDispatch: () => jest.fn(),
+  __esModule: true,
+}));
+
+jest.mock('../../../redux/actions/appStateActions', () => ({
+  showExploreAgentModalGlobal: (value: boolean) => ({
+    type: 'SHOW_EXPLORE_AGENT_MODAL_GLOBAL',
+    payload: value,
+  }),
+}));
+
 jest.mock('../../../utils/applications', () => ({
-  endpointsSummary: {
+  endpointSummary: {
     id: 'endpoints-summary',
     breadcrumbLabel: 'Endpoints',
   },
@@ -70,7 +87,7 @@ jest.mock('./table', () => ({
 describe('AgentStats', () => {
   beforeEach(() => {
     fetchDataMock.mockClear();
-    fetchDataMock.mockResolvedValue(undefined);
+    fetchDataMock.mockResolvedValue(statisticsResponse({}));
     AgentStatTableMock.mockClear();
     useDataSourceMock.mockReturnValue({
       isLoading: false,
@@ -118,10 +135,20 @@ describe('AgentStats', () => {
     ).toBeTruthy();
 
     expect(
+      container!.querySelector(
+        queryDataTestAttr('ribbon-item-tasks_dispatched'),
+      ),
+    ).toBeTruthy();
+
+    expect(
+      container!.querySelector(queryDataTestAttr('ribbon-item-tasks_failed')),
+    ).toBeTruthy();
+
+    expect(
       container!.querySelectorAll(
         queryDataTestAttr('ribbon-item-', CSS.Attribute.Substring),
       ),
-    ).toHaveLength(3);
+    ).toHaveLength(5);
   });
 
   it('should query the agent statistics index scoped to the agent', async () => {
@@ -175,6 +202,10 @@ describe('AgentStats', () => {
           status: 'connected',
           last_keepalive: '2026-08-02T10:06:50Z',
           messages: { count: 12543 },
+          tasks: {
+            dispatched: { total: 4820 },
+            failed: { total: 3 },
+          },
         },
       }),
     );
@@ -194,6 +225,28 @@ describe('AgentStats', () => {
     expect(ribbonItemValue('last_keepalive')).toContain(
       'formatted-2026-08-02T10:06:50Z',
     );
+    expect(ribbonItemValue('tasks_dispatched')).toContain('4,820');
+    expect(ribbonItemValue('tasks_failed')).toContain('3');
+  });
+
+  it('should show an empty state instead of the ribbon/tables when the agent has no statistics document', async () => {
+    fetchDataMock.mockResolvedValue(noDocumentResponse);
+
+    let container: HTMLElement;
+
+    await act(async () => {
+      ({ container } = render(<AgentStats agent={{ id: agent002 }} />));
+    });
+
+    // AgentStatTableMock may have been called once during the initial loading render (before
+    // the fetch resolved) -- that loading-skeleton render is unaffected by this feature. What
+    // matters is the FINAL committed DOM, once loading has settled with no document at all.
+    expect(
+      container!.querySelectorAll(
+        queryDataTestAttr('ribbon-item-', CSS.Attribute.Substring),
+      ),
+    ).toHaveLength(0);
+    expect(container!.textContent).toContain('No statistics reported');
   });
 
   it('should render - in the stats without value', async () => {

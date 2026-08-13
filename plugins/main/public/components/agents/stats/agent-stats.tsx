@@ -13,12 +13,15 @@ import React, { useState, useEffect } from 'react';
 import semver from 'semver';
 import { get } from 'lodash';
 import {
+  EuiButton,
+  EuiEmptyPrompt,
   EuiFlexGroup,
   EuiFlexItem,
   EuiPage,
   EuiPageBody,
   EuiSpacer,
 } from '@elastic/eui';
+import { useDispatch } from 'react-redux';
 import {
   withGlobalBreadcrumb,
   withGuard,
@@ -34,6 +37,7 @@ import {
   PromptNoActiveAgentWithoutSelect,
   PromptAgentFeatureVersion,
 } from '../prompts';
+import { showExploreAgentModalGlobal } from '../../../redux/actions/appStateActions';
 import {
   UIErrorLog,
   UI_ERROR_SEVERITIES,
@@ -116,6 +120,11 @@ interface AgentStatistics {
     status?: string;
     last_keepalive?: string;
     messages?: { count?: number };
+    tasks?: {
+      dispatched?: { total?: number };
+      failed?: { total?: number };
+      discarded_duplicate?: { total?: number };
+    };
   };
   logcollector?: {
     global?: AgentStatsLogcollectorWindow;
@@ -138,6 +147,18 @@ const statsAgents: {
     key: 'messages_count',
     title: 'Messages count',
     path: 'agent.messages.count',
+    render: formatUINumber,
+  },
+  {
+    key: 'tasks_dispatched',
+    title: 'Tasks dispatched',
+    path: 'agent.tasks.dispatched.total',
+    render: formatUINumber,
+  },
+  {
+    key: 'tasks_failed',
+    title: 'Tasks failed',
+    path: 'agent.tasks.failed.total',
     render: formatUINumber,
   },
   {
@@ -196,46 +217,75 @@ interface AgentStatsBodyProps {
   statistics?: AgentStatistics;
 }
 
+/** True once the fetch has settled and came back with no `statistics` document at all for this
+ * agent (as opposed to a document present but missing individual fields, which the ribbon/table
+ * already render as "-" per stat). Distinct from `loading`: while loading, `statistics` is also
+ * `undefined`, but that is not yet a "no data" state. */
+function hasNoStatistics(loading: boolean, statistics?: AgentStatistics) {
+  return !loading && !statistics;
+}
+
 const AgentStatsBody = withDataSourceInitiated({})(
-  ({ agentID, loading, statistics }: AgentStatsBodyProps) => (
-    <>
-      <WzRibbon
-        items={statsAgents.map(stat => ({
-          key: stat.key,
-          label: stat.title,
-          isLoading: loading,
-          value: stat.render
-            ? stat.render(get(statistics, stat.path))
-            : get(statistics, stat.path),
-        }))}
+  ({ agentID, loading, statistics }: AgentStatsBodyProps) => {
+    const dispatch = useDispatch();
+    const openAgentSelector = () => dispatch(showExploreAgentModalGlobal(true));
+
+    return hasNoStatistics(loading, statistics) ? (
+      <EuiEmptyPrompt
+        iconType='watchesApp'
+        title={<h2>No statistics reported</h2>}
+        body={
+          <p>
+            Statistics are not available for this agent. Confirm that statistics
+            collection is enabled in its configuration file.
+          </p>
+        }
+        actions={
+          <EuiButton color='primary' fill onClick={openAgentSelector}>
+            Select agent
+          </EuiButton>
+        }
       />
-      <EuiSpacer size='xxl' />
-      <EuiFlexGroup>
-        <EuiFlexItem>
-          <AgentStatTable
-            columns={tableColumns}
-            loading={loading}
-            title='Global'
-            start={statistics?.logcollector?.global?.start}
-            end={statistics?.logcollector?.global?.end}
-            items={toList(statistics?.logcollector?.global?.files)}
-            exportCSVFilename={`agent-stats-${agentID}-logcollector-global`}
-          />
-        </EuiFlexItem>
-        <EuiFlexItem>
-          <AgentStatTable
-            columns={tableColumns}
-            loading={loading}
-            title='Interval'
-            start={statistics?.logcollector?.interval?.start}
-            end={statistics?.logcollector?.interval?.end}
-            items={toList(statistics?.logcollector?.interval?.files)}
-            exportCSVFilename={`agent-stats-${agentID}-logcollector-interval`}
-          />
-        </EuiFlexItem>
-      </EuiFlexGroup>
-    </>
-  ),
+    ) : (
+      <>
+        <WzRibbon
+          items={statsAgents.map(stat => ({
+            key: stat.key,
+            label: stat.title,
+            isLoading: loading,
+            value: stat.render
+              ? stat.render(get(statistics, stat.path))
+              : get(statistics, stat.path),
+          }))}
+        />
+        <EuiSpacer size='xxl' />
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <AgentStatTable
+              columns={tableColumns}
+              loading={loading}
+              title='Global'
+              start={statistics?.logcollector?.global?.start}
+              end={statistics?.logcollector?.global?.end}
+              items={toList(statistics?.logcollector?.global?.files)}
+              exportCSVFilename={`agent-stats-${agentID}-logcollector-global`}
+            />
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <AgentStatTable
+              columns={tableColumns}
+              loading={loading}
+              title='Interval'
+              start={statistics?.logcollector?.interval?.start}
+              end={statistics?.logcollector?.interval?.end}
+              items={toList(statistics?.logcollector?.interval?.files)}
+              exportCSVFilename={`agent-stats-${agentID}-logcollector-interval`}
+            />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </>
+    );
+  },
 );
 
 export function AgentStats(props: AgentStatsProps) {
