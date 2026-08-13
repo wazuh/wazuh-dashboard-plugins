@@ -9,6 +9,7 @@ import { getToolDefinition } from './registry';
 import {
   applySafetyValves,
   checkIndexAllowlist,
+  clampLookbackWindow,
   clampManagerParams,
   lintDsl,
   MAX_AGG_SIZE,
@@ -399,6 +400,27 @@ async function appendEntityNearMissHint(
   }
 }
 
+/**
+ * The DSL an "Open in Discover" link carries (#8935 item I2): the guardrail-clamped query that
+ * actually ran, WITH any `post_filter` folded in as a sibling filter clause. The rendered table's
+ * rows come from `hits.hits`, which ARE post-filtered — a Discover link built from `body.query`
+ * alone would open a different row set than the table it sits under (get_sca_checks with an
+ * exact-name `search` renders 1 row while the bare query matches the whole policy). Folding the
+ * post_filter into a plain `bool.filter` reproduces the post-filtered row set exactly: Discover
+ * has no aggregations, so post-filter-vs-query placement changes nothing else there. Falls back
+ * to `match_all` for a query-less body (matches that same result set). Exported for its
+ * colocated test only.
+ */
+export function buildDiscoverDsl(
+  body: Record<string, unknown>,
+): Record<string, unknown> {
+  const query = (body.query as Record<string, unknown>) ?? { match_all: {} };
+  const postFilter = body.post_filter as Record<string, unknown> | undefined;
+  return postFilter && typeof postFilter === 'object'
+    ? { bool: { filter: [query, postFilter] } }
+    : query;
+}
+
 /** Executes a validated, guardrail-passed Indexer search and builds its digest + table.
  * `assumptionNote` (issue #8913) is threaded straight into `buildDigest` -- see that function and
  * `ToolDefinition.resolveParams`'s doc comments (types.ts) for where it comes from. */
@@ -421,18 +443,36 @@ async function executeIndexerRequest(
   // either would become an unhandled rejection, contradicting executeToolCall's documented "never
   // throws" contract. Nothing from the guardrail stage may escape uncaught.
   let body: Record<string, unknown>;
+  // Issue #8935 item I4 (bound disclosure): set inside the try block below when
+  // `clampLookbackWindow` actually narrows an over-wide time range, then appended to the
+  // successful digest's `hint` further down -- see that call site for why this must be the
+  // SUCCESSFUL call's own data rather than a rejection the model has to remember to relay.
+  let lookbackDisclosure: string | undefined;
   try {
     const valved = applySafetyValves(indexerRequest.body);
     if (!valved.ok) {
       return { toolResultContent: toolErrorContent(valved.reason) };
     }
 
+    // Issue #8935 item I4: clamp-and-disclose an over-wide @timestamp span BEFORE lintDsl, so a
+    // request whose only problem is exceeding the 90-day cap becomes a SUCCESSFUL, capped call
+    // instead of a rejection the model must remember to relay in its final answer (the rejection
+    // path stays intact below for every other unfixable-by-clamp shape -- see
+    // clampLookbackWindow's doc comment). A separate stage from applySafetyValves deliberately:
+    // appendWindowRecountHint/appendEntityNearMissHint below call applySafetyValves directly on
+    // their own internal probe bodies (this file, further down) and must never pick up a
+    // disclosure for a probe the model never asked for.
+    const { body: lookbackClamped, disclosure } = clampLookbackWindow(
+      valved.body,
+    );
+    lookbackDisclosure = disclosure;
+
     // Issue #8920 item 2, applied at the CHOKEPOINT rather than per tool: a bare parent
     // technique-id `term` filter (typed tool or hand-written escape-hatch DSL alike) is rolled
     // up to include its sub-techniques before execution -- see technique-rollup.ts for the
     // shape, the case normalization, and the safety argument. Runs BEFORE lintDsl so the body
     // that is linted is byte-identical to the body that executes.
-    const rolled = rollUpTechniqueIdFilters(valved.body);
+    const rolled = rollUpTechniqueIdFilters(lookbackClamped);
 
     // The vulnerability-field-on-findings-index check in guardrails.ts's lintDsl has no per-tool
     // exemptions (the 4.14 get_solved_vulnerabilities carve-out was retired in the 5.0 port).
@@ -485,6 +525,17 @@ async function executeIndexerRequest(
     // aggregation fields driving `breakdown` (if any) can be read from — see privacy.ts's
     // `extractAggFields` doc comment — so it is reused for that below when privacy is active.
     const digest = buildDigest(toolName, result, def, body, assumptionNote);
+    // Issue #8935 item I4: appended FIRST, before items 3/6 below, so the capped-window fact
+    // (when present) precedes any longer window-recount/near-miss probe hint under
+    // `MAX_HINT_LENGTH` -- a disclosure that got truncated away by a later, lower-priority hint
+    // would defeat the whole point of this item. Static first-party text plus timestamps only, no
+    // indexed values -- needs no privacy handling (same argument as
+    // `appendSubTechniqueSplitHint` below).
+    if (lookbackDisclosure) {
+      digest.hint = digest.hint
+        ? `${lookbackDisclosure} ${digest.hint}`
+        : lookbackDisclosure;
+    }
     // Issue #8920 items 3 and 6: both slot in HERE, between `buildDigest` and `finalizeDigest`,
     // and both extend `Digest.hint` by concatenation rather than a new field -- deliberately no
     // change to digest.ts's `Digest` interface (avoids colliding with sibling in-flight edits to
@@ -551,12 +602,12 @@ async function executeIndexerRequest(
       def.failClosedFieldPolicy,
     );
     // "Open in Discover" support (common/types.ts's `TableSpec.discover` doc comment): only this
-    // Indexer path has an index/DSL to attach — `body.query` is the guardrail-clamped clause that
-    // actually ran, falling back to `match_all` for a query-less body (matches this same result set).
+    // Indexer path has an index/DSL to attach — see buildDiscoverDsl for why a `post_filter` is
+    // folded in rather than shipping `body.query` alone.
     const tableSpec = buildTableSpec(result, def, body);
     tableSpec.discover = {
       index: indexerRequest.index,
-      dsl: (body.query as Record<string, unknown>) ?? { match_all: {} },
+      dsl: buildDiscoverDsl(body),
     };
     if (def.buildSecurityAnalyticsLink) {
       const space = resolveSecurityAnalyticsSpace(

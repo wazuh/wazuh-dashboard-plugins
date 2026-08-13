@@ -1121,6 +1121,7 @@ function resolveAggFieldSpec(
  * this function does not yet parse, rather than this function trying to enumerate every possible
  * future shape.
  *
+ *
  * Only BUCKET-producing aggregation types carry a field here, deliberately: a metric aggregation
  * (`cardinality`/`avg`/`sum`/`min`/`max`/`value_count`) returns a NUMBER, so no string value of
  * its field ever leaves through the digest, and mapping its field would misattribute the `key`
@@ -1578,6 +1579,13 @@ export function applyFieldPolicy(
     scrubbedDigest.breakdown = breakdown;
   } else {
     delete scrubbedDigest.breakdown;
+    // A `breakdownNote` describes the bucket list it rides with (its truncation figures, which
+    // end of the list was kept — see digest.ts's buildBucketTruncationNote). With the breakdown
+    // deleted above, the note would assert concrete counts about a list that is not in the
+    // payload (issue #8935 item 1's integration review caught this: a 'never' policy on the
+    // aggregated field left the note's carry-trim figures dangling). buildDigest never emits the
+    // note without the breakdown, so deleting both keeps that invariant through the scrub too.
+    delete scrubbedDigest.breakdownNote;
   }
 
   return scrubbedDigest;

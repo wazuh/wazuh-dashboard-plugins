@@ -39,8 +39,9 @@ jest.mock('../../services/session-heal', () => ({
 }));
 
 import { SettingsPage } from './settings-page';
+import { CoreStart } from '../../../../../src/core/public';
 
-const coreMock = { http: {} } as any;
+const coreMock = { http: {} } as unknown as CoreStart;
 
 beforeEach(() => {
   jest.clearAllMocks();

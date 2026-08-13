@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {
+  buildDiscoverDsl,
   executeToolCall,
   PrivacyContext,
   resolveSecurityAnalyticsSpace,
@@ -168,6 +169,51 @@ test('executeToolCall: unlisted-field fail-closed tracks failClosedFieldPolicy, 
   } finally {
     getAgentInventoryTool.failClosedFieldPolicy = original;
   }
+});
+
+// --- Issue #8913: end-to-end (executeToolCall, not just resolveDeicticAgentParams in isolation)
+// proof that a resolveParams-minted assumption note reaches the digest the model sees. A merge
+// regression once dropped `assumptionNote` from `executeIndexerRequest`'s call to `buildDigest`
+// (`executeManagerRequest`'s sibling call already threaded it through) -- silently discarding the
+// note for every Indexer-backed tool while keeping it for Manager-API-backed ones. -------------
+
+test('executeToolCall: a resolveParams-minted assumption note reaches the digest for an Indexer-backed tool', async () => {
+  const context = {
+    ...fakeSearchContext([{ package: { name: 'adduser', version: '1' } }]),
+    wazuh_core: {
+      manageHosts: { get: () => Promise.resolve([{ id: 'host-1' }]) },
+      api: {
+        client: {
+          asCurrentUser: {
+            request: () =>
+              Promise.resolve({
+                status: 200,
+                data: {
+                  data: {
+                    affected_items: [{ id: '001', name: 'agent-one' }],
+                    total_affected_items: 1,
+                  },
+                },
+              }),
+          },
+        },
+      },
+    },
+  } as unknown as ExecContext;
+  const outcome = await executeToolCall(
+    {
+      id: 'call-1',
+      name: 'get_agent_inventory',
+      arguments: { kind: 'packages' },
+    },
+    context,
+    fakeRequest,
+    undefined,
+  );
+  const digest = JSON.parse(outcome.toolResultContent) as {
+    assumptionNote?: string;
+  };
+  assert.match(digest.assumptionNote ?? '', /agent-one/);
 });
 
 test('resolveSecurityAnalyticsSpace: a single distinct space across all hits is used as-is', () => {
@@ -647,5 +693,123 @@ test('sub-technique split: a breakdown carrying a dotted technique id gains the 
   assert.match(
     digest.hint as string,
     /parent technique bucket .* does NOT include its sub-techniques/,
+  );
+});
+
+// --- #8935 item I2: the "Open in Discover" DSL matches the post-filtered table -----------------
+
+test('buildDiscoverDsl: a post_filter is folded into the DSL so Discover opens the same rows as the table', () => {
+  // FAILS ON BASE: base ships body.query alone, so a get_sca_checks call with an exact-name
+  // `search` rendered a 1-row table whose Discover link opened the whole policy (the post_filter
+  // narrows hits.hits, and the table is built from hits.hits).
+  const query = {
+    bool: { filter: [{ term: { 'wazuh.agent.id': '000' } }] },
+  };
+  const postFilter = {
+    bool: {
+      minimum_should_match: 1,
+      should: [{ prefix: { 'check.name': 'Ensure SSH' } }],
+    },
+  };
+  assert.deepEqual(buildDiscoverDsl({ query, post_filter: postFilter }), {
+    bool: { filter: [query, postFilter] },
+  });
+});
+
+test('buildDiscoverDsl: without a post_filter the DSL is body.query unchanged (match_all fallback)', () => {
+  const query = { bool: { filter: [{ term: { a: 1 } }] } };
+  assert.deepEqual(buildDiscoverDsl({ query }), query);
+  assert.deepEqual(buildDiscoverDsl({}), { match_all: {} });
+});
+
+// --- issue #8935 item I4: bound disclosure (lookback clamp) -------------------------------------
+
+test('bound disclosure: search_wazuh_data with a 180-day range is clamped-and-disclosed on a SUCCESSFUL call, not rejected', async () => {
+  // ON BASE (before this item): this exact call's toolResultContent is
+  // `{"error":"Range on time field \"@timestamp\" spans more than the 90-day maximum lookback."}`
+  // -- checkDateRanges' rejection in guardrails.ts. That error DOES reach the model (chat.ts's
+  // augmentToolError), but the model's bounded retry is an ordinary in-cap query indistinguishable
+  // from a default-window one, so nothing ever marks the eventual ANSWER as capped -- the defect
+  // this item fixes. This test is the strongest fails-on-base witness: it asserts the digest is a
+  // SUCCESS carrying the disclosure as data, not an error the model has to remember to relay.
+  const findingHit = {
+    _source: {
+      '@timestamp': '2026-08-10T00:00:00Z',
+      'wazuh.rule.title': 'test rule',
+    },
+  };
+  const { context, calls } = fakeContext(() => ({
+    hits: { hits: [findingHit], total: { value: 1 } },
+  }));
+  const queryDsl = JSON.stringify({
+    query: {
+      bool: {
+        filter: [{ range: { '@timestamp': { gte: 'now-180d', lte: 'now' } } }],
+      },
+    },
+    size: 20,
+  });
+  const outcome = await executeToolCall(
+    toolCall('search_wazuh_data', {
+      index_pattern: 'wazuh-findings-v5-*',
+      query_dsl: queryDsl,
+    }),
+    context,
+    dummyRequest,
+  );
+  const digest = parseDigest(outcome);
+  assert.equal(
+    digest.error,
+    undefined,
+    `expected a success digest, got an error instead: ${digest.error}`,
+  );
+  assert.match(digest.hint as string, /Time window capped/);
+  assert.match(digest.hint as string, /90-day maximum/);
+  // The MOCKED OpenSearch client itself must have received the CAPPED range -- the digest's hint
+  // text alone would not prove the query that actually ran was narrowed (executor.ts's own
+  // "linted body byte-identical to executed body" invariant is what this checks in practice).
+  assert.equal(
+    calls.length,
+    1,
+    'no recount/near-miss probe: the call itself returned rows',
+  );
+  const executedFilter = (
+    calls[0].body.query as { bool: { filter: Array<Record<string, unknown>> } }
+  ).bool.filter;
+  const rangeClause = executedFilter[0] as {
+    range: { '@timestamp': { gte: string; lte: string } };
+  };
+  const { gte, lte } = rangeClause.range['@timestamp'];
+  assert.notEqual(gte, 'now-180d');
+  assert.notEqual(lte, 'now');
+  const spanMs = Date.parse(lte) - Date.parse(gte);
+  assert.equal(spanMs, 90 * 24 * 60 * 60 * 1000);
+});
+
+test('bound disclosure: a request already within the 90-day cap gets no disclosure', async () => {
+  // OVER-CLAMPING GUARD, not a fails-on-base witness (it asserts the absence of a string base
+  // never emits) -- labeled per the integration review so it is never counted as fix evidence.
+  const findingHit = {
+    _source: {
+      '@timestamp': '2026-08-10T00:00:00Z',
+      'wazuh.rule.mitre.technique.id': ['T1110'],
+    },
+  };
+  const { context } = fakeContext(() => ({
+    hits: { hits: [findingHit], total: { value: 1 } },
+  }));
+  const outcome = await executeToolCall(
+    toolCall('get_mitre_findings', {
+      technique_id: 'T1110',
+      time_range_gte: 'now-30d',
+      time_range_lte: 'now',
+    }),
+    context,
+    dummyRequest,
+  );
+  const digest = parseDigest(outcome);
+  assert.equal(digest.error, undefined);
+  assert.ok(
+    !(digest.hint as string | undefined)?.includes('Time window capped'),
   );
 });
