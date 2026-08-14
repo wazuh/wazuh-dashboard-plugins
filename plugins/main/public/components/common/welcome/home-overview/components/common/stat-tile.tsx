@@ -1,5 +1,6 @@
 import React from 'react';
 import { EuiStat, EuiStatProps } from '@elastic/eui';
+import { HOME_OVERVIEW_TEXT_COLOR } from '../../lib/theme-colors';
 
 export interface StatTileProps {
   value: React.ReactNode;
@@ -9,13 +10,14 @@ export interface StatTileProps {
   titleSize?: EuiStatProps['titleSize'];
   /** Value before label; aligns numbers across a multi-tile row. */
   reverse?: boolean;
+  className?: string;
   ['data-test-subj']?: string;
 }
 
 export const StatTile: React.FC<StatTileProps> = ({
   value,
   label,
-  color,
+  color = HOME_OVERVIEW_TEXT_COLOR.text,
   textAlign = 'center',
   titleSize = 'l',
   reverse = false,

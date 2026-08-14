@@ -7,6 +7,7 @@ import {
 } from '../../../src/core/public';
 import { i18n } from '@osd/i18n';
 import { PLUGIN_ID } from '../common/constants';
+import { registerAssistantHeaderButton } from './components/header/assistant-header-button';
 import { WAZUH_HOME_APP_CATEGORY } from '../common/nav-categories';
 import { registerAiNavLink } from './utils/nav-link';
 import {
@@ -67,6 +68,9 @@ export class WazuhAiAssistantPlugin
   }
 
   public start(_core: CoreStart): WazuhAiAssistantPluginStart {
+    // TODO: Uncomment this when the AI Assistant sidecar is fixed
+    // registerAssistantHeaderButton(core);
+
     return {};
   }
 

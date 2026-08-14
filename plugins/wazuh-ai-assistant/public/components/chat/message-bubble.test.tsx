@@ -1,3 +1,5 @@
+import path from 'path';
+import fs from 'fs';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -250,6 +252,120 @@ describe('MessageBubble', () => {
       'href',
       'https://example.test/app/data-explorer/discover#?_a=...',
     );
+  });
+
+  // Layout contract §5 ("one measure, one gutter"): prose is held to a fixed reading measure;
+  // only block content (a result table) is allowed to break out past it, up to $wzTableMaxWidth.
+  describe('prose measure vs. table breakout (layout contract §5)', () => {
+    it('holds a prose-only assistant answer to the shared reading measure', () => {
+      render(
+        <MessageBubble
+          message={baseMessage({ role: 'assistant', content: 'Six today.' })}
+          resolveDiscoverUrl={noopResolveDiscoverUrl}
+          resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+        />,
+      );
+
+      const bubbleItem = screen
+        .getByText('Six today.')
+        .closest('.euiFlexItem') as HTMLElement;
+      // The measure arrives by CLASS, not as an inline `68ch` restated inside message-bubble.tsx:
+      // the figure's single home is `$wzProseMeasure`, which the next test pins to the stylesheet.
+      expect(bubbleItem).toHaveClass('wzProseMeasure');
+      expect(bubbleItem.style.maxWidth).not.toBe('68ch');
+    });
+
+    it('defines the prose measure once, in the stylesheet, from $wzProseMeasure', () => {
+      // The test above proves the bubble opts INTO the measure; this proves the thing it opts into
+      // is the shared token and not a second literal free to drift from it. It has to read the
+      // source directly because jest maps `.scss` to a style mock, so no rendered assertion can
+      // ever observe a value that came from a stylesheet.
+      const scssSource = fs.readFileSync(
+        path.join(__dirname, 'chat-page.scss'),
+        'utf8',
+      );
+      expect(scssSource).toMatch(
+        /\.wzProseMeasure\s*\{[^}]*max-width:\s*\$wzProseMeasure/,
+      );
+    });
+
+    it('lets a table-carrying answer break out past the prose measure', () => {
+      const table: TableSpec = {
+        columns: [{ id: 'agent', label: 'Agent' }],
+        rows: [{ agent: 'web-01' }],
+      };
+      render(
+        <MessageBubble
+          message={baseMessage({
+            role: 'assistant',
+            content: 'Here are the results:',
+            table,
+          })}
+          resolveDiscoverUrl={noopResolveDiscoverUrl}
+          resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+        />,
+      );
+
+      const bubbleItem = screen
+        .getByText('Results (1 rows)')
+        .closest('.euiFlexItem') as HTMLElement;
+      // Breaking out means declining the prose measure and filling whatever the ROW allows. The
+      // 1300px ceiling itself is `.wzMessageRow--wide`'s (chat-page.scss), applied one level up and
+      // asserted in message-list.test.tsx — restating it inline here was a second copy of that
+      // number with nothing keeping the two in step.
+      expect(bubbleItem).not.toHaveClass('wzProseMeasure');
+      expect(bubbleItem.style.maxWidth).toBe('100%');
+    });
+  });
+
+  // Provenance moves UP into the result card's header once a table exists (layout contract §4):
+  // the below-bubble chip disappears for that turn, and the card receives the same data instead.
+  describe('provenance handoff to the result card header', () => {
+    it('does not render a below-bubble chip for a turn whose tool call produced a table', () => {
+      const table: TableSpec = {
+        columns: [{ id: 'agent', label: 'Agent' }],
+        rows: [{ agent: 'web-01' }],
+      };
+      render(
+        <MessageBubble
+          message={baseMessage({
+            role: 'assistant',
+            content: 'Here are the results:',
+            table,
+            toolCalls: [
+              { id: 't1', name: 'get_critical_findings', arguments: {} },
+            ],
+          })}
+          resolveDiscoverUrl={noopResolveDiscoverUrl}
+          resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+        />,
+      );
+
+      // The chip still exists — just inside the result card's header, not below the bubble.
+      // Label includes the default 90-day window, same as describeToolCall (tool-call-label.ts)
+      // has always produced for a call with no explicit time_range_gte/lte.
+      expect(screen.getByText('Critical findings · 90d')).toBeInTheDocument();
+      // Only one instance: it was not ALSO left behind in the below-bubble meta row.
+      expect(screen.getAllByText('Critical findings · 90d')).toHaveLength(1);
+    });
+
+    it('still renders the below-bubble chip for a turn whose tool call produced no table', () => {
+      render(
+        <MessageBubble
+          message={baseMessage({
+            role: 'assistant',
+            content: 'Six alerts today.',
+            toolCalls: [
+              { id: 't1', name: 'get_critical_findings', arguments: {} },
+            ],
+          })}
+          resolveDiscoverUrl={noopResolveDiscoverUrl}
+          resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+        />,
+      );
+
+      expect(screen.getByText('Critical findings · 90d')).toBeInTheDocument();
+    });
   });
 
   it('does not render the suggested-query callout when message.suggestedQuery is absent', () => {

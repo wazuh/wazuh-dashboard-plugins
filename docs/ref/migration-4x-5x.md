@@ -8,7 +8,7 @@ Wazuh 5.x introduces significant changes to the dashboard plugins architecture a
 
 - **Platform upgrade**: Migration from Kibana/OpenSearch Dashboards 2.x to OpenSearch Dashboards 3.x
 - **Configuration changes**: Settings relocated from `wazuh.yml` to `opensearch_dashboards.yml`
-- **Plugin restructure**: Core functionality split into modular plugins (`wazuh-core`, `wazuh-check-updates`)
+- **Plugin restructure**: Core functionality split into modular plugins (`wazuh-core`, `wazuh-check-updates`, `wazuh-ai-assistant`)
 - **Index pattern updates**: New default pattern `wazuh-events*` replacing `wazuh-alerts-*`
 - **UI modernization**: Removal of legacy interfaces and deprecated features
 - **Security enhancements**: Updated authentication and authorization mechanisms
@@ -177,9 +177,9 @@ admin: true
 
 #### New plugin structure
 
-| 4.x                   | 5.x                                                          |
-| --------------------- | ------------------------------------------------------------ |
-| Single `wazuh` plugin | `wazuh` (main), `wazuh-core` (shared), `wazuh-check-updates` |
+| 4.x                   | 5.x                                                                                |
+| --------------------- | ---------------------------------------------------------------------------------- |
+| Single `wazuh` plugin | `wazuh` (main), `wazuh-core` (shared), `wazuh-check-updates`, `wazuh-ai-assistant` |
 
 **Impact**: Plugin dependencies are automatically managed. No manual action required.
 

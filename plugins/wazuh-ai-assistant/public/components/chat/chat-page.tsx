@@ -13,11 +13,14 @@ import {
   EuiText,
   EuiTitle,
   EuiScreenReaderOnly,
-  EuiBetaBadge,
+  EuiBadge,
+  EuiCard,
   EuiLoadingSpinner,
   EuiPanel,
   EuiIcon,
   EuiSelect,
+  EuiFlyout,
+  EuiFlyoutBody,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { AppMountParameters, CoreStart } from '../../../../../src/core/public';
@@ -79,7 +82,8 @@ interface ChatPageProps {
   /** Owned by the app shell (application.tsx); rendered here so the provider selector sits in the
    * chat column's own header row next to the privacy chip, instead of a separate top-level row. */
   onProviderChange: (id: string) => void;
-  /** Switches the app shell to the Settings tab; wired from the top-level route state. */
+  /** The no-provider empty state's "Add a provider" CTA — its only caller. Owners wire it to
+   * open Settings with the create-provider flyout (`#/settings?addProvider=true`). */
   onNavigateToSettings: () => void;
   /** The app shell's router history (the same instance `<Router history={history}>` in
    * application.tsx uses) — used to read/write the open-conversation route below through
@@ -94,6 +98,22 @@ interface ChatPageProps {
   /** Whether the chat view is the app shell's visible tab (default true). While hidden, the
    * conversation hash stays out of the URL so a restore can't rewrite `/settings`. */
   isActive?: boolean;
+  /** Whether to render the saved-conversations sidebar (default true). The docked header panel
+   * (assistant-chat-panel.tsx) hides it while the panel is too narrow for both panes. */
+  showConversationSidebar?: boolean;
+  /**
+   * Whether the rail is allowed to escalate to an `EuiFlyout` below `RAIL_FLYOUT_AT` (default
+   * true). `EuiFlyout` is a `position: fixed` overlay that covers the WHOLE screen it's rendered
+   * into — fine for the app shell's own full-page ChatPage, but the header's docked sidecar
+   * (assistant-chat-panel.tsx, `SIDEBAR_MIN_PANEL_WIDTH = 600`) renders ChatPage inside a panel that
+   * can itself be anywhere from 600 to 900+px wide, i.e. squarely inside the flyout band — which
+   * turned "the rail is a bit narrow" into "a full-screen overlay just opened from the right to show
+   * a LEFT-hand rail", covering the entire dashboard out of a sidecar the user never asked to leave.
+   * An explicit prop (rather than this component sniffing its own embedding context, e.g. via
+   * `showConversationSidebar` or some other side channel) is what keeps that decision the caller's
+   * to make, the same way `showConversationSidebar` already is.
+   */
+  allowRailFlyout?: boolean;
 }
 
 /**
@@ -106,9 +126,30 @@ interface TurnConversationTarget {
   version: string | undefined;
 }
 
-const CONVERSATION_MAX_WIDTH = 860;
-/** Fixed width of the saved-conversations sidebar (conversation_list.tsx). */
+/** Fixed width of the EXPANDED saved-conversations rail (conversation-list.tsx), asserted as an
+ * exact inline pixel value by this file's own display-mode tests. There is genuinely no SCSS
+ * counterpart for this one (unlike `$wzContentMaxWidth`, which chat-page.scss owns outright): the
+ * rail's width switches on a value this component measures off its own DOM node at runtime, which
+ * no CSS media/container query in this build can react to, so `$wzRailWidth` was deleted from
+ * `public/components/_redesign.scss` rather than kept as an unconsumed duplicate of this number. */
 const CONVERSATION_SIDEBAR_WIDTH = 260;
+/** Collapsed rail strip width (contract §5 / §6) — mirrors `$wzRailCollapsedWidth`
+ * (conversation-list.scss's `.wzConvoRailCollapsed` is the real SCSS consumer of that token; this
+ * is the same number applied to the OUTER panel this file renders, which has no CSS class of its
+ * own to read it from — same "measured at runtime" reasoning as `CONVERSATION_SIDEBAR_WIDTH`). */
+const RAIL_COLLAPSED_WIDTH = 48;
+/** Pane-width breakpoints for the rail's own display mode (contract §5 / §6). JS-only for the same
+ * reason as the widths above — these gate an imperative branch over a measured `offsetWidth`, not a
+ * CSS rule, so `$wzRailCollapseAt`/`$wzRailFlyoutAt` were deleted from `_redesign.scss` rather than
+ * left as tokens nothing could ever consume. Measured against the PANE (this component's own root),
+ * not the window, so an embedding context that gives this component less room (e.g. the docked
+ * header panel) collapses the rail on its own. */
+const RAIL_COLLAPSE_AT = 1100;
+const RAIL_FLYOUT_AT = 900;
+/** Window event announcing a conversation create/update/delete; every mounted ChatPage listens
+ * and refreshes, keeping the app shell's and the header flyout's sidebars in sync. */
+export const CONVERSATIONS_CHANGED_EVENT =
+  'wazuhAiAssistant:conversationsChanged';
 
 /**
  * Welcome-state example questions, now rendered as EuiCards (not plain badge chips) so the empty
@@ -196,6 +237,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   history,
   onGeneratingChange,
   isActive = true,
+  showConversationSidebar = true,
+  allowRailFlyout = true,
 }) => {
   // `useSyncedState` (public/hooks/use-synced-state.ts) is the `[value, setValue, ref]` pattern
   // used for `messages`, `inputText`, and `activeConversationId` below — see that hook's own doc
@@ -324,6 +367,26 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   // attached its "is the user near the bottom" listener to the wrong element and could fight
   // this one).
   const scrollPaneRef = useRef<HTMLDivElement | null>(null);
+
+  // Height of the transcript pane, published so ResultTable can step its page size 5 -> 10 above
+  // 900px (layout contract §4). MessageList/MessageBubble already thread this down; nothing was
+  // measuring it, so the taller page size was unreachable. Measured rather than derived from the
+  // window: the pane is what the rows have to fit inside, and it changes with the composer's own
+  // height, not just with the viewport. Guarded because jsdom has no ResizeObserver — there the
+  // value stays 0 and the default page size applies, which is what the existing tests expect.
+  const [transcriptHeightPx, setTranscriptHeightPx] = useState(0);
+  useEffect(() => {
+    const pane = scrollPaneRef.current;
+    if (!pane || typeof ResizeObserver === 'undefined') {
+      return;
+    }
+    const observer = new ResizeObserver(() =>
+      setTranscriptHeightPx(pane.clientHeight),
+    );
+    observer.observe(pane);
+    setTranscriptHeightPx(pane.clientHeight);
+    return () => observer.disconnect();
+  }, []);
   const pinnedToBottomRef = useRef(true);
   const handleScrollPane = () => {
     const pane = scrollPaneRef.current;
@@ -338,6 +401,94 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       pane.scrollTop = pane.scrollHeight;
     }
   }, [messages]);
+
+  /**
+   * Conversation rail display mode (layout contract §5 / job item 6): expanded at >=1100px of
+   * PANE width (not window width — `chatRootRef` is this component's own root, so an embedding
+   * context that gives it less room, e.g. the docked header panel, collapses on its own), a 48px
+   * collapsed strip below that, an `EuiFlyout` below 900px. `ConversationList` decides what to
+   * render FOR each mode (this component only owns the column's width/chrome and the breakpoint
+   * decision) via the optional `displayMode`/`onCollapse`/`onExpand` prop contract below — all
+   * default-safe so neither side breaks while the other half of this redesign is mid-flight.
+   *
+   * Deliberately does NOT measure at all when `ResizeObserver` is unavailable (jsdom, and any
+   * legacy browser) rather than falling back to a one-shot `offsetWidth` read: jsdom always
+   * reports 0, which would collapse every existing test's sidebar into 'flyout' mode. Every
+   * environment without `ResizeObserver` instead keeps the rail 'expanded', exactly how this
+   * component behaved before the rail became width-responsive.
+   *
+   * A width of exactly 0 IS observed in a real browser too — a hidden (`display: none`) pane, e.g.
+   * this component staying mounted behind the Settings tab (application.tsx) — and is ignored the
+   * same way for the same reason: see the `!width` guard inside the effect below.
+   *
+   * `allowRailFlyout` (default true, see this component's own prop doc comment) caps the mode at
+   * 'collapsed' instead of ever reaching 'flyout' — the docked header panel (assistant-chat-panel.tsx)
+   * passes `false` because its own panel routinely sits inside the flyout band, where an `EuiFlyout`
+   * would cover the whole dashboard from within a sidecar the user never asked to leave.
+   */
+  const chatRootRef = useRef<HTMLDivElement | null>(null);
+  const [railDisplayMode, setRailDisplayMode] = useState<
+    'expanded' | 'collapsed' | 'flyout'
+  >('expanded');
+  // A user-driven collapse/expand (via the rail's own affordance, once the other agent's
+  // ConversationList implements one) wins over the next resize tick landing in the same width
+  // bucket it already was in — reset the moment the pane crosses into/out of the flyout band,
+  // where there is no inline rail to keep collapsed or expanded in the first place.
+  const railManualOverrideRef = useRef<'expanded' | 'collapsed' | null>(null);
+  const [isRailFlyoutOpen, setIsRailFlyoutOpen] = useState(false);
+
+  useEffect(() => {
+    const element = chatRootRef.current;
+    if (!element || typeof ResizeObserver === 'undefined') {
+      return undefined;
+    }
+    const update = () => {
+      const width = element.offsetWidth;
+      // A hidden pane (`display: none`) measures 0 — the app shell (application.tsx) keeps ChatPage
+      // MOUNTED behind that while the Settings tab is showing, so every Chat<->Settings round-trip
+      // used to run this callback against a width of 0. Treating that as "very narrow" flipped the
+      // mode to 'flyout' AND (via the branch below) wiped `railManualOverrideRef`, so a rail the
+      // user had collapsed by hand silently re-expanded on every trip back from Settings. A width of
+      // 0 carries no real information about the pane's actual size, so it is ignored outright —
+      // whatever mode/override is already in state stays exactly as it was until a genuine
+      // measurement arrives.
+      if (!width) {
+        return;
+      }
+      if (width < RAIL_FLYOUT_AT) {
+        if (!allowRailFlyout) {
+          // The docked header panel (assistant-chat-panel.tsx) passes `allowRailFlyout={false}`:
+          // its own panel routinely sits inside this band (600–900px), and an `EuiFlyout` there
+          // would cover the whole dashboard from within a sidecar the user never asked to leave —
+          // see this prop's own doc comment. Capping at 'collapsed' is what removes the escalation
+          // instead of merely mitigating it.
+          railManualOverrideRef.current = null;
+          setRailDisplayMode('collapsed');
+          return;
+        }
+        railManualOverrideRef.current = null;
+        setRailDisplayMode('flyout');
+        return;
+      }
+      setRailDisplayMode(
+        railManualOverrideRef.current ??
+          (width < RAIL_COLLAPSE_AT ? 'collapsed' : 'expanded'),
+      );
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [allowRailFlyout]);
+
+  const handleRailCollapse = () => {
+    railManualOverrideRef.current = 'collapsed';
+    setRailDisplayMode('collapsed');
+  };
+  const handleRailExpand = () => {
+    railManualOverrideRef.current = 'expanded';
+    setRailDisplayMode('expanded');
+  };
 
   useEffect(() => {
     settingsService
@@ -485,9 +636,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     }
   };
 
-  // Persistent conversations: load the caller's own saved-conversation list once on mount.
-  // `refreshConversations` is also called after every create/update/delete below so the sidebar
-  // stays in sync without a full remount.
+  // Persistent conversations: load the caller's own saved-conversation list once on mount, then
+  // again on every CONVERSATIONS_CHANGED_EVENT so all mounted ChatPage instances (the app shell
+  // and the header flyout can be open at once) keep their sidebars in sync.
   const refreshConversations = () => {
     setIsLoadingConversations(true);
     conversationsService
@@ -500,8 +651,21 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       .finally(() => setIsLoadingConversations(false));
   };
 
+  // Mutations dispatch this instead of calling refreshConversations() directly: the event reaches
+  // every mounted ChatPage (including this one, synchronously), so the mutating instance refreshes
+  // exactly once and the listener never re-dispatches — no loop, no double fetch.
+  const notifyConversationsChanged = () => {
+    window.dispatchEvent(new Event(CONVERSATIONS_CHANGED_EVENT));
+  };
+
   useEffect(() => {
     refreshConversations();
+    window.addEventListener(CONVERSATIONS_CHANGED_EVENT, refreshConversations);
+    return () =>
+      window.removeEventListener(
+        CONVERSATIONS_CHANGED_EVENT,
+        refreshConversations,
+      );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -670,7 +834,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       if (activeConversationIdRef.current === id) {
         handleNewConversation();
       }
-      refreshConversations();
+      notifyConversationsChanged();
     } catch {
       setError(
         i18n.translate('wazuhAiAssistant.chat.conversations.deleteError', {
@@ -837,7 +1001,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             conversationVersionRef.current = created.version;
           }
         }
-        refreshConversations();
+        notifyConversationsChanged();
         if (args.adoptAsActive) {
           setSaveFailed(false);
         }
@@ -1515,19 +1679,15 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const showWelcomeState =
     hasProviders && messages.length === 0 && !showLoadingState;
 
-  // The sticky composer (`.wzStickyInputPanel` below) is a real flow sibling of the transcript,
-  // not an absolutely-positioned overlay: `position: sticky` reserves its own box in the flow like
-  // any other flex item, so a taller composer (e.g. multiline input) simply shrinks the
-  // transcript's flex-basis — no measurement needed for that. The one thing sticky positioning does
-  // NOT reserve is the fade gradient painted by its `::before` (chat-page.scss), which extends a
-  // fixed amount further upward outside the panel's own box, and is what a live measurement caught
-  // actually covering the last few pixels of the transcript's final element (a table's pagination
-  // bar) even once scrolled all the way down. `.wzChatTranscript`'s `padding-bottom` (chat-page.scss)
-  // reserves exactly that fixed gradient height via a shared SCSS constant, kept in sync with
-  // `::before` so the two can never drift apart. It deliberately does NOT reserve the panel's full
-  // rendered height — `position: sticky` already accounts for that on its own, and reserving it a
-  // second time here would leave a permanent gap the size of the composer at the bottom of every
-  // scroll once the transcript auto-scrolls all the way down.
+  // Layout contract §1 (AI/design/redesign-v2-spec.md): the composer (`.wzComposerRow` below) is
+  // the grid's own `auto` row, a real flow sibling of the transcript's `1fr` row — never an
+  // absolutely/sticky-positioned overlay. That is what makes the old overlap (a fixed-height fade
+  // gradient painted outside the sticky panel's own box, caught covering the last few pixels of the
+  // transcript's final element — a table's pagination bar — even scrolled all the way down)
+  // structurally impossible instead of something tuned per breakpoint: there is no gradient to
+  // desync from a compensating `padding-bottom`, because there is nothing left for either of them
+  // to compensate for. A taller composer (multiline input, up to `$wzComposerMaxHeight`) simply
+  // takes more of the grid's `auto` row, which the `1fr` row yields automatically.
 
   const privacyBadgeLabel = privacyEnabled
     ? i18n.translate('wazuhAiAssistant.chat.privacy.on', {
@@ -1604,12 +1764,14 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     // content, page scrolls normally) rather than breaking, so it is safe either way.
     <>
       {/* wzAiChat: the `--wz-*` token block chat-page.scss defines from EUI's own `$eui*` SASS
-        variables — every color/border reference in this subtree (sidebar rows, hero cards, the
-        sticky input focus ring) reads one of those custom properties instead of a hardcoded hex
+        variables — every color/border reference in this subtree (rail rows, welcome cards, the
+        composer's focus ring) reads one of those custom properties instead of a hardcoded hex
         or a JS-computed `theme:darkMode` branch. Custom properties inherit through the whole DOM
         subtree regardless of component boundaries, so nothing downstream needs its own dark-mode
-        prop threaded down to it. */}
+        prop threaded down to it. Also the rail-display-mode measurement root — see the
+        `railDisplayMode` effect above. */}
       <div
+        ref={chatRootRef}
         className='wzAiChat'
         style={{
           display: 'flex',
@@ -1617,575 +1779,579 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           minHeight: 0,
         }}
       >
-        {/* Left pane: saved-conversations sidebar. EuiPanel color="subdued" gives the standard OSD
-          "sunken" pane background without inventing a new hardcoded color. */}
-        <EuiPanel
-          color='subdued'
-          hasShadow={false}
-          hasBorder={false}
-          borderRadius='none'
-          paddingSize='m'
-          // EuiPanel's `grow` prop DEFAULTS TO TRUE (flex-grow:1), which in this flex-row parent
-          // overrode the fixed width below and let the sidebar swallow half the page. A
-          // fixed-width pane must explicitly opt out.
-          grow={false}
-          role='region'
-          aria-label={i18n.translate(
-            'wazuhAiAssistant.chat.conversations.sidebarRegionLabel',
-            { defaultMessage: 'Saved conversations' },
-          )}
-          style={{
-            width: CONVERSATION_SIDEBAR_WIDTH,
-            maxWidth: CONVERSATION_SIDEBAR_WIDTH,
-            flexShrink: 0,
-            overflowY: 'auto',
-            // `--wz-hairline` (chat-page.scss, sourced from `$euiBorderColor`) replaces the old
-            // hardcoded `#D3DAE6` — that hex was EUI's light-theme `lightShade` token with no
-            // dark-mode counterpart, so it rendered as the brightest edge on the page in dark mode.
-            borderRight: '1px solid var(--wz-hairline)',
-          }}
-        >
-          <ConversationList
-            conversations={conversations}
-            isLoading={isLoadingConversations}
-            activeConversationId={activeConversationId}
-            // Both go through the confirm gate: each would cancel a running answer. Delete is not
-            // gated — ConversationList already confirms it, and a second modal on top of that one
-            // would be worse than the risk it guards against.
-            //
-            // Clicking the conversation ALREADY open is not one of those actions: it is a no-op
-            // (`handleSelectConversation` returns immediately), so asking to confirm an interruption
-            // that was never going to happen only trains the user to dismiss the dialog. The check
-            // has to happen here, before the gate, not only inside the handler behind it.
-            onSelect={id => {
-              if (id === activeConversationIdRef.current) {
-                return;
-              }
-              void confirmIfGenerating(() => void handleSelectConversation(id));
-            }}
-            onNewConversation={() =>
-              void confirmIfGenerating(handleNewConversation)
-            }
-            onDelete={handleDeleteConversation}
-          />
-        </EuiPanel>
-
-        {/* Right pane: the chat column, centered, on the plain (default) background. This IS the
-          conversation's scroll container (the scrollbar belongs
-          at the pane's far edge like any chat app, never inside the chat column — and it should
-          only EXIST once the content actually overflows, no permanently reserved gutter, so
-          overflowY 'auto' with no scrollbarGutter). The auto-scroll pinning refs above target it;
-          overflowAnchor keeps Chrome's scroll anchoring from fighting the pinning while answers
-          stream (cast: React 16's CSSProperties predates that property). */}
-        <div
-          ref={scrollPaneRef}
-          onScroll={handleScrollPane}
-          role='region'
-          aria-label={i18n.translate(
-            'wazuhAiAssistant.chat.chatPaneRegionLabel',
-            { defaultMessage: 'Chat' },
-          )}
-          style={
-            {
-              flex: 1,
-              minWidth: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              // Always flex-start, in BOTH states. This used to be `center` for the welcome state,
-              // which centered the whole (hero + cards + input) cluster vertically by giving the
-              // PANE ITSELF — the one thing here with `overflowY: 'auto'` — a `justifyContent:
-              // 'center'`. That is the classic flexbox overflow-centering bug: when the centered
-              // content is taller than the pane (a saveFailed/error/session-expired callout above
-              // it, or just a short viewport with OSD chrome banners eating into it), a plain
-              // `center` distributes the overflow EQUALLY above and below, and scrollTop can never
-              // go negative — so the top of the overflow is simply unreachable, while the composer
-              // at the bottom renders past the visible edge, or mid-render is truncated. The
-              // welcome cluster now centers itself inside its own flex-grow spacers below instead
-              // (which collapse to 0 rather than going negative), so this container never needs to
-              // do it and never re-triggers the bug at any height >= ~600px.
-              justifyContent: 'flex-start',
-              overflowY: 'auto',
-              overflowAnchor: 'none',
-            } as React.CSSProperties
-          }
-        >
-          {/* Column flex is '1 0 auto' in BOTH states: grow fills the pane's available height when
-            content is short (so the WELCOME state's internal centering spacers below have room to
-            work with, and a CONVERSATION's input rests at the bottom), and shrink 0 stops flex
-            from SQUEEZING this column when its content — welcome cards plus a saveFailed/error/
-            session-expired callout above them, or a long conversation — outgrows the pane. A
-            shrinkable '1 1 auto' here (tried and reverted) let the column be squeezed below its
-            own content's height, which pushed the welcome prompt/cards to overflow BEHIND the
-            opaque sticky composer instead of the pane scrolling cleanly — the exact "spill past
-            the input" bug shrink 0 exists to prevent. With shrink 0 the column simply grows and
-            the PANE scrolls (edge scrollbar), while the sticky input keeps itself in view. */}
-          {/* Pane-centered in BOTH states (the earlier
-            welcome-only viewport-centering transform read as "leaning left with an empty right
-            band" on wide monitors — removed; the pane's alignItems centering is the only
-            horizontal centering now). */}
-          <div
+        {/* Left pane: saved-conversations rail. EuiPanel color="subdued" gives the standard OSD
+          "sunken" pane background without inventing a new hardcoded color. Width and the
+          expanded/collapsed choice are THIS component's (layout contract §5/§6); what a
+          'collapsed' 48px strip actually shows is ConversationList's own concern. */}
+        {showConversationSidebar && railDisplayMode !== 'flyout' && (
+          <EuiPanel
+            color='subdued'
+            hasShadow={false}
+            hasBorder={false}
+            borderRadius='none'
+            paddingSize={railDisplayMode === 'collapsed' ? 's' : 'm'}
+            // EuiPanel's `grow` prop DEFAULTS TO TRUE (flex-grow:1), which in this flex-row parent
+            // overrode the fixed width below and let the sidebar swallow half the page. A
+            // fixed-width pane must explicitly opt out.
+            grow={false}
+            role='region'
+            aria-label={i18n.translate(
+              'wazuhAiAssistant.chat.conversations.sidebarRegionLabel',
+              {
+                defaultMessage: 'Saved conversations',
+              },
+            )}
+            // `wzConvoRail` (conversation-list.scss) makes this panel a full-height flex column,
+            // which is what lets the rail's "Collapse" control pin itself to the bottom instead of
+            // simply following the last conversation.
+            className='wzConvoRail'
             style={{
-              maxWidth: CONVERSATION_MAX_WIDTH,
-              width: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              flex: '1 0 auto',
-              minHeight: 0,
-              padding: '16px 24px 0',
+              width:
+                railDisplayMode === 'collapsed'
+                  ? RAIL_COLLAPSED_WIDTH
+                  : CONVERSATION_SIDEBAR_WIDTH,
+              maxWidth:
+                railDisplayMode === 'collapsed'
+                  ? RAIL_COLLAPSED_WIDTH
+                  : CONVERSATION_SIDEBAR_WIDTH,
+              flexShrink: 0,
+              minWidth: 0,
+              // `.wzConvoRail`'s own list child scrolls (conversation-list.scss); the panel
+              // scrolling too is what produced a second, horizontal scrollbar and pushed the
+              // pinned Collapse control below the fold.
+              overflow: 'hidden',
+              // `--wz-hairline` (chat-page.scss, sourced from `$euiBorderColor`) replaces the old
+              // hardcoded `#D3DAE6` — that hex was EUI's light-theme `lightShade` token with no
+              // dark-mode counterpart, so it rendered as the brightest edge on the page in dark mode.
+              borderRight: '1px solid var(--wz-hairline)',
             }}
           >
-            {/* The view's `<h1>`, for assistive tech only. The chat column had no heading at all,
-                  which left screen-reader users without a name for the thing they are reading and
-                  the page without a document outline. A VISIBLE header was tried and dropped: a
-                  conversation's title is generated from its first message, so a visible strip
-                  restated the user's own question directly above that same question in the
-                  transcript, and the sidebar already marks which conversation is open. Screen-
-                  reader-only keeps the semantics without the duplication — and matches the Home
-                  Overview, which likewise shows no page-scale title. */}
-            {!showLoadingState && !showNoProviderState && (
-              <EuiScreenReaderOnly>
-                <h1>
-                  {activeConversationTitle ??
-                    i18n.translate(
-                      'wazuhAiAssistant.chat.conversations.newConversationHeading',
-                      { defaultMessage: 'New conversation' },
-                    )}
-                </h1>
-              </EuiScreenReaderOnly>
-            )}
+            <ConversationList
+              conversations={conversations}
+              isLoading={isLoadingConversations}
+              activeConversationId={activeConversationId}
+              // Both go through the confirm gate: each would cancel a running answer. Delete is not
+              // gated — ConversationList already confirms it, and a second modal on top of that one
+              // would be worse than the risk it guards against.
+              //
+              // Clicking the conversation ALREADY open is not one of those actions: it is a no-op
+              // (`handleSelectConversation` returns immediately), so asking to confirm an interruption
+              // that was never going to happen only trains the user to dismiss the dialog. The check
+              // has to happen here, before the gate, not only inside the handler behind it.
+              onSelect={id => {
+                if (id === activeConversationIdRef.current) {
+                  return;
+                }
+                void confirmIfGenerating(
+                  () => void handleSelectConversation(id),
+                );
+              }}
+              onNewConversation={() =>
+                void confirmIfGenerating(handleNewConversation)
+              }
+              onDelete={handleDeleteConversation}
+              // Rail prop contract agreed with the ConversationList owner (job item 6): all three
+              // are optional with defaults, so this call is safe to ship whether or not
+              // conversation-list.tsx has picked them up yet.
+              displayMode={railDisplayMode}
+              onCollapse={handleRailCollapse}
+              onExpand={handleRailExpand}
+            />
+          </EuiPanel>
+        )}
 
-            {/* Callouts render in priority order (never suppressed — resilience-first: every
-                  state is shown, just ordered): session expiry first (it blocks everything else),
-                  then generic errors, then a failed auto-save, then the optimistic-concurrency
-                  merge notices. Session-expiry recovery UX: a genuine 401, distinct from
-                  managerAuthHint's best-effort heuristic below. Persistent (no dismiss control,
-                  and nothing in this file ever calls setSessionExpired(false) except starting a
-                  fresh send) until the user reloads, per this fix's brief. */}
-            {sessionExpired && (
-              <StatusCallout
-                title={i18n.translate(
-                  'wazuhAiAssistant.chat.sessionExpired.title',
-                  {
-                    defaultMessage: 'Your session expired',
-                  },
+        {/* Below the flyout threshold there is no room for an inline rail at all — a small
+          trigger opens ConversationList inside an EuiFlyout instead (variation 4a's own flyout
+          idiom, reused here for the rail rather than invented fresh). This button is new UI the
+          spec's layout contract implies but does not itself word — see this component's final
+          report for the exact i18n key. */}
+        {showConversationSidebar && railDisplayMode === 'flyout' && (
+          <div
+            style={{
+              flexShrink: 0,
+              borderRight: '1px solid var(--wz-hairline)',
+              padding: '8px 4px',
+            }}
+          >
+            <EuiButtonIcon
+              iconType='menu'
+              color='text'
+              onClick={() => setIsRailFlyoutOpen(true)}
+              aria-label={i18n.translate(
+                'wazuhAiAssistant.chat.conversations.openRailButton',
+                { defaultMessage: 'Show conversations' },
+              )}
+            />
+          </div>
+        )}
+        {showConversationSidebar &&
+          railDisplayMode === 'flyout' &&
+          isRailFlyoutOpen && (
+            <EuiFlyout
+              size='s'
+              ownFocus
+              onClose={() => setIsRailFlyoutOpen(false)}
+              aria-label={i18n.translate(
+                'wazuhAiAssistant.chat.conversations.sidebarRegionLabel',
+                { defaultMessage: 'Saved conversations' },
+              )}
+            >
+              {/* EuiFlyout portals into document.body, past every ancestor that defines the
+                `--wz-*` tokens — including `.wzAiChat` — so without a block of its own the rail's
+                selected/hover row pills resolve to nothing inside it. Carried by a plain wrapper
+                rather than by EuiFlyout's own `className`: that prop does not reach an element
+                that ends up ancestral to this content in this EUI build, which a regression test
+                caught. `.wzConvoRailFlyout` sets custom properties only, so an extra div here
+                changes no layout. */}
+              <div className='wzConvoRailFlyout'>
+                <EuiFlyoutBody>
+                  <ConversationList
+                    conversations={conversations}
+                    isLoading={isLoadingConversations}
+                    activeConversationId={activeConversationId}
+                    onSelect={id => {
+                      if (id === activeConversationIdRef.current) {
+                        setIsRailFlyoutOpen(false);
+                        return;
+                      }
+                      void confirmIfGenerating(() => {
+                        void handleSelectConversation(id);
+                        setIsRailFlyoutOpen(false);
+                      });
+                    }}
+                    onNewConversation={() =>
+                      void confirmIfGenerating(() => {
+                        handleNewConversation();
+                        setIsRailFlyoutOpen(false);
+                      })
+                    }
+                    onDelete={handleDeleteConversation}
+                    displayMode='flyout'
+                    onCollapse={handleRailCollapse}
+                    onExpand={handleRailExpand}
+                  />
+                </EuiFlyoutBody>
+              </div>
+            </EuiFlyout>
+          )}
+
+        {/* Right pane: the chat column. Layout contract §1 — a two-row CSS grid
+          (`grid-template-rows: 1fr auto`, chat-page.scss `.wzChatPane`), NOT the flex column plus
+          `position: sticky` composer this replaces. Row 1 (`.wzChatTranscript` below) is the ONLY
+          scroll container; row 2 (`.wzComposerRow` below) stays in normal flow. That grid boundary
+          — not a tuned padding/gradient pair — is what makes the composer/welcome overlap this
+          redesign fixes structurally impossible instead of merely rare. */}
+        <div className='wzChatPane' style={{ flex: 1, minWidth: 0 }}>
+          {/* The conversation's ONE scroll container — scrollbar belongs at the pane's far edge
+            like any chat app, and should only exist once content overflows (no permanently
+            reserved gutter). The auto-scroll pinning refs above target it; overflowAnchor keeps
+            Chrome's scroll anchoring from fighting the pinning while answers stream. */}
+          <div
+            ref={scrollPaneRef}
+            onScroll={handleScrollPane}
+            role='region'
+            aria-label={i18n.translate(
+              'wazuhAiAssistant.chat.chatPaneRegionLabel',
+              {
+                defaultMessage: 'Chat',
+              },
+            )}
+            className='wzChatTranscript'
+          >
+            {/* `.wzTranscriptContent` (chat-page.scss): the full-width wrapper that owns the ONE
+              shared `16px 24px 0` gutter — `.wzContentMeasure` below (header/callouts/welcome) and
+              `MessageList` (rendered as ITS sibling further down, not its descendant) both sit
+              inside it, which is what lets a table-bearing turn's own row measure past
+              `.wzContentMeasure`'s 1060px cap instead of being clipped to it (layout contract §5). */}
+            <div
+              className='wzTranscriptContent'
+              style={{ padding: '16px 24px 0' }}
+            >
+              {/* `.wzContentMeasure` (chat-page.scss): the ONE centred column transcript prose and
+              the composer share (layout contract §5) — reads `$wzContentMaxWidth` off the shared
+              `_redesign.scss` token instead of restating it, which is what this file's old
+              `CONVERSATION_MAX_WIDTH = 860` constant used to do in parallel. `--stretch` only while
+              this holds the welcome state (see chat-page.scss's own comment on that modifier) — the
+              ordinary message-list case stays a plain flow box so it never claims the whole
+              transcript height for itself and pushes `MessageList`'s sibling row out of view. */}
+              <div
+                className={
+                  showWelcomeState
+                    ? 'wzContentMeasure wzContentMeasure--stretch'
+                    : 'wzContentMeasure'
+                }
+              >
+                {/* The view's `<h1>`, for assistive tech only. The chat column had no heading at all,
+                    which left screen-reader users without a name for the thing they are reading and
+                    the page without a document outline. A VISIBLE header was tried and dropped: a
+                    conversation's title is generated from its first message, so a visible strip
+                    restated the user's own question directly above that same question in the
+                    transcript, and the sidebar already marks which conversation is open. Screen-
+                    reader-only keeps the semantics without the duplication — and matches the Home
+                    Overview, which likewise shows no page-scale title. */}
+                {!showLoadingState && !showNoProviderState && (
+                  <EuiScreenReaderOnly>
+                    <h1>
+                      {activeConversationTitle ??
+                        i18n.translate(
+                          'wazuhAiAssistant.chat.conversations.newConversationHeading',
+                          {
+                            defaultMessage: 'New conversation',
+                          },
+                        )}
+                    </h1>
+                  </EuiScreenReaderOnly>
                 )}
-                color='danger'
-                iconType='lock'
-                body={i18n.translate(
-                  'wazuhAiAssistant.chat.sessionExpired.body',
-                  {
-                    defaultMessage:
-                      'Reload the page to sign in again. Your unsent message has been saved and will be restored automatically.',
-                  },
-                )}
-                action={
-                  <EuiButton
-                    size='s'
-                    color='danger'
-                    onClick={() => window.location.reload()}
-                  >
-                    {i18n.translate(
-                      'wazuhAiAssistant.chat.sessionExpired.reloadButton',
+
+                {/* Callouts render in priority order (never suppressed — resilience-first: every
+                    state is shown, just ordered): session expiry first (it blocks everything else),
+                    then generic errors, then a failed auto-save, then the optimistic-concurrency
+                    merge notices. Session-expiry recovery UX: a genuine 401, distinct from
+                    managerAuthHint's best-effort heuristic below. Persistent (no dismiss control,
+                    and nothing in this file ever calls setSessionExpired(false) except starting a
+                    fresh send) until the user reloads, per this fix's brief. */}
+                {sessionExpired && (
+                  <StatusCallout
+                    title={i18n.translate(
+                      'wazuhAiAssistant.chat.sessionExpired.title',
                       {
-                        defaultMessage: 'Reload page',
+                        defaultMessage: 'Your session expired',
                       },
                     )}
-                  </EuiButton>
-                }
-              />
-            )}
-
-            {(error || providersError) && (
-              <StatusCallout
-                title={i18n.translate('wazuhAiAssistant.chat.errorTitle', {
-                  defaultMessage: 'Something went wrong',
-                })}
-                color='danger'
-                iconType='alert'
-                body={error ?? providersError}
-              />
-            )}
-
-            {managerAuthHint && (
-              <StatusCallout
-                title={i18n.translate(
-                  'wazuhAiAssistant.chat.managerAuthHint.title',
-                  {
-                    defaultMessage: 'Your Wazuh session may have expired',
-                  },
+                    color='danger'
+                    iconType='lock'
+                    body={i18n.translate(
+                      'wazuhAiAssistant.chat.sessionExpired.body',
+                      {
+                        defaultMessage:
+                          'Reload the page to sign in again. Your unsent message has been saved and will be restored automatically.',
+                      },
+                    )}
+                    action={
+                      <EuiButton
+                        size='s'
+                        color='danger'
+                        onClick={() => window.location.reload()}
+                      >
+                        {i18n.translate(
+                          'wazuhAiAssistant.chat.sessionExpired.reloadButton',
+                          {
+                            defaultMessage: 'Reload page',
+                          },
+                        )}
+                      </EuiButton>
+                    }
+                  />
                 )}
-                color='warning'
-                iconType='alert'
-                body={i18n.translate(
-                  'wazuhAiAssistant.chat.managerAuthHint.body',
-                  {
-                    defaultMessage:
-                      'A request to the Wazuh manager failed, which can happen when your dashboard session token has expired. Reload the page and sign in again, then retry your question.',
-                  },
-                )}
-              />
-            )}
 
-            {/* A failed auto-save is surfaced instead of swallowed: the conversation on screen is
+                {(error || providersError) && (
+                  <StatusCallout
+                    title={i18n.translate('wazuhAiAssistant.chat.errorTitle', {
+                      defaultMessage: 'Something went wrong',
+                    })}
+                    color='danger'
+                    iconType='alert'
+                    body={error ?? providersError}
+                  />
+                )}
+
+                {managerAuthHint && (
+                  <StatusCallout
+                    title={i18n.translate(
+                      'wazuhAiAssistant.chat.managerAuthHint.title',
+                      {
+                        defaultMessage: 'Your Wazuh session may have expired',
+                      },
+                    )}
+                    color='warning'
+                    iconType='alert'
+                    body={i18n.translate(
+                      'wazuhAiAssistant.chat.managerAuthHint.body',
+                      {
+                        defaultMessage:
+                          'A request to the Wazuh manager failed, which can happen when your dashboard session token has expired. Reload the page and sign in again, then retry your question.',
+                      },
+                    )}
+                  />
+                )}
+
+                {/* A failed auto-save is surfaced instead of swallowed: the conversation on screen is
                 ahead of what is stored, which the user cannot infer from anything else. Not
                 dismissible — this reports real data-loss risk — but no longer purely passive: the
                 next turn's save still retries on its own, and "Retry now" (handleRetrySave) lets
                 the user clear it immediately once whatever blocked the save (e.g. a read-only
                 index) is fixed, instead of waiting on the next answer. Either path clears this the
                 same way, via persistConversationTurn's own setSaveFailed(false) on success. */}
-            {saveFailed && (
-              <StatusCallout
-                title={i18n.translate(
-                  'wazuhAiAssistant.chat.conversations.saveFailed.title',
-                  {
-                    defaultMessage: 'This conversation is not being saved',
-                  },
-                )}
-                color='warning'
-                iconType='alert'
-                body={i18n.translate(
-                  'wazuhAiAssistant.chat.conversations.saveFailed.body',
-                  {
-                    defaultMessage:
-                      'The latest messages could not be saved, so they may be missing if you reload. The chat still works, and saving is retried after each answer.',
-                  },
-                )}
-                action={
-                  <EuiButton
-                    size='s'
-                    color='warning'
-                    onClick={handleRetrySave}
-                    isLoading={isRetryingSave}
-                    // Also disabled while a turn is generating: retrying with a target built
-                    // from the live refs while the in-flight turn's OWN target is still
-                    // unresolved (e.g. its pre-send save hasn't created the row yet) would race
-                    // it into creating a second conversation row — see handleRetrySave's doc
-                    // comment. The turn's own post-answer save runs moments after streaming ends.
-                    isDisabled={isRetryingSave || isGenerating}
-                  >
-                    {i18n.translate(
-                      'wazuhAiAssistant.chat.conversations.saveFailed.retryButton',
-                      { defaultMessage: 'Retry now' },
+                {saveFailed && (
+                  <StatusCallout
+                    title={i18n.translate(
+                      'wazuhAiAssistant.chat.conversations.saveFailed.title',
+                      {
+                        defaultMessage: 'This conversation is not being saved',
+                      },
                     )}
-                  </EuiButton>
-                }
-              />
-            )}
+                    color='warning'
+                    iconType='alert'
+                    body={i18n.translate(
+                      'wazuhAiAssistant.chat.conversations.saveFailed.body',
+                      {
+                        defaultMessage:
+                          'The latest messages could not be saved, so they may be missing if you reload. The chat still works, and saving is retried after each answer.',
+                      },
+                    )}
+                    action={
+                      <EuiButton
+                        size='s'
+                        color='warning'
+                        onClick={handleRetrySave}
+                        isLoading={isRetryingSave}
+                        // Also disabled while a turn is generating: retrying with a target built
+                        // from the live refs while the in-flight turn's OWN target is still
+                        // unresolved (e.g. its pre-send save hasn't created the row yet) would race
+                        // it into creating a second conversation row — see handleRetrySave's doc
+                        // comment. The turn's own post-answer save runs moments after streaming ends.
+                        isDisabled={isRetryingSave || isGenerating}
+                      >
+                        {i18n.translate(
+                          'wazuhAiAssistant.chat.conversations.saveFailed.retryButton',
+                          { defaultMessage: 'Retry now' },
+                        )}
+                      </EuiButton>
+                    }
+                  />
+                )}
 
-            {/* Optimistic-concurrency notice: shown after persistConversationAfterTurn's
+                {/* Optimistic-concurrency notice: shown after persistConversationAfterTurn's
                   auto-save hit a 409 on the last completed turn — see saveConversationWithMerge's
                   own doc comment for exactly when each variant fires. Non-blocking: the chat itself
                   is fully usable either way, this is purely informational. */}
-            {mergeNotice === 'merged' && (
-              <StatusCallout
-                title={i18n.translate(
-                  'wazuhAiAssistant.chat.conversations.mergedNotice.title',
-                  {
-                    defaultMessage: 'Conversation merged',
-                  },
-                )}
-                // A successful merge is a good outcome, not a warning — the conflict variant
-                // right below keeps 'warning'/'alert', so the two are no longer visually
-                // identical for opposite results.
-                color='success'
-                iconType='check'
-                body={i18n.translate(
-                  'wazuhAiAssistant.chat.conversations.mergedNotice.body',
-                  {
-                    defaultMessage:
-                      'This conversation was also updated in another tab — the versions were merged.',
-                  },
-                )}
-              />
-            )}
-
-            {mergeNotice === 'conflict' && (
-              <StatusCallout
-                title={i18n.translate(
-                  'wazuhAiAssistant.chat.conversations.mergeConflictNotice.title',
-                  {
-                    defaultMessage: 'Could not merge automatically',
-                  },
-                )}
-                color='warning'
-                iconType='alert'
-                body={i18n.translate(
-                  'wazuhAiAssistant.chat.conversations.mergeConflictNotice.body',
-                  {
-                    defaultMessage:
-                      'This conversation is being edited in another tab and the changes could not be merged automatically. Your latest messages are still shown here, but they may not be saved.',
-                  },
-                )}
-              />
-            )}
-
-            {showLoadingState && (
-              <EuiFlexGroup
-                justifyContent='center'
-                alignItems='center'
-                style={{ minHeight: 240 }}
-              >
-                <EuiFlexItem grow={false}>
-                  <EuiLoadingSpinner
-                    size='xl'
-                    aria-label={i18n.translate(
-                      'wazuhAiAssistant.common.loading',
+                {mergeNotice === 'merged' && (
+                  <StatusCallout
+                    title={i18n.translate(
+                      'wazuhAiAssistant.chat.conversations.mergedNotice.title',
                       {
-                        defaultMessage: 'Loading...',
+                        defaultMessage: 'Conversation merged',
+                      },
+                    )}
+                    // A successful merge is a good outcome, not a warning — the conflict variant
+                    // right below keeps 'warning'/'alert', so the two are no longer visually
+                    // identical for opposite results.
+                    color='success'
+                    iconType='check'
+                    body={i18n.translate(
+                      'wazuhAiAssistant.chat.conversations.mergedNotice.body',
+                      {
+                        defaultMessage:
+                          'This conversation was also updated in another tab. The versions were merged.',
                       },
                     )}
                   />
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            )}
+                )}
 
-            {showNoProviderState && (
-              <EuiEmptyPrompt
-                iconType='machineLearningApp'
-                title={
-                  <h2>
-                    {i18n.translate('wazuhAiAssistant.chat.noProvider.title', {
-                      defaultMessage: 'No AI provider configured',
-                    })}
-                  </h2>
-                }
-                body={
-                  <p>
-                    {i18n.translate('wazuhAiAssistant.chat.noProvider.body', {
-                      defaultMessage:
-                        'The AI Assistant needs at least one connected provider (OpenAI-compatible or Anthropic) before it can answer questions. Add one to get started.',
-                    })}
-                  </p>
-                }
-                actions={
-                  <EuiButton
-                    color='primary'
-                    fill
-                    onClick={onNavigateToSettings}
-                  >
-                    {i18n.translate('wazuhAiAssistant.chat.noProvider.action', {
-                      defaultMessage: 'Add a provider',
-                    })}
-                  </EuiButton>
-                }
-              />
-            )}
-
-            {/* Middle section: grows to push the input to the pane's bottom on short
-                  conversations, and simply carries the message flow on long ones — the PANE (not
-                  this div) is the scroll container, so no scrollbar ever renders inside the chat
-                  column (the column's own flex '1 0 auto' shrink-lock is
-                  what prevents the old spill-past-the-input bug, see its comment above). In the
-                  welcome state it becomes a flex column so the two spacers just inside it (below)
-                  can position the empty prompt slightly above the vertical middle of the available
-                  space — no `justifyContent: 'center'` here either, for the same
-                  overflow-centering-bug reason as the pane above.
-
-                  The composer-overlap fix itself lives in chat-page.scss: `.wzChatTranscript`'s
-                  `padding-bottom` there reserves exactly the sticky panel's `::before` fade-gradient
-                  height (a constant shared with the panel's own rule, see that file), which is what
-                  guarantees the transcript's last element (e.g. a table's pagination bar) can always
-                  scroll fully clear of the sticky panel. It is a fixed CSS reservation, not the
-                  panel's full rendered height — `position: sticky` already reserves that on its own
-                  as an ordinary flex sibling, growing or shrinking with the composer automatically. */}
-            <div
-              className='wzChatTranscript'
-              style={
-                showWelcomeState
-                  ? {
-                      flex: '1 1 auto',
-                      minHeight: 0,
-                      display: 'flex',
-                      flexDirection: 'column',
-                    }
-                  : {
-                      flex: '1 1 auto',
-                      minHeight: 0,
-                    }
-              }
-            >
-              {showWelcomeState && (
-                <>
-                  {/* Centering spacer, top. A flex-GROW spacer (not `justifyContent: 'center'` on
-                        the parent) is what makes this degrade safely: when the welcome cluster is
-                        shorter than the available space, these two spacers split the leftover room
-                        4:5 so the cluster sits slightly ABOVE center rather than dead in the middle
-                        (Task: "should sit slightly above center, not float in dead space"). When
-                        the cluster is TALLER than the available space (a callout pushed it down, a
-                        short viewport, extra OSD chrome), both spacers have flex-basis 0 and
-                        nowhere to shrink to but 0 — so they simply vanish instead of going
-                        negative, and the content starts flush at the top and the pane scrolls
-                        normally. That is what a plain `center` on an overflowing scroll container
-                        cannot do (see the pane's own comment above). */}
-                  <div
-                    aria-hidden='true'
-                    style={{ flex: '4 0 0', minHeight: 0 }}
+                {mergeNotice === 'conflict' && (
+                  <StatusCallout
+                    title={i18n.translate(
+                      'wazuhAiAssistant.chat.conversations.mergeConflictNotice.title',
+                      {
+                        defaultMessage: 'Could not merge automatically',
+                      },
+                    )}
+                    color='warning'
+                    iconType='alert'
+                    body={i18n.translate(
+                      'wazuhAiAssistant.chat.conversations.mergeConflictNotice.body',
+                      {
+                        defaultMessage:
+                          'This conversation is being edited in another tab and the changes could not be merged automatically. Your latest messages are still shown here, but they may not be saved.',
+                      },
+                    )}
                   />
-                  <EuiEmptyPrompt
-                    // No `icon`: this chat already lives inside the Wazuh app chrome, so a Wazuh
-                    // mark on the welcome screen only repeated branding the user can already see.
-                    title={
-                      // EUI's own type scale (size='m') instead of an inline fontSize/weight/
-                      // letter-spacing override — the whole point of this pass is to stop
-                      // fighting EuiEmptyPrompt's built-in typography with inline styles.
-                      <EuiTitle size='m'>
-                        <h2>
-                          {i18n.translate(
-                            'wazuhAiAssistant.chat.welcome.title',
-                            {
-                              defaultMessage: 'Ask the AI Assistant something',
-                            },
-                          )}
-                        </h2>
-                      </EuiTitle>
-                    }
-                    body={
-                      // `color='subdued'`: the title alone should carry the visual weight — a
-                      // same-weight subtitle right under it was competing with it instead of
-                      // reading as a second, lighter tier of the same heading (the "clear heading
-                      // hierarchy" half of the welcome-screen polish pass). Text itself is
-                      // unchanged, so the i18n id stays stable.
-                      <EuiText size='m' color='subdued'>
-                        <p>
-                          {i18n.translate(
-                            'wazuhAiAssistant.chat.welcome.subtitle',
-                            {
-                              defaultMessage:
-                                'Ask questions about your security data in plain language.',
-                            },
-                          )}
-                        </p>
-                      </EuiText>
-                    }
-                  />
-                  <EuiSpacer size='l' />
-                  {/* Same existing "Try one of these..." string, now reads as a small
-                        section label introducing the cards rather than a second full
-                        paragraph competing with the subtitle above. Moved out of
-                        EuiEmptyPrompt's body (along with the card row below) so the row is
-                        no longer clamped to the empty prompt's ~576px content width — it now
-                        spans the full ~860px chat column instead of wrapping 2+1.
-                        EuiBetaBadge (the same "lighter, navigation-style" device the Home
-                        Overview's SectionHeader uses) replaces the old uppercase/letter-spaced
-                        inline-styled label — it is never smaller than the content it introduces,
-                        unlike the label it replaces. */}
+                )}
+
+                {showLoadingState && (
                   <EuiFlexGroup
-                    gutterSize='none'
                     justifyContent='center'
-                    responsive={false}
+                    alignItems='center'
+                    style={{ minHeight: 240 }}
                   >
                     <EuiFlexItem grow={false}>
-                      <EuiBetaBadge
-                        color='subdued'
-                        label={i18n.translate(
-                          'wazuhAiAssistant.chat.welcome.body',
-                          {
-                            defaultMessage: 'Try one of these',
-                          },
-                        )}
+                      <EuiLoadingSpinner
+                        size='xl'
                         aria-label={i18n.translate(
-                          'wazuhAiAssistant.chat.welcome.bodyAriaLabel',
-                          { defaultMessage: 'Example questions section' },
+                          'wazuhAiAssistant.common.loading',
+                          {
+                            defaultMessage: 'Loading...',
+                          },
                         )}
                       />
                     </EuiFlexItem>
                   </EuiFlexGroup>
-                  <EuiSpacer size='s' />
-                  {/* Elevated example cards (EuiPanel, not EuiCard): a titleSize="xs"-style
-                        compact EuiCard is not a reliably typed prop in this EUI version and
-                        EuiCard's fixed layout paddings still read oversized at "s"/horizontal
-                        for a 3-up row this narrow, so this uses onClick EuiPanels instead —
-                        icon chip + title + one truncated line, now with a consistent height,
-                        a hover lift (wzHeroCard, see chat-page.scss), and a staggered
-                        fade/slide-in on mount driven by each card's own --wzCardDelay.
-                        Clicking still only fills the input (unchanged setInputText call),
-                        never auto-sends. */}
-                  <EuiFlexGroup
-                    gutterSize='m'
-                    wrap
-                    justifyContent='center'
-                    responsive={false}
-                  >
-                    {EXAMPLE_CARDS.map((card, index) => (
-                      <EuiFlexItem
-                        grow={1}
-                        key={card.id}
-                        style={{ minWidth: 220, maxWidth: 280 }}
-                      >
-                        <EuiPanel
-                          paddingSize='m'
-                          hasShadow={false}
-                          hasBorder
-                          onClick={() => setInputText(card.question)}
-                          className='wzHeroCard'
-                          style={
-                            {
-                              textAlign: 'left',
-                              height: '100%',
-                              minHeight: 128,
-                              display: 'flex',
-                              flexDirection: 'column',
-                              // No borderRadius override — EuiPanel's own default applies.
-                              // Consumed only by chat-page.scss's reduced-motion-safe
-                              // animation-delay rule; see this component's own doc comment.
-                              '--wzCardDelay': `${index * 80}ms`,
-                            } as React.CSSProperties
-                          }
-                        >
-                          <div
-                            style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              width: 32,
-                              height: 32,
-                              borderRadius: 4,
-                              background: 'var(--wz-accent-soft)',
-                            }}
-                          >
-                            <EuiIcon
-                              type={card.icon}
-                              size='m'
-                              color='primary'
-                            />
-                          </div>
-                          <EuiSpacer size='s' />
-                          <EuiText size='s'>
-                            <strong>{card.title}</strong>
-                          </EuiText>
-                          <EuiText size='xs' color='subdued'>
-                            <p
-                              style={{
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap',
-                                margin: '2px 0 0',
-                              }}
-                            >
-                              {card.question}
-                            </p>
-                          </EuiText>
-                        </EuiPanel>
-                      </EuiFlexItem>
-                    ))}
-                  </EuiFlexGroup>
-                  <EuiSpacer size='l' />
-                  {/* Centering spacer, bottom — the 5 half of the 4:5 split described on the top
-                        spacer above; consistent spacing down to the composer is the `EuiSpacer`
-                        right above this, which stays fixed regardless of how much extra room this
-                        spacer ends up absorbing. */}
-                  <div
-                    aria-hidden='true'
-                    style={{ flex: '5 0 0', minHeight: 0 }}
-                  />
-                </>
-              )}
+                )}
 
+                {showNoProviderState && (
+                  <EuiEmptyPrompt
+                    iconType='machineLearningApp'
+                    title={
+                      <h2>
+                        {i18n.translate(
+                          'wazuhAiAssistant.chat.noProvider.title',
+                          {
+                            defaultMessage: 'No AI provider configured',
+                          },
+                        )}
+                      </h2>
+                    }
+                    body={
+                      <p>
+                        {i18n.translate(
+                          'wazuhAiAssistant.chat.noProvider.body',
+                          {
+                            defaultMessage:
+                              'The AI Assistant needs at least one connected provider (OpenAI-compatible or Anthropic) before it can answer questions. Add one to get started.',
+                          },
+                        )}
+                      </p>
+                    }
+                    actions={
+                      <EuiButton
+                        color='primary'
+                        fill
+                        onClick={onNavigateToSettings}
+                      >
+                        {i18n.translate(
+                          'wazuhAiAssistant.chat.noProvider.action',
+                          {
+                            defaultMessage: 'Add a provider',
+                          },
+                        )}
+                      </EuiButton>
+                    }
+                  />
+                )}
+
+                {/* Welcome centres only when there is room (contract §3): `.wzWelcomeCenter`
+                    (chat-page.scss) is a `flex: 1 1 auto` column with `justify-content: center`,
+                    growing into whatever the transcript row leaves it. NOT the
+                    `display:grid; place-content:center` this comment used to describe — on a grid
+                    container `place-content` also sets `justify-content`, which packed the column
+                    track at its content width and collapsed the example cards to one per row. A
+                    tall viewport centres the cluster; a short one has nowhere to grow into, so this
+                    stops at the content's own height and the transcript's own `overflow-y: auto`
+                    takes over — nothing here can ever reach the composer, which is a grid sibling
+                    of the transcript, never a descendant of it. */}
+                {showWelcomeState && (
+                  <div className='wzWelcomeCenter'>
+                    <EuiEmptyPrompt
+                      // No `icon`: this chat already lives inside the Wazuh app chrome, so a Wazuh
+                      // mark on the welcome screen only repeated branding the user can already see.
+                      title={
+                        // EUI's own type scale (size='m') instead of an inline fontSize/weight/
+                        // letter-spacing override — the whole point of this pass is to stop
+                        // fighting EuiEmptyPrompt's built-in typography with inline styles.
+                        <EuiTitle size='m'>
+                          <h2>
+                            {i18n.translate(
+                              'wazuhAiAssistant.chat.welcome.title',
+                              {
+                                defaultMessage:
+                                  'Ask the AI Assistant something',
+                              },
+                            )}
+                          </h2>
+                        </EuiTitle>
+                      }
+                      body={
+                        // `color='subdued'`: the title alone should carry the visual weight — a
+                        // same-weight subtitle right under it was competing with it instead of
+                        // reading as a second, lighter tier of the same heading (the "clear heading
+                        // hierarchy" half of the welcome-screen polish pass). Text itself is
+                        // unchanged, so the i18n id stays stable.
+                        <EuiText size='m' color='subdued'>
+                          <p>
+                            {i18n.translate(
+                              'wazuhAiAssistant.chat.welcome.subtitle',
+                              {
+                                defaultMessage:
+                                  'Ask questions about your security data in plain language.',
+                              },
+                            )}
+                          </p>
+                        </EuiText>
+                      }
+                    />
+                    <EuiSpacer size='l' />
+                    {/* Welcome variation 1a (design's own recommendation): ONE bordered, shadowless
+                        container with a centred pill header, holding three horizontal cards —
+                        icon-left, title plus the full question as a two-line description, hairline
+                        border — the Home Overview idiom, replacing the old icon-top/150px/
+                        one-truncated-line cards that floated on the page background with no
+                        grouping container. Clicking a card still only fills the input (unchanged
+                        `setInputText` call), never auto-sends. */}
+                    {/* `grow={false}`: EuiPanel's `grow` DEFAULTS TO TRUE (flex-grow: 1), and
+                        this panel is a flex item of the welcome's centring column — left at
+                        the default it stretched to the full transcript height, so the cards
+                        sat at the top of a tall empty box instead of the cluster sitting
+                        centred. Same trap as the conversation rail's own panel above. */}
+                    <EuiPanel
+                      hasBorder
+                      hasShadow={false}
+                      paddingSize='l'
+                      grow={false}
+                    >
+                      <EuiFlexGroup
+                        gutterSize='none'
+                        justifyContent='center'
+                        responsive={false}
+                      >
+                        <EuiFlexItem grow={false}>
+                          <EuiBadge color='hollow'>
+                            {i18n.translate(
+                              'wazuhAiAssistant.chat.welcome.body',
+                              {
+                                defaultMessage: 'Try one of these',
+                              },
+                            )}
+                          </EuiBadge>
+                        </EuiFlexItem>
+                      </EuiFlexGroup>
+                      <EuiSpacer size='m' />
+                      {/* `.wzExampleCardsGrid` (chat-page.scss): `repeat(auto-fit, minmax(240px,
+                          1fr))` — 3-up, 2-up, 1-up with no fixed pixel card widths, so this can
+                          never be the thing that introduces horizontal scroll (contract §3). */}
+                      <div className='wzExampleCardsGrid'>
+                        {EXAMPLE_CARDS.map(card => (
+                          <EuiCard
+                            key={card.id}
+                            layout='horizontal'
+                            display='plain'
+                            hasBorder
+                            icon={
+                              <EuiIcon
+                                type={card.icon}
+                                size='l'
+                                color='primary'
+                              />
+                            }
+                            title={card.title}
+                            description={card.question}
+                            onClick={() => setInputText(card.question)}
+                          />
+                        ))}
+                      </div>
+                    </EuiPanel>
+                  </div>
+                )}
+              </div>
+              {/* `MessageList` is `.wzContentMeasure`'s SIBLING inside `.wzTranscriptContent`, not its
+              descendant — see this file's `.wzTranscriptContent` doc comment above. Nesting it
+              inside `.wzContentMeasure` (the pre-fix shape) capped every row's own breakout width
+              against that element's 1060px measure, which is why a table-bearing turn could never
+              actually reach `min(100%, $wzTableMaxWidth)` regardless of window width. */}
               {!showLoadingState &&
                 !showNoProviderState &&
                 !showWelcomeState && (
                   <MessageList
+                    transcriptHeightPx={transcriptHeightPx}
                     messages={messages}
                     resolveDiscoverUrl={resolveDiscoverUrl}
                     resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
@@ -2196,23 +2362,34 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   />
                 )}
             </div>
+          </div>
 
-            {!showLoadingState && !showNoProviderState && (
-              <div
-                className={
-                  hasProviders
-                    ? 'wzStickyInputPanel'
-                    : 'wzStickyInputPanel wzStickyInputPanel-isDisabled'
-                }
-              >
-                <EuiSpacer size='xs' />
+          {/* Composer row: the grid's `auto` row (`.wzChatPane` above), a real flow sibling of the
+            transcript, never an overlay — see the layout-contract comment above `privacyBadgeLabel`.
+            `.wzComposerRow` (chat-page.scss) is the composer's OWN ceiling (`max-height:
+            $wzComposerMaxHeight`, internal scroll past that); the textarea's independent 5-row
+            autogrow cap lives in chat-input.tsx. */}
+          {!showLoadingState && !showNoProviderState && (
+            <div
+              className={
+                hasProviders
+                  ? 'wzComposerRow'
+                  : 'wzComposerRow wzComposerRow-isDisabled'
+              }
+            >
+              <div className='wzContentMeasure' style={{ padding: '8px 24px' }}>
                 <EuiPanel
                   color='plain'
                   hasBorder
                   hasShadow={false}
                   paddingSize='s'
-                  style={{ marginBottom: 12 }}
+                  style={{ marginBottom: 8 }}
                 >
+                  {/* Composer floor and ceiling (contract §2): the textarea (chat-input.tsx) owns
+                    its own one-line floor and 5-row autogrow cap; the controls row below it is a
+                    normal flow sibling, in-panel, BELOW the field — never a second layer over it.
+                    That stacking (not an absolute overlay) is what keeps the placeholder from ever
+                    being squeezed under one line box. */}
                   <ChatInput
                     ref={chatInputRef}
                     value={inputText}
@@ -2236,7 +2413,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                           <EuiToolTip
                             content={i18n.translate(
                               'wazuhAiAssistant.chat.privacy.adminSet',
-                              { defaultMessage: 'Set by administrator' },
+                              {
+                                defaultMessage: 'Set by administrator',
+                              },
                             )}
                           >
                             {privacyBadge}
@@ -2283,7 +2462,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                               compressed
                               prepend={i18n.translate(
                                 'wazuhAiAssistant.chat.providerLabel',
-                                { defaultMessage: 'Provider' },
+                                {
+                                  defaultMessage: 'Provider',
+                                },
                               )}
                               options={providerOptions}
                               value={selectedProviderId}
@@ -2292,7 +2473,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                               }
                               aria-label={i18n.translate(
                                 'wazuhAiAssistant.chat.providerSelect',
-                                { defaultMessage: 'Provider' },
+                                {
+                                  defaultMessage: 'Provider',
+                                },
                               )}
                             />
                           </EuiFlexItem>
@@ -2306,7 +2489,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                               onClick={handleStop}
                               aria-label={i18n.translate(
                                 'wazuhAiAssistant.chat.stopButton',
-                                { defaultMessage: 'Stop' },
+                                {
+                                  defaultMessage: 'Stop',
+                                },
                               )}
                             />
                           ) : (
@@ -2319,7 +2504,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                               disabled={!hasProviders || !inputText.trim()}
                               aria-label={i18n.translate(
                                 'wazuhAiAssistant.chat.sendButton',
-                                { defaultMessage: 'Send' },
+                                {
+                                  defaultMessage: 'Send',
+                                },
                               )}
                             />
                           )}
@@ -2336,10 +2523,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     })}
                   </p>
                 </EuiText>
-                <EuiSpacer size='s' />
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </>

@@ -1,0 +1,82 @@
+/**
+ * Results card (layout contract §4 — AI/design/redesign-v2-spec.md, "Screen 2"). The card is a
+ * 3-row CSS grid: header and the pagination footer are pinned rows, only the middle
+ * (`wzResultsCardBody`) row scrolls. This is what makes "page 2 of 6 unreachable without resizing
+ * the window" — the BREAKING bug the spec calls out — structurally impossible instead of merely
+ * rare: the footer can never end up below the viewport fold, because it is not laid out below an
+ * unbounded-height body any more.
+ *
+ * No `position: sticky` anywhere in here on purpose (Safari/high-DPR rule: "No position:sticky
+ * inside an overflow:auto table body" — pinning the header/footer as their own grid rows is the
+ * prescribed replacement).
+ */
+@import '../redesign';
+
+.wzResultsCard {
+  @include wzPanel(0);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  /* Fallback first: `dvh` only shipped in Safari 15.4, and a browser that drops the line
+     below would lose the cap entirely — which is exactly how the "pagination below the
+     fold" bug returns, on the browser family this redesign was written for. */
+  max-height: 460px;
+  max-height: $wzResultsMaxHeight;
+  // The card's own border/radius (from wzPanel) needs the grid to respect it instead of letting a
+  // tall body row bleed past the rounded corners.
+  overflow: hidden;
+}
+
+.wzResultsCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--wz-hairline, #{$euiBorderColor});
+}
+
+.wzResultsCardToggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+
+  &:hover,
+  &:focus-visible {
+    background-color: var(--wz-accent-hover, #{rgba($euiColorPrimary, 0.06)});
+  }
+}
+
+.wzResultsCardBody {
+  @include wzScrollChild;
+  padding: 12px;
+}
+
+.wzResultsCardFooter {
+  border-top: 1px solid var(--wz-hairline, #{$euiBorderColor});
+  padding: 4px 8px;
+}
+
+/** Provenance/Discover/Security-Analytics chip cluster in the header (result-table.tsx). Header's
+ * own `justify-content: space-between` already separates it from the toggle button; `flex-shrink: 0`
+ * is what this class actually needs to add — without it a long titleText (a wide table plus the
+ * "+N more fields" note) could squeeze the chips down to nothing instead of wrapping onto their own
+ * line the way `flex-wrap: wrap` above intends. */
+.wzResultsCardActions {
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .wzResultsCardToggle {
+    transition: background-color $wzMotionFast $wzEase;
+  }
+}

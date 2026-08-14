@@ -1,8 +1,16 @@
+import path from 'path';
+import fs from 'fs';
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import {
+  act,
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { createBrowserHistory } from 'history';
-import { ChatPage } from './chat-page';
+import { ChatPage, CONVERSATIONS_CHANGED_EVENT } from './chat-page';
 import {
   ConversationRecord,
   PersistedChatMessage,
@@ -712,6 +720,21 @@ describe('ChatPage — restoring the open conversation', () => {
     await waitFor(() =>
       expect(window.location.pathname).toBe('/conversation/conv-b'),
     );
+  });
+
+  it('hides the saved-conversations sidebar when showConversationSidebar is false', () => {
+    const view = renderChatPage({ showConversationSidebar: false });
+
+    // getByRole (not getByText): the conversation header's own "New conversation" fallback
+    // title (chat-page.tsx) can render the exact same string as this sidebar button.
+    expect(
+      screen.queryByRole('button', { name: 'New conversation' }),
+    ).toBeNull();
+
+    view.rerenderWith({ showConversationSidebar: true });
+    expect(
+      screen.getByRole('button', { name: 'New conversation' }),
+    ).toBeInTheDocument();
   });
 });
 
@@ -1640,103 +1663,50 @@ describe('ChatPage — pre-turn Manager session guard (issue #8826)', () => {
   });
 });
 
-describe('ChatPage — welcome-state layout does not clip the composer', () => {
+describe('ChatPage — two-row grid pane (contract §1)', () => {
   /**
-   * Regression guard for the composer-clipping bug: the chat pane (the region with `overflowY:
-   * 'auto'`, identified by its `aria-label`) must never carry `justifyContent: 'center'` in the
-   * welcome state. That combination is what caused the bug — a centered flex box whose content
-   * (hero + cards + composer) is taller than the pane distributes the overflow equally above and
-   * below, and since `scrollTop` can never go negative, the top half becomes unreachable while the
-   * bottom (the composer) renders past the visible edge or mid-content. The pane must stay
-   * `flex-start` at all times; any vertical centering happens further down, inside flex-grow
-   * spacers that collapse to zero instead of going negative.
-   */
-  it('never centers the scrollable chat pane itself, even on the welcome screen', async () => {
-    renderChatPage();
-    await waitFor(() =>
-      expect(
-        screen.getByText('Ask the AI Assistant something'),
-      ).toBeInTheDocument(),
-    );
-
-    const pane = screen.getByRole('region', { name: 'Chat' });
-    expect(pane.style.justifyContent).not.toBe('center');
-    expect(pane.style.overflowY).toBe('auto');
-  });
-
-  it('keeps the composer input reachable once a callout pushes the welcome content down', async () => {
-    mockConversationsService.create.mockRejectedValue(httpError(500));
-    const stream = createControllableStream();
-    mockStreamChat.mockImplementation(
-      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
-    );
-
-    renderChatPage();
-    // A save-failed callout above the welcome content is exactly the kind of extra height that
-    // used to push the composer out of the centered flex box and off screen.
-    await sendMessage('first question');
-    await waitFor(() =>
-      expect(
-        screen.getByText('This conversation is not being saved'),
-      ).toBeInTheDocument(),
-    );
-
-    // The composer is still there and not display:none/visibility:hidden'd — the whole point of
-    // the fix is that it stays in the DOM's visible flow, with the pane scrolling to reach it
-    // rather than the layout clipping it.
-    expect(screen.getByLabelText('Chat message')).toBeVisible();
-    const pane = screen.getByRole('region', { name: 'Chat' });
-    expect(pane.style.justifyContent).not.toBe('center');
-  });
-
-  /**
-   * Regression guard for the shrink/overlap bug: the welcome column (the pane's direct child) must
-   * never be shrinkable (`flex-shrink: 0`, i.e. a flex-basis of `1 0 auto`). A shrinkable column
-   * (`1 1 auto`, tried and reverted) let the pane squeeze it below its own content's height once
-   * welcome content plus a callout above it overflowed the pane — pushing the cards to render
-   * BEHIND the opaque sticky composer instead of the pane scrolling cleanly. A conversation's own
-   * column already uses `1 0 auto` for the same reason (see its own comment); the welcome state
-   * must match, not diverge.
-   */
-  it('never lets the welcome column shrink below its own content height', async () => {
-    renderChatPage();
-    await waitFor(() =>
-      expect(
-        screen.getByText('Ask the AI Assistant something'),
-      ).toBeInTheDocument(),
-    );
-
-    const pane = screen.getByRole('region', { name: 'Chat' });
-    const column = pane.firstElementChild as HTMLElement;
-    expect(column.style.flex).toBe('1 0 auto');
-    // jsdom serializes the numeric `minHeight: 0` style as '0'; real browsers report '0px'.
-    expect(['0', '0px']).toContain(column.style.minHeight);
-  });
-});
-
-describe('ChatPage — transcript reserves space for the sticky composer', () => {
-  /**
-   * Regression guard for the composer-overlap bug, and for the over-reservation bug a prior fix
-   * for it introduced. A live measurement caught the sticky composer (`.wzStickyInputPanel`)
-   * covering the bottom few pixels of the transcript's last element (a table's pagination bar)
-   * even once scrolled all the way down — `position: sticky` reserves the panel's own box in the
-   * flow, but not the fade gradient its `::before` paints further upward (chat-page.scss). A prior
-   * fix over-corrected by feeding the panel's FULL measured `offsetHeight` back as the transcript's
-   * `paddingBottom` in JS: that double-reserves space `position: sticky` already accounts for (the
-   * panel is an ordinary flex sibling), leaving a permanent composer-sized gap at the bottom of the
-   * transcript whenever the conversation is scrolled all the way down — which the auto-scroll
-   * effect forces after every turn. The actual fix is a fixed CSS `padding-bottom` on
-   * `.wzChatTranscript` (chat-page.scss) sized to just the `::before` gradient's height via a SCSS
-   * constant shared with the panel's own rule, so the two can never drift apart, and growth of the
-   * composer itself (e.g. multiline input) is left entirely to ordinary flex layout.
+   * Regression guard for the composer/welcome overlap bug, and for the over-reservation bug a
+   * prior fix for it introduced. A live measurement once caught the sticky composer covering the
+   * bottom few pixels of the transcript's last element (a table's pagination bar) even once
+   * scrolled all the way down — `position: sticky` reserved the panel's own box in the flow, but
+   * not the fade gradient its `::before` painted further upward. The fix replaces that whole
+   * mechanism: the pane is now a `display: grid; grid-template-rows: 1fr auto` (`.wzChatPane`,
+   * chat-page.scss), so the transcript (`1fr`, scrolling) and the composer (`auto`, in flow) are
+   * independent grid rows with no overlap possible by construction — nothing to desync, no
+   * gradient, no compensating padding.
    *
    * jsdom never lays out real boxes and does not evaluate the imported `.scss`, so no jsdom test
-   * can pin the actual pixel values or reproduce the real overlap. What these pin instead is the
-   * STRUCTURAL choice: (1) the component itself no longer computes or sets any `paddingBottom`
-   * inline — reintroducing a JS measurement here is exactly how the over-reservation bug came
-   * back — and (2) the stylesheet reserves the gradient's own fixed height, not an arbitrary or
-   * unrelated pixel figure, by construction (one SCSS variable feeding both rules).
+   * can pin actual pixel values or reproduce the real overlap. What these pin instead is the
+   * STRUCTURAL choice the grid rests on.
    */
+  it('gives the transcript its own scroll container, independent of the composer', async () => {
+    renderChatPage();
+    await waitFor(() =>
+      expect(
+        screen.getByText('Ask the AI Assistant something'),
+      ).toBeInTheDocument(),
+    );
+
+    // The region named "Chat" IS the transcript now — the single scroll container — not a wrapper
+    // that also encloses the composer the way the old sticky-panel layout did.
+    const transcript = screen.getByRole('region', { name: 'Chat' });
+    expect(transcript.className).toContain('wzChatTranscript');
+
+    // The composer is a SIBLING of the transcript inside `.wzChatPane`, never a descendant of it —
+    // that grid-row separation is what makes the old overlap structurally impossible.
+    const composerInput = screen.getByLabelText('Chat message');
+    expect(transcript.contains(composerInput)).toBe(false);
+
+    // Nothing in the composer's own ancestor chain uses sticky/absolute positioning any more — the
+    // grid row boundary is the only thing keeping it in place.
+    let node: HTMLElement | null = composerInput;
+    while (node) {
+      expect(node.style.position).not.toBe('sticky');
+      expect(node.style.position).not.toBe('absolute');
+      node = node.parentElement;
+    }
+  });
+
   it('never sets an inline paddingBottom on the transcript (no JS height measurement)', async () => {
     renderChatPage();
     await waitFor(() =>
@@ -1745,36 +1715,333 @@ describe('ChatPage — transcript reserves space for the sticky composer', () =>
       ).toBeInTheDocument(),
     );
 
-    const pane = screen.getByRole('region', { name: 'Chat' });
-    const transcript = pane.querySelector('.wzChatTranscript') as HTMLElement;
-    expect(transcript).not.toBeNull();
-    // A previous fix set this from a `ResizeObserver`-fed `offsetHeight` state; that measurement
-    // (and the double-reservation bug it caused) is gone. Any style on this element now comes
-    // entirely from the `.wzChatTranscript` CSS class in chat-page.scss.
+    const transcript = screen.getByRole('region', { name: 'Chat' });
+    // Any style on this element comes entirely from the `.wzChatTranscript` CSS class
+    // (chat-page.scss) — there is no gradient height to reserve space for any more.
     expect(transcript.style.paddingBottom).toBe('');
   });
 
-  it("keeps the transcript's CSS padding tied to the sticky panel's own gradient height", () => {
-    // `require.resolve` goes through Jest's own module resolution, which this project's
-    // moduleNameMapper points at `style_mock.js` for every `.scss` import — reading through
-    // that would read the mock's content, not this file's real rules. `path.join` against
-    // `__dirname` sidesteps Jest's resolver entirely and reads the actual SCSS off disk.
-    const scssPath = require('path').join(__dirname, 'chat-page.scss');
-    const scssSource = require('fs').readFileSync(scssPath, 'utf8');
-
-    const transcriptPadding = scssSource.match(
-      /\.wzChatTranscript\s*{\s*padding-bottom:\s*([^;]+);/,
-    );
-    const gradientHeight = scssSource.match(
-      /&::before\s*{[^}]*height:\s*([^;]+);/,
+  it('keeps the composer input reachable once a callout pushes the transcript content down', async () => {
+    mockConversationsService.create.mockRejectedValue(httpError(500));
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
     );
 
-    expect(transcriptPadding).not.toBeNull();
-    expect(gradientHeight).not.toBeNull();
-    // Both rules read from the same SCSS variable, so this equality holds by construction — the
-    // regression this guards against is one side being changed (or hardcoded) without the other,
-    // which would either reopen the overlap or reintroduce a mismatched over-reservation.
-    expect(transcriptPadding![1].trim()).toBe(gradientHeight![1].trim());
-    expect(transcriptPadding![1].trim()).toBe('$wzComposerGradientHeight');
+    renderChatPage();
+    // A save-failed callout above the welcome content is exactly the kind of extra height that
+    // used to push the composer out of a centered flex box and off screen under the old layout.
+    await sendMessage('first question');
+    await waitFor(() =>
+      expect(
+        screen.getByText('This conversation is not being saved'),
+      ).toBeInTheDocument(),
+    );
+
+    // The composer is still there and not display:none/visibility:hidden'd — it lives in its own
+    // grid row, entirely unaffected by how tall the transcript's content grows.
+    expect(screen.getByLabelText('Chat message')).toBeVisible();
+  });
+
+  it('removes the old sticky/gradient mechanism from the stylesheet entirely', () => {
+    // `path.join` against `__dirname` sidesteps Jest's `moduleNameMapper` (which points `.scss`
+    // imports at `style_mock.js`) and reads the actual SCSS off disk, the same way the previous
+    // version of this test did to pin the mechanism it was checking.
+    const scssPath = path.join(__dirname, 'chat-page.scss');
+    const scssSource = fs.readFileSync(scssPath, 'utf8');
+    // Comments are stripped before matching: this file DOCUMENTS the removed mechanism by name
+    // ("there is no `position: sticky` ..."), so asserting against the raw source would fail on the
+    // very prose that explains why the rule is gone. Only real declarations are interesting here.
+    const scssRules = scssSource
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/^\s*\/\/.*$/gm, '');
+
+    expect(scssRules).not.toMatch(/position:\s*sticky/);
+    expect(scssRules).not.toMatch(/wzComposerGradientHeight/);
+    expect(scssRules).not.toMatch(/::before/);
+    // The replacement mechanism is in place instead: a two-row grid pane, and a shared measure
+    // class reading the redesign token rather than restating a pixel figure.
+    expect(scssRules).toMatch(/grid-template-rows:\s*1fr auto/);
+    expect(scssRules).toMatch(/max-width:\s*\$wzContentMaxWidth/);
+  });
+});
+
+describe('ChatPage — welcome centers only when there is room (contract §3)', () => {
+  it('gives the welcome cluster its own centering box inside the transcript row', async () => {
+    renderChatPage();
+    const heading = await screen.findByText('Ask the AI Assistant something');
+
+    const welcomeBox = heading.closest('.wzWelcomeCenter');
+    expect(welcomeBox).not.toBeNull();
+    // The centering box is INSIDE the transcript's own scroll container, never a sibling of it —
+    // a short viewport falls back to the transcript's own scroll instead of pushing into the
+    // composer, which only holds if the centering box is a descendant, not a peer.
+    const transcript = screen.getByRole('region', { name: 'Chat' });
+    expect(transcript.contains(welcomeBox)).toBe(true);
+  });
+
+  it('groups the example prompts as horizontal cards inside one bordered container (variation 1a)', async () => {
+    renderChatPage();
+    await screen.findByText('Ask the AI Assistant something');
+
+    // The pill header groups the cards under one container, replacing the old three-cards-with-
+    // no-grouping-container layout.
+    expect(screen.getByText('Try one of these')).toBeInTheDocument();
+    // The full question is now the card's description (no longer truncated to one line), and the
+    // title is shown separately — both readable without truncation.
+    expect(
+      screen.getByText('Show me the critical findings of the last 24 hours'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Critical findings')).toBeInTheDocument();
+  });
+});
+
+describe('ChatPage — sidebar sync across instances (#8827)', () => {
+  it('refreshes the conversation list when another instance announces a change', async () => {
+    mockConversationsService.list.mockResolvedValue([]);
+    renderChatPage();
+    await waitFor(() =>
+      expect(mockConversationsService.list).toHaveBeenCalledTimes(1),
+    );
+
+    // Another mounted ChatPage (e.g. the header flyout) saved a new conversation.
+    mockConversationsService.list.mockResolvedValue([
+      {
+        id: 'conv-flyout',
+        title: 'Created in the flyout',
+        updatedAt: '2024-01-01',
+      },
+    ]);
+    act(() => {
+      window.dispatchEvent(new Event(CONVERSATIONS_CHANGED_EVENT));
+    });
+
+    await waitFor(() =>
+      expect(screen.getByText('Created in the flyout')).toBeInTheDocument(),
+    );
+    expect(mockConversationsService.list).toHaveBeenCalledTimes(2);
+  });
+
+  it('stops listening once unmounted', async () => {
+    mockConversationsService.list.mockResolvedValue([]);
+    const { unmount } = renderChatPage();
+    await waitFor(() =>
+      expect(mockConversationsService.list).toHaveBeenCalledTimes(1),
+    );
+
+    unmount();
+    window.dispatchEvent(new Event(CONVERSATIONS_CHANGED_EVENT));
+
+    expect(mockConversationsService.list).toHaveBeenCalledTimes(1);
+  });
+});
+
+/**
+ * Rail display mode (layout contract §5/§6): expanded at >=1100px of PANE width, a 48px collapsed
+ * strip below that, an `EuiFlyout` below 900px. jsdom has no `ResizeObserver`, and always reports
+ * `offsetWidth: 0` — measuring unconditionally against that would collapse the rail into 'flyout'
+ * mode in EVERY existing test in this file (all written against an always-expanded rail), so the
+ * component only measures when `ResizeObserver` actually exists, and stays 'expanded' otherwise.
+ * These tests stub `ResizeObserver` the same way assistant-chat-panel.test.tsx does for its own
+ * (unrelated) panel-width responsiveness, to exercise the measuring branch at all.
+ */
+describe('ChatPage — conversation rail display mode (layout contract §5/§6)', () => {
+  function stubResizeObserver(width: number) {
+    let triggerResize: (() => void) | undefined;
+    class ResizeObserverStub {
+      constructor(callback: () => void) {
+        triggerResize = callback;
+      }
+      observe() {}
+      disconnect() {}
+    }
+    const original = (window as unknown as { ResizeObserver?: unknown })
+      .ResizeObserver;
+    (window as unknown as { ResizeObserver: unknown }).ResizeObserver =
+      ResizeObserverStub;
+    const widthSpy = jest
+      .spyOn(HTMLElement.prototype, 'offsetWidth', 'get')
+      .mockReturnValue(width);
+    return {
+      resize: (nextWidth: number) => {
+        widthSpy.mockReturnValue(nextWidth);
+        triggerResize?.();
+      },
+      restore: () => {
+        widthSpy.mockRestore();
+        (window as unknown as { ResizeObserver: unknown }).ResizeObserver =
+          original;
+      },
+    };
+  }
+
+  it('stays expanded without ResizeObserver, matching every other test in this file', async () => {
+    mockConversationsService.list.mockResolvedValue([
+      { id: 'conv-b', title: 'Older conversation', updatedAt: '2024-01-01' },
+    ]);
+    renderChatPage();
+    // The rail is fully rendered inline — a 'flyout' mode here would hide this row behind a
+    // button/flyout instead, which every other test in this file assumes never happens.
+    await waitFor(() =>
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
+    );
+  });
+
+  it('collapses the rail to a 48px strip between the flyout and expand thresholds', async () => {
+    const stub = stubResizeObserver(1000);
+    try {
+      mockConversationsService.list.mockResolvedValue([
+        { id: 'conv-b', title: 'Older conversation', updatedAt: '2024-01-01' },
+      ]);
+      renderChatPage();
+      const rail = await screen.findByRole('region', {
+        name: 'Saved conversations',
+      });
+      expect(rail.style.width).toBe('48px');
+      // The strip is icon-only by design: at this width there is no room for titles, so the rail
+      // renders affordances (new conversation, search, expand) and nothing else. Asserting the
+      // absence is the point — a strip that still painted 22-character truncated titles would be
+      // the "undense rail" the redesign is removing, just narrower.
+      expect(screen.queryByText('Older conversation')).toBeNull();
+    } finally {
+      stub.restore();
+    }
+  });
+
+  it('moves the rail into an EuiFlyout below the flyout threshold, reachable via its own trigger', async () => {
+    const stub = stubResizeObserver(700);
+    try {
+      mockConversationsService.list.mockResolvedValue([
+        { id: 'conv-b', title: 'Older conversation', updatedAt: '2024-01-01' },
+      ]);
+      renderChatPage();
+      // No inline rail region at this width — the conversations list is not directly reachable.
+      await waitFor(() =>
+        expect(
+          screen.queryByRole('region', { name: 'Saved conversations' }),
+        ).not.toBeInTheDocument(),
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Show conversations' }),
+      );
+
+      await waitFor(() =>
+        expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      );
+    } finally {
+      stub.restore();
+    }
+  });
+
+  it('gives the rail flyout its own design-token block, since it renders outside the chat surface', async () => {
+    // `EuiFlyout` portals into document.body, so NOTHING in the chat surface's ancestor chain
+    // reaches it — including `.wzAiChat`, the element that defines every `--wz-*` custom property.
+    // Without a token block of its own the rows' selected/hover pills (`var(--wz-accent-soft)` /
+    // `var(--wz-accent-hover)`) failed substitution and computed to transparent, so on a narrow
+    // pane the open conversation had no highlight at all and hover did nothing. Same portal trap
+    // the provider flyout already carried its own token block for.
+    const stub = stubResizeObserver(700);
+    try {
+      mockConversationsService.list.mockResolvedValue([
+        { id: 'conv-b', title: 'Older conversation', updatedAt: '2024-01-01' },
+      ]);
+      renderChatPage();
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Show conversations' }),
+      );
+
+      await waitFor(() =>
+        expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      );
+      // Asserted as an ANCESTOR of the rows rather than on the flyout element by name: what the
+      // pills need is for the token block to sit somewhere above them in the tree, which is the
+      // precise thing portalling broke.
+      expect(
+        screen.getByText('Older conversation').closest('.wzConvoRailFlyout'),
+      ).not.toBeNull();
+    } finally {
+      stub.restore();
+    }
+  });
+
+  it('re-expands the rail when the pane grows back past the collapse threshold', async () => {
+    const stub = stubResizeObserver(1000);
+    try {
+      mockConversationsService.list.mockResolvedValue([
+        { id: 'conv-b', title: 'Older conversation', updatedAt: '2024-01-01' },
+      ]);
+      renderChatPage();
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('48px');
+      });
+
+      stub.resize(1200);
+
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('260px');
+      });
+    } finally {
+      stub.restore();
+    }
+  });
+
+  it('ignores a zero-width measurement instead of collapsing into flyout and wiping a manual override', async () => {
+    // A hidden pane (`display: none`) measures 0 — the app shell (application.tsx) keeps ChatPage
+    // MOUNTED behind that while the Settings tab is showing, so a Chat<->Settings round-trip used
+    // to run the resize callback against a width of 0. Before the fix that flipped the mode to
+    // 'flyout' AND cleared `railManualOverrideRef`, so a rail the user had collapsed/expanded by
+    // hand silently reverted to the resize-driven default on every trip back from Settings.
+    const stub = stubResizeObserver(1000);
+    try {
+      mockConversationsService.list.mockResolvedValue([
+        { id: 'conv-b', title: 'Older conversation', updatedAt: '2024-01-01' },
+      ]);
+      renderChatPage();
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('48px');
+      });
+
+      // Manually expand, at a width that would otherwise default to 'collapsed'.
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Expand conversation list' }),
+      );
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('260px');
+      });
+
+      // Pane hidden (e.g. behind the Settings tab): must not change anything.
+      stub.resize(0);
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('260px');
+      });
+
+      // Pane shown again, still narrow: the manual override is still respected, proving the
+      // zero-width tick never wiped it.
+      stub.resize(1000);
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('260px');
+      });
+    } finally {
+      stub.restore();
+    }
   });
 });

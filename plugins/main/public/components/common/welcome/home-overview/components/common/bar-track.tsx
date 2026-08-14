@@ -1,12 +1,10 @@
 import React from 'react';
 import { EuiText } from '@elastic/eui';
 import { formatUINumber } from '../../../../../../react-services/format-number';
+import { HOME_OVERVIEW_CHROME } from '../../lib/theme-colors';
 
 /** Height of every proportional bar (distribution, dual, gauge). */
 export const BAR_HEIGHT = 10;
-
-/** Unfilled portion of a bar; theme-neutral. */
-const TRACK_BACKGROUND = 'rgba(128, 128, 128, 0.15)';
 
 /** The colored square every legend entry starts with. */
 const LegendDot: React.FC<{ color: string }> = ({ color }) => (
@@ -60,7 +58,7 @@ export const BarTrack: React.FC<{ children: React.ReactNode }> = ({
       height: BAR_HEIGHT,
       borderRadius: 4,
       overflow: 'hidden',
-      background: TRACK_BACKGROUND,
+      background: HOME_OVERVIEW_CHROME.trackBackground,
     }}
   >
     {children}

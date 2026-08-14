@@ -14,7 +14,7 @@ mkdir -p "$TESTS_TMP"
 
 # Plugins present in the fixture; loop over this list so every plugin gets
 # the same assertions as plugins/main.
-PLUGINS=(main wazuh-core wazuh-check-updates)
+PLUGINS=(main wazuh-core wazuh-check-updates wazuh-ai-assistant)
 
 PASS=0
 FAIL=0
@@ -123,6 +123,7 @@ setup_fixture() {
     "$WORK/plugins/main/common/api-info" \
     "$WORK/plugins/wazuh-core" \
     "$WORK/plugins/wazuh-check-updates" \
+    "$WORK/plugins/wazuh-ai-assistant" \
     "$WORK/.github/workflows" \
     "$WORK/docker/imposter"
 
@@ -164,6 +165,14 @@ EOF
 }
 EOF
 
+  cat >"$WORK/plugins/wazuh-ai-assistant/package.json" <<'EOF'
+{
+  "name": "wazuh-ai-assistant",
+  "version": "5.0.0",
+  "revision": "02"
+}
+EOF
+
   cat >"$WORK/plugins/main/opensearch_dashboards.json" <<'EOF'
 {
   "id": "wazuh",
@@ -181,6 +190,13 @@ EOF
   cat >"$WORK/plugins/wazuh-check-updates/opensearch_dashboards.json" <<'EOF'
 {
   "id": "wazuhCheckUpdates",
+  "version": "5.0.0-02"
+}
+EOF
+
+  cat >"$WORK/plugins/wazuh-ai-assistant/opensearch_dashboards.json" <<'EOF'
+{
+  "id": "wazuhAiAssistant",
   "version": "5.0.0-02"
 }
 EOF

@@ -37,6 +37,7 @@ The Wazuh dashboard package includes:
   - `wazuh` - Main dashboard application
   - `wazuh-core` - Shared services and utilities
   - `wazuh-check-updates` - Update notification system
+  - `wazuh-ai-assistant` - AI assistant chat
 - **OpenSearch Dashboards**: Pre-configured base platform
 - **Node.js runtime**: Bundled with the package
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiText } from '@elastic/eui';
-import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
+import { HOME_OVERVIEW_COLOR } from '../../lib/theme-colors';
 import { decimalFormat } from '../../../utils/helpers';
 import { BarTrack, LegendItem } from './bar-track';
 import { EmptyState } from './empty-state';
@@ -58,10 +58,10 @@ export const DualBarList: React.FC<DualBarListProps> = ({
         style={{ marginBottom: 10 }}
       >
         <EuiFlexItem grow={false}>
-          <LegendItem color={UI_COLOR_STATUS.success} label='Passed' />
+          <LegendItem color={HOME_OVERVIEW_COLOR.success} label='Passed' />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <LegendItem color={UI_COLOR_STATUS.failed} label='Failed' />
+          <LegendItem color={HOME_OVERVIEW_COLOR.failed} label='Failed' />
         </EuiFlexItem>
       </EuiFlexGroup>
       <div
@@ -93,7 +93,7 @@ export const DualBarList: React.FC<DualBarListProps> = ({
                     <div
                       style={{
                         width: `${passPct}%`,
-                        background: UI_COLOR_STATUS.success,
+                        background: HOME_OVERVIEW_COLOR.success,
                       }}
                     />
                   )}
@@ -101,7 +101,7 @@ export const DualBarList: React.FC<DualBarListProps> = ({
                     <div
                       style={{
                         width: `${failPct}%`,
-                        background: UI_COLOR_STATUS.failed,
+                        background: HOME_OVERVIEW_COLOR.failed,
                       }}
                     />
                   )}
