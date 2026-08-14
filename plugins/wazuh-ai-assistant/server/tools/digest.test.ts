@@ -119,10 +119,11 @@ test('buildTableSpec: one resolving declared column keeps the declared shape (no
 });
 
 // UI run 2026-08-14 (finding 7): get_mitre_summary buckets on technique id and samples a
-// document whose id/name/tactic arrays are parallel. Object.assign merged them whole, so T1190
+// document whose id/name/tactic arrays are parallel. bucketsToRows merged them whole, so T1190
 // and T1068 both displayed the identical name pair and a seven-technique document showed all
 // seven names against one id. The tool's own design comment says a consumer should zip the
-// arrays and pick the index matching the bucket key -- nothing did.
+// arrays and pick the index matching the bucket key -- nothing did. `_source` is NESTED (the
+// shape getByPath walks), which is why the alignment recurses.
 test('bucketsToRows: a bucket key inside a parallel array picks the matching element from its siblings', () => {
   const def = buildToolDef({
     tableSpec: {
@@ -144,11 +145,19 @@ test('bucketsToRows: a bucket key inside a parallel array picks the matching ele
                 hits: [
                   {
                     _source: {
-                      'wazuh.rule.mitre.technique.id': ['T1190', 'T1068'],
-                      'wazuh.rule.mitre.technique.name': [
-                        'Exploit Public-Facing Application',
-                        'Exploitation for Privilege Escalation',
-                      ],
+                      wazuh: {
+                        rule: {
+                          mitre: {
+                            technique: {
+                              id: ['T1190', 'T1068'],
+                              name: [
+                                'Exploit Public-Facing Application',
+                                'Exploitation for Privilege Escalation',
+                              ],
+                            },
+                          },
+                        },
+                      },
                     },
                   },
                 ],
@@ -169,7 +178,12 @@ test('bucketsToRows: a bucket key inside a parallel array picks the matching ele
 
 test('bucketsToRows: arrays of a different length are left whole, never guessed at', () => {
   const def = buildToolDef({
-    tableSpec: { columns: [{ field: 'key', label: 'ID' }] },
+    tableSpec: {
+      columns: [
+        { field: 'key', label: 'ID' },
+        { field: 'wazuh.rule.mitre.tactic.name', label: 'Tactic' },
+      ],
+    },
   });
   const result = {
     aggregations: {
@@ -183,9 +197,15 @@ test('bucketsToRows: arrays of a different length are left whole, never guessed 
                 hits: [
                   {
                     _source: {
-                      'technique.id': ['T1078'],
-                      // A technique can belong to two tactics: NOT parallel to the id array.
-                      'tactic.name': ['Persistence', 'Initial Access'],
+                      wazuh: {
+                        rule: {
+                          mitre: {
+                            technique: { id: ['T1078'] },
+                            // A technique can belong to two tactics: NOT parallel to the id.
+                            tactic: { name: ['Persistence', 'Initial Access'] },
+                          },
+                        },
+                      },
                     },
                   },
                 ],
@@ -197,9 +217,10 @@ test('bucketsToRows: arrays of a different length are left whole, never guessed 
     },
   };
   const table = buildTableSpec(result, def);
-  const row = table.rows[0] as Record<string, unknown>;
-  assert.equal(row['technique.id'], 'T1078');
-  assert.deepEqual(row['tactic.name'], ['Persistence', 'Initial Access']);
+  assert.deepEqual(table.rows[0]['wazuh.rule.mitre.tactic.name'], [
+    'Persistence',
+    'Initial Access',
+  ]);
 });
 
 test('buildTableSpec: bare-string affected_items also normalize to {item} rows in the table', () => {

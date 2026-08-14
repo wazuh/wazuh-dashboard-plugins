@@ -354,30 +354,46 @@ function alignParallelArrays(
   if (typeof bucketKey !== 'string' && typeof bucketKey !== 'number') {
     return sampleSource;
   }
+  // `_source` comes back NESTED ({wazuh: {rule: {mitre: {technique: {name: [...]}}}}}), never as
+  // flat dotted keys -- the same shape `getByPath` walks. So both passes below recurse.
   let matchIndex = -1;
   let matchLength = -1;
-  for (const value of Object.values(sampleSource)) {
-    if (!Array.isArray(value)) {
-      continue;
+  const findIndex = (node: unknown): void => {
+    if (matchIndex !== -1 || !node || typeof node !== 'object') {
+      return;
     }
-    const index = value.indexOf(bucketKey);
-    if (index !== -1) {
-      matchIndex = index;
-      matchLength = value.length;
-      break;
+    if (Array.isArray(node)) {
+      const index = node.indexOf(bucketKey);
+      if (index !== -1) {
+        matchIndex = index;
+        matchLength = node.length;
+      }
+      return;
     }
-  }
+    for (const value of Object.values(node as Record<string, unknown>)) {
+      findIndex(value);
+    }
+  };
+  findIndex(sampleSource);
   if (matchIndex === -1) {
     return sampleSource;
   }
-  const aligned: Record<string, unknown> = {};
-  for (const [field, value] of Object.entries(sampleSource)) {
-    aligned[field] =
-      Array.isArray(value) && value.length === matchLength
-        ? value[matchIndex]
-        : value;
-  }
-  return aligned;
+  const project = (node: unknown): unknown => {
+    if (Array.isArray(node)) {
+      return node.length === matchLength ? node[matchIndex] : node;
+    }
+    if (!node || typeof node !== 'object') {
+      return node;
+    }
+    const out: Record<string, unknown> = {};
+    for (const [field, value] of Object.entries(
+      node as Record<string, unknown>,
+    )) {
+      out[field] = project(value);
+    }
+    return out;
+  };
+  return project(sampleSource) as Record<string, unknown>;
 }
 
 function bucketsToRows(
