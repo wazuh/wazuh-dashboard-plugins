@@ -24,16 +24,6 @@ const COUNT_BY_STATUS: Record<AgentStatusName, keyof AgentStatus> = {
   [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: 'neverConnected',
 };
 
-type AgentStatusName =
-  (typeof API_NAME_AGENT_STATUS)[keyof typeof API_NAME_AGENT_STATUS];
-
-const COUNT_BY_STATUS: Record<AgentStatusName, keyof AgentStatus> = {
-  [API_NAME_AGENT_STATUS.ACTIVE]: 'active',
-  [API_NAME_AGENT_STATUS.DISCONNECTED]: 'disconnected',
-  [API_NAME_AGENT_STATUS.PENDING]: 'pending',
-  [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: 'neverConnected',
-};
-
 export interface AgentsByStatusProps {
   data: AgentStatus;
   /** Deploy-agent CTA href; passed in so this stays a pure presentational widget. */
