@@ -861,7 +861,9 @@ test('orchestrate: an unnamed offer is forced via the CHAIN_PAIRS metadata fallb
         },
         { type: 'done', usage: { inputTokens: 25, outputTokens: 12 } },
       ],
-      textOnlyScript('The three highest-impact failed checks are listed above.'),
+      textOnlyScript(
+        'The three highest-impact failed checks are listed above.',
+      ),
     ],
     context,
   );

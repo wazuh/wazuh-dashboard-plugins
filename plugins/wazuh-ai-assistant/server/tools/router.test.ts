@@ -329,7 +329,9 @@ test('resolveStage2Tools: chain-pair expansion does not widen the general-alone 
   // get_security_summary is itself a CHAIN_PAIRS summary key (-> get_findings_by_time); the
   // general-alone branch must stay the exact minimal recovery set and not run through the
   // expansion.
-  const names = resolveStage2Tools(['general']).map(spec => spec.name).sort();
+  const names = resolveStage2Tools(['general'])
+    .map(spec => spec.name)
+    .sort();
   assert.deepEqual(names, ['get_security_summary', 'search_wazuh_data']);
 });
 

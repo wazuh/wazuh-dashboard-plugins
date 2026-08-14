@@ -31,7 +31,8 @@ const entries = (corpus as { questions: ParaphraseEntry[] }).questions;
 // schema rather than duplicated here, so a category rename in router.ts breaks this test instead
 // of the two silently drifting apart.
 const ROUTER_CATEGORIES = new Set(
-  (ROUTE_QUESTION_TOOL.parameters.properties as any).categories.items.enum as string[]
+  (ROUTE_QUESTION_TOOL.parameters.properties as any).categories.items
+    .enum as string[],
 );
 
 // A bare IPv4-looking dotted-quad, and the test VM hostname family this corpus was sanitized
@@ -43,34 +44,49 @@ const KNOWN_HOSTNAME_LEAK = /wazuh-aio/i;
 test('corpus is non-empty and every required field is present and non-empty', () => {
   assert.ok(entries.length > 0, 'corpus must contain at least one entry');
   for (const entry of entries) {
-    for (const field of ['id', 'canonical', 'register', 'expect_category', 'q'] as const) {
+    for (const field of [
+      'id',
+      'canonical',
+      'register',
+      'expect_category',
+      'q',
+    ] as const) {
       const value = entry[field];
-      assert.equal(typeof value, 'string', `${entry.id ?? '<unknown>'}.${field} must be a string`);
-      assert.ok(value.trim().length > 0, `${entry.id ?? '<unknown>'}.${field} must be non-empty`);
+      assert.equal(
+        typeof value,
+        'string',
+        `${entry.id ?? '<unknown>'}.${field} must be a string`,
+      );
+      assert.ok(
+        value.trim().length > 0,
+        `${entry.id ?? '<unknown>'}.${field} must be non-empty`,
+      );
     }
   }
 });
 
 test('every entry id is unique', () => {
-  const ids = entries.map((entry) => entry.id);
+  const ids = entries.map(entry => entry.id);
   const uniqueIds = new Set(ids);
   assert.equal(
     uniqueIds.size,
     ids.length,
-    `corpus has duplicate ids: ${ids.filter((id, index) => ids.indexOf(id) !== index).join(', ')}`
+    `corpus has duplicate ids: ${ids
+      .filter((id, index) => ids.indexOf(id) !== index)
+      .join(', ')}`,
   );
 });
 
 test('every expect_category is a real router category', () => {
   const unknown = entries
-    .map((entry) => entry.expect_category)
-    .filter((category) => !ROUTER_CATEGORIES.has(category));
+    .map(entry => entry.expect_category)
+    .filter(category => !ROUTER_CATEGORIES.has(category));
   assert.deepEqual(
     unknown,
     [],
     "these expect_category values are not in router.ts's ROUTE_QUESTION_TOOL category enum " +
       '(the corpus is stale against a router category rename): ' +
-      unknown.join(', ')
+      unknown.join(', '),
   );
 });
 
@@ -82,25 +98,30 @@ test('every canonical group has at least one paraphrase and one shared expect_ca
     groups.set(entry.canonical, group);
   }
 
-  assert.ok(groups.size > 0, 'corpus must contain at least one canonical group');
+  assert.ok(
+    groups.size > 0,
+    'corpus must contain at least one canonical group',
+  );
 
   for (const [canonical, members] of groups) {
     assert.ok(
       members.length >= 2,
-      `canonical group ${canonical} must have the canonical form plus at least one paraphrase`
+      `canonical group ${canonical} must have the canonical form plus at least one paraphrase`,
     );
-    const categories = new Set(members.map((member) => member.expect_category));
+    const categories = new Set(members.map(member => member.expect_category));
     assert.equal(
       categories.size,
       1,
       `canonical group ${canonical} has members disagreeing on expect_category: ${[
         ...categories,
-      ].join(', ')}`
+      ].join(', ')}`,
     );
-    const hasCanonicalRegister = members.some((member) => member.register === 'canonical');
+    const hasCanonicalRegister = members.some(
+      member => member.register === 'canonical',
+    );
     assert.ok(
       hasCanonicalRegister,
-      `canonical group ${canonical} is missing its 'canonical' register entry`
+      `canonical group ${canonical} is missing its 'canonical' register entry`,
     );
   }
 });
@@ -115,6 +136,8 @@ test('corpus contains no environment hostnames or bare IP addresses (sanitizatio
   assert.deepEqual(
     leaks,
     [],
-    `corpus entries must not reference real environment hostnames or IPs: ${leaks.join('; ')}`
+    `corpus entries must not reference real environment hostnames or IPs: ${leaks.join(
+      '; ',
+    )}`,
   );
 });
