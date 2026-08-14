@@ -5,6 +5,8 @@ import {
   checkIndexAllowlist,
   clampManagerParams,
   clampInt,
+  clampLookbackWindow,
+  MAX_CARDINALITY_PRECISION_THRESHOLD,
 } from './guardrails';
 import { WAZUH_FIELD } from '../../common/wazuh-fields';
 
@@ -194,6 +196,38 @@ test('lintDsl: steers a "prefix" clause on a vulnerability field away from the f
   }
 });
 
+// Cross-category tool audit (same bug shape as issue #8913): this reason reaches the model via
+// search_wazuh_data/find_document_by_field (`free_search`, always offered), but the four tools it
+// used to name unconditionally live in the separate `vulnerabilities` category, which is not
+// guaranteed to be offered on the same turn. Pins the conditional wording and the explicit
+// no-tools-available fallback so a future edit cannot silently reintroduce an unconditional
+// "use the vulnerability tools" instruction naming a tool set that may not exist this turn.
+test('lintDsl: the vulnerability-field steering reason is conditional on those tools being offered, not unconditional', () => {
+  const body = {
+    query: {
+      bool: {
+        filter: [
+          { range: { '@timestamp': { gte: 'now-1d', lte: 'now' } } },
+          { term: { 'vulnerability.severity': 'Critical' } },
+        ],
+      },
+    },
+    size: 20,
+  };
+  const result = lintDsl(body, 'wazuh-events-v5-*');
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.match(
+      result.reason,
+      /whichever of those is offered to you this\s+turn/,
+    );
+    assert.match(
+      result.reason,
+      /If none of them\s+are available to you this turn, tell the user this assistant cannot check\s+vulnerability data\s+from here/,
+    );
+  }
+});
+
 test('lintDsl: a "prefix" clause on a non-vulnerability field is unaffected by the steering check', () => {
   const body = {
     query: {
@@ -300,6 +334,291 @@ test('lintDsl: wazuh-states-* is exempt from the mandatory time-range check', ()
   assert.equal(result.ok, true);
 });
 
+// --- clampLookbackWindow (issue #8935 item I4: bound disclosure) -------------------------------
+// GOAL: MAX_LOOKBACK_MS stays 90 days, but a wider request produces a SUCCESSFUL, capped answer
+// instead of a rejection the model must remember to relay. Not exported from guardrails.ts, so
+// this file hardcodes the documented 90-day contract rather than importing the constant -- same
+// convention the "rejects a range spanning more than 90 days" test above already uses.
+const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
+
+function rangeBody(bounds: Record<string, unknown>): Record<string, unknown> {
+  return {
+    query: { bool: { filter: [{ range: { '@timestamp': bounds } }] } },
+    size: 20,
+  };
+}
+
+interface ClampedTimestampRange {
+  gte?: string;
+  gt?: string;
+  lte?: string;
+  lt?: string;
+}
+
+function readTimestampRange(
+  body: Record<string, unknown>,
+  clause: 'filter' | 'should' = 'filter',
+): ClampedTimestampRange {
+  const bool = (body.query as { bool: Record<string, unknown> }).bool;
+  const clauses = bool[clause] as Array<Record<string, unknown>>;
+  const range = clauses[0].range as Record<string, ClampedTimestampRange>;
+  return range['@timestamp'];
+}
+
+test('clampLookbackWindow: a 180-day range is clamped to exactly 90 days, discloses both windows, and the clamped body passes the real lintDsl', () => {
+  const body = rangeBody({ gte: 'now-180d', lte: 'now' });
+  const { body: clamped, disclosure } = clampLookbackWindow(body);
+  const range = readTimestampRange(clamped);
+  assert.equal(typeof range.gte, 'string');
+  assert.equal(typeof range.lte, 'string');
+  // Rewritten to concrete ISO timestamps, not left as date-math.
+  assert.notEqual(range.gte, 'now-180d');
+  assert.notEqual(range.lte, 'now');
+  assert.equal(new Date(range.gte as string).toISOString(), range.gte);
+  assert.equal(new Date(range.lte as string).toISOString(), range.lte);
+  // Exactly MAX_LOOKBACK_MS apart, regardless of when this test happens to run (see the
+  // off-by-epsilon trap documented on clampLookbackWindow).
+  const spanMs =
+    Date.parse(range.lte as string) - Date.parse(range.gte as string);
+  assert.equal(spanMs, NINETY_DAYS_MS);
+  assert.ok(disclosure);
+  assert.match(disclosure as string, /Time window capped/);
+  // Names both the ORIGINAL requested window and the CLAMPED window that actually ran.
+  assert.match(disclosure as string, /now-180d to now/);
+  assert.ok((disclosure as string).includes(range.gte as string));
+  assert.ok((disclosure as string).includes(range.lte as string));
+  const lint = lintDsl(clamped, 'wazuh-findings-v5-*');
+  assert.equal(lint.ok, true, lint.ok ? '' : lint.reason);
+  // The SAME (unclamped) 180-day body is rejected by the real lintDsl -- proves this is a genuine
+  // fix, not a body that always would have passed.
+  const unclampedLint = lintDsl(body, 'wazuh-findings-v5-*');
+  assert.equal(unclampedLint.ok, false);
+});
+
+// The five "left untouched" tests below are OVER-CLAMPING GUARDS, not fails-on-base witnesses:
+// an identity stub satisfies them. The fails-on-base evidence for this item is the 180-day test
+// above, executor.test.ts's end-to-end witness, and the lookback-disclosure-coverage sweep.
+test('clampLookbackWindow: a 90-day range is returned untouched, with no disclosure', () => {
+  const body = rangeBody({ gte: 'now-90d', lte: 'now' });
+  const { body: clamped, disclosure } = clampLookbackWindow(body);
+  assert.deepEqual(clamped, body);
+  assert.equal(disclosure, undefined);
+});
+
+test('clampLookbackWindow: an 89-day range is returned untouched, with no disclosure', () => {
+  const body = rangeBody({ gte: 'now-89d', lte: 'now' });
+  const { body: clamped, disclosure } = clampLookbackWindow(body);
+  assert.deepEqual(clamped, body);
+  assert.equal(disclosure, undefined);
+});
+
+test('clampLookbackWindow: gt/lt (exclusive bounds) are clamped the same way, and the spelling is preserved', () => {
+  const body = rangeBody({ gt: 'now-180d', lt: 'now' });
+  const { body: clamped, disclosure } = clampLookbackWindow(body);
+  const range = readTimestampRange(clamped);
+  assert.ok('gt' in range && !('gte' in range));
+  assert.ok('lt' in range && !('lte' in range));
+  const spanMs =
+    Date.parse(range.lt as string) - Date.parse(range.gt as string);
+  assert.equal(spanMs, NINETY_DAYS_MS);
+  assert.ok(disclosure);
+  const lint = lintDsl(clamped, 'wazuh-findings-v5-*');
+  assert.equal(lint.ok, true, lint.ok ? '' : lint.reason);
+});
+
+test('clampLookbackWindow: a bool.should (optional-context) 180-day range is NOT clamped -- the span rejection stays', () => {
+  // The recorded scope decision (see clampLookbackWindow's SCOPE paragraph, which REVERSES this
+  // fix's first cut): a should clause does not bound the result set, so a "results cover X to Y"
+  // disclosure derived from it is false -- the first cut clamped it and told the model the answer
+  // covered the last 90 days while the executed query covered the last 24 HOURS. Optional-context
+  // clauses keep checkDateRanges' base rejection instead. The in-cap filter clause here is what
+  // makes this a real witness: the body passes every OTHER lint check, so the surviving rejection
+  // is specifically the should clause's span.
+  const body = {
+    query: {
+      bool: {
+        filter: [{ range: { '@timestamp': { gte: 'now-24h', lte: 'now' } } }],
+        should: [{ range: { '@timestamp': { gte: 'now-180d', lte: 'now' } } }],
+      },
+    },
+    size: 20,
+  };
+  const { body: clamped, disclosure } = clampLookbackWindow(body);
+  assert.equal(disclosure, undefined, 'no result-set claim may be minted');
+  assert.deepEqual(clamped, body);
+  const lint = lintDsl(clamped, 'wazuh-findings-v5-*');
+  assert.equal(lint.ok, false);
+  if (!lint.ok) {
+    assert.match(lint.reason, /90-day maximum lookback/);
+  }
+});
+
+test('clampLookbackWindow: a bool.must_not 275-day exclusion is NOT clamped (the claim would be inverted)', () => {
+  // For a must_not clause the first cut's disclosure named precisely the window the results
+  // EXCLUDE ("findings in the last 90 days but nothing in the prior year" -> "results cover
+  // <the excluded window> only"), and silently narrowed the exclusion the caller asked for.
+  const body = {
+    query: {
+      bool: {
+        filter: [{ range: { '@timestamp': { gte: 'now-90d', lte: 'now' } } }],
+        must_not: [
+          { range: { '@timestamp': { gte: 'now-365d', lte: 'now-90d' } } },
+        ],
+      },
+    },
+    size: 20,
+  };
+  const { body: clamped, disclosure } = clampLookbackWindow(body);
+  assert.equal(disclosure, undefined);
+  assert.deepEqual(clamped, body);
+  const lint = lintDsl(clamped, 'wazuh-findings-v5-*');
+  assert.equal(lint.ok, false);
+  if (!lint.ok) {
+    assert.match(lint.reason, /90-day maximum lookback/);
+  }
+});
+
+test('clampLookbackWindow: an aggs-nested filter range is NOT clamped (outside body.query entirely)', () => {
+  // The whole-result "results cover" claim cannot be derived from one sub-aggregation's private
+  // filter; the base rejection stays the correction path there too.
+  const body = {
+    query: {
+      bool: {
+        filter: [{ range: { '@timestamp': { gte: 'now-24h', lte: 'now' } } }],
+      },
+    },
+    aggs: {
+      old: {
+        filter: { range: { '@timestamp': { gte: 'now-180d', lte: 'now' } } },
+      },
+    },
+    size: 0,
+  };
+  const { body: clamped, disclosure } = clampLookbackWindow(body);
+  assert.equal(disclosure, undefined);
+  assert.deepEqual(clamped, body);
+  const lint = lintDsl(clamped, 'wazuh-findings-v5-*');
+  assert.equal(lint.ok, false);
+  if (!lint.ok) {
+    assert.match(lint.reason, /90-day maximum lookback/);
+  }
+});
+
+test('clampLookbackWindow: with a SECOND required time range, the disclosure speaks of an intersection, not coverage', () => {
+  // Two required ranges (180d + 7d): the 180d clause is clamped to 90d, but the effective window
+  // is the 7-DAY intersection -- claiming "results cover <the 90-day window> only" here was an
+  // integration-review hole (overstated coverage).
+  const body = {
+    query: {
+      bool: {
+        filter: [
+          { range: { '@timestamp': { gte: 'now-180d', lte: 'now' } } },
+          { range: { '@timestamp': { gte: 'now-7d', lte: 'now' } } },
+        ],
+      },
+    },
+    size: 20,
+  };
+  const { disclosure } = clampLookbackWindow(body);
+  assert.ok(disclosure);
+  assert.match(disclosure as string, /intersection/);
+  assert.doesNotMatch(
+    disclosure as string,
+    /results cover/,
+    'whole-result coverage must not be claimed when other time filters also apply',
+  );
+});
+
+test('clampLookbackWindow: the disclosure is bounded -- duplicates collapse and the sentence count is capped', () => {
+  // Six identical over-wide clauses once produced a 1,499-char disclosure that MAX_HINT_LENGTH
+  // truncated mid-timestamp and that evicted the zero-row recount hint (integration review).
+  const wide = { range: { '@timestamp': { gte: 'now-180d', lte: 'now' } } };
+  const body = {
+    query: { bool: { filter: [wide, wide, wide, wide, wide, wide] } },
+    size: 20,
+  };
+  const { disclosure } = clampLookbackWindow(body);
+  assert.ok(disclosure);
+  // All six clauses are identical -> ONE deduplicated sentence, no overflow tail.
+  assert.equal(
+    (disclosure as string).match(/Time window capped/g)?.length,
+    1,
+    `duplicates must collapse: ${disclosure}`,
+  );
+  assert.ok(
+    (disclosure as string).length < 500,
+    `disclosure must stay a bounded, sentence-sized hint contribution: ${
+      (disclosure as string).length
+    }`,
+  );
+});
+
+test('clampLookbackWindow: a sibling `format` key is dropped when bounds are rewritten to ISO', () => {
+  // Keeping format:'yyyy-MM-dd' beside full ISO date-times produced a lint-clean body the Indexer
+  // then rejected with an opaque parse error -- worse than the clear span rejection it replaced.
+  const body = rangeBody({
+    gte: '2025-01-01',
+    lte: '2025-12-31',
+    format: 'yyyy-MM-dd',
+  });
+  const { body: clamped, disclosure } = clampLookbackWindow(body);
+  assert.ok(disclosure);
+  const range = readTimestampRange(clamped) as Record<string, unknown>;
+  assert.ok(!('format' in range), 'format must not survive the ISO rewrite');
+  assert.equal(new Date(range.gte as string).toISOString(), range.gte);
+});
+
+test('clampLookbackWindow: a duplicate bound spelling (gte AND gt) is dropped, not left stale', () => {
+  // A stale gt:'now-400d' beside the clamped gte would let the engine pick the wider bound while
+  // the disclosure claims the capped window -- the pre-existing checkDateRanges bypass, closed
+  // here at the one place that rewrites bounds.
+  const body = rangeBody({ gte: 'now-180d', gt: 'now-400d', lte: 'now' });
+  const { body: clamped, disclosure } = clampLookbackWindow(body);
+  assert.ok(disclosure);
+  const range = readTimestampRange(clamped);
+  assert.ok('gte' in range && !('gt' in range));
+  const spanMs =
+    Date.parse(range.lte as string) - Date.parse(range.gte as string);
+  assert.equal(spanMs, NINETY_DAYS_MS);
+});
+
+test('clampLookbackWindow: an unparseable bound is left untouched and still rejected by lintDsl', () => {
+  const body = rangeBody({ gte: 'not-a-date', lte: 'now' });
+  const { body: clamped, disclosure } = clampLookbackWindow(body);
+  assert.deepEqual(clamped, body);
+  assert.equal(disclosure, undefined);
+  const lint = lintDsl(clamped, 'wazuh-findings-v5-*');
+  assert.equal(lint.ok, false);
+  if (!lint.ok) {
+    assert.match(lint.reason, /unparseable bound/);
+  }
+});
+
+test('clampLookbackWindow: a single-sided range is left untouched (unfixable by clamping)', () => {
+  const body = rangeBody({ gte: 'now-180d' });
+  const { body: clamped, disclosure } = clampLookbackWindow(body);
+  assert.deepEqual(clamped, body);
+  assert.equal(disclosure, undefined);
+  const lint = lintDsl(clamped, 'wazuh-findings-v5-*');
+  assert.equal(lint.ok, false);
+});
+
+test('clampLookbackWindow: an inverted window (upper before lower) is left untouched (unfixable by clamping)', () => {
+  const body = rangeBody({ gte: 'now', lte: 'now-180d' });
+  const { body: clamped, disclosure } = clampLookbackWindow(body);
+  assert.deepEqual(clamped, body);
+  assert.equal(disclosure, undefined);
+  const lint = lintDsl(clamped, 'wazuh-findings-v5-*');
+  assert.equal(lint.ok, false);
+});
+
+test('clampLookbackWindow: never mutates the input body', () => {
+  const body = rangeBody({ gte: 'now-180d', lte: 'now' });
+  const snapshot = JSON.parse(JSON.stringify(body));
+  clampLookbackWindow(body);
+  assert.deepEqual(body, snapshot);
+});
+
 // --- aggregations ----------------------------------------------------------------------------
 
 test('lintDsl: rejects multi_terms on a disallowed field', () => {
@@ -359,6 +678,93 @@ test('lintDsl: rejects composite.size over 100', () => {
   assert.equal(result.ok, false);
   if (!result.ok) {
     assert.match(result.reason, /exceeds the maximum/);
+  }
+});
+
+test('lintDsl: passes composite with only "terms" sources on allowlisted fields', () => {
+  const wrapped = {
+    query: timeBoundedFilter(),
+    aggs: {
+      c: {
+        composite: {
+          size: 20,
+          sources: [
+            { agent: { terms: { field: WAZUH_FIELD.AGENT_ID } } },
+            { ip: { terms: { field: 'source.ip' } } },
+          ],
+        },
+      },
+    },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, true);
+});
+
+test('lintDsl: rejects a composite source whose type is not "terms" (e.g. histogram)', () => {
+  // Closes a gap: only a `terms` composite source was ever field/allowlist-checked, so a
+  // `histogram`/`date_histogram`/`geotile_grid` source's field was never checked against
+  // AGG_FIELD_ALLOWLIST at all -- rejected outright now, rather than silently letting an
+  // unchecked-cardinality field's bucket component through.
+  const wrapped = {
+    query: timeBoundedFilter(),
+    aggs: {
+      c: {
+        composite: {
+          size: 20,
+          sources: [
+            { agent: { terms: { field: WAZUH_FIELD.AGENT_ID } } },
+            {
+              bucket: {
+                histogram: { field: 'vulnerability.score.base', interval: 1 },
+              },
+            },
+          ],
+        },
+      },
+    },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.equal(
+      result.reason,
+      'Composite source type "histogram" is not allowed; only "terms" composite ' +
+        'sources are supported.',
+    );
+  }
+});
+
+test('lintDsl: rejects a composite source of type date_histogram, naming it in the reason', () => {
+  const wrapped = {
+    query: timeBoundedFilter(),
+    aggs: {
+      c: {
+        composite: {
+          size: 20,
+          sources: [
+            {
+              bucket: {
+                date_histogram: {
+                  field: '@timestamp',
+                  calendar_interval: '1d',
+                },
+              },
+            },
+          ],
+        },
+      },
+    },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.match(
+      result.reason,
+      /Composite source type "date_histogram" is not allowed/,
+    );
   }
 });
 
@@ -456,6 +862,103 @@ test("lintDsl: passes a terms aggregation on wazuh.integration.category (get_sec
   };
   const result = lintDsl(wrapped, 'wazuh-findings-v5*');
   assert.equal(result.ok, true);
+});
+
+test('lintDsl: passes a terms aggregation on package.name (states inventory-packages pivot)', () => {
+  // Regression: entity-pivot allowlist extension for get_top_agents-adjacent "top package"
+  // questions -- package.name is wazuh-states-inventory-packages-only (not on findings-v5/
+  // events-v5 at all), see get-agent-packages.ts's `_source` list. wazuh-states-* is exempt from
+  // the mandatory time-range check, so no time filter is needed here.
+  const wrapped = {
+    query: { match_all: {} },
+    aggs: { by_package: { terms: { field: 'package.name', size: 20 } } },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-states-inventory-packages-*');
+  assert.equal(result.ok, true);
+});
+
+test('lintDsl: passes a terms aggregation on host.os.name and host.os.platform (states OS pivot)', () => {
+  // Regression: entity-pivot allowlist extension for "top OS/platform" questions -- both fields
+  // are wazuh-states-inventory-system-only, see get-agent-os.ts's `_source` list.
+  const byName = {
+    query: { match_all: {} },
+    aggs: { by_os: { terms: { field: 'host.os.name', size: 20 } } },
+    size: 0,
+  };
+  const byPlatform = {
+    query: { match_all: {} },
+    aggs: { by_platform: { terms: { field: 'host.os.platform', size: 20 } } },
+    size: 0,
+  };
+  assert.equal(lintDsl(byName, 'wazuh-states-inventory-system-*').ok, true);
+  assert.equal(lintDsl(byPlatform, 'wazuh-states-inventory-system-*').ok, true);
+});
+
+test('lintDsl: passes a terms aggregation on wazuh.agent.id against wazuh-events-v5 (agent pivot, already allowlisted)', () => {
+  // Regression: confirms the agent pivot is reachable on events-v5 too -- WAZUH_FIELD.AGENT_ID is
+  // a flat, non-index-scoped allowlist entry (checkAggs has no `index` argument), and
+  // wazuh.agent.id/wazuh.agent.name are the same field names on events-v5 as on findings-v5 (see
+  // get-events-by-agent.ts), so no new allowlist entry was needed for this pivot specifically.
+  const wrapped = {
+    query: timeBoundedFilter({ gte: 'now-1d', lte: 'now' }),
+    aggs: {
+      by_agent: { terms: { field: WAZUH_FIELD.AGENT_ID, size: 10 } },
+    },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-events-v5-*');
+  assert.equal(result.ok, true);
+});
+
+test('lintDsl: still rejects a non-allowlisted events-v5 field (e.g. a hand-built high-cardinality pivot)', () => {
+  // Negative counterpart to the allowlist extension above: a field genuinely absent from
+  // AGG_FIELD_ALLOWLIST must still be rejected on events-v5, proving the extension did not widen
+  // the check into a blanket "any field on this index family" pass.
+  const wrapped = {
+    query: timeBoundedFilter({ gte: 'now-1d', lte: 'now' }),
+    aggs: {
+      by_action: { terms: { field: 'event.action', size: 10 } },
+    },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-events-v5-*');
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.match(
+      result.reason,
+      /not on the allowed low-cardinality field list/,
+    );
+  }
+});
+
+test('lintDsl: passes a terms aggregation on source.ip within the size cap (top attacking-IP pivot)', () => {
+  // Positive case for the source.ip allowlist entry (high-cardinality-but-bounded-bucket-safe --
+  // see guardrails.ts's AGG_FIELD_ALLOWLIST comment): a terms agg on source.ip at or under
+  // MAX_AGG_SIZE (100) passes exactly like any other allowlisted field.
+  const wrapped = {
+    query: timeBoundedFilter({ gte: 'now-7d', lte: 'now' }),
+    aggs: { top_source_ips: { terms: { field: 'source.ip', size: 100 } } },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, true);
+});
+
+test('lintDsl: still rejects a source.ip terms agg size over the 100 cap', () => {
+  // Negative case: source.ip's allowlisting does not exempt it from the same size cap every other
+  // allowlisted field is subject to -- being allowlisted only permits the FIELD, never an
+  // oversized bucket count.
+  const wrapped = {
+    query: timeBoundedFilter({ gte: 'now-7d', lte: 'now' }),
+    aggs: { top_source_ips: { terms: { field: 'source.ip', size: 500 } } },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.match(result.reason, /exceeds the maximum/);
+  }
 });
 
 test('lintDsl: rejects a terms agg on a non-allowlisted (high-cardinality) field', () => {
@@ -657,15 +1160,30 @@ test('applySafetyValves: clamps size to <= 500', () => {
   }
 });
 
-test('applySafetyValves: forces track_total_hits regardless of input', () => {
+test('applySafetyValves: forces track_total_hits to true (exact count) regardless of input', () => {
   const result = applySafetyValves({
     query: timeBoundedFilter(),
-    track_total_hits: true,
+    track_total_hits: 100,
     size: 20,
   });
   assert.equal(result.ok, true);
   if (result.ok) {
-    assert.equal(result.body.track_total_hits, 10000);
+    assert.equal(result.body.track_total_hits, true);
+  }
+});
+
+test('applySafetyValves: forces track_total_hits to true even when the query_dsl disables it', () => {
+  // A search_wazuh_data query_dsl setting track_total_hits: false must not be honored -- the
+  // enforced exact-count value always wins, same precedence as every other valve in this
+  // function (size/timeout/etc).
+  const result = applySafetyValves({
+    query: timeBoundedFilter(),
+    track_total_hits: false,
+    size: 20,
+  });
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.equal(result.body.track_total_hits, true);
   }
 });
 
@@ -1021,4 +1539,33 @@ test("clampInt: a non-numeric value coerces via Math.max/Math.min's own ToNumber
   // boundary (e.g. an untyped object property), so the coercion behavior is pinned here.
   const nonNumeric = 'not-a-number' as unknown as number;
   assert.ok(Number.isNaN(clampInt(nonNumeric, 1, 500)));
+});
+
+test('applySafetyValves: raises every cardinality precision_threshold, including sub-aggs', () => {
+  const valved = applySafetyValves({
+    size: 0,
+    aggs: {
+      distinct_hosts: { cardinality: { field: 'wazuh.agent.name' } },
+      by_rule: {
+        terms: { field: 'wazuh.rule.id', size: 10 },
+        aggs: {
+          distinct_titles: { cardinality: { field: 'wazuh.rule.title' } },
+        },
+      },
+    },
+  });
+  assert.ok(valved.ok);
+  const aggs = valved.body.aggs as Record<string, Record<string, never>>;
+  assert.equal(
+    (aggs.distinct_hosts.cardinality as Record<string, unknown>)
+      .precision_threshold,
+    MAX_CARDINALITY_PRECISION_THRESHOLD,
+  );
+  assert.equal(
+    (
+      (aggs.by_rule.aggs as Record<string, Record<string, unknown>>)
+        .distinct_titles.cardinality as Record<string, unknown>
+    ).precision_threshold,
+    MAX_CARDINALITY_PRECISION_THRESHOLD,
+  );
 });

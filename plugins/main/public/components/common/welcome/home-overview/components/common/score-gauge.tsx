@@ -1,6 +1,9 @@
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiText } from '@elastic/eui';
-import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
+import {
+  HOME_OVERVIEW_COLOR,
+  HOME_OVERVIEW_COLOR_TINT,
+} from '../../lib/theme-colors';
 import { decimalFormat } from '../../../utils/helpers';
 import { BAR_HEIGHT } from './bar-track';
 
@@ -17,16 +20,13 @@ const ZONES = { bad: 0.4, warn: 0.3, good: 0.3 } as const;
 const BAD_BOUNDARY = ZONES.bad * 100;
 const WARN_BOUNDARY = (ZONES.bad + ZONES.warn) * 100;
 
-/** Alpha-blended tint for a zone's background. */
-const zoneTint = (color: string) => `${color}2e`;
-
 const zoneColor = (pct: number) => {
   if (pct < BAD_BOUNDARY) {
-    return UI_COLOR_STATUS.danger;
+    return HOME_OVERVIEW_COLOR.danger;
   }
   return pct < WARN_BOUNDARY
-    ? UI_COLOR_STATUS.warning
-    : UI_COLOR_STATUS.success;
+    ? HOME_OVERVIEW_COLOR.warning
+    : HOME_OVERVIEW_COLOR.success;
 };
 
 /**
@@ -41,7 +41,7 @@ export const ScoreGauge: React.FC<ScoreGaugeProps> = ({
   const pct =
     score === undefined ? undefined : Math.min(100, Math.max(0, score * 100));
   const valueColor =
-    pct === undefined ? UI_COLOR_STATUS.disabled : zoneColor(pct);
+    pct === undefined ? HOME_OVERVIEW_COLOR.disabled : zoneColor(pct);
   const formattedScore =
     score === undefined ? undefined : decimalFormat().convert(score);
 
@@ -94,19 +94,19 @@ export const ScoreGauge: React.FC<ScoreGaugeProps> = ({
           <div
             style={{
               flexBasis: `${ZONES.bad * 100}%`,
-              background: zoneTint(UI_COLOR_STATUS.danger),
+              background: HOME_OVERVIEW_COLOR_TINT.danger,
             }}
           />
           <div
             style={{
               flexBasis: `${ZONES.warn * 100}%`,
-              background: zoneTint(UI_COLOR_STATUS.warning),
+              background: HOME_OVERVIEW_COLOR_TINT.warning,
             }}
           />
           <div
             style={{
               flexBasis: `${ZONES.good * 100}%`,
-              background: zoneTint(UI_COLOR_STATUS.success),
+              background: HOME_OVERVIEW_COLOR_TINT.success,
             }}
           />
         </div>

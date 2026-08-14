@@ -4,6 +4,62 @@
  * `search.allow_expensive_queries=true`) — the plugin enforces everything itself, on every
  * outbound `_search`, regardless of whether the query came from a typed catalog tool (defense in
  * depth) or the future free-DSL escape hatch (its only line of defense).
+ *
+ * BOUND-DISCLOSURE AUDIT (issue #8935 item I4). Every bound the model can hit against the
+ * Indexer/Manager through this plugin, as of this base commit — kept as one list because the
+ * class issue #8935 targets is "an unmarked bound", and a single list is what makes "did we miss
+ * one" answerable at a glance rather than scattered across call sites. Cross-references are by
+ * SYMBOL name, never line number (line numbers in an audit rot the moment code is inserted above
+ * them — integration review found every number in the first cut already stale).
+ *
+ * - MAX_SIZE=500 (hits `size`) — `applySafetyValves`: silent clamp, but STRUCTURALLY disclosed
+ *   (`Digest.counts` carries {total, returned, truncated} plus a `samplesNote`). Adequate; no
+ *   change.
+ * - MAX_FROM=1000 (`from`) — `applySafetyValves`: rejection with reason — disclosed (the model
+ *   sees why and can self-correct).
+ * - track_total_hits=10000 — `applySafetyValves`: SILENT on this base — digest.ts's count
+ *   extraction reads `hits.total.value` and ignores `relation: 'gte'`, so a >10k result set
+ *   reports exactly 10000 unmarked (only `appendWindowRecountHint`'s own probe words it "at
+ *   least N"). NOT FIXED HERE: issue #8909 removes this clamp and merges ahead of this branch in
+ *   the team's stated order — re-fixing here guarantees a conflict. Recorded as "silent on this
+ *   base, resolved upstream by #8909".
+ * - MAX_LOOKBACK_MS (90d time-range span) — `checkDateRanges`: THE DEFECT this item fixes. The
+ *   rejection reaches the model as an error, but a bare retry inside the cap is indistinguishable
+ *   from a default-window query — nothing marks the eventual ANSWER as capped. Fixed by
+ *   `clampLookbackWindow` below (required-context clauses only): clamp-and-disclose on the
+ *   successful call's own digest, the layer measured at 3/3 (not the prompt layer, measured 0/3).
+ *   The span REJECTION itself is UNCHANGED for every other clause shape — `lintDsl` is the
+ *   documented standalone boundary and still guards any call site that skips the clamp.
+ * - MAX_AGG_SIZE=100 (terms/composite/multi_terms/top_hits `size`) — `checkAggs`: rejection with
+ *   reason — disclosed.
+ * - MAX_TOP_LEVEL_AGGS=5 — `checkTopLevelAggCount`: rejection with reason — disclosed.
+ * - MIN_DATE_HISTOGRAM_INTERVAL_MS=60000 — `checkAggs`: rejection with reason — disclosed.
+ * - script/runtime_mappings/regexp/leading-wildcard bans — `lintDsl`: rejection with reason —
+ *   disclosed.
+ * - Request-side `terms` size truncation (more distinct values than the agg `size`) —
+ *   cluster-side, not this file: disclosed via `sum_other_doc_count` -> digest.ts's
+ *   `breakdownNote` (case 2). The SYNTHETIC-breakdown top-5 trim (`buildSyntheticBreakdown` in
+ *   digest.ts) is a SEPARATE instance owned and fixed by issue #8935 item I1 — cross-referenced,
+ *   not duplicated here.
+ * - MAX_SAMPLES=5 (digest sample rows) — digest.ts: `samplesNote` — disclosed.
+ * - MAX_FIELD_VALUE_LENGTH / MAX_HINT_LENGTH — digest.ts: visible "…" ellipsis — disclosed
+ *   inline. NOTE: this item's own lookback disclosure adds up to ~MAX_LOOKBACK_DISCLOSURES
+ *   sentences (~250 chars each) to `hint` on exactly the wide-window calls that return the most
+ *   data — bounded by design (see MAX_LOOKBACK_DISCLOSURES), but it does consume hint budget the
+ *   recount/near-miss writers share, which is why it is prepended first (executor.ts orders it
+ *   ahead of longer hints).
+ * - `capDigest` drop stages (samples beyond the worded samplesNote count; breakdown buckets
+ *   beyond the disclosed count) — digest.ts: SILENT RESIDUAL — a sample/breakdown bucket popped
+ *   by the hard char cap can fall below what the ALREADY-EMITTED note claims. Rare after item
+ *   I1's char-budgeted carry; recorded, deliberately NOT fixed here — a fix needs note
+ *   recomputation from INSIDE the cap loop, a digest.ts change out of this item's file list.
+ * - `clampManagerParams` limit -> MAX_SIZE (Manager API `limit`) — this file: silent clamp,
+ *   disclosed structurally via Manager digest counts (`total_affected_items` vs `returned`).
+ * - MAX_TOOL_ROUNDS — orchestration layer (not this file): owned by issue #8893's final-round
+ *   instruction and issue #8935 item I3 — out of scope here.
+ * - TABLE_ROW_CAP / DERIVED_COLUMN_CAP — client rendering / row schema: never model-facing
+ *   completeness (the table renders locally and never reaches the model, per executor.ts's own
+ *   comment on that boundary) — noted only, nothing to disclose to the model.
  */
 
 import {
@@ -58,7 +114,6 @@ function asNumber(value: unknown): number | undefined {
 
 const MAX_SIZE = 500;
 const MAX_FROM = 1000;
-const MAX_TRACK_TOTAL_HITS = 10000;
 const SEARCH_TIMEOUT = '10s';
 // A pathological ~20KB deeply-nested `bool` body overflows the stack in the recursive tree walkers
 // below (normalizeMustToFilter, walk) and throws an uncaught RangeError, which would break
@@ -106,6 +161,45 @@ export function checkIndexAllowlist(index: string): GuardrailCheck {
  * for pagination deeper than the plugin allows (deep pagination must go through search_after/PIT,
  * plugin-driven only, never LLM-driven — not implemented in this slice, so it's simply refused).
  */
+/** The largest `precision_threshold` OpenSearch honours for a `cardinality` aggregation. Below the
+ * threshold a distinct count is EXACT; above it, HyperLogLog++ returns an estimate. */
+export const MAX_CARDINALITY_PRECISION_THRESHOLD = 40000;
+
+/**
+ * Raises every `cardinality` aggregation's `precision_threshold` to the engine maximum, recursively
+ * (a cardinality can sit under a bucket agg as a sub-aggregation).
+ *
+ * Distinct counts are the one supported metric that is an ESTIMATE rather than a count, and the
+ * default threshold is only 3000 — so "how many distinct hosts/rules/CVEs" silently became
+ * approximate on any real fleet while looking exactly as authoritative as an exact count. Raising it
+ * costs a bounded amount of memory per aggregation and buys exactness across the whole range any
+ * Wazuh deployment plausibly reaches. Above it, `Digest.metrics[].approximate` marks the number so
+ * the caveat travels with the value instead of being lost.
+ *
+ * Deliberately raises rather than REJECTS a high-cardinality request: refusing to answer, or
+ * answering with an unmarked estimate, are both worse than answering exactly wherever the engine
+ * can.
+ */
+function raiseCardinalityPrecision(aggs: unknown): void {
+  if (!aggs || typeof aggs !== 'object') {
+    return;
+  }
+  for (const aggBody of Object.values(aggs as Record<string, unknown>)) {
+    if (!aggBody || typeof aggBody !== 'object') {
+      continue;
+    }
+    const agg = aggBody as Record<string, unknown>;
+    const cardinality = agg.cardinality;
+    if (cardinality && typeof cardinality === 'object') {
+      (cardinality as Record<string, unknown>).precision_threshold =
+        MAX_CARDINALITY_PRECISION_THRESHOLD;
+    }
+    // Sub-aggregations: a cardinality under a terms/date_histogram bucket is the common "distinct X
+    // per Y" shape and needs the same treatment.
+    raiseCardinalityPrecision(agg.aggs ?? agg.aggregations);
+  }
+}
+
 export function applySafetyValves(
   body: Record<string, unknown>,
 ): { ok: true; body: Record<string, unknown> } | { ok: false; reason: string } {
@@ -132,7 +226,38 @@ export function applySafetyValves(
   // clampInt's doc comment for why that difference is preserved rather than unified away.
   next.size =
     requestedSize === undefined ? 20 : clampInt(requestedSize, 0, MAX_SIZE);
-  next.track_total_hits = MAX_TRACK_TOTAL_HITS;
+  // Forced to `true` (an exact count) regardless of whatever the model/catalog tool set, the same
+  // "enforced value always wins" precedence every other valve in this function applies -- this
+  // assignment runs unconditionally, after `next` already carries through any caller-supplied
+  // `track_total_hits`, so a search_wazuh_data query_dsl setting its own value (true/false/a
+  // number) is silently overwritten here, never honored. Previously this was clamped to a
+  // NUMERIC cap (10000): OpenSearch stops counting past that number and reports
+  // `hits.total = {value: 10000, relation: 'gte'}` for any match count above it, so `digest.ts`'s
+  // "total" (and therefore its "truncated" flag) silently under-reported/mis-flagged once a
+  // fleet's real match count crossed 10k -- observed as "10,000 total, capped" answers that were
+  // not actually the true count. `true` asks OpenSearch for the EXACT count on every shard
+  // (`hits.total = {value: <exact>, relation: 'eq'}` always) with no upper bound of its own.
+  // Accepted trade-off, not a regression: exact counting costs strictly more than a capped count
+  // on a very large index -- COUNTING work, not RETURNED-volume work, so it is NOT actually bounded
+  // by the <=90-day time range or by `MAX_SIZE`/`MAX_AGG_SIZE`: those valves cap how many documents/
+  // buckets are ever RETURNED to the caller, but `track_total_hits: true` makes every shard walk
+  // its ENTIRE matching set to produce an exact count regardless of how few hits are returned or
+  // how narrow the declared time window is -- a 90-day range against a high-volume index can still
+  // match millions of documents that all have to be counted. The actual backstop against that cost
+  // is `SEARCH_TIMEOUT` ('10s', above): every search this valve applies to already carries that
+  // timeout, so a pathologically expensive exact count fails the request (a clean, bounded error)
+  // rather than running unbounded -- that timeout, not the time-range/size valves, is what makes
+  // this acceptable. Trade-off accepted because `counts.total` drives user-facing, often
+  // compliance-adjacent answers ("how many critical vulnerabilities") where an approximate/capped
+  // number is the wrong kind of wrong to ship silently, and this plugin's traffic is bounded
+  // lab/production security telemetry, not an unbounded web-scale corpus.
+  // Recorded follow-up concern, NOT mitigated by anything above: there is no per-TURN cap on how
+  // many tool calls a single conversation turn can issue, so a turn that fans out several expensive
+  // exact-count aggregations back-to-back has no aggregate cost ceiling beyond each individual
+  // call's own 10s timeout -- worth revisiting if this valve's cost profile turns out to matter in
+  // practice.
+  next.track_total_hits = true;
+  raiseCardinalityPrecision(next.aggs ?? next.aggregations);
   // allow_partial_search_results is deliberately NOT set here: it is a transport/URL parameter,
   // not a body field (a body key would 400 the whole search), and the cluster default is already
   // `true`, which is the behavior we want.
@@ -203,9 +328,24 @@ function normalizeMustToFilter(node: unknown): unknown {
 }
 
 /**
- * Low-cardinality fields vetted safe for terms/composite/cardinality/significant_terms aggs.
- * Only schema-valid `wazuh.*` fields are listed (see `common/wazuh-fields.ts`); population is
- * decoder-dependent.
+ * Fields vetted BOUNDED-BUCKET SAFE for terms/composite/cardinality/significant_terms aggs. Only
+ * schema-valid `wazuh.*` fields are listed where applicable (see `common/wazuh-fields.ts`);
+ * population is decoder-dependent.
+ *
+ * Originally documented as a "low-cardinality" allowlist, which described every entry until
+ * `source.ip` below: safety here does NOT actually come from the underlying field's cardinality
+ * being small -- it comes from `MAX_AGG_SIZE` (100) capping how many buckets any terms/composite/
+ * multi_terms agg on ANY of these fields can ever RETURN, and from every such query already being
+ * bounded by this file's other valves (the mandatory time range on timeline indices, `MAX_SIZE`
+ * on returned hits, the index allowlist). A field with unbounded underlying cardinality (like an
+ * IP address space) still only ever returns at most 100 buckets and costs the Indexer one bounded
+ * terms aggregation over an already time-/scope-bounded shard set -- the same resource shape as a
+ * genuinely low-cardinality field, just with more candidate terms to bucket over on the way there.
+ * Every entry below except `source.ip` also happens to be low-cardinality in the traditional
+ * sense (a finite taxonomy/catalog); that is a property of THOSE fields, not a requirement this
+ * list enforces. Field-level PRIVACY exposure (a bucket's `key` being a raw analyst-identifying
+ * value) is a SEPARATE, already-solved concern handled by `privacy.ts`'s `extractAggFields`/
+ * `applyFieldPolicy` -- see `source.ip`'s own comment below for how that applies here.
  */
 const AGG_FIELD_ALLOWLIST = new Set([
   WAZUH_FIELD.RULE_ID,
@@ -231,6 +371,95 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // low-cardinality — a handful of benchmark policies per agent; mapping live-verified against
   // wazuh-states-sca on 5.0.0-beta3).
   'policy.id',
+  // Issue #8920 item 1 (population-disclosure): the three fields below back the per-kind/per-tool
+  // breakdown aggregations added to close the "sample narrated as population" class ("named 2 of
+  // 10 failed checks" on get_sca_checks; a truncated ports inventory page with no view of the
+  // closed-set field's true distribution). This is a PERFORMANCE guard widening (aggregation
+  // cardinality), not a privacy guard: every field below is a small closed enum, not
+  // analyst/attacker-supplied free text, terms `size` still caps at MAX_AGG_SIZE via checkAggs
+  // for any caller including the escape hatch, and privacy.ts's field policy (a separate
+  // boundary) is unaffected by this list either way. Each entry cites in-repo aggregation
+  // evidence, per the standard `policy.id` (above) set — a terms agg on a text-mapped field is a
+  // hard 400 ("Fielddata is disabled"), so "probably keyword" is not enough. `process.state` is
+  // deliberately NOT here: its only in-repo use is a KQL filter
+  // (plugins/main/public/components/overview/it-hygiene/processes/dashboard.ts), which a text
+  // mapping would also satisfy — get_agent_inventory covers it with the digest-level
+  // breakdownDimensions fallback (no mapping requirement) until a live terms agg on
+  // wazuh-states-inventory-processes is verified.
+  //
+  // SCA per-check result — a closed enum ("Passed"/"Failed"/"Not applicable");
+  // get-sca-results.ts's own capitalized `term` filters on this field are checked-in proof it is
+  // keyword-mapped (a `term` filter with those exact capitalized values on a text mapping would
+  // never match).
+  'check.result',
+  // SCA check NAME enumeration (#8935 item I2, scoped-enumeration): keyword-mapped, proven by
+  // this tool's own checked-in `prefix` clause on `check.name` in get-sca-checks.ts's `search`
+  // filter -- a `prefix` clause on a text-mapped field would not behave as a prefix match, and
+  // the 5.0 field-rename comment at the top of that file records the live mapping verification
+  // against a real 5.0 stack. Cardinality is bounded by the finite CIS/benchmark check catalog
+  // per policy (~207 checks for cis_ubuntu22-04) -- same class as the already-listed RULE_TITLE
+  // (772 distinct live). PERFORMANCE guard widening (aggregation cardinality), not a privacy one,
+  // same framing as this block's header comment above.
+  'check.name',
+  // Syscollector ports: this repo's IT Hygiene network dashboard runs a real terms agg on it
+  // (plugins/main/public/components/overview/it-hygiene/dashboards/dashboard-panels.ts) — live
+  // values include "Inactive"/"Unknown".
+  'interface.state',
+  // Syscollector ports: aggregated by the IT Hygiene services/traffic dashboards; live values
+  // are uppercase ("TCP"/"UDP").
+  'network.transport',
+  // Entity-pivot fields for "noisiest/top X" questions (GA benchmark gap: this allowlist only
+  // ever listed wazuh-findings-v5 field names, so a terms/composite/multi_terms agg on the
+  // wazuh-events-v5 and wazuh-states-* families' own entity fields was rejected even though
+  // WAZUH_FIELD.AGENT_ID/AGENT_NAME above already cover the *agent* pivot on those families --
+  // `wazuh.agent.id`/`wazuh.agent.name` are the SAME field names on findings-v5, events-v5, and
+  // every wazuh-states-* index (confirmed identical field literals in get-events-by-agent.ts:54
+  // `wazuh.agent.name`, get-agent-os.ts:36/get-agent-packages.ts:43/get-fim-files.ts:72/
+  // get-vulnerabilities.ts:63/get-vulnerabilities-by-agent.ts:56-57 `wazuh.agent.id`/
+  // `wazuh.agent.name`) and this Set is a flat, non-index-scoped allowlist (checkAggs has no
+  // `index` argument), so no new entry was needed for that pivot -- it was already unblocked.
+  // The two pivots below are genuinely NEW field names, both `wazuh-states-*`-only (not present
+  // on findings-v5/events-v5 at all) and both cardinality-safe regardless of MAX_AGG_SIZE's
+  // (100) bucket cap, which bounds every terms/composite/multi_terms agg on this list anyway:
+  //
+  // - `package.name` (wazuh-states-inventory-packages, syscollector package inventory; field
+  //   verified live in get-agent-packages.ts:45 `_source`, KNOWN_SAFE_STRUCTURAL_FIELDS-listed
+  //   in field-policy-coverage.test.ts) -- a per-OS software catalog (distro package repositories
+  //   / vendor installers), not analyst/attacker-supplied free text, unbounded IDs, file paths,
+  //   or hashes; bounded by the fleet's actual installed-software catalog, not open cardinality.
+  // - `host.os.name` (wazuh-states-inventory-system, syscollector OS inventory; field verified
+  //   live in get-agent-os.ts:39 `_source`, KNOWN_SAFE_STRUCTURAL_FIELDS-listed) -- a finite OS
+  //   name taxonomy (Ubuntu/Windows/CentOS/...), lower cardinality than the rule/technique
+  //   taxonomies already on this list.
+  // - `host.os.platform` (same index/tool, get-agent-os.ts:41 `_source`, also
+  //   KNOWN_SAFE_STRUCTURAL_FIELDS-listed) -- an even coarser platform family bucket
+  //   (linux/windows/darwin/...), lower cardinality than `host.os.name` above.
+  'package.name',
+  'host.os.name',
+  'host.os.platform',
+  // Entity pivot for "top attacking/connecting source IPs" questions. Field name verified live:
+  // `source.ip` is the exact literal already used as a findings-v5 investigation field
+  // (`server/tools/catalog/common.ts:265` `FINDING_INVESTIGATION_ROW_FIELDS` and `:283`
+  // `FINDING_DIGEST_EXTRA_COLUMNS` -- sent to the model today in every finding-hits tool's digest,
+  // see `get-brute-force.ts`) and as the syscollector local-IP field
+  // (`get-agent-ports.ts:46,62,74`). HONEST cardinality note, unlike every other entry above:
+  // an IP address is HIGH-cardinality, not a finite taxonomy -- safety here rests entirely on
+  // `MAX_AGG_SIZE` capping the returned bucket count and the query's other mandatory bounds (time
+  // range, index allowlist), per this Set's contract comment above, NOT on `source.ip` itself
+  // having few distinct values. PRIVACY: `source.ip` already has a `FIELD_POLICY_DEFAULTS` entry
+  // (`privacy.ts`, `{action: 'anonymize', kind: 'IP'}`) from its existing use as a sample field,
+  // and `privacy.ts`'s `applyFieldPolicy` `breakdown` loop resolves EVERY bucket's aggregation
+  // field(s) via `extractAggFields`/`scrubAggKey` and applies that SAME policy entry to the bucket
+  // key (or, for a `multi_terms`/`composite` pivot, to each of its components) -- the "a top-agents
+  // terms agg leaks hostnames otherwise" mechanism documented on `applyFieldPolicy`, which already
+  // covers ANY aggregated field, not just agent fields. So a `source.ip` terms agg's buckets are
+  // pseudonymized under privacy mode exactly like a `source.ip` sample value is today; no new
+  // privacy plumbing was needed for a plain `terms` pivot on this field (a `multi_terms`/
+  // `composite` pivot combining `source.ip` with another field required fixing a separate,
+  // pre-existing gap in that same mechanism -- see `scrubAggKey`'s doc comment in privacy.ts).
+  // Privacy-off (the default) surfaces raw IPs in buckets, same as it already does in
+  // every finding-hits tool's digest samples via `FINDING_DIGEST_EXTRA_COLUMNS` -- no new exposure.
+  'source.ip',
 ]);
 
 /**
@@ -322,7 +551,20 @@ function walkExactIdLookupShape(node: unknown): boolean {
 
 const TIME_FIELD_RE = /(^|\.)(timestamp|@timestamp)$/;
 const MAX_LOOKBACK_MS = 90 * 24 * 60 * 60 * 1000;
-const MAX_AGG_SIZE = 100;
+/**
+ * Hard cap on any aggregation's `size`, enforced by `checkAggs` below on EVERY indexer request
+ * (executor.ts runs `lintDsl` unconditionally — a typed catalog tool is not exempt).
+ *
+ * Exported because a catalog tool that derives an aggregation `size` from its own `limit` parameter
+ * must clamp to the SAME number, and hard-coding it a second time is how issue #8894 happened:
+ * `get_sca_results` clamped `limit` to 500, fed it to a `terms` size, and every call in the 101-500
+ * range was rejected here — while its parameter description advertised 500 to the model, so a
+ * compliant model was steered straight into the failure. Catalog code must reach this value through
+ * `catalog/common.ts`'s `clampAggLimit`/`aggLimitProperty` rather than restating it, so the enforced
+ * cap and the advertised cap cannot drift apart again. `catalog/agg-size-coverage.test.ts` asserts
+ * no tool in the registry can build a request this rejects.
+ */
+export const MAX_AGG_SIZE = 100;
 
 const LEADING_WILDCARD_KEYS = new Set([
   'wildcard',
@@ -349,6 +591,17 @@ const TERMS_LIKE_AGG_KEYS = new Set([
  * inventory, vulnerabilities) have no meaningful event-time axis to bound (their time field,
  * state.modified_at, is a write time, not an event time). */
 const TIME_BASED_INDEX_RE = /^wazuh-(events|findings)-v5/;
+
+/**
+ * Whether `lintDsl` will REQUIRE a bounded `@timestamp` range for this index — exported so a
+ * caller that hand-builds a body (executor.ts's near-miss probe) can satisfy the rule instead of
+ * being silently rejected by it. A rangeless probe against a findings index fails `lintDsl` and the
+ * caller's early return then swallows the failure, so the feature disappears with no error: exactly
+ * what happened before this was exported.
+ */
+export function requiresBoundedTimeRange(index: string): boolean {
+  return TIME_BASED_INDEX_RE.test(index);
+}
 
 /**
  * Vulnerability STATE lives in wazuh-states-vulnerabilities, not the findings/events timeline — so
@@ -433,11 +686,24 @@ function findNumericRangeOnKeywordField(
   return reason;
 }
 
+// Cross-category tool audit: this reason reaches the model via lintDsl, which
+// executor.ts's executeIndexerRequest runs against EVERY Indexer-backed tool call with "no
+// per-tool exemptions" (see that file) -- in practice the realistic caller is search_wazuh_data
+// or find_document_by_field, both `free_search` (server/tools/router.ts), which is one of the two
+// categories ALWAYS offered whenever any tools are offered at all (resolveStage2Tools always adds
+// search_wazuh_data). The four named tools below, though, all live in the separate
+// `vulnerabilities` category, which stage-1 routing has no obligation to also offer on the SAME
+// turn -- an unconditional "use the vulnerability tools" here would be the same "instruction names
+// a tool that may not be offered" shape as issue #8913. Worded conditionally, with an explicit
+// fallback, so the model degrades to telling the user about the gap instead of stalling on tools
+// it was not given.
 const VULN_FIELD_ON_FINDINGS_REASON =
-  'Vulnerability data is not in the findings/events index. Use the vulnerability tools ' +
-  '(get_vulnerabilities, get_critical_vulnerabilities, ' +
-  'get_vulnerabilities_by_agent, get_vulnerability_by_cve) instead of querying vulnerability ' +
-  'fields on a findings/events index.';
+  'Vulnerability data is not in the findings/events index. The vulnerability tools ' +
+  '(get_vulnerabilities, get_critical_vulnerabilities, get_vulnerabilities_by_agent, ' +
+  'get_vulnerability_by_cve) cover this instead -- use whichever of those is offered to you this ' +
+  'turn rather than querying vulnerability fields on a findings/events index. If none of them ' +
+  'are available to you this turn, tell the user this assistant cannot check vulnerability data ' +
+  'from here.';
 
 /** Shared by both the `script` and `runtime_mappings` checks in `lintDsl` below, so the two
  * trigger paths can never report drifted wording — a scripted
@@ -547,7 +813,10 @@ export function lintDsl(
   return { ok: true };
 }
 
-function walk(
+// Exported so server/tools/field-validation.ts's field-name extractor can reuse the exact same
+// tree-walk shape this file's own checks (findKey, findLeadingWildcard, checkAggs, ...) already
+// rely on, instead of a second hand-rolled walker drifting out of sync with this one.
+export function walk(
   node: unknown,
   visit: (key: string, value: unknown, parent: Record<string, unknown>) => void,
 ): void {
@@ -751,6 +1020,290 @@ function walkRequiredForTimeRange(node: unknown, required: boolean): boolean {
   return false;
 }
 
+/** How many clamped-window sentences one disclosure may carry. digest.ts's MAX_HINT_LENGTH
+ * invariant is "every hint writer contributes bounded, sentence-sized text" — six clamped clauses
+ * once produced a 1,499-char disclosure that evicted the zero-row recount hint and truncated
+ * mid-timestamp (issue #8935 integration review). Identical (requested, clamped) pairs are
+ * de-duplicated before this cap applies; anything beyond it is summarized in one counted tail. */
+const MAX_LOOKBACK_DISCLOSURES = 2;
+
+/**
+ * Clamp-and-disclose for a time-range span above `MAX_LOOKBACK_MS` (the fix for the one row
+ * marked THE DEFECT in this file's module-header bound-disclosure audit). Returns a NEW body —
+ * `applySafetyValves`'s and `normalizeMustToFilter`'s no-mutation convention — plus a
+ * `disclosure` whenever at least one clause was actually clamped.
+ *
+ * SCOPE: REQUIRED query context ONLY — `body.query` through `bool.filter`/`bool.must` chains,
+ * exactly the context-tracking `walkRequiredForTimeRange` above applies. `bool.should`,
+ * `bool.must_not`, `aggs`-nested filters and `post_filter` are passed through UNTOUCHED and left
+ * to `checkDateRanges`'s existing span REJECTION. This deliberately REVERSES the first cut of
+ * this fix, which clamped every clause in the tree "for scope parity with checkDateRanges"
+ * (integration review): the disclosure asserts a property of the RESULT SET ("results cover X to
+ * Y"), and that claim is only derivable from a clause that BOUNDS what the query matches — for a
+ * `should` clause it is irrelevant-and-false, and for `must_not` it is exactly INVERTED (the
+ * named window would be the one window the results exclude, and the clamp would silently NARROW
+ * the exclusion the caller asked for). Rejection-with-reason is the honest, base-identical
+ * behaviour for those shapes; clamping is only honest where the sentence is true.
+ *
+ * CLAMPS ONLY the well-formed, over-wide case: both bounds present, both parseable via
+ * `resolveDateMath`, and upper >= lower. Every other shape (a single-sided range, an unparseable
+ * bound, an inverted window) is passed through UNCHANGED and left to `checkDateRanges`'s existing
+ * rejections -- those are "unfixable by clamping", not a narrower instance of this bound.
+ *
+ * THE OFF-BY-EPSILON TRAP (why both bounds are rewritten to concrete ISO strings, not just the
+ * lower one): if only the lower bound were rewritten while the upper bound stayed a live
+ * `'now'`/`'now-Nd'` date-math string, the span this function computed at clamp time and the span
+ * `checkDateRanges` computes moments later (it calls `Date.now()` again, independently) would
+ * differ by however many milliseconds elapsed in between -- reopening the window by that epsilon
+ * and defeating the "exactly `MAX_LOOKBACK_MS`" guarantee `lintDsl`'s strict `>` check depends on.
+ * Resolving BOTH bounds to absolute ISO timestamps up front removes the second `Date.now()` call
+ * from the equation entirely: `Date.parse` on an ISO string never depends on when it runs.
+ *
+ * Bound-key handling on a clamped clause (integration review, all three):
+ *  - the inclusive/exclusive spelling (`gte`/`gt`, `lte`/`lt`) is preserved;
+ *  - when BOTH spellings of one side are present, the non-preferred one is DROPPED — leaving a
+ *    stale `gt: now-400d` beside the clamped `gte` would let the engine pick the wider bound
+ *    while the disclosure claims the capped window;
+ *  - a sibling `format` key is DROPPED — the rewritten bounds are full ISO date-times, which a
+ *    caller's `format: 'yyyy-MM-dd'` would make unparseable cluster-side, converting a clear,
+ *    self-correctable rejection into an opaque one (`time_zone` is kept: the rewritten values
+ *    carry an explicit Z offset, which overrides it harmlessly).
+ *
+ * DISCLOSURE WORDING: derives the day figure from `MAX_LOOKBACK_MS` (never a hardcoded "90", so
+ * raising the cap cannot make the sentence false), and only claims "results cover X to Y" when
+ * the clamped clause is the SOLE required-context time range in the query — with more than one,
+ * the effective window is their INTERSECTION and the sentence says so instead of overstating
+ * coverage.
+ */
+export function clampLookbackWindow(body: Record<string, unknown>): {
+  body: Record<string, unknown>;
+  disclosure?: string;
+} {
+  if (!body.query || typeof body.query !== 'object') {
+    return { body };
+  }
+  const state: LookbackClampState = {
+    clamped: [],
+    requiredTimeRanges: 0,
+  };
+  const nowMs = Date.now();
+  const clampedQuery = clampLookbackNode(body.query, true, nowMs, state);
+  if (state.clamped.length === 0) {
+    return { body };
+  }
+  return {
+    body: { ...body, query: clampedQuery as Record<string, unknown> },
+    disclosure: buildLookbackDisclosure(state),
+  };
+}
+
+interface LookbackClampState {
+  clamped: Array<{
+    requestedLower: string;
+    requestedUpper: string;
+    clampedLowerIso: string;
+    clampedUpperIso: string;
+  }>;
+  /** Every well-formed (both-bounds, parseable) time-range clause seen in REQUIRED context,
+   * clamped or not — what decides whether the disclosure may claim whole-result coverage or must
+   * speak of an intersection. */
+  requiredTimeRanges: number;
+}
+
+/** One bounded disclosure from every clamp this body needed: de-duplicated, capped at
+ * `MAX_LOOKBACK_DISCLOSURES` sentences with a counted tail, day figure derived from
+ * `MAX_LOOKBACK_MS`, and coverage claimed only when it is actually derivable — see
+ * `clampLookbackWindow`'s DISCLOSURE WORDING paragraph. */
+function buildLookbackDisclosure(state: LookbackClampState): string {
+  const maxDays = MAX_LOOKBACK_MS / 86400000;
+  const seen = new Set<string>();
+  const unique = state.clamped.filter(entry => {
+    const key = JSON.stringify(entry);
+    if (seen.has(key)) {
+      return false;
+    }
+    seen.add(key);
+    return true;
+  });
+  const soleWindow = state.requiredTimeRanges === 1;
+  const sentences = unique
+    .slice(0, MAX_LOOKBACK_DISCLOSURES)
+    .map(
+      ({ requestedLower, requestedUpper, clampedLowerIso, clampedUpperIso }) =>
+        soleWindow
+          ? `Time window capped: the requested range (${requestedLower} to ${requestedUpper}) ` +
+            `spans more than the ${maxDays}-day maximum; results cover ${clampedLowerIso} to ` +
+            `${clampedUpperIso} only. State to the user that the answer covers this capped ` +
+            'window, not the full requested range.'
+          : `Time window capped: a requested range (${requestedLower} to ${requestedUpper}) ` +
+            `spanning more than the ${maxDays}-day maximum was narrowed to ${clampedLowerIso} ` +
+            `to ${clampedUpperIso}. Other time filters in this query still apply — the ` +
+            'effective window is the intersection of all of them; state the answer window ' +
+            'accordingly.',
+    );
+  const overflow = unique.length - MAX_LOOKBACK_DISCLOSURES;
+  if (overflow > 0) {
+    sentences.push(
+      `${overflow} more over-wide time filter(s) were capped the same way.`,
+    );
+  }
+  return sentences.join(' ');
+}
+
+/** Rebuilds a QUERY node, clamping `range` clauses only while `required` context holds -- same
+ * recursive rebuild-the-tree shape as `normalizeMustToFilter` above (never mutates its input),
+ * same required/optional context rules as `walkRequiredForTimeRange` (bool.filter/bool.must keep
+ * the parent's context; bool.should/bool.must_not are copied VERBATIM — nothing under them may be
+ * clamped, and `walkRequiredForTimeRange` never restores `required` under them either, so a
+ * verbatim copy is exactly equivalent). */
+function clampLookbackNode(
+  node: unknown,
+  required: boolean,
+  nowMs: number,
+  state: LookbackClampState,
+): unknown {
+  if (Array.isArray(node)) {
+    return node.map(item => clampLookbackNode(item, required, nowMs, state));
+  }
+  if (!node || typeof node !== 'object') {
+    return node;
+  }
+  const out: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(node as Record<string, unknown>)) {
+    if (
+      key === 'range' &&
+      required &&
+      value &&
+      typeof value === 'object' &&
+      !Array.isArray(value)
+    ) {
+      out[key] = clampRangeClause(
+        value as Record<string, unknown>,
+        nowMs,
+        state,
+      );
+      continue;
+    }
+    if (
+      key === 'bool' &&
+      value &&
+      typeof value === 'object' &&
+      !Array.isArray(value)
+    ) {
+      const boolClause = value as Record<string, unknown>;
+      const rebuilt: Record<string, unknown> = {};
+      for (const [subKey, subValue] of Object.entries(boolClause)) {
+        if (subKey === 'filter' || subKey === 'must') {
+          rebuilt[subKey] = clampLookbackNode(subValue, required, nowMs, state);
+        } else {
+          // should / must_not / minimum_should_match / boost / ...: verbatim — optional and
+          // negated context is never clamped (see the SCOPE paragraph above).
+          rebuilt[subKey] = subValue;
+        }
+      }
+      out[key] = rebuilt;
+      continue;
+    }
+    out[key] = clampLookbackNode(value, required, nowMs, state);
+  }
+  return out;
+}
+
+/** Clamps every `TIME_FIELD_RE` field inside one REQUIRED-context `range` clause's value
+ * (`{"@timestamp": {...}}`), field-by-field -- a clause could in principle carry more than one
+ * recognized time field. Fields that are not time fields, or that fail any of the "clampable"
+ * preconditions documented on `clampLookbackWindow` above, pass through with their original
+ * bounds object reference. */
+function clampRangeClause(
+  rangeValue: Record<string, unknown>,
+  nowMs: number,
+  state: LookbackClampState,
+): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [field, bounds] of Object.entries(rangeValue)) {
+    if (
+      !TIME_FIELD_RE.test(field) ||
+      !bounds ||
+      typeof bounds !== 'object' ||
+      Array.isArray(bounds)
+    ) {
+      out[field] = bounds;
+      continue;
+    }
+    const boundsRecord = bounds as Record<string, unknown>;
+    // Same "gte wins over gt" preference as checkDateRanges, so the two functions agree on which
+    // key is "the" lower/upper bound whenever a caller (unusually) sends both spellings.
+    const lowerKey: 'gte' | 'gt' | undefined =
+      boundsRecord.gte !== undefined
+        ? 'gte'
+        : boundsRecord.gt !== undefined
+        ? 'gt'
+        : undefined;
+    const upperKey: 'lte' | 'lt' | undefined =
+      boundsRecord.lte !== undefined
+        ? 'lte'
+        : boundsRecord.lt !== undefined
+        ? 'lt'
+        : undefined;
+    if (!lowerKey || !upperKey) {
+      // Single-sided range -- unfixable by clamping; checkDateRanges' "must specify both" rejection
+      // stays the correction path.
+      out[field] = bounds;
+      continue;
+    }
+    const lowerRaw = boundsRecord[lowerKey];
+    const upperRaw = boundsRecord[upperKey];
+    const lowerMs = resolveDateMath(lowerRaw, nowMs);
+    const upperMs = resolveDateMath(upperRaw, nowMs);
+    if (lowerMs === undefined || upperMs === undefined) {
+      // Unparseable bound -- unfixable by clamping; checkDateRanges' own rejection stays the
+      // correction path.
+      out[field] = bounds;
+      continue;
+    }
+    if (upperMs < lowerMs) {
+      // Inverted window -- unfixable by clamping; checkDateRanges' own rejection stays the
+      // correction path.
+      out[field] = bounds;
+      continue;
+    }
+    // A well-formed required-context time window (clamped or not) — counted for the disclosure's
+    // sole-window-vs-intersection wording decision.
+    state.requiredTimeRanges += 1;
+    if (upperMs - lowerMs <= MAX_LOOKBACK_MS) {
+      // Already within the cap -- nothing to clamp or disclose.
+      out[field] = bounds;
+      continue;
+    }
+    const clampedUpperMs = upperMs;
+    const clampedLowerMs = clampedUpperMs - MAX_LOOKBACK_MS;
+    const clampedUpperIso = new Date(clampedUpperMs).toISOString();
+    const clampedLowerIso = new Date(clampedLowerMs).toISOString();
+    const {
+      gte: _gte,
+      gt: _gt,
+      lte: _lte,
+      lt: _lt,
+      format: _format,
+      ...passthrough
+    } = boundsRecord;
+    out[field] = {
+      // Everything except the four bound spellings and `format` (see the bound-key handling
+      // paragraph on clampLookbackWindow for why the duplicate spellings and `format` must go).
+      ...passthrough,
+      [lowerKey]: clampedLowerIso,
+      [upperKey]: clampedUpperIso,
+    };
+    state.clamped.push({
+      requestedLower: String(lowerRaw),
+      requestedUpper: String(upperRaw),
+      clampedLowerIso,
+      clampedUpperIso,
+    });
+  }
+  return out;
+}
+
 function checkDateRanges(body: Record<string, unknown>): string | undefined {
   let reason: string | undefined;
   const now = Date.now();
@@ -934,9 +1487,35 @@ function checkAggs(body: Record<string, unknown>): string | undefined {
           for (const sourceSpec of Object.values(
             source as Record<string, unknown>,
           )) {
-            const termsSpec = (
-              sourceSpec as Record<string, unknown> | undefined
-            )?.terms as Record<string, unknown> | undefined;
+            if (
+              !sourceSpec ||
+              typeof sourceSpec !== 'object' ||
+              Array.isArray(sourceSpec)
+            ) {
+              continue;
+            }
+            const sourceSpecRecord = sourceSpec as Record<string, unknown>;
+            // Only a `terms` composite source was ever field/allowlist-checked below --
+            // `histogram`/`date_histogram`/`geotile_grid` sources were silently let through
+            // regardless of what field they aggregated on, and their bucket component then
+            // reached privacy.ts's field-policy scrub as an "unresolved property" (pass-through
+            // for a typed tool, since composite is escape-hatch-only in practice, this closes a
+            // real gap rather than a defense-in-depth one). Rejected here rather than merely
+            // routed to privacy.ts's fail-closed default: the field itself was NEVER checked
+            // against AGG_FIELD_ALLOWLIST for these source types, so a high-cardinality field
+            // (e.g. a raw numeric field bucketed by `histogram`) could reach a bucket regardless
+            // of this file's field-allowlist contract -- an aggregation-safety gap, not just a
+            // privacy one, and this file's job is the former.
+            if (!('terms' in sourceSpecRecord)) {
+              const sourceType = Object.keys(sourceSpecRecord)[0] ?? 'unknown';
+              reason =
+                `Composite source type "${sourceType}" is not allowed; only "terms" composite ` +
+                'sources are supported.';
+              continue;
+            }
+            const termsSpec = sourceSpecRecord.terms as
+              | Record<string, unknown>
+              | undefined;
             const field = termsSpec?.field;
             if (typeof field === 'string' && !AGG_FIELD_ALLOWLIST.has(field)) {
               reason = aggFieldViolation(field);

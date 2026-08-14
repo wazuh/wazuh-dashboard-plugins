@@ -15,7 +15,7 @@ Follow these steps to install the Wazuh dashboard.
 #### APT
 
 ```bash
-apt-get install debhelper tar curl libcap2-bin # debhelper version 9 or later
+apt-get install tar curl libcap2-bin
 ```
 
 #### Yum

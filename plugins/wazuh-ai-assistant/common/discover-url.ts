@@ -88,16 +88,68 @@ function rangeFromClause(clause: unknown): TimeRange | undefined {
   for (const field of TIMESTAMP_FIELDS) {
     const fieldRange = (range as Record<string, unknown>)[field];
     if (fieldRange && typeof fieldRange === 'object') {
-      const { gte, lte } = fieldRange as Record<string, unknown>;
-      if (gte !== undefined || lte !== undefined) {
+      // All three bound spellings OpenSearch accepts are read (gte/lte, the exclusive gt/lt,
+      // and the legacy from/to): a model-authored range in any of them is a real window, and
+      // failing to read it silently replaced the promised window with the 24h default (issue
+      // #8920 item 9's time-range half).
+      const bounds = fieldRange as Record<string, unknown>;
+      const lower = bounds.gte ?? bounds.gt ?? bounds.from;
+      const upper = bounds.lte ?? bounds.lt ?? bounds.to;
+      if (lower !== undefined || upper !== undefined) {
         return {
-          from: gte !== undefined ? String(gte) : DEFAULT_TIME_RANGE.from,
-          to: lte !== undefined ? String(lte) : DEFAULT_TIME_RANGE.to,
+          from: lower !== undefined ? String(lower) : DEFAULT_TIME_RANGE.from,
+          to: upper !== undefined ? String(upper) : DEFAULT_TIME_RANGE.to,
         };
       }
     }
   }
   return undefined;
+}
+
+/** Recursive companion to `extractTimeRange`: walks `bool.filter`/`bool.must` whether each is a
+ * single clause OBJECT or an array of them (both are legal DSL — the single-object form was
+ * previously unread, silently defaulting the window), and one `bool` level deeper. `should`/
+ * `must_not` are deliberately not walked: an optional or negated range does not bound what the
+ * query matches. */
+function findTimeRangeClause(clause: unknown): TimeRange | undefined {
+  const direct = rangeFromClause(clause);
+  if (direct) {
+    return direct;
+  }
+  if (!clause || typeof clause !== 'object' || Array.isArray(clause)) {
+    return undefined;
+  }
+  const bool = (clause as Record<string, unknown>).bool as
+    | Record<string, unknown>
+    | undefined;
+  if (!bool || typeof bool !== 'object') {
+    return undefined;
+  }
+  for (const key of ['filter', 'must']) {
+    const clauses = bool[key];
+    const list = Array.isArray(clauses)
+      ? clauses
+      : clauses !== undefined
+      ? [clauses]
+      : [];
+    for (const entry of list) {
+      const found = findTimeRangeClause(entry);
+      if (found) {
+        return found;
+      }
+    }
+  }
+  return undefined;
+}
+
+/** Whether `dsl` carries a readable timestamp range at all — i.e. whether `extractTimeRange`
+ * below would return the model's own window rather than silently substituting the 24h default.
+ * Exported for suggest-discover-query.ts, whose disclosure must SAY when the window was
+ * defaulted (issue #8920 item 9). */
+export function hasExplicitTimeRange(
+  dsl: Record<string, unknown> | undefined,
+): boolean {
+  return !!dsl && findTimeRangeClause(dsl) !== undefined;
 }
 
 /**
@@ -113,28 +165,7 @@ export function extractTimeRange(
   if (!dsl) {
     return DEFAULT_TIME_RANGE;
   }
-
-  const direct = rangeFromClause(dsl);
-  if (direct) {
-    return direct;
-  }
-
-  const bool = dsl.bool as Record<string, unknown> | undefined;
-  if (bool) {
-    for (const key of ['filter', 'must']) {
-      const clauses = bool[key];
-      if (Array.isArray(clauses)) {
-        for (const clause of clauses) {
-          const found = rangeFromClause(clause);
-          if (found) {
-            return found;
-          }
-        }
-      }
-    }
-  }
-
-  return DEFAULT_TIME_RANGE;
+  return findTimeRangeClause(dsl) ?? DEFAULT_TIME_RANGE;
 }
 
 /**

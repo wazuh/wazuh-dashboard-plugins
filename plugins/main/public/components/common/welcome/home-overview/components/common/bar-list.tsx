@@ -7,7 +7,7 @@ import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensea
 import { EmptyState } from './empty-state';
 import { WIDGET_LOADING_MIN_HEIGHT } from './widget-group';
 import { ListTitle, MoreItemsNote, getMissingSlots } from './list-chrome';
-import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
+import { HOME_OVERVIEW_COLOR } from '../../lib/theme-colors';
 
 export interface BarListProps {
   items: TopItem[];
@@ -30,7 +30,7 @@ export const BarList: React.FC<BarListProps> = ({
   emptyMessage,
   totalSlots,
   moreItemsMessage = 'No more items to display',
-  barColor = UI_COLOR_STATUS.info,
+  barColor = HOME_OVERVIEW_COLOR.info,
   ...rest
 }) => {
   const testSubj = rest['data-test-subj'];

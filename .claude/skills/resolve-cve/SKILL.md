@@ -42,7 +42,7 @@ GHSA if present. If you cannot confirm whether the repo is truly affected, run
 For each plugin, check the package is really installed and why:
 
 ```bash
-for p in plugins/main plugins/wazuh-core plugins/wazuh-check-updates; do
+for p in plugins/main plugins/wazuh-core plugins/wazuh-check-updates plugins/wazuh-ai-assistant; do
   echo "== $p =="
   grep -n '"<package>"' "$p/package.json" 2>/dev/null       # declared?
   grep -n '<package>@' "$p/yarn.lock" | head               # resolved versions

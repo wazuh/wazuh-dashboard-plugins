@@ -82,3 +82,12 @@ test('find_document_by_field: clamps limit to the [1, 500] range', () => {
   });
   assert.equal(request.body.size, 500);
 });
+
+// Issue #8917: this tool has no `_source` clause, so it can return ANY field of whatever document
+// matched -- exactly as uncurated a field surface as search_wazuh_data's arbitrary DSL. It must
+// opt into fail-closed field policy explicitly (not merely inherit it from `deriveColumns`, which
+// is now a separate flag -- see ToolDefinition.failClosedFieldPolicy's doc comment in types.ts).
+test('find_document_by_field: failClosedFieldPolicy is explicitly true (arbitrary whole-document field surface)', () => {
+  assert.equal(findDocumentByFieldTool.deriveColumns, true);
+  assert.equal(findDocumentByFieldTool.failClosedFieldPolicy, true);
+});

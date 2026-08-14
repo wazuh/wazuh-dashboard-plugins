@@ -9,12 +9,21 @@ import { WAZUH_FIELD } from '../../common/wazuh-fields';
  * WHAT THE FIELD POLICY DOES AND DOES NOT DO (issue #8821 was filed because this was not written
  * down anywhere, and the behavior reads like a bug until it is):
  *
- * The policy has exactly ONE boundary — what the AI provider receives — and the three actions differ
+ * The policy has exactly ONE boundary — what the AI provider receives — and the four actions differ
  * only in how much of a field's value get there:
  *
- * - `allow`: the provider receives the real value. Also the default for a field with no entry on a
- *   typed catalog tool (the search_wazuh_data escape hatch flips that default to `anonymize` — see
- *   `applyFieldPolicy`'s `isEscapeHatch`).
+ * - `allow`: the provider receives the real value, completely unscanned. Also the default for a
+ *   field with no entry on a typed catalog tool (the search_wazuh_data escape hatch flips that
+ *   default to `anonymize` — see `applyFieldPolicy`'s `isEscapeHatch`). Reserved for CURATED
+ *   vocabulary (MITRE technique names, compliance ids, `check.id`, rule tags/category/title) whose
+ *   values are not analyst/attacker/third-party-supplied free text — see `scrubKnownEntities`'s doc
+ *   comment for why a field carrying free text should be `allow-scan` instead.
+ * - `allow-scan` (issue #8912): the provider receives the real value, but ONLY after it passes
+ *   through both of allow-by-omission's existing scans: the value-shape scan (`prescanAndMint`,
+ *   IPs/FQDNs) and the new known-entity dictionary scan (`scrubKnownEntities`, bare identifiers the
+ *   pseudonymizer already minted a pseudonym for elsewhere this conversation). For fields whose
+ *   value is free text that a third party (not Wazuh's own curated ruleset) controls — e.g. a
+ *   package name string reported by the OS — but which the analyst still needs to read in full.
  * - `anonymize`: the provider receives a reversible pseudonym (`HOST_1`, `IP_2`) instead.
  * - `never`: the provider receives NOTHING for that field. `applyFieldPolicy` drops it from the
  *   digest's `samples`, drops its aggregation buckets from `breakdown`, and drops its name from the
@@ -36,7 +45,7 @@ import { WAZUH_FIELD } from '../../common/wazuh-fields';
  * provider request body carries.
  */
 
-export type FieldPolicyAction = 'allow' | 'anonymize' | 'never';
+export type FieldPolicyAction = 'allow' | 'allow-scan' | 'anonymize' | 'never';
 
 export interface FieldPolicyEntry {
   /** Either a plain digest field path ("wazuh.agent.name") or a tool-scoped form
@@ -77,6 +86,21 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // analyst/attacker-supplied — reviewed 'allow'.
   { field: WAZUH_FIELD.RULE_TAGS, action: 'allow' },
   { field: WAZUH_FIELD.RULE_CATEGORY, action: 'allow' },
+  // Explicit entry added for #8889: wazuh.rule.title is in every finding-hits tool's sample
+  // columns (catalog/common.ts's STANDARD_FINDING_SAMPLE_COLUMNS) but previously had no policy
+  // entry at all, so it reached the provider through allow-by-omission rather than an intentional
+  // decision. Reviewed 'allow', not 'anonymize': the overwhelming majority of titles are fixed
+  // strings from Wazuh's own curated ruleset — the model needs the real text to name/describe a
+  // finding, and anonymizing this high-cardinality field would replace nearly every distinct
+  // finding's label with its own opaque VAL_n, gutting the assistant's usefulness (the same
+  // tradeoff already made for rule.category/rule.tags above). The residual risk is real, not
+  // hypothetical, though: a LOCAL/custom rule's <description> can interpolate a decoder capture
+  // group (e.g. "Failed login from $(srcip)"), so a title CAN echo attacker-influenced log
+  // content, unlike the closed-vocabulary rule.category/rule.tags. That is not left unaddressed —
+  // it is covered at a different layer: chat.ts's scrubMessagesForProvider runs
+  // prescanAndMintToolContent over every tool-result string value (this one included) before it
+  // reaches the provider, so an embedded IP/FQDN in a custom title is still pseudonymized there.
+  { field: WAZUH_FIELD.RULE_TITLE, action: 'allow' },
   // Wildcard covers every compliance framework (pci_dss, hipaa, gdpr, iso_27001, nis2,
   // nist_800_171, nist_800_53, fedramp, cmmc, tsc, ...), not just the one this plugin has a
   // dedicated tool for — all are curated requirement-tag lists, equally not
@@ -91,18 +115,159 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'check.name', action: 'allow' },
   { field: 'check.result', action: 'allow' },
   { field: 'policy.name', action: 'allow' },
-  // get_agent_packages/name, get_agent_processes/name+cmd, get_sca_results/name are deliberately
-  // NOT anonymized: package/process/policy names are what the analyst asked about, and known
-  // mapped identifiers embedded in free text (e.g. a hostname inside a cmd path) are still caught
-  // by the outbound applyToText scrub in chat.ts.
+  // get_sca_results/name is deliberately NOT anonymized: a policy name is what the analyst asked
+  // about, and known mapped identifiers embedded in free text (e.g. a hostname inside a cmd path)
+  // are still caught by the outbound applyToText scrub in chat.ts.
   { field: 'vulnerability.score.base', action: 'allow' },
   { field: 'package.architecture', action: 'allow' },
+  // get_agent_inventory (issue: "Consolidate agent inventory into one tool") reads
+  // wazuh-states-inventory-* and sets `failClosedFieldPolicy: true` (issue #8917 -- see
+  // `ToolDefinition.failClosedFieldPolicy`'s doc comment, types.ts), which flips applyFieldPolicy's
+  // unlisted-field default from allow-by-omission to fail-closed anonymize (the same "any finding
+  // field" protection search_wazuh_data's escape hatch needed -- see this file's header doc
+  // comment on `isEscapeHatch`). The four deleted single-purpose tools it replaced never needed
+  // explicit entries for these because they had no such flag, so allow-by-omission
+  // covered them silently; folding them into this tool means every field that should
+  // stay readable now needs its own explicit 'allow' entry below, or it silently starts arriving
+  // at the provider as a VAL_n pseudonym -- making "what packages are installed on X" answer in
+  // meaningless pseudonyms under privacy mode. Each entry below is software/config IDENTITY, not a
+  // personal or infrastructure identifier -- the contrast with the fields that correctly stay
+  // anonymized (host.hostname, process.command_line, source.ip/destination.ip,
+  // source.user.name/destination.user.name -- all already listed above) is deliberate and must not
+  // be widened without the same scrutiny.
+  // #8912: a package name is free text SUPPLIED BY THE THIRD-PARTY VENDOR/PACKAGE MAINTAINER (not
+  // Wazuh's own curated ruleset, unlike rule.category/rule.tags/rule.title above), so it can
+  // legitimately (if rarely) embed an identifier — e.g. a vendor build that stamps a customer's own
+  // hostname into a bundled package's display name. 'allow-scan' keeps the value readable (still
+  // needed verbatim for "what packages are installed" to be useful) while running it through the
+  // same shape scan allow-by-omission fields get PLUS a dictionary lookup against every real
+  // identifier this conversation's pseudonymizer has already minted (see `scrubKnownEntities`) —
+  // catching a bare, dotless identifier the shape scan alone cannot.
+  { field: 'package.name', action: 'allow-scan' },
+  { field: 'package.version', action: 'allow' },
+  { field: 'package.type', action: 'allow' },
+  // NOT 'allow', unlike package.name/architecture/type/version above: a vendor/distributor string
+  // ("Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>", "Debian Sysadmin Team
+  // <debian-admin@lists.debian.org>") routinely embeds a maintainer/team EMAIL ADDRESS -- personal
+  // contact information, not software identity, and the one field in this deriveColumns group that
+  // actually needs review rather than a rubber-stamp 'allow'. This repo has no `allow-scan` action
+  // yet (issue #8912, branch fix/8912-privacy-allow-scan(-v2), not merged as of this fix) that
+  // could keep the distributor NAME readable while still catching the embedded address the way
+  // package.name does there for a bundled hostname -- with only allow/anonymize/never available
+  // today, 'anonymize' is the only choice that does not ship a real email address to the provider.
+  // This ALSO makes explicit (rather than accidental) the protection get_agent_inventory's
+  // deriveColumns fail-closed default already applied here silently: before this entry existed,
+  // field-policy-coverage.test.ts treated `package.vendor` as "covered" purely because it sat in
+  // that test's KNOWN_SAFE_STRUCTURAL_FIELDS allowlist (a structural-shape guess, never a reviewed
+  // privacy decision) -- which said nothing about what the runtime actually does with an unlisted
+  // field on a deriveColumns tool, and would have silently stopped protecting this field the
+  // moment it was ever read by a non-deriveColumns tool (allow-by-omission there means real value,
+  // untouched). See field-policy-coverage.test.ts's `requireExplicitEntry` for the coverage-test
+  // fix that closes that gap. Revisit this to 'allow-scan' once #8912 lands, to preserve the
+  // distributor name while still catching the embedded address.
+  { field: 'package.vendor', action: 'anonymize', kind: 'VAL' },
+  // A hotfix/KB identifier (e.g. "KB5034441"), not a person or a network address.
+  { field: 'package.hotfix.name', action: 'allow' },
+  // OS identity -- NOT host.hostname (above), which is the agent's network identity and stays
+  // anonymized.
+  { field: 'host.os.name', action: 'allow' },
+  { field: 'host.os.version', action: 'allow' },
+  { field: 'host.os.platform', action: 'allow' },
+  // A running program's name -- NOT process.command_line (above), which can carry user-supplied
+  // paths/arguments (a username in a home directory path, a secret passed as a CLI flag) and must
+  // keep being anonymized.
+  { field: 'process.name', action: 'allow' },
+  // Kernel process-state code (a closed enum, not an identifier) -- added for issue #8920 item
+  // 1's get_agent_inventory "processes" SYNTHETIC breakdown (digest.breakdownDimensions, which
+  // groups returned rows and so needs no aggregation-mapping evidence -- see
+  // get-agent-inventory.ts's InventoryKindConfig doc comment). Without this entry,
+  // deriveColumns:true's fail-closed default (see this file's header doc comment on
+  // `isEscapeHatch`) would pseudonymize the breakdown's bucket keys into meaningless VAL_n,
+  // making "how many processes are running vs zombie" unanswerable under privacy mode.
+  // interface.state/network.transport/check.result (the fields newly added to guardrails.ts's
+  // AGG_FIELD_ALLOWLIST for the same issue) already have 'allow' entries in this list.
+  { field: 'process.state', action: 'allow' },
+  // Open-port inventory mechanics (protocol, listen state, the two bare port numbers) -- NOT
+  // source.ip/destination.ip (above), which correctly stay anonymized: a port number alone
+  // identifies nothing without the IP it's paired with.
+  { field: 'network.transport', action: 'allow' },
+  { field: 'interface.state', action: 'allow' },
+  { field: 'source.port', action: 'allow' },
+  { field: 'destination.port', action: 'allow' },
   // get_events_by_agent reads the same wazuh.agent.* fields as the findings tools above (already
   // covered by WAZUH_FIELD.AGENT_NAME/AGENT_ID), plus its own ECS event taxonomy fields.
   { field: 'event.category', action: 'allow' },
   { field: 'event.action', action: 'allow' },
   { field: 'event.outcome', action: 'allow' },
 ];
+
+/**
+ * Reconciles a STORED field policy array (the `wazuh-ai-assistant-settings` saved object's
+ * `fieldPolicy` attribute) with the shipped `FIELD_POLICY_DEFAULTS`, so a policy entry added in a
+ * later release reaches an installation whose saved object predates it (issue #8917: a deployed
+ * lab's stored policy had 25 entries -- no `package.name`/`package.version` -- while the installed
+ * code shipped 31, and `server/routes/settings.ts` was taking `found.attributes.fieldPolicy`
+ * wholesale, so those two fields had NO policy entry at all and were pseudonymized wholesale by a
+ * fail-closed tool: the reported over-redaction). Pure and side-effect free -- the caller
+ * (`server/routes/settings.ts`'s `getOrCreateAssistantSettings`) decides what to do with `added`
+ * (log it, surface it in the settings response).
+ *
+ * The rule is ADD-ONLY and per-field, in this order:
+ *
+ * 1. A field already present in `stored` (any action, including one that overrides the shipped
+ *    default) is left completely untouched. The admin's own entry always wins -- this function
+ *    never edits or removes a stored entry, only ever appends ones that were missing.
+ * 2. A shipped default field ABSENT from `stored` is appended UNLESS it is also present in
+ *    `knownFields`. `knownFields` is the set of field keys the stored policy was already reconciled
+ *    against as of the settings object's last write (see `AssistantSettingsAttributes`'s
+ *    `fieldPolicyKnownFields`, stamped at every PUT with the merged view the admin was editing).
+ *    A field present in `knownFields` but absent from `stored` means the admin used the Settings
+ *    page's "remove" control (`handleRemoveFieldPolicyRow`) to deliberately delete that row -- that
+ *    deletion must stick, not be silently reverted on the next read.
+ * 3. A saved object that predates this fix entirely carries no `fieldPolicyKnownFields` at all
+ *    (`knownFields` is then `[]`) -- every currently-shipped default absent from its stored policy
+ *    is therefore treated as "genuinely never reached this install" and is appended. That is
+ *    exactly the one-time catch-up this fix performs for an existing installation: nothing was ever
+ *    deliberately removed from an object that has never been through this reconciliation before, so
+ *    there is nothing to protect from being "wrongly" re-added.
+ *
+ * SECURITY DIRECTION IS NOT UNIFORM -- read this before changing the rule above. Appending a missing
+ * entry does not uniformly increase protection:
+ *
+ * - On a `failClosedFieldPolicy` tool (`applyFieldPolicy`'s `isEscapeHatch` branch below), a field
+ *   with NO policy entry is fail-closed pseudonymized by default. Appending a shipped default whose
+ *   action is `'allow'` (most of the inventory fields are: `package.name`, `package.version`,
+ *   `host.os.name`, ...) therefore REDUCES redaction for that field on that tool -- from
+ *   "pseudonymized because absent" to "sent verbatim because explicitly allowed". That is the
+ *   correct outcome, not a regression: the shipped default reflects reviewed intent (see the
+ *   comments above each entry in `FIELD_POLICY_DEFAULTS`, e.g. "software/config IDENTITY, not a
+ *   personal or infrastructure identifier"), and the whole point of #8917 is that this reviewed
+ *   intent never reached an upgraded install. The over-redaction the issue reports IS this gap.
+ * - Appending a shipped default whose action is `'anonymize'` or `'never'` only ever INCREASES
+ *   protection: an unlisted field on a non-escape-hatch tool is allow-by-omission today, and
+ *   `'anonymize'`/`'never'` newly restricts it; on an escape-hatch tool the fail-closed default is
+ *   already `'anonymize'`, so a shipped `'anonymize'` default is a no-op and a shipped `'never'`
+ *   default (drops the field/bucket entirely) is strictly stronger. Never a regression either way.
+ * - What this function will NEVER do, in either direction, is touch a field the admin already has
+ *   an explicit opinion about (rule 1: present in `stored`). That is the one case that could
+ *   plausibly move protection in a direction the admin did not ask for, and it is excluded by
+ *   construction from both the append and the knownFields-suppression logic above.
+ */
+export function mergeFieldPolicyWithDefaults(
+  stored: FieldPolicyEntry[],
+  defaults: FieldPolicyEntry[],
+  knownFields: string[],
+): { merged: FieldPolicyEntry[]; added: FieldPolicyEntry[] } {
+  const storedFields = new Set(stored.map(entry => entry.field));
+  const known = new Set(knownFields);
+  const added = defaults.filter(
+    entry => !storedFields.has(entry.field) && !known.has(entry.field),
+  );
+  return {
+    merged: added.length > 0 ? [...stored, ...added] : stored,
+    added,
+  };
+}
 
 export type PseudonymKind = 'HOST' | 'IP' | 'USER' | 'URL' | 'VAL';
 
@@ -115,22 +280,65 @@ export interface PseudonymEntry {
   pseudonym: string;
 }
 
+/** Splits a field name into lowercase word tokens on '.', '_', '-', and camelCase boundaries —
+ * e.g. "data.srcuser" -> ["data","srcuser"] (no internal boundary inside "srcuser"), "GeoLocation"
+ * -> ["geo","location"], "country_name" -> ["country","name"]. Used by `inferPseudonymKind` so a
+ * keyword match is checked against a whole TOKEN (or a token's own prefix/suffix), never against
+ * an arbitrary substring floating in the middle of an unrelated word. */
+function fieldNameTokens(field: string): string[] {
+  return field
+    .split(/[.\-_]+/)
+    .flatMap(segment => segment.split(/(?<=[a-z0-9])(?=[A-Z])/))
+    .map(token => token.toLowerCase())
+    .filter(token => token.length > 0);
+}
+
+/** True when `keyword` occupies the WHOLE of `token`, or is glued to it as a prefix/suffix with no
+ * delimiter in between (e.g. "srcip"/"dstip" end with "ip", "clientuser" ends with "user") — but
+ * NOT when it merely appears somewhere in the middle, which is what let 'wazuh.rule.description'
+ * misclassify as an IP field before this fix (`'description'.includes('ip')` is true — "descr-IP-
+ * tion" — because raw substring search has no concept of a word boundary). */
+function tokenMatchesKeyword(token: string, keyword: string): boolean {
+  return (
+    token === keyword || token.startsWith(keyword) || token.endsWith(keyword)
+  );
+}
+
 /** Infers which pseudonym kind a field name should mint, from the field name alone ("kind
  * inferred from field name"). Checked in this order so a field matching more than one heuristic
  * (there are none in FIELD_POLICY_DEFAULTS today) resolves predictably; falls back to the generic
- * `VAL` kind for a field that is none of host/ip/user/url. */
+ * `VAL` kind for a field that is none of host/ip/user/url.
+ *
+ * Matches on whole tokens (see `fieldNameTokens`/`tokenMatchesKeyword`), not a raw substring of
+ * the entire field string — the previous `lower.includes('ip')` style check flagged any field
+ * whose name merely *contained* "ip" as a substring, e.g. 'wazuh.rule.description' ("descr-IP-
+ * tion") or 'recipient', misclassifying them as IP fields and making the model narrate their
+ * (actually opaque, unrelated-kind) pseudonym tokens as literal IP addresses. Compound field names
+ * with no delimiter (e.g. legacy Wazuh alert fields like "data.srcip"/"data.srcuser") still match,
+ * because the keyword only needs to be a prefix/suffix of a token, not the whole token. */
 export function inferPseudonymKind(field: string): PseudonymKind {
-  const lower = field.toLowerCase();
-  if (lower.includes('url')) {
+  const tokens = fieldNameTokens(field);
+  const hasKeyword = (keyword: string) =>
+    tokens.some(token => tokenMatchesKeyword(token, keyword));
+  if (hasKeyword('url')) {
     return 'URL';
   }
-  if (lower.includes('ip')) {
+  if (hasKeyword('ip')) {
     return 'IP';
   }
-  if (lower.includes('user')) {
+  if (hasKeyword('user')) {
     return 'USER';
   }
-  if (lower.includes('hostname') || lower.endsWith('.name')) {
+  if (hasKeyword('hostname')) {
+    return 'HOST';
+  }
+  // A field path's LAST '.'-delimited segment being the bare word "name" is this repo's
+  // hostname-alias convention (e.g. "wazuh.agent.name") — deliberately an exact match on the
+  // final PATH segment (split only on '.', unlike the token check above) so a within-segment
+  // compound like "country_name" (a place name, not a host) is not swept in; only a path
+  // structurally ending in ".name" is.
+  const pathSegments = field.split('.');
+  if (pathSegments[pathSegments.length - 1].toLowerCase() === 'name') {
     return 'HOST';
   }
   return 'VAL';
@@ -171,6 +379,16 @@ function deepMapStrings(
     return out;
   }
   return value;
+}
+
+/** Escapes every regex metacharacter in `value` so it can be embedded literally inside a
+ * dynamically-built `RegExp`, because a raw attacker/data-controlled value cannot be interpolated
+ * into a regex source without first escaping it. Two callers below need it: `Pseudonymizer
+ * .applyToText`, which (unlike a plain `split`/`join`) must express a word-boundary condition, and
+ * `scrubKnownEntities`, which needs actual regex features (case insensitivity, `\b`-style boundary
+ * lookarounds) that only a real `RegExp` gives it. */
+function escapeRegExpLiteral(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 /**
@@ -243,11 +461,31 @@ export class Pseudonymizer {
     return this.minted.slice();
   }
 
-  /** Replaces every known REAL value with its pseudonym, longest-value-first so a shorter value
+  /**
+   * Replaces every known REAL value with its pseudonym, longest-value-first so a shorter value
    * that happens to be a substring of a longer one (e.g. "10.0.0.1" inside "10.0.0.10") is never
-   * substituted first and left corrupting the longer value. Uses plain `split`/`join` rather than
-   * a regex built from the (unescaped, attacker/data-controlled) value — sidesteps regex-escaping
-   * entirely instead of trying to get it right. */
+   * substituted first and left corrupting the longer value.
+   *
+   * #8916: a value is only ever replaced as a WHOLE token, never as a substring embedded inside a
+   * larger alphanumeric run — observed live: the word "ubuntu" (pseudonymized to "VAL_2" from an
+   * earlier `host.os.platform` value) turned the unrelated package version "7.81.0-1ubuntu1.14"
+   * into "7.81.0-1VAL_21.14". A "boundary" here is any NON-ALPHANUMERIC character (or start/end of
+   * string) — deliberately NOT the conventional regex `\b` (which treats "_" as a word character):
+   * real identifiers routinely embed "-"/"_" as separators (e.g. "mysql-server-DBPRIMARY03"), and
+   * requiring only an actual alphanumeric neighbor to disqualify a match means a "-"/"_"-glued
+   * compound identifier still matches as a whole token, exactly like a space- or
+   * punctuation-delimited one. Embedded IP/FQDN values minted by `prescanAndMint`'s shape scan are
+   * unaffected by this tightening: they were already matched (and therefore already delimited) as
+   * whole tokens by their own `\b`-anchored regexes before ever reaching this map, so they still
+   * satisfy this boundary check here — this only ever REJECTS matches the previous plain
+   * `split`/`join` wrongly accepted, never one it correctly accepted.
+   *
+   * This now needs a real `RegExp` (to express the boundary condition) instead of the previous
+   * plain `split`/`join` — every value is escaped first via `escapeRegExpLiteral` since values
+   * here are attacker/data-controlled text, never safe to interpolate into a regex source
+   * unescaped. An empty value is skipped outright: an empty pattern's zero-width match would
+   * otherwise insert a pseudonym at every non-alphanumeric-adjacent position in the text.
+   */
   applyToText(text: string): string {
     if (!text || this.valueToPseudonym.size === 0) {
       return text;
@@ -257,10 +495,14 @@ export class Pseudonymizer {
     );
     let out = text;
     for (const value of values) {
-      if (!out.includes(value)) {
+      if (!value || !out.includes(value)) {
         continue;
       }
-      out = out.split(value).join(this.valueToPseudonym.get(value) as string);
+      const pattern = new RegExp(
+        `(?<![A-Za-z0-9])${escapeRegExpLiteral(value)}(?![A-Za-z0-9])`,
+        'g',
+      );
+      out = out.replace(pattern, this.valueToPseudonym.get(value) as string);
     }
     return out;
   }
@@ -269,6 +511,17 @@ export class Pseudonymizer {
    * through `applyToText`. */
   applyToObject<T>(value: T): T {
     return deepMapStrings(value, text => this.applyToText(text)) as T;
+  }
+
+  /** Read-only snapshot of every REAL value this pseudonymizer currently holds a mapping for
+   * (seeded + minted so far this request) — the "known-entity dictionary" `scrubKnownEntities`
+   * scans against. Deliberately returns a fresh array (not a live view) so a caller can't mutate
+   * the pseudonymizer's internal maps through it. */
+  knownEntities(): PseudonymEntry[] {
+    return [...this.valueToPseudonym.entries()].map(([value, pseudonym]) => ({
+      value,
+      pseudonym,
+    }));
   }
 
   /** Replaces every complete `KIND_n` pseudonym token with its real value. Word-boundary anchored
@@ -408,6 +661,136 @@ const FQDN_TOKEN_RE = new RegExp(
 const ALL_NUMERIC_DOTTED_RE = /^[0-9.]+Z?$/;
 
 /**
+ * A dotted token shaped like a package/software version string, covering the FULL Debian/RPM
+ * version grammar rather than the narrower "digit-only labels" shape: an optional leading "v"
+ * (semver-style, "v1.2.3"), an all-digit FIRST label, then one-or-more subsequent dot-labels each
+ * STARTING with a digit but allowed to carry letters after it (so "118ubuntu5", "1ubuntu2",
+ * "1k", "9p1" all count as one label each), and an optional final "-revision" suffix that may
+ * itself carry dots and MORE hyphens ("-213.224", and the kernel family's "-91-generic"/
+ * "-150-lowlatency" — a second hyphen is the single most common version shape in Wazuh Linux
+ * inventory, via agent.os.kernel/linux-image packages). `prescanAndMint` leaves these untouched —
+ * minting a HOST_n for a version string undermines a `package.version:{allow}`-style query the
+ * user is asking about. Tokens containing "+"/"~" never reach this regex at all (the tokenizer
+ * splits at them) — see `FULL_COMPOUND_VERSION_RE` below for how those are handled.
+ *
+ * (#8920 item 8): the previous digits-only-label shape rejected "3.118ubuntu5" and
+ * "3.20191218.1ubuntu2.3" — real `dpkg -l` versions with letters fused directly into a dot-label,
+ * no leading "-" — so they fell through to `FQDN_TOKEN_RE` and were minted as HOST_n. Rather than
+ * add those two shapes as special cases, the discriminator is rewritten as the STRUCTURAL property
+ * above, which covers the grammar by construction instead of by enumeration.
+ *
+ * Hostname-safety proof (why loosening this can only ever REDUCE minting, never open a leak): this
+ * regex is only ever consulted, inside `prescanAndMint`'s FQDN pass, for a token that already
+ * matched `FQDN_TOKEN_RE` — i.e. something already shaped like `label.label[.label]+`. A token is
+ * excluded from minting here ONLY when its first label is all-digit AND every subsequent label
+ * begins with a digit. Any genuine FQDN fails that test: a public hostname's last label is an
+ * alphabetic TLD ("...corp", "...com", "...local"), and an internal hostname's leading label is
+ * essentially always letter-initial ("web1.corp", "backup-vault.internal.corp") or, in the rarer
+ * case where it isn't ("01server.corp.local", "3com.example.com"), still carries a letter WITHIN
+ * that same first label — which fails "first label all-digit" outright, since this is a per-label
+ * structural check, not a "starts with a digit" check. The residue that IS excluded (first label
+ * pure digits, every later label digit-initial) is a shape no real deployment uses as a hostname;
+ * a token of that shape is indistinguishable from a version string by any test that only looks
+ * at the token itself. The accepted tradeoff for that pathological residue is fidelity, not
+ * privacy: worst case a version-shaped string is (correctly) never minted, never that a real
+ * hostname is missed.
+ *
+ * KNOWN, DELIBERATE RESIDUE (recorded so it is not mistaken for an oversight): a version label
+ * that starts with a LETTER after a dot — RPM dist tags fused into the version ("4.6.3.el7"),
+ * pre-release labels ("2.0.rc1", "4.0.dev0", "1.0.beta3") — is still minted, because loosening
+ * "every later label digit-initial" to accept letter-initial labels would stop minting real
+ * FQDNs whose first label is all-numeric: "0.pool.ntp.org", "1.gravatar.com",
+ * "2.bp.blogspot.com", "10.corp.local" are common, real hostnames of exactly that shape. That
+ * direction is a privacy regression, so this residue is NOT closable at the token level; the
+ * hostname corpus in privacy.test.ts pins those FQDNs as always-minting to keep it that way.
+ * (Debian policy only constrains the FIRST character of an upstream version, so those residual
+ * shapes are legal versions — the coverage here is structural-but-not-total, by choice.) */
+const VERSION_LIKE_TOKEN_RE =
+  /^v?\d+(?:\.\d[0-9A-Za-z]*)+(?:-[0-9A-Za-z.-]+)?$/i;
+
+/** Characters a whole (whitespace/quote-delimited) package-version token may carry — used by
+ * `expandToFullToken` to grow an FQDN sub-match back to the full token the tokenizer split.
+ * Includes "+"/"~" (Debian revision separators, at which FQDN_TOKEN_RE splits) and ":" (epoch,
+ * "1:2.4.41-4+deb11u1"). */
+const VERSION_TOKEN_CHAR_RE = /[0-9A-Za-z.+~:-]/;
+
+/**
+ * The WHOLE-token version test for compound Debian/RPM versions that FQDN_TOKEN_RE splits at
+ * "+"/"~": "2.4.37-43.module+el8.5.0+1022+b541f3b1" yields the FQDN-shaped sub-token "el8.5.0",
+ * "1.0+git20200101.abc1234-1" yields "git20200101.abc1234-1", "0.9.8+really0.9.7-1" yields
+ * "really0.9.7-1" — every one previously minted as HOST_n, corrupting the very version value a
+ * `package.version:{allow}` query is about. The rule: when the FULL surrounding token (a) is
+ * strictly larger than the FQDN match, (b) contains a "+" or "~" (the separators that caused the
+ * split — this is the load-bearing restriction), and (c) starts like a version (`v?` + digit)
+ * and stays within the version charset, the sub-token is part of a version string, not a
+ * hostname. Requiring (b) is what keeps "1.gravatar.com"/"0.pool.ntp.org" minting: they contain
+ * no "+"/"~", so they never take this path — only a hostname GLUED to a version by a "+"/"~"
+ * (no real naming scheme does this) could ever be skipped, and that direction is fidelity, not
+ * privacy. */
+const FULL_COMPOUND_VERSION_RE = /^v?\d[0-9A-Za-z.+~:-]*$/i;
+
+/** Grows the FQDN match at `offset` (length `length`) in `text` to the full surrounding token of
+ * version-charset characters — see `FULL_COMPOUND_VERSION_RE`. */
+function expandToFullToken(
+  text: string,
+  offset: number,
+  length: number,
+): string {
+  let start = offset;
+  while (start > 0 && VERSION_TOKEN_CHAR_RE.test(text[start - 1])) {
+    start -= 1;
+  }
+  let end = offset + length;
+  while (end < text.length && VERSION_TOKEN_CHAR_RE.test(text[end])) {
+    end += 1;
+  }
+  return text.slice(start, end);
+}
+
+/** A dotted token shaped like a MITRE ATT&CK technique id with sub-technique notation
+ * ("T1059.001", "T1548.002.001" would also match) — `prescanAndMint` leaves these untouched.
+ * Without this exclusion the FQDN pass mints them as HOST_n ("T1059" and "001" are both legal
+ * hostname labels), which destroys exactly the exact-vs-sub-technique breakdown issue #8920
+ * item 2's rollup disclosure depends on: the model would receive breakdown keys like
+ * {key: "T1059", ...}, {key: "HOST_1", ...} and could no longer report the split. Safety
+ * argument for the narrowing: the shape requires an initial label of "T" + digits ONLY and
+ * every subsequent label all-digits — a real FQDN needs an alphabetic TLD, so the only hostname
+ * this could ever skip is an internal name like "T123.456" (all-numeric final label), which is
+ * exotic enough to accept in exchange for not corrupting every sub-technique id the digest
+ * carries. The field-policy side already classifies the field itself as 'allow'
+ * (WAZUH_FIELD.RULE_MITRE_TECHNIQUE_ID above); this closes the OUTBOUND free-text/JSON scan
+ * that runs after it. */
+const TECHNIQUE_ID_TOKEN_RE = /^T\d+(?:\.\d+)+$/;
+
+/** Every dot-path SEGMENT word appearing in a curated Wazuh/ECS field name — drawn from
+ * `WAZUH_FIELD`'s values and every plain field in `FIELD_POLICY_DEFAULTS` (a tool-scope
+ * "toolName/" prefix and the trailing ".*" wildcard are stripped first, since those aren't part of
+ * the path itself), all lowercased. Self-updating: a field added to either source is automatically
+ * recognized here — no separate list to hand-maintain. Used by `isFieldPathToken` below. */
+const FIELD_PATH_WORDS: ReadonlySet<string> = new Set(
+  [
+    ...Object.values(WAZUH_FIELD),
+    ...FIELD_POLICY_DEFAULTS.map(entry => entry.field),
+  ]
+    .map(field => field.split('/').pop() as string) // drop a "toolName/" scoping prefix, if any
+    .flatMap(field => field.replace(/\.\*$/, '').split('.'))
+    .map(segment => segment.toLowerCase())
+    .filter(segment => segment.length > 0),
+);
+
+/** True when every '.'-separated segment of `token` is a known field-path word (see
+ * `FIELD_PATH_WORDS`) — i.e. `token` reads as the user NAMING A FIELD (e.g. typing
+ * "wazuh.agent.name" or "wazuh.rule.id" into their own question), not an actual hostname.
+ * Deliberately requires ALL segments to match, not just one: a real hostname composed entirely of
+ * words that also happen to be field-path vocabulary is exotic enough to accept the (favorable)
+ * tradeoff of never mangling a user's own field-path mention into a broken HOST_n token. */
+function isFieldPathToken(token: string): boolean {
+  return token
+    .split('.')
+    .every(segment => FIELD_PATH_WORDS.has(segment.toLowerCase()));
+}
+
+/**
  * First-mention pre-scan: mints a pseudonym for every IPv4/IPv6 address
  * and dotted-hostname (FQDN) token found in `text`, using the SAME `pseudonymizer` instance the
  * rest of the request uses — so these newly-minted entries are indistinguishable, from
@@ -420,6 +803,15 @@ const ALL_NUMERIC_DOTTED_RE = /^[0-9.]+Z?$/;
  * Scan order matters and is fixed: IPv4, then IPv6, then FQDN — an IPv4 octet run must be minted
  * (and thus removed from the text) before the FQDN pass runs, or a bare IP could otherwise be
  * mis-read as a dotted hostname and minted with the wrong `kind`.
+ *
+ * The FQDN pass additionally excludes (in order checked): an all-numeric dotted run or ISO
+ * timestamp fragment (`ALL_NUMERIC_DOTTED_RE`, pre-existing), a version/package-revision string
+ * (`VERSION_LIKE_TOKEN_RE` — e.g. "5.2.5-2ubuntu1" would otherwise undermine a
+ * `package.version:{allow}` query), a MITRE sub-technique id (`TECHNIQUE_ID_TOKEN_RE` — e.g.
+ * "T1059.001", whose minting would corrupt the technique breakdown the rollup disclosure
+ * depends on), and a field-path-shaped token (`isFieldPathToken` — e.g. the
+ * user typing "wazuh.agent.name"/"wazuh.rule.id" would otherwise get that mention replaced with a
+ * HOST_n, breaking their own query and making the model claim the field doesn't exist).
  *
  * Deliberately conservative (documented limitation): a bare
  * single-word hostname ("webserver", no dot) is NEVER matched — only `label.label[...]` forms are,
@@ -441,8 +833,25 @@ export function prescanAndMint(
   out = out.replace(IPV6_TOKEN_RE, token =>
     pseudonymizer.pseudonymize(token, 'IP'),
   );
-  out = out.replace(FQDN_TOKEN_RE, token => {
-    if (ALL_NUMERIC_DOTTED_RE.test(token)) {
+  out = out.replace(FQDN_TOKEN_RE, (token, offset: number, subject: string) => {
+    if (
+      ALL_NUMERIC_DOTTED_RE.test(token) ||
+      VERSION_LIKE_TOKEN_RE.test(token) ||
+      TECHNIQUE_ID_TOKEN_RE.test(token) ||
+      isFieldPathToken(token)
+    ) {
+      return token;
+    }
+    // Compound-version residue: the tokenizer splits at "+"/"~", so a Debian/RPM compound
+    // version yields FQDN-shaped fragments ("el8.5.0", "git20200101.abc1234-1") the per-token
+    // regex above can never see whole. Test the FULL surrounding token instead — see
+    // FULL_COMPOUND_VERSION_RE's doc comment for the rule and its hostname-safety argument.
+    const fullToken = expandToFullToken(subject, offset, token.length);
+    if (
+      fullToken !== token &&
+      /[+~]/.test(fullToken) &&
+      FULL_COMPOUND_VERSION_RE.test(fullToken)
+    ) {
       return token;
     }
     return pseudonymizer.pseudonymize(token, 'HOST');
@@ -465,8 +874,15 @@ export function prescanAndMint(
  * PATHS (e.g. "wazuh.agent.name"), not data — the same labels `applyFieldPolicy` deliberately
  * leaves untouched — and are FQDN-shaped, so scanning them would mint the same garbage HOST_n
  * this fix exists to prevent.
+ *
+ * `metrics` is likewise unscanned: its `value` is a computed NUMBER, its `agg` is the
+ * aggregation's own (model-chosen) name, and its `value_as_string` is OpenSearch's own date/
+ * number formatting of that numeric value (a min/max on a date field) — never indexed
+ * hostnames/IPs. Scanning `value_as_string` would misfire: the "00.000Z" tail of an ISO
+ * timestamp is FQDN-token-shaped and would be minted as a garbage HOST_n, corrupting the one
+ * human-readable form the field exists to carry. See digest.ts's `Digest.metrics` doc comment.
  */
-const UNSCANNED_DIGEST_KEYS = new Set(['columns']);
+const UNSCANNED_DIGEST_KEYS = new Set(['columns', 'metrics']);
 
 export function prescanAndMintToolContent(
   text: string,
@@ -504,6 +920,73 @@ export function prescanAndMintToolContent(
   return JSON.stringify(scanValues(parsed));
 }
 
+/**
+ * Known-entity dictionary scan (issue #8912): replaces every EXACT, word-boundary occurrence of an
+ * already-minted real identifier in `text` with its EXISTING pseudonym — never minting a new one.
+ *
+ * WHY shape-scanning cannot close this by construction: `prescanAndMint`'s IPv4/IPv6/FQDN regexes
+ * only match values that look like an address or a dotted hostname on their face. A bare, dotless
+ * identifier — an agent name typed without its domain suffix, a short internal codename, a hostname
+ * style like "DBPRIMARY03" — has no distinguishing shape at all; to a regex it is just another word,
+ * indistinguishable from ordinary prose. The only thing that CAN single it out is having already
+ * seen it minted somewhere else in this same conversation (an agent digest field, a prior turn's
+ * `wazuh.agent.name`, etc.) — i.e. the pseudonymizer's own map. That is what this function scans
+ * against, via `Pseudonymizer.knownEntities()`.
+ *
+ * This is therefore a STRICTLY NARROWER guarantee than the shape scan: an identifier NEVER seen
+ * elsewhere in the conversation (no existing mapping to reuse) still passes through unscrubbed —
+ * there being nothing to reuse and this function being explicitly forbidden from minting a fresh
+ * pseudonym for a dictionary hit (that would let a free-text field silently start inventing
+ * HOST_n/USER_n tokens for values no other part of the digest ever classified as that kind). The
+ * residual (documented, not silently accepted) risk is exactly this: a value that is BOTH shapeless
+ * AND never minted anywhere else. See privacy.test.ts's "unknown identifier" case for the explicit
+ * test of that limitation.
+ *
+ * Boundary rule: a "boundary" is any NON-alphanumeric character (or start/end of string) — NOT the
+ * conventional regex `\b` (which treats `_` as a word character). Real identifiers routinely embed
+ * `-`/`_` as separators (`mysql-server-DBPRIMARY03-config`, `db_primary_03`), and a naive `\b...\b`
+ * match would either fail to isolate the identifier inside such a compound token, or (worse, with
+ * `_` specifically) refuse to treat `foo_DBPRIMARY03_bar` as containing a boundary at all. Using
+ * `(?<![A-Za-z0-9])` / `(?![A-Za-z0-9])` lookarounds instead means only actual alphanumeric
+ * characters count as "part of the same token" — a `-` or `_` immediately beside the identifier is
+ * always a valid boundary, matching how `mysql-server-DBPRIMARY03-config` should scrub to
+ * `mysql-server-{PSEUDONYM}-config`. The flip side (an intentional, accepted trade-off, same spirit
+ * as `applyToText`'s longest-first ordering below): this also means a known identifier that is
+ * merely a substring of a LARGER alphanumeric run (e.g. known value "host1" inside the single token
+ * "host12") correctly does NOT match, because "2" is alphanumeric and therefore not a boundary.
+ *
+ * Case-insensitive: a provider/tool result may re-render an identifier in different casing
+ * (`DBPRIMARY03` vs `dbprimary03`) from where it was first minted; both must resolve to the SAME
+ * existing pseudonym for the map to stay conversation-consistent (see the class-level `pseudonymize`
+ * doc comment on `Pseudonymizer` — reuse, never a second mint for the same real entity).
+ *
+ * Longest-known-value-first, for the same reason as `Pseudonymizer.applyToText`: a shorter known
+ * value that happens to be a boundary-delimited PREFIX/SUFFIX chunk of a longer known value (e.g.
+ * "DB03" and "DB03-PRIMARY" both minted) must not have the shorter one's replacement corrupt the
+ * longer one's match.
+ */
+export function scrubKnownEntities(
+  text: string,
+  pseudonymizer: Pseudonymizer,
+): string {
+  if (!text) {
+    return text;
+  }
+  const entities = pseudonymizer
+    .knownEntities()
+    .filter(entry => entry.value.length > 0)
+    .sort((a, b) => b.value.length - a.value.length);
+  let out = text;
+  for (const { value, pseudonym } of entities) {
+    const pattern = new RegExp(
+      `(?<![A-Za-z0-9])${escapeRegExpLiteral(value)}(?![A-Za-z0-9])`,
+      'gi',
+    );
+    out = out.replace(pattern, pseudonym);
+  }
+  return out;
+}
+
 /** Resolves the policy entry for `field` (optionally scoped to `toolName`). Tool-scoped entries
  * ("toolName/field") are checked first and win over plain ones; plain entries support a trailing
  * `.*` prefix match (e.g. "wazuh.rule.compliance.*" matches "wazuh.rule.compliance" itself and
@@ -539,24 +1022,126 @@ function resolveFieldEntry(
 }
 
 /**
- * Reads the field name driving each of a digest's `breakdown` aggregations (a terms/
- * significant_terms/cardinality aggregation's bucket keys), from the EXECUTED request body — the
- * response's `aggregations` tree only carries bucket keys/counts, never which field produced them,
- * so this must read the query side. Returns a map of top-level aggregation name → field (an entry
- * is `undefined` for an agg with no extractable field, e.g. a date_histogram), in the body's key
- * order — the same order digest.ts's `buildBreakdown` iterates, so the two can't drift apart.
- * Breakdown entries name their aggregation (`agg`) only in the multi-agg case; a single-agg
- * entry attributes to the map's first key.
+ * Which field(s) drive an aggregation's bucket key, and how the key is shaped as a result:
+ * - `scalar`: terms/significant_terms/cardinality -- the bucket key is a single string, the value
+ *   of `field`.
+ * - `multi`: `multi_terms` -- the bucket key is an ARRAY, positionally aligned with `fields`
+ *   (`fields[i]` names the field `key[i]` is a value of). Position is the ONLY thing that ties a
+ *   component to its field, unlike `composite` below -- there is no per-component name to key off.
+ * - `composite`: `composite` -- the bucket key is an OBJECT, `{sourceName: value}`; `fields` maps
+ *   each `sourceName` (the composite `sources[]` entry's own key, a caller-chosen label, NOT a
+ *   field path) to the field path that source's `terms.field` aggregates on.
+ */
+export type AggFieldSpec =
+  | { kind: 'scalar'; field: string }
+  | { kind: 'multi'; fields: string[] }
+  | { kind: 'composite'; fields: Record<string, string> };
+
+/** `resolveAggFieldSpec`'s `multi_terms` branch: `{terms: [{field}, {field}, ...]}` -- mirrors the
+ * shape `guardrails.ts`'s `checkAggs` already validates for this same agg type. */
+function resolveMultiTermsSpec(
+  aggDef: Record<string, unknown> | undefined,
+): AggFieldSpec | undefined {
+  const multiTerms = aggDef?.multi_terms as { terms?: unknown } | undefined;
+  if (!multiTerms || !Array.isArray(multiTerms.terms)) {
+    return undefined;
+  }
+  const fields = multiTerms.terms
+    .map(spec => (spec as { field?: unknown } | undefined)?.field)
+    .filter((field): field is string => typeof field === 'string');
+  // Positional: a `multi_terms` bucket key's array length matches `terms.length`, INCLUDING any
+  // entry this loop couldn't resolve to a string field (silently dropped by `filter` above would
+  // desync position i in `fields` from position i in the bucket key array) -- so an incomplete
+  // resolution is reported as no spec at all (`undefined`) rather than a partial, misaligned one.
+  return fields.length > 0 && fields.length === multiTerms.terms.length
+    ? { kind: 'multi', fields }
+    : undefined;
+}
+
+/** `resolveAggFieldSpec`'s `composite` branch: `{sources: [{sourceName: {terms: {field}}}, ...]}`
+ * -- mirrors the shape `guardrails.ts`'s `checkAggs` already validates for this same agg type. */
+function resolveCompositeSpec(
+  aggDef: Record<string, unknown> | undefined,
+): AggFieldSpec | undefined {
+  const composite = aggDef?.composite as { sources?: unknown } | undefined;
+  if (!composite || !Array.isArray(composite.sources)) {
+    return undefined;
+  }
+  const fields: Record<string, string> = {};
+  for (const source of composite.sources) {
+    if (!source || typeof source !== 'object' || Array.isArray(source)) {
+      continue;
+    }
+    for (const [sourceName, sourceSpec] of Object.entries(
+      source as Record<string, unknown>,
+    )) {
+      const field = (sourceSpec as { terms?: { field?: unknown } } | undefined)
+        ?.terms?.field;
+      if (typeof field === 'string') {
+        fields[sourceName] = field;
+      }
+    }
+  }
+  return Object.keys(fields).length > 0
+    ? { kind: 'composite', fields }
+    : undefined;
+}
+
+function resolveAggFieldSpec(
+  aggDef: Record<string, unknown> | undefined,
+): AggFieldSpec | undefined {
+  // Bucket-producing types only -- `cardinality` (and every other metric agg) is deliberately
+  // excluded, see extractAggFields's doc comment above for why mapping it here misattributes
+  // samples[].key against a leading metric agg instead of the bucket agg the rows actually came
+  // from (#8920 item 5).
+  for (const aggType of ['terms', 'significant_terms'] as const) {
+    const spec = aggDef?.[aggType] as { field?: unknown } | undefined;
+    if (spec && typeof spec.field === 'string') {
+      return { kind: 'scalar', field: spec.field };
+    }
+  }
+  return resolveMultiTermsSpec(aggDef) ?? resolveCompositeSpec(aggDef);
+}
+
+/**
+ * Reads the field(s) driving each of a digest's `breakdown` aggregations' bucket keys, from the
+ * EXECUTED request body — the response's `aggregations` tree only carries bucket keys/counts,
+ * never which field(s) produced them, so this must read the query side. Returns a map of
+ * top-level aggregation name → `AggFieldSpec` (`undefined` for an agg with no extractable field,
+ * e.g. a date_histogram), in the body's key order — the same order digest.ts's `buildBreakdown`
+ * iterates, so the two can't drift apart. Breakdown entries name their aggregation (`agg`) only in
+ * the multi-agg case; a single-agg entry attributes to the map's first key.
+ *
+ * Resolves `terms`/`significant_terms` (a single scalar field), `multi_terms` (an
+ * array of fields, positionally aligned with the bucket key array), and `composite` (a
+ * `sourceName -> field` map, aligned with the bucket key object's own keys) — see `AggFieldSpec`.
+ * Any OTHER agg shape (date_histogram, histogram, filters, ...) resolves to `undefined`, exactly
+ * as before this file learned about `multi_terms`/`composite`; `applyFieldPolicy`'s fail-closed
+ * backstop for an `undefined` spec (see its own doc comment) is what now covers whatever agg shape
+ * this function does not yet parse, rather than this function trying to enumerate every possible
+ * future shape.
+ *
+ *
+ * Only BUCKET-producing aggregation types carry a field here, deliberately: a metric aggregation
+ * (`cardinality`/`avg`/`sum`/`min`/`max`/`value_count`) returns a NUMBER, so no string value of
+ * its field ever leaves through the digest, and mapping its field would misattribute the `key`
+ * sample column — since #8920 item 5, digest.ts's `bucketsToRows` sources rows from the first agg
+ * WITH BUCKETS, skipping over a leading metric agg, so `applyFieldPolicy` below must resolve
+ * `samples[].key` against the first agg with an extractable BUCKET field (the same skip), not
+ * against whatever agg happens to be declared first. Mapping `cardinality` here (as this function
+ * once did) would break exactly that: `aggs: {distinct_ids: {cardinality: wazuh.agent.id},
+ * by_agent: {terms: wazuh.agent.name}}` resolved `key` — which holds HOSTNAMES from `by_agent` —
+ * against `wazuh.agent.id`'s 'allow' policy and sent them to the provider verbatim.
  *
  * This is intentionally NOT threaded through `Digest` itself beyond the `agg` name: adding the
- * FIELD to every digest object would change buildDigest's output even when privacy is off,
+ * FIELD(S) to every digest object would change buildDigest's output even when privacy is off,
  * breaking the "privacy OFF is byte-identical to today" requirement. Computing it as a sibling
  * value in executor.ts (from the same `valved.body` it already has on hand) keeps digest.ts
  * privacy-agnostic.
  */
 export function extractAggFields(
   body: Record<string, unknown> | undefined,
-): Record<string, string | undefined> | undefined {
+): Record<string, AggFieldSpec | undefined> | undefined {
   // Both spellings must be read: OpenSearch accepts `aggregations` as a synonym for `aggs`, and
   // the escape hatch passes the model's raw body through. Reading only `aggs` would leave the
   // breakdown of an `aggregations`-spelled query unattributed, and therefore unscrubbed.
@@ -570,24 +1155,262 @@ export function extractAggFields(
   if (aggKeys.length === 0) {
     return undefined;
   }
-  const fields: Record<string, string | undefined> = {};
+  const fields: Record<string, AggFieldSpec | undefined> = {};
   for (const aggKey of aggKeys) {
-    const aggDef = aggs[aggKey] as Record<string, unknown> | undefined;
-    let field: string | undefined;
-    for (const aggType of [
-      'terms',
-      'significant_terms',
-      'cardinality',
-    ] as const) {
-      const spec = aggDef?.[aggType] as { field?: unknown } | undefined;
-      if (spec && typeof spec.field === 'string') {
-        field = spec.field;
-        break;
-      }
-    }
-    fields[aggKey] = field;
+    fields[aggKey] = resolveAggFieldSpec(
+      aggs[aggKey] as Record<string, unknown> | undefined,
+    );
   }
   return fields;
+}
+
+/**
+ * Applies one field's policy to one scalar value — the single-field decision shared by the
+ * `samples` loop's regular (non-aggregation-key) fields below and every "scalar" case of
+ * `scrubAggKeyComponent`. `keep: false` means "field is 'never': omit it"; a caller decides for
+ * itself what "omit" means at its own granularity (drop one sample field, drop one composite
+ * property, or drop a whole bucket for a positional multi_terms component — see
+ * `scrubAggKeyComponent`).
+ *
+ * The #8889/#8902 allow-by-omission branch below is the digest-boundary half of that hardening's
+ * defense-in-depth (the other half, chat.ts's `scrubMessagesForProvider` running
+ * `prescanAndMintToolContent`/`prescanAndMint` over every outbound message, is independent of this
+ * function and does not substitute for it) and MUST survive any future refactor of this function.
+ *
+ * Branch order is deliberate and every branch matters — do not reorder or drop one without
+ * re-checking every FIELD_POLICY_DEFAULTS entry that relies on it:
+ * 1. `never` — drop.
+ * 2. `anonymize` — pseudonymize.
+ * 3. `allow-scan` (#8912) — shape scan (`prescanAndMint`) THEN known-entity dictionary scan
+ *    (`scrubKnownEntities`); see that function's doc comment for why both passes are needed.
+ * 4. escape-hatch fail-closed default for an unlisted field — pseudonymize (kind inferred).
+ * 5. `#8889`/`#8902` allow-BY-OMISSION (typed tool, no explicit entry, not the escape hatch) —
+ *    shape scan only (`prescanAndMint`), no dictionary scan: an unlisted field is trusted
+ *    allow-by-default, but not curated the way an explicit `allow-scan` entry is, so it gets the
+ *    narrower of the two scans. The value still reaches the provider verbatim, but an IP/FQDN
+ *    embedded in otherwise-free text (e.g. a package/process name that happens to mention a
+ *    hostname) gets a secondary scan. Curated entries (agent id, MITRE technique IDs, compliance
+ *    citations, CIS benchmark content, ...) are explicit `allow` (case 6) and skip this — several
+ *    of those values are legitimately FQDN-token-shaped without being hostnames, so scanning them
+ *    here would misfire; they stay covered end-to-end regardless by chat.ts's
+ *    scrubMessagesForProvider, which runs prescanAndMintToolContent over every tool-result string
+ *    value unconditionally.
+ * 6. Explicit `allow` (or a non-string/empty value in any branch above that didn't already return)
+ *    — passthrough, completely unscanned. This is the ONLY branch that skips both scans; every
+ *    other outcome above goes through at least the shape scan.
+ */
+function scrubFieldValue(
+  field: string,
+  value: unknown,
+  policy: FieldPolicyEntry[],
+  pseudonymizer: Pseudonymizer,
+  toolName: string | undefined,
+  isEscapeHatch: boolean,
+): { keep: boolean; value: unknown } {
+  const entry = resolveFieldEntry(field, policy, toolName);
+  if (entry?.action === 'never') {
+    return { keep: false, value: undefined };
+  }
+  if (
+    entry?.action === 'anonymize' &&
+    typeof value === 'string' &&
+    value.length > 0
+  ) {
+    return {
+      keep: true,
+      value: pseudonymizer.pseudonymize(
+        value,
+        entry.kind ?? inferPseudonymKind(field),
+      ),
+    };
+  }
+  if (
+    entry?.action === 'allow-scan' &&
+    typeof value === 'string' &&
+    value.length > 0
+  ) {
+    // #8912: value stays readable, but is scrubbed against BOTH the value-shape scan (fresh
+    // IPs/FQDNs) and the known-entity dictionary (bare identifiers already minted elsewhere this
+    // conversation) — see `scrubKnownEntities`'s doc comment for why the dictionary scan exists on
+    // top of the shape scan, and this function's own doc comment for the full branch ordering.
+    return {
+      keep: true,
+      value: scrubKnownEntities(
+        prescanAndMint(value, pseudonymizer),
+        pseudonymizer,
+      ),
+    };
+  }
+  if (
+    !entry &&
+    isEscapeHatch &&
+    typeof value === 'string' &&
+    value.length > 0
+  ) {
+    // Fail-closed: no explicit policy entry for this field, but the escape hatch can surface any
+    // finding field, so an unlisted one is NOT trusted as safe-by-omission here.
+    return {
+      keep: true,
+      value: pseudonymizer.pseudonymize(value, inferPseudonymKind(field)),
+    };
+  }
+  if (!entry && typeof value === 'string' && value.length > 0) {
+    // #8889/#8902: allow-BY-OMISSION (typed tool, no explicit policy entry — the escape-hatch case
+    // above already handled isEscapeHatch). See this function's doc comment, branch 5, for why
+    // this is shape-scan-only (no dictionary scan) unlike the explicit `allow-scan` branch above,
+    // and for why this branch must never be silently dropped again (it was, once — see the
+    // module-level history in scrubFieldValue's doc comment above).
+    return { keep: true, value: prescanAndMint(value, pseudonymizer) };
+  }
+  return { keep: true, value };
+}
+
+/**
+ * Scrubs one aggregation bucket's `key`, whatever shape it is, against `spec` (from
+ * `extractAggFields` — `undefined` when the agg's field couldn't be determined, e.g. a
+ * date_histogram). Returns `{drop: true}` when the ENTIRE bucket must be dropped (a scalar/
+ * positional-multi 'never' — see below), otherwise `{drop: false, value}` with `value` the
+ * (possibly scrubbed) replacement key.
+ *
+ * - `scalar` (terms/significant_terms/cardinality): the existing single-field decision, unchanged
+ *   in behavior — 'never' drops the whole bucket (every bucket key IS a value of that one field,
+ *   so there is nothing left to keep), 'anonymize' pseudonymizes the string key.
+ * - `multi` (multi_terms — key is an ARRAY, `spec.fields[i]` names index `i`'s field): scrubbed
+ *   per-component, BUT if ANY component's field is 'never', the WHOLE bucket is dropped rather
+ *   than only that array slot — a positional array has no per-slot label the way `composite`'s
+ *   object does, so removing one slot would silently shift the remaining values out of alignment
+ *   with their own fields, which is worse than dropping the bucket outright.
+ * - `composite` (key is an OBJECT, `{sourceName: value}`, `spec.fields[sourceName]` names that
+ *   source's field): scrubbed per-component, and a 'never' component IS safely omittable here —
+ *   each property is independently labeled by its own `sourceName`, so dropping one leaves the
+ *   rest correctly attributable, unlike `multi` above. The bucket itself is only dropped if that
+ *   leaves NO properties at all.
+ * - `undefined` spec (no field could be determined — date_histogram, histogram, filters, or any
+ *   agg shape this file does not parse): typed catalog tools never see an aggregation shape they
+ *   did not build themselves, so a spec-less bucket here is trusted as non-field-bearing (the
+ *   date_histogram case this default was written for) and passed through untouched. The
+ *   `search_wazuh_data` escape hatch's arbitrary DSL, though, can put ANY agg shape here —
+ *   including one this file does not yet parse but that DOES carry a real field — so it fails
+ *   CLOSED instead: a string key is pseudonymized generically (no field name to infer a kind
+ *   from), anything else (object/array/number) is dropped outright rather than risk shipping an
+ *   unrecognized structured value verbatim.
+ */
+function scrubAggKey(
+  rawKey: unknown,
+  spec: AggFieldSpec | undefined,
+  policy: FieldPolicyEntry[],
+  pseudonymizer: Pseudonymizer,
+  toolName: string | undefined,
+  isEscapeHatch: boolean,
+): { drop: boolean; value?: unknown } {
+  if (!spec) {
+    if (!isEscapeHatch) {
+      return { drop: false, value: rawKey };
+    }
+    if (typeof rawKey === 'string' && rawKey.length > 0) {
+      return {
+        drop: false,
+        value: pseudonymizer.pseudonymize(rawKey, inferPseudonymKind('key')),
+      };
+    }
+    // An object/array of genuinely unknown shape cannot be safely component-scrubbed (no field
+    // mapping exists for it), so the whole bucket is dropped rather than risk shipping raw
+    // structured data. A harmless scalar (number, empty string) is not structured data worth
+    // dropping over -- pass it through unchanged, same as the non-escape-hatch branch above.
+    if (rawKey !== null && typeof rawKey === 'object') {
+      return { drop: true };
+    }
+    return { drop: false, value: rawKey };
+  }
+
+  if (spec.kind === 'scalar') {
+    const result = scrubFieldValue(
+      spec.field,
+      rawKey,
+      policy,
+      pseudonymizer,
+      toolName,
+      isEscapeHatch,
+    );
+    return result.keep ? { drop: false, value: result.value } : { drop: true };
+  }
+
+  if (spec.kind === 'multi') {
+    if (!Array.isArray(rawKey) || rawKey.length !== spec.fields.length) {
+      // Shape mismatch: not reachable through `extractAggFields` today (it only ever produces a
+      // `multi` spec whose `fields.length` already matches the source `multi_terms.terms.length`,
+      // and a well-formed OpenSearch response's bucket key array length always matches that same
+      // `terms` count) -- but the escape hatch's arbitrary DSL is this file's only caller that
+      // doesn't go through `extractAggFields`'s own validation on the way in, so this branch is
+      // still the last fail-open path on that route. Symmetric with the `!spec` structured-key
+      // branch above: an unrecognized/mismatched shape is dropped rather than trusted as safe.
+      return { drop: true };
+    }
+    const out: unknown[] = [];
+    for (let i = 0; i < rawKey.length; i += 1) {
+      const result = scrubFieldValue(
+        spec.fields[i],
+        rawKey[i],
+        policy,
+        pseudonymizer,
+        toolName,
+        isEscapeHatch,
+      );
+      if (!result.keep) {
+        return { drop: true }; // Any 'never' component drops the whole positional bucket.
+      }
+      out.push(result.value);
+    }
+    return { drop: false, value: out };
+  }
+
+  // composite
+  if (!rawKey || typeof rawKey !== 'object' || Array.isArray(rawKey)) {
+    return { drop: false, value: rawKey }; // Shape mismatch -- leave alone defensively.
+  }
+  const out: Record<string, unknown> = {};
+  for (const [sourceName, componentValue] of Object.entries(
+    rawKey as Record<string, unknown>,
+  )) {
+    const field = spec.fields[sourceName];
+    if (!field) {
+      // No resolved field for this named source (e.g. a composite source type `extractAggFields`
+      // does not map to a field, like `histogram`/`date_histogram`/`geotile_grid` -- as of this
+      // change `guardrails.ts`'s `checkAggs` REJECTS a non-`terms` composite source outright, so a
+      // typed tool or a guardrail-checked escape-hatch query can no longer reach this branch with
+      // one; kept as defense in depth for anything upstream of that check anyway). Typed catalog
+      // tools keep today's pass-through (same rationale as the top-level `undefined`-spec branch
+      // above: nothing curated is being bypassed). The escape hatch fails CLOSED instead: a string
+      // component is pseudonymized generically, a structured one is omitted outright rather than
+      // risk shipping an unrecognized value verbatim.
+      if (!isEscapeHatch) {
+        out[sourceName] = componentValue;
+      } else if (
+        typeof componentValue === 'string' &&
+        componentValue.length > 0
+      ) {
+        out[sourceName] = pseudonymizer.pseudonymize(
+          componentValue,
+          inferPseudonymKind(sourceName),
+        );
+      }
+      // else (escape hatch + non-string/empty component): omit the property entirely.
+      continue;
+    }
+    const result = scrubFieldValue(
+      field,
+      componentValue,
+      policy,
+      pseudonymizer,
+      toolName,
+      isEscapeHatch,
+    );
+    if (result.keep) {
+      out[sourceName] = result.value;
+    }
+    // else: 'never' on this one named component -- omit just that property, unlike `multi` above.
+  }
+  return { drop: Object.keys(out).length === 0, value: out };
 }
 
 /**
@@ -597,20 +1420,37 @@ export function extractAggFields(
  * `breakdown`, and `message`.
  *
  * - `samples`: 'never' fields are dropped from the sample object entirely; 'anonymize' string
- *   values are pseudonymized (kind inferred from the field name); 'allow' fields pass through
- *   unchanged. An UNLISTED field's behavior depends on `isEscapeHatch` (see below).
+ *   values are pseudonymized (kind inferred from the field name); an explicit 'allow' field
+ *   passes through unchanged; an explicit 'allow-scan' field (#8912) passes through but is
+ *   scrubbed by BOTH the value-shape scan and the known-entity dictionary scan (see
+ *   `scrubFieldValue`'s doc comment for the full branch ordering and `scrubKnownEntities` for the
+ *   dictionary scan itself). An UNLISTED field's behavior depends on `isEscapeHatch` (see
+ *   below) — and, when it stays allowed (the non-escape-hatch default), its string value is
+ *   still run through `prescanAndMint`'s IP/FQDN value-shape scan (#8889) so an identifier
+ *   embedded in otherwise-readable free text is not missed just because the field itself is
+ *   trusted.
  *   AGGREGATION samples are the one exception to "resolve by the sample's own field name": a bucket
  *   row's keys are `key`/`doc_count` (digest.ts's `bucketsToRows`), and `key` holds a VALUE of the
  *   AGGREGATED field, not of a field literally called "key". Resolving it by name matched no policy
  *   entry, so a top-agents/top-rules aggregation sent its real bucket values to the provider under
  *   `samples[].key` while `breakdown` — the same values, one key over — was correctly scrubbed.
- *   `key` is therefore resolved against `aggFields`' first aggregation field whenever there is one.
- * - `breakdown`: a bucket key's field can't be read from the digest alone (see `extractAggFields`
- *   above) — each bucket is attributed to its aggregation (the entry's `agg` name, or the first
- *   aggregation when unset — the single-agg case) and that aggregation's field is resolved against
- *   the same policy ("a top-agents terms agg leaks hostnames otherwise"). A 'never' field
- *   drops that aggregation's buckets entirely, since every bucket key IS a value of that field; a
- *   bucket whose aggregation has no extractable field (e.g. date_histogram) passes through.
+ *   `key` is therefore resolved via `scrubAggKey` against `aggFields`' first aggregation spec
+ *   whenever there is one — including `multi_terms`/`composite` shapes now, not just a scalar
+ *   field, per-component (see `scrubAggKey`'s doc comment). A sample whose 'key' bucket resolves
+ *   to `{drop: true}` (a scalar/positional-multi 'never') has its ENTIRE 'key' entry omitted, same
+ *   as any other 'never' field — 'doc_count' and any other sample field are unaffected, matching
+ *   the samples loop's existing per-field (not per-row) drop granularity.
+ * - `breakdown`: a bucket key's field(s) can't be read from the digest alone (see
+ *   `extractAggFields` above) — each bucket is attributed to its aggregation (the entry's `agg`
+ *   name, or the first aggregation when unset — the single-agg case) and that aggregation's
+ *   spec is resolved against the same policy via `scrubAggKey` ("a top-agents terms agg leaks
+ *   hostnames otherwise"). A spec that resolves to `{drop: true}` drops that WHOLE bucket (a
+ *   breakdown entry has no other field to fall back to, unlike a sample row's 'doc_count'); a
+ *   bucket whose aggregation has no extractable field (e.g. date_histogram) passes through
+ *   unscrubbed for typed tools, and fails closed for the escape hatch — see `scrubAggKey`'s
+ *   `undefined`-spec branch (this inverted default, plus `multi_terms`/`composite` support, is
+ *   what closed the gap where an escape-hatch multi_terms/composite bucket used to bypass the
+ *   field policy entirely by falling through this same "no field" branch unconditionally).
  * - `message`: the Manager top-level `message` field is free text from the API, not a
  *   structured field a per-field policy entry can target — it is run through the pseudonymizer's
  *   whole-text scrub (`applyToText`, the same pass the outbound tool-call-argument scrub in
@@ -619,67 +1459,77 @@ export function extractAggFields(
  *   privacy-on-but-message-absent both stay byte-identical to before this existed.
  *
  * `isEscapeHatch`: typed catalog tools only ever expose the ~10 fields curated in
- * `FIELD_POLICY_DEFAULTS`, so "unlisted = allow" was a safe default — but the search_wazuh_data
- * escape hatch's `deriveColumns` can pick ANY finding field into `samples`/`breakdown` (data.win.*,
+ * `FIELD_POLICY_DEFAULTS`, so "unlisted = allow" was a safe default — but search_wazuh_data's
+ * arbitrary DSL can pick ANY finding field into `samples`/`breakdown` (data.win.*,
  * data.office365.*, data.aws.*, syscheck.path, ...), and every one of those was passing through
  * untouched under privacy mode, defeating the guarantee for the one tool built to reach arbitrary
- * fields. When the caller sets `isEscapeHatch: true` (deriveColumns tools only — threaded from
- * `ToolDefinition.deriveColumns` at the executor.ts call site), an UNLISTED string field's default
- * flips from allow to anonymize (kind inferred from the field name, same as an explicit 'anonymize'
- * entry with no `kind`) — fail-closed: pseudonymize anything not explicitly allow-listed. A field
- * explicitly present in the policy (any action, including 'allow') is unaffected either way — this
- * only changes the *default for an absent entry*. Typed tools (the default, `isEscapeHatch` false
- * or omitted) keep today's allow-by-omission behavior exactly.
+ * fields. When the caller sets `isEscapeHatch: true` (threaded from
+ * `ToolDefinition.failClosedFieldPolicy` at the executor.ts call site — issue #8917; NOT the same
+ * as `deriveColumns`, which only controls how columns are computed and is set on tools of very
+ * different risk profiles, see that flag's own doc comment in types.ts), an UNLISTED string
+ * field's default flips from allow to anonymize (kind inferred from the field name, same as an
+ * explicit 'anonymize' entry with no `kind`) — fail-closed: pseudonymize anything not explicitly
+ * allow-listed. A field explicitly present in the policy (any action, including 'allow') is
+ * unaffected either way — this only changes the *default for an absent entry*. Typed tools (the
+ * default, `isEscapeHatch` false or omitted) keep today's allow-by-omission behavior exactly.
  */
 export function applyFieldPolicy(
   digest: Digest,
   policy: FieldPolicyEntry[],
   pseudonymizer: Pseudonymizer,
-  aggFields?: Record<string, string | undefined>,
+  aggFields?: Record<string, AggFieldSpec | undefined>,
   toolName?: string,
   isEscapeHatch = false,
 ): Digest {
-  // The field a bucket row's `key` holds the values OF — see the `samples` note above. `undefined`
-  // for a non-aggregation digest, or for an aggregation with no extractable field (e.g. a
-  // date_histogram), in which case `key` resolves by its own name like any other sample field.
+  // The field a bucket row's `key` holds the values OF — see the `samples` note above. The first
+  // agg with an extractable BUCKET field, not the first DECLARED agg: since #8920 item 5,
+  // digest.ts's `bucketsToRows` sources rows from the first agg with buckets, skipping a leading
+  // metric agg, and `extractAggFields` above maps only bucket-producing types — so "first defined
+  // entry" here walks in the exact same declaration order and lands on the same aggregation the
+  // rows came from. `undefined` for a non-aggregation digest, or when no aggregation has an
+  // extractable field (e.g. only a date_histogram — whose bucket keys are NUMBERS and never reach
+  // the string-scrub branches anyway), in which case `key` resolves by its own name like any
+  // other sample field.
   const firstAggField = aggFields
-    ? aggFields[Object.keys(aggFields)[0]]
+    ? Object.values(aggFields).find(field => field !== undefined)
     : undefined;
+  const isAggDigest = aggFields !== undefined;
 
   const samples = digest.samples.map(sample => {
     const out: Record<string, unknown> = {};
     for (const [sampleKey, value] of Object.entries(sample)) {
-      // `sampleKey` is what the digest stays KEYED by (never rewritten — the model's view of the
-      // digest shape must not change); `field` is only what the policy is resolved against.
-      const field =
-        sampleKey === 'key' && firstAggField ? firstAggField : sampleKey;
-      const entry = resolveFieldEntry(field, policy, toolName);
-      if (entry?.action === 'never') {
+      if (sampleKey === 'key' && isAggDigest) {
+        // `scrubAggKey`'s `drop: true` means "omit the 'key' entry" HERE, at sample granularity —
+        // matching this loop's existing per-field (not per-row) drop behavior. It means something
+        // stricter ("drop the whole bucket") in the `breakdown` loop below, which has no sibling
+        // field like `doc_count` to preserve once the identity itself is gone; a sample row does,
+        // so `doc_count`/any other sample field survives a dropped 'key' exactly as before.
+        const result = scrubAggKey(
+          value,
+          firstAggField,
+          policy,
+          pseudonymizer,
+          toolName,
+          isEscapeHatch,
+        );
+        if (!result.drop) {
+          out[sampleKey] = result.value;
+        }
         continue;
       }
-      if (
-        entry?.action === 'anonymize' &&
-        typeof value === 'string' &&
-        value.length > 0
-      ) {
-        out[sampleKey] = pseudonymizer.pseudonymize(
-          value,
-          entry.kind ?? inferPseudonymKind(field),
-        );
-      } else if (
-        !entry &&
-        isEscapeHatch &&
-        typeof value === 'string' &&
-        value.length > 0
-      ) {
-        // Fail-closed: no explicit policy entry for this field, but the escape hatch can
-        // surface any finding field, so an unlisted one is NOT trusted as safe-by-omission here.
-        out[sampleKey] = pseudonymizer.pseudonymize(
-          value,
-          inferPseudonymKind(field),
-        );
-      } else {
-        out[sampleKey] = value;
+      // `sampleKey` is what the digest stays KEYED by (never rewritten — the model's view of
+      // the digest shape must not change); `field` is only what the policy is resolved against
+      // (`scrubFieldValue` resolves it via `resolveFieldEntry`, same as every other caller).
+      const result = scrubFieldValue(
+        sampleKey,
+        value,
+        policy,
+        pseudonymizer,
+        toolName,
+        isEscapeHatch,
+      );
+      if (result.keep) {
+        out[sampleKey] = result.value;
       }
     }
     return out;
@@ -690,33 +1540,19 @@ export function applyFieldPolicy(
     const firstAggName = Object.keys(aggFields)[0];
     const scrubbed: NonNullable<Digest['breakdown']> = [];
     for (const bucket of breakdown) {
-      const field = aggFields[bucket.agg ?? firstAggName];
-      if (!field) {
-        scrubbed.push(bucket);
+      const spec = aggFields[bucket.agg ?? firstAggName];
+      const result = scrubAggKey(
+        bucket.key,
+        spec,
+        policy,
+        pseudonymizer,
+        toolName,
+        isEscapeHatch,
+      );
+      if (result.drop) {
         continue;
       }
-      const entry = resolveFieldEntry(field, policy, toolName);
-      if (entry?.action === 'never') {
-        continue;
-      }
-      if (entry?.action === 'anonymize') {
-        const kind = entry.kind ?? inferPseudonymKind(field);
-        scrubbed.push({
-          ...bucket,
-          key: pseudonymizer.pseudonymize(bucket.key, kind),
-        });
-      } else if (!entry && isEscapeHatch) {
-        // Same fail-closed default as the samples loop above, applied to bucket keys.
-        scrubbed.push({
-          ...bucket,
-          key: pseudonymizer.pseudonymize(
-            bucket.key,
-            inferPseudonymKind(field),
-          ),
-        });
-      } else {
-        scrubbed.push(bucket);
-      }
+      scrubbed.push({ ...bucket, key: result.value });
     }
     // Assigned unconditionally, empty result included: an empty array means a 'never' entry
     // dropped every bucket, and the caller must then see NO breakdown at all. Falling back to
@@ -743,6 +1579,13 @@ export function applyFieldPolicy(
     scrubbedDigest.breakdown = breakdown;
   } else {
     delete scrubbedDigest.breakdown;
+    // A `breakdownNote` describes the bucket list it rides with (its truncation figures, which
+    // end of the list was kept — see digest.ts's buildBucketTruncationNote). With the breakdown
+    // deleted above, the note would assert concrete counts about a list that is not in the
+    // payload (issue #8935 item 1's integration review caught this: a 'never' policy on the
+    // aggregated field left the note's carry-trim figures dangling). buildDigest never emits the
+    // note without the breakdown, so deleting both keeps that invariant through the scrub too.
+    delete scrubbedDigest.breakdownNote;
   }
 
   return scrubbedDigest;
