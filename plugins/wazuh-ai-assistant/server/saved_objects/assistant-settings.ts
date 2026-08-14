@@ -18,6 +18,19 @@ export interface AssistantSettingsAttributes {
   userCanOverride: boolean;
   fieldPolicy: FieldPolicyEntry[];
   /**
+   * The set of `fieldPolicy` field keys this object was already reconciled against as of its last
+   * write (see `server/tools/privacy.ts`'s `mergeFieldPolicyWithDefaults`, and
+   * `server/routes/settings.ts`'s `getOrCreateAssistantSettings`/PUT handler, which stamps this on
+   * every save with the merged view the admin was editing). Absent on any object written before
+   * this field existed (issue #8917) -- treated as `[]`, so on first read after upgrading, EVERY
+   * currently-shipped default field missing from `fieldPolicy` is treated as "genuinely never
+   * reached this install" and reconciled in, a one-time catch-up. Once stamped, it lets a later read
+   * tell "field never existed in defaults when this was last written" (append it) apart from
+   * "admin deliberately deleted this row via the Settings page" (leave it deleted) -- the ambiguity
+   * a pure diff-against-current-defaults could never resolve on its own.
+   */
+  fieldPolicyKnownFields?: string[];
+  /**
    * Persistent conversations retention: days to keep a saved conversation before it is
    * excluded from GET /conversations and best-effort deleted (server/routes/conversations.ts).
    * `0` (default) means "keep forever" — no enforcement at all. There is no scheduled/cron
@@ -54,6 +67,7 @@ export const assistantSettingsSavedObjectType: SavedObjectsType = {
       privacyDefaultPerProvider: { type: 'object', enabled: false },
       userCanOverride: { type: 'boolean' },
       fieldPolicy: { type: 'object', enabled: false },
+      fieldPolicyKnownFields: { type: 'object', enabled: false },
       conversationRetentionDays: { type: 'integer' },
     },
   },

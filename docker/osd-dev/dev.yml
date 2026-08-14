@@ -160,7 +160,7 @@ services:
       - discovery.seed_hosts=wazuh.indexer
       - cluster.initial_master_nodes=wazuh.indexer
       - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
-      - 'OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g' # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+      - 'OPENSEARCH_JAVA_OPTS=-Xms2g -Xmx2g' # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
     ulimits:
       memlock:
         soft: -1

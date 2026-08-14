@@ -1,8 +1,13 @@
 import { ToolDefinition } from '../types';
 import {
+  findingArtifactFilterClauses,
+  findingArtifactFilterProperties,
   findingDigestColumns,
+  FINDING_BREAKDOWN_AGGS,
+  FINDING_BREAKDOWN_DIMENSIONS,
   findingRowFields,
   clampLimit,
+  FINDING_SCOPE_NOTE,
   limitProperty,
   objectSchema,
   resolveTimeRange,
@@ -52,8 +57,9 @@ export const searchFindingsByRuleTagTool: ToolDefinition = {
     name: 'search_findings_by_rule_tag',
     description:
       'Searches security findings belonging to one or more rule classification tags ' +
-      '(wazuh.rule.tags), within a time range, most recent first. Use this for "which/what kind ' +
-      'of findings" questions about a category of activity (logins, SSH, sudo, file integrity, ' +
+      `(wazuh.rule.tags), within a time range, most recent first. ${FINDING_SCOPE_NOTE} Use ` +
+      'this for "which/what kind of findings" questions about a category of activity (logins, ' +
+      'SSH, sudo, file integrity, ' +
       'authentication) when you do not know the exact numeric rule ID -- never guess a ' +
       'wazuh.rule.id. The exact tag vocabulary is deployment-specific: if you are unsure what tag ' +
       'to use, first aggregate with get_top_rules to see the real rules/tags in the data rather ' +
@@ -72,6 +78,7 @@ export const searchFindingsByRuleTagTool: ToolDefinition = {
           'Max number of findings to return (default 20, max 500).',
         ),
         ...timeRangeProperties(),
+        ...findingArtifactFilterProperties(),
       },
       ['rule_tags'],
     ),
@@ -86,17 +93,19 @@ export const searchFindingsByRuleTagTool: ToolDefinition = {
       ruleTags.length === 1
         ? { term: { 'wazuh.rule.tags': ruleTags[0] } }
         : { terms: { 'wazuh.rule.tags': ruleTags } };
+    const filter: Record<string, unknown>[] = [
+      tagFilter,
+      { range: { '@timestamp': { gte, lte } } },
+      ...findingArtifactFilterClauses(params),
+    ];
     return {
       target: 'indexer',
       index: 'wazuh-findings-v5*',
       body: {
-        query: {
-          bool: {
-            filter: [tagFilter, { range: { '@timestamp': { gte, lte } } }],
-          },
-        },
+        query: { bool: { filter } },
         sort: [{ '@timestamp': { order: 'desc' } }],
         size: limit,
+        aggs: FINDING_BREAKDOWN_AGGS,
       },
     };
   },
@@ -106,5 +115,6 @@ export const searchFindingsByRuleTagTool: ToolDefinition = {
   },
   digest: {
     sampleColumns: findingDigestColumns(STANDARD_FINDING_SAMPLE_COLUMNS),
+    breakdownDimensions: FINDING_BREAKDOWN_DIMENSIONS,
   },
 };

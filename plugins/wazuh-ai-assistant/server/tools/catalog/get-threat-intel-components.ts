@@ -66,6 +66,17 @@ const COMPONENT_SECURITY_ANALYTICS_PATH: Record<
  *
  * `wazuh-threatintel-filters*` is a real, currently EMPTY index (0 docs, live-confirmed) -- a
  * 0-row result there is correct, not a bug.
+ *
+ * Cross-category tool audit: the SCA disambiguation sentence below names `get_sca_results`, which
+ * lives in the `sca` router category (server/tools/router.ts) -- a DIFFERENT category from this
+ * tool's own `security_analytics`. Stage-1 only offers one turn's routed categories at a time, so a
+ * route of `security_analytics` alone (plausible: "policy"/"policies" is genuinely overloaded
+ * between an SCA benchmark and a pipeline policy) would leave `get_sca_results` unavailable -- the
+ * same "instruction names a tool that may not be offered" shape as issue #8913, between two data
+ * tools' descriptions rather than the system prompt. Worded conditionally ("if ... is available to
+ * you this turn") rather than an unconditional "use X instead" so the model degrades to admitting
+ * the gap instead of stalling on a tool it was not given. `get_rules` is untouched: it shares this
+ * tool's OWN category, so it is guaranteed present whenever this description is read.
  */
 export const getThreatIntelComponentsTool: ToolDefinition = {
   spec: {
@@ -75,8 +86,9 @@ export const getThreatIntelComponentsTool: ToolDefinition = {
       'or KVDBs (key-value databases). Use for "which decoders/integrations/policies are ' +
       'active" questions. `component_type="policies"` here means a Security Analytics pipeline ' +
       'policy (config content), NOT a Security Configuration Assessment (SCA) compliance ' +
-      'benchmark like CIS Ubuntu -- for that, use get_sca_results instead. Not for rules (use ' +
-      'get_rules) or threat intel indicators/IOCs.',
+      'benchmark like CIS Ubuntu -- if that is what the question needs and get_sca_results is ' +
+      'available to you this turn, use that one instead. Not for rules (use get_rules) or ' +
+      'threat intel indicators/IOCs.',
     parameters: objectSchema(
       {
         component_type: {
@@ -213,5 +225,11 @@ export const getThreatIntelComponentsTool: ToolDefinition = {
       'document.index_discarded_events',
       'document.index_unclassified_events',
     ],
+    // Synthetic fallback (issue #8920 item 1): "which pipeline components are enabled / what
+    // categories exist" was answered from 5 sample rows on a limit-truncated page. Both fields
+    // are already in `_source` (getByPath groups the RETURNED rows — no AGG_FIELD_ALLOWLIST entry
+    // or live mapping check needed for the digest-level grouping) and are vendor-curated config
+    // enums, structurally safe under privacy. Page-scoped with `breakdownNote` when truncated.
+    breakdownDimensions: ['document.category', 'document.mode'],
   },
 };

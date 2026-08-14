@@ -194,9 +194,11 @@ jobs:
           git checkout HEAD -- plugins/main/package.json 2>/dev/null || true
           git checkout HEAD -- plugins/wazuh-core/package.json 2>/dev/null || true
           git checkout HEAD -- plugins/wazuh-check-updates/package.json 2>/dev/null || true
+          git checkout HEAD -- plugins/wazuh-ai-assistant/package.json 2>/dev/null || true
           git checkout HEAD -- plugins/main/opensearch_dashboards.json 2>/dev/null || true
           git checkout HEAD -- plugins/wazuh-check-updates/opensearch_dashboards.json 2>/dev/null || true
           git checkout HEAD -- plugins/wazuh-core/opensearch_dashboards.json 2>/dev/null || true
+          git checkout HEAD -- plugins/wazuh-ai-assistant/opensearch_dashboards.json 2>/dev/null || true
 
           if git diff --staged --quiet; then
             echo "No references to revert. Skipping commit."

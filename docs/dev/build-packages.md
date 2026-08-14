@@ -95,6 +95,9 @@ OPENSEARCH_DASHBOARDS_VERSION=$(jq -r .pluginPlatform.version package.json) yarn
 cd ../wazuh-check-updates/
 yarn
 OPENSEARCH_DASHBOARDS_VERSION=$(jq -r .pluginPlatform.version package.json) yarn build
+cd ../wazuh-ai-assistant/
+yarn
+OPENSEARCH_DASHBOARDS_VERSION=$(jq -r .pluginPlatform.version package.json) yarn build
 ```
 
 4. Clone the [wazuh-dashboard-reporting](https://github.com/wazuh/wazuh-dashboard-reporting.git) repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-reporting/` folder, and build the plugin:
@@ -166,7 +169,7 @@ zip -r -j ./reporting-package.zip ../wazuh-dashboard/plugins/wazuh-dashboard-rep
 zip -r -j ./security-analytics-package.zip ../wazuh-dashboard/plugins/wazuh-dashboard-security-analytics/build/security-analytics-dashboards-3.*.*.0.zip
 zip -r -j ./alerting-package.zip ../wazuh-dashboard/plugins/wazuh-dashboard-alerting/build/alertingDashboards-3.*.*.0.zip
 zip -r -j ./notifications-package.zip ../wazuh-dashboard/plugins/wazuh-dashboard-notifications/build/notifications-dashboards-3.*.*.0.zip
-zip -r -j ./wazuh-package.zip ../wazuh-dashboard/plugins/wazuh-check-updates/build/wazuhCheckUpdates-3.*.*.zip ../wazuh-dashboard/plugins/main/build/wazuh-3.*.*.zip ../wazuh-dashboard/plugins/wazuh-core/build/wazuhCore-3.*.*.zip
+zip -r -j ./wazuh-package.zip ../wazuh-dashboard/plugins/wazuh-check-updates/build/wazuhCheckUpdates-3.*.*.zip ../wazuh-dashboard/plugins/main/build/wazuh-3.*.*.zip ../wazuh-dashboard/plugins/wazuh-core/build/wazuhCore-3.*.*.zip ../wazuh-dashboard/plugins/wazuh-ai-assistant/build/wazuhAiAssistant-3.*.*.zip
 ls
 ```
 

@@ -100,10 +100,12 @@ files at run time.
 In this repository the tracked plugin files currently are:
 
 - `plugins/main/package.json`, `plugins/wazuh-core/package.json`,
-  `plugins/wazuh-check-updates/package.json`
+  `plugins/wazuh-check-updates/package.json`,
+  `plugins/wazuh-ai-assistant/package.json`
 - `plugins/main/opensearch_dashboards.json`,
   `plugins/wazuh-core/opensearch_dashboards.json`,
-  `plugins/wazuh-check-updates/opensearch_dashboards.json`
+  `plugins/wazuh-check-updates/opensearch_dashboards.json`,
+  `plugins/wazuh-ai-assistant/opensearch_dashboards.json`
 
 > **Note**: For the API info files, the script first tries
 > `yarn generate:api-data` (which regenerates `endpoints.json` and

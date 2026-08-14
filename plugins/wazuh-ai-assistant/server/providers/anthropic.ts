@@ -15,7 +15,10 @@ import {
 } from './types';
 import { widenNumericTypes } from './wire-schema';
 import { iterateSseLines } from './sse-utils';
-import { fetchProviderWithRetry } from './retry';
+import {
+  fetchProviderWithRetry,
+  describeToolUseFailedStreamMessage,
+} from './retry';
 import {
   DEFAULT_ANTHROPIC_MAX_TOKENS,
   DEFAULT_ANTHROPIC_VERSION,
@@ -24,6 +27,7 @@ import {
   assertProviderUrlAllowed,
   PROVIDER_FETCH_REDIRECT_POLICY,
 } from './url-guard';
+import { fetchWithTemperatureFallback } from './temperature-fallback';
 
 /** Per content-block-index accumulation of a streamed `tool_use` block until it closes. */
 interface ToolUseAccumulator {
@@ -67,45 +71,56 @@ export class AnthropicAdapter implements ProviderAdapter {
     const includeTools =
       Boolean(options?.tools?.length) && toolChoice !== 'none';
 
-    const response = yield* fetchProviderWithRetry(
-      () =>
-        fetch(url, {
-          method: 'POST',
-          signal,
-          redirect: PROVIDER_FETCH_REDIRECT_POLICY,
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': config.apiKey ?? '',
-            'anthropic-version': DEFAULT_ANTHROPIC_VERSION,
-          },
-          body: JSON.stringify({
-            model: config.model,
-            stream: true,
-            max_tokens: DEFAULT_ANTHROPIC_MAX_TOKENS,
-            // Checked for `undefined`, not truthiness -- same reasoning as
-            // openai-compatible.ts's identical guard: a caller-sent `temperature: 0` must survive.
-            ...(options?.temperature !== undefined
-              ? { temperature: options.temperature }
-              : {}),
-            ...(systemMessages.length
-              ? {
-                  system: systemMessages
-                    .map(message => message.content)
-                    .join('\n\n'),
-                }
-              : {}),
-            messages: conversationMessages.map(toAnthropicMessage),
-            ...(includeTools && options?.tools
-              ? {
-                  tools: toAnthropicTools(options.tools),
-                  tool_choice: {
-                    ...toAnthropicToolChoice(toolChoice),
-                    disable_parallel_tool_use: true,
-                  },
-                }
-              : {}),
-          }),
+    const doFetch = (includeTemperature: boolean): Promise<Response> =>
+      fetch(url, {
+        method: 'POST',
+        signal,
+        redirect: PROVIDER_FETCH_REDIRECT_POLICY,
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': config.apiKey ?? '',
+          'anthropic-version': DEFAULT_ANTHROPIC_VERSION,
+        },
+        body: JSON.stringify({
+          model: config.model,
+          stream: true,
+          max_tokens: DEFAULT_ANTHROPIC_MAX_TOKENS,
+          // Checked for `undefined`, not truthiness -- same reasoning as
+          // openai-compatible.ts's identical guard: a caller-sent `temperature: 0` must survive.
+          // `includeTemperature` additionally gates it on whether this model is already known (this
+          // process) to reject the parameter outright, which on the Anthropic Messages API is not an
+          // edge case but the norm for every current model: `temperature` was REMOVED on Claude
+          // Opus 4.7 and later (Opus 4.7/4.8, Opus 5, Sonnet 5, Fable 5) and is answered with a 400.
+          // Because the stage-1 router sends `temperature: 0` on EVERY turn (routes/chat.ts) and the
+          // tool-bearing rounds send 0.2, without this fallback an Anthropic provider on any of
+          // those models could not complete a single turn -- the 400 ended the turn and the UI
+          // showed nothing but "Response interrupted".
+          ...(includeTemperature && options?.temperature !== undefined
+            ? { temperature: options.temperature }
+            : {}),
+          ...(systemMessages.length
+            ? {
+                system: systemMessages
+                  .map(message => message.content)
+                  .join('\n\n'),
+              }
+            : {}),
+          messages: conversationMessages.map(toAnthropicMessage),
+          ...(includeTools && options?.tools
+            ? {
+                tools: toAnthropicTools(options.tools),
+                tool_choice: {
+                  ...toAnthropicToolChoice(toolChoice),
+                  disable_parallel_tool_use: true,
+                },
+              }
+            : {}),
         }),
+      });
+
+    const response = yield* fetchProviderWithRetry(
+      // Shared with openai-compatible.ts -- see temperature-fallback.ts's doc comment.
+      () => fetchWithTemperatureFallback(config, options?.temperature, doFetch),
       signal,
       // See server/providers/retry.ts's sanitizeProviderErrorBody doc comment for why the
       // exact configured key is passed through here.
@@ -186,9 +201,11 @@ export class AnthropicAdapter implements ProviderAdapter {
             toolUses.delete(blockIndex);
           }
         } else if (parsed.type === 'error') {
+          const rawMessage = parsed.error?.message ?? 'Unknown provider error';
           yield {
             type: 'error',
-            message: parsed.error?.message ?? 'Unknown provider error',
+            message:
+              describeToolUseFailedStreamMessage(rawMessage) ?? rawMessage,
           };
           return;
         } else if (parsed.type === 'message_stop') {

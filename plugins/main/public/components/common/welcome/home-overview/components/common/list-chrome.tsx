@@ -1,8 +1,6 @@
 import React from 'react';
 import { EuiText } from '@elastic/eui';
-
-/** Hairline that reads on both the light and dark themes. */
-const SUBTLE_BORDER = '1px solid rgba(128, 128, 128, 0.2)';
+import { HOME_OVERVIEW_CHROME } from '../../lib/theme-colors';
 
 /** Approx. rendered height of one `BarList`/`TopNTable` row. */
 export const TOP_N_ROW_HEIGHT = 36;
@@ -39,7 +37,7 @@ export const ListTitle: React.FC<{ children: React.ReactNode }> = ({
       paddingTop: 4,
       paddingBottom: 6,
       marginBottom: 10,
-      borderBottom: SUBTLE_BORDER,
+      borderBottom: HOME_OVERVIEW_CHROME.hairline,
     }}
   >
     <strong>{children}</strong>

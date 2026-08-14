@@ -3,6 +3,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '../../test-utils/setup-home-overview-test';
 import { BarList } from './bar-list';
+import { HOME_OVERVIEW_COLOR } from '../../lib/theme-colors';
 
 const items = [
   { key: 'Initial Access', count: 36231 },
@@ -38,5 +39,11 @@ describe('BarList', () => {
   it('renders the title caption above the list when provided', () => {
     render(<BarList items={items} title='Top 5 modified files' />);
     expect(screen.getByText('Top 5 modified files')).toBeInTheDocument();
+  });
+
+  it('defaults the bar color to a theme-aware CSS custom property, not a frozen hex', () => {
+    const { container } = render(<BarList items={items} />);
+    const progress = container.querySelector('progress');
+    expect(progress).toHaveStyle({ color: HOME_OVERVIEW_COLOR.info });
   });
 });

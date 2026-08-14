@@ -22,7 +22,10 @@ import { describeError } from '../../common/errors';
 import { getProviderAdapter } from '../providers/registry';
 import { assertProviderUrlAllowed } from '../providers/url-guard';
 import { AssistantSettingsAttributes } from '../saved_objects/assistant-settings';
-import { FIELD_POLICY_DEFAULTS } from '../tools/privacy';
+import {
+  FIELD_POLICY_DEFAULTS,
+  mergeFieldPolicyWithDefaults,
+} from '../tools/privacy';
 import { getApiKeyCipher, getSavedObjectsStart } from '../plugin-services';
 import { isEncrypted } from '../crypto/api-key-cipher';
 import { resolveApiHostId } from '../tools/api-host';
@@ -40,6 +43,10 @@ const DEFAULT_ASSISTANT_SETTINGS: AssistantSettingsAttributes = {
   privacyDefaultPerProvider: {},
   userCanOverride: true,
   fieldPolicy: FIELD_POLICY_DEFAULTS,
+  // A brand-new install starts fully "known" -- there is nothing pending to reconcile in on a
+  // later read, since it is created with today's defaults verbatim (see the `client.create` branch
+  // of `getOrCreateAssistantSettings` below).
+  fieldPolicyKnownFields: FIELD_POLICY_DEFAULTS.map(entry => entry.field),
   conversationRetentionDays: DEFAULT_CONVERSATION_RETENTION_DAYS,
 };
 
@@ -76,8 +83,9 @@ function providerClient(
 /**
  * Fetches the `wazuh-ai-assistant-settings` singleton, creating it with defaults on first access
  * (the GET route's documented "create-with-defaults if absent" behavior). Exported so
- * server/routes/chat.ts can resolve the same, always-consistent settings object when deciding
- * whether privacy mode is active for a turn, without duplicating this create-on-miss logic.
+ * server/routes/chat.ts and server/routes/conversations.ts can resolve the same,
+ * always-consistent settings object when deciding whether privacy mode is active for a turn,
+ * without duplicating this create-on-miss logic.
  *
  * Takes the REQUEST (not a client) and derives its own hidden-type-capable scoped client via
  * `assistantSettingsClient` above: the saved object type is `hidden: true`, so the plain
@@ -90,10 +98,25 @@ function providerClient(
  * `DEFAULT_CONVERSATION_RETENTION_DAYS` (keep forever) keeps every existing deployment behaving
  * exactly as before the field landed. A stored `actions` block from a build that still shipped
  * mutating tools is simply ignored (never read, never re-written).
+ *
+ * Issue #8917: `fieldPolicy` additionally goes through `mergeFieldPolicyWithDefaults` rather than a
+ * bare `??` default-fill, because the failure mode here is not "the whole array is absent" (that
+ * case is still `??`-defaulted, unchanged) but "the array is PRESENT and INCOMPLETE" -- a policy
+ * saved before a later release added new curated entries (e.g. `package.name`/`package.version`)
+ * keeps exactly the entries it had when it was written, forever, because the old code took
+ * `found.attributes.fieldPolicy` wholesale. The merge reconciles the stored array up to the shipped
+ * defaults, field-by-field, without discarding the admin's own customizations (see that function's
+ * own doc comment in server/tools/privacy.ts for the full rule and the security-direction analysis).
+ * Divergence is logged when `logger` is supplied and something was actually reconciled, and always
+ * surfaced on the returned object as `fieldPolicyReconciledFields` so a caller (the GET /settings
+ * route) can tell an admin their stored policy predated the current build.
  */
 export async function getOrCreateAssistantSettings(
   request: OpenSearchDashboardsRequest,
-): Promise<AssistantSettingsAttributes> {
+  logger?: Logger,
+): Promise<
+  AssistantSettingsAttributes & { fieldPolicyReconciledFields: string[] }
+> {
   const client = assistantSettingsClient(request);
   try {
     const found = await client.get<AssistantSettingsAttributes>(
@@ -109,6 +132,26 @@ export async function getOrCreateAssistantSettings(
     // every field mandatory and the route does a full merge update), so this is robustness/defense
     // in depth, not a live exploit -- but it brings this function in line with its own documented
     // "default-fill on read" policy for every field, not just one.
+    const storedFieldPolicy =
+      found.attributes.fieldPolicy ?? DEFAULT_ASSISTANT_SETTINGS.fieldPolicy;
+    const knownFields = found.attributes.fieldPolicyKnownFields ?? [];
+    const { merged, added } = mergeFieldPolicyWithDefaults(
+      storedFieldPolicy,
+      FIELD_POLICY_DEFAULTS,
+      knownFields,
+    );
+    if (added.length > 0) {
+      logger?.warn(
+        `wazuhAiAssistant: stored field policy (id=${ASSISTANT_SETTINGS_ID}) predates the ` +
+          `installed defaults -- reconciling ${added.length} missing entr${
+            added.length === 1 ? 'y' : 'ies'
+          } on read: ` +
+          `${added
+            .map(entry => entry.field)
+            .join(', ')}. The stored policy itself is left ` +
+          'untouched until the next explicit settings save.',
+      );
+    }
     return {
       privacyDefaultOn:
         found.attributes.privacyDefaultOn ??
@@ -119,11 +162,12 @@ export async function getOrCreateAssistantSettings(
       userCanOverride:
         found.attributes.userCanOverride ??
         DEFAULT_ASSISTANT_SETTINGS.userCanOverride,
-      fieldPolicy:
-        found.attributes.fieldPolicy ?? DEFAULT_ASSISTANT_SETTINGS.fieldPolicy,
+      fieldPolicy: merged,
+      fieldPolicyKnownFields: knownFields,
       conversationRetentionDays:
         found.attributes.conversationRetentionDays ??
         DEFAULT_CONVERSATION_RETENTION_DAYS,
+      fieldPolicyReconciledFields: added.map(entry => entry.field),
     };
   } catch {
     // client.get() on a missing singleton id rejects (a 404-shaped SavedObjectsErrorHelpers
@@ -135,7 +179,8 @@ export async function getOrCreateAssistantSettings(
       DEFAULT_ASSISTANT_SETTINGS,
       { id: ASSISTANT_SETTINGS_ID },
     );
-    return created.attributes;
+    // A freshly created object is defaults verbatim -- nothing to reconcile.
+    return { ...created.attributes, fieldPolicyReconciledFields: [] };
   }
 }
 
@@ -751,10 +796,13 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
   // Plugin-wide settings singleton: privacy defaults/override/field policy. GET creates the
   // object with defaults on first access (getOrCreateAssistantSettings above) so the admin UI and
   // server/routes/chat.ts's resolution logic never have to special-case "not configured yet".
+  // `fieldPolicyReconciledFields` (issue #8917) is included in the response body precisely so a
+  // stale-policy install is VISIBLE to an API consumer/admin, not just silently patched up
+  // in-memory -- empty on every install whose stored policy already matches the shipped defaults.
   router.get(
     { path: API_PATHS.SETTINGS, validate: false },
     async (_context, request, response) => {
-      const settings = await getOrCreateAssistantSettings(request);
+      const settings = await getOrCreateAssistantSettings(request, logger);
       return response.ok({ body: settings });
     },
   );
@@ -797,6 +845,10 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
 
   const fieldPolicyActionSchema = schema.oneOf([
     schema.literal('allow'),
+    // #8912: value passes, but is first run through the shape scan (IPs/FQDNs) AND a
+    // known-entity dictionary scan (already-minted real values) — see privacy.ts's
+    // `FieldPolicyAction` doc comment and `scrubKnownEntities`.
+    schema.literal('allow-scan'),
     schema.literal('anonymize'),
     schema.literal('never'),
   ]);
@@ -859,14 +911,29 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       // must go through the same hidden-type-capable scoped client
       // `getOrCreateAssistantSettings` itself uses internally.
       const client = assistantSettingsClient(request);
-      // Ensures the object exists (first-ever PUT with no prior GET) before updating it.
-      await getOrCreateAssistantSettings(request);
+      // Ensures the object exists (first-ever PUT with no prior GET) before updating it. Its
+      // (already-reconciled) `fieldPolicy` is also the MERGED view the admin's Settings page loaded
+      // and edited from, so its field keys are exactly what `fieldPolicyKnownFields` must capture
+      // below -- issue #8917's reconciliation only appends a shipped default the admin never had a
+      // chance to see or delete; once they HAVE seen it (this merged view) and this save persists,
+      // an absent field genuinely means they removed it, and `mergeFieldPolicyWithDefaults` must
+      // stop re-adding it on the next read.
+      const previous = await getOrCreateAssistantSettings(request, logger);
+      const nextAttributes: AssistantSettingsAttributes = {
+        ...request.body,
+        fieldPolicyKnownFields: previous.fieldPolicy.map(entry => entry.field),
+      };
       await client.update<AssistantSettingsAttributes>(
         ASSISTANT_SETTINGS_SAVED_OBJECT_TYPE,
         ASSISTANT_SETTINGS_ID,
-        request.body,
+        nextAttributes,
       );
-      return response.ok({ body: request.body });
+      // Nothing is left unreconciled immediately after a successful save -- `fieldPolicy` above
+      // IS the admin's own current, complete word on every field they were shown. Included so the
+      // PUT response has the exact same shape as GET's (same `fieldPolicyReconciledFields` key).
+      return response.ok({
+        body: { ...nextAttributes, fieldPolicyReconciledFields: [] },
+      });
     },
   );
 }

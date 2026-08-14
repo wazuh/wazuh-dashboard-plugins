@@ -1,7 +1,7 @@
 import { ToolDefinition } from '../types';
 import {
-  clampLimit,
-  limitProperty,
+  aggLimitProperty,
+  clampAggLimit,
   objectSchema,
   resolveTimeRange,
   severitiesAtOrAbove,
@@ -22,16 +22,14 @@ export const getSecuritySummaryTool: ToolDefinition = {
       '(wazuh.integration.category). Use for "summarize security events"/"what kinds of findings" ' +
       'questions, not for a list of individual findings.',
     parameters: objectSchema({
-      limit: limitProperty(
-        'Max number of rule-category buckets to return (default 20, max 100).',
-      ),
+      limit: aggLimitProperty('rule-category buckets', 20),
       ...timeRangeProperties(),
     }),
   },
   target: 'indexer',
   tier: 'T1',
   buildRequest(params) {
-    const limit = clampLimit(params.limit, 20, 100);
+    const limit = clampAggLimit(params.limit, 20);
     const { gte, lte } = resolveTimeRange(params);
     return {
       target: 'indexer',

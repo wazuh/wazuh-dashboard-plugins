@@ -1,4 +1,7 @@
-import { getMitreIntelligenceResourceUrl } from './navigation';
+import {
+  getAiAssistantUrl,
+  getMitreIntelligenceResourceUrl,
+} from './navigation';
 
 jest.mock('../../../../../react-services/navigation-service', () => ({
   __esModule: true,
@@ -52,5 +55,11 @@ describe('getMitreIntelligenceResourceUrl', () => {
     ).toBe(
       '/app/mitre-attack#/overview?tab=mitre&tabView=intelligence&tabRedirect=tactics&nameToRedirect=Initial%20Access',
     );
+  });
+});
+
+describe('getAiAssistantUrl', () => {
+  it('links to the wazuh-ai-assistant plugin app id (its PLUGIN_ID, kept as a literal here -- see the doc comment above getAiAssistantUrl for why it is not imported cross-plugin)', () => {
+    expect(getAiAssistantUrl()).toBe('/app/wazuhAiAssistant');
   });
 });
