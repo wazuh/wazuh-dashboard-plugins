@@ -28,6 +28,7 @@ function getProjectInfo() {
   return {
     app: manifest['keywords'].includes('opensearch_dashboards') ? 'osd' : 'kbn',
     version: manifest['pluginPlatform']['version'],
+    pluginVersion: manifest['version'],
     repo: process.cwd(),
   };
 }
@@ -57,13 +58,16 @@ function getJestArgs() {
  * Generates the execution parameters if they are not set.
  * @returns {Object} Default environment variables.
  */
-const buildEnvVars = ({ app, version, repo, cmd, args }) => {
+const buildEnvVars = ({ app, version, pluginVersion, repo, cmd, args }) => {
   return {
     APP: app,
     VERSION: version,
     REPO: repo,
     CMD: cmd,
     ARGS: args,
+    // Reference of the wazuh-indexer-plugins repository used to download the
+    // indexer resources. Its branches are named after the product version.
+    GIT_REF: pluginVersion,
   };
 };
 
@@ -90,7 +94,7 @@ function startRunner() {
     'docker',
     ['compose', '--project-directory', COMPOSE_DIR, 'up', '--no-log-prefix'],
     {
-      env: { ...process.env, GIT_REF: 'main' },
+      env: { ...process.env },
     },
   );
 

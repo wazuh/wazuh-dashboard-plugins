@@ -22,8 +22,9 @@ If you haven't already installed dependencies (from [Setup Environment](setup.md
 do so now:
 
 ```bash
-# Set GIT_REF to a compatible wazuh-indexer-plugins branch/tag
-export GIT_REF=main
+# Set GIT_REF to a compatible wazuh-indexer-plugins branch/tag.
+# Its branches are named after the product version, so use the plugin version.
+export GIT_REF=$(jq -r .version plugins/main/package.json)
 
 # Install dependencies for main plugin (downloads indexer resources)
 cd plugins/main

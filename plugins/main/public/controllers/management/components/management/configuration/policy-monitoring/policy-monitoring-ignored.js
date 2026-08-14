@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
 import { EuiBasicTable, EuiSpacer } from '@elastic/eui';
 
@@ -23,68 +24,63 @@ const columnsIgnore = [{ field: 'path', name: 'Path' }];
 
 const columnsIgnoreSregex = [{ field: 'sreg', name: 'Sregex' }];
 
+/* A block declared once is reported as a bare value rather than as a list of
+one, so both shapes have to render. */
+const toList = value => (Array.isArray(value) ? value : value ? [value] : []);
+
 class WzConfigurationPolicyMonitoringSystemAudit extends Component {
   constructor(props) {
     super(props);
   }
   render() {
     const { currentConfig } = this.props;
+    const rootcheck = currentConfig?.fim?.rootcheck;
+
+    if (isString(currentConfig?.fim)) {
+      return <WzNoConfig error={currentConfig.fim} help={helpLinks} />;
+    }
+
+    /* The report only carries the modules the agent runs, so an absent `fim`
+    is a module that reported nothing, not a fetch that went wrong. */
+    if (!rootcheck) {
+      return <WzNoConfig error='not-present' help={helpLinks} />;
+    }
+
+    const ignore = toList(rootcheck.ignore);
+    const ignoreSregex = toList(rootcheck.ignore_sregex);
+
+    if (!ignore.length && !ignoreSregex.length) {
+      return <WzNoConfig error='not-present' help={helpLinks} />;
+    }
+
     return (
-      <Fragment>
-        {currentConfig['syscheck-rootcheck'] &&
-          isString(currentConfig['syscheck-rootcheck']) && (
-            <WzNoConfig
-              error={currentConfig['syscheck-rootcheck']}
-              help={helpLinks}
+      <WzConfigurationSettingsHeader
+        title='Ignored files and directories'
+        description='These files and directories are ignored from the rootcheck scan'
+        help={helpLinks}
+      >
+        {ignore.length > 0 && (
+          <Fragment>
+            <EuiBasicTable
+              items={ignore.map(item => ({ path: item }))}
+              columns={columnsIgnore}
             />
-          )}
-        {currentConfig &&
-          currentConfig['syscheck-rootcheck'] &&
-          currentConfig['syscheck-rootcheck'].rootcheck &&
-          (!currentConfig['syscheck-rootcheck'].rootcheck.ignore ||
-            (currentConfig['syscheck-rootcheck'].rootcheck.ignore &&
-              !currentConfig['syscheck-rootcheck'].rootcheck.ignore
-                .length)) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
-          )}
-        {currentConfig &&
-        currentConfig['syscheck-rootcheck'] &&
-        currentConfig['syscheck-rootcheck'].rootcheck &&
-        currentConfig['syscheck-rootcheck'].rootcheck.ignore &&
-        currentConfig['syscheck-rootcheck'].rootcheck.ignore.length ? (
-          <WzConfigurationSettingsHeader
-            title="Ignored files and directories"
-            description="These files and directories are ignored from the rootcheck scan"
-            help={helpLinks}
-          >
-            {(currentConfig['syscheck-rootcheck'].rootcheck.ignore || {})
-              .length && (
-              <Fragment>
-                <EuiBasicTable
-                  items={currentConfig[
-                    'syscheck-rootcheck'
-                  ].rootcheck.ignore.map(item => ({ path: item }))}
-                  columns={columnsIgnore}
-                />
-                <EuiSpacer size="m" />
-              </Fragment>
-            )}
-            {(currentConfig['syscheck-rootcheck'].rootcheck.ignore_sregex || {})
-              .length && (
-              <Fragment>
-                <EuiBasicTable
-                  items={currentConfig[
-                    'syscheck-rootcheck'
-                  ].rootcheck.ignore_sregex.map(item => ({ sreg: item }))}
-                  columns={columnsIgnoreSregex}
-                />
-              </Fragment>
-            )}
-          </WzConfigurationSettingsHeader>
-        ) : null}
-      </Fragment>
+            <EuiSpacer size='m' />
+          </Fragment>
+        )}
+        {ignoreSregex.length > 0 && (
+          <EuiBasicTable
+            items={ignoreSregex.map(item => ({ sreg: item }))}
+            columns={columnsIgnoreSregex}
+          />
+        )}
+      </WzConfigurationSettingsHeader>
     );
   }
 }
+
+WzConfigurationPolicyMonitoringSystemAudit.propTypes = {
+  currentConfig: PropTypes.object,
+};
 
 export default WzConfigurationPolicyMonitoringSystemAudit;

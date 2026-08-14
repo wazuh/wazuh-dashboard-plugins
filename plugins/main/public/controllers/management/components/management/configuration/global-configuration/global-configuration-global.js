@@ -31,22 +31,11 @@ const helpLinks = [
   },
 ];
 
+/* Only the logging settings apply here: the alerts settings belong to
+analysisd, which does not run on an agent. */
 const mainSettings = [
-  { field: 'alerts_log', label: 'Write alerts to alerts.log file' },
-  {
-    field: 'jsonout_output',
-    label: 'Write JSON formatted alerts to alerts.json file',
-  },
-  { field: 'logall', label: 'Archive all the alerts in plain text format' },
-  { field: 'logall_json', label: 'Archive all the alerts in JSON format' },
-  {
-    field: 'custom_alert_output',
-    label: 'Customized alerts format for alerts.log file',
-  },
   { field: 'plain', label: 'Write internal logs in plain text' },
   { field: 'json', label: 'Write internal logs in JSON format' },
-  { field: 'max_output_size', label: 'Size limit of alert files' },
-  { field: 'rotate_interval', label: 'File rotation interval' },
 ];
 
 const buildHelpLinks = agent => [helpLinks[1]];
@@ -58,49 +47,32 @@ class WzConfigurationGlobalConfigurationGlobal extends Component {
   render() {
     const { currentConfig, agent, wazuhNotReadyYet } = this.props;
     const helpLinks = buildHelpLinks(agent);
-    const mainSettingsConfig = currentConfig['com-logging']?.logging
-      ? {
-          plain: currentConfig['com-logging'].logging.plain,
-          json: currentConfig['com-logging'].logging.json,
-        }
-      : {};
+    const loggingConfig = currentConfig?.execd?.logging;
+
+    if (isString(loggingConfig)) {
+      return <WzNoConfig error={loggingConfig} help={helpLinks} />;
+    }
+
+    if (!loggingConfig) {
+      return wazuhNotReadyYet ? (
+        <WzNoConfig error='Server not ready yet' help={helpLinks} />
+      ) : (
+        <WzNoConfig error='not-present' help={helpLinks} />
+      );
+    }
+
     return (
       <Fragment>
-        {currentConfig['analysis-global'] &&
-          isString(currentConfig['analysis-global']) && (
-            <WzNoConfig
-              error={currentConfig['analysis-global']}
-              help={helpLinks}
-            />
-          )}
-        {currentConfig['com-logging'] &&
-          isString(currentConfig['com-logging']) && (
-            <WzNoConfig error={currentConfig['com-global']} help={helpLinks} />
-          )}
-        {currentConfig['analysis-global'] &&
-          !isString(currentConfig['analysis-global']) &&
-          !currentConfig['analysis-global'].global && (
-            <WzNoConfig error='not-present' help={helpLinks} />
-          )}
-        {wazuhNotReadyYet &&
-          (!currentConfig || !currentConfig['analysis-global']) && (
-            <WzNoConfig error='Server not ready yet' help={helpLinks} />
-          )}
-        {((currentConfig['analysis-global'] &&
-          currentConfig['analysis-global'].global) ||
-          (currentConfig['com-logging'] &&
-            currentConfig['com-logging'].logging)) && (
-          <WzConfigurationSettingsHeader
-            title='Main settings'
-            description='Basic alerts and logging settings'
-            help={helpLinks}
-          >
-            <WzConfigurationSettingsGroup
-              config={mainSettingsConfig}
-              items={mainSettings}
-            />
-          </WzConfigurationSettingsHeader>
-        )}
+        <WzConfigurationSettingsHeader
+          title='Main settings'
+          description='Basic logging settings'
+          help={helpLinks}
+        >
+          <WzConfigurationSettingsGroup
+            config={loggingConfig}
+            items={mainSettings}
+          />
+        </WzConfigurationSettingsHeader>
       </Fragment>
     );
   }
@@ -109,6 +81,7 @@ class WzConfigurationGlobalConfigurationGlobal extends Component {
 WzConfigurationGlobalConfigurationGlobal.propTypes = {
   agent: PropTypes.object,
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
+  currentConfig: PropTypes.object,
 };
 
 export default WzConfigurationGlobalConfigurationGlobal;

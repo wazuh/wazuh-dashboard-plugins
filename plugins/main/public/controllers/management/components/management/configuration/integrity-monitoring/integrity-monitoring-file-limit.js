@@ -42,18 +42,16 @@ class WzConfigurationIntegrityMonitoringFileLimit extends Component {
     return (
       <Fragment>
         {currentConfig &&
-        currentConfig['syscheck-syscheck'] &&
-        currentConfig['syscheck-syscheck'].syscheck &&
-        currentConfig['syscheck-syscheck'].syscheck[FILE_LIMIT_PROP] ? (
+        currentConfig.fim &&
+        currentConfig.fim.syscheck &&
+        currentConfig.fim.syscheck[FILE_LIMIT_PROP] ? (
           <WzConfigurationSettingsHeader
             title='Files limit'
             description='Limit the maximum files in the FIM database'
             help={helpLinks}
           >
             <WzConfigurationSettingsGroup
-              config={
-                currentConfig['syscheck-syscheck'].syscheck[FILE_LIMIT_PROP]
-              }
+              config={currentConfig.fim.syscheck[FILE_LIMIT_PROP]}
               items={mainSettings}
             />
           </WzConfigurationSettingsHeader>
@@ -64,5 +62,9 @@ class WzConfigurationIntegrityMonitoringFileLimit extends Component {
     );
   }
 }
+
+WzConfigurationIntegrityMonitoringFileLimit.propTypes = {
+  currentConfig: PropTypes.object,
+};
 
 export default WzConfigurationIntegrityMonitoringFileLimit;

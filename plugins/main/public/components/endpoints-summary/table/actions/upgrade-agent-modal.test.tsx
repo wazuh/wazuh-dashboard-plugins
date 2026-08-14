@@ -26,7 +26,6 @@ describe('UpgradeAgentModal component', () => {
         }}
         onClose={() => {}}
         reloadAgents={() => {}}
-        setIsUpgradePanelClosed={() => {}}
       />,
     );
 
@@ -63,7 +62,6 @@ describe('UpgradeAgentModal component', () => {
         }}
         onClose={() => {}}
         reloadAgents={() => {}}
-        setIsUpgradePanelClosed={() => {}}
       />,
     );
 
