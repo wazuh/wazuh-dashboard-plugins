@@ -474,8 +474,6 @@ const DocsPopover: React.FC<{
 interface ProviderFormFlyoutProps {
   editingProvider: ProviderSummary | null;
   error: string | null;
-  canSave: boolean;
-  accessMessage: string | null;
   apiKeyEncryptionEnabled: boolean | null;
   /** True while a save (+ the connection test it triggers) is in flight. Optional/absent behaves
    * exactly as before this prop existed: the Save button is never shown as loading. */
@@ -491,8 +489,6 @@ interface ProviderFormFlyoutProps {
 export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   editingProvider,
   error,
-  canSave,
-  accessMessage,
   apiKeyEncryptionEnabled,
   isSaving = false,
   testOutcome = null,
@@ -743,32 +739,6 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                   {'openssl rand -base64 32\n' +
                     'opensearch-dashboards-keystore add wazuh_ai_assistant.encryptionKey'}
                 </EuiCodeBlock>
-              </EuiCallOut>
-              <EuiSpacer size='m' />
-            </>
-          )}
-          {!canSave && (
-            <>
-              <EuiCallOut
-                color='warning'
-                iconType='alert'
-                title={i18n.translate(
-                  'wazuhAiAssistant.settings.form.accessWarningTitle',
-                  {
-                    defaultMessage: 'You cannot save this provider right now',
-                  },
-                )}
-              >
-                <p>
-                  {accessMessage ??
-                    i18n.translate(
-                      'wazuhAiAssistant.settings.access.warningFallback',
-                      {
-                        defaultMessage:
-                          'Administrator privileges are required to change AI Assistant settings.',
-                      },
-                    )}
-                </p>
               </EuiCallOut>
               <EuiSpacer size='m' />
             </>
@@ -1333,9 +1303,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
               <EuiFlexItem grow={false}>
                 <EuiToolTip
                   content={
-                    !canSave
-                      ? accessMessage
-                      : apiKeyBlockedByEncryption
+                    apiKeyBlockedByEncryption
                       ? i18n.translate(
                           'wazuhAiAssistant.settings.form.encryptionRequiredTooltip',
                           {
@@ -1348,9 +1316,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 >
                   <EuiButton
                     onClick={handleSave}
-                    isDisabled={
-                      !canSave || apiKeyBlockedByEncryption || isSaving
-                    }
+                    isDisabled={apiKeyBlockedByEncryption || isSaving}
                     isLoading={isSaving}
                     fill
                   >

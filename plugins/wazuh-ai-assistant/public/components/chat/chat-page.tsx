@@ -675,7 +675,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
    * in-flight turn, showing a spinner, reacting to a conversation that no longer exists).
    *
    * The pseudonym map and `turnHistoryRef` both reset: a resumed conversation has no client-held
-   * pseudonym state to resume (server/saved_objects/conversation.ts's PRIVACY INTERACTION doc
+   * pseudonym state to resume (server/conversation-store.ts's PRIVACY INTERACTION doc
    * comment: the map is wire-only and never persisted) and no stored tool_call/digest pairs to
    * replay as history either.
    */

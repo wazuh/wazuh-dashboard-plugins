@@ -6,11 +6,7 @@ import {
   OpenSearchDashboardsRequest,
   RequestHandlerContext,
 } from '../../../../src/core/server';
-import {
-  API_PATHS,
-  CONVERSATION_OWNER_FALLBACK,
-  PROVIDER_SAVED_OBJECT_TYPE,
-} from '../../common/constants';
+import { API_PATHS, CONVERSATION_OWNER_FALLBACK } from '../../common/constants';
 import {
   ChatMessage,
   ProviderConfig,
@@ -38,8 +34,7 @@ import {
   StreamDepseudonymizer,
 } from '../tools/privacy';
 import { MarkdownTableSuppressor } from '../tools/markdown-table-filter';
-import { getOrCreateAssistantSettings } from './settings';
-import { getApiKeyCipher, getSavedObjectsStart } from '../plugin-services';
+import { getApiKeyCipher } from '../plugin-services';
 import { resolveWazuhUsername } from '../identity';
 import {
   buildRoutingPrompt,
@@ -604,7 +599,7 @@ function toSseFrame(event: StreamEvent): string {
 }
 
 /** Minimal shape of the settings singleton this route needs (see
- * server/saved_objects/assistant-settings.ts's `AssistantSettingsAttributes`). */
+ * server/settings/types.ts's `AssistantSettingsAttributes`). */
 interface PrivacySettings {
   privacyDefaultOn: boolean;
   privacyDefaultPerProvider: Record<string, boolean>;
@@ -775,40 +770,27 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
     async (context, request, response) => {
       const { providerId, messages } = request.body;
 
-      let providerAttributes: StoredProviderAttributes;
-      try {
-        // The provider type is hidden (security review follow-up), so it is reachable only through
-        // a start-contract scoped client with includedHiddenTypes — the plain route-context client
-        // (context.core.savedObjects.client) can no longer read it. Mirrors settings.ts's
-        // providerClient() and the conversation/assistant-settings scoped-client pattern.
-        const providerScopedClient = getSavedObjectsStart().getScopedClient(
-          request,
-          {
-            includedHiddenTypes: [PROVIDER_SAVED_OBJECT_TYPE],
-          },
-        );
-        const stored = await providerScopedClient.get<StoredProviderAttributes>(
-          PROVIDER_SAVED_OBJECT_TYPE,
-          providerId,
-        );
-        providerAttributes = stored.attributes;
-      } catch (error) {
-        logger.error(
-          `wazuhAiAssistant: unknown provider ${providerId}: ${describeError(
-            error,
-          )}`,
-        );
+      // Reads go through the internal user (server/settings/ai-providers-client.ts's `get`) — see
+      // that class's doc comment for why: the underlying endpoint requires
+      // `plugin:wazuh/ai_assistant/settings/read`, but any authenticated dashboard user must be
+      // able to chat with whichever provider they select.
+      const stored = await context.wazuh_ai_assistant.aiProviders
+        .get(context, providerId)
+        .catch(() => undefined);
+      if (!stored) {
+        logger.error(`wazuhAiAssistant: unknown provider ${providerId}`);
         return response.notFound({
           body: { message: `Unknown provider "${providerId}"` },
         });
       }
+      const providerAttributes = stored.attributes;
 
-      // Decrypt-on-read (server/crypto/api-key-cipher.ts): the saved object may hold `enc:v1:`
-      // ciphertext (AAD-bound to `providerId`, the id this exact saved object was fetched by
+      // Decrypt-on-read (server/crypto/api-key-cipher.ts): the document may hold `enc:v1:`
+      // ciphertext (AAD-bound to `providerId`, the id this exact document was fetched by
       // above) — anything else (a legacy PLAINTEXT key from a pre-release build) makes decrypt()
       // throw: plaintext keys are never used, the admin must re-enter them. Passing `providerId`
-      // here is what makes the substitution-attack detection real for chat: if this saved
-      // object's `apiKey` were ever a ciphertext blob copied in from a DIFFERENT provider's row,
+      // here is what makes the substitution-attack detection real for chat: if this document's
+      // `apiKey` were ever a ciphertext blob copied in from a DIFFERENT provider's row,
       // this call — using THIS provider's own id — would hard-fail rather than silently decrypt
       // to the wrong provider's key. Kept in its own try/catch, separate from the "unknown
       // provider" one above, so a decrypt failure (plaintext value, ciphertext present but
@@ -838,14 +820,14 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
         });
       }
 
-      // getOrCreateAssistantSettings derives its own hidden-type-capable scoped client from
-      // `request` internally (server/routes/settings.ts). The plain route-context client above
-      // (`context.core.savedObjects.client`, used for the PROVIDER lookup a few lines up) cannot
-      // see the hidden `wazuh-ai-assistant-settings` type at all.
-      const assistantSettings = await getOrCreateAssistantSettings(
-        request,
-        logger,
-      );
+      // context.wazuh_ai_assistant.assistantSettings (server/settings/route-handler-context.ts)
+      // is this plugin's single AssistantSettingsManager; getOrCreateSettings fans out to every
+      // registered provider, each of which reads through the internal user — same split as the
+      // provider lookup a few lines up.
+      const assistantSettings =
+        await context.wazuh_ai_assistant.assistantSettings.getOrCreateSettings(
+          context,
+        );
       const privacyEnabled = resolvePrivacyEnabled(
         assistantSettings,
         providerId,

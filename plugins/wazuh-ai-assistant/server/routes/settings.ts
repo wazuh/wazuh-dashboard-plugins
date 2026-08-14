@@ -7,26 +7,18 @@ import {
   OpenSearchDashboardsResponseFactory,
   IOpenSearchDashboardsResponse,
   RequestHandlerContext,
-  SavedObjectsClientContract,
 } from '../../../../src/core/server';
 import {
-  ASSISTANT_SETTINGS_ID,
-  ASSISTANT_SETTINGS_SAVED_OBJECT_TYPE,
   API_PATHS,
   MANAGER_SESSION_EXPIRED_COPY,
-  PROVIDER_SAVED_OBJECT_TYPE,
   PROVIDER_TYPES,
 } from '../../common/constants';
 import { ProviderConfig, ProviderSummary } from '../../common/types';
 import { describeError } from '../../common/errors';
 import { getProviderAdapter } from '../providers/registry';
 import { assertProviderUrlAllowed } from '../providers/url-guard';
-import { AssistantSettingsAttributes } from '../saved_objects/assistant-settings';
-import {
-  FIELD_POLICY_DEFAULTS,
-  mergeFieldPolicyWithDefaults,
-} from '../tools/privacy';
-import { getApiKeyCipher, getSavedObjectsStart } from '../plugin-services';
+import { StoredProviderAttributes } from '../settings/ai-providers-client';
+import { getApiKeyCipher } from '../plugin-services';
 import { isEncrypted } from '../crypto/api-key-cipher';
 import { resolveApiHostId } from '../tools/api-host';
 import {
@@ -34,164 +26,6 @@ import {
   resolvePagination,
   withInternalErrorHandling,
 } from './route-helpers';
-
-/** Keep saved conversations forever unless an admin opts into a retention window. */
-const DEFAULT_CONVERSATION_RETENTION_DAYS = 0;
-
-const DEFAULT_ASSISTANT_SETTINGS: AssistantSettingsAttributes = {
-  privacyDefaultOn: false,
-  privacyDefaultPerProvider: {},
-  userCanOverride: true,
-  fieldPolicy: FIELD_POLICY_DEFAULTS,
-  // A brand-new install starts fully "known" -- there is nothing pending to reconcile in on a
-  // later read, since it is created with today's defaults verbatim (see the `client.create` branch
-  // of `getOrCreateAssistantSettings` below).
-  fieldPolicyKnownFields: FIELD_POLICY_DEFAULTS.map(entry => entry.field),
-  conversationRetentionDays: DEFAULT_CONVERSATION_RETENTION_DAYS,
-};
-
-/**
- * A request-scoped saved-objects client that CAN see the hidden `wazuh-ai-assistant-settings`
- * type. Mirrors server/routes/conversations.ts's `conversationClient` exactly: the
- * route context's default `context.core.savedObjects.client` has no hidden types on this OSD
- * version, so reaching a `hidden: true` type requires the start contract's
- * `getScopedClient(request, {includedHiddenTypes})` — reusing `plugin_services`' start-service
- * singleton (set once in plugin.ts's start(), already used for the conversation type) rather than
- * standing up a second one. `includedHiddenTypes` ADDS to the visible types, so this client is a
- * superset of the plain route-context one for every other (non-hidden) call made through it.
- */
-function assistantSettingsClient(
-  request: OpenSearchDashboardsRequest,
-): SavedObjectsClientContract {
-  return getSavedObjectsStart().getScopedClient(request, {
-    includedHiddenTypes: [ASSISTANT_SETTINGS_SAVED_OBJECT_TYPE],
-  });
-}
-
-/** Scoped client for the (hidden) provider saved-object type (security review follow-up): the
- * provider row holds the API key, so — like assistant-settings and conversations — it is reached only
- * through this start-contract client with `includedHiddenTypes`, never the plain route-context
- * client, which keeps it off the generic `/api/saved_objects` API entirely. */
-function providerClient(
-  request: OpenSearchDashboardsRequest,
-): SavedObjectsClientContract {
-  return getSavedObjectsStart().getScopedClient(request, {
-    includedHiddenTypes: [PROVIDER_SAVED_OBJECT_TYPE],
-  });
-}
-
-/**
- * Fetches the `wazuh-ai-assistant-settings` singleton, creating it with defaults on first access
- * (the GET route's documented "create-with-defaults if absent" behavior). Exported so
- * server/routes/chat.ts and server/routes/conversations.ts can resolve the same,
- * always-consistent settings object when deciding whether privacy mode is active for a turn,
- * without duplicating this create-on-miss logic.
- *
- * Takes the REQUEST (not a client) and derives its own hidden-type-capable scoped client via
- * `assistantSettingsClient` above: the saved object type is `hidden: true`, so the plain
- * route-context client (`context.core.savedObjects.client`) cannot read or write it at all and
- * every caller must go through this function rather than reaching the type directly.
- *
- * Default-fills `conversationRetentionDays` for any saved object created before that field
- * existed: such an object's `attributes.conversationRetentionDays` is simply absent from the
- * persisted JSON, so reading it here yields `undefined` rather than throwing — falling back to
- * `DEFAULT_CONVERSATION_RETENTION_DAYS` (keep forever) keeps every existing deployment behaving
- * exactly as before the field landed. A stored `actions` block from a build that still shipped
- * mutating tools is simply ignored (never read, never re-written).
- *
- * Issue #8917: `fieldPolicy` additionally goes through `mergeFieldPolicyWithDefaults` rather than a
- * bare `??` default-fill, because the failure mode here is not "the whole array is absent" (that
- * case is still `??`-defaulted, unchanged) but "the array is PRESENT and INCOMPLETE" -- a policy
- * saved before a later release added new curated entries (e.g. `package.name`/`package.version`)
- * keeps exactly the entries it had when it was written, forever, because the old code took
- * `found.attributes.fieldPolicy` wholesale. The merge reconciles the stored array up to the shipped
- * defaults, field-by-field, without discarding the admin's own customizations (see that function's
- * own doc comment in server/tools/privacy.ts for the full rule and the security-direction analysis).
- * Divergence is logged when `logger` is supplied and something was actually reconciled, and always
- * surfaced on the returned object as `fieldPolicyReconciledFields` so a caller (the GET /settings
- * route) can tell an admin their stored policy predated the current build.
- */
-export async function getOrCreateAssistantSettings(
-  request: OpenSearchDashboardsRequest,
-  logger?: Logger,
-): Promise<
-  AssistantSettingsAttributes & { fieldPolicyReconciledFields: string[] }
-> {
-  const client = assistantSettingsClient(request);
-  try {
-    const found = await client.get<AssistantSettingsAttributes>(
-      ASSISTANT_SETTINGS_SAVED_OBJECT_TYPE,
-      ASSISTANT_SETTINGS_ID,
-    );
-    // Previously only
-    // `conversationRetentionDays` was defaulted here; the other four fields were read with no
-    // fallback at all, so a saved object missing any of them (e.g. written by a build predating
-    // that field) would surface `undefined` here. server/routes/chat.ts's `resolvePrivacyEnabled`
-    // does `settings.privacyDefaultPerProvider[providerId]` unconditionally, which would throw on
-    // an `undefined` map (500 on every chat). Currently unreachable via the API (PUT's schema makes
-    // every field mandatory and the route does a full merge update), so this is robustness/defense
-    // in depth, not a live exploit -- but it brings this function in line with its own documented
-    // "default-fill on read" policy for every field, not just one.
-    const storedFieldPolicy =
-      found.attributes.fieldPolicy ?? DEFAULT_ASSISTANT_SETTINGS.fieldPolicy;
-    const knownFields = found.attributes.fieldPolicyKnownFields ?? [];
-    const { merged, added } = mergeFieldPolicyWithDefaults(
-      storedFieldPolicy,
-      FIELD_POLICY_DEFAULTS,
-      knownFields,
-    );
-    if (added.length > 0) {
-      logger?.warn(
-        `wazuhAiAssistant: stored field policy (id=${ASSISTANT_SETTINGS_ID}) predates the ` +
-          `installed defaults -- reconciling ${added.length} missing entr${
-            added.length === 1 ? 'y' : 'ies'
-          } on read: ` +
-          `${added
-            .map(entry => entry.field)
-            .join(', ')}. The stored policy itself is left ` +
-          'untouched until the next explicit settings save.',
-      );
-    }
-    return {
-      privacyDefaultOn:
-        found.attributes.privacyDefaultOn ??
-        DEFAULT_ASSISTANT_SETTINGS.privacyDefaultOn,
-      privacyDefaultPerProvider:
-        found.attributes.privacyDefaultPerProvider ??
-        DEFAULT_ASSISTANT_SETTINGS.privacyDefaultPerProvider,
-      userCanOverride:
-        found.attributes.userCanOverride ??
-        DEFAULT_ASSISTANT_SETTINGS.userCanOverride,
-      fieldPolicy: merged,
-      fieldPolicyKnownFields: knownFields,
-      conversationRetentionDays:
-        found.attributes.conversationRetentionDays ??
-        DEFAULT_CONVERSATION_RETENTION_DAYS,
-      fieldPolicyReconciledFields: added.map(entry => entry.field),
-    };
-  } catch {
-    // client.get() on a missing singleton id rejects (a 404-shaped SavedObjectsErrorHelpers
-    // "not found" error is the only failure mode for a `get` given a valid, already-registered
-    // type/id pair) — create it with defaults rather than importing the error-helpers just to
-    // discriminate this one case.
-    const created = await client.create<AssistantSettingsAttributes>(
-      ASSISTANT_SETTINGS_SAVED_OBJECT_TYPE,
-      DEFAULT_ASSISTANT_SETTINGS,
-      { id: ASSISTANT_SETTINGS_ID },
-    );
-    // A freshly created object is defaults verbatim -- nothing to reconcile.
-    return { ...created.attributes, fieldPolicyReconciledFields: [] };
-  }
-}
-
-interface StoredProviderAttributes {
-  name: string;
-  type: ProviderConfig['type'];
-  baseUrl: string;
-  model: string;
-  apiKey?: string;
-  isDefault?: boolean;
-}
 
 function toSummary(
   id: string,
@@ -210,28 +44,28 @@ function toSummary(
 
 /**
  * Clears `isDefault` on every provider except `keepId`. Providers are capped at ~200 (see the
- * `perPage` used for `find` below), so a plain find+update loop is fine here; no bulk update API
- * is used because saved objects don't expose a partial "update where" primitive.
+ * `perPage` used for `list` below), so a plain list+update loop is fine here; no bulk update API
+ * is used because `AiProvidersClient`'s endpoint has no partial "update where" primitive of its
+ * own — each write below re-sends the FULL attributes of the provider it's clearing, not just the
+ * `isDefault` flag (see that class's doc comment). Both the list read and each clearing write run
+ * as the calling user — see server/settings/opensearch-user.ts's doc comment.
  */
 async function clearOtherDefaults(
-  client: SavedObjectsClientContract,
+  context: RequestHandlerContext,
   keepId: string,
 ): Promise<void> {
-  const result = await client.find<StoredProviderAttributes>({
-    type: PROVIDER_SAVED_OBJECT_TYPE,
-    perPage: 200,
-  });
+  const { aiProviders } = context.wazuh_ai_assistant;
+  const { providers } = await aiProviders.list(context, 1, 200);
   await Promise.all(
-    result.saved_objects
-      .filter(object => object.id !== keepId && object.attributes.isDefault)
-      .map(object =>
-        client.update<StoredProviderAttributes>(
-          PROVIDER_SAVED_OBJECT_TYPE,
-          object.id,
-          {
-            isDefault: false,
-          },
-        ),
+    providers
+      .filter(
+        provider => provider.id !== keepId && provider.attributes.isDefault,
+      )
+      .map(provider =>
+        aiProviders.update(context, provider.id, {
+          ...provider.attributes,
+          isDefault: false,
+        }),
       ),
   );
 }
@@ -249,94 +83,59 @@ const providerTypeSchema: Type<ProviderConfig['type']> = schema.oneOf(
 );
 
 /**
- * Maps the reference plugin's `administratorRequirements` string (server/wazuh-core.d.ts's
- * `isAdministratorUser`) to a message that tells the user what to DO, not just that they were
- * rejected. The real-world failure for a genuine admin is almost always "opened this app without
- * the main Wazuh app ever running its /api/login in this browser session" — no `wz-token` cookie
- * yet — rather than an actual permissions problem, so that family of reasons gets its own,
- * actionable copy; a real permissions problem gets different, equally actionable copy; anything
- * else falls back to a generic administrator-required message with the raw reason appended so it
- * is never silently swallowed. The raw `administratorRequirements` string is always included in
- * parentheses so a report from a user still carries the exact reference-plugin reason.
+ * Distinguishes a missing/expired `wz-token` from every other `administrator_requirements` reason
+ * (server/wazuh-core.d.ts's `isAdministratorUser`). Matches the three exact literals
+ * `isAdministratorUser` returns for "no token" cases, plus the two observed shapes of its own live
+ * Manager probe surfacing as a bare 401 (opening this app directly, without ever visiting the main
+ * Wazuh app in this browser session, leaves no `wz-token` cookie at all): a bare "status code 401",
+ * or "could not check" paired with "401" anywhere in the string (case-sensitive, matching the
+ * reference plugin's own casing).
  */
-function tokenMissingOrExpiredMessage(
-  administratorRequirements: string | null,
-): string {
+function isTokenMissingOrExpiredReason(
+  administratorRequirements: string,
+): boolean {
   return (
-    // Built from MANAGER_SESSION_EXPIRED_COPY so the client-side heal/retry trigger
-    `Your Wazuh Manager API ${MANAGER_SESSION_EXPIRED_COPY}. Open any page of the main Wazuh ` +
-    'app (or reload and log in again) to establish it, then retry saving. ' +
-    `(${administratorRequirements})`
-  );
-}
-
-/**
- * Catch-all: opening this app directly (without ever visiting the main
- * Wazuh app in this browser session) makes `isAdministratorUser`'s own live Manager probe 401 —
- * the reference plugin then surfaces that as a free-form string like "It could not check if the
- * current user is administrator due to: Request failed with status code 401", which is NOT one of
- * the three exact literals the switch above matches, so without this it falls into the generic
- * message despite being the same "no/expired wz-token" situation. Matches
- * on the two observed shapes of that family: a bare "status code 401", or "could not check" paired
- * with "401" anywhere in the string (case-sensitive, matching the reference plugin's own casing).
- */
-function isTokenMissingOr401(administratorRequirements: string): boolean {
-  return (
+    administratorRequirements === 'No token provider' ||
+    administratorRequirements === 'Token is not valid' ||
+    administratorRequirements === 'No API id provided' ||
     administratorRequirements.includes('status code 401') ||
     (administratorRequirements.includes('could not check') &&
       administratorRequirements.includes('401'))
   );
 }
 
-/** Exported for unit testing only — every other caller in this file uses it directly. */
-export function describeAdministratorRequirement(
-  administratorRequirements: string | null,
+/** Actionable copy for a missing/expired Manager session, built from `MANAGER_SESSION_EXPIRED_COPY`
+ * so the client-side heal/retry trigger (public/services/session-heal.ts) keeps matching it. The
+ * raw `administratorRequirements` string is always included in parentheses so a report from a user
+ * still carries the exact reference-plugin reason. */
+function managerSessionExpiredMessage(
+  administratorRequirements: string,
 ): string {
-  switch (administratorRequirements) {
-    case 'No token provider':
-    case 'Token is not valid':
-    case 'No API id provided':
-      return tokenMissingOrExpiredMessage(administratorRequirements);
-    case 'No administrator role':
-    case 'No permissions in token':
-      return (
-        'Your Wazuh Manager API user does not have the administrator role, which is required to ' +
-        `change AI Assistant settings. (${administratorRequirements})`
-      );
-    default:
-      if (
-        administratorRequirements &&
-        isTokenMissingOr401(administratorRequirements)
-      ) {
-        return tokenMissingOrExpiredMessage(administratorRequirements);
-      }
-      return (
-        'Administrator privileges are required to change AI Assistant settings.' +
-        (administratorRequirements ? ` (${administratorRequirements})` : '')
-      );
-  }
+  return (
+    `Your Wazuh Manager API ${MANAGER_SESSION_EXPIRED_COPY}. Open any page of the main Wazuh ` +
+    'app (or reload and log in again) to establish it, then retry. ' +
+    `(${administratorRequirements})`
+  );
 }
 
 /**
- * Runs the reference plugin's administrator check and ALWAYS resolves — never throws — a
- * `{administrator: true}` or `{administrator: false, message}` pair, where `message` is the
- * actionable text from `describeAdministratorRequirement` above.
- * Shared by:
- *  - the PUT /settings admin gate below, which turns a `false` into a 403 response;
- *  - GET /settings/access (pre-flight probe), which the Settings page calls on mount so it
- *    can warn the user and disable Save buttons BEFORE they attempt (and get rejected by) the real
- *    PUT.
- * Fails CLOSED like the original inline try/catch did: any throw from `isAdministratorUser` itself
- * (wazuh_core context drift, not a real admin-vs-not-admin answer) is treated as "not an
- * administrator", but with a message that says the CHECK failed, not that the user lacks
- * privileges — those are different problems and deserve different copy.
+ * Resolves whether the caller's Wazuh Manager session (`wz-token`) is alive — NOT whether they are
+ * an administrator. AI Assistant settings and providers are no longer gated on the Manager's
+ * administrator role: every read/write against them runs as the calling user against the Wazuh
+ * indexer's own `/_plugins/_setup/ai_assistant/...` endpoints (server/settings/opensearch-user.ts's
+ * `asCurrentUser`), so the indexer's own `plugin:wazuh/ai_assistant/settings/{read,write}`
+ * permissions are the real authorization boundary now (see
+ * docs/ref/modules/ai-assistant/security.md). `isAdministratorUser` remains the only
+ * session-liveness probe `wazuh-core` exposes, so this reuses it but discards its role verdict:
+ * "No administrator role"/"No permissions in token" mean the check itself SUCCEEDED — the session
+ * is fine, this account simply isn't a Manager admin, which no longer matters here. Only a
+ * token-missing/expired-shaped reason means the session itself has a problem.
+ * Exported for unit testing only — every other caller in this file uses it directly.
  */
-async function checkAdministrator(
+export async function checkManagerSession(
   context: RequestHandlerContext,
   request: OpenSearchDashboardsRequest,
-): Promise<
-  { administrator: true } | { administrator: false; message: string }
-> {
+): Promise<{ ok: true } | { ok: false; message: string }> {
   try {
     const {
       administrator,
@@ -345,53 +144,23 @@ async function checkAdministrator(
       context,
       request,
     );
-    // The upstream contract
-    // types `administrator` as boolean but enforces nothing about it at runtime -- a plain JS
-    // truthiness check (`if (administrator)`) would grant admin for ANY truthy value, including a
-    // non-boolean like the string "false" (truthy in JS despite its name). Require the literal
-    // value `true` so only an actual boolean true grants access.
-    if (administrator === true) {
-      return { administrator: true };
+    if (
+      administrator !== true &&
+      administratorRequirements &&
+      isTokenMissingOrExpiredReason(administratorRequirements)
+    ) {
+      return {
+        ok: false,
+        message: managerSessionExpiredMessage(administratorRequirements),
+      };
     }
-    return {
-      administrator: false,
-      message: describeAdministratorRequirement(administratorRequirements),
-    };
+    return { ok: true };
   } catch {
-    return {
-      administrator: false,
-      message:
-        'The administrator check itself could not be performed (the Wazuh core plugin did not ' +
-        'respond as expected), so this request was rejected as a precaution. Try again, and ' +
-        'contact your Wazuh administrator if this persists.',
-    };
+    // This is only a liveness probe; the indexer enforces the real permission check on the
+    // actual read/write, so an unexpected failure here just means "can't tell", which fails OPEN
+    // (no needless heal attempt) rather than closed.
+    return { ok: true };
   }
-}
-
-/**
- * Shared admin gate for the five provider mutation/test routes:
- * resolves to the same `response.forbidden(...)` value PUT /settings's own inline gate below
- * returns when the caller is not an administrator, or `null` when the caller may proceed. Every
- * gated route calls this as the very FIRST thing in its handler, before any client/saved-object
- * work — mirroring PUT /settings's inline `checkAdministrator` + `forbidden` pattern exactly, just
- * centralized once so five call sites can't drift from each other.
- * Fails CLOSED like `checkAdministrator` itself: any unexpected/thrown result is never treated as
- * "proceed".
- * Exported for unit testing only (same convention as `describeAdministratorRequirement` above);
- * every other caller in this file uses it directly. There is no request/response mocking harness
- * for full route-level HTTP tests in this plugin, and this single gate is the smallest seam that
- * proves all five routes reject a non-administrator and admit an administrator.
- */
-export async function requireAdministrator(
-  context: RequestHandlerContext,
-  request: OpenSearchDashboardsRequest,
-  response: OpenSearchDashboardsResponseFactory,
-): Promise<IOpenSearchDashboardsResponse | null> {
-  const result = await checkAdministrator(context, request);
-  if (!result.administrator) {
-    return response.forbidden({ body: { message: result.message } });
-  }
-  return null;
 }
 
 /** Backstop for direct API calls — the UI blocks these writes first (see the access probe's
@@ -427,19 +196,19 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
   router.get(
     { path: API_PATHS.PROVIDERS, validate: { query: paginationQuerySchema } },
     withInternalErrorHandling(async (context, request, response) => {
-      const client = providerClient(request);
       const { page, perPage } = resolvePagination(request.query);
-      const result = await client.find<StoredProviderAttributes>({
-        type: PROVIDER_SAVED_OBJECT_TYPE,
-        page,
-        perPage,
-      });
+      const { providers, total } =
+        await context.wazuh_ai_assistant.aiProviders.list(
+          context,
+          page,
+          perPage,
+        );
       return response.ok({
         body: {
-          providers: result.saved_objects.map(object =>
-            toSummary(object.id, object.attributes),
+          providers: providers.map(provider =>
+            toSummary(provider.id, provider.attributes),
           ),
-          total: result.total,
+          total,
           page,
           perPage,
         },
@@ -464,12 +233,6 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       },
     },
     withInternalErrorHandling(async (context, request, response) => {
-      // Administrator-only, gated before any client or saved-object work: creating a provider
-      // sets the endpoint the server itself will call.
-      const gate = await requireAdministrator(context, request, response);
-      if (gate) {
-        return gate;
-      }
       // SSRF fail-fast. The fetch-time guard inside each adapter remains the security-critical
       // check — it re-validates on every request, including configs saved by an earlier version —
       // but rejecting an obviously-bad baseUrl at save time gives the admin an immediate,
@@ -479,7 +242,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       } catch (error) {
         return response.badRequest({ body: { message: describeError(error) } });
       }
-      // Refuse plaintext before any saved-object write.
+      // Refuse plaintext before any document write.
       const encryptionGate = requireApiKeyEncryption(
         request.body.apiKey,
         response,
@@ -487,48 +250,44 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       if (encryptionGate) {
         return encryptionGate;
       }
-      const client = providerClient(request);
-      const existingCount = await client.find<StoredProviderAttributes>({
-        type: PROVIDER_SAVED_OBJECT_TYPE,
-        perPage: 1,
-      });
-      const isFirstProvider = existingCount.total === 0;
+      const isFirstProvider =
+        (await context.wazuh_ai_assistant.aiProviders.count(context)) === 0;
       const isDefault = isFirstProvider || Boolean(request.body.isDefault);
       // THE CREATE-BEFORE-ID PROBLEM (AAD binding, server/crypto/api-key-cipher.ts): `enc:v1:`
-      // binds the ciphertext to the saved object's id, but `client.create()` is what MINTS that
-      // id — normally not known until after the call returns. Rather than create-then-update (two
-      // writes, with a real "provider left with no key" failure window if the second write fails),
-      // this pre-generates the id client-side with `crypto.randomUUID()` and passes it through
-      // `client.create(type, attrs, {id})` — the SAME explicit-id create contract this file
-      // already relies on elsewhere (`getOrCreateAssistantSettings` above creates the
-      // `wazuh-ai-assistant-settings` singleton with `{id: ASSISTANT_SETTINGS_ID}`), so this is a
-      // proven-working call shape on this OSD version, not a new assumption.
-      // This keeps provider creation a SINGLE atomic saved-objects write: either it fully succeeds (provider exists, apiKey correctly bound to its
-      // own id from birth) or it fully fails (RandomUUID collision against an existing id —
-      // astronomically unlikely — or any other saved-objects write error) and NOTHING is created,
-      // surfaced to the caller as the same 500 `withInternalErrorHandling` every other failure in
-      // this route already produces. There is no partial/half-written state to reason about: no
-      // second write exists that could fail after the first one succeeded.
+      // binds the ciphertext to the id `PUT .../providers/{id}` is called with, but there is no
+      // id to bind against until AFTER a create call that lets the server mint one (`POST
+      // .../providers` per the OpenAPI spec). Rather than create-then-update (two writes, with a
+      // real "provider left with no key" failure window if the second write fails), this
+      // pre-generates the id client-side with `crypto.randomUUID()` and passes it through
+      // `aiProviders.create(context, providerId, attrs)` (`PUT .../providers/{providerId}` — see
+      // server/settings/ai-providers-client.ts), a proven-working call shape, not a new
+      // assumption.
+      // This keeps provider creation a SINGLE atomic write: either it fully succeeds (provider
+      // exists, apiKey correctly bound to its own id from birth) or it fails outright and NOTHING
+      // is created, surfaced to the caller as the same 500 `withInternalErrorHandling` every
+      // other failure in this route already produces. There is no partial/half-written state to
+      // reason about: no second write exists that could fail after the first one succeeded.
       // Encryption-at-rest (server/crypto/api-key-cipher.ts): the encryption gate above
       // guarantees the cipher is enabled whenever a non-empty apiKey reaches this point.
       // `request.body.apiKey` is `schema.maybe(schema.string())`; an absent/empty value
       // stays absent/empty (encrypt() is only ever called with a truthy string).
       const providerId = crypto.randomUUID();
-      const created = await client.create<StoredProviderAttributes>(
-        PROVIDER_SAVED_OBJECT_TYPE,
-        {
-          ...request.body,
-          apiKey: request.body.apiKey
-            ? getApiKeyCipher().encrypt(request.body.apiKey, providerId)
-            : request.body.apiKey,
-          isDefault,
-        },
-        { id: providerId },
+      const attributes: StoredProviderAttributes = {
+        ...request.body,
+        apiKey: request.body.apiKey
+          ? getApiKeyCipher().encrypt(request.body.apiKey, providerId)
+          : request.body.apiKey,
+        isDefault,
+      };
+      await context.wazuh_ai_assistant.aiProviders.create(
+        context,
+        providerId,
+        attributes,
       );
       if (isDefault) {
-        await clearOtherDefaults(client, created.id);
+        await clearOtherDefaults(context, providerId);
       }
-      return response.ok({ body: toSummary(created.id, created.attributes) });
+      return response.ok({ body: toSummary(providerId, attributes) });
     }),
   );
 
@@ -550,14 +309,10 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       },
     },
     withInternalErrorHandling(async (context, request, response) => {
-      // Administrator-only, gated before any client work. This is the most sensitive mutation on
-      // the route: omitting `apiKey` from the body keeps the stored key, so an unprivileged caller
-      // able to change `baseUrl` alone would redirect the existing credential to a host of their
-      // choosing.
-      const gate = await requireAdministrator(context, request, response);
-      if (gate) {
-        return gate;
-      }
+      // This is the most sensitive mutation on the route: omitting `apiKey` from the body keeps
+      // the stored key, so a caller without the indexer's own write permission on this endpoint —
+      // rejected by `aiProviders.update`'s `asCurrentUser` call below — could otherwise redirect
+      // an existing credential to a host of their choosing just by changing `baseUrl`.
       // SSRF fail-fast: see the identical comment on POST /providers above.
       try {
         await assertProviderUrlAllowed(request.body.baseUrl);
@@ -572,11 +327,13 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       if (encryptionGate) {
         return encryptionGate;
       }
-      const client = providerClient(request);
-      const existing = await client.get<StoredProviderAttributes>(
-        PROVIDER_SAVED_OBJECT_TYPE,
+      const existing = await context.wazuh_ai_assistant.aiProviders.get(
+        context,
         request.params.id,
       );
+      if (!existing) {
+        return response.notFound();
+      }
       const cipher = getApiKeyCipher();
       let nextApiKey: string | undefined;
       if (request.body.apiKey && request.body.apiKey.length > 0) {
@@ -610,27 +367,25 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
         request.body.isDefault === undefined
           ? Boolean(existing.attributes.isDefault)
           : request.body.isDefault;
-      // The update response only contains changed attributes, not the full object, so build the
-      // summary from what we know was just written instead of re-reading it back.
-      await client.update<StoredProviderAttributes>(
-        PROVIDER_SAVED_OBJECT_TYPE,
+      // `PUT .../providers/{id}` never echoes the persisted object back (just `{message, status,
+      // id}` — see server/settings/ai-providers-client.ts), so build the summary from what we
+      // know was just written instead of re-reading it back.
+      const nextAttributes: StoredProviderAttributes = {
+        ...existing.attributes,
+        ...request.body,
+        apiKey: nextApiKey,
+        isDefault: nextIsDefault,
+      };
+      await context.wazuh_ai_assistant.aiProviders.update(
+        context,
         request.params.id,
-        {
-          ...request.body,
-          apiKey: nextApiKey,
-          isDefault: nextIsDefault,
-        },
+        nextAttributes,
       );
       if (nextIsDefault) {
-        await clearOtherDefaults(client, request.params.id);
+        await clearOtherDefaults(context, request.params.id);
       }
       return response.ok({
-        body: toSummary(request.params.id, {
-          ...existing.attributes,
-          ...request.body,
-          apiKey: nextApiKey,
-          isDefault: nextIsDefault,
-        } as StoredProviderAttributes),
+        body: toSummary(request.params.id, nextAttributes),
       });
     }),
   );
@@ -642,30 +397,22 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       validate: { params: schema.object({ id: schema.string() }) },
     },
     async (context, request, response) => {
-      // Administrator-only, gated before any client work: the default provider applies to every
-      // user of the deployment, so this setting is not the caller's own to change.
-      const gate = await requireAdministrator(context, request, response);
-      if (gate) {
-        return gate;
+      const { aiProviders } = context.wazuh_ai_assistant;
+      const existing = await aiProviders.get(context, request.params.id);
+      if (!existing) {
+        return response.notFound();
       }
-      const client = providerClient(request);
-      const existing = await client.get<StoredProviderAttributes>(
-        PROVIDER_SAVED_OBJECT_TYPE,
-        request.params.id,
-      );
-      await client.update<StoredProviderAttributes>(
-        PROVIDER_SAVED_OBJECT_TYPE,
-        request.params.id,
-        {
-          isDefault: true,
-        },
-      );
-      await clearOtherDefaults(client, request.params.id);
+      // No partial-update primitive on the new endpoint (see AiProvidersClient's doc comment):
+      // resend the FULL existing attributes with only `isDefault` flipped, rather than the old
+      // `setProviderDefault`'s single-field partial write.
+      const nextAttributes: StoredProviderAttributes = {
+        ...existing.attributes,
+        isDefault: true,
+      };
+      await aiProviders.update(context, request.params.id, nextAttributes);
+      await clearOtherDefaults(context, request.params.id);
       return response.ok({
-        body: toSummary(request.params.id, {
-          ...existing.attributes,
-          isDefault: true,
-        }),
+        body: toSummary(request.params.id, nextAttributes),
       });
     },
   );
@@ -677,14 +424,10 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       validate: { params: schema.object({ id: schema.string() }) },
     },
     withInternalErrorHandling(async (context, request, response) => {
-      // Administrator-only, gated before any client work: provider configuration is
-      // deployment-wide state.
-      const gate = await requireAdministrator(context, request, response);
-      if (gate) {
-        return gate;
-      }
-      const client = providerClient(request);
-      await client.delete(PROVIDER_SAVED_OBJECT_TYPE, request.params.id);
+      await context.wazuh_ai_assistant.aiProviders.delete(
+        context,
+        request.params.id,
+      );
       return response.ok({ body: { deleted: true } });
     }),
   );
@@ -697,20 +440,18 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       validate: { params: schema.object({ id: schema.string() }) },
     },
     async (context, request, response) => {
-      // Administrator-only, gated before any client work: this route returns the provider's own
-      // response to the caller, which makes it a read-capable SSRF primitive on top of the
-      // url-guard's network restrictions.
-      const gate = await requireAdministrator(context, request, response);
-      if (gate) {
-        return gate;
-      }
-      const client = providerClient(request);
-      const stored = await client.get<StoredProviderAttributes>(
-        PROVIDER_SAVED_OBJECT_TYPE,
+      // This route returns the provider's own response to the caller, which makes it a
+      // read-capable SSRF primitive on top of the url-guard's network restrictions — the
+      // indexer's own write permission on this endpoint is what actually authorizes it.
+      const stored = await context.wazuh_ai_assistant.aiProviders.get(
+        context,
         request.params.id,
       );
-      // Decrypt-on-read: the saved object may hold `enc:v1:` ciphertext (AAD-bound to
-      // `request.params.id`, the id this exact row was fetched by — see
+      if (!stored) {
+        return response.notFound();
+      }
+      // Decrypt-on-read: the document may hold `enc:v1:` ciphertext (AAD-bound to
+      // `request.params.id`, the id this exact document was fetched by — see
       // server/crypto/api-key-cipher.ts). A decrypt failure here means a real misconfiguration
       // (ciphertext present but no/rotated encryptionKey or an AAD/id mismatch, the admin must re-enter it) — surfaced as a failed
       // test rather than crashing the route or leaking the raw stored value to the adapter.
@@ -794,38 +535,37 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
   );
 
   // Plugin-wide settings singleton: privacy defaults/override/field policy. GET creates the
-  // object with defaults on first access (getOrCreateAssistantSettings above) so the admin UI and
-  // server/routes/chat.ts's resolution logic never have to special-case "not configured yet".
-  // `fieldPolicyReconciledFields` (issue #8917) is included in the response body precisely so a
-  // stale-policy install is VISIBLE to an API consumer/admin, not just silently patched up
-  // in-memory -- empty on every install whose stored policy already matches the shipped defaults.
+  // object with defaults on first access (AssistantSettingsManager.getOrCreateSettings, reached
+  // via context.wazuh_ai_assistant.assistantSettings — server/settings/route-handler-context.ts)
+  // so the admin UI and server/routes/chat.ts's resolution logic never have to special-case "not
+  // configured yet".
   router.get(
     { path: API_PATHS.SETTINGS, validate: false },
-    async (_context, request, response) => {
-      const settings = await getOrCreateAssistantSettings(request, logger);
+    withInternalErrorHandling(async (context, _request, response) => {
+      const settings =
+        await context.wazuh_ai_assistant.assistantSettings.getOrCreateSettings(
+          context,
+        );
       return response.ok({ body: settings });
-    },
+    }),
   );
 
-  // Pre-flight administrator probe: lets the Settings page warn the user
-  // and disable Save buttons BEFORE they attempt (and get rejected by) the real PUT below. Never
-  // 403s — always 200 with the same {administrator, message} shape `checkAdministrator` produces,
-  // using the SAME check/message mapping as the PUT gate so the two surfaces never disagree.
+  // Manager-session liveness probe, called on app mount and before Manager-path work
+  // (public/services/session-heal.ts's `ensureManagerSession`) so a missing/expired `wz-token` can
+  // be healed before it causes a confusing failure elsewhere (see `checkManagerSession` above).
+  // Always 200.
   //
-  // `defaultApiHostId` (client-side session auto-heal): the Manager host id the client
-  // should pass to the main Wazuh plugin's POST {basePath}/api/login to (re)establish a wz-token
-  // cookie when `administrator` came back false for token reasons. Resolved via the SAME
-  // `resolveApiHostId` every Manager-path tool call already uses (server/tools/api-host.ts), so this
-  // never disagrees with which host the rest of the plugin would actually call. Wrapped in its own
-  // try/catch -> null: an unresolvable host (no Wazuh manager host configured at all) must not turn
-  // this always-200 probe into a 500, and `null` is a perfectly meaningful answer for the client
-  // (nothing to heal against).
+  // `defaultApiHostId` (client-side session auto-heal): the Manager host id the client should pass
+  // to the main Wazuh plugin's POST {basePath}/api/login to (re)establish a wz-token cookie when
+  // `managerSessionOk` came back false. Resolved via the SAME `resolveApiHostId` every Manager-path
+  // tool call already uses (server/tools/api-host.ts), so this never disagrees with which host the
+  // rest of the plugin would actually call. Wrapped in its own try/catch -> null: an unresolvable
+  // host (no Wazuh manager host configured at all) must not turn this always-200 probe into a 500,
+  // and `null` is a perfectly meaningful answer for the client (nothing to heal against).
   router.get(
     { path: API_PATHS.SETTINGS_ACCESS, validate: false },
     async (context, request, response) => {
-      const result = await checkAdministrator(context, request);
-      const { administrator } = result;
-      const message = result.administrator ? null : result.message;
+      const sessionCheck = await checkManagerSession(context, request);
       let defaultApiHostId: string | null;
       try {
         defaultApiHostId = await resolveApiHostId(context, request);
@@ -834,8 +574,8 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       }
       return response.ok({
         body: {
-          administrator,
-          message,
+          managerSessionOk: sessionCheck.ok,
+          message: sessionCheck.ok ? null : sessionCheck.message,
           defaultApiHostId,
           apiKeyEncryptionEnabled: getApiKeyCipher().enabled,
         },
@@ -882,58 +622,37 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
             }),
           ),
           // Mandatory in the PUT body (same "no schema.maybe" convention as every other field
-          // here — the Settings UI always sends the full object; a saved object written BEFORE
-          // this field existed is handled on the READ side instead, getOrCreateAssistantSettings's
-          // default-fill above). `min: 0` — a negative retention window has no meaning.
+          // here — the Settings UI always sends the full object; a document written BEFORE
+          // this field existed is handled on the READ side instead, by
+          // AssistantSettingsManager.getOrCreateSettings's per-field default-fill above).
+          // `min: 0` — a negative retention window has no meaning.
           conversationRetentionDays: schema.number({ min: 0 }),
         }),
       },
     },
     async (context, request, response) => {
-      // Administrator-only gate: without this, any authenticated dashboard user could
-      // rewrite the plugin's privacy defaults and field policy (e.g. blanket-'allow' every field,
-      // silently defeating pseudonymization for every other user). Same mechanism the reference
-      // plugin uses for its own administrator-only routes (v4.14.6
-      // main/controllers/decorators.ts's `routeDecoratorProtectedAdministrator`; see
-      // server/wazuh-core.d.ts). Fails CLOSED: any throw here is treated as "not an administrator",
-      // never as "proceed" — the GET route above stays open (clients need to read defaults; it
-      // never returns an apiKey), only this mutating PUT is gated.
-      const result = await checkAdministrator(context, request);
-      if (!result.administrator) {
-        return response.forbidden({
-          body: {
-            message: result.message,
-          },
+      // Ensures every provider's backend exists (first-ever PUT with no prior GET) before
+      // updating it. The actual write goes through the CURRENT user for every provider, unlike
+      // the read above (`getOrCreateSettings`) — see server/settings/opensearch-user.ts's doc
+      // comment.
+      const { assistantSettings } = context.wazuh_ai_assistant;
+      await assistantSettings.getOrCreateSettings(context);
+      try {
+        const updated = await assistantSettings.updateSettings(
+          context,
+          request.body,
+        );
+        return response.ok({ body: updated });
+      } catch (error) {
+        // Surfaces `IsmSettingsProvider`'s "policy not found"/"no delete transition" failures
+        // (expected on any deployment where `CONVERSATION_SESSIONS_ISM_POLICY_ID` — see
+        // common/constants.ts — hasn't been provisioned indexer-side yet) as an actionable 503
+        // instead of a bare 500.
+        return response.customError({
+          statusCode: 503,
+          body: { message: describeError(error) },
         });
       }
-
-      // The plain route-context client cannot see this hidden type at all, so the update below
-      // must go through the same hidden-type-capable scoped client
-      // `getOrCreateAssistantSettings` itself uses internally.
-      const client = assistantSettingsClient(request);
-      // Ensures the object exists (first-ever PUT with no prior GET) before updating it. Its
-      // (already-reconciled) `fieldPolicy` is also the MERGED view the admin's Settings page loaded
-      // and edited from, so its field keys are exactly what `fieldPolicyKnownFields` must capture
-      // below -- issue #8917's reconciliation only appends a shipped default the admin never had a
-      // chance to see or delete; once they HAVE seen it (this merged view) and this save persists,
-      // an absent field genuinely means they removed it, and `mergeFieldPolicyWithDefaults` must
-      // stop re-adding it on the next read.
-      const previous = await getOrCreateAssistantSettings(request, logger);
-      const nextAttributes: AssistantSettingsAttributes = {
-        ...request.body,
-        fieldPolicyKnownFields: previous.fieldPolicy.map(entry => entry.field),
-      };
-      await client.update<AssistantSettingsAttributes>(
-        ASSISTANT_SETTINGS_SAVED_OBJECT_TYPE,
-        ASSISTANT_SETTINGS_ID,
-        nextAttributes,
-      );
-      // Nothing is left unreconciled immediately after a successful save -- `fieldPolicy` above
-      // IS the admin's own current, complete word on every field they were shown. Included so the
-      // PUT response has the exact same shape as GET's (same `fieldPolicyReconciledFields` key).
-      return response.ok({
-        body: { ...nextAttributes, fieldPolicyReconciledFields: [] },
-      });
     },
   );
 }

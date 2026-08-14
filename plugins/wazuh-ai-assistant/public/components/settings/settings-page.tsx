@@ -41,7 +41,6 @@ import {
   FieldPolicyEntry,
   SettingsService,
 } from '../../services/settings-service';
-import { ensureManagerSession } from '../../services/session-heal';
 import { ProviderInput, ProviderSummary } from '../../../common/types';
 import { useDirtyFormState } from '../../hooks/use-dirty-form-state';
 import { ProviderFormFlyout } from './provider-form-flyout';
@@ -342,7 +341,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   // policy row closures below far more reliably than repeated `privacy.value` member accesses.
   const privacyDraft = privacy.value;
   const fieldPolicyDraft = privacyDraft?.fieldPolicy ?? [];
-  const [privacyLoadError, setPrivacyLoadError] = useState<string | null>(null);
+  // Shared between the Privacy and Conversation history sections below — both are populated by
+  // the same `getAssistantSettings()` round-trip in `reloadPrivacySettings`, so a single failure
+  // there means neither section has data to show.
+  const [settingsLoadError, setSettingsLoadError] = useState<string | null>(
+    null,
+  );
   const [privacySaveError, setPrivacySaveError] = useState<string | null>(null);
   const [isSavingPrivacy, setIsSavingPrivacy] = useState(false);
   // Kept alongside the drafts above so "Save" can PUT the full AssistantSettings body (the route
@@ -381,17 +385,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     );
   })();
 
-  // Pre-flight administrator probe: a live check (GET /settings/access),
-  // not a stored setting — loaded once on mount, independent of the settings save/load cycle above.
-  // `canSave` starts `true` (optimistic) so the page never blocks anything until the probe actually
-  // comes back `false`; if the probe request itself fails, `.catch` below deliberately leaves
-  // `canSave` untouched (fail OPEN on the client — the server still enforces the real
-  // gate on every PUT regardless of what this banner shows).
-  const [canSave, setCanSave] = useState(true);
-  const [accessMessage, setAccessMessage] = useState<string | null>(null);
-  // Tri-state, fail-open like `canSave`: `null` = probe pending/failed → no callout and no Save
-  // block; only a confirmed server `false` gates the form. The server's 503 gate still refuses
-  // plaintext key writes regardless.
+  // Tri-state: `null` = probe pending/failed → no callout, no block. The server's 503 gate still
+  // refuses plaintext key writes regardless of what this warns about.
   const [apiKeyEncryptionEnabled, setApiKeyEncryptionEnabled] = useState<
     boolean | null
   >(null);
@@ -406,12 +401,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           fieldPolicy: loaded.fieldPolicy,
         });
         retention.commit(loaded.conversationRetentionDays);
-        setPrivacyLoadError(null);
+        setSettingsLoadError(null);
       })
       .catch(() =>
-        setPrivacyLoadError(
-          i18n.translate('wazuhAiAssistant.settings.privacy.loadError', {
-            defaultMessage: 'Could not load privacy settings.',
+        setSettingsLoadError(
+          i18n.translate('wazuhAiAssistant.settings.loadError', {
+            defaultMessage: 'Could not load settings.',
           }),
         ),
       );
@@ -419,19 +414,18 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
 
   useEffect(() => {
     reloadPrivacySettings();
-    // The probe→heal→re-probe choreography lives in ensureManagerSession now (it shares the
-    // execution renderApp already started, so a /settings deep link gets the healed answer on
-    // first paint). A `null` result means the probe itself failed: fail OPEN — `canSave` stays at
-    // its optimistic default and the server still enforces the real gate on every PUT regardless.
-    void ensureManagerSession(core.http).then(access => {
-      if (!access) {
-        return;
-      }
-      // `!== false` stays fail-open when older servers omit the field.
-      setApiKeyEncryptionEnabled(access.apiKeyEncryptionEnabled !== false);
-      setCanSave(access.administrator);
-      setAccessMessage(access.administrator ? null : access.message);
-    });
+    // Capability probe only (encryption-at-rest availability) — settings/providers are authorized
+    // by the Wazuh indexer's own RBAC on the calling user, not by anything this page checks, so a
+    // failed probe just leaves `apiKeyEncryptionEnabled` at its fail-open `null` default.
+    void service
+      .getSettingsAccess()
+      .then(access => {
+        // `!== false` stays fail-open when older servers omit the field.
+        setApiKeyEncryptionEnabled(access.apiKeyEncryptionEnabled !== false);
+      })
+      .catch(() => {
+        // Fail open: leave `apiKeyEncryptionEnabled` at its `null` default.
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -569,7 +563,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       .then(setProviders)
       .catch(() =>
         setError(
-          i18n.translate('wazuhAiAssistant.settings.loadError', {
+          i18n.translate('wazuhAiAssistant.settings.providers.loadError', {
             defaultMessage: 'Could not load providers.',
           }),
         ),
@@ -612,7 +606,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       })
       .catch(() =>
         setError(
-          i18n.translate('wazuhAiAssistant.settings.loadError', {
+          i18n.translate('wazuhAiAssistant.settings.providers.loadError', {
             defaultMessage: 'Could not load providers.',
           }),
         ),
@@ -659,7 +653,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
 
   // No per-provider privacy toggle in this form, deliberately.
   // `AssistantSettings.privacyDefaultPerProvider` is keyed by provider id and lives in a
-  // SEPARATE saved object from `ProviderInput`/`ProviderSummary` (common/types.ts has no field for
+  // SEPARATE document from `ProviderInput`/`ProviderSummary` (common/types.ts has no field for
   // it, by design — it is not part of a provider's own config). Adding a per-provider toggle to
   // this form would mean: (a) a brand-new provider's id isn't known until AFTER `service.create()`
   // resolves, so the toggle's write has to happen as a second, separate `updateAssistantSettings`
@@ -1165,33 +1159,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         />
         <EuiSpacer size='l' />
 
-        {!canSave && (
-          <>
-            <EuiCallOut
-              color='warning'
-              iconType='alert'
-              title={i18n.translate(
-                'wazuhAiAssistant.settings.access.warningTitle',
-                {
-                  defaultMessage: 'You cannot save settings right now',
-                },
-              )}
-            >
-              <p>
-                {accessMessage ??
-                  i18n.translate(
-                    'wazuhAiAssistant.settings.access.warningFallback',
-                    {
-                      defaultMessage:
-                        'Administrator privileges are required to change AI Assistant settings.',
-                    },
-                  )}
-              </p>
-            </EuiCallOut>
-            <EuiSpacer size='l' />
-          </>
-        )}
-
         <SectionCard
           pillLabel={i18n.translate(
             'wazuhAiAssistant.settings.providers.title',
@@ -1289,19 +1256,19 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             },
           )}
         >
-          {privacyLoadError && (
+          {settingsLoadError && (
             <>
               <EuiCallOut
                 color='danger'
                 iconType='alert'
-                title={privacyLoadError}
+                title={settingsLoadError}
                 size='s'
               />
               <EuiSpacer size='m' />
             </>
           )}
 
-          {!privacyDraft && !privacyLoadError && (
+          {!privacyDraft && !settingsLoadError && (
             <>
               <EuiLoadingSpinner
                 size='m'
@@ -1565,20 +1532,16 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
               )}
 
               <EuiHorizontalRule margin='m' />
-              <EuiToolTip content={!canSave ? accessMessage : undefined}>
-                <EuiButton
-                  onClick={handleSavePrivacySettings}
-                  isLoading={isSavingPrivacy}
-                  isDisabled={
-                    !canSave || hasEmptyFieldPolicyRow || !privacy.isDirty
-                  }
-                  fill
-                >
-                  {i18n.translate('wazuhAiAssistant.settings.privacy.save', {
-                    defaultMessage: 'Save privacy settings',
-                  })}
-                </EuiButton>
-              </EuiToolTip>
+              <EuiButton
+                onClick={handleSavePrivacySettings}
+                isLoading={isSavingPrivacy}
+                isDisabled={hasEmptyFieldPolicyRow || !privacy.isDirty}
+                fill
+              >
+                {i18n.translate('wazuhAiAssistant.settings.privacy.save', {
+                  defaultMessage: 'Save privacy settings',
+                })}
+              </EuiButton>
             </>
           )}
         </SectionCard>
@@ -1599,7 +1562,19 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             },
           )}
         >
-          {retention.value === null && !privacyLoadError && (
+          {settingsLoadError && (
+            <>
+              <EuiCallOut
+                color='danger'
+                iconType='alert'
+                title={settingsLoadError}
+                size='s'
+              />
+              <EuiSpacer size='m' />
+            </>
+          )}
+
+          {retention.value === null && !settingsLoadError && (
             <>
               <EuiLoadingSpinner
                 size='m'
@@ -1636,7 +1611,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   'wazuhAiAssistant.settings.retention.daysHelp',
                   {
                     defaultMessage:
-                      '0 keeps every saved conversation forever. Enforcement happens when the conversation list is loaded. There is no scheduled background cleanup.',
+                      '0 keeps every saved conversation forever. Enforcement runs on its own schedule, via an ISM policy on the underlying data stream.',
                   },
                 )}
               >
@@ -1653,18 +1628,16 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
               </EuiFormRow>
 
               <EuiHorizontalRule margin='m' />
-              <EuiToolTip content={!canSave ? accessMessage : undefined}>
-                <EuiButton
-                  onClick={handleSaveRetentionSettings}
-                  isLoading={isSavingRetention}
-                  isDisabled={!canSave || !retention.isDirty}
-                  fill
-                >
-                  {i18n.translate('wazuhAiAssistant.settings.retention.save', {
-                    defaultMessage: 'Save conversation history settings',
-                  })}
-                </EuiButton>
-              </EuiToolTip>
+              <EuiButton
+                onClick={handleSaveRetentionSettings}
+                isLoading={isSavingRetention}
+                isDisabled={!retention.isDirty}
+                fill
+              >
+                {i18n.translate('wazuhAiAssistant.settings.retention.save', {
+                  defaultMessage: 'Save conversation history settings',
+                })}
+              </EuiButton>
             </>
           )}
         </SectionCard>
@@ -1673,8 +1646,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         <ProviderFormFlyout
           editingProvider={editingProvider}
           error={error}
-          canSave={canSave}
-          accessMessage={accessMessage}
           apiKeyEncryptionEnabled={apiKeyEncryptionEnabled}
           isSaving={isSubmittingProvider}
           testOutcome={flyoutTestOutcome}

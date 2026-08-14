@@ -19,23 +19,17 @@ const mockService = {
     fieldPolicy: [],
     conversationRetentionDays: 0,
   }),
-  getSettingsAccess: jest
-    .fn()
-    .mockResolvedValue({ administrator: true, message: null }),
+  getSettingsAccess: jest.fn().mockResolvedValue({
+    managerSessionOk: true,
+    message: null,
+    defaultApiHostId: 'default',
+    apiKeyEncryptionEnabled: true,
+  }),
   updateAssistantSettings: jest.fn().mockResolvedValue({}),
 };
 
 jest.mock('../../services/settings-service', () => ({
   SettingsService: jest.fn(() => mockService),
-}));
-
-// The page derives canSave/accessMessage/apiKeyEncryptionEnabled from ensureManagerSession's
-// resolved value now (the probe→heal→re-probe choreography lives in the service, tested there).
-const mockEnsureManagerSession = jest.fn();
-
-jest.mock('../../services/session-heal', () => ({
-  ensureManagerSession: (...args: unknown[]) =>
-    mockEnsureManagerSession(...args),
 }));
 
 import { SettingsPage } from './settings-page';
@@ -53,11 +47,7 @@ beforeEach(() => {
     conversationRetentionDays: 0,
   });
   mockService.getSettingsAccess.mockResolvedValue({
-    administrator: true,
-    message: null,
-  });
-  mockEnsureManagerSession.mockResolvedValue({
-    administrator: true,
+    managerSessionOk: true,
     message: null,
     defaultApiHostId: 'default',
     apiKeyEncryptionEnabled: true,
@@ -229,34 +219,15 @@ describe('SettingsPage — field policy filter', () => {
   });
 });
 
-describe('SettingsPage — RBAC tooltip on disabled Save buttons', () => {
-  it('renders the access message when the user is not an administrator', async () => {
-    mockEnsureManagerSession.mockResolvedValue({
-      administrator: false,
-      message: 'Administrator role required to change settings.',
-      defaultApiHostId: 'default',
-      apiKeyEncryptionEnabled: true,
-    });
+describe('SettingsPage — settings-access probe', () => {
+  it('fails open (page usable, nothing blocked) when the settings-access probe itself fails', async () => {
+    mockService.getSettingsAccess.mockRejectedValue(new Error('network error'));
 
     render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
 
-    await waitFor(() => {
-      expect(
-        screen.getAllByText('Administrator role required to change settings.')
-          .length,
-      ).toBeGreaterThan(0);
-    });
-  });
-
-  it('fails open (no callout, saving not blocked) when the access probe itself fails', async () => {
-    mockEnsureManagerSession.mockResolvedValue(null);
-
-    render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
-
-    await waitFor(() => expect(mockEnsureManagerSession).toHaveBeenCalled());
-    expect(
-      screen.queryByText(/administrator role required/i),
-    ).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(mockService.getSettingsAccess).toHaveBeenCalled(),
+    );
     expect(
       await screen.findByRole('button', { name: /add provider/i }),
     ).toBeEnabled();
