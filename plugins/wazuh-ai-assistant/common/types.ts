@@ -20,6 +20,21 @@ export interface JsonSchemaPrimitive {
   type: JsonSchemaPrimitiveType;
   description?: string;
   enum?: Array<string | number>;
+  /**
+   * Marks a `string`-typed property whose canonical content is itself JSON-encoded text (today:
+   * only search-wazuh-data.ts's `query_dsl`, a stringified OpenSearch request body — this file's
+   * `JsonSchemaObject` has no nested-object property type to declare it against directly, see the
+   * file header comment above). Two consumers key off this flag: wire-schema.ts's
+   * `widenNumericTypes` widens the property's WIRE type to `["string","object"]` (marker stripped
+   * before the schema reaches the provider — it is not a standard JSON Schema keyword) so a model
+   * that naturally emits nested JSON as a live object isn't hard-rejected by provider-side
+   * argument validation (e.g. Groq's), and server/tools/schema-validator.ts's `coerce` stringifies
+   * an object-valued argument back to the declared `string` type once the call arrives. Absent
+   * (the default) on every other string property, so an object emitted for e.g. `agent_name`
+   * still fails validation instead of being silently accepted as a JSON-blob string that matches
+   * nothing downstream.
+   */
+  jsonString?: true;
 }
 
 export interface JsonSchemaArray {
@@ -59,6 +74,24 @@ export interface ToolCall {
   id: string;
   name: string;
   arguments: Record<string, unknown>;
+  /**
+   * Vendor-specific fields the provider attached to the tool-call entry itself (sibling to
+   * `id`/`type`/`function` on the wire), captured verbatim so a later round can echo them back.
+   * Gemini's OpenAI-compatible endpoint is the motivating case: it requires `thought_signature`
+   * to be replayed on the next request's `tool_calls[]` entry or the call is rejected with
+   * "Function call is missing a thought_signature in functionCall parts" — but this is generic
+   * passthrough, not a Gemini special case. Absent for every provider that doesn't send extras
+   * (OpenAI, Groq, Bedrock, Ollama, ...), so re-serializing is a no-op for them.
+   */
+  vendorExtras?: Record<string, unknown>;
+  /**
+   * Same passthrough as `vendorExtras`, but for fields nested inside the tool call's `function`
+   * object (name/arguments' sibling) rather than the tool-call entry itself — some providers
+   * (Gemini included, depending on the exact wire revision) put their extra field there instead
+   * of at the outer level, so both locations are captured independently and replayed back to
+   * whichever one they came from.
+   */
+  functionVendorExtras?: Record<string, unknown>;
 }
 
 export type CanonicalToolChoice =
@@ -74,6 +107,21 @@ export interface ChatMessage {
   toolCalls?: ToolCall[];
   /** Set on role:'tool' messages: which ToolCall.id this result answers. */
   toolCallId?: string;
+  /**
+   * Vendor-specific fields the provider attached to the assistant message itself (not to a
+   * specific tool call — see `ToolCall.vendorExtras` for that), captured verbatim so a LATER
+   * ROUND WITHIN THE SAME TURN can echo them back (server/routes/chat.ts rebuilds its own
+   * in-process `messages` accumulator from these while a multi-round turn is in flight).
+   * Deliberately does NOT survive a turn boundary: `ToolExchange` (common/chat-history.ts), the
+   * only thing that persists a tool call across turns/conversation reloads, has no field for it,
+   * so a message-level extra is lost the moment the turn ends. That is an accepted limitation, not
+   * a gap needing a fix -- every known case of a *required* extra (Gemini's `thought_signature`)
+   * is a `ToolCall`-level field, not a message-level one, and `ToolCall.vendorExtras`/
+   * `functionVendorExtras` DO survive the turn boundary (see their own doc comments above and
+   * `ToolExchange`). Generic passthrough: absent, and therefore a no-op, for every provider that
+   * never sends message-level extras.
+   */
+  vendorExtras?: Record<string, unknown>;
 }
 
 /** One client-held pseudonym mapping entry: a real value and
@@ -105,6 +153,18 @@ export interface TableColumn {
   id: string;
   label: string;
 }
+
+/**
+ * Client-side column-count budget for rendered result tables (issue #8921: no table may need a
+ * horizontal scrollbar): only the first MAX_VISIBLE_RESULT_COLUMNS of a `TableSpec.columns` list
+ * render as visible table columns; the rest stay reachable through the row expander, since
+ * buildTableSpec (server/tools/digest.ts) puts every spec-column field into each row object
+ * regardless of visibility. Lives in common/ because BOTH sides consult it: result-table.tsx
+ * applies it, and server/tools/catalog/visible-column-budget-coverage.test.ts asserts every
+ * tool's severity column sits INSIDE it — a severity badge demoted past the budget is invisible,
+ * which is the exact "missing severity" defect the issue lists.
+ */
+export const MAX_VISIBLE_RESULT_COLUMNS = 6;
 
 export interface TableSpec {
   columns: TableColumn[];
@@ -145,10 +205,27 @@ export interface StreamUsage {
 }
 
 export type StreamEvent =
-  | { type: 'delta'; content: string }
+  /**
+   * `reasoningFallback` (issue #8935 item I3): set by openai-compatible.ts's reasoning-channel
+   * fallback ONLY — the one path where a provider's raw deliberation text is surfaced as the
+   * answer because no real `content` ever arrived. The client renders it like any delta;
+   * server-side orchestration (chat.ts) uses the flag to keep deliberation text — which routinely
+   * names a tool the model decided NOT to call — out of the deferred-offer interception. Optional
+   * and absent everywhere else, so every other producer/consumer is untouched.
+   */
+  | { type: 'delta'; content: string; reasoningFallback?: true }
   | { type: 'table'; spec: TableSpec }
-  /** Emitted once per call, fully assembled server-side; the browser never sees partial JSON. */
-  | { type: 'tool_call'; toolCall: ToolCall }
+  /**
+   * Emitted once per call, fully assembled server-side; the browser never sees partial JSON.
+   * `messageVendorExtras`, when present, belongs on the assistant message this call is part of
+   * (see `ChatMessage.vendorExtras`) rather than on the call itself — carried here because the
+   * adapter never constructs a `ChatMessage` directly, only `StreamEvent`s.
+   */
+  | {
+      type: 'tool_call';
+      toolCall: ToolCall;
+      messageVendorExtras?: Record<string, unknown>;
+    }
   /**
    * Transient progress line (e.g. "querying Wazuh") shown between deltas while the engine works.
    */
@@ -167,6 +244,28 @@ export type StreamEvent =
    */
   | { type: 'digest'; toolCallId: string; content: string }
   | { type: 'done'; usage?: StreamUsage }
+  /**
+   * The graceful-failure handoff (server/tools/suggest-discover-query.ts): emitted instead of a
+   * table when the model determines the data the user asked about is out of reach for every tool
+   * available to it — a blocked index, a filter search_wazuh_data cannot express within its rules,
+   * or a time range beyond the 90-day maximum — rather than guessing or silently answering a
+   * narrower question than the one asked. `index`/`dsl` are enough to build a Discover deep link
+   * (see common/discover-url.ts's `buildDiscoverUrl`, the same helper the `table` event's
+   * `TableSpec.discover` already uses) for the query the user should run themselves; `dsl` may
+   * already have its field-level filters stripped down to index + time range only when their field
+   * names could not be verified against the target index (see suggest-discover-query.ts's
+   * `resolveSuggestedDsl` doc comment for why). `reason` is the model's own plain-language
+   * explanation of what it could not check, shown to the user next to the link — but NOT always
+   * verbatim: whenever `dsl` above lost field-level filters relative to what the model asked to
+   * show, chat.ts appends a fixed disclosure sentence to `reason` so the two can never silently
+   * diverge (the link would otherwise promise a filter it does not carry — issue #8920 item 9).
+   */
+  | {
+      type: 'suggested_query';
+      index: string;
+      dsl: Record<string, unknown>;
+      reason: string;
+    }
   | { type: 'error'; message: string }
   /**
    * Session-expiry recovery UX (the dashboard's
@@ -201,8 +300,8 @@ export interface ConversationSummary {
  * resumed conversation needs in order to be the SAME conversation rather than a summary of one.
  *
  * Both are optional, and deliberately so: conversations saved before they existed simply lack them
- * and resume exactly as they did before (no migration — `messages` is an `enabled: false` opaque
- * object in the saved-object mappings, see server/saved_objects/conversation.ts).
+ * and resume exactly as they did before (no migration — `messages` is stored as an opaque,
+ * unindexed blob, see server/conversation-store.ts's `ConversationDocument`).
  *
  * What was lost without them: `createdAt` meant every message in a resumed conversation was stamped
  * with the moment of the resume, so a conversation from last week read as seconds old; and dropping
@@ -229,15 +328,16 @@ export interface ConversationRecord extends ConversationSummary {
   messages: PersistedChatMessage[];
   /**
    * Optimistic-concurrency token (two tabs on the
-   * same conversation previously overwrote each other, last-write-wins). Opaque, OSD-assigned
-   * (the underlying saved object's own `version`) — never parsed or compared client-side, only
-   * round-tripped: the client remembers the value from the last GET/POST/PUT response it saw for
-   * this conversation and sends it back as `expectedVersion` on its next PUT (server/routes/
-   * conversations.ts) so a write against a since-changed row 409s instead of silently overwriting
-   * it. `undefined` only in the defensive case where the saved-objects client itself omits a
-   * version (does not happen in practice on this OSD version, but the type stays honest about it).
-   * Deliberately absent from `ConversationSummary` — the list route never needed a version before
-   * this fix and still doesn't (only single-conversation GET/POST/PUT round-trip it).
+   * same conversation previously overwrote each other, last-write-wins). Opaque — encodes
+   * OpenSearch's `seq_no`/`primary_term` pair (server/conversation-store.ts's `encodeVersion`) —
+   * never parsed or compared client-side, only round-tripped: the client remembers the value from
+   * the last GET/POST/PUT response it saw for this conversation and sends it back as
+   * `expectedVersion` on its next PUT (server/routes/conversations.ts) so a write against a
+   * since-changed document 409s instead of silently overwriting it. `undefined` only in the
+   * defensive case where a version token could not be decoded (does not happen in practice, but
+   * the type stays honest about it). Deliberately absent from `ConversationSummary` — the list
+   * route never needed a version before this fix and still doesn't (only single-conversation
+   * GET/POST/PUT round-trip it).
    */
   version?: string;
 }

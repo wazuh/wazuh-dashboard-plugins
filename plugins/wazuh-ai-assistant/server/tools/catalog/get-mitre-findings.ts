@@ -1,7 +1,10 @@
 import { ToolDefinition } from '../types';
+import { BREAKDOWN_BUCKET_CAP } from '../digest';
 import {
   findingDigestColumns,
   findingRowFields,
+  FINDING_BREAKDOWN_AGGS,
+  FINDING_BREAKDOWN_DIMENSIONS,
   clampLimit,
   limitProperty,
   objectSchema,
@@ -10,24 +13,132 @@ import {
   timeRangeProperties,
 } from './common';
 
+/** Bare parent technique id, e.g. "T1059" -- no sub-technique dot. A dotted id ("T1059.001") names
+ * one specific sub-technique and must NOT match this. */
+const PARENT_TECHNIQUE_ID_RE = /^T\d+$/i;
+
+/** Dotted sub-technique id, e.g. "T1059.001". Only used to decide whether an input LOOKS like an
+ * ATT&CK id at all, so case-normalization can be skipped for anything that does not. */
+const SUB_TECHNIQUE_ID_RE = /^T\d+\.\d+$/i;
+
+/**
+ * Sub-technique rollup (issue #8920 item 2): a bare parent id must match its own exact bucket
+ * AND every "<id>.NNN" sub-technique -- MITRE ATT&CK itself treats a parent technique as
+ * covering its children, so a `term`-only filter on "T1059" silently excludes every
+ * T1059.001/.002/... finding, undercounting "how many T1059 findings" questions. Expressed as a
+ * `should` of an exact `term` plus a `prefix` on "<id>." (guardrail-legal shape -- see
+ * get-sca-checks.ts:131's `prefix` precedent; `wazuh.rule.mitre.technique.id` is already on
+ * guardrails.ts's `AGG_FIELD_ALLOWLIST`, so this needs no guard change). A dotted id is already
+ * maximally specific and stays an exact `term`, never broadened --
+ * `technique-rollup-coverage.test.ts` pins both halves of this for every present and future tool
+ * with a technique-id parameter, not just this one.
+ */
+function buildMitreTechniqueFilter(
+  techniqueId: string,
+): Record<string, unknown> {
+  // MITRE ids are indexed UPPERCASE and `term`/`prefix` on a keyword field are case-sensitive:
+  // a caller's "t1110" would otherwise build a query that matches nothing at all — a silent
+  // 0-row lie, strictly worse than the undercount this rollup fixes. Case-normalization is
+  // GATED ON THE ID SHAPE, though: an input that is not an ATT&CK id is passed through verbatim
+  // rather than upper-cased, so a caller's own string is never rewritten on its way into an error
+  // message or a 0-row explanation (same principle as this issue's "preserve user-supplied
+  // identifiers verbatim" rule for agent names).
+  const isAttackId =
+    PARENT_TECHNIQUE_ID_RE.test(techniqueId) ||
+    SUB_TECHNIQUE_ID_RE.test(techniqueId);
+  const normalized = isAttackId ? techniqueId.toUpperCase() : techniqueId;
+  if (!PARENT_TECHNIQUE_ID_RE.test(normalized)) {
+    return { term: { 'wazuh.rule.mitre.technique.id': normalized } };
+  }
+  return {
+    bool: {
+      minimum_should_match: 1,
+      should: [
+        { term: { 'wazuh.rule.mitre.technique.id': normalized } },
+        { prefix: { 'wazuh.rule.mitre.technique.id': `${normalized}.` } },
+      ],
+    },
+  };
+}
+
+/** Escapes a normalized MITRE id for embedding in a `terms.include` Lucene-regexp pattern. The id
+ * is already restricted to `[A-Za-z0-9.]` (an ATT&CK id) or passed through verbatim (a defensive
+ * non-ATT&CK fallback -- see buildMitreTechniqueFilter), so the only character that can carry
+ * regexp meaning is the sub-technique dot, which must be escaped to match literally rather than
+ * "any character". */
+function escapeTechniqueIdForRegexp(id: string): string {
+  return id.replace(/\./g, '\\.');
+}
+
+/**
+ * Builds the `terms.include` pattern that scopes the technique_ids breakdown aggregation to the
+ * requested id and its sub-techniques -- the aggregation-side counterpart of
+ * buildMitreTechniqueFilter's query-side rollup above, and the fix for a real disclosure loss:
+ * `wazuh.rule.mitre.technique.id` is a keyword ARRAY, so one document commonly carries several
+ * co-tagged technique ids (live evidence: a single finding tagged with six ids spanning three
+ * unrelated tactics). Those co-tags compete for the SAME `BREAKDOWN_BUCKET_CAP` (5) bucket slots
+ * as the ids the user actually asked about, so a sufficiently co-tagged population can push a
+ * genuine parent/sub-technique pair out of the top 5 entirely -- silently dropping the very
+ * exact-vs-rolled-up split this aggregation exists to disclose (see this file's header comment).
+ * Scoping via `include` removes co-tagged ids from the aggregation's candidate set altogether
+ * (they are excluded before bucketing, not merely outranked), so they can no longer crowd out the
+ * requested id's own buckets regardless of population size.
+ *
+ * Mirrors buildMitreTechniqueFilter's rollup exactly: a bare parent id matches itself and every
+ * "<id>.NNN" sub-technique; a dotted id, or anything not ATT&CK-id-shaped, is already maximally
+ * specific and matches only itself. Returns undefined for "no technique_id supplied" (the "any
+ * MITRE-tagged finding" case), where an unscoped top-N breakdown across the full tagged
+ * population is the correct, unchanged behavior.
+ */
+function buildTechniqueIdsAggInclude(
+  techniqueId: string | undefined,
+): string | undefined {
+  if (!techniqueId) {
+    return undefined;
+  }
+  const isAttackId =
+    PARENT_TECHNIQUE_ID_RE.test(techniqueId) ||
+    SUB_TECHNIQUE_ID_RE.test(techniqueId);
+  const normalized = isAttackId ? techniqueId.toUpperCase() : techniqueId;
+  const escaped = escapeTechniqueIdForRegexp(normalized);
+  if (!PARENT_TECHNIQUE_ID_RE.test(normalized)) {
+    return escaped;
+  }
+  return `${escaped}(\\..*)?`;
+}
+
 /**
  * MITRE ATT&CK-tagged findings. MITRE-tagged findings are detected via an `exists` filter on
- * `wazuh.rule.mitre.technique.id` (a `keyword`-mapped array), with `wazuh.rule.mitre.technique.name`
- * and `wazuh.rule.mitre.tactic.name` as sibling display columns. `technique_id` narrows to one
- * exact technique via a `term` match on `wazuh.rule.mitre.technique.id`; omitted, the tool falls
- * back to the `exists` filter for "any MITRE-tagged finding".
+ * `wazuh.rule.mitre.technique.id` (a `keyword`-mapped array), with
+ * `wazuh.rule.mitre.technique.name` and `wazuh.rule.mitre.tactic.name` as sibling display
+ * columns. `technique_id` narrows to one technique AND its sub-techniques via
+ * `buildMitreTechniqueFilter` above (a dotted id stays exact); omitted, the tool falls back to
+ * the `exists` filter for "any MITRE-tagged finding". A `terms` agg on the same field is always
+ * attached so the digest `breakdown` discloses the exact-vs-rolled-up split population-true
+ * ("T1059: 3, T1059.001: 9") rather than leaving the model to infer it from `samples` alone --
+ * the disclosure this rollup exists for is a data field, not a sentence of prose. When a
+ * technique_id was requested, that aggregation is scoped to the id's own family via
+ * `buildTechniqueIdsAggInclude` (an `include` pattern) so co-tagged ids on the SAME document
+ * (the field is a keyword ARRAY) cannot crowd the requested id's buckets out of the bucket cap --
+ * see that function's doc comment for the live evidence and the mechanism.
  */
 export const getMitreFindingsTool: ToolDefinition = {
   spec: {
     name: 'get_mitre_findings',
     description:
       'Searches security findings for findings mapped to MITRE ATT&CK techniques, within a time ' +
-      'range, most recent first. Optional technique_id (e.g. "T1110") narrows to one exact ' +
-      'technique; omit it to list any MITRE-tagged finding.',
+      'range, most recent first. Optional technique_id (e.g. "T1110") covers that technique AND ' +
+      'its sub-techniques (e.g. "T1059" includes every "T1059.*"); pass a dotted id (e.g. ' +
+      '"T1059.001") to narrow to one sub-technique only. Omit technique_id to list any ' +
+      'MITRE-tagged finding. The digest breakdown shows counts per exact technique id, so a ' +
+      'rolled-up parent id call still shows which sub-technique(s) the matches actually belong to.',
     parameters: objectSchema({
       technique_id: {
         type: 'string',
-        description: 'Optional exact MITRE technique ID, e.g. "T1110".',
+        description:
+          'Optional MITRE technique ID, e.g. "T1110". A bare parent id ("T1059") also matches ' +
+          'its sub-techniques ("T1059.001", "T1059.002", ...); pass a dotted id for one ' +
+          'sub-technique only.',
       },
       limit: limitProperty(
         'Max number of findings to return (default 20, max 500).',
@@ -42,8 +153,9 @@ export const getMitreFindingsTool: ToolDefinition = {
     const { gte, lte } = resolveTimeRange(params);
     const techniqueId = optionalStringParam(params.technique_id);
     const mitreFilter = techniqueId
-      ? { term: { 'wazuh.rule.mitre.technique.id': techniqueId } }
+      ? buildMitreTechniqueFilter(techniqueId)
       : { exists: { field: 'wazuh.rule.mitre.technique.id' } };
+    const techniqueIdsInclude = buildTechniqueIdsAggInclude(techniqueId);
     return {
       target: 'indexer',
       index: 'wazuh-findings-v5*',
@@ -55,18 +167,52 @@ export const getMitreFindingsTool: ToolDefinition = {
         },
         sort: [{ '@timestamp': { order: 'desc' } }],
         size: limit,
+        // Population-true breakdowns over the FULL matched set — BOTH halves are load-bearing:
+        // FINDING_BREAKDOWN_AGGS (issue #8920 item 1 — agent/rule-title distribution, same
+        // mechanism as every other finding-hits tool; this tool was missed when that fix first
+        // landed) AND technique_ids (issue #8920 item 2 — the per-exact-technique-id split the
+        // rollup above broadens the match for, so the model can attribute rolled-up rows to
+        // their sub-technique). Three top-level aggs total, inside guardrails'
+        // MAX_TOP_LEVEL_AGGS.
+        //
+        // technique_ids carries an `include` (buildTechniqueIdsAggInclude above) whenever a
+        // technique_id was requested: `wazuh.rule.mitre.technique.id` is a keyword ARRAY, so
+        // co-tagged ids on the same document compete with the requested id's own buckets for
+        // BREAKDOWN_BUCKET_CAP slots -- without scoping, a co-tag-heavy population can push the
+        // requested id's parent/sub-technique buckets out of the top 5 and silently drop the
+        // split disclosure this aggregation exists for. `include` is on `AGG_FIELD_ALLOWLIST`'s
+        // TERMS_LIKE_AGG_KEYS path in guardrails.ts, which checks only `field`/`size` -- it does
+        // not inspect or restrict `include`, and the near-miss probe in executor.ts already
+        // relies on the same mechanism. No technique_id at all ("any MITRE-tagged finding")
+        // leaves `include` unset, unchanged from before.
+        aggs: {
+          ...FINDING_BREAKDOWN_AGGS,
+          technique_ids: {
+            terms: {
+              field: 'wazuh.rule.mitre.technique.id',
+              size: BREAKDOWN_BUCKET_CAP,
+              ...(techniqueIdsInclude ? { include: techniqueIdsInclude } : {}),
+            },
+          },
+        },
       },
     };
   },
   tableSpec: {
     columns: [
+      // Column order (issue #8921's budget item): the severity badge MUST sit inside the
+      // client's MAX_VISIBLE_RESULT_COLUMNS budget — the issue lists "missing severity" as a
+      // defect, and a severity column demoted past the budget is invisible (enforced
+      // registry-wide by visible-column-budget-coverage.test.ts). Tactic is the column demoted
+      // to the row expander: it is derivable from the technique and the least
+      // decision-relevant of the seven.
       { field: '@timestamp', label: 'Time' },
       { field: 'wazuh.agent.name', label: 'Agent' },
       { field: 'wazuh.rule.title', label: 'Title' },
+      { field: 'wazuh.rule.level', label: 'Level', severity: true },
       { field: 'wazuh.rule.mitre.technique.id', label: 'Technique ID' },
       { field: 'wazuh.rule.mitre.technique.name', label: 'Technique' },
       { field: 'wazuh.rule.mitre.tactic.name', label: 'Tactic' },
-      { field: 'wazuh.rule.level', label: 'Level', severity: true },
     ],
     // Same finding-hits investigation row set as the other finding tools
     // (server/tools/catalog/common.ts). `wazuh.rule.mitre.technique.id` is already a visible column
@@ -91,5 +237,6 @@ export const getMitreFindingsTool: ToolDefinition = {
       'wazuh.rule.mitre.technique.name',
       'wazuh.rule.mitre.tactic.name',
     ]),
+    breakdownDimensions: FINDING_BREAKDOWN_DIMENSIONS,
   },
 };

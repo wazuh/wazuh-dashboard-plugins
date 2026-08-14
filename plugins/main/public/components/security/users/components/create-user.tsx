@@ -117,9 +117,9 @@ export const CreateUser = ({ closeFlyout }) => {
       {
         fn: () =>
           !password.match(
-            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,64}$/,
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{12,64}$/,
           )
-            ? 'The password must contain a length between 8 and 64 characters, and must contain at least one upper and lower case letter, a number and a symbol.'
+            ? 'The password must contain a length between 12 and 64 characters, and must contain at least one upper and lower case letter, a number and a symbol.'
             : '',
       },
     ],

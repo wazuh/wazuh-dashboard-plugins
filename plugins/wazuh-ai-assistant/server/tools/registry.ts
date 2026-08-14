@@ -4,8 +4,10 @@ import { getAgentsTool } from './catalog/get-agents';
 import { getCriticalFindingsTool } from './catalog/get-critical-findings';
 import { searchFindingsByAgentTool } from './catalog/search-findings-by-agent';
 import { getTopRulesTool } from './catalog/get-top-rules';
+import { getTopAgentsTool } from './catalog/get-top-agents';
 import { getCriticalVulnerabilitiesTool } from './catalog/get-critical-vulnerabilities';
 import { getFindingsByTimeTool } from './catalog/get-findings-by-time';
+import { getEventsByAgentTool } from './catalog/get-events-by-agent';
 import { getBruteForceTool } from './catalog/get-brute-force';
 import { getSecuritySummaryTool } from './catalog/get-security-summary';
 import { getSuspiciousPowershellTool } from './catalog/get-suspicious-powershell';
@@ -23,10 +25,7 @@ import { getScaResultsTool } from './catalog/get-sca-results';
 import { getScaChecksTool } from './catalog/get-sca-checks';
 import { getMitreFindingsTool } from './catalog/get-mitre-findings';
 import { getMitreSummaryTool } from './catalog/get-mitre-summary';
-import { getAgentOsTool } from './catalog/get-agent-os';
-import { getAgentPackagesTool } from './catalog/get-agent-packages';
-import { getAgentPortsTool } from './catalog/get-agent-ports';
-import { getAgentProcessesTool } from './catalog/get-agent-processes';
+import { getAgentInventoryTool } from './catalog/get-agent-inventory';
 import { getRulesTool } from './catalog/get-rules';
 import { getThreatIntelComponentsTool } from './catalog/get-threat-intel-components';
 import { getDetectorsTool } from './catalog/get-detectors';
@@ -51,9 +50,17 @@ const CATALOG: ToolDefinition[] = [
   searchFindingsByAgentTool,
   getTopRulesTool,
   getCriticalVulnerabilitiesTool,
+  // Entity-pivot counterpart to get_top_rules above -- "which agents are noisiest" (GA benchmark
+  // gap). Kept adjacent to get_top_rules since both are the same "aggregate and rank" shape.
+  getTopAgentsTool,
 
   // General finding search / summary
   getFindingsByTimeTool,
+  // Raw event stream (issue: "Add a typed events tool over wazuh-events-v5") -- the mirror image
+  // of the finding-hits tools above: ALL normalized events, matched or not, not just rule-matched
+  // detections. Kept adjacent to them in this list since the two are the same category
+  // (server/tools/router.ts's TOOL_CATEGORY) and are the tools users most often conflate.
+  getEventsByAgentTool,
   getBruteForceTool,
   getSecuritySummaryTool,
   getSuspiciousPowershellTool,
@@ -80,11 +87,9 @@ const CATALOG: ToolDefinition[] = [
   getMitreFindingsTool,
   getMitreSummaryTool,
 
-  // Syscollector inventory
-  getAgentOsTool,
-  getAgentPackagesTool,
-  getAgentPortsTool,
-  getAgentProcessesTool,
+  // Syscollector inventory (get_agent_os/get_agent_packages/get_agent_ports/get_agent_processes
+  // were consolidated into this one tool -- see get-agent-inventory.ts's doc comment)
+  getAgentInventoryTool,
 
   // Security Analytics content: ruleset + pipeline components + detector definitions
   getRulesTool,

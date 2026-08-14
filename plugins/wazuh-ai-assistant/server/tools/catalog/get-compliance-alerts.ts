@@ -7,6 +7,8 @@ import { ToolDefinition } from '../types';
 import {
   findingDigestColumns,
   findingRowFields,
+  FINDING_BREAKDOWN_AGGS,
+  FINDING_BREAKDOWN_DIMENSIONS,
   clampLimit,
   limitProperty,
   objectSchema,
@@ -119,6 +121,10 @@ export const getComplianceAlertsTool: ToolDefinition = {
         },
         sort: [{ '@timestamp': { order: 'desc' } }],
         size: limit,
+        // Population-true agent/rule-title breakdown over the FULL matched set (issue #8920 item
+        // 1) -- same mechanism as the other finding-hits tools (common.ts's FINDING_BREAKDOWN_AGGS
+        // doc comment); this tool was missed when that fix first landed.
+        aggs: FINDING_BREAKDOWN_AGGS,
       },
     };
   },
@@ -134,5 +140,6 @@ export const getComplianceAlertsTool: ToolDefinition = {
       ...findingDigestColumns(STANDARD_FINDING_SAMPLE_COLUMNS),
       ...COMPLIANCE_ROW_FIELDS,
     ],
+    breakdownDimensions: FINDING_BREAKDOWN_DIMENSIONS,
   },
 };

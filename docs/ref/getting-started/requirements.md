@@ -43,7 +43,7 @@ Supported Linux distributions:
 
 Required packages (automatically installed with Wazuh dashboard):
 
-- **Debian/Ubuntu**: `debhelper`, `tar`, `curl`, `libcap2-bin`
+- **Debian/Ubuntu**: `tar`, `curl`, `libcap2-bin`
 - **RHEL/CentOS**: `libcap`
 
 ## Network requirements

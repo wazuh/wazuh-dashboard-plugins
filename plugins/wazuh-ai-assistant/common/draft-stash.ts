@@ -26,7 +26,7 @@
  *
  * There is no client-side identity to key the stash on, and adding one would mean a new server
  * route: `GET /settings/access` (server/routes/settings.ts, wrapped by
- * `services/settings-service.ts#getSettingsAccess`) returns only `{administrator, message,
+ * `services/settings-service.ts#getSettingsAccess`) returns only `{managerSessionOk, message,
  * defaultApiHostId}`, and `plugin.ts` declares no `requiredPlugins`/`optionalPlugins` on the
  * platform `security` plugin, so there is no `core.security`/`authc` surface to read either.
  * Instead of inventing an identity, this module:

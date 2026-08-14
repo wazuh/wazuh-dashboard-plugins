@@ -1,8 +1,16 @@
+import path from 'path';
+import fs from 'fs';
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import {
+  act,
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { createBrowserHistory } from 'history';
-import { ChatPage } from './chat-page';
+import { ChatPage, CONVERSATIONS_CHANGED_EVENT } from './chat-page';
 import {
   ConversationRecord,
   PersistedChatMessage,
@@ -36,7 +44,7 @@ const mockSettingsService = {
   getAssistantSettings: jest.fn(),
   getSettingsAccess: jest.fn(),
 };
-const mockHealManagerSession = jest.fn();
+const mockEnsureManagerSession = jest.fn();
 const mockOpenConfirm = jest.fn();
 
 jest.mock('../../services/chat-service', () => ({
@@ -63,7 +71,8 @@ jest.mock('../../services/settings-service', () => ({
 }));
 
 jest.mock('../../services/session-heal', () => ({
-  healManagerSession: (...args: unknown[]) => mockHealManagerSession(...args),
+  ensureManagerSession: (...args: unknown[]) =>
+    mockEnsureManagerSession(...args),
 }));
 
 jest.mock('./discover-link', () => ({
@@ -202,12 +211,30 @@ function lastSavedRoleContent(mock: jest.Mock): Array<[string, string]> {
 }
 
 /**
+ * Finds a conversation's SIDEBAR ROW by its title text. Once a conversation is both open (the
+ * conversation header now shows its title as an `<h1>`, chat-page.tsx) and listed in the sidebar,
+ * the same title string can render twice on screen — `screen.getByText` would then throw on an
+ * ambiguous match, so every lookup goes through here instead, which disambiguates by picking the
+ * match inside the sidebar's own `[role="button"]` row.
+ */
+function conversationRow(title: string): HTMLElement {
+  const row = screen
+    .getAllByText(title)
+    .map(element => element.closest('[role="button"]'))
+    .find((element): element is HTMLElement => element !== null);
+  if (!row) {
+    throw new Error(`No conversation row found for "${title}"`);
+  }
+  return row;
+}
+
+/**
  * Opens another conversation from the sidebar. A mid-stream switch asks for confirmation first
  * (`overlays.openConfirm`, mocked to accept by default), so every such switch in these tests goes
  * through here rather than assuming a bare click is enough.
  */
 async function leaveForConversation(title: string) {
-  fireEvent.click(screen.getByText(title));
+  fireEvent.click(conversationRow(title));
   await waitFor(() => expect(mockConversationsService.get).toHaveBeenCalled());
 }
 
@@ -228,6 +255,8 @@ beforeEach(() => {
   // real navigation for that, only for pushState/replaceState-driven changes).
   window.history.replaceState(null, '', '/');
   window.sessionStorage.clear();
+  // startTurn awaits this pre-turn guard; `null` (probe failed, fail-open) is the neutral default.
+  mockEnsureManagerSession.mockResolvedValue(null);
   mockSettingsService.getAssistantSettings.mockResolvedValue({
     privacyDefaultOn: false,
     privacyDefaultPerProvider: {},
@@ -261,7 +290,7 @@ describe('ChatPage — turn abandoned mid-stream', () => {
 
     renderChatPage();
     await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
     );
     await sendMessage('first question');
     stream.push({ type: 'delta', content: 'partial ' });
@@ -285,7 +314,7 @@ describe('ChatPage — turn abandoned mid-stream', () => {
 
     renderChatPage();
     await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
     );
     await sendMessage('first question');
     stream.push({ type: 'delta', content: 'partial answer' });
@@ -343,7 +372,7 @@ describe('ChatPage — turn abandoned mid-stream', () => {
 
     renderChatPage();
     await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
     );
     await sendMessage('first question');
     stream.push({ type: 'delta', content: 'partial answer' });
@@ -379,7 +408,7 @@ describe('ChatPage — turn abandoned mid-stream', () => {
 
     renderChatPage();
     await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
     );
     await sendMessage('first question');
     expect(screen.getByLabelText('Chat message')).toBeDisabled();
@@ -433,7 +462,10 @@ describe('ChatPage — turn abandoned mid-stream', () => {
     );
 
     const signal = lastStreamSignal();
-    fireEvent.click(screen.getByText('New conversation'));
+    // getByRole (not getByText): the conversation header's own "New conversation" fallback
+    // title (chat-page.tsx, shown while no conversation is active) can render the exact same
+    // string at the same time as this sidebar button.
+    fireEvent.click(screen.getByRole('button', { name: 'New conversation' }));
 
     await waitFor(() => expect(signal.aborted).toBe(true));
     await waitFor(() =>
@@ -481,7 +513,7 @@ describe('ChatPage — turn abandoned mid-stream', () => {
 
     renderChatPage();
     await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
     );
     await sendMessage('first question');
     firstStream.push({
@@ -646,7 +678,10 @@ describe('ChatPage — restoring the open conversation', () => {
       expect(screen.getByText('earlier question')).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByText('New conversation'));
+    // getByRole (not getByText): the conversation header's own "New conversation" fallback
+    // title (chat-page.tsx, shown while no conversation is active) can render the exact same
+    // string at the same time as this sidebar button.
+    fireEvent.click(screen.getByRole('button', { name: 'New conversation' }));
 
     await waitFor(() => expect(window.location.pathname).toBe('/'));
     expect(
@@ -685,6 +720,21 @@ describe('ChatPage — restoring the open conversation', () => {
     await waitFor(() =>
       expect(window.location.pathname).toBe('/conversation/conv-b'),
     );
+  });
+
+  it('hides the saved-conversations sidebar when showConversationSidebar is false', () => {
+    const view = renderChatPage({ showConversationSidebar: false });
+
+    // getByRole (not getByText): the conversation header's own "New conversation" fallback
+    // title (chat-page.tsx) can render the exact same string as this sidebar button.
+    expect(
+      screen.queryByRole('button', { name: 'New conversation' }),
+    ).toBeNull();
+
+    view.rerenderWith({ showConversationSidebar: true });
+    expect(
+      screen.getByRole('button', { name: 'New conversation' }),
+    ).toBeInTheDocument();
   });
 });
 
@@ -912,6 +962,106 @@ describe('ChatPage — interrupted turns and failed saves', () => {
     );
   });
 
+  it('"Retry now" on the save-failed callout re-saves through the same path and clears the notice on success, without creating a second conversation', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+    // Persistent failure: both this turn's pre-send AND post-answer saves fail, so the notice is
+    // still up (with nothing else left to auto-retry it) when the user clicks the button.
+    mockConversationsService.create.mockRejectedValue(httpError(500));
+
+    renderChatPage();
+    await sendMessage('first question');
+    await waitFor(() =>
+      expect(
+        screen.getByText('This conversation is not being saved'),
+      ).toBeInTheDocument(),
+    );
+    stream.push({ type: 'delta', content: 'an answer' });
+    stream.push({ type: 'done' });
+    stream.end();
+    await waitFor(() =>
+      expect(mockConversationsService.create).toHaveBeenCalledTimes(2),
+    );
+    expect(
+      screen.getByText('This conversation is not being saved'),
+    ).toBeInTheDocument();
+
+    // Whatever was blocking the save is now fixed — the next attempt succeeds.
+    mockConversationsService.create.mockResolvedValueOnce(
+      conversationRecord({ id: 'conv-retried', version: 'v1' }),
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Retry now' }));
+
+    await waitFor(() =>
+      expect(
+        screen.queryByText('This conversation is not being saved'),
+      ).not.toBeInTheDocument(),
+    );
+    // Exactly one more `create` call — the retry reuses `persistConversationTurn`, not a second
+    // save implementation — and the conversation it just created becomes this tab's active one,
+    // never a second row: the update.mock check confirms this by targeting that id.
+    expect(mockConversationsService.create).toHaveBeenCalledTimes(3);
+    const [title, messages] = mockConversationsService.create.mock.calls[2];
+    expect(title).toBeTruthy();
+    expect(messages[messages.length - 1].content).toBe('an answer');
+
+    // A later turn updates the row the retry created instead of creating another one.
+    await sendMessage('second question');
+    await waitFor(() =>
+      expect(mockConversationsService.update).toHaveBeenCalled(),
+    );
+    expect(mockConversationsService.update.mock.calls[0][0]).toBe(
+      'conv-retried',
+    );
+    expect(mockConversationsService.create).toHaveBeenCalledTimes(3);
+  });
+
+  it('disables "Retry now" while a turn is generating, so it cannot double-create the conversation', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+    // The pre-send save (before any streaming starts) fails first, raising the callout while the
+    // turn is still generating; the post-answer save that follows once the stream ends succeeds.
+    mockConversationsService.create
+      .mockRejectedValueOnce(httpError(500))
+      .mockResolvedValueOnce(
+        conversationRecord({ id: 'conv-new', version: 'v1' }),
+      );
+
+    renderChatPage();
+    await sendMessage('first question');
+    await waitFor(() =>
+      expect(
+        screen.getByText('This conversation is not being saved'),
+      ).toBeInTheDocument(),
+    );
+    expect(mockConversationsService.create).toHaveBeenCalledTimes(1);
+
+    // The turn is still streaming: clicking "Retry now" here must be a no-op — it is disabled
+    // precisely so this window (the in-flight turn's own target not yet resolved, per
+    // `handleRetrySave`'s doc comment) can never race the turn's own saves into a second create.
+    const retryButton = screen.getByRole('button', { name: 'Retry now' });
+    expect(retryButton).toBeDisabled();
+    fireEvent.click(retryButton);
+    expect(mockConversationsService.create).toHaveBeenCalledTimes(1);
+
+    stream.push({ type: 'delta', content: 'an answer' });
+    stream.push({ type: 'done' });
+    stream.end();
+
+    // Only the turn's own post-answer save creates the row — never a second one from the blocked
+    // retry click.
+    await waitFor(() =>
+      expect(
+        screen.queryByText('This conversation is not being saved'),
+      ).not.toBeInTheDocument(),
+    );
+    expect(mockConversationsService.create).toHaveBeenCalledTimes(2);
+  });
+
   it('does not raise the save notice for a 401, which has its own callout', async () => {
     const stream = createControllableStream();
     mockStreamChat.mockImplementation(
@@ -1071,8 +1221,10 @@ describe('ChatPage — feedback while a turn runs', () => {
     // The `digest` event that follows must not release the held table — it is held until TEXT
     // arrives, not until the next non-delta event comes along.
     stream.push({ type: 'digest', toolCallId: 't1', content: '{}' });
+    // The chip's label is derived from the tool call itself (name + time range), not from the
+    // table, so it appears with its final text even while the table is still held.
     await waitFor(() =>
-      expect(screen.getByText('1 query executed')).toBeInTheDocument(),
+      expect(screen.getByText('Top agents · 90d')).toBeInTheDocument(),
     );
     expect(screen.queryByText('web-01')).not.toBeInTheDocument();
 
@@ -1145,11 +1297,16 @@ describe('ChatPage — feedback while a turn runs', () => {
       },
     });
 
+    // No table event this turn, so the chip's label is derived purely from the tool call itself:
+    // its humanized name plus the default 90-day time window.
     await waitFor(() =>
-      expect(screen.getByText('1 query executed')).toBeInTheDocument(),
+      expect(screen.getByText('Wazuh data · 90d')).toBeInTheDocument(),
     );
-    expect(screen.getByText('search_wazuh_data')).toBeInTheDocument();
-    expect(screen.getByText(/wazuh-alerts-\*/)).toBeInTheDocument();
+    // Raw arguments are one click deeper, not on screen unbidden.
+    expect(screen.queryByText(/wazuh-alerts-\*/)).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('Wazuh data · 90d'));
+    expect(await screen.findByText(/wazuh-alerts-\*/)).toBeInTheDocument();
   });
 
   it('shows the executed queries again on a resumed conversation', async () => {
@@ -1180,8 +1337,144 @@ describe('ChatPage — feedback while a turn runs', () => {
     await waitFor(() =>
       expect(screen.getByText('42 alerts')).toBeInTheDocument(),
     );
-    expect(screen.getByText('1 query executed')).toBeInTheDocument();
-    expect(screen.getByText('search_wazuh_data')).toBeInTheDocument();
+    // No discover info on this restored table, but the chip's label doesn't need it — it's
+    // derived from the tool call itself, same as on a live turn.
+    expect(screen.getByText('Wazuh data · 90d')).toBeInTheDocument();
+  });
+});
+
+/**
+ * Coverage for issue #8920 item 7: a populated result table must never be overwritten by an empty
+ * one at end-of-stream. `chat-page.tsx` flushes its held table buffers (`pendingTable`,
+ * `pendingEmptyTable`) from three different call sites — `finally`, the `error` branch, and the
+ * `auth_expired` branch — and they do not all flush in the same order (`finally`/`auth_expired`
+ * flush the non-empty one first; `error` flushes the empty one first). On the unfixed code only
+ * `finally` was reachably broken: `error`'s empty-first order happened to be benign (the later
+ * non-empty commit won) and `auth_expired` fires on the initial POST's 401 before any SSE frame
+ * is read, so it can never hold a table. "Happens to be benign" is still worth pinning.
+ * The class fix is an order-INDEPENDENT invariant (see the `pendingEmptyTable` comment above it):
+ * an empty spec is refused on arrival once a non-empty table exists for the turn, and
+ * `flushPendingEmptyTable` independently yields to any pending/committed non-empty table.
+ *
+ * This is the UI-layer equivalent of the registry-wide coverage tests elsewhere in this codebase
+ * (see server/tools/catalog/agg-size-coverage.test.ts): the class here is "orderings of table
+ * events within one turn", and the five scenarios below enumerate it exhaustively for the
+ * single-table-per-message model — every place an empty `table` event can land relative to a
+ * non-empty one, plus the one honest-empty case that must still render.
+ */
+describe('ChatPage — an empty table never clobbers a populated one (issue #8920 item 7)', () => {
+  const ROWS_SPEC = {
+    columns: [{ id: 'agent', label: 'Agent' }],
+    rows: [{ agent: 'web-01' }],
+  };
+  const EMPTY_SPEC = { columns: [{ id: 'agent', label: 'Agent' }], rows: [] };
+
+  it('keeps the populated table when an empty one arrives after the answer text (text-flush path)', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('top agents?');
+
+    stream.push({ type: 'table', spec: ROWS_SPEC });
+    // The delta's text releases `pendingTable` into `committedTable` — by the time the empty table
+    // below arrives, the non-empty one is no longer "pending", it is already committed, which is
+    // exactly why `hasNonEmptyTableForTurn` also checks `committedTable`, not just `pendingTable`.
+    stream.push({ type: 'delta', content: 'here they are' });
+    await waitFor(() =>
+      expect(screen.getByText('here they are')).toBeInTheDocument(),
+    );
+    stream.push({ type: 'table', spec: EMPTY_SPEC });
+    stream.push({ type: 'done' });
+    stream.end();
+
+    await waitFor(() => expect(screen.getByText('web-01')).toBeInTheDocument());
+    expect(screen.queryByText('Results (0 rows)')).not.toBeInTheDocument();
+  });
+
+  it('keeps the populated table when an empty one arrives with no answer text (finally-path)', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('top agents?');
+
+    // No delta text this turn: both tables reach `finally` still held (`pendingTable` non-empty,
+    // the empty spec never even makes it into `pendingEmptyTable` — refused on arrival).
+    stream.push({ type: 'table', spec: ROWS_SPEC });
+    stream.push({ type: 'table', spec: EMPTY_SPEC });
+    stream.push({ type: 'done' });
+    stream.end();
+
+    await waitFor(() => expect(screen.getByText('web-01')).toBeInTheDocument());
+    expect(screen.queryByText('Results (0 rows)')).not.toBeInTheDocument();
+  });
+
+  it('shows the retried table when an empty attempt is followed by a real one', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('top agents?');
+
+    // A failed/empty first tool attempt, then a successful retry in the same turn — the suppression
+    // this buffer exists for in the first place must still work in the other direction.
+    stream.push({ type: 'table', spec: EMPTY_SPEC });
+    stream.push({ type: 'table', spec: ROWS_SPEC });
+    stream.push({ type: 'done' });
+    stream.end();
+
+    await waitFor(() => expect(screen.getByText('web-01')).toBeInTheDocument());
+  });
+
+  it('still shows an honest empty table when it is the only table this turn', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('top agents?');
+
+    stream.push({ type: 'table', spec: EMPTY_SPEC });
+    stream.push({ type: 'done' });
+    stream.end();
+
+    await waitFor(() =>
+      expect(screen.getByText('Results (0 rows)')).toBeInTheDocument(),
+    );
+  });
+
+  it('keeps the populated table when an empty one arrives and the turn then errors', async () => {
+    // The `error` call site's cell of the matrix: rows, THEN an empty table, THEN a mid-stream
+    // provider error. The `error` branch is the one call site that flushes the EMPTY buffer
+    // before the non-empty one (`flushPendingEmptyTable()` then `flushPendingTable()`) — on the
+    // unfixed code that order happened to be benign (the later non-empty commit won), but this
+    // scenario pins the cell so a future reorder of the `error` branch, or a change to which
+    // commit "wins", cannot silently reintroduce the clobber at this call site. With the fix the
+    // empty spec is already refused on arrival, so both halves of the invariant are exercised on
+    // the path that ends in `error` rather than `finally`.
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('top agents?');
+
+    stream.push({ type: 'table', spec: ROWS_SPEC });
+    stream.push({ type: 'table', spec: EMPTY_SPEC });
+    stream.push({ type: 'error', message: 'provider stream failed' });
+    stream.end();
+
+    await waitFor(() => expect(screen.getByText('web-01')).toBeInTheDocument());
+    expect(screen.queryByText('Results (0 rows)')).not.toBeInTheDocument();
   });
 });
 
@@ -1202,7 +1495,7 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
   }) {
     renderChatPage();
     await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
     );
     await sendMessage('first question');
     stream.push({ type: 'delta', content: 'half an ans' });
@@ -1215,7 +1508,7 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
     const stream = startGeneratingWithSidebar();
     await renderAndStartTurn(stream);
 
-    fireEvent.click(screen.getByText('Older conversation'));
+    fireEvent.click(conversationRow('Older conversation'));
 
     await waitFor(() => expect(mockOpenConfirm).toHaveBeenCalledTimes(1));
     // No styling overrides: the platform's own app-leave confirmation passes none either, and
@@ -1234,7 +1527,7 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
     await renderAndStartTurn(stream);
     const signal = lastStreamSignal();
 
-    fireEvent.click(screen.getByText('Older conversation'));
+    fireEvent.click(conversationRow('Older conversation'));
 
     await waitFor(() => expect(mockOpenConfirm).toHaveBeenCalled());
     expect(signal.aborted).toBe(false);
@@ -1247,7 +1540,7 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
     await renderAndStartTurn(stream);
     const signal = lastStreamSignal();
 
-    fireEvent.click(screen.getByText('Older conversation'));
+    fireEvent.click(conversationRow('Older conversation'));
     await waitFor(() => expect(mockOpenConfirm).toHaveBeenCalled());
 
     expect(signal.aborted).toBe(false);
@@ -1265,7 +1558,7 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
     await renderAndStartTurn(stream);
     const signal = lastStreamSignal();
 
-    fireEvent.click(screen.getByText('Older conversation'));
+    fireEvent.click(conversationRow('Older conversation'));
 
     await waitFor(() => expect(signal.aborted).toBe(true));
     await waitFor(() =>
@@ -1278,7 +1571,10 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
     mockOpenConfirm.mockResolvedValue(false);
     await renderAndStartTurn(stream);
 
-    fireEvent.click(screen.getByText('New conversation'));
+    // getByRole (not getByText): the conversation header's own "New conversation" fallback
+    // title (chat-page.tsx, shown while no conversation is active) can render the exact same
+    // string at the same time as this sidebar button.
+    fireEvent.click(screen.getByRole('button', { name: 'New conversation' }));
 
     await waitFor(() => expect(mockOpenConfirm).toHaveBeenCalledTimes(1));
     // Declined, so the turn is untouched.
@@ -1293,9 +1589,9 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
     // Open conv-b, then start a turn inside it.
     renderChatPage();
     await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
     );
-    fireEvent.click(screen.getByText('Older conversation'));
+    fireEvent.click(conversationRow('Older conversation'));
     await waitFor(() =>
       expect(screen.getByText('earlier question')).toBeInTheDocument(),
     );
@@ -1309,7 +1605,7 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
 
     // Clicking the conversation that is already open changes nothing, so there is nothing to
     // interrupt and nothing to confirm.
-    fireEvent.click(screen.getByText('Older conversation'));
+    fireEvent.click(conversationRow('Older conversation'));
 
     await waitFor(() =>
       expect(screen.getByText('half an ans')).toBeInTheDocument(),
@@ -1326,14 +1622,426 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
 
     renderChatPage();
     await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByText('Older conversation'));
+    fireEvent.click(conversationRow('Older conversation'));
 
     await waitFor(() =>
       expect(screen.getByText('earlier question')).toBeInTheDocument(),
     );
     expect(mockOpenConfirm).not.toHaveBeenCalled();
+  });
+});
+
+describe('ChatPage — pre-turn Manager session guard (issue #8826)', () => {
+  it('ensures the Manager session (60s memo) before the chat stream fires', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('hello');
+
+    expect(mockEnsureManagerSession).toHaveBeenCalledWith(expect.anything(), {
+      maxAgeMs: 60_000,
+    });
+    // The guard must settle before the stream request is issued.
+    expect(mockEnsureManagerSession.mock.invocationCallOrder[0]).toBeLessThan(
+      mockStreamChat.mock.invocationCallOrder[0],
+    );
+    stream.end();
+  });
+
+  it('does not run the mount-time access-probe heal any more', async () => {
+    renderChatPage();
+    await waitFor(() =>
+      expect(mockSettingsService.getAssistantSettings).toHaveBeenCalled(),
+    );
+    expect(mockSettingsService.getSettingsAccess).not.toHaveBeenCalled();
+  });
+});
+
+describe('ChatPage — two-row grid pane (contract §1)', () => {
+  /**
+   * Regression guard for the composer/welcome overlap bug, and for the over-reservation bug a
+   * prior fix for it introduced. A live measurement once caught the sticky composer covering the
+   * bottom few pixels of the transcript's last element (a table's pagination bar) even once
+   * scrolled all the way down — `position: sticky` reserved the panel's own box in the flow, but
+   * not the fade gradient its `::before` painted further upward. The fix replaces that whole
+   * mechanism: the pane is now a `display: grid; grid-template-rows: 1fr auto` (`.wzChatPane`,
+   * chat-page.scss), so the transcript (`1fr`, scrolling) and the composer (`auto`, in flow) are
+   * independent grid rows with no overlap possible by construction — nothing to desync, no
+   * gradient, no compensating padding.
+   *
+   * jsdom never lays out real boxes and does not evaluate the imported `.scss`, so no jsdom test
+   * can pin actual pixel values or reproduce the real overlap. What these pin instead is the
+   * STRUCTURAL choice the grid rests on.
+   */
+  it('gives the transcript its own scroll container, independent of the composer', async () => {
+    renderChatPage();
+    await waitFor(() =>
+      expect(
+        screen.getByText('Ask the AI Assistant something'),
+      ).toBeInTheDocument(),
+    );
+
+    // The region named "Chat" IS the transcript now — the single scroll container — not a wrapper
+    // that also encloses the composer the way the old sticky-panel layout did.
+    const transcript = screen.getByRole('region', { name: 'Chat' });
+    expect(transcript.className).toContain('wzChatTranscript');
+
+    // The composer is a SIBLING of the transcript inside `.wzChatPane`, never a descendant of it —
+    // that grid-row separation is what makes the old overlap structurally impossible.
+    const composerInput = screen.getByLabelText('Chat message');
+    expect(transcript.contains(composerInput)).toBe(false);
+
+    // Nothing in the composer's own ancestor chain uses sticky/absolute positioning any more — the
+    // grid row boundary is the only thing keeping it in place.
+    let node: HTMLElement | null = composerInput;
+    while (node) {
+      expect(node.style.position).not.toBe('sticky');
+      expect(node.style.position).not.toBe('absolute');
+      node = node.parentElement;
+    }
+  });
+
+  it('never sets an inline paddingBottom on the transcript (no JS height measurement)', async () => {
+    renderChatPage();
+    await waitFor(() =>
+      expect(
+        screen.getByText('Ask the AI Assistant something'),
+      ).toBeInTheDocument(),
+    );
+
+    const transcript = screen.getByRole('region', { name: 'Chat' });
+    // Any style on this element comes entirely from the `.wzChatTranscript` CSS class
+    // (chat-page.scss) — there is no gradient height to reserve space for any more.
+    expect(transcript.style.paddingBottom).toBe('');
+  });
+
+  it('keeps the composer input reachable once a callout pushes the transcript content down', async () => {
+    mockConversationsService.create.mockRejectedValue(httpError(500));
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    // A save-failed callout above the welcome content is exactly the kind of extra height that
+    // used to push the composer out of a centered flex box and off screen under the old layout.
+    await sendMessage('first question');
+    await waitFor(() =>
+      expect(
+        screen.getByText('This conversation is not being saved'),
+      ).toBeInTheDocument(),
+    );
+
+    // The composer is still there and not display:none/visibility:hidden'd — it lives in its own
+    // grid row, entirely unaffected by how tall the transcript's content grows.
+    expect(screen.getByLabelText('Chat message')).toBeVisible();
+  });
+
+  it('removes the old sticky/gradient mechanism from the stylesheet entirely', () => {
+    // `path.join` against `__dirname` sidesteps Jest's `moduleNameMapper` (which points `.scss`
+    // imports at `style_mock.js`) and reads the actual SCSS off disk, the same way the previous
+    // version of this test did to pin the mechanism it was checking.
+    const scssPath = path.join(__dirname, 'chat-page.scss');
+    const scssSource = fs.readFileSync(scssPath, 'utf8');
+    // Comments are stripped before matching: this file DOCUMENTS the removed mechanism by name
+    // ("there is no `position: sticky` ..."), so asserting against the raw source would fail on the
+    // very prose that explains why the rule is gone. Only real declarations are interesting here.
+    const scssRules = scssSource
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/^\s*\/\/.*$/gm, '');
+
+    expect(scssRules).not.toMatch(/position:\s*sticky/);
+    expect(scssRules).not.toMatch(/wzComposerGradientHeight/);
+    expect(scssRules).not.toMatch(/::before/);
+    // The replacement mechanism is in place instead: a two-row grid pane, and a shared measure
+    // class reading the redesign token rather than restating a pixel figure.
+    expect(scssRules).toMatch(/grid-template-rows:\s*1fr auto/);
+    expect(scssRules).toMatch(/max-width:\s*\$wzContentMaxWidth/);
+  });
+});
+
+describe('ChatPage — welcome centers only when there is room (contract §3)', () => {
+  it('gives the welcome cluster its own centering box inside the transcript row', async () => {
+    renderChatPage();
+    const heading = await screen.findByText('Ask the AI Assistant something');
+
+    const welcomeBox = heading.closest('.wzWelcomeCenter');
+    expect(welcomeBox).not.toBeNull();
+    // The centering box is INSIDE the transcript's own scroll container, never a sibling of it —
+    // a short viewport falls back to the transcript's own scroll instead of pushing into the
+    // composer, which only holds if the centering box is a descendant, not a peer.
+    const transcript = screen.getByRole('region', { name: 'Chat' });
+    expect(transcript.contains(welcomeBox)).toBe(true);
+  });
+
+  it('groups the example prompts as horizontal cards inside one bordered container (variation 1a)', async () => {
+    renderChatPage();
+    await screen.findByText('Ask the AI Assistant something');
+
+    // The pill header groups the cards under one container, replacing the old three-cards-with-
+    // no-grouping-container layout.
+    expect(screen.getByText('Try one of these')).toBeInTheDocument();
+    // The full question is now the card's description (no longer truncated to one line), and the
+    // title is shown separately — both readable without truncation.
+    expect(
+      screen.getByText('Show me the critical findings of the last 24 hours'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Critical findings')).toBeInTheDocument();
+  });
+});
+
+describe('ChatPage — sidebar sync across instances (#8827)', () => {
+  it('refreshes the conversation list when another instance announces a change', async () => {
+    mockConversationsService.list.mockResolvedValue([]);
+    renderChatPage();
+    await waitFor(() =>
+      expect(mockConversationsService.list).toHaveBeenCalledTimes(1),
+    );
+
+    // Another mounted ChatPage (e.g. the header flyout) saved a new conversation.
+    mockConversationsService.list.mockResolvedValue([
+      {
+        id: 'conv-flyout',
+        title: 'Created in the flyout',
+        updatedAt: '2024-01-01',
+      },
+    ]);
+    act(() => {
+      window.dispatchEvent(new Event(CONVERSATIONS_CHANGED_EVENT));
+    });
+
+    await waitFor(() =>
+      expect(screen.getByText('Created in the flyout')).toBeInTheDocument(),
+    );
+    expect(mockConversationsService.list).toHaveBeenCalledTimes(2);
+  });
+
+  it('stops listening once unmounted', async () => {
+    mockConversationsService.list.mockResolvedValue([]);
+    const { unmount } = renderChatPage();
+    await waitFor(() =>
+      expect(mockConversationsService.list).toHaveBeenCalledTimes(1),
+    );
+
+    unmount();
+    window.dispatchEvent(new Event(CONVERSATIONS_CHANGED_EVENT));
+
+    expect(mockConversationsService.list).toHaveBeenCalledTimes(1);
+  });
+});
+
+/**
+ * Rail display mode (layout contract §5/§6): expanded at >=1100px of PANE width, a 48px collapsed
+ * strip below that, an `EuiFlyout` below 900px. jsdom has no `ResizeObserver`, and always reports
+ * `offsetWidth: 0` — measuring unconditionally against that would collapse the rail into 'flyout'
+ * mode in EVERY existing test in this file (all written against an always-expanded rail), so the
+ * component only measures when `ResizeObserver` actually exists, and stays 'expanded' otherwise.
+ * These tests stub `ResizeObserver` the same way assistant-chat-panel.test.tsx does for its own
+ * (unrelated) panel-width responsiveness, to exercise the measuring branch at all.
+ */
+describe('ChatPage — conversation rail display mode (layout contract §5/§6)', () => {
+  function stubResizeObserver(width: number) {
+    let triggerResize: (() => void) | undefined;
+    class ResizeObserverStub {
+      constructor(callback: () => void) {
+        triggerResize = callback;
+      }
+      observe() {}
+      disconnect() {}
+    }
+    const original = (window as unknown as { ResizeObserver?: unknown })
+      .ResizeObserver;
+    (window as unknown as { ResizeObserver: unknown }).ResizeObserver =
+      ResizeObserverStub;
+    const widthSpy = jest
+      .spyOn(HTMLElement.prototype, 'offsetWidth', 'get')
+      .mockReturnValue(width);
+    return {
+      resize: (nextWidth: number) => {
+        widthSpy.mockReturnValue(nextWidth);
+        triggerResize?.();
+      },
+      restore: () => {
+        widthSpy.mockRestore();
+        (window as unknown as { ResizeObserver: unknown }).ResizeObserver =
+          original;
+      },
+    };
+  }
+
+  it('stays expanded without ResizeObserver, matching every other test in this file', async () => {
+    mockConversationsService.list.mockResolvedValue([
+      { id: 'conv-b', title: 'Older conversation', updatedAt: '2024-01-01' },
+    ]);
+    renderChatPage();
+    // The rail is fully rendered inline — a 'flyout' mode here would hide this row behind a
+    // button/flyout instead, which every other test in this file assumes never happens.
+    await waitFor(() =>
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
+    );
+  });
+
+  it('collapses the rail to a 48px strip between the flyout and expand thresholds', async () => {
+    const stub = stubResizeObserver(1000);
+    try {
+      mockConversationsService.list.mockResolvedValue([
+        { id: 'conv-b', title: 'Older conversation', updatedAt: '2024-01-01' },
+      ]);
+      renderChatPage();
+      const rail = await screen.findByRole('region', {
+        name: 'Saved conversations',
+      });
+      expect(rail.style.width).toBe('48px');
+      // The strip is icon-only by design: at this width there is no room for titles, so the rail
+      // renders affordances (new conversation, search, expand) and nothing else. Asserting the
+      // absence is the point — a strip that still painted 22-character truncated titles would be
+      // the "undense rail" the redesign is removing, just narrower.
+      expect(screen.queryByText('Older conversation')).toBeNull();
+    } finally {
+      stub.restore();
+    }
+  });
+
+  it('moves the rail into an EuiFlyout below the flyout threshold, reachable via its own trigger', async () => {
+    const stub = stubResizeObserver(700);
+    try {
+      mockConversationsService.list.mockResolvedValue([
+        { id: 'conv-b', title: 'Older conversation', updatedAt: '2024-01-01' },
+      ]);
+      renderChatPage();
+      // No inline rail region at this width — the conversations list is not directly reachable.
+      await waitFor(() =>
+        expect(
+          screen.queryByRole('region', { name: 'Saved conversations' }),
+        ).not.toBeInTheDocument(),
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Show conversations' }),
+      );
+
+      await waitFor(() =>
+        expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      );
+    } finally {
+      stub.restore();
+    }
+  });
+
+  it('gives the rail flyout its own design-token block, since it renders outside the chat surface', async () => {
+    // `EuiFlyout` portals into document.body, so NOTHING in the chat surface's ancestor chain
+    // reaches it — including `.wzAiChat`, the element that defines every `--wz-*` custom property.
+    // Without a token block of its own the rows' selected/hover pills (`var(--wz-accent-soft)` /
+    // `var(--wz-accent-hover)`) failed substitution and computed to transparent, so on a narrow
+    // pane the open conversation had no highlight at all and hover did nothing. Same portal trap
+    // the provider flyout already carried its own token block for.
+    const stub = stubResizeObserver(700);
+    try {
+      mockConversationsService.list.mockResolvedValue([
+        { id: 'conv-b', title: 'Older conversation', updatedAt: '2024-01-01' },
+      ]);
+      renderChatPage();
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Show conversations' }),
+      );
+
+      await waitFor(() =>
+        expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      );
+      // Asserted as an ANCESTOR of the rows rather than on the flyout element by name: what the
+      // pills need is for the token block to sit somewhere above them in the tree, which is the
+      // precise thing portalling broke.
+      expect(
+        screen.getByText('Older conversation').closest('.wzConvoRailFlyout'),
+      ).not.toBeNull();
+    } finally {
+      stub.restore();
+    }
+  });
+
+  it('re-expands the rail when the pane grows back past the collapse threshold', async () => {
+    const stub = stubResizeObserver(1000);
+    try {
+      mockConversationsService.list.mockResolvedValue([
+        { id: 'conv-b', title: 'Older conversation', updatedAt: '2024-01-01' },
+      ]);
+      renderChatPage();
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('48px');
+      });
+
+      stub.resize(1200);
+
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('260px');
+      });
+    } finally {
+      stub.restore();
+    }
+  });
+
+  it('ignores a zero-width measurement instead of collapsing into flyout and wiping a manual override', async () => {
+    // A hidden pane (`display: none`) measures 0 — the app shell (application.tsx) keeps ChatPage
+    // MOUNTED behind that while the Settings tab is showing, so a Chat<->Settings round-trip used
+    // to run the resize callback against a width of 0. Before the fix that flipped the mode to
+    // 'flyout' AND cleared `railManualOverrideRef`, so a rail the user had collapsed/expanded by
+    // hand silently reverted to the resize-driven default on every trip back from Settings.
+    const stub = stubResizeObserver(1000);
+    try {
+      mockConversationsService.list.mockResolvedValue([
+        { id: 'conv-b', title: 'Older conversation', updatedAt: '2024-01-01' },
+      ]);
+      renderChatPage();
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('48px');
+      });
+
+      // Manually expand, at a width that would otherwise default to 'collapsed'.
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Expand conversation list' }),
+      );
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('260px');
+      });
+
+      // Pane hidden (e.g. behind the Settings tab): must not change anything.
+      stub.resize(0);
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('260px');
+      });
+
+      // Pane shown again, still narrow: the manual override is still respected, proving the
+      // zero-width tick never wiped it.
+      stub.resize(1000);
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('260px');
+      });
+    } finally {
+      stub.restore();
+    }
   });
 });

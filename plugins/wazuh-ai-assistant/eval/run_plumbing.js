@@ -223,7 +223,8 @@ async function registerMockProvider(baseUrl, cookies) {
 }
 
 /** GET server/routes/settings.ts's API_PATHS.SETTINGS singleton (creates it with defaults on
- * first access server-side -- see getOrCreateAssistantSettings, settings.ts:28-49). */
+ * first access server-side -- see AssistantSettingsManager.getOrCreateSettings,
+ * server/settings/assistant-settings-manager.ts). */
 async function getAssistantSettings(baseUrl, cookies) {
   const response = await fetch(`${baseUrl}${API_ROOT}/settings`, {
     method: 'GET',
@@ -463,9 +464,11 @@ async function main() {
 
   // [[route:general]]-only: mock_provider.js's stage-1 branch echoes categories:["general"]
   // (eval/mock_provider.js's ROUTE_MARKER_RE), so server/tools/router.ts's resolveStage2Tools
-  // resolves `tools: undefined` for the turn (routed to `general` alone) and
-  // the stage-2 round runs with no tools at all: assert NO tool_call and NO table, just a normal
-  // text answer ending in 'done'.
+  // resolves the minimal recovery set (get_security_summary + search_wazuh_data) for the turn
+  // (routed to `general` alone) rather than no tools at all. The prompt below is a genuine
+  // greeting with no tool marker, so mock_provider.js's plain-text branch fires regardless of
+  // which tools were offered: assert NO tool_call and NO table, just a normal text answer ending
+  // in 'done'.
   index += 1;
   console.log(`[${index}/${totalRuns}]`);
   {

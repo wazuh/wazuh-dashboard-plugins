@@ -3,6 +3,7 @@ import {
   risonEncode,
   extractTimeRange,
   buildDiscoverUrl,
+  hasExplicitTimeRange,
 } from './discover-url';
 
 test('risonEncode: plain string is single-quoted', () => {
@@ -101,6 +102,85 @@ test('extractTimeRange: absent range clause falls back to the default 24h window
 
 test('extractTimeRange: undefined dsl falls back to the default 24h window', () => {
   assert.deepEqual(extractTimeRange(undefined), { from: 'now-24h', to: 'now' });
+});
+
+// --- rangeFromClause: the gt/lt/from/to bound spellings (issue #8920 item 9's time-range half) --
+// Previously only gte/lte were read; a model-authored range in any of the other three legal
+// OpenSearch spellings silently fell back to the 24h default instead of the real window.
+
+test('extractTimeRange: exclusive gt/lt bounds are read like gte/lte', () => {
+  const dsl = { range: { timestamp: { gt: 'now-2h', lt: 'now' } } };
+  assert.deepEqual(extractTimeRange(dsl), { from: 'now-2h', to: 'now' });
+});
+
+test('extractTimeRange: legacy from/to bounds are read like gte/lte', () => {
+  const dsl = { range: { timestamp: { from: 'now-30d', to: 'now-1d' } } };
+  assert.deepEqual(extractTimeRange(dsl), { from: 'now-30d', to: 'now-1d' });
+});
+
+test('extractTimeRange: only gt present falls back to the default "to" (same as gte-only)', () => {
+  const dsl = { range: { timestamp: { gt: 'now-1h' } } };
+  assert.deepEqual(extractTimeRange(dsl), { from: 'now-1h', to: 'now' });
+});
+
+// --- findTimeRangeClause: single-clause-object bool.filter/bool.must, and one bool level deeper -
+// (issue #8920 item 9's time-range half). Both single-object clauses and a nested bool are legal
+// DSL shapes that the previous array-only, one-level walk in extractTimeRange never read.
+
+test('findTimeRangeClause: bool.filter as a SINGLE clause object (not an array) is still read', () => {
+  const dsl = {
+    bool: {
+      filter: { range: { '@timestamp': { gte: 'now-2h', lte: 'now' } } },
+    },
+  };
+  assert.deepEqual(extractTimeRange(dsl), { from: 'now-2h', to: 'now' });
+});
+
+test('findTimeRangeClause: bool.must as a SINGLE clause object (not an array) is still read', () => {
+  const dsl = {
+    bool: {
+      must: {
+        range: { 'state.modified_at': { gte: 'now-90d', lte: 'now' } },
+      },
+    },
+  };
+  assert.deepEqual(extractTimeRange(dsl), { from: 'now-90d', to: 'now' });
+});
+
+test('findTimeRangeClause: recurses one bool level deeper (a nested bool inside bool.filter)', () => {
+  const dsl = {
+    bool: {
+      filter: [
+        {
+          bool: {
+            filter: [{ range: { timestamp: { gte: 'now-3d', lte: 'now' } } }],
+          },
+        },
+      ],
+    },
+  };
+  assert.deepEqual(extractTimeRange(dsl), { from: 'now-3d', to: 'now' });
+});
+
+// --- hasExplicitTimeRange: no direct unit test existed at all before this pass. Exported for
+// suggest-discover-query.ts's window-defaulted disclosure (issue #8920 item 9) -- getting this
+// wrong (e.g. always true) would silently drop that disclosure.
+
+test("hasExplicitTimeRange: true when extractTimeRange would find the model's own window", () => {
+  const dsl = {
+    bool: {
+      filter: [{ range: { timestamp: { gte: 'now-7d', lte: 'now' } } }],
+    },
+  };
+  assert.equal(hasExplicitTimeRange(dsl), true);
+});
+
+test('hasExplicitTimeRange: false when no readable range clause is present', () => {
+  assert.equal(hasExplicitTimeRange({ match_all: {} }), false);
+});
+
+test('hasExplicitTimeRange: false for undefined dsl', () => {
+  assert.equal(hasExplicitTimeRange(undefined), false);
 });
 
 test('buildDiscoverUrl: produces the expected rison-encoded, encodeURI-escaped hash', () => {

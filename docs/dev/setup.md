@@ -22,7 +22,7 @@ nvm use $(cat .nvmrc)
 Install dependencies for the in-repo plugins:
 
 ```bash
-for plugin in plugins/main plugins/wazuh-core plugins/wazuh-check-updates; do
+for plugin in plugins/main plugins/wazuh-core plugins/wazuh-check-updates plugins/wazuh-ai-assistant; do
 	(cd "$plugin" && yarn)
 done
 ```

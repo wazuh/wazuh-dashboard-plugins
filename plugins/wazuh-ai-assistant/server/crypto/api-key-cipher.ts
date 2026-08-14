@@ -1,12 +1,13 @@
 import * as crypto from 'crypto';
-import { PROVIDER_SAVED_OBJECT_TYPE } from '../../common/constants';
+import { PROVIDER_API_KEY_AAD_NAMESPACE } from '../../common/constants';
 
 /**
- * Encryption-at-rest for provider API keys (`wazuh-ai-assistant-provider` saved object's `apiKey`
- * attribute — see server/saved_objects/provider-settings.ts). The saved object is never returned
- * over the public API (server/routes/settings.ts's `toSummary` only ever exposes a `hasApiKey`
- * boolean), but it IS readable in plaintext by anyone with direct `.kibana`/saved-objects index
- * access; this closes that gap using a symmetric key supplied via this plugin's own OSD config
+ * Encryption-at-rest for provider API keys (a provider's `api_key` field, managed through the
+ * Wazuh indexer's `/_plugins/_setup/ai_assistant/settings/providers*` endpoints — see
+ * server/settings/ai-providers-client.ts). The value is never returned over the
+ * public API (server/routes/settings.ts's `toSummary` only ever exposes a `hasApiKey` boolean),
+ * but it IS readable in plaintext by anyone with direct read access to the underlying hidden
+ * index; this closes that gap using a symmetric key supplied via this plugin's own OSD config
  * (`wazuh_ai_assistant.encryptionKey` in opensearch_dashboards.yml — see server/config.ts and
  * server/plugin.ts's setup()), with zero new npm dependencies (Node's builtin `crypto` only).
  *
@@ -14,13 +15,13 @@ import { PROVIDER_SAVED_OBJECT_TYPE } from '../../common/constants';
  *
  * `enc:v1:` + base64(iv[12] ‖ authTag[16] ‖ ciphertext) — AES-256-GCM, PLUS
  * `cipher.setAAD(aad)`/`decipher.setAAD(aad)` binding the ciphertext to WHERE it lives: `buildAad`
- * below derives `aad` deterministically from the saved object id the value is stored on. This
+ * below derives `aad` deterministically from the id of the document the value is stored on. This
  * closes a ciphertext-substitution / confused-deputy gap the platform precedent (OSD core's
  * `data_source` plugin, same AES-256-GCM/IV12/TAG16 parameters) already guards against by binding
  * its own wrapping-key name + namespace: without this binding, a blob would be a bare AES-GCM
- * ciphertext with no notion of where it belongs, so anyone able to write saved-object attributes
- * (e.g. through a saved-objects import, a bug elsewhere, or an admin mistake) could copy provider
- * A's encrypted `apiKey` blob into provider B's `apiKey` field and it would still decrypt there —
+ * ciphertext with no notion of where it belongs, so anyone able to write document fields directly
+ * (e.g. through a bulk import, a bug elsewhere, or an admin mistake) could copy provider A's
+ * encrypted `api_key` blob into provider B's `api_key` field and it would still decrypt there —
  * the AAD makes that copy fail decryption instead (GCM auth-tag verification covers the AAD too,
  * so a mismatched id is a hard decrypt failure, not a silent success).
  *
@@ -30,9 +31,11 @@ import { PROVIDER_SAVED_OBJECT_TYPE } from '../../common/constants';
  *
  * ## The saved-object-id parameter
  *
- * Both `encrypt` and `decrypt` take a mandatory `savedObjectId: string` second parameter — the id
- * the AAD is bound to (see `buildAad`). Required, not optional, so a caller can never forget to
- * pass the real id.
+ * Both `encrypt` and `decrypt` take a mandatory `savedObjectId: string` second parameter — the
+ * provider document id the AAD is bound to (see `buildAad`). Required, not optional, so a caller
+ * can never forget to pass the real id. Named `savedObjectId` for historical reasons (providers
+ * were originally an OSD saved object); it is now an OpenSearch document id, but the AAD-binding
+ * role is identical either way, and renaming it would not change any behavior.
  *
  * ## No-plaintext contract
  *
@@ -51,24 +54,26 @@ const KEY_LENGTH_BYTES = 32;
 const IV_LENGTH_BYTES = 12;
 const AUTH_TAG_LENGTH_BYTES = 16;
 
-/** Fixed field/purpose label bound into every AAD alongside the saved object id — see
+/** Fixed field/purpose label bound into every AAD alongside the provider document id — see
  * `buildAad` below. Kept as its own constant only for readability; it is never used standalone. */
 const API_KEY_ATTRIBUTE_NAME = 'apiKey';
 
 /**
- * Builds the exact AAD bytes bound into a ciphertext: `<saved-object-type>:<savedObjectId>:
+ * Builds the exact AAD bytes bound into a ciphertext: `<namespace>:<savedObjectId>:
  * <attribute-name>`, e.g. `wazuh-ai-assistant-provider:3f2504e0-...:apiKey`. This is the ONE place
  * that string is assembled — both `encrypt` and `decrypt` call it, so they can never disagree
  * about the exact bytes (a mismatch, even a single differing byte, is a hard GCM auth-tag failure
  * on decrypt, which is the whole point: it is what turns a copy-this-blob-into-another-field
  * substitution attempt into a decrypt error instead of a silent success).
  *
- * Uses `PROVIDER_SAVED_OBJECT_TYPE` (common/constants.ts) rather than a duplicated literal so the
- * AAD can never drift from the real saved-object type name.
+ * Uses `PROVIDER_API_KEY_AAD_NAMESPACE` (common/constants.ts) rather than a duplicated literal so
+ * the AAD can never accidentally drift from that one constant's value. This value must stay
+ * byte-for-byte stable forever (see that constant's own doc comment) regardless of how or where a
+ * provider is actually stored.
  */
 function buildAad(savedObjectId: string): Buffer {
   return Buffer.from(
-    `${PROVIDER_SAVED_OBJECT_TYPE}:${savedObjectId}:${API_KEY_ATTRIBUTE_NAME}`,
+    `${PROVIDER_API_KEY_AAD_NAMESPACE}:${savedObjectId}:${API_KEY_ATTRIBUTE_NAME}`,
     'utf8',
   );
 }
@@ -101,8 +106,8 @@ export class ApiKeyCipher {
   }
 
   /**
-   * Encrypts `plaintext`, binding the result to `savedObjectId` (the id of the
-   * `wazuh-ai-assistant-provider` saved object `plaintext` will be stored on — see `buildAad`).
+   * Encrypts `plaintext`, binding the result to `savedObjectId` (the id of the provider document
+   * `plaintext` will be stored on — see `buildAad`).
    * Throws when disabled: this module never writes plaintext, so a call without a configured key
    * is a bug in the caller (routes gate on `enabled`/`requireApiKeyEncryption` first), never a
    * silent plaintext write.

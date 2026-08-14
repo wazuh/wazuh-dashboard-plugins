@@ -32,7 +32,7 @@ GIT_REF=$GIT_REF yarn
 cd ../..
 
 # Install dependencies for other plugins
-for plugin in plugins/wazuh-core plugins/wazuh-check-updates; do
+for plugin in plugins/wazuh-core plugins/wazuh-check-updates plugins/wazuh-ai-assistant; do
 	(cd "$plugin" && yarn)
 done
 ```
@@ -60,6 +60,10 @@ cd ../..
 cd plugins/wazuh-check-updates
 OPENSEARCH_DASHBOARDS_VERSION=$OPENSEARCH_DASHBOARDS_VERSION yarn build
 cd ../..
+
+cd plugins/wazuh-ai-assistant
+OPENSEARCH_DASHBOARDS_VERSION=$OPENSEARCH_DASHBOARDS_VERSION yarn build
+cd ../..
 ```
 
 The build artifacts (ZIP files) are written to each plugin's `build/` directory:
@@ -67,6 +71,7 @@ The build artifacts (ZIP files) are written to each plugin's `build/` directory:
 - `plugins/main/build/wazuh-<version>.zip`
 - `plugins/wazuh-core/build/wazuhCore-<version>.zip`
 - `plugins/wazuh-check-updates/build/wazuhCheckUpdates-<version>.zip`
+- `plugins/wazuh-ai-assistant/build/wazuhAiAssistant-<version>.zip`
 
 ## Build inside Docker
 

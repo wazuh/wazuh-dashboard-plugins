@@ -60,7 +60,10 @@ export const getAgentsTool: ToolDefinition = {
     name: 'get_agents',
     description:
       'Lists Wazuh agents, optionally filtered by status (active, pending, never_connected, ' +
-      'disconnected) and/or by exact agent ID. Omit both filters to list every agent.',
+      'disconnected) and/or by exact agent ID. Omit both filters to list every agent. Reports ' +
+      'manager-side enrollment/connection status only -- does NOT cover agent communication-' +
+      'channel health or message drop-rate; no tool covers that, so say that plainly instead of ' +
+      'treating agent status as a proxy for it.',
     parameters: objectSchema({
       agent_ids: {
         type: 'array',

@@ -85,7 +85,8 @@ official `main` and `wazuh-check-updates` plugins use:
 { apiHostID })` for Manager API calls — this rides the JWT from the `wz-token` cookie set by
   the main plugin's login flow, so there is no parallel auth path.
 - **Plugin contract**: `plugins.wazuhCore` at setup/start for non-request code (host registry,
-  `dashboardSecurity.isAdministratorUser` for the admin gate).
+  `dashboardSecurity.isAdministratorUser` for the Manager-session liveness probe behind
+  `GET /settings/access`, see [Security](./security.md)).
 
 Every Indexer and Manager call runs **`asCurrentUser`** — the user's own RBAC is the real
 enforcement boundary; the plugin adds no privileged path (see [Security](./security.md)).

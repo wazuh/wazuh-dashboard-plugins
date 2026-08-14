@@ -1,14 +1,47 @@
 import '@testing-library/jest-dom';
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import '../../test-utils/setup-home-overview-test';
 import { ItHygieneTiles } from './it-hygiene-tiles';
+import {
+  getItHygieneServicesTabUrl,
+  getItHygieneSoftwareUrl,
+  getItHygieneSystemOsUrl,
+  getItHygieneUsersTabUrl,
+} from '../../utils/navigation';
+
+jest.mock('../../utils/navigation', () => ({
+  getItHygieneSystemOsUrl: jest.fn(),
+  getItHygieneSoftwareUrl: jest.fn(),
+  getItHygieneUsersTabUrl: jest.fn(),
+  getItHygieneServicesTabUrl: jest.fn(),
+}));
 
 const available = (value: number) => ({
   status: 'available' as const,
   data: value,
 });
 
+const allAvailable = {
+  operatingSystems: available(12),
+  packages: available(35682),
+  users: available(48),
+  services: available(320),
+};
+
 describe('ItHygieneTiles', () => {
+  it('navigates to each tab on click', () => {
+    render(<ItHygieneTiles {...allAvailable} />);
+    fireEvent.click(screen.getByText('Operating systems'));
+    expect(getItHygieneSystemOsUrl).toHaveBeenCalledWith();
+    fireEvent.click(screen.getByText('Packages'));
+    expect(getItHygieneSoftwareUrl).toHaveBeenCalled();
+    fireEvent.click(screen.getByText('Users'));
+    expect(getItHygieneUsersTabUrl).toHaveBeenCalled();
+    fireEvent.click(screen.getByText('Services'));
+    expect(getItHygieneServicesTabUrl).toHaveBeenCalled();
+  });
+
   it('keeps every tile (never hidden); an unavailable index shows "-"', () => {
     const { container } = render(
       <ItHygieneTiles

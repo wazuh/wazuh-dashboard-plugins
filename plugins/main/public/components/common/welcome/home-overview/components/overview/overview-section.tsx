@@ -8,44 +8,37 @@ import {
   WIDGET_LOADING_MIN_HEIGHT,
 } from '../common';
 import { AgentsByStatus } from './agents-by-status';
-import { TopNetworkServicesTable } from './top-network-services-table';
-import { useInViewport } from '../../../../hooks';
 import {
   useAgentStatus,
   useFindingsOverview,
-  useTopOperatingSystems,
-  useTopNetworkServices,
 } from '../../hooks/use-overview-data';
 import {
   getDeployAgentUrl,
   getAgentsUrl,
   goToAgentsByStatus,
   getThreatHuntingUrl,
+  getMitreIntelligenceResourceUrl,
   getMitreUrl,
-  getItHygieneUrl,
   getDiscoverFindingsBySeverityUrl,
 } from '../../utils/navigation';
 import { FINDING_SEVERITY_FIELD } from '../../lib/fields';
 import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
+import { AiAssistantCta } from './ai-assistant-cta';
 
 export interface OverviewSectionProps {
   /** Owned by the page shell so Threat Hunting reuses the same on-mount search. */
   findings: ReturnType<typeof useFindingsOverview>;
 }
 
-/** Findings fire on mount; the inventory row is lazy. */
 const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
   findings,
 }) => {
   const agents = useAgentStatus();
-  const [inventoryRef, inventoryVisible] = useInViewport<HTMLDivElement>();
-  const topOs = useTopOperatingSystems(inventoryVisible);
-  const topServices = useTopNetworkServices(inventoryVisible);
 
   return (
     <div>
       <EuiFlexGroup>
-        <EuiFlexItem>
+        <EuiFlexItem style={{ minWidth: 0 }}>
           <WidgetGroup
             status={agents.status}
             errorLabel={agents.error?.message}
@@ -64,7 +57,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             )}
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem>
+        <EuiFlexItem style={{ minWidth: 0 }}>
           <WidgetGroup
             status={findings.status}
             errorLabel={findings.error?.message}
@@ -98,83 +91,38 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
 
       <EuiSpacer size='m' />
 
-      <WidgetGroup
-        status={findings.status}
-        errorLabel={findings.error?.message}
-        showManageIndexPatternsLink={
-          findings.error?.kind === 'index-pattern-missing'
-        }
-        isPermissionDenied={findings.error?.kind === 'permission-denied'}
-        title='MITRE ATT&CK top tactics'
-        caption='Last 24 hours'
-        headerLink={{ label: 'MITRE ATT&CK', href: getMitreUrl() }}
-        loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
-        data-test-subj='home-overview-mitre-tactics'
-      >
-        {findings.data && (
-          <BarList
-            items={findings.data.topTactics}
-            emptyMessage='No MITRE ATT&CK tactics observed'
-            data-test-subj='mitre-top-tactics'
-            barColor={UI_COLOR_STATUS.success}
-          />
-        )}
-      </WidgetGroup>
-
-      <EuiSpacer size='m' />
-
-      <div ref={inventoryRef}>
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <WidgetGroup
-              status={topOs.status}
-              errorLabel={topOs.error?.message}
-              showManageIndexPatternsLink={
-                topOs.error?.kind === 'index-pattern-missing'
-              }
-              isPermissionDenied={topOs.error?.kind === 'permission-denied'}
-              title='Top 5 operating systems'
-              caption='Current state'
-              headerLink={{ label: 'IT Hygiene', href: getItHygieneUrl() }}
-              loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
-              centerBody
-              data-test-subj='home-overview-top-os'
-            >
-              {topOs.data && (
-                <BarList
-                  items={topOs.data}
-                  emptyMessage='No operating systems found'
-                  title='OS name'
-                  totalSlots={5}
-                  moreItemsMessage='No more operating systems to display'
-                  data-test-subj='top-os'
-                />
-              )}
-            </WidgetGroup>
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <WidgetGroup
-              status={topServices.status}
-              errorLabel={topServices.error?.message}
-              showManageIndexPatternsLink={
-                topServices.error?.kind === 'index-pattern-missing'
-              }
-              isPermissionDenied={
-                topServices.error?.kind === 'permission-denied'
-              }
-              title='Top 5 network services'
-              caption='Current state'
-              headerLink={{ label: 'IT Hygiene', href: getItHygieneUrl() }}
-              loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
-              data-test-subj='home-overview-top-network-services'
-            >
-              {topServices.data && (
-                <TopNetworkServicesTable items={topServices.data} />
-              )}
-            </WidgetGroup>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      </div>
+      <EuiFlexGroup>
+        <EuiFlexItem style={{ minWidth: 0 }}>
+          <WidgetGroup
+            status={findings.status}
+            errorLabel={findings.error?.message}
+            showManageIndexPatternsLink={
+              findings.error?.kind === 'index-pattern-missing'
+            }
+            isPermissionDenied={findings.error?.kind === 'permission-denied'}
+            title='MITRE ATT&CK top tactics'
+            caption='Last 24 hours'
+            headerLink={{ label: 'MITRE ATT&CK', href: getMitreUrl() }}
+            loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
+            data-test-subj='home-overview-mitre-tactics'
+          >
+            {findings.data && (
+              <BarList
+                items={findings.data.topTactics}
+                emptyMessage='No MITRE ATT&CK tactics observed'
+                getHref={item =>
+                  getMitreIntelligenceResourceUrl('tactics', item)
+                }
+                data-test-subj='mitre-top-tactics'
+                barColor={UI_COLOR_STATUS.success}
+              />
+            )}
+          </WidgetGroup>
+        </EuiFlexItem>
+        <EuiFlexItem style={{ minWidth: 0 }}>
+          <AiAssistantCta />
+        </EuiFlexItem>
+      </EuiFlexGroup>
     </div>
   );
 };

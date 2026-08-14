@@ -1,0 +1,129 @@
+/**
+ * Settings page (Screen 3 of the redesign — see AI/design/redesign-v2-spec.md). Sections become
+ * bordered, shadowless cards under a centred pill title (the Home overview idiom), replacing the
+ * plain heading + panel pair the page used before. Tokens come from the shared `_redesign.scss`
+ * partial (see its own file-level doc comment) so this page never restates a value it already
+ * defines.
+ */
+@import '../redesign';
+
+.wzSettingsPage {
+  @include wzSurfaceTokens;
+}
+
+// The pill's own vertical padding and line-height, pinned explicitly rather than left to
+// EuiBadge's default — so its total rendered height is a value THIS file controls, not one it
+// would otherwise have to guess at from the outside (see $wzSettingsCardPillHeight below).
+$wzSettingsCardPillPaddingBlock: 2px;
+$wzSettingsCardPillLineHeight: 16px;
+$wzSettingsCardPillHeight: $wzSettingsCardPillLineHeight +
+  (2 * $wzSettingsCardPillPaddingBlock);
+
+/**
+ * Section card: a centred, bordered pill straddling the panel's own top border by half its own
+ * height — exactly the idiom Home's overview cards already use. `pillRow` sits ABOVE the panel in
+ * normal flow; the pill's `transform: translateY(50%)` is what pulls it down to overlap the
+ * panel's hairline, and the panel's extra top padding is what reserves the room the pill's other
+ * half needs so the first row of real content never collides with it.
+ */
+.wzSettingsCard {
+  &__pillRow {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  &__pill {
+    // 11px uppercase muted label — the same idiom `wzMicroLabel` already names for table column
+    // heads, so this restates nothing of its own.
+    @include wzMicroLabel;
+    // Fallback matters more here than anywhere else: this fill is the only thing masking the
+    // panel's own top border behind the pill, so a failed substitution does not merely lose a
+    // background — it draws the hairline straight through the label.
+    background-color: var(--wz-surface, #{$euiColorEmptyShade});
+    transform: translateY(50%);
+    padding: $wzSettingsCardPillPaddingBlock 14px;
+    line-height: $wzSettingsCardPillLineHeight;
+  }
+
+  &__panel {
+    @include wzPanel($wzCardPaddingRoomy);
+    // Reserves exactly half the pill's own height ($wzSettingsCardPillHeight above) rather than a
+    // hand-picked pixel guess, so the two values cannot silently drift apart. `calc()` (not Sass
+    // `/`) does the division, since plain `/` on two Sass numbers is deprecated.
+    padding-top: calc(
+      #{$wzCardPaddingRoomy} + #{$wzSettingsCardPillHeight} / 2
+    );
+  }
+}
+
+/**
+ * Status chip (screen 3, variation 3a — "one chip, four states"): tinted fill, no border, fully
+ * round, colour alone carries the state. Replaces the table's earlier three status languages
+ * (EuiHealth dot, plain danger badge, spinner+text). `provider-status.ts` already models these
+ * states (PR #8936) — this only restyles their presentation, it never re-derives them.
+ */
+/* Qualified with `.euiBadge` deliberately. Every rule this block overrides lives on EUI's own
+   `.euiBadge--hollow`, also a single class — a 0,1,0 vs 0,1,0 tie decided purely by which
+   stylesheet the browser loaded last. Compounding the two classes the element already carries
+   makes these 0,2,0 and takes bundle order out of it; without that, a future load-order change
+   silently reverts every chip to a hollow badge and variation 3a disappears from Screen 3. */
+.euiBadge.wzStatusChip {
+  display: inline-flex;
+  align-items: center;
+  // No `gap` here: EuiBadge wraps its children in `.euiBadge__content > .euiBadge__text`, so this
+  // element's own direct children never include both the spinner and the text for `gap` to space
+  // — `&__spinner`'s own margin below is the one mechanism that actually does that job.
+  &--ok {
+    // This OUI fork predates EUI's success/secondary rename (see wz-stat/_stat.scss's own
+    // $euiColorSecondaryText) — $euiColorSecondary is the green brand color here, not
+    // $euiColorSuccess, which this fork does not define.
+    @include wzStatusChip($euiColorSecondary, $euiColorSecondaryText);
+  }
+
+  &--failed {
+    @include wzStatusChip($euiColorDanger, $euiColorDangerText);
+  }
+
+  /* No `*Text` twin passed: $euiColorPrimary already measures ~4.6:1 over its own 12% wash, and
+     this fork has no $euiColorPrimaryText to reach for. */
+  &--testing {
+    @include wzStatusChip($euiColorPrimary);
+  }
+
+  &--could-not-verify {
+    @include wzStatusChip($euiColorWarning, $euiColorWarningText);
+  }
+
+  /* Not one of the design's four test-outcome states — a provider simply hasn't been tested yet.
+     Same pill shape for visual consistency, a neutral tint since there is no outcome to carry.
+     $euiColorMediumShade is a border/divider role, far too light to read as 11px text: the fill
+     keeps it, the label steps down to the next shade that was built to be read. */
+  &--pending {
+    @include wzStatusChip($euiColorMediumShade, $euiColorDarkShade);
+  }
+}
+
+/* Deliberately NOT nested in the block above: the spinner is a CHILD of the badge and carries only
+   this one class, so compounding it with `.euiBadge` (which the block above does to every nested
+   selector) would demand a class the element never has and the rule would simply never match. */
+.wzStatusChip__spinner {
+  margin-right: 2px;
+}
+
+/* Endpoint column (screen 3 gap: "Endpoints dominate the row"): `middleTruncate` (settings-
+   page.tsx) is the ONLY truncation mechanism — it already bounds the string length and keeps the
+   distinguishing tail visible, which a second, competing `text-overflow: ellipsis` here used to
+   throw away by re-truncating from the end at narrow widths. `overflow: hidden` stays as a plain
+   layout safety net (no ellipsis of its own), not a second truncation: with the table's
+   `tableLayout="fixed"` (settings-page.tsx) capping this column's width, it just silently clips
+   the rare case where even the already-bounded string doesn't fit, instead of visually bleeding
+   into the next cell. */
+.wzSettingsEndpointCell {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  vertical-align: bottom;
+}

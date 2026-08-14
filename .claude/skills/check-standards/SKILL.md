@@ -73,7 +73,8 @@ npx eslint $CODE --fix
 > **repo-specific (wazuh-dashboard-plugins):** Jest **must run inside the Docker
 > dev container** — host runs fail on missing `setup_node_env`. Bring up the env
 > (`cd docker/osd-dev && ./dev.sh up`), then, for each plugin containing changed
-> files (`plugins/main`, `plugins/wazuh-core`, `plugins/wazuh-check-updates`):
+> files (`plugins/main`, `plugins/wazuh-core`, `plugins/wazuh-check-updates`,
+> `plugins/wazuh-ai-assistant`):
 >
 > ```bash
 > docker exec -it <osd-dev-container> bash -lc 'cd plugins/<plugin> && yarn test:jest --runInBand'

@@ -1,0 +1,200 @@
+/**
+ * Shared design tokens for the AI Assistant redesign (see AI/design/redesign-v2-spec.md).
+ *
+ * Every component's own `.scss` imports THIS file rather than restating a value, so the four
+ * screens cannot drift apart. Values here are the design's, expressed through EUI's own SASS
+ * variables wherever one exists: the reference's flat `#E7EAEF` hairline IS `$euiBorderColor` in
+ * the light theme, and spelling it as the EUI variable is what makes the dark theme correct for
+ * free. A raw hex belongs here only when EUI genuinely has no equivalent.
+ *
+ * Usage: `@import '../redesign';` (partial, so it emits nothing on its own).
+ */
+
+/* --- Depth, radius, padding -------------------------------------------------------------------
+   The reference is flat: a 1px hairline and nothing else. Shadow is reserved for things that
+   genuinely float — popovers, the flyout, and the composer's top edge. Panels take a scoped 12px
+   while controls keep EUI's 8px, because the felt difference between the reference and today is
+   padding, not radius. */
+$wzPanelRadius: 12px;
+$wzCardPadding: 20px;
+$wzCardPaddingRoomy: 24px;
+
+/* --- Measure and gutters (layout contract §5) --------------------------------------------------
+   Prose and the composer share one centred column so they stay optically locked as the window
+   grows; only tables may break out. Extra width at 1920 goes to the rail and gutters, never to
+   line length. */
+$wzContentMaxWidth: 1060px;
+$wzTableMaxWidth: 1300px;
+$wzProseMeasure: 68ch;
+
+/* --- Composer floor and ceiling (layout contract §2) -------------------------------------------
+   The `vh` twin is a REQUIRED fallback, not a nicety: `dvh` only shipped in Safari 15.4, and a
+   browser that drops the `dvh` declaration is left with no cap at all — at which point the
+   composer's own `overflow-y: auto` never engages and a full-height field pushes the transcript
+   row away instead. `$wzResultsMaxHeight` below already shipped this pair; the composer, the other
+   `dvh` consumer, did not.
+
+   `$wzComposerMaxRows` is NOT here: the 5-row autogrow cap is `line-height * rows + padding`, and
+   only JS can read the field's own computed line-height, so it lives in `layout-constants.ts` as
+   `WZ_COMPOSER_MAX_ROWS`. A SCSS copy no rule could consume was a duplicate waiting to drift. */
+$wzComposerMaxHeightFallback: 30vh;
+$wzComposerMaxHeight: 30dvh;
+
+/* --- Results card (layout contract §4) ---------------------------------------------------------
+   Header and pagination are pinned card rows; only the body scrolls. */
+$wzResultsMaxHeight: min(460px, 52dvh);
+
+/* --- Conversation rail (layout contract §5) ----------------------------------------------------
+   NO width token lives here. Every rail width — expanded, collapsed, and both breakpoints — is read
+   imperatively off the pane's own measured `offsetWidth` in chat-page.tsx
+   (`CONVERSATION_SIDEBAR_WIDTH`, `RAIL_COLLAPSED_WIDTH`, `RAIL_COLLAPSE_AT`, `RAIL_FLYOUT_AT`) and
+   applied as an inline style, because no CSS media/container query in this build can react to a
+   component's own measured width. `$wzRailCollapsedWidth` used to restate the collapsed 48px here,
+   and the duplicate did real damage: the panel applied 48px as its border-box width AND
+   `.wzConvoRailCollapsed` applied 48px again inside the panel's own 32px content box, so the strip
+   overflowed by 16px and `.wzConvoRail`'s `overflow: hidden` clipped it. The child now says
+   `width: 100%` and the panel is the single owner of the number. */
+
+/* --- Scrollbars --------------------------------------------------------------------------------
+   The reference draws no scrollbar chrome at all: its rail mockup is `overflow: hidden` and the
+   whole design bundle contains zero scrollbar rules. Windows Chrome, meanwhile, defaults to a 15px
+   opaque bar over a full-height grey track — measured against a 260px rail that is 6% of the rail's
+   width spent on chrome, and visually the loudest object on a surface whose entire premise is
+   "quiet and dense". These two make ours an overlay instead: a 4px thumb floating in a 10px gutter
+   with no track, darkening only while its region is hovered or focused.
+
+   Deliberately NOT transparent at rest. A scroll region whose only affordance appears on hover is
+   undiscoverable for a pointer user and absent entirely for anyone who never hovers, so the resting
+   thumb stays visible — just quiet enough to read as an edge rather than as a control. */
+$wzScrollGutter: 10px;
+$wzScrollThumb: rgba($euiColorDarkShade, 0.3);
+$wzScrollThumbHover: rgba($euiColorDarkShade, 0.55);
+
+/* --- Motion (120–200ms ease-out, nothing loops) ------------------------------------------------
+   Always used inside a `prefers-reduced-motion: no-preference` block. */
+$wzMotionFast: 120ms;
+$wzMotionBase: 160ms;
+$wzMotionSlow: 200ms;
+$wzEase: ease-out;
+
+/**
+ * The token block every redesigned surface roots itself in. Compiled once per theme by OSD, so no
+ * component hardcodes a hex or branches on `theme:darkMode` itself; custom properties inherit
+ * through the whole subtree, so nothing downstream needs a dark-mode prop threaded into it.
+ */
+@mixin wzSurfaceTokens {
+  --wz-hairline: #{$euiBorderColor};
+  --wz-accent: #{$euiColorPrimary};
+  --wz-accent-soft: #{rgba($euiColorPrimary, 0.1)};
+  --wz-accent-hover: #{rgba($euiColorPrimary, 0.06)};
+  --wz-surface: #{$euiColorEmptyShade};
+  --wz-text-subdued: #{$euiTextSubduedColor};
+  --wz-panel-radius: #{$wzPanelRadius};
+}
+
+/** A bordered, shadowless panel — the one container idiom the whole redesign uses. */
+@mixin wzPanel($padding: $wzCardPadding) {
+  // A `var()` with no fallback that fails to resolve makes the ENTIRE declaration invalid (not
+  // just that one value), so an environment where the token is unset — before `wzSurfaceTokens`
+  // runs, or a subtree the mixin never reached, as the rail's PORTALLED flyout was — silently drew
+  // no border and no fill at all instead of degrading to something visible. Every `var()` in this
+  // file carries its own SASS twin as the fallback for that reason.
+  background-color: var(--wz-surface, #{$euiColorEmptyShade});
+  border: 1px solid var(--wz-hairline, #{$euiBorderColor});
+  border-radius: var(--wz-panel-radius, #{$wzPanelRadius});
+  box-shadow: none;
+  padding: $padding;
+}
+
+/**
+ * 11px uppercase muted label, used for section headers and table column heads. The reference sets
+ * these in small caps above the value; `letter-spacing` is what keeps 11px uppercase legible.
+ */
+@mixin wzMicroLabel {
+  color: var(--wz-text-subdued, #{$euiTextSubduedColor});
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/**
+ * Status chip: tinted fill, NO border, fully round, 11px semibold. This is `EuiBadge` with a custom
+ * color — deliberately not a fork. `$tint` is the role color; the fill is that color at low alpha
+ * so the chip reads as a state, not as a solid button.
+ *
+ * `$textTint` exists because a role color chosen to be seen as a FILL is usually not legible as
+ * TEXT. Over the 12% wash, EUI's raw `$euiColorSecondary` (#00BFB3), `$euiColorWarning` (#F5A700)
+ * and `$euiColorMediumShade` (#98A2B3) measure roughly 2.0:1, 1.9:1 and 2.5:1 at 11px — against
+ * WCAG 1.4.3's 4.5:1 — so "OK", "Could not verify" and "Not tested" were three of the five states
+ * and effectively unreadable in the light theme. Only danger and primary passed, which is what hid
+ * it. EUI ships a darkened `*Text` variant of each role for exactly this, so the caller passes the
+ * fill role and its text twin and both themes stay correct.
+ */
+@mixin wzStatusChip($tint, $textTint: $tint) {
+  background-color: rgba($tint, 0.12);
+  border: none;
+  border-radius: 999px;
+  color: $textTint;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+  padding: 0 8px;
+}
+
+/**
+ * The quiet overlay scrollbar described by the `$wzScroll*` tokens above. Applied to every scroll
+ * region this redesign owns — via `wzScrollChild` below for the ones that are also layout children,
+ * and directly for the two that are not (the composer row and its textarea).
+ *
+ * Both vendor surfaces are covered because they are disjoint: Firefox reads `scrollbar-width` /
+ * `scrollbar-color` and ignores the pseudo-elements, WebKit/Blink the reverse. Styling only one
+ * leaves the other browser on the platform default, which is the bar this exists to remove.
+ */
+@mixin wzQuietScrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: $wzScrollThumb transparent;
+
+  &::-webkit-scrollbar {
+    width: $wzScrollGutter;
+    height: $wzScrollGutter;
+  }
+
+  /* No track, so the bar reads as a floating thumb rather than as a channel cut down the edge of
+     the pane — the track is what makes the platform default look like furniture. */
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: $wzScrollThumb;
+    border-radius: 999px;
+    /* Transparent border + `content-box` clip is what paints a 4px thumb inside a 10px gutter
+       WITHOUT shrinking the grab target: the border area still hit-tests as the thumb, so the
+       pointer target stays the full 10px even though only 4px of it is visible. */
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+
+  &:hover,
+  &:focus-within {
+    scrollbar-color: $wzScrollThumbHover transparent;
+  }
+
+  &:hover::-webkit-scrollbar-thumb,
+  &:focus-within::-webkit-scrollbar-thumb {
+    background-color: $wzScrollThumbHover;
+  }
+}
+
+/**
+ * Any grid/flex child that scrolls needs this. The automatic minimum size of a flex/grid item is
+ * its content size, so without it the transcript refuses to shrink and pushes the composer
+ * off-screen — Safari surfaces this earlier than Chrome, and it is the first of the six Safari
+ * rules in the spec.
+ */
+@mixin wzScrollChild {
+  min-height: 0;
+  overflow-y: auto;
+  @include wzQuietScrollbar;
+}

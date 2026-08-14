@@ -31,8 +31,8 @@ cd plugins/main
 yarn test:jest
 ```
 
-Repeat the same pattern for `plugins/wazuh-core` and
-`plugins/wazuh-check-updates` if needed.
+Repeat the same pattern for `plugins/wazuh-core`,
+`plugins/wazuh-check-updates` and `plugins/wazuh-ai-assistant` if needed.
 
 Jest will execute all `.test.ts` and `.test.tsx` files in the plugin and display results with coverage information.
 

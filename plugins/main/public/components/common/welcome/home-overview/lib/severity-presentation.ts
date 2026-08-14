@@ -1,5 +1,5 @@
 import { SeverityBand } from '../interfaces/types';
-import { UI_COLOR_STATUS } from '../../../../../../common/constants';
+import { HOME_OVERVIEW_COLOR, HOME_OVERVIEW_TEXT_COLOR } from './theme-colors';
 
 export interface SeverityPresentation {
   band: SeverityBand;
@@ -7,20 +7,23 @@ export interface SeverityPresentation {
   color: string;
 }
 
-/** Label and color per band, shared by every severity visualization. */
+/**
+ * Label and color per band, shared by every severity visualization. Colors come from
+ * `HOME_OVERVIEW_COLOR` (theme-aware CSS custom properties) rather than the frozen hex in
+ * `UI_COLOR_STATUS`.
+ */
 export const SEVERITY_PRESENTATION: SeverityPresentation[] = [
-  { band: 'critical', label: 'Critical', color: UI_COLOR_STATUS.danger },
-  { band: 'high', label: 'High', color: UI_COLOR_STATUS.warning },
-  { band: 'medium', label: 'Medium', color: UI_COLOR_STATUS.info },
-  { band: 'low', label: 'Low', color: UI_COLOR_STATUS.success },
+  {
+    band: 'critical',
+    label: 'Critical',
+    color: HOME_OVERVIEW_COLOR.danger,
+  },
+  { band: 'high', label: 'High', color: HOME_OVERVIEW_COLOR.warning },
+  { band: 'medium', label: 'Medium', color: HOME_OVERVIEW_COLOR.info },
+  { band: 'low', label: 'Low', color: HOME_OVERVIEW_COLOR.success },
   {
     band: 'informational',
     label: 'Informational',
-    color: UI_COLOR_STATUS.disabled,
-  },
-  {
-    band: 'pending',
-    label: 'Pending',
-    color: UI_COLOR_STATUS.disabled,
+    color: HOME_OVERVIEW_TEXT_COLOR.text,
   },
 ];

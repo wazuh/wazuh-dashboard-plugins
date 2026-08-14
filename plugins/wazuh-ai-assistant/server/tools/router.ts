@@ -38,10 +38,10 @@ export type RouterCategory =
  * contains has an entry here at all — so a new catalog tool that forgets to add itself here fails
  * loudly at plugin start instead of silently never being routed to.
  *
- * `general` (no tools) and `free_search` (the escape hatch, `search_wazuh_data`) are not listed as
- * map values for any OTHER tool; `search_wazuh_data` is also always appended to stage 2's resolved
- * tool list regardless of routed category (see `resolveStage2Tools`), so its category membership
- * here is mostly documentary.
+ * `general` (minimal recovery set, not "no tools" — see `resolveStage2Tools`) and `free_search`
+ * (the escape hatch, `search_wazuh_data`) are not listed as map values for any OTHER tool;
+ * `search_wazuh_data` is also always appended to stage 2's resolved tool list regardless of routed
+ * category (see `resolveStage2Tools`), so its category membership here is mostly documentary.
  */
 const TOOL_CATEGORY: Record<string, RouterCategory> = {
   // agents
@@ -51,7 +51,20 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   get_critical_findings: 'findings',
   search_findings_by_agent: 'findings',
   get_top_rules: 'findings',
+  // get_top_agents ranks agents over either findings or events (its own `index` param) -- filed
+  // under 'findings' for the same reason as get_events_by_agent below: it is the common case and
+  // costs no extra stage-1 category.
+  get_top_agents: 'findings',
   get_findings_by_time: 'findings',
+  // get_events_by_agent (issue: "Add a typed events tool over wazuh-events-v5") targets the raw
+  // event stream, not findings -- but it is filed under 'findings' rather than a new 'events'
+  // category. Rationale: a dedicated category costs one more line on the stage-1 routing menu
+  // (CATEGORY_DESCRIPTIONS) on EVERY turn regardless of whether it is ever picked, and users
+  // conflate "what happened"/"events" with "findings" in exactly the way the issue's own
+  // reproduction shows (a findings-only tool call for an "everything that happened" question) --
+  // filing this under 'findings' means it is reachable whenever the model (mis)routes an
+  // events-shaped question there, which is the common case, at zero extra stage-1 cost.
+  get_events_by_agent: 'findings',
   get_brute_force: 'findings',
   get_security_summary: 'findings',
   get_suspicious_powershell: 'findings',
@@ -77,11 +90,10 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   get_mitre_findings: 'mitre',
   get_mitre_summary: 'mitre',
 
-  // inventory (syscollector)
-  get_agent_os: 'inventory',
-  get_agent_packages: 'inventory',
-  get_agent_ports: 'inventory',
-  get_agent_processes: 'inventory',
+  // inventory (syscollector) -- get_agent_os/get_agent_packages/get_agent_ports/
+  // get_agent_processes were consolidated into get_agent_inventory (issue: "Consolidate agent
+  // inventory into one tool"); this single entry replaces all four.
+  get_agent_inventory: 'inventory',
 
   // compliance
   get_compliance_alerts: 'compliance',
@@ -116,10 +128,13 @@ const CATEGORY_ORDER: RouterCategory[] = [
  * character here is paid for on every turn (stage-1 token budget). */
 const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
   agents:
-    'Agent listing by status (active, pending, never_connected, disconnected) and/or agent ID.',
+    'Agent listing by status (active, pending, never_connected, disconnected) and/or agent ID. ' +
+    'Enrollment/connection status only, NOT comms-channel health or message drop-rate.',
   findings:
-    'Finding search/summaries: critical findings, by agent/rule/rule-tag/OS/time, top rules, ' +
-    'brute-force, suspicious PowerShell, general security summary.',
+    'Finding search/summaries: critical findings, by agent/rule/rule-tag/OS/time, top rules, top/' +
+    'noisiest agents, brute-force, suspicious PowerShell, general security summary. Also covers ' +
+    'the raw/normalized event stream ("everything that happened", matched or not). NOT automated ' +
+    'actions Wazuh took in response (active response/blocking/quarantine) -- no category covers that.',
   vulnerabilities:
     'CVE/vulnerability data: by agent, by CVE ID, solved, or critical only.',
   fim: 'File Integrity Monitoring: current state of monitored files (path, mtime, owner, hashes).',
@@ -129,7 +144,9 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
   mitre:
     'MITRE ATT&CK technique/tactic findings and technique-frequency summaries.',
   inventory:
-    'Syscollector inventory: agent OS, installed packages, open ports, running processes.',
+    'Syscollector inventory: agent/host OS, installed software or packages, open ports, running ' +
+    'processes, or installed hotfixes -- including "what software/programs are installed" ' +
+    'questions that name the host only vaguely ("this box/server/machine") rather than by ID.',
   compliance:
     'Compliance findings/summaries for any of 10 frameworks (PCI DSS, HIPAA, GDPR, ISO 27001, ' +
     'NIS2, NIST 800-171/800-53, FedRAMP, CMMC, TSC).',
@@ -141,7 +158,8 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
   free_search:
     'Anything else about Wazuh finding/vulnerability/state data (last resort).',
   general:
-    'No Wazuh data needed at all: greeting, meta-question, clarification, chit-chat.',
+    'Greetings, thanks, or questions about the assistant itself. If the user asks anything about ' +
+    'their own environment - however vaguely - do NOT pick general.',
 };
 
 /**
@@ -242,8 +260,9 @@ export function buildRoutingPrompt(nowIso: string): string {
     'You are the routing pre-step for the Wazuh AI Assistant. Do not answer the user yet.',
     `The current UTC time is ${nowIso}.`,
     "Pick the 1-2 categories of Wazuh data most likely needed to answer the user's last message, " +
-      'then call route_question with them, most relevant first. If no Wazuh data is needed at ' +
-      'all (greeting, meta-question, clarification, chit-chat), pick "general" alone.',
+      'then call route_question with them, most relevant first. Pick "general" alone only for ' +
+      'greetings, thanks, or questions about the assistant itself - never when the user asks ' +
+      'anything, however vaguely, about their own environment.',
     'Categories:',
     menu,
     'Call route_question now.',
@@ -251,32 +270,99 @@ export function buildRoutingPrompt(nowIso: string): string {
 }
 
 /**
+ * Categories whose QUESTION VOCABULARY genuinely overlaps, so routing to one must also offer the
+ * other's tools. Deterministic, because the alternative (making the descriptions clearer) was
+ * measured and lost.
+ *
+ * EVIDENCE (issue #8935, instrumented on the deployed build, 3/3 runs identical): "How badly are we
+ * failing CIS, in plain numbers?" routed to `["compliance"]`, which offers
+ * `get_compliance_alerts` / `get_compliance_summary` / `search_wazuh_data`. `get_sca_results` --
+ * which holds the answer, 102 failed / 95 passed / 10 not-applicable on `cis_ubuntu22-04` -- was
+ * NEVER OFFERED. The assistant then said "none of the available compliance-framework tools include a
+ * 'cis' tag", which was LITERALLY TRUE of the tools it had. It was not hallucinating a limitation; it
+ * was accurately describing a tool list that did not contain SCA.
+ *
+ * Note what this is NOT: `sca`'s own description already reads "per-agent compliance benchmark
+ * results (e.g. CIS Ubuntu)" -- the vocabulary was already there and the router still chose
+ * `compliance`. So sharpening prose is not the fix. Neither is a prompt instruction: the model cannot
+ * call a tool it was not given, which is the same shape as issue #8913 (guidance naming `get_agents`
+ * on a turn where the `agents` category was never routed) and #8919 (a tool description naming a tool
+ * from another category).
+ *
+ * Why co-routing rather than moving the vocabulary: in Wazuh a "compliance" question can legitimately
+ * be answered from EITHER side -- SCA benchmark results (per-agent CIS/hardening checks) or
+ * framework-tagged findings (PCI DSS, HIPAA, GDPR...). Neither router choice is wrong, so the fix is
+ * to stop making it a choice. Symmetric on purpose: "which PCI controls are we failing" deserves the
+ * SCA tools for the same reason "how badly are we failing CIS" deserves the compliance ones.
+ *
+ * Kept deliberately narrow -- one evidenced pair. This is NOT a place to relax routing generally: the
+ * router exists to narrow ~30 tools to a handful, and every added category costs the model attention
+ * on tools it does not need. Add a pair here only with a measured witness like the one above.
+ */
+export const CO_ROUTED_CATEGORIES: Partial<
+  Record<RouterCategory, readonly RouterCategory[]>
+> = {
+  compliance: ['sca'],
+  sca: ['compliance'],
+};
+
+/** `categories` plus every co-routed sibling (see `CO_ROUTED_CATEGORIES`), order-preserving and
+ * deduped. `general` is deliberately not co-routed with anything -- it is the no-data-path recovery
+ * category, and widening it would defeat the minimal recovery set below. */
+export function withCoRoutedCategories(
+  categories: readonly RouterCategory[],
+): RouterCategory[] {
+  const out: RouterCategory[] = [];
+  const seen = new Set<RouterCategory>();
+  const push = (category: RouterCategory): void => {
+    if (!seen.has(category)) {
+      seen.add(category);
+      out.push(category);
+    }
+  };
+  for (const category of categories) {
+    push(category);
+  }
+  for (const category of categories) {
+    for (const sibling of CO_ROUTED_CATEGORIES[category] ?? []) {
+      push(sibling);
+    }
+  }
+  return out;
+}
+
+/**
  * Stage-2 tool-list resolver: union of the routed categories' tools, plus
- * `search_wazuh_data` always appended (deduped) as the safety-valve escape hatch — UNLESS the
- * model routed to `general` alone, in which case this returns `undefined` so chat.ts's orchestrate
- * loop skips tools entirely for the turn (today's plain-text-only behavior, options with `tools`
- * undefined).
+ * `search_wazuh_data` always appended (deduped) as the safety-valve escape hatch. NEVER returns
+ * `undefined` and NEVER resolves to an empty list: a stage-1 misclassification must be
+ * recoverable, not terminal, so even a lone `general` route (see issue "never route zero
+ * tools") resolves to a minimal recovery set — `get_security_summary` plus `search_wazuh_data`
+ * — instead of leaving the turn with no data path at all. `tool_choice` still stays `'auto'` for
+ * these turns (server/routes/chat.ts's `orchestrate`), so a genuine greeting still gets a
+ * plain-text answer; the minimal set is only an escape hatch the model *may* reach for, never a
+ * forced call.
  *
  * `categories` is expected to already be schema-validated (schema-validator.ts against
  * `ROUTE_QUESTION_TOOL.parameters`, done by the caller in chat.ts) so every entry is one of
  * `CATEGORY_ORDER`; this function still defensively drops anything unrecognized rather than
  * trusting that invariant blindly.
  */
-export function resolveStage2Tools(
-  categories: string[],
-): ToolSpec[] | undefined {
+export function resolveStage2Tools(categories: string[]): ToolSpec[] {
   const valid = categories.filter((cat): cat is RouterCategory =>
     (CATEGORY_ORDER as string[]).includes(cat),
   );
-
-  if (valid.length === 1 && valid[0] === 'general') {
-    return undefined;
-  }
+  const routed = withCoRoutedCategories(valid);
 
   const toolNames = new Set<string>();
-  for (const category of valid) {
-    for (const toolName of CATEGORY_TOOLS[category]) {
-      toolNames.add(toolName);
+  if (routed.length === 1 && routed[0] === 'general') {
+    // Minimal recovery set (see doc comment above): `general` alone maps to no tool category in
+    // `TOOL_CATEGORY`/`CATEGORY_TOOLS`, so without this branch the union below would be empty.
+    toolNames.add('get_security_summary');
+  } else {
+    for (const category of routed) {
+      for (const toolName of CATEGORY_TOOLS[category]) {
+        toolNames.add(toolName);
+      }
     }
   }
   // Always-on escape hatch, deduped via the Set regardless of whether

@@ -16,7 +16,11 @@ import { objectSchema } from './common';
  *
  * `tableSpec.columns`/`digest.sampleColumns` are left empty and `deriveColumns: true` opts this
  * tool into digest.ts's per-response column derivation (see digest.ts) — there is no fixed schema
- * to declare statically for an arbitrary query.
+ * to declare statically for an arbitrary query. `validateFieldNames: true` opts this tool (and
+ * only this tool) into executor.ts's pre-execution field-existence check (field-validation.ts):
+ * unlike every typed catalog tool, the field paths here come straight from the model's own guess,
+ * so this is the one call site where a made-up field name (e.g. "agent.name.keyword") is actually
+ * reachable.
  */
 export const searchWazuhDataTool: ToolDefinition = {
   spec: {
@@ -32,9 +36,16 @@ export const searchWazuhDataTool: ToolDefinition = {
       'field with both "gte" and "lte" bounds, spanning no more than 90 days (a query without one ' +
       'is rejected); "size" must be <= 500; no "script"/"script_fields"/"runtime_mappings", no ' +
       '"regexp", and no leading-wildcard "wildcard"/"query_string"/"simple_query_string" values. ' +
+      'For "how many distinct X" questions use a "cardinality" aggregation; metric aggregations ' +
+      '("cardinality"/"avg"/"sum"/"min"/"max"/"value_count") are returned to you in the digest. ' +
       'If "aggs" has more than one top-level aggregation, every aggregation\'s buckets are ' +
       'summarized in the digest text you receive, but the rendered table only shows the first ' +
-      "aggregation's buckets.",
+      'aggregation\'s buckets. For a "how many DISTINCT X" question, use a "cardinality" ' +
+      'aggregation on an ALLOWLISTED keyword field such as wazuh.agent.name (for distinct hosts/' +
+      'agents) instead of counting hits -- a hit count overcounts when one host has multiple ' +
+      'documents. Only a fixed set of low-cardinality fields is allowed for this (the allowlist ' +
+      'may grow over time); an arbitrary field like source.user.name or file.path is rejected -- ' +
+      'if the field you need is not accepted, say so rather than retrying variations.',
     parameters: objectSchema(
       {
         index_pattern: {
@@ -48,6 +59,11 @@ export const searchWazuhDataTool: ToolDefinition = {
         },
         query_dsl: {
           type: 'string',
+          // JSON-in-a-string (common/types.ts's JsonSchemaPrimitive.jsonString doc comment): lets
+          // wire-schema.ts widen this property's WIRE type to accept an object too, and
+          // schema-validator.ts's coerce() stringify it back — a model that emits nested JSON as
+          // a live object rather than hand-serializing it isn't hard-rejected for that alone.
+          jsonString: true,
           description:
             'A JSON-encoded (stringified) OpenSearch search request body, e.g. ' +
             '"{\\"query\\":{\\"bool\\":{\\"filter\\":[...]}},\\"sort\\":[...],\\"_source\\":[...],' +
@@ -95,4 +111,11 @@ export const searchWazuhDataTool: ToolDefinition = {
   tableSpec: { columns: [] },
   digest: { sampleColumns: [] },
   deriveColumns: true,
+  // The genuine escape hatch: the model's own DSL can put ANY finding/event/state field into the
+  // digest, so an unlisted field must fail closed (issue #8917 -- see
+  // `ToolDefinition.failClosedFieldPolicy`'s doc comment, types.ts; this used to be inherited from
+  // `deriveColumns` above, now explicit). Do not set this to `false` -- that would remove the
+  // fail-closed protection this tool has always had.
+  failClosedFieldPolicy: true,
+  validateFieldNames: true,
 };

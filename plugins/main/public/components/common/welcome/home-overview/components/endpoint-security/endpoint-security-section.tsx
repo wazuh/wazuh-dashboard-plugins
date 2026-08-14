@@ -21,6 +21,7 @@ import {
 } from '../../hooks/use-overview-data';
 import {
   getConfigurationAssessmentUrl,
+  getFileIntegrityMonitoringInventoryFilesUrl,
   getFileIntegrityMonitoringUrl,
 } from '../../utils/navigation';
 import { DataGroupResult } from '../../interfaces/data-group';
@@ -82,7 +83,10 @@ const EndpointSecuritySectionComponent: React.FC<
           >
             {sca.data && (
               <>
-                <ScaTiles tiles={sca.data.tiles} />
+                <ScaTiles
+                  tiles={sca.data.tiles}
+                  indexPatternId={sca.indexPatternId}
+                />
                 <EuiSpacer size='m' />
                 <ScoreGauge
                   title='Overall score'
@@ -128,8 +132,19 @@ const EndpointSecuritySectionComponent: React.FC<
             {fim.data && (
               <>
                 <StatTile
-                  value={<TabNumber value={fim.data.total} />}
-                  label='Files & registry objects baselined fleet-wide'
+                  value={
+                    <RedirectAppLinks application={getCore().application}>
+                      <EuiLink
+                        style={{ fontWeight: 'inherit' }}
+                        color='text'
+                        href={getFileIntegrityMonitoringInventoryFilesUrl()}
+                        data-test-subj='fim-hero-link'
+                      >
+                        <TabNumber value={fim.data.total} />
+                      </EuiLink>
+                    </RedirectAppLinks>
+                  }
+                  label='File integrity baselined fleet-wide'
                   reverse
                   textAlign='center'
                   data-test-subj='fim-hero'

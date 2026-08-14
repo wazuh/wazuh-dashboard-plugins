@@ -86,11 +86,11 @@ interface DiscoverLinkProps {
 }
 
 /**
- * Small "Open in Discover" action rendered next to a result table (result-table.tsx's accordion
- * `extraAction`) when its spec carries `discover` (Indexer-backed tables only). Resolves the target
- * URL eagerly on mount rather than on first expand — the underlying lookup is cheap and cached
- * (module-level Map above), so there is no real cost to resolving it even for a collapsed table,
- * and it keeps this component's behavior independent of the accordion's own open/closed state.
+ * Small "Open in Discover" action rendered in a result card's header (result-table.tsx) when its
+ * spec carries `discover` (Indexer-backed tables only). Resolves the target URL eagerly on mount
+ * rather than on first expand — the underlying lookup is cheap and cached (module-level Map above),
+ * so there is no real cost to resolving it even for a collapsed card, and it keeps this component's
+ * behavior independent of the card's own open/closed state.
  * Renders nothing until resolved, and nothing (silently) if resolution fails — the table itself
  * always renders regardless, this is purely an optional affordance on top of it.
  */

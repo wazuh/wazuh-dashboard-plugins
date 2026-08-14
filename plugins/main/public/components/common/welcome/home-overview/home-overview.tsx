@@ -57,10 +57,7 @@ const HomeOverviewBody: React.FC = () => {
         />
       </div>
       <EuiSpacer size='l' />
-      <ThreatIntelligenceFeedSection
-        vulnerabilities={vulnerabilities}
-        threatIntel={threatIntel}
-      />
+      <ThreatIntelligenceFeedSection threatIntel={threatIntel} />
       <EuiSpacer size='l' />
       <div ref={breakdownsRef}>
         <SecurityOperationsSection
@@ -83,7 +80,7 @@ const HomeOverviewBody: React.FC = () => {
 
 export const HomeOverview = withErrorBoundary(
   withGlobalBreadcrumb(() => [{ text: overview.breadcrumbLabel }])(() => (
-    <EuiPage paddingSize='l'>
+    <EuiPage paddingSize='l' className='wzHomeOverview'>
       <EuiPageBody>
         <HomeOverviewBody />
       </EuiPageBody>

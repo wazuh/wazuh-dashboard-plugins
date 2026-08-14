@@ -7,12 +7,11 @@ import {
   Logger,
 } from '../../../src/core/server';
 import { registerRoutes } from './routes';
-import { setSavedObjectsStart, setApiKeyCipher } from './plugin-services';
-import { providerSettingsSavedObjectType } from './saved_objects/provider-settings';
-import { assistantSettingsSavedObjectType } from './saved_objects/assistant-settings';
-import { conversationSavedObjectType } from './saved_objects/conversation';
+import { setApiKeyCipher } from './plugin-services';
 import { ApiKeyCipher, parseEncryptionKey } from './crypto/api-key-cipher';
 import { WazuhAiAssistantConfigType } from './config';
+import { createAssistantSettingsManager } from './settings/route-handler-context';
+import { AiProvidersClient } from './settings/ai-providers-client';
 import {
   WazuhAiAssistantPluginSetup,
   WazuhAiAssistantPluginSetupDependencies,
@@ -41,9 +40,9 @@ export class WazuhAiAssistantPlugin
     this.logger.debug('wazuhAiAssistant: setup');
 
     // Encryption-at-rest for provider API keys (server/crypto/api-key-cipher.ts): read this
-    // plugin's own config once here and stash a cipher for every route handler to share (same
-    // getter/setter singleton pattern as `setSavedObjectsStart` below — see
-    // server/plugin-services.ts). `.pipe(first()).toPromise()` is the same idiom the reference
+    // plugin's own config once here and stash a cipher for every route handler to share (the
+    // getter/setter singleton pattern documented in server/plugin-services.ts).
+    // `.pipe(first()).toPromise()` is the same idiom the reference
     // main plugin uses to read its own config in setup() (wdp-5/plugins/main/server/plugin.ts:
     // `const config = await config$.pipe(first()).toPromise();`), confirming this is the standard
     // OSD/Kibana plugin-platform convention rather than something specific to this plugin.
@@ -79,12 +78,24 @@ export class WazuhAiAssistantPlugin
       );
     }
 
-    core.savedObjects.registerType(providerSettingsSavedObjectType);
-    core.savedObjects.registerType(assistantSettingsSavedObjectType);
-    // All three types are `hidden: true`, which keeps them out of the Saved Objects management UI
-    // but does not change registration: a hidden type must still be registered here, and is then
-    // reached through a scoped client built with `includedHiddenTypes`.
-    core.savedObjects.registerType(conversationSavedObjectType);
+    // This plugin registers no saved object types: persisted conversations live in the
+    // `wazuh-ai-assistant-sessions` index alias (server/conversation-store.ts); AI provider
+    // configuration, privacy defaults/override/field policy, and (via a separate ISM policy)
+    // `conversationRetentionDays` all go through the Wazuh indexer's own APIs instead of direct
+    // index access (server/settings/ai-providers-client.ts, index-settings-provider.ts,
+    // ism-settings-provider.ts) — all provisioned/owned indexer-side, not by this plugin
+    // (wazuh-indexer-plugins#1422, wazuh-dashboard-plugins#8841/#500).
+
+    // Single `AssistantSettingsManager` and `AiProvidersClient` for the whole plugin, reached by
+    // every route handler as `context.wazuh_ai_assistant.{assistantSettings,aiProviders}` (see
+    // server/settings/route-handler-context.ts) rather than a module-level singleton imported by
+    // whichever file happens to need it.
+    const assistantSettingsManager = createAssistantSettingsManager();
+    const aiProvidersClient = new AiProvidersClient();
+    core.http.registerRouteHandlerContext('wazuh_ai_assistant', () => ({
+      assistantSettings: assistantSettingsManager,
+      aiProviders: aiProvidersClient,
+    }));
 
     const router = core.http.createRouter();
     registerRoutes(router, this.logger);
@@ -92,11 +103,8 @@ export class WazuhAiAssistantPlugin
     return {};
   }
 
-  public start(core: CoreStart): WazuhAiAssistantPluginStart {
+  public start(_core: CoreStart): WazuhAiAssistantPluginStart {
     this.logger.debug('wazuhAiAssistant: start');
-    // Stash the savedObjects start contract so the conversation routes can build a scoped client
-    // that includes the hidden `wazuh-ai-assistant-conversation` type (see plugin-services.ts).
-    setSavedObjectsStart(core.savedObjects);
     return {};
   }
 

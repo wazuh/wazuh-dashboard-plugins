@@ -37,6 +37,13 @@ const KNOWN_SAFE_STRUCTURAL_FIELDS = new Set<string>([
   // Aggregation-bucket shape (get_top_rules and the *_summary tools).
   'key',
   'doc_count',
+  // Sampled-label-spread sub-aggs (issue #8921): `cardinality`/`filter` sub-agg counters merged
+  // into a bucket row by digest.ts's existing metric-/filter-sub-agg branches — aggregation
+  // counters over already-classified fields (wazuh.rule.title/wazuh.rule.level/
+  // wazuh.agent.name), never analyst/attacker-supplied free text themselves.
+  'distinct_titles',
+  'distinct_names',
+  'high_or_critical',
   // os.* / architecture / vendor / version: OS/package metadata, not identifiers.
   'wazuh.agent.host.os.name',
   'os.name',
@@ -150,15 +157,35 @@ function hasPolicyEntry(
   });
 }
 
+/**
+ * Coverage check for one field on one tool. `requireExplicitEntry` must be `true` whenever the
+ * field is read by a `deriveColumns` tool (executor.ts threads `ToolDefinition.deriveColumns` into
+ * `applyFieldPolicy`'s `isEscapeHatch` parameter): for such a tool, "no FIELD_POLICY_DEFAULTS
+ * entry" means FAIL-CLOSED anonymize at runtime, the OPPOSITE of what an omission means for a
+ * static-schema tool (allow-by-omission, `isEscapeHatch: false`). `KNOWN_SAFE_STRUCTURAL_FIELDS`
+ * only ever certifies "this field needs no entry under the ALLOW-by-omission default" — it is a
+ * structural-shape guess (counts, IDs, enums), never a reviewed privacy decision — so it must NOT
+ * be allowed to satisfy coverage for a field whose actual runtime default is anonymize: a field
+ * that merely "looks harmless" is not the same thing as a field someone actually decided should
+ * reach the provider un-anonymized. This is precisely the gap that let `get_agent_inventory`'s
+ * `package.vendor` (a distributor string that routinely embeds a maintainer email address) ship
+ * with no real policy entry: `KNOWN_SAFE_STRUCTURAL_FIELDS` satisfied the OLD version of this
+ * check, making the test green while the field had never actually been reviewed — it happened to
+ * come out anonymized only because `applyFieldPolicy`'s fail-closed default did so by accident, a
+ * property this test could not see because it applied the SAME "known-safe" exemption regardless
+ * of which default an unlisted field would actually get at runtime. See the mechanism self-test
+ * below, and privacy.ts's `package.vendor` entry for the resulting fix.
+ */
 function isFieldCovered(
   field: string,
   toolName: string,
   policy: FieldPolicyEntry[],
+  requireExplicitEntry: boolean,
 ): boolean {
-  return (
-    hasPolicyEntry(field, toolName, policy) ||
-    KNOWN_SAFE_STRUCTURAL_FIELDS.has(field)
-  );
+  if (hasPolicyEntry(field, toolName, policy)) {
+    return true;
+  }
+  return !requireExplicitEntry && KNOWN_SAFE_STRUCTURAL_FIELDS.has(field);
 }
 
 test('every T1 non-deriveColumns tool digest column is privacy-classified or explicitly allowlisted', () => {
@@ -168,7 +195,10 @@ test('every T1 non-deriveColumns tool digest column is privacy-classified or exp
       continue;
     }
     for (const field of def.digest.sampleColumns) {
-      if (!isFieldCovered(field, def.spec.name, FIELD_POLICY_DEFAULTS)) {
+      // `requireExplicitEntry: false` — this loop only ever reaches non-deriveColumns tools (see
+      // the `continue` above), where an unlisted field allows-by-omission and the structural
+      // allowlist is exactly the right signal that the omission is safe.
+      if (!isFieldCovered(field, def.spec.name, FIELD_POLICY_DEFAULTS, false)) {
         failures.push(`${def.spec.name}/${field}`);
       }
     }
@@ -182,15 +212,65 @@ test('every T1 non-deriveColumns tool digest column is privacy-classified or exp
   );
 });
 
+test('every breakdownDimensions field is privacy-classified or explicitly allowlisted', () => {
+  // `digest.breakdownDimensions` is a second model-facing data path: synthetic breakdown BUCKET
+  // KEYS are values of these fields and leave through the digest exactly like sampleColumns
+  // values do (executor.ts's identity-map path routes them through the same applyFieldPolicy
+  // pass). Unlike the sampleColumns loop above this includes deriveColumns tools too — the
+  // dimensions list is static and declared, so there is no reason to leave it to the
+  // fail-closed runtime default when it can be reviewed here. For a deriveColumns tool
+  // specifically, `requireExplicitEntry: true` means the structural allowlist cannot substitute
+  // for that review (see `isFieldCovered`'s doc comment) — the field needs a REAL
+  // FIELD_POLICY_DEFAULTS entry, because omitting one there does not mean "allow", it means
+  // "anonymize with nobody having decided that's correct".
+  const failures: string[] = [];
+  // Without this guard the loop passes vacuously if no registered tool declared
+  // breakdownDimensions at all (e.g. the field got renamed) -- same standard as the
+  // registry-sweep guards in agg-representability-coverage.test.ts/window-recount.test.ts.
+  let checkedCount = 0;
+  for (const def of listToolDefinitions()) {
+    for (const field of def.digest.breakdownDimensions ?? []) {
+      checkedCount += 1;
+      if (
+        !isFieldCovered(
+          field,
+          def.spec.name,
+          FIELD_POLICY_DEFAULTS,
+          // A `deriveColumns` tool takes the fail-closed path, where a test-only
+          // KNOWN_SAFE_STRUCTURAL_FIELDS entry is the OPPOSITE of "will be allowed" — such a field
+          // needs a real policy entry. See isFieldCovered's doc comment.
+          !!def.deriveColumns,
+        )
+      ) {
+        failures.push(`${def.spec.name}/${field}`);
+      }
+    }
+  }
+  assert.ok(
+    checkedCount > 0,
+    'no registered tool declared breakdownDimensions -- this test would pass vacuously',
+  );
+  assert.deepEqual(
+    failures,
+    [],
+    `breakdownDimensions field(s) with no FIELD_POLICY_DEFAULTS entry and no structural ` +
+      `allowlist entry: ${failures.join(', ')}`,
+  );
+});
+
 test('isFieldCovered mechanism: an unclassified field is correctly flagged as NOT covered', () => {
   // Regression-guard sanity check for the helper itself: a field that is neither a
   // FIELD_POLICY_DEFAULTS entry nor a known-safe structural field must fail coverage — this is
   // what makes the test above fail loudly if a future PR adds a digest column and forgets both.
+  // `requireExplicitEntry: false` throughout this test — these are all the allow-by-omission
+  // (non-deriveColumns) semantics; the deriveColumns/`requireExplicitEntry: true` distinction has
+  // its own test below.
   assert.equal(
     isFieldCovered(
       'data.totally_new_field',
       'get_critical_findings',
       FIELD_POLICY_DEFAULTS,
+      false,
     ),
     false,
   );
@@ -201,6 +281,7 @@ test('isFieldCovered mechanism: an unclassified field is correctly flagged as NO
       'wazuh.agent.host.ip',
       'get_critical_findings',
       FIELD_POLICY_DEFAULTS,
+      false,
     ),
     true,
   );
@@ -209,15 +290,63 @@ test('isFieldCovered mechanism: an unclassified field is correctly flagged as NO
       'wazuh.rule.tags',
       'get_compliance_alerts',
       FIELD_POLICY_DEFAULTS,
+      false,
     ),
     true,
   );
   assert.equal(
-    isFieldCovered('name', 'get_agent_packages', FIELD_POLICY_DEFAULTS),
+    isFieldCovered('name', 'get_agent_packages', FIELD_POLICY_DEFAULTS, false),
     true,
   );
   assert.equal(
-    isFieldCovered('name', 'get_agents', FIELD_POLICY_DEFAULTS),
+    isFieldCovered('name', 'get_agents', FIELD_POLICY_DEFAULTS, false),
+    true,
+  );
+});
+
+test("isFieldCovered mechanism: KNOWN_SAFE_STRUCTURAL_FIELDS does not satisfy a deriveColumns tool's fail-closed requirement", () => {
+  // Mechanism self-test for the exact defect this file's `requireExplicitEntry` parameter fixes
+  // (see `isFieldCovered`'s doc comment): `get_agent_inventory` sets `deriveColumns: true`, which
+  // makes executor.ts pass `isEscapeHatch: true` into `applyFieldPolicy` — an UNLISTED field there
+  // is FAIL-CLOSED anonymized at runtime, not allowed through. 'vendor' (the bare structural word,
+  // deliberately NOT 'package.vendor' — which now has its own real FIELD_POLICY_DEFAULTS entry
+  // and would pass either way, masking this test's point) sits in KNOWN_SAFE_STRUCTURAL_FIELDS but
+  // has no FIELD_POLICY_DEFAULTS entry of its own anywhere. If `isFieldCovered` ever regresses to
+  // ignoring `requireExplicitEntry` (i.e. back to the pre-fix behavior that let `package.vendor`
+  // ship unreviewed), this assertion flips to `true` and fails — that IS the regression this test
+  // exists to catch.
+  assert.equal(
+    isFieldCovered(
+      'vendor',
+      'get_agent_inventory',
+      FIELD_POLICY_DEFAULTS,
+      true,
+    ),
+    false,
+  );
+  // The identical field/tool/policy inputs ARE covered when `requireExplicitEntry` is false — this
+  // pins that the structural allowlist still does its intended job for a tool whose unlisted
+  // fields allow-by-omission (the pre-existing, still-correct semantics for every non-deriveColumns
+  // tool), so the fix above narrows the exemption rather than deleting it.
+  assert.equal(
+    isFieldCovered(
+      'vendor',
+      'get_agent_inventory',
+      FIELD_POLICY_DEFAULTS,
+      false,
+    ),
+    true,
+  );
+  // A field with a REAL FIELD_POLICY_DEFAULTS entry (package.vendor's own fix) is covered
+  // regardless of `requireExplicitEntry`: an explicit, reviewed policy decision is exactly what
+  // the distinction demands, so it must never be penalized by it.
+  assert.equal(
+    isFieldCovered(
+      'package.vendor',
+      'get_agent_inventory',
+      FIELD_POLICY_DEFAULTS,
+      true,
+    ),
     true,
   );
 });

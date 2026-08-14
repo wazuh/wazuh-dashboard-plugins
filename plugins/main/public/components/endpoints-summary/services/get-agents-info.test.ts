@@ -5,10 +5,8 @@ import { getColorPaletteByIndex } from './get-color-palette-by-index';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
-import {
-  agentStatusLabelByAgentStatus,
-  agentStatusColorByAgentStatus,
-} from '../../../../common/services/wz_agent_status';
+import { agentStatusLabelByAgentStatus } from '../../../../common/services/wz_agent_status';
+import { HOME_OVERVIEW_AGENT_STATUS_COLOR } from '../../common/welcome/home-overview/lib/theme-colors';
 
 jest.mock('../../../react-services/wz-request', () => ({
   WzRequest: {
@@ -26,7 +24,6 @@ jest.mock('../../../react-services/common-services', () => ({
 
 jest.mock('../../../../common/services/wz_agent_status', () => ({
   agentStatusLabelByAgentStatus: jest.fn(),
-  agentStatusColorByAgentStatus: jest.fn(),
 }));
 
 describe('getAgents', () => {
@@ -70,25 +67,25 @@ describe('getAgents', () => {
           status: 'active',
           label: 'ACTIVE',
           value: 24,
-          color: 'mockColoractive',
+          color: HOME_OVERVIEW_AGENT_STATUS_COLOR.active,
         },
         {
           status: 'disconnected',
           label: 'DISCONNECTED',
           value: 0,
-          color: 'mockColordisconnected',
+          color: HOME_OVERVIEW_AGENT_STATUS_COLOR.disconnected,
         },
         {
           status: 'pending',
           label: 'PENDING',
           value: 15,
-          color: 'mockColorpending',
+          color: HOME_OVERVIEW_AGENT_STATUS_COLOR.pending,
         },
         {
           status: 'never_connected',
           label: 'NEVER_CONNECTED',
           value: 11,
-          color: 'mockColornever_connected',
+          color: HOME_OVERVIEW_AGENT_STATUS_COLOR.never_connected,
         },
       ],
     };
@@ -98,12 +95,6 @@ describe('getAgents', () => {
     (agentStatusLabelByAgentStatus as jest.Mock).mockImplementation(
       (label: string) => {
         return label.toUpperCase();
-      },
-    );
-
-    (agentStatusColorByAgentStatus as jest.Mock).mockImplementation(
-      (label: string) => {
-        return `mockColor${label}`;
       },
     );
 

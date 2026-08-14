@@ -4,6 +4,8 @@ import {
   limitProperty,
   objectSchema,
   optionalStringParam,
+  VULN_BREAKDOWN_AGGS,
+  VULN_CURRENT_STATE_NOTE,
   VULN_DIGEST_SAMPLE_COLUMNS,
   VULN_SOURCE_FIELDS,
 } from './common';
@@ -21,10 +23,11 @@ export const getVulnerabilitiesTool: ToolDefinition = {
   spec: {
     name: 'get_vulnerabilities',
     description:
-      'Lists active vulnerabilities and the agents affected by them, across the whole fleet. ' +
-      'Optional severity filter (Critical/High/Medium/Low); omit severity to list ALL ' +
-      'vulnerabilities regardless of severity. Use get_critical_vulnerabilities instead if the ' +
-      'question is specifically about critical-only vulnerabilities.',
+      'Lists active vulnerabilities and the agents (hosts/machines) affected by them, across ' +
+      `the whole fleet. ${VULN_CURRENT_STATE_NOTE} Optional severity filter (Critical/High/` +
+      'Medium/Low); omit severity to list ALL vulnerabilities regardless of severity. Use ' +
+      'get_critical_vulnerabilities instead if the question is specifically about ' +
+      'critical-only vulnerabilities.',
     parameters: objectSchema({
       severity: {
         type: 'string',
@@ -55,19 +58,27 @@ export const getVulnerabilitiesTool: ToolDefinition = {
         _source: VULN_SOURCE_FIELDS,
         sort: ['_doc'],
         size: limit,
+        // Population-true severity/agent breakdown over the FULL matched set (issue #8920 item 1)
+        // -- see VULN_BREAKDOWN_AGGS's doc comment in common.ts.
+        aggs: VULN_BREAKDOWN_AGGS,
       },
     };
   },
   tableSpec: {
+    // Column order (issue #8921's budget item): the 6 columns that earn visibility under the
+    // client's MAX_VISIBLE_COLUMNS budget (result-table.tsx) lead; Architecture and CVSS Score are
+    // demoted -- NOT deleted, still queried and still in the row expander -- to positions 7-8,
+    // since Description carries more decision-relevant information for a fleet-wide listing than
+    // either does.
     columns: [
       { field: 'wazuh.agent.name', label: 'Agent' },
       { field: 'vulnerability.id', label: 'CVE' },
       { field: 'vulnerability.severity', label: 'Severity', severity: true },
       { field: 'package.name', label: 'Package' },
       { field: 'package.version', label: 'Version' },
+      { field: 'vulnerability.description', label: 'Description' },
       { field: 'package.architecture', label: 'Architecture' },
       { field: 'vulnerability.score.base', label: 'CVSS Score' },
-      { field: 'vulnerability.description', label: 'Description' },
     ],
   },
   digest: { sampleColumns: VULN_DIGEST_SAMPLE_COLUMNS },
