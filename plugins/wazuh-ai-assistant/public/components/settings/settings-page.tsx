@@ -1326,7 +1326,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                           <strong>
                             {i18n.translate(
                               'wazuhAiAssistant.settings.privacy.fieldColumnHeader',
-                              { defaultMessage: 'Field' },
+                              {
+                                defaultMessage: 'Field',
+                              },
                             )}
                           </strong>
                         </EuiText>

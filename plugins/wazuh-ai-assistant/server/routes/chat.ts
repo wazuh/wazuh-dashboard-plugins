@@ -438,54 +438,6 @@ export function shouldConsiderDeferredOffer(gate: {
 }
 
 /**
- * Fallback narration for a turn that used at least one tool but whose model never emitted any
- * `delta` text of its own before ending in `done` — observed with a tool call that returned zero
- * rows, where the model apparently considered the (empty) table sufficient and said nothing.
- * Without this, the user sees a bare table (or nothing at all, for a zero-row result) with no
- * written answer. Two variants: the table rendered something (`sawNonEmptyTable`) vs. the query
- * came back empty. Both are tables-oriented copy — see NO_ANSWER_MESSAGE below for the sibling
- * case where no tool ran at all, which this copy would misdescribe.
- */
-const NO_ANALYSIS_TEXT_MESSAGE =
-  'No additional analysis — see the results above.';
-const NO_MATCHING_RESULTS_MESSAGE =
-  'No matching results were found for that query.';
-/**
- * Sibling fallback for a `general`-routed (no-tool) turn that still ends with no text at all —
- * e.g. a reasoning model streaming its entire answer on a channel nothing reads (issue
- * 02-read-reasoning-delta.md's `openai-compatible.ts` fix is the known cause; this is the
- * structural backstop for any future one). Deliberately its own copy rather than reusing
- * NO_ANALYSIS_TEXT_MESSAGE/NO_MATCHING_RESULTS_MESSAGE above: both of those say or imply "see the
- * results above" / "that query", which is wrong here — no tool ran, so there is no table and no
- * query to refer to.
- */
-const NO_ANSWER_MESSAGE =
-  'I was not able to come up with an answer for that. Try rephrasing your question.';
-
-/** Picks which of the three no-text fallbacks above fits a turn that ended without any `delta`
- * text — shared by both `!sawAnyDelta` exit points below (the normal per-round `done` branch and
- * the round-budget-exhausted path) so the same three-way decision lives in exactly one place. */
-function noTextFallbackMessage(
-  toolUsedThisTurn: boolean,
-  sawNonEmptyTable: boolean,
-): string {
-  if (!toolUsedThisTurn) {
-    return NO_ANSWER_MESSAGE;
-  }
-  return sawNonEmptyTable
-    ? NO_ANALYSIS_TEXT_MESSAGE
-    : NO_MATCHING_RESULTS_MESSAGE;
-}
-
-/** Whitespace-only delta content (e.g. a lone "\n\n" some models emit as priming/formatting
- * right before a tool call) must NOT count as "the model produced an answer" — otherwise the
- * `sawAnyDelta` guard above never fires for exactly the turns it exists to catch. Still forwarded
- * to the client as a normal delta either way; this only affects the tracking flag. */
-function hasMeaningfulText(content: string): boolean {
-  return content.trim().length > 0;
-}
-
-/**
  * Concurrent-stream cap. Without it, one script or user can open unlimited concurrent streams --
  * the only other protections are accidental (the browser's 6-connection cap, the event loop).
  * `perUserActiveStreams`/`globalActiveStreams` are the enforcement: live counters of open chat
@@ -1470,7 +1422,6 @@ export async function* orchestrate(
 
       if (event.type === 'tool_call') {
         sawToolCall = true;
-        toolUsedThisTurn = true;
         if (signal.aborted) {
           return;
         }
