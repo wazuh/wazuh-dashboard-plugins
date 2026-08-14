@@ -94,7 +94,7 @@ test('executeToolCall: get_agent_inventory keeps package.name/package.version re
   // test below, which uses a genuinely unlisted field) -- while the embedded maintainer
   // address is still caught by the value-shape scan.
   const vendor = digest.samples[0]['package.vendor'] as string;
-  assert.match(vendor, /^Ubuntu Developers /);
+  assert.match(vendor, /^Ubuntu Developers/);
   assert.doesNotMatch(vendor, /lists\.ubuntu\.com/);
 });
 
