@@ -201,6 +201,10 @@ const NO_ANSWER_MESSAGE =
  *    the absent capability invites the model to narrate the mechanism ("I cannot query further…")
  *    instead of answering.
  */
+/** Blank line inserted between two ROUNDS' text within one turn — see `separateRoundText`. Not a
+ * newline: the client renders markdown, where a single newline is not a paragraph break. */
+export const ROUND_TEXT_SEPARATOR = '\n\n';
+
 export const FINAL_ROUND_ANSWER_INSTRUCTION =
   "Now answer the user's question directly, using only the tool results already gathered in " +
   'this conversation. Do not state anything the results do not show. If they do not answer the ' +
@@ -1506,6 +1510,20 @@ export async function* orchestrate(
   // exactly the case a `general`-routed reasoning-only stream produces (issue
   // 02-read-reasoning-delta.md), and it deserves a sentence, not a silently empty bubble.
   let sawAnyDelta = false;
+  // Round separation for the CLIENT's single message bubble (UI run 2026-08-14, finding 6). Every
+  // round's text is appended into the same bubble, so a round that narrates before calling a tool
+  // ("I'll check the SCA results for this box.") ran straight into the next round's answer with no
+  // separator at all -- measured live as "...for it.The most frequent finding...", two sentences
+  // fused mid-word, and one bubble restating itself with two different counts. The model cannot fix
+  // this: from its side each round is a fresh completion that legitimately starts at column 0.
+  // A blank line is the minimum that makes them separate paragraphs in the rendered markdown.
+  let lastTextRound = -1;
+  function* separateRoundText(round: number): Generator<StreamEvent> {
+    if (lastTextRound !== -1 && lastTextRound !== round) {
+      yield { type: 'delta', content: ROUND_TEXT_SEPARATOR };
+    }
+    lastTextRound = round;
+  }
   let toolUsedThisTurn = false;
   // Bounds the suggest_discover_query self-correction loop to ONE retry per turn (issue #8920 item
   // 9): the first `unknown_fields` resolution this turn is returned as a tool error instead of a
@@ -1825,6 +1843,7 @@ export async function* orchestrate(
         }
         if (content) {
           if (hasMeaningfulText(content)) {
+            yield* separateRoundText(round);
             sawAnyDelta = true;
           }
           roundText += content;
@@ -1844,6 +1863,10 @@ export async function* orchestrate(
           const trailing = drainRoundBuffers();
           if (trailing) {
             if (hasMeaningfulText(trailing)) {
+              // Same round separation as the main delta path: a round whose text arrives ONLY
+              // through this drain (the depseudonymizer holds back the tail of every chunk) still
+              // needs the blank line before it.
+              yield* separateRoundText(round);
               sawAnyDelta = true;
             }
             roundText += trailing;
@@ -2139,6 +2162,10 @@ export async function* orchestrate(
           const trailing = drainRoundBuffers();
           if (trailing) {
             if (hasMeaningfulText(trailing)) {
+              // Same round separation as the main delta path: a round whose text arrives ONLY
+              // through this drain (the depseudonymizer holds back the tail of every chunk) still
+              // needs the blank line before it.
+              yield* separateRoundText(round);
               sawAnyDelta = true;
             }
             roundText += trailing;

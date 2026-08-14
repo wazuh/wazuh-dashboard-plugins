@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { ChatMessage } from '../../common/types';
 import {
   FINAL_ROUND_ANSWER_INSTRUCTION,
+  ROUND_TEXT_SEPARATOR,
   shouldEnterFinalRoundEarly,
   withFinalRoundAnswerInstruction,
 } from './chat';
@@ -171,4 +172,15 @@ test('FINAL_ROUND_ANSWER_INSTRUCTION: constrains the model to the gathered resul
     FINAL_ROUND_ANSWER_INSTRUCTION,
     /no\s+more tool calls will run/i,
   );
+});
+
+// UI run 2026-08-14 (finding 6): every round's text lands in ONE client bubble, so a round that
+// narrates before calling a tool ran straight into the next round's answer -- measured live as
+// "...for it.The most frequent finding...", fused mid-word, and one bubble restating itself with
+// two different counts. A markdown paragraph break is the minimum separation; a single newline
+// would not render as one.
+test('ROUND_TEXT_SEPARATOR: a markdown paragraph break, not a bare newline', () => {
+  assert.equal(ROUND_TEXT_SEPARATOR, '
+
+');
 });
