@@ -1,8 +1,13 @@
 import { ToolDefinition } from '../types';
 import {
+  findingArtifactFilterClauses,
+  findingArtifactFilterProperties,
   findingDigestColumns,
+  FINDING_BREAKDOWN_AGGS,
+  FINDING_BREAKDOWN_DIMENSIONS,
   findingRowFields,
   clampLimit,
+  FINDING_SCOPE_NOTE,
   limitProperty,
   objectSchema,
   optionalStringParam,
@@ -27,9 +32,9 @@ export const searchFindingsByAgentTool: ToolDefinition = {
   spec: {
     name: 'search_findings_by_agent',
     description:
-      'Searches security findings for findings from one named agent, within a time range. ' +
-      'Optional severity narrows to exactly that severity, or to a floor/ceiling via ' +
-      'severity_comparison.',
+      'Searches security findings from one named agent (host/machine/endpoint), within a time ' +
+      `range. ${FINDING_SCOPE_NOTE} Optional severity narrows to exactly that severity, or to a ` +
+      'floor/ceiling via severity_comparison.',
     parameters: objectSchema(
       {
         agent_name: {
@@ -42,6 +47,7 @@ export const searchFindingsByAgentTool: ToolDefinition = {
           'Max number of findings to return (default 20, max 500).',
         ),
         ...timeRangeProperties(),
+        ...findingArtifactFilterProperties(),
       },
       ['agent_name'],
     ),
@@ -71,6 +77,7 @@ export const searchFindingsByAgentTool: ToolDefinition = {
         },
       });
     }
+    filter.push(...findingArtifactFilterClauses(params));
     return {
       target: 'indexer',
       index: 'wazuh-findings-v5*',
@@ -78,6 +85,7 @@ export const searchFindingsByAgentTool: ToolDefinition = {
         query: { bool: { filter } },
         sort: [{ '@timestamp': { order: 'desc' } }],
         size: limit,
+        aggs: FINDING_BREAKDOWN_AGGS,
       },
     };
   },
@@ -87,5 +95,6 @@ export const searchFindingsByAgentTool: ToolDefinition = {
   },
   digest: {
     sampleColumns: findingDigestColumns(STANDARD_FINDING_SAMPLE_COLUMNS),
+    breakdownDimensions: FINDING_BREAKDOWN_DIMENSIONS,
   },
 };

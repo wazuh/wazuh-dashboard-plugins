@@ -28,7 +28,9 @@ export const getEventsByAgentTool: ToolDefinition = {
       'Searches the raw normalized event stream, most recent first, optionally scoped to one ' +
       `named agent (host/machine/endpoint). ${EVENTS_SCOPE_NOTE} Use for "everything that ` +
       'happened on/in the last N hours" questions, or to check whether events exist at all when a ' +
-      'findings-tool search returned 0 rows.',
+      'findings-tool search returned 0 rows. Does NOT cover automated actions Wazuh itself took ' +
+      '(active response, blocking, quarantine) -- no tool covers active-response actions, so say ' +
+      'that plainly rather than treating a normalized event as evidence of one.',
     parameters: objectSchema({
       agent_name: {
         type: 'string',
@@ -81,5 +83,11 @@ export const getEventsByAgentTool: ToolDefinition = {
       'event.action',
       'event.outcome',
     ],
+    // Synthetic fallback, not a real aggregation (issue #8920 item 1): this tool sorts by
+    // @timestamp desc, so its 5-row `samples` slice is the newest events only -- "what kinds of
+    // events happened" would otherwise be answered from a handful of the most recent rows.
+    // `event.category`/`event.outcome` both already have `allow` policy entries in privacy.ts, so
+    // no privacy-policy change is needed for this addition.
+    breakdownDimensions: ['event.category', 'event.outcome'],
   },
 };

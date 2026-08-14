@@ -9,10 +9,11 @@ import {
   EuiButtonIcon,
   EuiCallOut,
   EuiCodeBlock,
+  EuiTextColor,
   htmlIdGenerator,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
-import { TableSpec } from '../../../common/types';
+import { MAX_VISIBLE_RESULT_COLUMNS, TableSpec } from '../../../common/types';
 import { SeverityLevel } from '../../../common/constants';
 import { DiscoverLink, ResolveDiscoverUrl } from './discover-link';
 import {
@@ -109,6 +110,87 @@ const SHORT_COLUMN_MIN_WIDTH = 92;
  * columns up to 200px left the rule title ~225px and wrapping onto three lines, which made row
  * heights alternate between one and three lines down the page. */
 const SHORT_COLUMN_MAX_WIDTH = 132;
+
+/**
+ * Column-count budget (issue #8921's "no table may need a horizontal scrollbar" item): a
+ * rendering INVARIANT applied here, in the one generic table renderer, rather than per-tool —
+ * every current and future tool's `tableSpec` inherits it automatically. The value lives in
+ * common/types.ts (MAX_VISIBLE_RESULT_COLUMNS) so the server-side registry test can hold every
+ * tool's severity column inside the same budget this renderer applies. Only the first
+ * `MAX_VISIBLE_COLUMNS` of `spec.columns` become visible table columns; the rest are NOT dropped —
+ * `buildTableSpec` (server/tools/digest.ts) already puts every spec-column field into each row
+ * object regardless of visibility, so a hidden column stays reachable through the row expander
+ * (the `EuiCodeBlock` JSON view below). Server-side column ORDER is therefore what decides which
+ * fields win visibility; this cap decides only how many. `DERIVED_COLUMN_CAP` (digest.ts) stays 8
+ * server-side on purpose — the model-facing digest and the client's visible-column budget are two
+ * independent caps that are allowed to disagree, same as before this existed for the static-column
+ * tools.
+ */
+const MAX_VISIBLE_COLUMNS = MAX_VISIBLE_RESULT_COLUMNS;
+
+/** Rendered in place of an absent value (`undefined`/`null`/`''`) in every column render path
+ * (default, severity, timestamp) — issue #8921's "absent is rendered as absent" item. An em dash,
+ * not a blank cell, so a reader can tell "this field genuinely has no value" apart from "this cell
+ * failed to render". Falsy-but-present values (`0`, `false`) are NOT absent and must render
+ * normally — see `isAbsentValue` below. */
+const ABSENT_VALUE_PLACEHOLDER = '—';
+
+/** `undefined`/`null`/`''` only — deliberately NOT the broader JS-falsy check, so a genuine `0` or
+ * `false` value (e.g. a zero count, a boolean flag) still renders as itself rather than as the
+ * absent-value placeholder. */
+function isAbsentValue(value: unknown): boolean {
+  return value === undefined || value === null || value === '';
+}
+
+/** Subdued em-dash placeholder for an absent cell — shared by every column render path so the
+ * three (default/severity/timestamp) can never render three different "nothing here" spellings. */
+function renderAbsentPlaceholder(): React.ReactNode {
+  return (
+    <EuiTextColor color='subdued'>{ABSENT_VALUE_PLACEHOLDER}</EuiTextColor>
+  );
+}
+
+/**
+ * Default-path cell renderer. Setting ANY `render` replaces EuiBasicTable's own default cell
+ * formatter, so this must reproduce sane formatting for every value shape, not just pass values
+ * through as React children — a raw `false`/`true` child renders as NOTHING in React (a blank
+ * cell indistinguishable from absent, on real columns: get_rules'/get_detectors' Enabled), and a
+ * raw array child renders concatenated with no separator ("informationalwazuh-generic..."). The
+ * explicit shapes below are deterministic and locally owned rather than delegating to EUI's
+ * internal formatAuto (whose exact behavior varies by EUI version):
+ *  - absent (`undefined`/`null`/`''`) -> the shared em-dash placeholder,
+ *  - boolean -> "Yes"/"No",
+ *  - array   -> elements joined with ", " (each formatted by these same rules),
+ *  - other objects -> JSON (never "[object Object]"),
+ *  - strings/numbers -> unchanged.
+ */
+function formatCellValue(value: unknown): string {
+  if (typeof value === 'boolean') {
+    return value ? 'Yes' : 'No';
+  }
+  if (Array.isArray(value)) {
+    return value
+      .filter(entry => !isAbsentValue(entry))
+      .map(entry => formatCellValue(entry))
+      .join(', ');
+  }
+  if (typeof value === 'object' && value !== null) {
+    return JSON.stringify(value);
+  }
+  return String(value);
+}
+
+function renderDefaultCell(value: unknown): React.ReactNode {
+  if (isAbsentValue(value)) {
+    return renderAbsentPlaceholder();
+  }
+  if (typeof value === 'string' || typeof value === 'number') {
+    // Unchanged fast path: strings/numbers render exactly as EuiBasicTable rendered them with no
+    // `render` set.
+    return value as React.ReactNode;
+  }
+  return formatCellValue(value);
+}
 
 /** Length of the longest rendered value in a column (header included, so a short column never
  * ends up narrower than its own label). */
@@ -288,15 +370,30 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   // renders every value verbatim, so a raw ISO instant wrapped onto three lines and dragged every
   // row's height with it, while the free-text title column (the one that actually needs room) got
   // no more space than the severity word beside it.
+  // Only the first MAX_VISIBLE_COLUMNS spec columns become visible table columns — see that
+  // constant's doc comment. `spec.rows` is untouched (every spec-column field is still in each
+  // row object), so a hidden column stays reachable through the row expander below.
+  const visibleColumns = useMemo(
+    () => spec.columns.slice(0, MAX_VISIBLE_COLUMNS),
+    [spec.columns],
+  );
+  const hiddenColumnCount = Math.max(
+    0,
+    spec.columns.length - MAX_VISIBLE_COLUMNS,
+  );
+
   const fieldColumns: EuiBasicTableColumn<ResultRow>[] = useMemo(
     () =>
-      spec.columns.map(column => {
+      visibleColumns.map(column => {
         if (column.id === spec.severityColumn) {
           return {
             field: column.id,
             name: column.label,
             width: SEVERITY_COLUMN_WIDTH,
-            render: (value: unknown) => renderSeverityBadge(value),
+            render: (value: unknown) =>
+              isAbsentValue(value)
+                ? renderAbsentPlaceholder()
+                : renderSeverityBadge(value),
           };
         }
         if (isTimestampColumn(spec.rows, column.id)) {
@@ -304,16 +401,18 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
             field: column.id,
             name: column.label,
             width: TIMESTAMP_COLUMN_WIDTH,
-            render: (value: unknown) =>
-              typeof value === 'string' ? (
-                // The unabbreviated instant stays one hover away, so precision is deferred rather
-                // than discarded.
+            render: (value: unknown) => {
+              if (isAbsentValue(value)) {
+                return renderAbsentPlaceholder();
+              }
+              // The unabbreviated instant stays one hover away, so precision is deferred rather
+              // than discarded.
+              return typeof value === 'string' ? (
                 <span title={value}>{formatTimestamp(value)}</span>
               ) : (
-                // `isTimestampColumn` only skips null/undefined/'' — render those as empty rather
-                // than letting an `unknown` reach React.
-                String(value ?? '')
-              ),
+                String(value)
+              );
+            },
           };
         }
         // EuiBasicTable's default fixed layout splits the leftover width EQUALLY between every
@@ -334,11 +433,16 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
             field: column.id,
             name: column.label,
             width: `${width}px`,
+            render: renderDefaultCell,
           };
         }
-        return { field: column.id, name: column.label };
+        return {
+          field: column.id,
+          name: column.label,
+          render: renderDefaultCell,
+        };
       }),
-    [spec.columns, spec.severityColumn, spec.rows],
+    [visibleColumns, spec.severityColumn, spec.rows],
   );
 
   const columns: EuiBasicTableColumn<ResultRow>[] = useMemo(
@@ -394,13 +498,23 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
         id={accordionId}
         className='wzResultTableAccordion'
         paddingSize='none'
-        buttonContent={i18n.translate(
-          'wazuhAiAssistant.resultTable.accordionSummary',
-          {
+        buttonContent={
+          i18n.translate('wazuhAiAssistant.resultTable.accordionSummary', {
             defaultMessage: 'Results ({count} rows)',
             values: { count: spec.rows.length },
-          },
-        )}
+          }) +
+          // Column-budget disclosure (issue #8921): a column demoted past MAX_VISIBLE_COLUMNS is
+          // NOT deleted — buildTableSpec (digest.ts) still puts its field into every row — so this
+          // tells the reader where to find it instead of leaving its disappearance unexplained.
+          (hiddenColumnCount > 0
+            ? i18n.translate('wazuhAiAssistant.resultTable.hiddenColumnsNote', {
+                defaultMessage:
+                  ' (+{count, plural, one {# more field} other {# more fields}}' +
+                  ' per row — expand a row to see them)',
+                values: { count: hiddenColumnCount },
+              })
+            : '')
+        }
         initialIsOpen={initiallyOpen}
         // Lazy-mount: flips `hasOpened` permanently true the first time the accordion is opened
         // (never reset on a later re-collapse, so the table stays mounted from then on).

@@ -3,8 +3,8 @@
 The Wazuh dashboard plugins provide the user interface for exploring Wazuh
 data and managing Wazuh server capabilities from OpenSearch Dashboards. The
 primary plugin (`main`) delivers the Wazuh application, while auxiliary plugins
-(`wazuh-core` and `wazuh-check-updates`) provide shared services and update
-notifications.
+(`wazuh-core`, `wazuh-check-updates` and `wazuh-ai-assistant`) provide shared
+services, update notifications and the AI assistant.
 
 Key capabilities include:
 

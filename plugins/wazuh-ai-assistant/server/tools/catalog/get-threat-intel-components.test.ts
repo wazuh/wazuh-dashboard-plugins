@@ -153,3 +153,19 @@ test('get_threat_intel_components: buildSecurityAnalyticsLink maps each componen
     url: '/app/kvdbs#/kvdbs?space=test',
   });
 });
+
+// Cross-category tool audit (same bug shape as issue #8913): this tool's own category is
+// `security_analytics` (server/tools/router.ts), while get_sca_results -- named here for the
+// "you actually want an SCA benchmark" case -- is the separate `sca` category, not guaranteed
+// offered on the same turn. Pins the conditional wording so a future edit cannot silently
+// reintroduce an unconditional "use get_sca_results instead" naming a tool that may not be
+// offered. get_rules stays unconditional since it shares this tool's own category.
+test('get_threat_intel_components: names get_sca_results only conditionally on it being offered, not unconditionally', () => {
+  const description = getThreatIntelComponentsTool.spec.description;
+  assert.match(
+    description,
+    /if that is what the question needs and get_sca_results is\s+available to you this turn, use that one instead/,
+  );
+  assert.doesNotMatch(description, /-- for that, use get_sca_results instead/);
+  assert.match(description, /Not for rules \(use get_rules\)/);
+});

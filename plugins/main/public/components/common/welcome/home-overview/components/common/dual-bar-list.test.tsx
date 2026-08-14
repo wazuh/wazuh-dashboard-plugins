@@ -8,6 +8,7 @@ jest.mock('../../../utils/helpers', () => ({
   }),
 }));
 import { DualBarList } from './dual-bar-list';
+import { HOME_OVERVIEW_COLOR } from '../../lib/theme-colors';
 
 const items = [
   {
@@ -34,5 +35,15 @@ describe('DualBarList', () => {
   it('renders the empty message instead of a blank list when items is empty', () => {
     render(<DualBarList items={[]} emptyMessage='No SCA benchmarks found' />);
     expect(screen.getByText('No SCA benchmarks found')).toBeInTheDocument();
+  });
+
+  it('colors the Passed/Failed legend swatches with theme-aware CSS custom properties', () => {
+    render(<DualBarList items={items} />);
+    expect(screen.getByText('Passed').previousElementSibling).toHaveStyle({
+      background: HOME_OVERVIEW_COLOR.success,
+    });
+    expect(screen.getByText('Failed').previousElementSibling).toHaveStyle({
+      background: HOME_OVERVIEW_COLOR.failed,
+    });
   });
 });

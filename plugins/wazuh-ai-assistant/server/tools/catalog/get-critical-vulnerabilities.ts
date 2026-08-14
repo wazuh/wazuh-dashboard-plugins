@@ -3,6 +3,8 @@ import {
   clampLimit,
   limitProperty,
   objectSchema,
+  VULN_BREAKDOWN_AGGS,
+  VULN_CURRENT_STATE_NOTE,
   VULN_DIGEST_SAMPLE_COLUMNS,
   VULN_SOURCE_FIELDS,
 } from './common';
@@ -16,7 +18,8 @@ export const getCriticalVulnerabilitiesTool: ToolDefinition = {
   spec: {
     name: 'get_critical_vulnerabilities',
     description:
-      'Lists active critical-severity vulnerabilities and the agents affected by them.',
+      'Lists active critical-severity vulnerabilities and the agents (hosts/machines) affected ' +
+      `by them. ${VULN_CURRENT_STATE_NOTE}`,
     parameters: objectSchema({
       limit: limitProperty(
         'Max number of vulnerabilities to return (default 20, max 500).',
@@ -39,19 +42,30 @@ export const getCriticalVulnerabilitiesTool: ToolDefinition = {
         _source: VULN_SOURCE_FIELDS,
         sort: ['_doc'],
         size: limit,
+        // Population-true severity/agent breakdown over the FULL matched set (issue #8920 item 1)
+        // -- see VULN_BREAKDOWN_AGGS's doc comment in common.ts. The severity bucket is
+        // degenerate here (this tool always filters to Critical), but the agent-name bucket still
+        // discloses every affected agent regardless of `limit` truncation, and attaching the same
+        // shared aggs uniformly across all three vulnerability tools keeps the class fix from
+        // silently depending on which of the three the model happened to call.
+        aggs: VULN_BREAKDOWN_AGGS,
       },
     };
   },
   tableSpec: {
     columns: [
+      // Column order (issue #8921's budget item): identical treatment to its three siblings
+      // (get-vulnerabilities.ts et al.) — this is the 4th tool with the same 8-column set, and
+      // leaving it un-reordered would show Architecture in the visible 6 while hiding Description
+      // and CVSS, the exact ordering the sibling files' comments argue against.
       { field: 'wazuh.agent.name', label: 'Agent' },
       { field: 'vulnerability.id', label: 'CVE' },
       { field: 'vulnerability.severity', label: 'Severity', severity: true },
       { field: 'package.name', label: 'Package' },
       { field: 'package.version', label: 'Version' },
+      { field: 'vulnerability.description', label: 'Description' },
       { field: 'package.architecture', label: 'Architecture' },
       { field: 'vulnerability.score.base', label: 'CVSS Score' },
-      { field: 'vulnerability.description', label: 'Description' },
     ],
   },
   digest: { sampleColumns: VULN_DIGEST_SAMPLE_COLUMNS },

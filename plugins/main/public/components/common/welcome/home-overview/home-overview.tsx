@@ -80,7 +80,7 @@ const HomeOverviewBody: React.FC = () => {
 
 export const HomeOverview = withErrorBoundary(
   withGlobalBreadcrumb(() => [{ text: overview.breadcrumbLabel }])(() => (
-    <EuiPage paddingSize='l'>
+    <EuiPage paddingSize='l' className='wzHomeOverview'>
       <EuiPageBody>
         <HomeOverviewBody />
       </EuiPageBody>
