@@ -51,6 +51,67 @@ test('buildDigest: bare-string affected_items are normalized to {item} rows', ()
   assert.equal(digest.counts.truncated, false);
 });
 
+// UI run 2026-08-14 (A2): get_sca_checks called with a `search` fragment has ZERO hits by design
+// (the fragment lives in post_filter, #8955) but a populated terms aggregation -- so
+// bucketsToRows supplies {key, doc_count} rows while the tool's FIXED columns describe hit
+// documents (check.id/check.name/...). Every declared column resolved undefined on every row:
+// the client rendered 102 em-dashes and `{}` in the row expander. When NO declared column
+// resolves on ANY row, the table must fall back to the derived projection and render the rows
+// as what they are.
+test('buildTableSpec: bucket rows under a fixed-column tool fall back to derived columns instead of an all-empty grid', () => {
+  const def = buildToolDef({
+    tableSpec: {
+      columns: [
+        { field: 'check.id', label: 'Check ID' },
+        { field: 'check.name', label: 'Check' },
+      ],
+    },
+  });
+  const result = {
+    hits: { total: { value: 0 }, hits: [] },
+    aggregations: {
+      matching_checks: {
+        buckets: [
+          { key: 'Ensure sshd is hardened.', doc_count: 1 },
+          { key: 'Ensure sshd DisableForwarding is enabled.', doc_count: 1 },
+        ],
+      },
+    },
+  };
+  const table = buildTableSpec(result, def);
+  assert.equal(table.rows.length, 2);
+  // Derived, not the declared hit-document columns.
+  const ids = table.columns.map(c => c.id);
+  assert.ok(ids.includes('key'), `derived columns must include "key", got ${ids.join(',')}`);
+  assert.ok(!ids.includes('check.id'));
+  // The rows carry real values -- the em-dash grid is the regression.
+  assert.equal(table.rows[0].key, 'Ensure sshd is hardened.');
+  assert.equal(table.rows[0].doc_count, 1);
+});
+
+test('buildTableSpec: one resolving declared column keeps the declared shape (no fallback)', () => {
+  const def = buildToolDef({
+    tableSpec: {
+      columns: [
+        { field: 'check.id', label: 'Check ID' },
+        { field: 'check.missing', label: 'Never populated' },
+      ],
+    },
+  });
+  const result = {
+    hits: {
+      total: { value: 1 },
+      hits: [{ _id: 'a', _source: { check: { id: '28500' } } }],
+    },
+  };
+  const table = buildTableSpec(result, def);
+  assert.deepEqual(
+    table.columns.map(c => c.id),
+    ['check.id', 'check.missing'],
+  );
+  assert.equal(table.rows[0]['check.id'], '28500');
+});
+
 test('buildTableSpec: bare-string affected_items also normalize to {item} rows in the table', () => {
   const def = buildToolDef({
     tableSpec: { columns: [{ field: 'item', label: 'Item' }] },

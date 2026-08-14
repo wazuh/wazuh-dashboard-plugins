@@ -146,6 +146,10 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'package.name', action: 'allow-scan' },
   { field: 'package.version', action: 'allow' },
   { field: 'package.type', action: 'allow' },
+  // The vulnerability scanner's own fix-bound sentence ("Package less than 5.21.4") -- written by
+  // Wazuh's scanner from CTI data, never analyst/attacker-supplied. Surfaced (2026-08-14) so the
+  // model can state the fixed version instead of offering an update check no tool can perform.
+  { field: 'vulnerability.scanner.condition', action: 'allow' },
   // NOT 'allow', unlike package.name/architecture/type/version above: a vendor/distributor string
   // ("Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>", "Debian Sysadmin Team
   // <debian-admin@lists.debian.org>") routinely embeds a maintainer/team EMAIL ADDRESS -- personal
@@ -163,9 +167,10 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // field on a deriveColumns tool, and would have silently stopped protecting this field the
   // moment it was ever read by a non-deriveColumns tool (allow-by-omission there means real value,
   // untouched). See field-policy-coverage.test.ts's `requireExplicitEntry` for the coverage-test
-  // fix that closes that gap. Revisit this to 'allow-scan' once #8912 lands, to preserve the
-  // distributor name while still catching the embedded address.
-  { field: 'package.vendor', action: 'anonymize', kind: 'VAL' },
+  // fix that closed that gap. #8912 landed (merged as #8933), so this is now the 'allow-scan'
+  // that comment promised: the distributor name ("Ubuntu Developers") stays readable while the
+  // embedded address/FQDN (the <...@lists.ubuntu.com> part) is caught by the value-shape scan.
+  { field: 'package.vendor', action: 'allow-scan' },
   // A hotfix/KB identifier (e.g. "KB5034441"), not a person or a network address.
   { field: 'package.hotfix.name', action: 'allow' },
   // OS identity -- NOT host.hostname (above), which is the agent's network identity and stays
@@ -1416,8 +1421,10 @@ function scrubAggKey(
 /**
  * Applies field policy to one digest, right before it is serialized as `toolResultContent`
  * (called from server/tools/executor.ts, immediately before `JSON.stringify`). `columns` (schema
- * hint labels) are left untouched per the design note — only data leaves through `samples`,
- * `breakdown`, and `message`.
+ * hint labels) pass through with ONE filter: a field whose policy action is 'never' loses its
+ * column entry too, per that action's "even the fact the field exists" contract (probe P4,
+ * 2026-08-14, caught the name leaking while the values were gone). Other actions leave the
+ * hint untouched — a schema-hint NAME is not a value.
  *
  * - `samples`: 'never' fields are dropped from the sample object entirely; 'anonymize' string
  *   values are pseudonymized (kind inferred from the field name); an explicit 'allow' field
@@ -1562,6 +1569,17 @@ export function applyFieldPolicy(
 
   const scrubbedDigest: Digest = {
     ...digest,
+    // 'never' hides even the FIELD'S EXISTENCE (the action's contract above: "drops its name from
+    // the `columns` schema hint") -- the wire capture of probe P4 (2026-08-14) showed the column
+    // name still reaching the provider while the values were correctly gone, because this
+    // function's earlier doc claimed columns were "left untouched per the design note" and the
+    // implementation followed THAT sentence. The two docs now agree: names of 'never' fields are
+    // filtered here; every other action keeps its column entry (a schema-hint NAME is not a
+    // value, so anonymize/allow/allow-scan have nothing to scrub in it).
+    columns: digest.columns.filter(
+      field =>
+        resolveFieldEntry(field, policy, toolName)?.action !== 'never',
+    ),
     samples,
     // `...digest` already spread the raw `message` through untouched when present; this explicit
     // key runs it through the whole-text scrub and overrides that spread (object spread is

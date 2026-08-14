@@ -204,7 +204,9 @@ const NO_ANSWER_MESSAGE =
 export const FINAL_ROUND_ANSWER_INSTRUCTION =
   "Now answer the user's question directly, using only the tool results already gathered in " +
   'this conversation. Do not state anything the results do not show. If they do not answer the ' +
-  'question, say so plainly and state what is missing.';
+  'question, say so plainly and state what is missing. This is your final step this turn: do ' +
+  'not announce further data pulls or say you will now fetch/break down anything else — no ' +
+  'more tool calls will run. Offering the user a follow-up they can ASK for is fine.';
 
 /**
  * Appends FINAL_ROUND_ANSWER_INSTRUCTION to the messages bound for the provider, but only on the

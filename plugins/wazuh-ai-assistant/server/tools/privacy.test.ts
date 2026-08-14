@@ -610,6 +610,37 @@ test('applyFieldPolicy: "never" field is dropped from samples', () => {
   assert.equal(out.samples[0]['rule.id'], '100');
 });
 
+test('applyFieldPolicy: "never" drops the field name from the columns schema hint too (probe P4)', () => {
+  // Wire capture 2026-08-14 (/vagrant/qa-out/privacy-p4.jsonl): with package.version set to
+  // 'never' the VALUES were correctly gone, but the digest's `columns` hint still named the
+  // field -- the action's contract says even the field's existence is hidden.
+  const policy: FieldPolicyEntry[] = [
+    { field: 'package.version', action: 'never' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    columns: ['package.name', 'package.version', 'package.architecture'],
+    samples: [{ 'package.name': 'lxd', 'package.version': '5.0.8' }],
+  });
+  const out = applyFieldPolicy(digest, policy, p);
+  assert.deepEqual(out.columns, ['package.name', 'package.architecture']);
+  assert.ok(!('package.version' in out.samples[0]));
+});
+
+test('applyFieldPolicy: anonymize/allow keep their columns entries (a schema-hint name is not a value)', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'agent.name', action: 'anonymize' },
+    { field: 'rule.id', action: 'allow' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    columns: ['agent.name', 'rule.id'],
+    samples: [{ 'agent.name': 'web-01.corp', 'rule.id': '100' }],
+  });
+  const out = applyFieldPolicy(digest, policy, p);
+  assert.deepEqual(out.columns, ['agent.name', 'rule.id']);
+});
+
 test('applyFieldPolicy: "anonymize" field is pseudonymized', () => {
   const policy: FieldPolicyEntry[] = [
     { field: 'agent.name', action: 'anonymize' },

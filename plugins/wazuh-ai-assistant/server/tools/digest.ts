@@ -758,6 +758,39 @@ export function buildTableSpec(
     return out;
   });
 
+  // Bucket-row fallthrough guard (UI run 2026-08-14, A2): a fixed-column tool whose response had
+  // ZERO hits but a populated aggregation (get_sca_checks with a `search` fragment -- the
+  // post_filter moved the fragment out of the query, so hits are empty by design and
+  // `bucketsToRows` supplies the rows) projects hit-document columns onto bucket-shaped rows.
+  // Every cell resolves undefined, the client renders a full table of em-dashes, and the row
+  // expander shows `{}` (JSON.stringify drops undefined). When NO declared column resolved on ANY
+  // row, the rows are structurally not what the columns describe -- fall back to the derived
+  // projection (same one deriveColumns tools use), which renders the rows as what they ARE
+  // (key/doc_count and any sub-agg counters) instead of an all-empty grid. A table with even one
+  // resolving declared column keeps the declared shape unchanged.
+  const anyDeclaredColumnResolved = tableRows.some(row =>
+    def.tableSpec.columns.some(column => row[column.field] !== undefined),
+  );
+  if (tableRows.length > 0 && !anyDeclaredColumnResolved) {
+    const columnPaths = deriveResultColumns(rows, requestBody);
+    return {
+      columns: columnPaths.map(path => ({
+        id: path,
+        label: deriveColumnLabel(path, columnPaths),
+      })),
+      rows: capped.map(row => {
+        const out: Record<string, unknown> = {};
+        for (const path of columnPaths) {
+          const value = getByPath(row, path);
+          if (value !== undefined) {
+            out[path] = value;
+          }
+        }
+        return out;
+      }),
+    };
+  }
+
   return {
     columns: def.tableSpec.columns.map(column => ({
       id: column.field,

@@ -159,4 +159,16 @@ test('FINAL_ROUND_ANSWER_INSTRUCTION: constrains the model to the gathered resul
     /do not state anything the results do not show/i,
   );
   assert.match(FINAL_ROUND_ANSWER_INSTRUCTION, /say so plainly/i);
+  // UI run 2026-08-14 (B3): on the forced final round the model answered AND announced "Let me
+  // pull the same window broken down over time" -- then the turn ended, because no round was
+  // left to keep that promise. Nothing in the instruction forbade announcing further work. B4
+  // was the natural control: identical phrasing, budget remaining, the follow-up actually ran.
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /do\s+not announce further data pulls/i,
+  );
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /no\s+more tool calls will run/i,
+  );
 });

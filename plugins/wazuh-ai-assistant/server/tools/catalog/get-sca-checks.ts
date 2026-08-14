@@ -290,7 +290,7 @@ export const getScaChecksTool: ToolDefinition = {
           'check.id',
           'check.name',
           'check.result',
-          'check.reason',
+          'check.rationale',
           'check.remediation',
           'check.rules',
         ],
@@ -342,7 +342,11 @@ export const getScaChecksTool: ToolDefinition = {
       // `check.result` is a pass/fail/not-applicable WORD, not a finding-severity level — plain
       // column, not `severity: true` (same rationale as the 4.14 version of this tool).
       { field: 'check.result', label: 'Result' },
-      { field: 'check.reason', label: 'Reason' },
+      // 'check.rationale', not 'check.reason': the reason field exists in the wazuh-states-sca
+      // mapping but is EMPTY in every live document (verified 2026-08-14) -- the populated
+      // explanation text lives in check.rationale, so a Reason column keyed on check.reason
+      // rendered an em-dash on every row that ever had this table.
+      { field: 'check.rationale', label: 'Reason' },
     ],
     // Row expander: remediation + the raw rule text (where 5.0 folds the old
     // file/directory/command detail, per the matrix — the investigative payload of this tool).
