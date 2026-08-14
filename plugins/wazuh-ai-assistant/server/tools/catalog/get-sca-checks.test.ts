@@ -464,7 +464,9 @@ test('get_sca_checks: the request (with its new aggs clause) passes applySafetyV
 test('get_sca_checks: tableSpec/digest declare the locked 5.0 columns/rowFields/sampleColumns', () => {
   assert.deepEqual(
     getScaChecksTool.tableSpec.columns.map(c => c.field),
-    ['check.id', 'check.name', 'check.result', 'check.reason'],
+    // check.rationale, not check.reason -- the latter is mapped but empty in every live
+    // document (2026-08-14), so the Reason column was an em-dash on every row it ever had.
+    ['check.id', 'check.name', 'check.result', 'check.rationale'],
   );
   assert.deepEqual(getScaChecksTool.tableSpec.rowFields, [
     'check.remediation',

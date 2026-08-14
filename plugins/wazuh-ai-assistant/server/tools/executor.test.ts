@@ -87,15 +87,15 @@ test('executeToolCall: get_agent_inventory keeps package.name/package.version re
   assert.equal(digest.samples[0]['package.name'], 'adduser');
   assert.equal(digest.samples[0]['package.version'], '3.118ubuntu5');
   assert.equal(digest.samples[0]['package.architecture'], 'all');
-  // package.vendor has an explicit 'anonymize' FIELD_POLICY_DEFAULTS entry (a vendor/distributor
-  // string routinely embeds a maintainer email address -- see privacy.ts's comment on that entry)
-  // -- it comes back pseudonymized on that explicit basis, not via
-  // get_agent_inventory's `failClosedFieldPolicy: true` unlisted-field default (see the dedicated
-  // decoupling-proof test below for that case, which uses a genuinely unlisted field instead).
-  assert.match(
-    digest.samples[0]['package.vendor'] as string,
-    /^(HOST|IP|USER|URL|VAL)_\d+$/,
-  );
+  // package.vendor has an explicit 'allow-scan' FIELD_POLICY_DEFAULTS entry (the #8912
+  // follow-through its previous 'anonymize' entry's comment promised): the distributor name
+  // stays readable on that explicit basis -- not via get_agent_inventory's
+  // `failClosedFieldPolicy: true` unlisted-field default (see the dedicated decoupling-proof
+  // test below, which uses a genuinely unlisted field) -- while the embedded maintainer
+  // address is still caught by the value-shape scan.
+  const vendor = digest.samples[0]['package.vendor'] as string;
+  assert.match(vendor, /^Ubuntu Developers /);
+  assert.doesNotMatch(vendor, /lists\.ubuntu\.com/);
 });
 
 test('executeToolCall: privacy off leaves get_agent_inventory digest completely unscrubbed', async () => {
