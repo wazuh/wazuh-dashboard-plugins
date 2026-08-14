@@ -109,8 +109,12 @@ export async function fetchActiveManagerAgents(
         }
       | undefined
   )?.data;
-  const agents = Array.isArray(data?.affected_items)
-    ? (data.affected_items as ManagerAgentSummary[])
+  // Hoisted so `Array.isArray` narrows the value itself: narrowing an optional-chained
+  // `data?.affected_items` does not carry back to `data`, so reading `data.affected_items` in the
+  // true branch is an "object is possibly undefined" error.
+  const affectedItems = data?.affected_items;
+  const agents = Array.isArray(affectedItems)
+    ? (affectedItems as ManagerAgentSummary[])
     : [];
   const totalActive =
     typeof data?.total_affected_items === 'number'
