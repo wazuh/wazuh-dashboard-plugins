@@ -180,7 +180,5 @@ test('FINAL_ROUND_ANSWER_INSTRUCTION: constrains the model to the gathered resul
 // two different counts. A markdown paragraph break is the minimum separation; a single newline
 // would not render as one.
 test('ROUND_TEXT_SEPARATOR: a markdown paragraph break, not a bare newline', () => {
-  assert.equal(ROUND_TEXT_SEPARATOR, '
-
-');
+  assert.equal(ROUND_TEXT_SEPARATOR, '\n\n');
 });
