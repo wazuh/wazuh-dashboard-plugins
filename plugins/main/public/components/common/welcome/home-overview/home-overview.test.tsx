@@ -4,6 +4,10 @@ import { render, screen } from '@testing-library/react';
 
 // Stub the sections and the shared findings hook so the shell test doesn't
 // pull the data-access seam.
+// The AI Assistant CTA is rendered INSIDE OverviewSection (components/overview/
+// overview-section.tsx), which this mock replaces wholesale -- so it can never
+// appear in this shell test, and its own placement is covered by
+// overview-section.test.tsx / ai-assistant-cta.test.tsx instead.
 jest.mock('./components/overview', () => ({
   OverviewSection: () => <div data-test-subj='overview-section' />,
 }));
