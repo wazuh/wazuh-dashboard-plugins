@@ -266,7 +266,11 @@ test('scrubAssumptionNote: no-op without privacy, without a note, or without ent
   };
   const note = 'resolved to "wazuh-aio-5" (id 001).';
   assert.equal(
-    scrubAssumptionNote(note, [{ value: 'wazuh-aio-5', kind: 'HOST' }], undefined),
+    scrubAssumptionNote(
+      note,
+      [{ value: 'wazuh-aio-5', kind: 'HOST' }],
+      undefined,
+    ),
     note,
   );
   assert.equal(scrubAssumptionNote(undefined, [], privacy), undefined);
