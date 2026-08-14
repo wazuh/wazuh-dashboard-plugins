@@ -543,6 +543,11 @@ async function resolveDeicticAgentParams(
           'No "agent_id"/"agent_name" was given, so this call was resolved to the only active ' +
           `agent, "${resolvedName}" (id ${resolvedId}). State this assumption to the user rather ` +
           'than presenting the result as if a specific agent had been named.',
+        // The hostname the note just interpolated -- declared so executor.ts's
+        // scrubAssumptionNote pseudonymizes it under privacy mode (capture probe P3's leak,
+        // 2026-08-14). The bare agent ID is not declared: wazuh.agent.id is a reviewed 'allow'
+        // in the field policy.
+        noteEntities: [{ value: resolvedName, kind: 'HOST' as const }],
       },
     };
   }

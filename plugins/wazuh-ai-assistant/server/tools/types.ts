@@ -19,6 +19,22 @@ export interface ResolvedToolParams {
    * agent". Omitted when nothing was inferred (every param the hook cared about was already
    * supplied), so a call that needed no resolution produces no note. */
   note?: string;
+  /** Identifier values embedded in `note` that carry privacy weight (e.g. the resolved agent's
+   * hostname), each tagged with its pseudonym kind. Under privacy mode `executor.ts` substitutes
+   * each one in the note with `pseudonymizer.pseudonymize(value, kind)` BEFORE the note reaches
+   * the digest — without this, a resolved hostname reaches the provider in the clear: it is a
+   * bare single-word token, so neither the shape scan (not address-shaped; privacy.ts's
+   * documented bare-hostname limitation) nor the known-entity scan (nothing minted it — the
+   * whole point of resolution is that the caller never supplied the value) can catch it. Proven
+   * on the wire 2026-08-14 (privacy capture probe P3): the note carried the raw agent name while
+   * `HOST_` appeared nowhere in the outbound body. Same treatment as the near-miss hint's
+   * explicit HOST pseudonymization (executor.ts's appendEntityNearMissHint PRIVACY note) — a
+   * resolver that names an identifier in prose must also declare it here. Omitted when the note
+   * carries no identifier, or there is no note. */
+  noteEntities?: Array<{
+    value: string;
+    kind: 'HOST' | 'IP' | 'USER' | 'URL' | 'VAL';
+  }>;
 }
 
 export type ResolveParamsResult =

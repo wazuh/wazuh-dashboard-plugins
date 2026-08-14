@@ -36,20 +36,18 @@ import { applySafetyValves, checkIndexAllowlist, lintDsl } from './guardrails';
  * param `scopedBy` an earlier one (e.g. `get_sca_checks`'s `policy_id` narrows its own lookup to
  * whichever `agent_id` was supplied or just resolved).
  *
- * PRIVACY DECISION, made explicit rather than left implicit: the assumption notes and "which one?"
- * candidate lists this module returns embed raw agent names (and, for `indexer-terms`, raw field
- * values) in free text, with no pseudonymization at construction. `executor.ts` awaits
- * `def.resolveParams(params, context, request)` -- it does not pass its `PrivacyContext` in, so
- * this generic hook structurally cannot call `privacy.pseudonymizer.pseudonymize(...)` the way
- * `executor.ts`'s own `appendEntityNearMissHint` does (issue #8920) before a name reaches free
- * text. This is exact parity with #8913's hand-written `resolveDeicticAgentParams`, which has the
- * same gap today -- so this change does not introduce a new hole, but it does widen the SAME gap
- * from one tool/one name to five tools and up to `MAX_LISTED_CANDIDATES` names per failed call.
- * The net that still applies is `chat.ts`'s best-effort post-hoc `prescanAndMintToolContent` /
- * `applyToText` pass over the final tool-result text. Threading `PrivacyContext` into
- * `resolveParams` so this module (and #8913's hook) can pseudonymize at construction, matching
- * #8920's convention, is tracked as follow-up rather than done here: it is an `executor.ts` change,
- * which this task was explicitly scoped to avoid.
+ * PRIVACY: the assumption notes this module returns embed raw identifier values (an agent's
+ * hostname) in free text. Resolvers still have no `PrivacyContext` -- instead each resolved
+ * outcome DECLARES the identifier values it interpolated (`noteEntities`), and `executor.ts`'s
+ * `scrubAssumptionNote` pseudonymizes them at the single choke point every resolver's note passes
+ * through, under privacy mode only. This replaced the earlier "post-hoc text scan will catch it"
+ * assumption after a wire capture (privacy probe P3, 2026-08-14) proved it false: a bare
+ * single-word hostname in the note reached the provider in the clear -- it is not address-shaped
+ * (the shape scan's documented limitation) and was never minted (resolution exists precisely
+ * because the caller never supplied the value), so both downstream scans missed it. The "which
+ * one?" candidate lists in FAILED outcomes travel as tool-result error text, not as a digest
+ * note, and remain covered by `chat.ts`'s `prescanAndMintToolContent` pass plus the same bare-name
+ * limitation -- a residual documented in the privacy issue, not silently assumed away.
  */
 
 /** How many named candidates a "which one?" error lists, for either lookup kind -- bounded so a
@@ -337,7 +335,19 @@ async function resolveOneParam(
   request: OpenSearchDashboardsRequest,
 ): Promise<
   | { status: 'skip' }
-  | { status: 'resolved'; value: string; note: string }
+  | {
+      status: 'resolved';
+      value: string;
+      note: string;
+      /** Identifier values interpolated into `note`, threaded up to
+       * `ResolvedToolParams.noteEntities` (types.ts) so executor.ts pseudonymizes them under
+       * privacy mode (capture probe P3, 2026-08-14: an undeclared resolved hostname reached
+       * the provider in the clear). Empty for values that are not identifiers (a policy id). */
+      noteEntities: Array<{
+        value: string;
+        kind: 'HOST' | 'IP' | 'USER' | 'URL' | 'VAL';
+      }>;
+    }
   | { status: 'failed'; reason: string }
 > {
   const existing = params[spec.param];
@@ -356,6 +366,9 @@ async function resolveOneParam(
           `No "${spec.param}" was given, so this call was resolved to the only active agent ` +
           `"${result.name}" (id ${result.id}). State this assumption to the user rather than ` +
           'presenting the result as if a specific agent had been named.',
+        // The hostname the note interpolates; the bare id stays undeclared (wazuh.agent.id is a
+        // reviewed 'allow' in the field policy).
+        noteEntities: [{ value: result.name, kind: 'HOST' }],
       };
     }
     if (result.kind === 'none') {
@@ -408,6 +421,10 @@ async function resolveOneParam(
         `No "${spec.param}" was given, so this call was resolved to the only matching value, ` +
         `"${result.value}". State this assumption to the user rather than presenting the ` +
         'result as if that value had been named.',
+      // A terms-source value is a catalog identifier (an SCA policy id), not a host/user/network
+      // identifier -- nothing to declare. If a future spec resolves an identifier-bearing field
+      // this way, it must declare it here or the P3 leak returns for that tool.
+      noteEntities: [],
     };
   }
   if (result.kind === 'none') {
@@ -466,6 +483,7 @@ export function buildGenericResolveParams(
   ): Promise<ResolveParamsResult> {
     let nextParams = params;
     const notes: string[] = [];
+    const noteEntities: NonNullable<ResolvedToolParams['noteEntities']> = [];
     for (const spec of specs) {
       const outcome = await resolveOneParam(spec, nextParams, context, request);
       if (outcome.status === 'skip') {
@@ -476,12 +494,14 @@ export function buildGenericResolveParams(
       }
       nextParams = { ...nextParams, [spec.param]: outcome.value };
       notes.push(outcome.note);
+      noteEntities.push(...outcome.noteEntities);
     }
     return {
       ok: true,
       resolved: {
         params: nextParams,
         ...(notes.length > 0 ? { note: notes.join(' ') } : {}),
+        ...(noteEntities.length > 0 ? { noteEntities } : {}),
       },
     };
   };

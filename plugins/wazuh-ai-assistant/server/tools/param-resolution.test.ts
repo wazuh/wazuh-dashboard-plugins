@@ -149,6 +149,13 @@ test('buildGenericResolveParams (manager-agents): exactly one active agent resol
   assert.equal(result.resolved.params.agent_id, '001');
   assert.match(result.resolved.note ?? '', /wazuh-aio-5/);
   assert.match(result.resolved.note ?? '', /001/);
+  // Privacy capture probe P3 (2026-08-14): the raw hostname in this note reached the provider in
+  // the clear under privacy mode. The resolver must DECLARE it so executor.ts's
+  // scrubAssumptionNote can pseudonymize it -- an undeclared identifier here is the leak
+  // recurring.
+  assert.deepEqual(result.resolved.noteEntities, [
+    { value: 'wazuh-aio-5', kind: 'HOST' },
+  ]);
 });
 
 test('buildGenericResolveParams (manager-agents, valueFrom "name"): injects the agent NAME, not the id', async () => {
@@ -205,6 +212,9 @@ test('buildGenericResolveParams (indexer-terms): exactly one candidate resolves 
   if (!result.ok) return;
   assert.equal(result.resolved.params.policy_id, 'cis_ubuntu22-04');
   assert.match(result.resolved.note ?? '', /cis_ubuntu22-04/);
+  // A terms-source value is a catalog identifier (an SCA policy id), not a host/user/network
+  // identifier -- deliberately NO declared note entities (see resolveOneParam's terms branch).
+  assert.equal(result.resolved.noteEntities, undefined);
 });
 
 // --- contract outcome 3: zero/many candidates -> ok:false with named candidates ----------------
