@@ -1,9 +1,14 @@
 import assert from 'node:assert/strict';
 import {
+  FINDING_BREAKDOWN_AGGS,
+  FINDING_BREAKDOWN_DIMENSIONS,
   severitiesAtOrAbove,
   severitiesAtOrBelow,
   severityFilterValues,
+  VULN_BREAKDOWN_AGGS,
+  VULN_BREAKDOWN_DIMENSIONS,
 } from './common';
+import { BREAKDOWN_BUCKET_CAP } from '../digest';
 
 test('severitiesAtOrAbove returns the tail of the severity order, inclusive', () => {
   assert.deepEqual(severitiesAtOrAbove('medium'), [
@@ -115,4 +120,51 @@ test('severityFilterValues fails open to the full list for an unrecognized compa
 
 test('severityFilterValues treats an undefined comparison as exact', () => {
   assert.deepEqual(severityFilterValues('medium', undefined), ['medium']);
+});
+
+// --- FINDING_BREAKDOWN_AGGS: real aggregations attached to every finding-hits tool's request ----
+
+test('FINDING_BREAKDOWN_AGGS declares one terms aggregation per FINDING_BREAKDOWN_DIMENSIONS', () => {
+  assert.equal(
+    Object.keys(FINDING_BREAKDOWN_AGGS).length,
+    FINDING_BREAKDOWN_DIMENSIONS.length,
+  );
+  for (const field of FINDING_BREAKDOWN_DIMENSIONS) {
+    const aggName = field.replace(/\./g, '_');
+    const agg = FINDING_BREAKDOWN_AGGS[aggName] as {
+      terms?: { field?: string; size?: number };
+    };
+    assert.ok(
+      agg,
+      `expected an aggregation named "${aggName}" for field "${field}"`,
+    );
+    assert.equal(agg.terms?.field, field);
+    // Sized identically to the synthetic fallback's per-dimension cap (digest.ts's
+    // buildSyntheticBreakdown) so the token cost of a breakdown does not depend on which of the
+    // two paths ends up serving a given call.
+    assert.equal(agg.terms?.size, BREAKDOWN_BUCKET_CAP);
+  }
+});
+
+// --- VULN_BREAKDOWN_AGGS: real aggregations attached to the 3 hits-based vulnerability tools ----
+// (issue #8920 item 1: "no high-severity vulnerabilities" on a host that actually has some, just
+// sorted outside the returned page).
+
+test('VULN_BREAKDOWN_AGGS declares one terms aggregation per VULN_BREAKDOWN_DIMENSIONS', () => {
+  assert.equal(
+    Object.keys(VULN_BREAKDOWN_AGGS).length,
+    VULN_BREAKDOWN_DIMENSIONS.length,
+  );
+  for (const field of VULN_BREAKDOWN_DIMENSIONS) {
+    const aggName = field.replace(/\./g, '_');
+    const agg = VULN_BREAKDOWN_AGGS[aggName] as {
+      terms?: { field?: string; size?: number };
+    };
+    assert.ok(
+      agg,
+      `expected an aggregation named "${aggName}" for field "${field}"`,
+    );
+    assert.equal(agg.terms?.field, field);
+    assert.equal(agg.terms?.size, BREAKDOWN_BUCKET_CAP);
+  }
 });

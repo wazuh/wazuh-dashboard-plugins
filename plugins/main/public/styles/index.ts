@@ -23,6 +23,7 @@ import './media-queries.scss';
 import './typography.scss';
 import './inventory.scss';
 import './dashboard.scss';
+import './theme-colors.scss';
 
 const IS_DARK_THEME = getUiSettings().get('theme:darkMode');
 /* tslint-disable no-undef */

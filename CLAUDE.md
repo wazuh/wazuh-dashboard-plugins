@@ -17,13 +17,14 @@ fork), into which these plugins are installed under its `plugins/` directory.
 
 ## Architecture — read this before importing anything
 
-Three plugins under `plugins/`, in dependency order:
+Four plugins under `plugins/`, in dependency order:
 
 | Plugin folder                 | OSD id              | Role                                                                                      |
 | ----------------------------- | ------------------- | ----------------------------------------------------------------------------------------- |
 | `plugins/wazuh-core`          | `wazuhCore`         | Base services: config, API hosts, Server API client, security. Depended on by the others. |
 | `plugins/wazuh-check-updates` | `wazuhCheckUpdates` | Update notifications + CTI registration. Depends on `wazuhCore`.                          |
 | `plugins/main`                | `wazuh`             | Main app (alerts, agents, modules, Dev Tools…). Depends on both above.                    |
+| `plugins/wazuh-ai-assistant`  | `wazuhAiAssistant`  | AI assistant chat. Requires `wazuhCore`; `wazuh` (main) is optional.                      |
 
 Each plugin is **self-contained**: its own `package.json`, `yarn.lock`,
 `eslint.config.mjs`, `knip.json`, and Jest config.
@@ -94,7 +95,8 @@ yarn knip                          # unused files/exports
 ```
 
 Run per-plugin commands from that plugin's folder (`plugins/main`,
-`plugins/wazuh-core`, `plugins/wazuh-check-updates`). Fallback host setup:
+`plugins/wazuh-core`, `plugins/wazuh-check-updates`,
+`plugins/wazuh-ai-assistant`). Fallback host setup:
 [`docs/dev/setup.md`](docs/dev/setup.md).
 
 ### Running the full stack — this repo drives the local dev env
@@ -102,7 +104,8 @@ Run per-plugin commands from that plugin's folder (`plugins/main`,
 `docker/osd-dev` is the local run/dev environment for the **entire Wazuh dashboard
 stack**, and it lives **here**, not in `wazuh-dashboard`. `./dev.sh up` starts the
 OSD platform plus the internal plugins (`main`, `wazuh-core`, `wazuh-check-updates`,
-auto-detected under `plugins/`). To develop the **other repos** locally, mount them:
+`wazuh-ai-assistant`, auto-detected under `plugins/`). To develop the **other repos**
+locally, mount them:
 
 - `-r <repo>=/abs/path` (or `-r <repo>`, resolved from the sibling parent dir) —
   external plugin repos: `security`, `alerting`, `notifications`, `reporting`,
@@ -165,4 +168,4 @@ wins and relevant upstream notes are folded into the sections above.
 - [`STYLEGUIDE.md`](STYLEGUIDE.md), [`SECURITY.md`](SECURITY.md),
   [`RELEASING.md`](RELEASING.md).
 - Per-plugin READMEs: `plugins/main/README.md`, `plugins/wazuh-core/README.md`,
-  `plugins/wazuh-check-updates/README.md`.
+  `plugins/wazuh-check-updates/README.md`, `plugins/wazuh-ai-assistant/README.md`.

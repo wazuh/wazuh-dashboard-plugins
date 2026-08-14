@@ -939,6 +939,106 @@ describe('ChatPage — interrupted turns and failed saves', () => {
     );
   });
 
+  it('"Retry now" on the save-failed callout re-saves through the same path and clears the notice on success, without creating a second conversation', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+    // Persistent failure: both this turn's pre-send AND post-answer saves fail, so the notice is
+    // still up (with nothing else left to auto-retry it) when the user clicks the button.
+    mockConversationsService.create.mockRejectedValue(httpError(500));
+
+    renderChatPage();
+    await sendMessage('first question');
+    await waitFor(() =>
+      expect(
+        screen.getByText('This conversation is not being saved'),
+      ).toBeInTheDocument(),
+    );
+    stream.push({ type: 'delta', content: 'an answer' });
+    stream.push({ type: 'done' });
+    stream.end();
+    await waitFor(() =>
+      expect(mockConversationsService.create).toHaveBeenCalledTimes(2),
+    );
+    expect(
+      screen.getByText('This conversation is not being saved'),
+    ).toBeInTheDocument();
+
+    // Whatever was blocking the save is now fixed — the next attempt succeeds.
+    mockConversationsService.create.mockResolvedValueOnce(
+      conversationRecord({ id: 'conv-retried', version: 'v1' }),
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Retry now' }));
+
+    await waitFor(() =>
+      expect(
+        screen.queryByText('This conversation is not being saved'),
+      ).not.toBeInTheDocument(),
+    );
+    // Exactly one more `create` call — the retry reuses `persistConversationTurn`, not a second
+    // save implementation — and the conversation it just created becomes this tab's active one,
+    // never a second row: the update.mock check confirms this by targeting that id.
+    expect(mockConversationsService.create).toHaveBeenCalledTimes(3);
+    const [title, messages] = mockConversationsService.create.mock.calls[2];
+    expect(title).toBeTruthy();
+    expect(messages[messages.length - 1].content).toBe('an answer');
+
+    // A later turn updates the row the retry created instead of creating another one.
+    await sendMessage('second question');
+    await waitFor(() =>
+      expect(mockConversationsService.update).toHaveBeenCalled(),
+    );
+    expect(mockConversationsService.update.mock.calls[0][0]).toBe(
+      'conv-retried',
+    );
+    expect(mockConversationsService.create).toHaveBeenCalledTimes(3);
+  });
+
+  it('disables "Retry now" while a turn is generating, so it cannot double-create the conversation', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+    // The pre-send save (before any streaming starts) fails first, raising the callout while the
+    // turn is still generating; the post-answer save that follows once the stream ends succeeds.
+    mockConversationsService.create
+      .mockRejectedValueOnce(httpError(500))
+      .mockResolvedValueOnce(
+        conversationRecord({ id: 'conv-new', version: 'v1' }),
+      );
+
+    renderChatPage();
+    await sendMessage('first question');
+    await waitFor(() =>
+      expect(
+        screen.getByText('This conversation is not being saved'),
+      ).toBeInTheDocument(),
+    );
+    expect(mockConversationsService.create).toHaveBeenCalledTimes(1);
+
+    // The turn is still streaming: clicking "Retry now" here must be a no-op — it is disabled
+    // precisely so this window (the in-flight turn's own target not yet resolved, per
+    // `handleRetrySave`'s doc comment) can never race the turn's own saves into a second create.
+    const retryButton = screen.getByRole('button', { name: 'Retry now' });
+    expect(retryButton).toBeDisabled();
+    fireEvent.click(retryButton);
+    expect(mockConversationsService.create).toHaveBeenCalledTimes(1);
+
+    stream.push({ type: 'delta', content: 'an answer' });
+    stream.push({ type: 'done' });
+    stream.end();
+
+    // Only the turn's own post-answer save creates the row — never a second one from the blocked
+    // retry click.
+    await waitFor(() =>
+      expect(
+        screen.queryByText('This conversation is not being saved'),
+      ).not.toBeInTheDocument(),
+    );
+    expect(mockConversationsService.create).toHaveBeenCalledTimes(2);
+  });
+
   it('does not raise the save notice for a 401, which has its own callout', async () => {
     const stream = createControllableStream();
     mockStreamChat.mockImplementation(
@@ -1220,6 +1320,141 @@ describe('ChatPage — feedback while a turn runs', () => {
   });
 });
 
+/**
+ * Coverage for issue #8920 item 7: a populated result table must never be overwritten by an empty
+ * one at end-of-stream. `chat-page.tsx` flushes its held table buffers (`pendingTable`,
+ * `pendingEmptyTable`) from three different call sites — `finally`, the `error` branch, and the
+ * `auth_expired` branch — and they do not all flush in the same order (`finally`/`auth_expired`
+ * flush the non-empty one first; `error` flushes the empty one first). On the unfixed code only
+ * `finally` was reachably broken: `error`'s empty-first order happened to be benign (the later
+ * non-empty commit won) and `auth_expired` fires on the initial POST's 401 before any SSE frame
+ * is read, so it can never hold a table. "Happens to be benign" is still worth pinning.
+ * The class fix is an order-INDEPENDENT invariant (see the `pendingEmptyTable` comment above it):
+ * an empty spec is refused on arrival once a non-empty table exists for the turn, and
+ * `flushPendingEmptyTable` independently yields to any pending/committed non-empty table.
+ *
+ * This is the UI-layer equivalent of the registry-wide coverage tests elsewhere in this codebase
+ * (see server/tools/catalog/agg-size-coverage.test.ts): the class here is "orderings of table
+ * events within one turn", and the five scenarios below enumerate it exhaustively for the
+ * single-table-per-message model — every place an empty `table` event can land relative to a
+ * non-empty one, plus the one honest-empty case that must still render.
+ */
+describe('ChatPage — an empty table never clobbers a populated one (issue #8920 item 7)', () => {
+  const ROWS_SPEC = {
+    columns: [{ id: 'agent', label: 'Agent' }],
+    rows: [{ agent: 'web-01' }],
+  };
+  const EMPTY_SPEC = { columns: [{ id: 'agent', label: 'Agent' }], rows: [] };
+
+  it('keeps the populated table when an empty one arrives after the answer text (text-flush path)', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('top agents?');
+
+    stream.push({ type: 'table', spec: ROWS_SPEC });
+    // The delta's text releases `pendingTable` into `committedTable` — by the time the empty table
+    // below arrives, the non-empty one is no longer "pending", it is already committed, which is
+    // exactly why `hasNonEmptyTableForTurn` also checks `committedTable`, not just `pendingTable`.
+    stream.push({ type: 'delta', content: 'here they are' });
+    await waitFor(() =>
+      expect(screen.getByText('here they are')).toBeInTheDocument(),
+    );
+    stream.push({ type: 'table', spec: EMPTY_SPEC });
+    stream.push({ type: 'done' });
+    stream.end();
+
+    await waitFor(() => expect(screen.getByText('web-01')).toBeInTheDocument());
+    expect(screen.queryByText('Results (0 rows)')).not.toBeInTheDocument();
+  });
+
+  it('keeps the populated table when an empty one arrives with no answer text (finally-path)', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('top agents?');
+
+    // No delta text this turn: both tables reach `finally` still held (`pendingTable` non-empty,
+    // the empty spec never even makes it into `pendingEmptyTable` — refused on arrival).
+    stream.push({ type: 'table', spec: ROWS_SPEC });
+    stream.push({ type: 'table', spec: EMPTY_SPEC });
+    stream.push({ type: 'done' });
+    stream.end();
+
+    await waitFor(() => expect(screen.getByText('web-01')).toBeInTheDocument());
+    expect(screen.queryByText('Results (0 rows)')).not.toBeInTheDocument();
+  });
+
+  it('shows the retried table when an empty attempt is followed by a real one', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('top agents?');
+
+    // A failed/empty first tool attempt, then a successful retry in the same turn — the suppression
+    // this buffer exists for in the first place must still work in the other direction.
+    stream.push({ type: 'table', spec: EMPTY_SPEC });
+    stream.push({ type: 'table', spec: ROWS_SPEC });
+    stream.push({ type: 'done' });
+    stream.end();
+
+    await waitFor(() => expect(screen.getByText('web-01')).toBeInTheDocument());
+  });
+
+  it('still shows an honest empty table when it is the only table this turn', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('top agents?');
+
+    stream.push({ type: 'table', spec: EMPTY_SPEC });
+    stream.push({ type: 'done' });
+    stream.end();
+
+    await waitFor(() =>
+      expect(screen.getByText('Results (0 rows)')).toBeInTheDocument(),
+    );
+  });
+
+  it('keeps the populated table when an empty one arrives and the turn then errors', async () => {
+    // The `error` call site's cell of the matrix: rows, THEN an empty table, THEN a mid-stream
+    // provider error. The `error` branch is the one call site that flushes the EMPTY buffer
+    // before the non-empty one (`flushPendingEmptyTable()` then `flushPendingTable()`) — on the
+    // unfixed code that order happened to be benign (the later non-empty commit won), but this
+    // scenario pins the cell so a future reorder of the `error` branch, or a change to which
+    // commit "wins", cannot silently reintroduce the clobber at this call site. With the fix the
+    // empty spec is already refused on arrival, so both halves of the invariant are exercised on
+    // the path that ends in `error` rather than `finally`.
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('top agents?');
+
+    stream.push({ type: 'table', spec: ROWS_SPEC });
+    stream.push({ type: 'table', spec: EMPTY_SPEC });
+    stream.push({ type: 'error', message: 'provider stream failed' });
+    stream.end();
+
+    await waitFor(() => expect(screen.getByText('web-01')).toBeInTheDocument());
+    expect(screen.queryByText('Results (0 rows)')).not.toBeInTheDocument();
+  });
+});
+
 describe('ChatPage — confirming before interrupting a running answer', () => {
   function startGeneratingWithSidebar() {
     const stream = createControllableStream();
@@ -1402,5 +1637,144 @@ describe('ChatPage — pre-turn Manager session guard (issue #8826)', () => {
       expect(mockSettingsService.getAssistantSettings).toHaveBeenCalled(),
     );
     expect(mockSettingsService.getSettingsAccess).not.toHaveBeenCalled();
+  });
+});
+
+describe('ChatPage — welcome-state layout does not clip the composer', () => {
+  /**
+   * Regression guard for the composer-clipping bug: the chat pane (the region with `overflowY:
+   * 'auto'`, identified by its `aria-label`) must never carry `justifyContent: 'center'` in the
+   * welcome state. That combination is what caused the bug — a centered flex box whose content
+   * (hero + cards + composer) is taller than the pane distributes the overflow equally above and
+   * below, and since `scrollTop` can never go negative, the top half becomes unreachable while the
+   * bottom (the composer) renders past the visible edge or mid-content. The pane must stay
+   * `flex-start` at all times; any vertical centering happens further down, inside flex-grow
+   * spacers that collapse to zero instead of going negative.
+   */
+  it('never centers the scrollable chat pane itself, even on the welcome screen', async () => {
+    renderChatPage();
+    await waitFor(() =>
+      expect(
+        screen.getByText('Ask the AI Assistant something'),
+      ).toBeInTheDocument(),
+    );
+
+    const pane = screen.getByRole('region', { name: 'Chat' });
+    expect(pane.style.justifyContent).not.toBe('center');
+    expect(pane.style.overflowY).toBe('auto');
+  });
+
+  it('keeps the composer input reachable once a callout pushes the welcome content down', async () => {
+    mockConversationsService.create.mockRejectedValue(httpError(500));
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    // A save-failed callout above the welcome content is exactly the kind of extra height that
+    // used to push the composer out of the centered flex box and off screen.
+    await sendMessage('first question');
+    await waitFor(() =>
+      expect(
+        screen.getByText('This conversation is not being saved'),
+      ).toBeInTheDocument(),
+    );
+
+    // The composer is still there and not display:none/visibility:hidden'd — the whole point of
+    // the fix is that it stays in the DOM's visible flow, with the pane scrolling to reach it
+    // rather than the layout clipping it.
+    expect(screen.getByLabelText('Chat message')).toBeVisible();
+    const pane = screen.getByRole('region', { name: 'Chat' });
+    expect(pane.style.justifyContent).not.toBe('center');
+  });
+
+  /**
+   * Regression guard for the shrink/overlap bug: the welcome column (the pane's direct child) must
+   * never be shrinkable (`flex-shrink: 0`, i.e. a flex-basis of `1 0 auto`). A shrinkable column
+   * (`1 1 auto`, tried and reverted) let the pane squeeze it below its own content's height once
+   * welcome content plus a callout above it overflowed the pane — pushing the cards to render
+   * BEHIND the opaque sticky composer instead of the pane scrolling cleanly. A conversation's own
+   * column already uses `1 0 auto` for the same reason (see its own comment); the welcome state
+   * must match, not diverge.
+   */
+  it('never lets the welcome column shrink below its own content height', async () => {
+    renderChatPage();
+    await waitFor(() =>
+      expect(
+        screen.getByText('Ask the AI Assistant something'),
+      ).toBeInTheDocument(),
+    );
+
+    const pane = screen.getByRole('region', { name: 'Chat' });
+    const column = pane.firstElementChild as HTMLElement;
+    expect(column.style.flex).toBe('1 0 auto');
+    // jsdom serializes the numeric `minHeight: 0` style as '0'; real browsers report '0px'.
+    expect(['0', '0px']).toContain(column.style.minHeight);
+  });
+});
+
+describe('ChatPage — transcript reserves space for the sticky composer', () => {
+  /**
+   * Regression guard for the composer-overlap bug, and for the over-reservation bug a prior fix
+   * for it introduced. A live measurement caught the sticky composer (`.wzStickyInputPanel`)
+   * covering the bottom few pixels of the transcript's last element (a table's pagination bar)
+   * even once scrolled all the way down — `position: sticky` reserves the panel's own box in the
+   * flow, but not the fade gradient its `::before` paints further upward (chat-page.scss). A prior
+   * fix over-corrected by feeding the panel's FULL measured `offsetHeight` back as the transcript's
+   * `paddingBottom` in JS: that double-reserves space `position: sticky` already accounts for (the
+   * panel is an ordinary flex sibling), leaving a permanent composer-sized gap at the bottom of the
+   * transcript whenever the conversation is scrolled all the way down — which the auto-scroll
+   * effect forces after every turn. The actual fix is a fixed CSS `padding-bottom` on
+   * `.wzChatTranscript` (chat-page.scss) sized to just the `::before` gradient's height via a SCSS
+   * constant shared with the panel's own rule, so the two can never drift apart, and growth of the
+   * composer itself (e.g. multiline input) is left entirely to ordinary flex layout.
+   *
+   * jsdom never lays out real boxes and does not evaluate the imported `.scss`, so no jsdom test
+   * can pin the actual pixel values or reproduce the real overlap. What these pin instead is the
+   * STRUCTURAL choice: (1) the component itself no longer computes or sets any `paddingBottom`
+   * inline — reintroducing a JS measurement here is exactly how the over-reservation bug came
+   * back — and (2) the stylesheet reserves the gradient's own fixed height, not an arbitrary or
+   * unrelated pixel figure, by construction (one SCSS variable feeding both rules).
+   */
+  it('never sets an inline paddingBottom on the transcript (no JS height measurement)', async () => {
+    renderChatPage();
+    await waitFor(() =>
+      expect(
+        screen.getByText('Ask the AI Assistant something'),
+      ).toBeInTheDocument(),
+    );
+
+    const pane = screen.getByRole('region', { name: 'Chat' });
+    const transcript = pane.querySelector('.wzChatTranscript') as HTMLElement;
+    expect(transcript).not.toBeNull();
+    // A previous fix set this from a `ResizeObserver`-fed `offsetHeight` state; that measurement
+    // (and the double-reservation bug it caused) is gone. Any style on this element now comes
+    // entirely from the `.wzChatTranscript` CSS class in chat-page.scss.
+    expect(transcript.style.paddingBottom).toBe('');
+  });
+
+  it("keeps the transcript's CSS padding tied to the sticky panel's own gradient height", () => {
+    // `require.resolve` goes through Jest's own module resolution, which this project's
+    // moduleNameMapper points at `style_mock.js` for every `.scss` import — reading through
+    // that would read the mock's content, not this file's real rules. `path.join` against
+    // `__dirname` sidesteps Jest's resolver entirely and reads the actual SCSS off disk.
+    const scssPath = require('path').join(__dirname, 'chat-page.scss');
+    const scssSource = require('fs').readFileSync(scssPath, 'utf8');
+
+    const transcriptPadding = scssSource.match(
+      /\.wzChatTranscript\s*{\s*padding-bottom:\s*([^;]+);/,
+    );
+    const gradientHeight = scssSource.match(
+      /&::before\s*{[^}]*height:\s*([^;]+);/,
+    );
+
+    expect(transcriptPadding).not.toBeNull();
+    expect(gradientHeight).not.toBeNull();
+    // Both rules read from the same SCSS variable, so this equality holds by construction — the
+    // regression this guards against is one side being changed (or hardcoded) without the other,
+    // which would either reopen the overlap or reintroduce a mismatched over-reservation.
+    expect(transcriptPadding![1].trim()).toBe(gradientHeight![1].trim());
+    expect(transcriptPadding![1].trim()).toBe('$wzComposerGradientHeight');
   });
 });

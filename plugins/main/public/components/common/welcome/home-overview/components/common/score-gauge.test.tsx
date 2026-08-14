@@ -8,6 +8,7 @@ jest.mock('../../../utils/helpers', () => ({
   }),
 }));
 import { ScoreGauge } from './score-gauge';
+import { HOME_OVERVIEW_COLOR } from '../../lib/theme-colors';
 
 describe('ScoreGauge', () => {
   it('renders the formatted score value and the scale captions', () => {
@@ -15,6 +16,13 @@ describe('ScoreGauge', () => {
     expect(screen.getByText('50.2%')).toBeInTheDocument();
     expect(screen.getByText('0')).toBeInTheDocument();
     expect(screen.getByText('100')).toBeInTheDocument();
+  });
+
+  it('colors the value with a theme-aware CSS custom property, not a frozen hex', () => {
+    render(<ScoreGauge score={0.502} data-test-subj='sca-gauge' />);
+    expect(screen.getByText('50.2%')).toHaveStyle({
+      color: HOME_OVERVIEW_COLOR.warning,
+    });
   });
 
   it('renders no marker/value when the score is undefined', () => {

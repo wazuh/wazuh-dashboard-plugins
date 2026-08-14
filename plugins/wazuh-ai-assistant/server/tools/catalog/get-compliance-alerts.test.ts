@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { getComplianceAlertsTool } from './get-compliance-alerts';
 import { lintDsl, checkIndexAllowlist } from '../guardrails';
+import { FINDING_BREAKDOWN_AGGS, FINDING_BREAKDOWN_DIMENSIONS } from './common';
 import { COMPLIANCE_FRAMEWORK_FIELDS } from '../../../common/wazuh-fields';
 import { IndexerRequest } from '../types';
 
@@ -73,4 +74,15 @@ test('get_compliance_alerts: request passes checkIndexAllowlist and lintDsl', ()
   assert.equal(checkIndexAllowlist(request.index).ok, true);
   const result = lintDsl(request.body, request.index);
   assert.equal(result.ok, true, result.ok ? '' : result.reason);
+});
+
+// Issue #8920 item 1 (population-disclosure): this tool was a hits-only search with no view of
+// the true agent/rule-title distribution beyond the `limit`-truncated page.
+test('get_compliance_alerts: attaches the shared population-true finding breakdown', () => {
+  const request = build({ framework: ['gdpr'] });
+  assert.deepEqual(request.body.aggs, FINDING_BREAKDOWN_AGGS);
+  assert.deepEqual(
+    getComplianceAlertsTool.digest.breakdownDimensions,
+    FINDING_BREAKDOWN_DIMENSIONS,
+  );
 });
