@@ -78,12 +78,18 @@ test('buildTableSpec: bucket rows under a fixed-column tool fall back to derived
       },
     },
   };
-  const table = buildTableSpec(result, def);
+  // requestBody present WITH a _source list -- the live shape (first deploy caught this: the
+  // fallback derived the _source columns and reproduced the empty grid under new headers).
+  const table = buildTableSpec(result, def, {
+    _source: ['check.id', 'check.name', 'check.result'],
+    size: 50,
+  });
   assert.equal(table.rows.length, 2);
-  // Derived, not the declared hit-document columns.
+  // Derived FROM THE ROWS, never from the request's _source list.
   const ids = table.columns.map(c => c.id);
   assert.ok(ids.includes('key'), `derived columns must include "key", got ${ids.join(',')}`);
   assert.ok(!ids.includes('check.id'));
+  assert.ok(!ids.includes('check.result'), '_source must not drive the fallback columns');
   // The rows carry real values -- the em-dash grid is the regression.
   assert.equal(table.rows[0].key, 'Ensure sshd is hardened.');
   assert.equal(table.rows[0].doc_count, 1);

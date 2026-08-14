@@ -772,7 +772,12 @@ export function buildTableSpec(
     def.tableSpec.columns.some(column => row[column.field] !== undefined),
   );
   if (tableRows.length > 0 && !anyDeclaredColumnResolved) {
-    const columnPaths = deriveResultColumns(rows, requestBody);
+    // requestBody deliberately NOT passed: deriveResultColumns' priority-2 branch returns the
+    // request's `_source` list before ever looking at the rows -- which for THESE rows (bucket
+    // shapes, the very reason the declared columns all missed) reproduces the empty grid with
+    // different column headers (caught live, first deploy of this fallback). Deriving from the
+    // rows alone lands in the key/doc_count branch and renders what the rows actually hold.
+    const columnPaths = deriveResultColumns(capped, undefined);
     return {
       columns: columnPaths.map(path => ({
         id: path,
