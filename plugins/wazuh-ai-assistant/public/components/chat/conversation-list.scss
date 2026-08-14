@@ -1,0 +1,122 @@
+/**
+ * Conversation rail (layout contract §5 — AI/design/redesign-v2-spec.md, "Screen 1"). Row
+ * highlighting/motion (`.wzConvoRow`) stays defined in chat-page.scss (this component only
+ * consumes that class, it does not own that stylesheet); everything below is new markup this
+ * redesign introduces on top of it.
+ */
+@import '../redesign';
+
+.wzConvoRailHeader {
+  padding-bottom: 4px;
+}
+
+/** Uppercase group label treatment (design language, "Navigation" / "Micro-labels"), reused for
+ * both the rail's own "CONVERSATIONS" title and its per-date group headers below — the underlying
+ * translated strings stay natural-case (see conversation-list.tsx's `dateBucketLabel` doc
+ * comment); this is what actually renders them uppercase. */
+.wzConvoRailTitle {
+  @include wzMicroLabel;
+  margin: 0;
+}
+
+/**
+ * Date-group header ("TODAY" / "YESTERDAY" / "TUESDAY").
+ *
+ * The label's TYPE was never the problem — 11px uppercase muted is already a shade darker than the
+ * reference's own #98A2B3 — but its SPACING was: 10px of lead against rows that sit 4px apart is
+ * not enough contrast to read as a section break, so a day header scanned as one more list item.
+ * The reference solves this with air alone (14px above a group, 6px above the first). This adds the
+ * air AND a hairline, because a rail that can hold a week of conversations has more rows between
+ * two headers than the mockup's three, and by the third group the gap alone stops registering.
+ */
+.wzConvoRailGroupHeader {
+  @include wzMicroLabel;
+  margin-top: 10px;
+  padding: 8px 4px 4px;
+  border-top: 1px solid var(--wz-hairline, #{$euiBorderColor});
+
+  /* The first group opens the list, so a rule above it would read as a divider hanging off the
+     search field rather than as the start of a section. React fragments emit no DOM, so the first
+     group's header genuinely is `.wzConvoRailScroll`'s first element child. */
+  &:first-child {
+    margin-top: 0;
+    padding-top: 2px;
+    border-top: none;
+  }
+}
+
+/**
+ * Pinned at the bottom of the rail (design: "a collapse chevron pinned at the bottom"). `margin-top:
+ * auto` only pins if the rail column actually fills the pane's height — `.wzConvoRail` below is what
+ * supplies that. Without the pair, the control simply followed the last conversation, so a long list
+ * pushed it out of view: the mechanism existed but was inert.
+ */
+.wzConvoRailCollapseControl {
+  width: 100%;
+  justify-content: flex-start;
+  margin-top: auto;
+  /* The reference rules this control off from the list above it (measured: a 1px #F0F2F5 top
+     border on the "‹ Collapse" row). Without it the control reads as one more list row that
+     happens to sit last, rather than as the rail's own footer — and once the list scrolls under a
+     pinned control, a boundary is what tells you the scrolling stopped. */
+  border-top: 1px solid var(--wz-hairline, #{$euiBorderColor});
+  padding-top: 2px;
+}
+
+/** The expanded rail is a full-height flex column so the collapse control above can be pinned and
+  * the conversation list itself is the part that scrolls. */
+.wzConvoRail {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  /* The rail itself never scrolls in either axis: its list child does (below). Horizontal scroll in
+     particular was pure noise — a row overflowed its 260px column by a few pixels and earned a
+     second scrollbar for it, against a design whose whole point is that the rail is dense and
+     quiet. */
+  overflow: hidden;
+}
+
+/** The one scrolling region in the rail, so the header (new conversation + search) and the pinned
+  * Collapse control stay put while a long history scrolls between them. */
+.wzConvoRailScroll {
+  @include wzScrollChild;
+  flex: 1 1 auto;
+  overflow-x: hidden;
+}
+
+/**
+ * The rail's own flyout rendering (chat-page.tsx, below `RAIL_FLYOUT_AT`). `EuiFlyout` portals into
+ * `document.body`, so NOTHING in the chat surface's ancestor chain reaches it — including
+ * `.wzAiChat`, the element that defines every `--wz-*` token. Without this the rows' selected/hover
+ * pills (`var(--wz-accent-soft)` / `var(--wz-accent-hover)`, conversation-list.tsx) failed
+ * substitution and computed to transparent, so on a narrow pane the open conversation had no
+ * highlight at all and hover did nothing. The provider flyout already carried its own token block
+ * for exactly this reason; this rail never got one.
+ */
+.wzConvoRailFlyout {
+  @include wzSurfaceTokens;
+}
+
+.wzConvoRailCollapsed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding-top: 4px;
+  /* 100%, NOT a restated 48px. The panel already applies `RAIL_COLLAPSED_WIDTH` (chat-page.tsx) as
+     its own border-box width with `paddingSize='s'` inside it, leaving a 32px content box — a
+     second 48px here made this strip overflow by 16px on the cross axis of a column flex container
+     (where it cannot shrink), which pushed the icons off-centre and let `.wzConvoRail`'s
+     `overflow: hidden` clip their focus rings. */
+  width: 100%;
+  /* Same reason as `.wzConvoRail`: the spacer below can only push the expand affordance down if
+     this column has the pane's height to spread across. */
+  height: 100%;
+}
+
+/** Pushes the "expand" affordance to the bottom of the 48px strip, mirroring the expanded rail's
+ * own pinned-at-the-bottom "‹ Collapse" control. */
+.wzConvoRailCollapsedSpacer {
+  flex: 1 1 auto;
+}

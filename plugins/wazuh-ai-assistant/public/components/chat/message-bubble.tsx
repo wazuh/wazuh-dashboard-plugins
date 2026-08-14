@@ -16,7 +16,7 @@ import {
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { ChatRole, TableSpec, ToolCall } from '../../../common/types';
-import { ResultTable } from './result-table';
+import { ResultTable, ResultTableProvenanceChip } from './result-table';
 import { DiscoverLink, ResolveDiscoverUrl } from './discover-link';
 import { ResolveSecurityAnalyticsUrl } from './security-analytics-link';
 import { describeToolCall } from './tool-call-label';
@@ -115,6 +115,9 @@ interface MessageBubbleProps {
    * case the interrupted notice is shown without an action.
    */
   onRetry?: () => void;
+  /** Passed straight through to this message's ResultTable — see that component's own doc
+   * comment on the same-named prop for why it is optional and currently always `undefined`. */
+  transcriptHeightPx?: number;
 }
 
 function formatTimestamp(epochMs: number): string {
@@ -197,11 +200,34 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   resolveDiscoverUrl,
   resolveSecurityAnalyticsUrl,
   onRetry,
+  transcriptHeightPx,
 }) => {
   const isUser = message.role === 'user';
   const isWaitingForFirstToken =
     !isUser && message.isStreaming === true && message.content === '';
   const toolCalls = message.toolCalls ?? [];
+  // Provenance chips move UP into the result card's own header once a table exists (layout
+  // contract §4: "the tool call renders BELOW the table it produced; it should become a chip in
+  // the card header") — ResultTable renders them there instead. Below-bubble chips stay exactly
+  // as before for the (common) case a turn ran tool calls but produced no table at all (a count
+  // answer, a suggested-query handoff, or a table still held back by chat-page.tsx pending the
+  // first answer token — see chat-page.test.tsx's "holds the result table back..." coverage: the
+  // chip must still appear from `toolCalls` alone at that point, since `message.table` is not yet
+  // set on the message).
+  const metaRowToolCalls = message.table ? [] : toolCalls;
+  const tableProvenanceChips: ResultTableProvenanceChip[] | undefined =
+    message.table
+      ? toolCalls.map(toolCall => {
+          const { short, full } = describeToolCall(toolCall, message.table);
+          return {
+            id: toolCall.id,
+            shortLabel: short,
+            fullLabel: full,
+            toolName: toolCall.name,
+            argumentsJson: toolCall.arguments,
+          };
+        })
+      : undefined;
   // Only the finished-assistant branch below renders through EuiMarkdownFormat (the user bubble
   // and the streaming branch both render message.content as plain text/JSX, which React already
   // escapes), so this is only ever read there — memoized on message.content since re-sanitizing
@@ -259,12 +285,16 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   );
 
   // Prose keeps a fixed reading measure even when the turn is wide. A turn carrying a table
-  // widens to the full column so the table fits (see the wrapper below), and without this the
+  // widens up to the table's own breakout width (see the wrapper below), and without this the
   // answer's sentences inherited that width and ran to ~117 characters a line — roughly 60% past
   // the point where the eye reliably finds the next line, which reads as a wall of text. Only
   // block content (the table, the raw query view) is allowed to use the extra width.
-  const PROSE_MEASURE = 720;
-  const proseStyle: React.CSSProperties = { maxWidth: PROSE_MEASURE };
+  // `.wzProseMeasure` (chat-page.scss) reads `$wzProseMeasure` — this component has no colocated
+  // .scss file of its own, but the plugin's whole stylesheet loads once, globally, from
+  // chat-page.tsx's own import, so this global class is reachable here without a separate import
+  // (the same way `wzMsgRow` below already is). Kept as a class rather than an inline style so this
+  // 68ch figure has exactly one home instead of a second copy restated in this file.
+  const PROSE_MEASURE_CLASS = 'wzProseMeasure';
 
   const bubbleContent = (
     <>
@@ -273,7 +303,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
         // branch also covers): announces incoming delta tokens to screen readers, which
         // otherwise stay silent for the whole stream since nothing else here changes focus.
         <div
-          style={proseStyle}
+          className={PROSE_MEASURE_CLASS}
           {...(!isUser
             ? {
                 'aria-live': 'polite' as const,
@@ -304,7 +334,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           </EuiText>
         </div>
       ) : (
-        <div style={proseStyle}>
+        <div className={PROSE_MEASURE_CLASS}>
           <EuiText size='s'>
             {/* sanitizeAssistantMarkdown (#8890): the finished answer is model output built
                   from tool results that can carry attacker-influenced text — see that
@@ -321,6 +351,8 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
             spec={message.table}
             resolveDiscoverUrl={resolveDiscoverUrl}
             resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
+            provenanceChips={tableProvenanceChips}
+            transcriptHeightPx={transcriptHeightPx}
           />
         </>
       )}
@@ -358,12 +390,17 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   const bubble = (
     <EuiFlexItem
       grow={false}
+      // The assistant's prose measure comes from the CLASS, not from a restated `68ch` — this file
+      // is not where `$wzProseMeasure` lives, and the comment above PROSE_MEASURE_CLASS already
+      // claimed the figure had exactly one home while an inline copy sat right here. A
+      // table-bearing turn takes no class: `.wzMessageRow--wide` (chat-page.scss) already caps the
+      // row at `min(100%, $wzTableMaxWidth)` one level up, so the `min(100%, 1300px)` that used to
+      // be inlined here was a second copy of that same number with nothing keeping the two in step.
+      className={!isUser && !message.table ? PROSE_MEASURE_CLASS : undefined}
       style={{
-        // The user turn keeps its 75% share (a question is always prose); the assistant turn
-        // gets a readable 720px prose measure EXCEPT when it carries a result table, which uses
-        // the full column width instead — a wide table squeezed into 75% of an already-narrow
-        // column forced a horizontal scrollbar inside the table's own 400px scroller.
-        maxWidth: isUser ? '75%' : message.table ? '100%' : 720,
+        // The user turn keeps its 75% share — a question is always prose, and the figure is
+        // genuinely local to this decision, with no token or class behind it to drift from.
+        maxWidth: isUser ? '75%' : '100%',
         minWidth: 180,
       }}
     >
@@ -424,7 +461,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           </EuiText>
         </EuiFlexItem>
         {!isUser &&
-          toolCalls.map(toolCall => {
+          metaRowToolCalls.map(toolCall => {
             const { short, full } = describeToolCall(toolCall, message.table);
             const isRawOpen = openRawIds.has(toolCall.id);
             return (
@@ -455,13 +492,13 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
             the query behind it, and an analyst has to be able to check that query without reading
             server logs — but nothing here is on screen unbidden. */}
       {!isUser &&
-        toolCalls
+        metaRowToolCalls
           .filter(toolCall => openRawIds.has(toolCall.id))
           .map(toolCall => (
             <div
               key={toolCall.id}
               id={`${rawViewId}-${toolCall.id}`}
-              style={proseStyle}
+              className={PROSE_MEASURE_CLASS}
             >
               <EuiSpacer size='xs' />
               <EuiText size='xs'>

@@ -1,0 +1,15 @@
+/**
+ * Add-provider flyout (Screen 4 of the redesign — variation 4a, numbered groups; see
+ * AI/design/redesign-v2-spec.md). Tokens come from the shared `_redesign.scss` partial; this file
+ * only adds the flyout's own layout touch — consistent spacing between the three numbered
+ * `EuiFormFieldset` groups. EUI's own fieldset/legend/checkable-card styling is left alone.
+ */
+@import '../redesign';
+
+.wzProviderFlyout {
+  @include wzSurfaceTokens;
+}
+
+.wzProviderFlyout__group + .wzProviderFlyout__group {
+  margin-top: $wzCardPaddingRoomy;
+}

@@ -5,6 +5,18 @@ import '@testing-library/jest-dom';
 import { ProviderFormFlyout } from './provider-form-flyout';
 import { ProviderSummary } from '../../../common/types';
 
+/**
+ * The model field is an `EuiComboBox`, so the CURRENT selection is not the input's `value` — with
+ * `singleSelection={{ asPlainText: true }}` EUI renders it as a plain-text pill beside the search
+ * input, which keeps its own (usually empty) value. Reading the input would therefore report "no
+ * model" for a provider that plainly shows one, so these assertions read the selection where it
+ * actually lives.
+ */
+function selectedModel(): string {
+  const input = document.querySelector('[data-test-subj="comboBoxInput"]');
+  return input?.textContent?.trim() ?? '';
+}
+
 const baseProps = {
   editingProvider: null,
   error: null,
@@ -39,14 +51,24 @@ describe('ProviderFormFlyout — create mode', () => {
     expect(screen.getByLabelText(/^name/i)).toHaveValue('');
   });
 
-  it('clarifies the API key is optional for auth-free endpoints and encrypted at rest', () => {
+  it('states the key requirement for the SELECTED provider type, not one line for both', () => {
+    // One shared line used to serve both types, so an admin adding a Claude provider was told the
+    // key was "optional for endpoints that don't require authentication (e.g. a local Ollama
+    // server without auth)": three claims, none of them true of Anthropic, on the very form the
+    // CEO already found confusing to sign an Anthropic key up on.
     render(<ProviderFormFlyout {...baseProps} />);
 
-    expect(
-      screen.getByText(
-        /optional for endpoints that don't require authentication/i,
-      ),
-    ).toBeInTheDocument();
+    // openai_compatible is the default selection: optional, and Ollama is a real example here.
+    expect(screen.getByText(/^Optional\./)).toBeInTheDocument();
+    expect(screen.getByText(/stored encrypted at rest/i)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
+
+    expect(screen.getByText(/^Required\./)).toBeInTheDocument();
+    expect(screen.queryByText(/^Optional\./)).toBeNull();
+    // Matched on a phrase unique to the requirement line: a bare /Ollama/ would also hit the
+    // openai_compatible TYPE CARD's own label, which stays on screen in both selections.
+    expect(screen.queryByText(/such as Ollama, needs no key/i)).toBeNull();
     expect(screen.getByText(/stored encrypted at rest/i)).toBeInTheDocument();
   });
 
@@ -73,9 +95,13 @@ describe('ProviderFormFlyout — create mode', () => {
     fireEvent.change(screen.getByLabelText(/endpoint url/i), {
       target: { value: ' https://api.groq.com/openai/v1 ' },
     });
-    fireEvent.change(screen.getByLabelText(/^model/i), {
+    const modelField = screen.getByLabelText(/^model/i);
+    fireEvent.change(modelField, {
       target: { value: 'llama-3.3-70b-versatile' },
     });
+    // The Model field is now an EuiComboBox (customOptionText): typing a value not in the
+    // suggestion list needs Enter to commit it as a custom option, same as any combobox.
+    fireEvent.keyDown(modelField, { key: 'Enter', code: 'Enter' });
     fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
 
     await waitFor(() => {
@@ -111,7 +137,7 @@ describe('ProviderFormFlyout — edit mode', () => {
     expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
       'https://api.openai.com/v1',
     );
-    expect(screen.getByLabelText(/^model/i)).toHaveValue('gpt-4o');
+    expect(selectedModel()).toBe('gpt-4o');
     expect(
       screen.getByText(/leave empty to keep the current key/i),
     ).toBeInTheDocument();
@@ -202,9 +228,13 @@ describe('ProviderFormFlyout — unsaved changes confirmation', () => {
       <ProviderFormFlyout {...baseProps} editingProvider={editingProvider} />,
     );
 
-    fireEvent.change(screen.getByLabelText(/^model/i), {
+    const modelField = screen.getByLabelText(/^model/i);
+    fireEvent.change(modelField, {
       target: { value: 'gpt-4.1' },
     });
+    // The Model field is now an EuiComboBox (customOptionText): typing a value not in the
+    // suggestion list needs Enter to commit it as a custom option, same as any combobox.
+    fireEvent.keyDown(modelField, { key: 'Enter', code: 'Enter' });
     fireEvent.click(
       document.querySelector(
         '[data-test-subj="euiFlyoutCloseButton"]',
@@ -294,9 +324,7 @@ describe('ProviderFormFlyout — endpoint URL guidance', () => {
   it('switches to the Anthropic placeholder/example and docs link when the provider type changes', async () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    fireEvent.change(screen.getByLabelText(/provider type/i), {
-      target: { value: 'anthropic' },
-    });
+    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
 
     expect(screen.getByLabelText(/endpoint url/i)).toHaveAttribute(
       'placeholder',
@@ -325,12 +353,10 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
   it('labels the type options self-explanatorily and describes each one', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    expect(
-      screen.getByRole('option', { name: /anthropic \(claude\)/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText(/anthropic \(claude\)/i)).toBeInTheDocument();
     expect(
       screen.getByText(
-        /choose this for openai, groq, bedrock-mantle, or any other provider/i,
+        /for hosted services such as openai, gemini or an aws bedrock gateway/i,
       ),
     ).toBeInTheDocument();
   });
@@ -338,9 +364,7 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
   it('prefills the Anthropic base URL when switching type while the field is untouched', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    fireEvent.change(screen.getByLabelText(/provider type/i), {
-      target: { value: 'anthropic' },
-    });
+    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
 
     expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
       'https://api.anthropic.com',
@@ -353,9 +377,7 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
     fireEvent.change(screen.getByLabelText(/endpoint url/i), {
       target: { value: 'https://my-custom-gateway.example.com' },
     });
-    fireEvent.change(screen.getByLabelText(/provider type/i), {
-      target: { value: 'anthropic' },
-    });
+    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
 
     expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
       'https://my-custom-gateway.example.com',
@@ -367,9 +389,7 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
       <ProviderFormFlyout {...baseProps} editingProvider={editingProvider} />,
     );
 
-    fireEvent.change(screen.getByLabelText(/provider type/i), {
-      target: { value: 'anthropic' },
-    });
+    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
 
     expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
       'https://api.openai.com/v1',
@@ -379,12 +399,10 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
   it('shows where to create an Anthropic key and its expected shape under the API key field', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    fireEvent.change(screen.getByLabelText(/provider type/i), {
-      target: { value: 'anthropic' },
-    });
+    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
 
     expect(
-      screen.getByText(/console\.anthropic\.com -> api keys/i),
+      screen.getByText(/console\.anthropic\.com, under api keys/i),
     ).toBeInTheDocument();
     expect(screen.getByText(/sk-ant-/)).toBeInTheDocument();
   });
@@ -392,9 +410,7 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
   it('shows a non-blocking warning when the key shape does not match the Anthropic type', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    fireEvent.change(screen.getByLabelText(/provider type/i), {
-      target: { value: 'anthropic' },
-    });
+    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
     fireEvent.change(screen.getByLabelText(/^api key$/i), {
       target: { value: 'sk-not-anthropic-shaped' },
     });
@@ -403,15 +419,15 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
       screen.getByText(/doesn't look like an anthropic key/i),
     ).toBeInTheDocument();
     // Non-blocking: Save must stay enabled despite the shape warning.
-    expect(screen.getByRole('button', { name: /save & test/i })).toBeEnabled();
+    expect(
+      screen.getByRole('button', { name: /^save & test$/i }),
+    ).toBeEnabled();
   });
 
   it('shows no shape warning for a well-formed Anthropic key', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    fireEvent.change(screen.getByLabelText(/provider type/i), {
-      target: { value: 'anthropic' },
-    });
+    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
     fireEvent.change(screen.getByLabelText(/^api key$/i), {
       target: { value: 'sk-ant-abc123' },
     });
@@ -424,9 +440,7 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
   it('never marks the API key field itself as invalid (warning stays non-blocking)', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    fireEvent.change(screen.getByLabelText(/provider type/i), {
-      target: { value: 'anthropic' },
-    });
+    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
     fireEvent.change(screen.getByLabelText(/^api key$/i), {
       target: { value: 'not-anthropic-shaped-at-all' },
     });
@@ -455,16 +469,12 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
   it('clears an untouched Anthropic prefill when switching to another type', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    fireEvent.change(screen.getByLabelText(/provider type/i), {
-      target: { value: 'anthropic' },
-    });
+    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
     expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
       'https://api.anthropic.com',
     );
 
-    fireEvent.change(screen.getByLabelText(/provider type/i), {
-      target: { value: 'openai_compatible' },
-    });
+    fireEvent.click(screen.getByLabelText(/openai-compatible/i));
 
     expect(screen.getByLabelText(/endpoint url/i)).toHaveValue('');
   });
@@ -472,9 +482,7 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
   it('keeps an admin-typed Anthropic URL when switching away from anthropic', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    fireEvent.change(screen.getByLabelText(/provider type/i), {
-      target: { value: 'anthropic' },
-    });
+    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
     // A value the admin actually TYPED must survive the switch. Note it must differ from the
     // prefill already in the field: React deduplicates controlled-input change events whose
     // value is identical to the current one, so firing a change with the prefill's own value
@@ -483,15 +491,15 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
       target: { value: 'https://claude.internal-proxy.example' },
     });
 
-    fireEvent.change(screen.getByLabelText(/provider type/i), {
-      target: { value: 'openai_compatible' },
-    });
+    fireEvent.click(screen.getByLabelText(/openai-compatible/i));
 
     expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
       'https://claude.internal-proxy.example',
     );
   });
+});
 
+describe('ProviderFormFlyout — getting-started onboarding', () => {
   it('shows a numbered getting-started hint for a new provider, not when editing', () => {
     const { rerender } = render(<ProviderFormFlyout {...baseProps} />);
     expect(screen.getByText(/getting started/i)).toBeInTheDocument();
@@ -513,7 +521,9 @@ describe('ProviderFormFlyout — model help text does not recommend retiring mod
 
     expect(helpText.textContent).not.toMatch(/llama-3\.3-70b-versatile/);
     expect(helpText.textContent).not.toMatch(/llama-3\.1-8b-instant/);
-    expect(helpText.textContent).toMatch(/GPT-4o/);
+    // The example follows the selected provider type rather than being a fixed GPT-4o, which is
+    // what this line used to assert — see the per-type example test above.
+    expect(helpText.textContent).toMatch(/openai\.gpt-oss-120b/);
     expect(helpText.textContent).not.toMatch(
       /small or base models often fail/i,
     );
@@ -525,10 +535,10 @@ describe('ProviderFormFlyout — model help text does not recommend retiring mod
     expect(
       screen.queryByText(/^llama-3\.3-70b-versatile$/),
     ).not.toBeInTheDocument();
-    // Anchored to the CHIP specifically — it renders the bare id in its own <code>.
+    // Anchored to the CHIP specifically — it renders inside the examples' own role="group" row.
     const chips = screen
       .getAllByText(/^openai\.gpt-oss-120b$/)
-      .filter(node => node.tagName.toLowerCase() === 'code');
+      .filter(node => node.closest('[role="group"]'));
     expect(chips.length).toBeGreaterThan(0);
   });
 });
@@ -541,7 +551,7 @@ describe('ProviderFormFlyout — Model field guidance', () => {
     expect(
       screen
         .getAllByText(/^mistral\.mistral-large-3-675b-instruct$/i)
-        .filter(node => node.tagName.toLowerCase() === 'code').length,
+        .filter(node => node.closest('[role="group"]')).length,
     ).toBeGreaterThan(0);
 
     fireEvent.click(
@@ -565,9 +575,7 @@ describe('ProviderFormFlyout — Model field guidance', () => {
   it('switches to Anthropic model examples and docs link when the provider type changes', async () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    fireEvent.change(screen.getByLabelText(/provider type/i), {
-      target: { value: 'anthropic' },
-    });
+    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
     // No auto-prefill of the endpoint URL on type switch here -- type the Anthropic endpoint
     // explicitly so the curated model-suggestion chips (keyed off the base URL) surface below.
     fireEvent.change(screen.getByLabelText(/endpoint url/i), {
@@ -579,7 +587,7 @@ describe('ProviderFormFlyout — Model field guidance', () => {
     expect(
       screen
         .getAllByText(/^claude-opus-4-8$/i)
-        .filter(node => node.tagName.toLowerCase() === 'code').length,
+        .filter(node => node.closest('[role="group"]')).length,
     ).toBeGreaterThan(0);
 
     fireEvent.click(
@@ -599,17 +607,61 @@ describe('ProviderFormFlyout — Model field guidance', () => {
 });
 
 describe('ProviderFormFlyout — type label and tool-support copy corrections', () => {
-  it('does not headline Gemini support under the OpenAI-compatible type', () => {
+  it('names only providers this build actually supports, and separates hosted from local', () => {
+    // Naming a service here is a support claim: it sends an admin off to configure it.
+    //
+    // This assertion previously required that Gemini NOT be named, from a time when Gemini's
+    // OpenAI-compatible endpoint 400'd on every tool round-trip ("Function call is missing a
+    // thought_signature"). That adapter fix has since landed — `vendorExtras` round-trips in
+    // server/providers/openai-compatible.ts, common/types.ts and both route schemas — so the
+    // reason for excluding it is gone and it is named again.
+    //
+    // Groq goes the other way: it was named as a recommended example and was measured returning
+    // 413 across its whole tier, so the UI was sending admins to a provider we knew failed.
+    // "Bedrock-Mantle" is an internal gateway name that should never have shipped in a product
+    // string.
     render(<ProviderFormFlyout {...baseProps} />);
 
-    expect(
-      screen.getByRole('option', {
-        name: /openai-compatible \(openai, bedrock gateway, ollama, lm studio, vllm\.\.\.\)/i,
-      }),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole('option', { name: /gemini/i }),
-    ).not.toBeInTheDocument();
+    const label = screen.getByLabelText(/openai-compatible/i);
+    expect(label).toBeInTheDocument();
+
+    const description = screen.getByText(/any endpoint that exposes/i);
+    expect(description).toHaveTextContent(/OpenAI/);
+    expect(description).toHaveTextContent(/Gemini/);
+    expect(description).toHaveTextContent(/AWS Bedrock gateway/);
+    // Hosted services and local runtimes are called out as different things, rather than run
+    // together in one comma list where "Ollama" reads like a service you sign up for.
+    expect(description).toHaveTextContent(/local runtimes/i);
+    expect(description).toHaveTextContent(/Ollama/);
+
+    // Scoped to the RECOMMENDATION, not the whole form. Groq is still named in the key-shape hint
+    // ("Groq keys with gsk_") and in two documentation links, and that is deliberate: those are
+    // reference for someone who has already chosen Groq, not an invitation to choose it. The 413
+    // finding was measured on one tier with tool-heavy prompts, which is enough to stop leading
+    // with it and not enough to erase it.
+    expect(description).not.toHaveTextContent(/Groq/);
+    expect(description).not.toHaveTextContent(/Bedrock-Mantle/);
+    expect(screen.queryByText(/Bedrock-Mantle/)).toBeNull();
+  });
+
+  it('offers a tool-calling example model the SELECTED provider can actually serve', () => {
+    // The callout's example was a hardcoded `gpt-4o` chip, shown on every provider type — so an
+    // admin configuring Claude was told GPT-4o was the kind of model to use, and one click filled
+    // the Model field with a value Anthropic cannot serve. The per-type example list two fields
+    // above already had the right answer.
+    render(<ProviderFormFlyout {...baseProps} />);
+    const callout = screen
+      .getByText(/tool calling needs a model/i)
+      .closest('.euiCallOut') as HTMLElement;
+    expect(callout).toHaveTextContent('openai.gpt-oss-120b');
+
+    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
+
+    const anthropicCallout = screen
+      .getByText(/tool calling needs a model/i)
+      .closest('.euiCallOut') as HTMLElement;
+    expect(anthropicCallout).toHaveTextContent('claude-opus-4-8');
+    expect(anthropicCallout).not.toHaveTextContent(/gpt-4o/i);
   });
 
   it('requires tool-calling support and warns about fabricated answers, without naming Claude Sonnet', () => {
@@ -658,9 +710,7 @@ describe('ProviderFormFlyout — curated per-vendor model suggestions', () => {
     // Suggestions are gated by provider type: api.anthropic.com only makes sense for the
     // `anthropic` type (an openai_compatible provider pointed at it is a guaranteed-broken
     // config), so switch type and type the endpoint explicitly.
-    fireEvent.change(screen.getByLabelText(/provider type/i), {
-      target: { value: 'anthropic' },
-    });
+    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
     fireEvent.change(screen.getByLabelText(/endpoint url/i), {
       target: { value: 'https://api.anthropic.com' },
     });
@@ -671,7 +721,7 @@ describe('ProviderFormFlyout — curated per-vendor model suggestions', () => {
     expect(chip).toBeDefined();
     fireEvent.click(chip as HTMLElement);
 
-    expect(screen.getByLabelText(/^model/i)).toHaveValue('claude-haiku-4-5');
+    expect(selectedModel()).toBe('claude-haiku-4-5');
   });
 
   it('does not suggest Anthropic models when api.anthropic.com is used with the openai_compatible type', () => {
@@ -736,5 +786,38 @@ describe('ProviderFormFlyout — curated per-vendor model suggestions', () => {
     expect(screen.getByText('llama3.3')).toBeInTheDocument();
     expect(screen.getByText('qwen3')).toBeInTheDocument();
     expect(screen.getByText('mistral')).toBeInTheDocument();
+  });
+});
+
+describe('ProviderFormFlyout — Model field is an editable EuiComboBox', () => {
+  it('accepts a typed model id that is in neither list, via Enter (customOptionText)', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    const modelField = screen.getByLabelText(/^model/i);
+    fireEvent.change(modelField, { target: { value: 'my-custom-fine-tune' } });
+    fireEvent.keyDown(modelField, { key: 'Enter', code: 'Enter' });
+
+    expect(selectedModel()).toBe('my-custom-fine-tune');
+  });
+
+  it('does not render the same model id under both "Examples:" and "Suggested models:"', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://api.anthropic.com' },
+    });
+
+    // claude-opus-4-8 is listed in both PROVIDER_MODEL_GUIDANCE (examples) and
+    // VENDOR_MODEL_SUGGESTIONS (suggested models) for this endpoint — it must render once across
+    // the two LISTS. The tool-calling callout names the same model as its inline example and is
+    // excluded deliberately: the invariant here is "the two lists do not repeat each other", not
+    // "this string appears once on the form". Prose naming a model a list also offers is normal.
+    const inTheLists = screen
+      .getAllByText('claude-opus-4-8')
+      .filter(node => !node.closest('.euiCallOut'));
+    expect(inTheLists).toHaveLength(1);
+    // claude-sonnet-5 only exists in the vendor suggestion list — the dedupe must not drop it.
+    expect(screen.getByText('claude-sonnet-5')).toBeInTheDocument();
   });
 });
