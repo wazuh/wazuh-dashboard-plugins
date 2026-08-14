@@ -205,7 +205,7 @@ describe('WzConfigurationSwitch', () => {
 
       const { findByText, queryByText } = renderSwitch();
 
-      await findByText(/has not reported its configuration/i);
+      await findByText(/hasn't reported its configuration/i);
       expect(queryByText('Configuration')).not.toBeInTheDocument();
       // The way out of a prompt that has nothing to show for this agent.
       await findByText('Select agent');
