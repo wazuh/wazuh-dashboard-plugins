@@ -3,6 +3,7 @@ import {
   RequestHandlerContext,
 } from '../../../../src/core/server';
 import {
+  ResolvedToolParams,
   ResolveParamsResult,
   SoleCandidateParamSpec,
   ToolDefinition,
