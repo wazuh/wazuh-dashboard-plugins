@@ -1756,7 +1756,15 @@ describe('ChatPage — two-row grid pane (contract §1)', () => {
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/^\s*\/\/.*$/gm, '');
 
-    expect(scssRules).not.toMatch(/position:\s*sticky/);
+    // Scoped to the composer's own rule block rather than the whole file. This used to assert the
+    // file contained NO `position: sticky` anywhere, which was a fair proxy while the composer was
+    // the only thing that had ever been sticky — but `.wzStatusCallouts` is now legitimately sticky
+    // (a status band pinned inside the transcript's scroll container, an entirely different
+    // element and mechanism), so the file-wide form would fail on that unrelated rule. What this
+    // test actually protects is that the COMPOSER is a flow grid row and not a sticky overlay.
+    expect(ruleBlock(scssRules, '.wzComposerRow')).not.toMatch(
+      /position:\s*sticky/,
+    );
     expect(scssRules).not.toMatch(/wzComposerGradientHeight/);
     expect(scssRules).not.toMatch(/::before/);
     // The replacement mechanism is in place instead: a two-row grid pane, and a shared measure

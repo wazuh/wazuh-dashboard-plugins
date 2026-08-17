@@ -1678,6 +1678,19 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const showLoadingState = !providersLoaded || isRestoringConversation;
   const showWelcomeState =
     hasProviders && messages.length === 0 && !showLoadingState;
+  /**
+   * Gates the sticky status-callout band below, so an empty band never paints its opaque ground
+   * over the first transcript row. Mirrors the conditions of the individual callouts inside it —
+   * each still decides its own visibility; this only decides whether the band exists at all.
+   */
+  const hasStatusCallout =
+    sessionExpired ||
+    Boolean(error) ||
+    Boolean(providersError) ||
+    managerAuthHint ||
+    saveFailed ||
+    mergeNotice === 'merged' ||
+    mergeNotice === 'conflict';
 
   // Layout contract §1 (AI/design/redesign-v2-spec.md): the composer (`.wzComposerRow` below) is
   // the grid's own `auto` row, a real flow sibling of the transcript's `1fr` row — never an
@@ -1974,6 +1987,199 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               this holds the welcome state (see chat-page.scss's own comment on that modifier) — the
               ordinary message-list case stays a plain flow box so it never claims the whole
               transcript height for itself and pushes `MessageList`'s sibling row out of view. */}
+              {/* `.wzStatusCallouts` (chat-page.scss): the sticky status band. It is a DIRECT child
+                of `.wzTranscriptContent` rather than of `.wzContentMeasure` below, and that
+                placement is the whole point — a `position: sticky` element can only travel inside
+                its own parent's box, and the non-welcome `.wzContentMeasure` is a plain flow box
+                only as tall as the callouts themselves, so sticking inside it had nowhere to go and
+                the band scrolled away with the first screenful. `.wzTranscriptContent` is the flex
+                column that spans the transcript's whole scroll height (`min-height: 100%`), so a
+                sticky child of THIS box stays pinned for the entire conversation. Kept as the first
+                child so the band sits above the transcript rather than below the welcome state.
+                Rendered only when something is actually in it (`hasStatusCallout`) — see that
+                flag's comment. */}
+              {hasStatusCallout && (
+                <div className='wzStatusCallouts'>
+                  {/* Same shared 1060px measure as the transcript prose below, so a pinned callout
+                    lines up with the messages it is reporting on instead of spanning wider. */}
+                  <div className='wzContentMeasure'>
+                    {/* Callouts render in priority order (never suppressed — resilience-first: every
+                      state is shown, just ordered): session expiry first (it blocks everything
+                      else), then generic errors, then a failed auto-save, then the
+                      optimistic-concurrency merge notices. Session-expiry recovery UX: a genuine
+                      401, distinct from managerAuthHint's best-effort heuristic below. Persistent
+                      (no dismiss control, and nothing in this file ever calls
+                      setSessionExpired(false) except starting a fresh send) until the user reloads,
+                      per this fix's brief. */}
+                    {sessionExpired && (
+                      <StatusCallout
+                        title={i18n.translate(
+                          'wazuhAiAssistant.chat.sessionExpired.title',
+                          {
+                            defaultMessage: 'Your session expired',
+                          },
+                        )}
+                        color='danger'
+                        iconType='lock'
+                        body={i18n.translate(
+                          'wazuhAiAssistant.chat.sessionExpired.body',
+                          {
+                            defaultMessage:
+                              'Reload the page to sign in again. Your unsent message has been saved and will be restored automatically.',
+                          },
+                        )}
+                        action={
+                          <EuiButton
+                            size='s'
+                            color='danger'
+                            onClick={() => window.location.reload()}
+                          >
+                            {i18n.translate(
+                              'wazuhAiAssistant.chat.sessionExpired.reloadButton',
+                              {
+                                defaultMessage: 'Reload page',
+                              },
+                            )}
+                          </EuiButton>
+                        }
+                      />
+                    )}
+
+                    {(error || providersError) && (
+                      <StatusCallout
+                        title={i18n.translate(
+                          'wazuhAiAssistant.chat.errorTitle',
+                          {
+                            defaultMessage: 'Something went wrong',
+                          },
+                        )}
+                        color='danger'
+                        iconType='alert'
+                        body={error ?? providersError}
+                      />
+                    )}
+
+                    {managerAuthHint && (
+                      <StatusCallout
+                        title={i18n.translate(
+                          'wazuhAiAssistant.chat.managerAuthHint.title',
+                          {
+                            defaultMessage:
+                              'Your Wazuh session may have expired',
+                          },
+                        )}
+                        color='warning'
+                        iconType='alert'
+                        body={i18n.translate(
+                          'wazuhAiAssistant.chat.managerAuthHint.body',
+                          {
+                            defaultMessage:
+                              'A request to the Wazuh manager failed, which can happen when your dashboard session token has expired. Reload the page and sign in again, then retry your question.',
+                          },
+                        )}
+                      />
+                    )}
+
+                    {/* A failed auto-save is surfaced instead of swallowed: the conversation on
+                    screen is ahead of what is stored, which the user cannot infer from anything
+                    else. Not dismissible — this reports real data-loss risk — but no longer purely
+                    passive: the next turn's save still retries on its own, and "Retry now"
+                    (handleRetrySave) lets the user clear it immediately once whatever blocked the
+                    save (e.g. a read-only index) is fixed, instead of waiting on the next answer.
+                    Either path clears this the same way, via persistConversationTurn's own
+                    setSaveFailed(false) on success. */}
+                    {saveFailed && (
+                      <StatusCallout
+                        title={i18n.translate(
+                          'wazuhAiAssistant.chat.conversations.saveFailed.title',
+                          {
+                            defaultMessage:
+                              'This conversation is not being saved',
+                          },
+                        )}
+                        color='warning'
+                        iconType='alert'
+                        body={i18n.translate(
+                          'wazuhAiAssistant.chat.conversations.saveFailed.body',
+                          {
+                            defaultMessage:
+                              'The latest messages could not be saved, so they may be missing if you reload. The chat still works, and saving is retried after each answer.',
+                          },
+                        )}
+                        action={
+                          <EuiButton
+                            size='s'
+                            color='warning'
+                            onClick={handleRetrySave}
+                            // Also disabled while a turn is generating: retrying with a target
+                            // built from the live refs while the in-flight turn's OWN target is
+                            // still unresolved (e.g. its pre-send save hasn't created the row yet)
+                            // would race it into creating a second conversation row — see
+                            // handleRetrySave's doc comment. The turn's own post-answer save runs
+                            // moments after streaming ends.
+                            isLoading={isRetryingSave}
+                            isDisabled={isRetryingSave || isGenerating}
+                          >
+                            {i18n.translate(
+                              'wazuhAiAssistant.chat.conversations.saveFailed.retryButton',
+                              { defaultMessage: 'Retry now' },
+                            )}
+                          </EuiButton>
+                        }
+                      />
+                    )}
+
+                    {/* Optimistic-concurrency notice: shown after persistConversationAfterTurn's
+                      auto-save hit a 409 on the last completed turn — see
+                      saveConversationWithMerge's own doc comment for exactly when each variant
+                      fires. Non-blocking: the chat itself is fully usable either way, this is
+                      purely informational. */}
+                    {mergeNotice === 'merged' && (
+                      <StatusCallout
+                        title={i18n.translate(
+                          'wazuhAiAssistant.chat.conversations.mergedNotice.title',
+                          {
+                            defaultMessage: 'Conversation merged',
+                          },
+                        )}
+                        // A successful merge is a good outcome, not a warning — the conflict
+                        // variant right below keeps 'warning'/'alert', so the two are no longer
+                        // visually identical for opposite results.
+                        color='success'
+                        iconType='check'
+                        body={i18n.translate(
+                          'wazuhAiAssistant.chat.conversations.mergedNotice.body',
+                          {
+                            defaultMessage:
+                              'This conversation was also updated in another tab. The versions were merged.',
+                          },
+                        )}
+                      />
+                    )}
+
+                    {mergeNotice === 'conflict' && (
+                      <StatusCallout
+                        title={i18n.translate(
+                          'wazuhAiAssistant.chat.conversations.mergeConflictNotice.title',
+                          {
+                            defaultMessage: 'Could not merge automatically',
+                          },
+                        )}
+                        color='warning'
+                        iconType='alert'
+                        body={i18n.translate(
+                          'wazuhAiAssistant.chat.conversations.mergeConflictNotice.body',
+                          {
+                            defaultMessage:
+                              'This conversation is being edited in another tab and the changes could not be merged automatically. Your latest messages are still shown here, but they may not be saved.',
+                          },
+                        )}
+                      />
+                    )}
+                  </div>
+                </div>
+              )}
+
               <div
                 className={
                   showWelcomeState
@@ -2001,171 +2207,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                         )}
                     </h1>
                   </EuiScreenReaderOnly>
-                )}
-
-                {/* Callouts render in priority order (never suppressed — resilience-first: every
-                    state is shown, just ordered): session expiry first (it blocks everything else),
-                    then generic errors, then a failed auto-save, then the optimistic-concurrency
-                    merge notices. Session-expiry recovery UX: a genuine 401, distinct from
-                    managerAuthHint's best-effort heuristic below. Persistent (no dismiss control,
-                    and nothing in this file ever calls setSessionExpired(false) except starting a
-                    fresh send) until the user reloads, per this fix's brief. */}
-                {sessionExpired && (
-                  <StatusCallout
-                    title={i18n.translate(
-                      'wazuhAiAssistant.chat.sessionExpired.title',
-                      {
-                        defaultMessage: 'Your session expired',
-                      },
-                    )}
-                    color='danger'
-                    iconType='lock'
-                    body={i18n.translate(
-                      'wazuhAiAssistant.chat.sessionExpired.body',
-                      {
-                        defaultMessage:
-                          'Reload the page to sign in again. Your unsent message has been saved and will be restored automatically.',
-                      },
-                    )}
-                    action={
-                      <EuiButton
-                        size='s'
-                        color='danger'
-                        onClick={() => window.location.reload()}
-                      >
-                        {i18n.translate(
-                          'wazuhAiAssistant.chat.sessionExpired.reloadButton',
-                          {
-                            defaultMessage: 'Reload page',
-                          },
-                        )}
-                      </EuiButton>
-                    }
-                  />
-                )}
-
-                {(error || providersError) && (
-                  <StatusCallout
-                    title={i18n.translate('wazuhAiAssistant.chat.errorTitle', {
-                      defaultMessage: 'Something went wrong',
-                    })}
-                    color='danger'
-                    iconType='alert'
-                    body={error ?? providersError}
-                  />
-                )}
-
-                {managerAuthHint && (
-                  <StatusCallout
-                    title={i18n.translate(
-                      'wazuhAiAssistant.chat.managerAuthHint.title',
-                      {
-                        defaultMessage: 'Your Wazuh session may have expired',
-                      },
-                    )}
-                    color='warning'
-                    iconType='alert'
-                    body={i18n.translate(
-                      'wazuhAiAssistant.chat.managerAuthHint.body',
-                      {
-                        defaultMessage:
-                          'A request to the Wazuh manager failed, which can happen when your dashboard session token has expired. Reload the page and sign in again, then retry your question.',
-                      },
-                    )}
-                  />
-                )}
-
-                {/* A failed auto-save is surfaced instead of swallowed: the conversation on screen is
-                ahead of what is stored, which the user cannot infer from anything else. Not
-                dismissible — this reports real data-loss risk — but no longer purely passive: the
-                next turn's save still retries on its own, and "Retry now" (handleRetrySave) lets
-                the user clear it immediately once whatever blocked the save (e.g. a read-only
-                index) is fixed, instead of waiting on the next answer. Either path clears this the
-                same way, via persistConversationTurn's own setSaveFailed(false) on success. */}
-                {saveFailed && (
-                  <StatusCallout
-                    title={i18n.translate(
-                      'wazuhAiAssistant.chat.conversations.saveFailed.title',
-                      {
-                        defaultMessage: 'This conversation is not being saved',
-                      },
-                    )}
-                    color='warning'
-                    iconType='alert'
-                    body={i18n.translate(
-                      'wazuhAiAssistant.chat.conversations.saveFailed.body',
-                      {
-                        defaultMessage:
-                          'The latest messages could not be saved, so they may be missing if you reload. The chat still works, and saving is retried after each answer.',
-                      },
-                    )}
-                    action={
-                      <EuiButton
-                        size='s'
-                        color='warning'
-                        onClick={handleRetrySave}
-                        isLoading={isRetryingSave}
-                        // Also disabled while a turn is generating: retrying with a target built
-                        // from the live refs while the in-flight turn's OWN target is still
-                        // unresolved (e.g. its pre-send save hasn't created the row yet) would race
-                        // it into creating a second conversation row — see handleRetrySave's doc
-                        // comment. The turn's own post-answer save runs moments after streaming ends.
-                        isDisabled={isRetryingSave || isGenerating}
-                      >
-                        {i18n.translate(
-                          'wazuhAiAssistant.chat.conversations.saveFailed.retryButton',
-                          { defaultMessage: 'Retry now' },
-                        )}
-                      </EuiButton>
-                    }
-                  />
-                )}
-
-                {/* Optimistic-concurrency notice: shown after persistConversationAfterTurn's
-                  auto-save hit a 409 on the last completed turn — see saveConversationWithMerge's
-                  own doc comment for exactly when each variant fires. Non-blocking: the chat itself
-                  is fully usable either way, this is purely informational. */}
-                {mergeNotice === 'merged' && (
-                  <StatusCallout
-                    title={i18n.translate(
-                      'wazuhAiAssistant.chat.conversations.mergedNotice.title',
-                      {
-                        defaultMessage: 'Conversation merged',
-                      },
-                    )}
-                    // A successful merge is a good outcome, not a warning — the conflict variant
-                    // right below keeps 'warning'/'alert', so the two are no longer visually
-                    // identical for opposite results.
-                    color='success'
-                    iconType='check'
-                    body={i18n.translate(
-                      'wazuhAiAssistant.chat.conversations.mergedNotice.body',
-                      {
-                        defaultMessage:
-                          'This conversation was also updated in another tab. The versions were merged.',
-                      },
-                    )}
-                  />
-                )}
-
-                {mergeNotice === 'conflict' && (
-                  <StatusCallout
-                    title={i18n.translate(
-                      'wazuhAiAssistant.chat.conversations.mergeConflictNotice.title',
-                      {
-                        defaultMessage: 'Could not merge automatically',
-                      },
-                    )}
-                    color='warning'
-                    iconType='alert'
-                    body={i18n.translate(
-                      'wazuhAiAssistant.chat.conversations.mergeConflictNotice.body',
-                      {
-                        defaultMessage:
-                          'This conversation is being edited in another tab and the changes could not be merged automatically. Your latest messages are still shown here, but they may not be saved.',
-                      },
-                    )}
-                  />
                 )}
 
                 {showLoadingState && (

@@ -113,6 +113,21 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
     [runGuarded, onClose, core.application],
   );
 
+  /**
+   * Hands the conversation off to the app-shell chat page (`#/`, the plugin's default route) —
+   * the same full-width surface the sidecar renders a narrow view of. Goes through `runGuarded`
+   * and closes the sidecar first, exactly like `openSettings`: leaving it docked over the page it
+   * just navigated to would show the chat twice.
+   */
+  const openFullPage = useCallback(
+    () =>
+      runGuarded(() => {
+        onClose();
+        void core.application.navigateToApp(PLUGIN_ID, { path: '#/' });
+      }),
+    [runGuarded, onClose, core.application],
+  );
+
   const openSettingsToAddProvider = useCallback(
     () =>
       runGuarded(() => {
@@ -134,6 +149,12 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
     'wazuhAiAssistant.headerPanel.hideConversationsButtonLabel',
     {
       defaultMessage: 'Hide saved conversations',
+    },
+  );
+  const maximizeLabel = i18n.translate(
+    'wazuhAiAssistant.headerPanel.maximizeButtonLabel',
+    {
+      defaultMessage: 'Open the AI Assistant in full page',
     },
   );
   const settingsLabel = i18n.translate(
@@ -193,6 +214,17 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
                 aria-pressed={sidebarOpen}
                 onClick={toggleSidebar}
                 data-test-subj='wzAiAssistantPanelToggleSidebarButton'
+              />
+            </EuiToolTip>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiToolTip content={maximizeLabel}>
+              <EuiButtonIcon
+                iconType='expand'
+                color='text'
+                aria-label={maximizeLabel}
+                onClick={openFullPage}
+                data-test-subj='wzAiAssistantPanelMaximizeButton'
               />
             </EuiToolTip>
           </EuiFlexItem>

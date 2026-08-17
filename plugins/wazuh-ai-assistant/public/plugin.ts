@@ -67,9 +67,8 @@ export class WazuhAiAssistantPlugin
     return {};
   }
 
-  public start(_core: CoreStart): WazuhAiAssistantPluginStart {
-    // TODO: Uncomment this when the AI Assistant sidecar is fixed
-    // registerAssistantHeaderButton(core);
+  public start(core: CoreStart): WazuhAiAssistantPluginStart {
+    registerAssistantHeaderButton(core);
 
     return {};
   }
