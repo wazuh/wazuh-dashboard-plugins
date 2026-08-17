@@ -25,6 +25,12 @@
 .wzChatPane {
   display: grid;
   grid-template-rows: 1fr auto;
+  /* The single column is explicit for the same reason the rows are: the jump button and the
+     transcript must share a CELL, not just a row. With only `grid-row` on both, the button's
+     auto column found row 1's column 1 occupied and created an implicit 40px SECOND column --
+     the re-audit measured the whole surface narrowing 40px and every message shifting 20px
+     left the instant the button appeared (worse than the vertical shove it replaced). */
+  grid-template-columns: 1fr;
   height: 100%;
   min-height: 0;
 }
@@ -225,10 +231,11 @@ $wzWelcomeFadeOut: 180ms;
      of this element. So while the button was on screen the transcript was auto-placed into row 1,
      the button also occupied row 1, and the composer's `auto` row got pushed to an implicit third
      row: the live audit (§3.2) measured the whole surface shoving down 36px the moment the button
-     appeared. Naming this row explicitly takes auto-placement out of it entirely — transcript and
-     button share row 1 by declaration, the composer keeps row 2, and the button's appearance moves
-     nothing. */
-  grid-row: 1;
+     appeared. Naming the row alone was still not enough: with `grid-column` left auto the button
+     created an implicit second COLUMN instead (re-audit §3.1), so both items now name the full
+     CELL. Transcript and button share cell 1/1 by declaration, the composer keeps row 2, and the
+     button's appearance moves nothing on either axis. */
+  grid-area: 1 / 1;
 }
 
 /**
@@ -258,10 +265,11 @@ $wzWelcomeFadeOut: 180ms;
  * gutter and the scrollbar's own 10px one: at the row's centre there is no scrollbar to sit on.
  */
 .wzJumpToLatest {
-  grid-row: 1;
+  /* The full cell, not just the row — see .wzChatTranscript's comment. */
+  grid-area: 1 / 1;
   justify-self: center;
   align-self: end;
-  /* This item does contribute its ~32px to the `1fr` row's automatic minimum size, which is
+  /* This item does contribute its ~40px to the `1fr` row's automatic minimum size, which is
      harmless: the transcript is `min-height: 0` (wzScrollChild) and the pane it sits in is always
      far taller than one button, so this can never become the thing that squeezes the composer. */
   margin-block-end: 16px;
@@ -499,7 +507,11 @@ $wzWelcomeFadeOut: 180ms;
      12.6px here (§2.2) — the same 12px as every other piece of secondary text on the surface.
      `:not(pre) > code` so a fenced code BLOCK (`EuiCodeBlock`, which is `pre > code`) keeps its own
      styling; only the inline form is a chip. */
-  :not(pre) > code {
+  /* EUI renders inline code as `<span class="euiCodeBlock"><code>...</code></span>` and puts
+     the fill/padding/radius on the SPAN — styling only `code` left the slab untouched (re-audit:
+     the rule shipped and changed nothing). Target both, still excluding fenced blocks. */
+  :not(pre) > code,
+  span.euiCodeBlock {
     border-radius: 4px;
     padding: 0 4px;
     font-size: 12px;
@@ -521,8 +533,25 @@ $wzWelcomeFadeOut: 180ms;
  * `max(0px, ...)` is the floor for a pane narrower than the prose measure itself, where there is no
  * jog to correct and a negative margin would pull the prose out of the row.
  */
+/* 40px = the assistant row's avatar column (32px avatar + the flex group's 8px gutter,
+   message-bubble.tsx). `100%` below resolves against the CONTENT flex item, which sits after
+   that column and is therefore 40px narrower than the row — without adding half the column
+   back, the correction fell 20px short (re-audit §3.2: prose at 575 where every other row
+   reads at 595). */
+$wzMsgAvatarColumn: 40px;
+
 .wzMessageRow--wide .wzProseMeasure {
-  margin-inline-start: max(0px, calc((100% - #{$wzContentMaxWidth}) / 2));
+  margin-inline-start: max(
+    0px,
+    calc((100% - #{$wzContentMaxWidth}) / 2 + #{$wzMsgAvatarColumn} / 2)
+  );
+}
+
+/* The results card breaks out of the avatar column too: inside the content item it sat 40px
+   off the row's left edge and 0 off its right (re-audit §3.3) -- three different centre lines
+   on one surface. Pulled back by the full column, it spans and centres with the row itself. */
+.wzMessageRow--wide .wzResultsCard {
+  margin-inline-start: -$wzMsgAvatarColumn;
 }
 
 /**

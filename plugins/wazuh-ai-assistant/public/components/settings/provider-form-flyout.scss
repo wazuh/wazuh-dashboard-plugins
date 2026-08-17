@@ -27,6 +27,14 @@
   max-width: 640px;
 }
 
+/* EUI caps every .euiFormRow at 400px — sized for forms living inside wide pages. Inside this
+   deliberately narrow 640px column the cap left a 181px dead gutter down the form's right side
+   (re-audit §1.1): three content widths on one surface. The column IS the measure here, so the
+   rows take it fully and the flyout keeps one right edge. */
+.wzProviderFlyoutPanel .euiFormRow {
+  max-width: 100%;
+}
+
 .wzProviderFlyout__group + .wzProviderFlyout__group {
   margin-top: $wzCardPaddingRoomy;
 }
@@ -78,9 +86,16 @@
  * those elements' padding and this file has no reliable way to read the value it would have to add
  * to, whereas a margin composes with whatever EUI's padding happens to be in any version.
  */
-.wzProviderFlyoutPanel .euiFlyoutHeader > *,
-.wzProviderFlyoutPanel .euiFlyoutFooter > * {
+.wzProviderFlyoutPanel .euiFlyoutHeader > * {
   margin-inline-end: $wzScrollGutter;
+}
+
+/* The footer's direct child is EUI's own EuiFlexGroup, whose negative-margin/item-margin pair
+   means compensating the GROUP still leaves the visible button 12px inside the shared edge
+   (re-audit §1.2: Save & test at 1874 vs content at 1886). Compensate the LAST ITEM — the one
+   that actually paints the edge — by EUI's own 12px item margin plus the scroll gutter. */
+.wzProviderFlyoutPanel .euiFlyoutFooter > .euiFlexGroup > .euiFlexItem:last-child {
+  margin-inline-end: calc(#{$euiSizeM} + #{$wzScrollGutter});
 }
 
 /** The flyout body's own scroll region takes the surface's quiet overlay scrollbar (the 4px thumb in

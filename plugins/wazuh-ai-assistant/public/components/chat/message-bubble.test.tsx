@@ -433,17 +433,20 @@ describe('MessageBubble', () => {
       // (1300 - 1060) / 2 = 120px further out, and the ANSWER's left edge moved 120px whenever the
       // turn happened to carry a table. Only the table is entitled to the breakout; the sentences
       // above it are not. Written against the row's own resolved width (`100%`) with a `max(0px,…)`
-      // floor rather than a flat 120px, so it stays correct on a pane narrower than 1300.
+      // floor rather than a flat 120px, so it stays correct on a pane narrower than 1300. The
+      // re-audit (§3.2) then showed `100%` resolves against the content flex item, which sits
+      // AFTER the 40px avatar column — so the arithmetic must add half that column back, or the
+      // correction lands 20px short.
       const scssSource = fs.readFileSync(
         path.join(__dirname, 'chat-page.scss'),
         'utf8',
       );
       expect(scssSource).toMatch(
-        /\.wzMessageRow--wide \.wzProseMeasure \{\s*margin-inline-start: max\(0px, calc\(\(100% - /,
+        /\.wzMessageRow--wide \.wzProseMeasure \{\s*margin-inline-start: max\(/,
       );
-      // ...and the offset is derived from the shared measure token, not a restated 120px.
+      // ...derived from the shared measure token plus the avatar column, not a restated 120px.
       expect(scssSource).toMatch(
-        /margin-inline-start: max\(0px, calc\(\(100% - #\{\$wzContentMaxWidth\}\) \/ 2\)\)/,
+        /calc\(\(100% - #\{\$wzContentMaxWidth\}\) \/ 2 \+ #\{\$wzMsgAvatarColumn\} \/ 2\)/,
       );
     });
 
@@ -457,8 +460,11 @@ describe('MessageBubble', () => {
         path.join(__dirname, 'chat-page.scss'),
         'utf8',
       );
+      // The re-audit found the first version of this rule shipped and changed nothing: EUI puts
+      // the fill/padding/radius on the wrapping `span.euiCodeBlock`, not on `code`. The selector
+      // list must therefore include the span, or the slab survives untouched.
       expect(scssSource).toMatch(
-        /:not\(pre\) > code \{[^}]*border-radius:\s*4px[^}]*padding:\s*0 4px[^}]*font-size:\s*12px/,
+        /:not\(pre\) > code,\s*span\.euiCodeBlock \{[^}]*border-radius:\s*4px[^}]*padding:\s*0 4px[^}]*font-size:\s*12px/,
       );
     });
 

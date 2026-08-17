@@ -2011,26 +2011,35 @@ describe('ChatPage — jump to latest (C2)', () => {
     expect(button.closest('.wzComposerRow')).toBeNull();
   });
 
-  it('shares the transcript grid row explicitly, so appearing moves nothing', () => {
-    // The bug this pins (css-audit-full.md §3.2): only the BUTTON named `grid-row: 1`. An explicitly
-    // placed grid item does not advance the auto-placement cursor, but it also does not reserve its
-    // row against an item auto-placed later — and the transcript, an EARLIER sibling, was the
-    // auto-placed one. Both landed in row 1, the composer was pushed into an implicit third row, and
-    // the whole surface shoved down ~36px the instant the button appeared.
+  it('shares the transcript grid CELL explicitly, so appearing moves nothing on either axis', () => {
+    // Two bugs in sequence pin this shape (css-audit-full.md §3.2 and the re-audit's §3.1):
+    // with NEITHER item placed, the button pushed the composer into an implicit third ROW
+    // (36px vertical shove); with only `grid-row: 1` on both, the button's auto COLUMN created
+    // an implicit 40px second column instead — the surface narrowed 40px and every message
+    // shifted 20px left when it appeared. The invariant that matters is that transcript and
+    // button share the full CELL (grid-area 1/1) inside an explicit single-column grid.
     //
-    // jsdom lays out no grid, so the mechanism is pinned where it lives: both declarations must be
-    // present, because either one alone is the broken state.
+    // jsdom lays out no grid, so the mechanism is pinned where it lives: all three declarations
+    // must be present, because any one missing is a broken state we have already shipped once.
     const scssRules = fs
       .readFileSync(path.join(__dirname, 'chat-page.scss'), 'utf8')
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/^\s*\/\/.*$/gm, '');
 
-    expect(scssRules).toMatch(/\.wzChatTranscript \{[^}]*grid-row:\s*1/);
-    expect(scssRules).toMatch(/\.wzJumpToLatest \{[^}]*grid-row:\s*1/);
-    // Centred over the measure, not parked in the row's inline-end corner — and with no inline-end
-    // margin left over from the corner placement (§3.2).
+    expect(scssRules).toMatch(/\.wzChatPane \{[^}]*grid-template-columns:\s*1fr/);
+    expect(scssRules).toMatch(/\.wzChatTranscript \{[^}]*grid-area:\s*1 \/ 1/);
+    expect(scssRules).toMatch(/\.wzJumpToLatest \{[^}]*grid-area:\s*1 \/ 1/);
+    // Centred over the measure, not parked in the row's inline-end corner — and with no
+    // inline-end margin left over from the corner placement (§3.2).
     expect(scssRules).toMatch(/\.wzJumpToLatest \{[^}]*justify-self:\s*center/);
     expect(scssRules).not.toMatch(/margin-inline-end:\s*\$wzScrollGutter \+ 24px/);
+    // The prose-offset arithmetic must carry the avatar column's half-width (re-audit §3.2:
+    // without it the correction fell 20px short), and the results card must break out of the
+    // avatar column (§3.3).
+    expect(scssRules).toMatch(/wzMsgAvatarColumn.*\/ 2/);
+    expect(scssRules).toMatch(
+      /\.wzMessageRow--wide \.wzResultsCard \{[^}]*margin-inline-start:\s*-\$wzMsgAvatarColumn/,
+    );
   });
 
   it('scrolls to the newest content and re-pins when clicked', async () => {
