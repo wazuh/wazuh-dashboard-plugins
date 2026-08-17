@@ -39,39 +39,30 @@ free-text query against the Indexer is exactly what the guardrails exist to prev
 
 ## Verification status
 
-This section indicates which providers and models are **verified
-working**, which are **verified NOT working** (and why), and which are **expected to work but
-have not been verified yet**.
+This table indicates which providers and models are **verified supported**, which are **verified
+NOT supported** (and why), and which are **expected to work but have not been verified yet** —
+"expected" is not the same claim as "verified".
 
-### Verified supported
+| Status                    | Provider type / combination                                    | Model(s) / details                                                                                                    | Notes                                                                                                                                                                                                                                                          |
+| ------------------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ✅ Verified supported     | Anthropic — Anthropic's own API                                | The current Claude model family (Opus, Sonnet, Haiku, Fable)                                                          | Recommended: **`claude-haiku-4-5`** for the fastest responses, **`claude-opus-4-8`** as the balanced default.                                                                                                                                                  |
+| ✅ Verified supported     | OpenAI-compatible — AWS Bedrock chat gateway                   | `openai.gpt-oss-120b`, `mistral.mistral-large-3-675b-instruct`, `qwen.qwen3-32b`, `qwen3-coder-480b`, `deepseek.v3.2` | Model names use the gateway's own vendor-prefixed naming — see [model-name gotchas](#per-vendor-model-name-gotchas) below.                                                                                                                                     |
+| ✅ Verified supported     | OpenAI-compatible — Google Gemini (OpenAI-compatible endpoint) | `gemini-flash-latest`, `gemini-3-flash-preview`                                                                       | Works, with two gotchas — see [model-name gotchas](#per-vendor-model-name-gotchas) below.                                                                                                                                                                      |
+| ❌ Verified NOT supported | Claude models through an OpenAI-compatible gateway             | —                                                                                                                     | An OpenAI-compatible provider cannot speak the protocol a Claude model expects — impossible, not degraded. The turn fails or the model behaves unpredictably; the only fix is a provider with type Anthropic (Claude), pointed at `https://api.anthropic.com`. |
+| ❌ Verified NOT supported | Groq, any model (typical account tier)                         | —                                                                                                                     | The assistant's tool definitions are rejected outright on typical Groq account tiers — a Groq-side limit, not something an administrator can configure around. Chat turns fail outright; the Test button may still pass.                                       |
+| ❌ Verified NOT supported | Models without reliable tool calling                           | Confirmed with `gemma-3-27b` and `qwen3-235b`                                                                         | **No error at all.** The model answers fluently but **fabricates security data** — invented alerts, agents, and numbers. This is the most important failure mode on this page: see [Tool calling is a hard requirement](#tool-calling-is-a-hard-requirement).  |
+| ❌ Verified NOT supported | OpenRouter, free tier                                          | —                                                                                                                     | Too slow for real use — 2-3 minutes per answer.                                                                                                                                                                                                                |
+| ❌ Verified NOT supported | OpenRouter, paid models                                        | —                                                                                                                     | Need a funded account with credits.                                                                                                                                                                                                                            |
+| 🕓 Expected, unverified   | OpenAI's own API                                               | `gpt-5.x`, `gpt-4o`, and similar                                                                                      | **Top priority to verify next** — one of the providers administrators are most likely to try first.                                                                                                                                                            |
+| 🕓 Expected, unverified   | OpenAI-compatible host running Llama                           | Llama 3.3/4                                                                                                           | Shares the same protocol as every other OpenAI-compatible service.                                                                                                                                                                                             |
+| 🕓 Expected, unverified   | Self-hosted Ollama                                             | —                                                                                                                     | Base URL pattern: `http://<host>:11434/v1`.                                                                                                                                                                                                                    |
 
-| Provider type     | Service                                    | Model(s)                                                                                                              | Notes                                                                                                                      |
-| ----------------- | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Anthropic         | Anthropic's own API                        | The current Claude model family (Opus, Sonnet, Haiku, Fable)                                                          | Recommended: **`claude-haiku-4-5`** for the fastest responses, **`claude-opus-4-8`** as the balanced default.              |
-| OpenAI-compatible | AWS Bedrock chat gateway                   | `openai.gpt-oss-120b`, `mistral.mistral-large-3-675b-instruct`, `qwen.qwen3-32b`, `qwen3-coder-480b`, `deepseek.v3.2` | Model names use the gateway's own vendor-prefixed naming — see [model-name gotchas](#per-vendor-model-name-gotchas) below. |
-| OpenAI-compatible | Google Gemini (OpenAI-compatible endpoint) | `gemini-flash-latest`, `gemini-3-flash-preview`                                                                       | Works, with two gotchas — see [model-name gotchas](#per-vendor-model-name-gotchas) below.                                  |
+### Support policy for untested models
 
-### Verified NOT supported
-
-| Combination                                                                          | Why it fails                                                                                                                                                   | What the administrator sees                                                                                                                                                                                                                                   |
-| ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Claude models through an OpenAI-compatible gateway                                   | An OpenAI-compatible provider cannot speak the protocol a Claude model expects. Impossible, not degraded.                                                      | The turn fails or the model behaves unpredictably. The only fix is a provider with type Anthropic (Claude), pointed at `https://api.anthropic.com`.                                                                                                           |
-| Groq (any model, typical account tier)                                               | The assistant's tool definitions are rejected outright on typical Groq account tiers — a Groq-side limit, not something an administrator can configure around. | Chat turns fail outright; the Test button may still pass.                                                                                                                                                                                                     |
-| Models without reliable tool calling (confirmed with `gemma-3-27b` and `qwen3-235b`) | The model cannot call the tools the assistant uses to fetch real Wazuh data.                                                                                   | **No error at all.** The model answers fluently but **fabricates security data** — invented alerts, agents, and numbers. This is the most important failure mode on this page: see [Tool calling is a hard requirement](#tool-calling-is-a-hard-requirement). |
-| OpenRouter free tier                                                                 | Too slow for real use — 2-3 minutes per answer.                                                                                                                | Answers eventually arrive, but with an unusable delay.                                                                                                                                                                                                        |
-| OpenRouter paid models                                                               | Need a funded account with credits.                                                                                                                            | Requests fail until the account holds credits.                                                                                                                                                                                                                |
-
-### Expected to work, not yet verified
-
-These share a service type already verified above, but were not tested during this pass (no key
-or endpoint was available at test time). **"Expected to work" is not the same claim as
-"verified."**
-
-| Combination                                         | Status               | Notes                                                                                               |
-| --------------------------------------------------- | -------------------- | --------------------------------------------------------------------------------------------------- |
-| OpenAI's own API (`gpt-5.x`, `gpt-4o`, and similar) | Expected, unverified | **Top priority to verify next** — one of the providers administrators are most likely to try first. |
-| Llama 3.3/4 through an OpenAI-compatible host       | Expected, unverified | Shares the same protocol as every other OpenAI-compatible service.                                  |
-| Self-hosted Ollama                                  | Expected, unverified | Base URL pattern: `http://<host>:11434/v1`.                                                         |
+A model or provider not covered by the tables above is **use at your own risk**, not officially
+unsupported — the assistant works with any service that correctly implements one of the two
+supported service types and supports tool calling. To request verification of a specific provider
+or model, contact Wazuh support or open an issue in the `wazuh-dashboard-plugins` repository.
 
 ## Provider type must match the service
 
@@ -135,13 +126,6 @@ provider's **own** console — for example an organization data-retention or usa
 the API accepts anything at all, regardless of a correct base URL, model, and key. Check the
 provider's own account or organization settings before assuming a failure is a Wazuh
 configuration problem.
-
-## Support policy for untested models
-
-A model or provider not covered by the tables above is **use at your own risk**, not officially
-unsupported — the assistant works with any service that correctly implements one of the two
-supported service types and supports tool calling. To request verification of a specific provider
-or model, contact Wazuh support or open an issue in the `wazuh-dashboard-plugins` repository.
 
 ## Connection lifecycle
 
