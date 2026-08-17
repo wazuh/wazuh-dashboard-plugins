@@ -37,7 +37,13 @@ cause — the model, not the query — and pointing at the Model field's guidanc
 plugin does not fall back to asking a tool-less model for JSON in the prompt: an unvalidated
 free-text query against the Indexer is exactly what the guardrails exist to prevent.
 
-## Verified supported
+## Verification status
+
+Based on a live test pass against Wazuh 5.0.0: which providers and models are **verified
+working**, which are **verified NOT working** (and why), and which are **expected to work but
+have not been verified yet**.
+
+### Verified supported
 
 | Provider type      | Service                                    | Model(s)                                                                                                              | Notes                                                                                                                      |
 | ------------------ | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
@@ -45,7 +51,7 @@ free-text query against the Indexer is exactly what the guardrails exist to prev
 | OpenAI-compatible  | AWS Bedrock chat gateway                   | `openai.gpt-oss-120b`, `mistral.mistral-large-3-675b-instruct`, `qwen.qwen3-32b`, `qwen3-coder-480b`, `deepseek.v3.2` | Model names use the gateway's own vendor-prefixed naming — see [model-name gotchas](#per-vendor-model-name-gotchas) below. |
 | OpenAI-compatible  | Google Gemini (OpenAI-compatible endpoint) | `gemini-flash-latest`, `gemini-3-flash-preview`                                                                       | Works, with two gotchas — see [model-name gotchas](#per-vendor-model-name-gotchas) below.                                  |
 
-## Verified NOT supported
+### Verified NOT supported
 
 | Combination                                                                          | Why it fails                                                                                                                                                   | What the administrator sees                                                                                                                                                                                                                                   |
 | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -55,7 +61,7 @@ free-text query against the Indexer is exactly what the guardrails exist to prev
 | OpenRouter free tier                                                                 | Too slow for real use — 2-3 minutes per answer.                                                                                                                | Answers eventually arrive, but with an unusable delay.                                                                                                                                                                                                        |
 | OpenRouter paid models                                                               | Need a funded account with credits.                                                                                                                            | Requests fail until the account holds credits.                                                                                                                                                                                                                |
 
-## Expected to work, not yet verified
+### Expected to work, not yet verified
 
 These share a service type already verified above, but were not tested during this pass (no key
 or endpoint was available at test time). **"Expected to work" is not the same claim as
@@ -67,7 +73,7 @@ or endpoint was available at test time). **"Expected to work" is not the same cl
 | Llama 3.3/4 through an OpenAI-compatible host       | Expected, unverified | Shares the same protocol as every other OpenAI-compatible service.                                  |
 | Self-hosted Ollama                                  | Expected, unverified | Base URL pattern: `http://<host>:11434/v1`.                                                         |
 
-### Provider type must match the service
+## Provider type must match the service
 
 The provider type decides which protocol is used and this should match with the service URL. Some AI services can expose OpenAI-compatible or Anthropic-compatible API URL, ensure matching the provider type with the service URL.
 
@@ -78,7 +84,7 @@ Claude model is wanted, create a provider with type **Anthropic (Claude)** and b
 `https://api.anthropic.com`; there is no way to make a Claude model work through the
 OpenAI-compatible type.
 
-### A successful Test does not prove the assistant can answer a question
+## A successful Test does not prove the assistant can answer a question
 
 The **Test** button in Settings only proves the assistant can reach the endpoint and get a
 response — it sends no Wazuh data and does not exercise tool calling. After configuring a provider,
