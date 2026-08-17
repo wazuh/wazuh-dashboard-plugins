@@ -29,7 +29,7 @@ export class StatisticsDataSource extends PatternDataSource {
   }
 
   getAPIFilter(): tFilter[] {
-    // wazuh-metrics-comms* does not include an apiName field, no API level filter is applied
+    // wazuh-metrics-comms-v4* does not include an apiName field, no API level filter is applied
     return [];
   }
 }
