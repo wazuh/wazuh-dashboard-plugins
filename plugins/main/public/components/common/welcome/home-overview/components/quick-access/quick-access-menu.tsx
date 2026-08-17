@@ -2,14 +2,17 @@ import React, { useMemo, useState } from 'react';
 import {
   EuiButtonEmpty,
   EuiFlexGrid,
+  EuiFlexGroup,
   EuiFlexItem,
   EuiIcon,
+  EuiLink,
   EuiListGroup,
   EuiListGroupItem,
   EuiPopover,
   EuiPopoverTitle,
   EuiText,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { getCore } from '../../../../../../kibana-services';
 import { Applications, Categories } from '../../../../../../utils/applications';
@@ -21,6 +24,7 @@ import {
   getIntegrationsUrl,
   getKvdbsUrl,
   getFiltersUrl,
+  getAiAssistantUrl,
 } from '../../utils/navigation';
 
 interface QuickAccessItem {
@@ -120,7 +124,38 @@ export const QuickAccessMenu: React.FC = () => {
     >
       {isOpen && (
         <RedirectAppLinks application={getCore().application}>
-          <EuiPopoverTitle>Quick access</EuiPopoverTitle>
+          <EuiPopoverTitle>
+            <EuiFlexGroup
+              gutterSize='s'
+              alignItems='center'
+              justifyContent='spaceBetween'
+              responsive={false}
+            >
+              <EuiFlexItem grow={false}>Quick access</EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                {/*
+                 * Home's entry point to the AI Assistant, which lives in the separate
+                 * `wazuh-ai-assistant` plugin (see `getAiAssistantUrl`). It sits in the popover
+                 * title rather than in the group grid below because the assistant is not one of
+                 * the `Applications`/category-driven groups — it is a single shortcut, not a
+                 * content type. `RedirectAppLinks` (wrapping this subtree) turns the `href` into
+                 * an in-app `navigateToApp`, same as the group items.
+                 */}
+                <EuiLink
+                  href={getAiAssistantUrl()}
+                  data-test-subj='quick-access-ai-assistant-link'
+                >
+                  <EuiIcon type='machineLearningApp' size='s' />{' '}
+                  {i18n.translate(
+                    'wazuh.homeOverview.quickAccess.aiAssistant',
+                    {
+                      defaultMessage: 'AI Assistant',
+                    },
+                  )}
+                </EuiLink>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiPopoverTitle>
           <EuiFlexGrid columns={2} style={{ width: 420 }}>
             {groups.map(group => (
               <EuiFlexItem

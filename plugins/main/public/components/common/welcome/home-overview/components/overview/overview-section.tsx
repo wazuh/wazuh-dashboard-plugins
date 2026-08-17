@@ -23,7 +23,6 @@ import {
 } from '../../utils/navigation';
 import { FINDING_SEVERITY_FIELD } from '../../lib/fields';
 import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
-import { AiAssistantCta } from './ai-assistant-cta';
 
 export interface OverviewSectionProps {
   /** Owned by the page shell so Threat Hunting reuses the same on-mount search. */
@@ -118,9 +117,6 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
               />
             )}
           </WidgetGroup>
-        </EuiFlexItem>
-        <EuiFlexItem style={{ minWidth: 0 }}>
-          <AiAssistantCta />
         </EuiFlexItem>
       </EuiFlexGroup>
     </div>

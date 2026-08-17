@@ -129,6 +129,22 @@ describe('AssistantChatPanel', () => {
     });
   });
 
+  it('routes the maximize shortcut to the app chat view and closes the panel', () => {
+    const { props } = renderPanel();
+
+    fireEvent.click(
+      document.querySelector(
+        '[data-test-subj="wzAiAssistantPanelMaximizeButton"]',
+      ) as HTMLElement,
+    );
+
+    expect(props.runGuarded).toHaveBeenCalledTimes(1);
+    expect(props.onClose).toHaveBeenCalled();
+    expect(mockNavigateToApp).toHaveBeenCalledWith('wazuhAiAssistant', {
+      path: '#/',
+    });
+  });
+
   it("routes ChatPage's add-provider CTA to settings with the add-provider flag", () => {
     const { props } = renderPanel();
 
