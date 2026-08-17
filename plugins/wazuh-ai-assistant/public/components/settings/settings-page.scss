@@ -137,3 +137,15 @@ $wzSettingsCardPillHeight: $wzSettingsCardPillLineHeight +
   white-space: nowrap;
   vertical-align: bottom;
 }
+
+/* EuiToolTip's own anchor span, named via `anchorClassName` (settings-page.tsx): the anchor is
+   what the fixed-layout cell actually lays out, so IT must be the width-bounded element — the
+   inner .wzSettingsEndpointCell's max-width: 100% is measured against the anchor, and an
+   auto-width anchor made that bound a no-op, letting long endpoints paint over the Model
+   column. `min-width: 0` matters for the same reason it does in flex rows: without it the
+   anchor's intrinsic (content) width wins over the cell's fixed track. */
+.wzSettingsEndpointAnchor {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+}

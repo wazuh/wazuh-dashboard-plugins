@@ -147,7 +147,7 @@ function buildSettingsPayload(
  * ellipsis. The full value is still available via the `EuiToolTip` wrapping the caller's render,
  * so nothing is actually lost, only compacted (screen 3 gap: "Endpoints dominate the row").
  */
-function middleTruncate(value: string, maxLength = 42): string {
+function middleTruncate(value: string, maxLength = 28): string {
   if (value.length <= maxLength) {
     return value;
   }
@@ -886,7 +886,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       // dominate the row") — `truncateText` is deliberately left off: EUI's own end-truncation
       // would hide the path/host tail, which is usually the part that tells two endpoints apart.
       render: (baseUrl: string) => (
-        <EuiToolTip content={baseUrl}>
+        // `anchorClassName` bounds EuiToolTip's own wrapper span. Without it the anchor is an
+        // auto-width inline-block the fixed-layout cell cannot clip, so a truncated string that
+        // is still longer than the column paints straight over the Model column — which is what
+        // happened once the page gained its 1200px cap and this column narrowed to ~220px.
+        <EuiToolTip content={baseUrl} anchorClassName='wzSettingsEndpointAnchor'>
           <span className='wzSettingsEndpointCell'>
             {middleTruncate(baseUrl)}
           </span>
