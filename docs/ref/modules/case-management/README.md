@@ -21,11 +21,11 @@ This module exposes the following views:
   Use the **Status**, **Severity**, **Priority**, and **User** filters to narrow the list. Select
   a row to open the finding details, then open the **Case** tab.
 
-![Case Management Cases view](./images/07-cases-list.png)
+![Case Management Cases view](images/07-cases-list.png)
 
 The **Dashboard** view summarizes the same cases with charts.
 
-![Case Management Dashboard view](./images/06-dashboard.png)
+![Case Management Dashboard view](images/06-dashboard.png)
 
 ## How it fits together
 
@@ -61,7 +61,7 @@ value (`Case_` followed by the finding identifier). Replace it with a title of y
 save the form, the module writes the case fields to the finding, and the finding starts to appear
 in the **Cases** view.
 
-![New case form in the Case tab](./images/01-case-tab-new.png)
+![New case form in the Case tab](images/01-case-tab-new.png)
 
 The **Case** tab is shared by every view that shows finding documents. You can create a case from
 the Threat Hunting findings and from the **Cases** table, and the tab behaves the same way in each
@@ -129,7 +129,7 @@ The server controls the author and the timestamps of a comment:
 
 You can edit one comment at a time. Save or cancel the open edit before you start another one.
 
-![Comment thread on a case](./images/04-case-comments.png)
+![Comment thread on a case](images/04-case-comments.png)
 
 ### Confirmation before you discard changes
 
@@ -145,7 +145,7 @@ change by mistake.
 - **Delete comment**: When you delete a comment, the module shows a confirmation dialog with the
   message `This action cannot be undone.`.
 
-![Clean case confirmation dialog](./images/05-clean-confirm.png)
+![Clean case confirmation dialog](images/05-clean-confirm.png)
 
 ## Create a case from a finding
 
@@ -154,13 +154,12 @@ change by mistake.
 3. Open the **Case** tab.
 4. Fill in the form. Set the **Title**, the **Status**, and the **Severity**. These fields are
    required. Set the **Description**, **Priority**, **TLP**, and **Tags** as needed.
-
-   ![Filled case form before you create the case](./images/02-case-tab-filled.png)
-
 5. Select **Create case**. The module saves the case data to the finding and shows the case
    summary.
 
-   ![Case summary after you create the case](./images/03-case-summary.png)
+![Filled case form before you create the case](images/02-case-tab-filled.png)
+
+![Case summary after you create the case](images/03-case-summary.png)
 
 To change a case later, open the **Case** tab again, select **Edit**, change the fields, and
 select **Update case**. To add a note, write it in the **New comment** box and select **Add
