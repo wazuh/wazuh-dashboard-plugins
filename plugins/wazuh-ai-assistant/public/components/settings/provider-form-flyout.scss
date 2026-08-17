@@ -18,6 +18,15 @@
   @include wzSurfaceTokens;
 }
 
+/* The flyout's reading-width cap (audit item 5.1). The TSX also passes `maxWidth={640}`, but
+   the bundled OUI drops that prop on the floor (no inline style ever reaches the DOM — proven
+   by the jest run on the VM build), so the CSS rule is the one that actually holds the 640px
+   column. Keep both: the prop documents intent and works on newer EUI; this rule guarantees it
+   here. */
+.wzProviderFlyoutPanel {
+  max-width: 640px;
+}
+
 .wzProviderFlyout__group + .wzProviderFlyout__group {
   margin-top: $wzCardPaddingRoomy;
 }
