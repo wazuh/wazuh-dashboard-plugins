@@ -81,6 +81,10 @@ export const AssistantHeaderButton: React.FC<{ core: CoreStart }> = ({
     lastWidthRef.current = initialSidecarWidth();
     const sidecar = core.overlays.sidecar.open(
       element => {
+        // react-focus-lock's escape hatch: an open `EuiFlyout` (default `ownFocus`) keeps its trap
+        // live on outside clicks and yanks focus back, leaving the chat input untypeable. The
+        // attribute is matched document-wide, so it frees the sidecar from any plugin's flyout.
+        element.setAttribute('data-no-focus-lock', 'true');
         const root = createRoot(element);
         root.render(
           <Suspense fallback={null}>
