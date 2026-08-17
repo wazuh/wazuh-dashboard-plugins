@@ -31,7 +31,15 @@
    deliberately narrow 640px column the cap left a 181px dead gutter down the form's right side
    (re-audit §1.1): three content widths on one surface. The column IS the measure here, so the
    rows take it fully and the flyout keeps one right edge. */
-.wzProviderFlyoutPanel .euiFormRow {
+/* The cap lives on FOUR EUI layers, not one: the row, the control layout, and the field
+   elements themselves each carry their own 400px max-width. Lifting only the row's (the first
+   version of this fix) freed the labels and help text while the input BOXES still stopped 181px
+   short of the column (final verify, item 4 residual). All layers take the measure. */
+.wzProviderFlyoutPanel .euiFormRow,
+.wzProviderFlyoutPanel .euiFormControlLayout,
+.wzProviderFlyoutPanel .euiFieldText,
+.wzProviderFlyoutPanel .euiFieldPassword,
+.wzProviderFlyoutPanel .euiComboBox {
   max-width: 100%;
 }
 
