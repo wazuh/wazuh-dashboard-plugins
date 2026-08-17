@@ -1844,19 +1844,27 @@ describe('ChatPage — two-row grid pane (contract §1)', () => {
 });
 
 describe('ChatPage — dismissing the error callout', () => {
-  const failSend = () =>
-    mockStreamChat.mockImplementation(() => {
-      throw new Error('fetch failed');
-    });
+  // The real failure this reports, verbatim: a provider the assistant could not reach. Delivered as
+  // an in-stream `error` event, which is how the generic callout is actually fed (`runChatStream`) —
+  // a thrown exception is a different path and never reaches it.
+  const PROVIDER_ERROR =
+    'Could not reach the provider endpoint. Check the base URL and network access. (fetch failed)';
 
   it('hides the error callout when dismissed, and shows the same message again on the next failure', async () => {
-    failSend();
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
     renderChatPage();
     await sendMessage('first question');
+    stream.push({ type: 'error', message: PROVIDER_ERROR });
+    stream.end();
 
     await waitFor(() =>
       expect(screen.getByText('Something went wrong')).toBeInTheDocument(),
     );
+    expect(screen.getByText(PROVIDER_ERROR)).toBeInTheDocument();
 
     fireEvent.click(
       document.querySelector(
@@ -1867,7 +1875,14 @@ describe('ChatPage — dismissing the error callout', () => {
 
     // Dismissal is per-message, not permanent: the next send clears `error`, which drops the
     // dismissal, so an identical failure is reported again rather than silently swallowed.
+    const retry = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => retry.generate(signal),
+    );
     await sendMessage('second question');
+    retry.push({ type: 'error', message: PROVIDER_ERROR });
+    retry.end();
+
     await waitFor(() =>
       expect(screen.getByText('Something went wrong')).toBeInTheDocument(),
     );
