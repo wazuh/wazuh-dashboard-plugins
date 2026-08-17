@@ -63,6 +63,15 @@ export function buildSystemPrompt(nowIso: string): string {
       'it with search_wazuh_data instead of speculating. End with at most one short follow-up ' +
       'offer. Keep the whole answer under roughly 120 words unless the user asks for more ' +
       'detail.',
+    // Emphasis guidance exists because the UI renders markdown but the model only sometimes
+    // emitted any, so answers looked inconsistently formatted turn to turn (UX iteration 3:
+    // "the highlights in the conversations are random?"). Scannability inside an answer comes
+    // from weight and structure, never from extra sizes or headings.
+    'Use light markdown emphasis in every answer, consistently: bold the single key figure or ' +
+      'term of each sentence or bullet (e.g. **576 hits**, **11 techniques**), and set every ' +
+      'identifier — technique ids, agent names, hostnames, file paths, CVE ids, field names, ' +
+      'index names — in inline code (e.g. `T1078`, `web-prod-02`, `/var/ossec`). Never use ' +
+      'headings, block quotes, or horizontal rules inside an answer.',
     'Tool arguments must use correct JSON types: numbers are unquoted (limit: 5, never "5").',
     'Reply in the same language the user wrote in (Spanish or English).',
     'Always state the actual time window a tool call queried (e.g. "in the last 90 days, the ' +
