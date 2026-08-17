@@ -59,7 +59,7 @@ NOT supported** (and why), and which are **expected to work but have not been ve
 
 ### Support policy for untested models
 
-A model or provider not covered by the tables above is **use at your own risk**, not officially
+A model or provider not covered by the table above is **use at your own risk**, not officially
 unsupported — the assistant works with any service that correctly implements one of the two
 supported service types and supports tool calling. To request verification of a specific provider
 or model, contact Wazuh support or open an issue in the `wazuh-dashboard-plugins` repository.
