@@ -995,17 +995,20 @@ describe('ProviderFormFlyout — one tight column (audit §5)', () => {
   it('caps the panel at a reading-width column', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    // The bundled OUI drops EuiFlyout's `maxWidth` prop (no inline style reaches the DOM in
-    // this build — VM-verified), so the 640px cap lives in provider-form-flyout.scss on the
-    // `wzProviderFlyoutPanel` class. The DOM assertion is therefore: our class reached the
-    // flyout panel (the node that carries the close button). The width value itself is pinned
-    // by the stylesheet assertion below, the same pattern chat-page.test.tsx uses for its
-    // measure tokens.
-    const closeButton = document.querySelector(
-      '[data-test-subj="euiFlyoutCloseButton"]',
-    ) as HTMLElement;
-    expect(closeButton).not.toBeNull();
-    expect(closeButton.closest('.wzProviderFlyoutPanel')).not.toBeNull();
+    // No DOM assertion is possible for this one: the test-env's EuiFlyout is a STUB that
+    // drops every prop except role/children/the close button (see
+    // @elastic/eui/test-env/eui_components/flyout/flyout.js) -- className and maxWidth never
+    // reach jsdom no matter what the product passes. The cap is therefore pinned at its two
+    // sources: the TSX must hand the panel class to EuiFlyout, and the stylesheet must cap
+    // that class at 640px (the rule that guarantees the cap even if a bundled EUI ignores
+    // the maxWidth prop).
+    const tsx = fs.readFileSync(
+      path.join(__dirname, 'provider-form-flyout.tsx'),
+      'utf8',
+    );
+    expect(tsx).toMatch(
+      /<EuiFlyout[^>]*className='wzProviderFlyoutPanel'/s,
+    );
 
     const scss = fs.readFileSync(
       path.join(__dirname, 'provider-form-flyout.scss'),
