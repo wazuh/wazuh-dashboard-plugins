@@ -177,7 +177,6 @@
     "wazuhAiAssistant.settings.form.testResultCouldNotVerifyTitle": "Could not verify the connection",
     "wazuhAiAssistant.settings.form.testResultFailureTitle": "Connection test failed",
     "wazuhAiAssistant.settings.form.testResultSuccessTitle": "Connection test succeeded ({latencyMs} ms)",
-    "wazuhAiAssistant.settings.form.toolCallingModelChipAriaLabel": "Use model gpt-4o",
     "wazuhAiAssistant.settings.form.toolCallingWarningTitle": "Tool calling requirement",
     "wazuhAiAssistant.settings.providers.filterPlaceholder": "Filter providers",
     "wazuhAiAssistant.settings.providers.testAll": "Test all",

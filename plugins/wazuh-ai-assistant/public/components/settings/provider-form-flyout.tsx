@@ -400,6 +400,53 @@ function getVendorModelSuggestions(
   return vendor?.models ?? [];
 }
 
+/**
+ * The four steps of the getting-started callout: one i18n message per step, so each is
+ * translatable on its own and the numbering comes from the `<ol>` rather than from the copy. They
+ * used to be a single message with "1. … 2. … 3. … 4. …" run together in one inline paragraph,
+ * which is the shape a sequence should never take — it neither scans nor is announced as a list.
+ */
+const GETTING_STARTED_STEPS: string[] = [
+  i18n.translate('wazuhAiAssistant.settings.form.gettingStartedStepType', {
+    defaultMessage: 'Pick a provider type.',
+  }),
+  i18n.translate('wazuhAiAssistant.settings.form.gettingStartedStepKey', {
+    defaultMessage: 'Paste its API key.',
+  }),
+  i18n.translate('wazuhAiAssistant.settings.form.gettingStartedStepModel', {
+    defaultMessage: 'Pick a model.',
+  }),
+  i18n.translate('wazuhAiAssistant.settings.form.gettingStartedStepTest', {
+    defaultMessage: 'Test the connection.',
+  }),
+];
+
+/**
+ * The form's ONE example-value chip. Three render sites (endpoint examples, model examples,
+ * per-vendor model suggestions) each carried their own copy of the same inline `EuiBadge`, which is
+ * how they drifted apart in the first place.
+ *
+ * Every value it ever shows is a URL or a model id, so it is set in the code face: the chip has to
+ * read as a value you can click into the field, not as a label describing one. Clicking fills the
+ * field (validated for non-secret values — credentials are never chipped anywhere in this form).
+ * `onClickAriaLabel` is EUI's requirement for a clickable badge, so each caller passes the sentence
+ * that fits its own field.
+ */
+const ExampleChip: React.FC<{
+  value: string;
+  onClickAriaLabel: string;
+  onSelect: (value: string) => void;
+}> = ({ value, onClickAriaLabel, onSelect }) => (
+  <EuiBadge
+    className='wzProviderFlyout__exampleChip'
+    color='hollow'
+    onClick={() => onSelect(value)}
+    onClickAriaLabel={onClickAriaLabel}
+  >
+    <code>{value}</code>
+  </EuiBadge>
+);
+
 const RequiredLabel: React.FC<{ label: string }> = ({ label }) => (
   <>
     {label}{' '}
@@ -462,9 +509,11 @@ const DocsPopover: React.FC<{
       {note && (
         <>
           <EuiSpacer size='s' />
-          <EuiText size='xs' color='subdued'>
-            {note}
-          </EuiText>
+          {/* Help-sized, like every other piece of guidance in this form — see
+              `.wzProviderFlyout__help`, which restates EUI's own `.euiFormHelpText` values for the
+              guidance blocks that sit outside an `EuiFormRow`'s `helpText` slot and therefore do
+              not inherit it. Deliberately not a second `EuiText size` on this form. */}
+          <div className='wzProviderFlyout__help'>{note}</div>
         </>
       )}
     </EuiPopover>
@@ -770,26 +819,18 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                   { defaultMessage: 'Getting started' },
                 )}
               >
-                <p>
-                  {i18n.translate(
-                    'wazuhAiAssistant.settings.form.gettingStartedSteps',
-                    {
-                      defaultMessage:
-                        '1. Pick a provider type. 2. Paste its API key. 3. Pick a model. ' +
-                        '4. Test the connection.',
-                    },
-                  )}
-                </p>
-                <p>
-                  {i18n.translate(
-                    'wazuhAiAssistant.settings.form.gettingStartedTestCaveat',
-                    {
-                      defaultMessage:
-                        'A green test confirms connection and key — it does not guarantee ' +
-                        'every chat request will succeed.',
-                    },
-                  )}
-                </p>
+                {/* A real ordered list, not four sentences run together in one paragraph: the
+                    numbers come from the `<ol>`, so they stay correct under translation and the
+                    steps scan as a sequence. `EuiCallOut` already wraps its children in `EuiText`,
+                    which is what supplies the list styling. The caveat sentence that used to close
+                    this callout ("a green test confirms connection and key…") is gone: hedging the
+                    Test button before the admin has filled anything in was noise on the one
+                    surface that has to feel simple. */}
+                <ol className='wzProviderFlyout__steps'>
+                  {GETTING_STARTED_STEPS.map(step => (
+                    <li key={step}>{step}</li>
+                  ))}
+                </ol>
               </EuiCallOut>
               <EuiSpacer size='m' />
             </>
@@ -940,11 +981,11 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 error={baseUrlError}
                 helpText={
                   <>
-                    <EuiText
-                      size='xs'
-                      color='subdued'
-                      id='wz-ai-provider-baseurl-examples-label'
-                    >
+                    {/* A plain element, so it takes the `helpText` slot's own
+                        `.euiFormHelpText` size and color. It used to be an `EuiText size='xs'`,
+                        which produced the same visual size by a second, independent mechanism —
+                        the kind of near-miss that made this form read as sloppy. */}
+                    <div id='wz-ai-provider-baseurl-examples-label'>
                       <FormattedMessage
                         id='wazuhAiAssistant.settings.form.baseUrlExample'
                         defaultMessage='{header}:'
@@ -955,7 +996,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                               : 'Example',
                         }}
                       />
-                    </EuiText>
+                    </div>
                     <EuiSpacer size='xs' />
                     <EuiFlexGroup
                       wrap
@@ -966,9 +1007,9 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     >
                       {urlGuidance.examples.map(example => (
                         <EuiFlexItem grow={false} key={example}>
-                          <EuiBadge
-                            color='hollow'
-                            onClick={() => fillBaseUrl(example)}
+                          <ExampleChip
+                            value={example}
+                            onSelect={fillBaseUrl}
                             onClickAriaLabel={i18n.translate(
                               'wazuhAiAssistant.settings.form.baseUrlExampleAriaLabel',
                               {
@@ -976,9 +1017,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                                 values: { example },
                               },
                             )}
-                          >
-                            {example}
-                          </EuiBadge>
+                          />
                         </EuiFlexItem>
                       ))}
                     </EuiFlexGroup>
@@ -1037,11 +1076,8 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 }
                 helpText={
                   <>
-                    <EuiText
-                      size='xs'
-                      color='subdued'
-                      id='wz-ai-provider-model-examples-label'
-                    >
+                    {/* Plain element on purpose — see the endpoint field's label above. */}
+                    <div id='wz-ai-provider-model-examples-label'>
                       <FormattedMessage
                         id='wazuhAiAssistant.settings.form.modelExample'
                         defaultMessage='{header}:'
@@ -1052,7 +1088,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                               : 'Example',
                         }}
                       />
-                    </EuiText>
+                    </div>
                     <EuiSpacer size='xs' />
                     <EuiFlexGroup
                       wrap
@@ -1063,9 +1099,9 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     >
                       {modelGuidance.examples.map(example => (
                         <EuiFlexItem grow={false} key={example}>
-                          <EuiBadge
-                            color='hollow'
-                            onClick={() => fillModel(example)}
+                          <ExampleChip
+                            value={example}
+                            onSelect={fillModel}
                             onClickAriaLabel={i18n.translate(
                               'wazuhAiAssistant.settings.form.modelExampleAriaLabel',
                               {
@@ -1073,9 +1109,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                                 values: { example },
                               },
                             )}
-                          >
-                            {example}
-                          </EuiBadge>
+                          />
                         </EuiFlexItem>
                       ))}
                     </EuiFlexGroup>
@@ -1142,16 +1176,19 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
               {suggestedModelChips.length > 0 && (
                 <>
                   <EuiSpacer size='xs' />
-                  <EuiText
-                    size='xs'
-                    color='subdued'
+                  {/* This block sits OUTSIDE the EuiFormRow above (see the comment there), so it
+                      cannot inherit the `helpText` slot's styling — `.wzProviderFlyout__help`
+                      restates EUI's own `.euiFormHelpText` values so it matches the examples label
+                      one field up pixel for pixel. */}
+                  <div
+                    className='wzProviderFlyout__help'
                     id='wz-ai-provider-model-suggestions-label'
                   >
                     {i18n.translate(
                       'wazuhAiAssistant.settings.form.modelSuggestionsLabel',
                       { defaultMessage: 'Suggested models:' },
                     )}
-                  </EuiText>
+                  </div>
                   <EuiSpacer size='xs' />
                   <EuiFlexGroup
                     gutterSize='xs'
@@ -1162,9 +1199,9 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                   >
                     {suggestedModelChips.map(suggestedModel => (
                       <EuiFlexItem key={suggestedModel} grow={false}>
-                        <EuiBadge
-                          color='hollow'
-                          onClick={() => fillModel(suggestedModel)}
+                        <ExampleChip
+                          value={suggestedModel}
+                          onSelect={fillModel}
                           onClickAriaLabel={i18n.translate(
                             'wazuhAiAssistant.settings.form.modelSuggestionAriaLabel',
                             {
@@ -1172,9 +1209,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                               values: { suggestedModel },
                             },
                           )}
-                        >
-                          {suggestedModel}
-                        </EuiBadge>
+                        />
                       </EuiFlexItem>
                     ))}
                   </EuiFlexGroup>
@@ -1214,20 +1249,16 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     // tool-calling example and one click filled the Model field with a value that
                     // provider cannot serve. `modelGuidance.examples` is the same per-type list
                     // the Examples chips two fields above already use.
+                    //
+                    // Rendered as plain inline code, NOT as an `ExampleChip`: this one is
+                    // illustrative prose ("a model like this one"), and the very same id is already
+                    // offered as a real fill-on-click chip under the Model field. A chip here looked
+                    // identical to those but sat mid-sentence inside a warning, so it advertised an
+                    // action where the surrounding text was only naming an example.
                     model: (
-                      <EuiBadge
-                        color='hollow'
-                        onClick={() => fillModel(toolCallingExampleModel)}
-                        onClickAriaLabel={i18n.translate(
-                          'wazuhAiAssistant.settings.form.toolCallingModelChipAriaLabel',
-                          {
-                            defaultMessage: 'Use model {model}',
-                            values: { model: toolCallingExampleModel },
-                          },
-                        )}
-                      >
+                      <code className='wzProviderFlyout__inlineValue'>
                         {toolCallingExampleModel}
-                      </EuiBadge>
+                      </code>
                     ),
                   }}
                 />

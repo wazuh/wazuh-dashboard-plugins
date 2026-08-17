@@ -2,7 +2,15 @@
  * Add-provider flyout (Screen 4 of the redesign — variation 4a, numbered groups; see
  * AI/design/redesign-v2-spec.md). Tokens come from the shared `_redesign.scss` partial; this file
  * only adds the flyout's own layout touch — consistent spacing between the three numbered
- * `EuiFormFieldset` groups. EUI's own fieldset/legend/checkable-card styling is left alone.
+ * `EuiFormFieldset` groups — plus the two presentation idioms the form owns: ONE help-text size and
+ * ONE example-value chip. EUI's own fieldset/legend/checkable-card styling is left alone.
+ *
+ * Type scale (UX iteration 3, CEO item 1): the form has exactly two text sizes, each produced by a
+ * single mechanism. Descriptions are `EuiText size='s'`; every piece of field-level help is EUI's
+ * own `.euiFormHelpText` — inherited for free by plain elements inside an `EuiFormRow`'s `helpText`
+ * slot, and restated by `.wzProviderFlyout__help` below for the two guidance blocks that cannot
+ * live in that slot. No `EuiText size='xs'` anywhere in the form: it produced the same pixels by a
+ * second, independent route, which is precisely how the sizes drifted.
  */
 @import '../redesign';
 
@@ -12,4 +20,77 @@
 
 .wzProviderFlyout__group + .wzProviderFlyout__group {
   margin-top: $wzCardPaddingRoomy;
+}
+
+/**
+ * Getting-started steps. `EuiCallOut` already wraps its children in `EuiText`, which supplies the
+ * decimal markers and indentation; all that is left is to tighten the rhythm — four three-word
+ * imperatives do not need `EuiText`'s prose-paragraph spacing — and to drop the trailing margin so
+ * the callout closes on the last step instead of on empty space.
+ */
+.wzProviderFlyout__steps {
+  margin-bottom: 0;
+
+  li + li {
+    margin-top: $euiSizeXS;
+  }
+}
+
+/**
+ * The help size for guidance that sits OUTSIDE an `EuiFormRow`'s `helpText` slot (the per-vendor
+ * "Suggested models:" row, which must be a sibling of the row because `EuiFormRow` clones its
+ * single child; and the docs popover's closing note, which renders in a portal). These two values
+ * are EUI's own `.euiFormHelpText` declarations, so the blocks match the in-slot help exactly and
+ * both themes stay correct without a hardcoded color.
+ */
+.wzProviderFlyout__help {
+  color: $euiColorDarkShade;
+  font-size: $euiFontSizeXS;
+}
+
+/**
+ * Example-value chip: `EuiBadge color='hollow'` (its hairline and neutral fill are already the
+ * quiet chip this form wants) re-typeset in the code face, because every value it carries is a URL
+ * or a model id and should read as a value rather than as a label. Clicking one fills the field.
+ *
+ * The hover state is the click affordance: EUI's default for a clickable badge is an underline,
+ * which on a monospace URL reads as a hyperlink to somewhere else rather than as "put this in the
+ * field". A soft accent wash plus an accent hairline says the same thing in the chip's own idiom.
+ */
+.wzProviderFlyout__exampleChip {
+  cursor: pointer;
+
+  /* The badge, not the `<code>`, carries the type treatment: EUI renders the badge's own text
+     wrapper between the two, and setting the family here keeps the inner element free to simply
+     inherit — which is what stops browsers from applying their default `code` size reduction on
+     top of an already-small chip. */
+  font-family: $euiCodeFontFamily;
+  font-size: $euiFontSizeXS;
+
+  code {
+    font: inherit;
+  }
+
+  &:hover,
+  &:focus {
+    background-color: var(--wz-accent-hover, #{rgba($euiColorPrimary, 0.06)});
+    border-color: var(--wz-accent, #{$euiColorPrimary});
+    text-decoration: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    transition: background-color $wzMotionFast $wzEase,
+      border-color $wzMotionFast $wzEase;
+  }
+}
+
+/**
+ * An illustrative value named in prose — the model id inside the tool-calling warning. Same code
+ * face as the chip so the two read as the same kind of thing, but deliberately no chip chrome and
+ * no pointer: that one is not fillable, and the identical id is already offered as a real chip
+ * under the Model field.
+ */
+.wzProviderFlyout__inlineValue {
+  font-family: $euiCodeFontFamily;
+  font-size: inherit;
 }

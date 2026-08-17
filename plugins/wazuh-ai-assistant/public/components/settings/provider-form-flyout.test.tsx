@@ -486,6 +486,9 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
 });
 
 describe('ProviderFormFlyout — getting-started onboarding', () => {
+  const gettingStartedCallout = () =>
+    screen.getByText(/getting started/i).closest('.euiCallOut') as HTMLElement;
+
   it('shows a numbered getting-started hint for a new provider, not when editing', () => {
     const { rerender } = render(<ProviderFormFlyout {...baseProps} />);
     expect(screen.getByText(/getting started/i)).toBeInTheDocument();
@@ -494,6 +497,158 @@ describe('ProviderFormFlyout — getting-started onboarding', () => {
       <ProviderFormFlyout {...baseProps} editingProvider={editingProvider} />,
     );
     expect(screen.queryByText(/getting started/i)).not.toBeInTheDocument();
+  });
+
+  it('lays the four steps out as a real ordered list, in order', () => {
+    // The steps used to be a single i18n message with the numbering baked into the copy
+    // ("1. Pick a provider type. 2. Paste its API key. ...") rendered as ONE inline paragraph, so a
+    // sequence neither scanned nor was announced as one. The numbers now come from the <ol>.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    const list = gettingStartedCallout().querySelector('ol');
+    expect(list).not.toBeNull();
+    expect(
+      Array.from((list as HTMLOListElement).querySelectorAll('li')).map(item =>
+        item.textContent?.trim(),
+      ),
+    ).toEqual([
+      'Pick a provider type.',
+      'Paste its API key.',
+      'Pick a model.',
+      'Test the connection.',
+    ]);
+    // The numbering must not be duplicated in the copy now that the list draws it.
+    expect(list?.textContent).not.toMatch(/1\.\s*Pick a provider type/);
+  });
+
+  it('no longer hedges the connection test before the form is even filled in', () => {
+    // Deleted copy (CEO item 2): "A green test confirms connection and key — it does not guarantee
+    // every chat request will succeed." True, but a caveat about the outcome of step 4 read as
+    // doubt about the whole feature on the surface that most needs to feel simple.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    expect(
+      screen.queryByText(/a green test confirms connection and key/i),
+    ).toBeNull();
+    expect(
+      screen.queryByText(/does not guarantee every chat request will succeed/i),
+    ).toBeNull();
+    expect(gettingStartedCallout().querySelectorAll('p')).toHaveLength(0);
+  });
+});
+
+describe('ProviderFormFlyout — one type scale for field guidance', () => {
+  it('renders the in-slot examples labels through EUI help text, not an ad-hoc EuiText size', () => {
+    // Three uncoordinated mechanisms used to produce "small text" on this form: EuiText size='s',
+    // raw elements in an EuiFormRow helpText slot, and EuiText size='xs'. The xs variant is gone —
+    // both "Examples:" labels are plain elements inside the helpText slot, so they take
+    // .euiFormHelpText and cannot drift from the API key field's help beside them.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    const labels = screen.getAllByText(/^Examples:$/);
+    expect(labels).toHaveLength(2);
+    for (const label of labels) {
+      expect(label.closest('.euiFormHelpText')).not.toBeNull();
+      expect(label.closest('.euiText--extraSmall')).toBeNull();
+    }
+  });
+
+  it('matches the out-of-slot suggestions label to that same help styling', () => {
+    // "Suggested models:" cannot live in the helpText slot (EuiFormRow clones its single child), so
+    // it carries the class that restates EUI's own .euiFormHelpText values instead of a second
+    // EuiText size.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://api.openai.com/v1' },
+    });
+
+    const label = screen.getByText(/^Suggested models:$/);
+    expect(label).toHaveClass('wzProviderFlyout__help');
+    expect(label.closest('.euiText--extraSmall')).toBeNull();
+  });
+});
+
+describe('ProviderFormFlyout — example value chips', () => {
+  const exampleChips = () =>
+    Array.from(
+      document.querySelectorAll<HTMLElement>('.wzProviderFlyout__exampleChip'),
+    );
+
+  it('renders every fillable example through the one shared chip, set in the code face', () => {
+    // Four inline EuiBadge repeats collapsed into a single ExampleChip. Each chip puts its value in
+    // its own <code>: the values are URLs and model ids, and they must read as values you can click
+    // into the field rather than as labels describing one.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    const chips = exampleChips();
+    // Four endpoint examples plus two model examples for the default openai_compatible type; no
+    // vendor suggestions yet, because the endpoint URL is still empty.
+    expect(chips).toHaveLength(6);
+    for (const chip of chips) {
+      expect(chip.querySelector('code')).not.toBeNull();
+    }
+    expect(chips.map(chip => chip.querySelector('code')?.textContent)).toEqual(
+      expect.arrayContaining([
+        'https://api.openai.com/v1',
+        'openai.gpt-oss-120b',
+      ]),
+    );
+  });
+
+  it('still fills the endpoint URL field when an example chip is clicked', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    const chip = screen
+      .getAllByText('http://localhost:11434/v1')
+      .find(node => node.closest('.wzProviderFlyout__exampleChip'));
+    expect(chip).toBeDefined();
+    fireEvent.click(chip as HTMLElement);
+
+    expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
+      'http://localhost:11434/v1',
+    );
+  });
+
+  it('still fills the model field when an example chip is clicked', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    const chip = screen
+      .getAllByText('mistral.mistral-large-3-675b-instruct')
+      .find(node => node.closest('.wzProviderFlyout__exampleChip'));
+    expect(chip).toBeDefined();
+    fireEvent.click(chip as HTMLElement);
+
+    expect(selectedModel()).toBe('mistral.mistral-large-3-675b-instruct');
+  });
+
+  it('keeps a click aria-label on every chip (EUI requires one for a clickable badge)', () => {
+    // Queried by label rather than by role so the assertion survives whichever element EuiBadge
+    // chooses for a clickable badge — what matters is that the value-only chip still announces the
+    // action it performs.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    expect(
+      screen.getByLabelText('Use endpoint https://api.openai.com/v1'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('Use model openai.gpt-oss-120b'),
+    ).toBeInTheDocument();
+  });
+
+  it('names the tool-calling example as plain inline code, not as a fillable chip', () => {
+    // That model id is illustrative prose ("a model like this one") and the very same id is already
+    // offered as a real fill-on-click chip under the Model field, so a chip here advertised an
+    // action mid-sentence inside a warning callout.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    const callout = screen
+      .getByText(/tool calling needs a model/i)
+      .closest('.euiCallOut') as HTMLElement;
+    const value = callout.querySelector('code') as HTMLElement;
+    expect(value).toHaveTextContent('openai.gpt-oss-120b');
+    expect(value).toHaveClass('wzProviderFlyout__inlineValue');
+    expect(callout.querySelector('.wzProviderFlyout__exampleChip')).toBeNull();
   });
 });
 
@@ -666,16 +821,6 @@ describe('ProviderFormFlyout — type label and tool-support copy corrections', 
       /tool calling needs a model with solid function-calling support/i,
     );
     expect(helpText.textContent).not.toMatch(/claude sonnet/i);
-  });
-
-  it('caveats that a green test does not guarantee every chat request will succeed', () => {
-    render(<ProviderFormFlyout {...baseProps} />);
-
-    expect(
-      screen.getByText(
-        /a green test confirms connection and key — it does not guarantee every chat request will succeed/i,
-      ),
-    ).toBeInTheDocument();
   });
 });
 
