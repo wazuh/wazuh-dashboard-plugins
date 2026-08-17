@@ -17,6 +17,8 @@
     "wazuhAiAssistant.chat.providerSelect": "Proveedor",
     "wazuhAiAssistant.chat.providersLoadError": "No se pudieron cargar los proveedores configurados. Revisa la pestaña de Configuración.",
     "wazuhAiAssistant.chat.noProviderError": "Configura un proveedor en la pestaña de Configuración antes de iniciar un chat.",
+    "wazuhAiAssistant.chat.emptyResultNote": "La consulta no devolvió filas.",
+    "wazuhAiAssistant.chat.jumpToLatest": "Ir a lo más reciente",
     "wazuhAiAssistant.chat.errorTitle": "Algo salió mal",
     "wazuhAiAssistant.chat.error.requestFailed": "La solicitud falló (HTTP {status}): {detail}",
     "wazuhAiAssistant.chat.error.unreachable": "No se pudo contactar con el servidor del dashboard de Wazuh: {detail}",

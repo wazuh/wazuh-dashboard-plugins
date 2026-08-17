@@ -1358,9 +1358,15 @@ describe('ChatPage — feedback while a turn runs', () => {
  *
  * This is the UI-layer equivalent of the registry-wide coverage tests elsewhere in this codebase
  * (see server/tools/catalog/agg-size-coverage.test.ts): the class here is "orderings of table
- * events within one turn", and the five scenarios below enumerate it exhaustively for the
+ * events within one turn", and the scenarios below enumerate it exhaustively for the
  * single-table-per-message model — every place an empty `table` event can land relative to a
- * non-empty one, plus the one honest-empty case that must still render.
+ * non-empty one, plus the honest-empty cases.
+ *
+ * The honest-empty cells changed shape with C4 (CEO item 6) and did not go away: a turn whose FINAL
+ * table has zero rows still commits that spec (so the saved conversation still says a query ran and
+ * matched nothing) but renders no card — the assistant's prose carries the answer, and a turn with
+ * no prose gets one quiet subdued line instead. The suppression mechanism this describe covers is
+ * unchanged; only what a committed empty spec looks like on screen is.
  */
 describe('ChatPage — an empty table never clobbers a populated one (issue #8920 item 7)', () => {
   const ROWS_SPEC = {
@@ -1433,7 +1439,15 @@ describe('ChatPage — an empty table never clobbers a populated one (issue #892
     await waitFor(() => expect(screen.getByText('web-01')).toBeInTheDocument());
   });
 
-  it('still shows an honest empty table when it is the only table this turn', async () => {
+  /**
+   * C4 (CEO item 6): the honest-empty case still COMMITS its spec — that is the turn's record of
+   * having queried and matched nothing, and it is what gets persisted — but it no longer draws a
+   * card: message-bubble.tsx suppresses a 0-row table and, when the turn produced no prose of its
+   * own, shows one quiet line in its place. This test used to assert the card ("Results (0 rows)");
+   * its premise moved rather than disappeared, so it now pins the replacement end state through the
+   * SAME event sequence, keeping this describe's matrix of table-event orderings complete.
+   */
+  it('shows the quiet no-rows line, not a table card, when the only table this turn is empty and no prose arrived', async () => {
     const stream = createControllableStream();
     mockStreamChat.mockImplementation(
       (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
@@ -1447,8 +1461,72 @@ describe('ChatPage — an empty table never clobbers a populated one (issue #892
     stream.end();
 
     await waitFor(() =>
-      expect(screen.getByText('Results (0 rows)')).toBeInTheDocument(),
+      expect(
+        screen.getByText('The query returned no rows.'),
+      ).toBeInTheDocument(),
     );
+    expect(screen.queryByText('Results (0 rows)')).not.toBeInTheDocument();
+    // EuiBasicTable's stock empty body went with the card that held it.
+    expect(screen.queryByText('No items found')).not.toBeInTheDocument();
+  });
+
+  it('drops the empty table silently when the turn narrated its own answer', async () => {
+    // The common shape of a zero-result turn: the tool returns nothing and the model says so in
+    // words. That prose IS the answer (CEO decision: suppress entirely), so neither the card nor the
+    // fallback line may appear — the line is the guarantee for a turn with NO prose, never a second
+    // answer stapled under one that already has it.
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('top agents?');
+
+    stream.push({ type: 'table', spec: EMPTY_SPEC });
+    stream.push({
+      type: 'delta',
+      content: 'No agents matched that filter in the last 24 hours.',
+    });
+    stream.push({ type: 'done' });
+    stream.end();
+
+    await waitFor(() =>
+      expect(
+        screen.getByText('No agents matched that filter in the last 24 hours.'),
+      ).toBeInTheDocument(),
+    );
+    expect(screen.queryByText('Results (0 rows)')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('The query returned no rows.'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('keeps the executed-query chip reachable on a suppressed empty result', async () => {
+    // Provenance normally moves UP into the result card's header (layout contract §4). With the card
+    // suppressed there is no header to move it into, so the below-bubble chip has to stay — "what
+    // did it actually look for?" is the first question a reader asks of a zero-result answer.
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('top agents?');
+
+    stream.push({
+      type: 'tool_call',
+      toolCall: { id: 't1', name: 'get_top_agents', arguments: {} },
+    });
+    stream.push({ type: 'table', spec: EMPTY_SPEC });
+    stream.push({ type: 'delta', content: 'Nothing matched.' });
+    stream.push({ type: 'done' });
+    stream.end();
+
+    await waitFor(() =>
+      expect(screen.getByText('Nothing matched.')).toBeInTheDocument(),
+    );
+    expect(screen.getByText('Top agents · 90d')).toBeInTheDocument();
   });
 
   it('keeps the populated table when an empty one arrives and the turn then errors', async () => {
@@ -1797,6 +1875,164 @@ describe('ChatPage — two-row grid pane (contract §1)', () => {
     // class reading the redesign token rather than restating a pixel figure.
     expect(scssRules).toMatch(/grid-template-rows:\s*1fr auto/);
     expect(scssRules).toMatch(/max-width:\s*\$wzContentMaxWidth/);
+  });
+});
+
+/**
+ * C2 (ux-iter3): the "jump to latest" affordance that pairs with stick-to-bottom scrolling in every
+ * streaming chat UI (ux-research.md §B). The PINNING logic itself is untouched and untested here —
+ * jsdom lays out no boxes, so `scrollHeight`/`clientHeight` are 0 and every element reads as pinned;
+ * these tests stub those three numbers on the pane so the component's own predicate
+ * (`scrollHeight - scrollTop - clientHeight < 160`) resolves to a real answer, and pin the STRUCTURE
+ * plus the state transitions around it.
+ */
+describe('ChatPage — jump to latest (C2)', () => {
+  /**
+   * Makes the transcript pane read as scrolled up. jsdom hardcodes `scrollTop`/`scrollHeight`/
+   * `clientHeight` to 0 and ignores writes to `scrollTop`, so all three are redefined as own
+   * properties on the instance; `configurable` so a later call can move the pane back down.
+   */
+  function stubPaneScroll(
+    pane: HTMLElement,
+    metrics: { scrollHeight: number; clientHeight: number; scrollTop: number },
+  ) {
+    Object.entries(metrics).forEach(([name, value]) => {
+      Object.defineProperty(pane, name, {
+        value,
+        writable: true,
+        configurable: true,
+      });
+    });
+  }
+
+  function transcriptPane(): HTMLElement {
+    return screen.getByRole('region', { name: 'Chat' });
+  }
+
+  const jumpButton = () =>
+    screen.queryByRole('button', { name: 'Jump to latest' });
+
+  async function renderWithOneTurn() {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+    const view = renderChatPage();
+    await sendMessage('top agents?');
+    stream.push({ type: 'delta', content: 'here they are' });
+    await waitFor(() =>
+      expect(screen.getByText('here they are')).toBeInTheDocument(),
+    );
+    return view;
+  }
+
+  it('renders nothing while the reader is following the conversation', async () => {
+    await renderWithOneTurn();
+    expect(jumpButton()).toBeNull();
+
+    // A scroll event that lands INSIDE the 160px pin threshold must not raise the button either —
+    // this is the "table render shifted the pane by a few pixels" case the threshold exists for.
+    const pane = transcriptPane();
+    stubPaneScroll(pane, {
+      scrollHeight: 2000,
+      clientHeight: 900,
+      scrollTop: 1050,
+    });
+    fireEvent.scroll(pane);
+    expect(jumpButton()).toBeNull();
+  });
+
+  it('appears once the reader scrolls up, outside the pin threshold', async () => {
+    await renderWithOneTurn();
+    const pane = transcriptPane();
+    stubPaneScroll(pane, {
+      scrollHeight: 2000,
+      clientHeight: 500,
+      scrollTop: 0,
+    });
+    fireEvent.scroll(pane);
+
+    expect(jumpButton()).not.toBeNull();
+  });
+
+  it('lives beside the transcript, not inside it and not inside the composer', async () => {
+    // Structural, because it is what makes the button behave: a child of the scroll container would
+    // scroll away with the content, and the pane-level grid row is what keeps it clear of the
+    // composer without any offset tracking the composer's variable height. Same reasoning as the
+    // two-row grid tests above — jsdom cannot check the pixels, only the structure they rest on.
+    await renderWithOneTurn();
+    const pane = transcriptPane();
+    stubPaneScroll(pane, {
+      scrollHeight: 2000,
+      clientHeight: 500,
+      scrollTop: 0,
+    });
+    fireEvent.scroll(pane);
+
+    const button = jumpButton() as HTMLElement;
+    expect(pane.contains(button)).toBe(false);
+    expect(button.closest('.wzJumpToLatest')).not.toBeNull();
+    // Same grid parent as the transcript (`.wzChatPane`), so `grid-row: 1` can put it back into the
+    // transcript's own row.
+    expect(button.closest('.wzChatPane')).toBe(pane.parentElement);
+    expect(button.closest('.wzComposerRow')).toBeNull();
+  });
+
+  it('scrolls to the newest content and re-pins when clicked', async () => {
+    await renderWithOneTurn();
+    const pane = transcriptPane();
+    stubPaneScroll(pane, {
+      scrollHeight: 2000,
+      clientHeight: 500,
+      scrollTop: 0,
+    });
+    // `Element.prototype.scrollTo` is not implemented in jsdom, so the component feature-detects it
+    // and falls back to a direct `scrollTop` assignment (which jsdom ignores). Supplying the mock is
+    // what makes the smooth path observable at all.
+    const scrollTo = jest.fn();
+    Object.defineProperty(pane, 'scrollTo', {
+      value: scrollTo,
+      writable: true,
+      configurable: true,
+    });
+    fireEvent.scroll(pane);
+
+    fireEvent.click(jumpButton() as HTMLElement);
+
+    expect(scrollTo).toHaveBeenCalledWith({ top: 2000, behavior: 'smooth' });
+    // Re-pinned: the button removes itself immediately on click rather than waiting for the smooth
+    // scroll's own trailing scroll event, so it can never be left floating over a pinned transcript.
+    expect(jumpButton()).toBeNull();
+  });
+
+  it('re-pins on send, so a new turn never leaves the button on screen', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+    renderChatPage();
+    await sendMessage('first question');
+    const pane = transcriptPane();
+    stubPaneScroll(pane, {
+      scrollHeight: 2000,
+      clientHeight: 500,
+      scrollTop: 0,
+    });
+    fireEvent.scroll(pane);
+    expect(jumpButton()).not.toBeNull();
+
+    stream.push({ type: 'done' });
+    stream.end();
+    // The composer swaps Send for Stop while a turn generates, so waiting for Send to come back is
+    // also how this waits for the first turn to have finished.
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Send' })).toBeInTheDocument(),
+    );
+    await sendMessage('second question');
+
+    // `startTurn` force-repins (the one case where overriding the reader's scroll position is what
+    // they expect), and the button's own mirror follows it through `repinToBottom`.
+    expect(jumpButton()).toBeNull();
   });
 });
 

@@ -17,6 +17,8 @@
     "wazuhAiAssistant.chat.providerSelect": "Provider",
     "wazuhAiAssistant.chat.providersLoadError": "Could not load configured providers. Check the Settings tab.",
     "wazuhAiAssistant.chat.noProviderError": "Configure a provider in the Settings tab before starting a chat.",
+    "wazuhAiAssistant.chat.emptyResultNote": "The query returned no rows.",
+    "wazuhAiAssistant.chat.jumpToLatest": "Jump to latest",
     "wazuhAiAssistant.chat.errorTitle": "Something went wrong",
     "wazuhAiAssistant.chat.error.requestFailed": "Request failed (HTTP {status}): {detail}",
     "wazuhAiAssistant.chat.error.unreachable": "Could not reach the Wazuh dashboard server: {detail}",

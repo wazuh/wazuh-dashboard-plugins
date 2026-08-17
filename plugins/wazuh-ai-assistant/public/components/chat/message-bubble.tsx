@@ -206,6 +206,48 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   const isWaitingForFirstToken =
     !isUser && message.isStreaming === true && message.content === '';
   const toolCalls = message.toolCalls ?? [];
+  /**
+   * The table this turn actually DRAWS — `undefined` for a final table with zero rows.
+   *
+   * A header-only result card ("Results (0 rows)" over EuiBasicTable's stock "No items found") is
+   * never rendered (CEO item 6 / ux-research.md §E, which is also PatternFly's explicit "never
+   * render a header-only table"): the assistant's own prose already answers a zero-result question
+   * in words, and the card added a second, emptier answer underneath it.
+   *
+   * The gate lives HERE, in the renderer, rather than in chat-page.tsx's flush path, for two
+   * reasons: (1) `message.table` is persisted (server/conversation-store.ts), so a conversation
+   * SAVED before this change — or restored from any older release — carries 0-row specs that a
+   * stream-time gate would never see, and would still draw the empty card on resume; (2) the
+   * within-turn empty-table suppression in chat-page.tsx (`pendingEmptyTable`) is a STATE invariant
+   * about which spec a turn is remembered with, and it stays exactly as it was — an honest-empty
+   * turn is still recorded as having run a query that returned nothing, which is what keeps the
+   * saved conversation truthful; only the drawing of it changes.
+   *
+   * Every table-conditional RENDERING decision in this component reads THIS value, not
+   * `message.table`, so a suppressed table can never (a) strand its provenance chips in a card
+   * header that does not exist, or (b) leave a prose-only answer opted out of the reading measure.
+   * The one deliberate exception is the meta-row chip's hover title (see its own comment below),
+   * which reads the suppressed spec purely to keep naming the index it queried.
+   */
+  const renderedTable =
+    message.table && message.table.rows.length > 0 ? message.table : undefined;
+  /**
+   * The guarantee half of the suppression above: hiding the card must never leave a turn with no
+   * feedback at all. A turn that ends on a 0-row table AND produced no prose (the model stopped
+   * after the tool call, or Stop was pressed before it narrated anything) gets ONE quiet subdued
+   * line instead — no card, no icon, no illustration, since an illustration-scale empty state
+   * belongs to a page, not to one turn inside a conversation.
+   *
+   * `isStreaming` is excluded because a still-streaming bubble already shows its own placeholder
+   * lines; in the live path an empty spec only ever reaches a message at flush time (chat-page.tsx),
+   * by which point the turn is no longer streaming, so this is a guard against a future writer
+   * rather than a case reachable today.
+   */
+  const showEmptyResultNote =
+    message.table !== undefined &&
+    message.table.rows.length === 0 &&
+    message.content.trim() === '' &&
+    message.isStreaming !== true;
   // Provenance chips move UP into the result card's own header once a table exists (layout
   // contract §4: "the tool call renders BELOW the table it produced; it should become a chip in
   // the card header") — ResultTable renders them there instead. Below-bubble chips stay exactly
@@ -213,12 +255,15 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   // answer, a suggested-query handoff, or a table still held back by chat-page.tsx pending the
   // first answer token — see chat-page.test.tsx's "holds the result table back..." coverage: the
   // chip must still appear from `toolCalls` alone at that point, since `message.table` is not yet
-  // set on the message).
-  const metaRowToolCalls = message.table ? [] : toolCalls;
+  // set on the message). A turn whose only table was empty is a THIRD case of the same shape: the
+  // card that would have carried the chips is suppressed (see `renderedTable`), so the below-bubble
+  // chips have to stay — that is the only place left to check what the turn actually queried, which
+  // matters most precisely when the answer is "nothing was found".
+  const metaRowToolCalls = renderedTable ? [] : toolCalls;
   const tableProvenanceChips: ResultTableProvenanceChip[] | undefined =
-    message.table
+    renderedTable
       ? toolCalls.map(toolCall => {
-          const { short, full } = describeToolCall(toolCall, message.table);
+          const { short, full } = describeToolCall(toolCall, renderedTable);
           return {
             id: toolCall.id,
             shortLabel: short,
@@ -344,17 +389,33 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           </EuiText>
         </div>
       )}
-      {message.table && (
+      {renderedTable && (
         <>
           <EuiSpacer size='s' />
           <ResultTable
-            spec={message.table}
+            spec={renderedTable}
             resolveDiscoverUrl={resolveDiscoverUrl}
             resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
             provenanceChips={tableProvenanceChips}
             transcriptHeightPx={transcriptHeightPx}
           />
         </>
+      )}
+      {/* The suppressed-card fallback line — see `showEmptyResultNote` above for exactly when this
+          is the turn's only feedback. Deliberately not an EuiCallOut/EuiEmptyPrompt: this is a
+          sentence, and the whole point of suppressing the card was to stop answering "nothing
+          matched" with a box. */}
+      {showEmptyResultNote && (
+        <div className={PROSE_MEASURE_CLASS}>
+          <EuiSpacer size='xs' />
+          <EuiText size='s' color='subdued'>
+            <p style={{ margin: 0 }}>
+              {i18n.translate('wazuhAiAssistant.chat.emptyResultNote', {
+                defaultMessage: 'The query returned no rows.',
+              })}
+            </p>
+          </EuiText>
+        </div>
       )}
       {/* Graceful-failure handoff (server/tools/suggest-discover-query.ts): the model's own reason
           text plus a link to run the query itself in Discover, in place of the table/answer it
@@ -396,7 +457,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
       // table-bearing turn takes no class: `.wzMessageRow--wide` (chat-page.scss) already caps the
       // row at `min(100%, $wzTableMaxWidth)` one level up, so the `min(100%, 1300px)` that used to
       // be inlined here was a second copy of that same number with nothing keeping the two in step.
-      className={!isUser && !message.table ? PROSE_MEASURE_CLASS : undefined}
+      className={!isUser && !renderedTable ? PROSE_MEASURE_CLASS : undefined}
       style={{
         // The user turn keeps its 75% share — a question is always prose, and the figure is
         // genuinely local to this decision, with no token or class behind it to drift from.
@@ -462,6 +523,11 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
         </EuiFlexItem>
         {!isUser &&
           metaRowToolCalls.map(toolCall => {
+            // `message.table` here, deliberately NOT `renderedTable`: this is the one place the
+            // suppressed 0-row spec is still worth reading, because `describeToolCall` uses it for
+            // exactly one thing — naming the index in the chip's hover title. A suppressed empty
+            // result is precisely when "which index did it read?" matters, and dropping the spec
+            // here would quietly shorten that tooltip. It cannot affect the visible chip text.
             const { short, full } = describeToolCall(toolCall, message.table);
             const isRawOpen = openRawIds.has(toolCall.id);
             return (

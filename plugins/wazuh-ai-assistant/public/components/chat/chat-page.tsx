@@ -146,6 +146,12 @@ const RAIL_COLLAPSED_WIDTH = 48;
  * header panel) collapses the rail on its own. */
 const RAIL_COLLAPSE_AT = 1100;
 const RAIL_FLYOUT_AT = 900;
+/** How close to the bottom of the transcript still counts as "following the conversation" (see
+ * `pinnedToBottomRef` below). A table render or a late-arriving image can shift the pane by a few
+ * pixels, so an exact `=== 0` check would unpin spuriously and stop auto-scrolling mid-answer.
+ * Extracted from the two places that now read it (the pinning handler and the jump-to-latest
+ * button's own visibility, which is the same predicate inverted) rather than restated. */
+const SCROLL_PIN_THRESHOLD_PX = 160;
 /** Window event announcing a conversation create/update/delete; every mounted ChatPage listens
  * and refreshes, keeping the app shell's and the header flyout's sidebars in sync. */
 export const CONVERSATIONS_CHANGED_EVENT =
@@ -409,12 +415,40 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     return () => observer.disconnect();
   }, []);
   const pinnedToBottomRef = useRef(true);
+  /**
+   * Render mirror of `pinnedToBottomRef`, and ONLY that: it exists so the "jump to latest" button
+   * (bottom-right of the transcript row, below) can appear the moment the user scrolls up and
+   * disappear the moment they are following again. The REF stays the single source of truth every
+   * scroll read goes through, so the streaming path keeps costing one cheap `scrollTop` assignment
+   * per flushed frame and never a re-render.
+   *
+   * Written only when the value actually FLIPS. A drag-scroll fires a scroll event per frame, and
+   * committing an identical value on each one would trade the ref's whole reason for existing for a
+   * render per frame (React would bail out of re-rendering an unchanged value, but only after the
+   * state update has already been scheduled and processed).
+   */
+  const [isPinnedToBottom, setIsPinnedToBottom] = useState(true);
+  /**
+   * Re-pins the pane to the newest content. Every "snap back to the latest turn" caller goes
+   * through this — sending a message, opening a saved conversation, starting a new one, and the
+   * jump button — so the ref and its render mirror can never disagree; a stale `true` mirror would
+   * leave the jump button hidden while the user sits scrolled up, and a stale `false` one would
+   * leave it floating over a transcript that is already at the bottom.
+   */
+  const repinToBottom = () => {
+    pinnedToBottomRef.current = true;
+    setIsPinnedToBottom(true);
+  };
   const handleScrollPane = () => {
     const pane = scrollPaneRef.current;
-    if (pane) {
-      pinnedToBottomRef.current =
-        pane.scrollHeight - pane.scrollTop - pane.clientHeight < 160;
+    if (!pane) {
+      return;
     }
+    const pinned =
+      pane.scrollHeight - pane.scrollTop - pane.clientHeight <
+      SCROLL_PIN_THRESHOLD_PX;
+    pinnedToBottomRef.current = pinned;
+    setIsPinnedToBottom(previous => (previous === pinned ? previous : pinned));
   };
   useEffect(() => {
     const pane = scrollPaneRef.current;
@@ -422,6 +456,35 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       pane.scrollTop = pane.scrollHeight;
     }
   }, [messages]);
+
+  /**
+   * "Jump to latest": the one convention the pinning logic above was missing (every streaming chat
+   * UI offers it — see AI/ux-iter3/ux-research.md §B). Scrolls to the newest content and re-pins, so
+   * the answer starts following again from here on.
+   *
+   * Smooth via `scrollTo`, NOT via a `scroll-behavior: smooth` rule on the pane: the effect above
+   * writes `scrollTop` on every flushed streaming frame, and a smooth container would animate each
+   * of those writes instead of tracking the stream — the pane would visibly lag behind the text.
+   * That also means `prefers-reduced-motion` has to be honoured here in JS (the `behavior` option
+   * ignores it), which is why this reads the media query itself rather than relying on the
+   * stylesheet's own reduced-motion block. Both browser APIs are probed rather than assumed:
+   * `matchMedia` and `Element.prototype.scrollTo` are absent in jsdom, where this falls back to the
+   * same direct `scrollTop` assignment the streaming effect uses.
+   */
+  const handleJumpToLatest = () => {
+    repinToBottom();
+    const pane = scrollPaneRef.current;
+    if (!pane) {
+      return;
+    }
+    const prefersReducedMotion =
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
+    if (!prefersReducedMotion && typeof pane.scrollTo === 'function') {
+      pane.scrollTo({ top: pane.scrollHeight, behavior: 'smooth' });
+      return;
+    }
+    pane.scrollTop = pane.scrollHeight;
+  };
 
   /**
    * Conversation rail display mode (layout contract §5 / job item 6): expanded at >=1100px of
@@ -701,8 +764,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
    * replay as history either.
    */
   const applyLoadedConversation = (record: ConversationRecord) => {
-    // A resumed conversation opens at its latest turn (bottom), like every chat client.
-    pinnedToBottomRef.current = true;
+    // A resumed conversation opens at its latest turn (bottom), like every chat client — through
+    // `repinToBottom` so the jump button's own mirror is repinned with it.
+    repinToBottom();
     const restored = reconstructConversation(record.messages);
     updateMessages(restored.messages);
     // Restoring the tool history is what makes a resumed conversation continuable rather than just
@@ -812,7 +876,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
    */
   const handleNewConversation = () => {
     abandonActiveStream();
-    pinnedToBottomRef.current = true;
+    repinToBottom();
     updateMessages([]);
     turnHistoryRef.current = [];
     setPseudonymMap([]);
@@ -1134,9 +1198,18 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     // Empty-table suppression: an empty `table` event is held back (not
     // committed to `message.table`) instead of rendered immediately, since a failed/empty first
     // tool attempt followed by a successful retry's table in the SAME turn should show only the
-    // later, real one. Flushed (shown) if the stream ends before anything replaces it — "keep a
+    // later, real one. Flushed if the stream ends before anything replaces it — "keep a
     // single empty table if it's the only one" (honest-empty stays correct). A plain local
     // variable, not a ref/state: scoped to this one stream's sequential event loop only.
+    //
+    // RENDERING NOTE (CEO item 6, ux-iter3 C4): flushing an honest-empty spec still COMMITS it to
+    // `message.table` — that is this turn's record of "a query ran and matched nothing", and it is
+    // what gets persisted with the conversation — but it no longer draws anything: message-bubble.tsx
+    // suppresses the card for a 0-row spec and shows one quiet subdued line in its place when the
+    // turn produced no prose of its own. The gate is deliberately in the renderer and not here, so
+    // conversations SAVED before that change (whose stored turns already carry 0-row specs) stop
+    // drawing the empty card on resume too. Nothing about this buffer's behavior or its invariant
+    // below changed; only what a committed empty spec looks like on screen did.
     //
     // INVARIANT: within one turn, an empty table may NEVER replace — or outlive alongside — a
     // non-empty one. The suppression above is one-directional: real rows always win over an empty
@@ -1594,7 +1667,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
     // Sending always snaps the pane to the new turn, even if the user had scrolled up — the one
     // case where overriding their scroll position is what they expect (see pinnedToBottomRef).
-    pinnedToBottomRef.current = true;
+    repinToBottom();
     const baseMessages = [...history, assistantMessage];
     updateMessages(baseMessages);
 
@@ -2436,6 +2509,42 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 )}
             </div>
           </div>
+
+          {/* "Jump to latest" (ux-research.md §B: the affordance every streaming chat UI pairs with
+            stick-to-bottom scrolling). Shown whenever the user is unpinned — not only while a turn
+            is streaming, which is what Claude/ChatGPT do: after an answer finishes, "take me back
+            to the end" is exactly as useful as it was mid-stream, and gating on `isGenerating`
+            would make the control blink out from under the pointer the moment the stream ended.
+            The pinning logic itself is untouched (`pinnedToBottomRef` above); this only renders its
+            state and calls the same re-pin the send path already used.
+
+            A SIBLING of the transcript in `.wzChatPane`, explicitly placed back into the grid's
+            first row by `.wzJumpToLatest` (chat-page.scss) — NOT a child of the scroll container,
+            which would scroll away with the content, and NOT viewport-fixed, which would float over
+            whatever else the page is showing when this same ChatPage is embedded in the header's
+            docked panel (assistant-chat-panel.tsx). Sharing the transcript's grid row is what keeps
+            it above the composer's own `auto` row by construction: there is no offset to keep in
+            sync with the composer's variable height. */}
+          {!showLoadingState && !showNoProviderState && !isPinnedToBottom && (
+            <div className='wzJumpToLatest'>
+              <EuiButtonIcon
+                className='wzJumpToLatestButton'
+                // `arrowDown`, not `sortDown`: both read correctly, but this one is already used
+                // elsewhere in this plugin (result-table.tsx's row expander), so it is proven
+                // present in whichever EUI version the host platform bundles.
+                iconType='arrowDown'
+                display='base'
+                color='text'
+                onClick={handleJumpToLatest}
+                aria-label={i18n.translate(
+                  'wazuhAiAssistant.chat.jumpToLatest',
+                  {
+                    defaultMessage: 'Jump to latest',
+                  },
+                )}
+              />
+            </div>
+          )}
 
           {/* Composer row: the grid's `auto` row (`.wzChatPane` above), a real flow sibling of the
             transcript, never an overlay — see the layout-contract comment above `privacyBadgeLabel`.

@@ -206,6 +206,131 @@ describe('MessageBubble', () => {
     expect(screen.getByText('Results (2 rows)')).toBeInTheDocument();
   });
 
+  /**
+   * C4 (CEO item 6 / ux-research.md §E, and PatternFly's explicit "never render a header-only
+   * table"): a FINAL table with zero rows draws no card at all. The gate is here, in the renderer,
+   * rather than in chat-page.tsx's flush path, because `message.table` is persisted — a conversation
+   * saved before this change carries 0-row specs a stream-time gate would never see, and would still
+   * draw the empty card on resume.
+   */
+  describe('a zero-row table is never drawn as a card', () => {
+    const EMPTY_TABLE: TableSpec = {
+      columns: [{ id: 'agent', label: 'Agent' }],
+      rows: [],
+    };
+
+    it('renders neither the card nor the fallback line when the answer says it in prose', () => {
+      const { container } = render(
+        <MessageBubble
+          message={baseMessage({
+            role: 'assistant',
+            content: 'No agents matched that filter in the last 24 hours.',
+            table: EMPTY_TABLE,
+          })}
+          resolveDiscoverUrl={noopResolveDiscoverUrl}
+          resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+        />,
+      );
+
+      expect(
+        screen.getByText('No agents matched that filter in the last 24 hours.'),
+      ).toBeInTheDocument();
+      expect(screen.queryByText('Results (0 rows)')).toBeNull();
+      expect(container.querySelector('.wzResultsCard')).toBeNull();
+      expect(container.querySelector('table')).toBeNull();
+      // The prose already answered the question; a second, quieter answer under it would be noise.
+      expect(screen.queryByText('The query returned no rows.')).toBeNull();
+    });
+
+    it('renders one quiet subdued line when the turn produced no prose at all', () => {
+      // The guarantee case: the model stopped after the tool call (or Stop was pressed before it
+      // narrated anything), so suppressing the card silently would leave the turn with no feedback.
+      const { container } = render(
+        <MessageBubble
+          message={baseMessage({
+            role: 'assistant',
+            content: '',
+            isStreaming: false,
+            table: EMPTY_TABLE,
+          })}
+          resolveDiscoverUrl={noopResolveDiscoverUrl}
+          resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+        />,
+      );
+
+      expect(
+        screen.getByText('The query returned no rows.'),
+      ).toBeInTheDocument();
+      expect(screen.queryByText('Results (0 rows)')).toBeNull();
+      expect(container.querySelector('.wzResultsCard')).toBeNull();
+      // A sentence, not a box: no callout and no empty-prompt illustration for one turn's result.
+      expect(container.querySelector('.euiCallOut')).toBeNull();
+      expect(container.querySelector('.euiEmptyPrompt')).toBeNull();
+    });
+
+    it('leaves a turn whose table has rows completely unaffected', () => {
+      render(
+        <MessageBubble
+          message={baseMessage({
+            role: 'assistant',
+            content: 'Here are the results:',
+            table: {
+              columns: [{ id: 'agent', label: 'Agent' }],
+              rows: [{ agent: 'web-01' }],
+            },
+          })}
+          resolveDiscoverUrl={noopResolveDiscoverUrl}
+          resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+        />,
+      );
+
+      expect(screen.getByText('Results (1 rows)')).toBeInTheDocument();
+      expect(screen.getByText('web-01')).toBeInTheDocument();
+      expect(screen.queryByText('The query returned no rows.')).toBeNull();
+    });
+
+    it('keeps the below-bubble provenance chip, since there is no card header to move it into', () => {
+      render(
+        <MessageBubble
+          message={baseMessage({
+            role: 'assistant',
+            content: 'Nothing matched.',
+            table: EMPTY_TABLE,
+            toolCalls: [{ id: 't1', name: 'get_top_agents', arguments: {} }],
+          })}
+          resolveDiscoverUrl={noopResolveDiscoverUrl}
+          resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+        />,
+      );
+
+      // "What did it actually look for?" is the first question a reader asks of a zero-result
+      // answer, and the suppressed card is where that chip would otherwise have lived.
+      expect(screen.getByText('Top agents · 90d')).toBeInTheDocument();
+    });
+
+    it('holds a suppressed-table answer to the prose measure, like any other prose-only turn', () => {
+      // The bubble opts OUT of the reading measure only to make room for a table (layout contract
+      // §5). With no table drawn there is nothing to make room for, so the answer must not be left
+      // running to the wide table measure.
+      render(
+        <MessageBubble
+          message={baseMessage({
+            role: 'assistant',
+            content: 'Nothing matched.',
+            table: EMPTY_TABLE,
+          })}
+          resolveDiscoverUrl={noopResolveDiscoverUrl}
+          resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+        />,
+      );
+
+      const bubbleItem = screen
+        .getByText('Nothing matched.')
+        .closest('.euiFlexItem') as HTMLElement;
+      expect(bubbleItem).toHaveClass('wzProseMeasure');
+    });
+  });
+
   it('does not render a table section when message.table is absent', () => {
     const { container } = render(
       <MessageBubble

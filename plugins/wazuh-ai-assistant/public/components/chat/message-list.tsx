@@ -71,7 +71,13 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
         <React.Fragment key={message.id}>
           <div
             className={
-              message.table ? 'wzMessageRow wzMessageRow--wide' : 'wzMessageRow'
+              // Zero-row tables are suppressed at render time (message-bubble.tsx's
+              // `renderedTable`), so a suppressed table must not widen its row either — a --wide
+              // row around prose-only content would center it on the 1300px table measure for no
+              // visible reason.
+              message.table && message.table.rows.length > 0
+                ? 'wzMessageRow wzMessageRow--wide'
+                : 'wzMessageRow'
             }
           >
             <MessageBubble

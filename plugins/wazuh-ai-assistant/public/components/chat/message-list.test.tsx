@@ -98,4 +98,31 @@ describe('MessageList — per-row measure (layout contract §5)', () => {
     expect(tableRow).toHaveClass('wzMessageRow--wide');
     expect(userRow).not.toBe(tableRow);
   });
+
+  it('keeps the normal row measure for a zero-row table, matching its suppressed rendering', () => {
+    const table: TableSpec = {
+      columns: [{ id: 'agent', label: 'Agent' }],
+      rows: [],
+    };
+    const { container } = render(
+      <MessageList
+        messages={[
+          baseMessage({
+            id: 'm1',
+            role: 'assistant',
+            content: 'No matching agents in that window.',
+            table,
+          }),
+        ]}
+        resolveDiscoverUrl={noopResolveDiscoverUrl}
+        resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+      />,
+    );
+
+    // The bubble suppresses the 0-row table (message-bubble.tsx renderedTable), so the row
+    // must not take the 1300px table measure around what is now prose-only content.
+    const row = container.querySelector('.wzMessageRow');
+    expect(row).not.toBeNull();
+    expect(row).not.toHaveClass('wzMessageRow--wide');
+  });
 });

@@ -39,6 +39,58 @@
 }
 
 /**
+ * "Jump to latest" (chat-page.tsx), the floating control the stick-to-bottom scrolling was missing.
+ *
+ * Placed back into the grid's FIRST row explicitly (`grid-row: 1`), because it is a third child of
+ * `.wzChatPane`'s two-row grid: without this, auto-placement would give it an implicit third row of
+ * its own and it would push the composer up instead of floating over the transcript. An explicitly
+ * placed item is positioned before auto-placement runs and does not advance the auto-placement
+ * cursor, so the transcript still takes row 1 and the composer still takes row 2 — the layout
+ * contract §1 grid is unchanged.
+ *
+ * Sharing the transcript's row (rather than `position: fixed`, or absolute positioning against the
+ * pane) is what makes "never overlaps the composer" structural: the row boundary already separates
+ * them, so there is no bottom offset to keep in sync with the composer's variable height, and
+ * nothing changes when the same ChatPage is embedded in the narrow docked header panel. The
+ * `justify-self`/`align-self` pair parks it in the row's bottom-right corner; the inline-end margin
+ * clears BOTH the transcript's own 24px gutter and the 10px scroll gutter
+ * (`$wzScrollGutter`) the scrollbar floats in, so the button never sits on top of the bar.
+ */
+.wzJumpToLatest {
+  grid-row: 1;
+  justify-self: end;
+  align-self: end;
+  /* This item does contribute its ~32px to the `1fr` row's automatic minimum size, which is
+     harmless: the transcript is `min-height: 0` (wzScrollChild) and the pane it sits in is always
+     far taller than one button, so this can never become the thing that squeezes the composer. */
+  margin-inline-end: $wzScrollGutter + 24px;
+  margin-block-end: 12px;
+  /* The row's OTHER child (the scroll container) still has to receive the pointer everywhere this
+     button is not — a wrapper stretched over the corner would swallow clicks on the last turn. */
+  pointer-events: none;
+}
+
+/**
+ * The button itself: circular, hairline-bordered, and the one genuinely FLOATING element on the
+ * chat surface, which is what earns it a shadow under `_redesign.scss`'s rule ("shadow is reserved
+ * for things that genuinely float"). The shadow is local to this file rather than a shared token
+ * because nothing else on the surface floats over its own scrolling content; the `var()` fallbacks
+ * follow the same "every var carries its SASS twin" convention the shared mixins use.
+ */
+.wzJumpToLatestButton {
+  pointer-events: auto;
+  border-radius: 999px;
+  border: 1px solid var(--wz-hairline, #{$euiBorderColor});
+  background-color: var(--wz-surface, #{$euiColorEmptyShade});
+  /* `$euiColorDarkShade`, not EUI's own `$euiShadowColor`: that variable is not referenced anywhere
+     else in this repo, so it cannot be confirmed against the EUI version the host platform bundles,
+     and an undefined SASS variable fails the whole stylesheet's compile rather than one rule.
+     `$euiColorDarkShade` is already a proven consumer here (`$wzScrollThumb`, _redesign.scss) and is
+     theme-aware, so the shadow stays a soft edge in both themes. */
+  box-shadow: 0 2px 8px #{rgba($euiColorDarkShade, 0.25)};
+}
+
+/**
  * Composer floor and ceiling (contract §2). The row itself is the grid's `auto` row — it grows
  * with its content (field + controls + disclaimer) up to `$wzComposerMaxHeight`, then scrolls
  * internally rather than pushing the transcript row any further, since the two rows are otherwise
@@ -66,9 +118,11 @@
     opacity: 0.6;
   }
 
-  /* Focus-within ring is the ONE box-shadow this surface allows (a focus indicator, not
-     decoration) — the textarea itself is intentionally chromeless (chat-input.tsx), so the
-     composer panel is what shows focus has landed inside it. */
+  /* Focus-within ring is the only box-shadow in the composer, and it is a focus indicator rather
+     than decoration — the textarea itself is intentionally chromeless (chat-input.tsx), so the
+     composer panel is what shows focus has landed inside it. (The surface's one other shadow is
+     `.wzJumpToLatestButton`'s above, which is _redesign.scss's "shadow is reserved for things that
+     genuinely float" case: it is the only element here that floats over its own scrolling content.) */
   .euiPanel:focus-within {
     border-color: var(--wz-accent);
     box-shadow: 0 0 0 1px var(--wz-accent);
@@ -326,6 +380,28 @@
    * animated step. */
   .wzComposerTextarea {
     transition: height $wzMotionBase $wzEase;
+  }
+
+  /* The jump button is inserted mid-gesture (the user is scrolling when it appears), so a hard
+     pop-in next to moving content reads as a glitch. One $wzMotionFast fade and NO movement: a
+     translate would be a second thing moving while the reader is already moving the transcript.
+     Plays once on insert for the same reason `.wzMsgRow` does — the class is unconditional, so a
+     later re-render of the same node never restarts it. */
+  .wzJumpToLatest {
+    animation: wzFadeIn $wzMotionFast $wzEase both;
+  }
+
+  .wzJumpToLatestButton {
+    transition: background-color $wzMotionFast $wzEase;
+  }
+
+  @keyframes wzFadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   @keyframes wzFadeUp {

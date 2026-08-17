@@ -261,8 +261,17 @@ describe('ResultTable', () => {
     });
 
     it('renders no pagination footer for an empty result set', () => {
+      // Kept, with its premise narrowed: as of C4 (CEO item 6) the CHAT SURFACE never hands this
+      // component a 0-row spec — message-bubble.tsx suppresses the whole card for one and shows a
+      // quiet line instead (covered in message-bubble.test.tsx). This component is still the generic
+      // spec renderer, though, so what it does when a call site hands it one directly stays pinned:
+      // no footer, and — deliberately — no crash and no pagination arithmetic over zero rows
+      // (`pageCount` floors at 1). Nothing here asserts that an empty CARD is a desirable end state.
       const { container } = render(<ResultTable spec={spec({ rows: [] })} />);
       expect(container.querySelector('.wzResultsCardFooter')).toBeNull();
+      // The generic renderer still mounts its card — the suppression decision is the caller's,
+      // one level up, where the turn's prose is known.
+      expect(container.querySelector('.wzResultsCard')).not.toBeNull();
     });
   });
 
