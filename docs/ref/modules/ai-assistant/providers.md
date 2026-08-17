@@ -39,17 +39,17 @@ free-text query against the Indexer is exactly what the guardrails exist to prev
 
 ## Verification status
 
-Based on a live test pass against Wazuh 5.0.0: which providers and models are **verified
+This section indicates which providers and models are **verified
 working**, which are **verified NOT working** (and why), and which are **expected to work but
 have not been verified yet**.
 
 ### Verified supported
 
-| Provider type      | Service                                    | Model(s)                                                                                                              | Notes                                                                                                                      |
-| ------------------ | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Anthropic (Claude) | Anthropic's own API                        | The current Claude model family (Opus, Sonnet, Haiku, Fable)                                                          | Recommended: **`claude-haiku-4-5`** for the fastest responses, **`claude-opus-4-8`** as the balanced default.              |
-| OpenAI-compatible  | AWS Bedrock chat gateway                   | `openai.gpt-oss-120b`, `mistral.mistral-large-3-675b-instruct`, `qwen.qwen3-32b`, `qwen3-coder-480b`, `deepseek.v3.2` | Model names use the gateway's own vendor-prefixed naming — see [model-name gotchas](#per-vendor-model-name-gotchas) below. |
-| OpenAI-compatible  | Google Gemini (OpenAI-compatible endpoint) | `gemini-flash-latest`, `gemini-3-flash-preview`                                                                       | Works, with two gotchas — see [model-name gotchas](#per-vendor-model-name-gotchas) below.                                  |
+| Provider type     | Service                                    | Model(s)                                                                                                              | Notes                                                                                                                      |
+| ----------------- | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Anthropic         | Anthropic's own API                        | The current Claude model family (Opus, Sonnet, Haiku, Fable)                                                          | Recommended: **`claude-haiku-4-5`** for the fastest responses, **`claude-opus-4-8`** as the balanced default.              |
+| OpenAI-compatible | AWS Bedrock chat gateway                   | `openai.gpt-oss-120b`, `mistral.mistral-large-3-675b-instruct`, `qwen.qwen3-32b`, `qwen3-coder-480b`, `deepseek.v3.2` | Model names use the gateway's own vendor-prefixed naming — see [model-name gotchas](#per-vendor-model-name-gotchas) below. |
+| OpenAI-compatible | Google Gemini (OpenAI-compatible endpoint) | `gemini-flash-latest`, `gemini-3-flash-preview`                                                                       | Works, with two gotchas — see [model-name gotchas](#per-vendor-model-name-gotchas) below.                                  |
 
 ### Verified NOT supported
 
