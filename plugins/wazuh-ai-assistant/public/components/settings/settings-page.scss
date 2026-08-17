@@ -9,6 +9,16 @@
 
 .wzSettingsPage {
   @include wzSurfaceTokens;
+
+  // Caps the header + the three SectionCards at one shared measure and centers that column, so
+  // the page reads as one composition instead of full-viewport cards with intrinsic-width content
+  // floating inside them (CEO complaint: "huge grey empty space" at 2500px). `EuiPageBody` is the
+  // element EUI itself grows to the page's full width; capping IT (not each child separately) is
+  // what keeps the header and every card aligned to the same edges.
+  .euiPageBody {
+    max-width: $wzSettingsMaxWidth;
+    margin: 0 auto;
+  }
 }
 
 // The pill's own vertical padding and line-height, pinned explicitly rather than left to

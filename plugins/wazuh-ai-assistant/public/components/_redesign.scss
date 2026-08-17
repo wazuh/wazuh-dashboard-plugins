@@ -26,6 +26,12 @@ $wzCardPaddingRoomy: 24px;
 $wzContentMaxWidth: 1060px;
 $wzTableMaxWidth: 1300px;
 $wzProseMeasure: 68ch;
+/* Settings is its own page, not chat prose, so it does not share $wzContentMaxWidth: the
+   providers table has 9 fixed-percentage columns (settings-page.tsx) and needs more breathing
+   room than a centred column of prose or form fields would call for. Wider than
+   $wzContentMaxWidth, narrower than $wzTableMaxWidth (that one caps a table breaking OUT of the
+   chat column at the transcript's widest point, not a whole page's own measure). */
+$wzSettingsMaxWidth: 1200px;
 
 /* --- Composer floor and ceiling (layout contract §2) -------------------------------------------
    The `vh` twin is a REQUIRED fallback, not a nicety: `dvh` only shipped in Safari 15.4, and a
