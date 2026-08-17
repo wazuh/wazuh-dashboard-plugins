@@ -391,16 +391,24 @@ describe('SettingsPage — in-card layout and hierarchy (audit §4)', () => {
   const scss = () =>
     fs.readFileSync(path.join(__dirname, 'settings-page.scss'), 'utf8');
 
+  /**
+   * Deliberately NOT queried through `findByLabelText`. Measured on the VM against this EUI build,
+   * neither control is reachable that way: the switch's caption is not associated with a labellable
+   * element at all (EuiSwitch's control is a `<button role="switch">`, which a `<label for>` cannot
+   * label), and the retention row's label resolved to a button rather than to its own input. The
+   * caption TEXT and the control's ROLE are the hooks that do hold — and they are what these
+   * assertions are actually about, which is which column a block sits in.
+   */
   it('lays the privacy controls and the field policy out as two columns', async () => {
     render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
-    const firstSwitch = await screen.findByLabelText(
+    const switchCaption = await screen.findByText(
       /enable privacy mode by default/i,
     );
 
     // One flex row holding both: the switches in the first item, the field-policy editor in the
     // second. Left as EUI's responsive default (this file's other flex rows pass
     // `responsive={false}`), so a narrow window stacks the two columns instead of squeezing them.
-    const row = firstSwitch.closest('.euiFlexGroup') as HTMLElement;
+    const row = switchCaption.closest('.euiFlexGroup') as HTMLElement;
     expect(row).not.toBeNull();
     expect(row.textContent).toContain('Field policy');
     expect(row.className).toMatch(/responsive/i);
@@ -408,9 +416,9 @@ describe('SettingsPage — in-card layout and hierarchy (audit §4)', () => {
 
   it('puts the retention field and its explanation side by side', async () => {
     render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
-    const field = await screen.findByLabelText(
-      /keep saved conversations for \(days\)/i,
-    );
+    // The page's only number input, so its role names it unambiguously — and unlike the form row's
+    // label, the input itself is a hook that survives however EuiFormRow wires `for`.
+    const field = await screen.findByRole('spinbutton');
 
     const row = field.closest('.euiFlexGroup') as HTMLElement;
     expect(row).not.toBeNull();
@@ -424,22 +432,29 @@ describe('SettingsPage — in-card layout and hierarchy (audit §4)', () => {
 
   it('drops the fill on a disabled Save button', async () => {
     render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
+    // Both cards' Save buttons read the same `fill={!disabled}` expression; this one is driven
+    // through the retention field because a number input is the cleanest control to dirty.
     const save = await screen.findByRole('button', {
+      name: /save conversation history settings/i,
+    });
+    const privacySave = screen.getByRole('button', {
       name: /save privacy settings/i,
     });
 
-    // Nothing has been edited yet, so this is the disabled state the audit measured as the darkest
-    // slab on the page at ~2.2:1 against its own label.
+    // Nothing has been edited yet, so both are in the disabled state the audit measured as the two
+    // darkest slabs on the page, at ~2.2:1 against their own labels.
     expect(save).toBeDisabled();
-    expect(save.className).not.toMatch(/euiButton--fill/);
+    expect(privacySave).toBeDisabled();
+    expect(save.className).not.toMatch(/fill/i);
+    expect(privacySave.className).not.toMatch(/fill/i);
 
-    fireEvent.click(
-      await screen.findByLabelText(/enable privacy mode by default/i),
-    );
+    fireEvent.change(await screen.findByRole('spinbutton'), {
+      target: { value: '30' },
+    });
 
     // Dirty now: the button is both enabled and filled, i.e. fill tracks "you can press this".
     await waitFor(() => expect(save).toBeEnabled());
-    expect(save.className).toMatch(/euiButton--fill/);
+    expect(save.className).toMatch(/fill/i);
   });
 
   it('keeps the section cards, their descriptions and their rules on one measure', () => {

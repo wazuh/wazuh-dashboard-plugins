@@ -995,11 +995,25 @@ describe('ProviderFormFlyout — one tight column (audit §5)', () => {
   it('caps the panel at a reading-width column', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    const flyout = document.querySelector('.euiFlyout') as HTMLElement;
-    expect(flyout).not.toBeNull();
+    // Reached from the close button's `data-test-subj` — the hook the rest of this file already uses
+    // to address this flyout — because a `.euiFlyout` class selector finds nothing in this EUI
+    // test-env build. From there, the panel is identified by the inline cap itself rather than by any
+    // class, so the assertion does not depend on which of the flyout's nodes EUI decides to put a
+    // class on.
+    const closeButton = document.querySelector(
+      '[data-test-subj="euiFlyoutCloseButton"]',
+    ) as HTMLElement;
+    expect(closeButton).not.toBeNull();
+
+    const panel = closeButton.closest(
+      '[style*="max-width"]',
+    ) as HTMLElement | null;
+    expect(panel).not.toBeNull();
     // `size='m'` stays as the smaller-viewport behaviour; the cap is what stops a 960px panel from
     // pairing with EUI's own 400px form-control ceiling.
-    expect(flyout.style.maxWidth).toBe('640px');
+    expect((panel as HTMLElement).style.maxWidth).toBe('640px');
+    // ...and it is our own flyout carrying it, not some inner EUI box that happens to be capped.
+    expect((panel as HTMLElement).className).toContain('wzProviderFlyoutPanel');
   });
 
   it('stacks Name and API key in one column instead of two', () => {
