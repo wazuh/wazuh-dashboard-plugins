@@ -23,13 +23,86 @@
 }
 
 /**
+ * Every callout inside this flyout — the getting-started hint, the tool-calling warning, the
+ * encryption notice, the test result.
+ *
+ * EUI's small callout ships `border-radius: 0` and `padding: 8px`, which the audit (§5.7) measured
+ * as the reason these read as system banners cut across the form rather than as blocks belonging to
+ * it: a square, tight box beside 12px-radius panels. 4px of radius and a 12/16 inset put them in the
+ * same design language as the rest of the surface at their own smaller scale, all four values on the
+ * ladder.
+ *
+ * Qualified through `.wzProviderFlyoutPanel` (the flyout's own class) rather than declared on
+ * `.euiCallOut` alone: the padding it overrides lives on EUI's single-class `.euiCallOut--small`, so
+ * an unqualified rule would be a 0,1,0 tie decided by bundle order — the same trap
+ * `.euiBadge.wzStatusChip` (settings-page.scss) documents.
+ */
+.wzProviderFlyoutPanel .euiCallOut {
+  border-radius: 4px;
+  padding: 12px 16px;
+}
+
+/**
+ * ...and the one long-form callout is held to the reading measure. The tool-calling warning is a
+ * six-line paragraph, and in a 640px flyout it is the only block here that can run past a
+ * comfortable line length (audit §5.7 / rulebook C12).
+ */
+.wzProviderFlyoutPanel .euiCallOut .euiText p {
+  max-width: $wzProseMeasure;
+}
+
+/**
+ * The header and the footer sit OUTSIDE the flyout body's scroll region, so they do not carry the
+ * gutter the scrollbar floats in — measured live as the "Save & test" button breaking the form's
+ * right edge by exactly those 10px (audit §5.5). Adding the same inset to the header's and the
+ * footer's own children is what lines the CTA back up with the fields it submits.
+ *
+ * The margin goes on the CHILDREN rather than as `padding-inline-end` on the header/footer: EUI owns
+ * those elements' padding and this file has no reliable way to read the value it would have to add
+ * to, whereas a margin composes with whatever EUI's padding happens to be in any version.
+ */
+.wzProviderFlyoutPanel .euiFlyoutHeader > *,
+.wzProviderFlyoutPanel .euiFlyoutFooter > * {
+  margin-inline-end: $wzScrollGutter;
+}
+
+/** The flyout body's own scroll region takes the surface's quiet overlay scrollbar (the 4px thumb in
+ * a `$wzScrollGutter` channel), so the 10px the header/footer compensate for above is OUR number
+ * rather than whatever bar the platform would otherwise draw here. */
+.wzProviderFlyoutPanel .euiFlyoutBody__overflow {
+  @include wzQuietScrollbar;
+}
+
+/**
+ * The numbered group legends — "1 Provider type", "2 Connection", "3 Model". They rendered at
+ * 12px/500 in the full text color, which is EXACTLY what a field label renders at: the audit (§5.2)
+ * found that one type spec doing 18 different jobs on this form, so a group heading was
+ * indistinguishable from the labels inside the group it heads. `wzMicroLabel` is the idiom the
+ * redesign already uses for "this is a section, not content" (settings' own section pills use it
+ * too), which differentiates the tier by case, tracking and color instead of by inventing a size.
+ */
+.wzProviderFlyout__group legend {
+  @include wzMicroLabel;
+}
+
+/**
  * Getting-started steps. `EuiCallOut` already wraps its children in `EuiText`, which supplies the
  * decimal markers and indentation; all that is left is to tighten the rhythm — four three-word
  * imperatives do not need `EuiText`'s prose-paragraph spacing — and to drop the trailing margin so
  * the callout closes on the last step instead of on empty space.
+ *
+ * The inline offset is the audit's §5.3 finding: EUI indents a callout's body from the callout's own
+ * padding edge, but the TITLE beside the icon starts one icon-plus-gap further in, so the list's
+ * decimal markers hung 21px to the left of the title they belong to — the only element on the whole
+ * form breaking the alignment rail. `$euiSize + $euiSizeS` is that icon-plus-gap offset expressed as
+ * what it is; `list-style-position: inside` is what puts the MARKER (not the text after it) on that
+ * rail, which is the glyph the eye reads as the list's left edge.
  */
 .wzProviderFlyout__steps {
   margin-bottom: 0;
+  margin-inline-start: $euiSize + $euiSizeS;
+  padding-inline-start: 0;
+  list-style-position: inside;
 
   li + li {
     margin-top: $euiSizeXS;
@@ -59,6 +132,14 @@
  */
 .wzProviderFlyout__exampleChip {
   cursor: pointer;
+  /* A chip never wider than the column it sits in. The widest endpoint example measured 396px inside
+     a 400px field column and simply overflowed it (audit §5.4) — the value is recognisable from its
+     head, so ellipsising the tail is the right trade, and clicking still fills the field with the
+     WHOLE value (the DOM text is untouched; only its rendering is clipped). */
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
   /* The badge, not the `<code>`, carries the type treatment: EUI renders the badge's own text
      wrapper between the two, and setting the family here keeps the inner element free to simply
@@ -87,8 +168,10 @@
 /**
  * An illustrative value named in prose — the model id inside the tool-calling warning. Same code
  * face as the chip so the two read as the same kind of thing, but deliberately no chip chrome and
- * no pointer: that one is not fillable, and the identical id is already offered as a real chip
- * under the Model field.
+ * no pointer: this one is prose naming an example, not an action. (It used to say the same id was
+ * "already offered as a real chip under the Model field"; that generic per-type Examples row has
+ * since been removed — see provider-form-flyout.tsx's Model field — so this is now the only place
+ * the id is NAMED, while the chips under the field are the endpoint's own vendor suggestions.)
  */
 .wzProviderFlyout__inlineValue {
   font-family: $euiCodeFontFamily;

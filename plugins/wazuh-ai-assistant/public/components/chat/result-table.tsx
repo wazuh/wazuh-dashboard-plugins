@@ -133,6 +133,13 @@ const ISO_TIMESTAMP_RE =
 const TIMESTAMP_COLUMN_WIDTH = '118px';
 /** Column width for the severity column: a badge plus its longest label ("Informational"). */
 const SEVERITY_COLUMN_WIDTH = '104px';
+/** Width for a column whose every value is short (see `isShortValueColumn`) — an agent name, an id,
+ * a category. Enough for ~20 characters at the table's own font size; the free-text column takes the
+ * remainder, which is the whole point (audit §3.4). */
+const SHORT_COLUMN_WIDTH = '140px';
+/** Longest rendered value that still counts as "short". Deliberately generous: a value that fits a
+ * 140px cell on one line is what this is trying to identify, not a strict character budget. */
+const SHORT_COLUMN_MAX_CHARS = 20;
 
 /**
  * Column-count budget (issue #8921's "no table may need a horizontal scrollbar" item): a
@@ -256,6 +263,36 @@ function isTimestampColumn(
   return sawValue;
 }
 
+/**
+ * True when every non-empty value in a column is a SHORT scalar — an id, an agent name, a category
+ * word. Same shape (and same "the whole column or nothing" rule) as `isTimestampColumn` above: one
+ * long value is enough to disqualify a column, because the point is to identify the columns that
+ * plainly do NOT need width so the one that does can have it.
+ *
+ * Arrays and objects are disqualifying regardless of length: `renderDefaultCell` joins/serializes
+ * them, so their rendered width is not their raw one.
+ */
+function isShortValueColumn(
+  rows: Array<Record<string, unknown>>,
+  field: string,
+): boolean {
+  let sawValue = false;
+  for (const row of rows) {
+    const value = row[field];
+    if (isAbsentValue(value)) {
+      continue;
+    }
+    if (typeof value === 'object') {
+      return false;
+    }
+    if (String(value).length > SHORT_COLUMN_MAX_CHARS) {
+      return false;
+    }
+    sawValue = true;
+  }
+  return sawValue;
+}
+
 function renderSeverityBadge(value: unknown): React.ReactNode {
   const word = String(value ?? '').toLowerCase();
   // Look up directly in SEVERITY_BUCKETS (the single source of truth for what's renderable)
@@ -265,10 +302,26 @@ function renderSeverityBadge(value: unknown): React.ReactNode {
   const bucket = SEVERITY_BUCKETS[word as SeverityLevel] as
     | { color: string; label: string }
     | undefined;
+  // `.wzSeverityChip` (result-table.scss) gives every severity the wzStatusChip SHAPE — fully round,
+  // 11px semibold — so a severity reads as the same kind of object as the provider status chips on
+  // the settings page instead of as EUI's 2px-radius rectangle (audit §3.5). The FILL is deliberately
+  // left as the platform's own `UI_COLOR_STATUS` hex (see SEVERITY_BUCKETS above), not swapped for
+  // wzStatusChip's tinted-EUI-role wash: that palette is a cross-product agreement, and two of the
+  // five roles ($euiColorWarning for high, $euiColorPrimary for medium) are not legible as 11px text
+  // over their own 12% tint, which is the failure wzStatusChip's `$textTint` argument exists for and
+  // which no `*Text` twin covers for a raw hex.
   if (!bucket) {
-    return <EuiBadge color='default'>{String(value ?? '')}</EuiBadge>;
+    return (
+      <EuiBadge className='wzSeverityChip' color='default'>
+        {String(value ?? '')}
+      </EuiBadge>
+    );
   }
-  return <EuiBadge color={bucket.color}>{bucket.label}</EuiBadge>;
+  return (
+    <EuiBadge className='wzSeverityChip' color={bucket.color}>
+      {bucket.label}
+    </EuiBadge>
+  );
 }
 
 /**
@@ -567,6 +620,17 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
         return {
           field: column.id,
           name: column.label,
+          // A column whose every value is short gets a matching short width, so the ONE free-text
+          // column in a findings table (the rule/finding title) inherits all the leftover room
+          // instead of the fixed layout dividing it evenly. The live audit (§3.4) measured the
+          // even split as three identical 324px slabs holding an agent name and a category each,
+          // while the title beside them wrapped onto three lines. Data-driven rather than keyed to
+          // field names: this renderer is generic (any tool's spec), so "how wide should this be"
+          // can only come from what the column actually holds — the same way the timestamp and
+          // severity cases above are detected rather than declared.
+          ...(isShortValueColumn(spec.rows, column.id)
+            ? { width: SHORT_COLUMN_WIDTH }
+            : {}),
           render: renderDefaultCell,
         };
       }),

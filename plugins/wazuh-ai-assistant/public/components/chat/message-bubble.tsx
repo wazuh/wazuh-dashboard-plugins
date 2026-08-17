@@ -304,21 +304,21 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   // reading queries. A second copy in the meta row was the same query at a lower abstraction
   // level, competing with the chips that answer the question people actually ask of an answer:
   // what did it look for?
-  // color="plain" keeps both avatars on the same neutral background, so the pair reads as one
-  // set instead of picking up EUI's auto-assigned per-name colors.
-  const avatar = isUser ? (
-    <EuiAvatar
-      size='m'
-      iconType='user'
-      color='plain'
-      name={i18n.translate('wazuhAiAssistant.chat.userAvatarName', {
-        defaultMessage: 'You',
-      })}
-    />
-  ) : (
-    // Initials, not an image: the Wazuh mark was dropped here because the app chrome already
-    // brands the page. `name` backs both the aria-label/title and the rendered initials, and
-    // initialsLength=2 keeps it as "AI" rather than EUI's default single-letter "A".
+  // ONE avatar per conversation, on the assistant side only.
+  //
+  // The user turn's own avatar is gone (audit §3.7): a 32px avatar plus its 12px gutter held the
+  // user bubble 16px in from the transcript's right edge, so the question's right edge and the
+  // composer's — the two things directly above one another on the surface — never lined up, on a
+  // screen whose whole premise is one shared alignment edge (rulebook D14/D22). It carried no
+  // information either: the bubble's own fill, border and right alignment already say "you said
+  // this", which is exactly how ChatGPT/Claude/Gemini render a user turn (rulebook F29). The
+  // assistant keeps its mark, because that side is undecorated prose and the avatar is the only
+  // thing marking where an answer begins.
+  //
+  // Initials, not an image: the Wazuh mark was dropped here because the app chrome already brands
+  // the page. `name` backs both the aria-label/title and the rendered initials, and
+  // initialsLength=2 keeps it as "AI" rather than EUI's default single-letter "A".
+  const avatar = (
     <EuiAvatar
       size='m'
       color='plain'
@@ -478,9 +478,12 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           paddingSize='m'
           hasShadow={false}
           hasBorder
-          // The one deliberate radius override on the surface: a conversation turn reads as a
-          // bubble, not as a data panel. Everything else uses EUI defaults (see chat-page.scss).
-          style={{ borderRadius: 14 }}
+          // Radius comes from `.euiPanel.wzUserBubble` (chat-page.scss), which folds this bubble
+          // onto the shared `$wzPanelRadius`. It used to be an inline `borderRadius: 14` with a
+          // comment claiming the rest of the surface "uses EUI defaults" — that was both a fifth
+          // radius invented for one element and a contradiction of the actual doctrine
+          // (_redesign.scss's "one container idiom, 12px"), which is the one that stands.
+          className='wzUserBubble'
         >
           {bubbleContent}
         </EuiPanel>
@@ -608,11 +611,11 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
       gutterSize='s'
       responsive={false}
     >
+      {/* No avatar item at all on the user side — see the `avatar` comment above. The bubble is
+          then the row's only child, so `justifyContent='flexEnd'` puts its right edge exactly where
+          the composer's own right edge is. */}
       {isUser ? (
-        <>
-          {bubble}
-          {avatarItem}
-        </>
+        bubble
       ) : (
         <>
           {avatarItem}

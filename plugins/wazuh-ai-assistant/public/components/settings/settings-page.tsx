@@ -182,7 +182,14 @@ const SectionCard: React.FC<{
     >
       {description && (
         <>
-          <EuiText size='s' color='subdued'>
+          {/* `.wzSettingsCard__description` caps the sentence at the prose measure. Without it the
+              description inherited the card's full 1150px (audit §4.3): the page measure exists for
+              the providers table, and a line of prose inside that page is not entitled to it. */}
+          <EuiText
+            size='s'
+            color='subdued'
+            className='wzSettingsCard__description'
+          >
             <p>{description}</p>
           </EuiText>
           <EuiSpacer size='m' />
@@ -370,6 +377,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   const hasEmptyFieldPolicyRow = fieldPolicyDraft.some(
     entry => entry.field.trim() === '',
   );
+  // Named once because the Save button now reads it TWICE — for `isDisabled` and for `fill`, which
+  // it drops while disabled (audit §4.4). Two copies of the same expression on one element is how
+  // the two would drift into disagreeing about which state the button is in.
+  const privacySaveDisabled = hasEmptyFieldPolicyRow || !privacy.isDirty;
   // Approximates EuiInMemoryTable's own (uncontrolled) default search — a case-insensitive
   // substring match against every column's own text — closely enough to know which rows "Test
   // all" should act on. Only used for that; the table keeps filtering itself independently.
@@ -828,7 +839,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   // Proportional (%) column widths, not fixed px, so no column carries a hard pixel floor that
   // could force a horizontal scrollbar between 1024 and 2560px of window width (layout contract
   // acceptance check; screen 3 gap: "Fixed pixel column widths"). Percentages sum to 100 across
-  // the whole set below (star 5 + name 15 + type 12 + endpoint 20 + model 15 + API key 9 +
+  // the whole set below (star 7 + name 13 + type 12 + endpoint 20 + model 15 + API key 9 +
   // status 14 + actions 6 + collapse 4), sized roughly to each column's own typical content.
   const columns: EuiBasicTableColumn<ProviderSummary>[] = [
     {
@@ -836,7 +847,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       name: i18n.translate('wazuhAiAssistant.settings.column.default', {
         defaultMessage: 'Default',
       }),
-      width: '5%',
+      // 7%, up from 5%: at 5% of the page's own 1200px cap this header rendered as "Defa…" — a
+      // truncated column heading, which is the one string in a table that cannot afford to be
+      // guessed at (audit §4.5). The two points come from Name below, the only other column with
+      // both a tooltip and truncation already in place.
+      width: '7%',
       align: 'center' as const,
       render: (isDefault: boolean, provider: ProviderSummary) => (
         <EuiButtonIcon
@@ -864,7 +879,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       name: i18n.translate('wazuhAiAssistant.settings.column.name', {
         defaultMessage: 'Name',
       }),
-      width: '15%',
+      // 13%: the two points the Default column above needed. This column already truncates with a
+      // `title` tooltip, so it is the one that can give them up without losing information.
+      width: '13%',
       truncateText: true,
       render: (name: string) => <span title={name}>{name}</span>,
     },
@@ -1137,6 +1154,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   return (
     <EuiPage className='wzSettingsPage'>
       <EuiPageBody>
+        {/* Page-title scale, decided (audit §6): this H1 keeps EuiPageHeader's own 28px. It is a
+            real page header with three sections under it, so it is the surface that needs the
+            largest step; the chat greeting deliberately stays at 24 as a hero on an otherwise
+            empty canvas rather than being pulled up to match (see chat-page.tsx's own note where
+            that greeting is defined). Two surfaces, two jobs, one deliberate difference — not the
+            drift the audit flagged. */}
         <EuiPageHeader
           pageTitle={i18n.translate('wazuhAiAssistant.settings.pageTitle', {
             defaultMessage: 'AI Assistant settings',
@@ -1246,7 +1269,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           )}
         </SectionCard>
 
-        <EuiSpacer size='xl' />
+        {/* `xxl` (40px), not `xl` (32): the pill straddling each card's top border
+            hangs 12px above the panel, so a 32px spacer between two cards read as
+            ~56px of separation above one card and 32 below the other — an uneven
+            gap where the rulebook (C16/A3) wants section separation to be one
+            deliberate step. 40 + the overhang lands on 64, the ladder's own
+            page-level separation value (audit §4.8). */}
+        <EuiSpacer size='xxl' />
 
         <SectionCard
           pillLabel={i18n.translate('wazuhAiAssistant.settings.privacy.title', {
@@ -1298,249 +1327,282 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 </>
               )}
 
-              <EuiFormRow>
-                <EuiSwitch
-                  label={i18n.translate(
-                    'wazuhAiAssistant.settings.privacy.defaultOnLabel',
-                    {
-                      defaultMessage: 'Enable privacy mode by default',
-                    },
-                  )}
-                  checked={privacyDraft.privacyDefaultOn}
-                  onChange={event => {
-                    privacy.setValue({
-                      ...privacyDraft,
-                      privacyDefaultOn: event.target.checked,
-                    });
-                  }}
-                />
-              </EuiFormRow>
-              <EuiSpacer size='s' />
-              <EuiFormRow>
-                <EuiSwitch
-                  label={i18n.translate(
-                    'wazuhAiAssistant.settings.privacy.userCanOverrideLabel',
-                    {
-                      defaultMessage:
-                        'Allow users to override privacy mode from the chat page',
-                    },
-                  )}
-                  checked={privacyDraft.userCanOverride}
-                  onChange={event => {
-                    privacy.setValue({
-                      ...privacyDraft,
-                      userCanOverride: event.target.checked,
-                    });
-                  }}
-                />
-              </EuiFormRow>
-
-              <EuiSpacer size='l' />
-              {/* The full explanation lives in the tooltip rather than inline: it is long enough
-                  to dominate the section, and it only matters the first time an admin configures
-                  a rule (or when one surprises them). */}
-              <EuiFlexGroup
-                gutterSize='xs'
-                alignItems='center'
-                responsive={false}
-              >
-                <EuiFlexItem grow={false}>
-                  <EuiText size='s'>
-                    <strong>
-                      {i18n.translate(
-                        'wazuhAiAssistant.settings.privacy.fieldPolicyTitle',
+              {/* Two columns inside the card (audit's layout recommendation for §4): the two
+                  switches on the left, the field-policy editor on the right. The void the audit
+                  measured had MOVED inside these cards once the page took its 1200px cap — a pair
+                  of ~300px switches alone in a 1150px row is the "abandoned whitespace" the
+                  rulebook (C11/C17) describes, and the field policy is genuinely independent
+                  content that earns the second column rather than padding invented to fill it.
+                  EUI's responsive default (no `responsive={false}` here) stacks the two below EUI's
+                  own breakpoint, which is the narrow-width behaviour we want and not a media query
+                  of our own. */}
+              <EuiFlexGroup gutterSize='xl'>
+                <EuiFlexItem>
+                  <EuiFormRow>
+                    <EuiSwitch
+                      label={i18n.translate(
+                        'wazuhAiAssistant.settings.privacy.defaultOnLabel',
                         {
-                          defaultMessage: 'Field policy',
+                          defaultMessage: 'Enable privacy mode by default',
                         },
                       )}
-                    </strong>
-                  </EuiText>
-                </EuiFlexItem>
-                <EuiFlexItem grow={false}>
-                  <EuiIconTip
-                    type='questionInCircle'
-                    color='subdued'
-                    content={i18n.translate(
-                      'wazuhAiAssistant.settings.privacy.fieldPolicyHelp',
-                      {
-                        defaultMessage:
-                          'What the AI provider gets per field: real value (Allow), pseudonym (Anonymize), or nothing (Never send).',
-                      },
-                    )}
-                  />
-                </EuiFlexItem>
-              </EuiFlexGroup>
-              <EuiSpacer size='s' />
-
-              {fieldPolicyDraft.length > 0 && (
-                <EuiAccordion
-                  id='field-policy-accordion'
-                  // Collapsed by default: the rule list is long (the curated defaults alone are
-                  // ~25 rows) and it is not what an admin comes to this section for — the two
-                  // privacy switches above it are. The button content carries the rule count, so
-                  // the section still reports its size without being expanded.
-                  buttonContent={i18n.translate(
-                    'wazuhAiAssistant.settings.privacy.fieldPolicyAccordion',
-                    {
-                      defaultMessage: 'Field rules ({count})',
-                      values: { count: fieldPolicyDraft.length },
-                    },
-                  )}
-                  paddingSize='s'
-                >
-                  <EuiFieldSearch
-                    compressed
-                    placeholder={i18n.translate(
-                      'wazuhAiAssistant.settings.privacy.filterFields',
-                      { defaultMessage: 'Filter fields' },
-                    )}
-                    value={fieldPolicyFilter}
-                    onChange={e => setFieldPolicyFilter(e.target.value)}
-                    isClearable
-                  />
+                      checked={privacyDraft.privacyDefaultOn}
+                      onChange={event => {
+                        privacy.setValue({
+                          ...privacyDraft,
+                          privacyDefaultOn: event.target.checked,
+                        });
+                      }}
+                    />
+                  </EuiFormRow>
                   <EuiSpacer size='s' />
+                  <EuiFormRow>
+                    <EuiSwitch
+                      label={i18n.translate(
+                        'wazuhAiAssistant.settings.privacy.userCanOverrideLabel',
+                        {
+                          defaultMessage:
+                            'Allow users to override privacy mode from the chat page',
+                        },
+                      )}
+                      checked={privacyDraft.userCanOverride}
+                      onChange={event => {
+                        privacy.setValue({
+                          ...privacyDraft,
+                          userCanOverride: event.target.checked,
+                        });
+                      }}
+                    />
+                  </EuiFormRow>
+                </EuiFlexItem>
+                <EuiFlexItem>
+                  {/* The full explanation lives in the tooltip rather than
+                      inline: it is long enough to dominate the section, and it
+                      only matters the first time an admin configures a rule (or
+                      when one surprises them). */}
                   <EuiFlexGroup
-                    gutterSize='s'
+                    gutterSize='xs'
                     alignItems='center'
                     responsive={false}
                   >
-                    <EuiFlexItem>
-                      <EuiText size='xs' color='subdued'>
+                    <EuiFlexItem grow={false}>
+                      <EuiText size='s'>
                         <strong>
                           {i18n.translate(
-                            'wazuhAiAssistant.settings.privacy.fieldColumnHeader',
+                            'wazuhAiAssistant.settings.privacy.fieldPolicyTitle',
                             {
-                              defaultMessage: 'Field',
+                              defaultMessage: 'Field policy',
                             },
                           )}
                         </strong>
                       </EuiText>
                     </EuiFlexItem>
-                    <EuiFlexItem grow={false} style={{ minWidth: 160 }}>
-                      <EuiText size='xs' color='subdued'>
-                        <strong>
-                          {i18n.translate(
-                            'wazuhAiAssistant.settings.privacy.actionColumnHeader',
-                            { defaultMessage: 'Action' },
-                          )}
-                        </strong>
-                      </EuiText>
+                    <EuiFlexItem grow={false}>
+                      <EuiIconTip
+                        type='questionInCircle'
+                        color='subdued'
+                        content={i18n.translate(
+                          'wazuhAiAssistant.settings.privacy.fieldPolicyHelp',
+                          {
+                            defaultMessage:
+                              'What the AI provider gets per field: real value (Allow), pseudonym (Anonymize), or nothing (Never send).',
+                          },
+                        )}
+                      />
                     </EuiFlexItem>
-                    <EuiFlexItem grow={false} style={{ width: 24 }} />
                   </EuiFlexGroup>
-                  <EuiSpacer size='xs' />
-                  {fieldPolicyDraft
-                    .map((entry, index) => ({ entry, index }))
-                    .filter(
-                      ({ entry }) =>
-                        !fieldPolicyFilter ||
-                        entry._isNew ||
-                        entry.field
-                          .toLowerCase()
-                          .includes(fieldPolicyFilter.toLowerCase()),
-                    )
-                    .map(({ entry, index }) => (
-                      <React.Fragment key={index}>
-                        <EuiFlexGroup
-                          gutterSize='s'
-                          alignItems='center'
-                          responsive={false}
-                        >
-                          <EuiFlexItem>
-                            <EuiFieldText
-                              fullWidth
-                              compressed
-                              placeholder={i18n.translate(
-                                'wazuhAiAssistant.settings.privacy.fieldPlaceholder',
-                                { defaultMessage: 'e.g. agent.name' },
+                  <EuiSpacer size='s' />
+
+                  {fieldPolicyDraft.length > 0 && (
+                    <EuiAccordion
+                      id='field-policy-accordion'
+                      // Collapsed by default: the rule list is long (the
+                      // curated defaults alone are ~25 rows) and it is not what
+                      // an admin comes to this section for — the two privacy
+                      // switches beside it are. The button content carries the
+                      // rule count, so the section still reports its size
+                      // without being expanded.
+                      buttonContent={i18n.translate(
+                        'wazuhAiAssistant.settings.privacy.fieldPolicyAccordion',
+                        {
+                          defaultMessage: 'Field rules ({count})',
+                          values: { count: fieldPolicyDraft.length },
+                        },
+                      )}
+                      paddingSize='s'
+                    >
+                      <EuiFieldSearch
+                        compressed
+                        placeholder={i18n.translate(
+                          'wazuhAiAssistant.settings.privacy.filterFields',
+                          { defaultMessage: 'Filter fields' },
+                        )}
+                        value={fieldPolicyFilter}
+                        onChange={e => setFieldPolicyFilter(e.target.value)}
+                        isClearable
+                      />
+                      <EuiSpacer size='s' />
+                      <EuiFlexGroup
+                        gutterSize='s'
+                        alignItems='center'
+                        responsive={false}
+                      >
+                        <EuiFlexItem>
+                          <EuiText size='xs' color='subdued'>
+                            <strong>
+                              {i18n.translate(
+                                'wazuhAiAssistant.settings.privacy.fieldColumnHeader',
+                                {
+                                  defaultMessage: 'Field',
+                                },
                               )}
-                              aria-label={i18n.translate(
-                                'wazuhAiAssistant.settings.privacy.fieldColumnLabel',
-                                { defaultMessage: 'Field' },
-                              )}
-                              value={entry.field}
-                              onChange={event =>
-                                handleFieldPolicyChange(index, {
-                                  field: event.target.value,
-                                })
-                              }
-                            />
-                          </EuiFlexItem>
-                          <EuiFlexItem grow={false} style={{ minWidth: 160 }}>
-                            <EuiSelect
-                              compressed
-                              aria-label={i18n.translate(
-                                'wazuhAiAssistant.settings.privacy.actionColumnLabel',
+                            </strong>
+                          </EuiText>
+                        </EuiFlexItem>
+                        <EuiFlexItem grow={false} style={{ minWidth: 160 }}>
+                          <EuiText size='xs' color='subdued'>
+                            <strong>
+                              {i18n.translate(
+                                'wazuhAiAssistant.settings.privacy.actionColumnHeader',
                                 { defaultMessage: 'Action' },
                               )}
-                              options={FIELD_POLICY_ACTIONS.map(action => ({
-                                value: action,
-                                text: FIELD_POLICY_ACTION_LABELS[action],
-                              }))}
-                              value={entry.action}
-                              onChange={event =>
-                                handleFieldPolicyChange(index, {
-                                  action: event.target
-                                    .value as FieldPolicyAction,
-                                })
-                              }
-                            />
-                          </EuiFlexItem>
-                          <EuiFlexItem grow={false}>
-                            <EuiButtonIcon
-                              iconType='trash'
-                              color='danger'
-                              aria-label={i18n.translate(
-                                'wazuhAiAssistant.settings.privacy.removeField',
-                                { defaultMessage: 'Remove field' },
-                              )}
-                              onClick={() => handleRemoveFieldPolicyRow(index)}
-                            />
-                          </EuiFlexItem>
-                        </EuiFlexGroup>
-                        <EuiSpacer size='xs' />
-                      </React.Fragment>
-                    ))}
-                  <EuiSpacer size='s' />
-                  <EuiButton
-                    size='s'
-                    iconType='plusInCircle'
-                    onClick={handleAddFieldPolicyRow}
-                  >
-                    {i18n.translate(
-                      'wazuhAiAssistant.settings.privacy.addField',
-                      {
-                        defaultMessage: 'Add field',
-                      },
-                    )}
-                  </EuiButton>
-                </EuiAccordion>
-              )}
+                            </strong>
+                          </EuiText>
+                        </EuiFlexItem>
+                        <EuiFlexItem grow={false} style={{ width: 24 }} />
+                      </EuiFlexGroup>
+                      <EuiSpacer size='xs' />
+                      {fieldPolicyDraft
+                        .map((entry, index) => ({ entry, index }))
+                        .filter(
+                          ({ entry }) =>
+                            !fieldPolicyFilter ||
+                            entry._isNew ||
+                            entry.field
+                              .toLowerCase()
+                              .includes(fieldPolicyFilter.toLowerCase()),
+                        )
+                        .map(({ entry, index }) => (
+                          <React.Fragment key={index}>
+                            <EuiFlexGroup
+                              gutterSize='s'
+                              alignItems='center'
+                              responsive={false}
+                            >
+                              <EuiFlexItem>
+                                <EuiFieldText
+                                  fullWidth
+                                  compressed
+                                  placeholder={i18n.translate(
+                                    'wazuhAiAssistant.settings.privacy.fieldPlaceholder',
+                                    { defaultMessage: 'e.g. agent.name' },
+                                  )}
+                                  aria-label={i18n.translate(
+                                    'wazuhAiAssistant.settings.privacy.fieldColumnLabel',
+                                    { defaultMessage: 'Field' },
+                                  )}
+                                  value={entry.field}
+                                  onChange={event =>
+                                    handleFieldPolicyChange(index, {
+                                      field: event.target.value,
+                                    })
+                                  }
+                                />
+                              </EuiFlexItem>
+                              <EuiFlexItem
+                                grow={false}
+                                style={{ minWidth: 160 }}
+                              >
+                                <EuiSelect
+                                  compressed
+                                  aria-label={i18n.translate(
+                                    'wazuhAiAssistant.settings.privacy.actionColumnLabel',
+                                    { defaultMessage: 'Action' },
+                                  )}
+                                  options={FIELD_POLICY_ACTIONS.map(action => ({
+                                    value: action,
+                                    text: FIELD_POLICY_ACTION_LABELS[action],
+                                  }))}
+                                  value={entry.action}
+                                  onChange={event =>
+                                    handleFieldPolicyChange(index, {
+                                      action: event.target
+                                        .value as FieldPolicyAction,
+                                    })
+                                  }
+                                />
+                              </EuiFlexItem>
+                              <EuiFlexItem grow={false}>
+                                <EuiButtonIcon
+                                  iconType='trash'
+                                  color='danger'
+                                  aria-label={i18n.translate(
+                                    'wazuhAiAssistant.settings.privacy.removeField',
+                                    { defaultMessage: 'Remove field' },
+                                  )}
+                                  onClick={() =>
+                                    handleRemoveFieldPolicyRow(index)
+                                  }
+                                />
+                              </EuiFlexItem>
+                            </EuiFlexGroup>
+                            <EuiSpacer size='xs' />
+                          </React.Fragment>
+                        ))}
+                      <EuiSpacer size='s' />
+                      <EuiButton
+                        size='s'
+                        iconType='plusInCircle'
+                        onClick={handleAddFieldPolicyRow}
+                      >
+                        {i18n.translate(
+                          'wazuhAiAssistant.settings.privacy.addField',
+                          {
+                            defaultMessage: 'Add field',
+                          },
+                        )}
+                      </EuiButton>
+                    </EuiAccordion>
+                  )}
 
-              {fieldPolicyDraft.length === 0 && (
-                <>
-                  <EuiSpacer size='s' />
-                  <EuiButton
-                    size='s'
-                    iconType='plusInCircle'
-                    onClick={handleAddFieldPolicyRow}
-                  >
-                    {i18n.translate(
-                      'wazuhAiAssistant.settings.privacy.addField',
-                      {
-                        defaultMessage: 'Add field',
-                      },
-                    )}
-                  </EuiButton>
-                </>
-              )}
+                  {fieldPolicyDraft.length === 0 && (
+                    <>
+                      <EuiSpacer size='s' />
+                      <EuiButton
+                        size='s'
+                        iconType='plusInCircle'
+                        onClick={handleAddFieldPolicyRow}
+                      >
+                        {i18n.translate(
+                          'wazuhAiAssistant.settings.privacy.addField',
+                          {
+                            defaultMessage: 'Add field',
+                          },
+                        )}
+                      </EuiButton>
+                    </>
+                  )}
+                </EuiFlexItem>
+              </EuiFlexGroup>
 
-              <EuiHorizontalRule margin='m' />
+              {/* `className` caps the rule at the content measure (settings-page.scss):
+                  a full-bleed 1150px hairline over one button read as a page
+                  divider rather than as this card's own footer (audit §4.4). */}
+              <EuiHorizontalRule
+                margin='m'
+                className='wzSettingsCard__actionsRule'
+              />
+              {/* `fill` only while the button can actually be pressed. A DISABLED
+                  filled button is EUI's darkest slab at ~2.2:1 against its own
+                  label — the audit (§4.4) measured the two disabled Saves as the
+                  heaviest objects on the whole page, i.e. maximum visual weight
+                  for the one state that has nothing to offer. Unfilled, a
+                  disabled Save reads as what it is: present, not yet available. */}
               <EuiButton
                 onClick={handleSavePrivacySettings}
                 isLoading={isSavingPrivacy}
-                isDisabled={hasEmptyFieldPolicyRow || !privacy.isDirty}
-                fill
+                isDisabled={privacySaveDisabled}
+                fill={!privacySaveDisabled}
               >
                 {i18n.translate('wazuhAiAssistant.settings.privacy.save', {
                   defaultMessage: 'Save privacy settings',
@@ -1550,7 +1612,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           )}
         </SectionCard>
 
-        <EuiSpacer size='xl' />
+        {/* `xxl` for the same reason as the spacer above the Privacy card. */}
+        <EuiSpacer size='xxl' />
 
         <SectionCard
           pillLabel={i18n.translate(
@@ -1604,39 +1667,67 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 </>
               )}
 
-              <EuiFormRow
-                label={i18n.translate(
-                  'wazuhAiAssistant.settings.retention.daysLabel',
-                  {
-                    defaultMessage: 'Keep saved conversations for (days)',
-                  },
-                )}
-                helpText={i18n.translate(
-                  'wazuhAiAssistant.settings.retention.daysHelp',
-                  {
-                    defaultMessage:
-                      '0 keeps every saved conversation forever. Enforcement runs on its own schedule, via an ISM policy on the underlying data stream.',
-                  },
-                )}
-              >
-                <EuiFieldNumber
-                  min={0}
-                  value={retention.value}
-                  onChange={event => {
-                    const parsed = Number(event.target.value);
-                    retention.setValue(
-                      Number.isNaN(parsed) ? 0 : Math.max(0, parsed),
-                    );
-                  }}
-                />
-              </EuiFormRow>
+              {/* Input left, its explanation right (audit's §4 layout
+                  recommendation). A 327px number field alone in a 1150px row was
+                  the clearest case of the void having moved INSIDE the cards once
+                  the page took its 1200px cap, and the help text is the natural
+                  occupant: it is what the admin reads while deciding the number.
+                  Moved out of the row's `helpText` slot for that reason — in the
+                  slot it can only ever render under the field. EUI's responsive
+                  default stacks the two on a narrow window, help below input,
+                  which is the same reading order. */}
+              <EuiFlexGroup gutterSize='xl'>
+                <EuiFlexItem>
+                  <EuiFormRow
+                    label={i18n.translate(
+                      'wazuhAiAssistant.settings.retention.daysLabel',
+                      {
+                        defaultMessage: 'Keep saved conversations for (days)',
+                      },
+                    )}
+                  >
+                    <EuiFieldNumber
+                      min={0}
+                      value={retention.value}
+                      onChange={event => {
+                        const parsed = Number(event.target.value);
+                        retention.setValue(
+                          Number.isNaN(parsed) ? 0 : Math.max(0, parsed),
+                        );
+                      }}
+                    />
+                  </EuiFormRow>
+                </EuiFlexItem>
+                <EuiFlexItem>
+                  {/* Not a third text scale: `.wzSettingsCard__fieldHelp`
+                      (settings-page.scss) restates EUI's own `.euiFormHelpText`
+                      values, exactly as `.wzProviderFlyout__help` does in the
+                      flyout — so a sentence that left the `helpText` slot keeps
+                      the typography that slot gave it. */}
+                  <div className='wzSettingsCard__fieldHelp'>
+                    {i18n.translate(
+                      'wazuhAiAssistant.settings.retention.daysHelp',
+                      {
+                        defaultMessage:
+                          '0 keeps every saved conversation forever. Enforcement runs on its own schedule, via an ISM policy on the underlying data stream.',
+                      },
+                    )}
+                  </div>
+                </EuiFlexItem>
+              </EuiFlexGroup>
 
-              <EuiHorizontalRule margin='m' />
+              {/* Same two fixes as the Privacy card's own footer above (audit §4.4):
+                  the rule stops at the content measure, and `fill` comes off
+                  while the button is disabled. */}
+              <EuiHorizontalRule
+                margin='m'
+                className='wzSettingsCard__actionsRule'
+              />
               <EuiButton
                 onClick={handleSaveRetentionSettings}
                 isLoading={isSavingRetention}
                 isDisabled={!retention.isDirty}
-                fill
+                fill={retention.isDirty}
               >
                 {i18n.translate('wazuhAiAssistant.settings.retention.save', {
                   defaultMessage: 'Save conversation history settings',

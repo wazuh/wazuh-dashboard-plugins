@@ -422,9 +422,10 @@ const GETTING_STARTED_STEPS: string[] = [
 ];
 
 /**
- * The form's ONE example-value chip. Three render sites (endpoint examples, model examples,
- * per-vendor model suggestions) each carried their own copy of the same inline `EuiBadge`, which is
- * how they drifted apart in the first place.
+ * The form's ONE example-value chip. Four inline `EuiBadge` copies used to render this same idiom
+ * across the form, which is how they drifted apart in the first place; TWO render sites are left
+ * (the endpoint field's examples and the per-vendor model suggestions) now that the Model field's
+ * generic per-type examples row is gone.
  *
  * Every value it ever shows is a URL or a model id, so it is set in the code face: the chip has to
  * read as a value you can click into the field, not as a label describing one. Clicking fills the
@@ -594,18 +595,14 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
     form.baseUrl,
     form.type,
   );
-  // The "Suggested models:" chip row must not repeat an id already shown under "Examples:" above
-  // — PROVIDER_MODEL_GUIDANCE (curated per-type examples) and VENDOR_MODEL_SUGGESTIONS (curated
-  // per-endpoint suggestions) are maintained independently and can legitimately list the same
-  // model id (e.g. Anthropic's claude-opus-4-8/claude-haiku-4-5 appear in both tables), which used
-  // to render the same chip twice under two different labels. An id that only ONE of the two
-  // tables carries (e.g. claude-sonnet-5, vendor-only) is kept here untouched.
-  const suggestedModelChips = vendorModelSuggestions.filter(
-    model => !modelGuidance.examples.includes(model),
-  );
-  // Feeds the Model EuiComboBox's dropdown `options` — deliberately the RAW (non-deduplicated)
-  // vendor list: the Examples chips below are a separate, always-typeable affordance and are not
-  // part of this dropdown, so there is nothing for them to collide with here.
+  // Feeds both the "Suggested models:" chips and the Model EuiComboBox's dropdown `options`.
+  //
+  // No deduplication any more: this list used to be filtered against `modelGuidance.examples`,
+  // because an id curated in BOTH tables (Anthropic's claude-opus-4-8 is in each) rendered as two
+  // identical chips under two different headings. With the generic "Examples:" row gone (see the
+  // Model field below) there is nothing left to collide with — and keeping the filter would now do
+  // real damage, silently hiding the vendor's own primary model from the only list that still
+  // offers it.
   const modelOptions = vendorModelSuggestions.map(model => ({ label: model }));
   const selectedModelOption = form.model ? [{ label: form.model }] : [];
 
@@ -722,6 +719,13 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
       <EuiFlyout
         onClose={requestClose}
         size='m'
+        // 640px on top of `size='m'` (audit §5.1). `m` resolved to 960px in this build while the
+        // form inside it was 400 wide — EUI caps a form control at 400px — so the flyout's right
+        // half was 500px of nothing, on the one surface the audit called genuinely too empty. The
+        // column below is now a single tight stack and everything in it terminates on the same
+        // edge; `size` stays as the smaller-viewport behaviour (`maxWidth` is a cap, not a width).
+        maxWidth={640}
+        className='wzProviderFlyoutPanel'
         aria-labelledby='wz-ai-provider-flyout-title'
       >
         <EuiFlyoutHeader hasBorder>
@@ -856,14 +860,23 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                       checkableType='radio'
                       checked={form.type === type}
                       onChange={() => handleTypeChange(type)}
-                    />
+                    >
+                      {/* The type's description lives INSIDE its own card (audit §5.6). It used to
+                          sit full-width underneath BOTH cards while describing only the selected
+                          one, so the sentence "for hosted services such as OpenAI..." appeared to
+                          belong to whichever card the eye happened to be on. Rendered only for the
+                          selected type — an unselected card is a choice, not a comparison table,
+                          and EuiFlexGroup stretches both items to the taller one's height so the
+                          pair stays level (rulebook D21). */}
+                      {form.type === type && (
+                        <EuiText size='s' color='subdued'>
+                          <p>{PROVIDER_TYPE_DESCRIPTIONS[type]}</p>
+                        </EuiText>
+                      )}
+                    </EuiCheckableCard>
                   </EuiFlexItem>
                 ))}
               </EuiFlexGroup>
-              <EuiSpacer size='s' />
-              <EuiText size='s' color='subdued'>
-                <p>{PROVIDER_TYPE_DESCRIPTIONS[form.type]}</p>
-              </EuiText>
             </EuiFormFieldset>
 
             <EuiFormFieldset
@@ -875,7 +888,17 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 ),
               }}
             >
-              <EuiFlexGroup gutterSize='m' responsive={false}>
+              {/* One COLUMN, not two (audit §5.1): the API key field follows Name in the flow
+                  instead of sitting beside it. Side by side, each field was half of a control EUI
+                  already caps at 400px, and the API key's two-paragraph help text sat level with
+                  the Name field's blank space — the shape that produced a 960px flyout holding a
+                  400px form. `direction='column'` rather than unwrapping the group entirely so the
+                  two rows keep one owner for the gap between them. */}
+              <EuiFlexGroup
+                direction='column'
+                gutterSize='m'
+                responsive={false}
+              >
                 <EuiFlexItem>
                   <EuiFormRow
                     id='wz-ai-provider-name'
@@ -1074,63 +1097,32 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     )}
                   />
                 }
+                // No generic "Examples:" chip row here any more (Miguel + UX decision, recorded in
+                // the audit's own "additional decided items"): the two ids it offered were
+                // Bedrock-gateway model names, i.e. valid for exactly one of the many services this
+                // provider type covers, and they were shown on every endpoint — including one whose
+                // own vendor suggestions were listed 20px below under a second heading. What
+                // remains is everything that is actually keyed to the admin's endpoint: the combo
+                // box's own suggestions, the "Suggested models:" chips, and the vendor's model list
+                // behind the link below. The endpoint field keeps its examples, because there an
+                // example is the fastest way to recognise the shape of the value being asked for.
                 helpText={
-                  <>
-                    {/* Plain element on purpose — see the endpoint field's label above. */}
-                    <div id='wz-ai-provider-model-examples-label'>
-                      <FormattedMessage
-                        id='wazuhAiAssistant.settings.form.modelExample'
-                        defaultMessage='{header}:'
-                        values={{
-                          header:
-                            modelGuidance.examples.length > 1
-                              ? 'Examples'
-                              : 'Example',
-                        }}
-                      />
-                    </div>
-                    <EuiSpacer size='xs' />
-                    <EuiFlexGroup
-                      wrap
-                      gutterSize='xs'
-                      responsive={false}
-                      role='group'
-                      aria-labelledby='wz-ai-provider-model-examples-label'
-                    >
-                      {modelGuidance.examples.map(example => (
-                        <EuiFlexItem grow={false} key={example}>
-                          <ExampleChip
-                            value={example}
-                            onSelect={fillModel}
-                            onClickAriaLabel={i18n.translate(
-                              'wazuhAiAssistant.settings.form.modelExampleAriaLabel',
-                              {
-                                defaultMessage: 'Use model {example}',
-                                values: { example },
-                              },
-                            )}
-                          />
-                        </EuiFlexItem>
-                      ))}
-                    </EuiFlexGroup>
-                    <EuiSpacer size='xs' />
-                    <DocsPopover
-                      triggerLabel={i18n.translate(
-                        'wazuhAiAssistant.settings.form.modelDocsButton',
-                        {
-                          defaultMessage: 'See available models',
-                        },
-                      )}
-                      title={i18n.translate(
-                        'wazuhAiAssistant.settings.form.modelDocsTitle',
-                        {
-                          defaultMessage: 'Model documentation',
-                        },
-                      )}
-                      docs={modelGuidance.docs}
-                      note={modelGuidance.note}
-                    />
-                  </>
+                  <DocsPopover
+                    triggerLabel={i18n.translate(
+                      'wazuhAiAssistant.settings.form.modelDocsButton',
+                      {
+                        defaultMessage: 'See available models',
+                      },
+                    )}
+                    title={i18n.translate(
+                      'wazuhAiAssistant.settings.form.modelDocsTitle',
+                      {
+                        defaultMessage: 'Model documentation',
+                      },
+                    )}
+                    docs={modelGuidance.docs}
+                    note={modelGuidance.note}
+                  />
                 }
               >
                 <EuiComboBox
@@ -1170,10 +1162,10 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                   vendor — clicking a chip fills the model (still freely re-typeable in the
                   EuiComboBox above). Kept outside the EuiFormRow above for the same reason as the
                   API key shape warning: EuiFormRow clones its single child to inject a11y props,
-                  so it cannot take a sibling. Deduplicated against the "Examples:" chips above
-                  (`suggestedModelChips`, not the raw `vendorModelSuggestions`) so an id shared by
-                  both curated lists (e.g. Anthropic's claude-opus-4-8) isn't rendered twice. */}
-              {suggestedModelChips.length > 0 && (
+                  so it cannot take a sibling. These are now the field's ONLY chips (the generic
+                  per-type "Examples:" row is gone), so the list is used raw — see
+                  `modelOptions` above for why the dedupe went with it. */}
+              {vendorModelSuggestions.length > 0 && (
                 <>
                   <EuiSpacer size='xs' />
                   {/* This block sits OUTSIDE the EuiFormRow above (see the comment there), so it
@@ -1197,7 +1189,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     role='group'
                     aria-labelledby='wz-ai-provider-model-suggestions-label'
                   >
-                    {suggestedModelChips.map(suggestedModel => (
+                    {vendorModelSuggestions.map(suggestedModel => (
                       <EuiFlexItem key={suggestedModel} grow={false}>
                         <ExampleChip
                           value={suggestedModel}

@@ -75,6 +75,44 @@
   flex-shrink: 0;
 }
 
+/**
+ * Column heads take the redesign's own micro-label idiom — the one `wzMicroLabel`
+ * (public/components/_redesign.scss) documents as being FOR "section headers and table column
+ * heads", and which every table in this plugin was nevertheless ignoring (audit §3.6): they rendered
+ * at body size and weight, so a header row read as another data row.
+ *
+ * The inner `font: inherit` is the same mechanism `.wzProviderFlyout__exampleChip` uses on its
+ * `<code>`: EUI puts the text in its own `.euiTableCellContent__text` span with its own size/weight,
+ * so the span has to be told to inherit or the `th`'s declarations never reach the glyphs.
+ */
+.wzResultsCard .euiTableHeaderCell {
+  @include wzMicroLabel;
+
+  .euiTableCellContent__text {
+    font: inherit;
+    color: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+  }
+}
+
+/**
+ * Severity chip. Takes the SHAPE of the `wzStatusChip` idiom the rest of the redesign uses (fully
+ * round, 11px semibold, no border) so a severity is visibly the same class of object as a provider
+ * status chip, instead of EUI's default 2px-radius rectangle (audit §3.5).
+ *
+ * Only the shape: the FILL stays the solid platform severity color result-table.tsx passes in — see
+ * the comment at `renderSeverityBadge` for why the tinted-role half of `wzStatusChip` is deliberately
+ * NOT adopted here. Qualified with `.euiBadge` for the specificity reason
+ * `.euiBadge.wzStatusChip` (settings-page.scss) documents at length.
+ */
+.euiBadge.wzSeverityChip {
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  border: none;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .wzResultsCardToggle {
     transition: background-color $wzMotionFast $wzEase;

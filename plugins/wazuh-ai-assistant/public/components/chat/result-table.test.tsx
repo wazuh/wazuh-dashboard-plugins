@@ -381,6 +381,31 @@ describe('ResultTable', () => {
       expect(screen.getByText('Critical')).toBeInTheDocument();
     });
 
+    it('shapes every severity like the other status chips, keeping the platform fill', () => {
+      // §3.5: the badge was EUI's default 2px-radius rectangle while every other state-carrying chip
+      // in this plugin (the provider status chips) is a round 11px pill — two idioms for one job.
+      // `.wzSeverityChip` (result-table.scss) adopts the SHAPE only; the fill stays the platform's
+      // own UI_COLOR_STATUS hex, which is a cross-product agreement and, unlike an EUI role color,
+      // has no darkened text twin to stay legible over a 12% wash.
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'agent', label: 'Agent' },
+              { id: 'severity', label: 'Severity' },
+            ],
+            rows: [{ agent: 'a', severity: 'critical' }],
+            severityColumn: 'severity',
+          })}
+        />,
+      );
+
+      const badge = screen.getByText('Critical').closest('.euiBadge');
+      expect(badge).toHaveClass('wzSeverityChip');
+      // Still a real fill, not a hollow outline — the guard the palette decision already carries.
+      expect((badge as HTMLElement).style.backgroundColor).not.toBe('');
+    });
+
     it('renders the "informational" severity (below low, not one of the 4 badge colors) with its own label', () => {
       render(
         <ResultTable
@@ -596,6 +621,67 @@ describe('ResultTable', () => {
     it('adds no hidden-columns note when the spec has 6 or fewer columns', () => {
       render(<ResultTable spec={spec()} />);
       expect(screen.getByText('Results (1 rows)')).toBeInTheDocument();
+    });
+  });
+
+  describe('column widths (css-audit-full.md §3.4: the free-text column gets the room)', () => {
+    /**
+     * EuiBasicTable lays the table out with `table-layout: fixed`, so a column with no width shares
+     * the remainder evenly with its peers — which the live audit measured as three identical 324px
+     * slabs holding an agent name and a category each, beside a finding title wrapping onto three
+     * lines. Columns whose every value is SHORT now declare a matching short width, leaving the
+     * remainder to the one column that actually needs it. Data-driven, because this renderer is
+     * generic: only the values can say how wide a column should be.
+     *
+     * jsdom computes no layout, so what is asserted is the declared `width` attribute EUI puts on
+     * the `<col>`/`<th>` — i.e. that the renderer classified each column correctly.
+     */
+    const headerWidths = () =>
+      screen
+        .getAllByRole('columnheader')
+        .map(header => (header as HTMLElement).style.width);
+
+    it('gives short-value columns a fixed width and leaves the long one unset', () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'agent', label: 'Agent' },
+              { id: 'title', label: 'Title' },
+            ],
+            rows: [
+              {
+                agent: 'web-01',
+                title:
+                  'Multiple authentication failures followed by a successful login',
+              },
+            ],
+          })}
+        />,
+      );
+
+      const [agentWidth, titleWidth] = headerWidths();
+      expect(agentWidth).toBe('140px');
+      // Unset, so the fixed layout hands it everything the sized columns did not take.
+      expect(titleWidth).toBe('');
+    });
+
+    it('treats a column as long as soon as ONE of its values is long', () => {
+      // Same "the whole column or nothing" rule the timestamp detection uses: a column that is
+      // mostly short but sometimes long must not be capped at a width its longest value overflows.
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'note', label: 'Note' }],
+            rows: [
+              { note: 'short' },
+              { note: 'a value comfortably past the twenty-character budget' },
+            ],
+          })}
+        />,
+      );
+
+      expect(headerWidths()[0]).toBe('');
     });
   });
 

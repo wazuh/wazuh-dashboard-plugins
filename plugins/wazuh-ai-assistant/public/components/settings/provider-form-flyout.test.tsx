@@ -1,3 +1,5 @@
+import path from 'path';
+import fs from 'fs';
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -538,15 +540,17 @@ describe('ProviderFormFlyout — getting-started onboarding', () => {
 });
 
 describe('ProviderFormFlyout — one type scale for field guidance', () => {
-  it('renders the in-slot examples labels through EUI help text, not an ad-hoc EuiText size', () => {
+  it('renders the in-slot examples label through EUI help text, not an ad-hoc EuiText size', () => {
     // Three uncoordinated mechanisms used to produce "small text" on this form: EuiText size='s',
     // raw elements in an EuiFormRow helpText slot, and EuiText size='xs'. The xs variant is gone —
-    // both "Examples:" labels are plain elements inside the helpText slot, so they take
-    // .euiFormHelpText and cannot drift from the API key field's help beside them.
+    // the "Examples:" label is a plain element inside the helpText slot, so it takes
+    // .euiFormHelpText and cannot drift from the API key field's help beside it.
     render(<ProviderFormFlyout {...baseProps} />);
 
+    // ONE label, the endpoint field's: the Model field's own generic examples row was removed
+    // (see the Model-field describe below).
     const labels = screen.getAllByText(/^Examples:$/);
-    expect(labels).toHaveLength(2);
+    expect(labels).toHaveLength(1);
     for (const label of labels) {
       expect(label.closest('.euiFormHelpText')).not.toBeNull();
       expect(label.closest('.euiText--extraSmall')).toBeNull();
@@ -582,17 +586,15 @@ describe('ProviderFormFlyout — example value chips', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
     const chips = exampleChips();
-    // Four endpoint examples plus two model examples for the default openai_compatible type; no
-    // vendor suggestions yet, because the endpoint URL is still empty.
-    expect(chips).toHaveLength(6);
+    // The four endpoint examples for the default openai_compatible type, and nothing else: the
+    // Model field's generic per-type examples are gone, and no vendor suggestions have appeared yet
+    // because the endpoint URL is still empty.
+    expect(chips).toHaveLength(4);
     for (const chip of chips) {
       expect(chip.querySelector('code')).not.toBeNull();
     }
     expect(chips.map(chip => chip.querySelector('code')?.textContent)).toEqual(
-      expect.arrayContaining([
-        'https://api.openai.com/v1',
-        'openai.gpt-oss-120b',
-      ]),
+      expect.arrayContaining(['https://api.openai.com/v1']),
     );
   });
 
@@ -610,16 +612,44 @@ describe('ProviderFormFlyout — example value chips', () => {
     );
   });
 
-  it('still fills the model field when an example chip is clicked', () => {
+  it('still fills the model field when a suggestion chip is clicked', () => {
+    // The Model field's chips are now exclusively the endpoint's own vendor suggestions (the generic
+    // per-type "Examples:" row was removed), so this goes through the endpoint to reach them.
     render(<ProviderFormFlyout {...baseProps} />);
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://api.openai.com/v1' },
+    });
 
     const chip = screen
-      .getAllByText('mistral.mistral-large-3-675b-instruct')
+      .getAllByText('gpt-4o-mini')
       .find(node => node.closest('.wzProviderFlyout__exampleChip'));
     expect(chip).toBeDefined();
     fireEvent.click(chip as HTMLElement);
 
-    expect(selectedModel()).toBe('mistral.mistral-large-3-675b-instruct');
+    expect(selectedModel()).toBe('gpt-4o-mini');
+  });
+
+  it('offers no generic per-type model example chips under the Model field', () => {
+    // Decided with Miguel alongside the CSS audit: the two ids that row offered
+    // (openai.gpt-oss-120b, mistral.mistral-large-3-675b-instruct) are Bedrock-gateway model names
+    // shown on EVERY openai_compatible endpoint — including endpoints whose own curated suggestions
+    // were listed 20px below under a second heading. Everything keyed to the admin's actual
+    // endpoint stays: the combo box options, the "Suggested models:" chips and the docs link.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    // The row's own label element is gone with it, which is the cheapest structural proof.
+    expect(
+      document.getElementById('wz-ai-provider-model-examples-label'),
+    ).toBeNull();
+    expect(screen.queryByLabelText('Use model openai.gpt-oss-120b')).toBeNull();
+    expect(
+      screen.queryByLabelText(
+        'Use model mistral.mistral-large-3-675b-instruct',
+      ),
+    ).toBeNull();
+    expect(
+      screen.getByRole('button', { name: /^see available models$/i }),
+    ).toBeInTheDocument();
   });
 
   it('keeps a click aria-label on every chip (EUI requires one for a clickable badge)', () => {
@@ -631,9 +661,12 @@ describe('ProviderFormFlyout — example value chips', () => {
     expect(
       screen.getByLabelText('Use endpoint https://api.openai.com/v1'),
     ).toBeInTheDocument();
-    expect(
-      screen.getByLabelText('Use model openai.gpt-oss-120b'),
-    ).toBeInTheDocument();
+
+    // The model-side chips are the endpoint's vendor suggestions now, so they need an endpoint.
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://api.openai.com/v1' },
+    });
+    expect(screen.getByLabelText('Use model gpt-4o-mini')).toBeInTheDocument();
   });
 
   it('names the tool-calling example as plain inline code, not as a fillable chip', () => {
@@ -670,30 +703,25 @@ describe('ProviderFormFlyout — model help text does not recommend retiring mod
     );
   });
 
-  it('does not offer llama-3.3-70b-versatile as a model example chip', () => {
+  it('does not offer llama-3.3-70b-versatile anywhere on the form', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
     expect(
       screen.queryByText(/^llama-3\.3-70b-versatile$/),
     ).not.toBeInTheDocument();
-    // Anchored to the CHIP specifically — it renders inside the examples' own role="group" row.
-    const chips = screen
-      .getAllByText(/^openai\.gpt-oss-120b$/)
-      .filter(node => node.closest('[role="group"]'));
-    expect(chips.length).toBeGreaterThan(0);
+    // The per-type example the tool-calling callout NAMES is still the type's own first curated
+    // model — that list did not go away, only its chip row under the Model field did, so this is
+    // now the one place the id appears and it is prose rather than a fillable chip.
+    const named = screen.getAllByText(/^openai\.gpt-oss-120b$/);
+    expect(named).toHaveLength(1);
+    expect(named[0].closest('.euiCallOut')).not.toBeNull();
+    expect(named[0].closest('[role="group"]')).toBeNull();
   });
 });
 
 describe('ProviderFormFlyout — Model field guidance', () => {
-  it('shows OpenAI-compatible model examples and one docs link per covered service by default', async () => {
+  it('shows one model docs link per covered service by default', async () => {
     render(<ProviderFormFlyout {...baseProps} />);
-
-    // Anchored to the example CHIP's own <code>.
-    expect(
-      screen
-        .getAllByText(/^mistral\.mistral-large-3-675b-instruct$/i)
-        .filter(node => node.closest('[role="group"]')).length,
-    ).toBeGreaterThan(0);
 
     fireEvent.click(
       screen.getByRole('button', { name: /^see available models$/i }),
@@ -713,7 +741,7 @@ describe('ProviderFormFlyout — Model field guidance', () => {
     ).toBeInTheDocument();
   });
 
-  it('switches to Anthropic model examples and docs link when the provider type changes', async () => {
+  it('switches to Anthropic model suggestions and docs link when the provider type changes', async () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
     fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
@@ -723,8 +751,11 @@ describe('ProviderFormFlyout — Model field guidance', () => {
       target: { value: 'https://api.anthropic.com' },
     });
 
-    // Anchored to the example CHIP's own <code>: an unanchored getByText would match both the
-    // chip and the plain-text model example rendered elsewhere on the form.
+    // Anchored to the CHIP's own <code>: an unanchored getByText would match both the chip and the
+    // plain-text model example the tool-calling callout names. The chip is a vendor suggestion now
+    // (the generic per-type examples row is gone) — and claude-opus-4-8 reaching it at all is the
+    // point: it is in BOTH curated lists, and the dedupe that used to hide it here went with the
+    // row it was deduplicating against.
     expect(
       screen
         .getAllByText(/^claude-opus-4-8$/i)
@@ -931,7 +962,7 @@ describe('ProviderFormFlyout — Model field is an editable EuiComboBox', () => 
     expect(selectedModel()).toBe('my-custom-fine-tune');
   });
 
-  it('does not render the same model id under both "Examples:" and "Suggested models:"', () => {
+  it('lists each suggested model once, including the ids the old dedupe used to hide', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
     fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
@@ -939,16 +970,129 @@ describe('ProviderFormFlyout — Model field is an editable EuiComboBox', () => 
       target: { value: 'https://api.anthropic.com' },
     });
 
-    // claude-opus-4-8 is listed in both PROVIDER_MODEL_GUIDANCE (examples) and
-    // VENDOR_MODEL_SUGGESTIONS (suggested models) for this endpoint — it must render once across
-    // the two LISTS. The tool-calling callout names the same model as its inline example and is
-    // excluded deliberately: the invariant here is "the two lists do not repeat each other", not
-    // "this string appears once on the form". Prose naming a model a list also offers is normal.
-    const inTheLists = screen
+    // claude-opus-4-8 is listed in both PROVIDER_MODEL_GUIDANCE and VENDOR_MODEL_SUGGESTIONS, and
+    // it used to be filtered OUT of the suggestions because the Model field also showed a generic
+    // examples row carrying it. That row is gone, so the filter is gone with it — dropping the
+    // vendor's own primary model from the only list still offering it would have been the real
+    // regression. The tool-calling callout names the same id in prose and is excluded here: the
+    // invariant is about the LIST, not about the string appearing once on the form.
+    const inTheList = screen
       .getAllByText('claude-opus-4-8')
       .filter(node => !node.closest('.euiCallOut'));
-    expect(inTheLists).toHaveLength(1);
-    // claude-sonnet-5 only exists in the vendor suggestion list — the dedupe must not drop it.
+    expect(inTheList).toHaveLength(1);
+    // ...and an id only the vendor list carries is still there beside it.
     expect(screen.getByText('claude-sonnet-5')).toBeInTheDocument();
+  });
+});
+
+/**
+ * The live CSS audit (AI/ux-iter3/css-audit-full.md §5) called this flyout "the ONE genuinely
+ * too-empty surface in the build": a 960px panel holding a 400px form, i.e. 500px of nothing beside
+ * every field. These pin the shape that replaced it, plus the two idioms the audit found competing
+ * inside it.
+ */
+describe('ProviderFormFlyout — one tight column (audit §5)', () => {
+  it('caps the panel at a reading-width column', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    const flyout = document.querySelector('.euiFlyout') as HTMLElement;
+    expect(flyout).not.toBeNull();
+    // `size='m'` stays as the smaller-viewport behaviour; the cap is what stops a 960px panel from
+    // pairing with EUI's own 400px form-control ceiling.
+    expect(flyout.style.maxWidth).toBe('640px');
+  });
+
+  it('stacks Name and API key in one column instead of two', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    const nameGroup = screen
+      .getByLabelText(/^name/i)
+      .closest('.euiFlexGroup') as HTMLElement;
+    const keyGroup = screen
+      .getByLabelText(/^api key$/i)
+      .closest('.euiFlexGroup') as HTMLElement;
+    // Same group, and that group runs down the page: the API key field follows Name in the flow, so
+    // each field is read together with its own help text instead of level with the other's.
+    expect(nameGroup).toBe(keyGroup);
+    expect(nameGroup.className).toMatch(/directionColumn/i);
+  });
+
+  it('describes the selected provider type inside its own card', () => {
+    // §5.6: the description used to sit full-width UNDER both cards while describing only the
+    // selected one, so it appeared to belong to whichever card the eye was on.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    const description = screen.getByText(/any endpoint that exposes/i);
+    const card = description.closest('.euiCheckableCard') as HTMLElement;
+    expect(card).not.toBeNull();
+    expect(card.textContent).toContain('OpenAI-compatible');
+
+    // Switching type moves the description with the selection.
+    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
+    expect(screen.queryByText(/any endpoint that exposes/i)).toBeNull();
+    const anthropicDescription = screen.getByText(/Anthropic's own API/i);
+    expect(
+      anthropicDescription.closest('.euiCheckableCard')?.textContent,
+    ).toContain('Anthropic (Claude)');
+  });
+
+  it('keeps the getting-started callout, restyled rather than deleted', () => {
+    // The audit recommended DELETING this block (it restates the numbered group legends 20px
+    // below); the CEO's instruction is that it stays, so §5.3 lands as presentation only. The copy
+    // is unchanged — see the getting-started describe above for the list itself.
+    render(<ProviderFormFlyout {...baseProps} />);
+    expect(screen.getByText(/getting started/i)).toBeInTheDocument();
+
+    const scss = fs.readFileSync(
+      path.join(__dirname, 'provider-form-flyout.scss'),
+      'utf8',
+    );
+    // Callouts get the small radius and a 12/16 inset instead of EUI's square, 8px-padded banner,
+    // qualified through the flyout's own class so bundle order cannot decide it (§5.7).
+    expect(scss).toMatch(
+      /\.wzProviderFlyoutPanel \.euiCallOut \{[^}]*border-radius: 4px;[^}]*padding: 12px 16px/,
+    );
+    // The steps list is aligned with the callout's TITLE, not with its icon (§5.3).
+    expect(scss).toMatch(
+      /\.wzProviderFlyout__steps \{[^}]*margin-inline-start: \$euiSize \+ \$euiSizeS/,
+    );
+    expect(scss).toMatch(
+      /\.wzProviderFlyout__steps \{[^}]*list-style-position: inside/,
+    );
+  });
+
+  it('sets the group legends in the section idiom, not the field-label spec', () => {
+    // §5.2: legends rendered at 12px/500 in the full text color, which is EXACTLY a field label —
+    // so a group heading was indistinguishable from the labels inside the group it heads.
+    const scss = fs.readFileSync(
+      path.join(__dirname, 'provider-form-flyout.scss'),
+      'utf8',
+    );
+    expect(scss).toMatch(
+      /\.wzProviderFlyout__group legend \{[^}]*@include wzMicroLabel/,
+    );
+  });
+
+  it('bounds an example chip to its own column', () => {
+    // §5.4: the widest endpoint example measured 396px inside a 400px column and overflowed it.
+    const scss = fs.readFileSync(
+      path.join(__dirname, 'provider-form-flyout.scss'),
+      'utf8',
+    );
+    expect(scss).toMatch(
+      /\.wzProviderFlyout__exampleChip \{[^}]*max-width: 100%;[^}]*text-overflow: ellipsis/,
+    );
+  });
+
+  it('clears the body scroll gutter for the header and the footer', () => {
+    // §5.5: the CTA broke the form's right edge by the scrollbar's own 10px, because header and
+    // footer sit outside the scrolling body and so never carried that gutter.
+    const scss = fs.readFileSync(
+      path.join(__dirname, 'provider-form-flyout.scss'),
+      'utf8',
+    );
+    expect(scss).toMatch(
+      /\.wzProviderFlyoutPanel \.euiFlyoutFooter > \*,?\s*\{[^}]*margin-inline-end: \$wzScrollGutter/,
+    );
   });
 });

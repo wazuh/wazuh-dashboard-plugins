@@ -13,7 +13,6 @@ import {
   EuiText,
   EuiTitle,
   EuiScreenReaderOnly,
-  EuiBadge,
   EuiCard,
   EuiLoadingSpinner,
   EuiPanel,
@@ -238,8 +237,12 @@ const EXAMPLE_CARDS = [
         defaultMessage: 'Critical findings',
       },
     ),
+    // Deliberately the shortest of the three questions rather than the longest: rendered as a card
+    // description in a 3-up grid, the old "Show me the critical findings of the last 24 hours"
+    // wrapped to two lines while its two neighbours took one, so the row's cards had visibly
+    // different amounts of empty space in them (audit §1.6, rulebook D21).
     question: i18n.translate('wazuhAiAssistant.chat.example.criticalAlerts', {
-      defaultMessage: 'Show me the critical findings of the last 24 hours',
+      defaultMessage: 'Critical findings in the last 24 hours',
     }),
   },
   {
@@ -2674,6 +2677,17 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                         // EUI's own type scale (size='m') instead of an inline fontSize/weight/
                         // letter-spacing override — the whole point of this pass is to stop
                         // fighting EuiEmptyPrompt's built-in typography with inline styles.
+                        //
+                        // Page-title scale, decided: this greeting stays at EuiTitle `m` (24px)
+                        // while the settings page's H1 is 28. The live audit (§6) flagged the two
+                        // as an inconsistency and offered either "pick 28 everywhere" or "make the
+                        // greeting a deliberate hero" — this is the second. The greeting is not a
+                        // page title doing a navigational job; it is the one large element on an
+                        // otherwise empty canvas (rulebook B7: only 1–2 large elements per view),
+                        // and it shares its screen with nothing else that competes for that rank,
+                        // so 24 is the size that keeps the cluster feeling like a group rather than
+                        // like a page header with content under it. Settings, which really does
+                        // have a header over three sections, keeps 28.
                         <EuiTitle size='m'>
                           <h2>
                             {i18n.translate(
@@ -2705,66 +2719,48 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                         </EuiText>
                       }
                     />
-                    <EuiSpacer size='l' />
-                    {/* Welcome variation 1a (design's own recommendation): ONE bordered, shadowless
-                        container with a centred pill header, holding three horizontal cards —
-                        icon-left, title plus the full question as a two-line description, hairline
-                        border — the Home Overview idiom, replacing the old icon-top/150px/
-                        one-truncated-line cards that floated on the page background with no
-                        grouping container. Clicking a card still only fills the input (unchanged
-                        `setInputText` call), never auto-sends. */}
-                    {/* `grow={false}`: EuiPanel's `grow` DEFAULTS TO TRUE (flex-grow: 1), and
-                        this panel is a flex item of the welcome's centring column — left at
-                        the default it stretched to the full transcript height, so the cards
-                        sat at the top of a tall empty box instead of the cluster sitting
-                        centred. Same trap as the conversation rail's own panel above. */}
-                    <EuiPanel
-                      hasBorder
-                      hasShadow={false}
-                      paddingSize='l'
-                      grow={false}
-                    >
-                      <EuiFlexGroup
-                        gutterSize='none'
-                        justifyContent='center'
-                        responsive={false}
-                      >
-                        <EuiFlexItem grow={false}>
-                          <EuiBadge color='hollow'>
-                            {i18n.translate(
-                              'wazuhAiAssistant.chat.welcome.body',
-                              {
-                                defaultMessage: 'Try one of these',
-                              },
-                            )}
-                          </EuiBadge>
-                        </EuiFlexItem>
-                      </EuiFlexGroup>
-                      <EuiSpacer size='m' />
-                      {/* `.wzExampleCardsGrid` (chat-page.scss): `repeat(auto-fit, minmax(240px,
-                          1fr))` — 3-up, 2-up, 1-up with no fixed pixel card widths, so this can
-                          never be the thing that introduces horizontal scroll (contract §3). */}
-                      <div className='wzExampleCardsGrid'>
-                        {EXAMPLE_CARDS.map(card => (
-                          <EuiCard
-                            key={card.id}
-                            layout='horizontal'
-                            display='plain'
-                            hasBorder
-                            icon={
-                              <EuiIcon
-                                type={card.icon}
-                                size='l'
-                                color='primary'
-                              />
-                            }
-                            title={card.title}
-                            description={card.question}
-                            onClick={() => setInputText(card.question)}
-                          />
-                        ))}
-                      </div>
-                    </EuiPanel>
+                    {/* 16, not 24: greeting → cards → composer are now one evenly-spaced group
+                        (audit §1.5 / rulebook C16 — the trio was 24/9, i.e. neither even nor on the
+                        ladder). The composer's own half of that step lives in
+                        `.wzChatPane--welcome .wzComposerMeasure` (chat-page.scss). */}
+                    <EuiSpacer size='m' />
+                    {/* Three horizontal cards — icon-left, short title, the full question as the
+                        description. Clicking a card only fills the input (unchanged `setInputText`
+                        call), never auto-sends.
+
+                        NO grouping panel around them, and no "Try one of these" pill header. Both
+                        were variation 1a's original shape and both were measured as failures
+                        (audit §1.2/§1.3): the outer `EuiPanel` had the identical fill, hairline and
+                        radius as the `EuiCard`s inside it, so the group read as a card-in-a-card
+                        with no information in the outer one; and the pill was a THIRD piece of
+                        instructional copy under a title and subtitle that already say what to do,
+                        centred over left-aligned cards. The cards' own borders group them perfectly
+                        well — this is a plain layout div now, carrying only the grid. */}
+                    {/* `.wzExampleCardsGrid` (chat-page.scss): `repeat(auto-fit, minmax(240px,
+                        1fr))` — 3-up, 2-up, 1-up with no fixed pixel card widths, so this can
+                        never be the thing that introduces horizontal scroll (contract §3). */}
+                    <div className='wzExampleCardsGrid'>
+                      {EXAMPLE_CARDS.map(card => (
+                        <EuiCard
+                          key={card.id}
+                          className='wzWelcomeCard'
+                          layout='horizontal'
+                          display='plain'
+                          hasBorder
+                          // `xs` (16px), down from EuiCard's default `s` (18px): the card titles
+                          // used to be BIGGER and bolder than the greeting they sit under
+                          // (18/500 vs 24/400), which inverted the screen's own hierarchy — the
+                          // eye landed on a card title first (audit §1.4, rulebook B8).
+                          titleSize='xs'
+                          icon={
+                            <EuiIcon type={card.icon} size='l' color='primary' />
+                          }
+                          title={card.title}
+                          description={card.question}
+                          onClick={() => setInputText(card.question)}
+                        />
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -2822,6 +2818,12 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   // present in whichever EUI version the host platform bundles.
                   iconType='arrowDown'
                   display='base'
+                  // `m` (32px), not EUI's default `s` (24): at 24 the circle was smaller than the
+                  // 32px comfortable-hit-target floor and read as a stray glyph floating over the
+                  // transcript rather than as a control (audit §3.2). It is also centred over the
+                  // measure now (`.wzJumpToLatest`, chat-page.scss) instead of parked in the
+                  // corner.
+                  size='m'
                   color='text'
                   onClick={handleJumpToLatest}
                   aria-label={i18n.translate(
@@ -2849,21 +2851,23 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   : 'wzComposerRow wzComposerRow-isDisabled'
               }
             >
-              {/* `.wzComposerMeasure` alongside the shared measure class: it is the hook C1 needs
-                for the composer's own COMPACT width in the centred state (`min(90%, 680px)`), which
-                widens back to the shared measure over the same 400ms as the travel — a plain CSS
-                `max-width` transition, since both ends are lengths (unlike the pane's own
-                flex↔grid switch, which is why the vertical half has to be a FLIP). */}
-              <div
-                className='wzContentMeasure wzComposerMeasure'
-                style={{ padding: '8px 24px' }}
-              >
+              {/* `.wzComposerMeasure` alongside the shared measure class: it owns the composer's
+                own gutters (chat-page.scss), which is all it is left carrying now that the composer
+                shares ONE measure with the transcript in both states. It used to hold a compact
+                `min(90%, 680px)` centred width that tweened back to the shared measure over the
+                travel; that width was the empty state's third competing edge (audit §1.1), so it is
+                gone and the tween with it. The vertical FLIP travel is untouched. */}
+              <div className='wzContentMeasure wzComposerMeasure'>
+                {/* `.wzComposerPanel` (chat-page.scss) supplies the shared `wzPanel` idiom — the
+                  redesign's 12px radius and an 8px inset — in place of a raw EuiPanel's own 4px
+                  radius plus an inline `marginBottom`. `paddingSize`/`hasBorder`/`hasShadow` stay
+                  as the props EUI needs to not paint its own competing chrome. */}
                 <EuiPanel
+                  className='wzComposerPanel'
                   color='plain'
                   hasBorder
                   hasShadow={false}
                   paddingSize='s'
-                  style={{ marginBottom: 8 }}
                 >
                   {/* Composer floor and ceiling (contract §2): the textarea (chat-input.tsx) owns
                     its own one-line floor and 5-row autogrow cap; the controls row below it is a

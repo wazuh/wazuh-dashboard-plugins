@@ -14,7 +14,18 @@
    The reference is flat: a 1px hairline and nothing else. Shadow is reserved for things that
    genuinely float — popovers, the flyout, and the composer's top edge. Panels take a scoped 12px
    while controls keep EUI's 8px, because the felt difference between the reference and today is
-   padding, not radius. */
+   padding, not radius.
+
+   This is the doctrine — ONE container idiom at 12px — and the live CSS audit (AI/ux-iter3/
+   css-audit-full.md §6) found it losing on every surface it was supposed to own: a "radius zoo" of
+   2 (severity badge), 4 (raw EuiPanels, and the settings card where this token lost a specificity
+   tie), 12 (the results card alone) and an inline 14 invented for the user bubble. Every one of
+   those has since been reconciled to this token, qualified with the EUI class it competes with
+   (`.euiPanel.wzSettingsCard__panel`, `.euiPanel.wzComposerPanel`, `.euiCard.wzWelcomeCard`,
+   `.euiPanel.wzUserBubble`) so bundle order cannot decide it. The ONE other radius the surface
+   allows is 4px, for small inline chrome that is not a container — an inline-code chip, a callout —
+   and it is deliberately not a token: a value with three unrelated consumers and no shared meaning
+   is a literal, not a design decision. */
 $wzPanelRadius: 12px;
 $wzCardPadding: 20px;
 $wzCardPaddingRoomy: 24px;

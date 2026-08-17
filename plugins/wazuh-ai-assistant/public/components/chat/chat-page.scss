@@ -35,11 +35,16 @@
  * role, and _redesign.scss is the shared-vocabulary file (its existing motion tokens — 120/160/200ms
  * ease-out — are the surface's micro-interaction band, deliberately far below this travel).
  */
-/* Composer measure in the centred state: the observed Gemini pill is ~36% of a 1280px viewport,
-   i.e. compact, NOT the full transcript measure. 680px keeps it comfortably wider than that at our
-   own 1060px measure while still reading as a pill rather than a bar; 90% is the small-window floor
-   so it never touches the pane edges. */
-$wzWelcomeComposerMaxWidth: 680px;
+/* NO composer measure of its own in the centred state any more. The empty state used to give the
+   composer a compact 680px pill (the observed Gemini proportion) while the greeting sat at its own
+   intrinsic width and the cards panel filled the 1060px measure — three different widths on one
+   screen, which the live CSS audit (AI/ux-iter3/css-audit-full.md §1.1) measured as the empty
+   state's biggest problem: no shared edge for the eye to read the group against. The composer now
+   joins the ONE measure every other element on the surface uses (`$wzContentMaxWidth`, via
+   `.wzContentMeasure`), so greeting, cards and composer terminate on the same two edges.
+   Consequence for C1: the docking transition's width tween is gone with it (there is no longer a
+   width difference between the two states to interpolate) — the FLIP travel below is untouched and
+   is still what carries the composer down to its docked row. */
 /* How far ABOVE the vertical middle the centred group sits (the recording puts the greeting just
    above the midpoint). Padding at the pane's block end, so `justify-content: center` centres the
    group inside what is left — viewport-relative with a floor and a ceiling, because on a short pane
@@ -102,10 +107,41 @@ $wzWelcomeFadeOut: 180ms;
   background-color: transparent;
 }
 
-/** The compact centred composer (see `$wzWelcomeComposerMaxWidth`). Interpolated `min()` for the
- * same reason `.wzMessageRow--wide` uses it: mixed units, so it must reach the browser as CSS. */
+/**
+ * Composer gutters, moved out of chat-page.tsx's inline `style={{ padding: '8px 24px' }}` (audit §6,
+ * "inline styles carrying layout"): 24px inline matches the transcript's own shared gutter, and 8px
+ * block is the docked composer's separation from the transcript row above it.
+ *
+ * In the CENTRED state that 8px is the whole gap between the welcome cluster and the composer, which
+ * measured 9px live (8 + the row's hairline) — off the 4/8/16/24 ladder and, more to the point,
+ * tighter than the 16px rhythm the rest of the cluster uses (audit §1.5). The centred state alone
+ * therefore steps it up to 16, so greeting → cards → composer read as one evenly-spaced group.
+ * Height changing between the two states is harmless to C1: the FLIP measures the row's actual top
+ * in each state rather than assuming the two are the same size.
+ */
+.wzComposerMeasure {
+  padding: 8px 24px;
+}
+
 .wzChatPane--welcome .wzComposerMeasure {
-  max-width: min(90%, $wzWelcomeComposerMaxWidth);
+  padding-block-start: 16px;
+}
+
+/**
+ * The composer panel takes the redesign's ONE container idiom (`wzPanel`, _redesign.scss) instead of
+ * a raw `EuiPanel`'s defaults, which shipped EUI's 4px radius here while the results card next to it
+ * carried 12 (audit §6, "radius zoo"). Qualified with `.euiPanel` for the same reason the settings
+ * card's panel and the status chips are: the EUI rule it overrides
+ * (`.euiPanel--borderRadiusMedium`) is also a single class, so an unqualified `.wzComposerPanel`
+ * would be a 0,1,0 tie decided by bundle order.
+ *
+ * 8px of padding, not the mixin's 20px default: this panel wraps a text field, and the composer's
+ * felt size is the field's, not a card's. `margin-block-end` replaces the old inline
+ * `style={{ marginBottom: 8 }}`.
+ */
+.euiPanel.wzComposerPanel {
+  @include wzPanel(8px);
+  margin-block-end: 8px;
 }
 
 /**
@@ -127,14 +163,9 @@ $wzWelcomeFadeOut: 180ms;
     will-change: transform;
   }
 
-  /* The composer's own width closes the gap between the compact centred measure and the shared
-     docked one over the same budget as the travel. Pure CSS: both ends are lengths, so the value
-     change that lands with this class is directly transitionable — the property is declared HERE, on
-     the docking class, so it only ever animates in this direction (returning to the centred state
-     after "New conversation" is an instant re-centre, not a reverse animation). */
-  .wzChatPane--docking .wzComposerMeasure {
-    transition: max-width $wzDockTravel $wzDockEase;
-  }
+  /* No width tween beside the travel any more: the composer is at the shared measure in BOTH states
+     (see the note where `$wzWelcomeComposerMaxWidth` used to be defined), so there is no `max-width`
+     difference left to interpolate. The vertical travel above is the whole transition. */
 
   /* Greeting + cards: fade only, no travel — the spec's own reading of the recording ("no visible
      lingering fade"), and the reason it can be this fast is that it starts on send rather than
@@ -188,37 +219,55 @@ $wzWelcomeFadeOut: 180ms;
 .wzChatTranscript {
   @include wzScrollChild;
   overflow-anchor: none;
+  /* Explicitly the grid's FIRST row. `.wzJumpToLatest` below claims `grid-row: 1` too, and an
+     explicitly-placed item is placed BEFORE auto-placement runs — but only the items that come
+     before it in the source order are skipped by the cursor, and the jump button is a LATER sibling
+     of this element. So while the button was on screen the transcript was auto-placed into row 1,
+     the button also occupied row 1, and the composer's `auto` row got pushed to an implicit third
+     row: the live audit (§3.2) measured the whole surface shoving down 36px the moment the button
+     appeared. Naming this row explicitly takes auto-placement out of it entirely — transcript and
+     button share row 1 by declaration, the composer keeps row 2, and the button's appearance moves
+     nothing. */
+  grid-row: 1;
 }
 
 /**
  * "Jump to latest" (chat-page.tsx), the floating control the stick-to-bottom scrolling was missing.
  *
- * Placed back into the grid's FIRST row explicitly (`grid-row: 1`), because it is a third child of
+ * Placed into the grid's FIRST row explicitly (`grid-row: 1`), because it is a third child of
  * `.wzChatPane`'s two-row grid: without this, auto-placement would give it an implicit third row of
- * its own and it would push the composer up instead of floating over the transcript. An explicitly
- * placed item is positioned before auto-placement runs and does not advance the auto-placement
- * cursor, so the transcript still takes row 1 and the composer still takes row 2 — the layout
- * contract §1 grid is unchanged.
+ * its own and it would push the composer up instead of floating over the transcript.
+ *
+ * This declaration is only HALF of that guarantee, and the comment here used to claim the whole of
+ * it: an explicitly-placed item does not advance the auto-placement cursor, but it also does not
+ * reserve its row against an item auto-placed LATER — and the transcript, this element's earlier
+ * sibling, was the auto-placed one. Both ended up in row 1 with the composer pushed into an implicit
+ * third row (audit §3.2, measured as a 36px shove of the entire surface the instant this button
+ * appeared). `.wzChatTranscript` above now names its row explicitly too, which is what actually
+ * makes the sharing hold.
  *
  * Sharing the transcript's row (rather than `position: fixed`, or absolute positioning against the
  * pane) is what makes "never overlaps the composer" structural: the row boundary already separates
  * them, so there is no bottom offset to keep in sync with the composer's variable height, and
- * nothing changes when the same ChatPage is embedded in the narrow docked header panel. The
- * `justify-self`/`align-self` pair parks it in the row's bottom-right corner; the inline-end margin
- * clears BOTH the transcript's own 24px gutter and the 10px scroll gutter
- * (`$wzScrollGutter`) the scrollbar floats in, so the button never sits on top of the bar.
+ * nothing changes when the same ChatPage is embedded in the narrow docked header panel.
+ *
+ * `justify-self: center`, not `end`: over a CENTRED reading column a corner-parked control reads as
+ * page chrome (and, at 1920, floats far off the text it acts on), while the same button centred over
+ * the measure is unmistakably "the bottom of this conversation" — the placement every streaming chat
+ * UI uses. Centring also retires the inline-end margin that used to clear the transcript's 24px
+ * gutter and the scrollbar's own 10px one: at the row's centre there is no scrollbar to sit on.
  */
 .wzJumpToLatest {
   grid-row: 1;
-  justify-self: end;
+  justify-self: center;
   align-self: end;
   /* This item does contribute its ~32px to the `1fr` row's automatic minimum size, which is
      harmless: the transcript is `min-height: 0` (wzScrollChild) and the pane it sits in is always
      far taller than one button, so this can never become the thing that squeezes the composer. */
-  margin-inline-end: $wzScrollGutter + 24px;
-  margin-block-end: 12px;
+  margin-block-end: 16px;
   /* The row's OTHER child (the scroll container) still has to receive the pointer everywhere this
-     button is not — a wrapper stretched over the corner would swallow clicks on the last turn. */
+     button is not — this wrapper spans the whole row, so without it a strip across the bottom of the
+     transcript would swallow clicks on the last turn. */
   pointer-events: none;
 }
 
@@ -438,6 +487,42 @@ $wzWelcomeFadeOut: 180ms;
  */
 .wzProseMeasure {
   max-width: $wzProseMeasure;
+
+  /* Inline code inside an answer (`EuiMarkdownFormat`, message-bubble.tsx). EUI gives it a fill with
+     `border-radius: 0` and `padding: 0 8px`, which the live audit (§2.1) measured as the single
+     worst-reading element on a finished answer: a square, 8px-padded slab wrapped around a 4-letter
+     field name reads as detached punctuation rather than as a value inside the sentence. 4px of
+     padding is the inset the chip actually needs, and 4px of radius makes it a chip — the same
+     small radius the flyout's callouts use, so the surface keeps two radii (4 for small inline
+     chrome, `$wzPanelRadius` for containers) instead of the four it had.
+     Font size is pinned rather than left to EUI's `em` multiplier, which resolved to a fractional
+     12.6px here (§2.2) — the same 12px as every other piece of secondary text on the surface.
+     `:not(pre) > code` so a fenced code BLOCK (`EuiCodeBlock`, which is `pre > code`) keeps its own
+     styling; only the inline form is a chip. */
+  :not(pre) > code {
+    border-radius: 4px;
+    padding: 0 4px;
+    font-size: 12px;
+  }
+}
+
+/**
+ * Prose inside a table-bearing (`--wide`) row starts where prose in every OTHER row starts.
+ *
+ * A wide row is capped at `min(100%, $wzTableMaxWidth)` while a normal row is capped at
+ * `$wzContentMaxWidth`, and both are centred — so the wide row's content box begins
+ * (1300 - 1060) / 2 = 120px further left. The audit (§3.1) measured exactly that: the answer's left
+ * edge jogging 120px outward on any turn that happens to carry a table, i.e. the reader's one
+ * dependable alignment edge moving because of something in the row BELOW the sentence they are
+ * reading. Only the table is entitled to the breakout (rulebook D22); the prose is not.
+ *
+ * Written against `100%` (the row's own resolved width) rather than as a flat 120px so it stays
+ * correct below 1300px of pane width, where the wide row is viewport-limited and the jog is smaller;
+ * `max(0px, ...)` is the floor for a pane narrower than the prose measure itself, where there is no
+ * jog to correct and a negative margin would pull the prose out of the row.
+ */
+.wzMessageRow--wide .wzProseMeasure {
+  margin-inline-start: max(0px, calc((100% - #{$wzContentMaxWidth}) / 2));
 }
 
 /**
@@ -494,8 +579,30 @@ $wzWelcomeFadeOut: 180ms;
 .wzExampleCardsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 12px;
+  /* 16, not the old 12: the whole welcome cluster is now on one step (greeting → cards → composer,
+     16px each), and 12 was the one value in it off that rhythm (audit §1.5, rulebook A1/C16). */
+  gap: 16px;
   width: 100%;
+}
+
+/**
+ * The welcome cards carry the container radius the rest of the surface uses. `EuiCard` ships EUI's
+ * own 4px, which is what made the empty state read as a different design language from the results
+ * card and the settings cards (audit §6, "radius zoo"). Qualified with `.euiCard` so the EUI rule
+ * this overrides cannot win on bundle order — the same trap `.euiBadge.wzStatusChip` documents.
+ */
+.euiCard.wzWelcomeCard {
+  border-radius: $wzPanelRadius;
+}
+
+/**
+ * The user turn's bubble (message-bubble.tsx). Was an inline `style={{ borderRadius: 14 }}` — a
+ * fifth radius, invented for one element and unreachable from any stylesheet (audit §6). Folded onto
+ * `$wzPanelRadius`: 12 and 14 are indistinguishable at this size, and the doctrine
+ * (_redesign.scss's own "one container idiom, 12px") is worth more than the 2px.
+ */
+.euiPanel.wzUserBubble {
+  border-radius: $wzPanelRadius;
 }
 
 /**

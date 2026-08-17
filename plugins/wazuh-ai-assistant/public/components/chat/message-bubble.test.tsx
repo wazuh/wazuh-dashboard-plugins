@@ -24,7 +24,7 @@ function baseMessage(overrides: Partial<UiChatMessage>): UiChatMessage {
 }
 
 describe('MessageBubble', () => {
-  it('renders a user message as plain text, with the "You" avatar', () => {
+  it('renders a user message as plain text in a bubble, with no avatar beside it', () => {
     const { container } = render(
       <MessageBubble
         message={baseMessage({ role: 'user', content: 'How many alerts?' })}
@@ -34,7 +34,20 @@ describe('MessageBubble', () => {
     );
 
     expect(screen.getByText('How many alerts?')).toBeInTheDocument();
-    expect(container.querySelector('[title="You"]')).not.toBeNull();
+    // The "You" avatar is gone (css-audit-full.md §3.7): its 32px plus the row gutter held the
+    // question's right edge 16px in from the transcript's, so the bubble and the composer directly
+    // below it never shared the surface's one alignment edge. It carried no information the
+    // bubble's own fill, border and right alignment do not already carry — which is exactly how
+    // every mainstream chat client renders a user turn.
+    expect(container.querySelector('[title="You"]')).toBeNull();
+    expect(container.querySelector('.euiAvatar')).toBeNull();
+    // The bubble itself is unchanged, and takes its radius from the shared container token rather
+    // than the inline `borderRadius: 14` it used to carry (§6).
+    const bubble = screen
+      .getByText('How many alerts?')
+      .closest('.euiPanel') as HTMLElement;
+    expect(bubble).toHaveClass('wzUserBubble');
+    expect(bubble.style.borderRadius).toBe('');
     // The user bubble never renders the aria-live wrapper (that's assistant-only).
     expect(container.querySelector('[aria-live="polite"]')).toBeNull();
   });
@@ -411,6 +424,41 @@ describe('MessageBubble', () => {
       );
       expect(scssSource).toMatch(
         /\.wzProseMeasure\s*\{[^}]*max-width:\s*\$wzProseMeasure/,
+      );
+    });
+
+    it('keeps prose on the same left edge in a table-carrying (--wide) row', () => {
+      // The jog this pins (css-audit-full.md §3.1): a `--wide` row is capped at $wzTableMaxWidth and
+      // a normal row at $wzContentMaxWidth, both centred — so the wide row's content box starts
+      // (1300 - 1060) / 2 = 120px further out, and the ANSWER's left edge moved 120px whenever the
+      // turn happened to carry a table. Only the table is entitled to the breakout; the sentences
+      // above it are not. Written against the row's own resolved width (`100%`) with a `max(0px,…)`
+      // floor rather than a flat 120px, so it stays correct on a pane narrower than 1300.
+      const scssSource = fs.readFileSync(
+        path.join(__dirname, 'chat-page.scss'),
+        'utf8',
+      );
+      expect(scssSource).toMatch(
+        /\.wzMessageRow--wide \.wzProseMeasure \{\s*margin-inline-start: max\(0px, calc\(\(100% - /,
+      );
+      // ...and the offset is derived from the shared measure token, not a restated 120px.
+      expect(scssSource).toMatch(
+        /margin-inline-start: max\(0px, calc\(\(100% - #\{\$wzContentMaxWidth\}\) \/ 2\)\)/,
+      );
+    });
+
+    it('renders inline code in an answer as a chip, not as a square 8px slab', () => {
+      // §2.1/§2.2: EUI's markdown default gives inline code `border-radius: 0` and `padding: 0 8px`,
+      // which around a short field name read as detached punctuation rather than as a value inside
+      // the sentence — and its `em`-based size resolved to a fractional 12.6px. Scoped to
+      // `:not(pre) > code` so a fenced block (EuiCodeBlock renders `pre > code`) keeps its own
+      // styling.
+      const scssSource = fs.readFileSync(
+        path.join(__dirname, 'chat-page.scss'),
+        'utf8',
+      );
+      expect(scssSource).toMatch(
+        /:not\(pre\) > code \{[^}]*border-radius:\s*4px[^}]*padding:\s*0 4px[^}]*font-size:\s*12px/,
       );
     });
 

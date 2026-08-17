@@ -1978,6 +1978,28 @@ describe('ChatPage — jump to latest (C2)', () => {
     expect(button.closest('.wzComposerRow')).toBeNull();
   });
 
+  it('shares the transcript grid row explicitly, so appearing moves nothing', () => {
+    // The bug this pins (css-audit-full.md §3.2): only the BUTTON named `grid-row: 1`. An explicitly
+    // placed grid item does not advance the auto-placement cursor, but it also does not reserve its
+    // row against an item auto-placed later — and the transcript, an EARLIER sibling, was the
+    // auto-placed one. Both landed in row 1, the composer was pushed into an implicit third row, and
+    // the whole surface shoved down ~36px the instant the button appeared.
+    //
+    // jsdom lays out no grid, so the mechanism is pinned where it lives: both declarations must be
+    // present, because either one alone is the broken state.
+    const scssRules = fs
+      .readFileSync(path.join(__dirname, 'chat-page.scss'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/^\s*\/\/.*$/gm, '');
+
+    expect(scssRules).toMatch(/\.wzChatTranscript \{[^}]*grid-row:\s*1/);
+    expect(scssRules).toMatch(/\.wzJumpToLatest \{[^}]*grid-row:\s*1/);
+    // Centred over the measure, not parked in the row's inline-end corner — and with no inline-end
+    // margin left over from the corner placement (§3.2).
+    expect(scssRules).toMatch(/\.wzJumpToLatest \{[^}]*justify-self:\s*center/);
+    expect(scssRules).not.toMatch(/margin-inline-end:\s*\$wzScrollGutter \+ 24px/);
+  });
+
   it('scrolls to the newest content and re-pins when clicked', async () => {
     await renderWithOneTurn();
     const pane = transcriptPane();
@@ -2050,19 +2072,31 @@ describe('ChatPage — welcome centers only when there is room (contract §3)', 
     expect(transcript.contains(welcomeBox)).toBe(true);
   });
 
-  it('groups the example prompts as horizontal cards inside one bordered container (variation 1a)', async () => {
+  it('offers the example prompts as horizontal cards, with no wrapper panel and no pill header', async () => {
     renderChatPage();
     await screen.findByText('Ask the AI Assistant something');
 
-    // The pill header groups the cards under one container, replacing the old three-cards-with-
-    // no-grouping-container layout.
-    expect(screen.getByText('Try one of these')).toBeInTheDocument();
-    // The full question is now the card's description (no longer truncated to one line), and the
-    // title is shown separately — both readable without truncation.
+    // The full question is the card's description and the short title is shown separately — both
+    // readable, neither truncated.
     expect(
-      screen.getByText('Show me the critical findings of the last 24 hours'),
+      screen.getByText('Critical findings in the last 24 hours'),
     ).toBeInTheDocument();
-    expect(screen.getByText('Critical findings')).toBeInTheDocument();
+    const title = screen.getByText('Critical findings');
+    expect(title).toBeInTheDocument();
+
+    // The grouping container and the "Try one of these" pill that used to head it are BOTH gone
+    // (css-audit-full.md §1.2/§1.3): the outer EuiPanel had the identical border, radius and fill as
+    // the cards inside it — a card-in-a-card carrying no information — and the pill was a third
+    // instructional line under a title and subtitle that already say what to do.
+    expect(screen.queryByText('Try one of these')).toBeNull();
+    const grid = title.closest('.wzExampleCardsGrid') as HTMLElement;
+    expect(grid).not.toBeNull();
+    // The grid's own parent is the plain welcome column, not a panel wrapped around the cards. The
+    // cards themselves are still bordered EuiPanels — that is what groups them now.
+    expect(grid.parentElement?.className).toContain('wzWelcomeCenter');
+    expect(grid.closest('.euiPanel')).toBeNull();
+    // ...and each card carries the shared container radius rather than EuiCard's own 4px (§6).
+    expect(title.closest('.euiCard')).toHaveClass('wzWelcomeCard');
   });
 });
 
@@ -2143,7 +2177,9 @@ describe('ChatPage — welcome composer and first-send transition (C1)', () => {
     expect(chatPane().className).toBe('wzChatPane');
     // The welcome content itself is unchanged there — only the composer's position is.
     expect(welcomeGroup()?.className).toBe('wzWelcomeCenter');
-    expect(screen.getByText('Try one of these')).toBeInTheDocument();
+    expect(
+      screen.getByText('Critical findings in the last 24 hours'),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText('Chat message')).toBeVisible();
   });
 
@@ -2302,12 +2338,21 @@ describe('ChatPage — welcome composer and first-send transition (C1)', () => {
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/^\s*\/\/.*$/gm, '');
 
-    // The centred state is a flex column that centres the pair, and the composer gets its own
-    // compact measure there.
+    // The centred state is a flex column that centres the pair.
     expect(scssRules).toMatch(/\.wzChatPane--welcome\s*\{/);
     expect(scssRules).toMatch(/justify-content:\s*center/);
+    // The composer has NO measure of its own in the centred state any more, and therefore no width
+    // tween across the travel: it shares the transcript's one measure in both states, which is what
+    // gives the empty state a single alignment edge (css-audit-full.md §1.1). Both halves of the old
+    // mechanism are pinned as ABSENT, since a silently-restored 680px pill is exactly the
+    // regression this fix is about.
+    expect(scssRules).not.toMatch(/\$wzWelcomeComposerMaxWidth/);
+    expect(scssRules).not.toMatch(/transition:\s*max-width/);
+    // What the class carries instead: the composer's own gutters, and a 16px block start in the
+    // centred state so greeting → cards → composer are one evenly-spaced group (§1.5).
+    expect(scssRules).toMatch(/\.wzComposerMeasure\s*\{\s*padding:\s*8px 24px/);
     expect(scssRules).toMatch(
-      /\.wzComposerMeasure\s*\{\s*max-width:\s*min\(90%, \$wzWelcomeComposerMaxWidth\)/,
+      /\.wzChatPane--welcome \.wzComposerMeasure\s*\{\s*padding-block-start:\s*16px/,
     );
     // The travel is a transform transition on the composer row, and the fading cluster leaves the
     // flow instead of pushing the incoming message down.
