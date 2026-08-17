@@ -50,6 +50,8 @@
     - [Providers](ref/modules/ai-assistant/providers.md)
     - [Security](ref/modules/ai-assistant/security.md)
     - [Configuration](ref/modules/ai-assistant/configuration.md)
+  - [Case Management](ref/modules/case-management/README.md)
+  - [Incident Response](ref/modules/incident-response/README.md)
 - [External Integrations](ref/external-integrations.md)
 - [Release notes](ref/release-notes.md)
 - [Upgrade](ref/upgrade.md)

@@ -13,3 +13,5 @@
   - [Providers](./ai-assistant/providers.md)
   - [Security](./ai-assistant/security.md)
   - [Configuration](./ai-assistant/configuration.md)
+- [Case Management](./case-management/README.md)
+- [Incident Response](./incident-response/README.md)
