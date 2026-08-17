@@ -31,6 +31,14 @@
   margin-top: $wzCardPaddingRoomy;
 }
 
+/* The two provider-type cards must occupy the same box (rulebook D21; design review feedback).
+   EuiFlexGroup stretches its ITEMS to the row height, but EuiCheckableCard is a plain block that
+   sizes to its content inside that item — so without this, the card with less content rendered
+   visibly shorter than its stretched sibling. */
+.wzProviderFlyout__group .euiCheckableCard {
+  height: 100%;
+}
+
 /**
  * Every callout inside this flyout — the getting-started hint, the tool-calling warning, the
  * encryption notice, the test result.

@@ -861,18 +861,17 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                       checked={form.type === type}
                       onChange={() => handleTypeChange(type)}
                     >
-                      {/* The type's description lives INSIDE its own card (audit §5.6). It used to
-                          sit full-width underneath BOTH cards while describing only the selected
-                          one, so the sentence "for hosted services such as OpenAI..." appeared to
-                          belong to whichever card the eye happened to be on. Rendered only for the
-                          selected type — an unselected card is a choice, not a comparison table,
-                          and EuiFlexGroup stretches both items to the taller one's height so the
-                          pair stays level (rulebook D21). */}
-                      {form.type === type && (
-                        <EuiText size='s' color='subdued'>
-                          <p>{PROVIDER_TYPE_DESCRIPTIONS[type]}</p>
-                        </EuiText>
-                      )}
+                      {/* The type's description lives INSIDE its own card (audit §5.6) and is
+                          rendered on BOTH cards, not only the selected one: a selected-only
+                          description made the pair visibly unequal (design review: "trataría de
+                          que cada caja ocupe lo mismo") — the selected card grew around its text
+                          while the other stayed short, because EuiFlexGroup stretches its flex
+                          ITEMS but EuiCheckableCard does not fill its item. Symmetric content
+                          plus the card's own height rule (scss) keeps the two boxes level no
+                          matter which is selected (rulebook D21). */}
+                      <EuiText size='s' color='subdued'>
+                        <p>{PROVIDER_TYPE_DESCRIPTIONS[type]}</p>
+                      </EuiText>
                     </EuiCheckableCard>
                   </EuiFlexItem>
                 ))}

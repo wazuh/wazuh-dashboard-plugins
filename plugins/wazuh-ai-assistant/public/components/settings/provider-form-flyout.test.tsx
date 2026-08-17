@@ -1034,23 +1034,36 @@ describe('ProviderFormFlyout — one tight column (audit §5)', () => {
     expect(nameGroup.className).toMatch(/directionColumn/i);
   });
 
-  it('describes the selected provider type inside its own card', () => {
-    // §5.6: the description used to sit full-width UNDER both cards while describing only the
-    // selected one, so it appeared to belong to whichever card the eye was on.
+  it('describes BOTH provider types inside their own cards, keeping the pair level', () => {
+    // §5.6 moved the description inside the card; the design review then flagged that a
+    // selected-only description made the two cards visibly unequal ("trataria de que cada
+    // caja ocupe lo mismo"). Each card now always carries its own description -- symmetric
+    // content -- and the scss stretches the card to its flex item (height: 100%), so the
+    // boxes stay level no matter which is selected.
     render(<ProviderFormFlyout {...baseProps} />);
 
-    const description = screen.getByText(/any endpoint that exposes/i);
-    const card = description.closest('.euiCheckableCard') as HTMLElement;
-    expect(card).not.toBeNull();
-    expect(card.textContent).toContain('OpenAI-compatible');
-
-    // Switching type moves the description with the selection.
-    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
-    expect(screen.queryByText(/any endpoint that exposes/i)).toBeNull();
+    const openaiDescription = screen.getByText(/any endpoint that exposes/i);
     const anthropicDescription = screen.getByText(/Anthropic's own API/i);
+    expect(
+      openaiDescription.closest('.euiCheckableCard')?.textContent,
+    ).toContain('OpenAI-compatible');
     expect(
       anthropicDescription.closest('.euiCheckableCard')?.textContent,
     ).toContain('Anthropic (Claude)');
+
+    // Switching the selection changes NO text: both descriptions stay put.
+    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
+    expect(screen.getByText(/any endpoint that exposes/i)).toBeInTheDocument();
+    expect(screen.getByText(/Anthropic's own API/i)).toBeInTheDocument();
+
+    // The geometry half of the guarantee lives in the stylesheet (jsdom cannot measure it):
+    const scss = fs.readFileSync(
+      path.join(__dirname, 'provider-form-flyout.scss'),
+      'utf8',
+    );
+    expect(scss).toMatch(
+      /\.wzProviderFlyout__group \.euiCheckableCard\s*\{[^}]*height:\s*100%/,
+    );
   });
 
   it('keeps the getting-started callout, restyled rather than deleted', () => {
