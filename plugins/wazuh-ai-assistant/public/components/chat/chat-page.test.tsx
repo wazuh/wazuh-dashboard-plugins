@@ -1743,6 +1743,32 @@ describe('ChatPage — two-row grid pane (contract §1)', () => {
     expect(screen.getByLabelText('Chat message')).toBeVisible();
   });
 
+  /**
+   * Returns the body of one top-level SCSS rule, brace-matched so nested rules (`.wzComposerRow` has
+   * several) come back with it instead of the block being cut at the first `}`. Used to scope a
+   * "this declaration is absent" assertion to the element it is actually about — a file-wide regex
+   * cannot tell "the composer is not sticky" from "nothing on this surface is sticky", and the two
+   * stopped being the same thing once the status band gained a legitimate `position: sticky`.
+   */
+  const ruleBlock = (scss: string, selector: string) => {
+    const start = scss.indexOf(`${selector} {`);
+    if (start === -1) {
+      throw new Error(`selector ${selector} not found in stylesheet`);
+    }
+    let depth = 0;
+    for (let i = scss.indexOf('{', start); i < scss.length; i++) {
+      if (scss[i] === '{') {
+        depth++;
+      } else if (scss[i] === '}') {
+        depth--;
+        if (depth === 0) {
+          return scss.slice(start, i + 1);
+        }
+      }
+    }
+    throw new Error(`unbalanced braces after ${selector}`);
+  };
+
   it('removes the old sticky/gradient mechanism from the stylesheet entirely', () => {
     // `path.join` against `__dirname` sidesteps Jest's `moduleNameMapper` (which points `.scss`
     // imports at `style_mock.js`) and reads the actual SCSS off disk, the same way the previous
@@ -1771,6 +1797,102 @@ describe('ChatPage — two-row grid pane (contract §1)', () => {
     // class reading the redesign token rather than restating a pixel figure.
     expect(scssRules).toMatch(/grid-template-rows:\s*1fr auto/);
     expect(scssRules).toMatch(/max-width:\s*\$wzContentMaxWidth/);
+  });
+
+  // The band is what keeps a failed turn's explanation on screen in a long conversation. Its
+  // placement is the mechanism, not an implementation detail: sticky only travels inside the parent
+  // box, so being a child of the wrong element silently reverts the fix with no visual difference on
+  // a short conversation, which is exactly where it would be tested by hand.
+  it('pins the status band to the transcript scroll container, not to the short content measure', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+    mockConversationsService.create.mockRejectedValue(httpError(500));
+
+    renderChatPage();
+    await sendMessage('first question');
+    await waitFor(() =>
+      expect(
+        screen.getByText('This conversation is not being saved'),
+      ).toBeInTheDocument(),
+    );
+
+    const band = document.querySelector('.wzStatusCallouts');
+    expect(band).not.toBeNull();
+    // Direct child of the full-height flex column, so sticky has the whole scroll height to travel.
+    expect(band?.parentElement).toHaveClass('wzTranscriptContent');
+    // And NOT inside the content measure, whose box is only as tall as the callouts themselves.
+    expect(band?.closest('.wzContentMeasure')).toBeNull();
+
+    const scssRules = fs
+      .readFileSync(path.join(__dirname, 'chat-page.scss'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/^\s*\/\/.*$/gm, '');
+    expect(ruleBlock(scssRules, '.wzStatusCallouts')).toMatch(
+      /position:\s*sticky/,
+    );
+  });
+
+  it('leaves no status band in the DOM when there is nothing to report', async () => {
+    renderChatPage();
+    await screen.findByText('Ask the AI Assistant something');
+
+    // An always-rendered band would paint its opaque ground over the first transcript row.
+    expect(document.querySelector('.wzStatusCallouts')).toBeNull();
+  });
+});
+
+describe('ChatPage — dismissing the error callout', () => {
+  const failSend = () =>
+    mockStreamChat.mockImplementation(() => {
+      throw new Error('fetch failed');
+    });
+
+  it('hides the error callout when dismissed, and shows the same message again on the next failure', async () => {
+    failSend();
+    renderChatPage();
+    await sendMessage('first question');
+
+    await waitFor(() =>
+      expect(screen.getByText('Something went wrong')).toBeInTheDocument(),
+    );
+
+    fireEvent.click(
+      document.querySelector(
+        '[data-test-subj="wzAiStatusCalloutDismiss"]',
+      ) as HTMLElement,
+    );
+    expect(screen.queryByText('Something went wrong')).not.toBeInTheDocument();
+
+    // Dismissal is per-message, not permanent: the next send clears `error`, which drops the
+    // dismissal, so an identical failure is reported again rather than silently swallowed.
+    await sendMessage('second question');
+    await waitFor(() =>
+      expect(screen.getByText('Something went wrong')).toBeInTheDocument(),
+    );
+  });
+
+  it('gives the states that are still true after being read no dismiss control', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+    mockConversationsService.create.mockRejectedValue(httpError(500));
+
+    renderChatPage();
+    await sendMessage('first question');
+    await waitFor(() =>
+      expect(
+        screen.getByText('This conversation is not being saved'),
+      ).toBeInTheDocument(),
+    );
+
+    // The save-failure notice reports real data-loss risk that dismissing would not resolve, so it
+    // deliberately passes no `onDismiss` — no close control anywhere in the band.
+    expect(
+      document.querySelector('[data-test-subj="wzAiStatusCalloutDismiss"]'),
+    ).toBeNull();
   });
 });
 

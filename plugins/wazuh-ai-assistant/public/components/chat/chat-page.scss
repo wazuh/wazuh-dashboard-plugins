@@ -160,7 +160,28 @@
   /* Above the transcript rows that scroll beneath it, below the composer row — which is a grid
      sibling in normal flow (contract §1), so it needs no z-index of its own to stay clear. */
   z-index: 2;
-  background-color: var(--wz-surface, #{$euiColorEmptyShade});
+}
+
+/**
+ * Close control for a dismissible `StatusCallout` (status-callout.tsx explains why the callout does
+ * not use EUI's own `dismissible` prop). `.euiCallOut` is already `position: relative` in the theme,
+ * so this only needs to claim the top-right corner of whichever callout holds it. The title reserves
+ * room for it rather than running underneath: the callout's own padding is `$euiSize` (16px), which
+ * a wrapping title would otherwise fill edge to edge.
+ */
+.wzStatusCallout--dismissible {
+  .wzStatusCallout__dismiss {
+    position: absolute;
+    top: $euiSizeXS;
+    right: $euiSizeXS;
+  }
+
+  /* Reserve the corner rather than letting a wrapping title run under the button. Carried by a
+     modifier class on the callout itself, not by a `:has()` selector on the button — the parent
+     already knows whether it is dismissible, so there is no need to depend on selector support. */
+  .euiCallOutHeader__title {
+    padding-right: $euiSizeL;
+  }
 }
 
 /**

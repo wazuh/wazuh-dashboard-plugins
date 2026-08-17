@@ -251,6 +251,16 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const [inputText, setInputText, inputTextRef] = useSyncedState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /**
+   * The error MESSAGE the user dismissed, not a `boolean` flag — so what re-shows the callout is the
+   * error value itself changing, with no separate reset call to keep in sync. `error` is cleared
+   * (`setError(null)`) by every path that starts fresh work — a new send, a retry, switching or
+   * starting a conversation — and the effect below turns that into the dismissal being dropped, so
+   * the next failure surfaces even when it reports the identical message. Comparing by value rather
+   * than by flag also keeps the two sources honest: dismissing a transient send error cannot
+   * suppress a DIFFERENT, still-current `providersError` underneath it.
+   */
+  const [dismissedError, setDismissedError] = useState<string | null>(null);
 
   // Persistent conversations (server/routes/conversations.ts). `activeConversationId` is
   // `null` for a brand-new, never-yet-saved conversation; `activeConversationIdRef` mirrors it the
@@ -374,6 +384,17 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   // window: the pane is what the rows have to fit inside, and it changes with the composer's own
   // height, not just with the viewport. Guarded because jsdom has no ResizeObserver — there the
   // value stays 0 and the default page size applies, which is what the existing tests expect.
+  // Drops a dismissal once there is no error left to dismiss, which is what lets the SAME message
+  // re-surface on the next failure (see `dismissedError`'s own comment). Hangs off the error values
+  // rather than being called from each reset path — `setError(null)` already runs in five of them
+  // (new send, retry-last-answer, conversation select, new conversation, provider reload), and a
+  // sixth added later would silently not clear the dismissal if this were plumbed by hand.
+  useEffect(() => {
+    if (!error && !providersError) {
+      setDismissedError(null);
+    }
+  }, [error, providersError]);
+
   const [transcriptHeightPx, setTranscriptHeightPx] = useState(0);
   useEffect(() => {
     const pane = scrollPaneRef.current;
@@ -1678,6 +1699,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const showLoadingState = !providersLoaded || isRestoringConversation;
   const showWelcomeState =
     hasProviders && messages.length === 0 && !showLoadingState;
+  /** `error` is the send-path failure; `providersError` the app shell's provider-load failure. One
+   * callout reports whichever is current, so dismissal is tracked against this one value. */
+  const activeError = error ?? providersError;
+  const showErrorCallout =
+    Boolean(activeError) && activeError !== dismissedError;
   /**
    * Gates the sticky status-callout band below, so an empty band never paints its opaque ground
    * over the first transcript row. Mirrors the conditions of the individual callouts inside it —
@@ -1685,8 +1711,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
    */
   const hasStatusCallout =
     sessionExpired ||
-    Boolean(error) ||
-    Boolean(providersError) ||
+    showErrorCallout ||
     managerAuthHint ||
     saveFailed ||
     mergeNotice === 'merged' ||
@@ -2045,7 +2070,13 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                       />
                     )}
 
-                    {(error || providersError) && (
+                    {/* The one dismissible callout in the band. A failed turn is already visible in
+                      the transcript and the user can simply ask again, so once they have read why it
+                      failed there is nothing left for this to report — unlike the session-expiry and
+                      save-failure notices around it, which describe a condition that is still true
+                      after being read and so stay put (see `StatusCallout`'s `onDismiss` doc).
+                      Dismissal is per-message, so the next failure surfaces again on its own. */}
+                    {showErrorCallout && (
                       <StatusCallout
                         title={i18n.translate(
                           'wazuhAiAssistant.chat.errorTitle',
@@ -2055,7 +2086,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                         )}
                         color='danger'
                         iconType='alert'
-                        body={error ?? providersError}
+                        body={activeError}
+                        onDismiss={() => setDismissedError(activeError)}
                       />
                     )}
 
