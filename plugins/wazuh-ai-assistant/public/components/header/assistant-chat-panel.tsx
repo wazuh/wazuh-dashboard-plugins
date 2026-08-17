@@ -271,6 +271,13 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
             // sidecar the user never asked to leave. Capped at the collapsed strip instead; see
             // ChatPage's own `allowRailFlyout` doc comment.
             allowRailFlyout={false}
+            // Same "no room for theatre" reasoning, different decision (see ChatPage's own
+            // `enableWelcomeComposer` doc comment): the full page can afford to centre the
+            // greeting, composer and example cards as one group and dock the composer on the first
+            // send, but this sidecar is a narrow column whose composer must simply be where the
+            // user last left it. Opting out keeps today's always-docked composer here, with no
+            // centred state and no transition.
+            enableWelcomeComposer={false}
           />
         </div>
       </div>

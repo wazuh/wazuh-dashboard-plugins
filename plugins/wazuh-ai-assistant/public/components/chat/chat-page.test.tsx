@@ -2066,6 +2066,266 @@ describe('ChatPage — welcome centers only when there is room (contract §3)', 
   });
 });
 
+/**
+ * C1 (ux-iter3, AI/ux-iter3/gemini-motion-spec.md): the Gemini-style empty state — greeting,
+ * example cards and composer as ONE vertically centred group — and the one-time transition that
+ * docks the composer on the first send.
+ *
+ * jsdom runs no transitions and lays out no boxes, so what these pin is the STATE MACHINE and the
+ * structure it drives (which classes exist in which state, what is in flow when the first message
+ * lands, and both settle paths), exactly as the two-row-grid tests above pin the grid's structure
+ * rather than its pixels. Every measured delta is 0 here — `getBoundingClientRect` returns zeros —
+ * which is why the inverted transform below is asserted as `translateY(0px)`: the value is the
+ * environment's, the fact that the mechanism ran is the point.
+ */
+describe('ChatPage — welcome composer and first-send transition (C1)', () => {
+  const chatPane = () => document.querySelector('.wzChatPane') as HTMLElement;
+  const composerRow = () =>
+    document.querySelector('.wzComposerRow') as HTMLElement;
+  const welcomeGroup = () =>
+    document.querySelector('.wzWelcomeCenter') as HTMLElement | null;
+
+  /** Presses Send WITHOUT awaiting the turn: the docking frame is set up synchronously inside the
+   * click, and the assertions about it have to run before anything else is flushed. */
+  function pressSend(text: string) {
+    fireEvent.change(screen.getByLabelText('Chat message'), {
+      target: { value: text },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Send' }));
+  }
+
+  function stubStream() {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+    return stream;
+  }
+
+  /**
+   * Dispatches a real `transitionend`, built by hand. `fireEvent.transitionEnd(el, {propertyName})`
+   * cannot be used: jsdom implements no `TransitionEvent` constructor, so dom-testing-library falls
+   * back to plain `Event`, which silently drops unknown init fields — and `propertyName` is exactly
+   * what the component filters on, so the settle would never be reached.
+   */
+  function fireTransitionEnd(element: HTMLElement, propertyName: string) {
+    const event = new Event('transitionend', { bubbles: true });
+    Object.defineProperty(event, 'propertyName', { value: propertyName });
+    fireEvent(element, event);
+  }
+
+  it('centres the greeting, the cards and the composer as one group', async () => {
+    renderChatPage();
+    await screen.findByText('Ask the AI Assistant something');
+
+    // The pane itself is the centring container, which is what makes the cluster and the composer
+    // ONE group without the composer leaving its own grid row / DOM position.
+    expect(chatPane().className).toBe('wzChatPane wzChatPane--welcome');
+    const input = screen.getByLabelText('Chat message');
+    expect(chatPane().contains(input)).toBe(true);
+    expect(chatPane().contains(welcomeGroup())).toBe(true);
+    // The compact centred measure hangs off this class (chat-page.scss); the shared measure class
+    // stays on the same element, so the docked width needs no second element to fall back to.
+    const measure = input.closest('.wzComposerMeasure');
+    expect(measure).not.toBeNull();
+    expect(measure?.classList.contains('wzContentMeasure')).toBe(true);
+    // Nothing may be wedged between the cluster and the composer: `grid-row: 1` means nothing in a
+    // flex column, so the jump button is withheld until there is a conversation to jump to.
+    expect(screen.queryByRole('button', { name: 'Jump to latest' })).toBeNull();
+  });
+
+  it('never centres in the embedded docked panel', async () => {
+    // assistant-chat-panel.tsx passes exactly this: the sidecar keeps today's always-docked
+    // composer, with no centred state and no transition to run in a 600px column.
+    renderChatPage({ enableWelcomeComposer: false });
+    await screen.findByText('Ask the AI Assistant something');
+
+    expect(chatPane().className).toBe('wzChatPane');
+    // The welcome content itself is unchanged there — only the composer's position is.
+    expect(welcomeGroup()?.className).toBe('wzWelcomeCenter');
+    expect(screen.getByText('Try one of these')).toBeInTheDocument();
+    expect(screen.getByLabelText('Chat message')).toBeVisible();
+  });
+
+  it('moves through docking and settles docked on the first send', async () => {
+    const stream = stubStream();
+    renderChatPage();
+    await screen.findByText('Ask the AI Assistant something');
+
+    pressSend('first question');
+
+    // The bridge is entered in the same click that sends, before any await — the composer's final
+    // (docked) layout is committed immediately and the travel is the inverted transform below.
+    expect(chatPane().className).toBe('wzChatPane wzChatPane--docking');
+    expect(composerRow().style.transform).toBe('translateY(0px)');
+    // Inverted with transitions OFF, so the jump back to the old position is instant; the next
+    // animation frame releases both and `.wzChatPane--docking`'s own transition takes over.
+    expect(composerRow().style.transition).toBe('none');
+
+    // The fading cluster is out of flow (`--leaving`) and no longer stretches the measure box, so
+    // the transcript is already laid out at its final height when the user's message lands in it.
+    const leaving = welcomeGroup() as HTMLElement;
+    expect(leaving.className).toContain('wzWelcomeCenter--leaving');
+    expect(leaving.closest('.wzContentMeasure')?.className).not.toContain(
+      'wzContentMeasure--stretch',
+    );
+
+    await waitFor(() => expect(mockStreamChat).toHaveBeenCalled());
+    expect(screen.getByText('first question')).toBeInTheDocument();
+
+    // Fast settle path: the row's own transform transition finishing.
+    fireTransitionEnd(composerRow(), 'transform');
+
+    // Byte-identical end state: the bare docked pane, no modifier and no leftover inline styles.
+    expect(chatPane().className).toBe('wzChatPane');
+    expect(composerRow().style.transform).toBe('');
+    expect(composerRow().style.transition).toBe('');
+    expect(welcomeGroup()).toBeNull();
+    stream.end();
+  });
+
+  it('ignores a nested transition and settles on the timer instead', async () => {
+    const stream = stubStream();
+    renderChatPage();
+    await screen.findByText('Ask the AI Assistant something');
+
+    pressSend('first question');
+
+    // A descendant's own transition (an EUI button hover, the textarea's height) bubbles to the same
+    // handler and must not end the travel early. Fired synchronously, before anything is awaited, so
+    // this can never race the fallback timer below.
+    fireTransitionEnd(screen.getByLabelText('Chat message'), 'height');
+    expect(chatPane().className).toBe('wzChatPane wzChatPane--docking');
+    await waitFor(() => expect(mockStreamChat).toHaveBeenCalled());
+
+    // Real timers, not fake ones: the fallback timer is the PRIMARY settle path (a browser can
+    // swallow `transitionend`, and jsdom never fires one on its own), so this waits it out for real
+    // rather than mocking away the very mechanism under test.
+    await waitFor(() => expect(chatPane().className).toBe('wzChatPane'), {
+      timeout: 3000,
+    });
+    expect(composerRow().style.transform).toBe('');
+    stream.end();
+  });
+
+  it('hard-cuts to the docked layout under prefers-reduced-motion', async () => {
+    const original = window.matchMedia;
+    // Only the reduced-motion query answers `true`, and the returned object carries the whole
+    // MediaQueryList surface: EUI's own responsive helpers call `matchMedia` too, and a bare
+    // `{ matches }` stub would throw the moment one of them attached a listener.
+    Object.defineProperty(window, 'matchMedia', {
+      value: jest.fn().mockImplementation((query: string) => ({
+        matches: query.includes('prefers-reduced-motion'),
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        dispatchEvent: jest.fn(),
+      })),
+      writable: true,
+      configurable: true,
+    });
+    try {
+      const stream = stubStream();
+      renderChatPage();
+      await screen.findByText('Ask the AI Assistant something');
+      expect(chatPane().className).toBe('wzChatPane wzChatPane--welcome');
+
+      pressSend('first question');
+
+      // No `docking` frame at all: no travel, no ghost, no inline transform — the composer is
+      // simply where it will stay.
+      expect(chatPane().className).toBe('wzChatPane');
+      expect(composerRow().style.transform).toBe('');
+      expect(welcomeGroup()?.className).not.toContain('--leaving');
+      await waitFor(() => expect(mockStreamChat).toHaveBeenCalled());
+      stream.end();
+    } finally {
+      Object.defineProperty(window, 'matchMedia', {
+        value: original,
+        writable: true,
+        configurable: true,
+      });
+    }
+  });
+
+  it('starts docked, with no transition, for a conversation restored on mount', async () => {
+    window.history.replaceState(null, '', '/conversation/conv-b');
+
+    renderChatPage();
+    await waitFor(() =>
+      expect(screen.getByText('earlier question')).toBeInTheDocument(),
+    );
+
+    // A restored conversation has messages, so it never passes through the centred state and has no
+    // bridge to animate — `docked` is the machine's initial value precisely for this case.
+    expect(chatPane().className).toBe('wzChatPane');
+    expect(welcomeGroup()).toBeNull();
+    expect(composerRow().style.transform).toBe('');
+  });
+
+  it('returns to the centred welcome after New conversation', async () => {
+    const stream = stubStream();
+    renderChatPage();
+    await screen.findByText('Ask the AI Assistant something');
+    await sendMessage('first question');
+    stream.push({ type: 'done' });
+    stream.end();
+    // Send coming back is how the composer reports the turn has finished.
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Send' })).toBeInTheDocument(),
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'New conversation' }));
+
+    // The transition is once per conversation, not once per session: an empty transcript is offered
+    // the centred composer again. Waited for, because a still-settling bridge owns the machine
+    // until its own settle lands.
+    await waitFor(
+      () => expect(chatPane().className).toBe('wzChatPane wzChatPane--welcome'),
+      { timeout: 3000 },
+    );
+    expect(
+      screen.getByText('Ask the AI Assistant something'),
+    ).toBeInTheDocument();
+  });
+
+  it('keeps the centred state and the travel in the stylesheet, not in JS', () => {
+    // Same reasoning (and same `path.join`/`fs` route around `moduleNameMapper`) as the
+    // two-row-grid stylesheet test above: the mechanism lives in CSS, so the CSS is what gets
+    // pinned.
+    const scssPath = path.join(__dirname, 'chat-page.scss');
+    const scssRules = fs
+      .readFileSync(scssPath, 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/^\s*\/\/.*$/gm, '');
+
+    // The centred state is a flex column that centres the pair, and the composer gets its own
+    // compact measure there.
+    expect(scssRules).toMatch(/\.wzChatPane--welcome\s*\{/);
+    expect(scssRules).toMatch(/justify-content:\s*center/);
+    expect(scssRules).toMatch(
+      /\.wzComposerMeasure\s*\{\s*max-width:\s*min\(90%, \$wzWelcomeComposerMaxWidth\)/,
+    );
+    // The travel is a transform transition on the composer row, and the fading cluster leaves the
+    // flow instead of pushing the incoming message down.
+    expect(scssRules).toMatch(
+      /\.wzChatPane--docking > \.wzComposerRow \{\s*transition: transform/,
+    );
+    expect(scssRules).toMatch(
+      /\.wzWelcomeCenter--leaving \{[\s\S]*?position: absolute/,
+    );
+    // Motion stays opt-in: the travel/fade declarations live inside a reduced-motion block, so a
+    // reduced-motion user gets the layout without any of it.
+    expect(scssRules).toMatch(
+      /@media \(prefers-reduced-motion: no-preference\)/,
+    );
+    expect(scssRules).toMatch(/animation: wzFadeOut/);
+  });
+});
+
 describe('ChatPage — sidebar sync across instances (#8827)', () => {
   it('refreshes the conversation list when another instance announces a change', async () => {
     mockConversationsService.list.mockResolvedValue([]);

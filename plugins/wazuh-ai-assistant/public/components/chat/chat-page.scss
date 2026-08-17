@@ -29,6 +29,158 @@
   min-height: 0;
 }
 
+/**
+ * C1 tokens (AI/ux-iter3/gemini-motion-spec.md). Local to this file rather than added to
+ * `public/components/_redesign.scss`: they describe ONE surface's one-time transition, not a shared
+ * role, and _redesign.scss is the shared-vocabulary file (its existing motion tokens — 120/160/200ms
+ * ease-out — are the surface's micro-interaction band, deliberately far below this travel).
+ */
+/* Composer measure in the centred state: the observed Gemini pill is ~36% of a 1280px viewport,
+   i.e. compact, NOT the full transcript measure. 680px keeps it comfortably wider than that at our
+   own 1060px measure while still reading as a pill rather than a bar; 90% is the small-window floor
+   so it never touches the pane edges. */
+$wzWelcomeComposerMaxWidth: 680px;
+/* How far ABOVE the vertical middle the centred group sits (the recording puts the greeting just
+   above the midpoint). Padding at the pane's block end, so `justify-content: center` centres the
+   group inside what is left — viewport-relative with a floor and a ceiling, because on a short pane
+   the group needs every pixel and on a 1800px-tall one a fixed 24px would read as dead centre. */
+$wzWelcomeLift: clamp(16px, 8vh, 96px);
+/* Composer travel: the spec's ~400ms with a DECELERATING ease (fast start, soft settle). Mirrored in
+   chat-page.tsx as `DOCK_TRAVEL_MS` for the settle fallback only — this is the value that actually
+   animates. */
+$wzDockTravel: 400ms;
+$wzDockEase: cubic-bezier(0.16, 1, 0.3, 1);
+/* Greeting + cards fade-out: the spec's "≤200ms, starts immediately on send" — the group is gone
+   well before the composer finishes travelling, exactly as the recording shows. */
+$wzWelcomeFadeOut: 180ms;
+
+/**
+ * C1 — the centred empty state (`ComposerMode = 'centered'`, chat-page.tsx).
+ *
+ * A flex COLUMN for the duration of the empty state, replacing the two-row grid above. That is the
+ * one shape in which the transcript and the composer can read as a single group: `justify-content:
+ * center` centres the pair, and the transcript takes only the height its content needs
+ * (`flex: 0 1 auto`) instead of the `1fr` that would pin the composer to the pane's floor.
+ *
+ * Why not keep the grid and centre with tracks (e.g. `1fr auto 1.3fr`)? A `1fr` transcript track
+ * gets its share of free space regardless of how little content it holds, so the welcome cluster
+ * would be clipped and scrollable at heights where it plainly fits. `flex: 0 1 auto` is the exact
+ * behaviour needed instead: content-sized when there is room, and — because `wzScrollChild` already
+ * gives the transcript `min-height: 0` — shrinking into its OWN scroll when there is not, so a short
+ * viewport degrades by scrolling the greeting rather than by pushing the composer off screen. No
+ * media query, no measured heights, and nothing here is an overlay or a portal.
+ */
+.wzChatPane--welcome {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block-end: $wzWelcomeLift;
+
+  > .wzChatTranscript {
+    flex: 0 1 auto;
+  }
+
+  > .wzComposerRow {
+    flex: 0 0 auto;
+  }
+}
+
+/**
+ * Composer chrome is DOCKED chrome. The full-bleed top hairline and surface fill say "this is the
+ * bottom of the pane"; behind a composer floating mid-pane they would draw a band straight across
+ * the middle of an otherwise empty surface. Suppressed for the centred state AND for the travel:
+ * the row itself is the element that moves (see `.wzChatPane--docking` below), so a fill restored at
+ * the start of the travel would be dragged down the pane with it. It comes back at the settle, which
+ * is also the moment the recording shows the docked footer appearing.
+ *
+ * `transparent` rather than dropping the border: the row keeps its 1px so the composer's height —
+ * and therefore the FLIP's own measured travel — is identical in both states.
+ */
+.wzChatPane--welcome > .wzComposerRow,
+.wzChatPane--docking > .wzComposerRow {
+  border-top-color: transparent;
+  background-color: transparent;
+}
+
+/** The compact centred composer (see `$wzWelcomeComposerMaxWidth`). Interpolated `min()` for the
+ * same reason `.wzMessageRow--wide` uses it: mixed units, so it must reach the browser as CSS. */
+.wzChatPane--welcome .wzComposerMeasure {
+  max-width: min(90%, $wzWelcomeComposerMaxWidth);
+}
+
+/**
+ * C1 — the ~400ms bridge (`ComposerMode = 'docking'`).
+ *
+ * By the time this class is on the pane, the pane is ALREADY the plain two-row grid again (this
+ * modifier adds no layout of its own) — the transcript is at its final height, so the first user
+ * message lands where it will stay even though it can arrive mid-travel. What is left to animate is
+ * the composer row, which chat-page.tsx holds at its old position with an inverted `translateY` and
+ * then releases; this is the transition that carries it home. `transform` only: the row's own layout
+ * is untouched, so the travel costs no reflow, and nothing else on the surface moves with it.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .wzChatPane--docking > .wzComposerRow {
+    transition: transform $wzDockTravel $wzDockEase;
+    /* The row paints a border, a background and a whole composer panel — promoting it for the one
+       transition is the difference between a smooth travel and a repaint per frame on a 2500px
+       window. Scoped to this class, so nothing is left promoted after the settle. */
+    will-change: transform;
+  }
+
+  /* The composer's own width closes the gap between the compact centred measure and the shared
+     docked one over the same budget as the travel. Pure CSS: both ends are lengths, so the value
+     change that lands with this class is directly transitionable — the property is declared HERE, on
+     the docking class, so it only ever animates in this direction (returning to the centred state
+     after "New conversation" is an instant re-centre, not a reverse animation). */
+  .wzChatPane--docking .wzComposerMeasure {
+    transition: max-width $wzDockTravel $wzDockEase;
+  }
+
+  /* Greeting + cards: fade only, no travel — the spec's own reading of the recording ("no visible
+     lingering fade"), and the reason it can be this fast is that it starts on send rather than
+     waiting for the composer. */
+  .wzWelcomeCenter--leaving {
+    animation: wzFadeOut $wzWelcomeFadeOut $wzEase both;
+  }
+
+  @keyframes wzFadeOut {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+}
+
+/**
+ * The fading welcome group, out of flow (chat-page.tsx keeps it mounted for the transition only).
+ *
+ * `position: absolute` with `top`/`inset-inline` against the measure box it already sat in, so the
+ * transcript's flow collapses to just the message list underneath it — that is what guarantees the
+ * incoming message is laid out at its FINAL position rather than below a cluster that is about to
+ * disappear. Its remaining vertical offset is corrected by the same FLIP inversion the composer
+ * gets (chat-page.tsx), so the group holds still while it fades instead of jumping to the top of the
+ * transcript first. `pointer-events: none` because it is a ghost: the cards must not be clickable
+ * while they fade, and the message list is live underneath them.
+ *
+ * One knock-on effect, deliberately left alone: for the fade's duration the ghost's own translated
+ * box still counts towards the transcript's scrollable overflow, so on a SHORT viewport the first
+ * turn can sit a few pixels off the top while it plays. It corrects itself with no extra code —
+ * browsers clamp `scrollTop` when content shrinks, and the ghost unmounts at the settle — which is
+ * why there is no JS here compensating for it.
+ */
+.wzChatPane--docking .wzContentMeasure {
+  position: relative;
+}
+
+.wzWelcomeCenter--leaving {
+  position: absolute;
+  top: 0;
+  inset-inline: 0;
+  pointer-events: none;
+}
+
 /** The transcript is the ONLY thing that scrolls (layout contract §1). `wzScrollChild`
  * (public/components/_redesign.scss) is `min-height: 0; overflow-y: auto` — the Safari/high-res
  * rule that every scrolling grid/flex child needs, since a grid row's automatic minimum size is
@@ -380,6 +532,17 @@
    * animated step. */
   .wzComposerTextarea {
     transition: height $wzMotionBase $wzEase;
+  }
+
+  /* C1: the docked chrome suppressed above comes back the instant the travel settles, which would
+     otherwise be a hairline and a fill popping into existence under a composer that has just stopped
+     moving. One quiet $wzMotionSlow fade instead. Overridden (same property) by
+     `.wzChatPane--docking > .wzComposerRow`'s own `transition: transform` while the row is
+     travelling, which is exactly when this must NOT run — the chrome is transparent throughout the
+     travel and only fades in once the row has arrived. */
+  .wzComposerRow {
+    transition: background-color $wzMotionSlow $wzEase,
+      border-color $wzMotionSlow $wzEase;
   }
 
   /* The jump button is inserted mid-gesture (the user is scrolling when it appears), so a hard

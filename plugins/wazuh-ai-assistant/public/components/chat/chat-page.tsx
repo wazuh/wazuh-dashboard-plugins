@@ -1,5 +1,5 @@
 import './chat-page.scss';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   EuiSpacer,
   EuiEmptyPrompt,
@@ -114,6 +114,71 @@ interface ChatPageProps {
    * to make, the same way `showConversationSidebar` already is.
    */
   allowRailFlyout?: boolean;
+  /**
+   * Whether the empty state may render as ONE vertically centred group (greeting + composer +
+   * example cards) that docks the composer to the bottom on the first send — C1, the Gemini-style
+   * empty state (AI/ux-iter3/gemini-motion-spec.md). Default true, i.e. the app shell's full-page
+   * chat gets it; the header's docked sidecar (assistant-chat-panel.tsx) passes `false` and keeps
+   * today's always-docked composer, per the spec's own "no room for theatre" note.
+   *
+   * A dedicated prop rather than piggy-backing on `allowRailFlyout === false` (the only other
+   * signal that currently distinguishes the sidecar): that prop answers "may the rail escalate to
+   * a full-screen overlay", which is a different question with a different answer surface — a
+   * future caller could well want a centred welcome AND no rail flyout, or the reverse. Same
+   * reasoning `allowRailFlyout`'s own doc comment gives for not sniffing `showConversationSidebar`:
+   * the embedding context is the CALLER's to declare, one explicit prop per decision.
+   */
+  enableWelcomeComposer?: boolean;
+}
+
+/**
+ * C1 composer position state machine (chat-page.scss carries the matching classes).
+ *
+ * - `centered` — the empty state: the pane is a centred flex column, so the transcript (holding
+ *   greeting + example cards) and the composer read as one group sitting slightly above the
+ *   vertical middle, with a compact composer measure.
+ * - `docking` — the one-time bridge, ~400ms: the pane is ALREADY back in its final
+ *   `grid-template-rows: 1fr auto` layout (so the transcript is laid out at full height before the
+ *   first user message lands in it), and the composer is carried from its old position to its new
+ *   one by an inverted transform (FLIP). The welcome group fades out of flow on top.
+ * - `docked` — today's layout, byte for byte: `.wzChatPane` with no modifier, no inline transform.
+ *   Every other state of this component (loading, no-provider, restored conversation, and the
+ *   embedded sidecar) is this one, so nothing about the existing surface depends on the machine.
+ *
+ * FLIP (measure → apply final layout → invert → release) rather than a pure CSS transition,
+ * because the two end states differ in `display` (flex vs grid) and in track sizing (`auto` vs
+ * `1fr`) — neither is interpolable, so there is no property a CSS transition could animate between
+ * them. Inverting a transform on the composer row is the only mechanism that gets the final layout
+ * committed immediately (which is what the transcript needs) while still showing the travel.
+ */
+type ComposerMode = 'centered' | 'docking' | 'docked';
+
+/** Pane classes per mode. A map, not a nested ternary in the JSX: the docked entry has to stay
+ * exactly `'wzChatPane'` (no modifier) and reading that off one table is what makes it obvious. */
+const PANE_CLASS_BY_COMPOSER_MODE: Record<ComposerMode, string> = {
+  centered: 'wzChatPane wzChatPane--welcome',
+  docking: 'wzChatPane wzChatPane--docking',
+  docked: 'wzChatPane',
+};
+
+/** Composer travel budget — the JS half of `$wzDockTravel` (chat-page.scss), which owns the actual
+ * `transition-duration`. This copy exists only for the settle FALLBACK below, so the two are
+ * allowed to differ slightly (the fallback is deliberately the longer of the two). */
+const DOCK_TRAVEL_MS = 400;
+/** `transitionend` can never be relied on alone: it does not fire when the animated property never
+ * actually changes (a zero-length travel — e.g. an already-bottom composer), when the element is
+ * hidden mid-flight (the sidecar's own tab switch), or in jsdom, which runs no transitions at all.
+ * The timer is therefore the primary settle path and the event is the fast path. */
+const DOCK_SETTLE_FALLBACK_MS = DOCK_TRAVEL_MS + 300;
+
+/** Reduced-motion probe. `matchMedia` is absent in jsdom, so it is optional-called rather than
+ * assumed; a missing implementation reads as "no preference", i.e. animate. Shared by the two
+ * places that need the preference in JS instead of CSS (smooth-scrolling the transcript, and the
+ * composer's dock travel) so they can never disagree. */
+function prefersReducedMotion(): boolean {
+  return (
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
+  );
 }
 
 /**
@@ -245,6 +310,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   isActive = true,
   showConversationSidebar = true,
   allowRailFlyout = true,
+  enableWelcomeComposer = true,
 }) => {
   // `useSyncedState` (public/hooks/use-synced-state.ts) is the `[value, setValue, ref]` pattern
   // used for `messages`, `inputText`, and `activeConversationId` below — see that hook's own doc
@@ -466,8 +532,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
    * writes `scrollTop` on every flushed streaming frame, and a smooth container would animate each
    * of those writes instead of tracking the stream — the pane would visibly lag behind the text.
    * That also means `prefers-reduced-motion` has to be honoured here in JS (the `behavior` option
-   * ignores it), which is why this reads the media query itself rather than relying on the
-   * stylesheet's own reduced-motion block. Both browser APIs are probed rather than assumed:
+   * ignores it), which is why this goes through `prefersReducedMotion()` above rather than relying
+   * on the stylesheet's own reduced-motion block. Both browser APIs are probed rather than assumed:
    * `matchMedia` and `Element.prototype.scrollTo` are absent in jsdom, where this falls back to the
    * same direct `scrollTop` assignment the streaming effect uses.
    */
@@ -477,14 +543,193 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     if (!pane) {
       return;
     }
-    const prefersReducedMotion =
-      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
-    if (!prefersReducedMotion && typeof pane.scrollTo === 'function') {
+    if (!prefersReducedMotion() && typeof pane.scrollTo === 'function') {
       pane.scrollTo({ top: pane.scrollHeight, behavior: 'smooth' });
       return;
     }
     pane.scrollTop = pane.scrollHeight;
   };
+
+  const hasProviders = providers.length > 0;
+  const showNoProviderState = providersLoaded && !hasProviders;
+  // Initial mount, before the app shell's provider load has resolved either way: neither the
+  // no-provider nor the welcome state can render yet (both depend on `providersLoaded`), so without
+  // an explicit state here this window shows a blank pane. Restoring a conversation shows the same
+  // spinner, so a reload lands on "loading" and then the transcript, instead of flashing the
+  // welcome state at a user who is not starting from scratch.
+  const showLoadingState = !providersLoaded || isRestoringConversation;
+  const showWelcomeState =
+    hasProviders && messages.length === 0 && !showLoadingState;
+  // Declared HERE, above the handlers, rather than beside the JSX where they used to sit: the C1
+  // composer-mode machine below reads `showWelcomeState`, and `handleSend` further down reads the
+  // machine — with `no-use-before-define` (eslint.config.mjs) forbidding const hoisting, this is
+  // the one ordering that satisfies both. The JSX consumes all four exactly as before.
+
+  /**
+   * C1 — the composer's own position state (see `ComposerMode` above for what each state means and
+   * why the travel is a FLIP rather than a CSS transition).
+   *
+   * `docked` is the initial value on purpose: it is today's layout, so the very first paint of every
+   * embedding context (and of a page that is still loading providers or restoring a conversation)
+   * is exactly what it is now, and the centred state is only ever entered deliberately, by the
+   * effect below. A conversation restored on mount therefore never passes through `centered` and
+   * never animates — it has messages, so the effect leaves it `docked`.
+   */
+  const [composerMode, setComposerMode] = useState<ComposerMode>('docked');
+  /** The travelling element: the composer's grid ROW, not the panel inside it. The row is what the
+   * grid positions, and `.wzComposerRow` clips its own overflow (`overflow-y: auto`, the composer
+   * ceiling), so a transform on anything inside it would be cut off mid-flight. */
+  const composerRowRef = useRef<HTMLDivElement | null>(null);
+  /** The greeting + example-cards cluster, measured for the same inversion: it has to stay visually
+   * still while it fades, even though the layout underneath it has already changed. */
+  const welcomeGroupRef = useRef<HTMLDivElement | null>(null);
+  /** Viewport-relative tops captured in the LAST centred frame, i.e. the "First" half of FLIP. */
+  const dockOriginRef = useRef<{
+    composerTop: number;
+    welcomeTop: number | null;
+  } | null>(null);
+  /**
+   * "The centred welcome has already been dismissed for the conversation on screen." Without it,
+   * the settle below could hand control back to the effect while `messages` is still empty (the
+   * first `updateMessages` happens after `startTurn`'s awaited session probe, which is normally
+   * instant but is a network call), and the composer would fly back up to the centre a beat after
+   * it finished docking. Cleared wherever a genuinely fresh conversation appears
+   * (`handleNewConversation`) or a stored one is loaded (`applyLoadedConversation`).
+   */
+  const welcomeDismissedRef = useRef(false);
+
+  /**
+   * The only entry into `centered`, and the only automatic exit that is NOT the send transition
+   * (opening a saved conversation from the rail, whose messages make `showWelcomeState` false).
+   * Never runs while `docking`: the machine owns that window, and re-deriving from
+   * `showWelcomeState` inside it is exactly the flicker `welcomeDismissedRef` exists to prevent.
+   */
+  useEffect(() => {
+    if (composerMode === 'docking') {
+      return;
+    }
+    const shouldCenter =
+      enableWelcomeComposer && showWelcomeState && !welcomeDismissedRef.current;
+    if (shouldCenter && composerMode !== 'centered') {
+      setComposerMode('centered');
+    } else if (!shouldCenter && composerMode !== 'docked') {
+      setComposerMode('docked');
+    }
+  }, [composerMode, enableWelcomeComposer, showWelcomeState]);
+
+  /** Settles the machine: drops the inline FLIP styles and returns the pane to the plain docked
+   * layout. Idempotent, because both settle paths (the `transitionend` fast path and the timer
+   * fallback) can legitimately fire for the same travel. */
+  const settleDock = () => {
+    const row = composerRowRef.current;
+    if (row) {
+      row.style.transition = '';
+      row.style.transform = '';
+    }
+    dockOriginRef.current = null;
+    setComposerMode('docked');
+  };
+
+  /**
+   * Starts the bridge. Called from `handleSend` while centred, BEFORE it awaits anything, so the
+   * measurement below is taken from the frame the user actually pressed Send in.
+   *
+   * Reduced motion (and any environment where the composer row is not measurable) hard-cuts to
+   * `docked`: no travel, no fade, no `docking` frame at all — the spec's own reduced-motion rule.
+   */
+  const beginDocking = () => {
+    welcomeDismissedRef.current = true;
+    const row = composerRowRef.current;
+    if (!row || prefersReducedMotion()) {
+      setComposerMode('docked');
+      return;
+    }
+    dockOriginRef.current = {
+      composerTop: row.getBoundingClientRect().top,
+      welcomeTop: welcomeGroupRef.current?.getBoundingClientRect().top ?? null,
+    };
+    setComposerMode('docking');
+  };
+
+  /**
+   * The "Invert" and "Play" halves of the FLIP, plus the settle fallback.
+   *
+   * `useLayoutEffect`, not `useEffect`: this runs after React has committed the docked layout but
+   * BEFORE the browser paints it, which is the whole reason the composer is never seen at the
+   * bottom for one frame. The inversion is applied with `transition: none` inline so the jump back
+   * up is instant, then released on the next animation frame — at which point `.wzChatPane--docking`
+   * (chat-page.scss) supplies the real `transition: transform $wzDockTravel` and the row travels
+   * down to its committed position. The welcome ghost is inverted the same way but never released:
+   * it only has to stay still while its own fade-out runs.
+   *
+   * An environment without `requestAnimationFrame` would otherwise be left holding the inverted
+   * transform for good, so it settles immediately instead (jsdom does provide rAF; a legacy browser
+   * simply gets the hard cut, same as reduced motion).
+   */
+  useLayoutEffect(() => {
+    if (composerMode !== 'docking') {
+      return undefined;
+    }
+    const origin = dockOriginRef.current;
+    const row = composerRowRef.current;
+    if (!origin || !row) {
+      settleDock();
+      return undefined;
+    }
+    const welcome = welcomeGroupRef.current;
+    if (welcome && origin.welcomeTop !== null) {
+      const welcomeDelta =
+        origin.welcomeTop - welcome.getBoundingClientRect().top;
+      welcome.style.transform = `translateY(${welcomeDelta}px)`;
+    }
+    const composerDelta = origin.composerTop - row.getBoundingClientRect().top;
+    row.style.transition = 'none';
+    row.style.transform = `translateY(${composerDelta}px)`;
+
+    const timer = window.setTimeout(settleDock, DOCK_SETTLE_FALLBACK_MS);
+    if (typeof window.requestAnimationFrame !== 'function') {
+      settleDock();
+      return () => window.clearTimeout(timer);
+    }
+    const frame = window.requestAnimationFrame(() => {
+      row.style.transition = '';
+      row.style.transform = '';
+    });
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.clearTimeout(timer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on the mode only: every other
+    // value it reads is a ref, and re-running this on an unrelated re-render would restart the
+    // travel from wherever it had got to.
+  }, [composerMode]);
+
+  /** The fast settle path. Scoped to the row's OWN transform (a nested EUI transition — a button's
+   * hover, the textarea's height — bubbles to the same handler and must not end the travel early). */
+  const handleComposerTransitionEnd = (
+    event: React.TransitionEvent<HTMLDivElement>,
+  ) => {
+    if (
+      composerMode === 'docking' &&
+      event.target === event.currentTarget &&
+      event.propertyName === 'transform'
+    ) {
+      settleDock();
+    }
+  };
+
+  /**
+   * The welcome group (greeting + example cards) outlives `showWelcomeState` by exactly one
+   * transition: the moment the user's message is appended the welcome state is false, but the group
+   * still has a fade-out to run, so `docking` keeps it mounted.
+   *
+   * While it is fading it is NO LONGER in flow (`.wzWelcomeCenter--leaving` is out-of-flow, and the
+   * `--stretch` centring modifier comes off with it), which is what lets the transcript lay itself
+   * out at its final height immediately — streaming starts on send, so the first user message can
+   * land while the composer is still travelling, and it has to land in the position it will keep.
+   */
+  const welcomeIsInFlow = showWelcomeState && composerMode !== 'docking';
+  const isWelcomeGroupMounted = showWelcomeState || composerMode === 'docking';
 
   /**
    * Conversation rail display mode (layout contract §5 / job item 6): expanded at >=1100px of
@@ -767,6 +1012,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     // A resumed conversation opens at its latest turn (bottom), like every chat client — through
     // `repinToBottom` so the jump button's own mirror is repinned with it.
     repinToBottom();
+    // C1: the loaded conversation decides the composer's position on its own — with messages it
+    // stays docked (no transition, it was never centred), and in the degenerate empty-transcript
+    // case the welcome composer is legitimately offered again.
+    welcomeDismissedRef.current = false;
     const restored = reconstructConversation(record.messages);
     updateMessages(restored.messages);
     // Restoring the tool history is what makes a resumed conversation continuable rather than just
@@ -877,6 +1126,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const handleNewConversation = () => {
     abandonActiveStream();
     repinToBottom();
+    // C1: a brand-new conversation gets the centred welcome composer back (the effect above picks
+    // this up as soon as `messages` is empty again) — the transition is once per conversation, not
+    // once per session.
+    welcomeDismissedRef.current = false;
     updateMessages([]);
     turnHistoryRef.current = [];
     setPseudonymMap([]);
@@ -1713,6 +1966,15 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     setMergeNotice(null);
     setSessionExpired(false);
     setSaveFailed(false);
+    // C1: the first send of a centred conversation is what docks the composer. Started here, before
+    // the first `await`, for two reasons: the FLIP measurement has to be taken from the frame the
+    // user pressed Send in, and the transcript has to be in its final (docked) layout before the
+    // user's own message lands in it — `startTurn` appends that message after an awaited session
+    // probe, so anything scheduled later could race it. Deliberately AFTER the no-provider guard
+    // above: a send that never happens must not move the composer.
+    if (composerMode === 'centered') {
+      beginDocking();
+    }
     await startTurn([
       ...messages,
       {
@@ -1762,16 +2024,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     await startTurn(history);
   };
 
-  const hasProviders = providers.length > 0;
-  const showNoProviderState = providersLoaded && !hasProviders;
-  // Initial mount, before the app shell's provider load has resolved either way: neither the
-  // no-provider nor the welcome state can render yet (both depend on `providersLoaded`), so without
-  // an explicit state here this window shows a blank pane. Restoring a conversation shows the same
-  // spinner, so a reload lands on "loading" and then the transcript, instead of flashing the
-  // welcome state at a user who is not starting from scratch.
-  const showLoadingState = !providersLoaded || isRestoringConversation;
-  const showWelcomeState =
-    hasProviders && messages.length === 0 && !showLoadingState;
   /** `error` is the send-path failure; `providersError` the app shell's provider-load failure. One
    * callout reports whichever is current, so dismissal is tracked against this one value. */
   const activeError = error ?? providersError;
@@ -2051,8 +2303,16 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           `position: sticky` composer this replaces. Row 1 (`.wzChatTranscript` below) is the ONLY
           scroll container; row 2 (`.wzComposerRow` below) stays in normal flow. That grid boundary
           — not a tuned padding/gradient pair — is what makes the composer/welcome overlap this
-          redesign fixes structurally impossible instead of merely rare. */}
-        <div className='wzChatPane' style={{ flex: 1, minWidth: 0 }}>
+          redesign fixes structurally impossible instead of merely rare.
+
+          C1 adds exactly two temporary modifiers to that pane (`PANE_CLASS_BY_COMPOSER_MODE`
+          above): `--welcome` while the empty state is one centred group, and `--docking` for the
+          ~400ms bridge. The `docked` entry is the bare `wzChatPane` this always was, so the end
+          state of every conversation — and every state of the embedded sidecar — is unchanged. */}
+        <div
+          className={PANE_CLASS_BY_COMPOSER_MODE[composerMode]}
+          style={{ flex: 1, minWidth: 0 }}
+        >
           {/* The conversation's ONE scroll container — scrollbar belongs at the pane's far edge
             like any chat app, and should only exist once content overflows (no permanently
             reserved gutter). The auto-scroll pinning refs above target it; overflowAnchor keeps
@@ -2287,7 +2547,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
               <div
                 className={
-                  showWelcomeState
+                  welcomeIsInFlow
                     ? 'wzContentMeasure wzContentMeasure--stretch'
                     : 'wzContentMeasure'
                 }
@@ -2384,9 +2644,29 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     tall viewport centres the cluster; a short one has nowhere to grow into, so this
                     stops at the content's own height and the transcript's own `overflow-y: auto`
                     takes over — nothing here can ever reach the composer, which is a grid sibling
-                    of the transcript, never a descendant of it. */}
-                {showWelcomeState && (
-                  <div className='wzWelcomeCenter'>
+                    of the transcript, never a descendant of it.
+
+                    C1 layers on top WITHOUT moving any of this: in the centred state the pane
+                    itself becomes the centring container (`.wzChatPane--welcome`), so this cluster
+                    and the composer read as one group while each stays exactly where it already
+                    lived in the DOM. That is deliberate — the composer must remain ONE React
+                    instance across the transition (re-parenting it into this subtree would remount
+                    ChatInput, dropping focus and the textarea's autogrow height, and an element
+                    cannot animate across a remount). The order inside the group is therefore
+                    greeting → cards → composer rather than the recording's greeting → composer:
+                    Gemini shows no cards at all, and putting ours BELOW the composer would need a
+                    second render site for them plus a pane row underneath the travelling composer
+                    for the transition to pass through. Group composition and motion match the spec;
+                    the internal order is the one the existing DOM already gives. */}
+                {isWelcomeGroupMounted && (
+                  <div
+                    ref={welcomeGroupRef}
+                    className={
+                      welcomeIsInFlow
+                        ? 'wzWelcomeCenter'
+                        : 'wzWelcomeCenter wzWelcomeCenter--leaving'
+                    }
+                  >
                     <EuiEmptyPrompt
                       // No `icon`: this chat already lives inside the Wazuh app chrome, so a Wazuh
                       // mark on the welcome screen only repeated branding the user can already see.
@@ -2524,27 +2804,35 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             whatever else the page is showing when this same ChatPage is embedded in the header's
             docked panel (assistant-chat-panel.tsx). Sharing the transcript's grid row is what keeps
             it above the composer's own `auto` row by construction: there is no offset to keep in
-            sync with the composer's variable height. */}
-          {!showLoadingState && !showNoProviderState && !isPinnedToBottom && (
-            <div className='wzJumpToLatest'>
-              <EuiButtonIcon
-                className='wzJumpToLatestButton'
-                // `arrowDown`, not `sortDown`: both read correctly, but this one is already used
-                // elsewhere in this plugin (result-table.tsx's row expander), so it is proven
-                // present in whichever EUI version the host platform bundles.
-                iconType='arrowDown'
-                display='base'
-                color='text'
-                onClick={handleJumpToLatest}
-                aria-label={i18n.translate(
-                  'wazuhAiAssistant.chat.jumpToLatest',
-                  {
-                    defaultMessage: 'Jump to latest',
-                  },
-                )}
-              />
-            </div>
-          )}
+            sync with the composer's variable height.
+
+            Withheld in the centred empty state (C1): there is no conversation to jump to yet, and
+            `grid-row: 1` means nothing while the pane is a flex column — the button would become a
+            third flex item wedged between the welcome group and the composer, breaking the very
+            grouping the centred state exists to create. */}
+          {!showLoadingState &&
+            !showNoProviderState &&
+            composerMode !== 'centered' &&
+            !isPinnedToBottom && (
+              <div className='wzJumpToLatest'>
+                <EuiButtonIcon
+                  className='wzJumpToLatestButton'
+                  // `arrowDown`, not `sortDown`: both read correctly, but this one is already used
+                  // elsewhere in this plugin (result-table.tsx's row expander), so it is proven
+                  // present in whichever EUI version the host platform bundles.
+                  iconType='arrowDown'
+                  display='base'
+                  color='text'
+                  onClick={handleJumpToLatest}
+                  aria-label={i18n.translate(
+                    'wazuhAiAssistant.chat.jumpToLatest',
+                    {
+                      defaultMessage: 'Jump to latest',
+                    },
+                  )}
+                />
+              </div>
+            )}
 
           {/* Composer row: the grid's `auto` row (`.wzChatPane` above), a real flow sibling of the
             transcript, never an overlay — see the layout-contract comment above `privacyBadgeLabel`.
@@ -2553,13 +2841,23 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             autogrow cap lives in chat-input.tsx. */}
           {!showLoadingState && !showNoProviderState && (
             <div
+              ref={composerRowRef}
+              onTransitionEnd={handleComposerTransitionEnd}
               className={
                 hasProviders
                   ? 'wzComposerRow'
                   : 'wzComposerRow wzComposerRow-isDisabled'
               }
             >
-              <div className='wzContentMeasure' style={{ padding: '8px 24px' }}>
+              {/* `.wzComposerMeasure` alongside the shared measure class: it is the hook C1 needs
+                for the composer's own COMPACT width in the centred state (`min(90%, 680px)`), which
+                widens back to the shared measure over the same 400ms as the travel — a plain CSS
+                `max-width` transition, since both ends are lengths (unlike the pane's own
+                flex↔grid switch, which is why the vertical half has to be a FLIP). */}
+              <div
+                className='wzContentMeasure wzComposerMeasure'
+                style={{ padding: '8px 24px' }}
+              >
                 <EuiPanel
                   color='plain'
                   hasBorder
