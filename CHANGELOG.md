@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.14.9
 
+### Changed
+
+- Upgraded jsdom and its dependencies (`lodash` to `4.18.1`, `form-data` to `3.0.5`) [#8978](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8978)
+
 ## Wazuh v4.14.8 - OpenSearch Dashboards 2.19.5 - Revision 00
 
 ### Added
