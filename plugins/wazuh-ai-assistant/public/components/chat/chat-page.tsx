@@ -216,6 +216,13 @@ const RAIL_FLYOUT_AT = 900;
  * Extracted from the two places that now read it (the pinning handler and the jump-to-latest
  * button's own visibility, which is the same predicate inverted) rather than restated. */
 const SCROLL_PIN_THRESHOLD_PX = 160;
+/** Extra slack before an already-pinned pane UNpins (hysteresis). The pin predicate reads
+ * `clientHeight`, and anything that resizes the pane right on the pin boundary — in the audited
+ * bug it was the jump button owning its own 36px grid track; any future layout could reintroduce
+ * an equivalent — turns a single boundary crossing into show→resize→hide→resize flicker when both
+ * directions share one threshold. Unpinning at 160+40 while re-pinning at 160 keeps the
+ * predicate's output from ever feeding back into its own input. */
+const SCROLL_UNPIN_SLACK_PX = 40;
 /** Window event announcing a conversation create/update/delete; every mounted ChatPage listens
  * and refreshes, keeping the app shell's and the header flyout's sidebars in sync. */
 export const CONVERSATIONS_CHANGED_EVENT =
@@ -513,9 +520,12 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     if (!pane) {
       return;
     }
-    const pinned =
-      pane.scrollHeight - pane.scrollTop - pane.clientHeight <
-      SCROLL_PIN_THRESHOLD_PX;
+    const distance = pane.scrollHeight - pane.scrollTop - pane.clientHeight;
+    // Hysteresis: a pinned pane must travel PAST the threshold plus slack to unpin, while an
+    // unpinned one re-pins at the plain threshold — see SCROLL_UNPIN_SLACK_PX.
+    const pinned = pinnedToBottomRef.current
+      ? distance < SCROLL_PIN_THRESHOLD_PX + SCROLL_UNPIN_SLACK_PX
+      : distance < SCROLL_PIN_THRESHOLD_PX;
     pinnedToBottomRef.current = pinned;
     setIsPinnedToBottom(previous => (previous === pinned ? previous : pinned));
   };

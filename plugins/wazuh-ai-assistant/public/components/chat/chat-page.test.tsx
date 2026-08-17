@@ -1942,6 +1942,39 @@ describe('ChatPage — jump to latest (C2)', () => {
     expect(jumpButton()).toBeNull();
   });
 
+  it('holds its state inside the hysteresis band instead of flickering', async () => {
+    // The unpin threshold carries extra slack over the re-pin one (SCROLL_UNPIN_SLACK_PX):
+    // a distance between the two must keep whatever state the pane already had, so a layout
+    // shift of a few dozen pixels right on the boundary can never toggle the button.
+    await renderWithOneTurn();
+    const pane = transcriptPane();
+
+    // Pinned, then a scroll landing between 160 and 200 (distance 180): stays pinned.
+    stubPaneScroll(pane, {
+      scrollHeight: 2000,
+      clientHeight: 900,
+      scrollTop: 920,
+    });
+    fireEvent.scroll(pane);
+    expect(jumpButton()).toBeNull();
+
+    // Unpin for real (distance 1500), then the same in-band distance: stays UNpinned.
+    stubPaneScroll(pane, {
+      scrollHeight: 2000,
+      clientHeight: 500,
+      scrollTop: 0,
+    });
+    fireEvent.scroll(pane);
+    expect(jumpButton()).not.toBeNull();
+    stubPaneScroll(pane, {
+      scrollHeight: 2000,
+      clientHeight: 900,
+      scrollTop: 920,
+    });
+    fireEvent.scroll(pane);
+    expect(jumpButton()).not.toBeNull();
+  });
+
   it('appears once the reader scrolls up, outside the pin threshold', async () => {
     await renderWithOneTurn();
     const pane = transcriptPane();
