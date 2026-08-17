@@ -1114,15 +1114,22 @@ describe('ProviderFormFlyout — one tight column (audit §5)', () => {
     );
   });
 
-  it('clears the body scroll gutter for the header and the footer', () => {
+  it('clears the body scroll gutter for the header and lands the footer CTA on the shared edge', () => {
     // §5.5: the CTA broke the form's right edge by the scrollbar's own 10px, because header and
-    // footer sit outside the scrolling body and so never carried that gutter.
+    // footer sit outside the scrolling body and never carried that gutter. The re-audit (§1.2)
+    // then showed compensating the footer's direct child was not enough: that child is EUI's
+    // EuiFlexGroup, whose ITEMS carry their own 12px margins, so the visible button still sat
+    // 12px inside the edge. The compensation therefore lives on the last flex item — the element
+    // that actually paints the edge — as EUI's item margin plus the gutter.
     const scss = fs.readFileSync(
       path.join(__dirname, 'provider-form-flyout.scss'),
       'utf8',
     );
     expect(scss).toMatch(
-      /\.wzProviderFlyoutPanel \.euiFlyoutFooter > \*,?\s*\{[^}]*margin-inline-end: \$wzScrollGutter/,
+      /\.wzProviderFlyoutPanel \.euiFlyoutHeader > \* \{[^}]*margin-inline-end: \$wzScrollGutter/,
+    );
+    expect(scss).toMatch(
+      /\.euiFlyoutFooter > \.euiFlexGroup > \.euiFlexItem:last-child \{[^}]*margin-inline-end: calc\(#\{\$euiSizeM\} \+ #\{\$wzScrollGutter\}\)/,
     );
   });
 });
