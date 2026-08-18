@@ -258,19 +258,49 @@ test('buildSystemPrompt: the deliberate vulnerability-history limitation is NOT 
   );
 });
 
-test('buildSystemPrompt: instructs the model to never name internal tool ids in user-facing prose', () => {
+test('buildSystemPrompt: instructs the model to never name internal tool ids in explanatory prose', () => {
   // A real answer once wrote "which get_rules (Security Analytics correlation rules) doesn't
-  // index..." -- a raw tool id from CAPABILITY_INVENTORY leaking into the user-visible answer.
-  // The model has no other source for these ids than the catalog clause, so the rule must name
-  // at least one example id and require plain-language description instead.
+  // index..." -- a raw tool id from CAPABILITY_INVENTORY leaking into the user-visible answer,
+  // inside an EXPLANATION rather than an offer. The model has no other source for these ids
+  // than the catalog clause, so the rule must name at least one example id and require
+  // plain-language description instead, scoped to explanatory/narrative prose so it does not
+  // swallow the pre-existing search_wazuh_data offer instruction (see next test).
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
-    /Never write an internal tool name \(e\.g\. get_rules, search_wazuh_data\) in your answer text/,
+    /Never write an internal tool name \(e\.g\. get_rules, search_wazuh_data\) inside an\s+explanation or narrative sentence of your answer text/,
   );
   assert.match(
     prompt,
-    /describe the capability in plain language instead/,
+    /describe the capability in\s+plain language instead/,
+  );
+});
+
+test('buildSystemPrompt: the no-tool-names rule explicitly carves out the search_wazuh_data offer, and the offer instruction still survives verbatim', () => {
+  // Fix for the contradiction flagged in adversarial review: prompts.ts previously told the
+  // model both to offer to query with search_wazuh_data BY NAME (Answer format rule) and to
+  // never write an internal tool name in its answer (added later). If the model obeyed the
+  // newer, more general rule, it would stop naming search_wazuh_data in its offers, which
+  // silently disables findOfferedFollowUpTool's regex-based deferred-offer detector in
+  // routes/chat.ts (it matches on the bare tool name appearing in an offer-shaped sentence).
+  // Both rules must therefore explicitly cross-reference the same carve-out, and the offer
+  // instruction itself must still be present so the detector has something to match.
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  // The pre-existing offer instruction must still order the model to name search_wazuh_data.
+  assert.match(
+    prompt,
+    /say so and offer to query\s+it with search_wazuh_data instead of speculating/,
+  );
+  // The offer instruction must flag itself as the exception to the no-tool-names rule.
+  assert.match(
+    prompt,
+    /is the one permitted exception to the\s+"never write an internal tool name" rule below/,
+  );
+  // The no-tool-names rule must in turn reference that same carve-out by describing the exact
+  // offer sentence, so a future reader cannot read the two rules as contradictory.
+  assert.match(
+    prompt,
+    /The one exception is the follow-up-offer sentence described in the Answer format\s+rule above/,
   );
 });
 

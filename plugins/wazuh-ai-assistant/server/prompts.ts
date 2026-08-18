@@ -60,7 +60,9 @@ export function buildSystemPrompt(nowIso: string): string {
       'danger unless the user explicitly asked about risk. Do not enumerate individual ' +
       'timestamps or rows in prose; the table below your answer shows them. If the user asks ' +
       'about a field your result does not include (e.g. source IPs), say so and offer to query ' +
-      'it with search_wazuh_data instead of speculating. End with at most one short follow-up ' +
+      'it with search_wazuh_data instead of speculating -- naming search_wazuh_data by name in ' +
+      'that offer sentence is required here and is the one permitted exception to the ' +
+      '"never write an internal tool name" rule below. End with at most one short follow-up ' +
       'offer. Keep the whole answer under roughly 120 words unless the user asks for more ' +
       'detail.',
     // Emphasis guidance exists because the UI renders markdown but the model only sometimes
@@ -86,12 +88,22 @@ export function buildSystemPrompt(nowIso: string): string {
       `catalog: ${CAPABILITY_INVENTORY}.`,
     // A real answer once wrote "which get_rules (Security Analytics correlation rules) doesn't
     // index..." -- a raw tool id from CAPABILITY_INVENTORY leaking straight into user-facing
-    // prose. Tool ids are internal plumbing named for this catalog, not vocabulary the user
-    // shares; the fix is a plain-language description of the capability instead.
-    'Never write an internal tool name (e.g. get_rules, search_wazuh_data) in your answer text ' +
-      '-- describe the capability in plain language instead (e.g. "the correlation-rule ' +
-      'listing", "the Wazuh data search"). This applies to every tool in the catalog above, not ' +
-      'just the ones offered to you this turn.',
+    // prose, in an EXPLANATION, not an offer. Tool ids are internal plumbing named for this
+    // catalog, not vocabulary the user shares; the fix is a plain-language description of the
+    // capability instead. This rule must not swallow the pre-existing "Answer format" rule
+    // above, which ORDERS the model to name search_wazuh_data verbatim when offering it as a
+    // follow-up query -- that offer sentence is the one carved-out exception, kept so the
+    // deferred-offer detector (findOfferedFollowUpTool in routes/chat.ts) still has a bare tool
+    // name to match against.
+    'Never write an internal tool name (e.g. get_rules, search_wazuh_data) inside an ' +
+      'explanation or narrative sentence of your answer text -- describe the capability in ' +
+      'plain language instead (e.g. "the correlation-rule listing", "the Wazuh data search"). ' +
+      'This applies to every tool in the catalog above, not just the ones offered to you this ' +
+      'turn. The one exception is the follow-up-offer sentence described in the Answer format ' +
+      'rule above ("say so and offer to query it with search_wazuh_data instead of ' +
+      'speculating"): that offer must still name search_wazuh_data explicitly, because the ' +
+      'offer itself is what makes the tool name appropriate there -- this rule only forbids ' +
+      'naming a tool while explaining or describing something, not while offering to run one.',
     // Issue #8920 item 4 overshot here: an earlier wording made "no tool was offered" and "a
     // real gap" both collapse to "say you cannot check it", which pushed the model to deny a
     // capability it could not actually verify was missing. The fix gives it a concrete test it
