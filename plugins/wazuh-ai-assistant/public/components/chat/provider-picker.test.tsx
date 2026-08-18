@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProviderPicker } from './provider-picker';
 import { ProviderSummary } from '../../../common/types';
@@ -53,12 +53,38 @@ describe('ProviderPicker (iteration-4 item 2)', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /OpenAI production/i }));
 
-    expect(screen.getByText('OpenAI production')).toBeInTheDocument();
-    expect(screen.getByText('gpt-4o')).toBeInTheDocument();
-    expect(screen.getByText('Anthropic staging')).toBeInTheDocument();
-    expect(screen.getByText('claude-3-5-sonnet')).toBeInTheDocument();
-    // The non-selected provider's own default flag still surfaces as a badge.
-    expect(screen.getByText('Default')).toBeInTheDocument();
+    // Scoped to the popover: "OpenAI production" also names the trigger button itself, so an
+    // unscoped getByText matches both and throws.
+    const menu = within(screen.getByRole('dialog'));
+    expect(menu.getByText('OpenAI production')).toBeInTheDocument();
+    expect(menu.getByText('gpt-4o')).toBeInTheDocument();
+    expect(menu.getByText('Anthropic staging')).toBeInTheDocument();
+    expect(menu.getByText('claude-3-5-sonnet')).toBeInTheDocument();
+    // The non-selected provider's own default flag still surfaces as a badge. Asserted as a
+    // count rather than a single getByText: it is only accidentally singular here (one of two
+    // providers is marked default) and a second default item must not silently make this throw.
+    expect(menu.queryAllByText('Default')).toHaveLength(1);
+  });
+
+  it('closes the popover after a provider is selected', () => {
+    render(
+      <ProviderPicker
+        providers={[
+          provider({ id: 'p1', name: 'OpenAI production' }),
+          provider({ id: 'p2', name: 'Anthropic staging' }),
+        ]}
+        selectedProviderId='p1'
+        onProviderChange={jest.fn()}
+        onManageProviders={jest.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /OpenAI production/i }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('Anthropic staging'));
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('fires the same onProviderChange handler the old select used when an item is clicked', () => {
@@ -98,5 +124,33 @@ describe('ProviderPicker (iteration-4 item 2)', () => {
 
     expect(onManageProviders).toHaveBeenCalledTimes(1);
     expect(onProviderChange).not.toHaveBeenCalled();
+  });
+
+  it('exposes the trigger and the selected item to assistive tech via ARIA, not just an icon', () => {
+    render(
+      <ProviderPicker
+        providers={[
+          provider({ id: 'p1', name: 'OpenAI production' }),
+          provider({ id: 'p2', name: 'Anthropic staging' }),
+        ]}
+        selectedProviderId='p1'
+        onProviderChange={jest.fn()}
+        onManageProviders={jest.fn()}
+      />,
+    );
+
+    const trigger = screen.getByRole('button', { name: /OpenAI production/i });
+    expect(trigger).toHaveAttribute('aria-haspopup', 'true');
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+    fireEvent.click(trigger);
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    const items = screen.getAllByRole('menuitemradio');
+    // The two provider items come first (in list order), the "Manage providers" footer action
+    // isn't part of the radio group and so isn't in this list at all.
+    expect(items).toHaveLength(2);
+    expect(items[0]).toHaveAttribute('aria-checked', 'true');
+    expect(items[1]).toHaveAttribute('aria-checked', 'false');
   });
 });

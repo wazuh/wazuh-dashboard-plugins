@@ -12,11 +12,28 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  vertical-align: bottom;
 }
 
+/* The menu item's content used to be an EuiFlexGroup/EuiFlexItem (div) layout; it is span-based
+ * now (button content model), so the flex layout that grouping used to provide for free has to
+ * be declared here instead. */
 .wzProviderPickerItem {
+  display: flex;
+  align-items: center;
+  gap: $euiSizeS;
   min-width: 220px;
+}
+
+.wzProviderPickerItemBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.wzProviderPickerItemNameRow {
+  display: flex;
+  align-items: center;
+  gap: $euiSizeXS;
 }
 
 .wzProviderPickerItemName {

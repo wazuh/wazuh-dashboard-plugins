@@ -5,25 +5,11 @@ import {
   EuiButtonEmpty,
   EuiContextMenuItem,
   EuiContextMenuPanel,
-  EuiFlexGroup,
-  EuiFlexItem,
   EuiPopover,
   EuiText,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { ProviderSummary } from '../../../common/types';
-
-/** The trigger's own label is truncated with CSS ellipsis (`.wzProviderPickerTriggerLabel`,
- * provider-picker.scss) rather than sliced in JS — this bound is just what keeps a pathologically
- * long provider name from ballooning the composer's controls row before the CSS clamp engages;
- * the full name is still always available via `title`/aria on the trigger. */
-const TRIGGER_LABEL_MAX_CHARS = 22;
-
-function truncateLabel(name: string): string {
-  return name.length > TRIGGER_LABEL_MAX_CHARS
-    ? `${name.slice(0, TRIGGER_LABEL_MAX_CHARS - 1)}…`
-    : name;
-}
 
 interface ProviderPickerProps {
   providers: ProviderSummary[];
@@ -59,8 +45,11 @@ export const ProviderPicker: React.FC<ProviderPickerProps> = ({
   const selectedProvider = providers.find(
     provider => provider.id === selectedProviderId,
   );
+  // Truncation is CSS-only now (`.wzProviderPickerTriggerLabel`, provider-picker.scss): a JS
+  // character-count slice raced the actual rendered width (font metrics, zoom, locale) and could
+  // still overflow or clip early. The full name is still always available via `title`/aria below.
   const triggerText = selectedProvider
-    ? truncateLabel(selectedProvider.name)
+    ? selectedProvider.name
     : i18n.translate('wazuhAiAssistant.chat.providerPicker.noSelection', {
         defaultMessage: 'Select a provider',
       });
@@ -75,6 +64,8 @@ export const ProviderPicker: React.FC<ProviderPickerProps> = ({
       iconSide='right'
       onClick={() => setIsOpen(previous => !previous)}
       title={selectedProvider?.name}
+      aria-haspopup='true'
+      aria-expanded={isOpen}
       aria-label={i18n.translate(
         'wazuhAiAssistant.chat.providerPicker.triggerAriaLabel',
         {
@@ -94,46 +85,58 @@ export const ProviderPicker: React.FC<ProviderPickerProps> = ({
     </EuiButtonEmpty>
   );
 
-  const providerItems = providers.map(provider => (
-    <EuiContextMenuItem
-      key={provider.id}
-      icon={provider.id === selectedProviderId ? 'check' : 'empty'}
-      onClick={() => {
-        onProviderChange(provider.id);
-        closePopover();
-      }}
-    >
-      <EuiFlexGroup
-        alignItems='center'
-        gutterSize='s'
-        responsive={false}
-        className='wzProviderPickerItem'
+  const providerItems = providers.map(provider => {
+    const isSelected = provider.id === selectedProviderId;
+    return (
+      <EuiContextMenuItem
+        key={provider.id}
+        icon={isSelected ? 'check' : 'empty'}
+        // Selection is EuiContextMenuItem's own `icon` (a check mark), which is decorative only —
+        // it never reaches assistive tech. `menuitemradio`/`aria-checked` convey the same
+        // single-select-from-a-list semantics that the old <select> gave for free.
+        role='menuitemradio'
+        aria-checked={isSelected}
+        onClick={() => {
+          onProviderChange(provider.id);
+          closePopover();
+        }}
       >
-        <EuiFlexItem>
-          <EuiFlexGroup alignItems='center' gutterSize='xs' responsive={false}>
-            <EuiFlexItem grow={false}>
-              <EuiText size='s' className='wzProviderPickerItemName'>
+        {/* Button content model: a <button> may legally contain block content in HTML5, but the
+            menu item's accessible name/description computation is far more predictable when its
+            content is plain phrasing content, so this stays span-based rather than the
+            EuiFlexGroup/EuiFlexItem (div-based) layout used elsewhere on the page. */}
+        <span className='wzProviderPickerItem'>
+          <span className='wzProviderPickerItemBody'>
+            <span className='wzProviderPickerItemNameRow'>
+              <EuiText
+                size='s'
+                component='span'
+                className='wzProviderPickerItemName'
+              >
                 {provider.name}
               </EuiText>
-            </EuiFlexItem>
-            {provider.isDefault && (
-              <EuiFlexItem grow={false}>
+              {provider.isDefault && (
                 <EuiBadge color='hollow'>
                   {i18n.translate(
                     'wazuhAiAssistant.chat.providerPicker.defaultBadge',
                     { defaultMessage: 'Default' },
                   )}
                 </EuiBadge>
-              </EuiFlexItem>
-            )}
-          </EuiFlexGroup>
-          <EuiText size='xs' color='subdued' className='wzProviderPickerItemModel'>
-            {provider.model}
-          </EuiText>
-        </EuiFlexItem>
-      </EuiFlexGroup>
-    </EuiContextMenuItem>
-  ));
+              )}
+            </span>
+            <EuiText
+              size='xs'
+              color='subdued'
+              component='span'
+              className='wzProviderPickerItemModel'
+            >
+              {provider.model}
+            </EuiText>
+          </span>
+        </span>
+      </EuiContextMenuItem>
+    );
+  });
 
   const manageProvidersItem = (
     <EuiContextMenuItem
