@@ -19,6 +19,24 @@ function selectedModel(): string {
   return input?.textContent?.trim() ?? '';
 }
 
+/**
+ * The "Provider type" EuiButtonGroup renders each option's radio input inside a <label> whose
+ * `for` attribute points at the button group's own id — in this test environment every option
+ * shares that same generated id, and it belongs to a non-labellable <fieldset>. `getByLabelText`
+ * throws on that ("non-labellable element"), even though the option is visibly and correctly
+ * labelled on screen. Select the input directly by its stable data-test-subj (the provider type
+ * id) instead.
+ */
+function providerTypeOption(
+  type: 'openai_compatible' | 'anthropic',
+): HTMLElement {
+  const input = document.querySelector(`input[data-test-subj="${type}"]`);
+  if (!input) {
+    throw new Error(`provider type option not found: ${type}`);
+  }
+  return input as HTMLElement;
+}
+
 const baseProps = {
   editingProvider: null,
   error: null,
@@ -62,7 +80,7 @@ describe('ProviderFormFlyout — create mode', () => {
     expect(screen.getByText(/^Optional\./)).toBeInTheDocument();
     expect(screen.getByText(/stored encrypted at rest/i)).toBeInTheDocument();
 
-    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
+    fireEvent.click(providerTypeOption('anthropic'));
 
     expect(screen.getByText(/^Required\./)).toBeInTheDocument();
     expect(screen.queryByText(/^Optional\./)).toBeNull();
@@ -312,7 +330,7 @@ describe('ProviderFormFlyout — endpoint URL guidance', () => {
   it('switches to the Anthropic placeholder/example and docs link when the provider type changes', async () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
+    fireEvent.click(providerTypeOption('anthropic'));
 
     expect(screen.getByLabelText(/endpoint url/i)).toHaveAttribute(
       'placeholder',
@@ -341,7 +359,7 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
   it('labels the type options self-explanatorily and describes each one', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    expect(screen.getByLabelText(/anthropic \(claude\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/anthropic \(claude\)/i)).toBeInTheDocument();
     expect(
       screen.getByText(
         /for hosted services such as openai, gemini or an aws bedrock gateway/i,
@@ -352,7 +370,7 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
   it('prefills the Anthropic base URL when switching type while the field is untouched', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
+    fireEvent.click(providerTypeOption('anthropic'));
 
     expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
       'https://api.anthropic.com',
@@ -365,7 +383,7 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
     fireEvent.change(screen.getByLabelText(/endpoint url/i), {
       target: { value: 'https://my-custom-gateway.example.com' },
     });
-    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
+    fireEvent.click(providerTypeOption('anthropic'));
 
     expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
       'https://my-custom-gateway.example.com',
@@ -377,7 +395,7 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
       <ProviderFormFlyout {...baseProps} editingProvider={editingProvider} />,
     );
 
-    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
+    fireEvent.click(providerTypeOption('anthropic'));
 
     expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
       'https://api.openai.com/v1',
@@ -387,7 +405,7 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
   it('shows where to create an Anthropic key and its expected shape under the API key field', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
+    fireEvent.click(providerTypeOption('anthropic'));
 
     expect(
       screen.getByText(/console\.anthropic\.com, under api keys/i),
@@ -398,7 +416,7 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
   it('shows a non-blocking warning when the key shape does not match the Anthropic type', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
+    fireEvent.click(providerTypeOption('anthropic'));
     fireEvent.change(screen.getByLabelText(/^api key$/i), {
       target: { value: 'sk-not-anthropic-shaped' },
     });
@@ -415,7 +433,7 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
   it('shows no shape warning for a well-formed Anthropic key', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
+    fireEvent.click(providerTypeOption('anthropic'));
     fireEvent.change(screen.getByLabelText(/^api key$/i), {
       target: { value: 'sk-ant-abc123' },
     });
@@ -428,7 +446,7 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
   it('never marks the API key field itself as invalid (warning stays non-blocking)', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
+    fireEvent.click(providerTypeOption('anthropic'));
     fireEvent.change(screen.getByLabelText(/^api key$/i), {
       target: { value: 'not-anthropic-shaped-at-all' },
     });
@@ -457,12 +475,12 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
   it('clears an untouched Anthropic prefill when switching to another type', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
+    fireEvent.click(providerTypeOption('anthropic'));
     expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
       'https://api.anthropic.com',
     );
 
-    fireEvent.click(screen.getByLabelText(/openai-compatible/i));
+    fireEvent.click(providerTypeOption('openai_compatible'));
 
     expect(screen.getByLabelText(/endpoint url/i)).toHaveValue('');
   });
@@ -470,7 +488,7 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
   it('keeps an admin-typed Anthropic URL when switching away from anthropic', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
+    fireEvent.click(providerTypeOption('anthropic'));
     // A value the admin actually TYPED must survive the switch. Note it must differ from the
     // prefill already in the field: React deduplicates controlled-input change events whose
     // value is identical to the current one, so firing a change with the prefill's own value
@@ -479,7 +497,7 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
       target: { value: 'https://claude.internal-proxy.example' },
     });
 
-    fireEvent.click(screen.getByLabelText(/openai-compatible/i));
+    fireEvent.click(providerTypeOption('openai_compatible'));
 
     expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
       'https://claude.internal-proxy.example',
@@ -744,7 +762,7 @@ describe('ProviderFormFlyout — Model field guidance', () => {
   it('switches to Anthropic model suggestions and docs link when the provider type changes', async () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
+    fireEvent.click(providerTypeOption('anthropic'));
     // No auto-prefill of the endpoint URL on type switch here -- type the Anthropic endpoint
     // explicitly so the curated model-suggestion chips (keyed off the base URL) surface below.
     fireEvent.change(screen.getByLabelText(/endpoint url/i), {
@@ -794,7 +812,7 @@ describe('ProviderFormFlyout — type label and tool-support copy corrections', 
     // string.
     render(<ProviderFormFlyout {...baseProps} />);
 
-    const label = screen.getByLabelText(/openai-compatible/i);
+    const label = screen.getByText(/openai-compatible/i);
     expect(label).toBeInTheDocument();
 
     const description = screen.getByText(/any endpoint that exposes/i);
@@ -827,7 +845,7 @@ describe('ProviderFormFlyout — type label and tool-support copy corrections', 
       .closest('.euiCallOut') as HTMLElement;
     expect(callout).toHaveTextContent('openai.gpt-oss-120b');
 
-    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
+    fireEvent.click(providerTypeOption('anthropic'));
 
     const anthropicCallout = screen
       .getByText(/tool calling needs a model/i)
@@ -872,7 +890,7 @@ describe('ProviderFormFlyout — curated per-vendor model suggestions', () => {
     // Suggestions are gated by provider type: api.anthropic.com only makes sense for the
     // `anthropic` type (an openai_compatible provider pointed at it is a guaranteed-broken
     // config), so switch type and type the endpoint explicitly.
-    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
+    fireEvent.click(providerTypeOption('anthropic'));
     fireEvent.change(screen.getByLabelText(/endpoint url/i), {
       target: { value: 'https://api.anthropic.com' },
     });
@@ -965,7 +983,7 @@ describe('ProviderFormFlyout — Model field is an editable EuiComboBox', () => 
   it('lists each suggested model once, including the ids the old dedupe used to hide', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
+    fireEvent.click(providerTypeOption('anthropic'));
     fireEvent.change(screen.getByLabelText(/endpoint url/i), {
       target: { value: 'https://api.anthropic.com' },
     });
@@ -1052,7 +1070,7 @@ describe('ProviderFormFlyout — one tight column (audit §5)', () => {
     expect(screen.getByText(/any endpoint that exposes/i)).toBeInTheDocument();
     expect(screen.queryByText(/Anthropic's own API/i)).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByLabelText(/anthropic \(claude\)/i));
+    fireEvent.click(providerTypeOption('anthropic'));
 
     expect(screen.getByText(/Anthropic's own API/i)).toBeInTheDocument();
     expect(
