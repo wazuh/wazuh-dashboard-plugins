@@ -18,7 +18,11 @@
   grid-template-rows: auto minmax(0, 1fr) auto;
   /* Fallback first: `dvh` only shipped in Safari 15.4, and a browser that drops the line
      below would lose the cap entirely — which is exactly how the "pagination below the
-     fold" bug returns, on the browser family this redesign was written for. */
+     fold" bug returns, on the browser family this redesign was written for.
+     This is also, separately, the PRE-MEASURE fallback: result-table.tsx sets an inline
+     `style.maxHeight` once `transcriptHeightPx` is actually measured, and that inline style
+     always beats this stylesheet value — see the `--expanded` variant below for the full
+     explanation. */
   max-height: 460px;
   max-height: $wzResultsMaxHeight;
   // The card's own border/radius (from wzPanel) needs the grid to respect it instead of letting a
@@ -27,9 +31,16 @@
 
   /**
    * "Card grows" (iteration-4 item 3): applied only once the reader explicitly picks a page size
-   * above the 5-row default (result-table.tsx) — a 5-row result never needed more than the
-   * default cap, so the card only grows on a choice that actually produced more rows to show.
-   * Same fallback-then-`dvh` pair as the default cap above, for the same reason.
+   * above the 5-row default (result-table.tsx's `userPickedPageSize` flag) — a 5-row result never
+   * needed more than the default cap, so the card only grows on a choice that actually produced
+   * more rows to show. Same fallback-then-`dvh` pair as the default cap above, for the same
+   * reason.
+   *
+   * This `max-height` (like the default cap above) is only the PRE-MEASURE fallback: whenever
+   * `transcriptHeightPx` has actually been measured, `result-table.tsx` sets an inline
+   * `style.maxHeight` on this same element, and an inline style always wins over any stylesheet
+   * rule regardless of specificity — this class's `max-height` then only ever applies before that
+   * measurement lands (or in an environment with no `ResizeObserver`, e.g. these Jest tests).
    */
   &.wzResultsCard--expanded {
     max-height: 80vh;

@@ -164,6 +164,29 @@ describe('ResultTable', () => {
       const card = container.querySelector('.wzResultsCard') as HTMLElement;
       expect(card.style.maxHeight).toBe('');
     });
+
+    it('does not enter the expanded state on its own for a tall transcript, only on a user page-size pick', () => {
+      // A tall transcript (> 900px) bumps the INITIAL page size to 10 (5 -> 10) so a long result
+      // doesn't need instant re-paging — but that alone is not a user action, and used to satisfy
+      // `pageSize > DEFAULT_PAGE_SIZE` on its own, silently switching the card to the 900px
+      // "expanded" ceiling for every long transcript regardless of anything the reader did.
+      const thirtyRows = Array.from({ length: 30 }, (_unused, i) => ({
+        agent: `agent-${i}`,
+      }));
+      const { container } = render(
+        <ResultTable
+          spec={spec({ columns: [{ id: 'agent', label: 'Agent' }], rows: thirtyRows })}
+          transcriptHeightPx={2000}
+        />,
+      );
+      const card = container.querySelector('.wzResultsCard') as HTMLElement;
+      expect(card.classList.contains('wzResultsCard--expanded')).toBe(false);
+      expect(card.style.maxHeight).toBe('460px');
+
+      // Picking 25 explicitly IS a user action, and only then does the card expand.
+      fireEvent.click(screen.getByRole('button', { name: '25' }));
+      expect(card.classList.contains('wzResultsCard--expanded')).toBe(true);
+    });
   });
 
   // The BREAKING bug this whole card rewrite exists for: "page 2 of 6 unreachable without
@@ -248,6 +271,20 @@ describe('ResultTable', () => {
       expect(body.scrollTop).toBe(120);
 
       fireEvent.click(screen.getByRole('button', { name: '10' }));
+
+      expect(body.scrollTop).toBe(0);
+    });
+
+    it('also scrolls the card body back to the top on a plain next/previous page click', () => {
+      // The reset used to live only in the page-SIZE change handler, so a reader who scrolled
+      // deep into page 1's rows and then clicked "Next page" (no size change at all) landed on
+      // page 2 still scrolled to wherever page 1 left off.
+      const { container } = render(<ResultTable spec={thirtyRowSpec()} />);
+      const body = container.querySelector('.wzResultsCardBody') as HTMLElement;
+      body.scrollTop = 120;
+      expect(body.scrollTop).toBe(120);
+
+      fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
 
       expect(body.scrollTop).toBe(0);
     });

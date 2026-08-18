@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   EuiBasicTable,
   EuiBasicTableColumn,
@@ -489,6 +489,12 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
       ? TALL_TRANSCRIPT_PAGE_SIZE
       : DEFAULT_PAGE_SIZE,
   );
+  // Set ONLY by `handlePageSizeChange` below — i.e. only by the reader actually picking a size
+  // in the footer control. `pageSize` above also gets bumped to `TALL_TRANSCRIPT_PAGE_SIZE` on
+  // mount for a tall transcript, with no user action involved; without this flag THAT bump alone
+  // satisfied `pageSize > DEFAULT_PAGE_SIZE` and silently expanded the card's height ceiling to
+  // 900px on every long transcript, which is the "expanded" state (see `isExpanded` below).
+  const [userPickedPageSize, setUserPickedPageSize] = useState(false);
 
   // Unlike the page size above, this one IS a live binding: re-capping the card as the transcript
   // resizes costs the reader nothing (the body simply scrolls), whereas re-paginating under them
@@ -496,9 +502,10 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   // measured (jsdom has no ResizeObserver, so `transcriptHeightPx` stays 0 there) — the stylesheet's
   // own `min(460px, 52dvh)` then applies exactly as before.
   // "Card grows" (iteration-4 item 3): once the reader has explicitly chosen a page size above
-  // the 5-row default, the ceiling this clamps against switches to the expanded twin — see that
-  // constant's own doc comment for why 900px is a safe ceiling rather than a real ceiling.
-  const isExpanded = pageSize > DEFAULT_PAGE_SIZE;
+  // the 5-row default (`userPickedPageSize`, NOT merely the size having drifted above it), the
+  // ceiling this clamps against switches to the expanded twin — see that constant's own doc
+  // comment for why 900px is a safe ceiling rather than a real ceiling.
+  const isExpanded = userPickedPageSize && pageSize > DEFAULT_PAGE_SIZE;
   const cardMaxHeightCeilingPx = isExpanded
     ? RESULTS_CARD_MAX_HEIGHT_EXPANDED_PX
     : RESULTS_CARD_MAX_HEIGHT_PX;
@@ -518,16 +525,15 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
     [transcriptHeightPx, cardMaxHeightCeilingPx],
   );
 
-  // Scrolling body ref (iteration-4 item 3): any page-size change — including going back to the
-  // 5-row default — scrolls `.wzResultsCardBody` back to its top, so a reader who was scrolled
-  // deep into a 50-row page never lands mid-scroll in a now-differently-sized page of rows.
+  // Scrolling body ref (iteration-4 item 3). The actual scroll-to-top reset lives in the
+  // `useLayoutEffect` below, keyed on `[safePageIndex, pageSize]` — that runs for a page-size
+  // change (including going back to the 5-row default) AND for a plain next/previous-page click,
+  // which used to leave the body scrolled wherever it was on the PREVIOUS page.
   const bodyRef = useRef<HTMLDivElement | null>(null);
   const handlePageSizeChange = (size: number) => {
+    setUserPickedPageSize(true);
     setPageSize(size);
     setPageIndex(0);
-    if (bodyRef.current) {
-      bodyRef.current.scrollTop = 0;
-    }
   };
 
   /**
@@ -709,6 +715,18 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   // question), so a reader sitting on page 6 of a 26-row result would otherwise slice past the end
   // of a new 8-row one — an empty body under "Page 6 of 2", with Next disabled.
   const safePageIndex = Math.min(pageIndex, pageCount - 1);
+
+  // Resets the scrolling body to its top for EITHER trigger that changes which rows are on
+  // screen: a page-size change (`pageSize`) or a plain next/previous-page click (`safePageIndex`)
+  // — a `useLayoutEffect` rather than the event handlers themselves because `safePageIndex` (not
+  // the `pageIndex` state the click handlers set) is the value that actually decides what is
+  // rendered, and running before paint avoids a visible scrolled-then-snapped-to-top flash.
+  useLayoutEffect(() => {
+    if (bodyRef.current) {
+      bodyRef.current.scrollTop = 0;
+    }
+  }, [safePageIndex, pageSize]);
+
   const pageStart = safePageIndex * pageSize;
   const pagedItems = useMemo(
     () => items.slice(pageStart, pageStart + pageSize),
