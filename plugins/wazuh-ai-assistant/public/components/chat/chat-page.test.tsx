@@ -2229,6 +2229,40 @@ describe('ChatPage — welcome composer and first-send transition (C1)', () => {
     expect(screen.getByLabelText('Chat message')).toBeVisible();
   });
 
+  // Iteration-4 item 1 (option A): the two-row composer floor is scoped to the full-page surface
+  // via `.wzComposerRow--roomy`, derived from the same `enableWelcomeComposer` prop this describe
+  // block already uses to distinguish the full-page surface from the header's docked sidecar.
+  it('marks the composer row roomy on the full-page surface only', async () => {
+    renderChatPage();
+    await screen.findByText('Ask the AI Assistant something');
+    expect(composerRow().classList.contains('wzComposerRow--roomy')).toBe(
+      true,
+    );
+  });
+
+  it('never marks the composer row roomy in the embedded docked panel', async () => {
+    renderChatPage({ enableWelcomeComposer: false });
+    await screen.findByText('Ask the AI Assistant something');
+    expect(composerRow().classList.contains('wzComposerRow--roomy')).toBe(
+      false,
+    );
+  });
+
+  // Iteration-4 item 1 (option C): greeting, example cards and composer all narrow to the same
+  // 840px cluster width under `.wzChatPane--welcome`, reusing `.wzContentMeasure` — the very class
+  // the 'centres the greeting, the cards and the composer as one group' test above confirms all
+  // three already share, which is what lets one override reach every one of them.
+  it('caps the welcome cluster width via .wzContentMeasure, not the docked 1060px measure', () => {
+    const scssPath = path.join(__dirname, 'chat-page.scss');
+    const scssSource = fs.readFileSync(scssPath, 'utf8').replace(
+      /\/\*[\s\S]*?\*\//g,
+      '',
+    );
+    expect(scssSource).toMatch(
+      /\.wzChatPane--welcome \.wzContentMeasure\s*\{\s*max-width:\s*\$wzWelcomeGroupMaxWidth;/,
+    );
+  });
+
   it('moves through docking and settles docked on the first send', async () => {
     const stream = stubStream();
     renderChatPage();

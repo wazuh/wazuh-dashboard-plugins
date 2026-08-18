@@ -2859,11 +2859,19 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             <div
               ref={composerRowRef}
               onTransitionEnd={handleComposerTransitionEnd}
-              className={
-                hasProviders
-                  ? 'wzComposerRow'
-                  : 'wzComposerRow wzComposerRow-isDisabled'
-              }
+              // `wzComposerRow--roomy` (iteration-4 item A) is derived straight from
+              // `enableWelcomeComposer` rather than a new prop of its own: that prop already IS the
+              // "is this the full-page surface or the 600-900px header sidecar" signal (see its own
+              // doc comment above), and the docked composer's two-row floor is exactly the thing the
+              // sidecar cannot afford. `.wzComposerRow--roomy .wzComposerTextarea` (chat-page.scss)
+              // is the only rule this class exists to scope.
+              className={[
+                'wzComposerRow',
+                hasProviders ? '' : 'wzComposerRow-isDisabled',
+                enableWelcomeComposer ? 'wzComposerRow--roomy' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
             >
               {/* `.wzComposerMeasure` alongside the shared measure class: it owns the composer's
                 own gutters (chat-page.scss), which is all it is left carrying now that the composer
@@ -2896,7 +2904,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     isGenerating={isGenerating}
                     onSend={handleSend}
                   />
-                  <EuiSpacer size='xs' />
+                  {/* No `EuiSpacer` here any more (iteration-4 item A): the field's own bottom
+                    padding plus the controls row's `gutterSize='s'` already separated them, and
+                    the spacer on top of that was the extra few px that made the docked composer
+                    feel taller than its "2-row floor" was supposed to read. */}
                   <EuiFlexGroup
                     alignItems='center'
                     gutterSize='s'
@@ -2996,7 +3007,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                             <EuiButtonIcon
                               iconType='arrowUp'
                               color='primary'
-                              size='s'
+                              // 'm', not 's' (iteration-4 item A): against the roomier two-row
+                              // field the small size read as undersized for the row's own height.
+                              size='m'
                               display='fill'
                               onClick={() => chatInputRef.current?.send()}
                               disabled={!hasProviders || !inputText.trim()}

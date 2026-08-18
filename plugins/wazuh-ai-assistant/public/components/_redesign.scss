@@ -35,6 +35,12 @@ $wzCardPaddingRoomy: 24px;
    grows; only tables may break out. Extra width at 1920 goes to the rail and gutters, never to
    line length. */
 $wzContentMaxWidth: 1060px;
+/* Welcome-only cluster width (iteration-4 item C): the empty state's greeting, example-card grid
+   and composer measure all cap here instead of the docked surface's 1060px — a live audit call
+   read the full-width welcome cluster as too spread out for three short lines of content. Narrower
+   than $wzContentMaxWidth, applied only under `.wzChatPane--welcome` (chat-page.scss); the docked
+   surface is untouched. */
+$wzWelcomeGroupMaxWidth: 840px;
 $wzTableMaxWidth: 1300px;
 $wzProseMeasure: 68ch;
 /* Settings is its own page, not chat prose, so it does not share $wzContentMaxWidth: the

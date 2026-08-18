@@ -134,6 +134,19 @@ $wzWelcomeFadeOut: 180ms;
 }
 
 /**
+ * Welcome group width, option C (iteration-4 item 1): the empty state's centred cluster — the
+ * greeting (`EuiEmptyPrompt`), `.wzExampleCardsGrid` and the composer's own `.wzComposerMeasure` —
+ * all share `.wzContentMeasure` already (see that class's own comment on the shared-edge rule from
+ * the live audit), so ONE override here narrows every one of them from the docked surface's 1060px
+ * down to $wzWelcomeGroupMaxWidth without touching `.wzContentMeasure` itself. The docked state
+ * (no `--welcome` modifier) keeps the full 1060px untouched, and the FLIP dock transition is
+ * unaffected: it measures the row's own top per state, which a width-only change never disturbs.
+ */
+.wzChatPane--welcome .wzContentMeasure {
+  max-width: $wzWelcomeGroupMaxWidth;
+}
+
+/**
  * The composer panel takes the redesign's ONE container idiom (`wzPanel`, _redesign.scss) instead of
  * a raw `EuiPanel`'s defaults, which shipped EUI's 4px radius here while the results card next to it
  * carried 12 (audit §6, "radius zoo"). Qualified with `.euiPanel` for the same reason the settings
@@ -346,7 +359,24 @@ $wzWelcomeFadeOut: 180ms;
     /* The field scrolls internally once autogrow hits its 5-row cap (chat-input.tsx), inside a row
        that is itself only 10px wider than the text — the default bar there is unmistakable. */
     @include wzQuietScrollbar;
+    /* Field/privacy-button/prose share one left rail (iteration-4 item A): EUI's own textarea
+       padding does not line up with `.wzComposerMeasure`'s 24px/8px gutter, so the field's own
+       inline padding is pinned to the same 8px inset the panel already uses. */
+    padding-inline: 8px;
   }
+}
+
+/**
+ * Docked composer proportions, option A (iteration-4 item 1): a two-row floor on the FULL-PAGE
+ * surface only. `enableWelcomeComposer` (chat-page.tsx) is what tells the row it is on that
+ * surface rather than the header's 600-900px sidecar (assistant-chat-panel.tsx passes `false`
+ * there) — see the modifier's own comment at the call site. `rows={1}` on the textarea
+ * (chat-input.tsx) is left exactly as it was: this is a CSS floor under the field's OWN autogrow
+ * arithmetic, not a change to it, so `WZ_COMPOSER_MAX_ROWS` still caps the same way from the same
+ * one-line start.
+ */
+.wzComposerRow--roomy .wzComposerTextarea {
+  min-height: 66px;
 }
 
 /**
