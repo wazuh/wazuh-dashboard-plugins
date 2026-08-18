@@ -503,6 +503,13 @@ $wzWelcomeFadeOut: 180ms;
   /* Above the transcript rows that scroll beneath it, below the composer row — which is a grid
      sibling in normal flow (contract §1), so it needs no z-index of its own to stay clear. */
   z-index: 2;
+  /* The opaque ground the comment above already calls for was never actually declared (iteration-4
+     audit, P2 item 9) — with no `background-color` this element's computed value is `transparent`
+     (backgrounds are not an inherited property), so message rows scrolled straight through what was
+     meant to read as a status bar. `--wz-surface` is the same token `.wzComposerRow`/
+     `.wzJumpToLatestButton` (this file) already use for the pane's own opaque surface, so the band
+     matches the transcript's ground in both themes instead of inventing a second one. */
+  background-color: var(--wz-surface, #{$euiColorEmptyShade});
 }
 
 /**
@@ -715,6 +722,16 @@ $wzMsgAvatarColumn: 40px;
     0px,
     calc((100% - #{$wzContentMaxWidth}) / 2 + #{$wzMsgAvatarColumn} / 2)
   );
+}
+
+/**
+ * The avatar sits 2.5px above the first line's optical center when top-aligned against the row's
+ * own flex baseline (iteration-4 audit item 11, cosmetic) — a small nudge down centers it against
+ * the first line of prose/timestamp beside it. Unscoped (not just `--wide`): the misalignment is
+ * general, not specific to a table-bearing row.
+ */
+.wzMsgAvatarItem {
+  margin-block-start: 2px;
 }
 
 /**

@@ -116,7 +116,9 @@ interface MessageBubbleProps {
    */
   onRetry?: () => void;
   /** Passed straight through to this message's ResultTable — see that component's own doc
-   * comment on the same-named prop for why it is optional and currently always `undefined`. */
+   * comment on the same-named prop for how it steps the table's initial page size. Threaded here
+   * from MessageList, which gets it from chat-page.tsx's real `ResizeObserver` measurement; it
+   * stays optional because jsdom has no `ResizeObserver`, so it is `undefined` in tests. */
   transcriptHeightPx?: number;
 }
 
@@ -455,13 +457,14 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   const bubble = (
     <EuiFlexItem
       grow={false}
-      // The assistant's prose measure comes from the CLASS, not from a restated `68ch` — this file
-      // is not where `$wzProseMeasure` lives, and the comment above PROSE_MEASURE_CLASS already
-      // claimed the figure had exactly one home while an inline copy sat right here. A
-      // table-bearing turn takes no class: `.wzMessageRow--wide` (chat-page.scss) already caps the
-      // row at `min(100%, $wzTableMaxWidth)` one level up, so the `min(100%, 1300px)` that used to
-      // be inlined here was a second copy of that same number with nothing keeping the two in step.
-      className={!isUser && !renderedTable ? PROSE_MEASURE_CLASS : undefined}
+      // No `PROSE_MEASURE_CLASS` here (iteration-4 audit, P2 item 10): this item's own inline
+      // `maxWidth` below is ALWAYS set (`'75%'` or `'100%'`), and an inline style always wins over
+      // a class on specificity — so the class used to sit here doing nothing for either turn kind:
+      // dead weight for a table-bearing turn (its `'100%'` matched the class's own no-op) and,
+      // worse, misleading for a prose-only one, where it read as "the 68ch cap lives here" while
+      // the `'100%'` inline value silently overrode it. The real cap is (and always was) the INNER
+      // prose `<div className={PROSE_MEASURE_CLASS}>` a few lines below, which carries no inline
+      // style of its own to fight it.
       style={{
         // The user turn keeps its 75% share — a question is always prose, and the figure is
         // genuinely local to this decision, with no token or class behind it to drift from.

@@ -337,10 +337,13 @@ describe('MessageBubble', () => {
         />,
       );
 
-      const bubbleItem = screen
+      // The measure lives on the inner prose container (iteration-4 audit item 10: the outer flex
+      // item's own inline `maxWidth` always wins over a class there, so it no longer carries this
+      // class at all — see the "prose measure vs. table breakout" tests below for that).
+      const proseContainer = screen
         .getByText('Nothing matched.')
-        .closest('.euiFlexItem') as HTMLElement;
-      expect(bubbleItem).toHaveClass('wzProseMeasure');
+        .closest('.wzProseMeasure') as HTMLElement;
+      expect(proseContainer).toHaveClass('wzProseMeasure');
     });
   });
 
@@ -404,12 +407,21 @@ describe('MessageBubble', () => {
         />,
       );
 
+      // The measure arrives by CLASS, on the INNER prose container — not as an inline `68ch`
+      // restated inside message-bubble.tsx: the figure's single home is `$wzProseMeasure`, which
+      // the next test pins to the stylesheet.
+      const proseContainer = screen
+        .getByText('Six today.')
+        .closest('.wzProseMeasure') as HTMLElement;
+      expect(proseContainer).toHaveClass('wzProseMeasure');
+
+      // The OUTER flex item does NOT also carry the class (iteration-4 audit item 10): its own
+      // inline `maxWidth` (below) always wins over a class on specificity, so the class used to sit
+      // here doing nothing — dead weight for a table turn, misleading for a prose-only one.
       const bubbleItem = screen
         .getByText('Six today.')
         .closest('.euiFlexItem') as HTMLElement;
-      // The measure arrives by CLASS, not as an inline `68ch` restated inside message-bubble.tsx:
-      // the figure's single home is `$wzProseMeasure`, which the next test pins to the stylesheet.
-      expect(bubbleItem).toHaveClass('wzProseMeasure');
+      expect(bubbleItem).not.toHaveClass('wzProseMeasure');
       expect(bubbleItem.style.maxWidth).not.toBe('68ch');
     });
 

@@ -431,13 +431,14 @@ interface ResultTableProps {
   provenanceChips?: ResultTableProvenanceChip[];
   /**
    * Real measured height (px) of the scrolling transcript pane, for layout contract §4's "page
-   * size steps 5 → 10 above 900px of transcript height". Optional and currently never supplied by
-   * chat-page.tsx (confirmed by reading it — no such measurement exists there yet), so this stays
-   * a no-op today and the pre-redesign default of 5 is exactly preserved; once chat-page.tsx grows
-   * a transcript-height measurement it can thread it straight through MessageList → MessageBubble
-   * → here with no further change on this end. Read only ONCE, to pick the table's INITIAL page
-   * size — not a live-resize binding, so a reader mid-way through a wide window resize never has
-   * their current page silently renumbered underneath them.
+   * size steps 5 → 10 above 900px of transcript height". chat-page.tsx measures the pane with a
+   * `ResizeObserver` and threads the result straight through MessageList → MessageBubble → here
+   * (confirmed by reading it — see its `transcriptHeightPx` state), so the taller page size is
+   * live in the real app. Still optional: jsdom has no `ResizeObserver`, so it stays `undefined`
+   * in tests and the pre-redesign default of 5 applies there, which is what the existing tests
+   * expect. Read only ONCE, to pick the table's INITIAL page size — not a live-resize binding, so a
+   * reader mid-way through a wide window resize never has their current page silently renumbered
+   * underneath them.
    */
   transcriptHeightPx?: number;
 }

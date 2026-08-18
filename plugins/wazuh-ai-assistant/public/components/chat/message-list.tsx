@@ -24,9 +24,11 @@ interface MessageListProps {
    * Real measured height (px) of the scrolling transcript pane — layout contract §4's "page size
    * steps 5 → 10 above 900px of transcript height". Threaded straight through to every
    * MessageBubble/ResultTable; see result-table.tsx's own doc comment on the same-named prop for
-   * why this is optional and, as of this redesign pass, never actually supplied by chat-page.tsx
-   * (no such measurement exists there yet). Kept here so chat-page.tsx only needs to start passing
-   * it, once it measures the pane, with no further prop-plumbing change on this end.
+   * how it feeds the table's initial page size. chat-page.tsx measures the pane with a
+   * `ResizeObserver` and supplies this on every render (confirmed by reading it — see its
+   * `transcriptHeightPx` state and where it passes this prop down); it is optional here only
+   * because jsdom has no `ResizeObserver`, so it stays `0`/`undefined` in tests and the pre-redesign
+   * default page size applies there.
    */
   transcriptHeightPx?: number;
 }
