@@ -484,7 +484,14 @@ const DocsPopover: React.FC<{
   return (
     <EuiPopover
       button={
-        <EuiLink onClick={() => setIsOpen(open => !open)}>
+        // `lineHeight: 18px` matches the rest of this form's help-text rhythm (audit item 5):
+        // this single trigger backs both "API documentation" (endpoint URL) and "See available
+        // models" (model field) via `triggerLabel`, so fixing it here fixes both at once rather
+        // than needing two separate overrides at each call site.
+        <EuiLink
+          onClick={() => setIsOpen(open => !open)}
+          style={{ lineHeight: '18px' }}
+        >
           {triggerLabel}
         </EuiLink>
       }
@@ -857,9 +864,14 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                   so only the type actually chosen is ever described. */}
               <EuiFormRow
                 helpText={
-                  <EuiText size='s' color='subdued'>
-                    <p>{PROVIDER_TYPE_DESCRIPTIONS[form.type]}</p>
-                  </EuiText>
+                  // A plain element, not an `EuiText size='s'`: `size='s'` renders at 14px/21px,
+                  // which made this the only 14px helper text in a form whose every other
+                  // `helpText` (the API key's, the endpoint URL's below) is the slot's own
+                  // 12px/18px — the same near-miss the endpoint URL's own comment already calls
+                  // out for this file. A plain `<p>` inherits `.euiFormHelpText`'s size/color
+                  // directly, so there is exactly one mechanism setting this text's size, not two
+                  // that can drift apart (audit item 5).
+                  <p>{PROVIDER_TYPE_DESCRIPTIONS[form.type]}</p>
                 }
               >
                 <EuiButtonGroup
