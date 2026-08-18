@@ -2250,17 +2250,50 @@ describe('ChatPage — welcome composer and first-send transition (C1)', () => {
   });
 
   // Iteration-4 item 1 (option C): greeting, example cards and composer all narrow to the same
-  // 840px cluster width under `.wzChatPane--welcome`, reusing `.wzContentMeasure` — the very class
-  // the 'centres the greeting, the cards and the composer as one group' test above confirms all
-  // three already share, which is what lets one override reach every one of them.
-  it('caps the welcome cluster width via .wzContentMeasure, not the docked 1060px measure', () => {
+  // 840px cluster width under `.wzChatPane--welcome`, via `.wzWelcomeMeasure` and
+  // `.wzComposerMeasure` specifically — NOT the bare `.wzContentMeasure` those two also carry,
+  // which the sticky status-callout band's own measure carries too with no welcome-specific class
+  // of its own; an unscoped rule on the bare class would narrow that band right along with the
+  // welcome cluster.
+  it('caps the welcome cluster width via .wzWelcomeMeasure/.wzComposerMeasure, not the bare .wzContentMeasure', () => {
     const scssPath = path.join(__dirname, 'chat-page.scss');
     const scssSource = fs.readFileSync(scssPath, 'utf8').replace(
       /\/\*[\s\S]*?\*\//g,
       '',
     );
     expect(scssSource).toMatch(
-      /\.wzChatPane--welcome \.wzContentMeasure\s*\{\s*max-width:\s*\$wzWelcomeGroupMaxWidth;/,
+      /\.wzChatPane--welcome \.wzWelcomeMeasure,\s*\n\s*\.wzChatPane--welcome \.wzComposerMeasure\s*\{\s*max-width:\s*\$wzWelcomeGroupMaxWidth;/,
+    );
+    expect(scssSource).not.toMatch(
+      /\.wzChatPane--welcome \.wzContentMeasure\s*\{/,
+    );
+  });
+
+  it('renders the welcome cluster with .wzWelcomeMeasure, not just the bare .wzContentMeasure the status band also carries', async () => {
+    renderChatPage();
+    await screen.findByText('Ask the AI Assistant something');
+
+    const measure = welcomeGroup()?.closest('.wzContentMeasure');
+    expect(measure?.classList.contains('wzWelcomeMeasure')).toBe(true);
+  });
+
+  it('animates the composer measure open on dock, but keeps the welcome measure pinned at 840px through the same bridge', () => {
+    const scssPath = path.join(__dirname, 'chat-page.scss');
+    const scssSource = fs.readFileSync(scssPath, 'utf8').replace(
+      /\/\*[\s\S]*?\*\//g,
+      '',
+    );
+    // The composer's OWN measure is the one that tweens the cap open — no scoping to a pane state,
+    // so the transition is armed regardless of which class swap (`--welcome` leaving or
+    // `--docking` arriving) actually changes the computed max-width.
+    expect(scssSource).toMatch(
+      /\.wzComposerMeasure\s*\{\s*transition:\s*max-width \$wzDockTravel \$wzDockEase;/,
+    );
+    // The welcome cluster's own measure ancestor — the containing block its `--leaving` ghost
+    // fades against — stays pinned at the SAME cap through the docking bridge instead, so the
+    // ghost's box never resizes out from under it mid-fade.
+    expect(scssSource).toMatch(
+      /\.wzChatPane--docking \.wzWelcomeMeasure\s*\{\s*max-width:\s*\$wzWelcomeGroupMaxWidth;/,
     );
   });
 
@@ -2422,13 +2455,19 @@ describe('ChatPage — welcome composer and first-send transition (C1)', () => {
     // The centred state is a flex column that centres the pair.
     expect(scssRules).toMatch(/\.wzChatPane--welcome\s*\{/);
     expect(scssRules).toMatch(/justify-content:\s*center/);
-    // The composer has NO measure of its own in the centred state any more, and therefore no width
-    // tween across the travel: it shares the transcript's one measure in both states, which is what
-    // gives the empty state a single alignment edge (css-audit-full.md §1.1). Both halves of the old
-    // mechanism are pinned as ABSENT, since a silently-restored 680px pill is exactly the
-    // regression this fix is about.
+    // The composer has NO measure of its own DISTINCT from the shared one any more — it shares
+    // `.wzContentMeasure`'s system (via `.wzComposerMeasure`) in both states, which is what gives
+    // the empty state a single alignment edge (css-audit-full.md §1.1). The OLD 680px-pill
+    // mechanism (a private `$wzWelcomeComposerMaxWidth`, a width tween between two DIFFERENT pill
+    // widths) is pinned as absent — a silently-restored 680px pill would be exactly that
+    // regression. A `max-width` transition on `.wzComposerMeasure` DOES legitimately exist now,
+    // though (assertion below): it interpolates the shared measure's OWN two caps, 840px centred
+    // vs 1060px docked, which is a different mechanism from the removed pill and is covered by its
+    // own SCSS test above ('animates the composer measure open on dock...').
     expect(scssRules).not.toMatch(/\$wzWelcomeComposerMaxWidth/);
-    expect(scssRules).not.toMatch(/transition:\s*max-width/);
+    expect(scssRules).toMatch(
+      /\.wzComposerMeasure\s*\{\s*transition:\s*max-width \$wzDockTravel \$wzDockEase;/,
+    );
     // What the class carries instead: the composer's own gutters, and a 16px block start in the
     // centred state so greeting → cards → composer are one evenly-spaced group (§1.5).
     expect(scssRules).toMatch(/\.wzComposerMeasure\s*\{\s*padding:\s*8px 24px/);

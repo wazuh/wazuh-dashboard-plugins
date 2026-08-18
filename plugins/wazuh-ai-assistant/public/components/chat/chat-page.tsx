@@ -2559,10 +2559,15 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               )}
 
               <div
+                // `wzWelcomeMeasure` (chat-page.scss), not the bare `.wzContentMeasure` this also
+                // carries: the 840px welcome-cluster cap is scoped to THIS class specifically,
+                // because the sticky status-callout band above (`.wzStatusCallouts`) wraps its own
+                // content in a plain `.wzContentMeasure` too — an unscoped `.wzChatPane--welcome
+                // .wzContentMeasure` rule narrowed that band as an unrelated side effect.
                 className={
                   welcomeIsInFlow
-                    ? 'wzContentMeasure wzContentMeasure--stretch'
-                    : 'wzContentMeasure'
+                    ? 'wzContentMeasure wzContentMeasure--stretch wzWelcomeMeasure'
+                    : 'wzContentMeasure wzWelcomeMeasure'
                 }
               >
                 {/* The view's `<h1>`, for assistive tech only. The chat column had no heading at all,
@@ -2972,7 +2977,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                             <EuiButtonIcon
                               iconType='cross'
                               color='danger'
-                              size='s'
+                              // 'm', matching the Send button's own size (iteration-4 item A) —
+                              // this button replaces Send in the exact same row slot while
+                              // generating, and a smaller icon here shrank that slot's height
+                              // between the two states.
+                              size='m'
                               onClick={handleStop}
                               aria-label={i18n.translate(
                                 'wazuhAiAssistant.chat.stopButton',

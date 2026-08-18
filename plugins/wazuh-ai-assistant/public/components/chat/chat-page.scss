@@ -135,14 +135,30 @@ $wzWelcomeFadeOut: 180ms;
 
 /**
  * Welcome group width, option C (iteration-4 item 1): the empty state's centred cluster — the
- * greeting (`EuiEmptyPrompt`), `.wzExampleCardsGrid` and the composer's own `.wzComposerMeasure` —
- * all share `.wzContentMeasure` already (see that class's own comment on the shared-edge rule from
- * the live audit), so ONE override here narrows every one of them from the docked surface's 1060px
- * down to $wzWelcomeGroupMaxWidth without touching `.wzContentMeasure` itself. The docked state
- * (no `--welcome` modifier) keeps the full 1060px untouched, and the FLIP dock transition is
- * unaffected: it measures the row's own top per state, which a width-only change never disturbs.
+ * greeting (`EuiEmptyPrompt`), `.wzExampleCardsGrid` (both inside `.wzWelcomeMeasure`) and the
+ * composer's own `.wzComposerMeasure` — all narrow from the docked surface's 1060px down to
+ * $wzWelcomeGroupMaxWidth while centred. Scoped to those two classes specifically, NOT to the bare
+ * `.wzContentMeasure` both of them also carry: the sticky status-callout band
+ * (`.wzStatusCallouts`) wraps its own content in a plain `.wzContentMeasure` too, with no welcome-
+ * specific class of its own, and an unscoped `.wzChatPane--welcome .wzContentMeasure` rule narrowed
+ * that band right along with the welcome cluster as an unrelated side effect.
  */
-.wzChatPane--welcome .wzContentMeasure {
+.wzChatPane--welcome .wzWelcomeMeasure,
+.wzChatPane--welcome .wzComposerMeasure {
+  max-width: $wzWelcomeGroupMaxWidth;
+}
+
+/**
+ * The welcome ghost's measure ancestor (`.wzWelcomeMeasure`, ALWAYS mounted — it also carries the
+ * screen-reader-only `<h1>` — wrapping the `.wzWelcomeCenter--leaving` ghost while it fades) stays
+ * pinned at the SAME 840px cap through the whole docking bridge, not just the centred state.
+ * `.wzChatPane--docking .wzContentMeasure { position: relative }` above makes this ancestor the
+ * containing block for that ghost's `position: absolute; inset-inline: 0`, so letting the
+ * ancestor's own width snap open to 1060px mid-fade would reflow the fading cards under it. The
+ * composer's OWN measure below is a DIFFERENT element and is exactly the one that should animate
+ * this cap away instead of freezing it.
+ */
+.wzChatPane--docking .wzWelcomeMeasure {
   max-width: $wzWelcomeGroupMaxWidth;
 }
 
@@ -182,9 +198,20 @@ $wzWelcomeFadeOut: 180ms;
     will-change: transform;
   }
 
-  /* No width tween beside the travel any more: the composer is at the shared measure in BOTH states
-     (see the note where `$wzWelcomeComposerMaxWidth` used to be defined), so there is no `max-width`
-     difference left to interpolate. The vertical travel above is the whole transition. */
+  /* The composer's OWN measure DOES have a width difference to interpolate: 840px centred vs
+     1060px docked (`.wzChatPane--welcome .wzComposerMeasure` above). Declared unconditionally
+     (not scoped to either pane state) so the transition is armed regardless of which class swap
+     — `--welcome` leaving or `--docking` arriving — actually changes the computed value; without
+     it the cap otherwise SNAPPED open the instant `.wzChatPane--welcome` came off the pane (the
+     class swap to `.wzChatPane--docking` happens in the same tick handleSend flips the mode),
+     rather than animating open over the same travel the row above takes to dock. The welcome
+     cluster's OWN measure (`.wzWelcomeMeasure`) is deliberately left out of this transition — it
+     stays pinned at 840px through the whole docking bridge instead (see the rule above), because
+     it is the containing block its own `.wzWelcomeCenter--leaving` ghost fades against.
+     */
+  .wzComposerMeasure {
+    transition: max-width $wzDockTravel $wzDockEase;
+  }
 
   /* Greeting + cards: fade only, no travel — the spec's own reading of the recording ("no visible
      lingering fade"), and the reason it can be this fast is that it starts on send rather than
@@ -558,6 +585,23 @@ $wzWelcomeFadeOut: 180ms;
     vertical-align: baseline;
     white-space: normal;
     overflow-wrap: anywhere;
+    /* A chip that wraps mid-token (a long dotted field path via `overflow-wrap: anywhere` above)
+       otherwise renders as two square-ended slab halves at the line break — each fragment's own
+       background box stops flush at the wrap point instead of keeping the chip's rounded corners
+       on whichever ends are actually the chip's start/end. `clone` repaints the full border/
+       background/radius on EVERY fragment instead of only the first. */
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
+  /* `:not(pre) > code` above also matches the SAME inline `<code>` this chip's own wrapping
+     `span.euiCodeBlock` already styles (EUI renders inline code as
+     `<span class="euiCodeBlock"><code>...</code></span>`, and `code`'s parent here is that span,
+     not a `pre`) — so the code element carried its own `padding: 0 4px` INSIDE a span that had
+     already added the same 4px, doubling the chip's visible inset to 8px per side. The span is the
+     one actual chip surface; the inner code's own padding is reset to nothing. */
+  span.euiCodeBlock > code {
+    padding: 0;
   }
 }
 
