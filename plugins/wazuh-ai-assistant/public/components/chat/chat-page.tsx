@@ -2418,9 +2418,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                         </EuiFlexItem>
                       </EuiFlexGroup>
                       <EuiSpacer size='m' />
-                      {/* `.wzExampleCardsGrid` (chat-page.scss): `repeat(auto-fit, minmax(240px,
-                          1fr))` — 3-up, 2-up, 1-up with no fixed pixel card widths, so this can
-                          never be the thing that introduces horizontal scroll (contract §3). */}
+                      {/* `.wzExampleCardsGrid` (chat-page.scss): `repeat(auto-fit,
+                          minmax(min(240px, 100%), 1fr))` — 3-up, 2-up, 1-up, shrinking below
+                          240px only once the container itself is narrower than that (a docked
+                          sidecar panel at its own minimum width), so this never overflows its own
+                          wrapper regardless of pane width (contract §3). */}
                       <div className='wzExampleCardsGrid'>
                         {EXAMPLE_CARDS.map(card => (
                           <EuiCard

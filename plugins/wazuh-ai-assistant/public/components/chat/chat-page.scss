@@ -287,7 +287,13 @@
 
 .wzExampleCardsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  // `minmax(240px, 1fr)` sets a HARD 240px floor per track — it does not shrink below that even
+  // when the container itself is narrower (a docked sidecar panel dragged down toward its own
+  // minimum width, for instance), so the single remaining column still demanded 240px and pushed
+  // the grid — and the `EuiPanel` wrapping it — wider than its own container instead of wrapping
+  // inside it. `min(240px, 100%)` is the same 240px preference, clamped down to the container's own
+  // width when there isn't room for it, so a track can always shrink to fit.
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
   gap: 12px;
   width: 100%;
 
