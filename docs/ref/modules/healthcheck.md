@@ -128,7 +128,13 @@ The health check data can be explored in the **Dashboard management** > **Health
 
 This displays information about the overall result and checks details. It allows to export the health check data to JSON to be shared for troubleshooting.
 
-TODO: screenshot
+Overview:
+
+![health check application overview](./images/healthcheck-application-overview.png)
+
+Check details:
+
+![health check application check details](./images/healthcheck-application-check-details.png)
 
 # Icon in the platform header
 
@@ -138,7 +144,9 @@ The icon is only displayed when the overall result is `yellow` or `red`. When th
 
 Hovering over the icon shows a tooltip with the overall status. Clicking it opens a popover with the overall status and a link to the **Health Check** app for more details.
 
-TODO: screenshot
+For example, when the status is `yellow`:
+
+![health check warning header icon](./images/healthcheck-warning-header-icon.png)
 
 # Wazuh dashboard is not ready yet
 
