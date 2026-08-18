@@ -31,6 +31,13 @@ interface MessageListProps {
    * default page size applies there.
    */
   transcriptHeightPx?: number;
+  /**
+   * Threaded down to every MessageBubble's ResultTable: fired when a table's rows-per-page control
+   * changes, so chat-page.tsx can re-pin the transcript pane to the freshly-grown card's bottom. A
+   * stable callback (chat-page holds it via `useCallback`), so it never defeats this component's
+   * memo. See result-table.tsx's `onRowsPerPageChange` doc comment for the bug it fixes.
+   */
+  onTableRowsPerPageChange?: () => void;
 }
 
 /**
@@ -53,6 +60,8 @@ interface MessageListProps {
  *    the component's whole lifetime, not just "equal" — confirmed by reading chat-page.tsx.
  *  - `transcriptHeightPx`: a plain number (or `undefined`), so it is trivially shallow-equal across
  *    a keystroke re-render regardless of how/whether chat-page.tsx ever starts measuring it.
+ *  - `onTableRowsPerPageChange`: chat-page holds it via `useCallback` with a stable dependency list,
+ *    so it is the same function instance across a keystroke re-render, not just "equal".
  * Default (shallow) React.memo comparison is therefore sufficient; no custom comparator needed.
  */
 export const MessageList = React.memo<MessageListProps>(function MessageList({
@@ -61,6 +70,7 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
   resolveSecurityAnalyticsUrl,
   onRetryLastTurn,
   transcriptHeightPx,
+  onTableRowsPerPageChange,
 }) {
   const lastMessage = messages[messages.length - 1];
   return (
@@ -90,6 +100,7 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
                 index === messages.length - 1 ? onRetryLastTurn : undefined
               }
               transcriptHeightPx={transcriptHeightPx}
+              onTableRowsPerPageChange={onTableRowsPerPageChange}
             />
           </div>
           {/* One turn boundary = one 32px breath (EuiSpacer size='xl') — iteration-4 audit, P0 item

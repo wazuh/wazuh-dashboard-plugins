@@ -275,6 +275,31 @@ describe('ResultTable', () => {
       expect(body.scrollTop).toBe(0);
     });
 
+    // Re-pin hook (iteration-4 item 3, part A): the card grows downward when a larger page size is
+    // picked, and it lives inside chat-page.tsx's scrolling transcript pane. That pane only re-pins
+    // to its bottom on a `messages` change, so without this notification the freshly-grown
+    // pagination footer slid behind the composer until the reader scrolled by hand. The callback
+    // fires for a page-SIZE pick only — a plain next/previous-page click never grows the card, so it
+    // must not trigger a re-pin.
+    it('notifies the host on a rows-per-page change so the transcript can re-pin, but not on paging', () => {
+      const onRowsPerPageChange = jest.fn();
+      render(
+        <ResultTable
+          spec={thirtyRowSpec()}
+          onRowsPerPageChange={onRowsPerPageChange}
+        />,
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+      expect(onRowsPerPageChange).not.toHaveBeenCalled();
+
+      fireEvent.click(screen.getByRole('button', { name: '25' }));
+      expect(onRowsPerPageChange).toHaveBeenCalledTimes(1);
+
+      fireEvent.click(screen.getByRole('button', { name: '5' }));
+      expect(onRowsPerPageChange).toHaveBeenCalledTimes(2);
+    });
+
     it('also scrolls the card body back to the top on a plain next/previous page click', () => {
       // The reset used to live only in the page-SIZE change handler, so a reader who scrolled
       // deep into page 1's rows and then clicked "Next page" (no size change at all) landed on

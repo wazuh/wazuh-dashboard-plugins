@@ -1,5 +1,11 @@
 import './chat-page.scss';
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   EuiSpacer,
   EuiEmptyPrompt,
@@ -544,6 +550,33 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       pane.scrollTop = pane.scrollHeight;
     }
   }, [messages]);
+
+  /**
+   * Re-pin on card growth (layout contract §4, iteration-4 item 3). The effect above re-pins only on
+   * a `messages` change, but a result table's rows-per-page control grows its card WITHOUT changing
+   * `messages` — that growth is internal `ResultTable` state — so a reader who was following the
+   * bottom was left with the freshly-grown pagination footer sitting behind the composer until they
+   * scrolled down by hand (the browser-verified bug this fixes). `ResultTable` calls
+   * `handleTableRowsPerPageChange` in the SAME event as it grows the card, which bumps this nonce;
+   * the `useLayoutEffect` then runs AFTER React has committed the taller card and re-pins the pane to
+   * its new bottom — but only when the reader was still pinned (`pinnedToBottomRef`), never yanking
+   * one who had scrolled up to read. A layout effect, not `useEffect`, so the re-pin lands before
+   * paint and the footer is never seen behind the composer even for a frame. Stable via `useCallback`
+   * so passing it down through the memoized MessageList never defeats that memo.
+   */
+  const [tableGrowthNonce, setTableGrowthNonce] = useState(0);
+  const handleTableRowsPerPageChange = useCallback(() => {
+    setTableGrowthNonce(previous => previous + 1);
+  }, []);
+  useLayoutEffect(() => {
+    if (tableGrowthNonce === 0) {
+      return;
+    }
+    const pane = scrollPaneRef.current;
+    if (pane && pinnedToBottomRef.current) {
+      pane.scrollTop = pane.scrollHeight;
+    }
+  }, [tableGrowthNonce]);
 
   /**
    * "Jump to latest": the one convention the pinning logic above was missing (every streaming chat
@@ -2819,6 +2852,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     messages={messages}
                     resolveDiscoverUrl={resolveDiscoverUrl}
                     resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
+                    onTableRowsPerPageChange={handleTableRowsPerPageChange}
                     // Withheld while generating: retrying would abandon the turn already running.
                     onRetryLastTurn={
                       isGenerating ? undefined : handleRetryLastTurn

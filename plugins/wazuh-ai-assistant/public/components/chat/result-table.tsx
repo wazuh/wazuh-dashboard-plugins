@@ -441,6 +441,17 @@ interface ResultTableProps {
    * underneath them.
    */
   transcriptHeightPx?: number;
+  /**
+   * Fired when the reader changes the rows-per-page control (item 3, "card grows"). The card grows
+   * downward when a larger page size is picked, but the card lives INSIDE chat-page.tsx's scrolling
+   * transcript pane, and that pane only re-pins to its bottom on a `messages` change — a page-size
+   * pick is internal `ResultTable` state, so nothing re-pinned and the freshly-grown pagination
+   * footer slid below the fold, behind the composer, until the reader manually scrolled. chat-page
+   * hands this down so it can re-pin the pane (only when the reader was already following the
+   * bottom) right after the card has grown. Optional: a call site with no scrolling pane to re-pin
+   * (or a unit test) simply omits it.
+   */
+  onRowsPerPageChange?: () => void;
 }
 
 /**
@@ -455,6 +466,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   resolveSecurityAnalyticsUrl,
   provenanceChips,
   transcriptHeightPx,
+  onRowsPerPageChange,
 }) => {
   const [expandedRowIds, setExpandedRowIds] = useState<Set<number>>(new Set());
   // Stable across re-renders of the SAME mounted table (a later spec on the same tool round would
@@ -510,20 +522,63 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   const cardMaxHeightCeilingPx = isExpanded
     ? RESULTS_CARD_MAX_HEIGHT_EXPANDED_PX
     : RESULTS_CARD_MAX_HEIGHT_PX;
+
+  // Live cap guard (iteration-4 item 3, part C). The ceiling below is clamped against the
+  // transcript pane's height so the card never grows past the space left above the composer.
+  // `transcriptHeightPx` (the prop) is that height as chat-page.tsx measures it — but it reaches
+  // here only after chat-page's own `ResizeObserver` fires AND the new number propagates back down
+  // through two memoized components (MessageList, MessageBubble). On a fast viewport shrink that lag
+  // would leave the card holding a ceiling taller than the pane now is, and its footer would clip
+  // below the fold again. So the card ALSO measures its own scroll container directly and the cap
+  // uses the SMALLER of the two, self-correcting regardless of prop-propagation timing. Inert in
+  // jsdom (no `ResizeObserver`, and the unit tests render the card with no `.wzChatTranscript`
+  // ancestor), so `livePaneHeightPx` stays `undefined` there and the prop-only path — and the
+  // stylesheet fallback when even that is absent — behaves exactly as before.
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const [livePaneHeightPx, setLivePaneHeightPx] = useState<number | undefined>(
+    undefined,
+  );
+  useLayoutEffect(() => {
+    const card = cardRef.current;
+    if (!card || typeof ResizeObserver === 'undefined') {
+      return;
+    }
+    const pane = card.closest('.wzChatTranscript') as HTMLElement | null;
+    if (!pane) {
+      return;
+    }
+    const measure = () => setLivePaneHeightPx(pane.clientHeight);
+    const observer = new ResizeObserver(measure);
+    observer.observe(pane);
+    measure();
+    return () => observer.disconnect();
+  }, []);
+
+  // The most conservative measured pane height: the card can never claim more than the pane it
+  // actually lives in, whichever source reported the smaller number. Zero when nothing has been
+  // measured (both the prop and the live reading absent), which keeps the stylesheet fallback in
+  // charge — see `measuredCardMaxHeight` below.
+  const measuredPaneHeightPx = useMemo(() => {
+    const measured = [transcriptHeightPx, livePaneHeightPx].filter(
+      (value): value is number => typeof value === 'number' && value > 0,
+    );
+    return measured.length > 0 ? Math.min(...measured) : 0;
+  }, [transcriptHeightPx, livePaneHeightPx]);
+
   const measuredCardMaxHeight = useMemo<React.CSSProperties | undefined>(
     () =>
-      transcriptHeightPx
+      measuredPaneHeightPx
         ? {
             maxHeight: Math.max(
               RESULTS_CARD_MIN_HEIGHT_PX,
               Math.min(
                 cardMaxHeightCeilingPx,
-                transcriptHeightPx - RESULTS_CARD_TRANSCRIPT_RESERVE_PX,
+                measuredPaneHeightPx - RESULTS_CARD_TRANSCRIPT_RESERVE_PX,
               ),
             ),
           }
         : undefined,
-    [transcriptHeightPx, cardMaxHeightCeilingPx],
+    [measuredPaneHeightPx, cardMaxHeightCeilingPx],
   );
 
   // Scrolling body ref (iteration-4 item 3). The actual scroll-to-top reset lives in the
@@ -535,6 +590,13 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
     setUserPickedPageSize(true);
     setPageSize(size);
     setPageIndex(0);
+    // Tell chat-page the card is about to grow/shrink so it can re-pin the transcript to the new
+    // bottom (only if the reader was already following it) — otherwise a larger page size grows the
+    // card downward and its pinned footer lands behind the composer until a manual scroll. Fired in
+    // the same event as the state changes above, so React commits the grown card and chat-page's
+    // re-pin in one pass (chat-page reads the pane's height AFTER the growth). See this prop's own
+    // doc comment.
+    onRowsPerPageChange?.();
   };
 
   /**
@@ -791,6 +853,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
     // grid this fix depends on; `wzResultsCard` (result-table.scss) applies the same bordered,
     // shadowless look via the shared `wzPanel` mixin instead, so the visual result is identical.
     <div
+      ref={cardRef}
       className={
         isExpanded ? 'wzResultsCard wzResultsCard--expanded' : 'wzResultsCard'
       }
@@ -990,6 +1053,7 @@ class ResultTableBoundary extends React.Component<
         resolveSecurityAnalyticsUrl={this.props.resolveSecurityAnalyticsUrl}
         provenanceChips={this.props.provenanceChips}
         transcriptHeightPx={this.props.transcriptHeightPx}
+        onRowsPerPageChange={this.props.onRowsPerPageChange}
       />
     );
   }
@@ -1001,6 +1065,7 @@ export const ResultTable: React.FC<ResultTableProps> = ({
   resolveSecurityAnalyticsUrl,
   provenanceChips,
   transcriptHeightPx,
+  onRowsPerPageChange,
 }) => (
   <ResultTableBoundary
     spec={spec}
@@ -1008,5 +1073,6 @@ export const ResultTable: React.FC<ResultTableProps> = ({
     resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
     provenanceChips={provenanceChips}
     transcriptHeightPx={transcriptHeightPx}
+    onRowsPerPageChange={onRowsPerPageChange}
   />
 );

@@ -120,6 +120,10 @@ interface MessageBubbleProps {
    * from MessageList, which gets it from chat-page.tsx's real `ResizeObserver` measurement; it
    * stays optional because jsdom has no `ResizeObserver`, so it is `undefined` in tests. */
   transcriptHeightPx?: number;
+  /** Passed straight through to this message's ResultTable so a rows-per-page change can re-pin the
+   * transcript pane — see that component's own doc comment on the same-named prop. Threaded here
+   * from MessageList, which gets it from chat-page.tsx. */
+  onTableRowsPerPageChange?: () => void;
 }
 
 function formatTimestamp(epochMs: number): string {
@@ -203,6 +207,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   resolveSecurityAnalyticsUrl,
   onRetry,
   transcriptHeightPx,
+  onTableRowsPerPageChange,
 }) => {
   const isUser = message.role === 'user';
   const isWaitingForFirstToken =
@@ -402,6 +407,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
             resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
             provenanceChips={tableProvenanceChips}
             transcriptHeightPx={transcriptHeightPx}
+            onRowsPerPageChange={onTableRowsPerPageChange}
           />
         </>
       )}
