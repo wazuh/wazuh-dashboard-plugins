@@ -2464,12 +2464,18 @@ describe('ChatPage — welcome composer and first-send transition (C1)', () => {
     expect(scssRules).toMatch(
       /\.wzComposerMeasure\s*\{\s*transition:\s*max-width \$wzDockTravel \$wzDockEase;/,
     );
-    // What the class carries instead: the composer's own gutters, and a 16px block start in the
-    // centred state so greeting → cards → composer are one evenly-spaced group (§1.5).
-    expect(scssRules).toMatch(/\.wzComposerMeasure\s*\{\s*padding:\s*8px 24px/);
+    // What the class carries instead: the composer's own BLOCK gutter (8px, 16px block-start in
+    // the centred state so greeting → cards → composer are one evenly-spaced group — §1.5). The
+    // 24px INLINE half moved to `.wzComposerRow` instead (live-audit follow-up, item 3): keeping
+    // it on `.wzComposerMeasure` shrank the visible panel to 840 - 2×24 = 792px while the welcome
+    // cluster's own padding-less measure reached the full 840, a 48px edge mismatch the two
+    // shared-measure elements must not have.
+    expect(scssRules).toMatch(/\.wzComposerMeasure\s*\{\s*padding-block:\s*8px/);
+    expect(scssRules).not.toMatch(/\.wzComposerMeasure\s*\{\s*padding:\s*8px 24px/);
     expect(scssRules).toMatch(
       /\.wzChatPane--welcome \.wzComposerMeasure\s*\{\s*padding-block-start:\s*16px/,
     );
+    expect(scssRules).toMatch(/\.wzComposerRow\s*\{[\s\S]*?padding-inline:\s*24px/);
     // The travel is a transform transition on the composer row, and the fading cluster leaves the
     // flow instead of pushing the incoming message down.
     expect(scssRules).toMatch(

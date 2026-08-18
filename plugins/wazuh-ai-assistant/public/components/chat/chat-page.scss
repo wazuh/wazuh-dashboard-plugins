@@ -118,6 +118,17 @@ $wzWelcomeFadeOut: 180ms;
  * "inline styles carrying layout"): 24px inline matches the transcript's own shared gutter, and 8px
  * block is the docked composer's separation from the transcript row above it.
  *
+ * The 24px inline half lives on `.wzComposerRow` (below), NOT here, on purpose (live-audit follow-up,
+ * item 3): `.wzComposerMeasure` carries the same `max-width` this element's OTHER two instances do
+ * (`.wzContentMeasure`/`.wzWelcomeMeasure` above) with no padding of their own, exactly like
+ * `.wzTranscriptContent`'s inline `padding: '16px 24px 0'` (chat-page.tsx) sits OUTSIDE
+ * `.wzContentMeasure` rather than shrinking it. Putting the 24px INSIDE this box instead (the
+ * pre-fix shape) meant `.wzComposerPanel` only ever reached 840 - 2×24 = 792px of visible width
+ * while the welcome greeting/cards sitting in the padding-less `.wzWelcomeMeasure` reached the full
+ * 840 — the two edges the audit measured as 48px apart. Moving the horizontal half out to the row
+ * (a plain flow ancestor, so it costs nothing structurally) lets both resolve against the exact same
+ * 840/1060px box, the same way the transcript's own gutter already does.
+ *
  * In the CENTRED state that 8px is the whole gap between the welcome cluster and the composer, which
  * measured 9px live (8 + the row's hairline) — off the 4/8/16/24 ladder and, more to the point,
  * tighter than the 16px rhythm the rest of the cluster uses (audit §1.5). The centred state alone
@@ -126,7 +137,7 @@ $wzWelcomeFadeOut: 180ms;
  * in each state rather than assuming the two are the same size.
  */
 .wzComposerMeasure {
-  padding: 8px 24px;
+  padding-block: 8px;
 }
 
 .wzChatPane--welcome .wzComposerMeasure {
@@ -354,6 +365,10 @@ $wzWelcomeFadeOut: 180ms;
  * chat-input.tsx (it needs the field's own `scrollHeight`, which CSS alone cannot read).
  */
 .wzComposerRow {
+  /* The composer's 24px horizontal gutter (see `.wzComposerMeasure` above for why it lives here
+     and not there): a plain flow box outside `.wzComposerMeasure`'s max-width, the same relationship
+     `.wzTranscriptContent`'s own inline `padding: '16px 24px 0'` has to `.wzContentMeasure`. */
+  padding-inline: 24px;
   /* Fallback first, exactly as `.wzResultsCard` does it: a browser that drops the `dvh` line is
      left with NO cap, at which point `overflow-y` below never engages and a field at full height
      pushes the transcript row away instead of scrolling inside its own. */
@@ -394,8 +409,9 @@ $wzWelcomeFadeOut: 180ms;
        that is itself only 10px wider than the text — the default bar there is unmistakable. */
     @include wzQuietScrollbar;
     /* Field/privacy-button/prose share one left rail (iteration-4 item A): EUI's own textarea
-       padding does not line up with `.wzComposerMeasure`'s 24px/8px gutter, so the field's own
-       inline padding is pinned to the same 8px inset the panel already uses. */
+       padding does not line up with the composer's 24px (`.wzComposerRow`) / 8px
+       (`.wzComposerMeasure`) gutter, so the field's own inline padding is pinned to the same 8px
+       inset the panel already uses. */
     padding-inline: 8px;
   }
 }
