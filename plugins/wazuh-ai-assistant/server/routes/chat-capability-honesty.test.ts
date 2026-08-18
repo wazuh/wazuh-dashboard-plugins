@@ -581,9 +581,11 @@ test('orchestrate: a SECOND unknown_fields resolution emits stripped DSL + discl
   // to digest.ts's breakdown-note wording.
   assert.equal(
     secondParsed.note,
-    'The suggested query was shown to the user as an "Open in Discover" link. Now tell the ' +
-      'user plainly, in your own words, what you could not check and why — do not repeat the ' +
-      'query itself, the link already shows it.',
+    'The suggested query was shown to the user as an "Open in Discover" link, not as visible ' +
+      'query text. Now tell the user plainly, in your own words, what you could not check and ' +
+      'why — do not repeat the query itself, the link already shows it, and if you mention the ' +
+      'handoff at all call it "the Discover link", never "the query below" or similar wording ' +
+      'that implies a query block is displayed.',
     'the "shown" acknowledgment must carry its own explanatory note untouched by ' +
       'augmentToolError, not merely something different from CAPABILITY_DENIAL_NOTE',
   );

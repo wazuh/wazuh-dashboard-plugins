@@ -1554,9 +1554,12 @@ export async function* orchestrate(
               toolResultContent = JSON.stringify({
                 shown: true,
                 note:
-                  'The suggested query was shown to the user as an "Open in Discover" link. Now ' +
-                  'tell the user plainly, in your own words, what you could not check and why — ' +
-                  'do not repeat the query itself, the link already shows it.',
+                  'The suggested query was shown to the user as an "Open in Discover" link, not ' +
+                  'as visible query text. Now tell the user plainly, in your own words, what you ' +
+                  'could not check and why — do not repeat the query itself, the link already ' +
+                  'shows it, and if you mention the handoff at all call it "the Discover link", ' +
+                  'never "the query below" or similar wording that implies a query block is ' +
+                  'displayed.',
               });
             }
           }

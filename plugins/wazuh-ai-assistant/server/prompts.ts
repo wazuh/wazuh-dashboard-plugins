@@ -244,6 +244,11 @@ export function buildSystemPrompt(nowIso: string): string {
     // already said, but seeing it is not the same as knowing not to say it again; this line makes
     // the "don't repeat" behavior explicit instead of assuming it follows from visibility alone.
     'Within a single answer, never repeat or re-explain a sentence you already wrote earlier in ' +
-      'this same answer -- continue from where you left off instead of restarting the narration.',
+      'this same answer -- continue from where you left off instead of restarting the narration. ' +
+      'This applies with equal force when a tool call comes back with zero rows: state that ' +
+      'absence -- and any scope caveat that goes with it (e.g. the index, agent, or time range ' +
+      'you checked) -- exactly ONCE, then move on; do not restate the same "nothing found" ' +
+      'finding a second time later in the answer using different wording, even if it feels like ' +
+      'a natural way to summarize or conclude.',
   ].join('\n');
 }

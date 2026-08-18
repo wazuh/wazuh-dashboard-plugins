@@ -370,3 +370,20 @@ test('buildSystemPrompt: instructs the model not to repeat earlier sentences wit
     /continue from where you left off instead of restarting the narration/,
   );
 });
+
+// Live-audit finding (item 8a): a T1134 zero-rule answer restated the same "no matching rules
+// found" finding twice, in different wording, elsewhere in the same answer -- the generic
+// no-repeat rule above did not name this specific shape of the mistake explicitly enough to stop
+// it. This asserts the sharpened, zero-result-specific addition stays in the prompt.
+test('buildSystemPrompt: instructs the model to state a zero-row finding once, not restate it later in different wording', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /zero rows/);
+  assert.match(
+    prompt,
+    /state that absence[\s\S]*exactly ONCE/,
+  );
+  assert.match(
+    prompt,
+    /do not restate the same "nothing found" finding a second time later in the answer/,
+  );
+});
