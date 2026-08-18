@@ -1,0 +1,31 @@
+@import '../redesign';
+
+/**
+ * Provider selector, option A2 (iteration-4 item 2). The trigger's label needs an EXPLICIT
+ * max-width for the ellipsis to have something to clip against — a flex/inline-block child with
+ * no width constraint of its own never triggers `text-overflow`, it just grows to fit its
+ * content. The full provider name still reaches the reader through `title`/aria on the button.
+ */
+.wzProviderPickerTriggerLabel {
+  display: inline-block;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.wzProviderPickerItem {
+  min-width: 220px;
+}
+
+.wzProviderPickerItemName {
+  font-weight: 500;
+}
+
+/** The model id reads as a value, not as prose — the same reasoning `provider-form-flyout.scss`
+ * already applies to model ids there ($euiCodeFontFamily), reused here rather than restated as a
+ * bare font stack. */
+.wzProviderPickerItemModel {
+  font-family: $euiCodeFontFamily;
+}

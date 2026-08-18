@@ -162,6 +162,7 @@ function renderChatPage(
     selectedProviderId: PROVIDER.id,
     onProviderChange: jest.fn(),
     onNavigateToSettings: jest.fn(),
+    onManageProviders: jest.fn(),
     // A real browser history, backed by jsdom's own `window.history`/`window.location` — reads
     // whatever path a test seeded via `window.history.replaceState` before mounting, and its own
     // `history.replace` calls are real `replaceState`s a test can assert on via `window.location`.
@@ -2698,5 +2699,47 @@ describe('ChatPage — conversation rail display mode (layout contract §5/§6)'
     } finally {
       stub.restore();
     }
+  });
+});
+
+// Iteration-4 item 2: the composer's provider control is now `ProviderPicker` (provider-picker.tsx)
+// rather than an inline `EuiSelect` — these pin the wiring at the ChatPage level (the picker's own
+// popover/selection/manage-providers behaviour is covered by provider-picker.test.tsx).
+describe('ChatPage — provider picker wiring', () => {
+  it('renders the picker instead of a raw <select>, and its trigger shows the provider name', async () => {
+    renderChatPage();
+    await screen.findByLabelText('Chat message');
+    expect(screen.queryByRole('combobox')).toBeNull();
+    expect(
+      screen.getByRole('button', { name: /Test provider/i }),
+    ).toBeInTheDocument();
+  });
+
+  it('routes provider selection through the same onProviderChange handler as before', async () => {
+    const onProviderChange = jest.fn();
+    const secondProvider = { ...PROVIDER, id: 'p2', name: 'Second provider' };
+    renderChatPage({
+      providers: [PROVIDER, secondProvider],
+      onProviderChange,
+    });
+    await screen.findByLabelText('Chat message');
+
+    fireEvent.click(screen.getByRole('button', { name: /Test provider/i }));
+    fireEvent.click(screen.getByText('Second provider'));
+
+    expect(onProviderChange).toHaveBeenCalledWith('p2');
+  });
+
+  it('calls the dedicated onManageProviders callback, not onNavigateToSettings', async () => {
+    const onManageProviders = jest.fn();
+    const onNavigateToSettings = jest.fn();
+    renderChatPage({ onManageProviders, onNavigateToSettings });
+    await screen.findByLabelText('Chat message');
+
+    fireEvent.click(screen.getByRole('button', { name: /Test provider/i }));
+    fireEvent.click(screen.getByText('Manage providers'));
+
+    expect(onManageProviders).toHaveBeenCalledTimes(1);
+    expect(onNavigateToSettings).not.toHaveBeenCalled();
   });
 });

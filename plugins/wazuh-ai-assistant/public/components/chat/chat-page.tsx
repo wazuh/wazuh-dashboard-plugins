@@ -17,7 +17,6 @@ import {
   EuiLoadingSpinner,
   EuiPanel,
   EuiIcon,
-  EuiSelect,
   EuiFlyout,
   EuiFlyoutBody,
 } from '@elastic/eui';
@@ -67,6 +66,7 @@ import { UiChatMessage } from './message-bubble';
 import { createDiscoverUrlResolver } from './discover-link';
 import { createSecurityAnalyticsUrlResolver } from './security-analytics-link';
 import { ChatInput, ChatInputHandle } from './chat-input';
+import { ProviderPicker } from './provider-picker';
 import { ConversationList } from './conversation-list';
 import { StatusCallout } from './status-callout';
 import { useSyncedState } from '../../hooks/use-synced-state';
@@ -84,6 +84,15 @@ interface ChatPageProps {
   /** The no-provider empty state's "Add a provider" CTA — its only caller. Owners wire it to
    * open Settings with the create-provider flyout (`#/settings?addProvider=true`). */
   onNavigateToSettings: () => void;
+  /** The provider picker's (chat-page.tsx, `ProviderPicker`) "Manage providers" footer item — a
+   * plain visit to the Settings app, deliberately a SEPARATE callback from `onNavigateToSettings`
+   * above rather than a reuse of it: that one always opens the create-provider flyout
+   * (`?addProvider=true`), which is the wrong behaviour for a reader who already has providers
+   * configured and just wants the table. Each embedding context wires this to the SAME helper it
+   * already uses for a plain Settings visit — application.tsx's tab-switch
+   * `navigateTo('settings')`, assistant-chat-panel.tsx's `openSettings` — rather than a new
+   * hardcoded path. */
+  onManageProviders: () => void;
   /** The app shell's router history (the same instance `<Router history={history}>` in
    * application.tsx uses) — used to read/write the open-conversation route below through
    * `history.replace` rather than the raw `window.history` API. */
@@ -315,6 +324,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   selectedProviderId,
   onProviderChange,
   onNavigateToSettings,
+  onManageProviders,
   history,
   onGeneratingChange,
   isActive = true,
@@ -2117,16 +2127,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       )?.title
     : undefined;
 
-  const providerOptions = providers.map(provider => ({
-    value: provider.id,
-    text: provider.isDefault
-      ? i18n.translate('wazuhAiAssistant.chat.providerOptionDefault', {
-          defaultMessage: '{name} (default)',
-          values: { name: provider.name },
-        })
-      : provider.name,
-  }));
-
   return (
     // Iteration 2 layout: EuiPage/EuiPageSideBar rendered as an unreliable hairline sliver in this
     // OSD/EUI build (iteration 1 screenshots), so the two-pane layout is now an explicit,
@@ -2949,43 +2949,21 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                       </EuiFlexItem>
                     )}
                     {/* Explicit grow spacer (was a bare `<EuiFlexItem />` relying on `grow`
-                          defaulting to true) pushes the provider/send cluster to the far right;
-                          that cluster now sits behind its own hairline left border, so the two
-                          concerns (privacy controls vs. provider/send) read as visually separate
-                          groups instead of one undivided row. */}
+                          defaulting to true) pushes the provider/send cluster to the far right.
+                          The hairline divider that used to separate it from the privacy controls
+                          is gone (iteration-4 item 2): the picker is now its own clickable text
+                          button rather than an inline `<select>`, and reads as a distinct control
+                          without needing a rule drawn next to it. */}
                     <EuiFlexItem grow />
                     <EuiFlexItem grow={false}>
-                      <EuiFlexGroup
-                        alignItems='center'
-                        gutterSize='s'
-                        responsive={false}
-                        style={{
-                          borderLeft: '1px solid var(--wz-hairline)',
-                          paddingLeft: 8,
-                        }}
-                      >
+                      <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false}>
                         {hasProviders && (
                           <EuiFlexItem grow={false}>
-                            <EuiSelect
-                              id='wzAiAssistantProviderSelect'
-                              compressed
-                              prepend={i18n.translate(
-                                'wazuhAiAssistant.chat.providerLabel',
-                                {
-                                  defaultMessage: 'Provider',
-                                },
-                              )}
-                              options={providerOptions}
-                              value={selectedProviderId}
-                              onChange={event =>
-                                onProviderChange(event.target.value)
-                              }
-                              aria-label={i18n.translate(
-                                'wazuhAiAssistant.chat.providerSelect',
-                                {
-                                  defaultMessage: 'Provider',
-                                },
-                              )}
+                            <ProviderPicker
+                              providers={providers}
+                              selectedProviderId={selectedProviderId}
+                              onProviderChange={onProviderChange}
+                              onManageProviders={onManageProviders}
                             />
                           </EuiFlexItem>
                         )}
