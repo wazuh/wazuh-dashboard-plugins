@@ -280,6 +280,118 @@ describe('SettingsPage — field policy filter', () => {
   });
 });
 
+// Symmetry pass (iteration-4 batch 2 item 5): the per-field action select drops `allow-scan` from
+// the choices it OFFERS, while the server keeps it a valid STORED action (server/tools/privacy.ts,
+// #8912) so existing/default `allow-scan` fields keep working and keep their server-side injection
+// scan. These tests pin the three-way symmetry, the display-only "Allow" mapping, and — the part
+// most at risk of a careless implementation coercing it on load/display — that a row nobody
+// touched still round-trips as `allow-scan`, not `allow`.
+describe('SettingsPage — field policy action select (symmetry pass, item 5)', () => {
+  const renderOnPrivacyTab = () =>
+    render(
+      <SettingsPageWithRouter
+        core={coreMock}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=privacy']}
+      />,
+    );
+
+  it('offers exactly three action options, with no allow-scan among them', async () => {
+    mockService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: false,
+      userCanOverride: true,
+      privacyDefaultPerProvider: {},
+      fieldPolicy: [{ field: 'agent.name', action: 'allow' }],
+      conversationRetentionDays: 0,
+    });
+    renderOnPrivacyTab();
+
+    const actionSelect = await screen.findByRole('combobox', {
+      name: /^action$/i,
+    });
+    const optionTexts = within(actionSelect)
+      .getAllByRole('option')
+      .map(option => option.textContent);
+    expect(optionTexts).toEqual(['Allow', 'Anonymize', 'Never send']);
+  });
+
+  it('displays a stored allow-scan field as "Allow" — the word "scanned" never appears', async () => {
+    mockService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: false,
+      userCanOverride: true,
+      privacyDefaultPerProvider: {},
+      fieldPolicy: [{ field: 'package.name', action: 'allow-scan' }],
+      conversationRetentionDays: 0,
+    });
+    renderOnPrivacyTab();
+
+    const actionSelect = await screen.findByRole('combobox', {
+      name: /^action$/i,
+    });
+    expect(actionSelect).toHaveValue('allow');
+    expect(screen.queryByText(/scanned/i)).not.toBeInTheDocument();
+  });
+
+  it('saves an untouched allow-scan row back unchanged, not coerced to allow', async () => {
+    mockService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: false,
+      userCanOverride: true,
+      privacyDefaultPerProvider: {},
+      fieldPolicy: [{ field: 'package.name', action: 'allow-scan' }],
+      conversationRetentionDays: 0,
+    });
+    renderOnPrivacyTab();
+
+    await screen.findByRole('combobox', { name: /^action$/i });
+    // Nothing about the field-policy row itself is touched — dirty state is raised through an
+    // unrelated switch instead, purely to make the (otherwise legitimately disabled-while-clean)
+    // Save button clickable, so the save this test inspects is genuinely a no-op on this row.
+    fireEvent.click(
+      screen.getByRole('switch', {
+        name: /enable privacy mode by default/i,
+      }),
+    );
+    fireEvent.click(
+      screen.getByRole('button', { name: /save privacy settings/i }),
+    );
+
+    await waitFor(() =>
+      expect(mockService.updateAssistantSettings).toHaveBeenCalled(),
+    );
+    const payload = mockService.updateAssistantSettings.mock.calls[0][0];
+    expect(payload.fieldPolicy).toEqual([
+      { field: 'package.name', action: 'allow-scan' },
+    ]);
+  });
+
+  it('persists an explicit edit away from allow-scan (e.g. to Anonymize)', async () => {
+    mockService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: false,
+      userCanOverride: true,
+      privacyDefaultPerProvider: {},
+      fieldPolicy: [{ field: 'package.name', action: 'allow-scan' }],
+      conversationRetentionDays: 0,
+    });
+    renderOnPrivacyTab();
+
+    const actionSelect = await screen.findByRole('combobox', {
+      name: /^action$/i,
+    });
+    fireEvent.change(actionSelect, { target: { value: 'anonymize' } });
+    fireEvent.click(
+      screen.getByRole('button', { name: /save privacy settings/i }),
+    );
+
+    await waitFor(() =>
+      expect(mockService.updateAssistantSettings).toHaveBeenCalled(),
+    );
+    const payload = mockService.updateAssistantSettings.mock.calls[0][0];
+    expect(payload.fieldPolicy).toEqual([
+      { field: 'package.name', action: 'anonymize' },
+    ]);
+  });
+});
+
 describe('SettingsPage — settings-access probe', () => {
   it('fails open (page usable, nothing blocked) when the settings-access probe itself fails', async () => {
     mockService.getSettingsAccess.mockRejectedValue(new Error('network error'));

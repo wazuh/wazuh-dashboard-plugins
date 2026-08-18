@@ -54,34 +54,50 @@ import {
   outcomeFromTestResult,
 } from './provider-status';
 
-const FIELD_POLICY_ACTIONS: FieldPolicyAction[] = [
+// Exactly three selectable options (symmetry pass, iteration-4 batch 2 item 5) — `allow-scan`
+// (#8912) is deliberately excluded here even though it stays a valid STORED action:
+// `server/tools/privacy.ts` keeps `allow-scan` in the server-side `FieldPolicyAction` type so
+// existing/default fields configured with it keep working and keep their server-side injection
+// scan; this select just no longer offers picking it. See `toSelectableFieldPolicyAction` below
+// for how an `allow-scan` row still displays (and round-trips) correctly.
+type SelectableFieldPolicyAction = Exclude<FieldPolicyAction, 'allow-scan'>;
+
+const FIELD_POLICY_ACTIONS: SelectableFieldPolicyAction[] = [
   'allow',
-  'allow-scan',
   'anonymize',
   'never',
 ];
 
-const FIELD_POLICY_ACTION_LABELS: Record<FieldPolicyAction, string> = {
-  allow: i18n.translate('wazuhAiAssistant.settings.privacy.action.allow', {
-    defaultMessage: 'Allow',
-  }),
-  'allow-scan': i18n.translate(
-    'wazuhAiAssistant.settings.privacy.action.allowScan',
-    {
-      // #8912: value is sent, but scanned first for known identifiers/IPs/hostnames.
-      defaultMessage: 'Allow (scanned)',
-    },
-  ),
-  anonymize: i18n.translate(
-    'wazuhAiAssistant.settings.privacy.action.anonymize',
-    {
-      defaultMessage: 'Anonymize',
-    },
-  ),
-  never: i18n.translate('wazuhAiAssistant.settings.privacy.action.never', {
-    defaultMessage: 'Never send',
-  }),
-};
+const FIELD_POLICY_ACTION_LABELS: Record<SelectableFieldPolicyAction, string> =
+  {
+    allow: i18n.translate('wazuhAiAssistant.settings.privacy.action.allow', {
+      defaultMessage: 'Allow',
+    }),
+    anonymize: i18n.translate(
+      'wazuhAiAssistant.settings.privacy.action.anonymize',
+      {
+        defaultMessage: 'Anonymize',
+      },
+    ),
+    never: i18n.translate('wazuhAiAssistant.settings.privacy.action.never', {
+      defaultMessage: 'Never send',
+    }),
+  };
+
+/**
+ * Maps a STORED action (including the no-longer-selectable `allow-scan`) to what this dropdown
+ * displays/selects. `allow-scan` reads as plain "Allow" — the word "scanned" never appears here —
+ * while the underlying draft value is left completely alone by this function; it is a display-only
+ * mapping fed to the `<EuiSelect>`'s `value`, never written back into `fieldPolicyDraft`. A row
+ * this maps is only ever actually rewritten to a new value when the admin explicitly changes it
+ * (the select's own `onChange` below), so an untouched `allow-scan` row keeps that exact stored
+ * value and round-trips unchanged on save.
+ */
+function toSelectableFieldPolicyAction(
+  action: FieldPolicyAction,
+): SelectableFieldPolicyAction {
+  return action === 'allow-scan' ? 'allow' : action;
+}
 
 interface SettingsPageProps {
   core: CoreStart;
@@ -1765,7 +1781,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                                     value: action,
                                     text: FIELD_POLICY_ACTION_LABELS[action],
                                   }))}
-                                  value={entry.action}
+                                  value={toSelectableFieldPolicyAction(
+                                    entry.action,
+                                  )}
                                   onChange={event =>
                                     handleFieldPolicyChange(index, {
                                       action: event.target
