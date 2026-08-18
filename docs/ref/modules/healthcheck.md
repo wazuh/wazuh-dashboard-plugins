@@ -186,7 +186,11 @@ TODO: screenshot
 
 # Icon in the platform header
 
-An icon is present in the platform header to display the overall result of the health check.
+A pulse icon, colored based on the overall result, is present in the platform header to draw attention to a health check status that needs attention.
+
+The icon is only displayed when the overall result is `yellow` or `red`. When the overall result is `green` (or `gray`), the icon is not rendered.
+
+Hovering over the icon shows a tooltip with the overall status. Clicking it opens a popover with the overall status and a link to the **Health Check** app for more details.
 
 TODO: screenshot
 
