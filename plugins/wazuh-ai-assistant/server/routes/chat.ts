@@ -163,8 +163,8 @@ const NO_MATCHING_RESULTS_MESSAGE =
  * chain got, not the full answer, so the user should know a step was left unreached.
  */
 const NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE =
-  'The tool-round budget for this turn ran out before a full answer could be written. See the ' +
-  'results above for what was found so far — a follow-up question can continue from there.';
+  'I reached the analysis limit for this question. The results gathered so far are above — ask ' +
+  'a narrower follow-up to dig deeper.';
 /**
  * Sibling fallback for a `general`-routed (no-tool) turn that still ends with no text at all —
  * e.g. a reasoning model streaming its entire answer on a channel nothing reads (issue

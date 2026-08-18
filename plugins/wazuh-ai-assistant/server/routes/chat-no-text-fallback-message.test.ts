@@ -18,8 +18,11 @@ test('noTextFallbackMessage: a tool ran, results rendered, rounds NOT exhausted 
 
 test('noTextFallbackMessage: a tool ran, results rendered, rounds exhausted discloses the unreached step', () => {
   const message = noTextFallbackMessage(true, true, true);
-  assert.match(message, /tool-round budget/i);
+  assert.match(message, /analysis limit/i);
   assert.doesNotMatch(message, /no additional analysis/i);
+  // Regression: "tool-round budget" is an internal implementation detail with no corresponding
+  // setting anywhere in the UI — the user-facing copy must not name it.
+  assert.doesNotMatch(message, /tool-round budget/i);
 });
 
 test('noTextFallbackMessage: roundsExhausted is ignored when there is no table to reference', () => {
