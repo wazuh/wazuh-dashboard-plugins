@@ -291,20 +291,20 @@
   gap: 12px;
   width: 100%;
 
-  /* `.ouiCard__content` (the title+description column, OUI's `_card.scss`) is a `flex-grow: 1`
+  /* `.euiCard__content` (the title+description column, OUI's `_card.scss`) is a `flex-grow: 1`
      item with no `min-width` override, so its default `min-width: auto` sizes it to its own
      content instead of the 240px track above — the one way text could still force a card wider
      than its column despite the grid itself only ever growing via `1fr` (see the comment above).
      `min-width: 0` is what actually lets the title/description wrap or truncate within the card's
      own width instead of pushing it wider. */
-  .ouiCard__content {
+  .euiCard__content {
     min-width: 0;
   }
 
   /* One line per title (the EXAMPLE_CARDS doc comment's own "one short title... per card"): without
      this a longer title ("Disconnected agents") wraps to two lines while its same-row siblings stay
      on one, so the row reads as uneven instead of three cards of a kind. */
-  .ouiCard__title {
+  .euiCard__title {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -313,7 +313,7 @@
   /* Two lines per description (the same doc comment's "the full question as a two-line
      description") — clamped, not just wrapped, so a longer question truncates with an ellipsis
      instead of growing that one card taller than its row's other two. */
-  .ouiCard__description {
+  .euiCard__description {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
