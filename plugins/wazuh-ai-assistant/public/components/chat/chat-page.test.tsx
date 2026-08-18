@@ -2236,9 +2236,7 @@ describe('ChatPage — welcome composer and first-send transition (C1)', () => {
   it('marks the composer row roomy on the full-page surface only', async () => {
     renderChatPage();
     await screen.findByText('Ask the AI Assistant something');
-    expect(composerRow().classList.contains('wzComposerRow--roomy')).toBe(
-      true,
-    );
+    expect(composerRow().classList.contains('wzComposerRow--roomy')).toBe(true);
   });
 
   it('never marks the composer row roomy in the embedded docked panel', async () => {
@@ -2257,10 +2255,9 @@ describe('ChatPage — welcome composer and first-send transition (C1)', () => {
   // welcome cluster.
   it('caps the welcome cluster width via .wzWelcomeMeasure/.wzComposerMeasure, not the bare .wzContentMeasure', () => {
     const scssPath = path.join(__dirname, 'chat-page.scss');
-    const scssSource = fs.readFileSync(scssPath, 'utf8').replace(
-      /\/\*[\s\S]*?\*\//g,
-      '',
-    );
+    const scssSource = fs
+      .readFileSync(scssPath, 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '');
     expect(scssSource).toMatch(
       /\.wzChatPane--welcome \.wzWelcomeMeasure,\s*\n\s*\.wzChatPane--welcome \.wzComposerMeasure\s*\{\s*max-width:\s*\$wzWelcomeGroupMaxWidth;/,
     );
@@ -2279,10 +2276,9 @@ describe('ChatPage — welcome composer and first-send transition (C1)', () => {
 
   it('animates the composer measure open on dock, but keeps the welcome measure pinned at 840px through the same bridge', () => {
     const scssPath = path.join(__dirname, 'chat-page.scss');
-    const scssSource = fs.readFileSync(scssPath, 'utf8').replace(
-      /\/\*[\s\S]*?\*\//g,
-      '',
-    );
+    const scssSource = fs
+      .readFileSync(scssPath, 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '');
     // The composer's OWN measure is the one that tweens the cap open — no scoping to a pane state,
     // so the transition is armed regardless of which class swap (`--welcome` leaving or
     // `--docking` arriving) actually changes the computed max-width.
@@ -2780,5 +2776,52 @@ describe('ChatPage — provider picker wiring', () => {
 
     expect(onManageProviders).toHaveBeenCalledTimes(1);
     expect(onNavigateToSettings).not.toHaveBeenCalled();
+  });
+});
+
+describe('ChatPage — composer privacy chip (iteration 4)', () => {
+  it('renders as a single wzPrivacyChip badge carrying the --off/--on modifier for the current setting', async () => {
+    renderChatPage();
+    const offChip = await screen.findByTestId('wzPrivacyChip');
+    expect(offChip).toHaveClass('wzPrivacyChip--off');
+    expect(offChip).not.toHaveClass('wzPrivacyChip--on');
+
+    mockSettingsService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: true,
+      privacyDefaultPerProvider: {},
+      userCanOverride: true,
+      conversationRetentionDays: 0,
+    });
+    renderChatPage();
+    const chips = await screen.findAllByTestId('wzPrivacyChip');
+    const onChip = chips[chips.length - 1];
+    expect(onChip).toHaveClass('wzPrivacyChip--on');
+    expect(onChip).not.toHaveClass('wzPrivacyChip--off');
+  });
+
+  it('toggles privacy on click when the admin left it overridable, and is not clickable when fixed', async () => {
+    renderChatPage();
+    const chip = await screen.findByTestId('wzPrivacyChip');
+    // A clickable EuiBadge renders its outer element as a <button> (onClick/onClickAriaLabel are
+    // spread onto it); a non-clickable one renders a plain <span> — asserting the tag name is the
+    // same "is this actually clickable" check a screen-reader/keyboard user relies on.
+    expect(chip.tagName).toBe('BUTTON');
+
+    fireEvent.click(chip);
+    await waitFor(() => expect(chip).toHaveClass('wzPrivacyChip--on'));
+
+    mockSettingsService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: false,
+      privacyDefaultPerProvider: {},
+      userCanOverride: false,
+      conversationRetentionDays: 0,
+    });
+    renderChatPage();
+    const chips = await screen.findAllByTestId('wzPrivacyChip');
+    const fixedChip = chips[chips.length - 1];
+    expect(fixedChip.tagName).not.toBe('BUTTON');
+
+    fireEvent.click(fixedChip);
+    expect(fixedChip).toHaveClass('wzPrivacyChip--off');
   });
 });

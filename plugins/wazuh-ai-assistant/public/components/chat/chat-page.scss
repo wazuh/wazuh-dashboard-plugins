@@ -764,7 +764,8 @@ $wzMsgAvatarColumn: 40px;
      travelling, which is exactly when this must NOT run — the chrome is transparent throughout the
      travel and only fades in once the row has arrived. */
   .wzComposerRow {
-    transition: background-color $wzMotionSlow $wzEase,
+    transition:
+      background-color $wzMotionSlow $wzEase,
       border-color $wzMotionSlow $wzEase;
   }
 
@@ -799,5 +800,96 @@ $wzMsgAvatarColumn: 40px;
       opacity: 1;
       transform: translateY(0);
     }
+  }
+}
+
+/**
+ * Composer control-row spec (iteration 4, Target 1): the privacy pill that replaces the old
+ * padlock `EuiButtonEmpty` + floating `EuiIconTip` pair (chat-page.tsx's `privacyChip`). Qualified
+ * with `.euiBadge` for the same reason `.euiBadge.wzStatusChip` above is (settings-page.scss) —
+ * both classes land at 0,1,0 on EUI's own stylesheet, so without the compound this chip would be
+ * one bundle-order accident away from reverting to a plain hollow badge.
+ *
+ * CRITICAL fork constraint (settings-page.scss:135-138): `$euiColorSuccess` does not exist in this
+ * OUI fork — the "on"/active tint is `$euiColorSecondary`/`$euiColorSecondaryText` via the shared
+ * `wzStatusChip` mixin (`_redesign.scss`, imported at the top of this file), never `color='success'`.
+ */
+.euiBadge.wzPrivacyChip {
+  border-radius: 999px;
+  min-block-size: 24px;
+  padding-inline: 8px;
+  font-size: 12px;
+  font-weight: 600;
+
+  &.wzPrivacyChip--off {
+    background-color: transparent;
+    border: 1px solid var(--wz-hairline, #{$euiBorderColor});
+    color: var(--wz-text-subdued, #{$euiTextSubduedColor});
+  }
+
+  &.wzPrivacyChip--on {
+    @include wzStatusChip($euiColorSecondary, $euiColorSecondaryText);
+    font-size: 12px;
+    line-height: 22px;
+  }
+
+  // EUI's own clickable-badge hover/focus adds an underline to the text; this chip is a status
+  // pill first and a control second, so it keeps its pill look on hover/focus instead of picking
+  // up link styling.
+  &.euiBadge-isClickable:hover,
+  &.euiBadge-isClickable:focus {
+    text-decoration: none;
+  }
+
+  &.wzPrivacyChip--off.euiBadge-isClickable:hover {
+    background-color: rgba($euiColorSecondary, 0.06);
+  }
+
+  &.wzPrivacyChip--on.euiBadge-isClickable:hover {
+    background-color: rgba($euiColorSecondary, 0.2);
+  }
+
+  &.euiBadge-isClickable:focus-visible {
+    outline: 2px solid var(--wz-accent, #{$euiColorPrimary});
+    outline-offset: 1px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .euiBadge.wzPrivacyChip {
+    transition:
+      background-color $wzMotionFast $wzEase,
+      color $wzMotionFast $wzEase;
+  }
+}
+
+/**
+ * Composer control-row spec (iteration 4, Target 2): Send/Stop share this class so the two states
+ * occupy the exact same footprint in the row (geometry parity) — a `size='m'` `EuiButtonIcon`
+ * alone still varies its rendered box with `display` ('empty' vs 'fill' vs 'base'), and the two
+ * buttons swap `display` between each other and across `canSend`. Fixed `block-size`/`inline-size`
+ * pin both to one 32px square regardless of which `display` either is currently rendering.
+ *
+ * 999px radius (not `$wzPanelRadius`): a circular control, matching the send/stop affordance of
+ * every chat composer this design was benchmarked against, not the rectangular-panel radius the
+ * rest of this file's containers use.
+ */
+.euiButtonIcon.wzComposerSendButton {
+  border-radius: 999px;
+  block-size: 32px;
+  inline-size: 32px;
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .euiButtonIcon.wzComposerSendButton {
+    transition:
+      background-color $wzMotionFast $wzEase,
+      color $wzMotionFast $wzEase,
+      transform $wzMotionFast $wzEase;
+  }
+
+  .euiButtonIcon.wzComposerSendButton:not(:disabled):active {
+    transform: scale(0.94);
   }
 }

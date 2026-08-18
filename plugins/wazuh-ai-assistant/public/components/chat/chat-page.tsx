@@ -4,12 +4,11 @@ import {
   EuiSpacer,
   EuiEmptyPrompt,
   EuiButton,
-  EuiButtonEmpty,
+  EuiBadge,
   EuiButtonIcon,
   EuiFlexGroup,
   EuiFlexItem,
   EuiToolTip,
-  EuiIconTip,
   EuiText,
   EuiTitle,
   EuiScreenReaderOnly,
@@ -2049,6 +2048,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
   /** `error` is the send-path failure; `providersError` the app shell's provider-load failure. One
    * callout reports whichever is current, so dismissal is tracked against this one value. */
+  // Composer control-row spec (iteration-4): the Send button's own disabled/enabled state, split
+  // out once so both the `disabled` prop and the `display` (filled only when it would actually
+  // do something) read the same condition instead of re-deriving it in two places.
+  const canSend = hasProviders && Boolean(inputText.trim());
   const activeError = error ?? providersError;
   const showErrorCallout =
     Boolean(activeError) && activeError !== dismissedError;
@@ -2083,24 +2086,37 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         defaultMessage: 'Off',
       });
   const privacyBadgeIcon = privacyEnabled ? 'lock' : 'lockOpen';
-  const privacyBadge = assistantSettings?.userCanOverride ? (
-    <EuiButtonEmpty
-      size='s'
-      color={privacyEnabled ? 'success' : 'text'}
+  // Single pill replacing the old padlock EuiButtonEmpty + floating EuiIconTip pair (iteration-4
+  // composer control-row spec): one element carries the state (icon + "Privacy · On/Off" label),
+  // the explanation of what that state does to the user's data, and — only when the admin has
+  // left it overridable — the click affordance to flip it. `onClick`/`onClickAriaLabel` are
+  // spread in together rather than each defaulting to `undefined`, since OuiBadge warns if
+  // `onClickAriaLabel` is present without `onClick` (and vice versa reads as a badge that looks
+  // clickable but isn't).
+  const privacyChip = (
+    <EuiBadge
+      className={`wzPrivacyChip wzPrivacyChip--${privacyEnabled ? 'on' : 'off'}`}
+      color='hollow'
       iconType={privacyBadgeIcon}
-      onClick={handleTogglePrivacy}
+      data-test-subj='wzPrivacyChip'
+      {...(assistantSettings?.userCanOverride
+        ? {
+            onClick: handleTogglePrivacy,
+            onClickAriaLabel: privacyEnabled
+              ? i18n.translate('wazuhAiAssistant.chat.privacy.toggleToOff', {
+                  defaultMessage: 'Turn privacy mode off',
+                })
+              : i18n.translate('wazuhAiAssistant.chat.privacy.toggleToOn', {
+                  defaultMessage: 'Turn privacy mode on',
+                }),
+          }
+        : {})}
     >
-      {privacyBadgeLabel}
-    </EuiButtonEmpty>
-  ) : (
-    <EuiButtonEmpty
-      size='s'
-      color={privacyEnabled ? 'success' : 'text'}
-      iconType={privacyBadgeIcon}
-      isDisabled
-    >
-      {privacyBadgeLabel}
-    </EuiButtonEmpty>
+      {i18n.translate('wazuhAiAssistant.chat.privacy.chipLabel', {
+        defaultMessage: 'Privacy · {state}',
+        values: { state: privacyBadgeLabel },
+      })}
+    </EuiBadge>
   );
 
   // The badge alone only ever said
@@ -2921,36 +2937,26 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   >
                     {hasProviders && assistantSettings && (
                       <EuiFlexItem grow={false}>
-                        {assistantSettings.userCanOverride ? (
-                          privacyBadge
-                        ) : (
-                          <EuiToolTip
-                            content={i18n.translate(
-                              'wazuhAiAssistant.chat.privacy.adminSet',
-                              {
-                                defaultMessage: 'Set by administrator',
-                              },
-                            )}
-                          >
-                            {privacyBadge}
-                          </EuiToolTip>
-                        )}
-                      </EuiFlexItem>
-                    )}
-                    {hasProviders && assistantSettings && (
-                      <EuiFlexItem grow={false}>
-                        <EuiIconTip
-                          type='iInCircle'
-                          color='subdued'
-                          content={privacyExplainerText}
-                          aria-label={i18n.translate(
-                            'wazuhAiAssistant.chat.privacy.explainAriaLabel',
-                            {
-                              defaultMessage:
-                                'What privacy mode does to your data',
-                            },
-                          )}
-                        />
+                        <EuiToolTip
+                          content={
+                            assistantSettings.userCanOverride ? (
+                              privacyExplainerText
+                            ) : (
+                              <>
+                                {privacyExplainerText}
+                                <br />
+                                {i18n.translate(
+                                  'wazuhAiAssistant.chat.privacy.adminSet',
+                                  {
+                                    defaultMessage: 'Set by administrator',
+                                  },
+                                )}
+                              </>
+                            )
+                          }
+                        >
+                          {privacyChip}
+                        </EuiToolTip>
                       </EuiFlexItem>
                     )}
                     {/* Explicit grow spacer (was a bare `<EuiFlexItem />` relying on `grow`
@@ -2961,7 +2967,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                           without needing a rule drawn next to it. */}
                     <EuiFlexItem grow />
                     <EuiFlexItem grow={false}>
-                      <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false}>
+                      <EuiFlexGroup
+                        alignItems='center'
+                        gutterSize='s'
+                        responsive={false}
+                      >
                         {hasProviders && (
                           <EuiFlexItem grow={false}>
                             <ProviderPicker
@@ -2975,6 +2985,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                         <EuiFlexItem grow={false}>
                           {isGenerating ? (
                             <EuiButtonIcon
+                              className='wzComposerSendButton'
                               iconType='cross'
                               color='danger'
                               // 'm', matching the Send button's own size (iteration-4 item A) —
@@ -2982,6 +2993,15 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                               // generating, and a smaller icon here shrank that slot's height
                               // between the two states.
                               size='m'
+                              // 'base' (bordered, unfilled) — a deliberate step down from the
+                              // Send button's filled 'fill': Stop is a real interrupt but not the
+                              // row's primary action, and a second filled/colored button in the
+                              // same slot the instant generation starts would read as the
+                              // composer's emphasis flipping to "danger" by default. Verified
+                              // against this fork's OUI build (button_icon.tsx's
+                              // `displayToClassNameMap`), which does define 'base' alongside
+                              // 'empty'/'fill' — same three-value `display` union EUI ships.
+                              display='base'
                               onClick={handleStop}
                               aria-label={i18n.translate(
                                 'wazuhAiAssistant.chat.stopButton',
@@ -2992,14 +3012,19 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                             />
                           ) : (
                             <EuiButtonIcon
+                              className='wzComposerSendButton'
                               iconType='arrowUp'
                               color='primary'
                               // 'm', not 's' (iteration-4 item A): against the roomier two-row
                               // field the small size read as undersized for the row's own height.
                               size='m'
-                              display='fill'
+                              // Filled only once there is something to send (`canSend`); an empty
+                              // composer now gets the same unfilled 'empty' display Stop's sibling
+                              // slot uses instead of a filled-but-disabled button, which used to
+                              // read as broken rather than "nothing typed yet".
+                              display={canSend ? 'fill' : 'empty'}
                               onClick={() => chatInputRef.current?.send()}
-                              disabled={!hasProviders || !inputText.trim()}
+                              disabled={!canSend}
                               aria-label={i18n.translate(
                                 'wazuhAiAssistant.chat.sendButton',
                                 {
