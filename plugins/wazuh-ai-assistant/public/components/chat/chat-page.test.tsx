@@ -2785,10 +2785,32 @@ describe('ChatPage — provider picker wiring', () => {
   });
 });
 
+// This codebase's element-lookup convention is `data-test-subj` (37 uses across the plugin), not
+// React Testing Library's own `data-testid` — the component below wires up `data-test-subj`, so
+// these two helpers query DOM directly instead of `findByTestId`/`findAllByTestId`, which look for
+// the wrong attribute and would never resolve.
+async function findPrivacyChip(): Promise<HTMLElement> {
+  return waitFor(() => {
+    const el = document.querySelector('[data-test-subj="wzPrivacyChip"]');
+    expect(el).not.toBeNull();
+    return el as HTMLElement;
+  });
+}
+
+async function findAllPrivacyChips(): Promise<HTMLElement[]> {
+  return waitFor(() => {
+    const els = Array.from(
+      document.querySelectorAll('[data-test-subj="wzPrivacyChip"]'),
+    ) as HTMLElement[];
+    expect(els.length).toBeGreaterThan(0);
+    return els;
+  });
+}
+
 describe('ChatPage — composer privacy chip (iteration 4)', () => {
   it('renders as a single wzPrivacyChip badge carrying the --off/--on modifier for the current setting', async () => {
     renderChatPage();
-    const offChip = await screen.findByTestId('wzPrivacyChip');
+    const offChip = await findPrivacyChip();
     expect(offChip).toHaveClass('wzPrivacyChip--off');
     expect(offChip).not.toHaveClass('wzPrivacyChip--on');
 
@@ -2799,7 +2821,7 @@ describe('ChatPage — composer privacy chip (iteration 4)', () => {
       conversationRetentionDays: 0,
     });
     renderChatPage();
-    const chips = await screen.findAllByTestId('wzPrivacyChip');
+    const chips = await findAllPrivacyChips();
     const onChip = chips[chips.length - 1];
     expect(onChip).toHaveClass('wzPrivacyChip--on');
     expect(onChip).not.toHaveClass('wzPrivacyChip--off');
@@ -2807,7 +2829,7 @@ describe('ChatPage — composer privacy chip (iteration 4)', () => {
 
   it('toggles privacy on click when the admin left it overridable, and is not clickable when fixed', async () => {
     renderChatPage();
-    const chip = await screen.findByTestId('wzPrivacyChip');
+    const chip = await findPrivacyChip();
     // A clickable EuiBadge renders its outer element as a <button> (onClick/onClickAriaLabel are
     // spread onto it); a non-clickable one renders a plain <span> — asserting the tag name is the
     // same "is this actually clickable" check a screen-reader/keyboard user relies on.
@@ -2823,7 +2845,7 @@ describe('ChatPage — composer privacy chip (iteration 4)', () => {
       conversationRetentionDays: 0,
     });
     renderChatPage();
-    const chips = await screen.findAllByTestId('wzPrivacyChip');
+    const chips = await findAllPrivacyChips();
     const fixedChip = chips[chips.length - 1];
     expect(fixedChip.tagName).not.toBe('BUTTON');
 
