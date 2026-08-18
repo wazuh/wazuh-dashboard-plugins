@@ -660,6 +660,49 @@ test('orchestrate: two tool_calls in the SAME round each get only the narration 
   assert.equal(secondToolMessage?.content, 'Now checking a second thing.');
 });
 
+test('orchestrate: a round that streams only whitespace before its tool_call produces content: "" in history, never a whitespace string', async () => {
+  // Adversarial-review finding: models routinely emit a bare priming newline run ("\n\n") right
+  // before a tool call. The C4 slice (`roundText.slice(roundTextConsumed)`) used to carry that
+  // whitespace straight into the assistant message's `content`, and anthropic.ts pushes any
+  // truthy `content` as a `text` block -- Anthropic's Messages API 400s on a whitespace-only
+  // text block. The fix trims the slice; this pins the orchestration-level contract the adapter
+  // relies on: whitespace-only round text must become an empty string, not survive as "\n\n".
+  const { context } = scaContext();
+  const { callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      [
+        { type: 'delta', content: '\n\n' },
+        {
+          type: 'tool_call',
+          toolCall: {
+            id: 'call_sca_results',
+            name: 'get_sca_results',
+            arguments: { agent_id: '001' },
+          },
+        },
+        { type: 'done', usage: { inputTokens: 20, outputTokens: 10 } },
+      ],
+      textOnlyScript('CIS Ubuntu: 95 passed, 102 failed, 10 N/A.'),
+    ],
+    context,
+  );
+
+  const round1Messages = callMessages[2];
+  const toolCallMessage = round1Messages.find(
+    message =>
+      message.role === 'assistant' &&
+      message.toolCalls?.[0]?.id === 'call_sca_results',
+  );
+  assert.ok(toolCallMessage);
+  assert.equal(
+    toolCallMessage?.content,
+    '',
+    'whitespace-only round text preceding a tool_call must be trimmed to an empty string, not ' +
+      'passed through as "\\n\\n"',
+  );
+});
+
 // --- orchestrate: main end-to-end case -- FAILS ON BASE -----------------------------------------
 
 test('orchestrate: an unprompted single-tool offer with rounds remaining is forced into a chained call, not left to end the turn', async () => {

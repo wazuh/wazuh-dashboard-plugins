@@ -1566,7 +1566,13 @@ export async function* orchestrate(
             // into its own history turn instead of discarding it as `content: ''` — otherwise the
             // model has no record of having said it and re-narrates near-identically on a retry
             // round (the `unknown_fields` self-correction just above is exactly that retry path).
-            const priorRoundText = roundText.slice(roundTextConsumed);
+            // Trim before it reaches history: models often emit a bare priming newline (or
+            // whitespace run) right before a tool call (see the "\n\n"-before-tool-call note at
+            // this file's top), and Anthropic's Messages API 400s on a whitespace-only text
+            // block (anthropic.ts pushes any truthy `content` as a text block). The offset
+            // bookkeeping below stays on the UNtrimmed `roundText.length` so later slices are
+            // still measured from the right position.
+            const priorRoundText = roundText.slice(roundTextConsumed).trim();
             roundTextConsumed = roundText.length;
             messages = [
               ...messages,
@@ -1695,7 +1701,10 @@ export async function* orchestrate(
           // Issue C4: see the identical comment on the suggest_discover_query branch above --
           // this round's own narration, already shown to the user, belongs in its own history
           // turn instead of being dropped as `content: ''`.
-          const priorRoundText = roundText.slice(roundTextConsumed);
+          // Trim before it reaches history for the same reason as the suggest_discover_query
+          // branch above: a whitespace-only text block 400s against Anthropic. Offset
+          // bookkeeping stays on the UNtrimmed `roundText.length`.
+          const priorRoundText = roundText.slice(roundTextConsumed).trim();
           roundTextConsumed = roundText.length;
           messages = [
             ...messages,
