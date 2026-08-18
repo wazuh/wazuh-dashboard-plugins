@@ -224,6 +224,34 @@ describe('ResultTable', () => {
       expect(screen.queryByText('agent-10')).toBeNull();
     });
 
+    // "Card grows" (iteration-4 item 3, F2): picking a page size ABOVE the 5-row default is what
+    // used to be imperceptible — the card stayed height-capped, so 50 rows just added an internal
+    // scrollbar. The approved fix lets the card itself grow past its default cap once the reader
+    // has deliberately asked for more rows than the default shows.
+    it('grows past the default cap once a larger page size is chosen, shrinks back at 5', () => {
+      const { container } = render(<ResultTable spec={thirtyRowSpec()} />);
+      const card = () => container.querySelector('.wzResultsCard') as HTMLElement;
+
+      expect(card().classList.contains('wzResultsCard--expanded')).toBe(false);
+
+      fireEvent.click(screen.getByRole('button', { name: '10' }));
+      expect(card().classList.contains('wzResultsCard--expanded')).toBe(true);
+
+      fireEvent.click(screen.getByRole('button', { name: '5' }));
+      expect(card().classList.contains('wzResultsCard--expanded')).toBe(false);
+    });
+
+    it('scrolls the card body back to the top on any page-size change', () => {
+      const { container } = render(<ResultTable spec={thirtyRowSpec()} />);
+      const body = container.querySelector('.wzResultsCardBody') as HTMLElement;
+      body.scrollTop = 120;
+      expect(body.scrollTop).toBe(120);
+
+      fireEvent.click(screen.getByRole('button', { name: '10' }));
+
+      expect(body.scrollTop).toBe(0);
+    });
+
     it('renders no pagination footer when every offered page size already fits the result', () => {
       // A one-row table used to get the full "Rows per page: 5 10 25 50" control plus
       // "Page 1 of 1" — four controls that cannot change anything on screen, since 5 (the smallest

@@ -66,6 +66,13 @@ $wzComposerMaxHeight: 30dvh;
 /* --- Results card (layout contract §4) ---------------------------------------------------------
    Header and pagination are pinned card rows; only the body scrolls. */
 $wzResultsMaxHeight: min(460px, 52dvh);
+/* Expanded ceiling (iteration-4 item 3, "card grows"): applied only via the
+   `.wzResultsCard--expanded` modifier (result-table.tsx) when the reader explicitly picks a page
+   size above the 5-row default — at the default size the card stays capped at
+   $wzResultsMaxHeight above, since a 5-row result never needed the extra room.
+   `RESULTS_CARD_MAX_HEIGHT_EXPANDED_PX` (result-table.tsx) is this token's JS twin for the
+   transcript-measured-height code path, same pairing as $wzResultsMaxHeight's own. */
+$wzResultsMaxHeightExpanded: 80dvh;
 
 /* --- Conversation rail (layout contract §5) ----------------------------------------------------
    NO width token lives here. Every rail width — expanded, collapsed, and both breakpoints — is read

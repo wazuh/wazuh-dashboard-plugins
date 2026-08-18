@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import {
   EuiBasicTable,
   EuiBasicTableColumn,
@@ -71,6 +71,16 @@ const PAGE_SIZE_OPTIONS = [5, 10, 25, 50];
  * (which is a full-pane scroll, not a nested one) is the better answer.
  */
 const RESULTS_CARD_MAX_HEIGHT_PX = 460;
+/**
+ * "Card grows" (iteration-4 item 3): the JS twin of `$wzResultsMaxHeightExpanded` (80dvh,
+ * result-table.scss/_redesign.scss) for the transcript-measured-height code path above — that
+ * `dvh` figure has no meaningful px equivalent here (this clamp works in the transcript's own
+ * measured space, not the viewport), so this is a generous ceiling that in practice only ever
+ * matters as an upper bound: `measuredCardMaxHeight` below still subtracts
+ * `RESULTS_CARD_TRANSCRIPT_RESERVE_PX` from `transcriptHeightPx`, so the card can never actually
+ * push the pinned footer off the transcript's own fold even at this "expanded" ceiling.
+ */
+const RESULTS_CARD_MAX_HEIGHT_EXPANDED_PX = 900;
 const RESULTS_CARD_MIN_HEIGHT_PX = 240;
 const RESULTS_CARD_TRANSCRIPT_RESERVE_PX = 140;
 
@@ -485,6 +495,13 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   // would silently renumber the page they are reading. Left `undefined` when nothing has been
   // measured (jsdom has no ResizeObserver, so `transcriptHeightPx` stays 0 there) — the stylesheet's
   // own `min(460px, 52dvh)` then applies exactly as before.
+  // "Card grows" (iteration-4 item 3): once the reader has explicitly chosen a page size above
+  // the 5-row default, the ceiling this clamps against switches to the expanded twin — see that
+  // constant's own doc comment for why 900px is a safe ceiling rather than a real ceiling.
+  const isExpanded = pageSize > DEFAULT_PAGE_SIZE;
+  const cardMaxHeightCeilingPx = isExpanded
+    ? RESULTS_CARD_MAX_HEIGHT_EXPANDED_PX
+    : RESULTS_CARD_MAX_HEIGHT_PX;
   const measuredCardMaxHeight = useMemo<React.CSSProperties | undefined>(
     () =>
       transcriptHeightPx
@@ -492,14 +509,26 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
             maxHeight: Math.max(
               RESULTS_CARD_MIN_HEIGHT_PX,
               Math.min(
-                RESULTS_CARD_MAX_HEIGHT_PX,
+                cardMaxHeightCeilingPx,
                 transcriptHeightPx - RESULTS_CARD_TRANSCRIPT_RESERVE_PX,
               ),
             ),
           }
         : undefined,
-    [transcriptHeightPx],
+    [transcriptHeightPx, cardMaxHeightCeilingPx],
   );
+
+  // Scrolling body ref (iteration-4 item 3): any page-size change — including going back to the
+  // 5-row default — scrolls `.wzResultsCardBody` back to its top, so a reader who was scrolled
+  // deep into a 50-row page never lands mid-scroll in a now-differently-sized page of rows.
+  const bodyRef = useRef<HTMLDivElement | null>(null);
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setPageIndex(0);
+    if (bodyRef.current) {
+      bodyRef.current.scrollTop = 0;
+    }
+  };
 
   /**
    * Whether the pagination footer has anything to offer. The footer used to render for ANY
@@ -742,7 +771,12 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
     // wraps its content in markup this component does not control, which fought the exact 3-row
     // grid this fix depends on; `wzResultsCard` (result-table.scss) applies the same bordered,
     // shadowless look via the shared `wzPanel` mixin instead, so the visual result is identical.
-    <div className='wzResultsCard' style={measuredCardMaxHeight}>
+    <div
+      className={
+        isExpanded ? 'wzResultsCard wzResultsCard--expanded' : 'wzResultsCard'
+      }
+      style={measuredCardMaxHeight}
+    >
       <div className='wzResultsCardHeader'>
         <button
           type='button'
@@ -761,6 +795,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
       </div>
       {hasOpened ? (
         <div
+          ref={bodyRef}
           id={bodyId}
           className='wzResultsCardBody'
           // `display: none` (not unmounting) once collapsed again — same lazy-mount contract as
@@ -817,10 +852,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
                     <EuiButtonEmpty
                       size='xs'
                       color={pageSize === size ? 'primary' : 'text'}
-                      onClick={() => {
-                        setPageSize(size);
-                        setPageIndex(0);
-                      }}
+                      onClick={() => handlePageSizeChange(size)}
                     >
                       {size}
                     </EuiButtonEmpty>

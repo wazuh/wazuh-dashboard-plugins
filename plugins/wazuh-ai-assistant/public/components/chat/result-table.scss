@@ -24,6 +24,17 @@
   // The card's own border/radius (from wzPanel) needs the grid to respect it instead of letting a
   // tall body row bleed past the rounded corners.
   overflow: hidden;
+
+  /**
+   * "Card grows" (iteration-4 item 3): applied only once the reader explicitly picks a page size
+   * above the 5-row default (result-table.tsx) — a 5-row result never needed more than the
+   * default cap, so the card only grows on a choice that actually produced more rows to show.
+   * Same fallback-then-`dvh` pair as the default cap above, for the same reason.
+   */
+  &.wzResultsCard--expanded {
+    max-height: 80vh;
+    max-height: $wzResultsMaxHeightExpanded;
+  }
 }
 
 .wzResultsCardHeader {
