@@ -1,5 +1,5 @@
 import './provider-picker.scss';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   EuiBadge,
   EuiButtonEmpty,
@@ -53,14 +53,6 @@ export const ProviderPicker: React.FC<ProviderPickerProps> = ({
   activeConversationId,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  // One DOM node per provider id, populated via each EuiContextMenuItem's `buttonRef` below. Used
-  // only to steer initial keyboard focus on open (see the effect a few lines down) — EUI's own
-  // `EuiContextMenuPanel` has no prop for "focus the item that is already selected", only
-  // `initialFocusedItemIndex`, which is documented against its `items` API. This panel instead
-  // builds its items as `children` (needed for the two-line name/model layout below), and nothing
-  // in EUI's context-menu source ties that index to arbitrary children, so a ref is the only lever
-  // that reaches the right DOM node regardless of which API renders it.
-  const itemRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   // Closes a popover left open across a conversation switch (see the prop's own doc comment above)
   // — "New conversation" and picking a different saved conversation from the sidebar both change
@@ -71,35 +63,45 @@ export const ProviderPicker: React.FC<ProviderPickerProps> = ({
     setIsOpen(false);
   }, [activeConversationId]);
 
-  // Bug (behavioral, iteration-4 audit item 1): `EuiContextMenuPanel` focuses its first item as
-  // soon as it mounts, regardless of selection. That focus ring paints the same highlighted
-  // background as the real selection (check icon + "Default" badge), so on every open the reader
-  // saw item 0 look selected while the actual current provider sat highlighted-looking further
-  // down — two visually contradictory "selected" cues in the same list.
+  // Bug (behavioral, iteration-4 audit item 1): `EuiContextMenuPanel` focuses its first item on
+  // mount regardless of selection. That focus background reads as "selected", so on every open the
+  // reader saw item 0 highlighted while the ACTUAL current provider (check icon + "Default" badge)
+  // sat highlighted-looking further down — two contradictory "selected" cues in the same list.
+  // Confirmed live at localhost:8444 (2026-08-18): opening the picker with "Claude test" selected
+  // focused "Groq" (item 0) instead.
   //
-  // Fix: once the panel is open, move focus onto the DOM node of the ACTUALLY selected provider
-  // (falling back to item 0 when nothing is selected yet, e.g. no provider configured). This runs
-  // in a `setTimeout`, not synchronously, because EUI's own mount-time autofocus is *also*
-  // scheduled asynchronously (its `componentDidMount` queues the initial focus rather than calling
-  // it inline) — a synchronous call here would run BEFORE that queued call and lose the race,
-  // right back to item 0 stealing focus a tick later. Queuing ours the same way guarantees it runs
-  // after, since our effect (and therefore this timeout) is only scheduled once the panel — and
-  // EUI's own mount effect ahead of it — has already committed.
-  useEffect(() => {
-    if (!isOpen) {
-      return undefined;
-    }
-
-    const timer = window.setTimeout(() => {
-      const target =
-        (selectedProviderId && itemRefs.current[selectedProviderId]) ||
-        itemRefs.current[providers[0]?.id];
-      target?.focus();
-    }, 0);
-
-    return () => window.clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
+  // Fix, part 1: `initialFocusedItemIndex`, the exact prop `EuiContextMenuPanel` ships for this —
+  // NOT a per-item `buttonRef`, which looked promising but doesn't work here.
+  // `EuiContextMenuPanel`'s own source (`context_menu_panel.js`) clones every element passed via
+  // its `items` prop and unconditionally OVERWRITES `buttonRef` with its own internal tracker
+  // (`cloneElement(MenuItem, { buttonRef: (node) => this.menuItemRef(index, node) })`), so a
+  // `buttonRef` set on our own `EuiContextMenuItem` elements is silently discarded — confirmed by
+  // instrumenting it: the ref callback never fired. `initialFocusedItemIndex` reads into that SAME
+  // internal `menuItems` array the panel already builds from `items`, so it is the one lever that
+  // actually reaches it. It only takes effect once, from the panel's constructor — safe here
+  // because `EuiPopover` unmounts its panel content entirely on close (`popover.js`: content only
+  // renders while `isOpen || isClosing`), so every open is a fresh mount that re-reads the current
+  // selection.
+  //
+  // Fix, part 2: `EuiPopover` ALSO runs its own independent initial-focus pass (`popover.js`'s own
+  // `updateFocus`, guarding a `OuiFocusTrap`), on its OWN `requestAnimationFrame`, racing
+  // `EuiContextMenuPanel`'s. When no `initialFocus` target is given, its fallback is "the first
+  // tabbable element in the panel" (or the panel itself if none resolves) — a SECOND opinion that
+  // can override the first one after the fact, observed live in this repo's own jsdom tests via a
+  // `focus()` spy: item 2 was correctly focused first, then the popover's own pass immediately
+  // refocused the panel container. Telling `EuiPopover` to target the SAME element via
+  // `initialFocus` (a selector string, resolved lazily — see `getElementFromInitialFocus`) makes
+  // both mechanisms agree, so whichever one's `requestAnimationFrame` runs last still lands on the
+  // right item instead of undoing the other's work.
+  const selectedProviderIndex = providers.findIndex(
+    provider => provider.id === selectedProviderId,
+  );
+  // Falls back to item 0 when nothing is selected yet (e.g. no provider configured), matching the
+  // "if no provider is selected, fall back to index 0" requirement.
+  const initialFocusedItemIndex =
+    selectedProviderIndex >= 0 ? selectedProviderIndex : 0;
+  const initialFocusedProviderId =
+    providers[initialFocusedItemIndex]?.id ?? providers[0]?.id;
 
   const selectedProvider = providers.find(
     provider => provider.id === selectedProviderId,
@@ -156,11 +158,14 @@ export const ProviderPicker: React.FC<ProviderPickerProps> = ({
         // single-select-from-a-list semantics that the old <select> gave for free.
         role='menuitemradio'
         aria-checked={isSelected}
-        // Captured so the open-effect above can move focus onto the selected item's own DOM node
-        // instead of leaving it on whatever EUI auto-focused (see that effect's comment).
-        buttonRef={ref => {
-          itemRefs.current[provider.id] = ref;
-        }}
+        // Gives `EuiPopover`'s own `initialFocus` (below) a stable, lazily-resolved selector for
+        // whichever item `initialFocusedItemIndex` above also targets — see that effect's comment
+        // for why both need to agree on the same element.
+        data-test-subj={
+          provider.id === initialFocusedProviderId
+            ? 'wzProviderPickerInitialFocusItem'
+            : undefined
+        }
         onClick={() => {
           onProviderChange(provider.id);
           closePopover();
@@ -226,10 +231,12 @@ export const ProviderPicker: React.FC<ProviderPickerProps> = ({
       closePopover={closePopover}
       panelPaddingSize='none'
       anchorPosition='downRight'
+      initialFocus='[data-test-subj="wzProviderPickerInitialFocusItem"]'
     >
       <EuiContextMenuPanel
         className='wzProviderPickerPanel'
         items={[...providerItems, manageProvidersItem]}
+        initialFocusedItemIndex={initialFocusedItemIndex}
       />
     </EuiPopover>
   );

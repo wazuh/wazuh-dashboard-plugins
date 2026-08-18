@@ -86,14 +86,14 @@ describe('ProviderPicker (iteration-4 item 2)', () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: /OpenAI production/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Groq test/i }));
 
     const menu = within(screen.getByRole('dialog'));
     const selectedItem = menu.getByRole('menuitemradio', { name: /Groq test/i });
 
-    // The focus move is queued in a `setTimeout` (see provider-picker.tsx) so it runs after EUI's
-    // own mount-time autofocus of item 0 rather than racing it — hence `waitFor` here instead of a
-    // synchronous assertion.
+    // Both `EuiContextMenuPanel`'s `initialFocusedItemIndex` and `EuiPopover`'s own `initialFocus`
+    // resolve this asynchronously (each on its own `requestAnimationFrame` — see provider-picker.tsx
+    // for why both need to be set), hence `waitFor` here instead of a synchronous assertion.
     await waitFor(() => expect(document.activeElement).toBe(selectedItem));
   });
 
