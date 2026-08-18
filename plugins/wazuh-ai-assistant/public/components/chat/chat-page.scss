@@ -558,6 +558,18 @@ $wzWelcomeFadeOut: 180ms;
   max-width: $wzContentMaxWidth;
   width: 100%;
   margin: 0 auto;
+  /* Establishes a new block formatting context (iteration-4 audit, P0 item 1). This element is a
+     bare block wrapping `MessageBubble`'s root, which is an `EuiFlexGroup` (`.wzMsgRow` below)
+     carrying EUI's own gutter implementation: a negative margin on the group that is meant to be
+     cancelled entirely by its flex items' own padding, so the gutter never escapes the group's box.
+     A bare block parent does not stop that from happening anyway — a child's negative margin
+     collapses straight through a parent with no border/padding/BFC of its own — so the -4px leaked
+     out of `.wzMessageRow` and ate into whatever sat immediately outside it in the transcript's
+     flow: the turn-to-turn `EuiSpacer` (message-list.tsx) measured at 16px instead of its intended
+     24px, and the interrupted-notice spacer measured at 0 instead of 8px. `display: flow-root` is
+     the side-effect-free way to open a BFC here (unlike `overflow: hidden`, which would also clip a
+     wide row's own breakout content) and needs no other property to do it. */
+  display: flow-root;
 
   /* A turn carrying a result table is allowed the wider measure; every other turn keeps the same
      column prose and the composer share. */
@@ -626,6 +638,25 @@ $wzWelcomeFadeOut: 180ms;
   span.euiCodeBlock > code {
     padding: 0;
   }
+
+  /* Paragraph/list/blockquote rhythm inside a finished answer (iteration-4 audit, P0 item 3):
+     EUI's own markdown styling gives these an off-scale `1.5 * $euiSize` bottom margin (21px) and
+     adjacent list items a 3.5px gap, neither of which sits on this plugin's 4/8/16/24 rhythm.
+     Pinned to the ladder's own 16px/4px instead. Scoped under `.wzProseMeasure` — the ancestor that
+     ONLY ever wraps prose — rather than as bare top-level `p`/`ul` rules, so nothing outside a
+     finished answer picks this up. No `:not(pre)`-style exclusion is needed for the block margins:
+     a fenced code block renders as `pre > code` and a table as `table`, neither of which this
+     selector list can ever match. */
+  .euiMarkdownFormat p,
+  .euiMarkdownFormat ul,
+  .euiMarkdownFormat ol,
+  .euiMarkdownFormat blockquote {
+    margin-block-end: 16px;
+  }
+
+  .euiMarkdownFormat li + li {
+    margin-block-start: 4px;
+  }
 }
 
 /**
@@ -662,6 +693,28 @@ $wzMsgAvatarColumn: 40px;
    on one surface. Pulled back by the full column, it spans and centres with the row itself. */
 .wzMessageRow--wide .wzResultsCard {
   margin-inline-start: -$wzMsgAvatarColumn;
+}
+
+/**
+ * The other two of the turn's four left edges (iteration-4 audit, P0 item 4): only the card and
+ * the prose above picked up a wide-row correction, so on a table-bearing turn the AVATAR and the
+ * META/footer row (the timestamp + tool-call chips, `.wzMsgMetaRow` on message-bubble.tsx's own
+ * `EuiFlexGroup`) were left at whichever edge they naturally fell on — a third and fourth x-value
+ * on the same row, most visibly the footer jogging 120px left of the prose sitting right above it.
+ * Given each element the SAME treatment as its counterpart: the avatar is a breakout element like
+ * the card (both resolve to the row's own true edge), and the meta row lives in the same content
+ * column as the prose (both resolve to the prose rail, avatarX + 40px) — collapsing the row's four
+ * edges down to the two the design actually calls for.
+ */
+.wzMessageRow--wide .wzMsgAvatarItem {
+  margin-inline-start: -$wzMsgAvatarColumn;
+}
+
+.wzMessageRow--wide .wzMsgMetaRow {
+  margin-inline-start: max(
+    0px,
+    calc((100% - #{$wzContentMaxWidth}) / 2 + #{$wzMsgAvatarColumn} / 2)
+  );
 }
 
 /**

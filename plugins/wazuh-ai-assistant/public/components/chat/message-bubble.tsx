@@ -510,6 +510,9 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
             wired via aria-expanded/aria-controls). Anchoring the interrupted notice here instead
             of as its own floating line keeps it attached to the turn it belongs to. */}
       <EuiFlexGroup
+        // `wzMsgMetaRow` (chat-page.scss, iteration-4 audit P0 item 4): stable class so a
+        // table-bearing (`--wide`) row can correct this row's inline-start onto the prose rail.
+        className='wzMsgMetaRow'
         gutterSize='xs'
         alignItems='center'
         responsive={false}
@@ -605,7 +608,9 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   // alongside the in-bubble EuiLoadingContent skeleton/status line is gone — that pair read as two
   // independent "something is happening" signals for the same event.
   const avatarItem = (
-    <EuiFlexItem grow={false}>
+    // `wzMsgAvatarItem` (chat-page.scss, iteration-4 audit P0 item 4): stable class so a
+    // table-bearing (`--wide`) row can correct this item's inline-start onto the row's true edge.
+    <EuiFlexItem grow={false} className='wzMsgAvatarItem'>
       <EuiFlexGroup direction='column' alignItems='center' gutterSize='xs'>
         <EuiFlexItem grow={false}>{avatar}</EuiFlexItem>
       </EuiFlexGroup>

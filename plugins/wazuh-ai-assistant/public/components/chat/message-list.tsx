@@ -90,9 +90,11 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
               transcriptHeightPx={transcriptHeightPx}
             />
           </div>
-          {/* One turn = one 24px breath (EuiSpacer size='l'), matching the rhythm the conversation
-              header and welcome state also use — intra-turn spacing inside a bubble stays 's'. */}
-          {index < messages.length - 1 && <EuiSpacer size='l' />}
+          {/* One turn boundary = one 32px breath (EuiSpacer size='xl') — iteration-4 audit, P0 item
+              2: raised from 24px ('l') now that the P0 flow-root fix on `.wzMessageRow`
+              (chat-page.scss) stops this spacer from silently collapsing to 16px via the
+              margin-collapse leak. Intra-turn spacing inside a bubble stays 's'. */}
+          {index < messages.length - 1 && <EuiSpacer size='xl' />}
         </React.Fragment>
       ))}
       {/* A conversation that ENDS on a question is an unanswered turn: the page was reloaded or
