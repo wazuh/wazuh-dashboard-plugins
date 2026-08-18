@@ -1,5 +1,11 @@
 import React from 'react';
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  within,
+  waitFor,
+} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProviderPicker } from './provider-picker';
 import { ProviderSummary } from '../../../common/types';
@@ -66,7 +72,7 @@ describe('ProviderPicker (iteration-4 item 2)', () => {
     expect(menu.queryAllByText('Default')).toHaveLength(1);
   });
 
-  it('closes the popover after a provider is selected', () => {
+  it('closes the popover after a provider is selected', async () => {
     render(
       <ProviderPicker
         providers={[
@@ -84,7 +90,14 @@ describe('ProviderPicker (iteration-4 item 2)', () => {
 
     fireEvent.click(screen.getByText('Anthropic staging'));
 
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    // `closePopover` sets `isOpen={false}` synchronously, but the underlying EuiPopover keeps the
+    // panel mounted for its own 250ms exit-transition timeout (real component behavior, not a test
+    // artifact — see eui_components/popover/popover.js's `componentDidUpdate`) before actually
+    // removing it from the DOM. An immediate synchronous assertion here raced that timeout and
+    // always found the still-mounted dialog; `waitFor` gives the transition time to finish.
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+    );
   });
 
   it('fires the same onProviderChange handler the old select used when an item is clicked', () => {

@@ -928,12 +928,20 @@ describe('SettingsPage — per-provider privacy override (UX iteration 4 item 3)
     renderOnPrivacyTab();
 
     // Scoped to the per-provider block for the same reason as the test above: the Providers
-    // table's own rows (once loaded) share "Alpha"'s text with this list, and while the promise
-    // is still pending the container itself has already rendered (just with nothing inside it).
-    const perProviderContainer = document.querySelector(
-      '[data-test-subj="wzPerProviderPrivacyList"]',
-    ) as HTMLElement;
-    expect(perProviderContainer).not.toBeNull();
+    // table's own rows (once loaded) share "Alpha"'s text with this list, and while the provider
+    // list promise is still pending the container itself has already rendered (just with nothing
+    // inside it). The container only mounts once the SEPARATE `getAssistantSettings()` load
+    // resolves and `privacyDraft` stops being null — that resolves on the microtask queue even
+    // though the mock is synchronous (`mockResolvedValue`), so this waits for it rather than
+    // querying immediately after the synchronous `render()` call above, which ran before that
+    // microtask had a chance to flush.
+    const perProviderContainer = await waitFor(() => {
+      const container = document.querySelector(
+        '[data-test-subj="wzPerProviderPrivacyList"]',
+      ) as HTMLElement;
+      expect(container).not.toBeNull();
+      return container;
+    });
     const perProviderList = within(perProviderContainer);
     expect(
       perProviderList.queryByText(/no providers configured yet/i),
