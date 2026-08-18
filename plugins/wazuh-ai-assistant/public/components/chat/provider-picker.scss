@@ -28,6 +28,7 @@
   display: flex;
   flex: 1;
   flex-direction: column;
+  gap: 2px;
 }
 
 .wzProviderPickerItemNameRow {
@@ -37,12 +38,55 @@
 }
 
 .wzProviderPickerItemName {
+  font-size: 14px;
   font-weight: 500;
+  line-height: 1.4;
 }
 
 /** The model id reads as a value, not as prose — the same reasoning `provider-form-flyout.scss`
  * already applies to model ids there ($euiCodeFontFamily), reused here rather than restated as a
- * bare font stack. */
+ * bare font stack. Sized down from the default `EuiText size="xs"` (~12px) to 11px, with a
+ * tighter line-height, so the second line reads as a subordinate caption rather than competing
+ * with the provider name for attention. */
 .wzProviderPickerItemModel {
   font-family: $euiCodeFontFamily;
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+/**
+ * Scoped to this component's own panel (`.wzProviderPickerPanel`, set via
+ * `EuiContextMenuPanel`'s `className`) so neither override leaks into any other
+ * EuiContextMenu in the app.
+ */
+.wzProviderPickerPanel {
+  /* EuiContextMenuItem renders its hover/focus affordance as a text-decoration underline (the
+   * same treatment EUI gives link-like actions), which reads as a hyperlink on both the
+   * provider name and the model line. The picker's selection affordance is background-only
+   * (EUI's own hover/focus background stays), so the underline is turned off here — on the
+   * item itself and on its two text children, in case the browser renders the decoration on
+   * the nearest inline box rather than letting it inherit down. */
+  .euiContextMenuItem,
+  .euiContextMenuItem__text {
+    &:hover,
+    &:focus {
+      text-decoration: none;
+    }
+  }
+
+  .euiContextMenuItem:hover,
+  .euiContextMenuItem:focus {
+    .wzProviderPickerItemName,
+    .wzProviderPickerItemModel {
+      text-decoration: none;
+    }
+  }
+
+  /* Default EuiContextMenuItem block padding reads roughly 25% taller than this two-line,
+   * compact-density menu calls for. Trimmed to ~8px top/bottom while keeping the existing
+   * horizontal padding untouched (menu width is unaffected). */
+  .euiContextMenuItem {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
 }

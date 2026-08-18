@@ -161,7 +161,10 @@ export const ProviderPicker: React.FC<ProviderPickerProps> = ({
       panelPaddingSize='none'
       anchorPosition='downRight'
     >
-      <EuiContextMenuPanel items={[...providerItems, manageProvidersItem]} />
+      <EuiContextMenuPanel
+        className='wzProviderPickerPanel'
+        items={[...providerItems, manageProvidersItem]}
+      />
     </EuiPopover>
   );
 };
