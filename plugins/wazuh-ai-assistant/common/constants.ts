@@ -117,7 +117,14 @@ export type ProviderType = (typeof PROVIDER_TYPES)[number];
 export { SEVERITY_LEVELS } from './wazuh-fields';
 export type { SeverityLevel } from './wazuh-fields';
 
-export const DEFAULT_ANTHROPIC_MAX_TOKENS = 4096;
+// 16384, not the API's old 4096 default: the model suggestions now lead with claude-sonnet-5 /
+// claude-opus-5, which have adaptive "extended thinking" ON by default whenever `thinking` is
+// omitted from the request (as this adapter does -- see anthropic.ts), and `max_tokens` on the
+// Anthropic Messages API caps thinking tokens AND the visible answer together. At 4096 a model
+// that spends a chunk of the budget thinking can truncate the user-visible answer mid-sentence.
+// Raising the cap does not touch the thinking parameter itself (adaptive thinking stays on --
+// that is wanted for answer quality); it only removes the shared-budget truncation risk.
+export const DEFAULT_ANTHROPIC_MAX_TOKENS = 16384;
 export const DEFAULT_ANTHROPIC_VERSION = '2023-06-01';
 
 /**
