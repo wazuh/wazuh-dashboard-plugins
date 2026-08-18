@@ -1810,8 +1810,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   'wazuhAiAssistant.settings.privacy.perProviderHelp',
                   {
                     defaultMessage:
-                      'Overrides the global privacy default above for one provider only. Providers ' +
-                      'left at "Use global default" follow that switch.',
+                      "Anonymize data sent to providers you don't control (hosted APIs) while " +
+                      "sending raw data to a local model. Providers on 'Use global default' " +
+                      'follow the switch above.',
                   },
                 )}
               </div>
@@ -1841,8 +1842,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                         gutterSize='s'
                         alignItems='center'
                         responsive={false}
+                        className='wzSettingsCard__perProviderRow'
                       >
-                        <EuiFlexItem>
+                        <EuiFlexItem
+                          grow={false}
+                          style={{ flexBasis: 300, maxWidth: 300 }}
+                        >
                           <EuiText size='s' title={provider.name}>
                             {provider.name}
                           </EuiText>

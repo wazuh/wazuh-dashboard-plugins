@@ -112,6 +112,20 @@ $wzSettingsCardPillHeight: $wzSettingsCardPillLineHeight +
   &__actionsRule {
     max-width: $wzProseMeasure;
   }
+
+  /* Per-provider privacy override rows (settings-page.tsx): a bare `EuiSpacer` between rows read
+     as a table with orphaned gaps rather than a coherent list, because nothing marked where one
+     row ended and the next began. A hairline under each row (not the last — no trailing rule
+     against the card's own bottom edge) gives the list a visible seam without a full table's
+     chrome. */
+  &__perProviderRow {
+    padding-block: 6px;
+    border-bottom: 1px solid $euiColorLightShade;
+
+    &:last-of-type {
+      border-bottom: none;
+    }
+  }
 }
 
 /**

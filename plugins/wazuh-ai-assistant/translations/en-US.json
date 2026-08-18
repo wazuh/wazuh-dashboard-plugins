@@ -132,7 +132,7 @@
     "wazuhAiAssistant.settings.privacy.addField": "Add field",
     "wazuhAiAssistant.settings.privacy.save": "Save privacy settings",
     "wazuhAiAssistant.settings.privacy.perProviderTitle": "Per-provider override",
-    "wazuhAiAssistant.settings.privacy.perProviderHelp": "Overrides the global privacy default above for one provider only. Providers left at \"Use global default\" follow that switch.",
+    "wazuhAiAssistant.settings.privacy.perProviderHelp": "Anonymize data sent to providers you don't control (hosted APIs) while sending raw data to a local model. Providers on 'Use global default' follow the switch above.",
     "wazuhAiAssistant.settings.privacy.perProviderEmpty": "No providers configured yet.",
     "wazuhAiAssistant.settings.privacy.perProviderSelectAriaLabel": "Privacy override for {name}",
     "wazuhAiAssistant.settings.privacy.perProviderInherit": "Use global default",

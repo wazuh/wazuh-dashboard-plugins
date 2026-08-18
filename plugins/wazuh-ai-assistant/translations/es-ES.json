@@ -133,7 +133,7 @@
     "wazuhAiAssistant.settings.privacy.addField": "Agregar campo",
     "wazuhAiAssistant.settings.privacy.save": "Guardar configuración de privacidad",
     "wazuhAiAssistant.settings.privacy.perProviderTitle": "Anulación por proveedor",
-    "wazuhAiAssistant.settings.privacy.perProviderHelp": "Anula el valor global de privacidad anterior solo para un proveedor. Los proveedores que se dejen en \"Usar valor global\" siguen ese interruptor.",
+    "wazuhAiAssistant.settings.privacy.perProviderHelp": "Anonimiza los datos enviados a proveedores que no controlas (API alojadas) mientras envías datos sin anonimizar a un modelo local. Los proveedores en \"Usar valor global\" siguen el interruptor de arriba.",
     "wazuhAiAssistant.settings.privacy.perProviderEmpty": "Aún no hay proveedores configurados.",
     "wazuhAiAssistant.settings.privacy.perProviderSelectAriaLabel": "Anulación de privacidad para {name}",
     "wazuhAiAssistant.settings.privacy.perProviderInherit": "Usar valor global",
