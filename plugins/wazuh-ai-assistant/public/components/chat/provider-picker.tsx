@@ -1,5 +1,5 @@
 import './provider-picker.scss';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   EuiBadge,
   EuiButtonEmpty,
@@ -53,6 +53,14 @@ export const ProviderPicker: React.FC<ProviderPickerProps> = ({
   activeConversationId,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  // One DOM node per provider id, populated via each EuiContextMenuItem's `buttonRef` below. Used
+  // only to steer initial keyboard focus on open (see the effect a few lines down) — EUI's own
+  // `EuiContextMenuPanel` has no prop for "focus the item that is already selected", only
+  // `initialFocusedItemIndex`, which is documented against its `items` API. This panel instead
+  // builds its items as `children` (needed for the two-line name/model layout below), and nothing
+  // in EUI's context-menu source ties that index to arbitrary children, so a ref is the only lever
+  // that reaches the right DOM node regardless of which API renders it.
+  const itemRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   // Closes a popover left open across a conversation switch (see the prop's own doc comment above)
   // — "New conversation" and picking a different saved conversation from the sidebar both change
@@ -62,6 +70,36 @@ export const ProviderPicker: React.FC<ProviderPickerProps> = ({
   useEffect(() => {
     setIsOpen(false);
   }, [activeConversationId]);
+
+  // Bug (behavioral, iteration-4 audit item 1): `EuiContextMenuPanel` focuses its first item as
+  // soon as it mounts, regardless of selection. That focus ring paints the same highlighted
+  // background as the real selection (check icon + "Default" badge), so on every open the reader
+  // saw item 0 look selected while the actual current provider sat highlighted-looking further
+  // down — two visually contradictory "selected" cues in the same list.
+  //
+  // Fix: once the panel is open, move focus onto the DOM node of the ACTUALLY selected provider
+  // (falling back to item 0 when nothing is selected yet, e.g. no provider configured). This runs
+  // in a `setTimeout`, not synchronously, because EUI's own mount-time autofocus is *also*
+  // scheduled asynchronously (its `componentDidMount` queues the initial focus rather than calling
+  // it inline) — a synchronous call here would run BEFORE that queued call and lose the race,
+  // right back to item 0 stealing focus a tick later. Queuing ours the same way guarantees it runs
+  // after, since our effect (and therefore this timeout) is only scheduled once the panel — and
+  // EUI's own mount effect ahead of it — has already committed.
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined;
+    }
+
+    const timer = window.setTimeout(() => {
+      const target =
+        (selectedProviderId && itemRefs.current[selectedProviderId]) ||
+        itemRefs.current[providers[0]?.id];
+      target?.focus();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   const selectedProvider = providers.find(
     provider => provider.id === selectedProviderId,
@@ -118,6 +156,11 @@ export const ProviderPicker: React.FC<ProviderPickerProps> = ({
         // single-select-from-a-list semantics that the old <select> gave for free.
         role='menuitemradio'
         aria-checked={isSelected}
+        // Captured so the open-effect above can move focus onto the selected item's own DOM node
+        // instead of leaving it on whatever EUI auto-focused (see that effect's comment).
+        buttonRef={ref => {
+          itemRefs.current[provider.id] = ref;
+        }}
         onClick={() => {
           onProviderChange(provider.id);
           closePopover();
@@ -163,6 +206,7 @@ export const ProviderPicker: React.FC<ProviderPickerProps> = ({
   const manageProvidersItem = (
     <EuiContextMenuItem
       key='wzManageProviders'
+      className='wzProviderPickerFooterItem'
       icon='gear'
       onClick={() => {
         closePopover();

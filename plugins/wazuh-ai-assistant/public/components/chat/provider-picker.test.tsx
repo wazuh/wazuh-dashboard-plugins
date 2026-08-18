@@ -72,6 +72,54 @@ describe('ProviderPicker (iteration-4 item 2)', () => {
     expect(menu.queryAllByText('Default')).toHaveLength(1);
   });
 
+  it('focuses the currently selected provider on open, not the first item in the list', async () => {
+    render(
+      <ProviderPicker
+        providers={[
+          provider({ id: 'p1', name: 'OpenAI production' }),
+          provider({ id: 'p2', name: 'Anthropic staging' }),
+          provider({ id: 'p3', name: 'Groq test', isDefault: true }),
+        ]}
+        selectedProviderId='p3'
+        onProviderChange={jest.fn()}
+        onManageProviders={jest.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /OpenAI production/i }));
+
+    const menu = within(screen.getByRole('dialog'));
+    const selectedItem = menu.getByRole('menuitemradio', { name: /Groq test/i });
+
+    // The focus move is queued in a `setTimeout` (see provider-picker.tsx) so it runs after EUI's
+    // own mount-time autofocus of item 0 rather than racing it — hence `waitFor` here instead of a
+    // synchronous assertion.
+    await waitFor(() => expect(document.activeElement).toBe(selectedItem));
+  });
+
+  it('falls back to focusing the first item when nothing is selected yet', async () => {
+    render(
+      <ProviderPicker
+        providers={[
+          provider({ id: 'p1', name: 'OpenAI production' }),
+          provider({ id: 'p2', name: 'Anthropic staging' }),
+        ]}
+        selectedProviderId=''
+        onProviderChange={jest.fn()}
+        onManageProviders={jest.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /Select a provider/i }));
+
+    const menu = within(screen.getByRole('dialog'));
+    const firstItem = menu.getByRole('menuitemradio', {
+      name: /OpenAI production/i,
+    });
+
+    await waitFor(() => expect(document.activeElement).toBe(firstItem));
+  });
+
   it('closes the popover after a provider is selected', async () => {
     render(
       <ProviderPicker
