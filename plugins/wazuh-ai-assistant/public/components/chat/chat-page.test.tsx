@@ -2797,13 +2797,22 @@ async function findPrivacyChip(): Promise<HTMLElement> {
   });
 }
 
-async function findAllPrivacyChips(): Promise<HTMLElement[]> {
+// Each test in this describe block mounts a SECOND, separate ChatPage instance (via a fresh
+// `renderChatPage()` call rather than `rerenderWith`) without unmounting the first, to exercise a
+// brand-new component picking up a changed settings mock — so both chips coexist in `document`
+// once the second instance's own settings fetch resolves. Selecting by the modifier class the
+// second mount is expected to land on (rather than "whichever chip appeared last") avoids a race
+// where `waitFor` resolves on the FIRST mount's still-present, stale-state chip before the second
+// mount's own async fetch has finished and re-rendered its badge.
+async function findPrivacyChipWithModifier(
+  modifier: 'on' | 'off',
+): Promise<HTMLElement> {
   return waitFor(() => {
-    const els = Array.from(
-      document.querySelectorAll('[data-test-subj="wzPrivacyChip"]'),
-    ) as HTMLElement[];
-    expect(els.length).toBeGreaterThan(0);
-    return els;
+    const el = document.querySelector(
+      `[data-test-subj="wzPrivacyChip"].wzPrivacyChip--${modifier}`,
+    );
+    expect(el).not.toBeNull();
+    return el as HTMLElement;
   });
 }
 
@@ -2821,8 +2830,7 @@ describe('ChatPage — composer privacy chip (iteration 4)', () => {
       conversationRetentionDays: 0,
     });
     renderChatPage();
-    const chips = await findAllPrivacyChips();
-    const onChip = chips[chips.length - 1];
+    const onChip = await findPrivacyChipWithModifier('on');
     expect(onChip).toHaveClass('wzPrivacyChip--on');
     expect(onChip).not.toHaveClass('wzPrivacyChip--off');
   });
@@ -2845,8 +2853,9 @@ describe('ChatPage — composer privacy chip (iteration 4)', () => {
       conversationRetentionDays: 0,
     });
     renderChatPage();
-    const chips = await findAllPrivacyChips();
-    const fixedChip = chips[chips.length - 1];
+    // The first chip was just clicked to `--on` above, so `--off` can only match the SECOND
+    // mount's own chip — no risk of picking up the first mount's stale element here.
+    const fixedChip = await findPrivacyChipWithModifier('off');
     expect(fixedChip.tagName).not.toBe('BUTTON');
 
     fireEvent.click(fixedChip);
