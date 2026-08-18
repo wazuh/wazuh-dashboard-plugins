@@ -2866,3 +2866,18 @@ describe('ChatPage — composer privacy chip (iteration 4)', () => {
     expect(fixedChip).toHaveClass('wzPrivacyChip--off');
   });
 });
+
+// The full explainer used to live in an EuiToolTip WRAPPING the pill itself, which meant hovering
+// the pill to click it also forced a wall of text. It now lives on a separate, discrete ⓘ
+// (EuiIconTip) placed right after the pill — this only needs to prove that affordance exists;
+// the pill's own click/toggle behavior is already covered by the describe block above.
+describe('ChatPage — privacy explainer moved off the pill onto a discrete ⓘ (iteration-4 batch 2 item 1)', () => {
+  it('renders a discrete info affordance beside the pill, separate from the pill itself', async () => {
+    renderChatPage();
+    const chip = await findPrivacyChip();
+
+    const infoTip = screen.getByLabelText(/about privacy mode/i);
+    expect(infoTip).toBeInTheDocument();
+    expect(infoTip).not.toBe(chip);
+  });
+});

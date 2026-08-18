@@ -8,7 +8,7 @@ import {
   EuiButtonIcon,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiToolTip,
+  EuiIconTip,
   EuiText,
   EuiTitle,
   EuiScreenReaderOnly,
@@ -2087,12 +2087,14 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       });
   const privacyBadgeIcon = privacyEnabled ? 'lock' : 'lockOpen';
   // Single pill replacing the old padlock EuiButtonEmpty + floating EuiIconTip pair (iteration-4
-  // composer control-row spec): one element carries the state (icon + "Privacy · On/Off" label),
-  // the explanation of what that state does to the user's data, and — only when the admin has
-  // left it overridable — the click affordance to flip it. `onClick`/`onClickAriaLabel` are
-  // spread in together rather than each defaulting to `undefined`, since OuiBadge warns if
-  // `onClickAriaLabel` is present without `onClick` (and vice versa reads as a badge that looks
-  // clickable but isn't).
+  // composer control-row spec): the icon + "Privacy · On/Off" label carries the state, and —
+  // only when the admin has left it overridable — the click affordance to flip it. `onClick`/
+  // `onClickAriaLabel` are spread in together rather than each defaulting to `undefined`, since
+  // OuiBadge warns if `onClickAriaLabel` is present without `onClick` (and vice versa reads as a
+  // badge that looks clickable but isn't). The explanation of what the state does to the user's
+  // data used to live in a hover tooltip wrapping this whole pill, which meant hovering to click
+  // it also forced a wall of text — it now lives on a separate, discrete ⓘ (`EuiIconTip`) placed
+  // right after the pill, so it is available on demand without blocking the click gesture.
   const privacyChip = (
     <EuiBadge
       className={`wzPrivacyChip wzPrivacyChip--${privacyEnabled ? 'on' : 'off'}`}
@@ -2941,28 +2943,43 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     wrap
                   >
                     {hasProviders && assistantSettings && (
-                      <EuiFlexItem grow={false}>
-                        <EuiToolTip
-                          content={
-                            assistantSettings.userCanOverride ? (
-                              privacyExplainerText
-                            ) : (
-                              <>
-                                {privacyExplainerText}
-                                <br />
-                                {i18n.translate(
-                                  'wazuhAiAssistant.chat.privacy.adminSet',
-                                  {
-                                    defaultMessage: 'Set by administrator',
-                                  },
-                                )}
-                              </>
-                            )
-                          }
-                        >
-                          {privacyChip}
-                        </EuiToolTip>
-                      </EuiFlexItem>
+                      <>
+                        {/* The pill itself no longer carries the full explainer as a hover
+                          tooltip — that turned "click to toggle" into "hover through a wall
+                          of text first". `onClickAriaLabel` (set on `privacyChip` above) still
+                          covers the click affordance for a11y. The explanation now lives on the
+                          discrete ⓘ immediately after it, on demand. */}
+                        <EuiFlexItem grow={false}>{privacyChip}</EuiFlexItem>
+                        <EuiFlexItem grow={false}>
+                          <EuiIconTip
+                            type='iInCircle'
+                            color='subdued'
+                            size='s'
+                            aria-label={i18n.translate(
+                              'wazuhAiAssistant.chat.privacy.explainerAriaLabel',
+                              {
+                                defaultMessage: 'About privacy mode',
+                              },
+                            )}
+                            content={
+                              assistantSettings.userCanOverride ? (
+                                privacyExplainerText
+                              ) : (
+                                <>
+                                  {privacyExplainerText}
+                                  <br />
+                                  {i18n.translate(
+                                    'wazuhAiAssistant.chat.privacy.adminSet',
+                                    {
+                                      defaultMessage: 'Set by administrator',
+                                    },
+                                  )}
+                                </>
+                              )
+                            }
+                          />
+                        </EuiFlexItem>
+                      </>
                     )}
                     {/* Explicit grow spacer (was a bare `<EuiFlexItem />` relying on `grow`
                           defaulting to true) pushes the provider/send cluster to the far right.
