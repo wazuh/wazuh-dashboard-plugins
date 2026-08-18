@@ -1,6 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import React from 'react';
+import { MemoryRouter } from 'react-router-dom';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
@@ -39,6 +40,21 @@ import { CoreStart } from '../../../../../src/core/public';
 
 const coreMock = { http: {} } as unknown as CoreStart;
 
+/**
+ * `SettingsPage` reads the active tab off the URL via `useLocation`/`useHistory` (UX iteration 4
+ * item 2), which requires an ambient `<Router>` — in the real app that's application.tsx's own
+ * `<Router history={history}>`, which this page is always rendered under. `initialEntries`
+ * defaults to the bare settings path (no `?tab=`), i.e. the Providers tab, matching every
+ * pre-existing test's assumption below unless a test overrides it to reach another tab.
+ */
+const SettingsPageWithRouter: React.FC<
+  React.ComponentProps<typeof SettingsPage> & { initialEntries?: string[] }
+> = ({ initialEntries = ['/settings'], ...props }) => (
+  <MemoryRouter initialEntries={initialEntries}>
+    <SettingsPage {...props} />
+  </MemoryRouter>
+);
+
 beforeEach(() => {
   jest.clearAllMocks();
   mockService.list.mockResolvedValue([]);
@@ -63,7 +79,7 @@ beforeEach(() => {
 
 describe('SettingsPage — wazuh_brain hidden from provider type choices', () => {
   it('does not offer wazuh_brain among the provider type cards when the form is open', async () => {
-    render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
+    render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
 
     const addButton = await screen.findByRole('button', {
       name: /add provider/i,
@@ -97,7 +113,7 @@ describe('SettingsPage — auto-test on load', () => {
       },
     ]);
 
-    render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
+    render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
 
     await waitFor(() => {
       expect(mockService.test).toHaveBeenCalledWith('p1');
@@ -105,7 +121,7 @@ describe('SettingsPage — auto-test on load', () => {
   });
 
   it('does not call service.test when there are no providers', async () => {
-    render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
+    render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
 
     await waitFor(() => expect(mockService.list).toHaveBeenCalled());
     expect(mockService.test).not.toHaveBeenCalled();
@@ -143,7 +159,7 @@ describe('SettingsPage — Test all tests only the filtered set, throttled', () 
   it('only re-tests the providers the "Filter providers" box is currently showing', async () => {
     mockService.list.mockResolvedValue(threeProviders);
 
-    render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
+    render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
 
     // Let the silent auto-probe (one call per loaded provider) finish before clearing, so it
     // cannot be mistaken for "Test all"'s own calls below.
@@ -179,7 +195,7 @@ describe('SettingsPage — Test all tests only the filtered set, throttled', () 
     });
     mockService.test.mockImplementation(() => pending);
 
-    render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
+    render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
 
     const testAllButton = await screen.findByRole('button', {
       name: /test all/i,
@@ -206,7 +222,13 @@ describe('SettingsPage — field policy filter', () => {
       conversationRetentionDays: 0,
     });
 
-    render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
+    render(
+      <SettingsPageWithRouter
+        core={coreMock}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=privacy']}
+      />,
+    );
 
     const filterInput = await screen.findByPlaceholderText(/filter fields/i);
     expect(filterInput).toBeInTheDocument();
@@ -225,7 +247,7 @@ describe('SettingsPage — settings-access probe', () => {
   it('fails open (page usable, nothing blocked) when the settings-access probe itself fails', async () => {
     mockService.getSettingsAccess.mockRejectedValue(new Error('network error'));
 
-    render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
+    render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
 
     await waitFor(() =>
       expect(mockService.getSettingsAccess).toHaveBeenCalled(),
@@ -241,7 +263,7 @@ describe('SettingsPage — auto-open create-provider flyout (?addProvider=true)'
     const onOpenChange = jest.fn();
 
     render(
-      <SettingsPage
+      <SettingsPageWithRouter
         core={coreMock}
         onProvidersChanged={jest.fn()}
         autoOpenCreateForm={true}
@@ -255,7 +277,7 @@ describe('SettingsPage — auto-open create-provider flyout (?addProvider=true)'
   });
 
   it('does not open the form when the flag is absent', async () => {
-    render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
+    render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
 
     await screen.findByRole('button', { name: /add provider/i });
     expect(screen.queryByLabelText(/^name\s*\*?$/i)).not.toBeInTheDocument();
@@ -268,7 +290,7 @@ describe('SettingsPage — auto-open create-provider flyout (?addProvider=true)'
     const onOpenChange = jest.fn();
 
     render(
-      <SettingsPage
+      <SettingsPageWithRouter
         core={coreMock}
         onProvidersChanged={jest.fn()}
         onCreateFormOpenChange={onOpenChange}
@@ -287,7 +309,7 @@ describe('SettingsPage — auto-open create-provider flyout (?addProvider=true)'
     const onOpenChange = jest.fn();
 
     render(
-      <SettingsPage
+      <SettingsPageWithRouter
         core={coreMock}
         onProvidersChanged={jest.fn()}
         autoOpenCreateForm={true}
@@ -324,7 +346,7 @@ describe('SettingsPage — auto-open create-provider flyout (?addProvider=true)'
     const onOpenChange = jest.fn();
 
     render(
-      <SettingsPage
+      <SettingsPageWithRouter
         core={coreMock}
         onProvidersChanged={jest.fn()}
         onCreateFormOpenChange={onOpenChange}
@@ -358,7 +380,7 @@ describe('SettingsPage — the hidden tab must not keep a flyout on screen', () 
     // document.body where no ancestor's `display: none` can reach it — so the flyout floated over
     // the chat surface after switching tabs with it open.
     const { rerender } = render(
-      <SettingsPage
+      <SettingsPageWithRouter
         core={coreMock}
         onProvidersChanged={jest.fn()}
         autoOpenCreateForm={true}
@@ -367,7 +389,7 @@ describe('SettingsPage — the hidden tab must not keep a flyout on screen', () 
     expect(await screen.findByLabelText(/^name\s*\*?$/i)).toBeInTheDocument();
 
     rerender(
-      <SettingsPage
+      <SettingsPageWithRouter
         core={coreMock}
         onProvidersChanged={jest.fn()}
         autoOpenCreateForm={true}
@@ -376,6 +398,110 @@ describe('SettingsPage — the hidden tab must not keep a flyout on screen', () 
     );
 
     expect(screen.queryByLabelText(/^name\s*\*?$/i)).toBeNull();
+  });
+});
+
+describe('SettingsPage — settings tabs (UX iteration 4 item 2)', () => {
+  it('renders the three tabs, Providers selected by default', async () => {
+    render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
+
+    const providersTab = await screen.findByRole('tab', { name: /^providers$/i });
+    const privacyTab = screen.getByRole('tab', {
+      name: /privacy & data protection/i,
+    });
+    const retentionTab = screen.getByRole('tab', {
+      name: /conversation history/i,
+    });
+
+    expect(providersTab).toHaveAttribute('aria-selected', 'true');
+    expect(privacyTab).toHaveAttribute('aria-selected', 'false');
+    expect(retentionTab).toHaveAttribute('aria-selected', 'false');
+    // The Providers card's own content (its "Add provider" empty-state action, distinct from the
+    // page header's own button of the same name) is visible; the other two cards' content isn't.
+    expect(
+      screen.getByRole('button', { name: /add a provider/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/enable privacy mode by default/i),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/keep saved conversations for/i),
+    ).not.toBeInTheDocument();
+  });
+
+  it('switches which card is shown when a tab is clicked, and updates the URL', async () => {
+    render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
+
+    await screen.findByRole('button', { name: /add provider/i });
+
+    fireEvent.click(
+      screen.getByRole('tab', { name: /privacy & data protection/i }),
+    );
+    expect(
+      await screen.findByText(/enable privacy mode by default/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /add a provider/i }),
+    ).not.toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole('tab', { name: /conversation history/i }),
+    );
+    expect(
+      await screen.findByText(/keep saved conversations for/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/enable privacy mode by default/i),
+    ).not.toBeInTheDocument();
+  });
+
+  it('lands on the Privacy tab when deep-linked with ?tab=privacy', async () => {
+    render(
+      <SettingsPageWithRouter
+        core={coreMock}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=privacy']}
+      />,
+    );
+
+    expect(
+      await screen.findByText(/enable privacy mode by default/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('tab', { name: /privacy & data protection/i }),
+    ).toHaveAttribute('aria-selected', 'true');
+  });
+
+  it('lands on the Providers tab when deep-linked with ?tab=retention&addProvider=true', async () => {
+    // The create-provider flyout only belongs to the Providers tab — an addProvider deep link
+    // must win over any (nonsensical) `?tab=` value it might be combined with.
+    render(
+      <SettingsPageWithRouter
+        core={coreMock}
+        onProvidersChanged={jest.fn()}
+        autoOpenCreateForm={true}
+        initialEntries={['/settings?tab=retention&addProvider=true']}
+      />,
+    );
+
+    expect(await screen.findByLabelText(/^name\s*\*?$/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole('tab', { name: /^providers$/i }),
+    ).toHaveAttribute('aria-selected', 'true');
+  });
+
+  it('falls back to the Providers tab for an unknown ?tab= value', async () => {
+    render(
+      <SettingsPageWithRouter
+        core={coreMock}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=nonsense']}
+      />,
+    );
+
+    expect(
+      await screen.findByRole('tab', { name: /^providers$/i }),
+    ).toHaveAttribute('aria-selected', 'true');
   });
 });
 
@@ -400,7 +526,13 @@ describe('SettingsPage — in-card layout and hierarchy (audit §4)', () => {
    * assertions are actually about, which is which column a block sits in.
    */
   it('lays the privacy controls and the field policy out as two columns', async () => {
-    render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
+    render(
+      <SettingsPageWithRouter
+        core={coreMock}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=privacy']}
+      />,
+    );
     const switchCaption = await screen.findByText(
       /enable privacy mode by default/i,
     );
@@ -415,7 +547,13 @@ describe('SettingsPage — in-card layout and hierarchy (audit §4)', () => {
   });
 
   it('puts the retention field and its explanation side by side', async () => {
-    render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
+    render(
+      <SettingsPageWithRouter
+        core={coreMock}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=retention']}
+      />,
+    );
     // The page's only number input, so its role names it unambiguously — and unlike the form row's
     // label, the input itself is a hook that survives however EuiFormRow wires `for`.
     const field = await screen.findByRole('spinbutton');
@@ -431,22 +569,21 @@ describe('SettingsPage — in-card layout and hierarchy (audit §4)', () => {
   });
 
   it('drops the fill on a disabled Save button', async () => {
-    render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
-    // Both cards' Save buttons read the same `fill={!disabled}` expression; this one is driven
-    // through the retention field because a number input is the cleanest control to dirty.
+    // Both cards' Save buttons read the same `fill={!disabled}` expression, but each now lives on
+    // its own tab (UX iteration 4 item 2), so this switches tabs between the two halves of the
+    // assertion instead of finding both buttons in one render.
+    render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
+
+    fireEvent.click(
+      screen.getByRole('tab', { name: /conversation history/i }),
+    );
     const save = await screen.findByRole('button', {
       name: /save conversation history settings/i,
     });
-    const privacySave = screen.getByRole('button', {
-      name: /save privacy settings/i,
-    });
-
-    // Nothing has been edited yet, so both are in the disabled state the audit measured as the two
-    // darkest slabs on the page, at ~2.2:1 against their own labels.
+    // Nothing has been edited yet, so this is in the disabled state the audit measured as one of
+    // the two darkest slabs on the page, at ~2.2:1 against its own label.
     expect(save).toBeDisabled();
-    expect(privacySave).toBeDisabled();
     expect(save.className).not.toMatch(/fill/i);
-    expect(privacySave.className).not.toMatch(/fill/i);
 
     fireEvent.change(await screen.findByRole('spinbutton'), {
       target: { value: '30' },
@@ -455,6 +592,15 @@ describe('SettingsPage — in-card layout and hierarchy (audit §4)', () => {
     // Dirty now: the button is both enabled and filled, i.e. fill tracks "you can press this".
     await waitFor(() => expect(save).toBeEnabled());
     expect(save.className).toMatch(/fill/i);
+
+    fireEvent.click(
+      screen.getByRole('tab', { name: /privacy & data protection/i }),
+    );
+    const privacySave = await screen.findByRole('button', {
+      name: /save privacy settings/i,
+    });
+    expect(privacySave).toBeDisabled();
+    expect(privacySave.className).not.toMatch(/fill/i);
   });
 
   it('keeps the section cards, their descriptions and their rules on one measure', () => {

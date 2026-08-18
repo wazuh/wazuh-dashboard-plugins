@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
 import './settings-page.scss';
 import {
   EuiPage,
   EuiBadge,
   EuiPageBody,
   EuiPageHeader,
+  EuiTabs,
+  EuiTab,
   EuiInMemoryTable,
   EuiBasicTableColumn,
   EuiButton,
@@ -110,6 +113,27 @@ const PROVIDER_TYPE_SHORT_LABELS: Record<string, string> = {
     defaultMessage: 'Anthropic',
   }),
 };
+
+/**
+ * The three landmarks this page organizes its (currently three, one-per-tab) SectionCards under
+ * (UX iteration 4 item 2). Deliberately not open-ended: a future settings section earns its own
+ * id here when it actually ships, rather than a placeholder tab sitting empty in the meantime.
+ */
+type SettingsTabId = 'providers' | 'privacy' | 'retention';
+const SETTINGS_TAB_IDS: SettingsTabId[] = ['providers', 'privacy', 'retention'];
+const DEFAULT_SETTINGS_TAB: SettingsTabId = 'providers';
+/** `?tab=<id>` on `#/settings`, the same query-param deep-link idiom `?addProvider=true`
+ * (application.tsx) already establishes for this page. */
+const TAB_PARAM = 'tab';
+
+/** Reads the active tab off the URL, following the same precedent `?addProvider=true` set: an
+ * unknown/stale/missing value falls back to the Providers tab rather than rendering nothing. */
+function tabFromSearch(search: string): SettingsTabId {
+  const raw = new URLSearchParams(search).get(TAB_PARAM);
+  return (SETTINGS_TAB_IDS as string[]).includes(raw ?? '')
+    ? (raw as SettingsTabId)
+    : DEFAULT_SETTINGS_TAB;
+}
 
 // The Privacy section's whole save unit: the two on/off switches plus the field policy rows
 // below them, all gated behind the same "Save privacy settings" button and the same dirty check.
@@ -301,6 +325,34 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   autoOpenCreateForm,
   onCreateFormOpenChange,
 }) => {
+  // This page is always rendered as a descendant of the app's own <Router> (application.tsx), so
+  // these hooks latch onto that ambient context without this component needing a `history`/
+  // `location` prop threaded down from there.
+  const location = useLocation();
+  const history = useHistory();
+  const [activeTabId, setActiveTabId] = useState<SettingsTabId>(() =>
+    autoOpenCreateForm ? 'providers' : tabFromSearch(location.search),
+  );
+  // Keeps the active tab in sync with the URL: a bookmarked/shared `?tab=privacy` link, the
+  // browser's back/forward buttons, and the `?addProvider=true` deep link (which always means
+  // Providers, since that is the only tab the create-provider flyout belongs to) all funnel
+  // through here rather than through the click handler below, which only covers the admin
+  // actually clicking a tab.
+  useEffect(() => {
+    setActiveTabId(
+      autoOpenCreateForm ? 'providers' : tabFromSearch(location.search),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search, autoOpenCreateForm]);
+
+  const switchTab = (tabId: SettingsTabId) => {
+    setActiveTabId(tabId);
+    history.push({
+      pathname: location.pathname,
+      search: tabId === DEFAULT_SETTINGS_TAB ? '' : `?${TAB_PARAM}=${tabId}`,
+    });
+  };
+
   const [service] = useState(() => new SettingsService(core.http));
   const [providers, setProviders] = useState<ProviderSummary[]>([]);
   // Raw text typed into the Providers card's "Filter providers" search box, mirrored out of
@@ -1189,6 +1241,39 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         />
         <EuiSpacer size='l' />
 
+        {/* Landmarks before more settings land (UX iteration 4 item 2): one tab per existing
+            SectionCard, deep-linkable via `?tab=`. Not a full router switch — all three cards stay
+            mounted-or-not exactly as they were, this only decides which one is visible, the same
+            way application.tsx's outer Chat/Settings tabs already hide rather than unmount. */}
+        <EuiTabs>
+          <EuiTab
+            isSelected={activeTabId === 'providers'}
+            onClick={() => switchTab('providers')}
+          >
+            {i18n.translate('wazuhAiAssistant.settings.tabs.providers', {
+              defaultMessage: 'Providers',
+            })}
+          </EuiTab>
+          <EuiTab
+            isSelected={activeTabId === 'privacy'}
+            onClick={() => switchTab('privacy')}
+          >
+            {i18n.translate('wazuhAiAssistant.settings.tabs.privacy', {
+              defaultMessage: 'Privacy & data protection',
+            })}
+          </EuiTab>
+          <EuiTab
+            isSelected={activeTabId === 'retention'}
+            onClick={() => switchTab('retention')}
+          >
+            {i18n.translate('wazuhAiAssistant.settings.tabs.retention', {
+              defaultMessage: 'Conversation history',
+            })}
+          </EuiTab>
+        </EuiTabs>
+        <EuiSpacer size='l' />
+
+        {activeTabId === 'providers' && (
         <SectionCard
           pillLabel={i18n.translate(
             'wazuhAiAssistant.settings.providers.title',
@@ -1271,15 +1356,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             />
           )}
         </SectionCard>
+        )}
 
-        {/* `xxl` (40px), not `xl` (32): the pill straddling each card's top border
-            hangs 12px above the panel, so a 32px spacer between two cards read as
-            ~56px of separation above one card and 32 below the other — an uneven
-            gap where the rulebook (C16/A3) wants section separation to be one
-            deliberate step. 40 + the overhang lands on 64, the ladder's own
-            page-level separation value (audit §4.8). */}
-        <EuiSpacer size='xxl' />
-
+        {/* No `xxl` spacer between the cards any more (it existed to separate two ADJACENT
+            cards — see the comment that used to sit here) — each card now owns a whole tab, so
+            there is never a second card directly below it to separate from. */}
+        {activeTabId === 'privacy' && (
         <SectionCard
           pillLabel={i18n.translate('wazuhAiAssistant.settings.privacy.title', {
             defaultMessage: 'Privacy',
@@ -1614,10 +1696,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             </>
           )}
         </SectionCard>
+        )}
 
-        {/* `xxl` for the same reason as the spacer above the Privacy card. */}
-        <EuiSpacer size='xxl' />
-
+        {/* No `xxl` spacer here either, for the same reason noted above the Privacy tab. */}
+        {activeTabId === 'retention' && (
         <SectionCard
           pillLabel={i18n.translate(
             'wazuhAiAssistant.settings.retention.title',
@@ -1739,6 +1821,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             </>
           )}
         </SectionCard>
+        )}
       </EuiPageBody>
       {isFormOpen && isActive && (
         <ProviderFormFlyout
