@@ -265,6 +265,13 @@ $wzWelcomeFadeOut: 180ms;
 .wzChatTranscript {
   @include wzScrollChild;
   overflow-anchor: none;
+  /* Reserves the scrollbar's own width whether or not the bar is currently rendered (audit item 2's
+     second, separate ~5px shift): without this, a turn that pushes the transcript from "fits without
+     scrolling" to "needs to scroll" makes the scrollbar appear and claim space FROM the content box,
+     narrowing every row by the scrollbar's width — the same kind of sideways jog as the flex-basis bug
+     above, just a few pixels instead of ~115. Reserving the gutter unconditionally means the content
+     box width never depends on whether a scrollbar happens to be drawn right now. */
+  scrollbar-gutter: stable;
   /* Explicitly the grid's FIRST row. `.wzJumpToLatest` below claims `grid-row: 1` too, and an
      explicitly-placed item is placed BEFORE auto-placement runs — but only the items that come
      before it in the source order are skipped by the cursor, and the jump button is a LATER sibling

@@ -462,7 +462,21 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
         // The user turn keeps its 75% share — a question is always prose, and the figure is
         // genuinely local to this decision, with no token or class behind it to drift from.
         maxWidth: isUser ? '75%' : '100%',
-        minWidth: 180,
+        minWidth: isUser ? 180 : 0,
+        // The assistant column is forced to a DETERMINISTIC width (full row, minus the avatar
+        // column) instead of EUI's default shrink-to-fit sizing (audit item 2). Shrink-to-fit made
+        // this flex item's resolved width track whatever it happened to be rendering — 605px for a
+        // collapsed/prose-only turn, 1260px once a `wzResultsCard` was expanded — and every percentage
+        // in `.wzMessageRow--wide .wzProseMeasure`'s `margin-inline-start` (chat-page.scss) resolves
+        // against THIS element's width. A shrink-to-fit width therefore turned "the panel expanded"
+        // into "the whole card/prose block jogs ~115px sideways", not just "the panel got taller".
+        // `flex: 1 1 auto` makes the item grow to fill the row like any other block, and `min-width: 0`
+        // is required alongside it — a flex item's automatic minimum is its content's, which for a
+        // wide `wzResultsCard` would otherwise refuse to shrink back down and re-introduce the same
+        // instability from the other direction. The user bubble is deliberately left out of this: it
+        // is a real chat bubble that is supposed to hug its own text up to the 75% cap above, and nothing
+        // about it collapses/expands the way a results card does.
+        ...(!isUser ? { flex: '1 1 auto', width: '100%' } : {}),
       }}
     >
       {isUser ? (
