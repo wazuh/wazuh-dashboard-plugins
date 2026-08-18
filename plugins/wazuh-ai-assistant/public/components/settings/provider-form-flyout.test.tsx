@@ -753,12 +753,12 @@ describe('ProviderFormFlyout — Model field guidance', () => {
 
     // Anchored to the CHIP's own <code>: an unanchored getByText would match both the chip and the
     // plain-text model example the tool-calling callout names. The chip is a vendor suggestion now
-    // (the generic per-type examples row is gone) — and claude-opus-4-8 reaching it at all is the
+    // (the generic per-type examples row is gone) — and claude-sonnet-5 reaching it at all is the
     // point: it is in BOTH curated lists, and the dedupe that used to hide it here went with the
     // row it was deduplicating against.
     expect(
       screen
-        .getAllByText(/^claude-opus-4-8$/i)
+        .getAllByText(/^claude-sonnet-5$/i)
         .filter(node => node.closest('[role="group"]')).length,
     ).toBeGreaterThan(0);
 
@@ -832,7 +832,7 @@ describe('ProviderFormFlyout — type label and tool-support copy corrections', 
     const anthropicCallout = screen
       .getByText(/tool calling needs a model/i)
       .closest('.euiCallOut') as HTMLElement;
-    expect(anthropicCallout).toHaveTextContent('claude-opus-4-8');
+    expect(anthropicCallout).toHaveTextContent('claude-sonnet-5');
     expect(anthropicCallout).not.toHaveTextContent(/gpt-4o/i);
   });
 
@@ -863,7 +863,7 @@ describe('ProviderFormFlyout — curated per-vendor model suggestions', () => {
       target: { value: 'https://my-custom-gateway.example.com' },
     });
 
-    expect(screen.queryByText('claude-opus-4-8')).not.toBeInTheDocument();
+    expect(screen.queryByText('claude-sonnet-5')).not.toBeInTheDocument();
   });
 
   it('suggests Anthropic models for api.anthropic.com on the anthropic type and fills the model field on click', () => {
@@ -970,18 +970,18 @@ describe('ProviderFormFlyout — Model field is an editable EuiComboBox', () => 
       target: { value: 'https://api.anthropic.com' },
     });
 
-    // claude-opus-4-8 is listed in both PROVIDER_MODEL_GUIDANCE and VENDOR_MODEL_SUGGESTIONS, and
+    // claude-sonnet-5 is listed in both PROVIDER_MODEL_GUIDANCE and VENDOR_MODEL_SUGGESTIONS, and
     // it used to be filtered OUT of the suggestions because the Model field also showed a generic
     // examples row carrying it. That row is gone, so the filter is gone with it — dropping the
     // vendor's own primary model from the only list still offering it would have been the real
     // regression. The tool-calling callout names the same id in prose and is excluded here: the
     // invariant is about the LIST, not about the string appearing once on the form.
     const inTheList = screen
-      .getAllByText('claude-opus-4-8')
+      .getAllByText('claude-sonnet-5')
       .filter(node => !node.closest('.euiCallOut'));
     expect(inTheList).toHaveLength(1);
     // ...and an id only the vendor list carries is still there beside it.
-    expect(screen.getByText('claude-sonnet-5')).toBeInTheDocument();
+    expect(screen.getByText('claude-opus-5')).toBeInTheDocument();
   });
 });
 

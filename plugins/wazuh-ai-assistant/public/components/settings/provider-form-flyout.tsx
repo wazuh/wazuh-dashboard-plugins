@@ -313,7 +313,7 @@ const PROVIDER_MODEL_GUIDANCE: Record<
     note: OTHER_OPENAI_COMPATIBLE_PROVIDERS_NOTE,
   },
   anthropic: {
-    examples: ['claude-opus-4-8', 'claude-haiku-4-5'],
+    examples: ['claude-sonnet-5', 'claude-haiku-4-5'],
     docs: [
       {
         label: i18n.translate(
@@ -347,7 +347,7 @@ const VENDOR_MODEL_SUGGESTIONS: Array<{
   {
     match: 'api.anthropic.com',
     forType: 'anthropic',
-    models: ['claude-opus-4-8', 'claude-haiku-4-5', 'claude-sonnet-5'],
+    models: ['claude-sonnet-5', 'claude-haiku-4-5', 'claude-opus-5'],
   },
   {
     match: 'api.openai.com',
@@ -598,7 +598,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   // Feeds both the "Suggested models:" chips and the Model EuiComboBox's dropdown `options`.
   //
   // No deduplication any more: this list used to be filtered against `modelGuidance.examples`,
-  // because an id curated in BOTH tables (Anthropic's claude-opus-4-8 is in each) rendered as two
+  // because an id curated in BOTH tables (Anthropic's claude-sonnet-5 is in each) rendered as two
   // identical chips under two different headings. With the generic "Examples:" row gone (see the
   // Model field below) there is nothing left to collide with — and keeping the filter would now do
   // real damage, silently hiding the vendor's own primary model from the only list that still

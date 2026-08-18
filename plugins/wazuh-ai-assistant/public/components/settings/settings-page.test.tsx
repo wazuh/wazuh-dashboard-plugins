@@ -135,7 +135,7 @@ describe('SettingsPage — Test all tests only the filtered set, throttled', () 
       name: 'Gamma-matched',
       type: 'anthropic',
       baseUrl: 'https://api.anthropic.com',
-      model: 'claude-opus-4-8',
+      model: 'claude-sonnet-5',
       isDefault: false,
     },
   ];
