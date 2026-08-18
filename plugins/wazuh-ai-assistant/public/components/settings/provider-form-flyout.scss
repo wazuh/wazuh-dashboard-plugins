@@ -203,8 +203,7 @@
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    transition:
-      background-color $wzMotionFast $wzEase,
+    transition: background-color $wzMotionFast $wzEase,
       border-color $wzMotionFast $wzEase;
   }
 }

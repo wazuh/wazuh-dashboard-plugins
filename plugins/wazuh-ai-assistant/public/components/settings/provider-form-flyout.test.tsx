@@ -1124,8 +1124,10 @@ describe('ProviderFormFlyout — one tight column (audit §5)', () => {
     expect(scss).toMatch(
       /\.wzProviderFlyoutPanel \.euiFlyoutHeader > \* \{[^}]*margin-inline-end: \$wzScrollGutter/,
     );
+    // Prettier wraps this long selector across several lines, so match the
+    // combinators tolerant of any whitespace rather than a single space.
     expect(scss).toMatch(
-      /\.euiFlyoutFooter > \.euiFlexGroup > \.euiFlexItem:last-child \{[^}]*margin-inline-end: calc\(#\{\$euiSizeM\} \+ #\{\$wzScrollGutter\}\)/,
+      /\.euiFlyoutFooter\s*>\s*\.euiFlexGroup\s*>\s*\.euiFlexItem:last-child \{[^}]*margin-inline-end: calc\(#\{\$euiSizeM\} \+ #\{\$wzScrollGutter\}\)/,
     );
   });
 });

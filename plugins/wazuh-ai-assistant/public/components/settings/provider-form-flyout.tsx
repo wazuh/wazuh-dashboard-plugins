@@ -588,8 +588,8 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
     PROVIDER_API_KEY_GUIDANCE.openai_compatible;
   const apiKeyShapeMismatch = Boolean(
     apiKeyGuidance.keyPattern &&
-    form.apiKey?.trim() &&
-    !apiKeyGuidance.keyPattern.test(form.apiKey.trim()),
+      form.apiKey?.trim() &&
+      !apiKeyGuidance.keyPattern.test(form.apiKey.trim()),
   );
   const vendorModelSuggestions = getVendorModelSuggestions(
     form.baseUrl,
@@ -657,8 +657,8 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
         baseUrl: shouldPrefillAnthropicBaseUrl
           ? PROVIDER_URL_GUIDANCE.anthropic.placeholder
           : shouldClearAnthropicPrefill
-            ? ''
-            : current.baseUrl,
+          ? ''
+          : current.baseUrl,
       };
     });
   };
@@ -1265,8 +1265,8 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     testOutcome.status === 'ok'
                       ? 'success'
                       : testOutcome.status === 'failed'
-                        ? 'danger'
-                        : 'warning'
+                      ? 'danger'
+                      : 'warning'
                   }
                   iconType={testOutcome.status === 'ok' ? 'check' : 'alert'}
                   title={
@@ -1280,16 +1280,16 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                           },
                         )
                       : testOutcome.status === 'failed'
-                        ? i18n.translate(
-                            'wazuhAiAssistant.settings.form.testResultFailureTitle',
-                            { defaultMessage: 'Connection test failed' },
-                          )
-                        : i18n.translate(
-                            'wazuhAiAssistant.settings.form.testResultCouldNotVerifyTitle',
-                            {
-                              defaultMessage: 'Could not verify the connection',
-                            },
-                          )
+                      ? i18n.translate(
+                          'wazuhAiAssistant.settings.form.testResultFailureTitle',
+                          { defaultMessage: 'Connection test failed' },
+                        )
+                      : i18n.translate(
+                          'wazuhAiAssistant.settings.form.testResultCouldNotVerifyTitle',
+                          {
+                            defaultMessage: 'Could not verify the connection',
+                          },
+                        )
                   }
                 >
                   {/* Success needs no body: the title already carries the latency, which is the
