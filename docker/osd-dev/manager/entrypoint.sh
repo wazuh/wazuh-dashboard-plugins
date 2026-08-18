@@ -23,6 +23,8 @@ if [ -n "$INDEXER_SSL_CERTIFICATE_KEY" ]; then
   chmod 400 $INDEXER_SSL_CERTIFICATE_KEY
 fi
 
+sed -i "/<https>/,/<\/https>/ s|<bind_addr>[^<]*</bind_addr>|<bind_addr>0.0.0.0</bind_addr>|g" /var/wazuh-manager/etc/wazuh-manager.conf
+
 # Configure the agent enrollment password expected by authd (use_password is
 # enabled by default in the manager package; without this file authd generates
 # a random password and agent enrollment fails with "Invalid password")
