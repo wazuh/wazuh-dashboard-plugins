@@ -32,11 +32,11 @@ The **Dashboard** view summarizes the same cases with charts.
 Case Management reuses the findings data and the finding details flyout. It does not add a new
 index.
 
-| Area                     | Role in Case Management                                                                                                                                     |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Findings**             | The source data. A case is the `wazuh.case.*` fields on a finding in the `wazuh-findings-v5*` indices. The **Cases** view lists the findings that have case data. |
+| Area                       | Role in Case Management                                                                                                                                                              |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Findings**               | The source data. A case is the `wazuh.case.*` fields on a finding in the `wazuh-findings-v5*` indices. The **Cases** view lists the findings that have case data.                    |
 | **Finding details flyout** | The **Case** tab in the flyout creates, edits, and removes the case data of a finding. The tab is available on the finding surfaces, such as Threat Hunting and the **Cases** table. |
-| **Wazuh Indexer**        | Stores the case data inside the finding document. The server reads and writes it with the requesting user's own permissions. |
+| **Wazuh Indexer**          | Stores the case data inside the finding document. The server reads and writes it with the requesting user's own permissions.                                                         |
 
 The server sets the user and the timestamps. It sets `wazuh.case.user.name` to the logged-in
 user, records when the case is created and updated, and assigns the author and the timestamps of
@@ -72,16 +72,16 @@ one.
 A case has the following fields. The **Title**, **Status**, and **Severity** fields are required.
 The other fields are optional.
 
-| Field           | Required | Description                                                                                           |
-| --------------- | -------- | ----------------------------------------------------------------------------------------------------- |
-| **Title**       | Yes      | Short summary of the case. The maximum length is 1024 characters.                                     |
-| **Description** | No       | Detailed description of the case.                                                                     |
-| **Status**      | Yes      | Current lifecycle status of the case. See [Case lifecycle](#case-lifecycle).                          |
-| **Severity**    | Yes      | Impact severity of the case: `Informational`, `Low`, `Medium`, `High`, or `Critical`.                 |
-| **Priority**    | No       | Triage priority of the case: `Urgent`, `High`, `Medium`, or `Low`.                                    |
-| **TLP**         | No       | Traffic Light Protocol sharing level. See [TLP](#tlp-traffic-light-protocol).                         |
-| **Tags**        | No       | Free-form labels. Type a tag name and press `Enter` to add it.                                        |
-| **Comments**    | No       | Notes about the case. See [Comments](#comments).                                                      |
+| Field           | Required | Description                                                                           |
+| --------------- | -------- | ------------------------------------------------------------------------------------- |
+| **Title**       | Yes      | Short summary of the case. The maximum length is 1024 characters.                     |
+| **Description** | No       | Detailed description of the case.                                                     |
+| **Status**      | Yes      | Current lifecycle status of the case. See [Case lifecycle](#case-lifecycle).          |
+| **Severity**    | Yes      | Impact severity of the case: `Informational`, `Low`, `Medium`, `High`, or `Critical`. |
+| **Priority**    | No       | Triage priority of the case: `Urgent`, `High`, `Medium`, or `Low`.                    |
+| **TLP**         | No       | Traffic Light Protocol sharing level. See [TLP](#tlp-traffic-light-protocol).         |
+| **Tags**        | No       | Free-form labels. Type a tag name and press `Enter` to add it.                        |
+| **Comments**    | No       | Notes about the case. See [Comments](#comments).                                      |
 
 The module also shows read-only metadata that the server sets: the **User** who owns the case, the
 **Created at** time, and the **Updated at** time.
@@ -90,14 +90,14 @@ The module also shows read-only metadata that the server sets: the **User** who 
 
 The **Status** field records the stage of the case. A case has one of these values:
 
-| Status           | Meaning                                                                       |
-| ---------------- | ----------------------------------------------------------------------------- |
-| **Active**       | The case is open and under review.                                            |
-| **Acknowledged** | An analyst has confirmed the case and works on it.                            |
-| **Completed**    | The work on the case is done.                                                 |
-| **Audit**        | The case is kept for review or for a compliance record.                       |
-| **Error**        | The case is marked as a mistake, for example a false positive.                |
-| **Deleted**      | The case is marked as removed but the record stays for the history.           |
+| Status           | Meaning                                                             |
+| ---------------- | ------------------------------------------------------------------- |
+| **Active**       | The case is open and under review.                                  |
+| **Acknowledged** | An analyst has confirmed the case and works on it.                  |
+| **Completed**    | The work on the case is done.                                       |
+| **Audit**        | The case is kept for review or for a compliance record.             |
+| **Error**        | The case is marked as a mistake, for example a false positive.      |
+| **Deleted**      | The case is marked as removed but the record stays for the history. |
 
 A typical case moves from **Active** to **Acknowledged**, and then to **Completed**. The module
 does not force a fixed order, so you can set any status that fits your process.
@@ -107,12 +107,12 @@ does not force a fixed order, so you can set any status that fits your process.
 The **TLP** field records how widely you can share the case. It uses the standard Traffic Light
 Protocol values.
 
-| Value         | Sharing rule                                                        |
-| ------------- | ------------------------------------------------------------------- |
-| **TLP:RED**   | Do not share outside the people named in the exchange.              |
-| **TLP:AMBER** | Share only with the members of your organization who need to know.  |
-| **TLP:GREEN** | Share within your community, but not on public channels.            |
-| **TLP:CLEAR** | Share without a restriction.                                        |
+| Value         | Sharing rule                                                       |
+| ------------- | ------------------------------------------------------------------ |
+| **TLP:RED**   | Do not share outside the people named in the exchange.             |
+| **TLP:AMBER** | Share only with the members of your organization who need to know. |
+| **TLP:GREEN** | Share within your community, but not on public channels.           |
+| **TLP:CLEAR** | Share without a restriction.                                       |
 
 ### Comments
 

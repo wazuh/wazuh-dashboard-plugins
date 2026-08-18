@@ -27,11 +27,11 @@ This module exposes the following views:
 Incident Response reads the active response records. Two related features produce and define those
 records.
 
-| Area                  | Role in Incident Response                                                                                                                              |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Active response records** | The source data. The module reads the `wazuh-active-responses*` indices. Each record describes one action that ran on an agent.                   |
-| **Active Response**   | Defines the actions and attaches them to a trigger. See the [Active Response](../active-response/index.md) module for how to create and run an action. |
-| **Findings**          | Each action record keeps a reference to the finding that triggered it (the `event.doc_id` field). The **Source finding** tab reads that finding from the `wazuh-findings-v5*` indices. |
+| Area                        | Role in Incident Response                                                                                                                                                              |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Active response records** | The source data. The module reads the `wazuh-active-responses*` indices. Each record describes one action that ran on an agent.                                                        |
+| **Active Response**         | Defines the actions and attaches them to a trigger. See the [Active Response](../active-response/index.md) module for how to create and run an action.                                 |
+| **Findings**                | Each action record keeps a reference to the finding that triggered it (the `event.doc_id` field). The **Source finding** tab reads that finding from the `wazuh-findings-v5*` indices. |
 
 ## Reference
 
