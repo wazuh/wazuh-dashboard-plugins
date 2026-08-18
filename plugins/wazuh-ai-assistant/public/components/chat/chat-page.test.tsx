@@ -1743,6 +1743,32 @@ describe('ChatPage — two-row grid pane (contract §1)', () => {
     expect(screen.getByLabelText('Chat message')).toBeVisible();
   });
 
+  /**
+   * Returns the body of one top-level SCSS rule, brace-matched so nested rules (`.wzComposerRow` has
+   * several) come back with it instead of the block being cut at the first `}`. Used to scope a
+   * "this declaration is absent" assertion to the element it is actually about — a file-wide regex
+   * cannot tell "the composer is not sticky" from "nothing on this surface is sticky", and the two
+   * stopped being the same thing once the status band gained a legitimate `position: sticky`.
+   */
+  const ruleBlock = (scss: string, selector: string) => {
+    const start = scss.indexOf(`${selector} {`);
+    if (start === -1) {
+      throw new Error(`selector ${selector} not found in stylesheet`);
+    }
+    let depth = 0;
+    for (let i = scss.indexOf('{', start); i < scss.length; i++) {
+      if (scss[i] === '{') {
+        depth++;
+      } else if (scss[i] === '}') {
+        depth--;
+        if (depth === 0) {
+          return scss.slice(start, i + 1);
+        }
+      }
+    }
+    throw new Error(`unbalanced braces after ${selector}`);
+  };
+
   it('removes the old sticky/gradient mechanism from the stylesheet entirely', () => {
     // `path.join` against `__dirname` sidesteps Jest's `moduleNameMapper` (which points `.scss`
     // imports at `style_mock.js`) and reads the actual SCSS off disk, the same way the previous
@@ -1756,7 +1782,15 @@ describe('ChatPage — two-row grid pane (contract §1)', () => {
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/^\s*\/\/.*$/gm, '');
 
-    expect(scssRules).not.toMatch(/position:\s*sticky/);
+    // Scoped to the composer's own rule block rather than the whole file. This used to assert the
+    // file contained NO `position: sticky` anywhere, which was a fair proxy while the composer was
+    // the only thing that had ever been sticky — but `.wzStatusCallouts` is now legitimately sticky
+    // (a status band pinned inside the transcript's scroll container, an entirely different
+    // element and mechanism), so the file-wide form would fail on that unrelated rule. What this
+    // test actually protects is that the COMPOSER is a flow grid row and not a sticky overlay.
+    expect(ruleBlock(scssRules, '.wzComposerRow')).not.toMatch(
+      /position:\s*sticky/,
+    );
     expect(scssRules).not.toMatch(/wzComposerGradientHeight/);
     expect(scssRules).not.toMatch(/::before/);
     // The replacement mechanism is in place instead: a two-row grid pane, and a shared measure

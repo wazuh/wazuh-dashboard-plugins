@@ -134,6 +134,57 @@
 }
 
 /**
+ * Sticky status band (chat-page.tsx). A failed turn's callout used to render at the top of the
+ * transcript's flow and scroll away with the first screenful, so in a long conversation the user got
+ * an answer that never arrived and no visible reason why — the explanation was hundreds of pixels
+ * above the fold, in the one place they had no reason to look.
+ *
+ * Pinning it requires the band to be a direct child of `.wzTranscriptContent`, not of
+ * `.wzContentMeasure`: a sticky element travels only inside its own parent's box, and the ordinary
+ * (non-welcome) `.wzContentMeasure` is a plain flow box no taller than the callouts themselves — see
+ * `.wzContentMeasure--stretch`'s comment for why it must stay that way. `.wzTranscriptContent` is
+ * the flex column carrying `min-height: 100%` off `.wzChatTranscript`, so it spans the whole
+ * scrollable height and a sticky child of it stays pinned for the entire conversation.
+ *
+ * `top: 0` pins against the scroll port, which means the transcript's own `16px` top padding scrolls
+ * out from under the band — deliberate, so a pinned callout sits flush at the pane's edge like any
+ * status bar rather than floating with a stripe of transcript above it. The opaque ground is not
+ * decoration: `EuiCallOut` only fills its own box, so without it the `EuiSpacer` each `StatusCallout`
+ * trails (and the callout's own rounded corners) would let message rows scroll through the band.
+ * The horizontal gutter is inherited from `.wzTranscriptContent`, so nothing renders in the 24px
+ * margins for the ground to have to cover.
+ */
+.wzStatusCallouts {
+  position: sticky;
+  top: 0;
+  /* Above the transcript rows that scroll beneath it, below the composer row — which is a grid
+     sibling in normal flow (contract §1), so it needs no z-index of its own to stay clear. */
+  z-index: 2;
+}
+
+/**
+ * Close control for a dismissible `StatusCallout` (status-callout.tsx explains why the callout does
+ * not use EUI's own `dismissible` prop). `.euiCallOut` is already `position: relative` in the theme,
+ * so this only needs to claim the top-right corner of whichever callout holds it. The title reserves
+ * room for it rather than running underneath: the callout's own padding is `$euiSize` (16px), which
+ * a wrapping title would otherwise fill edge to edge.
+ */
+.wzStatusCallout--dismissible {
+  .wzStatusCallout__dismiss {
+    position: absolute;
+    top: $euiSizeXS;
+    right: $euiSizeXS;
+  }
+
+  /* Reserve the corner rather than letting a wrapping title run under the button. Carried by a
+     modifier class on the callout itself, not by a `:has()` selector on the button — the parent
+     already knows whether it is dismissible, so there is no need to depend on selector support. */
+  .euiCallOutHeader__title {
+    padding-right: $euiSizeL;
+  }
+}
+
+/**
  * Applied to `.wzContentMeasure` only while it holds the welcome state (chat-page.tsx) — see the
  * `.wzChatTranscript > .wzTranscriptContent` comment above for why the stretch chain lives here
  * instead of unconditionally on `.wzContentMeasure` itself: the ordinary message-list case must
