@@ -656,7 +656,10 @@ test('orchestrate: two tool_calls in the SAME round each get only the narration 
   const secondToolMessage = round1Messages.find(
     m => m.role === 'assistant' && m.toolCalls?.[0]?.id === 'call_2',
   );
-  assert.equal(firstToolMessage?.content, 'First, checking SCA. ');
+  // Trimmed, not the raw streamed slice with its trailing space: per-tool-call slices are now
+  // trimmed before being attributed (a later, deliberate fix — a whitespace-padded/whitespace-
+  // only content string is a 400 on the Anthropic API).
+  assert.equal(firstToolMessage?.content, 'First, checking SCA.');
   assert.equal(secondToolMessage?.content, 'Now checking a second thing.');
 });
 

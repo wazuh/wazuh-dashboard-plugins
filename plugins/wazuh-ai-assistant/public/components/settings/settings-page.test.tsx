@@ -3,7 +3,14 @@ import fs from 'fs';
 import React from 'react';
 import { MemoryRouter, Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
-import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
+import {
+  render,
+  screen,
+  waitFor,
+  fireEvent,
+  act,
+  within,
+} from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // SettingsService is instantiated internally — mock the module before importing the component.
@@ -105,10 +112,27 @@ describe('SettingsPage — wazuh_brain hidden from provider type choices', () =>
     // getByLabelText throws here: EUI's button-group radios sit in a <label> whose `for` points
     // at the group's own generated id, a non-labellable <fieldset> in this test environment (see
     // provider-form-flyout.test.tsx's providerTypeOption helper). The visible text is what
-    // matters for this assertion, so query it directly.
-    expect(screen.getByText(/openai-compatible/i)).toBeInTheDocument();
-    expect(screen.getByText(/anthropic \(claude\)/i)).toBeInTheDocument();
-    expect(screen.queryByText(/wazuh_brain/i)).not.toBeInTheDocument();
+    // matters for this assertion, but an unscoped getByText also matches the empty-state prompt's
+    // own body copy ("...OpenAI-compatible or Anthropic...") still in the DOM behind the flyout —
+    // so, like that helper, this scopes to the radio's own wrapping <label> via its stable
+    // data-test-subj instead of querying the whole document.
+    const openaiCompatibleOption = document.querySelector(
+      'input[data-test-subj="openai_compatible"]',
+    ) as HTMLElement;
+    const anthropicOption = document.querySelector(
+      'input[data-test-subj="anthropic"]',
+    ) as HTMLElement;
+    expect(openaiCompatibleOption).not.toBeNull();
+    expect(anthropicOption).not.toBeNull();
+    expect(openaiCompatibleOption.closest('label')?.textContent).toMatch(
+      /openai-compatible/i,
+    );
+    expect(anthropicOption.closest('label')?.textContent).toMatch(
+      /anthropic \(claude\)/i,
+    );
+    expect(
+      document.querySelector('input[data-test-subj="wazuh_brain"]'),
+    ).toBeNull();
   });
 });
 
@@ -726,11 +750,23 @@ describe('SettingsPage — per-provider privacy override (UX iteration 4 item 3)
     mockService.list.mockResolvedValue(twoProviders);
     renderOnPrivacyTab();
 
-    expect(await screen.findByText('Alpha')).toBeInTheDocument();
-    expect(screen.getByText('Beta')).toBeInTheDocument();
-    expect(
-      screen.getByRole('combobox', { name: /privacy override for alpha/i }),
-    ).toHaveValue('inherit');
+    // Scoped to the per-provider block: tabs keep all cards mounted (B1), so the Providers
+    // table's own "Alpha"/"Beta" rows are ALSO in the DOM at the same time as this list, making
+    // an unscoped getByText (or findByText) ambiguous. Waiting on the combobox itself (unique by
+    // its own aria-label) sidesteps that, and `data-test-subj` (EUI's own attribute, not RTL's
+    // default `data-testid`) is queried directly, matching this file's other data-test-subj
+    // lookups.
+    const alphaSelect = await screen.findByRole('combobox', {
+      name: /privacy override for alpha/i,
+    });
+    const perProviderList = within(
+      document.querySelector(
+        '[data-test-subj="wzPerProviderPrivacyList"]',
+      ) as HTMLElement,
+    );
+    expect(perProviderList.getByText('Alpha')).toBeInTheDocument();
+    expect(perProviderList.getByText('Beta')).toBeInTheDocument();
+    expect(alphaSelect).toHaveValue('inherit');
     expect(
       screen.getByRole('combobox', { name: /privacy override for beta/i }),
     ).toHaveValue('inherit');
@@ -891,15 +927,23 @@ describe('SettingsPage — per-provider privacy override (UX iteration 4 item 3)
     );
     renderOnPrivacyTab();
 
+    // Scoped to the per-provider block for the same reason as the test above: the Providers
+    // table's own rows (once loaded) share "Alpha"'s text with this list, and while the promise
+    // is still pending the container itself has already rendered (just with nothing inside it).
+    const perProviderContainer = document.querySelector(
+      '[data-test-subj="wzPerProviderPrivacyList"]',
+    ) as HTMLElement;
+    expect(perProviderContainer).not.toBeNull();
+    const perProviderList = within(perProviderContainer);
     expect(
-      screen.queryByText(/no providers configured yet/i),
+      perProviderList.queryByText(/no providers configured yet/i),
     ).not.toBeInTheDocument();
-    expect(screen.queryByText('Alpha')).not.toBeInTheDocument();
+    expect(perProviderList.queryByText('Alpha')).not.toBeInTheDocument();
 
     resolveList(twoProviders);
-    expect(await screen.findByText('Alpha')).toBeInTheDocument();
+    expect(await perProviderList.findByText('Alpha')).toBeInTheDocument();
     expect(
-      screen.queryByText(/no providers configured yet/i),
+      perProviderList.queryByText(/no providers configured yet/i),
     ).not.toBeInTheDocument();
   });
 });

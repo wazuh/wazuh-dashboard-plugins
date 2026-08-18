@@ -1822,80 +1822,86 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   showed "No providers configured yet." for a provider list that might still be on
                   its way (or that failed to load at all, with the actual error surfaced elsewhere
                   on the Providers tab). */}
-              {!providersLoaded ? null : providers.length === 0 ? (
-                <EuiText size='s' color='subdued'>
-                  {i18n.translate(
-                    'wazuhAiAssistant.settings.privacy.perProviderEmpty',
-                    { defaultMessage: 'No providers configured yet.' },
-                  )}
-                </EuiText>
-              ) : (
-                providers.map(provider => (
-                  <React.Fragment key={provider.id}>
-                    <EuiFlexGroup
-                      gutterSize='s'
-                      alignItems='center'
-                      responsive={false}
-                    >
-                      <EuiFlexItem>
-                        <EuiText size='s' title={provider.name}>
-                          {provider.name}
-                        </EuiText>
-                      </EuiFlexItem>
-                      <EuiFlexItem grow={false} style={{ minWidth: 200 }}>
-                        <EuiSelect
-                          compressed
-                          aria-label={i18n.translate(
-                            'wazuhAiAssistant.settings.privacy.perProviderSelectAriaLabel',
-                            {
-                              defaultMessage: 'Privacy override for {name}',
-                              values: { name: provider.name },
-                            },
-                          )}
-                          options={[
-                            {
-                              value: 'inherit',
-                              text: i18n.translate(
-                                'wazuhAiAssistant.settings.privacy.perProviderInherit',
-                                { defaultMessage: 'Use global default' },
-                              ),
-                            },
-                            {
-                              value: 'on',
-                              text: i18n.translate(
-                                'wazuhAiAssistant.settings.privacy.perProviderOn',
-                                { defaultMessage: 'On' },
-                              ),
-                            },
-                            {
-                              value: 'off',
-                              text: i18n.translate(
-                                'wazuhAiAssistant.settings.privacy.perProviderOff',
-                                { defaultMessage: 'Off' },
-                              ),
-                            },
-                          ]}
-                          value={providerPrivacyOverride(
-                            // Defensive fallback: `privacyDefaultPerProvider` should always be
-                            // present on a loaded/saved AssistantSettings, but a falsy value here
-                            // must never crash the render — it just reads as "every provider
-                            // inherits", the same as an explicitly empty map.
-                            privacyDraft.privacyDefaultPerProvider ?? {},
-                            provider.id,
-                          )}
-                          onChange={event =>
-                            handleProviderPrivacyOverrideChange(
+              {/* Stable hook for tests: the mounted-tabs design (B1) keeps the Providers table's
+                  own rows (also named after the provider) in the DOM at the same time as this
+                  list, so an unscoped query for a provider's name is ambiguous between the two —
+                  scope to this container. */}
+              <div data-test-subj='wzPerProviderPrivacyList'>
+                {!providersLoaded ? null : providers.length === 0 ? (
+                  <EuiText size='s' color='subdued'>
+                    {i18n.translate(
+                      'wazuhAiAssistant.settings.privacy.perProviderEmpty',
+                      { defaultMessage: 'No providers configured yet.' },
+                    )}
+                  </EuiText>
+                ) : (
+                  providers.map(provider => (
+                    <React.Fragment key={provider.id}>
+                      <EuiFlexGroup
+                        gutterSize='s'
+                        alignItems='center'
+                        responsive={false}
+                      >
+                        <EuiFlexItem>
+                          <EuiText size='s' title={provider.name}>
+                            {provider.name}
+                          </EuiText>
+                        </EuiFlexItem>
+                        <EuiFlexItem grow={false} style={{ minWidth: 200 }}>
+                          <EuiSelect
+                            compressed
+                            aria-label={i18n.translate(
+                              'wazuhAiAssistant.settings.privacy.perProviderSelectAriaLabel',
+                              {
+                                defaultMessage: 'Privacy override for {name}',
+                                values: { name: provider.name },
+                              },
+                            )}
+                            options={[
+                              {
+                                value: 'inherit',
+                                text: i18n.translate(
+                                  'wazuhAiAssistant.settings.privacy.perProviderInherit',
+                                  { defaultMessage: 'Use global default' },
+                                ),
+                              },
+                              {
+                                value: 'on',
+                                text: i18n.translate(
+                                  'wazuhAiAssistant.settings.privacy.perProviderOn',
+                                  { defaultMessage: 'On' },
+                                ),
+                              },
+                              {
+                                value: 'off',
+                                text: i18n.translate(
+                                  'wazuhAiAssistant.settings.privacy.perProviderOff',
+                                  { defaultMessage: 'Off' },
+                                ),
+                              },
+                            ]}
+                            value={providerPrivacyOverride(
+                              // Defensive fallback: `privacyDefaultPerProvider` should always be
+                              // present on a loaded/saved AssistantSettings, but a falsy value
+                              // here must never crash the render — it just reads as "every
+                              // provider inherits", the same as an explicitly empty map.
+                              privacyDraft.privacyDefaultPerProvider ?? {},
                               provider.id,
-                              event.target.value as ProviderPrivacyOverride,
-                            )
-                          }
-                        />
-                      </EuiFlexItem>
-                    </EuiFlexGroup>
-                    <EuiSpacer size='xs' />
-                  </React.Fragment>
-                ))
-              )}
+                            )}
+                            onChange={event =>
+                              handleProviderPrivacyOverrideChange(
+                                provider.id,
+                                event.target.value as ProviderPrivacyOverride,
+                              )
+                            }
+                          />
+                        </EuiFlexItem>
+                      </EuiFlexGroup>
+                      <EuiSpacer size='xs' />
+                    </React.Fragment>
+                  ))
+                )}
+              </div>
 
               {/* `className` caps the rule at the content measure (settings-page.scss):
                   a full-bleed 1150px hairline over one button read as a page
