@@ -677,7 +677,8 @@ $wzMsgAvatarColumn: 40px;
      travelling, which is exactly when this must NOT run — the chrome is transparent throughout the
      travel and only fades in once the row has arrived. */
   .wzComposerRow {
-    transition: background-color $wzMotionSlow $wzEase,
+    transition:
+      background-color $wzMotionSlow $wzEase,
       border-color $wzMotionSlow $wzEase;
   }
 

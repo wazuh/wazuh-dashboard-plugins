@@ -2026,13 +2026,17 @@ describe('ChatPage — jump to latest (C2)', () => {
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/^\s*\/\/.*$/gm, '');
 
-    expect(scssRules).toMatch(/\.wzChatPane \{[^}]*grid-template-columns:\s*1fr/);
+    expect(scssRules).toMatch(
+      /\.wzChatPane \{[^}]*grid-template-columns:\s*1fr/,
+    );
     expect(scssRules).toMatch(/\.wzChatTranscript \{[^}]*grid-area:\s*1 \/ 1/);
     expect(scssRules).toMatch(/\.wzJumpToLatest \{[^}]*grid-area:\s*1 \/ 1/);
     // Centred over the measure, not parked in the row's inline-end corner — and with no
     // inline-end margin left over from the corner placement (§3.2).
     expect(scssRules).toMatch(/\.wzJumpToLatest \{[^}]*justify-self:\s*center/);
-    expect(scssRules).not.toMatch(/margin-inline-end:\s*\$wzScrollGutter \+ 24px/);
+    expect(scssRules).not.toMatch(
+      /margin-inline-end:\s*\$wzScrollGutter \+ 24px/,
+    );
     // The prose-offset arithmetic must carry the avatar column's half-width (re-audit §3.2:
     // without it the correction fell 20px short), and the results card must break out of the
     // avatar column (§3.3).

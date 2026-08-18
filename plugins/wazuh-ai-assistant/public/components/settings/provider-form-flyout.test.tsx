@@ -1006,17 +1006,13 @@ describe('ProviderFormFlyout — one tight column (audit §5)', () => {
       path.join(__dirname, 'provider-form-flyout.tsx'),
       'utf8',
     );
-    expect(tsx).toMatch(
-      /<EuiFlyout[^>]*className='wzProviderFlyoutPanel'/s,
-    );
+    expect(tsx).toMatch(/<EuiFlyout[^>]*className='wzProviderFlyoutPanel'/s);
 
     const scss = fs.readFileSync(
       path.join(__dirname, 'provider-form-flyout.scss'),
       'utf8',
     );
-    expect(scss).toMatch(
-      /\.wzProviderFlyoutPanel\s*\{[^}]*max-width:\s*640px/,
-    );
+    expect(scss).toMatch(/\.wzProviderFlyoutPanel\s*\{[^}]*max-width:\s*640px/);
   });
 
   it('stacks Name and API key in one column instead of two', () => {

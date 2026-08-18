@@ -907,7 +907,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         // auto-width inline-block the fixed-layout cell cannot clip, so a truncated string that
         // is still longer than the column paints straight over the Model column — which is what
         // happened once the page gained its 1200px cap and this column narrowed to ~220px.
-        <EuiToolTip content={baseUrl} anchorClassName='wzSettingsEndpointAnchor'>
+        <EuiToolTip
+          content={baseUrl}
+          anchorClassName='wzSettingsEndpointAnchor'
+        >
           <span className='wzSettingsEndpointCell'>
             {middleTruncate(baseUrl)}
           </span>

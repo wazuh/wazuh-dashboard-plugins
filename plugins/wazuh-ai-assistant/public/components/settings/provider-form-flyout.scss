@@ -102,7 +102,10 @@
    means compensating the GROUP still leaves the visible button 12px inside the shared edge
    (re-audit §1.2: Save & test at 1874 vs content at 1886). Compensate the LAST ITEM — the one
    that actually paints the edge — by EUI's own 12px item margin plus the scroll gutter. */
-.wzProviderFlyoutPanel .euiFlyoutFooter > .euiFlexGroup > .euiFlexItem:last-child {
+.wzProviderFlyoutPanel
+  .euiFlyoutFooter
+  > .euiFlexGroup
+  > .euiFlexItem:last-child {
   margin-inline-end: calc(#{$euiSizeM} + #{$wzScrollGutter});
 }
 
@@ -200,7 +203,8 @@
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    transition: background-color $wzMotionFast $wzEase,
+    transition:
+      background-color $wzMotionFast $wzEase,
       border-color $wzMotionFast $wzEase;
   }
 }

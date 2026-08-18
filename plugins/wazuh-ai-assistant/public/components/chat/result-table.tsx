@@ -300,8 +300,7 @@ function renderSeverityBadge(value: unknown): React.ReactNode {
   // staying in sync is an assumption this can't verify at runtime, an object property lookup
   // can't throw, and `bucket` being `undefined` is a normal, handled outcome either way.
   const bucket = SEVERITY_BUCKETS[word as SeverityLevel] as
-    | { color: string; label: string }
-    | undefined;
+    { color: string; label: string } | undefined;
   // `.wzSeverityChip` (result-table.scss) gives every severity the wzStatusChip SHAPE — fully round,
   // 11px semibold — so a severity reads as the same kind of object as the provider status chips on
   // the settings page instead of as EUI's 2px-radius rectangle (audit §3.5). The FILL is deliberately
@@ -542,9 +541,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
         // `undefined`, throwing during render and unmounting the whole chat page (blank screen).
         // Accept both shapes so an EUI behavior change can never crash the app from here again.
         const row = (maybeRow ?? valueOrRow) as
-          | Record<string, unknown>
-          | null
-          | undefined;
+          Record<string, unknown> | null | undefined;
         const rowIndex = Number(row?.__rowId);
         if (!Number.isFinite(rowIndex)) {
           return null;

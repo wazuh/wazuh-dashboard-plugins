@@ -2763,7 +2763,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                           // eye landed on a card title first (audit §1.4, rulebook B8).
                           titleSize='xs'
                           icon={
-                            <EuiIcon type={card.icon} size='l' color='primary' />
+                            <EuiIcon
+                              type={card.icon}
+                              size='l'
+                              color='primary'
+                            />
                           }
                           title={card.title}
                           description={card.question}
