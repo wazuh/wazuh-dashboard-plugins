@@ -39,10 +39,10 @@
  *
  * These specs were authored and every one of their target numbers was hand-verified turn-by-turn
  * against a live instance at https://localhost:8444 (deployed build `50645f4ef`) using a real
- * browser + `getBoundingClientRect`, before being encoded here. Two are expected to be RED right
- * now against that build — each is called out at its assertion with the measured value and the
- * defect it documents, per this task's instruction to encode the intended spec rather than
- * whatever currently renders:
+ * browser + `getBoundingClientRect`/`getComputedStyle`, before being encoded here. One assertion
+ * is expected to be RED right now against that build — called out at its assertion with the
+ * measured value and the defect it documents, per this task's instruction to encode the intended
+ * spec rather than whatever currently renders:
  *
  *   1. The wide/table row's prose and meta/timestamp row measured 22px left of where every other
  *      row's prose sits (397/397 vs the normal row's 419), because
@@ -52,9 +52,19 @@
  *      FULL — a fix for this is being tracked separately (do not "fix" it by loosening these
  *      assertions; they are written to the ~2px noise floor a correct fix lands on, confirmed by
  *      live-patching the rule and re-measuring).
- *   2. The card/prose→footer(meta) row gap measured 6px on this build, not the spec's 8px, on
- *      every row checked (both a card-bearing and a card-less one) — a second, separate
- *      discrepancy this audit turned up that nobody has picked up yet.
+ *
+ * Two other candidates flagged in an earlier pass through this suite — a "24px not 32px" turn
+ * gap, and a "6px not 8px" card/prose→footer gap — turned out, after the same
+ * live-patch-and-re-measure treatment, to be measurement artifacts rather than real defects: both
+ * `.wzMsgRow` and `.wzMsgMetaRow` are themselves `EuiFlexGroup`s, and EUI's gutter compensation
+ * gives each of them a `margin: -Npx` on every side that is exactly cancelled by a `+Npx` margin
+ * on their own flex item(s) — leaving the GROUP's own box N px larger than its visible content on
+ * every side, but with nothing painted in that margin (no background/border/box-shadow) and the
+ * actual avatar/prose/timestamp exactly where they'd be without any of it. Measuring those two
+ * wrapper elements' own rects (rather than the avatar/timestamp elements actually inside them)
+ * undercounted both gaps by exactly that cancelled-out margin. Assertions 7, 8 and 11 below
+ * measure the correct (visible-content) element for this reason; assertion 11's comment has the
+ * full live-patch evidence for anyone re-deriving this.
  */
 
 const QUESTIONS = {
@@ -242,29 +252,32 @@ describe('AI Assistant — transcript geometry', () => {
     });
   });
 
+  // `.wzMsgMetaRow` is itself a `EuiFlexGroup` (`gutterExtraSmall`), which carries EUI's usual
+  // gutter-compensation margin: the GROUP gets `margin: -2px` on every side, and its own flex
+  // item(s) (the timestamp, tool-call chips) get `margin: 2px` back — a self-cancelling pair
+  // that keeps the group's actual VISIBLE content flush with where it would sit with no gutter
+  // machinery at all. That makes the group's own `getBoundingClientRect()` a 2px-oversized,
+  // unpainted box (no background/border/box-shadow: confirmed via computed style), not the
+  // visible edge a reader perceives — reading `.wzMsgMetaRow` itself under-counts this gap by
+  // exactly the 2px its own margin borrows. `.wzAiAssistantMessageTimestamp` is the actual
+  // visible content and is what these two assertions measure against.
   it('7. prose→results-card is 16px; card→footer(meta) row is 8px', () => {
     cy.get('.wzMessageRow').eq(WIDE_ROW).then($row => {
       const prose = rectOf($row.find('.wzProseMeasure').first());
       const card = rectOf($row.find('.wzResultsCard').first());
-      const meta = rectOf($row.find('.wzMsgMetaRow').first());
+      const timestamp = rectOf($row.find('.wzAiAssistantMessageTimestamp').first());
 
       expect(card.top - prose.bottom, 'prose.bottom -> card.top').to.be.closeTo(16, PX);
-
-      // KNOWN RED on build 50645f4ef (see file banner, defect 2): measured 6px on this build,
-      // not the spec's 8px. Independent of, and not fixed by, the wide-row prose/meta drift fix
-      // tracked for assertion 4 above.
-      expect(meta.top - card.bottom, 'card.bottom -> meta.top').to.be.closeTo(8, PX);
+      expect(timestamp.top - card.bottom, 'card.bottom -> timestamp.top').to.be.closeTo(8, PX);
     });
   });
 
   it('8. prose→footer(meta) row is 8px on a card-less row too', () => {
     cy.get('.wzMessageRow').eq(BADGE_ROW).then($row => {
       const prose = rectOf($row.find('.wzProseMeasure').first());
-      const meta = rectOf($row.find('.wzMsgMetaRow').first());
+      const timestamp = rectOf($row.find('.wzAiAssistantMessageTimestamp').first());
 
-      // KNOWN RED on build 50645f4ef (see file banner, defect 2): same 6px-not-8px gap as
-      // assertion 7's card->footer case, confirming it is not specific to the card being present.
-      expect(meta.top - prose.bottom, 'prose.bottom -> meta.top').to.be.closeTo(8, PX);
+      expect(timestamp.top - prose.bottom, 'prose.bottom -> timestamp.top').to.be.closeTo(8, PX);
     });
   });
 
@@ -309,25 +322,28 @@ describe('AI Assistant — transcript geometry', () => {
     });
   });
 
-  it('11. [documents a known variance, not a hard spec target] the VISIBLE content-to-content gap is currently 24px, not 32px, due to a symmetric -4px margin leak on .wzMsgRow', () => {
-    // `.wzMessageRow` itself (assertion 1) measures a clean 32px because `display: flow-root`
-    // (chat-page.scss, iteration-4 audit P0 item 1) stops the child flex group's negative gutter
-    // margin from shrinking the NEXT row's structural position. It does not stop that same
-    // negative margin from letting the child's own rendered box poke 4px past `.wzMessageRow`'s
-    // top AND bottom edges (flow-root affects auto-height/margin-collapse, not paint/clipping,
-    // and `.wzMessageRow` deliberately carries no `overflow: hidden`, which would clip a wide
-    // row's breakout content). Net effect: 32px - 4px - 4px = 24px of actual visible whitespace
-    // between one turn's avatar/text and the next's, even though the `.wzMessageRow`-level
-    // measurement in assertion 1 is exactly on-spec. This assertion pins the CURRENT number so a
-    // future change cannot silently shrink it further (e.g. to 16 or 0) without this suite
-    // noticing — it intentionally does not assert 32, which would just re-fail assertion 1's own
-    // finding under a different name.
-    messageRows().then($rows => {
-      const innerRects = [...$rows].map(row => row.querySelector('.wzMsgRow').getBoundingClientRect());
-      for (let i = 1; i < innerRects.length; i++) {
-        const gap = innerRects[i].top - innerRects[i - 1].bottom;
-        expect(gap, `visible-content gap between row ${i - 1} and row ${i}`).to.be.closeTo(24, PX);
-      }
+  it('11. the VISIBLE avatar/content box (not the invisible EuiFlexGroup wrapper) is exactly flush with .wzMessageRow on every row — confirming the 32px gap (assertion 1) is real ink, not a measurement artifact', () => {
+    // An earlier pass through this suite measured `.wzMsgRow` itself (the row's own
+    // `EuiFlexGroup`, `gutterSmall`) between consecutive rows and got 24px, not 32 — and wrongly
+    // reported that as a real "visible gap" defect. `.wzMsgRow` carries EUI's usual
+    // gutter-compensation pair (`margin: -4px` on the group, `margin: 4px` on each flex item,
+    // confirmed via computed style), which is self-cancelling BY DESIGN: it lets the group's own
+    // box run 4px past its content on every side while the actual avatar/content stay exactly
+    // where they'd be without any of this machinery. `.wzMsgRow` paints nothing of its own
+    // (`background-color: rgba(0,0,0,0)`, no border, no box-shadow — confirmed via computed
+    // style) so that 4px is never rendered; treating its rect as "the visible content" was the
+    // error, not the CSS. Live-patching `.wzMsgRow`'s margin-top/bottom to 0 and re-measuring
+    // proved this two ways: the row grew 8px taller and the avatar shifted 4px away from the
+    // row's own edge — i.e. "fixing" it makes the rendering WORSE, not better. No SCSS change is
+    // warranted here; this assertion instead locks in the actual invariant (avatar/content flush
+    // with the row) so a future change to the gutter-compensation margins can't quietly break it.
+    [1, 3, 5].forEach(i => {
+      cy.get('.wzMessageRow').eq(i).then($row => {
+        const row = rectOf($row);
+        const avatar = rectOf($row.find('.wzMsgAvatarItem').first());
+        expect(avatar.top, `row ${i}: avatar.top == row.top`).to.be.closeTo(row.top, PX);
+        expect(avatar.bottom, `row ${i}: avatar.bottom == row.bottom`).to.be.closeTo(row.bottom, PX);
+      });
     });
   });
 });
