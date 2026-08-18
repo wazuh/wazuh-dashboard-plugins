@@ -46,10 +46,14 @@
  * left the avatar (and card) short of the prose rail, so the avatar drifted ~120px left of where a
  * prose-only turn's avatar sits and the prose/meta landed 22px short of the normal rail. The
  * ux-iteration-4 fix removed that scheme: `.wzMessageRow--wide` now anchors its own inline-start
- * edge at the normal row's and takes its extra width on the right side only, so avatar/prose/meta
- * all keep their normal x and only the results card reaches wider. Assertion 4 encodes that fixed
- * spec (do not "fix" a regression by loosening it; the tolerances are the ~2px noise floor a correct
- * fix lands on, confirmed by live-patching the rule and re-measuring).
+ * edge at the normal row's, so avatar/prose/meta all keep their normal x. A SECOND ux-iteration-4
+ * revision (owner's "bound the table by the chat box" call) then capped the wide row at the shared
+ * content measure ($wzContentMaxWidth) instead of a wider table-only $wzTableMaxWidth: the results
+ * card now fills the content column to its right edge — which lands on the COMPOSER's own right edge
+ * — and never overshoots it, at every viewport. Assertion 4 encodes that fixed spec (do not "fix" a
+ * regression by loosening it; the tolerances are the ~2px noise floor a correct fix lands on, plus a
+ * small scrollbar-gutter allowance on the card→composer right-edge match, confirmed by live-patching
+ * the rule and re-measuring at both 1920px and 1280px).
  *
  * Two other candidates flagged in an earlier pass through this suite — a "24px not 32px" turn
  * gap, and a "6px not 8px" card/prose→footer gap — turned out, after the same
@@ -75,6 +79,11 @@ const QUESTIONS = {
 // couple of px of built-in EUI flex-gutter offset is present on card-less rows too, so this is
 // not "loose enough to hide a regression" — a regression here reads in the tens of px, not this.
 const WIDE_ROW_PROSE_TOLERANCE_PX = 4;
+// Card→composer right-edge match allowance: the transcript reserves a ~10px scrollbar gutter
+// (`scrollbar-gutter: stable`, chat-page.scss) that the composer row does not, so the card's right
+// edge can land a few px INSIDE the composer's right edge. The card must never sit OUTSIDE it (that
+// separate `at.most` check has no such slack) — this only allows the small inward gutter offset.
+const CARD_TO_COMPOSER_RIGHT_TOLERANCE_PX = 12;
 // General sub-pixel/rounding tolerance for exact-integer spec targets (16, 4, 32, ...).
 const PX = 1;
 
@@ -179,7 +188,7 @@ describe('AI Assistant — transcript geometry', () => {
     });
   });
 
-  it('4. avatar, prose and meta sit at the SAME absolute x on a wide row as on a normal row; only the results card reaches wider, and only to the right', () => {
+  it('4. avatar, prose and meta sit at the SAME absolute x on a wide row as on a normal row; the results card fills the content column and its right edge lands on (never past) the composer right edge', () => {
     cy.get('.wzMessageRow').eq(PROSE_ROW).then($proseRow => {
       const normalRow = rectOf($proseRow);
       const avatar = rectOf($proseRow.find('.wzMsgAvatarItem').first());
@@ -209,15 +218,29 @@ describe('AI Assistant — transcript geometry', () => {
         expect(wideMeta.left, 'wide row: meta.left == normal row prose rail')
           .to.be.closeTo(prose.left, WIDE_ROW_PROSE_TOLERANCE_PX);
 
-        // The results card is the ONLY thing that widens, and it widens to the RIGHT: its left edge
-        // aligns with the prose column (avatarX + 40), never breaking out leftward, while the wide
-        // row's own right edge extends past where a normal row ends.
+        // The results card fills the content column and is BOUNDED by it: its left edge aligns with
+        // the prose column (avatarX + 40), never breaking out leftward, and its right edge lands on
+        // the composer's own right edge — never past it — instead of reaching a wider table-only cap.
         expect(wideCard.left, 'wide row: card.left == prose rail (avatarX + 40), not the avatar edge')
           .to.be.closeTo(prose.left, WIDE_ROW_PROSE_TOLERANCE_PX);
         expect(wideRow.left, 'wide row left edge == normal row left edge')
           .to.be.closeTo(normalRow.left, WIDE_ROW_PROSE_TOLERANCE_PX);
-        expect(wideRow.right, 'wide row extends further right than a normal row')
-          .to.be.greaterThan(normalRow.right + 1);
+        // Bounded, not breaking out: the wide row no longer extends past a normal row — both cap at
+        // $wzContentMaxWidth now that the table-only breakout is gone.
+        expect(wideRow.right, 'wide row right edge == normal row right edge (both at the content measure)')
+          .to.be.closeTo(normalRow.right, WIDE_ROW_PROSE_TOLERANCE_PX);
+
+        cy.get('.wzComposerMeasure').then($composer => {
+          const composer = rectOf($composer);
+          // The owner's "bound the table by the chat box" call: the card's right edge sits AT the
+          // composer's right edge and NEVER overshoots it (the earlier ~1300px table cap stuck out
+          // ~235px past the composer on a 1920px window). It may land a few px inside — the
+          // transcript reserves a scrollbar gutter the composer does not — but never outside.
+          expect(wideCard.right, 'card.right never overshoots composer.right')
+            .to.be.at.most(composer.right + PX);
+          expect(wideCard.right, 'card.right aligns with composer.right (within the scrollbar gutter)')
+            .to.be.closeTo(composer.right, CARD_TO_COMPOSER_RIGHT_TOLERANCE_PX);
+        });
       });
     });
   });

@@ -437,11 +437,11 @@ $wzWelcomeFadeOut: 180ms;
  * `CONVERSATION_MAX_WIDTH = 860` constant chat-page.tsx used to keep in parallel with it.
  *
  * A table-bearing message row is deliberately NOT inside this element (see `.wzMessageRow` below):
- * this used to wrap the whole transcript, including `MessageList`, which capped every row's own
- * "may break out to `min(100%, $wzTableMaxWidth)`" (message-bubble.tsx) against THIS column's own
- * 1060px box — so it could never resolve past ~1012px (1060 minus this element's own padding) at
- * any window width. `$wzTableMaxWidth` had zero consumers for the same reason: nothing could
- * actually reach it while every row lived inside this cap.
+ * this used to wrap the whole transcript, including `MessageList`, so a table row could not size
+ * itself independently of this shared 1060px column and every row's own width resolved against
+ * THIS element's padded box. Each row now centres on the content measure on its own
+ * (`.wzMessageRow`), which is what lets a table row fill that measure to its right edge while prose
+ * stays capped at 68ch.
  */
 .wzContentMeasure {
   max-width: $wzContentMaxWidth;
@@ -555,11 +555,11 @@ $wzWelcomeFadeOut: 180ms;
 }
 
 /**
- * Per-turn measure (contract §5): each transcript row centres itself independently instead of the
- * whole transcript sharing one column — this is what actually lets a table-bearing turn reach
- * `min(100%, $wzTableMaxWidth)` (message-bubble.tsx's own bubble-level cap resolves against THIS
- * row's width, not `.wzContentMeasure`'s 1060px one, now that `MessageList` is `.wzTranscriptContent`'s
- * sibling rather than `.wzContentMeasure`'s descendant).
+ * Per-turn measure (contract §5): each transcript row centres itself independently on the content
+ * measure instead of the whole transcript sharing one column. A table-bearing turn (`--wide`
+ * below) fills this same measure to its right edge with the results card, while a prose turn caps
+ * its text at 68ch inside it — both bounded by the one content column the composer also uses, so a
+ * table's right edge lands on the composer's right edge rather than reaching past it.
  */
 .wzMessageRow {
   max-width: $wzContentMaxWidth;
@@ -579,26 +579,35 @@ $wzWelcomeFadeOut: 180ms;
   display: flow-root;
 
   /**
-   * A table-bearing turn is the only one allowed to reach past the prose column — and it reaches
-   * only to the RIGHT. It pins its inline-start edge exactly where a normal ($wzContentMaxWidth)
-   * row's does: `margin-inline-start` reproduces that centred row's own start offset,
-   * `(100% - $wzContentMaxWidth) / 2` (floored at 0 for a pane narrower than the measure, where a
-   * normal row's own `margin: 0 auto` also collapses to 0), and then `width: auto` +
-   * `margin-inline-end: 0` take the remaining room on the end side alone, up to $wzTableMaxWidth.
-   * So the avatar, the prose and the meta/footer row all keep the exact same inline-start x they
-   * hold on every other turn — the avatars line up turn-to-turn instead of drifting left on table
-   * answers — and only the results card inside stretches wider. Because the used width can never
-   * exceed the space left after that start margin, the row's end edge stays within the transcript
-   * gutter at every pane width, so widening a turn never introduces a horizontal scrollbar.
+   * A table-bearing turn fills the SAME content column the composer uses ($wzContentMaxWidth) and
+   * is BOUNDED by it: the results card reaches from the prose rail to that column's right edge and
+   * never past it, so the card's right edge lands on the composer's own right edge at every
+   * viewport instead of overshooting to a wider table-only cap on wide screens. (Owner's
+   * iteration-4 call: the earlier `$wzTableMaxWidth` ~1300px breakout "stuck out" past the composer
+   * on a wide window — at a narrow window it happened to stop at the composer's edge, and that
+   * bounded-by-the-chat-box look is the one wanted at ALL widths.) The client column-count budget
+   * (`MAX_VISIBLE_RESULT_COLUMNS` = 6, common/types.ts) keeps every column visible at this width,
+   * so capping here never forces the horizontal scroll that budget already rules out.
    *
-   * This REPLACES an earlier per-element scheme (a `-$wzMsgAvatarColumn` breakout on the avatar and
-   * the card, plus a `calc()` inline-start nudge on the prose and meta rows): centring the wider row
-   * 120px further left and then pulling four separate edges back toward two left the avatar and the
-   * card short of the prose rail — exactly the leftward avatar drift this single rule removes.
+   * Anchoring is unchanged from the anti-drift fix: `margin-inline-start` reproduces a normal
+   * centred row's own start offset (`(100% - $wzContentMaxWidth) / 2`, floored at 0 for a pane
+   * narrower than the measure, where a normal row's `margin: 0 auto` also collapses to 0), and
+   * `width: auto` + `margin-inline-end: 0` take any remaining room on the end side only. So the
+   * avatar, the prose and the meta/footer row all keep the exact inline-start x they hold on every
+   * other turn — avatars line up turn-to-turn instead of drifting left on table answers — and the
+   * used width can never exceed the content measure, so the row's end edge stays within the
+   * transcript gutter at every pane width and widening a turn never introduces a horizontal
+   * scrollbar.
+   *
+   * This REPLACES two earlier schemes in turn: first a `-$wzMsgAvatarColumn` per-element breakout
+   * (which drifted the avatar left of the prose rail), then a right-only stretch to a table-only
+   * `$wzTableMaxWidth` cap WIDER than the content column (which overshot the composer's right edge
+   * on wide windows). The card now shares the prose's left edge AND the composer's right edge —
+   * anchored on both, floating on neither.
    */
   &.wzMessageRow--wide {
     width: auto;
-    max-width: $wzTableMaxWidth;
+    max-width: $wzContentMaxWidth;
     margin-inline-start: max(0px, calc((100% - #{$wzContentMaxWidth}) / 2));
     margin-inline-end: 0;
   }

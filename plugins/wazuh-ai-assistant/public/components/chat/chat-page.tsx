@@ -2807,10 +2807,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 )}
               </div>
               {/* `MessageList` is `.wzContentMeasure`'s SIBLING inside `.wzTranscriptContent`, not its
-              descendant — see this file's `.wzTranscriptContent` doc comment above. Nesting it
-              inside `.wzContentMeasure` (the pre-fix shape) capped every row's own breakout width
-              against that element's 1060px measure, which is why a table-bearing turn could never
-              actually reach `min(100%, $wzTableMaxWidth)` regardless of window width. */}
+              descendant — see this file's `.wzTranscriptContent` doc comment above. Each message row
+              centres on the content measure independently (`.wzMessageRow`), so a table-bearing turn
+              fills that column to its right edge (bounded by the composer's own column) instead of
+              being nested inside another copy of it. */}
               {!showLoadingState &&
                 !showNoProviderState &&
                 !showWelcomeState && (

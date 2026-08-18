@@ -32,8 +32,9 @@ $wzCardPaddingRoomy: 24px;
 
 /* --- Measure and gutters (layout contract §5) --------------------------------------------------
    Prose and the composer share one centred column so they stay optically locked as the window
-   grows; only tables may break out. Extra width at 1920 goes to the rail and gutters, never to
-   line length. */
+   grows; a results table fills that same column to its right edge but is bounded by it (never past
+   the composer's right edge). Extra width at 1920 goes to the rail and gutters, never to line
+   length. */
 $wzContentMaxWidth: 1060px;
 /* Welcome-only cluster width (iteration-4 item C): the empty state's greeting, example-card grid
    and composer measure all cap here instead of the docked surface's 1060px — a live audit call
@@ -41,13 +42,12 @@ $wzContentMaxWidth: 1060px;
    than $wzContentMaxWidth, applied only under `.wzChatPane--welcome` (chat-page.scss); the docked
    surface is untouched. */
 $wzWelcomeGroupMaxWidth: 840px;
-$wzTableMaxWidth: 1300px;
 $wzProseMeasure: 68ch;
 /* Settings is its own page, not chat prose, so it does not share $wzContentMaxWidth: the
    providers table has 9 fixed-percentage columns (settings-page.tsx) and needs more breathing
    room than a centred column of prose or form fields would call for. Wider than
-   $wzContentMaxWidth, narrower than $wzTableMaxWidth (that one caps a table breaking OUT of the
-   chat column at the transcript's widest point, not a whole page's own measure). */
+   $wzContentMaxWidth — a whole page's own measure, not a chat turn bounded by the composer's
+   content column (a results table in the chat now fills $wzContentMaxWidth and stops there). */
 $wzSettingsMaxWidth: 1200px;
 
 /* --- Composer floor and ceiling (layout contract §2) -------------------------------------------

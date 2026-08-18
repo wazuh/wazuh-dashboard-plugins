@@ -396,7 +396,8 @@ describe('MessageBubble', () => {
   });
 
   // Layout contract §5 ("one measure, one gutter"): prose is held to a fixed reading measure;
-  // only block content (a result table) is allowed to break out past it, up to $wzTableMaxWidth.
+  // block content (a result table) fills the wider content column up to $wzContentMaxWidth — the
+  // same column the composer uses — but is bounded by it, never reaching past the composer's edge.
   describe('prose measure vs. table breakout (layout contract §5)', () => {
     it('holds a prose-only assistant answer to the shared reading measure', () => {
       render(
@@ -439,27 +440,33 @@ describe('MessageBubble', () => {
       );
     });
 
-    it('keeps avatar, prose and meta on the same left edge in a table-carrying (--wide) row', () => {
+    it('keeps avatar, prose and meta on the same left edge in a table-carrying (--wide) row, bounded at the content column', () => {
       // The drift this pins (css-audit-full.md §3.1 and the owner's live report that avatars sit
-      // further left on table answers): a `--wide` row is capped at $wzTableMaxWidth and a normal
-      // row at $wzContentMaxWidth. The earlier scheme centred the wider row — (1300 - 1060) / 2 =
-      // 120px further out — and then tried to pull four separate edges back with per-element calc
+      // further left on table answers): the earlier per-element scheme centred the wider row 120px
+      // further out and then tried to pull four separate edges back with per-element calc
       // corrections, which left the avatar and card short of the prose rail. The wide row now
       // instead ANCHORS its own inline-start edge at the normal row's (`margin-inline-start: max(0px,
       // (100% - $wzContentMaxWidth) / 2)`, the same offset a normal row's `margin: 0 auto` produces)
-      // and takes its extra width on the end side only (`width: auto; margin-inline-end: 0`), so the
-      // avatar, prose and meta all keep their normal x with no per-element correction and only the
-      // results card inside reaches wider. It reads the source directly because jest maps `.scss` to
-      // a style mock, so no rendered assertion can observe a value that came from a stylesheet.
+      // and takes any remaining room on the end side only (`width: auto; margin-inline-end: 0`), so
+      // the avatar, prose and meta all keep their normal x with no per-element correction. The cap is
+      // $wzContentMaxWidth — the SAME content column the composer uses (owner's iteration-4 call:
+      // bound the table by the chat box) — NOT a wider table-only $wzTableMaxWidth, so the card's
+      // right edge lands on the composer's right edge instead of overshooting it on wide windows. It
+      // reads the source directly because jest maps `.scss` to a style mock, so no rendered assertion
+      // can observe a value that came from a stylesheet.
       const scssSource = fs.readFileSync(
         path.join(__dirname, 'chat-page.scss'),
         'utf8',
       );
-      // The whole wide-row treatment lives on the row itself now, as an anchored inline-start plus a
-      // right-only stretch — no restated 120px, derived from the shared measure token.
+      // The whole wide-row treatment lives on the row itself: an anchored inline-start plus a
+      // right-only stretch, capped at the shared content measure (not a wider table-only token).
       expect(scssSource).toMatch(
-        /&\.wzMessageRow--wide \{[\s\S]*?width: auto;[\s\S]*?max-width: \$wzTableMaxWidth;[\s\S]*?margin-inline-start: max\(0px, calc\(\(100% - #\{\$wzContentMaxWidth\}\) \/ 2\)\);[\s\S]*?margin-inline-end: 0;/,
+        /&\.wzMessageRow--wide \{[\s\S]*?width: auto;[\s\S]*?max-width: \$wzContentMaxWidth;[\s\S]*?margin-inline-start: max\(0px, calc\(\(100% - #\{\$wzContentMaxWidth\}\) \/ 2\)\);[\s\S]*?margin-inline-end: 0;/,
       );
+      // The retired table-only breakout is gone: no rule caps the wide row at $wzTableMaxWidth any
+      // more (the token itself is removed from _redesign.scss; only history-explaining comments here
+      // still name it). Matched as a DECLARATION, not a bare mention, so those comments pass.
+      expect(scssSource).not.toMatch(/max-width:\s*\$wzTableMaxWidth/);
       // The old per-element left corrections are gone: the avatar no longer breaks left, the card no
       // longer breaks out to the avatar's edge, and prose/meta no longer carry a wide-row margin.
       expect(scssSource).not.toMatch(/\.wzMessageRow--wide \.wzProseMeasure/);
@@ -506,10 +513,11 @@ describe('MessageBubble', () => {
       const bubbleItem = screen
         .getByText('Results (1 rows)')
         .closest('.euiFlexItem') as HTMLElement;
-      // Breaking out means declining the prose measure and filling whatever the ROW allows. The
-      // 1300px ceiling itself is `.wzMessageRow--wide`'s (chat-page.scss), applied one level up and
-      // asserted in message-list.test.tsx — restating it inline here was a second copy of that
-      // number with nothing keeping the two in step.
+      // Breaking out means declining the 68ch prose measure and filling whatever the ROW allows —
+      // which is now the shared content column ($wzContentMaxWidth), still wider than the prose. The
+      // row-level cap itself lives on `.wzMessageRow--wide` (chat-page.scss), applied one level up
+      // and asserted in message-list.test.tsx; restating it inline here would be a second copy with
+      // nothing keeping the two in step.
       expect(bubbleItem).not.toHaveClass('wzProseMeasure');
       expect(bubbleItem.style.maxWidth).toBe('100%');
     });
