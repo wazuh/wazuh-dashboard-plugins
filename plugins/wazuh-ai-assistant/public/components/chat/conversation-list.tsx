@@ -11,6 +11,7 @@ import {
   EuiSpacer,
   EuiConfirmModal,
   EuiLoadingSpinner,
+  EuiToolTip,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { ConversationSummary } from '../../../common/types';
@@ -339,24 +340,37 @@ export const ConversationList: React.FC<ConversationListProps> = ({
     // is actually usable at this width.
     return (
       <div className='wzConvoRailCollapsed'>
-        <EuiButtonIcon
-          iconType='plusInCircle'
-          aria-label={i18n.translate(
-            'wazuhAiAssistant.chat.conversations.new',
-            {
-              defaultMessage: 'New conversation',
-            },
-          )}
-          onClick={onNewConversation}
-        />
-        <EuiButtonIcon
-          iconType='search'
-          aria-label={i18n.translate(
+        <EuiToolTip
+          content={i18n.translate('wazuhAiAssistant.chat.conversations.new', {
+            defaultMessage: 'New conversation',
+          })}
+        >
+          <EuiButtonIcon
+            iconType='plusInCircle'
+            aria-label={i18n.translate(
+              'wazuhAiAssistant.chat.conversations.new',
+              {
+                defaultMessage: 'New conversation',
+              },
+            )}
+            onClick={onNewConversation}
+          />
+        </EuiToolTip>
+        <EuiToolTip
+          content={i18n.translate(
             'wazuhAiAssistant.chat.conversations.searchPlaceholder',
             { defaultMessage: 'Search conversations' },
           )}
-          onClick={() => onExpand?.()}
-        />
+        >
+          <EuiButtonIcon
+            iconType='search'
+            aria-label={i18n.translate(
+              'wazuhAiAssistant.chat.conversations.searchPlaceholder',
+              { defaultMessage: 'Search conversations' },
+            )}
+            onClick={() => onExpand?.()}
+          />
+        </EuiToolTip>
         <div className='wzConvoRailCollapsedSpacer' />
         <EuiButtonIcon
           iconType='arrowRight'

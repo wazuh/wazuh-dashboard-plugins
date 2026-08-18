@@ -11,6 +11,7 @@ jest.mock('../chat/chat-page', () => ({
     onGeneratingChange?: (generating: boolean) => void;
     onNavigateToSettings: () => void;
     showConversationSidebar?: boolean;
+    railDisplayModeOverride?: 'expanded' | 'collapsed';
     allowRailFlyout?: boolean;
   }) =>
     mockReact.createElement(
@@ -18,6 +19,7 @@ jest.mock('../chat/chat-page', () => ({
       {
         'data-test-subj': 'chat-page-stub',
         'data-sidebar': String(props.showConversationSidebar),
+        'data-rail-mode': String(props.railDisplayModeOverride),
         'data-allow-rail-flyout': String(props.allowRailFlyout),
       },
       mockReact.createElement(
@@ -175,14 +177,17 @@ describe('AssistantChatPanel', () => {
     expect(fireUnload().defaultPrevented).toBe(false);
   });
 
-  it('hides the conversations sidebar while the panel is narrow', () => {
-    // jsdom reports offsetWidth 0, i.e. narrower than the sidebar threshold.
+  it('always renders the rail — narrower than the auto-expand threshold defaults to collapsed', () => {
+    // jsdom reports offsetWidth 0, i.e. narrower than the auto-expand threshold. The rail must
+    // still be RENDERED (never hidden outright) so "New conversation" and "Search" stay reachable
+    // without an extra click — only its mode (collapsed here) is width-driven.
     renderPanel();
 
-    expect(chatPageStub()).toHaveAttribute('data-sidebar', 'false');
+    expect(chatPageStub()).toHaveAttribute('data-sidebar', 'true');
+    expect(chatPageStub()).toHaveAttribute('data-rail-mode', 'collapsed');
   });
 
-  it('shows the conversations sidebar once the panel is wide enough', () => {
+  it('auto-prefers the expanded rail once the panel is wide enough', () => {
     const widthSpy = jest
       .spyOn(HTMLElement.prototype, 'offsetWidth', 'get')
       .mockReturnValue(800);
@@ -190,20 +195,22 @@ describe('AssistantChatPanel', () => {
     renderPanel();
 
     expect(chatPageStub()).toHaveAttribute('data-sidebar', 'true');
+    expect(chatPageStub()).toHaveAttribute('data-rail-mode', 'expanded');
     widthSpy.mockRestore();
   });
 
-  it('makes the conversations list reachable from a narrow panel via the toolbar toggle', () => {
-    // jsdom reports offsetWidth 0, i.e. narrower than the auto-show threshold.
+  it('expands the rail from a narrow panel via the toolbar toggle', () => {
+    // jsdom reports offsetWidth 0, i.e. narrower than the auto-expand threshold.
     renderPanel();
-    expect(chatPageStub()).toHaveAttribute('data-sidebar', 'false');
+    expect(chatPageStub()).toHaveAttribute('data-rail-mode', 'collapsed');
 
-    fireEvent.click(screen.getByLabelText('Show saved conversations'));
+    fireEvent.click(screen.getByLabelText('Expand saved conversations'));
 
     expect(chatPageStub()).toHaveAttribute('data-sidebar', 'true');
+    expect(chatPageStub()).toHaveAttribute('data-rail-mode', 'expanded');
   });
 
-  it('keeps a manually-closed sidebar closed across a resize that would otherwise auto-show it', () => {
+  it('keeps a manually-expanded rail expanded across a resize that would otherwise auto-collapse it', () => {
     // jsdom has no ResizeObserver; stub one whose callback this test can re-trigger on demand
     // to simulate a later resize (distinct from the mount-time `update()` call, which runs
     // regardless of ResizeObserver's existence).
@@ -222,17 +229,18 @@ describe('AssistantChatPanel', () => {
       ResizeObserverStub;
     const widthSpy = jest
       .spyOn(HTMLElement.prototype, 'offsetWidth', 'get')
-      .mockReturnValue(800);
+      .mockReturnValue(500);
 
     renderPanel();
-    expect(chatPageStub()).toHaveAttribute('data-sidebar', 'true');
+    expect(chatPageStub()).toHaveAttribute('data-rail-mode', 'collapsed');
 
-    fireEvent.click(screen.getByLabelText('Hide saved conversations'));
-    expect(chatPageStub()).toHaveAttribute('data-sidebar', 'false');
+    fireEvent.click(screen.getByLabelText('Expand saved conversations'));
+    expect(chatPageStub()).toHaveAttribute('data-rail-mode', 'expanded');
 
-    // A later resize (still wide) must not silently reopen it once the user has closed it.
+    // A later resize (still narrow) must not silently re-collapse it once the user has expanded it.
     triggerResize?.();
-    expect(chatPageStub()).toHaveAttribute('data-sidebar', 'false');
+    expect(chatPageStub()).toHaveAttribute('data-rail-mode', 'expanded');
+    expect(chatPageStub()).toHaveAttribute('data-sidebar', 'true');
 
     widthSpy.mockRestore();
     (window as unknown as { ResizeObserver: unknown }).ResizeObserver =

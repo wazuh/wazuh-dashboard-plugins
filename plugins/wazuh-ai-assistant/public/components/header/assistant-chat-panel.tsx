@@ -24,8 +24,12 @@ interface AssistantChatPanelProps {
   isGeneratingRef: React.MutableRefObject<boolean>;
 }
 
-/** Panel width from which the saved-conversations sidebar fits beside the chat column without
- * the toolbar toggle below — it still opens narrower than this on request. */
+/** Panel width above which the saved-conversations rail auto-prefers its expanded form (a full
+ * list, not just the collapsed icon strip) — below it the icon strip is the auto default, though
+ * either width can still be overridden by the toolbar toggle below. Below this width the rail is
+ * NEVER hidden outright: ChatPage's own `allowRailFlyout={false}` already caps it at the collapsed
+ * strip rather than a full-screen flyout, so "New conversation" and "Search" stay reachable at any
+ * panel width without an extra click. */
 const SIDEBAR_MIN_PANEL_WIDTH = 600;
 
 export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
@@ -46,11 +50,14 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
   );
   const titleId = useId();
   const rootRef = useRef<HTMLElement>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  // Whether the rail PREFERS its expanded form over the collapsed icon strip — never whether it
+  // renders at all (see `SIDEBAR_MIN_PANEL_WIDTH`'s own doc comment above: the rail is always
+  // shown, at minimum as the collapsed strip). Passed to ChatPage as `railDisplayModeOverride`.
+  const [railExpanded, setRailExpanded] = useState(false);
   // Flipped the first time the toolbar toggle below is used: once the user has taken explicit
-  // control of the sidebar, further panel resizes must not silently override their choice (the
+  // control of the rail's mode, further panel resizes must not silently override their choice (the
   // resize-driven default below is a starting point, not a standing rule).
-  const sidebarManuallySetRef = useRef(false);
+  const railModeManuallySetRef = useRef(false);
 
   const handleGeneratingChange = useCallback(
     (generating: boolean) => {
@@ -76,10 +83,10 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
       return undefined;
     }
     const update = () => {
-      if (sidebarManuallySetRef.current) {
+      if (railModeManuallySetRef.current) {
         return;
       }
-      setSidebarOpen(element.offsetWidth >= SIDEBAR_MIN_PANEL_WIDTH);
+      setRailExpanded(element.offsetWidth >= SIDEBAR_MIN_PANEL_WIDTH);
     };
     update();
     if (typeof ResizeObserver === 'undefined') {
@@ -90,13 +97,9 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
     return () => observer.disconnect();
   }, []);
 
-  // The resize-driven default above is a convenience, not the only way in: a panel narrower than
-  // SIDEBAR_MIN_PANEL_WIDTH never triggered it, so the conversation list was reachable only by
-  // dragging the sidecar wider — an affordance nothing in the panel hinted at. This toolbar
-  // toggle makes the list reachable at any width.
-  const toggleSidebar = useCallback(() => {
-    sidebarManuallySetRef.current = true;
-    setSidebarOpen(open => !open);
+  const toggleRailMode = useCallback(() => {
+    railModeManuallySetRef.current = true;
+    setRailExpanded(expanded => !expanded);
   }, []);
 
   const requestClose = useCallback(
@@ -139,16 +142,16 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
     [runGuarded, onClose, core.application],
   );
 
-  const showConversationsLabel = i18n.translate(
-    'wazuhAiAssistant.headerPanel.showConversationsButtonLabel',
+  const expandConversationsLabel = i18n.translate(
+    'wazuhAiAssistant.headerPanel.expandConversationsButtonLabel',
     {
-      defaultMessage: 'Show saved conversations',
+      defaultMessage: 'Expand saved conversations',
     },
   );
-  const hideConversationsLabel = i18n.translate(
-    'wazuhAiAssistant.headerPanel.hideConversationsButtonLabel',
+  const collapseConversationsLabel = i18n.translate(
+    'wazuhAiAssistant.headerPanel.collapseConversationsButtonLabel',
     {
-      defaultMessage: 'Hide saved conversations',
+      defaultMessage: 'Collapse saved conversations',
     },
   );
   const maximizeLabel = i18n.translate(
@@ -202,17 +205,21 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
           <EuiFlexItem grow={false}>
             <EuiToolTip
               content={
-                sidebarOpen ? hideConversationsLabel : showConversationsLabel
+                railExpanded
+                  ? collapseConversationsLabel
+                  : expandConversationsLabel
               }
             >
               <EuiButtonIcon
-                iconType={sidebarOpen ? 'menuLeft' : 'menuRight'}
+                iconType={railExpanded ? 'menuLeft' : 'menuRight'}
                 color='text'
                 aria-label={
-                  sidebarOpen ? hideConversationsLabel : showConversationsLabel
+                  railExpanded
+                    ? collapseConversationsLabel
+                    : expandConversationsLabel
                 }
-                aria-pressed={sidebarOpen}
-                onClick={toggleSidebar}
+                aria-pressed={railExpanded}
+                onClick={toggleRailMode}
                 data-test-subj='wzAiAssistantPanelToggleSidebarButton'
               />
             </EuiToolTip>
@@ -264,7 +271,10 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
             onProviderChange={setSelectedProviderId}
             onNavigateToSettings={openSettingsToAddProvider}
             onGeneratingChange={handleGeneratingChange}
-            showConversationSidebar={sidebarOpen}
+            // Always rendered (never hidden outright, see `SIDEBAR_MIN_PANEL_WIDTH`'s own doc
+            // comment): `railDisplayModeOverride` below is what the toolbar toggle actually drives.
+            showConversationSidebar
+            railDisplayModeOverride={railExpanded ? 'expanded' : 'collapsed'}
             // This panel's own width (`SIDEBAR_MIN_PANEL_WIDTH` above) routinely sits inside
             // ChatPage's flyout band (600-900px) — an `EuiFlyout` there would cover the WHOLE
             // dashboard, opening from the right, just to show a left-hand rail, out of a docked

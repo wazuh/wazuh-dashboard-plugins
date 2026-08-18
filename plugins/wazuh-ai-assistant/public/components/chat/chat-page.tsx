@@ -98,9 +98,18 @@ interface ChatPageProps {
   /** Whether the chat view is the app shell's visible tab (default true). While hidden, the
    * conversation hash stays out of the URL so a restore can't rewrite `/settings`. */
   isActive?: boolean;
-  /** Whether to render the saved-conversations sidebar (default true). The docked header panel
-   * (assistant-chat-panel.tsx) hides it while the panel is too narrow for both panes. */
+  /** Whether to render the saved-conversations sidebar (default true). */
   showConversationSidebar?: boolean;
+  /**
+   * Forces `railDisplayMode` to 'expanded' or 'collapsed', for a caller with no other way to reach
+   * ConversationList's own collapse/expand affordances (its pinned "‹ Collapse" button, its
+   * collapsed strip's "expand" arrow) — the docked header panel (assistant-chat-panel.tsx) drives
+   * its toolbar toggle through this instead. `undefined` (the default) leaves the mode entirely to
+   * the width-based logic and ConversationList's own controls, unchanged. Never forces 'flyout':
+   * this panel never reaches that mode itself (`allowRailFlyout={false}`), and a caller asking for
+   * 'expanded'/'collapsed' has no way to mean "escalate to a flyout" in the first place.
+   */
+  railDisplayModeOverride?: 'expanded' | 'collapsed';
   /**
    * Whether the rail is allowed to escalate to an `EuiFlyout` below `RAIL_FLYOUT_AT` (default
    * true). `EuiFlyout` is a `position: fixed` overlay that covers the WHOLE screen it's rendered
@@ -238,6 +247,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   onGeneratingChange,
   isActive = true,
   showConversationSidebar = true,
+  railDisplayModeOverride,
   allowRailFlyout = true,
 }) => {
   // `useSyncedState` (public/hooks/use-synced-state.ts) is the `[value, setValue, ref]` pattern
@@ -482,9 +492,13 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           // its own panel routinely sits inside this band (600–900px), and an `EuiFlyout` there
           // would cover the whole dashboard from within a sidecar the user never asked to leave —
           // see this prop's own doc comment. Capping at 'collapsed' is what removes the escalation
-          // instead of merely mitigating it.
-          railManualOverrideRef.current = null;
-          setRailDisplayMode('collapsed');
+          // instead of merely mitigating it. Unlike the 'flyout' branch below, a manual/external
+          // override (`railManualOverrideRef` — set by ConversationList's own controls OR by
+          // `railDisplayModeOverride`, e.g. the docked panel's own toolbar toggle) is kept rather
+          // than wiped: this band has a real inline rail the whole time (never a flyout with
+          // nothing to keep collapsed/expanded), so there is no reason to discard a preference the
+          // user already made just because a later resize landed back in the same band.
+          setRailDisplayMode(railManualOverrideRef.current ?? 'collapsed');
           return;
         }
         railManualOverrideRef.current = null;
@@ -501,6 +515,22 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     observer.observe(element);
     return () => observer.disconnect();
   }, [allowRailFlyout]);
+
+  // `railDisplayModeOverride` (assistant-chat-panel.tsx's own toolbar toggle) goes through the
+  // SAME manual-override ref ConversationList's own collapse/expand controls use, so whichever one
+  // the user reached for last wins — exactly the contract `railManualOverrideRef` already keeps for
+  // those two. Skipped while the mode is 'flyout': this panel never reaches that mode itself
+  // (`allowRailFlyout={false}` is what the docked header panel always passes), and there is nothing
+  // sensible to force a flyout INTO.
+  useEffect(() => {
+    if (!railDisplayModeOverride) {
+      return;
+    }
+    railManualOverrideRef.current = railDisplayModeOverride;
+    setRailDisplayMode(current =>
+      current === 'flyout' ? current : railDisplayModeOverride,
+    );
+  }, [railDisplayModeOverride]);
 
   const handleRailCollapse = () => {
     railManualOverrideRef.current = 'collapsed';
