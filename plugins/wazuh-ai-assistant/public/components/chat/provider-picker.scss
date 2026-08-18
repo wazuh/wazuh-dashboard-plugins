@@ -14,6 +14,21 @@
   white-space: nowrap;
 }
 
+/**
+ * EUI draws an `EuiButtonEmpty`'s hover/focus underline as `text-decoration` on the BUTTON element
+ * itself, not on any of its children. An override placed on `.wzProviderPickerTriggerLabel` (the
+ * child `<span>` above) therefore never cancels it — `text-decoration` painted by an ancestor is
+ * not something a descendant's own `text-decoration: none` can undo, since the ancestor draws its
+ * own decoration line independently of the descendant's box. This has to sit on the trigger button
+ * itself (`wzProviderPickerTrigger`, set via the `EuiButtonEmpty`'s own `className`).
+ */
+.wzProviderPickerTrigger {
+  &:hover,
+  &:focus {
+    text-decoration: none;
+  }
+}
+
 /* The menu item's content used to be an EuiFlexGroup/EuiFlexItem (div) layout; it is span-based
  * now (button content model), so the flex layout that grouping used to provide for free has to
  * be declared here instead. */

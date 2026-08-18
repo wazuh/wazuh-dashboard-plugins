@@ -2979,6 +2979,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                               selectedProviderId={selectedProviderId}
                               onProviderChange={onProviderChange}
                               onManageProviders={onManageProviders}
+                              activeConversationId={activeConversationId}
                             />
                           </EuiFlexItem>
                         )}

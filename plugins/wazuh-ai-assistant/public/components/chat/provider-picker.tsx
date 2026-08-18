@@ -1,5 +1,5 @@
 import './provider-picker.scss';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   EuiBadge,
   EuiButtonEmpty,
@@ -20,6 +20,16 @@ interface ProviderPickerProps {
    * plain "go to Settings" visit, kept distinct from `onNavigateToSettings`'s
    * `?addProvider=true` flyout-opening behaviour. */
   onManageProviders: () => void;
+  /**
+   * The conversation this picker is currently anchored above. Purely a close signal (audit item 4,
+   * bug B): "New conversation" (and switching to a different saved conversation from the sidebar)
+   * swaps out the whole transcript underneath this control without the popover itself ever
+   * receiving a click, so a reader who opened it right before either action was left looking at a
+   * menu anchored to a trigger that had visually moved/reset under it. Undefined is a valid,
+   * distinct value (no conversation saved yet) — the effect below still fires on the transition
+   * into/out of it.
+   */
+  activeConversationId?: string | null;
 }
 
 /**
@@ -40,8 +50,19 @@ export const ProviderPicker: React.FC<ProviderPickerProps> = ({
   selectedProviderId,
   onProviderChange,
   onManageProviders,
+  activeConversationId,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  // Closes a popover left open across a conversation switch (see the prop's own doc comment above)
+  // — "New conversation" and picking a different saved conversation from the sidebar both change
+  // this id without ever routing a click through the popover's own `closePopover`, so nothing else
+  // here would otherwise notice the transition. Only closes; it never OPENS the popover, since
+  // `undefined` on mount must not pop it open on first render.
+  useEffect(() => {
+    setIsOpen(false);
+  }, [activeConversationId]);
+
   const selectedProvider = providers.find(
     provider => provider.id === selectedProviderId,
   );
@@ -58,6 +79,7 @@ export const ProviderPicker: React.FC<ProviderPickerProps> = ({
 
   const button = (
     <EuiButtonEmpty
+      className='wzProviderPickerTrigger'
       size='s'
       color='text'
       iconType='arrowDown'
