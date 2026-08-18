@@ -572,6 +572,94 @@ test('registry-wide coverage: no catalog tool is ever returned when it is the ON
   );
 });
 
+// --- orchestrate: issue C4 -- a round's own narration must survive into the NEXT round's history
+// instead of being discarded as `content: ''` on the assistant message that carries its tool_call
+// (otherwise the model has no record of having already said it and re-narrates on a later round).
+
+test("orchestrate: a round's streamed prose is carried into the NEXT round's history on the assistant message that made the tool_call", async () => {
+  const { context } = scaContext();
+  const narration = 'Let me check the SCA results for agent 001.';
+  const { callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      // round 0: narrates, THEN calls get_sca_results -- on base this narration is dropped
+      // (the pushed assistant message used `content: ''`).
+      [
+        { type: 'delta', content: narration },
+        {
+          type: 'tool_call',
+          toolCall: {
+            id: 'call_sca_results',
+            name: 'get_sca_results',
+            arguments: { agent_id: '001' },
+          },
+        },
+        { type: 'done', usage: { inputTokens: 20, outputTokens: 10 } },
+      ],
+      // round 1: closes out with no further tool call.
+      textOnlyScript('CIS Ubuntu: 95 passed, 102 failed, 10 N/A.'),
+    ],
+    context,
+  );
+
+  // callMessages[0] = stage1, [1] = round 0's own outbound (only INITIAL_MESSAGES, pre-narration),
+  // [2] = round 1's outbound -- the first call that could possibly see round 0's narration echoed
+  // back as history.
+  const round1Messages = callMessages[2];
+  const toolCallMessage = round1Messages.find(
+    message =>
+      message.role === 'assistant' &&
+      message.toolCalls?.[0]?.id === 'call_sca_results',
+  );
+  assert.ok(
+    toolCallMessage,
+    "expected round 0's [assistant{toolCalls}, tool{content}] pair in round 1's history",
+  );
+  assert.equal(
+    toolCallMessage?.content,
+    narration,
+    "round 0's already-streamed narration must be the assistant message's own content, not " +
+      'discarded as an empty string',
+  );
+});
+
+test('orchestrate: two tool_calls in the SAME round each get only the narration that preceded them, not the whole round repeated twice', async () => {
+  // Guards the `roundTextConsumed` slicing (chat.ts): a round with narration, a tool_call, MORE
+  // narration, then a second tool_call must attribute each slice once, not double-attribute the
+  // first slice to the second message too.
+  const context = rejectingContext();
+  const { callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      [
+        { type: 'delta', content: 'First, checking SCA. ' },
+        {
+          type: 'tool_call',
+          toolCall: { id: 'call_1', name: 'get_sca_results', arguments: {} },
+        },
+        { type: 'delta', content: 'Now checking a second thing.' },
+        {
+          type: 'tool_call',
+          toolCall: { id: 'call_2', name: 'search_wazuh_data', arguments: {} },
+        },
+        { type: 'done', usage: { inputTokens: 10, outputTokens: 4 } },
+      ],
+      textOnlyScript('Done.'),
+    ],
+    context,
+  );
+
+  const round1Messages = callMessages[2];
+  const firstToolMessage = round1Messages.find(
+    m => m.role === 'assistant' && m.toolCalls?.[0]?.id === 'call_1',
+  );
+  const secondToolMessage = round1Messages.find(
+    m => m.role === 'assistant' && m.toolCalls?.[0]?.id === 'call_2',
+  );
+  assert.equal(firstToolMessage?.content, 'First, checking SCA. ');
+  assert.equal(secondToolMessage?.content, 'Now checking a second thing.');
+});
+
 // --- orchestrate: main end-to-end case -- FAILS ON BASE -----------------------------------------
 
 test('orchestrate: an unprompted single-tool offer with rounds remaining is forced into a chained call, not left to end the turn', async () => {

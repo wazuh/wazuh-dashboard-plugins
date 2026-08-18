@@ -323,3 +323,20 @@ test('buildSystemPrompt: the verbatim-identifier rule does not contradict docume
   assert.match(prompt, /report every row a tool like that actually returns/);
   assert.match(prompt, /not you substituting a different\s+one/);
 });
+
+// Issue C4: within one turn, the orchestration loop (chat.ts's `orchestrate`) can run several
+// tool rounds, and each round's delta text is streamed straight to the client. Without an
+// explicit rule the model re-narrated the same sentences (e.g. the suggest_discover_query
+// handoff's "Let me hand you a Discover query…") on every retry round.
+
+test('buildSystemPrompt: instructs the model not to repeat earlier sentences within the same answer', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /never repeat or re-explain a sentence you already wrote earlier in\s+this same answer/,
+  );
+  assert.match(
+    prompt,
+    /continue from where you left off instead of restarting the narration/,
+  );
+});

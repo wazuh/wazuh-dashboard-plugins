@@ -1354,6 +1354,13 @@ export async function* orchestrate(
     // otherwise treats any `!sawToolCall` round as a dead adapter stream) does not return early on
     // the ONE round type that legitimately ends with no tool call yet still has a next round.
     let roundText = '';
+    // How much of `roundText` has already been attributed to an assistant history message this
+    // round (issue C4): a round can legitimately contain more than one tool_call (narration,
+    // tool_call, more narration, another tool_call), and each `messages` entry pushed below must
+    // carry only the prose that arrived SINCE the previous one -- otherwise the second tool_call's
+    // assistant message would repeat the first's narration verbatim. Sliced out at each tool_call
+    // history-append below, then advanced to `roundText.length` so the next slice starts clean.
+    let roundTextConsumed = 0;
     let forcedFollowUp = false;
     // TRUE when any delta this round was the adapter's reasoning-channel fallback
     // (openai-compatible.ts's `reasoningFallback`, flagged on the event): that text is raw
@@ -1554,28 +1561,36 @@ export async function* orchestrate(
             }
           }
 
-          messages = [
-            ...messages,
-            // ORIGINAL (pseudonym-form) toolCall — wire consistency, same as the real-tool path.
-            // `vendorExtras` (e.g. Gemini's `thought_signature`) is spread only when the adapter
-            // actually captured one this round — see StreamEvent's `tool_call` doc comment.
-            {
-              role: 'assistant',
-              content: '',
-              toolCalls: [event.toolCall],
-              ...(event.messageVendorExtras
-                ? { vendorExtras: event.messageVendorExtras }
-                : {}),
-            },
-            {
-              role: 'tool',
-              toolCallId: event.toolCall.id,
-              // CAPABILITY-DENIAL GUARD chokepoint (see augmentToolError's doc comment above): a
-              // no-op for the 'shown:true' acknowledgment, applies the note to either the arg-
-              // validation error or the unknown-fields self-correction error above.
-              content: augmentToolError(toolResultContent),
-            },
-          ];
+          {
+            // Issue C4: carry this round's own narration (already streamed to the user above)
+            // into its own history turn instead of discarding it as `content: ''` — otherwise the
+            // model has no record of having said it and re-narrates near-identically on a retry
+            // round (the `unknown_fields` self-correction just above is exactly that retry path).
+            const priorRoundText = roundText.slice(roundTextConsumed);
+            roundTextConsumed = roundText.length;
+            messages = [
+              ...messages,
+              // ORIGINAL (pseudonym-form) toolCall — wire consistency, same as the real-tool path.
+              // `vendorExtras` (e.g. Gemini's `thought_signature`) is spread only when the adapter
+              // actually captured one this round — see StreamEvent's `tool_call` doc comment.
+              {
+                role: 'assistant',
+                content: priorRoundText,
+                toolCalls: [event.toolCall],
+                ...(event.messageVendorExtras
+                  ? { vendorExtras: event.messageVendorExtras }
+                  : {}),
+              },
+              {
+                role: 'tool',
+                toolCallId: event.toolCall.id,
+                // CAPABILITY-DENIAL GUARD chokepoint (see augmentToolError's doc comment above): a
+                // no-op for the 'shown:true' acknowledgment, applies the note to either the arg-
+                // validation error or the unknown-fields self-correction error above.
+                content: augmentToolError(toolResultContent),
+              },
+            ];
+          }
           continue;
         }
 
@@ -1676,25 +1691,32 @@ export async function* orchestrate(
           };
         }
 
-        messages = [
-          ...messages,
-          // ORIGINAL (pseudonym-form) toolCall, not toolCallForClient — wire consistency.
-          // `vendorExtras` (e.g. Gemini's `thought_signature`) is spread only when the adapter
-          // actually captured one this round — see StreamEvent's `tool_call` doc comment.
-          {
-            role: 'assistant',
-            content: '',
-            toolCalls: [event.toolCall],
-            ...(event.messageVendorExtras
-              ? { vendorExtras: event.messageVendorExtras }
-              : {}),
-          },
-          {
-            role: 'tool',
-            toolCallId: event.toolCall.id,
-            content: toolResultContentForModel,
-          },
-        ];
+        {
+          // Issue C4: see the identical comment on the suggest_discover_query branch above --
+          // this round's own narration, already shown to the user, belongs in its own history
+          // turn instead of being dropped as `content: ''`.
+          const priorRoundText = roundText.slice(roundTextConsumed);
+          roundTextConsumed = roundText.length;
+          messages = [
+            ...messages,
+            // ORIGINAL (pseudonym-form) toolCall, not toolCallForClient — wire consistency.
+            // `vendorExtras` (e.g. Gemini's `thought_signature`) is spread only when the adapter
+            // actually captured one this round — see StreamEvent's `tool_call` doc comment.
+            {
+              role: 'assistant',
+              content: priorRoundText,
+              toolCalls: [event.toolCall],
+              ...(event.messageVendorExtras
+                ? { vendorExtras: event.messageVendorExtras }
+                : {}),
+            },
+            {
+              role: 'tool',
+              toolCallId: event.toolCall.id,
+              content: toolResultContentForModel,
+            },
+          ];
+        }
         continue;
       }
 

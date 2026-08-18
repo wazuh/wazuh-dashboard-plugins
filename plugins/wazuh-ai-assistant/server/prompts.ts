@@ -226,5 +226,12 @@ export function buildSystemPrompt(nowIso: string): string {
       'answer first, in your own words, saying plainly what you checked and what you could not ' +
       'confirm — never invent or assume the missing rows — then call suggest_discover_query so ' +
       'the user gets a Discover link instead of a dead end.',
+    // Issue C4: a single answer can span several tool-calling rounds (chat.ts's `orchestrate`,
+    // MAX_TOOL_ROUNDS), and every earlier round's prose is now fed back as that round's own
+    // assistant history message (see chat.ts's `roundTextConsumed`) -- the model CAN see it was
+    // already said, but seeing it is not the same as knowing not to say it again; this line makes
+    // the "don't repeat" behavior explicit instead of assuming it follows from visibility alone.
+    'Within a single answer, never repeat or re-explain a sentence you already wrote earlier in ' +
+      'this same answer -- continue from where you left off instead of restarting the narration.',
   ].join('\n');
 }

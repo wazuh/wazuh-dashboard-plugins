@@ -428,6 +428,57 @@ test('orchestrate: suggest_discover_query unknown field -> bounded tool error, n
   );
 });
 
+// --- (b2) issue C4: narration before the suggest_discover_query call must survive into the
+// RETRY round's history, not be discarded as `content: ''` -- this is the exact defect the CEO
+// review caught: "Let me hand you a Discover query…" repeated near-identically across rounds
+// because the model could not see it had already said it.
+
+test('orchestrate: narration before a suggest_discover_query call is carried into the retry round, not dropped', async () => {
+  const context = fakeContext(() => Promise.resolve({ body: { fields: {} } }));
+  const narration = 'Let me hand you a Discover query for that instead.';
+  const { callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCRIPT,
+      [
+        { type: 'delta', content: narration },
+        {
+          type: 'tool_call',
+          toolCall: {
+            id: 'call_1',
+            name: SUGGEST_DISCOVER_QUERY_TOOL.name,
+            arguments: {
+              index: 'wazuh-findings-v5-*',
+              query_dsl: JSON.stringify({ term: { 'made.up.field': 'x' } }),
+              reason: 'This filter needs a field I could not confirm exists.',
+            },
+          },
+        },
+        { type: 'done', usage: { inputTokens: 20, outputTokens: 3 } },
+      ],
+      textOnlyScript('I could not verify that field.'),
+    ],
+    context,
+  );
+
+  // callMessages[0] = stage1, [1] = round 0's own outbound (pre-narration), [2] = the retry
+  // round's outbound -- the first call that could echo round 0's narration back as history.
+  const retryRoundMessages = callMessages[2];
+  const toolCallMessage = retryRoundMessages.find(
+    message =>
+      message.role === 'assistant' && message.toolCalls?.[0]?.id === 'call_1',
+  );
+  assert.ok(
+    toolCallMessage,
+    "expected round 0's [assistant{toolCalls}, tool{content}] pair in the retry round's history",
+  );
+  assert.equal(
+    toolCallMessage?.content,
+    narration,
+    "the narration the user already read must be the assistant message's own content, so the " +
+      'model does not re-narrate it on the retry',
+  );
+});
+
 // --- (c) a SECOND unknown_fields failure this turn falls through to a disclosure-suffixed
 // suggested_query -------------------------------------------------------------------------------
 
