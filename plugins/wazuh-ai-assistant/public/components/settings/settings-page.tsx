@@ -379,10 +379,24 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   }, [location.search, autoOpenCreateForm]);
 
   const switchTab = (tabId: SettingsTabId) => {
+    // No-op on the already-active tab: this used to still push a new history entry (and, before
+    // the fix below, still stomp any OTHER query params) for a click that changes nothing on
+    // screen, which made "back" after clicking the current tab a no-op the admin didn't expect.
+    if (tabId === activeTabId) {
+      return;
+    }
     setActiveTabId(tabId);
+    // Preserve any OTHER query params the URL is carrying (`?addProvider=true` in particular) —
+    // this used to rebuild `search` from scratch with only `?tab=`, silently dropping them.
+    const params = new URLSearchParams(location.search);
+    if (tabId === DEFAULT_SETTINGS_TAB) {
+      params.delete(TAB_PARAM);
+    } else {
+      params.set(TAB_PARAM, tabId);
+    }
     history.push({
       pathname: location.pathname,
-      search: tabId === DEFAULT_SETTINGS_TAB ? '' : `?${TAB_PARAM}=${tabId}`,
+      search: params.toString() ? `?${params.toString()}` : '',
     });
   };
 
@@ -736,7 +750,20 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Remembers which tab the admin was actually on when the header's "Add provider" button (it is
+  // visible on every tab, not just Providers) sent them to the Providers tab to see the form —
+  // so closing the flyout can put them back where they were instead of stranding them on
+  // Providers. Only the header button's create flow goes through this: it stays `null` for the
+  // per-row "Edit" action (already on the Providers tab by construction) and for the
+  // `?addProvider=true` deep link (nothing to "return" to — Providers is the arrival tab).
+  const [tabBeforeCreateForm, setTabBeforeCreateForm] =
+    useState<SettingsTabId | null>(null);
+
   const openCreateForm = () => {
+    if (activeTabId !== 'providers') {
+      setTabBeforeCreateForm(activeTabId);
+      switchTab('providers');
+    }
     setEditingProvider(null);
     setError(null);
     setFlyoutTestOutcome(null);
@@ -757,6 +784,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     // state setter below takes effect).
     if (editingProvider === null) {
       onCreateFormOpenChange?.(false);
+    }
+    if (tabBeforeCreateForm !== null) {
+      switchTab(tabBeforeCreateForm);
+      setTabBeforeCreateForm(null);
     }
     setIsFormOpen(false);
     setError(null);
@@ -854,6 +885,33 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     }
     clearTestResult(providerId);
     setDeleteTarget(null);
+    // Prune any per-provider privacy override tied to the JUST-DELETED provider (S3): the wire
+    // shape has no FK relating `privacyDefaultPerProvider`'s keys back to real providers, so a
+    // stale entry otherwise stayed there forever — primed to reappear as a phantom on/off
+    // override if the deleted id were ever reused, and in the meantime making the Privacy tab's
+    // per-provider list (which only ever renders CURRENT providers) silently out of sync with
+    // what is actually stored server-side. Updates the baseline (`loadedAssistantSettings`) and
+    // the draft TOGETHER via `privacy.commit` rather than `privacy.setValue`, so this prune does
+    // not itself flip the Privacy tab's dirty flag — the tradeoff, deliberately accepted, is that
+    // any OTHER unsaved privacy edit sitting in the draft at delete time is folded into the new
+    // baseline here too, same as it would be by any other `commit` call on this page.
+    if (loadedAssistantSettings) {
+      const prunedPerProvider = withProviderPrivacyOverride(
+        loadedAssistantSettings.privacyDefaultPerProvider ?? {},
+        providerId,
+        'inherit',
+      );
+      setLoadedAssistantSettings({
+        ...loadedAssistantSettings,
+        privacyDefaultPerProvider: prunedPerProvider,
+      });
+      if (privacyDraft) {
+        privacy.commit({
+          ...privacyDraft,
+          privacyDefaultPerProvider: prunedPerProvider,
+        });
+      }
+    }
     reload();
     onProvidersChanged();
   };
@@ -1296,8 +1354,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
 
         {/* Landmarks before more settings land (UX iteration 4 item 2): one tab per existing
             SectionCard, deep-linkable via `?tab=`. Not a full router switch — all three cards stay
-            mounted-or-not exactly as they were, this only decides which one is visible, the same
-            way application.tsx's outer Chat/Settings tabs already hide rather than unmount. */}
+            MOUNTED at all times (below, each wrapped in a plain `display: none` div rather than an
+            `activeTabId === 'x' && (...)` conditional), the same way application.tsx's outer
+            Chat/Settings tabs already hide rather than unmount. Unmounting the non-active card was
+            the actual behavior here until this comment caught up with it: EuiInMemoryTable owns its
+            own (uncontrolled) search box internally, so unmounting the Providers card on a tab
+            switch reset that search box's text on remount — while `providersFilterText` above
+            (mirrored out via `search.onChange`) is page-level state that survived the switch, so
+            "Test all" kept computing against a filter the visible table no longer had applied. */}
         <EuiTabs>
           <EuiTab
             isSelected={activeTabId === 'providers'}
@@ -1326,7 +1390,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         </EuiTabs>
         <EuiSpacer size='l' />
 
-        {activeTabId === 'providers' && (
+        <div style={{ display: activeTabId === 'providers' ? undefined : 'none' }}>
         <SectionCard
           pillLabel={i18n.translate(
             'wazuhAiAssistant.settings.providers.title',
@@ -1409,12 +1473,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             />
           )}
         </SectionCard>
-        )}
+        </div>
 
         {/* No `xxl` spacer between the cards any more (it existed to separate two ADJACENT
             cards — see the comment that used to sit here) — each card now owns a whole tab, so
             there is never a second card directly below it to separate from. */}
-        {activeTabId === 'privacy' && (
+        <div style={{ display: activeTabId === 'privacy' ? undefined : 'none' }}>
         <SectionCard
           pillLabel={i18n.translate('wazuhAiAssistant.settings.privacy.title', {
             defaultMessage: 'Privacy',
@@ -1752,7 +1816,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 )}
               </div>
               <EuiSpacer size='s' />
-              {providers.length === 0 ? (
+              {/* Guarded on `providersLoaded`, not a bare `providers.length === 0` — the load is
+                  async (see the effect that sets `providersLoaded`), so the empty-length check on
+                  its own was also true WHILE loading and after a FAILED list load, both of which
+                  showed "No providers configured yet." for a provider list that might still be on
+                  its way (or that failed to load at all, with the actual error surfaced elsewhere
+                  on the Providers tab). */}
+              {!providersLoaded ? null : providers.length === 0 ? (
                 <EuiText size='s' color='subdued'>
                   {i18n.translate(
                     'wazuhAiAssistant.settings.privacy.perProviderEmpty',
@@ -1853,10 +1923,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             </>
           )}
         </SectionCard>
-        )}
+        </div>
 
         {/* No `xxl` spacer here either, for the same reason noted above the Privacy tab. */}
-        {activeTabId === 'retention' && (
+        <div style={{ display: activeTabId === 'retention' ? undefined : 'none' }}>
         <SectionCard
           pillLabel={i18n.translate(
             'wazuhAiAssistant.settings.retention.title',
@@ -1978,7 +2048,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             </>
           )}
         </SectionCard>
-        )}
+        </div>
       </EuiPageBody>
       {isFormOpen && isActive && (
         <ProviderFormFlyout

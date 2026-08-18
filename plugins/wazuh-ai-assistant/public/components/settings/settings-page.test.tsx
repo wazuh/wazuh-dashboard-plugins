@@ -1,8 +1,9 @@
 import path from 'path';
 import fs from 'fs';
 import React from 'react';
-import { MemoryRouter } from 'react-router-dom';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { MemoryRouter, Router } from 'react-router-dom';
+import { createMemoryHistory } from 'history';
+import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // SettingsService is instantiated internally — mock the module before importing the component.
@@ -29,7 +30,12 @@ const mockService = {
     defaultApiHostId: 'default',
     apiKeyEncryptionEnabled: true,
   }),
-  updateAssistantSettings: jest.fn().mockResolvedValue({}),
+  // Echoes its argument back (rather than an unconditional `{}`) so a test can assert what a
+  // save round-trip left `loadedAssistantSettings`/the draft holding, and so a SECOND save in the
+  // same test sees the first save's own payload as its starting point instead of an empty stub.
+  updateAssistantSettings: jest
+    .fn()
+    .mockImplementation(payload => Promise.resolve(payload)),
 };
 
 jest.mock('../../services/settings-service', () => ({
@@ -96,8 +102,12 @@ describe('SettingsPage — wazuh_brain hidden from provider type choices', () =>
     expect(screen.getAllByRole('radio')).toHaveLength(2);
     // The label is the type name alone now; the list of services it covers moved down into the
     // card's own description, which had the room for it (provider-form-flyout.tsx).
-    expect(screen.getByLabelText(/openai-compatible/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/anthropic \(claude\)/i)).toBeInTheDocument();
+    // getByLabelText throws here: EUI's button-group radios sit in a <label> whose `for` points
+    // at the group's own generated id, a non-labellable <fieldset> in this test environment (see
+    // provider-form-flyout.test.tsx's providerTypeOption helper). The visible text is what
+    // matters for this assertion, so query it directly.
+    expect(screen.getByText(/openai-compatible/i)).toBeInTheDocument();
+    expect(screen.getByText(/anthropic \(claude\)/i)).toBeInTheDocument();
     expect(screen.queryByText(/wazuh_brain/i)).not.toBeInTheDocument();
   });
 });
@@ -405,6 +415,27 @@ describe('SettingsPage — the hidden tab must not keep a flyout on screen', () 
 });
 
 describe('SettingsPage — settings tabs (UX iteration 4 item 2)', () => {
+  /**
+   * True when the element sits inside a subtree hidden with `display: none` — the same idiom
+   * application.test.tsx's own `isHidden` uses for the outer Chat/Settings tabs (application.tsx),
+   * now shared by these inner tabs (B1): all three cards stay MOUNTED at all times so
+   * EuiInMemoryTable's own uncontrolled search box never resets on a tab switch, so a plain
+   * `queryByText(...).not.toBeInTheDocument()` no longer tells the other cards' content apart —
+   * their text is still in the DOM, just hidden.
+   */
+  function isHidden(element: HTMLElement): boolean {
+    for (
+      let node: HTMLElement | null = element;
+      node;
+      node = node.parentElement
+    ) {
+      if (node.style.display === 'none') {
+        return true;
+      }
+    }
+    return false;
+  }
+
   it('renders the three tabs, Providers selected by default', async () => {
     render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
 
@@ -425,11 +456,11 @@ describe('SettingsPage — settings tabs (UX iteration 4 item 2)', () => {
       screen.getByRole('button', { name: /add a provider/i }),
     ).toBeInTheDocument();
     expect(
-      screen.queryByText(/enable privacy mode by default/i),
-    ).not.toBeInTheDocument();
+      isHidden(screen.getByText(/enable privacy mode by default/i)),
+    ).toBe(true);
     expect(
-      screen.queryByText(/keep saved conversations for/i),
-    ).not.toBeInTheDocument();
+      isHidden(screen.getByText(/keep saved conversations for/i)),
+    ).toBe(true);
   });
 
   it('switches which card is shown when a tab is clicked, and updates the URL', async () => {
@@ -440,9 +471,10 @@ describe('SettingsPage — settings tabs (UX iteration 4 item 2)', () => {
     fireEvent.click(
       screen.getByRole('tab', { name: /privacy & data protection/i }),
     );
-    expect(
-      await screen.findByText(/enable privacy mode by default/i),
-    ).toBeInTheDocument();
+    const privacyText = await screen.findByText(
+      /enable privacy mode by default/i,
+    );
+    expect(isHidden(privacyText)).toBe(false);
     expect(
       screen.queryByRole('button', { name: /add a provider/i }),
     ).not.toBeInTheDocument();
@@ -450,12 +482,77 @@ describe('SettingsPage — settings tabs (UX iteration 4 item 2)', () => {
     fireEvent.click(
       screen.getByRole('tab', { name: /conversation history/i }),
     );
+    const retentionText = await screen.findByText(
+      /keep saved conversations for/i,
+    );
+    expect(isHidden(retentionText)).toBe(false);
+    expect(isHidden(screen.getByText(/enable privacy mode by default/i))).toBe(
+      true,
+    );
+  });
+
+  it('does not switch tabs (or push a new URL entry) when clicking the already-active tab', async () => {
+    render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
+
+    const providersTab = await screen.findByRole('tab', { name: /^providers$/i });
+    expect(providersTab).toHaveAttribute('aria-selected', 'true');
+
+    fireEvent.click(providersTab);
+
+    // Still on Providers, and clicking the active tab must not have unmounted/remounted its card
+    // (which would have reset EuiInMemoryTable's own search box — see the B1 test below).
+    expect(providersTab).toHaveAttribute('aria-selected', 'true');
     expect(
-      await screen.findByText(/keep saved conversations for/i),
+      screen.getByRole('button', { name: /add a provider/i }),
     ).toBeInTheDocument();
-    expect(
-      screen.queryByText(/enable privacy mode by default/i),
-    ).not.toBeInTheDocument();
+  });
+
+  it('preserves other query params when switching tabs, and restores them on the way back', async () => {
+    // A real `history` instance (rather than `MemoryRouter`'s own, which this test has no handle
+    // on) so `history.location.search` can be asserted directly — the actual URL, not just what
+    // rendered.
+    const history = createMemoryHistory({
+      initialEntries: ['/settings?utm_source=digest&tab=privacy'],
+    });
+    render(
+      <Router history={history}>
+        <SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />
+      </Router>,
+    );
+
+    await screen.findByText(/enable privacy mode by default/i);
+
+    fireEvent.click(screen.getByRole('tab', { name: /^providers$/i }));
+    await screen.findByRole('button', { name: /add a provider/i });
+    // Providers is this page's DEFAULT tab, so `?tab=` itself drops — but `utm_source` (an
+    // unrelated param neither this page nor its tabs own) must survive the switch regardless.
+    expect(history.location.search).toBe('?utm_source=digest');
+
+    fireEvent.click(
+      screen.getByRole('tab', { name: /conversation history/i }),
+    );
+    await screen.findByText(/keep saved conversations for/i);
+    const afterRetention = new URLSearchParams(history.location.search);
+    expect(afterRetention.get('utm_source')).toBe('digest');
+    expect(afterRetention.get('tab')).toBe('retention');
+
+    // Back/forward: history navigation must land the page on the tab that URL entry names,
+    // exactly as a click on that tab would, and must not lose `utm_source` either.
+    act(() => {
+      history.goBack();
+    });
+    await screen.findByRole('button', { name: /add a provider/i });
+    const afterBack = new URLSearchParams(history.location.search);
+    expect(afterBack.get('tab')).toBeNull();
+    expect(afterBack.get('utm_source')).toBe('digest');
+
+    act(() => {
+      history.goForward();
+    });
+    await screen.findByText(/keep saved conversations for/i);
+    const afterForward = new URLSearchParams(history.location.search);
+    expect(afterForward.get('tab')).toBe('retention');
+    expect(afterForward.get('utm_source')).toBe('digest');
   });
 
   it('lands on the Privacy tab when deep-linked with ?tab=privacy', async () => {
@@ -504,6 +601,94 @@ describe('SettingsPage — settings tabs (UX iteration 4 item 2)', () => {
 
     expect(
       await screen.findByRole('tab', { name: /^providers$/i }),
+    ).toHaveAttribute('aria-selected', 'true');
+  });
+
+  it('keeps the Providers filter box and its filtered "Test all" set intact across a tab round trip (B1)', async () => {
+    // The bug this pins: the Providers card used to UNMOUNT on a tab switch (`activeTabId ===
+    // 'providers' && (...)`), which reset EuiInMemoryTable's own uncontrolled search box on
+    // remount — while `providersFilterText` (page-level state, mirrored out of that search box
+    // purely to tell "Test all" which rows are visible) survived the switch untouched. Landing
+    // back on Providers therefore showed an EMPTY search box while "Test all" still silently
+    // acted on the STALE filtered subset from before the round trip.
+    const threeProviders = [
+      {
+        id: 'p1',
+        name: 'Alpha',
+        type: 'openai_compatible',
+        baseUrl: 'https://api.openai.com/v1',
+        model: 'gpt-4o',
+        isDefault: true,
+      },
+      {
+        id: 'p2',
+        name: 'Beta',
+        type: 'openai_compatible',
+        baseUrl: 'https://api.groq.com/openai/v1',
+        model: 'llama3.3',
+        isDefault: false,
+      },
+      {
+        id: 'p3',
+        name: 'Gamma-matched',
+        type: 'anthropic',
+        baseUrl: 'https://api.anthropic.com',
+        model: 'claude-sonnet-5',
+        isDefault: false,
+      },
+    ];
+    mockService.list.mockResolvedValue(threeProviders);
+    render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
+
+    await waitFor(() => expect(mockService.test).toHaveBeenCalledTimes(3));
+    mockService.test.mockClear();
+
+    const filterBox = await screen.findByPlaceholderText(/filter providers/i);
+    fireEvent.change(filterBox, { target: { value: 'matched' } });
+
+    fireEvent.click(
+      screen.getByRole('tab', { name: /privacy & data protection/i }),
+    );
+    await screen.findByText(/enable privacy mode by default/i);
+    fireEvent.click(screen.getByRole('tab', { name: /^providers$/i }));
+
+    expect(
+      await screen.findByPlaceholderText(/filter providers/i),
+    ).toHaveValue('matched');
+
+    fireEvent.click(screen.getByRole('button', { name: /test all/i }));
+    await waitFor(() => expect(mockService.test).toHaveBeenCalledWith('p3'));
+    expect(mockService.test).not.toHaveBeenCalledWith('p1');
+    expect(mockService.test).not.toHaveBeenCalledWith('p2');
+  });
+
+  it('sends the header "Add provider" button to the Providers tab, and back to the original tab when the flyout closes', async () => {
+    // The header button (distinct from the Providers card's own empty-state "Add a provider"
+    // action) is visible on every tab, but the create form only ever lived on the Providers tab
+    // — clicking it from Privacy used to open the flyout ON TOP of the (still-selected) Privacy
+    // tab instead of taking the admin to the tab the form actually belongs to.
+    render(
+      <SettingsPageWithRouter
+        core={coreMock}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=privacy']}
+      />,
+    );
+    await screen.findByText(/enable privacy mode by default/i);
+
+    fireEvent.click(screen.getByRole('button', { name: /^add provider$/i }));
+
+    expect(await screen.findByLabelText(/^name\s*\*?$/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole('tab', { name: /^providers$/i }),
+    ).toHaveAttribute('aria-selected', 'true');
+
+    fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
+
+    expect(screen.queryByLabelText(/^name\s*\*?$/i)).not.toBeInTheDocument();
+    // Back on Privacy — the tab the admin actually clicked "Add provider" from.
+    expect(
+      await screen.findByRole('tab', { name: /privacy & data protection/i }),
     ).toHaveAttribute('aria-selected', 'true');
   });
 });
@@ -589,8 +774,11 @@ describe('SettingsPage — per-provider privacy override (UX iteration 4 item 3)
     );
     const payload = mockService.updateAssistantSettings.mock.calls[0][0];
     // Explicit true for the provider switched to "On"; the untouched one is simply absent —
-    // never a `false` it never had.
-    expect(payload.privacyDefaultPerProvider).toEqual({ p1: true });
+    // never a `false` it never had. `toEqual` treats an undefined-valued key as equivalent to a
+    // MISSING one, so it would have passed even if `p2: undefined` had leaked into the payload;
+    // `toStrictEqual` plus the explicit `in` check below catch that.
+    expect(payload.privacyDefaultPerProvider).toStrictEqual({ p1: true });
+    expect('p2' in payload.privacyDefaultPerProvider).toBe(false);
   });
 
   it('sends an explicit false for "Off", distinct from an absent key', async () => {
@@ -609,7 +797,8 @@ describe('SettingsPage — per-provider privacy override (UX iteration 4 item 3)
       expect(mockService.updateAssistantSettings).toHaveBeenCalled(),
     );
     const payload = mockService.updateAssistantSettings.mock.calls[0][0];
-    expect(payload.privacyDefaultPerProvider).toEqual({ p2: false });
+    expect(payload.privacyDefaultPerProvider).toStrictEqual({ p2: false });
+    expect('p1' in payload.privacyDefaultPerProvider).toBe(false);
   });
 
   it('reverting a provider to "Use global default" removes its key entirely', async () => {
@@ -637,7 +826,47 @@ describe('SettingsPage — per-provider privacy override (UX iteration 4 item 3)
     );
     const payload = mockService.updateAssistantSettings.mock.calls[0][0];
     // p1's key is gone entirely (inherit), p2's explicit false survives untouched.
-    expect(payload.privacyDefaultPerProvider).toEqual({ p2: false });
+    expect(payload.privacyDefaultPerProvider).toStrictEqual({ p2: false });
+    expect('p1' in payload.privacyDefaultPerProvider).toBe(false);
+  });
+
+  it('carries the first save forward as the starting point of a second, consecutive save', async () => {
+    // `mockService.updateAssistantSettings` now echoes its payload back (rather than an
+    // unconditional `{}`), so this exercises the real round-trip: the second save's payload must
+    // build on what the FIRST save actually persisted, not on some earlier stub.
+    mockService.list.mockResolvedValue(twoProviders);
+    renderOnPrivacyTab();
+
+    const alphaSelect = await screen.findByRole('combobox', {
+      name: /privacy override for alpha/i,
+    });
+    fireEvent.change(alphaSelect, { target: { value: 'on' } });
+    fireEvent.click(
+      screen.getByRole('button', { name: /save privacy settings/i }),
+    );
+    await waitFor(() =>
+      expect(mockService.updateAssistantSettings).toHaveBeenCalledTimes(1),
+    );
+    expect(
+      mockService.updateAssistantSettings.mock.calls[0][0]
+        .privacyDefaultPerProvider,
+    ).toStrictEqual({ p1: true });
+
+    const betaSelect = screen.getByRole('combobox', {
+      name: /privacy override for beta/i,
+    });
+    fireEvent.change(betaSelect, { target: { value: 'off' } });
+    fireEvent.click(
+      screen.getByRole('button', { name: /save privacy settings/i }),
+    );
+    await waitFor(() =>
+      expect(mockService.updateAssistantSettings).toHaveBeenCalledTimes(2),
+    );
+    // p1's override from the FIRST save survives into the second save's payload.
+    expect(
+      mockService.updateAssistantSettings.mock.calls[1][0]
+        .privacyDefaultPerProvider,
+    ).toStrictEqual({ p1: true, p2: false });
   });
 
   it('shows an empty-state message instead of a table when no providers are configured', async () => {
@@ -647,6 +876,31 @@ describe('SettingsPage — per-provider privacy override (UX iteration 4 item 3)
     expect(
       await screen.findByText(/no providers configured yet/i),
     ).toBeInTheDocument();
+  });
+
+  it('shows neither the empty message nor a row while the provider list is still loading', async () => {
+    // A bare `providers.length === 0` read as "empty" both WHILE the (async) list load was still
+    // pending and after it had actually FAILED — either way telling the admin "No providers
+    // configured yet." about a fleet that might be non-empty. This holds the mock's promise open
+    // to catch that window.
+    let resolveList!: (value: typeof twoProviders) => void;
+    mockService.list.mockReturnValue(
+      new Promise(resolve => {
+        resolveList = resolve;
+      }),
+    );
+    renderOnPrivacyTab();
+
+    expect(
+      screen.queryByText(/no providers configured yet/i),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText('Alpha')).not.toBeInTheDocument();
+
+    resolveList(twoProviders);
+    expect(await screen.findByText('Alpha')).toBeInTheDocument();
+    expect(
+      screen.queryByText(/no providers configured yet/i),
+    ).not.toBeInTheDocument();
   });
 });
 
