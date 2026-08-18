@@ -173,6 +173,7 @@
     "wazuhAiAssistant.settings.form.connectionGroupLegend": "2 Conexión",
     "wazuhAiAssistant.settings.form.done": "Hecho",
     "wazuhAiAssistant.settings.form.modelGroupLegend": "3 Modelo",
+    "wazuhAiAssistant.settings.form.providerTypeButtonGroupLegend": "Tipo de proveedor",
     "wazuhAiAssistant.settings.form.providerTypeGroupLegend": "1 Tipo de proveedor",
     "wazuhAiAssistant.settings.form.testResultCouldNotVerifyTitle": "No se pudo verificar la conexión",
     "wazuhAiAssistant.settings.form.testResultFailureTitle": "La prueba de conexión falló",

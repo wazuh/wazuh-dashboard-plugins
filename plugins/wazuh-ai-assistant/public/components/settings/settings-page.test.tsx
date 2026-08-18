@@ -73,8 +73,8 @@ describe('SettingsPage — wazuh_brain hidden from provider type choices', () =>
     // Wait for the form to be visible (Name field is present)
     await screen.findByLabelText(/^name/i);
 
-    // Provider type (screen 4, variation 4a) is now two EuiCheckableCard radios instead of a
-    // <select>/<option> pair — assert on those directly rather than on <option> elements.
+    // Provider type (UX iteration 4 item 1) is an EuiButtonGroup of two options, each backed by
+    // a hidden native radio input — assert on those directly rather than on <option> elements.
     expect(screen.getAllByRole('radio')).toHaveLength(2);
     // The label is the type name alone now; the list of services it covers moved down into the
     // card's own description, which had the room for it (provider-form-flyout.tsx).

@@ -3,8 +3,8 @@ import './provider-form-flyout.scss';
 import {
   EuiButton,
   EuiButtonEmpty,
+  EuiButtonGroup,
   EuiCallOut,
-  EuiCheckableCard,
   EuiCode,
   EuiCodeBlock,
   EuiComboBox,
@@ -849,33 +849,37 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 ),
               }}
             >
-              <EuiFlexGroup gutterSize='m' responsive={false}>
-                {PROVIDER_TYPES.map(type => (
-                  <EuiFlexItem key={type}>
-                    <EuiCheckableCard
-                      id={`wz-ai-provider-type-${type}`}
-                      label={PROVIDER_TYPE_FORM_LABELS[type]}
-                      name='wz-ai-provider-type'
-                      value={type}
-                      checkableType='radio'
-                      checked={form.type === type}
-                      onChange={() => handleTypeChange(type)}
-                    >
-                      {/* The type's description lives INSIDE its own card (audit §5.6) and is
-                          rendered on BOTH cards, not only the selected one: a selected-only
-                          description made the pair visibly unequal (design review: "trataría de
-                          que cada caja ocupe lo mismo") — the selected card grew around its text
-                          while the other stayed short, because EuiFlexGroup stretches its flex
-                          ITEMS but EuiCheckableCard does not fill its item. Symmetric content
-                          plus the card's own height rule (scss) keeps the two boxes level no
-                          matter which is selected (rulebook D21). */}
-                      <EuiText size='s' color='subdued'>
-                        <p>{PROVIDER_TYPE_DESCRIPTIONS[type]}</p>
-                      </EuiText>
-                    </EuiCheckableCard>
-                  </EuiFlexItem>
-                ))}
-              </EuiFlexGroup>
+              {/* A segmented control, not a pair of huge cards (UX iteration 4 item 1): a binary
+                  choice does not need ~450px of card real estate, and the old layout rendered
+                  BOTH types' descriptions at once while only one was ever selected — confusing on
+                  the exact surface CEO feedback already flagged as hard to get right. The
+                  selection-dependent description now lives in this EuiFormRow's own `helpText`,
+                  so only the type actually chosen is ever described. */}
+              <EuiFormRow
+                helpText={
+                  <EuiText size='s' color='subdued'>
+                    <p>{PROVIDER_TYPE_DESCRIPTIONS[form.type]}</p>
+                  </EuiText>
+                }
+              >
+                <EuiButtonGroup
+                  legend={i18n.translate(
+                    'wazuhAiAssistant.settings.form.providerTypeButtonGroupLegend',
+                    { defaultMessage: 'Provider type' },
+                  )}
+                  buttonSize='compressed'
+                  isFullWidth
+                  type='single'
+                  idSelected={form.type}
+                  onChange={id =>
+                    handleTypeChange(id as ProviderInput['type'])
+                  }
+                  options={PROVIDER_TYPES.map(type => ({
+                    id: type,
+                    label: PROVIDER_TYPE_FORM_LABELS[type],
+                  }))}
+                />
+              </EuiFormRow>
             </EuiFormFieldset>
 
             <EuiFormFieldset
