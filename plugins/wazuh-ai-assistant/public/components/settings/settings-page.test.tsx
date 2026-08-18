@@ -19,6 +19,7 @@ const mockService = {
   getAssistantSettings: jest.fn().mockResolvedValue({
     privacyDefaultOn: false,
     userCanOverride: true,
+    privacyDefaultPerProvider: {},
     fieldPolicy: [],
     conversationRetentionDays: 0,
   }),
@@ -61,6 +62,7 @@ beforeEach(() => {
   mockService.getAssistantSettings.mockResolvedValue({
     privacyDefaultOn: false,
     userCanOverride: true,
+    privacyDefaultPerProvider: {},
     fieldPolicy: [],
     conversationRetentionDays: 0,
   });
@@ -215,6 +217,7 @@ describe('SettingsPage — field policy filter', () => {
     mockService.getAssistantSettings.mockResolvedValue({
       privacyDefaultOn: false,
       userCanOverride: true,
+      privacyDefaultPerProvider: {},
       fieldPolicy: [
         { field: 'agent.name', action: 'allow' },
         { field: 'source.ip', action: 'anonymize' },
@@ -502,6 +505,148 @@ describe('SettingsPage — settings tabs (UX iteration 4 item 2)', () => {
     expect(
       await screen.findByRole('tab', { name: /^providers$/i }),
     ).toHaveAttribute('aria-selected', 'true');
+  });
+});
+
+describe('SettingsPage — per-provider privacy override (UX iteration 4 item 3)', () => {
+  const twoProviders = [
+    {
+      id: 'p1',
+      name: 'Alpha',
+      type: 'openai_compatible',
+      baseUrl: 'https://api.openai.com/v1',
+      model: 'gpt-4o',
+      isDefault: true,
+    },
+    {
+      id: 'p2',
+      name: 'Beta',
+      type: 'anthropic',
+      baseUrl: 'https://api.anthropic.com',
+      model: 'claude-sonnet-5',
+      isDefault: false,
+    },
+  ];
+
+  const renderOnPrivacyTab = () =>
+    render(
+      <SettingsPageWithRouter
+        core={coreMock}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=privacy']}
+      />,
+    );
+
+  it('lists every configured provider, defaulting to "Use global default"', async () => {
+    mockService.list.mockResolvedValue(twoProviders);
+    renderOnPrivacyTab();
+
+    expect(await screen.findByText('Alpha')).toBeInTheDocument();
+    expect(screen.getByText('Beta')).toBeInTheDocument();
+    expect(
+      screen.getByRole('combobox', { name: /privacy override for alpha/i }),
+    ).toHaveValue('inherit');
+    expect(
+      screen.getByRole('combobox', { name: /privacy override for beta/i }),
+    ).toHaveValue('inherit');
+  });
+
+  it('starts a provider already in privacyDefaultPerProvider at its stored state, not inherit', async () => {
+    mockService.list.mockResolvedValue(twoProviders);
+    mockService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: false,
+      userCanOverride: true,
+      privacyDefaultPerProvider: { p1: true, p2: false },
+      fieldPolicy: [],
+      conversationRetentionDays: 0,
+    });
+    renderOnPrivacyTab();
+
+    expect(
+      await screen.findByRole('combobox', {
+        name: /privacy override for alpha/i,
+      }),
+    ).toHaveValue('on');
+    expect(
+      screen.getByRole('combobox', { name: /privacy override for beta/i }),
+    ).toHaveValue('off');
+  });
+
+  it('sends an explicit true, and omits the key entirely for a reverted provider', async () => {
+    mockService.list.mockResolvedValue(twoProviders);
+    renderOnPrivacyTab();
+
+    const alphaSelect = await screen.findByRole('combobox', {
+      name: /privacy override for alpha/i,
+    });
+    fireEvent.change(alphaSelect, { target: { value: 'on' } });
+    fireEvent.click(
+      screen.getByRole('button', { name: /save privacy settings/i }),
+    );
+
+    await waitFor(() =>
+      expect(mockService.updateAssistantSettings).toHaveBeenCalled(),
+    );
+    const payload = mockService.updateAssistantSettings.mock.calls[0][0];
+    // Explicit true for the provider switched to "On"; the untouched one is simply absent —
+    // never a `false` it never had.
+    expect(payload.privacyDefaultPerProvider).toEqual({ p1: true });
+  });
+
+  it('sends an explicit false for "Off", distinct from an absent key', async () => {
+    mockService.list.mockResolvedValue(twoProviders);
+    renderOnPrivacyTab();
+
+    const betaSelect = await screen.findByRole('combobox', {
+      name: /privacy override for beta/i,
+    });
+    fireEvent.change(betaSelect, { target: { value: 'off' } });
+    fireEvent.click(
+      screen.getByRole('button', { name: /save privacy settings/i }),
+    );
+
+    await waitFor(() =>
+      expect(mockService.updateAssistantSettings).toHaveBeenCalled(),
+    );
+    const payload = mockService.updateAssistantSettings.mock.calls[0][0];
+    expect(payload.privacyDefaultPerProvider).toEqual({ p2: false });
+  });
+
+  it('reverting a provider to "Use global default" removes its key entirely', async () => {
+    mockService.list.mockResolvedValue(twoProviders);
+    mockService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: false,
+      userCanOverride: true,
+      privacyDefaultPerProvider: { p1: true, p2: false },
+      fieldPolicy: [],
+      conversationRetentionDays: 0,
+    });
+    renderOnPrivacyTab();
+
+    const alphaSelect = await screen.findByRole('combobox', {
+      name: /privacy override for alpha/i,
+    });
+    expect(alphaSelect).toHaveValue('on');
+    fireEvent.change(alphaSelect, { target: { value: 'inherit' } });
+    fireEvent.click(
+      screen.getByRole('button', { name: /save privacy settings/i }),
+    );
+
+    await waitFor(() =>
+      expect(mockService.updateAssistantSettings).toHaveBeenCalled(),
+    );
+    const payload = mockService.updateAssistantSettings.mock.calls[0][0];
+    // p1's key is gone entirely (inherit), p2's explicit false survives untouched.
+    expect(payload.privacyDefaultPerProvider).toEqual({ p2: false });
+  });
+
+  it('shows an empty-state message instead of a table when no providers are configured', async () => {
+    mockService.list.mockResolvedValue([]);
+    renderOnPrivacyTab();
+
+    expect(
+      await screen.findByText(/no providers configured yet/i),
+    ).toBeInTheDocument();
   });
 });
 

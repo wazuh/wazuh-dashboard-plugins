@@ -139,10 +139,43 @@ function tabFromSearch(search: string): SettingsTabId {
 // below them, all gated behind the same "Save privacy settings" button and the same dirty check.
 type PrivacyDraft = Pick<
   AssistantSettings,
-  'privacyDefaultOn' | 'userCanOverride'
+  'privacyDefaultOn' | 'userCanOverride' | 'privacyDefaultPerProvider'
 > & {
   fieldPolicy: Array<FieldPolicyEntry & { _isNew?: true }>;
 };
+
+/** The per-provider override control's three states (UX iteration 4 item 3): `'inherit'` means
+ * the provider's id is simply ABSENT from `privacyDefaultPerProvider` (the wire shape has no
+ * dedicated "inherit" value — see `AssistantSettings.privacyDefaultPerProvider`, a plain
+ * `Record<string, boolean>`), while `'on'`/`'off'` are an explicit `true`/`false` entry. A plain
+ * `EuiSwitch` can only express two of these three states, which is why this reaches for a select
+ * instead. */
+type ProviderPrivacyOverride = 'inherit' | 'on' | 'off';
+
+function providerPrivacyOverride(
+  perProvider: Record<string, boolean>,
+  providerId: string,
+): ProviderPrivacyOverride {
+  if (!(providerId in perProvider)) {
+    return 'inherit';
+  }
+  return perProvider[providerId] ? 'on' : 'off';
+}
+
+/** Applies one row's new override to the draft map, removing the KEY entirely for `'inherit'`
+ * rather than storing some sentinel — the wire shape's only way to say "no override" is for the
+ * provider's id to be absent (see `ProviderPrivacyOverride` above). */
+function withProviderPrivacyOverride(
+  perProvider: Record<string, boolean>,
+  providerId: string,
+  next: ProviderPrivacyOverride,
+): Record<string, boolean> {
+  if (next === 'inherit') {
+    const { [providerId]: _removed, ...rest } = perProvider;
+    return rest;
+  }
+  return { ...perProvider, [providerId]: next === 'on' };
+}
 
 /**
  * Full PUT /settings payload from the last successful load plus the one slice a section's Save
@@ -461,6 +494,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         privacy.commit({
           privacyDefaultOn: loaded.privacyDefaultOn,
           userCanOverride: loaded.userCanOverride,
+          privacyDefaultPerProvider: loaded.privacyDefaultPerProvider,
           fieldPolicy: loaded.fieldPolicy,
         });
         retention.commit(loaded.conversationRetentionDays);
@@ -540,6 +574,27 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     );
   };
 
+  // Per-provider privacy override (UX iteration 4 item 3): part of the same Privacy save unit as
+  // the switches and field policy above, gated behind the same "Save privacy settings" button and
+  // the same dirty check — it edits `privacy.value.privacyDefaultPerProvider` the same way
+  // `handleFieldPolicyChange` above edits `fieldPolicy`.
+  const handleProviderPrivacyOverrideChange = (
+    providerId: string,
+    next: ProviderPrivacyOverride,
+  ) => {
+    privacy.setValue(
+      current =>
+        current && {
+          ...current,
+          privacyDefaultPerProvider: withProviderPrivacyOverride(
+            current.privacyDefaultPerProvider ?? {},
+            providerId,
+            next,
+          ),
+        },
+    );
+  };
+
   const handleAddFieldPolicyRow = () => {
     privacy.setValue(
       current =>
@@ -576,6 +631,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         buildSettingsPayload(loadedAssistantSettings, {
           privacyDefaultOn: privacyDraft.privacyDefaultOn,
           userCanOverride: privacyDraft.userCanOverride,
+          privacyDefaultPerProvider:
+            privacyDraft.privacyDefaultPerProvider ?? {},
           // Drop any blank rows a user added via "Add field" but never filled in.
           // Strip the internal `_isNew` flag before sending — the server schema rejects unknown keys.
           fieldPolicy: fieldPolicyDraft
@@ -587,6 +644,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       privacy.commit({
         privacyDefaultOn: saved.privacyDefaultOn,
         userCanOverride: saved.userCanOverride,
+        privacyDefaultPerProvider: saved.privacyDefaultPerProvider,
         fieldPolicy: saved.fieldPolicy,
       });
       retention.setValue(saved.conversationRetentionDays);
@@ -714,20 +772,15 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoOpenCreateForm]);
 
-  // No per-provider privacy toggle in this form, deliberately.
-  // `AssistantSettings.privacyDefaultPerProvider` is keyed by provider id and lives in a
-  // SEPARATE document from `ProviderInput`/`ProviderSummary` (common/types.ts has no field for
-  // it, by design — it is not part of a provider's own config). Adding a per-provider toggle to
-  // this form would mean: (a) a brand-new provider's id isn't known until AFTER `service.create()`
-  // resolves, so the toggle's write has to happen as a second, separate `updateAssistantSettings`
-  // call following provider creation; (b) representing "no override for this provider" (key absent
-  // from the map) vs. an explicit `true`/`false` needs a tri-state control, since a plain EuiSwitch
-  // can't distinguish "inherit the global default" from "explicitly off"; (c) it would need to
-  // read/write `loadedAssistantSettings` from inside this unrelated form's submit handler, coupling
-  // two independently-loaded pieces of state. That cost is not worth a toggle no one has asked
-  // for; the per-provider map stays editable only by ensuring the global
-  // Privacy section below never overwrites it (see `handleSavePrivacySettings`'s
-  // `privacyDefaultPerProvider: loadedAssistantSettings.privacyDefaultPerProvider` passthrough).
+  // Still no per-provider privacy toggle in THIS form, deliberately (UX iteration 4 item 3 added
+  // the toggle itself, but not here). `AssistantSettings.privacyDefaultPerProvider` is keyed by
+  // provider id and lives in a SEPARATE document from `ProviderInput`/`ProviderSummary`
+  // (common/types.ts has no field for it, by design — it is not part of a provider's own config).
+  // A brand-new provider's id isn't known until AFTER `service.create()` resolves, so a toggle in
+  // THIS form would need a second, separate `updateAssistantSettings` call following provider
+  // creation. The Privacy tab's own per-provider override table (below, in the render) sidesteps
+  // that entirely: it lists already-created providers (real ids) and saves through the same
+  // `updateAssistantSettings` round-trip the rest of that tab already uses.
   const handleSubmit = async (input: ProviderInput) => {
     setError(null);
     setIsSubmittingProvider(true);
@@ -1669,6 +1722,110 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   )}
                 </EuiFlexItem>
               </EuiFlexGroup>
+
+              <EuiSpacer size='m' />
+              <EuiHorizontalRule margin='none' />
+              <EuiSpacer size='m' />
+
+              {/* Per-provider privacy override (UX iteration 4 item 3): the backend has accepted
+                  `privacyDefaultPerProvider` since before this UI existed (server/routes/settings.ts,
+                  server/settings/types.ts) — this is the first UI for it. A compact per-row control
+                  rather than a table component: three states per provider is not enough content to
+                  earn EuiInMemoryTable's own chrome, and this reuses the exact `providers` list the
+                  Providers tab already loads. */}
+              <EuiText size='s'>
+                <strong>
+                  {i18n.translate(
+                    'wazuhAiAssistant.settings.privacy.perProviderTitle',
+                    { defaultMessage: 'Per-provider override' },
+                  )}
+                </strong>
+              </EuiText>
+              <div className='wzSettingsCard__fieldHelp'>
+                {i18n.translate(
+                  'wazuhAiAssistant.settings.privacy.perProviderHelp',
+                  {
+                    defaultMessage:
+                      'Overrides the global privacy default above for one provider only. Providers ' +
+                      'left at "Use global default" follow that switch.',
+                  },
+                )}
+              </div>
+              <EuiSpacer size='s' />
+              {providers.length === 0 ? (
+                <EuiText size='s' color='subdued'>
+                  {i18n.translate(
+                    'wazuhAiAssistant.settings.privacy.perProviderEmpty',
+                    { defaultMessage: 'No providers configured yet.' },
+                  )}
+                </EuiText>
+              ) : (
+                providers.map(provider => (
+                  <React.Fragment key={provider.id}>
+                    <EuiFlexGroup
+                      gutterSize='s'
+                      alignItems='center'
+                      responsive={false}
+                    >
+                      <EuiFlexItem>
+                        <EuiText size='s' title={provider.name}>
+                          {provider.name}
+                        </EuiText>
+                      </EuiFlexItem>
+                      <EuiFlexItem grow={false} style={{ minWidth: 200 }}>
+                        <EuiSelect
+                          compressed
+                          aria-label={i18n.translate(
+                            'wazuhAiAssistant.settings.privacy.perProviderSelectAriaLabel',
+                            {
+                              defaultMessage: 'Privacy override for {name}',
+                              values: { name: provider.name },
+                            },
+                          )}
+                          options={[
+                            {
+                              value: 'inherit',
+                              text: i18n.translate(
+                                'wazuhAiAssistant.settings.privacy.perProviderInherit',
+                                { defaultMessage: 'Use global default' },
+                              ),
+                            },
+                            {
+                              value: 'on',
+                              text: i18n.translate(
+                                'wazuhAiAssistant.settings.privacy.perProviderOn',
+                                { defaultMessage: 'On' },
+                              ),
+                            },
+                            {
+                              value: 'off',
+                              text: i18n.translate(
+                                'wazuhAiAssistant.settings.privacy.perProviderOff',
+                                { defaultMessage: 'Off' },
+                              ),
+                            },
+                          ]}
+                          value={providerPrivacyOverride(
+                            // Defensive fallback: `privacyDefaultPerProvider` should always be
+                            // present on a loaded/saved AssistantSettings, but a falsy value here
+                            // must never crash the render — it just reads as "every provider
+                            // inherits", the same as an explicitly empty map.
+                            privacyDraft.privacyDefaultPerProvider ?? {},
+                            provider.id,
+                          )}
+                          onChange={event =>
+                            handleProviderPrivacyOverrideChange(
+                              provider.id,
+                              event.target.value as ProviderPrivacyOverride,
+                            )
+                          }
+                        />
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                    <EuiSpacer size='xs' />
+                  </React.Fragment>
+                ))
+              )}
 
               {/* `className` caps the rule at the content measure (settings-page.scss):
                   a full-bleed 1150px hairline over one button read as a page
