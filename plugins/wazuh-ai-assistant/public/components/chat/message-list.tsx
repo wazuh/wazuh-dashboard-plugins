@@ -104,8 +104,16 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
           user was left staring at their own question with no way to ask it again. */}
       {lastMessage?.role === 'user' && (
         <>
+          {/* This spacer used to render at 0px instead of its intended 8px, via the same
+              margin-collapse leak the P0 flow-root fix on `.wzMessageRow` (chat-page.scss)
+              corrects — the leak was general to any `EuiFlexGroup`-rooted content sitting inside a
+              bare `.wzMessageRow`, and `InterruptedTurnNotice` below is exactly that. */}
           <EuiSpacer size='s' />
-          <div className='wzMessageRow'>
+          {/* `wzInterruptedNoticeRow` (chat-page.scss, iteration-4 audit P1 item 8): this standalone
+              notice has no avatar column of its own, so without it the text rendered at the row's
+              own left edge (avatarX) instead of the prose rail every other line above it sits on
+              (avatarX + 40px). */}
+          <div className='wzMessageRow wzInterruptedNoticeRow'>
             <InterruptedTurnNotice onRetry={onRetryLastTurn} />
           </div>
         </>

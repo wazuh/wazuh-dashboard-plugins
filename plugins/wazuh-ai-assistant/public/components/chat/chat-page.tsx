@@ -2359,13 +2359,18 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             className='wzChatTranscript'
           >
             {/* `.wzTranscriptContent` (chat-page.scss): the full-width wrapper that owns the ONE
-              shared `16px 24px 0` gutter — `.wzContentMeasure` below (header/callouts/welcome) and
-              `MessageList` (rendered as ITS sibling further down, not its descendant) both sit
+              shared `24px 24px 24px` gutter — `.wzContentMeasure` below (header/callouts/welcome)
+              and `MessageList` (rendered as ITS sibling further down, not its descendant) both sit
               inside it, which is what lets a table-bearing turn's own row measure past
               `.wzContentMeasure`'s 1060px cap instead of being clipped to it (layout contract §5). */}
             <div
               className='wzTranscriptContent'
-              style={{ padding: '16px 24px 0' }}
+              // Restores lead breath at the top (16 -> 24px) and adds the tail breath the
+              // transcript never had at all (0 -> 24px) so the last turn is not flush against the
+              // composer's own hairline (iteration-4 audit, P1 item 7). See `.wzStatusCallouts`
+              // (chat-page.scss) for why the top half of this still scrolls out from under the
+              // sticky band rather than staying visible above it.
+              style={{ padding: '24px 24px 24px' }}
             >
               {/* `.wzContentMeasure` (chat-page.scss): the ONE centred column transcript prose and
               the composer share (layout contract §5) — reads `$wzContentMaxWidth` off the shared

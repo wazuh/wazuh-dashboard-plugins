@@ -391,7 +391,9 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
       )}
       {renderedTable && (
         <>
-          <EuiSpacer size='s' />
+          {/* Iteration-4 audit, P1 item 5: 16px ('m'), not 8px ('s') — a card must not sit closer
+              to the sentence above it than two sentences sit to each other. */}
+          <EuiSpacer size='m' />
           <ResultTable
             spec={renderedTable}
             resolveDiscoverUrl={resolveDiscoverUrl}
@@ -425,7 +427,9 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           link already goes through (discover-link.tsx). */}
       {message.suggestedQuery && (
         <>
-          <EuiSpacer size='s' />
+          {/* Iteration-4 audit, P1 item 5: same 16px ('m') as the results-card spacer above, for
+              the same reason — this callout is a card too. */}
+          <EuiSpacer size='m' />
           <EuiCallOut
             size='s'
             iconType='iInCircle'
@@ -533,7 +537,10 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           >
             <p
               style={{
-                margin: '4px 4px 0',
+                // Iteration-4 audit, P1 item 6: no inline-end/start asymmetry — the old
+                // `'4px 4px 0'` put a 4px indent in front of the timestamp that put this row's own
+                // left edge 4px off the prose's (and, for an assistant turn, off the avatar's).
+                margin: '4px 0 0',
                 fontVariantNumeric: 'tabular-nums',
               }}
             >

@@ -489,7 +489,7 @@ $wzWelcomeFadeOut: 180ms;
  * the flex column carrying `min-height: 100%` off `.wzChatTranscript`, so it spans the whole
  * scrollable height and a sticky child of it stays pinned for the entire conversation.
  *
- * `top: 0` pins against the scroll port, which means the transcript's own `16px` top padding scrolls
+ * `top: 0` pins against the scroll port, which means the transcript's own `24px` top padding scrolls
  * out from under the band — deliberate, so a pinned callout sits flush at the pane's edge like any
  * status bar rather than floating with a stripe of transcript above it. The opaque ground is not
  * decoration: `EuiCallOut` only fills its own box, so without it the `EuiSpacer` each `StatusCallout`
@@ -715,6 +715,19 @@ $wzMsgAvatarColumn: 40px;
     0px,
     calc((100% - #{$wzContentMaxWidth}) / 2 + #{$wzMsgAvatarColumn} / 2)
   );
+}
+
+/**
+ * The standalone interrupted-turn notice (message-list.tsx's own `InterruptedTurnNotice`, rendered
+ * with no bubble/avatar around it) has no avatar column of its own, so it rendered flush with the
+ * row's left edge — avatarX — while every line of prose above it in the same conversation sits on
+ * the prose rail, avatarX + `$wzMsgAvatarColumn` (iteration-4 audit, P1 item 8). Padding, not a
+ * margin-inline-start calc like the wide-row corrections above: this row's only content is inline
+ * text/a button, not a percentage-width block for a `calc((100% - ...))` expression to resolve
+ * against.
+ */
+.wzInterruptedNoticeRow {
+  padding-inline-start: $wzMsgAvatarColumn;
 }
 
 /**
