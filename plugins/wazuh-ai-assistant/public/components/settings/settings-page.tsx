@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import './settings-page.scss';
 import {
@@ -125,6 +125,12 @@ const DEFAULT_SETTINGS_TAB: SettingsTabId = 'providers';
 /** `?tab=<id>` on `#/settings`, the same query-param deep-link idiom `?addProvider=true`
  * (application.tsx) already establishes for this page. */
 const TAB_PARAM = 'tab';
+/** Mirrors `ADD_PROVIDER_PARAM` in `../../application.tsx` (not imported from there — that module
+ * imports `SettingsPage`, so importing back from it would be circular). `closeForm` below needs
+ * this name to strip the param from the URL in the SAME history write that restores the tab
+ * (item 1a): deleting it via a separate push let the still-stale `location.search` closure put it
+ * right back. */
+const ADD_PROVIDER_PARAM = 'addProvider';
 
 /** Reads the active tab off the URL, following the same precedent `?addProvider=true` set: an
  * unknown/stale/missing value falls back to the Providers tab rather than rendering nothing. */
@@ -366,15 +372,28 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   const [activeTabId, setActiveTabId] = useState<SettingsTabId>(() =>
     autoOpenCreateForm ? 'providers' : tabFromSearch(location.search),
   );
-  // Keeps the active tab in sync with the URL: a bookmarked/shared `?tab=privacy` link, the
-  // browser's back/forward buttons, and the `?addProvider=true` deep link (which always means
-  // Providers, since that is the only tab the create-provider flyout belongs to) all funnel
-  // through here rather than through the click handler below, which only covers the admin
-  // actually clicking a tab.
+  // Tracks the PREVIOUS `autoOpenCreateForm` value so the effect below can tell an ARRIVAL
+  // (false → true, e.g. the `?addProvider=true` deep link firing, or the header's "Add provider"
+  // button flipping it) from the flag merely still being true on some later, unrelated URL change.
+  // Seeded to `false` so a component that first MOUNTS with the flag already true (the deep-link
+  // case) is itself treated as an arrival, matching this component's own initial `activeTabId`
+  // state above.
+  const previousAutoOpenCreateFormRef = useRef(false);
+  // Keeps the active tab in sync with the URL: a bookmarked/shared `?tab=privacy` link and the
+  // browser's back/forward buttons funnel through here rather than through the click handler
+  // below (which only covers the admin actually clicking a tab) — as does the ARRIVAL of the
+  // `?addProvider=true` deep link, which always means Providers, since that is the only tab the
+  // create-provider flyout belongs to.
+  //
+  // Deliberately NOT "force Providers whenever `autoOpenCreateForm` is still true": `addProvider`
+  // can legitimately still be sitting in the URL (e.g. while the create flyout is open) on a
+  // search change that has nothing to do with arriving there — most notably `closeForm` below,
+  // whose own history push races this effect. Re-forcing Providers on every one of those changes
+  // silently overrode every OTHER tab click for as long as `addProvider` lingered (item 1b).
   useEffect(() => {
-    setActiveTabId(
-      autoOpenCreateForm ? 'providers' : tabFromSearch(location.search),
-    );
+    const isArrival = autoOpenCreateForm && !previousAutoOpenCreateFormRef.current;
+    previousAutoOpenCreateFormRef.current = Boolean(autoOpenCreateForm);
+    setActiveTabId(isArrival ? 'providers' : tabFromSearch(location.search));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search, autoOpenCreateForm]);
 
@@ -782,11 +801,32 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     // Only the create flow owns `?addProvider=true` — an edit close must not touch it (and
     // `editingProvider` here still reflects which flow was open, since this runs before either
     // state setter below takes effect).
+    //
+    // `onCreateFormOpenChange?.(false)` (application.tsx) reacts by pushing its OWN history entry
+    // (dropping every query param, including `?tab=`) — synchronously, before this component
+    // re-renders. The tab restore below therefore must not go through the generic `switchTab`
+    // helper: that rebuilds `search` from THIS closure's still-stale `location.search` (which
+    // still carries `addProvider=true`) and would push it right back, undoing the callback above
+    // and reproducing item 1a. Building the target tab AND dropping `addProvider` in one push
+    // here — issued AFTER the callback above, so it wins as the last history write — restores
+    // both correctly in a single step instead of two races.
     if (editingProvider === null) {
       onCreateFormOpenChange?.(false);
     }
     if (tabBeforeCreateForm !== null) {
-      switchTab(tabBeforeCreateForm);
+      const targetTab = tabBeforeCreateForm;
+      setActiveTabId(targetTab);
+      const params = new URLSearchParams(location.search);
+      params.delete(ADD_PROVIDER_PARAM);
+      if (targetTab === DEFAULT_SETTINGS_TAB) {
+        params.delete(TAB_PARAM);
+      } else {
+        params.set(TAB_PARAM, targetTab);
+      }
+      history.push({
+        pathname: location.pathname,
+        search: params.toString() ? `?${params.toString()}` : '',
+      });
       setTabBeforeCreateForm(null);
     }
     setIsFormOpen(false);

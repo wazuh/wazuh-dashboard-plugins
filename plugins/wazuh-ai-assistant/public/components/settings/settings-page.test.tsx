@@ -628,6 +628,64 @@ describe('SettingsPage — settings tabs (UX iteration 4 item 2)', () => {
     ).toHaveAttribute('aria-selected', 'true');
   });
 
+  it('lets a tab click through after Cancel closes the create form, and drops addProvider from the URL (item 1)', async () => {
+    // A real `history` so `onCreateFormOpenChange` can reproduce application.tsx's OWN history
+    // write (it replaces the whole URL with just `?addProvider=true`/bare `/settings`, dropping
+    // `?tab=` entirely) — the exact second, racing history update item 1a's fix has to win against.
+    const history = createMemoryHistory({
+      initialEntries: ['/settings?tab=privacy'],
+    });
+    render(
+      <Router history={history}>
+        <SettingsPage
+          core={coreMock}
+          onProvidersChanged={jest.fn()}
+          onCreateFormOpenChange={open => {
+            history.replace(open ? '/settings?addProvider=true' : '/settings');
+          }}
+        />
+      </Router>,
+    );
+
+    await screen.findByText(/enable privacy mode by default/i);
+
+    // The header's "Add provider" button (visible on every tab) opens the create flyout and sets
+    // `?addProvider=true`, exactly like the real app's onCreateFormOpenChange wiring.
+    fireEvent.click(screen.getByRole('button', { name: /^add provider$/i }));
+    await screen.findByLabelText(/^name\s*\*?$/i);
+    expect(history.location.search).toBe('?addProvider=true');
+
+    // Cancel the form without saving.
+    fireEvent.click(screen.getByRole('button', { name: /^cancel$/i }));
+    await waitFor(() =>
+      expect(screen.queryByLabelText(/^name\s*\*?$/i)).not.toBeInTheDocument(),
+    );
+
+    // `addProvider` must already be gone, and the admin should be back on Privacy...
+    expect(
+      new URLSearchParams(history.location.search).get('addProvider'),
+    ).toBeNull();
+    expect(
+      screen.getByRole('tab', { name: /privacy & data protection/i }),
+    ).toHaveAttribute('aria-selected', 'true');
+
+    // ...and a subsequent tab click must actually take effect (the bug: the arrival-forcing
+    // effect kept re-selecting Providers as long as `addProvider` lingered, swallowing this click).
+    fireEvent.click(
+      screen.getByRole('tab', { name: /conversation history/i }),
+    );
+    await screen.findByText(/keep saved conversations for/i);
+    expect(
+      screen.getByRole('tab', { name: /conversation history/i }),
+    ).toHaveAttribute('aria-selected', 'true');
+    expect(
+      new URLSearchParams(history.location.search).get('addProvider'),
+    ).toBeNull();
+    expect(new URLSearchParams(history.location.search).get('tab')).toBe(
+      'retention',
+    );
+  });
+
   it('keeps the Providers filter box and its filtered "Test all" set intact across a tab round trip (B1)', async () => {
     // The bug this pins: the Providers card used to UNMOUNT on a tab switch (`activeTabId ===
     // 'providers' && (...)`), which reset EuiInMemoryTable's own uncontrolled search box on
