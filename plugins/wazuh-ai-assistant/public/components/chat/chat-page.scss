@@ -509,12 +509,25 @@ $wzWelcomeFadeOut: 180ms;
      styling; only the inline form is a chip. */
   /* EUI renders inline code as `<span class="euiCodeBlock"><code>...</code></span>` and puts
      the fill/padding/radius on the SPAN — styling only `code` left the slab untouched (re-audit:
-     the rule shipped and changed nothing). Target both, still excluding fenced blocks. */
+     the rule shipped and changed nothing). Target both, still excluding fenced blocks.
+     Line-box half of the fix: EUI's chip is `display: inline-block` with its own `line-height`,
+     which lets it sit as a displaced block above the sentence instead of flowing inside it — most
+     visible with a long value (e.g. `wazuh.integration.name: linux`), where the chip breaks onto
+     its own line rather than wrapping mid-sentence like the surrounding words. `display: inline`
+     plus `line-height: inherit` and `vertical-align: baseline` put the chip back in the same line
+     box as the prose around it; `white-space: normal` undoes EUI's no-wrap so a long value can
+     still break at a space; `overflow-wrap: anywhere` lets a long token with no spaces (a long
+     dotted field path) break mid-string instead of forcing the line box wide. */
   :not(pre) > code,
   span.euiCodeBlock {
     border-radius: 4px;
     padding: 0 4px;
     font-size: 12px;
+    display: inline;
+    line-height: inherit;
+    vertical-align: baseline;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 }
 
