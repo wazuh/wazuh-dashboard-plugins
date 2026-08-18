@@ -683,15 +683,16 @@ $wzWelcomeFadeOut: 180ms;
  */
 /* 40px = the assistant row's avatar column (32px avatar + the flex group's 8px gutter,
    message-bubble.tsx). `100%` below resolves against the CONTENT flex item, which sits after
-   that column and is therefore 40px narrower than the row — without adding half the column
-   back, the correction fell 20px short (re-audit §3.2: prose at 575 where every other row
-   reads at 595). */
+   that column and is therefore 40px narrower than the row — without adding the FULL column
+   back, the correction under-corrected (live-verified, iteration-4 batch 2 item 3: prose.left
+   measured 397 with `+ $wzMsgAvatarColumn / 2` vs a normal turn's 419 — dropping the `/ 2` moved
+   it to 417, matching within a ~2px noise floor). */
 $wzMsgAvatarColumn: 40px;
 
 .wzMessageRow--wide .wzProseMeasure {
   margin-inline-start: max(
     0px,
-    calc((100% - #{$wzContentMaxWidth}) / 2 + #{$wzMsgAvatarColumn} / 2)
+    calc((100% - #{$wzContentMaxWidth}) / 2 + #{$wzMsgAvatarColumn})
   );
 }
 
@@ -720,7 +721,7 @@ $wzMsgAvatarColumn: 40px;
 .wzMessageRow--wide .wzMsgMetaRow {
   margin-inline-start: max(
     0px,
-    calc((100% - #{$wzContentMaxWidth}) / 2 + #{$wzMsgAvatarColumn} / 2)
+    calc((100% - #{$wzContentMaxWidth}) / 2 + #{$wzMsgAvatarColumn})
   );
 }
 

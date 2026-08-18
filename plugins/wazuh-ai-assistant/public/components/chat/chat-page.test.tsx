@@ -2038,10 +2038,14 @@ describe('ChatPage — jump to latest (C2)', () => {
     expect(scssRules).not.toMatch(
       /margin-inline-end:\s*\$wzScrollGutter \+ 24px/,
     );
-    // The prose-offset arithmetic must carry the avatar column's half-width (re-audit §3.2:
-    // without it the correction fell 20px short), and the results card must break out of the
-    // avatar column (§3.3).
-    expect(scssRules).toMatch(/wzMsgAvatarColumn.*\/ 2/);
+    // The prose-offset arithmetic must carry the avatar column's FULL width, not half of it
+    // (iteration-4 batch 2 item 3, live-verified: with `+ $wzMsgAvatarColumn / 2` the correction
+    // under-shot, landing prose.left at 397 against a normal turn's 419; dropping the `/ 2` moved
+    // it to 417, matching within a ~2px noise floor) — asserted both as the term appearing with no
+    // trailing `/ 2` and as that exact halved form being absent — and the results card must still
+    // break out of the avatar column (§3.3).
+    expect(scssRules).toMatch(/#\{\$wzMsgAvatarColumn\}\)/);
+    expect(scssRules).not.toMatch(/\$wzMsgAvatarColumn\}\s*\/\s*2/);
     expect(scssRules).toMatch(
       /\.wzMessageRow--wide \.wzResultsCard \{[^}]*margin-inline-start:\s*-\$wzMsgAvatarColumn/,
     );
