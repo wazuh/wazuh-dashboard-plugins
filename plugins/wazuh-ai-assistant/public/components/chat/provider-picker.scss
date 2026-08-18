@@ -104,4 +104,22 @@
     padding-top: 8px;
     padding-bottom: 8px;
   }
+
+  /**
+   * Footer rhythm (iteration-4 audit item 2 / measured live on 2026-08-18): provider items are
+   * two-line content (name+badge row, then the model line) and measured ~52px tall; this
+   * single-line "Manage providers" action inherited the same 8px top/bottom padding as those and
+   * measured only 33px — a ~19px drop that, sitting directly under the list with no visual
+   * separator, read as an inconsistent row height rather than a deliberately different kind of
+   * row. Two things were considered: forcing it to the full 52px (padding out empty space around
+   * one line, which would look like a mistake in the other direction), or marking it as its own
+   * footer region. Went with the latter — a hairline rule plus a bit more block padding narrows
+   * the gap to something that reads as "a shorter, distinct footer action" instead of "a menu
+   * item that lost track of its own height".
+   */
+  .wzProviderPickerFooterItem {
+    border-top: 1px solid var(--wz-hairline, #{$euiBorderColor});
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
 }

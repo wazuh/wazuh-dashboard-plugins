@@ -836,11 +836,24 @@ $wzMsgAvatarColumn: 40px;
  * CRITICAL fork constraint (settings-page.scss:135-138): `$euiColorSuccess` does not exist in this
  * OUI fork — the "on"/active tint is `$euiColorSecondary`/`$euiColorSecondaryText` via the shared
  * `wzStatusChip` mixin (`_redesign.scss`, imported at the top of this file), never `color='success'`.
+ *
+ * Sizing (iteration-4 audit item 2 / measured live on 2026-08-18): this chip rendered at 24px
+ * block size while the provider-picker trigger next to it and the send/stop button
+ * (`.wzComposerSendButton` below) are both fixed at 32px — same row, same vertical center, but a
+ * visibly shorter third control. Trade-off considered: keep 24px (lighter chip, but reads as an
+ * odd one out against two 32px buttons) vs raise to 32px (one consistent row height, but more
+ * padding around a 12px label than the badge "needs"). Raised to 32px — a 32px pill with an 11-
+ * 12px label is a standard chip proportion (see `wzStatusChip` itself, used at well under 32px
+ * blocks elsewhere without looking sparse), and "one row of equal-weight controls" reads more
+ * intentional here than saving 8px of height on just one of the three. `EuiBadge` centers its
+ * content on the block axis itself (this is how the previous 24px block-size worked with the
+ * mixin's own 18px line-height), so no line-height change is needed to keep the label centered —
+ * only the horizontal padding is nudged out slightly so the taller pill doesn't look narrow.
  */
 .euiBadge.wzPrivacyChip {
   border-radius: 999px;
-  min-block-size: 24px;
-  padding-inline: 8px;
+  min-block-size: 32px;
+  padding-inline: 10px;
   font-size: 12px;
   font-weight: 600;
 
