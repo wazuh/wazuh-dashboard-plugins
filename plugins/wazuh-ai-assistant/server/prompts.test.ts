@@ -258,6 +258,22 @@ test('buildSystemPrompt: the deliberate vulnerability-history limitation is NOT 
   );
 });
 
+test('buildSystemPrompt: instructs the model to never name internal tool ids in user-facing prose', () => {
+  // A real answer once wrote "which get_rules (Security Analytics correlation rules) doesn't
+  // index..." -- a raw tool id from CAPABILITY_INVENTORY leaking into the user-visible answer.
+  // The model has no other source for these ids than the catalog clause, so the rule must name
+  // at least one example id and require plain-language description instead.
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /Never write an internal tool name \(e\.g\. get_rules, search_wazuh_data\) in your answer text/,
+  );
+  assert.match(
+    prompt,
+    /describe the capability in plain language instead/,
+  );
+});
+
 test('buildSystemPrompt: still says plainly what it can/cannot check (amended, not contradicted)', () => {
   // The new "never claim a missing capability" line must not silently replace or contradict
   // the pre-existing honesty instruction it was added next to.

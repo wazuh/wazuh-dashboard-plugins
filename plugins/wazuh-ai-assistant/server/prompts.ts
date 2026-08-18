@@ -84,6 +84,14 @@ export function buildSystemPrompt(nowIso: string): string {
       'check with the available tools — never silently answer a narrower question than the one ' +
       'asked. The tools offered to you on any given turn are a routed subset of this full ' +
       `catalog: ${CAPABILITY_INVENTORY}.`,
+    // A real answer once wrote "which get_rules (Security Analytics correlation rules) doesn't
+    // index..." -- a raw tool id from CAPABILITY_INVENTORY leaking straight into user-facing
+    // prose. Tool ids are internal plumbing named for this catalog, not vocabulary the user
+    // shares; the fix is a plain-language description of the capability instead.
+    'Never write an internal tool name (e.g. get_rules, search_wazuh_data) in your answer text ' +
+      '-- describe the capability in plain language instead (e.g. "the correlation-rule ' +
+      'listing", "the Wazuh data search"). This applies to every tool in the catalog above, not ' +
+      'just the ones offered to you this turn.',
     // Issue #8920 item 4 overshot here: an earlier wording made "no tool was offered" and "a
     // real gap" both collapse to "say you cannot check it", which pushed the model to deny a
     // capability it could not actually verify was missing. The fix gives it a concrete test it
