@@ -1088,6 +1088,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
             >
               <EuiFormRow
                 id='wz-ai-provider-model'
+                fullWidth
                 label={
                   <RequiredLabel
                     label={i18n.translate(
@@ -1125,6 +1126,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 }
               >
                 <EuiComboBox
+                  fullWidth
                   placeholder={i18n.translate(
                     'wazuhAiAssistant.settings.form.modelPlaceholder',
                     {
