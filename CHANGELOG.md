@@ -8,6 +8,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.10.5
 
+### Changed
+
+- Removed unnecessary axios plugin dependency, provided by the OpenSearch Dashboards platform [#8576](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8576)
+- Removed unnecessary follow-redirects plugin dependency and upgraded dompurify and swagger-client dependencies [#8582](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8582)
+
 ## Wazuh v4.10.4 - OpenSearch Dashboards 2.19.5 - Revision 01
 
 ### Added
