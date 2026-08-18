@@ -1746,6 +1746,18 @@ export async function* orchestrate(
         // reached the client).
         usageTotals = addUsage(usageTotals, event.usage);
         if (sawToolCall) {
+          // Issue C4 follow-up: text streamed AFTER this round's LAST tool call (e.g. a closing
+          // remark before the round ended) is not captured by either tool_call history-append
+          // above -- both only consume the text that arrived BEFORE their own call. Append the
+          // unconsumed tail onto its own assistant history turn now, before the next round
+          // starts, so it is not silently dropped the same way `content: ''` used to drop
+          // everything. Trimmed for the same whitespace-only-text-block reason as the tool_call
+          // sites above.
+          const roundTail = roundText.slice(roundTextConsumed).trim();
+          roundTextConsumed = roundText.length;
+          if (roundTail) {
+            messages = [...messages, { role: 'assistant', content: roundTail }];
+          }
           // More rounds needed: suppress this 'done' (the turn isn't over) and start the next
           // round with the grown message history instead of ending the SSE stream here.
           break;

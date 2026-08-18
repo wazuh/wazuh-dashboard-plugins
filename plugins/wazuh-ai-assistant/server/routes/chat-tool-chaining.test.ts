@@ -703,6 +703,48 @@ test('orchestrate: a round that streams only whitespace before its tool_call pro
   );
 });
 
+// --- orchestrate: round-tail narration -- text streamed AFTER a round's LAST tool_call ---------
+
+test("orchestrate: text streamed AFTER a round's last tool_call is carried into history as its own assistant message", async () => {
+  // Residual gap flagged in adversarial review: the C4 fix only attributes narration that
+  // arrives BEFORE each tool_call (`roundTextConsumed` slicing). Text streamed after the LAST
+  // tool_call of a round -- before that round's `done` -- was still silently dropped, because the
+  // 'done' handler for a tool-bearing round only accumulated usage and broke to the next round.
+  const { context } = scaContext();
+  const { callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      [
+        {
+          type: 'tool_call',
+          toolCall: {
+            id: 'call_sca_results',
+            name: 'get_sca_results',
+            arguments: { agent_id: '001' },
+          },
+        },
+        { type: 'delta', content: 'That query is running now.' },
+        { type: 'done', usage: { inputTokens: 20, outputTokens: 10 } },
+      ],
+      textOnlyScript('CIS Ubuntu: 95 passed, 102 failed, 10 N/A.'),
+    ],
+    context,
+  );
+
+  const round1Messages = callMessages[2];
+  const tailMessage = round1Messages.find(
+    message =>
+      message.role === 'assistant' &&
+      !message.toolCalls?.length &&
+      message.content === 'That query is running now.',
+  );
+  assert.ok(
+    tailMessage,
+    "text streamed after a round's last tool_call must be appended to history as its own " +
+      'assistant message, not silently dropped',
+  );
+});
+
 // --- orchestrate: main end-to-end case -- FAILS ON BASE -----------------------------------------
 
 test('orchestrate: an unprompted single-tool offer with rounds remaining is forced into a chained call, not left to end the turn', async () => {
