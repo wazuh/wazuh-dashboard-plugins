@@ -272,6 +272,55 @@ const PROVIDER_URL_GUIDANCE: Record<
   },
 };
 
+const ANTHROPIC_HOST = 'api.anthropic.com';
+
+/**
+ * Cheap, non-blocking host/type sanity check shown under the endpoint field. It deliberately does
+ * NOT try to validate "is this a legitimate host for openai_compatible" — that type covers OpenAI,
+ * Gemini, Bedrock, Ollama, LM Studio, vLLM and any private gateway, so there is no closed set of
+ * valid hosts to check against. The one thing that IS checkable both ways is Anthropic's own host,
+ * since Anthropic has exactly one real endpoint: an `anthropic`-typed provider NOT pointed at it is
+ * almost certainly a stale/copy-pasted URL, and an `openai_compatible`-typed provider pointed AT it
+ * is almost certainly a type picked before/after the endpoint was changed. Never blocks Save —
+ * the server's own "Save & test" connection check is the real validator.
+ */
+function getBaseUrlMismatchWarning(
+  type: ProviderInput['type'],
+  baseUrl: string,
+): string | null {
+  const trimmed = baseUrl.trim();
+  if (!trimmed) {
+    return null;
+  }
+  let host: string;
+  try {
+    host = new URL(trimmed).hostname.toLowerCase();
+  } catch {
+    // Not a parseable URL at all — the field's own format validation (`baseUrlError`) already
+    // covers that case, so there is nothing further to add here.
+    return null;
+  }
+  if (type === 'anthropic' && host !== ANTHROPIC_HOST) {
+    return i18n.translate(
+      'wazuhAiAssistant.settings.form.baseUrlMismatchAnthropic',
+      {
+        defaultMessage:
+          "This endpoint doesn't look like an Anthropic endpoint — double-check before saving.",
+      },
+    );
+  }
+  if (type === 'openai_compatible' && host === ANTHROPIC_HOST) {
+    return i18n.translate(
+      'wazuhAiAssistant.settings.form.baseUrlMismatchOpenaiCompatible',
+      {
+        defaultMessage:
+          "This endpoint doesn't look like an OpenAI-compatible endpoint — double-check before saving.",
+      },
+    );
+  }
+  return null;
+}
+
 /**
  * Per-type MODEL guidance: the model field is free text (no enum — providers add models faster
  * than this form could track), so it gets the same examples-plus-docs treatment as the endpoint
@@ -569,10 +618,11 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   );
   const [baseUrlError, setBaseUrlError] = useState<string | null>(null);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
-  // Tracks whether the admin has typed into the endpoint URL field themselves, so switching
-  // provider type to anthropic only prefills its base URL while the field is still
-  // empty/untouched — never overwriting a value the admin already entered. An existing
-  // provider being edited already has a real baseUrl, so it starts "touched".
+  // Tracks whether the admin has typed into the endpoint URL field themselves (see the field's own
+  // `onChange` below), so a provider-type switch (`handleTypeChange` above) only ever resets the
+  // base URL while the field is still empty or holds one of the OLD type's own known defaults —
+  // never overwriting a value the admin actually entered. An existing provider being edited
+  // already has a real baseUrl, so it starts "touched".
   const [baseUrlTouched, setBaseUrlTouched] = useState(
     Boolean(editingProvider),
   );
@@ -584,6 +634,10 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   // guards its own label lookup the same way.
   const urlGuidance =
     PROVIDER_URL_GUIDANCE[form.type] ?? PROVIDER_URL_GUIDANCE.openai_compatible;
+  const baseUrlMismatchWarning = getBaseUrlMismatchWarning(
+    form.type,
+    form.baseUrl,
+  );
   const modelGuidance =
     PROVIDER_MODEL_GUIDANCE[form.type] ??
     PROVIDER_MODEL_GUIDANCE.openai_compatible;
@@ -613,9 +667,11 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   const modelOptions = vendorModelSuggestions.map(model => ({ label: model }));
   const selectedModelOption = form.model ? [{ label: form.model }] : [];
 
+  // Deliberately does NOT set `baseUrlTouched` — this fills the field from one of the type's own
+  // "Examples:" chips, which is still just a suggested value (see `handleTypeChange` above), not
+  // something the admin hand-typed. Only the field's own `onChange` marks it touched.
   const fillBaseUrl = (value: string) => {
     setForm({ ...form, baseUrl: value });
-    setBaseUrlTouched(true);
     if (baseUrlError) {
       setBaseUrlError(null);
     }
@@ -641,31 +697,38 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
 
   // Group 1 (Provider type) onChange: same prefill/clear logic the old EuiSelect's onChange had,
   // just taking the next type directly instead of reading it off a native <select> change event.
+  //
+  // Generalized from an anthropic-only special case: a value only ever gets reset here when it is
+  // empty OR is exactly one of the OLD type's own known defaults (its `placeholder`, or one of its
+  // "Examples:" chip values) — i.e. it reads as "still just this type's suggestion", never as
+  // something the admin put there on purpose. `baseUrlTouched` is the other half of that check: it
+  // starts `true` for an existing provider being edited (see its initializer above), so opening
+  // Edit and clicking around the type selector never rewrites a value the admin already has
+  // running in production — even one that happens to read identical to today's placeholder text —
+  // and it is set on the field's own `onChange` (real hand-typing) but deliberately NOT by
+  // `fillBaseUrl` (example-chip selections): picking a suggested example is exactly the kind of
+  // "still just a suggestion" value this reset is meant to catch on the next type switch.
   const handleTypeChange = (nextType: ProviderInput['type']) => {
     setForm(current => {
-      // Prefill Anthropic's base URL the first time the admin switches to that type, but only
-      // while the endpoint field is still empty/untouched — see `baseUrlTouched` above.
-      const shouldPrefillAnthropicBaseUrl =
-        nextType === 'anthropic' &&
-        !baseUrlTouched &&
-        current.baseUrl.trim() === '';
-      // Mirror image of the prefill above: leaving anthropic for another type while the field is
-      // still untouched and still holds exactly the value this form prefilled clears it again, so
-      // a wrong-type URL can't be saved unnoticed. A value the admin typed themselves
-      // (`baseUrlTouched`) is never touched here.
-      const shouldClearAnthropicPrefill =
-        current.type === 'anthropic' &&
-        nextType !== 'anthropic' &&
-        !baseUrlTouched &&
-        current.baseUrl === PROVIDER_URL_GUIDANCE.anthropic.placeholder;
+      const oldGuidance =
+        PROVIDER_URL_GUIDANCE[current.type] ?? PROVIDER_URL_GUIDANCE.openai_compatible;
+      const trimmedBaseUrl = current.baseUrl.trim();
+      const isOldTypeDefault =
+        trimmedBaseUrl === '' ||
+        trimmedBaseUrl === oldGuidance.placeholder ||
+        oldGuidance.examples.includes(trimmedBaseUrl);
+      const shouldReset = !baseUrlTouched && isOldTypeDefault;
+      // Anthropic effectively has one real endpoint, so switching TO it prefills the field with
+      // that value outright. Every other type covers multiple vendors (OpenAI, Gemini, Bedrock,
+      // Ollama, a private gateway...) with no single "the" default to fill in, so clearing the
+      // field and letting its own `placeholder` attribute show the new type's example is the
+      // equivalent behavior there.
+      const resetBaseUrl =
+        nextType === 'anthropic' ? PROVIDER_URL_GUIDANCE.anthropic.placeholder : '';
       return {
         ...current,
         type: nextType,
-        baseUrl: shouldPrefillAnthropicBaseUrl
-          ? PROVIDER_URL_GUIDANCE.anthropic.placeholder
-          : shouldClearAnthropicPrefill
-          ? ''
-          : current.baseUrl,
+        baseUrl: shouldReset ? resetBaseUrl : current.baseUrl,
       };
     });
   };
@@ -1091,6 +1154,20 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                   }}
                 />
               </EuiFormRow>
+              {/* Non-blocking: a host/type mismatch never stops Save, same idea as the API key
+                  shape warning above — it only flags a likely wrong-endpoint mistake before the
+                  admin hits an opaque "Test connection" failure. */}
+              {baseUrlMismatchWarning && (
+                <>
+                  <EuiSpacer size='xs' />
+                  <EuiCallOut
+                    size='s'
+                    color='warning'
+                    iconType='alert'
+                    title={baseUrlMismatchWarning}
+                  />
+                </>
+              )}
             </EuiFormFieldset>
 
             <EuiFormFieldset

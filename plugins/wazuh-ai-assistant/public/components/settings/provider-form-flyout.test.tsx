@@ -503,6 +503,99 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
       'https://claude.internal-proxy.example',
     );
   });
+
+  // Generalized from the anthropic-only special case (batch 2 item 2): the reset now fires for
+  // ANY value that is still just the OLD type's own known default, not only an empty field —
+  // including one filled by clicking an "Examples:" chip, which is exactly the kind of "still just
+  // a suggestion" value the reset is meant to catch.
+  it('resets an endpoint still holding the OLD type\'s own example when switching type, even though it was filled by clicking a chip', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.click(
+      screen.getByLabelText('Use endpoint http://localhost:11434/v1'),
+    );
+    expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
+      'http://localhost:11434/v1',
+    );
+
+    fireEvent.click(providerTypeOption('anthropic'));
+
+    expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
+      'https://api.anthropic.com',
+    );
+  });
+});
+
+describe('ProviderFormFlyout — endpoint/type mismatch warning', () => {
+  it('warns, non-blockingly, when an anthropic-typed provider is not pointed at api.anthropic.com', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.click(providerTypeOption('anthropic'));
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://api.openai.com/v1' },
+    });
+
+    expect(
+      screen.getByText(/doesn't look like an anthropic endpoint/i),
+    ).toBeInTheDocument();
+    // Non-blocking: Save must stay enabled despite the mismatch warning.
+    expect(
+      screen.getByRole('button', { name: /^save & test$/i }),
+    ).toBeEnabled();
+  });
+
+  it('clears the anthropic-host warning once the endpoint matches again', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.click(providerTypeOption('anthropic'));
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://api.openai.com/v1' },
+    });
+    expect(
+      screen.getByText(/doesn't look like an anthropic endpoint/i),
+    ).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://api.anthropic.com' },
+    });
+
+    expect(
+      screen.queryByText(/doesn't look like an anthropic endpoint/i),
+    ).not.toBeInTheDocument();
+  });
+
+  it('warns when an openai_compatible-typed provider points at Anthropic\'s own host', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://api.anthropic.com' },
+    });
+
+    expect(
+      screen.getByText(/doesn't look like an openai-compatible endpoint/i),
+    ).toBeInTheDocument();
+  });
+
+  it('shows no mismatch warning for a normal openai_compatible endpoint', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://api.groq.com/openai/v1' },
+    });
+
+    expect(screen.queryByText(/doesn't look like/i)).not.toBeInTheDocument();
+  });
+
+  it('shows no mismatch warning while the endpoint field is empty', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.click(providerTypeOption('anthropic'));
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: '' },
+    });
+
+    expect(screen.queryByText(/doesn't look like/i)).not.toBeInTheDocument();
+  });
 });
 
 describe('ProviderFormFlyout — getting-started onboarding', () => {
