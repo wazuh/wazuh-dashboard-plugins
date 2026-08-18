@@ -470,13 +470,12 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
         // genuinely local to this decision, with no token or class behind it to drift from.
         maxWidth: isUser ? '75%' : '100%',
         minWidth: isUser ? 180 : 0,
-        // The assistant column is forced to a DETERMINISTIC width (full row, minus the avatar
-        // column) instead of EUI's default shrink-to-fit sizing (audit item 2). Shrink-to-fit made
-        // this flex item's resolved width track whatever it happened to be rendering — 605px for a
-        // collapsed/prose-only turn, 1260px once a `wzResultsCard` was expanded — and every percentage
-        // in `.wzMessageRow--wide .wzProseMeasure`'s `margin-inline-start` (chat-page.scss) resolves
-        // against THIS element's width. A shrink-to-fit width therefore turned "the panel expanded"
-        // into "the whole card/prose block jogs ~115px sideways", not just "the panel got taller".
+        // The assistant column is forced to a DETERMINISTIC width (the full row) instead of EUI's
+        // default shrink-to-fit sizing (audit item 2). Shrink-to-fit made this flex item's resolved
+        // width track whatever it happened to be rendering — 605px for a collapsed/prose-only turn,
+        // 1260px once a `wzResultsCard` was expanded — so the results card jogged ~115px sideways as
+        // it expanded/collapsed instead of just changing height, and a collapsed card hugged its own
+        // content rather than filling the wide row it was given.
         // `flex: 1 1 auto` makes the item grow to fill the row like any other block, and `min-width: 0`
         // is required alongside it — a flex item's automatic minimum is its content's, which for a
         // wide `wzResultsCard` would otherwise refuse to shrink back down and re-introduce the same
@@ -517,8 +516,10 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
             wired via aria-expanded/aria-controls). Anchoring the interrupted notice here instead
             of as its own floating line keeps it attached to the turn it belongs to. */}
       <EuiFlexGroup
-        // `wzMsgMetaRow` (chat-page.scss, iteration-4 audit P0 item 4): stable class so a
-        // table-bearing (`--wide`) row can correct this row's inline-start onto the prose rail.
+        // `wzMsgMetaRow`: a stable class marking the meta/footer row. A table-bearing (`--wide`)
+        // turn no longer needs to correct this row's inline-start — `.wzMessageRow--wide` anchors
+        // the whole row at the normal left edge (chat-page.scss) — but the class stays as the hook
+        // the transcript-geometry Cypress spec measures the footer's left edge from.
         className='wzMsgMetaRow'
         gutterSize='xs'
         alignItems='center'
@@ -618,8 +619,10 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   // alongside the in-bubble EuiLoadingContent skeleton/status line is gone — that pair read as two
   // independent "something is happening" signals for the same event.
   const avatarItem = (
-    // `wzMsgAvatarItem` (chat-page.scss, iteration-4 audit P0 item 4): stable class so a
-    // table-bearing (`--wide`) row can correct this item's inline-start onto the row's true edge.
+    // `wzMsgAvatarItem` (chat-page.scss): stable class carrying the avatar's small vertical nudge.
+    // A table-bearing (`--wide`) turn no longer breaks this item's inline-start out — the avatar
+    // keeps the same left x as on every other turn, since `.wzMessageRow--wide` anchors the whole
+    // row at the normal left edge (chat-page.scss) rather than correcting each element separately.
     <EuiFlexItem grow={false} className='wzMsgAvatarItem'>
       <EuiFlexGroup direction='column' alignItems='center' gutterSize='xs'>
         <EuiFlexItem grow={false}>{avatar}</EuiFlexItem>

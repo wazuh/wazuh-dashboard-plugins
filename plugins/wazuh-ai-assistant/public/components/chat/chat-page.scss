@@ -578,10 +578,29 @@ $wzWelcomeFadeOut: 180ms;
      wide row's own breakout content) and needs no other property to do it. */
   display: flow-root;
 
-  /* A turn carrying a result table is allowed the wider measure; every other turn keeps the same
-     column prose and the composer share. */
+  /**
+   * A table-bearing turn is the only one allowed to reach past the prose column — and it reaches
+   * only to the RIGHT. It pins its inline-start edge exactly where a normal ($wzContentMaxWidth)
+   * row's does: `margin-inline-start` reproduces that centred row's own start offset,
+   * `(100% - $wzContentMaxWidth) / 2` (floored at 0 for a pane narrower than the measure, where a
+   * normal row's own `margin: 0 auto` also collapses to 0), and then `width: auto` +
+   * `margin-inline-end: 0` take the remaining room on the end side alone, up to $wzTableMaxWidth.
+   * So the avatar, the prose and the meta/footer row all keep the exact same inline-start x they
+   * hold on every other turn — the avatars line up turn-to-turn instead of drifting left on table
+   * answers — and only the results card inside stretches wider. Because the used width can never
+   * exceed the space left after that start margin, the row's end edge stays within the transcript
+   * gutter at every pane width, so widening a turn never introduces a horizontal scrollbar.
+   *
+   * This REPLACES an earlier per-element scheme (a `-$wzMsgAvatarColumn` breakout on the avatar and
+   * the card, plus a `calc()` inline-start nudge on the prose and meta rows): centring the wider row
+   * 120px further left and then pulling four separate edges back toward two left the avatar and the
+   * card short of the prose rail — exactly the leftward avatar drift this single rule removes.
+   */
   &.wzMessageRow--wide {
-    max-width: min(100%, $wzTableMaxWidth);
+    width: auto;
+    max-width: $wzTableMaxWidth;
+    margin-inline-start: max(0px, calc((100% - #{$wzContentMaxWidth}) / 2));
+    margin-inline-end: 0;
   }
 }
 
@@ -667,63 +686,14 @@ $wzWelcomeFadeOut: 180ms;
 }
 
 /**
- * Prose inside a table-bearing (`--wide`) row starts where prose in every OTHER row starts.
- *
- * A wide row is capped at `min(100%, $wzTableMaxWidth)` while a normal row is capped at
- * `$wzContentMaxWidth`, and both are centred — so the wide row's content box begins
- * (1300 - 1060) / 2 = 120px further left. The audit (§3.1) measured exactly that: the answer's left
- * edge jogging 120px outward on any turn that happens to carry a table, i.e. the reader's one
- * dependable alignment edge moving because of something in the row BELOW the sentence they are
- * reading. Only the table is entitled to the breakout (rulebook D22); the prose is not.
- *
- * Written against `100%` (the row's own resolved width) rather than as a flat 120px so it stays
- * correct below 1300px of pane width, where the wide row is viewport-limited and the jog is smaller;
- * `max(0px, ...)` is the floor for a pane narrower than the prose measure itself, where there is no
- * jog to correct and a negative margin would pull the prose out of the row.
+ * The assistant row's avatar column — the 32px avatar plus the flex group's 8px gutter
+ * (message-bubble.tsx). The wide-row layout no longer needs it: `.wzMessageRow--wide` now anchors
+ * its own inline-start edge at a normal row's (see that rule above), so the avatar, prose and meta
+ * all keep their normal x with no per-element correction and only the results card reaches wider.
+ * The one consumer left is `.wzInterruptedNoticeRow` below, which has no avatar of its own and uses
+ * this to indent its inline text onto the prose rail.
  */
-/* 40px = the assistant row's avatar column (32px avatar + the flex group's 8px gutter,
-   message-bubble.tsx). `100%` below resolves against the CONTENT flex item, which sits after
-   that column and is therefore 40px narrower than the row — without adding the FULL column
-   back, the correction under-corrected (live-verified, iteration-4 batch 2 item 3: prose.left
-   measured 397 with `+ $wzMsgAvatarColumn / 2` vs a normal turn's 419 — dropping the `/ 2` moved
-   it to 417, matching within a ~2px noise floor). */
 $wzMsgAvatarColumn: 40px;
-
-.wzMessageRow--wide .wzProseMeasure {
-  margin-inline-start: max(
-    0px,
-    calc((100% - #{$wzContentMaxWidth}) / 2 + #{$wzMsgAvatarColumn})
-  );
-}
-
-/* The results card breaks out of the avatar column too: inside the content item it sat 40px
-   off the row's left edge and 0 off its right (re-audit §3.3) -- three different centre lines
-   on one surface. Pulled back by the full column, it spans and centres with the row itself. */
-.wzMessageRow--wide .wzResultsCard {
-  margin-inline-start: -$wzMsgAvatarColumn;
-}
-
-/**
- * The other two of the turn's four left edges (iteration-4 audit, P0 item 4): only the card and
- * the prose above picked up a wide-row correction, so on a table-bearing turn the AVATAR and the
- * META/footer row (the timestamp + tool-call chips, `.wzMsgMetaRow` on message-bubble.tsx's own
- * `EuiFlexGroup`) were left at whichever edge they naturally fell on — a third and fourth x-value
- * on the same row, most visibly the footer jogging 120px left of the prose sitting right above it.
- * Given each element the SAME treatment as its counterpart: the avatar is a breakout element like
- * the card (both resolve to the row's own true edge), and the meta row lives in the same content
- * column as the prose (both resolve to the prose rail, avatarX + 40px) — collapsing the row's four
- * edges down to the two the design actually calls for.
- */
-.wzMessageRow--wide .wzMsgAvatarItem {
-  margin-inline-start: -$wzMsgAvatarColumn;
-}
-
-.wzMessageRow--wide .wzMsgMetaRow {
-  margin-inline-start: max(
-    0px,
-    calc((100% - #{$wzContentMaxWidth}) / 2 + #{$wzMsgAvatarColumn})
-  );
-}
 
 /**
  * The avatar sits 2.5px above the first line's optical center when top-aligned against the row's
@@ -740,9 +710,8 @@ $wzMsgAvatarColumn: 40px;
  * with no bubble/avatar around it) has no avatar column of its own, so it rendered flush with the
  * row's left edge — avatarX — while every line of prose above it in the same conversation sits on
  * the prose rail, avatarX + `$wzMsgAvatarColumn` (iteration-4 audit, P1 item 8). Padding, not a
- * margin-inline-start calc like the wide-row corrections above: this row's only content is inline
- * text/a button, not a percentage-width block for a `calc((100% - ...))` expression to resolve
- * against.
+ * `margin-inline-start` calc: this row's only content is inline text/a button, not a
+ * percentage-width block for a `calc((100% - ...))` expression to resolve against.
  */
 .wzInterruptedNoticeRow {
   padding-inline-start: $wzMsgAvatarColumn;

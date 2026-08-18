@@ -38,20 +38,18 @@
  * flaky way to reproduce on demand.
  *
  * These specs were authored and every one of their target numbers was hand-verified turn-by-turn
- * against a live instance at https://localhost:8444 (deployed build `50645f4ef`) using a real
- * browser + `getBoundingClientRect`/`getComputedStyle`, before being encoded here. One assertion
- * is expected to be RED right now against that build — called out at its assertion with the
- * measured value and the defect it documents, per this task's instruction to encode the intended
- * spec rather than whatever currently renders:
+ * against a live instance at https://localhost:8444 using a real browser +
+ * `getBoundingClientRect`/`getComputedStyle`, before being encoded here.
  *
- *   1. The wide/table row's prose and meta/timestamp row measured 22px left of where every other
- *      row's prose sits (397/397 vs the normal row's 419), because
- *      `.wzMessageRow--wide .wzProseMeasure`/`.wzMessageRow--wide .wzMsgMetaRow` (chat-page.scss)
- *      add back only HALF of `$wzMsgAvatarColumn` when the sibling `.wzMessageRow--wide
- *      .wzMsgAvatarItem`/`.wzResultsCard` rules (same file) now give the avatar column back in
- *      FULL — a fix for this is being tracked separately (do not "fix" it by loosening these
- *      assertions; they are written to the ~2px noise floor a correct fix lands on, confirmed by
- *      live-patching the rule and re-measuring).
+ * The wide-row alignment (assertion 4) was RED on the earlier build `50645f4ef`: a table-bearing
+ * turn centred its wider row 120px further left and then used per-element `calc()` corrections that
+ * left the avatar (and card) short of the prose rail, so the avatar drifted ~120px left of where a
+ * prose-only turn's avatar sits and the prose/meta landed 22px short of the normal rail. The
+ * ux-iteration-4 fix removed that scheme: `.wzMessageRow--wide` now anchors its own inline-start
+ * edge at the normal row's and takes its extra width on the right side only, so avatar/prose/meta
+ * all keep their normal x and only the results card reaches wider. Assertion 4 encodes that fixed
+ * spec (do not "fix" a regression by loosening it; the tolerances are the ~2px noise floor a correct
+ * fix lands on, confirmed by live-patching the rule and re-measuring).
  *
  * Two other candidates flagged in an earlier pass through this suite — a "24px not 32px" turn
  * gap, and a "6px not 8px" card/prose→footer gap — turned out, after the same
@@ -181,8 +179,9 @@ describe('AI Assistant — transcript geometry', () => {
     });
   });
 
-  it('4. two-left-edges rule: avatar/card share one x, prose/meta share another — and that second x is the SAME on a wide row as on a normal row', () => {
+  it('4. avatar, prose and meta sit at the SAME absolute x on a wide row as on a normal row; only the results card reaches wider, and only to the right', () => {
     cy.get('.wzMessageRow').eq(PROSE_ROW).then($proseRow => {
+      const normalRow = rectOf($proseRow);
       const avatar = rectOf($proseRow.find('.wzMsgAvatarItem').first());
       const prose = rectOf($proseRow.find('.wzProseMeasure').first());
       const meta = rectOf($proseRow.find('.wzMsgMetaRow').first());
@@ -192,23 +191,33 @@ describe('AI Assistant — transcript geometry', () => {
       expect(meta.left, 'normal row: meta.left ≈ prose.left').to.be.closeTo(prose.left, 3);
 
       cy.get('.wzMessageRow').eq(WIDE_ROW).then($wideRow => {
+        const wideRow = rectOf($wideRow);
         const wideAvatar = rectOf($wideRow.find('.wzMsgAvatarItem').first());
         const wideCard = rectOf($wideRow.find('.wzResultsCard').first());
         const wideProse = rectOf($wideRow.find('.wzProseMeasure').first());
         const wideMeta = rectOf($wideRow.find('.wzMsgMetaRow').first());
 
-        // The card is entitled to break out to the avatar's own (further-left) edge on a wide
-        // row — that's by design, not a defect (rulebook: only a table may break out).
-        expect(wideCard.left, 'wide row: card.left == avatar.left (intentional breakout)').to.be.closeTo(wideAvatar.left, PX);
+        // The owner's fix (ux-iteration-4): a table-bearing turn must never pull the avatar (or the
+        // prose, or the meta row) leftward. All three keep the exact x they hold on a prose-only
+        // turn, so avatars line up turn-to-turn instead of drifting left on table answers. This is
+        // the assertion that was RED before the fix — the avatar used to break out ~120px further
+        // left than the prose-only row's avatar.
+        expect(wideAvatar.left, 'wide row: avatar.left == normal row avatar.left (no left drift)')
+          .to.be.closeTo(avatar.left, WIDE_ROW_PROSE_TOLERANCE_PX);
+        expect(wideProse.left, 'wide row: prose.left == normal row prose.left')
+          .to.be.closeTo(prose.left, WIDE_ROW_PROSE_TOLERANCE_PX);
+        expect(wideMeta.left, 'wide row: meta.left == normal row prose rail')
+          .to.be.closeTo(prose.left, WIDE_ROW_PROSE_TOLERANCE_PX);
 
-        // KNOWN RED on build 50645f4ef (see file banner, defect 1): prose/meta on the wide row
-        // are supposed to land on the SAME absolute x as the normal row's prose rail (avatarX+40
-        // for a normal row), not at their own avatar's x+40 (which is a different row's avatar
-        // entirely, since the wide row's avatar itself breaks out further left). Fix pending.
-        expect(wideProse.left, 'prose.left is the SAME on a wide row as on a normal row')
+        // The results card is the ONLY thing that widens, and it widens to the RIGHT: its left edge
+        // aligns with the prose column (avatarX + 40), never breaking out leftward, while the wide
+        // row's own right edge extends past where a normal row ends.
+        expect(wideCard.left, 'wide row: card.left == prose rail (avatarX + 40), not the avatar edge')
           .to.be.closeTo(prose.left, WIDE_ROW_PROSE_TOLERANCE_PX);
-        expect(wideMeta.left, 'meta.left is the SAME on a wide row as on a normal row')
-          .to.be.closeTo(prose.left, WIDE_ROW_PROSE_TOLERANCE_PX);
+        expect(wideRow.left, 'wide row left edge == normal row left edge')
+          .to.be.closeTo(normalRow.left, WIDE_ROW_PROSE_TOLERANCE_PX);
+        expect(wideRow.right, 'wide row extends further right than a normal row')
+          .to.be.greaterThan(normalRow.right + 1);
       });
     });
   });

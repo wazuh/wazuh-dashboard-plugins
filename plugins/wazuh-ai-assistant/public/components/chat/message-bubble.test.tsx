@@ -439,27 +439,33 @@ describe('MessageBubble', () => {
       );
     });
 
-    it('keeps prose on the same left edge in a table-carrying (--wide) row', () => {
-      // The jog this pins (css-audit-full.md §3.1): a `--wide` row is capped at $wzTableMaxWidth and
-      // a normal row at $wzContentMaxWidth, both centred — so the wide row's content box starts
-      // (1300 - 1060) / 2 = 120px further out, and the ANSWER's left edge moved 120px whenever the
-      // turn happened to carry a table. Only the table is entitled to the breakout; the sentences
-      // above it are not. Written against the row's own resolved width (`100%`) with a `max(0px,…)`
-      // floor rather than a flat 120px, so it stays correct on a pane narrower than 1300. The
-      // re-audit (§3.2) then showed `100%` resolves against the content flex item, which sits
-      // AFTER the 40px avatar column — so the arithmetic must add half that column back, or the
-      // correction lands 20px short.
+    it('keeps avatar, prose and meta on the same left edge in a table-carrying (--wide) row', () => {
+      // The drift this pins (css-audit-full.md §3.1 and the owner's live report that avatars sit
+      // further left on table answers): a `--wide` row is capped at $wzTableMaxWidth and a normal
+      // row at $wzContentMaxWidth. The earlier scheme centred the wider row — (1300 - 1060) / 2 =
+      // 120px further out — and then tried to pull four separate edges back with per-element calc
+      // corrections, which left the avatar and card short of the prose rail. The wide row now
+      // instead ANCHORS its own inline-start edge at the normal row's (`margin-inline-start: max(0px,
+      // (100% - $wzContentMaxWidth) / 2)`, the same offset a normal row's `margin: 0 auto` produces)
+      // and takes its extra width on the end side only (`width: auto; margin-inline-end: 0`), so the
+      // avatar, prose and meta all keep their normal x with no per-element correction and only the
+      // results card inside reaches wider. It reads the source directly because jest maps `.scss` to
+      // a style mock, so no rendered assertion can observe a value that came from a stylesheet.
       const scssSource = fs.readFileSync(
         path.join(__dirname, 'chat-page.scss'),
         'utf8',
       );
+      // The whole wide-row treatment lives on the row itself now, as an anchored inline-start plus a
+      // right-only stretch — no restated 120px, derived from the shared measure token.
       expect(scssSource).toMatch(
-        /\.wzMessageRow--wide \.wzProseMeasure \{\s*margin-inline-start: max\(/,
+        /&\.wzMessageRow--wide \{[\s\S]*?width: auto;[\s\S]*?max-width: \$wzTableMaxWidth;[\s\S]*?margin-inline-start: max\(0px, calc\(\(100% - #\{\$wzContentMaxWidth\}\) \/ 2\)\);[\s\S]*?margin-inline-end: 0;/,
       );
-      // ...derived from the shared measure token plus the avatar column, not a restated 120px.
-      expect(scssSource).toMatch(
-        /calc\(\(100% - #\{\$wzContentMaxWidth\}\) \/ 2 \+ #\{\$wzMsgAvatarColumn\} \/ 2\)/,
-      );
+      // The old per-element left corrections are gone: the avatar no longer breaks left, the card no
+      // longer breaks out to the avatar's edge, and prose/meta no longer carry a wide-row margin.
+      expect(scssSource).not.toMatch(/\.wzMessageRow--wide \.wzProseMeasure/);
+      expect(scssSource).not.toMatch(/\.wzMessageRow--wide \.wzMsgAvatarItem/);
+      expect(scssSource).not.toMatch(/\.wzMessageRow--wide \.wzMsgMetaRow/);
+      expect(scssSource).not.toMatch(/\.wzMessageRow--wide \.wzResultsCard/);
     });
 
     it('renders inline code in an answer as a chip, not as a square 8px slab', () => {
