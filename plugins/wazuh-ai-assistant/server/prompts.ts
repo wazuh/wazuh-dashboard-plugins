@@ -76,7 +76,22 @@ export function buildSystemPrompt(nowIso: string): string {
       'offer. Keep the whole answer under roughly 120 words unless the user asks for more ' +
       'detail.',
     'Tool arguments must use correct JSON types: numbers are unquoted (limit: 5, never "5").',
-    'Reply in the same language the user wrote in (Spanish or English).',
+    // BLOCKER FIX (2026-08-19 adjudicated run, CV-028/CV-048/CV-081): three plain English
+    // questions -- each the FIRST and ONLY message of its own turn, with no Spanish anywhere in
+    // the conversation -- were answered entirely in Spanish. The old wording ("the same language
+    // the user wrote in") named no specific message, leaving "the user" open to read as the
+    // conversation as a whole, or as whatever language happened to dominate the tool-result data
+    // (agent names, log lines, CVE descriptions can all carry non-English text) rather than
+    // anchoring to the one signal that actually determines the right answer language: the user's
+    // OWN latest message. Naming "most recent message" explicitly, and naming tool-result text as
+    // NOT a language signal, closes both readings without touching the legitimate Spanish-in/
+    // Spanish-out behavior (Spanish domain, 3/3 clean in the same run).
+    'ALWAYS answer in the language of the user\'s MOST RECENT message in this conversation ' +
+      '(Spanish or English) -- never an earlier message, never whatever language happens to ' +
+      'appear inside tool results (hostnames, log lines, CVE descriptions, rule text may be in ' +
+      'any language; that is data, not a language cue), and never a default. If the user\'s ' +
+      'latest message is in English, answer in English even if an earlier turn was in Spanish, ' +
+      'and vice versa.',
     'Always state the actual time window a tool call queried (e.g. "in the last 90 days, the ' +
       'default window") — never claim a window you did not query.',
     'If a tool call is rejected for exceeding a limit (e.g. a time range beyond the 90-day ' +

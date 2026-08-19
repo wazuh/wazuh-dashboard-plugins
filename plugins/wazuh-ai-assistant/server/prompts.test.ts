@@ -39,6 +39,35 @@ test('buildSystemPrompt: instructs the model to never assert a remediation/compl
   assert.match(prompt, /never from prose inside a result/);
 });
 
+// BLOCKER FIX (2026-08-19 adjudicated run, CV-028/CV-048/CV-081): three single-turn English
+// questions -- no Spanish anywhere in the conversation -- were answered entirely in Spanish. The
+// old wording ("Reply in the same language the user wrote in") named no specific message, leaving
+// room to read "the user" as the conversation as a whole or to be swayed by non-English text
+// inside tool results. The fix anchors explicitly to the user's MOST RECENT message and names
+// tool-result content as not a language signal.
+
+test('buildSystemPrompt: instructs the model to answer in the language of the user\'s MOST RECENT message', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /MOST RECENT message/);
+  assert.match(prompt, /never an\s+earlier message/);
+});
+
+test('buildSystemPrompt: tool-result content (hostnames, log lines, CVE text) is never a language cue', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /never whatever language happens to\s+appear inside tool results/,
+  );
+});
+
+test('buildSystemPrompt: the language rule explicitly overrides an earlier turn\'s language', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /answer in English even if an earlier turn was in Spanish,\s+and vice versa/,
+  );
+});
+
 // #8913: deictic host references ("this box") produced no tool call -- the model asked the user
 // for an agent id/name instead of resolving it itself. A live diagnostic (branch
 // diag/8913-router-logging) proved WHY the original single instruction below still failed 0/5 on
