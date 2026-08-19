@@ -65,8 +65,13 @@ test('get_field_values: prefix becomes a fully-escaped, case-expanded, anchored-
 });
 
 test('get_field_values: an unknown field is rejected with close-match suggestions, never reaching the indexer', () => {
+  // A truncated field path (a plausible real typo) is a genuine PREFIX of the real field, so it
+  // exercises suggestCloseFields' substring branch deterministically -- unlike an inserted-letter
+  // typo (e.g. "leveel"), which shares no contiguous substring or last-segment prefix relation
+  // with "level" and would only be reachable through a full fuzzy-distance match, explicitly out
+  // of scope for this tool's "bounded, simple prefix match" suggestion mechanism.
   assert.throws(
-    () => build({ field: 'wazuh.rule.leveel' }),
+    () => build({ field: 'wazuh.rule.lev' }),
     /not one of this tool's vetted, bounded-cardinality fields.*wazuh\.rule\.level/s,
   );
 });
