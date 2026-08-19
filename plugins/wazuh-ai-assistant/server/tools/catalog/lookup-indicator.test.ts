@@ -12,7 +12,7 @@ test('lookup_indicator: requires a non-empty indicator', () => {
   assert.throws(() => build({ indicator: '   ' }), /indicator.*required/i);
 });
 
-test('lookup_indicator: queries wazuh-threatintel-enrichments-a with an exact-or-prefix term on document.name', () => {
+test('lookup_indicator: a bare IP queries wazuh-threatintel-enrichments-a with an exact term PLUS an anchored "ip:" prefix', () => {
   const request = build({ indicator: '124.70.213.43' });
   assert.equal(request.index, 'wazuh-threatintel-enrichments-a');
   assert.deepEqual(request.body.query, {
@@ -33,7 +33,7 @@ test('lookup_indicator: queries wazuh-threatintel-enrichments-a with an exact-or
               {
                 prefix: {
                   'document.name': {
-                    value: '124.70.213.43',
+                    value: '124.70.213.43:',
                     case_insensitive: true,
                   },
                 },
@@ -45,6 +45,66 @@ test('lookup_indicator: queries wazuh-threatintel-enrichments-a with an exact-or
     },
   });
   assert.equal(request.body.size, 10);
+});
+
+test('lookup_indicator: a non-IP indicator (hash/url/domain) is exact-term only, no prefix arm', () => {
+  const request = build({ indicator: 'google.com' });
+  assert.deepEqual(request.body.query, {
+    bool: {
+      filter: [
+        {
+          bool: {
+            minimum_should_match: 1,
+            should: [
+              {
+                term: {
+                  'document.name': {
+                    value: 'google.com',
+                    case_insensitive: true,
+                  },
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  });
+});
+
+// A-1 (AI/plan/a1b-review.md), live-proven 2026-08-19 on wazuh-aio-5: the OLD unanchored prefix
+// arm made `prefix document.name = "124.70.213.4"` match all 55 "124.70.213.43:<port>" records --
+// a false known-malicious verdict for a distinct, benign IP. The anchored `${indicator}:` prefix
+// makes that structurally impossible: "124.70.213.4:" is never a prefix of "124.70.213.43:<port>"
+// (the character after "124.70.213.4" in the real record is "3", not ":").
+test('A-1 regression: 124.70.213.4 must NOT match 124.70.213.43\'s connection records', () => {
+  const request = build({ indicator: '124.70.213.4' });
+  const shouldClauses = (request.body.query as any).bool.filter[0].bool.should as Array<
+    Record<string, unknown>
+  >;
+  const prefixClause = shouldClauses.find(clause => 'prefix' in clause) as
+    | { prefix: { 'document.name': { value: string } } }
+    | undefined;
+  assert.ok(prefixClause, 'expected an anchored prefix clause for a bare IP indicator');
+  const prefixValue = prefixClause!.prefix['document.name'].value;
+  assert.equal(prefixValue, '124.70.213.4:');
+  // The DSL shape itself proves the false positive is impossible: a real "124.70.213.43:<port>"
+  // document.name does not start with "124.70.213.4:" (it starts with "124.70.213.43:"), so no
+  // amount of live data can make this prefix clause match that record.
+  assert.equal('124.70.213.43:18386'.startsWith(prefixValue), false);
+  assert.equal('124.70.213.4:80'.startsWith(prefixValue), true);
+});
+
+// A-1 regression, domain half: an unanchored prefix previously matched
+// "google.com-x09-206-188-196-165.sslip.io" for input "google.com". A domain is never treated as
+// a bare IP, so it now gets no prefix clause at all -- exact-term-only, which cannot match a
+// longer, unrelated hostname.
+test('A-1 regression: google.com gets no prefix clause (would have matched *.sslip.io typosquats)', () => {
+  const request = build({ indicator: 'google.com' });
+  const shouldClauses = (request.body.query as any).bool.filter[0].bool.should as Array<
+    Record<string, unknown>
+  >;
+  assert.equal(shouldClauses.some(clause => 'prefix' in clause), false);
 });
 
 test('lookup_indicator: trims the indicator and clamps limit to [1, 50]', () => {

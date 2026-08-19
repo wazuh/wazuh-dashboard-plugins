@@ -181,3 +181,96 @@ test('get_detectors: resolveParams degrades honestly when the findings-index loo
     assert.match(result.resolved.note ?? '', /could not be checked/);
   }
 });
+
+// A-2 (AI/plan/a1b-review.md), live-proven 2026-08-19 on wazuh-aio-5: BEFORE this fix,
+// detector_type = "*,.wazuh-cti-consumers,*" built the index string
+// ".opensearch-sap-*,.wazuh-cti-consumers,*-findings" and issued a real search against it (526
+// hits, reaching a DELIBERATELY EXCLUDED index) with no allowlist check at all. The fix rejects
+// any detector_type outside the safe index-name charset before it is ever interpolated, so no
+// search is issued.
+test('A-2 regression: a comma-smuggled detector_type issues no search at all', async () => {
+  const search = jest.fn();
+  const result = await getDetectorsTool.resolveParams!(
+    { detector_type: '*,.wazuh-cti-consumers,*' },
+    fakeContext(search),
+    {} as any,
+  );
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.equal(result.resolved.note, undefined);
+  }
+  assert.equal(search.mock.calls.length, 0);
+});
+
+// A-2 regression, second live-proven vector: "*-alerts,*" reached ".opensearch-sap-*-alerts", a
+// family guardrails.ts documents as DELIBERATELY EXCLUDED (empty by a provisioning defect, not by
+// design -- allowing it would let the model run a real query with escape-hatch-shaped risk this
+// tool was never meant to carry).
+test('A-2 regression: a detector_type that would reach the excluded *-alerts family issues no search', async () => {
+  const search = jest.fn();
+  const result = await getDetectorsTool.resolveParams!(
+    { detector_type: '*-alerts,*' },
+    fakeContext(search),
+    {} as any,
+  );
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.equal(result.resolved.note, undefined);
+  }
+  assert.equal(search.mock.calls.length, 0);
+});
+
+// A-2: a well-formed detector_type (the common case) is unaffected by the new validation -- still
+// reaches the search exactly as before.
+test('A-2: a well-formed detector_type still issues the findings-count search', async () => {
+  const search = jest.fn().mockResolvedValue({ body: { hits: { total: { value: 0 } } } });
+  const result = await getDetectorsTool.resolveParams!(
+    { detector_type: 'wazuh-generic' },
+    fakeContext(search),
+    {} as any,
+  );
+  assert.equal(result.ok, true);
+  assert.equal(search.mock.calls.length, 1);
+  assert.equal((search.mock.calls[0][0] as any).index, '.opensearch-sap-wazuh-generic-findings');
+});
+
+// A-4 (AI/plan/a1b-review.md): a `filter_path` response that resolves NONE of the four candidate
+// keys (live-verified on wazuh-aio-5: only two of the four requested keys come back; a `200` with
+// `{}` never throws) must degrade to the honest "could not verify" guidance, never collapse via
+// `??` into the affirmative, fabricated "findings persistence appears disabled" claim the OLD
+// code produced for this exact case.
+test('A-4 regression: an all-absent cluster-settings response yields honest "could not verify", never a fabricated "disabled" claim', async () => {
+  const search = jest.fn().mockResolvedValue({ body: { hits: { total: { value: 0 } } } });
+  const transportRequest = jest.fn().mockResolvedValue({ body: {} });
+  const result = await getDetectorsTool.resolveParams!(
+    { detector_type: 'gitlab' },
+    fakeContext(search, transportRequest),
+    {} as any,
+  );
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.match(result.resolved.note ?? '', /could not verify persistence settings/);
+    assert.doesNotMatch(result.resolved.note ?? '', /appears disabled/);
+  }
+});
+
+// A-4b (AI/plan/a1b-review.md): when the verdict is driven by the security_analytics key (not the
+// alerting one), the advice must name THAT key, not a hardcoded different one.
+test('A-4b regression: disabled-persistence advice names the key that actually resolved', async () => {
+  const search = jest.fn().mockResolvedValue({ body: { hits: { total: { value: 0 } } } });
+  const transportRequest = jest.fn().mockResolvedValue({
+    body: { defaults: { plugins: { security_analytics: { alert_finding_enabled: 'false' } } } },
+  });
+  const result = await getDetectorsTool.resolveParams!(
+    { detector_type: 'okta' },
+    fakeContext(search, transportRequest),
+    {} as any,
+  );
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.match(
+      result.resolved.note ?? '',
+      /enable plugins\.security_analytics\.alert_finding_enabled/,
+    );
+  }
+});

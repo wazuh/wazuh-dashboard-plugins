@@ -176,10 +176,11 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
     'and whether the CTI content feeds are up to date. Pipeline/threat-intel-catalog content, ' +
     'NOT findings that fired and NOT SCA compliance benchmarks.',
   free_search:
-    'Anything else about Wazuh finding/vulnerability/state data, PLUS operational metrics and ' +
-    'Security Analytics detector findings (last resort — always offered regardless of which ' +
-    'category is picked, so this rarely needs to be picked for its own sake). For IOC lookup, ' +
-    'CTI feed freshness, or CVE feed knowledge, prefer lookup_indicator/get_cti_status/' +
+    'Anything else about Wazuh finding/vulnerability/state data, PLUS operational metrics, ' +
+    'Security Analytics detector findings, and browsing/counting the raw CVE/IOC threat-intel ' +
+    'feeds (last resort — always offered regardless of which category is picked, so this ' +
+    'rarely needs to be picked for its own sake). For IOC lookup, CTI feed freshness, or CVE ' +
+    'feed knowledge about ONE specific indicator/CVE, prefer lookup_indicator/get_cti_status/' +
     'get_cve_intel (security_analytics/vulnerabilities categories) over this escape hatch.',
   general:
     'Greetings, thanks, or questions about the assistant itself. If the user asks anything about ' +

@@ -1,6 +1,13 @@
 import { RequestHandlerContext } from '../../../../../src/core/server';
 import { ResolveParamsResult, ToolDefinition } from '../types';
+import { checkIndexAllowlist } from '../guardrails';
 import { clampLimit, limitProperty, objectSchema } from './common';
+
+// A-2 hardening (AI/plan/a1b-review.md): `.wazuh-content-manager-jobs` is a hardcoded literal, not
+// model-controlled, so this is "free" defense-in-depth rather than a fix for a reachable attack --
+// it keeps "every indexer read in this catalog goes through checkIndexAllowlist" a grep-able
+// invariant instead of an invariant with a silent exception.
+const CONTENT_MANAGER_JOBS_INDEX = '.wazuh-content-manager-jobs';
 
 /** Stable per-feed document ids on `.wazuh-cti-consumers` (live-verified 2026-08-19: `_id`s are
  * `cti:catalog:consumer:{ruleset,iocs,vulnerabilities}`) -- used instead of the `context`/`name`
@@ -60,10 +67,19 @@ export const getCtiStatusTool: ToolDefinition = {
     context: RequestHandlerContext,
   ): Promise<ResolveParamsResult> {
     let note: string;
+    const allowlistCheck = checkIndexAllowlist(CONTENT_MANAGER_JOBS_INDEX);
+    if (!allowlistCheck.ok) {
+      // Should be unreachable (the index is a hardcoded literal above), but never issue a search
+      // this catalog's own boundary would reject -- degrade honestly instead.
+      return {
+        ok: true,
+        resolved: { params, note: 'Sync schedule: could not be checked (index not allowlisted).' },
+      };
+    }
     try {
       const response = await context.core.opensearch.client.asCurrentUser.search(
         {
-          index: '.wazuh-content-manager-jobs',
+          index: CONTENT_MANAGER_JOBS_INDEX,
           body: {
             query: { match_all: {} },
             _source: ['name', 'job_type', 'schedule', 'enabled'],

@@ -29,7 +29,24 @@ import { clampLimit, limitProperty, objectSchema, requireNonEmptyString } from '
  * (guardrails.ts) makes a "contains" search on a keyword field impossible here, same constraint
  * `nameFilterClause` (catalog/common.ts) already documents for the Security Analytics content
  * tools. A prefix match only ever anchors at the START of `document.name`.
+ *
+ * A-1 (AI/plan/a1b-review.md): an EARLIER version of this tool ran the prefix clause unanchored
+ * and unconditionally (`prefix: { 'document.name': indicator }`), which live-proved a false
+ * "known-malicious" verdict for benign values -- `124.70.213.4` returned 55 hits that all belonged
+ * to the DIFFERENT ip `124.70.213.43`, and `google.com` returned 2 hits for
+ * `google.com-x0*.sslip.io` records, a domain never in the feed. For an IOC tool that must never
+ * imply "malicious" any more than it may imply "safe", an unanchored prefix is the worst possible
+ * error direction. The prefix clause is now anchored to `` `${indicator}:` `` (the only shape it
+ * exists to serve -- the `"<ip>:<port>"` connection records) and only added when the input parses
+ * as a bare IPv4/IPv6 address; every other indicator shape (hash/url/domain) is exact-`term`-only.
  */
+const BARE_IPV4_RE = /^(\d{1,3}\.){3}\d{1,3}$/;
+const BARE_IPV6_RE = /^[0-9a-f:]+$/i;
+
+function isBareIpAddress(value: string): boolean {
+  return BARE_IPV4_RE.test(value) || (value.includes(':') && BARE_IPV6_RE.test(value));
+}
+
 export const lookupIndicatorTool: ToolDefinition = {
   spec: {
     name: 'lookup_indicator',
@@ -40,8 +57,10 @@ export const lookupIndicatorTool: ToolDefinition = {
       '-- never the customer\'s own environment. A match means the indicator is a KNOWN entry in ' +
       'this third-party feed; the ABSENCE of a match means "not present in the CTI feed", which ' +
       'is NOT proof the indicator is safe or clean -- never phrase a no-match result as "safe". ' +
-      'For an IP address, also try the bare address without a port; connection-type records store ' +
-      '"ip:port" and this tool matches by prefix as well as exact value. Distinct from the ' +
+      'For a bare IP address, connection-type records store "ip:port" as the indicator name, so ' +
+      'this tool also matches those records by an anchored "ip:" prefix (never a substring or ' +
+      'unanchored match) in addition to the exact value; every other indicator shape (hash, URL, ' +
+      'domain) matches by exact value only. Distinct from the ' +
       'vulnerability tools (CVE data) and from the customer\'s own observed source.ip/' +
       'destination.ip fields on findings -- this tool only reports third-party feed knowledge ' +
       'about the indicator itself.',
@@ -69,6 +88,31 @@ export const lookupIndicatorTool: ToolDefinition = {
     ).trim();
     const limit = clampLimit(params.limit, 10, 50);
 
+    // A-1: the prefix arm is only ever anchored to `${indicator}:` (the "ip:port" connection-
+    // record shape) and only added for a bare IP address -- every other indicator shape is
+    // exact-match only, so a value can never register a false "known-malicious" verdict just for
+    // sharing a leading substring with an unrelated record.
+    const should: unknown[] = [
+      {
+        term: {
+          'document.name': {
+            value: indicator,
+            case_insensitive: true,
+          },
+        },
+      },
+    ];
+    if (isBareIpAddress(indicator)) {
+      should.push({
+        prefix: {
+          'document.name': {
+            value: `${indicator}:`,
+            case_insensitive: true,
+          },
+        },
+      });
+    }
+
     return {
       target: 'indexer',
       index: 'wazuh-threatintel-enrichments-a',
@@ -79,24 +123,7 @@ export const lookupIndicatorTool: ToolDefinition = {
               {
                 bool: {
                   minimum_should_match: 1,
-                  should: [
-                    {
-                      term: {
-                        'document.name': {
-                          value: indicator,
-                          case_insensitive: true,
-                        },
-                      },
-                    },
-                    {
-                      prefix: {
-                        'document.name': {
-                          value: indicator,
-                          case_insensitive: true,
-                        },
-                      },
-                    },
-                  ],
+                  should,
                 },
               },
             ],
