@@ -7,7 +7,7 @@ import type {
 import {
   augmentToolError,
   CAPABILITY_DENIAL_NOTE,
-  MAX_TOOL_ROUNDS,
+  MAX_CONSECUTIVE_REJECTED_ROUNDS,
   orchestrate,
 } from './chat';
 import { ROUTE_QUESTION_TOOL } from '../tools/router';
@@ -757,17 +757,17 @@ test('orchestrate: a range-only suggestion on a blocked index is NOT told its fi
   assert.match(JSON.stringify(suggested[0].dsl), /now-180d/);
 });
 
-test('orchestrate: an unknown_fields resolution on the LAST tool-bearing round still emits the handoff', async () => {
-  // Round-aware retry gate: converting to a tool error on round MAX_TOOL_ROUNDS-1 would leave
-  // the final (tools-less) round unable to call suggest_discover_query at all -- the user
-  // would lose the handoff entirely, a regression against base. Rounds 0..MAX_TOOL_ROUNDS-2 are
-  // spent on ordinary rejected tool calls; the suggest call must land on round
-  // MAX_TOOL_ROUNDS - 1 (the last tool-bearing one) and fall through to strip-plus-disclose.
-  // The filler-round COUNT is derived from MAX_TOOL_ROUNDS instead of hardcoding 2 script
-  // entries: the old literal `[STAGE1_SCRIPT, rejectedSearchRound, rejectedSearchRound, ...]`
-  // encoded "the budget is 3" purely through array position, so a future round-budget change
-  // would silently start exercising a DIFFERENT round (no longer the last one) while this test
-  // kept passing -- proving nothing.
+test('orchestrate: an unknown_fields resolution on the round the F3 rejected-round bound forces final still emits the handoff', async () => {
+  // Round-aware retry gate (F2, AI/plan/c-review.md): converting to a tool error only helps if a
+  // FUTURE tool-bearing round exists to retry in. Review fix F3 added an independent bound
+  // (`MAX_CONSECUTIVE_REJECTED_ROUNDS`) for a turn that never succeeds even once -- tighter than
+  // the structural `MAX_TOOL_ROUNDS` cap this test used to exercise (5 filler rounds before F3;
+  // now the F3 bound of 3 consecutive rejected real-tool-call rounds fires first and is what
+  // actually decides "no more tool-bearing rounds" for an all-rejected turn like this one). The
+  // filler-round COUNT is derived from `MAX_CONSECUTIVE_REJECTED_ROUNDS` rather than hardcoded, for
+  // the same reason as before: a literal script array encodes "the bound is N" purely through
+  // array position, so a future change to that bound would silently start exercising a different
+  // round while this test kept passing, proving nothing.
   const rejectedSearchRound: StreamEvent[] = [
     {
       type: 'tool_call',
@@ -781,7 +781,7 @@ test('orchestrate: an unknown_fields resolution on the LAST tool-bearing round s
   ];
   const context = fakeContext(() => Promise.resolve({ body: { fields: {} } }));
   const fillerRounds = Array.from(
-    { length: MAX_TOOL_ROUNDS - 1 },
+    { length: MAX_CONSECUTIVE_REJECTED_ROUNDS },
     () => rejectedSearchRound,
   );
   const { events } = await runOrchestrate(

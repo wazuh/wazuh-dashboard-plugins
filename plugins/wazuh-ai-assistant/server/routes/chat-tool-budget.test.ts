@@ -16,7 +16,7 @@ import {
   shouldGrantBudgetExtension,
   toolCallCostUnits,
 } from './chat';
-import { getToolCostClass } from '../tools/registry';
+import { getToolCostClass, getToolDefinition } from '../tools/registry';
 import { ROUTE_QUESTION_TOOL } from '../tools/router';
 import { ChatMessage, ProviderConfig, StreamEvent } from '../../common/types';
 import { ChatStreamOptions, ProviderAdapter } from '../providers/types';
@@ -66,6 +66,11 @@ test('getToolCostClass: an ordinary typed hits tool defaults to class 2', () => 
     'get_vulnerabilities',
     'get_agent_inventory',
   ]) {
+    // F13 fix (AI/plan/c-review.md): `getToolCostClass` returns 2 for an UNKNOWN name too (see the
+    // very next test), so this assertion alone would pass whether or not the tool still exists --
+    // a rename would silently keep this green. Assert the tool is still a real catalog entry first,
+    // so a rename fails loudly here instead of just quietly costing 2 forever.
+    assert.ok(getToolDefinition(name), `${name} must still exist in the tool registry`);
     assert.equal(getToolCostClass(name), 2, `${name} should default to class 2`);
   }
 });
@@ -92,7 +97,7 @@ test('toolCallCostUnits: a successful call costs exactly its registry class', ()
 
 // --- isRoundFutile: the early futility stop (product design item 4) ------------------------
 
-test('isRoundFutile: no successful calls this round -- not this mechanism's concern (returns false)', () => {
+test("isRoundFutile: no successful calls this round -- not this mechanism's concern (returns false)", () => {
   // An all-rejected round is #8911's (shouldEnterFinalRoundEarly) territory, never this one's --
   // see the function's own doc comment for why the two must not overlap.
   assert.equal(isRoundFutile([]), false);
@@ -163,6 +168,35 @@ test('extractEnumeratedTargets: no cue word at all is NOT enumerable', () => {
   assert.equal(
     extractEnumeratedTargets('Summarize critical findings from the last 24 hours.'),
     undefined,
+  );
+});
+
+// F5 fix (AI/plan/c-review.md): before the identifier-shape requirement, every one of these was a
+// measured false positive -- an ordinary English "X, Y and Z" list near a cue word, with no digit
+// in any item, silently tripling the turn's budget. Each must now be rejected.
+test('extractEnumeratedTargets: F5 false-positive table -- ordinary prose lists near a cue word are rejected', () => {
+  const proseQuestions = [
+    'Which agents are offline, disconnected and never registered?',
+    'Show me the agents with high, medium and low severity alerts',
+    'Are there any agents that failed SCA and FIM checks?',
+    'How many hosts are in the production, staging and dev environments?',
+    'What is the policy for password, lockout and audit settings?',
+  ];
+  for (const question of proseQuestions) {
+    assert.equal(
+      extractEnumeratedTargets(question),
+      undefined,
+      `should not be enumerable: "${question}"`,
+    );
+  }
+});
+
+test('extractEnumeratedTargets: an identifier list still matches even when it is not immediately adjacent to the cue word', () => {
+  // The tightened 8-char gap (F5) still allows "agents" directly followed by a short qualifier
+  // before the list, as long as it stays within the identifier-list shape.
+  assert.deepEqual(
+    extractEnumeratedTargets('Check agents 001, 002 and 003 for drift.'),
+    ['001', '002', '003'],
   );
 });
 
@@ -247,13 +281,15 @@ test('HARD_CEILING_UNITS is exactly 3x BASE_BUDGET_UNITS', () => {
 });
 
 test('MAX_TOOL_ROUNDS is a structural backstop, deliberately independent of the cost budget', () => {
-  // MAX_TOOL_ROUNDS (8) is NOT sized to guarantee the hard ceiling (18) is reachable -- it exists
-  // to bound a PATHOLOGICAL loop of free (cost-0, rejected/errored) calls, which never spends the
-  // cost budget at all (see BASE_BUDGET_UNITS's doc comment). A turn doing genuine cost-2 work can
-  // hit this round cap before HARD_CEILING_UNITS is spent (8 rounds x 2 units = 16 < 18) -- that is
-  // an accepted, deliberate tradeoff of "e.g. 8" per the product design, not a bug; this test just
-  // pins the constants so a future edit to either one is a conscious choice.
-  assert.equal(MAX_TOOL_ROUNDS, 8);
+  // MAX_TOOL_ROUNDS (6, lowered from the original design's "e.g. 8" by review fix D1) is NOT sized
+  // to guarantee the hard ceiling (18) is reachable -- it exists to bound a PATHOLOGICAL loop of
+  // free (cost-0, rejected/errored) calls, which never spends the cost budget at all (see
+  // BASE_BUDGET_UNITS's doc comment; review fix F3 additionally bounds that specific shape with
+  // its own independent, tighter `MAX_CONSECUTIVE_REJECTED_ROUNDS`). A turn doing genuine cost-2
+  // work can still hit this round cap before HARD_CEILING_UNITS is spent (6 rounds x 2 units =
+  // 12 < 18) -- an accepted, deliberate tradeoff, not a bug; this test just pins the constants so a
+  // future edit to either one is a conscious choice.
+  assert.equal(MAX_TOOL_ROUNDS, 6);
   assert.ok(MAX_TOOL_ROUNDS * 2 < HARD_CEILING_UNITS);
 });
 
@@ -270,7 +306,7 @@ test('mechanism silence: every no-text fallback message is free of round/budget/
   for (const message of messages) {
     assert.doesNotMatch(
       message,
-      /\b(round|budget|limit|unit|threshold|quota|cost)\b/i,
+      /\b(round|budget|limit|unit|threshold|quota|cost|turn)\b/i,
       `fallback copy leaked internal mechanism wording: ${message}`,
     );
   }
@@ -279,7 +315,7 @@ test('mechanism silence: every no-text fallback message is free of round/budget/
 test('mechanism silence: FINAL_ROUND_ANSWER_INSTRUCTION never names the internal mechanism, even while asking for a coverage statement', () => {
   assert.doesNotMatch(
     FINAL_ROUND_ANSWER_INSTRUCTION,
-    /\b(round|budget|limit|unit|threshold|quota|cost)\b/i,
+    /\b(round|budget|limit|unit|threshold|quota|cost|turn)\b/i,
   );
   // And the coverage-statement clause (product design item 5) is actually present.
   assert.match(FINAL_ROUND_ANSWER_INSTRUCTION, /do and do not cover/i);
@@ -487,5 +523,146 @@ test('CV-069 budget stress: a 5-agent SCA sweep spends past the base budget via 
     .filter((e): e is Extract<StreamEvent, { type: 'delta' }> => e.type === 'delta')
     .map(e => e.content)
     .join('');
-  assert.doesNotMatch(deltaText, /\b(round|budget|limit|unit|threshold|quota)\b/i);
+  assert.doesNotMatch(
+    deltaText,
+    /\b(round|budget|limit|unit|threshold|quota|turn)\b/i,
+  );
+});
+
+// --- F6 fix: the enumerable-remaining heuristic reads the CURRENT question, not a stale one -----
+
+test('orchestrate: a follow-up turn is gated by the CURRENT question\'s agent list, not an earlier turn\'s', async () => {
+  // Review fix F6: `initialMessages` is the full resent conversation history, so reading the
+  // FIRST `user` message (the old bug) would gate this turn's extension on turn 1's question --
+  // which names no agents at all here -- instead of the actual, list-bearing follow-up question.
+  // If the bug were still present, `extractEnumeratedTargets` would find nothing, the silent
+  // extension would never be granted, and the sweep would stop incomplete after 3 agents (cost
+  // 2 x 3 = 6 = BASE_BUDGET_UNITS). Completing the full 5-agent sweep is only possible when the
+  // CURRENT (second) user message is what gets read.
+  const agentIds = ['001', '002', '003', '004', '005'];
+  const initialMessages: ChatMessage[] = [
+    { role: 'user', content: 'How many agents are currently connected?' },
+    { role: 'assistant', content: 'There are 42 agents currently connected.' },
+    {
+      role: 'user',
+      content:
+        `Now list the failing SCA hardening checks for agents ${agentIds.join(', ')}.`,
+    },
+  ];
+
+  const scripts: StreamEvent[][] = [
+    STAGE1_SCA_SCRIPT,
+    ...agentIds.map((agentId, i) => scaCheckCallScript(`call_${i}`, agentId)),
+    textOnlyScript('All five agents were checked; see the tables above.'),
+  ];
+
+  const { adapter, callMessages } = scriptedAdapter(scripts);
+  const controller = new AbortController();
+  const events: StreamEvent[] = [];
+  for await (const event of orchestrate(
+    adapter,
+    PROVIDER_CONFIG,
+    initialMessages,
+    new Date().toISOString(),
+    controller.signal,
+    scaChecksContext(agentIds),
+    NOOP_REQUEST,
+    NOOP_LOGGER,
+    undefined,
+  )) {
+    events.push(event);
+  }
+
+  assert.equal(
+    callMessages.length,
+    scripts.length,
+    'the sweep must complete via the CURRENT question\'s agent list, not stop early on a stale one',
+  );
+  const toolCallEvents = events.filter(
+    (e): e is Extract<StreamEvent, { type: 'tool_call' }> =>
+      e.type === 'tool_call',
+  );
+  assert.deepEqual(
+    toolCallEvents.map(e => e.toolCall.arguments.agent_id),
+    agentIds,
+  );
+});
+
+// --- F13 fix: end-to-end coverage of the STRUCTURAL cap and the exhaustion -> instruction path --
+
+test('orchestrate: with the extension granted, MAX_TOOL_ROUNDS (not the cost budget) is what ends the turn, and the final round carries FINAL_ROUND_ANSWER_INSTRUCTION', async () => {
+  // F13 (AI/plan/c-review.md): before this test, nothing drove `orchestrate` all the way to
+  // `round === MAX_TOOL_ROUNDS` with successful calls the whole way -- the CV-069 test above ends
+  // on a plain tools-offered round the model chose to answer in (never a FORCED final round), so it
+  // never exercised the exhaustion-to-instruction path either. This test grants the silent
+  // extension early (same mechanism as CV-069) specifically so the cost ceiling (raised to
+  // HARD_CEILING_UNITS = 18) stays well ahead of spend for the whole sweep, isolating the
+  // STRUCTURAL `MAX_TOOL_ROUNDS` cap as the actual reason the turn's 6th tool round is followed by
+  // a forced, tools-less final round.
+  {
+    const agentIds = ['001', '002', '003', '004', '005', '006'];
+    assert.equal(
+      agentIds.length,
+      MAX_TOOL_ROUNDS,
+      'this test is calibrated to drive exactly MAX_TOOL_ROUNDS successful rounds',
+    );
+    const initialMessages: ChatMessage[] = [
+      {
+        role: 'user',
+        content:
+          `List the failing SCA hardening checks for agents ${agentIds.join(', ')}.`,
+      },
+    ];
+
+    const scripts: StreamEvent[][] = [
+      STAGE1_SCA_SCRIPT,
+      ...agentIds.map((agentId, i) => scaCheckCallScript(`call_${i}`, agentId)),
+      textOnlyScript('Every listed agent was checked; see the tables above.'),
+    ];
+
+    const { adapter, callMessages } = scriptedAdapter(scripts);
+    const controller = new AbortController();
+    const events: StreamEvent[] = [];
+    for await (const event of orchestrate(
+      adapter,
+      PROVIDER_CONFIG,
+      initialMessages,
+      new Date().toISOString(),
+      controller.signal,
+      scaChecksContext(agentIds),
+      NOOP_REQUEST,
+      NOOP_LOGGER,
+      undefined,
+    )) {
+      events.push(event);
+    }
+
+    // Every scripted round was consumed -- stage1 + MAX_TOOL_ROUNDS sweep rounds + the forced
+    // final round -- proving the turn ran the FULL structural allowance, not fewer rounds via an
+    // earlier budget/futility stop (the cost budget stays under HARD_CEILING_UNITS throughout: 6
+    // cost-2 calls = 12 units, comfortably short of 18).
+    assert.equal(callMessages.length, scripts.length);
+
+    const toolCallEvents = events.filter(
+      (e): e is Extract<StreamEvent, { type: 'tool_call' }> =>
+        e.type === 'tool_call',
+    );
+    assert.equal(
+      toolCallEvents.length,
+      MAX_TOOL_ROUNDS,
+      'exactly MAX_TOOL_ROUNDS real tool calls should have executed before the structural cap forced the final round',
+    );
+
+    // The LAST provider call is the forced final round -- its outbound messages must end with
+    // FINAL_ROUND_ANSWER_INSTRUCTION (issue #8893), proving the exhaustion path actually appends
+    // it, not just the "model chose to stop, tools were still offered" path CV-069 covers.
+    const finalRoundMessages = callMessages[callMessages.length - 1];
+    assert.equal(
+      finalRoundMessages[finalRoundMessages.length - 1].content,
+      FINAL_ROUND_ANSWER_INSTRUCTION,
+    );
+
+    assert.equal(events.filter(e => e.type === 'done').length, 1);
+    assert.equal(events.filter(e => e.type === 'error').length, 0);
+  }
 });
