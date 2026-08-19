@@ -42,12 +42,6 @@ The server sets the user and the timestamps. It sets `wazuh.case.user.name` to t
 user, records when the case is created and updated, and assigns the author and the timestamps of
 each comment. The client cannot change these values.
 
-## Reference
-
-- [Incident Response](../incident-response/README.md): The dashboard that audits the active
-  response actions that run across the environment. Use Case Management for the manual triage of a
-  finding, and use Incident Response to review the automated actions that the finding triggered.
-
 ---
 
 ## Concepts
