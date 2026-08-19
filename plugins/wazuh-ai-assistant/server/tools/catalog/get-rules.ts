@@ -80,11 +80,12 @@ export const getRulesTool: ToolDefinition = {
       tag: {
         type: 'string',
         description:
-          'Filter by one exact rule tag. For a MITRE ATT&CK technique, pass its "attack.<id>" ' +
-          'tag form (e.g. "attack.t1190" for T1110) -- this is the tag vocabulary this field ' +
-          'actually holds (confirmed live). There is deliberately no separate `technique_id` ' +
-          'parameter: the tool used to expose one against `document.mitre.technique.id`, but ' +
-          'that path is absent from this index\'s mapping and can only ever return 0 rows (see ' +
+          'Filter by one exact rule tag (lowercase). For a MITRE ATT&CK technique, pass its ' +
+          '"attack.<id>" tag form (e.g. "attack.t1190" for T1190) -- this is the tag vocabulary ' +
+          'this field actually holds (confirmed live). There is deliberately no separate ' +
+          '`technique_id` parameter: the tool used to expose one against ' +
+          '`document.mitre.technique.id`, but that path is absent from this index\'s mapping ' +
+          'and can only ever return 0 rows (see ' +
           'AI/plan/qa-rules-decoders-rootcause.md, defect #2) -- removed rather than fixed onto ' +
           'this field, because `technique.id` here is a real MAPPED keyword that is simply ' +
           'unpopulated (0 docs), so a filter on it would be silently, permanently empty too. ' +
@@ -122,7 +123,13 @@ export const getRulesTool: ToolDefinition = {
       typeof params.status === 'string' ? params.status.trim() : undefined;
     const level =
       typeof params.level === 'string' ? params.level.trim() : undefined;
-    const tag = typeof params.tag === 'string' ? params.tag.trim() : undefined;
+    // F3 (review): `document.tags` is a case-sensitive keyword whose live vocabulary is entirely
+    // lowercase (e.g. "attack.t1190"), while ATT&CK ids are conventionally written uppercase --
+    // lowercase an "attack.*" tag so a model-written "attack.T1190" still hits instead of
+    // silently returning 0 rows.
+    const rawTag = typeof params.tag === 'string' ? params.tag.trim() : undefined;
+    const tag =
+      rawTag && /^attack\./i.test(rawTag) ? rawTag.toLowerCase() : rawTag;
     const logsourceProduct =
       typeof params.logsource_product === 'string'
         ? params.logsource_product.trim()

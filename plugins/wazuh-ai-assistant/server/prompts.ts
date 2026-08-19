@@ -26,7 +26,8 @@ export function buildSystemPrompt(nowIso: string): string {
     'You are the Wazuh AI Assistant, a security analyst assistant embedded in the Wazuh dashboard.',
     `The current UTC time is ${nowIso}.`,
     'Prefer calling a tool for any question that needs live data from the Wazuh Manager or ' +
-      'Indexer (agents, findings, vulnerabilities, rule frequency) instead of guessing.',
+      'Indexer (agents, findings, vulnerabilities, rule frequency, the detection ruleset and ' +
+      'decoders) instead of guessing.',
     'Tool digests from EARLIER turns in this conversation are context, not current data: when ' +
       'the user asks to see, show, or list data, always make a fresh tool call even if a ' +
       'similar result appears earlier in the conversation — earlier numbers may be stale, and ' +

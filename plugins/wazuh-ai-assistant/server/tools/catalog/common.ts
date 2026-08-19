@@ -637,18 +637,20 @@ export function validateAgentId(value: unknown): string {
  * decoders); `"ssh"` returns the 1 SSH decoder (plus one honest extra whose description also
  * names SSH); `"ssti"` returns the one rule ("Server side template injection strings...") that
  * burned Q8's whole round budget on `tag`/`technique_id` guesses that could only ever return 0.
+ * The description `match` uses `operator: 'and'` (review finding F1): the default `or` operator
+ * matches on ANY token, and because this whole clause sits in a non-scoring `bool.filter` sorted
+ * by `_doc`, a multi-word `name` (e.g. "decoder/apache-access/0") returns hundreds of unranked,
+ * mostly-irrelevant rows instead of the one row the caller meant -- live-verified 330 -> 1 hit for
+ * that exact name. `and` costs nothing on the single-token cases above (unchanged results) and
+ * still lets the exact-title `term`/`prefix` should-clauses fire independently.
  */
 export function nameFilterProperty(subject: string): JsonSchemaProperty {
   return {
     type: 'string',
     description:
-      `Case-insensitive filter on the ${subject}'s name/title -- matches an exact value, a ` +
-      'fragment anchored at the START of the name/title (e.g. "ssh" against a name literally ' +
-      'beginning with "ssh"), OR a whole word appearing anywhere in its description (e.g. ' +
-      '"apache" also matches a decoder named "modsecurity-apache" or "zeek-ssh", because their ' +
-      'descriptions mention the word). Not a true substring match on the name/title fields ' +
-      'themselves -- those are exact-match keyword fields with no substring index; the ' +
-      'description-word match is what actually finds most "is there a X for <topic>" questions.',
+      `Case-insensitive filter on the ${subject}'s name/title (exact value or a prefix) or a ` +
+      'whole-word match anywhere in its description. If a call returns 0 rows, retry once with ' +
+      'a shorter root word (e.g. "ssh" instead of "sshd") before concluding nothing exists.',
   };
 }
 
@@ -666,6 +668,8 @@ export function nameFilterClause(
       prefix: { [field]: { value: name, case_insensitive: true } },
     });
   }
-  should.push({ match: { [descriptionField]: name } });
+  should.push({
+    match: { [descriptionField]: { query: name, operator: 'and' } },
+  });
   return { bool: { minimum_should_match: 1, should } };
 }

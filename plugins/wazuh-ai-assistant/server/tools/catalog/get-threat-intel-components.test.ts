@@ -116,7 +116,14 @@ test('get_threat_intel_components: name builds a should-clause on name/title (te
                   },
                 },
               },
-              { match: { 'document.metadata.description': 'apache' } },
+              {
+                match: {
+                  'document.metadata.description': {
+                    query: 'apache',
+                    operator: 'and',
+                  },
+                },
+              },
             ],
           },
         },
@@ -125,6 +132,28 @@ test('get_threat_intel_components: name builds a should-clause on name/title (te
   });
   const result = lintDsl(request.body, request.index);
   assert.equal(result.ok, true, result.ok ? '' : result.reason);
+});
+
+// Review finding F1: the description match must use operator "and" so a multi-token name (e.g.
+// a decoder's full identifier) does not match on any single token inside a non-scoring,
+// `_doc`-sorted `bool.filter` -- live-verified 330 -> 1 hit for "decoder/apache-access/0".
+test('get_threat_intel_components: the description match uses operator "and" for multi-token names', () => {
+  const request = build({
+    component_type: 'decoders',
+    name: 'decoder/apache-access/0',
+  });
+  const shouldClause = (
+    request.body.query as { bool: { filter: Record<string, unknown>[] } }
+  ).bool.filter[0] as {
+    bool: { should: Array<{ match?: Record<string, unknown> }> };
+  };
+  const matchEntry = shouldClause.bool.should[shouldClause.bool.should.length - 1];
+  assert.deepEqual(matchEntry.match, {
+    'document.metadata.description': {
+      query: 'decoder/apache-access/0',
+      operator: 'and',
+    },
+  });
 });
 
 test('get_threat_intel_components: name is trimmed and omitted when blank', () => {

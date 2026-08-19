@@ -103,6 +103,33 @@ test('get_rules: technique lookups go through tag as "attack.<id>", per the tag 
   );
 });
 
+// Review finding F2: the description's example previously mapped "attack.t1190" to "T1110" --
+// a mismatched id that invites the model to invent its own transformation. The example id must
+// be internally consistent (T1190 -> attack.t1190).
+test('get_rules: the tag description example maps attack.t1190 to T1190, not T1110', () => {
+  const description = getRulesTool.spec.parameters.properties.tag
+    .description as string;
+  assert.match(description, /"attack\.t1190" for T1190/);
+  assert.doesNotMatch(description, /T1110/);
+});
+
+// Review finding F3: `document.tags` is a case-sensitive keyword whose live vocabulary is
+// entirely lowercase, while ATT&CK ids are conventionally written uppercase -- an "attack.*" tag
+// must be lowercased before it reaches the term filter, or an uppercase id silently returns 0.
+test('get_rules: an uppercase "attack.*" tag is lowercased before filtering', () => {
+  const request = build({ enabled: 'any', tag: 'attack.T1190' });
+  assert.deepEqual(request.body.query, {
+    bool: { filter: [{ term: { 'document.tags': 'attack.t1190' } }] },
+  });
+});
+
+test('get_rules: a non-"attack." tag is passed through unchanged (not force-lowercased)', () => {
+  const request = build({ enabled: 'any', tag: 'MyCustomTag' });
+  assert.deepEqual(request.body.query, {
+    bool: { filter: [{ term: { 'document.tags': 'MyCustomTag' } }] },
+  });
+});
+
 test('get_rules: logsource_product adds an exact term filter on document.logsource.product', () => {
   const request = build({ enabled: 'any', logsource_product: 'apache-http' });
   assert.deepEqual(request.body.query, {
@@ -140,7 +167,14 @@ test('get_rules: name builds a should-clause on title (term+prefix) and descript
                   },
                 },
               },
-              { match: { 'document.metadata.description': 'ssti' } },
+              {
+                match: {
+                  'document.metadata.description': {
+                    query: 'ssti',
+                    operator: 'and',
+                  },
+                },
+              },
             ],
           },
         },
@@ -151,6 +185,25 @@ test('get_rules: name builds a should-clause on title (term+prefix) and descript
   assert.equal(result.ok, true, result.ok ? '' : result.reason);
 });
 
+// Review finding F1: the description `match` must use `operator: 'and'`, not the default `or`.
+// Live-verified: with `or` (as originally shipped), `name="decoder/apache-access/0"` returned
+// 330 of 345 decoders (any one token matched) inside a non-scoring `bool.filter` sorted by
+// `_doc`, so the wanted row never appeared in the visible page; with `and` it returns exactly 1.
+test('get_rules: the description match uses operator "and" so multi-token names stay precise', () => {
+  const request = build({ enabled: 'any', name: 'server side template injection' });
+  const shouldClause = (
+    request.body.query as { bool: { filter: Record<string, unknown>[] } }
+  ).bool.filter[0] as {
+    bool: { should: Array<{ match?: Record<string, unknown> }> };
+  };
+  assert.deepEqual(shouldClause.bool.should[2].match, {
+    'document.metadata.description': {
+      query: 'server side template injection',
+      operator: 'and',
+    },
+  });
+});
+
 test('get_rules: name is trimmed and omitted when blank', () => {
   const withSpaces = build({ enabled: 'any', name: '  ssh  ' });
   const shouldClause = (
@@ -158,9 +211,9 @@ test('get_rules: name is trimmed and omitted when blank', () => {
   ).bool.filter[0] as {
     bool: { should: Array<{ match?: Record<string, unknown> }> };
   };
-  assert.equal(
+  assert.deepEqual(
     shouldClause.bool.should[2].match?.['document.metadata.description'],
-    'ssh',
+    { query: 'ssh', operator: 'and' },
   );
   assert.deepEqual(build({ enabled: 'any', name: '   ' }).body.query, {
     bool: { filter: [] },

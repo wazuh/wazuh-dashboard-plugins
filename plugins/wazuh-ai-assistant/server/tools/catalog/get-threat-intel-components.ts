@@ -152,9 +152,12 @@ export const getThreatIntelComponentsTool: ToolDefinition = {
       filter.push({ term: { 'space.name': space } });
     }
     if (name) {
-      // `document.name` and `document.metadata.title` are both mapped `keyword` (confirmed live
-      // on every one of the 5 sub-indices); see `nameFilterClause`'s doc comment for why this
-      // needs no leading wildcard.
+      // `document.metadata.title` is mapped `keyword` on every one of the 5 sub-indices;
+      // `document.name` is mapped `keyword` too but only EXISTS on `decoders` and `filters` --
+      // `integrations`/`policies`/`kvdbs` have no `document.name` field at all, so for those
+      // three types the should-clause above is description-only by construction (a `term`/
+      // `prefix` against an unmapped field is 0 hits, not an error). See `nameFilterClause`'s
+      // doc comment for why this needs no leading wildcard.
       filter.push(
         nameFilterClause(
           name,
