@@ -11,6 +11,7 @@ import {
   EuiSpacer,
   EuiConfirmModal,
   EuiLoadingSpinner,
+  EuiToolTip,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { ConversationSummary } from '../../../common/types';
@@ -43,6 +44,15 @@ interface ConversationListProps {
    * strip has no room for a real search field and "open search" and "show the full rail" are the
    * same action from here. */
   onExpand?: () => void;
+  /** The "Conversations" title row + loading spinner (only relevant in 'expanded'/'flyout' mode).
+   * Default true — every pre-existing caller keeps its title row. The sidecar header's own
+   * conversations popover (assistant-chat-panel.tsx) passes false: the popover already has its own
+   * trigger button, and repeating a "Conversations" label inside it is pure redundancy. */
+  showHeader?: boolean;
+  /** The "New conversation" button (only relevant in 'expanded'/'flyout' mode). Default true. The
+   * sidecar header's conversations popover passes false: it gets its own "New conversation" icon
+   * button next to the popover's own trigger instead, per the header's own doc comment. */
+  showNewConversationButton?: boolean;
 }
 
 /**
@@ -248,6 +258,8 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   displayMode = 'expanded',
   onCollapse,
   onExpand,
+  showHeader = true,
+  showNewConversationButton = true,
 }) => {
   const [deleteTarget, setDeleteTarget] = useState<ConversationSummary | null>(
     null,
@@ -339,24 +351,37 @@ export const ConversationList: React.FC<ConversationListProps> = ({
     // is actually usable at this width.
     return (
       <div className='wzConvoRailCollapsed'>
-        <EuiButtonIcon
-          iconType='plusInCircle'
-          aria-label={i18n.translate(
-            'wazuhAiAssistant.chat.conversations.new',
-            {
-              defaultMessage: 'New conversation',
-            },
-          )}
-          onClick={onNewConversation}
-        />
-        <EuiButtonIcon
-          iconType='search'
-          aria-label={i18n.translate(
+        <EuiToolTip
+          content={i18n.translate('wazuhAiAssistant.chat.conversations.new', {
+            defaultMessage: 'New conversation',
+          })}
+        >
+          <EuiButtonIcon
+            iconType='plusInCircle'
+            aria-label={i18n.translate(
+              'wazuhAiAssistant.chat.conversations.new',
+              {
+                defaultMessage: 'New conversation',
+              },
+            )}
+            onClick={onNewConversation}
+          />
+        </EuiToolTip>
+        <EuiToolTip
+          content={i18n.translate(
             'wazuhAiAssistant.chat.conversations.searchPlaceholder',
             { defaultMessage: 'Search conversations' },
           )}
-          onClick={() => onExpand?.()}
-        />
+        >
+          <EuiButtonIcon
+            iconType='search'
+            aria-label={i18n.translate(
+              'wazuhAiAssistant.chat.conversations.searchPlaceholder',
+              { defaultMessage: 'Search conversations' },
+            )}
+            onClick={() => onExpand?.()}
+          />
+        </EuiToolTip>
         <div className='wzConvoRailCollapsedSpacer' />
         <EuiButtonIcon
           iconType='arrowRight'
@@ -372,51 +397,62 @@ export const ConversationList: React.FC<ConversationListProps> = ({
 
   return (
     <>
-      <div className='wzConvoRailHeader'>
-        <EuiFlexGroup
-          responsive={false}
-          alignItems='center'
-          justifyContent='spaceBetween'
-          gutterSize='s'
-        >
-          <EuiFlexItem grow={false}>
-            <EuiTitle size='xxs'>
-              <h3 className='wzConvoRailTitle'>
-                {i18n.translate('wazuhAiAssistant.chat.conversations.title', {
-                  defaultMessage: 'Conversations',
-                })}
-              </h3>
-            </EuiTitle>
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            {isLoading && (
-              <EuiLoadingSpinner
-                size='s'
-                aria-label={i18n.translate(
-                  'wazuhAiAssistant.chat.conversations.loading',
-                  {
-                    defaultMessage: 'Loading conversations',
-                  },
+      {showHeader && (
+        <>
+          <div className='wzConvoRailHeader'>
+            <EuiFlexGroup
+              responsive={false}
+              alignItems='center'
+              justifyContent='spaceBetween'
+              gutterSize='s'
+            >
+              <EuiFlexItem grow={false}>
+                <EuiTitle size='xxs'>
+                  <h3 className='wzConvoRailTitle'>
+                    {i18n.translate(
+                      'wazuhAiAssistant.chat.conversations.title',
+                      {
+                        defaultMessage: 'Conversations',
+                      },
+                    )}
+                  </h3>
+                </EuiTitle>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                {isLoading && (
+                  <EuiLoadingSpinner
+                    size='s'
+                    aria-label={i18n.translate(
+                      'wazuhAiAssistant.chat.conversations.loading',
+                      {
+                        defaultMessage: 'Loading conversations',
+                      },
+                    )}
+                  />
                 )}
-              />
-            )}
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      </div>
-      <EuiSpacer size='s' />
-      <EuiButton
-        iconType='plusInCircle'
-        size='s'
-        fill={false}
-        fullWidth
-        style={{ textDecoration: 'none' }}
-        onClick={onNewConversation}
-      >
-        {i18n.translate('wazuhAiAssistant.chat.conversations.new', {
-          defaultMessage: 'New conversation',
-        })}
-      </EuiButton>
-      <EuiSpacer size='s' />
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </div>
+          <EuiSpacer size='s' />
+        </>
+      )}
+      {showNewConversationButton && (
+        <>
+          <EuiButton
+            iconType='plusInCircle'
+            size='s'
+            fill={false}
+            fullWidth
+            style={{ textDecoration: 'none' }}
+            onClick={onNewConversation}
+          >
+            {i18n.translate('wazuhAiAssistant.chat.conversations.new', {
+              defaultMessage: 'New conversation',
+            })}
+          </EuiButton>
+          <EuiSpacer size='s' />
+        </>
+      )}
       <EuiFieldSearch
         placeholder={i18n.translate(
           'wazuhAiAssistant.chat.conversations.searchPlaceholder',

@@ -287,9 +287,44 @@
 
 .wzExampleCardsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  // `minmax(240px, 1fr)` sets a HARD 240px floor per track — it does not shrink below that even
+  // when the container itself is narrower (a docked sidecar panel dragged down toward its own
+  // minimum width, for instance), so the single remaining column still demanded 240px and pushed
+  // the grid — and the `EuiPanel` wrapping it — wider than its own container instead of wrapping
+  // inside it. `min(240px, 100%)` is the same 240px preference, clamped down to the container's own
+  // width when there isn't room for it, so a track can always shrink to fit.
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
   gap: 12px;
   width: 100%;
+
+  /* `.euiCard__content` (the title+description column, OUI's `_card.scss`) is a `flex-grow: 1`
+     item with no `min-width` override, so its default `min-width: auto` sizes it to its own
+     content instead of the 240px track above — the one way text could still force a card wider
+     than its column despite the grid itself only ever growing via `1fr` (see the comment above).
+     `min-width: 0` is what actually lets the title/description wrap or truncate within the card's
+     own width instead of pushing it wider. */
+  .euiCard__content {
+    min-width: 0;
+  }
+
+  /* One line per title (the EXAMPLE_CARDS doc comment's own "one short title... per card"): without
+     this a longer title ("Disconnected agents") wraps to two lines while its same-row siblings stay
+     on one, so the row reads as uneven instead of three cards of a kind. */
+  .euiCard__title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Two lines per description (the same doc comment's "the full question as a two-line
+     description") — clamped, not just wrapped, so a longer question truncates with an ellipsis
+     instead of growing that one card taller than its row's other two. */
+  .euiCard__description {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 }
 
 /**
@@ -338,4 +373,20 @@
       transform: translateY(0);
     }
   }
+}
+
+/**
+ * Sidecar header conversation-title tooltip anchor (assistant-chat-panel.tsx's own doc comment on
+ * its `EuiToolTip` explains the full chain). `overflow: hidden` is the load-bearing rule: per the
+ * flexbox spec, a flex item's AUTOMATIC minimum size (what `min-width: auto` resolves to) is 0
+ * rather than content-based whenever the item's own `overflow` isn't `visible` — that's what lets
+ * this anchor genuinely flex-SHRINK below its (very wide, `white-space: nowrap`) content's
+ * min-content width instead of overflowing its column the way ordinary block/inline-block
+ * shrink-to-fit sizing would. `min-width: 0` is the same outcome spelled out explicitly, kept
+ * alongside it rather than relied on alone since it's the version most engines have supported
+ * longest.
+ */
+.wzAiAssistantTitleTooltipAnchor {
+  overflow: hidden;
+  min-width: 0;
 }

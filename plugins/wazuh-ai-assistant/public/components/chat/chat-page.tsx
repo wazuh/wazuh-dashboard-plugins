@@ -1,5 +1,5 @@
 import './chat-page.scss';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import {
   EuiSpacer,
   EuiEmptyPrompt,
@@ -98,9 +98,18 @@ interface ChatPageProps {
   /** Whether the chat view is the app shell's visible tab (default true). While hidden, the
    * conversation hash stays out of the URL so a restore can't rewrite `/settings`. */
   isActive?: boolean;
-  /** Whether to render the saved-conversations sidebar (default true). The docked header panel
-   * (assistant-chat-panel.tsx) hides it while the panel is too narrow for both panes. */
+  /** Whether to render the saved-conversations sidebar (default true). */
   showConversationSidebar?: boolean;
+  /**
+   * Forces `railDisplayMode` to 'expanded' or 'collapsed', for a caller with no other way to reach
+   * ConversationList's own collapse/expand affordances (its pinned "‹ Collapse" button, its
+   * collapsed strip's "expand" arrow) — the docked header panel (assistant-chat-panel.tsx) drives
+   * its toolbar toggle through this instead. `undefined` (the default) leaves the mode entirely to
+   * the width-based logic and ConversationList's own controls, unchanged. Never forces 'flyout':
+   * this panel never reaches that mode itself (`allowRailFlyout={false}`), and a caller asking for
+   * 'expanded'/'collapsed' has no way to mean "escalate to a flyout" in the first place.
+   */
+  railDisplayModeOverride?: 'expanded' | 'collapsed';
   /**
    * Whether the rail is allowed to escalate to an `EuiFlyout` below `RAIL_FLYOUT_AT` (default
    * true). `EuiFlyout` is a `position: fixed` overlay that covers the WHOLE screen it's rendered
@@ -114,6 +123,34 @@ interface ChatPageProps {
    * to make, the same way `showConversationSidebar` already is.
    */
   allowRailFlyout?: boolean;
+  /**
+   * Fires whenever the saved-conversations state this component owns (`conversations`,
+   * `isLoadingConversations`, `activeConversationId`) changes — the sidecar header
+   * (assistant-chat-panel.tsx) has its OWN conversations UI (a popover anchored to a header icon,
+   * not this component's rail/flyout) but no state of its own to render it from, since ChatPage is
+   * what loads/saves conversations. Paired with the `ref` handle below, which is how that popover
+   * actually acts on a selection instead of just displaying one.
+   */
+  onConversationsChange?: (state: ConversationsSnapshot) => void;
+}
+
+/** `onConversationsChange`'s payload — see that prop's own doc comment. */
+export interface ConversationsSnapshot {
+  conversations: ConversationSummary[];
+  isLoading: boolean;
+  activeConversationId: string | null;
+}
+
+/**
+ * Imperative actions a caller with no inline rail of its own (the sidecar header's popover) can
+ * still take on ChatPage's saved conversations — each goes through the SAME interrupt-confirm gate
+ * and dedupe-on-already-active guard the inline rail's own click handlers use, so acting through
+ * this handle behaves identically to clicking a rail row would have.
+ */
+export interface ChatPageHandle {
+  newConversation: () => void;
+  selectConversation: (id: string) => void;
+  deleteConversation: (id: string) => void;
 }
 
 /**
@@ -226,1793 +263,1864 @@ function replaceConversationRoute(
   }
 }
 
-export const ChatPage: React.FC<ChatPageProps> = ({
-  core,
-  providers,
-  providersLoaded,
-  providersError,
-  selectedProviderId,
-  onProviderChange,
-  onNavigateToSettings,
-  history,
-  onGeneratingChange,
-  isActive = true,
-  showConversationSidebar = true,
-  allowRailFlyout = true,
-}) => {
-  // `useSyncedState` (public/hooks/use-synced-state.ts) is the `[value, setValue, ref]` pattern
-  // used for `messages`, `inputText`, and `activeConversationId` below — see that hook's own doc
-  // comment for the one consolidated explanation of WHY each needs a ref mirror synced on every
-  // set (persistConversationAfterTurn reads `messagesRef.current`, handleSessionExpired reads
-  // `inputTextRef.current`, both from inside an async callback rather than a fresh render).
-  const [messages, updateMessages, messagesRef] = useSyncedState<
-    UiChatMessage[]
-  >([]);
-  const [inputText, setInputText, inputTextRef] = useSyncedState('');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  /**
-   * The error MESSAGE the user dismissed, not a `boolean` flag — so what re-shows the callout is the
-   * error value itself changing, with no separate reset call to keep in sync. `error` is cleared
-   * (`setError(null)`) by every path that starts fresh work — a new send, a retry, switching or
-   * starting a conversation — and the effect below turns that into the dismissal being dropped, so
-   * the next failure surfaces even when it reports the identical message. Comparing by value rather
-   * than by flag also keeps the two sources honest: dismissing a transient send error cannot
-   * suppress a DIFFERENT, still-current `providersError` underneath it.
-   */
-  const [dismissedError, setDismissedError] = useState<string | null>(null);
+export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
+  (
+    {
+      core,
+      providers,
+      providersLoaded,
+      providersError,
+      selectedProviderId,
+      onProviderChange,
+      onNavigateToSettings,
+      history,
+      onGeneratingChange,
+      isActive = true,
+      showConversationSidebar = true,
+      railDisplayModeOverride,
+      allowRailFlyout = true,
+      onConversationsChange,
+    },
+    ref,
+  ) => {
+    // `useSyncedState` (public/hooks/use-synced-state.ts) is the `[value, setValue, ref]` pattern
+    // used for `messages`, `inputText`, and `activeConversationId` below — see that hook's own doc
+    // comment for the one consolidated explanation of WHY each needs a ref mirror synced on every
+    // set (persistConversationAfterTurn reads `messagesRef.current`, handleSessionExpired reads
+    // `inputTextRef.current`, both from inside an async callback rather than a fresh render).
+    const [messages, updateMessages, messagesRef] = useSyncedState<
+      UiChatMessage[]
+    >([]);
+    const [inputText, setInputText, inputTextRef] = useSyncedState('');
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    /**
+     * The error MESSAGE the user dismissed, not a `boolean` flag — so what re-shows the callout is the
+     * error value itself changing, with no separate reset call to keep in sync. `error` is cleared
+     * (`setError(null)`) by every path that starts fresh work — a new send, a retry, switching or
+     * starting a conversation — and the effect below turns that into the dismissal being dropped, so
+     * the next failure surfaces even when it reports the identical message. Comparing by value rather
+     * than by flag also keeps the two sources honest: dismissing a transient send error cannot
+     * suppress a DIFFERENT, still-current `providersError` underneath it.
+     */
+    const [dismissedError, setDismissedError] = useState<string | null>(null);
 
-  // Persistent conversations (server/routes/conversations.ts). `activeConversationId` is
-  // `null` for a brand-new, never-yet-saved conversation; `activeConversationIdRef` mirrors it the
-  // same synchronous way `messagesRef` mirrors `messages`, for the same reason (read from inside
-  // an async stream's completion handler without waiting on a re-render).
-  const [conversations, setConversations] = useState<ConversationSummary[]>([]);
-  const [isLoadingConversations, setIsLoadingConversations] = useState(false);
-  const [
-    activeConversationId,
-    setActiveConversationId,
-    activeConversationIdRef,
-  ] = useSyncedState<string | null>(null);
-  // Save serialization: every auto-save is chained onto this promise instead of being dropped when
-  // one is already in flight. Dropping an overlap was safe only while every save targeted the
-  // conversation on screen (the next turn's save would resend the same, fuller array) — it is NOT
-  // safe now that an abandoned turn saves a DIFFERENT conversation than the active one (see
-  // `persistConversationTurn`): dropping that save would silently lose the answer the user
-  // navigated away from, which is exactly what this is meant to preserve.
-  const saveQueueRef = useRef<Promise<void>>(Promise.resolve());
-  const [conversationsService] = useState(
-    () => new ConversationsService(core.http),
-  );
-
-  // Optimistic concurrency: this tab's last-known saved-object `version` for whatever
-  // conversation is currently active — `undefined` for a brand-new, never-yet-saved conversation.
-  // A ref (not state): only ever read/written from `persistConversationAfterTurn`'s save path,
-  // never rendered directly. Reset alongside `activeConversationId` in `handleNewConversation` and
-  // `handleSelectConversation`.
-  const conversationVersionRef = useRef<string | undefined>(undefined);
-  // Shown after a 409 version conflict was reconciled (or failed to reconcile) on the last
-  // auto-save — see `saveConversationWithMerge` below. Reset whenever the user starts a fresh save
-  // attempt (`handleSend`) or switches conversations, same lifecycle as `error`/`managerAuthHint`.
-  const [mergeNotice, setMergeNotice] = useState<'merged' | 'conflict' | null>(
-    null,
-  );
-
-  // Privacy mode. `assistantSettings` is loaded once on mount; `privacyEnabled` and
-  // `pseudonymMap` are per-conversation state that lives only in this component's own useState.
-  // Besides an unmount/remount, `handleNewConversation` is now the other trigger that resets
-  // them — see its own doc comment for exactly what it clears vs. leaves alone.
-  const [assistantSettings, setAssistantSettings] =
-    useState<AssistantSettings | null>(null);
-  const [privacyEnabled, setPrivacyEnabled] = useState(false);
-  const [pseudonymMap, setPseudonymMap] = useState<PseudonymEntry[]>([]);
-  // Set on the user's first manual toggle so the settings-driven default effect below stops
-  // recomputing it (e.g. if the top-level provider selector changes later in the same session).
-  const privacyTouchedRef = useRef(false);
-  // Per-turn tool_call/digest bookkeeping for history reconstruction. A ref, not
-  // state: consulted only when building the NEXT request's body, never rendered.
-  const turnHistoryRef = useRef<AssistantTurnRecord[]>([]);
-
-  // wz-token pre-check: set when `detectManagerAuthError` matches something
-  // visible from the just-completed turn; cleared at the start of every new send so it never goes
-  // stale across turns.
-  const [managerAuthHint, setManagerAuthHint] = useState(false);
-
-  // Session-expiry recovery UX (the dashboard's
-  // 15-minute session TTL vs fully-quiescent idle tabs). Set on an actual 401 from either the chat
-  // POST (`runChatStream`'s `auth_expired` stream event) or a conversation save
-  // (`persistConversationAfterTurn`'s catch) — unlike `managerAuthHint`, which is a best-effort
-  // heuristic over the MODEL's own narration, this is a genuine platform-level auth rejection, so
-  // it gets its own distinct, persistent (not auto-dismissed) callout with a reload action.
-  const [sessionExpired, setSessionExpired] = useState(false);
-
-  // A save failed and the conversation on screen is now ahead of what is stored. Auto-save used to
-  // swallow every failure silently, so a user could keep chatting for an hour believing their
-  // history was being kept when it had stopped being saved after the first rejection.
-  const [saveFailed, setSaveFailed] = useState(false);
-  // Drives the saveFailed callout's "Retry now" button: true only for the duration of a
-  // manually-triggered retry, so the button shows a spinner and cannot be double-clicked into a
-  // second concurrent save. `persistConversationTurn` itself is already queued/serialized
-  // (`saveQueueRef`), so this is purely a button-affordance guard, not a correctness one.
-  const [isRetryingSave, setIsRetryingSave] = useState(false);
-
-  // Conversation restore (common/conversation-location.ts): true while the conversation named by the
-  // URL hash / this tab's stored pointer is being fetched on mount, so the chat shows a spinner
-  // instead of flashing the welcome state and then swapping it for a transcript.
-  const [isRestoringConversation, setIsRestoringConversation] = useState(false);
-  // Guards the location-sync effect below from clobbering the hash it is supposed to READ on mount:
-  // set once the initial restore attempt has been decided, one way or the other.
-  const initialRestoreSettledRef = useRef(false);
-
-  const [chatService] = useState(() => new ChatService(core.http.basePath));
-  const [settingsService] = useState(() => new SettingsService(core.http));
-  const abortControllerRef = useRef<AbortController | null>(null);
-  // Turn identity. Incremented when a turn starts AND when a turn is abandoned, so
-  // `runChatStream`'s own `finally` can tell whether the conversation it was streaming into is
-  // still the one on screen. Without it, switching conversations mid-stream let the outgoing
-  // turn's completion handler write its terminal state, its pseudonym entries and its auto-save
-  // into whichever conversation the user had just opened.
-  const streamGenerationRef = useRef(0);
-  const chatInputRef = useRef<ChatInputHandle>(null);
-  // "Open in Discover" (discover-link.tsx): built once with `core` in closure, rather than
-  // threading `core` itself down through MessageList/MessageBubble/ResultTable.
-  const [resolveDiscoverUrl] = useState(() => createDiscoverUrlResolver(core));
-  // "Open in Security Analytics" (security-analytics-link.tsx): same rationale as above.
-  const [resolveSecurityAnalyticsUrl] = useState(() =>
-    createSecurityAnalyticsUrlResolver(core),
-  );
-
-  // Auto-scroll: `scrollPaneRef` is the right PANE — the conversation's ONE
-  // true scroll container (it owns `overflowY: auto`; the chat column inside it is shrink-locked
-  // via flex '1 0 auto', see the JSX comments, so the pane is what overflows and the scrollbar
-  // sits at the pane's far edge, never inside the chat column). Standard
-  // chat behavior: keep it pinned to the bottom while new content streams in, UNLESS the user has
-  // deliberately scrolled up to read (then never hijack their position). `pinnedToBottomRef`
-  // tracks intent via the pane's own scroll events (within ~160px of the bottom counts as
-  // pinned — table renders/late images can shift a few px, an exact ===0 check would unpin
-  // spuriously); `handleSend` force-repins so sending always snaps to the new turn. The effect
-  // keys on `messages`, which the rAF-batched delta flush updates at most once per frame, so
-  // this adds no per-token work beyond one cheap scroll assignment. This is the ONLY auto-scroll
-  // mechanism — message-list.tsx's old sentinel/scrollIntoView version was removed with this fix
-  // (it detected the scroll container ONCE at mount, usually before anything overflowed, so it
-  // attached its "is the user near the bottom" listener to the wrong element and could fight
-  // this one).
-  const scrollPaneRef = useRef<HTMLDivElement | null>(null);
-
-  // Height of the transcript pane, published so ResultTable can step its page size 5 -> 10 above
-  // 900px (layout contract §4). MessageList/MessageBubble already thread this down; nothing was
-  // measuring it, so the taller page size was unreachable. Measured rather than derived from the
-  // window: the pane is what the rows have to fit inside, and it changes with the composer's own
-  // height, not just with the viewport. Guarded because jsdom has no ResizeObserver — there the
-  // value stays 0 and the default page size applies, which is what the existing tests expect.
-  // Drops a dismissal once there is no error left to dismiss, which is what lets the SAME message
-  // re-surface on the next failure (see `dismissedError`'s own comment). Hangs off the error values
-  // rather than being called from each reset path — `setError(null)` already runs in five of them
-  // (new send, retry-last-answer, conversation select, new conversation, provider reload), and a
-  // sixth added later would silently not clear the dismissal if this were plumbed by hand.
-  useEffect(() => {
-    if (!error && !providersError) {
-      setDismissedError(null);
-    }
-  }, [error, providersError]);
-
-  const [transcriptHeightPx, setTranscriptHeightPx] = useState(0);
-  useEffect(() => {
-    const pane = scrollPaneRef.current;
-    if (!pane || typeof ResizeObserver === 'undefined') {
-      return;
-    }
-    const observer = new ResizeObserver(() =>
-      setTranscriptHeightPx(pane.clientHeight),
+    // Persistent conversations (server/routes/conversations.ts). `activeConversationId` is
+    // `null` for a brand-new, never-yet-saved conversation; `activeConversationIdRef` mirrors it the
+    // same synchronous way `messagesRef` mirrors `messages`, for the same reason (read from inside
+    // an async stream's completion handler without waiting on a re-render).
+    const [conversations, setConversations] = useState<ConversationSummary[]>(
+      [],
     );
-    observer.observe(pane);
-    setTranscriptHeightPx(pane.clientHeight);
-    return () => observer.disconnect();
-  }, []);
-  const pinnedToBottomRef = useRef(true);
-  const handleScrollPane = () => {
-    const pane = scrollPaneRef.current;
-    if (pane) {
-      pinnedToBottomRef.current =
-        pane.scrollHeight - pane.scrollTop - pane.clientHeight < 160;
-    }
-  };
-  useEffect(() => {
-    const pane = scrollPaneRef.current;
-    if (pane && pinnedToBottomRef.current) {
-      pane.scrollTop = pane.scrollHeight;
-    }
-  }, [messages]);
+    const [isLoadingConversations, setIsLoadingConversations] = useState(false);
+    const [
+      activeConversationId,
+      setActiveConversationId,
+      activeConversationIdRef,
+    ] = useSyncedState<string | null>(null);
+    // Save serialization: every auto-save is chained onto this promise instead of being dropped when
+    // one is already in flight. Dropping an overlap was safe only while every save targeted the
+    // conversation on screen (the next turn's save would resend the same, fuller array) — it is NOT
+    // safe now that an abandoned turn saves a DIFFERENT conversation than the active one (see
+    // `persistConversationTurn`): dropping that save would silently lose the answer the user
+    // navigated away from, which is exactly what this is meant to preserve.
+    const saveQueueRef = useRef<Promise<void>>(Promise.resolve());
+    const [conversationsService] = useState(
+      () => new ConversationsService(core.http),
+    );
 
-  /**
-   * Conversation rail display mode (layout contract §5 / job item 6): expanded at >=1100px of
-   * PANE width (not window width — `chatRootRef` is this component's own root, so an embedding
-   * context that gives it less room, e.g. the docked header panel, collapses on its own), a 48px
-   * collapsed strip below that, an `EuiFlyout` below 900px. `ConversationList` decides what to
-   * render FOR each mode (this component only owns the column's width/chrome and the breakpoint
-   * decision) via the optional `displayMode`/`onCollapse`/`onExpand` prop contract below — all
-   * default-safe so neither side breaks while the other half of this redesign is mid-flight.
-   *
-   * Deliberately does NOT measure at all when `ResizeObserver` is unavailable (jsdom, and any
-   * legacy browser) rather than falling back to a one-shot `offsetWidth` read: jsdom always
-   * reports 0, which would collapse every existing test's sidebar into 'flyout' mode. Every
-   * environment without `ResizeObserver` instead keeps the rail 'expanded', exactly how this
-   * component behaved before the rail became width-responsive.
-   *
-   * A width of exactly 0 IS observed in a real browser too — a hidden (`display: none`) pane, e.g.
-   * this component staying mounted behind the Settings tab (application.tsx) — and is ignored the
-   * same way for the same reason: see the `!width` guard inside the effect below.
-   *
-   * `allowRailFlyout` (default true, see this component's own prop doc comment) caps the mode at
-   * 'collapsed' instead of ever reaching 'flyout' — the docked header panel (assistant-chat-panel.tsx)
-   * passes `false` because its own panel routinely sits inside the flyout band, where an `EuiFlyout`
-   * would cover the whole dashboard from within a sidecar the user never asked to leave.
-   */
-  const chatRootRef = useRef<HTMLDivElement | null>(null);
-  const [railDisplayMode, setRailDisplayMode] = useState<
-    'expanded' | 'collapsed' | 'flyout'
-  >('expanded');
-  // A user-driven collapse/expand (via the rail's own affordance, once the other agent's
-  // ConversationList implements one) wins over the next resize tick landing in the same width
-  // bucket it already was in — reset the moment the pane crosses into/out of the flyout band,
-  // where there is no inline rail to keep collapsed or expanded in the first place.
-  const railManualOverrideRef = useRef<'expanded' | 'collapsed' | null>(null);
-  const [isRailFlyoutOpen, setIsRailFlyoutOpen] = useState(false);
+    // Optimistic concurrency: this tab's last-known saved-object `version` for whatever
+    // conversation is currently active — `undefined` for a brand-new, never-yet-saved conversation.
+    // A ref (not state): only ever read/written from `persistConversationAfterTurn`'s save path,
+    // never rendered directly. Reset alongside `activeConversationId` in `handleNewConversation` and
+    // `handleSelectConversation`.
+    const conversationVersionRef = useRef<string | undefined>(undefined);
+    // Shown after a 409 version conflict was reconciled (or failed to reconcile) on the last
+    // auto-save — see `saveConversationWithMerge` below. Reset whenever the user starts a fresh save
+    // attempt (`handleSend`) or switches conversations, same lifecycle as `error`/`managerAuthHint`.
+    const [mergeNotice, setMergeNotice] = useState<
+      'merged' | 'conflict' | null
+    >(null);
 
-  useEffect(() => {
-    const element = chatRootRef.current;
-    if (!element || typeof ResizeObserver === 'undefined') {
-      return undefined;
-    }
-    const update = () => {
-      const width = element.offsetWidth;
-      // A hidden pane (`display: none`) measures 0 — the app shell (application.tsx) keeps ChatPage
-      // MOUNTED behind that while the Settings tab is showing, so every Chat<->Settings round-trip
-      // used to run this callback against a width of 0. Treating that as "very narrow" flipped the
-      // mode to 'flyout' AND (via the branch below) wiped `railManualOverrideRef`, so a rail the
-      // user had collapsed by hand silently re-expanded on every trip back from Settings. A width of
-      // 0 carries no real information about the pane's actual size, so it is ignored outright —
-      // whatever mode/override is already in state stays exactly as it was until a genuine
-      // measurement arrives.
-      if (!width) {
+    // Privacy mode. `assistantSettings` is loaded once on mount; `privacyEnabled` and
+    // `pseudonymMap` are per-conversation state that lives only in this component's own useState.
+    // Besides an unmount/remount, `handleNewConversation` is now the other trigger that resets
+    // them — see its own doc comment for exactly what it clears vs. leaves alone.
+    const [assistantSettings, setAssistantSettings] =
+      useState<AssistantSettings | null>(null);
+    const [privacyEnabled, setPrivacyEnabled] = useState(false);
+    const [pseudonymMap, setPseudonymMap] = useState<PseudonymEntry[]>([]);
+    // Set on the user's first manual toggle so the settings-driven default effect below stops
+    // recomputing it (e.g. if the top-level provider selector changes later in the same session).
+    const privacyTouchedRef = useRef(false);
+    // Per-turn tool_call/digest bookkeeping for history reconstruction. A ref, not
+    // state: consulted only when building the NEXT request's body, never rendered.
+    const turnHistoryRef = useRef<AssistantTurnRecord[]>([]);
+
+    // wz-token pre-check: set when `detectManagerAuthError` matches something
+    // visible from the just-completed turn; cleared at the start of every new send so it never goes
+    // stale across turns.
+    const [managerAuthHint, setManagerAuthHint] = useState(false);
+
+    // Session-expiry recovery UX (the dashboard's
+    // 15-minute session TTL vs fully-quiescent idle tabs). Set on an actual 401 from either the chat
+    // POST (`runChatStream`'s `auth_expired` stream event) or a conversation save
+    // (`persistConversationAfterTurn`'s catch) — unlike `managerAuthHint`, which is a best-effort
+    // heuristic over the MODEL's own narration, this is a genuine platform-level auth rejection, so
+    // it gets its own distinct, persistent (not auto-dismissed) callout with a reload action.
+    const [sessionExpired, setSessionExpired] = useState(false);
+
+    // A save failed and the conversation on screen is now ahead of what is stored. Auto-save used to
+    // swallow every failure silently, so a user could keep chatting for an hour believing their
+    // history was being kept when it had stopped being saved after the first rejection.
+    const [saveFailed, setSaveFailed] = useState(false);
+    // Drives the saveFailed callout's "Retry now" button: true only for the duration of a
+    // manually-triggered retry, so the button shows a spinner and cannot be double-clicked into a
+    // second concurrent save. `persistConversationTurn` itself is already queued/serialized
+    // (`saveQueueRef`), so this is purely a button-affordance guard, not a correctness one.
+    const [isRetryingSave, setIsRetryingSave] = useState(false);
+
+    // Conversation restore (common/conversation-location.ts): true while the conversation named by the
+    // URL hash / this tab's stored pointer is being fetched on mount, so the chat shows a spinner
+    // instead of flashing the welcome state and then swapping it for a transcript.
+    const [isRestoringConversation, setIsRestoringConversation] =
+      useState(false);
+    // Guards the location-sync effect below from clobbering the hash it is supposed to READ on mount:
+    // set once the initial restore attempt has been decided, one way or the other.
+    const initialRestoreSettledRef = useRef(false);
+
+    const [chatService] = useState(() => new ChatService(core.http.basePath));
+    const [settingsService] = useState(() => new SettingsService(core.http));
+    const abortControllerRef = useRef<AbortController | null>(null);
+    // Turn identity. Incremented when a turn starts AND when a turn is abandoned, so
+    // `runChatStream`'s own `finally` can tell whether the conversation it was streaming into is
+    // still the one on screen. Without it, switching conversations mid-stream let the outgoing
+    // turn's completion handler write its terminal state, its pseudonym entries and its auto-save
+    // into whichever conversation the user had just opened.
+    const streamGenerationRef = useRef(0);
+    const chatInputRef = useRef<ChatInputHandle>(null);
+    // "Open in Discover" (discover-link.tsx): built once with `core` in closure, rather than
+    // threading `core` itself down through MessageList/MessageBubble/ResultTable.
+    const [resolveDiscoverUrl] = useState(() =>
+      createDiscoverUrlResolver(core),
+    );
+    // "Open in Security Analytics" (security-analytics-link.tsx): same rationale as above.
+    const [resolveSecurityAnalyticsUrl] = useState(() =>
+      createSecurityAnalyticsUrlResolver(core),
+    );
+
+    // Auto-scroll: `scrollPaneRef` is the right PANE — the conversation's ONE
+    // true scroll container (it owns `overflowY: auto`; the chat column inside it is shrink-locked
+    // via flex '1 0 auto', see the JSX comments, so the pane is what overflows and the scrollbar
+    // sits at the pane's far edge, never inside the chat column). Standard
+    // chat behavior: keep it pinned to the bottom while new content streams in, UNLESS the user has
+    // deliberately scrolled up to read (then never hijack their position). `pinnedToBottomRef`
+    // tracks intent via the pane's own scroll events (within ~160px of the bottom counts as
+    // pinned — table renders/late images can shift a few px, an exact ===0 check would unpin
+    // spuriously); `handleSend` force-repins so sending always snaps to the new turn. The effect
+    // keys on `messages`, which the rAF-batched delta flush updates at most once per frame, so
+    // this adds no per-token work beyond one cheap scroll assignment. This is the ONLY auto-scroll
+    // mechanism — message-list.tsx's old sentinel/scrollIntoView version was removed with this fix
+    // (it detected the scroll container ONCE at mount, usually before anything overflowed, so it
+    // attached its "is the user near the bottom" listener to the wrong element and could fight
+    // this one).
+    const scrollPaneRef = useRef<HTMLDivElement | null>(null);
+
+    // Height of the transcript pane, published so ResultTable can step its page size 5 -> 10 above
+    // 900px (layout contract §4). MessageList/MessageBubble already thread this down; nothing was
+    // measuring it, so the taller page size was unreachable. Measured rather than derived from the
+    // window: the pane is what the rows have to fit inside, and it changes with the composer's own
+    // height, not just with the viewport. Guarded because jsdom has no ResizeObserver — there the
+    // value stays 0 and the default page size applies, which is what the existing tests expect.
+    // Drops a dismissal once there is no error left to dismiss, which is what lets the SAME message
+    // re-surface on the next failure (see `dismissedError`'s own comment). Hangs off the error values
+    // rather than being called from each reset path — `setError(null)` already runs in five of them
+    // (new send, retry-last-answer, conversation select, new conversation, provider reload), and a
+    // sixth added later would silently not clear the dismissal if this were plumbed by hand.
+    useEffect(() => {
+      if (!error && !providersError) {
+        setDismissedError(null);
+      }
+    }, [error, providersError]);
+
+    const [transcriptHeightPx, setTranscriptHeightPx] = useState(0);
+    useEffect(() => {
+      const pane = scrollPaneRef.current;
+      if (!pane || typeof ResizeObserver === 'undefined') {
         return;
       }
-      if (width < RAIL_FLYOUT_AT) {
-        if (!allowRailFlyout) {
-          // The docked header panel (assistant-chat-panel.tsx) passes `allowRailFlyout={false}`:
-          // its own panel routinely sits inside this band (600–900px), and an `EuiFlyout` there
-          // would cover the whole dashboard from within a sidecar the user never asked to leave —
-          // see this prop's own doc comment. Capping at 'collapsed' is what removes the escalation
-          // instead of merely mitigating it.
-          railManualOverrideRef.current = null;
-          setRailDisplayMode('collapsed');
+      const observer = new ResizeObserver(() =>
+        setTranscriptHeightPx(pane.clientHeight),
+      );
+      observer.observe(pane);
+      setTranscriptHeightPx(pane.clientHeight);
+      return () => observer.disconnect();
+    }, []);
+    const pinnedToBottomRef = useRef(true);
+    const handleScrollPane = () => {
+      const pane = scrollPaneRef.current;
+      if (pane) {
+        pinnedToBottomRef.current =
+          pane.scrollHeight - pane.scrollTop - pane.clientHeight < 160;
+      }
+    };
+    useEffect(() => {
+      const pane = scrollPaneRef.current;
+      if (pane && pinnedToBottomRef.current) {
+        pane.scrollTop = pane.scrollHeight;
+      }
+    }, [messages]);
+
+    /**
+     * Conversation rail display mode (layout contract §5 / job item 6): expanded at >=1100px of
+     * PANE width (not window width — `chatRootRef` is this component's own root, so an embedding
+     * context that gives it less room, e.g. the docked header panel, collapses on its own), a 48px
+     * collapsed strip below that, an `EuiFlyout` below 900px. `ConversationList` decides what to
+     * render FOR each mode (this component only owns the column's width/chrome and the breakpoint
+     * decision) via the optional `displayMode`/`onCollapse`/`onExpand` prop contract below — all
+     * default-safe so neither side breaks while the other half of this redesign is mid-flight.
+     *
+     * Deliberately does NOT measure at all when `ResizeObserver` is unavailable (jsdom, and any
+     * legacy browser) rather than falling back to a one-shot `offsetWidth` read: jsdom always
+     * reports 0, which would collapse every existing test's sidebar into 'flyout' mode. Every
+     * environment without `ResizeObserver` instead keeps the rail 'expanded', exactly how this
+     * component behaved before the rail became width-responsive.
+     *
+     * A width of exactly 0 IS observed in a real browser too — a hidden (`display: none`) pane, e.g.
+     * this component staying mounted behind the Settings tab (application.tsx) — and is ignored the
+     * same way for the same reason: see the `!width` guard inside the effect below.
+     *
+     * `allowRailFlyout` (default true, see this component's own prop doc comment) caps the mode at
+     * 'collapsed' instead of ever reaching 'flyout' — the docked header panel (assistant-chat-panel.tsx)
+     * passes `false` because its own panel routinely sits inside the flyout band, where an `EuiFlyout`
+     * would cover the whole dashboard from within a sidecar the user never asked to leave.
+     */
+    const chatRootRef = useRef<HTMLDivElement | null>(null);
+    const [railDisplayMode, setRailDisplayMode] = useState<
+      'expanded' | 'collapsed' | 'flyout'
+    >('expanded');
+    // A user-driven collapse/expand (via the rail's own affordance, once the other agent's
+    // ConversationList implements one) wins over the next resize tick landing in the same width
+    // bucket it already was in — reset the moment the pane crosses into/out of the flyout band,
+    // where there is no inline rail to keep collapsed or expanded in the first place.
+    const railManualOverrideRef = useRef<'expanded' | 'collapsed' | null>(null);
+    const [isRailFlyoutOpen, setIsRailFlyoutOpen] = useState(false);
+
+    useEffect(() => {
+      const element = chatRootRef.current;
+      if (!element || typeof ResizeObserver === 'undefined') {
+        return undefined;
+      }
+      const update = () => {
+        const width = element.offsetWidth;
+        // A hidden pane (`display: none`) measures 0 — the app shell (application.tsx) keeps ChatPage
+        // MOUNTED behind that while the Settings tab is showing, so every Chat<->Settings round-trip
+        // used to run this callback against a width of 0. Treating that as "very narrow" flipped the
+        // mode to 'flyout' AND (via the branch below) wiped `railManualOverrideRef`, so a rail the
+        // user had collapsed by hand silently re-expanded on every trip back from Settings. A width of
+        // 0 carries no real information about the pane's actual size, so it is ignored outright —
+        // whatever mode/override is already in state stays exactly as it was until a genuine
+        // measurement arrives.
+        if (!width) {
           return;
         }
-        railManualOverrideRef.current = null;
-        setRailDisplayMode('flyout');
+        if (width < RAIL_FLYOUT_AT) {
+          if (!allowRailFlyout) {
+            // The docked header panel (assistant-chat-panel.tsx) passes `allowRailFlyout={false}`:
+            // its own panel routinely sits inside this band (600–900px), and an `EuiFlyout` there
+            // would cover the whole dashboard from within a sidecar the user never asked to leave —
+            // see this prop's own doc comment. Capping at 'collapsed' is what removes the escalation
+            // instead of merely mitigating it. Unlike the 'flyout' branch below, a manual/external
+            // override (`railManualOverrideRef` — set by ConversationList's own controls OR by
+            // `railDisplayModeOverride`, e.g. the docked panel's own toolbar toggle) is kept rather
+            // than wiped: this band has a real inline rail the whole time (never a flyout with
+            // nothing to keep collapsed/expanded), so there is no reason to discard a preference the
+            // user already made just because a later resize landed back in the same band.
+            setRailDisplayMode(railManualOverrideRef.current ?? 'collapsed');
+            return;
+          }
+          railManualOverrideRef.current = null;
+          setRailDisplayMode('flyout');
+          return;
+        }
+        setRailDisplayMode(
+          railManualOverrideRef.current ??
+            (width < RAIL_COLLAPSE_AT ? 'collapsed' : 'expanded'),
+        );
+      };
+      update();
+      const observer = new ResizeObserver(update);
+      observer.observe(element);
+      return () => observer.disconnect();
+    }, [allowRailFlyout]);
+
+    // `railDisplayModeOverride` (assistant-chat-panel.tsx's own toolbar toggle) goes through the
+    // SAME manual-override ref ConversationList's own collapse/expand controls use, so whichever one
+    // the user reached for last wins — exactly the contract `railManualOverrideRef` already keeps for
+    // those two. Skipped while the mode is 'flyout': this panel never reaches that mode itself
+    // (`allowRailFlyout={false}` is what the docked header panel always passes), and there is nothing
+    // sensible to force a flyout INTO.
+    useEffect(() => {
+      if (!railDisplayModeOverride) {
         return;
       }
-      setRailDisplayMode(
-        railManualOverrideRef.current ??
-          (width < RAIL_COLLAPSE_AT ? 'collapsed' : 'expanded'),
+      railManualOverrideRef.current = railDisplayModeOverride;
+      setRailDisplayMode(current =>
+        current === 'flyout' ? current : railDisplayModeOverride,
       );
+    }, [railDisplayModeOverride]);
+
+    const handleRailCollapse = () => {
+      railManualOverrideRef.current = 'collapsed';
+      setRailDisplayMode('collapsed');
     };
-    update();
-    const observer = new ResizeObserver(update);
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [allowRailFlyout]);
+    const handleRailExpand = () => {
+      railManualOverrideRef.current = 'expanded';
+      setRailDisplayMode('expanded');
+    };
 
-  const handleRailCollapse = () => {
-    railManualOverrideRef.current = 'collapsed';
-    setRailDisplayMode('collapsed');
-  };
-  const handleRailExpand = () => {
-    railManualOverrideRef.current = 'expanded';
-    setRailDisplayMode('expanded');
-  };
+    useEffect(() => {
+      settingsService
+        .getAssistantSettings()
+        .then(setAssistantSettings)
+        .catch(() => {
+          // Non-fatal: privacy mode simply stays off (mirrors server/routes/chat.ts's own
+          // resolvePrivacyEnabled default when nothing overrides it) and the chip below stays
+          // non-interactive until a later successful load, if any. No separate error banner here —
+          // it would compete with the chat error state on first paint for something that degrades
+          // gracefully on its own.
+        });
 
-  useEffect(() => {
-    settingsService
-      .getAssistantSettings()
-      .then(setAssistantSettings)
-      .catch(() => {
-        // Non-fatal: privacy mode simply stays off (mirrors server/routes/chat.ts's own
-        // resolvePrivacyEnabled default when nothing overrides it) and the chip below stays
-        // non-interactive until a later successful load, if any. No separate error banner here —
-        // it would compete with the chat error state on first paint for something that degrades
-        // gracefully on its own.
-      });
-
-    // Session-expiry draft stash restore: the mirror image of `handleSessionExpired`'s
-    // stash below. Runs once, on mount — the only time a stashed draft could be waiting, since it
-    // is only ever written right before the "reload to sign in again" callout tells the user to
-    // reload. `activeConversationIdRef.current` is always `null` this early (no conversation has
-    // been selected/resumed yet), so this is really just the fallback scan in
-    // `restoreAndClearDraft` doing the actual work — see that function's own doc comment for why
-    // the scan (not a direct keyed lookup) is what makes restoration work across a reload at all.
-    //
-    // `detectNavigationType()` is passed through so
-    // `restoreAndClearDraft` only actually restores something across the ONE reload the "session
-    // expired" callout itself solicited — every other mount of this component (a plain
-    // Chat<->Settings tab switch, a fresh page load after a same-tab logout/login) now clears any
-    // stashed draft instead of potentially handing it to whoever is looking at the screen.
-    try {
-      const restored = restoreAndClearDraft(
-        window.sessionStorage,
-        activeConversationIdRef.current,
-        detectNavigationType(),
-      );
-      if (restored) {
-        setInputText(restored);
+      // Session-expiry draft stash restore: the mirror image of `handleSessionExpired`'s
+      // stash below. Runs once, on mount — the only time a stashed draft could be waiting, since it
+      // is only ever written right before the "reload to sign in again" callout tells the user to
+      // reload. `activeConversationIdRef.current` is always `null` this early (no conversation has
+      // been selected/resumed yet), so this is really just the fallback scan in
+      // `restoreAndClearDraft` doing the actual work — see that function's own doc comment for why
+      // the scan (not a direct keyed lookup) is what makes restoration work across a reload at all.
+      //
+      // `detectNavigationType()` is passed through so
+      // `restoreAndClearDraft` only actually restores something across the ONE reload the "session
+      // expired" callout itself solicited — every other mount of this component (a plain
+      // Chat<->Settings tab switch, a fresh page load after a same-tab logout/login) now clears any
+      // stashed draft instead of potentially handing it to whoever is looking at the screen.
+      try {
+        const restored = restoreAndClearDraft(
+          window.sessionStorage,
+          activeConversationIdRef.current,
+          detectNavigationType(),
+        );
+        if (restored) {
+          setInputText(restored);
+        }
+      } catch {
+        // sessionStorage can throw in locked-down browser contexts (e.g. some private-browsing
+        // configurations) — losing the draft stash is a UX regression only, never a functional bug.
       }
-    } catch {
-      // sessionStorage can throw in locked-down browser contexts (e.g. some private-browsing
-      // configurations) — losing the draft stash is a UX regression only, never a functional bug.
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-  // Per-conversation privacy default: resolved once settings AND a selected
-  // provider are both known, and never recomputed after the user's first manual toggle — switching
-  // providers mid-conversation does not retroactively change an already-chosen value.
-  useEffect(() => {
-    if (
-      !assistantSettings ||
-      !selectedProviderId ||
-      privacyTouchedRef.current
-    ) {
-      return;
-    }
-    const perProviderDefault =
-      assistantSettings.privacyDefaultPerProvider[selectedProviderId];
-    setPrivacyEnabled(perProviderDefault ?? assistantSettings.privacyDefaultOn);
-  }, [assistantSettings, selectedProviderId]);
-
-  const handleTogglePrivacy = () => {
-    if (!assistantSettings?.userCanOverride) {
-      return;
-    }
-    privacyTouchedRef.current = true;
-    // Applies from the NEXT message only: toggling just changes what handleSend reads on its next
-    // call — nothing about already-sent turns is rewritten.
-    setPrivacyEnabled(current => !current);
-  };
-
-  /**
-   * Stop button: cancels the provider stream but keeps the turn ATTACHED to the conversation on
-   * screen — the generation counter is deliberately not bumped, so `runChatStream`'s `finally`
-   * still takes its normal path (terminal state committed to the visible bubble, auto-save adopted
-   * into the active conversation). Whatever streamed in before the stop is kept, exactly as
-   * before.
-   */
-  const handleStop = () => {
-    abortControllerRef.current?.abort();
-    setIsGenerating(false);
-  };
-
-  useEffect(() => {
-    onGeneratingChange?.(isGenerating);
-  }, [isGenerating, onGeneratingChange]);
-
-  /**
-   * Gate for any action that would throw away a running answer: asks first instead of silently
-   * cancelling. Passing through untouched when nothing is generating is what keeps the common case
-   * a single click.
-   *
-   * Covers the in-app moves (opening another conversation, starting a new one), through the SAME
-   * `overlays.openConfirm` dialog the platform shows when the user leaves the app entirely — see
-   * services/interrupt-confirm.ts for why this is not a locally rendered modal. Switching to the
-   * Settings TAB deliberately asks nothing: that no longer interrupts anything, the answer keeps
-   * streaming into the Chat tab.
-   */
-  const confirmIfGenerating = async (proceed: () => void) => {
-    if (!isGenerating) {
-      proceed();
-      return;
-    }
-    if (await confirmInterruption(core.overlays)) {
-      proceed();
-    }
-  };
-
-  /**
-   * Cancels the in-flight turn AND detaches it from this component's live state: the user is
-   * leaving the conversation that turn belongs to (conversation switch, new conversation, deleting
-   * the active one, or unmount). Bumping the generation counter is what makes `runChatStream`'s
-   * `finally` take its abandoned path — it persists the turn to the conversation it actually
-   * started in, and touches no state belonging to whatever the user opened next.
-   *
-   * Resetting `isGenerating` here (rather than leaving it to that `finally`, which will no longer
-   * do it for an abandoned turn) is what unblocks the newly opened conversation's input: the abort
-   * only settles a microtask later, and the abandoned path must not flip shared UI state at all.
-   */
-  const abandonActiveStream = () => {
-    if (!abortControllerRef.current) {
-      return;
-    }
-    streamGenerationRef.current += 1;
-    abortControllerRef.current.abort();
-    abortControllerRef.current = null;
-    setIsGenerating(false);
-  };
-
-  /**
-   * Session-expiry recovery UX: called on a genuine 401 from either the chat POST or a
-   * conversation save. Stashes whatever the user currently has typed (via `inputTextRef`, not
-   * `inputText` — see that ref's own doc comment for why) before showing the persistent callout,
-   * so `window.location.reload()` never silently discards it. Idempotent: calling this again while
-   * the callout is already showing just re-stashes the (possibly since-edited) draft under the
-   * same key.
-   */
-  const handleSessionExpired = () => {
-    setSessionExpired(true);
-    try {
-      stashDraft(
-        window.sessionStorage,
-        activeConversationIdRef.current,
-        inputTextRef.current,
+    // Per-conversation privacy default: resolved once settings AND a selected
+    // provider are both known, and never recomputed after the user's first manual toggle — switching
+    // providers mid-conversation does not retroactively change an already-chosen value.
+    useEffect(() => {
+      if (
+        !assistantSettings ||
+        !selectedProviderId ||
+        privacyTouchedRef.current
+      ) {
+        return;
+      }
+      const perProviderDefault =
+        assistantSettings.privacyDefaultPerProvider[selectedProviderId];
+      setPrivacyEnabled(
+        perProviderDefault ?? assistantSettings.privacyDefaultOn,
       );
-    } catch {
-      // As above: sessionStorage failures here are a lost-draft UX regression, never fatal.
-    }
-  };
+    }, [assistantSettings, selectedProviderId]);
 
-  // Persistent conversations: load the caller's own saved-conversation list once on mount, then
-  // again on every CONVERSATIONS_CHANGED_EVENT so all mounted ChatPage instances (the app shell
-  // and the header flyout can be open at once) keep their sidebars in sync.
-  const refreshConversations = () => {
-    setIsLoadingConversations(true);
-    conversationsService
-      .list()
-      .then(setConversations)
-      .catch(() => {
-        // Non-fatal: the sidebar just stays empty/stale — the main chat still works without it,
-        // and the next successful refreshConversations() call (e.g. after the next save) recovers.
-      })
-      .finally(() => setIsLoadingConversations(false));
-  };
+    const handleTogglePrivacy = () => {
+      if (!assistantSettings?.userCanOverride) {
+        return;
+      }
+      privacyTouchedRef.current = true;
+      // Applies from the NEXT message only: toggling just changes what handleSend reads on its next
+      // call — nothing about already-sent turns is rewritten.
+      setPrivacyEnabled(current => !current);
+    };
 
-  // Mutations dispatch this instead of calling refreshConversations() directly: the event reaches
-  // every mounted ChatPage (including this one, synchronously), so the mutating instance refreshes
-  // exactly once and the listener never re-dispatches — no loop, no double fetch.
-  const notifyConversationsChanged = () => {
-    window.dispatchEvent(new Event(CONVERSATIONS_CHANGED_EVENT));
-  };
+    /**
+     * Stop button: cancels the provider stream but keeps the turn ATTACHED to the conversation on
+     * screen — the generation counter is deliberately not bumped, so `runChatStream`'s `finally`
+     * still takes its normal path (terminal state committed to the visible bubble, auto-save adopted
+     * into the active conversation). Whatever streamed in before the stop is kept, exactly as
+     * before.
+     */
+    const handleStop = () => {
+      abortControllerRef.current?.abort();
+      setIsGenerating(false);
+    };
 
-  useEffect(() => {
-    refreshConversations();
-    window.addEventListener(CONVERSATIONS_CHANGED_EVENT, refreshConversations);
-    return () =>
-      window.removeEventListener(
+    useEffect(() => {
+      onGeneratingChange?.(isGenerating);
+    }, [isGenerating, onGeneratingChange]);
+
+    /**
+     * Gate for any action that would throw away a running answer: asks first instead of silently
+     * cancelling. Passing through untouched when nothing is generating is what keeps the common case
+     * a single click.
+     *
+     * Covers the in-app moves (opening another conversation, starting a new one), through the SAME
+     * `overlays.openConfirm` dialog the platform shows when the user leaves the app entirely — see
+     * services/interrupt-confirm.ts for why this is not a locally rendered modal. Switching to the
+     * Settings TAB deliberately asks nothing: that no longer interrupts anything, the answer keeps
+     * streaming into the Chat tab.
+     */
+    const confirmIfGenerating = async (proceed: () => void) => {
+      if (!isGenerating) {
+        proceed();
+        return;
+      }
+      if (await confirmInterruption(core.overlays)) {
+        proceed();
+      }
+    };
+
+    /**
+     * Cancels the in-flight turn AND detaches it from this component's live state: the user is
+     * leaving the conversation that turn belongs to (conversation switch, new conversation, deleting
+     * the active one, or unmount). Bumping the generation counter is what makes `runChatStream`'s
+     * `finally` take its abandoned path — it persists the turn to the conversation it actually
+     * started in, and touches no state belonging to whatever the user opened next.
+     *
+     * Resetting `isGenerating` here (rather than leaving it to that `finally`, which will no longer
+     * do it for an abandoned turn) is what unblocks the newly opened conversation's input: the abort
+     * only settles a microtask later, and the abandoned path must not flip shared UI state at all.
+     */
+    const abandonActiveStream = () => {
+      if (!abortControllerRef.current) {
+        return;
+      }
+      streamGenerationRef.current += 1;
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+      setIsGenerating(false);
+    };
+
+    /**
+     * Session-expiry recovery UX: called on a genuine 401 from either the chat POST or a
+     * conversation save. Stashes whatever the user currently has typed (via `inputTextRef`, not
+     * `inputText` — see that ref's own doc comment for why) before showing the persistent callout,
+     * so `window.location.reload()` never silently discards it. Idempotent: calling this again while
+     * the callout is already showing just re-stashes the (possibly since-edited) draft under the
+     * same key.
+     */
+    const handleSessionExpired = () => {
+      setSessionExpired(true);
+      try {
+        stashDraft(
+          window.sessionStorage,
+          activeConversationIdRef.current,
+          inputTextRef.current,
+        );
+      } catch {
+        // As above: sessionStorage failures here are a lost-draft UX regression, never fatal.
+      }
+    };
+
+    // Persistent conversations: load the caller's own saved-conversation list once on mount, then
+    // again on every CONVERSATIONS_CHANGED_EVENT so all mounted ChatPage instances (the app shell
+    // and the header flyout can be open at once) keep their sidebars in sync.
+    const refreshConversations = () => {
+      setIsLoadingConversations(true);
+      conversationsService
+        .list()
+        .then(setConversations)
+        .catch(() => {
+          // Non-fatal: the sidebar just stays empty/stale — the main chat still works without it,
+          // and the next successful refreshConversations() call (e.g. after the next save) recovers.
+        })
+        .finally(() => setIsLoadingConversations(false));
+    };
+
+    // Mutations dispatch this instead of calling refreshConversations() directly: the event reaches
+    // every mounted ChatPage (including this one, synchronously), so the mutating instance refreshes
+    // exactly once and the listener never re-dispatches — no loop, no double fetch.
+    const notifyConversationsChanged = () => {
+      window.dispatchEvent(new Event(CONVERSATIONS_CHANGED_EVENT));
+    };
+
+    useEffect(() => {
+      refreshConversations();
+      window.addEventListener(
         CONVERSATIONS_CHANGED_EVENT,
         refreshConversations,
       );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+      return () =>
+        window.removeEventListener(
+          CONVERSATIONS_CHANGED_EVENT,
+          refreshConversations,
+        );
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-  /**
-   * Loads a saved conversation into the live chat. Shared by the sidebar's resume handler and by the
-   * mount-time restore below — the difference is only what each does around it (aborting an
-   * in-flight turn, showing a spinner, reacting to a conversation that no longer exists).
-   *
-   * The pseudonym map and `turnHistoryRef` both reset: a resumed conversation has no client-held
-   * pseudonym state to resume (server/conversation-store.ts's PRIVACY INTERACTION doc
-   * comment: the map is wire-only and never persisted) and no stored tool_call/digest pairs to
-   * replay as history either.
-   */
-  const applyLoadedConversation = (record: ConversationRecord) => {
-    // A resumed conversation opens at its latest turn (bottom), like every chat client.
-    pinnedToBottomRef.current = true;
-    const restored = reconstructConversation(record.messages);
-    updateMessages(restored.messages);
-    // Restoring the tool history is what makes a resumed conversation continuable rather than just
-    // readable: the model gets back the tool calls whose results its prose describes, instead of
-    // re-running the same queries on the next question.
-    turnHistoryRef.current = restored.turnRecords;
-    setPseudonymMap([]);
-    setActiveConversationId(record.id);
-    // Optimistic concurrency: this tab's last-known version starts at whatever the GET returned —
-    // the baseline its NEXT save's `expectedVersion` is checked against.
-    conversationVersionRef.current = record.version;
-    setError(null);
-    setManagerAuthHint(false);
-    setMergeNotice(null);
-  };
+    /**
+     * Loads a saved conversation into the live chat. Shared by the sidebar's resume handler and by the
+     * mount-time restore below — the difference is only what each does around it (aborting an
+     * in-flight turn, showing a spinner, reacting to a conversation that no longer exists).
+     *
+     * The pseudonym map and `turnHistoryRef` both reset: a resumed conversation has no client-held
+     * pseudonym state to resume (server/conversation-store.ts's PRIVACY INTERACTION doc
+     * comment: the map is wire-only and never persisted) and no stored tool_call/digest pairs to
+     * replay as history either.
+     */
+    const applyLoadedConversation = (record: ConversationRecord) => {
+      // A resumed conversation opens at its latest turn (bottom), like every chat client.
+      pinnedToBottomRef.current = true;
+      const restored = reconstructConversation(record.messages);
+      updateMessages(restored.messages);
+      // Restoring the tool history is what makes a resumed conversation continuable rather than just
+      // readable: the model gets back the tool calls whose results its prose describes, instead of
+      // re-running the same queries on the next question.
+      turnHistoryRef.current = restored.turnRecords;
+      setPseudonymMap([]);
+      setActiveConversationId(record.id);
+      // Optimistic concurrency: this tab's last-known version starts at whatever the GET returned —
+      // the baseline its NEXT save's `expectedVersion` is checked against.
+      conversationVersionRef.current = record.version;
+      setError(null);
+      setManagerAuthHint(false);
+      setMergeNotice(null);
+    };
 
-  /**
-   * Mount-time conversation restore: the open conversation used to live ONLY in this component's
-   * state, so a reload, a deep link, or coming back from another dashboard app landed on an empty
-   * chat with no way to tell which conversation the user had been in — and the next turn then
-   * created a second saved conversation instead of continuing theirs.
-   *
-   * The URL route wins over this tab's stored pointer, so a pasted/bookmarked link always opens what
-   * it names. A conversation that is simply GONE (deleted in another tab, or pruned by the retention
-   * policy, which deletes on access) is not an error worth a banner: the pointer is forgotten and the
-   * user gets a clean new conversation, exactly as if they had never had one open. Any OTHER failure
-   * keeps the pointer (the conversation is probably still there; the request just failed) and
-   * surfaces the same load error the sidebar's own resume path uses.
-   */
-  useEffect(() => {
-    const restoreId =
-      parseConversationRoute(history.location.pathname) ??
-      readLastConversationId(window.sessionStorage);
-    if (!restoreId) {
-      initialRestoreSettledRef.current = true;
-      return;
-    }
-    setIsRestoringConversation(true);
-    conversationsService
-      .get(restoreId)
-      .then(record => {
+    /**
+     * Mount-time conversation restore: the open conversation used to live ONLY in this component's
+     * state, so a reload, a deep link, or coming back from another dashboard app landed on an empty
+     * chat with no way to tell which conversation the user had been in — and the next turn then
+     * created a second saved conversation instead of continuing theirs.
+     *
+     * The URL route wins over this tab's stored pointer, so a pasted/bookmarked link always opens what
+     * it names. A conversation that is simply GONE (deleted in another tab, or pruned by the retention
+     * policy, which deletes on access) is not an error worth a banner: the pointer is forgotten and the
+     * user gets a clean new conversation, exactly as if they had never had one open. Any OTHER failure
+     * keeps the pointer (the conversation is probably still there; the request just failed) and
+     * surfaces the same load error the sidebar's own resume path uses.
+     */
+    useEffect(() => {
+      const restoreId =
+        parseConversationRoute(history.location.pathname) ??
+        readLastConversationId(window.sessionStorage);
+      if (!restoreId) {
         initialRestoreSettledRef.current = true;
-        applyLoadedConversation(record);
-      })
-      .catch(restoreError => {
-        initialRestoreSettledRef.current = true;
-        const status = getHttpErrorStatus(restoreError);
-        if (status === 404 || status === 403) {
-          writeLastConversationId(window.sessionStorage, null);
-          if (isActive) {
-            replaceConversationRoute(history, null);
+        return;
+      }
+      setIsRestoringConversation(true);
+      conversationsService
+        .get(restoreId)
+        .then(record => {
+          initialRestoreSettledRef.current = true;
+          applyLoadedConversation(record);
+        })
+        .catch(restoreError => {
+          initialRestoreSettledRef.current = true;
+          const status = getHttpErrorStatus(restoreError);
+          if (status === 404 || status === 403) {
+            writeLastConversationId(window.sessionStorage, null);
+            if (isActive) {
+              replaceConversationRoute(history, null);
+            }
+            return;
           }
-          return;
-        }
+          setError(
+            i18n.translate('wazuhAiAssistant.chat.conversations.loadError', {
+              defaultMessage: 'Could not load that conversation.',
+            }),
+          );
+        })
+        .finally(() => setIsRestoringConversation(false));
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    /**
+     * Keeps the two out-of-band records of "which conversation is open" in step with state, so the
+     * next reload/deep link can restore it. `history.replace` (not `push`) because opening a
+     * conversation is not a navigation the back button should have to walk back through turn by turn.
+     *
+     * The route is only written while the view is visible (`isActive`), and re-synced when it becomes
+     * visible again — a restore running behind Settings must not rewrite `/settings` (#8820).
+     *
+     * Skipped until the mount-time restore above has settled — otherwise this effect's very first run
+     * would overwrite the route it is supposed to read.
+     */
+    useEffect(() => {
+      if (!initialRestoreSettledRef.current) {
+        return;
+      }
+      writeLastConversationId(window.sessionStorage, activeConversationId);
+      if (isActive) {
+        replaceConversationRoute(history, activeConversationId);
+      }
+    }, [activeConversationId, isActive, history]);
+
+    // Unmount cleanup: the app shell (application.tsx) now KEEPS this component mounted across a
+    // Chat<->Settings tab switch, so unmount means the user really left the app (another dashboard
+    // app, a reload, a logout) — without this that orphans the in-flight SSE stream instead of
+    // cancelling it. `abandonActiveStream` (not a bare abort) so the
+    // turn's `finally` persists what streamed in to the conversation it belongs to instead of
+    // writing terminal state into a component that no longer exists. Empty deps with no exhaustive-
+    // deps exemption needed: everything `abandonActiveStream` touches is a ref or a stable setter,
+    // so the first render's closure stays correct for the whole component lifetime.
+    useEffect(() => () => abandonActiveStream(), []);
+
+    /**
+     * New conversation: resets messages AND the pseudonym map — fresh privacy state — plus
+     * the digest-in-history bookkeeping (`turnHistoryRef`, meaningless
+     * without the messages it was built for) and `activeConversationId` (so the NEXT auto-save
+     * creates a new saved-conversation row instead of overwriting the one just left). Deliberately
+     * leaves `privacyEnabled`/`privacyTouchedRef` and the selected provider untouched — those are
+     * session-level choices, not per-conversation ones, per this component's existing convention.
+     *
+     * Abandons any in-flight turn first: it belongs to the conversation being left, and every
+     * `updateMessages` call it still has queued targets a message id that no longer exists in the
+     * list this replaces it with.
+     */
+    const handleNewConversation = () => {
+      abandonActiveStream();
+      pinnedToBottomRef.current = true;
+      updateMessages([]);
+      turnHistoryRef.current = [];
+      setPseudonymMap([]);
+      setActiveConversationId(null);
+      // Optimistic concurrency: a brand-new conversation has no server version to conflict with
+      // yet — the next auto-save creates it with a POST.
+      conversationVersionRef.current = undefined;
+      setError(null);
+      setManagerAuthHint(false);
+      setMergeNotice(null);
+    };
+
+    /**
+     * Resume a saved conversation from the sidebar: loads its full transcript and replaces the live
+     * chat with it (`applyLoadedConversation`, shared with the mount-time restore above).
+     */
+    const handleSelectConversation = async (id: string) => {
+      if (id === activeConversationIdRef.current) {
+        return;
+      }
+      try {
+        const record = await conversationsService.get(id);
+        // Abandon the in-flight turn only once the switch is certain to happen — after the GET
+        // resolved, immediately before the message list is replaced. Aborting before the await would
+        // throw away a running answer even when the load fails and the user stays put.
+        abandonActiveStream();
+        applyLoadedConversation(record);
+      } catch {
         setError(
           i18n.translate('wazuhAiAssistant.chat.conversations.loadError', {
             defaultMessage: 'Could not load that conversation.',
           }),
         );
-      })
-      .finally(() => setIsRestoringConversation(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  /**
-   * Keeps the two out-of-band records of "which conversation is open" in step with state, so the
-   * next reload/deep link can restore it. `history.replace` (not `push`) because opening a
-   * conversation is not a navigation the back button should have to walk back through turn by turn.
-   *
-   * The route is only written while the view is visible (`isActive`), and re-synced when it becomes
-   * visible again — a restore running behind Settings must not rewrite `/settings` (#8820).
-   *
-   * Skipped until the mount-time restore above has settled — otherwise this effect's very first run
-   * would overwrite the route it is supposed to read.
-   */
-  useEffect(() => {
-    if (!initialRestoreSettledRef.current) {
-      return;
-    }
-    writeLastConversationId(window.sessionStorage, activeConversationId);
-    if (isActive) {
-      replaceConversationRoute(history, activeConversationId);
-    }
-  }, [activeConversationId, isActive, history]);
-
-  // Unmount cleanup: the app shell (application.tsx) now KEEPS this component mounted across a
-  // Chat<->Settings tab switch, so unmount means the user really left the app (another dashboard
-  // app, a reload, a logout) — without this that orphans the in-flight SSE stream instead of
-  // cancelling it. `abandonActiveStream` (not a bare abort) so the
-  // turn's `finally` persists what streamed in to the conversation it belongs to instead of
-  // writing terminal state into a component that no longer exists. Empty deps with no exhaustive-
-  // deps exemption needed: everything `abandonActiveStream` touches is a ref or a stable setter,
-  // so the first render's closure stays correct for the whole component lifetime.
-  useEffect(() => () => abandonActiveStream(), []);
-
-  /**
-   * New conversation: resets messages AND the pseudonym map — fresh privacy state — plus
-   * the digest-in-history bookkeeping (`turnHistoryRef`, meaningless
-   * without the messages it was built for) and `activeConversationId` (so the NEXT auto-save
-   * creates a new saved-conversation row instead of overwriting the one just left). Deliberately
-   * leaves `privacyEnabled`/`privacyTouchedRef` and the selected provider untouched — those are
-   * session-level choices, not per-conversation ones, per this component's existing convention.
-   *
-   * Abandons any in-flight turn first: it belongs to the conversation being left, and every
-   * `updateMessages` call it still has queued targets a message id that no longer exists in the
-   * list this replaces it with.
-   */
-  const handleNewConversation = () => {
-    abandonActiveStream();
-    pinnedToBottomRef.current = true;
-    updateMessages([]);
-    turnHistoryRef.current = [];
-    setPseudonymMap([]);
-    setActiveConversationId(null);
-    // Optimistic concurrency: a brand-new conversation has no server version to conflict with
-    // yet — the next auto-save creates it with a POST.
-    conversationVersionRef.current = undefined;
-    setError(null);
-    setManagerAuthHint(false);
-    setMergeNotice(null);
-  };
-
-  /**
-   * Resume a saved conversation from the sidebar: loads its full transcript and replaces the live
-   * chat with it (`applyLoadedConversation`, shared with the mount-time restore above).
-   */
-  const handleSelectConversation = async (id: string) => {
-    if (id === activeConversationIdRef.current) {
-      return;
-    }
-    try {
-      const record = await conversationsService.get(id);
-      // Abandon the in-flight turn only once the switch is certain to happen — after the GET
-      // resolved, immediately before the message list is replaced. Aborting before the await would
-      // throw away a running answer even when the load fails and the user stays put.
-      abandonActiveStream();
-      applyLoadedConversation(record);
-    } catch {
-      setError(
-        i18n.translate('wazuhAiAssistant.chat.conversations.loadError', {
-          defaultMessage: 'Could not load that conversation.',
-        }),
-      );
-    }
-  };
-
-  const handleDeleteConversation = async (id: string) => {
-    try {
-      await conversationsService.remove(id);
-      if (activeConversationIdRef.current === id) {
-        handleNewConversation();
       }
-      notifyConversationsChanged();
-    } catch {
-      setError(
-        i18n.translate('wazuhAiAssistant.chat.conversations.deleteError', {
-          defaultMessage: 'Could not delete that conversation.',
-        }),
-      );
-    }
-  };
+    };
 
-  /**
-   * PUT with optimistic concurrency and merge-on-conflict (two tabs on the SAME conversation
-   * previously last-write-wins, silently erasing the
-   * faster tab's turns). Sends `expectedVersion` (the caller's last-known version for THIS
-   * conversation — the active conversation's `conversationVersionRef`, or the version captured when
-   * an abandoned turn started); the server 409s when another tab's write landed first
-   * (server/routes/conversations.ts).
-   *
-   * `reflectInUi` is false when saving a conversation the user has already navigated away from: a
-   * merge outcome for a conversation that is no longer on screen must not replace the visible
-   * message list, reset this tab's tool-history bookkeeping, or raise a notice about a conversation
-   * the user is no longer looking at.
-   *
-   * On a 409: fetches the server's current copy, merges it with THIS tab's own local messages via
-   * the longest-common-prefix merge (common/conversation-merge.ts — "server messages, then this
-   * tab's own messages after the shared history"), and retries the save ONCE with the fresh
-   * version. On success, the merged transcript is reflected back into the live UI (`updateMessages`
-   * below) so what is on screen matches what was just persisted, and a non-blocking notice tells
-   * the user their tab was reconciled with another one.
-   *
-   * If the retry ALSO 409s (a third write raced in during reconciliation), this gives up rather
-   * than looping: it re-throws so the caller's catch treats it like any other failed save (no
-   * further retry until the next completed turn), and this tab's own `messages` state is left
-   * completely untouched — the user never loses what they see, even though it may not be what is
-   * currently persisted server-side. A `getHttpErrorStatus(...) === 401` is deliberately NOT
-   * handled here (re-thrown untouched): that is the session-expiry path's concern, not a version conflict, and
-   * `persistConversationAfterTurn`'s own catch below is what reacts to it.
-   */
-  const saveConversationWithMerge = async (
-    id: string,
-    title: string,
-    localMessages: PersistedChatMessage[],
-    expectedVersion: string | undefined,
-    reflectInUi: boolean,
-  ): Promise<ConversationRecord> => {
-    try {
-      return await conversationsService.update(
-        id,
-        title,
-        localMessages,
-        expectedVersion,
-      );
-    } catch (firstError) {
-      if (getHttpErrorStatus(firstError) !== 409) {
-        throw firstError;
-      }
-    }
-
-    // 409: reconcile against whatever the server has right now.
-    const serverRecord = await conversationsService.get(id);
-    const merged = mergeConversationMessages(
-      serverRecord.messages,
-      localMessages,
-    );
-    try {
-      const retried = await conversationsService.update(
-        id,
-        title,
-        merged,
-        serverRecord.version,
-      );
-      if (reflectInUi) {
-        setMergeNotice('merged');
-        updateMessages(reconstructUiMessages(merged));
-        // The reconstructed messages above have fresh ids that don't match anything in
-        // turnHistoryRef's bookkeeping (built for THIS tab's own assistantMessageIds) — clearing it
-        // is the same reset `handleSelectConversation` already does after any wholesale message-list
-        // replacement, so a later turn's digest-in-history resend doesn't try to look up a
-        // now-nonexistent id.
-        turnHistoryRef.current = [];
-      }
-      return retried;
-    } catch (retryError) {
-      if (reflectInUi && getHttpErrorStatus(retryError) === 409) {
-        setMergeNotice('conflict');
-      }
-      throw retryError;
-    }
-  };
-
-  /**
-   * Auto-save, called from `runChatStream`'s `finally` after EVERY turn — including a turn the user
-   * navigated away from mid-stream, which is why the conversation being written is an explicit
-   * argument rather than read from `activeConversationIdRef` in here.
-   *
-   * `adoptAsActive` distinguishes the two callers. True for the turn the user is still watching:
-   * the created id and the returned version become this component's active conversation state, the
-   * same as before. False for an ABANDONED turn: its transcript is still persisted (that is the
-   * whole point — the answer the user walked away from is not lost), but nothing about this
-   * component's live state is touched, so it cannot overwrite the id/version of whatever
-   * conversation is now on screen. An abandoned turn with no `conversationId` yet gets its own new
-   * row via POST, so a partial first answer still shows up in the sidebar instead of vanishing.
-   *
-   * Serialized through `saveQueueRef` rather than dropped on overlap — see that ref's own comment.
-   *
-   * `target` is the row this TURN writes to, and it is mutable: a turn now saves twice (once when
-   * the question is sent, once when the answer completes), and the first of those may be what
-   * creates the conversation. Both saves share one target, so the second updates the row the first
-   * created instead of creating a second one — which is exactly what happened while the target was
-   * a plain id captured before the stream started.
-   */
-  const persistConversationTurn = (args: {
-    target: TurnConversationTarget;
-    messages: UiChatMessage[];
-    turnRecords: AssistantTurnRecord[];
-    adoptAsActive: boolean;
-  }): Promise<void> => {
-    const task = async () => {
-      if (args.messages.length === 0) {
-        return;
-      }
-      const { target, turnRecords } = args;
-      const conversationId = target.conversationId;
-      // Prefer the component's live version while this still IS the conversation on screen: a merge
-      // or another save may have moved it on since the target was created.
-      const expectedVersion =
-        args.adoptAsActive && activeConversationIdRef.current === conversationId
-          ? conversationVersionRef.current
-          : target.version;
+    const handleDeleteConversation = async (id: string) => {
       try {
-        // The untitled-fallback label is resolved here (not inside buildConversationTitle, which is
-        // now a dependency-free common/ helper — see its own doc comment) via the same
-        // i18n.translate call this file always made for it.
-        const title = buildConversationTitle(
-          args.messages,
-          i18n.translate('wazuhAiAssistant.chat.conversations.untitled', {
-            defaultMessage: 'Untitled conversation',
-          }),
-        );
-        const toPersist = toPersistedMessages(args.messages, turnRecords);
-        if (conversationId) {
-          const record = await saveConversationWithMerge(
-            conversationId,
-            title,
-            toPersist,
-            expectedVersion,
-            args.adoptAsActive,
-          );
-          // Only when this IS still the active conversation: an adopted save that raced with a
-          // conversation switch must not stamp its version onto the newly opened one.
-          if (
-            args.adoptAsActive &&
-            activeConversationIdRef.current === conversationId
-          ) {
-            conversationVersionRef.current = record.version;
-          }
-          target.version = record.version;
-        } else {
-          const created = await conversationsService.create(title, toPersist);
-          // The turn now owns this row: its later saves update it instead of creating another.
-          target.conversationId = created.id;
-          target.version = created.version;
-          if (args.adoptAsActive && activeConversationIdRef.current === null) {
-            setActiveConversationId(created.id);
-            conversationVersionRef.current = created.version;
-          }
+        await conversationsService.remove(id);
+        if (activeConversationIdRef.current === id) {
+          handleNewConversation();
         }
         notifyConversationsChanged();
-        if (args.adoptAsActive) {
-          setSaveFailed(false);
-        }
-      } catch (persistError) {
-        // Session-expiry recovery UX: a conversation save can 401 the same way the chat POST
-        // can (same dashboard session, same 15-minute TTL) — this is the "and from the conversation
-        // save" half of that fix; the chat POST's own 401 is handled in runChatStream's event loop.
-        if (getHttpErrorStatus(persistError) === 401) {
-          handleSessionExpired();
+      } catch {
+        setError(
+          i18n.translate('wazuhAiAssistant.chat.conversations.deleteError', {
+            defaultMessage: 'Could not delete that conversation.',
+          }),
+        );
+      }
+    };
+
+    // No deps array: a caller (the sidecar header's popover) acting on this handle must never see a
+    // stale `handleSelectConversation`/`confirmIfGenerating` closure from an earlier render — these
+    // functions are cheap to recreate and this component already re-renders on every keystroke (see
+    // `message-list.tsx`'s own doc comment on that), so recomputing here every render costs nothing
+    // extra.
+    useImperativeHandle(ref, () => ({
+      newConversation: () => void confirmIfGenerating(handleNewConversation),
+      selectConversation: (id: string) => {
+        // Same dedupe the inline rail's own `onSelect` does before its `confirmIfGenerating` call
+        // (chat-page.tsx's rail JSX below) — without it, reselecting the conversation already open
+        // would ask to confirm an interruption that was never going to happen.
+        if (id === activeConversationIdRef.current) {
           return;
         }
-        // The chat itself keeps working — the transcript on screen is intact and the next turn's
-        // save retries with the full message list — but the user is TOLD, because "your history
-        // stopped being saved" is not something to discover later. Only for the conversation on
-        // screen: a notice about a conversation the user already left would be unactionable.
-        if (args.adoptAsActive) {
-          setSaveFailed(true);
+        void confirmIfGenerating(() => void handleSelectConversation(id));
+      },
+      deleteConversation: (id: string) => void handleDeleteConversation(id),
+    }));
+
+    useEffect(() => {
+      onConversationsChange?.({
+        conversations,
+        isLoading: isLoadingConversations,
+        activeConversationId,
+      });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [conversations, isLoadingConversations, activeConversationId]);
+
+    /**
+     * PUT with optimistic concurrency and merge-on-conflict (two tabs on the SAME conversation
+     * previously last-write-wins, silently erasing the
+     * faster tab's turns). Sends `expectedVersion` (the caller's last-known version for THIS
+     * conversation — the active conversation's `conversationVersionRef`, or the version captured when
+     * an abandoned turn started); the server 409s when another tab's write landed first
+     * (server/routes/conversations.ts).
+     *
+     * `reflectInUi` is false when saving a conversation the user has already navigated away from: a
+     * merge outcome for a conversation that is no longer on screen must not replace the visible
+     * message list, reset this tab's tool-history bookkeeping, or raise a notice about a conversation
+     * the user is no longer looking at.
+     *
+     * On a 409: fetches the server's current copy, merges it with THIS tab's own local messages via
+     * the longest-common-prefix merge (common/conversation-merge.ts — "server messages, then this
+     * tab's own messages after the shared history"), and retries the save ONCE with the fresh
+     * version. On success, the merged transcript is reflected back into the live UI (`updateMessages`
+     * below) so what is on screen matches what was just persisted, and a non-blocking notice tells
+     * the user their tab was reconciled with another one.
+     *
+     * If the retry ALSO 409s (a third write raced in during reconciliation), this gives up rather
+     * than looping: it re-throws so the caller's catch treats it like any other failed save (no
+     * further retry until the next completed turn), and this tab's own `messages` state is left
+     * completely untouched — the user never loses what they see, even though it may not be what is
+     * currently persisted server-side. A `getHttpErrorStatus(...) === 401` is deliberately NOT
+     * handled here (re-thrown untouched): that is the session-expiry path's concern, not a version conflict, and
+     * `persistConversationAfterTurn`'s own catch below is what reacts to it.
+     */
+    const saveConversationWithMerge = async (
+      id: string,
+      title: string,
+      localMessages: PersistedChatMessage[],
+      expectedVersion: string | undefined,
+      reflectInUi: boolean,
+    ): Promise<ConversationRecord> => {
+      try {
+        return await conversationsService.update(
+          id,
+          title,
+          localMessages,
+          expectedVersion,
+        );
+      } catch (firstError) {
+        if (getHttpErrorStatus(firstError) !== 409) {
+          throw firstError;
         }
       }
-    };
-    // `task` handles its own errors, so the queue can never be poisoned by a rejected link.
-    saveQueueRef.current = saveQueueRef.current.then(task, task);
-    return saveQueueRef.current;
-  };
 
-  /**
-   * "Retry now" on the saveFailed callout. Re-invokes `persistConversationTurn` — the SAME
-   * persistence path every auto-save already goes through — instead of a second save
-   * implementation, so success clears `saveFailed` exactly like the auto path does (that function's
-   * own `setSaveFailed(false)` on a successful `adoptAsActive` save) and a failure re-sets it exactly
-   * the same way too.
-   *
-   * `target` is built from this tab's live `activeConversationIdRef`/`conversationVersionRef` —
-   * the same pair `startTurn` reads when it constructs a fresh turn's target — so a conversation
-   * that was never created yet (still `null`) is POSTed once, and one that already has an id is
-   * PUT to that SAME row: this can never create a second conversation for what the user sees as one
-   * conversation, whether the failing save was the first one or a later one.
-   *
-   * Blocked while `isGenerating`: the in-flight turn (`startTurn`) already holds its OWN
-   * `TurnConversationTarget` in closure (shared between its pre-send save and its post-answer
-   * save — see that target's own doc comment) — a `target` built here from the live refs while
-   * that turn is still streaming is a DIFFERENT object. If the turn's pre-send save has already
-   * failed (raising this very callout) but not yet created the row, firing this handler would
-   * race it: this save creates+adopts the conversation from the live refs, while the turn's own
-   * target still holds `conversationId: null` and later POSTs a second row instead of updating
-   * the one this save just created. The turn's post-answer auto-save runs moments after the
-   * stream ends anyway, so a mid-stream retry is redundant — the button is disabled instead of
-   * queued so the same click is never re-armed into a second attempt when generation finishes.
-   */
-  const handleRetrySave = () => {
-    if (isRetryingSave || isGenerating) {
-      return;
-    }
-    setIsRetryingSave(true);
-    const target: TurnConversationTarget = {
-      conversationId: activeConversationIdRef.current,
-      version: conversationVersionRef.current,
-    };
-    void persistConversationTurn({
-      adoptAsActive: true,
-      target,
-      messages: messagesRef.current,
-      turnRecords: turnHistoryRef.current,
-    }).finally(() => setIsRetryingSave(false));
-  };
-
-  /**
-   * Stream-consuming core for a user turn (`handleSend`): consumes the SSE stream and commits
-   * every event into the assistant bubble identified by `assistantMessageId`.
-   */
-  const runChatStream = async (args: {
-    assistantMessageId: string;
-    /** The full UI message list this turn started from, INCLUDING its own (still empty) assistant
-     * placeholder. Kept as a local copy so the turn can reconstruct its own complete transcript in
-     * `finally` without reading React state — which, for an abandoned turn, has already been
-     * replaced by whatever conversation the user opened next. */
-    baseMessages: UiChatMessage[];
-    /** The row this turn saves to, already carrying the active conversation's id (or `null` for one
-     * that does not exist yet) and shared with the pre-send save `handleSend` fired. */
-    target: TurnConversationTarget;
-    outgoingMessages: ChatMessage[];
-    privacyPayload: ChatRequest['privacy'];
-  }) => {
-    const {
-      assistantMessageId,
-      baseMessages,
-      target,
-      outgoingMessages,
-      privacyPayload,
-    } = args;
-
-    setIsGenerating(true);
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
-
-    streamGenerationRef.current += 1;
-    const generation = streamGenerationRef.current;
-    /** False once this turn has been abandoned (`abandonActiveStream`) or superseded by a newer
-     * one — every write into shared component state is gated on it. */
-    const isTurnStillActive = () => generation === streamGenerationRef.current;
-    // This turn's own tool-call record, held by reference rather than looked up per event: the
-    // `tool_call`/`digest` handlers below used to search `turnHistoryRef` by assistant message id,
-    // which finds nothing once the ref has been reset by a conversation switch — so an abandoned
-    // turn's tool exchanges were dropped instead of saved with it.
-    const turnRecord = turnHistoryRef.current.find(
-      turn => turn.assistantMessageId === assistantMessageId,
-    );
-
-    // Empty-table suppression: an empty `table` event is held back (not
-    // committed to `message.table`) instead of rendered immediately, since a failed/empty first
-    // tool attempt followed by a successful retry's table in the SAME turn should show only the
-    // later, real one. Flushed (shown) if the stream ends before anything replaces it — "keep a
-    // single empty table if it's the only one" (honest-empty stays correct). A plain local
-    // variable, not a ref/state: scoped to this one stream's sequential event loop only.
-    //
-    // INVARIANT: within one turn, an empty table may NEVER replace — or outlive alongside — a
-    // non-empty one. The suppression above is one-directional: real rows always win over an empty
-    // spec, never the other way. This buffer and `pendingTable` are flushed together from three
-    // different call sites below (`finally`, the `error` branch, the `auth_expired` branch), and
-    // the sites do not all use the same flush order (`finally`/`auth_expired` flush the non-empty
-    // buffer first, `error` flushes the empty one first). On the unfixed code only `finally` was
-    // reachably broken: `error`'s empty-first order happened to be benign (the later non-empty
-    // commit won), and `auth_expired` can never hold content at all — chat-service.ts emits it
-    // only on the initial POST's 401, before any SSE frame (so no `table` event) has been read.
-    // But "happens to be benign" and "currently unreachable" are exactly the properties a future
-    // reorder or a new terminal path silently breaks. The invariant is therefore enforced
-    // independently at BOTH ends of this buffer's lifecycle instead of relying on flush order:
-    // `hasNonEmptyTableForTurn` (below) gates
-    // both the `table` event handler's empty branch (refuses to queue an empty spec once a
-    // non-empty one exists for this turn) and `flushPendingEmptyTable` itself (yields to a
-    // pending-or-committed non-empty table instead of committing). With both ends covered, no
-    // future call-site addition or reordering can reintroduce the clobber.
-    let pendingEmptyTable: TableSpec | undefined;
-    /**
-     * A non-empty `table` event held back until the answer's first text arrives. The server emits
-     * `table` the moment a tool returns, well before the model has narrated anything, so committing
-     * it immediately made the table pop in first and the prose then grow in above it — the bubble
-     * renders the table UNDER the text (message-bubble.tsx), so the turn read backwards while it
-     * streamed. Released by `flushPendingDelta` together with that first text (one React update, so
-     * text and table appear at once), or on its own by `flushPendingTable` if the turn ends, errors,
-     * or expires before any text arrives — an answer that is only a table must still show it.
-     */
-    let pendingTable: TableSpec | undefined;
-    /** The tool calls issued this turn, in order — mirrors what the bubble displays so the abandoned
-     * path can rebuild the turn without reading React state. */
-    let committedToolCalls: ToolCall[] = [];
-    /** The table this turn will be remembered with — mirrors what the flushes below commit to
-     * React state, so the abandoned path can rebuild the turn without reading that state. */
-    let committedTable: TableSpec | undefined;
-    /**
-     * Whether this turn already has, or is about to have, a table with rows in it — the single
-     * predicate both ends of the empty-table invariant above check, so they can never disagree.
-     * Checks `pendingTable` (a non-empty table not yet committed, e.g. still waiting on the first
-     * delta) as well as `committedTable` (already committed, by whichever flush ran first this
-     * turn). `rows.length > 0`, not mere truthiness, matters on BOTH arms: a previously-committed
-     * HONEST-empty table (this turn's only table so far) must still be superseded by a later
-     * non-empty one — the existing empty→rows retry path — so this only starts refusing once
-     * something with actual rows exists. (Today only the non-empty `table` branch ever assigns
-     * `pendingTable`, so its arm could be plain truthiness — but the explicit row check keeps the
-     * predicate correct even if a future refactor parks an empty spec there, instead of silently
-     * turning honest-empty turns into no-table turns.)
-     */
-    const hasNonEmptyTableForTurn = () =>
-      (pendingTable !== undefined && pendingTable.rows.length > 0) ||
-      (committedTable !== undefined && committedTable.rows.length > 0);
-    const flushPendingEmptyTable = () => {
-      if (!pendingEmptyTable) {
-        return;
-      }
-      // Yield to a non-empty table regardless of which flush call site got here first this turn —
-      // see the invariant comment on `pendingEmptyTable`. Drop the stale empty spec rather than
-      // committing it. NOTE: with the arrival-side guard below in place this branch is currently
-      // unreachable by construction (an empty spec is never queued once a non-empty table exists,
-      // and every later writer that could make the predicate true also clears this buffer). It is
-      // kept as defence-in-depth for a future writer of `pendingEmptyTable`, not because any
-      // event sequence reaches it today — do not count it as a tested code path.
-      if (hasNonEmptyTableForTurn()) {
-        pendingEmptyTable = undefined;
-        return;
-      }
-      const spec = pendingEmptyTable;
-      pendingEmptyTable = undefined;
-      committedTable = spec;
-      if (!isTurnStillActive()) {
-        return;
-      }
-      updateMessages(current =>
-        current.map(message =>
-          message.id === assistantMessageId
-            ? { ...message, table: spec }
-            : message,
-        ),
+      // 409: reconcile against whatever the server has right now.
+      const serverRecord = await conversationsService.get(id);
+      const merged = mergeConversationMessages(
+        serverRecord.messages,
+        localMessages,
       );
-    };
-    /** Commits a held non-empty table on its own, for the turns where no answer text ever arrives to
-     * pair it with (stream ended, errored, or the session expired). A no-op once `flushPendingDelta`
-     * has already released it. */
-    const flushPendingTable = () => {
-      if (!pendingTable) {
-        return;
-      }
-      const spec = pendingTable;
-      pendingTable = undefined;
-      committedTable = spec;
-      if (!isTurnStillActive()) {
-        return;
-      }
-      updateMessages(current =>
-        current.map(message =>
-          message.id === assistantMessageId
-            ? { ...message, table: spec }
-            : message,
-        ),
-      );
-    };
-
-    // wz-token pre-check: accumulated locally (not read back from React state)
-    // so `detectManagerAuthError` can be checked once the stream ends, over exactly the text THIS
-    // stream produced.
-    let accumulatedContent = '';
-    /**
-     * Whether this turn reached a terminal state of its own — a `done` frame, or an `error`/
-     * `auth_expired` that has already been reported. Anything else means the stream simply STOPPED:
-     * Stop was pressed, the user navigated away, or the connection dropped. That case used to be
-     * indistinguishable from a finished answer, so a truncated response was saved and later resumed
-     * as though it were complete.
-     */
-    let turnCompleted = false;
-
-    // Delta batching (typing-lag/streaming-jank fix): a fast-streaming provider can
-    // emit a `delta` event per token, and without batching EVERY one committed its own React state
-    // update (its own MessageList/MessageBubble/ResultTable re-render pass). `pendingDeltaText`
-    // buffers consecutive delta text locally; `flushPendingDelta` is the only place that ever
-    // commits it to `message.content`, via a SINGLE `updateMessages` call, scheduled at most once
-    // per animation frame (`flushScheduled` guards against scheduling a second one while one is
-    // already pending). This is local to this one stream call, not a ref persisted across renders
-    // — a `let`/const closure is enough since nothing outside this function ever reads it.
-    let pendingDeltaText = '';
-    let flushScheduled = false;
-    const flushPendingDelta = () => {
-      flushScheduled = false;
-      if (!pendingDeltaText) {
-        return;
-      }
-      const text = pendingDeltaText;
-      pendingDeltaText = '';
-      // The first text of the answer is what the held table was waiting for: released in this same
-      // update so the bubble shows text and table together, already in their final order.
-      const table = pendingTable;
-      pendingTable = undefined;
-      if (table) {
-        committedTable = table;
-      }
-      // An abandoned turn keeps accumulating into `accumulatedContent` (which is what its own
-      // transcript is rebuilt from) but stops writing into the message list, which now belongs to
-      // a different conversation.
-      if (!isTurnStillActive()) {
-        return;
-      }
-      updateMessages(current =>
-        current.map(message =>
-          message.id === assistantMessageId
-            ? // Real content is arriving: drop any stale "querying..." status line.
-              {
-                ...message,
-                content: message.content + text,
-                statusMessage: undefined,
-                ...(table ? { table } : {}),
-              }
-            : message,
-        ),
-      );
-    };
-    const scheduleFlush = () => {
-      if (flushScheduled) {
-        return;
-      }
-      flushScheduled = true;
-      // requestAnimationFrame caps the commit rate to the display's own refresh rate (typically
-      // ~16ms), which is both smoother and cheaper than a fixed timeout; a plain setTimeout is the
-      // fallback for any non-browser environment (e.g. a future SSR/test context) where rAF isn't
-      // defined.
-      if (typeof requestAnimationFrame === 'function') {
-        requestAnimationFrame(flushPendingDelta);
-      } else {
-        setTimeout(flushPendingDelta, 80);
-      }
-    };
-
-    try {
-      for await (const event of chatService.streamChat(
-        selectedProviderId,
-        outgoingMessages,
-        controller.signal,
-        privacyPayload,
-      )) {
-        // Ordering invariant: every non-delta event must observe `message.content` as it stands
-        // AFTER every delta text that arrived strictly before it — flushing here (a no-op if
-        // nothing is pending) guarantees that regardless of where the batched flush would
-        // otherwise have landed.
-        if (event.type !== 'delta') {
-          flushPendingDelta();
+      try {
+        const retried = await conversationsService.update(
+          id,
+          title,
+          merged,
+          serverRecord.version,
+        );
+        if (reflectInUi) {
+          setMergeNotice('merged');
+          updateMessages(reconstructUiMessages(merged));
+          // The reconstructed messages above have fresh ids that don't match anything in
+          // turnHistoryRef's bookkeeping (built for THIS tab's own assistantMessageIds) — clearing it
+          // is the same reset `handleSelectConversation` already does after any wholesale message-list
+          // replacement, so a later turn's digest-in-history resend doesn't try to look up a
+          // now-nonexistent id.
+          turnHistoryRef.current = [];
         }
-        if (event.type === 'delta') {
-          accumulatedContent += event.content;
-          pendingDeltaText += event.content;
-          scheduleFlush();
-        } else if (event.type === 'table') {
-          if (event.spec.rows.length === 0) {
-            // Arrival-side half of the invariant on `pendingEmptyTable`: refuse to queue an empty
-            // spec at all once a non-empty table already exists for this turn, rather than queuing
-            // it and relying on flush order to sort it out later. If a non-empty table has not
-            // arrived (or committed) yet, this is either the honest-empty case or a retry's first
-            // (failed) attempt, and is held exactly as before.
-            if (!hasNonEmptyTableForTurn()) {
-              pendingEmptyTable = event.spec;
+        return retried;
+      } catch (retryError) {
+        if (reflectInUi && getHttpErrorStatus(retryError) === 409) {
+          setMergeNotice('conflict');
+        }
+        throw retryError;
+      }
+    };
+
+    /**
+     * Auto-save, called from `runChatStream`'s `finally` after EVERY turn — including a turn the user
+     * navigated away from mid-stream, which is why the conversation being written is an explicit
+     * argument rather than read from `activeConversationIdRef` in here.
+     *
+     * `adoptAsActive` distinguishes the two callers. True for the turn the user is still watching:
+     * the created id and the returned version become this component's active conversation state, the
+     * same as before. False for an ABANDONED turn: its transcript is still persisted (that is the
+     * whole point — the answer the user walked away from is not lost), but nothing about this
+     * component's live state is touched, so it cannot overwrite the id/version of whatever
+     * conversation is now on screen. An abandoned turn with no `conversationId` yet gets its own new
+     * row via POST, so a partial first answer still shows up in the sidebar instead of vanishing.
+     *
+     * Serialized through `saveQueueRef` rather than dropped on overlap — see that ref's own comment.
+     *
+     * `target` is the row this TURN writes to, and it is mutable: a turn now saves twice (once when
+     * the question is sent, once when the answer completes), and the first of those may be what
+     * creates the conversation. Both saves share one target, so the second updates the row the first
+     * created instead of creating a second one — which is exactly what happened while the target was
+     * a plain id captured before the stream started.
+     */
+    const persistConversationTurn = (args: {
+      target: TurnConversationTarget;
+      messages: UiChatMessage[];
+      turnRecords: AssistantTurnRecord[];
+      adoptAsActive: boolean;
+    }): Promise<void> => {
+      const task = async () => {
+        if (args.messages.length === 0) {
+          return;
+        }
+        const { target, turnRecords } = args;
+        const conversationId = target.conversationId;
+        // Prefer the component's live version while this still IS the conversation on screen: a merge
+        // or another save may have moved it on since the target was created.
+        const expectedVersion =
+          args.adoptAsActive &&
+          activeConversationIdRef.current === conversationId
+            ? conversationVersionRef.current
+            : target.version;
+        try {
+          // The untitled-fallback label is resolved here (not inside buildConversationTitle, which is
+          // now a dependency-free common/ helper — see its own doc comment) via the same
+          // i18n.translate call this file always made for it.
+          const title = buildConversationTitle(
+            args.messages,
+            i18n.translate('wazuhAiAssistant.chat.conversations.untitled', {
+              defaultMessage: 'Untitled conversation',
+            }),
+          );
+          const toPersist = toPersistedMessages(args.messages, turnRecords);
+          if (conversationId) {
+            const record = await saveConversationWithMerge(
+              conversationId,
+              title,
+              toPersist,
+              expectedVersion,
+              args.adoptAsActive,
+            );
+            // Only when this IS still the active conversation: an adopted save that raced with a
+            // conversation switch must not stamp its version onto the newly opened one.
+            if (
+              args.adoptAsActive &&
+              activeConversationIdRef.current === conversationId
+            ) {
+              conversationVersionRef.current = record.version;
             }
+            target.version = record.version;
           } else {
-            pendingEmptyTable = undefined;
-            // Held rather than committed — see `pendingTable`. `committedTable` is deliberately NOT
-            // set here: it is set at the moment the table actually reaches the message list, so an
-            // abandoned turn is remembered with exactly what it displayed.
-            pendingTable = event.spec;
+            const created = await conversationsService.create(title, toPersist);
+            // The turn now owns this row: its later saves update it instead of creating another.
+            target.conversationId = created.id;
+            target.version = created.version;
+            if (
+              args.adoptAsActive &&
+              activeConversationIdRef.current === null
+            ) {
+              setActiveConversationId(created.id);
+              conversationVersionRef.current = created.version;
+            }
           }
-        } else if (event.type === 'status' && isTurnStillActive()) {
-          // Transient progress line (e.g. "Querying Wazuh...") from the orchestration loop; no
-          // engine emits this yet, but the bubble already knows how to show it once one does.
-          updateMessages(current =>
-            current.map(message =>
-              message.id === assistantMessageId
-                ? { ...message, statusMessage: event.message }
-                : message,
-            ),
-          );
-        } else if (event.type === 'tool_call') {
-          // Digest-in-history bookkeeping only — never rendered as a UI message (message_bubble.tsx
-          // has no bubble type for it; it lives in this turn's record until a LATER turn's
-          // buildOutgoingMessages call resends it, or until the turn is saved).
-          turnRecord?.toolExchanges.push({ toolCall: event.toolCall });
-          // Also surfaced in the bubble (message-bubble.tsx's collapsed "queries executed" panel),
-          // so the reader can check the query behind the answer as it runs.
-          committedToolCalls = [...committedToolCalls, event.toolCall];
-          if (isTurnStillActive()) {
-            const toolCallsForDisplay = committedToolCalls;
-            updateMessages(current =>
-              current.map(message =>
-                message.id === assistantMessageId
-                  ? { ...message, toolCalls: toolCallsForDisplay }
-                  : message,
-              ),
-            );
+          notifyConversationsChanged();
+          if (args.adoptAsActive) {
+            setSaveFailed(false);
           }
-        } else if (event.type === 'digest') {
-          const exchange = turnRecord?.toolExchanges.find(
-            entry => entry.toolCall.id === event.toolCallId,
-          );
-          if (exchange) {
-            exchange.digestContent = event.content;
+        } catch (persistError) {
+          // Session-expiry recovery UX: a conversation save can 401 the same way the chat POST
+          // can (same dashboard session, same 15-minute TTL) — this is the "and from the conversation
+          // save" half of that fix; the chat POST's own 401 is handled in runChatStream's event loop.
+          if (getHttpErrorStatus(persistError) === 401) {
+            handleSessionExpired();
+            return;
           }
-        } else if (event.type === 'suggested_query') {
-          // Graceful-failure handoff (server/tools/suggest-discover-query.ts): a callout rendered
-          // alongside this message's prose (message-bubble.tsx), not another `table` — the model
-          // is telling the user what it could NOT check, so there is no result set to show, only a
-          // query the user can run themselves. Set immediately (unlike `table`'s held/flushed
-          // `pendingTable`) since it has no ordering dependency on delta text arriving first.
-          if (isTurnStillActive()) {
-            const suggestedQuery = {
-              index: event.index,
-              dsl: event.dsl,
-              reason: event.reason,
-            };
-            updateMessages(current =>
-              current.map(message =>
-                message.id === assistantMessageId
-                  ? { ...message, suggestedQuery }
-                  : message,
-              ),
-            );
+          // The chat itself keeps working — the transcript on screen is intact and the next turn's
+          // save retries with the full message list — but the user is TOLD, because "your history
+          // stopped being saved" is not something to discover later. Only for the conversation on
+          // screen: a notice about a conversation the user already left would be unactionable.
+          if (args.adoptAsActive) {
+            setSaveFailed(true);
           }
-        } else if (event.type === 'privacy_map' && isTurnStillActive()) {
-          // Gated: the pseudonym map is PER-CONVERSATION state. An abandoned turn's entries used to
-          // be merged into whatever conversation the user had just opened, and then sent up with
-          // that conversation's next request.
-          setPseudonymMap(current => {
-            const known = new Set(current.map(entry => entry.pseudonym));
-            const additions = event.entries.filter(
-              entry => !known.has(entry.pseudonym),
-            );
-            return additions.length > 0 ? [...current, ...additions] : current;
-          });
-        } else if (event.type === 'done') {
-          turnCompleted = true;
-        } else if (event.type === 'error') {
-          turnCompleted = true;
-          flushPendingEmptyTable();
-          // Released before the placeholder cleanup below, which drops an assistant message with
-          // neither content nor table — a turn whose tool succeeded and whose narration then failed
-          // must keep the table it already produced.
-          flushPendingTable();
-          if (!isTurnStillActive()) {
-            // An error banner for a conversation the user already left is pure noise — the turn's
-            // own transcript (rebuilt in `finally`) simply carries whatever streamed in before it.
-            continue;
-          }
-          if (detectManagerAuthError(event.message)) {
-            setManagerAuthHint(true);
-          } else {
-            setError(event.message);
-          }
-          // Drop the assistant placeholder if no content ever arrived for it; keep it if
-          // partial deltas (or a table) already streamed in before the error happened.
-          updateMessages(current =>
-            current.filter(
-              message =>
-                !(
-                  message.id === assistantMessageId &&
-                  message.content === '' &&
-                  !message.table
-                ),
-            ),
-          );
-        } else if (event.type === 'auth_expired') {
-          // Session-expiry recovery UX: a genuine 401 on the chat POST itself, distinct
-          // from the generic `error` branch above — same placeholder-cleanup, but a dedicated,
-          // persistent callout instead of the free-form error banner. Unlike the branch above this
-          // is NOT gated on the turn still being active: the session is gone for the whole app, so
-          // the callout is just as relevant to whatever conversation is now on screen.
-          turnCompleted = true;
-          flushPendingTable();
-          flushPendingEmptyTable();
-          handleSessionExpired();
-          if (!isTurnStillActive()) {
-            continue;
-          }
-          updateMessages(current =>
-            current.filter(
-              message =>
-                !(
-                  message.id === assistantMessageId &&
-                  message.content === '' &&
-                  !message.table
-                ),
-            ),
-          );
         }
-      }
-    } finally {
-      // Flush order matches the loop's own invariant above: any buffered delta text lands before
-      // the empty-table flush and the final `isStreaming: false` update below, whether the stream
-      // ended normally, errored, or was aborted (handleStop's `controller.abort()` unwinds the
-      // `for await` and lands here the same way).
-      flushPendingDelta();
-      // A turn that produced a table but never any prose (the model stopped after the tool call, or
-      // Stop was pressed while it was still thinking) still has to show that table.
-      flushPendingTable();
-      flushPendingEmptyTable();
+      };
+      // `task` handles its own errors, so the queue can never be poisoned by a rejected link.
+      saveQueueRef.current = saveQueueRef.current.then(task, task);
+      return saveQueueRef.current;
+    };
 
-      if (!isTurnStillActive()) {
-        // Abandoned turn: the user switched conversation, started a new one, or left the app while
-        // this was streaming. Persist what it produced to the conversation it actually belongs to,
-        // rebuilt from this turn's OWN local record (`baseMessages` + `accumulatedContent` +
-        // `committedTable`) rather than from React state, which now describes a different
-        // conversation. Nothing here touches shared state — `abandonActiveStream` already reset
-        // `isGenerating` and `abortControllerRef` at the moment of abandonment.
-        const abandonedTranscript = baseMessages
-          .map(message =>
-            message.id === assistantMessageId
-              ? {
-                  ...message,
-                  content: accumulatedContent,
-                  table: committedTable,
-                  ...(committedToolCalls.length > 0
-                    ? { toolCalls: committedToolCalls }
-                    : {}),
-                  isStreaming: false,
-                  ...(turnCompleted ? {} : { interrupted: true }),
-                }
-              : message,
-          )
-          // Same rule the `error` branch applies to the visible list: an assistant placeholder that
-          // never received anything is not worth persisting.
-          .filter(
-            message =>
-              !(
-                message.id === assistantMessageId &&
-                message.content === '' &&
-                !message.table
-              ),
-          );
-        void persistConversationTurn({
-          adoptAsActive: false,
-          target,
-          messages: abandonedTranscript,
-          // `turnHistoryRef` has already been reset to whatever conversation the user opened
-          // instead, so this turn's own record is passed explicitly.
-          turnRecords: turnRecord ? [turnRecord] : [],
-        });
-      } else {
-        if (detectManagerAuthError(accumulatedContent)) {
-          setManagerAuthHint(true);
+    /**
+     * "Retry now" on the saveFailed callout. Re-invokes `persistConversationTurn` — the SAME
+     * persistence path every auto-save already goes through — instead of a second save
+     * implementation, so success clears `saveFailed` exactly like the auto path does (that function's
+     * own `setSaveFailed(false)` on a successful `adoptAsActive` save) and a failure re-sets it exactly
+     * the same way too.
+     *
+     * `target` is built from this tab's live `activeConversationIdRef`/`conversationVersionRef` —
+     * the same pair `startTurn` reads when it constructs a fresh turn's target — so a conversation
+     * that was never created yet (still `null`) is POSTed once, and one that already has an id is
+     * PUT to that SAME row: this can never create a second conversation for what the user sees as one
+     * conversation, whether the failing save was the first one or a later one.
+     *
+     * Blocked while `isGenerating`: the in-flight turn (`startTurn`) already holds its OWN
+     * `TurnConversationTarget` in closure (shared between its pre-send save and its post-answer
+     * save — see that target's own doc comment) — a `target` built here from the live refs while
+     * that turn is still streaming is a DIFFERENT object. If the turn's pre-send save has already
+     * failed (raising this very callout) but not yet created the row, firing this handler would
+     * race it: this save creates+adopts the conversation from the live refs, while the turn's own
+     * target still holds `conversationId: null` and later POSTs a second row instead of updating
+     * the one this save just created. The turn's post-answer auto-save runs moments after the
+     * stream ends anyway, so a mid-stream retry is redundant — the button is disabled instead of
+     * queued so the same click is never re-armed into a second attempt when generation finishes.
+     */
+    const handleRetrySave = () => {
+      if (isRetryingSave || isGenerating) {
+        return;
+      }
+      setIsRetryingSave(true);
+      const target: TurnConversationTarget = {
+        conversationId: activeConversationIdRef.current,
+        version: conversationVersionRef.current,
+      };
+      void persistConversationTurn({
+        adoptAsActive: true,
+        target,
+        messages: messagesRef.current,
+        turnRecords: turnHistoryRef.current,
+      }).finally(() => setIsRetryingSave(false));
+    };
+
+    /**
+     * Stream-consuming core for a user turn (`handleSend`): consumes the SSE stream and commits
+     * every event into the assistant bubble identified by `assistantMessageId`.
+     */
+    const runChatStream = async (args: {
+      assistantMessageId: string;
+      /** The full UI message list this turn started from, INCLUDING its own (still empty) assistant
+       * placeholder. Kept as a local copy so the turn can reconstruct its own complete transcript in
+       * `finally` without reading React state — which, for an abandoned turn, has already been
+       * replaced by whatever conversation the user opened next. */
+      baseMessages: UiChatMessage[];
+      /** The row this turn saves to, already carrying the active conversation's id (or `null` for one
+       * that does not exist yet) and shared with the pre-send save `handleSend` fired. */
+      target: TurnConversationTarget;
+      outgoingMessages: ChatMessage[];
+      privacyPayload: ChatRequest['privacy'];
+    }) => {
+      const {
+        assistantMessageId,
+        baseMessages,
+        target,
+        outgoingMessages,
+        privacyPayload,
+      } = args;
+
+      setIsGenerating(true);
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
+      streamGenerationRef.current += 1;
+      const generation = streamGenerationRef.current;
+      /** False once this turn has been abandoned (`abandonActiveStream`) or superseded by a newer
+       * one — every write into shared component state is gated on it. */
+      const isTurnStillActive = () =>
+        generation === streamGenerationRef.current;
+      // This turn's own tool-call record, held by reference rather than looked up per event: the
+      // `tool_call`/`digest` handlers below used to search `turnHistoryRef` by assistant message id,
+      // which finds nothing once the ref has been reset by a conversation switch — so an abandoned
+      // turn's tool exchanges were dropped instead of saved with it.
+      const turnRecord = turnHistoryRef.current.find(
+        turn => turn.assistantMessageId === assistantMessageId,
+      );
+
+      // Empty-table suppression: an empty `table` event is held back (not
+      // committed to `message.table`) instead of rendered immediately, since a failed/empty first
+      // tool attempt followed by a successful retry's table in the SAME turn should show only the
+      // later, real one. Flushed (shown) if the stream ends before anything replaces it — "keep a
+      // single empty table if it's the only one" (honest-empty stays correct). A plain local
+      // variable, not a ref/state: scoped to this one stream's sequential event loop only.
+      //
+      // INVARIANT: within one turn, an empty table may NEVER replace — or outlive alongside — a
+      // non-empty one. The suppression above is one-directional: real rows always win over an empty
+      // spec, never the other way. This buffer and `pendingTable` are flushed together from three
+      // different call sites below (`finally`, the `error` branch, the `auth_expired` branch), and
+      // the sites do not all use the same flush order (`finally`/`auth_expired` flush the non-empty
+      // buffer first, `error` flushes the empty one first). On the unfixed code only `finally` was
+      // reachably broken: `error`'s empty-first order happened to be benign (the later non-empty
+      // commit won), and `auth_expired` can never hold content at all — chat-service.ts emits it
+      // only on the initial POST's 401, before any SSE frame (so no `table` event) has been read.
+      // But "happens to be benign" and "currently unreachable" are exactly the properties a future
+      // reorder or a new terminal path silently breaks. The invariant is therefore enforced
+      // independently at BOTH ends of this buffer's lifecycle instead of relying on flush order:
+      // `hasNonEmptyTableForTurn` (below) gates
+      // both the `table` event handler's empty branch (refuses to queue an empty spec once a
+      // non-empty one exists for this turn) and `flushPendingEmptyTable` itself (yields to a
+      // pending-or-committed non-empty table instead of committing). With both ends covered, no
+      // future call-site addition or reordering can reintroduce the clobber.
+      let pendingEmptyTable: TableSpec | undefined;
+      /**
+       * A non-empty `table` event held back until the answer's first text arrives. The server emits
+       * `table` the moment a tool returns, well before the model has narrated anything, so committing
+       * it immediately made the table pop in first and the prose then grow in above it — the bubble
+       * renders the table UNDER the text (message-bubble.tsx), so the turn read backwards while it
+       * streamed. Released by `flushPendingDelta` together with that first text (one React update, so
+       * text and table appear at once), or on its own by `flushPendingTable` if the turn ends, errors,
+       * or expires before any text arrives — an answer that is only a table must still show it.
+       */
+      let pendingTable: TableSpec | undefined;
+      /** The tool calls issued this turn, in order — mirrors what the bubble displays so the abandoned
+       * path can rebuild the turn without reading React state. */
+      let committedToolCalls: ToolCall[] = [];
+      /** The table this turn will be remembered with — mirrors what the flushes below commit to
+       * React state, so the abandoned path can rebuild the turn without reading that state. */
+      let committedTable: TableSpec | undefined;
+      /**
+       * Whether this turn already has, or is about to have, a table with rows in it — the single
+       * predicate both ends of the empty-table invariant above check, so they can never disagree.
+       * Checks `pendingTable` (a non-empty table not yet committed, e.g. still waiting on the first
+       * delta) as well as `committedTable` (already committed, by whichever flush ran first this
+       * turn). `rows.length > 0`, not mere truthiness, matters on BOTH arms: a previously-committed
+       * HONEST-empty table (this turn's only table so far) must still be superseded by a later
+       * non-empty one — the existing empty→rows retry path — so this only starts refusing once
+       * something with actual rows exists. (Today only the non-empty `table` branch ever assigns
+       * `pendingTable`, so its arm could be plain truthiness — but the explicit row check keeps the
+       * predicate correct even if a future refactor parks an empty spec there, instead of silently
+       * turning honest-empty turns into no-table turns.)
+       */
+      const hasNonEmptyTableForTurn = () =>
+        (pendingTable !== undefined && pendingTable.rows.length > 0) ||
+        (committedTable !== undefined && committedTable.rows.length > 0);
+      const flushPendingEmptyTable = () => {
+        if (!pendingEmptyTable) {
+          return;
+        }
+        // Yield to a non-empty table regardless of which flush call site got here first this turn —
+        // see the invariant comment on `pendingEmptyTable`. Drop the stale empty spec rather than
+        // committing it. NOTE: with the arrival-side guard below in place this branch is currently
+        // unreachable by construction (an empty spec is never queued once a non-empty table exists,
+        // and every later writer that could make the predicate true also clears this buffer). It is
+        // kept as defence-in-depth for a future writer of `pendingEmptyTable`, not because any
+        // event sequence reaches it today — do not count it as a tested code path.
+        if (hasNonEmptyTableForTurn()) {
+          pendingEmptyTable = undefined;
+          return;
+        }
+        const spec = pendingEmptyTable;
+        pendingEmptyTable = undefined;
+        committedTable = spec;
+        if (!isTurnStillActive()) {
+          return;
         }
         updateMessages(current =>
           current.map(message =>
             message.id === assistantMessageId
-              ? {
+              ? { ...message, table: spec }
+              : message,
+          ),
+        );
+      };
+      /** Commits a held non-empty table on its own, for the turns where no answer text ever arrives to
+       * pair it with (stream ended, errored, or the session expired). A no-op once `flushPendingDelta`
+       * has already released it. */
+      const flushPendingTable = () => {
+        if (!pendingTable) {
+          return;
+        }
+        const spec = pendingTable;
+        pendingTable = undefined;
+        committedTable = spec;
+        if (!isTurnStillActive()) {
+          return;
+        }
+        updateMessages(current =>
+          current.map(message =>
+            message.id === assistantMessageId
+              ? { ...message, table: spec }
+              : message,
+          ),
+        );
+      };
+
+      // wz-token pre-check: accumulated locally (not read back from React state)
+      // so `detectManagerAuthError` can be checked once the stream ends, over exactly the text THIS
+      // stream produced.
+      let accumulatedContent = '';
+      /**
+       * Whether this turn reached a terminal state of its own — a `done` frame, or an `error`/
+       * `auth_expired` that has already been reported. Anything else means the stream simply STOPPED:
+       * Stop was pressed, the user navigated away, or the connection dropped. That case used to be
+       * indistinguishable from a finished answer, so a truncated response was saved and later resumed
+       * as though it were complete.
+       */
+      let turnCompleted = false;
+
+      // Delta batching (typing-lag/streaming-jank fix): a fast-streaming provider can
+      // emit a `delta` event per token, and without batching EVERY one committed its own React state
+      // update (its own MessageList/MessageBubble/ResultTable re-render pass). `pendingDeltaText`
+      // buffers consecutive delta text locally; `flushPendingDelta` is the only place that ever
+      // commits it to `message.content`, via a SINGLE `updateMessages` call, scheduled at most once
+      // per animation frame (`flushScheduled` guards against scheduling a second one while one is
+      // already pending). This is local to this one stream call, not a ref persisted across renders
+      // — a `let`/const closure is enough since nothing outside this function ever reads it.
+      let pendingDeltaText = '';
+      let flushScheduled = false;
+      const flushPendingDelta = () => {
+        flushScheduled = false;
+        if (!pendingDeltaText) {
+          return;
+        }
+        const text = pendingDeltaText;
+        pendingDeltaText = '';
+        // The first text of the answer is what the held table was waiting for: released in this same
+        // update so the bubble shows text and table together, already in their final order.
+        const table = pendingTable;
+        pendingTable = undefined;
+        if (table) {
+          committedTable = table;
+        }
+        // An abandoned turn keeps accumulating into `accumulatedContent` (which is what its own
+        // transcript is rebuilt from) but stops writing into the message list, which now belongs to
+        // a different conversation.
+        if (!isTurnStillActive()) {
+          return;
+        }
+        updateMessages(current =>
+          current.map(message =>
+            message.id === assistantMessageId
+              ? // Real content is arriving: drop any stale "querying..." status line.
+                {
                   ...message,
-                  isStreaming: false,
-                  ...(turnCompleted ? {} : { interrupted: true }),
+                  content: message.content + text,
+                  statusMessage: undefined,
+                  ...(table ? { table } : {}),
                 }
               : message,
           ),
         );
-        setIsGenerating(false);
-        abortControllerRef.current = null;
-        chatInputRef.current?.focus();
-        // Auto-save: fire-and-forget — `persistConversationTurn` handles its own errors (no
-        // separate banner) and is handed `messagesRef.current`, which the `isStreaming: false`
-        // update just above already applied synchronously (see `useSyncedState`'s doc comment).
-        void persistConversationTurn({
-          adoptAsActive: true,
-          target,
-          messages: messagesRef.current,
-          turnRecords: turnHistoryRef.current,
-        });
-      }
-    }
-  };
+      };
+      const scheduleFlush = () => {
+        if (flushScheduled) {
+          return;
+        }
+        flushScheduled = true;
+        // requestAnimationFrame caps the commit rate to the display's own refresh rate (typically
+        // ~16ms), which is both smoother and cheaper than a fixed timeout; a plain setTimeout is the
+        // fallback for any non-browser environment (e.g. a future SSR/test context) where rAF isn't
+        // defined.
+        if (typeof requestAnimationFrame === 'function') {
+          requestAnimationFrame(flushPendingDelta);
+        } else {
+          setTimeout(flushPendingDelta, 80);
+        }
+      };
 
-  // Privacy: omit the whole `privacy` key when it would be `{enabled:false, map:[]}` — i.e. a
-  // conversation that has never enabled privacy mode and never minted a pseudonym. The route
-  // treats an absent key and a disabled one identically, so sending nothing keeps the request
-  // body minimal for the common case.
-  const privacyPayload =
-    privacyEnabled || pseudonymMap.length > 0
-      ? { enabled: privacyEnabled, map: pseudonymMap }
+      try {
+        for await (const event of chatService.streamChat(
+          selectedProviderId,
+          outgoingMessages,
+          controller.signal,
+          privacyPayload,
+        )) {
+          // Ordering invariant: every non-delta event must observe `message.content` as it stands
+          // AFTER every delta text that arrived strictly before it — flushing here (a no-op if
+          // nothing is pending) guarantees that regardless of where the batched flush would
+          // otherwise have landed.
+          if (event.type !== 'delta') {
+            flushPendingDelta();
+          }
+          if (event.type === 'delta') {
+            accumulatedContent += event.content;
+            pendingDeltaText += event.content;
+            scheduleFlush();
+          } else if (event.type === 'table') {
+            if (event.spec.rows.length === 0) {
+              // Arrival-side half of the invariant on `pendingEmptyTable`: refuse to queue an empty
+              // spec at all once a non-empty table already exists for this turn, rather than queuing
+              // it and relying on flush order to sort it out later. If a non-empty table has not
+              // arrived (or committed) yet, this is either the honest-empty case or a retry's first
+              // (failed) attempt, and is held exactly as before.
+              if (!hasNonEmptyTableForTurn()) {
+                pendingEmptyTable = event.spec;
+              }
+            } else {
+              pendingEmptyTable = undefined;
+              // Held rather than committed — see `pendingTable`. `committedTable` is deliberately NOT
+              // set here: it is set at the moment the table actually reaches the message list, so an
+              // abandoned turn is remembered with exactly what it displayed.
+              pendingTable = event.spec;
+            }
+          } else if (event.type === 'status' && isTurnStillActive()) {
+            // Transient progress line (e.g. "Querying Wazuh...") from the orchestration loop; no
+            // engine emits this yet, but the bubble already knows how to show it once one does.
+            updateMessages(current =>
+              current.map(message =>
+                message.id === assistantMessageId
+                  ? { ...message, statusMessage: event.message }
+                  : message,
+              ),
+            );
+          } else if (event.type === 'tool_call') {
+            // Digest-in-history bookkeeping only — never rendered as a UI message (message_bubble.tsx
+            // has no bubble type for it; it lives in this turn's record until a LATER turn's
+            // buildOutgoingMessages call resends it, or until the turn is saved).
+            turnRecord?.toolExchanges.push({ toolCall: event.toolCall });
+            // Also surfaced in the bubble (message-bubble.tsx's collapsed "queries executed" panel),
+            // so the reader can check the query behind the answer as it runs.
+            committedToolCalls = [...committedToolCalls, event.toolCall];
+            if (isTurnStillActive()) {
+              const toolCallsForDisplay = committedToolCalls;
+              updateMessages(current =>
+                current.map(message =>
+                  message.id === assistantMessageId
+                    ? { ...message, toolCalls: toolCallsForDisplay }
+                    : message,
+                ),
+              );
+            }
+          } else if (event.type === 'digest') {
+            const exchange = turnRecord?.toolExchanges.find(
+              entry => entry.toolCall.id === event.toolCallId,
+            );
+            if (exchange) {
+              exchange.digestContent = event.content;
+            }
+          } else if (event.type === 'suggested_query') {
+            // Graceful-failure handoff (server/tools/suggest-discover-query.ts): a callout rendered
+            // alongside this message's prose (message-bubble.tsx), not another `table` — the model
+            // is telling the user what it could NOT check, so there is no result set to show, only a
+            // query the user can run themselves. Set immediately (unlike `table`'s held/flushed
+            // `pendingTable`) since it has no ordering dependency on delta text arriving first.
+            if (isTurnStillActive()) {
+              const suggestedQuery = {
+                index: event.index,
+                dsl: event.dsl,
+                reason: event.reason,
+              };
+              updateMessages(current =>
+                current.map(message =>
+                  message.id === assistantMessageId
+                    ? { ...message, suggestedQuery }
+                    : message,
+                ),
+              );
+            }
+          } else if (event.type === 'privacy_map' && isTurnStillActive()) {
+            // Gated: the pseudonym map is PER-CONVERSATION state. An abandoned turn's entries used to
+            // be merged into whatever conversation the user had just opened, and then sent up with
+            // that conversation's next request.
+            setPseudonymMap(current => {
+              const known = new Set(current.map(entry => entry.pseudonym));
+              const additions = event.entries.filter(
+                entry => !known.has(entry.pseudonym),
+              );
+              return additions.length > 0
+                ? [...current, ...additions]
+                : current;
+            });
+          } else if (event.type === 'done') {
+            turnCompleted = true;
+          } else if (event.type === 'error') {
+            turnCompleted = true;
+            flushPendingEmptyTable();
+            // Released before the placeholder cleanup below, which drops an assistant message with
+            // neither content nor table — a turn whose tool succeeded and whose narration then failed
+            // must keep the table it already produced.
+            flushPendingTable();
+            if (!isTurnStillActive()) {
+              // An error banner for a conversation the user already left is pure noise — the turn's
+              // own transcript (rebuilt in `finally`) simply carries whatever streamed in before it.
+              continue;
+            }
+            if (detectManagerAuthError(event.message)) {
+              setManagerAuthHint(true);
+            } else {
+              setError(event.message);
+            }
+            // Drop the assistant placeholder if no content ever arrived for it; keep it if
+            // partial deltas (or a table) already streamed in before the error happened.
+            updateMessages(current =>
+              current.filter(
+                message =>
+                  !(
+                    message.id === assistantMessageId &&
+                    message.content === '' &&
+                    !message.table
+                  ),
+              ),
+            );
+          } else if (event.type === 'auth_expired') {
+            // Session-expiry recovery UX: a genuine 401 on the chat POST itself, distinct
+            // from the generic `error` branch above — same placeholder-cleanup, but a dedicated,
+            // persistent callout instead of the free-form error banner. Unlike the branch above this
+            // is NOT gated on the turn still being active: the session is gone for the whole app, so
+            // the callout is just as relevant to whatever conversation is now on screen.
+            turnCompleted = true;
+            flushPendingTable();
+            flushPendingEmptyTable();
+            handleSessionExpired();
+            if (!isTurnStillActive()) {
+              continue;
+            }
+            updateMessages(current =>
+              current.filter(
+                message =>
+                  !(
+                    message.id === assistantMessageId &&
+                    message.content === '' &&
+                    !message.table
+                  ),
+              ),
+            );
+          }
+        }
+      } finally {
+        // Flush order matches the loop's own invariant above: any buffered delta text lands before
+        // the empty-table flush and the final `isStreaming: false` update below, whether the stream
+        // ended normally, errored, or was aborted (handleStop's `controller.abort()` unwinds the
+        // `for await` and lands here the same way).
+        flushPendingDelta();
+        // A turn that produced a table but never any prose (the model stopped after the tool call, or
+        // Stop was pressed while it was still thinking) still has to show that table.
+        flushPendingTable();
+        flushPendingEmptyTable();
+
+        if (!isTurnStillActive()) {
+          // Abandoned turn: the user switched conversation, started a new one, or left the app while
+          // this was streaming. Persist what it produced to the conversation it actually belongs to,
+          // rebuilt from this turn's OWN local record (`baseMessages` + `accumulatedContent` +
+          // `committedTable`) rather than from React state, which now describes a different
+          // conversation. Nothing here touches shared state — `abandonActiveStream` already reset
+          // `isGenerating` and `abortControllerRef` at the moment of abandonment.
+          const abandonedTranscript = baseMessages
+            .map(message =>
+              message.id === assistantMessageId
+                ? {
+                    ...message,
+                    content: accumulatedContent,
+                    table: committedTable,
+                    ...(committedToolCalls.length > 0
+                      ? { toolCalls: committedToolCalls }
+                      : {}),
+                    isStreaming: false,
+                    ...(turnCompleted ? {} : { interrupted: true }),
+                  }
+                : message,
+            )
+            // Same rule the `error` branch applies to the visible list: an assistant placeholder that
+            // never received anything is not worth persisting.
+            .filter(
+              message =>
+                !(
+                  message.id === assistantMessageId &&
+                  message.content === '' &&
+                  !message.table
+                ),
+            );
+          void persistConversationTurn({
+            adoptAsActive: false,
+            target,
+            messages: abandonedTranscript,
+            // `turnHistoryRef` has already been reset to whatever conversation the user opened
+            // instead, so this turn's own record is passed explicitly.
+            turnRecords: turnRecord ? [turnRecord] : [],
+          });
+        } else {
+          if (detectManagerAuthError(accumulatedContent)) {
+            setManagerAuthHint(true);
+          }
+          updateMessages(current =>
+            current.map(message =>
+              message.id === assistantMessageId
+                ? {
+                    ...message,
+                    isStreaming: false,
+                    ...(turnCompleted ? {} : { interrupted: true }),
+                  }
+                : message,
+            ),
+          );
+          setIsGenerating(false);
+          abortControllerRef.current = null;
+          chatInputRef.current?.focus();
+          // Auto-save: fire-and-forget — `persistConversationTurn` handles its own errors (no
+          // separate banner) and is handed `messagesRef.current`, which the `isStreaming: false`
+          // update just above already applied synchronously (see `useSyncedState`'s doc comment).
+          void persistConversationTurn({
+            adoptAsActive: true,
+            target,
+            messages: messagesRef.current,
+            turnRecords: turnHistoryRef.current,
+          });
+        }
+      }
+    };
+
+    // Privacy: omit the whole `privacy` key when it would be `{enabled:false, map:[]}` — i.e. a
+    // conversation that has never enabled privacy mode and never minted a pseudonym. The route
+    // treats an absent key and a disabled one identically, so sending nothing keeps the request
+    // body minimal for the common case.
+    const privacyPayload =
+      privacyEnabled || pseudonymMap.length > 0
+        ? { enabled: privacyEnabled, map: pseudonymMap }
+        : undefined;
+
+    /**
+     * Runs one assistant turn over `history`, whose LAST message must be the user message being
+     * answered. Shared by `handleSend` (which appends a new question) and `handleRetryLastTurn` (which
+     * re-answers the existing last question after dropping the interrupted answer), so both go through
+     * exactly the same placeholder/history/save/stream sequence.
+     */
+    const startTurn = async (history: UiChatMessage[]) => {
+      // Pre-turn session guard: after >60s idle, re-probe (and heal if the wz-token
+      // expired) so this turn's Manager-path tool calls see a fresh token. The 60s memo makes it free
+      // during rapid back-and-forth; `detectManagerAuthError` below stays the mid-turn backstop.
+      await ensureManagerSession(core.http, { maxAgeMs: 60_000 });
+
+      const assistantMessageId = nextMessageId();
+      const assistantMessage: UiChatMessage = {
+        id: assistantMessageId,
+        role: 'assistant',
+        content: '',
+        isStreaming: true,
+        createdAt: Date.now(),
+      };
+
+      // Built from turnHistoryRef BEFORE this turn's own (still-empty) record is registered below, so
+      // it only ever reflects PRIOR completed turns — see buildOutgoingMessages's doc comment.
+      const outgoingMessages = buildOutgoingMessages(
+        history,
+        turnHistoryRef.current,
+      );
+      turnHistoryRef.current = [
+        ...turnHistoryRef.current,
+        { assistantMessageId, toolExchanges: [] },
+      ];
+
+      // Sending always snaps the pane to the new turn, even if the user had scrolled up — the one
+      // case where overriding their scroll position is what they expect (see pinnedToBottomRef).
+      pinnedToBottomRef.current = true;
+      const baseMessages = [...history, assistantMessage];
+      updateMessages(baseMessages);
+
+      // Persist the question BEFORE generating, not only after the turn completes. A reload, a
+      // navigation, or a crash mid-answer used to lose the question too — the conversation was only
+      // created once the turn ended, so the user came back to an empty chat with no trace that they
+      // had asked anything. `history` excludes the still-empty assistant placeholder. Both of this
+      // turn's saves share `target`, so whichever runs first creates the row and the other updates it
+      // — see `TurnConversationTarget`.
+      const target: TurnConversationTarget = {
+        conversationId: activeConversationIdRef.current,
+        version: conversationVersionRef.current,
+      };
+      void persistConversationTurn({
+        adoptAsActive: true,
+        target,
+        messages: history,
+        turnRecords: turnHistoryRef.current,
+      });
+
+      await runChatStream({
+        assistantMessageId,
+        baseMessages,
+        target,
+        outgoingMessages,
+        privacyPayload,
+      });
+    };
+
+    const handleSend = async (text: string) => {
+      if (!selectedProviderId) {
+        setError(
+          i18n.translate('wazuhAiAssistant.chat.noProviderError', {
+            defaultMessage:
+              'Configure a provider in the Settings tab before starting a chat.',
+          }),
+        );
+        return;
+      }
+
+      setError(null);
+      setManagerAuthHint(false);
+      setMergeNotice(null);
+      setSessionExpired(false);
+      setSaveFailed(false);
+      await startTurn([
+        ...messages,
+        {
+          id: nextMessageId(),
+          role: 'user',
+          content: text,
+          createdAt: Date.now(),
+        },
+      ]);
+    };
+
+    /**
+     * Re-asks the question whose answer was interrupted. The interrupted answer is dropped from the
+     * transcript first, so the retry replaces it rather than appending a second answer to the same
+     * question — and the pre-send save then persists the conversation without it, which is what makes
+     * a retried turn look like one turn after a reload too.
+     *
+     * Only ever offered for the LAST message (message-list.tsx) and only while nothing is generating,
+     * so there is no case where this rewrites the middle of a conversation.
+     */
+    const handleRetryLastTurn = async () => {
+      const last = messages[messages.length - 1];
+      if (isGenerating || !last) {
+        return;
+      }
+      // Two shapes of unfinished turn. An interrupted ASSISTANT message is the one this tab marked
+      // itself (Stop, or leaving while the page stayed alive). A trailing USER message is the harder
+      // case: a reload or a navigation killed the page mid-answer, so nothing was left running to mark
+      // anything — the question was saved before generating started and that is all there is.
+      const isInterruptedAnswer =
+        last.role === 'assistant' && last.interrupted === true;
+      if (!isInterruptedAnswer && last.role !== 'user') {
+        return;
+      }
+      const history = isInterruptedAnswer ? messages.slice(0, -1) : messages;
+      if (history[history.length - 1]?.role !== 'user') {
+        return;
+      }
+      // The dropped answer's tool exchanges go with it: they belong to a turn that is being replaced.
+      turnHistoryRef.current = turnHistoryRef.current.filter(
+        turn => turn.assistantMessageId !== last.id,
+      );
+      setError(null);
+      setManagerAuthHint(false);
+      setSaveFailed(false);
+      updateMessages(history);
+      await startTurn(history);
+    };
+
+    const hasProviders = providers.length > 0;
+    const showNoProviderState = providersLoaded && !hasProviders;
+    // Initial mount, before the app shell's provider load has resolved either way: neither the
+    // no-provider nor the welcome state can render yet (both depend on `providersLoaded`), so without
+    // an explicit state here this window shows a blank pane. Restoring a conversation shows the same
+    // spinner, so a reload lands on "loading" and then the transcript, instead of flashing the
+    // welcome state at a user who is not starting from scratch.
+    const showLoadingState = !providersLoaded || isRestoringConversation;
+    const showWelcomeState =
+      hasProviders && messages.length === 0 && !showLoadingState;
+    /** `error` is the send-path failure; `providersError` the app shell's provider-load failure. One
+     * callout reports whichever is current, so dismissal is tracked against this one value. */
+    const activeError = error ?? providersError;
+    const showErrorCallout =
+      Boolean(activeError) && activeError !== dismissedError;
+    /**
+     * Gates the sticky status-callout band below, so an empty band never paints its opaque ground
+     * over the first transcript row. Mirrors the conditions of the individual callouts inside it —
+     * each still decides its own visibility; this only decides whether the band exists at all.
+     */
+    const hasStatusCallout =
+      sessionExpired ||
+      showErrorCallout ||
+      managerAuthHint ||
+      saveFailed ||
+      mergeNotice === 'merged' ||
+      mergeNotice === 'conflict';
+
+    // Layout contract §1 (AI/design/redesign-v2-spec.md): the composer (`.wzComposerRow` below) is
+    // the grid's own `auto` row, a real flow sibling of the transcript's `1fr` row — never an
+    // absolutely/sticky-positioned overlay. That is what makes the old overlap (a fixed-height fade
+    // gradient painted outside the sticky panel's own box, caught covering the last few pixels of the
+    // transcript's final element — a table's pagination bar — even scrolled all the way down)
+    // structurally impossible instead of something tuned per breakpoint: there is no gradient to
+    // desync from a compensating `padding-bottom`, because there is nothing left for either of them
+    // to compensate for. A taller composer (multiline input, up to `$wzComposerMaxHeight`) simply
+    // takes more of the grid's `auto` row, which the `1fr` row yields automatically.
+
+    const privacyBadgeLabel = privacyEnabled
+      ? i18n.translate('wazuhAiAssistant.chat.privacy.on', {
+          defaultMessage: 'On',
+        })
+      : i18n.translate('wazuhAiAssistant.chat.privacy.off', {
+          defaultMessage: 'Off',
+        });
+    const privacyBadgeIcon = privacyEnabled ? 'lock' : 'lockOpen';
+    const privacyBadge = assistantSettings?.userCanOverride ? (
+      <EuiButtonEmpty
+        size='s'
+        color={privacyEnabled ? 'success' : 'text'}
+        iconType={privacyBadgeIcon}
+        onClick={handleTogglePrivacy}
+      >
+        {privacyBadgeLabel}
+      </EuiButtonEmpty>
+    ) : (
+      <EuiButtonEmpty
+        size='s'
+        color={privacyEnabled ? 'success' : 'text'}
+        iconType={privacyBadgeIcon}
+        isDisabled
+      >
+        {privacyBadgeLabel}
+      </EuiButtonEmpty>
+    );
+
+    // The badge alone only ever said
+    // "on"/"off" with no explanation of what that actually does to the user's data. This is the
+    // chat-page half of that disclosure — the concrete field categories are named once here and
+    // once more in the admin Settings page description (settings-page.tsx); wording intentionally
+    // matches between the two.
+    const privacyExplainerText = privacyEnabled
+      ? i18n.translate('wazuhAiAssistant.chat.privacy.explainOn', {
+          defaultMessage:
+            'Privacy on: hostnames, IP addresses, usernames, process command lines, and finding/rule text are pseudonymized before being sent to the configured AI provider.',
+        })
+      : i18n.translate('wazuhAiAssistant.chat.privacy.explainOff', {
+          defaultMessage:
+            'Privacy off: hostnames, IP addresses, usernames, process command lines, and finding/rule text are sent to the configured AI provider as-is.',
+        });
+
+    // Conversation header title: the active conversation's own saved title when one is open
+    // (looked up from the sidebar's own `conversations` list, never re-derived), or the
+    // "New conversation" fallback for a brand-new, never-yet-saved one.
+    const activeConversationTitle = activeConversationId
+      ? conversations.find(
+          conversation => conversation.id === activeConversationId,
+        )?.title
       : undefined;
 
-  /**
-   * Runs one assistant turn over `history`, whose LAST message must be the user message being
-   * answered. Shared by `handleSend` (which appends a new question) and `handleRetryLastTurn` (which
-   * re-answers the existing last question after dropping the interrupted answer), so both go through
-   * exactly the same placeholder/history/save/stream sequence.
-   */
-  const startTurn = async (history: UiChatMessage[]) => {
-    // Pre-turn session guard: after >60s idle, re-probe (and heal if the wz-token
-    // expired) so this turn's Manager-path tool calls see a fresh token. The 60s memo makes it free
-    // during rapid back-and-forth; `detectManagerAuthError` below stays the mid-turn backstop.
-    await ensureManagerSession(core.http, { maxAgeMs: 60_000 });
+    const providerOptions = providers.map(provider => ({
+      value: provider.id,
+      text: provider.isDefault
+        ? i18n.translate('wazuhAiAssistant.chat.providerOptionDefault', {
+            defaultMessage: '{name} (default)',
+            values: { name: provider.name },
+          })
+        : provider.name,
+    }));
 
-    const assistantMessageId = nextMessageId();
-    const assistantMessage: UiChatMessage = {
-      id: assistantMessageId,
-      role: 'assistant',
-      content: '',
-      isStreaming: true,
-      createdAt: Date.now(),
-    };
-
-    // Built from turnHistoryRef BEFORE this turn's own (still-empty) record is registered below, so
-    // it only ever reflects PRIOR completed turns — see buildOutgoingMessages's doc comment.
-    const outgoingMessages = buildOutgoingMessages(
-      history,
-      turnHistoryRef.current,
-    );
-    turnHistoryRef.current = [
-      ...turnHistoryRef.current,
-      { assistantMessageId, toolExchanges: [] },
-    ];
-
-    // Sending always snaps the pane to the new turn, even if the user had scrolled up — the one
-    // case where overriding their scroll position is what they expect (see pinnedToBottomRef).
-    pinnedToBottomRef.current = true;
-    const baseMessages = [...history, assistantMessage];
-    updateMessages(baseMessages);
-
-    // Persist the question BEFORE generating, not only after the turn completes. A reload, a
-    // navigation, or a crash mid-answer used to lose the question too — the conversation was only
-    // created once the turn ended, so the user came back to an empty chat with no trace that they
-    // had asked anything. `history` excludes the still-empty assistant placeholder. Both of this
-    // turn's saves share `target`, so whichever runs first creates the row and the other updates it
-    // — see `TurnConversationTarget`.
-    const target: TurnConversationTarget = {
-      conversationId: activeConversationIdRef.current,
-      version: conversationVersionRef.current,
-    };
-    void persistConversationTurn({
-      adoptAsActive: true,
-      target,
-      messages: history,
-      turnRecords: turnHistoryRef.current,
-    });
-
-    await runChatStream({
-      assistantMessageId,
-      baseMessages,
-      target,
-      outgoingMessages,
-      privacyPayload,
-    });
-  };
-
-  const handleSend = async (text: string) => {
-    if (!selectedProviderId) {
-      setError(
-        i18n.translate('wazuhAiAssistant.chat.noProviderError', {
-          defaultMessage:
-            'Configure a provider in the Settings tab before starting a chat.',
-        }),
-      );
-      return;
-    }
-
-    setError(null);
-    setManagerAuthHint(false);
-    setMergeNotice(null);
-    setSessionExpired(false);
-    setSaveFailed(false);
-    await startTurn([
-      ...messages,
-      {
-        id: nextMessageId(),
-        role: 'user',
-        content: text,
-        createdAt: Date.now(),
-      },
-    ]);
-  };
-
-  /**
-   * Re-asks the question whose answer was interrupted. The interrupted answer is dropped from the
-   * transcript first, so the retry replaces it rather than appending a second answer to the same
-   * question — and the pre-send save then persists the conversation without it, which is what makes
-   * a retried turn look like one turn after a reload too.
-   *
-   * Only ever offered for the LAST message (message-list.tsx) and only while nothing is generating,
-   * so there is no case where this rewrites the middle of a conversation.
-   */
-  const handleRetryLastTurn = async () => {
-    const last = messages[messages.length - 1];
-    if (isGenerating || !last) {
-      return;
-    }
-    // Two shapes of unfinished turn. An interrupted ASSISTANT message is the one this tab marked
-    // itself (Stop, or leaving while the page stayed alive). A trailing USER message is the harder
-    // case: a reload or a navigation killed the page mid-answer, so nothing was left running to mark
-    // anything — the question was saved before generating started and that is all there is.
-    const isInterruptedAnswer =
-      last.role === 'assistant' && last.interrupted === true;
-    if (!isInterruptedAnswer && last.role !== 'user') {
-      return;
-    }
-    const history = isInterruptedAnswer ? messages.slice(0, -1) : messages;
-    if (history[history.length - 1]?.role !== 'user') {
-      return;
-    }
-    // The dropped answer's tool exchanges go with it: they belong to a turn that is being replaced.
-    turnHistoryRef.current = turnHistoryRef.current.filter(
-      turn => turn.assistantMessageId !== last.id,
-    );
-    setError(null);
-    setManagerAuthHint(false);
-    setSaveFailed(false);
-    updateMessages(history);
-    await startTurn(history);
-  };
-
-  const hasProviders = providers.length > 0;
-  const showNoProviderState = providersLoaded && !hasProviders;
-  // Initial mount, before the app shell's provider load has resolved either way: neither the
-  // no-provider nor the welcome state can render yet (both depend on `providersLoaded`), so without
-  // an explicit state here this window shows a blank pane. Restoring a conversation shows the same
-  // spinner, so a reload lands on "loading" and then the transcript, instead of flashing the
-  // welcome state at a user who is not starting from scratch.
-  const showLoadingState = !providersLoaded || isRestoringConversation;
-  const showWelcomeState =
-    hasProviders && messages.length === 0 && !showLoadingState;
-  /** `error` is the send-path failure; `providersError` the app shell's provider-load failure. One
-   * callout reports whichever is current, so dismissal is tracked against this one value. */
-  const activeError = error ?? providersError;
-  const showErrorCallout =
-    Boolean(activeError) && activeError !== dismissedError;
-  /**
-   * Gates the sticky status-callout band below, so an empty band never paints its opaque ground
-   * over the first transcript row. Mirrors the conditions of the individual callouts inside it —
-   * each still decides its own visibility; this only decides whether the band exists at all.
-   */
-  const hasStatusCallout =
-    sessionExpired ||
-    showErrorCallout ||
-    managerAuthHint ||
-    saveFailed ||
-    mergeNotice === 'merged' ||
-    mergeNotice === 'conflict';
-
-  // Layout contract §1 (AI/design/redesign-v2-spec.md): the composer (`.wzComposerRow` below) is
-  // the grid's own `auto` row, a real flow sibling of the transcript's `1fr` row — never an
-  // absolutely/sticky-positioned overlay. That is what makes the old overlap (a fixed-height fade
-  // gradient painted outside the sticky panel's own box, caught covering the last few pixels of the
-  // transcript's final element — a table's pagination bar — even scrolled all the way down)
-  // structurally impossible instead of something tuned per breakpoint: there is no gradient to
-  // desync from a compensating `padding-bottom`, because there is nothing left for either of them
-  // to compensate for. A taller composer (multiline input, up to `$wzComposerMaxHeight`) simply
-  // takes more of the grid's `auto` row, which the `1fr` row yields automatically.
-
-  const privacyBadgeLabel = privacyEnabled
-    ? i18n.translate('wazuhAiAssistant.chat.privacy.on', {
-        defaultMessage: 'On',
-      })
-    : i18n.translate('wazuhAiAssistant.chat.privacy.off', {
-        defaultMessage: 'Off',
-      });
-  const privacyBadgeIcon = privacyEnabled ? 'lock' : 'lockOpen';
-  const privacyBadge = assistantSettings?.userCanOverride ? (
-    <EuiButtonEmpty
-      size='s'
-      color={privacyEnabled ? 'success' : 'text'}
-      iconType={privacyBadgeIcon}
-      onClick={handleTogglePrivacy}
-    >
-      {privacyBadgeLabel}
-    </EuiButtonEmpty>
-  ) : (
-    <EuiButtonEmpty
-      size='s'
-      color={privacyEnabled ? 'success' : 'text'}
-      iconType={privacyBadgeIcon}
-      isDisabled
-    >
-      {privacyBadgeLabel}
-    </EuiButtonEmpty>
-  );
-
-  // The badge alone only ever said
-  // "on"/"off" with no explanation of what that actually does to the user's data. This is the
-  // chat-page half of that disclosure — the concrete field categories are named once here and
-  // once more in the admin Settings page description (settings-page.tsx); wording intentionally
-  // matches between the two.
-  const privacyExplainerText = privacyEnabled
-    ? i18n.translate('wazuhAiAssistant.chat.privacy.explainOn', {
-        defaultMessage:
-          'Privacy on: hostnames, IP addresses, usernames, process command lines, and finding/rule text are pseudonymized before being sent to the configured AI provider.',
-      })
-    : i18n.translate('wazuhAiAssistant.chat.privacy.explainOff', {
-        defaultMessage:
-          'Privacy off: hostnames, IP addresses, usernames, process command lines, and finding/rule text are sent to the configured AI provider as-is.',
-      });
-
-  // Conversation header title: the active conversation's own saved title when one is open
-  // (looked up from the sidebar's own `conversations` list, never re-derived), or the
-  // "New conversation" fallback for a brand-new, never-yet-saved one.
-  const activeConversationTitle = activeConversationId
-    ? conversations.find(
-        conversation => conversation.id === activeConversationId,
-      )?.title
-    : undefined;
-
-  const providerOptions = providers.map(provider => ({
-    value: provider.id,
-    text: provider.isDefault
-      ? i18n.translate('wazuhAiAssistant.chat.providerOptionDefault', {
-          defaultMessage: '{name} (default)',
-          values: { name: provider.name },
-        })
-      : provider.name,
-  }));
-
-  return (
-    // Iteration 2 layout: EuiPage/EuiPageSideBar rendered as an unreliable hairline sliver in this
-    // OSD/EUI build (iteration 1 screenshots), so the two-pane layout is now an explicit,
-    // deterministic flex row instead of relying on EuiPageSideBar's own internal layout. `height:
-    // '100%'` is a no-op (resolves to `auto`, i.e. natural content height) unless an ancestor in
-    // application.tsx / the OSD app-mount chain supplies a bounded height, which is the normal OSD
-    // app-mount pattern (html/body/#osdApp height:100% chain) but was NOT verified by running the
-    // app here — application.tsx itself sets no height anywhere (EuiTabs + EuiSpacer + this
-    // component in plain document flow). If that chain turns out NOT to be bounded, this simply
-    // behaves like the old plain document-flow layout (sidebar and chat column both size to
-    // content, page scrolls normally) rather than breaking, so it is safe either way.
-    <>
-      {/* wzAiChat: the `--wz-*` token block chat-page.scss defines from EUI's own `$eui*` SASS
+    return (
+      // Iteration 2 layout: EuiPage/EuiPageSideBar rendered as an unreliable hairline sliver in this
+      // OSD/EUI build (iteration 1 screenshots), so the two-pane layout is now an explicit,
+      // deterministic flex row instead of relying on EuiPageSideBar's own internal layout. `height:
+      // '100%'` is a no-op (resolves to `auto`, i.e. natural content height) unless an ancestor in
+      // application.tsx / the OSD app-mount chain supplies a bounded height, which is the normal OSD
+      // app-mount pattern (html/body/#osdApp height:100% chain) but was NOT verified by running the
+      // app here — application.tsx itself sets no height anywhere (EuiTabs + EuiSpacer + this
+      // component in plain document flow). If that chain turns out NOT to be bounded, this simply
+      // behaves like the old plain document-flow layout (sidebar and chat column both size to
+      // content, page scrolls normally) rather than breaking, so it is safe either way.
+      <>
+        {/* wzAiChat: the `--wz-*` token block chat-page.scss defines from EUI's own `$eui*` SASS
         variables — every color/border reference in this subtree (rail rows, welcome cards, the
         composer's focus ring) reads one of those custom properties instead of a hardcoded hex
         or a JS-computed `theme:darkMode` branch. Custom properties inherit through the whole DOM
         subtree regardless of component boundaries, so nothing downstream needs its own dark-mode
         prop threaded down to it. Also the rail-display-mode measurement root — see the
         `railDisplayMode` effect above. */}
-      <div
-        ref={chatRootRef}
-        className='wzAiChat'
-        style={{
-          display: 'flex',
-          height: '100%',
-          minHeight: 0,
-        }}
-      >
-        {/* Left pane: saved-conversations rail. EuiPanel color="subdued" gives the standard OSD
+        <div
+          ref={chatRootRef}
+          className='wzAiChat'
+          style={{
+            display: 'flex',
+            height: '100%',
+            minHeight: 0,
+          }}
+        >
+          {/* Left pane: saved-conversations rail. EuiPanel color="subdued" gives the standard OSD
           "sunken" pane background without inventing a new hardcoded color. Width and the
           expanded/collapsed choice are THIS component's (layout contract §5/§6); what a
           'collapsed' 48px strip actually shows is ConversationList's own concern. */}
-        {showConversationSidebar && railDisplayMode !== 'flyout' && (
-          <EuiPanel
-            color='subdued'
-            hasShadow={false}
-            hasBorder={false}
-            borderRadius='none'
-            paddingSize={railDisplayMode === 'collapsed' ? 's' : 'm'}
-            // EuiPanel's `grow` prop DEFAULTS TO TRUE (flex-grow:1), which in this flex-row parent
-            // overrode the fixed width below and let the sidebar swallow half the page. A
-            // fixed-width pane must explicitly opt out.
-            grow={false}
-            role='region'
-            aria-label={i18n.translate(
-              'wazuhAiAssistant.chat.conversations.sidebarRegionLabel',
-              {
-                defaultMessage: 'Saved conversations',
-              },
-            )}
-            // `wzConvoRail` (conversation-list.scss) makes this panel a full-height flex column,
-            // which is what lets the rail's "Collapse" control pin itself to the bottom instead of
-            // simply following the last conversation.
-            className='wzConvoRail'
-            style={{
-              width:
-                railDisplayMode === 'collapsed'
-                  ? RAIL_COLLAPSED_WIDTH
-                  : CONVERSATION_SIDEBAR_WIDTH,
-              maxWidth:
-                railDisplayMode === 'collapsed'
-                  ? RAIL_COLLAPSED_WIDTH
-                  : CONVERSATION_SIDEBAR_WIDTH,
-              flexShrink: 0,
-              minWidth: 0,
-              // `.wzConvoRail`'s own list child scrolls (conversation-list.scss); the panel
-              // scrolling too is what produced a second, horizontal scrollbar and pushed the
-              // pinned Collapse control below the fold.
-              overflow: 'hidden',
-              // `--wz-hairline` (chat-page.scss, sourced from `$euiBorderColor`) replaces the old
-              // hardcoded `#D3DAE6` — that hex was EUI's light-theme `lightShade` token with no
-              // dark-mode counterpart, so it rendered as the brightest edge on the page in dark mode.
-              borderRight: '1px solid var(--wz-hairline)',
-            }}
-          >
-            <ConversationList
-              conversations={conversations}
-              isLoading={isLoadingConversations}
-              activeConversationId={activeConversationId}
-              // Both go through the confirm gate: each would cancel a running answer. Delete is not
-              // gated — ConversationList already confirms it, and a second modal on top of that one
-              // would be worse than the risk it guards against.
-              //
-              // Clicking the conversation ALREADY open is not one of those actions: it is a no-op
-              // (`handleSelectConversation` returns immediately), so asking to confirm an interruption
-              // that was never going to happen only trains the user to dismiss the dialog. The check
-              // has to happen here, before the gate, not only inside the handler behind it.
-              onSelect={id => {
-                if (id === activeConversationIdRef.current) {
-                  return;
-                }
-                void confirmIfGenerating(
-                  () => void handleSelectConversation(id),
-                );
+          {showConversationSidebar && railDisplayMode !== 'flyout' && (
+            <EuiPanel
+              color='subdued'
+              hasShadow={false}
+              hasBorder={false}
+              borderRadius='none'
+              paddingSize={railDisplayMode === 'collapsed' ? 's' : 'm'}
+              // EuiPanel's `grow` prop DEFAULTS TO TRUE (flex-grow:1), which in this flex-row parent
+              // overrode the fixed width below and let the sidebar swallow half the page. A
+              // fixed-width pane must explicitly opt out.
+              grow={false}
+              role='region'
+              aria-label={i18n.translate(
+                'wazuhAiAssistant.chat.conversations.sidebarRegionLabel',
+                {
+                  defaultMessage: 'Saved conversations',
+                },
+              )}
+              // `wzConvoRail` (conversation-list.scss) makes this panel a full-height flex column,
+              // which is what lets the rail's "Collapse" control pin itself to the bottom instead of
+              // simply following the last conversation.
+              className='wzConvoRail'
+              style={{
+                width:
+                  railDisplayMode === 'collapsed'
+                    ? RAIL_COLLAPSED_WIDTH
+                    : CONVERSATION_SIDEBAR_WIDTH,
+                maxWidth:
+                  railDisplayMode === 'collapsed'
+                    ? RAIL_COLLAPSED_WIDTH
+                    : CONVERSATION_SIDEBAR_WIDTH,
+                flexShrink: 0,
+                minWidth: 0,
+                // `.wzConvoRail`'s own list child scrolls (conversation-list.scss); the panel
+                // scrolling too is what produced a second, horizontal scrollbar and pushed the
+                // pinned Collapse control below the fold.
+                overflow: 'hidden',
+                // `--wz-hairline` (chat-page.scss, sourced from `$euiBorderColor`) replaces the old
+                // hardcoded `#D3DAE6` — that hex was EUI's light-theme `lightShade` token with no
+                // dark-mode counterpart, so it rendered as the brightest edge on the page in dark mode.
+                borderRight: '1px solid var(--wz-hairline)',
               }}
-              onNewConversation={() =>
-                void confirmIfGenerating(handleNewConversation)
-              }
-              onDelete={handleDeleteConversation}
-              // Rail prop contract agreed with the ConversationList owner (job item 6): all three
-              // are optional with defaults, so this call is safe to ship whether or not
-              // conversation-list.tsx has picked them up yet.
-              displayMode={railDisplayMode}
-              onCollapse={handleRailCollapse}
-              onExpand={handleRailExpand}
-            />
-          </EuiPanel>
-        )}
+            >
+              <ConversationList
+                conversations={conversations}
+                isLoading={isLoadingConversations}
+                activeConversationId={activeConversationId}
+                // Both go through the confirm gate: each would cancel a running answer. Delete is not
+                // gated — ConversationList already confirms it, and a second modal on top of that one
+                // would be worse than the risk it guards against.
+                //
+                // Clicking the conversation ALREADY open is not one of those actions: it is a no-op
+                // (`handleSelectConversation` returns immediately), so asking to confirm an interruption
+                // that was never going to happen only trains the user to dismiss the dialog. The check
+                // has to happen here, before the gate, not only inside the handler behind it.
+                onSelect={id => {
+                  if (id === activeConversationIdRef.current) {
+                    return;
+                  }
+                  void confirmIfGenerating(
+                    () => void handleSelectConversation(id),
+                  );
+                }}
+                onNewConversation={() =>
+                  void confirmIfGenerating(handleNewConversation)
+                }
+                onDelete={handleDeleteConversation}
+                // Rail prop contract agreed with the ConversationList owner (job item 6): all three
+                // are optional with defaults, so this call is safe to ship whether or not
+                // conversation-list.tsx has picked them up yet.
+                displayMode={railDisplayMode}
+                onCollapse={handleRailCollapse}
+                onExpand={handleRailExpand}
+              />
+            </EuiPanel>
+          )}
 
-        {/* Below the flyout threshold there is no room for an inline rail at all — a small
+          {/* Below the flyout threshold there is no room for an inline rail at all — a small
           trigger opens ConversationList inside an EuiFlyout instead (variation 4a's own flyout
           idiom, reused here for the rail rather than invented fresh). This button is new UI the
           spec's layout contract implies but does not itself word — see this component's final
           report for the exact i18n key. */}
-        {showConversationSidebar && railDisplayMode === 'flyout' && (
-          <div
-            style={{
-              flexShrink: 0,
-              borderRight: '1px solid var(--wz-hairline)',
-              padding: '8px 4px',
-            }}
-          >
-            <EuiButtonIcon
-              iconType='menu'
-              color='text'
-              onClick={() => setIsRailFlyoutOpen(true)}
-              aria-label={i18n.translate(
-                'wazuhAiAssistant.chat.conversations.openRailButton',
-                { defaultMessage: 'Show conversations' },
-              )}
-            />
-          </div>
-        )}
-        {showConversationSidebar &&
-          railDisplayMode === 'flyout' &&
-          isRailFlyoutOpen && (
-            <EuiFlyout
-              size='s'
-              ownFocus
-              onClose={() => setIsRailFlyoutOpen(false)}
-              aria-label={i18n.translate(
-                'wazuhAiAssistant.chat.conversations.sidebarRegionLabel',
-                { defaultMessage: 'Saved conversations' },
-              )}
+          {showConversationSidebar && railDisplayMode === 'flyout' && (
+            <div
+              style={{
+                flexShrink: 0,
+                borderRight: '1px solid var(--wz-hairline)',
+                padding: '8px 4px',
+              }}
             >
-              {/* EuiFlyout portals into document.body, past every ancestor that defines the
+              <EuiButtonIcon
+                iconType='menu'
+                color='text'
+                onClick={() => setIsRailFlyoutOpen(true)}
+                aria-label={i18n.translate(
+                  'wazuhAiAssistant.chat.conversations.openRailButton',
+                  { defaultMessage: 'Show conversations' },
+                )}
+              />
+            </div>
+          )}
+          {showConversationSidebar &&
+            railDisplayMode === 'flyout' &&
+            isRailFlyoutOpen && (
+              <EuiFlyout
+                size='s'
+                ownFocus
+                onClose={() => setIsRailFlyoutOpen(false)}
+                aria-label={i18n.translate(
+                  'wazuhAiAssistant.chat.conversations.sidebarRegionLabel',
+                  { defaultMessage: 'Saved conversations' },
+                )}
+              >
+                {/* EuiFlyout portals into document.body, past every ancestor that defines the
                 `--wz-*` tokens — including `.wzAiChat` — so without a block of its own the rail's
                 selected/hover row pills resolve to nothing inside it. Carried by a plain wrapper
                 rather than by EuiFlyout's own `className`: that prop does not reach an element
                 that ends up ancestral to this content in this EUI build, which a regression test
                 caught. `.wzConvoRailFlyout` sets custom properties only, so an extra div here
                 changes no layout. */}
-              <div className='wzConvoRailFlyout'>
-                <EuiFlyoutBody>
-                  <ConversationList
-                    conversations={conversations}
-                    isLoading={isLoadingConversations}
-                    activeConversationId={activeConversationId}
-                    onSelect={id => {
-                      if (id === activeConversationIdRef.current) {
-                        setIsRailFlyoutOpen(false);
-                        return;
+                <div className='wzConvoRailFlyout'>
+                  <EuiFlyoutBody>
+                    <ConversationList
+                      conversations={conversations}
+                      isLoading={isLoadingConversations}
+                      activeConversationId={activeConversationId}
+                      onSelect={id => {
+                        if (id === activeConversationIdRef.current) {
+                          setIsRailFlyoutOpen(false);
+                          return;
+                        }
+                        void confirmIfGenerating(() => {
+                          void handleSelectConversation(id);
+                          setIsRailFlyoutOpen(false);
+                        });
+                      }}
+                      onNewConversation={() =>
+                        void confirmIfGenerating(() => {
+                          handleNewConversation();
+                          setIsRailFlyoutOpen(false);
+                        })
                       }
-                      void confirmIfGenerating(() => {
-                        void handleSelectConversation(id);
-                        setIsRailFlyoutOpen(false);
-                      });
-                    }}
-                    onNewConversation={() =>
-                      void confirmIfGenerating(() => {
-                        handleNewConversation();
-                        setIsRailFlyoutOpen(false);
-                      })
-                    }
-                    onDelete={handleDeleteConversation}
-                    displayMode='flyout'
-                    onCollapse={handleRailCollapse}
-                    onExpand={handleRailExpand}
-                  />
-                </EuiFlyoutBody>
-              </div>
-            </EuiFlyout>
-          )}
+                      onDelete={handleDeleteConversation}
+                      displayMode='flyout'
+                      onCollapse={handleRailCollapse}
+                      onExpand={handleRailExpand}
+                    />
+                  </EuiFlyoutBody>
+                </div>
+              </EuiFlyout>
+            )}
 
-        {/* Right pane: the chat column. Layout contract §1 — a two-row CSS grid
+          {/* Right pane: the chat column. Layout contract §1 — a two-row CSS grid
           (`grid-template-rows: 1fr auto`, chat-page.scss `.wzChatPane`), NOT the flex column plus
           `position: sticky` composer this replaces. Row 1 (`.wzChatTranscript` below) is the ONLY
           scroll container; row 2 (`.wzComposerRow` below) stays in normal flow. That grid boundary
           — not a tuned padding/gradient pair — is what makes the composer/welcome overlap this
           redesign fixes structurally impossible instead of merely rare. */}
-        <div className='wzChatPane' style={{ flex: 1, minWidth: 0 }}>
-          {/* The conversation's ONE scroll container — scrollbar belongs at the pane's far edge
+          <div className='wzChatPane' style={{ flex: 1, minWidth: 0 }}>
+            {/* The conversation's ONE scroll container — scrollbar belongs at the pane's far edge
             like any chat app, and should only exist once content overflows (no permanently
             reserved gutter). The auto-scroll pinning refs above target it; overflowAnchor keeps
             Chrome's scroll anchoring from fighting the pinning while answers stream. */}
-          <div
-            ref={scrollPaneRef}
-            onScroll={handleScrollPane}
-            role='region'
-            aria-label={i18n.translate(
-              'wazuhAiAssistant.chat.chatPaneRegionLabel',
-              {
-                defaultMessage: 'Chat',
-              },
-            )}
-            className='wzChatTranscript'
-          >
-            {/* `.wzTranscriptContent` (chat-page.scss): the full-width wrapper that owns the ONE
+            <div
+              ref={scrollPaneRef}
+              onScroll={handleScrollPane}
+              role='region'
+              aria-label={i18n.translate(
+                'wazuhAiAssistant.chat.chatPaneRegionLabel',
+                {
+                  defaultMessage: 'Chat',
+                },
+              )}
+              className='wzChatTranscript'
+            >
+              {/* `.wzTranscriptContent` (chat-page.scss): the full-width wrapper that owns the ONE
               shared `16px 24px 0` gutter — `.wzContentMeasure` below (header/callouts/welcome) and
               `MessageList` (rendered as ITS sibling further down, not its descendant) both sit
               inside it, which is what lets a table-bearing turn's own row measure past
               `.wzContentMeasure`'s 1060px cap instead of being clipped to it (layout contract §5). */}
-            <div
-              className='wzTranscriptContent'
-              style={{ padding: '16px 24px 0' }}
-            >
-              {/* `.wzContentMeasure` (chat-page.scss): the ONE centred column transcript prose and
+              <div
+                className='wzTranscriptContent'
+                style={{ padding: '16px 24px 0' }}
+              >
+                {/* `.wzContentMeasure` (chat-page.scss): the ONE centred column transcript prose and
               the composer share (layout contract §5) — reads `$wzContentMaxWidth` off the shared
               `_redesign.scss` token instead of restating it, which is what this file's old
               `CONVERSATION_MAX_WIDTH = 860` constant used to do in parallel. `--stretch` only while
               this holds the welcome state (see chat-page.scss's own comment on that modifier) — the
               ordinary message-list case stays a plain flow box so it never claims the whole
               transcript height for itself and pushes `MessageList`'s sibling row out of view. */}
-              {/* `.wzStatusCallouts` (chat-page.scss): the sticky status band. It is a DIRECT child
+                {/* `.wzStatusCallouts` (chat-page.scss): the sticky status band. It is a DIRECT child
                 of `.wzTranscriptContent` rather than of `.wzContentMeasure` below, and that
                 placement is the whole point — a `position: sticky` element can only travel inside
                 its own parent's box, and the non-welcome `.wzContentMeasure` is a plain flow box
@@ -2023,12 +2131,12 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 child so the band sits above the transcript rather than below the welcome state.
                 Rendered only when something is actually in it (`hasStatusCallout`) — see that
                 flag's comment. */}
-              {hasStatusCallout && (
-                <div className='wzStatusCallouts'>
-                  {/* Same shared 1060px measure as the transcript prose below, so a pinned callout
+                {hasStatusCallout && (
+                  <div className='wzStatusCallouts'>
+                    {/* Same shared 1060px measure as the transcript prose below, so a pinned callout
                     lines up with the messages it is reporting on instead of spanning wider. */}
-                  <div className='wzContentMeasure'>
-                    {/* Callouts render in priority order (never suppressed — resilience-first: every
+                    <div className='wzContentMeasure'>
+                      {/* Callouts render in priority order (never suppressed — resilience-first: every
                       state is shown, just ordered): session expiry first (it blocks everything
                       else), then generic errors, then a failed auto-save, then the
                       optimistic-concurrency merge notices. Session-expiry recovery UX: a genuine
@@ -2036,83 +2144,83 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                       (no dismiss control, and nothing in this file ever calls
                       setSessionExpired(false) except starting a fresh send) until the user reloads,
                       per this fix's brief. */}
-                    {sessionExpired && (
-                      <StatusCallout
-                        title={i18n.translate(
-                          'wazuhAiAssistant.chat.sessionExpired.title',
-                          {
-                            defaultMessage: 'Your session expired',
-                          },
-                        )}
-                        color='danger'
-                        iconType='lock'
-                        body={i18n.translate(
-                          'wazuhAiAssistant.chat.sessionExpired.body',
-                          {
-                            defaultMessage:
-                              'Reload the page to sign in again. Your unsent message has been saved and will be restored automatically.',
-                          },
-                        )}
-                        action={
-                          <EuiButton
-                            size='s'
-                            color='danger'
-                            onClick={() => window.location.reload()}
-                          >
-                            {i18n.translate(
-                              'wazuhAiAssistant.chat.sessionExpired.reloadButton',
-                              {
-                                defaultMessage: 'Reload page',
-                              },
-                            )}
-                          </EuiButton>
-                        }
-                      />
-                    )}
+                      {sessionExpired && (
+                        <StatusCallout
+                          title={i18n.translate(
+                            'wazuhAiAssistant.chat.sessionExpired.title',
+                            {
+                              defaultMessage: 'Your session expired',
+                            },
+                          )}
+                          color='danger'
+                          iconType='lock'
+                          body={i18n.translate(
+                            'wazuhAiAssistant.chat.sessionExpired.body',
+                            {
+                              defaultMessage:
+                                'Reload the page to sign in again. Your unsent message has been saved and will be restored automatically.',
+                            },
+                          )}
+                          action={
+                            <EuiButton
+                              size='s'
+                              color='danger'
+                              onClick={() => window.location.reload()}
+                            >
+                              {i18n.translate(
+                                'wazuhAiAssistant.chat.sessionExpired.reloadButton',
+                                {
+                                  defaultMessage: 'Reload page',
+                                },
+                              )}
+                            </EuiButton>
+                          }
+                        />
+                      )}
 
-                    {/* The one dismissible callout in the band. A failed turn is already visible in
+                      {/* The one dismissible callout in the band. A failed turn is already visible in
                       the transcript and the user can simply ask again, so once they have read why it
                       failed there is nothing left for this to report — unlike the session-expiry and
                       save-failure notices around it, which describe a condition that is still true
                       after being read and so stay put (see `StatusCallout`'s `onDismiss` doc).
                       Dismissal is per-message, so the next failure surfaces again on its own. */}
-                    {showErrorCallout && (
-                      <StatusCallout
-                        title={i18n.translate(
-                          'wazuhAiAssistant.chat.errorTitle',
-                          {
-                            defaultMessage: 'Something went wrong',
-                          },
-                        )}
-                        color='danger'
-                        iconType='alert'
-                        body={activeError}
-                        onDismiss={() => setDismissedError(activeError)}
-                      />
-                    )}
+                      {showErrorCallout && (
+                        <StatusCallout
+                          title={i18n.translate(
+                            'wazuhAiAssistant.chat.errorTitle',
+                            {
+                              defaultMessage: 'Something went wrong',
+                            },
+                          )}
+                          color='danger'
+                          iconType='alert'
+                          body={activeError}
+                          onDismiss={() => setDismissedError(activeError)}
+                        />
+                      )}
 
-                    {managerAuthHint && (
-                      <StatusCallout
-                        title={i18n.translate(
-                          'wazuhAiAssistant.chat.managerAuthHint.title',
-                          {
-                            defaultMessage:
-                              'Your Wazuh session may have expired',
-                          },
-                        )}
-                        color='warning'
-                        iconType='alert'
-                        body={i18n.translate(
-                          'wazuhAiAssistant.chat.managerAuthHint.body',
-                          {
-                            defaultMessage:
-                              'A request to the Wazuh manager failed, which can happen when your dashboard session token has expired. Reload the page and sign in again, then retry your question.',
-                          },
-                        )}
-                      />
-                    )}
+                      {managerAuthHint && (
+                        <StatusCallout
+                          title={i18n.translate(
+                            'wazuhAiAssistant.chat.managerAuthHint.title',
+                            {
+                              defaultMessage:
+                                'Your Wazuh session may have expired',
+                            },
+                          )}
+                          color='warning'
+                          iconType='alert'
+                          body={i18n.translate(
+                            'wazuhAiAssistant.chat.managerAuthHint.body',
+                            {
+                              defaultMessage:
+                                'A request to the Wazuh manager failed, which can happen when your dashboard session token has expired. Reload the page and sign in again, then retry your question.',
+                            },
+                          )}
+                        />
+                      )}
 
-                    {/* A failed auto-save is surfaced instead of swallowed: the conversation on
+                      {/* A failed auto-save is surfaced instead of swallowed: the conversation on
                     screen is ahead of what is stored, which the user cannot infer from anything
                     else. Not dismissible — this reports real data-loss risk — but no longer purely
                     passive: the next turn's save still retries on its own, and "Retry now"
@@ -2120,106 +2228,106 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     save (e.g. a read-only index) is fixed, instead of waiting on the next answer.
                     Either path clears this the same way, via persistConversationTurn's own
                     setSaveFailed(false) on success. */}
-                    {saveFailed && (
-                      <StatusCallout
-                        title={i18n.translate(
-                          'wazuhAiAssistant.chat.conversations.saveFailed.title',
-                          {
-                            defaultMessage:
-                              'This conversation is not being saved',
-                          },
-                        )}
-                        color='warning'
-                        iconType='alert'
-                        body={i18n.translate(
-                          'wazuhAiAssistant.chat.conversations.saveFailed.body',
-                          {
-                            defaultMessage:
-                              'The latest messages could not be saved, so they may be missing if you reload. The chat still works, and saving is retried after each answer.',
-                          },
-                        )}
-                        action={
-                          <EuiButton
-                            size='s'
-                            color='warning'
-                            onClick={handleRetrySave}
-                            // Also disabled while a turn is generating: retrying with a target
-                            // built from the live refs while the in-flight turn's OWN target is
-                            // still unresolved (e.g. its pre-send save hasn't created the row yet)
-                            // would race it into creating a second conversation row — see
-                            // handleRetrySave's doc comment. The turn's own post-answer save runs
-                            // moments after streaming ends.
-                            isLoading={isRetryingSave}
-                            isDisabled={isRetryingSave || isGenerating}
-                          >
-                            {i18n.translate(
-                              'wazuhAiAssistant.chat.conversations.saveFailed.retryButton',
-                              { defaultMessage: 'Retry now' },
-                            )}
-                          </EuiButton>
-                        }
-                      />
-                    )}
+                      {saveFailed && (
+                        <StatusCallout
+                          title={i18n.translate(
+                            'wazuhAiAssistant.chat.conversations.saveFailed.title',
+                            {
+                              defaultMessage:
+                                'This conversation is not being saved',
+                            },
+                          )}
+                          color='warning'
+                          iconType='alert'
+                          body={i18n.translate(
+                            'wazuhAiAssistant.chat.conversations.saveFailed.body',
+                            {
+                              defaultMessage:
+                                'The latest messages could not be saved, so they may be missing if you reload. The chat still works, and saving is retried after each answer.',
+                            },
+                          )}
+                          action={
+                            <EuiButton
+                              size='s'
+                              color='warning'
+                              onClick={handleRetrySave}
+                              // Also disabled while a turn is generating: retrying with a target
+                              // built from the live refs while the in-flight turn's OWN target is
+                              // still unresolved (e.g. its pre-send save hasn't created the row yet)
+                              // would race it into creating a second conversation row — see
+                              // handleRetrySave's doc comment. The turn's own post-answer save runs
+                              // moments after streaming ends.
+                              isLoading={isRetryingSave}
+                              isDisabled={isRetryingSave || isGenerating}
+                            >
+                              {i18n.translate(
+                                'wazuhAiAssistant.chat.conversations.saveFailed.retryButton',
+                                { defaultMessage: 'Retry now' },
+                              )}
+                            </EuiButton>
+                          }
+                        />
+                      )}
 
-                    {/* Optimistic-concurrency notice: shown after persistConversationAfterTurn's
+                      {/* Optimistic-concurrency notice: shown after persistConversationAfterTurn's
                       auto-save hit a 409 on the last completed turn — see
                       saveConversationWithMerge's own doc comment for exactly when each variant
                       fires. Non-blocking: the chat itself is fully usable either way, this is
                       purely informational. */}
-                    {mergeNotice === 'merged' && (
-                      <StatusCallout
-                        title={i18n.translate(
-                          'wazuhAiAssistant.chat.conversations.mergedNotice.title',
-                          {
-                            defaultMessage: 'Conversation merged',
-                          },
-                        )}
-                        // A successful merge is a good outcome, not a warning — the conflict
-                        // variant right below keeps 'warning'/'alert', so the two are no longer
-                        // visually identical for opposite results.
-                        color='success'
-                        iconType='check'
-                        body={i18n.translate(
-                          'wazuhAiAssistant.chat.conversations.mergedNotice.body',
-                          {
-                            defaultMessage:
-                              'This conversation was also updated in another tab. The versions were merged.',
-                          },
-                        )}
-                      />
-                    )}
+                      {mergeNotice === 'merged' && (
+                        <StatusCallout
+                          title={i18n.translate(
+                            'wazuhAiAssistant.chat.conversations.mergedNotice.title',
+                            {
+                              defaultMessage: 'Conversation merged',
+                            },
+                          )}
+                          // A successful merge is a good outcome, not a warning — the conflict
+                          // variant right below keeps 'warning'/'alert', so the two are no longer
+                          // visually identical for opposite results.
+                          color='success'
+                          iconType='check'
+                          body={i18n.translate(
+                            'wazuhAiAssistant.chat.conversations.mergedNotice.body',
+                            {
+                              defaultMessage:
+                                'This conversation was also updated in another tab. The versions were merged.',
+                            },
+                          )}
+                        />
+                      )}
 
-                    {mergeNotice === 'conflict' && (
-                      <StatusCallout
-                        title={i18n.translate(
-                          'wazuhAiAssistant.chat.conversations.mergeConflictNotice.title',
-                          {
-                            defaultMessage: 'Could not merge automatically',
-                          },
-                        )}
-                        color='warning'
-                        iconType='alert'
-                        body={i18n.translate(
-                          'wazuhAiAssistant.chat.conversations.mergeConflictNotice.body',
-                          {
-                            defaultMessage:
-                              'This conversation is being edited in another tab and the changes could not be merged automatically. Your latest messages are still shown here, but they may not be saved.',
-                          },
-                        )}
-                      />
-                    )}
+                      {mergeNotice === 'conflict' && (
+                        <StatusCallout
+                          title={i18n.translate(
+                            'wazuhAiAssistant.chat.conversations.mergeConflictNotice.title',
+                            {
+                              defaultMessage: 'Could not merge automatically',
+                            },
+                          )}
+                          color='warning'
+                          iconType='alert'
+                          body={i18n.translate(
+                            'wazuhAiAssistant.chat.conversations.mergeConflictNotice.body',
+                            {
+                              defaultMessage:
+                                'This conversation is being edited in another tab and the changes could not be merged automatically. Your latest messages are still shown here, but they may not be saved.',
+                            },
+                          )}
+                        />
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              <div
-                className={
-                  showWelcomeState
-                    ? 'wzContentMeasure wzContentMeasure--stretch'
-                    : 'wzContentMeasure'
-                }
-              >
-                {/* The view's `<h1>`, for assistive tech only. The chat column had no heading at all,
+                <div
+                  className={
+                    showWelcomeState
+                      ? 'wzContentMeasure wzContentMeasure--stretch'
+                      : 'wzContentMeasure'
+                  }
+                >
+                  {/* The view's `<h1>`, for assistive tech only. The chat column had no heading at all,
                     which left screen-reader users without a name for the thing they are reading and
                     the page without a document outline. A VISIBLE header was tried and dropped: a
                     conversation's title is generated from its first message, so a visible strip
@@ -2227,82 +2335,82 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     transcript, and the sidebar already marks which conversation is open. Screen-
                     reader-only keeps the semantics without the duplication — and matches the Home
                     Overview, which likewise shows no page-scale title. */}
-                {!showLoadingState && !showNoProviderState && (
-                  <EuiScreenReaderOnly>
-                    <h1>
-                      {activeConversationTitle ??
-                        i18n.translate(
-                          'wazuhAiAssistant.chat.conversations.newConversationHeading',
-                          {
-                            defaultMessage: 'New conversation',
-                          },
-                        )}
-                    </h1>
-                  </EuiScreenReaderOnly>
-                )}
+                  {!showLoadingState && !showNoProviderState && (
+                    <EuiScreenReaderOnly>
+                      <h1>
+                        {activeConversationTitle ??
+                          i18n.translate(
+                            'wazuhAiAssistant.chat.conversations.newConversationHeading',
+                            {
+                              defaultMessage: 'New conversation',
+                            },
+                          )}
+                      </h1>
+                    </EuiScreenReaderOnly>
+                  )}
 
-                {showLoadingState && (
-                  <EuiFlexGroup
-                    justifyContent='center'
-                    alignItems='center'
-                    style={{ minHeight: 240 }}
-                  >
-                    <EuiFlexItem grow={false}>
-                      <EuiLoadingSpinner
-                        size='xl'
-                        aria-label={i18n.translate(
-                          'wazuhAiAssistant.common.loading',
-                          {
-                            defaultMessage: 'Loading...',
-                          },
-                        )}
-                      />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                )}
+                  {showLoadingState && (
+                    <EuiFlexGroup
+                      justifyContent='center'
+                      alignItems='center'
+                      style={{ minHeight: 240 }}
+                    >
+                      <EuiFlexItem grow={false}>
+                        <EuiLoadingSpinner
+                          size='xl'
+                          aria-label={i18n.translate(
+                            'wazuhAiAssistant.common.loading',
+                            {
+                              defaultMessage: 'Loading...',
+                            },
+                          )}
+                        />
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  )}
 
-                {showNoProviderState && (
-                  <EuiEmptyPrompt
-                    iconType='machineLearningApp'
-                    title={
-                      <h2>
-                        {i18n.translate(
-                          'wazuhAiAssistant.chat.noProvider.title',
-                          {
-                            defaultMessage: 'No AI provider configured',
-                          },
-                        )}
-                      </h2>
-                    }
-                    body={
-                      <p>
-                        {i18n.translate(
-                          'wazuhAiAssistant.chat.noProvider.body',
-                          {
-                            defaultMessage:
-                              'The AI Assistant needs at least one connected provider (OpenAI-compatible or Anthropic) before it can answer questions. Add one to get started.',
-                          },
-                        )}
-                      </p>
-                    }
-                    actions={
-                      <EuiButton
-                        color='primary'
-                        fill
-                        onClick={onNavigateToSettings}
-                      >
-                        {i18n.translate(
-                          'wazuhAiAssistant.chat.noProvider.action',
-                          {
-                            defaultMessage: 'Add a provider',
-                          },
-                        )}
-                      </EuiButton>
-                    }
-                  />
-                )}
+                  {showNoProviderState && (
+                    <EuiEmptyPrompt
+                      iconType='machineLearningApp'
+                      title={
+                        <h2>
+                          {i18n.translate(
+                            'wazuhAiAssistant.chat.noProvider.title',
+                            {
+                              defaultMessage: 'No AI provider configured',
+                            },
+                          )}
+                        </h2>
+                      }
+                      body={
+                        <p>
+                          {i18n.translate(
+                            'wazuhAiAssistant.chat.noProvider.body',
+                            {
+                              defaultMessage:
+                                'The AI Assistant needs at least one connected provider (OpenAI-compatible or Anthropic) before it can answer questions. Add one to get started.',
+                            },
+                          )}
+                        </p>
+                      }
+                      actions={
+                        <EuiButton
+                          color='primary'
+                          fill
+                          onClick={onNavigateToSettings}
+                        >
+                          {i18n.translate(
+                            'wazuhAiAssistant.chat.noProvider.action',
+                            {
+                              defaultMessage: 'Add a provider',
+                            },
+                          )}
+                        </EuiButton>
+                      }
+                    />
+                  )}
 
-                {/* Welcome centres only when there is room (contract §3): `.wzWelcomeCenter`
+                  {/* Welcome centres only when there is room (contract §3): `.wzWelcomeCenter`
                     (chat-page.scss) is a `flex: 1 1 auto` column with `justify-content: center`,
                     growing into whatever the transcript row leaves it. NOT the
                     `display:grid; place-content:center` this comment used to describe — on a grid
@@ -2312,295 +2420,302 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     stops at the content's own height and the transcript's own `overflow-y: auto`
                     takes over — nothing here can ever reach the composer, which is a grid sibling
                     of the transcript, never a descendant of it. */}
-                {showWelcomeState && (
-                  <div className='wzWelcomeCenter'>
-                    <EuiEmptyPrompt
-                      // No `icon`: this chat already lives inside the Wazuh app chrome, so a Wazuh
-                      // mark on the welcome screen only repeated branding the user can already see.
-                      title={
-                        // EUI's own type scale (size='m') instead of an inline fontSize/weight/
-                        // letter-spacing override — the whole point of this pass is to stop
-                        // fighting EuiEmptyPrompt's built-in typography with inline styles.
-                        <EuiTitle size='m'>
-                          <h2>
-                            {i18n.translate(
-                              'wazuhAiAssistant.chat.welcome.title',
-                              {
-                                defaultMessage:
-                                  'Ask the AI Assistant something',
-                              },
-                            )}
-                          </h2>
-                        </EuiTitle>
-                      }
-                      body={
-                        // `color='subdued'`: the title alone should carry the visual weight — a
-                        // same-weight subtitle right under it was competing with it instead of
-                        // reading as a second, lighter tier of the same heading (the "clear heading
-                        // hierarchy" half of the welcome-screen polish pass). Text itself is
-                        // unchanged, so the i18n id stays stable.
-                        <EuiText size='m' color='subdued'>
-                          <p>
-                            {i18n.translate(
-                              'wazuhAiAssistant.chat.welcome.subtitle',
-                              {
-                                defaultMessage:
-                                  'Ask questions about your security data in plain language.',
-                              },
-                            )}
-                          </p>
-                        </EuiText>
-                      }
-                    />
-                    <EuiSpacer size='l' />
-                    {/* Welcome variation 1a (design's own recommendation): ONE bordered, shadowless
+                  {showWelcomeState && (
+                    <div className='wzWelcomeCenter'>
+                      <EuiEmptyPrompt
+                        // No `icon`: this chat already lives inside the Wazuh app chrome, so a Wazuh
+                        // mark on the welcome screen only repeated branding the user can already see.
+                        title={
+                          // EUI's own type scale (size='m') instead of an inline fontSize/weight/
+                          // letter-spacing override — the whole point of this pass is to stop
+                          // fighting EuiEmptyPrompt's built-in typography with inline styles.
+                          <EuiTitle size='m'>
+                            <h2>
+                              {i18n.translate(
+                                'wazuhAiAssistant.chat.welcome.title',
+                                {
+                                  defaultMessage:
+                                    'Ask the AI Assistant something',
+                                },
+                              )}
+                            </h2>
+                          </EuiTitle>
+                        }
+                        body={
+                          // `color='subdued'`: the title alone should carry the visual weight — a
+                          // same-weight subtitle right under it was competing with it instead of
+                          // reading as a second, lighter tier of the same heading (the "clear heading
+                          // hierarchy" half of the welcome-screen polish pass). Text itself is
+                          // unchanged, so the i18n id stays stable.
+                          <EuiText size='m' color='subdued'>
+                            <p>
+                              {i18n.translate(
+                                'wazuhAiAssistant.chat.welcome.subtitle',
+                                {
+                                  defaultMessage:
+                                    'Ask questions about your security data in plain language.',
+                                },
+                              )}
+                            </p>
+                          </EuiText>
+                        }
+                      />
+                      <EuiSpacer size='l' />
+                      {/* Welcome variation 1a (design's own recommendation): ONE bordered, shadowless
                         container with a centred pill header, holding three horizontal cards —
                         icon-left, title plus the full question as a two-line description, hairline
                         border — the Home Overview idiom, replacing the old icon-top/150px/
                         one-truncated-line cards that floated on the page background with no
                         grouping container. Clicking a card still only fills the input (unchanged
                         `setInputText` call), never auto-sends. */}
-                    {/* `grow={false}`: EuiPanel's `grow` DEFAULTS TO TRUE (flex-grow: 1), and
+                      {/* `grow={false}`: EuiPanel's `grow` DEFAULTS TO TRUE (flex-grow: 1), and
                         this panel is a flex item of the welcome's centring column — left at
                         the default it stretched to the full transcript height, so the cards
                         sat at the top of a tall empty box instead of the cluster sitting
                         centred. Same trap as the conversation rail's own panel above. */}
-                    <EuiPanel
-                      hasBorder
-                      hasShadow={false}
-                      paddingSize='l'
-                      grow={false}
-                    >
-                      <EuiFlexGroup
-                        gutterSize='none'
-                        justifyContent='center'
-                        responsive={false}
+                      <EuiPanel
+                        hasBorder
+                        hasShadow={false}
+                        paddingSize='l'
+                        grow={false}
                       >
-                        <EuiFlexItem grow={false}>
-                          <EuiBadge color='hollow'>
-                            {i18n.translate(
-                              'wazuhAiAssistant.chat.welcome.body',
-                              {
-                                defaultMessage: 'Try one of these',
-                              },
-                            )}
-                          </EuiBadge>
-                        </EuiFlexItem>
-                      </EuiFlexGroup>
-                      <EuiSpacer size='m' />
-                      {/* `.wzExampleCardsGrid` (chat-page.scss): `repeat(auto-fit, minmax(240px,
-                          1fr))` — 3-up, 2-up, 1-up with no fixed pixel card widths, so this can
-                          never be the thing that introduces horizontal scroll (contract §3). */}
-                      <div className='wzExampleCardsGrid'>
-                        {EXAMPLE_CARDS.map(card => (
-                          <EuiCard
-                            key={card.id}
-                            layout='horizontal'
-                            display='plain'
-                            hasBorder
-                            icon={
-                              <EuiIcon
-                                type={card.icon}
-                                size='l'
-                                color='primary'
-                              />
-                            }
-                            title={card.title}
-                            description={card.question}
-                            onClick={() => setInputText(card.question)}
-                          />
-                        ))}
-                      </div>
-                    </EuiPanel>
-                  </div>
-                )}
-              </div>
-              {/* `MessageList` is `.wzContentMeasure`'s SIBLING inside `.wzTranscriptContent`, not its
+                        <EuiFlexGroup
+                          gutterSize='none'
+                          justifyContent='center'
+                          responsive={false}
+                        >
+                          <EuiFlexItem grow={false}>
+                            <EuiBadge color='hollow'>
+                              {i18n.translate(
+                                'wazuhAiAssistant.chat.welcome.body',
+                                {
+                                  defaultMessage: 'Try one of these',
+                                },
+                              )}
+                            </EuiBadge>
+                          </EuiFlexItem>
+                        </EuiFlexGroup>
+                        <EuiSpacer size='m' />
+                        {/* `.wzExampleCardsGrid` (chat-page.scss): `repeat(auto-fit,
+                          minmax(min(240px, 100%), 1fr))` — 3-up, 2-up, 1-up, shrinking below
+                          240px only once the container itself is narrower than that (a docked
+                          sidecar panel at its own minimum width), so this never overflows its own
+                          wrapper regardless of pane width (contract §3). */}
+                        <div className='wzExampleCardsGrid'>
+                          {EXAMPLE_CARDS.map(card => (
+                            <EuiCard
+                              key={card.id}
+                              layout='horizontal'
+                              display='plain'
+                              hasBorder
+                              icon={
+                                <EuiIcon
+                                  type={card.icon}
+                                  size='l'
+                                  color='primary'
+                                />
+                              }
+                              title={card.title}
+                              description={card.question}
+                              onClick={() => setInputText(card.question)}
+                            />
+                          ))}
+                        </div>
+                      </EuiPanel>
+                    </div>
+                  )}
+                </div>
+                {/* `MessageList` is `.wzContentMeasure`'s SIBLING inside `.wzTranscriptContent`, not its
               descendant — see this file's `.wzTranscriptContent` doc comment above. Nesting it
               inside `.wzContentMeasure` (the pre-fix shape) capped every row's own breakout width
               against that element's 1060px measure, which is why a table-bearing turn could never
               actually reach `min(100%, $wzTableMaxWidth)` regardless of window width. */}
-              {!showLoadingState &&
-                !showNoProviderState &&
-                !showWelcomeState && (
-                  <MessageList
-                    transcriptHeightPx={transcriptHeightPx}
-                    messages={messages}
-                    resolveDiscoverUrl={resolveDiscoverUrl}
-                    resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
-                    // Withheld while generating: retrying would abandon the turn already running.
-                    onRetryLastTurn={
-                      isGenerating ? undefined : handleRetryLastTurn
-                    }
-                  />
-                )}
+                {!showLoadingState &&
+                  !showNoProviderState &&
+                  !showWelcomeState && (
+                    <MessageList
+                      transcriptHeightPx={transcriptHeightPx}
+                      messages={messages}
+                      resolveDiscoverUrl={resolveDiscoverUrl}
+                      resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
+                      // Withheld while generating: retrying would abandon the turn already running.
+                      onRetryLastTurn={
+                        isGenerating ? undefined : handleRetryLastTurn
+                      }
+                    />
+                  )}
+              </div>
             </div>
-          </div>
 
-          {/* Composer row: the grid's `auto` row (`.wzChatPane` above), a real flow sibling of the
+            {/* Composer row: the grid's `auto` row (`.wzChatPane` above), a real flow sibling of the
             transcript, never an overlay — see the layout-contract comment above `privacyBadgeLabel`.
             `.wzComposerRow` (chat-page.scss) is the composer's OWN ceiling (`max-height:
             $wzComposerMaxHeight`, internal scroll past that); the textarea's independent 5-row
             autogrow cap lives in chat-input.tsx. */}
-          {!showLoadingState && !showNoProviderState && (
-            <div
-              className={
-                hasProviders
-                  ? 'wzComposerRow'
-                  : 'wzComposerRow wzComposerRow-isDisabled'
-              }
-            >
-              <div className='wzContentMeasure' style={{ padding: '8px 24px' }}>
-                <EuiPanel
-                  color='plain'
-                  hasBorder
-                  hasShadow={false}
-                  paddingSize='s'
-                  style={{ marginBottom: 8 }}
+            {!showLoadingState && !showNoProviderState && (
+              <div
+                className={
+                  hasProviders
+                    ? 'wzComposerRow'
+                    : 'wzComposerRow wzComposerRow-isDisabled'
+                }
+              >
+                <div
+                  className='wzContentMeasure'
+                  style={{ padding: '8px 24px' }}
                 >
-                  {/* Composer floor and ceiling (contract §2): the textarea (chat-input.tsx) owns
+                  <EuiPanel
+                    color='plain'
+                    hasBorder
+                    hasShadow={false}
+                    paddingSize='s'
+                    style={{ marginBottom: 8 }}
+                  >
+                    {/* Composer floor and ceiling (contract §2): the textarea (chat-input.tsx) owns
                     its own one-line floor and 5-row autogrow cap; the controls row below it is a
                     normal flow sibling, in-panel, BELOW the field — never a second layer over it.
                     That stacking (not an absolute overlay) is what keeps the placeholder from ever
                     being squeezed under one line box. */}
-                  <ChatInput
-                    ref={chatInputRef}
-                    value={inputText}
-                    onChange={setInputText}
-                    disabled={!hasProviders}
-                    isGenerating={isGenerating}
-                    onSend={handleSend}
-                  />
-                  <EuiSpacer size='xs' />
-                  <EuiFlexGroup
-                    alignItems='center'
-                    gutterSize='s'
-                    responsive={false}
-                    wrap
-                  >
-                    {hasProviders && assistantSettings && (
-                      <EuiFlexItem grow={false}>
-                        {assistantSettings.userCanOverride ? (
-                          privacyBadge
-                        ) : (
-                          <EuiToolTip
-                            content={i18n.translate(
-                              'wazuhAiAssistant.chat.privacy.adminSet',
+                    <ChatInput
+                      ref={chatInputRef}
+                      value={inputText}
+                      onChange={setInputText}
+                      disabled={!hasProviders}
+                      isGenerating={isGenerating}
+                      onSend={handleSend}
+                    />
+                    <EuiSpacer size='xs' />
+                    <EuiFlexGroup
+                      alignItems='center'
+                      gutterSize='s'
+                      responsive={false}
+                      wrap
+                    >
+                      {hasProviders && assistantSettings && (
+                        <EuiFlexItem grow={false}>
+                          {assistantSettings.userCanOverride ? (
+                            privacyBadge
+                          ) : (
+                            <EuiToolTip
+                              content={i18n.translate(
+                                'wazuhAiAssistant.chat.privacy.adminSet',
+                                {
+                                  defaultMessage: 'Set by administrator',
+                                },
+                              )}
+                            >
+                              {privacyBadge}
+                            </EuiToolTip>
+                          )}
+                        </EuiFlexItem>
+                      )}
+                      {hasProviders && assistantSettings && (
+                        <EuiFlexItem grow={false}>
+                          <EuiIconTip
+                            type='iInCircle'
+                            color='subdued'
+                            content={privacyExplainerText}
+                            aria-label={i18n.translate(
+                              'wazuhAiAssistant.chat.privacy.explainAriaLabel',
                               {
-                                defaultMessage: 'Set by administrator',
+                                defaultMessage:
+                                  'What privacy mode does to your data',
                               },
                             )}
-                          >
-                            {privacyBadge}
-                          </EuiToolTip>
-                        )}
-                      </EuiFlexItem>
-                    )}
-                    {hasProviders && assistantSettings && (
-                      <EuiFlexItem grow={false}>
-                        <EuiIconTip
-                          type='iInCircle'
-                          color='subdued'
-                          content={privacyExplainerText}
-                          aria-label={i18n.translate(
-                            'wazuhAiAssistant.chat.privacy.explainAriaLabel',
-                            {
-                              defaultMessage:
-                                'What privacy mode does to your data',
-                            },
-                          )}
-                        />
-                      </EuiFlexItem>
-                    )}
-                    {/* Explicit grow spacer (was a bare `<EuiFlexItem />` relying on `grow`
+                          />
+                        </EuiFlexItem>
+                      )}
+                      {/* Explicit grow spacer (was a bare `<EuiFlexItem />` relying on `grow`
                           defaulting to true) pushes the provider/send cluster to the far right;
                           that cluster now sits behind its own hairline left border, so the two
                           concerns (privacy controls vs. provider/send) read as visually separate
                           groups instead of one undivided row. */}
-                    <EuiFlexItem grow />
-                    <EuiFlexItem grow={false}>
-                      <EuiFlexGroup
-                        alignItems='center'
-                        gutterSize='s'
-                        responsive={false}
-                        style={{
-                          borderLeft: '1px solid var(--wz-hairline)',
-                          paddingLeft: 8,
-                        }}
-                      >
-                        {hasProviders && (
-                          <EuiFlexItem grow={false}>
-                            <EuiSelect
-                              id='wzAiAssistantProviderSelect'
-                              compressed
-                              prepend={i18n.translate(
-                                'wazuhAiAssistant.chat.providerLabel',
-                                {
-                                  defaultMessage: 'Provider',
-                                },
-                              )}
-                              options={providerOptions}
-                              value={selectedProviderId}
-                              onChange={event =>
-                                onProviderChange(event.target.value)
-                              }
-                              aria-label={i18n.translate(
-                                'wazuhAiAssistant.chat.providerSelect',
-                                {
-                                  defaultMessage: 'Provider',
-                                },
-                              )}
-                            />
-                          </EuiFlexItem>
-                        )}
-                        <EuiFlexItem grow={false}>
-                          {isGenerating ? (
-                            <EuiButtonIcon
-                              iconType='cross'
-                              color='danger'
-                              size='s'
-                              onClick={handleStop}
-                              aria-label={i18n.translate(
-                                'wazuhAiAssistant.chat.stopButton',
-                                {
-                                  defaultMessage: 'Stop',
-                                },
-                              )}
-                            />
-                          ) : (
-                            <EuiButtonIcon
-                              iconType='arrowUp'
-                              color='primary'
-                              size='s'
-                              display='fill'
-                              onClick={() => chatInputRef.current?.send()}
-                              disabled={!hasProviders || !inputText.trim()}
-                              aria-label={i18n.translate(
-                                'wazuhAiAssistant.chat.sendButton',
-                                {
-                                  defaultMessage: 'Send',
-                                },
-                              )}
-                            />
+                      <EuiFlexItem grow />
+                      <EuiFlexItem grow={false}>
+                        <EuiFlexGroup
+                          alignItems='center'
+                          gutterSize='s'
+                          responsive={false}
+                          style={{
+                            borderLeft: '1px solid var(--wz-hairline)',
+                            paddingLeft: 8,
+                          }}
+                        >
+                          {hasProviders && (
+                            <EuiFlexItem grow={false}>
+                              <EuiSelect
+                                id='wzAiAssistantProviderSelect'
+                                compressed
+                                prepend={i18n.translate(
+                                  'wazuhAiAssistant.chat.providerLabel',
+                                  {
+                                    defaultMessage: 'Provider',
+                                  },
+                                )}
+                                options={providerOptions}
+                                value={selectedProviderId}
+                                onChange={event =>
+                                  onProviderChange(event.target.value)
+                                }
+                                aria-label={i18n.translate(
+                                  'wazuhAiAssistant.chat.providerSelect',
+                                  {
+                                    defaultMessage: 'Provider',
+                                  },
+                                )}
+                              />
+                            </EuiFlexItem>
                           )}
-                        </EuiFlexItem>
-                      </EuiFlexGroup>
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                </EuiPanel>
-                <EuiText size='xs' color='subdued' textAlign='center'>
-                  <p>
-                    {i18n.translate('wazuhAiAssistant.chat.disclaimer', {
-                      defaultMessage:
-                        'AI responses may contain errors. Always verify critical information.',
-                    })}
-                  </p>
-                </EuiText>
+                          <EuiFlexItem grow={false}>
+                            {isGenerating ? (
+                              <EuiButtonIcon
+                                iconType='cross'
+                                color='danger'
+                                size='s'
+                                onClick={handleStop}
+                                aria-label={i18n.translate(
+                                  'wazuhAiAssistant.chat.stopButton',
+                                  {
+                                    defaultMessage: 'Stop',
+                                  },
+                                )}
+                              />
+                            ) : (
+                              <EuiButtonIcon
+                                iconType='arrowUp'
+                                color='primary'
+                                size='s'
+                                display='fill'
+                                onClick={() => chatInputRef.current?.send()}
+                                disabled={!hasProviders || !inputText.trim()}
+                                aria-label={i18n.translate(
+                                  'wazuhAiAssistant.chat.sendButton',
+                                  {
+                                    defaultMessage: 'Send',
+                                  },
+                                )}
+                              />
+                            )}
+                          </EuiFlexItem>
+                        </EuiFlexGroup>
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  </EuiPanel>
+                  <EuiText size='xs' color='subdued' textAlign='center'>
+                    <p>
+                      {i18n.translate('wazuhAiAssistant.chat.disclaimer', {
+                        defaultMessage:
+                          'AI responses may contain errors. Always verify critical information.',
+                      })}
+                    </p>
+                  </EuiText>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </div>
-    </>
-  );
-};
+      </>
+    );
+  },
+);
+ChatPage.displayName = 'ChatPage';

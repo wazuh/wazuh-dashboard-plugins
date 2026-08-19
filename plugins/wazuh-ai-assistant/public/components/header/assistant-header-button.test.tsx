@@ -134,6 +134,9 @@ describe('AssistantHeaderButton', () => {
 
     fireEvent.click(headerButton());
     expect(sidecar.open).toHaveBeenCalledTimes(1);
+    expect(sidecar.open.mock.calls[0][1]).toMatchObject({
+      classNameButton: 'osd-resetFocusState',
+    });
     // findBy: the panel module is React.lazy-loaded, so it appears asynchronously.
     await screen.findByText('close panel');
     expect(headerButton()).toHaveAttribute('aria-expanded', 'true');
