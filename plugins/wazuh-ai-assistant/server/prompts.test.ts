@@ -488,3 +488,39 @@ test('buildSystemPrompt: caps inter-round status narration to one terse, action-
     /never a guess or speculation about what a field is probably named or\s+what a value probably is/,
   );
 });
+
+// Workstream D (coverage doc CV-054): SCA/compliance results in hand must be INTERPRETED
+// (grouped by theme, led with why-it-matters/what-to-do from the check's own rationale/
+// remediation text) rather than recited as a bare pass/fail table with a compliance percentage.
+test('CV-054: buildSystemPrompt instructs interpreting SCA results, not reciting them', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /interpret them — do not just recite the pass\/fail table back as prose/,
+  );
+});
+
+test('CV-054: buildSystemPrompt tells the model to group failed SCA checks by theme', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /group them by theme.*rather than listing each check_id in isolation/,
+  );
+});
+
+test('CV-054: buildSystemPrompt tells the model to lead with why/what-to-do and put compliance percentages second', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /lead with WHY it matters.*and WHAT to do about it/);
+  assert.match(
+    prompt,
+    /compliance percentage too, but SECOND, as supporting\s+context/,
+  );
+});
+
+test('CV-054: buildSystemPrompt forbids claiming a live host re-check beyond the SCA scan result', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /never claim to have verified the\s+live host configuration yourself beyond what the SCA result already reported/,
+  );
+});

@@ -466,19 +466,29 @@ test('get_sca_checks: tableSpec/digest declare the locked 5.0 columns/rowFields/
     getScaChecksTool.tableSpec.columns.map(c => c.field),
     ['check.id', 'check.name', 'check.result', 'check.reason'],
   );
+  // Workstream D (coverage doc CV-054): rationale/remediation joined the row expander (still
+  // row-only, not a table column -- the browser table itself is unchanged) so the analyst can
+  // read the CIS/benchmark's own WHY/WHAT-to-do text without a second tool call.
   assert.deepEqual(getScaChecksTool.tableSpec.rowFields, [
+    'check.rationale',
     'check.remediation',
     'check.rules',
   ]);
+  // Workstream D: rationale/remediation now ALSO ride in the digest sample rows (previously
+  // row-expander-only, i.e. never sent to the model at all) -- the model cannot lead an
+  // interpreted SCA answer with "why this matters"/"what to do" from a sample that never carried
+  // either field. `check.reason` (the SCA engine's own short pass/fail note, already a table
+  // column) is left out of the sample on purpose -- it duplicates `check.result` for most checks
+  // and adds nothing rationale/remediation don't already cover for synthesis.
   assert.deepEqual(getScaChecksTool.digest.sampleColumns, [
     'check.id',
     'check.name',
     'check.result',
+    'check.rationale',
+    'check.remediation',
   ]);
-  // Long-text fields stay out of the digest (token-budget decision, unchanged from 4.14).
-  assert.ok(
-    !getScaChecksTool.digest.sampleColumns.includes('check.remediation'),
-  );
+  // `check.description` (the benchmark's own restatement of the check's title, not interpretive
+  // content) stays out of the digest — unchanged token-budget decision from 4.14/pre-D.
   assert.ok(
     !getScaChecksTool.digest.sampleColumns.includes('check.description'),
   );

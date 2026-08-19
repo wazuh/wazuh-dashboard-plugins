@@ -266,6 +266,7 @@ export const getScaChecksTool: ToolDefinition = {
           'check.name',
           'check.result',
           'check.reason',
+          'check.rationale',
           'check.remediation',
           'check.rules',
         ],
@@ -319,11 +320,28 @@ export const getScaChecksTool: ToolDefinition = {
       { field: 'check.result', label: 'Result' },
       { field: 'check.reason', label: 'Reason' },
     ],
-    // Row expander: remediation + the raw rule text (where 5.0 folds the old
+    // Row expander: rationale/remediation + the raw rule text (where 5.0 folds the old
     // file/directory/command detail, per the matrix — the investigative payload of this tool).
-    rowFields: ['check.remediation', 'check.rules'],
+    rowFields: ['check.rationale', 'check.remediation', 'check.rules'],
   },
-  // description/rationale excluded on purpose: hundreds of words each (same budget decision as
-  // 4.14). remediation/rules are row-only for the same reason.
-  digest: { sampleColumns: ['check.id', 'check.name', 'check.result'] },
+  // Workstream D (SCA interpretation, coverage doc CV-054): `check.rationale` (WHY the check
+  // exists/what it protects against) and `check.remediation` (WHAT to do about a failure) now
+  // ride in the digest sample rows too, not just the row expander -- the model cannot lead an
+  // interpreted answer with "why this matters" / "what to do" (prompts.ts's SCA synthesis
+  // guidance) from a sample that never carried either field. `check.description` stays excluded
+  // (same hundreds-of-words budget concern that originally excluded rationale/remediation too) --
+  // it is the benchmark's own restatement of the check's title, not additional interpretive
+  // content the synthesis guidance needs. Both fields are free CIS/benchmark prose that can run
+  // long: `digest.ts`'s `MAX_FIELD_VALUE_LENGTH` (500 chars) already truncates ANY oversized
+  // sample field generically, and `capDigest`'s char-cap pop is the last-resort backstop beyond
+  // that -- no new cap needed here.
+  digest: {
+    sampleColumns: [
+      'check.id',
+      'check.name',
+      'check.result',
+      'check.rationale',
+      'check.remediation',
+    ],
+  },
 };

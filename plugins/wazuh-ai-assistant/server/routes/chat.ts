@@ -155,6 +155,127 @@ const NO_ANALYSIS_TEXT_MESSAGE =
   'No additional analysis — see the results above.';
 const NO_MATCHING_RESULTS_MESSAGE =
   'No matching results were found for that query.';
+
+/**
+ * N1 fix (AI/plan/qa-battery-v31.md, proven live on A0/#8935: "the canned empty-copy says
+ * nothing about what was searched"). `NO_MATCHING_RESULTS_MESSAGE` alone reads identically for
+ * every zero-row turn regardless of what was actually asked — a scoped SCA/vulnerability/agent
+ * search and a wide-open one both produce the exact same sentence, so the user has no way to
+ * tell "nothing matched this narrow filter" from "something may be broken." This appends what
+ * the last real tool call this turn actually targeted: the data domain it searched (derived
+ * from the tool's own name) and, when the caller supplied any, the filters/time-window that
+ * narrowed it to zero — both already present on `lastAttemptedToolCall`, the digest/request
+ * context for that call.
+ *
+ * MECHANISM-FREE BY CONSTRUCTION (product decision, same posture as
+ * NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE below): this reads the tool NAME and its ARGUMENT
+ * key/value pairs, never anything about rounds/budgets/cost units/the orchestration loop. A
+ * tool name is data-domain vocabulary the user already thinks in ("SCA checks", "agents"), not
+ * an internal mechanism — chat-no-text-fallback-message.test.ts's mechanism-silence word list
+ * covers this output too.
+ */
+const TOOL_NAME_VERB_PREFIX_RE = /^(get|search|lookup)_/;
+/** Short catalog acronyms that read badly lowercased by the generic "snake_case -> words"
+ * conversion below (e.g. "sca checks" -> "SCA checks"). Deliberately a small, hand-picked list —
+ * this is a display nicety, not a classification the empty-copy's correctness depends on: any
+ * acronym missing from this map still renders as a perfectly readable lowercase word. */
+const TOOL_DOMAIN_ACRONYMS: Record<string, string> = {
+  sca: 'SCA',
+  cti: 'CTI',
+  cve: 'CVE',
+  ioc: 'IOC',
+  mitre: 'MITRE',
+  fim: 'FIM',
+};
+
+/** Turns a tool name like `get_sca_checks` into the plain-language domain it searches,
+ * `"SCA checks"` — strips the leading verb (get/search/lookup, none of which add meaning for a
+ * user) and renders every remaining underscore-joined word, uppercasing the handful of known
+ * catalog acronyms above. */
+function describeToolDomain(toolName: string): string {
+  return toolName
+    .replace(TOOL_NAME_VERB_PREFIX_RE, '')
+    .split('_')
+    .filter(word => word.length > 0)
+    .map(word => TOOL_DOMAIN_ACRONYMS[word] ?? word)
+    .join(' ');
+}
+
+/** Caller-supplied filter keys renamed to the word a user would recognize, e.g. `agent_id` ->
+ * "agent" rather than the raw parameter name. Any key absent from this map still renders fine —
+ * `describeSearchFilters` falls back to spacing out its own underscores. */
+const FILTER_KEY_LABELS: Record<string, string> = {
+  agent_id: 'agent',
+  policy_id: 'policy',
+  cve_id: 'CVE',
+  detector_type: 'detector type',
+  rule_id: 'rule',
+  indicator: 'indicator',
+};
+/** Never part of the user-facing filter description: `limit` is a page-size mechanism, not
+ * something the user asked to narrow by. */
+const FILTER_KEYS_EXCLUDED_FROM_SCOPE = new Set(['limit']);
+
+/**
+ * Renders a tool call's resolved arguments as short "label value" clauses (e.g. `"agent 003"`,
+ * `"policy CIS_Ubuntu"`), plus one combined time-window clause when either time-range bound was
+ * supplied — never two separate gte/lte clauses, which would read as two unrelated filters
+ * instead of the one narrowing they actually are. Only scalar (string/number/boolean) argument
+ * values are described; an object/array argument is skipped rather than JSON-dumped into
+ * user-facing copy.
+ */
+function describeSearchFilters(args: Record<string, unknown>): string[] {
+  const clauses: string[] = [];
+  for (const [key, value] of Object.entries(args)) {
+    if (
+      FILTER_KEYS_EXCLUDED_FROM_SCOPE.has(key) ||
+      key === 'time_range_gte' ||
+      key === 'time_range_lte' ||
+      value === undefined ||
+      value === ''
+    ) {
+      continue;
+    }
+    if (
+      typeof value !== 'string' &&
+      typeof value !== 'number' &&
+      typeof value !== 'boolean'
+    ) {
+      continue;
+    }
+    const label = FILTER_KEY_LABELS[key] ?? key.replace(/_/g, ' ');
+    clauses.push(`${label} ${value}`);
+  }
+  const gte = args.time_range_gte;
+  const lte = args.time_range_lte;
+  if (typeof gte === 'string' || typeof lte === 'string') {
+    clauses.push(
+      `time window ${typeof gte === 'string' ? gte : 'the start'} to ` +
+        `${typeof lte === 'string' ? lte : 'now'}`,
+    );
+  }
+  return clauses;
+}
+
+/**
+ * Builds the full N1 empty-result sentence: the base copy plus, when a real tool call was
+ * attempted this turn, a parenthetical naming what it searched. Returns the unmodified base
+ * message when no tool call is on record (defensive — `noTextFallbackMessage` only reaches this
+ * branch when `toolUsedThisTurn` is true, so this should always have one, but a missing record
+ * degrades to the honest pre-N1 sentence rather than a broken parenthetical).
+ */
+function buildNoMatchingResultsMessage(
+  lastToolCall: { name: string; args: Record<string, unknown> } | undefined,
+): string {
+  if (!lastToolCall) {
+    return NO_MATCHING_RESULTS_MESSAGE;
+  }
+  const domain = describeToolDomain(lastToolCall.name);
+  const filters = describeSearchFilters(lastToolCall.args);
+  const scope =
+    filters.length > 0 ? `${domain}, filtered to ${filters.join(', ')}` : domain;
+  return `${NO_MATCHING_RESULTS_MESSAGE} (Searched: ${scope}.)`;
+}
 /**
  * Variant of NO_ANALYSIS_TEXT_MESSAGE for a turn that exhausted its tool-round budget (a serial
  * chain deeper than MAX_TOOL_ROUNDS) and still produced no text even after
@@ -259,12 +380,16 @@ export function noTextFallbackMessage(
   toolUsedThisTurn: boolean,
   sawNonEmptyTable: boolean,
   roundsExhausted: boolean,
+  // N1 (optional, appended last so every pre-existing call site — including the two that already
+  // omit `roundsExhausted`/this param entirely — keeps compiling unchanged): the last real tool
+  // call this turn attempted, used only to enrich the zero-row branch below.
+  lastToolCall?: { name: string; args: Record<string, unknown> },
 ): string {
   if (!toolUsedThisTurn) {
     return NO_ANSWER_MESSAGE;
   }
   if (!sawNonEmptyTable) {
-    return NO_MATCHING_RESULTS_MESSAGE;
+    return buildNoMatchingResultsMessage(lastToolCall);
   }
   return roundsExhausted
     ? NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE
@@ -1120,6 +1245,14 @@ export async function* orchestrate(
   let tools: ToolSpec[] | undefined = listToolSpecs();
   let messages = initialMessages;
   let sawNonEmptyTable = false;
+  // N1 fix (AI/plan/qa-battery-v31.md): the most recent REAL tool call this turn attempted to
+  // execute (name + real/reversed arguments), regardless of outcome — the only state
+  // `noTextFallbackMessage`'s zero-row branch has available to describe WHAT was searched when
+  // the model itself never wrote a word (see `describeEmptySearchScope` below, and that
+  // function's doc comment for why this must stay mechanism-free). Overwritten on every real
+  // tool-call attempt (not just successful ones) so it always reflects the LAST thing this turn
+  // actually tried, which is what the empty-result copy is standing in for.
+  let lastAttemptedToolCall: { name: string; args: Record<string, unknown> } | undefined;
   // Whole-turn guards (not per-round, unlike `sawToolCall` below which resets every round): true
   // once ANY delta text / tool call has happened THIS TURN, across every round — see
   // NO_ANALYSIS_TEXT_MESSAGE/NO_MATCHING_RESULTS_MESSAGE/NO_ANSWER_MESSAGE above. `toolUsedThisTurn`
@@ -1594,6 +1727,12 @@ export async function* orchestrate(
           ...event.toolCall,
           arguments: realArguments,
         };
+        // N1: recorded for EVERY real attempt (success, rejection, or execution error alike) —
+        // see `lastAttemptedToolCall`'s doc comment above for why the outcome does not gate this.
+        lastAttemptedToolCall = {
+          name: event.toolCall.name,
+          args: realArguments,
+        };
 
         // Forwarded for transparency and for the eval harness: which tool ran, with which
         // arguments. The UI currently ignores it (unknown types fall through in chat-page.tsx).
@@ -1788,6 +1927,7 @@ export async function* orchestrate(
               toolUsedThisTurn,
               sawNonEmptyTable,
               isFinalRound,
+              lastAttemptedToolCall,
             ),
           };
         }
@@ -1850,7 +1990,12 @@ export async function* orchestrate(
         if (!sawAnyDelta) {
           yield {
             type: 'delta',
-            content: noTextFallbackMessage(toolUsedThisTurn, sawNonEmptyTable),
+            content: noTextFallbackMessage(
+              toolUsedThisTurn,
+              sawNonEmptyTable,
+              false,
+              lastAttemptedToolCall,
+            ),
           };
         }
         yield* emitPrivacyMapOnce();
@@ -1881,7 +2026,12 @@ export async function* orchestrate(
   if (!sawAnyDelta) {
     yield {
       type: 'delta',
-      content: noTextFallbackMessage(toolUsedThisTurn, sawNonEmptyTable, true),
+      content: noTextFallbackMessage(
+        toolUsedThisTurn,
+        sawNonEmptyTable,
+        true,
+        lastAttemptedToolCall,
+      ),
     };
   }
   yield* emitPrivacyMapOnce();

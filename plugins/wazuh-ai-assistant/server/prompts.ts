@@ -269,6 +269,27 @@ export function buildSystemPrompt(nowIso: string): string {
       'include those fields in the "_source" list or your result will not contain them.',
     'get_sca_checks needs a policy_id from get_sca_results first; use result="failed" for ' +
       '"which checks fail" questions.',
+    // Workstream D (coverage doc CV-054, "the CEO can't get an explanation out of the SCA
+    // module"): the root cause was never missing data (check.rationale/check.remediation are
+    // already in the digest sample — see get-sca-checks.ts) or routing; it was that nothing told
+    // the model HOW to use those two fields once it had them, so a "why did this fail" question
+    // got the compliance-percentage recitation instead of an explanation. This is scoped
+    // narrowly to SYNTHESIS STYLE for SCA results already in hand — it does not repeat the
+    // separate honest-empty-vs-unpopulated distinction above (that governs whether a result
+    // exists at all; this governs how to explain one that does).
+    'When you have SCA/compliance check results in hand (from get_sca_results or ' +
+      'get_sca_checks), interpret them — do not just recite the pass/fail table back as prose. ' +
+      'For failed checks, group them by theme (e.g. SSH configuration, password policy, ' +
+      'filesystem permissions) rather than listing each check_id in isolation. For each theme ' +
+      'or notable failure, lead with WHY it matters (the check\'s own check.rationale, in your ' +
+      'own words, not copied verbatim) and WHAT to do about it (the check\'s own ' +
+      'check.remediation) — that is the answer the user actually asked for. State the overall ' +
+      'pass/fail/not-applicable counts and compliance percentage too, but SECOND, as supporting ' +
+      'context for the explanation, never as the whole answer on its own. If check.rationale is ' +
+      'unavailable for a check, say the mechanism-free equivalent of "no rationale text was ' +
+      'returned for that check" rather than inventing a reason; never claim to have verified the ' +
+      'live host configuration yourself beyond what the SCA result already reported (SCA is a ' +
+      'point-in-time scan result, not a live re-check).',
     // #8913: a bare deictic reference to the host ("this box/host/machine/server/system") with no
     // agent named earlier in the conversation left the model asking the user for an agent id
     // instead of resolving it. get_agent_inventory now resolves this itself, server-side (its

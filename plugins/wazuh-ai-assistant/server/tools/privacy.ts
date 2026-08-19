@@ -127,6 +127,13 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'check.id', action: 'allow' },
   { field: 'check.name', action: 'allow' },
   { field: 'check.result', action: 'allow' },
+  // Workstream D (coverage doc CV-054): get_sca_checks now also samples check.rationale/
+  // check.remediation into the digest (previously row-expander-only, see get-sca-checks.ts) --
+  // same curated-benchmark/policy-content class as check.id/name/result above (CIS/benchmark
+  // authored text describing WHY a check exists and WHAT to do about a failure), not
+  // analyst/attacker-supplied. Reviewed 'allow' for the identical reason.
+  { field: 'check.rationale', action: 'allow' },
+  { field: 'check.remediation', action: 'allow' },
   { field: 'policy.name', action: 'allow' },
   // get_sca_results/name is deliberately NOT anonymized: a policy name is what the analyst asked
   // about, and known mapped identifiers embedded in free text (e.g. a hostname inside a cmd path)
