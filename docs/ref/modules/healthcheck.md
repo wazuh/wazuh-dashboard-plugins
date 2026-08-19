@@ -142,7 +142,7 @@ A pulse icon, colored based on the overall result, is present in the platform he
 
 The icon is only displayed when the overall result is `yellow` or `red`. When the overall result is `green` (or `gray`), the icon is not rendered.
 
-Hovering over the icon shows a tooltip with the overall status. Clicking it opens a popover with the overall status and a link to the **Health Check** app for more details.
+Hovering over the icon shows a tooltip with the overall status. Clicking it opens a popover listing the enabled checks whose result is `yellow` or `red`, each colored by its result and with a tooltip showing its error, followed by a link to the **Health Check** app for more details.
 
 For example, when the status is `yellow`:
 
