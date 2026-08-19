@@ -6,6 +6,7 @@ import {
   ANSWER_BUCKET_CAP,
   BREAKDOWN_BUCKET_CAP,
   buildDigest,
+  DIGEST_CHAR_CAP,
 } from '../digest';
 
 /**
@@ -492,4 +493,59 @@ test('get_sca_checks: tableSpec/digest declare the locked 5.0 columns/rowFields/
   assert.ok(
     !getScaChecksTool.digest.sampleColumns.includes('check.description'),
   );
+});
+
+test('get_sca_checks: sampleFieldMaxLength caps rationale/remediation tighter than the generic field cap', () => {
+  assert.deepEqual(getScaChecksTool.digest.sampleFieldMaxLength, {
+    'check.rationale': 200,
+    'check.remediation': 240,
+  });
+});
+
+test('get_sca_checks: review D1 — a 5-row digest of LIVE-SIZED rationale/remediation text stays under DIGEST_CHAR_CAP, and no sample row is popped', () => {
+  // Review finding D1 (AI/plan/d-review.md): the live wazuh-aio-5 document that surfaced this had
+  // check.rationale at 604 chars and check.remediation at 597 -- both past digest.ts's generic
+  // MAX_FIELD_VALUE_LENGTH (500), which without get-sca-checks.ts's sampleFieldMaxLength cap would
+  // truncate every long row to EXACTLY 500 chars (the cap becomes the typical size), pushing a
+  // 5-row digest to ~5,890 chars -- within capDigest's pop-a-row range of DIGEST_CHAR_CAP (6,000)
+  // -- and popping 1-2 of the 5 rows while samplesNote (computed pre-cap) still claimed 5.
+  const rationale = 'r'.repeat(604);
+  const remediation = 'm'.repeat(597);
+  const hits = Array.from({ length: 5 }, (_, i) => ({
+    _source: {
+      check: {
+        id: `check_${i}`,
+        name: 'Ensure sshd PermitRootLogin is disabled',
+        result: 'failed',
+        rationale,
+        remediation,
+      },
+    },
+  }));
+  const response = {
+    hits: { total: { value: 5 }, hits },
+    aggregations: { results: { buckets: [{ key: 'failed', doc_count: 5 }] } },
+  };
+  const digest = buildDigest('get_sca_checks', response, getScaChecksTool);
+
+  // All 5 rows survive: capDigest's row-drop loop never triggers because the per-field cap keeps
+  // the whole digest under DIGEST_CHAR_CAP without it.
+  assert.equal(digest.samples.length, 5, 'no sample row should be popped');
+  assert.ok(!digest.samplesNote, 'no truncation to caveat when all 5 rows survive');
+  for (const sample of digest.samples) {
+    assert.equal((sample['check.rationale'] as string).length, 201); // 200 chars + ellipsis
+    assert.equal((sample['check.remediation'] as string).length, 241); // 240 chars + ellipsis
+  }
+
+  const digestChars = JSON.stringify(digest).length;
+  assert.ok(
+    digestChars < DIGEST_CHAR_CAP,
+    `expected a single get_sca_checks digest (${digestChars} chars) to stay under DIGEST_CHAR_CAP (${DIGEST_CHAR_CAP})`,
+  );
+
+  // ADAPTATION (branch 8997): the original commit's second assertion here compared 4 accumulated
+  // digests against chat.ts's CONTEXT_CHAR_BUDGET (workstream C's context-char stop, calibrated
+  // for the CV-069 5-agent sweep). That budget lives on enhancement/8998-ai-assistant-tool-budget,
+  // not this branch, so the assertion is dropped; the per-field cap it was calibrating for is
+  // still fully covered by the DIGEST_CHAR_CAP assertion above.
 });

@@ -86,6 +86,41 @@ test('noTextFallbackMessage: zero-row result strips the get_/search_/lookup_ ver
   assert.match(search, /Searched: wazuh data/);
 });
 
+test('D3 fix (AI/plan/d-review.md): search_wazuh_data\'s query_dsl (raw Elasticsearch DSL, declared type "string") never leaks into user-facing empty copy', () => {
+  const rawDsl = JSON.stringify({
+    query: {
+      bool: {
+        filter: [{ range: { '@timestamp': { gte: 'now-1d', lte: 'now' } } }],
+      },
+    },
+    size: 20,
+    from: 0,
+  });
+  const message = noTextFallbackMessage(true, false, false, {
+    name: 'search_wazuh_data',
+    args: { index_pattern: 'wazuh-alerts-*', query_dsl: rawDsl },
+  });
+  // Only the index_pattern filter (a genuine scalar, user-meaningful) should render; the DSL
+  // blob itself -- machine syntax, unbounded length, and liable to contain the literal tokens
+  // "limit"/"size" that would otherwise flake the mechanism-silence assertion -- must not.
+  assert.match(message, /\(Searched: wazuh data, filtered to index pattern wazuh-alerts-\*\.\)/);
+  assert.doesNotMatch(message, /query dsl/);
+  assert.doesNotMatch(message, /"query":\{"bool"/);
+});
+
+test('D4 fix (AI/plan/d-review.md): lookup_indicator does not double the word "indicator" (domain and its own filter clause collide)', () => {
+  const message = noTextFallbackMessage(true, false, false, {
+    name: 'lookup_indicator',
+    args: { indicator: '124.70.213.43' },
+  });
+  // Base: domain resolves to "indicator" (verb-prefix strip), and the sole filter argument is
+  // named "indicator" too -- rendering both produced "(Searched: indicator, filtered to
+  // indicator 124.70.213.43.)", which reads as a copy bug. The filter clause is dropped when it
+  // duplicates the domain, leaving just the domain.
+  assert.match(message, /\(Searched: indicator\.\)/);
+  assert.doesNotMatch(message, /filtered to indicator/);
+});
+
 test('noTextFallbackMessage: the enriched empty-copy stays mechanism-free (no round/budget/limit/turn wording)', () => {
   const message = noTextFallbackMessage(true, false, false, {
     name: 'get_sca_checks',

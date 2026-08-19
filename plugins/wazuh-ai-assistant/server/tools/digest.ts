@@ -1674,7 +1674,7 @@ export function buildDigest(
     ...(coverage ? { coverage } : {}),
   };
 
-  return capDigest(digest);
+  return capDigest(digest, def.digest.sampleFieldMaxLength);
 }
 
 /** Strips ASCII control characters (code points 0-31, and 127/DEL) — a tool-derived string field
@@ -1739,13 +1739,23 @@ function capKeyValue(key: unknown): unknown {
  * preprocessing pass before capDigest's row-drop fallback below, since one oversized field (e.g. a
  * raw log line) shouldn't cost an entire row when trimming just that field is enough. Also caps
  * (length + control-char strip, via `capFieldValue`/`capKeyValue`) the two other previously-
- * unbounded string fields: the Manager `message` and each `breakdown[].key`. */
-function truncateLongFieldValues(digest: Digest): void {
+ * unbounded string fields: the Manager `message` and each `breakdown[].key`.
+ *
+ * `sampleFieldMaxLength` (from `ToolDefinition.digest.sampleFieldMaxLength`, e.g. SCA's
+ * `check.rationale`/`check.remediation` — see `get-sca-checks.ts`) lets a specific column be
+ * capped tighter than the shared `MAX_FIELD_VALUE_LENGTH` default without lowering that default
+ * for every other tool. A key absent from the map (or the map itself being `undefined`, every
+ * tool but SCA) falls back to `MAX_FIELD_VALUE_LENGTH` unchanged. */
+function truncateLongFieldValues(
+  digest: Digest,
+  sampleFieldMaxLength?: Record<string, number>,
+): void {
   for (const sample of digest.samples) {
     for (const key of Object.keys(sample)) {
       const value = sample[key];
-      if (typeof value === 'string' && value.length > MAX_FIELD_VALUE_LENGTH) {
-        sample[key] = `${value.slice(0, MAX_FIELD_VALUE_LENGTH)}…`;
+      const maxLength = sampleFieldMaxLength?.[key] ?? MAX_FIELD_VALUE_LENGTH;
+      if (typeof value === 'string' && value.length > maxLength) {
+        sample[key] = `${value.slice(0, maxLength)}…`;
       }
     }
   }
@@ -1774,6 +1784,11 @@ function truncateLongFieldValues(digest: Digest): void {
  * breakdown are both fully exhausted and the digest is STILL oversized, dropping the one
  * remaining small field is enough (there is nothing left to partially trim).
  *
+ * `sampleFieldMaxLength` is forwarded to `truncateLongFieldValues` unchanged (see that function's
+ * doc comment) — every re-run below (executor.ts) passes the SAME calling tool's
+ * `def.digest.sampleFieldMaxLength`, so the per-field cap stays in force across the
+ * pre-privacy and post-privacy-substitution passes alike.
+ *
  * Exported (not just an inline step of `buildDigest` above) so server/tools/executor.ts can re-run
  * it after server/tools/privacy.ts's `applyFieldPolicy` substitutes pseudonyms for real values:
  * pseudonym tokens ("HOST_3") are usually shorter than the real value they replace but are not
@@ -1798,8 +1813,11 @@ function truncateLongFieldValues(digest: Digest): void {
  * post-privacy-substitution too, see above, where the original row/bucket counts are no longer at
  * hand). A future fix would need to move disclosure to run AFTER this cap, not before it.
  */
-export function capDigest(digest: Digest): Digest {
-  truncateLongFieldValues(digest);
+export function capDigest(
+  digest: Digest,
+  sampleFieldMaxLength?: Record<string, number>,
+): Digest {
+  truncateLongFieldValues(digest, sampleFieldMaxLength);
   while (
     JSON.stringify(digest).length > DIGEST_CHAR_CAP &&
     digest.samples.length > 0

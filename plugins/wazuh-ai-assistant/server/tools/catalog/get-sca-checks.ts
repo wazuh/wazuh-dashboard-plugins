@@ -331,10 +331,23 @@ export const getScaChecksTool: ToolDefinition = {
   // guidance) from a sample that never carried either field. `check.description` stays excluded
   // (same hundreds-of-words budget concern that originally excluded rationale/remediation too) --
   // it is the benchmark's own restatement of the check's title, not additional interpretive
-  // content the synthesis guidance needs. Both fields are free CIS/benchmark prose that can run
-  // long: `digest.ts`'s `MAX_FIELD_VALUE_LENGTH` (500 chars) already truncates ANY oversized
-  // sample field generically, and `capDigest`'s char-cap pop is the last-resort backstop beyond
-  // that -- no new cap needed here.
+  // content the synthesis guidance needs.
+  //
+  // Both fields are free CIS/benchmark prose that routinely runs long -- live data (a
+  // `wazuh-states-sca` document pulled from `wazuh-aio-5`) has `check.rationale` at 604 chars and
+  // `check.remediation` at 597, both already past `digest.ts`'s generic `MAX_FIELD_VALUE_LENGTH`
+  // (500). Relying on that generic cap alone means every long rationale/remediation is capped
+  // AT EXACTLY 500 chars -- the cap becomes the typical size, not a rare backstop -- which pushes
+  // a 5-sample-row digest to ~5,890 chars, within `capDigest`'s pop-a-sample-row range of
+  // `DIGEST_CHAR_CAP` (6,000) and, cumulated over `CONTEXT_CHAR_BUDGET`'s calibration sweep (5
+  // single-agent digests), past it a round early (see chat.ts's `CONTEXT_CHAR_BUDGET` comment).
+  // `sampleFieldMaxLength` below caps these two fields tighter (200 / 240) than
+  // `MAX_FIELD_VALUE_LENGTH` WITHOUT lowering that shared default for every other tool -- 200
+  // chars is enough for the rationale's first sentence (verified against the live document above:
+  // the "why it matters" sentence is 186 chars), and the synthesis guidance only ever asks for a
+  // paraphrase, not the full CIS text. Post-cap this digest runs ~616 chars/row, ~3,080 chars of
+  // samples, ~3,400 total -- comfortably under `DIGEST_CHAR_CAP` with all 5 sample rows intact,
+  // and the calibration sweep (5 x ~3,400) stays under `CONTEXT_CHAR_BUDGET` with headroom.
   digest: {
     sampleColumns: [
       'check.id',
@@ -343,5 +356,9 @@ export const getScaChecksTool: ToolDefinition = {
       'check.rationale',
       'check.remediation',
     ],
+    sampleFieldMaxLength: {
+      'check.rationale': 200,
+      'check.remediation': 240,
+    },
   },
 };

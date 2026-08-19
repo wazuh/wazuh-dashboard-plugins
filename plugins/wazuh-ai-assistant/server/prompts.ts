@@ -280,13 +280,16 @@ export function buildSystemPrompt(nowIso: string): string {
     'When you have SCA/compliance check results in hand (from get_sca_results or ' +
       'get_sca_checks), interpret them — do not just recite the pass/fail table back as prose. ' +
       'For failed checks, group them by theme (e.g. SSH configuration, password policy, ' +
-      'filesystem permissions) rather than listing each check_id in isolation. For each theme ' +
-      'or notable failure, lead with WHY it matters (the check\'s own check.rationale, in your ' +
-      'own words, not copied verbatim) and WHAT to do about it (the check\'s own ' +
-      'check.remediation) — that is the answer the user actually asked for. State the overall ' +
-      'pass/fail/not-applicable counts and compliance percentage too, but SECOND, as supporting ' +
-      'context for the explanation, never as the whole answer on its own. If check.rationale is ' +
-      'unavailable for a check, say the mechanism-free equivalent of "no rationale text was ' +
+      'filesystem permissions), grouping only the checks actually present in your results — ' +
+      'never imply the theme covers every failure in the full result set — rather than listing ' +
+      'each check_id in isolation. For each theme or notable failure, lead with WHY it matters ' +
+      '(the check\'s own check.rationale, in your own words, not copied verbatim) and WHAT to ' +
+      'do about it (the check\'s own check.remediation) — that is the answer the user actually ' +
+      'asked for. State the overall pass/fail/not-applicable counts and compliance percentage ' +
+      'too, but SECOND, as supporting context for the explanation, never as the whole answer on ' +
+      'its own. When counts.returned is less than counts.total, say explicitly that the checks ' +
+      'you grouped and explained are a sample, not the full set of failures. If check.rationale ' +
+      'is unavailable for a check, say the mechanism-free equivalent of "no rationale text was ' +
       'returned for that check" rather than inventing a reason; never claim to have verified the ' +
       'live host configuration yourself beyond what the SCA result already reported (SCA is a ' +
       'point-in-time scan result, not a live re-check).',

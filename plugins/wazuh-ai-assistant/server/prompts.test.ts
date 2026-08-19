@@ -524,3 +524,24 @@ test('CV-054: buildSystemPrompt forbids claiming a live host re-check beyond the
     /never claim to have verified the\s+live host configuration yourself beyond what the SCA result already reported/,
   );
 });
+
+test('D2 fix (AI/plan/d-review.md): the group-by-theme instruction is scoped to the results actually in hand, and requires a sample disclosure when the page is not the whole result set', () => {
+  // get_sca_checks declares no breakdownDimensions, so a theme built from at most MAX_SAMPLES (5,
+  // often fewer post-D1) sample rows has no whole-result-set aggregation behind it -- without this
+  // scoping the instruction invited a confident-sounding generalization from a non-representative
+  // slice, exactly the failure mode the rest of this prompt file spends several instructions
+  // preventing.
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /grouping only the checks actually present in your results/,
+  );
+  assert.match(
+    prompt,
+    /never imply the theme covers every failure in the full result set/,
+  );
+  assert.match(
+    prompt,
+    /When counts\.returned is less than counts\.total, say explicitly that the checks you grouped and explained are a sample/,
+  );
+});

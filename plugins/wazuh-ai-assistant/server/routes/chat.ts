@@ -141,6 +141,10 @@ interface StoredProviderAttributes {
  * chat-capability-honesty.test.ts's last-tool-bearing-round test) instead of hardcoding the
  * round count, which would silently start testing a different round on any budget change. */
 export const MAX_TOOL_ROUNDS = 3;
+/* ADAPTATION (branch 8997 vs D's original commit): workstream C's cost-budget block
+ * (BASE_BUDGET_UNITS, HARD_CEILING_UNITS, CONTEXT_CHAR_BUDGET, MAX_CONSECUTIVE_REJECTED_ROUNDS)
+ * is dropped here -- it belongs to enhancement/8998-ai-assistant-tool-budget. This branch keeps
+ * the plain MAX_TOOL_ROUNDS=3 count from before workstream C existed. */
 
 /**
  * Fallback narration for a turn that used at least one tool but whose model never emitted any
@@ -210,11 +214,25 @@ const FILTER_KEY_LABELS: Record<string, string> = {
   cve_id: 'CVE',
   detector_type: 'detector type',
   rule_id: 'rule',
-  indicator: 'indicator',
+  // D4 fix (AI/plan/d-review.md): NOT mapped to 'indicator' here on purpose -- for
+  // `lookup_indicator`, `describeToolDomain('lookup_indicator')` already resolves to "indicator"
+  // (the verb-prefix strip leaves just that one word), so an explicit entry here produced the
+  // doubled "(Searched: indicator, filtered to indicator 124.70.213.43.)" copy bug. The fallback
+  // (`key.replace(/_/g, ' ')`) renders the bare key "indicator" identically anyway, so omitting
+  // this entry changes nothing about the label itself -- it only removes the redundant mapping.
 };
 /** Never part of the user-facing filter description: `limit` is a page-size mechanism, not
- * something the user asked to narrow by. */
-const FILTER_KEYS_EXCLUDED_FROM_SCOPE = new Set(['limit']);
+ * something the user asked to narrow by. `query_dsl` (D3 fix, AI/plan/d-review.md) is
+ * `search_wazuh_data`'s escape-hatch parameter — declared `type: 'string'` in its schema, but the
+ * string it carries is raw Elasticsearch DSL JSON, not a user-meaningful value. Excluding objects
+ * and arrays (the type guard below) does not catch it because the DSL rides in as a STRING; left
+ * unexcluded, a zero-row `search_wazuh_data` call rendered "query dsl {"query":{"bool": ..." into
+ * user-facing copy whose own doc comment promises plain language and no mechanism internals. */
+const FILTER_KEYS_EXCLUDED_FROM_SCOPE = new Set(['limit', 'query_dsl']);
+/** Defensive length cap for a single filter clause's value (D3 fix): `query_dsl` above is the
+ * known case, but this bounds ANY future string parameter the same way, so a new escape-hatch-
+ * shaped argument cannot reopen this defect by accident. */
+const FILTER_VALUE_MAX_LENGTH = 60;
 
 /**
  * Renders a tool call's resolved arguments as short "label value" clauses (e.g. `"agent 003"`,
@@ -244,7 +262,11 @@ function describeSearchFilters(args: Record<string, unknown>): string[] {
       continue;
     }
     const label = FILTER_KEY_LABELS[key] ?? key.replace(/_/g, ' ');
-    clauses.push(`${label} ${value}`);
+    const shown =
+      String(value).length > FILTER_VALUE_MAX_LENGTH
+        ? `${String(value).slice(0, FILTER_VALUE_MAX_LENGTH)}…`
+        : String(value);
+    clauses.push(`${label} ${shown}`);
   }
   const gte = args.time_range_gte;
   const lte = args.time_range_lte;
@@ -271,7 +293,15 @@ function buildNoMatchingResultsMessage(
     return NO_MATCHING_RESULTS_MESSAGE;
   }
   const domain = describeToolDomain(lastToolCall.name);
-  const filters = describeSearchFilters(lastToolCall.args);
+  // D4 fix (AI/plan/d-review.md): for `lookup_indicator`, `domain` is already "indicator" (the
+  // verb-prefix strip leaves just that one word) and its own filter clause would ALSO read
+  // "indicator <value>" -- rendering both produced the doubled "(Searched: indicator, filtered
+  // to indicator 124.70.213.43.)" copy bug. A filter clause whose label is exactly the domain word
+  // is redundant with the domain itself (the domain already told the reader what was searched),
+  // so it is dropped from the filtered-to list rather than repeated.
+  const filters = describeSearchFilters(lastToolCall.args).filter(
+    clause => !clause.toLowerCase().startsWith(`${domain.toLowerCase()} `),
+  );
   const scope =
     filters.length > 0 ? `${domain}, filtered to ${filters.join(', ')}` : domain;
   return `${NO_MATCHING_RESULTS_MESSAGE} (Searched: ${scope}.)`;
@@ -350,6 +380,9 @@ export function withFinalRoundAnswerInstruction(
   ];
 }
 
+/* ADAPTATION (branch 8997): workstream C's cost-budget helper functions (toolCallCostUnits,
+ * isRoundFutile, extractEnumeratedTargets, shouldGrantBudgetExtension) are dropped here -- they
+ * live on enhancement/8998-ai-assistant-tool-budget, which owns C's round-loop mechanism. */
 /**
  * Issue #8911: a tool round that produced only rejected/errored calls (no successful digest/table)
  * is, for round-budget purposes, indistinguishable from a productive one — the loop below just
@@ -1305,6 +1338,9 @@ export async function* orchestrate(
   // round in this turn had at least one successful (non-rejected/non-errored) tool call, and set
   // when the round loop below should make its NEXT iteration the final round early.
   let hadSuccessfulRoundEarlier = false;
+  // ADAPTATION (branch 8997): the M1/M2 `hadNonEmptySuccessfulRoundEarlier` tracker that used to
+  // sit here fed only the C-owned futility stop dropped above (see the ADAPTATION note near
+  // isRoundFutile) -- removed as dead state along with it.
   let forceFinalRoundEarly = false;
   // Sum of every provider call's `usage` THIS TURN — the stage-1 routing call (if the router ran)
   // plus every round of the loop below, INCLUDING non-final rounds whose `done` is otherwise

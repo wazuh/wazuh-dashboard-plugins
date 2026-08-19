@@ -72,6 +72,10 @@ function finalizeDigest(
   // (get_agent_inventory) sets this so its unlisted-field default is fail-closed (anonymize)
   // instead of the curated typed tools' allow-by-omission — see privacy.ts's applyFieldPolicy.
   isEscapeHatch = false,
+  // Threaded from the calling tool's `def.digest.sampleFieldMaxLength` (types.ts) so the re-run of
+  // `capDigest` after pseudonym substitution keeps applying the SAME per-field cap the first run
+  // (buildDigest, digest.ts) used — see capDigest's doc comment.
+  sampleFieldMaxLength?: Record<string, number>,
 ): Digest {
   if (!privacy) {
     return digest;
@@ -85,6 +89,7 @@ function finalizeDigest(
       toolName,
       isEscapeHatch,
     ),
+    sampleFieldMaxLength,
   );
 }
 
@@ -563,7 +568,7 @@ async function executeIndexerRequest(
     // `finalizeDigest` privacy-on path below) is what keeps the "bounded ~1-2k token digest"
     // guarantee (digest.ts's `DIGEST_CHAR_CAP`) true even after these two appends, instead of
     // silently letting a hint-inflated digest slip past the cap whenever privacy mode is off.
-    capDigest(digest);
+    capDigest(digest, def.digest.sampleFieldMaxLength);
     // A `breakdownDimensions`-opted-in tool's synthesized breakdown (digest.ts's
     // `buildSyntheticBreakdown`) tags each bucket `agg: <dimension field path>` — a map from each
     // dimension to a SCALAR `AggFieldSpec` naming that same field (a synthesized breakdown is
@@ -600,6 +605,7 @@ async function executeIndexerRequest(
       // Issue #8917: was `def.deriveColumns` -- see `ToolDefinition.failClosedFieldPolicy`'s doc
       // comment (types.ts) for why this must be its own, explicitly-set flag instead.
       def.failClosedFieldPolicy,
+      def.digest.sampleFieldMaxLength,
     );
     // "Open in Discover" support (common/types.ts's `TableSpec.discover` doc comment): only this
     // Indexer path has an index/DSL to attach — see buildDiscoverDsl for why a `post_filter` is
@@ -681,7 +687,14 @@ async function executeManagerRequest(
       undefined,
       assumptionNote,
     );
-    const finalDigest = finalizeDigest(digest, privacy, toolName);
+    const finalDigest = finalizeDigest(
+      digest,
+      privacy,
+      toolName,
+      undefined,
+      undefined,
+      def.digest.sampleFieldMaxLength,
+    );
     return {
       toolResultContent: JSON.stringify(finalDigest),
       tableEvent: { type: 'table', spec: buildTableSpec(result, def) },
