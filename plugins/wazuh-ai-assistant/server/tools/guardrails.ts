@@ -127,19 +127,93 @@ const MAX_TREE_DEPTH = 100;
 // catalog today (`index` is enum-locked at the tool-schema level), but this function is the
 // standalone boundary and must hold on its own.
 //
-// `threatintel-(rules|decoders|integrations|policies|filters|kvdbs)` is enumerated explicitly,
-// NOT a bare `threatintel-[^,\s]*`: this plugin has NO tool touching `wazuh-threatintel-enrichments`
-// (228k IOC docs — deliberately out of scope, see get-rules.ts/get-threat-intel-
-// components.ts's doc comments for why). This allowlist is documented as the standalone boundary
-// that must hold on its own, independent of what today's tool schemas happen to permit — opening
-// the whole prefix would silently authorize `enrichments` at this layer the day someone adds it to
-// an enum elsewhere, without anyone consciously deciding to widen it.
+// `threatintel-(rules|decoders|integrations|policies|filters|kvdbs)` is enumerated explicitly
+// (a sub-family list, not a bare `threatintel-[^,\s]*`), so opening a NEW sub-family always
+// requires a conscious edit here rather than silently inheriting from the wildcard prefix. This
+// allowlist is documented as the standalone boundary that must hold on its own, independent of
+// what today's tool schemas happen to permit.
+//
+// Workstream A1a (AI/plan/coverage-validation-design.md, TC-8/MS-6/MS-7): widened past the
+// original 3-family + threatintel-{rules..kvdbs} + sap-detectors-config set left by workstream B.
+// Every addition below is a family/index with REAL data on `wazuh-aio-5` (live-verified 2026-08-19,
+// see this branch's own verification notes) and no owning typed tool -- the mission is "every
+// family with real data is queryable by construction", not "a new typed tool per family", so these
+// widen the SAME escape hatch (`search_wazuh_data`) rather than spawning one-off tools. Each entry
+// below documents its own live evidence; entries considered and DELIBERATELY EXCLUDED are
+// documented immediately after the regex so "why isn't X in here" is answerable without git log
+// archaeology.
+//
+//  - `wazuh-metrics-[^,\s]*` -- covers `wazuh-metrics-comms`/`wazuh-metrics-agents`/
+//    `wazuh-metrics-normalization`/`wazuh-metrics-comms-v4` as one family (coverage doc's open gap
+//    G1: fleet-health/comms metrics, real data -- 1,040/716/16,620/0 docs respectively on this VM
+//    at verification time -- and no workstream owned it before this one). One wildcard rather than
+//    four literals: all four are the plugin's own emitted operational-metrics data streams (no
+//    tool ever needs to see one without being able to see the others), and `comms-v4`'s live doc
+//    count is volatile (drift noted in the coverage doc, 0 here vs 1,032 observed elsewhere) so a
+//    literal would have to be re-verified on every drift; the wildcard is stable regardless.
+//  - `\.wazuh-cti-consumers` / `\.wazuh-content-manager-jobs` -- CTI freshness status (coverage
+//    doc MS-6/MS-7, retiers CV-050 from "can't diagnose" to answerable): live-verified 3 docs
+//    (per-feed `status`/`local_offset`/`remote_offset`) and 2 docs (sync-schedule metadata) --
+//    config/status documents written by the content-manager service itself, never
+//    analyst/attacker-supplied.
+//  - `\.opensearch-sap-[^,\s]*-findings` -- the 15 per-log-type Security Analytics findings
+//    indices (coverage doc G2, "findings now flowing after the `alert_finding_enabled=true`
+//    fix"), live-verified reachable via their aliases (`.opensearch-sap-wazuh-generic-findings`
+//    etc., `_cat/aliases` confirms one alias per family, no ambiguity with the sibling
+//    `-detectors-queries-optimized-<uuid>` internal artifact indices, which end in a UUID suffix
+//    and a differently-worded family name, never `-findings`). Deliberately does NOT open
+//    `-alerts` (see exclusions below) or the `-detectors-queries-optimized-*` compiled-query
+//    indices (already out of scope per the coverage doc's own appendix -- an internal artifact,
+//    not a question surface).
+//  - `\.opensearch-sap-pre-packaged-rules-config` -- the 1,472-doc pre-packaged Sigma catalog
+//    (coverage doc G3, live-verified 126 docs at re-check time -- count drift, still real,
+//    non-empty). Vendor-curated rule metadata, same class as `get_rules`'s own corpus.
+//  - `\.opensearch-sap-correlation-metadata` -- coverage doc MS-12 correction: NOT empty like its
+//    correlation-alerts/history siblings (live-verified 2 docs: `root`/`counter`/`finding1`/
+//    `finding2`/`logType`/`timestamp`, internal correlation bookkeeping, not analyst data).
+//  - `\.wazuh-threatintel-vulnerabilities-a` -- the raw CTI CVE feed (coverage doc, "one of only
+//    two cover-now rows with production-shaped volume", TC-8 sequences it first). Live-verified
+//    372,301 docs, public CVE-record JSON (cveMetadata/containers.cna, the same public NVD-sourced
+//    schema `get_rules`' own vendor content descends from).
+//  - `wazuh-threatintel-enrichments-a` -- IOC enrichment feed (coverage doc, same TC-8 sequencing
+//    as vulnerabilities-a above). REVERSES the prior "deliberately out of scope" decision recorded
+//    on this same line by workstream B/earlier phases (see `guardrails.test.ts`'s prior assertion,
+//    now updated) -- that decision predates the A1a mission ("every family with real data must be
+//    queryable by construction") and TC-8's explicit resequencing of this exact row to cover-now.
+//    Live-verified 257,071+ docs, third-party threat-intel indicator records (domain/hash/IP
+//    values IDENTIFYING KNOWN-MALICIOUS INFRASTRUCTURE, not the customer's own network -- see this
+//    branch's `privacy.ts` additions for why these are 'allow', not anonymized).
+//
+// DELIBERATELY EXCLUDED (documented so a future reader doesn't silently rediscover the same
+// live-checks and reach a different conclusion):
+//  - `.opendistro-ism-config` (retention-policy config, coverage doc G8) -- live-verified BLOCKED:
+//    `_cat/indices` reports 82 docs, but `_search`/`_count` against it both return 0 hits/0 count
+//    for the plugin's own `admin` credential (same behavior verified live against
+//    `.opendistro_security`, a known system-protected index) -- OpenSearch Security's system-index
+//    protection filters document reads even for an admin REST credential. Skipped per this
+//    workstream's own instruction ("verify live and skip with a note if perms block it") rather
+//    than allowlisted-but-nonfunctional; G8 remains an open product-decision gap, unresolved by
+//    this branch.
+//  - `wazuh-ai-assistant-sessions` -- explicitly excluded (privacy: this plugin's own chat-history
+//    store; a user must never be able to read another user's session content, including through
+//    this escape hatch -- coverage doc MS-1, "not a coverage gap, a security assertion").
+//  - `.opendistro_security` / any other `.opendistro-security`-family index -- explicitly excluded
+//    (internal authz plane; reading it directly IS the information leak the RBAC-troubleshooting
+//    decline exists to prevent -- coverage doc MS-11's corrected reasoning).
+//  - `.opensearch-sap-*-alerts` / `.opensearch-sap-correlation-alerts` /
+//    `.opensearch-sap-correlation-history*` -- left out: all are empty on this VM by a provisioning
+//    defect (`triggers: []` on every detector, coverage doc G2) rather than by design, so allowing
+//    the pattern would let the model run a real query that can only ever return zero -- no
+//    escape-hatch value until the provisioning defect is fixed upstream.
+//  - `.opendistro-alerting-config` / `.opensearch-notifications-config` -- open product-decision
+//    gaps (coverage doc G7/G9) with no workstream ownership assigned; NOT this workstream's call to
+//    make unilaterally, so left closed pending that decision.
 // `.opensearch-sap-detectors-config` (get_detectors.ts) is an exact single index, not a wildcard
 // family -- OpenSearch Security Analytics' own config store for detector definitions, confirmed
 // live to be indexer-reachable and to hold no analyst/attacker-supplied data (name/type/schedule/
 // enabled/source, all vendor- or admin-configured).
 const INDEX_ALLOWLIST_RE =
-  /^wazuh-(events-v5|findings-v5|states|threatintel-(rules|decoders|integrations|policies|filters|kvdbs))[^,\s]*$|^\.opensearch-sap-detectors-config$/;
+  /^wazuh-(events-v5|findings-v5|states|threatintel-(rules|decoders|integrations|policies|filters|kvdbs)|metrics)[^,\s]*$|^wazuh-threatintel-enrichments-a$|^\.opensearch-sap-detectors-config$|^\.opensearch-sap-pre-packaged-rules-config$|^\.opensearch-sap-correlation-metadata$|^\.opensearch-sap-[^,\s]*-findings$|^\.wazuh-cti-consumers$|^\.wazuh-content-manager-jobs$|^\.wazuh-threatintel-vulnerabilities-a$/;
 
 /** The escape hatch's (and every catalog tool's) index-pattern allowlist. */
 export function checkIndexAllowlist(index: string): GuardrailCheck {
@@ -148,8 +222,11 @@ export function checkIndexAllowlist(index: string): GuardrailCheck {
       ok: false,
       reason:
         `Index "${index}" is not in the allowed set (wazuh-events-v5-*, wazuh-findings-v5-*, ` +
-        'wazuh-states-*, wazuh-threatintel-{rules,decoders,integrations,policies,filters,kvdbs}-*, ' +
-        '.opensearch-sap-detectors-config).',
+        'wazuh-states-*, wazuh-metrics-*, ' +
+        'wazuh-threatintel-{rules,decoders,integrations,policies,filters,kvdbs,enrichments}-*, ' +
+        '.wazuh-threatintel-vulnerabilities-a, .wazuh-cti-consumers, .wazuh-content-manager-jobs, ' +
+        '.opensearch-sap-detectors-config, .opensearch-sap-*-findings, ' +
+        '.opensearch-sap-pre-packaged-rules-config, .opensearch-sap-correlation-metadata).',
     };
   }
   return { ok: true };

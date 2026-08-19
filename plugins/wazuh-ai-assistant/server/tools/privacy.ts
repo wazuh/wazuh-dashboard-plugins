@@ -212,6 +212,167 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'event.category', action: 'allow' },
   { field: 'event.action', action: 'allow' },
   { field: 'event.outcome', action: 'allow' },
+
+  // --- Workstream A1a (AI/plan/coverage-validation-design.md) -------------------------------
+  // Every family below is newly reachable through `search_wazuh_data` (guardrails.ts's
+  // `INDEX_ALLOWLIST_RE`, widened by this workstream) and that tool sets `deriveColumns: true` +
+  // `failClosedFieldPolicy: true` -- an unlisted field there is FAIL-CLOSED anonymized (the
+  // opposite default from a typed tool's allow-by-omission), so every field an analyst should
+  // actually be able to read needs a REAL entry here, not just a "looks harmless" structural
+  // guess. See `field-policy-coverage.test.ts`'s `requireExplicitEntry` for why the test enforces
+  // exactly this distinction.
+  //
+  // A GENUINE MECHANISM LIMIT, surfaced rather than worked around: `FieldPolicyEntry.field` is
+  // either a bare digest path or a `tool/field` SCOPED path -- there is no INDEX/FAMILY scope.
+  // `search_wazuh_data` is the one tool that queries every family below (and every
+  // pre-existing one), so a bare entry here is NOT scoped to "this field on this family" the way
+  // a typed tool's own fixed `_source` list is -- it is scoped to "this exact field NAME, on
+  // whatever family the model happened to query this turn". Every entry below was checked against
+  // this constraint before being added: the field NAME itself is either (a) a `wazuh.*`-namespaced
+  // dotted path unique to the family it was verified on (no other reachable family uses the same
+  // literal), or (b) a bare, undotted top-level key -- SAFE specifically because every existing
+  // Wazuh WCS/ECS `wazuh-states-*`/`wazuh-events-v5-*`/`wazuh-findings-v5-*` schema nests every
+  // personal-shaped field under a dotted path (`user.name`, `host.hostname`, `source.ip`, ...) and
+  // NEVER exposes one bare at a document's root -- live-verified against
+  // `wazuh-states-inventory-users` (this branch's own check: the personal field is `user.name`,
+  // never a bare `name`). The CTI/content-manager/Security-Analytics documents classified below
+  // are the ONLY reachable surfaces that use bare root-level keys at all, which is exactly why a
+  // bare entry for them cannot silently widen to cover a WCS personal field of the same bare name
+  // -- no such WCS field exists. Fields that could NOT be cleared this way (ambiguous, or a value
+  // shape the reviewer could not confidently call safe) are left OFF this list on purpose --
+  // fail-closed anonymize is the correct outcome for those, not an oversight; see the two
+  // "DELIBERATELY NOT LISTED" notes below.
+
+  // wazuh-metrics-agents (live-verified mapping, `wazuh-aio-5`): agent registration/connection
+  // telemetry. `wazuh.agent.id`/`.name`/`.host.ip` already have entries above (same literals,
+  // same field on this family too). The rest below are NEW literals only this family carries.
+  { field: 'wazuh.agent.register.ip', action: 'anonymize', kind: 'IP' },
+  // OS identity (name/platform/full/version, one wildcard) -- same class and same 'allow'
+  // decision as the pre-existing bare `host.os.name`/`.platform` entries above, just on the
+  // POPULATED `wazuh.agent.host.os.*` path this family (and findings/events, per guardrails.ts's
+  // AGG_FIELD_ALLOWLIST comment) actually carries.
+  { field: 'wazuh.agent.host.os.*', action: 'allow' },
+  { field: 'wazuh.agent.host.architecture', action: 'allow' },
+  // Admin-defined agent-group tag list -- same class as `policy.name`/`check.name` above
+  // (admin/vendor taxonomy, not analyst/attacker-supplied).
+  { field: 'wazuh.agent.groups', action: 'allow' },
+  // Closed enum (active/disconnected/pending/never_connected) + its paired numeric code, not an
+  // identifier.
+  { field: 'wazuh.agent.status', action: 'allow' },
+  { field: 'wazuh.agent.status_code', action: 'allow' },
+  { field: 'wazuh.agent.version', action: 'allow' },
+  // Timestamps -- same class as the already-'allow' bare `timestamp`/`@timestamp`.
+  { field: 'wazuh.agent.last_seen', action: 'allow' },
+  { field: 'wazuh.agent.registered_at', action: 'allow' },
+  { field: 'wazuh.agent.disconnected_at', action: 'allow' },
+  // Config-sync checksums/flags -- an MD5 of the agent's own config payload, not an identifier of
+  // a person or network address.
+  { field: 'wazuh.agent.config.hash.md5', action: 'allow' },
+  { field: 'wazuh.agent.config.group.hash.md5', action: 'allow' },
+  { field: 'wazuh.agent.config.group.synced', action: 'allow' },
+
+  // wazuh-metrics-comms / wazuh-metrics-agents / wazuh-metrics-normalization (shared fields):
+  // manager cluster identity -- admin-configured infra naming (e.g. "wazuh"), not a person or a
+  // network address; same class as `policy.name`/`document.name` above, not `host.hostname`.
+  { field: 'wazuh.cluster.*', action: 'allow' },
+  { field: 'wazuh.schema.version', action: 'allow' },
+  // wazuh-metrics-normalization: tenant/space label (admin-configured), and the ECS event/metric
+  // taxonomy fields describing WHICH counter a document is, not any analyst/attacker data.
+  { field: 'wazuh.space.name', action: 'allow' },
+  { field: 'event.module', action: 'allow' },
+  { field: 'event.kind', action: 'allow' },
+  { field: 'metric.name', action: 'allow' },
+  { field: 'metric.type', action: 'allow' },
+
+  // .wazuh-cti-consumers / .wazuh-content-manager-jobs (CTI freshness status, coverage doc
+  // MS-6/MS-7): every field is written by the content-manager service itself describing ITS OWN
+  // sync state/schedule -- never analyst- or attacker-supplied, and (per the mechanism-limit note
+  // above) these bare root-level keys cannot collide with any WCS-schema field of the same name.
+  { field: 'name', action: 'allow' },
+  { field: 'context', action: 'allow' },
+  { field: 'resource', action: 'allow' },
+  { field: 'status', action: 'allow' },
+  { field: 'is_public', action: 'allow' },
+  { field: 'local_offset', action: 'allow' },
+  { field: 'remote_offset', action: 'allow' },
+  { field: 'job_type', action: 'allow' },
+  { field: 'enabled', action: 'allow' },
+  // `type` is DELIBERATELY NOT LISTED here even though it appears on both CTI documents (a
+  // consumer-type enum) and would otherwise pass the same "bare root key, WCS never uses it bare"
+  // reasoning: `.opensearch-sap-correlation-metadata`'s own `type` usage was not verified in this
+  // pass (its one sampled live doc did not populate it), and a later family reachable through this
+  // same escape hatch could plausibly use a bare `type` for something less clearly safe. Left
+  // fail-closed (anonymized) rather than guessed -- the CTI-specific need ("what type of consumer
+  // is this") is already answerable from `name`/`context` above without it.
+
+  // .opensearch-sap-*-findings (per-log-type Security Analytics findings, coverage doc G2):
+  // detector/finding bookkeeping -- monitor identity and cross-references to the underlying
+  // event/finding docs, never analyst/attacker free text.
+  { field: 'monitor_id', action: 'allow' },
+  { field: 'monitor_name', action: 'allow' },
+  { field: 'execution_id', action: 'allow' },
+  { field: 'related_doc_ids', action: 'allow' },
+  { field: 'correlated_doc_ids', action: 'allow' },
+  // The finding's own compiled Sigma-derived query template/tags -- vendor-curated pipeline
+  // content, same class and same 'allow' decision as `document.metadata.description` above (a
+  // LOCAL rule's title/description can echo attacker-influenced content in principle, and the
+  // same outbound `scrubMessagesForProvider` scan documented on that entry covers this one too).
+  { field: 'queries.id', action: 'allow' },
+  { field: 'queries.name', action: 'allow' },
+  { field: 'queries.query', action: 'allow' },
+  { field: 'queries.tags', action: 'allow' },
+  { field: 'queries.query_field_names', action: 'allow' },
+
+  // .opensearch-sap-pre-packaged-rules-config (coverage doc G3) / .opensearch-sap-detectors-config
+  // share the same `document.metadata.*` vendor-rule-metadata shape `document.metadata.description`
+  // above already covers; the fields below are the ones that shape does not already list.
+  { field: 'document.metadata.title', action: 'allow' },
+  { field: 'document.metadata.author', action: 'allow' },
+  { field: 'document.metadata.date', action: 'allow' },
+  { field: 'document.metadata.modified', action: 'allow' },
+  { field: 'document.metadata.references', action: 'allow' },
+  { field: 'document.id', action: 'allow' },
+  { field: 'document.space', action: 'allow' },
+
+  // .opensearch-sap-correlation-metadata (coverage doc MS-12): internal correlation-engine
+  // bookkeeping (a running score counter and cross-references to the two findings being
+  // correlated) -- `finding1`/`finding2` hold finding/document IDs, same class as
+  // `related_doc_ids` above, not free text.
+  { field: 'root', action: 'allow' },
+  { field: 'counter', action: 'allow' },
+  { field: 'finding1', action: 'allow' },
+  { field: 'finding2', action: 'allow' },
+  { field: 'logType', action: 'allow' },
+
+  // .wazuh-threatintel-vulnerabilities-a (raw CTI CVE feed) / wazuh-threatintel-enrichments-a (IOC
+  // enrichment feed) -- coverage doc TC-8. Both are THIRD-PARTY THREAT-INTEL CATALOG DATA: public
+  // CVE records and known-malicious-indicator records. The privacy boundary this whole file exists
+  // to enforce protects the CUSTOMER's own observed data (their hosts/users/IPs) from reaching the
+  // provider un-pseudonymized -- these two families are the mirror image, vendor/community
+  // threat-intel content ABOUT the outside world, not about the customer's environment, so a
+  // domain/hash/IP value here identifies KNOWN-MALICIOUS PUBLIC INFRASTRUCTURE, never the
+  // customer's own network (contrast with `source.ip`/`destination.ip` above, which DO need
+  // anonymizing because those values come from the customer's own traffic).
+  { field: 'document.cveMetadata.cveId', action: 'allow' },
+  { field: 'document.cveMetadata.assignerShortName', action: 'allow' },
+  { field: 'document.cveMetadata.state', action: 'allow' },
+  { field: 'document.dataType', action: 'allow' },
+  { field: 'document.dataVersion', action: 'allow' },
+  // Indicator identity/metadata: a domain, hash, or IP string, but of a THIRD-PARTY indicator, not
+  // the customer's own address space -- see the family-level reasoning above.
+  { field: 'document.name', action: 'allow' },
+  { field: 'document.provider', action: 'allow' },
+  { field: 'document.type', action: 'allow' },
+  { field: 'document.tags', action: 'allow' },
+  { field: 'document.feed.name', action: 'allow' },
+  { field: 'software.name', action: 'allow' },
+  { field: 'software.type', action: 'allow' },
+  { field: 'software.alias', action: 'allow' },
+  { field: 'hash.sha256', action: 'allow' },
+  // `document.reference`/rejection-reason free text is DELIBERATELY NOT LISTED: a CVE record's
+  // `containers.cna.rejectedReasons[].value` is analyst-authored free text from the CVE assigning
+  // body, not a closed vocabulary -- left fail-closed (anonymized) rather than assumed safe, same
+  // "too risky to classify confidently" call as `type` above.
 ];
 
 export type PseudonymKind = 'HOST' | 'IP' | 'USER' | 'URL' | 'VAL';

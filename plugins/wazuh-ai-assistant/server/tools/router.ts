@@ -163,7 +163,10 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
     'definitions (which detectors exist, enabled state, monitored indices). Pipeline ' +
     'configuration, NOT findings that fired and NOT SCA compliance benchmarks.',
   free_search:
-    'Anything else about Wazuh finding/vulnerability/state data (last resort).',
+    'Anything else about Wazuh finding/vulnerability/state data, PLUS operational metrics, CTI ' +
+    'feed freshness, Security Analytics detector findings/rule catalog, and the raw CVE/IOC ' +
+    'threat-intel feeds (last resort — always offered regardless of which category is picked, ' +
+    'so this rarely needs to be picked for its own sake).',
   general:
     'Greetings, thanks, or questions about the assistant itself. If the user asks anything about ' +
     'their own environment - however vaguely - do NOT pick general.',

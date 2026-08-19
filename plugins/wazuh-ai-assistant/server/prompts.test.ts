@@ -352,6 +352,78 @@ test('buildSystemPrompt: keeps "field is unpopulated" and "no documents match" a
   );
 });
 
+// Workstream A1a (AI/plan/coverage-validation-design.md): the generic-query-layer mission --
+// name the newly-reachable data families in user vocabulary, point the model at search_wazuh_data
+// when no typed tool fits, and narrow the decline list to exactly the five product-decided classes
+// (never mentioning tiers/roadmap/internal names).
+
+test('buildSystemPrompt: names the newly-reachable data families in user vocabulary', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /operational metrics/);
+  assert.match(prompt, /threat-intel\/CTI\s+feeds are up to date/);
+  assert.match(prompt, /Security\s+Analytics detector findings/);
+  assert.match(prompt, /raw CVE\/IOC threat-intel\s+feeds/);
+});
+
+test('buildSystemPrompt: instructs the model to prefer a typed tool but reach for search_wazuh_data otherwise', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /Always prefer a typed tool when\s+one already matches the question; reach for search_wazuh_data when one\s+doesn't/,
+  );
+});
+
+test('buildSystemPrompt: narrows the unanswerable-question list to exactly five named classes', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /Only FIVE classes of question have NO tool that can answer them at all/,
+  );
+  assert.match(prompt, /1\. Simulating or tracing decode\/rule evaluation/);
+  assert.match(prompt, /2\. Actions — restarting an agent/);
+  assert.match(prompt, /3\. RBAC \/ spaces admin troubleshooting/);
+  assert.match(prompt, /4\. Another user's chat history/);
+  assert.match(prompt, /5\. Authoring — drafting or generating a new rule/);
+});
+
+test('buildSystemPrompt: decline copy itself (the quoted user-facing sentences) never mentions tiers, roadmap status, or internal workstream codenames', () => {
+  // Extract just the five quoted decline sentences, not the surrounding meta-instruction that
+  // legitimately NAMES "tiers"/"roadmap" in order to tell the model not to say them -- a blanket
+  // whole-prompt check would fail on that meta-instruction itself.
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  const quoted = [...prompt.matchAll(/"([^"]{20,})"/g)].map(m => m[1]);
+  const declineSentences = quoted.filter(text =>
+    text.startsWith('I can'),
+  );
+  assert.ok(
+    declineSentences.length >= 5,
+    `expected at least 5 quoted decline sentences, found ${declineSentences.length}`,
+  );
+  for (const sentence of declineSentences) {
+    for (const forbidden of [/\btier\b/i, /roadmap/i, /workstream/i, /\bA1a\b/, /beta3/i]) {
+      assert.doesNotMatch(
+        sentence,
+        forbidden,
+        `decline sentence "${sentence}" must not match ${forbidden}`,
+      );
+    }
+  }
+});
+
+test('buildSystemPrompt: the five decline classes point at a concrete dashboard page, not a bare refusal', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /Server management > Rules > Logtest/);
+  assert.match(
+    prompt,
+    /Agents\s+management or Server management > Active response/,
+  );
+  assert.match(prompt, /Server management > Security > Roles/);
+  assert.match(
+    prompt,
+    /Server management > Rules \(or Decoders\s+\/ SCA policies\)/,
+  );
+});
+
 test('buildSystemPrompt: caps inter-round status narration to one terse, action-oriented, non-speculative line', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(

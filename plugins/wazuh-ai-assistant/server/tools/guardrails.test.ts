@@ -1102,10 +1102,18 @@ test('checkIndexAllowlist: accepts the 6 named wazuh-threatintel-* sub-families 
   }
 });
 
-// Deliberate (ADR-1, sdd/add-SA-tools/design): no tool in this catalog touches the IOC feed, and
-// the allowlist enumerates only the 6 sub-families that are — it must NOT accept the bare
-// wazuh-threatintel-* prefix, which would silently authorize enrichments too.
-test('checkIndexAllowlist: rejects wazuh-threatintel-enrichments-* (deliberately out of scope)', () => {
+// REVERSED by workstream A1a (AI/plan/coverage-validation-design.md, TC-8): the prior ADR-1
+// decision predates the "every family with real data must be queryable by construction" mission
+// and the coverage doc's explicit resequencing of this exact row to cover-now (372,301/257,071-doc
+// corpora, two of only two production-shaped-volume gaps). The exact literal
+// `wazuh-threatintel-enrichments-a` is now allowed (see guardrails.ts's INDEX_ALLOWLIST_RE
+// comment) -- but the bare wildcarded prefix is still rejected below: only the one real index name
+// is opened, not a whole new sub-family the way rules/decoders/etc. are.
+test('checkIndexAllowlist: accepts the exact wazuh-threatintel-enrichments-a index (A1a, TC-8)', () => {
+  assert.equal(checkIndexAllowlist('wazuh-threatintel-enrichments-a').ok, true);
+});
+
+test('checkIndexAllowlist: rejects a wildcarded wazuh-threatintel-enrichments-* (only the exact literal is opened)', () => {
   const result = checkIndexAllowlist('wazuh-threatintel-enrichments-*');
   assert.equal(result.ok, false);
   if (!result.ok) {
@@ -1116,6 +1124,37 @@ test('checkIndexAllowlist: rejects wazuh-threatintel-enrichments-* (deliberately
 test('checkIndexAllowlist: rejects a bare wazuh-threatintel-* or an unrecognized sub-family', () => {
   assert.equal(checkIndexAllowlist('wazuh-threatintel-*').ok, false);
   assert.equal(checkIndexAllowlist('wazuh-threatintel-bogus-*').ok, false);
+});
+
+test('checkIndexAllowlist: accepts the exact .wazuh-threatintel-vulnerabilities-a index (A1a, TC-8)', () => {
+  assert.equal(
+    checkIndexAllowlist('.wazuh-threatintel-vulnerabilities-a').ok,
+    true,
+  );
+});
+
+test('checkIndexAllowlist: accepts wazuh-metrics-* (A1a, coverage doc open gap G1)', () => {
+  assert.equal(checkIndexAllowlist('wazuh-metrics-comms').ok, true);
+  assert.equal(checkIndexAllowlist('wazuh-metrics-agents').ok, true);
+  assert.equal(checkIndexAllowlist('wazuh-metrics-normalization').ok, true);
+  assert.equal(checkIndexAllowlist('wazuh-metrics-comms-v4').ok, true);
+});
+
+test('checkIndexAllowlist: accepts the CTI status indices (A1a, coverage doc MS-6/MS-7)', () => {
+  assert.equal(checkIndexAllowlist('.wazuh-cti-consumers').ok, true);
+  assert.equal(checkIndexAllowlist('.wazuh-content-manager-jobs').ok, true);
+});
+
+test('checkIndexAllowlist: rejects .opendistro-ism-config (system-index read protection verified live, coverage doc G8)', () => {
+  const result = checkIndexAllowlist('.opendistro-ism-config');
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.match(result.reason, /not in the allowed set/);
+  }
+});
+
+test('checkIndexAllowlist: rejects wazuh-ai-assistant-sessions (privacy: other users\' chat history)', () => {
+  assert.equal(checkIndexAllowlist('wazuh-ai-assistant-sessions').ok, false);
 });
 
 test('checkIndexAllowlist: rejects a comma-smuggled second threatintel index', () => {
@@ -1135,17 +1174,66 @@ test('checkIndexAllowlist: accepts .opensearch-sap-detectors-config (get_detecto
   );
 });
 
-test('checkIndexAllowlist: rejects any other .opensearch-sap-* index or a wildcard on the detectors index', () => {
+test('checkIndexAllowlist: rejects a wildcard on the detectors-config index and any .opensearch-sap-*-alerts index', () => {
   assert.equal(
     checkIndexAllowlist('.opensearch-sap-detectors-config*').ok,
     false,
   );
+  // -alerts stays closed (A1a, coverage doc G2): every detector's `triggers: []` provisioning
+  // defect means this can only ever return zero live data -- see guardrails.ts's exclusion note.
   assert.equal(
     checkIndexAllowlist('.opensearch-sap-suricata-alerts').ok,
     false,
   );
+});
+
+// REVERSED by workstream A1a (coverage doc G2: "findings now flowing after the
+// alert_finding_enabled=true fix" -- live-verified non-empty on wazuh-aio-5). Any prior assertion
+// that this family was rejected predates that fix.
+test('checkIndexAllowlist: accepts .opensearch-sap-*-findings (A1a, coverage doc G2)', () => {
   assert.equal(
     checkIndexAllowlist('.opensearch-sap-suricata-findings').ok,
+    true,
+  );
+  assert.equal(
+    checkIndexAllowlist('.opensearch-sap-wazuh-generic-findings').ok,
+    true,
+  );
+});
+
+// The internal compiled-query artifact indices end in a UUID, never in "-findings" -- must stay
+// closed even though they share the ".opensearch-sap-" prefix (coverage doc's own out-of-scope
+// appendix: "not a user-facing question surface").
+test('checkIndexAllowlist: rejects the .opensearch-sap-*-detectors-queries-optimized-* internal artifact', () => {
+  assert.equal(
+    checkIndexAllowlist(
+      '.opensearch-sap-wazuh-generic-detectors-queries-optimized-24d7f640-b381-444e-834b-fce1ba8f47e1',
+    ).ok,
+    false,
+  );
+});
+
+test('checkIndexAllowlist: accepts .opensearch-sap-pre-packaged-rules-config (A1a, coverage doc G3)', () => {
+  assert.equal(
+    checkIndexAllowlist('.opensearch-sap-pre-packaged-rules-config').ok,
+    true,
+  );
+});
+
+test('checkIndexAllowlist: accepts .opensearch-sap-correlation-metadata (A1a, coverage doc MS-12)', () => {
+  assert.equal(
+    checkIndexAllowlist('.opensearch-sap-correlation-metadata').ok,
+    true,
+  );
+});
+
+test('checkIndexAllowlist: rejects .opensearch-sap-correlation-alerts/-history (empty, no provisioning fix yet)', () => {
+  assert.equal(
+    checkIndexAllowlist('.opensearch-sap-correlation-alerts').ok,
+    false,
+  );
+  assert.equal(
+    checkIndexAllowlist('.opensearch-sap-correlation-history').ok,
     false,
   );
 });

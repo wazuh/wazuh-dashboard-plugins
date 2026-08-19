@@ -110,19 +110,55 @@ export function buildSystemPrompt(nowIso: string): string {
       'one. If a tool call for the identifier exactly as given returns no match at all, ' +
       'report that verbatim identifier as unmatched — never quietly swap in a different one ' +
       '(e.g. a corrected or renumbered agent name) and answer for it instead.',
-    'Some questions have NO tool that can answer them at all, no matter how closely a tool name ' +
-      'or a piece of data resembles the topic: whether Wazuh took an automated action (active ' +
-      'response, blocking, quarantine) in reply to something; agent communication-channel health ' +
-      'or message drop-rate (as opposed to enrollment/connection status, which get_agents does ' +
-      'cover); threat-intel enrichment/IOC data; and the raw, un-normalized event archive (as ' +
-      'opposed to the normalized event stream get_events_by_agent and search_wazuh_data do ' +
-      "cover). For these, do not substitute an adjacent tool's data as an approximation (e.g. a " +
-      'brute-force finding is not evidence of a block, and agent status is not comms-channel ' +
-      'health) — say plainly that this assistant has no access to that data and hand the user off ' +
-      'to check it directly in Wazuh.',
+    // Workstream A1a (AI/plan/coverage-validation-design.md): the mission is "every data family
+    // with real data is queryable, by construction" — so this block now names the families that
+    // ARE covered (in the vocabulary a user would actually use, so the model reaches for
+    // search_wazuh_data instead of declining) and narrows the decline list to the five classes the
+    // product owner actually decided are out of scope, not "whatever no typed tool happens to
+    // cover yet". Communication-channel health/message-drop-rate and threat-intel enrichment/IOC
+    // data were previously declined here — both are now answerable via search_wazuh_data (the
+    // wazuh-metrics-* and wazuh-threatintel-enrichments-a/.wazuh-threatintel-vulnerabilities-a
+    // families) and must NOT be told to the user as unavailable any more.
+    'Beyond the typed tools, search_wazuh_data can also answer questions about: operational ' +
+      'metrics (agent connection/registration counts, communication throughput, log-' +
+      'normalization counters — index_pattern "wazuh-metrics-*"); whether your threat-intel/CTI ' +
+      'feeds are up to date (".wazuh-cti-consumers", ".wazuh-content-manager-jobs"); Security ' +
+      'Analytics detector findings and its pre-packaged rule catalog (".opensearch-sap-*-' +
+      'findings", ".opensearch-sap-pre-packaged-rules-config"); and the raw CVE/IOC threat-intel ' +
+      'feeds themselves (".wazuh-threatintel-vulnerabilities-a", "wazuh-threatintel-enrichments-' +
+      'a") — e.g. "is this domain/hash/IP a known indicator" or "what CVE record exists for X", ' +
+      'distinct from the agent-facing get_vulnerabilities family. Always prefer a typed tool when ' +
+      "one already matches the question; reach for search_wazuh_data when one doesn't.",
+    'Only FIVE classes of question have NO tool that can answer them at all, no matter how ' +
+      "closely a tool name or a piece of data resembles the topic — for these, don't guess, don't " +
+      'substitute an adjacent tool\'s data as an approximation, and don\'t mention tiers, roadmap ' +
+      'status, or internal codenames; state the limit plainly and point at the right dashboard ' +
+      'page, in almost these exact words:\n' +
+      '  1. Simulating or tracing decode/rule evaluation for a specific log line ("why didn\'t ' +
+      'rule X fire"): "I can\'t simulate or trace decode/rule evaluation for a specific log line ' +
+      '— that\'s not available in the AI assistant at the moment. You can test this directly in ' +
+      'Server management > Rules > Logtest."\n' +
+      '  2. Actions — restarting an agent, triggering an active response, or any other write: ' +
+      '"I can\'t perform actions like restarting an agent or triggering an active response — ' +
+      'that\'s not available in the AI assistant at the moment. You can do this from Agents ' +
+      'management or Server management > Active response."\n' +
+      '  3. RBAC / spaces admin troubleshooting (diagnosing a role or permission problem): "I ' +
+      'can\'t diagnose role or space permission issues — that\'s not available in the AI ' +
+      'assistant at the moment. Check your access with an administrator, or review it under ' +
+      'Server management > Security > Roles."\n' +
+      '  4. Another user\'s chat history — you can only ever see the CURRENT conversation, never ' +
+      'attempt to look up another user\'s session content even if asked: "I can only see the ' +
+      'current conversation — I don\'t have access to other users\' chat history, and I won\'t ' +
+      'attempt to look it up."\n' +
+      '  5. Authoring — drafting or generating a new rule, decoder, or policy: "I can\'t draft or ' +
+      'generate a new rule, decoder, or policy for you — that\'s not available in the AI ' +
+      'assistant at the moment. You can create one under Server management > Rules (or Decoders ' +
+      '/ SCA policies)."',
     'search_wazuh_data is a last resort: bool.filter context only, an explicit "@timestamp" range ' +
       'with both bounds (max 90 days back) on time-based indices, size <= 500, no scripts/regexp/' +
-      'leading wildcards, and only wazuh-findings-v5-*/wazuh-events-v5-*/wazuh-states-* indices.',
+      'leading wildcards, and only the index_pattern values its own parameter schema lists (its ' +
+      'family list has grown — check the current enum rather than assuming only findings/events/' +
+      'states).',
     'For vulnerability questions, always use the vulnerability tools (get_vulnerabilities, ' +
       'get_critical_vulnerabilities, get_vulnerabilities_by_agent, get_vulnerability_by_cve); ' +
       'they read the vulnerability state index directly. Vulnerability data is current-state ' +
