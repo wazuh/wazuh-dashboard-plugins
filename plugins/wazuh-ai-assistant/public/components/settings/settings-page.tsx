@@ -907,6 +907,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       const saved = editingProvider
         ? await service.update(editingProvider.id, input)
         : await service.create(input);
+      // From here on, a retry (after a failed test) must UPDATE this same provider rather than
+      // create a duplicate — the save itself already succeeded, only the test result is pending.
+      setEditingProvider(saved);
       reload();
       onProvidersChanged();
       core.notifications.toasts.addSuccess(
@@ -920,12 +923,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
               values: { name: saved.name },
             }),
       );
-      // The flyout no longer closes itself on a successful save — it stays open to surface the
-      // connection-test result (screen 4: "Save & test gains a result panel"). Once
-      // `flyoutTestOutcome` is set, the flyout's footer swaps Cancel/Save & test for a single
-      // "Done" button; the admin dismisses it explicitly.
       const outcome = await handleTest(saved);
-      setFlyoutTestOutcome(outcome);
+      if (outcome.status === 'ok') {
+        // A passing test needs no further confirmation from the admin — close the flyout.
+        closeForm();
+      } else {
+        // Keep the flyout open with the result panel so the admin can fix the config and retry.
+        setFlyoutTestOutcome(outcome);
+      }
     } catch (submitError) {
       setError(
         describeHttpError(

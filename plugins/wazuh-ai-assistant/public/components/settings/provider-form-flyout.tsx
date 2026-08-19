@@ -1396,58 +1396,55 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
           </EuiForm>
         </EuiFlyoutBody>
         <EuiFlyoutFooter>
-          {testOutcome ? (
-            // A result is already showing: the save happened, so there is nothing left to
-            // Cancel — a single "Done" replaces the Cancel/Save & test pair.
-            <EuiFlexGroup justifyContent='flexEnd' responsive={false}>
-              <EuiFlexItem grow={false}>
-                <EuiButton onClick={onClose} fill>
-                  {i18n.translate('wazuhAiAssistant.settings.form.done', {
-                    defaultMessage: 'Done',
-                  })}
-                </EuiButton>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          ) : (
-            <EuiFlexGroup justifyContent='spaceBetween'>
-              <EuiFlexItem grow={false}>
-                <EuiButtonEmpty onClick={requestClose} flush='left'>
-                  {i18n.translate('wazuhAiAssistant.settings.form.cancel', {
-                    defaultMessage: 'Cancel',
-                  })}
-                </EuiButtonEmpty>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <EuiToolTip
-                  content={
-                    apiKeyBlockedByEncryption
-                      ? i18n.translate(
-                          'wazuhAiAssistant.settings.form.encryptionRequiredTooltip',
-                          {
-                            defaultMessage:
-                              'An encryption key must be configured before an API key can be saved.',
-                          },
-                        )
-                      : undefined
-                  }
+          {/* A passing test closes the flyout on its own (see settings-page.tsx's handleSubmit),
+              so `testOutcome` only ever holds a failed/could-not-verify result here — the admin
+              needs to fix the config and retry, so "Save & test" stays available alongside the
+              close action instead of being replaced by a lone "Done". */}
+          <EuiFlexGroup justifyContent='spaceBetween'>
+            <EuiFlexItem grow={false}>
+              <EuiButtonEmpty
+                onClick={testOutcome ? onClose : requestClose}
+                flush='left'
+              >
+                {testOutcome
+                  ? i18n.translate('wazuhAiAssistant.settings.form.done', {
+                      defaultMessage: 'Done',
+                    })
+                  : i18n.translate('wazuhAiAssistant.settings.form.cancel', {
+                      defaultMessage: 'Cancel',
+                    })}
+              </EuiButtonEmpty>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiToolTip
+                content={
+                  apiKeyBlockedByEncryption
+                    ? i18n.translate(
+                        'wazuhAiAssistant.settings.form.encryptionRequiredTooltip',
+                        {
+                          defaultMessage:
+                            'An encryption key must be configured before an API key can be saved.',
+                        },
+                      )
+                    : undefined
+                }
+              >
+                <EuiButton
+                  onClick={handleSave}
+                  isDisabled={apiKeyBlockedByEncryption || isSaving}
+                  isLoading={isSaving}
+                  fill
                 >
-                  <EuiButton
-                    onClick={handleSave}
-                    isDisabled={apiKeyBlockedByEncryption || isSaving}
-                    isLoading={isSaving}
-                    fill
-                  >
-                    {i18n.translate(
-                      'wazuhAiAssistant.settings.form.saveAndTest',
-                      {
-                        defaultMessage: 'Save & test',
-                      },
-                    )}
-                  </EuiButton>
-                </EuiToolTip>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          )}
+                  {i18n.translate(
+                    'wazuhAiAssistant.settings.form.saveAndTest',
+                    {
+                      defaultMessage: 'Save & test',
+                    },
+                  )}
+                </EuiButton>
+              </EuiToolTip>
+            </EuiFlexItem>
+          </EuiFlexGroup>
         </EuiFlyoutFooter>
       </EuiFlyout>
       {showCloseConfirm && (
