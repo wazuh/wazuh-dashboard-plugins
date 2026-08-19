@@ -82,6 +82,13 @@ const POPULATION_DISCLOSURE_EXEMPT: Record<string, string> = {
  * absurd limit, only a value shape every validator in the catalog accepts.
  */
 function sampleValue(name: string, prop: JsonSchemaProperty): unknown {
+  // get_field_values' `field` param is restricted to guardrails.ts's AGG_FIELD_ALLOWLIST.
+  // "wazuh.agent.id" is chosen because its FIELD_LOCATIONS include "events", the family this
+  // file's own generic enum heuristic samples first for `index_family` (alphabetical
+  // `enumValues[0]`).
+  if (name === 'field') {
+    return 'wazuh.agent.id';
+  }
   if ((prop as { jsonString?: true }).jsonString) {
     return JSON.stringify({
       query: {
