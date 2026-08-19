@@ -288,6 +288,134 @@ describe('SettingsPage — field policy filter', () => {
     expect(screen.getByDisplayValue('agent.name')).toBeInTheDocument();
     expect(screen.queryByDisplayValue('source.ip')).not.toBeInTheDocument();
   });
+
+  it('shows a "no matches" message instead of an empty table when the filter matches nothing', async () => {
+    mockService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: false,
+      userCanOverride: true,
+      privacyDefaultPerProvider: {},
+      fieldPolicy: [{ field: 'agent.name', action: 'allow' }],
+      conversationRetentionDays: 0,
+    });
+
+    render(
+      <SettingsPageWithRouter
+        core={coreMock}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=privacy']}
+      />,
+    );
+
+    const filterInput = await screen.findByPlaceholderText(/filter fields/i);
+    // The "Field"/"Action" column heads are table chrome with nothing under them once the
+    // filter matches zero rows — they must go away along with the rows, not linger empty.
+    expect(screen.getByText(/^field$/i)).toBeInTheDocument();
+
+    fireEvent.change(filterInput, { target: { value: 'asdf' } });
+
+    expect(screen.getByText(/0 found/i)).toBeInTheDocument();
+    expect(screen.getByText(/no fields match “asdf”/i)).toBeInTheDocument();
+    expect(screen.queryByText(/^field$/i)).not.toBeInTheDocument();
+    expect(screen.queryByDisplayValue('agent.name')).not.toBeInTheDocument();
+    // The search box and "Add field" stay put — a dead-end filter shouldn't strand the admin.
+    expect(filterInput).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /add field/i }),
+    ).toBeInTheDocument();
+  });
+
+  it('caps the list at 5 rows behind "Show N more"/"Show less" — no collapsible section', async () => {
+    mockService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: false,
+      userCanOverride: true,
+      privacyDefaultPerProvider: {},
+      fieldPolicy: Array.from({ length: 7 }, (_, i) => ({
+        field: `field.${i}`,
+        action: 'allow' as const,
+      })),
+      conversationRetentionDays: 0,
+    });
+
+    render(
+      <SettingsPageWithRouter
+        core={coreMock}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=privacy']}
+      />,
+    );
+
+    // No "Field rules (N)" toggle any more — the search box and rows are visible without a click.
+    await screen.findByPlaceholderText(/filter fields/i);
+    expect(
+      screen.queryByRole('button', { name: /field rules/i }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText(/7 found/i)).toBeInTheDocument();
+    expect(screen.getAllByPlaceholderText(/e\.g\. agent\.name/i)).toHaveLength(
+      5,
+    );
+    expect(
+      screen.queryByRole('button', { name: /show less/i }),
+    ).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /show 2 more/i }));
+
+    expect(screen.getAllByPlaceholderText(/e\.g\. agent\.name/i)).toHaveLength(
+      7,
+    );
+    expect(
+      screen.queryByRole('button', { name: /show .* more/i }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByDisplayValue('field.0')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /show less/i }));
+
+    // Back to 5 — but the first 5 (including field.0) were never the ones hidden.
+    expect(screen.getAllByPlaceholderText(/e\.g\. agent\.name/i)).toHaveLength(
+      5,
+    );
+    expect(screen.getByDisplayValue('field.0')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /show 2 more/i }),
+    ).toBeInTheDocument();
+  });
+
+  it('"Add field" reveals only its own new row, not the rest of a collapsed list', async () => {
+    mockService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: false,
+      userCanOverride: true,
+      privacyDefaultPerProvider: {},
+      fieldPolicy: Array.from({ length: 7 }, (_, i) => ({
+        field: `field.${i}`,
+        action: 'allow' as const,
+      })),
+      conversationRetentionDays: 0,
+    });
+
+    render(
+      <SettingsPageWithRouter
+        core={coreMock}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=privacy']}
+      />,
+    );
+
+    await screen.findByPlaceholderText(/filter fields/i);
+    expect(screen.getAllByPlaceholderText(/e\.g\. agent\.name/i)).toHaveLength(
+      5,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /add field/i }));
+
+    // 5 existing rows still capped + the 1 new blank row — 6, NOT all 8. Clicking "Add field"
+    // must never dump the rest of an already-collapsed list onto the screen.
+    const rows = screen.getAllByPlaceholderText(/e\.g\. agent\.name/i);
+    expect(rows).toHaveLength(6);
+    expect(rows[rows.length - 1]).toHaveValue('');
+    // "Show N more" still offers the 2 existing rows that stayed hidden (7 existing - 5 visible).
+    expect(
+      screen.getByRole('button', { name: /show 2 more/i }),
+    ).toBeInTheDocument();
+  });
 });
 
 // Symmetry pass (iteration-4 batch 2 item 5): the per-field action select drops `allow-scan` from
@@ -364,9 +492,7 @@ describe('SettingsPage — field policy action select (symmetry pass, item 5)', 
     fireEvent.click(
       switchLabel.closest('.euiSwitch')!.querySelector('[role="switch"]')!,
     );
-    fireEvent.click(
-      screen.getByRole('button', { name: /save privacy settings/i }),
-    );
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
 
     await waitFor(() =>
       expect(mockService.updateAssistantSettings).toHaveBeenCalled(),
@@ -391,9 +517,7 @@ describe('SettingsPage — field policy action select (symmetry pass, item 5)', 
       name: /^action$/i,
     });
     fireEvent.change(actionSelect, { target: { value: 'anonymize' } });
-    fireEvent.click(
-      screen.getByRole('button', { name: /save privacy settings/i }),
-    );
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
 
     await waitFor(() =>
       expect(mockService.updateAssistantSettings).toHaveBeenCalled(),
@@ -996,9 +1120,7 @@ describe('SettingsPage — per-provider privacy override (UX iteration 4 item 3)
       name: /privacy override for alpha/i,
     });
     fireEvent.change(alphaSelect, { target: { value: 'on' } });
-    fireEvent.click(
-      screen.getByRole('button', { name: /save privacy settings/i }),
-    );
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
 
     await waitFor(() =>
       expect(mockService.updateAssistantSettings).toHaveBeenCalled(),
@@ -1020,9 +1142,7 @@ describe('SettingsPage — per-provider privacy override (UX iteration 4 item 3)
       name: /privacy override for beta/i,
     });
     fireEvent.change(betaSelect, { target: { value: 'off' } });
-    fireEvent.click(
-      screen.getByRole('button', { name: /save privacy settings/i }),
-    );
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
 
     await waitFor(() =>
       expect(mockService.updateAssistantSettings).toHaveBeenCalled(),
@@ -1048,9 +1168,7 @@ describe('SettingsPage — per-provider privacy override (UX iteration 4 item 3)
     });
     expect(alphaSelect).toHaveValue('on');
     fireEvent.change(alphaSelect, { target: { value: 'inherit' } });
-    fireEvent.click(
-      screen.getByRole('button', { name: /save privacy settings/i }),
-    );
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
 
     await waitFor(() =>
       expect(mockService.updateAssistantSettings).toHaveBeenCalled(),
@@ -1072,9 +1190,7 @@ describe('SettingsPage — per-provider privacy override (UX iteration 4 item 3)
       name: /privacy override for alpha/i,
     });
     fireEvent.change(alphaSelect, { target: { value: 'on' } });
-    fireEvent.click(
-      screen.getByRole('button', { name: /save privacy settings/i }),
-    );
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
     await waitFor(() =>
       expect(mockService.updateAssistantSettings).toHaveBeenCalledTimes(1),
     );
@@ -1087,9 +1203,7 @@ describe('SettingsPage — per-provider privacy override (UX iteration 4 item 3)
       name: /privacy override for beta/i,
     });
     fireEvent.change(betaSelect, { target: { value: 'off' } });
-    fireEvent.click(
-      screen.getByRole('button', { name: /save privacy settings/i }),
-    );
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
     await waitFor(() =>
       expect(mockService.updateAssistantSettings).toHaveBeenCalledTimes(2),
     );
@@ -1171,7 +1285,7 @@ describe('SettingsPage — in-card layout and hierarchy (audit §4)', () => {
    * caption TEXT and the control's ROLE are the hooks that do hold — and they are what these
    * assertions are actually about, which is which column a block sits in.
    */
-  it('lays the privacy controls and the field policy out as two columns', async () => {
+  it('splits privacy into three stacked full-width cards instead of a two-column layout', async () => {
     render(
       <SettingsPageWithRouter
         core={coreMock}
@@ -1183,13 +1297,24 @@ describe('SettingsPage — in-card layout and hierarchy (audit §4)', () => {
       /enable privacy mode by default/i,
     );
 
-    // One flex row holding both: the switches in the first item, the field-policy editor in the
-    // second. Left as EUI's responsive default (this file's other flex rows pass
-    // `responsive={false}`), so a narrow window stacks the two columns instead of squeezing them.
-    const row = switchCaption.closest('.euiFlexGroup') as HTMLElement;
-    expect(row).not.toBeNull();
-    expect(row.textContent).toContain('Field policy');
-    expect(row.className).toMatch(/responsive/i);
+    // Each topic now owns its own bordered `.wzSettingsCard` instead of sharing one two-column
+    // flex row, so the switches' card carries no trace of the field-policy editor next to it.
+    const switchCard = switchCaption.closest('.wzSettingsCard') as HTMLElement;
+    expect(switchCard).not.toBeNull();
+    expect(switchCard.textContent).not.toContain('Field policy');
+
+    // The three cards read top to bottom in the same order the page always explained them in.
+    // Scoped to the privacy tab's own wrapper (the switch card's parent) so the Providers and
+    // Retention tabs' own cards — mounted but hidden, not unmounted (design B1) — never leak in.
+    const tabWrapper = switchCard.parentElement as HTMLElement;
+    const pills = Array.from(
+      tabWrapper.querySelectorAll('.wzSettingsCard__pill'),
+    ).map(pill => pill.textContent);
+    expect(pills).toEqual([
+      'Global settings',
+      'Field policy',
+      'Per-provider override',
+    ]);
   });
 
   it('puts the retention field and its explanation side by side', async () => {
@@ -1242,11 +1367,46 @@ describe('SettingsPage — in-card layout and hierarchy (audit §4)', () => {
     fireEvent.click(
       screen.getByRole('tab', { name: /privacy & data protection/i }),
     );
-    const privacySave = await screen.findByRole('button', {
-      name: /save privacy settings/i,
-    });
-    expect(privacySave).toBeDisabled();
-    expect(privacySave.className).not.toMatch(/fill/i);
+    // Privacy's own Save moved into a bottom bar (indexer-settings/index.tsx's pattern) that
+    // only mounts once there is something to save — so, unlike Retention's inline (and always
+    // rendered, just disabled) button, nothing has been edited here yet means no bar at all.
+    await screen.findByText(/enable privacy mode by default/i);
+    expect(
+      screen.queryByRole('button', { name: /save changes/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows the privacy bottom bar only while there is something unsaved, and Cancel discards it', async () => {
+    render(
+      <SettingsPageWithRouter
+        core={coreMock}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=privacy']}
+      />,
+    );
+
+    const switchLabel = await screen.findByText(
+      /enable privacy mode by default/i,
+    );
+    expect(
+      screen.queryByRole('button', { name: /save changes/i }),
+    ).not.toBeInTheDocument();
+
+    fireEvent.click(
+      switchLabel.closest('.euiSwitch')!.querySelector('[role="switch"]')!,
+    );
+
+    const save = await screen.findByRole('button', { name: /save changes/i });
+    expect(save).toBeEnabled();
+    expect(save.className).toMatch(/fill/i);
+    expect(screen.getByText(/you have unsaved changes/i)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /cancel changes/i }));
+
+    // Reset back to the loaded value, so nothing is dirty and the bar is gone again.
+    expect(
+      screen.queryByRole('button', { name: /save changes/i }),
+    ).not.toBeInTheDocument();
   });
 
   it('keeps the section cards, their descriptions and their rules on one measure', () => {
