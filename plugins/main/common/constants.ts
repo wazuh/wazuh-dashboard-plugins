@@ -36,7 +36,7 @@ export const WAZUH_METRICS_AGENTS_PATTERN = 'wazuh-metrics-agents*';
 
 // Job - Wazuh metrics comms
 export const WAZUH_INDEX_TYPE_METRICS_COMMS = 'metrics-comms';
-export const WAZUH_METRICS_COMMS_PATTERN = 'wazuh-metrics-comms*';
+export const WAZUH_METRICS_COMMS_PATTERN = 'wazuh-metrics-comms-v4*';
 
 // Job - Wazuh metrics normalization
 export const WAZUH_INDEX_TYPE_METRICS_NORMALIZATION = 'metrics-normalization';
