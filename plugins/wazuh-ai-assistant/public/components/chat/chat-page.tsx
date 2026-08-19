@@ -2997,7 +2997,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                           <EuiIconTip
                             type='iInCircle'
                             color='subdued'
-                            size='s'
+                            /* `size='s'` renders this 16px-grid glyph below its native size, so the
+                               thin circle stroke falls between device pixels and reads blurry next
+                               to the crisp pill. `m` is the glyph's own 16px grid — crisp — and
+                               still discrete beside the 32px privacy chip. */
+                            size='m'
                             aria-label={i18n.translate(
                               'wazuhAiAssistant.chat.privacy.explainerAriaLabel',
                               {
