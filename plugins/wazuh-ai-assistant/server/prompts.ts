@@ -210,5 +210,33 @@ export function buildSystemPrompt(nowIso: string): string {
       'answer first, in your own words, saying plainly what you checked and what you could not ' +
       'confirm — never invent or assume the missing rows — then call suggest_discover_query so ' +
       'the user gets a Discover link instead of a dead end.',
+    // Workstream B ("verify before filter"): AI/plan/qa-rules-decoders-rootcause.md's root cause
+    // for "the assistant can't show rules or decoders" was never routing or missing data — it was
+    // filtering on a GUESSED value with no way to check it first. get_field_values closes that
+    // gap; this instruction is what actually sends the model there instead of guessing.
+    'Before filtering on a value that is not a fixed, already-documented enum (a parameter\'s own ' +
+      '`enum` list, or a value you already saw in an earlier tool result this turn, needs no ' +
+      'check) — a rule level, a check result, an OS name, a category word the user said in their ' +
+      'own words — call get_field_values first if it is available to you this turn, to see the ' +
+      'real values instead of guessing a spelling/casing/synonym. If a filtered call still comes ' +
+      'back with zero rows for something that plausibly exists, call get_field_values on that ' +
+      'same field before concluding it does not exist — a zero-row result proves the FILTER VALUE ' +
+      'did not match, not that the data is absent, and those are different findings to report.',
+    // Honest-empty distinction: the same root-cause report's Q4 witness ("no dedicated Linux rule
+    // set" when logsource.product=linux had 2 rules) was exactly this confusion stated as fact.
+    'Keep these two statements distinct and never substitute one for the other: "field X is ' +
+      'unpopulated/empty in your data" (you checked — e.g. with get_field_values, or a prior tool ' +
+      'result already showed the field absent or always empty — and confirmed no document ' +
+      'carries a value for it) versus "no documents match your filter" (the field may be fine; ' +
+      'your specific filter value simply matched nothing). Only make the first claim when you ' +
+      'have that kind of direct evidence; otherwise describe the second, narrower fact.',
+    // Inter-round narration: kept separate from the answer-format rule above (which governs the
+    // FINAL answer) — this governs what, if anything, is shown to the user WHILE tool rounds are
+    // still in progress.
+    'Between tool-calling rounds, any status update you produce for the user must be at most one ' +
+      'short, action-oriented line (e.g. "Checking which rule levels exist before filtering." or ' +
+      '"Zero rows — verifying the field actually holds that value.") — never longer, never more ' +
+      'than one line, and never a guess or speculation about what a field is probably named or ' +
+      'what a value probably is; state only what you already checked or are about to check next.',
   ].join('\n');
 }

@@ -20,13 +20,19 @@ test('resolveStage2Tools(general) returns the minimal set, never undefined/empty
   const specs = resolveStage2Tools(['general']);
   assert.ok(Array.isArray(specs), 'must return an array, never undefined');
   const names = specs.map(spec => spec.name).sort();
-  assert.deepEqual(names, ['get_security_summary', 'search_wazuh_data']);
+  // get_field_values joins search_wazuh_data as an always-on tool (workstream B, "verify before
+  // filter") -- see router.ts's TOOL_CATEGORY/resolveStage2Tools doc comments.
+  assert.deepEqual(names, [
+    'get_field_values',
+    'get_security_summary',
+    'search_wazuh_data',
+  ]);
 });
 
 test('resolveStage2Tools: a data category resolution is unchanged', () => {
   const specs = resolveStage2Tools(['agents']);
   const names = specs.map(spec => spec.name).sort();
-  assert.deepEqual(names, ['get_agents', 'search_wazuh_data']);
+  assert.deepEqual(names, ['get_agents', 'get_field_values', 'search_wazuh_data']);
 });
 
 test('resolveStage2Tools: general + a data category still resolves that category', () => {
@@ -117,7 +123,11 @@ test('CO_ROUTED_CATEGORIES: every pair is symmetric and names a real category (c
 
 test('every general-alone turn still gets the minimal recovery set, unchanged by co-routing', () => {
   const names = resolveStage2Tools(['general']).map(spec => spec.name);
-  assert.deepEqual(names.sort(), ['get_security_summary', 'search_wazuh_data']);
+  assert.deepEqual(names.sort(), [
+    'get_field_values',
+    'get_security_summary',
+    'search_wazuh_data',
+  ]);
 });
 test('the "findings" category description mentions top/noisiest agents (get_top_agents routing)', () => {
   // Pins get_top_agents' routing hint in TOOL_CATEGORY/CATEGORY_DESCRIPTIONS -- with no test, this

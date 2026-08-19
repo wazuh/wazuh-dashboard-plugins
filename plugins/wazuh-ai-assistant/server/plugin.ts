@@ -12,6 +12,7 @@ import { ApiKeyCipher, parseEncryptionKey } from './crypto/api-key-cipher';
 import { WazuhAiAssistantConfigType } from './config';
 import { createAssistantSettingsManager } from './settings/route-handler-context';
 import { AiProvidersClient } from './settings/ai-providers-client';
+import { runFieldDriftCanary, MappingClient } from './tools/field-drift-canary';
 import {
   WazuhAiAssistantPluginSetup,
   WazuhAiAssistantPluginSetupDependencies,
@@ -103,8 +104,28 @@ export class WazuhAiAssistantPlugin
     return {};
   }
 
-  public start(_core: CoreStart): WazuhAiAssistantPluginStart {
+  public start(core: CoreStart): WazuhAiAssistantPluginStart {
     this.logger.debug('wazuhAiAssistant: start');
+
+    // Workstream B, deliverable 3: a one-shot, timeout-bounded live check that the field catalog
+    // (common/field-catalog.ts) and the tool catalog's aggregation allowlist (guardrails.ts's
+    // AGG_FIELD_ALLOWLIST) still match what the Indexer actually maps -- logs a
+    // "[field-drift]" warning per stale field instead of that drift only ever surfacing as a
+    // silent zero-row/zero-bucket tool answer. `core.opensearch.client.asInternalUser` is the
+    // standard OSD background-job client (no per-request context exists at plugin start; the
+    // reference `main` plugin's own `jobInitializeRun`/`start/initialize/index.ts` uses the exact
+    // same client off CoreStart for its own startup-time Indexer calls). Deliberately NOT
+    // awaited: `runFieldDriftCanary` races its own internal timeout and swallows every error, so
+    // it must never be allowed to delay plugin start regardless of indexer health.
+    // Cast rather than relying on structural assignability against the real (much wider) OSD
+    // OpenSearch client type: `MappingClient` only declares the one method this canary calls, and
+    // matching it exactly against every overload of the real client's `indices.getMapping` is
+    // more fragile than asserting the one call shape this module actually uses.
+    runFieldDriftCanary(
+      core.opensearch.client.asInternalUser as unknown as MappingClient,
+      this.logger.get('field-drift'),
+    );
+
     return {};
   }
 

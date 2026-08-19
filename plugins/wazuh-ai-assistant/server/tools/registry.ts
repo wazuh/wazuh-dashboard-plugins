@@ -31,6 +31,7 @@ import { getThreatIntelComponentsTool } from './catalog/get-threat-intel-compone
 import { getDetectorsTool } from './catalog/get-detectors';
 import { findDocumentByFieldTool } from './catalog/find-document-by-field';
 import { searchWazuhDataTool } from './catalog/search-wazuh-data';
+import { getFieldValuesTool } from './catalog/get-field-values';
 
 /**
  * In-process tool catalog: declarative objects loaded at import
@@ -98,6 +99,12 @@ const CATALOG: ToolDefinition[] = [
 
   // Generic exact-ID lookup (document _id or a business-level UUID field, tried automatically)
   findDocumentByFieldTool,
+
+  // Cheap discovery tool (workstream B): "what values does this field actually hold" -- meant to
+  // be called BEFORE a filtered call whose value is a guess, not after. Available broadly (see
+  // router.ts's TOOL_CATEGORY): it is not scoped to one data family, since the "verify before
+  // filter" need cuts across all of them.
+  getFieldValuesTool,
 
   // Escape hatch — last resort, kept last so the typed tools are listed first.
   searchWazuhDataTool,

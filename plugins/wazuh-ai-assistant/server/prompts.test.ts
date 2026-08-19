@@ -307,3 +307,58 @@ test('buildSystemPrompt: the verbatim-identifier rule does not contradict docume
   assert.match(prompt, /report every row a tool like that actually returns/);
   assert.match(prompt, /not you substituting a different\s+one/);
 });
+
+// Workstream B ("verify before filter" / honest-empty / inter-round narration) --
+// AI/plan/qa-rules-decoders-rootcause.md's root cause for "the assistant can't show rules or
+// decoders" was filtering on a guessed value with no way to check it first, and confusing a
+// zero-row filtered result with the field itself being empty.
+
+test('buildSystemPrompt: instructs the model to call get_field_values before filtering on an unverified value', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /call get_field_values first if it is available to you this turn/,
+  );
+  assert.match(
+    prompt,
+    /needs no\s+check/,
+    'a documented enum or an already-seen value must be exempted from the check',
+  );
+});
+
+test('buildSystemPrompt: instructs the model to verify a field\'s real values after a zero-row filtered result, before concluding absence', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /call get_field_values on that\s+same field before concluding it does not exist/,
+  );
+  assert.match(
+    prompt,
+    /did not match, not that the data is absent/,
+  );
+});
+
+test('buildSystemPrompt: keeps "field is unpopulated" and "no documents match" as distinct, non-substitutable statements', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /"field X is\s+unpopulated\/empty in your data"/,
+  );
+  assert.match(prompt, /"no documents\s+match your filter"/);
+  assert.match(
+    prompt,
+    /Only make the first claim when you\s+have that kind of direct evidence/,
+  );
+});
+
+test('buildSystemPrompt: caps inter-round status narration to one terse, action-oriented, non-speculative line', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /any status update you produce for the user must be at most one\s+short/,
+  );
+  assert.match(
+    prompt,
+    /never a guess or speculation about what a field is probably named or\s+what a value probably is/,
+  );
+});

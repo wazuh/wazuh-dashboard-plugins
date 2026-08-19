@@ -463,6 +463,26 @@ const AGG_FIELD_ALLOWLIST = new Set([
 ]);
 
 /**
+ * Read-only accessor for `AGG_FIELD_ALLOWLIST` (workstream B, get_field_values -- server/tools/
+ * catalog/get-field-values.ts): that tool must refuse a `field` this allowlist would reject
+ * anyway, with a helpful message, INSTEAD OF letting the call reach `lintDsl`/`checkAggs` and come
+ * back as an opaque guardrail rejection -- the same "fail with a useful message, not a generic
+ * guardrail error" shape every other typed tool's own parameter validation already gets. Kept as
+ * a function rather than exporting the `Set` itself so this file stays the only place that can
+ * mutate the allowlist.
+ */
+export function isAggAllowedField(field: string): boolean {
+  return AGG_FIELD_ALLOWLIST.has(field);
+}
+
+/** The allowlist's members as a stable, sorted array -- for `get_field_values`'s "closest known
+ * field" suggestion when a caller's `field` is not on the list (a plain prefix/substring scan
+ * needs something iterable; the `Set` itself is fine for membership checks but awkward to scan). */
+export function listAggAllowedFields(): string[] {
+  return [...AGG_FIELD_ALLOWLIST].sort();
+}
+
+/**
  * Exact-match ID lookup fields shared by `find_document_by_field` (and any `term`/`terms`/`ids`
  * query shaped the same way, including the search_wazuh_data escape hatch — see
  * `isExactIdLookupQuery` below): high-selectivity business-level UUID fields, distinct from the

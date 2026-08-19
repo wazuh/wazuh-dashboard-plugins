@@ -107,6 +107,13 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   // free_search (escape hatch + generic ID lookup)
   find_document_by_field: 'free_search',
   search_wazuh_data: 'free_search',
+  // get_field_values (workstream B) is the "verify before filter" discovery tool: it is useful
+  // regardless of which data family a question ultimately routes to (a bad guess at a rule level,
+  // a check result, an OS name can happen from any category), so -- like search_wazuh_data -- it
+  // is always appended to the resolved tool list in `resolveStage2Tools` below rather than gated
+  // behind one category. Filed under 'free_search' here only for `assertRegistryConsistency`'s
+  // bookkeeping and documentation; the always-on behavior is what actually makes it reachable.
+  get_field_values: 'free_search',
 };
 
 /** Fixed menu order for both the enum on the wire and the routing prompt's category list. */
@@ -368,6 +375,9 @@ export function resolveStage2Tools(categories: string[]): ToolSpec[] {
   // Always-on escape hatch, deduped via the Set regardless of whether
   // `free_search` was itself one of the routed categories.
   toolNames.add('search_wazuh_data');
+  // Always-on discovery tool (workstream B) -- see TOOL_CATEGORY's get_field_values entry above
+  // for why this mirrors search_wazuh_data's unconditional placement instead of a category gate.
+  toolNames.add('get_field_values');
 
   const specs: ToolSpec[] = [];
   for (const name of toolNames) {
