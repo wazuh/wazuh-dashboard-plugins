@@ -259,13 +259,35 @@ const MAX_FIELD_VALUE_LENGTH = 500;
  * than allowed to crowd out the data it annotates. */
 const MAX_HINT_LENGTH = 1000;
 
-function getByPath(source: Record<string, unknown>, path: string): unknown {
-  return path.split('.').reduce<unknown>((acc, segment) => {
-    if (acc && typeof acc === 'object' && !Array.isArray(acc)) {
-      return (acc as Record<string, unknown>)[segment];
+/**
+ * Resolves one dotted path segment-by-segment against `source`. Unlike a plain reduce, a segment
+ * hit on an ARRAY does not stop resolution (P-2, AI/plan/a1a-review.md — "getByPath must traverse
+ * arrays"): it maps the REMAINING path over every array element and returns the array of
+ * per-element results, so e.g. `"queries.id"` resolves through the `queries` array (one entry per
+ * SAP finding's compiled query) instead of returning `undefined` the moment the walk reaches the
+ * array, and `"wazuh.agent.host.ip"` resolves to the real IP array instead of vanishing before the
+ * field policy ever sees it. A nested array-of-arrays result is left as an array of arrays rather
+ * than flattened — no field shape reachable today produces one, and flattening would blur which
+ * element came from which parent. Object/scalar segments resolve exactly as before this fix.
+ */
+export function getByPath(source: unknown, path: string): unknown {
+  const segments = path.split('.');
+  function resolve(value: unknown, index: number): unknown {
+    if (index >= segments.length) {
+      return value;
+    }
+    if (Array.isArray(value)) {
+      return value.map(item => resolve(item, index));
+    }
+    if (value && typeof value === 'object') {
+      return resolve(
+        (value as Record<string, unknown>)[segments[index]],
+        index + 1,
+      );
     }
     return undefined;
-  }, source);
+  }
+  return resolve(source, 0);
 }
 
 /**

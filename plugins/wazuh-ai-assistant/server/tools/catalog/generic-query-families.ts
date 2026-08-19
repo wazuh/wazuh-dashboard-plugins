@@ -76,7 +76,10 @@ const A1A_FAMILIES: GenericQueryFamily[] = [
   },
   {
     pattern: '.opensearch-sap-pre-packaged-rules-config',
-    label: 'the pre-packaged Sigma detection-rule catalog Security Analytics ships with',
+    label:
+      'the pre-packaged Sigma detection-rule catalog Security Analytics ships with — fields are ' +
+      'nested under rule.* (rule.metadata.title/author, rule.category, rule.level, rule.status, ' +
+      'rule.queries.value), NOT document.*',
   },
   {
     pattern: '.opensearch-sap-correlation-metadata',
@@ -90,7 +93,9 @@ const A1A_FAMILIES: GenericQueryFamily[] = [
     pattern: 'wazuh-threatintel-enrichments-a',
     label:
       'the IOC enrichment feed (known-malicious domain/hash/IP indicators from third-party threat ' +
-      'intel — NOT the customer\'s own observed network data)',
+      'intel — NOT the customer\'s own observed network data); the indicator VALUE is ' +
+      'document.name and its kind is document.type (e.g. hash_sha256, url_domain, connection) — ' +
+      'root hash.sha256 is the RECORD\'S OWN content hash, not the indicator',
   },
 ];
 

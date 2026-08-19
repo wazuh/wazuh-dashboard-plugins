@@ -373,17 +373,59 @@ test('buildSystemPrompt: instructs the model to prefer a typed tool but reach fo
   );
 });
 
-test('buildSystemPrompt: narrows the unanswerable-question list to exactly five named classes', () => {
+test('buildSystemPrompt: names exactly five classes with EXACT required decline copy', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
-    /Only FIVE classes of question have NO tool that can answer them at all/,
+    /These FIVE classes of question have exact required decline copy/,
   );
   assert.match(prompt, /1\. Simulating or tracing decode\/rule evaluation/);
   assert.match(prompt, /2\. Actions — restarting an agent/);
   assert.match(prompt, /3\. RBAC \/ spaces admin troubleshooting/);
   assert.match(prompt, /4\. Another user's chat history/);
   assert.match(prompt, /5\. Authoring — drafting or generating a new rule/);
+});
+
+// P-8/P-9 (AI/plan/a1a-review.md): the five classes above have EXACT required copy, but the
+// coverage-validation-design.md §3 decline inventory has ~20 rows -- the still-valid data-gap
+// declines this workstream's widened search_wazuh_data enum does NOT close must stay in the
+// prompt, verbatim, so the model is never left thinking only five things are unanswerable.
+test('buildSystemPrompt: still names the data-gap declines this workstream does not close, verbatim', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /raw, un-normalized event archive/);
+  assert.match(
+    prompt,
+    /I can't see or\s+explain the specific chart or panel you're looking at/,
+  );
+  assert.match(
+    prompt,
+    /I can show techniques we've actually seen triggered, but I don't have a way\s+to compare that against the full ATT&CK matrix/,
+  );
+  assert.match(
+    prompt,
+    /I can summarize compliance\s+findings, but I can't generate a formatted audit report/,
+  );
+  assert.match(
+    prompt,
+    /I can't\s+compare your custom rules against the 4\.x ruleset for compatibility/,
+  );
+  assert.match(
+    prompt,
+    /I can't check integration health directly/,
+  );
+  assert.match(prompt, /I don't have alert data for that detector/);
+  assert.match(
+    prompt,
+    /I can show you which rule is generating the most alerts, but I\s+can't change a rule's threshold or level/,
+  );
+  assert.match(
+    prompt,
+    /I don't\s+have a way to filter or aggregate on that field yet/,
+  );
+  assert.match(
+    prompt,
+    /That's outside what I can help with here/,
+  );
 });
 
 test('buildSystemPrompt: decline copy itself (the quoted user-facing sentences) never mentions tiers, roadmap status, or internal workstream codenames', () => {

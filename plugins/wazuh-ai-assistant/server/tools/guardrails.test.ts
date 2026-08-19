@@ -1238,6 +1238,21 @@ test('checkIndexAllowlist: rejects .opensearch-sap-correlation-alerts/-history (
   );
 });
 
+// P-10 (AI/plan/a1a-review.md): the wildcard suffix used to be `[^,\s]*`, which let `/` and `.`
+// through -- so a path-traversal-shaped value could match the regex even though it is not
+// reachable via search_wazuh_data's own JSON-schema `enum` today. Tightened to the explicit
+// index-name charset; this pins that the standalone boundary now rejects it directly too.
+test('checkIndexAllowlist: rejects a path-traversal-shaped value even though the leading segment is allowlisted', () => {
+  assert.equal(
+    checkIndexAllowlist('wazuh-findings-v5-*/../.opendistro_security').ok,
+    false,
+  );
+  assert.equal(
+    checkIndexAllowlist('.opensearch-sap-suricata/../-findings').ok,
+    false,
+  );
+});
+
 // --- applySafetyValves ------------------------------------------------------------------------
 
 test('applySafetyValves: clamps size to <= 500', () => {

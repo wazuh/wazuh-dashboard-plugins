@@ -1741,7 +1741,11 @@ test('applyFieldPolicy: search_wazuh_data keeps wazuh-metrics-agents identity/OS
         'wazuh.agent.status': 'active',
         'wazuh.agent.version': 'v5.0.0',
         'wazuh.agent.host.os.platform': 'ubuntu',
-        'wazuh.agent.groups': 'default',
+        // P-2 (AI/plan/a1a-review.md): real docs carry this as an ARRAY
+        // ("wazuh-metrics-agents": `{"agent":{"groups":["default"]}}`), not the bare string the
+        // pre-review test asserted (a shape real data never produces) -- 'allow' means unscanned
+        // passthrough regardless of shape, so the array survives untouched.
+        'wazuh.agent.groups': ['default'],
         'wazuh.agent.register.ip': '203.0.113.7',
       },
     ],
@@ -1757,8 +1761,84 @@ test('applyFieldPolicy: search_wazuh_data keeps wazuh-metrics-agents identity/OS
   assert.equal(out.samples[0]['wazuh.agent.status'], 'active');
   assert.equal(out.samples[0]['wazuh.agent.version'], 'v5.0.0');
   assert.equal(out.samples[0]['wazuh.agent.host.os.platform'], 'ubuntu');
-  assert.equal(out.samples[0]['wazuh.agent.groups'], 'default');
+  assert.deepEqual(out.samples[0]['wazuh.agent.groups'], ['default']);
   assert.match(out.samples[0]['wazuh.agent.register.ip'] as string, /^IP_\d+$/);
+});
+
+// --- P-2 (AI/plan/a1a-review.md): array/object privacy bypass regression tests -----------------
+
+test('P-2 regression: an array-valued anonymize field is anonymized element-wise, not passed through raw', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'search_wazuh_data',
+    samples: [
+      {
+        // Real shape on wazuh-metrics-agents: "host": {"ip": ["127.0.0.1", "10.0.0.5"]}.
+        [WAZUH_FIELD.AGENT_IP]: ['127.0.0.1', '10.0.0.5'],
+      },
+    ],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    'search_wazuh_data',
+    true,
+  );
+  const scrubbed = out.samples[0][WAZUH_FIELD.AGENT_IP] as string[];
+  assert.equal(scrubbed.length, 2);
+  assert.match(scrubbed[0], /^IP_\d+$/);
+  assert.match(scrubbed[1], /^IP_\d+$/);
+  assert.notEqual(scrubbed[0], scrubbed[1]);
+  assert.doesNotMatch(JSON.stringify(scrubbed), /127\.0\.0\.1|10\.0\.0\.5/);
+});
+
+test('P-2 regression: an unlisted object value under the escape hatch fail-closed default is omitted, not passed through raw', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'search_wazuh_data',
+    samples: [
+      {
+        // Real shape when `_source: ["document"]` is requested on
+        // .wazuh-threatintel-vulnerabilities-a: `document` itself has no policy entry (only its
+        // dotted children do), so under fail-closed it must be omitted, never shipped raw.
+        document: { unlistedNested: 'attacker-influenced free text' },
+      },
+    ],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    'search_wazuh_data',
+    true,
+  );
+  assert.equal('document' in out.samples[0], false);
+});
+
+test('P-2 regression: an unlisted non-empty array of objects under the escape hatch fail-closed default is omitted', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'search_wazuh_data',
+    samples: [
+      {
+        // Real shape when `_source: ["queries"]` is requested on an .opensearch-sap-*-findings
+        // document: `queries` itself is an array of objects with no bare policy entry.
+        queries: [{ id: 'q1', query: 'srcip:1.2.3.4' }],
+      },
+    ],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    'search_wazuh_data',
+    true,
+  );
+  assert.equal('queries' in out.samples[0], false);
 });
 
 test('applyFieldPolicy: search_wazuh_data keeps CTI status fields (.wazuh-cti-consumers) readable', () => {

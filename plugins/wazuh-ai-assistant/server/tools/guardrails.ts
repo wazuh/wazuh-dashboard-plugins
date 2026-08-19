@@ -212,8 +212,16 @@ const MAX_TREE_DEPTH = 100;
 // family -- OpenSearch Security Analytics' own config store for detector definitions, confirmed
 // live to be indexer-reachable and to hold no analyst/attacker-supplied data (name/type/schedule/
 // enabled/source, all vendor- or admin-configured).
+// P-10 (AI/plan/a1a-review.md): the wildcard suffix was `[^,\s]*`, which excludes only a comma or
+// whitespace -- permitting `/` and `.` through, so a crafted value like
+// "wazuh-findings-v5-*/../.opendistro_security" matched this regex (unreachable via
+// search_wazuh_data today because schema-validator.ts's `enum` is the actual gate on that
+// parameter, but this function is documented as a standalone boundary and
+// suggest-discover-query.ts also calls it directly). Tightened to the explicit index-name
+// charset OpenSearch itself allows (letters/digits/`._-*`), which cannot express a
+// path-traversal segment or smuggle a second index name.
 const INDEX_ALLOWLIST_RE =
-  /^wazuh-(events-v5|findings-v5|states|threatintel-(rules|decoders|integrations|policies|filters|kvdbs)|metrics)[^,\s]*$|^wazuh-threatintel-enrichments-a$|^\.opensearch-sap-detectors-config$|^\.opensearch-sap-pre-packaged-rules-config$|^\.opensearch-sap-correlation-metadata$|^\.opensearch-sap-[^,\s]*-findings$|^\.wazuh-cti-consumers$|^\.wazuh-content-manager-jobs$|^\.wazuh-threatintel-vulnerabilities-a$/;
+  /^wazuh-(events-v5|findings-v5|states|threatintel-(rules|decoders|integrations|policies|filters|kvdbs)|metrics)[A-Za-z0-9._*-]*$|^wazuh-threatintel-enrichments-a$|^\.opensearch-sap-detectors-config$|^\.opensearch-sap-pre-packaged-rules-config$|^\.opensearch-sap-correlation-metadata$|^\.opensearch-sap-[A-Za-z0-9._*-]*-findings$|^\.wazuh-cti-consumers$|^\.wazuh-content-manager-jobs$|^\.wazuh-threatintel-vulnerabilities-a$/;
 
 /** The escape hatch's (and every catalog tool's) index-pattern allowlist. */
 export function checkIndexAllowlist(index: string): GuardrailCheck {

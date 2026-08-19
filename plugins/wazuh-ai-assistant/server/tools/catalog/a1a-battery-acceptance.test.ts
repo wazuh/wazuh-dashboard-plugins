@@ -122,16 +122,26 @@ test('CV-049: "is IP/hash/URL X known-malicious" is answerable via search_wazuh_
   assert.ok(
     GENERIC_QUERY_INDEX_PATTERNS.includes('wazuh-threatintel-enrichments-a'),
   );
+  // P-5 (AI/plan/a1a-review.md): the indicator VALUE lives in `document.name`, not `hash.sha256` --
+  // that root field is the RECORD'S OWN content hash (a sibling of `document`, e.g.
+  // `{"hash":{"sha256":"4321..."}, "document":{"name":"<the actual indicator>", "type":
+  // "hash_sha256"}}`), unrelated to the indicator being looked up. A `term` filter on `hash.sha256`
+  // lints clean and passes this test, but against real data it returns 0 hits forever -- this
+  // exemplar previously filtered the wrong field. Filtering `document.name` (with `document.type`
+  // narrowing to the indicator kind) is what actually matches the live terms-agg population
+  // (`document.type`: url_domain 107,653 / connection 95,252 / url_full 28,704 / hash_sha256
+  // 10,734 / hash_md5 8,167 / hash_sha1 6,559).
   const { index } = buildAndValidate('wazuh-threatintel-enrichments-a', {
     query: {
       bool: {
         filter: [
           {
             term: {
-              'hash.sha256':
+              'document.name':
                 '43213038f6dd23be380e9ee07e339e33b27a1da94ebd6e35af3258d2f1374951',
             },
           },
+          { term: { 'document.type': 'hash_sha256' } },
         ],
       },
     },
