@@ -700,6 +700,16 @@ export function extractEnumeratedTargets(
   const tokens = match[1]
     .split(/,|\band\b/i)
     .map(token => token.trim())
+    // The LAST token in the list is followed by whatever sentence punctuation ended the
+    // question ("...agents 001, 002 and 003." / "003?"), and the token charset above
+    // deliberately allows '.' (so an id like "v1.2" or an IP-shaped token stays intact) --
+    // that same allowance also lets a genuinely trailing, sentence-ending period get captured
+    // as part of the token itself (verified: without this trim, "...and 005." extracted "005."
+    // instead of "005", a real bug the F1 parse failure had hidden until this file's own tests
+    // could actually run). Stripping ONLY a trailing run of '.' (never an interior one, and
+    // never '?'/'!' etc., which the char class does not admit in the first place) removes the
+    // sentence terminator without touching a legitimate internal '.'.
+    .map(token => token.replace(/\.+$/, ''))
     .filter(token => token.length > 0);
   if (tokens.length < 2 || tokens.length > 20) {
     return undefined;

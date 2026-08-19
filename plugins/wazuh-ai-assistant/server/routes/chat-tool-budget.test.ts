@@ -171,6 +171,23 @@ test('extractEnumeratedTargets: no cue word at all is NOT enumerable', () => {
   );
 });
 
+test('extractEnumeratedTargets: the sentence-terminating period after the last token is not part of it', () => {
+  // Regression: the token charset deliberately allows '.' (so an id like "v1.2" survives), which
+  // let the LAST token in the list also swallow the question's own closing period -- this file's
+  // F1 parse failure hid the fact that the very first test above ("...004 and 005.") was already
+  // asserting the correct trimmed value and had never actually run. A trailing '?' needs no
+  // equivalent trim: '?' is not in the token charset at all, so it is never captured in the first
+  // place.
+  assert.deepEqual(
+    extractEnumeratedTargets('Check on agents 001, 002 and 003.'),
+    ['001', '002', '003'],
+  );
+  assert.deepEqual(
+    extractEnumeratedTargets('Are agents 001, 002 and 003 online?'),
+    ['001', '002', '003'],
+  );
+});
+
 // F5 fix (AI/plan/c-review.md): before the identifier-shape requirement, every one of these was a
 // measured false positive -- an ordinary English "X, Y and Z" list near a cue word, with no digit
 // in any item, silently tripling the turn's budget. Each must now be rejected.
