@@ -3,6 +3,8 @@ import {
   EuiButtonIcon,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiPanel,
+  EuiPopover,
   EuiTitle,
   EuiToolTip,
 } from '@elastic/eui';
@@ -10,7 +12,12 @@ import { i18n } from '@osd/i18n';
 import { createMemoryHistory } from 'history';
 import { AppMountParameters, CoreStart } from '../../../../../src/core/public';
 import { PLUGIN_ID } from '../../../common/constants';
-import { ChatPage, ConversationsSnapshot } from '../chat/chat-page';
+import {
+  ChatPage,
+  ChatPageHandle,
+  ConversationsSnapshot,
+} from '../chat/chat-page';
+import { ConversationList } from '../chat/conversation-list';
 import { useProviders } from '../../hooks/use-providers';
 import { interruptConfirmationText } from '../../services/interrupt-confirm';
 
@@ -24,13 +31,15 @@ interface AssistantChatPanelProps {
   isGeneratingRef: React.MutableRefObject<boolean>;
 }
 
-/** Panel width above which the saved-conversations rail auto-prefers its expanded form (a full
- * list, not just the collapsed icon strip) — below it the icon strip is the auto default, though
- * either width can still be overridden by the toolbar toggle below. Below this width the rail is
- * NEVER hidden outright: ChatPage's own `allowRailFlyout={false}` already caps it at the collapsed
- * strip rather than a full-screen flyout, so "New conversation" and "Search" stay reachable at any
- * panel width without an extra click. */
-const SIDEBAR_MIN_PANEL_WIDTH = 600;
+/** Width of the saved-conversations popover panel (chat-page.tsx's inline rail uses the same
+ * `CONVERSATION_SIDEBAR_WIDTH`, but that constant is private to that file — this popover is a
+ * wholly separate rendering of the same `ConversationList`, not a mode of that rail, so it owns
+ * its own width rather than reaching into chat-page.tsx for one). */
+const CONVERSATIONS_POPOVER_WIDTH = 320;
+/** Max height of the popover panel before its own `ConversationList` scroll region takes over
+ * (`.wzConvoRail`/`.wzConvoRailScroll`, conversation-list.scss) — without a cap a long history
+ * would grow the popover panel itself instead of scrolling inside it. */
+const CONVERSATIONS_POPOVER_HEIGHT = 420;
 
 const emptyConversationsSnapshot: ConversationsSnapshot = {
   conversations: [],
@@ -55,20 +64,14 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
     () => createMemoryHistory() as unknown as AppMountParameters['history'],
   );
   const titleId = useId();
-  const rootRef = useRef<HTMLElement>(null);
-  // Whether the rail PREFERS its expanded form over the collapsed icon strip — never whether it
-  // renders at all (see `SIDEBAR_MIN_PANEL_WIDTH`'s own doc comment above: the rail is always
-  // shown, at minimum as the collapsed strip). Passed to ChatPage as `railDisplayModeOverride`.
-  const [railExpanded, setRailExpanded] = useState(false);
-  // Flipped the first time the toolbar toggle below is used: once the user has taken explicit
-  // control of the rail's mode, further panel resizes must not silently override their choice (the
-  // resize-driven default below is a starting point, not a standing rule).
-  const railModeManuallySetRef = useRef(false);
+  const chatPageRef = useRef<ChatPageHandle>(null);
   // ChatPage owns the actual saved-conversations state (it loads/saves them) — this panel only
-  // mirrors it, via `onConversationsChange` below, to render the header's own title/subtitle.
+  // mirrors it, via `onConversationsChange` below, to render the popover's own trigger/content.
   const [conversationsSnapshot, setConversationsSnapshot] = useState(
     emptyConversationsSnapshot,
   );
+  const [isConversationsPopoverOpen, setIsConversationsPopoverOpen] =
+    useState(false);
 
   const untitledConversationLabel = i18n.translate(
     'wazuhAiAssistant.headerPanel.untitledConversation',
@@ -102,30 +105,18 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
     return () => window.removeEventListener('beforeunload', warnBeforeUnload);
   }, [isGeneratingRef]);
 
-  useEffect(() => {
-    const element = rootRef.current;
-    if (!element) {
-      return undefined;
-    }
-    const update = () => {
-      if (railModeManuallySetRef.current) {
-        return;
-      }
-      setRailExpanded(element.offsetWidth >= SIDEBAR_MIN_PANEL_WIDTH);
-    };
-    update();
-    if (typeof ResizeObserver === 'undefined') {
-      return undefined;
-    }
-    const observer = new ResizeObserver(update);
-    observer.observe(element);
-    return () => observer.disconnect();
+  const closeConversationsPopover = useCallback(() => {
+    setIsConversationsPopoverOpen(false);
   }, []);
 
-  const toggleRailMode = useCallback(() => {
-    railModeManuallySetRef.current = true;
-    setRailExpanded(expanded => !expanded);
+  const toggleConversationsPopover = useCallback(() => {
+    setIsConversationsPopoverOpen(open => !open);
   }, []);
+
+  const handleNewConversation = useCallback(() => {
+    chatPageRef.current?.newConversation();
+    closeConversationsPopover();
+  }, [closeConversationsPopover]);
 
   const requestClose = useCallback(
     () => runGuarded(onClose),
@@ -167,16 +158,16 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
     [runGuarded, onClose, core.application],
   );
 
-  const expandConversationsLabel = i18n.translate(
-    'wazuhAiAssistant.headerPanel.expandConversationsButtonLabel',
+  const newConversationLabel = i18n.translate(
+    'wazuhAiAssistant.headerPanel.newConversationButtonLabel',
     {
-      defaultMessage: 'Expand saved conversations',
+      defaultMessage: 'New conversation',
     },
   );
-  const collapseConversationsLabel = i18n.translate(
-    'wazuhAiAssistant.headerPanel.collapseConversationsButtonLabel',
+  const conversationsLabel = i18n.translate(
+    'wazuhAiAssistant.headerPanel.conversationsButtonLabel',
     {
-      defaultMessage: 'Collapse saved conversations',
+      defaultMessage: 'Saved conversations',
     },
   );
   const maximizeLabel = i18n.translate(
@@ -200,7 +191,6 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
 
   return (
     <section
-      ref={rootRef}
       // `wzAiChat`: the same `--wz-*` token block chat-page.scss defines for the app-shell chat
       // surface — applied here too so this panel's own chrome (the header border below) reads
       // from it instead of a hardcoded hex. ChatPage's nested `wzAiChat` div just redefines the
@@ -219,6 +209,13 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
       >
         <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false}>
           <EuiFlexItem style={{ minWidth: 0 }}>
+            {/* A plain block `div`, NOT two direct `EuiFlexItem` children: `EuiFlexItem` is itself
+              `display: flex; flex-direction: column` (EUI's own CSS), whose default
+              `align-items: stretch` forces every child — including the tooltip's own anchor
+              `span` below — to stretch to this column's FULL width regardless of that child's own
+              `display`. That stretched span, not the short text inside it, was what `EuiToolTip`
+              was actually hovering/triggering on. A plain non-flex wrapper here means the anchor
+              span is an ordinary inline-block box again, sized to its own content. */}
             <div>
               <EuiTitle size='xs'>
                 <h2 id={titleId}>
@@ -231,20 +228,23 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
                 never-yet-saved one) — a subtitle under the panel's own name rather than a
                 replacement for it, so the sidecar keeps reading as "AI Assistant" first even once
                 a conversation is open.
-                `display: flex` here is what lets a long title truncate: `EuiToolTip` always wraps
-                its child in an inline-block `span` (`wzAiAssistantTitleTooltipAnchor`,
-                chat-page.scss) whose `width: auto` sizing, under ordinary block/inline-block
-                shrink-to-fit rules, can never go below its content's own min-content width — and
-                `white-space: nowrap` makes a long title's min-content width the FULL one-line
-                width, so the anchor simply overflowed this column no matter what `max-width` the
-                text inside it asked for. Flex-shrink uses a DIFFERENT algorithm with no such
-                floor, provided the item's automatic minimum size is zeroed out — which
-                `overflow: hidden` on that same anchor class does per spec, since a flex item's
-                automatic min-width computes to 0 rather than content-based when its own
-                `overflow` isn't `visible`. That shrunk, now-definite anchor width is what finally
-                lets the plain `span` inside truncate against a real number instead of an
-                indefinite one. For a SHORT title, this flex item just renders at its natural
-                (small) size — grow defaults to 0, so it never stretches to fill the column. */}
+                `display: flex` here (a SECOND, inner flex context, not the outer `EuiFlexItem`
+                whose own stretch this component's other doc comment already routes around) is what
+                actually lets a long title truncate: `EuiToolTip` always wraps its child in an
+                inline-block `span` (`wzAiAssistantTitleTooltipAnchor` below) whose `width: auto`
+                sizing, under ordinary block/inline-block shrink-to-fit rules, can never go below
+                its content's own min-content width — and `white-space: nowrap` makes a long title's
+                min-content width the FULL one-line width, so the anchor simply overflowed this
+                column (running under the header's own icon buttons) no matter what `max-width` the
+                text inside it asked for. Flex-shrink uses a DIFFERENT algorithm with no such floor,
+                PROVIDED the item's automatic minimum size is zeroed out — which `overflow: hidden`
+                on that same anchor class (a plain CSS rule, not inline: `anchorClassName` only
+                accepts a class) does per spec, since a flex item's automatic min-width computes to
+                0 rather than content-based when its own `overflow` isn't `visible`. That shrunk,
+                now-DEFINITE anchor width is what finally lets the plain `span` inside truncate
+                against a real number instead of an indefinite one. For a SHORT title, this flex
+                item just renders at its natural (small) size — grow defaults to 0, so it never
+                stretches to fill the column the way `EuiFlexItem`'s OWN children did before. */}
               <div style={{ display: 'flex' }}>
                 <EuiToolTip
                   content={activeConversationTitle}
@@ -267,26 +267,69 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
             </div>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiToolTip
-              content={
-                railExpanded
-                  ? collapseConversationsLabel
-                  : expandConversationsLabel
-              }
-            >
+            <EuiToolTip content={newConversationLabel}>
               <EuiButtonIcon
-                iconType={railExpanded ? 'menuLeft' : 'menuRight'}
+                iconType='plusInCircle'
                 color='text'
-                aria-label={
-                  railExpanded
-                    ? collapseConversationsLabel
-                    : expandConversationsLabel
-                }
-                aria-pressed={railExpanded}
-                onClick={toggleRailMode}
-                data-test-subj='wzAiAssistantPanelToggleSidebarButton'
+                aria-label={newConversationLabel}
+                onClick={handleNewConversation}
+                data-test-subj='wzAiAssistantPanelNewConversationButton'
               />
             </EuiToolTip>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiPopover
+              isOpen={isConversationsPopoverOpen}
+              closePopover={closeConversationsPopover}
+              anchorPosition='downRight'
+              panelPaddingSize='none'
+              button={
+                <EuiToolTip content={conversationsLabel}>
+                  <EuiButtonIcon
+                    iconType='list'
+                    // Filled + primary while open — the same "active toggle" look EUI's own filter
+                    // buttons use, so the header shows which state the popover is in.
+                    color={isConversationsPopoverOpen ? 'primary' : 'text'}
+                    display={isConversationsPopoverOpen ? 'fill' : 'empty'}
+                    aria-label={conversationsLabel}
+                    aria-pressed={isConversationsPopoverOpen}
+                    onClick={toggleConversationsPopover}
+                    data-test-subj='wzAiAssistantPanelToggleSidebarButton'
+                  />
+                </EuiToolTip>
+              }
+            >
+              <EuiPanel
+                color='plain'
+                hasShadow={false}
+                hasBorder={false}
+                paddingSize='m'
+                className='wzConvoRail'
+                style={{
+                  width: CONVERSATIONS_POPOVER_WIDTH,
+                  height: CONVERSATIONS_POPOVER_HEIGHT,
+                }}
+              >
+                <ConversationList
+                  conversations={conversationsSnapshot.conversations}
+                  isLoading={conversationsSnapshot.isLoading}
+                  activeConversationId={
+                    conversationsSnapshot.activeConversationId
+                  }
+                  onSelect={id => {
+                    chatPageRef.current?.selectConversation(id);
+                    closeConversationsPopover();
+                  }}
+                  onNewConversation={handleNewConversation}
+                  onDelete={id => chatPageRef.current?.deleteConversation(id)}
+                  displayMode='flyout'
+                  // The header's own icon buttons above cover both: no reason to repeat a
+                  // "Conversations" title or a second "New conversation" button inside the popover.
+                  showHeader={false}
+                  showNewConversationButton={false}
+                />
+              </EuiPanel>
+            </EuiPopover>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiToolTip content={maximizeLabel}>
@@ -326,6 +369,7 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
       <div style={{ flex: '1 1 auto', minHeight: 0, overflow: 'auto' }}>
         <div style={{ height: '100%' }}>
           <ChatPage
+            ref={chatPageRef}
             core={core}
             history={chatHistory}
             providers={providers}
@@ -336,16 +380,10 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
             onNavigateToSettings={openSettingsToAddProvider}
             onGeneratingChange={handleGeneratingChange}
             onConversationsChange={setConversationsSnapshot}
-            // Always rendered (never hidden outright, see `SIDEBAR_MIN_PANEL_WIDTH`'s own doc
-            // comment): `railDisplayModeOverride` below is what the toolbar toggle actually drives.
-            showConversationSidebar
-            railDisplayModeOverride={railExpanded ? 'expanded' : 'collapsed'}
-            // This panel's own width (`SIDEBAR_MIN_PANEL_WIDTH` above) routinely sits inside
-            // ChatPage's flyout band (600-900px) — an `EuiFlyout` there would cover the WHOLE
-            // dashboard, opening from the right, just to show a left-hand rail, out of a docked
-            // sidecar the user never asked to leave. Capped at the collapsed strip instead; see
-            // ChatPage's own `allowRailFlyout` doc comment.
-            allowRailFlyout={false}
+            // The saved-conversations UI now lives entirely in the header's own popover above —
+            // ChatPage's inline rail/collapsed-strip/flyout would be a second, redundant way to
+            // reach the same conversations from inside this same docked panel.
+            showConversationSidebar={false}
           />
         </div>
       </div>
