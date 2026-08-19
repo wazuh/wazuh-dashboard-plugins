@@ -145,3 +145,16 @@ export function listToolDefinitions(): ToolDefinition[] {
 export function listToolSpecs(): ToolSpec[] {
   return CATALOG.map(tool => tool.spec);
 }
+
+/**
+ * Resolves a tool's cost-budget class for chat.ts's tool-round COST budget (see
+ * `ToolDefinition.costClass`'s doc comment in types.ts for the 1/2/3 scale). Defaults to 2 (the
+ * ordinary filtered-search weight) for a tool with no `costClass` opinion AND for a name this
+ * registry does not recognize at all (a router/pseudo-tool like `route_question` or
+ * `suggest_discover_query`, which are never executed via `executeToolCall` and so never reach this
+ * lookup in practice, or a stale name from a scripted test) -- never throws, never returns
+ * `undefined`, so every call site can charge a cost unconditionally.
+ */
+export function getToolCostClass(name: string): 1 | 2 | 3 {
+  return getToolDefinition(name)?.costClass ?? 2;
+}

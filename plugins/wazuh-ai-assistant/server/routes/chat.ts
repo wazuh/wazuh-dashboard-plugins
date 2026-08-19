@@ -20,7 +20,7 @@ import { describeError } from '../../common/errors';
 import { getProviderAdapter } from '../providers/registry';
 import { ChatStreamOptions, ProviderAdapter } from '../providers/types';
 import { buildSystemPrompt } from '../prompts';
-import { listToolSpecs } from '../tools/registry';
+import { getToolCostClass, listToolSpecs } from '../tools/registry';
 import {
   executeToolCall,
   PrivacyContext,
@@ -128,15 +128,53 @@ function suggestedQueryReasonMismatchDisclosure(fields: string[]): string {
   );
 }
 
-/** Bounded tool rounds per turn; a final no-tools round follows to close out the answer.
- * Exported so tests can derive round-budget-dependent scripts from it (see
- * chat-capability-honesty.test.ts's last-tool-bearing-round test) instead of hardcoding the
- * round count, which would silently start testing a different round on any budget change. */
-export const MAX_TOOL_ROUNDS = 3;
-/* ADAPTATION (branch 8997 vs D's original commit): workstream C's cost-budget block
- * (BASE_BUDGET_UNITS, HARD_CEILING_UNITS, CONTEXT_CHAR_BUDGET, MAX_CONSECUTIVE_REJECTED_ROUNDS)
- * is dropped here -- it belongs to enhancement/8998-ai-assistant-tool-budget. This branch keeps
- * the plain MAX_TOOL_ROUNDS=3 count from before workstream C existed. */
+interface StoredProviderAttributes {
+  name: string;
+  type: ProviderConfig['type'];
+  baseUrl: string;
+  model: string;
+  apiKey?: string;
+}
+
+/**
+ * TOOL-ROUND COST BUDGET (workstream C -- replaces the old fixed `MAX_TOOL_ROUNDS = 3` count).
+ * Rounds are no longer bounded by a plain count: each EXECUTED, SUCCESSFUL real tool call this
+ * turn (one that actually reached the Indexer/Manager and produced a `tableEvent` -- see
+ * `chargeableToolCallCost` below) spends `getToolCostClass(name)` units (1 aggregation-only / 2
+ * filtered-search default / 3 escape-hatch) from a running total. A call rejected by local
+ * schema/argument/guardrail validation never dispatches a backend request and so is NEVER charged
+ * against this budget -- that failure mode is already bounded by `MAX_TOOL_ROUNDS` (the structural
+ * safety net below) and by `shouldEnterFinalRoundEarly` (#8911, unchanged).
+ *
+ * CALIBRATION: 6 units is chosen to reproduce the OLD `MAX_TOOL_ROUNDS = 3` behaviour for the
+ * common case -- three rounds of one DEFAULT-cost (2-unit) tool call each spend exactly 6, so a
+ * turn that used to get 3 tool rounds still gets 3 under the new scheme. A turn that leans on
+ * cheap aggregation-only tools (cost 1) now affordably gets MORE rounds (up to 6) before the
+ * budget is exhausted; a turn that leans on the cost-3 escape hatch gets fewer (2) -- the budget
+ * spends where the actual backend cost is, instead of a flat per-round count that charged a
+ * single `search_wazuh_data` call the same as a cheap `size:0` aggregation.
+ */
+export const BASE_BUDGET_UNITS = 6;
+
+/**
+ * Absolute cap on how far `BASE_BUDGET_UNITS` may be silently extended (see
+ * `shouldGrantBudgetExtension` below) -- 3x base, no exceptions, regardless of how many times the
+ * extension conditions keep holding. Once total spend reaches this, the turn's NEXT round is
+ * forced tools-off exactly like an ordinary budget exhaustion with no extension granted.
+ */
+export const HARD_CEILING_UNITS = BASE_BUDGET_UNITS * 3;
+
+/**
+ * Bounded tool rounds per turn -- now a DERIVED STRUCTURAL SAFETY BOUND, not the primary
+ * mechanism: the cost budget above is what normally decides when a turn's tool rounds end, but a
+ * pathological turn that only ever executes free (cost-0, rejected/errored) calls would otherwise
+ * never exhaust the cost budget at all and could loop forever. This count-based ceiling is the
+ * backstop for exactly that case -- it terminates the loop on ROUND COUNT alone regardless of
+ * spend. A final no-tools round follows to close out the answer. Exported so tests can derive
+ * round-budget-dependent scripts from it (see chat-capability-honesty.test.ts's
+ * last-tool-bearing-round test) instead of hardcoding the round count, which would silently start
+ * testing a different round on any budget change. */
+export const MAX_TOOL_ROUNDS = 8;
 
 /**
  * Fallback narration for a turn that used at least one tool but whose model never emitted any
@@ -400,15 +438,19 @@ function describeErroredLastAttempt(
 }
 
 /**
- * Variant of NO_ANALYSIS_TEXT_MESSAGE for a turn that exhausted its tool-round budget (a serial
- * chain deeper than MAX_TOOL_ROUNDS) and still produced no text even after
- * FINAL_ROUND_ANSWER_INSTRUCTION asked for one. Named explicitly rather than folded into the
- * generic copy above: the results table IS non-empty here, but it reflects only as far as the
- * chain got, not the full answer, so the user should know a step was left unreached.
+ * Variant of NO_ANALYSIS_TEXT_MESSAGE for a turn whose tool-gathering ended (either the cost
+ * budget or the structural round cap -- see the exhaustion doc comments above `BASE_BUDGET_UNITS`
+ * and `MAX_TOOL_ROUNDS`) before the model wrote any text, even after FINAL_ROUND_ANSWER_INSTRUCTION
+ * asked for one. Named explicitly rather than folded into the generic copy above: the results
+ * table IS non-empty here, but it reflects only as far as the turn got, not the full answer, so
+ * the user should know a step was left unreached. NEVER NAMES THE MECHANISM (no "round"/"budget"/
+ * "limit" wording, per product decision) -- this is user-visible copy, and the internal cost-unit
+ * accounting that decided the turn was done must stay invisible to the reader (see
+ * chat-no-text-fallback-message.test.ts's mechanism-silence test).
  */
 const NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE =
-  'I reached the analysis limit for this question. The results gathered so far are above — ask ' +
-  'a narrower follow-up to dig deeper.';
+  'This turn ended before a full answer could be written. See the results above for what was ' +
+  'found so far — a follow-up question can continue from there.';
 /**
  * Sibling fallback for a `general`-routed (no-tool) turn that still ends with no text at all —
  * e.g. a reasoning model streaming its entire answer on a channel nothing reads (issue
@@ -438,11 +480,22 @@ const NO_ANSWER_MESSAGE =
  *  - no mention of tools being unavailable: the round already omits `tools` entirely, and naming
  *    the absent capability invites the model to narrate the mechanism ("I cannot query further…")
  *    instead of answering.
+ *  - the trailing coverage-statement clause (workstream C, the cost-budget redesign's exhaustion
+ *    contract) asks for exactly WHAT was and was not covered ("covers agents 001-003; 004 and 007
+ *    not retrieved" is the shape), never HOW OR WHY the turn ended -- "describe only the coverage
+ *    itself" is what keeps this mechanism-free: the model has no internal round/budget/limit
+ *    vocabulary to reach for because the instruction never offers it one, on purpose (see
+ *    NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE's doc comment for the matching code-side rule). This is a
+ *    request only -- same as every other clause here, the model's compliance is not guaranteed by
+ *    this code.
  */
 export const FINAL_ROUND_ANSWER_INSTRUCTION =
   "Now answer the user's question directly, using only the tool results already gathered in " +
   'this conversation. Do not state anything the results do not show. If they do not answer the ' +
-  'question, say so plainly and state what is missing.';
+  'question, say so plainly and state what is missing. Then state plainly what the gathered ' +
+  'results do and do not cover (for example, which agents, hosts, rules, or items were ' +
+  'retrieved and which were not) — describe only the coverage itself, never how or why the turn ' +
+  'ended.';
 
 /**
  * Appends FINAL_ROUND_ANSWER_INSTRUCTION to the messages bound for the provider, but only on the
@@ -473,9 +526,141 @@ export function withFinalRoundAnswerInstruction(
   ];
 }
 
-/* ADAPTATION (branch 8997): workstream C's cost-budget helper functions (toolCallCostUnits,
- * isRoundFutile, extractEnumeratedTargets, shouldGrantBudgetExtension) are dropped here -- they
- * live on enhancement/8998-ai-assistant-tool-budget, which owns C's round-loop mechanism. */
+// ---------------------------------------------------------------------------------------------
+// TOOL-ROUND COST BUDGET (workstream C) -- pure, testable pieces of the mechanism wired into
+// `orchestrate`'s round loop below. See BASE_BUDGET_UNITS/HARD_CEILING_UNITS/MAX_TOOL_ROUNDS'
+// doc comments above for the overall shape; this section is the decision logic three call sites
+// in the loop each need: how much a call costs, whether a round was futile, and whether an
+// exhausted budget may be silently extended.
+// ---------------------------------------------------------------------------------------------
+
+/**
+ * Cost, in budget units, of ONE real tool call this turn -- `0` unless the call actually reached
+ * the Indexer/Manager and produced a `tableEvent` (`wasSuccessful`); a call rejected by local
+ * schema/argument/guardrail validation never dispatched a backend request, so it is free against
+ * THIS budget (see `BASE_BUDGET_UNITS`'s doc comment for why that failure mode is bounded
+ * elsewhere instead -- `MAX_TOOL_ROUNDS` and `shouldEnterFinalRoundEarly`/#8911). A successful call
+ * costs exactly `getToolCostClass(toolName)` (registry.ts) -- 1 aggregation-only / 2 default
+ * filtered-search / 3 escape-hatch.
+ */
+export function toolCallCostUnits(
+  toolName: string,
+  wasSuccessful: boolean,
+): number {
+  return wasSuccessful ? getToolCostClass(toolName) : 0;
+}
+
+/**
+ * EARLY FUTILITY STOP (product design item 4): a round whose tool calls all came back with
+ * nothing new must not spend further budget on variations -- this is the fix for the QA
+ * worst-transcript pattern (AI/plan/qa-rules-decoders-rootcause.md, "3 rounds burned on 0-row
+ * calls").
+ *
+ * Takes only the SUCCESSFUL calls this round (a caller-side filter, same shape as
+ * `roundHadSuccessfulToolCall` elsewhere in this file) -- a round with zero successful calls
+ * (every call rejected/errored) is NOT this mechanism's concern: that shape is exactly what
+ * `shouldEnterFinalRoundEarly` (#8911) already governs, gated on "an EARLIER round already
+ * succeeded" so the model keeps one legitimate self-correction attempt. Passing an EMPTY array
+ * here therefore returns `false` -- deliberately, so the two mechanisms stay non-overlapping
+ * (#8911 owns "every call failed", this owns "every call succeeded but taught us nothing new").
+ *
+ * A successful call counts as "taught us nothing new" when EITHER:
+ *  - `hadRows` is `false` -- the tool executed cleanly but its result carried zero rows (the
+ *    "0 rows / all-empty aggs" half of the product wording; `hadRows` is computed at the call
+ *    site from `outcome.tableEvent.spec.rows.length > 0`, which is `true` for both a genuine hits
+ *    table and an aggregation-only tool's bucket rows, so this one boolean covers both shapes), OR
+ *  - `isDuplicate` is `true` -- this exact tool+arguments pair already executed successfully
+ *    earlier THIS TURN (the "duplicate of a previous round's identical query" half; computed at
+ *    the call site from a `Set` of `name|JSON.stringify(args)` signatures).
+ */
+export function isRoundFutile(
+  successfulCalls: ReadonlyArray<{ hadRows: boolean; isDuplicate: boolean }>,
+): boolean {
+  if (successfulCalls.length === 0) {
+    return false;
+  }
+  return successfulCalls.every(call => call.isDuplicate || !call.hadRows);
+}
+
+/**
+ * ENUMERABLE-REMAINING heuristic (product design item 3b) -- the CHEAPEST SOUND form, scoped
+ * deliberately narrowly rather than attempting general list-detection:
+ *
+ * Detects ONLY an explicit, literal, comma/"and"-separated list of >=2 tokens that follows one of
+ * a fixed set of cue words (agent(s)/host(s)/node(s)/polic{y,ies}) in the conversation's FIRST
+ * `user` message -- e.g. "check agents 001, 003, and 007" or "hosts web-01, web-02 and db-01"
+ * yields `['001', '003', '007']` / `['web-01', 'web-02', 'db-01']`.
+ *
+ * Deliberately does NOT: parse ranges ("agents 001-010"), read any message OTHER than the first
+ * user one, or infer a list from the MODEL's own prose/tool-call pattern -- every one of those
+ * would need either a second, fuzzier extraction pass or trusting model-authored text as the
+ * source of a budget decision, and a false POSITIVE here (claiming a list exists when the
+ * question wasn't actually enumerable) risks granting an extension the futility/duplicate checks
+ * alone wouldn't catch. A false NEGATIVE (returning `undefined` for a genuinely enumerable
+ * question phrased some other way) just degrades to "not confidently enumerable" -- the safe
+ * default the product design explicitly asks for ("when not confidently enumerable, do NOT
+ * extend").
+ *
+ * Returns the literal token list (trimmed, 2-20 tokens) when found, else `undefined`.
+ */
+const ENUMERATION_CUE_RE =
+  /\b(?:agents?|hosts?|nodes?|polic(?:y|ies))\b[^.\n]{0,24}?\b((?:[A-Za-z0-9][\w.-]{0,63}\s*(?:,\s*|\s+and\s+))+[A-Za-z0-9][\w.-]{0,63})/i;
+
+export function extractEnumeratedTargets(
+  userText: string,
+): string[] | undefined {
+  const match = ENUMERATION_CUE_RE.exec(userText);
+  if (!match) {
+    return undefined;
+  }
+  const tokens = match[1]
+    .split(/,|\band\b/i)
+    .map(token => token.trim())
+    .filter(token => token.length > 0);
+  if (tokens.length < 2 || tokens.length > 20) {
+    return undefined;
+  }
+  return tokens;
+}
+
+/**
+ * SILENT EXTENSION gate (product design item 3): whether an exhausted budget may be raised to
+ * `HARD_CEILING_UNITS`. Requires ALL of:
+ *  - `roundHadNewInfo` -- the round that just spent the budget to zero actually produced new
+ *    information (see the call site: a successful, non-duplicate call with `hadRows`), so the
+ *    extension is bought with genuine progress, never with a round of failed variations;
+ *  - an enumerated target list was found in the user's original question
+ *    (`extractEnumeratedTargets`) with at least 2 entries -- the "remaining work is ENUMERABLE"
+ *    requirement, deterministic by construction;
+ *  - `coveredTargets` (every literal token from that list seen in a successful call's arguments
+ *    so far this turn, lower-cased) covers SOME but not ALL of the list -- zero covered means the
+ *    turn hasn't even started the sweep (nothing yet proves it IS the sweep the list describes),
+ *    all covered means there is nothing left to extend FOR;
+ *  - `currentCeiling` has not already reached `HARD_CEILING_UNITS` -- the extension is granted at
+ *    most once per turn (raising straight to the hard ceiling, not incrementally), and never
+ *    beyond it.
+ */
+export function shouldGrantBudgetExtension(opts: {
+  roundHadNewInfo: boolean;
+  enumeratedTargets: readonly string[] | undefined;
+  coveredTargets: ReadonlySet<string>;
+  currentCeiling: number;
+}): boolean {
+  if (!opts.roundHadNewInfo) {
+    return false;
+  }
+  if (opts.currentCeiling >= HARD_CEILING_UNITS) {
+    return false;
+  }
+  if (!opts.enumeratedTargets || opts.enumeratedTargets.length < 2) {
+    return false;
+  }
+  const coveredCount = opts.enumeratedTargets.filter(target =>
+    opts.coveredTargets.has(target.toLowerCase()),
+  ).length;
+  return coveredCount > 0 && coveredCount < opts.enumeratedTargets.length;
+}
+
 /**
  * Issue #8911: a tool round that produced only rejected/errored calls (no successful digest/table)
  * is, for round-budget purposes, indistinguishable from a productive one — the loop below just
@@ -1493,6 +1678,42 @@ export async function* orchestrate(
   // sit here fed only the C-owned futility stop dropped above (see the ADAPTATION note near
   // isRoundFutile) -- removed as dead state along with it.
   let forceFinalRoundEarly = false;
+  // TOOL-ROUND COST BUDGET (workstream C) state -- see the doc comments right above
+  // `BASE_BUDGET_UNITS`/`HARD_CEILING_UNITS`/`MAX_TOOL_ROUNDS` near the top of this file for the
+  // overall shape. `budgetCeiling` starts at the base and is raised
+  // ONCE, straight to the hard ceiling, the first time `shouldGrantBudgetExtension` allows it --
+  // never incrementally, never past the hard ceiling. `totalSpentUnits` only ever grows (a
+  // successful real tool call's cost, `toolCallCostUnits`); a rejected/errored call adds nothing.
+  let budgetCeiling = BASE_BUDGET_UNITS;
+  let totalSpentUnits = 0;
+  // Forces the round AFTER the one that just finished to be the final (tools-off) round --
+  // distinct from `forceFinalRoundEarly` (#8911, above) so the two triggers stay independently
+  // testable/auditable: this one fires from EITHER the futility stop (product design item 4) or a
+  // budget exhaustion with no extension granted (item 3), never from an all-rejected round (that
+  // remains #8911's own, narrower concern -- see `isRoundFutile`'s doc comment for why the two
+  // never overlap).
+  let budgetForcesFinalRoundEarly = false;
+  // Enumerable-remaining heuristic (product design item 3b): computed ONCE, from the turn's
+  // first user message, never re-derived mid-turn (see `extractEnumeratedTargets`'s doc comment
+  // for exactly what it does and does not detect). `undefined` when no explicit literal list was
+  // found -- the safe default that keeps `shouldGrantBudgetExtension` from ever firing.
+  const firstUserMessage = initialMessages.find(
+    message => message.role === 'user',
+  );
+  const enumeratedTargets = firstUserMessage
+    ? extractEnumeratedTargets(firstUserMessage.content)
+    : undefined;
+  // Every enumerated-list token (lower-cased) that has appeared in a SUCCESSFUL real tool call's
+  // arguments THIS TURN -- grows monotonically, read by `shouldGrantBudgetExtension` at every
+  // budget-exhaustion check.
+  const coveredEnumerationTargets = new Set<string>();
+  // Every `${toolName}|${JSON.stringify(realArguments)}` signature of a SUCCESSFUL real tool call
+  // executed so far this turn -- the "duplicate of a previous round's identical query" half of
+  // `isRoundFutile`. Approximate by construction (plain `JSON.stringify` key order, not a
+  // canonicalized/sorted form): a false negative here (two calls that are semantically identical
+  // but serialize differently) merely degrades to "not detected as a duplicate", which is the
+  // safe direction -- it costs budget normally instead of wrongly forcing an early stop.
+  const executedCallSignatures = new Set<string>();
   // Sum of every provider call's `usage` THIS TURN — the stage-1 routing call (if the router ran)
   // plus every round of the loop below, INCLUDING non-final rounds whose `done` is otherwise
   // suppressed (see the round loop's `if (sawToolCall) { break; }`). Without this, only the last
@@ -1556,6 +1777,24 @@ export async function* orchestrate(
     tools = [...tools, SUGGEST_DISCOVER_QUERY_TOOL];
   }
 
+  // TERMINATION (workstream C constraint: prove this loop cannot spin forever):
+  //  1. `round` is a plain incrementing counter with a fixed upper bound (`round += 1` every
+  //     iteration, loop condition `round <= MAX_TOOL_ROUNDS`) -- this alone already bounds the
+  //     loop to at most `MAX_TOOL_ROUNDS + 1` iterations regardless of anything else below, the
+  //     same structural guarantee the OLD fixed-round-count design always had.
+  //  2. Independently, `totalSpentUnits` (the cost budget) is MONOTONICALLY NON-DECREASING --
+  //     every round either adds >=0 to it (a successful real tool call's class-derived cost) or
+  //     nothing at all (no successful call) -- and `budgetCeiling` is capped at
+  //     `HARD_CEILING_UNITS`, raised there AT MOST ONCE and never lowered. Once
+  //     `totalSpentUnits >= budgetCeiling` with no further extension possible (the ceiling
+  //     already at its hard maximum), `budgetForcesFinalRoundEarly` latches permanently `true`,
+  //     which keeps `isFinalRound` `true` for every subsequent round -- a final round offers no
+  //     `tools`, so no further tool call (and therefore no further cost) can occur, making this a
+  //     terminating condition on its own, reached in a bounded number of rounds because each
+  //     round that keeps the budget open must have spent >=1 unit (a round with zero cost neither
+  //     advances the budget toward exhaustion NOR is itself unbounded, per guarantee 1 above).
+  // The two guarantees are independent (either alone bounds the loop) and both hold regardless of
+  // model behavior, so the loop terminates unconditionally.
   for (let round = 0; round <= MAX_TOOL_ROUNDS; round += 1) {
     if (signal.aborted) {
       return;
@@ -1570,7 +1809,15 @@ export async function* orchestrate(
     // Issue #8911: `forceFinalRoundEarly` (set at the end of the PREVIOUS round below) short-circuits
     // the normal `round === MAX_TOOL_ROUNDS` budget check once a fully-rejected round has already
     // followed an earlier successful one this turn — see `shouldEnterFinalRoundEarly`'s doc comment.
-    const isFinalRound = round === MAX_TOOL_ROUNDS || forceFinalRoundEarly;
+    // `budgetForcesFinalRoundEarly` (workstream C, set at the end of the PREVIOUS round below) is
+    // the cost-budget's own early trigger -- either the futility stop or an exhausted budget with
+    // no extension granted (see that flag's own declaration above for why it never overlaps
+    // #8911's narrower "every call failed" case). `round === MAX_TOOL_ROUNDS` remains the
+    // structural backstop that fires regardless of spend.
+    const isFinalRound =
+      round === MAX_TOOL_ROUNDS ||
+      forceFinalRoundEarly ||
+      budgetForcesFinalRoundEarly;
     // Final round: omit `tools` entirely rather than send `{tools, toolChoice: 'none'}`. That hint
     // depends on the model complying with it — Groq's own docs warn some models call a tool anyway
     // and the API then 400s ("Tool choice is none, but model called a tool"), observed on
@@ -1699,6 +1946,16 @@ export async function* orchestrate(
     // as a "fully rejected round".
     let roundHadRealToolCall = false;
     let roundHadSuccessfulToolCall = false;
+    // TOOL-ROUND COST BUDGET (workstream C), round-scoped: one entry per SUCCESSFUL real tool
+    // call this round -- `isRoundFutile` reads this array at round-end, and its cost is folded
+    // into `totalSpentUnits` there too. A rejected/errored call never gets an entry (it costs 0
+    // and cannot be "futile" in this mechanism's sense -- see `isRoundFutile`'s doc comment).
+    const roundSuccessfulCalls: Array<{
+      toolName: string;
+      cost: number;
+      hadRows: boolean;
+      isDuplicate: boolean;
+    }> = [];
 
     // eslint-disable-next-line no-await-in-loop -- provider events must be consumed strictly in stream order
     for await (const event of adapter.chatStream(
@@ -2019,6 +2276,34 @@ export async function* orchestrate(
           // path above returns `toolResultContent` alone) — this is the round's "did anything
           // actually succeed" signal `shouldEnterFinalRoundEarly` needs below.
           roundHadSuccessfulToolCall = true;
+
+          // TOOL-ROUND COST BUDGET (workstream C): this call reached the backend and produced a
+          // real result, so (and only so) it is chargeable -- see `toolCallCostUnits`'s doc
+          // comment for why a rejected/errored call never reaches this branch at all.
+          const callSignature = `${event.toolCall.name}|${JSON.stringify(
+            realArguments,
+          )}`;
+          const isDuplicateCall = executedCallSignatures.has(callSignature);
+          executedCallSignatures.add(callSignature);
+          const hadRows = outcome.tableEvent.spec.rows.length > 0;
+          roundSuccessfulCalls.push({
+            toolName: event.toolCall.name,
+            cost: toolCallCostUnits(event.toolCall.name, true),
+            hadRows,
+            isDuplicate: isDuplicateCall,
+          });
+          // Enumerable-remaining coverage tracking (product design item 3b): a target counts as
+          // "done" once a successful call's arguments named it, regardless of row count -- the
+          // point is "was this item queried", not "did it come back non-empty".
+          if (enumeratedTargets) {
+            const argsText = JSON.stringify(realArguments).toLowerCase();
+            for (const target of enumeratedTargets) {
+              if (argsText.includes(target.toLowerCase())) {
+                coveredEnumerationTargets.add(target.toLowerCase());
+              }
+            }
+          }
+
           yield outcome.tableEvent;
           if (outcome.tableEvent.spec.rows.length > 0) {
             // Table-suppression activation (markdown-table-filter.ts): from this point on in the
@@ -2265,6 +2550,40 @@ export async function* orchestrate(
     }
     hadSuccessfulRoundEarlier =
       hadSuccessfulRoundEarlier || roundHadSuccessfulToolCall;
+
+    // TOOL-ROUND COST BUDGET (workstream C): charge this round's successful real-tool-call cost,
+    // then decide whether the NEXT round must be forced tools-off -- either because this round
+    // was futile (product design item 4, checked FIRST: a futile round must stop immediately
+    // regardless of remaining budget) or because charging its cost exhausted the current ceiling
+    // with no extension granted (item 3). Skipped entirely once `forceFinalRoundEarly` (#8911)
+    // already forces the next round early on its own narrower ground -- no need to layer a second
+    // reason on top, and `isRoundFutile([])` would return `false` for an all-rejected round
+    // anyway (see that function's doc comment), so this would be a no-op here regardless.
+    if (!forceFinalRoundEarly) {
+      totalSpentUnits += roundSuccessfulCalls.reduce(
+        (sum, call) => sum + call.cost,
+        0,
+      );
+      if (isRoundFutile(roundSuccessfulCalls)) {
+        budgetForcesFinalRoundEarly = true;
+      } else if (totalSpentUnits >= budgetCeiling) {
+        const roundHadNewInfo = roundSuccessfulCalls.some(
+          call => !call.isDuplicate && call.hadRows,
+        );
+        if (
+          shouldGrantBudgetExtension({
+            roundHadNewInfo,
+            enumeratedTargets,
+            coveredTargets: coveredEnumerationTargets,
+            currentCeiling: budgetCeiling,
+          })
+        ) {
+          budgetCeiling = HARD_CEILING_UNITS;
+        } else {
+          budgetForcesFinalRoundEarly = true;
+        }
+      }
+    }
   }
 
   // Exhausted the round budget and the forced-final (no-tools) round still didn't end cleanly
