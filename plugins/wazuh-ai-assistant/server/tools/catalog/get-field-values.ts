@@ -104,20 +104,35 @@ export function fieldsForFamily(family: string): string[] {
 }
 
 /** Simple, bounded prefix/substring match for the "did you mean" suggestion list -- no fuzzy
- * matching dependency, just a plain scan of the (short, ~20-entry) allowlist for a candidate that
- * shares a leading path segment or a substring with the caller's typo. Capped at 5 suggestions. */
+ * matching dependency, just a plain scan of the (short, ~20-entry) allowlist. Two tiers, STRONG
+ * matches (substring either direction, or one's last dot-segment is a prefix of the other's --
+ * catches the common "extra/missing letter in the last word" typo, e.g. "wazuh.rule.leveel" ->
+ * "wazuh.rule.level") sorted ahead of WEAK matches (same leading path segment only, e.g. any
+ * other "wazuh.*" field) -- so a near-miss on the meaningful part of the name is never pushed out
+ * of the capped top 5 by a same-namespace field that shares nothing but "wazuh.". */
 function suggestCloseFields(field: string): string[] {
   const needle = field.toLowerCase();
-  const firstSegment = needle.split('.')[0];
-  const candidates = listAggAllowedFields().filter(candidate => {
+  const needleSegments = needle.split('.');
+  const firstSegment = needleSegments[0];
+  const lastSegment = needleSegments[needleSegments.length - 1];
+  const strong: string[] = [];
+  const weak: string[] = [];
+  for (const candidate of listAggAllowedFields()) {
     const lower = candidate.toLowerCase();
-    return (
+    const segments = lower.split('.');
+    const candidateLastSegment = segments[segments.length - 1];
+    const isStrongMatch =
       lower.includes(needle) ||
       needle.includes(lower) ||
-      lower.split('.')[0] === firstSegment
-    );
-  });
-  return candidates.slice(0, 5);
+      candidateLastSegment.startsWith(lastSegment) ||
+      lastSegment.startsWith(candidateLastSegment);
+    if (isStrongMatch) {
+      strong.push(candidate);
+    } else if (segments[0] === firstSegment) {
+      weak.push(candidate);
+    }
+  }
+  return [...strong, ...weak].slice(0, 5);
 }
 
 /** Quote-free, fully-escaped, anchored "starts with" Lucene regexp for a `terms.include` clause --

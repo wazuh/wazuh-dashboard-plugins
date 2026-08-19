@@ -35,6 +35,49 @@ function clientReturning(
   };
 }
 
+/** Every OTHER queried family's index pattern resolving to "no backing index" (empty body) --
+ * treated as "nothing to check yet", not drift (see field-drift-canary.ts's `checkFamily` doc
+ * comment) -- so a fixture can isolate the one family it actually cares about. */
+const OTHER_EMPTY_FAMILY_INDICES: Record<string, MappingsResponseBody> = {
+  'wazuh-findings-v5*': {},
+  'wazuh-events-v5*': {},
+  'wazuh-states-vulnerabilities*': {},
+  'wazuh-states-fim-files*': {},
+  'wazuh-states-inventory-system*': {},
+  'wazuh-states-inventory-packages*': {},
+  'wazuh-states-inventory-ports*': {},
+  'wazuh-states-inventory-processes*': {},
+  'wazuh-states-inventory-hotfixes*': {},
+};
+
+/** Sets one leaf field (`path`, dot-separated) on a mapping `properties` tree, creating every
+ * intermediate object-with-`properties` node it needs along the way. Safe to call repeatedly for
+ * overlapping paths (e.g. "check.id" then "check.result") -- an existing intermediate node is
+ * reused rather than clobbered, unlike a naive `node[segment] = node[segment] ?? {...}` inline
+ * loop (which breaks the moment segment 0 of one path was already written as a LEAF by a
+ * previous, unrelated single-segment path). */
+function setMappingLeaf(
+  root: Record<string, unknown>,
+  path: string,
+  type: string,
+): void {
+  const segments = path.split('.');
+  let node = root;
+  segments.forEach((segment, index) => {
+    if (index === segments.length - 1) {
+      node[segment] = { type };
+      return;
+    }
+    const existing = node[segment] as
+      | { properties?: Record<string, unknown> }
+      | undefined;
+    if (!existing || typeof existing !== 'object' || !existing.properties) {
+      node[segment] = { properties: {} };
+    }
+    node = (node[segment] as { properties: Record<string, unknown> }).properties;
+  });
+}
+
 test('flattenMappedFieldPaths: flattens nested object properties into dot paths, never descending into multi-field "fields"', () => {
   const paths = flattenMappedFieldPaths({
     '@timestamp': { type: 'date' },
@@ -55,51 +98,34 @@ test('flattenMappedFieldPaths: an undefined properties tree yields an empty set'
   assert.deepEqual(flattenMappedFieldPaths(undefined), new Set());
 });
 
-test('checkFieldDrift: logs nothing when every catalog field for a family is present live', async () => {
-  // 'sca' is a small, real FIELD_CATALOG family -- build a live mapping that is a SUPERSET of it
-  // (extra fields are fine; the canary only cares about MISSING ones).
+/** Builds a full, genuinely no-drift SCA mapping tree: every `FIELD_CATALOG.sca` path plus every
+ * `fieldsForFamily('sca')` allowlist path (the latter are `wazuh.*` fields, never in
+ * `FIELD_CATALOG` itself -- see field-drift-canary.ts's `QUERIED_FAMILIES` doc comment) minus
+ * whichever `pathsToOmit` the caller wants to simulate as dropped/renamed. */
+async function buildScaProperties(pathsToOmit: string[] = []): Promise<Record<string, unknown>> {
   const { FIELD_CATALOG } = await import('../../common/field-catalog');
-  const scaProperties: Record<string, unknown> = {};
-  for (const entry of FIELD_CATALOG.sca) {
-    const segments = entry.path.split('.');
-    let node = scaProperties;
-    for (const [i, segment] of segments.entries()) {
-      if (i === segments.length - 1) {
-        node[segment] = { type: entry.type };
-      } else {
-        node[segment] = node[segment] ?? { properties: {} };
-        node = (node[segment] as { properties: Record<string, unknown> }).properties;
-      }
+  const { fieldsForFamily } = await import('./catalog/get-field-values');
+  const omit = new Set(pathsToOmit);
+  const properties: Record<string, unknown> = {};
+  const allPaths = [
+    ...FIELD_CATALOG.sca.map(entry => ({ path: entry.path, type: entry.type })),
+    ...fieldsForFamily('sca').map(path => ({ path, type: 'keyword' })),
+  ];
+  for (const { path, type } of allPaths) {
+    if (!omit.has(path)) {
+      setMappingLeaf(properties, path, type);
     }
   }
-  // checkFamily also live-checks the AGG_FIELD_ALLOWLIST fields get-field-values.ts knows for
-  // "sca" (fieldsForFamily('sca')) -- wazuh.agent.id/wazuh.agent.name are not WCS/ECS paths, so
-  // they are never in FIELD_CATALOG itself and must be added here too for this to be a genuine
-  // no-drift fixture.
-  (scaProperties.wazuh as { properties: Record<string, unknown> } | undefined) ??
-    (scaProperties.wazuh = { properties: {} });
-  const wazuhProperties = (
-    scaProperties.wazuh as { properties: Record<string, unknown> }
-  ).properties;
-  wazuhProperties.agent = {
-    properties: { id: { type: 'keyword' }, name: { type: 'keyword' } },
-  };
+  return properties;
+}
 
+test('checkFieldDrift: logs nothing when every catalog + tool-filter field for a family is present live', async () => {
+  const properties = await buildScaProperties();
   const client = clientReturning({
     'wazuh-states-sca*': {
-      'wazuh-states-sca-000001': { mappings: { properties: scaProperties } },
+      'wazuh-states-sca-000001': { mappings: { properties } },
     },
-    // Other queried families in this run resolve to nothing -- treated as "no backing index yet",
-    // not drift (see checkFamily's doc comment) -- so this test isolates the sca case cleanly.
-    'wazuh-findings-v5*': {},
-    'wazuh-events-v5*': {},
-    'wazuh-states-vulnerabilities*': {},
-    'wazuh-states-fim-files*': {},
-    'wazuh-states-inventory-system*': {},
-    'wazuh-states-inventory-packages*': {},
-    'wazuh-states-inventory-ports*': {},
-    'wazuh-states-inventory-processes*': {},
-    'wazuh-states-inventory-hotfixes*': {},
+    ...OTHER_EMPTY_FAMILY_INDICES,
   });
   const logger = fakeLogger();
   await checkFieldDrift(client, logger as never);
@@ -107,27 +133,15 @@ test('checkFieldDrift: logs nothing when every catalog field for a family is pre
 });
 
 test('checkFieldDrift: warns, prefixed "[field-drift]", for a catalog field missing from the live mapping', async () => {
+  // Every other sca/tool-filter field present; ONLY "policy.id" simulated as dropped/renamed --
+  // keeps this fixture to a single missing field, well inside MAX_MISSING_FIELDS_LOGGED_PER_FAMILY,
+  // so the assertion below cannot be defeated by the per-family log cap.
+  const properties = await buildScaProperties(['policy.id']);
   const client = clientReturning({
     'wazuh-states-sca*': {
-      'wazuh-states-sca-000001': {
-        mappings: {
-          properties: {
-            check: { properties: { id: { type: 'keyword' } } },
-            // 'policy.id'/'policy.name' etc. deliberately omitted -- simulates a renamed/dropped
-            // field group.
-          },
-        },
-      },
+      'wazuh-states-sca-000001': { mappings: { properties } },
     },
-    'wazuh-findings-v5*': {},
-    'wazuh-events-v5*': {},
-    'wazuh-states-vulnerabilities*': {},
-    'wazuh-states-fim-files*': {},
-    'wazuh-states-inventory-system*': {},
-    'wazuh-states-inventory-packages*': {},
-    'wazuh-states-inventory-ports*': {},
-    'wazuh-states-inventory-processes*': {},
-    'wazuh-states-inventory-hotfixes*': {},
+    ...OTHER_EMPTY_FAMILY_INDICES,
   });
   const logger = fakeLogger();
   await checkFieldDrift(client, logger as never);
@@ -139,20 +153,15 @@ test('checkFieldDrift: warns, prefixed "[field-drift]", for a catalog field miss
     logger.warnMessages.some(message => message.includes('"policy.id"')),
     'expected a warning naming the missing "policy.id" field',
   );
+  // Nothing else was omitted -- exactly one missing-field line (plus no "additional" remainder
+  // line, since 1 is well under the cap).
+  assert.equal(logger.warnMessages.length, 1);
 });
 
 test('checkFieldDrift: a family whose index pattern matches nothing live is not drift', async () => {
   const client = clientReturning({
     'wazuh-states-sca*': {},
-    'wazuh-findings-v5*': {},
-    'wazuh-events-v5*': {},
-    'wazuh-states-vulnerabilities*': {},
-    'wazuh-states-fim-files*': {},
-    'wazuh-states-inventory-system*': {},
-    'wazuh-states-inventory-packages*': {},
-    'wazuh-states-inventory-ports*': {},
-    'wazuh-states-inventory-processes*': {},
-    'wazuh-states-inventory-hotfixes*': {},
+    ...OTHER_EMPTY_FAMILY_INDICES,
   });
   const logger = fakeLogger();
   await checkFieldDrift(client, logger as never);
