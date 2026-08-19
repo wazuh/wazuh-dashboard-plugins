@@ -10,7 +10,7 @@ import { i18n } from '@osd/i18n';
 import { createMemoryHistory } from 'history';
 import { AppMountParameters, CoreStart } from '../../../../../src/core/public';
 import { PLUGIN_ID } from '../../../common/constants';
-import { ChatPage } from '../chat/chat-page';
+import { ChatPage, ConversationsSnapshot } from '../chat/chat-page';
 import { useProviders } from '../../hooks/use-providers';
 import { interruptConfirmationText } from '../../services/interrupt-confirm';
 
@@ -31,6 +31,12 @@ interface AssistantChatPanelProps {
  * strip rather than a full-screen flyout, so "New conversation" and "Search" stay reachable at any
  * panel width without an extra click. */
 const SIDEBAR_MIN_PANEL_WIDTH = 600;
+
+const emptyConversationsSnapshot: ConversationsSnapshot = {
+  conversations: [],
+  isLoading: false,
+  activeConversationId: null,
+};
 
 export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
   core,
@@ -58,6 +64,25 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
   // control of the rail's mode, further panel resizes must not silently override their choice (the
   // resize-driven default below is a starting point, not a standing rule).
   const railModeManuallySetRef = useRef(false);
+  // ChatPage owns the actual saved-conversations state (it loads/saves them) — this panel only
+  // mirrors it, via `onConversationsChange` below, to render the header's own title/subtitle.
+  const [conversationsSnapshot, setConversationsSnapshot] = useState(
+    emptyConversationsSnapshot,
+  );
+
+  const untitledConversationLabel = i18n.translate(
+    'wazuhAiAssistant.headerPanel.untitledConversation',
+    { defaultMessage: 'Untitled' },
+  );
+  // The active conversation's own saved title, looked up from the mirrored snapshot (never
+  // re-derived) — `undefined` both for a brand-new, never-yet-saved conversation AND for one
+  // whose row hasn't reached this mirror yet, so both fall back to the same "Untitled" label
+  // rather than the header briefly reading blank.
+  const activeConversationTitle =
+    conversationsSnapshot.conversations.find(
+      conversation =>
+        conversation.id === conversationsSnapshot.activeConversationId,
+    )?.title ?? untitledConversationLabel;
 
   const handleGeneratingChange = useCallback(
     (generating: boolean) => {
@@ -193,14 +218,53 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
         }}
       >
         <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false}>
-          <EuiFlexItem>
-            <EuiTitle size='xs'>
-              <h2 id={titleId}>
-                {i18n.translate('wazuhAiAssistant.headerPanel.title', {
-                  defaultMessage: 'AI Assistant',
-                })}
-              </h2>
-            </EuiTitle>
+          <EuiFlexItem style={{ minWidth: 0 }}>
+            <div>
+              <EuiTitle size='xs'>
+                <h2 id={titleId}>
+                  {i18n.translate('wazuhAiAssistant.headerPanel.title', {
+                    defaultMessage: 'AI Assistant',
+                  })}
+                </h2>
+              </EuiTitle>
+              {/* The active conversation's own title (or "Untitled" for a brand-new,
+                never-yet-saved one) — a subtitle under the panel's own name rather than a
+                replacement for it, so the sidecar keeps reading as "AI Assistant" first even once
+                a conversation is open.
+                `display: flex` here is what lets a long title truncate: `EuiToolTip` always wraps
+                its child in an inline-block `span` (`wzAiAssistantTitleTooltipAnchor`,
+                chat-page.scss) whose `width: auto` sizing, under ordinary block/inline-block
+                shrink-to-fit rules, can never go below its content's own min-content width — and
+                `white-space: nowrap` makes a long title's min-content width the FULL one-line
+                width, so the anchor simply overflowed this column no matter what `max-width` the
+                text inside it asked for. Flex-shrink uses a DIFFERENT algorithm with no such
+                floor, provided the item's automatic minimum size is zeroed out — which
+                `overflow: hidden` on that same anchor class does per spec, since a flex item's
+                automatic min-width computes to 0 rather than content-based when its own
+                `overflow` isn't `visible`. That shrunk, now-definite anchor width is what finally
+                lets the plain `span` inside truncate against a real number instead of an
+                indefinite one. For a SHORT title, this flex item just renders at its natural
+                (small) size — grow defaults to 0, so it never stretches to fill the column. */}
+              <div style={{ display: 'flex' }}>
+                <EuiToolTip
+                  content={activeConversationTitle}
+                  anchorClassName='wzAiAssistantTitleTooltipAnchor'
+                >
+                  <span
+                    style={{
+                      display: 'block',
+                      overflow: 'hidden',
+                      whiteSpace: 'nowrap',
+                      textOverflow: 'ellipsis',
+                      fontSize: '0.75rem',
+                      color: 'var(--wz-text-subdued)',
+                    }}
+                  >
+                    {activeConversationTitle}
+                  </span>
+                </EuiToolTip>
+              </div>
+            </div>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiToolTip
@@ -271,6 +335,7 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
             onProviderChange={setSelectedProviderId}
             onNavigateToSettings={openSettingsToAddProvider}
             onGeneratingChange={handleGeneratingChange}
+            onConversationsChange={setConversationsSnapshot}
             // Always rendered (never hidden outright, see `SIDEBAR_MIN_PANEL_WIDTH`'s own doc
             // comment): `railDisplayModeOverride` below is what the toolbar toggle actually drives.
             showConversationSidebar

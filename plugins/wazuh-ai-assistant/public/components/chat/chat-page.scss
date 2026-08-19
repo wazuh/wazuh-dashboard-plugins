@@ -374,3 +374,19 @@
     }
   }
 }
+
+/**
+ * Sidecar header conversation-title tooltip anchor (assistant-chat-panel.tsx's own doc comment on
+ * its `EuiToolTip` explains the full chain). `overflow: hidden` is the load-bearing rule: per the
+ * flexbox spec, a flex item's AUTOMATIC minimum size (what `min-width: auto` resolves to) is 0
+ * rather than content-based whenever the item's own `overflow` isn't `visible` — that's what lets
+ * this anchor genuinely flex-SHRINK below its (very wide, `white-space: nowrap`) content's
+ * min-content width instead of overflowing its column the way ordinary block/inline-block
+ * shrink-to-fit sizing would. `min-width: 0` is the same outcome spelled out explicitly, kept
+ * alongside it rather than relied on alone since it's the version most engines have supported
+ * longest.
+ */
+.wzAiAssistantTitleTooltipAnchor {
+  overflow: hidden;
+  min-width: 0;
+}

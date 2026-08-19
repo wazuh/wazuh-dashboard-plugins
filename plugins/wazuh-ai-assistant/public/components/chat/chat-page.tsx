@@ -123,6 +123,21 @@ interface ChatPageProps {
    * to make, the same way `showConversationSidebar` already is.
    */
   allowRailFlyout?: boolean;
+  /**
+   * Fires whenever the saved-conversations state this component owns (`conversations`,
+   * `isLoadingConversations`, `activeConversationId`) changes — the sidecar header
+   * (assistant-chat-panel.tsx) shows the active conversation's own title (or "Untitled") next to
+   * its own "AI Assistant" heading, but has no state of its own to read that from, since ChatPage
+   * is what loads/saves conversations.
+   */
+  onConversationsChange?: (state: ConversationsSnapshot) => void;
+}
+
+/** `onConversationsChange`'s payload — see that prop's own doc comment. */
+export interface ConversationsSnapshot {
+  conversations: ConversationSummary[];
+  isLoading: boolean;
+  activeConversationId: string | null;
 }
 
 /**
@@ -249,6 +264,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   showConversationSidebar = true,
   railDisplayModeOverride,
   allowRailFlyout = true,
+  onConversationsChange,
 }) => {
   // `useSyncedState` (public/hooks/use-synced-state.ts) is the `[value, setValue, ref]` pattern
   // used for `messages`, `inputText`, and `activeConversationId` below — see that hook's own doc
@@ -283,6 +299,16 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     setActiveConversationId,
     activeConversationIdRef,
   ] = useSyncedState<string | null>(null);
+
+  useEffect(() => {
+    onConversationsChange?.({
+      conversations,
+      isLoading: isLoadingConversations,
+      activeConversationId,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversations, isLoadingConversations, activeConversationId]);
+
   // Save serialization: every auto-save is chained onto this promise instead of being dropped when
   // one is already in flight. Dropping an overlap was safe only while every save targeted the
   // conversation on screen (the next turn's save would resend the same, fuller array) — it is NOT
