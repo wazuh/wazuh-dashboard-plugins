@@ -849,8 +849,7 @@ $wzMsgAvatarColumn: 40px;
      travelling, which is exactly when this must NOT run — the chrome is transparent throughout the
      travel and only fades in once the row has arrived. */
   .wzComposerRow {
-    transition:
-      background-color $wzMotionSlow $wzEase,
+    transition: background-color $wzMotionSlow $wzEase,
       border-color $wzMotionSlow $wzEase;
   }
 
@@ -955,8 +954,7 @@ $wzMsgAvatarColumn: 40px;
 
 @media (prefers-reduced-motion: no-preference) {
   .euiBadge.wzPrivacyChip {
-    transition:
-      background-color $wzMotionFast $wzEase,
+    transition: background-color $wzMotionFast $wzEase,
       color $wzMotionFast $wzEase;
   }
 }
@@ -981,10 +979,8 @@ $wzMsgAvatarColumn: 40px;
 
 @media (prefers-reduced-motion: no-preference) {
   .euiButtonIcon.wzComposerSendButton {
-    transition:
-      background-color $wzMotionFast $wzEase,
-      color $wzMotionFast $wzEase,
-      transform $wzMotionFast $wzEase;
+    transition: background-color $wzMotionFast $wzEase,
+      color $wzMotionFast $wzEase, transform $wzMotionFast $wzEase;
   }
 
   .euiButtonIcon.wzComposerSendButton:not(:disabled):active {

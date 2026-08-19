@@ -407,10 +407,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   // whose own history push races this effect. Re-forcing Providers on every one of those changes
   // silently overrode every OTHER tab click for as long as `addProvider` lingered (item 1b).
   useEffect(() => {
-    const isArrival = autoOpenCreateForm && !previousAutoOpenCreateFormRef.current;
+    const isArrival =
+      autoOpenCreateForm && !previousAutoOpenCreateFormRef.current;
     previousAutoOpenCreateFormRef.current = Boolean(autoOpenCreateForm);
     setActiveTabId(isArrival ? 'providers' : tabFromSearch(location.search));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search, autoOpenCreateForm]);
 
   const switchTab = (tabId: SettingsTabId) => {
@@ -1446,146 +1446,159 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         </EuiTabs>
         <EuiSpacer size='l' />
 
-        <div style={{ display: activeTabId === 'providers' ? undefined : 'none' }}>
-        <SectionCard
-          pillLabel={i18n.translate(
-            'wazuhAiAssistant.settings.providers.title',
-            {
-              defaultMessage: 'Providers',
-            },
-          )}
-          description={i18n.translate(
-            'wazuhAiAssistant.settings.providers.description',
-            {
-              defaultMessage:
-                'Connect and manage the AI providers available to the chat.',
-            },
-          )}
+        <div
+          style={{ display: activeTabId === 'providers' ? undefined : 'none' }}
         >
-          {error && !isFormOpen && (
-            <>
-              <EuiCallOut
-                title={i18n.translate('wazuhAiAssistant.settings.errorTitle', {
-                  defaultMessage: 'Something went wrong',
-                })}
-                color='danger'
-                iconType='alert'
-              >
-                <p>{error}</p>
-              </EuiCallOut>
-              <EuiSpacer size='m' />
-            </>
-          )}
+          <SectionCard
+            pillLabel={i18n.translate(
+              'wazuhAiAssistant.settings.providers.title',
+              {
+                defaultMessage: 'Providers',
+              },
+            )}
+            description={i18n.translate(
+              'wazuhAiAssistant.settings.providers.description',
+              {
+                defaultMessage:
+                  'Connect and manage the AI providers available to the chat.',
+              },
+            )}
+          >
+            {error && !isFormOpen && (
+              <>
+                <EuiCallOut
+                  title={i18n.translate(
+                    'wazuhAiAssistant.settings.errorTitle',
+                    {
+                      defaultMessage: 'Something went wrong',
+                    },
+                  )}
+                  color='danger'
+                  iconType='alert'
+                >
+                  <p>{error}</p>
+                </EuiCallOut>
+                <EuiSpacer size='m' />
+              </>
+            )}
 
-          {providersLoaded && providers.length === 0 ? (
-            <EuiEmptyPrompt
-              iconType='machineLearningApp'
-              title={
-                <h2>
-                  {i18n.translate(
-                    'wazuhAiAssistant.settings.providers.emptyTitle',
-                    {
-                      defaultMessage: 'No AI provider configured',
-                    },
-                  )}
-                </h2>
-              }
-              body={
-                <p>
-                  {i18n.translate(
-                    'wazuhAiAssistant.settings.providers.emptyBody',
-                    {
-                      defaultMessage:
-                        'The AI Assistant needs at least one connected provider ' +
-                        '(OpenAI-compatible or Anthropic) before it can answer questions. ' +
-                        'Add one to get started.',
-                    },
-                  )}
-                </p>
-              }
-              actions={
-                <EuiButton color='primary' fill onClick={openCreateForm}>
-                  {i18n.translate(
-                    'wazuhAiAssistant.settings.providers.emptyAction',
-                    {
-                      defaultMessage: 'Add a provider',
-                    },
-                  )}
-                </EuiButton>
-              }
-            />
-          ) : (
-            <EuiInMemoryTable
-              items={providers}
-              columns={columns}
-              itemId='id'
-              search={providersSearch}
-              itemIdToExpandedRowMap={itemIdToExpandedRowMap}
-              // Enforces the proportional column widths above as real caps (screen 3 gap: "Fixed
-              // pixel column widths") — without it, auto table layout lets a column's content grow
-              // the whole table past its container, which is exactly the horizontal-scroll failure
-              // those percentages exist to prevent.
-              tableLayout='fixed'
-            />
-          )}
-        </SectionCard>
+            {providersLoaded && providers.length === 0 ? (
+              <EuiEmptyPrompt
+                iconType='machineLearningApp'
+                title={
+                  <h2>
+                    {i18n.translate(
+                      'wazuhAiAssistant.settings.providers.emptyTitle',
+                      {
+                        defaultMessage: 'No AI provider configured',
+                      },
+                    )}
+                  </h2>
+                }
+                body={
+                  <p>
+                    {i18n.translate(
+                      'wazuhAiAssistant.settings.providers.emptyBody',
+                      {
+                        defaultMessage:
+                          'The AI Assistant needs at least one connected provider ' +
+                          '(OpenAI-compatible or Anthropic) before it can answer questions. ' +
+                          'Add one to get started.',
+                      },
+                    )}
+                  </p>
+                }
+                actions={
+                  <EuiButton color='primary' fill onClick={openCreateForm}>
+                    {i18n.translate(
+                      'wazuhAiAssistant.settings.providers.emptyAction',
+                      {
+                        defaultMessage: 'Add a provider',
+                      },
+                    )}
+                  </EuiButton>
+                }
+              />
+            ) : (
+              <EuiInMemoryTable
+                items={providers}
+                columns={columns}
+                itemId='id'
+                search={providersSearch}
+                itemIdToExpandedRowMap={itemIdToExpandedRowMap}
+                // Enforces the proportional column widths above as real caps (screen 3 gap: "Fixed
+                // pixel column widths") — without it, auto table layout lets a column's content grow
+                // the whole table past its container, which is exactly the horizontal-scroll failure
+                // those percentages exist to prevent.
+                tableLayout='fixed'
+              />
+            )}
+          </SectionCard>
         </div>
 
         {/* No `xxl` spacer between the cards any more (it existed to separate two ADJACENT
             cards — see the comment that used to sit here) — each card now owns a whole tab, so
             there is never a second card directly below it to separate from. */}
-        <div style={{ display: activeTabId === 'privacy' ? undefined : 'none' }}>
-        <SectionCard
-          pillLabel={i18n.translate('wazuhAiAssistant.settings.privacy.title', {
-            defaultMessage: 'Privacy',
-          })}
-          description={i18n.translate(
-            'wazuhAiAssistant.settings.privacy.description',
-            {
-              defaultMessage:
-                'Control whether finding data is anonymized before reaching the configured AI provider. When privacy mode is off, hostnames, IP addresses, usernames, process command lines, and finding/rule text leave the cluster as-is.',
-            },
-          )}
+        <div
+          style={{ display: activeTabId === 'privacy' ? undefined : 'none' }}
         >
-          {settingsLoadError && (
-            <>
-              <EuiCallOut
-                color='danger'
-                iconType='alert'
-                title={settingsLoadError}
-                size='s'
-              />
-              <EuiSpacer size='m' />
-            </>
-          )}
+          <SectionCard
+            pillLabel={i18n.translate(
+              'wazuhAiAssistant.settings.privacy.title',
+              {
+                defaultMessage: 'Privacy',
+              },
+            )}
+            description={i18n.translate(
+              'wazuhAiAssistant.settings.privacy.description',
+              {
+                defaultMessage:
+                  'Control whether finding data is anonymized before reaching the configured AI provider. When privacy mode is off, hostnames, IP addresses, usernames, process command lines, and finding/rule text leave the cluster as-is.',
+              },
+            )}
+          >
+            {settingsLoadError && (
+              <>
+                <EuiCallOut
+                  color='danger'
+                  iconType='alert'
+                  title={settingsLoadError}
+                  size='s'
+                />
+                <EuiSpacer size='m' />
+              </>
+            )}
 
-          {!privacyDraft && !settingsLoadError && (
-            <>
-              <EuiLoadingSpinner
-                size='m'
-                aria-label={i18n.translate('wazuhAiAssistant.common.loading', {
-                  defaultMessage: 'Loading...',
-                })}
-              />
-              <EuiSpacer size='m' />
-            </>
-          )}
+            {!privacyDraft && !settingsLoadError && (
+              <>
+                <EuiLoadingSpinner
+                  size='m'
+                  aria-label={i18n.translate(
+                    'wazuhAiAssistant.common.loading',
+                    {
+                      defaultMessage: 'Loading...',
+                    },
+                  )}
+                />
+                <EuiSpacer size='m' />
+              </>
+            )}
 
-          {privacyDraft && (
-            <>
-              {privacySaveError && (
-                <>
-                  <EuiCallOut
-                    color='danger'
-                    iconType='alert'
-                    title={privacySaveError}
-                    size='s'
-                  />
-                  <EuiSpacer size='m' />
-                </>
-              )}
+            {privacyDraft && (
+              <>
+                {privacySaveError && (
+                  <>
+                    <EuiCallOut
+                      color='danger'
+                      iconType='alert'
+                      title={privacySaveError}
+                      size='s'
+                    />
+                    <EuiSpacer size='m' />
+                  </>
+                )}
 
-              {/* Two columns inside the card (audit's layout recommendation for §4): the two
+                {/* Two columns inside the card (audit's layout recommendation for §4): the two
                   switches on the left, the field-policy editor on the right. The void the audit
                   measured had MOVED inside these cards once the page took its 1200px cap — a pair
                   of ~300px switches alone in a 1150px row is the "abandoned whitespace" the
@@ -1594,461 +1607,471 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   EUI's responsive default (no `responsive={false}` here) stacks the two below EUI's
                   own breakpoint, which is the narrow-width behaviour we want and not a media query
                   of our own. */}
-              <EuiFlexGroup gutterSize='xl'>
-                <EuiFlexItem>
-                  <EuiFormRow>
-                    <EuiSwitch
-                      label={i18n.translate(
-                        'wazuhAiAssistant.settings.privacy.defaultOnLabel',
-                        {
-                          defaultMessage: 'Enable privacy mode by default',
-                        },
-                      )}
-                      checked={privacyDraft.privacyDefaultOn}
-                      onChange={event => {
-                        privacy.setValue({
-                          ...privacyDraft,
-                          privacyDefaultOn: event.target.checked,
-                        });
-                      }}
-                    />
-                  </EuiFormRow>
-                  <EuiSpacer size='s' />
-                  <EuiFormRow>
-                    <EuiSwitch
-                      label={i18n.translate(
-                        'wazuhAiAssistant.settings.privacy.userCanOverrideLabel',
-                        {
-                          defaultMessage:
-                            'Allow users to override privacy mode from the chat page',
-                        },
-                      )}
-                      checked={privacyDraft.userCanOverride}
-                      onChange={event => {
-                        privacy.setValue({
-                          ...privacyDraft,
-                          userCanOverride: event.target.checked,
-                        });
-                      }}
-                    />
-                  </EuiFormRow>
-                </EuiFlexItem>
-                <EuiFlexItem>
-                  {/* The full explanation lives in the tooltip rather than
+                <EuiFlexGroup gutterSize='xl'>
+                  <EuiFlexItem>
+                    <EuiFormRow>
+                      <EuiSwitch
+                        label={i18n.translate(
+                          'wazuhAiAssistant.settings.privacy.defaultOnLabel',
+                          {
+                            defaultMessage: 'Enable privacy mode by default',
+                          },
+                        )}
+                        checked={privacyDraft.privacyDefaultOn}
+                        onChange={event => {
+                          privacy.setValue({
+                            ...privacyDraft,
+                            privacyDefaultOn: event.target.checked,
+                          });
+                        }}
+                      />
+                    </EuiFormRow>
+                    <EuiSpacer size='s' />
+                    <EuiFormRow>
+                      <EuiSwitch
+                        label={i18n.translate(
+                          'wazuhAiAssistant.settings.privacy.userCanOverrideLabel',
+                          {
+                            defaultMessage:
+                              'Allow users to override privacy mode from the chat page',
+                          },
+                        )}
+                        checked={privacyDraft.userCanOverride}
+                        onChange={event => {
+                          privacy.setValue({
+                            ...privacyDraft,
+                            userCanOverride: event.target.checked,
+                          });
+                        }}
+                      />
+                    </EuiFormRow>
+                  </EuiFlexItem>
+                  <EuiFlexItem>
+                    {/* The full explanation lives in the tooltip rather than
                       inline: it is long enough to dominate the section, and it
                       only matters the first time an admin configures a rule (or
                       when one surprises them). */}
-                  <EuiFlexGroup
-                    gutterSize='xs'
-                    alignItems='center'
-                    responsive={false}
-                  >
-                    <EuiFlexItem grow={false}>
-                      <EuiText size='s'>
-                        <strong>
-                          {i18n.translate(
-                            'wazuhAiAssistant.settings.privacy.fieldPolicyTitle',
+                    <EuiFlexGroup
+                      gutterSize='xs'
+                      alignItems='center'
+                      responsive={false}
+                    >
+                      <EuiFlexItem grow={false}>
+                        <EuiText size='s'>
+                          <strong>
+                            {i18n.translate(
+                              'wazuhAiAssistant.settings.privacy.fieldPolicyTitle',
+                              {
+                                defaultMessage: 'Field policy',
+                              },
+                            )}
+                          </strong>
+                        </EuiText>
+                      </EuiFlexItem>
+                      <EuiFlexItem grow={false}>
+                        <EuiIconTip
+                          type='questionInCircle'
+                          color='subdued'
+                          content={i18n.translate(
+                            'wazuhAiAssistant.settings.privacy.fieldPolicyHelp',
                             {
-                              defaultMessage: 'Field policy',
+                              defaultMessage:
+                                'What the AI provider gets per field: real value (Allow), pseudonym (Anonymize), or nothing (Never send).',
                             },
                           )}
-                        </strong>
-                      </EuiText>
-                    </EuiFlexItem>
-                    <EuiFlexItem grow={false}>
-                      <EuiIconTip
-                        type='questionInCircle'
-                        color='subdued'
-                        content={i18n.translate(
-                          'wazuhAiAssistant.settings.privacy.fieldPolicyHelp',
+                        />
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                    <EuiSpacer size='s' />
+
+                    {fieldPolicyDraft.length > 0 && (
+                      <EuiAccordion
+                        id='field-policy-accordion'
+                        // Collapsed by default: the rule list is long (the
+                        // curated defaults alone are ~25 rows) and it is not what
+                        // an admin comes to this section for — the two privacy
+                        // switches beside it are. The button content carries the
+                        // rule count, so the section still reports its size
+                        // without being expanded.
+                        buttonContent={i18n.translate(
+                          'wazuhAiAssistant.settings.privacy.fieldPolicyAccordion',
                           {
-                            defaultMessage:
-                              'What the AI provider gets per field: real value (Allow), pseudonym (Anonymize), or nothing (Never send).',
+                            defaultMessage: 'Field rules ({count})',
+                            values: { count: fieldPolicyDraft.length },
                           },
                         )}
-                      />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                  <EuiSpacer size='s' />
-
-                  {fieldPolicyDraft.length > 0 && (
-                    <EuiAccordion
-                      id='field-policy-accordion'
-                      // Collapsed by default: the rule list is long (the
-                      // curated defaults alone are ~25 rows) and it is not what
-                      // an admin comes to this section for — the two privacy
-                      // switches beside it are. The button content carries the
-                      // rule count, so the section still reports its size
-                      // without being expanded.
-                      buttonContent={i18n.translate(
-                        'wazuhAiAssistant.settings.privacy.fieldPolicyAccordion',
-                        {
-                          defaultMessage: 'Field rules ({count})',
-                          values: { count: fieldPolicyDraft.length },
-                        },
-                      )}
-                      paddingSize='s'
-                    >
-                      <EuiFieldSearch
-                        compressed
-                        placeholder={i18n.translate(
-                          'wazuhAiAssistant.settings.privacy.filterFields',
-                          { defaultMessage: 'Filter fields' },
-                        )}
-                        value={fieldPolicyFilter}
-                        onChange={e => setFieldPolicyFilter(e.target.value)}
-                        isClearable
-                      />
-                      <EuiSpacer size='s' />
-                      <EuiFlexGroup
-                        gutterSize='s'
-                        alignItems='center'
-                        responsive={false}
+                        paddingSize='s'
                       >
-                        <EuiFlexItem>
-                          <EuiText size='xs' color='subdued'>
-                            <strong>
-                              {i18n.translate(
-                                'wazuhAiAssistant.settings.privacy.fieldColumnHeader',
-                                {
-                                  defaultMessage: 'Field',
-                                },
-                              )}
-                            </strong>
-                          </EuiText>
-                        </EuiFlexItem>
-                        <EuiFlexItem grow={false} style={{ minWidth: 160 }}>
-                          <EuiText size='xs' color='subdued'>
-                            <strong>
-                              {i18n.translate(
-                                'wazuhAiAssistant.settings.privacy.actionColumnHeader',
-                                { defaultMessage: 'Action' },
-                              )}
-                            </strong>
-                          </EuiText>
-                        </EuiFlexItem>
-                        <EuiFlexItem grow={false} style={{ width: 24 }} />
-                      </EuiFlexGroup>
-                      <EuiSpacer size='xs' />
-                      {fieldPolicyDraft
-                        .map((entry, index) => ({ entry, index }))
-                        .filter(
-                          ({ entry }) =>
-                            !fieldPolicyFilter ||
-                            entry._isNew ||
-                            entry.field
-                              .toLowerCase()
-                              .includes(fieldPolicyFilter.toLowerCase()),
-                        )
-                        .map(({ entry, index }) => (
-                          <React.Fragment key={index}>
-                            <EuiFlexGroup
-                              gutterSize='s'
-                              alignItems='center'
-                              responsive={false}
-                            >
-                              <EuiFlexItem>
-                                <EuiFieldText
-                                  fullWidth
-                                  compressed
-                                  placeholder={i18n.translate(
-                                    'wazuhAiAssistant.settings.privacy.fieldPlaceholder',
-                                    { defaultMessage: 'e.g. agent.name' },
-                                  )}
-                                  aria-label={i18n.translate(
-                                    'wazuhAiAssistant.settings.privacy.fieldColumnLabel',
-                                    { defaultMessage: 'Field' },
-                                  )}
-                                  value={entry.field}
-                                  onChange={event =>
-                                    handleFieldPolicyChange(index, {
-                                      field: event.target.value,
-                                    })
-                                  }
-                                />
-                              </EuiFlexItem>
-                              <EuiFlexItem
-                                grow={false}
-                                style={{ minWidth: 160 }}
+                        <EuiFieldSearch
+                          compressed
+                          placeholder={i18n.translate(
+                            'wazuhAiAssistant.settings.privacy.filterFields',
+                            { defaultMessage: 'Filter fields' },
+                          )}
+                          value={fieldPolicyFilter}
+                          onChange={e => setFieldPolicyFilter(e.target.value)}
+                          isClearable
+                        />
+                        <EuiSpacer size='s' />
+                        <EuiFlexGroup
+                          gutterSize='s'
+                          alignItems='center'
+                          responsive={false}
+                        >
+                          <EuiFlexItem>
+                            <EuiText size='xs' color='subdued'>
+                              <strong>
+                                {i18n.translate(
+                                  'wazuhAiAssistant.settings.privacy.fieldColumnHeader',
+                                  {
+                                    defaultMessage: 'Field',
+                                  },
+                                )}
+                              </strong>
+                            </EuiText>
+                          </EuiFlexItem>
+                          <EuiFlexItem grow={false} style={{ minWidth: 160 }}>
+                            <EuiText size='xs' color='subdued'>
+                              <strong>
+                                {i18n.translate(
+                                  'wazuhAiAssistant.settings.privacy.actionColumnHeader',
+                                  { defaultMessage: 'Action' },
+                                )}
+                              </strong>
+                            </EuiText>
+                          </EuiFlexItem>
+                          <EuiFlexItem grow={false} style={{ width: 24 }} />
+                        </EuiFlexGroup>
+                        <EuiSpacer size='xs' />
+                        {fieldPolicyDraft
+                          .map((entry, index) => ({ entry, index }))
+                          .filter(
+                            ({ entry }) =>
+                              !fieldPolicyFilter ||
+                              entry._isNew ||
+                              entry.field
+                                .toLowerCase()
+                                .includes(fieldPolicyFilter.toLowerCase()),
+                          )
+                          .map(({ entry, index }) => (
+                            <React.Fragment key={index}>
+                              <EuiFlexGroup
+                                gutterSize='s'
+                                alignItems='center'
+                                responsive={false}
                               >
-                                <EuiSelect
-                                  compressed
-                                  aria-label={i18n.translate(
-                                    'wazuhAiAssistant.settings.privacy.actionColumnLabel',
-                                    { defaultMessage: 'Action' },
-                                  )}
-                                  options={FIELD_POLICY_ACTIONS.map(action => ({
-                                    value: action,
-                                    text: FIELD_POLICY_ACTION_LABELS[action],
-                                  }))}
-                                  value={toSelectableFieldPolicyAction(
-                                    entry.action,
-                                  )}
-                                  onChange={event =>
-                                    handleFieldPolicyChange(index, {
-                                      action: event.target
-                                        .value as FieldPolicyAction,
-                                    })
-                                  }
-                                />
-                              </EuiFlexItem>
-                              <EuiFlexItem grow={false}>
-                                <EuiButtonIcon
-                                  iconType='trash'
-                                  color='danger'
-                                  aria-label={i18n.translate(
-                                    'wazuhAiAssistant.settings.privacy.removeField',
-                                    { defaultMessage: 'Remove field' },
-                                  )}
-                                  onClick={() =>
-                                    handleRemoveFieldPolicyRow(index)
-                                  }
-                                />
-                              </EuiFlexItem>
-                            </EuiFlexGroup>
-                            <EuiSpacer size='xs' />
-                          </React.Fragment>
-                        ))}
-                      <EuiSpacer size='s' />
-                      <EuiButton
-                        size='s'
-                        iconType='plusInCircle'
-                        onClick={handleAddFieldPolicyRow}
-                      >
-                        {i18n.translate(
-                          'wazuhAiAssistant.settings.privacy.addField',
-                          {
-                            defaultMessage: 'Add field',
-                          },
-                        )}
-                      </EuiButton>
-                    </EuiAccordion>
-                  )}
+                                <EuiFlexItem>
+                                  <EuiFieldText
+                                    fullWidth
+                                    compressed
+                                    placeholder={i18n.translate(
+                                      'wazuhAiAssistant.settings.privacy.fieldPlaceholder',
+                                      { defaultMessage: 'e.g. agent.name' },
+                                    )}
+                                    aria-label={i18n.translate(
+                                      'wazuhAiAssistant.settings.privacy.fieldColumnLabel',
+                                      { defaultMessage: 'Field' },
+                                    )}
+                                    value={entry.field}
+                                    onChange={event =>
+                                      handleFieldPolicyChange(index, {
+                                        field: event.target.value,
+                                      })
+                                    }
+                                  />
+                                </EuiFlexItem>
+                                <EuiFlexItem
+                                  grow={false}
+                                  style={{ minWidth: 160 }}
+                                >
+                                  <EuiSelect
+                                    compressed
+                                    aria-label={i18n.translate(
+                                      'wazuhAiAssistant.settings.privacy.actionColumnLabel',
+                                      { defaultMessage: 'Action' },
+                                    )}
+                                    options={FIELD_POLICY_ACTIONS.map(
+                                      action => ({
+                                        value: action,
+                                        text: FIELD_POLICY_ACTION_LABELS[
+                                          action
+                                        ],
+                                      }),
+                                    )}
+                                    value={toSelectableFieldPolicyAction(
+                                      entry.action,
+                                    )}
+                                    onChange={event =>
+                                      handleFieldPolicyChange(index, {
+                                        action: event.target
+                                          .value as FieldPolicyAction,
+                                      })
+                                    }
+                                  />
+                                </EuiFlexItem>
+                                <EuiFlexItem grow={false}>
+                                  <EuiButtonIcon
+                                    iconType='trash'
+                                    color='danger'
+                                    aria-label={i18n.translate(
+                                      'wazuhAiAssistant.settings.privacy.removeField',
+                                      { defaultMessage: 'Remove field' },
+                                    )}
+                                    onClick={() =>
+                                      handleRemoveFieldPolicyRow(index)
+                                    }
+                                  />
+                                </EuiFlexItem>
+                              </EuiFlexGroup>
+                              <EuiSpacer size='xs' />
+                            </React.Fragment>
+                          ))}
+                        <EuiSpacer size='s' />
+                        <EuiButton
+                          size='s'
+                          iconType='plusInCircle'
+                          onClick={handleAddFieldPolicyRow}
+                        >
+                          {i18n.translate(
+                            'wazuhAiAssistant.settings.privacy.addField',
+                            {
+                              defaultMessage: 'Add field',
+                            },
+                          )}
+                        </EuiButton>
+                      </EuiAccordion>
+                    )}
 
-                  {fieldPolicyDraft.length === 0 && (
-                    <>
-                      <EuiSpacer size='s' />
-                      <EuiButton
-                        size='s'
-                        iconType='plusInCircle'
-                        onClick={handleAddFieldPolicyRow}
-                      >
-                        {i18n.translate(
-                          'wazuhAiAssistant.settings.privacy.addField',
-                          {
-                            defaultMessage: 'Add field',
-                          },
-                        )}
-                      </EuiButton>
-                    </>
-                  )}
-                </EuiFlexItem>
-              </EuiFlexGroup>
+                    {fieldPolicyDraft.length === 0 && (
+                      <>
+                        <EuiSpacer size='s' />
+                        <EuiButton
+                          size='s'
+                          iconType='plusInCircle'
+                          onClick={handleAddFieldPolicyRow}
+                        >
+                          {i18n.translate(
+                            'wazuhAiAssistant.settings.privacy.addField',
+                            {
+                              defaultMessage: 'Add field',
+                            },
+                          )}
+                        </EuiButton>
+                      </>
+                    )}
+                  </EuiFlexItem>
+                </EuiFlexGroup>
 
-              <EuiSpacer size='m' />
-              <EuiHorizontalRule margin='none' />
-              <EuiSpacer size='m' />
+                <EuiSpacer size='m' />
+                <EuiHorizontalRule margin='none' />
+                <EuiSpacer size='m' />
 
-              {/* Per-provider privacy override (UX iteration 4 item 3): the backend has accepted
+                {/* Per-provider privacy override (UX iteration 4 item 3): the backend has accepted
                   `privacyDefaultPerProvider` since before this UI existed (server/routes/settings.ts,
                   server/settings/types.ts) — this is the first UI for it. A compact per-row control
                   rather than a table component: three states per provider is not enough content to
                   earn EuiInMemoryTable's own chrome, and this reuses the exact `providers` list the
                   Providers tab already loads. */}
-              <EuiText size='s'>
-                <strong>
+                <EuiText size='s'>
+                  <strong>
+                    {i18n.translate(
+                      'wazuhAiAssistant.settings.privacy.perProviderTitle',
+                      { defaultMessage: 'Per-provider override' },
+                    )}
+                  </strong>
+                </EuiText>
+                <div className='wzSettingsCard__fieldHelp'>
                   {i18n.translate(
-                    'wazuhAiAssistant.settings.privacy.perProviderTitle',
-                    { defaultMessage: 'Per-provider override' },
+                    'wazuhAiAssistant.settings.privacy.perProviderHelp',
+                    {
+                      defaultMessage:
+                        "Anonymize data sent to providers you don't control (hosted APIs) while " +
+                        "sending raw data to a local model. Providers on 'Use global default' " +
+                        'follow the switch above.',
+                    },
                   )}
-                </strong>
-              </EuiText>
-              <div className='wzSettingsCard__fieldHelp'>
-                {i18n.translate(
-                  'wazuhAiAssistant.settings.privacy.perProviderHelp',
-                  {
-                    defaultMessage:
-                      "Anonymize data sent to providers you don't control (hosted APIs) while " +
-                      "sending raw data to a local model. Providers on 'Use global default' " +
-                      'follow the switch above.',
-                  },
-                )}
-              </div>
-              <EuiSpacer size='s' />
-              {/* Guarded on `providersLoaded`, not a bare `providers.length === 0` — the load is
+                </div>
+                <EuiSpacer size='s' />
+                {/* Guarded on `providersLoaded`, not a bare `providers.length === 0` — the load is
                   async (see the effect that sets `providersLoaded`), so the empty-length check on
                   its own was also true WHILE loading and after a FAILED list load, both of which
                   showed "No providers configured yet." for a provider list that might still be on
                   its way (or that failed to load at all, with the actual error surfaced elsewhere
                   on the Providers tab). */}
-              {/* Stable hook for tests: the mounted-tabs design (B1) keeps the Providers table's
+                {/* Stable hook for tests: the mounted-tabs design (B1) keeps the Providers table's
                   own rows (also named after the provider) in the DOM at the same time as this
                   list, so an unscoped query for a provider's name is ambiguous between the two —
                   scope to this container. */}
-              <div data-test-subj='wzPerProviderPrivacyList'>
-                {!providersLoaded ? null : providers.length === 0 ? (
-                  <EuiText size='s' color='subdued'>
-                    {i18n.translate(
-                      'wazuhAiAssistant.settings.privacy.perProviderEmpty',
-                      { defaultMessage: 'No providers configured yet.' },
-                    )}
-                  </EuiText>
-                ) : (
-                  providers.map(provider => (
-                    <React.Fragment key={provider.id}>
-                      <EuiFlexGroup
-                        gutterSize='s'
-                        alignItems='center'
-                        responsive={false}
-                        className='wzSettingsCard__perProviderRow'
-                      >
-                        <EuiFlexItem
-                          grow={false}
-                          style={{ flexBasis: 300, maxWidth: 300 }}
+                <div data-test-subj='wzPerProviderPrivacyList'>
+                  {!providersLoaded ? null : providers.length === 0 ? (
+                    <EuiText size='s' color='subdued'>
+                      {i18n.translate(
+                        'wazuhAiAssistant.settings.privacy.perProviderEmpty',
+                        { defaultMessage: 'No providers configured yet.' },
+                      )}
+                    </EuiText>
+                  ) : (
+                    providers.map(provider => (
+                      <React.Fragment key={provider.id}>
+                        <EuiFlexGroup
+                          gutterSize='s'
+                          alignItems='center'
+                          responsive={false}
+                          className='wzSettingsCard__perProviderRow'
                         >
-                          <EuiText size='s' title={provider.name}>
-                            {provider.name}
-                          </EuiText>
-                        </EuiFlexItem>
-                        <EuiFlexItem grow={false} style={{ minWidth: 200 }}>
-                          <EuiSelect
-                            compressed
-                            aria-label={i18n.translate(
-                              'wazuhAiAssistant.settings.privacy.perProviderSelectAriaLabel',
-                              {
-                                defaultMessage: 'Privacy override for {name}',
-                                values: { name: provider.name },
-                              },
-                            )}
-                            options={[
-                              {
-                                value: 'inherit',
-                                text: i18n.translate(
-                                  'wazuhAiAssistant.settings.privacy.perProviderInherit',
-                                  { defaultMessage: 'Use global default' },
-                                ),
-                              },
-                              {
-                                value: 'on',
-                                text: i18n.translate(
-                                  'wazuhAiAssistant.settings.privacy.perProviderOn',
-                                  { defaultMessage: 'On' },
-                                ),
-                              },
-                              {
-                                value: 'off',
-                                text: i18n.translate(
-                                  'wazuhAiAssistant.settings.privacy.perProviderOff',
-                                  { defaultMessage: 'Off' },
-                                ),
-                              },
-                            ]}
-                            value={providerPrivacyOverride(
-                              // Defensive fallback: `privacyDefaultPerProvider` should always be
-                              // present on a loaded/saved AssistantSettings, but a falsy value
-                              // here must never crash the render — it just reads as "every
-                              // provider inherits", the same as an explicitly empty map.
-                              privacyDraft.privacyDefaultPerProvider ?? {},
-                              provider.id,
-                            )}
-                            onChange={event =>
-                              handleProviderPrivacyOverrideChange(
+                          <EuiFlexItem
+                            grow={false}
+                            style={{ flexBasis: 300, maxWidth: 300 }}
+                          >
+                            <EuiText size='s' title={provider.name}>
+                              {provider.name}
+                            </EuiText>
+                          </EuiFlexItem>
+                          <EuiFlexItem grow={false} style={{ minWidth: 200 }}>
+                            <EuiSelect
+                              compressed
+                              aria-label={i18n.translate(
+                                'wazuhAiAssistant.settings.privacy.perProviderSelectAriaLabel',
+                                {
+                                  defaultMessage: 'Privacy override for {name}',
+                                  values: { name: provider.name },
+                                },
+                              )}
+                              options={[
+                                {
+                                  value: 'inherit',
+                                  text: i18n.translate(
+                                    'wazuhAiAssistant.settings.privacy.perProviderInherit',
+                                    { defaultMessage: 'Use global default' },
+                                  ),
+                                },
+                                {
+                                  value: 'on',
+                                  text: i18n.translate(
+                                    'wazuhAiAssistant.settings.privacy.perProviderOn',
+                                    { defaultMessage: 'On' },
+                                  ),
+                                },
+                                {
+                                  value: 'off',
+                                  text: i18n.translate(
+                                    'wazuhAiAssistant.settings.privacy.perProviderOff',
+                                    { defaultMessage: 'Off' },
+                                  ),
+                                },
+                              ]}
+                              value={providerPrivacyOverride(
+                                // Defensive fallback: `privacyDefaultPerProvider` should always be
+                                // present on a loaded/saved AssistantSettings, but a falsy value
+                                // here must never crash the render — it just reads as "every
+                                // provider inherits", the same as an explicitly empty map.
+                                privacyDraft.privacyDefaultPerProvider ?? {},
                                 provider.id,
-                                event.target.value as ProviderPrivacyOverride,
-                              )
-                            }
-                          />
-                        </EuiFlexItem>
-                      </EuiFlexGroup>
-                      <EuiSpacer size='xs' />
-                    </React.Fragment>
-                  ))
-                )}
-              </div>
+                              )}
+                              onChange={event =>
+                                handleProviderPrivacyOverrideChange(
+                                  provider.id,
+                                  event.target.value as ProviderPrivacyOverride,
+                                )
+                              }
+                            />
+                          </EuiFlexItem>
+                        </EuiFlexGroup>
+                        <EuiSpacer size='xs' />
+                      </React.Fragment>
+                    ))
+                  )}
+                </div>
 
-              {/* `className` caps the rule at the content measure (settings-page.scss):
+                {/* `className` caps the rule at the content measure (settings-page.scss):
                   a full-bleed 1150px hairline over one button read as a page
                   divider rather than as this card's own footer (audit §4.4). */}
-              <EuiHorizontalRule
-                margin='m'
-                className='wzSettingsCard__actionsRule'
-              />
-              {/* `fill` only while the button can actually be pressed. A DISABLED
+                <EuiHorizontalRule
+                  margin='m'
+                  className='wzSettingsCard__actionsRule'
+                />
+                {/* `fill` only while the button can actually be pressed. A DISABLED
                   filled button is EUI's darkest slab at ~2.2:1 against its own
                   label — the audit (§4.4) measured the two disabled Saves as the
                   heaviest objects on the whole page, i.e. maximum visual weight
                   for the one state that has nothing to offer. Unfilled, a
                   disabled Save reads as what it is: present, not yet available. */}
-              <EuiButton
-                onClick={handleSavePrivacySettings}
-                isLoading={isSavingPrivacy}
-                isDisabled={privacySaveDisabled}
-                fill={!privacySaveDisabled}
-              >
-                {i18n.translate('wazuhAiAssistant.settings.privacy.save', {
-                  defaultMessage: 'Save privacy settings',
-                })}
-              </EuiButton>
-            </>
-          )}
-        </SectionCard>
+                <EuiButton
+                  onClick={handleSavePrivacySettings}
+                  isLoading={isSavingPrivacy}
+                  isDisabled={privacySaveDisabled}
+                  fill={!privacySaveDisabled}
+                >
+                  {i18n.translate('wazuhAiAssistant.settings.privacy.save', {
+                    defaultMessage: 'Save privacy settings',
+                  })}
+                </EuiButton>
+              </>
+            )}
+          </SectionCard>
         </div>
 
         {/* No `xxl` spacer here either, for the same reason noted above the Privacy tab. */}
-        <div style={{ display: activeTabId === 'retention' ? undefined : 'none' }}>
-        <SectionCard
-          pillLabel={i18n.translate(
-            'wazuhAiAssistant.settings.retention.title',
-            {
-              defaultMessage: 'Conversation history',
-            },
-          )}
-          description={i18n.translate(
-            'wazuhAiAssistant.settings.retention.description',
-            {
-              defaultMessage: 'Control how long saved conversations are kept.',
-            },
-          )}
+        <div
+          style={{ display: activeTabId === 'retention' ? undefined : 'none' }}
         >
-          {settingsLoadError && (
-            <>
-              <EuiCallOut
-                color='danger'
-                iconType='alert'
-                title={settingsLoadError}
-                size='s'
-              />
-              <EuiSpacer size='m' />
-            </>
-          )}
+          <SectionCard
+            pillLabel={i18n.translate(
+              'wazuhAiAssistant.settings.retention.title',
+              {
+                defaultMessage: 'Conversation history',
+              },
+            )}
+            description={i18n.translate(
+              'wazuhAiAssistant.settings.retention.description',
+              {
+                defaultMessage:
+                  'Control how long saved conversations are kept.',
+              },
+            )}
+          >
+            {settingsLoadError && (
+              <>
+                <EuiCallOut
+                  color='danger'
+                  iconType='alert'
+                  title={settingsLoadError}
+                  size='s'
+                />
+                <EuiSpacer size='m' />
+              </>
+            )}
 
-          {retention.value === null && !settingsLoadError && (
-            <>
-              <EuiLoadingSpinner
-                size='m'
-                aria-label={i18n.translate('wazuhAiAssistant.common.loading', {
-                  defaultMessage: 'Loading...',
-                })}
-              />
-              <EuiSpacer size='m' />
-            </>
-          )}
+            {retention.value === null && !settingsLoadError && (
+              <>
+                <EuiLoadingSpinner
+                  size='m'
+                  aria-label={i18n.translate(
+                    'wazuhAiAssistant.common.loading',
+                    {
+                      defaultMessage: 'Loading...',
+                    },
+                  )}
+                />
+                <EuiSpacer size='m' />
+              </>
+            )}
 
-          {retention.value !== null && (
-            <>
-              {retentionSaveError && (
-                <>
-                  <EuiCallOut
-                    color='danger'
-                    iconType='alert'
-                    title={retentionSaveError}
-                    size='s'
-                  />
-                  <EuiSpacer size='m' />
-                </>
-              )}
+            {retention.value !== null && (
+              <>
+                {retentionSaveError && (
+                  <>
+                    <EuiCallOut
+                      color='danger'
+                      iconType='alert'
+                      title={retentionSaveError}
+                      size='s'
+                    />
+                    <EuiSpacer size='m' />
+                  </>
+                )}
 
-              {/* Input left, its explanation right (audit's §4 layout
+                {/* Input left, its explanation right (audit's §4 layout
                   recommendation). A 327px number field alone in a 1150px row was
                   the clearest case of the void having moved INSIDE the cards once
                   the page took its 1200px cap, and the help text is the natural
@@ -2057,66 +2080,66 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   slot it can only ever render under the field. EUI's responsive
                   default stacks the two on a narrow window, help below input,
                   which is the same reading order. */}
-              <EuiFlexGroup gutterSize='xl'>
-                <EuiFlexItem>
-                  <EuiFormRow
-                    label={i18n.translate(
-                      'wazuhAiAssistant.settings.retention.daysLabel',
-                      {
-                        defaultMessage: 'Keep saved conversations for (days)',
-                      },
-                    )}
-                  >
-                    <EuiFieldNumber
-                      min={0}
-                      value={retention.value}
-                      onChange={event => {
-                        const parsed = Number(event.target.value);
-                        retention.setValue(
-                          Number.isNaN(parsed) ? 0 : Math.max(0, parsed),
-                        );
-                      }}
-                    />
-                  </EuiFormRow>
-                </EuiFlexItem>
-                <EuiFlexItem>
-                  {/* Not a third text scale: `.wzSettingsCard__fieldHelp`
+                <EuiFlexGroup gutterSize='xl'>
+                  <EuiFlexItem>
+                    <EuiFormRow
+                      label={i18n.translate(
+                        'wazuhAiAssistant.settings.retention.daysLabel',
+                        {
+                          defaultMessage: 'Keep saved conversations for (days)',
+                        },
+                      )}
+                    >
+                      <EuiFieldNumber
+                        min={0}
+                        value={retention.value}
+                        onChange={event => {
+                          const parsed = Number(event.target.value);
+                          retention.setValue(
+                            Number.isNaN(parsed) ? 0 : Math.max(0, parsed),
+                          );
+                        }}
+                      />
+                    </EuiFormRow>
+                  </EuiFlexItem>
+                  <EuiFlexItem>
+                    {/* Not a third text scale: `.wzSettingsCard__fieldHelp`
                       (settings-page.scss) restates EUI's own `.euiFormHelpText`
                       values, exactly as `.wzProviderFlyout__help` does in the
                       flyout — so a sentence that left the `helpText` slot keeps
                       the typography that slot gave it. */}
-                  <div className='wzSettingsCard__fieldHelp'>
-                    {i18n.translate(
-                      'wazuhAiAssistant.settings.retention.daysHelp',
-                      {
-                        defaultMessage:
-                          '0 keeps every saved conversation forever. Enforcement runs on its own schedule, via an ISM policy on the underlying data stream.',
-                      },
-                    )}
-                  </div>
-                </EuiFlexItem>
-              </EuiFlexGroup>
+                    <div className='wzSettingsCard__fieldHelp'>
+                      {i18n.translate(
+                        'wazuhAiAssistant.settings.retention.daysHelp',
+                        {
+                          defaultMessage:
+                            '0 keeps every saved conversation forever. Enforcement runs on its own schedule, via an ISM policy on the underlying data stream.',
+                        },
+                      )}
+                    </div>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
 
-              {/* Same two fixes as the Privacy card's own footer above (audit §4.4):
+                {/* Same two fixes as the Privacy card's own footer above (audit §4.4):
                   the rule stops at the content measure, and `fill` comes off
                   while the button is disabled. */}
-              <EuiHorizontalRule
-                margin='m'
-                className='wzSettingsCard__actionsRule'
-              />
-              <EuiButton
-                onClick={handleSaveRetentionSettings}
-                isLoading={isSavingRetention}
-                isDisabled={!retention.isDirty}
-                fill={retention.isDirty}
-              >
-                {i18n.translate('wazuhAiAssistant.settings.retention.save', {
-                  defaultMessage: 'Save conversation history settings',
-                })}
-              </EuiButton>
-            </>
-          )}
-        </SectionCard>
+                <EuiHorizontalRule
+                  margin='m'
+                  className='wzSettingsCard__actionsRule'
+                />
+                <EuiButton
+                  onClick={handleSaveRetentionSettings}
+                  isLoading={isSavingRetention}
+                  isDisabled={!retention.isDirty}
+                  fill={retention.isDirty}
+                >
+                  {i18n.translate('wazuhAiAssistant.settings.retention.save', {
+                    defaultMessage: 'Save conversation history settings',
+                  })}
+                </EuiButton>
+              </>
+            )}
+          </SectionCard>
         </div>
       </EuiPageBody>
       {isFormOpen && isActive && (

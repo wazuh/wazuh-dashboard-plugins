@@ -508,7 +508,7 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
   // ANY value that is still just the OLD type's own known default, not only an empty field —
   // including one filled by clicking an "Examples:" chip, which is exactly the kind of "still just
   // a suggestion" value the reset is meant to catch.
-  it('resets an endpoint still holding the OLD type\'s own example when switching type, even though it was filled by clicking a chip', () => {
+  it("resets an endpoint still holding the OLD type's own example when switching type, even though it was filled by clicking a chip", () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
     fireEvent.click(
@@ -564,7 +564,7 @@ describe('ProviderFormFlyout — endpoint/type mismatch warning', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('warns when an openai_compatible-typed provider points at Anthropic\'s own host', () => {
+  it("warns when an openai_compatible-typed provider points at Anthropic's own host", () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
     fireEvent.change(screen.getByLabelText(/endpoint url/i), {

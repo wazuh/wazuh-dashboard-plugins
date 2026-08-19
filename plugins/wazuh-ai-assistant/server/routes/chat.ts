@@ -128,14 +128,6 @@ function suggestedQueryReasonMismatchDisclosure(fields: string[]): string {
   );
 }
 
-interface StoredProviderAttributes {
-  name: string;
-  type: ProviderConfig['type'];
-  baseUrl: string;
-  model: string;
-  apiKey?: string;
-}
-
 /** Bounded tool rounds per turn; a final no-tools round follows to close out the answer.
  * Exported so tests can derive round-budget-dependent scripts from it (see
  * chat-capability-honesty.test.ts's last-tool-bearing-round test) instead of hardcoding the
@@ -1757,7 +1749,6 @@ export async function* orchestrate(
           // everything. Trimmed for the same whitespace-only-text-block reason as the tool_call
           // sites above.
           const roundTail = roundText.slice(roundTextConsumed).trim();
-          roundTextConsumed = roundText.length;
           if (roundTail) {
             messages = [...messages, { role: 'assistant', content: roundTail }];
           }
@@ -1896,7 +1887,11 @@ export async function* orchestrate(
         if (!sawAnyDelta) {
           yield {
             type: 'delta',
-            content: noTextFallbackMessage(toolUsedThisTurn, sawNonEmptyTable),
+            content: noTextFallbackMessage(
+              toolUsedThisTurn,
+              sawNonEmptyTable,
+              true,
+            ),
           };
         }
         yield* emitPrivacyMapOnce();

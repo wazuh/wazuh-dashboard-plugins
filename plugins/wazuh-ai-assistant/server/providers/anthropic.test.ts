@@ -241,9 +241,7 @@ test('AnthropicAdapter: an assistant message with narration text and a tool call
           {
             role: 'assistant',
             content: 'Let me check that for you.',
-            toolCalls: [
-              { id: 'call-1', name: 'get_rules', arguments: {} },
-            ],
+            toolCalls: [{ id: 'call-1', name: 'get_rules', arguments: {} }],
           },
           { role: 'tool', toolCallId: 'call-1', content: '{"rows":[]}' },
         ] as never,
@@ -254,7 +252,9 @@ test('AnthropicAdapter: an assistant message with narration text and a tool call
       role: string;
       content: Array<{ type: string; text?: string }>;
     }>;
-    const assistantMessage = messages.find(message => message.role === 'assistant');
+    const assistantMessage = messages.find(
+      message => message.role === 'assistant',
+    );
     expect(assistantMessage).toBeDefined();
     expect(assistantMessage!.content[0]).toMatchObject({
       type: 'text',
@@ -284,9 +284,7 @@ test('AnthropicAdapter: an assistant message with whitespace-only content emits 
           {
             role: 'assistant',
             content: '\n\n',
-            toolCalls: [
-              { id: 'call-1', name: 'get_rules', arguments: {} },
-            ],
+            toolCalls: [{ id: 'call-1', name: 'get_rules', arguments: {} }],
           },
           { role: 'tool', toolCallId: 'call-1', content: '{"rows":[]}' },
         ] as never,
@@ -297,7 +295,9 @@ test('AnthropicAdapter: an assistant message with whitespace-only content emits 
       role: string;
       content: Array<{ type: string }>;
     }>;
-    const assistantMessage = messages.find(message => message.role === 'assistant');
+    const assistantMessage = messages.find(
+      message => message.role === 'assistant',
+    );
     expect(assistantMessage).toBeDefined();
     expect(assistantMessage!.content).toHaveLength(1);
     expect(assistantMessage!.content[0].type).toBe('tool_use');

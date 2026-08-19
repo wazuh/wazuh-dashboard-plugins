@@ -270,10 +270,7 @@ test('buildSystemPrompt: instructs the model to never name internal tool ids in 
     prompt,
     /Never write an internal tool name \(e\.g\. get_rules, search_wazuh_data\) inside an\s+explanation or narrative sentence of your answer text/,
   );
-  assert.match(
-    prompt,
-    /describe the capability in\s+plain language instead/,
-  );
+  assert.match(prompt, /describe the capability in\s+plain language instead/);
 });
 
 test('buildSystemPrompt: the no-tool-names rule explicitly carves out the search_wazuh_data offer, and the offer instruction still survives verbatim', () => {
@@ -378,10 +375,7 @@ test('buildSystemPrompt: instructs the model not to repeat earlier sentences wit
 test('buildSystemPrompt: instructs the model to state a zero-row finding once, not restate it later in different wording', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(prompt, /zero rows/);
-  assert.match(
-    prompt,
-    /state that absence[\s\S]*exactly ONCE/,
-  );
+  assert.match(prompt, /state that absence[\s\S]*exactly ONCE/);
   assert.match(
     prompt,
     /do not restate the same "nothing found" finding a second time later in the answer/,

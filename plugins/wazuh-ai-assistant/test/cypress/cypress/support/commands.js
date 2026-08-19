@@ -19,7 +19,9 @@ Cypress.Commands.add('wzLogin', () => {
     if ($body.find('input[data-test-subj="user-name"]').length === 0) {
       return;
     }
-    cy.get('input[data-test-subj="user-name"]', { timeout: 20000 }).type(username);
+    cy.get('input[data-test-subj="user-name"]', { timeout: 20000 }).type(
+      username,
+    );
     cy.get('input[data-test-subj="password"]').type(password, { log: false });
     cy.get('button[data-test-subj="submit"]').click();
   });
@@ -48,10 +50,12 @@ Cypress.Commands.add('wzSendMessage', text => {
     cy.get('.wzComposerSendButton').click();
     // `defaultCommandTimeout` (40s, cypress.config.js) covers a live LLM turn's latency; the
     // assertion just waits for the new pair of rows to exist, not for any particular content.
-    cy.get('.wzMessageRow', { timeout: 40000 }).should('have.length', before + 2);
+    cy.get('.wzMessageRow', { timeout: 40000 }).should(
+      'have.length',
+      before + 2,
+    );
     // Let the last row's streamed content (and its results-card measurement effect, if any)
     // settle before any geometry read — a mid-stream read would measure a growing box.
     cy.wait(1500);
   });
 });
-

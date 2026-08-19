@@ -754,9 +754,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       window.cancelAnimationFrame(frame);
       window.clearTimeout(timer);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on the mode only: every other
-    // value it reads is a ref, and re-running this on an unrelated re-render would restart the
-    // travel from wherever it had got to.
+    // Keyed on the mode only: every other value it reads is a ref, and re-running this on an
+    // unrelated re-render would restart the travel from wherever it had got to.
   }, [composerMode]);
 
   /** The fast settle path. Scoped to the row's OWN transform (a nested EUI transition — a button's
@@ -2128,9 +2127,19 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   // data used to live in a hover tooltip wrapping this whole pill, which meant hovering to click
   // it also forced a wall of text — it now lives on a separate, discrete ⓘ (`EuiIconTip`) placed
   // right after the pill, so it is available on demand without blocking the click gesture.
+  // EUI types onClick/onClickAriaLabel as an ExclusiveUnion against the non-clickable badge
+  // variant; spreading the conditional pair in flattens that union into plain optional props,
+  // which satisfies neither union member structurally — hence rendering through an untyped
+  // component reference rather than fighting the union with a props cast.
+  const ClickableEuiBadge = EuiBadge as React.ComponentType<
+    Record<string, unknown>
+  >;
+
   const privacyChip = (
-    <EuiBadge
-      className={`wzPrivacyChip wzPrivacyChip--${privacyEnabled ? 'on' : 'off'}`}
+    <ClickableEuiBadge
+      className={`wzPrivacyChip wzPrivacyChip--${
+        privacyEnabled ? 'on' : 'off'
+      }`}
       color='hollow'
       iconType={privacyBadgeIcon}
       data-test-subj='wzPrivacyChip'
@@ -2151,7 +2160,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         defaultMessage: 'Privacy · {state}',
         values: { state: privacyBadgeLabel },
       })}
-    </EuiBadge>
+    </ClickableEuiBadge>
   );
 
   // The badge alone only ever said

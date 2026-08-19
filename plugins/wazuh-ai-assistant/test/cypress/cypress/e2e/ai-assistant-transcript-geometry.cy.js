@@ -72,7 +72,8 @@
 const QUESTIONS = {
   prose: 'In one sentence, what is a Wazuh decoder?',
   table: 'Show me the findings in the last 7 days',
-  zeroResult: 'Any brute force attempts from agent nonexistent-agent-cypress-zzz999',
+  zeroResult:
+    'Any brute force attempts from agent nonexistent-agent-cypress-zzz999',
 };
 
 // Post-fix noise floor for the wide-row prose/meta correction (see file banner, defect 1): a
@@ -89,7 +90,14 @@ const PX = 1;
 
 function rectOf($el) {
   const r = $el[0].getBoundingClientRect();
-  return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height };
+  return {
+    left: r.left,
+    right: r.right,
+    top: r.top,
+    bottom: r.bottom,
+    width: r.width,
+    height: r.height,
+  };
 }
 
 function messageRows() {
@@ -118,7 +126,10 @@ describe('AI Assistant — transcript geometry', () => {
       const rects = [...$rows].map(el => el.getBoundingClientRect());
       for (let i = 1; i < rects.length; i++) {
         const gap = rects[i].top - rects[i - 1].bottom;
-        expect(gap, `gap between row ${i - 1} and row ${i}`).to.be.closeTo(32, PX);
+        expect(gap, `gap between row ${i - 1} and row ${i}`).to.be.closeTo(
+          32,
+          PX,
+        );
       }
     });
   });
@@ -142,13 +153,22 @@ describe('AI Assistant — transcript geometry', () => {
 
     messageRows().then($rows => {
       const collapsed = [...$rows].map(el => el.getBoundingClientRect());
-      expect(collapsed[WIDE_ROW].height, 'row height after collapse').to.be.lessThan(expandedHeight);
+      expect(
+        collapsed[WIDE_ROW].height,
+        'row height after collapse',
+      ).to.be.lessThan(expandedHeight);
       const gapCollapsed = {
         above: collapsed[WIDE_ROW].top - collapsed[WIDE_ROW - 1].bottom,
         below: collapsed[WIDE_ROW + 1].top - collapsed[WIDE_ROW].bottom,
       };
-      expect(gapCollapsed.above, 'gap above the row, collapsed').to.be.closeTo(gapBefore.above, PX);
-      expect(gapCollapsed.below, 'gap below the row, collapsed').to.be.closeTo(gapBefore.below, PX);
+      expect(gapCollapsed.above, 'gap above the row, collapsed').to.be.closeTo(
+        gapBefore.above,
+        PX,
+      );
+      expect(gapCollapsed.below, 'gap below the row, collapsed').to.be.closeTo(
+        gapBefore.below,
+        PX,
+      );
     });
 
     cy.get('.wzMessageRow').eq(WIDE_ROW).find('.wzResultsCardToggle').click();
@@ -156,13 +176,22 @@ describe('AI Assistant — transcript geometry', () => {
 
     messageRows().then($rows => {
       const reExpanded = [...$rows].map(el => el.getBoundingClientRect());
-      expect(reExpanded[WIDE_ROW].height, 'row height after re-expand').to.be.closeTo(expandedHeight, PX);
+      expect(
+        reExpanded[WIDE_ROW].height,
+        'row height after re-expand',
+      ).to.be.closeTo(expandedHeight, PX);
       gapAfter = {
         above: reExpanded[WIDE_ROW].top - reExpanded[WIDE_ROW - 1].bottom,
         below: reExpanded[WIDE_ROW + 1].top - reExpanded[WIDE_ROW].bottom,
       };
-      expect(gapAfter.above, 'gap above the row, re-expanded').to.be.closeTo(gapBefore.above, PX);
-      expect(gapAfter.below, 'gap below the row, re-expanded').to.be.closeTo(gapBefore.below, PX);
+      expect(gapAfter.above, 'gap above the row, re-expanded').to.be.closeTo(
+        gapBefore.above,
+        PX,
+      );
+      expect(gapAfter.below, 'gap below the row, re-expanded').to.be.closeTo(
+        gapBefore.below,
+        PX,
+      );
     });
   });
 
@@ -183,105 +212,165 @@ describe('AI Assistant — transcript geometry', () => {
         // own flex-gutter margin escaping a `display: flow-root` boundary, present on every row
         // here) is a separate, pre-existing rendering quirk, not the "reserved space" defect this
         // check targets, so it is not asserted against here.
-        expect(rowBottom - maxDescendantBottom, `row ${i} bottom vs its own last descendant`).to.be.at.most(6);
+        expect(
+          rowBottom - maxDescendantBottom,
+          `row ${i} bottom vs its own last descendant`,
+        ).to.be.at.most(6);
       });
     });
   });
 
   it('4. avatar, prose and meta sit at the SAME absolute x on a wide row as on a normal row; the results card fills the content column and its right edge lands on (never past) the composer right edge', () => {
-    cy.get('.wzMessageRow').eq(PROSE_ROW).then($proseRow => {
-      const normalRow = rectOf($proseRow);
-      const avatar = rectOf($proseRow.find('.wzMsgAvatarItem').first());
-      const prose = rectOf($proseRow.find('.wzProseMeasure').first());
-      const meta = rectOf($proseRow.find('.wzMsgMetaRow').first());
+    cy.get('.wzMessageRow')
+      .eq(PROSE_ROW)
+      .then($proseRow => {
+        const normalRow = rectOf($proseRow);
+        const avatar = rectOf($proseRow.find('.wzMsgAvatarItem').first());
+        const prose = rectOf($proseRow.find('.wzProseMeasure').first());
+        const meta = rectOf($proseRow.find('.wzMsgMetaRow').first());
 
-      // Normal row: prose/meta sit exactly one avatar-column-width right of the avatar.
-      expect(prose.left - avatar.left, 'normal row: prose.left - avatar.left').to.be.closeTo(40, PX);
-      expect(meta.left, 'normal row: meta.left ≈ prose.left').to.be.closeTo(prose.left, 3);
+        // Normal row: prose/meta sit exactly one avatar-column-width right of the avatar.
+        expect(
+          prose.left - avatar.left,
+          'normal row: prose.left - avatar.left',
+        ).to.be.closeTo(40, PX);
+        expect(meta.left, 'normal row: meta.left ≈ prose.left').to.be.closeTo(
+          prose.left,
+          3,
+        );
 
-      cy.get('.wzMessageRow').eq(WIDE_ROW).then($wideRow => {
-        const wideRow = rectOf($wideRow);
-        const wideAvatar = rectOf($wideRow.find('.wzMsgAvatarItem').first());
-        const wideCard = rectOf($wideRow.find('.wzResultsCard').first());
-        const wideProse = rectOf($wideRow.find('.wzProseMeasure').first());
-        const wideMeta = rectOf($wideRow.find('.wzMsgMetaRow').first());
+        cy.get('.wzMessageRow')
+          .eq(WIDE_ROW)
+          .then($wideRow => {
+            const wideRow = rectOf($wideRow);
+            const wideAvatar = rectOf(
+              $wideRow.find('.wzMsgAvatarItem').first(),
+            );
+            const wideCard = rectOf($wideRow.find('.wzResultsCard').first());
+            const wideProse = rectOf($wideRow.find('.wzProseMeasure').first());
+            const wideMeta = rectOf($wideRow.find('.wzMsgMetaRow').first());
 
-        // The owner's fix (ux-iteration-4): a table-bearing turn must never pull the avatar (or the
-        // prose, or the meta row) leftward. All three keep the exact x they hold on a prose-only
-        // turn, so avatars line up turn-to-turn instead of drifting left on table answers. This is
-        // the assertion that was RED before the fix — the avatar used to break out ~120px further
-        // left than the prose-only row's avatar.
-        expect(wideAvatar.left, 'wide row: avatar.left == normal row avatar.left (no left drift)')
-          .to.be.closeTo(avatar.left, WIDE_ROW_PROSE_TOLERANCE_PX);
-        expect(wideProse.left, 'wide row: prose.left == normal row prose.left')
-          .to.be.closeTo(prose.left, WIDE_ROW_PROSE_TOLERANCE_PX);
-        expect(wideMeta.left, 'wide row: meta.left == normal row prose rail')
-          .to.be.closeTo(prose.left, WIDE_ROW_PROSE_TOLERANCE_PX);
+            // The owner's fix (ux-iteration-4): a table-bearing turn must never pull the avatar (or the
+            // prose, or the meta row) leftward. All three keep the exact x they hold on a prose-only
+            // turn, so avatars line up turn-to-turn instead of drifting left on table answers. This is
+            // the assertion that was RED before the fix — the avatar used to break out ~120px further
+            // left than the prose-only row's avatar.
+            expect(
+              wideAvatar.left,
+              'wide row: avatar.left == normal row avatar.left (no left drift)',
+            ).to.be.closeTo(avatar.left, WIDE_ROW_PROSE_TOLERANCE_PX);
+            expect(
+              wideProse.left,
+              'wide row: prose.left == normal row prose.left',
+            ).to.be.closeTo(prose.left, WIDE_ROW_PROSE_TOLERANCE_PX);
+            expect(
+              wideMeta.left,
+              'wide row: meta.left == normal row prose rail',
+            ).to.be.closeTo(prose.left, WIDE_ROW_PROSE_TOLERANCE_PX);
 
-        // The results card fills the content column and is BOUNDED by it: its left edge aligns with
-        // the prose column (avatarX + 40), never breaking out leftward, and its right edge lands on
-        // the composer's own right edge — never past it — instead of reaching a wider table-only cap.
-        expect(wideCard.left, 'wide row: card.left == prose rail (avatarX + 40), not the avatar edge')
-          .to.be.closeTo(prose.left, WIDE_ROW_PROSE_TOLERANCE_PX);
-        expect(wideRow.left, 'wide row left edge == normal row left edge')
-          .to.be.closeTo(normalRow.left, WIDE_ROW_PROSE_TOLERANCE_PX);
-        // Bounded, not breaking out: the wide row no longer extends past a normal row — both cap at
-        // $wzContentMaxWidth now that the table-only breakout is gone.
-        expect(wideRow.right, 'wide row right edge == normal row right edge (both at the content measure)')
-          .to.be.closeTo(normalRow.right, WIDE_ROW_PROSE_TOLERANCE_PX);
+            // The results card fills the content column and is BOUNDED by it: its left edge aligns with
+            // the prose column (avatarX + 40), never breaking out leftward, and its right edge lands on
+            // the composer's own right edge — never past it — instead of reaching a wider table-only cap.
+            expect(
+              wideCard.left,
+              'wide row: card.left == prose rail (avatarX + 40), not the avatar edge',
+            ).to.be.closeTo(prose.left, WIDE_ROW_PROSE_TOLERANCE_PX);
+            expect(
+              wideRow.left,
+              'wide row left edge == normal row left edge',
+            ).to.be.closeTo(normalRow.left, WIDE_ROW_PROSE_TOLERANCE_PX);
+            // Bounded, not breaking out: the wide row no longer extends past a normal row — both cap at
+            // $wzContentMaxWidth now that the table-only breakout is gone.
+            expect(
+              wideRow.right,
+              'wide row right edge == normal row right edge (both at the content measure)',
+            ).to.be.closeTo(normalRow.right, WIDE_ROW_PROSE_TOLERANCE_PX);
 
-        cy.get('.wzComposerMeasure').then($composer => {
-          const composer = rectOf($composer);
-          // The owner's "bound the table by the chat box" call: the card's right edge sits AT the
-          // composer's right edge and NEVER overshoots it (the earlier ~1300px table cap stuck out
-          // ~235px past the composer on a 1920px window). It may land a few px inside — the
-          // transcript reserves a scrollbar gutter the composer does not — but never outside.
-          expect(wideCard.right, 'card.right never overshoots composer.right')
-            .to.be.at.most(composer.right + PX);
-          expect(wideCard.right, 'card.right aligns with composer.right (within the scrollbar gutter)')
-            .to.be.closeTo(composer.right, CARD_TO_COMPOSER_RIGHT_TOLERANCE_PX);
-        });
+            cy.get('.wzComposerMeasure').then($composer => {
+              const composer = rectOf($composer);
+              // The owner's "bound the table by the chat box" call: the card's right edge sits AT the
+              // composer's right edge and NEVER overshoots it (the earlier ~1300px table cap stuck out
+              // ~235px past the composer on a 1920px window). It may land a few px inside — the
+              // transcript reserves a scrollbar gutter the composer does not — but never outside.
+              expect(
+                wideCard.right,
+                'card.right never overshoots composer.right',
+              ).to.be.at.most(composer.right + PX);
+              expect(
+                wideCard.right,
+                'card.right aligns with composer.right (within the scrollbar gutter)',
+              ).to.be.closeTo(
+                composer.right,
+                CARD_TO_COMPOSER_RIGHT_TOLERANCE_PX,
+              );
+            });
+          });
       });
-    });
   });
 
   it('5. the footer/timestamp row left edge matches the prose left edge, on both a normal and a wide row', () => {
     [PROSE_ROW, WIDE_ROW].forEach(idx => {
-      cy.get('.wzMessageRow').eq(idx).then($row => {
-        const prose = rectOf($row.find('.wzProseMeasure').first());
-        const timestamp = rectOf($row.find('.wzAiAssistantMessageTimestamp').first());
-        expect(timestamp.left, `row ${idx}: timestamp.left == prose.left`).to.be.closeTo(prose.left, 3);
-      });
+      cy.get('.wzMessageRow')
+        .eq(idx)
+        .then($row => {
+          const prose = rectOf($row.find('.wzProseMeasure').first());
+          const timestamp = rectOf(
+            $row.find('.wzAiAssistantMessageTimestamp').first(),
+          );
+          expect(
+            timestamp.left,
+            `row ${idx}: timestamp.left == prose.left`,
+          ).to.be.closeTo(prose.left, 3);
+        });
     });
   });
 
   it('6. prose rhythm: paragraph→paragraph and paragraph→list are 16px, list-item→list-item is 4px', () => {
-    cy.get('.wzMessageRow').eq(WIDE_ROW).find('.wzProseMeasure .euiMarkdownFormat').first().then($md => {
-      // `.euiMarkdownFormat` wraps the actual sequence of <p>/<ul>/<p> blocks in one or more
-      // single-child passthrough <div>s (react-markdown's own wrapper elements) before reaching
-      // the node whose children are the real top-level blocks — descend through those rather
-      // than assuming a fixed nesting depth, since that depth is an implementation detail of the
-      // markdown renderer, not something this spec should encode.
-      let node = $md[0];
-      while (node.children.length === 1 && node.children[0].children.length > 0) {
-        node = node.children[0];
-      }
-      const blocks = [...node.children];
-      expect(blocks.length, 'markdown top-level block count').to.be.greaterThan(1);
-      for (let i = 1; i < blocks.length; i++) {
-        const gap = blocks[i].getBoundingClientRect().top - blocks[i - 1].getBoundingClientRect().bottom;
-        expect(gap, `block ${i - 1} -> block ${i} (${blocks[i - 1].tagName} -> ${blocks[i].tagName})`).to.be.closeTo(16, PX);
-      }
+    cy.get('.wzMessageRow')
+      .eq(WIDE_ROW)
+      .find('.wzProseMeasure .euiMarkdownFormat')
+      .first()
+      .then($md => {
+        // `.euiMarkdownFormat` wraps the actual sequence of <p>/<ul>/<p> blocks in one or more
+        // single-child passthrough <div>s (react-markdown's own wrapper elements) before reaching
+        // the node whose children are the real top-level blocks — descend through those rather
+        // than assuming a fixed nesting depth, since that depth is an implementation detail of the
+        // markdown renderer, not something this spec should encode.
+        let node = $md[0];
+        while (
+          node.children.length === 1 &&
+          node.children[0].children.length > 0
+        ) {
+          node = node.children[0];
+        }
+        const blocks = [...node.children];
+        expect(
+          blocks.length,
+          'markdown top-level block count',
+        ).to.be.greaterThan(1);
+        for (let i = 1; i < blocks.length; i++) {
+          const gap =
+            blocks[i].getBoundingClientRect().top -
+            blocks[i - 1].getBoundingClientRect().bottom;
+          expect(
+            gap,
+            `block ${i - 1} -> block ${i} (${blocks[i - 1].tagName} -> ${
+              blocks[i].tagName
+            })`,
+          ).to.be.closeTo(16, PX);
+        }
 
-      const list = blocks.find(b => b.tagName === 'UL' || b.tagName === 'OL');
-      expect(list, 'a list block exists in this answer').to.exist;
-      const items = [...list.children];
-      expect(items.length, 'list item count').to.be.greaterThan(1);
-      for (let i = 1; i < items.length; i++) {
-        const gap = items[i].getBoundingClientRect().top - items[i - 1].getBoundingClientRect().bottom;
-        expect(gap, `li ${i - 1} -> li ${i}`).to.be.closeTo(4, PX);
-      }
-    });
+        const list = blocks.find(b => b.tagName === 'UL' || b.tagName === 'OL');
+        expect(list, 'a list block exists in this answer').to.exist;
+        const items = [...list.children];
+        expect(items.length, 'list item count').to.be.greaterThan(1);
+        for (let i = 1; i < items.length; i++) {
+          const gap =
+            items[i].getBoundingClientRect().top -
+            items[i - 1].getBoundingClientRect().bottom;
+          expect(gap, `li ${i - 1} -> li ${i}`).to.be.closeTo(4, PX);
+        }
+      });
   });
 
   // `.wzMsgMetaRow` is itself a `EuiFlexGroup` (`gutterExtraSmall`), which carries EUI's usual
@@ -294,23 +383,40 @@ describe('AI Assistant — transcript geometry', () => {
   // exactly the 2px its own margin borrows. `.wzAiAssistantMessageTimestamp` is the actual
   // visible content and is what these two assertions measure against.
   it('7. prose→results-card is 16px; card→footer(meta) row is 8px', () => {
-    cy.get('.wzMessageRow').eq(WIDE_ROW).then($row => {
-      const prose = rectOf($row.find('.wzProseMeasure').first());
-      const card = rectOf($row.find('.wzResultsCard').first());
-      const timestamp = rectOf($row.find('.wzAiAssistantMessageTimestamp').first());
+    cy.get('.wzMessageRow')
+      .eq(WIDE_ROW)
+      .then($row => {
+        const prose = rectOf($row.find('.wzProseMeasure').first());
+        const card = rectOf($row.find('.wzResultsCard').first());
+        const timestamp = rectOf(
+          $row.find('.wzAiAssistantMessageTimestamp').first(),
+        );
 
-      expect(card.top - prose.bottom, 'prose.bottom -> card.top').to.be.closeTo(16, PX);
-      expect(timestamp.top - card.bottom, 'card.bottom -> timestamp.top').to.be.closeTo(8, PX);
-    });
+        expect(
+          card.top - prose.bottom,
+          'prose.bottom -> card.top',
+        ).to.be.closeTo(16, PX);
+        expect(
+          timestamp.top - card.bottom,
+          'card.bottom -> timestamp.top',
+        ).to.be.closeTo(8, PX);
+      });
   });
 
   it('8. prose→footer(meta) row is 8px on a card-less row too', () => {
-    cy.get('.wzMessageRow').eq(BADGE_ROW).then($row => {
-      const prose = rectOf($row.find('.wzProseMeasure').first());
-      const timestamp = rectOf($row.find('.wzAiAssistantMessageTimestamp').first());
+    cy.get('.wzMessageRow')
+      .eq(BADGE_ROW)
+      .then($row => {
+        const prose = rectOf($row.find('.wzProseMeasure').first());
+        const timestamp = rectOf(
+          $row.find('.wzAiAssistantMessageTimestamp').first(),
+        );
 
-      expect(timestamp.top - prose.bottom, 'prose.bottom -> timestamp.top').to.be.closeTo(8, PX);
-    });
+        expect(
+          timestamp.top - prose.bottom,
+          'prose.bottom -> timestamp.top',
+        ).to.be.closeTo(8, PX);
+      });
   });
 
   it("9. the sticky status band's background is not transparent when a status callout renders", () => {
@@ -318,7 +424,11 @@ describe('AI Assistant — transcript geometry', () => {
     // endpoint instead so this assertion is deterministic and does not depend on a live model.
     cy.intercept('POST', '**/api/wazuh_ai_assistant/chat', {
       statusCode: 500,
-      body: { statusCode: 500, error: 'Internal Server Error', message: 'stubbed failure for geometry spec' },
+      body: {
+        statusCode: 500,
+        error: 'Internal Server Error',
+        message: 'stubbed failure for geometry spec',
+      },
     }).as('chatFailure');
 
     cy.get('.wzComposerTextarea').click().type('trigger an error callout');
@@ -329,7 +439,9 @@ describe('AI Assistant — transcript geometry', () => {
       .should('be.visible')
       .then($band => {
         const bg = window.getComputedStyle($band[0]).backgroundColor;
-        expect(bg, 'computed background-color').to.not.equal('rgba(0, 0, 0, 0)');
+        expect(bg, 'computed background-color').to.not.equal(
+          'rgba(0, 0, 0, 0)',
+        );
         expect(bg, 'computed background-color').to.not.equal('transparent');
       });
   });
@@ -347,7 +459,10 @@ describe('AI Assistant — transcript geometry', () => {
           [chip, trigger, send].forEach((rect, i) => {
             expect(rect.height, `control ${i} height`).to.be.closeTo(32, PX);
           });
-          expect(trigger.top, 'trigger.top == chip.top').to.be.closeTo(chip.top, PX);
+          expect(trigger.top, 'trigger.top == chip.top').to.be.closeTo(
+            chip.top,
+            PX,
+          );
           expect(send.top, 'send.top == chip.top').to.be.closeTo(chip.top, PX);
         });
       });
@@ -370,12 +485,20 @@ describe('AI Assistant — transcript geometry', () => {
     // warranted here; this assertion instead locks in the actual invariant (avatar/content flush
     // with the row) so a future change to the gutter-compensation margins can't quietly break it.
     [1, 3, 5].forEach(i => {
-      cy.get('.wzMessageRow').eq(i).then($row => {
-        const row = rectOf($row);
-        const avatar = rectOf($row.find('.wzMsgAvatarItem').first());
-        expect(avatar.top, `row ${i}: avatar.top == row.top`).to.be.closeTo(row.top, PX);
-        expect(avatar.bottom, `row ${i}: avatar.bottom == row.bottom`).to.be.closeTo(row.bottom, PX);
-      });
+      cy.get('.wzMessageRow')
+        .eq(i)
+        .then($row => {
+          const row = rectOf($row);
+          const avatar = rectOf($row.find('.wzMsgAvatarItem').first());
+          expect(avatar.top, `row ${i}: avatar.top == row.top`).to.be.closeTo(
+            row.top,
+            PX,
+          );
+          expect(
+            avatar.bottom,
+            `row ${i}: avatar.bottom == row.bottom`,
+          ).to.be.closeTo(row.bottom, PX);
+        });
     });
   });
 });

@@ -175,7 +175,10 @@ describe('ResultTable', () => {
       }));
       const { container } = render(
         <ResultTable
-          spec={spec({ columns: [{ id: 'agent', label: 'Agent' }], rows: thirtyRows })}
+          spec={spec({
+            columns: [{ id: 'agent', label: 'Agent' }],
+            rows: thirtyRows,
+          })}
           transcriptHeightPx={2000}
         />,
       );
@@ -253,7 +256,8 @@ describe('ResultTable', () => {
     // has deliberately asked for more rows than the default shows.
     it('grows past the default cap once a larger page size is chosen, shrinks back at 5', () => {
       const { container } = render(<ResultTable spec={thirtyRowSpec()} />);
-      const card = () => container.querySelector('.wzResultsCard') as HTMLElement;
+      const card = () =>
+        container.querySelector('.wzResultsCard') as HTMLElement;
 
       expect(card().classList.contains('wzResultsCard--expanded')).toBe(false);
 

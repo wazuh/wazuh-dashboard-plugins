@@ -94,7 +94,9 @@ beforeEach(() => {
 
 describe('SettingsPage — wazuh_brain hidden from provider type choices', () => {
   it('does not offer wazuh_brain among the provider type cards when the form is open', async () => {
-    render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
+    );
 
     const addButton = await screen.findByRole('button', {
       name: /add provider/i,
@@ -149,7 +151,9 @@ describe('SettingsPage — auto-test on load', () => {
       },
     ]);
 
-    render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
+    );
 
     await waitFor(() => {
       expect(mockService.test).toHaveBeenCalledWith('p1');
@@ -157,7 +161,9 @@ describe('SettingsPage — auto-test on load', () => {
   });
 
   it('does not call service.test when there are no providers', async () => {
-    render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
+    );
 
     await waitFor(() => expect(mockService.list).toHaveBeenCalled());
     expect(mockService.test).not.toHaveBeenCalled();
@@ -195,7 +201,9 @@ describe('SettingsPage — Test all tests only the filtered set, throttled', () 
   it('only re-tests the providers the "Filter providers" box is currently showing', async () => {
     mockService.list.mockResolvedValue(threeProviders);
 
-    render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
+    );
 
     // Let the silent auto-probe (one call per loaded provider) finish before clearing, so it
     // cannot be mistaken for "Test all"'s own calls below.
@@ -231,7 +239,9 @@ describe('SettingsPage — Test all tests only the filtered set, throttled', () 
     });
     mockService.test.mockImplementation(() => pending);
 
-    render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
+    );
 
     const testAllButton = await screen.findByRole('button', {
       name: /test all/i,
@@ -346,10 +356,13 @@ describe('SettingsPage — field policy action select (symmetry pass, item 5)', 
     // Nothing about the field-policy row itself is touched — dirty state is raised through an
     // unrelated switch instead, purely to make the (otherwise legitimately disabled-while-clean)
     // Save button clickable, so the save this test inspects is genuinely a no-op on this row.
+    // Located by its label text, not by role+name: every tab's card stays mounted (hidden, not
+    // unmounted) so multiple EuiSwitch instances share this env's mocked htmlIdGenerator output,
+    // which makes aria-labelledby-based accessible-name lookup resolve to the wrong switch (see
+    // the "puts the retention field..." test above for the same caveat on EuiFormRow's `for`).
+    const switchLabel = screen.getByText(/enable privacy mode by default/i);
     fireEvent.click(
-      screen.getByRole('switch', {
-        name: /enable privacy mode by default/i,
-      }),
+      switchLabel.closest('.euiSwitch')!.querySelector('[role="switch"]')!,
     );
     fireEvent.click(
       screen.getByRole('button', { name: /save privacy settings/i }),
@@ -396,7 +409,9 @@ describe('SettingsPage — settings-access probe', () => {
   it('fails open (page usable, nothing blocked) when the settings-access probe itself fails', async () => {
     mockService.getSettingsAccess.mockRejectedValue(new Error('network error'));
 
-    render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
+    );
 
     await waitFor(() =>
       expect(mockService.getSettingsAccess).toHaveBeenCalled(),
@@ -426,7 +441,9 @@ describe('SettingsPage — auto-open create-provider flyout (?addProvider=true)'
   });
 
   it('does not open the form when the flag is absent', async () => {
-    render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
+    );
 
     await screen.findByRole('button', { name: /add provider/i });
     expect(screen.queryByLabelText(/^name\s*\*?$/i)).not.toBeInTheDocument();
@@ -573,9 +590,13 @@ describe('SettingsPage — settings tabs (UX iteration 4 item 2)', () => {
   }
 
   it('renders the three tabs, Providers selected by default', async () => {
-    render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
+    );
 
-    const providersTab = await screen.findByRole('tab', { name: /^providers$/i });
+    const providersTab = await screen.findByRole('tab', {
+      name: /^providers$/i,
+    });
     const privacyTab = screen.getByRole('tab', {
       name: /privacy & data protection/i,
     });
@@ -591,16 +612,18 @@ describe('SettingsPage — settings tabs (UX iteration 4 item 2)', () => {
     expect(
       screen.getByRole('button', { name: /add a provider/i }),
     ).toBeInTheDocument();
-    expect(
-      isHidden(screen.getByText(/enable privacy mode by default/i)),
-    ).toBe(true);
-    expect(
-      isHidden(screen.getByText(/keep saved conversations for/i)),
-    ).toBe(true);
+    expect(isHidden(screen.getByText(/enable privacy mode by default/i))).toBe(
+      true,
+    );
+    expect(isHidden(screen.getByText(/keep saved conversations for/i))).toBe(
+      true,
+    );
   });
 
   it('switches which card is shown when a tab is clicked, and updates the URL', async () => {
-    render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
+    );
 
     await screen.findByRole('button', { name: /add provider/i });
 
@@ -615,9 +638,7 @@ describe('SettingsPage — settings tabs (UX iteration 4 item 2)', () => {
       screen.queryByRole('button', { name: /add a provider/i }),
     ).not.toBeInTheDocument();
 
-    fireEvent.click(
-      screen.getByRole('tab', { name: /conversation history/i }),
-    );
+    fireEvent.click(screen.getByRole('tab', { name: /conversation history/i }));
     const retentionText = await screen.findByText(
       /keep saved conversations for/i,
     );
@@ -628,9 +649,13 @@ describe('SettingsPage — settings tabs (UX iteration 4 item 2)', () => {
   });
 
   it('does not switch tabs (or push a new URL entry) when clicking the already-active tab', async () => {
-    render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
+    );
 
-    const providersTab = await screen.findByRole('tab', { name: /^providers$/i });
+    const providersTab = await screen.findByRole('tab', {
+      name: /^providers$/i,
+    });
     expect(providersTab).toHaveAttribute('aria-selected', 'true');
 
     fireEvent.click(providersTab);
@@ -664,9 +689,7 @@ describe('SettingsPage — settings tabs (UX iteration 4 item 2)', () => {
     // unrelated param neither this page nor its tabs own) must survive the switch regardless.
     expect(history.location.search).toBe('?utm_source=digest');
 
-    fireEvent.click(
-      screen.getByRole('tab', { name: /conversation history/i }),
-    );
+    fireEvent.click(screen.getByRole('tab', { name: /conversation history/i }));
     await screen.findByText(/keep saved conversations for/i);
     const afterRetention = new URLSearchParams(history.location.search);
     expect(afterRetention.get('utm_source')).toBe('digest');
@@ -721,9 +744,10 @@ describe('SettingsPage — settings tabs (UX iteration 4 item 2)', () => {
     );
 
     expect(await screen.findByLabelText(/^name\s*\*?$/i)).toBeInTheDocument();
-    expect(
-      screen.getByRole('tab', { name: /^providers$/i }),
-    ).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: /^providers$/i })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
   });
 
   it('falls back to the Providers tab for an unknown ?tab= value', async () => {
@@ -783,9 +807,7 @@ describe('SettingsPage — settings tabs (UX iteration 4 item 2)', () => {
 
     // ...and a subsequent tab click must actually take effect (the bug: the arrival-forcing
     // effect kept re-selecting Providers as long as `addProvider` lingered, swallowing this click).
-    fireEvent.click(
-      screen.getByRole('tab', { name: /conversation history/i }),
-    );
+    fireEvent.click(screen.getByRole('tab', { name: /conversation history/i }));
     await screen.findByText(/keep saved conversations for/i);
     expect(
       screen.getByRole('tab', { name: /conversation history/i }),
@@ -832,7 +854,9 @@ describe('SettingsPage — settings tabs (UX iteration 4 item 2)', () => {
       },
     ];
     mockService.list.mockResolvedValue(threeProviders);
-    render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
+    );
 
     await waitFor(() => expect(mockService.test).toHaveBeenCalledTimes(3));
     mockService.test.mockClear();
@@ -846,9 +870,9 @@ describe('SettingsPage — settings tabs (UX iteration 4 item 2)', () => {
     await screen.findByText(/enable privacy mode by default/i);
     fireEvent.click(screen.getByRole('tab', { name: /^providers$/i }));
 
-    expect(
-      await screen.findByPlaceholderText(/filter providers/i),
-    ).toHaveValue('matched');
+    expect(await screen.findByPlaceholderText(/filter providers/i)).toHaveValue(
+      'matched',
+    );
 
     fireEvent.click(screen.getByRole('button', { name: /test all/i }));
     await waitFor(() => expect(mockService.test).toHaveBeenCalledWith('p3'));
@@ -873,9 +897,10 @@ describe('SettingsPage — settings tabs (UX iteration 4 item 2)', () => {
     fireEvent.click(screen.getByRole('button', { name: /^add provider$/i }));
 
     expect(await screen.findByLabelText(/^name\s*\*?$/i)).toBeInTheDocument();
-    expect(
-      screen.getByRole('tab', { name: /^providers$/i }),
-    ).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: /^providers$/i })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
 
     fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
 
@@ -1193,11 +1218,11 @@ describe('SettingsPage — in-card layout and hierarchy (audit §4)', () => {
     // Both cards' Save buttons read the same `fill={!disabled}` expression, but each now lives on
     // its own tab (UX iteration 4 item 2), so this switches tabs between the two halves of the
     // assertion instead of finding both buttons in one render.
-    render(<SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />);
-
-    fireEvent.click(
-      screen.getByRole('tab', { name: /conversation history/i }),
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
     );
+
+    fireEvent.click(screen.getByRole('tab', { name: /conversation history/i }));
     const save = await screen.findByRole('button', {
       name: /save conversation history settings/i,
     });

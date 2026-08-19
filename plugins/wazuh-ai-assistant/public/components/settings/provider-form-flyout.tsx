@@ -25,7 +25,6 @@ import {
   EuiPopover,
   EuiPopoverTitle,
   EuiSpacer,
-  EuiText,
   EuiTextColor,
   EuiTitle,
   EuiToolTip,
@@ -711,7 +710,8 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   const handleTypeChange = (nextType: ProviderInput['type']) => {
     setForm(current => {
       const oldGuidance =
-        PROVIDER_URL_GUIDANCE[current.type] ?? PROVIDER_URL_GUIDANCE.openai_compatible;
+        PROVIDER_URL_GUIDANCE[current.type] ??
+        PROVIDER_URL_GUIDANCE.openai_compatible;
       const trimmedBaseUrl = current.baseUrl.trim();
       const isOldTypeDefault =
         trimmedBaseUrl === '' ||
@@ -724,7 +724,9 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
       // field and letting its own `placeholder` attribute show the new type's example is the
       // equivalent behavior there.
       const resetBaseUrl =
-        nextType === 'anthropic' ? PROVIDER_URL_GUIDANCE.anthropic.placeholder : '';
+        nextType === 'anthropic'
+          ? PROVIDER_URL_GUIDANCE.anthropic.placeholder
+          : '';
       return {
         ...current,
         type: nextType,
@@ -946,9 +948,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                   isFullWidth
                   type='single'
                   idSelected={form.type}
-                  onChange={id =>
-                    handleTypeChange(id as ProviderInput['type'])
-                  }
+                  onChange={id => handleTypeChange(id as ProviderInput['type'])}
                   options={PROVIDER_TYPES.map(type => ({
                     id: type,
                     label: PROVIDER_TYPE_FORM_LABELS[type],

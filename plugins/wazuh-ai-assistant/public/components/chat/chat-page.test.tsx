@@ -2463,12 +2463,18 @@ describe('ChatPage — welcome composer and first-send transition (C1)', () => {
     // it on `.wzComposerMeasure` shrank the visible panel to 840 - 2×24 = 792px while the welcome
     // cluster's own padding-less measure reached the full 840, a 48px edge mismatch the two
     // shared-measure elements must not have.
-    expect(scssRules).toMatch(/\.wzComposerMeasure\s*\{\s*padding-block:\s*8px/);
-    expect(scssRules).not.toMatch(/\.wzComposerMeasure\s*\{\s*padding:\s*8px 24px/);
+    expect(scssRules).toMatch(
+      /\.wzComposerMeasure\s*\{\s*padding-block:\s*8px/,
+    );
+    expect(scssRules).not.toMatch(
+      /\.wzComposerMeasure\s*\{\s*padding:\s*8px 24px/,
+    );
     expect(scssRules).toMatch(
       /\.wzChatPane--welcome \.wzComposerMeasure\s*\{\s*padding-block-start:\s*16px/,
     );
-    expect(scssRules).toMatch(/\.wzComposerRow\s*\{[\s\S]*?padding-inline:\s*24px/);
+    expect(scssRules).toMatch(
+      /\.wzComposerRow\s*\{[\s\S]*?padding-inline:\s*24px/,
+    );
     // The travel is a transform transition on the composer row, and the fading cluster leaves the
     // flow instead of pushing the incoming message down.
     expect(scssRules).toMatch(
@@ -2782,7 +2788,7 @@ describe('ChatPage — provider picker wiring', () => {
 // React Testing Library's own `data-testid` — the component below wires up `data-test-subj`, so
 // these two helpers query DOM directly instead of `findByTestId`/`findAllByTestId`, which look for
 // the wrong attribute and would never resolve.
-async function findPrivacyChip(): Promise<HTMLElement> {
+function findPrivacyChip(): Promise<HTMLElement> {
   return waitFor(() => {
     const el = document.querySelector('[data-test-subj="wzPrivacyChip"]');
     expect(el).not.toBeNull();
@@ -2797,7 +2803,7 @@ async function findPrivacyChip(): Promise<HTMLElement> {
 // second mount is expected to land on (rather than "whichever chip appeared last") avoids a race
 // where `waitFor` resolves on the FIRST mount's still-present, stale-state chip before the second
 // mount's own async fetch has finished and re-rendered its badge.
-async function findPrivacyChipWithModifier(
+function findPrivacyChipWithModifier(
   modifier: 'on' | 'off',
 ): Promise<HTMLElement> {
   return waitFor(() => {

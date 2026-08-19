@@ -89,7 +89,9 @@ describe('ProviderPicker (iteration-4 item 2)', () => {
     fireEvent.click(screen.getByRole('button', { name: /Groq test/i }));
 
     const menu = within(screen.getByRole('dialog'));
-    const selectedItem = menu.getByRole('menuitemradio', { name: /Groq test/i });
+    const selectedItem = menu.getByRole('menuitemradio', {
+      name: /Groq test/i,
+    });
 
     // Both `EuiContextMenuPanel`'s `initialFocusedItemIndex` and `EuiPopover`'s own `initialFocus`
     // resolve this asynchronously (each on its own `requestAnimationFrame` — see provider-picker.tsx
