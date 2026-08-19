@@ -110,6 +110,19 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: WAZUH_FIELD.RULE_MITRE_TECHNIQUE_NAME, action: 'allow' },
   { field: WAZUH_FIELD.RULE_MITRE_TACTIC, action: 'allow' },
   { field: WAZUH_FIELD.RULE_MITRE_TACTIC_NAME, action: 'allow' },
+  // Hotfix A0 (AI/plan/qa-rules-decoders-rootcause.md, defect #4): get_rules/
+  // get_threat_intel_components newly surface document.metadata.description (mapped `text`,
+  // populated on every rule/decoder/integration/policy/kvdb doc) so "what does rule/decoder X
+  // detect" is answerable at all -- previously the field was omitted from both tools' `_source`
+  // entirely, so the model had no way to answer that question from the ruleset. Reviewed 'allow',
+  // same reasoning and same residual-risk mitigation as WAZUH_FIELD.RULE_TITLE above: this is
+  // Wazuh's own curated Sigma/pipeline documentation text, not analyst/attacker-supplied data, and
+  // anonymizing it would replace every rule/decoder's actual explanation with an opaque VAL_n,
+  // gutting the one thing this fix exists to enable. The residual risk (a LOCAL/custom rule's
+  // description CAN in principle embed a decoder capture group or free text) is the same shape as
+  // rule.title's, and is covered the same way: chat.ts's scrubMessagesForProvider runs
+  // prescanAndMintToolContent over every tool-result string value before it reaches the provider.
+  { field: 'document.metadata.description', action: 'allow' },
   // Curated benchmark/policy content (CIS etc.), not analyst/attacker-supplied — reviewed 'allow'.
   { field: 'check.id', action: 'allow' },
   { field: 'check.name', action: 'allow' },

@@ -605,3 +605,67 @@ export function validateAgentId(value: unknown): string {
   }
   return value;
 }
+
+/**
+ * Shared "name" filter for the two Security Analytics catalog tools (get_rules,
+ * get_threat_intel_components) -- hotfix A0, root-caused in
+ * `AI/plan/qa-rules-decoders-rootcause.md`: neither tool exposed ANY keyword filter, so a
+ * QUALIFIED question ("is there a decoder for apache?", "the rule about SSTI") always fell back
+ * to reading the full unfiltered page and admitting defeat, even though the underlying data
+ * trivially answers it (live: 1 SSH decoder, 5 Apache decoders, 1 SSTI rule).
+ *
+ * `document.name` (decoders only) and `document.metadata.title` (every type) are mapped
+ * `keyword` on every `wazuh-threatintel-*` index (confirmed live) -- exact value only, no
+ * analyzer, no multi-field. A genuine substring match on a keyword field needs a LEADING
+ * wildcard (`*apache*`), which `guardrails.ts`'s `lintDsl`/`findLeadingWildcard` bans outright
+ * (an unbounded term-dictionary scan) -- the exact same constraint `get-sca-checks.ts`'s
+ * `search` param already documents and works around for `check.name`. Do NOT reach for
+ * `wildcard`/`query_string`/`regexp` here; it will be rejected by lintDsl on every call.
+ *
+ * This helper closes the gap in three should-clauses, none of which need a leading wildcard:
+ *  1. a case-insensitive exact `term` on each keyword field (the full name/title case);
+ *  2. a case-insensitive, non-leading `prefix` on each keyword field (a fragment anchored at
+ *     the start, e.g. "Ensure SSH" against a check-style name) -- same shape as get-sca-checks.ts;
+ *  3. an analyzed `match` against `document.metadata.description` (mapped `text`, unlike the
+ *     keyword name/title fields -- a `match` TOKENIZES it, so "ssh" matches the standalone word
+ *     "SSH" wherever it sits, with no wildcard involved at all).
+ *
+ * (3) is what actually closes the QA report's three live-witnessed failures, none of which are
+ * name-prefix matches: live-verified against `wazuh-threatintel-{rules,decoders}-a`, `match
+ * document.metadata.description "apache"` returns exactly the same 5 decoders the report's raw
+ * wildcard probe found (apache-access, apache-error, modsecurity-apache, both apache-tomcat
+ * decoders); `"ssh"` returns the 1 SSH decoder (plus one honest extra whose description also
+ * names SSH); `"ssti"` returns the one rule ("Server side template injection strings...") that
+ * burned Q8's whole round budget on `tag`/`technique_id` guesses that could only ever return 0.
+ */
+export function nameFilterProperty(subject: string): JsonSchemaProperty {
+  return {
+    type: 'string',
+    description:
+      `Case-insensitive filter on the ${subject}'s name/title -- matches an exact value, a ` +
+      'fragment anchored at the START of the name/title (e.g. "ssh" against a name literally ' +
+      'beginning with "ssh"), OR a whole word appearing anywhere in its description (e.g. ' +
+      '"apache" also matches a decoder named "modsecurity-apache" or "zeek-ssh", because their ' +
+      'descriptions mention the word). Not a true substring match on the name/title fields ' +
+      'themselves -- those are exact-match keyword fields with no substring index; the ' +
+      'description-word match is what actually finds most "is there a X for <topic>" questions.',
+  };
+}
+
+export function nameFilterClause(
+  name: string,
+  keywordFields: string[],
+  descriptionField: string,
+): Record<string, unknown> {
+  const should: Record<string, unknown>[] = [];
+  for (const field of keywordFields) {
+    should.push({
+      term: { [field]: { value: name, case_insensitive: true } },
+    });
+    should.push({
+      prefix: { [field]: { value: name, case_insensitive: true } },
+    });
+  }
+  should.push({ match: { [descriptionField]: name } });
+  return { bool: { minimum_should_match: 1, should } };
+}

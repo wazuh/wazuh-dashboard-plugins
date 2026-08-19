@@ -74,6 +74,66 @@ test('get_threat_intel_components: space adds an exact term filter', () => {
   );
 });
 
+// Defect #1: neither tool had ANY name/keyword filter before this fix -- the largest failure
+// class in the QA report (Q2/Q9/Q12: "what decoders exist for ssh?"/"which decoder parses sshd
+// logs?"/"is there a decoder for apache?" all returned all 345 rows unfiltered). `name` builds a
+// should-clause with no leading wildcard (guardrails.ts's lintDsl bans that outright): exact/
+// prefix on document.name and document.metadata.title, plus a word match on the analyzed
+// document.metadata.description -- live-verified to find the same 5 Apache decoders and the 1
+// SSH decoder the QA report's raw wildcard probe found.
+test('get_threat_intel_components: name builds a should-clause on name/title (term+prefix) and description (match), no wildcard', () => {
+  const request = build({ component_type: 'decoders', name: 'apache' });
+  assert.deepEqual(request.body.query, {
+    bool: {
+      filter: [
+        {
+          bool: {
+            minimum_should_match: 1,
+            should: [
+              {
+                term: {
+                  'document.name': { value: 'apache', case_insensitive: true },
+                },
+              },
+              {
+                prefix: {
+                  'document.name': { value: 'apache', case_insensitive: true },
+                },
+              },
+              {
+                term: {
+                  'document.metadata.title': {
+                    value: 'apache',
+                    case_insensitive: true,
+                  },
+                },
+              },
+              {
+                prefix: {
+                  'document.metadata.title': {
+                    value: 'apache',
+                    case_insensitive: true,
+                  },
+                },
+              },
+              { match: { 'document.metadata.description': 'apache' } },
+            ],
+          },
+        },
+      ],
+    },
+  });
+  const result = lintDsl(request.body, request.index);
+  assert.equal(result.ok, true, result.ok ? '' : result.reason);
+});
+
+test('get_threat_intel_components: name is trimmed and omitted when blank', () => {
+  assert.deepEqual(
+    build({ component_type: 'decoders', name: '   ' }).body.query,
+    { bool: { filter: [] } },
+  );
+});
+
 test('get_threat_intel_components: an invalid space value is ignored (no filter, no throw)', () => {
   const request = build({
     component_type: 'integrations',
