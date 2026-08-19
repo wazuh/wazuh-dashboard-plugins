@@ -1,6 +1,7 @@
-import { ToolDefinition } from '../types';
+import { ResolvedToolParams, ResolveParamsResult, ToolDefinition } from '../types';
 import { WAZUH_FIELD, COMPLIANCE_FRAMEWORK_FIELDS } from '../../../common/wazuh-fields';
-import { isAggAllowedField, listAggAllowedFields } from '../guardrails';
+import { isAggAllowedField, listAggAllowedFields, requiresBoundedTimeRange } from '../guardrails';
+import { FIELD_ALIASES, resolveFieldAlias } from '../../../common/field-catalog';
 import {
   objectSchema,
   optionalStringParam,
@@ -15,6 +16,22 @@ import {
  * `limit` param (unlike the listing tools). Kept well under `guardrails.ts`'s `MAX_AGG_SIZE`
  * (100), which this request would also have to satisfy either way. */
 const BUCKET_CAP = 50;
+
+/** Code review B9: `prefix` is turned into a `[xX]`-doubled Lucene regexp below (one character
+ * class pair per input character), so an unbounded caller-supplied string can grow the compiled
+ * automaton past Lucene's `max_determinized_states` (10,000) and surface as an opaque 400 the
+ * model has to interpret instead of a clear parameter error. 64 is far beyond any real field value
+ * prefix a caller would type, so this never clips a legitimate query. */
+const PREFIX_MAX_LENGTH = 64;
+
+/** Tool family (`FieldLocation.family`, this module's own vocabulary) -> `common/field-catalog.ts`
+ * family key, for the two families `FIELD_ALIASES` actually covers. Deliberately a tiny, explicit
+ * map rather than a generic rule: only `findings`/`events` currently have a known-unpopulated ECS
+ * twin (see `common/field-catalog.ts`'s `FIELD_ALIASES` doc comment). */
+const TOOL_FAMILY_TO_CATALOG_FAMILY: Record<string, string> = {
+  findings: 'events.findings',
+  events: 'events.main',
+};
 
 /** One field's queryable location: a router-style `family` label (mirrors the vocabulary an
  * analyst/the model already uses for "which surface") plus the concrete index pattern to query. */
@@ -75,9 +92,20 @@ export const FIELD_LOCATIONS: Record<string, FieldLocation[]> = {
   'interface.state': [INVENTORY_PORTS],
   'network.transport': [INVENTORY_PORTS],
   'package.name': [INVENTORY_PACKAGES],
-  'host.os.name': [INVENTORY_SYSTEM],
-  'host.os.platform': [INVENTORY_SYSTEM],
+  // Code review B1 (AI/plan/b-review.md P1.1): extended from `[INVENTORY_SYSTEM]` alone. Without
+  // `FINDINGS`/`EVENTS` here, the model could never even OBSERVE the empty ECS twin on the surface
+  // the CEO scenario actually asks about (findings/events) -- it would silently get routed to
+  // inventory_system instead, which answers a different question and hides the `missing_count`
+  // this tool exists to surface. See `resolveParams` below for what points the model at the
+  // populated `wazuh.agent.host.os.*` twin once it lands here.
+  'host.os.name': [INVENTORY_SYSTEM, FINDINGS, EVENTS],
+  'host.os.platform': [INVENTORY_SYSTEM, FINDINGS, EVENTS],
   'source.ip': [FINDINGS, EVENTS],
+  // Code review B1: the populated twins of the two ECS fields above -- see guardrails.ts's
+  // AGG_FIELD_ALLOWLIST entry for the live cardinality evidence.
+  [WAZUH_FIELD.AGENT_OS_NAME]: [FINDINGS, EVENTS],
+  [WAZUH_FIELD.AGENT_OS_PLATFORM]: [FINDINGS, EVENTS],
+  [WAZUH_FIELD.INTEGRATION_NAME]: [FINDINGS, EVENTS],
 };
 // Every compliance-framework requirement field (wazuh.rule.compliance.pci_dss, .hipaa, ...) lives
 // on findings-v5 only, same as the rest of the rule taxonomy above -- filled in from the shared
@@ -106,10 +134,13 @@ export function fieldsForFamily(family: string): string[] {
 /** Simple, bounded prefix/substring match for the "did you mean" suggestion list -- no fuzzy
  * matching dependency, just a plain scan of the (short, ~20-entry) allowlist. Two tiers, STRONG
  * matches (substring either direction, or one's last dot-segment is a prefix of the other's --
- * catches the common "extra/missing letter in the last word" typo, e.g. "wazuh.rule.leveel" ->
- * "wazuh.rule.level") sorted ahead of WEAK matches (same leading path segment only, e.g. any
- * other "wazuh.*" field) -- so a near-miss on the meaningful part of the name is never pushed out
- * of the capped top 5 by a same-namespace field that shares nothing but "wazuh.". */
+ * catches a truncated-field-path typo, e.g. "wazuh.rule.lev" -> "wazuh.rule.level", the case this
+ * module's own test exercises) sorted ahead of WEAK matches (same leading path segment only, e.g.
+ * any other "wazuh.*" field) -- so a near-miss on the meaningful part of the name is never pushed
+ * out of the capped top 5 by a same-namespace field that shares nothing but "wazuh.". Code review
+ * B10: an inserted-letter typo like "wazuh.rule.leveel" shares no contiguous substring or
+ * last-segment prefix relation with "wazuh.rule.level" and is NOT caught by this tier -- that class
+ * of typo is out of scope for this deliberately simple matcher, not a bug. */
 function suggestCloseFields(field: string): string[] {
   const needle = field.toLowerCase();
   const needleSegments = needle.split('.');
@@ -175,7 +206,11 @@ export const getFieldValuesTool: ToolDefinition = {
       'call returns zero rows, to check whether the filter value itself was wrong before ' +
       'concluding the data does not exist. Only works for a small set of vetted, bounded-' +
       'cardinality fields (the same list this catalog\'s aggregations are always restricted to) -- ' +
-      'if the field you need is not accepted, say what you could check instead of guessing a value.',
+      'if the field you need is not accepted, say what you could check instead of guessing a value. ' +
+      'On the "findings"/"events" surfaces specifically, the ECS `host.os.name`/`host.os.platform` ' +
+      'fields are largely UNPOPULATED -- if a call on one of those returns a high `missing_count`, ' +
+      'call this tool again with field "wazuh.agent.host.os.name"/"wazuh.agent.host.os.platform" ' +
+      '(the populated twin for the same data) before concluding the value does not exist.',
     parameters: objectSchema(
       {
         field: {
@@ -197,7 +232,7 @@ export const getFieldValuesTool: ToolDefinition = {
           type: 'string',
           description:
             'Only return values starting with this text (case-insensitive). Omit to see the ' +
-            'most common values overall.',
+            `most common values overall. Max ${PREFIX_MAX_LENGTH} characters.`,
         },
         ...timeRangeProperties(),
       },
@@ -206,6 +241,44 @@ export const getFieldValuesTool: ToolDefinition = {
   },
   target: 'indexer',
   tier: 'T1',
+  /** Code review B1 (alias surfacing, AI/plan/b-review.md P1.1): the only production caller of
+   * `common/field-catalog.ts`'s `FIELD_ALIASES`/`resolveFieldAlias` -- without this, that map had
+   * zero runtime consumers and was exercised only by its own unit test. When the resolved
+   * `field`/`index_family` combination has a known-unpopulated-on-this-family alias (currently
+   * `host.os.name`/`host.os.platform` on `findings`/`events`), this surfaces the POPULATED twin's
+   * field name via `Digest.assumptionNote` -- the same channel `get_agent_inventory` uses for an
+   * inferred `agent_id` -- so the model sees the pointer on the SAME call instead of needing a
+   * prompt-only hint to know to ask again. Params are never rewritten here: the tool still queries
+   * exactly the field/family the caller asked for (so `missing_count` on the empty twin remains
+   * observable, per this scenario's own point), the note only tells the model where to look next. */
+  async resolveParams(params): Promise<ResolveParamsResult> {
+    const resolvedParams: Record<string, unknown> = { ...params };
+    const field = typeof params.field === 'string' ? params.field : undefined;
+    if (!field || !isAggAllowedField(field) || FIELD_LOCATIONS[field] === undefined) {
+      return { ok: true, resolved: { params: resolvedParams } };
+    }
+    const locations = FIELD_LOCATIONS[field];
+    const requestedFamily = optionalStringParam(params.index_family);
+    const location = requestedFamily
+      ? locations.find(candidate => candidate.family === requestedFamily)
+      : locations[0];
+    if (!location) {
+      return { ok: true, resolved: { params: resolvedParams } };
+    }
+    const catalogFamily = TOOL_FAMILY_TO_CATALOG_FAMILY[location.family];
+    if (!catalogFamily) {
+      return { ok: true, resolved: { params: resolvedParams } };
+    }
+    const populatedTwin = resolveFieldAlias(catalogFamily, field);
+    const resolved: ResolvedToolParams = { params: resolvedParams };
+    if (populatedTwin !== field && FIELD_ALIASES[catalogFamily]?.[field] !== undefined) {
+      resolved.note =
+        `"${field}" is largely unpopulated on the "${location.family}" surface -- ` +
+        `"${populatedTwin}" is the populated twin for the same data on this fleet; call ` +
+        `get_field_values again with field "${populatedTwin}" to see the real distribution.`;
+    }
+    return { ok: true, resolved };
+  },
   buildRequest(params) {
     const field = requireNonEmptyString(
       params.field,
@@ -238,9 +311,19 @@ export const getFieldValuesTool: ToolDefinition = {
     }
 
     const rawPrefix = optionalStringParam(params.prefix)?.trim();
+    if (rawPrefix && rawPrefix.length > PREFIX_MAX_LENGTH) {
+      throw new Error(
+        `Parameter "prefix" is ${rawPrefix.length} characters long; the maximum is ` +
+          `${PREFIX_MAX_LENGTH}. Narrow the prefix instead of passing the full expected value.`,
+      );
+    }
     const prefix = rawPrefix && rawPrefix.length > 0 ? rawPrefix : undefined;
 
-    const isTimeBased = location.family === 'findings' || location.family === 'events';
+    // Code review B8: reuse the single source of truth for "does this index need a bounded
+    // @timestamp range" instead of hand-rolling the same family check a second time -- this drifts
+    // the moment a new time-based family is added, and the old failure mode was a guardrail
+    // rejection at runtime, not a compile error.
+    const isTimeBased = requiresBoundedTimeRange(location.index);
     const filter: Record<string, unknown>[] = [];
     if (isTimeBased) {
       const { gte, lte } = resolveTimeRange(params);

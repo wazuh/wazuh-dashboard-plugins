@@ -42,12 +42,9 @@ const OTHER_EMPTY_FAMILY_INDICES: Record<string, MappingsResponseBody> = {
   'wazuh-findings-v5*': {},
   'wazuh-events-v5*': {},
   'wazuh-states-vulnerabilities*': {},
-  'wazuh-states-fim-files*': {},
   'wazuh-states-inventory-system*': {},
   'wazuh-states-inventory-packages*': {},
   'wazuh-states-inventory-ports*': {},
-  'wazuh-states-inventory-processes*': {},
-  'wazuh-states-inventory-hotfixes*': {},
 };
 
 /** Sets one leaf field (`path`, dot-separated) on a mapping `properties` tree, creating every
@@ -107,13 +104,10 @@ async function buildScaProperties(pathsToOmit: string[] = []): Promise<Record<st
   const { fieldsForFamily } = await import('./catalog/get-field-values');
   const omit = new Set(pathsToOmit);
   const properties: Record<string, unknown> = {};
-  const allPaths = [
-    ...FIELD_CATALOG.sca.map(entry => ({ path: entry.path, type: entry.type })),
-    ...fieldsForFamily('sca').map(path => ({ path, type: 'keyword' })),
-  ];
-  for (const { path, type } of allPaths) {
+  const allPaths = [...FIELD_CATALOG.sca, ...fieldsForFamily('sca')];
+  for (const path of allPaths) {
     if (!omit.has(path)) {
-      setMappingLeaf(properties, path, type);
+      setMappingLeaf(properties, path, 'keyword');
     }
   }
   return properties;
@@ -132,10 +126,11 @@ test('checkFieldDrift: logs nothing when every catalog + tool-filter field for a
   assert.deepEqual(logger.warnMessages, []);
 });
 
-test('checkFieldDrift: warns, prefixed "[field-drift]", for a catalog field missing from the live mapping', async () => {
-  // Every other sca/tool-filter field present; ONLY "policy.id" simulated as dropped/renamed --
-  // keeps this fixture to a single missing field, well inside MAX_MISSING_FIELDS_LOGGED_PER_FAMILY,
-  // so the assertion below cannot be defeated by the per-family log cap.
+test('checkFieldDrift: warns, prefixed "[field-drift]", for a TOOL-FACING field missing from the live mapping', async () => {
+  // Every other sca/tool-filter field present; ONLY "policy.id" (a fieldsForFamily('sca') field,
+  // consumed by get_field_values) simulated as dropped/renamed -- keeps this fixture to a single
+  // missing field, well inside MAX_MISSING_FIELDS_LOGGED_PER_FAMILY, so the assertion below cannot
+  // be defeated by the per-family log cap.
   const properties = await buildScaProperties(['policy.id']);
   const client = clientReturning({
     'wazuh-states-sca*': {
@@ -156,6 +151,58 @@ test('checkFieldDrift: warns, prefixed "[field-drift]", for a catalog field miss
   // Nothing else was omitted -- exactly one missing-field line (plus no "additional" remainder
   // line, since 1 is well under the cap).
   assert.equal(logger.warnMessages.length, 1);
+});
+
+test('checkFieldDrift: warns for a CATALOG-ONLY field are demoted to debug, never warn -- code ' +
+  'review B2/B3 (AI/plan/b-review.md)', async () => {
+  // "check.id" is a FIELD_CATALOG.sca entry with no get-field-values.ts tool field of its own
+  // (fieldsForFamily('sca') covers policy.id/check.result/check.name, not check.id) -- simulate
+  // it as dropped/renamed while every tool-facing field stays present.
+  const properties = await buildScaProperties(['check.id']);
+  const client = clientReturning({
+    'wazuh-states-sca*': {
+      'wazuh-states-sca-000001': { mappings: { properties } },
+    },
+    ...OTHER_EMPTY_FAMILY_INDICES,
+  });
+  const logger = fakeLogger();
+  await checkFieldDrift(client, logger as never);
+  assert.deepEqual(logger.warnMessages, []);
+  assert.ok(
+    logger.debugMessages.some(message => message.includes('"check.id"')),
+    'expected a DEBUG line naming the missing catalog-only "check.id" field',
+  );
+});
+
+test('checkFieldDrift: a live mapping missing MOST of the WCS catalog for a family, but every ' +
+  'tool-facing field present, produces no warnings -- fixture is independent of FIELD_CATALOG ' +
+  '(code review B3, AI/plan/b-review.md: the old mirror-test fixture was BUILT FROM ' +
+  'FIELD_CATALOG.sca itself, so "logs nothing when everything is present" was true by ' +
+  'construction and could never observe the real bug (B2): the live index TEMPLATE maps far ' +
+  'fewer fields than the WCS schema defines. This fixture hand-lists only a handful of real ' +
+  'sca fields plus every get-field-values.ts tool field, which is what a genuinely healthy ' +
+  '"template is a subset of the schema" live mapping actually looks like -- it fails on the ' +
+  'pre-B2 code (which warned on every catalog field not in this deliberately small mapping) and ' +
+  'passes after the fix.', async () => {
+  const { fieldsForFamily } = await import('./catalog/get-field-values');
+  const properties: Record<string, unknown> = {};
+  for (const path of fieldsForFamily('sca')) {
+    setMappingLeaf(properties, path, 'keyword');
+  }
+  // A small, realistic subset of the WCS sca schema -- deliberately NOT the full
+  // FIELD_CATALOG.sca list (52 fields), matching how a real live template maps a subset of the
+  // schema, not the whole thing.
+  setMappingLeaf(properties, 'check.id', 'keyword');
+  setMappingLeaf(properties, '@timestamp', 'date');
+  const client = clientReturning({
+    'wazuh-states-sca*': {
+      'wazuh-states-sca-000001': { mappings: { properties } },
+    },
+    ...OTHER_EMPTY_FAMILY_INDICES,
+  });
+  const logger = fakeLogger();
+  await checkFieldDrift(client, logger as never);
+  assert.deepEqual(logger.warnMessages, []);
 });
 
 test('checkFieldDrift: a family whose index pattern matches nothing live is not drift', async () => {

@@ -47,7 +47,8 @@ test('buildSystemPrompt: instructs the model to never assert a remediation/compl
 // time, but this instruction told the model to call get_agents first -- a tool the router does not
 // offer alongside a lone 'inventory' route, so the model could not obey it and fell back to asking
 // the user or improvising with search_wazuh_data instead. The fix splits this into two
-// instructions: get_agent_inventory (the only tool with server-side resolveParams resolution) gets
+// instructions: get_agent_inventory (which resolves a deictic agent reference itself via its
+// server-side resolveParams hook, unlike every other agent-scoped tool) gets
 // its own "call it directly, do not call get_agents" rule; every other agent-scoped tool keeps a
 // get-agents-first rule, since none of them can resolve a deictic reference on their own -- BUT
 // (follow-up audit fix, same bug class, caught before it was independently reproduced live) that

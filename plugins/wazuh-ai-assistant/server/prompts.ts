@@ -157,7 +157,8 @@ export function buildSystemPrompt(nowIso: string): string {
     // fell back to asking the user or improvising with search_wazuh_data -- 0/5 calls to either
     // get_agents or get_agent_inventory, on that exact worked example, with this exact
     // (pre-fix) wording in place. No OTHER agent-scoped tool in the catalog has this server-side
-    // resolution (only get_agent_inventory implements `resolveParams`), so the get-agents-first
+    // AGENT resolution (get_field_values also implements `resolveParams`, but for the unrelated
+    // field-alias hint of code review B1, not agent-id inference), so the get-agents-first
     // instruction further below is still needed for every other tool -- BUT (follow-up audit,
     // never independently reproduced live, caught by inspection before it repeated the same
     // mistake) it must not repeat the exact bug this whole fix exists for: telling the model to
@@ -222,6 +223,14 @@ export function buildSystemPrompt(nowIso: string): string {
       'back with zero rows for something that plausibly exists, call get_field_values on that ' +
       'same field before concluding it does not exist — a zero-row result proves the FILTER VALUE ' +
       'did not match, not that the data is absent, and those are different findings to report.',
+    // Code review B1 (AI/plan/b-review.md P1.1): on this platform version, the ECS host fields on
+    // findings/events are largely unpopulated even though they are queryable — a naive reading of
+    // a high missing_count could wrongly conclude "no host OS data exists" instead of looking at
+    // the field that actually carries it.
+    'On findings/events, the ECS `host.os.*`/`host.name` fields are largely unpopulated on this ' +
+      'platform version — if get_field_values on one of those returns a high missing_count (or ' +
+      'the tool result includes a note naming a populated twin), the real data lives at ' +
+      '`wazuh.agent.host.*` instead; check that field before concluding host/OS data does not exist.',
     // Honest-empty distinction: the same root-cause report's Q4 witness ("no dedicated Linux rule
     // set" when logsource.product=linux had 2 rules) was exactly this confusion stated as fact.
     'Keep these two statements distinct and never substitute one for the other: "field X is ' +

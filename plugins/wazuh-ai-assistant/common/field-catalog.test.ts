@@ -42,18 +42,20 @@ test('FIELD_CATALOG covers the index families the catalog tools query', () => {
   }
 });
 
-test('every entry has a non-empty path and type', () => {
-  for (const [family, entries] of Object.entries(FIELD_CATALOG)) {
-    for (const entry of entries) {
-      assert.ok(entry.path.length > 0, `${family}: empty path`);
-      assert.ok(entry.type.length > 0, `${family}: empty type for ${entry.path}`);
+test('every entry is a non-empty path string', () => {
+  // Code review footprint gate (AI/plan/b-review.md P1.2): FIELD_CATALOG entries were
+  // `{ path, type }` objects; `type` had no production consumer (only this test read it), so the
+  // catalog is now `ReadonlyArray<string>` (paths only) to shrink the compressed footprint.
+  for (const [family, paths] of Object.entries(FIELD_CATALOG)) {
+    for (const path of paths) {
+      assert.equal(typeof path, 'string', `${family}: non-string entry`);
+      assert.ok(path.length > 0, `${family}: empty path`);
     }
   }
 });
 
 test('no duplicate paths within a family', () => {
-  for (const [family, entries] of Object.entries(FIELD_CATALOG)) {
-    const paths = entries.map(entry => entry.path);
+  for (const [family, paths] of Object.entries(FIELD_CATALOG)) {
     assert.equal(
       new Set(paths).size,
       paths.length,
@@ -111,12 +113,12 @@ test('resolveFieldAlias routes the empty ECS OS fields to the populated wazuh.ag
 });
 
 test('sca and vulnerabilities catalogs contain the fields the existing tools already rely on', () => {
-  const scaPaths = new Set(FIELD_CATALOG.sca.map(e => e.path));
+  const scaPaths = new Set(FIELD_CATALOG.sca);
   assert.ok(scaPaths.has('check.id'));
   assert.ok(scaPaths.has('check.result'));
   assert.ok(scaPaths.has('policy.id'));
 
-  const vulnPaths = new Set(FIELD_CATALOG.vulnerabilities.map(e => e.path));
+  const vulnPaths = new Set(FIELD_CATALOG.vulnerabilities);
   assert.ok(vulnPaths.has('vulnerability.id'));
   assert.ok(vulnPaths.has('vulnerability.severity'));
   assert.ok(vulnPaths.has('package.name'));

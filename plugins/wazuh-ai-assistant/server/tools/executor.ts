@@ -827,9 +827,10 @@ export async function executeToolCall(
   let { params } = validated.validated;
   const { def } = validated.validated;
 
-  // Issue #8913: an opt-in async pre-buildRequest step (currently only get_agent_inventory) that
-  // resolves a param the model omitted (e.g. "this server" with no agent named) against a live
-  // source, instead of relying on the model to have called a lookup tool first -- a live-verified
+  // Issue #8913: an opt-in async pre-buildRequest step (originally only get_agent_inventory; code
+  // review B1 added get_field_values, for a different purpose -- surfacing a populated-field-alias
+  // note, not resolving an omitted param) that resolves/annotates params against a live source
+  // instead of relying on the model to have called a lookup tool first -- a live-verified
   // system-prompt-only instruction to do that was found NOT to work (0/5 runs complied). Wrapped
   // in try/catch (unlike `buildRequest`'s own try/catch below, `resolveParams` is async and a
   // rejected promise would otherwise become an unhandled rejection, breaking this function's

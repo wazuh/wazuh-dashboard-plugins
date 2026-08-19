@@ -377,6 +377,11 @@ export function resolveStage2Tools(categories: string[]): ToolSpec[] {
   toolNames.add('search_wazuh_data');
   // Always-on discovery tool (workstream B) -- see TOOL_CATEGORY's get_field_values entry above
   // for why this mirrors search_wazuh_data's unconditional placement instead of a category gate.
+  // DELIBERATE product decision, not a side effect (code review B11): this adds ~1.5 KB of
+  // description + 4 params to EVERY stage-2 call, including `general`, where field discovery is
+  // rarely relevant. Accepted because the alternative -- gating it per category -- would silently
+  // reintroduce the "model guesses a filter value" failure mode B1 exists to close, on whichever
+  // category someone forgets to add it to.
   toolNames.add('get_field_values');
 
   const specs: ToolSpec[] = [];

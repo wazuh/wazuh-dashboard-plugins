@@ -37,23 +37,28 @@ const MAX_MISSING_FIELDS_LOGGED_PER_FAMILY = 20;
  * would only add startup-log noise with no actionable tool to fix). Keep in sync with
  * `server/tools/router.ts`'s `TOOL_CATEGORY` index targets and `get-field-values.ts`'s
  * `FIELD_LOCATIONS` if either changes which indices are actually queried.
+ *
+ * Code review B2 (AI/plan/b-review.md): `fim.files`, `inventory.processes`, and
+ * `inventory.hotfixes` were previously listed WITHOUT an `allowlistFamily` -- meaning they had no
+ * `get-field-values.ts` tool fields of their own, so once `checkFamily` below stopped diffing the
+ * full WCS catalog (see that fix) they would check nothing at all. Dropped rather than kept as
+ * dead entries.
  */
 /**
- * `allowlistFamily` (when set) is `get-field-values.ts`'s OWN family vocabulary
- * ("findings"/"events"/"sca"/...) for that same index -- deliberately a separate label from the
- * `common/field-catalog.ts` `family` key on the same row, since the two modules' family
- * vocabularies were built independently and do not share spelling (e.g. "events.findings" here
- * vs. "findings" there). `fieldsForFamily(allowlistFamily)` is how part (b) of this canary's job
- * (checking the fields tool PARAMS actually filter/aggregate on, not just the WCS catalog's
- * fields) is resolved -- `wazuh.*` fields such as `wazuh.rule.id`/`wazuh.agent.name` are never in
- * `FIELD_CATALOG` at all (that catalog only carries WCS/ECS paths), so without this second source
- * those tool-facing fields would never be live-checked. Omitted for a family with no
- * `get-field-values.ts` fields of its own (`fim.files` has no AGG_FIELD_ALLOWLIST entry yet).
+ * `allowlistFamily` is `get-field-values.ts`'s OWN family vocabulary ("findings"/"events"/"sca"/
+ * ...) for that same index -- deliberately a separate label from the `common/field-catalog.ts`
+ * `family` key on the same row, since the two modules' family vocabularies were built
+ * independently and do not share spelling (e.g. "events.findings" here vs. "findings" there).
+ * `fieldsForFamily(allowlistFamily)` resolves the fields tool PARAMS actually filter/aggregate on
+ * -- `wazuh.*` fields such as `wazuh.rule.id`/`wazuh.agent.name` are never in `FIELD_CATALOG` at
+ * all (that catalog only carries WCS/ECS paths), so without this second source those tool-facing
+ * fields would never be live-checked. Now REQUIRED (not optional) -- see `checkFamily`'s doc
+ * comment for why a family with no tool-facing fields has nothing left to check.
  */
 const QUERIED_FAMILIES: ReadonlyArray<{
   family: string;
   index: string;
-  allowlistFamily?: string;
+  allowlistFamily: string;
 }> = [
   { family: 'events.findings', index: 'wazuh-findings-v5*', allowlistFamily: 'findings' },
   { family: 'events.main', index: 'wazuh-events-v5*', allowlistFamily: 'events' },
@@ -63,7 +68,6 @@ const QUERIED_FAMILIES: ReadonlyArray<{
     index: 'wazuh-states-vulnerabilities*',
     allowlistFamily: 'vulnerabilities',
   },
-  { family: 'fim.files', index: 'wazuh-states-fim-files*' },
   {
     family: 'inventory.system',
     index: 'wazuh-states-inventory-system*',
@@ -79,8 +83,6 @@ const QUERIED_FAMILIES: ReadonlyArray<{
     index: 'wazuh-states-inventory-ports*',
     allowlistFamily: 'inventory_ports',
   },
-  { family: 'inventory.processes', index: 'wazuh-states-inventory-processes*' },
-  { family: 'inventory.hotfixes', index: 'wazuh-states-inventory-hotfixes*' },
 ];
 
 /** Minimal shape of the OpenSearch `_mapping` response this canary needs -- one entry per
@@ -100,9 +102,19 @@ export interface MappingsResponseBody {
  * this shape, so the real call site needs no adapter and a test can pass a trivial stub. */
 export interface MappingClient {
   indices: {
-    getMapping(params: { index: string }): Promise<{ body: MappingsResponseBody }>;
+    getMapping(params: {
+      index: string;
+      filter_path?: string;
+    }): Promise<{ body: MappingsResponseBody }>;
   };
 }
+
+/** Code review B5: without `filter_path`, `indices.getMapping` returns the FULL mapping response
+ * (settings/aliases/other metadata this canary never reads) -- measured at 939 KB for one family
+ * on a live 8-backing-index findings pattern. Requesting only the `mappings.properties` subtree
+ * per index cuts that payload (and the `JSON.parse` cost) down to just what `flattenMappedFieldPaths`
+ * actually walks, across all `QUERIED_FAMILIES` on every process start. */
+const MAPPING_FILTER_PATH = '*.mappings.properties';
 
 /** Flattens one index's `mappings.properties` tree into the set of dot-path field names it maps --
  * the same shape `common/field-catalog.ts`'s `path` entries use. Recurses into nested
@@ -131,27 +143,44 @@ export function flattenMappedFieldPaths(
   return paths;
 }
 
+/** Result of one family's live check: `toolMissing` are `get-field-values.ts`-facing fields
+ * (something a tool can actually filter/aggregate on) that are no longer mapped -- these are real,
+ * actionable drift and are logged at WARN. `catalogMissing` are WCS-catalog-only fields (schema
+ * fields no tool queries) that are no longer mapped -- see `checkFamily`'s doc comment for why
+ * these are informational only. */
+interface FamilyDriftResult {
+  toolMissing: string[];
+  catalogMissing: string[];
+}
+
 /** Live-checks one family: fetches its `_mapping`, unions every concrete index's flattened field
  * paths (a data-stream/alias pattern can back more than one backing index, and a field mapped on
- * ANY of them counts as present), and returns the catalog fields that are missing from that
- * union. Returns `[]` (never throws) when the pattern currently resolves to zero indices -- an
- * empty environment/family is not drift, it is simply nothing to check yet. */
+ * ANY of them counts as present), and returns which known fields are missing from that union,
+ * split into the two buckets `FamilyDriftResult` documents. Returns `{[], []}` (never throws) when
+ * the pattern currently resolves to zero indices -- an empty environment/family is not drift, it
+ * is simply nothing to check yet.
+ *
+ * Code review B2 (AI/plan/b-review.md): this used to union `FIELD_CATALOG[family]` (the full WCS
+ * schema) with the tool-facing fields and warn on ANY of them missing. WCS is the schema, not what
+ * the live index TEMPLATE actually maps -- measured live, `events.main` alone had 2,121 WCS
+ * fields the template never mapped, none of which any tool touches, producing ~2,100 false
+ * "drift" warnings on a perfectly healthy system every startup (a canary that cries wolf on day
+ * one gets muted, costing the real signal it exists for). The catalog side is still checked, for
+ * visibility, but only ever at DEBUG.
+ */
 async function checkFamily(
   client: MappingClient,
   family: string,
   index: string,
-  allowlistFamily: string | undefined,
-): Promise<string[]> {
+  allowlistFamily: string,
+): Promise<FamilyDriftResult> {
   const catalogFields = FIELD_CATALOG[family] ?? [];
-  const toolFilterFields = allowlistFamily ? fieldsForFamily(allowlistFamily) : [];
-  const namesToCheck = new Set<string>([
-    ...catalogFields.map(entry => entry.path),
-    ...toolFilterFields,
-  ]);
+  const toolFilterFields = fieldsForFamily(allowlistFamily);
+  const namesToCheck = new Set<string>([...catalogFields, ...toolFilterFields]);
   if (namesToCheck.size === 0) {
-    return [];
+    return { toolMissing: [], catalogMissing: [] };
   }
-  const response = await client.indices.getMapping({ index });
+  const response = await client.indices.getMapping({ index, filter_path: MAPPING_FILTER_PATH });
   const mapped = new Set<string>();
   for (const indexBody of Object.values(response.body ?? {})) {
     for (const path of flattenMappedFieldPaths(indexBody.mappings?.properties)) {
@@ -160,35 +189,62 @@ async function checkFamily(
   }
   if (mapped.size === 0) {
     // No backing index yet (pattern matched nothing) -- nothing to compare against, not drift.
-    return [];
+    return { toolMissing: [], catalogMissing: [] };
   }
-  const missing: string[] = [];
-  for (const path of namesToCheck) {
-    if (!mapped.has(path)) {
-      missing.push(path);
-    }
-  }
-  return missing.sort();
+  const toolFilterFieldSet = new Set(toolFilterFields);
+  const toolMissing = toolFilterFields.filter(path => !mapped.has(path)).sort();
+  const catalogMissing = catalogFields
+    .filter(path => !toolFilterFieldSet.has(path) && !mapped.has(path))
+    .sort();
+  return { toolMissing, catalogMissing };
 }
 
-/** Runs the bounded live check across every queried family and logs one warning line per missing
- * field (capped per family), plus a debug summary line when everything matched. Never throws --
- * every per-family failure (a down indexer, an auth error, a malformed response) is caught and
- * logged at DEBUG, individually, so one unreachable family does not stop the rest from being
- * checked. Exported separately from `runFieldDriftCanary` (the fire-and-forget, timeout-guarded
- * entry point) so a test can await this directly without racing a real timer.
+/** Logs up to `MAX_MISSING_FIELDS_LOGGED_PER_FAMILY` missing-field lines (plus a remainder line)
+ * at the given level, prefixed identically either way -- shared by the WARN (tool-facing) and
+ * DEBUG (catalog-only) paths below so the two only differ in level and wording, not structure. */
+function logMissing(
+  logger: Logger,
+  level: 'warn' | 'debug',
+  family: string,
+  index: string,
+  missing: string[],
+  detail: string,
+): void {
+  const shown = missing.slice(0, MAX_MISSING_FIELDS_LOGGED_PER_FAMILY);
+  const remainder = missing.length - shown.length;
+  for (const path of shown) {
+    logger[level](
+      `[field-drift] "${family}" (${index}): ${detail} "${path}" is no longer present in the ` +
+        'live mapping.',
+    );
+  }
+  if (remainder > 0) {
+    logger[level](
+      `[field-drift] "${family}" (${index}): ${remainder} additional missing field(s) not shown ` +
+        `(capped at ${MAX_MISSING_FIELDS_LOGGED_PER_FAMILY} per family).`,
+    );
+  }
+}
+
+/** Runs the bounded live check across every queried family and logs one WARN line per missing
+ * TOOL-FACING field (capped per family, code review B2), one DEBUG line per missing catalog-only
+ * field, plus a DEBUG summary line when everything matched. Never throws -- every per-family
+ * failure (a down indexer, an auth error, a malformed response) is caught and logged at DEBUG,
+ * individually, so one unreachable family does not stop the rest from being checked. Exported
+ * separately from `runFieldDriftCanary` (the fire-and-forget, timeout-guarded entry point) so a
+ * test can await this directly without racing a real timer.
  */
 export async function checkFieldDrift(
   client: MappingClient,
   logger: Logger,
 ): Promise<void> {
   for (const { family, index, allowlistFamily } of QUERIED_FAMILIES) {
-    let missing: string[];
+    let result: FamilyDriftResult;
     try {
       // eslint-disable-next-line no-await-in-loop -- a handful of small, independent _mapping
       // calls at process start; sequential keeps this canary's own load on the indexer bounded
       // and its log output ordered by family, which matters more here than shaving startup time.
-      missing = await checkFamily(client, family, index, allowlistFamily);
+      result = await checkFamily(client, family, index, allowlistFamily);
     } catch (error) {
       logger.debug(
         `[field-drift] could not check "${family}" (${index}): ${
@@ -197,24 +253,30 @@ export async function checkFieldDrift(
       );
       continue;
     }
-    if (missing.length === 0) {
+    if (result.toolMissing.length === 0 && result.catalogMissing.length === 0) {
       logger.debug(`[field-drift] "${family}" (${index}): no drift detected.`);
       continue;
     }
-    const shown = missing.slice(0, MAX_MISSING_FIELDS_LOGGED_PER_FAMILY);
-    const remainder = missing.length - shown.length;
-    for (const path of shown) {
-      logger.warn(
-        `[field-drift] "${family}" (${index}): known field "${path}" is no longer present in ` +
-          'the live mapping -- a tool filtering or aggregating on it will silently return zero ' +
-          'rows/buckets instead of erroring. Regenerate common/field-catalog.ts and review the ' +
-          'affected tool(s) if this is a real platform-side rename, not a transient empty index.',
+    if (result.toolMissing.length > 0) {
+      logMissing(
+        logger,
+        'warn',
+        family,
+        index,
+        result.toolMissing,
+        'tool-facing field',
       );
     }
-    if (remainder > 0) {
-      logger.warn(
-        `[field-drift] "${family}" (${index}): ${remainder} additional missing field(s) not shown ` +
-          `(capped at ${MAX_MISSING_FIELDS_LOGGED_PER_FAMILY} per family).`,
+    if (result.catalogMissing.length > 0) {
+      // Informational only (code review B2): a WCS-catalog field with no tool that queries it --
+      // no filter/aggregation can silently break, so this never rises above DEBUG.
+      logMissing(
+        logger,
+        'debug',
+        family,
+        index,
+        result.catalogMissing,
+        'catalog-only field',
       );
     }
   }
@@ -229,7 +291,12 @@ export async function checkFieldDrift(
  */
 export function runFieldDriftCanary(client: MappingClient, logger: Logger): void {
   const timeout = new Promise<void>(resolve => {
-    setTimeout(resolve, CANARY_TIMEOUT_MS);
+    const handle = setTimeout(resolve, CANARY_TIMEOUT_MS);
+    // Code review B12: without `.unref()`, this timer keeps the process alive for the full
+    // `CANARY_TIMEOUT_MS` after startup even when `checkFieldDrift` wins the race well before
+    // then -- harmless on the long-lived OSD server, but free to fix and avoids holding a handle
+    // Node has no other reason to keep around.
+    handle.unref?.();
   });
   Promise.race([checkFieldDrift(client, logger), timeout]).catch(error => {
     logger.debug(

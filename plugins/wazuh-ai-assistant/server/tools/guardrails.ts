@@ -402,11 +402,14 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // same framing as this block's header comment above.
   'check.name',
   // Syscollector ports: this repo's IT Hygiene network dashboard runs a real terms agg on it
-  // (plugins/main/public/components/overview/it-hygiene/dashboards/dashboard-panels.ts) — live
-  // values include "Inactive"/"Unknown".
+  // (plugins/main/public/components/overview/it-hygiene/dashboards/dashboard-panels.ts). Code
+  // review B10: this comment previously claimed live values include "Inactive"/"Unknown" --
+  // corrected per live spot-check (AI/plan/b-review.md P1.3): actual values are
+  // "established"/"listening"/"time_wait"/"close_wait".
   'interface.state',
-  // Syscollector ports: aggregated by the IT Hygiene services/traffic dashboards; live values
-  // are uppercase ("TCP"/"UDP").
+  // Syscollector ports: aggregated by the IT Hygiene services/traffic dashboards. Code review B10:
+  // this comment previously claimed live values are uppercase ("TCP"/"UDP") -- corrected per live
+  // spot-check (AI/plan/b-review.md P1.3): actual values are lowercase "tcp"/"tcp6"/"udp".
   'network.transport',
   // Entity-pivot fields for "noisiest/top X" questions (GA benchmark gap: this allowlist only
   // ever listed wazuh-findings-v5 field names, so a terms/composite/multi_terms agg on the
@@ -460,6 +463,28 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // Privacy-off (the default) surfaces raw IPs in buckets, same as it already does in
   // every finding-hits tool's digest samples via `FINDING_DIGEST_EXTRA_COLUMNS` -- no new exposure.
   'source.ip',
+  // Code review B1 (CEO-scenario dead-end, AI/plan/b-review.md P1.1): the three fields below are
+  // the POPULATED `wazuh.agent.host.*`/`wazuh.integration.*` twins of already-listed
+  // findings/events-side fields (`host.os.name`/`host.os.platform` above, which are largely
+  // UNPOPULATED on findings/events -- see FIELD_ALIASES in common/field-catalog.ts). Without these,
+  // the model could enumerate the empty field but was guardrail-blocked from ever reaching the
+  // twin that actually carries the answer. All three verified live on this v31 environment as
+  // `keyword`-mapped, aggregatable, single-digit-to-low cardinality -- safer than `host.os.name`,
+  // which is already on this list:
+  //
+  // - `wazuh.agent.host.os.name` / `wazuh.agent.host.os.platform` (wazuh-findings-v5*/
+  //   wazuh-events-v5*): live terms agg returns `ubuntu` 2,825 (single dominant bucket) on this
+  //   fleet's findings retention -- coarser, lower-cardinality than the already-listed
+  //   `host.os.name`/`host.os.platform` pair, same finite OS taxonomy, just on the surface that is
+  //   actually populated.
+  // - `wazuh.integration.name` (wazuh-findings-v5*/wazuh-events-v5*): live terms agg returns
+  //   `linux` 2,022, `wazuh-vd` 796, `wazuh-fim` 10, `wazuh-sca` 8, `wazuh-it-hygiene` 2 -- a
+  //   finite, single-digit-cardinality integration catalog, same class and shape as the
+  //   already-listed `wazuh.integration.category` ("system-activity"/"security"/...), just one
+  //   level more specific.
+  WAZUH_FIELD.AGENT_OS_NAME,
+  WAZUH_FIELD.AGENT_OS_PLATFORM,
+  WAZUH_FIELD.INTEGRATION_NAME,
 ]);
 
 /**

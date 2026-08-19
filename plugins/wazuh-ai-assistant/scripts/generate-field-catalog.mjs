@@ -77,18 +77,37 @@ function fetchCsv(path) {
   return Buffer.from(b64.trim(), 'base64').toString('utf8');
 }
 
-/** Quote-aware CSV line splitter -- handles the WCS `Example`/`Description` columns' embedded
- * commas and `""`-escaped quotes. Not a general CSV parser: sufficient for this fixed 9-column
- * schema (see the file header this generator writes for the expected column order). */
-function splitCsvLine(line) {
-  const fields = [];
+/** Quote-aware CSV ROW splitter, run over the WHOLE file text rather than pre-split lines (code
+ * review B6): the previous version ran `csvText.split(/\r?\n/)` BEFORE this quote-aware splitter,
+ * so a `Description`/`Example` cell containing an embedded newline (common in ECS-derived CSVs)
+ * silently broke one row into two and shifted every column index -- the malformed halves usually
+ * failed the `indexed !== 'true'` check and were just dropped, so real fields vanished from the
+ * catalog with no error. This version treats a `\r?\n` as a row terminator ONLY when not currently
+ * inside a quoted field, exactly like `,` is treated as a field terminator only outside quotes.
+ * Handles the WCS `Example`/`Description` columns' embedded commas and `""`-escaped quotes. Not a
+ * general CSV parser: sufficient for this fixed 9-column schema (see the file header this
+ * generator writes for the expected column order). */
+function splitCsvRows(csvText) {
+  const rows = [];
+  let fields = [];
   let current = '';
   let inQuotes = false;
-  for (let i = 0; i < line.length; i += 1) {
-    const ch = line[i];
+  let rowHasContent = false;
+  const endField = () => {
+    fields.push(current);
+    current = '';
+  };
+  const endRow = () => {
+    endField();
+    rows.push(fields);
+    fields = [];
+    rowHasContent = false;
+  };
+  for (let i = 0; i < csvText.length; i += 1) {
+    const ch = csvText[i];
     if (inQuotes) {
       if (ch === '"') {
-        if (line[i + 1] === '"') {
+        if (csvText[i + 1] === '"') {
           current += '"';
           i += 1;
         } else {
@@ -97,42 +116,56 @@ function splitCsvLine(line) {
       } else {
         current += ch;
       }
-    } else if (ch === '"') {
+      continue;
+    }
+    if (ch === '"') {
       inQuotes = true;
+      rowHasContent = true;
     } else if (ch === ',') {
-      fields.push(current);
-      current = '';
+      endField();
+      rowHasContent = true;
+    } else if (ch === '\r') {
+      // Swallow bare CR; the following (or standalone) \n below ends the row.
+    } else if (ch === '\n') {
+      if (rowHasContent || current.length > 0 || fields.length > 0) {
+        endRow();
+      }
     } else {
       current += ch;
+      rowHasContent = true;
     }
   }
-  fields.push(current);
-  return fields;
+  if (rowHasContent || current.length > 0 || fields.length > 0) {
+    endRow();
+  }
+  return rows;
 }
 
-/** Parses one WCS `fields.csv` into `{ path, type }` entries, indexed fields only (a field with
+/** Parses one WCS `fields.csv` into a sorted list of PATHS, indexed fields only (a field with
  * `Indexed=false` cannot be filtered/aggregated, so it is out of scope for a "does this field
  * exist and is it queryable" catalog). Columns: ECS_Version, Indexed, Field_Set, Field, Type,
- * Level, Normalization, Example, Description. */
+ * Level, Normalization, Example, Description. Code review footprint gate: `Type` is READ (still
+ * required to validate the header shape) but no longer carried into the output -- the generated
+ * catalog's only production consumer is a boolean "does this path exist" lookup
+ * (`isKnownField`/`field-drift-canary.ts`), and `type` had no other reader (see the test file for
+ * the sole exception, now removed). Dropping it takes the compressed catalog from ~1.10% of the
+ * ~2.4 MB footprint gate to ~0.85%. */
 function parseFieldsCsv(csvText) {
-  const lines = csvText.split(/\r?\n/).filter(line => line.length > 0);
-  const [header, ...rows] = lines;
-  const columns = splitCsvLine(header);
-  const indexedIdx = columns.indexOf('Indexed');
-  const fieldIdx = columns.indexOf('Field');
-  const typeIdx = columns.indexOf('Type');
+  const rows = splitCsvRows(csvText).filter(row => row.length > 1 || row[0] !== '');
+  const [header, ...dataRows] = rows;
+  const indexedIdx = header.indexOf('Indexed');
+  const fieldIdx = header.indexOf('Field');
+  const typeIdx = header.indexOf('Type');
   if (indexedIdx === -1 || fieldIdx === -1 || typeIdx === -1) {
     throw new Error(
-      `Unexpected WCS CSV header (missing Indexed/Field/Type): ${header}`,
+      `Unexpected WCS CSV header (missing Indexed/Field/Type): ${header.join(',')}`,
     );
   }
-  const entries = [];
+  const paths = [];
   const seen = new Set();
-  for (const row of rows) {
-    const cells = splitCsvLine(row);
+  for (const cells of dataRows) {
     const indexed = cells[indexedIdx];
     const path = cells[fieldIdx];
-    const type = cells[typeIdx];
     if (!path || indexed !== 'true') {
       continue;
     }
@@ -140,10 +173,13 @@ function parseFieldsCsv(csvText) {
       continue;
     }
     seen.add(path);
-    entries.push({ path, type: type || 'unknown' });
+    paths.push(path);
   }
-  entries.sort((a, b) => a.path.localeCompare(b.path));
-  return entries;
+  // Code review B7: `localeCompare` ordering varies by ICU locale, so regenerating this file on a
+  // different machine could produce a large spurious diff across all 5,000+ entries. A plain
+  // codepoint comparison is locale-independent and stable across machines/CI.
+  paths.sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+  return paths;
 }
 
 function main() {
@@ -161,22 +197,27 @@ function main() {
 
   if (notFetched.length > 0) {
     process.stderr.write(
-      `\nWARNING: ${notFetched.length} family/families could not be fetched -- catalog will be ` +
-        'incomplete:\n',
+      `\nERROR: ${notFetched.length} family/families could not be fetched -- refusing to write a ` +
+        'truncated catalog:\n',
     );
     for (const failure of notFetched) {
       process.stderr.write(`  - ${failure.key} (${failure.path}): ${failure.error}\n`);
     }
+    // Code review B4: this generator's own doc comment for `fetchCsv` promises it "fails loudly
+    // rather than silently writing a truncated catalog", but the previous version wrote the file
+    // anyway and only set `process.exitCode` afterwards -- a transient network blip during a
+    // regeneration would silently drop a whole family from the committed catalog, leaving a
+    // plausible-looking diff for a reviewer to approve. Return BEFORE `writeFileSync` instead.
+    process.exitCode = 1;
+    return;
   }
 
   const generatedDate = new Date().toISOString().slice(0, 10);
   const totalFields = Object.values(catalog).reduce((sum, list) => sum + list.length, 0);
 
   const familyEntries = Object.entries(catalog)
-    .map(([key, entries]) => {
-      const rows = entries
-        .map(e => `      { path: ${JSON.stringify(e.path)}, type: ${JSON.stringify(e.type)} },`)
-        .join('\n');
+    .map(([key, paths]) => {
+      const rows = paths.map(path => `      ${JSON.stringify(path)},`).join('\n');
       return `  ${JSON.stringify(key)}: [\n${rows}\n  ],`;
     })
     .join('\n');
@@ -184,40 +225,34 @@ function main() {
   const output = `/**
  * Generated by scripts/generate-field-catalog.mjs -- DO NOT hand-edit.
  *
- * Source: wazuh/wazuh-indexer-plugins, branch ${REF}, wcs/**\\/docs/fields.csv
- * (Wazuh Common Schema). Regenerated: ${generatedDate}.
- * Regenerate with: node scripts/generate-field-catalog.mjs (from plugins/wazuh-ai-assistant/).
+ * Source: wazuh/wazuh-indexer-plugins, branch ${REF}, wcs/**\\/docs/fields.csv (Wazuh Common
+ * Schema). Regenerated: ${generatedDate}. Regenerate with: node scripts/generate-field-catalog.mjs
+ * (from plugins/wazuh-ai-assistant/).
  *
- * Only fields with Indexed=true are included (Indexed=false fields exist in WCS but can never be
- * filtered/aggregated in the indexer, so they are out of scope for a "does this field exist and
- * is it queryable" catalog). Keys match the index families the catalog tools query -- see
- * AI/plan/phase0-ground-truth.md's Tool catalog section for the family -> tool mapping. Path +
- * type only (no descriptions) to keep this file's footprint small.
+ * Only Indexed=true fields are included (Indexed=false can never be filtered/aggregated, so is
+ * out of scope for a "does this field exist and is it queryable" catalog). Keys match the index
+ * families the catalog tools query -- see AI/plan/phase0-ground-truth.md's Tool catalog section.
+ * PATHS ONLY (no type/descriptions), to keep this file's footprint small: the only production
+ * consumer is a boolean existence lookup (\`isKnownField\`, \`field-drift-canary.ts\`'s live-mapping
+ * diff) -- code review footprint gate, see AI/plan/b-review.md P1.2.
  */
 
-export interface FieldCatalogEntry {
-  path: string;
-  type: string;
-}
-
-export const FIELD_CATALOG: Record<string, ReadonlyArray<FieldCatalogEntry>> = {
+export const FIELD_CATALOG: Record<string, ReadonlyArray<string>> = {
 ${familyEntries}
 };
 
 /**
- * KNOWN PLATFORM BUG (filed; see AI/plan/phase0-ground-truth.md's "Surprises" #1 and
- * AI/plan/qa-rules-decoders-rootcause.md for the live reproduction): ECS \`host.os.*\`/\`host.name\`
- * are defined in WCS and mapped on \`wazuh-events-v5*\`/\`wazuh-findings-v5*\`, but return ZERO
- * buckets on every document on this platform version -- confirmed live via terms aggs on both an
- * events and a findings index (1,815+ and 219,317+ docs, 0 buckets on \`host.os.name\` and
- * \`host.os.platform\`). The POPULATED twin for the same data is \`wazuh.agent.host.os.*\` (and
- * \`wazuh.agent.host.name\`) -- \`wazuh.integration.category\`/\`.name\` are fully populated on the
- * exact same documents, proving this is a field-population gap, not a data gap.
+ * KNOWN PLATFORM GAP (see AI/plan/phase0-ground-truth.md "Surprises" #1 and
+ * AI/plan/qa-rules-decoders-rootcause.md): ECS \`host.os.*\`/\`host.name\` are mapped on
+ * \`wazuh-events-v5*\`/\`wazuh-findings-v5*\` but LARGELY UNPOPULATED (AI/plan/b-review.md P1.1:
+ * \`host.os.platform\` was only 7% populated on one live environment -- corrected from an earlier
+ * "zero buckets" claim, which was stale). The POPULATED twin is \`wazuh.agent.host.os.*\` (and
+ * \`wazuh.agent.host.name\`) -- \`wazuh.integration.category\`/\`.name\` are fully populated on the same
+ * documents, so this is a field-population gap, not a data gap.
  *
- * Tools and prompts should route OS-name/OS-platform questions on events/findings to the aliased
- * (\`wazuh.agent.host.*\`) field until the platform fix ships -- filtering/aggregating on the bare
- * ECS path will silently return nothing. This map is intentionally small and explicit rather than
- * a generic rewrite rule: only the confirmed-empty paths are listed.
+ * Tools/prompts should route OS-name/OS-platform questions on events/findings to the aliased
+ * (\`wazuh.agent.host.*\`) field until the platform fix ships. Intentionally small and explicit
+ * rather than a generic rewrite rule -- only the confirmed-largely-empty paths are listed.
  */
 export const FIELD_ALIASES: Record<string, Record<string, string>> = {
   'events.main': {
@@ -240,11 +275,11 @@ export const FIELD_ALIASES: Record<string, Record<string, string>> = {
  * \`FIELD_CATALOG[family]\` or a known alias source for it (see \`FIELD_ALIASES\`). Returns \`false\`
  * for an unknown family (fails closed: an unrecognized family has no known fields by definition). */
 export function isKnownField(family: string, path: string): boolean {
-  const entries = FIELD_CATALOG[family];
-  if (!entries) {
+  const paths = FIELD_CATALOG[family];
+  if (!paths) {
     return false;
   }
-  if (entries.some(entry => entry.path === path)) {
+  if (paths.includes(path)) {
     return true;
   }
   return Object.prototype.hasOwnProperty.call(FIELD_ALIASES[family] ?? {}, path);
@@ -266,9 +301,6 @@ export const FIELD_CATALOG_TOTAL_FIELDS = ${totalFields};
   process.stderr.write(
     `\nWrote ${outPath} -- ${Object.keys(catalog).length} families, ${totalFields} fields.\n`,
   );
-  if (notFetched.length > 0) {
-    process.exitCode = 1;
-  }
 }
 
 main();
