@@ -16,6 +16,12 @@ import React from 'react';
 import WzReporting from './reporting-main';
 import { renderWithProviders } from '../../../../../redux/render-with-redux-provider';
 
+jest.mock('../../../../../react-services/common-services', () => ({
+  getErrorOrchestrator: () => ({
+    handleError: () => {},
+  }),
+}));
+
 jest.mock('../../../../../kibana-services', () => ({
   getHttp: () => ({
     basePath: {

@@ -15,9 +15,7 @@
   "author": "Wazuh, Inc",
   "license": "GPL-2.0",
   "resolutions": {
-    "**/es5-ext": "^0.10.63",
-    "**/follow-redirects": "^1.15.6",
-    "**/axios": "^1.12.2"
+    "**/es5-ext": "^0.10.63"
   },
   "repository": {
     "type": "git",
@@ -50,8 +48,7 @@
     "knip": "knip --files"
   },
   "dependencies": {
-    "axios": "^1.12.2",
-    "dompurify": "3.2.4",
+    "dompurify": "3.4.0",
     "install": "^0.13.0",
     "js2xmlparser": "^5.0.0",
     "jsdom": "16.7.0",
@@ -86,7 +83,7 @@
     "knip": "^5.22.0",
     "prettier": "^2.7.1",
     "redux-mock-store": "^1.5.4",
-    "swagger-client": "^3.19.11",
+    "swagger-client": "3.37.3",
     "typescript": "^5.5.2"
   }
 }
