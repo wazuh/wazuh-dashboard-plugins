@@ -74,6 +74,20 @@ const POPULATION_DISCLOSURE_EXEMPT: Record<string, string> = {
     'Escape hatch: the query body (including any "aggs") is model-authored, not built by this ' +
     'catalog -- the population-disclosure guarantee for a hand-authored aggregation is the ' +
     "model's own responsibility, same boundary as every other guardrail on this tool's output.",
+  // Workstream A1b: IOC lookup for one specific indicator value -- an exact-or-prefix should
+  // clause over document.name, matching at most a handful of records for that one indicator
+  // (same "not an open-ended result" shape as find_document_by_field above), never a distribution
+  // a breakdown would meaningfully summarize.
+  lookup_indicator:
+    'Exact-or-prefix lookup for one specific indicator value (document.name) -- returns at most ' +
+    'a handful of feed records for that one indicator, not a population a categorical breakdown ' +
+    'could meaningfully summarize.',
+  // Workstream A1b: exactly 3 possible rows total (one per CTI feed), a fixed, tiny, non-growing
+  // set -- a categorical breakdown over 3 rows is not a meaningful population-disclosure concern
+  // this mechanism exists to guard against (that concern is about large, open-ended result sets).
+  get_cti_status:
+    'Lists a fixed, tiny set (exactly 3 possible rows, one per CTI feed) -- not an open-ended ' +
+    'result set a categorical breakdown would meaningfully summarize.',
 };
 
 /**

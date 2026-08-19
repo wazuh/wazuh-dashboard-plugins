@@ -360,9 +360,20 @@ test('buildSystemPrompt: keeps "field is unpopulated" and "no documents match" a
 test('buildSystemPrompt: names the newly-reachable data families in user vocabulary', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(prompt, /operational metrics/);
-  assert.match(prompt, /threat-intel\/CTI\s+feeds are up to date/);
   assert.match(prompt, /Security\s+Analytics detector findings/);
-  assert.match(prompt, /raw CVE\/IOC threat-intel\s+feeds/);
+});
+
+// Workstream A1b (AI/plan/coverage-validation-design.md, CV-047/048/049/078): three of the
+// families A1a pointed at search_wazuh_data now have their own typed tool, named explicitly so
+// the model reaches for the precise tool instead of the escape hatch or a decline.
+test('buildSystemPrompt: names the three new premium typed tools (IOC/CTI/CVE-feed) by name', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /use lookup_indicator/);
+  assert.match(prompt, /not present in the CTI feed/);
+  assert.match(prompt, /use get_cti_status/);
+  assert.match(prompt, /local_offset equals remote_offset/);
+  assert.match(prompt, /use get_cve_intel/);
+  assert.match(prompt, /as two separate, clearly labeled sections/);
 });
 
 test('buildSystemPrompt: instructs the model to prefer a typed tool but reach for search_wazuh_data otherwise', () => {
