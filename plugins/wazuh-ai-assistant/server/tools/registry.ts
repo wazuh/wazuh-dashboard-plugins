@@ -32,6 +32,9 @@ import { getDetectorsTool } from './catalog/get-detectors';
 import { findDocumentByFieldTool } from './catalog/find-document-by-field';
 import { searchWazuhDataTool } from './catalog/search-wazuh-data';
 import { getFieldValuesTool } from './catalog/get-field-values';
+import { lookupIndicatorTool } from './catalog/lookup-indicator';
+import { getCveIntelTool } from './catalog/get-cve-intel';
+import { getCtiStatusTool } from './catalog/get-cti-status';
 
 /**
  * In-process tool catalog: declarative objects loaded at import
@@ -78,6 +81,9 @@ const CATALOG: ToolDefinition[] = [
   getVulnerabilitiesTool,
   getVulnerabilitiesByAgentTool,
   getVulnerabilityByCveTool,
+  // The two-source CVE answer (workstream A1b): feed knowledge + local detection, in the same
+  // call. Kept adjacent to get_vulnerability_by_cve since both key off a CVE id.
+  getCveIntelTool,
 
   // FIM / SCA / MITRE. (get_fim_events was REPLACED by get_fim_files in the 5.0 port — product
   // 5.0's confirmed FIM surface is current file STATE, not an event stream;
@@ -96,6 +102,13 @@ const CATALOG: ToolDefinition[] = [
   getRulesTool,
   getThreatIntelComponentsTool,
   getDetectorsTool,
+
+  // IOC/indicator lookup against the CTI enrichment feed (workstream A1b, coverage doc CV-049) --
+  // filed adjacent to the Security Analytics content tools above since it is the same "Security
+  // Analytics / threat-intel pipeline knowledge" domain, not the customer's own observed data.
+  lookupIndicatorTool,
+  // CTI content freshness (workstream A1b, coverage doc CV-078/MS-6/MS-7) -- same domain as above.
+  getCtiStatusTool,
 
   // Generic exact-ID lookup (document _id or a business-level UUID field, tried automatically)
   findDocumentByFieldTool,

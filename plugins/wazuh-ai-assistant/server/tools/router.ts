@@ -78,6 +78,9 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   get_vulnerabilities_by_agent: 'vulnerabilities',
   get_vulnerability_by_cve: 'vulnerabilities',
   get_critical_vulnerabilities: 'vulnerabilities',
+  // get_cve_intel (workstream A1b) keys off a CVE id like get_vulnerability_by_cve -- same
+  // category, no extra stage-1 line.
+  get_cve_intel: 'vulnerabilities',
 
   // fim
   get_fim_files: 'fim',
@@ -103,6 +106,12 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   get_rules: 'security_analytics',
   get_threat_intel_components: 'security_analytics',
   get_detectors: 'security_analytics',
+  // lookup_indicator/get_cti_status (workstream A1b) are threat-intel-pipeline-content questions
+  // ("is this a known indicator", "is the feed up to date"), the same domain as the rule/decoder/
+  // detector catalog above, not the customer's own observed data -- filed here rather than a new
+  // category to avoid one more stage-1 routing line.
+  lookup_indicator: 'security_analytics',
+  get_cti_status: 'security_analytics',
 
   // free_search (escape hatch + generic ID lookup)
   find_document_by_field: 'free_search',
@@ -143,7 +152,9 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
     'the raw/normalized event stream ("everything that happened", matched or not). NOT automated ' +
     'actions Wazuh took in response (active response/blocking/quarantine) -- no category covers that.',
   vulnerabilities:
-    'CVE/vulnerability data: by agent, by CVE ID, solved, or critical only.',
+    'CVE/vulnerability data: by agent, by CVE ID, solved, or critical only -- plus the CTI ' +
+    "feed's own catalog knowledge about a specific CVE (description, severity, affected " +
+    'software), separate from what is actually detected on this deployment.',
   fim: 'File Integrity Monitoring: current state of monitored files (path, mtime, owner, hashes).',
   sca:
     'Security Configuration Assessment (SCA): per-agent compliance benchmark results (e.g. CIS ' +
@@ -159,14 +170,17 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
     'NIS2, NIST 800-171/800-53, FedRAMP, CMMC, TSC).',
   security_analytics:
     'The Security Analytics ruleset and pipeline content itself — rules (name/level/status/' +
-    'technique), components (decoders, integrations, policies, filters, KVDBs), and detector ' +
-    'definitions (which detectors exist, enabled state, monitored indices). Pipeline ' +
-    'configuration, NOT findings that fired and NOT SCA compliance benchmarks.',
+    'technique), components (decoders, integrations, policies, filters, KVDBs), detector ' +
+    'definitions (which detectors exist, enabled state, monitored indices, findings counts), ' +
+    'whether a specific IP/hash/URL/domain is a known indicator (IOC) per the threat-intel feed, ' +
+    'and whether the CTI content feeds are up to date. Pipeline/threat-intel-catalog content, ' +
+    'NOT findings that fired and NOT SCA compliance benchmarks.',
   free_search:
-    'Anything else about Wazuh finding/vulnerability/state data, PLUS operational metrics, CTI ' +
-    'feed freshness, Security Analytics detector findings/rule catalog, and the raw CVE/IOC ' +
-    'threat-intel feeds (last resort — always offered regardless of which category is picked, ' +
-    'so this rarely needs to be picked for its own sake).',
+    'Anything else about Wazuh finding/vulnerability/state data, PLUS operational metrics and ' +
+    'Security Analytics detector findings (last resort — always offered regardless of which ' +
+    'category is picked, so this rarely needs to be picked for its own sake). For IOC lookup, ' +
+    'CTI feed freshness, or CVE feed knowledge, prefer lookup_indicator/get_cti_status/' +
+    'get_cve_intel (security_analytics/vulnerabilities categories) over this escape hatch.',
   general:
     'Greetings, thanks, or questions about the assistant itself. If the user asks anything about ' +
     'their own environment - however vaguely - do NOT pick general.',

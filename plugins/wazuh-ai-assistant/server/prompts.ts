@@ -112,23 +112,37 @@ export function buildSystemPrompt(nowIso: string): string {
       '(e.g. a corrected or renumbered agent name) and answer for it instead.',
     // Workstream A1a (AI/plan/coverage-validation-design.md): the mission is "every data family
     // with real data is queryable, by construction" — so this block now names the families that
-    // ARE covered (in the vocabulary a user would actually use, so the model reaches for
-    // search_wazuh_data instead of declining) and narrows the decline list to the five classes the
-    // product owner actually decided are out of scope, not "whatever no typed tool happens to
-    // cover yet". Communication-channel health/message-drop-rate and threat-intel enrichment/IOC
-    // data were previously declined here — both are now answerable via search_wazuh_data (the
-    // wazuh-metrics-* and wazuh-threatintel-enrichments-a/.wazuh-threatintel-vulnerabilities-a
-    // families) and must NOT be told to the user as unavailable any more.
+    // ARE covered (in the vocabulary a user would actually use, so the model reaches for a tool
+    // instead of declining) and narrows the decline list to the five classes the product owner
+    // actually decided are out of scope, not "whatever no typed tool happens to cover yet".
+    // Communication-channel health/message-drop-rate was previously declined here — it is now
+    // answerable via search_wazuh_data (the wazuh-metrics-* family) and must NOT be told to the
+    // user as unavailable any more. Workstream A1b then gave three of these families their own
+    // TYPED tools (lookup_indicator, get_cti_status, get_cve_intel) — those three are named below
+    // instead of pointing at search_wazuh_data, since a typed tool is always preferred when one
+    // matches (this same instruction's last sentence).
     'Beyond the typed tools, search_wazuh_data can also answer questions about: operational ' +
       'metrics (agent connection/registration counts, communication throughput, log-' +
-      'normalization counters — index_pattern "wazuh-metrics-*"); whether your threat-intel/CTI ' +
-      'feeds are up to date (".wazuh-cti-consumers", ".wazuh-content-manager-jobs"); Security ' +
-      'Analytics detector findings and its pre-packaged rule catalog (".opensearch-sap-*-' +
-      'findings", ".opensearch-sap-pre-packaged-rules-config"); and the raw CVE/IOC threat-intel ' +
-      'feeds themselves (".wazuh-threatintel-vulnerabilities-a", "wazuh-threatintel-enrichments-' +
-      'a") — e.g. "is this domain/hash/IP a known indicator" or "what CVE record exists for X", ' +
-      'distinct from the agent-facing get_vulnerabilities family. Always prefer a typed tool when ' +
-      "one already matches the question; reach for search_wazuh_data when one doesn't.",
+      'normalization counters — index_pattern "wazuh-metrics-*"); and Security Analytics ' +
+      'detector findings and its pre-packaged rule catalog (".opensearch-sap-*-findings", ' +
+      '".opensearch-sap-pre-packaged-rules-config"). Always prefer a typed tool when one already ' +
+      "matches the question; reach for search_wazuh_data when one doesn't.",
+    // Workstream A1b: three CTI/threat-intel-catalog questions each have their own typed tool now
+    // — named explicitly so the model reaches for these instead of declining or falling back to
+    // search_wazuh_data (which can no longer see wazuh-threatintel-enrichments-a/.wazuh-threatintel-
+    // vulnerabilities-a well enough to answer them precisely: those two families' real value is a
+    // specific document.name/_id lookup, not a browsable listing).
+    'For "is this IP/hash/URL/domain a known indicator" questions, use lookup_indicator — it ' +
+      'reports the CTI feed\'s own verdict (present/absent, provider, related software); a ' +
+      'no-match result means "not present in the CTI feed," never "safe". For "is our threat-' +
+      'intel/CTI content up to date" questions, use get_cti_status — always name the specific ' +
+      'feed(s) and state whether local_offset equals remote_offset, never a generic "yes it\'s ' +
+      'fine". For a specific CVE, use get_cve_intel: it returns the CTI feed\'s general knowledge ' +
+      'about that CVE (description, severity, affected software) AND whether it is actually ' +
+      'detected on this deployment, as two separate, clearly labeled sections — never state the ' +
+      "feed's general severity as if it were this deployment's own risk, and never state a local " +
+      'detection as if it were general knowledge about the CVE. get_vulnerability_by_cve alone ' +
+      'remains fine when only the local-detection side is asked about.',
     // P-8 (AI/plan/a1a-review.md): the five sentences below are verbatim-correct against
     // coverage-validation-design.md §3, but the ORIGINAL framing ("Only FIVE classes... have NO
     // tool") falsely implied every other still-valid decline from that same inventory had also

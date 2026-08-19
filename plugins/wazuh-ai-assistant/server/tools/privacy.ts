@@ -419,6 +419,17 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // `containers.cna.rejectedReasons[].value` is analyst-authored free text from the CVE assigning
   // body, not a closed vocabulary -- left fail-closed (anonymized) rather than assumed safe, same
   // "too risky to classify confidently" call as `type` above.
+  //
+  // Workstream A1b (get-cve-intel.ts) deliberately adds NO entries here for
+  // `document.containers.cna.descriptions/metrics/affected`: those paths never reach
+  // `applyFieldPolicy` at all -- `get-cve-intel.ts`'s `resolveParams` reads them directly via the
+  // opensearch client (bypassing the typed-tool digest/table path entirely, since `document` is
+  // mapped `enabled: false` on this index and is therefore never in any tool's declared
+  // `_source`/`sampleColumns`) and folds a plain-language SUMMARY into `Digest.assumptionNote`, a
+  // freeform string, not a field-keyed digest row. That string still passes through chat.ts's
+  // generic `prescanAndMintToolContent` JSON-value scan (the same residual-risk mitigation every
+  // 'allow' entry above relies on) -- an entry in THIS list would be inert documentation-debt,
+  // since `applyFieldPolicy`'s per-field lookup is never consulted for it.
 ];
 
 export type PseudonymKind = 'HOST' | 'IP' | 'USER' | 'URL' | 'VAL';
