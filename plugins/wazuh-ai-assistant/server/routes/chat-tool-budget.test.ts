@@ -6,6 +6,7 @@ import type {
 } from '../../../../src/core/server';
 import {
   BASE_BUDGET_UNITS,
+  CONTEXT_CHAR_BUDGET,
   extractEnumeratedTargets,
   FINAL_ROUND_ANSWER_INSTRUCTION,
   HARD_CEILING_UNITS,
@@ -45,9 +46,7 @@ test('getToolCostClass: aggregation-only tools (size:0, no hit documents) are cl
     'get_mitre_summary',
     'get_compliance_summary',
     'get_sca_results',
-    // ADAPTATION (branch 8998): 'get_field_values' is workstream B's tool
-    // (enhancement/8997-ai-assistant-data-coverage-wave) and does not exist on this branch's
-    // registry -- dropped from this list; see this file's header note.
+    'get_field_values',
   ]) {
     assert.equal(getToolCostClass(name), 1, `${name} should be cost class 1`);
   }
@@ -70,8 +69,15 @@ test('getToolCostClass: an ordinary typed hits tool defaults to class 2', () => 
     // very next test), so this assertion alone would pass whether or not the tool still exists --
     // a rename would silently keep this green. Assert the tool is still a real catalog entry first,
     // so a rename fails loudly here instead of just quietly costing 2 forever.
-    assert.ok(getToolDefinition(name), `${name} must still exist in the tool registry`);
-    assert.equal(getToolCostClass(name), 2, `${name} should default to class 2`);
+    assert.ok(
+      getToolDefinition(name),
+      `${name} must still exist in the tool registry`,
+    );
+    assert.equal(
+      getToolCostClass(name),
+      2,
+      `${name} should default to class 2`,
+    );
   }
 });
 
@@ -114,10 +120,7 @@ test('isRoundFutile: every successful call returned zero rows -- futile', () => 
 });
 
 test('isRoundFutile: every successful call was a duplicate of an earlier query -- futile even with rows', () => {
-  assert.equal(
-    isRoundFutile([{ hadRows: true, isDuplicate: true }]),
-    true,
-  );
+  assert.equal(isRoundFutile([{ hadRows: true, isDuplicate: true }]), true);
 });
 
 test('isRoundFutile: at least one successful call had new, non-duplicate rows -- not futile', () => {
@@ -143,7 +146,9 @@ test('extractEnumeratedTargets: an explicit comma-separated agent list is detect
 
 test('extractEnumeratedTargets: a host list with the "and" conjunction is detected', () => {
   assert.deepEqual(
-    extractEnumeratedTargets('Check hosts web-01, web-02 and db-01 for FIM drift.'),
+    extractEnumeratedTargets(
+      'Check hosts web-01, web-02 and db-01 for FIM drift.',
+    ),
     ['web-01', 'web-02', 'db-01'],
   );
 });
@@ -166,7 +171,9 @@ test('extractEnumeratedTargets: a range expression is NOT detected (documented s
 
 test('extractEnumeratedTargets: no cue word at all is NOT enumerable', () => {
   assert.equal(
-    extractEnumeratedTargets('Summarize critical findings from the last 24 hours.'),
+    extractEnumeratedTargets(
+      'Summarize critical findings from the last 24 hours.',
+    ),
     undefined,
   );
 });
@@ -397,7 +404,8 @@ function scaChecksContext(agentIds: string[]): RequestHandlerContext {
         client: {
           asCurrentUser: {
             search: () => {
-              const agentId = agentIds[callIndex] ?? agentIds[agentIds.length - 1];
+              const agentId =
+                agentIds[callIndex] ?? agentIds[agentIds.length - 1];
               callIndex += 1;
               return Promise.resolve({
                 body: {
@@ -481,16 +489,15 @@ test('CV-069 budget stress: a 5-agent SCA sweep spends past the base budget via 
   const initialMessages: ChatMessage[] = [
     {
       role: 'user',
-      content:
-        `List the failing SCA hardening checks for agents ${agentIds.join(', ')}.`,
+      content: `List the failing SCA hardening checks for agents ${agentIds.join(
+        ', ',
+      )}.`,
     },
   ];
 
   const scripts: StreamEvent[][] = [
     STAGE1_SCA_SCRIPT,
-    ...agentIds.map((agentId, i) =>
-      scaCheckCallScript(`call_${i}`, agentId),
-    ),
+    ...agentIds.map((agentId, i) => scaCheckCallScript(`call_${i}`, agentId)),
     textOnlyScript(
       'Agents 001-005 each have at least one failing SCA check (SSH root login enabled); ' +
         'see the tables above for detail.',
@@ -537,7 +544,9 @@ test('CV-069 budget stress: a 5-agent SCA sweep spends past the base budget via 
 
   // No user-visible text anywhere in the turn names the internal mechanism.
   const deltaText = events
-    .filter((e): e is Extract<StreamEvent, { type: 'delta' }> => e.type === 'delta')
+    .filter(
+      (e): e is Extract<StreamEvent, { type: 'delta' }> => e.type === 'delta',
+    )
     .map(e => e.content)
     .join('');
   assert.doesNotMatch(
@@ -548,7 +557,7 @@ test('CV-069 budget stress: a 5-agent SCA sweep spends past the base budget via 
 
 // --- F6 fix: the enumerable-remaining heuristic reads the CURRENT question, not a stale one -----
 
-test('orchestrate: a follow-up turn is gated by the CURRENT question\'s agent list, not an earlier turn\'s', async () => {
+test("orchestrate: a follow-up turn is gated by the CURRENT question's agent list, not an earlier turn's", async () => {
   // Review fix F6: `initialMessages` is the full resent conversation history, so reading the
   // FIRST `user` message (the old bug) would gate this turn's extension on turn 1's question --
   // which names no agents at all here -- instead of the actual, list-bearing follow-up question.
@@ -562,8 +571,9 @@ test('orchestrate: a follow-up turn is gated by the CURRENT question\'s agent li
     { role: 'assistant', content: 'There are 42 agents currently connected.' },
     {
       role: 'user',
-      content:
-        `Now list the failing SCA hardening checks for agents ${agentIds.join(', ')}.`,
+      content: `Now list the failing SCA hardening checks for agents ${agentIds.join(
+        ', ',
+      )}.`,
     },
   ];
 
@@ -593,7 +603,7 @@ test('orchestrate: a follow-up turn is gated by the CURRENT question\'s agent li
   assert.equal(
     callMessages.length,
     scripts.length,
-    'the sweep must complete via the CURRENT question\'s agent list, not stop early on a stale one',
+    "the sweep must complete via the CURRENT question's agent list, not stop early on a stale one",
   );
   const toolCallEvents = events.filter(
     (e): e is Extract<StreamEvent, { type: 'tool_call' }> =>
@@ -626,8 +636,9 @@ test('orchestrate: with the extension granted, MAX_TOOL_ROUNDS (not the cost bud
     const initialMessages: ChatMessage[] = [
       {
         role: 'user',
-        content:
-          `List the failing SCA hardening checks for agents ${agentIds.join(', ')}.`,
+        content: `List the failing SCA hardening checks for agents ${agentIds.join(
+          ', ',
+        )}.`,
       },
     ];
 
@@ -682,4 +693,160 @@ test('orchestrate: with the extension granted, MAX_TOOL_ROUNDS (not the cost bud
     assert.equal(events.filter(e => e.type === 'done').length, 1);
     assert.equal(events.filter(e => e.type === 'error').length, 0);
   }
+});
+
+// --- context-char stop: the OTHER independent bound (`CONTEXT_CHAR_BUDGET`), never exercised ------
+// --- end-to-end anywhere else in this file -- proves it fires on its own, before either the -------
+// --- cost-unit budget or the structural round cap would ------------------------------------------
+
+/** get_top_agents is cost class 1 (aggregation-only) -- 5 successful calls spend only 5 units,
+ * comfortably under `BASE_BUDGET_UNITS` (6), and 5 rounds is short of `MAX_TOOL_ROUNDS` (6) too.
+ * The only thing that can end the turn early here is `CONTEXT_CHAR_BUDGET`. digest.ts caps every
+ * sample/breakdown-key STRING field at `MAX_FIELD_VALUE_LENGTH` (500) regardless of how long the
+ * mocked source value is, and samples at 5 rows (`MAX_SAMPLES`) -- so an oversized bucket COUNT
+ * cannot inflate one call's digest past that ceiling either (breakdown is itself bucket-capped at
+ * `BREAKDOWN_BUCKET_CAP` = 5). Both the sampled `wazuh.agent.name` AND the bucket `key` are set
+ * past 500 chars here (both truncate to ~500) to push one call's digest close to `DIGEST_CHAR_CAP`
+ * (6000) -- ~5 such calls is what it takes to cross `CONTEXT_CHAR_BUDGET` (24,000). */
+const OVERSIZED_FIELD_LEN = 600;
+
+function bigTopAgentsContext(): RequestHandlerContext {
+  return {
+    core: {
+      opensearch: {
+        client: {
+          asCurrentUser: {
+            search: () =>
+              Promise.resolve({
+                body: {
+                  hits: { hits: [], total: { value: 0 } },
+                  aggregations: {
+                    top_agents: {
+                      buckets: Array.from({ length: 5 }, (_, i) => ({
+                        key: `${i}`.repeat(OVERSIZED_FIELD_LEN),
+                        doc_count: 1000 + i,
+                        sample_doc: {
+                          hits: {
+                            hits: [
+                              {
+                                _source: {
+                                  wazuh: {
+                                    agent: {
+                                      name: 'X'.repeat(OVERSIZED_FIELD_LEN),
+                                    },
+                                  },
+                                },
+                              },
+                            ],
+                          },
+                        },
+                        distinct_names: { value: 1 },
+                      })),
+                    },
+                  },
+                },
+              }),
+          },
+        },
+      },
+    },
+  } as unknown as RequestHandlerContext;
+}
+
+const STAGE1_FINDINGS_SCRIPT: StreamEvent[] = [
+  {
+    type: 'tool_call',
+    toolCall: {
+      id: 'route_1',
+      name: ROUTE_QUESTION_TOOL.name,
+      arguments: { categories: ['findings'] },
+    },
+  },
+  { type: 'done', usage: { inputTokens: 50, outputTokens: 5 } },
+];
+
+function topAgentsCallScript(id: string, gte: string): StreamEvent[] {
+  return [
+    {
+      type: 'tool_call',
+      toolCall: {
+        id,
+        name: 'get_top_agents',
+        // time_range_gte varies per round so no two calls share an arguments signature --
+        // otherwise `isRoundFutile` would read round 2 onward as a duplicate and force the final
+        // round on ITS OWN ground, confounding what this test is trying to isolate.
+        arguments: { time_range_gte: gte, time_range_lte: 'now' },
+      },
+    },
+    { type: 'done', usage: { inputTokens: 20, outputTokens: 8 } },
+  ];
+}
+
+test('orchestrate: CONTEXT_CHAR_BUDGET alone ends the turn early -- well under the cost-unit budget and the structural round cap', async () => {
+  const initialMessages: ChatMessage[] = [
+    { role: 'user', content: 'Which agents are noisiest recently?' },
+  ];
+
+  const scripts: StreamEvent[][] = [
+    STAGE1_FINDINGS_SCRIPT,
+    ...['now-1d', 'now-2d', 'now-3d', 'now-4d', 'now-5d'].map((gte, i) =>
+      topAgentsCallScript(`call_${i}`, gte),
+    ),
+    textOnlyScript('The most active agents recently are listed above.'),
+  ];
+
+  const { adapter, callMessages } = scriptedAdapter(scripts);
+  const controller = new AbortController();
+  const events: StreamEvent[] = [];
+  for await (const event of orchestrate(
+    adapter,
+    PROVIDER_CONFIG,
+    initialMessages,
+    new Date().toISOString(),
+    controller.signal,
+    bigTopAgentsContext(),
+    NOOP_REQUEST,
+    NOOP_LOGGER,
+    undefined,
+  )) {
+    events.push(event);
+  }
+
+  // Every scripted round was consumed -- stage1 + 5 tool rounds + one forced final round -- NOT
+  // fewer (an earlier stop) and NOT more (the model still had tools on offer past round 5).
+  assert.equal(callMessages.length, scripts.length);
+
+  const toolCallEvents = events.filter(
+    (e): e is Extract<StreamEvent, { type: 'tool_call' }> =>
+      e.type === 'tool_call',
+  );
+  assert.equal(
+    toolCallEvents.length,
+    5,
+    'exactly 5 real tool calls -- 5 cost-1 units spent (< BASE_BUDGET_UNITS=6) and 5 rounds ' +
+      '(< MAX_TOOL_ROUNDS=6): neither the cost budget nor the structural cap explains the stop',
+  );
+
+  // The final round carries FINAL_ROUND_ANSWER_INSTRUCTION -- proving it was a FORCED final round
+  // (the exhaustion path), not the model simply choosing not to call a tool on offer.
+  const finalRoundMessages = callMessages[callMessages.length - 1];
+  assert.equal(
+    finalRoundMessages[finalRoundMessages.length - 1].content,
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+  );
+
+  assert.equal(events.filter(e => e.type === 'done').length, 1);
+  assert.equal(events.filter(e => e.type === 'error').length, 0);
+
+  // Sanity on the premise itself: 5 real digests must actually cross CONTEXT_CHAR_BUDGET for the
+  // stop to be attributable to it at all -- guards this test against silently passing for the
+  // wrong reason if MAX_SAMPLES/digest shape ever changes.
+  const toolResultChars = callMessages[callMessages.length - 1]
+    .filter(m => m.role === 'tool')
+    .reduce((sum, m) => sum + (m.content?.length ?? 0), 0);
+  assert.ok(
+    toolResultChars > CONTEXT_CHAR_BUDGET,
+    `expected accumulated tool-result chars (${toolResultChars}) to exceed CONTEXT_CHAR_BUDGET ` +
+      `(${CONTEXT_CHAR_BUDGET}) -- tune AGENT_NAME_LEN if digest.ts's shape changed`,
+  );
 });

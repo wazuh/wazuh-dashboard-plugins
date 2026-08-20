@@ -321,7 +321,7 @@ test('noTextFallbackMessage: rounds exhausted AND the last attempt errored -> bo
     args: {},
     errorMessage: 'some unclassified internal error',
   });
-  assert.match(message, /ended before a full answer could be written/i);
+  assert.match(message, /a full answer could not be written/i);
   assert.match(message, /did not complete/);
 });
 

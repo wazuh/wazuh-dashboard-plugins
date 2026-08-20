@@ -1318,7 +1318,7 @@ test(
     );
     assert.match(
       text,
-      /analysis limit/i,
+      /a full answer could not be written/i,
       'falls back to the truthful "see results above" copy once the forced-early final round ' +
         'ends silently (CV-039)',
     );
