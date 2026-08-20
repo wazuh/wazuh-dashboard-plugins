@@ -179,6 +179,52 @@ test('fetchProviderWithRetry: 429 retries still work unchanged alongside the new
   assert.match((events[0] as { message: string }).message, /rate limit/i);
 });
 
+// --- Group G fix: 429 retry-budget exhaustion gets its own honest, provider-attributed, ---------
+// --- mechanism-free terminal message, distinct from the generic HTTP-status dump ----------------
+
+test('fetchProviderWithRetry: 429 that never recovers (retry budget exhausted) gets a ' +
+  'provider-attributed, transient-framed terminal message, not a raw HTTP-status dump', async () => {
+  // A short explicit wait hint ("try again in 10ms") keeps the two retry backoffs this test
+  // exercises fast (MIN_DELAY_MS still floors each to 500ms, well under the fallback delays'
+  // 2s/8s) -- same pattern the existing "429 retries still work" test above already uses.
+  const doFetch = () =>
+    Promise.resolve(fakeResponse(429, 'try again in 10ms', {}));
+  const controller = new AbortController();
+  const { events, result } = await drain(
+    fetchProviderWithRetry(doFetch, controller.signal),
+  );
+
+  assert.equal(result, undefined);
+  const errorEvent = events.find(event => event.type === 'error');
+  assert.ok(errorEvent, 'expected a terminal error event once the retry budget is exhausted');
+  const message = (errorEvent as { message: string }).message;
+  assert.equal(
+    message,
+    'The AI provider rejected this request due to rate limits — try again in a moment.',
+  );
+  // Mechanism-free: no retry count, backoff duration, or internal budget vocabulary.
+  assert.doesNotMatch(message, /\b(retry|retries|attempt|budget)\b/i);
+  // Never the raw provider body leaking through as the terminal copy.
+  assert.doesNotMatch(message, /try again in 10ms/);
+});
+
+test('fetchProviderWithRetry: a non-429 retryable status (e.g. 503) keeps the existing generic ' +
+  'HTTP-status terminal message unchanged once its retry budget is exhausted', async () => {
+  const doFetch = () =>
+    Promise.resolve(fakeResponse(503, 'upstream overloaded, try again in 10ms', {}));
+  const controller = new AbortController();
+  const { events, result } = await drain(
+    fetchProviderWithRetry(doFetch, controller.signal),
+  );
+
+  assert.equal(result, undefined);
+  const errorEvent = events.find(event => event.type === 'error');
+  assert.match(
+    (errorEvent as { message: string }).message,
+    /Provider responded with HTTP 503/,
+  );
+});
+
 test('sanitizeProviderErrorBody: redacts a bearer token', () => {
   const out = sanitizeProviderErrorBody(
     'upstream said: Bearer sk-abc123def456ghi789 was rejected',
