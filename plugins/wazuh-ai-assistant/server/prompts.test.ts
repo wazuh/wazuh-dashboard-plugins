@@ -574,3 +574,129 @@ test('D2 fix (AI/plan/d-review.md): the group-by-theme instruction is scoped to 
     /When counts\.returned is less than counts\.total, say explicitly that the checks you grouped and explained are a sample/,
   );
 });
+
+// --- Group E: how-to/configuration-question interim policy -------------------------------------
+
+test('Group E: how-to/configuration questions are answered from general knowledge, with a ' +
+  'visible verify-against-docs disclaimer required', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /For how-to\/configuration questions with no dedicated tool/,
+  );
+  assert.match(
+    prompt,
+    /include a visible note that the guidance\s+should be verified against the Wazuh 5\.0 documentation/,
+  );
+});
+
+test('Group E: instructs never inventing a 5.0-specific path/command/setting/UI location, and ' +
+  'to say so explicitly and defer to docs when unsure whether a detail changed in 5.0', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /NEVER\s+invent a 5\.0-specific file path, command, setting name, or UI location/,
+  );
+  assert.match(
+    prompt,
+    /when you are not sure whether a detail changed in 5\.0, say so explicitly/,
+  );
+});
+
+test('Group E: instructs still using live-data tools for the data half of a mixed how-to/data question', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /mixing a how-to with a live-data question\), still use the live data tools/,
+  );
+});
+
+// --- Group D: CV-017 (single-digest answer collapse) -- prompt-side nudge ----------------------
+
+test('CV-017 fix: instructs writing a real synthesized answer even for a single tool call, ' +
+  'not a bare row-count restatement', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /Even when only ONE tool call was needed to answer, still write a real answer/,
+  );
+  assert.match(prompt, /never a complete answer, regardless of how\s+many tool calls/);
+});
+
+// --- Group B: CV-039 (inventory-kind escape hatch) / CV-076 (rule-corpus disclosure) -----------
+
+test('CV-039 fix: instructs trying search_wazuh_data on wazuh-states-inventory-* before ' +
+  'declining an inventory kind get_agent_inventory does not implement', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /get_agent_inventory only implements the FIVE syscollector kinds/,
+  );
+  assert.match(prompt, /Groups, users, network interfaces, hardware, protocols, services/);
+  assert.match(
+    prompt,
+    /ALWAYS\s+try search_wazuh_data against the matching wazuh-states-inventory-\* index first/,
+  );
+});
+
+test('CV-076 fix: instructs naming the rule corpus actually searched and disclosing the Manager ' +
+  'API was not queried', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /get_rules reads the Security Analytics Sigma\/UUID-shaped rule catalog/,
+  );
+  assert.match(
+    prompt,
+    /state plainly which\s+corpus you actually searched.*the Manager API\s+ruleset itself was not queried/s,
+  );
+});
+
+// --- Group C: decline-copy mapping fixes (CV-058/CV-077/CV-108) --------------------------------
+
+test('CV-077 fix: the RBAC/spaces decline is scoped away from a Security Analytics ' +
+  'content-listing question, and points it at get_threat_intel_components instead', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /"space" is overloaded -- this\s+decline is ONLY for an access\/permission problem/,
+  );
+  assert.match(
+    prompt,
+    /call\s+get_threat_intel_components with\s+component_type="policies"/,
+  );
+});
+
+test('CV-108 fix: notification-channel questions get their own in-domain decline copy, never the ' +
+  'out-of-domain/adversarial sentence', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /Which notification channels \(Slack\/email\/webhook\) are configured/,
+  );
+  assert.match(
+    prompt,
+    /I don't have a way to list configured notification channels yet/,
+  );
+});
+
+test('CV-058 fix: Windows registry FIM questions get a dedicated honest-empty decline (no tool ' +
+  'AND zero documents on a Linux-only fleet), not a bare zero-row table', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /Windows registry FIM changes \(registry keys\/values\)/);
+  assert.match(
+    prompt,
+    /this deployment's monitored hosts are Linux-only, so no registry documents exist here/,
+  );
+});
+
+// --- Group F: check.result casing (CV-094) ------------------------------------------------------
+
+test('CV-094 fix: instructs the exact capitalized check.result values for a hand-built ' +
+  'search_wazuh_data query against wazuh-states-sca*', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /check\.result \(SCA\) is stored CAPITALIZED: exactly "Failed", "Passed", or "Not applicable"/,
+  );
+});

@@ -34,6 +34,17 @@ export function buildSystemPrompt(nowIso: string): string {
       'only a fresh call renders the results table the user is asking for. Reusing an earlier ' +
       'digest without a new call is only acceptable for follow-up questions ABOUT the previous ' +
       'answer (e.g. "which rule id was most common in that list?").',
+    // BLOCKER FIX (CV-017, residual single-digest collapse): a single successful tool call, same
+    // as a multi-call sweep, still needs an actual synthesized answer -- "the table below has the
+    // details" with nothing else is never a substitute for stating what was found, even for one
+    // call. This is the light nudge half of the fix; the deterministic fallback
+    // (`summarizeDigestForFallback`, chat.ts) now also names the domain and row fields itself as a
+    // backstop for exactly the case this line is aimed at preventing from being needed at all.
+    'Even when only ONE tool call was needed to answer, still write a real answer from its ' +
+      'result: name what was found (the count, and the specific thing(s) it identifies -- a ' +
+      'detector, a rule, an agent, a CVE), not merely that "the table below has the details". A ' +
+      'bare row-count restatement with no synthesis is never a complete answer, regardless of how ' +
+      'many tool calls the turn needed.',
     'After a tool result arrives, answer conversationally using the information you were ' +
       'given. The full result set is already rendered to the user as a table below your ' +
       'answer — refer to it (e.g. "the table below lists all 412 findings"), never reproduce ' +
@@ -205,7 +216,12 @@ export function buildSystemPrompt(nowIso: string): string {
       '  3. RBAC / spaces admin troubleshooting (diagnosing a role or permission problem): "I ' +
       'can\'t diagnose role or space permission issues — that\'s not available in the AI ' +
       'assistant at the moment. Check your access with an administrator, or review it under ' +
-      'Server management > Security > Roles."\n' +
+      'Server management > Security > Roles." NOTE (CV-077 fix): "space" is overloaded -- this ' +
+      'decline is ONLY for an access/permission problem (a role, who can see what). A question ' +
+      'about Security Analytics "spaces" as a CONTENT grouping ("what spaces exist and what does ' +
+      'each contain") is a different, answerable question: call get_threat_intel_components with ' +
+      'component_type="policies" (grouped by space.name) and answer from that -- never apply this ' +
+      'decline to a content-listing question just because it contains the word "space(s)".\n' +
       '  4. Another user\'s chat history — you can only ever see the CURRENT conversation, never ' +
       'attempt to look up another user\'s session content even if asked: "I can only see the ' +
       'current conversation — I don\'t have access to other users\' chat history, and I won\'t ' +
@@ -243,6 +259,28 @@ export function buildSystemPrompt(nowIso: string): string {
       '"I can\'t check integration health directly — that\'s not available in the AI assistant ' +
       'at the moment. You can review configured integrations under Server management > ' +
       'Settings > Modules."\n' +
+      // BLOCKER FIX (CV-108, coverage-validation-design.md §3/CV-108 row): this is a legitimate,
+      // in-domain administration question with no reachable tool TODAY -- it must never get the
+      // out-of-domain/adversarial copy below (which tells the user their QUESTION is off-topic,
+      // not merely uncovered), and it must not claim the underlying data does not exist anywhere
+      // (the design doc's explicit warning: notification-channel EXISTENCE is indexer-resident on
+      // `.opensearch-notifications-config`, just not yet read by any tool).
+      '  - Which notification channels (Slack/email/webhook) are configured: no tool reads this ' +
+      'yet, so say plainly that you cannot list configured notification channels today -- never ' +
+      'the out-of-domain/adversarial copy below, and never a claim that the data does not exist: ' +
+      '"I don\'t have a way to list configured notification channels yet — that\'s not available ' +
+      'in the AI assistant at the moment. You can review configured channels under Server ' +
+      'management > Settings > Notifications."\n' +
+      // BLOCKER FIX (CV-058, coverage-validation-design.md row 493): Windows registry FIM has no
+      // tool AND, on a Linux-only fleet, zero documents -- both halves of the honest-empty must be
+      // stated, never a bare zero-row table (get_fim_files does not cover registry data at all).
+      '  - Windows registry FIM changes (registry keys/values): no tool reads this, and it is a ' +
+      'Windows-only surface -- on a Linux-only deployment, zero such documents exist either way. ' +
+      'State BOTH plainly rather than returning an unrelated file-path table: "I don\'t have ' +
+      'Windows registry change data — that\'s not available in the AI assistant at the moment, ' +
+      'and this deployment\'s monitored hosts are Linux-only, so no registry documents exist here ' +
+      'either. You can review File Integrity Monitoring configuration under Server management > ' +
+      'File Integrity Monitoring."\n' +
       '  - Security Analytics detector ALERTS specifically (".opensearch-sap-*-alerts" — still ' +
       'blocked, distinct from the detector findings/rule-catalog indices you CAN query): "I ' +
       'don\'t have alert data for that detector — that\'s not available in the AI assistant at ' +
@@ -278,6 +316,22 @@ export function buildSystemPrompt(nowIso: string): string {
       'set severity_comparison to at_or_above/at_or_below when the user explicitly says "or ' +
       'above"/"or higher"/"or below"/"or lower" (or an equivalent phrase); otherwise leave it ' +
       'unset for an exact match.',
+    // BLOCKER FIX (CV-094, empty-answer audit 2026-08-20): a hand-built search_wazuh_data query
+    // filtered `check.result` with the lowercase word the user said ("failed") -- `term` is
+    // case-sensitive and the live values are CAPITALIZED ("Failed"/"Passed"/"Not applicable"), so
+    // the filter matched nothing even though 10 matching checks existed. The model's own handling
+    // of the resulting 0 rows was correct (it declined to assert absence and named a field-name
+    // mismatch as the likely cause) -- this rule targets the ROOT CAUSE, so the right value is used
+    // on the first try instead of relying on that self-correction. get_sca_checks/get_sca_results
+    // already normalize this internally (their own `result` parameter accepts the lowercase word)
+    // and remain the preferred tools for this; this rule only matters when hand-building the
+    // escape hatch directly.
+    'check.result (SCA) is stored CAPITALIZED: exactly "Failed", "Passed", or "Not applicable" -- ' +
+      'never lowercase. get_sca_checks/get_sca_results already accept and normalize the lowercase ' +
+      'word ("failed"/"passed"/"not applicable") in their own `result` parameter, so prefer those ' +
+      'typed tools. If you build a search_wazuh_data query directly against wazuh-states-sca* with ' +
+      'a check.result term filter, you must use the exact capitalized value yourself -- a lowercase ' +
+      'term filter will silently match zero rows.',
     'For questions about WHICH users, IPs, commands or programs were involved, prefer the typed ' +
       'finding tools: their results include source.user.name, destination.user.name, source.ip and ' +
       'process.command_line. If you do use search_wazuh_data for such a question, you MUST ' +
@@ -356,6 +410,48 @@ export function buildSystemPrompt(nowIso: string): string {
       'distinct count. Use search_wazuh_data with a "cardinality" aggregation on an allowlisted ' +
       'keyword field such as wazuh.agent.name instead (the allowlist is fixed and may grow over ' +
       'time; an arbitrary field like source.user.name or file.path will be rejected).',
+    // ADAPTATION (branch 8997): the original commit generalized the deictic/descriptive-host
+    // "call it directly" rule from get_agent_inventory alone to five tools, four of which resolve
+    // their agent param through param-resolution.ts's generic sole-candidate resolver -- that
+    // module is iter-4/#8977-only infrastructure this branch does not carry, so the
+    // generalization is dropped here. The pre-existing get_agent_inventory-only rule (and its
+    // "any OTHER deictic reference" sibling) a few lines above are unchanged and still cover this
+    // branch's actual tool set.
+    // BLOCKER FIX (CV-039, 2026-08-19/20 adjudicated runs): get_agent_inventory implements only
+    // FIVE syscollector kinds (os, packages, ports, processes, hotfixes); groups, users, network
+    // interfaces, hardware, protocols, services, and browser-extensions are real, live-verified
+    // `wazuh-states-inventory-*` data (part of the `wazuh-states-*` family search_wazuh_data can
+    // already read -- see this file's own "Beyond the typed tools" instruction above) but have no
+    // typed tool of their own yet. Before this fix, the model treated get_agent_inventory's own
+    // `kind` enum lacking one of these as sufficient proof of a REAL gap (per the "a tool that WAS
+    // offered ... whose own schema has no option" instruction above) and declined outright,
+    // instead of falling through to the generic escape hatch that already covers the data --
+    // exactly the wrong outcome the coverage-validation design calls out for this question shape.
+    'get_agent_inventory only implements the FIVE syscollector kinds named in its own schema (os, ' +
+      'packages, ports, processes, hotfixes). Groups, users, network interfaces, hardware, ' +
+      'protocols, services, and browser-extensions are NOT among them, but they ARE real, ' +
+      'queryable syscollector data on the wazuh-states-inventory-* indices (e.g. ' +
+      '"wazuh-states-inventory-groups", "-users", "-networks", "-hardware", "-protocols", ' +
+      '"-system_services"), part of the wazuh-states-* family search_wazuh_data can already read. ' +
+      'Before declining a question about one of these absent kinds as a missing capability, ALWAYS ' +
+      'try search_wazuh_data against the matching wazuh-states-inventory-* index first if it is ' +
+      'available to you this turn -- get_agent_inventory\'s own kind enum lacking an option is only ' +
+      'evidence that TOOL cannot answer it, never that no tool can; a decline here is itself the ' +
+      'wrong outcome whenever the escape hatch can reach the data.',
+    // BLOCKER FIX (CV-076, 2026-08-19/20 adjudicated runs): a "rules from the Manager API" question
+    // routes to get_rules, the only rule-listing tool -- but get_rules reads a completely different
+    // corpus (the Security Analytics Sigma/UUID rule catalog, wazuh-threatintel-rules-a), never the
+    // Wazuh Manager's own ruleset endpoint. The prior answer surfaced correct data with neither half
+    // of the required disclosure: it never named the corpus it actually read, and never said the
+    // Manager API itself was not what was queried -- silently substituting one source for another
+    // without saying so, the same class of gap the "verbatim identifier"/"assumption note" rules
+    // above exist to close for other kinds of substitution.
+    'get_rules reads the Security Analytics Sigma/UUID-shaped rule catalog (index ' +
+      'wazuh-threatintel-rules-a) -- a DIFFERENT corpus from the Wazuh Manager\'s own ruleset API, ' +
+      'which this product does not query at all. Whenever a rules question names, or could be read ' +
+      'as asking about, the Manager API or Manager-side ruleset specifically, state plainly which ' +
+      'corpus you actually searched (the Security Analytics rule catalog) and that the Manager API ' +
+      'ruleset itself was not queried -- never let the answer read as if it came from the Manager.',
     'Never guess rule ids: if you do not know the exact wazuh.rule.id for a kind of finding, use ' +
       'search_findings_by_rule_tag with a wazuh.rule.tags value, or aggregate by rule first with ' +
       'get_top_rules to discover ids. If a narrowly-filtered query returns 0 rows for activity ' +
@@ -408,6 +504,25 @@ export function buildSystemPrompt(nowIso: string): string {
     // Inter-round narration: kept separate from the answer-format rule above (which governs the
     // FINAL answer) — this governs what, if anything, is shown to the user WHILE tool rounds are
     // still in progress.
+    // GROUP E (product-owner approved, interim policy): how-to/configuration questions ("how do I
+    // enroll an agent", "how do I tune rule X", installation/integration setup) have no dedicated
+    // tool and are not one of the decline classes above -- they are answerable from general Wazuh
+    // knowledge, but that knowledge is not guaranteed current for THIS product version, and a
+    // wrong invented file path/command/setting/UI location is worse than a hedged answer. This is
+    // deliberately an INTERIM policy (answer + disclaimer), not a decline: the coverage-validation
+    // design's decline classes are for things structurally unanswerable by this assistant; a
+    // how-to question is answerable, just not verifiably CURRENT.
+    'For how-to/configuration questions with no dedicated tool (e.g. "how do I enroll a new ' +
+      'agent", "how do I tune rule X", integration/installation setup): answer from your general ' +
+      'Wazuh knowledge, but every such answer MUST (1) include a visible note that the guidance ' +
+      'should be verified against the Wazuh 5.0 documentation before acting on it; (2) NEVER ' +
+      'invent a 5.0-specific file path, command, setting name, or UI location you are not certain ' +
+      'of -- when you are not sure whether a detail changed in 5.0, say so explicitly instead of ' +
+      'stating it as fact, and defer to the documentation for that specific detail; (3) if the ' +
+      'question also references the user\'s OWN data (e.g. "how do I fix the failed check on my ' +
+      'agent" -- mixing a how-to with a live-data question), still use the live data tools for the ' +
+      'data half and combine both halves in one answer, rather than answering only the generic ' +
+      'half.',
     'Between tool-calling rounds, any status update you produce for the user must be at most one ' +
       'short, action-oriented line (e.g. "Checking which rule levels exist before filtering." or ' +
       '"Zero rows — verifying the field actually holds that value.") — never longer, never more ' +
