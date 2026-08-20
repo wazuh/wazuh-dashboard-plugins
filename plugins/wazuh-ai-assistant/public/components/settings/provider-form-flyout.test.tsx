@@ -1240,3 +1240,191 @@ describe('ProviderFormFlyout — one tight column (audit §5)', () => {
     );
   });
 });
+
+describe('ProviderFormFlyout — duplicate provider names', () => {
+  const existingProviders: ProviderSummary[] = [
+    editingProvider,
+    {
+      id: 'p2',
+      name: 'Claude staging',
+      type: 'anthropic',
+      baseUrl: 'https://api.anthropic.com',
+      model: 'claude-opus-4-8',
+      hasApiKey: true,
+      isDefault: true,
+    },
+  ];
+
+  /** Fills the three required fields with a valid endpoint and model, so the ONLY thing that can
+   * block Save in these cases is the name check under test. */
+  const fillValidForm = (name: string) => {
+    fireEvent.change(screen.getByLabelText(/^name/i), {
+      target: { value: name },
+    });
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://api.openai.com/v1' },
+    });
+    const modelField = screen.getByLabelText(/^model/i);
+    fireEvent.change(modelField, { target: { value: 'gpt-4o' } });
+    fireEvent.keyDown(modelField, { key: 'Enter', code: 'Enter' });
+  };
+
+  it('blocks submit and shows an inline error for a name another provider already uses', async () => {
+    render(
+      <ProviderFormFlyout
+        {...baseProps}
+        existingProviders={existingProviders}
+      />,
+    );
+
+    fillValidForm('Claude staging');
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+
+    expect(await screen.findByText(/already exists/i)).toBeInTheDocument();
+    expect(baseProps.onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('matches the taken name regardless of casing and surrounding whitespace', async () => {
+    render(
+      <ProviderFormFlyout
+        {...baseProps}
+        existingProviders={existingProviders}
+      />,
+    );
+
+    fillValidForm('  claude STAGING  ');
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+
+    expect(await screen.findByText(/already exists/i)).toBeInTheDocument();
+    expect(baseProps.onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('clears the duplicate-name error as soon as the name is edited', async () => {
+    render(
+      <ProviderFormFlyout
+        {...baseProps}
+        existingProviders={existingProviders}
+      />,
+    );
+
+    fillValidForm('Claude staging');
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+    expect(await screen.findByText(/already exists/i)).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText(/^name/i), {
+      target: { value: 'Claude staging 2' },
+    });
+
+    expect(screen.queryByText(/already exists/i)).toBeNull();
+  });
+
+  it('accepts a name no other provider uses', async () => {
+    render(
+      <ProviderFormFlyout
+        {...baseProps}
+        existingProviders={existingProviders}
+      />,
+    );
+
+    fillValidForm('Gemini lab');
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+
+    await waitFor(() => {
+      expect(baseProps.onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({ name: 'Gemini lab' }),
+      );
+    });
+  });
+
+  it('lets an edited provider keep its OWN name — no self-collision', async () => {
+    render(
+      <ProviderFormFlyout
+        {...baseProps}
+        editingProvider={editingProvider}
+        existingProviders={existingProviders}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+
+    await waitFor(() => {
+      expect(baseProps.onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({ name: 'My OpenAI' }),
+      );
+    });
+    expect(screen.queryByText(/already exists/i)).toBeNull();
+  });
+
+  it('still blocks an edited provider renamed onto ANOTHER provider name', async () => {
+    render(
+      <ProviderFormFlyout
+        {...baseProps}
+        editingProvider={editingProvider}
+        existingProviders={existingProviders}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText(/^name/i), {
+      target: { value: 'Claude staging' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+
+    expect(await screen.findByText(/already exists/i)).toBeInTheDocument();
+    expect(baseProps.onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('performs no duplicate check when no provider list is supplied', async () => {
+    // Absent `existingProviders` must behave exactly as before the prop existed.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fillValidForm('Claude staging');
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+
+    await waitFor(() => {
+      expect(baseProps.onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({ name: 'Claude staging' }),
+      );
+    });
+  });
+
+  it('surfaces a duplicate name AND a bad URL on the same click', async () => {
+    // L10: validating sequentially made a form with both problems take two clicks to reveal two
+    // errors, which reads as though fixing the first broke something new.
+    render(
+      <ProviderFormFlyout
+        {...baseProps}
+        existingProviders={existingProviders}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText(/^name/i), {
+      target: { value: 'Claude staging' },
+    });
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'not-a-url' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+
+    expect(await screen.findByText(/already exists/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/valid URL starting with http/i),
+    ).toBeInTheDocument();
+    expect(baseProps.onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('surfaces a server-side 409 through the existing error callout', () => {
+    // A race (another admin created the same name while this flyout was open) comes back as the
+    // 409 message on the `error` prop; the flyout must show it, not swallow it.
+    render(
+      <ProviderFormFlyout
+        {...baseProps}
+        existingProviders={existingProviders}
+        error='A provider named "Claude staging" already exists.'
+      />,
+    );
+
+    expect(
+      screen.getByText('A provider named "Claude staging" already exists.'),
+    ).toBeInTheDocument();
+  });
+});

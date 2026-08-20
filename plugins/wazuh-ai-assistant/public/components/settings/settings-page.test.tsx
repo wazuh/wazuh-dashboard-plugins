@@ -46,10 +46,18 @@ const mockService = {
 };
 
 jest.mock('../../services/settings-service', () => ({
+  // Keeps the module's real constants — `ASSISTANT_SETTINGS_CHANGED_EVENT` and
+  // `PROVIDERS_CHANGED_EVENT`, which this page dispatches and the tests below listen for. Stubbing
+  // them out would make both sides agree on `undefined` and prove nothing.
+  ...jest.requireActual('../../services/settings-service'),
   SettingsService: jest.fn(() => mockService),
 }));
 
 import { SettingsPage } from './settings-page';
+import {
+  ASSISTANT_SETTINGS_CHANGED_EVENT,
+  PROVIDERS_CHANGED_EVENT,
+} from '../../services/settings-service';
 import { CoreStart } from '../../../../../src/core/public';
 
 const coreMock = { http: {} } as unknown as CoreStart;
@@ -1455,5 +1463,309 @@ describe('SettingsPage — in-card layout and hierarchy (audit §4)', () => {
     expect(resultTableScss).toMatch(
       /\.wzResultsCard \.euiTableHeaderCell \{\s*@include wzMicroLabel/,
     );
+  });
+});
+
+/**
+ * Cross-view propagation (wazuh-dashboard#1512). Chat and Settings both stay mounted behind
+ * `display: none` (application.tsx), and the header flyout holds a SECOND, independent ChatPage and
+ * `useProviders` instance — so neither a saved privacy policy nor a provider CRUD action used to
+ * reach them until a reload. Both are announced with a window event now; these cases prove the
+ * dispatch side.
+ */
+describe('SettingsPage — announcing saved changes to the mounted chat', () => {
+  const coreWithToasts = {
+    http: {},
+    notifications: {
+      toasts: { addSuccess: jest.fn(), addDanger: jest.fn() },
+    },
+  } as unknown as CoreStart;
+
+  /** Records every dispatch of `eventName` for the duration of one test. */
+  function listenFor(eventName: string): {
+    count: () => number;
+    stop: () => void;
+  } {
+    let seen = 0;
+    const handler = () => {
+      seen += 1;
+    };
+    window.addEventListener(eventName, handler);
+    return {
+      count: () => seen,
+      stop: () => window.removeEventListener(eventName, handler),
+    };
+  }
+
+  const PROVIDER = {
+    id: 'p1',
+    name: 'My OpenAI',
+    type: 'openai_compatible',
+    baseUrl: 'https://api.openai.com/v1',
+    model: 'gpt-4o',
+    isDefault: false,
+  };
+
+  it('dispatches ASSISTANT_SETTINGS_CHANGED_EVENT after a successful privacy save', async () => {
+    // With no providers the page renders the "No AI provider configured" empty prompt instead of
+    // the Privacy section, so every privacy case here needs at least one provider loaded.
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.updateAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: true,
+      privacyDefaultPerProvider: {},
+      userCanOverride: false,
+      fieldPolicy: [],
+      conversationRetentionDays: 0,
+    });
+    const heard = listenFor(ASSISTANT_SETTINGS_CHANGED_EVENT);
+
+    try {
+      render(
+        <SettingsPageWithRouter
+          core={coreWithToasts}
+          onProvidersChanged={jest.fn()}
+          initialEntries={['/settings?tab=privacy']}
+        />,
+      );
+
+      // The Save button is disabled until the section is dirty, so change something first.
+      // The switch is reached through its label text, not by role+name: this jest environment
+      // stubs EUI's htmlIdGenerator so EVERY generated id is the literal string "generated-id",
+      // which makes the switch's own `aria-labelledby` resolve to the wrong node and leaves it
+      // with no accessible name. EUI puts a click handler on the label <span> precisely so it
+      // behaves like a real <label>, so clicking the text toggles the switch.
+      fireEvent.click(
+        await screen.findByText(/allow users to override privacy mode/i),
+      );
+      fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
+
+      await waitFor(() =>
+        expect(mockService.updateAssistantSettings).toHaveBeenCalled(),
+      );
+      await waitFor(() => expect(heard.count()).toBe(1));
+    } finally {
+      heard.stop();
+    }
+  });
+
+  it('does not announce anything when the privacy save fails', async () => {
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.updateAssistantSettings.mockRejectedValue(new Error('boom'));
+    const heard = listenFor(ASSISTANT_SETTINGS_CHANGED_EVENT);
+
+    try {
+      render(
+        <SettingsPageWithRouter
+          core={coreWithToasts}
+          onProvidersChanged={jest.fn()}
+          initialEntries={['/settings?tab=privacy']}
+        />,
+      );
+
+      fireEvent.click(
+        await screen.findByText(/allow users to override privacy mode/i),
+      );
+      fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
+
+      await waitFor(() =>
+        expect(mockService.updateAssistantSettings).toHaveBeenCalled(),
+      );
+      expect(heard.count()).toBe(0);
+    } finally {
+      heard.stop();
+    }
+  });
+
+  it('dispatches PROVIDERS_CHANGED_EVENT when a provider becomes the default', async () => {
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.setDefault.mockResolvedValue({ ...PROVIDER, isDefault: true });
+    const heard = listenFor(PROVIDERS_CHANGED_EVENT);
+    const onProvidersChanged = jest.fn();
+
+    try {
+      render(
+        <SettingsPageWithRouter
+          core={coreWithToasts}
+          onProvidersChanged={onProvidersChanged}
+        />,
+      );
+      await waitFor(() => expect(mockService.list).toHaveBeenCalled());
+
+      fireEvent.click(
+        await screen.findByRole('button', { name: /set as default/i }),
+      );
+
+      await waitFor(() =>
+        expect(mockService.setDefault).toHaveBeenCalledWith('p1'),
+      );
+      await waitFor(() => expect(heard.count()).toBe(1));
+      // The pre-existing prop path stays intact — the event only ADDS the reach the prop lacks.
+      expect(onProvidersChanged).toHaveBeenCalled();
+    } finally {
+      heard.stop();
+    }
+  });
+  it('dispatches the settings event with the SAVED document as its payload', async () => {
+    // M4: listeners must be able to skip their own GET, which can still return the pre-save
+    // document. The dispatch therefore has to carry what the PUT returned, not just a bare Event.
+    mockService.list.mockResolvedValue([PROVIDER]);
+    const saved = {
+      privacyDefaultOn: true,
+      privacyDefaultPerProvider: {},
+      userCanOverride: false,
+      fieldPolicy: [],
+      conversationRetentionDays: 0,
+    };
+    mockService.updateAssistantSettings.mockResolvedValue(saved);
+    const payloads: unknown[] = [];
+    const handler = (event: Event) => {
+      payloads.push((event as CustomEvent<unknown>).detail);
+    };
+    window.addEventListener(ASSISTANT_SETTINGS_CHANGED_EVENT, handler);
+
+    try {
+      render(
+        <SettingsPageWithRouter
+          core={coreWithToasts}
+          onProvidersChanged={jest.fn()}
+          initialEntries={['/settings?tab=privacy']}
+        />,
+      );
+      fireEvent.click(
+        await screen.findByText(/allow users to override privacy mode/i),
+      );
+      fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
+
+      await waitFor(() => expect(payloads).toHaveLength(1));
+      expect(payloads[0]).toEqual(saved);
+    } finally {
+      window.removeEventListener(ASSISTANT_SETTINGS_CHANGED_EVENT, handler);
+    }
+  });
+
+  it('dispatches the settings event after a conversation-history save too', async () => {
+    // L12: the retention section writes the same settings document, so it must announce it as well
+    // — otherwise a retention save would leave every mounted chat holding a stale document.
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.updateAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: false,
+      privacyDefaultPerProvider: {},
+      userCanOverride: true,
+      fieldPolicy: [],
+      conversationRetentionDays: 30,
+    });
+    const heard = listenFor(ASSISTANT_SETTINGS_CHANGED_EVENT);
+
+    try {
+      render(
+        <SettingsPageWithRouter
+          core={coreWithToasts}
+          onProvidersChanged={jest.fn()}
+          initialEntries={['/settings?tab=retention']}
+        />,
+      );
+      // Queried by role, not by label: this jest environment stubs EUI's htmlIdGenerator so every
+      // generated id is the literal "generated-id", which makes the field's own <label for=...>
+      // resolve to whichever element carries that id first (a button). The retention days field is
+      // the page's only number input, so `spinbutton` identifies it unambiguously.
+      const days = await screen.findByRole('spinbutton');
+      fireEvent.change(days, { target: { value: '30' } });
+      fireEvent.click(
+        screen.getByRole('button', {
+          name: /save conversation history settings/i,
+        }),
+      );
+
+      await waitFor(() =>
+        expect(mockService.updateAssistantSettings).toHaveBeenCalled(),
+      );
+      await waitFor(() => expect(heard.count()).toBe(1));
+    } finally {
+      heard.stop();
+    }
+  });
+
+  it('dispatches PROVIDERS_CHANGED_EVENT when a provider is created', async () => {
+    mockService.list.mockResolvedValue([]);
+    mockService.create.mockResolvedValue({ ...PROVIDER, name: 'Gemini lab' });
+    const heard = listenFor(PROVIDERS_CHANGED_EVENT);
+
+    try {
+      render(
+        <SettingsPageWithRouter
+          core={coreWithToasts}
+          onProvidersChanged={jest.fn()}
+          autoOpenCreateForm={true}
+        />,
+      );
+      fireEvent.change(await screen.findByLabelText(/^name/i), {
+        target: { value: 'Gemini lab' },
+      });
+      fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+        target: { value: 'https://api.openai.com/v1' },
+      });
+      const modelField = screen.getByLabelText(/^model/i);
+      fireEvent.change(modelField, { target: { value: 'gpt-4o' } });
+      fireEvent.keyDown(modelField, { key: 'Enter', code: 'Enter' });
+      fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+
+      await waitFor(() => expect(mockService.create).toHaveBeenCalled());
+      await waitFor(() => expect(heard.count()).toBe(1));
+    } finally {
+      heard.stop();
+    }
+  });
+
+  it('dispatches PROVIDERS_CHANGED_EVENT when a provider is deleted', async () => {
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.remove.mockResolvedValue(undefined);
+    const heard = listenFor(PROVIDERS_CHANGED_EVENT);
+
+    try {
+      render(
+        <SettingsPageWithRouter
+          core={coreWithToasts}
+          onProvidersChanged={jest.fn()}
+        />,
+      );
+      // Delete lives behind the row's actions popover.
+      fireEvent.click(
+        await screen.findByRole('button', { name: /actions for my openai/i }),
+      );
+      fireEvent.click(await screen.findByText(/^delete$/i));
+      fireEvent.click(await screen.findByRole('button', { name: /^delete$/i }));
+
+      await waitFor(() =>
+        expect(mockService.remove).toHaveBeenCalledWith('p1'),
+      );
+      await waitFor(() => expect(heard.count()).toBe(1));
+    } finally {
+      heard.stop();
+    }
+  });
+
+  it('does not announce a provider change when the delete fails', async () => {
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.remove.mockRejectedValue(new Error('403'));
+    const heard = listenFor(PROVIDERS_CHANGED_EVENT);
+
+    try {
+      render(
+        <SettingsPageWithRouter
+          core={coreWithToasts}
+          onProvidersChanged={jest.fn()}
+        />,
+      );
+      fireEvent.click(
+        await screen.findByRole('button', { name: /actions for my openai/i }),
+      );
+      fireEvent.click(await screen.findByText(/^delete$/i));
+      fireEvent.click(await screen.findByRole('button', { name: /^delete$/i }));
+
+      await waitFor(() => expect(mockService.remove).toHaveBeenCalled());
+      expect(heard.count()).toBe(0);
+    } finally {
+      heard.stop();
+    }
   });
 });

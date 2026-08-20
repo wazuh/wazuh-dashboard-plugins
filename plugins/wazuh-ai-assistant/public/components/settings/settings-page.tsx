@@ -40,9 +40,11 @@ import {
 import { i18n } from '@osd/i18n';
 import { CoreStart } from '../../../../../src/core/public';
 import {
+  ASSISTANT_SETTINGS_CHANGED_EVENT,
   AssistantSettings,
   FieldPolicyAction,
   FieldPolicyEntry,
+  PROVIDERS_CHANGED_EVENT,
   SettingsService,
 } from '../../services/settings-service';
 import { ProviderInput, ProviderSummary } from '../../../common/types';
@@ -115,6 +117,25 @@ interface SettingsPageProps {
   /** True while the URL carries `?addProvider=true`: opens the create-provider flyout. */
   autoOpenCreateForm?: boolean;
   onCreateFormOpenChange?: (open: boolean) => void;
+}
+
+/** Announces a saved assistant-settings document to every mounted ChatPage (including the header
+ * flyout's independent one), so an admin's privacy policy change applies without a page reload.
+ * See `ASSISTANT_SETTINGS_CHANGED_EVENT` for why this is a window event, not a prop callback.
+ *
+ * The document the PUT returned rides along as `detail` so listeners never have to re-GET it: a
+ * read issued right after the write can still see the PRE-save document (the indexer write is not
+ * synchronously visible), which would silently reinstate the policy just changed. */
+function notifyAssistantSettingsChanged(saved: AssistantSettings): void {
+  window.dispatchEvent(
+    new CustomEvent(ASSISTANT_SETTINGS_CHANGED_EVENT, { detail: saved }),
+  );
+}
+
+/** Announces a provider create/update/delete/default change to every `useProviders` consumer.
+ * Complements the `onProvidersChanged` prop, which only reaches the in-app chat view. */
+function notifyProvidersChanged(): void {
+  window.dispatchEvent(new Event(PROVIDERS_CHANGED_EVENT));
 }
 
 // Short labels shown in the providers table; the add/edit flyout uses its own long labels
@@ -620,6 +641,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         }),
       );
       setLoadedAssistantSettings(saved);
+      notifyAssistantSettingsChanged(saved);
       retention.commit(saved.conversationRetentionDays);
       core.notifications.toasts.addSuccess(
         i18n.translate('wazuhAiAssistant.settings.retention.saveSuccess', {
@@ -722,6 +744,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         }),
       );
       setLoadedAssistantSettings(saved);
+      notifyAssistantSettingsChanged(saved);
       privacy.commit({
         privacyDefaultOn: saved.privacyDefaultOn,
         userCanOverride: saved.userCanOverride,
@@ -912,6 +935,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       setEditingProvider(saved);
       reload();
       onProvidersChanged();
+      notifyProvidersChanged();
       core.notifications.toasts.addSuccess(
         editingProvider
           ? i18n.translate('wazuhAiAssistant.settings.updateSuccess', {
@@ -1007,6 +1031,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     }
     reload();
     onProvidersChanged();
+    notifyProvidersChanged();
   };
 
   const handleSetDefault = async (provider: ProviderSummary) => {
@@ -1015,6 +1040,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       await service.setDefault(provider.id);
       reload();
       onProvidersChanged();
+      notifyProvidersChanged();
       core.notifications.toasts.addSuccess(
         i18n.translate('wazuhAiAssistant.settings.setDefaultSuccess', {
           defaultMessage: '"{name}" is now the default provider.',
@@ -2244,6 +2270,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         <ProviderFormFlyout
           editingProvider={editingProvider}
           error={error}
+          existingProviders={providers}
           apiKeyEncryptionEnabled={apiKeyEncryptionEnabled}
           isSaving={isSubmittingProvider}
           testOutcome={flyoutTestOutcome}

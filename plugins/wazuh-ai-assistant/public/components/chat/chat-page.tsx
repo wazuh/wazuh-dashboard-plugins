@@ -30,8 +30,10 @@ import { i18n } from '@osd/i18n';
 import { AppMountParameters, CoreStart } from '../../../../../src/core/public';
 import { ChatService } from '../../services/chat-service';
 import {
+  ASSISTANT_SETTINGS_CHANGED_EVENT,
   AssistantSettings,
   SettingsService,
+  isAssistantSettingsPayload,
 } from '../../services/settings-service';
 import { ensureManagerSession } from '../../services/session-heal';
 import { confirmInterruption } from '../../services/interrupt-confirm';
@@ -280,6 +282,50 @@ const SCROLL_UNPIN_SLACK_PX = 40;
 export const CONVERSATIONS_CHANGED_EVENT =
   'wazuhAiAssistant:conversationsChanged';
 
+/** Deadline for the pre-send policy refresh in `startTurn`. Short on purpose: its only job is to
+ * catch a policy changed elsewhere, and a user pressing Send must never wait on a slow settings
+ * GET — past this point the turn proceeds with the policy already in state. */
+const PRE_SEND_SETTINGS_TIMEOUT_MS = 1500;
+
+/**
+ * Resolves with `work`'s value, or `null` if it has not settled within `timeoutMs`.
+ *
+ * The timer is ALWAYS cleared, including on the fast path — a bare
+ * `Promise.race([work, new Promise(r => setTimeout(r, ms))])` leaves a live timer behind on every
+ * call, which keeps the event loop busy for the full deadline even though the answer already
+ * arrived. Harmless-looking in production, but it made every send in the test suite hold a 1.5s
+ * timer and turned a 39s suite into a 306s one.
+ */
+async function resolveWithinDeadline<T>(
+  work: Promise<T>,
+  timeoutMs: number,
+): Promise<T | null> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      work,
+      new Promise<null>(resolve => {
+        timer = setTimeout(() => resolve(null), timeoutMs);
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** The privacy default a settings document resolves to for one provider: the provider's own
+ * override if the admin set one, otherwise the global default. Shared by the default-resolution
+ * effect and the pre-send refresh so the two can never drift apart — server/routes/chat.ts's
+ * `resolvePrivacyEnabled` applies the same rule authoritatively. */
+function resolvePrivacyDefault(
+  settings: AssistantSettings,
+  providerId: string,
+): boolean {
+  return (
+    settings.privacyDefaultPerProvider[providerId] ?? settings.privacyDefaultOn
+  );
+}
+
 /**
  * Welcome-state example questions, now rendered as EuiCards (not plain badge chips) so the empty
  * state reads as a real product surface: one short title + icon per card, the full question as
@@ -437,6 +483,16 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
     // Set on the user's first manual toggle so the settings-driven default effect below stops
     // recomputing it (e.g. if the top-level provider selector changes later in the same session).
     const privacyTouchedRef = useRef(false);
+    // Guards the settings refetch paths below (window event, tab activation, tab visibility,
+    // pre-send): all of them can resolve after this component has gone away — the header flyout's
+    // ChatPage in particular unmounts every time the flyout closes.
+    const isMountedRef = useRef(true);
+    useEffect(
+      () => () => {
+        isMountedRef.current = false;
+      },
+      [],
+    );
     // Per-turn tool_call/digest bookkeeping for history reconstruction. A ref, not
     // state: consulted only when building the NEXT request's body, never rendered.
     const turnHistoryRef = useRef<AssistantTurnRecord[]>([]);
@@ -948,10 +1004,77 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       setRailDisplayMode('expanded');
     };
 
+    /**
+     * Applies a freshly-obtained settings document to this component's privacy state.
+     *
+     * The non-obvious part is `privacyTouchedRef`: when the admin has just turned OFF
+     * `userCanOverride`, the policy has to bind the CURRENT conversation too, not only the next
+     * one — a lock a user's earlier manual toggle could sit above would not be a lock at all. So
+     * the "user already chose" flag is cleared, which re-arms the default-resolution effect below;
+     * that effect then recomputes `privacyEnabled` from the per-provider default (falling back to
+     * `privacyDefaultOn`) as soon as this new settings object lands.
+     *
+     * When `userCanOverride` is (still, or newly) true the flag is left exactly as it is: a value
+     * the user picked themselves survives an unrelated admin save, and an untouched one is
+     * re-resolved by that same effect anyway.
+     */
+    const applyAssistantSettings = (next: AssistantSettings) => {
+      // Nothing to apply to an unmounted component; setState would warn and the ref write would
+      // outlive the instance that owned it.
+      if (!isMountedRef.current) {
+        return;
+      }
+      if (!next.userCanOverride) {
+        privacyTouchedRef.current = false;
+      }
+      setAssistantSettings(next);
+    };
+
+    /** (Re)loads the plugin-wide assistant settings and re-applies the resulting privacy policy,
+     * resolving with the document that was applied (or `null` if the load failed).
+     * Fail-soft: a failed GET keeps whatever policy is already applied rather than degrading to a
+     * default, and never rejects — callers may safely ignore the returned promise. */
+    const refreshAssistantSettings = (): Promise<AssistantSettings | null> =>
+      settingsService
+        .getAssistantSettings()
+        .then(next => {
+          applyAssistantSettings(next);
+          return next;
+        })
+        .catch(() => {
+          // Same fail-soft as the initial load below: keep whatever policy is already applied.
+          return null;
+        });
+
+    /**
+     * The policy the server itself would resolve for this turn, used to make the chip and the
+     * outgoing request agree with the server at the one moment it matters — send time.
+     *
+     * `settings` is the just-refreshed document, or `null` when the refresh failed. A locked policy
+     * (`userCanOverride === false`) always wins; otherwise an untouched conversation follows the
+     * default and a conversation the user has toggled themselves keeps their choice. Falls back to
+     * the current state whenever there is nothing fresher to go on, so a failed GET can never flip
+     * privacy OFF — the direction that would leak.
+     */
+    const resolveEffectivePrivacy = (
+      settings: AssistantSettings | null,
+    ): boolean => {
+      if (!settings) {
+        return privacyEnabled;
+      }
+      if (!settings.userCanOverride || !privacyTouchedRef.current) {
+        return resolvePrivacyDefault(settings, selectedProviderId);
+      }
+      return privacyEnabled;
+    };
+
     useEffect(() => {
       settingsService
         .getAssistantSettings()
-        .then(setAssistantSettings)
+        // Routed through `applyAssistantSettings` like every later refresh, so the mount path picks
+        // up the same unmounted guard rather than setting state on a component the user has already
+        // navigated away from.
+        .then(applyAssistantSettings)
         .catch(() => {
           // Non-fatal: privacy mode simply stays off (mirrors server/routes/chat.ts's own
           // resolvePrivacyEnabled default when nothing overrides it) and the chip below stays
@@ -1000,12 +1123,77 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       ) {
         return;
       }
-      const perProviderDefault =
-        assistantSettings.privacyDefaultPerProvider[selectedProviderId];
       setPrivacyEnabled(
-        perProviderDefault ?? assistantSettings.privacyDefaultOn,
+        resolvePrivacyDefault(assistantSettings, selectedProviderId),
       );
     }, [assistantSettings, selectedProviderId]);
+
+    /**
+     * Admin privacy policy changes have to land in the chat without a page reload: this view stays
+     * MOUNTED behind `display: none` when the Settings tab is showing (application.tsx), so the
+     * mount-only load above would otherwise hold a stale policy forever.
+     *
+     * Same-document saves arrive on ASSISTANT_SETTINGS_CHANGED_EVENT and carry the saved document
+     * as `detail`, which is applied DIRECTLY — a re-GET issued this soon after the write can still
+     * return the pre-save document and silently reinstate the old policy. A dispatch without a
+     * usable payload falls back to the GET.
+     *
+     * This event cannot cross a browser or a machine, so it is only one of three triggers; see the
+     * visibility effect below and the pre-send refresh in `handleSend` for the cases it misses.
+     * Deliberately no polling/interval anywhere.
+     */
+    useEffect(() => {
+      const onSettingsChanged = (event: Event) => {
+        const payload = (event as CustomEvent<unknown>).detail;
+        if (isAssistantSettingsPayload(payload)) {
+          applyAssistantSettings(payload);
+          return;
+        }
+        void refreshAssistantSettings();
+      };
+      window.addEventListener(
+        ASSISTANT_SETTINGS_CHANGED_EVENT,
+        onSettingsChanged,
+      );
+      return () =>
+        window.removeEventListener(
+          ASSISTANT_SETTINGS_CHANGED_EVENT,
+          onSettingsChanged,
+        );
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Cheap freshness on a Settings -> Chat tab switch. Skips its own first run: the mount effect
+    // above already issued that exact GET, so this only has to cover a LATER false -> true
+    // transition. This is an IN-APP tab toggle only — it says nothing about saves made elsewhere,
+    // which the visibility effect and the pre-send refresh below are what actually cover.
+    const assistantSettingsActiveSyncedRef = useRef(false);
+    useEffect(() => {
+      if (!assistantSettingsActiveSyncedRef.current) {
+        assistantSettingsActiveSyncedRef.current = true;
+        return;
+      }
+      if (isActive) {
+        void refreshAssistantSettings();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isActive]);
+
+    // A policy saved by an admin in a DIFFERENT browser or on a different machine reaches no window
+    // event here, so an idle chat left open would keep showing (and honouring) a stale chip
+    // indefinitely. Refetching when the document becomes visible again corrects it the moment the
+    // user comes back to the tab — still event-driven, no timer.
+    useEffect(() => {
+      const onVisibilityChange = () => {
+        if (document.visibilityState === 'visible') {
+          void refreshAssistantSettings();
+        }
+      };
+      document.addEventListener('visibilitychange', onVisibilityChange);
+      return () =>
+        document.removeEventListener('visibilitychange', onVisibilityChange);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleTogglePrivacy = () => {
       if (!assistantSettings?.userCanOverride) {
@@ -2041,9 +2229,9 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
     // conversation that has never enabled privacy mode and never minted a pseudonym. The route
     // treats an absent key and a disabled one identically, so sending nothing keeps the request
     // body minimal for the common case.
-    const privacyPayload =
-      privacyEnabled || pseudonymMap.length > 0
-        ? { enabled: privacyEnabled, map: pseudonymMap }
+    const buildPrivacyPayload = (enabled: boolean): ChatRequest['privacy'] =>
+      enabled || pseudonymMap.length > 0
+        ? { enabled, map: pseudonymMap }
         : undefined;
 
     /**
@@ -2057,6 +2245,21 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       // expired) so this turn's Manager-path tool calls see a fresh token. The 60s memo makes it free
       // during rapid back-and-forth; `detectManagerAuthError` below stays the mid-turn backstop.
       await ensureManagerSession(core.http, { maxAgeMs: 60_000 });
+
+      // Pre-send policy refresh — the one trigger that does not depend on this browser having seen
+      // the admin's save. Neither the window event nor the visibility/tab refreshes can cross a
+      // browser or a machine, so without this a user on another workstation could hold a chip
+      // reading "Off"/"On" that disagrees with the policy the server will actually enforce, and
+      // (worse) believe unmasked data was masked. Bounded and fail-soft: a slow or failing GET must
+      // never be able to block sending, so it is raced against a short deadline and a `null` result
+      // simply keeps the current state. The server re-resolves the policy authoritatively either
+      // way (server/routes/chat.ts) — this is what keeps the UI honest about it.
+      const freshSettings = await resolveWithinDeadline(
+        refreshAssistantSettings(),
+        PRE_SEND_SETTINGS_TIMEOUT_MS,
+      );
+      const effectivePrivacyEnabled = resolveEffectivePrivacy(freshSettings);
+      const privacyPayload = buildPrivacyPayload(effectivePrivacyEnabled);
 
       const assistantMessageId = nextMessageId();
       const assistantMessage: UiChatMessage = {
