@@ -506,10 +506,14 @@ $wzWelcomeFadeOut: 180ms;
   /* The opaque ground the comment above already calls for was never actually declared (iteration-4
      audit, P2 item 9) — with no `background-color` this element's computed value is `transparent`
      (backgrounds are not an inherited property), so message rows scrolled straight through what was
-     meant to read as a status bar. `--wz-surface` is the same token `.wzComposerRow`/
-     `.wzJumpToLatestButton` (this file) already use for the pane's own opaque surface, so the band
-     matches the transcript's ground in both themes instead of inventing a second one. */
-  background-color: var(--wz-surface, #{$euiColorEmptyShade});
+     meant to read as a status bar. `--wz-chrome` (`_redesign.scss`), NOT `--wz-surface`: the
+     transcript pane behind this band has no white ground of its own (`.wzChatTranscript`/
+     `.wzTranscriptContent` declare no background), so `--wz-surface`'s white read as a stray white
+     patch wherever the band was narrower or shorter than a callout's own tinted box (a centred
+     `.wzContentMeasure` column on a wide pane, or the gap a `StatusCallout`'s trailing spacer
+     leaves below a lone callout) — the OSD chrome gray behind the whole pane is the only ground
+     that actually matches what surrounds this band on every side. */
+  background-color: var(--wz-chrome, #{$euiPageBackgroundColor});
 }
 
 /**

@@ -118,6 +118,11 @@ $wzEase: ease-out;
   --wz-accent-soft: #{rgba($euiColorPrimary, 0.1)};
   --wz-accent-hover: #{rgba($euiColorPrimary, 0.06)};
   --wz-surface: #{$euiColorEmptyShade};
+  /* The OSD app-chrome gray behind the header/sidebar (`$euiPageBackgroundColor`), NOT the white
+     `--wz-surface` card tone above — for chrome sitting directly on the page background (e.g. the
+     chat pane's sticky status-callout band, chat-page.scss's `.wzStatusCallouts`), which has no
+     white ground of its own to match. */
+  --wz-chrome: #{$euiPageBackgroundColor};
   --wz-text-subdued: #{$euiTextSubduedColor};
   --wz-panel-radius: #{$wzPanelRadius};
 }
