@@ -33,7 +33,9 @@ const helpLinks = [
   },
   {
     text: 'Registration service reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/auth.html'),
+    href: webDocumentationLink(
+      'user-manual/manager/wazuh-manager-services.html#agent-enrollment-service',
+    ),
   },
 ];
 

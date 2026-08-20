@@ -40,9 +40,7 @@ const renderAllowedDeniedIPs = (items, label) => {
 const helpLinks = [
   {
     text: 'Remote daemon reference',
-    href: webDocumentationLink(
-      'user-manual/reference/daemons/wazuh-remoted.html',
-    ),
+    href: webDocumentationLink('user-manual/manager/reference.html#daemons'),
   },
   {
     text: 'Remote configuration reference',

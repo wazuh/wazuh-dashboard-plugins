@@ -50,7 +50,7 @@ const helpLinks = [
   },
   {
     text: 'Local configuration reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/index.html'),
+    href: webDocumentationLink('user-manual/manager/reference.html'),
   },
 ];
 
