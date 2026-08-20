@@ -579,6 +579,14 @@ const DocsPopover: React.FC<{
 interface ProviderFormFlyoutProps {
   editingProvider: ProviderSummary | null;
   error: string | null;
+  /** Every provider already configured, so this form can refuse a name that is already taken
+   * before the round-trip (the server enforces the same rule with a 409 — see
+   * `rejectDuplicateProviderName` in server/routes/settings.ts — which still covers the race of a
+   * second admin creating the same name while this flyout is open).
+   *
+   * Optional/absent means "no list available", which behaves exactly as before this prop existed:
+   * no client-side duplicate check at all. */
+  existingProviders?: ProviderSummary[];
   apiKeyEncryptionEnabled: boolean | null;
   /** True while a save (+ the connection test it triggers) is in flight. Optional/absent behaves
    * exactly as before this prop existed: the Save button is never shown as loading. */
@@ -594,6 +602,7 @@ interface ProviderFormFlyoutProps {
 export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   editingProvider,
   error,
+  existingProviders = [],
   apiKeyEncryptionEnabled,
   isSaving = false,
   testOutcome = null,
@@ -616,6 +625,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
       : emptyForm,
   );
   const [baseUrlError, setBaseUrlError] = useState<string | null>(null);
+  const [nameError, setNameError] = useState<string | null>(null);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   // Tracks whether the admin has typed into the endpoint URL field themselves (see the field's own
   // `onChange` below), so a provider-type switch (`handleTypeChange` above) only ever resets the
@@ -743,6 +753,27 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
       model: form.model.trim(),
       apiKey: form.apiKey?.trim() ?? '',
     };
+
+    // Duplicate name check, mirroring the server's own 409 (`rejectDuplicateProviderName`): same
+    // trim + lowercase comparison, and the provider being edited is excluded so re-saving it
+    // unchanged is never a collision with itself.
+    const normalizedName = trimmedForm.name.toLowerCase();
+    const nameTaken = existingProviders.some(
+      provider =>
+        provider.id !== editingProvider?.id &&
+        provider.name.trim().toLowerCase() === normalizedName,
+    );
+    if (nameTaken) {
+      setNameError(
+        i18n.translate('wazuhAiAssistant.settings.form.nameDuplicate', {
+          defaultMessage:
+            'A provider named "{name}" already exists. Pick a different name.',
+          values: { name: trimmedForm.name },
+        }),
+      );
+      return;
+    }
+    setNameError(null);
 
     if (!isValidEndpointUrl(trimmedForm.baseUrl)) {
       setBaseUrlError(
@@ -988,13 +1019,21 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                         )}
                       />
                     }
+                    isInvalid={Boolean(nameError)}
+                    error={nameError}
                   >
                     <EuiFieldText
                       value={form.name}
                       aria-required='true'
-                      onChange={event =>
-                        setForm({ ...form, name: event.target.value })
-                      }
+                      isInvalid={Boolean(nameError)}
+                      onChange={event => {
+                        setForm({ ...form, name: event.target.value });
+                        // Clear the duplicate-name error as soon as the admin starts fixing it,
+                        // same as `fillBaseUrl` does for `baseUrlError`.
+                        if (nameError) {
+                          setNameError(null);
+                        }
+                      }}
                     />
                   </EuiFormRow>
                 </EuiFlexItem>

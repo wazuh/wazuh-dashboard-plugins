@@ -172,6 +172,54 @@ export const ENCRYPTION_REQUIRED_MESSAGE =
   'add wazuh_ai_assistant.encryptionKey` (recommended) or in `opensearch_dashboards.yml` — then ' +
   'restart dashboard service and try again.';
 
+/** Message for a name already taken by another provider. Kept as a builder so the route and its
+ * test agree on the exact wording the admin sees. */
+export function duplicateProviderNameMessage(name: string): string {
+  return `A provider named "${name}" already exists.`;
+}
+
+/**
+ * Rejects a provider name that is already taken by ANOTHER provider with HTTP 409.
+ *
+ * Provider names are the only way an admin tells two providers apart in the chat's provider
+ * selector and in every toast/error this plugin emits, so two providers sharing one name is
+ * indistinguishable in the UI even though the ids differ. The comparison is `trim()` +
+ * `toLowerCase()`: " OpenAI " and "openai" read as the same provider to a human, so accepting both
+ * would defeat the point.
+ *
+ * `excludeId` is the provider being updated (PUT /providers/{id}) so re-saving a provider without
+ * renaming it never collides with itself; it is `undefined` on create. Providers are capped at ~200
+ * (the same `perPage` `clearOtherDefaults` above uses) and every read of this store is a full
+ * in-memory list anyway (server/settings/ai-providers-client.ts), so a plain list+scan is fine.
+ *
+ * Exported for unit testing only — the routes below call it directly.
+ */
+export async function rejectDuplicateProviderName(
+  context: RequestHandlerContext,
+  name: string,
+  excludeId: string | undefined,
+  response: OpenSearchDashboardsResponseFactory,
+): Promise<IOpenSearchDashboardsResponse | null> {
+  const normalized = name.trim().toLowerCase();
+  const { providers } = await context.wazuh_ai_assistant.aiProviders.list(
+    context,
+    1,
+    200,
+  );
+  const taken = providers.some(
+    provider =>
+      provider.id !== excludeId &&
+      (provider.attributes.name ?? '').trim().toLowerCase() === normalized,
+  );
+  if (!taken) {
+    return null;
+  }
+  return response.customError({
+    statusCode: 409,
+    body: { message: duplicateProviderNameMessage(name.trim()) },
+  });
+}
+
 /** Refuses a non-empty `apiKey` when no encryption key is configured. See docs/ENCRYPTION.md. */
 export function requireApiKeyEncryption(
   apiKey: string | undefined,
@@ -249,6 +297,17 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       );
       if (encryptionGate) {
         return encryptionGate;
+      }
+      // Name uniqueness, before any document write: `crypto.randomUUID()` below would otherwise
+      // happily mint a second provider indistinguishable from an existing one in every UI surface.
+      const duplicateName = await rejectDuplicateProviderName(
+        context,
+        request.body.name,
+        undefined,
+        response,
+      );
+      if (duplicateName) {
+        return duplicateName;
       }
       const isFirstProvider =
         (await context.wazuh_ai_assistant.aiProviders.count(context)) === 0;
@@ -333,6 +392,17 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       );
       if (!existing) {
         return response.notFound();
+      }
+      // Same uniqueness rule as POST /providers, excluding this provider so re-saving it (or
+      // renaming it to a different casing/spacing of its own name) never collides with itself.
+      const duplicateName = await rejectDuplicateProviderName(
+        context,
+        request.body.name,
+        request.params.id,
+        response,
+      );
+      if (duplicateName) {
+        return duplicateName;
       }
       const cipher = getApiKeyCipher();
       let nextApiKey: string | undefined;
