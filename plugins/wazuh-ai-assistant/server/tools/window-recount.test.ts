@@ -154,6 +154,13 @@ function sampleValue(name: string, prop: JsonSchemaProperty): unknown {
   if (name === 'time_range_lte') {
     return 'now-1d';
   }
+  // get_field_values' `field` param is restricted to guardrails.ts's AGG_FIELD_ALLOWLIST.
+  // "wazuh.agent.id" is chosen because its FIELD_LOCATIONS include "events", the family this
+  // file's own generic enum heuristic samples first for `index_family` (alphabetical
+  // `enumValues[0]`) -- and because it IS a time-ranged surface, exercising this sweep for real.
+  if (name === 'field') {
+    return 'wazuh.agent.id';
+  }
   const enumValues = (prop as { enum?: unknown[] }).enum;
   if (Array.isArray(enumValues) && enumValues.length > 0) {
     return enumValues[0];

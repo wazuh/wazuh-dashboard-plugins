@@ -110,10 +110,30 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: WAZUH_FIELD.RULE_MITRE_TECHNIQUE_NAME, action: 'allow' },
   { field: WAZUH_FIELD.RULE_MITRE_TACTIC, action: 'allow' },
   { field: WAZUH_FIELD.RULE_MITRE_TACTIC_NAME, action: 'allow' },
+  // Hotfix A0 (AI/plan/qa-rules-decoders-rootcause.md, defect #4): get_rules/
+  // get_threat_intel_components newly surface document.metadata.description (mapped `text`,
+  // populated on every rule/decoder/integration/policy/kvdb doc) so "what does rule/decoder X
+  // detect" is answerable at all -- previously the field was omitted from both tools' `_source`
+  // entirely, so the model had no way to answer that question from the ruleset. Reviewed 'allow',
+  // same reasoning and same residual-risk mitigation as WAZUH_FIELD.RULE_TITLE above: this is
+  // Wazuh's own curated Sigma/pipeline documentation text, not analyst/attacker-supplied data, and
+  // anonymizing it would replace every rule/decoder's actual explanation with an opaque VAL_n,
+  // gutting the one thing this fix exists to enable. The residual risk (a LOCAL/custom rule's
+  // description CAN in principle embed a decoder capture group or free text) is the same shape as
+  // rule.title's, and is covered the same way: chat.ts's scrubMessagesForProvider runs
+  // prescanAndMintToolContent over every tool-result string value before it reaches the provider.
+  { field: 'document.metadata.description', action: 'allow' },
   // Curated benchmark/policy content (CIS etc.), not analyst/attacker-supplied — reviewed 'allow'.
   { field: 'check.id', action: 'allow' },
   { field: 'check.name', action: 'allow' },
   { field: 'check.result', action: 'allow' },
+  // Workstream D (coverage doc CV-054): get_sca_checks now also samples check.rationale/
+  // check.remediation into the digest (previously row-expander-only, see get-sca-checks.ts) --
+  // same curated-benchmark/policy-content class as check.id/name/result above (CIS/benchmark
+  // authored text describing WHY a check exists and WHAT to do about a failure), not
+  // analyst/attacker-supplied. Reviewed 'allow' for the identical reason.
+  { field: 'check.rationale', action: 'allow' },
+  { field: 'check.remediation', action: 'allow' },
   { field: 'policy.name', action: 'allow' },
   // get_sca_results/name is deliberately NOT anonymized: a policy name is what the analyst asked
   // about, and known mapped identifiers embedded in free text (e.g. a hostname inside a cmd path)
@@ -199,6 +219,224 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'event.category', action: 'allow' },
   { field: 'event.action', action: 'allow' },
   { field: 'event.outcome', action: 'allow' },
+
+  // --- Workstream A1a (AI/plan/coverage-validation-design.md) -------------------------------
+  // Every family below is newly reachable through `search_wazuh_data` (guardrails.ts's
+  // `INDEX_ALLOWLIST_RE`, widened by this workstream) and that tool sets `deriveColumns: true` +
+  // `failClosedFieldPolicy: true` -- an unlisted field there is FAIL-CLOSED anonymized (the
+  // opposite default from a typed tool's allow-by-omission), so every field an analyst should
+  // actually be able to read needs a REAL entry here, not just a "looks harmless" structural
+  // guess. See `field-policy-coverage.test.ts`'s `requireExplicitEntry` for why the test enforces
+  // exactly this distinction.
+  //
+  // A GENUINE MECHANISM LIMIT, surfaced rather than worked around: `FieldPolicyEntry.field` is
+  // either a bare digest path or a `tool/field` SCOPED path -- there is no INDEX/FAMILY scope.
+  // `search_wazuh_data` is the one tool that queries every family below (and every
+  // pre-existing one), so a bare entry here is NOT scoped to "this field on this family" the way
+  // a typed tool's own fixed `_source` list is -- it is scoped to "this exact field NAME, on
+  // whatever family the model happened to query this turn". Every entry below was checked against
+  // this constraint before being added: the field NAME itself is either (a) a `wazuh.*`-namespaced
+  // dotted path unique to the family it was verified on (no other reachable family uses the same
+  // literal), or (b) a bare, undotted top-level key.
+  //
+  // P-1 (AI/plan/a1a-review.md): the (b) bare-name entries below were originally justified with the
+  // claim "no existing WCS schema ever exposes a personal-shaped field bare at a document's root" --
+  // that claim is FALSE as stated (live-verified: `.ds-wazuh-events-v5-security-000001`'s root leaves
+  // include `message` (the raw log line), `related` (ECS `related.ip`/`related.user`), and `url` (an
+  // observed URL) -- all bare, all customer data). The narrower claim that actually holds, and the
+  // one this file's safety depends on, is the COLLISION claim: none of the 19 bare names below is
+  // itself the SAME literal as a bare root leaf of any customer-data family (`wazuh-states-*`,
+  // `wazuh-events-v5-*`, `wazuh-findings-v5-*`) -- live-verified for every one of them against
+  // `wazuh-states-inventory-users` (whose personal field is `user.name`, never a bare `name`) and
+  // every other reachable customer-data index. `field-policy-no-bare-collision.test.ts` pins this as
+  // a regression: it asserts no bare (dotless) `FIELD_POLICY_DEFAULTS` entry appears in a hardcoded
+  // list of real customer-family root leaves, so the next bare entry added here re-derives a claim
+  // that is actually checked, not one that merely reads true. The CTI/content-manager/Security-
+  // Analytics documents classified below are the ONLY reachable surfaces that use bare root-level
+  // keys at all today, which is exactly why a bare entry for them cannot silently widen to cover a
+  // WCS personal field of the same bare name -- no such WCS field exists among the ones checked.
+  // Fields that could NOT be cleared this way (ambiguous, or a value shape the reviewer could not
+  // confidently call safe) are left OFF this list on purpose -- fail-closed anonymize is the correct
+  // outcome for those, not an oversight; see the two "DELIBERATELY NOT LISTED" notes below.
+
+  // wazuh-metrics-agents (live-verified mapping, `wazuh-aio-5`): agent registration/connection
+  // telemetry. `wazuh.agent.id`/`.name`/`.host.ip` already have entries above (same literals,
+  // same field on this family too). The rest below are NEW literals only this family carries.
+  { field: 'wazuh.agent.register.ip', action: 'anonymize', kind: 'IP' },
+  // OS identity (name/platform/full/version, one wildcard) -- same class and same 'allow'
+  // decision as the pre-existing bare `host.os.name`/`.platform` entries above, just on the
+  // POPULATED `wazuh.agent.host.os.*` path this family (and findings/events, per guardrails.ts's
+  // AGG_FIELD_ALLOWLIST comment) actually carries.
+  { field: 'wazuh.agent.host.os.*', action: 'allow' },
+  { field: 'wazuh.agent.host.architecture', action: 'allow' },
+  // Admin-defined agent-group tag list -- same class as `policy.name`/`check.name` above
+  // (admin/vendor taxonomy, not analyst/attacker-supplied).
+  { field: 'wazuh.agent.groups', action: 'allow' },
+  // Closed enum (active/disconnected/pending/never_connected) + its paired numeric code, not an
+  // identifier.
+  { field: 'wazuh.agent.status', action: 'allow' },
+  { field: 'wazuh.agent.status_code', action: 'allow' },
+  { field: 'wazuh.agent.version', action: 'allow' },
+  // Timestamps -- same class as the already-'allow' bare `timestamp`/`@timestamp`.
+  { field: 'wazuh.agent.last_seen', action: 'allow' },
+  { field: 'wazuh.agent.registered_at', action: 'allow' },
+  { field: 'wazuh.agent.disconnected_at', action: 'allow' },
+  // Config-sync checksums/flags -- an MD5 of the agent's own config payload, not an identifier of
+  // a person or network address.
+  { field: 'wazuh.agent.config.hash.md5', action: 'allow' },
+  { field: 'wazuh.agent.config.group.hash.md5', action: 'allow' },
+  { field: 'wazuh.agent.config.group.synced', action: 'allow' },
+
+  // wazuh-metrics-comms / wazuh-metrics-agents / wazuh-metrics-normalization (shared fields):
+  // manager cluster identity -- admin-configured infra naming (e.g. "wazuh"), not a person or a
+  // network address; same class as `policy.name`/`document.name` above, not `host.hostname`.
+  { field: 'wazuh.cluster.*', action: 'allow' },
+  { field: 'wazuh.schema.version', action: 'allow' },
+  // wazuh-metrics-normalization: tenant/space label (admin-configured), and the ECS event/metric
+  // taxonomy fields describing WHICH counter a document is, not any analyst/attacker data.
+  { field: 'wazuh.space.name', action: 'allow' },
+  { field: 'event.module', action: 'allow' },
+  { field: 'event.kind', action: 'allow' },
+  { field: 'metric.name', action: 'allow' },
+  { field: 'metric.type', action: 'allow' },
+
+  // .wazuh-cti-consumers / .wazuh-content-manager-jobs (CTI freshness status, coverage doc
+  // MS-6/MS-7): every field is written by the content-manager service itself describing ITS OWN
+  // sync state/schedule -- never analyst- or attacker-supplied, and (per the mechanism-limit note
+  // above) these bare root-level keys cannot collide with any WCS-schema field of the same name.
+  // P-6 (AI/plan/a1a-review.md): `resource` is a full vendor API URL and `context` a tenant/
+  // context id -- vendor-side today (the SaaS CTI backend), but at a customer running a PRIVATE
+  // CTI mirror `resource` would carry an INTERNAL hostname, and this is 'allow' (unscanned at the
+  // digest boundary; the outbound shape scan in chat.ts still applies to it, same residual as
+  // every other 'allow' entry above). Accepted as low-risk today because no such deployment mode
+  // exists yet -- revisit if/when a private-mirror CTI backend ships.
+  { field: 'name', action: 'allow' },
+  { field: 'context', action: 'allow' },
+  { field: 'resource', action: 'allow' },
+  { field: 'status', action: 'allow' },
+  { field: 'is_public', action: 'allow' },
+  { field: 'local_offset', action: 'allow' },
+  { field: 'remote_offset', action: 'allow' },
+  { field: 'job_type', action: 'allow' },
+  { field: 'enabled', action: 'allow' },
+  // `type` is DELIBERATELY NOT LISTED here even though it appears on both CTI documents (a
+  // consumer-type enum) and would otherwise pass the same "bare root key, WCS never uses it bare"
+  // reasoning: `.opensearch-sap-correlation-metadata`'s own `type` usage was not verified in this
+  // pass (its one sampled live doc did not populate it), and a later family reachable through this
+  // same escape hatch could plausibly use a bare `type` for something less clearly safe. Left
+  // fail-closed (anonymized) rather than guessed -- the CTI-specific need ("what type of consumer
+  // is this") is already answerable from `name`/`context` above without it.
+
+  // .opensearch-sap-*-findings (per-log-type Security Analytics findings, coverage doc G2):
+  // detector/finding bookkeeping -- monitor identity and cross-references to the underlying
+  // event/finding docs, never analyst/attacker free text.
+  { field: 'monitor_id', action: 'allow' },
+  { field: 'monitor_name', action: 'allow' },
+  { field: 'execution_id', action: 'allow' },
+  { field: 'related_doc_ids', action: 'allow' },
+  { field: 'correlated_doc_ids', action: 'allow' },
+  // The finding's own compiled Sigma-derived query template/tags -- vendor-curated pipeline
+  // content, same class and same 'allow' decision as `document.metadata.description` above (a
+  // LOCAL rule's title/description can echo attacker-influenced content in principle, and the
+  // same outbound `scrubMessagesForProvider` scan documented on that entry covers this one too).
+  { field: 'queries.id', action: 'allow' },
+  { field: 'queries.name', action: 'allow' },
+  { field: 'queries.query', action: 'allow' },
+  { field: 'queries.tags', action: 'allow' },
+  { field: 'queries.query_field_names', action: 'allow' },
+
+  // .opensearch-sap-pre-packaged-rules-config (coverage doc G3): P-4 (AI/plan/a1a-review.md) --
+  // this index does NOT share `document.metadata.*` at all. Live mapping root is a single object,
+  // `rule`: real paths are `rule.metadata.title/author/date/modified/references`, `rule.category`,
+  // `rule.level`, `rule.status`, `rule.queries[].value`, `rule.document.id`, `rule.space`. The
+  // original `document.metadata.*`/`document.id`/`document.space` entries below matched nothing on
+  // this family, so every string in the Sigma catalog arrived as an opaque `VAL_n` under privacy
+  // mode -- G3 was NOT actually closed for that mode despite the family being enum/allowlist
+  // reachable. `.opensearch-sap-detectors-config` DOES share the `document.metadata.*` shape
+  // `document.metadata.description` above already covers (verified separately), so that family is
+  // unaffected by this correction.
+  { field: 'rule.metadata.title', action: 'allow' },
+  { field: 'rule.metadata.author', action: 'allow' },
+  { field: 'rule.metadata.date', action: 'allow' },
+  { field: 'rule.metadata.modified', action: 'allow' },
+  { field: 'rule.metadata.references', action: 'allow' },
+  { field: 'rule.category', action: 'allow' },
+  { field: 'rule.level', action: 'allow' },
+  { field: 'rule.status', action: 'allow' },
+  { field: 'rule.queries.value', action: 'allow' },
+  { field: 'rule.document.id', action: 'allow' },
+  { field: 'rule.space', action: 'allow' },
+
+  // .opensearch-sap-correlation-metadata (coverage doc MS-12): internal correlation-engine
+  // bookkeeping (a running score counter and cross-references to the two findings being
+  // correlated) -- `finding1`/`finding2` hold finding/document IDs, same class as
+  // `related_doc_ids` above, not free text.
+  { field: 'root', action: 'allow' },
+  { field: 'counter', action: 'allow' },
+  { field: 'finding1', action: 'allow' },
+  { field: 'finding2', action: 'allow' },
+  { field: 'logType', action: 'allow' },
+
+  // .wazuh-threatintel-vulnerabilities-a (raw CTI CVE feed) / wazuh-threatintel-enrichments-a (IOC
+  // enrichment feed) -- coverage doc TC-8. Both are THIRD-PARTY THREAT-INTEL CATALOG DATA: public
+  // CVE records and known-malicious-indicator records. The privacy boundary this whole file exists
+  // to enforce protects the CUSTOMER's own observed data (their hosts/users/IPs) from reaching the
+  // provider un-pseudonymized -- these two families are the mirror image, vendor/community
+  // threat-intel content ABOUT the outside world, not about the customer's environment, so a
+  // domain/hash/IP value here identifies KNOWN-MALICIOUS PUBLIC INFRASTRUCTURE, never the
+  // customer's own network (contrast with `source.ip`/`destination.ip` above, which DO need
+  // anonymizing because those values come from the customer's own traffic).
+  { field: 'document.cveMetadata.cveId', action: 'allow' },
+  { field: 'document.cveMetadata.assignerShortName', action: 'allow' },
+  { field: 'document.cveMetadata.state', action: 'allow' },
+  { field: 'document.dataType', action: 'allow' },
+  { field: 'document.dataVersion', action: 'allow' },
+  // Indicator identity/metadata: a domain, hash, or IP string, but of a THIRD-PARTY indicator, not
+  // the customer's own address space -- see the family-level reasoning above.
+  //
+  // P-3 (AI/plan/a1a-review.md): this literal is NOT unique to the two threat-intel families named
+  // above -- `get_threat_intel_components.ts` reads the exact same `document.name` on
+  // `wazuh-threatintel-{rules,decoders,kvdbs,filters,integrations}-a`, which are the indices a
+  // CUSTOMER'S OWN custom rules/decoders/KVDBs land in (before this branch that field was
+  // fail-closed-anonymized there, on the escape hatch). Deliberately kept 'allow' rather than
+  // downgraded to 'allow-scan': the enrichments/vulnerabilities family above NEEDS the raw
+  // domain/hash/IP indicator value verbatim (the whole point of that tool), and 'allow-scan' would
+  // pseudonymize exactly that value whenever it happens to be FQDN/IP-shaped -- which a real
+  // indicator name usually is. The accepted residual for the rules/decoders/kvdbs family: on this
+  // VM `document.name` is unpopulated on `rules-a` (`space.name: "standard"`, all vendor content
+  // today), and even a populated custom name containing an FQDN/IP is still caught by the outbound
+  // `scrubMessagesForProvider`/`prescanAndMintToolContent` shape scan in chat.ts -- the same
+  // dotless-identifier residual class already accepted for `wazuh.rule.title` and
+  // `document.metadata.description` above, not a new gap this branch introduces.
+  { field: 'document.name', action: 'allow' },
+  { field: 'document.provider', action: 'allow' },
+  { field: 'document.type', action: 'allow' },
+  { field: 'document.tags', action: 'allow' },
+  { field: 'document.feed.name', action: 'allow' },
+  // P-4 (AI/plan/a1a-review.md): the branch's original entries were the bare `software.name`/
+  // `.type`/`.alias`, which match nothing on a real enrichment document -- the field is nested
+  // under `document.software.*` (verified in a sampled live doc), not a top-level `software`
+  // object. Corrected to the real paths so these three actually resolve instead of silently never
+  // firing (the bare, unmatched entries were previously harmless-but-dead weight in this list).
+  { field: 'document.software.name', action: 'allow' },
+  { field: 'document.software.type', action: 'allow' },
+  { field: 'document.software.alias', action: 'allow' },
+  { field: 'hash.sha256', action: 'allow' },
+  // `document.reference`/rejection-reason free text is DELIBERATELY NOT LISTED: a CVE record's
+  // `containers.cna.rejectedReasons[].value` is analyst-authored free text from the CVE assigning
+  // body, not a closed vocabulary -- left fail-closed (anonymized) rather than assumed safe, same
+  // "too risky to classify confidently" call as `type` above.
+  //
+  // Workstream A1b (get-cve-intel.ts) deliberately adds NO entries here for
+  // `document.containers.cna.descriptions/metrics/affected`: those paths never reach
+  // `applyFieldPolicy` at all -- `get-cve-intel.ts`'s `resolveParams` reads them directly via the
+  // opensearch client (bypassing the typed-tool digest/table path entirely, since `document` is
+  // mapped `enabled: false` on this index and is therefore never in any tool's declared
+  // `_source`/`sampleColumns`) and folds a plain-language SUMMARY into `Digest.assumptionNote`, a
+  // freeform string, not a field-keyed digest row. That string still passes through chat.ts's
+  // generic `prescanAndMintToolContent` JSON-value scan (the same residual-risk mitigation every
+  // 'allow' entry above relies on) -- an entry in THIS list would be inert documentation-debt,
+  // since `applyFieldPolicy`'s per-field lookup is never consulted for it.
 ];
 
 export type PseudonymKind = 'HOST' | 'IP' | 'USER' | 'URL' | 'VAL';
@@ -1130,6 +1368,13 @@ export function extractAggFields(
  * 6. Explicit `allow` (or a non-string/empty value in any branch above that didn't already return)
  *    — passthrough, completely unscanned. This is the ONLY branch that skips both scans; every
  *    other outcome above goes through at least the shape scan.
+ *
+ * P-2 (AI/plan/a1a-review.md) added two branches ahead of the ones above: a STRING ARRAY under an
+ * 'anonymize'/'allow-scan' entry recurses element-wise through this same function (so a multi-valued
+ * field like `wazuh.agent.host.ip` is no longer silently unscrubbed just because it is an array
+ * instead of a scalar), and an unlisted OBJECT/non-empty-ARRAY value under the escape hatch's
+ * fail-closed default (branch 4) is now dropped outright rather than passed through raw — the
+ * bounded fallback the review sanctioned over a full recursive per-leaf walk.
  */
 function scrubFieldValue(
   field: string,
@@ -1142,6 +1387,34 @@ function scrubFieldValue(
   const entry = resolveFieldEntry(field, policy, toolName);
   if (entry?.action === 'never') {
     return { keep: false, value: undefined };
+  }
+  // P-2 (AI/plan/a1a-review.md): a STRING-ARRAY value under a policy-covered path (e.g.
+  // `wazuh.agent.host.ip`, an array in real docs) used to bypass its own field's policy entirely —
+  // this function only ever matched on `typeof value === 'string'`, so an 'anonymize'/'allow-scan'
+  // action silently did nothing for the multi-valued case and the value reached the provider raw.
+  // Recurse element-wise (same action, same field/kind) for a string array under any of the three
+  // scanned/anonymized branches below, BEFORE the scalar `typeof value === 'string'` checks — a
+  // non-string, non-array value (number/boolean/null) still falls through unchanged to the final
+  // passthrough, exactly as before this fix.
+  if (
+    Array.isArray(value) &&
+    value.every(item => typeof item === 'string') &&
+    (entry?.action === 'anonymize' || entry?.action === 'allow-scan')
+  ) {
+    return {
+      keep: true,
+      value: value.map(
+        item =>
+          scrubFieldValue(
+            field,
+            item,
+            policy,
+            pseudonymizer,
+            toolName,
+            isEscapeHatch,
+          ).value,
+      ),
+    };
   }
   if (
     entry?.action === 'anonymize' &&
@@ -1173,6 +1446,19 @@ function scrubFieldValue(
       ),
     };
   }
+  if (!entry && isEscapeHatch && isNonEmptyObjectOrArray(value)) {
+    // P-2, second consequence: the escape hatch's fail-closed default (see this function's doc
+    // comment, branch 4) only ever fired for a STRING value — an unlisted field whose real value is
+    // an object or array (`_source: ["queries"]` on a SAP finding, `_source: ["document"]` on a
+    // vulnerability record) fell through every branch above untouched and reached the provider
+    // completely unpseudonymized, defeating fail-closed for exactly the shape it exists to catch.
+    // Bounded fix (the review's sanctioned fallback, chosen over a full recursive per-leaf walk to
+    // keep this function's blast radius small): omit the value entirely, the same "drop" outcome a
+    // 'never' field gets. A caller that needs a specific sub-path readable must add an explicit
+    // dotted policy entry for it (as this branch's own new entries do for `queries.id` etc.) rather
+    // than rely on the parent object/array passing through.
+    return { keep: false, value: undefined };
+  }
   if (
     !entry &&
     isEscapeHatch &&
@@ -1195,6 +1481,16 @@ function scrubFieldValue(
     return { keep: true, value: prescanAndMint(value, pseudonymizer) };
   }
   return { keep: true, value };
+}
+
+/** True for a non-null object or a non-empty array — the shapes `scrubFieldValue`'s escape-hatch
+ * fail-closed branch (P-2) must not pass through raw. An empty array/object carries no data worth
+ * omitting over and is left to the final passthrough branch. */
+function isNonEmptyObjectOrArray(value: unknown): boolean {
+  if (Array.isArray(value)) {
+    return value.length > 0;
+  }
+  return value !== null && typeof value === 'object';
 }
 
 /**

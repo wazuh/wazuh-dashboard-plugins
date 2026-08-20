@@ -243,6 +243,12 @@ function sampleValue(name: string, prop: JsonSchemaProperty): unknown {
   if (name === 'limit') {
     return ABSURD_LIMIT;
   }
+  // get_field_values' `field` param is restricted to guardrails.ts's AGG_FIELD_ALLOWLIST -- a
+  // generic sample string throws (correctly) rather than reaching an aggregation this sweep can
+  // inspect.
+  if (name === 'field') {
+    return 'wazuh.agent.id';
+  }
   if ((prop as { jsonString?: true }).jsonString) {
     // The escape hatch's sample body CARRIES aggregations on purpose (see the module doc comment's
     // SHAPE COVERAGE paragraph): a size-100 terms agg with an EXPLICIT non-count order (the

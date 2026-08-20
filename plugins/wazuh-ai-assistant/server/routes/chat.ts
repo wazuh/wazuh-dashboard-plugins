@@ -133,6 +133,10 @@ function suggestedQueryReasonMismatchDisclosure(fields: string[]): string {
  * chat-capability-honesty.test.ts's last-tool-bearing-round test) instead of hardcoding the
  * round count, which would silently start testing a different round on any budget change. */
 export const MAX_TOOL_ROUNDS = 3;
+/* ADAPTATION (branch 8997 vs D's original commit): workstream C's cost-budget block
+ * (BASE_BUDGET_UNITS, HARD_CEILING_UNITS, CONTEXT_CHAR_BUDGET, MAX_CONSECUTIVE_REJECTED_ROUNDS)
+ * is dropped here -- it belongs to enhancement/8998-ai-assistant-tool-budget. This branch keeps
+ * the plain MAX_TOOL_ROUNDS=3 count from before workstream C existed. */
 
 /**
  * Fallback narration for a turn that used at least one tool but whose model never emitted any
@@ -147,6 +151,254 @@ const NO_ANALYSIS_TEXT_MESSAGE =
   'No additional analysis — see the results above.';
 const NO_MATCHING_RESULTS_MESSAGE =
   'No matching results were found for that query.';
+
+/**
+ * N1 fix (AI/plan/qa-battery-v31.md, proven live on A0/#8935: "the canned empty-copy says
+ * nothing about what was searched"). `NO_MATCHING_RESULTS_MESSAGE` alone reads identically for
+ * every zero-row turn regardless of what was actually asked — a scoped SCA/vulnerability/agent
+ * search and a wide-open one both produce the exact same sentence, so the user has no way to
+ * tell "nothing matched this narrow filter" from "something may be broken." This appends what
+ * the last real tool call this turn actually targeted: the data domain it searched (derived
+ * from the tool's own name) and, when the caller supplied any, the filters/time-window that
+ * narrowed it to zero — both already present on `lastAttemptedToolCall`, the digest/request
+ * context for that call.
+ *
+ * MECHANISM-FREE BY CONSTRUCTION (product decision, same posture as
+ * NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE below): this reads the tool NAME and its ARGUMENT
+ * key/value pairs, never anything about rounds/budgets/cost units/the orchestration loop. A
+ * tool name is data-domain vocabulary the user already thinks in ("SCA checks", "agents"), not
+ * an internal mechanism — chat-no-text-fallback-message.test.ts's mechanism-silence word list
+ * covers this output too.
+ */
+const TOOL_NAME_VERB_PREFIX_RE = /^(get|search|lookup)_/;
+/** Short catalog acronyms that read badly lowercased by the generic "snake_case -> words"
+ * conversion below (e.g. "sca checks" -> "SCA checks"). Deliberately a small, hand-picked list —
+ * this is a display nicety, not a classification the empty-copy's correctness depends on: any
+ * acronym missing from this map still renders as a perfectly readable lowercase word. */
+const TOOL_DOMAIN_ACRONYMS: Record<string, string> = {
+  sca: 'SCA',
+  cti: 'CTI',
+  cve: 'CVE',
+  ioc: 'IOC',
+  mitre: 'MITRE',
+  fim: 'FIM',
+};
+
+/** Turns a tool name like `get_sca_checks` into the plain-language domain it searches,
+ * `"SCA checks"` — strips the leading verb (get/search/lookup, none of which add meaning for a
+ * user) and renders every remaining underscore-joined word, uppercasing the handful of known
+ * catalog acronyms above. */
+function describeToolDomain(toolName: string): string {
+  return toolName
+    .replace(TOOL_NAME_VERB_PREFIX_RE, '')
+    .split('_')
+    .filter(word => word.length > 0)
+    .map(word => TOOL_DOMAIN_ACRONYMS[word] ?? word)
+    .join(' ');
+}
+
+/** Caller-supplied filter keys renamed to the word a user would recognize, e.g. `agent_id` ->
+ * "agent" rather than the raw parameter name. Any key absent from this map still renders fine —
+ * `describeSearchFilters` falls back to spacing out its own underscores. */
+const FILTER_KEY_LABELS: Record<string, string> = {
+  agent_id: 'agent',
+  policy_id: 'policy',
+  cve_id: 'CVE',
+  detector_type: 'detector type',
+  rule_id: 'rule',
+  // D4 fix (AI/plan/d-review.md): NOT mapped to 'indicator' here on purpose -- for
+  // `lookup_indicator`, `describeToolDomain('lookup_indicator')` already resolves to "indicator"
+  // (the verb-prefix strip leaves just that one word), so an explicit entry here produced the
+  // doubled "(Searched: indicator, filtered to indicator 124.70.213.43.)" copy bug. The fallback
+  // (`key.replace(/_/g, ' ')`) renders the bare key "indicator" identically anyway, so omitting
+  // this entry changes nothing about the label itself -- it only removes the redundant mapping.
+};
+/** Never part of the user-facing filter description: `limit` is a page-size mechanism, not
+ * something the user asked to narrow by. `query_dsl` (D3 fix, AI/plan/d-review.md) is
+ * `search_wazuh_data`'s escape-hatch parameter — declared `type: 'string'` in its schema, but the
+ * string it carries is raw Elasticsearch DSL JSON, not a user-meaningful value. Excluding objects
+ * and arrays (the type guard below) does not catch it because the DSL rides in as a STRING; left
+ * unexcluded, a zero-row `search_wazuh_data` call rendered "query dsl {"query":{"bool": ..." into
+ * user-facing copy whose own doc comment promises plain language and no mechanism internals. */
+const FILTER_KEYS_EXCLUDED_FROM_SCOPE = new Set(['limit', 'query_dsl']);
+/** Defensive length cap for a single filter clause's value (D3 fix): `query_dsl` above is the
+ * known case, but this bounds ANY future string parameter the same way, so a new escape-hatch-
+ * shaped argument cannot reopen this defect by accident. */
+const FILTER_VALUE_MAX_LENGTH = 60;
+
+/**
+ * Renders a tool call's resolved arguments as short "label value" clauses (e.g. `"agent 003"`,
+ * `"policy CIS_Ubuntu"`), plus one combined time-window clause when either time-range bound was
+ * supplied — never two separate gte/lte clauses, which would read as two unrelated filters
+ * instead of the one narrowing they actually are. Only scalar (string/number/boolean) argument
+ * values are described; an object/array argument is skipped rather than JSON-dumped into
+ * user-facing copy.
+ */
+function describeSearchFilters(args: Record<string, unknown>): string[] {
+  const clauses: string[] = [];
+  for (const [key, value] of Object.entries(args)) {
+    if (
+      FILTER_KEYS_EXCLUDED_FROM_SCOPE.has(key) ||
+      key === 'time_range_gte' ||
+      key === 'time_range_lte' ||
+      value === undefined ||
+      value === ''
+    ) {
+      continue;
+    }
+    if (
+      typeof value !== 'string' &&
+      typeof value !== 'number' &&
+      typeof value !== 'boolean'
+    ) {
+      continue;
+    }
+    const label = FILTER_KEY_LABELS[key] ?? key.replace(/_/g, ' ');
+    const shown =
+      String(value).length > FILTER_VALUE_MAX_LENGTH
+        ? `${String(value).slice(0, FILTER_VALUE_MAX_LENGTH)}…`
+        : String(value);
+    clauses.push(`${label} ${shown}`);
+  }
+  const gte = args.time_range_gte;
+  const lte = args.time_range_lte;
+  if (typeof gte === 'string' || typeof lte === 'string') {
+    clauses.push(
+      `time window ${typeof gte === 'string' ? gte : 'the start'} to ` +
+        `${typeof lte === 'string' ? lte : 'now'}`,
+    );
+  }
+  return clauses;
+}
+
+/**
+ * Builds the full N1 empty-result sentence: the base copy plus, when a real tool call was
+ * attempted this turn, a parenthetical naming what it searched. Returns the unmodified base
+ * message when no tool call is on record (defensive — `noTextFallbackMessage` only reaches this
+ * branch when `toolUsedThisTurn` is true, so this should always have one, but a missing record
+ * degrades to the honest pre-N1 sentence rather than a broken parenthetical).
+ */
+/** Defensive cap on an embedded, already-classified suggestion clause (see
+ * `classifyToolErrorForFallback` below) -- these are short, hand-written, bounded strings by
+ * construction (the same convention every other bounded tool-result error in this catalog
+ * follows), but this backstops any future one that is not, the same defensive posture
+ * `FILTER_VALUE_MAX_LENGTH` applies to a filter clause value. */
+const TOOL_ERROR_MESSAGE_MAX_LENGTH = 300;
+
+/**
+ * REVIEW FIX F1 (groupA-regression-review.md, REQUIRED) folded in directly (ported from deploy
+ * commit aa75dc38a alongside CV-033/CV-066's original errorMessage plumbing, deploy commit
+ * 424164be7): `buildNoMatchingResultsMessage` must never render an arbitrary `{error: "..."}`
+ * tool result verbatim into user-facing copy -- that channel also carries guardrail-violation text
+ * and raw `sanitizeError()` output, both of which may echo mechanism vocabulary or a
+ * privacy-mode pseudonym (this text renders outside the per-round depseudonymization pipeline).
+ * This is a STRICT ALLOWLIST: only get_field_values' two vetted, schema-only error shapes (an
+ * unknown field, or an invalid field/family pairing -- see get-field-values.ts's `buildRequest`)
+ * are recognized and rewritten into short, user-vocabulary copy. Every other shape returns
+ * `undefined` and the caller falls back to the plain "no matching results" sentence.
+ */
+function classifyToolErrorForFallback(message: string): string | undefined {
+  if (
+    message.includes("is not one of this tool's vetted, bounded-cardinality")
+  ) {
+    const suggestionMatch = message.match(
+      /(Closest known fields: .*\.|No similarly-named known field was found\.)\s*$/,
+    );
+    return suggestionMatch
+      ? `that field isn't one this tool can look up. ${suggestionMatch[1]}`
+      : "that field isn't one this tool can look up.";
+  }
+  if (/^Parameter "index_family" \(.*\) is not valid for field/.test(message)) {
+    const surfacesMatch = message.match(
+      /(Valid surfaces for this field: [^.]*\.)\s*$/,
+    );
+    return surfacesMatch
+      ? `that isn't a valid data surface for this field. ${surfacesMatch[1]}`
+      : "that isn't a valid data surface for this field.";
+  }
+  return undefined;
+}
+
+function buildNoMatchingResultsMessage(
+  lastToolCall:
+    | { name: string; args: Record<string, unknown>; errorMessage?: string }
+    | undefined,
+): string {
+  if (!lastToolCall) {
+    return NO_MATCHING_RESULTS_MESSAGE;
+  }
+  // BLOCKER FIX (empty-answer audit, 2026-08-20, CV-033/CV-066; ported deploy commits
+  // 424164be7 + aa75dc38a's F1 fix folded together): a REJECTED/ERRORED call (a bad parameter, an
+  // unknown field, an invalid field/family pairing) is a different finding from a valid call that
+  // genuinely matched nothing, and only a narrow, vetted allowlist of error shapes
+  // (`classifyToolErrorForFallback`) is ever surfaced here -- never the raw error channel.
+  const classified = lastToolCall.errorMessage
+    ? classifyToolErrorForFallback(lastToolCall.errorMessage)
+    : undefined;
+  if (classified) {
+    const domain = describeToolDomain(lastToolCall.name);
+    const shown =
+      classified.length > TOOL_ERROR_MESSAGE_MAX_LENGTH
+        ? `${classified.slice(0, TOOL_ERROR_MESSAGE_MAX_LENGTH)}…`
+        : classified;
+    return `The ${domain} lookup could not run as asked: ${shown}`;
+  }
+  const domain = describeToolDomain(lastToolCall.name);
+  // D4 fix (AI/plan/d-review.md): for `lookup_indicator`, `domain` is already "indicator" (the
+  // verb-prefix strip leaves just that one word) and its own filter clause would ALSO read
+  // "indicator <value>" -- rendering both produced the doubled "(Searched: indicator, filtered
+  // to indicator 124.70.213.43.)" copy bug. A filter clause whose label is exactly the domain word
+  // is redundant with the domain itself (the domain already told the reader what was searched),
+  // so it is dropped from the filtered-to list rather than repeated.
+  const filters = describeSearchFilters(lastToolCall.args).filter(
+    clause => !clause.toLowerCase().startsWith(`${domain.toLowerCase()} `),
+  );
+  const scope =
+    filters.length > 0
+      ? `${domain}, filtered to ${filters.join(', ')}`
+      : domain;
+  return `${NO_MATCHING_RESULTS_MESSAGE} (Searched: ${scope}.)`;
+}
+
+/**
+ * BLOCKER FIX (backlog CV-017 residual, "stale digest after silent mid-turn error"; ported from
+ * deploy commit 872704fd4): the NO_ANALYSIS_TEXT_MESSAGE/NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE
+ * copy below (the `sawNonEmptyTable === true` branch of `noTextFallbackMessage`) only ever says
+ * "see the results above" — it has no idea whether the table on screen actually reflects the
+ * question that was asked. CV-017's live shape: an EARLIER, broader call already rendered a
+ * (real, non-empty) table, but the actual LAST call this turn attempted — a narrower, correctly-
+ * scoped follow-up the question needed — errored silently. Without this, the fallback sentence
+ * describes that earlier, broader table as though it were the answer, with no hint that the real,
+ * scoped lookup never completed.
+ *
+ * `lastToolCall.errorMessage` is set ONLY on an error outcome (see `lastAttemptedToolCall`'s
+ * assignment site above), so its mere presence already proves the LAST attempt this turn did not
+ * make it into the table on screen — no extra bookkeeping needed to tell "last attempt errored"
+ * apart from "last attempt succeeded and is already what the table describes".
+ *
+ * Reuses `classifyToolErrorForFallback`'s narrow, vetted allowlist (the same one
+ * `buildNoMatchingResultsMessage` above uses) so this never echoes a raw OpenSearch/Node
+ * exception or a pseudonym into user-facing copy — an unclassified error still gets a truthful,
+ * generic "did not complete" clause rather than staying silent about it. Returns `''` when there
+ * is nothing to add (no last attempt, or it succeeded), so every call site can simply append this
+ * to an existing sentence unconditionally.
+ */
+function describeErroredLastAttempt(
+  lastToolCall:
+    | { name: string; args: Record<string, unknown>; errorMessage?: string }
+    | undefined,
+): string {
+  if (!lastToolCall?.errorMessage) {
+    return '';
+  }
+  const domain = describeToolDomain(lastToolCall.name);
+  const classified = classifyToolErrorForFallback(lastToolCall.errorMessage);
+  return classified
+    ? ` The most recent ${domain} lookup could not run as asked: ${classified}`
+    : ` The most recent, more specific ${domain} lookup attempted did not complete, so the ` +
+        'results above may not fully answer the question as scoped.';
+}
+
 /**
  * Variant of NO_ANALYSIS_TEXT_MESSAGE for a turn that exhausted its tool-round budget (a serial
  * chain deeper than MAX_TOOL_ROUNDS) and still produced no text even after
@@ -221,6 +473,9 @@ export function withFinalRoundAnswerInstruction(
   ];
 }
 
+/* ADAPTATION (branch 8997): workstream C's cost-budget helper functions (toolCallCostUnits,
+ * isRoundFutile, extractEnumeratedTargets, shouldGrantBudgetExtension) are dropped here -- they
+ * live on enhancement/8998-ai-assistant-tool-budget, which owns C's round-loop mechanism. */
 /**
  * Issue #8911: a tool round that produced only rejected/errored calls (no successful digest/table)
  * is, for round-budget purposes, indistinguishable from a productive one — the loop below just
@@ -245,28 +500,41 @@ export function shouldEnterFinalRoundEarly(
 }
 
 /** Picks which of the three no-text fallbacks above fits a turn that ended without any `delta`
- * text — shared by both `!sawAnyDelta` exit points below (the normal per-round `done` branch and
- * the round-budget-exhausted path) so the same three-way decision lives in exactly one place. */
+ * text — shared by every `!roundSawAnyDelta` exit point below (the normal per-round `done` branch,
+ * the forced-round dead-stream guard, and the round-budget-exhausted path) so the same three-way
+ * decision lives in exactly one place. */
 export function noTextFallbackMessage(
   toolUsedThisTurn: boolean,
   sawNonEmptyTable: boolean,
   roundsExhausted: boolean,
+  // N1 (optional, appended last so every pre-existing call site — including the two that already
+  // omit `roundsExhausted`/this param entirely — keeps compiling unchanged): the last real tool
+  // call this turn attempted, used only to enrich the zero-row branch below.
+  lastToolCall?: {
+    name: string;
+    args: Record<string, unknown>;
+    errorMessage?: string;
+  },
 ): string {
   if (!toolUsedThisTurn) {
     return NO_ANSWER_MESSAGE;
   }
   if (!sawNonEmptyTable) {
-    return NO_MATCHING_RESULTS_MESSAGE;
+    return buildNoMatchingResultsMessage(lastToolCall);
   }
-  return roundsExhausted
-    ? NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE
-    : NO_ANALYSIS_TEXT_MESSAGE;
+  // CV-017 residual fix: append the honest "last attempt errored" clause (empty string when the
+  // last attempt succeeded, or there was none) — see `describeErroredLastAttempt`'s doc comment.
+  return (
+    (roundsExhausted
+      ? NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE
+      : NO_ANALYSIS_TEXT_MESSAGE) + describeErroredLastAttempt(lastToolCall)
+  );
 }
 
 /** Whitespace-only delta content (e.g. a lone "\n\n" some models emit as priming/formatting
  * right before a tool call) must NOT count as "the model produced an answer" — otherwise the
- * `sawAnyDelta` guard above never fires for exactly the turns it exists to catch. Still forwarded
- * to the client as a normal delta either way; this only affects the tracking flag. */
+ * `roundSawAnyDelta` guard above never fires for exactly the turns it exists to catch. Still
+ * forwarded to the client as a normal delta either way; this only affects the tracking flag. */
 function hasMeaningfulText(content: string): boolean {
   return content.trim().length > 0;
 }
@@ -400,6 +668,41 @@ function isToolResultError(content: string): boolean {
   } catch {
     return false;
   }
+}
+
+/**
+ * BLOCKER FIX (empty-answer audit, 2026-08-20, CV-033/CV-066; ported from deploy commit
+ * 424164be7): extracts the bounded error string from a `{error: "..."}` tool-result payload, or
+ * `undefined` when `content` is not that shape (same shape test as `isToolResultError` -- kept as
+ * a separate function rather than having that one return the string too, so its existing boolean
+ * call sites are untouched).
+ *
+ * WHY THIS EXISTS: `get_field_values`'s own `buildRequest` already throws a specific, genuinely
+ * useful error for an unknown field or an invalid field/family pairing -- "Closest known fields:
+ * host.os.platform, ..." for a typo, "Valid surfaces: findings, events" for a wrong family. Before
+ * this fix, that message reached `messages` as the tool-result content (so the MODEL could read
+ * it), but if the model's own next turn produced no text, the deterministic fallback
+ * (`buildNoMatchingResultsMessage`) discarded it entirely and substituted the generic "No matching
+ * results were found for that query" sentence -- indistinguishable, to the user, from a genuine
+ * zero-row search. A rejected/errored call and an executed-but-empty one are different findings
+ * ("the request itself was invalid" vs. "the request was valid and nothing matched") and deserve
+ * different copy.
+ */
+function extractToolErrorMessage(content: string): string | undefined {
+  try {
+    const parsed: unknown = JSON.parse(content);
+    if (
+      parsed &&
+      typeof parsed === 'object' &&
+      !Array.isArray(parsed) &&
+      typeof (parsed as Record<string, unknown>).error === 'string'
+    ) {
+      return (parsed as Record<string, unknown>).error as string;
+    }
+  } catch {
+    // Not JSON, or not the error shape -- no message to extract.
+  }
+  return undefined;
 }
 
 /**
@@ -1112,15 +1415,37 @@ export async function* orchestrate(
   let tools: ToolSpec[] | undefined = listToolSpecs();
   let messages = initialMessages;
   let sawNonEmptyTable = false;
-  // Whole-turn guards (not per-round, unlike `sawToolCall` below which resets every round): true
-  // once ANY delta text / tool call has happened THIS TURN, across every round — see
+  // N1 fix (AI/plan/qa-battery-v31.md): the most recent REAL tool call this turn attempted to
+  // execute (name + real/reversed arguments), regardless of outcome — the only state
+  // `noTextFallbackMessage`'s zero-row branch has available to describe WHAT was searched when
+  // the model itself never wrote a word (see `describeEmptySearchScope` below, and that
+  // function's doc comment for why this must stay mechanism-free). Overwritten on every real
+  // tool-call attempt (not just successful ones) so it always reflects the LAST thing this turn
+  // actually tried, which is what the empty-result copy is standing in for.
+  let lastAttemptedToolCall:
+    | { name: string; args: Record<string, unknown>; errorMessage?: string }
+    | undefined;
+  // True once ANY delta text has happened in the CURRENT round -- see
   // NO_ANALYSIS_TEXT_MESSAGE/NO_MATCHING_RESULTS_MESSAGE/NO_ANSWER_MESSAGE above. `toolUsedThisTurn`
-  // now only picks WHICH fallback copy fits (tables-oriented vs. the generic one) — every no-text
-  // ending gets *some* fallback text; see the `!sawAnyDelta` branches below. It no longer gates
+  // picks WHICH fallback copy fits (tables-oriented vs. the generic one) — every no-text ending
+  // gets *some* fallback text; see the `!roundSawAnyDelta` branches below. It no longer gates
   // whether a fallback fires at all: a plain no-tool conversational turn that ends with no text is
   // exactly the case a `general`-routed reasoning-only stream produces (issue
   // 02-read-reasoning-delta.md), and it deserves a sentence, not a silently empty bubble.
-  let sawAnyDelta = false;
+  //
+  // BLOCKER FIX (backlog CV-039 residual, "sweep ends without closing text"; ported from deploy
+  // commit 872704fd4): this used to be a WHOLE-TURN flag (`sawAnyDelta`, set once and never
+  // cleared) instead of a round-scoped one. A multi-kind inventory sweep routinely narrates once
+  // early ("I checked the agent list... let me pull that data") and then spends every remaining
+  // round on back-to-back tool_calls with no further text, so by the time the round budget closes
+  // mid-sweep the whole-turn flag was already permanently `true` from that first round and its
+  // `!sawAnyDelta` guards never fired for the round that actually ends the turn -- exactly the gap
+  // the comment above describes wanting ("every no-text ending gets *some* fallback text") but a
+  // whole-turn flag cannot deliver, since it never forgets an earlier round's text. Declared here
+  // (outside the round loop) but reset to `false` at the TOP of every loop iteration (not
+  // re-`let`-declared inside the loop body) so it still holds the LAST round's value once the loop
+  // exits, for the post-loop round-budget-exhaustion check.
+  let roundSawAnyDelta = false;
   let toolUsedThisTurn = false;
   // Bounds the suggest_discover_query self-correction loop to ONE retry per turn (issue #8920 item
   // 9): the first `unknown_fields` resolution this turn is returned as a tool error instead of a
@@ -1164,6 +1489,9 @@ export async function* orchestrate(
   // round in this turn had at least one successful (non-rejected/non-errored) tool call, and set
   // when the round loop below should make its NEXT iteration the final round early.
   let hadSuccessfulRoundEarlier = false;
+  // ADAPTATION (branch 8997): the M1/M2 `hadNonEmptySuccessfulRoundEarlier` tracker that used to
+  // sit here fed only the C-owned futility stop dropped above (see the ADAPTATION note near
+  // isRoundFutile) -- removed as dead state along with it.
   let forceFinalRoundEarly = false;
   // Sum of every provider call's `usage` THIS TURN — the stage-1 routing call (if the router ran)
   // plus every round of the loop below, INCLUDING non-final rounds whose `done` is otherwise
@@ -1289,7 +1617,7 @@ export async function* orchestrate(
     // outstanding request, so "I already presented the data, nothing to add" is a rational
     // completion rather than a malfunction, and the turn ends with no text at all: measured on
     // openai/gpt-oss-120b over a 40-question analyst-persona bank, 6/40 turns ended on the
-    // `!sawAnyDelta` fallback below, every one with the same 4-tool-call signature (the 3
+    // `!roundSawAnyDelta` fallback below, every one with the same 4-tool-call signature (the 3
     // tool-bearing rounds this budget allows plus stage 1's own forced `route_question`), and 4 of
     // those 6 had already rendered a NON-EMPTY table — a non-answer sitting directly above real
     // data the user asked to have interpreted.
@@ -1338,6 +1666,9 @@ export async function* orchestrate(
 
     let sawToolCall = false;
     let ended = false;
+    // Reset every round -- see `roundSawAnyDelta`'s declaration above the loop for why this is a
+    // reset (not a fresh `let`): it must still hold this iteration's value once the loop exits.
+    roundSawAnyDelta = false;
     // Deferred-offer interception, per-round state (issue #8935 item I3): `roundText` is every
     // delta this round actually yielded to the client (main deltas plus both trailing-buffer
     // flushes), reset fresh each round so a PRIOR round's text can never be mistaken for THIS
@@ -1393,7 +1724,7 @@ export async function* orchestrate(
         }
         if (content) {
           if (hasMeaningfulText(content)) {
-            sawAnyDelta = true;
+            roundSawAnyDelta = true;
           }
           roundText += content;
           yield { type: 'delta', content };
@@ -1412,7 +1743,7 @@ export async function* orchestrate(
           const trailing = drainRoundBuffers();
           if (trailing) {
             if (hasMeaningfulText(trailing)) {
-              sawAnyDelta = true;
+              roundSawAnyDelta = true;
             }
             roundText += trailing;
             yield { type: 'delta', content: trailing };
@@ -1610,6 +1941,12 @@ export async function* orchestrate(
           ...event.toolCall,
           arguments: realArguments,
         };
+        // N1: recorded for EVERY real attempt (success, rejection, or execution error alike) —
+        // see `lastAttemptedToolCall`'s doc comment above for why the outcome does not gate this.
+        lastAttemptedToolCall = {
+          name: event.toolCall.name,
+          args: realArguments,
+        };
 
         // Forwarded for transparency and for the eval harness: which tool ran, with which
         // arguments. The UI currently ignores it (unknown types fall through in chat-page.tsx).
@@ -1662,6 +1999,19 @@ export async function* orchestrate(
         // risks loops -- recorded as a deliberate bound of this mechanism, not an oversight.
         if (!isToolResultError(outcome.toolResultContent)) {
           executedToolNames.add(event.toolCall.name);
+        }
+
+        // BLOCKER FIX (empty-answer audit, 2026-08-20, CV-033/CV-066; ported from deploy commit
+        // 424164be7): backfill the specific error text onto the already-recorded
+        // `lastAttemptedToolCall` (set before `outcome` existed, above) now that it does. Only
+        // ever set for the error shape -- `extractToolErrorMessage` returns `undefined` for a
+        // real result, leaving `errorMessage` unset so `buildNoMatchingResultsMessage`'s generic
+        // branch is unaffected for a genuinely empty successful call.
+        const attemptedErrorMessage = extractToolErrorMessage(
+          toolResultContentForModel,
+        );
+        if (attemptedErrorMessage && lastAttemptedToolCall) {
+          lastAttemptedToolCall.errorMessage = attemptedErrorMessage;
         }
 
         if (outcome.tableEvent) {
@@ -1729,7 +2079,7 @@ export async function* orchestrate(
           const trailing = drainRoundBuffers();
           if (trailing) {
             if (hasMeaningfulText(trailing)) {
-              sawAnyDelta = true;
+              roundSawAnyDelta = true;
             }
             roundText += trailing;
             yield { type: 'delta', content: trailing };
@@ -1818,13 +2168,14 @@ export async function* orchestrate(
         // any text at all — see NO_ANALYSIS_TEXT_MESSAGE/NO_ANSWER_MESSAGE's doc comments. Which
         // copy fits depends on whether a tool ran earlier this turn; if none did, there is no
         // table and no query to reference, so NO_ANSWER_MESSAGE is used instead.
-        if (!sawAnyDelta) {
+        if (!roundSawAnyDelta) {
           yield {
             type: 'delta',
             content: noTextFallbackMessage(
               toolUsedThisTurn,
               sawNonEmptyTable,
               isFinalRound,
+              lastAttemptedToolCall,
             ),
           };
         }
@@ -1884,13 +2235,14 @@ export async function* orchestrate(
         // suppressed -- returning bare here would close the SSE stream with no terminating frame,
         // strictly worse than base. Emit the clean termination the suppressed 'done' owed the
         // client (same policy as the forced-round 'error' branch above).
-        if (!sawAnyDelta) {
+        if (!roundSawAnyDelta) {
           yield {
             type: 'delta',
             content: noTextFallbackMessage(
               toolUsedThisTurn,
               sawNonEmptyTable,
-              true,
+              false,
+              lastAttemptedToolCall,
             ),
           };
         }
@@ -1919,10 +2271,15 @@ export async function* orchestrate(
   // above; close the SSE stream rather than hang the client. Same widened no-text guard as the
   // main 'done' branch above — a model that never produced text deserves a written answer, not a
   // bare done, regardless of whether a tool ran.
-  if (!sawAnyDelta) {
+  if (!roundSawAnyDelta) {
     yield {
       type: 'delta',
-      content: noTextFallbackMessage(toolUsedThisTurn, sawNonEmptyTable, true),
+      content: noTextFallbackMessage(
+        toolUsedThisTurn,
+        sawNonEmptyTable,
+        true,
+        lastAttemptedToolCall,
+      ),
     };
   }
   yield* emitPrivacyMapOnce();

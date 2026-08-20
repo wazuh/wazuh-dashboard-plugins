@@ -109,6 +109,16 @@ export interface ToolDefinition {
   digest: {
     sampleColumns: string[];
     /**
+     * Opt-in per-field truncation for sample columns whose source text is long free prose (e.g.
+     * SCA's `check.rationale`/`check.remediation` — see `get-sca-checks.ts`). `digest.ts`'s
+     * `truncateLongFieldValues` uses `sampleFieldMaxLength[key]` in place of the generic
+     * `MAX_FIELD_VALUE_LENGTH` when a key is listed here, so a field that is routinely long can be
+     * capped tighter than the shared default without lowering it for every other tool. Keys not
+     * listed (or when this map itself is `undefined`, every tool but SCA) fall back to
+     * `MAX_FIELD_VALUE_LENGTH` unchanged.
+     */
+    sampleFieldMaxLength?: Record<string, number>;
+    /**
      * Opt-in (currently only the 8 finding-hits tools, via `catalog/common.ts`'s
      * `FINDING_BREAKDOWN_DIMENSIONS`): dot-paths digest.ts's `buildDigest` groups ALL returned
      * rows by (not just the `MAX_SAMPLES` slice) to synthesize a `breakdown` when the tool's own

@@ -1170,3 +1170,100 @@ test('orchestrate: a second offer after one force was already spent this turn do
   // force is delivered to the round AFTER detection, never the detecting round itself.
   assert.equal(callOptions[2]?.toolChoice, 'auto');
 });
+
+// --- orchestrate: BLOCKER FIX (backlog CV-039 + CV-017 residuals; ported from deploy commits ----
+// --- 872704fd4 + ca142293c) -----------------------------------------------------------------------
+//
+// CV-039's live shape: the model narrates ONCE, early ("Let me check the SCA policy compliance
+// for this agent"), then a LATER round in the same turn is rejected (a bad/missing parameter),
+// which -- since an EARLIER round already succeeded -- forces the NEXT round to be the final
+// (tools-off) round early (`shouldEnterFinalRoundEarly`). That forced-final round then ends with
+// NO text and NO tool call. Before the CV-039 fix, `orchestrate` tracked "did the model ever
+// produce text this turn" as a WHOLE-TURN flag (`sawAnyDelta`) that, once set by the FIRST round's
+// narration, stayed `true` for the rest of the turn -- so the round that actually ends the turn
+// (with a non-empty table already on screen and nothing else to say) skipped the no-text fallback
+// entirely. Fixed by making the flag round-scoped (`roundSawAnyDelta`, reset every round).
+//
+// CV-017's live shape, layered on the same scenario: the rejected round is also the LAST call this
+// turn attempted, so the fallback text must honestly say that specific, more targeted attempt
+// never completed -- not just silently point at the earlier table (`describeErroredLastAttempt`,
+// threaded through `noTextFallbackMessage`'s `sawNonEmptyTable === true` branch).
+
+test(
+  'orchestrate: a round that narrates early, then a later rejected round forces the final ' +
+    'round early, which ends silently -> still gets closing text that both fires (CV-039) and ' +
+    'names the last, unresolved attempt (CV-017)',
+  async () => {
+    const { context } = scaContext();
+    const { events, callMessages } = await runOrchestrate(
+      [
+        STAGE1_SCA_SCRIPT,
+        // round 0: narrates, THEN calls get_sca_results (real tool, succeeds against the canned
+        // response) -- sets the whole-turn "saw text" state that used to mask everything below.
+        [
+          {
+            type: 'delta',
+            content: 'Let me check the SCA policy compliance for this agent.',
+          },
+          {
+            type: 'tool_call',
+            toolCall: {
+              id: 'call_sca_results',
+              name: 'get_sca_results',
+              arguments: { agent_id: '001' },
+            },
+          },
+          { type: 'done', usage: { inputTokens: 20, outputTokens: 10 } },
+        ],
+        // round 1: get_sca_results called again, this time missing the required agent_id --
+        // rejected by argument validation before any cluster access. Since round 0 already
+        // succeeded, this forces round 2 to be the final (tools-off) round early
+        // (`shouldEnterFinalRoundEarly`) instead of waiting for the full MAX_TOOL_ROUNDS budget.
+        REJECTED_SCA_RESULTS_ROUND,
+        // round 2 (forced final, no tools offered): ends with NO text and NO tool call -- the exact
+        // "sweep ends silently" shape. This must still trigger the no-text fallback.
+        [{ type: 'done', usage: { inputTokens: 5, outputTokens: 0 } }],
+      ],
+      context,
+    );
+
+    assert.equal(
+      callMessages.length,
+      4,
+      'stage1 + the narrated success round + the rejected round + the forced-early final round',
+    );
+
+    const deltaEvents = events.filter(
+      (e): e is Extract<StreamEvent, { type: 'delta' }> => e.type === 'delta',
+    );
+    const text = deltaEvents
+      .map(e => e.content)
+      .join('')
+      .trim();
+    assert.notEqual(
+      text,
+      'Let me check the SCA policy compliance for this agent.',
+      'the turn must not end with ONLY the early narration and no closing text for the round that ' +
+        'actually ended the turn',
+    );
+    assert.match(
+      text,
+      /analysis limit/i,
+      'falls back to the truthful "see results above" copy once the forced-early final round ' +
+        'ends silently (CV-039)',
+    );
+    assert.match(
+      text,
+      /did not complete/,
+      'and admits the LAST, more specific attempt (the rejected get_sca_results retry) never ' +
+        'completed, instead of silently standing in for it (CV-017)',
+    );
+
+    const doneEvents = events.filter(e => e.type === 'done');
+    assert.equal(
+      doneEvents.length,
+      1,
+      'the SSE stream must still close with exactly one terminating done frame',
+    );
+  },
+);

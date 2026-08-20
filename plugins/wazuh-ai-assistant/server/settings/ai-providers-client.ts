@@ -125,7 +125,7 @@ export class AiProvidersClient {
     } catch (error) {
       if (typeof error?.meta?.body?.error === 'string') {
         // This catches error related to missing endpoint that is returned in error.meta.body.error as string
-        throw new Error(error?.meta?.body?.error);
+        throw new Error(error?.meta?.body?.error, { cause: error });
       }
       throw error;
     }

@@ -20,13 +20,23 @@ test('resolveStage2Tools(general) returns the minimal set, never undefined/empty
   const specs = resolveStage2Tools(['general']);
   assert.ok(Array.isArray(specs), 'must return an array, never undefined');
   const names = specs.map(spec => spec.name).sort();
-  assert.deepEqual(names, ['get_security_summary', 'search_wazuh_data']);
+  // get_field_values joins search_wazuh_data as an always-on tool (workstream B, "verify before
+  // filter") -- see router.ts's TOOL_CATEGORY/resolveStage2Tools doc comments.
+  assert.deepEqual(names, [
+    'get_field_values',
+    'get_security_summary',
+    'search_wazuh_data',
+  ]);
 });
 
 test('resolveStage2Tools: a data category resolution is unchanged', () => {
   const specs = resolveStage2Tools(['agents']);
   const names = specs.map(spec => spec.name).sort();
-  assert.deepEqual(names, ['get_agents', 'search_wazuh_data']);
+  assert.deepEqual(names, [
+    'get_agents',
+    'get_field_values',
+    'search_wazuh_data',
+  ]);
 });
 
 test('resolveStage2Tools: general + a data category still resolves that category', () => {
@@ -117,7 +127,11 @@ test('CO_ROUTED_CATEGORIES: every pair is symmetric and names a real category (c
 
 test('every general-alone turn still gets the minimal recovery set, unchanged by co-routing', () => {
   const names = resolveStage2Tools(['general']).map(spec => spec.name);
-  assert.deepEqual(names.sort(), ['get_security_summary', 'search_wazuh_data']);
+  assert.deepEqual(names.sort(), [
+    'get_field_values',
+    'get_security_summary',
+    'search_wazuh_data',
+  ]);
 });
 test('the "findings" category description mentions top/noisiest agents (get_top_agents routing)', () => {
   // Pins get_top_agents' routing hint in TOOL_CATEGORY/CATEGORY_DESCRIPTIONS -- with no test, this
@@ -165,6 +179,44 @@ test('the "inventory" category description covers "software" and vague host phra
       'named/numbered agents',
   );
 });
+
+/**
+ * REVIEW FOLLOW-UP (CV-077, live battery re-run 2026-08-20): "What spaces exist and what does
+ * each contain?" declined with "I don't have the tool needed... available in this turn" -- the
+ * prompt-level decline-copy fix (prompts.ts, see the RBAC/spaces disambiguation note) correctly
+ * stopped the WRONG (RBAC-permissions) decline from firing, but stage-1 routing still never
+ * offered get_threat_intel_components at all: the "security_analytics" category menu line never
+ * used the word "space"/"spaces" anywhere, even though that is exactly the vocabulary the
+ * question (and get_threat_intel_components' own `space` parameter) uses. A stage-1 router
+ * choosing a category from a description-only menu has no way to match a word that literally
+ * never appears in any category's text.
+ */
+test(
+  'the "security_analytics" category description covers Security Analytics "spaces" ' +
+    '(content grouping), disambiguated from an RBAC/dashboard permission space',
+  () => {
+    const prompt = buildRoutingPrompt('2026-01-01T00:00:00.000Z');
+    const line = prompt
+      .split('\n')
+      .find(l => l.trim().startsWith('- security_analytics:'));
+    assert.ok(
+      line,
+      'routing prompt must list a "security_analytics" menu entry',
+    );
+    assert.match(
+      line as string,
+      /\bSPACES\b/,
+      'security_analytics description must literally say "spaces" so the stage-1 router can match ' +
+        'a "what spaces exist" question to this category',
+    );
+    assert.match(
+      line as string,
+      /different "space" than an RBAC\/dashboard permission/,
+      'must disambiguate from an RBAC/dashboard permission space, not just introduce a second, ' +
+        'equally-ambiguous meaning of the same word',
+    );
+  },
+);
 
 /**
  * Out-of-scope regression: M-OOS-01/02 (active-response questions) and M-OOS-05 (agent

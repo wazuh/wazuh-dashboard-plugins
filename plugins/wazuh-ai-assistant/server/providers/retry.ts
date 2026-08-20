@@ -437,14 +437,29 @@ export async function* fetchProviderWithRetry(
     }
 
     if (!RETRYABLE_STATUSES.has(response.status) || attempt >= MAX_RETRIES) {
+      // BLOCKER FIX (Group G, provider rate-limit transparency): every retry attempt already
+      // yields an honest, provider-attributed, mechanism-free STATUS line for a 429 ("Provider
+      // rate limit reached — retrying in Ns…", above) — but once the retry budget is exhausted,
+      // this branch used to fall through to the generic "Provider responded with HTTP {status}:
+      // {raw sanitized body}" message for EVERY retryable status alike, losing the 429-specific
+      // "this is transient, try again" framing and surfacing the provider's own raw error body
+      // (developer-facing JSON/text) instead of a plain sentence. A 429 gets its own terminal
+      // copy: still honest (it says the rejection came from the AI provider, never a generic
+      // "something went wrong") and still mechanism-free (no retry count, backoff, or budget
+      // vocabulary), but framed as a transient condition worth retrying rather than a bare status
+      // dump. Every OTHER retryable status (500/502/503/504/529) keeps the existing generic
+      // message unchanged — this is scoped to 429 specifically.
       yield {
         type: 'error',
-        message: `Provider responded with HTTP ${
-          response.status
-        }: ${sanitizeProviderErrorBody(
-          extractProviderErrorMessage(bodyText),
-          secret,
-        )}`,
+        message:
+          response.status === 429
+            ? 'The AI provider rejected this request due to rate limits — try again in a moment.'
+            : `Provider responded with HTTP ${
+                response.status
+              }: ${sanitizeProviderErrorBody(
+                extractProviderErrorMessage(bodyText),
+                secret,
+              )}`,
       };
       return undefined;
     }
