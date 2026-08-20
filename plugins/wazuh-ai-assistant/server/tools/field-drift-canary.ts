@@ -241,9 +241,10 @@ export async function checkFieldDrift(
   for (const { family, index, allowlistFamily } of QUERIED_FAMILIES) {
     let result: FamilyDriftResult;
     try {
-      // eslint-disable-next-line no-await-in-loop -- a handful of small, independent _mapping
-      // calls at process start; sequential keeps this canary's own load on the indexer bounded
-      // and its log output ordered by family, which matters more here than shaving startup time.
+      // A handful of small, independent _mapping calls at process start; sequential keeps this
+      // canary's own load on the indexer bounded and its log output ordered by family, which
+      // matters more here than shaving startup time.
+      // eslint-disable-next-line no-await-in-loop
       result = await checkFamily(client, family, index, allowlistFamily);
     } catch (error) {
       logger.debug(

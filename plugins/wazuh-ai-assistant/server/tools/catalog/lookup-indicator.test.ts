@@ -7,6 +7,16 @@ function build(params: Record<string, unknown>): IndexerRequest {
   return lookupIndicatorTool.buildRequest(params) as IndexerRequest;
 }
 
+// Narrows the query DSL's `bool.filter[0].bool.should` clause list without an `any` cast --
+// every test below only ever needs this one shape out of the broader DSL union.
+function boolFilterShould(query: unknown): Array<Record<string, unknown>> {
+  return (
+    query as {
+      bool: { filter: Array<{ bool: { should: Array<Record<string, unknown>> } }> };
+    }
+  ).bool.filter[0].bool.should;
+}
+
 test('lookup_indicator: requires a non-empty indicator', () => {
   assert.throws(() => build({}), /indicator.*required/i);
   assert.throws(() => build({ indicator: '   ' }), /indicator.*required/i);
@@ -79,9 +89,7 @@ test('lookup_indicator: a non-IP indicator (hash/url/domain) is exact-term only,
 // (the character after "124.70.213.4" in the real record is "3", not ":").
 test('A-1 regression: 124.70.213.4 must NOT match 124.70.213.43\'s connection records', () => {
   const request = build({ indicator: '124.70.213.4' });
-  const shouldClauses = (request.body.query as any).bool.filter[0].bool.should as Array<
-    Record<string, unknown>
-  >;
+  const shouldClauses = boolFilterShould(request.body.query);
   const prefixClause = shouldClauses.find(clause => 'prefix' in clause) as
     | { prefix: { 'document.name': { value: string } } }
     | undefined;
@@ -101,16 +109,15 @@ test('A-1 regression: 124.70.213.4 must NOT match 124.70.213.43\'s connection re
 // longer, unrelated hostname.
 test('A-1 regression: google.com gets no prefix clause (would have matched *.sslip.io typosquats)', () => {
   const request = build({ indicator: 'google.com' });
-  const shouldClauses = (request.body.query as any).bool.filter[0].bool.should as Array<
-    Record<string, unknown>
-  >;
+  const shouldClauses = boolFilterShould(request.body.query);
   assert.equal(shouldClauses.some(clause => 'prefix' in clause), false);
 });
 
 test('lookup_indicator: trims the indicator and clamps limit to [1, 50]', () => {
   assert.equal(
-    (build({ indicator: '  evil.com  ' }).body.query as any).bool.filter[0]
-      .bool.should[0].term['document.name'].value,
+    (boolFilterShould(build({ indicator: '  evil.com  ' }).body.query)[0] as {
+      term: { 'document.name': { value: string } };
+    }).term['document.name'].value,
     'evil.com',
   );
   assert.equal(build({ indicator: 'x', limit: 9999 }).body.size, 50);

@@ -133,7 +133,7 @@ export class IndexSettingsProvider
         return undefined;
       }
       if (typeof error?.meta?.body?.error === 'string') {
-        throw new Error(error?.meta?.body?.error);
+        throw new Error(error?.meta?.body?.error, { cause: error });
       }
       throw error;
     }

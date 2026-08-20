@@ -261,11 +261,11 @@ export const getFieldValuesTool: ToolDefinition = {
    * prompt-only hint to know to ask again. Params are never rewritten here: the tool still queries
    * exactly the field/family the caller asked for (so `missing_count` on the empty twin remains
    * observable, per this scenario's own point), the note only tells the model where to look next. */
-  async resolveParams(params): Promise<ResolveParamsResult> {
+  resolveParams(params): Promise<ResolveParamsResult> {
     const resolvedParams: Record<string, unknown> = { ...params };
     const field = typeof params.field === 'string' ? params.field : undefined;
     if (!field || !isAggAllowedField(field) || FIELD_LOCATIONS[field] === undefined) {
-      return { ok: true, resolved: { params: resolvedParams } };
+      return Promise.resolve({ ok: true, resolved: { params: resolvedParams } });
     }
     const locations = FIELD_LOCATIONS[field];
     const requestedFamily = optionalStringParam(params.index_family);
@@ -273,11 +273,11 @@ export const getFieldValuesTool: ToolDefinition = {
       ? locations.find(candidate => candidate.family === requestedFamily)
       : locations[0];
     if (!location) {
-      return { ok: true, resolved: { params: resolvedParams } };
+      return Promise.resolve({ ok: true, resolved: { params: resolvedParams } });
     }
     const catalogFamily = TOOL_FAMILY_TO_CATALOG_FAMILY[location.family];
     if (!catalogFamily) {
-      return { ok: true, resolved: { params: resolvedParams } };
+      return Promise.resolve({ ok: true, resolved: { params: resolvedParams } });
     }
     const populatedTwin = resolveFieldAlias(catalogFamily, field);
     const resolved: ResolvedToolParams = { params: resolvedParams };
@@ -287,7 +287,7 @@ export const getFieldValuesTool: ToolDefinition = {
         `"${populatedTwin}" is the populated twin for the same data on this fleet; call ` +
         `get_field_values again with field "${populatedTwin}" to see the real distribution.`;
     }
-    return { ok: true, resolved };
+    return Promise.resolve({ ok: true, resolved });
   },
   buildRequest(params) {
     const field = requireNonEmptyString(

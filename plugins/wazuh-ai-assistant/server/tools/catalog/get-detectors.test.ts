@@ -73,10 +73,16 @@ test('get_detectors: table/digest columns stay within the declared _source', () 
   }
 });
 
+// Derived from resolveParams's own signature rather than imported from the OSD platform path,
+// matching the convention api-host.test.ts documents for the same reason.
+type ResolveParamsFn = Exclude<typeof getDetectorsTool.resolveParams, undefined>;
+type DetectorsContext = Parameters<ResolveParamsFn>[1];
+type DetectorsRequest = Parameters<ResolveParamsFn>[2];
+
 function fakeContext(
   searchImpl: (req: unknown) => Promise<unknown>,
   transportRequestImpl?: (req: unknown) => Promise<unknown>,
-) {
+): DetectorsContext {
   return {
     core: {
       opensearch: {
@@ -88,12 +94,16 @@ function fakeContext(
         },
       },
     },
-  } as any;
+  } as unknown as DetectorsContext;
 }
 
 test('get_detectors: resolveParams skips findings-count enrichment with no single detector_type', async () => {
   const search = jest.fn();
-  const result = await getDetectorsTool.resolveParams!({}, fakeContext(search), {} as any);
+  const result = await getDetectorsTool.resolveParams!(
+    {},
+    fakeContext(search),
+    {} as unknown as DetectorsRequest,
+  );
   assert.equal(result.ok, true);
   if (result.ok) {
     assert.equal(result.resolved.note, undefined);
@@ -109,7 +119,7 @@ test('get_detectors: resolveParams reports a positive findings count without per
   const result = await getDetectorsTool.resolveParams!(
     { detector_type: 'wazuh-generic' },
     fakeContext(search, transportRequest),
-    {} as any,
+    {} as unknown as DetectorsRequest,
   );
   assert.equal(result.ok, true);
   if (result.ok) {
@@ -130,7 +140,7 @@ test('get_detectors: resolveParams reports honest-empty guidance when persistenc
   const result = await getDetectorsTool.resolveParams!(
     { detector_type: 'suricata' },
     fakeContext(search, transportRequest),
-    {} as any,
+    {} as unknown as DetectorsRequest,
   );
   assert.equal(result.ok, true);
   if (result.ok) {
@@ -147,7 +157,7 @@ test('get_detectors: resolveParams recommends enabling persistence when it resol
   const result = await getDetectorsTool.resolveParams!(
     { detector_type: 'docker' },
     fakeContext(search, transportRequest),
-    {} as any,
+    {} as unknown as DetectorsRequest,
   );
   assert.equal(result.ok, true);
   if (result.ok) {
@@ -161,7 +171,7 @@ test('get_detectors: resolveParams degrades honestly when the persistence check 
   const result = await getDetectorsTool.resolveParams!(
     { detector_type: 'azure' },
     fakeContext(search, transportRequest),
-    {} as any,
+    {} as unknown as DetectorsRequest,
   );
   assert.equal(result.ok, true);
   if (result.ok) {
@@ -174,7 +184,7 @@ test('get_detectors: resolveParams degrades honestly when the findings-index loo
   const result = await getDetectorsTool.resolveParams!(
     { detector_type: 'not-a-real-type' },
     fakeContext(search),
-    {} as any,
+    {} as unknown as DetectorsRequest,
   );
   assert.equal(result.ok, true);
   if (result.ok) {
@@ -193,7 +203,7 @@ test('A-2 regression: a comma-smuggled detector_type issues no search at all', a
   const result = await getDetectorsTool.resolveParams!(
     { detector_type: '*,.wazuh-cti-consumers,*' },
     fakeContext(search),
-    {} as any,
+    {} as unknown as DetectorsRequest,
   );
   assert.equal(result.ok, true);
   if (result.ok) {
@@ -211,7 +221,7 @@ test('A-2 regression: a detector_type that would reach the excluded *-alerts fam
   const result = await getDetectorsTool.resolveParams!(
     { detector_type: '*-alerts,*' },
     fakeContext(search),
-    {} as any,
+    {} as unknown as DetectorsRequest,
   );
   assert.equal(result.ok, true);
   if (result.ok) {
@@ -227,11 +237,14 @@ test('A-2: a well-formed detector_type still issues the findings-count search', 
   const result = await getDetectorsTool.resolveParams!(
     { detector_type: 'wazuh-generic' },
     fakeContext(search),
-    {} as any,
+    {} as unknown as DetectorsRequest,
   );
   assert.equal(result.ok, true);
   assert.equal(search.mock.calls.length, 1);
-  assert.equal((search.mock.calls[0][0] as any).index, '.opensearch-sap-wazuh-generic-findings');
+  assert.equal(
+    (search.mock.calls[0][0] as { index: string }).index,
+    '.opensearch-sap-wazuh-generic-findings',
+  );
 });
 
 // A-4 (AI/plan/a1b-review.md): a `filter_path` response that resolves NONE of the four candidate
@@ -245,7 +258,7 @@ test('A-4 regression: an all-absent cluster-settings response yields honest "cou
   const result = await getDetectorsTool.resolveParams!(
     { detector_type: 'gitlab' },
     fakeContext(search, transportRequest),
-    {} as any,
+    {} as unknown as DetectorsRequest,
   );
   assert.equal(result.ok, true);
   if (result.ok) {
@@ -264,7 +277,7 @@ test('A-4b regression: disabled-persistence advice names the key that actually r
   const result = await getDetectorsTool.resolveParams!(
     { detector_type: 'okta' },
     fakeContext(search, transportRequest),
-    {} as any,
+    {} as unknown as DetectorsRequest,
   );
   assert.equal(result.ok, true);
   if (result.ok) {

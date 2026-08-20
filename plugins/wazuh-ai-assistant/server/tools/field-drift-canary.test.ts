@@ -24,12 +24,12 @@ function clientReturning(
 ): MappingClient {
   return {
     indices: {
-      async getMapping({ index }: { index: string }) {
+      getMapping({ index }: { index: string }) {
         const body = bodyByIndexPattern[index];
         if (!body) {
-          throw new Error(`no fixture for index pattern "${index}"`);
+          return Promise.reject(new Error(`no fixture for index pattern "${index}"`));
         }
-        return { body };
+        return Promise.resolve({ body });
       },
     },
   };
@@ -218,11 +218,11 @@ test('checkFieldDrift: a family whose index pattern matches nothing live is not 
 test('checkFieldDrift: never throws when the client itself errors for a family -- logged at debug, other families still checked', async () => {
   const client: MappingClient = {
     indices: {
-      async getMapping({ index }: { index: string }) {
+      getMapping({ index }: { index: string }) {
         if (index === 'wazuh-states-sca*') {
-          throw new Error('simulated indexer unreachable');
+          return Promise.reject(new Error('simulated indexer unreachable'));
         }
-        return { body: {} };
+        return Promise.resolve({ body: {} });
       },
     },
   };

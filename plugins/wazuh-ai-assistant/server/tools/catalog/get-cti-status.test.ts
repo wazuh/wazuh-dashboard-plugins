@@ -7,14 +7,20 @@ function build(params: Record<string, unknown>): IndexerRequest {
   return getCtiStatusTool.buildRequest(params) as IndexerRequest;
 }
 
-function fakeContext(searchImpl: (req: unknown) => Promise<unknown>) {
+// Derived from resolveParams's own signature rather than imported from the OSD platform path,
+// matching the convention api-host.test.ts documents for the same reason.
+type ResolveParamsFn = Exclude<typeof getCtiStatusTool.resolveParams, undefined>;
+type CtiContext = Parameters<ResolveParamsFn>[1];
+type CtiRequest = Parameters<ResolveParamsFn>[2];
+
+function fakeContext(searchImpl: (req: unknown) => Promise<unknown>): CtiContext {
   return {
     core: {
       opensearch: {
         client: { asCurrentUser: { search: searchImpl } },
       },
     },
-  } as any;
+  } as unknown as CtiContext;
 }
 
 test('get_cti_status: default body is match_all against .wazuh-cti-consumers', () => {
@@ -85,7 +91,7 @@ test('get_cti_status: resolveParams summarizes the sync schedule from .wazuh-con
       },
     },
   });
-  const result = await getCtiStatusTool.resolveParams!({}, fakeContext(search), {} as any);
+  const result = await getCtiStatusTool.resolveParams!({}, fakeContext(search), {} as unknown as CtiRequest);
   assert.equal(result.ok, true);
   if (result.ok) {
     const note = result.resolved.note ?? '';
@@ -96,7 +102,7 @@ test('get_cti_status: resolveParams summarizes the sync schedule from .wazuh-con
 
 test('get_cti_status: resolveParams degrades honestly when the schedule lookup fails', async () => {
   const search = jest.fn().mockRejectedValue(new Error('unreachable'));
-  const result = await getCtiStatusTool.resolveParams!({}, fakeContext(search), {} as any);
+  const result = await getCtiStatusTool.resolveParams!({}, fakeContext(search), {} as unknown as CtiRequest);
   assert.equal(result.ok, true);
   if (result.ok) {
     assert.match(result.resolved.note ?? '', /could not be checked/);
