@@ -611,6 +611,39 @@ test('Group E: instructs still using live-data tools for the data half of a mixe
   );
 });
 
+// REVIEW FIX E (groupA-regression-review.md, MEDIUM): a how-to about a non-Wazuh product must
+// still get the out-of-domain decline, never the how-to policy.
+test('Group E fix: the how-to policy is explicitly scoped to Wazuh itself, and points a ' +
+  'non-Wazuh how-to back at the out-of-domain decline', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /this policy applies\s+ONLY to how-tos about Wazuh itself/,
+  );
+  assert.match(
+    prompt,
+    /a how-to about anything else \(a third-party product,\s+e\.g\. "how do I configure my Cisco ASA", "how do I harden nginx"\) is\s+out-of-domain and must\s+get the out-of-domain\/adversarial decline above instead/,
+  );
+});
+
+test('Group E fix: the how-to policy sits immediately after the out-of-domain decline in the ' +
+  'prompt array, so the two are read together rather than the how-to policy appearing to ' +
+  'override the decline it now explicitly defers to', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  const outOfDomainIndex = prompt.indexOf('Out-of-domain or adversarial input');
+  const howToIndex = prompt.indexOf(
+    'For how-to/configuration questions with no dedicated tool',
+  );
+  assert.ok(outOfDomainIndex >= 0 && howToIndex >= 0);
+  assert.ok(howToIndex > outOfDomainIndex);
+  // Nothing else should sit between the decline block and the how-to policy's own scope guard.
+  const between = prompt.slice(outOfDomainIndex, howToIndex);
+  assert.ok(
+    between.length < 800,
+    `expected the how-to policy to immediately follow the out-of-domain decline, found ${between.length} chars between them`,
+  );
+});
+
 // --- Group D: CV-017 (single-digest answer collapse) -- prompt-side nudge ----------------------
 
 test('CV-017 fix: instructs writing a real synthesized answer even for a single tool call, ' +

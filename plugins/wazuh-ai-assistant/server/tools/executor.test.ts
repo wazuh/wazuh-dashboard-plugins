@@ -479,8 +479,64 @@ test('entity near-miss: a category word with no near-miss sibling and no exact m
   const digest = parseDigest(outcome);
   assert.equal(calls.length, 2, 'the probe still fires on a 0-row call');
   const hint = digest.hint as string;
-  assert.match(hint, /No agent named "cloud-services"/);
-  assert.match(hint, /not because that agent has no data/);
+  assert.match(hint, /"cloud-services" has no match \(exact or near-miss\)/);
+  // REVIEW FIX A1 (groupA-regression-review.md): the hint must never assert the agent itself is
+  // absent or clean -- only that the NAME has no match, with both explanations (mistaken name vs.
+  // a real agent with genuinely no rows here) left open.
+  assert.doesNotMatch(hint, /not because that agent has no data/);
+  assert.match(hint, /this probe cannot\s+tell those apart/);
+  assert.match(hint, /never as a\s+claim that the agent itself is absent, clean, or has no data/);
+});
+
+test('entity near-miss: an ID-shaped agent_identifier with zero rows is NOT reported as an ' +
+  'unmatched name (REVIEW FIX A1, groupA-regression-review.md, HIGH) -- the probe only ' +
+  'aggregates wazuh.agent.name, so a numeric id can never appear in its buckets even for a ' +
+  'real, healthy agent that simply has no vulnerabilities in this window', async () => {
+  const { context, calls } = fakeContext(() => ({
+    hits: { hits: [], total: { value: 0 } },
+    aggregations: { agent_names: { buckets: [] } },
+  }));
+  const outcome = await executeToolCall(
+    toolCall('get_vulnerabilities_by_agent', { agent_identifier: '001' }),
+    context,
+    dummyRequest,
+  );
+  const digest = parseDigest(outcome);
+  assert.equal(calls.length, 2, 'the probe still runs (it degrades silently, not by skipping)');
+  // No false "no agent named 001" -- a clean host's honest zero must stay a plain zero-row result.
+  assert.equal(digest.hint, undefined);
+});
+
+test('entity near-miss: REVIEW FIX A2 (groupA-regression-review.md, MEDIUM) -- a multi-agent ' +
+  'sweep with ONE matching name and one unmatched (category-word) name still discloses the ' +
+  'unmatched one, even though the call\'s overall returned count is > 0', async () => {
+  const findingHit = {
+    _source: { 'wazuh.agent.name': 'web-prod-01', 'wazuh.rule.level': 'high' },
+  };
+  const { context, calls } = fakeContext((_call, index) =>
+    index === 0
+      ? { hits: { hits: [findingHit], total: { value: 1 } } }
+      : {
+          hits: { hits: [], total: { value: 0 } },
+          aggregations: {
+            agent_names: { buckets: [{ key: 'web-prod-01', doc_count: 1 }] },
+          },
+        },
+  );
+  const outcome = await executeToolCall(
+    toolCall('search_findings_by_multiple_agents', {
+      agent_names: ['web-prod-01', 'cloud-services'],
+    }),
+    context,
+    dummyRequest,
+  );
+  const digest = parseDigest(outcome);
+  assert.equal(calls.length, 2);
+  assert.ok((digest.counts as { returned: number }).returned > 0);
+  const hint = digest.hint as string;
+  assert.match(hint, /"cloud-services" has no match/);
+  // The matching name must never be reported as unmatched.
+  assert.doesNotMatch(hint, /"web-prod-01" has no match/);
 });
 
 test('entity near-miss: unmatched-name disclosure does not fire when the call actually returned ' +

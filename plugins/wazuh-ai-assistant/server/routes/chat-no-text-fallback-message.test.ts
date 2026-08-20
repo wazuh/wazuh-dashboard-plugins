@@ -151,6 +151,19 @@ test('noTextFallbackMessage: an errored call (unknown field, invalid pairing, ..
   assert.match(message, /Closest known fields: host\.os\.platform/);
 });
 
+test('noTextFallbackMessage: the other recognized shape (invalid field/family pairing) is also ' +
+  'classified into user-vocabulary copy', () => {
+  const message = noTextFallbackMessage(true, false, false, {
+    name: 'get_field_values',
+    args: { field: 'wazuh.agent.host.os.platform', index_family: 'inventory_system' },
+    errorMessage:
+      'Parameter "index_family" ("inventory_system") is not valid for field ' +
+      '"wazuh.agent.host.os.platform". Valid surfaces for this field: findings, events.',
+  });
+  assert.doesNotMatch(message, /No matching results were found/);
+  assert.match(message, /Valid surfaces for this field: findings, events/);
+});
+
 test('noTextFallbackMessage: a genuinely empty successful call (no errorMessage) still uses the ' +
   'plain "no matching results" copy -- the error branch does not swallow the ordinary case', () => {
   const message = noTextFallbackMessage(true, false, false, {
@@ -160,13 +173,58 @@ test('noTextFallbackMessage: a genuinely empty successful call (no errorMessage)
   assert.match(message, /No matching results were found/);
 });
 
-test('noTextFallbackMessage: an overlong error message is truncated with an ellipsis, never dumped ' +
-  'verbatim into user-facing copy', () => {
+test('noTextFallbackMessage: an overlong (but recognized-shape) error message is truncated with ' +
+  'an ellipsis, never dumped verbatim into user-facing copy', () => {
   const message = noTextFallbackMessage(true, false, false, {
     name: 'get_field_values',
     args: { field: 'bogus' },
-    errorMessage: 'x'.repeat(500),
+    errorMessage:
+      'Parameter "field" ("bogus") is not one of this tool\'s vetted, bounded-cardinality ' +
+      `fields, so its values cannot be enumerated this way. Closest known fields: ${'x'.repeat(
+        400,
+      )}.`,
   });
-  assert.ok(message.length < 500);
+  assert.ok(message.length < 400);
   assert.match(message, /…/);
+});
+
+// --- REVIEW FIX F1 (groupA-regression-review.md, REQUIRED): the error channel is a strict --------
+// --- allowlist, never a pass-through -- guardrail/exception text must never reach user copy ------
+
+test('noTextFallbackMessage: a guardrail violation error is NEVER surfaced verbatim -- falls back ' +
+  'to the plain "no matching results" copy instead of leaking mechanism vocabulary', () => {
+  const message = noTextFallbackMessage(true, false, false, {
+    name: 'search_wazuh_data',
+    args: { index_pattern: 'wazuh-events-v5-*' },
+    errorMessage:
+      'Aggregation on field "event.action" is not on the allowed low-cardinality field list.',
+  });
+  assert.match(message, /No matching results were found/);
+  assert.doesNotMatch(message, /low-cardinality field list/);
+});
+
+test('noTextFallbackMessage: a raw sanitized exception (OpenSearch/Node error text) is NEVER ' +
+  'surfaced verbatim -- falls back to the plain "no matching results" copy', () => {
+  const message = noTextFallbackMessage(true, false, false, {
+    name: 'search_wazuh_data',
+    args: { index_pattern: 'wazuh-events-v5-*' },
+    errorMessage: 'Indexer query failed: index_not_found_exception [wazuh-bogus-*]',
+  });
+  assert.match(message, /No matching results were found/);
+  assert.doesNotMatch(message, /index_not_found_exception/);
+});
+
+test('noTextFallbackMessage: a bounded "which one?" candidate-list error (which may itself carry ' +
+  'a pseudonymized identifier) is NEVER surfaced verbatim', () => {
+  const message = noTextFallbackMessage(true, false, false, {
+    name: 'get_sca_checks',
+    args: {},
+    errorMessage:
+      'Parameter "agent_id" was not supplied and could not be resolved automatically. (2 active ' +
+      'agents exist, so which one is meant cannot be assumed. Candidates: "HOST_1" (id 001), ' +
+      '"HOST_2" (id 002).)',
+  });
+  assert.match(message, /No matching results were found/);
+  assert.doesNotMatch(message, /HOST_1/);
+  assert.doesNotMatch(message, /Candidates:/);
 });

@@ -251,6 +251,16 @@ const MAX_NEAR_MISS_NAMES = 5;
 const MAX_NEAR_MISS_SENTENCES = 3;
 const MAX_NEAR_MISS_SIBLINGS = 3;
 
+/** REVIEW FIX A1 (groupA-regression-review.md): a purely-numeric token is a Manager agent ID
+ * (`agent_identifier`, or the #8913 deictic path's `pickAgentValue(..., 'id-or-name')`), never a
+ * `wazuh.agent.name` value -- the "unmatched name" disclosure's probe only aggregates
+ * `wazuh.agent.name`, so an ID can never appear in its bucket set regardless of whether the agent
+ * is real, healthy, and simply has zero rows in this index/window. Tokens matching this are
+ * skipped from that disclosure entirely rather than risk a false "no agent named 001" on a clean
+ * host. Deliberately narrow (`^\d+$`, no leading/trailing text) -- a name that merely CONTAINS
+ * digits (e.g. "web-prod-01") is still a name, not an id, and stays eligible for the disclosure. */
+const ID_SHAPED_TOKEN_RE = /^\d+$/;
+
 /** Matches a dotted MITRE sub-technique id ("T1059.001") as a breakdown bucket key. */
 const SUB_TECHNIQUE_KEY_RE = /^T\d+\.\d+$/;
 
@@ -400,26 +410,61 @@ async function appendEntityNearMissHint(
     }
     // BLOCKER FIX (CV-028/CV-033, category-word-misread-as-agent-name class): a requested name
     // with no near-miss sibling can still be a token that never named a real agent at all (a
-    // category/domain word the model mistook for a host name). Only worth stating when the
-    // call's own filter actually came back empty -- if it returned rows, this exact string DID
-    // match the population and the "does not appear" framing below would be false. Fires
-    // independently of the near-miss branch above (a name can have zero near-miss SIBLINGS while
-    // still having zero matches of its own -- those are different findings, see
-    // `findUnmatchedAgentNames`'s doc comment). This is the deterministic "only becomes an agent
-    // filter if it matches a known candidate" guarantee: `indexedNames` IS the candidate lookup
-    // (the same population probe used for the near-miss disclosure), so a name absent from it,
-    // exactly and by every normalized variant, is reported to the model as unmatched rather than
-    // silently presented as an ordinary empty result.
-    if (digest.counts.returned === 0) {
-      const unmatched = findUnmatchedAgentNames(requestedNames, indexedNames);
+    // category/domain word the model mistook for a host name). Fires independently of the
+    // near-miss branch above (a name can have zero near-miss SIBLINGS while still having zero
+    // matches of its own -- those are different findings, see `findUnmatchedAgentNames`'s doc
+    // comment). This is the deterministic "only becomes an agent filter if it matches a known
+    // candidate" guarantee: `indexedNames` IS the candidate lookup (the same population probe
+    // used for the near-miss disclosure), so a name absent from it, exactly and by every
+    // normalized variant, is reported to the model as unmatched rather than silently presented
+    // as an ordinary empty result.
+    //
+    // REVIEW FIX A1 (groupA-regression-review.md, HIGH): the earlier wording added "...not
+    // because that agent has no data", an inference this probe cannot support -- an empty
+    // candidate-bucket set means only "this index/window has no documents whose
+    // wazuh.agent.name matches", which is exactly as consistent with a REAL, healthy agent that
+    // simply has zero rows here as with a name that matches no agent at all. Two fixes:
+    //   1. Drop that clause. State only what the probe actually proves: the NAME has no match in
+    //      this data, framed as a possible mistaken name -- never a claim about whether the host
+    //      itself exists or is clean.
+    //   2. Skip this branch entirely for an ID-SHAPED token (`/^\d+$/`) -- `agent_identifier`
+    //      (get_vulnerabilities_by_agent) and the #8913/soleCandidateParams deictic path
+    //      (`pickAgentValue(..., 'id-or-name')`) both feed a numeric Manager id here, and the
+    //      probe only aggregates `wazuh.agent.name`: an id can never match a hostname bucket, so
+    //      a clean agent with genuinely zero rows (e.g. "what vulnerabilities does agent 001
+    //      have?" on a healthy host) would otherwise be misreported as "no agent named 001".
+    //      `extractRequestedAgentNames`'s own doc comment calls an id "harmless here" for the
+    //      near-miss branch above (true: an id's normalized form only matches its own padding
+    //      variants) -- that reasoning does NOT extend to this branch, which fires precisely on
+    //      NO match, so it is guarded separately here rather than by editing that shared reader.
+    //
+    // REVIEW FIX A2 (groupA-regression-review.md, MEDIUM, multi-agent coverage gap): this used to
+    // be gated on `digest.counts.returned === 0` for the WHOLE call, so a multi-name sweep
+    // (search_findings_by_multiple_agents: "compare web-01 and cloud-services") where ONE name
+    // matched never disclosed the OTHER, unmatched one -- CV-028's exact shape, just with a
+    // sibling that succeeds masking it. `findUnmatchedAgentNames` is already computed PER
+    // REQUESTED NAME against the same population probe regardless of the call's aggregate row
+    // count, so removing that outer gate is sufficient to close the gap for every
+    // `AGENT_NAME_PARAM_KEYS`-bearing tool, single- or multi-name alike: for a single-name call, a
+    // non-zero `returned` already proves that one name matched (the query filtered on it and
+    // found rows), so it is already absent from `indexedNames`'s complement and this reports
+    // nothing new or false for that shape -- the removed gate was redundant there, never
+    // load-bearing.
+    {
+      const unmatched = findUnmatchedAgentNames(
+        requestedNames,
+        indexedNames,
+      ).filter(requested => !ID_SHAPED_TOKEN_RE.test(requested.trim()));
       sentences.push(
         ...unmatched.slice(0, MAX_NEAR_MISS_SENTENCES).map(
           requested =>
-            `No agent named "${display(
+            `The agent-name filter "${display(
               requested,
-            )}" (or a close variant) appears in this data -- the filter matched nothing ` +
-            'because no such agent is present here, not because that agent has no data. State ' +
-            'this to the user as an unmatched name, never as a bare "no data" result.',
+            )}" has no match (exact or near-miss) in this data. This may be a mistaken name -- ` +
+            'e.g. a category/domain word rather than a real host -- but it may also be a real ' +
+            'agent with genuinely no rows in this specific index/time window; this probe cannot ' +
+            'tell those apart. State it to the user as an unmatched filter name, never as a ' +
+            'claim that the agent itself is absent, clean, or has no data.',
         ),
       );
     }
