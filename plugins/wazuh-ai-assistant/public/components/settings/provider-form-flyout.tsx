@@ -580,9 +580,16 @@ interface ProviderFormFlyoutProps {
   editingProvider: ProviderSummary | null;
   error: string | null;
   /** Every provider already configured, so this form can refuse a name that is already taken
-   * before the round-trip (the server enforces the same rule with a 409 — see
-   * `rejectDuplicateProviderName` in server/routes/settings.ts — which still covers the race of a
-   * second admin creating the same name while this flyout is open).
+   * before the round-trip. The server enforces the same rule with a 409
+   * (`rejectDuplicateProviderName` in server/routes/settings.ts), which is what covers a STALE
+   * list here — a provider created by someone else since this page last loaded.
+   *
+   * What neither check closes is a true concurrent-create TOCTOU: the server does a read and then
+   * a separate write, and the indexer endpoint behind providers has no unique constraint on `name`,
+   * so two admins submitting the same name in the same instant can both succeed. That residual race
+   * is ACCEPTED — the window is milliseconds and the worst outcome is two same-named providers,
+   * which an admin fixes by renaming one. Closing it properly needs a storage-level constraint that
+   * does not exist.
    *
    * Optional/absent means "no list available", which behaves exactly as before this prop existed:
    * no client-side duplicate check at all. */
@@ -754,6 +761,10 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
       apiKey: form.apiKey?.trim() ?? '',
     };
 
+    // Both field checks are evaluated BEFORE either returns, so one click surfaces everything that
+    // is wrong. Validating sequentially made a form with a duplicate name and a bad URL take two
+    // clicks to reveal two problems, which reads like the first fix broke something new.
+    //
     // Duplicate name check, mirroring the server's own 409 (`rejectDuplicateProviderName`): same
     // trim + lowercase comparison, and the provider being edited is excluded so re-saving it
     // unchanged is never a collision with itself.
@@ -763,27 +774,25 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
         provider.id !== editingProvider?.id &&
         provider.name.trim().toLowerCase() === normalizedName,
     );
-    if (nameTaken) {
-      setNameError(
-        i18n.translate('wazuhAiAssistant.settings.form.nameDuplicate', {
+    const nextNameError = nameTaken
+      ? i18n.translate('wazuhAiAssistant.settings.form.nameDuplicate', {
           defaultMessage:
             'A provider named "{name}" already exists. Pick a different name.',
           values: { name: trimmedForm.name },
-        }),
-      );
-      return;
-    }
-    setNameError(null);
-
-    if (!isValidEndpointUrl(trimmedForm.baseUrl)) {
-      setBaseUrlError(
-        i18n.translate('wazuhAiAssistant.settings.form.baseUrlInvalid', {
+        })
+      : null;
+    const nextBaseUrlError = isValidEndpointUrl(trimmedForm.baseUrl)
+      ? null
+      : i18n.translate('wazuhAiAssistant.settings.form.baseUrlInvalid', {
           defaultMessage: 'Enter a valid URL starting with http:// or https://',
-        }),
-      );
+        });
+
+    setNameError(nextNameError);
+    setBaseUrlError(nextBaseUrlError);
+    if (nextNameError || nextBaseUrlError) {
       return;
     }
-    setBaseUrlError(null);
+
     await onSubmit(trimmedForm);
   };
 

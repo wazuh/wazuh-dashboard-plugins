@@ -1387,6 +1387,31 @@ describe('ProviderFormFlyout — duplicate provider names', () => {
     });
   });
 
+  it('surfaces a duplicate name AND a bad URL on the same click', async () => {
+    // L10: validating sequentially made a form with both problems take two clicks to reveal two
+    // errors, which reads as though fixing the first broke something new.
+    render(
+      <ProviderFormFlyout
+        {...baseProps}
+        existingProviders={existingProviders}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText(/^name/i), {
+      target: { value: 'Claude staging' },
+    });
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'not-a-url' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+
+    expect(await screen.findByText(/already exists/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/valid URL starting with http/i),
+    ).toBeInTheDocument();
+    expect(baseProps.onSubmit).not.toHaveBeenCalled();
+  });
+
   it('surfaces a server-side 409 through the existing error callout', () => {
     // A race (another admin created the same name while this flyout was open) comes back as the
     // 409 message on the `error` prop; the flyout must show it, not swallow it.
