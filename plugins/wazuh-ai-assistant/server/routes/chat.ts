@@ -298,7 +298,9 @@ const TOOL_ERROR_MESSAGE_MAX_LENGTH = 300;
  * `undefined` and the caller falls back to the plain "no matching results" sentence.
  */
 function classifyToolErrorForFallback(message: string): string | undefined {
-  if (message.includes("is not one of this tool's vetted, bounded-cardinality")) {
+  if (
+    message.includes("is not one of this tool's vetted, bounded-cardinality")
+  ) {
     const suggestionMatch = message.match(
       /(Closest known fields: .*\.|No similarly-named known field was found\.)\s*$/,
     );
@@ -352,7 +354,9 @@ function buildNoMatchingResultsMessage(
     clause => !clause.toLowerCase().startsWith(`${domain.toLowerCase()} `),
   );
   const scope =
-    filters.length > 0 ? `${domain}, filtered to ${filters.join(', ')}` : domain;
+    filters.length > 0
+      ? `${domain}, filtered to ${filters.join(', ')}`
+      : domain;
   return `${NO_MATCHING_RESULTS_MESSAGE} (Searched: ${scope}.)`;
 }
 
@@ -403,8 +407,8 @@ function describeErroredLastAttempt(
  * chain got, not the full answer, so the user should know a step was left unreached.
  */
 const NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE =
-  'The tool-round budget for this turn ran out before a full answer could be written. See the ' +
-  'results above for what was found so far — a follow-up question can continue from there.';
+  'I reached the analysis limit for this question. The results gathered so far are above — ask ' +
+  'a narrower follow-up to dig deeper.';
 /**
  * Sibling fallback for a `general`-routed (no-tool) turn that still ends with no text at all —
  * e.g. a reasoning model streaming its entire answer on a channel nothing reads (issue
@@ -1673,6 +1677,13 @@ export async function* orchestrate(
     // otherwise treats any `!sawToolCall` round as a dead adapter stream) does not return early on
     // the ONE round type that legitimately ends with no tool call yet still has a next round.
     let roundText = '';
+    // How much of `roundText` has already been attributed to an assistant history message this
+    // round (issue C4): a round can legitimately contain more than one tool_call (narration,
+    // tool_call, more narration, another tool_call), and each `messages` entry pushed below must
+    // carry only the prose that arrived SINCE the previous one -- otherwise the second tool_call's
+    // assistant message would repeat the first's narration verbatim. Sliced out at each tool_call
+    // history-append below, then advanced to `roundText.length` so the next slice starts clean.
+    let roundTextConsumed = 0;
     let forcedFollowUp = false;
     // TRUE when any delta this round was the adapter's reasoning-channel fallback
     // (openai-compatible.ts's `reasoningFallback`, flagged on the event): that text is raw
@@ -1866,35 +1877,52 @@ export async function* orchestrate(
               toolResultContent = JSON.stringify({
                 shown: true,
                 note:
-                  'The suggested query was shown to the user as an "Open in Discover" link. Now ' +
-                  'tell the user plainly, in your own words, what you could not check and why — ' +
-                  'do not repeat the query itself, the link already shows it.',
+                  'The suggested query was shown to the user as an "Open in Discover" link, not ' +
+                  'as visible query text. Now tell the user plainly, in your own words, what you ' +
+                  'could not check and why — do not repeat the query itself, the link already ' +
+                  'shows it, and if you mention the handoff at all call it "the Discover link", ' +
+                  'never "the query below" or similar wording that implies a query block is ' +
+                  'displayed.',
               });
             }
           }
 
-          messages = [
-            ...messages,
-            // ORIGINAL (pseudonym-form) toolCall — wire consistency, same as the real-tool path.
-            // `vendorExtras` (e.g. Gemini's `thought_signature`) is spread only when the adapter
-            // actually captured one this round — see StreamEvent's `tool_call` doc comment.
-            {
-              role: 'assistant',
-              content: '',
-              toolCalls: [event.toolCall],
-              ...(event.messageVendorExtras
-                ? { vendorExtras: event.messageVendorExtras }
-                : {}),
-            },
-            {
-              role: 'tool',
-              toolCallId: event.toolCall.id,
-              // CAPABILITY-DENIAL GUARD chokepoint (see augmentToolError's doc comment above): a
-              // no-op for the 'shown:true' acknowledgment, applies the note to either the arg-
-              // validation error or the unknown-fields self-correction error above.
-              content: augmentToolError(toolResultContent),
-            },
-          ];
+          {
+            // Issue C4: carry this round's own narration (already streamed to the user above)
+            // into its own history turn instead of discarding it as `content: ''` — otherwise the
+            // model has no record of having said it and re-narrates near-identically on a retry
+            // round (the `unknown_fields` self-correction just above is exactly that retry path).
+            // Trim before it reaches history: models often emit a bare priming newline (or
+            // whitespace run) right before a tool call (see the "\n\n"-before-tool-call note at
+            // this file's top), and Anthropic's Messages API 400s on a whitespace-only text
+            // block (anthropic.ts pushes any truthy `content` as a text block). The offset
+            // bookkeeping below stays on the UNtrimmed `roundText.length` so later slices are
+            // still measured from the right position.
+            const priorRoundText = roundText.slice(roundTextConsumed).trim();
+            roundTextConsumed = roundText.length;
+            messages = [
+              ...messages,
+              // ORIGINAL (pseudonym-form) toolCall — wire consistency, same as the real-tool path.
+              // `vendorExtras` (e.g. Gemini's `thought_signature`) is spread only when the adapter
+              // actually captured one this round — see StreamEvent's `tool_call` doc comment.
+              {
+                role: 'assistant',
+                content: priorRoundText,
+                toolCalls: [event.toolCall],
+                ...(event.messageVendorExtras
+                  ? { vendorExtras: event.messageVendorExtras }
+                  : {}),
+              },
+              {
+                role: 'tool',
+                toolCallId: event.toolCall.id,
+                // CAPABILITY-DENIAL GUARD chokepoint (see augmentToolError's doc comment above): a
+                // no-op for the 'shown:true' acknowledgment, applies the note to either the arg-
+                // validation error or the unknown-fields self-correction error above.
+                content: augmentToolError(toolResultContent),
+              },
+            ];
+          }
           continue;
         }
 
@@ -2014,25 +2042,35 @@ export async function* orchestrate(
           };
         }
 
-        messages = [
-          ...messages,
-          // ORIGINAL (pseudonym-form) toolCall, not toolCallForClient — wire consistency.
-          // `vendorExtras` (e.g. Gemini's `thought_signature`) is spread only when the adapter
-          // actually captured one this round — see StreamEvent's `tool_call` doc comment.
-          {
-            role: 'assistant',
-            content: '',
-            toolCalls: [event.toolCall],
-            ...(event.messageVendorExtras
-              ? { vendorExtras: event.messageVendorExtras }
-              : {}),
-          },
-          {
-            role: 'tool',
-            toolCallId: event.toolCall.id,
-            content: toolResultContentForModel,
-          },
-        ];
+        {
+          // Issue C4: see the identical comment on the suggest_discover_query branch above --
+          // this round's own narration, already shown to the user, belongs in its own history
+          // turn instead of being dropped as `content: ''`.
+          // Trim before it reaches history for the same reason as the suggest_discover_query
+          // branch above: a whitespace-only text block 400s against Anthropic. Offset
+          // bookkeeping stays on the UNtrimmed `roundText.length`.
+          const priorRoundText = roundText.slice(roundTextConsumed).trim();
+          roundTextConsumed = roundText.length;
+          messages = [
+            ...messages,
+            // ORIGINAL (pseudonym-form) toolCall, not toolCallForClient — wire consistency.
+            // `vendorExtras` (e.g. Gemini's `thought_signature`) is spread only when the adapter
+            // actually captured one this round — see StreamEvent's `tool_call` doc comment.
+            {
+              role: 'assistant',
+              content: priorRoundText,
+              toolCalls: [event.toolCall],
+              ...(event.messageVendorExtras
+                ? { vendorExtras: event.messageVendorExtras }
+                : {}),
+            },
+            {
+              role: 'tool',
+              toolCallId: event.toolCall.id,
+              content: toolResultContentForModel,
+            },
+          ];
+        }
         continue;
       }
 
@@ -2053,6 +2091,17 @@ export async function* orchestrate(
         // reached the client).
         usageTotals = addUsage(usageTotals, event.usage);
         if (sawToolCall) {
+          // Issue C4 follow-up: text streamed AFTER this round's LAST tool call (e.g. a closing
+          // remark before the round ended) is not captured by either tool_call history-append
+          // above -- both only consume the text that arrived BEFORE their own call. Append the
+          // unconsumed tail onto its own assistant history turn now, before the next round
+          // starts, so it is not silently dropped the same way `content: ''` used to drop
+          // everything. Trimmed for the same whitespace-only-text-block reason as the tool_call
+          // sites above.
+          const roundTail = roundText.slice(roundTextConsumed).trim();
+          if (roundTail) {
+            messages = [...messages, { role: 'assistant', content: roundTail }];
+          }
           // More rounds needed: suppress this 'done' (the turn isn't over) and start the next
           // round with the grown message history instead of ending the SSE stream here.
           break;

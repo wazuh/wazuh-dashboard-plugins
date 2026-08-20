@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   EuiBasicTable,
   EuiBasicTableColumn,
@@ -71,6 +71,16 @@ const PAGE_SIZE_OPTIONS = [5, 10, 25, 50];
  * (which is a full-pane scroll, not a nested one) is the better answer.
  */
 const RESULTS_CARD_MAX_HEIGHT_PX = 460;
+/**
+ * "Card grows" (iteration-4 item 3): the JS twin of `$wzResultsMaxHeightExpanded` (80dvh,
+ * result-table.scss/_redesign.scss) for the transcript-measured-height code path above — that
+ * `dvh` figure has no meaningful px equivalent here (this clamp works in the transcript's own
+ * measured space, not the viewport), so this is a generous ceiling that in practice only ever
+ * matters as an upper bound: `measuredCardMaxHeight` below still subtracts
+ * `RESULTS_CARD_TRANSCRIPT_RESERVE_PX` from `transcriptHeightPx`, so the card can never actually
+ * push the pinned footer off the transcript's own fold even at this "expanded" ceiling.
+ */
+const RESULTS_CARD_MAX_HEIGHT_EXPANDED_PX = 900;
 const RESULTS_CARD_MIN_HEIGHT_PX = 240;
 const RESULTS_CARD_TRANSCRIPT_RESERVE_PX = 140;
 
@@ -133,6 +143,13 @@ const ISO_TIMESTAMP_RE =
 const TIMESTAMP_COLUMN_WIDTH = '118px';
 /** Column width for the severity column: a badge plus its longest label ("Informational"). */
 const SEVERITY_COLUMN_WIDTH = '104px';
+/** Width for a column whose every value is short (see `isShortValueColumn`) — an agent name, an id,
+ * a category. Enough for ~20 characters at the table's own font size; the free-text column takes the
+ * remainder, which is the whole point (audit §3.4). */
+const SHORT_COLUMN_WIDTH = '140px';
+/** Longest rendered value that still counts as "short". Deliberately generous: a value that fits a
+ * 140px cell on one line is what this is trying to identify, not a strict character budget. */
+const SHORT_COLUMN_MAX_CHARS = 20;
 
 /**
  * Column-count budget (issue #8921's "no table may need a horizontal scrollbar" item): a
@@ -256,6 +273,36 @@ function isTimestampColumn(
   return sawValue;
 }
 
+/**
+ * True when every non-empty value in a column is a SHORT scalar — an id, an agent name, a category
+ * word. Same shape (and same "the whole column or nothing" rule) as `isTimestampColumn` above: one
+ * long value is enough to disqualify a column, because the point is to identify the columns that
+ * plainly do NOT need width so the one that does can have it.
+ *
+ * Arrays and objects are disqualifying regardless of length: `renderDefaultCell` joins/serializes
+ * them, so their rendered width is not their raw one.
+ */
+function isShortValueColumn(
+  rows: Array<Record<string, unknown>>,
+  field: string,
+): boolean {
+  let sawValue = false;
+  for (const row of rows) {
+    const value = row[field];
+    if (isAbsentValue(value)) {
+      continue;
+    }
+    if (typeof value === 'object') {
+      return false;
+    }
+    if (String(value).length > SHORT_COLUMN_MAX_CHARS) {
+      return false;
+    }
+    sawValue = true;
+  }
+  return sawValue;
+}
+
 function renderSeverityBadge(value: unknown): React.ReactNode {
   const word = String(value ?? '').toLowerCase();
   // Look up directly in SEVERITY_BUCKETS (the single source of truth for what's renderable)
@@ -265,10 +312,26 @@ function renderSeverityBadge(value: unknown): React.ReactNode {
   const bucket = SEVERITY_BUCKETS[word as SeverityLevel] as
     | { color: string; label: string }
     | undefined;
+  // `.wzSeverityChip` (result-table.scss) gives every severity the wzStatusChip SHAPE — fully round,
+  // 11px semibold — so a severity reads as the same kind of object as the provider status chips on
+  // the settings page instead of as EUI's 2px-radius rectangle (audit §3.5). The FILL is deliberately
+  // left as the platform's own `UI_COLOR_STATUS` hex (see SEVERITY_BUCKETS above), not swapped for
+  // wzStatusChip's tinted-EUI-role wash: that palette is a cross-product agreement, and two of the
+  // five roles ($euiColorWarning for high, $euiColorPrimary for medium) are not legible as 11px text
+  // over their own 12% tint, which is the failure wzStatusChip's `$textTint` argument exists for and
+  // which no `*Text` twin covers for a raw hex.
   if (!bucket) {
-    return <EuiBadge color='default'>{String(value ?? '')}</EuiBadge>;
+    return (
+      <EuiBadge className='wzSeverityChip' color='default'>
+        {String(value ?? '')}
+      </EuiBadge>
+    );
   }
-  return <EuiBadge color={bucket.color}>{bucket.label}</EuiBadge>;
+  return (
+    <EuiBadge className='wzSeverityChip' color={bucket.color}>
+      {bucket.label}
+    </EuiBadge>
+  );
 }
 
 /**
@@ -368,15 +431,27 @@ interface ResultTableProps {
   provenanceChips?: ResultTableProvenanceChip[];
   /**
    * Real measured height (px) of the scrolling transcript pane, for layout contract §4's "page
-   * size steps 5 → 10 above 900px of transcript height". Optional and currently never supplied by
-   * chat-page.tsx (confirmed by reading it — no such measurement exists there yet), so this stays
-   * a no-op today and the pre-redesign default of 5 is exactly preserved; once chat-page.tsx grows
-   * a transcript-height measurement it can thread it straight through MessageList → MessageBubble
-   * → here with no further change on this end. Read only ONCE, to pick the table's INITIAL page
-   * size — not a live-resize binding, so a reader mid-way through a wide window resize never has
-   * their current page silently renumbered underneath them.
+   * size steps 5 → 10 above 900px of transcript height". chat-page.tsx measures the pane with a
+   * `ResizeObserver` and threads the result straight through MessageList → MessageBubble → here
+   * (confirmed by reading it — see its `transcriptHeightPx` state), so the taller page size is
+   * live in the real app. Still optional: jsdom has no `ResizeObserver`, so it stays `undefined`
+   * in tests and the pre-redesign default of 5 applies there, which is what the existing tests
+   * expect. Read only ONCE, to pick the table's INITIAL page size — not a live-resize binding, so a
+   * reader mid-way through a wide window resize never has their current page silently renumbered
+   * underneath them.
    */
   transcriptHeightPx?: number;
+  /**
+   * Fired when the reader changes the rows-per-page control (item 3, "card grows"). The card grows
+   * downward when a larger page size is picked, but the card lives INSIDE chat-page.tsx's scrolling
+   * transcript pane, and that pane only re-pins to its bottom on a `messages` change — a page-size
+   * pick is internal `ResultTable` state, so nothing re-pinned and the freshly-grown pagination
+   * footer slid below the fold, behind the composer, until the reader manually scrolled. chat-page
+   * hands this down so it can re-pin the pane (only when the reader was already following the
+   * bottom) right after the card has grown. Optional: a call site with no scrolling pane to re-pin
+   * (or a unit test) simply omits it.
+   */
+  onRowsPerPageChange?: () => void;
 }
 
 /**
@@ -391,6 +466,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   resolveSecurityAnalyticsUrl,
   provenanceChips,
   transcriptHeightPx,
+  onRowsPerPageChange,
 }) => {
   const [expandedRowIds, setExpandedRowIds] = useState<Set<number>>(new Set());
   // Stable across re-renders of the SAME mounted table (a later spec on the same tool round would
@@ -426,27 +502,102 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
       ? TALL_TRANSCRIPT_PAGE_SIZE
       : DEFAULT_PAGE_SIZE,
   );
+  // Set ONLY by `handlePageSizeChange` below — i.e. only by the reader actually picking a size
+  // in the footer control. `pageSize` above also gets bumped to `TALL_TRANSCRIPT_PAGE_SIZE` on
+  // mount for a tall transcript, with no user action involved; without this flag THAT bump alone
+  // satisfied `pageSize > DEFAULT_PAGE_SIZE` and silently expanded the card's height ceiling to
+  // 900px on every long transcript, which is the "expanded" state (see `isExpanded` below).
+  const [userPickedPageSize, setUserPickedPageSize] = useState(false);
 
   // Unlike the page size above, this one IS a live binding: re-capping the card as the transcript
   // resizes costs the reader nothing (the body simply scrolls), whereas re-paginating under them
   // would silently renumber the page they are reading. Left `undefined` when nothing has been
   // measured (jsdom has no ResizeObserver, so `transcriptHeightPx` stays 0 there) — the stylesheet's
   // own `min(460px, 52dvh)` then applies exactly as before.
+  // "Card grows" (iteration-4 item 3): once the reader has explicitly chosen a page size above
+  // the 5-row default (`userPickedPageSize`, NOT merely the size having drifted above it), the
+  // ceiling this clamps against switches to the expanded twin — see that constant's own doc
+  // comment for why 900px is a safe ceiling rather than a real ceiling.
+  const isExpanded = userPickedPageSize && pageSize > DEFAULT_PAGE_SIZE;
+  const cardMaxHeightCeilingPx = isExpanded
+    ? RESULTS_CARD_MAX_HEIGHT_EXPANDED_PX
+    : RESULTS_CARD_MAX_HEIGHT_PX;
+
+  // Live cap guard (iteration-4 item 3, part C). The ceiling below is clamped against the
+  // transcript pane's height so the card never grows past the space left above the composer.
+  // `transcriptHeightPx` (the prop) is that height as chat-page.tsx measures it — but it reaches
+  // here only after chat-page's own `ResizeObserver` fires AND the new number propagates back down
+  // through two memoized components (MessageList, MessageBubble). On a fast viewport shrink that lag
+  // would leave the card holding a ceiling taller than the pane now is, and its footer would clip
+  // below the fold again. So the card ALSO measures its own scroll container directly and the cap
+  // uses the SMALLER of the two, self-correcting regardless of prop-propagation timing. Inert in
+  // jsdom (no `ResizeObserver`, and the unit tests render the card with no `.wzChatTranscript`
+  // ancestor), so `livePaneHeightPx` stays `undefined` there and the prop-only path — and the
+  // stylesheet fallback when even that is absent — behaves exactly as before.
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const [livePaneHeightPx, setLivePaneHeightPx] = useState<number | undefined>(
+    undefined,
+  );
+  useLayoutEffect(() => {
+    const card = cardRef.current;
+    if (!card || typeof ResizeObserver === 'undefined') {
+      return;
+    }
+    const pane = card.closest('.wzChatTranscript') as HTMLElement | null;
+    if (!pane) {
+      return;
+    }
+    const measure = () => setLivePaneHeightPx(pane.clientHeight);
+    const observer = new ResizeObserver(measure);
+    observer.observe(pane);
+    measure();
+    return () => observer.disconnect();
+  }, []);
+
+  // The most conservative measured pane height: the card can never claim more than the pane it
+  // actually lives in, whichever source reported the smaller number. Zero when nothing has been
+  // measured (both the prop and the live reading absent), which keeps the stylesheet fallback in
+  // charge — see `measuredCardMaxHeight` below.
+  const measuredPaneHeightPx = useMemo(() => {
+    const measured = [transcriptHeightPx, livePaneHeightPx].filter(
+      (value): value is number => typeof value === 'number' && value > 0,
+    );
+    return measured.length > 0 ? Math.min(...measured) : 0;
+  }, [transcriptHeightPx, livePaneHeightPx]);
+
   const measuredCardMaxHeight = useMemo<React.CSSProperties | undefined>(
     () =>
-      transcriptHeightPx
+      measuredPaneHeightPx
         ? {
             maxHeight: Math.max(
               RESULTS_CARD_MIN_HEIGHT_PX,
               Math.min(
-                RESULTS_CARD_MAX_HEIGHT_PX,
-                transcriptHeightPx - RESULTS_CARD_TRANSCRIPT_RESERVE_PX,
+                cardMaxHeightCeilingPx,
+                measuredPaneHeightPx - RESULTS_CARD_TRANSCRIPT_RESERVE_PX,
               ),
             ),
           }
         : undefined,
-    [transcriptHeightPx],
+    [measuredPaneHeightPx, cardMaxHeightCeilingPx],
   );
+
+  // Scrolling body ref (iteration-4 item 3). The actual scroll-to-top reset lives in the
+  // `useLayoutEffect` below, keyed on `[safePageIndex, pageSize]` — that runs for a page-size
+  // change (including going back to the 5-row default) AND for a plain next/previous-page click,
+  // which used to leave the body scrolled wherever it was on the PREVIOUS page.
+  const bodyRef = useRef<HTMLDivElement | null>(null);
+  const handlePageSizeChange = (size: number) => {
+    setUserPickedPageSize(true);
+    setPageSize(size);
+    setPageIndex(0);
+    // Tell chat-page the card is about to grow/shrink so it can re-pin the transcript to the new
+    // bottom (only if the reader was already following it) — otherwise a larger page size grows the
+    // card downward and its pinned footer lands behind the composer until a manual scroll. Fired in
+    // the same event as the state changes above, so React commits the grown card and chat-page's
+    // re-pin in one pass (chat-page reads the pane's height AFTER the growth). See this prop's own
+    // doc comment.
+    onRowsPerPageChange?.();
+  };
 
   /**
    * Whether the pagination footer has anything to offer. The footer used to render for ANY
@@ -567,6 +718,17 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
         return {
           field: column.id,
           name: column.label,
+          // A column whose every value is short gets a matching short width, so the ONE free-text
+          // column in a findings table (the rule/finding title) inherits all the leftover room
+          // instead of the fixed layout dividing it evenly. The live audit (§3.4) measured the
+          // even split as three identical 324px slabs holding an agent name and a category each,
+          // while the title beside them wrapped onto three lines. Data-driven rather than keyed to
+          // field names: this renderer is generic (any tool's spec), so "how wide should this be"
+          // can only come from what the column actually holds — the same way the timestamp and
+          // severity cases above are detected rather than declared.
+          ...(isShortValueColumn(spec.rows, column.id)
+            ? { width: SHORT_COLUMN_WIDTH }
+            : {}),
           render: renderDefaultCell,
         };
       }),
@@ -616,6 +778,18 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   // question), so a reader sitting on page 6 of a 26-row result would otherwise slice past the end
   // of a new 8-row one — an empty body under "Page 6 of 2", with Next disabled.
   const safePageIndex = Math.min(pageIndex, pageCount - 1);
+
+  // Resets the scrolling body to its top for EITHER trigger that changes which rows are on
+  // screen: a page-size change (`pageSize`) or a plain next/previous-page click (`safePageIndex`)
+  // — a `useLayoutEffect` rather than the event handlers themselves because `safePageIndex` (not
+  // the `pageIndex` state the click handlers set) is the value that actually decides what is
+  // rendered, and running before paint avoids a visible scrolled-then-snapped-to-top flash.
+  useLayoutEffect(() => {
+    if (bodyRef.current) {
+      bodyRef.current.scrollTop = 0;
+    }
+  }, [safePageIndex, pageSize]);
+
   const pageStart = safePageIndex * pageSize;
   const pagedItems = useMemo(
     () => items.slice(pageStart, pageStart + pageSize),
@@ -678,7 +852,13 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
     // wraps its content in markup this component does not control, which fought the exact 3-row
     // grid this fix depends on; `wzResultsCard` (result-table.scss) applies the same bordered,
     // shadowless look via the shared `wzPanel` mixin instead, so the visual result is identical.
-    <div className='wzResultsCard' style={measuredCardMaxHeight}>
+    <div
+      ref={cardRef}
+      className={
+        isExpanded ? 'wzResultsCard wzResultsCard--expanded' : 'wzResultsCard'
+      }
+      style={measuredCardMaxHeight}
+    >
       <div className='wzResultsCardHeader'>
         <button
           type='button'
@@ -697,6 +877,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
       </div>
       {hasOpened ? (
         <div
+          ref={bodyRef}
           id={bodyId}
           className='wzResultsCardBody'
           // `display: none` (not unmounting) once collapsed again — same lazy-mount contract as
@@ -753,10 +934,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
                     <EuiButtonEmpty
                       size='xs'
                       color={pageSize === size ? 'primary' : 'text'}
-                      onClick={() => {
-                        setPageSize(size);
-                        setPageIndex(0);
-                      }}
+                      onClick={() => handlePageSizeChange(size)}
                     >
                       {size}
                     </EuiButtonEmpty>
@@ -875,6 +1053,7 @@ class ResultTableBoundary extends React.Component<
         resolveSecurityAnalyticsUrl={this.props.resolveSecurityAnalyticsUrl}
         provenanceChips={this.props.provenanceChips}
         transcriptHeightPx={this.props.transcriptHeightPx}
+        onRowsPerPageChange={this.props.onRowsPerPageChange}
       />
     );
   }
@@ -886,6 +1065,7 @@ export const ResultTable: React.FC<ResultTableProps> = ({
   resolveSecurityAnalyticsUrl,
   provenanceChips,
   transcriptHeightPx,
+  onRowsPerPageChange,
 }) => (
   <ResultTableBoundary
     spec={spec}
@@ -893,5 +1073,6 @@ export const ResultTable: React.FC<ResultTableProps> = ({
     resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
     provenanceChips={provenanceChips}
     transcriptHeightPx={transcriptHeightPx}
+    onRowsPerPageChange={onRowsPerPageChange}
   />
 );

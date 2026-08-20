@@ -100,6 +100,8 @@ export const AssistantHeaderButton: React.FC<{ core: CoreStart }> = ({
       },
       {
         'data-test-subj': 'wzAiAssistantSidecar',
+        // Remove some animation style on focus the button
+        classNameButton: 'osd-resetFocusState',
         config: {
           dockedMode: 'right' as ISidecarConfig['dockedMode'],
           paddingSize: lastWidthRef.current,

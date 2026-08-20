@@ -3,8 +3,8 @@ import './provider-form-flyout.scss';
 import {
   EuiButton,
   EuiButtonEmpty,
+  EuiButtonGroup,
   EuiCallOut,
-  EuiCheckableCard,
   EuiCode,
   EuiCodeBlock,
   EuiComboBox,
@@ -25,7 +25,6 @@ import {
   EuiPopover,
   EuiPopoverTitle,
   EuiSpacer,
-  EuiText,
   EuiTextColor,
   EuiTitle,
   EuiToolTip,
@@ -272,6 +271,55 @@ const PROVIDER_URL_GUIDANCE: Record<
   },
 };
 
+const ANTHROPIC_HOST = 'api.anthropic.com';
+
+/**
+ * Cheap, non-blocking host/type sanity check shown under the endpoint field. It deliberately does
+ * NOT try to validate "is this a legitimate host for openai_compatible" — that type covers OpenAI,
+ * Gemini, Bedrock, Ollama, LM Studio, vLLM and any private gateway, so there is no closed set of
+ * valid hosts to check against. The one thing that IS checkable both ways is Anthropic's own host,
+ * since Anthropic has exactly one real endpoint: an `anthropic`-typed provider NOT pointed at it is
+ * almost certainly a stale/copy-pasted URL, and an `openai_compatible`-typed provider pointed AT it
+ * is almost certainly a type picked before/after the endpoint was changed. Never blocks Save —
+ * the server's own "Save & test" connection check is the real validator.
+ */
+function getBaseUrlMismatchWarning(
+  type: ProviderInput['type'],
+  baseUrl: string,
+): string | null {
+  const trimmed = baseUrl.trim();
+  if (!trimmed) {
+    return null;
+  }
+  let host: string;
+  try {
+    host = new URL(trimmed).hostname.toLowerCase();
+  } catch {
+    // Not a parseable URL at all — the field's own format validation (`baseUrlError`) already
+    // covers that case, so there is nothing further to add here.
+    return null;
+  }
+  if (type === 'anthropic' && host !== ANTHROPIC_HOST) {
+    return i18n.translate(
+      'wazuhAiAssistant.settings.form.baseUrlMismatchAnthropic',
+      {
+        defaultMessage:
+          "This endpoint doesn't look like an Anthropic endpoint — double-check before saving.",
+      },
+    );
+  }
+  if (type === 'openai_compatible' && host === ANTHROPIC_HOST) {
+    return i18n.translate(
+      'wazuhAiAssistant.settings.form.baseUrlMismatchOpenaiCompatible',
+      {
+        defaultMessage:
+          "This endpoint doesn't look like an OpenAI-compatible endpoint — double-check before saving.",
+      },
+    );
+  }
+  return null;
+}
+
 /**
  * Per-type MODEL guidance: the model field is free text (no enum — providers add models faster
  * than this form could track), so it gets the same examples-plus-docs treatment as the endpoint
@@ -313,7 +361,7 @@ const PROVIDER_MODEL_GUIDANCE: Record<
     note: OTHER_OPENAI_COMPATIBLE_PROVIDERS_NOTE,
   },
   anthropic: {
-    examples: ['claude-opus-4-8', 'claude-haiku-4-5'],
+    examples: ['claude-sonnet-5', 'claude-haiku-4-5'],
     docs: [
       {
         label: i18n.translate(
@@ -347,7 +395,7 @@ const VENDOR_MODEL_SUGGESTIONS: Array<{
   {
     match: 'api.anthropic.com',
     forType: 'anthropic',
-    models: ['claude-opus-4-8', 'claude-haiku-4-5', 'claude-sonnet-5'],
+    models: ['claude-sonnet-5', 'claude-haiku-4-5', 'claude-opus-5'],
   },
   {
     match: 'api.openai.com',
@@ -400,6 +448,54 @@ function getVendorModelSuggestions(
   return vendor?.models ?? [];
 }
 
+/**
+ * The four steps of the getting-started callout: one i18n message per step, so each is
+ * translatable on its own and the numbering comes from the `<ol>` rather than from the copy. They
+ * used to be a single message with "1. … 2. … 3. … 4. …" run together in one inline paragraph,
+ * which is the shape a sequence should never take — it neither scans nor is announced as a list.
+ */
+const GETTING_STARTED_STEPS: string[] = [
+  i18n.translate('wazuhAiAssistant.settings.form.gettingStartedStepType', {
+    defaultMessage: 'Pick a provider type.',
+  }),
+  i18n.translate('wazuhAiAssistant.settings.form.gettingStartedStepKey', {
+    defaultMessage: 'Paste its API key.',
+  }),
+  i18n.translate('wazuhAiAssistant.settings.form.gettingStartedStepModel', {
+    defaultMessage: 'Pick a model.',
+  }),
+  i18n.translate('wazuhAiAssistant.settings.form.gettingStartedStepTest', {
+    defaultMessage: 'Test the connection.',
+  }),
+];
+
+/**
+ * The form's ONE example-value chip. Four inline `EuiBadge` copies used to render this same idiom
+ * across the form, which is how they drifted apart in the first place; TWO render sites are left
+ * (the endpoint field's examples and the per-vendor model suggestions) now that the Model field's
+ * generic per-type examples row is gone.
+ *
+ * Every value it ever shows is a URL or a model id, so it is set in the code face: the chip has to
+ * read as a value you can click into the field, not as a label describing one. Clicking fills the
+ * field (validated for non-secret values — credentials are never chipped anywhere in this form).
+ * `onClickAriaLabel` is EUI's requirement for a clickable badge, so each caller passes the sentence
+ * that fits its own field.
+ */
+const ExampleChip: React.FC<{
+  value: string;
+  onClickAriaLabel: string;
+  onSelect: (value: string) => void;
+}> = ({ value, onClickAriaLabel, onSelect }) => (
+  <EuiBadge
+    className='wzProviderFlyout__exampleChip'
+    color='hollow'
+    onClick={() => onSelect(value)}
+    onClickAriaLabel={onClickAriaLabel}
+  >
+    <code>{value}</code>
+  </EuiBadge>
+);
+
 const RequiredLabel: React.FC<{ label: string }> = ({ label }) => (
   <>
     {label}{' '}
@@ -436,7 +532,14 @@ const DocsPopover: React.FC<{
   return (
     <EuiPopover
       button={
-        <EuiLink onClick={() => setIsOpen(open => !open)}>
+        // `lineHeight: 18px` matches the rest of this form's help-text rhythm (audit item 5):
+        // this single trigger backs both "API documentation" (endpoint URL) and "See available
+        // models" (model field) via `triggerLabel`, so fixing it here fixes both at once rather
+        // than needing two separate overrides at each call site.
+        <EuiLink
+          onClick={() => setIsOpen(open => !open)}
+          style={{ lineHeight: '18px' }}
+        >
           {triggerLabel}
         </EuiLink>
       }
@@ -462,9 +565,11 @@ const DocsPopover: React.FC<{
       {note && (
         <>
           <EuiSpacer size='s' />
-          <EuiText size='xs' color='subdued'>
-            {note}
-          </EuiText>
+          {/* Help-sized, like every other piece of guidance in this form — see
+              `.wzProviderFlyout__help`, which restates EUI's own `.euiFormHelpText` values for the
+              guidance blocks that sit outside an `EuiFormRow`'s `helpText` slot and therefore do
+              not inherit it. Deliberately not a second `EuiText size` on this form. */}
+          <div className='wzProviderFlyout__help'>{note}</div>
         </>
       )}
     </EuiPopover>
@@ -474,6 +579,21 @@ const DocsPopover: React.FC<{
 interface ProviderFormFlyoutProps {
   editingProvider: ProviderSummary | null;
   error: string | null;
+  /** Every provider already configured, so this form can refuse a name that is already taken
+   * before the round-trip. The server enforces the same rule with a 409
+   * (`rejectDuplicateProviderName` in server/routes/settings.ts), which is what covers a STALE
+   * list here — a provider created by someone else since this page last loaded.
+   *
+   * What neither check closes is a true concurrent-create TOCTOU: the server does a read and then
+   * a separate write, and the indexer endpoint behind providers has no unique constraint on `name`,
+   * so two admins submitting the same name in the same instant can both succeed. That residual race
+   * is ACCEPTED — the window is milliseconds and the worst outcome is two same-named providers,
+   * which an admin fixes by renaming one. Closing it properly needs a storage-level constraint that
+   * does not exist.
+   *
+   * Optional/absent means "no list available", which behaves exactly as before this prop existed:
+   * no client-side duplicate check at all. */
+  existingProviders?: ProviderSummary[];
   apiKeyEncryptionEnabled: boolean | null;
   /** True while a save (+ the connection test it triggers) is in flight. Optional/absent behaves
    * exactly as before this prop existed: the Save button is never shown as loading. */
@@ -489,6 +609,7 @@ interface ProviderFormFlyoutProps {
 export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   editingProvider,
   error,
+  existingProviders = [],
   apiKeyEncryptionEnabled,
   isSaving = false,
   testOutcome = null,
@@ -511,11 +632,13 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
       : emptyForm,
   );
   const [baseUrlError, setBaseUrlError] = useState<string | null>(null);
+  const [nameError, setNameError] = useState<string | null>(null);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
-  // Tracks whether the admin has typed into the endpoint URL field themselves, so switching
-  // provider type to anthropic only prefills its base URL while the field is still
-  // empty/untouched — never overwriting a value the admin already entered. An existing
-  // provider being edited already has a real baseUrl, so it starts "touched".
+  // Tracks whether the admin has typed into the endpoint URL field themselves (see the field's own
+  // `onChange` below), so a provider-type switch (`handleTypeChange` above) only ever resets the
+  // base URL while the field is still empty or holds one of the OLD type's own known defaults —
+  // never overwriting a value the admin actually entered. An existing provider being edited
+  // already has a real baseUrl, so it starts "touched".
   const [baseUrlTouched, setBaseUrlTouched] = useState(
     Boolean(editingProvider),
   );
@@ -527,6 +650,10 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   // guards its own label lookup the same way.
   const urlGuidance =
     PROVIDER_URL_GUIDANCE[form.type] ?? PROVIDER_URL_GUIDANCE.openai_compatible;
+  const baseUrlMismatchWarning = getBaseUrlMismatchWarning(
+    form.type,
+    form.baseUrl,
+  );
   const modelGuidance =
     PROVIDER_MODEL_GUIDANCE[form.type] ??
     PROVIDER_MODEL_GUIDANCE.openai_compatible;
@@ -545,24 +672,22 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
     form.baseUrl,
     form.type,
   );
-  // The "Suggested models:" chip row must not repeat an id already shown under "Examples:" above
-  // — PROVIDER_MODEL_GUIDANCE (curated per-type examples) and VENDOR_MODEL_SUGGESTIONS (curated
-  // per-endpoint suggestions) are maintained independently and can legitimately list the same
-  // model id (e.g. Anthropic's claude-opus-4-8/claude-haiku-4-5 appear in both tables), which used
-  // to render the same chip twice under two different labels. An id that only ONE of the two
-  // tables carries (e.g. claude-sonnet-5, vendor-only) is kept here untouched.
-  const suggestedModelChips = vendorModelSuggestions.filter(
-    model => !modelGuidance.examples.includes(model),
-  );
-  // Feeds the Model EuiComboBox's dropdown `options` — deliberately the RAW (non-deduplicated)
-  // vendor list: the Examples chips below are a separate, always-typeable affordance and are not
-  // part of this dropdown, so there is nothing for them to collide with here.
+  // Feeds both the "Suggested models:" chips and the Model EuiComboBox's dropdown `options`.
+  //
+  // No deduplication any more: this list used to be filtered against `modelGuidance.examples`,
+  // because an id curated in BOTH tables (Anthropic's claude-sonnet-5 is in each) rendered as two
+  // identical chips under two different headings. With the generic "Examples:" row gone (see the
+  // Model field below) there is nothing left to collide with — and keeping the filter would now do
+  // real damage, silently hiding the vendor's own primary model from the only list that still
+  // offers it.
   const modelOptions = vendorModelSuggestions.map(model => ({ label: model }));
   const selectedModelOption = form.model ? [{ label: form.model }] : [];
 
+  // Deliberately does NOT set `baseUrlTouched` — this fills the field from one of the type's own
+  // "Examples:" chips, which is still just a suggested value (see `handleTypeChange` above), not
+  // something the admin hand-typed. Only the field's own `onChange` marks it touched.
   const fillBaseUrl = (value: string) => {
     setForm({ ...form, baseUrl: value });
-    setBaseUrlTouched(true);
     if (baseUrlError) {
       setBaseUrlError(null);
     }
@@ -588,31 +713,41 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
 
   // Group 1 (Provider type) onChange: same prefill/clear logic the old EuiSelect's onChange had,
   // just taking the next type directly instead of reading it off a native <select> change event.
+  //
+  // Generalized from an anthropic-only special case: a value only ever gets reset here when it is
+  // empty OR is exactly one of the OLD type's own known defaults (its `placeholder`, or one of its
+  // "Examples:" chip values) — i.e. it reads as "still just this type's suggestion", never as
+  // something the admin put there on purpose. `baseUrlTouched` is the other half of that check: it
+  // starts `true` for an existing provider being edited (see its initializer above), so opening
+  // Edit and clicking around the type selector never rewrites a value the admin already has
+  // running in production — even one that happens to read identical to today's placeholder text —
+  // and it is set on the field's own `onChange` (real hand-typing) but deliberately NOT by
+  // `fillBaseUrl` (example-chip selections): picking a suggested example is exactly the kind of
+  // "still just a suggestion" value this reset is meant to catch on the next type switch.
   const handleTypeChange = (nextType: ProviderInput['type']) => {
     setForm(current => {
-      // Prefill Anthropic's base URL the first time the admin switches to that type, but only
-      // while the endpoint field is still empty/untouched — see `baseUrlTouched` above.
-      const shouldPrefillAnthropicBaseUrl =
-        nextType === 'anthropic' &&
-        !baseUrlTouched &&
-        current.baseUrl.trim() === '';
-      // Mirror image of the prefill above: leaving anthropic for another type while the field is
-      // still untouched and still holds exactly the value this form prefilled clears it again, so
-      // a wrong-type URL can't be saved unnoticed. A value the admin typed themselves
-      // (`baseUrlTouched`) is never touched here.
-      const shouldClearAnthropicPrefill =
-        current.type === 'anthropic' &&
-        nextType !== 'anthropic' &&
-        !baseUrlTouched &&
-        current.baseUrl === PROVIDER_URL_GUIDANCE.anthropic.placeholder;
+      const oldGuidance =
+        PROVIDER_URL_GUIDANCE[current.type] ??
+        PROVIDER_URL_GUIDANCE.openai_compatible;
+      const trimmedBaseUrl = current.baseUrl.trim();
+      const isOldTypeDefault =
+        trimmedBaseUrl === '' ||
+        trimmedBaseUrl === oldGuidance.placeholder ||
+        oldGuidance.examples.includes(trimmedBaseUrl);
+      const shouldReset = !baseUrlTouched && isOldTypeDefault;
+      // Anthropic effectively has one real endpoint, so switching TO it prefills the field with
+      // that value outright. Every other type covers multiple vendors (OpenAI, Gemini, Bedrock,
+      // Ollama, a private gateway...) with no single "the" default to fill in, so clearing the
+      // field and letting its own `placeholder` attribute show the new type's example is the
+      // equivalent behavior there.
+      const resetBaseUrl =
+        nextType === 'anthropic'
+          ? PROVIDER_URL_GUIDANCE.anthropic.placeholder
+          : '';
       return {
         ...current,
         type: nextType,
-        baseUrl: shouldPrefillAnthropicBaseUrl
-          ? PROVIDER_URL_GUIDANCE.anthropic.placeholder
-          : shouldClearAnthropicPrefill
-          ? ''
-          : current.baseUrl,
+        baseUrl: shouldReset ? resetBaseUrl : current.baseUrl,
       };
     });
   };
@@ -626,15 +761,38 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
       apiKey: form.apiKey?.trim() ?? '',
     };
 
-    if (!isValidEndpointUrl(trimmedForm.baseUrl)) {
-      setBaseUrlError(
-        i18n.translate('wazuhAiAssistant.settings.form.baseUrlInvalid', {
+    // Both field checks are evaluated BEFORE either returns, so one click surfaces everything that
+    // is wrong. Validating sequentially made a form with a duplicate name and a bad URL take two
+    // clicks to reveal two problems, which reads like the first fix broke something new.
+    //
+    // Duplicate name check, mirroring the server's own 409 (`rejectDuplicateProviderName`): same
+    // trim + lowercase comparison, and the provider being edited is excluded so re-saving it
+    // unchanged is never a collision with itself.
+    const normalizedName = trimmedForm.name.toLowerCase();
+    const nameTaken = existingProviders.some(
+      provider =>
+        provider.id !== editingProvider?.id &&
+        provider.name.trim().toLowerCase() === normalizedName,
+    );
+    const nextNameError = nameTaken
+      ? i18n.translate('wazuhAiAssistant.settings.form.nameDuplicate', {
+          defaultMessage:
+            'A provider named "{name}" already exists. Pick a different name.',
+          values: { name: trimmedForm.name },
+        })
+      : null;
+    const nextBaseUrlError = isValidEndpointUrl(trimmedForm.baseUrl)
+      ? null
+      : i18n.translate('wazuhAiAssistant.settings.form.baseUrlInvalid', {
           defaultMessage: 'Enter a valid URL starting with http:// or https://',
-        }),
-      );
+        });
+
+    setNameError(nextNameError);
+    setBaseUrlError(nextBaseUrlError);
+    if (nextNameError || nextBaseUrlError) {
       return;
     }
-    setBaseUrlError(null);
+
     await onSubmit(trimmedForm);
   };
 
@@ -673,6 +831,13 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
       <EuiFlyout
         onClose={requestClose}
         size='m'
+        // 640px on top of `size='m'` (audit §5.1). `m` resolved to 960px in this build while the
+        // form inside it was 400 wide — EUI caps a form control at 400px — so the flyout's right
+        // half was 500px of nothing, on the one surface the audit called genuinely too empty. The
+        // column below is now a single tight stack and everything in it terminates on the same
+        // edge; `size` stays as the smaller-viewport behaviour (`maxWidth` is a cap, not a width).
+        maxWidth={640}
+        className='wzProviderFlyoutPanel'
         aria-labelledby='wz-ai-provider-flyout-title'
       >
         <EuiFlyoutHeader hasBorder>
@@ -770,26 +935,18 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                   { defaultMessage: 'Getting started' },
                 )}
               >
-                <p>
-                  {i18n.translate(
-                    'wazuhAiAssistant.settings.form.gettingStartedSteps',
-                    {
-                      defaultMessage:
-                        '1. Pick a provider type. 2. Paste its API key. 3. Pick a model. ' +
-                        '4. Test the connection.',
-                    },
-                  )}
-                </p>
-                <p>
-                  {i18n.translate(
-                    'wazuhAiAssistant.settings.form.gettingStartedTestCaveat',
-                    {
-                      defaultMessage:
-                        'A green test confirms connection and key — it does not guarantee ' +
-                        'every chat request will succeed.',
-                    },
-                  )}
-                </p>
+                {/* A real ordered list, not four sentences run together in one paragraph: the
+                    numbers come from the `<ol>`, so they stay correct under translation and the
+                    steps scan as a sequence. `EuiCallOut` already wraps its children in `EuiText`,
+                    which is what supplies the list styling. The caveat sentence that used to close
+                    this callout ("a green test confirms connection and key…") is gone: hedging the
+                    Test button before the admin has filled anything in was noise on the one
+                    surface that has to feel simple. */}
+                <ol className='wzProviderFlyout__steps'>
+                  {GETTING_STARTED_STEPS.map(step => (
+                    <li key={step}>{step}</li>
+                  ))}
+                </ol>
               </EuiCallOut>
               <EuiSpacer size='m' />
             </>
@@ -804,25 +961,40 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 ),
               }}
             >
-              <EuiFlexGroup gutterSize='m' responsive={false}>
-                {PROVIDER_TYPES.map(type => (
-                  <EuiFlexItem key={type}>
-                    <EuiCheckableCard
-                      id={`wz-ai-provider-type-${type}`}
-                      label={PROVIDER_TYPE_FORM_LABELS[type]}
-                      name='wz-ai-provider-type'
-                      value={type}
-                      checkableType='radio'
-                      checked={form.type === type}
-                      onChange={() => handleTypeChange(type)}
-                    />
-                  </EuiFlexItem>
-                ))}
-              </EuiFlexGroup>
-              <EuiSpacer size='s' />
-              <EuiText size='s' color='subdued'>
-                <p>{PROVIDER_TYPE_DESCRIPTIONS[form.type]}</p>
-              </EuiText>
+              {/* A segmented control, not a pair of huge cards (UX iteration 4 item 1): a binary
+                  choice does not need ~450px of card real estate, and the old layout rendered
+                  BOTH types' descriptions at once while only one was ever selected — confusing on
+                  the exact surface CEO feedback already flagged as hard to get right. The
+                  selection-dependent description now lives in this EuiFormRow's own `helpText`,
+                  so only the type actually chosen is ever described. */}
+              <EuiFormRow
+                helpText={
+                  // A plain element, not an `EuiText size='s'`: `size='s'` renders at 14px/21px,
+                  // which made this the only 14px helper text in a form whose every other
+                  // `helpText` (the API key's, the endpoint URL's below) is the slot's own
+                  // 12px/18px — the same near-miss the endpoint URL's own comment already calls
+                  // out for this file. A plain `<p>` inherits `.euiFormHelpText`'s size/color
+                  // directly, so there is exactly one mechanism setting this text's size, not two
+                  // that can drift apart (audit item 5).
+                  <p>{PROVIDER_TYPE_DESCRIPTIONS[form.type]}</p>
+                }
+              >
+                <EuiButtonGroup
+                  legend={i18n.translate(
+                    'wazuhAiAssistant.settings.form.providerTypeButtonGroupLegend',
+                    { defaultMessage: 'Provider type' },
+                  )}
+                  buttonSize='compressed'
+                  isFullWidth
+                  type='single'
+                  idSelected={form.type}
+                  onChange={id => handleTypeChange(id as ProviderInput['type'])}
+                  options={PROVIDER_TYPES.map(type => ({
+                    id: type,
+                    label: PROVIDER_TYPE_FORM_LABELS[type],
+                  }))}
+                />
+              </EuiFormRow>
             </EuiFormFieldset>
 
             <EuiFormFieldset
@@ -834,7 +1006,17 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 ),
               }}
             >
-              <EuiFlexGroup gutterSize='m' responsive={false}>
+              {/* One COLUMN, not two (audit §5.1): the API key field follows Name in the flow
+                  instead of sitting beside it. Side by side, each field was half of a control EUI
+                  already caps at 400px, and the API key's two-paragraph help text sat level with
+                  the Name field's blank space — the shape that produced a 960px flyout holding a
+                  400px form. `direction='column'` rather than unwrapping the group entirely so the
+                  two rows keep one owner for the gap between them. */}
+              <EuiFlexGroup
+                direction='column'
+                gutterSize='m'
+                responsive={false}
+              >
                 <EuiFlexItem>
                   <EuiFormRow
                     id='wz-ai-provider-name'
@@ -846,13 +1028,21 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                         )}
                       />
                     }
+                    isInvalid={Boolean(nameError)}
+                    error={nameError}
                   >
                     <EuiFieldText
                       value={form.name}
                       aria-required='true'
-                      onChange={event =>
-                        setForm({ ...form, name: event.target.value })
-                      }
+                      isInvalid={Boolean(nameError)}
+                      onChange={event => {
+                        setForm({ ...form, name: event.target.value });
+                        // Clear the duplicate-name error as soon as the admin starts fixing it,
+                        // same as `fillBaseUrl` does for `baseUrlError`.
+                        if (nameError) {
+                          setNameError(null);
+                        }
+                      }}
                     />
                   </EuiFormRow>
                 </EuiFlexItem>
@@ -940,11 +1130,11 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 error={baseUrlError}
                 helpText={
                   <>
-                    <EuiText
-                      size='xs'
-                      color='subdued'
-                      id='wz-ai-provider-baseurl-examples-label'
-                    >
+                    {/* A plain element, so it takes the `helpText` slot's own
+                        `.euiFormHelpText` size and color. It used to be an `EuiText size='xs'`,
+                        which produced the same visual size by a second, independent mechanism —
+                        the kind of near-miss that made this form read as sloppy. */}
+                    <div id='wz-ai-provider-baseurl-examples-label'>
                       <FormattedMessage
                         id='wazuhAiAssistant.settings.form.baseUrlExample'
                         defaultMessage='{header}:'
@@ -955,7 +1145,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                               : 'Example',
                         }}
                       />
-                    </EuiText>
+                    </div>
                     <EuiSpacer size='xs' />
                     <EuiFlexGroup
                       wrap
@@ -966,9 +1156,9 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     >
                       {urlGuidance.examples.map(example => (
                         <EuiFlexItem grow={false} key={example}>
-                          <EuiBadge
-                            color='hollow'
-                            onClick={() => fillBaseUrl(example)}
+                          <ExampleChip
+                            value={example}
+                            onSelect={fillBaseUrl}
                             onClickAriaLabel={i18n.translate(
                               'wazuhAiAssistant.settings.form.baseUrlExampleAriaLabel',
                               {
@@ -976,9 +1166,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                                 values: { example },
                               },
                             )}
-                          >
-                            {example}
-                          </EuiBadge>
+                          />
                         </EuiFlexItem>
                       ))}
                     </EuiFlexGroup>
@@ -1014,6 +1202,20 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                   }}
                 />
               </EuiFormRow>
+              {/* Non-blocking: a host/type mismatch never stops Save, same idea as the API key
+                  shape warning above — it only flags a likely wrong-endpoint mistake before the
+                  admin hits an opaque "Test connection" failure. */}
+              {baseUrlMismatchWarning && (
+                <>
+                  <EuiSpacer size='xs' />
+                  <EuiCallOut
+                    size='s'
+                    color='warning'
+                    iconType='alert'
+                    title={baseUrlMismatchWarning}
+                  />
+                </>
+              )}
             </EuiFormFieldset>
 
             <EuiFormFieldset
@@ -1027,6 +1229,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
             >
               <EuiFormRow
                 id='wz-ai-provider-model'
+                fullWidth
                 label={
                   <RequiredLabel
                     label={i18n.translate(
@@ -1035,71 +1238,36 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     )}
                   />
                 }
+                // No generic "Examples:" chip row here any more (Miguel + UX decision, recorded in
+                // the audit's own "additional decided items"): the two ids it offered were
+                // Bedrock-gateway model names, i.e. valid for exactly one of the many services this
+                // provider type covers, and they were shown on every endpoint — including one whose
+                // own vendor suggestions were listed 20px below under a second heading. What
+                // remains is everything that is actually keyed to the admin's endpoint: the combo
+                // box's own suggestions, the "Suggested models:" chips, and the vendor's model list
+                // behind the link below. The endpoint field keeps its examples, because there an
+                // example is the fastest way to recognise the shape of the value being asked for.
                 helpText={
-                  <>
-                    <EuiText
-                      size='xs'
-                      color='subdued'
-                      id='wz-ai-provider-model-examples-label'
-                    >
-                      <FormattedMessage
-                        id='wazuhAiAssistant.settings.form.modelExample'
-                        defaultMessage='{header}:'
-                        values={{
-                          header:
-                            modelGuidance.examples.length > 1
-                              ? 'Examples'
-                              : 'Example',
-                        }}
-                      />
-                    </EuiText>
-                    <EuiSpacer size='xs' />
-                    <EuiFlexGroup
-                      wrap
-                      gutterSize='xs'
-                      responsive={false}
-                      role='group'
-                      aria-labelledby='wz-ai-provider-model-examples-label'
-                    >
-                      {modelGuidance.examples.map(example => (
-                        <EuiFlexItem grow={false} key={example}>
-                          <EuiBadge
-                            color='hollow'
-                            onClick={() => fillModel(example)}
-                            onClickAriaLabel={i18n.translate(
-                              'wazuhAiAssistant.settings.form.modelExampleAriaLabel',
-                              {
-                                defaultMessage: 'Use model {example}',
-                                values: { example },
-                              },
-                            )}
-                          >
-                            {example}
-                          </EuiBadge>
-                        </EuiFlexItem>
-                      ))}
-                    </EuiFlexGroup>
-                    <EuiSpacer size='xs' />
-                    <DocsPopover
-                      triggerLabel={i18n.translate(
-                        'wazuhAiAssistant.settings.form.modelDocsButton',
-                        {
-                          defaultMessage: 'See available models',
-                        },
-                      )}
-                      title={i18n.translate(
-                        'wazuhAiAssistant.settings.form.modelDocsTitle',
-                        {
-                          defaultMessage: 'Model documentation',
-                        },
-                      )}
-                      docs={modelGuidance.docs}
-                      note={modelGuidance.note}
-                    />
-                  </>
+                  <DocsPopover
+                    triggerLabel={i18n.translate(
+                      'wazuhAiAssistant.settings.form.modelDocsButton',
+                      {
+                        defaultMessage: 'See available models',
+                      },
+                    )}
+                    title={i18n.translate(
+                      'wazuhAiAssistant.settings.form.modelDocsTitle',
+                      {
+                        defaultMessage: 'Model documentation',
+                      },
+                    )}
+                    docs={modelGuidance.docs}
+                    note={modelGuidance.note}
+                  />
                 }
               >
                 <EuiComboBox
+                  fullWidth
                   placeholder={i18n.translate(
                     'wazuhAiAssistant.settings.form.modelPlaceholder',
                     {
@@ -1136,22 +1304,25 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                   vendor — clicking a chip fills the model (still freely re-typeable in the
                   EuiComboBox above). Kept outside the EuiFormRow above for the same reason as the
                   API key shape warning: EuiFormRow clones its single child to inject a11y props,
-                  so it cannot take a sibling. Deduplicated against the "Examples:" chips above
-                  (`suggestedModelChips`, not the raw `vendorModelSuggestions`) so an id shared by
-                  both curated lists (e.g. Anthropic's claude-opus-4-8) isn't rendered twice. */}
-              {suggestedModelChips.length > 0 && (
+                  so it cannot take a sibling. These are now the field's ONLY chips (the generic
+                  per-type "Examples:" row is gone), so the list is used raw — see
+                  `modelOptions` above for why the dedupe went with it. */}
+              {vendorModelSuggestions.length > 0 && (
                 <>
                   <EuiSpacer size='xs' />
-                  <EuiText
-                    size='xs'
-                    color='subdued'
+                  {/* This block sits OUTSIDE the EuiFormRow above (see the comment there), so it
+                      cannot inherit the `helpText` slot's styling — `.wzProviderFlyout__help`
+                      restates EUI's own `.euiFormHelpText` values so it matches the examples label
+                      one field up pixel for pixel. */}
+                  <div
+                    className='wzProviderFlyout__help'
                     id='wz-ai-provider-model-suggestions-label'
                   >
                     {i18n.translate(
                       'wazuhAiAssistant.settings.form.modelSuggestionsLabel',
                       { defaultMessage: 'Suggested models:' },
                     )}
-                  </EuiText>
+                  </div>
                   <EuiSpacer size='xs' />
                   <EuiFlexGroup
                     gutterSize='xs'
@@ -1160,11 +1331,11 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     role='group'
                     aria-labelledby='wz-ai-provider-model-suggestions-label'
                   >
-                    {suggestedModelChips.map(suggestedModel => (
+                    {vendorModelSuggestions.map(suggestedModel => (
                       <EuiFlexItem key={suggestedModel} grow={false}>
-                        <EuiBadge
-                          color='hollow'
-                          onClick={() => fillModel(suggestedModel)}
+                        <ExampleChip
+                          value={suggestedModel}
+                          onSelect={fillModel}
                           onClickAriaLabel={i18n.translate(
                             'wazuhAiAssistant.settings.form.modelSuggestionAriaLabel',
                             {
@@ -1172,9 +1343,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                               values: { suggestedModel },
                             },
                           )}
-                        >
-                          {suggestedModel}
-                        </EuiBadge>
+                        />
                       </EuiFlexItem>
                     ))}
                   </EuiFlexGroup>
@@ -1214,20 +1383,16 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     // tool-calling example and one click filled the Model field with a value that
                     // provider cannot serve. `modelGuidance.examples` is the same per-type list
                     // the Examples chips two fields above already use.
+                    //
+                    // Rendered as plain inline code, NOT as an `ExampleChip`: this one is
+                    // illustrative prose ("a model like this one"), and the very same id is already
+                    // offered as a real fill-on-click chip under the Model field. A chip here looked
+                    // identical to those but sat mid-sentence inside a warning, so it advertised an
+                    // action where the surrounding text was only naming an example.
                     model: (
-                      <EuiBadge
-                        color='hollow'
-                        onClick={() => fillModel(toolCallingExampleModel)}
-                        onClickAriaLabel={i18n.translate(
-                          'wazuhAiAssistant.settings.form.toolCallingModelChipAriaLabel',
-                          {
-                            defaultMessage: 'Use model {model}',
-                            values: { model: toolCallingExampleModel },
-                          },
-                        )}
-                      >
+                      <code className='wzProviderFlyout__inlineValue'>
                         {toolCallingExampleModel}
-                      </EuiBadge>
+                      </code>
                     ),
                   }}
                 />
@@ -1279,58 +1444,55 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
           </EuiForm>
         </EuiFlyoutBody>
         <EuiFlyoutFooter>
-          {testOutcome ? (
-            // A result is already showing: the save happened, so there is nothing left to
-            // Cancel — a single "Done" replaces the Cancel/Save & test pair.
-            <EuiFlexGroup justifyContent='flexEnd' responsive={false}>
-              <EuiFlexItem grow={false}>
-                <EuiButton onClick={onClose} fill>
-                  {i18n.translate('wazuhAiAssistant.settings.form.done', {
-                    defaultMessage: 'Done',
-                  })}
-                </EuiButton>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          ) : (
-            <EuiFlexGroup justifyContent='spaceBetween'>
-              <EuiFlexItem grow={false}>
-                <EuiButtonEmpty onClick={requestClose} flush='left'>
-                  {i18n.translate('wazuhAiAssistant.settings.form.cancel', {
-                    defaultMessage: 'Cancel',
-                  })}
-                </EuiButtonEmpty>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <EuiToolTip
-                  content={
-                    apiKeyBlockedByEncryption
-                      ? i18n.translate(
-                          'wazuhAiAssistant.settings.form.encryptionRequiredTooltip',
-                          {
-                            defaultMessage:
-                              'An encryption key must be configured before an API key can be saved.',
-                          },
-                        )
-                      : undefined
-                  }
+          {/* A passing test closes the flyout on its own (see settings-page.tsx's handleSubmit),
+              so `testOutcome` only ever holds a failed/could-not-verify result here — the admin
+              needs to fix the config and retry, so "Save & test" stays available alongside the
+              close action instead of being replaced by a lone "Done". */}
+          <EuiFlexGroup justifyContent='spaceBetween'>
+            <EuiFlexItem grow={false}>
+              <EuiButtonEmpty
+                onClick={testOutcome ? onClose : requestClose}
+                flush='left'
+              >
+                {testOutcome
+                  ? i18n.translate('wazuhAiAssistant.settings.form.done', {
+                      defaultMessage: 'Done',
+                    })
+                  : i18n.translate('wazuhAiAssistant.settings.form.cancel', {
+                      defaultMessage: 'Cancel',
+                    })}
+              </EuiButtonEmpty>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiToolTip
+                content={
+                  apiKeyBlockedByEncryption
+                    ? i18n.translate(
+                        'wazuhAiAssistant.settings.form.encryptionRequiredTooltip',
+                        {
+                          defaultMessage:
+                            'An encryption key must be configured before an API key can be saved.',
+                        },
+                      )
+                    : undefined
+                }
+              >
+                <EuiButton
+                  onClick={handleSave}
+                  isDisabled={apiKeyBlockedByEncryption || isSaving}
+                  isLoading={isSaving}
+                  fill
                 >
-                  <EuiButton
-                    onClick={handleSave}
-                    isDisabled={apiKeyBlockedByEncryption || isSaving}
-                    isLoading={isSaving}
-                    fill
-                  >
-                    {i18n.translate(
-                      'wazuhAiAssistant.settings.form.saveAndTest',
-                      {
-                        defaultMessage: 'Save & test',
-                      },
-                    )}
-                  </EuiButton>
-                </EuiToolTip>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          )}
+                  {i18n.translate(
+                    'wazuhAiAssistant.settings.form.saveAndTest',
+                    {
+                      defaultMessage: 'Save & test',
+                    },
+                  )}
+                </EuiButton>
+              </EuiToolTip>
+            </EuiFlexItem>
+          </EuiFlexGroup>
         </EuiFlyoutFooter>
       </EuiFlyout>
       {showCloseConfirm && (

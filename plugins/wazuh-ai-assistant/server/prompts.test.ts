@@ -46,7 +46,7 @@ test('buildSystemPrompt: instructs the model to never assert a remediation/compl
 // inside tool results. The fix anchors explicitly to the user's MOST RECENT message and names
 // tool-result content as not a language signal.
 
-test('buildSystemPrompt: instructs the model to answer in the language of the user\'s MOST RECENT message', () => {
+test("buildSystemPrompt: instructs the model to answer in the language of the user's MOST RECENT message", () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(prompt, /MOST RECENT message/);
   assert.match(prompt, /never an\s+earlier message/);
@@ -60,7 +60,7 @@ test('buildSystemPrompt: tool-result content (hostnames, log lines, CVE text) is
   );
 });
 
-test('buildSystemPrompt: the language rule explicitly overrides an earlier turn\'s language', () => {
+test("buildSystemPrompt: the language rule explicitly overrides an earlier turn's language", () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
@@ -288,6 +288,49 @@ test('buildSystemPrompt: the deliberate vulnerability-history limitation is NOT 
   );
 });
 
+test('buildSystemPrompt: instructs the model to never name internal tool ids in explanatory prose', () => {
+  // A real answer once wrote "which get_rules (Security Analytics correlation rules) doesn't
+  // index..." -- a raw tool id from CAPABILITY_INVENTORY leaking into the user-visible answer,
+  // inside an EXPLANATION rather than an offer. The model has no other source for these ids
+  // than the catalog clause, so the rule must name at least one example id and require
+  // plain-language description instead, scoped to explanatory/narrative prose so it does not
+  // swallow the pre-existing search_wazuh_data offer instruction (see next test).
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /Never write an internal tool name \(e\.g\. get_rules, search_wazuh_data\) inside an\s+explanation or narrative sentence of your answer text/,
+  );
+  assert.match(prompt, /describe the capability in\s+plain language instead/);
+});
+
+test('buildSystemPrompt: the no-tool-names rule explicitly carves out the search_wazuh_data offer, and the offer instruction still survives verbatim', () => {
+  // Fix for the contradiction flagged in adversarial review: prompts.ts previously told the
+  // model both to offer to query with search_wazuh_data BY NAME (Answer format rule) and to
+  // never write an internal tool name in its answer (added later). If the model obeyed the
+  // newer, more general rule, it would stop naming search_wazuh_data in its offers, which
+  // silently disables findOfferedFollowUpTool's regex-based deferred-offer detector in
+  // routes/chat.ts (it matches on the bare tool name appearing in an offer-shaped sentence).
+  // Both rules must therefore explicitly cross-reference the same carve-out, and the offer
+  // instruction itself must still be present so the detector has something to match.
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  // The pre-existing offer instruction must still order the model to name search_wazuh_data.
+  assert.match(
+    prompt,
+    /say so and offer to query\s+it with search_wazuh_data instead of speculating/,
+  );
+  // The offer instruction must flag itself as the exception to the no-tool-names rule.
+  assert.match(
+    prompt,
+    /is the one permitted exception to the\s+"never write an internal tool name" rule below/,
+  );
+  // The no-tool-names rule must in turn reference that same carve-out by describing the exact
+  // offer sentence, so a future reader cannot read the two rules as contradictory.
+  assert.match(
+    prompt,
+    /The one exception is the follow-up-offer sentence described in the Answer format\s+rule above/,
+  );
+});
+
 test('buildSystemPrompt: still says plainly what it can/cannot check (amended, not contradicted)', () => {
   // The new "never claim a missing capability" line must not silently replace or contradict
   // the pre-existing honesty instruction it was added next to.
@@ -356,24 +399,18 @@ test('buildSystemPrompt: instructs the model to call get_field_values before fil
   );
 });
 
-test('buildSystemPrompt: instructs the model to verify a field\'s real values after a zero-row filtered result, before concluding absence', () => {
+test("buildSystemPrompt: instructs the model to verify a field's real values after a zero-row filtered result, before concluding absence", () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
     /call get_field_values on that\s+same field before concluding it does not exist/,
   );
-  assert.match(
-    prompt,
-    /did not match, not that the data is absent/,
-  );
+  assert.match(prompt, /did not match, not that the data is absent/);
 });
 
 test('buildSystemPrompt: keeps "field is unpopulated" and "no documents match" as distinct, non-substitutable statements', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
-  assert.match(
-    prompt,
-    /"field X is\s+unpopulated\/empty in your data"/,
-  );
+  assert.match(prompt, /"field X is\s+unpopulated\/empty in your data"/);
   assert.match(prompt, /"no documents\s+match your filter"/);
   assert.match(
     prompt,
@@ -449,10 +486,7 @@ test('buildSystemPrompt: still names the data-gap declines this workstream does 
     prompt,
     /I can't\s+compare your custom rules against the 4\.x ruleset for compatibility/,
   );
-  assert.match(
-    prompt,
-    /I can't check integration health directly/,
-  );
+  assert.match(prompt, /I can't check integration health directly/);
   assert.match(prompt, /I don't have alert data for that detector/);
   assert.match(
     prompt,
@@ -462,10 +496,7 @@ test('buildSystemPrompt: still names the data-gap declines this workstream does 
     prompt,
     /I don't\s+have a way to filter or aggregate on that field yet/,
   );
-  assert.match(
-    prompt,
-    /That's outside what I can help with here/,
-  );
+  assert.match(prompt, /That's outside what I can help with here/);
 });
 
 test('buildSystemPrompt: decline copy itself (the quoted user-facing sentences) never mentions tiers, roadmap status, or internal workstream codenames', () => {
@@ -474,15 +505,19 @@ test('buildSystemPrompt: decline copy itself (the quoted user-facing sentences) 
   // whole-prompt check would fail on that meta-instruction itself.
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   const quoted = [...prompt.matchAll(/"([^"]{20,})"/g)].map(m => m[1]);
-  const declineSentences = quoted.filter(text =>
-    text.startsWith('I can'),
-  );
+  const declineSentences = quoted.filter(text => text.startsWith('I can'));
   assert.ok(
     declineSentences.length >= 5,
     `expected at least 5 quoted decline sentences, found ${declineSentences.length}`,
   );
   for (const sentence of declineSentences) {
-    for (const forbidden of [/\btier\b/i, /roadmap/i, /workstream/i, /\bA1a\b/, /beta3/i]) {
+    for (const forbidden of [
+      /\btier\b/i,
+      /roadmap/i,
+      /workstream/i,
+      /\bA1a\b/,
+      /beta3/i,
+    ]) {
       assert.doesNotMatch(
         sentence,
         forbidden,
@@ -577,31 +612,37 @@ test('D2 fix (AI/plan/d-review.md): the group-by-theme instruction is scoped to 
 
 // --- Group E: how-to/configuration-question interim policy -------------------------------------
 
-test('Group E: how-to/configuration questions are answered from general knowledge, with a ' +
-  'visible verify-against-docs disclaimer required', () => {
-  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
-  assert.match(
-    prompt,
-    /For how-to\/configuration questions with no dedicated tool/,
-  );
-  assert.match(
-    prompt,
-    /include a visible note that the guidance\s+should be verified against the Wazuh 5\.0 documentation/,
-  );
-});
+test(
+  'Group E: how-to/configuration questions are answered from general knowledge, with a ' +
+    'visible verify-against-docs disclaimer required',
+  () => {
+    const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+    assert.match(
+      prompt,
+      /For how-to\/configuration questions with no dedicated tool/,
+    );
+    assert.match(
+      prompt,
+      /include a visible note that the guidance\s+should be verified against the Wazuh 5\.0 documentation/,
+    );
+  },
+);
 
-test('Group E: instructs never inventing a 5.0-specific path/command/setting/UI location, and ' +
-  'to say so explicitly and defer to docs when unsure whether a detail changed in 5.0', () => {
-  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
-  assert.match(
-    prompt,
-    /NEVER\s+invent a 5\.0-specific file path, command, setting name, or UI location/,
-  );
-  assert.match(
-    prompt,
-    /when you are not sure whether a detail changed in 5\.0, say so explicitly/,
-  );
-});
+test(
+  'Group E: instructs never inventing a 5.0-specific path/command/setting/UI location, and ' +
+    'to say so explicitly and defer to docs when unsure whether a detail changed in 5.0',
+  () => {
+    const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+    assert.match(
+      prompt,
+      /NEVER\s+invent a 5\.0-specific file path, command, setting name, or UI location/,
+    );
+    assert.match(
+      prompt,
+      /when you are not sure whether a detail changed in 5\.0, say so explicitly/,
+    );
+  },
+);
 
 test('Group E: instructs still using live-data tools for the data half of a mixed how-to/data question', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
@@ -613,123 +654,192 @@ test('Group E: instructs still using live-data tools for the data half of a mixe
 
 // REVIEW FIX E (groupA-regression-review.md, MEDIUM): a how-to about a non-Wazuh product must
 // still get the out-of-domain decline, never the how-to policy.
-test('Group E fix: the how-to policy is explicitly scoped to Wazuh itself, and points a ' +
-  'non-Wazuh how-to back at the out-of-domain decline', () => {
-  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
-  assert.match(
-    prompt,
-    /this policy applies\s+ONLY to how-tos about Wazuh itself/,
-  );
-  assert.match(
-    prompt,
-    /a how-to about anything else \(a third-party product,\s+e\.g\. "how do I configure my Cisco ASA", "how do I harden nginx"\) is\s+out-of-domain and must\s+get the out-of-domain\/adversarial decline above instead/,
-  );
-});
+test(
+  'Group E fix: the how-to policy is explicitly scoped to Wazuh itself, and points a ' +
+    'non-Wazuh how-to back at the out-of-domain decline',
+  () => {
+    const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+    assert.match(
+      prompt,
+      /this policy applies\s+ONLY to how-tos about Wazuh itself/,
+    );
+    assert.match(
+      prompt,
+      /a how-to about anything else \(a third-party product,\s+e\.g\. "how do I configure my Cisco ASA", "how do I harden nginx"\) is\s+out-of-domain and must\s+get the out-of-domain\/adversarial decline above instead/,
+    );
+  },
+);
 
-test('Group E fix: the how-to policy sits immediately after the out-of-domain decline in the ' +
-  'prompt array, so the two are read together rather than the how-to policy appearing to ' +
-  'override the decline it now explicitly defers to', () => {
-  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
-  const outOfDomainIndex = prompt.indexOf('Out-of-domain or adversarial input');
-  const howToIndex = prompt.indexOf(
-    'For how-to/configuration questions with no dedicated tool',
-  );
-  assert.ok(outOfDomainIndex >= 0 && howToIndex >= 0);
-  assert.ok(howToIndex > outOfDomainIndex);
-  // Nothing else should sit between the decline block and the how-to policy's own scope guard.
-  const between = prompt.slice(outOfDomainIndex, howToIndex);
-  assert.ok(
-    between.length < 800,
-    `expected the how-to policy to immediately follow the out-of-domain decline, found ${between.length} chars between them`,
-  );
-});
+test(
+  'Group E fix: the how-to policy sits immediately after the out-of-domain decline in the ' +
+    'prompt array, so the two are read together rather than the how-to policy appearing to ' +
+    'override the decline it now explicitly defers to',
+  () => {
+    const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+    const outOfDomainIndex = prompt.indexOf(
+      'Out-of-domain or adversarial input',
+    );
+    const howToIndex = prompt.indexOf(
+      'For how-to/configuration questions with no dedicated tool',
+    );
+    assert.ok(outOfDomainIndex >= 0 && howToIndex >= 0);
+    assert.ok(howToIndex > outOfDomainIndex);
+    // Nothing else should sit between the decline block and the how-to policy's own scope guard.
+    const between = prompt.slice(outOfDomainIndex, howToIndex);
+    assert.ok(
+      between.length < 800,
+      `expected the how-to policy to immediately follow the out-of-domain decline, found ${between.length} chars between them`,
+    );
+  },
+);
 
 // --- Group D: CV-017 (single-digest answer collapse) -- prompt-side nudge ----------------------
 
-test('CV-017 fix: instructs writing a real synthesized answer even for a single tool call, ' +
-  'not a bare row-count restatement', () => {
-  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
-  assert.match(
-    prompt,
-    /Even when only ONE tool call was needed to answer, still write a real answer/,
-  );
-  assert.match(prompt, /never a complete answer, regardless of how\s+many tool calls/);
-});
+test(
+  'CV-017 fix: instructs writing a real synthesized answer even for a single tool call, ' +
+    'not a bare row-count restatement',
+  () => {
+    const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+    assert.match(
+      prompt,
+      /Even when only ONE tool call was needed to answer, still write a real answer/,
+    );
+    assert.match(
+      prompt,
+      /never a complete answer, regardless of how\s+many tool calls/,
+    );
+  },
+);
 
 // --- Group B: CV-039 (inventory-kind escape hatch) / CV-076 (rule-corpus disclosure) -----------
 
-test('CV-039 fix: instructs trying search_wazuh_data on wazuh-states-inventory-* before ' +
-  'declining an inventory kind get_agent_inventory does not implement', () => {
-  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
-  assert.match(
-    prompt,
-    /get_agent_inventory only implements the FIVE syscollector kinds/,
-  );
-  assert.match(prompt, /Groups, users, network interfaces, hardware, protocols, services/);
-  assert.match(
-    prompt,
-    /ALWAYS\s+try search_wazuh_data against the matching wazuh-states-inventory-\* index first/,
-  );
-});
+test(
+  'CV-039 fix: instructs trying search_wazuh_data on wazuh-states-inventory-* before ' +
+    'declining an inventory kind get_agent_inventory does not implement',
+  () => {
+    const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+    assert.match(
+      prompt,
+      /get_agent_inventory only implements the FIVE syscollector kinds/,
+    );
+    assert.match(
+      prompt,
+      /Groups, users, network interfaces, hardware, protocols, services/,
+    );
+    assert.match(
+      prompt,
+      /ALWAYS\s+try search_wazuh_data against the matching wazuh-states-inventory-\* index first/,
+    );
+  },
+);
 
-test('CV-076 fix: instructs naming the rule corpus actually searched and disclosing the Manager ' +
-  'API was not queried', () => {
-  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
-  assert.match(
-    prompt,
-    /get_rules reads the Security Analytics Sigma\/UUID-shaped rule catalog/,
-  );
-  assert.match(
-    prompt,
-    /state plainly which\s+corpus you actually searched.*the Manager API\s+ruleset itself was not queried/s,
-  );
-});
+test(
+  'CV-076 fix: instructs naming the rule corpus actually searched and disclosing the Manager ' +
+    'API was not queried',
+  () => {
+    const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+    assert.match(
+      prompt,
+      /get_rules reads the Security Analytics Sigma\/UUID-shaped rule catalog/,
+    );
+    assert.match(
+      prompt,
+      /state plainly which\s+corpus you actually searched.*the Manager API\s+ruleset itself was not queried/s,
+    );
+  },
+);
 
 // --- Group C: decline-copy mapping fixes (CV-058/CV-077/CV-108) --------------------------------
 
-test('CV-077 fix: the RBAC/spaces decline is scoped away from a Security Analytics ' +
-  'content-listing question, and points it at get_threat_intel_components instead', () => {
-  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
-  assert.match(
-    prompt,
-    /the word space\/spaces is\s+overloaded -- this decline is ONLY for an access\/permission problem/,
-  );
-  assert.match(
-    prompt,
-    /call\s+get_threat_intel_components with component_type set to policies/,
-  );
-});
+test(
+  'CV-077 fix: the RBAC/spaces decline is scoped away from a Security Analytics ' +
+    'content-listing question, and points it at get_threat_intel_components instead',
+  () => {
+    const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+    assert.match(
+      prompt,
+      /the word space\/spaces is\s+overloaded -- this decline is ONLY for an access\/permission problem/,
+    );
+    assert.match(
+      prompt,
+      /call\s+get_threat_intel_components with component_type set to policies/,
+    );
+  },
+);
 
-test('CV-108 fix: notification-channel questions get their own in-domain decline copy, never the ' +
-  'out-of-domain/adversarial sentence', () => {
-  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
-  assert.match(
-    prompt,
-    /Which notification channels \(Slack\/email\/webhook\) are configured/,
-  );
-  assert.match(
-    prompt,
-    /I don't have a way to list configured notification channels yet/,
-  );
-});
+test(
+  'CV-108 fix: notification-channel questions get their own in-domain decline copy, never the ' +
+    'out-of-domain/adversarial sentence',
+  () => {
+    const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+    assert.match(
+      prompt,
+      /Which notification channels \(Slack\/email\/webhook\) are configured/,
+    );
+    assert.match(
+      prompt,
+      /I don't have a way to list configured notification channels yet/,
+    );
+  },
+);
 
-test('CV-058 fix: Windows registry FIM questions get a dedicated honest-empty decline (no tool ' +
-  'AND zero documents on a Linux-only fleet), not a bare zero-row table', () => {
-  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
-  assert.match(prompt, /Windows registry FIM changes \(registry keys\/values\)/);
-  assert.match(
-    prompt,
-    /this deployment's monitored hosts are Linux-only, so no registry documents exist here/,
-  );
-});
+test(
+  'CV-058 fix: Windows registry FIM questions get a dedicated honest-empty decline (no tool ' +
+    'AND zero documents on a Linux-only fleet), not a bare zero-row table',
+  () => {
+    const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+    assert.match(
+      prompt,
+      /Windows registry FIM changes \(registry keys\/values\)/,
+    );
+    assert.match(
+      prompt,
+      /this deployment's monitored hosts are Linux-only, so no registry documents exist here/,
+    );
+  },
+);
 
 // --- Group F: check.result casing (CV-094) ------------------------------------------------------
 
-test('CV-094 fix: instructs the exact capitalized check.result values for a hand-built ' +
-  'search_wazuh_data query against wazuh-states-sca*', () => {
+test(
+  'CV-094 fix: instructs the exact capitalized check.result values for a hand-built ' +
+    'search_wazuh_data query against wazuh-states-sca*',
+  () => {
+    const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+    assert.match(
+      prompt,
+      /check\.result \(SCA\) is stored CAPITALIZED: exactly "Failed", "Passed", or "Not applicable"/,
+    );
+  },
+);
+
+// Issue C4: within one turn, the orchestration loop (chat.ts's `orchestrate`) can run several
+// tool rounds, and each round's delta text is streamed straight to the client. Without an
+// explicit rule the model re-narrated the same sentences (e.g. the suggest_discover_query
+// handoff's "Let me hand you a Discover query…") on every retry round.
+
+test('buildSystemPrompt: instructs the model not to repeat earlier sentences within the same answer', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
-    /check\.result \(SCA\) is stored CAPITALIZED: exactly "Failed", "Passed", or "Not applicable"/,
+    /never repeat or re-explain a sentence you already wrote earlier in\s+this same answer/,
+  );
+  assert.match(
+    prompt,
+    /continue from where you left off instead of restarting the narration/,
+  );
+});
+
+// Live-audit finding (item 8a): a T1134 zero-rule answer restated the same "no matching rules
+// found" finding twice, in different wording, elsewhere in the same answer -- the generic
+// no-repeat rule above did not name this specific shape of the mistake explicitly enough to stop
+// it. This asserts the sharpened, zero-result-specific addition stays in the prompt.
+test('buildSystemPrompt: instructs the model to state a zero-row finding once, not restate it later in different wording', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /zero rows/);
+  assert.match(prompt, /state that absence[\s\S]*exactly ONCE/);
+  assert.match(
+    prompt,
+    /do not restate the same "nothing found" finding a second time later in the answer/,
   );
 });

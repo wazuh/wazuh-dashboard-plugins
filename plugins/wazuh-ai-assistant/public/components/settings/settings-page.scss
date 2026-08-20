@@ -9,6 +9,16 @@
 
 .wzSettingsPage {
   @include wzSurfaceTokens;
+
+  // Caps the header + the three SectionCards at one shared measure and centers that column, so
+  // the page reads as one composition instead of full-viewport cards with intrinsic-width content
+  // floating inside them (CEO complaint: "huge grey empty space" at 2500px). `EuiPageBody` is the
+  // element EUI itself grows to the page's full width; capping IT (not each child separately) is
+  // what keeps the header and every card aligned to the same edges.
+  .euiPageBody {
+    max-width: $wzSettingsMaxWidth;
+    margin: 0 auto;
+  }
 }
 
 // The pill's own vertical padding and line-height, pinned explicitly rather than left to
@@ -38,6 +48,16 @@ $wzSettingsCardPillHeight: $wzSettingsCardPillLineHeight +
     // 11px uppercase muted label — the same idiom `wzMicroLabel` already names for table column
     // heads, so this restates nothing of its own.
     @include wzMicroLabel;
+    // ...with two deliberate steps up from it. The pill is a SECTION TITLE sitting under a 28px H1
+    // and over its own 14px/400 description, and at the micro-label's 11px/600 subdued it was
+    // measured quieter than the body text it introduces: the page's hierarchy ran 28 → 11 → 14,
+    // i.e. inverted at the middle tier (audit §4.2). 12px/700 at the full text color is still
+    // unmistakably the same idiom (uppercase, tracked, pill-shaped) while ranking above its own
+    // body — the rulebook's "same size, a full weight step" differentiation (B8) rather than a
+    // fourth font size.
+    color: $euiTextColor;
+    font-size: 12px;
+    font-weight: 700;
     // Fallback matters more here than anywhere else: this fill is the only thing masking the
     // panel's own top border behind the pill, so a failed substitution does not merely lose a
     // background — it draws the hairline straight through the label.
@@ -47,7 +67,13 @@ $wzSettingsCardPillHeight: $wzSettingsCardPillLineHeight +
     line-height: $wzSettingsCardPillLineHeight;
   }
 
-  &__panel {
+  /* Qualified with `.euiPanel` — the same 0,1,0-tie trap `.euiBadge.wzStatusChip` below documents,
+     and the audit (§4.6) caught this file losing it: `wzPanel`'s `border-radius: 12px` was a single
+     class against EUI's own single-class `.euiPanel--borderRadiusMedium`, so which one won came down
+     to bundle order, and in the deployed build EUI's 4px did. The settings cards were the reason
+     `$wzPanelRadius` looked like it had no effect on this page. Compounding the two classes the
+     element already carries makes this 0,2,0 and takes load order out of it. */
+  .euiPanel#{&}__panel {
     @include wzPanel($wzCardPaddingRoomy);
     // Reserves exactly half the pill's own height ($wzSettingsCardPillHeight above) rather than a
     // hand-picked pixel guess, so the two values cannot silently drift apart. `calc()` (not Sass
@@ -55,6 +81,50 @@ $wzSettingsCardPillHeight: $wzSettingsCardPillLineHeight +
     padding-top: calc(
       #{$wzCardPaddingRoomy} + #{$wzSettingsCardPillHeight} / 2
     );
+  }
+
+  /* The card's own description line. Capped at the prose measure because it ran the full 1150px of
+     the card — about 145 characters a line, roughly twice the 60–80 the eye can track (audit §4.3,
+     rulebook C12): the 1200px page measure is right for the providers TABLE, and a sentence inside
+     that page is not entitled to it. Only the block is capped, not the card. */
+  &__description {
+    max-width: $wzProseMeasure;
+  }
+
+  /* A field's help text when it sits BESIDE the field instead of under it (the Conversation-history
+     card's second column — see settings-page.tsx). These are EUI's own `.euiFormHelpText`
+     declarations, restated the same way `.wzProviderFlyout__help` restates them in the flyout, so
+     leaving the `helpText` slot costs the sentence nothing typographically and the page still has
+     exactly one help size produced one way.
+
+     The block offset aligns the help with the CONTROL rather than with the control's label: 16px of
+     label line plus the 8px `EuiFormRow` gap. Top-aligned labels are the convention (rulebook D19),
+     so the label is the only thing in that column at the row's own top edge. */
+  &__fieldHelp {
+    color: $euiColorDarkShade;
+    font-size: $euiFontSizeXS;
+    padding-block-start: 24px;
+  }
+
+  /* The rule above a card's Save button, held to the same measure as the content it closes. A
+     full-bleed 1150px hairline over a 200px button read as a section divider rather than as that
+     button's own footer (audit §4.4). */
+  &__actionsRule {
+    max-width: $wzProseMeasure;
+  }
+
+  /* Per-provider privacy override rows (settings-page.tsx): a bare `EuiSpacer` between rows read
+     as a table with orphaned gaps rather than a coherent list, because nothing marked where one
+     row ended and the next began. A hairline under each row (not the last — no trailing rule
+     against the card's own bottom edge) gives the list a visible seam without a full table's
+     chrome. */
+  &__perProviderRow {
+    padding-block: 6px;
+    border-bottom: 1px solid $euiColorLightShade;
+
+    &:last-of-type {
+      border-bottom: none;
+    }
   }
 }
 
@@ -126,4 +196,71 @@ $wzSettingsCardPillHeight: $wzSettingsCardPillLineHeight +
   overflow: hidden;
   white-space: nowrap;
   vertical-align: bottom;
+}
+
+/**
+ * Classname-INDEPENDENT containment for every cell in this page's tables, and the actual guarantee
+ * behind the endpoint fix (audit §4.1 — the endpoint column overprinting the Model column was the
+ * page's single worst rendering bug).
+ *
+ * The two rules below are what make the fixed-layout column width a real bound:
+ *  - `min-width: 0` on the cell's own content wrapper. EUI's `.euiTableCellContent` is a flex
+ *    container, and a flex item's automatic minimum size is its CONTENT size — so a long unbroken
+ *    URL made the wrapper wider than the `tableLayout: fixed` track it lives in, and the overflow
+ *    painted over the next column.
+ *  - a bound on whatever wrapper EuiToolTip puts around the cell's content. `anchorClassName`
+ *    (settings-page.tsx) names that wrapper so `.wzSettingsEndpointAnchor` below can bound it, but
+ *    the prop is EUI-version-dependent: if this OUI build ignores it, the class never lands and the
+ *    only thing left holding the endpoint inside its column is `middleTruncate`'s character budget,
+ *    which a long enough host defeats. Selecting the anchor by ITS OWN EUI class needs no cooperation
+ *    from the props, so the fix survives an EUI upgrade that drops `anchorClassName`.
+ *
+ * Both are deliberately scoped to `.wzSettingsPage td`: they are cell-containment rules, not a
+ * global tooltip restyle, and a tooltip anchor elsewhere on the page (the disabled Save button's, for
+ * one) must keep sizing to its content.
+ */
+.wzSettingsPage td .euiTableCellContent {
+  min-width: 0;
+}
+
+.wzSettingsPage td .euiToolTipAnchor {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/**
+ * Providers-table column heads, in the idiom `wzMicroLabel` documents for exactly this job — the
+ * same change the results table's own heads take (result-table.scss), so the two tables in the
+ * product do not label their columns two different ways (audit §4.7). See that file for why the
+ * inner span needs `font: inherit`.
+ */
+.wzSettingsPage .euiTableHeaderCell {
+  @include wzMicroLabel;
+
+  .euiTableCellContent__text {
+    font: inherit;
+    color: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+  }
+}
+
+/* EuiToolTip's own anchor span, named via `anchorClassName` (settings-page.tsx): the anchor is
+   what the fixed-layout cell actually lays out, so IT must be the width-bounded element — the
+   inner .wzSettingsEndpointCell's max-width: 100% is measured against the anchor, and an
+   auto-width anchor made that bound a no-op, letting long endpoints paint over the Model
+   column. `min-width: 0` matters for the same reason it does in flex rows: without it the
+   anchor's intrinsic (content) width wins over the cell's fixed track.
+
+   Kept even though the `.wzSettingsPage td .euiToolTipAnchor` rule above now says the same thing
+   without depending on the prop: this one is the DECLARED intent at the render site (a reader of
+   settings-page.tsx can follow `anchorClassName` to a rule), while the rule above is the
+   version-independent backstop. Neither is redundant with the other in the way that matters — if EUI
+   drops the prop only the backstop fires, and if EUI renames `.euiToolTipAnchor` only this one does. */
+.wzSettingsEndpointAnchor {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
 }

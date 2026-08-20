@@ -18,8 +18,11 @@ test('noTextFallbackMessage: a tool ran, results rendered, rounds NOT exhausted 
 
 test('noTextFallbackMessage: a tool ran, results rendered, rounds exhausted discloses the unreached step', () => {
   const message = noTextFallbackMessage(true, true, true);
-  assert.match(message, /tool-round budget/i);
+  assert.match(message, /analysis limit/i);
   assert.doesNotMatch(message, /no additional analysis/i);
+  // Regression: "tool-round budget" is an internal implementation detail with no corresponding
+  // setting anywhere in the UI — the user-facing copy must not name it.
+  assert.doesNotMatch(message, /tool-round budget/i);
 });
 
 test('noTextFallbackMessage: roundsExhausted is ignored when there is no table to reference', () => {
@@ -103,7 +106,10 @@ test('D3 fix (AI/plan/d-review.md): search_wazuh_data\'s query_dsl (raw Elastics
   // Only the index_pattern filter (a genuine scalar, user-meaningful) should render; the DSL
   // blob itself -- machine syntax, unbounded length, and liable to contain the literal tokens
   // "limit"/"size" that would otherwise flake the mechanism-silence assertion -- must not.
-  assert.match(message, /\(Searched: wazuh data, filtered to index pattern wazuh-alerts-\*\.\)/);
+  assert.match(
+    message,
+    /\(Searched: wazuh data, filtered to index pattern wazuh-alerts-\*\.\)/,
+  );
   assert.doesNotMatch(message, /query dsl/);
   assert.doesNotMatch(message, /"query":\{"bool"/);
 });
@@ -137,97 +143,122 @@ test('noTextFallbackMessage: omitting lastToolCall (no attempt on record) falls 
 // --- BLOCKER FIX (empty-answer audit, 2026-08-20, CV-033/CV-066): an errored/rejected call gets --
 // --- its own specific error text surfaced, never the generic "no matching results" sentence -----
 
-test('noTextFallbackMessage: an errored call (unknown field, invalid pairing, ...) surfaces its ' +
-  'own error text instead of the generic "no matching results" sentence', () => {
-  const message = noTextFallbackMessage(true, false, false, {
-    name: 'get_field_values',
-    args: { field: 'os.platform' },
-    errorMessage:
-      'Parameter "field" ("os.platform") is not one of this tool\'s vetted, bounded-cardinality ' +
-      'fields, so its values cannot be enumerated this way. Closest known fields: host.os.platform.',
-  });
-  assert.doesNotMatch(message, /No matching results were found/);
-  assert.match(message, /field values/);
-  assert.match(message, /Closest known fields: host\.os\.platform/);
-});
+test(
+  'noTextFallbackMessage: an errored call (unknown field, invalid pairing, ...) surfaces its ' +
+    'own error text instead of the generic "no matching results" sentence',
+  () => {
+    const message = noTextFallbackMessage(true, false, false, {
+      name: 'get_field_values',
+      args: { field: 'os.platform' },
+      errorMessage:
+        'Parameter "field" ("os.platform") is not one of this tool\'s vetted, bounded-cardinality ' +
+        'fields, so its values cannot be enumerated this way. Closest known fields: host.os.platform.',
+    });
+    assert.doesNotMatch(message, /No matching results were found/);
+    assert.match(message, /field values/);
+    assert.match(message, /Closest known fields: host\.os\.platform/);
+  },
+);
 
-test('noTextFallbackMessage: the other recognized shape (invalid field/family pairing) is also ' +
-  'classified into user-vocabulary copy', () => {
-  const message = noTextFallbackMessage(true, false, false, {
-    name: 'get_field_values',
-    args: { field: 'wazuh.agent.host.os.platform', index_family: 'inventory_system' },
-    errorMessage:
-      'Parameter "index_family" ("inventory_system") is not valid for field ' +
-      '"wazuh.agent.host.os.platform". Valid surfaces for this field: findings, events.',
-  });
-  assert.doesNotMatch(message, /No matching results were found/);
-  assert.match(message, /Valid surfaces for this field: findings, events/);
-});
+test(
+  'noTextFallbackMessage: the other recognized shape (invalid field/family pairing) is also ' +
+    'classified into user-vocabulary copy',
+  () => {
+    const message = noTextFallbackMessage(true, false, false, {
+      name: 'get_field_values',
+      args: {
+        field: 'wazuh.agent.host.os.platform',
+        index_family: 'inventory_system',
+      },
+      errorMessage:
+        'Parameter "index_family" ("inventory_system") is not valid for field ' +
+        '"wazuh.agent.host.os.platform". Valid surfaces for this field: findings, events.',
+    });
+    assert.doesNotMatch(message, /No matching results were found/);
+    assert.match(message, /Valid surfaces for this field: findings, events/);
+  },
+);
 
-test('noTextFallbackMessage: a genuinely empty successful call (no errorMessage) still uses the ' +
-  'plain "no matching results" copy -- the error branch does not swallow the ordinary case', () => {
-  const message = noTextFallbackMessage(true, false, false, {
-    name: 'get_field_values',
-    args: { field: 'event.category' },
-  });
-  assert.match(message, /No matching results were found/);
-});
+test(
+  'noTextFallbackMessage: a genuinely empty successful call (no errorMessage) still uses the ' +
+    'plain "no matching results" copy -- the error branch does not swallow the ordinary case',
+  () => {
+    const message = noTextFallbackMessage(true, false, false, {
+      name: 'get_field_values',
+      args: { field: 'event.category' },
+    });
+    assert.match(message, /No matching results were found/);
+  },
+);
 
-test('noTextFallbackMessage: an overlong (but recognized-shape) error message is truncated with ' +
-  'an ellipsis, never dumped verbatim into user-facing copy', () => {
-  const message = noTextFallbackMessage(true, false, false, {
-    name: 'get_field_values',
-    args: { field: 'bogus' },
-    errorMessage:
-      'Parameter "field" ("bogus") is not one of this tool\'s vetted, bounded-cardinality ' +
-      `fields, so its values cannot be enumerated this way. Closest known fields: ${'x'.repeat(
-        400,
-      )}.`,
-  });
-  assert.ok(message.length < 400);
-  assert.match(message, /…/);
-});
+test(
+  'noTextFallbackMessage: an overlong (but recognized-shape) error message is truncated with ' +
+    'an ellipsis, never dumped verbatim into user-facing copy',
+  () => {
+    const message = noTextFallbackMessage(true, false, false, {
+      name: 'get_field_values',
+      args: { field: 'bogus' },
+      errorMessage:
+        'Parameter "field" ("bogus") is not one of this tool\'s vetted, bounded-cardinality ' +
+        `fields, so its values cannot be enumerated this way. Closest known fields: ${'x'.repeat(
+          400,
+        )}.`,
+    });
+    assert.ok(message.length < 400);
+    assert.match(message, /…/);
+  },
+);
 
 // --- REVIEW FIX F1 (groupA-regression-review.md, REQUIRED): the error channel is a strict --------
 // --- allowlist, never a pass-through -- guardrail/exception text must never reach user copy ------
 
-test('noTextFallbackMessage: a guardrail violation error is NEVER surfaced verbatim -- falls back ' +
-  'to the plain "no matching results" copy instead of leaking mechanism vocabulary', () => {
-  const message = noTextFallbackMessage(true, false, false, {
-    name: 'search_wazuh_data',
-    args: { index_pattern: 'wazuh-events-v5-*' },
-    errorMessage:
-      'Aggregation on field "event.action" is not on the allowed low-cardinality field list.',
-  });
-  assert.match(message, /No matching results were found/);
-  assert.doesNotMatch(message, /low-cardinality field list/);
-});
+test(
+  'noTextFallbackMessage: a guardrail violation error is NEVER surfaced verbatim -- falls back ' +
+    'to the plain "no matching results" copy instead of leaking mechanism vocabulary',
+  () => {
+    const message = noTextFallbackMessage(true, false, false, {
+      name: 'search_wazuh_data',
+      args: { index_pattern: 'wazuh-events-v5-*' },
+      errorMessage:
+        'Aggregation on field "event.action" is not on the allowed low-cardinality field list.',
+    });
+    assert.match(message, /No matching results were found/);
+    assert.doesNotMatch(message, /low-cardinality field list/);
+  },
+);
 
-test('noTextFallbackMessage: a raw sanitized exception (OpenSearch/Node error text) is NEVER ' +
-  'surfaced verbatim -- falls back to the plain "no matching results" copy', () => {
-  const message = noTextFallbackMessage(true, false, false, {
-    name: 'search_wazuh_data',
-    args: { index_pattern: 'wazuh-events-v5-*' },
-    errorMessage: 'Indexer query failed: index_not_found_exception [wazuh-bogus-*]',
-  });
-  assert.match(message, /No matching results were found/);
-  assert.doesNotMatch(message, /index_not_found_exception/);
-});
+test(
+  'noTextFallbackMessage: a raw sanitized exception (OpenSearch/Node error text) is NEVER ' +
+    'surfaced verbatim -- falls back to the plain "no matching results" copy',
+  () => {
+    const message = noTextFallbackMessage(true, false, false, {
+      name: 'search_wazuh_data',
+      args: { index_pattern: 'wazuh-events-v5-*' },
+      errorMessage:
+        'Indexer query failed: index_not_found_exception [wazuh-bogus-*]',
+    });
+    assert.match(message, /No matching results were found/);
+    assert.doesNotMatch(message, /index_not_found_exception/);
+  },
+);
 
-test('noTextFallbackMessage: a bounded "which one?" candidate-list error (which may itself carry ' +
-  'a pseudonymized identifier) is NEVER surfaced verbatim', () => {
-  const message = noTextFallbackMessage(true, false, false, {
-    name: 'get_sca_checks',
-    args: {},
-    errorMessage:
-      'Parameter "agent_id" was not supplied and could not be resolved automatically. (2 active ' +
-      'agents exist, so which one is meant cannot be assumed. Candidates: "HOST_1" (id 001), ' +
-      '"HOST_2" (id 002).)',
-  });
-  assert.match(message, /No matching results were found/);
-  assert.doesNotMatch(message, /HOST_1/);
-  assert.doesNotMatch(message, /Candidates:/);
-});
+test(
+  'noTextFallbackMessage: a bounded "which one?" candidate-list error (which may itself carry ' +
+    'a pseudonymized identifier) is NEVER surfaced verbatim',
+  () => {
+    const message = noTextFallbackMessage(true, false, false, {
+      name: 'get_sca_checks',
+      args: {},
+      errorMessage:
+        'Parameter "agent_id" was not supplied and could not be resolved automatically. (2 active ' +
+        'agents exist, so which one is meant cannot be assumed. Candidates: "HOST_1" (id 001), ' +
+        '"HOST_2" (id 002).)',
+    });
+    assert.match(message, /No matching results were found/);
+    assert.doesNotMatch(message, /HOST_1/);
+    assert.doesNotMatch(message, /Candidates:/);
+  },
+);
 
 // --- BLOCKER FIX (backlog CV-017 residual, "stale digest after silent mid-turn error"; ported ----
 // --- from deploy commit 872704fd4) -----------------------------------------------------------------
@@ -239,41 +270,47 @@ test('noTextFallbackMessage: a bounded "which one?" candidate-list error (which 
 // NO_ANALYSIS_TEXT_MESSAGE/NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE copy ("see the results above"),
 // with no hint that the table on screen does not reflect the question actually asked.
 
-test('noTextFallbackMessage: a table already rendered, but the LAST attempted call errored -> ' +
-  'admits the more specific lookup did not complete instead of silently standing in for it ' +
-  '(CV-017 shape)', () => {
-  const message = noTextFallbackMessage(true, true, false, {
-    name: 'search_wazuh_data',
-    args: { index_pattern: '.opensearch-sap-*-findings' },
-    errorMessage: 'search_phase_execution_exception: some internal detail',
-  });
-  assert.match(
-    message,
-    /no additional analysis/i,
-    'still opens with the base "see the results above" sentence',
-  );
-  assert.match(
-    message,
-    /did not complete/,
-    'and admits the LAST, more specific attempt never completed',
-  );
-  // The raw exception text is never surfaced -- same allowlist-only policy as
-  // `buildNoMatchingResultsMessage`/`classifyToolErrorForFallback` above.
-  assert.doesNotMatch(message, /search_phase_execution_exception/);
-});
+test(
+  'noTextFallbackMessage: a table already rendered, but the LAST attempted call errored -> ' +
+    'admits the more specific lookup did not complete instead of silently standing in for it ' +
+    '(CV-017 shape)',
+  () => {
+    const message = noTextFallbackMessage(true, true, false, {
+      name: 'search_wazuh_data',
+      args: { index_pattern: '.opensearch-sap-*-findings' },
+      errorMessage: 'search_phase_execution_exception: some internal detail',
+    });
+    assert.match(
+      message,
+      /no additional analysis/i,
+      'still opens with the base "see the results above" sentence',
+    );
+    assert.match(
+      message,
+      /did not complete/,
+      'and admits the LAST, more specific attempt never completed',
+    );
+    // The raw exception text is never surfaced -- same allowlist-only policy as
+    // `buildNoMatchingResultsMessage`/`classifyToolErrorForFallback` above.
+    assert.doesNotMatch(message, /search_phase_execution_exception/);
+  },
+);
 
-test('noTextFallbackMessage: a table already rendered, LAST attempted call errored with a ' +
-  'vetted/classified error -> uses the classified "could not run as asked" phrasing', () => {
-  const message = noTextFallbackMessage(true, true, false, {
-    name: 'get_field_values',
-    args: { field: 'os.platform' },
-    errorMessage:
-      'Parameter "field" ("os.platform") is not one of this tool\'s vetted, bounded-cardinality ' +
-      'fields, so its values cannot be enumerated this way. Closest known fields: host.os.platform.',
-  });
-  assert.match(message, /could not run as asked/);
-  assert.match(message, /Closest known fields: host\.os\.platform/);
-});
+test(
+  'noTextFallbackMessage: a table already rendered, LAST attempted call errored with a ' +
+    'vetted/classified error -> uses the classified "could not run as asked" phrasing',
+  () => {
+    const message = noTextFallbackMessage(true, true, false, {
+      name: 'get_field_values',
+      args: { field: 'os.platform' },
+      errorMessage:
+        'Parameter "field" ("os.platform") is not one of this tool\'s vetted, bounded-cardinality ' +
+        'fields, so its values cannot be enumerated this way. Closest known fields: host.os.platform.',
+    });
+    assert.match(message, /could not run as asked/);
+    assert.match(message, /Closest known fields: host\.os\.platform/);
+  },
+);
 
 test('noTextFallbackMessage: rounds exhausted AND the last attempt errored -> both clauses appear', () => {
   const message = noTextFallbackMessage(true, true, true, {
@@ -285,18 +322,24 @@ test('noTextFallbackMessage: rounds exhausted AND the last attempt errored -> bo
   assert.match(message, /did not complete/);
 });
 
-test('noTextFallbackMessage: a table already rendered, LAST attempted call succeeded (no ' +
-  'errorMessage) -> no errored-attempt clause is added', () => {
-  const message = noTextFallbackMessage(true, true, false, {
-    name: 'get_critical_findings',
-    args: {},
-  });
-  assert.doesNotMatch(message, /did not complete/);
-  assert.doesNotMatch(message, /could not run/);
-});
+test(
+  'noTextFallbackMessage: a table already rendered, LAST attempted call succeeded (no ' +
+    'errorMessage) -> no errored-attempt clause is added',
+  () => {
+    const message = noTextFallbackMessage(true, true, false, {
+      name: 'get_critical_findings',
+      args: {},
+    });
+    assert.doesNotMatch(message, /did not complete/);
+    assert.doesNotMatch(message, /could not run/);
+  },
+);
 
-test('noTextFallbackMessage: a table already rendered, no lastToolCall on record -> unchanged base ' +
-  'sentence, no errored-attempt clause', () => {
-  const message = noTextFallbackMessage(true, true, false);
-  assert.equal(message, 'No additional analysis — see the results above.');
-});
+test(
+  'noTextFallbackMessage: a table already rendered, no lastToolCall on record -> unchanged base ' +
+    'sentence, no errored-attempt clause',
+  () => {
+    const message = noTextFallbackMessage(true, true, false);
+    assert.equal(message, 'No additional analysis — see the results above.');
+  },
+);
