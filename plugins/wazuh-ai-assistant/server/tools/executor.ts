@@ -31,6 +31,7 @@ import {
   buildNearMissIncludePattern,
   extractRequestedAgentNames,
   findNearMissSiblings,
+  findUnmatchedAgentNames,
 } from './entity-resolution';
 import { rollUpTechniqueIdFilters } from './technique-rollup';
 import {
@@ -374,29 +375,57 @@ async function appendEntityNearMissHint(
       .map(bucket => (bucket as { key?: unknown })?.key)
       .filter((key): key is string => typeof key === 'string');
     const nearMisses = findNearMissSiblings(requestedNames, indexedNames);
-    if (nearMisses.length === 0) {
-      return;
-    }
     const display = (name: string): string =>
       privacy ? privacy.pseudonymizer.pseudonymize(name, 'HOST') : name;
-    // Bounded on both axes (names above, siblings/sentences here): agent_names declares no
-    // maxItems, so an unbounded hint could evict every sample row from the digest and still
-    // bust the char cap -- capDigest's hint-length cap is the backstop, this is the shaper.
-    const sentences = nearMisses
-      .slice(0, MAX_NEAR_MISS_SENTENCES)
-      .map(
-        ({ requested, siblings }) =>
-          `The agent-name filter "${display(
-            requested,
-          )}" also nearly matches distinct ` +
-          `agent(s) with data: ${siblings
-            .slice(0, MAX_NEAR_MISS_SIBLINGS)
-            .map(display)
-            .join(
-              ', ',
-            )}. If the user named one of those, re-run with that exact name -- ` +
-          'never silently substitute one host for another.',
+    const sentences: string[] = [];
+    if (nearMisses.length > 0) {
+      // Bounded on both axes (names above, siblings/sentences here): agent_names declares no
+      // maxItems, so an unbounded hint could evict every sample row from the digest and still
+      // bust the char cap -- capDigest's hint-length cap is the backstop, this is the shaper.
+      sentences.push(
+        ...nearMisses.slice(0, MAX_NEAR_MISS_SENTENCES).map(
+          ({ requested, siblings }) =>
+            `The agent-name filter "${display(
+              requested,
+            )}" also nearly matches distinct ` +
+            `agent(s) with data: ${siblings
+              .slice(0, MAX_NEAR_MISS_SIBLINGS)
+              .map(display)
+              .join(
+                ', ',
+              )}. If the user named one of those, re-run with that exact name -- ` +
+            'never silently substitute one host for another.',
+        ),
       );
+    }
+    // BLOCKER FIX (CV-028/CV-033, category-word-misread-as-agent-name class): a requested name
+    // with no near-miss sibling can still be a token that never named a real agent at all (a
+    // category/domain word the model mistook for a host name). Only worth stating when the
+    // call's own filter actually came back empty -- if it returned rows, this exact string DID
+    // match the population and the "does not appear" framing below would be false. Fires
+    // independently of the near-miss branch above (a name can have zero near-miss SIBLINGS while
+    // still having zero matches of its own -- those are different findings, see
+    // `findUnmatchedAgentNames`'s doc comment). This is the deterministic "only becomes an agent
+    // filter if it matches a known candidate" guarantee: `indexedNames` IS the candidate lookup
+    // (the same population probe used for the near-miss disclosure), so a name absent from it,
+    // exactly and by every normalized variant, is reported to the model as unmatched rather than
+    // silently presented as an ordinary empty result.
+    if (digest.counts.returned === 0) {
+      const unmatched = findUnmatchedAgentNames(requestedNames, indexedNames);
+      sentences.push(
+        ...unmatched.slice(0, MAX_NEAR_MISS_SENTENCES).map(
+          requested =>
+            `No agent named "${display(
+              requested,
+            )}" (or a close variant) appears in this data -- the filter matched nothing ` +
+            'because no such agent is present here, not because that agent has no data. State ' +
+            'this to the user as an unmatched name, never as a bare "no data" result.',
+        ),
+      );
+    }
+    if (sentences.length === 0) {
+      return;
+    }
     digest.hint = digest.hint
       ? `${digest.hint} ${sentences.join(' ')}`
       : sentences.join(' ');

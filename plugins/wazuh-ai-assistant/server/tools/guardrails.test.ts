@@ -932,6 +932,22 @@ test('lintDsl: still rejects a non-allowlisted events-v5 field (e.g. a hand-buil
   }
 });
 
+test('lintDsl: passes a terms aggregation on event.category/event.outcome (CV-033 fix -- the ' +
+  'events-v5 category taxonomy, get_field_values verify-before-filter probe)', () => {
+  const byCategory = {
+    query: timeBoundedFilter({ gte: 'now-1d', lte: 'now' }),
+    aggs: { candidates: { terms: { field: 'event.category', size: 10 } } },
+    size: 0,
+  };
+  const byOutcome = {
+    query: timeBoundedFilter({ gte: 'now-1d', lte: 'now' }),
+    aggs: { candidates: { terms: { field: 'event.outcome', size: 10 } } },
+    size: 0,
+  };
+  assert.equal(lintDsl(byCategory, 'wazuh-events-v5-*').ok, true);
+  assert.equal(lintDsl(byOutcome, 'wazuh-events-v5-*').ok, true);
+});
+
 test('lintDsl: passes a terms aggregation on source.ip within the size cap (top attacking-IP pivot)', () => {
   // Positive case for the source.ip allowlist entry (high-cardinality-but-bounded-bucket-safe --
   // see guardrails.ts's AGG_FIELD_ALLOWLIST comment): a terms agg on source.ip at or under

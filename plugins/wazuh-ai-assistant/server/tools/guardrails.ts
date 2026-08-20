@@ -570,6 +570,27 @@ const AGG_FIELD_ALLOWLIST = new Set([
   WAZUH_FIELD.AGENT_OS_NAME,
   WAZUH_FIELD.AGENT_OS_PLATFORM,
   WAZUH_FIELD.INTEGRATION_NAME,
+  // BLOCKER FIX (CV-033, 2026-08-19/20 adjudicated runs): `wazuh.integration.category` (already
+  // above, findings-v5's own category taxonomy) has no events-v5 counterpart on this list, even
+  // though `event.category` is the events-v5 family's OWN finite category taxonomy for the exact
+  // same "browse the real category values before filtering" use case the "verify before filter"
+  // system-prompt rule asks the model to follow (prompts.ts). Before this fix, a `get_field_values`
+  // probe on `event.category` was rejected by `checkAggs` below with `aggFieldViolation` -- a
+  // guardrail rejection with NO tableEvent/digest -- which the caller's generic empty-result
+  // fallback (`chat.ts`'s `noTextFallbackMessage`/`NO_MATCHING_RESULTS_MESSAGE`) then rendered as
+  // an ordinary "no matching results" sentence, indistinguishable from a genuine zero-row answer.
+  // That silently hid an internal capability gap (an allowlist omission) behind copy that reads as
+  // an honest empty-data outcome -- exactly the forbidden silent-empty class. `event.category` is
+  // already a reviewed, `allow`-policy PRIVACY field (privacy.ts's field policy) and is already
+  // read as a real aggregation dimension by `get-events-by-agent.ts`'s own `breakdownDimensions`
+  // fallback (`['event.category', 'event.outcome']`) -- this list was simply never updated to match
+  // when that field was wired up elsewhere, a genuine omission rather than a deliberate exclusion.
+  // `event.outcome` is added alongside it for the same reason and the same existing `allow` policy
+  // entry (privacy.ts) -- both are finite ECS enums (event.category: a closed taxonomy of
+  // authentication/network/process/... kinds; event.outcome: success/failure/unknown), the same
+  // cardinality class as the already-listed `wazuh.integration.category`.
+  'event.category',
+  'event.outcome',
 ]);
 
 /**

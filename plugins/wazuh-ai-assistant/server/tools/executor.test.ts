@@ -461,6 +461,50 @@ test('entity near-miss: agent names in the hint are pseudonymized when privacy m
   assert.ok(realValues.includes('wazuh-aio-5'));
 });
 
+test('entity near-miss: a category word with no near-miss sibling and no exact match is reported ' +
+  'unmatched, not a bare zero-row result (CV-028/CV-033 fix)', async () => {
+  const { context, calls } = fakeContext((_call, index) =>
+    index === 0
+      ? { hits: { hits: [], total: { value: 0 } } }
+      : {
+          hits: { hits: [], total: { value: 0 } },
+          aggregations: { agent_names: { buckets: [] } },
+        },
+  );
+  const outcome = await executeToolCall(
+    toolCall('search_findings_by_agent', { agent_name: 'cloud-services' }),
+    context,
+    dummyRequest,
+  );
+  const digest = parseDigest(outcome);
+  assert.equal(calls.length, 2, 'the probe still fires on a 0-row call');
+  const hint = digest.hint as string;
+  assert.match(hint, /No agent named "cloud-services"/);
+  assert.match(hint, /not because that agent has no data/);
+});
+
+test('entity near-miss: unmatched-name disclosure does not fire when the call actually returned ' +
+  'rows (the name DID match something)', async () => {
+  const findingHit = {
+    _source: { 'wazuh.agent.name': 'wazuh-aio-5', 'wazuh.rule.level': 'high' },
+  };
+  const { context } = fakeContext((_call, index) =>
+    index === 0
+      ? { hits: { hits: [findingHit], total: { value: 1 } } }
+      : {
+          hits: { hits: [], total: { value: 0 } },
+          aggregations: { agent_names: { buckets: [{ key: 'wazuh-aio-5', doc_count: 1 }] } },
+        },
+  );
+  const outcome = await executeToolCall(
+    toolCall('search_findings_by_agent', { agent_name: 'wazuh-aio-5' }),
+    context,
+    dummyRequest,
+  );
+  const digest = parseDigest(outcome);
+  assert.equal(digest.hint, undefined);
+});
+
 test('entity near-miss: does not fire for a tool call naming no agent at all', async () => {
   const { context, calls } = fakeContext(() => ({
     hits: { hits: [], total: { value: 0 } },
