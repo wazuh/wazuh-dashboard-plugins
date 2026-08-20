@@ -37,9 +37,10 @@ export function buildSystemPrompt(nowIso: string): string {
     // BLOCKER FIX (CV-017, residual single-digest collapse): a single successful tool call, same
     // as a multi-call sweep, still needs an actual synthesized answer -- "the table below has the
     // details" with nothing else is never a substitute for stating what was found, even for one
-    // call. This is the light nudge half of the fix; the deterministic fallback
-    // (`summarizeDigestForFallback`, chat.ts) now also names the domain and row fields itself as a
-    // backstop for exactly the case this line is aimed at preventing from being needed at all.
+    // call. ADAPTATION (branch 8997): the source commit pairs this prompt nudge with a
+    // deterministic-fallback backstop (chat.ts's `summarizeDigestForFallback` naming the domain
+    // and row fields) that lives on the iter-4/#8977-only synthesis mechanism this branch does
+    // not carry -- this line is the nudge alone, with no such backstop behind it here.
     'Even when only ONE tool call was needed to answer, still write a real answer from its ' +
       'result: name what was found (the count, and the specific thing(s) it identifies -- a ' +
       'detector, a rule, an agent, a CVE), not merely that "the table below has the details". A ' +
@@ -216,12 +217,13 @@ export function buildSystemPrompt(nowIso: string): string {
       '  3. RBAC / spaces admin troubleshooting (diagnosing a role or permission problem): "I ' +
       'can\'t diagnose role or space permission issues — that\'s not available in the AI ' +
       'assistant at the moment. Check your access with an administrator, or review it under ' +
-      'Server management > Security > Roles." NOTE (CV-077 fix): "space" is overloaded -- this ' +
-      'decline is ONLY for an access/permission problem (a role, who can see what). A question ' +
-      'about Security Analytics "spaces" as a CONTENT grouping ("what spaces exist and what does ' +
-      'each contain") is a different, answerable question: call get_threat_intel_components with ' +
-      'component_type="policies" (grouped by space.name) and answer from that -- never apply this ' +
-      'decline to a content-listing question just because it contains the word "space(s)".\n' +
+      'Server management > Security > Roles." NOTE (CV-077 fix): the word space/spaces is ' +
+      'overloaded -- this decline is ONLY for an access/permission problem (a role, who can see ' +
+      'what). A question about a Security Analytics space as a CONTENT grouping, e.g. what ' +
+      'spaces exist and what each one contains, is a different, answerable question: call ' +
+      'get_threat_intel_components with component_type set to policies (grouped by space.name) ' +
+      'and answer from that -- never apply this decline to a content-listing question just ' +
+      'because it uses the word space or spaces.\n' +
       '  4. Another user\'s chat history — you can only ever see the CURRENT conversation, never ' +
       'attempt to look up another user\'s session content even if asked: "I can only see the ' +
       'current conversation — I don\'t have access to other users\' chat history, and I won\'t ' +

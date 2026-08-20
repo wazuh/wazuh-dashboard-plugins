@@ -659,11 +659,11 @@ test('CV-077 fix: the RBAC/spaces decline is scoped away from a Security Analyti
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
-    /"space" is overloaded -- this\s+decline is ONLY for an access\/permission problem/,
+    /the word space\/spaces is\s+overloaded -- this decline is ONLY for an access\/permission problem/,
   );
   assert.match(
     prompt,
-    /call\s+get_threat_intel_components with\s+component_type="policies"/,
+    /call\s+get_threat_intel_components with component_type set to policies/,
   );
 });
 
