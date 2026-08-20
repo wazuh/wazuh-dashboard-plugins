@@ -173,8 +173,11 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
     'technique), components (decoders, integrations, policies, filters, KVDBs), detector ' +
     'definitions (which detectors exist, enabled state, monitored indices, findings counts), ' +
     'whether a specific IP/hash/URL/domain is a known indicator (IOC) per the threat-intel feed, ' +
-    'and whether the CTI content feeds are up to date. Pipeline/threat-intel-catalog content, ' +
-    'NOT findings that fired and NOT SCA compliance benchmarks.',
+    'and whether the CTI content feeds are up to date. Also covers Security Analytics SPACES -- ' +
+    'the content-grouping/tenancy concept for this pipeline content (e.g. "what spaces exist and ' +
+    'what does each contain") -- this is a different "space" than an RBAC/dashboard permission ' +
+    'space. Pipeline/threat-intel-catalog content, NOT findings that fired and NOT SCA compliance ' +
+    'benchmarks.',
   free_search:
     'Anything else about Wazuh finding/vulnerability/state data, PLUS operational metrics, ' +
     'Security Analytics detector findings, and browsing/counting the raw CVE/IOC threat-intel ' +
