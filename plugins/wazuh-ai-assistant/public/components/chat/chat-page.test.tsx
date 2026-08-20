@@ -2740,6 +2740,85 @@ describe('ChatPage — conversation rail display mode (layout contract §5/§6)'
       stub.restore();
     }
   });
+
+  /**
+   * `railDisplayModeOverride` (the docked header panel's own toolbar toggle — assistant-chat-
+   * panel.tsx has no other way to reach ConversationList's inline collapse/expand controls) forces
+   * the mode the same way ConversationList's own affordances already do, going through the SAME
+   * `railManualOverrideRef` — so it wins over whatever the width alone would pick, and (below
+   * RAIL_FLYOUT_AT with `allowRailFlyout={false}`, the sidecar's own band) SURVIVES a later resize
+   * that lands in the same band, instead of being silently wiped back to 'collapsed'.
+   */
+  it('forces the rail expanded via railDisplayModeOverride even under the collapse threshold', async () => {
+    const stub = stubResizeObserver(1000);
+    try {
+      renderChatPage({ railDisplayModeOverride: 'expanded' });
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('260px');
+      });
+    } finally {
+      stub.restore();
+    }
+  });
+
+  it('forces the rail collapsed via railDisplayModeOverride even above the expand threshold', async () => {
+    const stub = stubResizeObserver(1200);
+    try {
+      renderChatPage({ railDisplayModeOverride: 'collapsed' });
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('48px');
+      });
+    } finally {
+      stub.restore();
+    }
+  });
+
+  it('keeps an expanded override alive across a resize inside the docked panel band (allowRailFlyout=false)', async () => {
+    // The docked sidecar's own default width (assistant-chat-panel.tsx) sits well under
+    // RAIL_FLYOUT_AT — exactly the band that used to force 'collapsed' and wipe any override on
+    // every resize tick, which would have silently undone the panel's own toolbar toggle the
+    // moment the user dragged the sidecar to a new (still narrow) width.
+    const stub = stubResizeObserver(500);
+    try {
+      const view = renderChatPage({
+        allowRailFlyout: false,
+        railDisplayModeOverride: 'expanded',
+      });
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('260px');
+      });
+
+      stub.resize(600);
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('260px');
+      });
+
+      view.rerenderWith({
+        allowRailFlyout: false,
+        railDisplayModeOverride: 'collapsed',
+      });
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('48px');
+      });
+    } finally {
+      stub.restore();
+    }
+  });
 });
 
 // Iteration-4 item 2: the composer's provider control is now `ProviderPicker` (provider-picker.tsx)

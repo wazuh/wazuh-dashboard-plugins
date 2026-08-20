@@ -44,7 +44,7 @@ Create, edit, delete, and test providers, and choose the default one.
 | Field        | Description                                                                                                                                                             |
 | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Name**     | Display name shown in the chat provider selector.                                                                                                                       |
-| **Type**     | `OpenAI-compatible`, `Anthropic`, or `Wazuh hosted brain`.                                                                                                              |
+| **Type**     | `OpenAI-compatible` or `Anthropic` — see [Providers](./providers.md) for which services and models under each type are verified working.                                |
 | **Base URL** | Endpoint root. Checked by the SSRF guard on every request; private/loopback addresses are allowed (self-hosted gateways), cloud-metadata and link-local ranges are not. |
 | **Model**    | Model identifier passed through to the provider.                                                                                                                        |
 | **API key**  | Optional; write-only (the UI only ever shows whether a key is set). Saving one requires `encryptionKey` to be configured; always encrypted at rest.                     |

@@ -23,9 +23,12 @@ and streams back a short answer plus the real result table.
 - **Optional pseudonymisation** (`server/tools/privacy.ts`) of data leaving the cluster, with a
   per-turn badge in the UI. Off by default — see "What leaves the cluster" below.
 - **Persistent conversations** as owner-scoped saved objects, with optimistic concurrency.
-- **Provider settings** (admin-only) for three adapters, each used purely as a transport:
-  OpenAI-compatible (OpenAI, Ollama, vLLM, LiteLLM…), Anthropic Messages API, and the Wazuh AI
-  Assistant hosted brain (n8n webhook). Provider API keys can be encrypted at rest.
+- **Provider settings** (admin-only) for two selectable adapters, each used purely as a transport:
+  OpenAI-compatible (OpenAI, Gemini, Bedrock, Ollama, vLLM, LiteLLM…) and Anthropic Messages API.
+  A third adapter (the Wazuh AI Assistant hosted brain, n8n webhook) exists in the registry but
+  isn't yet exposed as a selectable provider type. Provider API keys can be encrypted at rest. See
+  `docs/ref/modules/ai-assistant/providers.md` (repo root) for which services and models under
+  each type are verified working.
 
 ## Layout
 
