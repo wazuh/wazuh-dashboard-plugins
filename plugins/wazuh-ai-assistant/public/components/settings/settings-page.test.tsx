@@ -1524,6 +1524,7 @@ describe('SettingsPage — announcing saved changes to the mounted chat', () => 
         <SettingsPageWithRouter
           core={coreWithToasts}
           onProvidersChanged={jest.fn()}
+          initialEntries={['/settings?tab=privacy']}
         />,
       );
 
@@ -1557,6 +1558,7 @@ describe('SettingsPage — announcing saved changes to the mounted chat', () => 
         <SettingsPageWithRouter
           core={coreWithToasts}
           onProvidersChanged={jest.fn()}
+          initialEntries={['/settings?tab=privacy']}
         />,
       );
 
@@ -1623,14 +1625,16 @@ describe('SettingsPage — announcing saved changes to the mounted chat', () => 
 
     try {
       render(
-        <SettingsPage core={coreWithToasts} onProvidersChanged={jest.fn()} />,
+        <SettingsPageWithRouter
+          core={coreWithToasts}
+          onProvidersChanged={jest.fn()}
+          initialEntries={['/settings?tab=privacy']}
+        />,
       );
       fireEvent.click(
         await screen.findByText(/allow users to override privacy mode/i),
       );
-      fireEvent.click(
-        screen.getByRole('button', { name: /save privacy settings/i }),
-      );
+      fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
 
       await waitFor(() => expect(payloads).toHaveLength(1));
       expect(payloads[0]).toEqual(saved);
@@ -1654,7 +1658,11 @@ describe('SettingsPage — announcing saved changes to the mounted chat', () => 
 
     try {
       render(
-        <SettingsPage core={coreWithToasts} onProvidersChanged={jest.fn()} />,
+        <SettingsPageWithRouter
+          core={coreWithToasts}
+          onProvidersChanged={jest.fn()}
+          initialEntries={['/settings?tab=retention']}
+        />,
       );
       // Queried by role, not by label: this jest environment stubs EUI's htmlIdGenerator so every
       // generated id is the literal "generated-id", which makes the field's own <label for=...>
@@ -1684,7 +1692,7 @@ describe('SettingsPage — announcing saved changes to the mounted chat', () => 
 
     try {
       render(
-        <SettingsPage
+        <SettingsPageWithRouter
           core={coreWithToasts}
           onProvidersChanged={jest.fn()}
           autoOpenCreateForm={true}
@@ -1715,7 +1723,10 @@ describe('SettingsPage — announcing saved changes to the mounted chat', () => 
 
     try {
       render(
-        <SettingsPage core={coreWithToasts} onProvidersChanged={jest.fn()} />,
+        <SettingsPageWithRouter
+          core={coreWithToasts}
+          onProvidersChanged={jest.fn()}
+        />,
       );
       // Delete lives behind the row's actions popover.
       fireEvent.click(
@@ -1740,7 +1751,10 @@ describe('SettingsPage — announcing saved changes to the mounted chat', () => 
 
     try {
       render(
-        <SettingsPage core={coreWithToasts} onProvidersChanged={jest.fn()} />,
+        <SettingsPageWithRouter
+          core={coreWithToasts}
+          onProvidersChanged={jest.fn()}
+        />,
       );
       fireEvent.click(
         await screen.findByRole('button', { name: /actions for my openai/i }),

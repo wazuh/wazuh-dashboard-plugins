@@ -3104,8 +3104,17 @@ describe('ChatPage — admin privacy policy applies without a reload', () => {
     );
     announceSettingsSaved();
 
-    const chip = await findPrivacyChipWithModifier('on');
-    expect(chip.tagName).toBe('BUTTON');
+    // The modifier class stays `--on` through this transition (only clickability changes), so a
+    // plain class-selector wait can resolve on the stale, still-`--on` SPAN from before the
+    // refetch — wait for the tag itself to actually flip to BUTTON.
+    const chip = await waitFor(() => {
+      const el = document.querySelector(
+        '[data-test-subj="wzPrivacyChip"].wzPrivacyChip--on',
+      ) as HTMLElement;
+      expect(el).not.toBeNull();
+      expect(el.tagName).toBe('BUTTON');
+      return el;
+    });
     // And it is genuinely interactive again, not just visually enabled.
     fireEvent.click(chip);
     await findPrivacyChipWithModifier('off');
@@ -3199,7 +3208,8 @@ describe('ChatPage — admin privacy policy applies without a reload', () => {
       settings({ userCanOverride: true, privacyDefaultOn: false }),
     );
     renderChatPage();
-    await waitFor(() => expect(privacyChip()).toBeEnabled());
+    const offChip = await findPrivacyChipWithModifier('off');
+    expect(offChip.tagName).toBe('BUTTON');
 
     // Deliberately leave the GET returning the STALE document: if the listener re-read, the chip
     // would stay unlocked and this test would fail.
@@ -3207,8 +3217,8 @@ describe('ChatPage — admin privacy policy applies without a reload', () => {
       settings({ userCanOverride: false, privacyDefaultOn: true }),
     );
 
-    await waitFor(() => expect(privacyChip()).toBeDisabled());
-    expect(privacyChip()).toHaveTextContent(/on/i);
+    const chip = await findPrivacyChipWithModifier('on');
+    expect(chip.tagName).not.toBe('BUTTON');
     expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(1);
   });
 
@@ -3217,7 +3227,7 @@ describe('ChatPage — admin privacy policy applies without a reload', () => {
       settings({ userCanOverride: true, privacyDefaultOn: false }),
     );
     renderChatPage();
-    await waitFor(() => expect(privacyChip()).toBeEnabled());
+    await findPrivacyChipWithModifier('off');
 
     mockSettingsService.getAssistantSettings.mockResolvedValue(
       settings({ userCanOverride: false, privacyDefaultOn: true }),
@@ -3228,7 +3238,8 @@ describe('ChatPage — admin privacy policy applies without a reload', () => {
     await waitFor(() =>
       expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(2),
     );
-    await waitFor(() => expect(privacyChip()).toBeDisabled());
+    const chip = await findPrivacyChipWithModifier('on');
+    expect(chip.tagName).not.toBe('BUTTON');
   });
 
   it('refetches when the document becomes visible again', async () => {
@@ -3238,7 +3249,7 @@ describe('ChatPage — admin privacy policy applies without a reload', () => {
       settings({ userCanOverride: true, privacyDefaultOn: false }),
     );
     renderChatPage();
-    await waitFor(() => expect(privacyChip()).toBeEnabled());
+    await findPrivacyChipWithModifier('off');
 
     mockSettingsService.getAssistantSettings.mockResolvedValue(
       settings({ userCanOverride: false, privacyDefaultOn: true }),
@@ -3249,8 +3260,8 @@ describe('ChatPage — admin privacy policy applies without a reload', () => {
     await waitFor(() =>
       expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(2),
     );
-    await waitFor(() => expect(privacyChip()).toBeDisabled());
-    expect(privacyChip()).toHaveTextContent(/on/i);
+    const chip = await findPrivacyChipWithModifier('on');
+    expect(chip.tagName).not.toBe('BUTTON');
   });
 
   it('does not refetch when the document merely becomes hidden', async () => {
@@ -3292,7 +3303,7 @@ describe('ChatPage — admin privacy policy applies without a reload', () => {
     );
     mockOpenStream();
     renderChatPage();
-    await waitFor(() => expect(privacyChip()).toHaveTextContent(/off/i));
+    await findPrivacyChipWithModifier('off');
 
     // An admin elsewhere locks privacy ON. Nothing in this browser knows yet.
     mockSettingsService.getAssistantSettings.mockResolvedValue(
@@ -3304,8 +3315,8 @@ describe('ChatPage — admin privacy policy applies without a reload', () => {
     // The privacy payload is the 4th argument of streamChat.
     expect(mockStreamChat.mock.calls[0][3]).toEqual({ enabled: true, map: [] });
     // ...and the chip now tells the truth too.
-    await waitFor(() => expect(privacyChip()).toHaveTextContent(/on/i));
-    expect(privacyChip()).toBeDisabled();
+    const chip = await findPrivacyChipWithModifier('on');
+    expect(chip.tagName).not.toBe('BUTTON');
   });
 
   it('still sends when the pre-send policy re-read fails', async () => {
@@ -3315,7 +3326,7 @@ describe('ChatPage — admin privacy policy applies without a reload', () => {
     );
     mockOpenStream();
     renderChatPage();
-    await waitFor(() => expect(privacyChip()).toHaveTextContent(/on/i));
+    await findPrivacyChipWithModifier('on');
 
     mockSettingsService.getAssistantSettings.mockRejectedValue(httpError(503));
 
@@ -3333,11 +3344,11 @@ describe('ChatPage — admin privacy policy applies without a reload', () => {
     );
     mockOpenStream();
     renderChatPage();
-    await waitFor(() => expect(privacyChip()).toBeEnabled());
+    const offChip = await findPrivacyChipWithModifier('off');
 
     // The user turns privacy on for this conversation; overrides stay allowed server-side.
-    fireEvent.click(privacyChip());
-    await waitFor(() => expect(privacyChip()).toHaveTextContent(/on/i));
+    fireEvent.click(offChip);
+    await findPrivacyChipWithModifier('on');
 
     await sendMessage('respect my choice');
 
