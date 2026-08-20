@@ -1,5 +1,10 @@
 import { ToolDefinition } from '../types';
-import { clampLimit, limitProperty, objectSchema, requireNonEmptyString } from './common';
+import {
+  clampLimit,
+  limitProperty,
+  objectSchema,
+  requireNonEmptyString,
+} from './common';
 
 /**
  * IOC (indicator of compromise) lookup against the CTI indicator-enrichment feed (coverage doc
@@ -44,7 +49,10 @@ const BARE_IPV4_RE = /^(\d{1,3}\.){3}\d{1,3}$/;
 const BARE_IPV6_RE = /^[0-9a-f:]+$/i;
 
 function isBareIpAddress(value: string): boolean {
-  return BARE_IPV4_RE.test(value) || (value.includes(':') && BARE_IPV6_RE.test(value));
+  return (
+    BARE_IPV4_RE.test(value) ||
+    (value.includes(':') && BARE_IPV6_RE.test(value))
+  );
 }
 
 export const lookupIndicatorTool: ToolDefinition = {
@@ -52,16 +60,16 @@ export const lookupIndicatorTool: ToolDefinition = {
     name: 'lookup_indicator',
     description:
       'Checks whether an IP address, file hash (MD5/SHA1/SHA256), URL, or domain matches a ' +
-      'known-malicious record in the threat-intel indicator (IOC) feed. Reports the feed\'s own ' +
+      "known-malicious record in the threat-intel indicator (IOC) feed. Reports the feed's own " +
       'verdict (present/absent), the provider, tags, and any associated malware/software family ' +
-      '-- never the customer\'s own environment. A match means the indicator is a KNOWN entry in ' +
+      "-- never the customer's own environment. A match means the indicator is a KNOWN entry in " +
       'this third-party feed; the ABSENCE of a match means "not present in the CTI feed", which ' +
       'is NOT proof the indicator is safe or clean -- never phrase a no-match result as "safe". ' +
       'For a bare IP address, connection-type records store "ip:port" as the indicator name, so ' +
       'this tool also matches those records by an anchored "ip:" prefix (never a substring or ' +
       'unanchored match) in addition to the exact value; every other indicator shape (hash, URL, ' +
       'domain) matches by exact value only. Distinct from the ' +
-      'vulnerability tools (CVE data) and from the customer\'s own observed source.ip/' +
+      "vulnerability tools (CVE data) and from the customer's own observed source.ip/" +
       'destination.ip fields on findings -- this tool only reports third-party feed knowledge ' +
       'about the indicator itself.',
     parameters: objectSchema(

@@ -84,7 +84,10 @@ test('get_rules: status/level/tag/logsource_product/space each add exactly one f
 // (mapped `keyword`, 14 rules carry `attack.t1190`, live-confirmed) -- reachable through the
 // existing `tag` param, whose description now says so.
 test('get_rules: has no technique_id parameter (removed, not repointed at a dead field)', () => {
-  assert.equal('technique_id' in getRulesTool.spec.parameters.properties, false);
+  assert.equal(
+    'technique_id' in getRulesTool.spec.parameters.properties,
+    false,
+  );
 });
 
 test('get_rules: a technique_id-shaped param is silently ignored rather than erroring (build never sees it)', () => {
@@ -133,7 +136,9 @@ test('get_rules: a non-"attack." tag is passed through unchanged (not force-lowe
 test('get_rules: logsource_product adds an exact term filter on document.logsource.product', () => {
   const request = build({ enabled: 'any', logsource_product: 'apache-http' });
   assert.deepEqual(request.body.query, {
-    bool: { filter: [{ term: { 'document.logsource.product': 'apache-http' } }] },
+    bool: {
+      filter: [{ term: { 'document.logsource.product': 'apache-http' } }],
+    },
   });
 });
 
@@ -190,7 +195,10 @@ test('get_rules: name builds a should-clause on title (term+prefix) and descript
 // 330 of 345 decoders (any one token matched) inside a non-scoring `bool.filter` sorted by
 // `_doc`, so the wanted row never appeared in the visible page; with `and` it returns exactly 1.
 test('get_rules: the description match uses operator "and" so multi-token names stay precise', () => {
-  const request = build({ enabled: 'any', name: 'server side template injection' });
+  const request = build({
+    enabled: 'any',
+    name: 'server side template injection',
+  });
   const shouldClause = (
     request.body.query as { bool: { filter: Record<string, unknown>[] } }
   ).bool.filter[0] as {

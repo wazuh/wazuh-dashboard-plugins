@@ -27,7 +27,9 @@ function clientReturning(
       getMapping({ index }: { index: string }) {
         const body = bodyByIndexPattern[index];
         if (!body) {
-          return Promise.reject(new Error(`no fixture for index pattern "${index}"`));
+          return Promise.reject(
+            new Error(`no fixture for index pattern "${index}"`),
+          );
         }
         return Promise.resolve({ body });
       },
@@ -71,7 +73,8 @@ function setMappingLeaf(
     if (!existing || typeof existing !== 'object' || !existing.properties) {
       node[segment] = { properties: {} };
     }
-    node = (node[segment] as { properties: Record<string, unknown> }).properties;
+    node = (node[segment] as { properties: Record<string, unknown> })
+      .properties;
   });
 }
 
@@ -85,10 +88,12 @@ test('flattenMappedFieldPaths: flattens nested object properties into dot paths,
       },
     },
   });
-  assert.deepEqual(
-    [...paths].sort(),
-    ['@timestamp', 'agent', 'agent.id', 'agent.name'],
-  );
+  assert.deepEqual([...paths].sort(), [
+    '@timestamp',
+    'agent',
+    'agent.id',
+    'agent.name',
+  ]);
 });
 
 test('flattenMappedFieldPaths: an undefined properties tree yields an empty set', () => {
@@ -99,7 +104,9 @@ test('flattenMappedFieldPaths: an undefined properties tree yields an empty set'
  * `fieldsForFamily('sca')` allowlist path (the latter are `wazuh.*` fields, never in
  * `FIELD_CATALOG` itself -- see field-drift-canary.ts's `QUERIED_FAMILIES` doc comment) minus
  * whichever `pathsToOmit` the caller wants to simulate as dropped/renamed. */
-async function buildScaProperties(pathsToOmit: string[] = []): Promise<Record<string, unknown>> {
+async function buildScaProperties(
+  pathsToOmit: string[] = [],
+): Promise<Record<string, unknown>> {
   const { FIELD_CATALOG } = await import('../../common/field-catalog');
   const { fieldsForFamily } = await import('./catalog/get-field-values');
   const omit = new Set(pathsToOmit);
@@ -153,57 +160,63 @@ test('checkFieldDrift: warns, prefixed "[field-drift]", for a TOOL-FACING field 
   assert.equal(logger.warnMessages.length, 1);
 });
 
-test('checkFieldDrift: warns for a CATALOG-ONLY field are demoted to debug, never warn -- code ' +
-  'review B2/B3 (AI/plan/b-review.md)', async () => {
-  // "check.id" is a FIELD_CATALOG.sca entry with no get-field-values.ts tool field of its own
-  // (fieldsForFamily('sca') covers policy.id/check.result/check.name, not check.id) -- simulate
-  // it as dropped/renamed while every tool-facing field stays present.
-  const properties = await buildScaProperties(['check.id']);
-  const client = clientReturning({
-    'wazuh-states-sca*': {
-      'wazuh-states-sca-000001': { mappings: { properties } },
-    },
-    ...OTHER_EMPTY_FAMILY_INDICES,
-  });
-  const logger = fakeLogger();
-  await checkFieldDrift(client, logger as never);
-  assert.deepEqual(logger.warnMessages, []);
-  assert.ok(
-    logger.debugMessages.some(message => message.includes('"check.id"')),
-    'expected a DEBUG line naming the missing catalog-only "check.id" field',
-  );
-});
+test(
+  'checkFieldDrift: warns for a CATALOG-ONLY field are demoted to debug, never warn -- code ' +
+    'review B2/B3 (AI/plan/b-review.md)',
+  async () => {
+    // "check.id" is a FIELD_CATALOG.sca entry with no get-field-values.ts tool field of its own
+    // (fieldsForFamily('sca') covers policy.id/check.result/check.name, not check.id) -- simulate
+    // it as dropped/renamed while every tool-facing field stays present.
+    const properties = await buildScaProperties(['check.id']);
+    const client = clientReturning({
+      'wazuh-states-sca*': {
+        'wazuh-states-sca-000001': { mappings: { properties } },
+      },
+      ...OTHER_EMPTY_FAMILY_INDICES,
+    });
+    const logger = fakeLogger();
+    await checkFieldDrift(client, logger as never);
+    assert.deepEqual(logger.warnMessages, []);
+    assert.ok(
+      logger.debugMessages.some(message => message.includes('"check.id"')),
+      'expected a DEBUG line naming the missing catalog-only "check.id" field',
+    );
+  },
+);
 
-test('checkFieldDrift: a live mapping missing MOST of the WCS catalog for a family, but every ' +
-  'tool-facing field present, produces no warnings -- fixture is independent of FIELD_CATALOG ' +
-  '(code review B3, AI/plan/b-review.md: the old mirror-test fixture was BUILT FROM ' +
-  'FIELD_CATALOG.sca itself, so "logs nothing when everything is present" was true by ' +
-  'construction and could never observe the real bug (B2): the live index TEMPLATE maps far ' +
-  'fewer fields than the WCS schema defines. This fixture hand-lists only a handful of real ' +
-  'sca fields plus every get-field-values.ts tool field, which is what a genuinely healthy ' +
-  '"template is a subset of the schema" live mapping actually looks like -- it fails on the ' +
-  'pre-B2 code (which warned on every catalog field not in this deliberately small mapping) and ' +
-  'passes after the fix.', async () => {
-  const { fieldsForFamily } = await import('./catalog/get-field-values');
-  const properties: Record<string, unknown> = {};
-  for (const path of fieldsForFamily('sca')) {
-    setMappingLeaf(properties, path, 'keyword');
-  }
-  // A small, realistic subset of the WCS sca schema -- deliberately NOT the full
-  // FIELD_CATALOG.sca list (52 fields), matching how a real live template maps a subset of the
-  // schema, not the whole thing.
-  setMappingLeaf(properties, 'check.id', 'keyword');
-  setMappingLeaf(properties, '@timestamp', 'date');
-  const client = clientReturning({
-    'wazuh-states-sca*': {
-      'wazuh-states-sca-000001': { mappings: { properties } },
-    },
-    ...OTHER_EMPTY_FAMILY_INDICES,
-  });
-  const logger = fakeLogger();
-  await checkFieldDrift(client, logger as never);
-  assert.deepEqual(logger.warnMessages, []);
-});
+test(
+  'checkFieldDrift: a live mapping missing MOST of the WCS catalog for a family, but every ' +
+    'tool-facing field present, produces no warnings -- fixture is independent of FIELD_CATALOG ' +
+    '(code review B3, AI/plan/b-review.md: the old mirror-test fixture was BUILT FROM ' +
+    'FIELD_CATALOG.sca itself, so "logs nothing when everything is present" was true by ' +
+    'construction and could never observe the real bug (B2): the live index TEMPLATE maps far ' +
+    'fewer fields than the WCS schema defines. This fixture hand-lists only a handful of real ' +
+    'sca fields plus every get-field-values.ts tool field, which is what a genuinely healthy ' +
+    '"template is a subset of the schema" live mapping actually looks like -- it fails on the ' +
+    'pre-B2 code (which warned on every catalog field not in this deliberately small mapping) and ' +
+    'passes after the fix.',
+  async () => {
+    const { fieldsForFamily } = await import('./catalog/get-field-values');
+    const properties: Record<string, unknown> = {};
+    for (const path of fieldsForFamily('sca')) {
+      setMappingLeaf(properties, path, 'keyword');
+    }
+    // A small, realistic subset of the WCS sca schema -- deliberately NOT the full
+    // FIELD_CATALOG.sca list (52 fields), matching how a real live template maps a subset of the
+    // schema, not the whole thing.
+    setMappingLeaf(properties, 'check.id', 'keyword');
+    setMappingLeaf(properties, '@timestamp', 'date');
+    const client = clientReturning({
+      'wazuh-states-sca*': {
+        'wazuh-states-sca-000001': { mappings: { properties } },
+      },
+      ...OTHER_EMPTY_FAMILY_INDICES,
+    });
+    const logger = fakeLogger();
+    await checkFieldDrift(client, logger as never);
+    assert.deepEqual(logger.warnMessages, []);
+  },
+);
 
 test('checkFieldDrift: a family whose index pattern matches nothing live is not drift', async () => {
   const client = clientReturning({
@@ -231,7 +244,8 @@ test('checkFieldDrift: never throws when the client itself errors for a family -
   assert.ok(
     logger.debugMessages.some(
       message =>
-        message.includes('[field-drift]') && message.includes('simulated indexer unreachable'),
+        message.includes('[field-drift]') &&
+        message.includes('simulated indexer unreachable'),
     ),
   );
 });

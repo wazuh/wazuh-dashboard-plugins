@@ -318,7 +318,7 @@ test('noTextFallbackMessage: rounds exhausted AND the last attempt errored -> bo
     args: {},
     errorMessage: 'some unclassified internal error',
   });
-  assert.match(message, /tool-round budget/i);
+  assert.match(message, /analysis limit/i);
   assert.match(message, /did not complete/);
 });
 

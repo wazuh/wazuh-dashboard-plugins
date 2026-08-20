@@ -1910,7 +1910,8 @@ test('applyFieldPolicy: search_wazuh_data still anonymizes an unlisted field on 
     tool: 'search_wazuh_data',
     samples: [
       {
-        'document.containers.cna.rejectedReasons': 'REJECT: duplicate of CVE-2024-32111',
+        'document.containers.cna.rejectedReasons':
+          'REJECT: duplicate of CVE-2024-32111',
       },
     ],
   });

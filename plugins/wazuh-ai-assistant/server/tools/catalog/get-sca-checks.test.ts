@@ -531,7 +531,10 @@ test('get_sca_checks: review D1 — a 5-row digest of LIVE-SIZED rationale/remed
   // All 5 rows survive: capDigest's row-drop loop never triggers because the per-field cap keeps
   // the whole digest under DIGEST_CHAR_CAP without it.
   assert.equal(digest.samples.length, 5, 'no sample row should be popped');
-  assert.ok(!digest.samplesNote, 'no truncation to caveat when all 5 rows survive');
+  assert.ok(
+    !digest.samplesNote,
+    'no truncation to caveat when all 5 rows survive',
+  );
   for (const sample of digest.samples) {
     assert.equal((sample['check.rationale'] as string).length, 201); // 200 chars + ellipsis
     assert.equal((sample['check.remediation'] as string).length, 241); // 240 chars + ellipsis

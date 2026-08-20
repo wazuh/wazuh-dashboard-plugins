@@ -35,25 +35,67 @@ const REF = '5.0.0';
  */
 const FAMILIES = [
   { key: 'events.main', path: 'wcs/stateless/events/main/docs/fields.csv' },
-  { key: 'events.findings', path: 'wcs/stateless/events/findings/docs/fields.csv' },
-  { key: 'inventory.system', path: 'wcs/stateful/inventory/system/docs/fields.csv' },
-  { key: 'inventory.packages', path: 'wcs/stateful/inventory/packages/docs/fields.csv' },
-  { key: 'inventory.ports', path: 'wcs/stateful/inventory/ports/docs/fields.csv' },
-  { key: 'inventory.processes', path: 'wcs/stateful/inventory/processes/docs/fields.csv' },
-  { key: 'inventory.hotfixes', path: 'wcs/stateful/inventory/hotfixes/docs/fields.csv' },
-  { key: 'inventory.users', path: 'wcs/stateful/inventory/users/docs/fields.csv' },
-  { key: 'inventory.groups', path: 'wcs/stateful/inventory/groups/docs/fields.csv' },
-  { key: 'inventory.networks', path: 'wcs/stateful/inventory/networks/docs/fields.csv' },
-  { key: 'inventory.interfaces', path: 'wcs/stateful/inventory/interfaces/docs/fields.csv' },
-  { key: 'inventory.services', path: 'wcs/stateful/inventory/services/docs/fields.csv' },
-  { key: 'inventory.hardware', path: 'wcs/stateful/inventory/hardware/docs/fields.csv' },
-  { key: 'inventory.protocols', path: 'wcs/stateful/inventory/protocols/docs/fields.csv' },
+  {
+    key: 'events.findings',
+    path: 'wcs/stateless/events/findings/docs/fields.csv',
+  },
+  {
+    key: 'inventory.system',
+    path: 'wcs/stateful/inventory/system/docs/fields.csv',
+  },
+  {
+    key: 'inventory.packages',
+    path: 'wcs/stateful/inventory/packages/docs/fields.csv',
+  },
+  {
+    key: 'inventory.ports',
+    path: 'wcs/stateful/inventory/ports/docs/fields.csv',
+  },
+  {
+    key: 'inventory.processes',
+    path: 'wcs/stateful/inventory/processes/docs/fields.csv',
+  },
+  {
+    key: 'inventory.hotfixes',
+    path: 'wcs/stateful/inventory/hotfixes/docs/fields.csv',
+  },
+  {
+    key: 'inventory.users',
+    path: 'wcs/stateful/inventory/users/docs/fields.csv',
+  },
+  {
+    key: 'inventory.groups',
+    path: 'wcs/stateful/inventory/groups/docs/fields.csv',
+  },
+  {
+    key: 'inventory.networks',
+    path: 'wcs/stateful/inventory/networks/docs/fields.csv',
+  },
+  {
+    key: 'inventory.interfaces',
+    path: 'wcs/stateful/inventory/interfaces/docs/fields.csv',
+  },
+  {
+    key: 'inventory.services',
+    path: 'wcs/stateful/inventory/services/docs/fields.csv',
+  },
+  {
+    key: 'inventory.hardware',
+    path: 'wcs/stateful/inventory/hardware/docs/fields.csv',
+  },
+  {
+    key: 'inventory.protocols',
+    path: 'wcs/stateful/inventory/protocols/docs/fields.csv',
+  },
   {
     key: 'inventory.browser_extensions',
     path: 'wcs/stateful/inventory/browser-extensions/docs/fields.csv',
   },
   { key: 'sca', path: 'wcs/stateful/sca/docs/fields.csv' },
-  { key: 'vulnerabilities', path: 'wcs/stateful/vulnerabilities/docs/fields.csv' },
+  {
+    key: 'vulnerabilities',
+    path: 'wcs/stateful/vulnerabilities/docs/fields.csv',
+  },
   { key: 'fim.files', path: 'wcs/stateful/fim/files/docs/fields.csv' },
   {
     key: 'fim.windows_registry_keys',
@@ -151,14 +193,18 @@ function splitCsvRows(csvText) {
  * the sole exception, now removed). Dropping it takes the compressed catalog from ~1.10% of the
  * ~2.4 MB footprint gate to ~0.85%. */
 function parseFieldsCsv(csvText) {
-  const rows = splitCsvRows(csvText).filter(row => row.length > 1 || row[0] !== '');
+  const rows = splitCsvRows(csvText).filter(
+    row => row.length > 1 || row[0] !== '',
+  );
   const [header, ...dataRows] = rows;
   const indexedIdx = header.indexOf('Indexed');
   const fieldIdx = header.indexOf('Field');
   const typeIdx = header.indexOf('Type');
   if (indexedIdx === -1 || fieldIdx === -1 || typeIdx === -1) {
     throw new Error(
-      `Unexpected WCS CSV header (missing Indexed/Field/Type): ${header.join(',')}`,
+      `Unexpected WCS CSV header (missing Indexed/Field/Type): ${header.join(
+        ',',
+      )}`,
     );
   }
   const paths = [];
@@ -191,7 +237,11 @@ function main() {
       const csvText = fetchCsv(family.path);
       catalog[family.key] = parseFieldsCsv(csvText);
     } catch (error) {
-      notFetched.push({ key: family.key, path: family.path, error: String(error) });
+      notFetched.push({
+        key: family.key,
+        path: family.path,
+        error: String(error),
+      });
     }
   }
 
@@ -201,7 +251,9 @@ function main() {
         'truncated catalog:\n',
     );
     for (const failure of notFetched) {
-      process.stderr.write(`  - ${failure.key} (${failure.path}): ${failure.error}\n`);
+      process.stderr.write(
+        `  - ${failure.key} (${failure.path}): ${failure.error}\n`,
+      );
     }
     // Code review B4: this generator's own doc comment for `fetchCsv` promises it "fails loudly
     // rather than silently writing a truncated catalog", but the previous version wrote the file
@@ -213,11 +265,16 @@ function main() {
   }
 
   const generatedDate = new Date().toISOString().slice(0, 10);
-  const totalFields = Object.values(catalog).reduce((sum, list) => sum + list.length, 0);
+  const totalFields = Object.values(catalog).reduce(
+    (sum, list) => sum + list.length,
+    0,
+  );
 
   const familyEntries = Object.entries(catalog)
     .map(([key, paths]) => {
-      const rows = paths.map(path => `      ${JSON.stringify(path)},`).join('\n');
+      const rows = paths
+        .map(path => `      ${JSON.stringify(path)},`)
+        .join('\n');
       return `  ${JSON.stringify(key)}: [\n${rows}\n  ],`;
     })
     .join('\n');
@@ -299,7 +356,9 @@ export const FIELD_CATALOG_TOTAL_FIELDS = ${totalFields};
   const outPath = join(__dirname, '..', 'common', 'field-catalog.ts');
   writeFileSync(outPath, output, 'utf8');
   process.stderr.write(
-    `\nWrote ${outPath} -- ${Object.keys(catalog).length} families, ${totalFields} fields.\n`,
+    `\nWrote ${outPath} -- ${
+      Object.keys(catalog).length
+    } families, ${totalFields} fields.\n`,
   );
 }
 

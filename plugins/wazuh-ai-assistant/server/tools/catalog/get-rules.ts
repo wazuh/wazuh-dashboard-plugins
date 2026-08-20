@@ -84,7 +84,7 @@ export const getRulesTool: ToolDefinition = {
           '"attack.<id>" tag form (e.g. "attack.t1190" for T1190) -- this is the tag vocabulary ' +
           'this field actually holds (confirmed live). There is deliberately no separate ' +
           '`technique_id` parameter: the tool used to expose one against ' +
-          '`document.mitre.technique.id`, but that path is absent from this index\'s mapping ' +
+          "`document.mitre.technique.id`, but that path is absent from this index's mapping " +
           'and can only ever return 0 rows (see ' +
           'AI/plan/qa-rules-decoders-rootcause.md, defect #2) -- removed rather than fixed onto ' +
           'this field, because `technique.id` here is a real MAPPED keyword that is simply ' +
@@ -113,7 +113,8 @@ export const getRulesTool: ToolDefinition = {
   target: 'indexer',
   tier: 'T1',
   buildRequest(params) {
-    const name = typeof params.name === 'string' ? params.name.trim() : undefined;
+    const name =
+      typeof params.name === 'string' ? params.name.trim() : undefined;
     const enabled =
       typeof params.enabled === 'string' &&
       (ENABLED_VALUES as readonly string[]).includes(params.enabled)
@@ -127,7 +128,8 @@ export const getRulesTool: ToolDefinition = {
     // lowercase (e.g. "attack.t1190"), while ATT&CK ids are conventionally written uppercase --
     // lowercase an "attack.*" tag so a model-written "attack.T1190" still hits instead of
     // silently returning 0 rows.
-    const rawTag = typeof params.tag === 'string' ? params.tag.trim() : undefined;
+    const rawTag =
+      typeof params.tag === 'string' ? params.tag.trim() : undefined;
     const tag =
       rawTag && /^attack\./i.test(rawTag) ? rawTag.toLowerCase() : rawTag;
     const logsourceProduct =

@@ -54,10 +54,13 @@ export const getCtiStatusTool: ToolDefinition = {
     parameters: objectSchema({
       feed: {
         type: 'string',
-        description: 'Filter to one specific feed. Omit to see the status of all three.',
+        description:
+          'Filter to one specific feed. Omit to see the status of all three.',
         enum: FEED_NAMES,
       },
-      limit: limitProperty('Max number of feeds to return (default 10, max 10).'),
+      limit: limitProperty(
+        'Max number of feeds to return (default 10, max 10).',
+      ),
     }),
   },
   target: 'indexer',
@@ -73,23 +76,28 @@ export const getCtiStatusTool: ToolDefinition = {
       // this catalog's own boundary would reject -- degrade honestly instead.
       return {
         ok: true,
-        resolved: { params, note: 'Sync schedule: could not be checked (index not allowlisted).' },
+        resolved: {
+          params,
+          note: 'Sync schedule: could not be checked (index not allowlisted).',
+        },
       };
     }
     try {
-      const response = await context.core.opensearch.client.asCurrentUser.search(
-        {
+      const response =
+        await context.core.opensearch.client.asCurrentUser.search({
           index: CONTENT_MANAGER_JOBS_INDEX,
           body: {
             query: { match_all: {} },
             _source: ['name', 'job_type', 'schedule', 'enabled'],
             size: 10,
           },
-        },
-      );
-      const hits = (response.body as {
-        hits?: { hits?: Array<{ _source?: Record<string, unknown> }> };
-      }).hits?.hits ?? [];
+        });
+      const hits =
+        (
+          response.body as {
+            hits?: { hits?: Array<{ _source?: Record<string, unknown> }> };
+          }
+        ).hits?.hits ?? [];
       const jobs = hits
         .map(hit => describeJob(hit._source))
         .filter((text): text is string => text !== undefined);
@@ -100,7 +108,8 @@ export const getCtiStatusTool: ToolDefinition = {
     } catch {
       // Same honest-degrade posture as get-cve-intel.ts: a schedule-lookup failure must not
       // block or taint the per-feed status table this tool's own request already answers.
-      note = 'Sync schedule: could not be checked (the schedule lookup failed).';
+      note =
+        'Sync schedule: could not be checked (the schedule lookup failed).';
     }
     return { ok: true, resolved: { params, note } };
   },
@@ -155,7 +164,9 @@ export const getCtiStatusTool: ToolDefinition = {
 /** Renders one `.wazuh-content-manager-jobs` doc's schedule as a short clause, e.g. "Catalog Sync
  * Periodic Task every 60 Minutes (enabled)". Returns `undefined` (never a fabricated placeholder)
  * for a doc missing the fields it needs. */
-function describeJob(source: Record<string, unknown> | undefined): string | undefined {
+function describeJob(
+  source: Record<string, unknown> | undefined,
+): string | undefined {
   if (!source) {
     return undefined;
   }

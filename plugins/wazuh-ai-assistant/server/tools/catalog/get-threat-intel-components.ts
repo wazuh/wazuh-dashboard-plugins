@@ -135,7 +135,8 @@ export const getThreatIntelComponentsTool: ToolDefinition = {
     }
     const index = COMPONENT_INDEX[componentType as ComponentType];
 
-    const name = typeof params.name === 'string' ? params.name.trim() : undefined;
+    const name =
+      typeof params.name === 'string' ? params.name.trim() : undefined;
     const enabled =
       typeof params.enabled === 'string' &&
       (ENABLED_VALUES as readonly string[]).includes(params.enabled)

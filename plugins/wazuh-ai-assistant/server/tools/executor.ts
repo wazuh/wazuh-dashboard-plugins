@@ -393,19 +393,21 @@ async function appendEntityNearMissHint(
       // maxItems, so an unbounded hint could evict every sample row from the digest and still
       // bust the char cap -- capDigest's hint-length cap is the backstop, this is the shaper.
       sentences.push(
-        ...nearMisses.slice(0, MAX_NEAR_MISS_SENTENCES).map(
-          ({ requested, siblings }) =>
-            `The agent-name filter "${display(
-              requested,
-            )}" also nearly matches distinct ` +
-            `agent(s) with data: ${siblings
-              .slice(0, MAX_NEAR_MISS_SIBLINGS)
-              .map(display)
-              .join(
-                ', ',
-              )}. If the user named one of those, re-run with that exact name -- ` +
-            'never silently substitute one host for another.',
-        ),
+        ...nearMisses
+          .slice(0, MAX_NEAR_MISS_SENTENCES)
+          .map(
+            ({ requested, siblings }) =>
+              `The agent-name filter "${display(
+                requested,
+              )}" also nearly matches distinct ` +
+              `agent(s) with data: ${siblings
+                .slice(0, MAX_NEAR_MISS_SIBLINGS)
+                .map(display)
+                .join(
+                  ', ',
+                )}. If the user named one of those, re-run with that exact name -- ` +
+              'never silently substitute one host for another.',
+          ),
       );
     }
     // BLOCKER FIX (CV-028/CV-033, category-word-misread-as-agent-name class): a requested name
@@ -456,16 +458,18 @@ async function appendEntityNearMissHint(
         indexedNames,
       ).filter(requested => !ID_SHAPED_TOKEN_RE.test(requested.trim()));
       sentences.push(
-        ...unmatched.slice(0, MAX_NEAR_MISS_SENTENCES).map(
-          requested =>
-            `The agent-name filter "${display(
-              requested,
-            )}" has no match (exact or near-miss) in this data. This may be a mistaken name -- ` +
-            'e.g. a category/domain word rather than a real host -- but it may also be a real ' +
-            'agent with genuinely no rows in this specific index/time window; this probe cannot ' +
-            'tell those apart. State it to the user as an unmatched filter name, never as a ' +
-            'claim that the agent itself is absent, clean, or has no data.',
-        ),
+        ...unmatched
+          .slice(0, MAX_NEAR_MISS_SENTENCES)
+          .map(
+            requested =>
+              `The agent-name filter "${display(
+                requested,
+              )}" has no match (exact or near-miss) in this data. This may be a mistaken name -- ` +
+              'e.g. a category/domain word rather than a real host -- but it may also be a real ' +
+              'agent with genuinely no rows in this specific index/time window; this probe cannot ' +
+              'tell those apart. State it to the user as an unmatched filter name, never as a ' +
+              'claim that the agent itself is absent, clean, or has no data.',
+          ),
       );
     }
     if (sentences.length === 0) {

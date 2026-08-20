@@ -36,7 +36,10 @@ const ORIGINAL_FAMILIES: GenericQueryFamily[] = [
     label:
       'rule-match findings — the security detections, with wazuh.rule.level/wazuh.rule.mitre/severity',
   },
-  { pattern: 'wazuh-events-v5-*', label: 'all normalized events, matched or not' },
+  {
+    pattern: 'wazuh-events-v5-*',
+    label: 'all normalized events, matched or not',
+  },
   {
     pattern: 'wazuh-states-*',
     label: 'current-state data: vulnerabilities, FIM, SCA, inventory',
@@ -66,7 +69,8 @@ const A1A_FAMILIES: GenericQueryFamily[] = [
   },
   {
     pattern: '.wazuh-content-manager-jobs',
-    label: 'the CTI content-manager\'s own sync schedule (catalog sync / telemetry ping jobs)',
+    label:
+      "the CTI content-manager's own sync schedule (catalog sync / telemetry ping jobs)",
   },
   {
     pattern: '.opensearch-sap-*-findings',
@@ -83,19 +87,21 @@ const A1A_FAMILIES: GenericQueryFamily[] = [
   },
   {
     pattern: '.opensearch-sap-correlation-metadata',
-    label: 'Security Analytics correlation-engine bookkeeping (root/counter/score state)',
+    label:
+      'Security Analytics correlation-engine bookkeeping (root/counter/score state)',
   },
   {
     pattern: '.wazuh-threatintel-vulnerabilities-a',
-    label: 'the raw CTI CVE-record feed (public NVD-derived vulnerability records, not agent state)',
+    label:
+      'the raw CTI CVE-record feed (public NVD-derived vulnerability records, not agent state)',
   },
   {
     pattern: 'wazuh-threatintel-enrichments-a',
     label:
       'the IOC enrichment feed (known-malicious domain/hash/IP indicators from third-party threat ' +
-      'intel — NOT the customer\'s own observed network data); the indicator VALUE is ' +
+      "intel — NOT the customer's own observed network data); the indicator VALUE is " +
       'document.name and its kind is document.type (e.g. hash_sha256, url_domain, connection) — ' +
-      'root hash.sha256 is the RECORD\'S OWN content hash, not the indicator',
+      "root hash.sha256 is the RECORD'S OWN content hash, not the indicator",
   },
 ];
 
@@ -106,6 +112,5 @@ export const GENERIC_QUERY_FAMILIES: GenericQueryFamily[] = [
   ...A1A_FAMILIES,
 ];
 
-export const GENERIC_QUERY_INDEX_PATTERNS: string[] = GENERIC_QUERY_FAMILIES.map(
-  family => family.pattern,
-);
+export const GENERIC_QUERY_INDEX_PATTERNS: string[] =
+  GENERIC_QUERY_FAMILIES.map(family => family.pattern);

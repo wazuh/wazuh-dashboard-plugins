@@ -147,7 +147,8 @@ test('get_threat_intel_components: the description match uses operator "and" for
   ).bool.filter[0] as {
     bool: { should: Array<{ match?: Record<string, unknown> }> };
   };
-  const matchEntry = shouldClause.bool.should[shouldClause.bool.should.length - 1];
+  const matchEntry =
+    shouldClause.bool.should[shouldClause.bool.should.length - 1];
   assert.deepEqual(matchEntry.match, {
     'document.metadata.description': {
       query: 'decoder/apache-access/0',

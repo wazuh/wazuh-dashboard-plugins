@@ -1,10 +1,6 @@
 import assert from 'node:assert/strict';
 import { searchWazuhDataTool } from './search-wazuh-data';
-import {
-  checkIndexAllowlist,
-  applySafetyValves,
-  lintDsl,
-} from '../guardrails';
+import { checkIndexAllowlist, applySafetyValves, lintDsl } from '../guardrails';
 import { GENERIC_QUERY_INDEX_PATTERNS } from './generic-query-families';
 
 /**
@@ -21,7 +17,10 @@ import { GENERIC_QUERY_INDEX_PATTERNS } from './generic-query-families';
 
 /** Builds and fully validates a search_wazuh_data request the way executor.ts would, returning
  * the final clamped body so a test can assert on its shape too. */
-function buildAndValidate(indexPattern: string, queryDsl: Record<string, unknown>) {
+function buildAndValidate(
+  indexPattern: string,
+  queryDsl: Record<string, unknown>,
+) {
   const request = searchWazuhDataTool.buildRequest!({
     index_pattern: indexPattern,
     query_dsl: JSON.stringify(queryDsl),
@@ -146,7 +145,12 @@ test('CV-049: "is IP/hash/URL X known-malicious" is answerable via search_wazuh_
       },
     },
     size: 5,
-    _source: ['document.name', 'document.type', 'document.provider', 'hash.sha256'],
+    _source: [
+      'document.name',
+      'document.type',
+      'document.provider',
+      'hash.sha256',
+    ],
   });
   assert.equal(index, 'wazuh-threatintel-enrichments-a');
 });

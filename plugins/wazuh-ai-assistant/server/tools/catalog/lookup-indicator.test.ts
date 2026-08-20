@@ -12,7 +12,9 @@ function build(params: Record<string, unknown>): IndexerRequest {
 function boolFilterShould(query: unknown): Array<Record<string, unknown>> {
   return (
     query as {
-      bool: { filter: Array<{ bool: { should: Array<Record<string, unknown>> } }> };
+      bool: {
+        filter: Array<{ bool: { should: Array<Record<string, unknown>> } }>;
+      };
     }
   ).bool.filter[0].bool.should;
 }
@@ -87,13 +89,16 @@ test('lookup_indicator: a non-IP indicator (hash/url/domain) is exact-term only,
 // a false known-malicious verdict for a distinct, benign IP. The anchored `${indicator}:` prefix
 // makes that structurally impossible: "124.70.213.4:" is never a prefix of "124.70.213.43:<port>"
 // (the character after "124.70.213.4" in the real record is "3", not ":").
-test('A-1 regression: 124.70.213.4 must NOT match 124.70.213.43\'s connection records', () => {
+test("A-1 regression: 124.70.213.4 must NOT match 124.70.213.43's connection records", () => {
   const request = build({ indicator: '124.70.213.4' });
   const shouldClauses = boolFilterShould(request.body.query);
   const prefixClause = shouldClauses.find(clause => 'prefix' in clause) as
     | { prefix: { 'document.name': { value: string } } }
     | undefined;
-  assert.ok(prefixClause, 'expected an anchored prefix clause for a bare IP indicator');
+  assert.ok(
+    prefixClause,
+    'expected an anchored prefix clause for a bare IP indicator',
+  );
   const prefixValue = prefixClause!.prefix['document.name'].value;
   assert.equal(prefixValue, '124.70.213.4:');
   // The DSL shape itself proves the false positive is impossible: a real "124.70.213.43:<port>"
@@ -110,14 +115,19 @@ test('A-1 regression: 124.70.213.4 must NOT match 124.70.213.43\'s connection re
 test('A-1 regression: google.com gets no prefix clause (would have matched *.sslip.io typosquats)', () => {
   const request = build({ indicator: 'google.com' });
   const shouldClauses = boolFilterShould(request.body.query);
-  assert.equal(shouldClauses.some(clause => 'prefix' in clause), false);
+  assert.equal(
+    shouldClauses.some(clause => 'prefix' in clause),
+    false,
+  );
 });
 
 test('lookup_indicator: trims the indicator and clamps limit to [1, 50]', () => {
   assert.equal(
-    (boolFilterShould(build({ indicator: '  evil.com  ' }).body.query)[0] as {
-      term: { 'document.name': { value: string } };
-    }).term['document.name'].value,
+    (
+      boolFilterShould(build({ indicator: '  evil.com  ' }).body.query)[0] as {
+        term: { 'document.name': { value: string } };
+      }
+    ).term['document.name'].value,
     'evil.com',
   );
   assert.equal(build({ indicator: 'x', limit: 9999 }).body.size, 50);
@@ -133,7 +143,10 @@ test('lookup_indicator: trims the indicator and clamps limit to [1, 50]', () => 
 // present (live presence was confirmed by direct curl during development, not re-asserted here so
 // this test does not depend on fixture data that can rotate).
 test('CV-049: default body passes checkIndexAllowlist and lintDsl (no time range required, no leading wildcard)', () => {
-  const request = build({ indicator: 'e9a5fd60da9f1f94f1cefa43fe6b7dd80a7368c7cdba13528445724320fc4948' });
+  const request = build({
+    indicator:
+      'e9a5fd60da9f1f94f1cefa43fe6b7dd80a7368c7cdba13528445724320fc4948',
+  });
   assert.equal(checkIndexAllowlist(request.index).ok, true);
   const result = lintDsl(request.body, request.index);
   assert.equal(result.ok, true, result.ok ? '' : result.reason);

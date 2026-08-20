@@ -110,11 +110,14 @@ test('findUnmatchedAgentNames: an exact indexed match is not unmatched', () => {
   assert.deepEqual(results, []);
 });
 
-test('findUnmatchedAgentNames: a zero-padding/case/separator near-miss variant is not unmatched -- ' +
-  'it is the SAME agent by normalization, just spelled differently', () => {
-  const results = findUnmatchedAgentNames(['wazuh-aio-05'], ['wazuh-aio-5']);
-  assert.deepEqual(results, []);
-});
+test(
+  'findUnmatchedAgentNames: a zero-padding/case/separator near-miss variant is not unmatched -- ' +
+    'it is the SAME agent by normalization, just spelled differently',
+  () => {
+    const results = findUnmatchedAgentNames(['wazuh-aio-05'], ['wazuh-aio-5']);
+    assert.deepEqual(results, []);
+  },
+);
 
 test('findUnmatchedAgentNames: handles multiple requested names independently', () => {
   const results = findUnmatchedAgentNames(

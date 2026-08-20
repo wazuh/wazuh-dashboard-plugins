@@ -1,7 +1,21 @@
-import { ResolvedToolParams, ResolveParamsResult, ToolDefinition } from '../types';
-import { WAZUH_FIELD, COMPLIANCE_FRAMEWORK_FIELDS } from '../../../common/wazuh-fields';
-import { isAggAllowedField, listAggAllowedFields, requiresBoundedTimeRange } from '../guardrails';
-import { FIELD_ALIASES, resolveFieldAlias } from '../../../common/field-catalog';
+import {
+  ResolvedToolParams,
+  ResolveParamsResult,
+  ToolDefinition,
+} from '../types';
+import {
+  WAZUH_FIELD,
+  COMPLIANCE_FRAMEWORK_FIELDS,
+} from '../../../common/wazuh-fields';
+import {
+  isAggAllowedField,
+  listAggAllowedFields,
+  requiresBoundedTimeRange,
+} from '../guardrails';
+import {
+  FIELD_ALIASES,
+  resolveFieldAlias,
+} from '../../../common/field-catalog';
 import {
   objectSchema,
   optionalStringParam,
@@ -40,7 +54,10 @@ interface FieldLocation {
   index: string;
 }
 
-const FINDINGS: FieldLocation = { family: 'findings', index: 'wazuh-findings-v5*' };
+const FINDINGS: FieldLocation = {
+  family: 'findings',
+  index: 'wazuh-findings-v5*',
+};
 const EVENTS: FieldLocation = { family: 'events', index: 'wazuh-events-v5*' };
 const VULNERABILITIES: FieldLocation = {
   family: 'vulnerabilities',
@@ -126,7 +143,11 @@ for (const field of Object.values(COMPLIANCE_FRAMEWORK_FIELDS)) {
 }
 
 const ALL_FAMILIES = Array.from(
-  new Set(Object.values(FIELD_LOCATIONS).flatMap(locations => locations.map(l => l.family))),
+  new Set(
+    Object.values(FIELD_LOCATIONS).flatMap(locations =>
+      locations.map(l => l.family),
+    ),
+  ),
 ).sort();
 
 /** Every `AGG_FIELD_ALLOWLIST` field this tool knows how to query on the given `family` (this
@@ -136,7 +157,9 @@ const ALL_FAMILIES = Array.from(
  * module's doc comment for why both sources matter. */
 export function fieldsForFamily(family: string): string[] {
   return Object.entries(FIELD_LOCATIONS)
-    .filter(([, locations]) => locations.some(location => location.family === family))
+    .filter(([, locations]) =>
+      locations.some(location => location.family === family),
+    )
     .map(([field]) => field)
     .sort();
 }
@@ -211,11 +234,11 @@ export const getFieldValuesTool: ToolDefinition = {
       'Discover which values actually exist in a field BEFORE filtering on it, so a filter is ' +
       'never a guess. Returns up to 50 distinct values with their document counts, plus how many ' +
       'documents are missing the field entirely. Use this before a filtered call whose value is ' +
-      'not a fixed, already-documented enum (a tool parameter\'s own `enum` list already tells ' +
+      "not a fixed, already-documented enum (a tool parameter's own `enum` list already tells " +
       'you its valid values -- you do not need this tool for those); also use it AFTER a filtered ' +
       'call returns zero rows, to check whether the filter value itself was wrong before ' +
       'concluding the data does not exist. Only works for a small set of vetted, bounded-' +
-      'cardinality fields (the same list this catalog\'s aggregations are always restricted to) -- ' +
+      "cardinality fields (the same list this catalog's aggregations are always restricted to) -- " +
       'if the field you need is not accepted, say what you could check instead of guessing a value. ' +
       'On the "findings"/"events" surfaces specifically, the ECS `host.os.name`/`host.os.platform` ' +
       'fields are largely UNPOPULATED -- if a call on one of those returns a high `missing_count`, ' +
@@ -264,8 +287,15 @@ export const getFieldValuesTool: ToolDefinition = {
   resolveParams(params): Promise<ResolveParamsResult> {
     const resolvedParams: Record<string, unknown> = { ...params };
     const field = typeof params.field === 'string' ? params.field : undefined;
-    if (!field || !isAggAllowedField(field) || FIELD_LOCATIONS[field] === undefined) {
-      return Promise.resolve({ ok: true, resolved: { params: resolvedParams } });
+    if (
+      !field ||
+      !isAggAllowedField(field) ||
+      FIELD_LOCATIONS[field] === undefined
+    ) {
+      return Promise.resolve({
+        ok: true,
+        resolved: { params: resolvedParams },
+      });
     }
     const locations = FIELD_LOCATIONS[field];
     const requestedFamily = optionalStringParam(params.index_family);
@@ -273,15 +303,24 @@ export const getFieldValuesTool: ToolDefinition = {
       ? locations.find(candidate => candidate.family === requestedFamily)
       : locations[0];
     if (!location) {
-      return Promise.resolve({ ok: true, resolved: { params: resolvedParams } });
+      return Promise.resolve({
+        ok: true,
+        resolved: { params: resolvedParams },
+      });
     }
     const catalogFamily = TOOL_FAMILY_TO_CATALOG_FAMILY[location.family];
     if (!catalogFamily) {
-      return Promise.resolve({ ok: true, resolved: { params: resolvedParams } });
+      return Promise.resolve({
+        ok: true,
+        resolved: { params: resolvedParams },
+      });
     }
     const populatedTwin = resolveFieldAlias(catalogFamily, field);
     const resolved: ResolvedToolParams = { params: resolvedParams };
-    if (populatedTwin !== field && FIELD_ALIASES[catalogFamily]?.[field] !== undefined) {
+    if (
+      populatedTwin !== field &&
+      FIELD_ALIASES[catalogFamily]?.[field] !== undefined
+    ) {
       resolved.note =
         `"${field}" is largely unpopulated on the "${location.family}" surface -- ` +
         `"${populatedTwin}" is the populated twin for the same data on this fleet; call ` +
@@ -361,7 +400,9 @@ export const getFieldValuesTool: ToolDefinition = {
           // those recognize, and adding it registry-wide is out of this tool's scope. Same final
           // result (a doc count of documents lacking `field`), reached through an agg type this
           // catalog already knows how to represent end to end.
-          missing_count: { filter: { bool: { must_not: [{ exists: { field } }] } } },
+          missing_count: {
+            filter: { bool: { must_not: [{ exists: { field } }] } },
+          },
         },
       },
     };

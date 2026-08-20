@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
-import { GENERIC_QUERY_FAMILIES, GENERIC_QUERY_INDEX_PATTERNS } from './generic-query-families';
+import {
+  GENERIC_QUERY_FAMILIES,
+  GENERIC_QUERY_INDEX_PATTERNS,
+} from './generic-query-families';
 import { checkIndexAllowlist } from '../guardrails';
 
 // Regression guard for the single-source-of-truth claim this file's own doc comment makes: every

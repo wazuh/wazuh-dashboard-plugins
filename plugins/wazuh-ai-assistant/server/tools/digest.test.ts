@@ -1749,7 +1749,10 @@ test('getByPath: resolves a dotted path through an array instead of stopping at 
 });
 
 test('getByPath: a bare array path (no further segments) still returns the array itself', () => {
-  const row = { 'wazuh.agent.host.ip': undefined, wazuh: { agent: { host: { ip: ['127.0.0.1'] } } } };
+  const row = {
+    'wazuh.agent.host.ip': undefined,
+    wazuh: { agent: { host: { ip: ['127.0.0.1'] } } },
+  };
   assert.deepEqual(getByPath(row, 'wazuh.agent.host.ip'), ['127.0.0.1']);
 });
 

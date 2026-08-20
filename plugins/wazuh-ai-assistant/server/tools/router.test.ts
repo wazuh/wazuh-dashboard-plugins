@@ -32,7 +32,11 @@ test('resolveStage2Tools(general) returns the minimal set, never undefined/empty
 test('resolveStage2Tools: a data category resolution is unchanged', () => {
   const specs = resolveStage2Tools(['agents']);
   const names = specs.map(spec => spec.name).sort();
-  assert.deepEqual(names, ['get_agents', 'get_field_values', 'search_wazuh_data']);
+  assert.deepEqual(names, [
+    'get_agents',
+    'get_field_values',
+    'search_wazuh_data',
+  ]);
 });
 
 test('resolveStage2Tools: general + a data category still resolves that category', () => {
@@ -187,26 +191,32 @@ test('the "inventory" category description covers "software" and vague host phra
  * choosing a category from a description-only menu has no way to match a word that literally
  * never appears in any category's text.
  */
-test('the "security_analytics" category description covers Security Analytics "spaces" ' +
-  '(content grouping), disambiguated from an RBAC/dashboard permission space', () => {
-  const prompt = buildRoutingPrompt('2026-01-01T00:00:00.000Z');
-  const line = prompt
-    .split('\n')
-    .find(l => l.trim().startsWith('- security_analytics:'));
-  assert.ok(line, 'routing prompt must list a "security_analytics" menu entry');
-  assert.match(
-    line as string,
-    /\bSPACES\b/,
-    'security_analytics description must literally say "spaces" so the stage-1 router can match ' +
-      'a "what spaces exist" question to this category',
-  );
-  assert.match(
-    line as string,
-    /different "space" than an RBAC\/dashboard permission/,
-    'must disambiguate from an RBAC/dashboard permission space, not just introduce a second, ' +
-      'equally-ambiguous meaning of the same word',
-  );
-});
+test(
+  'the "security_analytics" category description covers Security Analytics "spaces" ' +
+    '(content grouping), disambiguated from an RBAC/dashboard permission space',
+  () => {
+    const prompt = buildRoutingPrompt('2026-01-01T00:00:00.000Z');
+    const line = prompt
+      .split('\n')
+      .find(l => l.trim().startsWith('- security_analytics:'));
+    assert.ok(
+      line,
+      'routing prompt must list a "security_analytics" menu entry',
+    );
+    assert.match(
+      line as string,
+      /\bSPACES\b/,
+      'security_analytics description must literally say "spaces" so the stage-1 router can match ' +
+        'a "what spaces exist" question to this category',
+    );
+    assert.match(
+      line as string,
+      /different "space" than an RBAC\/dashboard permission/,
+      'must disambiguate from an RBAC/dashboard permission space, not just introduce a second, ' +
+        'equally-ambiguous meaning of the same word',
+    );
+  },
+);
 
 /**
  * Out-of-scope regression: M-OOS-01/02 (active-response questions) and M-OOS-05 (agent

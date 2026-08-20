@@ -1,6 +1,9 @@
 import { ToolDefinition } from '../types';
 import { objectSchema } from './common';
-import { GENERIC_QUERY_FAMILIES, GENERIC_QUERY_INDEX_PATTERNS } from './generic-query-families';
+import {
+  GENERIC_QUERY_FAMILIES,
+  GENERIC_QUERY_INDEX_PATTERNS,
+} from './generic-query-families';
 
 /**
  * Escape hatch: the ONE generic, catalog-validated query tool for any data family a typed catalog
@@ -94,7 +97,7 @@ export const searchWazuhDataTool: ToolDefinition = {
       'if the field you need is not accepted, say so rather than retrying variations. If a field ' +
       'name you guessed is rejected as not existing, or a query returns zero rows and you suspect ' +
       'the filter value itself was wrong (not that the data is absent), call get_field_values ' +
-      'first to see the field\'s real values before retrying this tool with a different guess.',
+      "first to see the field's real values before retrying this tool with a different guess.",
     parameters: objectSchema(
       {
         index_pattern: {

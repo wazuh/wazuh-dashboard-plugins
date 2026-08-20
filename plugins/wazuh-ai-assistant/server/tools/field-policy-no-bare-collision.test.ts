@@ -46,7 +46,9 @@ test('P-1 regression: no bare (dotless) FIELD_POLICY_DEFAULTS entry collides wit
     collisions,
     [],
     `Bare FIELD_POLICY_DEFAULTS entr${collisions.length === 1 ? 'y' : 'ies'} ` +
-      `[${collisions.join(', ')}] collide${collisions.length === 1 ? 's' : ''} with a real ` +
+      `[${collisions.join(', ')}] collide${
+        collisions.length === 1 ? 's' : ''
+      } with a real ` +
       'customer-data family root leaf -- this would silently widen the entry to cover the ' +
       "customer's own data. See P-1 in AI/plan/a1a-review.md.",
   );

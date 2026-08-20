@@ -75,7 +75,10 @@ test('get_detectors: table/digest columns stay within the declared _source', () 
 
 // Derived from resolveParams's own signature rather than imported from the OSD platform path,
 // matching the convention api-host.test.ts documents for the same reason.
-type ResolveParamsFn = Exclude<typeof getDetectorsTool.resolveParams, undefined>;
+type ResolveParamsFn = Exclude<
+  typeof getDetectorsTool.resolveParams,
+  undefined
+>;
 type DetectorsContext = Parameters<ResolveParamsFn>[1];
 type DetectorsRequest = Parameters<ResolveParamsFn>[2];
 
@@ -114,7 +117,9 @@ test('get_detectors: resolveParams skips findings-count enrichment with no singl
 // CV-017-adjacent, live-verified 2026-08-19: .opensearch-sap-wazuh-generic-findings had 161 real
 // findings at verification time -- a positive count must be reported plainly, no guidance needed.
 test('get_detectors: resolveParams reports a positive findings count without persistence guidance', async () => {
-  const search = jest.fn().mockResolvedValue({ body: { hits: { total: { value: 161 } } } });
+  const search = jest
+    .fn()
+    .mockResolvedValue({ body: { hits: { total: { value: 161 } } } });
   const transportRequest = jest.fn();
   const result = await getDetectorsTool.resolveParams!(
     { detector_type: 'wazuh-generic' },
@@ -123,7 +128,10 @@ test('get_detectors: resolveParams reports a positive findings count without per
   );
   assert.equal(result.ok, true);
   if (result.ok) {
-    assert.match(result.resolved.note ?? '', /Findings for detector_type "wazuh-generic": 161/);
+    assert.match(
+      result.resolved.note ?? '',
+      /Findings for detector_type "wazuh-generic": 161/,
+    );
   }
   // No need to check persistence when findings are already flowing.
   assert.equal(transportRequest.mock.calls.length, 0);
@@ -133,9 +141,13 @@ test('get_detectors: resolveParams reports a positive findings count without per
 // persistent.plugins.alerting.alert_finding_enabled is "true" -- the correct guidance for THIS
 // live state is "honest-empty, not a misconfiguration", never a fabricated "enable the setting".
 test('get_detectors: resolveParams reports honest-empty guidance when persistence is enabled but findings are zero', async () => {
-  const search = jest.fn().mockResolvedValue({ body: { hits: { total: { value: 0 } } } });
+  const search = jest
+    .fn()
+    .mockResolvedValue({ body: { hits: { total: { value: 0 } } } });
   const transportRequest = jest.fn().mockResolvedValue({
-    body: { persistent: { plugins: { alerting: { alert_finding_enabled: 'true' } } } },
+    body: {
+      persistent: { plugins: { alerting: { alert_finding_enabled: 'true' } } },
+    },
   });
   const result = await getDetectorsTool.resolveParams!(
     { detector_type: 'suricata' },
@@ -144,15 +156,25 @@ test('get_detectors: resolveParams reports honest-empty guidance when persistenc
   );
   assert.equal(result.ok, true);
   if (result.ok) {
-    assert.match(result.resolved.note ?? '', /Findings for detector_type "suricata": 0/);
-    assert.match(result.resolved.note ?? '', /most likely means no matching source events/);
+    assert.match(
+      result.resolved.note ?? '',
+      /Findings for detector_type "suricata": 0/,
+    );
+    assert.match(
+      result.resolved.note ?? '',
+      /most likely means no matching source events/,
+    );
   }
 });
 
 test('get_detectors: resolveParams recommends enabling persistence when it resolves disabled', async () => {
-  const search = jest.fn().mockResolvedValue({ body: { hits: { total: { value: 0 } } } });
+  const search = jest
+    .fn()
+    .mockResolvedValue({ body: { hits: { total: { value: 0 } } } });
   const transportRequest = jest.fn().mockResolvedValue({
-    body: { defaults: { plugins: { alerting: { alert_finding_enabled: 'false' } } } },
+    body: {
+      defaults: { plugins: { alerting: { alert_finding_enabled: 'false' } } },
+    },
   });
   const result = await getDetectorsTool.resolveParams!(
     { detector_type: 'docker' },
@@ -161,12 +183,17 @@ test('get_detectors: resolveParams recommends enabling persistence when it resol
   );
   assert.equal(result.ok, true);
   if (result.ok) {
-    assert.match(result.resolved.note ?? '', /findings persistence appears disabled/);
+    assert.match(
+      result.resolved.note ?? '',
+      /findings persistence appears disabled/,
+    );
   }
 });
 
 test('get_detectors: resolveParams degrades honestly when the persistence check itself fails', async () => {
-  const search = jest.fn().mockResolvedValue({ body: { hits: { total: { value: 0 } } } });
+  const search = jest
+    .fn()
+    .mockResolvedValue({ body: { hits: { total: { value: 0 } } } });
   const transportRequest = jest.fn().mockRejectedValue(new Error('403'));
   const result = await getDetectorsTool.resolveParams!(
     { detector_type: 'azure' },
@@ -175,12 +202,17 @@ test('get_detectors: resolveParams degrades honestly when the persistence check 
   );
   assert.equal(result.ok, true);
   if (result.ok) {
-    assert.match(result.resolved.note ?? '', /could not verify persistence settings -- requires admin/);
+    assert.match(
+      result.resolved.note ?? '',
+      /could not verify persistence settings -- requires admin/,
+    );
   }
 });
 
 test('get_detectors: resolveParams degrades honestly when the findings-index lookup itself fails', async () => {
-  const search = jest.fn().mockRejectedValue(new Error('index_not_found_exception'));
+  const search = jest
+    .fn()
+    .mockRejectedValue(new Error('index_not_found_exception'));
   const result = await getDetectorsTool.resolveParams!(
     { detector_type: 'not-a-real-type' },
     fakeContext(search),
@@ -233,7 +265,9 @@ test('A-2 regression: a detector_type that would reach the excluded *-alerts fam
 // A-2: a well-formed detector_type (the common case) is unaffected by the new validation -- still
 // reaches the search exactly as before.
 test('A-2: a well-formed detector_type still issues the findings-count search', async () => {
-  const search = jest.fn().mockResolvedValue({ body: { hits: { total: { value: 0 } } } });
+  const search = jest
+    .fn()
+    .mockResolvedValue({ body: { hits: { total: { value: 0 } } } });
   const result = await getDetectorsTool.resolveParams!(
     { detector_type: 'wazuh-generic' },
     fakeContext(search),
@@ -253,7 +287,9 @@ test('A-2: a well-formed detector_type still issues the findings-count search', 
 // `??` into the affirmative, fabricated "findings persistence appears disabled" claim the OLD
 // code produced for this exact case.
 test('A-4 regression: an all-absent cluster-settings response yields honest "could not verify", never a fabricated "disabled" claim', async () => {
-  const search = jest.fn().mockResolvedValue({ body: { hits: { total: { value: 0 } } } });
+  const search = jest
+    .fn()
+    .mockResolvedValue({ body: { hits: { total: { value: 0 } } } });
   const transportRequest = jest.fn().mockResolvedValue({ body: {} });
   const result = await getDetectorsTool.resolveParams!(
     { detector_type: 'gitlab' },
@@ -262,7 +298,10 @@ test('A-4 regression: an all-absent cluster-settings response yields honest "cou
   );
   assert.equal(result.ok, true);
   if (result.ok) {
-    assert.match(result.resolved.note ?? '', /could not verify persistence settings/);
+    assert.match(
+      result.resolved.note ?? '',
+      /could not verify persistence settings/,
+    );
     assert.doesNotMatch(result.resolved.note ?? '', /appears disabled/);
   }
 });
@@ -270,9 +309,15 @@ test('A-4 regression: an all-absent cluster-settings response yields honest "cou
 // A-4b (AI/plan/a1b-review.md): when the verdict is driven by the security_analytics key (not the
 // alerting one), the advice must name THAT key, not a hardcoded different one.
 test('A-4b regression: disabled-persistence advice names the key that actually resolved', async () => {
-  const search = jest.fn().mockResolvedValue({ body: { hits: { total: { value: 0 } } } });
+  const search = jest
+    .fn()
+    .mockResolvedValue({ body: { hits: { total: { value: 0 } } } });
   const transportRequest = jest.fn().mockResolvedValue({
-    body: { defaults: { plugins: { security_analytics: { alert_finding_enabled: 'false' } } } },
+    body: {
+      defaults: {
+        plugins: { security_analytics: { alert_finding_enabled: 'false' } },
+      },
+    },
   });
   const result = await getDetectorsTool.resolveParams!(
     { detector_type: 'okta' },

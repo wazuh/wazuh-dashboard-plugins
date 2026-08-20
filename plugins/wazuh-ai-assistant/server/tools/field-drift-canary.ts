@@ -60,8 +60,16 @@ const QUERIED_FAMILIES: ReadonlyArray<{
   index: string;
   allowlistFamily: string;
 }> = [
-  { family: 'events.findings', index: 'wazuh-findings-v5*', allowlistFamily: 'findings' },
-  { family: 'events.main', index: 'wazuh-events-v5*', allowlistFamily: 'events' },
+  {
+    family: 'events.findings',
+    index: 'wazuh-findings-v5*',
+    allowlistFamily: 'findings',
+  },
+  {
+    family: 'events.main',
+    index: 'wazuh-events-v5*',
+    allowlistFamily: 'events',
+  },
   { family: 'sca', index: 'wazuh-states-sca*', allowlistFamily: 'sca' },
   {
     family: 'vulnerabilities',
@@ -133,7 +141,9 @@ export function flattenMappedFieldPaths(
   for (const [key, rawValue] of Object.entries(properties)) {
     const path = prefix ? `${prefix}.${key}` : key;
     paths.add(path);
-    const value = rawValue as { properties?: Record<string, unknown> } | undefined;
+    const value = rawValue as
+      | { properties?: Record<string, unknown> }
+      | undefined;
     if (value && typeof value === 'object' && value.properties) {
       for (const nested of flattenMappedFieldPaths(value.properties, path)) {
         paths.add(nested);
@@ -180,10 +190,15 @@ async function checkFamily(
   if (namesToCheck.size === 0) {
     return { toolMissing: [], catalogMissing: [] };
   }
-  const response = await client.indices.getMapping({ index, filter_path: MAPPING_FILTER_PATH });
+  const response = await client.indices.getMapping({
+    index,
+    filter_path: MAPPING_FILTER_PATH,
+  });
   const mapped = new Set<string>();
   for (const indexBody of Object.values(response.body ?? {})) {
-    for (const path of flattenMappedFieldPaths(indexBody.mappings?.properties)) {
+    for (const path of flattenMappedFieldPaths(
+      indexBody.mappings?.properties,
+    )) {
       mapped.add(path);
     }
   }
@@ -290,7 +305,10 @@ export async function checkFieldDrift(
  * caller (a canary blocking plugin start defeats its own "fire and forget" premise). Runs exactly
  * once per process lifetime: no interval, no retry, no re-arm.
  */
-export function runFieldDriftCanary(client: MappingClient, logger: Logger): void {
+export function runFieldDriftCanary(
+  client: MappingClient,
+  logger: Logger,
+): void {
   const timeout = new Promise<void>(resolve => {
     const handle = setTimeout(resolve, CANARY_TIMEOUT_MS);
     // Code review B12: without `.unref()`, this timer keeps the process alive for the full

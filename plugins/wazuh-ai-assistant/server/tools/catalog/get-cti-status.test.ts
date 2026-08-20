@@ -9,11 +9,16 @@ function build(params: Record<string, unknown>): IndexerRequest {
 
 // Derived from resolveParams's own signature rather than imported from the OSD platform path,
 // matching the convention api-host.test.ts documents for the same reason.
-type ResolveParamsFn = Exclude<typeof getCtiStatusTool.resolveParams, undefined>;
+type ResolveParamsFn = Exclude<
+  typeof getCtiStatusTool.resolveParams,
+  undefined
+>;
 type CtiContext = Parameters<ResolveParamsFn>[1];
 type CtiRequest = Parameters<ResolveParamsFn>[2];
 
-function fakeContext(searchImpl: (req: unknown) => Promise<unknown>): CtiContext {
+function fakeContext(
+  searchImpl: (req: unknown) => Promise<unknown>,
+): CtiContext {
   return {
     core: {
       opensearch: {
@@ -91,18 +96,29 @@ test('get_cti_status: resolveParams summarizes the sync schedule from .wazuh-con
       },
     },
   });
-  const result = await getCtiStatusTool.resolveParams!({}, fakeContext(search), {} as unknown as CtiRequest);
+  const result = await getCtiStatusTool.resolveParams!(
+    {},
+    fakeContext(search),
+    {} as unknown as CtiRequest,
+  );
   assert.equal(result.ok, true);
   if (result.ok) {
     const note = result.resolved.note ?? '';
-    assert.match(note, /Catalog Sync Periodic Task every 60 Minutes \(enabled\)/);
+    assert.match(
+      note,
+      /Catalog Sync Periodic Task every 60 Minutes \(enabled\)/,
+    );
     assert.match(note, /Telemetry Ping Periodic Task every 1 Days \(enabled\)/);
   }
 });
 
 test('get_cti_status: resolveParams degrades honestly when the schedule lookup fails', async () => {
   const search = jest.fn().mockRejectedValue(new Error('unreachable'));
-  const result = await getCtiStatusTool.resolveParams!({}, fakeContext(search), {} as unknown as CtiRequest);
+  const result = await getCtiStatusTool.resolveParams!(
+    {},
+    fakeContext(search),
+    {} as unknown as CtiRequest,
+  );
   assert.equal(result.ok, true);
   if (result.ok) {
     assert.match(result.resolved.note ?? '', /could not be checked/);
