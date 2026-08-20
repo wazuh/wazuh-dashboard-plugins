@@ -416,4 +416,7 @@ export const getFieldValuesTool: ToolDefinition = {
   digest: {
     sampleColumns: ['key', 'doc_count'],
   },
+  // Cost-budget class 1 (chat.ts's tool-round budget): this request is `size: 0` --
+  // aggregation-only, no hit documents (see the buildBody `size: 0` above).
+  costClass: 1,
 };

@@ -2,7 +2,9 @@ import assert from 'node:assert/strict';
 import { ChatMessage } from '../../common/types';
 import {
   FINAL_ROUND_ANSWER_INSTRUCTION,
+  MAX_TOOL_ROUNDS,
   shouldEnterFinalRoundEarly,
+  willBeFinalRound,
   withFinalRoundAnswerInstruction,
 } from './chat';
 
@@ -144,6 +146,26 @@ test('shouldEnterFinalRoundEarly: a round with no tool calls at all never forces
     ),
     false,
   );
+});
+
+// --- willBeFinalRound (review fix F2, AI/plan/c-review.md): the single predicate shared by
+// `isFinalRound` and the `suggest_discover_query` round-aware retry gate ------------------------
+
+test('willBeFinalRound: true once round reaches the structural MAX_TOOL_ROUNDS cap', () => {
+  assert.equal(willBeFinalRound(MAX_TOOL_ROUNDS, false, false), true);
+  assert.equal(willBeFinalRound(MAX_TOOL_ROUNDS - 1, false, false), false);
+});
+
+test('willBeFinalRound: true whenever #8911/F3 already latched forceFinalRoundEarly, regardless of round index', () => {
+  assert.equal(willBeFinalRound(0, true, false), true);
+});
+
+test('willBeFinalRound: true whenever the cost/context/futility budget already latched budgetForcesFinalRoundEarly, regardless of round index', () => {
+  assert.equal(willBeFinalRound(0, false, true), true);
+});
+
+test('willBeFinalRound: false when neither latch is set and the structural cap has not been reached', () => {
+  assert.equal(willBeFinalRound(1, false, false), false);
 });
 
 test('FINAL_ROUND_ANSWER_INSTRUCTION: constrains the model to the gathered results', () => {

@@ -18,11 +18,14 @@ test('noTextFallbackMessage: a tool ran, results rendered, rounds NOT exhausted 
 
 test('noTextFallbackMessage: a tool ran, results rendered, rounds exhausted discloses the unreached step', () => {
   const message = noTextFallbackMessage(true, true, true);
-  assert.match(message, /analysis limit/i);
+  // Discloses that a step was left unreached WITHOUT naming any internal mechanism (product
+  // decision, workstream C: no "round"/"budget"/"limit"/"turn" wording in user-visible copy -- see
+  // NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE's doc comment in chat.ts; review fix F11 dropped the
+  // earlier "This turn ended..." phrasing since "turn" is itself internal orchestration
+  // vocabulary the reader has no model for).
+  assert.match(message, /a full answer could not be written/i);
   assert.doesNotMatch(message, /no additional analysis/i);
-  // Regression: "tool-round budget" is an internal implementation detail with no corresponding
-  // setting anywhere in the UI — the user-facing copy must not name it.
-  assert.doesNotMatch(message, /tool-round budget/i);
+  assert.doesNotMatch(message, /\b(round|budget|limit|turn)\b/i);
 });
 
 test('noTextFallbackMessage: roundsExhausted is ignored when there is no table to reference', () => {
@@ -318,7 +321,7 @@ test('noTextFallbackMessage: rounds exhausted AND the last attempt errored -> bo
     args: {},
     errorMessage: 'some unclassified internal error',
   });
-  assert.match(message, /analysis limit/i);
+  assert.match(message, /a full answer could not be written/i);
   assert.match(message, /did not complete/);
 });
 

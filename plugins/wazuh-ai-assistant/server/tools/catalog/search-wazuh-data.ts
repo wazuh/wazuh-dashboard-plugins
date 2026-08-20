@@ -124,6 +124,9 @@ export const searchWazuhDataTool: ToolDefinition = {
   },
   target: 'indexer',
   tier: 'T1',
+  // Cost-budget class 3 (chat.ts's tool-round budget): the escape hatch -- unconstrained
+  // caller-authored query_dsl, the heaviest and least-bounded request this catalog can issue.
+  costClass: 3,
   buildRequest(params) {
     const indexPattern = params.index_pattern as string;
     const rawDsl = params.query_dsl as string;

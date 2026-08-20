@@ -260,6 +260,32 @@ function scaContext(): {
         results: { buckets: [{ key: 'Failed', doc_count: 102 }] },
       },
     },
+    // A THIRD response, same shape as the first -- used by the main end-to-end test's extra
+    // duplicate get_sca_results round (workstream C: the cost-budget redesign's futility-stop
+    // needs a repeated identical call to demonstrate the "duplicate query" trigger).
+    {
+      hits: { hits: [], total: { value: 207 } },
+      aggregations: {
+        policies: {
+          buckets: [
+            {
+              key: 'cis_ubuntu_2004',
+              doc_count: 207,
+              policy_sample: {
+                hits: {
+                  hits: [
+                    { _source: { policy: { name: 'CIS Ubuntu Linux 20.04' } } },
+                  ],
+                },
+              },
+              passed: { doc_count: 95 },
+              failed: { doc_count: 102 },
+              not_applicable: { doc_count: 10 },
+            },
+          ],
+        },
+      },
+    },
   ];
   const context = {
     core: {
@@ -749,6 +775,19 @@ test("orchestrate: text streamed AFTER a round's last tool_call is carried into 
 });
 
 // --- orchestrate: main end-to-end case -- FAILS ON BASE -----------------------------------------
+//
+// WORKSTREAM C NOTE: under the old fixed `MAX_TOOL_ROUNDS = 3`, round index 3 was UNCONDITIONALLY
+// final regardless of how much real tool work had happened. Under the cost-budget redesign, a
+// round only becomes final once the budget (BASE_BUDGET_UNITS = 6) is spent or the futility stop
+// fires -- and this scenario's first two real tool calls (get_sca_results cost 1, get_sca_checks
+// cost 2 -- see registry.ts's `getToolCostClass`) only spend 3, leaving budget remaining. A THIRD
+// round -- the model re-running get_sca_results with the SAME arguments -- is added so the
+// scenario now also exercises the futility stop's "duplicate of a previous round's identical
+// query" trigger (chat.ts's `isRoundFutile`): that duplicate is what makes round 4 the genuinely
+// final one, not a bare round-count coincidence. This is the exact "update the script, keep what
+// it proves" adjustment the redesign calls for -- the test still proves I3 (deferred-offer
+// interception) and #8893 (final-round-answer instruction) compose correctly; it now ALSO proves
+// the budget mechanism recognizes a real stopping point instead of guessing from round count.
 
 test('orchestrate: an unprompted single-tool offer with rounds remaining is forced into a chained call, not left to end the turn', async () => {
   const { context } = scaContext();
@@ -790,7 +829,23 @@ test('orchestrate: an unprompted single-tool offer with rounds remaining is forc
         },
         { type: 'done', usage: { inputTokens: 25, outputTokens: 12 } },
       ],
-      // round 3: final (no-tools) round closes out the answer.
+      // round 3 (workstream C addition): the model re-runs get_sca_results with the IDENTICAL
+      // arguments as round 0 -- a duplicate query, cost-budget-wise still charged (cost 1, running
+      // total 1+2+1=4, still under BASE_BUDGET_UNITS=6) but flagged futile by `isRoundFutile`
+      // (every successful call this round is a duplicate), which forces round 4 to be the final
+      // (tools-off) round regardless of the 2 units of budget still nominally left.
+      [
+        {
+          type: 'tool_call',
+          toolCall: {
+            id: 'call_sca_results_repeat',
+            name: 'get_sca_results',
+            arguments: { agent_id: '001' },
+          },
+        },
+        { type: 'done', usage: { inputTokens: 15, outputTokens: 6 } },
+      ],
+      // round 4: final (no-tools) round closes out the answer.
       textOnlyScript(
         'The three highest-impact failed checks are SSH root login, password expiration, ' +
           'and (see table above).',
@@ -800,12 +855,12 @@ test('orchestrate: an unprompted single-tool offer with rounds remaining is forc
   );
 
   // On base: orchestrate yields 'done' immediately after round 1 (3 chatStream calls total:
-  // stage1, round0, round1) -- this turn instead runs all 5 scripted calls.
+  // stage1, round0, round1) -- this turn instead runs all 6 scripted calls.
   assert.equal(
     callMessages.length,
-    5,
-    'expected stage1 + 4 rounds (get_sca_results, the offer, the forced get_sca_checks, the ' +
-      `final round) -- got ${callMessages.length} chatStream calls`,
+    6,
+    'expected stage1 + 5 rounds (get_sca_results, the offer, the forced get_sca_checks, the ' +
+      `duplicate get_sca_results, the final round) -- got ${callMessages.length} chatStream calls`,
   );
 
   // Exactly one 'done' StreamEvent ends the turn -- the round-1 offer's 'done' must be suppressed,
@@ -820,22 +875,25 @@ test('orchestrate: an unprompted single-tool offer with rounds remaining is forc
   // The 4th chatStream call (0-indexed 3: stage1=0, round0=1, offer=2, forced=3) is the forced
   // round, and its options.toolChoice names get_sca_checks specifically -- not 'auto'.
   assert.deepEqual(callOptions[3]?.toolChoice, { name: 'get_sca_checks' });
+  // Round 3 (the duplicate query, index 4) is an ordinary round, not a forced one -- 'auto'.
+  assert.equal(callOptions[4]?.toolChoice, 'auto');
 
-  // Both real tools actually ran (forwarded as tool_call StreamEvents with the reversed/real args
-  // -- privacy is off in this test, so real args are the only form).
+  // All three real tool calls actually ran (forwarded as tool_call StreamEvents with the
+  // reversed/real args -- privacy is off in this test, so real args are the only form).
   const toolCallEvents = events.filter(
     (e): e is Extract<StreamEvent, { type: 'tool_call' }> =>
       e.type === 'tool_call',
   );
   assert.deepEqual(
     toolCallEvents.map(e => e.toolCall.name),
-    ['get_sca_results', 'get_sca_checks'],
+    ['get_sca_results', 'get_sca_checks', 'get_sca_results'],
   );
 
   // #8893 pin: the final round's outbound messages still end with FINAL_ROUND_ANSWER_INSTRUCTION.
-  // This must survive item I3 unchanged -- the forced round is a normal tool round, not the final
-  // one, so it does NOT carry the instruction; only the genuinely last (no-tools) round does.
-  const finalRoundMessages = callMessages[4];
+  // This must survive item I3 (and the budget redesign) unchanged -- the forced round and the
+  // duplicate round are both normal tool rounds, not the final one, so neither carries the
+  // instruction; only the genuinely last (no-tools) round does.
+  const finalRoundMessages = callMessages[5];
   const lastMessage = finalRoundMessages[finalRoundMessages.length - 1];
   assert.equal(lastMessage.role, 'system');
   assert.equal(lastMessage.content, FINAL_ROUND_ANSWER_INSTRUCTION);
@@ -845,10 +903,17 @@ test('orchestrate: an unprompted single-tool offer with rounds remaining is forc
     forcedRoundMessages[forcedRoundMessages.length - 1].content,
     FINAL_ROUND_ANSWER_INSTRUCTION,
   );
+  // Nor does the duplicate round's -- it is the round whose OWN futility forces the round AFTER
+  // it, never itself.
+  const duplicateRoundMessages = callMessages[4];
+  assert.notEqual(
+    duplicateRoundMessages[duplicateRoundMessages.length - 1].content,
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+  );
 
-  // The offer text the user already read is IN the forced round's and the final round's history
-  // (integration review: without it, the forced call and the final answer are authored blind of
-  // the summary-plus-offer on screen, and the turn ships two independently-authored summaries).
+  // The offer text the user already read is IN the forced round's, the duplicate round's, and the
+  // final round's history (integration review: without it, later rounds are authored blind of the
+  // summary-plus-offer on screen, and the turn ships two independently-authored summaries).
   const offerText =
     'CIS Ubuntu: 95 passed, 102 failed, 10 N/A. I can run get_sca_checks to list the ' +
     'failing checks — want me to?';
@@ -862,6 +927,10 @@ test('orchestrate: an unprompted single-tool offer with rounds remaining is forc
   );
   assert.ok(
     hasOfferMessage(callMessages[4]),
+    "the duplicate round's history must carry the already-streamed offer text",
+  );
+  assert.ok(
+    hasOfferMessage(callMessages[5]),
     "the final round's history must carry the already-streamed offer text",
   );
   assert.ok(
@@ -1147,10 +1216,11 @@ test('orchestrate: a second offer after one force was already spent this turn do
       // round 1: offers get_sca_checks -- forces round 2.
       offerScript('I can run get_sca_checks — want me to?'),
       // round 2 (forced): instead of complying, the model offers a DIFFERENT unexecuted tool.
-      // Round 2 also happens to be the last tool-bearing round at MAX_TOOL_ROUNDS=3, so this
-      // fences BOTH forcedFollowUpSpent and the round-budget gate at once -- see this file's own
-      // header note on why the fixed round budget makes the two impossible to isolate cleanly in
-      // one scripted scenario.
+      // This fences `forcedFollowUpSpent` alone (workstream C: every call in this script is
+      // rejected/offer-only, so the cost budget never spends anything and never enters the
+      // picture -- see chat.ts's `toolCallCostUnits` doc comment for why a validation-rejected
+      // call is free against that budget) -- unlike the main end-to-end test above, this scenario
+      // does not also need to fence the round-budget gate.
       offerScript('I could also run search_wazuh_data — want me to?'),
     ],
     rejectingContext(),
@@ -1248,7 +1318,7 @@ test(
     );
     assert.match(
       text,
-      /analysis limit/i,
+      /a full answer could not be written/i,
       'falls back to the truthful "see results above" copy once the forced-early final round ' +
         'ends silently (CV-039)',
     );
