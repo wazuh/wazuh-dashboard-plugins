@@ -30,6 +30,17 @@ export function useProviders(http: HttpSetup): ProvidersState {
     undefined,
   );
 
+  // Every resolution below is gated on this: the flyout mount unmounts on every close, so a
+  // refresh triggered right before that (or by a PROVIDERS_CHANGED_EVENT it saw on the way out)
+  // would otherwise set state on a dead hook.
+  const isMountedRef = useRef(true);
+  useEffect(
+    () => () => {
+      isMountedRef.current = false;
+    },
+    [],
+  );
+
   const refreshProviders = useCallback(() => {
     clearTimeout(deadlineRef.current);
     const deadline = setTimeout(() => {
@@ -47,6 +58,9 @@ export function useProviders(http: HttpSetup): ProvidersState {
       .list()
       .then(list => {
         clearTimeout(deadline);
+        if (!isMountedRef.current) {
+          return;
+        }
         setProviders(list);
         setProvidersError(null);
         setSelectedProviderId(current => {
@@ -60,6 +74,9 @@ export function useProviders(http: HttpSetup): ProvidersState {
       })
       .catch(() => {
         clearTimeout(deadline);
+        if (!isMountedRef.current) {
+          return;
+        }
         setProvidersError(
           i18n.translate('wazuhAiAssistant.chat.providersLoadError', {
             defaultMessage:
@@ -67,7 +84,11 @@ export function useProviders(http: HttpSetup): ProvidersState {
           }),
         );
       })
-      .finally(() => setProvidersLoaded(true));
+      .finally(() => {
+        if (isMountedRef.current) {
+          setProvidersLoaded(true);
+        }
+      });
   }, [settingsService]);
 
   // Load once per mount, then again on every PROVIDERS_CHANGED_EVENT. Every consumer of this hook

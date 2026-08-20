@@ -121,9 +121,15 @@ interface SettingsPageProps {
 
 /** Announces a saved assistant-settings document to every mounted ChatPage (including the header
  * flyout's independent one), so an admin's privacy policy change applies without a page reload.
- * See `ASSISTANT_SETTINGS_CHANGED_EVENT` for why this is a window event, not a prop callback. */
-function notifyAssistantSettingsChanged(): void {
-  window.dispatchEvent(new Event(ASSISTANT_SETTINGS_CHANGED_EVENT));
+ * See `ASSISTANT_SETTINGS_CHANGED_EVENT` for why this is a window event, not a prop callback.
+ *
+ * The document the PUT returned rides along as `detail` so listeners never have to re-GET it: a
+ * read issued right after the write can still see the PRE-save document (the indexer write is not
+ * synchronously visible), which would silently reinstate the policy just changed. */
+function notifyAssistantSettingsChanged(saved: AssistantSettings): void {
+  window.dispatchEvent(
+    new CustomEvent(ASSISTANT_SETTINGS_CHANGED_EVENT, { detail: saved }),
+  );
 }
 
 /** Announces a provider create/update/delete/default change to every `useProviders` consumer.
@@ -635,7 +641,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         }),
       );
       setLoadedAssistantSettings(saved);
-      notifyAssistantSettingsChanged();
+      notifyAssistantSettingsChanged(saved);
       retention.commit(saved.conversationRetentionDays);
       core.notifications.toasts.addSuccess(
         i18n.translate('wazuhAiAssistant.settings.retention.saveSuccess', {
@@ -738,7 +744,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         }),
       );
       setLoadedAssistantSettings(saved);
-      notifyAssistantSettingsChanged();
+      notifyAssistantSettingsChanged(saved);
       privacy.commit({
         privacyDefaultOn: saved.privacyDefaultOn,
         userCanOverride: saved.userCanOverride,

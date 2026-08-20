@@ -18,9 +18,35 @@ import { SettingsAccess } from './session-heal';
  * ChatPage mount in the header flyout (public/components/header/assistant-chat-panel.tsx) that no
  * prop from the Settings page could ever reach. Lives here — the module that owns the settings
  * GET/PUT — so neither view has to import the other.
+ *
+ * Dispatched as a `CustomEvent` whose `detail` carries the settings object the PUT just returned.
+ * Listeners must PREFER that payload over issuing their own GET: the indexer write may not be
+ * visible to a read that happens microseconds later, so a re-GET can hand back the PRE-save
+ * document and silently reinstate the policy the admin just changed. The GET stays as the fallback
+ * for any dispatch without a usable payload (see `isAssistantSettingsPayload`).
  */
 export const ASSISTANT_SETTINGS_CHANGED_EVENT =
   'wazuhAiAssistant:assistantSettingsChanged';
+
+/**
+ * Narrows an untrusted `CustomEvent.detail` to `AssistantSettings`. Deliberately minimal — it
+ * checks only the fields consumers actually branch on, so a server that grows the shape does not
+ * make every payload fall back to a GET. Anything failing this check is treated as "no payload".
+ */
+export function isAssistantSettingsPayload(
+  detail: unknown,
+): detail is AssistantSettings {
+  if (!detail || typeof detail !== 'object') {
+    return false;
+  }
+  const candidate = detail as Partial<AssistantSettings>;
+  return (
+    typeof candidate.privacyDefaultOn === 'boolean' &&
+    typeof candidate.userCanOverride === 'boolean' &&
+    Boolean(candidate.privacyDefaultPerProvider) &&
+    typeof candidate.privacyDefaultPerProvider === 'object'
+  );
+}
 
 /**
  * Window event announcing that the provider list changed (created/updated/deleted, or a new
@@ -28,6 +54,13 @@ export const ASSISTANT_SETTINGS_CHANGED_EVENT =
  * refreshes — including the header flyout's own independent `useProviders` instance, which the
  * Settings page's `onProvidersChanged` prop callback can never reach for the same reason described
  * above. That prop path stays in place; a duplicate refresh is harmless.
+ *
+ * Carries NO payload, unlike `ASSISTANT_SETTINGS_CHANGED_EVENT`: the mutation sites only ever hold
+ * the single provider they just wrote, never the full post-write list this event's consumers
+ * (`useProviders`) actually need, so there is nothing useful to attach. The read-after-write window
+ * is tolerable here in a way it is not for privacy: a list that is one refresh stale shows a
+ * missing or extra row until the next refresh, whereas a stale privacy policy silently sends
+ * unmasked data.
  */
 export const PROVIDERS_CHANGED_EVENT = 'wazuhAiAssistant:providersChanged';
 
