@@ -172,6 +172,10 @@ export const ENCRYPTION_REQUIRED_MESSAGE =
   'add wazuh_ai_assistant.encryptionKey` (recommended) or in `opensearch_dashboards.yml` — then ' +
   'restart dashboard service and try again.';
 
+/** First-page size for the provider-name scan below, matching `clearOtherDefaults`'s own `perPage`.
+ * A store larger than this is re-read in full — see `rejectDuplicateProviderName`. */
+const PROVIDER_SCAN_PAGE_SIZE = 200;
+
 /** Message for a name already taken by another provider. Kept as a builder so the route and its
  * test agree on the exact wording the admin sees. */
 export function duplicateProviderNameMessage(name: string): string {
@@ -188,9 +192,22 @@ export function duplicateProviderNameMessage(name: string): string {
  * would defeat the point.
  *
  * `excludeId` is the provider being updated (PUT /providers/{id}) so re-saving a provider without
- * renaming it never collides with itself; it is `undefined` on create. Providers are capped at ~200
- * (the same `perPage` `clearOtherDefaults` above uses) and every read of this store is a full
- * in-memory list anyway (server/settings/ai-providers-client.ts), so a plain list+scan is fine.
+ * renaming it never collides with itself; it is `undefined` on create.
+ *
+ * The scan must cover EVERY provider, not just the first page: the client-side pre-check in the
+ * add/edit flyout compares against the full list (public/services/settings-service.ts's `list()`
+ * loops pages via `fetchAllPages`), so a server that only compared the first page would disagree
+ * with it and let provider #201's name through. The first read therefore uses the same `perPage` as
+ * `clearOtherDefaults` above and then re-lists with `perPage: total` if the store turned out to
+ * hold more — cheap, because every read of this store materializes the whole thing in memory
+ * anyway (server/settings/ai-providers-client.ts).
+ *
+ * Residual race (accepted): this is a read followed by a separate write, and the indexer endpoint
+ * backing providers has no unique constraint on `name`, so two admins creating the same name at the
+ * same instant can both pass this check. Closing that would need a constraint the storage layer
+ * does not offer. The window is milliseconds, the outcome is cosmetic (two same-named providers,
+ * fixable by renaming one), and the check still catches every realistic case: a stale flyout list,
+ * a second browser tab, and a direct API caller.
  *
  * Exported for unit testing only — the routes below call it directly.
  */
@@ -201,11 +218,12 @@ export async function rejectDuplicateProviderName(
   response: OpenSearchDashboardsResponseFactory,
 ): Promise<IOpenSearchDashboardsResponse | null> {
   const normalized = name.trim().toLowerCase();
-  const { providers } = await context.wazuh_ai_assistant.aiProviders.list(
-    context,
-    1,
-    200,
-  );
+  const { aiProviders } = context.wazuh_ai_assistant;
+  const firstPage = await aiProviders.list(context, 1, PROVIDER_SCAN_PAGE_SIZE);
+  let { providers } = firstPage;
+  if (providers.length < firstPage.total) {
+    ({ providers } = await aiProviders.list(context, 1, firstPage.total));
+  }
   const taken = providers.some(
     provider =>
       provider.id !== excludeId &&
@@ -217,6 +235,21 @@ export async function rejectDuplicateProviderName(
   return response.customError({
     statusCode: 409,
     body: { message: duplicateProviderNameMessage(name.trim()) },
+  });
+}
+
+/** Rejects a name that is empty once trimmed. The body schema's `minLength: 1` only rejects the
+ * empty string, so `"   "` reaches here; since both the uniqueness comparison and the persisted
+ * value are trimmed (L9), a whitespace-only name would otherwise be stored as `""`. */
+export function rejectBlankProviderName(
+  name: string,
+  response: OpenSearchDashboardsResponseFactory,
+): IOpenSearchDashboardsResponse | null {
+  if (name.trim().length > 0) {
+    return null;
+  }
+  return response.badRequest({
+    body: { message: 'Provider name cannot be empty.' },
   });
 }
 
@@ -298,6 +331,10 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       if (encryptionGate) {
         return encryptionGate;
       }
+      const blankName = rejectBlankProviderName(request.body.name, response);
+      if (blankName) {
+        return blankName;
+      }
       // Name uniqueness, before any document write: `crypto.randomUUID()` below would otherwise
       // happily mint a second provider indistinguishable from an existing one in every UI surface.
       const duplicateName = await rejectDuplicateProviderName(
@@ -333,6 +370,10 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       const providerId = crypto.randomUUID();
       const attributes: StoredProviderAttributes = {
         ...request.body,
+        // Persist the trimmed name so what is STORED matches what the uniqueness check above
+        // compared: otherwise " OpenAI " could be saved and then collide with itself on the next
+        // edit, and the two would render as visually identical rows.
+        name: request.body.name.trim(),
         apiKey: request.body.apiKey
           ? getApiKeyCipher().encrypt(request.body.apiKey, providerId)
           : request.body.apiKey,
@@ -393,6 +434,10 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       if (!existing) {
         return response.notFound();
       }
+      const blankName = rejectBlankProviderName(request.body.name, response);
+      if (blankName) {
+        return blankName;
+      }
       // Same uniqueness rule as POST /providers, excluding this provider so re-saving it (or
       // renaming it to a different casing/spacing of its own name) never collides with itself.
       const duplicateName = await rejectDuplicateProviderName(
@@ -443,6 +488,8 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       const nextAttributes: StoredProviderAttributes = {
         ...existing.attributes,
         ...request.body,
+        // Same trim-at-the-write rule as POST /providers above.
+        name: request.body.name.trim(),
         apiKey: nextApiKey,
         isDefault: nextIsDefault,
       };

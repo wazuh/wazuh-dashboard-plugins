@@ -27,19 +27,28 @@ type Context = Parameters<typeof rejectDuplicateProviderName>[0];
 type ResponseFactory = Parameters<typeof rejectDuplicateProviderName>[3];
 
 /** Mirrors the `{ providers, total }` shape `AiProvidersClient.list` resolves with — only `id` and
- * `attributes.name` are read by the gate. */
-function fakeContext(names: Array<{ id: string; name: string }>): Context {
+ * `attributes.name` are read by the gate. Pages honestly, so a store larger than the gate's
+ * first-page size exercises its re-read branch rather than silently returning everything. */
+function fakeContext(
+  names: Array<{ id: string; name: string }>,
+  listCalls: Array<{ page: number; perPage: number }> = [],
+): Context {
   return {
     wazuh_ai_assistant: {
       aiProviders: {
-        list: () =>
-          Promise.resolve({
-            providers: names.map(({ id, name }) => ({
-              id,
-              attributes: { name },
-            })),
+        list: (_context: unknown, page: number, perPage: number) => {
+          listCalls.push({ page, perPage });
+          const start = (page - 1) * perPage;
+          return Promise.resolve({
+            providers: names
+              .slice(start, start + perPage)
+              .map(({ id, name }) => ({
+                id,
+                attributes: { name },
+              })),
             total: names.length,
-          }),
+          });
+        },
       },
     },
   } as unknown as Context;
@@ -202,6 +211,46 @@ test('the very first provider (empty store) is never a duplicate', async () => {
     ),
     null,
   );
+});
+
+test('a name held by provider #201+ still collides: the whole store is scanned', async () => {
+  // M3: the first read is capped at 200 (matching `clearOtherDefaults`), but `total` says there are
+  // more, so the gate re-reads everything. Without that, provider #201's name was never compared —
+  // and the client-side pre-check DOES compare it (fetchAllPages), so the two disagreed.
+  const many = Array.from({ length: 260 }, (_value, index) => ({
+    id: `p${index}`,
+    name: `provider-${index}`,
+  }));
+  const listCalls: Array<{ page: number; perPage: number }> = [];
+  const { calls, factory } = fakeResponse();
+
+  const result = await rejectDuplicateProviderName(
+    fakeContext(many, listCalls),
+    'PROVIDER-255',
+    undefined,
+    factory,
+  );
+
+  assert.ok(result, 'a name beyond the first page must still be refused');
+  assert.equal(calls[0].statusCode, 409);
+  assert.deepEqual(listCalls, [
+    { page: 1, perPage: 200 },
+    { page: 1, perPage: 260 },
+  ]);
+});
+
+test('a store that fits the first page is read exactly once', async () => {
+  const listCalls: Array<{ page: number; perPage: number }> = [];
+  const { factory } = fakeResponse();
+
+  await rejectDuplicateProviderName(
+    fakeContext(EXISTING, listCalls),
+    'Gemini lab',
+    undefined,
+    factory,
+  );
+
+  assert.deepEqual(listCalls, [{ page: 1, perPage: 200 }]);
 });
 
 test('the 409 message names the offending provider and stays actionable', () => {
