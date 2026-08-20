@@ -45,7 +45,9 @@ test('getToolCostClass: aggregation-only tools (size:0, no hit documents) are cl
     'get_mitre_summary',
     'get_compliance_summary',
     'get_sca_results',
-    'get_field_values',
+    // ADAPTATION (branch 8998): 'get_field_values' is workstream B's tool
+    // (enhancement/8997-ai-assistant-data-coverage-wave) and does not exist on this branch's
+    // registry -- dropped from this list; see this file's header note.
   ]) {
     assert.equal(getToolCostClass(name), 1, `${name} should be cost class 1`);
   }
