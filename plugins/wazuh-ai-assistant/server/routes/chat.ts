@@ -128,14 +128,6 @@ function suggestedQueryReasonMismatchDisclosure(fields: string[]): string {
   );
 }
 
-interface StoredProviderAttributes {
-  name: string;
-  type: ProviderConfig['type'];
-  baseUrl: string;
-  model: string;
-  apiKey?: string;
-}
-
 /**
  * TOOL-ROUND COST BUDGET (workstream C -- replaces the old fixed `MAX_TOOL_ROUNDS = 3` count).
  * Rounds are no longer bounded by a plain count: each EXECUTED, SUCCESSFUL real tool call this
