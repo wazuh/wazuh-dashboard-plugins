@@ -286,11 +286,68 @@ function describeSearchFilters(args: Record<string, unknown>): string[] {
  * branch when `toolUsedThisTurn` is true, so this should always have one, but a missing record
  * degrades to the honest pre-N1 sentence rather than a broken parenthetical).
  */
+/** Defensive cap on an embedded, already-classified suggestion clause (see
+ * `classifyToolErrorForFallback` below) -- these are short, hand-written, bounded strings by
+ * construction (the same convention every other bounded tool-result error in this catalog
+ * follows), but this backstops any future one that is not, the same defensive posture
+ * `FILTER_VALUE_MAX_LENGTH` applies to a filter clause value. */
+const TOOL_ERROR_MESSAGE_MAX_LENGTH = 300;
+
+/**
+ * REVIEW FIX F1 (groupA-regression-review.md, REQUIRED) folded in directly (ported from deploy
+ * commit aa75dc38a alongside CV-033/CV-066's original errorMessage plumbing, deploy commit
+ * 424164be7): `buildNoMatchingResultsMessage` must never render an arbitrary `{error: "..."}`
+ * tool result verbatim into user-facing copy -- that channel also carries guardrail-violation text
+ * and raw `sanitizeError()` output, both of which may echo mechanism vocabulary or a
+ * privacy-mode pseudonym (this text renders outside the per-round depseudonymization pipeline).
+ * This is a STRICT ALLOWLIST: only get_field_values' two vetted, schema-only error shapes (an
+ * unknown field, or an invalid field/family pairing -- see get-field-values.ts's `buildRequest`)
+ * are recognized and rewritten into short, user-vocabulary copy. Every other shape returns
+ * `undefined` and the caller falls back to the plain "no matching results" sentence.
+ */
+function classifyToolErrorForFallback(message: string): string | undefined {
+  if (message.includes("is not one of this tool's vetted, bounded-cardinality")) {
+    const suggestionMatch = message.match(
+      /(Closest known fields: .*\.|No similarly-named known field was found\.)\s*$/,
+    );
+    return suggestionMatch
+      ? `that field isn't one this tool can look up. ${suggestionMatch[1]}`
+      : "that field isn't one this tool can look up.";
+  }
+  if (/^Parameter "index_family" \(.*\) is not valid for field/.test(message)) {
+    const surfacesMatch = message.match(
+      /(Valid surfaces for this field: [^.]*\.)\s*$/,
+    );
+    return surfacesMatch
+      ? `that isn't a valid data surface for this field. ${surfacesMatch[1]}`
+      : "that isn't a valid data surface for this field.";
+  }
+  return undefined;
+}
+
 function buildNoMatchingResultsMessage(
-  lastToolCall: { name: string; args: Record<string, unknown> } | undefined,
+  lastToolCall:
+    | { name: string; args: Record<string, unknown>; errorMessage?: string }
+    | undefined,
 ): string {
   if (!lastToolCall) {
     return NO_MATCHING_RESULTS_MESSAGE;
+  }
+  // BLOCKER FIX (empty-answer audit, 2026-08-20, CV-033/CV-066; ported deploy commits
+  // 424164be7 + aa75dc38a's F1 fix folded together): a REJECTED/ERRORED call (a bad parameter, an
+  // unknown field, an invalid field/family pairing) is a different finding from a valid call that
+  // genuinely matched nothing, and only a narrow, vetted allowlist of error shapes
+  // (`classifyToolErrorForFallback`) is ever surfaced here -- never the raw error channel.
+  const classified = lastToolCall.errorMessage
+    ? classifyToolErrorForFallback(lastToolCall.errorMessage)
+    : undefined;
+  if (classified) {
+    const domain = describeToolDomain(lastToolCall.name);
+    const shown =
+      classified.length > TOOL_ERROR_MESSAGE_MAX_LENGTH
+        ? `${classified.slice(0, TOOL_ERROR_MESSAGE_MAX_LENGTH)}…`
+        : classified;
+    return `The ${domain} lookup could not run as asked: ${shown}`;
   }
   const domain = describeToolDomain(lastToolCall.name);
   // D4 fix (AI/plan/d-review.md): for `lookup_indicator`, `domain` is already "indicator" (the
@@ -416,7 +473,11 @@ export function noTextFallbackMessage(
   // N1 (optional, appended last so every pre-existing call site — including the two that already
   // omit `roundsExhausted`/this param entirely — keeps compiling unchanged): the last real tool
   // call this turn attempted, used only to enrich the zero-row branch below.
-  lastToolCall?: { name: string; args: Record<string, unknown> },
+  lastToolCall?: {
+    name: string;
+    args: Record<string, unknown>;
+    errorMessage?: string;
+  },
 ): string {
   if (!toolUsedThisTurn) {
     return NO_ANSWER_MESSAGE;
@@ -566,6 +627,41 @@ function isToolResultError(content: string): boolean {
   } catch {
     return false;
   }
+}
+
+/**
+ * BLOCKER FIX (empty-answer audit, 2026-08-20, CV-033/CV-066; ported from deploy commit
+ * 424164be7): extracts the bounded error string from a `{error: "..."}` tool-result payload, or
+ * `undefined` when `content` is not that shape (same shape test as `isToolResultError` -- kept as
+ * a separate function rather than having that one return the string too, so its existing boolean
+ * call sites are untouched).
+ *
+ * WHY THIS EXISTS: `get_field_values`'s own `buildRequest` already throws a specific, genuinely
+ * useful error for an unknown field or an invalid field/family pairing -- "Closest known fields:
+ * host.os.platform, ..." for a typo, "Valid surfaces: findings, events" for a wrong family. Before
+ * this fix, that message reached `messages` as the tool-result content (so the MODEL could read
+ * it), but if the model's own next turn produced no text, the deterministic fallback
+ * (`buildNoMatchingResultsMessage`) discarded it entirely and substituted the generic "No matching
+ * results were found for that query" sentence -- indistinguishable, to the user, from a genuine
+ * zero-row search. A rejected/errored call and an executed-but-empty one are different findings
+ * ("the request itself was invalid" vs. "the request was valid and nothing matched") and deserve
+ * different copy.
+ */
+function extractToolErrorMessage(content: string): string | undefined {
+  try {
+    const parsed: unknown = JSON.parse(content);
+    if (
+      parsed &&
+      typeof parsed === 'object' &&
+      !Array.isArray(parsed) &&
+      typeof (parsed as Record<string, unknown>).error === 'string'
+    ) {
+      return (parsed as Record<string, unknown>).error as string;
+    }
+  } catch {
+    // Not JSON, or not the error shape -- no message to extract.
+  }
+  return undefined;
 }
 
 /**
@@ -1285,7 +1381,9 @@ export async function* orchestrate(
   // function's doc comment for why this must stay mechanism-free). Overwritten on every real
   // tool-call attempt (not just successful ones) so it always reflects the LAST thing this turn
   // actually tried, which is what the empty-result copy is standing in for.
-  let lastAttemptedToolCall: { name: string; args: Record<string, unknown> } | undefined;
+  let lastAttemptedToolCall:
+    | { name: string; args: Record<string, unknown>; errorMessage?: string }
+    | undefined;
   // Whole-turn guards (not per-round, unlike `sawToolCall` below which resets every round): true
   // once ANY delta text / tool call has happened THIS TURN, across every round — see
   // NO_ANALYSIS_TEXT_MESSAGE/NO_MATCHING_RESULTS_MESSAGE/NO_ANSWER_MESSAGE above. `toolUsedThisTurn`
@@ -1821,6 +1919,19 @@ export async function* orchestrate(
         // risks loops -- recorded as a deliberate bound of this mechanism, not an oversight.
         if (!isToolResultError(outcome.toolResultContent)) {
           executedToolNames.add(event.toolCall.name);
+        }
+
+        // BLOCKER FIX (empty-answer audit, 2026-08-20, CV-033/CV-066; ported from deploy commit
+        // 424164be7): backfill the specific error text onto the already-recorded
+        // `lastAttemptedToolCall` (set before `outcome` existed, above) now that it does. Only
+        // ever set for the error shape -- `extractToolErrorMessage` returns `undefined` for a
+        // real result, leaving `errorMessage` unset so `buildNoMatchingResultsMessage`'s generic
+        // branch is unaffected for a genuinely empty successful call.
+        const attemptedErrorMessage = extractToolErrorMessage(
+          toolResultContentForModel,
+        );
+        if (attemptedErrorMessage && lastAttemptedToolCall) {
+          lastAttemptedToolCall.errorMessage = attemptedErrorMessage;
         }
 
         if (outcome.tableEvent) {
