@@ -30,6 +30,7 @@ import { i18n } from '@osd/i18n';
 import { AppMountParameters, CoreStart } from '../../../../../src/core/public';
 import { ChatService } from '../../services/chat-service';
 import {
+  ASSISTANT_SETTINGS_CHANGED_EVENT,
   AssistantSettings,
   SettingsService,
 } from '../../services/settings-service';
@@ -948,6 +949,33 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       setRailDisplayMode('expanded');
     };
 
+    /**
+     * (Re)loads the plugin-wide assistant settings and re-applies the resulting privacy policy.
+     *
+     * The non-obvious part is `privacyTouchedRef`: when the admin has just turned OFF
+     * `userCanOverride`, the policy has to bind the CURRENT conversation too, not only the next
+     * one — a lock a user's earlier manual toggle could sit above would not be a lock at all. So
+     * the "user already chose" flag is cleared, which re-arms the default-resolution effect below;
+     * that effect then recomputes `privacyEnabled` from the per-provider default (falling back to
+     * `privacyDefaultOn`) as soon as this new settings object lands.
+     *
+     * When `userCanOverride` is (still, or newly) true the flag is left exactly as it is: a value
+     * the user picked themselves survives an unrelated admin save, and an untouched one is
+     * re-resolved by that same effect anyway.
+     */
+    const refreshAssistantSettings = () =>
+      settingsService
+        .getAssistantSettings()
+        .then(next => {
+          if (!next.userCanOverride) {
+            privacyTouchedRef.current = false;
+          }
+          setAssistantSettings(next);
+        })
+        .catch(() => {
+          // Same fail-soft as the initial load below: keep whatever policy is already applied.
+        });
+
     useEffect(() => {
       settingsService
         .getAssistantSettings()
@@ -1006,6 +1034,42 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
         perProviderDefault ?? assistantSettings.privacyDefaultOn,
       );
     }, [assistantSettings, selectedProviderId]);
+
+    // Admin privacy policy changes have to land in the chat without a page reload: this view stays
+    // MOUNTED behind `display: none` when the Settings tab is showing (application.tsx), so the
+    // mount-only load above would otherwise hold a stale policy forever. Event-driven (the Settings
+    // page dispatches ASSISTANT_SETTINGS_CHANGED_EVENT after every successful save) plus one
+    // refetch when this view becomes visible again, which also covers a save made in another tab.
+    // Deliberately no polling/interval — there is nothing to poll for between those two triggers.
+    useEffect(() => {
+      const onSettingsChanged = () => {
+        void refreshAssistantSettings();
+      };
+      window.addEventListener(
+        ASSISTANT_SETTINGS_CHANGED_EVENT,
+        onSettingsChanged,
+      );
+      return () =>
+        window.removeEventListener(
+          ASSISTANT_SETTINGS_CHANGED_EVENT,
+          onSettingsChanged,
+        );
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Skips its own first run: the mount effect above already issued that exact GET, and this only
+    // has to cover a LATER false -> true transition (a Settings -> Chat tab switch).
+    const assistantSettingsActiveSyncedRef = useRef(false);
+    useEffect(() => {
+      if (!assistantSettingsActiveSyncedRef.current) {
+        assistantSettingsActiveSyncedRef.current = true;
+        return;
+      }
+      if (isActive) {
+        void refreshAssistantSettings();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isActive]);
 
     const handleTogglePrivacy = () => {
       if (!assistantSettings?.userCanOverride) {

@@ -11,6 +11,7 @@ import {
 import '@testing-library/jest-dom';
 import { createBrowserHistory } from 'history';
 import { ChatPage, CONVERSATIONS_CHANGED_EVENT } from './chat-page';
+import { ASSISTANT_SETTINGS_CHANGED_EVENT } from '../../services/settings-service';
 import {
   ConversationRecord,
   PersistedChatMessage,
@@ -64,6 +65,10 @@ jest.mock('../../services/conversations-service', () => ({
 }));
 
 jest.mock('../../services/settings-service', () => ({
+  // Keeps the module's real constants — notably `ASSISTANT_SETTINGS_CHANGED_EVENT`, which the
+  // component subscribes to and the tests below dispatch. Stubbing them out would make both sides
+  // agree on `undefined` and prove nothing.
+  ...jest.requireActual('../../services/settings-service'),
   SettingsService: jest.fn().mockImplementation(() => ({
     getAssistantSettings: () => mockSettingsService.getAssistantSettings(),
     getSettingsAccess: () => mockSettingsService.getSettingsAccess(),
@@ -2953,5 +2958,180 @@ describe('ChatPage — privacy explainer moved off the pill onto a discrete ⓘ 
     const infoTip = screen.getByLabelText(/about privacy mode/i);
     expect(infoTip).toBeInTheDocument();
     expect(infoTip).not.toBe(chip);
+  });
+});
+
+/**
+ * Admin privacy policy changes have to reach an ALREADY-MOUNTED chat. Both views stay mounted
+ * behind `display: none` (application.tsx), so the mount-only settings load held a stale policy
+ * until a full page reload. The Settings page now dispatches
+ * `ASSISTANT_SETTINGS_CHANGED_EVENT` after every successful save, and the chat also refetches when
+ * it becomes visible again.
+ */
+describe('ChatPage — admin privacy policy applies without a reload', () => {
+  /** Every case here mounts the full ChatPage and then drives two or three settings round-trips
+   * through it. That is comfortably under Jest's 5s default in isolation, but the whole suite runs
+   * `--runInBand` alongside 99 others and the slowest observed full-gate run took roughly twice as
+   * long per render, which tipped these over. Explicit headroom instead of a global bump, so a
+   * genuinely hung test still fails rather than stalling the gate. */
+  const PRIVACY_POLICY_TEST_TIMEOUT_MS = 30_000;
+  // Scoped through jest.setTimeout rather than a per-test third argument, which Prettier expands
+  // into a far noisier shape; the afterEach restores Jest's own default so no later file-level
+  // test inherits the longer budget.
+  beforeEach(() => jest.setTimeout(PRIVACY_POLICY_TEST_TIMEOUT_MS));
+  afterEach(() => jest.setTimeout(5_000));
+
+  const settings = (overrides: Record<string, unknown>) => ({
+    privacyDefaultOn: false,
+    privacyDefaultPerProvider: {},
+    userCanOverride: true,
+    conversationRetentionDays: 0,
+    ...overrides,
+  });
+
+  const announceSettingsSaved = () =>
+    act(() => {
+      window.dispatchEvent(new Event(ASSISTANT_SETTINGS_CHANGED_EVENT));
+    });
+
+  it('locks the chip — and overrides the user own toggle — when the admin revokes overrides', async () => {
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: true, privacyDefaultOn: false }),
+    );
+    renderChatPage();
+    const offChip = await findPrivacyChipWithModifier('off');
+    expect(offChip.tagName).toBe('BUTTON');
+
+    // The user makes their own choice, which normally freezes the default resolution.
+    fireEvent.click(offChip);
+    await findPrivacyChipWithModifier('on');
+
+    // The admin now revokes overrides with the global default OFF. The lock has to bind the
+    // CURRENT conversation too, so the user's manual "On" must not survive it.
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: false, privacyDefaultOn: false }),
+    );
+    announceSettingsSaved();
+
+    const lockedChip = await findPrivacyChipWithModifier('off');
+    expect(lockedChip.tagName).not.toBe('BUTTON');
+    expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(2);
+  });
+
+  it('applies a newly locked-ON policy to the live conversation', async () => {
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: true, privacyDefaultOn: false }),
+    );
+    renderChatPage();
+    await findPrivacyChipWithModifier('off');
+
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: false, privacyDefaultOn: true }),
+    );
+    announceSettingsSaved();
+
+    const chip = await findPrivacyChipWithModifier('on');
+    expect(chip.tagName).not.toBe('BUTTON');
+  });
+
+  it('re-enables the chip when the admin gives overrides back (the unlock case)', async () => {
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: false, privacyDefaultOn: true }),
+    );
+    renderChatPage();
+    const lockedChip = await findPrivacyChipWithModifier('on');
+    expect(lockedChip.tagName).not.toBe('BUTTON');
+
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: true, privacyDefaultOn: true }),
+    );
+    announceSettingsSaved();
+
+    const chip = await findPrivacyChipWithModifier('on');
+    expect(chip.tagName).toBe('BUTTON');
+    // And it is genuinely interactive again, not just visually enabled.
+    fireEvent.click(chip);
+    await findPrivacyChipWithModifier('off');
+  });
+
+  it('leaves a user-chosen value alone while overrides stay allowed', async () => {
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: true, privacyDefaultOn: false }),
+    );
+    renderChatPage();
+    const offChip = await findPrivacyChipWithModifier('off');
+
+    fireEvent.click(offChip);
+    await findPrivacyChipWithModifier('on');
+
+    // An unrelated admin save (still allowing overrides) must not undo the user's own choice.
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: true, privacyDefaultOn: false }),
+    );
+    announceSettingsSaved();
+
+    await waitFor(() =>
+      expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(2),
+    );
+    const chip = await findPrivacyChipWithModifier('on');
+    expect(chip.tagName).toBe('BUTTON');
+  });
+
+  it('refetches when the Chat view becomes visible again, and not on the first render', async () => {
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: true }),
+    );
+    const view = renderChatPage({ isActive: true });
+    await waitFor(() =>
+      expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(1),
+    );
+
+    // Switching to Settings and back: only the false -> true transition refetches.
+    view.rerenderWith({ isActive: false });
+    expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(1);
+
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: false, privacyDefaultOn: true }),
+    );
+    view.rerenderWith({ isActive: true });
+
+    await waitFor(() =>
+      expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(2),
+    );
+    const chip = await findPrivacyChipWithModifier('on');
+    expect(chip.tagName).not.toBe('BUTTON');
+  });
+
+  it('stops listening once unmounted', async () => {
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: true }),
+    );
+    const { unmount } = renderChatPage();
+    await waitFor(() =>
+      expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(1),
+    );
+
+    unmount();
+    window.dispatchEvent(new Event(ASSISTANT_SETTINGS_CHANGED_EVENT));
+
+    expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the applied policy when the refetch fails', async () => {
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: false, privacyDefaultOn: true }),
+    );
+    renderChatPage();
+    const chip = await findPrivacyChipWithModifier('on');
+    expect(chip.tagName).not.toBe('BUTTON');
+
+    mockSettingsService.getAssistantSettings.mockRejectedValue(httpError(503));
+    announceSettingsSaved();
+
+    await waitFor(() =>
+      expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(2),
+    );
+    const chipAfter = await findPrivacyChipWithModifier('on');
+    expect(chipAfter.tagName).not.toBe('BUTTON');
   });
 });

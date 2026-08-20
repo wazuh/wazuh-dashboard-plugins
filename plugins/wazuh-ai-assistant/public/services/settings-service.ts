@@ -8,6 +8,29 @@ import {
 import { fetchAllPages } from './fetch-all-pages';
 import { SettingsAccess } from './session-heal';
 
+/**
+ * Window event announcing that the plugin-wide assistant settings document was just saved
+ * (`updateAssistantSettings`). Every mounted ChatPage listens and refetches, so an admin's privacy
+ * policy change lands in the chat immediately instead of only after a full page reload.
+ *
+ * A window event rather than a prop callback on purpose: the Chat and Settings views stay mounted
+ * side by side behind `display: none` (public/application.tsx), and there is a SECOND, independent
+ * ChatPage mount in the header flyout (public/components/header/assistant-chat-panel.tsx) that no
+ * prop from the Settings page could ever reach. Lives here — the module that owns the settings
+ * GET/PUT — so neither view has to import the other.
+ */
+export const ASSISTANT_SETTINGS_CHANGED_EVENT =
+  'wazuhAiAssistant:assistantSettingsChanged';
+
+/**
+ * Window event announcing that the provider list changed (created/updated/deleted, or a new
+ * default). Consumed by `useProviders` (public/hooks/use-providers.ts), so every mounted consumer
+ * refreshes — including the header flyout's own independent `useProviders` instance, which the
+ * Settings page's `onProvidersChanged` prop callback can never reach for the same reason described
+ * above. That prop path stays in place; a duplicate refresh is harmless.
+ */
+export const PROVIDERS_CHANGED_EVENT = 'wazuhAiAssistant:providersChanged';
+
 /** Mirrors server/tools/privacy.ts's `FieldPolicyAction` — that file lives under server/ (out of
  * scope to import from public/), so this is a hand-kept public-side copy of the same wire values
  * (server/routes/settings.ts's `fieldPolicyActionSchema` is the source of truth). */

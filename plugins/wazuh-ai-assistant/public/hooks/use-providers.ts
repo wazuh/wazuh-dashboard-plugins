@@ -2,7 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { i18n } from '@osd/i18n';
 import { HttpSetup } from '../../../../src/core/public';
 import { ProviderSummary } from '../../common/types';
-import { SettingsService } from '../services/settings-service';
+import {
+  PROVIDERS_CHANGED_EVENT,
+  SettingsService,
+} from '../services/settings-service';
 
 const PROVIDERS_LOAD_TIMEOUT_MS = 20_000;
 
@@ -67,9 +70,17 @@ export function useProviders(http: HttpSetup): ProvidersState {
       .finally(() => setProvidersLoaded(true));
   }, [settingsService]);
 
+  // Load once per mount, then again on every PROVIDERS_CHANGED_EVENT. Every consumer of this hook
+  // is fixed at once by subscribing here — notably the header flyout's own independent instance
+  // (public/components/header/assistant-chat-panel.tsx), which no prop callback from the Settings
+  // page can reach because both views stay mounted side by side. Event-driven only: no polling.
   useEffect(() => {
     refreshProviders();
-    return () => clearTimeout(deadlineRef.current);
+    window.addEventListener(PROVIDERS_CHANGED_EVENT, refreshProviders);
+    return () => {
+      window.removeEventListener(PROVIDERS_CHANGED_EVENT, refreshProviders);
+      clearTimeout(deadlineRef.current);
+    };
   }, [refreshProviders]);
 
   return {
