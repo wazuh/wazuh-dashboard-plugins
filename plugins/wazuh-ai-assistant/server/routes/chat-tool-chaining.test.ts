@@ -572,6 +572,182 @@ test('registry-wide coverage: no catalog tool is ever returned when it is the ON
   );
 });
 
+// --- orchestrate: issue C4 -- a round's own narration must survive into the NEXT round's history
+// instead of being discarded as `content: ''` on the assistant message that carries its tool_call
+// (otherwise the model has no record of having already said it and re-narrates on a later round).
+
+test("orchestrate: a round's streamed prose is carried into the NEXT round's history on the assistant message that made the tool_call", async () => {
+  const { context } = scaContext();
+  const narration = 'Let me check the SCA results for agent 001.';
+  const { callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      // round 0: narrates, THEN calls get_sca_results -- on base this narration is dropped
+      // (the pushed assistant message used `content: ''`).
+      [
+        { type: 'delta', content: narration },
+        {
+          type: 'tool_call',
+          toolCall: {
+            id: 'call_sca_results',
+            name: 'get_sca_results',
+            arguments: { agent_id: '001' },
+          },
+        },
+        { type: 'done', usage: { inputTokens: 20, outputTokens: 10 } },
+      ],
+      // round 1: closes out with no further tool call.
+      textOnlyScript('CIS Ubuntu: 95 passed, 102 failed, 10 N/A.'),
+    ],
+    context,
+  );
+
+  // callMessages[0] = stage1, [1] = round 0's own outbound (only INITIAL_MESSAGES, pre-narration),
+  // [2] = round 1's outbound -- the first call that could possibly see round 0's narration echoed
+  // back as history.
+  const round1Messages = callMessages[2];
+  const toolCallMessage = round1Messages.find(
+    message =>
+      message.role === 'assistant' &&
+      message.toolCalls?.[0]?.id === 'call_sca_results',
+  );
+  assert.ok(
+    toolCallMessage,
+    "expected round 0's [assistant{toolCalls}, tool{content}] pair in round 1's history",
+  );
+  assert.equal(
+    toolCallMessage?.content,
+    narration,
+    "round 0's already-streamed narration must be the assistant message's own content, not " +
+      'discarded as an empty string',
+  );
+});
+
+test('orchestrate: two tool_calls in the SAME round each get only the narration that preceded them, not the whole round repeated twice', async () => {
+  // Guards the `roundTextConsumed` slicing (chat.ts): a round with narration, a tool_call, MORE
+  // narration, then a second tool_call must attribute each slice once, not double-attribute the
+  // first slice to the second message too.
+  const context = rejectingContext();
+  const { callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      [
+        { type: 'delta', content: 'First, checking SCA. ' },
+        {
+          type: 'tool_call',
+          toolCall: { id: 'call_1', name: 'get_sca_results', arguments: {} },
+        },
+        { type: 'delta', content: 'Now checking a second thing.' },
+        {
+          type: 'tool_call',
+          toolCall: { id: 'call_2', name: 'search_wazuh_data', arguments: {} },
+        },
+        { type: 'done', usage: { inputTokens: 10, outputTokens: 4 } },
+      ],
+      textOnlyScript('Done.'),
+    ],
+    context,
+  );
+
+  const round1Messages = callMessages[2];
+  const firstToolMessage = round1Messages.find(
+    m => m.role === 'assistant' && m.toolCalls?.[0]?.id === 'call_1',
+  );
+  const secondToolMessage = round1Messages.find(
+    m => m.role === 'assistant' && m.toolCalls?.[0]?.id === 'call_2',
+  );
+  // Trimmed, not the raw streamed slice with its trailing space: per-tool-call slices are now
+  // trimmed before being attributed (a later, deliberate fix — a whitespace-padded/whitespace-
+  // only content string is a 400 on the Anthropic API).
+  assert.equal(firstToolMessage?.content, 'First, checking SCA.');
+  assert.equal(secondToolMessage?.content, 'Now checking a second thing.');
+});
+
+test('orchestrate: a round that streams only whitespace before its tool_call produces content: "" in history, never a whitespace string', async () => {
+  // Adversarial-review finding: models routinely emit a bare priming newline run ("\n\n") right
+  // before a tool call. The C4 slice (`roundText.slice(roundTextConsumed)`) used to carry that
+  // whitespace straight into the assistant message's `content`, and anthropic.ts pushes any
+  // truthy `content` as a `text` block -- Anthropic's Messages API 400s on a whitespace-only
+  // text block. The fix trims the slice; this pins the orchestration-level contract the adapter
+  // relies on: whitespace-only round text must become an empty string, not survive as "\n\n".
+  const { context } = scaContext();
+  const { callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      [
+        { type: 'delta', content: '\n\n' },
+        {
+          type: 'tool_call',
+          toolCall: {
+            id: 'call_sca_results',
+            name: 'get_sca_results',
+            arguments: { agent_id: '001' },
+          },
+        },
+        { type: 'done', usage: { inputTokens: 20, outputTokens: 10 } },
+      ],
+      textOnlyScript('CIS Ubuntu: 95 passed, 102 failed, 10 N/A.'),
+    ],
+    context,
+  );
+
+  const round1Messages = callMessages[2];
+  const toolCallMessage = round1Messages.find(
+    message =>
+      message.role === 'assistant' &&
+      message.toolCalls?.[0]?.id === 'call_sca_results',
+  );
+  assert.ok(toolCallMessage);
+  assert.equal(
+    toolCallMessage?.content,
+    '',
+    'whitespace-only round text preceding a tool_call must be trimmed to an empty string, not ' +
+      'passed through as "\\n\\n"',
+  );
+});
+
+// --- orchestrate: round-tail narration -- text streamed AFTER a round's LAST tool_call ---------
+
+test("orchestrate: text streamed AFTER a round's last tool_call is carried into history as its own assistant message", async () => {
+  // Residual gap flagged in adversarial review: the C4 fix only attributes narration that
+  // arrives BEFORE each tool_call (`roundTextConsumed` slicing). Text streamed after the LAST
+  // tool_call of a round -- before that round's `done` -- was still silently dropped, because the
+  // 'done' handler for a tool-bearing round only accumulated usage and broke to the next round.
+  const { context } = scaContext();
+  const { callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      [
+        {
+          type: 'tool_call',
+          toolCall: {
+            id: 'call_sca_results',
+            name: 'get_sca_results',
+            arguments: { agent_id: '001' },
+          },
+        },
+        { type: 'delta', content: 'That query is running now.' },
+        { type: 'done', usage: { inputTokens: 20, outputTokens: 10 } },
+      ],
+      textOnlyScript('CIS Ubuntu: 95 passed, 102 failed, 10 N/A.'),
+    ],
+    context,
+  );
+
+  const round1Messages = callMessages[2];
+  const tailMessage = round1Messages.find(
+    message =>
+      message.role === 'assistant' &&
+      !message.toolCalls?.length &&
+      message.content === 'That query is running now.',
+  );
+  assert.ok(
+    tailMessage,
+    "text streamed after a round's last tool_call must be appended to history as its own " +
+      'assistant message, not silently dropped',
+  );
+});
+
 // --- orchestrate: main end-to-end case -- FAILS ON BASE -----------------------------------------
 
 test('orchestrate: an unprompted single-tool offer with rounds remaining is forced into a chained call, not left to end the turn', async () => {

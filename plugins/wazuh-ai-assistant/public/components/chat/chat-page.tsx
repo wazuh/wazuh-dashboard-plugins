@@ -1,24 +1,28 @@
 import './chat-page.scss';
-import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   EuiSpacer,
   EuiEmptyPrompt,
   EuiButton,
-  EuiButtonEmpty,
+  EuiBadge,
   EuiButtonIcon,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiToolTip,
   EuiIconTip,
   EuiText,
   EuiTitle,
   EuiScreenReaderOnly,
-  EuiBadge,
   EuiCard,
   EuiLoadingSpinner,
   EuiPanel,
   EuiIcon,
-  EuiSelect,
   EuiFlyout,
   EuiFlyoutBody,
 } from '@elastic/eui';
@@ -68,6 +72,7 @@ import { UiChatMessage } from './message-bubble';
 import { createDiscoverUrlResolver } from './discover-link';
 import { createSecurityAnalyticsUrlResolver } from './security-analytics-link';
 import { ChatInput, ChatInputHandle } from './chat-input';
+import { ProviderPicker } from './provider-picker';
 import { ConversationList } from './conversation-list';
 import { StatusCallout } from './status-callout';
 import { useSyncedState } from '../../hooks/use-synced-state';
@@ -85,6 +90,15 @@ interface ChatPageProps {
   /** The no-provider empty state's "Add a provider" CTA — its only caller. Owners wire it to
    * open Settings with the create-provider flyout (`#/settings?addProvider=true`). */
   onNavigateToSettings: () => void;
+  /** The provider picker's (chat-page.tsx, `ProviderPicker`) "Manage providers" footer item — a
+   * plain visit to the Settings app, deliberately a SEPARATE callback from `onNavigateToSettings`
+   * above rather than a reuse of it: that one always opens the create-provider flyout
+   * (`?addProvider=true`), which is the wrong behaviour for a reader who already has providers
+   * configured and just wants the table. Each embedding context wires this to the SAME helper it
+   * already uses for a plain Settings visit — application.tsx's tab-switch
+   * `navigateTo('settings')`, assistant-chat-panel.tsx's `openSettings` — rather than a new
+   * hardcoded path. */
+  onManageProviders: () => void;
   /** The app shell's router history (the same instance `<Router history={history}>` in
    * application.tsx uses) — used to read/write the open-conversation route below through
    * `history.replace` rather than the raw `window.history` API. */
@@ -124,6 +138,21 @@ interface ChatPageProps {
    */
   allowRailFlyout?: boolean;
   /**
+   * Whether the empty state may render as ONE vertically centred group (greeting + composer +
+   * example cards) that docks the composer to the bottom on the first send — C1, the Gemini-style
+   * empty state (AI/ux-iter3/gemini-motion-spec.md). Default true, i.e. the app shell's full-page
+   * chat gets it; the header's docked sidecar (assistant-chat-panel.tsx) passes `false` and keeps
+   * today's always-docked composer, per the spec's own "no room for theatre" note.
+   *
+   * A dedicated prop rather than piggy-backing on `allowRailFlyout === false` (the only other
+   * signal that currently distinguishes the sidecar): that prop answers "may the rail escalate to
+   * a full-screen overlay", which is a different question with a different answer surface — a
+   * future caller could well want a centred welcome AND no rail flyout, or the reverse. Same
+   * reasoning `allowRailFlyout`'s own doc comment gives for not sniffing `showConversationSidebar`:
+   * the embedding context is the CALLER's to declare, one explicit prop per decision.
+   */
+  enableWelcomeComposer?: boolean;
+  /**
    * Fires whenever the saved-conversations state this component owns (`conversations`,
    * `isLoadingConversations`, `activeConversationId`) changes — the sidecar header
    * (assistant-chat-panel.tsx) has its OWN conversations UI (a popover anchored to a header icon,
@@ -151,6 +180,56 @@ export interface ChatPageHandle {
   newConversation: () => void;
   selectConversation: (id: string) => void;
   deleteConversation: (id: string) => void;
+}
+
+/**
+ * C1 composer position state machine (chat-page.scss carries the matching classes).
+ *
+ * - `centered` — the empty state: the pane is a centred flex column, so the transcript (holding
+ *   greeting + example cards) and the composer read as one group sitting slightly above the
+ *   vertical middle, with a compact composer measure.
+ * - `docking` — the one-time bridge, ~400ms: the pane is ALREADY back in its final
+ *   `grid-template-rows: 1fr auto` layout (so the transcript is laid out at full height before the
+ *   first user message lands in it), and the composer is carried from its old position to its new
+ *   one by an inverted transform (FLIP). The welcome group fades out of flow on top.
+ * - `docked` — today's layout, byte for byte: `.wzChatPane` with no modifier, no inline transform.
+ *   Every other state of this component (loading, no-provider, restored conversation, and the
+ *   embedded sidecar) is this one, so nothing about the existing surface depends on the machine.
+ *
+ * FLIP (measure → apply final layout → invert → release) rather than a pure CSS transition,
+ * because the two end states differ in `display` (flex vs grid) and in track sizing (`auto` vs
+ * `1fr`) — neither is interpolable, so there is no property a CSS transition could animate between
+ * them. Inverting a transform on the composer row is the only mechanism that gets the final layout
+ * committed immediately (which is what the transcript needs) while still showing the travel.
+ */
+type ComposerMode = 'centered' | 'docking' | 'docked';
+
+/** Pane classes per mode. A map, not a nested ternary in the JSX: the docked entry has to stay
+ * exactly `'wzChatPane'` (no modifier) and reading that off one table is what makes it obvious. */
+const PANE_CLASS_BY_COMPOSER_MODE: Record<ComposerMode, string> = {
+  centered: 'wzChatPane wzChatPane--welcome',
+  docking: 'wzChatPane wzChatPane--docking',
+  docked: 'wzChatPane',
+};
+
+/** Composer travel budget — the JS half of `$wzDockTravel` (chat-page.scss), which owns the actual
+ * `transition-duration`. This copy exists only for the settle FALLBACK below, so the two are
+ * allowed to differ slightly (the fallback is deliberately the longer of the two). */
+const DOCK_TRAVEL_MS = 400;
+/** `transitionend` can never be relied on alone: it does not fire when the animated property never
+ * actually changes (a zero-length travel — e.g. an already-bottom composer), when the element is
+ * hidden mid-flight (the sidecar's own tab switch), or in jsdom, which runs no transitions at all.
+ * The timer is therefore the primary settle path and the event is the fast path. */
+const DOCK_SETTLE_FALLBACK_MS = DOCK_TRAVEL_MS + 300;
+
+/** Reduced-motion probe. `matchMedia` is absent in jsdom, so it is optional-called rather than
+ * assumed; a missing implementation reads as "no preference", i.e. animate. Shared by the two
+ * places that need the preference in JS instead of CSS (smooth-scrolling the transcript, and the
+ * composer's dock travel) so they can never disagree. */
+function prefersReducedMotion(): boolean {
+  return (
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
+  );
 }
 
 /**
@@ -183,6 +262,19 @@ const RAIL_COLLAPSED_WIDTH = 48;
  * header panel) collapses the rail on its own. */
 const RAIL_COLLAPSE_AT = 1100;
 const RAIL_FLYOUT_AT = 900;
+/** How close to the bottom of the transcript still counts as "following the conversation" (see
+ * `pinnedToBottomRef` below). A table render or a late-arriving image can shift the pane by a few
+ * pixels, so an exact `=== 0` check would unpin spuriously and stop auto-scrolling mid-answer.
+ * Extracted from the two places that now read it (the pinning handler and the jump-to-latest
+ * button's own visibility, which is the same predicate inverted) rather than restated. */
+const SCROLL_PIN_THRESHOLD_PX = 160;
+/** Extra slack before an already-pinned pane UNpins (hysteresis). The pin predicate reads
+ * `clientHeight`, and anything that resizes the pane right on the pin boundary — in the audited
+ * bug it was the jump button owning its own 36px grid track; any future layout could reintroduce
+ * an equivalent — turns a single boundary crossing into show→resize→hide→resize flicker when both
+ * directions share one threshold. Unpinning at 160+40 while re-pinning at 160 keeps the
+ * predicate's output from ever feeding back into its own input. */
+const SCROLL_UNPIN_SLACK_PX = 40;
 /** Window event announcing a conversation create/update/delete; every mounted ChatPage listens
  * and refreshes, keeping the app shell's and the header flyout's sidebars in sync. */
 export const CONVERSATIONS_CHANGED_EVENT =
@@ -204,8 +296,12 @@ const EXAMPLE_CARDS = [
         defaultMessage: 'Critical findings',
       },
     ),
+    // Deliberately the shortest of the three questions rather than the longest: rendered as a card
+    // description in a 3-up grid, the old "Show me the critical findings of the last 24 hours"
+    // wrapped to two lines while its two neighbours took one, so the row's cards had visibly
+    // different amounts of empty space in them (audit §1.6, rulebook D21).
     question: i18n.translate('wazuhAiAssistant.chat.example.criticalAlerts', {
-      defaultMessage: 'Show me the critical findings of the last 24 hours',
+      defaultMessage: 'Critical findings in the last 24 hours',
     }),
   },
   {
@@ -273,12 +369,14 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       selectedProviderId,
       onProviderChange,
       onNavigateToSettings,
+      onManageProviders,
       history,
       onGeneratingChange,
       isActive = true,
       showConversationSidebar = true,
       railDisplayModeOverride,
       allowRailFlyout = true,
+      enableWelcomeComposer = true,
       onConversationsChange,
     },
     ref,
@@ -328,20 +426,6 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
     const [conversationsService] = useState(
       () => new ConversationsService(core.http),
     );
-
-    // Optimistic concurrency: this tab's last-known saved-object `version` for whatever
-    // conversation is currently active — `undefined` for a brand-new, never-yet-saved conversation.
-    // A ref (not state): only ever read/written from `persistConversationAfterTurn`'s save path,
-    // never rendered directly. Reset alongside `activeConversationId` in `handleNewConversation` and
-    // `handleSelectConversation`.
-    const conversationVersionRef = useRef<string | undefined>(undefined);
-    // Shown after a 409 version conflict was reconciled (or failed to reconcile) on the last
-    // auto-save — see `saveConversationWithMerge` below. Reset whenever the user starts a fresh save
-    // attempt (`handleSend`) or switches conversations, same lifecycle as `error`/`managerAuthHint`.
-    const [mergeNotice, setMergeNotice] = useState<
-      'merged' | 'conflict' | null
-    >(null);
-
     // Privacy mode. `assistantSettings` is loaded once on mount; `privacyEnabled` and
     // `pseudonymMap` are per-conversation state that lives only in this component's own useState.
     // Besides an unmount/remount, `handleNewConversation` is now the other trigger that resets
@@ -457,12 +541,45 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       return () => observer.disconnect();
     }, []);
     const pinnedToBottomRef = useRef(true);
+    /**
+     * Render mirror of `pinnedToBottomRef`, and ONLY that: it exists so the "jump to latest" button
+     * (bottom-right of the transcript row, below) can appear the moment the user scrolls up and
+     * disappear the moment they are following again. The REF stays the single source of truth every
+     * scroll read goes through, so the streaming path keeps costing one cheap `scrollTop` assignment
+     * per flushed frame and never a re-render.
+     *
+     * Written only when the value actually FLIPS. A drag-scroll fires a scroll event per frame, and
+     * committing an identical value on each one would trade the ref's whole reason for existing for a
+     * render per frame (React would bail out of re-rendering an unchanged value, but only after the
+     * state update has already been scheduled and processed).
+     */
+    const [isPinnedToBottom, setIsPinnedToBottom] = useState(true);
+    /**
+     * Re-pins the pane to the newest content. Every "snap back to the latest turn" caller goes
+     * through this — sending a message, opening a saved conversation, starting a new one, and the
+     * jump button — so the ref and its render mirror can never disagree; a stale `true` mirror would
+     * leave the jump button hidden while the user sits scrolled up, and a stale `false` one would
+     * leave it floating over a transcript that is already at the bottom.
+     */
+    const repinToBottom = () => {
+      pinnedToBottomRef.current = true;
+      setIsPinnedToBottom(true);
+    };
     const handleScrollPane = () => {
       const pane = scrollPaneRef.current;
-      if (pane) {
-        pinnedToBottomRef.current =
-          pane.scrollHeight - pane.scrollTop - pane.clientHeight < 160;
+      if (!pane) {
+        return;
       }
+      const distance = pane.scrollHeight - pane.scrollTop - pane.clientHeight;
+      // Hysteresis: a pinned pane must travel PAST the threshold plus slack to unpin, while an
+      // unpinned one re-pins at the plain threshold — see SCROLL_UNPIN_SLACK_PX.
+      const pinned = pinnedToBottomRef.current
+        ? distance < SCROLL_PIN_THRESHOLD_PX + SCROLL_UNPIN_SLACK_PX
+        : distance < SCROLL_PIN_THRESHOLD_PX;
+      pinnedToBottomRef.current = pinned;
+      setIsPinnedToBottom(previous =>
+        previous === pinned ? previous : pinned,
+      );
     };
     useEffect(() => {
       const pane = scrollPaneRef.current;
@@ -470,6 +587,245 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
         pane.scrollTop = pane.scrollHeight;
       }
     }, [messages]);
+
+    /**
+     * Re-pin on card growth (layout contract §4, iteration-4 item 3). The effect above re-pins only on
+     * a `messages` change, but a result table's rows-per-page control grows its card WITHOUT changing
+     * `messages` — that growth is internal `ResultTable` state — so a reader who was following the
+     * bottom was left with the freshly-grown pagination footer sitting behind the composer until they
+     * scrolled down by hand (the browser-verified bug this fixes). `ResultTable` calls
+     * `handleTableRowsPerPageChange` in the SAME event as it grows the card, which bumps this nonce;
+     * the `useLayoutEffect` then runs AFTER React has committed the taller card and re-pins the pane to
+     * its new bottom — but only when the reader was still pinned (`pinnedToBottomRef`), never yanking
+     * one who had scrolled up to read. A layout effect, not `useEffect`, so the re-pin lands before
+     * paint and the footer is never seen behind the composer even for a frame. Stable via `useCallback`
+     * so passing it down through the memoized MessageList never defeats that memo.
+     */
+    const [tableGrowthNonce, setTableGrowthNonce] = useState(0);
+    const handleTableRowsPerPageChange = useCallback(() => {
+      setTableGrowthNonce(previous => previous + 1);
+    }, []);
+    useLayoutEffect(() => {
+      if (tableGrowthNonce === 0) {
+        return;
+      }
+      const pane = scrollPaneRef.current;
+      if (pane && pinnedToBottomRef.current) {
+        pane.scrollTop = pane.scrollHeight;
+      }
+    }, [tableGrowthNonce]);
+
+    /**
+     * "Jump to latest": the one convention the pinning logic above was missing (every streaming chat
+     * UI offers it — see AI/ux-iter3/ux-research.md §B). Scrolls to the newest content and re-pins, so
+     * the answer starts following again from here on.
+     *
+     * Smooth via `scrollTo`, NOT via a `scroll-behavior: smooth` rule on the pane: the effect above
+     * writes `scrollTop` on every flushed streaming frame, and a smooth container would animate each
+     * of those writes instead of tracking the stream — the pane would visibly lag behind the text.
+     * That also means `prefers-reduced-motion` has to be honoured here in JS (the `behavior` option
+     * ignores it), which is why this goes through `prefersReducedMotion()` above rather than relying
+     * on the stylesheet's own reduced-motion block. Both browser APIs are probed rather than assumed:
+     * `matchMedia` and `Element.prototype.scrollTo` are absent in jsdom, where this falls back to the
+     * same direct `scrollTop` assignment the streaming effect uses.
+     */
+    const handleJumpToLatest = () => {
+      repinToBottom();
+      const pane = scrollPaneRef.current;
+      if (!pane) {
+        return;
+      }
+      if (!prefersReducedMotion() && typeof pane.scrollTo === 'function') {
+        pane.scrollTo({ top: pane.scrollHeight, behavior: 'smooth' });
+        return;
+      }
+      pane.scrollTop = pane.scrollHeight;
+    };
+
+    const hasProviders = providers.length > 0;
+    const showNoProviderState = providersLoaded && !hasProviders;
+    // Initial mount, before the app shell's provider load has resolved either way: neither the
+    // no-provider nor the welcome state can render yet (both depend on `providersLoaded`), so without
+    // an explicit state here this window shows a blank pane. Restoring a conversation shows the same
+    // spinner, so a reload lands on "loading" and then the transcript, instead of flashing the
+    // welcome state at a user who is not starting from scratch.
+    const showLoadingState = !providersLoaded || isRestoringConversation;
+    const showWelcomeState =
+      hasProviders && messages.length === 0 && !showLoadingState;
+    // Declared HERE, above the handlers, rather than beside the JSX where they used to sit: the C1
+    // composer-mode machine below reads `showWelcomeState`, and `handleSend` further down reads the
+    // machine — with `no-use-before-define` (eslint.config.mjs) forbidding const hoisting, this is
+    // the one ordering that satisfies both. The JSX consumes all four exactly as before.
+
+    /**
+     * C1 — the composer's own position state (see `ComposerMode` above for what each state means and
+     * why the travel is a FLIP rather than a CSS transition).
+     *
+     * `docked` is the initial value on purpose: it is today's layout, so the very first paint of every
+     * embedding context (and of a page that is still loading providers or restoring a conversation)
+     * is exactly what it is now, and the centred state is only ever entered deliberately, by the
+     * effect below. A conversation restored on mount therefore never passes through `centered` and
+     * never animates — it has messages, so the effect leaves it `docked`.
+     */
+    const [composerMode, setComposerMode] = useState<ComposerMode>('docked');
+    /** The travelling element: the composer's grid ROW, not the panel inside it. The row is what the
+     * grid positions, and `.wzComposerRow` clips its own overflow (`overflow-y: auto`, the composer
+     * ceiling), so a transform on anything inside it would be cut off mid-flight. */
+    const composerRowRef = useRef<HTMLDivElement | null>(null);
+    /** The greeting + example-cards cluster, measured for the same inversion: it has to stay visually
+     * still while it fades, even though the layout underneath it has already changed. */
+    const welcomeGroupRef = useRef<HTMLDivElement | null>(null);
+    /** Viewport-relative tops captured in the LAST centred frame, i.e. the "First" half of FLIP. */
+    const dockOriginRef = useRef<{
+      composerTop: number;
+      welcomeTop: number | null;
+    } | null>(null);
+    /**
+     * "The centred welcome has already been dismissed for the conversation on screen." Without it,
+     * the settle below could hand control back to the effect while `messages` is still empty (the
+     * first `updateMessages` happens after `startTurn`'s awaited session probe, which is normally
+     * instant but is a network call), and the composer would fly back up to the centre a beat after
+     * it finished docking. Cleared wherever a genuinely fresh conversation appears
+     * (`handleNewConversation`) or a stored one is loaded (`applyLoadedConversation`).
+     */
+    const welcomeDismissedRef = useRef(false);
+
+    /**
+     * The only entry into `centered`, and the only automatic exit that is NOT the send transition
+     * (opening a saved conversation from the rail, whose messages make `showWelcomeState` false).
+     * Never runs while `docking`: the machine owns that window, and re-deriving from
+     * `showWelcomeState` inside it is exactly the flicker `welcomeDismissedRef` exists to prevent.
+     */
+    useEffect(() => {
+      if (composerMode === 'docking') {
+        return;
+      }
+      const shouldCenter =
+        enableWelcomeComposer &&
+        showWelcomeState &&
+        !welcomeDismissedRef.current;
+      if (shouldCenter && composerMode !== 'centered') {
+        setComposerMode('centered');
+      } else if (!shouldCenter && composerMode !== 'docked') {
+        setComposerMode('docked');
+      }
+    }, [composerMode, enableWelcomeComposer, showWelcomeState]);
+
+    /** Settles the machine: drops the inline FLIP styles and returns the pane to the plain docked
+     * layout. Idempotent, because both settle paths (the `transitionend` fast path and the timer
+     * fallback) can legitimately fire for the same travel. */
+    const settleDock = () => {
+      const row = composerRowRef.current;
+      if (row) {
+        row.style.transition = '';
+        row.style.transform = '';
+      }
+      dockOriginRef.current = null;
+      setComposerMode('docked');
+    };
+
+    /**
+     * Starts the bridge. Called from `handleSend` while centred, BEFORE it awaits anything, so the
+     * measurement below is taken from the frame the user actually pressed Send in.
+     *
+     * Reduced motion (and any environment where the composer row is not measurable) hard-cuts to
+     * `docked`: no travel, no fade, no `docking` frame at all — the spec's own reduced-motion rule.
+     */
+    const beginDocking = () => {
+      welcomeDismissedRef.current = true;
+      const row = composerRowRef.current;
+      if (!row || prefersReducedMotion()) {
+        setComposerMode('docked');
+        return;
+      }
+      dockOriginRef.current = {
+        composerTop: row.getBoundingClientRect().top,
+        welcomeTop:
+          welcomeGroupRef.current?.getBoundingClientRect().top ?? null,
+      };
+      setComposerMode('docking');
+    };
+
+    /**
+     * The "Invert" and "Play" halves of the FLIP, plus the settle fallback.
+     *
+     * `useLayoutEffect`, not `useEffect`: this runs after React has committed the docked layout but
+     * BEFORE the browser paints it, which is the whole reason the composer is never seen at the
+     * bottom for one frame. The inversion is applied with `transition: none` inline so the jump back
+     * up is instant, then released on the next animation frame — at which point `.wzChatPane--docking`
+     * (chat-page.scss) supplies the real `transition: transform $wzDockTravel` and the row travels
+     * down to its committed position. The welcome ghost is inverted the same way but never released:
+     * it only has to stay still while its own fade-out runs.
+     *
+     * An environment without `requestAnimationFrame` would otherwise be left holding the inverted
+     * transform for good, so it settles immediately instead (jsdom does provide rAF; a legacy browser
+     * simply gets the hard cut, same as reduced motion).
+     */
+    useLayoutEffect(() => {
+      if (composerMode !== 'docking') {
+        return undefined;
+      }
+      const origin = dockOriginRef.current;
+      const row = composerRowRef.current;
+      if (!origin || !row) {
+        settleDock();
+        return undefined;
+      }
+      const welcome = welcomeGroupRef.current;
+      if (welcome && origin.welcomeTop !== null) {
+        const welcomeDelta =
+          origin.welcomeTop - welcome.getBoundingClientRect().top;
+        welcome.style.transform = `translateY(${welcomeDelta}px)`;
+      }
+      const composerDelta =
+        origin.composerTop - row.getBoundingClientRect().top;
+      row.style.transition = 'none';
+      row.style.transform = `translateY(${composerDelta}px)`;
+
+      const timer = window.setTimeout(settleDock, DOCK_SETTLE_FALLBACK_MS);
+      if (typeof window.requestAnimationFrame !== 'function') {
+        settleDock();
+        return () => window.clearTimeout(timer);
+      }
+      const frame = window.requestAnimationFrame(() => {
+        row.style.transition = '';
+        row.style.transform = '';
+      });
+      return () => {
+        window.cancelAnimationFrame(frame);
+        window.clearTimeout(timer);
+      };
+      // Keyed on the mode only: every other value it reads is a ref, and re-running this on an
+      // unrelated re-render would restart the travel from wherever it had got to.
+    }, [composerMode]);
+
+    /** The fast settle path. Scoped to the row's OWN transform (a nested EUI transition — a button's
+     * hover, the textarea's height — bubbles to the same handler and must not end the travel early). */
+    const handleComposerTransitionEnd = (
+      event: React.TransitionEvent<HTMLDivElement>,
+    ) => {
+      if (
+        composerMode === 'docking' &&
+        event.target === event.currentTarget &&
+        event.propertyName === 'transform'
+      ) {
+        settleDock();
+      }
+    };
+
+    /**
+     * The welcome group (greeting + example cards) outlives `showWelcomeState` by exactly one
+     * transition: the moment the user's message is appended the welcome state is false, but the group
+     * still has a fade-out to run, so `docking` keeps it mounted.
+     *
+     * While it is fading it is NO LONGER in flow (`.wzWelcomeCenter--leaving` is out-of-flow, and the
+     * `--stretch` centring modifier comes off with it), which is what lets the transcript lay itself
+     * out at its final height immediately — streaming starts on send, so the first user message can
+     * land while the composer is still travelling, and it has to land in the position it will keep.
+     */
+    const welcomeIsInFlow = showWelcomeState && composerMode !== 'docking';
+    const isWelcomeGroupMounted =
+      showWelcomeState || composerMode === 'docking';
 
     /**
      * Conversation rail display mode (layout contract §5 / job item 6): expanded at >=1100px of
@@ -505,6 +861,19 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
     // where there is no inline rail to keep collapsed or expanded in the first place.
     const railManualOverrideRef = useRef<'expanded' | 'collapsed' | null>(null);
     const [isRailFlyoutOpen, setIsRailFlyoutOpen] = useState(false);
+
+    // Optimistic concurrency: this tab's last-known saved-object `version` for whatever
+    // conversation is currently active — `undefined` for a brand-new, never-yet-saved conversation.
+    // A ref (not state): only ever read/written from `persistConversationAfterTurn`'s save path,
+    // never rendered directly. Reset alongside `activeConversationId` in `handleNewConversation` and
+    // `handleSelectConversation`.
+    const conversationVersionRef = useRef<string | undefined>(undefined);
+    // Shown after a 409 version conflict was reconciled (or failed to reconcile) on the last
+    // auto-save — see `saveConversationWithMerge` below. Reset whenever the user starts a fresh save
+    // attempt (`handleSend`) or switches conversations, same lifecycle as `error`/`managerAuthHint`.
+    const [mergeNotice, setMergeNotice] = useState<
+      'merged' | 'conflict' | null
+    >(null);
 
     useEffect(() => {
       const element = chatRootRef.current;
@@ -774,8 +1143,13 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
      * replay as history either.
      */
     const applyLoadedConversation = (record: ConversationRecord) => {
-      // A resumed conversation opens at its latest turn (bottom), like every chat client.
-      pinnedToBottomRef.current = true;
+      // A resumed conversation opens at its latest turn (bottom), like every chat client — through
+      // `repinToBottom` so the jump button's own mirror is repinned with it.
+      repinToBottom();
+      // C1: the loaded conversation decides the composer's position on its own — with messages it
+      // stays docked (no transition, it was never centred), and in the degenerate empty-transcript
+      // case the welcome composer is legitimately offered again.
+      welcomeDismissedRef.current = false;
       const restored = reconstructConversation(record.messages);
       updateMessages(restored.messages);
       // Restoring the tool history is what makes a resumed conversation continuable rather than just
@@ -885,7 +1259,11 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
      */
     const handleNewConversation = () => {
       abandonActiveStream();
-      pinnedToBottomRef.current = true;
+      repinToBottom();
+      // C1: a brand-new conversation gets the centred welcome composer back (the effect above picks
+      // this up as soon as `messages` is empty again) — the transition is once per conversation, not
+      // once per session.
+      welcomeDismissedRef.current = false;
       updateMessages([]);
       turnHistoryRef.current = [];
       setPseudonymMap([]);
@@ -1702,7 +2080,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
 
       // Sending always snaps the pane to the new turn, even if the user had scrolled up — the one
       // case where overriding their scroll position is what they expect (see pinnedToBottomRef).
-      pinnedToBottomRef.current = true;
+      repinToBottom();
       const baseMessages = [...history, assistantMessage];
       updateMessages(baseMessages);
 
@@ -1748,6 +2126,15 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       setMergeNotice(null);
       setSessionExpired(false);
       setSaveFailed(false);
+      // C1: the first send of a centred conversation is what docks the composer. Started here, before
+      // the first `await`, for two reasons: the FLIP measurement has to be taken from the frame the
+      // user pressed Send in, and the transcript has to be in its final (docked) layout before the
+      // user's own message lands in it — `startTurn` appends that message after an awaited session
+      // probe, so anything scheduled later could race it. Deliberately AFTER the no-provider guard
+      // above: a send that never happens must not move the composer.
+      if (composerMode === 'centered') {
+        beginDocking();
+      }
       await startTurn([
         ...messages,
         {
@@ -1797,18 +2184,12 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       await startTurn(history);
     };
 
-    const hasProviders = providers.length > 0;
-    const showNoProviderState = providersLoaded && !hasProviders;
-    // Initial mount, before the app shell's provider load has resolved either way: neither the
-    // no-provider nor the welcome state can render yet (both depend on `providersLoaded`), so without
-    // an explicit state here this window shows a blank pane. Restoring a conversation shows the same
-    // spinner, so a reload lands on "loading" and then the transcript, instead of flashing the
-    // welcome state at a user who is not starting from scratch.
-    const showLoadingState = !providersLoaded || isRestoringConversation;
-    const showWelcomeState =
-      hasProviders && messages.length === 0 && !showLoadingState;
     /** `error` is the send-path failure; `providersError` the app shell's provider-load failure. One
      * callout reports whichever is current, so dismissal is tracked against this one value. */
+    // Composer control-row spec (iteration-4): the Send button's own disabled/enabled state, split
+    // out once so both the `disabled` prop and the `display` (filled only when it would actually
+    // do something) read the same condition instead of re-deriving it in two places.
+    const canSend = hasProviders && Boolean(inputText.trim());
     const activeError = error ?? providersError;
     const showErrorCallout =
       Boolean(activeError) && activeError !== dismissedError;
@@ -1843,24 +2224,49 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
           defaultMessage: 'Off',
         });
     const privacyBadgeIcon = privacyEnabled ? 'lock' : 'lockOpen';
-    const privacyBadge = assistantSettings?.userCanOverride ? (
-      <EuiButtonEmpty
-        size='s'
-        color={privacyEnabled ? 'success' : 'text'}
+    // Single pill replacing the old padlock EuiButtonEmpty + floating EuiIconTip pair (iteration-4
+    // composer control-row spec): the icon + "Privacy · On/Off" label carries the state, and —
+    // only when the admin has left it overridable — the click affordance to flip it. `onClick`/
+    // `onClickAriaLabel` are spread in together rather than each defaulting to `undefined`, since
+    // OuiBadge warns if `onClickAriaLabel` is present without `onClick` (and vice versa reads as a
+    // badge that looks clickable but isn't). The explanation of what the state does to the user's
+    // data used to live in a hover tooltip wrapping this whole pill, which meant hovering to click
+    // it also forced a wall of text — it now lives on a separate, discrete ⓘ (`EuiIconTip`) placed
+    // right after the pill, so it is available on demand without blocking the click gesture.
+    // EUI types onClick/onClickAriaLabel as an ExclusiveUnion against the non-clickable badge
+    // variant; spreading the conditional pair in flattens that union into plain optional props,
+    // which satisfies neither union member structurally — hence rendering through an untyped
+    // component reference rather than fighting the union with a props cast.
+    const ClickableEuiBadge = EuiBadge as React.ComponentType<
+      Record<string, unknown>
+    >;
+
+    const privacyChip = (
+      <ClickableEuiBadge
+        className={`wzPrivacyChip wzPrivacyChip--${
+          privacyEnabled ? 'on' : 'off'
+        }`}
+        color='hollow'
         iconType={privacyBadgeIcon}
-        onClick={handleTogglePrivacy}
+        data-test-subj='wzPrivacyChip'
+        {...(assistantSettings?.userCanOverride
+          ? {
+              onClick: handleTogglePrivacy,
+              onClickAriaLabel: privacyEnabled
+                ? i18n.translate('wazuhAiAssistant.chat.privacy.toggleToOff', {
+                    defaultMessage: 'Turn privacy mode off',
+                  })
+                : i18n.translate('wazuhAiAssistant.chat.privacy.toggleToOn', {
+                    defaultMessage: 'Turn privacy mode on',
+                  }),
+            }
+          : {})}
       >
-        {privacyBadgeLabel}
-      </EuiButtonEmpty>
-    ) : (
-      <EuiButtonEmpty
-        size='s'
-        color={privacyEnabled ? 'success' : 'text'}
-        iconType={privacyBadgeIcon}
-        isDisabled
-      >
-        {privacyBadgeLabel}
-      </EuiButtonEmpty>
+        {i18n.translate('wazuhAiAssistant.chat.privacy.chipLabel', {
+          defaultMessage: 'Privacy · {state}',
+          values: { state: privacyBadgeLabel },
+        })}
+      </ClickableEuiBadge>
     );
 
     // The badge alone only ever said
@@ -1886,16 +2292,6 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
           conversation => conversation.id === activeConversationId,
         )?.title
       : undefined;
-
-    const providerOptions = providers.map(provider => ({
-      value: provider.id,
-      text: provider.isDefault
-        ? i18n.translate('wazuhAiAssistant.chat.providerOptionDefault', {
-            defaultMessage: '{name} (default)',
-            values: { name: provider.name },
-          })
-        : provider.name,
-    }));
 
     return (
       // Iteration 2 layout: EuiPage/EuiPageSideBar rendered as an unreliable hairline sliver in this
@@ -2086,8 +2482,16 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
           `position: sticky` composer this replaces. Row 1 (`.wzChatTranscript` below) is the ONLY
           scroll container; row 2 (`.wzComposerRow` below) stays in normal flow. That grid boundary
           — not a tuned padding/gradient pair — is what makes the composer/welcome overlap this
-          redesign fixes structurally impossible instead of merely rare. */}
-          <div className='wzChatPane' style={{ flex: 1, minWidth: 0 }}>
+          redesign fixes structurally impossible instead of merely rare.
+
+          C1 adds exactly two temporary modifiers to that pane (`PANE_CLASS_BY_COMPOSER_MODE`
+          above): `--welcome` while the empty state is one centred group, and `--docking` for the
+          ~400ms bridge. The `docked` entry is the bare `wzChatPane` this always was, so the end
+          state of every conversation — and every state of the embedded sidecar — is unchanged. */}
+          <div
+            className={PANE_CLASS_BY_COMPOSER_MODE[composerMode]}
+            style={{ flex: 1, minWidth: 0 }}
+          >
             {/* The conversation's ONE scroll container — scrollbar belongs at the pane's far edge
             like any chat app, and should only exist once content overflows (no permanently
             reserved gutter). The auto-scroll pinning refs above target it; overflowAnchor keeps
@@ -2105,13 +2509,18 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
               className='wzChatTranscript'
             >
               {/* `.wzTranscriptContent` (chat-page.scss): the full-width wrapper that owns the ONE
-              shared `16px 24px 0` gutter — `.wzContentMeasure` below (header/callouts/welcome) and
-              `MessageList` (rendered as ITS sibling further down, not its descendant) both sit
+              shared `24px 24px 24px` gutter — `.wzContentMeasure` below (header/callouts/welcome)
+              and `MessageList` (rendered as ITS sibling further down, not its descendant) both sit
               inside it, which is what lets a table-bearing turn's own row measure past
               `.wzContentMeasure`'s 1060px cap instead of being clipped to it (layout contract §5). */}
               <div
                 className='wzTranscriptContent'
-                style={{ padding: '16px 24px 0' }}
+                // Restores lead breath at the top (16 -> 24px) and adds the tail breath the
+                // transcript never had at all (0 -> 24px) so the last turn is not flush against the
+                // composer's own hairline (iteration-4 audit, P1 item 7). See `.wzStatusCallouts`
+                // (chat-page.scss) for why the top half of this still scrolls out from under the
+                // sticky band rather than staying visible above it.
+                style={{ padding: '24px 24px 24px' }}
               >
                 {/* `.wzContentMeasure` (chat-page.scss): the ONE centred column transcript prose and
               the composer share (layout contract §5) — reads `$wzContentMaxWidth` off the shared
@@ -2321,10 +2730,15 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                 )}
 
                 <div
+                  // `wzWelcomeMeasure` (chat-page.scss), not the bare `.wzContentMeasure` this also
+                  // carries: the 840px welcome-cluster cap is scoped to THIS class specifically,
+                  // because the sticky status-callout band above (`.wzStatusCallouts`) wraps its own
+                  // content in a plain `.wzContentMeasure` too — an unscoped `.wzChatPane--welcome
+                  // .wzContentMeasure` rule narrowed that band as an unrelated side effect.
                   className={
-                    showWelcomeState
-                      ? 'wzContentMeasure wzContentMeasure--stretch'
-                      : 'wzContentMeasure'
+                    welcomeIsInFlow
+                      ? 'wzContentMeasure wzContentMeasure--stretch wzWelcomeMeasure'
+                      : 'wzContentMeasure wzWelcomeMeasure'
                   }
                 >
                   {/* The view's `<h1>`, for assistive tech only. The chat column had no heading at all,
@@ -2419,9 +2833,29 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                     tall viewport centres the cluster; a short one has nowhere to grow into, so this
                     stops at the content's own height and the transcript's own `overflow-y: auto`
                     takes over — nothing here can ever reach the composer, which is a grid sibling
-                    of the transcript, never a descendant of it. */}
-                  {showWelcomeState && (
-                    <div className='wzWelcomeCenter'>
+                    of the transcript, never a descendant of it.
+
+                    C1 layers on top WITHOUT moving any of this: in the centred state the pane
+                    itself becomes the centring container (`.wzChatPane--welcome`), so this cluster
+                    and the composer read as one group while each stays exactly where it already
+                    lived in the DOM. That is deliberate — the composer must remain ONE React
+                    instance across the transition (re-parenting it into this subtree would remount
+                    ChatInput, dropping focus and the textarea's autogrow height, and an element
+                    cannot animate across a remount). The order inside the group is therefore
+                    greeting → cards → composer rather than the recording's greeting → composer:
+                    Gemini shows no cards at all, and putting ours BELOW the composer would need a
+                    second render site for them plus a pane row underneath the travelling composer
+                    for the transition to pass through. Group composition and motion match the spec;
+                    the internal order is the one the existing DOM already gives. */}
+                  {isWelcomeGroupMounted && (
+                    <div
+                      ref={welcomeGroupRef}
+                      className={
+                        welcomeIsInFlow
+                          ? 'wzWelcomeCenter'
+                          : 'wzWelcomeCenter wzWelcomeCenter--leaving'
+                      }
+                    >
                       <EuiEmptyPrompt
                         // No `icon`: this chat already lives inside the Wazuh app chrome, so a Wazuh
                         // mark on the welcome screen only repeated branding the user can already see.
@@ -2429,6 +2863,17 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                           // EUI's own type scale (size='m') instead of an inline fontSize/weight/
                           // letter-spacing override — the whole point of this pass is to stop
                           // fighting EuiEmptyPrompt's built-in typography with inline styles.
+                          //
+                          // Page-title scale, decided: this greeting stays at EuiTitle `m` (24px)
+                          // while the settings page's H1 is 28. The live audit (§6) flagged the two
+                          // as an inconsistency and offered either "pick 28 everywhere" or "make the
+                          // greeting a deliberate hero" — this is the second. The greeting is not a
+                          // page title doing a navigational job; it is the one large element on an
+                          // otherwise empty canvas (rulebook B7: only 1–2 large elements per view),
+                          // and it shares its screen with nothing else that competes for that rank,
+                          // so 24 is the size that keeps the cluster feeling like a group rather than
+                          // like a page header with content under it. Settings, which really does
+                          // have a header over three sections, keeps 28.
                           <EuiTitle size='m'>
                             <h2>
                               {i18n.translate(
@@ -2460,76 +2905,62 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                           </EuiText>
                         }
                       />
-                      <EuiSpacer size='l' />
-                      {/* Welcome variation 1a (design's own recommendation): ONE bordered, shadowless
-                        container with a centred pill header, holding three horizontal cards —
-                        icon-left, title plus the full question as a two-line description, hairline
-                        border — the Home Overview idiom, replacing the old icon-top/150px/
-                        one-truncated-line cards that floated on the page background with no
-                        grouping container. Clicking a card still only fills the input (unchanged
-                        `setInputText` call), never auto-sends. */}
-                      {/* `grow={false}`: EuiPanel's `grow` DEFAULTS TO TRUE (flex-grow: 1), and
-                        this panel is a flex item of the welcome's centring column — left at
-                        the default it stretched to the full transcript height, so the cards
-                        sat at the top of a tall empty box instead of the cluster sitting
-                        centred. Same trap as the conversation rail's own panel above. */}
-                      <EuiPanel
-                        hasBorder
-                        hasShadow={false}
-                        paddingSize='l'
-                        grow={false}
-                      >
-                        <EuiFlexGroup
-                          gutterSize='none'
-                          justifyContent='center'
-                          responsive={false}
-                        >
-                          <EuiFlexItem grow={false}>
-                            <EuiBadge color='hollow'>
-                              {i18n.translate(
-                                'wazuhAiAssistant.chat.welcome.body',
-                                {
-                                  defaultMessage: 'Try one of these',
-                                },
-                              )}
-                            </EuiBadge>
-                          </EuiFlexItem>
-                        </EuiFlexGroup>
-                        <EuiSpacer size='m' />
-                        {/* `.wzExampleCardsGrid` (chat-page.scss): `repeat(auto-fit,
-                          minmax(min(240px, 100%), 1fr))` — 3-up, 2-up, 1-up, shrinking below
-                          240px only once the container itself is narrower than that (a docked
-                          sidecar panel at its own minimum width), so this never overflows its own
-                          wrapper regardless of pane width (contract §3). */}
-                        <div className='wzExampleCardsGrid'>
-                          {EXAMPLE_CARDS.map(card => (
-                            <EuiCard
-                              key={card.id}
-                              layout='horizontal'
-                              display='plain'
-                              hasBorder
-                              icon={
-                                <EuiIcon
-                                  type={card.icon}
-                                  size='l'
-                                  color='primary'
-                                />
-                              }
-                              title={card.title}
-                              description={card.question}
-                              onClick={() => setInputText(card.question)}
-                            />
-                          ))}
-                        </div>
-                      </EuiPanel>
+                      {/* 16, not 24: greeting → cards → composer are now one evenly-spaced group
+                        (audit §1.5 / rulebook C16 — the trio was 24/9, i.e. neither even nor on the
+                        ladder). The composer's own half of that step lives in
+                        `.wzChatPane--welcome .wzComposerMeasure` (chat-page.scss). */}
+                      <EuiSpacer size='m' />
+                      {/* Three horizontal cards — icon-left, short title, the full question as the
+                        description. Clicking a card only fills the input (unchanged `setInputText`
+                        call), never auto-sends.
+
+                        NO grouping panel around them, and no "Try one of these" pill header. Both
+                        were variation 1a's original shape and both were measured as failures
+                        (audit §1.2/§1.3): the outer `EuiPanel` had the identical fill, hairline and
+                        radius as the `EuiCard`s inside it, so the group read as a card-in-a-card
+                        with no information in the outer one; and the pill was a THIRD piece of
+                        instructional copy under a title and subtitle that already say what to do,
+                        centred over left-aligned cards. The cards' own borders group them perfectly
+                        well — this is a plain layout div now, carrying only the grid. */}
+                      {/* `.wzExampleCardsGrid` (chat-page.scss): `repeat(auto-fit,
+                        minmax(min(240px, 100%), 1fr))` — 3-up, 2-up, 1-up, shrinking below
+                        240px only once the container itself is narrower than that (a docked
+                        sidecar panel at its own minimum width), so this never overflows its own
+                        wrapper regardless of pane width (contract §3). */}
+                      <div className='wzExampleCardsGrid'>
+                        {EXAMPLE_CARDS.map(card => (
+                          <EuiCard
+                            key={card.id}
+                            className='wzWelcomeCard'
+                            layout='horizontal'
+                            display='plain'
+                            hasBorder
+                            // `xs` (16px), down from EuiCard's default `s` (18px): the card titles
+                            // used to be BIGGER and bolder than the greeting they sit under
+                            // (18/500 vs 24/400), which inverted the screen's own hierarchy — the
+                            // eye landed on a card title first (audit §1.4, rulebook B8).
+                            titleSize='xs'
+                            icon={
+                              <EuiIcon
+                                type={card.icon}
+                                size='l'
+                                color='primary'
+                              />
+                            }
+                            title={card.title}
+                            description={card.question}
+                            onClick={() => setInputText(card.question)}
+                          />
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
                 {/* `MessageList` is `.wzContentMeasure`'s SIBLING inside `.wzTranscriptContent`, not its
-              descendant — see this file's `.wzTranscriptContent` doc comment above. Nesting it
-              inside `.wzContentMeasure` (the pre-fix shape) capped every row's own breakout width
-              against that element's 1060px measure, which is why a table-bearing turn could never
-              actually reach `min(100%, $wzTableMaxWidth)` regardless of window width. */}
+              descendant — see this file's `.wzTranscriptContent` doc comment above. Each message row
+              centres on the content measure independently (`.wzMessageRow`), so a table-bearing turn
+              fills that column to its right edge (bounded by the composer's own column) instead of
+              being nested inside another copy of it. */}
                 {!showLoadingState &&
                   !showNoProviderState &&
                   !showWelcomeState && (
@@ -2538,6 +2969,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                       messages={messages}
                       resolveDiscoverUrl={resolveDiscoverUrl}
                       resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
+                      onTableRowsPerPageChange={handleTableRowsPerPageChange}
                       // Withheld while generating: retrying would abandon the turn already running.
                       onRetryLastTurn={
                         isGenerating ? undefined : handleRetryLastTurn
@@ -2547,6 +2979,56 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
               </div>
             </div>
 
+            {/* "Jump to latest" (ux-research.md §B: the affordance every streaming chat UI pairs with
+            stick-to-bottom scrolling). Shown whenever the user is unpinned — not only while a turn
+            is streaming, which is what Claude/ChatGPT do: after an answer finishes, "take me back
+            to the end" is exactly as useful as it was mid-stream, and gating on `isGenerating`
+            would make the control blink out from under the pointer the moment the stream ended.
+            The pinning logic itself is untouched (`pinnedToBottomRef` above); this only renders its
+            state and calls the same re-pin the send path already used.
+
+            A SIBLING of the transcript in `.wzChatPane`, explicitly placed back into the grid's
+            first row by `.wzJumpToLatest` (chat-page.scss) — NOT a child of the scroll container,
+            which would scroll away with the content, and NOT viewport-fixed, which would float over
+            whatever else the page is showing when this same ChatPage is embedded in the header's
+            docked panel (assistant-chat-panel.tsx). Sharing the transcript's grid row is what keeps
+            it above the composer's own `auto` row by construction: there is no offset to keep in
+            sync with the composer's variable height.
+
+            Withheld in the centred empty state (C1): there is no conversation to jump to yet, and
+            `grid-row: 1` means nothing while the pane is a flex column — the button would become a
+            third flex item wedged between the welcome group and the composer, breaking the very
+            grouping the centred state exists to create. */}
+            {!showLoadingState &&
+              !showNoProviderState &&
+              composerMode !== 'centered' &&
+              !isPinnedToBottom && (
+                <div className='wzJumpToLatest'>
+                  <EuiButtonIcon
+                    className='wzJumpToLatestButton'
+                    // `arrowDown`, not `sortDown`: both read correctly, but this one is already used
+                    // elsewhere in this plugin (result-table.tsx's row expander), so it is proven
+                    // present in whichever EUI version the host platform bundles.
+                    iconType='arrowDown'
+                    display='base'
+                    // `m` (32px), not EUI's default `s` (24): at 24 the circle was smaller than the
+                    // 32px comfortable-hit-target floor and read as a stray glyph floating over the
+                    // transcript rather than as a control (audit §3.2). It is also centred over the
+                    // measure now (`.wzJumpToLatest`, chat-page.scss) instead of parked in the
+                    // corner.
+                    size='m'
+                    color='text'
+                    onClick={handleJumpToLatest}
+                    aria-label={i18n.translate(
+                      'wazuhAiAssistant.chat.jumpToLatest',
+                      {
+                        defaultMessage: 'Jump to latest',
+                      },
+                    )}
+                  />
+                </div>
+              )}
+
             {/* Composer row: the grid's `auto` row (`.wzChatPane` above), a real flow sibling of the
             transcript, never an overlay — see the layout-contract comment above `privacyBadgeLabel`.
             `.wzComposerRow` (chat-page.scss) is the composer's OWN ceiling (`max-height:
@@ -2554,22 +3036,39 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
             autogrow cap lives in chat-input.tsx. */}
             {!showLoadingState && !showNoProviderState && (
               <div
-                className={
-                  hasProviders
-                    ? 'wzComposerRow'
-                    : 'wzComposerRow wzComposerRow-isDisabled'
-                }
+                ref={composerRowRef}
+                onTransitionEnd={handleComposerTransitionEnd}
+                // `wzComposerRow--roomy` (iteration-4 item A) is derived straight from
+                // `enableWelcomeComposer` rather than a new prop of its own: that prop already IS the
+                // "is this the full-page surface or the 600-900px header sidecar" signal (see its own
+                // doc comment above), and the docked composer's two-row floor is exactly the thing the
+                // sidecar cannot afford. `.wzComposerRow--roomy .wzComposerTextarea` (chat-page.scss)
+                // is the only rule this class exists to scope.
+                className={[
+                  'wzComposerRow',
+                  hasProviders ? '' : 'wzComposerRow-isDisabled',
+                  enableWelcomeComposer ? 'wzComposerRow--roomy' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
               >
-                <div
-                  className='wzContentMeasure'
-                  style={{ padding: '8px 24px' }}
-                >
+                {/* `.wzComposerMeasure` alongside the shared measure class: it owns the composer's
+                own gutters (chat-page.scss), which is all it is left carrying now that the composer
+                shares ONE measure with the transcript in both states. It used to hold a compact
+                `min(90%, 680px)` centred width that tweened back to the shared measure over the
+                travel; that width was the empty state's third competing edge (audit §1.1), so it is
+                gone and the tween with it. The vertical FLIP travel is untouched. */}
+                <div className='wzContentMeasure wzComposerMeasure'>
+                  {/* `.wzComposerPanel` (chat-page.scss) supplies the shared `wzPanel` idiom — the
+                  redesign's 12px radius and an 8px inset — in place of a raw EuiPanel's own 4px
+                  radius plus an inline `marginBottom`. `paddingSize`/`hasBorder`/`hasShadow` stay
+                  as the props EUI needs to not paint its own competing chrome. */}
                   <EuiPanel
+                    className='wzComposerPanel'
                     color='plain'
                     hasBorder
                     hasShadow={false}
                     paddingSize='s'
-                    style={{ marginBottom: 8 }}
                   >
                     {/* Composer floor and ceiling (contract §2): the textarea (chat-input.tsx) owns
                     its own one-line floor and 5-row autogrow cap; the controls row below it is a
@@ -2584,7 +3083,10 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                       isGenerating={isGenerating}
                       onSend={handleSend}
                     />
-                    <EuiSpacer size='xs' />
+                    {/* No `EuiSpacer` here any more (iteration-4 item A): the field's own bottom
+                    padding plus the controls row's `gutterSize='s'` already separated them, and
+                    the spacer on top of that was the extra few px that made the docked composer
+                    feel taller than its "2-row floor" was supposed to read. */}
                     <EuiFlexGroup
                       alignItems='center'
                       gutterSize='s'
@@ -2592,86 +3094,92 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                       wrap
                     >
                       {hasProviders && assistantSettings && (
-                        <EuiFlexItem grow={false}>
-                          {assistantSettings.userCanOverride ? (
-                            privacyBadge
-                          ) : (
-                            <EuiToolTip
-                              content={i18n.translate(
-                                'wazuhAiAssistant.chat.privacy.adminSet',
+                        <>
+                          {/* The pill itself no longer carries the full explainer as a hover
+                          tooltip — that turned "click to toggle" into "hover through a wall
+                          of text first". `onClickAriaLabel` (set on `privacyChip` above) still
+                          covers the click affordance for a11y. The explanation now lives on the
+                          discrete ⓘ immediately after it, on demand. */}
+                          <EuiFlexItem grow={false}>{privacyChip}</EuiFlexItem>
+                          <EuiFlexItem grow={false}>
+                            <EuiIconTip
+                              type='iInCircle'
+                              color='subdued'
+                              /* `size='s'` renders this 16px-grid glyph below its native size, so the
+                               thin circle stroke falls between device pixels and reads blurry next
+                               to the crisp pill. `m` is the glyph's own 16px grid — crisp — and
+                               still discrete beside the 32px privacy chip. */
+                              size='m'
+                              aria-label={i18n.translate(
+                                'wazuhAiAssistant.chat.privacy.explainerAriaLabel',
                                 {
-                                  defaultMessage: 'Set by administrator',
+                                  defaultMessage: 'About privacy mode',
                                 },
                               )}
-                            >
-                              {privacyBadge}
-                            </EuiToolTip>
-                          )}
-                        </EuiFlexItem>
-                      )}
-                      {hasProviders && assistantSettings && (
-                        <EuiFlexItem grow={false}>
-                          <EuiIconTip
-                            type='iInCircle'
-                            color='subdued'
-                            content={privacyExplainerText}
-                            aria-label={i18n.translate(
-                              'wazuhAiAssistant.chat.privacy.explainAriaLabel',
-                              {
-                                defaultMessage:
-                                  'What privacy mode does to your data',
-                              },
-                            )}
-                          />
-                        </EuiFlexItem>
+                              content={
+                                assistantSettings.userCanOverride ? (
+                                  privacyExplainerText
+                                ) : (
+                                  <>
+                                    {privacyExplainerText}
+                                    <br />
+                                    {i18n.translate(
+                                      'wazuhAiAssistant.chat.privacy.adminSet',
+                                      {
+                                        defaultMessage: 'Set by administrator',
+                                      },
+                                    )}
+                                  </>
+                                )
+                              }
+                            />
+                          </EuiFlexItem>
+                        </>
                       )}
                       {/* Explicit grow spacer (was a bare `<EuiFlexItem />` relying on `grow`
-                          defaulting to true) pushes the provider/send cluster to the far right;
-                          that cluster now sits behind its own hairline left border, so the two
-                          concerns (privacy controls vs. provider/send) read as visually separate
-                          groups instead of one undivided row. */}
+                          defaulting to true) pushes the provider/send cluster to the far right.
+                          The hairline divider that used to separate it from the privacy controls
+                          is gone (iteration-4 item 2): the picker is now its own clickable text
+                          button rather than an inline `<select>`, and reads as a distinct control
+                          without needing a rule drawn next to it. */}
                       <EuiFlexItem grow />
                       <EuiFlexItem grow={false}>
                         <EuiFlexGroup
                           alignItems='center'
                           gutterSize='s'
                           responsive={false}
-                          style={{
-                            borderLeft: '1px solid var(--wz-hairline)',
-                            paddingLeft: 8,
-                          }}
                         >
                           {hasProviders && (
                             <EuiFlexItem grow={false}>
-                              <EuiSelect
-                                id='wzAiAssistantProviderSelect'
-                                compressed
-                                prepend={i18n.translate(
-                                  'wazuhAiAssistant.chat.providerLabel',
-                                  {
-                                    defaultMessage: 'Provider',
-                                  },
-                                )}
-                                options={providerOptions}
-                                value={selectedProviderId}
-                                onChange={event =>
-                                  onProviderChange(event.target.value)
-                                }
-                                aria-label={i18n.translate(
-                                  'wazuhAiAssistant.chat.providerSelect',
-                                  {
-                                    defaultMessage: 'Provider',
-                                  },
-                                )}
+                              <ProviderPicker
+                                providers={providers}
+                                selectedProviderId={selectedProviderId}
+                                onProviderChange={onProviderChange}
+                                onManageProviders={onManageProviders}
+                                activeConversationId={activeConversationId}
                               />
                             </EuiFlexItem>
                           )}
                           <EuiFlexItem grow={false}>
                             {isGenerating ? (
                               <EuiButtonIcon
+                                className='wzComposerSendButton'
                                 iconType='cross'
                                 color='danger'
-                                size='s'
+                                // 'm', matching the Send button's own size (iteration-4 item A) —
+                                // this button replaces Send in the exact same row slot while
+                                // generating, and a smaller icon here shrank that slot's height
+                                // between the two states.
+                                size='m'
+                                // 'base' (bordered, unfilled) — a deliberate step down from the
+                                // Send button's filled 'fill': Stop is a real interrupt but not the
+                                // row's primary action, and a second filled/colored button in the
+                                // same slot the instant generation starts would read as the
+                                // composer's emphasis flipping to "danger" by default. Verified
+                                // against this fork's OUI build (button_icon.tsx's
+                                // `displayToClassNameMap`), which does define 'base' alongside
+                                // 'empty'/'fill' — same three-value `display` union EUI ships.
+                                display='base'
                                 onClick={handleStop}
                                 aria-label={i18n.translate(
                                   'wazuhAiAssistant.chat.stopButton',
@@ -2682,12 +3190,19 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                               />
                             ) : (
                               <EuiButtonIcon
+                                className='wzComposerSendButton'
                                 iconType='arrowUp'
                                 color='primary'
-                                size='s'
-                                display='fill'
+                                // 'm', not 's' (iteration-4 item A): against the roomier two-row
+                                // field the small size read as undersized for the row's own height.
+                                size='m'
+                                // Filled only once there is something to send (`canSend`); an empty
+                                // composer now gets the same unfilled 'empty' display Stop's sibling
+                                // slot uses instead of a filled-but-disabled button, which used to
+                                // read as broken rather than "nothing typed yet".
+                                display={canSend ? 'fill' : 'empty'}
                                 onClick={() => chatInputRef.current?.send()}
-                                disabled={!hasProviders || !inputText.trim()}
+                                disabled={!canSend}
                                 aria-label={i18n.translate(
                                   'wazuhAiAssistant.chat.sendButton',
                                   {

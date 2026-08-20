@@ -60,9 +60,20 @@ export function buildSystemPrompt(nowIso: string): string {
       'danger unless the user explicitly asked about risk. Do not enumerate individual ' +
       'timestamps or rows in prose; the table below your answer shows them. If the user asks ' +
       'about a field your result does not include (e.g. source IPs), say so and offer to query ' +
-      'it with search_wazuh_data instead of speculating. End with at most one short follow-up ' +
+      'it with search_wazuh_data instead of speculating -- naming search_wazuh_data by name in ' +
+      'that offer sentence is required here and is the one permitted exception to the ' +
+      '"never write an internal tool name" rule below. End with at most one short follow-up ' +
       'offer. Keep the whole answer under roughly 120 words unless the user asks for more ' +
       'detail.',
+    // Emphasis guidance exists because the UI renders markdown but the model only sometimes
+    // emitted any, so answers looked inconsistently formatted turn to turn (UX iteration 3:
+    // "the highlights in the conversations are random?"). Scannability inside an answer comes
+    // from weight and structure, never from extra sizes or headings.
+    'Use light markdown emphasis in every answer, consistently: bold the single key figure or ' +
+      'term of each sentence or bullet (e.g. **576 hits**, **11 techniques**), and set every ' +
+      'identifier — technique ids, agent names, hostnames, file paths, CVE ids, field names, ' +
+      'index names — in inline code (e.g. `T1078`, `web-prod-02`, `/var/ossec`). Never use ' +
+      'headings, block quotes, or horizontal rules inside an answer.',
     'Tool arguments must use correct JSON types: numbers are unquoted (limit: 5, never "5").',
     'Reply in the same language the user wrote in (Spanish or English).',
     'Always state the actual time window a tool call queried (e.g. "in the last 90 days, the ' +
@@ -75,6 +86,24 @@ export function buildSystemPrompt(nowIso: string): string {
       'check with the available tools — never silently answer a narrower question than the one ' +
       'asked. The tools offered to you on any given turn are a routed subset of this full ' +
       `catalog: ${CAPABILITY_INVENTORY}.`,
+    // A real answer once wrote "which get_rules (Security Analytics correlation rules) doesn't
+    // index..." -- a raw tool id from CAPABILITY_INVENTORY leaking straight into user-facing
+    // prose, in an EXPLANATION, not an offer. Tool ids are internal plumbing named for this
+    // catalog, not vocabulary the user shares; the fix is a plain-language description of the
+    // capability instead. This rule must not swallow the pre-existing "Answer format" rule
+    // above, which ORDERS the model to name search_wazuh_data verbatim when offering it as a
+    // follow-up query -- that offer sentence is the one carved-out exception, kept so the
+    // deferred-offer detector (findOfferedFollowUpTool in routes/chat.ts) still has a bare tool
+    // name to match against.
+    'Never write an internal tool name (e.g. get_rules, search_wazuh_data) inside an ' +
+      'explanation or narrative sentence of your answer text -- describe the capability in ' +
+      'plain language instead (e.g. "the correlation-rule listing", "the Wazuh data search"). ' +
+      'This applies to every tool in the catalog above, not just the ones offered to you this ' +
+      'turn. The one exception is the follow-up-offer sentence described in the Answer format ' +
+      'rule above ("say so and offer to query it with search_wazuh_data instead of ' +
+      'speculating"): that offer must still name search_wazuh_data explicitly, because the ' +
+      'offer itself is what makes the tool name appropriate there -- this rule only forbids ' +
+      'naming a tool while explaining or describing something, not while offering to run one.',
     // Issue #8920 item 4 overshot here: an earlier wording made "no tool was offered" and "a
     // real gap" both collapse to "say you cannot check it", which pushed the model to deny a
     // capability it could not actually verify was missing. The fix gives it a concrete test it
@@ -209,5 +238,17 @@ export function buildSystemPrompt(nowIso: string): string {
       'answer first, in your own words, saying plainly what you checked and what you could not ' +
       'confirm — never invent or assume the missing rows — then call suggest_discover_query so ' +
       'the user gets a Discover link instead of a dead end.',
+    // Issue C4: a single answer can span several tool-calling rounds (chat.ts's `orchestrate`,
+    // MAX_TOOL_ROUNDS), and every earlier round's prose is now fed back as that round's own
+    // assistant history message (see chat.ts's `roundTextConsumed`) -- the model CAN see it was
+    // already said, but seeing it is not the same as knowing not to say it again; this line makes
+    // the "don't repeat" behavior explicit instead of assuming it follows from visibility alone.
+    'Within a single answer, never repeat or re-explain a sentence you already wrote earlier in ' +
+      'this same answer -- continue from where you left off instead of restarting the narration. ' +
+      'This applies with equal force when a tool call comes back with zero rows: state that ' +
+      'absence -- and any scope caveat that goes with it (e.g. the index, agent, or time range ' +
+      'you checked) -- exactly ONCE, then move on; do not restate the same "nothing found" ' +
+      'finding a second time later in the answer using different wording, even if it feels like ' +
+      'a natural way to summarize or conclude.',
   ].join('\n');
 }

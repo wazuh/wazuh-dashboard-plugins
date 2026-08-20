@@ -1043,6 +1043,51 @@ test('chatStream: no vendor extras produces a byte-equivalent body (no new keys)
   );
 });
 
+// Issue C4: chat.ts now carries a round's own narration (already streamed to the user) into its
+// own history turn alongside the tool call, instead of discarding it as `content: ''`. This
+// adapter must pass a non-empty `content` straight through next to `tool_calls`, not collapse it
+// to `null` -- the `content: null` case above pins the pre-existing empty-string behavior, this
+// pins the new non-empty one.
+test('chatStream: an assistant message with narration text and tool_calls passes the text through as content', async () => {
+  const config = uniqueVendorExtrasConfig('narration-plus-tool-calls');
+  const { capturedBodies } = await withFakeFetchSequence(
+    [freshSuccessResponse()],
+    () => {
+      const adapter = new OpenAiCompatibleAdapter();
+      const controller = new AbortController();
+      const history: ChatMessage[] = [
+        userMessage('list the agents'),
+        {
+          role: 'assistant',
+          content: 'Let me check that for you.',
+          toolCalls: [
+            { id: 'call-1', name: 'list_agents', arguments: { limit: 5 } },
+          ],
+        },
+        { role: 'tool', toolCallId: 'call-1', content: '{"agents":[]}' },
+      ];
+      return drain(adapter.chatStream(config, history, controller.signal));
+    },
+  );
+  const messages = capturedBodies[0].messages as Array<Record<string, unknown>>;
+  assert.deepEqual(
+    messages[1],
+    {
+      role: 'assistant',
+      content: 'Let me check that for you.',
+      tool_calls: [
+        {
+          id: 'call-1',
+          type: 'function',
+          function: { name: 'list_agents', arguments: '{"limit":5}' },
+        },
+      ],
+    },
+    'a non-empty content string must be passed through verbatim alongside tool_calls, not ' +
+      'collapsed to null',
+  );
+});
+
 test('chatStream: a streamed thought_signature is captured onto the ToolCall', async () => {
   const config = uniqueVendorExtrasConfig('stream-capture');
   const adapter = new OpenAiCompatibleAdapter();

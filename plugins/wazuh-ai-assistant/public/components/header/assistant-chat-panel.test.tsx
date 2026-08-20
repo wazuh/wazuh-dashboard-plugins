@@ -37,6 +37,8 @@ jest.mock('../chat/chat-page', () => {
         onNavigateToSettings: () => void;
         onConversationsChange?: (state: ConversationsSnapshot) => void;
         showConversationSidebar?: boolean;
+        allowRailFlyout?: boolean;
+        enableWelcomeComposer?: boolean;
       },
       ref: React.Ref<unknown>,
     ) {
@@ -50,6 +52,8 @@ jest.mock('../chat/chat-page', () => {
         {
           'data-test-subj': 'chat-page-stub',
           'data-sidebar': String(props.showConversationSidebar),
+          'data-allow-rail-flyout': String(props.allowRailFlyout),
+          'data-welcome-composer': String(props.enableWelcomeComposer),
         },
         mockReact.createElement(
           'button',
@@ -167,6 +171,16 @@ describe('AssistantChatPanel', () => {
     renderPanel();
 
     expect(chatPageStub()).toHaveAttribute('data-sidebar', 'false');
+  });
+
+  it('keeps the composer docked in this panel, with no centred welcome state', () => {
+    // C1 (AI/ux-iter3/gemini-motion-spec.md, "no room for theatre"): the centred greeting +
+    // composer + cards group and its dock-on-first-send transition are a FULL-PAGE affordance.
+    // This sidecar is a narrow column, so it opts out and keeps today's always-docked composer —
+    // a separate decision from `allowRailFlyout` above, hence a separate prop.
+    renderPanel();
+
+    expect(chatPageStub()).toHaveAttribute('data-welcome-composer', 'false');
   });
 
   it('routes the close button through the interrupt gate', () => {

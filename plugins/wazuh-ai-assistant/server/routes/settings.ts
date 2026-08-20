@@ -599,9 +599,16 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       validate: {
         body: schema.object({
           privacyDefaultOn: schema.boolean(),
+          // Optional with a default (not `schema.maybe`, which would make the field
+          // `undefined` and push the empty-object fallback onto every caller): a client that
+          // has no per-provider overrides yet (or predates this field) must not have its whole
+          // save 400 for omitting it. Matches the `{ defaultValue }` idiom used for every other
+          // optional-with-default field in this file/plugin (route-helpers.ts's `page`/
+          // `perPage`, config.ts's `enabled`).
           privacyDefaultPerProvider: schema.recordOf(
             schema.string(),
             schema.boolean(),
+            { defaultValue: {} },
           ),
           userCanOverride: schema.boolean(),
           fieldPolicy: schema.arrayOf(

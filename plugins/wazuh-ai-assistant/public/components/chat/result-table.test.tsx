@@ -164,6 +164,32 @@ describe('ResultTable', () => {
       const card = container.querySelector('.wzResultsCard') as HTMLElement;
       expect(card.style.maxHeight).toBe('');
     });
+
+    it('does not enter the expanded state on its own for a tall transcript, only on a user page-size pick', () => {
+      // A tall transcript (> 900px) bumps the INITIAL page size to 10 (5 -> 10) so a long result
+      // doesn't need instant re-paging — but that alone is not a user action, and used to satisfy
+      // `pageSize > DEFAULT_PAGE_SIZE` on its own, silently switching the card to the 900px
+      // "expanded" ceiling for every long transcript regardless of anything the reader did.
+      const thirtyRows = Array.from({ length: 30 }, (_unused, i) => ({
+        agent: `agent-${i}`,
+      }));
+      const { container } = render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'agent', label: 'Agent' }],
+            rows: thirtyRows,
+          })}
+          transcriptHeightPx={2000}
+        />,
+      );
+      const card = container.querySelector('.wzResultsCard') as HTMLElement;
+      expect(card.classList.contains('wzResultsCard--expanded')).toBe(false);
+      expect(card.style.maxHeight).toBe('460px');
+
+      // Picking 25 explicitly IS a user action, and only then does the card expand.
+      fireEvent.click(screen.getByRole('button', { name: '25' }));
+      expect(card.classList.contains('wzResultsCard--expanded')).toBe(true);
+    });
   });
 
   // The BREAKING bug this whole card rewrite exists for: "page 2 of 6 unreachable without
@@ -224,6 +250,74 @@ describe('ResultTable', () => {
       expect(screen.queryByText('agent-10')).toBeNull();
     });
 
+    // "Card grows" (iteration-4 item 3, F2): picking a page size ABOVE the 5-row default is what
+    // used to be imperceptible — the card stayed height-capped, so 50 rows just added an internal
+    // scrollbar. The approved fix lets the card itself grow past its default cap once the reader
+    // has deliberately asked for more rows than the default shows.
+    it('grows past the default cap once a larger page size is chosen, shrinks back at 5', () => {
+      const { container } = render(<ResultTable spec={thirtyRowSpec()} />);
+      const card = () =>
+        container.querySelector('.wzResultsCard') as HTMLElement;
+
+      expect(card().classList.contains('wzResultsCard--expanded')).toBe(false);
+
+      fireEvent.click(screen.getByRole('button', { name: '10' }));
+      expect(card().classList.contains('wzResultsCard--expanded')).toBe(true);
+
+      fireEvent.click(screen.getByRole('button', { name: '5' }));
+      expect(card().classList.contains('wzResultsCard--expanded')).toBe(false);
+    });
+
+    it('scrolls the card body back to the top on any page-size change', () => {
+      const { container } = render(<ResultTable spec={thirtyRowSpec()} />);
+      const body = container.querySelector('.wzResultsCardBody') as HTMLElement;
+      body.scrollTop = 120;
+      expect(body.scrollTop).toBe(120);
+
+      fireEvent.click(screen.getByRole('button', { name: '10' }));
+
+      expect(body.scrollTop).toBe(0);
+    });
+
+    // Re-pin hook (iteration-4 item 3, part A): the card grows downward when a larger page size is
+    // picked, and it lives inside chat-page.tsx's scrolling transcript pane. That pane only re-pins
+    // to its bottom on a `messages` change, so without this notification the freshly-grown
+    // pagination footer slid behind the composer until the reader scrolled by hand. The callback
+    // fires for a page-SIZE pick only — a plain next/previous-page click never grows the card, so it
+    // must not trigger a re-pin.
+    it('notifies the host on a rows-per-page change so the transcript can re-pin, but not on paging', () => {
+      const onRowsPerPageChange = jest.fn();
+      render(
+        <ResultTable
+          spec={thirtyRowSpec()}
+          onRowsPerPageChange={onRowsPerPageChange}
+        />,
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+      expect(onRowsPerPageChange).not.toHaveBeenCalled();
+
+      fireEvent.click(screen.getByRole('button', { name: '25' }));
+      expect(onRowsPerPageChange).toHaveBeenCalledTimes(1);
+
+      fireEvent.click(screen.getByRole('button', { name: '5' }));
+      expect(onRowsPerPageChange).toHaveBeenCalledTimes(2);
+    });
+
+    it('also scrolls the card body back to the top on a plain next/previous page click', () => {
+      // The reset used to live only in the page-SIZE change handler, so a reader who scrolled
+      // deep into page 1's rows and then clicked "Next page" (no size change at all) landed on
+      // page 2 still scrolled to wherever page 1 left off.
+      const { container } = render(<ResultTable spec={thirtyRowSpec()} />);
+      const body = container.querySelector('.wzResultsCardBody') as HTMLElement;
+      body.scrollTop = 120;
+      expect(body.scrollTop).toBe(120);
+
+      fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+
+      expect(body.scrollTop).toBe(0);
+    });
+
     it('renders no pagination footer when every offered page size already fits the result', () => {
       // A one-row table used to get the full "Rows per page: 5 10 25 50" control plus
       // "Page 1 of 1" — four controls that cannot change anything on screen, since 5 (the smallest
@@ -261,8 +355,17 @@ describe('ResultTable', () => {
     });
 
     it('renders no pagination footer for an empty result set', () => {
+      // Kept, with its premise narrowed: as of C4 (CEO item 6) the CHAT SURFACE never hands this
+      // component a 0-row spec — message-bubble.tsx suppresses the whole card for one and shows a
+      // quiet line instead (covered in message-bubble.test.tsx). This component is still the generic
+      // spec renderer, though, so what it does when a call site hands it one directly stays pinned:
+      // no footer, and — deliberately — no crash and no pagination arithmetic over zero rows
+      // (`pageCount` floors at 1). Nothing here asserts that an empty CARD is a desirable end state.
       const { container } = render(<ResultTable spec={spec({ rows: [] })} />);
       expect(container.querySelector('.wzResultsCardFooter')).toBeNull();
+      // The generic renderer still mounts its card — the suppression decision is the caller's,
+      // one level up, where the turn's prose is known.
+      expect(container.querySelector('.wzResultsCard')).not.toBeNull();
     });
   });
 
@@ -370,6 +473,31 @@ describe('ResultTable', () => {
       );
 
       expect(screen.getByText('Critical')).toBeInTheDocument();
+    });
+
+    it('shapes every severity like the other status chips, keeping the platform fill', () => {
+      // §3.5: the badge was EUI's default 2px-radius rectangle while every other state-carrying chip
+      // in this plugin (the provider status chips) is a round 11px pill — two idioms for one job.
+      // `.wzSeverityChip` (result-table.scss) adopts the SHAPE only; the fill stays the platform's
+      // own UI_COLOR_STATUS hex, which is a cross-product agreement and, unlike an EUI role color,
+      // has no darkened text twin to stay legible over a 12% wash.
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'agent', label: 'Agent' },
+              { id: 'severity', label: 'Severity' },
+            ],
+            rows: [{ agent: 'a', severity: 'critical' }],
+            severityColumn: 'severity',
+          })}
+        />,
+      );
+
+      const badge = screen.getByText('Critical').closest('.euiBadge');
+      expect(badge).toHaveClass('wzSeverityChip');
+      // Still a real fill, not a hollow outline — the guard the palette decision already carries.
+      expect((badge as HTMLElement).style.backgroundColor).not.toBe('');
     });
 
     it('renders the "informational" severity (below low, not one of the 4 badge colors) with its own label', () => {
@@ -587,6 +715,67 @@ describe('ResultTable', () => {
     it('adds no hidden-columns note when the spec has 6 or fewer columns', () => {
       render(<ResultTable spec={spec()} />);
       expect(screen.getByText('Results (1 rows)')).toBeInTheDocument();
+    });
+  });
+
+  describe('column widths (css-audit-full.md §3.4: the free-text column gets the room)', () => {
+    /**
+     * EuiBasicTable lays the table out with `table-layout: fixed`, so a column with no width shares
+     * the remainder evenly with its peers — which the live audit measured as three identical 324px
+     * slabs holding an agent name and a category each, beside a finding title wrapping onto three
+     * lines. Columns whose every value is SHORT now declare a matching short width, leaving the
+     * remainder to the one column that actually needs it. Data-driven, because this renderer is
+     * generic: only the values can say how wide a column should be.
+     *
+     * jsdom computes no layout, so what is asserted is the declared `width` attribute EUI puts on
+     * the `<col>`/`<th>` — i.e. that the renderer classified each column correctly.
+     */
+    const headerWidths = () =>
+      screen
+        .getAllByRole('columnheader')
+        .map(header => (header as HTMLElement).style.width);
+
+    it('gives short-value columns a fixed width and leaves the long one unset', () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'agent', label: 'Agent' },
+              { id: 'title', label: 'Title' },
+            ],
+            rows: [
+              {
+                agent: 'web-01',
+                title:
+                  'Multiple authentication failures followed by a successful login',
+              },
+            ],
+          })}
+        />,
+      );
+
+      const [agentWidth, titleWidth] = headerWidths();
+      expect(agentWidth).toBe('140px');
+      // Unset, so the fixed layout hands it everything the sized columns did not take.
+      expect(titleWidth).toBe('');
+    });
+
+    it('treats a column as long as soon as ONE of its values is long', () => {
+      // Same "the whole column or nothing" rule the timestamp detection uses: a column that is
+      // mostly short but sometimes long must not be capped at a width its longest value overflows.
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'note', label: 'Note' }],
+            rows: [
+              { note: 'short' },
+              { note: 'a value comfortably past the twenty-character budget' },
+            ],
+          })}
+        />,
+      );
+
+      expect(headerWidths()[0]).toBe('');
     });
   });
 

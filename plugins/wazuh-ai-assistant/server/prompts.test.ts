@@ -258,6 +258,49 @@ test('buildSystemPrompt: the deliberate vulnerability-history limitation is NOT 
   );
 });
 
+test('buildSystemPrompt: instructs the model to never name internal tool ids in explanatory prose', () => {
+  // A real answer once wrote "which get_rules (Security Analytics correlation rules) doesn't
+  // index..." -- a raw tool id from CAPABILITY_INVENTORY leaking into the user-visible answer,
+  // inside an EXPLANATION rather than an offer. The model has no other source for these ids
+  // than the catalog clause, so the rule must name at least one example id and require
+  // plain-language description instead, scoped to explanatory/narrative prose so it does not
+  // swallow the pre-existing search_wazuh_data offer instruction (see next test).
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /Never write an internal tool name \(e\.g\. get_rules, search_wazuh_data\) inside an\s+explanation or narrative sentence of your answer text/,
+  );
+  assert.match(prompt, /describe the capability in\s+plain language instead/);
+});
+
+test('buildSystemPrompt: the no-tool-names rule explicitly carves out the search_wazuh_data offer, and the offer instruction still survives verbatim', () => {
+  // Fix for the contradiction flagged in adversarial review: prompts.ts previously told the
+  // model both to offer to query with search_wazuh_data BY NAME (Answer format rule) and to
+  // never write an internal tool name in its answer (added later). If the model obeyed the
+  // newer, more general rule, it would stop naming search_wazuh_data in its offers, which
+  // silently disables findOfferedFollowUpTool's regex-based deferred-offer detector in
+  // routes/chat.ts (it matches on the bare tool name appearing in an offer-shaped sentence).
+  // Both rules must therefore explicitly cross-reference the same carve-out, and the offer
+  // instruction itself must still be present so the detector has something to match.
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  // The pre-existing offer instruction must still order the model to name search_wazuh_data.
+  assert.match(
+    prompt,
+    /say so and offer to query\s+it with search_wazuh_data instead of speculating/,
+  );
+  // The offer instruction must flag itself as the exception to the no-tool-names rule.
+  assert.match(
+    prompt,
+    /is the one permitted exception to the\s+"never write an internal tool name" rule below/,
+  );
+  // The no-tool-names rule must in turn reference that same carve-out by describing the exact
+  // offer sentence, so a future reader cannot read the two rules as contradictory.
+  assert.match(
+    prompt,
+    /The one exception is the follow-up-offer sentence described in the Answer format\s+rule above/,
+  );
+});
+
 test('buildSystemPrompt: still says plainly what it can/cannot check (amended, not contradicted)', () => {
   // The new "never claim a missing capability" line must not silently replace or contradict
   // the pre-existing honesty instruction it was added next to.
@@ -306,4 +349,35 @@ test('buildSystemPrompt: the verbatim-identifier rule does not contradict docume
   );
   assert.match(prompt, /report every row a tool like that actually returns/);
   assert.match(prompt, /not you substituting a different\s+one/);
+});
+
+// Issue C4: within one turn, the orchestration loop (chat.ts's `orchestrate`) can run several
+// tool rounds, and each round's delta text is streamed straight to the client. Without an
+// explicit rule the model re-narrated the same sentences (e.g. the suggest_discover_query
+// handoff's "Let me hand you a Discover query…") on every retry round.
+
+test('buildSystemPrompt: instructs the model not to repeat earlier sentences within the same answer', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /never repeat or re-explain a sentence you already wrote earlier in\s+this same answer/,
+  );
+  assert.match(
+    prompt,
+    /continue from where you left off instead of restarting the narration/,
+  );
+});
+
+// Live-audit finding (item 8a): a T1134 zero-rule answer restated the same "no matching rules
+// found" finding twice, in different wording, elsewhere in the same answer -- the generic
+// no-repeat rule above did not name this specific shape of the mistake explicitly enough to stop
+// it. This asserts the sharpened, zero-result-specific addition stays in the prompt.
+test('buildSystemPrompt: instructs the model to state a zero-row finding once, not restate it later in different wording', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /zero rows/);
+  assert.match(prompt, /state that absence[\s\S]*exactly ONCE/);
+  assert.match(
+    prompt,
+    /do not restate the same "nothing found" finding a second time later in the answer/,
+  );
 });
