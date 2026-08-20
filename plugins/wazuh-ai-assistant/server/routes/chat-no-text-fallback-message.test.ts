@@ -228,3 +228,75 @@ test('noTextFallbackMessage: a bounded "which one?" candidate-list error (which 
   assert.doesNotMatch(message, /HOST_1/);
   assert.doesNotMatch(message, /Candidates:/);
 });
+
+// --- BLOCKER FIX (backlog CV-017 residual, "stale digest after silent mid-turn error"; ported ----
+// --- from deploy commit 872704fd4) -----------------------------------------------------------------
+//
+// CV-017's live shape: an EARLIER, broader call already rendered a real, non-empty table
+// (`sawNonEmptyTable === true`), but the actual LAST call this turn attempted -- a narrower,
+// correctly-scoped follow-up the question needed -- errored silently. Before this fix, the
+// `sawNonEmptyTable === true` branch of `noTextFallbackMessage` only ever returned the bare
+// NO_ANALYSIS_TEXT_MESSAGE/NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE copy ("see the results above"),
+// with no hint that the table on screen does not reflect the question actually asked.
+
+test('noTextFallbackMessage: a table already rendered, but the LAST attempted call errored -> ' +
+  'admits the more specific lookup did not complete instead of silently standing in for it ' +
+  '(CV-017 shape)', () => {
+  const message = noTextFallbackMessage(true, true, false, {
+    name: 'search_wazuh_data',
+    args: { index_pattern: '.opensearch-sap-*-findings' },
+    errorMessage: 'search_phase_execution_exception: some internal detail',
+  });
+  assert.match(
+    message,
+    /no additional analysis/i,
+    'still opens with the base "see the results above" sentence',
+  );
+  assert.match(
+    message,
+    /did not complete/,
+    'and admits the LAST, more specific attempt never completed',
+  );
+  // The raw exception text is never surfaced -- same allowlist-only policy as
+  // `buildNoMatchingResultsMessage`/`classifyToolErrorForFallback` above.
+  assert.doesNotMatch(message, /search_phase_execution_exception/);
+});
+
+test('noTextFallbackMessage: a table already rendered, LAST attempted call errored with a ' +
+  'vetted/classified error -> uses the classified "could not run as asked" phrasing', () => {
+  const message = noTextFallbackMessage(true, true, false, {
+    name: 'get_field_values',
+    args: { field: 'os.platform' },
+    errorMessage:
+      'Parameter "field" ("os.platform") is not one of this tool\'s vetted, bounded-cardinality ' +
+      'fields, so its values cannot be enumerated this way. Closest known fields: host.os.platform.',
+  });
+  assert.match(message, /could not run as asked/);
+  assert.match(message, /Closest known fields: host\.os\.platform/);
+});
+
+test('noTextFallbackMessage: rounds exhausted AND the last attempt errored -> both clauses appear', () => {
+  const message = noTextFallbackMessage(true, true, true, {
+    name: 'search_wazuh_data',
+    args: {},
+    errorMessage: 'some unclassified internal error',
+  });
+  assert.match(message, /tool-round budget/i);
+  assert.match(message, /did not complete/);
+});
+
+test('noTextFallbackMessage: a table already rendered, LAST attempted call succeeded (no ' +
+  'errorMessage) -> no errored-attempt clause is added', () => {
+  const message = noTextFallbackMessage(true, true, false, {
+    name: 'get_critical_findings',
+    args: {},
+  });
+  assert.doesNotMatch(message, /did not complete/);
+  assert.doesNotMatch(message, /could not run/);
+});
+
+test('noTextFallbackMessage: a table already rendered, no lastToolCall on record -> unchanged base ' +
+  'sentence, no errored-attempt clause', () => {
+  const message = noTextFallbackMessage(true, true, false);
+  assert.equal(message, 'No additional analysis — see the results above.');
+});

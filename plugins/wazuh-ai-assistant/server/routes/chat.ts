@@ -363,6 +363,46 @@ function buildNoMatchingResultsMessage(
     filters.length > 0 ? `${domain}, filtered to ${filters.join(', ')}` : domain;
   return `${NO_MATCHING_RESULTS_MESSAGE} (Searched: ${scope}.)`;
 }
+
+/**
+ * BLOCKER FIX (backlog CV-017 residual, "stale digest after silent mid-turn error"; ported from
+ * deploy commit 872704fd4): the NO_ANALYSIS_TEXT_MESSAGE/NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE
+ * copy below (the `sawNonEmptyTable === true` branch of `noTextFallbackMessage`) only ever says
+ * "see the results above" — it has no idea whether the table on screen actually reflects the
+ * question that was asked. CV-017's live shape: an EARLIER, broader call already rendered a
+ * (real, non-empty) table, but the actual LAST call this turn attempted — a narrower, correctly-
+ * scoped follow-up the question needed — errored silently. Without this, the fallback sentence
+ * describes that earlier, broader table as though it were the answer, with no hint that the real,
+ * scoped lookup never completed.
+ *
+ * `lastToolCall.errorMessage` is set ONLY on an error outcome (see `lastAttemptedToolCall`'s
+ * assignment site above), so its mere presence already proves the LAST attempt this turn did not
+ * make it into the table on screen — no extra bookkeeping needed to tell "last attempt errored"
+ * apart from "last attempt succeeded and is already what the table describes".
+ *
+ * Reuses `classifyToolErrorForFallback`'s narrow, vetted allowlist (the same one
+ * `buildNoMatchingResultsMessage` above uses) so this never echoes a raw OpenSearch/Node
+ * exception or a pseudonym into user-facing copy — an unclassified error still gets a truthful,
+ * generic "did not complete" clause rather than staying silent about it. Returns `''` when there
+ * is nothing to add (no last attempt, or it succeeded), so every call site can simply append this
+ * to an existing sentence unconditionally.
+ */
+function describeErroredLastAttempt(
+  lastToolCall:
+    | { name: string; args: Record<string, unknown>; errorMessage?: string }
+    | undefined,
+): string {
+  if (!lastToolCall?.errorMessage) {
+    return '';
+  }
+  const domain = describeToolDomain(lastToolCall.name);
+  const classified = classifyToolErrorForFallback(lastToolCall.errorMessage);
+  return classified
+    ? ` The most recent ${domain} lookup could not run as asked: ${classified}`
+    : ` The most recent, more specific ${domain} lookup attempted did not complete, so the ` +
+        'results above may not fully answer the question as scoped.';
+}
+
 /**
  * Variant of NO_ANALYSIS_TEXT_MESSAGE for a turn that exhausted its tool-round budget (a serial
  * chain deeper than MAX_TOOL_ROUNDS) and still produced no text even after
@@ -464,8 +504,9 @@ export function shouldEnterFinalRoundEarly(
 }
 
 /** Picks which of the three no-text fallbacks above fits a turn that ended without any `delta`
- * text — shared by both `!sawAnyDelta` exit points below (the normal per-round `done` branch and
- * the round-budget-exhausted path) so the same three-way decision lives in exactly one place. */
+ * text — shared by every `!roundSawAnyDelta` exit point below (the normal per-round `done` branch,
+ * the forced-round dead-stream guard, and the round-budget-exhausted path) so the same three-way
+ * decision lives in exactly one place. */
 export function noTextFallbackMessage(
   toolUsedThisTurn: boolean,
   sawNonEmptyTable: boolean,
@@ -485,15 +526,19 @@ export function noTextFallbackMessage(
   if (!sawNonEmptyTable) {
     return buildNoMatchingResultsMessage(lastToolCall);
   }
-  return roundsExhausted
-    ? NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE
-    : NO_ANALYSIS_TEXT_MESSAGE;
+  // CV-017 residual fix: append the honest "last attempt errored" clause (empty string when the
+  // last attempt succeeded, or there was none) — see `describeErroredLastAttempt`'s doc comment.
+  return (
+    (roundsExhausted
+      ? NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE
+      : NO_ANALYSIS_TEXT_MESSAGE) + describeErroredLastAttempt(lastToolCall)
+  );
 }
 
 /** Whitespace-only delta content (e.g. a lone "\n\n" some models emit as priming/formatting
  * right before a tool call) must NOT count as "the model produced an answer" — otherwise the
- * `sawAnyDelta` guard above never fires for exactly the turns it exists to catch. Still forwarded
- * to the client as a normal delta either way; this only affects the tracking flag. */
+ * `roundSawAnyDelta` guard above never fires for exactly the turns it exists to catch. Still
+ * forwarded to the client as a normal delta either way; this only affects the tracking flag. */
 function hasMeaningfulText(content: string): boolean {
   return content.trim().length > 0;
 }
@@ -1384,15 +1429,27 @@ export async function* orchestrate(
   let lastAttemptedToolCall:
     | { name: string; args: Record<string, unknown>; errorMessage?: string }
     | undefined;
-  // Whole-turn guards (not per-round, unlike `sawToolCall` below which resets every round): true
-  // once ANY delta text / tool call has happened THIS TURN, across every round — see
+  // True once ANY delta text has happened in the CURRENT round -- see
   // NO_ANALYSIS_TEXT_MESSAGE/NO_MATCHING_RESULTS_MESSAGE/NO_ANSWER_MESSAGE above. `toolUsedThisTurn`
-  // now only picks WHICH fallback copy fits (tables-oriented vs. the generic one) — every no-text
-  // ending gets *some* fallback text; see the `!sawAnyDelta` branches below. It no longer gates
+  // picks WHICH fallback copy fits (tables-oriented vs. the generic one) — every no-text ending
+  // gets *some* fallback text; see the `!roundSawAnyDelta` branches below. It no longer gates
   // whether a fallback fires at all: a plain no-tool conversational turn that ends with no text is
   // exactly the case a `general`-routed reasoning-only stream produces (issue
   // 02-read-reasoning-delta.md), and it deserves a sentence, not a silently empty bubble.
-  let sawAnyDelta = false;
+  //
+  // BLOCKER FIX (backlog CV-039 residual, "sweep ends without closing text"; ported from deploy
+  // commit 872704fd4): this used to be a WHOLE-TURN flag (`sawAnyDelta`, set once and never
+  // cleared) instead of a round-scoped one. A multi-kind inventory sweep routinely narrates once
+  // early ("I checked the agent list... let me pull that data") and then spends every remaining
+  // round on back-to-back tool_calls with no further text, so by the time the round budget closes
+  // mid-sweep the whole-turn flag was already permanently `true` from that first round and its
+  // `!sawAnyDelta` guards never fired for the round that actually ends the turn -- exactly the gap
+  // the comment above describes wanting ("every no-text ending gets *some* fallback text") but a
+  // whole-turn flag cannot deliver, since it never forgets an earlier round's text. Declared here
+  // (outside the round loop) but reset to `false` at the TOP of every loop iteration (not
+  // re-`let`-declared inside the loop body) so it still holds the LAST round's value once the loop
+  // exits, for the post-loop round-budget-exhaustion check.
+  let roundSawAnyDelta = false;
   let toolUsedThisTurn = false;
   // Bounds the suggest_discover_query self-correction loop to ONE retry per turn (issue #8920 item
   // 9): the first `unknown_fields` resolution this turn is returned as a tool error instead of a
@@ -1564,7 +1621,7 @@ export async function* orchestrate(
     // outstanding request, so "I already presented the data, nothing to add" is a rational
     // completion rather than a malfunction, and the turn ends with no text at all: measured on
     // openai/gpt-oss-120b over a 40-question analyst-persona bank, 6/40 turns ended on the
-    // `!sawAnyDelta` fallback below, every one with the same 4-tool-call signature (the 3
+    // `!roundSawAnyDelta` fallback below, every one with the same 4-tool-call signature (the 3
     // tool-bearing rounds this budget allows plus stage 1's own forced `route_question`), and 4 of
     // those 6 had already rendered a NON-EMPTY table — a non-answer sitting directly above real
     // data the user asked to have interpreted.
@@ -1613,6 +1670,9 @@ export async function* orchestrate(
 
     let sawToolCall = false;
     let ended = false;
+    // Reset every round -- see `roundSawAnyDelta`'s declaration above the loop for why this is a
+    // reset (not a fresh `let`): it must still hold this iteration's value once the loop exits.
+    roundSawAnyDelta = false;
     // Deferred-offer interception, per-round state (issue #8935 item I3): `roundText` is every
     // delta this round actually yielded to the client (main deltas plus both trailing-buffer
     // flushes), reset fresh each round so a PRIOR round's text can never be mistaken for THIS
@@ -1661,7 +1721,7 @@ export async function* orchestrate(
         }
         if (content) {
           if (hasMeaningfulText(content)) {
-            sawAnyDelta = true;
+            roundSawAnyDelta = true;
           }
           roundText += content;
           yield { type: 'delta', content };
@@ -1680,7 +1740,7 @@ export async function* orchestrate(
           const trailing = drainRoundBuffers();
           if (trailing) {
             if (hasMeaningfulText(trailing)) {
-              sawAnyDelta = true;
+              roundSawAnyDelta = true;
             }
             roundText += trailing;
             yield { type: 'delta', content: trailing };
@@ -1989,7 +2049,7 @@ export async function* orchestrate(
           const trailing = drainRoundBuffers();
           if (trailing) {
             if (hasMeaningfulText(trailing)) {
-              sawAnyDelta = true;
+              roundSawAnyDelta = true;
             }
             roundText += trailing;
             yield { type: 'delta', content: trailing };
@@ -2067,7 +2127,7 @@ export async function* orchestrate(
         // any text at all — see NO_ANALYSIS_TEXT_MESSAGE/NO_ANSWER_MESSAGE's doc comments. Which
         // copy fits depends on whether a tool ran earlier this turn; if none did, there is no
         // table and no query to reference, so NO_ANSWER_MESSAGE is used instead.
-        if (!sawAnyDelta) {
+        if (!roundSawAnyDelta) {
           yield {
             type: 'delta',
             content: noTextFallbackMessage(
@@ -2134,7 +2194,7 @@ export async function* orchestrate(
         // suppressed -- returning bare here would close the SSE stream with no terminating frame,
         // strictly worse than base. Emit the clean termination the suppressed 'done' owed the
         // client (same policy as the forced-round 'error' branch above).
-        if (!sawAnyDelta) {
+        if (!roundSawAnyDelta) {
           yield {
             type: 'delta',
             content: noTextFallbackMessage(
@@ -2170,7 +2230,7 @@ export async function* orchestrate(
   // above; close the SSE stream rather than hang the client. Same widened no-text guard as the
   // main 'done' branch above — a model that never produced text deserves a written answer, not a
   // bare done, regardless of whether a tool ran.
-  if (!sawAnyDelta) {
+  if (!roundSawAnyDelta) {
     yield {
       type: 'delta',
       content: noTextFallbackMessage(
