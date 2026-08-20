@@ -133,3 +133,40 @@ test('noTextFallbackMessage: omitting lastToolCall (no attempt on record) falls 
   const message = noTextFallbackMessage(true, false, false);
   assert.equal(message, 'No matching results were found for that query.');
 });
+
+// --- BLOCKER FIX (empty-answer audit, 2026-08-20, CV-033/CV-066): an errored/rejected call gets --
+// --- its own specific error text surfaced, never the generic "no matching results" sentence -----
+
+test('noTextFallbackMessage: an errored call (unknown field, invalid pairing, ...) surfaces its ' +
+  'own error text instead of the generic "no matching results" sentence', () => {
+  const message = noTextFallbackMessage(true, false, false, {
+    name: 'get_field_values',
+    args: { field: 'os.platform' },
+    errorMessage:
+      'Parameter "field" ("os.platform") is not one of this tool\'s vetted, bounded-cardinality ' +
+      'fields, so its values cannot be enumerated this way. Closest known fields: host.os.platform.',
+  });
+  assert.doesNotMatch(message, /No matching results were found/);
+  assert.match(message, /field values/);
+  assert.match(message, /Closest known fields: host\.os\.platform/);
+});
+
+test('noTextFallbackMessage: a genuinely empty successful call (no errorMessage) still uses the ' +
+  'plain "no matching results" copy -- the error branch does not swallow the ordinary case', () => {
+  const message = noTextFallbackMessage(true, false, false, {
+    name: 'get_field_values',
+    args: { field: 'event.category' },
+  });
+  assert.match(message, /No matching results were found/);
+});
+
+test('noTextFallbackMessage: an overlong error message is truncated with an ellipsis, never dumped ' +
+  'verbatim into user-facing copy', () => {
+  const message = noTextFallbackMessage(true, false, false, {
+    name: 'get_field_values',
+    args: { field: 'bogus' },
+    errorMessage: 'x'.repeat(500),
+  });
+  assert.ok(message.length < 500);
+  assert.match(message, /…/);
+});

@@ -83,6 +83,16 @@ export const FIELD_LOCATIONS: Record<string, FieldLocation[]> = {
   [WAZUH_FIELD.RULE_MITRE_TECHNIQUE_NAME]: [FINDINGS],
   [WAZUH_FIELD.RULE_MITRE_TACTIC_NAME]: [FINDINGS],
   [WAZUH_FIELD.INTEGRATION_CATEGORY]: [FINDINGS, EVENTS],
+  // BLOCKER FIX (empty-answer audit, 2026-08-20, CV-033): `event.category` was added to
+  // `guardrails.ts`'s `AGG_FIELD_ALLOWLIST` (it is events-v5's own finite category taxonomy --
+  // 11 values over 258k live docs, verified) but had NO entry here, so `isAggAllowedField` passed
+  // while `FIELD_LOCATIONS[field] === undefined` still failed the same guard clause -- the call
+  // could only ever hit the "not one of this tool's vetted fields" error branch, an INCORRECT
+  // message for a field that genuinely is allowlisted, and a wasted round trip for the model.
+  // `event.outcome` is added alongside it for the same reason (success/failure/unknown, same
+  // finite-enum class) and the same events-v5 surface.
+  'event.category': [EVENTS],
+  'event.outcome': [EVENTS],
   [WAZUH_FIELD.AGENT_ID]: [FINDINGS, EVENTS, VULNERABILITIES, SCA],
   [WAZUH_FIELD.AGENT_NAME]: [FINDINGS, EVENTS, VULNERABILITIES, SCA],
   'vulnerability.severity': [VULNERABILITIES],

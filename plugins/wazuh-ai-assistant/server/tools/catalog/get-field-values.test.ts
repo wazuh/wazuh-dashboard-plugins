@@ -33,6 +33,21 @@ test('get_field_values: defaults to the field\'s first known surface with a boun
   assert.equal(request.body.size, 0);
 });
 
+test('get_field_values: event.category resolves to the events surface (CV-033 fix -- was ' +
+  'previously absent from FIELD_LOCATIONS despite being agg-allowlisted)', () => {
+  const request = build({ field: 'event.category' });
+  assert.equal(request.index, 'wazuh-events-v5*');
+  assert.deepEqual(
+    (request.body.aggs as { values: { terms: Record<string, unknown> } }).values.terms,
+    { field: 'event.category', size: 50 },
+  );
+});
+
+test('get_field_values: event.outcome resolves to the events surface (same fix, same reason)', () => {
+  const request = build({ field: 'event.outcome' });
+  assert.equal(request.index, 'wazuh-events-v5*');
+});
+
 test('get_field_values: a time-based family (findings/events) gets a bounded @timestamp range', () => {
   const request = build({
     field: 'wazuh.rule.level',
