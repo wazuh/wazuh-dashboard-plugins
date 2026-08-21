@@ -742,7 +742,7 @@ describe('ResultTable', () => {
       );
       expect(
         await screen.findByRole('link', {
-          name: 'Open in Discover (last 24h)',
+          name: 'Open in Discover (default range: 24h)',
         }),
       ).toHaveAttribute('href', 'https://example.test/discover');
     });

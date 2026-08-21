@@ -401,11 +401,12 @@ const ProvenanceChip: React.FC<{ chip: ResultTableProvenanceChip }> = ({
   // handler is attached to a div wrapping the WHOLE `<EuiPopover>` — button and panel both — so it
   // catches Escape regardless of which of the two currently has focus; React's synthetic events
   // bubble along the COMPONENT tree, which reaches here even though EUI portals the panel
-  // elsewhere in the DOM. `stopPropagation` on close is deliberate: an assistant popover living
-  // inside a docked sidecar/flyout must not let the same Escape keystroke also dismiss that
-  // enclosing surface (issue #9008 review, major 6).
+  // elsewhere in the DOM. `stopPropagation` fires ONLY while `isOpen` — issue #9008 review,
+  // major 4: an unguarded `stopPropagation` swallowed every Escape this chip ever saw, even one
+  // meant for an enclosing surface (a docked sidecar/flyout) while the popover was already
+  // closed. Closed, this handler does nothing at all, exactly like having no handler here.
   const closeOnEscape = (event: React.KeyboardEvent) => {
-    if (event.key === 'Escape') {
+    if (event.key === 'Escape' && isOpen) {
       event.stopPropagation();
       setIsOpen(false);
     }
