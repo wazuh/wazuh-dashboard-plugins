@@ -3385,24 +3385,20 @@ describe('ChatPage — admin privacy policy applies without a reload', () => {
 describe('conversation rail: rename, bulk delete, and delete toasts (#9010)', () => {
   it('B1 REGRESSION: a rename survives the very next auto-save, with no spurious 409/merge', async () => {
     // Before the fix, EVERY auto-save (this PUT included) resent a freshly recomputed
-    // `buildConversationTitle` -- so the second turn's save below would have silently reverted
-    // the rename back to the auto-generated title, AND -- because the rename's own write moved
-    // the document's version on without chat-page.tsx ever learning about it -- this PUT's stale
-    // `expectedVersion` would have 409'd, triggering an unnecessary merge round-trip (and, on a
-    // conversation that really was open in only one tab, a FALSE "merged from another tab"
-    // notice). Asserting both `update`'s own arguments (no title in the call, the fresh
-    // post-rename version) and that `get`/`update` never had to react to a conflict is what
-    // catches either half of the regression coming back.
+    // `buildConversationTitle` -- so the answer-complete save below (a turn saves twice: once
+    // when the question is sent -- the POST that creates the row -- and once more when the
+    // answer finishes, a PUT) would have silently reverted the rename back to the auto-generated
+    // title, AND -- because the rename's own write moved the document's version on without
+    // chat-page.tsx ever learning about it -- this PUT's stale `expectedVersion` would have
+    // 409'd, triggering an unnecessary merge round-trip (and, on a conversation that really was
+    // open in only one tab, a FALSE "merged from another tab" notice). Asserting both `update`'s
+    // own arguments (no title in the call, the fresh post-rename version) and that `get`/`update`
+    // never had to react to a conflict is what catches either half of the regression coming back.
     const handleRef = React.createRef<ChatPageHandle>();
-    const firstStream = createControllableStream();
-    const secondStream = createControllableStream();
-    mockStreamChat
-      .mockImplementationOnce((_providerId, _messages, signal: AbortSignal) =>
-        firstStream.generate(signal),
-      )
-      .mockImplementationOnce((_providerId, _messages, signal: AbortSignal) =>
-        secondStream.generate(signal),
-      );
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementationOnce(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
 
     renderChatPage({}, handleRef);
     await waitFor(() =>
@@ -3426,7 +3422,7 @@ describe('conversation rail: rename, bulk delete, and delete toasts (#9010)', ()
     await act(async () => {
       handleRef.current?.renameConversation('conv-new', 'My custom title');
       // Flushes the rename's own promise chain (await conversationsService.rename(...)) so
-      // `conversationVersionRef` is updated before the second turn below reads it.
+      // `conversationVersionRef` is updated before the answer-complete save below reads it.
       await Promise.resolve();
       await Promise.resolve();
     });
@@ -3437,7 +3433,13 @@ describe('conversation rail: rename, bulk delete, and delete toasts (#9010)', ()
       ),
     );
 
-    await sendMessage('second question');
+    // Finish the turn: this is the SECOND save (the first was the pre-send POST above), the one
+    // the fix is actually about -- an existing conversation's every save from here on is a PUT.
+    await act(async () => {
+      stream.push({ type: 'delta', content: 'an answer' });
+      stream.end();
+      await Promise.resolve();
+    });
     await waitFor(() =>
       expect(mockConversationsService.update).toHaveBeenCalledTimes(1),
     );

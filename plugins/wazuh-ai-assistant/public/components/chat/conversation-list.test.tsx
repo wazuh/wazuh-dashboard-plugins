@@ -643,7 +643,9 @@ describe('ConversationList', () => {
       });
       const wrapper = pencil.closest('[style]') as HTMLElement;
       expect(wrapper.style.width).toBe('0px');
-      expect(wrapper.style.minWidth).toBe('0px');
+      // jsdom's CSSStyleDeclaration normalizes a zero `min-width` without a unit (unlike `width`
+      // above) -- both represent the same "collapsed to nothing" value.
+      expect(wrapper.style.minWidth).toBe('0');
       expect(wrapper.style.opacity).toBe('0');
 
       fireEvent.mouseEnter(pencil.closest('.wzConvoRow') as HTMLElement);
