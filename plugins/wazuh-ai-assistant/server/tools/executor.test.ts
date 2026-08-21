@@ -118,6 +118,121 @@ test('executeToolCall: privacy off leaves get_agent_inventory digest completely 
   assert.equal(digest.samples[0]['package.version'], '3.118ubuntu5');
 });
 
+// --- Issue #9008 rework: `TableSpec.provenance` must carry only FACTS the executor actually
+// observed -- never a client-invented default, and never attributed to the wrong call. These
+// exercise the real `executeToolCall` -> `executeIndexerRequest`/`executeManagerRequest` wiring,
+// not a helper that could quietly omit a field. ---------------------------------------------------
+
+/** Minimal Manager-API context stub: `resolveApiHostId` (api-host.ts) needs
+ * `context.wazuh_core.manageHosts.get()` (no cookie on `request.headers`, so it always takes the
+ * first-configured-host fallback) and `context.wazuh_core.api.client.asCurrentUser.request` for
+ * the call itself. */
+function fakeManagerContext(affectedItems: Array<Record<string, unknown>>): ExecContext {
+  return {
+    wazuh_core: {
+      manageHosts: { get: () => Promise.resolve([{ id: 'default' }]) },
+      api: {
+        client: {
+          asCurrentUser: {
+            request: () =>
+              Promise.resolve({
+                data: {
+                  data: {
+                    affected_items: affectedItems,
+                    total_affected_items: affectedItems.length,
+                  },
+                },
+              }),
+          },
+        },
+      },
+    },
+  } as unknown as ExecContext;
+}
+const fakeManagerRequest = { headers: {} } as unknown as ExecRequest;
+
+test('executeToolCall: get_agent_inventory (no time-range concept) records no requestedRange/effectiveRange, and is not clamped', async () => {
+  // Blocker 1: 18 catalog tools carry no time_range_gte/lte parameter at all -- their DSL never
+  // has a range clause, so provenance must report NOTHING about a window, never a fabricated
+  // "now-90d" default.
+  const context = fakeSearchContext([{ package: { name: 'adduser' } }]);
+  const outcome = await executeToolCall(
+    {
+      id: 'call-1',
+      name: 'get_agent_inventory',
+      arguments: { agent_id: '001', kind: 'packages' },
+    },
+    context,
+    fakeRequest,
+    undefined,
+  );
+  const provenance = outcome.tableEvent?.spec.provenance;
+  assert.ok(provenance, 'expected a provenance object on the table event');
+  assert.equal(provenance?.index, 'wazuh-states-inventory-packages*');
+  assert.equal(provenance?.requestedRange, undefined);
+  assert.equal(provenance?.effectiveRange, undefined);
+  assert.equal(provenance?.clamped, false);
+});
+
+test('executeToolCall: get_critical_findings within the 90-day cap records matching, unclamped ranges', async () => {
+  const context = fakeSearchContext([{ 'wazuh.rule.level': 'critical' }]);
+  const outcome = await executeToolCall(
+    {
+      id: 'call-1',
+      name: 'get_critical_findings',
+      arguments: { time_range_gte: 'now-7d' },
+    },
+    context,
+    fakeRequest,
+    undefined,
+  );
+  const provenance = outcome.tableEvent?.spec.provenance;
+  assert.ok(provenance);
+  assert.equal(provenance?.clamped, false);
+  assert.deepEqual(provenance?.requestedRange, { gte: 'now-7d', lte: 'now' });
+  assert.deepEqual(provenance?.effectiveRange, { gte: 'now-7d', lte: 'now' });
+});
+
+test('executeToolCall: get_critical_findings past the 90-day cap is clamped, and provenance records BOTH windows', async () => {
+  // Blocker 1 fixture note: "now-2y" is not a value the server's own `validateTimeBound`
+  // (catalog/common.ts) ever accepts for a typed tool's time_range_gte -- only "now-N[dhm]" or
+  // ISO-8601. "now-720d" (≈2 years) is the reachable equivalent.
+  const context = fakeSearchContext([{ 'wazuh.rule.level': 'critical' }]);
+  const outcome = await executeToolCall(
+    {
+      id: 'call-1',
+      name: 'get_critical_findings',
+      arguments: { time_range_gte: 'now-720d' },
+    },
+    context,
+    fakeRequest,
+    undefined,
+  );
+  const provenance = outcome.tableEvent?.spec.provenance;
+  assert.ok(provenance);
+  assert.equal(provenance?.clamped, true);
+  assert.deepEqual(provenance?.requestedRange, { gte: 'now-720d', lte: 'now' });
+  // The clamped effective window is rewritten to absolute ISO bounds spanning EXACTLY 90 days
+  // (guardrails.ts's `clampLookbackWindow`/`MAX_LOOKBACK_MS`) -- never the requested one.
+  const effective = provenance?.effectiveRange;
+  assert.ok(effective);
+  const spanMs = Date.parse(effective!.lte) - Date.parse(effective!.gte);
+  assert.equal(spanMs, 90 * 24 * 60 * 60 * 1000);
+});
+
+test('executeToolCall: a Manager-API table carries no provenance at all (no index/DSL concept)', async () => {
+  const context = fakeManagerContext([{ id: '001', name: 'agent-1' }]);
+  const outcome = await executeToolCall(
+    { id: 'call-1', name: 'get_agents', arguments: {} },
+    context,
+    fakeManagerRequest,
+    undefined,
+  );
+  assert.equal(outcome.tableEvent?.spec.provenance, undefined);
+  // Sanity: this really did go through the Manager-API success path, not a swallowed error.
+  assert.equal(outcome.tableEvent?.spec.rows.length, 1);
+});
+
 test('executeToolCall: unlisted-field fail-closed tracks failClosedFieldPolicy, not deriveColumns (decoupling proof)', async () => {
   // Flips ONLY `failClosedFieldPolicy` on the real, registered get_agent_inventory tool --
   // `deriveColumns` stays `true` throughout. If the executor still keyed off `deriveColumns` (the

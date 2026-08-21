@@ -238,6 +238,29 @@ export const tableSpecSchema = schema.object({
       url: schema.string({ maxLength: MAX_TABLE_LABEL_LENGTH }),
     }),
   ),
+  /** Issue #9008 rework -- `common/types.ts`'s `TableSpec.provenance`: server-recorded index/
+   * time-range FACTS for the evidence popover. A range bound is free-form date-math or ISO-8601
+   * (see server/tools/catalog/common.ts's `timeRangeProperties`), hence `schema.string()` rather
+   * than a stricter format. */
+  provenance: schema.maybe(
+    schema.object({
+      toolCallId: schema.maybe(schema.string()),
+      index: schema.maybe(schema.string({ maxLength: MAX_TABLE_LABEL_LENGTH })),
+      requestedRange: schema.maybe(
+        schema.object({
+          gte: schema.string({ maxLength: MAX_TABLE_LABEL_LENGTH }),
+          lte: schema.string({ maxLength: MAX_TABLE_LABEL_LENGTH }),
+        }),
+      ),
+      effectiveRange: schema.maybe(
+        schema.object({
+          gte: schema.string({ maxLength: MAX_TABLE_LABEL_LENGTH }),
+          lte: schema.string({ maxLength: MAX_TABLE_LABEL_LENGTH }),
+        }),
+      ),
+      clamped: schema.boolean(),
+    }),
+  ),
 });
 
 /** Mirrors server/routes/chat.ts's inline `messages` body schema (role/content/toolCalls/
