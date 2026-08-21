@@ -297,7 +297,7 @@ describe('MessageBubble', () => {
         />,
       );
 
-      expect(screen.getByText('Results (1 rows)')).toBeInTheDocument();
+      expect(screen.getByText('Results (1 row)')).toBeInTheDocument();
       expect(screen.getByText('web-01')).toBeInTheDocument();
       expect(screen.queryByText('The query returned no rows.')).toBeNull();
     });
@@ -547,7 +547,7 @@ describe('MessageBubble', () => {
       );
 
       const bubbleItem = screen
-        .getByText('Results (1 rows)')
+        .getByText('Results (1 row)')
         .closest('.euiFlexItem') as HTMLElement;
       // Breaking out means declining the 68ch prose measure and filling whatever the ROW allows —
       // which is now the shared content column ($wzContentMaxWidth), still wider than the prose. The

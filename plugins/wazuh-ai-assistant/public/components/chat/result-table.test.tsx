@@ -758,7 +758,11 @@ describe('ResultTable', () => {
   // explicit `tableCaption` always states the total, with proper ICU pluralization, and adds the
   // page position only when the result actually spans more than one page.
   describe('accessible caption states the total, not the page slice (A1/A2)', () => {
-    it('uses a correctly-pluralized singular caption for one row, matching the visible header', () => {
+    // EuiBasicTable renders its `tableCaption` inside an `EuiDelayRender` (to avoid a flash for a
+    // caption that never becomes visible on screen), so the `<caption>` element is present but
+    // EMPTY on the very first render and only gets its text a tick later — hence `findByText`
+    // (async) rather than a synchronous `getByText` for every assertion in this block.
+    it('uses a correctly-pluralized singular caption for one row, matching the visible header', async () => {
       render(
         <ResultTable
           spec={spec({
@@ -769,11 +773,11 @@ describe('ResultTable', () => {
       );
       expect(screen.getByText('Results (1 row)')).toBeInTheDocument();
       expect(
-        screen.getByText('This table contains 1 row.'),
+        await screen.findByText('This table contains 1 row.'),
       ).toBeInTheDocument();
     });
 
-    it('states the TOTAL (not the page slice) when the result fits on one page', () => {
+    it('states the TOTAL (not the page slice) when the result fits on one page', async () => {
       const sixRows = Array.from({ length: 6 }, (_unused, i) => ({
         agent: `agent-${i}`,
       }));
@@ -787,11 +791,11 @@ describe('ResultTable', () => {
       );
       expect(screen.getByText('Results (6 rows)')).toBeInTheDocument();
       expect(
-        screen.getByText('This table contains 6 rows.'),
+        await screen.findByText('This table contains 6 rows.'),
       ).toBeInTheDocument();
     });
 
-    it('adds the total plus the current page position once the result actually paginates', () => {
+    it('adds the total plus the current page position once the result actually paginates', async () => {
       const elevenRows = Array.from({ length: 11 }, (_unused, i) => ({
         agent: `agent-${i}`,
       }));
@@ -804,7 +808,7 @@ describe('ResultTable', () => {
         />,
       );
       expect(
-        screen.getByText(
+        await screen.findByText(
           'This table contains 11 rows. Showing rows 1-10, page 1 of 2.',
         ),
       ).toBeInTheDocument();
@@ -812,7 +816,7 @@ describe('ResultTable', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
 
       expect(
-        screen.getByText(
+        await screen.findByText(
           'This table contains 11 rows. Showing rows 11-11, page 2 of 2.',
         ),
       ).toBeInTheDocument();
