@@ -18,6 +18,7 @@ import {
   useFindingsOverview,
   useVulnerabilityOverview,
 } from '../../hooks/use-overview-data';
+import { CARD_MIN_WIDTH } from '../../lib/constants';
 import {
   getMitreIntelligenceResourceUrl,
   getMitreUrl,
@@ -44,7 +45,7 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
         description='Hunt for threats, map activity to MITRE ATT&CK, and detect known vulnerabilities.'
       />
       <EuiFlexGroup wrap responsive={false}>
-        <EuiFlexItem>
+        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status={findings.status}
             errorLabel={findings.error?.message}
@@ -52,11 +53,8 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
               findings.error?.kind === 'index-pattern-missing'
             }
             isPermissionDenied={findings.error?.kind === 'permission-denied'}
-            title={
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={getMitreUrl()}>MITRE ATT&amp;CK</EuiLink>
-              </RedirectAppLinks>
-            }
+            title='MITRE ATT&CK'
+            titleLink={{ href: getMitreUrl() }}
             caption='Last 24 hours'
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-techniques'
@@ -84,7 +82,7 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
             )}
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem>
+        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status={findings.status}
             errorLabel={findings.error?.message}
@@ -92,11 +90,8 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
               findings.error?.kind === 'index-pattern-missing'
             }
             isPermissionDenied={findings.error?.kind === 'permission-denied'}
-            title={
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={getThreatHuntingUrl()}>Threat Hunting</EuiLink>
-              </RedirectAppLinks>
-            }
+            title='Threat Hunting'
+            titleLink={{ href: getThreatHuntingUrl() }}
             caption='Last 24 hours'
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-threat-hunting-findings'
@@ -127,7 +122,7 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
             )}
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem>
+        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status={vulnerabilities.status}
             errorLabel={vulnerabilities.error?.message}
@@ -137,13 +132,8 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
             isPermissionDenied={
               vulnerabilities.error?.kind === 'permission-denied'
             }
-            title={
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={getVulnerabilityDetectionUrl()}>
-                  Vulnerability Detection
-                </EuiLink>
-              </RedirectAppLinks>
-            }
+            title='Vulnerability Detection'
+            titleLink={{ href: getVulnerabilityDetectionUrl() }}
             caption='Current state'
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-vulnerabilities'

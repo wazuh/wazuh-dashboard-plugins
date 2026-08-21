@@ -18,6 +18,7 @@ import {
 } from './regulatory-compliance-badges';
 import { TopNetworkServicesTable } from '../overview/top-network-services-table';
 import { useInViewport } from '../../../../hooks';
+import { CARD_MIN_WIDTH } from '../../lib/constants';
 import {
   useActiveResponseOverview,
   useItHygieneOperatingSystemsCount,
@@ -59,14 +60,11 @@ const SecurityOperationsSectionComponent: React.FC<
         description='Fleet inventory scale, automated response activity, and the regulatory frameworks you can jump to.'
       />
       <EuiFlexGroup wrap responsive={false}>
-        <EuiFlexItem>
+        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status='available'
-            title={
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={getItHygieneUrl()}>IT Hygiene</EuiLink>
-              </RedirectAppLinks>
-            }
+            title='IT Hygiene'
+            titleLink={{ href: getItHygieneUrl() }}
             caption='Current state'
             centerBody
             data-test-subj='home-overview-it-hygiene'
@@ -79,7 +77,7 @@ const SecurityOperationsSectionComponent: React.FC<
             />
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem>
+        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status={activeResponse.status}
             errorLabel={activeResponse.error?.message}
@@ -89,13 +87,8 @@ const SecurityOperationsSectionComponent: React.FC<
             isPermissionDenied={
               activeResponse.error?.kind === 'permission-denied'
             }
-            title={
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={getActiveResponseUrl()}>
-                  Incident Response
-                </EuiLink>
-              </RedirectAppLinks>
-            }
+            title='Incident Response'
+            titleLink={{ href: getActiveResponseUrl() }}
             caption='Last 24 hours'
             centerBody
             data-test-subj='home-overview-active-response'
@@ -120,16 +113,11 @@ const SecurityOperationsSectionComponent: React.FC<
             />
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem style={{ minWidth: 'min(640px, 100%)' }}>
+        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status='available'
-            title={
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={getRegulatoryComplianceUrlHome()}>
-                  Regulatory Compliance
-                </EuiLink>
-              </RedirectAppLinks>
-            }
+            title='Regulatory Compliance'
+            titleLink={{ href: getRegulatoryComplianceUrlHome() }}
             caption='Controls implicated, last 24 hours'
             centerBody
             data-test-subj='home-overview-regulatory-compliance'
@@ -141,8 +129,8 @@ const SecurityOperationsSectionComponent: React.FC<
 
       <EuiSpacer size='m' />
 
-      <EuiFlexGroup>
-        <EuiFlexItem>
+      <EuiFlexGroup wrap responsive={false}>
+        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status={topOs.status}
             errorLabel={topOs.error?.message}
@@ -152,7 +140,7 @@ const SecurityOperationsSectionComponent: React.FC<
             isPermissionDenied={topOs.error?.kind === 'permission-denied'}
             title='Top 5 operating systems'
             caption='Current state'
-            headerLink={{ label: 'IT Hygiene', href: getItHygieneUrl() }}
+            titleLink={{ href: getItHygieneUrl(), destination: 'IT Hygiene' }}
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
             centerBody
             data-test-subj='home-overview-top-os'
@@ -172,7 +160,7 @@ const SecurityOperationsSectionComponent: React.FC<
             )}
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem>
+        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status={topServices.status}
             errorLabel={topServices.error?.message}
@@ -182,7 +170,7 @@ const SecurityOperationsSectionComponent: React.FC<
             isPermissionDenied={topServices.error?.kind === 'permission-denied'}
             title='Top 5 network services'
             caption='Current state'
-            headerLink={{ label: 'IT Hygiene', href: getItHygieneUrl() }}
+            titleLink={{ href: getItHygieneUrl(), destination: 'IT Hygiene' }}
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
             data-test-subj='home-overview-top-network-services'
           >

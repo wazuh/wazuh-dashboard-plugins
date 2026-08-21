@@ -22,6 +22,7 @@ import {
   getDiscoverFindingsBySeverityUrl,
 } from '../../utils/navigation';
 import { FINDING_SEVERITY_FIELD } from '../../lib/fields';
+import { CARD_MIN_WIDTH } from '../../lib/constants';
 import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
 
 export interface OverviewSectionProps {
@@ -36,14 +37,14 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
 
   return (
     <div>
-      <EuiFlexGroup>
-        <EuiFlexItem style={{ minWidth: 0 }}>
+      <EuiFlexGroup wrap responsive={false}>
+        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status={agents.status}
             errorLabel={agents.error?.message}
             isPermissionDenied={agents.error?.kind === 'permission-denied'}
             title='Agents by status'
-            headerLink={{ label: 'Agents', href: getAgentsUrl() }}
+            titleLink={{ href: getAgentsUrl(), destination: 'Agents' }}
             centerBody
             data-test-subj='home-overview-agents'
           >
@@ -56,16 +57,16 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             )}
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem style={{ minWidth: 0 }}>
+        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status={findings.status}
             errorLabel={findings.error?.message}
             isPermissionDenied={findings.error?.kind === 'permission-denied'}
             title='Findings'
             caption='Last 24 hours'
-            headerLink={{
-              label: 'Threat Hunting',
+            titleLink={{
               href: getThreatHuntingUrl(),
+              destination: 'Threat Hunting',
             }}
             centerBody
             data-test-subj='home-overview-findings-severity'
@@ -101,7 +102,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             isPermissionDenied={findings.error?.kind === 'permission-denied'}
             title='MITRE ATT&CK top tactics'
             caption='Last 24 hours'
-            headerLink={{ label: 'MITRE ATT&CK', href: getMitreUrl() }}
+            titleLink={{ href: getMitreUrl(), destination: 'MITRE ATT&CK' }}
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
             data-test-subj='home-overview-mitre-tactics'
           >

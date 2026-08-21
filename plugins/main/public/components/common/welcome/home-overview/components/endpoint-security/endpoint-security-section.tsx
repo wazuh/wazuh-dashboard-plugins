@@ -24,6 +24,7 @@ import {
   getFileIntegrityMonitoringInventoryFilesUrl,
   getFileIntegrityMonitoringUrl,
 } from '../../utils/navigation';
+import { CARD_MIN_WIDTH } from '../../lib/constants';
 import { DataGroupResult } from '../../interfaces/data-group';
 import { ThreatIntelEnrichments, TopItem } from '../../interfaces/types';
 import { getCore } from '../../../../../../kibana-services';
@@ -62,7 +63,7 @@ const EndpointSecuritySectionComponent: React.FC<
         description='Harden configurations, detect malware, and monitor file integrity across your fleet.'
       />
       <EuiFlexGroup wrap responsive={false}>
-        <EuiFlexItem>
+        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status={sca.status}
             errorLabel={sca.error?.message}
@@ -70,13 +71,8 @@ const EndpointSecuritySectionComponent: React.FC<
               sca.error?.kind === 'index-pattern-missing'
             }
             isPermissionDenied={sca.error?.kind === 'permission-denied'}
-            title={
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={getConfigurationAssessmentUrl()}>
-                  Configuration Assessment
-                </EuiLink>
-              </RedirectAppLinks>
-            }
+            title='Configuration Assessment'
+            titleLink={{ href: getConfigurationAssessmentUrl() }}
             caption='Current state'
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-sca'
@@ -110,7 +106,7 @@ const EndpointSecuritySectionComponent: React.FC<
             )}
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem>
+        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status={fim.status}
             errorLabel={fim.error?.message}
@@ -118,13 +114,8 @@ const EndpointSecuritySectionComponent: React.FC<
               fim.error?.kind === 'index-pattern-missing'
             }
             isPermissionDenied={fim.error?.kind === 'permission-denied'}
-            title={
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={getFileIntegrityMonitoringUrl()}>
-                  File Integrity Monitoring
-                </EuiLink>
-              </RedirectAppLinks>
-            }
+            title='File Integrity Monitoring'
+            titleLink={{ href: getFileIntegrityMonitoringUrl() }}
             caption='Current state'
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-fim'
@@ -155,7 +146,7 @@ const EndpointSecuritySectionComponent: React.FC<
             )}
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem>
+        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
           <MalwareDetectionPanel
             iocMatches={iocMatches}
             feedByType={feedByType}

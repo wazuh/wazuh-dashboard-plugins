@@ -13,6 +13,7 @@ import {
   useKvdbsCount,
   useRulesCount,
 } from '../../hooks/use-overview-data';
+import { CARD_MIN_WIDTH } from '../../lib/constants';
 import { DataGroupResult } from '../../interfaces/data-group';
 import { ThreatIntelEnrichments, TopItem } from '../../interfaces/types';
 import { getIntegrationsUrl } from '../../utils/navigation';
@@ -50,12 +51,15 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
         description='What the platform is detecting with — detection content and knowledge base.'
       />
       <EuiFlexGroup wrap responsive={false}>
-        <EuiFlexItem grow={3}>
+        <EuiFlexItem grow={3} style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status='available'
             title='Security analytics'
             caption='Current state'
-            headerLink={{ label: 'Manage content', href: getIntegrationsUrl() }}
+            titleLink={{
+              href: getIntegrationsUrl(),
+              destination: 'Security Analytics',
+            }}
             centerBody
             data-test-subj='home-overview-security-analytics'
           >
@@ -69,7 +73,7 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
             />
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem grow={2}>
+        <EuiFlexItem grow={2} style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status='available'
             title='Threat catalog'
