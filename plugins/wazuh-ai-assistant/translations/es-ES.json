@@ -56,7 +56,7 @@
     "wazuhAiAssistant.resultTable.renderError": "No se pudo mostrar esta tabla de resultados.",
     "wazuhAiAssistant.resultTable.accordionSummary": "Resultados ({count, plural, one {# fila} other {# filas}})",
     "wazuhAiAssistant.resultTable.tableCaptionTotal": "Esta tabla contiene {total, plural, one {# fila} other {# filas}}.",
-    "wazuhAiAssistant.resultTable.tableCaptionPaged": "{totalRowsCaption} Mostrando las filas {start}-{end}, página {page} de {pageCount}.",
+    "wazuhAiAssistant.resultTable.tableCaptionPaged": "Esta tabla contiene {total, plural, one {# fila} other {# filas}}. Mostrando las filas {start}-{end}, página {page} de {pageCount}.",
     "wazuhAiAssistant.resultTable.openInDiscover": "Abrir en Discover",
     "wazuhAiAssistant.resultTable.openInDiscoverDefaultRange": "Abrir en Discover (rango predeterminado: {window})",
     "wazuhAiAssistant.resultTable.severity.critical": "Crítico",

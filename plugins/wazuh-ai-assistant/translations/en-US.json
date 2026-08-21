@@ -56,7 +56,7 @@
     "wazuhAiAssistant.resultTable.renderError": "This result table could not be displayed.",
     "wazuhAiAssistant.resultTable.accordionSummary": "Results ({count, plural, one {# row} other {# rows}})",
     "wazuhAiAssistant.resultTable.tableCaptionTotal": "This table contains {total, plural, one {# row} other {# rows}}.",
-    "wazuhAiAssistant.resultTable.tableCaptionPaged": "{totalRowsCaption} Showing rows {start}-{end}, page {page} of {pageCount}.",
+    "wazuhAiAssistant.resultTable.tableCaptionPaged": "This table contains {total, plural, one {# row} other {# rows}}. Showing rows {start}-{end}, page {page} of {pageCount}.",
     "wazuhAiAssistant.resultTable.openInDiscover": "Open in Discover",
     "wazuhAiAssistant.resultTable.openInDiscoverDefaultRange": "Open in Discover (default range: {window})",
     "wazuhAiAssistant.resultTable.severity.critical": "Critical",

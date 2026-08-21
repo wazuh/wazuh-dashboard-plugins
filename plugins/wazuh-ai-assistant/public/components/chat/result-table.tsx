@@ -341,7 +341,8 @@ function renderSeverityBadge(value: unknown): React.ReactNode {
   // staying in sync is an assumption this can't verify at runtime, an object property lookup
   // can't throw, and `bucket` being `undefined` is a normal, handled outcome either way.
   const bucket = SEVERITY_BUCKETS[word as SeverityLevel] as
-    { color: string; label: string } | undefined;
+    | { color: string; label: string }
+    | undefined;
   // `.wzSeverityChip` (result-table.scss) gives every severity the wzStatusChip SHAPE — fully round,
   // 11px semibold — so a severity reads as the same kind of object as the provider status chips on
   // the settings page instead of as EUI's 2px-radius rectangle (audit §3.5). The FILL is deliberately
@@ -674,26 +675,29 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   // inside the AI Assistant sidecar (as narrow as ~480px in the QA E2E review), and only the
   // container it actually lives in can tell those two apart. Same guarded pattern as the pane
   // height effect above (and the rest of this plugin, e.g. chat-page.tsx's rail-width measurement):
-  // jsdom has no `ResizeObserver`, so `containerWidthPx` stays `undefined` and every existing test
-  // renders in (non-narrow) full-width mode, matching what they already assert.
-  const [containerWidthPx, setContainerWidthPx] = useState<number | undefined>(
-    undefined,
-  );
+  // jsdom has no `ResizeObserver`, so `isNarrow` stays `false` and every existing test renders in
+  // (non-narrow) full-width mode, matching what they already assert.
+  //
+  // Stores the derived BOOLEAN, not the raw width (review, required minor): the sidecar's own
+  // drag-resize fires the observer on every pixel, and re-rendering the table's columns/cells on
+  // every one of those (rather than only on the rare crossing of the narrow threshold) would be a
+  // render storm for no visible benefit — `setIsNarrow` only actually triggers a re-render on the
+  // side of the threshold actually changing.
+  const [isNarrow, setIsNarrow] = useState(false);
   useLayoutEffect(() => {
     const card = cardRef.current;
     if (!card || typeof ResizeObserver === 'undefined') {
       return;
     }
-    const measure = () => setContainerWidthPx(card.offsetWidth);
+    const measure = () => {
+      const width = card.offsetWidth;
+      setIsNarrow(width > 0 && width < NARROW_CONTAINER_WIDTH_PX);
+    };
     const observer = new ResizeObserver(measure);
     observer.observe(card);
     measure();
     return () => observer.disconnect();
   }, []);
-  const isNarrow =
-    typeof containerWidthPx === 'number' &&
-    containerWidthPx > 0 &&
-    containerWidthPx < NARROW_CONTAINER_WIDTH_PX;
 
   // The most conservative measured pane height: the card can never claim more than the pane it
   // actually lives in, whichever source reported the smaller number. Zero when nothing has been
@@ -747,10 +751,19 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
    * control the QA E2E review flagged as noise (a one-row table used to render the full "Rows per
    * page: 5 10 25 50" footer for nothing). With the default page size now 10, this is also what
    * hides the pager for the 6-10 row results whose off-page rows previously produced a factually
-   * wrong AI summary (the finding this fix exists for) — the page-size selector reappears together
-   * with the pager as soon as a larger result needs it.
+   * wrong AI summary (the finding this fix exists for).
+   *
+   * The second clause (review, MAJOR-1) covers a trapdoor the first clause alone falls into: a
+   * reader who explicitly PICKS a page size that happens to be >= the row count (e.g. 25 rows,
+   * pick page size 25) would otherwise make `spec.rows.length > pageSize` false and unmount the
+   * WHOLE footer — including the size selector itself — with no way back to a smaller size short
+   * of a remount. Once the reader has ever picked a size (`userPickedPageSize`), the footer stays
+   * as long as the result exceeds the SMALLEST offered option, so the selector that got them into
+   * this state can always get them back out of it.
    */
-  const needsPagination = spec.rows.length > pageSize;
+  const needsPagination =
+    spec.rows.length > pageSize ||
+    (userPickedPageSize && spec.rows.length > PAGE_SIZE_OPTIONS[0]);
 
   const toggleRow = (rowIndex: number) => {
     setExpandedRowIds(previous => {
@@ -780,7 +793,9 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
         // `undefined`, throwing during render and unmounting the whole chat page (blank screen).
         // Accept both shapes so an EUI behavior change can never crash the app from here again.
         const row = (maybeRow ?? valueOrRow) as
-          Record<string, unknown> | null | undefined;
+          | Record<string, unknown>
+          | null
+          | undefined;
         const rowIndex = Number(row?.__rowId);
         if (!Number.isFinite(rowIndex)) {
           return null;
@@ -803,12 +818,18 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
                   })
             }
             aria-expanded={isRowExpanded}
+            // Review, required minor: only set once the target actually exists in the DOM — the
+            // `itemIdToExpandedRowMap` entry (and its matching `id`) below is only populated for a
+            // row that IS expanded, so pointing at it while collapsed would reference nothing.
+            aria-controls={
+              isRowExpanded ? `${bodyId}-expanded-row-${rowIndex}` : undefined
+            }
             iconType={isRowExpanded ? 'arrowUp' : 'arrowDown'}
           />
         );
       },
     }),
-    [expandedRowIds],
+    [expandedRowIds, bodyId],
   );
 
   // Column widths and timestamp formatting are DISPLAY concerns only — same columns, same values,
@@ -910,10 +931,19 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
         // only exists because the reader deliberately expanded the row — cutting it off behind a
         // third scrollbar defeats the click they just made. EuiCodeBlock's own fullscreen control
         // handles a genuinely huge document.
+        // `id` (review, required minor): lets the expander button's own `aria-controls` point at
+        // exactly this content, the same relationship EUI's own expanding-row examples establish.
         map[String(rowIndex)] = (
-          <EuiCodeBlock language='json' paddingSize='s' fontSize='s' isCopyable>
-            {JSON.stringify(row, null, 2)}
-          </EuiCodeBlock>
+          <div id={`${bodyId}-expanded-row-${rowIndex}`}>
+            <EuiCodeBlock
+              language='json'
+              paddingSize='s'
+              fontSize='s'
+              isCopyable
+            >
+              {JSON.stringify(row, null, 2)}
+            </EuiCodeBlock>
+          </div>
         );
       }
     });
@@ -959,28 +989,31 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   // 5 rows" on a 6-row result while the visible header said "Results (6 rows)". An explicit
   // `tableCaption` always states the TOTAL (with the same plural handling as `titleText` above),
   // plus the page position whenever the result actually spans more than one page.
-  const totalRowsCaption = i18n.translate(
-    'wazuhAiAssistant.resultTable.tableCaptionTotal',
-    {
-      defaultMessage:
-        'This table contains {total, plural, one {# row} other {# rows}}.',
-      values: { total: spec.rows.length },
-    },
-  );
+  //
+  // Review, required minor: `tableCaptionPaged` is its OWN self-contained message with every
+  // value as a plain ICU argument, rather than interpolating the ALREADY-TRANSLATED
+  // `tableCaptionTotal` string into it — nesting one translated string inside another freezes the
+  // sentence order the first translator chose, leaving a later translator no way to reorder
+  // "total" relative to "showing rows X-Y" for their language's grammar.
   const tableCaption =
     pageCount > 1
       ? i18n.translate('wazuhAiAssistant.resultTable.tableCaptionPaged', {
           defaultMessage:
-            '{totalRowsCaption} Showing rows {start}-{end}, page {page} of {pageCount}.',
+            'This table contains {total, plural, one {# row} other {# rows}}. ' +
+            'Showing rows {start}-{end}, page {page} of {pageCount}.',
           values: {
-            totalRowsCaption,
+            total: spec.rows.length,
             start: pageStart + 1,
             end: Math.min(pageStart + pageSize, spec.rows.length),
             page: safePageIndex + 1,
             pageCount,
           },
         })
-      : totalRowsCaption;
+      : i18n.translate('wazuhAiAssistant.resultTable.tableCaptionTotal', {
+          defaultMessage:
+            'This table contains {total, plural, one {# row} other {# rows}}.',
+          values: { total: spec.rows.length },
+        });
 
   const titleText =
     // Issue #9009 (A2): was a literal 'Results ({count} rows)' with no plural handling — a
@@ -1089,13 +1122,13 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
           className='wzResultsCardFooter'
           style={{ display: isOpen ? undefined : 'none' }}
         >
-          {/* Hand-built pagination (not EuiTablePagination — see this component's PR/handoff
-              notes: this worktree has no installed node_modules to confirm that component's exact
-              prop shape against the OSD-bundled EUI version, and every element used below
-              (EuiButtonIcon/EuiButtonEmpty/EuiText) is already used/verified elsewhere in this
-              same file). Pinned in its own grid row (`wzResultsCardFooter`, never inside the
-              scrolling body), which is the acceptance check this whole rewrite exists for: "page 2
-              of 6 [must be] reachable without resizing the window". */}
+          {/* Hand-built pagination (not EuiTablePagination): pinned in its own grid row
+              (`wzResultsCardFooter`, never inside the scrolling body) is the acceptance check this
+              whole rewrite exists for — "page 2 of 6 [must be] reachable without resizing the
+              window" — and a hand-built footer keeps that pinned-row placement fully under this
+              component's own control rather than however EuiTablePagination happens to lay itself
+              out. Every element used below (EuiButtonIcon/EuiButtonEmpty/EuiText) is already
+              used/verified elsewhere in this same file. */}
           <EuiFlexGroup
             responsive={false}
             alignItems='center'

@@ -84,9 +84,8 @@ describe('ResultTable', () => {
         })}
       />,
     );
-    // 30 rows is over the auto-expand threshold (200), so the accordion starts open by default —
-    // this is well under that ceiling, so it opens immediately; the click just confirms the toggle
-    // text.
+    // 30 rows is well under the auto-expand threshold (200), so the accordion is open immediately
+    // — no click needed to see the rows below.
     expect(screen.getByText('Results (30 rows)')).toBeInTheDocument();
 
     expect(screen.getByText('agent-0')).toBeInTheDocument();
@@ -379,6 +378,37 @@ describe('ResultTable', () => {
       );
       expect(screen.getByText(/rows per page/i)).toBeInTheDocument();
       expect(screen.getByText('Page 1 of 2')).toBeInTheDocument();
+    });
+
+    // Review, MAJOR-1: the naive `spec.rows.length > pageSize` check alone falls into a
+    // trapdoor — a reader who explicitly picks a page size >= the row count would unmount the
+    // WHOLE footer, including the size selector itself, with no way back short of a remount.
+    it('keeps the footer (and its size selector) reachable after picking a page size >= the row count', () => {
+      const twentyFiveRows = Array.from({ length: 25 }, (_unused, i) => ({
+        agent: `agent-${i}`,
+      }));
+      const { container } = render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'agent', label: 'Agent' }],
+            rows: twentyFiveRows,
+          })}
+        />,
+      );
+      expect(container.querySelector('.wzResultsCardFooter')).not.toBeNull();
+
+      // 25 rows at page size 25 is exactly one page — the trapdoor the naive check falls into.
+      fireEvent.click(screen.getByRole('button', { name: '25' }));
+      expect(screen.getByText('Page 1 of 1')).toBeInTheDocument();
+      // The footer — and the size selector inside it — must still be there: this is the only way
+      // back to a smaller size.
+      expect(container.querySelector('.wzResultsCardFooter')).not.toBeNull();
+      expect(screen.getByText(/rows per page/i)).toBeInTheDocument();
+
+      // Picking a smaller size again restores real paging, proving the selector still works.
+      fireEvent.click(screen.getByRole('button', { name: '10' }));
+      expect(screen.getByText('Page 1 of 3')).toBeInTheDocument();
+      expect(container.querySelector('.wzResultsCardFooter')).not.toBeNull();
     });
 
     it('renders no pagination footer for an empty result set', () => {
