@@ -295,6 +295,16 @@ export interface ConversationSummary {
   updatedAt: string;
 }
 
+/** Response shape of the rename (PATCH) route (server/routes/conversations.ts) -- a
+ * `ConversationSummary` plus the WRITE's own fresh optimistic-concurrency token (same
+ * `encodeVersion` opaque string `ConversationRecord.version` carries). chat-page.tsx's
+ * `handleRenameConversation` stamps `version` onto `conversationVersionRef` when the renamed
+ * conversation is the active one, so the next auto-save's PUT does not 409 against a version this
+ * rename just moved past (issue #9010). */
+export interface ConversationRenameResult extends ConversationSummary {
+  version: string;
+}
+
 /**
  * One message as a saved conversation stores it: a `ChatMessage` plus the two presentation fields a
  * resumed conversation needs in order to be the SAME conversation rather than a summary of one.
