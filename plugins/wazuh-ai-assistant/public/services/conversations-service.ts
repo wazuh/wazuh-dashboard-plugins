@@ -83,6 +83,18 @@ export class ConversationsService {
     });
   }
 
+  /** Title-only rename (server/routes/conversations.ts's PATCH) -- never sends `messages`, so a
+   * rename never has to load the full transcript just to change a title. Returns the updated
+   * summary the rail already renders from. */
+  rename(id: string, title: string): Promise<ConversationSummary> {
+    return this.http.patch<ConversationSummary>(
+      API_PATHS.CONVERSATION_BY_ID(id),
+      {
+        body: JSON.stringify({ title }),
+      },
+    );
+  }
+
   async remove(id: string): Promise<void> {
     await this.http.delete(API_PATHS.CONVERSATION_BY_ID(id));
   }

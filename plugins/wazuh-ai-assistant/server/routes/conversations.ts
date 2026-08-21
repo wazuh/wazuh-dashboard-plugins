@@ -292,6 +292,14 @@ const createOrReplaceBodySchema = schema.object({
   }),
 });
 
+/** PATCH-only body for the rename route below: title only, never `messages` — a rename never
+ * touches the transcript, so the client never has to hold (or resend) the full messages array just
+ * to change a title. Exported for the same reason `tableSpecSchema` is: so
+ * conversations-rename-schema.test.ts can validate against it directly. */
+export const renameBodySchema = schema.object({
+  title: schema.string({ minLength: 1, maxLength: MAX_TITLE_LENGTH }),
+});
+
 /** PUT-only body: everything `createOrReplaceBodySchema` has, plus the optional
  * optimistic-concurrency token. A brand-new conversation (POST) has no prior version to conflict
  * with, so this field only ever makes sense on an update. */
@@ -524,6 +532,70 @@ export function registerConversationRoutes(
           nextDocument,
           encodeVersion(written.seqNo, written.primaryTerm),
         ),
+      });
+    }),
+  );
+
+  // Rename: title-only partial update, owner-checked exactly like GET/PUT/DELETE (resolveOwner +
+  // ownerUnresolvedResponse + findConversationHit -- same fail-closed/404-on-wrong-owner behavior,
+  // see this file's top doc comment). Deliberately NOT the full PUT above: the rail only ever has
+  // a `ConversationSummary` (id/title/updatedAt) in hand when a user renames a row, never the full
+  // `messages` transcript -- requiring the client to GET the whole conversation first just to
+  // rename it would be wasted work and a needless place for a stale-transcript overwrite bug.
+  // `messages`/`created_at`/`user` are carried over untouched from `existing.source`, mirroring the
+  // PUT route's own "carry over every field this request isn't changing" convention.
+  //
+  // Optimistic concurrency still applies (same reason as PUT's doc comment: the backing data stream
+  // rejects an unconditional write), using this request's own just-fetched seqNo/primaryTerm --
+  // there is no client-supplied `expectedVersion` for a rename, so a genuine conflict (someone else
+  // saved/deleted the conversation between this request's GET and its write) 409s the same way.
+  router.patch(
+    {
+      path: API_PATHS.CONVERSATION_BY_ID(`{id}`),
+      validate: {
+        params: schema.object({ id: schema.string() }),
+        body: renameBodySchema,
+      },
+    },
+    withInternalErrorHandling(async (context, request, response) => {
+      const owner = await resolveOwner(context, request);
+      if (owner === undefined) {
+        return ownerUnresolvedResponse(response);
+      }
+      const existing = await findConversationHit(
+        context,
+        owner,
+        request.params.id,
+      );
+      if (!existing) {
+        return response.notFound();
+      }
+      const nextDocument: ConversationDocument = {
+        ...existing.source,
+        title: request.body.title,
+        updated_at: new Date().toISOString(),
+      };
+
+      try {
+        await updateConversation(context, existing, nextDocument, {
+          ifSeqNo: existing.seqNo,
+          ifPrimaryTerm: existing.primaryTerm,
+        });
+      } catch (error) {
+        if (isVersionConflictError(error)) {
+          return response.customError({
+            statusCode: 409,
+            body: {
+              message:
+                'Conversation was updated by another session since you last loaded it. Refresh and retry.',
+            },
+          });
+        }
+        throw error;
+      }
+
+      return response.ok({
+        body: toSummary(request.params.id, nextDocument),
       });
     }),
   );
