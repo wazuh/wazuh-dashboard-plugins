@@ -1263,10 +1263,29 @@ function resolvePrivacyEnabled(
  * already been minted from Wazuh data earlier in the conversation (case variance between how the
  * indexer rendered it and how the user retyped it defeats `applyToText`'s case-sensitive exact
  * match). Closed by additionally running `scrubKnownEntities` — the same known-entity dictionary
- * scan `scrubFieldValue`'s `allow-scan` branch already uses — over the pre-scanned user text before
- * `applyToText`, exactly like that branch's `scrubKnownEntities(prescanAndMint(...), pseudonymizer)`
- * pairing. `applyToText` still runs after it (harmless no-op for anything `scrubKnownEntities` just
- * replaced, since its case-sensitive exact-value pass has nothing new left to find).
+ * scan `scrubFieldValue`'s `allow-scan` branch already uses — over the pre-scanned user text.
+ *
+ * F1 correction (adversarial validation): the ORIGINAL NF-1 fix additionally ran the general,
+ * UNFILTERED `applyToText` pass after `scrubKnownEntities` — reasoned at the time to be "a harmless
+ * no-op for anything `scrubKnownEntities` just replaced". That reasoning missed that `applyToText`
+ * matches EVERY known value's EXACT case, not just the ones `scrubKnownEntities` had just replaced:
+ * a value minted under the generic VAL kind (the escape hatch's fail-closed default for a field
+ * with no host/ip/user keyword — see `scrubKnownEntities`'s own doc comment) that happens to equal
+ * an ordinary English word IN THE SAME CASE it was minted (a lowercase "critical" or "root" is a
+ * completely ordinary way to type either word) was reintroduced as a corruption vector by
+ * `applyToText` itself, even after `scrubKnownEntities` was correctly restricted with
+ * `identifiersOnly: true` below. For `user` content, `applyToText`'s unfiltered pass is therefore
+ * REMOVED entirely rather than layered on top: `scrubKnownEntities({ identifiersOnly: true })`
+ * already subsumes everything `applyToText` would do FOR THE KINDS this path trusts (its
+ * case-insensitive boundary match is a strict superset of `applyToText`'s case-sensitive one), and
+ * a freshly-minted IP/FQDN from `prescanAndMint` above is already substituted in place by that same
+ * call — there is nothing left for a further `applyToText` pass to legitimately catch that
+ * `identifiersOnly` did not already deliberately exclude. The accepted residual: a `user` message
+ * that happens to retype, EXACTLY, some OTHER already-minted VAL/URL-kind value (e.g. a full
+ * `process.command_line` string) no longer gets masked via this path — the same class of residual
+ * `scrubKnownEntities`'s own doc comment already documents for VAL/URL kinds, just extended from
+ * "never scanned" to "never scanned OR exact-matched" for `user` content specifically. `tool`/
+ * `assistant` content is unaffected: only the `user` branch below had this call removed.
  *
  * What this closes: a previously-minted entity (any kind — HOST/IP/USER/VAL — from Wazuh tool data,
  * or from a prior `user` message) retyped bare, in ANY casing, later in the SAME MOUNTED SESSION —
@@ -1311,19 +1330,20 @@ export function scrubMessagesForProvider(
     let content: string;
     if (message.role === 'user') {
       // NF-1: shape scan (prescanAndMint) THEN known-entity dictionary scan (scrubKnownEntities,
-      // catches a previously-minted identifier retyped bare/in different casing) THEN the exact
-      // applyToText pass — see this function's doc comment for the residual this does not cover.
-      // F1/F2: `identifiersOnly: true` restricts the dictionary scan to IP/HOST/USER-kind,
+      // catches a previously-minted identifier retyped bare/in different casing) — see this
+      // function's doc comment for the residual this does not cover.
+      // F1: `identifiersOnly: true` restricts the dictionary scan to IP/HOST/USER-kind,
       // identifier-shaped entries — arbitrary user prose has no field-policy review behind it, so
       // this must not treat every string the pseudonymizer ever minted as a search-and-replace
       // target (see scrubKnownEntities's doc comment for the exact filter and the corruption this
-      // closes).
-      content = pseudonymizer.applyToText(
-        scrubKnownEntities(
-          prescanAndMint(message.content, pseudonymizer),
-          pseudonymizer,
-          { identifiersOnly: true },
-        ),
+      // closes). The general, UNFILTERED `applyToText` pass the ORIGINAL NF-1 fix chained after
+      // this is deliberately NOT run for `user` content any more — see this function's "F1
+      // correction" doc comment for why it reintroduced the same corruption `identifiersOnly` was
+      // just added to close.
+      content = scrubKnownEntities(
+        prescanAndMint(message.content, pseudonymizer),
+        pseudonymizer,
+        { identifiersOnly: true },
       );
     } else if (message.role === 'tool') {
       content = pseudonymizer.applyToText(
