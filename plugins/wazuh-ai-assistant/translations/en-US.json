@@ -210,6 +210,22 @@
     "wazuhAiAssistant.settings.form.modelCustomOptionText": "Add {token} as a custom model",
     "wazuhAiAssistant.chat.conversations.justNow": "now",
     "wazuhAiAssistant.chat.conversations.minutesShort": "{count}m",
-    "wazuhAiAssistant.chat.conversations.hoursShort": "{count}h"
+    "wazuhAiAssistant.chat.conversations.hoursShort": "{count}h",
+    "wazuhAiAssistant.chat.conversations.rename": "Rename conversation",
+    "wazuhAiAssistant.chat.conversations.renameInputLabel": "Conversation title",
+    "wazuhAiAssistant.chat.conversations.renameError": "Could not rename that conversation.",
+    "wazuhAiAssistant.chat.conversations.renameSuccess": "Conversation renamed.",
+    "wazuhAiAssistant.chat.conversations.deleteSuccess": "Conversation deleted.",
+    "wazuhAiAssistant.chat.conversations.bulkDeleteError": "Could not delete one or more conversations.",
+    "wazuhAiAssistant.chat.conversations.bulkDeleteSuccess": "{count, plural, one {Conversation deleted.} other {{count} conversations deleted.}}",
+    "wazuhAiAssistant.chat.conversations.selectMode.enter": "Select conversations",
+    "wazuhAiAssistant.chat.conversations.selectMode.cancel": "Cancel selection",
+    "wazuhAiAssistant.chat.conversations.selectMode.selectRow": "Select \"{title}\"",
+    "wazuhAiAssistant.chat.conversations.selectMode.selectedCount": "{count} selected",
+    "wazuhAiAssistant.chat.conversations.selectMode.deleteButton": "Delete ({count})",
+    "wazuhAiAssistant.chat.conversations.bulkDeleteConfirm.title": "{count, plural, one {Delete conversation?} other {Delete {count} conversations?}}",
+    "wazuhAiAssistant.chat.conversations.bulkDeleteConfirm.body": "This will permanently delete the selected {count, plural, one {conversation} other {conversations}}. This action cannot be undone.",
+    "wazuhAiAssistant.chat.conversations.bulkDeleteConfirm.cancel": "Cancel",
+    "wazuhAiAssistant.chat.conversations.bulkDeleteConfirm.confirm": "Delete"
   }
 }

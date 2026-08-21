@@ -5,7 +5,9 @@ import {
   EuiButton,
   EuiButtonEmpty,
   EuiButtonIcon,
+  EuiCheckbox,
   EuiFieldSearch,
+  EuiFieldText,
   EuiText,
   EuiTitle,
   EuiSpacer,
@@ -31,6 +33,16 @@ interface ConversationListProps {
   onSelect: (id: string) => void;
   onNewConversation: () => void;
   onDelete: (id: string) => void;
+  /** Inline rename (issue #9010, finding E2). Optional, like `onCollapse`/`onExpand` below: a
+   * caller that hasn't wired renaming yet simply never sees the pencil affordance rendered at all
+   * (see the row rendering below), rather than throwing on a missing handler. */
+  onRename?: (id: string, title: string) => void;
+  /** Bulk delete (issue #9010, finding E3): called once with every selected conversation id after
+   * the "Delete N conversations?" confirm modal is accepted. Same optionality reasoning as
+   * `onRename` above — no handler means no "Select conversations" entry point is rendered. The
+   * caller decides how to apply it (sequential awaits, `Promise.allSettled`, a bulk endpoint...);
+   * this component's own job ends at handing over the id list. */
+  onBulkDelete?: (ids: string[]) => void;
   /**
    * How the page grid is presenting the rail (layout contract §5). Optional, defaulting to
    * 'expanded' — every pre-redesign call site (and every pre-redesign test) keeps rendering the
@@ -255,6 +267,8 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   onSelect,
   onNewConversation,
   onDelete,
+  onRename,
+  onBulkDelete,
   displayMode = 'expanded',
   onCollapse,
   onExpand,
@@ -270,6 +284,18 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   // keyboard/touch users who can't hover.
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Inline rename (E2): which row (if any) currently shows an input instead of its title text, and
+  // that input's own in-progress value. Only one row can be renaming at a time.
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState('');
+
+  // Bulk delete (E3): an explicit select mode a "Select conversations" button enters/exits — rows
+  // never show checkboxes outside of it. `selectedIds` is cleared both on entry and on exit, so a
+  // stale selection from a previous select-mode session never survives into the next one.
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
 
   // Hooks run unconditionally on every render (rules of hooks) even though `displayMode ===
   // 'collapsed'` below returns a much smaller tree that never uses most of this state — the
@@ -310,6 +336,65 @@ export const ConversationList: React.FC<ConversationListProps> = ({
     setDeleteTarget(null);
   };
 
+  // --- Inline rename (E2) ---------------------------------------------------------------------
+
+  const startRename = (
+    event: React.MouseEvent,
+    conversation: ConversationSummary,
+  ) => {
+    // Same reason as `requestDelete`'s stopPropagation: never let the row's own onClick (resume)
+    // fire alongside the pencil icon's click.
+    event.stopPropagation();
+    setRenamingId(conversation.id);
+    setRenameValue(conversation.title);
+  };
+
+  const commitRename = () => {
+    const id = renamingId;
+    const nextTitle = renameValue.trim();
+    setRenamingId(null);
+    // An empty (or whitespace-only) title commits nothing rather than saving a blank title — the
+    // row simply reverts to showing its previous title, same as Escape would.
+    if (id && nextTitle) {
+      onRename?.(id, nextTitle);
+    }
+  };
+
+  const cancelRename = () => {
+    setRenamingId(null);
+  };
+
+  // --- Bulk delete / select mode (E3) -----------------------------------------------------------
+
+  const enterSelectMode = () => {
+    setSelectMode(true);
+    setSelectedIds(new Set());
+  };
+
+  const exitSelectMode = () => {
+    setSelectMode(false);
+    setSelectedIds(new Set());
+  };
+
+  const toggleSelected = (id: string) => {
+    setSelectedIds(current => {
+      const next = new Set(current);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const confirmBulkDelete = () => {
+    const ids = Array.from(selectedIds);
+    setBulkDeleteConfirmOpen(false);
+    exitSelectMode();
+    onBulkDelete?.(ids);
+  };
+
   const deleteModal = deleteTarget && (
     <EuiConfirmModal
       title={i18n.translate(
@@ -339,6 +424,41 @@ export const ConversationList: React.FC<ConversationListProps> = ({
             defaultMessage:
               'This will permanently delete the conversation "{title}". This action cannot be undone.',
             values: { title: deleteTarget.title },
+          },
+        )}
+      </p>
+    </EuiConfirmModal>
+  );
+
+  const bulkDeleteModal = bulkDeleteConfirmOpen && (
+    <EuiConfirmModal
+      title={i18n.translate(
+        'wazuhAiAssistant.chat.conversations.bulkDeleteConfirm.title',
+        {
+          defaultMessage:
+            '{count, plural, one {Delete conversation?} other {Delete {count} conversations?}}',
+          values: { count: selectedIds.size },
+        },
+      )}
+      onCancel={() => setBulkDeleteConfirmOpen(false)}
+      onConfirm={confirmBulkDelete}
+      cancelButtonText={i18n.translate(
+        'wazuhAiAssistant.chat.conversations.bulkDeleteConfirm.cancel',
+        { defaultMessage: 'Cancel' },
+      )}
+      confirmButtonText={i18n.translate(
+        'wazuhAiAssistant.chat.conversations.bulkDeleteConfirm.confirm',
+        { defaultMessage: 'Delete' },
+      )}
+      buttonColor='danger'
+    >
+      <p>
+        {i18n.translate(
+          'wazuhAiAssistant.chat.conversations.bulkDeleteConfirm.body',
+          {
+            defaultMessage:
+              'This will permanently delete the selected {count, plural, one {conversation} other {conversations}}. This action cannot be undone.',
+            values: { count: selectedIds.size },
           },
         )}
       </p>
@@ -436,7 +556,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
           <EuiSpacer size='s' />
         </>
       )}
-      {showNewConversationButton && (
+      {showNewConversationButton && !selectMode && (
         <>
           <EuiButton
             iconType='plusInCircle'
@@ -453,21 +573,88 @@ export const ConversationList: React.FC<ConversationListProps> = ({
           <EuiSpacer size='s' />
         </>
       )}
-      <EuiFieldSearch
-        placeholder={i18n.translate(
-          'wazuhAiAssistant.chat.conversations.searchPlaceholder',
-          { defaultMessage: 'Search conversations' },
-        )}
-        aria-label={i18n.translate(
-          'wazuhAiAssistant.chat.conversations.searchPlaceholder',
-          { defaultMessage: 'Search conversations' },
-        )}
-        value={searchTerm}
-        onChange={event => setSearchTerm(event.target.value)}
-        fullWidth
-        compressed
-        isClearable
-      />
+      {selectMode ? (
+        // Bulk-delete toolbar (E3): replaces the search field row for the duration of select
+        // mode — searching and bulk-selecting at once is out of scope, and this keeps the row's
+        // layout footprint identical to the search row it stands in for.
+        <EuiFlexGroup responsive={false} alignItems='center' gutterSize='xs'>
+          <EuiFlexItem grow>
+            <EuiText size='xs' color='subdued'>
+              {i18n.translate(
+                'wazuhAiAssistant.chat.conversations.selectMode.selectedCount',
+                {
+                  defaultMessage: '{count} selected',
+                  values: { count: selectedIds.size },
+                },
+              )}
+            </EuiText>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButtonEmpty size='xs' onClick={exitSelectMode}>
+              {i18n.translate(
+                'wazuhAiAssistant.chat.conversations.selectMode.cancel',
+                { defaultMessage: 'Cancel selection' },
+              )}
+            </EuiButtonEmpty>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButton
+              size='s'
+              color='danger'
+              fill
+              isDisabled={selectedIds.size === 0}
+              onClick={() => setBulkDeleteConfirmOpen(true)}
+            >
+              {i18n.translate(
+                'wazuhAiAssistant.chat.conversations.selectMode.deleteButton',
+                {
+                  defaultMessage: 'Delete ({count})',
+                  values: { count: selectedIds.size },
+                },
+              )}
+            </EuiButton>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      ) : (
+        <EuiFlexGroup responsive={false} alignItems='center' gutterSize='xs'>
+          <EuiFlexItem grow>
+            <EuiFieldSearch
+              placeholder={i18n.translate(
+                'wazuhAiAssistant.chat.conversations.searchPlaceholder',
+                { defaultMessage: 'Search conversations' },
+              )}
+              aria-label={i18n.translate(
+                'wazuhAiAssistant.chat.conversations.searchPlaceholder',
+                { defaultMessage: 'Search conversations' },
+              )}
+              value={searchTerm}
+              onChange={event => setSearchTerm(event.target.value)}
+              fullWidth
+              compressed
+              isClearable
+            />
+          </EuiFlexItem>
+          {onBulkDelete && conversations.length > 0 && (
+            <EuiFlexItem grow={false}>
+              <EuiToolTip
+                content={i18n.translate(
+                  'wazuhAiAssistant.chat.conversations.selectMode.enter',
+                  { defaultMessage: 'Select conversations' },
+                )}
+              >
+                <EuiButtonIcon
+                  iconType='listAdd'
+                  aria-label={i18n.translate(
+                    'wazuhAiAssistant.chat.conversations.selectMode.enter',
+                    { defaultMessage: 'Select conversations' },
+                  )}
+                  onClick={enterSelectMode}
+                />
+              </EuiToolTip>
+            </EuiFlexItem>
+          )}
+        </EuiFlexGroup>
+      )}
       <EuiSpacer size='m' />
 
       {/* Only this section scrolls (`.wzConvoRailScroll`): with the whole rail scrolling instead,
@@ -491,123 +678,236 @@ export const ConversationList: React.FC<ConversationListProps> = ({
           groups.map(group => (
             <React.Fragment key={group.key}>
               <div className='wzConvoRailGroupHeader'>{group.label}</div>
-              {group.items.map(conversation => {
-                const isSelected = conversation.id === activeConversationId;
-                const isHovered = conversation.id === hoveredId;
-                return (
-                  <React.Fragment key={conversation.id}>
-                    {/* Plain `div` (not EuiFlexGroup) carries the interactive/a11y attributes,
-                      since EUI's own prop types don't guarantee accepting arbitrary
-                      role/tabIndex/onKeyDown passthrough — EuiFlexGroup nested inside is purely
-                      for the row's layout. */}
-                    <div
-                      role='button'
-                      tabIndex={0}
-                      // Programmatic indication of the single-select list's current item, for
-                      // assistive tech — the selected row is also signaled visually (the soft-tinted
-                      // pill fill below, plus bold text), but this is what a screen reader can key
-                      // off of.
-                      aria-current={isSelected ? 'true' : undefined}
-                      onClick={() => onSelect(conversation.id)}
-                      onKeyDown={event => {
-                        if (event.key === 'Enter' || event.key === ' ') {
-                          event.preventDefault();
-                          onSelect(conversation.id);
-                        }
-                      }}
-                      onMouseEnter={() => setHoveredId(conversation.id)}
-                      onMouseLeave={() =>
-                        setHoveredId(current =>
-                          current === conversation.id ? null : current,
-                        )
-                      }
-                      // wzConvoRow (chat-page.scss) supplies a reduced-motion-safe transition timing
-                      // for the background/border-color changes below — the colors themselves stay
-                      // driven by this row's own hover/selected state, unchanged.
-                      className='wzConvoRow'
-                      style={{
-                        cursor: 'pointer',
-                        padding: '8px',
-                        // "Soft-tinted pill on the active row" (design language, "Navigation"): a
-                        // filled, well-rounded highlight rather than the old left-border indicator —
-                        // font-weight 600 plus `aria-current` above are what carry the
-                        // non-color-reliant signal now.
-                        borderRadius: 8,
-                        background: isSelected
-                          ? 'var(--wz-accent-soft)'
-                          : isHovered
-                          ? 'var(--wz-accent-hover)'
-                          : 'transparent',
-                      }}
+              {/* Real list markup (E4/#9010): each date group is its own native `<ul>` of `<li>`
+                  rows, so a screen reader announces "list, N items" the way EUI's own
+                  `EuiListGroup` does — rather than the previous plain `<div>`s, which read as an
+                  undifferentiated run of generic elements. `.wzConvoRailGroupList`/
+                  `.wzConvoRailListItem` (conversation-list.scss) reset the browser's default
+                  list marker/indent so this is a markup-only change with no visual effect. */}
+              <ul className='wzConvoRailGroupList' aria-label={group.label}>
+                {group.items.map(conversation => {
+                  const isSelected = conversation.id === activeConversationId;
+                  const isHovered = conversation.id === hoveredId;
+                  const isRenaming = conversation.id === renamingId;
+                  const isChecked = selectedIds.has(conversation.id);
+                  return (
+                    <li
+                      key={conversation.id}
+                      className='wzConvoRailListItem'
                     >
-                      <EuiFlexGroup
-                        responsive={false}
-                        alignItems='center'
-                        gutterSize='xs'
+                      {/* Plain `div` (not EuiFlexGroup) carries the interactive/a11y attributes,
+                        since EUI's own prop types don't guarantee accepting arbitrary
+                        role/tabIndex/onKeyDown passthrough — EuiFlexGroup nested inside is purely
+                        for the row's layout. In select mode the row toggles this conversation's
+                        checkbox instead of resuming it. */}
+                      <div
+                        role={selectMode ? undefined : 'button'}
+                        tabIndex={selectMode ? undefined : 0}
+                        // Programmatic indication of the single-select list's current item, for
+                        // assistive tech — the selected row is also signaled visually (the soft-tinted
+                        // pill fill below, plus bold text), but this is what a screen reader can key
+                        // off of. Only meaningful outside select mode (select mode has its own
+                        // multi-select semantics via each row's checkbox).
+                        aria-current={
+                          !selectMode && isSelected ? 'true' : undefined
+                        }
+                        onClick={() => {
+                          if (selectMode) {
+                            toggleSelected(conversation.id);
+                            return;
+                          }
+                          if (!isRenaming) {
+                            onSelect(conversation.id);
+                          }
+                        }}
+                        onKeyDown={event => {
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            if (selectMode) {
+                              toggleSelected(conversation.id);
+                            } else if (!isRenaming) {
+                              onSelect(conversation.id);
+                            }
+                          }
+                        }}
+                        onMouseEnter={() => setHoveredId(conversation.id)}
+                        onMouseLeave={() =>
+                          setHoveredId(current =>
+                            current === conversation.id ? null : current,
+                          )
+                        }
+                        // wzConvoRow (chat-page.scss) supplies a reduced-motion-safe transition timing
+                        // for the background/border-color changes below — the colors themselves stay
+                        // driven by this row's own hover/selected state, unchanged.
+                        className='wzConvoRow'
+                        style={{
+                          cursor: selectMode ? 'default' : 'pointer',
+                          padding: '8px',
+                          // "Soft-tinted pill on the active row" (design language, "Navigation"): a
+                          // filled, well-rounded highlight rather than the old left-border indicator —
+                          // font-weight 600 plus `aria-current` above are what carry the
+                          // non-color-reliant signal now.
+                          borderRadius: 8,
+                          background:
+                            !selectMode && isSelected
+                              ? 'var(--wz-accent-soft)'
+                              : isHovered
+                              ? 'var(--wz-accent-hover)'
+                              : 'transparent',
+                        }}
                       >
-                        <EuiFlexItem grow style={{ minWidth: 0 }}>
-                          <EuiText
-                            size='s'
-                            style={{
-                              ...truncateTextStyle,
-                              fontWeight: isSelected ? 600 : undefined,
-                            }}
-                            title={conversation.title}
-                          >
-                            {conversation.title}
-                          </EuiText>
-                        </EuiFlexItem>
-                        {/* The relative timestamp moves onto the row's own line (design gap "a
-                          whole line spent on a relative timestamp") — `flexShrink: 0` and
-                          `whiteSpace: 'nowrap'` keep it from ever wrapping under the truncated
-                          title beside it. */}
-                        <EuiFlexItem grow={false}>
-                          <EuiText
-                            size='xs'
-                            color='subdued'
-                            style={{
-                              fontVariantNumeric: 'tabular-nums',
-                              whiteSpace: 'nowrap',
-                              flexShrink: 0,
-                            }}
-                          >
-                            {formatRelativeTime(conversation.updatedAt)}
-                          </EuiText>
-                        </EuiFlexItem>
-                        <EuiFlexItem
-                          grow={false}
-                          // 0 at rest (never a mid-opacity resting state that fails WCAG 1.4.11's
-                          // 3:1 contrast requirement for a control) — 1 on hover, selection, OR
-                          // keyboard focus, so a keyboard/switch user can find and reach this
-                          // control too.
-                          style={{ opacity: isHovered || isSelected ? 1 : 0 }}
+                        <EuiFlexGroup
+                          responsive={false}
+                          alignItems='center'
+                          gutterSize='xs'
                         >
-                          <EuiButtonIcon
-                            iconType='trash'
-                            color='danger'
-                            aria-label={i18n.translate(
-                              'wazuhAiAssistant.chat.conversations.delete',
-                              {
-                                defaultMessage: 'Delete conversation',
-                              },
+                          {selectMode && (
+                            <EuiFlexItem grow={false}>
+                              <EuiCheckbox
+                                id={`wzConvoSelect-${conversation.id}`}
+                                checked={isChecked}
+                                onChange={() =>
+                                  toggleSelected(conversation.id)
+                                }
+                                label=''
+                                aria-label={i18n.translate(
+                                  'wazuhAiAssistant.chat.conversations.selectMode.selectRow',
+                                  {
+                                    defaultMessage: 'Select "{title}"',
+                                    values: { title: conversation.title },
+                                  },
+                                )}
+                              />
+                            </EuiFlexItem>
+                          )}
+                          <EuiFlexItem grow style={{ minWidth: 0 }}>
+                            {isRenaming ? (
+                              <EuiFieldText
+                                compressed
+                                autoFocus
+                                value={renameValue}
+                                aria-label={i18n.translate(
+                                  'wazuhAiAssistant.chat.conversations.renameInputLabel',
+                                  { defaultMessage: 'Conversation title' },
+                                )}
+                                onClick={event => event.stopPropagation()}
+                                onChange={event =>
+                                  setRenameValue(event.target.value)
+                                }
+                                onKeyDown={event => {
+                                  // Never let Enter/Escape/Space bubble to the row's own
+                                  // onKeyDown above (Space would otherwise re-trigger onSelect).
+                                  event.stopPropagation();
+                                  if (event.key === 'Enter') {
+                                    event.preventDefault();
+                                    commitRename();
+                                  } else if (event.key === 'Escape') {
+                                    event.preventDefault();
+                                    cancelRename();
+                                  }
+                                }}
+                              />
+                            ) : (
+                              <EuiText
+                                size='s'
+                                style={{
+                                  ...truncateTextStyle,
+                                  fontWeight: isSelected ? 600 : undefined,
+                                }}
+                                title={conversation.title}
+                              >
+                                {conversation.title}
+                              </EuiText>
                             )}
-                            onClick={(event: React.MouseEvent) =>
-                              requestDelete(event, conversation)
-                            }
-                            onFocus={() => setHoveredId(conversation.id)}
-                            onBlur={() =>
-                              setHoveredId(current =>
-                                current === conversation.id ? null : current,
-                              )
-                            }
-                          />
-                        </EuiFlexItem>
-                      </EuiFlexGroup>
-                    </div>
-                    <EuiSpacer size='xs' />
-                  </React.Fragment>
-                );
-              })}
+                          </EuiFlexItem>
+                          {!selectMode && !isRenaming && (
+                            <>
+                              {/* The relative timestamp moves onto the row's own line (design gap "a
+                                whole line spent on a relative timestamp") — `flexShrink: 0` and
+                                `whiteSpace: 'nowrap'` keep it from ever wrapping under the truncated
+                                title beside it. */}
+                              <EuiFlexItem grow={false}>
+                                <EuiText
+                                  size='xs'
+                                  color='subdued'
+                                  style={{
+                                    fontVariantNumeric: 'tabular-nums',
+                                    whiteSpace: 'nowrap',
+                                    flexShrink: 0,
+                                  }}
+                                >
+                                  {formatRelativeTime(conversation.updatedAt)}
+                                </EuiText>
+                              </EuiFlexItem>
+                              {onRename && (
+                                <EuiFlexItem
+                                  grow={false}
+                                  // Same WCAG 1.4.11 reasoning as the trash icon below: 0 at rest,
+                                  // 1 on hover, selection, OR keyboard focus.
+                                  style={{
+                                    opacity: isHovered || isSelected ? 1 : 0,
+                                  }}
+                                >
+                                  <EuiButtonIcon
+                                    iconType='pencil'
+                                    aria-label={i18n.translate(
+                                      'wazuhAiAssistant.chat.conversations.rename',
+                                      { defaultMessage: 'Rename conversation' },
+                                    )}
+                                    onClick={(event: React.MouseEvent) =>
+                                      startRename(event, conversation)
+                                    }
+                                    onFocus={() =>
+                                      setHoveredId(conversation.id)
+                                    }
+                                    onBlur={() =>
+                                      setHoveredId(current =>
+                                        current === conversation.id
+                                          ? null
+                                          : current,
+                                      )
+                                    }
+                                  />
+                                </EuiFlexItem>
+                              )}
+                              <EuiFlexItem
+                                grow={false}
+                                // 0 at rest (never a mid-opacity resting state that fails WCAG 1.4.11's
+                                // 3:1 contrast requirement for a control) — 1 on hover, selection, OR
+                                // keyboard focus, so a keyboard/switch user can find and reach this
+                                // control too.
+                                style={{ opacity: isHovered || isSelected ? 1 : 0 }}
+                              >
+                                <EuiButtonIcon
+                                  iconType='trash'
+                                  color='danger'
+                                  aria-label={i18n.translate(
+                                    'wazuhAiAssistant.chat.conversations.delete',
+                                    {
+                                      defaultMessage: 'Delete conversation',
+                                    },
+                                  )}
+                                  onClick={(event: React.MouseEvent) =>
+                                    requestDelete(event, conversation)
+                                  }
+                                  onFocus={() => setHoveredId(conversation.id)}
+                                  onBlur={() =>
+                                    setHoveredId(current =>
+                                      current === conversation.id
+                                        ? null
+                                        : current,
+                                    )
+                                  }
+                                />
+                              </EuiFlexItem>
+                            </>
+                          )}
+                        </EuiFlexGroup>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
             </React.Fragment>
           ))
         )}
@@ -631,6 +931,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
       )}
 
       {deleteModal}
+      {bulkDeleteModal}
     </>
   );
 };

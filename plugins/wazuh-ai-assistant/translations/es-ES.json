@@ -213,6 +213,22 @@
     "wazuhAiAssistant.chat.conversations.hoursShort": "{count} h",
     "wazuhAiAssistant.settings.form.apiKeyRequirementAnthropic": "Obligatoria. Se almacena cifrada si hay una clave de cifrado configurada.",
     "wazuhAiAssistant.settings.form.apiKeyRequirementOpenaiCompatible": "Opcional. Un endpoint local sin autenticación, como Ollama, no necesita clave. Se almacena cifrada si hay una clave de cifrado configurada.",
-    "wazuhAiAssistant.settings.form.apiKeyHelpEditing": "Déjalo vacío para conservar la clave actual. Se almacena cifrada si hay una clave de cifrado configurada."
+    "wazuhAiAssistant.settings.form.apiKeyHelpEditing": "Déjalo vacío para conservar la clave actual. Se almacena cifrada si hay una clave de cifrado configurada.",
+    "wazuhAiAssistant.chat.conversations.rename": "Renombrar conversación",
+    "wazuhAiAssistant.chat.conversations.renameInputLabel": "Título de la conversación",
+    "wazuhAiAssistant.chat.conversations.renameError": "No se ha podido renombrar esa conversación.",
+    "wazuhAiAssistant.chat.conversations.renameSuccess": "Conversación renombrada.",
+    "wazuhAiAssistant.chat.conversations.deleteSuccess": "Conversación eliminada.",
+    "wazuhAiAssistant.chat.conversations.bulkDeleteError": "No se han podido eliminar una o más conversaciones.",
+    "wazuhAiAssistant.chat.conversations.bulkDeleteSuccess": "{count, plural, one {Conversación eliminada.} other {{count} conversaciones eliminadas.}}",
+    "wazuhAiAssistant.chat.conversations.selectMode.enter": "Seleccionar conversaciones",
+    "wazuhAiAssistant.chat.conversations.selectMode.cancel": "Cancelar selección",
+    "wazuhAiAssistant.chat.conversations.selectMode.selectRow": "Seleccionar \"{title}\"",
+    "wazuhAiAssistant.chat.conversations.selectMode.selectedCount": "{count} seleccionadas",
+    "wazuhAiAssistant.chat.conversations.selectMode.deleteButton": "Eliminar ({count})",
+    "wazuhAiAssistant.chat.conversations.bulkDeleteConfirm.title": "{count, plural, one {¿Eliminar conversación?} other {¿Eliminar {count} conversaciones?}}",
+    "wazuhAiAssistant.chat.conversations.bulkDeleteConfirm.body": "Esto eliminará permanentemente las conversaciones seleccionadas. Esta acción no se puede deshacer.",
+    "wazuhAiAssistant.chat.conversations.bulkDeleteConfirm.cancel": "Cancelar",
+    "wazuhAiAssistant.chat.conversations.bulkDeleteConfirm.confirm": "Eliminar"
   }
 }

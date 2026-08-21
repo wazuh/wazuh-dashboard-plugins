@@ -120,3 +120,25 @@
 .wzConvoRailCollapsedSpacer {
   flex: 1 1 auto;
 }
+
+/**
+ * Real list markup (E4/#9010, conversation-list.tsx): one `<ul>` per date group, so a screen
+ * reader announces "list, N items" the way `EuiListGroup` does — previously each row was a plain
+ * `<div>`, with no list semantics at all. Reset to zero visual effect: no browser default has any
+ * business showing up in a "no redesign" change, only the actual accessibility markup does.
+ */
+.wzConvoRailGroupList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/** `margin-bottom` replaces the `<EuiSpacer size="xs" />` (4px) that used to sit between rows when
+ * they were flat siblings rather than `<li>`s — same visual gap, now expressed as the list item's
+ * own spacing rather than an extra DOM node between each pair. The last row in a group has no
+ * following spacer either way, so no `:last-child` exception is needed. */
+.wzConvoRailListItem {
+  margin: 0 0 4px;
+  padding: 0;
+  list-style: none;
+}
