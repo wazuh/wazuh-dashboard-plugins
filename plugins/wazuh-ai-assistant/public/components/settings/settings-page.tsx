@@ -1680,8 +1680,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 // FQDNs are scanned, and NF-1 additionally scans for identifiers already seen this
                 // session) — replaced with an accurate, equally short statement of what is and is
                 // not covered, in the same impersonal register as the rest of this description.
+                // Adversarial round 2: narrowed "hostnames" to "domain names" in the second
+                // sentence — a fresh bare hostname is not unconditionally scanned, only a dotted
+                // domain name/FQDN is; the bare case is covered separately by "identifiers already
+                // seen in the session".
                 defaultMessage:
-                  'Control whether Wazuh finding data is anonymized before reaching the configured AI provider. When privacy mode is off, hostnames, IP addresses, usernames, process command lines, and finding/rule text leave the cluster as-is. Text typed into chat is scanned for IP addresses, hostnames, and identifiers already seen in the session; other identifiers typed into chat may still reach the provider unmasked.',
+                  'Control whether Wazuh finding data is anonymized before reaching the configured AI provider. When privacy mode is off, hostnames, IP addresses, usernames, process command lines, and finding/rule text leave the cluster as-is. Text typed into chat is scanned for IP addresses, domain names, and identifiers already seen in the session; other identifiers typed into chat may still reach the provider unmasked.',
               },
             )}
           >

@@ -165,7 +165,23 @@ test('NF-1: a message with no matching identifiers passes through unchanged even
   assert.equal(scrubbed.content, text);
 });
 
-test('F10: a bare identifier typed on turn N is masked when that SAME turn is re-sent on turn N+1', () => {
+test('NF-1: privacy-off path is unaffected (scrubMessagesForProvider is simply never called)', () => {
+  // scrubMessagesForProvider is only ever invoked from chat.ts when `privacyCtx` is set, i.e.
+  // privacy mode resolved ON for this turn (see resolvePrivacyEnabled/orchestrate call sites) --
+  // there is no separate "privacy off" branch inside this function to regress. This pins that
+  // invariant directly (distinct from the "no matching identifiers, populated dictionary" test
+  // above, which pins the no-op-on-no-match BEHAVIOR, not this WHEN-is-it-called invariant): a
+  // message with no minted entities at all comes back byte-for-byte identical, which is the same
+  // observable outcome "privacy off" has today precisely because this function is not on that path.
+  const p = new Pseudonymizer();
+  const text = 'no identifiers in this message at all, and nothing minted yet';
+
+  const [scrubbed] = scrubMessagesForProvider([userMessage(text)], p);
+
+  assert.equal(scrubbed.content, text);
+});
+
+test('F10: a bare identifier minted via the TOOL path on turn N (never typed by the user) is masked when that SAME turn is re-sent on turn N+1', () => {
   // Bounds the NF-1 residual precisely: a client re-sends the FULL message history on every turn
   // (chat-page.tsx keeps `messages` across turns within one mounted session), so a user message
   // that minted a pseudonym via `scrubMessagesForProvider` on turn N must come back masked again
@@ -208,4 +224,143 @@ test('NF-1: the system message is never scrubbed (unchanged behavior)', () => {
   const [scrubbed] = scrubMessagesForProvider([system], p);
 
   assert.equal(scrubbed.content, 'talk about dbprod07');
+});
+
+// --- Replay-leak fix (Fix 1/Fix 2/regression): the SERVER NEVER TRUSTS client-replayed content to
+// already be protected. Every test below uses an EMPTY Pseudonymizer -- the exact shape of "privacy
+// toggled ON mid-conversation" (privacy ships OFF by default: index-settings-provider.ts's
+// `privacyDefaultOn: false`), a resumed conversation (chat-page.tsx's `applyLoadedConversation`
+// resets the client-held map on load), or simply the very first turn of a privacy-on conversation
+// before anything has been minted yet. Against an empty map, a pure map-SUBSTITUTION pass
+// (`applyToText`/`applyToObject`) is a no-op by construction -- these tests prove the unconditional
+// SHAPE SCAN (`prescanAndMint`) now added to the `assistant`/`toolCalls[].arguments` paths is what
+// actually catches a real value in that scenario, not the (necessarily empty) map.
+
+function assistantMessage(
+  content: string,
+  toolCalls?: ChatMessage['toolCalls'],
+): ChatMessage {
+  return { role: 'assistant', content, ...(toolCalls ? { toolCalls } : {}) };
+}
+
+test('Fix 1: a real IP and a real dotted FQDN in REPLAYED assistant content are masked against an EMPTY pseudonymizer', () => {
+  const p = new Pseudonymizer();
+
+  const [scrubbed] = scrubMessagesForProvider(
+    [
+      assistantMessage(
+        'The agent at 10.20.30.44 (dbprod07.corp.example.com) reported 3 critical alerts.',
+      ),
+    ],
+    p,
+  );
+
+  assert.match(scrubbed.content, /IP_\d+/);
+  assert.match(scrubbed.content, /HOST_\d+/);
+  assert.doesNotMatch(scrubbed.content, /10\.20\.30\.44/);
+  assert.doesNotMatch(scrubbed.content, /dbprod07\.corp\.example\.com/);
+});
+
+test('Fix 2: a real IP/hostname/username in REPLAYED tool-call arguments are masked against an EMPTY pseudonymizer', () => {
+  const p = new Pseudonymizer();
+
+  const [scrubbed] = scrubMessagesForProvider(
+    [
+      assistantMessage('', [
+        {
+          id: 't1',
+          name: 'search_wazuh_data',
+          arguments: {
+            note: 'reported by dbprod07.corp.example.com',
+            source_ip: '203.0.113.9',
+            filter: 'agent connected from 203.0.113.9',
+          },
+        },
+      ]),
+    ],
+    p,
+  );
+
+  const args = scrubbed.toolCalls?.[0].arguments as Record<string, unknown>;
+  // Assert on the actual outbound STRUCTURE, not a stringified blob: every leaf that carried a
+  // shape-scannable value is now pseudonym-form, and nothing else about the object's shape changed.
+  assert.match(args.note as string, /HOST_\d+/);
+  assert.doesNotMatch(args.note as string, /dbprod07\.corp\.example\.com/);
+  assert.match(args.source_ip as string, /IP_\d+/);
+  assert.match(args.filter as string, /IP_\d+/);
+  assert.doesNotMatch(args.source_ip as string, /203\.0\.113\.9/);
+  assert.doesNotMatch(args.filter as string, /203\.0\.113\.9/);
+  // The SAME real IP in two different fields must resolve to the SAME pseudonym (one mint, reused
+  // by prescanAndMint's own shared pseudonymizer instance across both leaves of this one call).
+  assert.equal(args.source_ip, (args.filter as string).match(/IP_\d+/)?.[0]);
+});
+
+test('MOST IMPORTANT: privacy-toggled-mid-conversation -- no real IP/dotted-hostname survives ANYWHERE in the outbound payload against an EMPTY map', () => {
+  // The exact live scenario: a user chats for a while with privacy OFF (the shipped default), then
+  // toggles privacy ON mid-conversation. The very next server request re-scrubs the WHOLE
+  // accumulated real-valued history -- user prose, the model's own prior narration, a past tool
+  // call's real arguments, and the corresponding tool-result digest -- against a Pseudonymizer
+  // seeded from an EMPTY client-held map (nothing has ever been minted, because privacy was off
+  // for every prior turn). If this test fails, some role/shape in scrubMessagesForProvider is
+  // still relying on the map alone and leaking real customer data to the third-party provider.
+  // Scoped to IP/dotted-FQDN, the shapes `prescanAndMint`'s unconditional scan can ALWAYS catch
+  // regardless of the map's contents -- a separate test below documents the honest, narrower,
+  // bare-username residual this same scenario still carries.
+  const p = new Pseudonymizer();
+
+  const history: ChatMessage[] = [
+    userMessage('can you check on dbprod07.corp.example.com for me?'),
+    assistantMessage(
+      'Looking into 203.0.113.9 (dbprod07.corp.example.com) now.',
+      [
+        {
+          id: 't1',
+          name: 'search_wazuh_data',
+          arguments: {
+            index_pattern: 'wazuh-alerts-*',
+            filter: 'source.ip: 203.0.113.9 and host: dbprod07.corp.example.com',
+          },
+        },
+      ],
+    ),
+    {
+      role: 'tool',
+      toolCallId: 't1',
+      content: JSON.stringify({
+        tool: 'search_wazuh_data',
+        samples: [
+          {
+            'source.ip': '203.0.113.9',
+            'host.hostname': 'dbprod07.corp.example.com',
+          },
+        ],
+      }),
+    },
+    assistantMessage('Found 3 alerts from 203.0.113.9.'),
+  ];
+
+  const scrubbed = scrubMessagesForProvider(history, p);
+  const serialized = JSON.stringify(scrubbed);
+
+  assert.doesNotMatch(serialized, /203\.0\.113\.9/);
+  assert.doesNotMatch(serialized, /dbprod07\.corp\.example\.com/);
+  // Sanity: something WAS actually pseudonymized, not just coincidentally absent.
+  assert.match(serialized, /IP_\d+/);
+  assert.match(serialized, /HOST_\d+/);
+});
+
+test('documented residual: a bare, never-before-seen username in the same mid-conversation-toggle scenario is NOT masked', () => {
+  // Honest limitation, not a silent gap: "jdoe" is a bare, dotless, shapeless username with no
+  // prior mint anywhere in this (empty) map -- nothing here can single it out as sensitive by
+  // shape alone, and there is nothing in the dictionary to reuse either. See
+  // scrubMessagesForProvider's own doc comment for the full accepted-residual writeup. This
+  // assertion exists so a future change to that residual is a deliberate, reviewed decision.
+  const p = new Pseudonymizer();
+
+  const [scrubbed] = scrubMessagesForProvider(
+    [assistantMessage('Found 3 alerts for user jdoe in the last hour.')],
+    p,
+  );
+
+  assert.match(scrubbed.content, /jdoe/);
 });

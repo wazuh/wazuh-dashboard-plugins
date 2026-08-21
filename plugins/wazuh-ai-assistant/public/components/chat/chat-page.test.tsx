@@ -804,7 +804,25 @@ describe('ChatPage — a resumed conversation is the same conversation', () => {
     expect(screen.getByText('web-01')).toBeInTheDocument();
   });
 
-  it('resends the restored tool history with the next question', async () => {
+  it('replay-leak fix (Fix 3): does NOT resend the restored tool history with the next question', async () => {
+    // Was: 'resends the restored tool history with the next question', asserting the OPPOSITE —
+    // that a resumed conversation's tool/digest pair WAS resent as history on the next turn. That
+    // was a real bug, not a feature: `ToolExchange.digestContent` (common/chat-history.ts) is
+    // "already pseudonym-form when privacy was on for that turn", carrying tokens like `HOST_1`
+    // minted by a PAST session's `Pseudonymizer`. `applyLoadedConversation` resets the client-held
+    // `pseudonymMap` to empty on resume (nothing survives a reload/reopen — the map is wire-only,
+    // never persisted), so the server's next `Pseudonymizer` restarts its mint counters at 0 — its
+    // very first fresh mint this session is `HOST_1` again, colliding with whatever `HOST_1`
+    // already meant in the resent OLD digest content. A model echoing that stale token back would
+    // then get it reversed (`StreamDepseudonymizer.reverseText`) to THIS session's real value,
+    // silently substituting a different session's real host/IP for the one the stale token
+    // actually meant. Fixed in chat-page.tsx's `applyLoadedConversation`: `turnHistoryRef.current`
+    // is now cleared (`[]`) on resume instead of being restored from `restored.turnRecords`, so
+    // `buildOutgoingMessages` has nothing to resend as a tool/digest pair — this test pins that
+    // observably, via the exact same `mockStreamChat` call-args seam the old (now-removed) test
+    // used. The resumed conversation is still fully READABLE (`42 alerts` renders, the tool-call
+    // chip still shows on the restored turn — see 'shows the executed queries again on a resumed
+    // conversation' above): only the ABILITY TO CONTINUE without re-querying is traded for safety.
     const stream = createControllableStream();
     mockStreamChat.mockImplementation(
       (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
@@ -831,23 +849,20 @@ describe('ChatPage — a resumed conversation is the same conversation', () => {
     await waitFor(() =>
       expect(screen.getByText('42 alerts')).toBeInTheDocument(),
     );
-    // The tool pair is history, not a bubble.
+    // The tool pair is history, not a bubble, whether or not it gets resent.
     expect(screen.queryByText('{"count":42}')).not.toBeInTheDocument();
 
     await sendMessage('and yesterday?');
 
-    // Without the restored tool history the model would have seen prose only and re-run the query.
+    // No stale tool/digest pair resent: just the two restored prose messages plus the new one.
     const sentMessages = mockStreamChat.mock
       .calls[0][1] as PersistedChatMessage[];
     expect(sentMessages.map(message => message.role)).toEqual([
       'user',
       'assistant',
-      'tool',
-      'assistant',
       'user',
     ]);
-    expect(sentMessages[2].content).toBe('{"count":42}');
-    expect(sentMessages[1].toolCalls?.[0].id).toBe('t1');
+    expect(sentMessages.every(message => !message.toolCalls)).toBe(true);
   });
 });
 

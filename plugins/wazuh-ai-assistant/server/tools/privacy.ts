@@ -551,8 +551,14 @@ function setOwnProperty(
 /** Deep-maps every string leaf of a JSON-like value through `mapFn`; objects/arrays are rebuilt,
  * everything else (number/boolean/null/undefined) passes through unchanged. Shared by
  * `Pseudonymizer.applyToObject` (real -> pseudonym, for outbound tool-call argument scrubbing) and
- * `.reverseObject` (pseudonym -> real, for inbound tool-call argument reversal). */
-function deepMapStrings(
+ * `.reverseObject` (pseudonym -> real, for inbound tool-call argument reversal).
+ *
+ * Exported (replay-leak fix) so `chat.ts`'s `scrubMessagesForProvider` can run the SAME shape-scan
+ * function (`prescanAndMint`) over every string leaf of a tool call's `arguments` that the `user`/
+ * `tool`/`assistant` content branches already run over their own content, rather than relying
+ * solely on `Pseudonymizer.applyToObject`'s map-substitution (a no-op against an empty/stale map —
+ * see that call site's doc comment for the full scenario this closes). */
+export function deepMapStrings(
   value: unknown,
   mapFn: (text: string) => string,
 ): unknown {
@@ -1185,13 +1191,23 @@ export function prescanAndMintToolContent(
  *    recoverable at reasonable confidence from a bare token in prose; VAL/URL are excluded because
  *    VAL is this file's catch-all "no better kind inferred" bucket (exactly what an ordinary noun
  *    like "critical" gets minted as under the escape hatch's fail-closed default), and
- * 2. pass `looksLikeIdentifierValue` — long/shaped enough to not plausibly be an ordinary short
- *    word ("root", "3") a real hostname/username would rarely collide with.
+ * 2. pass `looksLikeIdentifierValue` — not a length/shape floor (that was tried first and
+ *    regressed the NF-1 threat model this branch exists to close — see that function's doc
+ *    comment for why), but a short curated stop-list of common words/placeholders that are
+ *    plausible real minted USER/HOST values (a real "root" or "admin" account exists on plenty of
+ *    systems) but corrupt ordinary prose far more often than they protect anything.
  *
- * Combined, this still matches every NF-1 scenario value (`dbprod07`, `DBPRIMARY03`,
- * `db-primary-03`, `jsmith` — all either digit/separator-bearing or long enough) while leaving
- * `ubuntu`/`critical` (VAL-kind) and `root`/a bare `3` (too short) untouched, and — since F2's
- * corrupting value is always short — also closes F2 as a side effect of the same length floor.
+ * Combined, this matches every NF-1 scenario value (`dbprod07`, `DBPRIMARY03`, `db-primary-03`,
+ * `jsmith`) AND every SHORT real identifier a user might legitimately retype off a results table
+ * (`jdoe`, `bob`, `titan`) while leaving `ubuntu`/`critical` (VAL-kind, excluded by the kind check)
+ * and `root`/`admin`/`system`/`unknown` (IP/HOST/USER-kind, but stop-listed) untouched. F2's
+ * token-corruption concern (a minted value matching inside an already-inserted pseudonym token,
+ * e.g. known value "1" inside "HOST_1") is still closed by the `>= 3` character floor below: the
+ * boundary regex's `(?<![A-Za-z0-9])`/`(?![A-Za-z0-9])` lookarounds mean a corrupting match would
+ * require a minted digit run of 3+ chars that EXACTLY equals another live pseudonym's full numeric
+ * counter suffix — not just contains it — which needs both a same-session collision AND the
+ * shorter mint to be a complete, boundary-delimited token on its own; unreachable in practice for
+ * the counters a real conversation ever mints.
  */
 export interface ScrubKnownEntitiesOptions {
   /** Narrow the dictionary scan to IP/HOST/USER-kind, identifier-shaped entries only — see this
@@ -1205,25 +1221,63 @@ function isRecoverableIdentifierPseudonym(pseudonym: string): boolean {
   return /^(?:IP|HOST|USER)_\d+$/.test(pseudonym);
 }
 
+/** Case-insensitive stop-list of common words/placeholders that are plausible real IP/HOST/USER
+ * values (a genuine "root"/"admin" account, a genuine "localhost"/"windows" host-shaped value) but
+ * are ordinary enough that masking them in a user's typed question corrupts far more sentences
+ * than it protects — the exact F1 failure mode ("Which Ubuntu agents are critical? root cause
+ * please" -> "... USER_4 cause please"). Deliberately curated and short, not derived from a
+ * dictionary or a length heuristic: an earlier version of `looksLikeIdentifierValue` used a raw
+ * length/shape floor instead (>= 5 chars + digit/separator, or >= 6 plain-alphabetic) and that
+ * regressed the exact threat model NF-1 exists to close — EVERY IP/HOST/USER value shorter than 5
+ * chars, and every 5-char alphabetic one, went unmasked, including entirely realistic short
+ * identifiers a user would retype straight off a results table ("jdoe", "bob", "titan", 4-char AD
+ * account names). A stop-list keeps those short REAL identifiers masked while still excluding the
+ * handful of common words that would otherwise be indistinguishable from them. */
+const IDENTIFIER_STOP_WORDS = new Set([
+  'root',
+  'admin',
+  'administrator',
+  'user',
+  'users',
+  'guest',
+  'system',
+  'host',
+  'hostname',
+  'local',
+  'localhost',
+  'none',
+  'null',
+  'unknown',
+  'default',
+  'test',
+  'prod',
+  'dev',
+  'staging',
+  'server',
+  'agent',
+  'group',
+  'windows',
+  'linux',
+  'ubuntu',
+  'debian',
+  'centos',
+  'service',
+  'daemon',
+  'other',
+]);
+
 /** True when `value` is shaped enough like a real identifier (hostname/IP-adjacent/username) that
  * `identifiersOnly` mode should trust a dictionary match on it inside ordinary user-typed prose.
- * Two ways in: (a) at least 5 characters AND carrying a digit or one of the identifier separators
- * `-`/`_`/`.` (covers "dbprod07", "DBPRIMARY03", "db-primary-03", and rules out the 4-character
- * "root" and the 1-character "3"), or (b) at least 6 plain-alphabetic characters — needed for a
- * short, separator-less real username like "jsmith" (already pinned by the pre-existing NF-1 test
- * in scrub-messages-for-provider.test.ts, which this filter must not regress) that no digit/
- * separator rule can single out. That second branch is deliberately looser than a bare "8 chars"
- * cutoff would be for exactly that reason; it is safe in practice because the words this filter
- * must still exclude (`ubuntu`, `critical`, `root`) are excluded by the KIND check above (minted
- * VAL, not USER/HOST/IP) rather than by length. */
+ * Two conditions, both required: at least 3 characters (the F2 corruption-floor — see this
+ * function's own doc comment above for the exact boundary-collision analysis that makes 3 safe),
+ * and NOT an exact (case-insensitive) match of `IDENTIFIER_STOP_WORDS`. This deliberately masks
+ * SHORT real identifiers ("jdoe", "bob", "titan", "db1") that a length/shape floor alone would have
+ * missed — see `IDENTIFIER_STOP_WORDS`'s doc comment for why that was tried first and reverted. */
 function looksLikeIdentifierValue(value: string): boolean {
-  if (value.length < 5) {
+  if (value.length < 3) {
     return false;
   }
-  if (/[0-9_.-]/.test(value)) {
-    return true;
-  }
-  return value.length >= 6;
+  return !IDENTIFIER_STOP_WORDS.has(value.toLowerCase());
 }
 
 export function scrubKnownEntities(

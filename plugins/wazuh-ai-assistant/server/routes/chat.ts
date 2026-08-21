@@ -28,6 +28,7 @@ import {
 } from '../tools/executor';
 import { validate } from '../tools/schema-validator';
 import {
+  deepMapStrings,
   prescanAndMint,
   prescanAndMintToolContent,
   Pseudonymizer,
@@ -1244,6 +1245,26 @@ function resolvePrivacyEnabled(
  * turn): `applyToText` only replaces substrings it recognizes as a REAL value it has a mapping for,
  * so text that is already in pseudonym form is left alone.
  *
+ * SECURITY PRINCIPLE (replay-leak fix, live-proven gap): the SERVER NEVER TRUSTS client-replayed
+ * content to already be protected. Two trust boundaries exist here — the tool digest reaching the
+ * provider (`applyFieldPolicy` in privacy.ts, server-internal, unaffected by any of this) and this
+ * function's boundary, CLIENT -> SERVER REPLAY: the browser hands back real-valued `assistant`
+ * prose, `toolCalls[].arguments` (kept in REAL form server-side by design — see chat-history.ts),
+ * and a resumed conversation's whole history, and the server used to assume the client-held
+ * pseudonym map (re-seeded into `pseudonymizer` from the request body) already protects it. That
+ * map is emptied by two entirely ordinary client actions: resuming a saved conversation
+ * (chat-page.tsx's `applyLoadedConversation`, `setPseudonymMap([])`), and — far more likely in
+ * practice, since privacy ships OFF by default (index-settings-provider.ts's
+ * `privacyDefaultOn: false`) — a user chatting with privacy off, then toggling it ON mid-
+ * conversation, which resends the ENTIRE accumulated real-valued history against a map that has
+ * never minted anything. Against an empty/stale map, a pure map-SUBSTITUTION pass (`applyToText`,
+ * `applyToObject`) is a no-op by construction — there is nothing yet to substitute. So EVERY inbound
+ * role/shape now gets an unconditional SHAPE SCAN (`prescanAndMint`/`prescanAndMintToolContent`,
+ * IPv4/IPv6/dotted-FQDN) first, independent of what the map does or doesn't contain, with the map
+ * substitution layered on top as a reuse/consistency optimization, never as the sole mechanism this
+ * boundary depends on. `user`/`tool` content already had this (see "First-mention pre-scan" below);
+ * `assistant` content and `toolCalls[].arguments` did not, and are fixed by this same principle.
+ *
  * First-mention pre-scan: for `user`/`tool` role content ONLY, `content`
  * is first run through `privacy.ts`'s pre-scan — flat `prescanAndMint` for user free text,
  * `prescanAndMintToolContent` (JSON-aware, string VALUES only, never keys) for tool digests —
@@ -1253,8 +1274,8 @@ function resolvePrivacyEnabled(
  * a no-op for it), (b) already reflected in `newEntries()`, so it flows through the existing
  * `privacy_map` SSE emission unchanged, and (c) reverses correctly out of a model-echoed tool-call
  * argument via the existing `reverseObject` path — no second emission/reversal path needed.
- * `assistant` content is left to the `applyToText`-only path: it is the model's own prior narration,
- * out of scope here (see `prescanAndMint`'s doc comment for what it does and does not catch).
+ * `assistant` content gets the SAME shape-scan-first treatment as of the replay-leak fix above (see
+ * the `else` branch below) — it is no longer `applyToText`-only.
  *
  * NF-1 fix (live-proven gap): for `user` content specifically, `prescanAndMint` alone only mints
  * IPv4/IPv6 addresses and DOTTED hostnames — a BARE hostname the user types without its domain
@@ -1313,6 +1334,18 @@ function resolvePrivacyEnabled(
  * no recognizable shape, so it reaches the provider unmasked. A pasted secret/credential is the
  * same residual: nothing here classifies free text as sensitive by content, only by prior mint or
  * IP/FQDN shape.
+ *
+ * A SECOND, honestly-documented residual in the OPPOSITE direction (over-masking, a quality issue
+ * rather than a leak): `scrubKnownEntities`'s `IDENTIFIER_STOP_WORDS` list is curated and short, not
+ * exhaustive. An ordinary word NOT on that list — "database", "primary", "backup", "cluster", and
+ * plenty of others — that happens to have been minted under the HOST/USER kind (typically via the
+ * escape hatch's fail-closed default inferring HOST/USER from a `*.name`/`*user*`-shaped unlisted
+ * field name, `inferPseudonymKind`) is still masked if the user later retypes it in an unrelated
+ * sentence. This is the accepted trade-off of a curated stop-list over either extreme (a raw
+ * length/shape floor, which under-masked real short identifiers — see `IDENTIFIER_STOP_WORDS`'s own
+ * doc comment for why that was tried and reverted — or no filter at all, which is F1's original
+ * defect): some sentence corruption on an uncommon word is preferable to a real short identifier
+ * (a username like `jdoe`, a hostname like `titan`) reaching the provider unmasked.
  */
 // Exported purely so a colocated test can drive this directly with a scripted Pseudonymizer,
 // same rationale as this file's exported chatRequestMessageSchema.
@@ -1350,7 +1383,26 @@ export function scrubMessagesForProvider(
         prescanAndMintToolContent(message.content, pseudonymizer),
       );
     } else {
-      content = pseudonymizer.applyToText(message.content);
+      // Replay-leak fix (Fix 1): this is `assistant` content — the model's OWN prior narration,
+      // which the client resends verbatim on every subsequent turn as part of the accumulated
+      // history (never persisted/re-scrubbed server-side in between). This used to run through
+      // `applyToText` ONLY, which is a SUBSTITUTION, not a scan: it can only replace a value this
+      // `pseudonymizer` instance already holds a mapping for. The server has no way to verify the
+      // client-held pseudonym map it was seeded from is non-empty or even accurate for THIS
+      // content — a user can toggle privacy mode ON mid-conversation (privacy ships OFF by
+      // default, see index-settings-provider.ts's `privacyDefaultOn: false`), at which point every
+      // assistant message accumulated so far is real-valued prose that has never been scrubbed by
+      // anything, and gets resent with an effectively empty map. Closed the same way the `user`
+      // and `tool` branches already are: an unconditional shape scan (`prescanAndMint`) runs
+      // FIRST, regardless of what the map does or does not contain, so a real IP/dotted-FQDN in
+      // replayed assistant prose is caught even with a map that has nothing relevant in it.
+      // Principle (see this function's header doc comment too): the server never trusts
+      // client-replayed content to already be protected — every inbound role gets an
+      // unconditional shape scan; the pseudonym map is a REUSE/consistency optimization on top of
+      // that, never the sole mechanism a boundary depends on.
+      content = pseudonymizer.applyToText(
+        prescanAndMint(message.content, pseudonymizer),
+      );
     }
     return {
       ...message,
@@ -1359,7 +1411,26 @@ export function scrubMessagesForProvider(
         ? {
             toolCalls: message.toolCalls.map(call => ({
               ...call,
-              arguments: pseudonymizer.applyToObject(call.arguments),
+              // Replay-leak fix (Fix 2): tool-call arguments are kept in REAL form server-side by
+              // design (see chat-history.ts's doc comments on why — the client needs real-valued
+              // arguments to render the tool-call panel, and `reverseObject` puts them back to
+              // real form for that on the way out). chat-history.ts's own doc comment is explicit
+              // that this is safe ONLY because `scrubMessagesForProvider` re-scrubs them before
+              // every outbound call — i.e. THIS function is the one place that promise has to
+              // hold. `applyToObject` alone is a pure substitution against the pseudonymizer's
+              // map, same limitation as `applyToText` above: against an empty/stale map (privacy
+              // toggled on mid-conversation, or a resumed conversation) it is a no-op, and a real
+              // IP/hostname sitting in an earlier tool call's arguments would reach the provider
+              // verbatim. Closed with the same unconditional shape-scan-first principle as Fix 1,
+              // applied to every string leaf of the arguments object via `deepMapStrings`-over-
+              // `prescanAndMint` (reusing `Pseudonymizer.applyToObject`'s own deep-map machinery,
+              // just with the shape scan as the mapping function) before the existing
+              // map-substitution pass.
+              arguments: pseudonymizer.applyToObject(
+                deepMapStrings(call.arguments, value =>
+                  prescanAndMint(value, pseudonymizer),
+                ) as Record<string, unknown>,
+              ),
             })),
           }
         : {}),

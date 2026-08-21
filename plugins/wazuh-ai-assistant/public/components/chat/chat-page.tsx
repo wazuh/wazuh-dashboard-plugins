@@ -1329,6 +1329,30 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
      * pseudonym state to resume (server/conversation-store.ts's PRIVACY INTERACTION doc
      * comment: the map is wire-only and never persisted) and no stored tool_call/digest pairs to
      * replay as history either.
+     *
+     * Replay-leak fix (Fix 3): this comment always SAID both reset, but the code underneath it only
+     * ever reset the pseudonym map — `turnHistoryRef.current` was restored from
+     * `restored.turnRecords`, not cleared. That mismatch was a real bug, not just a stale comment:
+     * `ToolExchange.digestContent` (common/chat-history.ts) is "already pseudonym-form when privacy
+     * was on for that turn" — i.e. it can contain tokens like `HOST_1`/`IP_2` minted by a PAST
+     * session's `Pseudonymizer`, referring to THAT session's real values. `Pseudonymizer`'s mint
+     * counters (privacy.ts's constructor) are derived only from the SEEDED map, so a resumed
+     * conversation's now-empty map means the next turn's server-side `Pseudonymizer` restarts every
+     * counter at 0 — its very first fresh mint this session is `IP_1`/`HOST_1` again, colliding with
+     * whatever `IP_1`/`HOST_1` already means in the replayed digest content from the OLD session.
+     * `buildOutgoingMessages` (chat-history.ts) would then resend that stale digest verbatim as
+     * history, and `StreamDepseudonymizer.reverseText` (privacy.ts) would reverse any model-echoed
+     * `IP_1`/`HOST_1` using THIS session's fresh mapping — silently substituting a DIFFERENT
+     * session's real host/IP for the one the stale token actually meant. Fixed by actually clearing
+     * `turnHistoryRef.current` here, matching what this comment always claimed: a resumed
+     * conversation drops its tool-call/digest replay bookkeeping along with the pseudonym map that
+     * digest content's tokens depend on. This does NOT affect what's on screen — `restored.messages`
+     * (below) is the reconstructed, already-real-valued DISPLAY text, entirely separate from
+     * `turnHistoryRef`'s replay-only bookkeeping; only the model's ability to reuse a resumed
+     * conversation's last couple of tool calls without re-running them is lost, not any visible
+     * history. `handleNewConversation` below already resets both together the same way; this brings
+     * `applyLoadedConversation` into line with that existing convention instead of being the one
+     * path that didn't.
      */
     const applyLoadedConversation = (record: ConversationRecord) => {
       // A resumed conversation opens at its latest turn (bottom), like every chat client — through
@@ -1340,10 +1364,11 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       welcomeDismissedRef.current = false;
       const restored = reconstructConversation(record.messages);
       updateMessages(restored.messages);
-      // Restoring the tool history is what makes a resumed conversation continuable rather than just
-      // readable: the model gets back the tool calls whose results its prose describes, instead of
-      // re-running the same queries on the next question.
-      turnHistoryRef.current = restored.turnRecords;
+      // Replay-leak fix (Fix 3): NOT `restored.turnRecords` — see this function's doc comment above
+      // for why replaying another session's pseudonym-form digest content against a freshly emptied
+      // map (right below) is unsafe. The resumed conversation is fully READABLE (restored.messages
+      // above), just not continuable-without-re-querying the way a same-session turn is.
+      turnHistoryRef.current = [];
       setPseudonymMap([]);
       setActiveConversationId(record.id);
       // Optimistic concurrency: this tab's last-known version starts at whatever the GET returned —
@@ -2494,8 +2519,13 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
           // (scrubKnownEntities). Replaced with an accurate, still-short statement of what IS and
           // is NOT covered — see scrubMessagesForProvider's doc comment (server/routes/chat.ts) for
           // the full, precise residual this summarizes.
+          // Adversarial round 2: "hostnames" in the first clause over-promised — a FRESH bare
+          // hostname the user types (no dotted suffix) is never unconditionally scanned, only a
+          // dotted domain name/FQDN is (prescanAndMint's shape scan) or an already-known bare
+          // identifier is (the second clause, scrubKnownEntities). Narrowed the first clause to
+          // "domain names" so it names only what is ALWAYS scanned regardless of prior mint.
           defaultMessage:
-            'Privacy on: Wazuh data sent to the AI provider — hostnames, IP addresses, usernames, process command lines, and finding/rule text — is pseudonymized. Text you type is scanned for IP addresses, hostnames, and identifiers already seen in this session; other identifiers you type may reach the provider unmasked.',
+            'Privacy on: Wazuh data sent to the AI provider — hostnames, IP addresses, usernames, process command lines, and finding/rule text — is pseudonymized. Text you type is scanned for IP addresses, domain names, and identifiers already seen in this session; other identifiers you type may reach the provider unmasked.',
         })
       : i18n.translate('wazuhAiAssistant.chat.privacy.explainOff', {
           defaultMessage:

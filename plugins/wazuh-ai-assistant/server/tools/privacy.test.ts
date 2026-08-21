@@ -1695,6 +1695,55 @@ test('F2: the shape filter alone (not just the kind filter) excludes a short val
   assert.equal(out, text);
 });
 
+// --- Round-2 adversarial validation: the length/shape floor under-masked real SHORT identifiers
+// (a genuine regression vs. shipped upstream, where the `user` branch's unfiltered `applyToText`
+// masked ANY exact-case retype regardless of length). `looksLikeIdentifierValue` was rewritten from
+// a length/shape floor to a curated stop-list: any IP/HOST/USER-kind value of length >= 3 is now
+// treated as an identifier UNLESS it exactly (case-insensitively) matches `IDENTIFIER_STOP_WORDS`.
+
+test('round 2: identifiersOnly masks real SHORT identifiers ("jdoe", "titan", "bob") in any casing that the old length floor missed', () => {
+  const p = new Pseudonymizer();
+  const jdoe = p.pseudonymize('jdoe', 'USER'); // 4 chars -- the old floor required 5+
+  const titan = p.pseudonymize('titan', 'HOST'); // 5 chars, alpha-only -- the old floor required 6+
+  const bob = p.pseudonymize('bob', 'USER'); // 3 chars -- the old floor required 5+
+
+  assert.equal(
+    scrubKnownEntities('and what did JDOE do?', p, { identifiersOnly: true }),
+    `and what did ${jdoe} do?`,
+  );
+  assert.equal(
+    scrubKnownEntities('is TITAN still noisy', p, { identifiersOnly: true }),
+    `is ${titan} still noisy`,
+  );
+  assert.equal(
+    scrubKnownEntities('ask Bob about it', p, { identifiersOnly: true }),
+    `ask ${bob} about it`,
+  );
+});
+
+test('round 2: identifiersOnly leaves stop-listed common words untouched even though they clear the length floor', () => {
+  const p = new Pseudonymizer();
+  p.pseudonymize('root', 'USER');
+  p.pseudonymize('admin', 'USER');
+  p.pseudonymize('system', 'HOST');
+  p.pseudonymize('unknown', 'HOST');
+
+  const text = 'the root and admin accounts on this system are unknown to me';
+  const out = scrubKnownEntities(text, p, { identifiersOnly: true });
+  assert.equal(out, text);
+});
+
+test('round 2: an inserted HOST_1 token is never corrupted by a short stop-listed OR non-stop-listed minted value', () => {
+  const p = new Pseudonymizer();
+  p.pseudonymize('system', 'HOST'); // stop-listed, but also just 6 chars, nowhere near "1"
+  const hostPseudonym = p.pseudonymize('dbprod07', 'HOST');
+  assert.equal(hostPseudonym, 'HOST_2');
+
+  const text = `why is ${hostPseudonym} noisy`;
+  const out = scrubKnownEntities(text, p, { identifiersOnly: true });
+  assert.equal(out, text);
+});
+
 // --- applyFieldPolicy: 'allow-scan' action (#8912) ----------------------------------------------
 
 test('applyFieldPolicy: "allow-scan" field replaces a known dictionary hit with its existing pseudonym', () => {
