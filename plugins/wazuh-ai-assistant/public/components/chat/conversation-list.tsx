@@ -900,7 +900,10 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                           // commit (see `handleRenameBlur`'s own doc comment) is suppressed here,
                           // once, rather than also firing `onSelect` and navigating away in the
                           // same gesture that just committed the rename.
-                          if (justCommittedViaBlurIdRef.current === conversation.id) {
+                          if (
+                            justCommittedViaBlurIdRef.current ===
+                            conversation.id
+                          ) {
                             justCommittedViaBlurIdRef.current = null;
                             return;
                           }
@@ -919,7 +922,9 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                             event.preventDefault();
                             if (selectMode) {
                               toggleSelected(conversation.id);
-                            } else if (renamingIdRef.current !== conversation.id) {
+                            } else if (
+                              renamingIdRef.current !== conversation.id
+                            ) {
                               onSelect(conversation.id);
                             }
                           }
