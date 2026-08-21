@@ -307,15 +307,21 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
   // Mirrors `renamingId` but updated SYNCHRONOUSLY (state updates are not) -- see `commitRename`'s
-  // doc comment below for why the commit-on-blur behavior needs this to avoid double-committing,
-  // AND (F-5) why the row's own onClick/onKeyDown below read THIS instead of the `isRenaming`
-  // state-derived flag: a mousedown on the row body blurs the rename input FIRST (committing,
-  // which schedules a state update) and only THEN does the click fire -- if the click handler
-  // read the (still-stale, pre-commit) `isRenaming` state closure it would see `false` and also
-  // fire `onSelect`, navigating away in the same gesture that just committed the rename. The ref
-  // is updated synchronously by `commitRename`/`clearRename` before either of those React state
-  // updates has a chance to re-render, so the click sees the truth.
+  // doc comment below for why the commit-on-blur behavior needs this to avoid double-committing.
   const renamingIdRef = useRef<string | null>(null);
+  // F-5: a mousedown on the row body while renaming blurs the input FIRST -- committing, via
+  // `onBlur={commitRename}` below -- and only THEN does the click itself fire (the browser's
+  // default mousedown action moves focus, hence blur, before mouseup/click). By that point
+  // `renamingIdRef.current` has ALREADY been cleared by the commit, so checking it in the row's
+  // own onClick (below) is not enough on its own -- the click would still read "not renaming" and
+  // fire `onSelect`, navigating away in the same gesture that just committed the rename. This ref
+  // is what `commitRename`'s `onBlur` case (specifically -- NOT its Enter/keyboard case, which
+  // has no click to race) stamps with the id whose blur-triggered commit a click might be about
+  // to follow; the row's onClick (below) consumes and clears it to suppress exactly that one
+  // click, and a queued microtask clears it on its own if no click ever claims it (e.g. the user
+  // tabbed away instead of clicking), so it can never linger and wrongly swallow some LATER,
+  // unrelated click on the same row.
+  const justCommittedViaBlurIdRef = useRef<string | null>(null);
 
   // Bulk delete (E3): an explicit select mode a "Select conversations" button enters/exits — rows
   // never show checkboxes outside of it. `selectedIds` is cleared both on entry and on exit, so a
@@ -456,6 +462,30 @@ export const ConversationList: React.FC<ConversationListProps> = ({
     // row simply reverts to showing its previous title, same as Escape would.
     if (nextTitle) {
       onRename?.(id, nextTitle);
+    }
+  };
+
+  /**
+   * The rename input's own `onBlur` (m6: commit-on-blur) calls THIS, not `commitRename` directly
+   * (F-5) -- it additionally stamps `justCommittedViaBlurIdRef` with the id whose commit this
+   * blur just performed, so the row's own onClick (below), if a click follows this exact blur in
+   * the same gesture, can suppress navigating away instead of also firing `onSelect` right after
+   * the commit. Enter's own keydown handler calls `commitRename` directly instead of this
+   * wrapper: an Enter keypress never has a click racing it, so it has nothing to suppress.
+   * Cleared via a queued microtask if no click claims it within this same synchronous turn (a
+   * "real" blur with nothing to suppress, e.g. Tab), so a stale flag can never wrongly swallow
+   * some LATER, unrelated click on the same row.
+   */
+  const handleRenameBlur = () => {
+    const id = renamingIdRef.current;
+    commitRename();
+    if (id) {
+      justCommittedViaBlurIdRef.current = id;
+      queueMicrotask(() => {
+        if (justCommittedViaBlurIdRef.current === id) {
+          justCommittedViaBlurIdRef.current = null;
+        }
+      });
     }
   };
 
@@ -866,10 +896,20 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                             toggleSelected(conversation.id);
                             return;
                           }
-                          // F-5: reads the synchronous `renamingIdRef`, NOT the `isRenaming`
-                          // state-derived flag above -- see that ref's own doc comment for why a
-                          // click on the row body while renaming would otherwise both commit AND
-                          // navigate in the same gesture.
+                          // F-5: a click that immediately follows this exact row's blur-triggered
+                          // commit (see `handleRenameBlur`'s own doc comment) is suppressed here,
+                          // once, rather than also firing `onSelect` and navigating away in the
+                          // same gesture that just committed the rename.
+                          if (justCommittedViaBlurIdRef.current === conversation.id) {
+                            justCommittedViaBlurIdRef.current = null;
+                            return;
+                          }
+                          // Reads the synchronous `renamingIdRef`, NOT the `isRenaming`
+                          // state-derived flag above, for the same reason: by the time a click
+                          // dispatches, a blur that already ran has already cleared this ref
+                          // (and re-rendered, flipping `isRenaming` too) — either way, "not
+                          // renaming any more" is the correct read for a click that ISN'T the one
+                          // suppressed above.
                           if (renamingIdRef.current !== conversation.id) {
                             onSelect(conversation.id);
                           }
@@ -967,11 +1007,13 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                                   }
                                 }}
                                 // m6: commit on blur (clicking/tabbing away), the mainstream
-                                // inline-rename convention — see `commitRename`'s own doc comment
-                                // for why the `renamingIdRef` guard makes this safe to ALSO run
+                                // inline-rename convention — `handleRenameBlur` (not
+                                // `commitRename` directly, F-5) both commits (safe to ALSO run
                                 // after an Enter-triggered unmount's own synthetic blur, without
-                                // double-committing.
-                                onBlur={commitRename}
+                                // double-committing — see `commitRename`'s own doc comment) AND
+                                // arms the one-click navigation suppression a mousedown-triggered
+                                // blur needs — see that function's own doc comment.
+                                onBlur={handleRenameBlur}
                               />
                             ) : (
                               <EuiText
