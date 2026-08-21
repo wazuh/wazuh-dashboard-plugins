@@ -1269,13 +1269,31 @@ function resolvePrivacyEnabled(
  * replaced, since its case-sensitive exact-value pass has nothing new left to find).
  *
  * What this closes: a previously-minted entity (any kind — HOST/IP/USER/VAL — from Wazuh tool data,
- * or from a prior `user` message) retyped bare, in ANY casing, later in the SAME conversation.
+ * or from a prior `user` message) retyped bare, in ANY casing, later in the SAME MOUNTED SESSION —
+ * NOT "the same conversation" in the sense of the conversation record stored server-side. The
+ * dictionary this closes against lives entirely client-side (chat-page.tsx's `pseudonymMap`
+ * useState) and is explicitly reset to empty both on `handleNewConversation` and on loading a
+ * conversation's history back from storage (chat-page.tsx:1347's `setPseudonymMap([])` inside the
+ * conversation-restore path), and is lost outright on unmount (this component — the chat flyout's
+ * contents — unmounts whenever the flyout closes). So the precise residual is: reopen the flyout,
+ * or reload/reopen a stored conversation, and its restored history is RE-SENT to this same function
+ * with a freshly empty pseudonym map — every identifier that conversation ever minted has to be
+ * re-discovered (shape scan only; the dictionary scan below has nothing left to match) before it is
+ * masked again, exactly as if the conversation were brand new.
+ *
+ * F1/F2 (adversarial validation): for `user` content specifically, `scrubKnownEntities` is called
+ * with `{ identifiersOnly: true }` — narrower than the dictionary scan `scrubFieldValue`'s
+ * `allow-scan` branch runs over already-curated tool-value fields — because arbitrary user prose
+ * has no field-policy review behind it at all; see `scrubKnownEntities`'s own doc comment for the
+ * exact IP/HOST/USER-kind + identifier-shape filter this applies and why.
+ *
  * What this does NOT close (the accepted residual — see `scrubKnownEntities`'s own doc comment for
  * why a general bare-token masker is deliberately not attempted): a bare identifier that has never
- * been minted anywhere in this conversation — the very first time the user types it — has no
- * dictionary entry to match and no recognizable shape, so it reaches the provider unmasked. A
- * pasted secret/credential is the same residual: nothing here classifies free text as sensitive by
- * content, only by prior mint or IP/FQDN shape.
+ * been minted anywhere in this session — the very first time the user types it, or the first retype
+ * after a flyout reopen/conversation reload emptied the map — has no dictionary entry to match and
+ * no recognizable shape, so it reaches the provider unmasked. A pasted secret/credential is the
+ * same residual: nothing here classifies free text as sensitive by content, only by prior mint or
+ * IP/FQDN shape.
  */
 // Exported purely so a colocated test can drive this directly with a scripted Pseudonymizer,
 // same rationale as this file's exported chatRequestMessageSchema.
@@ -1295,10 +1313,16 @@ export function scrubMessagesForProvider(
       // NF-1: shape scan (prescanAndMint) THEN known-entity dictionary scan (scrubKnownEntities,
       // catches a previously-minted identifier retyped bare/in different casing) THEN the exact
       // applyToText pass — see this function's doc comment for the residual this does not cover.
+      // F1/F2: `identifiersOnly: true` restricts the dictionary scan to IP/HOST/USER-kind,
+      // identifier-shaped entries — arbitrary user prose has no field-policy review behind it, so
+      // this must not treat every string the pseudonymizer ever minted as a search-and-replace
+      // target (see scrubKnownEntities's doc comment for the exact filter and the corruption this
+      // closes).
       content = pseudonymizer.applyToText(
         scrubKnownEntities(
           prescanAndMint(message.content, pseudonymizer),
           pseudonymizer,
+          { identifiersOnly: true },
         ),
       );
     } else if (message.role === 'tool') {

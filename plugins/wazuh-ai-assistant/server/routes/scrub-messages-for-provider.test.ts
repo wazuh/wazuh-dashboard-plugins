@@ -113,8 +113,20 @@ test('NF-1 regression: a dotted FQDN is still minted and masked', () => {
   assert.doesNotMatch(scrubbed.content, /dbprod07\.corp\.example\.com/);
 });
 
-test('NF-1 regression: an ordinary question with no identifiers is left untouched (no false-positive mangling)', () => {
+test('F1 regression: an ordinary question is left untouched EVEN WITH A POPULATED DICTIONARY (no false-positive mangling)', () => {
+  // Was near-vacuous before this fix: it ran against an EMPTY pseudonymizer, so the dictionary
+  // scan was a no-op by construction and could never have caught the F1 defect (common minted
+  // words corrupting ordinary prose). Populated with the exact live repro's entities -- "ubuntu"/
+  // "critical" minted VAL (the escape hatch's fail-closed default for a field with no host/ip/
+  // user keyword), "root" minted USER (a real "root" user is a plausible value) -- so this test
+  // now actually exercises `scrubMessagesForProvider`'s `identifiersOnly: true` call and would
+  // fail without it.
   const p = new Pseudonymizer();
+  p.pseudonymize('ubuntu', 'VAL');
+  p.pseudonymize('critical', 'VAL');
+  p.pseudonymize('root', 'USER');
+  p.pseudonymize('dbprod07', 'HOST'); // an unrelated real identifier, also not present in this text
+
   const text =
     'Can you summarize the top failing SCA checks from the last 24 hours and group them by policy?';
 
@@ -123,18 +135,69 @@ test('NF-1 regression: an ordinary question with no identifiers is left untouche
   assert.equal(scrubbed.content, text);
 });
 
-test('NF-1: privacy-off path is unaffected (scrubMessagesForProvider is simply never called)', () => {
-  // scrubMessagesForProvider is only ever invoked from chat.ts when `privacyCtx` is set, i.e.
-  // privacy mode resolved ON for this turn (see resolvePrivacyEnabled/orchestrate call sites) --
-  // there is no separate "privacy off" branch inside this function to regress. This test pins that
-  // a message untouched by any mint/known-entity match (privacy mode's own no-op case) still comes
-  // back byte-for-byte identical, which is the same observable behavior "privacy off" has today.
+test('F1 regression: the live-repro sentence is left untouched with the exact entities that corrupted it', () => {
+  // Live-reproduced defect: "Which Ubuntu agents are critical? root cause please" became
+  // "Which VAL_2 agents are VAL_3? USER_4 cause please" once these three words had each been
+  // minted from unrelated fields earlier in the conversation.
   const p = new Pseudonymizer();
+  p.pseudonymize('ubuntu', 'VAL');
+  p.pseudonymize('critical', 'VAL');
+  p.pseudonymize('root', 'USER');
+
+  const text = 'Which Ubuntu agents are critical? root cause please';
+  const [scrubbed] = scrubMessagesForProvider([userMessage(text)], p);
+
+  assert.equal(scrubbed.content, text);
+});
+
+test('NF-1: a message with no matching identifiers passes through unchanged even with a populated dictionary', () => {
+  // Was near-vacuous before this fix: it ran against an EMPTY pseudonymizer, making the dictionary
+  // scan a no-op by construction regardless of whether the filter existed at all. Populated with
+  // real minted entities that simply do not appear in this message's text, so the "no match" path
+  // is genuinely exercised.
+  const p = new Pseudonymizer();
+  p.pseudonymize('dbprod07', 'HOST');
+  p.pseudonymize('jsmith', 'USER');
   const text = 'no identifiers in this message at all';
 
   const [scrubbed] = scrubMessagesForProvider([userMessage(text)], p);
 
   assert.equal(scrubbed.content, text);
+});
+
+test('F10: a bare identifier typed on turn N is masked when that SAME turn is re-sent on turn N+1', () => {
+  // Bounds the NF-1 residual precisely: a client re-sends the FULL message history on every turn
+  // (chat-page.tsx keeps `messages` across turns within one mounted session), so a user message
+  // that minted a pseudonym via `scrubMessagesForProvider` on turn N must come back masked again
+  // when that same message object is re-scrubbed as part of turn N+1's longer history -- the
+  // pseudonymizer instance is shared/reused across the whole session's turns (server/routes/
+  // chat.ts constructs one per request, seeded from the client-held map each time), so anything
+  // minted on turn N is already in the dictionary by turn N+1.
+  const p = new Pseudonymizer();
+
+  // Turn N: the user types a bare hostname for the first time; nothing has minted it yet, so it
+  // is caught by the FQDN/IP shape scan only if it has that shape -- here it does not, so it is
+  // the escape-hatch/tool-value path (simulated directly via pseudonymize) that mints it, exactly
+  // as get_agents/name would for the corresponding tool-call result earlier in the same turn.
+  const pseudonym = p.pseudonymize('dbprod07', 'HOST');
+  const turnNMessage = userMessage('can you check on dbprod07 for me?');
+  const [scrubbedTurnN] = scrubMessagesForProvider([turnNMessage], p);
+  assert.equal(scrubbedTurnN.content, `can you check on ${pseudonym} for me?`);
+
+  // Turn N+1: the SAME turn-N message object is re-sent (unscrubbed -- chat.ts always re-scrubs
+  // the raw accumulated history, never persists the scrubbed copy) as part of a longer history,
+  // alongside a new turn-N+1 message. Both must come back masked using the SAME pseudonymizer
+  // instance (the dictionary now already knows "dbprod07").
+  const turnNPlus1Message = userMessage('is it still noisy on dbprod07?');
+  const [reScrubbedTurnN, scrubbedTurnNPlus1] = scrubMessagesForProvider(
+    [turnNMessage, turnNPlus1Message],
+    p,
+  );
+
+  assert.equal(reScrubbedTurnN.content, `can you check on ${pseudonym} for me?`);
+  assert.doesNotMatch(reScrubbedTurnN.content, /dbprod07/i);
+  assert.equal(scrubbedTurnNPlus1.content, `is it still noisy on ${pseudonym}?`);
+  assert.doesNotMatch(scrubbedTurnNPlus1.content, /dbprod07/i);
 });
 
 test('NF-1: the system message is never scrubbed (unchanged behavior)', () => {

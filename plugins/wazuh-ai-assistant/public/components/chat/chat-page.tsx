@@ -2487,8 +2487,15 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
     // it the same way.
     const privacyExplainerText = privacyEnabled
       ? i18n.translate('wazuhAiAssistant.chat.privacy.explainOn', {
+          // F9: the previous wording ("Text you type yourself is not automatically masked.")
+          // flatly denied any protection for typed text, which under-promises and contradicts the
+          // actual pipeline: prescanAndMint already catches typed IPs/dotted FQDNs, and NF-1's fix
+          // additionally catches a bare identifier already known from earlier this session
+          // (scrubKnownEntities). Replaced with an accurate, still-short statement of what IS and
+          // is NOT covered — see scrubMessagesForProvider's doc comment (server/routes/chat.ts) for
+          // the full, precise residual this summarizes.
           defaultMessage:
-            'Privacy on: Wazuh data sent to the AI provider — hostnames, IP addresses, usernames, process command lines, and finding/rule text — is pseudonymized. Text you type yourself is not automatically masked.',
+            'Privacy on: Wazuh data sent to the AI provider — hostnames, IP addresses, usernames, process command lines, and finding/rule text — is pseudonymized. Text you type is scanned for IP addresses, hostnames, and identifiers already seen in this session; other identifiers you type may reach the provider unmasked.',
         })
       : i18n.translate('wazuhAiAssistant.chat.privacy.explainOff', {
           defaultMessage:
