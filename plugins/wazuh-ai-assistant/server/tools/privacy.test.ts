@@ -1721,6 +1721,63 @@ test('round 2: identifiersOnly masks real SHORT identifiers ("jdoe", "titan", "b
   );
 });
 
+// --- F-I1 (answer-quality adversarial validation): `inferPseudonymKind` mints HOST for ANY field
+// ending in a bare `.name` segment, not just genuine hostname fields -- `process.name`/
+// `file.name`/`package.name` etc. routinely mint ordinary short words ("top", "find", "make",
+// "less") as HOST. Live-verified: "show me the top 10 and find all" became
+// "show me the HOST_9 10 and HOST_10 USER_2" once those words had been minted this way elsewhere in
+// the conversation -- invisible to the analyst, since the reverse pass restores them in the MODEL's
+// own answer; they just see the assistant seem to misunderstand an ordinary question.
+
+test('F-I1: short plain-alphabetic HOST-kind command/process names are NOT replaced in prose', () => {
+  const p = new Pseudonymizer();
+  p.pseudonymize('top', 'HOST'); // e.g. minted from an unlisted process.name field
+  p.pseudonymize('find', 'HOST');
+  p.pseudonymize('make', 'HOST');
+  p.pseudonymize('less', 'HOST');
+
+  const text = 'show me the top 10 and find all, then make it less noisy';
+  const out = scrubKnownEntities(text, p, { identifiersOnly: true });
+  assert.equal(out, text);
+});
+
+test('F-I1: the fix does not regress masking of real short identifiers ("jdoe"/"bob" USER, "titan" HOST-5, "db1" HOST-digit)', () => {
+  const p = new Pseudonymizer();
+  const jdoe = p.pseudonymize('jdoe', 'USER');
+  const bob = p.pseudonymize('bob', 'USER');
+  const titan = p.pseudonymize('titan', 'HOST');
+  const db1 = p.pseudonymize('db1', 'HOST');
+
+  assert.equal(
+    scrubKnownEntities('ping jdoe about the outage', p, {
+      identifiersOnly: true,
+    }),
+    `ping ${jdoe} about the outage`,
+  );
+  assert.equal(
+    scrubKnownEntities('ask bob too', p, { identifiersOnly: true }),
+    `ask ${bob} too`,
+  );
+  assert.equal(
+    scrubKnownEntities('is titan still up', p, { identifiersOnly: true }),
+    `is ${titan} still up`,
+  );
+  assert.equal(
+    scrubKnownEntities('check db1 again', p, { identifiersOnly: true }),
+    `check ${db1} again`,
+  );
+});
+
+test('F-I1: without the pseudonym-kind check, a short HOST-kind command name WOULD be replaced -- proving the fix is load-bearing', () => {
+  const p = new Pseudonymizer();
+  p.pseudonymize('top', 'HOST');
+  const text = 'show me the top 10';
+  // Unfiltered dictionary scan (identifiersOnly: false/omitted) has no length/kind exemption at
+  // all -- this is the allow-scan tool-value behavior, deliberately unchanged by F-I1.
+  const out = scrubKnownEntities(text, p);
+  assert.notEqual(out, text);
+});
+
 test('round 2: identifiersOnly leaves stop-listed common words untouched even though they clear the length floor', () => {
   const p = new Pseudonymizer();
   p.pseudonymize('root', 'USER');
@@ -1733,15 +1790,29 @@ test('round 2: identifiersOnly leaves stop-listed common words untouched even th
   assert.equal(out, text);
 });
 
-test('round 2: an inserted HOST_1 token is never corrupted by a short stop-listed OR non-stop-listed minted value', () => {
+test('round 2: the >= 3 character floor (not the stop-list) is what saves an inserted HOST_1 token from a minted "1"', () => {
+  // Fixes a tautological predecessor of this test: minting only a STOP-LISTED value ("system")
+  // plus an UNRELATED value ("dbprod07" — never appears in the asserted text) proved nothing,
+  // because no minted value was ever a candidate to match inside the token either way — the
+  // assertion would have passed identically with the whole `identifiersOnly` filter deleted. This
+  // version mints the actual corrupting value from F2's own live repro ("1", NOT stop-listed, NOT
+  // excluded by kind) and shows the length floor is what stops it: "1" clears the kind filter
+  // (HOST) but fails length < 3, so it's excluded from the dictionary scan and the boundary match
+  // that would otherwise turn "why is HOST_1 noisy" into "why is HOSTHOST_1_1 noisy"-shaped
+  // corruption never gets the chance to fire.
   const p = new Pseudonymizer();
-  p.pseudonymize('system', 'HOST'); // stop-listed, but also just 6 chars, nowhere near "1"
-  const hostPseudonym = p.pseudonymize('dbprod07', 'HOST');
-  assert.equal(hostPseudonym, 'HOST_2');
+  const shortHostPseudonym = p.pseudonymize('1', 'HOST');
+  assert.equal(shortHostPseudonym, 'HOST_1');
 
-  const text = `why is ${hostPseudonym} noisy`;
+  const text = `why is ${shortHostPseudonym} noisy`;
   const out = scrubKnownEntities(text, p, { identifiersOnly: true });
   assert.equal(out, text);
+
+  // Prove the floor is actually load-bearing here (not vacuously true for some other reason):
+  // without `identifiersOnly`, the SAME minted value DOES corrupt the token, boundary rules and
+  // all — grounding the claim that `identifiersOnly`'s length floor is what changes the outcome.
+  const corrupted = scrubKnownEntities(text, p);
+  assert.notEqual(corrupted, text);
 });
 
 // --- applyFieldPolicy: 'allow-scan' action (#8912) ----------------------------------------------

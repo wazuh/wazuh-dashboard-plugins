@@ -1265,6 +1265,17 @@ function resolvePrivacyEnabled(
  * boundary depends on. `user`/`tool` content already had this (see "First-mention pre-scan" below);
  * `assistant` content and `toolCalls[].arguments` did not, and are fixed by this same principle.
  *
+ * ONE DELIBERATE EXCEPTION to "EVERY inbound role/shape": below, `toolCalls.map(call => ({ ...call,
+ * arguments: ... }))` spreads `call` before overwriting only `arguments` — so `ToolCall.vendorExtras`
+ * / `functionVendorExtras` (common/types.ts) are forwarded completely untouched, no shape scan and
+ * no map substitution. This is intentional, not an oversight: those fields are opaque, PROVIDER-
+ * origin passthrough blobs (the motivating case is Gemini's `thought_signature`, which the provider
+ * rejects the next request outright if it comes back even slightly altered) that must round-trip
+ * byte-identical for the adapter contract they exist for to keep working — running them through a
+ * scan/substitution pass built for CUSTOMER-origin text would risk corrupting a value this function
+ * has no business interpreting at all, for a boundary (provider-issued opaque tokens) that was never
+ * customer data to begin with.
+ *
  * First-mention pre-scan: for `user`/`tool` role content ONLY, `content`
  * is first run through `privacy.ts`'s pre-scan — flat `prescanAndMint` for user free text,
  * `prescanAndMintToolContent` (JSON-aware, string VALUES only, never keys) for tool digests —
@@ -1337,15 +1348,21 @@ function resolvePrivacyEnabled(
  *
  * A SECOND, honestly-documented residual in the OPPOSITE direction (over-masking, a quality issue
  * rather than a leak): `scrubKnownEntities`'s `IDENTIFIER_STOP_WORDS` list is curated and short, not
- * exhaustive. An ordinary word NOT on that list — "database", "primary", "backup", "cluster", and
- * plenty of others — that happens to have been minted under the HOST/USER kind (typically via the
- * escape hatch's fail-closed default inferring HOST/USER from a `*.name`/`*user*`-shaped unlisted
- * field name, `inferPseudonymKind`) is still masked if the user later retypes it in an unrelated
- * sentence. This is the accepted trade-off of a curated stop-list over either extreme (a raw
- * length/shape floor, which under-masked real short identifiers — see `IDENTIFIER_STOP_WORDS`'s own
- * doc comment for why that was tried and reverted — or no filter at all, which is F1's original
- * defect): some sentence corruption on an uncommon word is preferable to a real short identifier
- * (a username like `jdoe`, a hostname like `titan`) reaching the provider unmasked.
+ * exhaustive. The dominant real-world instance of this residual — see F-I1's fix in
+ * `looksLikeIdentifierValue`'s own doc comment for the live-verified repro and the length/kind
+ * mitigation applied — is a SHORT, plain process/file/package NAME minted as HOST via
+ * `inferPseudonymKind`'s bare-`.name`-segment rule (`process.name`/`file.name`/`package.name`/
+ * `service.name`/`group.name` all qualify): common Unix command names like "top"/"find"/"make"/
+ * "less" are exactly this shape, which is why that mitigation exists. What that mitigation does
+ * NOT close, and remains an honest residual, is any LONGER (>= 5 char) or non-`*.name`-sourced
+ * ordinary word not on the stop-list — "database", "primary", "backup", "cluster", and plenty of
+ * others — that happens to have been minted under the HOST/USER kind and is still masked if the
+ * user later retypes it in an unrelated sentence. This is the accepted trade-off of a curated
+ * stop-list (plus the length/kind mitigation) over either extreme (a raw length/shape floor, which
+ * under-masked real short identifiers — see `IDENTIFIER_STOP_WORDS`'s own doc comment for why that
+ * was tried and reverted — or no filter at all, which is F1's original defect): some sentence
+ * corruption on an uncommon word is preferable to a real short identifier (a username like `jdoe`,
+ * a hostname like `titan`) reaching the provider unmasked.
  */
 // Exported purely so a colocated test can drive this directly with a scripted Pseudonymizer,
 // same rationale as this file's exported chatRequestMessageSchema.

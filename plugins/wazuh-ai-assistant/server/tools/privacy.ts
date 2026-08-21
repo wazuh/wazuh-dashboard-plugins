@@ -1202,12 +1202,20 @@ export function prescanAndMintToolContent(
  * (`jdoe`, `bob`, `titan`) while leaving `ubuntu`/`critical` (VAL-kind, excluded by the kind check)
  * and `root`/`admin`/`system`/`unknown` (IP/HOST/USER-kind, but stop-listed) untouched. F2's
  * token-corruption concern (a minted value matching inside an already-inserted pseudonym token,
- * e.g. known value "1" inside "HOST_1") is still closed by the `>= 3` character floor below: the
- * boundary regex's `(?<![A-Za-z0-9])`/`(?![A-Za-z0-9])` lookarounds mean a corrupting match would
- * require a minted digit run of 3+ chars that EXACTLY equals another live pseudonym's full numeric
- * counter suffix — not just contains it — which needs both a same-session collision AND the
- * shorter mint to be a complete, boundary-delimited token on its own; unreachable in practice for
- * the counters a real conversation ever mints.
+ * e.g. known value "1" inside "HOST_1") is narrowed, NOT eliminated, by the `>= 3` character floor
+ * below: the boundary regex's `(?<![A-Za-z0-9])`/`(?![A-Za-z0-9])` lookarounds mean a corrupting
+ * match still requires a minted digit run that EXACTLY equals another live pseudonym's full numeric
+ * counter suffix — not just contains it. A 1-2 digit mint can never collide (every counter starts
+ * at 1, so a bare "1"/"12" is only ever a PREFIX of a 3+-digit counter, never boundary-delimited on
+ * its own against one), but a live-verified 3-digit mint DOES still bite: minting `"123"` (any kind)
+ * alongside a same-session counter that has climbed to a live `HOST_123` turns
+ * `"why is HOST_123 noisy"` into `"why is HOST_USER_4 noisy"` (or whichever pseudonym `"123"` got).
+ * Accurately: this requires a same-session counter of that KIND reaching >= 100 (three digits) PLUS
+ * a numeric, exactly-3-char identifier being minted in the SAME session — plausible in a long
+ * conversation with heavy tool use, not "unreachable". The consequence is bounded to a CORRUPTED,
+ * unreversible TOKEN in what the provider receives (the same failure mode `StreamDepseudonymizer`
+ * already can't recover from for any malformed token), not a leak of a real value — no additional
+ * real customer data reaches the provider as a result of this specific collision.
  */
 export interface ScrubKnownEntitiesOptions {
   /** Narrow the dictionary scan to IP/HOST/USER-kind, identifier-shaped entries only — see this
@@ -1232,7 +1240,19 @@ function isRecoverableIdentifierPseudonym(pseudonym: string): boolean {
  * chars, and every 5-char alphabetic one, went unmasked, including entirely realistic short
  * identifiers a user would retype straight off a results table ("jdoe", "bob", "titan", 4-char AD
  * account names). A stop-list keeps those short REAL identifiers masked while still excluding the
- * handful of common words that would otherwise be indistinguishable from them. */
+ * handful of common words that would otherwise be indistinguishable from them.
+ *
+ * `'host'`/`'user'`/`'ip'`/`'url'`/`'val'` are on this list for a SECOND reason beyond prose
+ * hygiene: they protect the PSEUDONYM TOKEN GRAMMAR itself, not just ordinary sentences. If a
+ * minted value ever equalled one of these kind keywords and were NOT excluded here, it would be
+ * eligible to match — and corrupt — the token boundary of a completely unrelated pseudonym: a
+ * minted value `"host"` (kind USER, say) would turn `"why is HOST_12 noisy"` into
+ * `"why is USER_9_12 noisy"` (the `(?<![A-Za-z0-9])`/`(?![A-Za-z0-9])` boundary this file's regex
+ * uses treats `_` as a valid boundary by design — see `scrubKnownEntities`'s doc comment). `'ip'`/
+ * `'url'`/`'val'` are added even though `identifiersOnly` text can never itself CONTAIN a `URL_n`/
+ * `VAL_n` token today (only IP/HOST/USER pseudonyms are ever eligible dictionary entries here) —
+ * they guard against exactly the kind of "safe until the next refactor" gap a future change to
+ * `isRecoverableIdentifierPseudonym` could reopen without anyone revisiting this list. */
 const IDENTIFIER_STOP_WORDS = new Set([
   'root',
   'admin',
@@ -1264,20 +1284,55 @@ const IDENTIFIER_STOP_WORDS = new Set([
   'service',
   'daemon',
   'other',
+  'ip',
+  'url',
+  'val',
 ]);
 
 /** True when `value` is shaped enough like a real identifier (hostname/IP-adjacent/username) that
  * `identifiersOnly` mode should trust a dictionary match on it inside ordinary user-typed prose.
- * Two conditions, both required: at least 3 characters (the F2 corruption-floor — see this
- * function's own doc comment above for the exact boundary-collision analysis that makes 3 safe),
- * and NOT an exact (case-insensitive) match of `IDENTIFIER_STOP_WORDS`. This deliberately masks
- * SHORT real identifiers ("jdoe", "bob", "titan", "db1") that a length/shape floor alone would have
- * missed — see `IDENTIFIER_STOP_WORDS`'s doc comment for why that was tried first and reverted. */
-function looksLikeIdentifierValue(value: string): boolean {
+ *
+ * F-I1 (answer-quality adversarial validation): `inferPseudonymKind` (see its own doc comment)
+ * mints HOST for ANY field path whose last `.`-segment is bare `"name"` — not just genuine hostname
+ * fields, but `process.name`/`file.name`/`package.name`/`service.name`/`group.name` too. Those
+ * fields' real values are routinely short, ordinary English/Unix words: `"top"`, `"find"`,
+ * `"make"`, `"less"`, `"more"`, `"cut"`, `"tar"`, `"git"`, `"ssh"`, `"cron"`, `"curl"`, `"wget"`,
+ * `"init"`, `"kill"`, `"log"` are all real process/command names a `get_agent_processes`-style tool
+ * can legitimately mint as HOST_n. Live-verified: once several of those had been minted this way,
+ * "show me the top 10 and find all" became "show me the HOST_9 10 and HOST_10 USER_2" — the
+ * analyst never sees why, because the reverse pass restores the words in the model's OWN answer;
+ * they just see the assistant appear to misunderstand a completely ordinary question. `USER`-kind
+ * inference (`inferPseudonymKind`'s `hasKeyword('user')` branch) does not have this problem: it
+ * requires a literal `user` token to appear in the FIELD NAME itself (not just any field ending in
+ * `.name`), which is specific enough that a `USER`-kind mint is trusted at any length — that is
+ * where "jdoe"/"bob" live. So: at least 3 characters (the F2 corruption-floor — see this function's
+ * own doc comment above for the exact boundary-collision analysis that makes 3 safe), NOT an exact
+ * (case-insensitive) match of `IDENTIFIER_STOP_WORDS`, and — new — a short (< 5 char), plain-
+ * alphabetic value is trusted ONLY when its pseudonym is `USER_`-prefixed; a short plain-alphabetic
+ * HOST/IP-kind value is presumed `*.name`-inference noise and left unmasked. Needs the entry's own
+ * `pseudonym` at the call site, not just its `value` — see `scrubKnownEntities` below. Verified to
+ * still mask `jdoe` (USER, 4 chars), `bob` (USER, 3 chars), `titan` (HOST, 5 chars — clears the
+ * length bar on its own), and `db1` (HOST, digit-bearing) while dropping `top`/`find`/`make`/
+ * `less`. */
+function looksLikeIdentifierValue(value: string, pseudonym: string): boolean {
   if (value.length < 3) {
     return false;
   }
-  return !IDENTIFIER_STOP_WORDS.has(value.toLowerCase());
+  if (IDENTIFIER_STOP_WORDS.has(value.toLowerCase())) {
+    return false;
+  }
+  // Short plain-alphabetic HOST/IP-kind values are dominated by `*.name` escape-hatch junk
+  // (process/file/package names: "top", "find", "make", "less") that collides with ordinary
+  // prose. USER-kind inference needs a literal `user` token in the field name, so it is precise
+  // enough to trust at any length — that is where "jdoe"/"bob" live.
+  if (
+    value.length < 5 &&
+    !/[0-9_.-]/.test(value) &&
+    !pseudonym.startsWith('USER_')
+  ) {
+    return false;
+  }
+  return true;
 }
 
 export function scrubKnownEntities(
@@ -1295,7 +1350,7 @@ export function scrubKnownEntities(
     entities = entities.filter(
       entry =>
         isRecoverableIdentifierPseudonym(entry.pseudonym) &&
-        looksLikeIdentifierValue(entry.value),
+        looksLikeIdentifierValue(entry.value, entry.pseudonym),
     );
   }
   entities = entities.sort((a, b) => b.value.length - a.value.length);

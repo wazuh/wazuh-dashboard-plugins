@@ -1353,6 +1353,17 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
      * history. `handleNewConversation` below already resets both together the same way; this brings
      * `applyLoadedConversation` into line with that existing convention instead of being the one
      * path that didn't.
+     *
+     * SCOPE of this fix, stated precisely: it closes the stale-token collision for DIGEST REPLAY
+     * only — the `turnHistoryRef`-driven `[assistant{toolCalls}, tool{digest}]` resend this
+     * function controls. A pseudonym-shaped token the MODEL itself hallucinated into its own prose
+     * (no real mapping ever backed it — nothing this codebase mints, just the model echoing
+     * something token-shaped) can still land in `record.messages`' persisted `assistant` content,
+     * survive `reconstructConversation` into `restored.messages` for DISPLAY, and later collide
+     * with a genuine fresh mint of that same token string after a subsequent resume. That is a
+     * DISPLAY-layer misattribution risk (the reconstructed transcript could render the wrong real
+     * value next to old prose) — not an exfiltration path, since it never puts a real value in
+     * front of the provider that shouldn't be there; out of scope for this fix.
      */
     const applyLoadedConversation = (record: ConversationRecord) => {
       // A resumed conversation opens at its latest turn (bottom), like every chat client — through
