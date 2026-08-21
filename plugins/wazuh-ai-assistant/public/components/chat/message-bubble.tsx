@@ -623,27 +623,62 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
       {!isUser &&
         metaRowToolCalls
           .filter(toolCall => openRawIds.has(toolCall.id))
-          .map(toolCall => (
-            <div
-              key={toolCall.id}
-              id={`${rawViewId}-${toolCall.id}`}
-              className={PROSE_MEASURE_CLASS}
-            >
-              <EuiSpacer size='xs' />
-              <EuiText size='xs'>
-                <strong>{toolCall.name}</strong>
-              </EuiText>
-              <EuiSpacer size='xs' />
-              <EuiCodeBlock
-                language='json'
-                paddingSize='s'
-                fontSize='s'
-                isCopyable
+          .map(toolCall => {
+            // Issue #9008 review, minor 7: the same Index/Time-range lines the rendered-table
+            // popover shows (ProvenanceChip, result-table.tsx) belong here too — this raw view IS
+            // the popover's equivalent for a turn whose table is suppressed (0 rows) or absent,
+            // and "which index did it read?" matters most exactly there. Same `toolCallId` match
+            // as the chip row above: only the call that actually produced `message.table` gets a
+            // real `provenance` object.
+            const provenance =
+              message.table?.provenance?.toolCallId === toolCall.id
+                ? message.table.provenance
+                : undefined;
+            const display = describeProvenance(provenance);
+            return (
+              <div
+                key={toolCall.id}
+                id={`${rawViewId}-${toolCall.id}`}
+                className={PROSE_MEASURE_CLASS}
               >
-                {JSON.stringify(toolCall.arguments, null, 2)}
-              </EuiCodeBlock>
-            </div>
-          ))}
+                <EuiSpacer size='xs' />
+                <EuiText size='xs'>
+                  <strong>{toolCall.name}</strong>
+                </EuiText>
+                {display.index && (
+                  <EuiText size='xs' color='subdued'>
+                    {i18n.translate(
+                      'wazuhAiAssistant.resultTable.provenanceIndex',
+                      {
+                        defaultMessage: 'Index: {index}',
+                        values: { index: display.index },
+                      },
+                    )}
+                  </EuiText>
+                )}
+                {display.resolvedRangeLabel && (
+                  <EuiText size='xs' color='subdued'>
+                    {i18n.translate(
+                      'wazuhAiAssistant.resultTable.provenanceTimeRange',
+                      {
+                        defaultMessage: 'Time range: {range}',
+                        values: { range: display.resolvedRangeLabel },
+                      },
+                    )}
+                  </EuiText>
+                )}
+                <EuiSpacer size='xs' />
+                <EuiCodeBlock
+                  language='json'
+                  paddingSize='s'
+                  fontSize='s'
+                  isCopyable
+                >
+                  {JSON.stringify(toolCall.arguments, null, 2)}
+                </EuiCodeBlock>
+              </div>
+            );
+          })}
     </EuiFlexItem>
   );
 

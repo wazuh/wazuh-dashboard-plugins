@@ -1321,7 +1321,9 @@ describe('ChatPage — feedback while a turn runs', () => {
 
     // No table event this turn, so no provenance either — issue #9008 rework: the chip must
     // name the call alone, with no window invented from its (here time-range-less) `arguments`.
-    await waitFor(() => expect(screen.getByText('Wazuh data')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText('Wazuh data')).toBeInTheDocument(),
+    );
     // Raw arguments are one click deeper, not on screen unbidden.
     expect(screen.queryByText(/wazuh-alerts-\*/)).not.toBeInTheDocument();
 

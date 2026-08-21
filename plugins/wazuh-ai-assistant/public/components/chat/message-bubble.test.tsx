@@ -423,7 +423,7 @@ describe('MessageBubble', () => {
     // label to say so rather than reading identically to a link that opened the answer's own
     // resolved window.
     const link = await screen.findByRole('link', {
-      name: 'Open in Discover (last 24h)',
+      name: 'Open in Discover (default range: 24h)',
     });
     expect(link).toHaveAttribute(
       'href',
