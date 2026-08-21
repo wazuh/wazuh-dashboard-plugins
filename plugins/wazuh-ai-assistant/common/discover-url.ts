@@ -76,7 +76,9 @@ export function risonEncode(value: unknown): string {
 }
 
 /** Reads a `{range: {<field>: {gte, lte}}}` clause for one of the recognized timestamp fields,
- * returning the recognized bound(s) (missing gte/lte falls back to the default window's edge). */
+ * returning the recognized bound(s) (missing gte/lte falls back to the default window's edge).
+ * See `rawRangeFromClause` below for the sibling walk that does NOT apply that fallback —
+ * accepted duplication, not an oversight (that function's own doc comment explains why). */
 function rangeFromClause(clause: unknown): TimeRange | undefined {
   if (!clause || typeof clause !== 'object') {
     return undefined;
