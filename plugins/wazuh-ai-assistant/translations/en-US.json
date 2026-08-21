@@ -214,7 +214,6 @@
     "wazuhAiAssistant.chat.conversations.rename": "Rename conversation",
     "wazuhAiAssistant.chat.conversations.renameInputLabel": "Conversation title",
     "wazuhAiAssistant.chat.conversations.renameError": "Could not rename that conversation.",
-    "wazuhAiAssistant.chat.conversations.renameSuccess": "Conversation renamed.",
     "wazuhAiAssistant.chat.conversations.deleteSuccess": "Conversation deleted.",
     "wazuhAiAssistant.chat.conversations.bulkDeleteError": "Could not delete one or more conversations.",
     "wazuhAiAssistant.chat.conversations.bulkDeleteSuccess": "{count, plural, one {Conversation deleted.} other {{count} conversations deleted.}}",
