@@ -30,11 +30,29 @@ import {
  * shape, which is A2's file, not this one. A count of how many of the bucket's hits were
  * high/critical is a cheap, honest, data-driven proxy for "does this rule matter" without either.
  *
- * Column order is meaning -> magnitude -> spread -> identity: the sampled title (what a reader
- * scans first), then the hit count (how often), then the spread and severity signals that qualify
- * the title, with the numeric rule id demoted to LAST rather than deleted — `sampleColumns` keeps
- * `key` too, since the model's own aggregate-then-lookup workflow (aggregate here, then look up a
- * specific rule id with another tool) depends on it staying visible.
+ * Column order is meaning -> severity -> magnitude -> spread -> identity: the sampled title (what
+ * a reader scans first), then the severity badge (the at-a-glance triage signal issue #8921 flags
+ * as missing whenever a finding tool has level data reachable — see `wazuh.rule.level` below),
+ * then the hit count (how often), then the spread signals that qualify the title, with the numeric
+ * rule id demoted to LAST rather than deleted — `sampleColumns` keeps `key` too, since the model's
+ * own aggregate-then-lookup workflow (aggregate here, then look up a specific rule id with another
+ * tool) depends on it staying visible.
+ *
+ * Severity column (issue #8921's "missing severity" item): the vulnerability table's Severity
+ * badge column is per-DOCUMENT data (each vulnerability row carries its own `vulnerability.severity`).
+ * A bucket here has no single severity — like the sampled title, `wazuh.rule.level` can only be
+ * read off the one document `sample_doc` already samples, so it is exactly as much a SAMPLE as the
+ * title is, not a bucket-wide "max"/"dominant" level (a `max`/`min` metric on this keyword field is
+ * rejected by OpenSearch, and a per-bucket `terms` sub-agg over the level word would need digest.ts
+ * to understand a second bucketed shape — see the `distinct_titles`/`high_or_critical` reasoning
+ * above). It is added to the SAME `sample_doc` top_hits `_source` the title already samples from
+ * (one extra field, zero extra requests) and rendered with the same badge component the
+ * vulnerability table uses (`tableSpec.columns[].severity: true` — result-table.tsx's
+ * `renderSeverityBadge`). `distinct_levels` (a `cardinality` sub-agg, same shape/precedent as
+ * `distinct_titles`) discloses this sample's spread exactly like `distinct_titles` discloses the
+ * title's — surfaced through `digest.sampleColumns` (the model-facing surface) rather than as its
+ * own visible column, since the 6-column visible-column budget (`MAX_VISIBLE_RESULT_COLUMNS`) is
+ * now fully spent by title + level + hits + distinct_titles + high_or_critical + key.
  */
 export const getTopRulesTool: ToolDefinition = {
   spec: {
@@ -68,10 +86,16 @@ export const getTopRulesTool: ToolDefinition = {
             terms: { field: 'wazuh.rule.id', size: limit },
             aggs: {
               sample_doc: {
-                top_hits: { size: 1, _source: ['wazuh.rule.title'] },
+                top_hits: {
+                  size: 1,
+                  _source: ['wazuh.rule.title', 'wazuh.rule.level'],
+                },
               },
               distinct_titles: {
                 cardinality: { field: 'wazuh.rule.title' },
+              },
+              distinct_levels: {
+                cardinality: { field: 'wazuh.rule.level' },
               },
               // `severitiesAtOrAbove('high')` resolves to exactly ['high', 'critical'] against the
               // 5-word SEVERITY_LEVELS scale -- reused rather than a second hardcoded literal so
@@ -91,6 +115,7 @@ export const getTopRulesTool: ToolDefinition = {
   tableSpec: {
     columns: [
       { field: 'wazuh.rule.title', label: 'Rule (sample)' },
+      { field: 'wazuh.rule.level', label: 'Level (sample)', severity: true },
       { field: 'doc_count', label: 'Hits' },
       { field: 'distinct_titles', label: 'Distinct titles' },
       { field: 'high_or_critical', label: 'High/critical hits' },
@@ -102,7 +127,9 @@ export const getTopRulesTool: ToolDefinition = {
       'key',
       'doc_count',
       'wazuh.rule.title',
+      'wazuh.rule.level',
       'distinct_titles',
+      'distinct_levels',
       'high_or_critical',
     ],
   },

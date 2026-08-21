@@ -19,11 +19,79 @@ export interface ResolvedToolParams {
    * agent". Omitted when nothing was inferred (every param the hook cared about was already
    * supplied), so a call that needed no resolution produces no note. */
   note?: string;
+  /** Identifier values embedded in `note` that carry privacy weight (e.g. the resolved agent's
+   * hostname), each tagged with its pseudonym kind. Under privacy mode `executor.ts` substitutes
+   * each one in the note with `pseudonymizer.pseudonymize(value, kind)` BEFORE the note reaches
+   * the digest — without this, a resolved hostname reaches the provider in the clear: it is a
+   * bare single-word token, so neither the shape scan (not address-shaped; privacy.ts's
+   * documented bare-hostname limitation) nor the known-entity scan (nothing minted it — the
+   * whole point of resolution is that the caller never supplied the value) can catch it. Proven
+   * on the wire 2026-08-14 (privacy capture probe P3): the note carried the raw agent name while
+   * `HOST_` appeared nowhere in the outbound body. Same treatment as the near-miss hint's
+   * explicit HOST pseudonymization (executor.ts's appendEntityNearMissHint PRIVACY note) — a
+   * resolver that names an identifier in prose must also declare it here. Omitted when the note
+   * carries no identifier, or there is no note. */
+  noteEntities?: Array<{
+    value: string;
+    kind: 'HOST' | 'IP' | 'USER' | 'URL' | 'VAL';
+  }>;
 }
 
 export type ResolveParamsResult =
   | { ok: true; resolved: ResolvedToolParams }
   | { ok: false; reason: string };
+
+/**
+ * Declarative "this param resolves to whichever value is the sole live candidate" spec (the
+ * generic form of issue #8913's `resolveDeicticAgentParams`; see `param-resolution.ts`'s header
+ * comment for the measured prompt-vs-code result that motivates this). A tool lists one entry per
+ * param it wants this treatment for in `ToolDefinition.soleCandidateParams`; `registry.ts`
+ * attaches `param-resolution.ts`'s `buildGenericResolveParams` as that tool's `resolveParams` hook
+ * automatically, UNLESS the tool already declares its own (get_agent_inventory keeps its
+ * hand-written hook, byte-for-byte unchanged, rather than being re-declared through this).
+ *
+ * Two lookup sources:
+ * - `manager-agents`: the active-agent list from the Manager API (`GET /agents`) -- the same
+ *   source/filters `get-agents.ts` itself reads. For a param identifying one agent.
+ * - `indexer-terms`: a bounded `terms` aggregation over one field of one Indexer index -- for a
+ *   param whose sole-candidate universe is enumerable from the Indexer rather than the Manager
+ *   API (e.g. `get_sca_checks`'s `policy_id`, enumerable via `policy.id` on `wazuh-states-sca*`).
+ *   `scopedBy` narrows that aggregation to whatever value an EARLIER param in the same tool's
+ *   `soleCandidateParams` array resolved to (or was already supplied as) -- params resolve in
+ *   declared order specifically so this can read that value.
+ *
+ * `valueFrom` (only meaningful for `manager-agents`) picks which shape of the resolved agent is
+ * injected: `'id'` (default) for a numeric Manager agent-id param, `'name'` for a free-text
+ * agent-name param, `'id-or-name'` for a param whose schema already accepts either (the id is
+ * injected -- exact and unambiguous, same precedent as `resolveAgentFilter`'s own agent_id-over-
+ * agent_name preference in get-agent-inventory.ts).
+ *
+ * EXCLUSIONS BY DESIGN -- never give a param this treatment:
+ * - an optional param whose OMISSION already has a well-defined, useful meaning of its own (e.g.
+ *   `get_fim_files.agent_id`, `get_events_by_agent.agent_name`: omitted means "fleet-wide", not
+ *   "unspecified and in need of resolution" -- auto-resolving it would silently narrow a
+ *   deliberately fleet-wide question down to one guessed agent).
+ * - a QUESTION-CONTENT param (e.g. `os_name`, `rule_tags`, `rule_titles`): these name what the
+ *   caller is asking ABOUT, not which entity/scope the question is about -- there is no "sole
+ *   live candidate" for an arbitrary rule tag the same way there is for "the only active agent",
+ *   and auto-resolving one would silently substitute the caller's own search term.
+ */
+export interface SoleCandidateParamSpec {
+  /** The param name on this tool's own JSON Schema (should be schema-OPTIONAL, not required --
+   * see the catalog tools that declare this for the accompanying schema/description change). */
+  param: string;
+  source:
+    | { kind: 'manager-agents' }
+    | {
+        kind: 'indexer-terms';
+        index: string;
+        field: string;
+        /** Narrows the aggregation to documents whose `field` equals whatever value the named
+         * earlier param resolved to (or was already supplied as). Omitted means unscoped. */
+        scopedBy?: { param: string; field: string };
+      };
+  valueFrom?: 'id' | 'name' | 'id-or-name';
+}
 
 /**
  * A search executed against the Wazuh Indexer (`context.core.opensearch.client.asCurrentUser`).
@@ -197,6 +265,15 @@ export interface ToolDefinition {
    * cannot guess one wrong, and would pay a `_field_caps` round trip on every call for no benefit.
    */
   validateFieldNames?: boolean;
+  /**
+   * Declarative sole-candidate resolution (see `SoleCandidateParamSpec`'s doc comment above for
+   * the full contract and the exclusions-by-design list). When set and this tool declares no
+   * hand-written `resolveParams` of its own, `registry.ts` attaches
+   * `param-resolution.ts`'s `buildGenericResolveParams(this)` as `resolveParams` at load time --
+   * every param listed here resolves against a live source before `buildRequest` runs, in
+   * declared order. `undefined` (every tool that doesn't need this) is unaffected either way.
+   */
+  soleCandidateParams?: SoleCandidateParamSpec[];
   /**
    * Cost-budget class for chat.ts's tool-round COST budget (workstream C, the fixed-3-round ->
    * cost-unit redesign; see chat.ts's `BASE_BUDGET_UNITS` doc comment for the calibration this
