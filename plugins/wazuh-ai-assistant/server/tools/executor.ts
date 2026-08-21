@@ -717,6 +717,12 @@ async function executeIndexerRequest(
       ),
       effectiveRange: rangeBoundsFromDsl(buildDiscoverDsl(body)),
       clamped: lookbackDisclosure !== undefined,
+      // Issue #9008 review, blocker 2: recorded HERE, at creation time -- a date-math bound
+      // ("now-90d") only means something relative to when the query actually ran, so resolving
+      // it against the render-time clock instead (the pre-fix behavior) showed a restored
+      // conversation a window the query never ran against. `describeProvenance`
+      // (tool-call-label.ts) resolves date-math against this stored instant, never `Date.now()`.
+      executedAt: Date.now(),
     };
     if (def.buildSecurityAnalyticsLink) {
       const space = resolveSecurityAnalyticsSpace(

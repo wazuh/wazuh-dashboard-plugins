@@ -213,6 +213,13 @@ export interface TableSpec {
    *  - `toolCallId`: attached by server/routes/chat.ts (which is where the streaming tool call's
    *    id is in scope), not by the executor — it is what lets the client attribute this table to
    *    the exact one tool call that produced it, rather than to every call in a multi-call turn.
+   *  - `executedAt`: the epoch ms the query actually ran at, recorded by the executor at creation
+   *    time. Issue #9008 review, blocker 2: a date-math bound ("now-90d") only means something
+   *    relative to WHEN it ran -- resolving it against the render-time clock instead would show a
+   *    restored conversation a window the query never ran against. `describeProvenance`
+   *    (tool-call-label.ts) resolves date-math bounds against this stored instant, never against
+   *    `Date.now()`. `undefined` only for a conversation persisted before this field existed --
+   *    the client shows the literal bound strings rather than an absolute instant in that case.
    */
   provenance?: {
     toolCallId?: string;
@@ -220,6 +227,7 @@ export interface TableSpec {
     requestedRange?: { gte: string; lte: string };
     effectiveRange?: { gte: string; lte: string };
     clamped: boolean;
+    executedAt?: number;
   };
 }
 

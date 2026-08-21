@@ -259,6 +259,11 @@ export const tableSpecSchema = schema.object({
         }),
       ),
       clamped: schema.boolean(),
+      // Issue #9008 review, blocker 2: the instant the query actually ran, so a resumed
+      // conversation resolves a date-math bound against WHEN it ran, never against the render
+      // clock. `min: 0` only rejects a nonsensical negative instant (same convention as
+      // `chatMessageSchema`'s own `createdAt` above).
+      executedAt: schema.maybe(schema.number({ min: 0 })),
     }),
   ),
 });

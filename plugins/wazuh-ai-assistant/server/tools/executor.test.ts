@@ -127,7 +127,9 @@ test('executeToolCall: privacy off leaves get_agent_inventory digest completely 
  * `context.wazuh_core.manageHosts.get()` (no cookie on `request.headers`, so it always takes the
  * first-configured-host fallback) and `context.wazuh_core.api.client.asCurrentUser.request` for
  * the call itself. */
-function fakeManagerContext(affectedItems: Array<Record<string, unknown>>): ExecContext {
+function fakeManagerContext(
+  affectedItems: Array<Record<string, unknown>>,
+): ExecContext {
   return {
     wazuh_core: {
       manageHosts: { get: () => Promise.resolve([{ id: 'default' }]) },
@@ -218,6 +220,12 @@ test('executeToolCall: get_critical_findings past the 90-day cap is clamped, and
   assert.ok(effective);
   const spanMs = Date.parse(effective!.lte) - Date.parse(effective!.gte);
   assert.equal(spanMs, 90 * 24 * 60 * 60 * 1000);
+  // Issue #9008 review, blocker 2: the instant the query actually ran, recorded as a plain
+  // number at creation time -- what `describeProvenance` (tool-call-label.ts) resolves a
+  // date-math bound against instead of the render-time clock.
+  const before = Date.now();
+  assert.equal(typeof provenance?.executedAt, 'number');
+  assert.ok(provenance!.executedAt! <= before);
 });
 
 test('executeToolCall: a Manager-API table carries no provenance at all (no index/DSL concept)', async () => {
