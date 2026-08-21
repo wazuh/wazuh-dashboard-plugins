@@ -948,7 +948,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
       }
     });
     return map;
-  }, [spec.rows, expandedRowIds]);
+  }, [spec.rows, expandedRowIds, bodyId]);
 
   const items = useMemo(
     () =>
