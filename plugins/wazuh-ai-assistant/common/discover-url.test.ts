@@ -200,6 +200,21 @@ test('rangeBoundsFromDsl: undefined for undefined dsl', () => {
   assert.equal(rangeBoundsFromDsl(undefined), undefined);
 });
 
+// Issue #9008 review, major 5: `extractTimeRange` (the Discover LINK's own reader) fills a
+// missing bound from `DEFAULT_TIME_RANGE` so the link always has an openable window -- a
+// legitimate default for that caller. `rangeBoundsFromDsl` feeds `TableSpec.provenance`, a FACT
+// record, and must NOT inherit that default: an escape-hatch query with only an `lte` bound (no
+// `gte` at all) must report NO range at all, never a fabricated `gte`.
+test('rangeBoundsFromDsl: undefined for a one-sided clause (lte only, no gte)', () => {
+  const dsl = { range: { '@timestamp': { lte: 'now' } } };
+  assert.equal(rangeBoundsFromDsl(dsl), undefined);
+});
+
+test('rangeBoundsFromDsl: undefined for a one-sided clause (gte only, no lte)', () => {
+  const dsl = { range: { '@timestamp': { gte: 'now-90d' } } };
+  assert.equal(rangeBoundsFromDsl(dsl), undefined);
+});
+
 test('buildDiscoverUrl: produces the expected rison-encoded, encodeURI-escaped hash', () => {
   const url = buildDiscoverUrl({
     discoverAppUrl: 'https://osd.example/app/data-explorer/discover',
