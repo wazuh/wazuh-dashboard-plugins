@@ -14,9 +14,11 @@ import { TableSpec, ToolCall } from '../../../common/types';
  * report means nothing is shown for it — no line, no badge, no invented default.
  */
 
-/** Truncates a label for the collapsed chip; the untruncated string is always still available via
- * `title`/`aria-label`, so this is purely a layout concern. */
-const CHIP_LABEL_MAX_LENGTH = 48;
+/** Truncates the humanized NAME segment of a chip label; the window text (once known) is always
+ * appended AFTER truncation, never truncated itself (issue #9008 review, major 3 — truncating the
+ * composed string used to cut a clamp badge mid-numeral, e.g. "requested 7…" for "requested
+ * 720d"). The untruncated string is always still available via `title`/`aria-label`. */
+const NAME_MAX_LENGTH = 32;
 
 /**
  * Turns a tool identifier into a readable name: `get_critical_findings` -> "Critical findings",
@@ -93,16 +95,31 @@ function formatDurationShort(durationMs: number): string {
   return `${Math.max(1, Math.round(abs / MS_PER_UNIT.d))}d`;
 }
 
-/** Resolves a date-math (`now`, `now-90d`) or ISO-8601 bound to an absolute epoch ms, against a
- * supplied `nowMs` so callers (and tests) get a deterministic result. `undefined` for a string
- * neither form recognizes. */
-function resolveBoundMs(value: string, nowMs: number): number | undefined {
+/**
+ * Resolves a date-math (`now`, `now-90d`) or ISO-8601 bound to an absolute epoch ms.
+ *
+ * `executedAt` is the FACT the server recorded (`TableSpec.provenance.executedAt`) for the
+ * instant the query actually ran — issue #9008 review, blocker 2: a date-math bound only means
+ * something relative to WHEN it ran, so resolving `now`/`now-90d` against the render-time clock
+ * instead (the pre-fix behavior) showed a restored conversation a window the query never ran
+ * against. When `executedAt` is `undefined` (a conversation persisted before this field existed),
+ * a date-math bound is left UNRESOLVED — `undefined`, never a guess against the current clock —
+ * so callers fall back to the literal bound string instead of a fabricated absolute instant. An
+ * ISO-8601 bound needs no "now" reference at all and resolves the same either way.
+ */
+function resolveBoundMs(
+  value: string,
+  executedAt: number | undefined,
+): number | undefined {
   if (value === 'now') {
-    return nowMs;
+    return executedAt;
   }
   const match = /^now-(\d+)([dhm])$/.exec(value);
   if (match) {
-    return nowMs - Number(match[1]) * MS_PER_UNIT[match[2] as 'd' | 'h' | 'm'];
+    return executedAt === undefined
+      ? undefined
+      : executedAt -
+          Number(match[1]) * MS_PER_UNIT[match[2] as 'd' | 'h' | 'm'];
   }
   const parsed = Date.parse(value);
   return Number.isNaN(parsed) ? undefined : parsed;
@@ -110,17 +127,17 @@ function resolveBoundMs(value: string, nowMs: number): number | undefined {
 
 /**
  * One bound-pair's short label: `shortDateMath` first (so `now-7d`/`now-720d` read exactly as
- * they already do everywhere else this shorthand appears), falling back to a computed span only
- * when at least one bound is not that shape — an absolute ISO instant, which is exactly what the
- * server's own lookback clamp rewrites BOTH bounds to when it fires (`guardrails.ts`'s
- * `clampLookbackWindow` doc comment: rewriting only one bound would reopen the window by
- * whatever elapsed between two independent `Date.now()` reads, so it always rewrites both). The
- * raw bound strings are the last-resort fallback for a pair neither path can resolve (e.g. an
- * inverted or malformed window) — never blank, but also never a guess at a duration.
+ * they already do everywhere else this shorthand appears — this path needs no `executedAt` at
+ * all), falling back to a computed span only when at least one bound is not that shape — an
+ * absolute ISO instant, which is exactly what the server's own lookback clamp rewrites BOTH
+ * bounds to when it fires (`guardrails.ts`'s `clampLookbackWindow` doc comment). The raw bound
+ * strings are the last-resort fallback for a pair neither path can resolve (e.g. `executedAt` is
+ * unknown and a bound is date-math, or the window is inverted/malformed) — never blank, but also
+ * never a guess at a duration.
  */
 function spanShortLabel(
   range: { gte: string; lte: string },
-  nowMs: number,
+  executedAt: number | undefined,
 ): string {
   if (range.lte === 'now') {
     const short = shortDateMath(range.gte);
@@ -128,8 +145,8 @@ function spanShortLabel(
       return short;
     }
   }
-  const gteMs = resolveBoundMs(range.gte, nowMs);
-  const lteMs = resolveBoundMs(range.lte, nowMs);
+  const gteMs = resolveBoundMs(range.gte, executedAt);
+  const lteMs = resolveBoundMs(range.lte, executedAt);
   if (gteMs !== undefined && lteMs !== undefined) {
     return formatDurationShort(lteMs - gteMs);
   }
@@ -153,13 +170,14 @@ function formatInstant(ms: number): string {
 }
 
 /** `{gte, lte}` -> "Jul 26, 2026, 05:58 – Oct 24, 2026, 05:58"; `undefined` when either bound
- * cannot be resolved to an absolute instant. */
+ * cannot be resolved to an absolute instant (including: `executedAt` unknown and a bound is
+ * date-math — see `resolveBoundMs`'s doc comment, issue #9008 review blocker 2). */
 function formatAbsoluteRangeLabel(
   range: { gte: string; lte: string },
-  nowMs: number,
+  executedAt: number | undefined,
 ): string | undefined {
-  const gteMs = resolveBoundMs(range.gte, nowMs);
-  const lteMs = resolveBoundMs(range.lte, nowMs);
+  const gteMs = resolveBoundMs(range.gte, executedAt);
+  const lteMs = resolveBoundMs(range.lte, executedAt);
   return gteMs !== undefined && lteMs !== undefined
     ? `${formatInstant(gteMs)} – ${formatInstant(lteMs)}`
     : undefined;
@@ -174,12 +192,15 @@ export interface ProvenanceDisplay {
    * Manager-API call, or no provenance at all). */
   index?: string;
   /** Human, absolute rendering of the EFFECTIVE window; `undefined` when the server recorded no
-   * `effectiveRange` (the query's DSL carried no recognizable time-range clause at all) or when
-   * a bound could not be resolved to an absolute instant. */
+   * `effectiveRange` (the query's DSL carried no recognizable time-range clause at all), no
+   * `executedAt` and the bound is date-math, or a bound could not be resolved at all. */
   resolvedRangeLabel?: string;
-  /** "90d" normally; "90d · requested 720d" once the server reports `clamped: true` — the single
-   * badge issue #9008 (G3) asks for. `undefined` whenever `resolvedRangeLabel` is (nothing to
-   * label a window with if the server never reported an effective one). */
+  /** "90d" normally; "90d · requested 720d" once the server reports `clamped: true` AND the
+   * requested window actually differs from the effective one (issue #9008 review, minor 6 — a
+   * clamp whose requested/effective spans happen to render identically would otherwise show
+   * "90d · requested 90d", which states nothing a reader doesn't already see). `undefined`
+   * whenever `resolvedRangeLabel`'s source (`effectiveRange`) is absent (nothing to label a
+   * window with if the server never reported an effective one). */
   windowBadgeLabel?: string;
 }
 
@@ -189,28 +210,33 @@ export interface ProvenanceDisplay {
  * more: a `provenance` of `undefined` (a Manager-API table, or a call this table did not produce
  * — see `toolCallId` matching at the call site) yields an empty `ProvenanceDisplay`, and a
  * `provenance` with no `effectiveRange` (the DSL had no time-range clause) yields one with `index`
- * set but no range/badge at all.
+ * set but no range/badge at all. Reads `provenance.executedAt` for every date-math resolution —
+ * never a caller-supplied or ambient "now" — so this function needs no such parameter itself.
  */
-export function describeProvenance(
-  provenance: Provenance,
-  nowMs: number = Date.now(),
-): ProvenanceDisplay {
+export function describeProvenance(provenance: Provenance): ProvenanceDisplay {
   if (!provenance) {
     return {};
   }
-  const { index, effectiveRange, requestedRange, clamped } = provenance;
+  const { index, effectiveRange, requestedRange, clamped, executedAt } =
+    provenance;
   if (!effectiveRange) {
     return { index };
   }
-  const effectiveShort = spanShortLabel(effectiveRange, nowMs);
+  const effectiveShort = spanShortLabel(effectiveRange, executedAt);
   const requestedShort =
-    clamped && requestedRange ? spanShortLabel(requestedRange, nowMs) : undefined;
-  const windowBadgeLabel = requestedShort
-    ? `${effectiveShort} · requested ${requestedShort}`
-    : effectiveShort;
+    clamped && requestedRange
+      ? spanShortLabel(requestedRange, executedAt)
+      : undefined;
+  // Issue #9008 review, minor 6: only state the requested window when it actually reads
+  // differently from the effective one — a clamp whose two spans happen to render identically
+  // (e.g. both round to "90d") has nothing further to disclose.
+  const windowBadgeLabel =
+    requestedShort && requestedShort !== effectiveShort
+      ? `${effectiveShort} · requested ${requestedShort}`
+      : effectiveShort;
   return {
     index,
-    resolvedRangeLabel: formatAbsoluteRangeLabel(effectiveRange, nowMs),
+    resolvedRangeLabel: formatAbsoluteRangeLabel(effectiveRange, executedAt),
     windowBadgeLabel,
   };
 }
@@ -227,12 +253,17 @@ export function describeProvenance(
 export function describeToolCall(
   toolCall: ToolCall,
   provenance: Provenance,
-  nowMs: number = Date.now(),
 ): ToolCallLabel {
   const readable = humanizeToolName(toolCall.name);
-  const { index, windowBadgeLabel } = describeProvenance(provenance, nowMs);
+  const { index, windowBadgeLabel } = describeProvenance(provenance);
 
-  const short = windowBadgeLabel ? `${readable} · ${windowBadgeLabel}` : readable;
+  // Issue #9008 review, major 3: truncate only the NAME segment, then append the window text
+  // (which can carry a clamp numeral like "720d") un-truncated — truncating the composed string
+  // used to cut it mid-digit ("requested 7…").
+  const truncatedName = truncate(readable, NAME_MAX_LENGTH);
+  const short = windowBadgeLabel
+    ? `${truncatedName} · ${windowBadgeLabel}`
+    : truncatedName;
 
   const fullParts = [toolCall.name];
   if (index) {
@@ -243,7 +274,7 @@ export function describeToolCall(
   }
 
   return {
-    short: truncate(short, CHIP_LABEL_MAX_LENGTH),
+    short,
     full: fullParts.join(' · '),
   };
 }

@@ -63,9 +63,34 @@ describe('describeToolCall', () => {
     const label = describeToolCall(
       call({ name: 'get_findings_by_time' }),
       provenance,
-      NOW_MS,
     );
     expect(label.short).toBe('Findings by time · 90d · requested 720d');
+  });
+
+  // Issue #9008 review, major 3: the OLD implementation truncated the whole composed string at a
+  // fixed length, which cut a clamp badge mid-numeral ("requested 7…" for "requested 720d") once
+  // the tool name was long enough. The fix truncates only the name segment; the window text is
+  // always appended afterward, in full — this fixture's full label is 51 characters, comfortably
+  // past where the old 48-char cap would have bitten.
+  it('never truncates the window text, even for a long tool name plus a clamp badge', () => {
+    const provenance: Provenance = {
+      index: 'wazuh-findings-v5*',
+      requestedRange: { gte: 'now-720d', lte: 'now' },
+      effectiveRange: {
+        gte: new Date(NOW_MS - NINETY_DAYS_MS).toISOString(),
+        lte: new Date(NOW_MS).toISOString(),
+      },
+      clamped: true,
+    };
+    const label = describeToolCall(
+      call({ name: 'search_findings_by_multiple_agents' }),
+      provenance,
+    );
+    expect(label.short).toBe(
+      'Findings by multiple agents · 90d · requested 720d',
+    );
+    expect(label.short).toContain('720d');
+    expect(label.short).not.toContain('…');
   });
 
   it('never claims a clamp the server did not report, even if requestedRange is present', () => {
@@ -77,16 +102,13 @@ describe('describeToolCall', () => {
       effectiveRange: { gte: 'now-7d', lte: 'now' },
       clamped: false,
     };
-    const label = describeToolCall(call(), provenance, NOW_MS);
+    const label = describeToolCall(call(), provenance);
     expect(label.short).toBe('Critical findings · 7d');
     expect(label.short).not.toContain('requested');
   });
 
   it('humanizes an unprefixed tool name rather than dropping it', () => {
-    const label = describeToolCall(
-      call({ name: 'agents_summary' }),
-      undefined,
-    );
+    const label = describeToolCall(call({ name: 'agents_summary' }), undefined);
     expect(label.short).toBe('Agents summary');
   });
 
@@ -128,42 +150,85 @@ describe('describeProvenance', () => {
   });
 
   it('renders the date-math shorthand for an unclamped date-math effective window', () => {
-    const display = describeProvenance(
-      { effectiveRange: { gte: 'now-90d', lte: 'now' }, clamped: false },
-      NOW_MS,
-    );
+    const display = describeProvenance({
+      effectiveRange: { gte: 'now-90d', lte: 'now' },
+      clamped: false,
+      executedAt: NOW_MS,
+    });
     expect(display.windowBadgeLabel).toBe('90d');
     expect(display.resolvedRangeLabel).toContain('–');
+  });
+
+  // Issue #9008 blocker 2 (review round 2): a date-math bound only means something relative to
+  // WHEN the query ran. Resolving it against the render-time clock instead of the server-recorded
+  // `executedAt` would show a restored conversation a window it never actually ran against — this
+  // pins that by mocking `Date.now()` to a wildly different instant and asserting the resolved
+  // range still reflects `executedAt`, never the mocked render clock.
+  it('resolves date-math bounds against the recorded executedAt, never the render-time clock', () => {
+    const executedAt = Date.parse('2026-01-15T00:00:00.000Z');
+    const realDateNow = Date.now;
+    Date.now = () => Date.parse('2031-06-01T00:00:00.000Z');
+    try {
+      const display = describeProvenance({
+        effectiveRange: { gte: 'now-90d', lte: 'now' },
+        clamped: false,
+        executedAt,
+      });
+      expect(display.resolvedRangeLabel).toContain('2026');
+      expect(display.resolvedRangeLabel).not.toContain('2031');
+    } finally {
+      Date.now = realDateNow;
+    }
+  });
+
+  // The other half of blocker 2: an older persisted conversation carries no `executedAt` at all
+  // (saved before this field existed). A date-math bound must stay UNRESOLVED then — never a
+  // guess against whatever clock happens to be running at render time — while the shorthand
+  // badge (which needs no "now" reference at all) still renders normally.
+  it('does not resolve date-math to an absolute instant when executedAt is absent', () => {
+    const display = describeProvenance({
+      effectiveRange: { gte: 'now-90d', lte: 'now' },
+      clamped: false,
+    });
+    expect(display.windowBadgeLabel).toBe('90d');
+    expect(display.resolvedRangeLabel).toBeUndefined();
   });
 
   // Issue #9008 blocker 2: no `?? requested` fallback anywhere — a `requestedRange` present
   // without `clamped: true` must never leak into the badge.
   it('ignores requestedRange entirely when clamped is false', () => {
-    const display = describeProvenance(
-      {
-        requestedRange: { gte: 'now-720d', lte: 'now' },
-        effectiveRange: { gte: 'now-90d', lte: 'now' },
-        clamped: false,
-      },
-      NOW_MS,
-    );
+    const display = describeProvenance({
+      requestedRange: { gte: 'now-720d', lte: 'now' },
+      effectiveRange: { gte: 'now-90d', lte: 'now' },
+      clamped: false,
+    });
     expect(display.windowBadgeLabel).toBe('90d');
   });
 
   it('merges a clamped lookback into ONE badge stating both windows', () => {
     const clampedGteIso = new Date(NOW_MS - NINETY_DAYS_MS).toISOString();
     const clampedLteIso = new Date(NOW_MS).toISOString();
-    const display = describeProvenance(
-      {
-        index: 'wazuh-findings-v5*',
-        requestedRange: { gte: 'now-720d', lte: 'now' },
-        effectiveRange: { gte: clampedGteIso, lte: clampedLteIso },
-        clamped: true,
-      },
-      NOW_MS,
-    );
+    const display = describeProvenance({
+      index: 'wazuh-findings-v5*',
+      requestedRange: { gte: 'now-720d', lte: 'now' },
+      effectiveRange: { gte: clampedGteIso, lte: clampedLteIso },
+      clamped: true,
+    });
     expect(display.windowBadgeLabel).toBe('90d · requested 720d');
     expect(display.resolvedRangeLabel).toContain('–');
+  });
+
+  // Issue #9008 review, minor 6: a clamp whose requested and effective spans happen to render
+  // identically (e.g. both round to "90d") has nothing further to disclose — the dual badge must
+  // not degrade into "90d · requested 90d", which repeats itself without adding information.
+  it('omits the requested half when it renders identically to the effective window', () => {
+    const display = describeProvenance({
+      requestedRange: { gte: 'now-90d', lte: 'now' },
+      effectiveRange: { gte: 'now-90d', lte: 'now' },
+      clamped: true,
+    });
+    expect(display.windowBadgeLabel).toBe('90d');
+    expect(display.windowBadgeLabel).not.toContain('requested');
   });
 
   it('computes a span for two absolute ISO bounds instead of using date-math shorthand', () => {
