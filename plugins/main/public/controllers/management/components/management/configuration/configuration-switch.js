@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
 import WzConfigurationOverview from './configuration-overview';
 import {
@@ -22,7 +23,6 @@ import WzConfigurationRegistrationService from './registration-service/registrat
 import WzConfigurationCluster from './cluster/cluster';
 import WzConfigurationIndexer from './indexer/indexer-configuration';
 import WzConfigurationClient from './client/client';
-import WzConfigurationClientBuffer from './client-buffer/client-buffer';
 import { WzConfigurationAlertsLabelsAgent } from './alerts/alerts-labels';
 import WzConfigurationPolicyMonitoring from './policy-monitoring/policy-monitoring';
 import WzConfigurationVulnerabilities from './vulnerabilities/vulnerabilities';
@@ -40,10 +40,12 @@ import WzConfigurationPath from './util-components/configuration-path';
 import WzRefreshClusterInfoButton from './util-components/refresh-cluster-info-button';
 import { withUserAuthorizationPrompt } from '../../../../../components/common/hocs';
 
+import { clusterNodes as requestClusterNodes } from './utils/wz-fetch';
 import {
-  clusterNodes as requestClusterNodes,
-  agentIsSynchronized,
-} from './utils/wz-fetch';
+  clearAgentReportedConfigurationCache,
+  getAgentReportedConfiguration,
+} from './utils/agent-config-service';
+import { PromptAgentConfigNotReported } from './util-components/prompt-agent-config-not-reported';
 import {
   updateClusterNodes,
   updateClusterNodeSelected,
@@ -59,6 +61,7 @@ import {
   EuiButtonEmpty,
   EuiFlexItem,
   EuiPageBody,
+  EuiProgress,
 } from '@elastic/eui';
 
 import { WzRequest } from '../../../../../react-services/wz-request';
@@ -80,13 +83,50 @@ class WzConfigurationSwitch extends Component {
     this.state = {
       view: '',
       viewProps: {},
-      agentSynchronized: undefined,
       loadingOverview: false,
+      /* The agent's report is read here rather than in each section: whether
+      one exists decides whether there is a configuration to show at all. The
+      service caches it for the rest of the visit, so the sections opened
+      afterwards cost no further request. */
+      loadingAgentReport: Boolean(props.agent?.id),
+      agentReport: undefined,
+      agentReportUnreadable: false,
     };
   }
 
+  readAgentReport = async () => {
+    if (!this.props.agent?.id) {
+      return;
+    }
+
+    this.setState({
+      loadingAgentReport: true,
+      agentReport: undefined,
+      agentReportUnreadable: false,
+    });
+
+    try {
+      const agentReport = await getAgentReportedConfiguration(
+        this.props.agent.id,
+      );
+      this.setState({ loadingAgentReport: false, agentReport });
+    } catch (error) {
+      /* The sections still open: each one reports the failure with the detail
+      it has, and a failed read is not the same as an agent that never
+      reported. */
+      this.setState({
+        loadingAgentReport: false,
+        agentReportUnreadable: true,
+      });
+      this.catchError(error, 'readAgentReport');
+    }
+  };
+
   componentWillUnmount() {
     this.resetClusterState();
+    /* The sections of a visit share one read of the agent's report. Leaving
+    ends the visit, so coming back reads the report again. */
+    clearAgentReportedConfigurationCache();
   }
 
   updateConfigurationSection = (view, title, description) => {
@@ -112,20 +152,6 @@ class WzConfigurationSwitch extends Component {
       },
     };
     getErrorOrchestrator().handleError(options);
-  };
-
-  updateAgentSynchronization = async (/** @type {string} */ context) => {
-    // If agent, check if is synchronized or not
-    if (!this.props.agent) {
-      // No agent (manager), no need to verify synchronization
-      return;
-    }
-    try {
-      const agentSynchronized = await agentIsSynchronized(this.props.agent);
-      this.setState({ agentSynchronized });
-    } catch (error) {
-      this.catchError(error, context);
-    }
   };
 
   handleClusterNodes = async () => {
@@ -154,18 +180,16 @@ class WzConfigurationSwitch extends Component {
     }
   };
 
-  handleAgentOrClusterUpdate = (/** @type {string} */ context) => {
-    this.updateAgentSynchronization(context);
-    this.updateClusterInformation(context);
-  };
-
   async componentDidMount() {
-    this.handleAgentOrClusterUpdate('componentDidMount');
+    this.updateClusterInformation('componentDidMount');
+    this.readAgentReport();
   }
 
   async componentDidUpdate(prevProps) {
     if (this.props.agent?.id !== prevProps.agent?.id) {
-      this.handleAgentOrClusterUpdate('componentDidUpdate');
+      clearAgentReportedConfigurationCache();
+      this.updateClusterInformation('componentDidUpdate');
+      this.readAgentReport();
 
       // Reset view if switching between manager/agent contexts
       const wasManager = !prevProps.agent;
@@ -180,10 +204,24 @@ class WzConfigurationSwitch extends Component {
     const {
       view,
       viewProps: { title, description, badge },
-      agentSynchronized,
+      agentReport,
+      agentReportUnreadable,
+      loadingAgentReport,
     } = this.state;
     const { agent } = this.props;
     const isManager = !agent; // If no agent, it's manager configuration
+
+    if (loadingAgentReport) {
+      return <EuiProgress size='xs' color='primary' />;
+    }
+
+    /* An agent that has never reported has no configuration to page through,
+    so the prompt takes the place of the panel rather than sitting inside it. A
+    read that failed is not the same thing, and keeps the sections available so
+    each one can report what went wrong. */
+    if (agentReport === null && !agentReportUnreadable) {
+      return <PromptAgentConfigNotReported />;
+    }
 
     return (
       <EuiPage>
@@ -227,7 +265,7 @@ class WzConfigurationSwitch extends Component {
               ((!this.state.loadingOverview && (
                 <WzConfigurationOverview
                   agent={agent}
-                  agentSynchronized={agentSynchronized}
+                  report={agentReport}
                   updateConfigurationSection={this.updateConfigurationSection}
                 />
               )) || <WzLoading />)}
@@ -296,15 +334,6 @@ class WzConfigurationSwitch extends Component {
                     </WzViewSelectorSwitch>
                     <WzViewSelectorSwitch view='client'>
                       <WzConfigurationClient
-                        clusterNodeSelected={this.props.clusterNodeSelected}
-                        agent={agent}
-                        updateConfigurationSection={
-                          this.updateConfigurationSection
-                        }
-                      />
-                    </WzViewSelectorSwitch>
-                    <WzViewSelectorSwitch view='client-buffer'>
-                      <WzConfigurationClientBuffer
                         clusterNodeSelected={this.props.clusterNodeSelected}
                         agent={agent}
                         updateConfigurationSection={
@@ -381,6 +410,13 @@ class WzConfigurationSwitch extends Component {
     );
   }
 }
+
+WzConfigurationSwitch.propTypes = {
+  agent: PropTypes.object,
+  clusterNodeSelected: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+  updateClusterNodes: PropTypes.func,
+  updateClusterNodeSelected: PropTypes.func,
+};
 
 const mapStateToProps = state => ({
   clusterNodes: state.configurationReducers.clusterNodes,

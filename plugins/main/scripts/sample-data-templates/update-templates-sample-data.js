@@ -93,6 +93,7 @@ const config = {
     'states-inventory-protocols': 'templates/states/inventory-protocols.json',
     'states-inventory-browser-extensions':
       'templates/states/inventory-browser-extensions.json',
+    'agent-stats': 'templates/states/agent-stats.json',
   },
   // WORKAROUND: This dataset is ignored due to issues with its template file (no existing in source repository). The wazuh-events dataset should be composed with the other wazuh-events related datasets in the future.
   ignore_datasets: ['wazuh-events'],

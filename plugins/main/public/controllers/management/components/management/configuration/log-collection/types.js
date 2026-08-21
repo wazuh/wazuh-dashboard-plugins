@@ -1,5 +1,6 @@
-export const LOGCOLLECTOR_LOCALFILE_PROP = 'logcollector-localfile';
-export const LOGCOLLECTOR_SOCKET_PROP = 'logcollector-socket';
+/* Module key of the agent's reported configuration. `localfile` and
+`socket` are blocks inside it, not separate sections. */
+export const LOGCOLLECTOR_PROP = 'logcollector';
 
 export const LOCALFILE_LOGS_PROP = 'localfile-logs';
 export const LOCALFILE_WINDOWSEVENT_PROP = 'localfile-windowsevent';

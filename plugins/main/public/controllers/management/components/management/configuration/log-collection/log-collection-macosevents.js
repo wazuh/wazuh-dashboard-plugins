@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
@@ -19,10 +20,7 @@ import WzConfigurationSettingsGroup from '../util-components/configuration-setti
 import { renderValueOrNoValue, isString } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 import helpLinks from './help-links';
-import {
-  LOGCOLLECTOR_LOCALFILE_PROP,
-  LOCALFILE_MACOSEVENT_PROP,
-} from './types';
+import { LOGCOLLECTOR_PROP, LOCALFILE_MACOSEVENT_PROP } from './types';
 
 /**
  *
@@ -76,31 +74,29 @@ class WzConfigurationLogCollectionMacOSEvents extends Component {
   }
   render() {
     const { currentConfig } = this.props;
-    const items = currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[
+    const items = currentConfig?.[LOGCOLLECTOR_PROP]?.[
       LOCALFILE_MACOSEVENT_PROP
     ]
       ? settingsListBuilder(
-          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_MACOSEVENT_PROP],
+          currentConfig[LOGCOLLECTOR_PROP][LOCALFILE_MACOSEVENT_PROP],
           panelsLabel,
         )
       : [];
 
     return (
       <Fragment>
-        {isString(currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]) && (
+        {isString(currentConfig?.[LOGCOLLECTOR_PROP]) && (
           <WzNoConfig
-            error={currentConfig[LOGCOLLECTOR_LOCALFILE_PROP]}
+            error={currentConfig[LOGCOLLECTOR_PROP]}
             help={helpLinks}
           />
         )}
-        {!currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[
-          LOCALFILE_MACOSEVENT_PROP
-        ]?.length ? (
+        {!currentConfig?.[LOGCOLLECTOR_PROP]?.[LOCALFILE_MACOSEVENT_PROP]
+          ?.length ? (
           <WzNoConfig error='not-present' help={helpLinks} />
         ) : null}
-        {currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[
-          LOCALFILE_MACOSEVENT_PROP
-        ]?.length > 1 ? (
+        {currentConfig?.[LOGCOLLECTOR_PROP]?.[LOCALFILE_MACOSEVENT_PROP]
+          ?.length > 1 ? (
           <WzConfigurationSettingsHeader
             title='macOS events logs'
             description='List of macOS logs that will be processed'
@@ -112,9 +108,8 @@ class WzConfigurationLogCollectionMacOSEvents extends Component {
             />
           </WzConfigurationSettingsHeader>
         ) : null}
-        {currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[
-          LOCALFILE_MACOSEVENT_PROP
-        ]?.length === 1 ? (
+        {currentConfig?.[LOGCOLLECTOR_PROP]?.[LOCALFILE_MACOSEVENT_PROP]
+          ?.length === 1 ? (
           <WzConfigurationSettingsHeader
             title='macOS events logs'
             description='Logs that will be processed'
@@ -130,5 +125,9 @@ class WzConfigurationLogCollectionMacOSEvents extends Component {
     );
   }
 }
+
+WzConfigurationLogCollectionMacOSEvents.propTypes = {
+  currentConfig: PropTypes.object,
+};
 
 export default WzConfigurationLogCollectionMacOSEvents;

@@ -31,7 +31,8 @@ export const settingsListBuilder = (items, label) =>
             : sum;
         }, '')
       : typeof label === 'function'
-        ? label(item) : item[label]
+      ? label(item)
+      : item[label],
   }));
 
 /**
@@ -41,7 +42,7 @@ export const settingsListBuilder = (items, label) =>
 export const settingsBuilder = items =>
   items.map((item, key) => ({
     field: item[0],
-    label: item[1]
+    label: item[1],
   }));
 
 /**
@@ -51,26 +52,36 @@ export const settingsBuilder = items =>
 export const helpLinksBuilder = items =>
   items.map((item, key) => ({
     text: item[0],
-    href: item[1]
+    href: item[1],
   }));
 
 /**
  * Build a object for current configuration with wodle inserted
+ *
+ * Resolves a wodle from either shape `currentConfig` can take:
+ *
+ *  - Manager: the Server API returns every wodle inside a single
+ *    `wmodules-wmodules` section, as an array of one-key objects.
+ *  - Agent: the reported configuration is keyed by module name, so a wodle is
+ *    a top level key of its own.
+ *
  * @param {*} currentConfig
  * @param {array|string} wodles
  */
 export const wodleBuilder = (currentConfig, wodles) => {
   const result = {};
+  const managerWodles = currentConfig['wmodules-wmodules'];
+  const hasManagerWodles =
+    managerWodles && !isString(managerWodles) && managerWodles.wmodules;
+
   wodles = typeof wodles === 'string' ? [wodles] : wodles;
-  wodles.map(wodle => {
-    result[wodle] =
-      currentConfig['wmodules-wmodules'] &&
-      !isString(currentConfig['wmodules-wmodules']) &&
-      currentConfig['wmodules-wmodules'].wmodules.find(item => item[wodle])
-        ? currentConfig['wmodules-wmodules'].wmodules.find(item => item[wodle])[
-            wodle
-          ]
-        : undefined;
+  wodles.forEach(wodle => {
+    if (hasManagerWodles) {
+      const entry = managerWodles.wmodules.find(item => item[wodle]);
+      result[wodle] = entry ? entry[wodle] : undefined;
+    } else {
+      result[wodle] = currentConfig[wodle];
+    }
   });
   return result;
 };

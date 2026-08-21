@@ -223,7 +223,8 @@ async function registerMockProvider(baseUrl, cookies) {
 }
 
 /** GET server/routes/settings.ts's API_PATHS.SETTINGS singleton (creates it with defaults on
- * first access server-side -- see getOrCreateAssistantSettings, settings.ts:28-49). */
+ * first access server-side -- see AssistantSettingsManager.getOrCreateSettings,
+ * server/settings/assistant-settings-manager.ts). */
 async function getAssistantSettings(baseUrl, cookies) {
   const response = await fetch(`${baseUrl}${API_ROOT}/settings`, {
     method: 'GET',

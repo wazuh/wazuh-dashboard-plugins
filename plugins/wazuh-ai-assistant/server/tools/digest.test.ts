@@ -7,6 +7,7 @@ import {
   capDigest,
   Digest,
   DIGEST_CHAR_CAP,
+  getByPath,
   isMetricAggValue,
   SUPPORTED_METRIC_AGG_TYPES,
 } from './digest';
@@ -1732,4 +1733,31 @@ test('buildDigest: a sample that IS the whole set is not described as a sample',
   const digest = buildDigest('search_wazuh_data', result, def, { size: 20 });
   assert.match(digest.coverage!, /are the complete set/);
   assert.doesNotMatch(digest.coverage!, /a sample of/);
+});
+
+// --- P-2 (AI/plan/a1a-review.md): getByPath must traverse arrays -------------------------------
+
+test('getByPath: resolves a dotted path through an array instead of stopping at it', () => {
+  const row = {
+    queries: [
+      { id: 'q1', name: 'first' },
+      { id: 'q2', name: 'second' },
+    ],
+  };
+  assert.deepEqual(getByPath(row, 'queries.id'), ['q1', 'q2']);
+  assert.deepEqual(getByPath(row, 'queries.name'), ['first', 'second']);
+});
+
+test('getByPath: a bare array path (no further segments) still returns the array itself', () => {
+  const row = {
+    'wazuh.agent.host.ip': undefined,
+    wazuh: { agent: { host: { ip: ['127.0.0.1'] } } },
+  };
+  assert.deepEqual(getByPath(row, 'wazuh.agent.host.ip'), ['127.0.0.1']);
+});
+
+test('getByPath: unchanged behavior for a plain object/scalar path (no array on the walk)', () => {
+  const row = { wazuh: { rule: { title: 'x' } } };
+  assert.equal(getByPath(row, 'wazuh.rule.title'), 'x');
+  assert.equal(getByPath(row, 'wazuh.rule.missing'), undefined);
 });

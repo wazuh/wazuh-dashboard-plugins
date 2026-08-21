@@ -192,9 +192,6 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
           </div>
           <div
             class="euiFlexItem"
-          />
-          <div
-            class="euiFlexItem"
           >
             <div>
               <div
@@ -486,31 +483,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                         aria-live="polite"
                         aria-sort="none"
                         class="euiTableHeaderCell"
-                        data-test-subj="tableHeaderCell_node_name_5"
-                        role="columnheader"
-                        scope="col"
-                      >
-                        <button
-                          class="euiTableHeaderButton"
-                          data-test-subj="tableHeaderSortButton"
-                          type="button"
-                        >
-                          <span
-                            class="euiTableCellContent"
-                          >
-                            <span
-                              class="euiTableCellContent__text"
-                            >
-                              Cluster node
-                            </span>
-                          </span>
-                        </button>
-                      </th>
-                      <th
-                        aria-live="polite"
-                        aria-sort="none"
-                        class="euiTableHeaderCell"
-                        data-test-subj="tableHeaderCell_version_6"
+                        data-test-subj="tableHeaderCell_version_5"
                         role="columnheader"
                         scope="col"
                         style="width:100px"
@@ -535,7 +508,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                         aria-live="polite"
                         aria-sort="none"
                         class="euiTableHeaderCell"
-                        data-test-subj="tableHeaderCell_status_7"
+                        data-test-subj="tableHeaderCell_status_6"
                         role="columnheader"
                         scope="col"
                       >
@@ -578,7 +551,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                     >
                       <td
                         class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
-                        colspan="10"
+                        colspan="9"
                       >
                         <div
                           class="euiTableCellContent euiTableCellContent--alignCenter"
@@ -795,9 +768,6 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
           </div>
           <div
             class="euiFlexItem"
-          />
-          <div
-            class="euiFlexItem"
           >
             <div>
               <div
@@ -1089,31 +1059,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                         aria-live="polite"
                         aria-sort="none"
                         class="euiTableHeaderCell"
-                        data-test-subj="tableHeaderCell_node_name_5"
-                        role="columnheader"
-                        scope="col"
-                      >
-                        <button
-                          class="euiTableHeaderButton"
-                          data-test-subj="tableHeaderSortButton"
-                          type="button"
-                        >
-                          <span
-                            class="euiTableCellContent"
-                          >
-                            <span
-                              class="euiTableCellContent__text"
-                            >
-                              Cluster node
-                            </span>
-                          </span>
-                        </button>
-                      </th>
-                      <th
-                        aria-live="polite"
-                        aria-sort="none"
-                        class="euiTableHeaderCell"
-                        data-test-subj="tableHeaderCell_version_6"
+                        data-test-subj="tableHeaderCell_version_5"
                         role="columnheader"
                         scope="col"
                         style="width:100px"
@@ -1138,7 +1084,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                         aria-live="polite"
                         aria-sort="none"
                         class="euiTableHeaderCell"
-                        data-test-subj="tableHeaderCell_status_7"
+                        data-test-subj="tableHeaderCell_status_6"
                         role="columnheader"
                         scope="col"
                       >
@@ -1181,7 +1127,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                     >
                       <td
                         class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
-                        colspan="10"
+                        colspan="9"
                       >
                         <div
                           class="euiTableCellContent euiTableCellContent--alignCenter"
@@ -1398,9 +1344,6 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
           </div>
           <div
             class="euiFlexItem"
-          />
-          <div
-            class="euiFlexItem"
           >
             <div>
               <div
@@ -1692,31 +1635,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                         aria-live="polite"
                         aria-sort="none"
                         class="euiTableHeaderCell"
-                        data-test-subj="tableHeaderCell_node_name_5"
-                        role="columnheader"
-                        scope="col"
-                      >
-                        <button
-                          class="euiTableHeaderButton"
-                          data-test-subj="tableHeaderSortButton"
-                          type="button"
-                        >
-                          <span
-                            class="euiTableCellContent"
-                          >
-                            <span
-                              class="euiTableCellContent__text"
-                            >
-                              Cluster node
-                            </span>
-                          </span>
-                        </button>
-                      </th>
-                      <th
-                        aria-live="polite"
-                        aria-sort="none"
-                        class="euiTableHeaderCell"
-                        data-test-subj="tableHeaderCell_version_6"
+                        data-test-subj="tableHeaderCell_version_5"
                         role="columnheader"
                         scope="col"
                         style="width:100px"
@@ -1741,7 +1660,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                         aria-live="polite"
                         aria-sort="none"
                         class="euiTableHeaderCell"
-                        data-test-subj="tableHeaderCell_status_7"
+                        data-test-subj="tableHeaderCell_status_6"
                         role="columnheader"
                         scope="col"
                       >
@@ -1784,7 +1703,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                     >
                       <td
                         class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
-                        colspan="10"
+                        colspan="9"
                       >
                         <div
                           class="euiTableCellContent euiTableCellContent--alignCenter"
