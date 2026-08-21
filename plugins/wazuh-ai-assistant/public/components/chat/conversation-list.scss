@@ -135,8 +135,11 @@
 
 /** `margin-bottom` replaces the `<EuiSpacer size="xs" />` (4px) that used to sit between rows when
  * they were flat siblings rather than `<li>`s — same visual gap, now expressed as the list item's
- * own spacing rather than an extra DOM node between each pair. The last row in a group has no
- * following spacer either way, so no `:last-child` exception is needed. */
+ * own spacing rather than an extra DOM node between each pair. Applied unconditionally, with no
+ * `:last-child` exception (F-10, #9010 review — the previous wording here claimed the opposite):
+ * the PRE-existing markup rendered that same `<EuiSpacer size="xs" />` after EVERY conversation,
+ * including the last one in each date group, so this rule matching that unconditionally is what
+ * keeps the gap byte-identical, not an exception to it. */
 .wzConvoRailListItem {
   margin: 0 0 4px;
   padding: 0;

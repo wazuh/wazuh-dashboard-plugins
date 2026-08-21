@@ -285,25 +285,31 @@ export const chatMessageSchema = schema.object({
   interrupted: schema.maybe(schema.boolean()),
 });
 
-const createOrReplaceBodySchema = schema.object({
-  title: schema.string({ minLength: 1, maxLength: MAX_TITLE_LENGTH }),
-  messages: schema.arrayOf(chatMessageSchema, {
-    maxSize: MAX_MESSAGES_PER_CONVERSATION,
-  }),
-});
-
 /** `minLength: 1` alone lets a whitespace-only string like `'   '` through (it has length 3), so
- * this `validate` closure is what actually rejects it -- both `renameBodySchema` (rename, below)
- * and `updateBodySchema.title` (PUT, below: only reached when a title is sent at all -- see that
- * field's own doc comment) share it, so the two can never drift on what counts as "no real
- * title". Returning a string (not throwing) is `@osd/config-schema`'s contract for a custom
- * validator: a non-empty return value IS the rejection, surfaced as a 400. The handler itself
- * still trims before storing (m10) -- this only rejects what trimming would reduce to nothing. */
+ * this `validate` closure is what actually rejects it -- `createOrReplaceBodySchema.title`
+ * (create, below), `renameBodySchema` (rename, further below), and `updateBodySchema.title` (PUT,
+ * further below: only reached when a title is sent at all -- see that field's own doc comment)
+ * all share it, so none of the three can drift on what counts as "no real title" (F-7, #9010
+ * review -- create and rename/update used to disagree). Returning a string (not throwing) is
+ * `@osd/config-schema`'s contract for a custom validator: a non-empty return value IS the
+ * rejection, surfaced as a 400. The create/rename handlers additionally trim before storing
+ * (m10) -- this only rejects what trimming would reduce to nothing. */
 function rejectWhitespaceOnly(value: string): string | void {
   if (!value.trim()) {
     return 'must not be empty or contain only whitespace';
   }
 }
+
+const createOrReplaceBodySchema = schema.object({
+  title: schema.string({
+    minLength: 1,
+    maxLength: MAX_TITLE_LENGTH,
+    validate: rejectWhitespaceOnly,
+  }),
+  messages: schema.arrayOf(chatMessageSchema, {
+    maxSize: MAX_MESSAGES_PER_CONVERSATION,
+  }),
+});
 
 /** PATCH-only body for the rename route below: title only, never `messages` — a rename never
  * touches the transcript, so the client never has to hold (or resend) the full messages array just

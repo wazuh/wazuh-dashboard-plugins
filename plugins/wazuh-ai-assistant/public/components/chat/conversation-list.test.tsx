@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ConversationList } from './conversation-list';
 import { ConversationSummary } from '../../../common/types';
@@ -579,6 +579,28 @@ describe('ConversationList', () => {
       expect(onDelete).toHaveBeenCalledWith('c1');
       expect(screen.queryByText(/permanently delete/)).toBeNull();
     });
+
+    it('m12/F-4: focus lands on the rail scroll container after a confirmed delete, not lost to <body>', async () => {
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Delete me' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Delete conversation' }),
+      );
+      fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+
+      await waitFor(() => {
+        expect(document.activeElement).toHaveClass('wzConvoRailScroll');
+      });
+    });
   });
 
   describe('list semantics (WCAG/AT: a real list, not a run of generic divs) — E5', () => {
@@ -829,6 +851,41 @@ describe('ConversationList', () => {
 
       expect(onRename).toHaveBeenCalledTimes(1);
       expect(onRename).toHaveBeenCalledWith('c1', 'New title');
+    });
+
+    it('F-5 REGRESSION: clicking the row body while renaming commits the edit but does NOT also navigate', () => {
+      // A real click on a different focusable element blurs the currently focused input FIRST
+      // (native default action on mousedown), THEN dispatches its own click -- by the time the
+      // row's onClick runs, the commit has already happened. Simulated explicitly here rather than
+      // relying on jsdom to chain these on its own, the same way the "Enter" test above simulates
+      // the unmount blur explicitly.
+      const onRename = jest.fn();
+      const onSelect = jest.fn();
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Old title' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={onSelect}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={onRename}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      );
+      const input = screen.getByLabelText('Conversation title');
+      fireEvent.change(input, { target: { value: 'New title' } });
+      const row = input.closest('[role="button"]') as HTMLElement;
+
+      fireEvent.mouseDown(row);
+      fireEvent.blur(input);
+      fireEvent.click(row);
+
+      expect(onRename).toHaveBeenCalledWith('c1', 'New title');
+      expect(onSelect).not.toHaveBeenCalled();
     });
 
     it('m6: entering select mode clears a rename in progress', () => {

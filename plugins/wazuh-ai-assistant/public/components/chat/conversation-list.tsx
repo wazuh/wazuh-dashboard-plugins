@@ -292,12 +292,29 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   // without adding it to the Tab order.
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  // Separate from `hoveredId` (F-3, WCAG 2.4.11): the pencil/trash icons used to reveal on
+  // `hoveredId` alone, which the row's OWN `onMouseEnter`/`onMouseLeave` also drive -- so a
+  // keyboard user who tabs to row A's pencil (revealing it via that button's own `onFocus`
+  // setting `hoveredId`), then merely moves the MOUSE over row B, saw row A's pencil collapse out
+  // from under their still-live focus ring the instant `onMouseEnter` overwrote `hoveredId` with
+  // row B's id. `focusedId` tracks keyboard/programmatic focus independently, so a focused
+  // control's reveal survives the pointer wandering elsewhere; each icon reveals on
+  // `isHovered || isFocused`.
+  const [focusedId, setFocusedId] = useState<string | null>(null);
+
   // Inline rename (E2): which row (if any) currently shows an input instead of its title text, and
   // that input's own in-progress value. Only one row can be renaming at a time.
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
   // Mirrors `renamingId` but updated SYNCHRONOUSLY (state updates are not) -- see `commitRename`'s
-  // doc comment below for why the commit-on-blur behavior needs this to avoid double-committing.
+  // doc comment below for why the commit-on-blur behavior needs this to avoid double-committing,
+  // AND (F-5) why the row's own onClick/onKeyDown below read THIS instead of the `isRenaming`
+  // state-derived flag: a mousedown on the row body blurs the rename input FIRST (committing,
+  // which schedules a state update) and only THEN does the click fire -- if the click handler
+  // read the (still-stale, pre-commit) `isRenaming` state closure it would see `false` and also
+  // fire `onSelect`, navigating away in the same gesture that just committed the rename. The ref
+  // is updated synchronously by `commitRename`/`clearRename` before either of those React state
+  // updates has a chance to re-render, so the click sees the truth.
   const renamingIdRef = useRef<string | null>(null);
 
   // Bulk delete (E3): an explicit select mode a "Select conversations" button enters/exits — rows
@@ -367,7 +384,16 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   // whatever opened it (the trash icon / "Delete (N)" button), which the action just deleted along
   // with its row. Deferred one frame: EUI's own focus-restoration runs as part of the SAME
   // dismissal, and would otherwise win a synchronous race against this.
+  //
+  // F-1: same fallback chat-page.tsx's own dock-animation effect uses for a missing
+  // `requestAnimationFrame` -- without it, an environment lacking rAF would simply never run the
+  // callback at all, silently dropping focus after the delete instead of just doing it a frame
+  // late.
   const focusRailContainer = () => {
+    if (typeof window.requestAnimationFrame !== 'function') {
+      scrollContainerRef.current?.focus();
+      return;
+    }
     window.requestAnimationFrame(() => {
       scrollContainerRef.current?.focus();
     });
@@ -666,7 +692,20 @@ export const ConversationList: React.FC<ConversationListProps> = ({
         // Bulk-delete toolbar (E3): replaces the search field row for the duration of select
         // mode — searching and bulk-selecting at once is out of scope, and this keeps the row's
         // layout footprint identical to the search row it stands in for.
-        <EuiFlexGroup responsive={false} alignItems='center' gutterSize='xs'>
+        //
+        // `wrap` (F-6, #9010 review): the docked sidecar popover is narrower (320px, its own
+        // padding) than the inline rail, and the es-ES strings for this row ("Cancelar
+        // selección", "Eliminar (N)") run longer than their English originals -- without `wrap`
+        // the three items could get squeezed or clipped by `.wzConvoRail`'s own
+        // `overflow: hidden`. Wrapping to a second line only grows this row's own height (the
+        // scroll region below it shrinks to make room, via its `flex: 1 1 auto`); nothing
+        // clips.
+        <EuiFlexGroup
+          responsive={false}
+          wrap
+          alignItems='center'
+          gutterSize='xs'
+        >
           <EuiFlexItem grow>
             <EuiText size='xs' color='subdued'>
               {i18n.translate(
@@ -793,11 +832,15 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                   `EuiListGroup` does — rather than the previous plain `<div>`s, which read as an
                   undifferentiated run of generic elements. `.wzConvoRailGroupList`/
                   `.wzConvoRailListItem` (conversation-list.scss) reset the browser's default
-                  list marker/indent so this is a markup-only change with no visual effect. */}
-              <ul className='wzConvoRailGroupList' aria-label={group.label}>
+                  list marker/indent so this is a markup-only change with no visual effect.
+                  No `aria-label` here (F-9): the `role='heading'` div right above already
+                  announces this group's name -- an `aria-label` repeating the SAME text on the
+                  list itself would make a screen reader announce "Today" twice back to back. */}
+              <ul className='wzConvoRailGroupList'>
                 {group.items.map(conversation => {
                   const isSelected = conversation.id === activeConversationId;
                   const isHovered = conversation.id === hoveredId;
+                  const isFocused = conversation.id === focusedId;
                   const isRenaming = conversation.id === renamingId;
                   const isChecked = selectedIds.has(conversation.id);
                   return (
@@ -823,7 +866,11 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                             toggleSelected(conversation.id);
                             return;
                           }
-                          if (!isRenaming) {
+                          // F-5: reads the synchronous `renamingIdRef`, NOT the `isRenaming`
+                          // state-derived flag above -- see that ref's own doc comment for why a
+                          // click on the row body while renaming would otherwise both commit AND
+                          // navigate in the same gesture.
+                          if (renamingIdRef.current !== conversation.id) {
                             onSelect(conversation.id);
                           }
                         }}
@@ -832,7 +879,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                             event.preventDefault();
                             if (selectMode) {
                               toggleSelected(conversation.id);
-                            } else if (!isRenaming) {
+                            } else if (renamingIdRef.current !== conversation.id) {
                               onSelect(conversation.id);
                             }
                           }
@@ -976,16 +1023,21 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                                   // otherwise force the button's intrinsic width back in despite
                                   // `width: 0`.
                                   //
-                                  // Reveal is `isHovered` ONLY, deliberately WITHOUT `isSelected`
-                                  // (unlike the trash icon's condition): the active/selected row
-                                  // must not show this permanently either — hover or keyboard
-                                  // focus, nothing else (`isHovered` already doubles as "has
-                                  // keyboard focus", via the button's own onFocus below).
+                                  // Reveal is `isHovered || isFocused`, deliberately WITHOUT
+                                  // `isSelected` (unlike the trash icon's condition): the
+                                  // active/selected row must not show this permanently either —
+                                  // hover or keyboard focus, nothing else. `isFocused` (not
+                                  // `isHovered` doubling for both, F-3/WCAG 2.4.11) is what keeps
+                                  // this visible while it holds keyboard focus even if the mouse
+                                  // then wanders over a DIFFERENT row — see `focusedId`'s own doc
+                                  // comment above for why sharing one flag between hover and focus
+                                  // let a focus ring collapse out from under itself.
                                   style={{
-                                    width: isHovered ? 'auto' : 0,
-                                    minWidth: isHovered ? 'auto' : 0,
+                                    width: isHovered || isFocused ? 'auto' : 0,
+                                    minWidth:
+                                      isHovered || isFocused ? 'auto' : 0,
                                     overflow: 'hidden',
-                                    opacity: isHovered ? 1 : 0,
+                                    opacity: isHovered || isFocused ? 1 : 0,
                                   }}
                                 >
                                   <EuiButtonIcon
@@ -998,10 +1050,10 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                                       startRename(event, conversation)
                                     }
                                     onFocus={() =>
-                                      setHoveredId(conversation.id)
+                                      setFocusedId(conversation.id)
                                     }
                                     onBlur={() =>
-                                      setHoveredId(current =>
+                                      setFocusedId(current =>
                                         current === conversation.id
                                           ? null
                                           : current,
@@ -1014,10 +1066,14 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                                 grow={false}
                                 // 0 at rest (never a mid-opacity resting state that fails WCAG 1.4.11's
                                 // 3:1 contrast requirement for a control) — 1 on hover, selection, OR
-                                // keyboard focus, so a keyboard/switch user can find and reach this
-                                // control too.
+                                // keyboard focus (F-3: `isFocused`, not `isHovered`, is what survives
+                                // the pointer moving to a different row), so a keyboard/switch user
+                                // can find and reach this control too.
                                 style={{
-                                  opacity: isHovered || isSelected ? 1 : 0,
+                                  opacity:
+                                    isHovered || isSelected || isFocused
+                                      ? 1
+                                      : 0,
                                 }}
                               >
                                 <EuiButtonIcon
@@ -1032,9 +1088,9 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                                   onClick={(event: React.MouseEvent) =>
                                     requestDelete(event, conversation)
                                   }
-                                  onFocus={() => setHoveredId(conversation.id)}
+                                  onFocus={() => setFocusedId(conversation.id)}
                                   onBlur={() =>
-                                    setHoveredId(current =>
+                                    setFocusedId(current =>
                                       current === conversation.id
                                         ? null
                                         : current,
