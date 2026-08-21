@@ -8,6 +8,7 @@ import {
   buildDigest,
   DIGEST_CHAR_CAP,
 } from '../digest';
+import { CONTEXT_CHAR_BUDGET } from '../../routes/chat';
 
 /**
  * Unit tests for get_sca_checks (SCA per-check drill-down), rewritten for the Wazuh 5.0 port:
@@ -465,7 +466,9 @@ test('get_sca_checks: the request (with its new aggs clause) passes applySafetyV
 test('get_sca_checks: tableSpec/digest declare the locked 5.0 columns/rowFields/sampleColumns', () => {
   assert.deepEqual(
     getScaChecksTool.tableSpec.columns.map(c => c.field),
-    ['check.id', 'check.name', 'check.result', 'check.reason'],
+    // check.rationale, not check.reason -- the latter is mapped but empty in every live
+    // document (2026-08-14), so the Reason column was an em-dash on every row it ever had.
+    ['check.id', 'check.name', 'check.result', 'check.rationale'],
   );
   // Workstream D (coverage doc CV-054): rationale/remediation joined the row expander (still
   // row-only, not a table column -- the browser table itself is unchanged) so the analyst can
@@ -493,6 +496,49 @@ test('get_sca_checks: tableSpec/digest declare the locked 5.0 columns/rowFields/
   assert.ok(
     !getScaChecksTool.digest.sampleColumns.includes('check.description'),
   );
+});
+
+// Generic sole-candidate parameter resolution (template: #8913's resolveDeicticAgentParams in
+// get-agent-inventory.ts): both agent_id and policy_id are schema-OPTIONAL, each resolving via the
+// generic resolver (param-resolution.ts) that registry.ts attaches automatically. policy_id
+// scopes ITS OWN lookup on whichever agent_id resolves first (declared order) -- see
+// param-resolution.test.ts's scopedBy-cascade tests for the resolution mechanics.
+
+test('get_sca_checks: neither agent_id nor policy_id is schema-required', () => {
+  const schema = getScaChecksTool.spec.parameters as { required?: string[] };
+  assert.ok(
+    !schema.required || schema.required.length === 0,
+    'agent_id/policy_id must not be schema-required -- server-side resolution needs both omittable',
+  );
+});
+
+test('get_sca_checks: agent_id/policy_id descriptions explain server-side resolution on omission', () => {
+  const schema = getScaChecksTool.spec.parameters as {
+    properties: Record<string, { description?: string }>;
+  };
+  assert.match(
+    schema.properties.agent_id.description ?? '',
+    /Optional: omit this.*resolves to the only active agent automatically/s,
+  );
+  assert.match(
+    schema.properties.policy_id.description ?? '',
+    /Optional: omit this when the agent has exactly one SCA policy/,
+  );
+});
+
+test('get_sca_checks: declares agent_id (manager-agents) then policy_id (indexer-terms, scoped by agent_id) in that order', () => {
+  assert.deepEqual(getScaChecksTool.soleCandidateParams, [
+    { param: 'agent_id', source: { kind: 'manager-agents' } },
+    {
+      param: 'policy_id',
+      source: {
+        kind: 'indexer-terms',
+        index: 'wazuh-states-sca*',
+        field: 'policy.id',
+        scopedBy: { param: 'agent_id', field: 'wazuh.agent.id' },
+      },
+    },
+  ]);
 });
 
 test('get_sca_checks: sampleFieldMaxLength caps rationale/remediation tighter than the generic field cap', () => {
@@ -546,9 +592,13 @@ test('get_sca_checks: review D1 — a 5-row digest of LIVE-SIZED rationale/remed
     `expected a single get_sca_checks digest (${digestChars} chars) to stay under DIGEST_CHAR_CAP (${DIGEST_CHAR_CAP})`,
   );
 
-  // ADAPTATION (branch 8997): the original commit's second assertion here compared 4 accumulated
-  // digests against chat.ts's CONTEXT_CHAR_BUDGET (workstream C's context-char stop, calibrated
-  // for the CV-069 5-agent sweep). That budget lives on enhancement/8998-ai-assistant-tool-budget,
-  // not this branch, so the assertion is dropped; the per-field cap it was calibrating for is
-  // still fully covered by the DIGEST_CHAR_CAP assertion above.
+  // The CEO's CV-069 5-agent sweep (chat.ts's CONTEXT_CHAR_BUDGET calibration comment): 4
+  // accumulated single-agent digests must stay under the budget so round 5 is not forced
+  // tools-off. Pre-D1 fix this failed: 4 x ~6,000 = 24,000 >= CONTEXT_CHAR_BUDGET.
+  assert.ok(
+    digestChars * 4 < CONTEXT_CHAR_BUDGET,
+    `expected 4 accumulated get_sca_checks digests (${
+      digestChars * 4
+    } chars) to stay under CONTEXT_CHAR_BUDGET (${CONTEXT_CHAR_BUDGET}), preserving the CV-069 5-agent sweep`,
+  );
 });

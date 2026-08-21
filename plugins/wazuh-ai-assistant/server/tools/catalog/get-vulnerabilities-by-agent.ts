@@ -22,24 +22,39 @@ export const getVulnerabilitiesByAgentTool: ToolDefinition = {
     name: 'get_vulnerabilities_by_agent',
     description:
       'Lists active vulnerabilities affecting one specific agent (host/machine/endpoint), ' +
-      'identified by its name or its numeric agent ID. Use when the question names a particular ' +
-      `host/agent, not the whole fleet. ${VULN_CURRENT_STATE_NOTE}`,
+      'identified by its name or its numeric agent ID, or resolved automatically for a deictic ' +
+      `host reference. Use when the question is about one particular host/agent, not the whole ` +
+      `fleet. ${VULN_CURRENT_STATE_NOTE}`,
     parameters: objectSchema(
       {
         agent_identifier: {
           type: 'string',
           description:
-            'Agent name (e.g. "web-prod-01") or numeric agent ID (e.g. "003").',
+            'Agent name (e.g. "web-prod-01") or numeric agent ID (e.g. "003"). Optional: omit ' +
+            'this for a deictic host reference ("this box"/"this server") with no known name or ' +
+            'id -- the call resolves to the only active agent automatically.',
         },
         limit: limitProperty(
           'Max number of vulnerabilities to return (default 20, max 500).',
         ),
       },
-      ['agent_identifier'],
+      [],
     ),
   },
   target: 'indexer',
   tier: 'T1',
+  // Issue: generic sole-candidate parameter resolution (template: #8913's
+  // resolveDeicticAgentParams in get-agent-inventory.ts). A strictly-required `agent_identifier`
+  // measured 0/40 invocations on deictic vulnerability questions ("what CVEs affect this box").
+  // `valueFrom: 'id-or-name'` since this param already accepts either shape -- the resolved
+  // agent's id is injected (exact, unambiguous).
+  soleCandidateParams: [
+    {
+      param: 'agent_identifier',
+      source: { kind: 'manager-agents' },
+      valueFrom: 'id-or-name',
+    },
+  ],
   buildRequest(params) {
     const agentIdentifier = requireNonEmptyString(
       params.agent_identifier,

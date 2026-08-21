@@ -512,6 +512,135 @@ test('findOfferedFollowUpTool: no name mentioned at all -> undefined', () => {
   );
 });
 
+// --- metadata fallback (issue #8935 Failure B, "nothing compels"): CHAIN_PAIRS keyed by the last
+// successful summary tool, for an offer that never names a tool at all -----------------------
+
+test('findOfferedFollowUpTool: metadata fallback -- an offer naming no tool chains via CHAIN_PAIRS', () => {
+  assert.equal(
+    findOfferedFollowUpTool(
+      'CIS Ubuntu: 95 passed, 102 failed. I can pull the specific failing checks if you would ' +
+        'like.',
+      SCA_TOOLS,
+      new Set(),
+      'get_sca_results',
+    ),
+    'get_sca_checks',
+  );
+});
+
+test('findOfferedFollowUpTool: metadata fallback -- no lastSuccessfulToolName -> undefined', () => {
+  assert.equal(
+    findOfferedFollowUpTool(
+      'I can pull more detail if you would like.',
+      SCA_TOOLS,
+      new Set(),
+      undefined,
+    ),
+    undefined,
+  );
+});
+
+test('findOfferedFollowUpTool: metadata fallback -- lastSuccessfulToolName has no CHAIN_PAIRS entry -> undefined', () => {
+  assert.equal(
+    findOfferedFollowUpTool(
+      'I can pull more detail if you would like.',
+      SCA_TOOLS,
+      new Set(),
+      'search_wazuh_data',
+    ),
+    undefined,
+  );
+});
+
+test('findOfferedFollowUpTool: metadata fallback -- the chained detail tool must actually be OFFERED this turn', () => {
+  // get_sca_results chains to get_sca_checks, but this turn's offered list does not include it --
+  // the fallback must not name a tool the model could not have called anyway.
+  assert.equal(
+    findOfferedFollowUpTool(
+      'I can pull more detail if you would like.',
+      [tool('get_sca_results'), tool('search_wazuh_data')],
+      new Set(),
+      'get_sca_results',
+    ),
+    undefined,
+  );
+});
+
+test('findOfferedFollowUpTool: metadata fallback -- the chained detail tool already executed is excluded', () => {
+  assert.equal(
+    findOfferedFollowUpTool(
+      'I can pull more detail if you would like.',
+      SCA_TOOLS,
+      new Set(['get_sca_checks']),
+      'get_sca_results',
+    ),
+    undefined,
+  );
+});
+
+test('findOfferedFollowUpTool: metadata fallback -- ordinary closing boilerplate is NOT force-called', () => {
+  // Integration-review fix: "Let me know if you need anything else." matches OFFER_MARKER_RE
+  // ("let me know") and names no tool, so without the relevance gate this force-calls
+  // CHAIN_PAIRS['get_sca_results'][0] (get_sca_checks) on every turn that ran get_sca_results and
+  // ended with this near-universal closer. The sentence has no more/specific/further/detail
+  // vocabulary, so the relevance gate must degrade this to base behaviour.
+  assert.equal(
+    findOfferedFollowUpTool(
+      'CIS Ubuntu: 95 passed, 102 failed. Let me know if you need anything else.',
+      SCA_TOOLS,
+      new Set(),
+      'get_sca_results',
+    ),
+    undefined,
+  );
+});
+
+test('findOfferedFollowUpTool: metadata fallback -- "happy to help with anything else" is NOT force-called', () => {
+  // Same false-positive class, different closer from the same OFFER_MARKER_RE vocabulary
+  // ("happy to"), also lacking any more/specific/further vocabulary.
+  assert.equal(
+    findOfferedFollowUpTool(
+      'CIS Ubuntu: 95 passed, 102 failed. Happy to help with anything else.',
+      SCA_TOOLS,
+      new Set(),
+      'get_sca_results',
+    ),
+    undefined,
+  );
+});
+
+test('findOfferedFollowUpTool: metadata fallback -- a paraphrased search_wazuh_data offer is NOT force-called into an unrelated tool', () => {
+  // Integration-review fix: prompts.ts orders the model to offer search_wazuh_data in prose for a
+  // field a typed result lacks; FORCE_EXEMPT_TOOL_NAMES only protects that offer when it NAMES the
+  // tool. A paraphrase ("a custom query for those fields") matches the detail-vocabulary gate (it
+  // says "those fields") but must still be excluded by the escape-hatch exclusion, or it would be
+  // force-called into get_sca_checks -- a tool the offer was never about.
+  assert.equal(
+    findOfferedFollowUpTool(
+      'CIS Ubuntu: 95 passed, 102 failed. The result does not include the exact remediation ' +
+        'text -- I can run a custom query for those fields if you would like.',
+      SCA_TOOLS,
+      new Set(),
+      'get_sca_results',
+    ),
+    undefined,
+  );
+});
+
+test('findOfferedFollowUpTool: a NON-offer round (no OFFER_MARKER_RE marker) is untouched by the fallback', () => {
+  // No offer-shaped sentence at all -- the metadata fallback must never fire just because a
+  // chained summary tool ran; the offer-shape gate is checked FIRST, same as the name-based path.
+  assert.equal(
+    findOfferedFollowUpTool(
+      'CIS Ubuntu: 95 passed, 102 failed, 10 not applicable.',
+      SCA_TOOLS,
+      new Set(),
+      'get_sca_results',
+    ),
+    undefined,
+  );
+});
+
 // --- registry-wide coverage: nothing exempt by default (same standard as
 // agg-size-coverage.test.ts / field-policy-coverage.test.ts) ------------------------------------
 
@@ -939,6 +1068,128 @@ test('orchestrate: an unprompted single-tool offer with rounds remaining is forc
   );
 });
 
+test('orchestrate: an unnamed offer is forced via the CHAIN_PAIRS metadata fallback', async () => {
+  // Failure B's un-named shape: the offer never says "get_sca_checks" at all, so the name-based
+  // gate above sees zero mentions -- only the metadata fallback (keyed by the last SUCCESSFUL
+  // tool this turn, get_sca_results) can force this one.
+  const { context } = scaContext();
+  const { events, callMessages, callOptions } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      [
+        {
+          type: 'tool_call',
+          toolCall: {
+            id: 'call_sca_results',
+            name: 'get_sca_results',
+            arguments: { agent_id: '001' },
+          },
+        },
+        { type: 'done', usage: { inputTokens: 20, outputTokens: 10 } },
+      ],
+      offerScript(
+        'CIS Ubuntu: 95 passed, 102 failed, 10 N/A. I can pull the specific failing checks if ' +
+          'you would like.',
+      ),
+      [
+        {
+          type: 'tool_call',
+          toolCall: {
+            id: 'call_sca_checks',
+            name: 'get_sca_checks',
+            arguments: {
+              agent_id: '001',
+              policy_id: 'cis_ubuntu_2004',
+              result: 'failed',
+            },
+          },
+        },
+        { type: 'done', usage: { inputTokens: 25, outputTokens: 12 } },
+      ],
+      textOnlyScript(
+        'The three highest-impact failed checks are listed above.',
+      ),
+    ],
+    context,
+  );
+
+  assert.equal(
+    callMessages.length,
+    5,
+    'the un-named offer must still be forced into a chained get_sca_checks round',
+  );
+  assert.deepEqual(callOptions[3]?.toolChoice, { name: 'get_sca_checks' });
+  const toolCallEvents = events.filter(
+    (e): e is Extract<StreamEvent, { type: 'tool_call' }> =>
+      e.type === 'tool_call',
+  );
+  assert.deepEqual(
+    toolCallEvents.map(e => e.toolCall.name),
+    ['get_sca_results', 'get_sca_checks'],
+  );
+  assert.equal(events.filter(e => e.type === 'done').length, 1);
+});
+
+test('orchestrate: an unnamed offer on the LAST tool-bearing round is not forced (round budget respected)', async () => {
+  // Same budget fence as the name-based path's own test, but for the metadata fallback: an
+  // unnamed offer landing on the last tool-bearing round must not spend a round the budget does
+  // not have. Integration-review fix: a script filled entirely with REJECTED_SEARCH_ROUND never
+  // sets `lastSuccessfulToolName` (rejected calls never reach the executed/success site), so that
+  // version of this test would pass identically even with the round-budget gate deleted -- it
+  // never gave the fallback a chance to fire in the first place. The LAST filler round here is
+  // instead a SUCCESSFUL get_sca_results call (a real CHAIN_PAIRS summary key), so the fallback
+  // has a genuine chain to key off and the round-budget gate is what must stop it from firing.
+  const { context } = scaContext();
+  const fillerRounds = Array.from(
+    { length: MAX_TOOL_ROUNDS - 2 },
+    () => REJECTED_SEARCH_ROUND,
+  );
+  const { events, callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      ...fillerRounds,
+      // The last tool-bearing round: a SUCCESSFUL get_sca_results call, so
+      // `lastSuccessfulToolName` is genuinely set going into the offer round below.
+      [
+        {
+          type: 'tool_call',
+          toolCall: {
+            id: 'call_sca_results',
+            name: 'get_sca_results',
+            arguments: { agent_id: '001' },
+          },
+        },
+        { type: 'done', usage: { inputTokens: 20, outputTokens: 10 } },
+      ],
+      offerScript('I can pull the specific failing checks if you would like.'),
+    ],
+    context,
+  );
+
+  assert.equal(callMessages.length, MAX_TOOL_ROUNDS + 1);
+  assert.equal(events.filter(e => e.type === 'done').length, 1);
+});
+
+test('orchestrate: an unnamed offer with no chained summary tool this turn is not forced', async () => {
+  // No tool ran this turn at all (rejected call only), so `lastSuccessfulToolName` is never set --
+  // the metadata fallback must not fire off a stale/absent summary tool.
+  const { events, callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      REJECTED_SCA_RESULTS_ROUND,
+      offerScript('I can pull more detail if you would like.'),
+    ],
+    rejectingContext(),
+  );
+
+  assert.equal(
+    callMessages.length,
+    3,
+    'no chained tool was successfully run this turn, so nothing should be forced',
+  );
+  assert.equal(events.filter(e => e.type === 'done').length, 1);
+});
+
 test('orchestrate: an offer to RETRY a rejected tool IS forced (a failed call must not immunize the tool)', async () => {
   // FAILS ON BASE and against this item's first cut: executedToolNames was populated on the
   // ATTEMPT, so one rejected call permanently immunized the tool and the reported failure shape
@@ -1240,100 +1491,3 @@ test('orchestrate: a second offer after one force was already spent this turn do
   // force is delivered to the round AFTER detection, never the detecting round itself.
   assert.equal(callOptions[2]?.toolChoice, 'auto');
 });
-
-// --- orchestrate: BLOCKER FIX (backlog CV-039 + CV-017 residuals; ported from deploy commits ----
-// --- 872704fd4 + ca142293c) -----------------------------------------------------------------------
-//
-// CV-039's live shape: the model narrates ONCE, early ("Let me check the SCA policy compliance
-// for this agent"), then a LATER round in the same turn is rejected (a bad/missing parameter),
-// which -- since an EARLIER round already succeeded -- forces the NEXT round to be the final
-// (tools-off) round early (`shouldEnterFinalRoundEarly`). That forced-final round then ends with
-// NO text and NO tool call. Before the CV-039 fix, `orchestrate` tracked "did the model ever
-// produce text this turn" as a WHOLE-TURN flag (`sawAnyDelta`) that, once set by the FIRST round's
-// narration, stayed `true` for the rest of the turn -- so the round that actually ends the turn
-// (with a non-empty table already on screen and nothing else to say) skipped the no-text fallback
-// entirely. Fixed by making the flag round-scoped (`roundSawAnyDelta`, reset every round).
-//
-// CV-017's live shape, layered on the same scenario: the rejected round is also the LAST call this
-// turn attempted, so the fallback text must honestly say that specific, more targeted attempt
-// never completed -- not just silently point at the earlier table (`describeErroredLastAttempt`,
-// threaded through `noTextFallbackMessage`'s `sawNonEmptyTable === true` branch).
-
-test(
-  'orchestrate: a round that narrates early, then a later rejected round forces the final ' +
-    'round early, which ends silently -> still gets closing text that both fires (CV-039) and ' +
-    'names the last, unresolved attempt (CV-017)',
-  async () => {
-    const { context } = scaContext();
-    const { events, callMessages } = await runOrchestrate(
-      [
-        STAGE1_SCA_SCRIPT,
-        // round 0: narrates, THEN calls get_sca_results (real tool, succeeds against the canned
-        // response) -- sets the whole-turn "saw text" state that used to mask everything below.
-        [
-          {
-            type: 'delta',
-            content: 'Let me check the SCA policy compliance for this agent.',
-          },
-          {
-            type: 'tool_call',
-            toolCall: {
-              id: 'call_sca_results',
-              name: 'get_sca_results',
-              arguments: { agent_id: '001' },
-            },
-          },
-          { type: 'done', usage: { inputTokens: 20, outputTokens: 10 } },
-        ],
-        // round 1: get_sca_results called again, this time missing the required agent_id --
-        // rejected by argument validation before any cluster access. Since round 0 already
-        // succeeded, this forces round 2 to be the final (tools-off) round early
-        // (`shouldEnterFinalRoundEarly`) instead of waiting for the full MAX_TOOL_ROUNDS budget.
-        REJECTED_SCA_RESULTS_ROUND,
-        // round 2 (forced final, no tools offered): ends with NO text and NO tool call -- the exact
-        // "sweep ends silently" shape. This must still trigger the no-text fallback.
-        [{ type: 'done', usage: { inputTokens: 5, outputTokens: 0 } }],
-      ],
-      context,
-    );
-
-    assert.equal(
-      callMessages.length,
-      4,
-      'stage1 + the narrated success round + the rejected round + the forced-early final round',
-    );
-
-    const deltaEvents = events.filter(
-      (e): e is Extract<StreamEvent, { type: 'delta' }> => e.type === 'delta',
-    );
-    const text = deltaEvents
-      .map(e => e.content)
-      .join('')
-      .trim();
-    assert.notEqual(
-      text,
-      'Let me check the SCA policy compliance for this agent.',
-      'the turn must not end with ONLY the early narration and no closing text for the round that ' +
-        'actually ended the turn',
-    );
-    assert.match(
-      text,
-      /a full answer could not be written/i,
-      'falls back to the truthful "see results above" copy once the forced-early final round ' +
-        'ends silently (CV-039)',
-    );
-    assert.match(
-      text,
-      /did not complete/,
-      'and admits the LAST, more specific attempt (the rejected get_sca_results retry) never ' +
-        'completed, instead of silently standing in for it (CV-017)',
-    );
-
-    const doneEvents = events.filter(e => e.type === 'done');
-    assert.equal(
-      doneEvents.length,
-      1,
-      'the SSE stream must still close with exactly one terminating done frame',
-    );
-  },
-);

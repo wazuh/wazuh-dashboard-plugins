@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { ChatMessage } from '../../common/types';
 import {
   FINAL_ROUND_ANSWER_INSTRUCTION,
+  ROUND_TEXT_SEPARATOR,
   MAX_TOOL_ROUNDS,
   shouldEnterFinalRoundEarly,
   willBeFinalRound,
@@ -11,7 +12,7 @@ import {
 /**
  * Issue #8893: a turn that exhausted the tool-round budget ended with no model-written text at all.
  * Dropping `tools` on the final round terminates the tool loop but never ASKS for a conclusion, so
- * the model rationally produced nothing and the user got the `!sawAnyDelta` fallback copy sitting
+ * the model rationally produced nothing and the user got the `!roundSawAnyDelta` fallback copy sitting
  * above a populated results table (4 of 6 such turns in a 40-question persona bank).
  * `withFinalRoundAnswerInstruction` is chat.ts's fix, kept pure so the decision is testable without
  * standing up a fake `orchestrate` run.
@@ -181,4 +182,25 @@ test('FINAL_ROUND_ANSWER_INSTRUCTION: constrains the model to the gathered resul
     /do not state anything the results do not show/i,
   );
   assert.match(FINAL_ROUND_ANSWER_INSTRUCTION, /say so plainly/i);
+  // UI run 2026-08-14 (B3): on the forced final round the model answered AND announced "Let me
+  // pull the same window broken down over time" -- then the turn ended, because no round was
+  // left to keep that promise. Nothing in the instruction forbade announcing further work. B4
+  // was the natural control: identical phrasing, budget remaining, the follow-up actually ran.
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /do\s+not announce further data pulls/i,
+  );
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /no\s+more tool calls will run/i,
+  );
+});
+
+// UI run 2026-08-14 (finding 6): every round's text lands in ONE client bubble, so a round that
+// narrates before calling a tool ran straight into the next round's answer -- measured live as
+// "...for it.The most frequent finding...", fused mid-word, and one bubble restating itself with
+// two different counts. A markdown paragraph break is the minimum separation; a single newline
+// would not render as one.
+test('ROUND_TEXT_SEPARATOR: a markdown paragraph break, not a bare newline', () => {
+  assert.equal(ROUND_TEXT_SEPARATOR, '\n\n');
 });

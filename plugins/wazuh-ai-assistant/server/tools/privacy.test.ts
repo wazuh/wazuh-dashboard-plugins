@@ -609,6 +609,37 @@ test('applyFieldPolicy: "never" field is dropped from samples', () => {
   assert.equal(out.samples[0]['rule.id'], '100');
 });
 
+test('applyFieldPolicy: "never" drops the field name from the columns schema hint too (probe P4)', () => {
+  // Wire capture 2026-08-14 (/vagrant/qa-out/privacy-p4.jsonl): with package.version set to
+  // 'never' the VALUES were correctly gone, but the digest's `columns` hint still named the
+  // field -- the action's contract says even the field's existence is hidden.
+  const policy: FieldPolicyEntry[] = [
+    { field: 'package.version', action: 'never' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    columns: ['package.name', 'package.version', 'package.architecture'],
+    samples: [{ 'package.name': 'lxd', 'package.version': '5.0.8' }],
+  });
+  const out = applyFieldPolicy(digest, policy, p);
+  assert.deepEqual(out.columns, ['package.name', 'package.architecture']);
+  assert.ok(!('package.version' in out.samples[0]));
+});
+
+test('applyFieldPolicy: anonymize/allow keep their columns entries (a schema-hint name is not a value)', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'agent.name', action: 'anonymize' },
+    { field: 'rule.id', action: 'allow' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    columns: ['agent.name', 'rule.id'],
+    samples: [{ 'agent.name': 'web-01.corp', 'rule.id': '100' }],
+  });
+  const out = applyFieldPolicy(digest, policy, p);
+  assert.deepEqual(out.columns, ['agent.name', 'rule.id']);
+});
+
 test('applyFieldPolicy: "anonymize" field is pseudonymized', () => {
   const policy: FieldPolicyEntry[] = [
     { field: 'agent.name', action: 'anonymize' },
@@ -767,7 +798,12 @@ test('applyFieldPolicy: a packages-kind get_agent_inventory digest anonymizes pa
   assert.equal(out.samples[0]['package.name'], 'openssl');
   assert.equal(out.samples[0]['package.version'], '3.0.2');
   assert.equal(out.samples[0]['package.architecture'], 'amd64');
-  assert.match(out.samples[0]['package.vendor'] as string, /^VAL_\d+$/);
+  // package.vendor is 'allow-scan' since the #8912 follow-through (its entry's own comment
+  // promised the change once that landed): the distributor NAME stays readable while the
+  // embedded address is caught by the value-shape scan.
+  const vendor = out.samples[0]['package.vendor'] as string;
+  assert.match(vendor, /^Ubuntu Developers /);
+  assert.doesNotMatch(vendor, /lists\.ubuntu\.com/);
 });
 
 test('applyFieldPolicy: a ports-kind get_agent_inventory digest still anonymizes source.ip/destination.ip', () => {
@@ -1032,8 +1068,10 @@ test('applyFieldPolicy: get_agent_inventory packages breakdown anonymizes packag
   const arch = out.breakdown!.find(b => b.agg === 'package.architecture')!;
   const vendor = out.breakdown!.find(b => b.agg === 'package.vendor')!;
   assert.equal(arch.key, 'amd64');
-  assert.match(vendor.key, /^VAL_\d+$/);
-  // The real vendor STRING (email address included) never appears in the scrubbed digest.
+  // allow-scan (the #8912 follow-through): the distributor name survives, the embedded
+  // address does not.
+  assert.match(vendor.key as string, /^Ubuntu Developers /);
+  // The real ADDRESS (the part that identifies infrastructure) never appears in the digest.
   assert.doesNotMatch(JSON.stringify(out), /lists\.ubuntu\.com/);
 });
 

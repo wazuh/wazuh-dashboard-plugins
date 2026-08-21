@@ -4,6 +4,7 @@ import {
   executeToolCall,
   PrivacyContext,
   resolveSecurityAnalyticsSpace,
+  scrubAssumptionNote,
 } from './executor';
 import { FIELD_POLICY_DEFAULTS, Pseudonymizer } from './privacy';
 import { ToolCall } from '../../common/types';
@@ -86,15 +87,15 @@ test('executeToolCall: get_agent_inventory keeps package.name/package.version re
   assert.equal(digest.samples[0]['package.name'], 'adduser');
   assert.equal(digest.samples[0]['package.version'], '3.118ubuntu5');
   assert.equal(digest.samples[0]['package.architecture'], 'all');
-  // package.vendor has an explicit 'anonymize' FIELD_POLICY_DEFAULTS entry (a vendor/distributor
-  // string routinely embeds a maintainer email address -- see privacy.ts's comment on that entry)
-  // -- it comes back pseudonymized on that explicit basis, not via
-  // get_agent_inventory's `failClosedFieldPolicy: true` unlisted-field default (see the dedicated
-  // decoupling-proof test below for that case, which uses a genuinely unlisted field instead).
-  assert.match(
-    digest.samples[0]['package.vendor'] as string,
-    /^(HOST|IP|USER|URL|VAL)_\d+$/,
-  );
+  // package.vendor has an explicit 'allow-scan' FIELD_POLICY_DEFAULTS entry (the #8912
+  // follow-through its previous 'anonymize' entry's comment promised): the distributor name
+  // stays readable on that explicit basis -- not via get_agent_inventory's
+  // `failClosedFieldPolicy: true` unlisted-field default (see the dedicated decoupling-proof
+  // test below, which uses a genuinely unlisted field) -- while the embedded maintainer
+  // address is still caught by the value-shape scan.
+  const vendor = digest.samples[0]['package.vendor'] as string;
+  assert.match(vendor, /^Ubuntu Developers/);
+  assert.doesNotMatch(vendor, /lists\.ubuntu\.com/);
 });
 
 test('executeToolCall: privacy off leaves get_agent_inventory digest completely unscrubbed', async () => {
@@ -214,6 +215,117 @@ test('executeToolCall: a resolveParams-minted assumption note reaches the digest
     assumptionNote?: string;
   };
   assert.match(digest.assumptionNote ?? '', /agent-one/);
+});
+
+// --- Privacy capture probe P3 (2026-08-14): the assumption note carried the resolved agent's
+// raw hostname to the provider under privacy mode -- a bare single-word token neither the shape
+// scan nor the known-entity scan can catch (nothing ever minted it; resolution exists precisely
+// because the caller never supplied the value). The fix: resolvers declare the identifiers their
+// note interpolates (`noteEntities`), and executeToolCall pseudonymizes them at its single choke
+// point via scrubAssumptionNote. These tests pin the pure helper AND the end-to-end wiring. ----
+
+test('scrubAssumptionNote: pseudonymizes each declared entity, every occurrence, under privacy mode', () => {
+  const privacy: PrivacyContext = {
+    pseudonymizer: new Pseudonymizer([]),
+    fieldPolicy: FIELD_POLICY_DEFAULTS,
+  };
+  const scrubbed = scrubAssumptionNote(
+    'resolved to "wazuh-aio-5" (id 001); wazuh-aio-5 was the only active agent.',
+    [{ value: 'wazuh-aio-5', kind: 'HOST' }],
+    privacy,
+  );
+  assert.ok(scrubbed);
+  assert.doesNotMatch(scrubbed as string, /wazuh-aio-5/);
+  const matches = (scrubbed as string).match(/HOST_1/g) ?? [];
+  assert.equal(matches.length, 2, 'both occurrences must be replaced');
+});
+
+test('scrubAssumptionNote: longest entity first, so a substring entity cannot corrupt a longer one', () => {
+  const privacy: PrivacyContext = {
+    pseudonymizer: new Pseudonymizer([]),
+    fieldPolicy: FIELD_POLICY_DEFAULTS,
+  };
+  const scrubbed = scrubAssumptionNote(
+    'candidates: DB03, DB03-PRIMARY.',
+    [
+      { value: 'DB03', kind: 'HOST' },
+      { value: 'DB03-PRIMARY', kind: 'HOST' },
+    ],
+    privacy,
+  );
+  assert.doesNotMatch(scrubbed as string, /DB03/);
+  // Two DISTINCT pseudonyms -- the longer name must not have been split by the shorter's
+  // substitution into "HOST_n-PRIMARY".
+  assert.doesNotMatch(scrubbed as string, /-PRIMARY/);
+});
+
+test('scrubAssumptionNote: no-op without privacy, without a note, or without entities', () => {
+  const privacy: PrivacyContext = {
+    pseudonymizer: new Pseudonymizer([]),
+    fieldPolicy: FIELD_POLICY_DEFAULTS,
+  };
+  const note = 'resolved to "wazuh-aio-5" (id 001).';
+  assert.equal(
+    scrubAssumptionNote(
+      note,
+      [{ value: 'wazuh-aio-5', kind: 'HOST' }],
+      undefined,
+    ),
+    note,
+  );
+  assert.equal(scrubAssumptionNote(undefined, [], privacy), undefined);
+  assert.equal(scrubAssumptionNote(note, [], privacy), note);
+  assert.equal(scrubAssumptionNote(note, undefined, privacy), note);
+});
+
+test('executeToolCall: under privacy mode the assumption note reaches the digest pseudonymized, never with the raw hostname', async () => {
+  const context = {
+    ...fakeSearchContext([{ package: { name: 'adduser', version: '1' } }]),
+    wazuh_core: {
+      manageHosts: { get: () => Promise.resolve([{ id: 'host-1' }]) },
+      api: {
+        client: {
+          asCurrentUser: {
+            request: () =>
+              Promise.resolve({
+                status: 200,
+                data: {
+                  data: {
+                    affected_items: [{ id: '001', name: 'agent-one' }],
+                    total_affected_items: 1,
+                  },
+                },
+              }),
+          },
+        },
+      },
+    },
+  } as unknown as ExecContext;
+  const outcome = await executeToolCall(
+    {
+      id: 'call-1',
+      name: 'get_agent_inventory',
+      arguments: { kind: 'packages' },
+    },
+    context,
+    fakeRequest,
+    {
+      pseudonymizer: new Pseudonymizer([]),
+      fieldPolicy: FIELD_POLICY_DEFAULTS,
+    },
+  );
+  const digest = JSON.parse(outcome.toolResultContent) as {
+    assumptionNote?: string;
+  };
+  assert.ok(digest.assumptionNote, 'the note itself must survive the scrub');
+  assert.doesNotMatch(
+    digest.assumptionNote as string,
+    /agent-one/,
+    'probe P3: the resolved hostname must never reach the provider raw',
+  );
+  assert.match(digest.assumptionNote as string, /HOST_\d+/);
+  // The agent ID is a reviewed 'allow' (wazuh.agent.id) and must stay readable.
+  assert.match(digest.assumptionNote as string, /001/);
 });
 
 test('resolveSecurityAnalyticsSpace: a single distinct space across all hits is used as-is', () => {

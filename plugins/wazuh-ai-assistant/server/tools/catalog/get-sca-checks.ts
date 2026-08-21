@@ -8,6 +8,7 @@ import {
   validateAgentId,
 } from './common';
 import { ANSWER_BUCKET_CAP, BREAKDOWN_BUCKET_CAP } from '../digest';
+import { resolveScaCheckParams } from '../param-resolution';
 
 /**
  * Wazuh 5.0 rewrite: the 4.14 Manager endpoint
@@ -94,31 +95,52 @@ function matchingChecksAggName(result: string | undefined): string {
     ? `matching_${result.replace(/\s+/g, '_')}_checks`
     : 'matching_checks_all_results';
 }
-export const getScaChecksTool: ToolDefinition = {
+const getScaChecksToolBase: ToolDefinition = {
   spec: {
     name: 'get_sca_checks',
     description:
       'Lists the individual checks within one Security Configuration Assessment (SCA) policy for ' +
       'one agent — check name, pass/fail result, reason, and (via the row expander) the ' +
       'remediation and rule text for each check. Use for "which SCA checks failed"/"why did this ' +
-      'policy fail" drill-down questions AFTER get_sca_results has given you a policy_id for the ' +
-      'agent — this tool needs that policy_id, it cannot discover one itself. Use ' +
-      'result="failed" for "which checks fail" questions. For a TOPIC question ("which SSH ' +
-      'checks failed"), pass a topic fragment via search (e.g. "ssh") together with ' +
-      'result="failed": the digest breakdown\'s "matching_failed_checks" entries name the ' +
-      'matching checks over the full result set (alphabetical; if more match than the list ' +
-      'carries, the digest says how many were cut — narrow the fragment to see them all).',
+      'policy fail" drill-down questions. Both agent_id and policy_id may be omitted: agent_id ' +
+      'resolves to the only active agent, and policy_id resolves to the only SCA policy for that ' +
+      'agent, each automatically when unambiguous -- pass an explicit policy_id (e.g. from a ' +
+      'prior get_sca_results call) when the agent has more than one policy. For "how do I ' +
+      'remediate check ID X" questions where a specific numeric check id is already known, pass ' +
+      "check_id instead: it resolves agent_id/policy_id directly from that check's own document, " +
+      'without needing to know or disambiguate the agent first. Use result="failed" for "which ' +
+      'checks fail" questions. For a TOPIC question ("which SSH checks failed"), pass a topic ' +
+      'fragment via search (e.g. "ssh") together with result="failed": the digest breakdown\'s ' +
+      '"matching_failed_checks" entries name the matching checks over the full result set ' +
+      '(alphabetical; if more match than the list carries, the digest says how many were cut — ' +
+      'narrow the fragment to see them all).',
     parameters: objectSchema(
       {
         agent_id: {
           type: 'string',
-          description: 'Numeric Wazuh agent ID, e.g. "003".',
+          description:
+            'Numeric Wazuh agent ID, e.g. "003". Optional: omit this for a deictic host ' +
+            'reference ("this box"/"this server") with no known id -- the call resolves to the ' +
+            'only active agent automatically, or (when check_id is given instead) from that ' +
+            "check's own document.",
         },
         policy_id: {
           type: 'string',
           description:
             'SCA policy id to drill into, obtained from a prior get_sca_results call for this ' +
-            'agent (the summary table’s "Policy ID" column).',
+            'agent (the summary table’s "Policy ID" column). Optional: omit this when the agent ' +
+            'has exactly one SCA policy -- it resolves automatically. If the agent has more than ' +
+            'one policy, this is required (the candidates are reported so you can ask which one).',
+        },
+        check_id: {
+          type: 'string',
+          description:
+            'Exact numeric check.id to look up (e.g. "28500"), when the user already names a ' +
+            'specific check id (typically a remediation/drill-down question about that one ' +
+            'check). When supplied, agent_id and policy_id resolve automatically from that ' +
+            'check\'s own document -- this is the preferred way to answer "how do I remediate ' +
+            'failed check ID X" without first asking which agent, since the check id alone ' +
+            'already identifies which agent/policy it belongs to.',
         },
         result: {
           type: 'string',
@@ -142,11 +164,29 @@ export const getScaChecksTool: ToolDefinition = {
           'Max number of checks to return (default 20, max 500).',
         ),
       },
-      ['agent_id', 'policy_id'],
+      [],
     ),
   },
   target: 'indexer',
   tier: 'T1',
+  // Issue: generic sole-candidate parameter resolution (template: #8913's
+  // resolveDeicticAgentParams in get-agent-inventory.ts). Both `agent_id` and `policy_id` measured
+  // as blockers on deictic/topic-only SCA questions when strictly required. Order matters:
+  // `agent_id` resolves first (unscoped, against the Manager API), then `policy_id` resolves
+  // against the Indexer's `policy.id` values scoped to whichever `agent_id` is now in `params` --
+  // either the caller's own or the one just resolved.
+  soleCandidateParams: [
+    { param: 'agent_id', source: { kind: 'manager-agents' } },
+    {
+      param: 'policy_id',
+      source: {
+        kind: 'indexer-terms',
+        index: 'wazuh-states-sca*',
+        field: 'policy.id',
+        scopedBy: { param: 'agent_id', field: 'wazuh.agent.id' },
+      },
+    },
+  ],
   buildRequest(params) {
     const agentId = validateAgentId(params.agent_id);
     const policyId = requireNonEmptyString(
@@ -318,7 +358,11 @@ export const getScaChecksTool: ToolDefinition = {
       // `check.result` is a pass/fail/not-applicable WORD, not a finding-severity level — plain
       // column, not `severity: true` (same rationale as the 4.14 version of this tool).
       { field: 'check.result', label: 'Result' },
-      { field: 'check.reason', label: 'Reason' },
+      // 'check.rationale', not 'check.reason': the reason field exists in the wazuh-states-sca
+      // mapping but is EMPTY in every live document (verified 2026-08-14) -- the populated
+      // explanation text lives in check.rationale, so a Reason column keyed on check.reason
+      // rendered an em-dash on every row that ever had this table.
+      { field: 'check.rationale', label: 'Reason' },
     ],
     // Row expander: rationale/remediation + the raw rule text (where 5.0 folds the old
     // file/directory/command detail, per the matrix — the investigative payload of this tool).
@@ -362,3 +406,16 @@ export const getScaChecksTool: ToolDefinition = {
     },
   },
 };
+
+// BLOCKER FIX (CV-053/CV-052/CV-088 turn 3): a hand-written `resolveParams`, wrapping
+// `resolveScaCheckParams` (param-resolution.ts), REPLACES the plain declarative
+// `soleCandidateParams`-only resolution `registry.ts` would otherwise attach. `soleCandidateParams`
+// above is still read (via `buildGenericResolveParams` inside `resolveScaCheckParams`) as the
+// fallback path for every call that supplies no `check_id` -- unchanged behavior for those calls.
+// Assigned after construction (rather than inline) because the hook needs a reference to this same
+// tool definition (to reach its `soleCandidateParams`), which an object literal cannot supply to
+// itself.
+getScaChecksToolBase.resolveParams =
+  resolveScaCheckParams(getScaChecksToolBase);
+
+export const getScaChecksTool: ToolDefinition = getScaChecksToolBase;
