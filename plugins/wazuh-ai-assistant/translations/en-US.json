@@ -189,7 +189,7 @@
     "wazuhAiAssistant.resultTable.provenanceChipAriaLabel": "Show the executed query: {label}",
     "wazuhAiAssistant.resultTable.provenanceIndex": "Index: {index}",
     "wazuhAiAssistant.resultTable.provenanceTimeRange": "Time range: {range}",
-    "wazuhAiAssistant.resultTable.openInDiscoverDefaultRange": "Open in Discover (last 24h)",
+    "wazuhAiAssistant.resultTable.openInDiscoverDefaultRange": "Open in Discover (last {window})",
     "wazuhAiAssistant.settings.action.rowMenu": "Actions for {name}",
     "wazuhAiAssistant.settings.form.baseUrlExampleAriaLabel": "Use endpoint {example}",
     "wazuhAiAssistant.settings.form.connectionGroupLegend": "2 Connection",

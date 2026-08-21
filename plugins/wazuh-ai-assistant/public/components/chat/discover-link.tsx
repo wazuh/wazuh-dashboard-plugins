@@ -5,6 +5,7 @@ import { CoreStart } from '../../../../../src/core/public';
 import { TableSpec } from '../../../common/types';
 import {
   buildDiscoverUrl,
+  DEFAULT_TIME_RANGE,
   extractTimeRange,
   hasExplicitTimeRange,
 } from '../../../common/discover-url';
@@ -86,6 +87,16 @@ interface DiscoverLinkProps {
   resolveDiscoverUrl: ResolveDiscoverUrl;
 }
 
+/** `now-24h` -> "24h": the same date-math shorthand every other window label in this plugin uses
+ * (tool-call-label.ts's `shortDateMath`). Derived from `DEFAULT_TIME_RANGE.from`
+ * (common/discover-url.ts) rather than a hardcoded "24h" literal, so the fallback label can never
+ * silently drift from the actual default window it is describing. Falls back to the raw
+ * date-math string on the off chance `DEFAULT_TIME_RANGE` ever stops being that shape. */
+function defaultRangeWindowLabel(): string {
+  const match = /^now-(\d+[dhm])$/.exec(DEFAULT_TIME_RANGE.from);
+  return match ? match[1] : DEFAULT_TIME_RANGE.from;
+}
+
 /**
  * Small "Open in Discover" action rendered in a result card's header (result-table.tsx) when its
  * spec carries `discover` (Indexer-backed tables only). Resolves the target URL eagerly on mount
@@ -141,7 +152,10 @@ export const DiscoverLink: React.FC<DiscoverLinkProps> = ({
       {isRangeLessFallback
         ? i18n.translate(
             'wazuhAiAssistant.resultTable.openInDiscoverDefaultRange',
-            { defaultMessage: 'Open in Discover (last 24h)' },
+            {
+              defaultMessage: 'Open in Discover (last {window})',
+              values: { window: defaultRangeWindowLabel() },
+            },
           )
         : i18n.translate('wazuhAiAssistant.resultTable.openInDiscover', {
             defaultMessage: 'Open in Discover',
