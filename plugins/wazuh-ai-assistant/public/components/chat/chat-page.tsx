@@ -1495,11 +1495,86 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
           handleNewConversation();
         }
         notifyConversationsChanged();
+        // E5 (#9010): confirm the delete actually happened via the same toast mechanism
+        // settings-page.tsx already uses (core.notifications.toasts) — a confirm MODAL already
+        // gated the action (conversation-list.tsx), so this toast is purely a "it worked"
+        // acknowledgement, not a second confirmation.
+        core.notifications.toasts.addSuccess(
+          i18n.translate('wazuhAiAssistant.chat.conversations.deleteSuccess', {
+            defaultMessage: 'Conversation deleted.',
+          }),
+        );
       } catch {
         setError(
           i18n.translate('wazuhAiAssistant.chat.conversations.deleteError', {
             defaultMessage: 'Could not delete that conversation.',
           }),
+        );
+      }
+    };
+
+    /** Inline rename (#9010, finding E2): title-only PATCH (conversations-service.ts's `rename`,
+     * server/routes/conversations.ts's PATCH route) — never round-trips the full transcript just to
+     * change a title. */
+    const handleRenameConversation = async (id: string, title: string) => {
+      try {
+        await conversationsService.rename(id, title);
+        notifyConversationsChanged();
+      } catch {
+        setError(
+          i18n.translate('wazuhAiAssistant.chat.conversations.renameError', {
+            defaultMessage: 'Could not rename that conversation.',
+          }),
+        );
+      }
+    };
+
+    /**
+     * Bulk delete (#9010, finding E3): reuses the existing single-delete endpoint client-side —
+     * `Promise.allSettled` so one failing delete never stops the rest from completing — rather than
+     * adding a bulk server route. If the currently open conversation is among the deleted ids, it
+     * gets the same "start a new conversation" treatment `handleDeleteConversation` gives a single
+     * delete of the active conversation.
+     */
+    const handleBulkDeleteConversations = async (ids: string[]) => {
+      if (ids.length === 0) {
+        return;
+      }
+      const results = await Promise.allSettled(
+        ids.map(id => conversationsService.remove(id)),
+      );
+      const failedCount = results.filter(
+        result => result.status === 'rejected',
+      ).length;
+      const succeededCount = ids.length - failedCount;
+
+      if (
+        activeConversationIdRef.current &&
+        ids.includes(activeConversationIdRef.current)
+      ) {
+        handleNewConversation();
+      }
+      if (succeededCount > 0) {
+        notifyConversationsChanged();
+        core.notifications.toasts.addSuccess(
+          i18n.translate(
+            'wazuhAiAssistant.chat.conversations.bulkDeleteSuccess',
+            {
+              defaultMessage:
+                '{count, plural, one {Conversation deleted.} other {{count} conversations deleted.}}',
+              values: { count: succeededCount },
+            },
+          ),
+        );
+      }
+      if (failedCount > 0) {
+        setError(
+          i18n.translate(
+            'wazuhAiAssistant.chat.conversations.bulkDeleteError',
+            {
+              defaultMessage: 'Could not delete one or more conversations.',
+            },
+          ),
         );
       }
     };
@@ -2595,6 +2670,8 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                   void confirmIfGenerating(handleNewConversation)
                 }
                 onDelete={handleDeleteConversation}
+                onRename={handleRenameConversation}
+                onBulkDelete={handleBulkDeleteConversations}
                 // Rail prop contract agreed with the ConversationList owner (job item 6): all three
                 // are optional with defaults, so this call is safe to ship whether or not
                 // conversation-list.tsx has picked them up yet.
@@ -2671,6 +2748,8 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                         })
                       }
                       onDelete={handleDeleteConversation}
+                onRename={handleRenameConversation}
+                onBulkDelete={handleBulkDeleteConversations}
                       displayMode='flyout'
                       onCollapse={handleRailCollapse}
                       onExpand={handleRailExpand}
