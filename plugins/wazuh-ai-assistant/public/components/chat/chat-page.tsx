@@ -2477,14 +2477,22 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
     // chat-page half of that disclosure — the concrete field categories are named once here and
     // once more in the admin Settings page description (settings-page.tsx); wording intentionally
     // matches between the two.
+    //
+    // NF-1 UX fix: the previous wording ("... are pseudonymized before being sent") named the field
+    // categories without saying WHOSE data they come from, which read as a blanket guarantee over
+    // everything reaching the provider — including text the user types into chat, which is only
+    // ever covered by the narrower, best-effort scan described in scrubMessagesForProvider's doc
+    // comment (server/routes/chat.ts), not the full field-policy pipeline. Reworded to scope the
+    // promise to Wazuh data explicitly and call out that the user's own typed text isn't covered by
+    // it the same way.
     const privacyExplainerText = privacyEnabled
       ? i18n.translate('wazuhAiAssistant.chat.privacy.explainOn', {
           defaultMessage:
-            'Privacy on: hostnames, IP addresses, usernames, process command lines, and finding/rule text are pseudonymized before being sent to the configured AI provider.',
+            'Privacy on: Wazuh data sent to the AI provider — hostnames, IP addresses, usernames, process command lines, and finding/rule text — is pseudonymized. Text you type yourself is not automatically masked.',
         })
       : i18n.translate('wazuhAiAssistant.chat.privacy.explainOff', {
           defaultMessage:
-            'Privacy off: hostnames, IP addresses, usernames, process command lines, and finding/rule text are sent to the configured AI provider as-is.',
+            'Privacy off: Wazuh data sent to the AI provider — hostnames, IP addresses, usernames, process command lines, and finding/rule text — is sent as-is.',
         });
 
     // Conversation header title: the active conversation's own saved title when one is open

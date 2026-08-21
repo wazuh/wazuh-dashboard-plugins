@@ -1670,8 +1670,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             description={i18n.translate(
               'wazuhAiAssistant.settings.privacy.description',
               {
+                // NF-1 UX fix: scoped explicitly to Wazuh finding data (the field-policy pipeline
+                // this control governs) — the previous wording didn't say whose data it covered,
+                // which read as also covering whatever the user types into chat. See chat-page.tsx's
+                // matching `chat.privacy.explainOn`/`explainOff` comment for the full rationale;
+                // wording intentionally stays in sync between the two.
                 defaultMessage:
-                  'Control whether finding data is anonymized before reaching the configured AI provider. When privacy mode is off, hostnames, IP addresses, usernames, process command lines, and finding/rule text leave the cluster as-is.',
+                  'Control whether Wazuh finding data is anonymized before reaching the configured AI provider. When privacy mode is off, hostnames, IP addresses, usernames, process command lines, and finding/rule text leave the cluster as-is. Text typed into chat is not automatically covered by this setting.',
               },
             )}
           >

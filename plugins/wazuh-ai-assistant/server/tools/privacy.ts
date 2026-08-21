@@ -1375,8 +1375,25 @@ export function extractAggFields(
  * instead of a scalar), and an unlisted OBJECT/non-empty-ARRAY value under the escape hatch's
  * fail-closed default (branch 4) is now dropped outright rather than passed through raw — the
  * bounded fallback the review sanctioned over a full recursive per-leaf walk.
+ *
+ * NF-2 fix: the P-2 array-recursion branch above only ever matched when EVERY element of the array
+ * was a string (`value.every(item => typeof item === 'string')`). Any other container shape under
+ * an explicit 'anonymize'/'allow-scan' entry — an array of objects, a nested array, a mixed-type
+ * array (a single null/number element was enough to miss the guard), or a plain object — matched
+ * none of the branches in this function (they are gated on `!entry`, i.e. no explicit policy entry)
+ * and fell all the way through to the terminal passthrough, reaching the provider RAW. That made an
+ * explicitly-curated 'anonymize'/'allow-scan' field LESS protected than an unlisted one. Fixed by
+ * `deepScrubContainer`: for an explicit 'anonymize'/'allow-scan' entry whose value is any
+ * array/object shape (not just a flat string array), deep-map every string leaf through the same
+ * per-string action the entry specifies, dropping (never passing through raw) any leaf whose type
+ * cannot be safely mapped. The terminal passthrough (this function's final `return`) is also now
+ * closed off for containers: reaching it with an array/object value that isn't behind an explicit
+ * 'allow' entry is a genuinely unhandled case, and is now dropped rather than defaulting to "raw".
  */
-function scrubFieldValue(
+// Exported purely so privacy.test.ts can drive the NF-2 container-shape branches directly, without
+// wiring a full Digest through applyFieldPolicy for every shape — same rationale as chat.ts's
+// exported chatRequestMessageSchema.
+export function scrubFieldValue(
   field: string,
   value: unknown,
   policy: FieldPolicyEntry[],
@@ -1388,31 +1405,27 @@ function scrubFieldValue(
   if (entry?.action === 'never') {
     return { keep: false, value: undefined };
   }
-  // P-2 (AI/plan/a1a-review.md): a STRING-ARRAY value under a policy-covered path (e.g.
-  // `wazuh.agent.host.ip`, an array in real docs) used to bypass its own field's policy entirely —
-  // this function only ever matched on `typeof value === 'string'`, so an 'anonymize'/'allow-scan'
-  // action silently did nothing for the multi-valued case and the value reached the provider raw.
-  // Recurse element-wise (same action, same field/kind) for a string array under any of the three
-  // scanned/anonymized branches below, BEFORE the scalar `typeof value === 'string'` checks — a
-  // non-string, non-array value (number/boolean/null) still falls through unchanged to the final
-  // passthrough, exactly as before this fix.
+  // P-2 (AI/plan/a1a-review.md), widened by NF-2: a container value (array or object, ANY shape —
+  // a flat string array, an array of objects, a nested array, a mixed-type array, a plain object)
+  // under an explicit 'anonymize'/'allow-scan' entry used to bypass its own field's policy — this
+  // function only matched `typeof value === 'string'` (plus, after P-2, a flat string array), so
+  // any other container reached the terminal passthrough and went to the provider RAW. Deep-map
+  // every string leaf through the same per-string action the entry specifies (reusing the scalar
+  // logic below via `deepScrubContainer`, no duplicated anonymize/scan implementation), dropping
+  // any leaf whose type can't be safely mapped. A non-container value (string/number/boolean/null)
+  // still falls through unchanged to the scalar branches below, exactly as before this fix.
   if (
-    Array.isArray(value) &&
-    value.every(item => typeof item === 'string') &&
-    (entry?.action === 'anonymize' || entry?.action === 'allow-scan')
+    (entry?.action === 'anonymize' || entry?.action === 'allow-scan') &&
+    (Array.isArray(value) || (value !== null && typeof value === 'object'))
   ) {
     return {
       keep: true,
-      value: value.map(
-        item =>
-          scrubFieldValue(
-            field,
-            item,
-            policy,
-            pseudonymizer,
-            toolName,
-            isEscapeHatch,
-          ).value,
+      value: deepScrubContainer(
+        value,
+        entry.action,
+        entry.kind,
+        field,
+        pseudonymizer,
       ),
     };
   }
@@ -1480,6 +1493,23 @@ function scrubFieldValue(
     // module-level history in scrubFieldValue's doc comment above).
     return { keep: true, value: prescanAndMint(value, pseudonymizer) };
   }
+  if (entry?.action === 'allow') {
+    // Explicit 'allow' (branch 6 in this function's doc comment): completely unscanned passthrough
+    // is the deliberate, curated outcome for these fields — including when the value is a
+    // container (e.g. `wazuh.rule.compliance.*`, `check.result`). Must stay ahead of the
+    // container-drop guard below, which exists precisely to stop OTHER, unhandled containers from
+    // inheriting this same raw passthrough by omission.
+    return { keep: true, value };
+  }
+  if (Array.isArray(value) || (value !== null && typeof value === 'object')) {
+    // NF-2 hardening: every branch above that is entitled to pass a container through (explicit
+    // 'allow') or that must scrub one (explicit 'anonymize'/'allow-scan', the escape hatch's
+    // fail-closed drop) has already returned. Reaching here with an array/object means no branch
+    // claimed it — most commonly an unlisted field on a typed tool (allow-by-omission, `!entry`,
+    // `!isEscapeHatch`) whose value happens to be a container. Fail closed rather than let a
+    // container inherit "raw" by omission the way the anonymize/allow-scan containers used to.
+    return { keep: false, value: undefined };
+  }
   return { keep: true, value };
 }
 
@@ -1491,6 +1521,67 @@ function isNonEmptyObjectOrArray(value: unknown): boolean {
     return value.length > 0;
   }
   return value !== null && typeof value === 'object';
+}
+
+/** Sentinel `deepScrubContainer` returns for a leaf it cannot safely map, so the array/object
+ * branches that call it recursively can tell "drop this leaf" apart from a legitimately scrubbed
+ * `undefined`-free value (which never occurs for our primitives, but keeps the signal unambiguous
+ * rather than overloading `undefined`). */
+const DEEP_SCRUB_DROP = Symbol('deepScrubContainer:drop');
+
+/**
+ * NF-2: deep-maps every string leaf of an array/object of ANY shape through the same per-string
+ * action `scrubFieldValue` already applies to a scalar string under an explicit 'anonymize' or
+ * 'allow-scan' entry — reusing that logic rather than duplicating the anonymize/scan
+ * implementations. Primitives (number/boolean/null) pass through unchanged (nothing to scrub).
+ * Any leaf whose type cannot be safely mapped (anything other than
+ * string/number/boolean/null/array/plain-object — e.g. `undefined`) is DROPPED (fail closed: an
+ * array element is omitted, an object key is omitted) rather than passed through raw.
+ */
+function deepScrubContainer(
+  value: unknown,
+  action: 'anonymize' | 'allow-scan',
+  kind: PseudonymKind | undefined,
+  field: string,
+  pseudonymizer: Pseudonymizer,
+): unknown {
+  if (typeof value === 'string') {
+    if (value.length === 0) {
+      return value;
+    }
+    return action === 'anonymize'
+      ? pseudonymizer.pseudonymize(value, kind ?? inferPseudonymKind(field))
+      : scrubKnownEntities(prescanAndMint(value, pseudonymizer), pseudonymizer);
+  }
+  if (value === null || typeof value === 'number' || typeof value === 'boolean') {
+    return value;
+  }
+  if (Array.isArray(value)) {
+    return value
+      .map(item => deepScrubContainer(item, action, kind, field, pseudonymizer))
+      .filter(item => item !== DEEP_SCRUB_DROP);
+  }
+  if (typeof value === 'object') {
+    const result: Record<string, unknown> = {};
+    for (const [key, entryValue] of Object.entries(
+      value as Record<string, unknown>,
+    )) {
+      const scrubbed = deepScrubContainer(
+        entryValue,
+        action,
+        kind,
+        field,
+        pseudonymizer,
+      );
+      if (scrubbed !== DEEP_SCRUB_DROP) {
+        result[key] = scrubbed;
+      }
+    }
+    return result;
+  }
+  // Anything else (undefined, function, symbol, bigint, ...) cannot be safely mapped to a scrubbed
+  // value or to a known-safe primitive — fail closed by signalling the caller to omit this leaf.
+  return DEEP_SCRUB_DROP;
 }
 
 /**

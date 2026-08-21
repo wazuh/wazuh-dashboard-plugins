@@ -9,6 +9,7 @@ import {
   prescanAndMint,
   prescanAndMintToolContent,
   scrubKnownEntities,
+  scrubFieldValue,
   FieldPolicyEntry,
   FIELD_POLICY_DEFAULTS,
 } from './privacy';
@@ -1839,6 +1840,265 @@ test('P-2 regression: an unlisted non-empty array of objects under the escape ha
     true,
   );
   assert.equal('queries' in out.samples[0], false);
+});
+
+// --- NF-2: scrubFieldValue container-shape hardening (a security-validation finding) ------------
+//
+// The P-2 array-recursion branch above only ever matched an array where EVERY element was a
+// string. Any other container shape (array of objects, nested array, mixed-type array, plain
+// object) under an EXPLICIT 'anonymize'/'allow-scan' policy entry missed every scanned branch and
+// fell through to the terminal passthrough, reaching the provider raw -- making a curated field
+// LESS protected than an unlisted one. These tests drive `scrubFieldValue` directly (exported
+// purely for this) rather than via a full Digest, since the fix is entirely inside that function.
+
+test('NF-2: an array of OBJECTS under an anonymize entry is deep-scrubbed, not passed through raw', () => {
+  const p = new Pseudonymizer();
+  const result = scrubFieldValue(
+    WAZUH_FIELD.AGENT_IP, // FIELD_POLICY_DEFAULTS: action 'anonymize', kind 'IP'
+    [{ addr: '127.0.0.1' }, { addr: '10.0.0.5', tag: 'primary' }],
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, true);
+  const value = result.value as Array<Record<string, string>>;
+  assert.match(value[0].addr, /^IP_\d+$/);
+  assert.match(value[1].addr, /^IP_\d+$/);
+  assert.equal(value[1].tag, 'primary'); // non-string leaf-adjacent field: untouched, kept
+  assert.doesNotMatch(JSON.stringify(value), /127\.0\.0\.1|10\.0\.0\.5/);
+});
+
+test('NF-2: a NESTED ARRAY under an anonymize entry is deep-scrubbed, not passed through raw', () => {
+  const p = new Pseudonymizer();
+  const result = scrubFieldValue(
+    WAZUH_FIELD.AGENT_IP,
+    [['127.0.0.1', '10.0.0.5'], ['192.168.1.1']],
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, true);
+  const value = result.value as string[][];
+  assert.match(value[0][0], /^IP_\d+$/);
+  assert.match(value[0][1], /^IP_\d+$/);
+  assert.match(value[1][0], /^IP_\d+$/);
+  assert.doesNotMatch(
+    JSON.stringify(value),
+    /127\.0\.0\.1|10\.0\.0\.5|192\.168\.1\.1/,
+  );
+});
+
+test('NF-2: a MIXED-TYPE array (a single null/number breaks the old .every guard) is deep-scrubbed', () => {
+  const p = new Pseudonymizer();
+  const result = scrubFieldValue(
+    WAZUH_FIELD.AGENT_IP,
+    ['127.0.0.1', null, 42, '10.0.0.5'],
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, true);
+  const value = result.value as unknown[];
+  assert.match(value[0] as string, /^IP_\d+$/);
+  assert.equal(value[1], null);
+  assert.equal(value[2], 42);
+  assert.match(value[3] as string, /^IP_\d+$/);
+});
+
+test('NF-2: a plain OBJECT under an anonymize entry is deep-scrubbed, not passed through raw', () => {
+  const p = new Pseudonymizer();
+  const result = scrubFieldValue(
+    WAZUH_FIELD.AGENT_IP,
+    { primary: '127.0.0.1', secondary: '10.0.0.5', count: 2 },
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, true);
+  const value = result.value as Record<string, unknown>;
+  assert.match(value.primary as string, /^IP_\d+$/);
+  assert.match(value.secondary as string, /^IP_\d+$/);
+  assert.equal(value.count, 2);
+});
+
+test('NF-2: an array of objects under an allow-scan entry is deep-scanned (shape + known-entity), not passed through raw', () => {
+  const p = new Pseudonymizer();
+  // Seed a known entity so the known-entity dictionary half of allow-scan has something to hit.
+  p.pseudonymize('DBPRIMARY03', 'HOST');
+  const result = scrubFieldValue(
+    'package.name', // FIELD_POLICY_DEFAULTS: action 'allow-scan'
+    [
+      { name: 'custom-build-for-DBPRIMARY03' },
+      { name: 'reaches-out-to-10.0.0.9' },
+    ],
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, true);
+  const value = result.value as Array<Record<string, string>>;
+  assert.doesNotMatch(value[0].name, /DBPRIMARY03/i);
+  assert.doesNotMatch(value[1].name, /10\.0\.0\.9/);
+});
+
+test('NF-2: a plain object under an allow-scan entry is deep-scanned, not passed through raw', () => {
+  const p = new Pseudonymizer();
+  const result = scrubFieldValue(
+    'package.name',
+    { primary: 'reaches-out-to-10.0.0.9', label: 'ok' },
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, true);
+  const value = result.value as Record<string, string>;
+  assert.doesNotMatch(value.primary, /10\.0\.0\.9/);
+  assert.equal(value.label, 'ok');
+});
+
+test('NF-2 regression: a flat string array under an anonymize entry still recurses element-wise (P-2 behavior preserved)', () => {
+  const p = new Pseudonymizer();
+  const result = scrubFieldValue(
+    WAZUH_FIELD.AGENT_IP,
+    ['127.0.0.1', '10.0.0.5'],
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, true);
+  const value = result.value as string[];
+  assert.match(value[0], /^IP_\d+$/);
+  assert.match(value[1], /^IP_\d+$/);
+  assert.notEqual(value[0], value[1]);
+});
+
+test('NF-2 regression: a scalar string under an anonymize entry is unchanged', () => {
+  const p = new Pseudonymizer();
+  const result = scrubFieldValue(
+    WAZUH_FIELD.AGENT_IP,
+    '127.0.0.1',
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, true);
+  assert.match(result.value as string, /^IP_\d+$/);
+});
+
+test('NF-2 regression: a "never" field is still dropped regardless of container shape', () => {
+  const p = new Pseudonymizer();
+  const neverPolicy: FieldPolicyEntry[] = [{ field: 'secret.blob', action: 'never' }];
+  const result = scrubFieldValue(
+    'secret.blob',
+    [{ any: 'shape' }, 'x', 1, null],
+    neverPolicy,
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, false);
+  assert.equal(result.value, undefined);
+});
+
+test('NF-2 regression: an unlisted field (no entry, not the escape hatch) with an object value is now dropped, not passed through raw', () => {
+  // Terminal-passthrough hardening: this container previously fell all the way through to the
+  // final `return { keep: true, value }` untouched. It is now explicitly dropped (fail closed) --
+  // the same outcome the escape-hatch's own fail-closed default already gave unlisted containers.
+  const p = new Pseudonymizer();
+  const result = scrubFieldValue(
+    'totally.unlisted.field',
+    { nested: 'attacker-influenced free text' },
+    [],
+    p,
+    undefined,
+    false, // isEscapeHatch: false -- allow-by-omission path, not the escape hatch
+  );
+  assert.equal(result.keep, false);
+});
+
+test('NF-2 regression: an empty array under an anonymize entry is unchanged (still empty, still kept)', () => {
+  const p = new Pseudonymizer();
+  const result = scrubFieldValue(
+    WAZUH_FIELD.AGENT_IP,
+    [],
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, true);
+  assert.deepEqual(result.value, []);
+});
+
+test('NF-2 regression: numbers/booleans under an anonymize entry are unchanged', () => {
+  const p = new Pseudonymizer();
+  assert.equal(
+    scrubFieldValue(
+      WAZUH_FIELD.AGENT_IP,
+      42,
+      FIELD_POLICY_DEFAULTS,
+      p,
+      undefined,
+      false,
+    ).value,
+    42,
+  );
+  assert.equal(
+    scrubFieldValue(
+      WAZUH_FIELD.AGENT_IP,
+      true,
+      FIELD_POLICY_DEFAULTS,
+      p,
+      undefined,
+      false,
+    ).value,
+    true,
+  );
+});
+
+test('NF-2: an explicit "allow" entry still passes a container through completely unscanned (curated passthrough preserved)', () => {
+  const p = new Pseudonymizer();
+  const result = scrubFieldValue(
+    WAZUH_FIELD.RULE_MITRE_TECHNIQUE_ID, // FIELD_POLICY_DEFAULTS: action 'allow'
+    ['T1059.001', 'T1548.002.001'],
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, true);
+  assert.deepEqual(result.value, ['T1059.001', 'T1548.002.001']);
+});
+
+test('NF-2: the terminal passthrough can never return a container (explicit assertion of the closed loophole)', () => {
+  const p = new Pseudonymizer();
+  // Any field/value combination that is NOT an explicit 'never', not an explicit
+  // 'anonymize'/'allow-scan' container, not an explicit 'allow', and not one of the scalar-string
+  // branches must never surface a raw array/object -- this drives a representative sample of such
+  // combinations and asserts none of them come back as a container with keep:true.
+  const cases: Array<[string, unknown, FieldPolicyEntry[], boolean]> = [
+    ['unlisted.object', { a: 1 }, [], false],
+    ['unlisted.array', [{ a: 1 }], [], false],
+    ['escape.hatch.object', { a: 1 }, [], true],
+  ];
+  for (const [field, value, policy, isEscapeHatch] of cases) {
+    const result = scrubFieldValue(field, value, policy, p, undefined, isEscapeHatch);
+    if (result.keep) {
+      assert.ok(
+        !Array.isArray(result.value) &&
+          (result.value === null || typeof result.value !== 'object'),
+        `expected a primitive or drop for ${field}, got a container`,
+      );
+    }
+  }
 });
 
 test('applyFieldPolicy: search_wazuh_data keeps CTI status fields (.wazuh-cti-consumers) readable', () => {

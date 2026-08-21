@@ -31,6 +31,7 @@ import {
   prescanAndMint,
   prescanAndMintToolContent,
   Pseudonymizer,
+  scrubKnownEntities,
   StreamDepseudonymizer,
 } from '../tools/privacy';
 import { MarkdownTableSuppressor } from '../tools/markdown-table-filter';
@@ -1254,8 +1255,31 @@ function resolvePrivacyEnabled(
  * argument via the existing `reverseObject` path — no second emission/reversal path needed.
  * `assistant` content is left to the `applyToText`-only path: it is the model's own prior narration,
  * out of scope here (see `prescanAndMint`'s doc comment for what it does and does not catch).
+ *
+ * NF-1 fix (live-proven gap): for `user` content specifically, `prescanAndMint` alone only mints
+ * IPv4/IPv6 addresses and DOTTED hostnames — a BARE hostname the user types without its domain
+ * suffix (`dbprod07`), or a username (`jsmith`), has no shape a regex can single out and used to
+ * reach the provider verbatim even with privacy on, regardless of whether that same identifier had
+ * already been minted from Wazuh data earlier in the conversation (case variance between how the
+ * indexer rendered it and how the user retyped it defeats `applyToText`'s case-sensitive exact
+ * match). Closed by additionally running `scrubKnownEntities` — the same known-entity dictionary
+ * scan `scrubFieldValue`'s `allow-scan` branch already uses — over the pre-scanned user text before
+ * `applyToText`, exactly like that branch's `scrubKnownEntities(prescanAndMint(...), pseudonymizer)`
+ * pairing. `applyToText` still runs after it (harmless no-op for anything `scrubKnownEntities` just
+ * replaced, since its case-sensitive exact-value pass has nothing new left to find).
+ *
+ * What this closes: a previously-minted entity (any kind — HOST/IP/USER/VAL — from Wazuh tool data,
+ * or from a prior `user` message) retyped bare, in ANY casing, later in the SAME conversation.
+ * What this does NOT close (the accepted residual — see `scrubKnownEntities`'s own doc comment for
+ * why a general bare-token masker is deliberately not attempted): a bare identifier that has never
+ * been minted anywhere in this conversation — the very first time the user types it — has no
+ * dictionary entry to match and no recognizable shape, so it reaches the provider unmasked. A
+ * pasted secret/credential is the same residual: nothing here classifies free text as sensitive by
+ * content, only by prior mint or IP/FQDN shape.
  */
-function scrubMessagesForProvider(
+// Exported purely so a colocated test can drive this directly with a scripted Pseudonymizer,
+// same rationale as this file's exported chatRequestMessageSchema.
+export function scrubMessagesForProvider(
   messages: ChatMessage[],
   pseudonymizer: Pseudonymizer,
 ): ChatMessage[] {
@@ -1268,8 +1292,14 @@ function scrubMessagesForProvider(
     // never minted as hostnames (see prescanAndMintToolContent's doc comment).
     let content: string;
     if (message.role === 'user') {
+      // NF-1: shape scan (prescanAndMint) THEN known-entity dictionary scan (scrubKnownEntities,
+      // catches a previously-minted identifier retyped bare/in different casing) THEN the exact
+      // applyToText pass — see this function's doc comment for the residual this does not cover.
       content = pseudonymizer.applyToText(
-        prescanAndMint(message.content, pseudonymizer),
+        scrubKnownEntities(
+          prescanAndMint(message.content, pseudonymizer),
+          pseudonymizer,
+        ),
       );
     } else if (message.role === 'tool') {
       content = pseudonymizer.applyToText(
