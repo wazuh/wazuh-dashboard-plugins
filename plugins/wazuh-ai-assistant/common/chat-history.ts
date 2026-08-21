@@ -430,8 +430,15 @@ export function reconstructConversation(
         exchange.digestContent = message.content;
         // Wire-proof fix: restores the flag this digest was captured under, so a resumed/reloaded
         // conversation's history-replay decision (excludePrivacyOffHistory) still fails closed on
-        // a digest captured with privacy off, exactly as it does within one live session.
-        exchange.privacyEnabled = message.privacyEnabled;
+        // a digest captured with privacy off, exactly as it does within one live session. Only
+        // assigned when present on the persisted message -- an explicit `privacyEnabled: undefined`
+        // own property (vs. the key being simply absent) is indistinguishable for every real
+        // consumer of this object, but IS distinguishable to a strict deep-equality check, so a
+        // conditional assignment keeps a pre-fix-persisted (flag-less) exchange object shaped
+        // exactly as it always was.
+        if (message.privacyEnabled !== undefined) {
+          exchange.privacyEnabled = message.privacyEnabled;
+        }
       }
       continue;
     }

@@ -62,7 +62,15 @@ function exchange(
   digestContent?: string,
   privacyEnabled?: boolean,
 ): ToolExchange {
-  return { toolCall: toolCall(toolCallId), digestContent, privacyEnabled };
+  return {
+    toolCall: toolCall(toolCallId),
+    digestContent,
+    // Omitted entirely (not `privacyEnabled: undefined`) when the caller doesn't pass it, so a
+    // deep-equal against `reconstructConversation`'s output -- which now also OMITS the key rather
+    // than setting it to `undefined` (see that function's own doc comment) -- compares like for
+    // like instead of tripping over a present-but-undefined vs. absent key mismatch.
+    ...(privacyEnabled !== undefined ? { privacyEnabled } : {}),
+  };
 }
 function turn(
   assistantMessageId: string,
@@ -243,8 +251,13 @@ test('buildOutgoingMessages: a turnRecord whose assistantMessageId has no matchi
 // ---------------------------------------------------------------------------
 
 test('excludePrivacyOffHistory: WIRE-PROOF regression -- a privacy-OFF-flagged tool digest containing a bare real agent name is absent from the outbound payload entirely', () => {
+  // The user's OWN question text deliberately does NOT mention the hostname here: this mechanism
+  // never drops role:'user' content (a separate, already-documented residual -- see
+  // excludePrivacyOffHistory's own doc comment), so a "no hostname anywhere" assertion must not be
+  // confounded by the user's own words. What this test isolates is specifically the digest and the
+  // model's own past narration, which DO get dropped.
   const messages: ChatMessage[] = [
-    { role: 'user', content: 'how many alerts on wazuh-aio-5?' },
+    { role: 'user', content: 'how many alerts right now?' },
     { role: 'assistant', content: '', toolCalls: [toolCall('t1')] },
     {
       role: 'tool',
@@ -350,8 +363,11 @@ test('excludePrivacyOffHistory: user messages are NEVER dropped by this mechanis
 });
 
 test('buildOutgoingMessages: WIRE-PROOF end-to-end -- privacy toggled on mid-conversation excludes the privacy-off turn (digest AND prose), keeping the current question', () => {
+  // As in the excludePrivacyOffHistory test above, the user's OWN question text deliberately does
+  // not mention the hostname -- only the digest and the model's own past narration carried it, and
+  // those (not user content) are what this fix drops.
   const uiMessages = [
-    uiUser('u1', 'how many alerts on wazuh-aio-5?'),
+    uiUser('u1', 'how many alerts right now?'),
     uiAssistant('a1', '3 alerts on wazuh-aio-5.', false), // this turn ran with privacy OFF
     uiUser('u2', 'and now, with privacy on?'),
   ];
@@ -360,7 +376,7 @@ test('buildOutgoingMessages: WIRE-PROOF end-to-end -- privacy toggled on mid-con
   const outgoing = buildOutgoingMessages(uiMessages, turns, true);
 
   assert.deepEqual(outgoing, [
-    { role: 'user', content: 'how many alerts on wazuh-aio-5?' },
+    { role: 'user', content: 'how many alerts right now?' },
     { role: 'user', content: 'and now, with privacy on?' },
   ]);
   assert.doesNotMatch(JSON.stringify(outgoing), /wazuh-aio-5/);
