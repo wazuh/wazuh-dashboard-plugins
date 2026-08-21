@@ -200,6 +200,9 @@ test('executeToolCall: get_critical_findings past the 90-day cap is clamped, and
   // (catalog/common.ts) ever accepts for a typed tool's time_range_gte -- only "now-N[dhm]" or
   // ISO-8601. "now-720d" (≈2 years) is the reachable equivalent.
   const context = fakeSearchContext([{ 'wazuh.rule.level': 'critical' }]);
+  // Captured BEFORE the call, not just after -- a real lower bound, so `executedAt` is pinned
+  // to the actual call window on both sides rather than only checked against an upper bound.
+  const before = Date.now();
   const outcome = await executeToolCall(
     {
       id: 'call-1',
@@ -210,6 +213,7 @@ test('executeToolCall: get_critical_findings past the 90-day cap is clamped, and
     fakeRequest,
     undefined,
   );
+  const after = Date.now();
   const provenance = outcome.tableEvent?.spec.provenance;
   assert.ok(provenance);
   assert.equal(provenance?.clamped, true);
@@ -223,9 +227,9 @@ test('executeToolCall: get_critical_findings past the 90-day cap is clamped, and
   // Issue #9008 review, blocker 2: the instant the query actually ran, recorded as a plain
   // number at creation time -- what `describeProvenance` (tool-call-label.ts) resolves a
   // date-math bound against instead of the render-time clock.
-  const before = Date.now();
   assert.equal(typeof provenance?.executedAt, 'number');
-  assert.ok(provenance!.executedAt! <= before);
+  assert.ok(provenance!.executedAt! >= before);
+  assert.ok(provenance!.executedAt! <= after);
 });
 
 test('executeToolCall: a Manager-API table carries no provenance at all (no index/DSL concept)', async () => {
