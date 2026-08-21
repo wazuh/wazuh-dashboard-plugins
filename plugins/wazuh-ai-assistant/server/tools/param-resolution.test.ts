@@ -127,7 +127,9 @@ test('buildGenericResolveParams: a supplied param passes through unchanged, no l
   });
   const result = await resolve({ agent_id: '007' }, context, fakeRequest);
   assert.equal(result.ok, true);
-  if (!result.ok) {return;}
+  if (!result.ok) {
+    return;
+  }
   assert.equal(result.resolved.params.agent_id, '007');
   assert.equal(result.resolved.note, undefined);
   assert.equal(
@@ -149,7 +151,9 @@ test('buildGenericResolveParams (manager-agents): exactly one active agent resol
   });
   const result = await resolve({}, context, fakeRequest);
   assert.equal(result.ok, true);
-  if (!result.ok) {return;}
+  if (!result.ok) {
+    return;
+  }
   assert.equal(result.resolved.params.agent_id, '001');
   assert.match(result.resolved.note ?? '', /wazuh-aio-5/);
   assert.match(result.resolved.note ?? '', /001/);
@@ -176,7 +180,9 @@ test('buildGenericResolveParams (manager-agents, valueFrom "name"): injects the 
   });
   const result = await resolve({}, context, fakeRequest);
   assert.equal(result.ok, true);
-  if (!result.ok) {return;}
+  if (!result.ok) {
+    return;
+  }
   assert.equal(result.resolved.params.agent_name, 'wazuh-aio-5');
 });
 
@@ -194,7 +200,9 @@ test('buildGenericResolveParams (manager-agents, valueFrom "id-or-name"): inject
   });
   const result = await resolve({}, context, fakeRequest);
   assert.equal(result.ok, true);
-  if (!result.ok) {return;}
+  if (!result.ok) {
+    return;
+  }
   assert.equal(result.resolved.params.agent_identifier, '001');
 });
 
@@ -213,7 +221,9 @@ test('buildGenericResolveParams (indexer-terms): exactly one candidate resolves 
   const { context } = fakeContext({ termBuckets: ['cis_ubuntu22-04'] });
   const result = await resolve({}, context, fakeRequest);
   assert.equal(result.ok, true);
-  if (!result.ok) {return;}
+  if (!result.ok) {
+    return;
+  }
   assert.equal(result.resolved.params.policy_id, 'cis_ubuntu22-04');
   assert.match(result.resolved.note ?? '', /cis_ubuntu22-04/);
   // A terms-source value is a catalog identifier (an SCA policy id), not a host/user/network
@@ -231,7 +241,9 @@ test('buildGenericResolveParams (manager-agents): zero active agents errors with
   const { context } = fakeContext({ agents: { items: [] } });
   const result = await resolve({}, context, fakeRequest);
   assert.equal(result.ok, false);
-  if (result.ok) {return;}
+  if (result.ok) {
+    return;
+  }
   assert.match(result.reason, /no active agent/i);
   assert.doesNotMatch(result.reason, /get_agents/);
 });
@@ -248,7 +260,9 @@ test('buildGenericResolveParams (manager-agents): multiple active agents errors 
   const { context } = fakeContext({ agents: { items, total: 15 } });
   const result = await resolve({}, context, fakeRequest);
   assert.equal(result.ok, false);
-  if (result.ok) {return;}
+  if (result.ok) {
+    return;
+  }
   assert.match(result.reason, /15 active agents/);
   assert.match(result.reason, /agent-1"/);
   assert.match(result.reason, /and \d+ more/);
@@ -269,7 +283,9 @@ test('buildGenericResolveParams (indexer-terms): zero matching values errors', a
   const { context } = fakeContext({ termBuckets: [] });
   const result = await resolve({}, context, fakeRequest);
   assert.equal(result.ok, false);
-  if (result.ok) {return;}
+  if (result.ok) {
+    return;
+  }
   assert.match(result.reason, /No matching value/);
 });
 
@@ -290,7 +306,9 @@ test('buildGenericResolveParams (indexer-terms): multiple matching values errors
   });
   const result = await resolve({}, context, fakeRequest);
   assert.equal(result.ok, false);
-  if (result.ok) {return;}
+  if (result.ok) {
+    return;
+  }
   assert.match(result.reason, /cis_ubuntu22-04/);
   assert.match(result.reason, /cis_rhel8/);
 });
@@ -305,7 +323,9 @@ test('buildGenericResolveParams (manager-agents): a Manager API failure degrades
   const { context } = fakeContext({ agentsThrows: true });
   const result = await resolve({}, context, fakeRequest);
   assert.equal(result.ok, false);
-  if (result.ok) {return;}
+  if (result.ok) {
+    return;
+  }
   assert.match(result.reason, /agent_id/);
   assert.doesNotMatch(result.reason, /get_agents/);
 });
@@ -325,7 +345,9 @@ test('buildGenericResolveParams (indexer-terms): an Indexer failure degrades to 
   const { context } = fakeContext({ termsThrows: true });
   const result = await resolve({}, context, fakeRequest);
   assert.equal(result.ok, false);
-  if (result.ok) {return;}
+  if (result.ok) {
+    return;
+  }
   assert.match(result.reason, /policy_id/);
 });
 
@@ -351,7 +373,9 @@ test("buildGenericResolveParams: scopedBy narrows the second param's lookup to t
   });
   const result = await resolve({}, context, fakeRequest);
   assert.equal(result.ok, true);
-  if (!result.ok) {return;}
+  if (!result.ok) {
+    return;
+  }
   assert.equal(result.resolved.params.agent_id, '001');
   assert.equal(result.resolved.params.policy_id, 'cis_ubuntu22-04');
   assert.equal(searchCalls.length, 1);
@@ -379,7 +403,9 @@ test('buildGenericResolveParams: scopedBy uses a CALLER-supplied earlier param u
   });
   const result = await resolve({ agent_id: '042' }, context, fakeRequest);
   assert.equal(result.ok, true);
-  if (!result.ok) {return;}
+  if (!result.ok) {
+    return;
+  }
   assert.equal(result.resolved.params.agent_id, '042');
   assert.equal(
     managerCalls.length,
@@ -540,7 +566,9 @@ test('lookupScaCheckOwner: genuinely ambiguous check_id (2+ distinct owners) lis
   });
   const result = await lookupScaCheckOwner(context, '28500');
   assert.equal(result.kind, 'many');
-  if (result.kind !== 'many') {return;}
+  if (result.kind !== 'many') {
+    return;
+  }
   assert.equal(result.owners.length, 2);
 });
 
@@ -577,7 +605,9 @@ test('resolveScaCheckParams: CV-053 regression -- check_id alone resolves withou
     fakeRequest,
   );
   assert.equal(result.ok, true);
-  if (!result.ok) {return;}
+  if (!result.ok) {
+    return;
+  }
   assert.equal(result.resolved.params.agent_id, '001');
   assert.equal(result.resolved.params.policy_id, 'cis_ubuntu22-04');
   assert.match(result.resolved.note ?? '', /28500/);
@@ -597,7 +627,9 @@ test('resolveScaCheckParams: no check_id supplied falls through to the ordinary 
   });
   const result = await resolve({ result: 'failed' }, context, fakeRequest);
   assert.equal(result.ok, true);
-  if (!result.ok) {return;}
+  if (!result.ok) {
+    return;
+  }
   assert.equal(result.resolved.params.agent_id, '001');
   assert.equal(result.resolved.params.policy_id, 'cis_ubuntu22-04');
 });
@@ -613,7 +645,9 @@ test('resolveScaCheckParams: an ambiguous check_id never hard-refuses -- it list
   });
   const result = await resolve({ check_id: '28500' }, context, fakeRequest);
   assert.equal(result.ok, false);
-  if (result.ok) {return;}
+  if (result.ok) {
+    return;
+  }
   assert.match(result.reason, /agent 001/);
   assert.match(result.reason, /agent 002/);
   assert.doesNotMatch(
@@ -635,7 +669,9 @@ test('resolveScaCheckParams: agent_id and policy_id already supplied bypasses ch
     fakeRequest,
   );
   assert.equal(result.ok, true);
-  if (!result.ok) {return;}
+  if (!result.ok) {
+    return;
+  }
   assert.equal(result.resolved.params.agent_id, '005');
   assert.equal(searchCalls.length, 0);
   assert.equal(managerCallLog.length, 0);
