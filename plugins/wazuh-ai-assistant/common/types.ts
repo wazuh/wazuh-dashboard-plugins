@@ -197,6 +197,30 @@ export interface TableSpec {
     label: string;
     url: string;
   };
+  /**
+   * Issue #9008 rework: server-recorded provenance FACTS for the evidence popover, the sole
+   * source the client may render index/time-range detail from — the client must never infer or
+   * default any of this itself. Populated in server/tools/executor.ts's `executeIndexerRequest`
+   * from exactly what it observed executing the query (absent entirely for a Manager-API table,
+   * which has no index/DSL concept at all):
+   *  - `index`: the concrete index queried (same value as `discover.index` above).
+   *  - `requestedRange`/`effectiveRange`: the `{gte, lte}` pair read directly off the query DSL,
+   *    before and after the 90-day lookback guardrail (`guardrails.ts`'s `clampLookbackWindow`)
+   *    ran — via `common/discover-url.ts`'s `rangeBoundsFromDsl`, the same reader the "Open in
+   *    Discover" link uses. `undefined` when that DSL carried no recognizable range clause at
+   *    all (most catalog tools have no time-range concept and never will), NOT a default.
+   *  - `clamped`: true only when `clampLookbackWindow` actually narrowed the query.
+   *  - `toolCallId`: attached by server/routes/chat.ts (which is where the streaming tool call's
+   *    id is in scope), not by the executor — it is what lets the client attribute this table to
+   *    the exact one tool call that produced it, rather than to every call in a multi-call turn.
+   */
+  provenance?: {
+    toolCallId?: string;
+    index?: string;
+    requestedRange?: { gte: string; lte: string };
+    effectiveRange?: { gte: string; lte: string };
+    clamped: boolean;
+  };
 }
 
 export interface StreamUsage {

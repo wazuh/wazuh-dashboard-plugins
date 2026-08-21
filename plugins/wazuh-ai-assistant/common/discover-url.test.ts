@@ -4,6 +4,7 @@ import {
   extractTimeRange,
   buildDiscoverUrl,
   hasExplicitTimeRange,
+  rangeBoundsFromDsl,
 } from './discover-url';
 
 test('risonEncode: plain string is single-quoted', () => {
@@ -181,6 +182,22 @@ test('hasExplicitTimeRange: false when no readable range clause is present', () 
 
 test('hasExplicitTimeRange: false for undefined dsl', () => {
   assert.equal(hasExplicitTimeRange(undefined), false);
+});
+
+// Issue #9008 rework: `rangeBoundsFromDsl` is the ONE function server (executor.ts's provenance
+// facts) and client (tool-call-label.ts's popover) both read a DSL's time window through, and it
+// must never substitute a default the DSL did not actually state.
+test('rangeBoundsFromDsl: reads the gte/lte pair when an explicit range clause is present', () => {
+  const dsl = { range: { '@timestamp': { gte: 'now-7d', lte: 'now' } } };
+  assert.deepEqual(rangeBoundsFromDsl(dsl), { gte: 'now-7d', lte: 'now' });
+});
+
+test('rangeBoundsFromDsl: undefined (never the 24h default) when no range clause is present', () => {
+  assert.equal(rangeBoundsFromDsl({ match_all: {} }), undefined);
+});
+
+test('rangeBoundsFromDsl: undefined for undefined dsl', () => {
+  assert.equal(rangeBoundsFromDsl(undefined), undefined);
 });
 
 test('buildDiscoverUrl: produces the expected rison-encoded, encodeURI-escaped hash', () => {

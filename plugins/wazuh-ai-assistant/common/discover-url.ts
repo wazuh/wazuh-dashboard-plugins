@@ -169,6 +169,24 @@ export function extractTimeRange(
 }
 
 /**
+ * `{gte, lte}` form of the same walk `extractTimeRange` does, but returning `undefined` — never
+ * the last-24h default — when `dsl` carries no explicit, recognizable range clause. Shared by
+ * server/tools/executor.ts (recording the FACTUAL requested/effective provenance windows on a
+ * `TableSpec`, issue #9008) and the client's evidence popover (tool-call-label.ts): both sides
+ * read a DSL's time window through this one function, so neither can invent a window the DSL
+ * never actually stated.
+ */
+export function rangeBoundsFromDsl(
+  dsl: Record<string, unknown> | undefined,
+): { gte: string; lte: string } | undefined {
+  if (!hasExplicitTimeRange(dsl)) {
+    return undefined;
+  }
+  const { from, to } = extractTimeRange(dsl);
+  return { gte: from, lte: to };
+}
+
+/**
  * Builds the OSD 2.x data-explorer Discover URL (rison-encoded hash state) for one result table's
  * backing index/query. The static parts of the app-state skeleton (columns, sort, filter meta,
  * etc.) are written as literal rison rather than run through `risonEncode` so they stay byte-stable
