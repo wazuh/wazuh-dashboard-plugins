@@ -103,9 +103,12 @@ function formatDurationShort(durationMs: number): string {
  * something relative to WHEN it ran, so resolving `now`/`now-90d` against the render-time clock
  * instead (the pre-fix behavior) showed a restored conversation a window the query never ran
  * against. When `executedAt` is `undefined` (a conversation persisted before this field existed),
- * a date-math bound is left UNRESOLVED — `undefined`, never a guess against the current clock —
- * so callers fall back to the literal bound string instead of a fabricated absolute instant. An
- * ISO-8601 bound needs no "now" reference at all and resolves the same either way.
+ * a date-math bound is left UNRESOLVED — `undefined`, never a guess against the current clock.
+ * The two callers react to that differently: `spanShortLabel`'s last-resort path falls back to
+ * the literal bound STRING (never blank), while `formatAbsoluteRangeLabel` has no such string
+ * fallback and simply returns `undefined`, which is what makes the popover's "Time range:" line
+ * OMITTED entirely rather than showing a fabricated absolute instant. An ISO-8601 bound needs no
+ * "now" reference at all and resolves the same either way, `executedAt` present or not.
  */
 function resolveBoundMs(
   value: string,

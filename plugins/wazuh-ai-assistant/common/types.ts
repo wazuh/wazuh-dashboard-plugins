@@ -219,7 +219,9 @@ export interface TableSpec {
    *    restored conversation a window the query never ran against. `describeProvenance`
    *    (tool-call-label.ts) resolves date-math bounds against this stored instant, never against
    *    `Date.now()`. `undefined` only for a conversation persisted before this field existed --
-   *    the client shows the literal bound strings rather than an absolute instant in that case.
+   *    a date-math bound then stays unresolved, so the popover's "Time range:" line is simply
+   *    OMITTED (never a fabricated absolute instant); the clamp badge still renders from the
+   *    literal date-math bounds, since that path needs no absolute instant at all.
    */
   provenance?: {
     toolCallId?: string;

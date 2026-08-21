@@ -70,7 +70,7 @@ describe('describeToolCall', () => {
   // Issue #9008 review, major 3: the OLD implementation truncated the whole composed string at a
   // fixed length, which cut a clamp badge mid-numeral ("requested 7…" for "requested 720d") once
   // the tool name was long enough. The fix truncates only the name segment; the window text is
-  // always appended afterward, in full — this fixture's full label is 51 characters, comfortably
+  // always appended afterward, in full — this fixture's full label is 50 characters, comfortably
   // past where the old 48-char cap would have bitten.
   it('never truncates the window text, even for a long tool name plus a clamp badge', () => {
     const provenance: Provenance = {
