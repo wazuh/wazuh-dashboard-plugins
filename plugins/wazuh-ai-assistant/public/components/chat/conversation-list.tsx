@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -285,10 +285,20 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // The rail's own scroll container (below) doubles as a focus target after a delete/bulk-delete
+  // closes its confirm modal (m12): EUI's modal otherwise tries to return focus to the row/button
+  // that opened it, which the delete just removed, silently dropping focus to `<body>`. `tabIndex
+  //={-1}` (set on the element below) makes a plain `<div>` programmatically focusable without
+  // adding it to the Tab order.
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
   // Inline rename (E2): which row (if any) currently shows an input instead of its title text, and
   // that input's own in-progress value. Only one row can be renaming at a time.
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
+  // Mirrors `renamingId` but updated SYNCHRONOUSLY (state updates are not) -- see `commitRename`'s
+  // doc comment below for why the commit-on-blur behavior needs this to avoid double-committing.
+  const renamingIdRef = useRef<string | null>(null);
 
   // Bulk delete (E3): an explicit select mode a "Select conversations" button enters/exits — rows
   // never show checkboxes outside of it. `selectedIds` is cleared both on entry and on exit, so a
@@ -310,6 +320,41 @@ export const ConversationList: React.FC<ConversationListProps> = ({
     );
   }, [conversations, searchTerm]);
 
+  // A rename in progress belongs to ONE specific conversation id -- switching to a different
+  // conversation (the row's own onSelect already fired) leaves it pointed at a row that is no
+  // longer the point of focus, so clear it rather than let a stale edit linger off-screen.
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally keyed on
+  // activeConversationId alone: clearRename's identity is stable across renders (see below) and
+  // including it would only add noise.
+  useEffect(() => {
+    renamingIdRef.current = null;
+    setRenamingId(null);
+  }, [activeConversationId]);
+
+  // Prune `selectedIds` (m13) whenever the caller's own `conversations` list changes -- a refresh
+  // after a delete elsewhere (another tab, the single-delete flow) can drop an id this rail still
+  // had checked; keeping it selected would let a later "Delete (N)" confirm try to delete an id
+  // that no longer exists. A no-op (same `Set` reference returned) when nothing needs pruning, so
+  // this never triggers an extra render on every ordinary list refresh.
+  useEffect(() => {
+    setSelectedIds(current => {
+      if (current.size === 0) {
+        return current;
+      }
+      const validIds = new Set(conversations.map(c => c.id));
+      const next = new Set<string>();
+      let changed = false;
+      current.forEach(id => {
+        if (validIds.has(id)) {
+          next.add(id);
+        } else {
+          changed = true;
+        }
+      });
+      return changed ? next : current;
+    });
+  }, [conversations]);
+
   // `new Date(Date.now())`, not a bare `new Date()`: the latter is NOT guaranteed to consult a
   // mocked `Date.now` (engines implement the no-arg constructor as its own native "current time"
   // read, independent of the `Date.now` static property), which would make the TODAY/YESTERDAY
@@ -319,6 +364,17 @@ export const ConversationList: React.FC<ConversationListProps> = ({
     () => groupByDate(filteredConversations, new Date(Date.now())),
     [filteredConversations],
   );
+
+  // m12: after a delete/bulk-delete closes its confirm modal, park focus on the rail's own scroll
+  // container rather than let it fall through to `<body>` -- EUI's modal tries to restore focus to
+  // whatever opened it (the trash icon / "Delete (N)" button), which the action just deleted along
+  // with its row. Deferred one frame: EUI's own focus-restoration runs as part of the SAME
+  // dismissal, and would otherwise win a synchronous race against this.
+  const focusRailContainer = () => {
+    window.requestAnimationFrame(() => {
+      scrollContainerRef.current?.focus();
+    });
+  };
 
   const requestDelete = (
     event: React.MouseEvent,
@@ -334,9 +390,15 @@ export const ConversationList: React.FC<ConversationListProps> = ({
       onDelete(deleteTarget.id);
     }
     setDeleteTarget(null);
+    focusRailContainer();
   };
 
   // --- Inline rename (E2) ---------------------------------------------------------------------
+
+  const clearRename = () => {
+    renamingIdRef.current = null;
+    setRenamingId(null);
+  };
 
   const startRename = (
     event: React.MouseEvent,
@@ -345,28 +407,45 @@ export const ConversationList: React.FC<ConversationListProps> = ({
     // Same reason as `requestDelete`'s stopPropagation: never let the row's own onClick (resume)
     // fire alongside the pencil icon's click.
     event.stopPropagation();
+    renamingIdRef.current = conversation.id;
     setRenamingId(conversation.id);
     setRenameValue(conversation.title);
   };
 
+  /**
+   * Commits via `renamingIdRef` (NOT the `renamingId` state variable) so this can be called from
+   * BOTH Enter and `onBlur` (m6: commit-on-blur, the mainstream inline-rename convention) without
+   * double-committing. Enter clears the ref synchronously before the resulting re-render unmounts
+   * the input; when a browser removes a focused element from the DOM it also fires a `blur` event
+   * on it as part of that removal, and this function running a second time off THAT blur -- with
+   * the ref already cleared -- is a deliberate no-op rather than a second `onRename` call with a
+   * stale closure's values. A "real" blur (the user clicked or tabbed away without pressing
+   * Enter/Escape) still finds the ref pointing at this row and commits normally.
+   */
   const commitRename = () => {
-    const id = renamingId;
+    const id = renamingIdRef.current;
+    if (!id) {
+      return;
+    }
     const nextTitle = renameValue.trim();
-    setRenamingId(null);
+    clearRename();
     // An empty (or whitespace-only) title commits nothing rather than saving a blank title — the
     // row simply reverts to showing its previous title, same as Escape would.
-    if (id && nextTitle) {
+    if (nextTitle) {
       onRename?.(id, nextTitle);
     }
   };
 
   const cancelRename = () => {
-    setRenamingId(null);
+    clearRename();
   };
 
   // --- Bulk delete / select mode (E3) -----------------------------------------------------------
 
   const enterSelectMode = () => {
+    // m6: a rename in progress and select mode are mutually exclusive UI states (the row's rename
+    // affordance is hidden while selectMode is true anyway) -- clear rather than leave it dangling.
+    clearRename();
     setSelectMode(true);
     setSelectedIds(new Set());
   };
@@ -393,6 +472,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
     setBulkDeleteConfirmOpen(false);
     exitSelectMode();
     onBulkDelete?.(ids);
+    focusRailContainer();
   };
 
   const deleteModal = deleteTarget && (
@@ -516,7 +596,19 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   }
 
   return (
-    <>
+    // `display: 'contents'`: purely an event-listener wrapper (m11 -- Escape exits select mode
+    // from anywhere in the rail, not only from a row) with zero layout/visual effect -- the
+    // element renders no box of its own, so it cannot be what "byte-identical row layout at rest"
+    // is checked against; every child below lays out exactly as if this wrapper were the
+    // Fragment it replaces.
+    <div
+      style={{ display: 'contents' }}
+      onKeyDown={event => {
+        if (event.key === 'Escape' && selectMode) {
+          exitSelectMode();
+        }
+      }}
+    >
       {showHeader && (
         <>
           <div className='wzConvoRailHeader'>
@@ -628,7 +720,14 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                 { defaultMessage: 'Search conversations' },
               )}
               value={searchTerm}
-              onChange={event => setSearchTerm(event.target.value)}
+              onChange={event => {
+                setSearchTerm(event.target.value);
+                // m6: a rename in progress belongs to a specific row that a new search term may
+                // filter out of view entirely -- clear it rather than leave an edit open on a row
+                // the user can no longer see. (select mode has no search field to begin with --
+                // see the toolbar's own comment above -- so there is no equivalent case there.)
+                clearRename();
+              }}
               fullWidth
               compressed
               isClearable
@@ -659,8 +758,10 @@ export const ConversationList: React.FC<ConversationListProps> = ({
 
       {/* Only this section scrolls (`.wzConvoRailScroll`): with the whole rail scrolling instead,
           a long history pushed the pinned "Collapse" control below the fold and put a second
-          scrollbar around the search field that never needed one. */}
-      <div className='wzConvoRailScroll'>
+          scrollbar around the search field that never needed one. `tabIndex={-1}` + the ref (m12)
+          make this a valid focus TARGET (after a delete/bulk-delete closes its confirm modal)
+          without adding it to the Tab order itself. */}
+      <div className='wzConvoRailScroll' ref={scrollContainerRef} tabIndex={-1}>
         {filteredConversations.length === 0 ? (
           <EuiText size='xs' color='subdued'>
             <p>
@@ -677,8 +778,20 @@ export const ConversationList: React.FC<ConversationListProps> = ({
         ) : (
           groups.map(group => (
             <React.Fragment key={group.key}>
-              <div className='wzConvoRailGroupHeader'>{group.label}</div>
-              {/* Real list markup (E4/#9010): each date group is its own native `<ul>` of `<li>`
+              {/* `role='heading'`/`aria-level` (m7): a screen reader should announce "Today" the
+                  same way it announces the panel's own "Conversations" title (a REAL `<h3>` above)
+                  -- one level down, since this heads a sub-section of that title, not a sibling of
+                  it -- rather than as an unstructured run of text before the list that follows it.
+                  Zero visual change: still the same `<div>` + `wzConvoRailGroupHeader` class: only
+                  an ARIA role/level is added, nothing about markup tag or styling. */}
+              <div
+                className='wzConvoRailGroupHeader'
+                role='heading'
+                aria-level={4}
+              >
+                {group.label}
+              </div>
+              {/* Real list markup (E5/#9010): each date group is its own native `<ul>` of `<li>`
                   rows, so a screen reader announces "list, N items" the way EUI's own
                   `EuiListGroup` does — rather than the previous plain `<div>`s, which read as an
                   undifferentiated run of generic elements. `.wzConvoRailGroupList`/
@@ -814,6 +927,12 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                                     cancelRename();
                                   }
                                 }}
+                                // m6: commit on blur (clicking/tabbing away), the mainstream
+                                // inline-rename convention — see `commitRename`'s own doc comment
+                                // for why the `renamingIdRef` guard makes this safe to ALSO run
+                                // after an Enter-triggered unmount's own synthetic blur, without
+                                // double-committing.
+                                onBlur={commitRename}
                               />
                             ) : (
                               <EuiText
@@ -850,10 +969,31 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                               {onRename && (
                                 <EuiFlexItem
                                   grow={false}
-                                  // Same WCAG 1.4.11 reasoning as the trash icon below: 0 at rest,
-                                  // 1 on hover, selection, OR keyboard focus.
+                                  // M3 (#9010 review): unlike the trash icon below (a PRE-EXISTING
+                                  // control this change did not touch, kept as-is), this one is
+                                  // NEW, so `opacity` alone was a real regression — an
+                                  // `opacity: 0` element still occupies its layout box, which
+                                  // permanently shrank every row's title column by this icon's
+                                  // full width even at rest. Collapsing `width`/`minWidth` to 0
+                                  // (with `overflow: hidden` to clip the button while collapsed)
+                                  // removes that reserved space entirely at rest — "NO REDESIGN"
+                                  // means the row's resting layout must stay byte-identical to
+                                  // before the pencil existed. `minWidth: 0` specifically is
+                                  // required, not just `width: 0`: a flex item's default
+                                  // `min-width` is derived from its CONTENT size, which would
+                                  // otherwise force the button's intrinsic width back in despite
+                                  // `width: 0`.
+                                  //
+                                  // Reveal is `isHovered` ONLY, deliberately WITHOUT `isSelected`
+                                  // (unlike the trash icon's condition): the active/selected row
+                                  // must not show this permanently either — hover or keyboard
+                                  // focus, nothing else (`isHovered` already doubles as "has
+                                  // keyboard focus", via the button's own onFocus below).
                                   style={{
-                                    opacity: isHovered || isSelected ? 1 : 0,
+                                    width: isHovered ? 'auto' : 0,
+                                    minWidth: isHovered ? 'auto' : 0,
+                                    overflow: 'hidden',
+                                    opacity: isHovered ? 1 : 0,
                                   }}
                                 >
                                   <EuiButtonIcon
@@ -940,6 +1080,6 @@ export const ConversationList: React.FC<ConversationListProps> = ({
 
       {deleteModal}
       {bulkDeleteModal}
-    </>
+    </div>
   );
 };

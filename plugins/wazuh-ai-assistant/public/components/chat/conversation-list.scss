@@ -122,7 +122,7 @@
 }
 
 /**
- * Real list markup (E4/#9010, conversation-list.tsx): one `<ul>` per date group, so a screen
+ * Real list markup (E5/#9010, conversation-list.tsx): one `<ul>` per date group, so a screen
  * reader announces "list, N items" the way `EuiListGroup` does — previously each row was a plain
  * `<div>`, with no list semantics at all. Reset to zero visual effect: no browser default has any
  * business showing up in a "no redesign" change, only the actual accessibility markup does.
