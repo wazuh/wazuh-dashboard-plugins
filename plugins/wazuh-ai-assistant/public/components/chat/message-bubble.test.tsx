@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import {
   MessageBubble,
@@ -329,6 +329,47 @@ describe('MessageBubble', () => {
       // "What did it actually look for?" is the first question a reader asks of a zero-result
       // answer, and the suppressed card is where that chip would otherwise have lived.
       expect(screen.getByText('Top agents · 90d')).toBeInTheDocument();
+    });
+
+    // Issue #9008 review, minor 7: this raw view IS the popover's equivalent for a turn whose
+    // table is suppressed (0 rows) — "which index did it read?" matters most exactly here, so it
+    // must show the same Index/Time-range lines the rendered-table popover does (ProvenanceChip,
+    // result-table.tsx), not just the tool name and raw arguments.
+    it('shows the Index and Time-range lines in the suppressed-table raw view once opened', () => {
+      render(
+        <MessageBubble
+          message={baseMessage({
+            role: 'assistant',
+            content: 'Nothing matched.',
+            table: {
+              ...EMPTY_TABLE,
+              provenance: {
+                toolCallId: 't1',
+                index: 'wazuh-agents-index-*',
+                effectiveRange: { gte: 'now-90d', lte: 'now' },
+                clamped: false,
+                // `executedAt` required for the Time-range line to resolve at all (issue #9008
+                // blocker 2) -- without it a date-math bound stays unresolved and that line is
+                // simply omitted, which is exactly what a colocated test below covers instead.
+                executedAt: Date.now(),
+              },
+            },
+            toolCalls: [{ id: 't1', name: 'get_top_agents', arguments: {} }],
+          })}
+          resolveDiscoverUrl={noopResolveDiscoverUrl}
+          resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+        />,
+      );
+
+      // Closed by default -- neither line is on screen unbidden.
+      expect(screen.queryByText(/^Index:/)).toBeNull();
+
+      fireEvent.click(screen.getByText('Top agents · 90d'));
+
+      expect(
+        screen.getByText('Index: wazuh-agents-index-*'),
+      ).toBeInTheDocument();
+      expect(screen.getByText(/^Time range:/)).toBeInTheDocument();
     });
 
     it('shows the tool name alone (no invented window) when the server recorded no provenance', () => {
