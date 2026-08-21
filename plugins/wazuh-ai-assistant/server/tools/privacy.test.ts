@@ -1865,8 +1865,13 @@ test('NF-2: an array of OBJECTS under an anonymize entry is deep-scrubbed, not p
   const value = result.value as Array<Record<string, string>>;
   assert.match(value[0].addr, /^IP_\d+$/);
   assert.match(value[1].addr, /^IP_\d+$/);
-  assert.equal(value[1].tag, 'primary'); // non-string leaf-adjacent field: untouched, kept
-  assert.doesNotMatch(JSON.stringify(value), /127\.0\.0\.1|10\.0\.0\.5/);
+  // Every STRING LEAF under this entry's subtree gets the entry's action -- deepScrubContainer
+  // does not try to guess which nested key "is" the IP and leave siblings alone (there is no
+  // reliable signal to do that from), so a sibling string field is pseudonymized too, with the
+  // SAME 'IP' kind the entry specifies. This is the deliberate, conservative fail-closed choice:
+  // better an unrelated string gets an IP-kind pseudonym than a real value slips through raw.
+  assert.match(value[1].tag, /^IP_\d+$/);
+  assert.doesNotMatch(JSON.stringify(value), /127\.0\.0\.1|10\.0\.0\.5|primary/);
 });
 
 test('NF-2: a NESTED ARRAY under an anonymize entry is deep-scrubbed, not passed through raw', () => {
