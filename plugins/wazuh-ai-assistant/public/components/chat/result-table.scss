@@ -140,3 +140,24 @@
     transition: background-color $wzMotionFast $wzEase;
   }
 }
+
+/**
+ * Issue #9009 (J1): narrow-mode cell truncation. At ~480px (the QA E2E review's reproduction
+ * width) an untruncated cell wraps onto several lines and makes the whole table unreadable; this
+ * clips it to one line with an ellipsis instead, with the full value one `EuiToolTip` away — the
+ * same truncate-plus-tooltip idiom the providers table already uses (settings-page.scss).
+ * `anchorClassName` (passed on the `EuiToolTip` in result-table.tsx) bounds the tooltip's own
+ * wrapper span the same way, so THAT span doesn't grow wider than the cell either.
+ */
+.wzResultsCellTruncate {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.wzResultsCellTruncateAnchor {
+  display: block;
+  max-width: 100%;
+}
