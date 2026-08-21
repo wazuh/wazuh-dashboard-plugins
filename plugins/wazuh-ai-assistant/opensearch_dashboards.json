@@ -1,6 +1,6 @@
 {
   "id": "wazuhAiAssistant",
-  "version": "5.0.0-00",
+  "version": "5.0.0-06",
   "opensearchDashboardsVersion": "opensearchDashboards",
   "requiredPlugins": [
     "navigation",
