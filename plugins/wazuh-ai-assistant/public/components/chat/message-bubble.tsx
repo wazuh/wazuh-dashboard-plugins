@@ -19,7 +19,7 @@ import { ChatRole, TableSpec, ToolCall } from '../../../common/types';
 import { ResultTable, ResultTableProvenanceChip } from './result-table';
 import { DiscoverLink, ResolveDiscoverUrl } from './discover-link';
 import { ResolveSecurityAnalyticsUrl } from './security-analytics-link';
-import { describeToolCall } from './tool-call-label';
+import { describeToolCall, describeToolCallProvenance } from './tool-call-label';
 
 /**
  * "This turn was cut short" affordance, rendered in two places: inside an interrupted assistant
@@ -271,12 +271,21 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
     renderedTable
       ? toolCalls.map(toolCall => {
           const { short, full } = describeToolCall(toolCall, renderedTable);
+          // Issue #9008 (G2/G3): index, resolved absolute time range, and the single clamp badge
+          // — see describeToolCallProvenance's own doc comment (tool-call-label.ts).
+          const provenance = describeToolCallProvenance(
+            toolCall,
+            renderedTable,
+          );
           return {
             id: toolCall.id,
             shortLabel: short,
             fullLabel: full,
             toolName: toolCall.name,
             argumentsJson: toolCall.arguments,
+            index: provenance.index,
+            resolvedRangeLabel: provenance.resolvedRangeLabel,
+            windowBadgeLabel: provenance.windowBadgeLabel,
           };
         })
       : undefined;

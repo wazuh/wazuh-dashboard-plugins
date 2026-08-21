@@ -455,6 +455,80 @@ describe('ResultTable', () => {
       const { container } = render(<ResultTable spec={spec()} />);
       expect(container.querySelector('.euiBadge[title]')).toBeNull();
     });
+
+    // Issue #9008 (G2): the index and resolved time range were previously reachable only through
+    // the chip's hover `title` — never inside the popover a touch/keyboard reader can actually
+    // open. These assert the labelled lines render as real popover content.
+    it('shows the index and resolved time range as labelled lines inside the popover', () => {
+      render(
+        <ResultTable
+          spec={spec()}
+          provenanceChips={[
+            chip({
+              index: 'wazuh-findings-v5-*',
+              resolvedRangeLabel: 'Jul 26, 2026 – Oct 24, 2026',
+              windowBadgeLabel: '90d',
+            }),
+          ]}
+        />,
+      );
+
+      fireEvent.click(screen.getByText('Critical findings · 90d'));
+
+      expect(
+        screen.getByText('Index: wazuh-findings-v5-*'),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText('Time range: Jul 26, 2026 – Oct 24, 2026'),
+      ).toBeInTheDocument();
+      expect(screen.getByText('90d')).toBeInTheDocument();
+    });
+
+    it('shows nothing extra when the chip carries no provenance detail (Manager API call)', () => {
+      render(<ResultTable spec={spec()} provenanceChips={[chip()]} />);
+
+      fireEvent.click(screen.getByText('Critical findings · 90d'));
+
+      expect(screen.queryByText(/^Index:/)).toBeNull();
+      expect(screen.queryByText(/^Time range:/)).toBeNull();
+    });
+
+    // Issue #9008 (G3): ONE badge stating both windows, replacing two separate near-identical
+    // chips with no requested-vs-effective concept between them.
+    it('shows one combined badge for a clamped lookback, not two separate labels', () => {
+      render(
+        <ResultTable
+          spec={spec()}
+          provenanceChips={[chip({ windowBadgeLabel: '90d · requested 2y' })]}
+        />,
+      );
+
+      fireEvent.click(screen.getByText('Critical findings · 90d'));
+
+      expect(screen.getByText('90d · requested 2y')).toBeInTheDocument();
+    });
+
+    // Issue #9008 (G1): the panel's own "hit escape to close" screen-reader announcement did not
+    // hold in the live QA run — Escape left the panel open, dismissible only by re-clicking the
+    // badge. This is a belt-and-braces handler on top of EUI's own popover keyboard handling.
+    it('closes the popover on Escape', async () => {
+      render(<ResultTable spec={spec()} provenanceChips={[chip()]} />);
+
+      fireEvent.click(screen.getByText('Critical findings · 90d'));
+      await waitFor(() =>
+        expect(
+          document.querySelector('.euiPopover__panel-isOpen'),
+        ).not.toBeNull(),
+      );
+
+      fireEvent.keyDown(screen.getByText('get_critical_findings'), {
+        key: 'Escape',
+      });
+
+      await waitFor(() =>
+        expect(document.querySelector('.euiPopover__panel-isOpen')).toBeNull(),
+      );
+    });
   });
 
   describe('severity badge rendering', () => {
@@ -631,10 +705,35 @@ describe('ResultTable', () => {
     });
 
     it('renders once the resolver resolves, when the spec has discover info', async () => {
+      // Issue #9008 (I5): `dsl: { query: {} }` carries no explicit time-range clause, so this is
+      // the range-less fallback case — the label discloses the substituted last-24h window
+      // rather than reading identically to a link that opened the answer's own resolved window
+      // (see the next test for that case).
       render(
         <ResultTable
           spec={spec({
             discover: { index: 'wazuh-alerts-*', dsl: { query: {} } },
+          })}
+          resolveDiscoverUrl={() =>
+            Promise.resolve('https://example.test/discover')
+          }
+        />,
+      );
+      expect(
+        await screen.findByRole('link', {
+          name: 'Open in Discover (last 24h)',
+        }),
+      ).toHaveAttribute('href', 'https://example.test/discover');
+    });
+
+    it('keeps the plain label when the query carries its own explicit time range', async () => {
+      render(
+        <ResultTable
+          spec={spec({
+            discover: {
+              index: 'wazuh-alerts-*',
+              dsl: { range: { '@timestamp': { gte: 'now-90d', lte: 'now' } } },
+            },
           })}
           resolveDiscoverUrl={() =>
             Promise.resolve('https://example.test/discover')
