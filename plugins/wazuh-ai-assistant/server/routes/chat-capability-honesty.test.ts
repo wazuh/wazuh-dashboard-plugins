@@ -7,7 +7,7 @@ import type {
 import {
   augmentToolError,
   CAPABILITY_DENIAL_NOTE,
-  MAX_TOOL_ROUNDS,
+  MAX_CONSECUTIVE_REJECTED_ROUNDS,
   orchestrate,
 } from './chat';
 import { ROUTE_QUESTION_TOOL } from '../tools/router';
@@ -428,6 +428,57 @@ test('orchestrate: suggest_discover_query unknown field -> bounded tool error, n
   );
 });
 
+// --- (b2) issue C4: narration before the suggest_discover_query call must survive into the
+// RETRY round's history, not be discarded as `content: ''` -- this is the exact defect the CEO
+// review caught: "Let me hand you a Discover query…" repeated near-identically across rounds
+// because the model could not see it had already said it.
+
+test('orchestrate: narration before a suggest_discover_query call is carried into the retry round, not dropped', async () => {
+  const context = fakeContext(() => Promise.resolve({ body: { fields: {} } }));
+  const narration = 'Let me hand you a Discover query for that instead.';
+  const { callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCRIPT,
+      [
+        { type: 'delta', content: narration },
+        {
+          type: 'tool_call',
+          toolCall: {
+            id: 'call_1',
+            name: SUGGEST_DISCOVER_QUERY_TOOL.name,
+            arguments: {
+              index: 'wazuh-findings-v5-*',
+              query_dsl: JSON.stringify({ term: { 'made.up.field': 'x' } }),
+              reason: 'This filter needs a field I could not confirm exists.',
+            },
+          },
+        },
+        { type: 'done', usage: { inputTokens: 20, outputTokens: 3 } },
+      ],
+      textOnlyScript('I could not verify that field.'),
+    ],
+    context,
+  );
+
+  // callMessages[0] = stage1, [1] = round 0's own outbound (pre-narration), [2] = the retry
+  // round's outbound -- the first call that could echo round 0's narration back as history.
+  const retryRoundMessages = callMessages[2];
+  const toolCallMessage = retryRoundMessages.find(
+    message =>
+      message.role === 'assistant' && message.toolCalls?.[0]?.id === 'call_1',
+  );
+  assert.ok(
+    toolCallMessage,
+    "expected round 0's [assistant{toolCalls}, tool{content}] pair in the retry round's history",
+  );
+  assert.equal(
+    toolCallMessage?.content,
+    narration,
+    "the narration the user already read must be the assistant message's own content, so the " +
+      'model does not re-narrate it on the retry',
+  );
+});
+
 // --- (c) a SECOND unknown_fields failure this turn falls through to a disclosure-suffixed
 // suggested_query -------------------------------------------------------------------------------
 
@@ -530,9 +581,11 @@ test('orchestrate: a SECOND unknown_fields resolution emits stripped DSL + discl
   // to digest.ts's breakdown-note wording.
   assert.equal(
     secondParsed.note,
-    'The suggested query was shown to the user as an "Open in Discover" link. Now tell the ' +
-      'user plainly, in your own words, what you could not check and why — do not repeat the ' +
-      'query itself, the link already shows it.',
+    'The suggested query was shown to the user as an "Open in Discover" link, not as visible ' +
+      'query text. Now tell the user plainly, in your own words, what you could not check and ' +
+      'why — do not repeat the query itself, the link already shows it, and if you mention the ' +
+      'handoff at all call it "the Discover link", never "the query below" or similar wording ' +
+      'that implies a query block is displayed.',
     'the "shown" acknowledgment must carry its own explanatory note untouched by ' +
       'augmentToolError, not merely something different from CAPABILITY_DENIAL_NOTE',
   );
@@ -704,17 +757,17 @@ test('orchestrate: a range-only suggestion on a blocked index is NOT told its fi
   assert.match(JSON.stringify(suggested[0].dsl), /now-180d/);
 });
 
-test('orchestrate: an unknown_fields resolution on the LAST tool-bearing round still emits the handoff', async () => {
-  // Round-aware retry gate: converting to a tool error on round MAX_TOOL_ROUNDS-1 would leave
-  // the final (tools-less) round unable to call suggest_discover_query at all -- the user
-  // would lose the handoff entirely, a regression against base. Rounds 0..MAX_TOOL_ROUNDS-2 are
-  // spent on ordinary rejected tool calls; the suggest call must land on round
-  // MAX_TOOL_ROUNDS - 1 (the last tool-bearing one) and fall through to strip-plus-disclose.
-  // The filler-round COUNT is derived from MAX_TOOL_ROUNDS instead of hardcoding 2 script
-  // entries: the old literal `[STAGE1_SCRIPT, rejectedSearchRound, rejectedSearchRound, ...]`
-  // encoded "the budget is 3" purely through array position, so a future round-budget change
-  // would silently start exercising a DIFFERENT round (no longer the last one) while this test
-  // kept passing -- proving nothing.
+test('orchestrate: an unknown_fields resolution on the round the F3 rejected-round bound forces final still emits the handoff', async () => {
+  // Round-aware retry gate (F2, AI/plan/c-review.md): converting to a tool error only helps if a
+  // FUTURE tool-bearing round exists to retry in. Review fix F3 added an independent bound
+  // (`MAX_CONSECUTIVE_REJECTED_ROUNDS`) for a turn that never succeeds even once -- tighter than
+  // the structural `MAX_TOOL_ROUNDS` cap this test used to exercise (5 filler rounds before F3;
+  // now the F3 bound of 3 consecutive rejected real-tool-call rounds fires first and is what
+  // actually decides "no more tool-bearing rounds" for an all-rejected turn like this one). The
+  // filler-round COUNT is derived from `MAX_CONSECUTIVE_REJECTED_ROUNDS` rather than hardcoded, for
+  // the same reason as before: a literal script array encodes "the bound is N" purely through
+  // array position, so a future change to that bound would silently start exercising a different
+  // round while this test kept passing, proving nothing.
   const rejectedSearchRound: StreamEvent[] = [
     {
       type: 'tool_call',
@@ -728,7 +781,7 @@ test('orchestrate: an unknown_fields resolution on the LAST tool-bearing round s
   ];
   const context = fakeContext(() => Promise.resolve({ body: { fields: {} } }));
   const fillerRounds = Array.from(
-    { length: MAX_TOOL_ROUNDS - 1 },
+    { length: MAX_CONSECUTIVE_REJECTED_ROUNDS },
     () => rejectedSearchRound,
   );
   const { events } = await runOrchestrate(

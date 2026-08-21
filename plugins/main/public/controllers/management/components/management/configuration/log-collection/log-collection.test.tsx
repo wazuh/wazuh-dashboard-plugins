@@ -39,7 +39,7 @@ jest.mock('../util-hocs/wz-config', () => () => Component => props => (
 
 // Linux Agent mocked data
 const linuxCurrentConfigMocked = {
-  'logcollector-localfile': {
+  logcollector: {
     localfile: [
       {
         file: '/var/wazuh-manager/logs/active-responses.log',
@@ -81,8 +81,8 @@ const linuxCurrentConfigMocked = {
         frequency: 360,
       },
     ],
+    socket: [],
   },
-  'logcollector-socket': {},
 };
 
 const linuxAgentMocked = {
@@ -102,7 +102,6 @@ const linuxAgentMocked = {
   lastKeepAlive: '2022-06-24T14:59:11Z',
   node_name: 'master-node',
   manager: 'wazuh-manager-master-v4.3.4-rc1-7.10.2',
-  mergedSum: '4a8724b20dee0124ff9656783c490c4e',
   dateAdd: '2022-06-23T15:28:03Z',
   registerIP: 'any',
   name: 'wazuh_agent_ubuntu_sources_cmake-v4.3.4-rc1',
@@ -131,7 +130,6 @@ const windowAgentMocked = {
   name: 'W10-4.3',
   status: 'active',
   version: 'Wazuh v4.3.0',
-  mergedSum: '4a8724b20dee0124ff9656783c490c4e',
   group: ['default'],
   id: '002',
   configSum: 'ab73af41699f13fdd81903b5f23d8d00',
@@ -141,7 +139,7 @@ const windowAgentMocked = {
 };
 
 const windowsCurrentConfigMocked = {
-  'logcollector-localfile': {
+  logcollector: {
     localfile: [
       {
         channel: 'Application',
@@ -179,8 +177,8 @@ const windowsCurrentConfigMocked = {
         target: ['agent'],
       },
     ],
+    socket: [],
   },
-  'logcollector-socket': {},
 };
 
 describe('Log Collection Section', () => {
@@ -214,9 +212,10 @@ describe('Log Collection Section', () => {
       fireEvent.click(getByText('Commands'));
       getByRole('heading', { name: /command monitoring/i });
       // buttons on left sidebar, showing alias
-      const localFilesWithAlias = linuxCurrentConfigMocked[
-        'logcollector-localfile'
-      ].localfile.filter(item => item.alias);
+      const localFilesWithAlias =
+        linuxCurrentConfigMocked.logcollector.localfile.filter(
+          item => item.alias,
+        );
       localFilesWithAlias.forEach(item => {
         getByRole('button', { name: new RegExp(item.alias || '', 'i') });
       });
@@ -235,9 +234,10 @@ describe('Log Collection Section', () => {
       fireEvent.click(getByText('Commands'));
       getByRole('heading', { name: /command monitoring/i });
       // check all sidebar buttons functionality and inputs showed
-      const localFilesWithAlias = linuxCurrentConfigMocked[
-        'logcollector-localfile'
-      ].localfile.filter(item => item.alias);
+      const localFilesWithAlias =
+        linuxCurrentConfigMocked.logcollector.localfile.filter(
+          item => item.alias,
+        );
       localFilesWithAlias.forEach(item => {
         const commandItem = getByRole('button', {
           name: new RegExp(item.alias || '', 'i'),
@@ -291,9 +291,10 @@ describe('Log Collection Section', () => {
       fireEvent.click(getByText('Windows Events'));
       getByRole('heading', { name: /windows events logs/i });
       // buttons on left sidebar, showing alias
-      const localFilesWithChannel = windowsCurrentConfigMocked[
-        'logcollector-localfile'
-      ].localfile.filter(item => item.logformat === 'eventchannel');
+      const localFilesWithChannel =
+        windowsCurrentConfigMocked.logcollector.localfile.filter(
+          item => item.logformat === 'eventchannel',
+        );
       localFilesWithChannel.forEach(item => {
         const eventBtn = getByRole('button', {
           name: new RegExp(`${item.channel}`, 'i'),
@@ -315,9 +316,10 @@ describe('Log Collection Section', () => {
       fireEvent.click(getByText('Windows Events'));
       getByRole('heading', { name: /windows events logs/i });
       // check all sidebar buttons functionality and inputs showed
-      const localFilesWithChannel = windowsCurrentConfigMocked[
-        'logcollector-localfile'
-      ].localfile.filter(item => item.logformat === 'eventchannel');
+      const localFilesWithChannel =
+        windowsCurrentConfigMocked.logcollector.localfile.filter(
+          item => item.logformat === 'eventchannel',
+        );
       localFilesWithChannel.forEach(item => {
         const eventBtn = getByRole('button', {
           name: new RegExp(`${item.channel}`, 'i'),
@@ -338,6 +340,25 @@ describe('Log Collection Section', () => {
           item.reconnect_time?.toString(),
         );
       });
+    });
+  });
+
+  /* The configuration is read from an index document that only carries the
+  modules the agent reported, so an agent that does not run logcollector has no
+  `logcollector` key at all. */
+  describe('Agent that did not report logcollector', () => {
+    it('reports the module as not configured instead of showing only Sockets', () => {
+      const { getByText, queryByRole } = render(
+        <Provider store={store}>
+          <WzConfigurationLogCollection
+            agent={linuxAgentMocked}
+            currentConfig={{}}
+          />
+        </Provider>,
+      );
+
+      getByText(/not present on the configuration file/i);
+      expect(queryByRole('tab', { name: 'Sockets' })).not.toBeInTheDocument();
     });
   });
 });

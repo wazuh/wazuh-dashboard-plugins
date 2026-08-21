@@ -11,6 +11,7 @@ import {
   getIntegrationsUrl,
   getKvdbsUrl,
   getFiltersUrl,
+  getAiAssistantUrl,
 } from '../../utils/navigation';
 
 jest.mock('../../utils/navigation', () => ({
@@ -21,6 +22,7 @@ jest.mock('../../utils/navigation', () => ({
   getIntegrationsUrl: jest.fn(() => '/mock/sa-integrations'),
   getKvdbsUrl: jest.fn(() => '/mock/kvdbs'),
   getFiltersUrl: jest.fn(() => '/mock/sa-integrations#/filters'),
+  getAiAssistantUrl: jest.fn(() => '/mock/wazuhAiAssistant'),
 }));
 
 const openMenu = () => {
@@ -69,6 +71,24 @@ describe('QuickAccessMenu', () => {
     expect(getIntegrationsUrl).toHaveBeenCalled();
     expect(getKvdbsUrl).toHaveBeenCalled();
     expect(getFiltersUrl).toHaveBeenCalled();
+  });
+
+  // The assistant is not in `Applications`, so it is a title-level shortcut
+  // rather than one of the category groups.
+  it('links the AI Assistant from the popover title', () => {
+    openMenu();
+    // `data-test-subj` is OSD's attribute, not testing-library's `data-testid`.
+    const link = document.querySelector(
+      '[data-test-subj="quick-access-ai-assistant-link"]',
+    );
+    expect(link).toHaveTextContent('AI Assistant');
+    expect(link).toHaveAttribute('href', '/mock/wazuhAiAssistant');
+    expect(getAiAssistantUrl).toHaveBeenCalled();
+  });
+
+  it('keeps the AI Assistant shortcut hidden until the trigger is clicked', () => {
+    render(<QuickAccessMenu />);
+    expect(screen.queryByText('AI Assistant')).not.toBeInTheDocument();
   });
 
   it('picks up every app the registry marks for the overview', () => {

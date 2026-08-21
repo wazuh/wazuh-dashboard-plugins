@@ -19,10 +19,7 @@ export type Agent = {
   manager: string;
   registerIP: string;
   status: string;
-  mergedSum: string;
   version: string;
-  node_name: string;
-  group_config_status: string;
   status_code: number;
 };
 
@@ -31,10 +28,7 @@ export type Group = {
   count: number;
 };
 
-export type ResponseUpgradeAgents = {
-  agent: string;
-  task_id: number;
-};
+export type ResponseUpgradeAgents = string;
 
 export type ResponseRemoveAgent = string;
 

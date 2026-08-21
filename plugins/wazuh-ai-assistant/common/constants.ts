@@ -17,55 +17,93 @@ export const API_PATHS = {
   /** Singleton settings resource — privacy defaults/override/field
    * policy today; GET creates the object with defaults on first access. */
   SETTINGS: `${API_ROOT}/settings`,
-  /** Pre-flight administrator probe: `{administrator: boolean, message: string |
-   * null}`, using the SAME isAdministratorUser check and message mapping as PUT SETTINGS's own
-   * admin gate but never 403ing. The Settings page calls this on mount to show an actionable
-   * warning and disable Save buttons before a non-admin's PUT would be rejected anyway. */
+  /** Manager-session liveness probe: `{managerSessionOk: boolean, message: string | null,
+   * defaultApiHostId: string | null, apiKeyEncryptionEnabled: boolean}`, never 403ing. NOT an
+   * authorization check — settings/providers are authorized by the Wazuh indexer's own RBAC on
+   * the calling user (see docs/ref/modules/ai-assistant/security.md), not by this probe. Called on
+   * app mount and before Manager-path work (public/services/session-heal.ts's
+   * `ensureManagerSession`) so a missing/expired `wz-token` can be healed proactively. */
   SETTINGS_ACCESS: `${API_ROOT}/settings/access`,
   /** Persistent conversations: owner-scoped CRUD over the
-   * `wazuh-ai-assistant-conversation` saved object (server/routes/conversations.ts). GET lists the
-   * caller's own conversations (summaries only — id/title/updatedAt, never `messages`); POST
-   * creates one; GET/PUT/DELETE `{id}` operate on a single conversation and 404 (never 403) when
-   * it exists but belongs to a different owner, so existence is never leaked cross-owner. */
+   * `wazuh-ai-assistant-sessions` index alias (server/routes/conversations.ts,
+   * server/conversation-store.ts). GET lists the caller's own conversations (summaries only —
+   * id/title/updatedAt, never `messages`); POST creates one; GET/PUT/DELETE `{id}` operate on a
+   * single conversation and 404 (never 403) when it exists but belongs to a different owner, so
+   * existence is never leaked cross-owner. */
   CONVERSATIONS: `${API_ROOT}/conversations`,
   CONVERSATION_BY_ID: (id: string) => `${API_ROOT}/conversations/${id}`,
 } as const;
 
-/** Substring contract between server/routes/settings.ts's token-failure copy and the client-side
- * session heal/retry (public/services/session-heal.ts) — reword only in both directions at once. */
+/** Substring contract between server/routes/settings.ts's Manager-session-expired copy and the
+ * client-side session heal/retry (public/services/session-heal.ts) — reword only in both
+ * directions at once. */
 export const MANAGER_SESSION_EXPIRED_COPY = 'session is missing or expired';
 
-/** Saved object type used to persist provider configuration. */
-export const PROVIDER_SAVED_OBJECT_TYPE = 'wazuh-ai-assistant-provider';
+/**
+ * Paths (relative to the OpenSearch/Wazuh indexer HTTP root) of the Wazuh indexer Setup plugin's
+ * `AI Assistant` endpoints — a REAL, documented contract, not a placeholder: see the `AI
+ * Assistant` tag's `/ai_assistant/settings` and `/ai_assistant/providers`{, `/{id}`} paths in the
+ * OpenAPI spec at
+ * https://github.com/wazuh/wazuh-indexer-plugins/blob/enhancement/1422-create-ai-assistant-indices/plugins/setup/openapi.yml
+ * (`getAiAssistantSettings`/`putAiAssistantSettings`/`listAiAssistantProviders`/
+ * `createAiAssistantProvider`/`putAiAssistantProvider`/`deleteAiAssistantProvider` operations).
+ *
+ * The two are genuinely separate resources on the indexer side, each with its own reader/writer
+ * here, neither ever calling OpenSearch's raw document APIs against the underlying hidden index
+ * directly any more (wazuh-dashboard-plugins#500): `server/settings/index-settings-provider.ts`
+ * for `GET`/`PUT {WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH}` (privacy defaults/override/field
+ * policy only — no providers in that response), `server/settings/ai-providers-client.ts` for
+ * `{WAZUH_INDEXER_AI_ASSISTANT_PROVIDERS_PATH}`{, `/{id}`} (provider CRUD). Both reach it the same
+ * way `IsmSettingsProvider` reaches `_plugins/_ism/*`: `context.core.opensearch.client.
+ * {asInternalUser, asCurrentUser}.transport.request(...)` — no separate HTTP client, since this is
+ * still an OpenSearch-cluster-local endpoint (the Wazuh indexer plugin runs inside the same
+ * cluster), not an external service.
+ */
+export const WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH =
+  '/_plugins/_setup/ai_assistant/settings';
 
-/** Singleton saved object type persisting plugin-wide settings, currently privacy-focused:
- * default on/off (globally and per provider), whether the user may override it, and the field
- * policy (server/tools/privacy.ts's `FIELD_POLICY_DEFAULTS`). */
-export const ASSISTANT_SETTINGS_SAVED_OBJECT_TYPE =
-  'wazuh-ai-assistant-settings';
+/** `GET` lists every provider (no pagination/query of its own — `AiProvidersClient` fetches this
+ * whole list and slices/searches it in memory, see that class's doc comment); `POST` creates one
+ * (id supplied in the body, validated server-side as a UUID); `PUT`/`DELETE {this path}/{id}`
+ * update/delete one. There is no per-id `GET`. */
+export const WAZUH_INDEXER_AI_ASSISTANT_PROVIDERS_PATH =
+  '/_plugins/_setup/ai_assistant/providers';
 
-/** Fixed singleton id — there is exactly one settings object per deployment. */
-export const ASSISTANT_SETTINGS_ID = 'settings';
+/** Namespacing label bound into the AAD of every provider API key's ciphertext
+ * (server/crypto/api-key-cipher.ts's `buildAad`) — kept as its own named constant purely so that
+ * derivation can't silently drift if this string is ever referenced from a second place. Its
+ * decrypt-time role only needs its VALUE to stay byte-for-byte identical to what a given ciphertext
+ * was encrypted with, so this string itself must never change once anything has been encrypted
+ * against it. */
+export const PROVIDER_API_KEY_AAD_NAMESPACE = 'wazuh-ai-assistant-provider';
 
-/** Saved object type persisting one saved (resumable) conversation per row: owner + title +
- * timestamps + the full `ChatMessage[]` transcript. `hidden: true` (server/saved_objects/
- * conversation.ts) — deliberately kept out of the generic Saved Objects management UI, unlike the
- * two types above; reached only through server/routes/conversations.ts's owner-scoped CRUD. */
-export const CONVERSATION_SAVED_OBJECT_TYPE = 'wazuh-ai-assistant-conversation';
+/** Index alias backing persisted (resumable) conversations — one document per conversation: `user`
+ * + title + timestamps + the full `ChatMessage[]` transcript. It is a data stream managed by an
+ * ISM policy on the indexer side (wazuh-indexer-plugins#1422), rotated daily and pruned after 7
+ * days; OpenSearch Document Level Security on it restricts each document to the `user` it belongs
+ * to. Reached only through server/routes/conversations.ts's owner-scoped CRUD and
+ * server/conversation-store.ts's query/document helpers — never a raw client call elsewhere. */
+export const CONVERSATION_SESSIONS_INDEX_ALIAS = 'wazuh-ai-assistant-sessions';
+
+/** Id of the ISM policy governing `CONVERSATION_SESSIONS_INDEX_ALIAS`'s retention, provisioned
+ * indexer-side (wazuh-indexer-plugins#1422) — `server/settings/ism-settings-provider.ts` is the
+ * only reader/writer. */
+export const CONVERSATION_SESSIONS_ISM_POLICY_ID =
+  'ai-assistant-sessions-policy';
 
 /** Sentinel owner value used when the authenticated username cannot be resolved (main plugin/
  * security not ready, or `context.wazuh` absent).
  * server/routes/conversations.ts's `resolveOwner` never returns this any more — it fails closed
  * with `undefined` instead, and the four owner-CHECKING routes (list/get/put/delete) 403 on that
  * rather than ever comparing against a shared bucket value. The ONLY remaining writer is that
- * file's CREATE route, which still stamps this sentinel on a row when identity can't be resolved
- * (see that route's comment for why that is still safe) — but since no route can subsequently
- * list, get, update, or delete a row stamped with it, this is now a create-only dead end: the row
- * persists but is otherwise unreachable through this API.
+ * file's CREATE route, which still stamps this sentinel on a document's `user` field when identity
+ * can't be resolved (see that route's comment for why that is still safe) — but since no route can
+ * subsequently list, get, update, or delete a document stamped with it, this is now a create-only
+ * dead end: the document persists but is otherwise unreachable through this API.
  * Separately and unrelatedly, server/routes/chat.ts's `resolveChatStreamUser` reuses this same
- * string as its own fallback bucket KEY for the per-user concurrent-stream rate limit (not a
- * saved-objects `owner` at all) — see that function's doc comment for the availability tradeoff
- * this implies when identity resolution is unavailable deployment-wide.
+ * string as its own fallback bucket KEY for the per-user concurrent-stream rate limit (not an
+ * authorization-relevant `user` value at all) — see that function's doc comment for the
+ * availability tradeoff this implies when identity resolution is unavailable deployment-wide.
  * NOTE: eval/run_persistence.js cannot import this (plain CommonJS, no TypeScript/ts-node in that
  * harness) — it only ever verifies owner-scoping BEHAVIOR (a session sees only its own rows),
  * never this literal string. */
@@ -79,7 +117,14 @@ export type ProviderType = (typeof PROVIDER_TYPES)[number];
 export { SEVERITY_LEVELS } from './wazuh-fields';
 export type { SeverityLevel } from './wazuh-fields';
 
-export const DEFAULT_ANTHROPIC_MAX_TOKENS = 4096;
+// 16384, not the API's old 4096 default: the model suggestions now lead with claude-sonnet-5 /
+// claude-opus-5, which have adaptive "extended thinking" ON by default whenever `thinking` is
+// omitted from the request (as this adapter does -- see anthropic.ts), and `max_tokens` on the
+// Anthropic Messages API caps thinking tokens AND the visible answer together. At 4096 a model
+// that spends a chunk of the budget thinking can truncate the user-visible answer mid-sentence.
+// Raising the cap does not touch the thinking parameter itself (adaptive thinking stays on --
+// that is wanted for answer quality); it only removes the shared-budget truncation risk.
+export const DEFAULT_ANTHROPIC_MAX_TOKENS = 16384;
 export const DEFAULT_ANTHROPIC_VERSION = '2023-06-01';
 
 /**

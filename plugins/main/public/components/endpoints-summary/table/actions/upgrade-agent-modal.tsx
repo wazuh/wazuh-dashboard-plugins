@@ -25,6 +25,7 @@ import { getErrorOrchestrator } from '../../../../react-services/common-services
 import { upgradeAgentService } from '../../services';
 import { Agent } from '../../types';
 import { getToasts } from '../../../../kibana-services';
+import { upgradeStatusState } from '../../services/upgrade-status-state';
 
 const supportedPlatforms = [
   'debian',
@@ -45,16 +46,10 @@ interface UpgradeAgentModalProps {
   agent: Agent;
   onClose: () => void;
   reloadAgents: () => void;
-  setIsUpgradePanelClosed: (isUpgradePanelClosed: boolean) => void;
 }
 
 export const UpgradeAgentModal = compose(withErrorBoundary)(
-  ({
-    agent,
-    onClose,
-    reloadAgents,
-    setIsUpgradePanelClosed,
-  }: UpgradeAgentModalProps) => {
+  ({ agent, onClose, reloadAgents }: UpgradeAgentModalProps) => {
     const [isLoading, setIsLoading] = useState(false);
     const [packageType, setPackageType] = useState<'deb' | 'rpm'>();
 
@@ -88,9 +83,17 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
 
       try {
         await upgradeAgentService(agent.id, packageType);
-        showToast('success', 'Upgrade agent', 'Upgrade task in progress');
+        if (agent.version) {
+          upgradeStatusState.trackUpgrade([
+            { id: agent.id, version: agent.version },
+          ]);
+        }
+        showToast(
+          'success',
+          'Upgrade agent',
+          'Upgrade request sent successfully',
+        );
         reloadAgents();
-        setIsUpgradePanelClosed(false);
       } catch (error: any) {
         const errorMessage = getUpgradeErrorMessage(error);
         const options = {

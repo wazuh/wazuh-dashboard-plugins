@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
@@ -18,7 +19,7 @@ import WzConfigurationListSelector from '../util-components/configuration-settin
 import { renderValueOrNoValue, isString } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 import helpLinks from './help-links';
-import { LOGCOLLECTOR_LOCALFILE_PROP, LOCALFILE_WINDOWSEVENT_PROP } from './types';
+import { LOGCOLLECTOR_PROP, LOCALFILE_WINDOWSEVENT_PROP } from './types';
 
 /**
  *  Return input label based on logformat value
@@ -41,8 +42,12 @@ const channelLabel = (value, item, config) => {
  * @param {*} data => all log data
  * @returns string => value to show in query input
  */
-const queryValue = (data) => {
-  return typeof data === 'undefined' ? '-' : typeof data === 'object' ? data.value : data;
+const queryValue = data => {
+  return typeof data === 'undefined'
+    ? '-'
+    : typeof data === 'object'
+    ? data.value
+    : data;
 };
 
 /**
@@ -50,20 +55,25 @@ const queryValue = (data) => {
  * @param {*} item
  * @returns string => target
  */
-const renderTargetField = (item) => (item ? item.join(', ') : 'agent');
+const renderTargetField = item => (item ? item.join(', ') : 'agent');
 /**
  * Return panels title
  * @param {*} item => log data
  * @returns
  */
-const panelsLabel = (item) =>
+const panelsLabel = item =>
   !item.channel
     ? `${item.logformat} - ${renderTargetField(item.target)}`
     : `${item.channel} (${item.logformat})`;
 
 const mainSettings = [
   { field: 'logformat', label: 'Log format' },
-  { field: 'channel', label: 'Channel', render: renderValueOrNoValue, renderLabel: channelLabel },
+  {
+    field: 'channel',
+    label: 'Channel',
+    render: renderValueOrNoValue,
+    renderLabel: channelLabel,
+  },
   { field: 'query', label: 'Query', render: queryValue },
   {
     field: 'only-future-events',
@@ -83,32 +93,46 @@ class WzConfigurationLogCollectionWindowsEvents extends Component {
   }
   render() {
     const { currentConfig } = this.props;
-    const items = currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[LOCALFILE_WINDOWSEVENT_PROP]
+    const items = currentConfig?.[LOGCOLLECTOR_PROP]?.[
+      LOCALFILE_WINDOWSEVENT_PROP
+    ]
       ? settingsListBuilder(
-          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_WINDOWSEVENT_PROP],
-          panelsLabel
+          currentConfig[LOGCOLLECTOR_PROP][LOCALFILE_WINDOWSEVENT_PROP],
+          panelsLabel,
         )
       : [];
     return (
       <Fragment>
-        {isString(currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]) && (
-          <WzNoConfig error={currentConfig[LOGCOLLECTOR_LOCALFILE_PROP]} help={helpLinks} />
+        {isString(currentConfig?.[LOGCOLLECTOR_PROP]) && (
+          <WzNoConfig
+            error={currentConfig[LOGCOLLECTOR_PROP]}
+            help={helpLinks}
+          />
         )}
-        {!currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[LOCALFILE_WINDOWSEVENT_PROP]?.length ? (
-          <WzNoConfig error="not-present" help={helpLinks} />
+        {!currentConfig?.[LOGCOLLECTOR_PROP]?.[LOCALFILE_WINDOWSEVENT_PROP]
+          ?.length ? (
+          <WzNoConfig error='not-present' help={helpLinks} />
         ) : null}
-        {currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[LOCALFILE_WINDOWSEVENT_PROP]?.length ? (
+        {currentConfig?.[LOGCOLLECTOR_PROP]?.[LOCALFILE_WINDOWSEVENT_PROP]
+          ?.length ? (
           <WzConfigurationSettingsHeader
-            title="Windows events logs"
-            description="List of Windows logs that will be processed"
+            title='Windows events logs'
+            description='List of Windows logs that will be processed'
             help={helpLinks}
           >
-            <WzConfigurationListSelector items={items} settings={mainSettings} />
+            <WzConfigurationListSelector
+              items={items}
+              settings={mainSettings}
+            />
           </WzConfigurationSettingsHeader>
         ) : null}
       </Fragment>
     );
   }
 }
+
+WzConfigurationLogCollectionWindowsEvents.propTypes = {
+  currentConfig: PropTypes.object,
+};
 
 export default WzConfigurationLogCollectionWindowsEvents;

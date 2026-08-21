@@ -59,8 +59,6 @@ const sectionsManager = [
   { useFullEndpoint: true, key: 'logging' },
 ];
 
-const sectionsAgent = [{ component: 'com', configuration: 'logging' }];
-
 const mapStateToProps = state => ({
   wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
   clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
@@ -76,7 +74,7 @@ export const WzConfigurationGlobalConfigurationManager = compose(
 
 export const WzConfigurationGlobalConfigurationAgent = compose(
   connect(mapStateToProps),
-  withWzConfig(sectionsAgent),
+  withWzConfig(),
 )(WzConfigurationGlobalConfiguration);
 
 WzConfigurationGlobalConfigurationManager.propTypes = {

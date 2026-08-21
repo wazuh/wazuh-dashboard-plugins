@@ -125,6 +125,16 @@ function sampleValue(name: string, prop: JsonSchemaProperty): unknown {
   if (name === 'limit') {
     return 20;
   }
+  // get_field_values' `field` param is restricted to guardrails.ts's AGG_FIELD_ALLOWLIST -- an
+  // arbitrary generic string throws (correctly) rather than reaching an aggregation, which would
+  // otherwise mask this sweep's real question. "wazuh.agent.id" is chosen (not just any
+  // allowlisted field) because its FIELD_LOCATIONS include "events" -- the family every OTHER
+  // enum property in this sweep also samples first (alphabetical `enumValues[0]`), including this
+  // tool's own `index_family`; a field whose locations did NOT include "events" would make the
+  // generically-sampled `index_family` invalid for it and throw for an unrelated reason.
+  if (name === 'field') {
+    return 'wazuh.agent.id';
+  }
   if ((prop as { jsonString?: true }).jsonString) {
     return JSON.stringify({
       query: {

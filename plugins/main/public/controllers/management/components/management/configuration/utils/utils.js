@@ -53,6 +53,9 @@ export const getJSON = currentConfig => {
  */
 export const isString = value => typeof value === 'string';
 
+export const reportedEnabled = (value, enabledValue) =>
+  value === undefined || value === null ? undefined : value === enabledValue;
+
 /**
  * Check if a value is an array
  * @param {*} value Value to check

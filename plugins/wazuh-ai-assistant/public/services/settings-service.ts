@@ -6,7 +6,63 @@ import {
   ProviderTestResult,
 } from '../../common/types';
 import { fetchAllPages } from './fetch-all-pages';
-import { SettingsAccess, withManagerSessionRetry } from './session-heal';
+import { SettingsAccess } from './session-heal';
+
+/**
+ * Window event announcing that the plugin-wide assistant settings document was just saved
+ * (`updateAssistantSettings`). Every mounted ChatPage listens and refetches, so an admin's privacy
+ * policy change lands in the chat immediately instead of only after a full page reload.
+ *
+ * A window event rather than a prop callback on purpose: the Chat and Settings views stay mounted
+ * side by side behind `display: none` (public/application.tsx), and there is a SECOND, independent
+ * ChatPage mount in the header flyout (public/components/header/assistant-chat-panel.tsx) that no
+ * prop from the Settings page could ever reach. Lives here — the module that owns the settings
+ * GET/PUT — so neither view has to import the other.
+ *
+ * Dispatched as a `CustomEvent` whose `detail` carries the settings object the PUT just returned.
+ * Listeners must PREFER that payload over issuing their own GET: the indexer write may not be
+ * visible to a read that happens microseconds later, so a re-GET can hand back the PRE-save
+ * document and silently reinstate the policy the admin just changed. The GET stays as the fallback
+ * for any dispatch without a usable payload (see `isAssistantSettingsPayload`).
+ */
+export const ASSISTANT_SETTINGS_CHANGED_EVENT =
+  'wazuhAiAssistant:assistantSettingsChanged';
+
+/**
+ * Narrows an untrusted `CustomEvent.detail` to `AssistantSettings`. Deliberately minimal — it
+ * checks only the fields consumers actually branch on, so a server that grows the shape does not
+ * make every payload fall back to a GET. Anything failing this check is treated as "no payload".
+ */
+export function isAssistantSettingsPayload(
+  detail: unknown,
+): detail is AssistantSettings {
+  if (!detail || typeof detail !== 'object') {
+    return false;
+  }
+  const candidate = detail as Partial<AssistantSettings>;
+  return (
+    typeof candidate.privacyDefaultOn === 'boolean' &&
+    typeof candidate.userCanOverride === 'boolean' &&
+    Boolean(candidate.privacyDefaultPerProvider) &&
+    typeof candidate.privacyDefaultPerProvider === 'object'
+  );
+}
+
+/**
+ * Window event announcing that the provider list changed (created/updated/deleted, or a new
+ * default). Consumed by `useProviders` (public/hooks/use-providers.ts), so every mounted consumer
+ * refreshes — including the header flyout's own independent `useProviders` instance, which the
+ * Settings page's `onProvidersChanged` prop callback can never reach for the same reason described
+ * above. That prop path stays in place; a duplicate refresh is harmless.
+ *
+ * Carries NO payload, unlike `ASSISTANT_SETTINGS_CHANGED_EVENT`: the mutation sites only ever hold
+ * the single provider they just wrote, never the full post-write list this event's consumers
+ * (`useProviders`) actually need, so there is nothing useful to attach. The read-after-write window
+ * is tolerable here in a way it is not for privacy: a list that is one refresh stale shows a
+ * missing or extra row until the next refresh, whereas a stale privacy policy silently sends
+ * unmasked data.
+ */
+export const PROVIDERS_CHANGED_EVENT = 'wazuhAiAssistant:providersChanged';
 
 /** Mirrors server/tools/privacy.ts's `FieldPolicyAction` — that file lives under server/ (out of
  * scope to import from public/), so this is a hand-kept public-side copy of the same wire values
@@ -20,27 +76,21 @@ export interface FieldPolicyEntry {
 }
 
 /**
- * Public-side mirror of server/saved_objects/assistant-settings.ts's `AssistantSettingsAttributes`
- * (a server/ type, out of scope to import here) — this is the exact GET/PUT body shape of
- * `API_PATHS.SETTINGS` (server/routes/settings.ts).
+ * Public-side mirror of server/settings/types.ts's `AssistantSettingsAttributes` (a server/ type,
+ * out of scope to import here) — this is the exact GET/PUT body shape of `API_PATHS.SETTINGS`
+ * (server/routes/settings.ts).
  */
 export interface AssistantSettings {
   privacyDefaultOn: boolean;
   privacyDefaultPerProvider: Record<string, boolean>;
   userCanOverride: boolean;
   fieldPolicy: FieldPolicyEntry[];
-  /** Days to keep a saved conversation before GET /conversations excludes (and best-effort
-   * deletes) it; `0` means keep forever. Mirrors server/saved_objects/assistant-settings.ts's
-   * `AssistantSettingsAttributes.conversationRetentionDays`. */
+  /** Days a saved conversation is kept before the ISM policy governing
+   * `CONVERSATION_SESSIONS_INDEX_ALIAS` deletes its backing index; `0` means keep forever. Backed
+   * by an ISM policy rather than this settings document — see
+   * server/settings/ism-settings-provider.ts — but travels through this same GET/PUT shape.
+   * Mirrors server/settings/types.ts's `AssistantSettingsAttributes.conversationRetentionDays`. */
   conversationRetentionDays: number;
-  /** Issue #8917: field keys `getOrCreateAssistantSettings` (server/routes/settings.ts) had to
-   * append to `fieldPolicy` on this read/save because the stored policy predated them -- empty
-   * when the stored policy already matches the shipped defaults. Response-only (GET/PUT always
-   * send it back; optional here only because this same interface also shapes the outgoing PUT
-   * payload, which never needs to set it). Visibility only: this plugin does not currently surface
-   * it in the Settings UI, but any caller of GET/PUT can see whether the effective policy it just
-   * received was patched up from something older than the running build. */
-  fieldPolicyReconciledFields?: string[];
 }
 
 /** Shape of the paginated GET /providers response (server/routes/settings.ts). */
@@ -84,45 +134,37 @@ export class SettingsService {
     );
   }
 
-  // The admin-gated write/test methods below run through withManagerSessionRetry: a wz-token that
-  // expired while the form sat open heals and replays once instead of surfacing the session error.
+  // These writes run against the Wazuh indexer as the current user (server/settings/
+  // opensearch-user.ts) — no Manager/wz-token involved, so no session-heal-retry wrapping here;
+  // the indexer's own `plugin:wazuh/ai_assistant/settings/write` permission on the caller's
+  // backend role is what authorizes them, and a real 403 surfaces as-is (see `describeHttpError`).
   create(input: ProviderInput): Promise<ProviderSummary> {
-    return withManagerSessionRetry(this.http, () =>
-      this.http.post<ProviderSummary>(API_PATHS.PROVIDERS, {
-        body: JSON.stringify(input),
-      }),
-    );
+    return this.http.post<ProviderSummary>(API_PATHS.PROVIDERS, {
+      body: JSON.stringify(input),
+    });
   }
 
   update(id: string, input: ProviderInput): Promise<ProviderSummary> {
-    return withManagerSessionRetry(this.http, () =>
-      this.http.put<ProviderSummary>(API_PATHS.PROVIDER_BY_ID(id), {
-        body: JSON.stringify(input),
-      }),
-    );
+    return this.http.put<ProviderSummary>(API_PATHS.PROVIDER_BY_ID(id), {
+      body: JSON.stringify(input),
+    });
   }
 
   async remove(id: string): Promise<void> {
-    await withManagerSessionRetry(this.http, () =>
-      this.http.delete(API_PATHS.PROVIDER_BY_ID(id)),
-    );
+    await this.http.delete(API_PATHS.PROVIDER_BY_ID(id));
   }
 
   test(id: string): Promise<ProviderTestResult> {
-    return withManagerSessionRetry(this.http, () =>
-      this.http.post<ProviderTestResult>(API_PATHS.PROVIDER_TEST(id)),
-    );
+    return this.http.post<ProviderTestResult>(API_PATHS.PROVIDER_TEST(id));
   }
 
   setDefault(id: string): Promise<ProviderSummary> {
-    return withManagerSessionRetry(this.http, () =>
-      this.http.post<ProviderSummary>(API_PATHS.PROVIDER_SET_DEFAULT(id)),
-    );
+    return this.http.post<ProviderSummary>(API_PATHS.PROVIDER_SET_DEFAULT(id));
   }
 
   /** Plugin-wide settings singleton: privacy defaults/override/field policy. The GET route
-   * creates it with defaults on first access (server/routes/settings.ts's
-   * `getOrCreateAssistantSettings`), so this never 404s. */
+   * creates it with defaults on first access (server/settings/assistant-settings-manager.ts's
+   * `AssistantSettingsManager.getOrCreateSettings`), so this never 404s. */
   getAssistantSettings(): Promise<AssistantSettings> {
     return this.http.get<AssistantSettings>(API_PATHS.SETTINGS);
   }
@@ -130,23 +172,19 @@ export class SettingsService {
   updateAssistantSettings(
     settings: AssistantSettings,
   ): Promise<AssistantSettings> {
-    return withManagerSessionRetry(this.http, () =>
-      this.http.put<AssistantSettings>(API_PATHS.SETTINGS, {
-        body: JSON.stringify(settings),
-      }),
-    );
+    return this.http.put<AssistantSettings>(API_PATHS.SETTINGS, {
+      body: JSON.stringify(settings),
+    });
   }
 
-  /** Pre-flight administrator probe: backs the Settings page's warning callout
-   * and Save-button disabling, called once on mount. Never rejects to report "not an admin" — the
-   * server always resolves 200 here with `administrator: false` and an actionable `message`
-   * instead (server/routes/settings.ts's GET /settings/access); a REJECTED promise here means the
-   * probe itself failed, which callers should treat as fail-open (the server still enforces the
-   * real gate on PUT).
+  /** Manager-session liveness probe (server/routes/settings.ts's GET /settings/access) — NOT an
+   * authorization check. Never rejects to report a session problem — the server always resolves
+   * 200 here with `managerSessionOk: false` and an actionable `message` instead; a REJECTED
+   * promise means the probe itself failed, which callers should treat as fail-open.
    *
    * `defaultApiHostId` (client-side session auto-heal): the Manager host id to pass to
-   * `session-heal.ts`'s `healManagerSession` when `administrator` is false for token reasons; `null`
-   * when the server could not resolve any configured Wazuh manager host.
+   * `session-heal.ts`'s `healManagerSession` when `managerSessionOk` is false; `null` when the
+   * server could not resolve any configured Wazuh manager host.
    *
    * `apiKeyEncryptionEnabled`: false when the server cannot encrypt keys at rest; the form then
    * warns and blocks saving a key (the server's 503 gate is the backstop). */

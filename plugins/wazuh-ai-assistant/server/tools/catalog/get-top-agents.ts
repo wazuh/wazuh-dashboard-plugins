@@ -69,6 +69,9 @@ export const getTopAgentsTool: ToolDefinition = {
   },
   target: 'indexer',
   tier: 'T1',
+  // Cost-budget class 1 (chat.ts's tool-round budget): this request is `size: 0` --
+  // aggregation-only, no hit documents (see this file's own doc comment above).
+  costClass: 1,
   buildRequest(params) {
     const indexFamily = resolveIndexFamily(optionalStringParam(params.index));
     const limit = clampLimit(params.limit, 10, 100);

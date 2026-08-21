@@ -57,6 +57,15 @@ function sampleValue(name: string, prop: JsonSchemaProperty): unknown {
   if (name === 'time_range_lte') {
     return OVER_WIDE_RANGE_LTE;
   }
+  // get_field_values' `field` param is restricted to guardrails.ts's AGG_FIELD_ALLOWLIST.
+  // "wazuh.agent.id" is chosen because its FIELD_LOCATIONS include "events", the family this
+  // file's own generic enum heuristic samples first for `index_family` (alphabetical
+  // `enumValues[0]`) -- and because it IS a time-ranged surface, this sample actually exercises
+  // the lookback clamp this sweep checks, unlike a field whose only location is a
+  // wazuh-states-* snapshot index.
+  if (name === 'field') {
+    return 'wazuh.agent.id';
+  }
   if ((prop as { jsonString?: true }).jsonString) {
     // search_wazuh_data's query_dsl -- not a member of the time-ranged sweep below (its schema has
     // no flat time_range_gte/lte property), but still needs a well-formed sample so it can be

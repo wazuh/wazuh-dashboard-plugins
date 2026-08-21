@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import {
   FINDING_BREAKDOWN_AGGS,
   FINDING_BREAKDOWN_DIMENSIONS,
+  nameFilterClause,
+  nameFilterProperty,
   severitiesAtOrAbove,
   severitiesAtOrBelow,
   severityFilterValues,
@@ -9,6 +11,45 @@ import {
   VULN_BREAKDOWN_DIMENSIONS,
 } from './common';
 import { BREAKDOWN_BUCKET_CAP } from '../digest';
+
+// --- nameFilterClause / nameFilterProperty: shared name filter for the catalog tools ----------
+// (review a0-review.md, findings F1/F4/F5)
+
+test('nameFilterClause: the description match uses operator "and", not the default "or"', () => {
+  const clause = nameFilterClause(
+    'server side template injection',
+    ['document.metadata.title'],
+    'document.metadata.description',
+  ) as { bool: { should: Array<Record<string, unknown>> } };
+  const matchClause = clause.bool.should[clause.bool.should.length - 1];
+  assert.deepEqual(matchClause, {
+    match: {
+      'document.metadata.description': {
+        query: 'server side template injection',
+        operator: 'and',
+      },
+    },
+  });
+});
+
+test('nameFilterClause: still builds a term+prefix should-clause per keyword field', () => {
+  const clause = nameFilterClause(
+    'apache',
+    ['document.name', 'document.metadata.title'],
+    'document.metadata.description',
+  ) as { bool: { minimum_should_match: number; should: unknown[] } };
+  assert.equal(clause.bool.minimum_should_match, 1);
+  // 2 keyword fields * (term + prefix) + 1 description match
+  assert.equal(clause.bool.should.length, 5);
+});
+
+test('nameFilterProperty: description tells the model to retry with a shorter word on 0 rows', () => {
+  const property = nameFilterProperty('rule');
+  assert.match(
+    property.description as string,
+    /retry once with a shorter root word/,
+  );
+});
 
 test('severitiesAtOrAbove returns the tail of the severity order, inclusive', () => {
   assert.deepEqual(severitiesAtOrAbove('medium'), [

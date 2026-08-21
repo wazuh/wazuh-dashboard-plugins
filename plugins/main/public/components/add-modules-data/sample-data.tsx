@@ -37,6 +37,7 @@ import {
   WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT,
   WAZUH_SAMPLE_METRICS_COMMS,
   WAZUH_SAMPLE_VULNERABILITIES,
+  WAZUH_SAMPLE_AGENT_STATS,
 } from '../../../common/constants';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { malwareDetection } from '../../utils/applications';
@@ -130,6 +131,12 @@ export default class WzSampleData extends Component {
         description: 'Sample data for server statistics.',
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_METRICS_COMMS,
+      },
+      {
+        title: 'Sample agent statistics',
+        description: 'Sample data for the endpoint statistics.',
+        image: '',
+        categorySampleDataIndex: WAZUH_SAMPLE_AGENT_STATS,
       },
     ];
     this.state = {};

@@ -31,6 +31,10 @@ import { getThreatIntelComponentsTool } from './catalog/get-threat-intel-compone
 import { getDetectorsTool } from './catalog/get-detectors';
 import { findDocumentByFieldTool } from './catalog/find-document-by-field';
 import { searchWazuhDataTool } from './catalog/search-wazuh-data';
+import { getFieldValuesTool } from './catalog/get-field-values';
+import { lookupIndicatorTool } from './catalog/lookup-indicator';
+import { getCveIntelTool } from './catalog/get-cve-intel';
+import { getCtiStatusTool } from './catalog/get-cti-status';
 
 /**
  * In-process tool catalog: declarative objects loaded at import
@@ -77,6 +81,9 @@ const CATALOG: ToolDefinition[] = [
   getVulnerabilitiesTool,
   getVulnerabilitiesByAgentTool,
   getVulnerabilityByCveTool,
+  // The two-source CVE answer (workstream A1b): feed knowledge + local detection, in the same
+  // call. Kept adjacent to get_vulnerability_by_cve since both key off a CVE id.
+  getCveIntelTool,
 
   // FIM / SCA / MITRE. (get_fim_events was REPLACED by get_fim_files in the 5.0 port — product
   // 5.0's confirmed FIM surface is current file STATE, not an event stream;
@@ -96,8 +103,21 @@ const CATALOG: ToolDefinition[] = [
   getThreatIntelComponentsTool,
   getDetectorsTool,
 
+  // IOC/indicator lookup against the CTI enrichment feed (workstream A1b, coverage doc CV-049) --
+  // filed adjacent to the Security Analytics content tools above since it is the same "Security
+  // Analytics / threat-intel pipeline knowledge" domain, not the customer's own observed data.
+  lookupIndicatorTool,
+  // CTI content freshness (workstream A1b, coverage doc CV-078/MS-6/MS-7) -- same domain as above.
+  getCtiStatusTool,
+
   // Generic exact-ID lookup (document _id or a business-level UUID field, tried automatically)
   findDocumentByFieldTool,
+
+  // Cheap discovery tool (workstream B): "what values does this field actually hold" -- meant to
+  // be called BEFORE a filtered call whose value is a guess, not after. Available broadly (see
+  // router.ts's TOOL_CATEGORY): it is not scoped to one data family, since the "verify before
+  // filter" need cuts across all of them.
+  getFieldValuesTool,
 
   // Escape hatch — last resort, kept last so the typed tools are listed first.
   searchWazuhDataTool,
@@ -124,4 +144,17 @@ export function listToolDefinitions(): ToolDefinition[] {
  */
 export function listToolSpecs(): ToolSpec[] {
   return CATALOG.map(tool => tool.spec);
+}
+
+/**
+ * Resolves a tool's cost-budget class for chat.ts's tool-round COST budget (see
+ * `ToolDefinition.costClass`'s doc comment in types.ts for the 1/2/3 scale). Defaults to 2 (the
+ * ordinary filtered-search weight) for a tool with no `costClass` opinion AND for a name this
+ * registry does not recognize at all (a router/pseudo-tool like `route_question` or
+ * `suggest_discover_query`, which are never executed via `executeToolCall` and so never reach this
+ * lookup in practice, or a stale name from a scripted test) -- never throws, never returns
+ * `undefined`, so every call site can charge a cost unconditionally.
+ */
+export function getToolCostClass(name: string): 1 | 2 | 3 {
+  return getToolDefinition(name)?.costClass ?? 2;
 }

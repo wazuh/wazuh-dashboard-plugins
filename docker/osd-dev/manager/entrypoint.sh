@@ -3,25 +3,27 @@
 # Configure Wazuh server-Wazuh indexer connection
 [ -n "$INDEXER_USERNAME" ] && echo "$INDEXER_USERNAME" | /var/wazuh-manager/bin/wazuh-manager-keystore -f indexer -k username
 [ -n "$INDEXER_PASSWORD" ] && echo "$INDEXER_PASSWORD" | /var/wazuh-manager/bin/wazuh-manager-keystore -f indexer -k password
-[ -n "$INDEXER_URL" ] && sed -i "s|<host>https://127.0.0.1:9200</host>|<host>$INDEXER_URL</host>|g" /var/wazuh-manager/etc/wazuh-manager.conf
+[ -n "$INDEXER_URL" ] && sed -i "/<indexer>/,/<\/indexer>/ s|<host>[^<]*</host>|<host>$INDEXER_URL</host>|g" /var/wazuh-manager/etc/wazuh-manager.conf
 WAZUH_USER_AND_GROUP="wazuh-manager:wazuh-manager"
 if [ -n "$INDEXER_SSL_CA" ]; then
-  sed -i "s|<ca>etc/certs/root-ca.pem</ca>|<ca>$INDEXER_SSL_CA</ca>|g" /var/wazuh-manager/etc/wazuh-manager.conf
+  sed -i "/<indexer>/,/<\/indexer>/ s|<ca>[^<]*</ca>|<ca>$INDEXER_SSL_CA</ca>|g" /var/wazuh-manager/etc/wazuh-manager.conf
   chown "$WAZUH_USER_AND_GROUP" $INDEXER_SSL_CA
   chmod 400 $INDEXER_SSL_CA
 fi
 
 if [ -n "$INDEXER_SSL_CERTIFICATE" ]; then
-  sed -i "s|<certificate>etc/certs/manager.pem</certificate>|<certificate>$INDEXER_SSL_CERTIFICATE</certificate>|g" /var/wazuh-manager/etc/wazuh-manager.conf
+  sed -i "/<indexer>/,/<\/indexer>/ s|<certificate>[^<]*</certificate>|<certificate>$INDEXER_SSL_CERTIFICATE</certificate>|g" /var/wazuh-manager/etc/wazuh-manager.conf
   chown "$WAZUH_USER_AND_GROUP" $INDEXER_SSL_CERTIFICATE
   chmod 400 $INDEXER_SSL_CERTIFICATE
 fi
 
 if [ -n "$INDEXER_SSL_CERTIFICATE_KEY" ]; then
-  sed -i "s|<key>etc/certs/manager-key.pem</key>|<key>$INDEXER_SSL_CERTIFICATE_KEY</key>|g" /var/wazuh-manager/etc/wazuh-manager.conf
+  sed -i "/<indexer>/,/<\/indexer>/ s|<key>[^<]*</key>|<key>$INDEXER_SSL_CERTIFICATE_KEY</key>|g" /var/wazuh-manager/etc/wazuh-manager.conf
   chown "$WAZUH_USER_AND_GROUP" $INDEXER_SSL_CERTIFICATE_KEY
   chmod 400 $INDEXER_SSL_CERTIFICATE_KEY
 fi
+
+sed -i "/<https>/,/<\/https>/ s|<bind_addr>[^<]*</bind_addr>|<bind_addr>0.0.0.0</bind_addr>|g" /var/wazuh-manager/etc/wazuh-manager.conf
 
 # Configure the agent enrollment password expected by authd (use_password is
 # enabled by default in the manager package; without this file authd generates
