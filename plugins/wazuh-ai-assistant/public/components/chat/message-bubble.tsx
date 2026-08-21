@@ -19,7 +19,7 @@ import { ChatRole, TableSpec, ToolCall } from '../../../common/types';
 import { ResultTable, ResultTableProvenanceChip } from './result-table';
 import { DiscoverLink, ResolveDiscoverUrl } from './discover-link';
 import { ResolveSecurityAnalyticsUrl } from './security-analytics-link';
-import { describeToolCall, describeToolCallProvenance } from './tool-call-label';
+import { describeProvenance, describeToolCall } from './tool-call-label';
 
 /**
  * "This turn was cut short" affordance, rendered in two places: inside an interrupted assistant
@@ -267,25 +267,37 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   // chips have to stay — that is the only place left to check what the turn actually queried, which
   // matters most precisely when the answer is "nothing was found".
   const metaRowToolCalls = renderedTable ? [] : toolCalls;
+  /**
+   * Issue #9008 (blocker 3): a multi-call turn runs several tool calls before landing on the one
+   * table that gets rendered, but `message.toolCalls` lists ALL of them — mapping every call to
+   * `renderedTable`'s provenance unconditionally attributed call 1's chip with call 2's index and
+   * time range (or vice-versa) whenever a turn ran more than one Indexer call. `renderedTable`
+   * itself is authoritative about exactly ONE call: `provenance.toolCallId`, attached by
+   * server/routes/chat.ts (see `TableSpec.provenance`'s doc comment) to the specific call that
+   * produced it. Only that one call's chip is passed the real `provenance` object; every other
+   * call in the same turn renders name-only, with no index/range/badge invented for it.
+   */
+  const provenanceForCall = (
+    toolCallId: string,
+  ): TableSpec['provenance'] | undefined =>
+    renderedTable?.provenance?.toolCallId === toolCallId
+      ? renderedTable.provenance
+      : undefined;
   const tableProvenanceChips: ResultTableProvenanceChip[] | undefined =
     renderedTable
       ? toolCalls.map(toolCall => {
-          const { short, full } = describeToolCall(toolCall, renderedTable);
-          // Issue #9008 (G2/G3): index, resolved absolute time range, and the single clamp badge
-          // — see describeToolCallProvenance's own doc comment (tool-call-label.ts).
-          const provenance = describeToolCallProvenance(
-            toolCall,
-            renderedTable,
-          );
+          const provenance = provenanceForCall(toolCall.id);
+          const { short, full } = describeToolCall(toolCall, provenance);
+          const display = describeProvenance(provenance);
           return {
             id: toolCall.id,
             shortLabel: short,
             fullLabel: full,
             toolName: toolCall.name,
             argumentsJson: toolCall.arguments,
-            index: provenance.index,
-            resolvedRangeLabel: provenance.resolvedRangeLabel,
-            windowBadgeLabel: provenance.windowBadgeLabel,
+            index: display.index,
+            resolvedRangeLabel: display.resolvedRangeLabel,
+            windowBadgeLabel: display.windowBadgeLabel,
           };
         })
       : undefined;
@@ -570,11 +582,16 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
         {!isUser &&
           metaRowToolCalls.map(toolCall => {
             // `message.table` here, deliberately NOT `renderedTable`: this is the one place the
-            // suppressed 0-row spec is still worth reading, because `describeToolCall` uses it for
-            // exactly one thing — naming the index in the chip's hover title. A suppressed empty
-            // result is precisely when "which index did it read?" matters, and dropping the spec
-            // here would quietly shorten that tooltip. It cannot affect the visible chip text.
-            const { short, full } = describeToolCall(toolCall, message.table);
+            // suppressed 0-row spec is still worth reading, because it is the only place left to
+            // check what the turn actually queried — precisely when the answer is "nothing was
+            // found". Same `toolCallId` match as the rendered-table case above (issue #9008
+            // blocker 3): a multi-call turn's chip only carries provenance for the ONE call
+            // `message.table.provenance.toolCallId` actually names, never for the others.
+            const provenance =
+              message.table?.provenance?.toolCallId === toolCall.id
+                ? message.table.provenance
+                : undefined;
+            const { short, full } = describeToolCall(toolCall, provenance);
             const isRawOpen = openRawIds.has(toolCall.id);
             return (
               <EuiFlexItem grow={false} key={toolCall.id}>

@@ -353,21 +353,30 @@ export interface ResultTableProvenanceChip {
   /** The call's real-form arguments, shown verbatim (copyable) in the popover. */
   argumentsJson: Record<string, unknown>;
   /**
-   * Issue #9008 (G2): the concrete index the call queried, shown as a labelled line inside the
-   * popover itself rather than only in the chip's hover title — the QA E2E review found the
-   * popover unusable for a touch/keyboard reader, who never sees a hover tooltip at all.
-   * `undefined` for a Manager-API call or a table with no `discover` link.
+   * Issue #9008 (G2, reworked after review): the concrete index the call queried, shown as a
+   * labelled line inside the popover itself rather than only in the chip's hover title — the QA
+   * E2E review found the popover unusable for a touch/keyboard reader, who never sees a hover
+   * tooltip at all. Sourced straight from `TableSpec.provenance.index` (a server-recorded FACT,
+   * `common/types.ts`) via `tool-call-label.ts`'s `describeProvenance` — never inferred
+   * client-side. `undefined` when the server recorded no provenance for this call at all (a
+   * Manager-API call, or a call other than the one that produced this table — see blocker 3's
+   * `toolCallId` match at the call site, message-bubble.tsx).
    */
   index?: string;
-  /** Issue #9008 (G2): the resolved, absolute time range the query actually ran against (e.g.
-   * "Jul 26, 2026 – Oct 24, 2026"), shown the same way as `index` above. `undefined` when no
-   * bound could be resolved to an absolute instant. */
+  /** Issue #9008 (G2, reworked): the resolved, absolute time range the query actually ran
+   * against, straight from `TableSpec.provenance.effectiveRange`. `undefined` whenever the
+   * server recorded no `effectiveRange` at all (the query's DSL carried no recognizable
+   * time-range clause — most catalog tools have no time concept and this is the correct,
+   * fact-based absence, never a substituted default) or a bound could not resolve to an instant.
+   */
   resolvedRangeLabel?: string;
   /**
-   * Issue #9008 (G3): "90d" normally, or "90d · requested 2y" once the server's 90-day lookback
-   * guardrail narrowed a wider request — ONE badge carrying both windows, replacing two separate
+   * Issue #9008 (G3, reworked): "90d" normally, or "90d · requested 720d" once the server reports
+   * `provenance.clamped: true` — ONE badge carrying both windows, replacing two separate
    * near-identically-labelled chips that gave the reader no requested-vs-effective distinction.
-   * `undefined` when neither window could be resolved to a duration (falls back to `shortLabel`).
+   * Also mirrored onto the chip's own collapsed `shortLabel` (`describeToolCall`) per the review's
+   * major 4: the dual-window text must be visible without opening the popover. `undefined`
+   * whenever `resolvedRangeLabel` is (nothing to label a window with).
    */
   windowBadgeLabel?: string;
 }
@@ -383,106 +392,118 @@ const ProvenanceChip: React.FC<{ chip: ResultTableProvenanceChip }> = ({
   chip,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  // Issue #9008 (G1) review fix: the QA E2E run found the panel's own "hit escape to close"
+  // screen-reader announcement did not hold — Escape left the panel open, focus still on the
+  // badge. A single inner handler around only the popover's CHILDREN (the panel content) missed
+  // exactly that case: the badge (`button` prop below) is a SIBLING of that content, not a
+  // descendant of it, so a keydown while focus is still on the badge never reached it. This one
+  // handler is attached to a div wrapping the WHOLE `<EuiPopover>` — button and panel both — so it
+  // catches Escape regardless of which of the two currently has focus; React's synthetic events
+  // bubble along the COMPONENT tree, which reaches here even though EUI portals the panel
+  // elsewhere in the DOM. `stopPropagation` on close is deliberate: an assistant popover living
+  // inside a docked sidecar/flyout must not let the same Escape keystroke also dismiss that
+  // enclosing surface (issue #9008 review, major 6).
+  const closeOnEscape = (event: React.KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      event.stopPropagation();
+      setIsOpen(false);
+    }
+  };
+
   return (
-    <EuiPopover
-      panelPaddingSize='s'
-      isOpen={isOpen}
-      closePopover={() => setIsOpen(false)}
-      button={
-        <EuiBadge
-          color='hollow'
-          iconType='search'
-          title={chip.fullLabel}
-          onClick={() => setIsOpen(previous => !previous)}
-          onClickAriaLabel={i18n.translate(
-            'wazuhAiAssistant.resultTable.provenanceChipAriaLabel',
-            {
-              defaultMessage: 'Show the executed query: {label}',
-              values: { label: chip.fullLabel },
-            },
-          )}
-        >
-          {chip.shortLabel}
-        </EuiBadge>
-      }
-    >
-      {/*
-       * Issue #9008 (G1): the QA E2E review found the panel's own "hit escape to close" screen-
-       * reader announcement did not hold — Escape left the panel open. This is a belt-and-braces
-       * handler on top of EUI's own popover keyboard handling rather than a replacement for it: it
-       * only ever calls `closePopover` a second, harmless time if EUI's own handling already fired.
-       * `onKeyDown` (not `onKeyUp`) so it fires on the same event phase document-level shortcuts
-       * expect, and it is attached here (inside the panel) rather than on the button, since focus
-       * moves INTO the panel while it is open.
-       */}
-      <div
-        onKeyDown={event => {
-          if (event.key === 'Escape') {
-            setIsOpen(false);
-          }
-        }}
-      >
-        <EuiText size='xs'>
-          <strong>{chip.toolName}</strong>
-        </EuiText>
-        {/* Issue #9008 (G2): index and resolved time range as labelled lines INSIDE the popover —
-            previously only reachable via the chip's own hover `title`, which a touch/keyboard
-            reader never sees. */}
-        {chip.index && (
-          <EuiText size='xs' color='subdued'>
-            {i18n.translate('wazuhAiAssistant.resultTable.provenanceIndex', {
-              defaultMessage: 'Index: {index}',
-              values: { index: chip.index },
-            })}
-          </EuiText>
-        )}
-        {chip.resolvedRangeLabel && (
-          <EuiText size='xs' color='subdued'>
-            {i18n.translate(
-              'wazuhAiAssistant.resultTable.provenanceTimeRange',
+    <div onKeyDown={closeOnEscape}>
+      <EuiPopover
+        panelPaddingSize='s'
+        isOpen={isOpen}
+        closePopover={() => setIsOpen(false)}
+        button={
+          <EuiBadge
+            color='hollow'
+            iconType='search'
+            title={chip.fullLabel}
+            onClick={() => setIsOpen(previous => !previous)}
+            onClickAriaLabel={i18n.translate(
+              'wazuhAiAssistant.resultTable.provenanceChipAriaLabel',
               {
-                defaultMessage: 'Time range: {range}',
-                values: { range: chip.resolvedRangeLabel },
+                defaultMessage: 'Show the executed query: {label}',
+                values: { label: chip.fullLabel },
               },
             )}
-          </EuiText>
-        )}
-        {chip.windowBadgeLabel && (
-          <>
-            <EuiSpacer size='xs' />
-            {/* Issue #9008 (G3): ONE badge stating both the effective and (when clamped) the
-                requested window, e.g. "90d · requested 2y" — see `windowBadgeLabel`'s own doc
-                comment (tool-call-label.ts) for why this replaced two separate near-identical
-                chips. */}
-            <EuiBadge color='hollow'>{chip.windowBadgeLabel}</EuiBadge>
-          </>
-        )}
-        <EuiSpacer size='xs' />
-        {/* A tool called with no arguments is a real, common case (`get_agents` with no filter
-            means "every agent"), and rendering it as a bare `{}` reads as a failure to capture the
-            query rather than as the query itself — it was reported as a bug on sight. Say it in
-            words; the code block stays for the case where there is something to read and copy. */}
-        {Object.keys(chip.argumentsJson).length === 0 ? (
-          <EuiText size='xs' color='subdued'>
-            {i18n.translate(
-              'wazuhAiAssistant.resultTable.provenanceNoArguments',
-              {
-                defaultMessage: 'Called with no parameters.',
-              },
-            )}
-          </EuiText>
-        ) : (
-          <EuiCodeBlock
-            language='json'
-            paddingSize='s'
-            fontSize='s'
-            isCopyable
+            // Belt-and-braces alongside the wrapping div above: focus is still on the badge the
+            // instant the popover opens (EUI moves it into the panel only asynchronously), so this
+            // catches an Escape pressed in that brief window too.
+            onKeyDown={closeOnEscape}
           >
-            {JSON.stringify(chip.argumentsJson, null, 2)}
-          </EuiCodeBlock>
-        )}
-      </div>
-    </EuiPopover>
+            {chip.shortLabel}
+          </EuiBadge>
+        }
+      >
+        <div>
+          <EuiText size='xs'>
+            <strong>{chip.toolName}</strong>
+          </EuiText>
+          {/* Issue #9008 (G2): index and resolved time range as labelled lines INSIDE the popover —
+              previously only reachable via the chip's own hover `title`, which a touch/keyboard
+              reader never sees. Both are rendered only when the server actually reported them
+              (`ResultTableProvenanceChip`'s doc comment) — never a client-side guess. */}
+          {chip.index && (
+            <EuiText size='xs' color='subdued'>
+              {i18n.translate('wazuhAiAssistant.resultTable.provenanceIndex', {
+                defaultMessage: 'Index: {index}',
+                values: { index: chip.index },
+              })}
+            </EuiText>
+          )}
+          {chip.resolvedRangeLabel && (
+            <EuiText size='xs' color='subdued'>
+              {i18n.translate(
+                'wazuhAiAssistant.resultTable.provenanceTimeRange',
+                {
+                  defaultMessage: 'Time range: {range}',
+                  values: { range: chip.resolvedRangeLabel },
+                },
+              )}
+            </EuiText>
+          )}
+          {chip.windowBadgeLabel && (
+            <>
+              <EuiSpacer size='xs' />
+              {/* Issue #9008 (G3): ONE badge stating both the effective and (when clamped) the
+                  requested window, e.g. "90d · requested 720d" — see `windowBadgeLabel`'s own doc
+                  comment (tool-call-label.ts) for why this replaced two separate near-identical
+                  chips. Also shown on the chip's own collapsed label (`describeToolCall`) so a
+                  reader never has to open the popover just to see which call was clamped. */}
+              <EuiBadge color='hollow'>{chip.windowBadgeLabel}</EuiBadge>
+            </>
+          )}
+          <EuiSpacer size='xs' />
+          {/* A tool called with no arguments is a real, common case (`get_agents` with no filter
+              means "every agent"), and rendering it as a bare `{}` reads as a failure to capture the
+              query rather than as the query itself — it was reported as a bug on sight. Say it in
+              words; the code block stays for the case where there is something to read and copy. */}
+          {Object.keys(chip.argumentsJson).length === 0 ? (
+            <EuiText size='xs' color='subdued'>
+              {i18n.translate(
+                'wazuhAiAssistant.resultTable.provenanceNoArguments',
+                {
+                  defaultMessage: 'Called with no parameters.',
+                },
+              )}
+            </EuiText>
+          ) : (
+            <EuiCodeBlock
+              language='json'
+              paddingSize='s'
+              fontSize='s'
+              isCopyable
+            >
+              {JSON.stringify(chip.argumentsJson, null, 2)}
+            </EuiCodeBlock>
+          )}
+        </div>
+      </EuiPopover>
+    </div>
   );
 };
 

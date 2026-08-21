@@ -499,13 +499,13 @@ describe('ResultTable', () => {
       render(
         <ResultTable
           spec={spec()}
-          provenanceChips={[chip({ windowBadgeLabel: '90d · requested 2y' })]}
+          provenanceChips={[chip({ windowBadgeLabel: '90d · requested 720d' })]}
         />,
       );
 
       fireEvent.click(screen.getByText('Critical findings · 90d'));
 
-      expect(screen.getByText('90d · requested 2y')).toBeInTheDocument();
+      expect(screen.getByText('90d · requested 720d')).toBeInTheDocument();
     });
 
     // Issue #9008 (G1): the panel's own "hit escape to close" screen-reader announcement did not
@@ -524,6 +524,27 @@ describe('ResultTable', () => {
       fireEvent.keyDown(screen.getByText('get_critical_findings'), {
         key: 'Escape',
       });
+
+      await waitFor(() =>
+        expect(document.querySelector('.euiPopover__panel-isOpen')).toBeNull(),
+      );
+    });
+
+    // Issue #9008 review, major 6: the QA-reported failure was Escape doing nothing while focus
+    // was STILL on the badge (EUI only moves focus into the panel asynchronously) — this fires
+    // the key on the badge itself, not on panel content, to cover exactly that window.
+    it('closes the popover on Escape fired on the badge anchor itself', async () => {
+      render(<ResultTable spec={spec()} provenanceChips={[chip()]} />);
+
+      const badge = screen.getByText('Critical findings · 90d');
+      fireEvent.click(badge);
+      await waitFor(() =>
+        expect(
+          document.querySelector('.euiPopover__panel-isOpen'),
+        ).not.toBeNull(),
+      );
+
+      fireEvent.keyDown(badge, { key: 'Escape' });
 
       await waitFor(() =>
         expect(document.querySelector('.euiPopover__panel-isOpen')).toBeNull(),
