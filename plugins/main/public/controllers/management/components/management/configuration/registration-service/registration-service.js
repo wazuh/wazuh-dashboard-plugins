@@ -11,13 +11,18 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 import { compose } from 'redux';
 
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import withWzConfig from '../util-hocs/wz-config';
 import WzNoConfig from '../util-components/no-config';
-import { isString, renderValueNoThenEnabled } from '../utils/utils';
+import {
+  isString,
+  renderValueNoThenEnabled,
+  reportedEnabled,
+} from '../utils/utils';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 import { withUserAuthorizationPrompt } from '../../../../../../components/common/hocs';
 
@@ -99,10 +104,9 @@ class WzRegistrationService extends Component {
     this.props.updateBadge(this.badgeEnabled());
   }
   badgeEnabled() {
-    return (
-      this.props.currentConfig['auth-auth'] &&
-      this.props.currentConfig['auth-auth'].auth &&
-      this.props.currentConfig['auth-auth'].auth.disabled === 'no'
+    return reportedEnabled(
+      this.props.currentConfig?.['auth-auth']?.auth?.disabled,
+      'no',
     );
   }
   render() {
@@ -136,6 +140,12 @@ class WzRegistrationService extends Component {
     );
   }
 }
+
+WzRegistrationService.propTypes = {
+  currentConfig: PropTypes.object,
+  updateBadge: PropTypes.func,
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
+};
 
 export default compose(
   withUserAuthorizationPrompt([

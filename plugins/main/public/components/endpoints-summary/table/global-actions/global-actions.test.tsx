@@ -19,9 +19,6 @@ describe('AgentsTableGlobalActions component', () => {
         allAgentsCount={3}
         filters={{}}
         reloadAgents={() => {}}
-        setIsUpgradeTasksModalVisible={() => {}}
-        setIsUpgradePanelClosed={() => {}}
-        allowGetTasks={true}
       />,
     );
 
@@ -39,9 +36,6 @@ describe('AgentsTableGlobalActions component', () => {
         allAgentsCount={3}
         filters={{}}
         reloadAgents={() => {}}
-        setIsUpgradeTasksModalVisible={() => {}}
-        setIsUpgradePanelClosed={() => {}}
-        allowGetTasks={true}
       />,
     );
 

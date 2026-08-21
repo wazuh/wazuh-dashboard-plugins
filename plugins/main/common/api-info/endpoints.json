@@ -57,14 +57,6 @@
             }
           },
           {
-            "name": "group_config_status",
-            "description": "Agent groups configuration sync status",
-            "schema": {
-              "type": "string",
-              "enum": ["synced", "not synced"]
-            }
-          },
-          {
             "name": "ip",
             "description": "Filter by the IP used by the agent to communicate with the manager. If it's not available, it will have the same value as registerIP",
             "schema": {
@@ -84,27 +76,11 @@
             }
           },
           {
-            "name": "manager",
-            "description": "Filter by manager hostname where agents are connected to",
-            "schema": {
-              "type": "string",
-              "format": "alphanumeric"
-            }
-          },
-          {
             "name": "name",
             "description": "Filter by name",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
-            }
-          },
-          {
-            "name": "node_name",
-            "description": "Filter by node name",
-            "schema": {
-              "type": "string",
-              "format": "names"
             }
           },
           {
@@ -126,6 +102,30 @@
             }
           },
           {
+            "name": "os.arch",
+            "description": "Filter by OS architecture",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "os.major",
+            "description": "Filter by OS major version",
+            "schema": {
+              "type": "string",
+              "format": "numbers"
+            }
+          },
+          {
+            "name": "os.minor",
+            "description": "Filter by OS minor version",
+            "schema": {
+              "type": "string",
+              "format": "numbers"
+            }
+          },
+          {
             "name": "os.name",
             "description": "Filter by OS name",
             "schema": {
@@ -142,11 +142,19 @@
             }
           },
           {
+            "name": "os.type",
+            "description": "Filter by OS family (Linux, Windows, Unix, ...)",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
             "name": "os.version",
             "description": "Filter by OS version",
             "schema": {
               "type": "string",
-              "format": "alphanumeric"
+              "format": "alphanumeric_symbols"
             }
           },
           {
@@ -415,7 +423,7 @@
         "args": [
           {
             "name": ":agent_id",
-            "description": "Agent ID. All possible values from 000 onwards",
+            "description": "Agent ID",
             "required": true,
             "schema": {
               "type": "string",
@@ -1026,21 +1034,12 @@
                 "cluster",
                 "command",
                 "global",
-                "labels",
-                "localfile",
                 "logging",
                 "remote",
                 "reports",
-                "rootcheck",
-                "sca",
                 "socket",
-                "syscheck",
                 "vulnerability-detection",
                 "indexer",
-                "aws-s3",
-                "azure-logs",
-                "cis-cat",
-                "docker-listener",
                 "syscollector"
               ]
             }
@@ -1064,51 +1063,30 @@
         "args": [
           {
             "name": ":component",
-            "description": "Selected agent's component",
+            "description": "Selected manager's component",
             "required": true,
             "schema": {
               "type": "string",
               "enum": [
-                "agent",
-                "analysis",
                 "auth",
-                "com",
-                "logcollector",
-                "mail",
                 "monitor",
                 "request",
-                "syscheck",
-                "wazuh-db",
+                "wazuh-manager-db",
                 "wmodules"
               ]
             }
           },
           {
             "name": ":configuration",
-            "description": "<p>Selected agent's configuration to read. The configuration to read depends on the selected component.\nThe following table shows all available combinations of component and configuration values:</p>\n<table class=\"table table-striped table-bordered\">\n<thead>\n<tr>\n<th>Component</th>\n<th>Configuration</th>\n<th>Tag</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>agent</td>\n<td>client</td>\n<td><code>&lt;client&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>buffer</td>\n<td><code>&lt;client_buffer&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>labels</td>\n<td><code>&lt;labels&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>internal</td>\n<td><code>&lt;agent&gt;</code>, <code>&lt;monitord&gt;</code>, <code>&lt;remoted&gt;</code></td>\n</tr>\n<tr>\n<td>agent</td>\n<td>anti_tampering</td>\n<td><code>&lt;anti_tampering&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>active_response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>alerts</td>\n<td><code>&lt;alerts&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>command</td>\n<td><code>&lt;command&gt;</code></td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>internal</td>\n<td><code>&lt;analysisd&gt;</code></td>\n</tr>\n<tr>\n<td>auth</td>\n<td>auth</td>\n<td><code>&lt;auth&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>active-response</td>\n<td><code>&lt;active-response&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>logging</td>\n<td><code>&lt;logging&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>internal</td>\n<td><code>&lt;execd&gt;</code></td>\n</tr>\n<tr>\n<td>com</td>\n<td>cluster</td>\n<td><code>&lt;cluster&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>localfile</td>\n<td><code>&lt;localfile&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>socket</td>\n<td><code>&lt;socket&gt;</code></td>\n</tr>\n<tr>\n<td>logcollector</td>\n<td>internal</td>\n<td><code>&lt;logcollector&gt;</code></td>\n</tr>\n<tr>\n<td>mail</td>\n<td>global</td>\n<td><code>&lt;global&gt;&lt;email...&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td><code>&lt;monitord&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>reports</td>\n<td><code>&lt;reports&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>remote</td>\n<td><code>&lt;remote&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>internal</td>\n<td><code>&lt;remoted&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>syscheck</td>\n<td><code>&lt;syscheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>rootcheck</td>\n<td><code>&lt;rootcheck&gt;</code></td>\n</tr>\n<tr>\n<td>syscheck</td>\n<td>internal</td>\n<td><code>&lt;syscheck&gt;</code>, <code>&lt;rootcheck&gt;</code></td>\n</tr>\n<tr>\n<td>wazuh-db</td>\n<td>internal</td>\n<td><code>&lt;wazuh_db&gt;</code></td>\n</tr>\n<tr>\n<td>wazuh-db</td>\n<td>wdb</td>\n<td><code>&lt;wdb&gt;</code></td>\n</tr>\n<tr>\n<td>wmodules</td>\n<td>wmodules</td>\n<td><code>&lt;wodle&gt;</code></td>\n</tr>\n</tbody>\n</table>\n",
+            "description": "<p>Selected manager's configuration to read. The configuration to read depends on the selected component.\nThe following table shows all available combinations of component and configuration values:</p>\n<table class=\"table table-striped table-bordered\">\n<thead>\n<tr>\n<th>Component</th>\n<th>Configuration</th>\n<th>Tag</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>auth</td>\n<td>auth</td>\n<td><code>&lt;auth&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td><code>&lt;monitord&gt;</code></td>\n</tr>\n<td>request</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>remote</td>\n<td><code>&lt;remote&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>internal</td>\n<td><code>&lt;remoted&gt;</code></td>\n</tr>\n<tr>\n<td>wazuh-manager-db</td>\n<td>internal</td>\n<td><code>&lt;wazuh_db&gt;</code></td>\n</tr>\n<tr>\n<td>wazuh-manager-db</td>\n<td>wdb</td>\n<td><code>&lt;wdb&gt;</code></td>\n</tr>\n<tr>\n<td>wmodules</td>\n<td>wmodules</td>\n<td><code>&lt;wodle&gt;</code></td>\n</tr>\n</tbody>\n</table>\n",
             "required": true,
             "schema": {
               "type": "string",
               "enum": [
-                "client",
-                "buffer",
-                "labels",
-                "internal",
-                "anti_tampering",
                 "global",
-                "active_response",
-                "alerts",
-                "command",
                 "auth",
-                "logging",
-                "reports",
-                "active-response",
-                "cluster",
-                "localfile",
-                "socket",
+                "internal",
                 "remote",
-                "syscheck",
-                "rootcheck",
                 "wdb",
                 "wmodules"
               ]
@@ -1168,7 +1146,11 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": ["wazuh-analysisd", "wazuh-remoted", "wazuh-db"]
+                "enum": [
+                  "wazuh-manager-analysisd",
+                  "wazuh-manager-remoted",
+                  "wazuh-manager-db"
+                ]
               }
             }
           },
@@ -1335,7 +1317,7 @@
             "description": "Server component that logged the event",
             "schema": {
               "type": "string",
-              "format": "alphanumeric"
+              "format": "alphanumeric_symbols"
             }
           },
           {
@@ -2382,7 +2364,618 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": ["conf", "rootkit_files", "rootkit_trojans", "rcl"]
+                "enum": ["conf", "rcl"]
+              }
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/mitre/groups",
+        "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_groups",
+        "description": "Return the groups from MITRE database",
+        "summary": "Get MITRE groups",
+        "tags": ["MITRE"],
+        "query": [
+          {
+            "name": "distinct",
+            "description": "Look for distinct values.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "group_ids",
+            "description": "List of MITRE's group IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "MITRE group ID"
+              }
+            }
+          },
+          {
+            "name": "limit",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 500,
+              "minimum": 1,
+              "maximum": 100000
+            }
+          },
+          {
+            "name": "offset",
+            "description": "First element to return in the collection",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "q",
+            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
+            "schema": {
+              "type": "string",
+              "format": "search"
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
+            }
+          },
+          {
+            "name": "sort",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "string",
+              "format": "sort"
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/mitre/metadata",
+        "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_metadata",
+        "description": "Return the metadata from MITRE database",
+        "summary": "Get MITRE metadata",
+        "tags": ["MITRE"],
+        "query": [
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/mitre/mitigations",
+        "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_mitigations",
+        "description": "Return the mitigations from MITRE database",
+        "summary": "Get MITRE mitigations",
+        "tags": ["MITRE"],
+        "query": [
+          {
+            "name": "distinct",
+            "description": "Look for distinct values.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "limit",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 500,
+              "minimum": 1,
+              "maximum": 100000
+            }
+          },
+          {
+            "name": "mitigation_ids",
+            "description": "List of MITRE's mitigations IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "MITRE mitigation ID"
+              }
+            }
+          },
+          {
+            "name": "offset",
+            "description": "First element to return in the collection",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "q",
+            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
+            "schema": {
+              "type": "string",
+              "format": "search"
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
+            }
+          },
+          {
+            "name": "sort",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "string",
+              "format": "sort"
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/mitre/references",
+        "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_references",
+        "description": "Return the references from MITRE database",
+        "summary": "Get MITRE references",
+        "tags": ["MITRE"],
+        "query": [
+          {
+            "name": "limit",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 500,
+              "minimum": 1,
+              "maximum": 100000
+            }
+          },
+          {
+            "name": "offset",
+            "description": "First element to return in the collection",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "q",
+            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reference_ids",
+            "description": "List of MITRE's references IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "MITRE Reference ID"
+              }
+            }
+          },
+          {
+            "name": "search",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
+            "schema": {
+              "type": "string",
+              "format": "search"
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
+            }
+          },
+          {
+            "name": "sort",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "string",
+              "format": "sort"
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/mitre/software",
+        "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_software",
+        "description": "Return the software from MITRE database",
+        "summary": "Get MITRE software",
+        "tags": ["MITRE"],
+        "query": [
+          {
+            "name": "distinct",
+            "description": "Look for distinct values.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "limit",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 500,
+              "minimum": 1,
+              "maximum": 100000
+            }
+          },
+          {
+            "name": "offset",
+            "description": "First element to return in the collection",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "q",
+            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
+            "schema": {
+              "type": "string",
+              "format": "search"
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
+            }
+          },
+          {
+            "name": "software_ids",
+            "description": "List of MITRE's software IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "MITRE software ID"
+              }
+            }
+          },
+          {
+            "name": "sort",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "string",
+              "format": "sort"
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/mitre/tactics",
+        "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_tactics",
+        "description": "Return the tactics from MITRE database",
+        "summary": "Get MITRE tactics",
+        "tags": ["MITRE"],
+        "query": [
+          {
+            "name": "distinct",
+            "description": "Look for distinct values.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "limit",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 500,
+              "minimum": 1,
+              "maximum": 100000
+            }
+          },
+          {
+            "name": "offset",
+            "description": "First element to return in the collection",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "q",
+            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
+            "schema": {
+              "type": "string",
+              "format": "search"
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
+            }
+          },
+          {
+            "name": "sort",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "string",
+              "format": "sort"
+            }
+          },
+          {
+            "name": "tactic_ids",
+            "description": "List of MITRE's tactics IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "MITRE tactic ID"
+              }
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/mitre/techniques",
+        "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_techniques",
+        "description": "Return the techniques from MITRE database",
+        "summary": "Get MITRE techniques",
+        "tags": ["MITRE"],
+        "query": [
+          {
+            "name": "distinct",
+            "description": "Look for distinct values.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "limit",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 500,
+              "minimum": 1,
+              "maximum": 100000
+            }
+          },
+          {
+            "name": "offset",
+            "description": "First element to return in the collection",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "q",
+            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
+            "schema": {
+              "type": "string",
+              "format": "search"
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
+            }
+          },
+          {
+            "name": "sort",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "string",
+              "format": "sort"
+            }
+          },
+          {
+            "name": "technique_ids",
+            "description": "List of MITRE's techniques IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "MITRE technique ID"
               }
             }
           },
@@ -3181,7 +3774,7 @@
         "args": [
           {
             "name": ":agent_id",
-            "description": "Agent ID. All possible values from 000 onwards",
+            "description": "Agent ID",
             "required": true,
             "schema": {
               "type": "string",
@@ -3228,6 +3821,44 @@
         ]
       },
       {
+        "name": "/agents/:agent_id/reload",
+        "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.agent_controller.reload_agent",
+        "description": "Reload the specified agent",
+        "summary": "Reload agent",
+        "tags": ["Agents"],
+        "args": [
+          {
+            "name": ":agent_id",
+            "description": "Agent ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 3,
+              "description": "Agent ID",
+              "format": "numbers"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
         "name": "/agents/:agent_id/restart",
         "documentation": "https://documentation.wazuh.com/5.1/user-manual/api/reference.html#operation/api.controllers.agent_controller.restart_agent",
         "description": "Restart the specified agent",
@@ -3236,7 +3867,7 @@
         "args": [
           {
             "name": ":agent_id",
-            "description": "Agent ID. All possible values from 000 onwards",
+            "description": "Agent ID",
             "required": true,
             "schema": {
               "type": "string",
@@ -3321,6 +3952,43 @@
         ]
       },
       {
+        "name": "/agents/group/:group_id/reload",
+        "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.agent_controller.reload_agents_by_group",
+        "description": "Reload all agents which belong to a given group",
+        "summary": "Reload agents in group",
+        "tags": ["Agents"],
+        "args": [
+          {
+            "name": ":group_id",
+            "description": "Group ID. (Name of the group)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Group name",
+              "format": "group_names"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
         "name": "/agents/group/:group_id/restart",
         "documentation": "https://documentation.wazuh.com/5.1/user-manual/api/reference.html#operation/api.controllers.agent_controller.restart_agents_by_group",
         "description": "Restart all agents which belong to a given group",
@@ -3335,6 +4003,42 @@
               "type": "string",
               "description": "Group name",
               "format": "group_names"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/agents/node/:node_id/reload",
+        "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.agent_controller.reload_agents_by_node",
+        "description": "Reload all agents which belong to a specific given node",
+        "summary": "Reload agents in node",
+        "tags": ["Agents"],
+        "args": [
+          {
+            "name": ":node_id",
+            "description": "Cluster node name",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "names"
             }
           }
         ],
@@ -3516,14 +4220,6 @@
             }
           },
           {
-            "name": "manager",
-            "description": "Filter by manager hostname where agents are connected to",
-            "schema": {
-              "type": "string",
-              "format": "alphanumeric"
-            }
-          },
-          {
             "name": "name",
             "description": "Filter by name",
             "schema": {
@@ -3532,11 +4228,27 @@
             }
           },
           {
-            "name": "node_name",
-            "description": "Filter by node name",
+            "name": "os.arch",
+            "description": "Filter by OS architecture",
             "schema": {
               "type": "string",
-              "format": "names"
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "os.major",
+            "description": "Filter by OS major version",
+            "schema": {
+              "type": "string",
+              "format": "numbers"
+            }
+          },
+          {
+            "name": "os.minor",
+            "description": "Filter by OS minor version",
+            "schema": {
+              "type": "string",
+              "format": "numbers"
             }
           },
           {
@@ -3556,11 +4268,19 @@
             }
           },
           {
+            "name": "os.type",
+            "description": "Filter by OS family (Linux, Windows, Unix, ...)",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
             "name": "os.version",
             "description": "Filter by OS version",
             "schema": {
               "type": "string",
-              "format": "alphanumeric"
+              "format": "alphanumeric_symbols"
             }
           },
           {
@@ -3659,7 +4379,7 @@
           },
           {
             "name": "file_path",
-            "description": "Full path to the WPK file. The file must be on a folder on the Server's installation directory (by default, <code>/var/ossec</code>)",
+            "description": "Full path to the WPK file. The file must be on a folder on the Server's installation directory (by default, <code>/var/wazuh-manager</code>)",
             "required": true,
             "schema": {
               "type": "string",
@@ -3692,14 +4412,6 @@
             }
           },
           {
-            "name": "manager",
-            "description": "Filter by manager hostname where agents are connected to",
-            "schema": {
-              "type": "string",
-              "format": "alphanumeric"
-            }
-          },
-          {
             "name": "name",
             "description": "Filter by name",
             "schema": {
@@ -3708,11 +4420,27 @@
             }
           },
           {
-            "name": "node_name",
-            "description": "Filter by node name",
+            "name": "os.arch",
+            "description": "Filter by OS architecture",
             "schema": {
               "type": "string",
-              "format": "names"
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "os.major",
+            "description": "Filter by OS major version",
+            "schema": {
+              "type": "string",
+              "format": "numbers"
+            }
+          },
+          {
+            "name": "os.minor",
+            "description": "Filter by OS minor version",
+            "schema": {
+              "type": "string",
+              "format": "numbers"
             }
           },
           {
@@ -3732,11 +4460,19 @@
             }
           },
           {
+            "name": "os.type",
+            "description": "Filter by OS family (Linux, Windows, Unix, ...)",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
             "name": "os.version",
             "description": "Filter by OS version",
             "schema": {
               "type": "string",
-              "format": "alphanumeric"
+              "format": "alphanumeric_symbols"
             }
           },
           {
@@ -3809,6 +4545,33 @@
           {
             "name": "wait_for_complete",
             "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/cluster/reload",
+        "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.cluster_controller.put_reload",
+        "description": "Restart Server manager daemons in all nodes in the cluster or a list of them, keeping active agent connections",
+        "summary": "Reload Server manager",
+        "tags": ["Cluster"],
+        "query": [
+          {
+            "name": "nodes_list",
+            "description": "List of node IDs (separated by comma), all nodes selected by default if not specified",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
             "schema": {
               "type": "boolean",
               "default": false
@@ -4970,27 +5733,11 @@
             }
           },
           {
-            "name": "manager",
-            "description": "Filter by manager hostname where agents are connected to",
-            "schema": {
-              "type": "string",
-              "format": "alphanumeric"
-            }
-          },
-          {
             "name": "name",
             "description": "Filter by name",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
-            }
-          },
-          {
-            "name": "node_name",
-            "description": "Filter by node name",
-            "schema": {
-              "type": "string",
-              "format": "names"
             }
           },
           {
@@ -5000,6 +5747,30 @@
               "type": "string",
               "format": "timeframe",
               "default": "7d"
+            }
+          },
+          {
+            "name": "os.arch",
+            "description": "Filter by OS architecture",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
+            "name": "os.major",
+            "description": "Filter by OS major version",
+            "schema": {
+              "type": "string",
+              "format": "numbers"
+            }
+          },
+          {
+            "name": "os.minor",
+            "description": "Filter by OS minor version",
+            "schema": {
+              "type": "string",
+              "format": "numbers"
             }
           },
           {
@@ -5019,11 +5790,19 @@
             }
           },
           {
+            "name": "os.type",
+            "description": "Filter by OS family (Linux, Windows, Unix, ...)",
+            "schema": {
+              "type": "string",
+              "format": "alphanumeric"
+            }
+          },
+          {
             "name": "os.version",
             "description": "Filter by OS version",
             "schema": {
               "type": "string",
-              "format": "alphanumeric"
+              "format": "alphanumeric_symbols"
             }
           },
           {
@@ -5036,7 +5815,7 @@
           },
           {
             "name": "purge",
-            "description": "Permanently delete an agent from the key store. The wazuh-authd `purge` configuration option has\nprecedence over this parameter, when enabled, agents will be permanently deleted regardless of this value.\n",
+            "description": "Permanently delete an agent from the key store. The wazuh-manager-authd `purge` configuration option has\nprecedence over this parameter, when enabled, agents will be permanently deleted regardless of this value.\n",
             "schema": {
               "type": "boolean",
               "default": false
@@ -5103,7 +5882,7 @@
         "args": [
           {
             "name": ":agent_id",
-            "description": "Agent ID. All possible values from 000 onwards",
+            "description": "Agent ID",
             "required": true,
             "schema": {
               "type": "string",
@@ -5153,7 +5932,7 @@
         "args": [
           {
             "name": ":agent_id",
-            "description": "Agent ID. All possible values from 000 onwards",
+            "description": "Agent ID",
             "required": true,
             "schema": {
               "type": "string",

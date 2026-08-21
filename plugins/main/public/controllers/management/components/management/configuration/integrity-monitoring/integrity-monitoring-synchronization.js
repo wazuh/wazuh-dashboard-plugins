@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
@@ -22,11 +23,11 @@ const mainSettings = [
   {
     field: 'enabled',
     label: 'Synchronization status',
-    render: renderValueYesThenEnabled
+    render: renderValueYesThenEnabled,
   },
   {
     field: 'max_interval',
-    label: 'Maximum interval (in seconds) between every sync'
+    label: 'Maximum interval (in seconds) between every sync',
   },
   { field: 'interval', label: 'Interval (in seconds) between every sync' },
   { field: 'response_timeout', label: 'Response timeout (in seconds)' },
@@ -44,27 +45,29 @@ class WzConfigurationIntegrityMonitoringSynchronization extends Component {
     return (
       <Fragment>
         {currentConfig &&
-        currentConfig['syscheck-syscheck'] &&
-        currentConfig['syscheck-syscheck'].syscheck &&
-        currentConfig['syscheck-syscheck'].syscheck.synchronization ? (
+        currentConfig.fim &&
+        currentConfig.fim.syscheck &&
+        currentConfig.fim.syscheck.synchronization ? (
           <WzConfigurationSettingsHeader
-            title="Syncronization"
-            description="Database synchronization settings"
+            title='Syncronization'
+            description='Database synchronization settings'
             help={helpLinks}
           >
             <WzConfigurationSettingsGroup
-              config={
-                currentConfig['syscheck-syscheck'].syscheck.synchronization
-              }
+              config={currentConfig.fim.syscheck.synchronization}
               items={mainSettings}
             />
           </WzConfigurationSettingsHeader>
         ) : (
-          <WzNoConfig error="not-present" help={helpLinks} />
+          <WzNoConfig error='not-present' help={helpLinks} />
         )}
       </Fragment>
     );
   }
 }
+
+WzConfigurationIntegrityMonitoringSynchronization.propTypes = {
+  currentConfig: PropTypes.object,
+};
 
 export default WzConfigurationIntegrityMonitoringSynchronization;

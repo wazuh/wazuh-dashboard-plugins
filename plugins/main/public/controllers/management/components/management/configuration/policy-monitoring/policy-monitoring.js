@@ -10,9 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 import withWzConfig from '../util-hocs/wz-config';
+import { reportedEnabled } from '../utils/utils';
 import WzTabSelector, {
   WzTabSelectorTab,
 } from '../util-components/tab-selector';
@@ -29,11 +31,9 @@ class WzPolicyMonitoring extends Component {
     this.props.updateBadge(this.badgeEnabled());
   }
   badgeEnabled() {
-    return (
-      this.props.currentConfig['syscheck-rootcheck'] &&
-      this.props.currentConfig['syscheck-rootcheck'].rootcheck &&
-      this.props.currentConfig['syscheck-rootcheck'].rootcheck.disabled &&
-      this.props.currentConfig['syscheck-rootcheck'].rootcheck.disabled === 'no'
+    return reportedEnabled(
+      this.props.currentConfig?.fim?.rootcheck?.disabled,
+      'no',
     );
   }
   render() {
@@ -53,9 +53,8 @@ class WzPolicyMonitoring extends Component {
   }
 }
 
-const sections = [
-  { component: 'syscheck', configuration: 'rootcheck' },
-  { component: 'wmodules', configuration: 'wmodules' },
-];
+WzPolicyMonitoring.propTypes = {
+  currentConfig: PropTypes.object,
+};
 
-export default withWzConfig(sections)(WzPolicyMonitoring);
+export default withWzConfig()(WzPolicyMonitoring);

@@ -96,6 +96,9 @@ export const getComplianceSummaryTool: ToolDefinition = {
   },
   target: 'indexer',
   tier: 'T1',
+  // Cost-budget class 1 (chat.ts's tool-round budget): this request is `size: 0` --
+  // aggregation-only, no hit documents (see this file's own doc comment above).
+  costClass: 1,
   buildRequest(params) {
     const frameworks = parseFrameworks(params.framework);
     const excludeFrameworks = parseExcludeFrameworks(params.exclude_framework);

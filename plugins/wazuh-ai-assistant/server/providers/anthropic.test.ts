@@ -212,6 +212,100 @@ test('AnthropicAdapter: a second turn on the same provider+model omits temperatu
   }
 });
 
+// --- wire shape: assistant messages carrying both narration text and tool calls (issue C4) ----
+// C4 changed history to carry the round's own narration alongside its tool call instead of
+// discarding it as `content: ''`. Neither adapter test previously covered the resulting wire
+// shape: an assistant ChatMessage with non-empty `content` AND `toolCalls` must become a `text`
+// block ahead of the `tool_use` block(s) (Anthropic requires blocks in emission order), and a
+// whitespace-only `content` (e.g. a bare "\n\n" a model streams as priming text right before a
+// tool call) must never become a text block at all -- Anthropic 400s on a whitespace-only text
+// block. chat.ts now trims before writing history, but this adapter guards independently
+// (defense in depth) since it is the actual point where a `content: ''`/whitespace value would
+// otherwise reach the wire.
+
+test('AnthropicAdapter: an assistant message with narration text and a tool call emits a text block before the tool_use block', async () => {
+  const adapter = new AnthropicAdapter();
+  const bodies: Array<Record<string, unknown>> = [];
+  const originalFetch = global.fetch;
+  global.fetch = ((_url: string, init: { body: string }) => {
+    bodies.push(JSON.parse(init.body));
+    return Promise.resolve(sseResponse(OK_STREAM));
+  }) as unknown as typeof fetch;
+  try {
+    const controller = new AbortController();
+    await drain(
+      adapter.chatStream(
+        freshConfig('claude-sonnet-5'),
+        [
+          { role: 'user', content: 'check the rules' },
+          {
+            role: 'assistant',
+            content: 'Let me check that for you.',
+            toolCalls: [{ id: 'call-1', name: 'get_rules', arguments: {} }],
+          },
+          { role: 'tool', toolCallId: 'call-1', content: '{"rows":[]}' },
+        ] as never,
+        controller.signal,
+      ),
+    );
+    const messages = bodies[0].messages as Array<{
+      role: string;
+      content: Array<{ type: string; text?: string }>;
+    }>;
+    const assistantMessage = messages.find(
+      message => message.role === 'assistant',
+    );
+    expect(assistantMessage).toBeDefined();
+    expect(assistantMessage!.content[0]).toMatchObject({
+      type: 'text',
+      text: 'Let me check that for you.',
+    });
+    expect(assistantMessage!.content[1]).toMatchObject({ type: 'tool_use' });
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+test('AnthropicAdapter: an assistant message with whitespace-only content emits no text block', async () => {
+  const adapter = new AnthropicAdapter();
+  const bodies: Array<Record<string, unknown>> = [];
+  const originalFetch = global.fetch;
+  global.fetch = ((_url: string, init: { body: string }) => {
+    bodies.push(JSON.parse(init.body));
+    return Promise.resolve(sseResponse(OK_STREAM));
+  }) as unknown as typeof fetch;
+  try {
+    const controller = new AbortController();
+    await drain(
+      adapter.chatStream(
+        freshConfig('claude-sonnet-5'),
+        [
+          { role: 'user', content: 'check the rules' },
+          {
+            role: 'assistant',
+            content: '\n\n',
+            toolCalls: [{ id: 'call-1', name: 'get_rules', arguments: {} }],
+          },
+          { role: 'tool', toolCallId: 'call-1', content: '{"rows":[]}' },
+        ] as never,
+        controller.signal,
+      ),
+    );
+    const messages = bodies[0].messages as Array<{
+      role: string;
+      content: Array<{ type: string }>;
+    }>;
+    const assistantMessage = messages.find(
+      message => message.role === 'assistant',
+    );
+    expect(assistantMessage).toBeDefined();
+    expect(assistantMessage!.content).toHaveLength(1);
+    expect(assistantMessage!.content[0].type).toBe('tool_use');
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
 test('AnthropicAdapter: an unrelated 400 is not treated as a temperature rejection', async () => {
   const adapter = new AnthropicAdapter();
   const bodies: Array<Record<string, unknown>> = [];

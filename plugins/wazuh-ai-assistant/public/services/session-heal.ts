@@ -1,12 +1,11 @@
 import { HttpSetup } from '../../../../src/core/public';
-import {
-  API_PATHS,
-  MANAGER_SESSION_EXPIRED_COPY,
-} from '../../common/constants';
+import { API_PATHS } from '../../common/constants';
 
-/** Response shape of GET /settings/access (server/routes/settings.ts's pre-flight probe). */
+/** Response shape of GET /settings/access (server/routes/settings.ts's Manager-session liveness
+ * probe — NOT an authorization check; settings/providers are authorized by the Wazuh indexer's own
+ * RBAC on the calling user, see docs/ref/modules/ai-assistant/security.md). */
 export interface SettingsAccess {
-  administrator: boolean;
+  managerSessionOk: boolean;
   message: string | null;
   defaultApiHostId: string | null;
   apiKeyEncryptionEnabled: boolean;
@@ -71,13 +70,9 @@ async function runEnsureManagerSession(
     lastResult = null;
     return null;
   }
-  // Only a token-shaped failure with a known host is healable; anything else (admin OK, genuine
-  // non-admin, no configured host) is returned as-is so no pointless /api/login is ever posted.
-  const healHostId =
-    !access.administrator &&
-    access.message?.includes(MANAGER_SESSION_EXPIRED_COPY)
-      ? access.defaultApiHostId
-      : null;
+  // Only a token-shaped failure with a known host is healable; anything else (session OK, no
+  // configured host) is returned as-is so no pointless /api/login is ever posted.
+  const healHostId = !access.managerSessionOk ? access.defaultApiHostId : null;
   if (!healHostId) {
     memoize(access);
     return access;
@@ -97,10 +92,10 @@ async function runEnsureManagerSession(
 }
 
 /**
- * Ensures the Manager API session cookies exist before Manager-gated work: probes
- * GET /settings/access and, when it reports `MANAGER_SESSION_EXPIRED_COPY`, heals via
+ * Ensures the Manager API session cookies exist before Manager-path work (chat's tool calls):
+ * probes GET /settings/access and, when `managerSessionOk` comes back false, heals via
  * `healManagerSession` and re-probes. Resolves the freshest access result, or `null` when the
- * probe itself failed (fail-open — the server still enforces every real gate). Never rejects.
+ * probe itself failed (fail-open). Never rejects.
  * `maxAgeMs` returns the memoized result without any network call when it is recent enough.
  */
 export function ensureManagerSession(
@@ -121,28 +116,4 @@ export function ensureManagerSession(
     });
   }
   return inFlight;
-}
-
-/**
- * Runs `fn` and, when it rejects with the server's session-expired copy in the response body
- * (an admin-gated route refusing a missing/expired `wz-token`), heals the session once and
- * replays `fn` exactly once. Any other error — and any error from the replay — rethrows untouched.
- */
-export async function withManagerSessionRetry<T>(
-  http: HttpSetup,
-  fn: () => Promise<T>,
-): Promise<T> {
-  try {
-    return await fn();
-  } catch (error) {
-    const message = (error as { body?: { message?: unknown } })?.body?.message;
-    if (
-      typeof message !== 'string' ||
-      !message.includes(MANAGER_SESSION_EXPIRED_COPY)
-    ) {
-      throw error;
-    }
-    await ensureManagerSession(http);
-    return fn();
-  }
 }

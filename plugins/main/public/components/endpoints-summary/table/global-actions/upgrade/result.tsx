@@ -65,13 +65,16 @@ export const UpgradeAgentsModalResult = ({
     />
   );
 
-  const tasksTable = (tasks: ResponseUpgradeAgents[]) => (
+  const upgradedAgentsTable = (agentIds: ResponseUpgradeAgents[]) => (
     <EuiInMemoryTable
-      items={tasks}
+      items={agentIds.map(id => ({
+        id,
+        name: finalAgents.find(agent => agent.id === id)?.name,
+      }))}
       tableLayout='auto'
       columns={[
         {
-          field: 'agent',
+          field: 'id',
           name: 'Agent ID',
           align: 'left',
           sortable: true,
@@ -81,24 +84,12 @@ export const UpgradeAgentsModalResult = ({
           name: 'Name',
           align: 'left',
           sortable: true,
-          render: (field, task) => {
-            const agent = finalAgents.find(
-              finalAgent => finalAgent.id === task.agent,
-            ) as Agent;
-            return agent.name;
-          },
-        },
-        {
-          field: 'task_id',
-          name: 'Task ID',
-          align: 'left',
-          sortable: true,
         },
       ]}
       pagination={true}
       sorting={{
         sort: {
-          field: 'agent',
+          field: 'id',
           direction: 'asc',
         },
       }}
@@ -195,13 +186,13 @@ export const UpgradeAgentsModalResult = ({
         },
         {
           step: 2,
-          title: 'Upgrade agent tasks',
+          title: 'Upgrade status',
           status: saveChangesStatus,
           children:
             getAgentsStatus === 'complete' ? (
               <EuiFlexGroup direction='column'>
                 {saveChangesStatus === 'loading' ? (
-                  <EuiFlexItem key='upgrade-tasks-loading'>
+                  <EuiFlexItem key='upgrade-agents-loading'>
                     <EuiFlexGroup
                       alignItems='center'
                       responsive={false}
@@ -212,24 +203,24 @@ export const UpgradeAgentsModalResult = ({
                         <EuiLoadingSpinner size='m' />
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
-                        <EuiText>Creating upgrade agent tasks</EuiText>
+                        <EuiText>Sending upgrade request</EuiText>
                       </EuiFlexItem>
                     </EuiFlexGroup>
                   </EuiFlexItem>
                 ) : (
                   <>
                     {successAgents?.length ? (
-                      <EuiFlexItem key='upgrade-tasks-success'>
+                      <EuiFlexItem key='upgrade-agents-success'>
                         <EuiAccordion
                           id={`$successAccordion`}
                           arrowDisplay='none'
                           paddingSize='m'
                           buttonContent={resultStatus({
                             status: RESULT_TYPE.SUCCESS,
-                            text: `Upgrade agent tasks created (${successAgents.length})`,
+                            text: `Agents queued for upgrade (${successAgents.length})`,
                           })}
                         >
-                          {tasksTable(successAgents)}
+                          {upgradedAgentsTable(successAgents)}
                         </EuiAccordion>
                       </EuiFlexItem>
                     ) : null}
@@ -237,14 +228,14 @@ export const UpgradeAgentsModalResult = ({
                       <EuiSpacer size='s' />
                     ) : null}
                     {totalErrorAgents ? (
-                      <EuiFlexItem key='upgrade-tasks-error'>
+                      <EuiFlexItem key='upgrade-agents-error'>
                         <EuiAccordion
                           id={`$errorAccordion`}
                           arrowDisplay='none'
                           paddingSize='m'
                           buttonContent={resultStatus({
                             status: RESULT_TYPE.ERROR,
-                            text: `Upgrade agent tasks not created (${totalErrorAgents})`,
+                            text: `Agents not queued for upgrade (${totalErrorAgents})`,
                           })}
                         >
                           {errorsTable(errorAgents)}

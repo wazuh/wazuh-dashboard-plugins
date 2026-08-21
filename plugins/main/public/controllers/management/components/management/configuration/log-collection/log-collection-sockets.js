@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
@@ -22,7 +23,7 @@ import {
   renderValueOrNoValue,
 } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
-import { LOGCOLLECTOR_SOCKET_PROP } from './types';
+import { LOGCOLLECTOR_PROP } from './types';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const helpLinks = [
@@ -59,31 +60,23 @@ class WzConfigurationLogCollectionSockets extends Component {
   }
   render() {
     const { currentConfig } = this.props;
-    const items = isArray(currentConfig?.[LOGCOLLECTOR_SOCKET_PROP]?.target)
-      ? settingsListBuilder(
-          currentConfig[LOGCOLLECTOR_SOCKET_PROP].target,
-          'name',
-        )
-      : isArray(currentConfig?.[LOGCOLLECTOR_SOCKET_PROP]?.socket)
-      ? settingsListBuilder(
-          currentConfig[LOGCOLLECTOR_SOCKET_PROP].socket,
-          'name',
-        )
+    const items = isArray(currentConfig?.[LOGCOLLECTOR_PROP]?.target)
+      ? settingsListBuilder(currentConfig[LOGCOLLECTOR_PROP].target, 'name')
+      : isArray(currentConfig?.[LOGCOLLECTOR_PROP]?.socket)
+      ? settingsListBuilder(currentConfig[LOGCOLLECTOR_PROP].socket, 'name')
       : [];
     return (
       <Fragment>
-        {isString(currentConfig?.[LOGCOLLECTOR_SOCKET_PROP]) && (
+        {isString(currentConfig?.[LOGCOLLECTOR_PROP]) && (
           <WzNoConfig
-            error={currentConfig[LOGCOLLECTOR_SOCKET_PROP]}
+            error={currentConfig[LOGCOLLECTOR_PROP]}
             help={helpLinks}
           />
         )}
-        {!isString(currentConfig?.[LOGCOLLECTOR_SOCKET_PROP]) &&
-        !items.length ? (
+        {!isString(currentConfig?.[LOGCOLLECTOR_PROP]) && !items.length ? (
           <WzNoConfig error='not-present' help={helpLinks} />
         ) : null}
-        {!isString(currentConfig?.[LOGCOLLECTOR_SOCKET_PROP]) &&
-        items.length ? (
+        {!isString(currentConfig?.[LOGCOLLECTOR_PROP]) && items.length ? (
           <WzConfigurationSettingsHeader
             title='Output sockets'
             description='Define custom outputs to send log data'
@@ -99,5 +92,9 @@ class WzConfigurationLogCollectionSockets extends Component {
     );
   }
 }
+
+WzConfigurationLogCollectionSockets.propTypes = {
+  currentConfig: PropTypes.object,
+};
 
 export default WzConfigurationLogCollectionSockets;

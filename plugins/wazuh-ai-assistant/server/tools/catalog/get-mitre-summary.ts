@@ -56,6 +56,9 @@ export const getMitreSummaryTool: ToolDefinition = {
   },
   target: 'indexer',
   tier: 'T1',
+  // Cost-budget class 1 (chat.ts's tool-round budget): this request is `size: 0` --
+  // aggregation-only, no hit documents (see this file's own doc comment above).
+  costClass: 1,
   buildRequest(params) {
     const limit = clampAggLimit(params.limit, 20);
     const { gte, lte } = resolveTimeRange(params);

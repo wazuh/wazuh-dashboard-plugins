@@ -19,7 +19,6 @@ jest.mock('../../utils/navigation', () => ({
   getMitreUrl: jest.fn(),
   getMitreIntelligenceResourceUrl: jest.fn(() => '#mitre-intelligence'),
   getDiscoverFindingsBySeverityUrl: jest.fn(() => '#discover'),
-  getAiAssistantUrl: jest.fn(() => '#ai-assistant'),
 }));
 // WzButtonPermissions pulls in a react-redux `useSelector` for RBAC checks —
 // out of scope here, so stub it down to a plain link (same as

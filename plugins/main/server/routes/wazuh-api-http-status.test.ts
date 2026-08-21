@@ -108,7 +108,7 @@ describe('[endpoint] POST /api/request - upstream API error status mapping', () 
 
   const requestBody = {
     method: 'GET',
-    path: '/tasks/status',
+    path: '/agents',
     body: {},
     id: 'default',
   };

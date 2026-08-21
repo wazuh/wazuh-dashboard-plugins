@@ -449,3 +449,16 @@ test('SUGGEST_DISCOVER_QUERY_TOOL: description still states it never fetches dat
     /nothing here is executed on your behalf/,
   );
 });
+
+// Live-audit finding (item 8b): a T1134 zero-rule answer told the user to "double-check directly
+// in Discover with the query below" -- the UI never renders a query block, only a small callout
+// with the model's reason and an "Open in Discover" link/button. The description must say so
+// plainly and forbid the "query below" framing that caused the mismatch.
+test('SUGGEST_DISCOVER_QUERY_TOOL: description says no query text is shown and forbids "query below" framing', () => {
+  const { description } = SUGGEST_DISCOVER_QUERY_TOOL;
+  assert.match(description, /no query text is displayed, only that link/);
+  assert.match(
+    description,
+    /call it "the Discover link", never\s+"the query below" or any other description of a visible query block/,
+  );
+});

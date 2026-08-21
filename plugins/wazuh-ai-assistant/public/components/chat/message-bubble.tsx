@@ -16,7 +16,7 @@ import {
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { ChatRole, TableSpec, ToolCall } from '../../../common/types';
-import { ResultTable } from './result-table';
+import { ResultTable, ResultTableProvenanceChip } from './result-table';
 import { DiscoverLink, ResolveDiscoverUrl } from './discover-link';
 import { ResolveSecurityAnalyticsUrl } from './security-analytics-link';
 import { describeToolCall } from './tool-call-label';
@@ -115,6 +115,15 @@ interface MessageBubbleProps {
    * case the interrupted notice is shown without an action.
    */
   onRetry?: () => void;
+  /** Passed straight through to this message's ResultTable — see that component's own doc
+   * comment on the same-named prop for how it steps the table's initial page size. Threaded here
+   * from MessageList, which gets it from chat-page.tsx's real `ResizeObserver` measurement; it
+   * stays optional because jsdom has no `ResizeObserver`, so it is `undefined` in tests. */
+  transcriptHeightPx?: number;
+  /** Passed straight through to this message's ResultTable so a rows-per-page change can re-pin the
+   * transcript pane — see that component's own doc comment on the same-named prop. Threaded here
+   * from MessageList, which gets it from chat-page.tsx. */
+  onTableRowsPerPageChange?: () => void;
 }
 
 function formatTimestamp(epochMs: number): string {
@@ -197,11 +206,80 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   resolveDiscoverUrl,
   resolveSecurityAnalyticsUrl,
   onRetry,
+  transcriptHeightPx,
+  onTableRowsPerPageChange,
 }) => {
   const isUser = message.role === 'user';
   const isWaitingForFirstToken =
     !isUser && message.isStreaming === true && message.content === '';
   const toolCalls = message.toolCalls ?? [];
+  /**
+   * The table this turn actually DRAWS — `undefined` for a final table with zero rows.
+   *
+   * A header-only result card ("Results (0 rows)" over EuiBasicTable's stock "No items found") is
+   * never rendered (CEO item 6 / ux-research.md §E, which is also PatternFly's explicit "never
+   * render a header-only table"): the assistant's own prose already answers a zero-result question
+   * in words, and the card added a second, emptier answer underneath it.
+   *
+   * The gate lives HERE, in the renderer, rather than in chat-page.tsx's flush path, for two
+   * reasons: (1) `message.table` is persisted (server/conversation-store.ts), so a conversation
+   * SAVED before this change — or restored from any older release — carries 0-row specs that a
+   * stream-time gate would never see, and would still draw the empty card on resume; (2) the
+   * within-turn empty-table suppression in chat-page.tsx (`pendingEmptyTable`) is a STATE invariant
+   * about which spec a turn is remembered with, and it stays exactly as it was — an honest-empty
+   * turn is still recorded as having run a query that returned nothing, which is what keeps the
+   * saved conversation truthful; only the drawing of it changes.
+   *
+   * Every table-conditional RENDERING decision in this component reads THIS value, not
+   * `message.table`, so a suppressed table can never (a) strand its provenance chips in a card
+   * header that does not exist, or (b) leave a prose-only answer opted out of the reading measure.
+   * The one deliberate exception is the meta-row chip's hover title (see its own comment below),
+   * which reads the suppressed spec purely to keep naming the index it queried.
+   */
+  const renderedTable =
+    message.table && message.table.rows.length > 0 ? message.table : undefined;
+  /**
+   * The guarantee half of the suppression above: hiding the card must never leave a turn with no
+   * feedback at all. A turn that ends on a 0-row table AND produced no prose (the model stopped
+   * after the tool call, or Stop was pressed before it narrated anything) gets ONE quiet subdued
+   * line instead — no card, no icon, no illustration, since an illustration-scale empty state
+   * belongs to a page, not to one turn inside a conversation.
+   *
+   * `isStreaming` is excluded because a still-streaming bubble already shows its own placeholder
+   * lines; in the live path an empty spec only ever reaches a message at flush time (chat-page.tsx),
+   * by which point the turn is no longer streaming, so this is a guard against a future writer
+   * rather than a case reachable today.
+   */
+  const showEmptyResultNote =
+    message.table !== undefined &&
+    message.table.rows.length === 0 &&
+    message.content.trim() === '' &&
+    message.isStreaming !== true;
+  // Provenance chips move UP into the result card's own header once a table exists (layout
+  // contract §4: "the tool call renders BELOW the table it produced; it should become a chip in
+  // the card header") — ResultTable renders them there instead. Below-bubble chips stay exactly
+  // as before for the (common) case a turn ran tool calls but produced no table at all (a count
+  // answer, a suggested-query handoff, or a table still held back by chat-page.tsx pending the
+  // first answer token — see chat-page.test.tsx's "holds the result table back..." coverage: the
+  // chip must still appear from `toolCalls` alone at that point, since `message.table` is not yet
+  // set on the message). A turn whose only table was empty is a THIRD case of the same shape: the
+  // card that would have carried the chips is suppressed (see `renderedTable`), so the below-bubble
+  // chips have to stay — that is the only place left to check what the turn actually queried, which
+  // matters most precisely when the answer is "nothing was found".
+  const metaRowToolCalls = renderedTable ? [] : toolCalls;
+  const tableProvenanceChips: ResultTableProvenanceChip[] | undefined =
+    renderedTable
+      ? toolCalls.map(toolCall => {
+          const { short, full } = describeToolCall(toolCall, renderedTable);
+          return {
+            id: toolCall.id,
+            shortLabel: short,
+            fullLabel: full,
+            toolName: toolCall.name,
+            argumentsJson: toolCall.arguments,
+          };
+        })
+      : undefined;
   // Only the finished-assistant branch below renders through EuiMarkdownFormat (the user bubble
   // and the streaming branch both render message.content as plain text/JSX, which React already
   // escapes), so this is only ever read there — memoized on message.content since re-sanitizing
@@ -233,21 +311,21 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   // reading queries. A second copy in the meta row was the same query at a lower abstraction
   // level, competing with the chips that answer the question people actually ask of an answer:
   // what did it look for?
-  // color="plain" keeps both avatars on the same neutral background, so the pair reads as one
-  // set instead of picking up EUI's auto-assigned per-name colors.
-  const avatar = isUser ? (
-    <EuiAvatar
-      size='m'
-      iconType='user'
-      color='plain'
-      name={i18n.translate('wazuhAiAssistant.chat.userAvatarName', {
-        defaultMessage: 'You',
-      })}
-    />
-  ) : (
-    // Initials, not an image: the Wazuh mark was dropped here because the app chrome already
-    // brands the page. `name` backs both the aria-label/title and the rendered initials, and
-    // initialsLength=2 keeps it as "AI" rather than EUI's default single-letter "A".
+  // ONE avatar per conversation, on the assistant side only.
+  //
+  // The user turn's own avatar is gone (audit §3.7): a 32px avatar plus its 12px gutter held the
+  // user bubble 16px in from the transcript's right edge, so the question's right edge and the
+  // composer's — the two things directly above one another on the surface — never lined up, on a
+  // screen whose whole premise is one shared alignment edge (rulebook D14/D22). It carried no
+  // information either: the bubble's own fill, border and right alignment already say "you said
+  // this", which is exactly how ChatGPT/Claude/Gemini render a user turn (rulebook F29). The
+  // assistant keeps its mark, because that side is undecorated prose and the avatar is the only
+  // thing marking where an answer begins.
+  //
+  // Initials, not an image: the Wazuh mark was dropped here because the app chrome already brands
+  // the page. `name` backs both the aria-label/title and the rendered initials, and
+  // initialsLength=2 keeps it as "AI" rather than EUI's default single-letter "A".
+  const avatar = (
     <EuiAvatar
       size='m'
       color='plain'
@@ -259,12 +337,16 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   );
 
   // Prose keeps a fixed reading measure even when the turn is wide. A turn carrying a table
-  // widens to the full column so the table fits (see the wrapper below), and without this the
+  // widens up to the table's own breakout width (see the wrapper below), and without this the
   // answer's sentences inherited that width and ran to ~117 characters a line — roughly 60% past
   // the point where the eye reliably finds the next line, which reads as a wall of text. Only
   // block content (the table, the raw query view) is allowed to use the extra width.
-  const PROSE_MEASURE = 720;
-  const proseStyle: React.CSSProperties = { maxWidth: PROSE_MEASURE };
+  // `.wzProseMeasure` (chat-page.scss) reads `$wzProseMeasure` — this component has no colocated
+  // .scss file of its own, but the plugin's whole stylesheet loads once, globally, from
+  // chat-page.tsx's own import, so this global class is reachable here without a separate import
+  // (the same way `wzMsgRow` below already is). Kept as a class rather than an inline style so this
+  // 68ch figure has exactly one home instead of a second copy restated in this file.
+  const PROSE_MEASURE_CLASS = 'wzProseMeasure';
 
   const bubbleContent = (
     <>
@@ -273,7 +355,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
         // branch also covers): announces incoming delta tokens to screen readers, which
         // otherwise stay silent for the whole stream since nothing else here changes focus.
         <div
-          style={proseStyle}
+          className={PROSE_MEASURE_CLASS}
           {...(!isUser
             ? {
                 'aria-live': 'polite' as const,
@@ -304,7 +386,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           </EuiText>
         </div>
       ) : (
-        <div style={proseStyle}>
+        <div className={PROSE_MEASURE_CLASS}>
           <EuiText size='s'>
             {/* sanitizeAssistantMarkdown (#8890): the finished answer is model output built
                   from tool results that can carry attacker-influenced text — see that
@@ -314,15 +396,36 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           </EuiText>
         </div>
       )}
-      {message.table && (
+      {renderedTable && (
         <>
-          <EuiSpacer size='s' />
+          {/* Iteration-4 audit, P1 item 5: 16px ('m'), not 8px ('s') — a card must not sit closer
+              to the sentence above it than two sentences sit to each other. */}
+          <EuiSpacer size='m' />
           <ResultTable
-            spec={message.table}
+            spec={renderedTable}
             resolveDiscoverUrl={resolveDiscoverUrl}
             resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
+            provenanceChips={tableProvenanceChips}
+            transcriptHeightPx={transcriptHeightPx}
+            onRowsPerPageChange={onTableRowsPerPageChange}
           />
         </>
+      )}
+      {/* The suppressed-card fallback line — see `showEmptyResultNote` above for exactly when this
+          is the turn's only feedback. Deliberately not an EuiCallOut/EuiEmptyPrompt: this is a
+          sentence, and the whole point of suppressing the card was to stop answering "nothing
+          matched" with a box. */}
+      {showEmptyResultNote && (
+        <div className={PROSE_MEASURE_CLASS}>
+          <EuiSpacer size='xs' />
+          <EuiText size='s' color='subdued'>
+            <p style={{ margin: 0 }}>
+              {i18n.translate('wazuhAiAssistant.chat.emptyResultNote', {
+                defaultMessage: 'The query returned no rows.',
+              })}
+            </p>
+          </EuiText>
+        </div>
       )}
       {/* Graceful-failure handoff (server/tools/suggest-discover-query.ts): the model's own reason
           text plus a link to run the query itself in Discover, in place of the table/answer it
@@ -332,7 +435,9 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           link already goes through (discover-link.tsx). */}
       {message.suggestedQuery && (
         <>
-          <EuiSpacer size='s' />
+          {/* Iteration-4 audit, P1 item 5: same 16px ('m') as the results-card spacer above, for
+              the same reason — this callout is a card too. */}
+          <EuiSpacer size='m' />
           <EuiCallOut
             size='s'
             iconType='iInCircle'
@@ -358,13 +463,32 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   const bubble = (
     <EuiFlexItem
       grow={false}
+      // No `PROSE_MEASURE_CLASS` here (iteration-4 audit, P2 item 10): this item's own inline
+      // `maxWidth` below is ALWAYS set (`'75%'` or `'100%'`), and an inline style always wins over
+      // a class on specificity — so the class used to sit here doing nothing for either turn kind:
+      // dead weight for a table-bearing turn (its `'100%'` matched the class's own no-op) and,
+      // worse, misleading for a prose-only one, where it read as "the 68ch cap lives here" while
+      // the `'100%'` inline value silently overrode it. The real cap is (and always was) the INNER
+      // prose `<div className={PROSE_MEASURE_CLASS}>` a few lines below, which carries no inline
+      // style of its own to fight it.
       style={{
-        // The user turn keeps its 75% share (a question is always prose); the assistant turn
-        // gets a readable 720px prose measure EXCEPT when it carries a result table, which uses
-        // the full column width instead — a wide table squeezed into 75% of an already-narrow
-        // column forced a horizontal scrollbar inside the table's own 400px scroller.
-        maxWidth: isUser ? '75%' : message.table ? '100%' : 720,
-        minWidth: 180,
+        // The user turn keeps its 75% share — a question is always prose, and the figure is
+        // genuinely local to this decision, with no token or class behind it to drift from.
+        maxWidth: isUser ? '75%' : '100%',
+        minWidth: isUser ? 180 : 0,
+        // The assistant column is forced to a DETERMINISTIC width (the full row) instead of EUI's
+        // default shrink-to-fit sizing (audit item 2). Shrink-to-fit made this flex item's resolved
+        // width track whatever it happened to be rendering — 605px for a collapsed/prose-only turn,
+        // 1260px once a `wzResultsCard` was expanded — so the results card jogged ~115px sideways as
+        // it expanded/collapsed instead of just changing height, and a collapsed card hugged its own
+        // content rather than filling the wide row it was given.
+        // `flex: 1 1 auto` makes the item grow to fill the row like any other block, and `min-width: 0`
+        // is required alongside it — a flex item's automatic minimum is its content's, which for a
+        // wide `wzResultsCard` would otherwise refuse to shrink back down and re-introduce the same
+        // instability from the other direction. The user bubble is deliberately left out of this: it
+        // is a real chat bubble that is supposed to hug its own text up to the 75% cap above, and nothing
+        // about it collapses/expands the way a results card does.
+        ...(!isUser ? { flex: '1 1 auto', width: '100%' } : {}),
       }}
     >
       {isUser ? (
@@ -380,9 +504,12 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           paddingSize='m'
           hasShadow={false}
           hasBorder
-          // The one deliberate radius override on the surface: a conversation turn reads as a
-          // bubble, not as a data panel. Everything else uses EUI defaults (see chat-page.scss).
-          style={{ borderRadius: 14 }}
+          // Radius comes from `.euiPanel.wzUserBubble` (chat-page.scss), which folds this bubble
+          // onto the shared `$wzPanelRadius`. It used to be an inline `borderRadius: 14` with a
+          // comment claiming the rest of the surface "uses EUI defaults" — that was both a fifth
+          // radius invented for one element and a contradiction of the actual doctrine
+          // (_redesign.scss's "one container idiom, 12px"), which is the one that stands.
+          className='wzUserBubble'
         >
           {bubbleContent}
         </EuiPanel>
@@ -395,6 +522,11 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
             wired via aria-expanded/aria-controls). Anchoring the interrupted notice here instead
             of as its own floating line keeps it attached to the turn it belongs to. */}
       <EuiFlexGroup
+        // `wzMsgMetaRow`: a stable class marking the meta/footer row. A table-bearing (`--wide`)
+        // turn no longer needs to correct this row's inline-start — `.wzMessageRow--wide` anchors
+        // the whole row at the normal left edge (chat-page.scss) — but the class stays as the hook
+        // the transcript-geometry Cypress spec measures the footer's left edge from.
+        className='wzMsgMetaRow'
         gutterSize='xs'
         alignItems='center'
         responsive={false}
@@ -415,7 +547,10 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           >
             <p
               style={{
-                margin: '4px 4px 0',
+                // Iteration-4 audit, P1 item 6: no inline-end/start asymmetry — the old
+                // `'4px 4px 0'` put a 4px indent in front of the timestamp that put this row's own
+                // left edge 4px off the prose's (and, for an assistant turn, off the avatar's).
+                margin: '4px 0 0',
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
@@ -424,7 +559,12 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           </EuiText>
         </EuiFlexItem>
         {!isUser &&
-          toolCalls.map(toolCall => {
+          metaRowToolCalls.map(toolCall => {
+            // `message.table` here, deliberately NOT `renderedTable`: this is the one place the
+            // suppressed 0-row spec is still worth reading, because `describeToolCall` uses it for
+            // exactly one thing — naming the index in the chip's hover title. A suppressed empty
+            // result is precisely when "which index did it read?" matters, and dropping the spec
+            // here would quietly shorten that tooltip. It cannot affect the visible chip text.
             const { short, full } = describeToolCall(toolCall, message.table);
             const isRawOpen = openRawIds.has(toolCall.id);
             return (
@@ -455,13 +595,13 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
             the query behind it, and an analyst has to be able to check that query without reading
             server logs — but nothing here is on screen unbidden. */}
       {!isUser &&
-        toolCalls
+        metaRowToolCalls
           .filter(toolCall => openRawIds.has(toolCall.id))
           .map(toolCall => (
             <div
               key={toolCall.id}
               id={`${rawViewId}-${toolCall.id}`}
-              style={proseStyle}
+              className={PROSE_MEASURE_CLASS}
             >
               <EuiSpacer size='xs' />
               <EuiText size='xs'>
@@ -485,7 +625,11 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   // alongside the in-bubble EuiLoadingContent skeleton/status line is gone — that pair read as two
   // independent "something is happening" signals for the same event.
   const avatarItem = (
-    <EuiFlexItem grow={false}>
+    // `wzMsgAvatarItem` (chat-page.scss): stable class carrying the avatar's small vertical nudge.
+    // A table-bearing (`--wide`) turn no longer breaks this item's inline-start out — the avatar
+    // keeps the same left x as on every other turn, since `.wzMessageRow--wide` anchors the whole
+    // row at the normal left edge (chat-page.scss) rather than correcting each element separately.
+    <EuiFlexItem grow={false} className='wzMsgAvatarItem'>
       <EuiFlexGroup direction='column' alignItems='center' gutterSize='xs'>
         <EuiFlexItem grow={false}>{avatar}</EuiFlexItem>
       </EuiFlexGroup>
@@ -505,11 +649,11 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
       gutterSize='s'
       responsive={false}
     >
+      {/* No avatar item at all on the user side — see the `avatar` comment above. The bubble is
+          then the row's only child, so `justifyContent='flexEnd'` puts its right edge exactly where
+          the composer's own right edge is. */}
       {isUser ? (
-        <>
-          {bubble}
-          {avatarItem}
-        </>
+        bubble
       ) : (
         <>
           {avatarItem}

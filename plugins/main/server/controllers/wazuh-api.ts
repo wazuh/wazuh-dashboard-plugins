@@ -854,7 +854,6 @@ export class WazuhApiCtrl {
               'ip',
               'group',
               'manager',
-              'node_name',
               'dateAdd',
               'version',
               'lastKeepAlive',

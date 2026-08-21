@@ -11,6 +11,7 @@
  */
 
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 import { EuiBasicTable } from '@elastic/eui';
 
@@ -36,26 +37,26 @@ class WzConfigurationIntegrityMonitoringWhoData extends Component {
     const { currentConfig } = this.props;
     return (
       <>
-        {!currentConfig?.['syscheck-syscheck']?.syscheck?.whodata && (
+        {!currentConfig?.fim?.syscheck?.whodata && (
           <WzNoConfig error='not-present' help={helpLinks} />
         )}
-        {currentConfig?.['syscheck-syscheck']?.syscheck?.whodata && (
+        {currentConfig?.fim?.syscheck?.whodata && (
           <WzConfigurationSettingsHeader
             title='Who-data audit keys'
             description='Server will include in its FIM baseline those events being monitored by Audit using audit_key.'
             help={helpLinks}
           >
             <WzConfigurationSettingsGroup
-              config={currentConfig['syscheck-syscheck'].syscheck.whodata}
+              config={currentConfig.fim.syscheck.whodata}
               items={mainSettings}
             />
-            {currentConfig['syscheck-syscheck'].syscheck.whodata.audit_key && (
+            {currentConfig.fim.syscheck.whodata.audit_key && (
               <EuiBasicTable
-                items={currentConfig[
-                  'syscheck-syscheck'
-                ].syscheck.whodata.audit_key.map(item => ({
-                  audit_key: item,
-                }))}
+                items={currentConfig.fim.syscheck.whodata.audit_key.map(
+                  item => ({
+                    audit_key: item,
+                  }),
+                )}
                 columns={columns}
               />
             )}
@@ -65,5 +66,9 @@ class WzConfigurationIntegrityMonitoringWhoData extends Component {
     );
   }
 }
+
+WzConfigurationIntegrityMonitoringWhoData.propTypes = {
+  currentConfig: PropTypes.object,
+};
 
 export default WzConfigurationIntegrityMonitoringWhoData;

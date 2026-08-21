@@ -103,7 +103,7 @@ class WzConfigurationIntegrityMonitoringGeneral extends Component {
           help={helpLinks}
         >
           <WzSettingsGroup
-            config={currentConfig['syscheck-syscheck'].syscheck}
+            config={currentConfig.fim.syscheck}
             items={mainSettingsOfAgentOrManager(agent)}
           />
         </WzConfigurationSettingsHeader>
@@ -112,8 +112,9 @@ class WzConfigurationIntegrityMonitoringGeneral extends Component {
   }
 }
 
-WzConfigurationIntegrityMonitoringGeneral.proptTypes = {
+WzConfigurationIntegrityMonitoringGeneral.propTypes = {
   agent: PropTypes.object,
+  currentConfig: PropTypes.object,
 };
 
 export default WzConfigurationIntegrityMonitoringGeneral;
