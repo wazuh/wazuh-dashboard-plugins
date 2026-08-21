@@ -72,7 +72,7 @@ describe('ResultTable', () => {
     expect(screen.getByText('agent-0')).toBeInTheDocument();
   });
 
-  it('paginates: only the first DEFAULT_PAGE_SIZE (5) rows are in the DOM at once', () => {
+  it('paginates: only the first DEFAULT_PAGE_SIZE (10) rows are in the DOM at once', () => {
     const thirtyRows = Array.from({ length: 30 }, (_unused, i) => ({
       agent: `agent-${i}`,
     }));
@@ -84,12 +84,14 @@ describe('ResultTable', () => {
         })}
       />,
     );
-    // 30 rows is over the auto-expand threshold (10), so the accordion starts collapsed.
-    fireEvent.click(screen.getByText('Results (30 rows)'));
+    // 30 rows is over the auto-expand threshold (200), so the accordion starts open by default —
+    // this is well under that ceiling, so it opens immediately; the click just confirms the toggle
+    // text.
+    expect(screen.getByText('Results (30 rows)')).toBeInTheDocument();
 
     expect(screen.getByText('agent-0')).toBeInTheDocument();
-    expect(screen.getByText('agent-4')).toBeInTheDocument();
-    expect(screen.queryByText('agent-5')).toBeNull();
+    expect(screen.getByText('agent-9')).toBeInTheDocument();
+    expect(screen.queryByText('agent-10')).toBeNull();
     expect(screen.queryByText('agent-29')).toBeNull();
   });
 
@@ -166,10 +168,9 @@ describe('ResultTable', () => {
     });
 
     it('does not enter the expanded state on its own for a tall transcript, only on a user page-size pick', () => {
-      // A tall transcript (> 900px) bumps the INITIAL page size to 10 (5 -> 10) so a long result
-      // doesn't need instant re-paging — but that alone is not a user action, and used to satisfy
-      // `pageSize > DEFAULT_PAGE_SIZE` on its own, silently switching the card to the 900px
-      // "expanded" ceiling for every long transcript regardless of anything the reader did.
+      // Merely measuring a tall transcript must never, on its own, satisfy
+      // `pageSize > DEFAULT_PAGE_SIZE` and silently switch the card to the 900px "expanded"
+      // ceiling — only a reader EXPLICITLY picking a larger page size counts as opting in.
       const thirtyRows = Array.from({ length: 30 }, (_unused, i) => ({
         agent: `agent-${i}`,
       }));
@@ -209,14 +210,15 @@ describe('ResultTable', () => {
     it('shows a working "next page" control that reveals the next slice of rows', () => {
       render(<ResultTable spec={thirtyRowSpec()} />);
 
-      expect(screen.getByText('Page 1 of 6')).toBeInTheDocument();
+      // 30 rows at the default page size (10) is 3 pages.
+      expect(screen.getByText('Page 1 of 3')).toBeInTheDocument();
       expect(screen.getByText('agent-0')).toBeInTheDocument();
-      expect(screen.queryByText('agent-5')).toBeNull();
+      expect(screen.queryByText('agent-10')).toBeNull();
 
       fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
 
-      expect(screen.getByText('Page 2 of 6')).toBeInTheDocument();
-      expect(screen.getByText('agent-5')).toBeInTheDocument();
+      expect(screen.getByText('Page 2 of 3')).toBeInTheDocument();
+      expect(screen.getByText('agent-10')).toBeInTheDocument();
       expect(screen.queryByText('agent-0')).toBeNull();
     });
 
@@ -230,11 +232,12 @@ describe('ResultTable', () => {
         screen.getByRole('button', { name: 'Next page' }),
       ).not.toBeDisabled();
 
-      for (let clickCount = 0; clickCount < 5; clickCount += 1) {
+      // 30 rows / 10 per page (default) = 3 pages, so 2 clicks reach the last one.
+      for (let clickCount = 0; clickCount < 2; clickCount += 1) {
         fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
       }
 
-      expect(screen.getByText('Page 6 of 6')).toBeInTheDocument();
+      expect(screen.getByText('Page 3 of 3')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Next page' })).toBeDisabled();
     });
 
@@ -242,29 +245,29 @@ describe('ResultTable', () => {
       render(<ResultTable spec={thirtyRowSpec()} />);
 
       fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
-      expect(screen.getByText('Page 2 of 6')).toBeInTheDocument();
+      expect(screen.getByText('Page 2 of 3')).toBeInTheDocument();
 
-      fireEvent.click(screen.getByRole('button', { name: '10' }));
-      expect(screen.getByText('Page 1 of 3')).toBeInTheDocument();
-      expect(screen.getByText('agent-9')).toBeInTheDocument();
-      expect(screen.queryByText('agent-10')).toBeNull();
+      fireEvent.click(screen.getByRole('button', { name: '5' }));
+      expect(screen.getByText('Page 1 of 6')).toBeInTheDocument();
+      expect(screen.getByText('agent-4')).toBeInTheDocument();
+      expect(screen.queryByText('agent-5')).toBeNull();
     });
 
-    // "Card grows" (iteration-4 item 3, F2): picking a page size ABOVE the 5-row default is what
+    // "Card grows" (iteration-4 item 3, F2): picking a page size ABOVE the 10-row default is what
     // used to be imperceptible — the card stayed height-capped, so 50 rows just added an internal
     // scrollbar. The approved fix lets the card itself grow past its default cap once the reader
     // has deliberately asked for more rows than the default shows.
-    it('grows past the default cap once a larger page size is chosen, shrinks back at 5', () => {
+    it('grows past the default cap once a larger page size is chosen, shrinks back at the default', () => {
       const { container } = render(<ResultTable spec={thirtyRowSpec()} />);
       const card = () =>
         container.querySelector('.wzResultsCard') as HTMLElement;
 
       expect(card().classList.contains('wzResultsCard--expanded')).toBe(false);
 
-      fireEvent.click(screen.getByRole('button', { name: '10' }));
+      fireEvent.click(screen.getByRole('button', { name: '25' }));
       expect(card().classList.contains('wzResultsCard--expanded')).toBe(true);
 
-      fireEvent.click(screen.getByRole('button', { name: '5' }));
+      fireEvent.click(screen.getByRole('button', { name: '10' }));
       expect(card().classList.contains('wzResultsCard--expanded')).toBe(false);
     });
 
@@ -274,7 +277,7 @@ describe('ResultTable', () => {
       body.scrollTop = 120;
       expect(body.scrollTop).toBe(120);
 
-      fireEvent.click(screen.getByRole('button', { name: '10' }));
+      fireEvent.click(screen.getByRole('button', { name: '5' }));
 
       expect(body.scrollTop).toBe(0);
     });
@@ -320,8 +323,9 @@ describe('ResultTable', () => {
 
     it('renders no pagination footer when every offered page size already fits the result', () => {
       // A one-row table used to get the full "Rows per page: 5 10 25 50" control plus
-      // "Page 1 of 1" — four controls that cannot change anything on screen, since 5 (the smallest
-      // offered size) already holds the whole result. Reported from the UI as looking broken.
+      // "Page 1 of 1" — four controls that cannot change anything on screen, since the CURRENT
+      // page size (the 10-row default) already holds the whole result. Reported from the UI as
+      // looking broken.
       const { container } = render(
         <ResultTable
           spec={spec({
@@ -337,16 +341,39 @@ describe('ResultTable', () => {
       expect(screen.getByText('web-01')).toBeInTheDocument();
     });
 
-    it('renders the footer as soon as a smaller page size would split the result', () => {
-      // Six rows: the current size (5) already pages it, and even if it did not, choosing 5 would.
+    // Issue #9009 (A4): the QA E2E review caught a factually wrong AI prose summary that resulted
+    // from exactly this — a 6-10 row answer used to split onto a hidden page 2 under the old
+    // 5-row default. With the default now 10, a 6-row result fits entirely on one page and the
+    // pager (and every row) must be visible with NO pagination footer at all.
+    it('shows every row with no pagination footer for a 6-row result (the A4 regression case)', () => {
       const sixRows = Array.from({ length: 6 }, (_unused, i) => ({
+        agent: `agent-${i}`,
+      }));
+      const { container } = render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'agent', label: 'Agent' }],
+            rows: sixRows,
+          })}
+        />,
+      );
+      expect(container.querySelector('.wzResultsCardFooter')).toBeNull();
+      for (let i = 0; i < 6; i += 1) {
+        expect(screen.getByText(`agent-${i}`)).toBeInTheDocument();
+      }
+    });
+
+    it('renders the footer as soon as the result exceeds the default page size', () => {
+      // Eleven rows: one more than the 10-row default, so the result genuinely needs a second
+      // page and the pager (with the page-size selector) must reappear.
+      const elevenRows = Array.from({ length: 11 }, (_unused, i) => ({
         agent: `agent-${i}`,
       }));
       render(
         <ResultTable
           spec={spec({
             columns: [{ id: 'agent', label: 'Agent' }],
-            rows: sixRows,
+            rows: elevenRows,
           })}
         />,
       );
@@ -695,6 +722,101 @@ describe('ResultTable', () => {
       fireEvent.click(expandButton);
       expect(screen.queryByText(/"extra": "detail"/)).toBeNull();
     });
+
+    // Issue #9009 (A3): the toggle used to keep the aria-label 'Expand row' after opening and
+    // exposed no `aria-expanded` at all, so a screen-reader/keyboard user got no feedback that a
+    // row had been opened. Both the attribute and the accessible name must flip with the state.
+    it('flips aria-expanded and the accessible name when a row is expanded and collapsed', () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'agent', label: 'Agent' }],
+            rows: [{ agent: 'web-01', extra: 'detail' }],
+          })}
+        />,
+      );
+
+      const expandButton = screen.getByRole('button', { name: 'Expand row' });
+      expect(expandButton).toHaveAttribute('aria-expanded', 'false');
+
+      fireEvent.click(expandButton);
+      expect(
+        screen.getByRole('button', { name: 'Collapse row' }),
+      ).toHaveAttribute('aria-expanded', 'true');
+
+      fireEvent.click(screen.getByRole('button', { name: 'Collapse row' }));
+      expect(
+        screen.getByRole('button', { name: 'Expand row' }),
+      ).toHaveAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // Issue #9009 (A1/A2): the table's accessible caption used to be EuiBasicTable's own default —
+  // built from the CURRENT PAGE's items, since this component paginates by hand rather than
+  // through EuiBasicTable's own `pagination` prop — so a screen-reader user was told "This table
+  // contains 5 rows" on a 6-row result while the visible header read "Results (6 rows)". An
+  // explicit `tableCaption` always states the total, with proper ICU pluralization, and adds the
+  // page position only when the result actually spans more than one page.
+  describe('accessible caption states the total, not the page slice (A1/A2)', () => {
+    it('uses a correctly-pluralized singular caption for one row, matching the visible header', () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'agent', label: 'Agent' }],
+            rows: [{ agent: 'web-01' }],
+          })}
+        />,
+      );
+      expect(screen.getByText('Results (1 row)')).toBeInTheDocument();
+      expect(
+        screen.getByText('This table contains 1 row.'),
+      ).toBeInTheDocument();
+    });
+
+    it('states the TOTAL (not the page slice) when the result fits on one page', () => {
+      const sixRows = Array.from({ length: 6 }, (_unused, i) => ({
+        agent: `agent-${i}`,
+      }));
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'agent', label: 'Agent' }],
+            rows: sixRows,
+          })}
+        />,
+      );
+      expect(screen.getByText('Results (6 rows)')).toBeInTheDocument();
+      expect(
+        screen.getByText('This table contains 6 rows.'),
+      ).toBeInTheDocument();
+    });
+
+    it('adds the total plus the current page position once the result actually paginates', () => {
+      const elevenRows = Array.from({ length: 11 }, (_unused, i) => ({
+        agent: `agent-${i}`,
+      }));
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'agent', label: 'Agent' }],
+            rows: elevenRows,
+          })}
+        />,
+      );
+      expect(
+        screen.getByText(
+          'This table contains 11 rows. Showing rows 1-10, page 1 of 2.',
+        ),
+      ).toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+
+      expect(
+        screen.getByText(
+          'This table contains 11 rows. Showing rows 11-11, page 2 of 2.',
+        ),
+      ).toBeInTheDocument();
+    });
   });
 
   describe('"Open in Discover" affordance', () => {
@@ -827,14 +949,14 @@ describe('ResultTable', () => {
       render(<ResultTable spec={eightColumnSpec()} />);
       expect(
         screen.getByText(
-          'Results (1 rows) (+2 more fields per row. Expand a row to see them.)',
+          'Results (1 row) (+2 more fields per row. Expand a row to see them.)',
         ),
       ).toBeInTheDocument();
     });
 
     it('adds no hidden-columns note when the spec has 6 or fewer columns', () => {
       render(<ResultTable spec={spec()} />);
-      expect(screen.getByText('Results (1 rows)')).toBeInTheDocument();
+      expect(screen.getByText('Results (1 row)')).toBeInTheDocument();
     });
   });
 
@@ -990,6 +1112,143 @@ describe('ResultTable', () => {
       expect(
         screen.getByText('informational, wazuh-generic'),
       ).toBeInTheDocument();
+    });
+  });
+
+  /**
+   * Issue #9009 (J1): at ~480px (the AI Assistant sidecar's reproduction width from the QA E2E
+   * review) an untruncated cell wraps onto several lines and the table becomes unreadable. The
+   * fix detects the CARD'S OWN measured width (not the viewport, since the same generic renderer
+   * mounts both full-page and inside the narrow sidecar) and, below `NARROW_CONTAINER_WIDTH_PX`,
+   * shows only the first `NARROW_MAX_VISIBLE_COLUMNS` columns with truncate-plus-tooltip cells and
+   * no horizontal scroll. Same stub pattern chat-page.test.tsx already uses for its own
+   * ResizeObserver-driven rail-width responsiveness: jsdom has no real ResizeObserver, so the
+   * width has to be injected by hand.
+   */
+  describe('narrow container mode (J1)', () => {
+    function stubContainerWidth(width: number) {
+      class ResizeObserverStub {
+        callback: () => void;
+        constructor(callback: () => void) {
+          this.callback = callback;
+        }
+        observe() {
+          this.callback();
+        }
+        disconnect() {}
+      }
+      const original = (window as unknown as { ResizeObserver?: unknown })
+        .ResizeObserver;
+      (window as unknown as { ResizeObserver: unknown }).ResizeObserver =
+        ResizeObserverStub;
+      const widthSpy = jest
+        .spyOn(HTMLElement.prototype, 'offsetWidth', 'get')
+        .mockReturnValue(width);
+      return () => {
+        widthSpy.mockRestore();
+        (window as unknown as { ResizeObserver: unknown }).ResizeObserver =
+          original;
+      };
+    }
+
+    function wideColumnSpec(): TableSpec {
+      return {
+        columns: [
+          { id: 'agent', label: 'Agent' },
+          { id: 'rule', label: 'Rule' },
+          { id: 'category', label: 'Category' },
+          { id: 'timestamp', label: 'Timestamp' },
+        ],
+        rows: [
+          {
+            agent: 'web-01',
+            rule: 'Multiple authentication failures followed by a successful login',
+            category: 'authentication',
+            timestamp: '2026-07-26T05:58:38.000Z',
+          },
+        ],
+      };
+    }
+
+    it('renders the full column set at ordinary widths (no ResizeObserver / not narrow)', () => {
+      render(<ResultTable spec={wideColumnSpec()} />);
+      const headerTexts = screen
+        .getAllByRole('columnheader')
+        .map(header => header.textContent ?? '');
+      expect(headerTexts).toContain('Agent');
+      expect(headerTexts).toContain('Rule');
+      expect(headerTexts).toContain('Category');
+      expect(headerTexts).toContain('Timestamp');
+    });
+
+    it('shows only the first NARROW_MAX_VISIBLE_COLUMNS (3) columns once the container measures narrow', () => {
+      const restore = stubContainerWidth(480);
+      try {
+        render(<ResultTable spec={wideColumnSpec()} />);
+        const headerTexts = screen
+          .getAllByRole('columnheader')
+          .map(header => header.textContent ?? '');
+        expect(headerTexts).toContain('Agent');
+        expect(headerTexts).toContain('Rule');
+        expect(headerTexts).toContain('Category');
+        // The 4th column is demoted, same "demoted, not deleted" contract as the full-width
+        // MAX_VISIBLE_COLUMNS budget.
+        expect(headerTexts).not.toContain('Timestamp');
+      } finally {
+        restore();
+      }
+    });
+
+    it('keeps every column visible when the measured width is at or above the narrow threshold', () => {
+      const restore = stubContainerWidth(900);
+      try {
+        render(<ResultTable spec={wideColumnSpec()} />);
+        const headerTexts = screen
+          .getAllByRole('columnheader')
+          .map(header => header.textContent ?? '');
+        expect(headerTexts).toContain('Timestamp');
+      } finally {
+        restore();
+      }
+    });
+
+    it('truncates long cell text with a tooltip instead of wrapping, in narrow mode', () => {
+      const restore = stubContainerWidth(480);
+      try {
+        render(<ResultTable spec={wideColumnSpec()} />);
+        const cell = screen.getByText(
+          'Multiple authentication failures followed by a successful login',
+        );
+        // Truncated with a tooltip (EuiToolTip), not wrapped: the value itself is unchanged and
+        // still fully present in the DOM (queryable by its exact text), just visually clipped —
+        // nothing is lost, only how it renders.
+        expect(cell).toHaveClass('wzResultsCellTruncate');
+      } finally {
+        restore();
+      }
+    });
+
+    it('does not truncate cell text at ordinary (non-narrow) widths', () => {
+      render(<ResultTable spec={wideColumnSpec()} />);
+      const cell = screen.getByText(
+        'Multiple authentication failures followed by a successful login',
+      );
+      expect(cell).not.toHaveClass('wzResultsCellTruncate');
+    });
+
+    it('keeps every field reachable via the row expander even with columns demoted in narrow mode', () => {
+      const restore = stubContainerWidth(480);
+      try {
+        render(<ResultTable spec={wideColumnSpec()} />);
+        fireEvent.click(screen.getByRole('button', { name: 'Expand row' }));
+        // The demoted 'timestamp' field is still in the row's full JSON, same "demoted, not
+        // deleted" guarantee the full-width column budget already gives.
+        expect(
+          screen.getByText(/"timestamp": "2026-07-26T05:58:38\.000Z"/),
+        ).toBeInTheDocument();
+      } finally {
+        restore();
+      }
     });
   });
 
