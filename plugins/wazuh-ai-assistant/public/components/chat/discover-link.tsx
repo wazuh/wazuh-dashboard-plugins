@@ -153,7 +153,7 @@ export const DiscoverLink: React.FC<DiscoverLinkProps> = ({
         ? i18n.translate(
             'wazuhAiAssistant.resultTable.openInDiscoverDefaultRange',
             {
-              defaultMessage: 'Open in Discover (last {window})',
+              defaultMessage: 'Open in Discover (default range: {window})',
               values: { window: defaultRangeWindowLabel() },
             },
           )
