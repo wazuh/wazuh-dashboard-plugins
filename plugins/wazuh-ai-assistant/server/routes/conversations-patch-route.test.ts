@@ -46,9 +46,18 @@ const context = {
     },
   },
 };
+// `Router`'s own constructor parameter type (`ContextEnhancer<any, any, any, any>`,
+// src/core/server/http/router/router.ts) is itself `any`-parameterized across all four of its
+// generics -- there is no narrower type to give this without reimplementing that framework
+// type's own inference, and the identical pattern is what
+// update-user-preferences.test.ts (this same convention's origin) uses too.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const enhanceWithContext = (fn: (...args: any[]) => any) =>
   fn.bind(null, context);
 
+// `HttpServer#setup`'s returned `server` is the raw Hapi server instance -- typing it exactly
+// would require importing Hapi's own types just for this one test-scaffolding variable.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let server: HttpServer, innerServer: any;
 
 const STORED_DOCUMENT = {
@@ -96,6 +105,9 @@ beforeAll(async () => {
       allowFromAnyIp: true,
       ipAllowlist: [],
     },
+    // `HttpConfig`'s real type carries many more fields than this minimal test config supplies
+    // -- same reasoning as `enhanceWithContext`'s own cast above.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any;
 
   server = new HttpServer(loggingSystemMock.create(), 'tests');

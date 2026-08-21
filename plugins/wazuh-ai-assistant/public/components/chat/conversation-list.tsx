@@ -287,9 +287,9 @@ export const ConversationList: React.FC<ConversationListProps> = ({
 
   // The rail's own scroll container (below) doubles as a focus target after a delete/bulk-delete
   // closes its confirm modal (m12): EUI's modal otherwise tries to return focus to the row/button
-  // that opened it, which the delete just removed, silently dropping focus to `<body>`. `tabIndex
-  //={-1}` (set on the element below) makes a plain `<div>` programmatically focusable without
-  // adding it to the Tab order.
+  // that opened it, which the delete just removed, silently dropping focus to `<body>`.
+  // `tabIndex={-1}` (set on the element below) makes a plain `<div>` programmatically focusable
+  // without adding it to the Tab order.
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Inline rename (E2): which row (if any) currently shows an input instead of its title text, and
@@ -323,9 +323,6 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   // A rename in progress belongs to ONE specific conversation id -- switching to a different
   // conversation (the row's own onSelect already fired) leaves it pointed at a row that is no
   // longer the point of focus, so clear it rather than let a stale edit linger off-screen.
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally keyed on
-  // activeConversationId alone: clearRename's identity is stable across renders (see below) and
-  // including it would only add noise.
   useEffect(() => {
     renamingIdRef.current = null;
     setRenamingId(null);
