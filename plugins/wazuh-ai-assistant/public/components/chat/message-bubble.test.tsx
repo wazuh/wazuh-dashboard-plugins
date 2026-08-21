@@ -388,7 +388,13 @@ describe('MessageBubble', () => {
     expect(
       screen.getByText('This index is outside what I can query directly.'),
     ).toBeInTheDocument();
-    const link = await screen.findByRole('link', { name: 'Open in Discover' });
+    // dsl `{ bool: { filter: [] } }` carries no explicit time-range clause, so this link falls
+    // back to the last-24h default window (discover-link.tsx) — issue #9008 (I5) requires the
+    // label to say so rather than reading identically to a link that opened the answer's own
+    // resolved window.
+    const link = await screen.findByRole('link', {
+      name: 'Open in Discover (last 24h)',
+    });
     expect(link).toHaveAttribute(
       'href',
       'https://example.test/app/data-explorer/discover#?_a=...',
