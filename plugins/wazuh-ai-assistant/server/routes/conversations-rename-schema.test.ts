@@ -33,7 +33,9 @@ test('renameBodySchema: rejects a whitespace-only title (m10) -- minLength alone
 test('renameBodySchema: accepts a title with incidental leading/trailing whitespace around real content', () => {
   // The schema itself does not trim -- the PATCH handler does (m10, see its own comment) -- this
   // only proves the VALIDATOR does not over-reject real content just because of stray whitespace.
-  assert.doesNotThrow(() => renameBodySchema.validate({ title: '  New title  ' }));
+  assert.doesNotThrow(() =>
+    renameBodySchema.validate({ title: '  New title  ' }),
+  );
 });
 
 test('renameBodySchema: rejects a title longer than CONVERSATION_MAX_TITLE_LENGTH', () => {

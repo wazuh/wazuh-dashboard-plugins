@@ -597,9 +597,7 @@ describe('ConversationList', () => {
       const list = container.querySelector('ul.wzConvoRailGroupList');
       expect(list).not.toBeNull();
       expect(list?.querySelector('li.wzConvoRailListItem')).not.toBeNull();
-      expect(
-        screen.getByText('Row one').closest('li'),
-      ).not.toBeNull();
+      expect(screen.getByText('Row one').closest('li')).not.toBeNull();
     });
   });
 
@@ -984,9 +982,7 @@ describe('ConversationList', () => {
       fireEvent.click(
         screen.getByRole('checkbox', { name: 'Select "Selectable"' }),
       );
-      fireEvent.click(
-        screen.getByRole('button', { name: 'Cancel selection' }),
-      );
+      fireEvent.click(screen.getByRole('button', { name: 'Cancel selection' }));
 
       expect(
         screen.queryByRole('checkbox', { name: 'Select "Selectable"' }),

@@ -804,10 +804,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                   const isRenaming = conversation.id === renamingId;
                   const isChecked = selectedIds.has(conversation.id);
                   return (
-                    <li
-                      key={conversation.id}
-                      className='wzConvoRailListItem'
-                    >
+                    <li key={conversation.id} className='wzConvoRailListItem'>
                       {/* Plain `div` (not EuiFlexGroup) carries the interactive/a11y attributes,
                         since EUI's own prop types don't guarantee accepting arbitrary
                         role/tabIndex/onKeyDown passthrough — EuiFlexGroup nested inside is purely
@@ -887,9 +884,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                               <EuiCheckbox
                                 id={`wzConvoSelect-${conversation.id}`}
                                 checked={isChecked}
-                                onChange={() =>
-                                  toggleSelected(conversation.id)
-                                }
+                                onChange={() => toggleSelected(conversation.id)}
                                 label=''
                                 aria-label={i18n.translate(
                                   'wazuhAiAssistant.chat.conversations.selectMode.selectRow',
@@ -1024,7 +1019,9 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                                 // 3:1 contrast requirement for a control) — 1 on hover, selection, OR
                                 // keyboard focus, so a keyboard/switch user can find and reach this
                                 // control too.
-                                style={{ opacity: isHovered || isSelected ? 1 : 0 }}
+                                style={{
+                                  opacity: isHovered || isSelected ? 1 : 0,
+                                }}
                               >
                                 <EuiButtonIcon
                                   iconType='trash'

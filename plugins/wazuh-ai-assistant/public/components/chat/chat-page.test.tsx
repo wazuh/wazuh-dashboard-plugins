@@ -3545,9 +3545,7 @@ describe('conversation rail: rename, bulk delete, and delete toasts (#9010)', ()
     );
     fireEvent.click(screen.getByRole('button', { name: 'Delete (2)' }));
 
-    expect(
-      screen.getByText('Delete 2 conversations?'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Delete 2 conversations?')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
 
     await waitFor(() =>
@@ -3617,8 +3615,6 @@ describe('conversation rail: rename, bulk delete, and delete toasts (#9010)', ()
     // The active conversation ('conv-a') is the one whose OWN delete failed -- it must still be
     // on screen, not replaced by a fresh empty conversation.
     expect(screen.getByText('earlier question')).toBeInTheDocument();
-    expect(
-      screen.queryByText('Ask the AI Assistant something'),
-    ).toBeNull();
+    expect(screen.queryByText('Ask the AI Assistant something')).toBeNull();
   });
 });

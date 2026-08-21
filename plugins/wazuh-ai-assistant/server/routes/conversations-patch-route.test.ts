@@ -99,7 +99,11 @@ beforeAll(async () => {
   } as any;
 
   server = new HttpServer(loggingSystemMock.create(), 'tests');
-  const router = new Router('', loggingSystemMock.create().get(), enhanceWithContext);
+  const router = new Router(
+    '',
+    loggingSystemMock.create().get(),
+    enhanceWithContext,
+  );
   const { registerRouter, server: innerServerTest } = await server.setup(
     config,
   );

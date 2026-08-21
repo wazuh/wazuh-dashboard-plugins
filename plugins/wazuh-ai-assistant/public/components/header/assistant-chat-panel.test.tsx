@@ -361,15 +361,15 @@ describe('AssistantChatPanel', () => {
     openConversationsPopover();
     const popover = await getPopoverPanel();
 
-    fireEvent.click(
-      within(popover).getByLabelText('Select conversations'),
-    );
+    fireEvent.click(within(popover).getByLabelText('Select conversations'));
     fireEvent.click(
       within(popover).getByRole('checkbox', {
         name: 'Select "Disconnected agents in production"',
       }),
     );
-    fireEvent.click(within(popover).getByRole('button', { name: 'Delete (1)' }));
+    fireEvent.click(
+      within(popover).getByRole('button', { name: 'Delete (1)' }),
+    );
     fireEvent.click(await screen.findByRole('button', { name: 'Delete' }));
 
     expect(mockBulkDeleteConversations).toHaveBeenCalledWith(['c1']);

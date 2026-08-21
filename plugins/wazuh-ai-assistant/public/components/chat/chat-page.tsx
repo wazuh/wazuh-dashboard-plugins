@@ -1671,7 +1671,11 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
         // NO title argument (issue #9010): every PUT through this method omits it, so the server
         // carries the stored title over unchanged — see conversations-service.ts's `update` doc
         // comment for why a resent, freshly recomputed title used to silently revert renames.
-        return await conversationsService.update(id, localMessages, expectedVersion);
+        return await conversationsService.update(
+          id,
+          localMessages,
+          expectedVersion,
+        );
       } catch (firstError) {
         if (getHttpErrorStatus(firstError) !== 409) {
           throw firstError;
@@ -2775,8 +2779,8 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                         })
                       }
                       onDelete={handleDeleteConversation}
-                onRename={handleRenameConversation}
-                onBulkDelete={handleBulkDeleteConversations}
+                      onRename={handleRenameConversation}
+                      onBulkDelete={handleBulkDeleteConversations}
                       displayMode='flyout'
                       onCollapse={handleRailCollapse}
                       onExpand={handleRailExpand}
