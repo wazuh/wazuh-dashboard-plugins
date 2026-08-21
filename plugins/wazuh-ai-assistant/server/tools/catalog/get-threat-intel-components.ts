@@ -2,6 +2,8 @@ import { ToolDefinition } from '../types';
 import {
   clampLimit,
   limitProperty,
+  nameFilterClause,
+  nameFilterProperty,
   objectSchema,
   parseSecurityAnalyticsSpace,
   SECURITY_ANALYTICS_SPACES,
@@ -84,11 +86,12 @@ export const getThreatIntelComponentsTool: ToolDefinition = {
     description:
       'Lists Security Analytics pipeline components: decoders, integrations, policies, filters, ' +
       'or KVDBs (key-value databases). Use for "which decoders/integrations/policies are ' +
-      'active" questions. `component_type="policies"` here means a Security Analytics pipeline ' +
-      'policy (config content), NOT a Security Configuration Assessment (SCA) compliance ' +
-      'benchmark like CIS Ubuntu -- if that is what the question needs and get_sca_results is ' +
-      'available to you this turn, use that one instead. Not for rules (use get_rules) or ' +
-      'threat intel indicators/IOCs.',
+      'active" and "is there a decoder/integration for <topic>" questions. ' +
+      '`component_type="policies"` here means a Security Analytics pipeline policy (config ' +
+      'content), NOT a Security Configuration Assessment (SCA) compliance benchmark like CIS ' +
+      'Ubuntu -- if that is what the question needs and get_sca_results is available to you ' +
+      'this turn, use that one instead. Not for rules (use get_rules) or threat intel ' +
+      'indicators/IOCs.',
     parameters: objectSchema(
       {
         component_type: {
@@ -96,6 +99,7 @@ export const getThreatIntelComponentsTool: ToolDefinition = {
           description: 'Which component family to list.',
           enum: [...COMPONENT_TYPES],
         },
+        name: nameFilterProperty('component'),
         enabled: {
           type: 'string',
           description:
@@ -131,6 +135,8 @@ export const getThreatIntelComponentsTool: ToolDefinition = {
     }
     const index = COMPONENT_INDEX[componentType as ComponentType];
 
+    const name =
+      typeof params.name === 'string' ? params.name.trim() : undefined;
     const enabled =
       typeof params.enabled === 'string' &&
       (ENABLED_VALUES as readonly string[]).includes(params.enabled)
@@ -146,6 +152,21 @@ export const getThreatIntelComponentsTool: ToolDefinition = {
     if (space) {
       filter.push({ term: { 'space.name': space } });
     }
+    if (name) {
+      // `document.metadata.title` is mapped `keyword` on every one of the 5 sub-indices;
+      // `document.name` is mapped `keyword` too but only EXISTS on `decoders` and `filters` --
+      // `integrations`/`policies`/`kvdbs` have no `document.name` field at all, so for those
+      // three types the should-clause above is description-only by construction (a `term`/
+      // `prefix` against an unmapped field is 0 hits, not an error). See `nameFilterClause`'s
+      // doc comment for why this needs no leading wildcard.
+      filter.push(
+        nameFilterClause(
+          name,
+          ['document.name', 'document.metadata.title'],
+          'document.metadata.description',
+        ),
+      );
+    }
 
     return {
       target: 'indexer',
@@ -157,9 +178,14 @@ export const getThreatIntelComponentsTool: ToolDefinition = {
         // for zero behavioral gain. `space.name` is read by executor.ts's
         // `resolveSecurityAnalyticsSpace` to fill in `buildSecurityAnalyticsLink`'s `space`, and
         // also shown as its own "Space" table column (see tableSpec below).
+        // `document.metadata.description` (mapped `text`, confirmed live on all 5 sub-indices)
+        // closes defect #4 of AI/plan/qa-rules-decoders-rootcause.md: it is the only field that
+        // answers "what does this decoder/integration do" -- kept out of `tableSpec.columns`
+        // (too wide for a table cell) and surfaced via `rowFields`/`digest.sampleColumns` instead.
         _source: [
           'document.name',
           'document.metadata.title',
+          'document.metadata.description',
           'document.enabled',
           'document.category',
           'document.mode',
@@ -204,6 +230,7 @@ export const getThreatIntelComponentsTool: ToolDefinition = {
     // excluded entirely -- plumbing, not analyst-facing content.
     rowFields: [
       'document.name',
+      'document.metadata.description',
       'document.category',
       'document.mode',
       'document.metadata.module',
@@ -215,6 +242,7 @@ export const getThreatIntelComponentsTool: ToolDefinition = {
   digest: {
     sampleColumns: [
       'document.metadata.title',
+      'document.metadata.description',
       'document.enabled',
       'space.name',
       'document.name',

@@ -236,7 +236,7 @@ function toPersistedTable(table?: TableSpec): TableSpec | undefined {
  * `reconstructConversation` can rebuild both halves. `statusMessage`/`isStreaming` stay unpersisted:
  * they describe a turn IN PROGRESS and are meaningless once it has ended.
  *
- * (server/saved_objects/conversation.ts's PRIVACY INTERACTION doc comment still governs what this
+ * (server/conversation-store.ts's PRIVACY INTERACTION doc comment still governs what this
  * means at rest: these messages are real-valued, and the pseudonym map is never persisted.)
  *
  * Everything is trimmed to what the server accepts (`common/constants.ts`) BEFORE the payload is

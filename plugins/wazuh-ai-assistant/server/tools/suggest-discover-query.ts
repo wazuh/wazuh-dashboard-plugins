@@ -62,10 +62,13 @@ export const SUGGEST_DISCOVER_QUERY_TOOL: ToolSpec = {
     'before you finish whenever: no other tool available to you covers what the user asked about ' +
     'at all; a tool call came back with zero rows and that zero is your whole answer; or the ' +
     'rows you would need were truncated away and the question depends on seeing every row. Shows ' +
-    'the user a query they can run themselves in Discover, with your reason shown alongside it — ' +
-    'say plainly what you could not check or confirm. This is NOT a way to fetch data yourself: ' +
-    'nothing here is executed on your behalf, and it never replaces answering with data you ' +
-    'already have — use it to close out only the parts you could not verify.',
+    'the user your reason plus an "Open in Discover" link they can click to run the query ' +
+    'themselves — no query text is displayed, only that link, so say plainly what you could not ' +
+    'check or confirm and, if you refer to the handoff at all, call it "the Discover link", never ' +
+    '"the query below" or any other description of a visible query block. This is NOT a way to ' +
+    'fetch data yourself: nothing here is executed on your behalf, and it never replaces ' +
+    'answering with data you already have — use it to close out only the parts you could not ' +
+    'verify.',
   parameters: {
     type: 'object',
     properties: {

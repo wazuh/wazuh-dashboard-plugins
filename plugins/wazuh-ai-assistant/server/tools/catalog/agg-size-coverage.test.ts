@@ -45,6 +45,13 @@ function sampleValue(name: string, prop: JsonSchemaProperty): unknown {
   if (name === 'limit') {
     return ABSURD_LIMIT;
   }
+  // get_field_values' `field` param is restricted to guardrails.ts's AGG_FIELD_ALLOWLIST -- a
+  // generic sample string throws (correctly) rather than reaching an aggregation size question.
+  // "wazuh.agent.id" is chosen because its FIELD_LOCATIONS include "events", the family every
+  // other enum property (including this tool's own `index_family`) samples first here.
+  if (name === 'field') {
+    return 'wazuh.agent.id';
+  }
   // A `jsonString: true` param (common/types.ts) carries JSON inside a string — search_wazuh_data's
   // `query_dsl` is the only one today. Detected from the schema MARKER rather than the param name so
   // a future jsonString param is handled without editing this file.

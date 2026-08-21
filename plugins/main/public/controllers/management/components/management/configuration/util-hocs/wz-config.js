@@ -10,20 +10,39 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import withLoading from './loading';
+import WzNoConfig from '../util-components/no-config';
 import { getCurrentConfig } from '../utils/wz-fetch';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { updateWazuhNotReadyYet } from '../../../../../../redux/actions/appStateActions';
 
 /**
+ * Rendered when the configuration could not be fetched at all, so a failure is
+ * not reported as a section the user never configured. `WzNoConfig` shows the
+ * generic "problem while fetching" message for any error other than
+ * `not-present`; the error itself reaches the user through the error
+ * orchestrator, which `withLoading` already notifies.
+ */
+const WzConfigurationError = ({ error }) => (
+  <WzNoConfig error={typeof error === 'string' ? error : 'fetch-error'} />
+);
+
+WzConfigurationError.propTypes = {
+  error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+};
+
+/**
+ * Provides `currentConfig` to the wrapped component.
  *
- * @param {string} agentId
- * @param {[]} sections
- * @param {React Component} LoadingComponent
- * @param {React Component} ErrorComponent
- * @param {function} throwError
+ * In manager context it holds the requested sections keyed by
+ * `component-configuration`. In agent context it holds the agent's last
+ * reported configuration keyed by module name, and `sections` does not apply:
+ * the whole report is read from the index in a single request.
+ *
+ * @param {[]} [sections] Sections to fetch. Manager context only
  */
 
 const mapStateToProps = state => ({
@@ -35,12 +54,13 @@ const mapDispatchToProps = dispatch => ({
   updateWazuhNotReadyYet: value => dispatch(updateWazuhNotReadyYet(value)),
 });
 
-const withWzConfig = sections => WrappedComponent =>
-  compose(
-    connect(mapStateToProps, mapDispatchToProps),
-    withLoading(
-      async props => {
-        try {
+const withWzConfig =
+  (sections = []) =>
+  WrappedComponent =>
+    compose(
+      connect(mapStateToProps, mapDispatchToProps),
+      withLoading(
+        async props => {
           // If no agent, use clusterNodeSelected as fallback
           const agentId = props.agent?.id || props.clusterNodeSelected;
           if (!agentId) {
@@ -54,6 +74,11 @@ const withWzConfig = sections => WrappedComponent =>
 
           // Use clusterNodeSelected only if there's no agent (manager context)
           const node = props.agent?.id ? false : props.clusterNodeSelected;
+          /* Errors are deliberately not caught here. In manager context a
+          section that fails is already resolved to its own error message, so
+          only a total failure reaches this point, and swallowing it would make
+          the views report a configuration the user never wrote instead of a
+          fetch that did not work. */
           const currentConfig = await getCurrentConfig(
             agentId,
             sections,
@@ -61,16 +86,15 @@ const withWzConfig = sections => WrappedComponent =>
             props.updateWazuhNotReadyYet,
           );
           return { ...props, currentConfig };
-        } catch (error) {
-          return { ...props, currentConfig: {}, error };
-        }
-      },
-      (props, prevProps) =>
-        (props.clusterNodeSelected &&
-          prevProps.clusterNodeSelected &&
-          props.clusterNodeSelected !== prevProps.clusterNodeSelected) ||
-        props.refreshTime !== prevProps.refreshTime,
-    ),
-  )(WrappedComponent);
+        },
+        (props, prevProps) =>
+          (props.clusterNodeSelected &&
+            prevProps.clusterNodeSelected &&
+            props.clusterNodeSelected !== prevProps.clusterNodeSelected) ||
+          props.refreshTime !== prevProps.refreshTime,
+        undefined,
+        WzConfigurationError,
+      ),
+    )(WrappedComponent);
 
 export default withWzConfig;

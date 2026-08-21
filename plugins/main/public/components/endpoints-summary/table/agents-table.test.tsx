@@ -4,8 +4,6 @@ import { AgentsTable } from './agents-table';
 import { WzRequest } from '../../../react-services/wz-request';
 import configureMockStore from 'redux-mock-store';
 import { Provider } from 'react-redux';
-import { useUserPermissionsRequirements } from '../../common/hooks/useUserPermissions';
-import { useGetUpgradeTasks } from '../hooks';
 
 jest.mock('../../common/hooks/use-app-config', () => ({
   useAppConfig: () => ({
@@ -23,7 +21,6 @@ const data = [
     name: 'Debian agent',
     ip: '127.0.0.1',
     status: 'active',
-    group_config_status: 'not synced',
     group: [
       'default',
       'test',
@@ -63,13 +60,10 @@ const data = [
       name: 'Debian agent',
       status: 'active',
       manager: 'wazuh-manager-master-0',
-      node_name: 'master',
       lastKeepAlive: '9999-12-31T23:59:59Z',
       version: 'Wazuh v4.5.0',
-      group_config_status: 'not synced',
     },
     version: 'v4.5.0',
-    node_name: 'master',
     dateAdd: 'Aug 25, 2022 @ 18:17:46.000',
     lastKeepAlive: 'Jan 1, 10000 @ 00:59:59.000',
     actions: {
@@ -100,10 +94,8 @@ const data = [
       name: 'Debian agent',
       status: 'active',
       manager: 'wazuh-manager-master-0',
-      node_name: 'master',
       lastKeepAlive: '9999-12-31T23:59:59Z',
       version: 'Wazuh v4.5.0',
-      group_config_status: 'not synced',
     },
     upgrading: true,
   },
@@ -112,7 +104,6 @@ const data = [
     name: 'wazuh-manager-master-0',
     ip: '127.0.0.1',
     status: 'active',
-    group_config_status: 'synced',
     group: ['default', 'test', 'test2', 'test3', 'test4'],
     os_name: {
       os: {
@@ -132,13 +123,10 @@ const data = [
       name: 'wazuh-manager-master-0',
       status: 'active',
       manager: 'wazuh-manager-master-0',
-      node_name: 'master',
       lastKeepAlive: '9999-12-31T23:59:59Z',
       version: 'Wazuh v4.5.0',
-      group_config_status: 'synced',
     },
     version: 'v4.5.0',
-    node_name: 'master',
     dateAdd: 'Aug 25, 2022 @ 18:17:46.000',
     lastKeepAlive: 'Jan 1, 10000 @ 00:59:59.000',
     actions: {
@@ -159,10 +147,8 @@ const data = [
       name: 'wazuh-manager-master-0',
       status: 'active',
       manager: 'wazuh-manager-master-0',
-      node_name: 'master',
       lastKeepAlive: '9999-12-31T23:59:59Z',
       version: 'Wazuh v4.5.0',
-      group_config_status: 'synced',
     },
     upgrading: false,
   },
@@ -171,7 +157,6 @@ const data = [
     name: 'disconnected-agent',
     ip: '111.111.1.111',
     status: 'disconnected',
-    group_config_status: 'not synced',
     group: ['default', 'test'],
     os_name: {
       os: {
@@ -190,17 +175,13 @@ const data = [
       dateAdd: '1970-01-01T00:00:00Z',
       group: ['default', 'test'],
       lastKeepAlive: '2023-03-14T04:20:51Z',
-      node_name: 'node01',
       registerIP: 'any',
       id: '003',
       version: 'Wazuh v4.3.10',
       ip: '111.111.1.111',
-      mergedSum: 'e669d89eba52f6897060fc65a45300ac',
       configSum: '97fccbb67e250b7c80aadc8d0dc59abe',
-      group_config_status: 'not synced',
     },
     version: 'v4.3.10',
-    node_name: 'node01',
     dateAdd: 'Jan 1, 1970 @ 01:00:00.000',
     lastKeepAlive: 'Mar 14, 2023 @ 05:20:51.000',
     actions: {
@@ -220,14 +201,11 @@ const data = [
       dateAdd: '1970-01-01T00:00:00Z',
       group: ['default', 'test'],
       lastKeepAlive: '2023-03-14T04:20:51Z',
-      node_name: 'node01',
       registerIP: 'any',
       id: '003',
       version: 'Wazuh v4.3.10',
       ip: '111.111.1.111',
-      mergedSum: 'e669d89eba52f6897060fc65a45300ac',
       configSum: '97fccbb67e250b7c80aadc8d0dc59abe',
-      group_config_status: 'not synced',
     },
     upgrading: false,
   },
@@ -239,21 +217,11 @@ const defaultColumns = [
   'ip',
   'group',
   'os.name,os.version',
-  'node_name',
   'version',
   'actions',
-  'group_config_status',
 ];
 
-const customColumns = [
-  'id',
-  'name',
-  'ip',
-  'version',
-  'actions',
-  'status',
-  'group_config_status',
-];
+const customColumns = ['id', 'name', 'ip', 'version', 'actions', 'status'];
 
 const localStorageMock = (function () {
   let store = {
@@ -333,16 +301,6 @@ jest.mock('react', () => ({
   useLayoutEffect: jest.requireActual('react').useEffect,
 }));
 
-jest.mock('../../common/hooks/useUserPermissions', () => ({
-  ...jest.requireActual('../../common/hooks/useUserPermissions'),
-  useUserPermissionsRequirements: jest.fn().mockReturnValue([false, {}]),
-}));
-
-jest.mock('../hooks', () => ({
-  ...jest.requireActual('../hooks'),
-  useGetUpgradeTasks: jest.fn().mockReturnValue({}),
-}));
-
 // TODO: Fix this test
 describe('AgentsTable component', () => {
   WzRequest.apiReq = jest.fn(AgentsTable, 'wzReq').mockResolvedValue({
@@ -416,44 +374,5 @@ describe('AgentsTable component', () => {
     expect(
       window.localStorage.getItem('wz-agents-overview-table-visible-fields'),
     ).toEqual(JSON.stringify(customColumns));
-  });
-
-  it('does not allow AgentUpgradesInProgress to fetch tasks when the task:status permission is missing', () => {
-    (useUserPermissionsRequirements as jest.Mock).mockReturnValue([
-      [{ action: 'task:status', resource: '*:*:*' }],
-      {},
-    ]);
-
-    render(
-      <Provider store={store}>
-        <AgentsTable
-          filters={[]}
-          showOnlyOutdated={false}
-          setShowOnlyOutdated={() => jest.fn()}
-          totalOutdated={0}
-          externalReload={false}
-        />
-      </Provider>,
-    );
-
-    expect(useGetUpgradeTasks).toHaveBeenCalledWith(false, false);
-  });
-
-  it('allows AgentUpgradesInProgress to fetch tasks when the task:status permission is granted', () => {
-    (useUserPermissionsRequirements as jest.Mock).mockReturnValue([false, {}]);
-
-    render(
-      <Provider store={store}>
-        <AgentsTable
-          filters={[]}
-          showOnlyOutdated={false}
-          setShowOnlyOutdated={() => jest.fn()}
-          totalOutdated={0}
-          externalReload={false}
-        />
-      </Provider>,
-    );
-
-    expect(useGetUpgradeTasks).toHaveBeenCalledWith(false, true);
   });
 });

@@ -8,7 +8,7 @@ import { setApiKeyCipher } from '../plugin-services';
 
 /**
  * The encryption gate `requireApiKeyEncryption` runs in POST /providers and PUT /providers/{id}
- * (server/routes/settings.ts) before any saved-object write: a non-empty `apiKey` is refused with
+ * (server/routes/settings.ts) before any document write: a non-empty `apiKey` is refused with
  * HTTP 503 unless the encryption-at-rest cipher is enabled, so a provider API key can never be
  * stored in plain text (see docs/ENCRYPTION.md). These cases prove the gate refuses a key without
  * encryption, admits one with it, and never fires for credential-less providers.

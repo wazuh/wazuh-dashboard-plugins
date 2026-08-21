@@ -1,3 +1,4 @@
+import rison from 'rison-node';
 import NavigationService from '../../../../../react-services/navigation-service';
 import {
   threatHunting,
@@ -11,7 +12,6 @@ import {
   regulatoryCompliance,
   endpointSummary,
 } from '../../../../../utils/applications';
-import rison from 'rison-node';
 import {
   FILTER_OPERATOR,
   PatternDataSourceFilterManager,
@@ -235,8 +235,8 @@ const SECURITY_ANALYTICS_APP_IDS = {
  */
 const AI_ASSISTANT_APP_ID = 'wazuhAiAssistant';
 
-/** Opens the AI Assistant app from its Home overview card (see
- * `../components/overview/ai-assistant-cta.tsx`). */
+/** Opens the AI Assistant app from its Home overview shortcut (see the popover title in
+ * `../components/quick-access/quick-access-menu.tsx`). */
 export const getAiAssistantUrl = () => getUrlForApp(AI_ASSISTANT_APP_ID);
 
 export const getRulesUrl = () => getUrlForApp(SECURITY_ANALYTICS_APP_IDS.rules);

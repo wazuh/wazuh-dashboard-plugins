@@ -109,6 +109,16 @@ export interface ToolDefinition {
   digest: {
     sampleColumns: string[];
     /**
+     * Opt-in per-field truncation for sample columns whose source text is long free prose (e.g.
+     * SCA's `check.rationale`/`check.remediation` — see `get-sca-checks.ts`). `digest.ts`'s
+     * `truncateLongFieldValues` uses `sampleFieldMaxLength[key]` in place of the generic
+     * `MAX_FIELD_VALUE_LENGTH` when a key is listed here, so a field that is routinely long can be
+     * capped tighter than the shared default without lowering it for every other tool. Keys not
+     * listed (or when this map itself is `undefined`, every tool but SCA) fall back to
+     * `MAX_FIELD_VALUE_LENGTH` unchanged.
+     */
+    sampleFieldMaxLength?: Record<string, number>;
+    /**
      * Opt-in (currently only the 8 finding-hits tools, via `catalog/common.ts`'s
      * `FINDING_BREAKDOWN_DIMENSIONS`): dot-paths digest.ts's `buildDigest` groups ALL returned
      * rows by (not just the `MAX_SAMPLES` slice) to synthesize a `breakdown` when the tool's own
@@ -187,4 +197,29 @@ export interface ToolDefinition {
    * cannot guess one wrong, and would pay a `_field_caps` round trip on every call for no benefit.
    */
   validateFieldNames?: boolean;
+  /**
+   * Cost-budget class for chat.ts's tool-round COST budget (workstream C, the fixed-3-round ->
+   * cost-unit redesign; see chat.ts's `BASE_BUDGET_UNITS` doc comment for the calibration this
+   * scale is measured against). A deliberately explicit, per-tool, testable classification instead
+   * of guessing a cost from request shape at call time:
+   *   1 = aggregation-only request -- a top-level `size: 0` body whose ONLY output is
+   *       aggregation buckets, no hit documents (e.g. get_top_rules, get_top_agents,
+   *       get_security_summary, get_mitre_summary, get_compliance_summary, get_sca_results,
+   *       get_field_values -- every one of these builds its Indexer request with `size: 0`).
+   *       Cheapest class: bounded bucket counts, no per-hit fetch cost.
+   *   2 = DEFAULT (used whenever this field is omitted) -- a filtered/typed hits search: every
+   *       ordinary catalog tool that returns actual matched documents (get_agents,
+   *       get_critical_findings, search_findings_by_agent, get_vulnerabilities*, get_fim_files,
+   *       get_sca_checks, get_agent_inventory, get_rules, ... -- the broad middle of the catalog).
+   *   3 = escape-hatch / free DSL (search_wazuh_data ONLY) -- unconstrained caller-authored query
+   *       shape, the heaviest and least-bounded request this catalog can issue.
+   * `undefined` on every tool that doesn't set it explicitly resolves to 2 via
+   * registry.ts's `getToolCostClass` -- adding a brand-new tool with no opinion on this field costs
+   * the ordinary default, never silently free (1) or silently the escape-hatch weight (3).
+   *
+   * Deliberately NOT read from `ToolSpec` (common/types.ts): this is server-side orchestration
+   * bookkeeping the model is never shown, not part of the wire tool schema every adapter forwards
+   * to the provider.
+   */
+  costClass?: 1 | 2 | 3;
 }

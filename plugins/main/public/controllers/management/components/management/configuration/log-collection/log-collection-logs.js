@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
@@ -19,7 +20,7 @@ import { isString, renderValueOrNoValue } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 
 import helpLinks from './help-links';
-import { LOGCOLLECTOR_LOCALFILE_PROP, LOCALFILE_LOGS_PROP } from './types';
+import { LOGCOLLECTOR_PROP, LOCALFILE_LOGS_PROP } from './types';
 
 const renderTargetField = item => (item ? item.join(', ') : 'agent');
 const renderArrayObjectField = arrayObjectField => {
@@ -86,11 +87,9 @@ class WzConfigurationLogCollectionLogs extends Component {
   }
   render() {
     const { currentConfig, agent } = this.props;
-    const items = currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[
-      LOCALFILE_LOGS_PROP
-    ]
+    const items = currentConfig?.[LOGCOLLECTOR_PROP]?.[LOCALFILE_LOGS_PROP]
       ? settingsListBuilder(
-          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_LOGS_PROP],
+          currentConfig[LOGCOLLECTOR_PROP][LOCALFILE_LOGS_PROP],
           [
             'file',
             'alias',
@@ -104,20 +103,18 @@ class WzConfigurationLogCollectionLogs extends Component {
       : [];
     return (
       <Fragment>
-        {isString(currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]) && (
+        {isString(currentConfig?.[LOGCOLLECTOR_PROP]) && (
           <WzNoConfig
-            error={currentConfig[LOGCOLLECTOR_LOCALFILE_PROP]}
+            error={currentConfig[LOGCOLLECTOR_PROP]}
             help={helpLinks}
           />
         )}
-        {!isString(currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]) &&
-        !currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[LOCALFILE_LOGS_PROP]
-          ?.length ? (
+        {!isString(currentConfig?.[LOGCOLLECTOR_PROP]) &&
+        !currentConfig?.[LOGCOLLECTOR_PROP]?.[LOCALFILE_LOGS_PROP]?.length ? (
           <WzNoConfig error='not-present' help={helpLinks} />
         ) : null}
-        {!isString(currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]) &&
-        currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[LOCALFILE_LOGS_PROP]
-          ?.length ? (
+        {!isString(currentConfig?.[LOGCOLLECTOR_PROP]) &&
+        currentConfig?.[LOGCOLLECTOR_PROP]?.[LOCALFILE_LOGS_PROP]?.length ? (
           <WzConfigurationSettingsHeader
             title='Logs files'
             description='List of log files that will be analyzed'
@@ -133,5 +130,9 @@ class WzConfigurationLogCollectionLogs extends Component {
     );
   }
 }
+
+WzConfigurationLogCollectionLogs.propTypes = {
+  currentConfig: PropTypes.object,
+};
 
 export default WzConfigurationLogCollectionLogs;

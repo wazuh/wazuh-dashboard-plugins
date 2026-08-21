@@ -18,7 +18,7 @@ is bounded by the same fact: the worst it can trigger is another read the user w
 allowed to perform. Answers are rendered through EUI's markdown component with raw HTML disabled
 (verified against stored-XSS probes).
 
-## Admin gating
+## Settings and providers: authorized by indexer RBAC
 
 Provider management (`POST/PUT/DELETE /providers`, set-default, connection test) and settings
 writes are gated on `wazuh-core`'s `dashboardSecurity.isAdministratorUser` check.

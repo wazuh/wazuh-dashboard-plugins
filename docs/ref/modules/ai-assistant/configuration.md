@@ -1,7 +1,9 @@
 # Configuration
 
-The AI Assistant needs **one administrator action** before it is usable: configuring at least one
-provider under **AI Assistant → Settings**. Everything else has safe defaults.
+The AI Assistant needs **one initial setup step** before it is usable: configuring at least one
+provider under **AI Assistant → Settings**. Everything else has safe defaults. Who can take that
+step is decided by the Wazuh indexer's own RBAC — see
+[Security](./security.md#settings-and-providers-authorized-by-indexer-rbac).
 
 ## Dashboard configuration keys
 
@@ -29,9 +31,11 @@ caveats.
 
 ## Settings view
 
-**AI Assistant → Settings** has three sections. Provider and privacy management require an
-**administrator**; the page detects a non-admin on mount and disables the save actions with an
-explanatory warning instead of failing on submit.
+**AI Assistant → Settings** has three sections. Provider and privacy management are open to any
+authenticated user. Whether a save actually succeeds depends on the calling user's own Wazuh
+indexer backend role carrying the relevant `plugin:wazuh/ai_assistant/settings/{read,write}`
+permission (see [Security](./security.md#required-indexer-permissions)); a caller without it gets
+the indexer's own error message back.
 
 ### Providers
 
@@ -40,7 +44,7 @@ Create, edit, delete, and test providers, and choose the default one.
 | Field        | Description                                                                                                                                                             |
 | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Name**     | Display name shown in the chat provider selector.                                                                                                                       |
-| **Type**     | `OpenAI-compatible`, `Anthropic`, or `Wazuh hosted brain`.                                                                                                              |
+| **Type**     | `OpenAI-compatible` or `Anthropic` — see [Providers](./providers.md) for which services and models under each type are verified working.                                |
 | **Base URL** | Endpoint root. Checked by the SSRF guard on every request; private/loopback addresses are allowed (self-hosted gateways), cloud-metadata and link-local ranges are not. |
 | **Model**    | Model identifier passed through to the provider.                                                                                                                        |
 | **API key**  | Optional; write-only (the UI only ever shows whether a key is set). Saving one requires `encryptionKey` to be configured; always encrypted at rest.                     |
@@ -63,18 +67,18 @@ Retention and housekeeping for the caller's stored conversations (per-user cap: 
 
 ## HTTP API
 
-All routes live under `/api/wazuh_ai_assistant` and enforce the same rules as the UI (admin gate
-on provider/settings writes, owner scoping on conversations):
+All routes live under `/api/wazuh_ai_assistant` and enforce the same rules as the UI (indexer RBAC
+on provider/settings reads and writes, owner scoping on conversations):
 
-| Route                                                           | Purpose                                                                              |
-| --------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `POST /chat`                                                    | Chat turn; responds as an SSE stream.                                                |
-| `GET/POST /providers`, `GET/PUT/DELETE /providers/{id}`         | Provider CRUD (writes admin-only; responses carry `hasApiKey`, never keys).          |
-| `POST /providers/{id}/test`                                     | Connectivity test (admin-only).                                                      |
-| `POST /providers/{id}/default`                                  | Set the default provider (admin-only).                                               |
-| `GET/PUT /settings`                                             | Singleton assistant settings (PUT admin-only; GET creates defaults on first access). |
-| `GET /settings/access`                                          | Non-403 admin probe used by the Settings page on mount.                              |
-| `GET/POST /conversations`, `GET/PUT/DELETE /conversations/{id}` | Owner-scoped conversation CRUD.                                                      |
+| Route                                                           | Purpose                                                                                                             |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `POST /chat`                                                    | Chat turn; responds as an SSE stream.                                                                               |
+| `GET/POST /providers`, `GET/PUT/DELETE /providers/{id}`         | Provider CRUD (writes need the indexer's `.../settings/write` permission; responses carry `hasApiKey`, never keys). |
+| `POST /providers/{id}/test`                                     | Connectivity test (same indexer write permission).                                                                  |
+| `POST /providers/{id}/default`                                  | Set the default provider (same indexer write permission).                                                           |
+| `GET/PUT /settings`                                             | Singleton assistant settings (PUT needs the same indexer write permission; GET creates defaults on first access).   |
+| `GET /settings/access`                                          | Non-403 Manager-session liveness probe (not an authorization check) plus capability flags for the Settings page.    |
+| `GET/POST /conversations`, `GET/PUT/DELETE /conversations/{id}` | Owner-scoped conversation CRUD.                                                                                     |
 
 ## Internationalization
 

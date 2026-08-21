@@ -31,6 +31,7 @@ import {
   buildNearMissIncludePattern,
   extractRequestedAgentNames,
   findNearMissSiblings,
+  findUnmatchedAgentNames,
 } from './entity-resolution';
 import { rollUpTechniqueIdFilters } from './technique-rollup';
 import {
@@ -72,6 +73,10 @@ function finalizeDigest(
   // (get_agent_inventory) sets this so its unlisted-field default is fail-closed (anonymize)
   // instead of the curated typed tools' allow-by-omission — see privacy.ts's applyFieldPolicy.
   isEscapeHatch = false,
+  // Threaded from the calling tool's `def.digest.sampleFieldMaxLength` (types.ts) so the re-run of
+  // `capDigest` after pseudonym substitution keeps applying the SAME per-field cap the first run
+  // (buildDigest, digest.ts) used — see capDigest's doc comment.
+  sampleFieldMaxLength?: Record<string, number>,
 ): Digest {
   if (!privacy) {
     return digest;
@@ -85,6 +90,7 @@ function finalizeDigest(
       toolName,
       isEscapeHatch,
     ),
+    sampleFieldMaxLength,
   );
 }
 
@@ -245,6 +251,16 @@ const MAX_NEAR_MISS_NAMES = 5;
 const MAX_NEAR_MISS_SENTENCES = 3;
 const MAX_NEAR_MISS_SIBLINGS = 3;
 
+/** REVIEW FIX A1 (groupA-regression-review.md): a purely-numeric token is a Manager agent ID
+ * (`agent_identifier`, or the #8913 deictic path's `pickAgentValue(..., 'id-or-name')`), never a
+ * `wazuh.agent.name` value -- the "unmatched name" disclosure's probe only aggregates
+ * `wazuh.agent.name`, so an ID can never appear in its bucket set regardless of whether the agent
+ * is real, healthy, and simply has zero rows in this index/window. Tokens matching this are
+ * skipped from that disclosure entirely rather than risk a false "no agent named 001" on a clean
+ * host. Deliberately narrow (`^\d+$`, no leading/trailing text) -- a name that merely CONTAINS
+ * digits (e.g. "web-prod-01") is still a name, not an id, and stays eligible for the disclosure. */
+const ID_SHAPED_TOKEN_RE = /^\d+$/;
+
 /** Matches a dotted MITRE sub-technique id ("T1059.001") as a breakdown bucket key. */
 const SUB_TECHNIQUE_KEY_RE = /^T\d+\.\d+$/;
 
@@ -369,29 +385,96 @@ async function appendEntityNearMissHint(
       .map(bucket => (bucket as { key?: unknown })?.key)
       .filter((key): key is string => typeof key === 'string');
     const nearMisses = findNearMissSiblings(requestedNames, indexedNames);
-    if (nearMisses.length === 0) {
-      return;
-    }
     const display = (name: string): string =>
       privacy ? privacy.pseudonymizer.pseudonymize(name, 'HOST') : name;
-    // Bounded on both axes (names above, siblings/sentences here): agent_names declares no
-    // maxItems, so an unbounded hint could evict every sample row from the digest and still
-    // bust the char cap -- capDigest's hint-length cap is the backstop, this is the shaper.
-    const sentences = nearMisses
-      .slice(0, MAX_NEAR_MISS_SENTENCES)
-      .map(
-        ({ requested, siblings }) =>
-          `The agent-name filter "${display(
-            requested,
-          )}" also nearly matches distinct ` +
-          `agent(s) with data: ${siblings
-            .slice(0, MAX_NEAR_MISS_SIBLINGS)
-            .map(display)
-            .join(
-              ', ',
-            )}. If the user named one of those, re-run with that exact name -- ` +
-          'never silently substitute one host for another.',
+    const sentences: string[] = [];
+    if (nearMisses.length > 0) {
+      // Bounded on both axes (names above, siblings/sentences here): agent_names declares no
+      // maxItems, so an unbounded hint could evict every sample row from the digest and still
+      // bust the char cap -- capDigest's hint-length cap is the backstop, this is the shaper.
+      sentences.push(
+        ...nearMisses
+          .slice(0, MAX_NEAR_MISS_SENTENCES)
+          .map(
+            ({ requested, siblings }) =>
+              `The agent-name filter "${display(
+                requested,
+              )}" also nearly matches distinct ` +
+              `agent(s) with data: ${siblings
+                .slice(0, MAX_NEAR_MISS_SIBLINGS)
+                .map(display)
+                .join(
+                  ', ',
+                )}. If the user named one of those, re-run with that exact name -- ` +
+              'never silently substitute one host for another.',
+          ),
       );
+    }
+    // BLOCKER FIX (CV-028/CV-033, category-word-misread-as-agent-name class): a requested name
+    // with no near-miss sibling can still be a token that never named a real agent at all (a
+    // category/domain word the model mistook for a host name). Fires independently of the
+    // near-miss branch above (a name can have zero near-miss SIBLINGS while still having zero
+    // matches of its own -- those are different findings, see `findUnmatchedAgentNames`'s doc
+    // comment). This is the deterministic "only becomes an agent filter if it matches a known
+    // candidate" guarantee: `indexedNames` IS the candidate lookup (the same population probe
+    // used for the near-miss disclosure), so a name absent from it, exactly and by every
+    // normalized variant, is reported to the model as unmatched rather than silently presented
+    // as an ordinary empty result.
+    //
+    // REVIEW FIX A1 (groupA-regression-review.md, HIGH): the earlier wording added "...not
+    // because that agent has no data", an inference this probe cannot support -- an empty
+    // candidate-bucket set means only "this index/window has no documents whose
+    // wazuh.agent.name matches", which is exactly as consistent with a REAL, healthy agent that
+    // simply has zero rows here as with a name that matches no agent at all. Two fixes:
+    //   1. Drop that clause. State only what the probe actually proves: the NAME has no match in
+    //      this data, framed as a possible mistaken name -- never a claim about whether the host
+    //      itself exists or is clean.
+    //   2. Skip this branch entirely for an ID-SHAPED token (`/^\d+$/`) -- `agent_identifier`
+    //      (get_vulnerabilities_by_agent) and the #8913/soleCandidateParams deictic path
+    //      (`pickAgentValue(..., 'id-or-name')`) both feed a numeric Manager id here, and the
+    //      probe only aggregates `wazuh.agent.name`: an id can never match a hostname bucket, so
+    //      a clean agent with genuinely zero rows (e.g. "what vulnerabilities does agent 001
+    //      have?" on a healthy host) would otherwise be misreported as "no agent named 001".
+    //      `extractRequestedAgentNames`'s own doc comment calls an id "harmless here" for the
+    //      near-miss branch above (true: an id's normalized form only matches its own padding
+    //      variants) -- that reasoning does NOT extend to this branch, which fires precisely on
+    //      NO match, so it is guarded separately here rather than by editing that shared reader.
+    //
+    // REVIEW FIX A2 (groupA-regression-review.md, MEDIUM, multi-agent coverage gap): this used to
+    // be gated on `digest.counts.returned === 0` for the WHOLE call, so a multi-name sweep
+    // (search_findings_by_multiple_agents: "compare web-01 and cloud-services") where ONE name
+    // matched never disclosed the OTHER, unmatched one -- CV-028's exact shape, just with a
+    // sibling that succeeds masking it. `findUnmatchedAgentNames` is already computed PER
+    // REQUESTED NAME against the same population probe regardless of the call's aggregate row
+    // count, so removing that outer gate is sufficient to close the gap for every
+    // `AGENT_NAME_PARAM_KEYS`-bearing tool, single- or multi-name alike: for a single-name call, a
+    // non-zero `returned` already proves that one name matched (the query filtered on it and
+    // found rows), so it is already absent from `indexedNames`'s complement and this reports
+    // nothing new or false for that shape -- the removed gate was redundant there, never
+    // load-bearing.
+    {
+      const unmatched = findUnmatchedAgentNames(
+        requestedNames,
+        indexedNames,
+      ).filter(requested => !ID_SHAPED_TOKEN_RE.test(requested.trim()));
+      sentences.push(
+        ...unmatched
+          .slice(0, MAX_NEAR_MISS_SENTENCES)
+          .map(
+            requested =>
+              `The agent-name filter "${display(
+                requested,
+              )}" has no match (exact or near-miss) in this data. This may be a mistaken name -- ` +
+              'e.g. a category/domain word rather than a real host -- but it may also be a real ' +
+              'agent with genuinely no rows in this specific index/time window; this probe cannot ' +
+              'tell those apart. State it to the user as an unmatched filter name, never as a ' +
+              'claim that the agent itself is absent, clean, or has no data.',
+          ),
+      );
+    }
+    if (sentences.length === 0) {
+      return;
+    }
     digest.hint = digest.hint
       ? `${digest.hint} ${sentences.join(' ')}`
       : sentences.join(' ');
@@ -563,7 +646,7 @@ async function executeIndexerRequest(
     // `finalizeDigest` privacy-on path below) is what keeps the "bounded ~1-2k token digest"
     // guarantee (digest.ts's `DIGEST_CHAR_CAP`) true even after these two appends, instead of
     // silently letting a hint-inflated digest slip past the cap whenever privacy mode is off.
-    capDigest(digest);
+    capDigest(digest, def.digest.sampleFieldMaxLength);
     // A `breakdownDimensions`-opted-in tool's synthesized breakdown (digest.ts's
     // `buildSyntheticBreakdown`) tags each bucket `agg: <dimension field path>` — a map from each
     // dimension to a SCALAR `AggFieldSpec` naming that same field (a synthesized breakdown is
@@ -600,6 +683,7 @@ async function executeIndexerRequest(
       // Issue #8917: was `def.deriveColumns` -- see `ToolDefinition.failClosedFieldPolicy`'s doc
       // comment (types.ts) for why this must be its own, explicitly-set flag instead.
       def.failClosedFieldPolicy,
+      def.digest.sampleFieldMaxLength,
     );
     // "Open in Discover" support (common/types.ts's `TableSpec.discover` doc comment): only this
     // Indexer path has an index/DSL to attach — see buildDiscoverDsl for why a `post_filter` is
@@ -681,7 +765,14 @@ async function executeManagerRequest(
       undefined,
       assumptionNote,
     );
-    const finalDigest = finalizeDigest(digest, privacy, toolName);
+    const finalDigest = finalizeDigest(
+      digest,
+      privacy,
+      toolName,
+      undefined,
+      undefined,
+      def.digest.sampleFieldMaxLength,
+    );
     return {
       toolResultContent: JSON.stringify(finalDigest),
       tableEvent: { type: 'table', spec: buildTableSpec(result, def) },
@@ -827,9 +918,10 @@ export async function executeToolCall(
   let { params } = validated.validated;
   const { def } = validated.validated;
 
-  // Issue #8913: an opt-in async pre-buildRequest step (currently only get_agent_inventory) that
-  // resolves a param the model omitted (e.g. "this server" with no agent named) against a live
-  // source, instead of relying on the model to have called a lookup tool first -- a live-verified
+  // Issue #8913: an opt-in async pre-buildRequest step (originally only get_agent_inventory; code
+  // review B1 added get_field_values, for a different purpose -- surfacing a populated-field-alias
+  // note, not resolving an omitted param) that resolves/annotates params against a live source
+  // instead of relying on the model to have called a lookup tool first -- a live-verified
   // system-prompt-only instruction to do that was found NOT to work (0/5 runs complied). Wrapped
   // in try/catch (unlike `buildRequest`'s own try/catch below, `resolveParams` is async and a
   // rejected promise would otherwise become an unhandled rejection, breaking this function's

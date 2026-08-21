@@ -36,7 +36,7 @@ export const WAZUH_METRICS_AGENTS_PATTERN = 'wazuh-metrics-agents*';
 
 // Job - Wazuh metrics comms
 export const WAZUH_INDEX_TYPE_METRICS_COMMS = 'metrics-comms';
-export const WAZUH_METRICS_COMMS_PATTERN = 'wazuh-metrics-comms*';
+export const WAZUH_METRICS_COMMS_PATTERN = 'wazuh-metrics-comms-v4*';
 
 // Job - Wazuh metrics normalization
 export const WAZUH_INDEX_TYPE_METRICS_NORMALIZATION = 'metrics-normalization';
@@ -114,6 +114,9 @@ export const WAZUH_FIM_REGISTRY_VALUES_PATTERN =
 // SCA
 export const WAZUH_SCA_PATTERN = 'wazuh-states-sca*';
 
+// Agent statistics reported by the agent and persisted by the server
+export const WAZUH_AGENT_STATS_PATTERN = 'wazuh-agent-stats*';
+
 // System inventory
 export const WAZUH_IT_HYGIENE_PATTERN = 'wazuh-states-inventory*';
 export const WAZUH_IT_HYGIENE_HARDWARE_PATTERN =
@@ -139,6 +142,9 @@ export const WAZUH_IT_HYGIENE_SERVICES_PATTERN =
 export const WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN =
   'wazuh-states-inventory-browser-extensions*';
 export const WAZUH_ACTIVE_RESPONSES_PATTERN = 'wazuh-active-responses*';
+
+// Agent configuration reported by the agent through the manager's /config endpoint
+export const WAZUH_AGENT_CONFIG_PATTERN = 'wazuh-agent-config*';
 
 // Index patterns - Events
 export const WAZUH_EVENTS_SYSTEM_ACTIVITY_PATTERN =
@@ -238,6 +244,7 @@ export const WAZUH_SAMPLE_VULNERABILITIES = 'wazuh-vulnerabilities';
 export const WAZUH_SAMPLE_METRICS_AGENTS = 'metrics-agents';
 export const WAZUH_SAMPLE_METRICS_COMMS = 'metrics-comms';
 export const WAZUH_SAMPLE_METRICS_NORMALIZATION = 'metrics-normalization';
+export const WAZUH_SAMPLE_AGENT_STATS = 'agent-stats';
 export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS = 1500;
 export const WAZUH_SETTING_ALERTS_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_EVENTS_PATTERN.replace('*', ''),
@@ -330,6 +337,10 @@ export const WAZUH_SETTING_METRICS_COMMS_SAMPLE_PREFIX = {
 export const WAZUH_SETTING_METRICS_NORMALIZATION_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_METRICS_NORMALIZATION_PATTERN.replace('*', ''),
   dataSet: 'metrics-normalization',
+};
+export const WAZUH_SETTING_AGENT_STATS_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_AGENT_STATS_PATTERN.replace('*', ''),
+  dataSet: 'agent-stats',
 };
 
 export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
@@ -533,6 +544,16 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
       indexPatternPrefix:
         WAZUH_SETTING_METRICS_NORMALIZATION_SAMPLE_PREFIX.indexPatternPrefix,
       dataSet: WAZUH_SETTING_METRICS_NORMALIZATION_SAMPLE_PREFIX.dataSet,
+    },
+  ],
+  [WAZUH_SAMPLE_AGENT_STATS]: [
+    {
+      // The index keeps the latest report of each agent, so a document per
+      // agent is enough to cover the agents of a development environment
+      count: 100,
+      indexPatternPrefix:
+        WAZUH_SETTING_AGENT_STATS_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_AGENT_STATS_SAMPLE_PREFIX.dataSet,
     },
   ],
   [WAZUH_SAMPLE_VULNERABILITIES]: [
@@ -772,11 +793,6 @@ export const UI_ORDER_AGENT_STATUS = [
   API_NAME_AGENT_STATUS.NEVER_CONNECTED,
 ];
 
-export const AGENT_SYNCED_STATUS = {
-  SYNCED: 'synced',
-  NOT_SYNCED: 'not synced',
-};
-
 // The status code can be seen here https://github.com/wazuh/wazuh/blob/686068a1f05d806b2e3b3d633a765320ae7ae114/src/wazuh_db/wdb.h#L55-L61
 
 export const AGENT_STATUS_CODE = [
@@ -806,26 +822,10 @@ export const AGENT_STATUS_CODE = [
   },
 ];
 
-export const API_NAME_TASK_STATUS = {
-  DONE: 'Done',
-  IN_PROGRESS: 'In progress',
-  FAILED: 'Failed',
-  TIMEOUT: 'Timeout',
-} as const;
-
-export const UI_TASK_STATUS = [
-  API_NAME_TASK_STATUS.DONE,
-  API_NAME_TASK_STATUS.IN_PROGRESS,
-  API_NAME_TASK_STATUS.FAILED,
-  API_NAME_TASK_STATUS.TIMEOUT,
-];
-
-export const UI_TASK_STATUS_COLORS = {
-  [API_NAME_TASK_STATUS.DONE]: 'success',
-  [API_NAME_TASK_STATUS.IN_PROGRESS]: 'warning',
-  [API_NAME_TASK_STATUS.FAILED]: 'danger',
-  [API_NAME_TASK_STATUS.TIMEOUT]: 'subdued',
-};
+// How often to re-check GET /agents while an upgrade is pending.
+export const AGENT_UPGRADE_STATUS_POLL_INTERVAL_MS = 15000;
+// Stop tracking an agent's upgrade if its version hasn't changed by then.
+export const AGENT_UPGRADE_STATUS_POLL_TIMEOUT_MS = 15 * 60 * 1000;
 
 // Documentation
 export const DOCUMENTATION_WEB_BASE_URL = 'https://documentation.wazuh.com';
@@ -953,6 +953,9 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_NORMALIZATION =
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_STATES =
   'index-pattern:states-inventory';
 
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_AGENT_CONFIG =
+  'index-pattern:agent-config';
+
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_GROUPS_STATES =
   'index-pattern:states-inventory-groups';
 
@@ -1006,6 +1009,9 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_VALUES_STATES =
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES =
   'index-pattern:states-sca';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_AGENT_STATS =
+  'index-pattern:agent-stats';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERNS = 'saved-objects:index-patterns';
 

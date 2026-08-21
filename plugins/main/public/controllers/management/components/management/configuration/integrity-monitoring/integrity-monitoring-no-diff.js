@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
 import { EuiBasicTable } from '@elastic/eui';
 
@@ -29,24 +30,24 @@ class WzConfigurationIntegrityMonitoringNoDiff extends Component {
     return (
       <Fragment>
         {currentConfig &&
-          currentConfig['syscheck-syscheck'] &&
-          currentConfig['syscheck-syscheck'].syscheck &&
-          !currentConfig['syscheck-syscheck'].syscheck.nodiff && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+          currentConfig.fim &&
+          currentConfig.fim.syscheck &&
+          !currentConfig.fim.syscheck.nodiff && (
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig &&
-          currentConfig['syscheck-syscheck'] &&
-          currentConfig['syscheck-syscheck'].syscheck &&
-          currentConfig['syscheck-syscheck'].syscheck.nodiff && (
+          currentConfig.fim &&
+          currentConfig.fim.syscheck &&
+          currentConfig.fim.syscheck.nodiff && (
             <WzConfigurationSettingsHeader
-              title="No diff directories"
+              title='No diff directories'
               description="These files won't have their diff calculated"
               help={helpLinks}
             >
               <EuiBasicTable
-                items={currentConfig['syscheck-syscheck'].syscheck.nodiff.map(
-                  item => ({ path: item })
-                )}
+                items={currentConfig.fim.syscheck.nodiff.map(item => ({
+                  path: item,
+                }))}
                 columns={columnsPath}
               />
             </WzConfigurationSettingsHeader>
@@ -55,5 +56,9 @@ class WzConfigurationIntegrityMonitoringNoDiff extends Component {
     );
   }
 }
+
+WzConfigurationIntegrityMonitoringNoDiff.propTypes = {
+  currentConfig: PropTypes.object,
+};
 
 export default WzConfigurationIntegrityMonitoringNoDiff;

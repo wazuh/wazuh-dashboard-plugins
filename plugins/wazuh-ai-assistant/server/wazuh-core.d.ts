@@ -84,7 +84,7 @@ interface WazuhCoreApiUserClient {
  * types `isAdministratorUser` as returning `Promise<void>` — its actual behavior is patched on at
  * runtime by `createDashboardSecurity`'s `enhanceDashboardSecurity` helper (security-factory.ts),
  * which resolves `{administrator: boolean, administrator_requirements: string | null}` instead; the
- * interface was never updated to match. `server/routes/settings.ts`'s `checkAdministrator`
+ * interface was never updated to match. `server/routes/settings.ts`'s `checkManagerSession`
  * destructures both fields from the resolved value, so importing the real (stale) return type would
  * break that destructuring. This hand-written shape reflects the real runtime contract rather than
  * the out-of-date published interface.
@@ -92,10 +92,11 @@ interface WazuhCoreApiUserClient {
 interface WazuhCoreDashboardSecurity {
   /**
    * Resolves whether the current request is authenticated as a Wazuh administrator (see the file
-   * doc comment above for the verified reference mechanism). Used by server/routes/settings.ts's
-   * PUT handler to gate the AI Assistant settings singleton — the only write route in this
-   * plugin that changes plugin-wide security posture (privacy defaults, field policy) and
-   * therefore must not be reachable by every authenticated dashboard user.
+   * doc comment above for the verified reference mechanism). AI Assistant settings and providers
+   * no longer gate on this role — that authorization now happens indexer-side (see
+   * docs/ref/modules/ai-assistant/security.md) — so `server/routes/settings.ts`'s
+   * `checkManagerSession` only uses this to detect a missing/expired `wz-token` (a session-liveness
+   * signal), discarding the role verdict entirely.
    */
   isAdministratorUser(
     context: RequestHandlerContext,

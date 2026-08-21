@@ -58,10 +58,6 @@ resources:
   - method: DELETE
     path: /agents/{agent_id}/group
 
-  # Get configuration sync status
-  - method: GET
-    path: /agents/{agent_id}/group/is_sync
-
   # Remove agent from group
   - method: DELETE
     path: /agents/{agent_id}/group/{group_id}
@@ -737,17 +733,6 @@ resources:
   # Get agent processes
   - method: GET
     path: /syscollector/{agent_id}/processes
-
-  # ===================================================== #
-  #   TASKS
-  # ===================================================== #
-
-  # List tasks
-  - method: GET
-    path: /tasks/status
-    response:
-      statusCode: 200
-      scriptFile: tasks/status.js
 
   # ===================================================== #
   #   VULNERABILITY

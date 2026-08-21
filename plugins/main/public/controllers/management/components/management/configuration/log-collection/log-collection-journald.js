@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
@@ -23,7 +24,7 @@ import {
 } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 import helpLinks from './help-links';
-import { LOGCOLLECTOR_LOCALFILE_PROP, LOCALFILE_JOURNALDT_PROP } from './types';
+import { LOGCOLLECTOR_PROP, LOCALFILE_JOURNALDT_PROP } from './types';
 
 /**
  * Returns targets array parsed in one string
@@ -80,31 +81,27 @@ class WzConfigurationLogCollectionJournald extends Component {
   }
   render() {
     const { currentConfig } = this.props;
-    const items = currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[
-      LOCALFILE_JOURNALDT_PROP
-    ]
+    const items = currentConfig?.[LOGCOLLECTOR_PROP]?.[LOCALFILE_JOURNALDT_PROP]
       ? settingsListBuilder(
-          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_JOURNALDT_PROP],
+          currentConfig[LOGCOLLECTOR_PROP][LOCALFILE_JOURNALDT_PROP],
           panelsLabel,
         )
       : [];
 
     return (
       <Fragment>
-        {isString(currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]) && (
+        {isString(currentConfig?.[LOGCOLLECTOR_PROP]) && (
           <WzNoConfig
-            error={currentConfig[LOGCOLLECTOR_LOCALFILE_PROP]}
+            error={currentConfig[LOGCOLLECTOR_PROP]}
             help={helpLinks}
           />
         )}
-        {!currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[
-          LOCALFILE_JOURNALDT_PROP
-        ]?.length ? (
+        {!currentConfig?.[LOGCOLLECTOR_PROP]?.[LOCALFILE_JOURNALDT_PROP]
+          ?.length ? (
           <WzNoConfig error='not-present' help={helpLinks} />
         ) : null}
-        {currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[
-          LOCALFILE_JOURNALDT_PROP
-        ]?.length > 1 ? (
+        {currentConfig?.[LOGCOLLECTOR_PROP]?.[LOCALFILE_JOURNALDT_PROP]
+          ?.length > 1 ? (
           <WzConfigurationSettingsHeader
             title='Journald events logs'
             description='List of journald logs that will be processed'
@@ -116,9 +113,8 @@ class WzConfigurationLogCollectionJournald extends Component {
             />
           </WzConfigurationSettingsHeader>
         ) : null}
-        {currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[
-          LOCALFILE_JOURNALDT_PROP
-        ]?.length === 1 ? (
+        {currentConfig?.[LOGCOLLECTOR_PROP]?.[LOCALFILE_JOURNALDT_PROP]
+          ?.length === 1 ? (
           <WzConfigurationSettingsHeader
             title='Journald events logs'
             description='List of journald logs that will be processed'
@@ -134,5 +130,9 @@ class WzConfigurationLogCollectionJournald extends Component {
     );
   }
 }
+
+WzConfigurationLogCollectionJournald.propTypes = {
+  currentConfig: PropTypes.object,
+};
 
 export default WzConfigurationLogCollectionJournald;

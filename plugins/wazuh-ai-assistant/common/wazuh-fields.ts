@@ -40,6 +40,7 @@ export const WAZUH_FIELD = Object.freeze({
   AGENT_ID: 'wazuh.agent.id',
   AGENT_NAME: 'wazuh.agent.name',
   AGENT_OS_NAME: 'wazuh.agent.host.os.name',
+  AGENT_OS_PLATFORM: 'wazuh.agent.host.os.platform',
   AGENT_IP: 'wazuh.agent.host.ip',
 } as const);
 

@@ -30,8 +30,10 @@ export const LAST_CONVERSATION_STORAGE_KEY =
   'wazuhAiAssistant.lastConversation';
 
 /**
- * Conversation ids are saved-object ids (UUIDs as this plugin creates them). This is a deliberately
- * conservative superset of that: it accepts what a saved-object id can legitimately be and rejects
+ * Conversation ids are OpenSearch document ids — auto-generated (base64url-shaped, e.g.
+ * `V4x8pIcBSGrmm6-XmzZP`) by `wazuh-ai-assistant-sessions` on create (server/conversation-store.ts;
+ * before that, they were OSD saved-object UUIDs). This pattern is a deliberately conservative
+ * superset of both shapes: it accepts what either kind of id can legitimately be and rejects
  * everything else, so a hand-edited hash or a stale storage value can never be interpolated into a
  * request path as `../` or a query string. An id that fails this check is treated exactly like no
  * id at all.

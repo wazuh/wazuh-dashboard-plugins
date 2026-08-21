@@ -127,16 +127,25 @@ export function TableWzAPI({
       : undefined,
   );
 
+  /* A persisted sorting field could reference a column that no longer exists, for example when a
+    field is removed from the table definition. In that case, fall back to the default sorting
+    instead of requesting an unknown field. */
+  const isPersistedSortingFieldAvailable = rest.tableColumns.some(
+    ({ field, composeField }) =>
+      [field, ...(composeField ?? [])].includes(tableStateRaw?.sorting?.field),
+  );
+
   // Ensure tableState has the correct structure with defaults
   const tableState = {
     pageSize: tableStateRaw?.pageSize ?? defaultPageSize,
-    sorting: tableStateRaw?.sorting?.field
-      ? {
-          field: tableStateRaw.sorting.field,
-          direction:
-            tableStateRaw.sorting.direction ?? defaultSorting.direction,
-        }
-      : defaultSorting,
+    sorting:
+      tableStateRaw?.sorting?.field && isPersistedSortingFieldAvailable
+        ? {
+            field: tableStateRaw.sorting.field,
+            direction:
+              tableStateRaw.sorting.direction ?? defaultSorting.direction,
+          }
+        : defaultSorting,
     selectedFields: tableStateRaw?.selectedFields ?? defaultSelectedFields,
   };
 

@@ -61,7 +61,7 @@ export class MainModuleAgent extends Component {
 
     return (
       <div className={'wz-module'}>
-        {agent?.os && (
+        {agent && (
           <Fragment>
             <div className='wz-module-header-agent-wrapper'>
               <div className='wz-module-header-agent'>{this.renderTitle()}</div>

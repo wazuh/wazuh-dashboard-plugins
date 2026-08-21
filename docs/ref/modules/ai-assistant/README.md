@@ -13,18 +13,18 @@ This module exposes the following views:
 - **Chat** — The conversation view: a message thread with SSE-streamed answers, per-turn result
   tables with an **Open in Discover** deep link, a conversation list with persistent history, and
   a privacy on/off badge in the header.
-- **Settings** — Admin-oriented configuration split into three sections: **Providers** (CRUD +
-  connection test for the AI providers), **Privacy** (pseudonymization defaults and the per-field
-  policy), and **Conversation history**.
+- **Settings** — Configuration split into three sections: **Providers** (CRUD + connection test
+  for the AI providers), **Privacy** (pseudonymization defaults and the per-field policy), and
+  **Conversation history**. Authorized by the Wazuh indexer's own RBAC on the calling user.
 
 ## How it fits together
 
-| Area                 | Role in the AI Assistant                                                                                                                                                                                                            |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Wazuh Indexer**    | Queried server-side through `context.core.opensearch.client.asCurrentUser` — every query runs with the requesting user's own permissions, never a service account.                                                                  |
-| **Wazuh Server API** | Reached through the `wazuh-core` plugin's request context (`context.wazuh_core.api.client.asCurrentUser`), riding the existing dashboard session.                                                                                   |
-| **AI provider**      | A configurable external endpoint (OpenAI-compatible, Anthropic, or the Wazuh-hosted brain) used purely as a transport: it decides _which_ tool to call; the plugin executes the query locally and sends back only a bounded digest. |
-| **Discover**         | Truncated result tables link out to Discover with the same index pattern, time range, and filters rebuilt from the tool's typed parameters.                                                                                         |
+| Area                 | Role in the AI Assistant                                                                                                                                                                                   |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Wazuh Indexer**    | Queried server-side through `context.core.opensearch.client.asCurrentUser` — every query runs with the requesting user's own permissions, never a service account.                                         |
+| **Wazuh Server API** | Reached through the `wazuh-core` plugin's request context (`context.wazuh_core.api.client.asCurrentUser`), riding the existing dashboard session.                                                          |
+| **AI provider**      | A configurable external endpoint (OpenAI-compatible or Anthropic) used purely as a transport: it decides _which_ tool to call; the plugin executes the query locally and sends back only a bounded digest. |
+| **Discover**         | Truncated result tables link out to Discover with the same index pattern, time range, and filters rebuilt from the tool's typed parameters.                                                                |
 
 The design principle behind every data path: **data never leaves the cluster in bulk**. Queries
 execute locally in the plugin server; the model receives a capped digest (aggregates plus at most
@@ -36,10 +36,10 @@ five whitelisted sample rows); the full result renders locally as a table in the
   and the wazuh-core integration points.
 - [Tool catalog](./tool-catalog.md) — the 32 read-only tools, the in-process registry, and the
   two-stage router.
-- [Providers](./providers.md) — the three provider adapters, retry/stall handling, and the SSRF
-  guard on outbound traffic.
-- [Security](./security.md) — the RBAC boundary, admin gating, API-key encryption at rest,
-  guardrails, and what leaves the cluster.
+- [Providers](./providers.md) — the provider adapters, which providers and models are verified
+  working, retry/stall handling, and the SSRF guard on outbound traffic.
+- [Security](./security.md) — the RBAC boundary, required indexer permissions for settings and
+  providers, API-key encryption at rest, guardrails, and what leaves the cluster.
 - [Configuration](./configuration.md) — dashboard configuration keys and the Settings UI.
 
 ---
@@ -55,11 +55,14 @@ concurrency so two tabs cannot silently overwrite each other.
 
 ### Providers
 
-A **provider** is a configured AI endpoint (base URL, model, optional API key). Three adapter
-types are supported; all of them speak one canonical internal tool-calling contract, so switching
-providers never changes plugin behavior — a better model answers better, a weaker model still
-answers correctly. Provider management is **administrator-only**; API keys are write-only through
-the API (`hasApiKey` boolean out, never the key) and can be encrypted at rest.
+A **provider** is a configured AI endpoint (base URL, model, optional API key). Two provider types
+can be created today, OpenAI-compatible and Anthropic (Claude) — see
+[Providers](./providers.md) for exactly which services and models under each type are verified
+working. Both speak one canonical internal tool-calling contract, so switching providers never
+changes plugin behavior — a better model answers better, a weaker model
+still answers correctly. Provider management is authorized by the Wazuh indexer's own RBAC on the
+calling user; API keys are write-only through the API (`hasApiKey` boolean out, never the key)
+and can be encrypted at rest.
 
 ### Tools, digests, and tables
 
@@ -72,9 +75,10 @@ table shape is deterministic and never controlled by the model.
 
 ### Privacy mode
 
-An optional, admin-governed pseudonymization layer replaces sensitive values (hostnames, IPs,
-usernames…) with consistent placeholders (`HOST_1`, `IP_2`…) before anything reaches the
-provider, and restores the real values locally in the rendered answer. Administrators set the
-default per provider and decide whether users may override it per conversation; a badge in the
+An optional pseudonymization layer, configured in Settings, replaces sensitive values (hostnames,
+IPs, usernames…) with consistent placeholders (`HOST_1`, `IP_2`…) before anything reaches the
+provider, and restores the real values locally in the rendered answer. Whoever configures
+Settings sets the default per provider and decides whether users may override it per
+conversation; a badge in the
 chat header always shows the current state. It is **off by default** — the primary deployment
 target is a self-hosted gateway.

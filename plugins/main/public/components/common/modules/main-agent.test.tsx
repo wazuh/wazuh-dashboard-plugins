@@ -185,5 +185,21 @@ describe('Main Agent', () => {
 
       expect(exploreAgentButton).toBeTruthy();
     });
+
+    it('should render the header of an agent that reported no OS', () => {
+      const { container } = render(
+        <MainModuleAgent
+          agent={{ id: '003' }}
+          section={AgentTabs.CONFIGURATION}
+        />,
+      );
+
+      expect(
+        container.querySelector(queryDataTestAttr(EXPLORE_AGENT_BUTTON)),
+      ).toBeTruthy();
+      expect(
+        container.querySelector(queryDataTestAttr('agent-tabs')),
+      ).toBeTruthy();
+    });
   });
 });

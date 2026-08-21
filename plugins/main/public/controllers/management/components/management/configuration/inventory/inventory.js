@@ -11,12 +11,17 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import withWzConfig from '../util-hocs/wz-config';
-import { isString, renderValueNoThenEnabled } from '../utils/utils';
+import {
+  isString,
+  renderValueNoThenEnabled,
+  reportedEnabled,
+} from '../utils/utils';
 import { wodleBuilder } from '../utils/builders';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
@@ -69,26 +74,18 @@ class WzConfigurationInventory extends Component {
     this.props.updateBadge(this.badgeEnabled());
   }
   badgeEnabled() {
-    return (
-      this.wodleConfig &&
-      this.wodleConfig.syscollector &&
-      this.wodleConfig.syscollector.disabled === 'no'
-    );
+    return reportedEnabled(this.wodleConfig?.syscollector?.disabled, 'no');
   }
   render() {
     const { currentConfig } = this.props;
     return (
       <Fragment>
-        {currentConfig['wmodules-wmodules'] &&
-          isString(currentConfig['wmodules-wmodules']) && (
-            <WzNoConfig
-              error={currentConfig['wmodules-wmodules']}
-              help={helpLinks}
-            />
-          )}
+        {isString(currentConfig?.syscollector) && (
+          <WzNoConfig error={currentConfig.syscollector} help={helpLinks} />
+        )}
         {currentConfig &&
           !this.wodleConfig.syscollector &&
-          !isString(currentConfig['wmodules-wmodules']) && (
+          !isString(currentConfig.syscollector) && (
             <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig && this.wodleConfig && this.wodleConfig.syscollector && (
@@ -114,6 +111,8 @@ class WzConfigurationInventory extends Component {
   }
 }
 
-const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
+WzConfigurationInventory.propTypes = {
+  currentConfig: PropTypes.object,
+};
 
-export default withWzConfig(sections)(WzConfigurationInventory);
+export default withWzConfig()(WzConfigurationInventory);

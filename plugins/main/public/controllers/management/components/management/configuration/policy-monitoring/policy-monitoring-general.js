@@ -10,7 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
@@ -39,40 +40,37 @@ class WzConfigurationPolicyMonitoringGeneral extends Component {
   constructor(props) {
     super(props);
   }
+
   render() {
     const { currentConfig } = this.props;
+    const rootcheck = currentConfig?.fim?.rootcheck;
+
+    if (isString(currentConfig?.fim)) {
+      return <WzNoConfig error={currentConfig.fim} help={helpLinks} />;
+    }
+
+    /* The report only carries the modules the agent runs, so an absent `fim`
+    is a module that reported nothing, not a fetch that went wrong. It used to
+    be enough to check that the section was empty, because the Server API
+    answered for every section that was asked for. */
+    if (!rootcheck) {
+      return <WzNoConfig error='not-present' help={helpLinks} />;
+    }
+
     return (
-      <Fragment>
-        {currentConfig['syscheck-rootcheck'] &&
-          isString(currentConfig['syscheck-rootcheck']) && (
-            <WzNoConfig
-              error={currentConfig['syscheck-rootcheck']}
-              help={helpLinks}
-            />
-          )}
-        {currentConfig['syscheck-rootcheck'] &&
-          !isString(currentConfig['syscheck-rootcheck']) &&
-          !currentConfig['syscheck-rootcheck'].rootcheck && (
-            <WzNoConfig error='not-present' help={helpLinks} />
-          )}
-        {((currentConfig['syscheck-rootcheck'] &&
-          !isString(currentConfig['syscheck-rootcheck']) &&
-          currentConfig['syscheck-rootcheck'].rootcheck) ||
-          currentConfig['sca']) && (
-          <WzConfigurationSettingsHeader
-            title='All settings'
-            description='General settings for the rootcheck daemon'
-            help={helpLinks}
-          >
-            <WzConfigurationSettingsGroup
-              config={currentConfig['syscheck-rootcheck'].rootcheck}
-              items={allSettings}
-            />
-          </WzConfigurationSettingsHeader>
-        )}
-      </Fragment>
+      <WzConfigurationSettingsHeader
+        title='All settings'
+        description='General settings for the rootcheck daemon'
+        help={helpLinks}
+      >
+        <WzConfigurationSettingsGroup config={rootcheck} items={allSettings} />
+      </WzConfigurationSettingsHeader>
     );
   }
 }
+
+WzConfigurationPolicyMonitoringGeneral.propTypes = {
+  currentConfig: PropTypes.object,
+};
 
 export default WzConfigurationPolicyMonitoringGeneral;

@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import WzNoConfig from '../util-components/no-config';
@@ -65,39 +65,33 @@ class WzConfigurationActiveResponseAgent extends Component {
   }
   render() {
     const { currentConfig, wazuhNotReadyYet } = this.props;
+    const activeResponse = currentConfig?.execd?.['active-response'];
+
+    if (isString(currentConfig?.execd)) {
+      return <WzNoConfig error={currentConfig.execd} help={helpLinks} />;
+    }
+
+    if (wazuhNotReadyYet && !currentConfig?.execd) {
+      return <WzNoConfig error='Server not ready yet' help={helpLinks} />;
+    }
+
+    /* The report only carries the modules the agent runs, so an absent `execd`
+    is a module that reported nothing, not a fetch that went wrong. */
+    if (!activeResponse) {
+      return <WzNoConfig error='not-present' help={helpLinks} />;
+    }
+
     return (
-      <Fragment>
-        {currentConfig['com-active-response'] &&
-          isString(currentConfig['com-active-response']) && (
-            <WzNoConfig
-              error={currentConfig['com-active-response']}
-              help={helpLinks}
-            />
-          )}
-        {currentConfig['com-active-response'] &&
-          !isString(currentConfig['com-active-response']) &&
-          !currentConfig['com-active-response']['active-response'] && (
-            <WzNoConfig error='not-present' help={helpLinks} />
-          )}
-        {wazuhNotReadyYet &&
-          (!currentConfig || !currentConfig['com-active-response']) && (
-            <WzNoConfig error='Server not ready yet' help={helpLinks} />
-          )}
-        {currentConfig['com-active-response'] &&
-          !isString(currentConfig['com-active-response']) &&
-          currentConfig['com-active-response']['active-response'] && (
-            <WzConfigurationSettingsHeader
-              title='Active response settings'
-              description='Find here all the Active response settings for this agent'
-              help={helpLinks}
-            >
-              <WzConfigurationSettingsGroup
-                config={currentConfig['com-active-response']['active-response']}
-                items={mainSettings}
-              />
-            </WzConfigurationSettingsHeader>
-          )}
-      </Fragment>
+      <WzConfigurationSettingsHeader
+        title='Active response settings'
+        description='Find here all the Active response settings for this agent'
+        help={helpLinks}
+      >
+        <WzConfigurationSettingsGroup
+          config={activeResponse}
+          items={mainSettings}
+        />
+      </WzConfigurationSettingsHeader>
     );
   }
 }
@@ -106,13 +100,12 @@ const mapStateToProps = state => ({
   wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
 });
 
-const sectionsAgent = [{ component: 'com', configuration: 'active-response' }];
-
 WzConfigurationActiveResponseAgent.propTypes = {
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
+  currentConfig: PropTypes.object,
 };
 
 export default compose(
   connect(mapStateToProps),
-  withWzConfig(sectionsAgent),
+  withWzConfig(),
 )(WzConfigurationActiveResponseAgent);
