@@ -17,6 +17,7 @@ import {
   ToolSpec,
 } from '../../common/types';
 import { describeError } from '../../common/errors';
+import { excludePrivacyOffHistory } from '../../common/chat-history';
 import { getProviderAdapter } from '../providers/registry';
 import { ChatStreamOptions, ProviderAdapter } from '../providers/types';
 import { buildSystemPrompt } from '../prompts';
@@ -1265,6 +1266,20 @@ function resolvePrivacyEnabled(
  * boundary depends on. `user`/`tool` content already had this (see "First-mention pre-scan" below);
  * `assistant` content and `toolCalls[].arguments` did not, and are fixed by this same principle.
  *
+ * WIRE-PROOF FOLLOW-UP (AI/qa/wire-proof-v35/capture.jsonl): the shape scan above has a real blind
+ * spot — a bare, non-dotted real value (most commonly a Wazuh AGENT NAME, e.g. `wazuh-aio-5`) has
+ * no shape a regex can single out, and the field policy that would normally anonymize
+ * `wazuh.agent.name` only ever runs when a digest is CREATED, never when a client-supplied one is
+ * REPLAYED. Rather than trying to shape-scan harder, the owner-chosen fix is structural: a digest
+ * or assistant-prose history entry captured while privacy was OFF is never resent at all once
+ * privacy is ON for the CURRENT turn — see `excludePrivacyOffHistory`'s doc comment
+ * (common/chat-history.ts) for the exact mechanism, which THIS function's caller (below,
+ * `initialMessages`) applies as the server-side authority before any of this function even runs.
+ * Practical consequence, worth being explicit about: turning privacy ON mid-conversation
+ * intentionally COSTS CONTEXT — the model loses its own prior tool results (and, for the same
+ * privacy-off turns, its own prior narration) and may re-run a query it already ran, rather than
+ * risk resending real-valued history disguised as safe.
+ *
  * ONE DELIBERATE EXCEPTION to "EVERY inbound role/shape": below, `toolCalls.map(call => ({ ...call,
  * arguments: ... }))` spreads `call` before overwriting only `arguments` — so `ToolCall.vendorExtras`
  * / `functionVendorExtras` (common/types.ts) are forwarded completely untouched, no shape scan and
@@ -1499,6 +1514,11 @@ export const chatRequestMessageSchema = schema.object({
   ),
   // Present on role:'tool' messages: which toolCalls[].id this result answers.
   toolCallId: schema.maybe(schema.string()),
+  // Wire-proof fix (common/types.ts's `ChatMessage.privacyEnabled` doc comment): the client resends
+  // this on every replayed history entry so `excludePrivacyOffHistory` (common/chat-history.ts) can
+  // fail closed on a privacy-off-captured digest/prose message once privacy is on for this request.
+  // `@osd/config-schema` rejects unknown keys by default, so this needs an explicit place here too.
+  privacyEnabled: schema.maybe(schema.boolean()),
 });
 
 export function registerChatRoutes(router: IRouter, logger: Logger): void {
@@ -1637,11 +1657,22 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
       // enabled) the stage-1 routing prompt, so the two agree on "now" for a single turn.
       const nowIso = new Date().toISOString();
 
+      // Wire-proof fix (AI/qa/wire-proof-v35/capture.jsonl): the SERVER-SIDE authority for the
+      // "never replay privacy-off history once privacy is on" rule -- common/chat-history.ts's
+      // `excludePrivacyOffHistory` doc comment has the full mechanism and why the client-side call
+      // in `buildOutgoingMessages` is not enough on its own to depend on. Applied to the CLIENT-SENT
+      // history only, once, right here, before any of it seeds the orchestration loop's own
+      // accumulator -- everything that loop appends afterwards is this request's own live activity,
+      // never client-replayed, and is already correctly protected by `scrubMessagesForProvider` on
+      // every round regardless.
       const initialMessages: ChatMessage[] = [
         // Per-request only: never persisted, never echoed back by the client. Any system message
         // the client itself sent (it doesn't today) is dropped so ours is always the sole one.
         { role: 'system', content: buildSystemPrompt(nowIso) },
-        ...messages.filter(message => message.role !== 'system'),
+        ...excludePrivacyOffHistory(
+          messages.filter(message => message.role !== 'system'),
+          privacyEnabled,
+        ),
       ];
 
       // `response.ok(...)` MUST stay inside this try. The acquired slot is released on three

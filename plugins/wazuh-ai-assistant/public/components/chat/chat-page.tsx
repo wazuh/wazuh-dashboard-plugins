@@ -1812,6 +1812,13 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       target: TurnConversationTarget;
       outgoingMessages: ChatMessage[];
       privacyPayload: ChatRequest['privacy'];
+      /** Wire-proof fix: this turn's own resolved privacy state, stamped onto every `ToolExchange`
+       * this turn records (`common/chat-history.ts`'s `ToolExchange.privacyEnabled` doc comment) so
+       * a LATER turn's `buildOutgoingMessages` call can fail-closed-exclude it if privacy has been
+       * turned off again by then. Passed separately from `privacyPayload` rather than derived from
+       * it (`privacyPayload` is `undefined` in the common "privacy off, nothing minted yet" case,
+       * which would make deriving "was privacy on" from its mere presence fragile). */
+      privacyEnabledForTurn: boolean;
     }) => {
       const {
         assistantMessageId,
@@ -1819,6 +1826,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
         target,
         outgoingMessages,
         privacyPayload,
+        privacyEnabledForTurn,
       } = args;
 
       setIsGenerating(true);
@@ -2069,7 +2077,12 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
             // Digest-in-history bookkeeping only — never rendered as a UI message (message_bubble.tsx
             // has no bubble type for it; it lives in this turn's record until a LATER turn's
             // buildOutgoingMessages call resends it, or until the turn is saved).
-            turnRecord?.toolExchanges.push({ toolCall: event.toolCall });
+            // Wire-proof fix: `privacyEnabledForTurn` stamped here, not derived later — see
+            // ToolExchange.privacyEnabled's doc comment (common/chat-history.ts).
+            turnRecord?.toolExchanges.push({
+              toolCall: event.toolCall,
+              privacyEnabled: privacyEnabledForTurn,
+            });
             // Also surfaced in the bubble (message-bubble.tsx's collapsed "queries executed" panel),
             // so the reader can check the query behind the answer as it runs.
             committedToolCalls = [...committedToolCalls, event.toolCall];
@@ -2304,6 +2317,10 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
         content: '',
         isStreaming: true,
         createdAt: Date.now(),
+        // Wire-proof fix: stamped once at creation and preserved through every later spread-update
+        // (delta/done/etc. never touch this field) — see UiChatMessage.privacyEnabled's doc
+        // comment (message-bubble.tsx).
+        privacyEnabled: effectivePrivacyEnabled,
       };
 
       // Built from turnHistoryRef BEFORE this turn's own (still-empty) record is registered below, so
@@ -2311,6 +2328,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       const outgoingMessages = buildOutgoingMessages(
         history,
         turnHistoryRef.current,
+        effectivePrivacyEnabled,
       );
       turnHistoryRef.current = [
         ...turnHistoryRef.current,
@@ -2346,6 +2364,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
         target,
         outgoingMessages,
         privacyPayload,
+        privacyEnabledForTurn: effectivePrivacyEnabled,
       });
     };
 

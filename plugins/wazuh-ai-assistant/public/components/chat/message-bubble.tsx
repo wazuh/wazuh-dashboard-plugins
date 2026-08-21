@@ -100,6 +100,12 @@ export interface UiChatMessage {
    * one instead of presenting it as finished.
    */
   interrupted?: boolean;
+  /** Wire-proof fix: whether privacy was ON for the turn that produced this message — display-only
+   * here (never shown in the UI), just carried on the object so `buildOutgoingMessages`
+   * (common/chat-history.ts) can fail-closed-exclude a privacy-off turn's prose from later history
+   * replay. See `common/types.ts`'s `ChatMessage.privacyEnabled` doc comment for the full
+   * mechanism. Only ever set on `role: 'assistant'`. */
+  privacyEnabled?: boolean;
 }
 
 interface MessageBubbleProps {
