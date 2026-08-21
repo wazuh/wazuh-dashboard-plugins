@@ -581,7 +581,7 @@ describe('ConversationList', () => {
     });
   });
 
-  describe('list semantics (WCAG/AT: a real list, not a run of generic divs) — E4', () => {
+  describe('list semantics (WCAG/AT: a real list, not a run of generic divs) — E5', () => {
     it('renders each date group as a native <ul>/<li> list', () => {
       const { container } = render(
         <ConversationList
@@ -619,6 +619,63 @@ describe('ConversationList', () => {
       expect(
         screen.queryByRole('button', { name: 'Rename conversation' }),
       ).toBeNull();
+    });
+
+    it('M3 REGRESSION: the pencil reserves ZERO width at rest, so the row is byte-identical to before it existed', () => {
+      // Screenshot-equivalent DOM check: rather than a real layout engine (jsdom has none),
+      // this asserts the exact inline style values conversation-list.tsx computes for the
+      // pencil's wrapping element -- `width`/`minWidth` collapsed to 0 (not merely `opacity: 0`,
+      // which still occupies its box) at rest, expanding only once the row is hovered. A regressed
+      // opacity-only implementation would leave `width` unset/`auto` here even at rest, which this
+      // would catch.
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Rename me' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={noop}
+        />,
+      );
+
+      const pencil = screen.getByRole('button', {
+        name: 'Rename conversation',
+      });
+      const wrapper = pencil.closest('[style]') as HTMLElement;
+      expect(wrapper.style.width).toBe('0px');
+      expect(wrapper.style.minWidth).toBe('0px');
+      expect(wrapper.style.opacity).toBe('0');
+
+      fireEvent.mouseEnter(pencil.closest('.wzConvoRow') as HTMLElement);
+
+      expect(wrapper.style.width).toBe('auto');
+      expect(wrapper.style.minWidth).toBe('auto');
+      expect(wrapper.style.opacity).toBe('1');
+    });
+
+    it('M3 REGRESSION: the pencil is NOT permanently shown on the active/selected row -- hover or focus only', () => {
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'active', title: 'Active one' })]}
+          isLoading={false}
+          activeConversationId='active'
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={noop}
+        />,
+      );
+
+      const pencil = screen.getByRole('button', {
+        name: 'Rename conversation',
+      });
+      const wrapper = pencil.closest('[style]') as HTMLElement;
+      // Selected but neither hovered nor focused -- must still be at rest, unlike the pre-fix
+      // condition which also checked `isSelected`.
+      expect(wrapper.style.width).toBe('0px');
+      expect(wrapper.style.opacity).toBe('0');
     });
 
     it('clicking the pencil icon swaps the title for an input, without triggering onSelect', () => {
@@ -719,6 +776,145 @@ describe('ConversationList', () => {
       fireEvent.keyDown(input, { key: 'Enter' });
 
       expect(onRename).not.toHaveBeenCalled();
+    });
+
+    it('m6: commits on blur (clicking/tabbing away), without needing Enter', () => {
+      const onRename = jest.fn();
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Old title' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={onRename}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      );
+      const input = screen.getByLabelText('Conversation title');
+      fireEvent.change(input, { target: { value: 'Blurred title' } });
+      fireEvent.blur(input);
+
+      expect(onRename).toHaveBeenCalledWith('c1', 'Blurred title');
+      expect(onRename).toHaveBeenCalledTimes(1);
+    });
+
+    it('m6: Enter does not ALSO commit a second time via the unmount blur that follows it', () => {
+      const onRename = jest.fn();
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Old title' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={onRename}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      );
+      const input = screen.getByLabelText('Conversation title');
+      fireEvent.change(input, { target: { value: 'New title' } });
+      fireEvent.keyDown(input, { key: 'Enter' });
+      // The input is unmounted now (isRenaming false) -- simulates the blur a real browser fires
+      // when a focused element is removed from the DOM.
+      fireEvent.blur(input);
+
+      expect(onRename).toHaveBeenCalledTimes(1);
+      expect(onRename).toHaveBeenCalledWith('c1', 'New title');
+    });
+
+    it('m6: entering select mode clears a rename in progress', () => {
+      const onRename = jest.fn();
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Old title' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={onRename}
+          onBulkDelete={noop}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      );
+      expect(screen.getByLabelText('Conversation title')).toBeInTheDocument();
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      );
+
+      expect(screen.queryByLabelText('Conversation title')).toBeNull();
+      expect(screen.getByText('Old title')).toBeInTheDocument();
+    });
+
+    it('m6: changing the search term clears a rename in progress', () => {
+      const onRename = jest.fn();
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Old title' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={onRename}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      );
+      fireEvent.change(screen.getByPlaceholderText('Search conversations'), {
+        target: { value: 'old' },
+      });
+
+      expect(screen.queryByLabelText('Conversation title')).toBeNull();
+    });
+
+    it('m6: switching the active conversation clears a rename in progress', () => {
+      const onRename = jest.fn();
+      const { rerender } = render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Old title' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={onRename}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      );
+      expect(screen.getByLabelText('Conversation title')).toBeInTheDocument();
+
+      rerender(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Old title' })]}
+          isLoading={false}
+          activeConversationId='c1'
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={onRename}
+        />,
+      );
+
+      expect(screen.queryByLabelText('Conversation title')).toBeNull();
     });
   });
 
@@ -888,6 +1084,88 @@ describe('ConversationList', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
       expect(onBulkDelete).not.toHaveBeenCalled();
+    });
+
+    it('m11: Escape exits select mode from anywhere in the rail', () => {
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'First' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={noop}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      );
+      expect(
+        screen.getByRole('checkbox', { name: 'Select "First"' }),
+      ).toBeInTheDocument();
+
+      fireEvent.keyDown(
+        screen.getByRole('checkbox', { name: 'Select "First"' }),
+        { key: 'Escape' },
+      );
+
+      expect(
+        screen.queryByRole('checkbox', { name: 'Select "First"' }),
+      ).toBeNull();
+      expect(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      ).toBeInTheDocument();
+    });
+
+    it('m13: a selected id no longer present in `conversations` is pruned on the next render', () => {
+      const onBulkDelete = jest.fn();
+      const { rerender } = render(
+        <ConversationList
+          conversations={[
+            conversation({ id: 'c1', title: 'First' }),
+            conversation({ id: 'c2', title: 'Second' }),
+          ]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={onBulkDelete}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      );
+      fireEvent.click(screen.getByRole('checkbox', { name: 'Select "First"' }));
+      fireEvent.click(
+        screen.getByRole('checkbox', { name: 'Select "Second"' }),
+      );
+      expect(
+        screen.getByRole('button', { name: 'Delete (2)' }),
+      ).toBeInTheDocument();
+
+      // 'First' (c1) is removed from the list this component is given — e.g. a refresh after it
+      // was deleted through some other path (another tab, the single-delete flow).
+      rerender(
+        <ConversationList
+          conversations={[conversation({ id: 'c2', title: 'Second' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={onBulkDelete}
+        />,
+      );
+
+      // The stale id is pruned -- the count drops to 1, not 2, and a confirm would only ever
+      // target the id that still exists.
+      expect(
+        screen.getByRole('button', { name: 'Delete (1)' }),
+      ).toBeInTheDocument();
     });
   });
 });
