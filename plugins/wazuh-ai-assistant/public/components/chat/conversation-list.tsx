@@ -762,7 +762,15 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                           gutterSize='xs'
                         >
                           {selectMode && (
-                            <EuiFlexItem grow={false}>
+                            <EuiFlexItem
+                              grow={false}
+                              // The row's own onClick above ALSO toggles selection in select mode
+                              // (so clicking anywhere on the row works, not only the checkbox
+                              // itself) -- without stopping propagation here, a click on the
+                              // checkbox would bubble into that same handler and toggle twice,
+                              // net effect: nothing changes.
+                              onClick={event => event.stopPropagation()}
+                            >
                               <EuiCheckbox
                                 id={`wzConvoSelect-${conversation.id}`}
                                 checked={isChecked}
