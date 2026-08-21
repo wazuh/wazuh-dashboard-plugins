@@ -580,4 +580,314 @@ describe('ConversationList', () => {
       expect(screen.queryByText(/permanently delete/)).toBeNull();
     });
   });
+
+  describe('list semantics (WCAG/AT: a real list, not a run of generic divs) — E4', () => {
+    it('renders each date group as a native <ul>/<li> list', () => {
+      const { container } = render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Row one' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+        />,
+      );
+
+      const list = container.querySelector('ul.wzConvoRailGroupList');
+      expect(list).not.toBeNull();
+      expect(list?.querySelector('li.wzConvoRailListItem')).not.toBeNull();
+      expect(
+        screen.getByText('Row one').closest('li'),
+      ).not.toBeNull();
+    });
+  });
+
+  describe('inline rename (E2)', () => {
+    it('does not render a rename affordance when onRename is not supplied', () => {
+      render(
+        <ConversationList
+          conversations={[conversation({ title: 'No rename here' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+        />,
+      );
+
+      expect(
+        screen.queryByRole('button', { name: 'Rename conversation' }),
+      ).toBeNull();
+    });
+
+    it('clicking the pencil icon swaps the title for an input, without triggering onSelect', () => {
+      const onSelect = jest.fn();
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Rename me' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={onSelect}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={noop}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      );
+
+      expect(onSelect).not.toHaveBeenCalled();
+      expect(screen.queryByText('Rename me')).toBeNull();
+      const input = screen.getByLabelText(
+        'Conversation title',
+      ) as HTMLInputElement;
+      expect(input.value).toBe('Rename me');
+    });
+
+    it('Enter commits the new title via onRename and closes the input', () => {
+      const onRename = jest.fn();
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Old title' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={onRename}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      );
+      const input = screen.getByLabelText('Conversation title');
+      fireEvent.change(input, { target: { value: 'New title' } });
+      fireEvent.keyDown(input, { key: 'Enter' });
+
+      expect(onRename).toHaveBeenCalledWith('c1', 'New title');
+      expect(screen.queryByLabelText('Conversation title')).toBeNull();
+    });
+
+    it('Escape cancels without calling onRename, restoring the original title', () => {
+      const onRename = jest.fn();
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Old title' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={onRename}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      );
+      const input = screen.getByLabelText('Conversation title');
+      fireEvent.change(input, { target: { value: 'Abandoned' } });
+      fireEvent.keyDown(input, { key: 'Escape' });
+
+      expect(onRename).not.toHaveBeenCalled();
+      expect(screen.getByText('Old title')).toBeInTheDocument();
+    });
+
+    it('an empty/whitespace-only title is not committed', () => {
+      const onRename = jest.fn();
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Old title' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={onRename}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      );
+      const input = screen.getByLabelText('Conversation title');
+      fireEvent.change(input, { target: { value: '   ' } });
+      fireEvent.keyDown(input, { key: 'Enter' });
+
+      expect(onRename).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('select mode / bulk delete (E3)', () => {
+    it('does not render a "Select conversations" entry point when onBulkDelete is not supplied', () => {
+      render(
+        <ConversationList
+          conversations={[conversation()]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+        />,
+      );
+
+      expect(
+        screen.queryByRole('button', { name: 'Select conversations' }),
+      ).toBeNull();
+    });
+
+    it('entering select mode shows a checkbox per row and hides the delete/rename icons', () => {
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Selectable' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={noop}
+          onBulkDelete={noop}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      );
+
+      expect(
+        screen.getByRole('checkbox', { name: 'Select "Selectable"' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Delete conversation' }),
+      ).toBeNull();
+      expect(
+        screen.queryByRole('button', { name: 'Rename conversation' }),
+      ).toBeNull();
+    });
+
+    it('"Cancel selection" exits select mode and clears the selection', () => {
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Selectable' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={noop}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      );
+      fireEvent.click(
+        screen.getByRole('checkbox', { name: 'Select "Selectable"' }),
+      );
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Cancel selection' }),
+      );
+
+      expect(
+        screen.queryByRole('checkbox', { name: 'Select "Selectable"' }),
+      ).toBeNull();
+      expect(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      ).toBeInTheDocument();
+    });
+
+    it('the delete button stays disabled until at least one row is checked', () => {
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Selectable' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={noop}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      );
+      expect(screen.getByRole('button', { name: 'Delete (0)' })).toBeDisabled();
+
+      fireEvent.click(
+        screen.getByRole('checkbox', { name: 'Select "Selectable"' }),
+      );
+      expect(
+        screen.getByRole('button', { name: 'Delete (1)' }),
+      ).not.toBeDisabled();
+    });
+
+    it('shows a "Delete N conversations?" confirm and calls onBulkDelete with every checked id', () => {
+      const onBulkDelete = jest.fn();
+      render(
+        <ConversationList
+          conversations={[
+            conversation({ id: 'c1', title: 'First' }),
+            conversation({ id: 'c2', title: 'Second' }),
+          ]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={onBulkDelete}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      );
+      fireEvent.click(screen.getByRole('checkbox', { name: 'Select "First"' }));
+      fireEvent.click(
+        screen.getByRole('checkbox', { name: 'Select "Second"' }),
+      );
+      fireEvent.click(screen.getByRole('button', { name: 'Delete (2)' }));
+
+      expect(screen.getByText('Delete 2 conversations?')).toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+
+      expect(onBulkDelete).toHaveBeenCalledTimes(1);
+      expect(new Set(onBulkDelete.mock.calls[0][0])).toEqual(
+        new Set(['c1', 'c2']),
+      );
+      // Confirming also leaves select mode.
+      expect(
+        screen.queryByRole('button', { name: 'Cancel selection' }),
+      ).toBeNull();
+    });
+
+    it('canceling the bulk-delete confirm calls neither onDelete nor onBulkDelete', () => {
+      const onBulkDelete = jest.fn();
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'First' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={onBulkDelete}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      );
+      fireEvent.click(screen.getByRole('checkbox', { name: 'Select "First"' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Delete (1)' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
+      expect(onBulkDelete).not.toHaveBeenCalled();
+    });
+  });
 });

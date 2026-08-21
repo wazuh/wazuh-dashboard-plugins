@@ -40,6 +40,7 @@ const mockConversationsService = {
   get: jest.fn(),
   update: jest.fn(),
   remove: jest.fn(),
+  rename: jest.fn(),
 };
 const mockSettingsService = {
   getAssistantSettings: jest.fn(),
@@ -61,6 +62,7 @@ jest.mock('../../services/conversations-service', () => ({
     get: (...args: unknown[]) => mockConversationsService.get(...args),
     update: (...args: unknown[]) => mockConversationsService.update(...args),
     remove: (...args: unknown[]) => mockConversationsService.remove(...args),
+    rename: (...args: unknown[]) => mockConversationsService.rename(...args),
   })),
 }));
 
@@ -157,6 +159,9 @@ function renderChatPage(
     // shows when leaving the app — so tests drive the user's answer through this mock rather than
     // clicking a locally rendered modal.
     overlays: { openConfirm: mockOpenConfirm },
+    notifications: {
+      toasts: { addSuccess: jest.fn(), addDanger: jest.fn() },
+    },
   };
 
   const props: React.ComponentProps<typeof ChatPage> = {
@@ -178,6 +183,7 @@ function renderChatPage(
   const view = render(<ChatPage {...props} />);
   return {
     ...view,
+    core,
     // Re-renders with the SAME prop identities plus `next`, so only the overridden props change.
     rerenderWith: (next: Partial<React.ComponentProps<typeof ChatPage>>) =>
       view.rerender(<ChatPage {...props} {...next} />),
@@ -282,6 +288,11 @@ beforeEach(() => {
     conversationRecord({ version: 'v2' }),
   );
   mockConversationsService.get.mockResolvedValue(conversationRecord());
+  mockConversationsService.rename.mockResolvedValue({
+    id: 'conv-b',
+    title: 'Renamed',
+    updatedAt: '2024-01-01T09:00:00.000Z',
+  });
 });
 
 describe('ChatPage — turn abandoned mid-stream', () => {
@@ -3353,5 +3364,122 @@ describe('ChatPage — admin privacy policy applies without a reload', () => {
     await sendMessage('respect my choice');
 
     expect(mockStreamChat.mock.calls[0][3]).toEqual({ enabled: true, map: [] });
+  });
+});
+
+/**
+ * Issue #9010, conversation-rail group (findings E2/E3/E5): chat-page.tsx's own wiring of
+ * ConversationList's `onRename`/`onBulkDelete` handlers to ConversationsService, plus the
+ * confirmation toast (E5) that fires after a successful single or bulk delete. conversation-list.
+ * test.tsx already covers the component's own rename-input/select-mode/checkbox mechanics in
+ * isolation; these tests are about what chat-page.tsx does once those callbacks actually fire.
+ */
+describe('conversation rail: rename, bulk delete, and delete toasts (#9010)', () => {
+  it('shows a success toast and refreshes the list after deleting a conversation', async () => {
+    mockConversationsService.list.mockResolvedValue([
+      { id: 'conv-b', title: 'Older conversation', updatedAt: '2024-01-01' },
+    ]);
+    const { core } = renderChatPage();
+    await waitFor(() =>
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
+    );
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Delete conversation' }),
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+
+    await waitFor(() =>
+      expect(mockConversationsService.remove).toHaveBeenCalledWith('conv-b'),
+    );
+    expect(core.notifications.toasts.addSuccess).toHaveBeenCalledWith(
+      'Conversation deleted.',
+    );
+    // notifyConversationsChanged() re-lists: once on mount, once after the delete.
+    await waitFor(() =>
+      expect(mockConversationsService.list).toHaveBeenCalledTimes(2),
+    );
+  });
+
+  it('renames a conversation via the pencil icon; Enter commits the new title', async () => {
+    mockConversationsService.list.mockResolvedValue([
+      { id: 'conv-b', title: 'Old title', updatedAt: '2024-01-01' },
+    ]);
+    renderChatPage();
+    await waitFor(() =>
+      expect(conversationRow('Old title')).toBeInTheDocument(),
+    );
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Rename conversation' }),
+    );
+    const input = screen.getByLabelText('Conversation title');
+    fireEvent.change(input, { target: { value: 'New title' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+
+    await waitFor(() =>
+      expect(mockConversationsService.rename).toHaveBeenCalledWith(
+        'conv-b',
+        'New title',
+      ),
+    );
+  });
+
+  it('Escape cancels a rename in progress without calling rename', async () => {
+    mockConversationsService.list.mockResolvedValue([
+      { id: 'conv-b', title: 'Old title', updatedAt: '2024-01-01' },
+    ]);
+    renderChatPage();
+    await waitFor(() =>
+      expect(conversationRow('Old title')).toBeInTheDocument(),
+    );
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Rename conversation' }),
+    );
+    const input = screen.getByLabelText('Conversation title');
+    fireEvent.change(input, { target: { value: 'Abandoned edit' } });
+    fireEvent.keyDown(input, { key: 'Escape' });
+
+    expect(screen.getByText('Old title')).toBeInTheDocument();
+    expect(mockConversationsService.rename).not.toHaveBeenCalled();
+  });
+
+  it('bulk-deletes every selected conversation and shows a pluralized success toast', async () => {
+    mockConversationsService.list.mockResolvedValue([
+      { id: 'conv-a', title: 'First conversation', updatedAt: '2024-01-02' },
+      { id: 'conv-b', title: 'Second conversation', updatedAt: '2024-01-01' },
+    ]);
+    const { core } = renderChatPage();
+    await waitFor(() =>
+      expect(conversationRow('First conversation')).toBeInTheDocument(),
+    );
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Select conversations' }),
+    );
+    fireEvent.click(
+      screen.getByRole('checkbox', { name: 'Select "First conversation"' }),
+    );
+    fireEvent.click(
+      screen.getByRole('checkbox', { name: 'Select "Second conversation"' }),
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Delete (2)' }));
+
+    expect(
+      screen.getByText('Delete 2 conversations?'),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+
+    await waitFor(() =>
+      expect(mockConversationsService.remove).toHaveBeenCalledTimes(2),
+    );
+    expect(mockConversationsService.remove).toHaveBeenCalledWith('conv-a');
+    expect(mockConversationsService.remove).toHaveBeenCalledWith('conv-b');
+    await waitFor(() =>
+      expect(core.notifications.toasts.addSuccess).toHaveBeenCalledWith(
+        '2 conversations deleted.',
+      ),
+    );
   });
 });
