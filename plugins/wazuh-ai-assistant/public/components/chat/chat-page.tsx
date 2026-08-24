@@ -26,6 +26,7 @@ import {
   EuiIcon,
   EuiFlyout,
   EuiFlyoutBody,
+  htmlIdGenerator,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { AppMountParameters, CoreStart } from '../../../../../src/core/public';
@@ -486,6 +487,18 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
      * deliberately NOT reset by anything else in this component: it is the reader's own disclosure,
      * so a conversation switch or an incoming answer must not close it under them. */
     const [isPrivacyHelpOpen, setIsPrivacyHelpOpen] = useState(false);
+    /**
+     * Id of the visible "set by administrator" line, referenced by the privacy chip's
+     * `aria-describedby` when the policy is locked.
+     *
+     * Generated per instance rather than a fixed string: this component is mounted TWICE in a
+     * running dashboard — the app shell's full-page chat and the header's docked sidecar — and two
+     * elements sharing one DOM id is exactly the case `aria-describedby` cannot resolve correctly.
+     * Held in `useState`'s lazy-initializer form so it is minted once per mount, not per render.
+     */
+    const [privacyLockNoteId] = useState(() =>
+      htmlIdGenerator('wzPrivacyLockNote')(),
+    );
     // Set on the user's first manual toggle so the settings-driven default effect below stops
     // recomputing it (e.g. if the top-level provider selector changes later in the same session).
     const privacyTouchedRef = useRef(false);
@@ -2602,9 +2615,6 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
           'Privacy mode: pseudonymize sensitive data before sending to the AI provider',
       },
     );
-    /** Id of the visible "set by administrator" line below, referenced by `aria-describedby` when
-     * the policy is locked — see `privacyChip`. */
-    const PRIVACY_LOCK_NOTE_ID = 'wzPrivacyLockNote';
     const canTogglePrivacy = assistantSettings?.userCanOverride === true;
 
     // A real switch, not a badge that happens to be clickable (`role='switch'` +
@@ -2641,7 +2651,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
           : {
               'aria-disabled': true,
               tabIndex: 0,
-              'aria-describedby': PRIVACY_LOCK_NOTE_ID,
+              'aria-describedby': privacyLockNoteId,
             })}
       >
         {i18n.translate('wazuhAiAssistant.chat.privacy.chipLabel', {
@@ -3521,7 +3531,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                               <EuiText
                                 size='xs'
                                 color='subdued'
-                                id={PRIVACY_LOCK_NOTE_ID}
+                                id={privacyLockNoteId}
                                 data-test-subj='wzPrivacyLockNote'
                               >
                                 <span>
