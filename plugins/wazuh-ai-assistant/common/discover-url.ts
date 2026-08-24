@@ -142,6 +142,79 @@ function findTimeRangeClause(clause: unknown): TimeRange | undefined {
   return undefined;
 }
 
+/**
+ * Same clause shape as `rangeFromClause` above, but returns a pair only when BOTH the lower and
+ * upper bound are actually present — never substituting `DEFAULT_TIME_RANGE`'s edge for a missing
+ * side. A one-sided clause (only a `gte`/`from`, or only an `lte`/`to`) is treated as "no
+ * recognizable range" here, preserving its true one-sided shape rather than inventing the missing
+ * bound.
+ *
+ * This is a deliberately SEPARATE walk from `rangeFromClause`/`findTimeRangeClause`, not a shared
+ * one with the default suppressed after the fact: those two feed the "Open in Discover" LINK,
+ * which always needs a concrete, openable window and so has a legitimate reason to default a
+ * missing side — `rangeBoundsFromDsl` (below) feeds `TableSpec.provenance`, a FACT record with no
+ * such need (issue #9008 review, major 5).
+ */
+function rawRangeFromClause(
+  clause: unknown,
+): { gte: string; lte: string } | undefined {
+  if (!clause || typeof clause !== 'object') {
+    return undefined;
+  }
+  const range = (clause as Record<string, unknown>).range;
+  if (!range || typeof range !== 'object') {
+    return undefined;
+  }
+  for (const field of TIMESTAMP_FIELDS) {
+    const fieldRange = (range as Record<string, unknown>)[field];
+    if (fieldRange && typeof fieldRange === 'object') {
+      const bounds = fieldRange as Record<string, unknown>;
+      const lower = bounds.gte ?? bounds.gt ?? bounds.from;
+      const upper = bounds.lte ?? bounds.lt ?? bounds.to;
+      if (lower !== undefined && upper !== undefined) {
+        return { gte: String(lower), lte: String(upper) };
+      }
+    }
+  }
+  return undefined;
+}
+
+/** `rawRangeFromClause`'s companion walk, mirroring `findTimeRangeClause`'s
+ * bool.filter/bool.must recursion exactly (see that function's own doc comment for why `should`/
+ * `must_not` are excluded and why a nested `bool` is followed one level deeper). */
+function findRawTimeRangeClause(
+  clause: unknown,
+): { gte: string; lte: string } | undefined {
+  const direct = rawRangeFromClause(clause);
+  if (direct) {
+    return direct;
+  }
+  if (!clause || typeof clause !== 'object' || Array.isArray(clause)) {
+    return undefined;
+  }
+  const bool = (clause as Record<string, unknown>).bool as
+    | Record<string, unknown>
+    | undefined;
+  if (!bool || typeof bool !== 'object') {
+    return undefined;
+  }
+  for (const key of ['filter', 'must']) {
+    const clauses = bool[key];
+    const list = Array.isArray(clauses)
+      ? clauses
+      : clauses !== undefined
+      ? [clauses]
+      : [];
+    for (const entry of list) {
+      const found = findRawTimeRangeClause(entry);
+      if (found) {
+        return found;
+      }
+    }
+  }
+  return undefined;
+}
+
 /** Whether `dsl` carries a readable timestamp range at all — i.e. whether `extractTimeRange`
  * below would return the model's own window rather than silently substituting the 24h default.
  * Exported for suggest-discover-query.ts, whose disclosure must SAY when the window was
@@ -166,6 +239,27 @@ export function extractTimeRange(
     return DEFAULT_TIME_RANGE;
   }
   return findTimeRangeClause(dsl) ?? DEFAULT_TIME_RANGE;
+}
+
+/**
+ * `{gte, lte}` form of a DSL's time-range clause — but, unlike `extractTimeRange`, `undefined`
+ * whenever `dsl` carries no clause with BOTH bounds present (never the last-24h default, and
+ * never a one-sided clause filled in with that default's edge — issue #9008 review, major 5:
+ * `extractTimeRange`/`rangeFromClause` fill a missing side from `DEFAULT_TIME_RANGE` for the
+ * "Open in Discover" link's own legitimate reason to always have an openable window; a FACT
+ * record has no such reason, so this walks the DSL again itself via `findRawTimeRangeClause`
+ * rather than reusing (and inheriting) that other walk's defaulting). Shared by
+ * server/tools/executor.ts (recording the requested/effective provenance windows on a
+ * `TableSpec`) and the client's evidence popover (tool-call-label.ts): both sides read a DSL's
+ * time window through this one function, so neither can invent a window the DSL never stated.
+ */
+export function rangeBoundsFromDsl(
+  dsl: Record<string, unknown> | undefined,
+): { gte: string; lte: string } | undefined {
+  if (!dsl) {
+    return undefined;
+  }
+  return findRawTimeRangeClause(dsl);
 }
 
 /**

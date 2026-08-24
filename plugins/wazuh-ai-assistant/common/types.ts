@@ -197,6 +197,38 @@ export interface TableSpec {
     label: string;
     url: string;
   };
+  /**
+   * Issue #9008 rework: server-recorded provenance FACTS for the evidence popover, the sole
+   * source the client may render index/time-range detail from — the client must never infer or
+   * default any of this itself. Populated in server/tools/executor.ts's `executeIndexerRequest`
+   * from exactly what it observed executing the query (absent entirely for a Manager-API table,
+   * which has no index/DSL concept at all):
+   *  - `index`: the concrete index queried (same value as `discover.index` above).
+   *  - `requestedRange`/`effectiveRange`: the `{gte, lte}` pair read directly off the query DSL,
+   *    before and after the 90-day lookback guardrail (`guardrails.ts`'s `clampLookbackWindow`)
+   *    ran — via `common/discover-url.ts`'s `rangeBoundsFromDsl`, the same reader the "Open in
+   *    Discover" link uses. `undefined` when that DSL carried no recognizable range clause at
+   *    all (most catalog tools have no time-range concept and never will), NOT a default.
+   *  - `clamped`: true only when `clampLookbackWindow` actually narrowed the query.
+   *  - `toolCallId`: attached by server/routes/chat.ts (which is where the streaming tool call's
+   *    id is in scope), not by the executor — it is what lets the client attribute this table to
+   *    the exact one tool call that produced it, rather than to every call in a multi-call turn.
+   *  - `executedAt`: the epoch ms the query actually ran at, recorded by the executor at creation
+   *    time. Issue #9008 review, blocker 2: a date-math bound ("now-90d") only means something
+   *    relative to WHEN it ran -- resolving it against the render-time clock instead would show a
+   *    restored conversation a window the query never ran against. `describeProvenance`
+   *    (tool-call-label.ts) resolves date-math bounds against this stored instant, never against
+   *    `Date.now()`. `undefined` only for a conversation persisted before this field existed --
+   *    the client shows the literal bound strings rather than an absolute instant in that case.
+   */
+  provenance?: {
+    toolCallId?: string;
+    index?: string;
+    requestedRange?: { gte: string; lte: string };
+    effectiveRange?: { gte: string; lte: string };
+    clamped: boolean;
+    executedAt?: number;
+  };
 }
 
 export interface StreamUsage {

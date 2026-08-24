@@ -1222,16 +1222,29 @@ describe('ChatPage — feedback while a turn runs', () => {
       spec: {
         columns: [{ id: 'agent', label: 'Agent' }],
         rows: [{ agent: 'web-01' }],
+        // Issue #9008 rework: the chip's window text is a server-recorded fact
+        // (`TableSpec.provenance`), matched to this call by `toolCallId` — not inferred from
+        // the call's own `arguments` (which are empty here).
+        provenance: {
+          toolCallId: 't1',
+          effectiveRange: { gte: 'now-90d', lte: 'now' },
+          clamped: false,
+        },
       },
     });
     // The `digest` event that follows must not release the held table — it is held until TEXT
     // arrives, not until the next non-delta event comes along.
     stream.push({ type: 'digest', toolCallId: 't1', content: '{}' });
-    // The chip's label is derived from the tool call itself (name + time range), not from the
-    // table, so it appears with its final text even while the table is still held.
+    // The below-bubble chip renders straight away from `toolCalls` alone (name only) — but the
+    // spec itself (and so its `provenance`) is still sitting in chat-page.tsx's `pendingTable`
+    // buffer, NOT yet on `message.table`, until the table is actually committed below. Issue
+    // #9008 rework: with no `message.table` to match a `toolCallId` against yet, there is
+    // genuinely no provenance fact available to show, so the chip must not invent one — it
+    // names the call alone until the table (and its provenance) actually commits.
     await waitFor(() =>
-      expect(screen.getByText('Top agents · 90d')).toBeInTheDocument(),
+      expect(screen.getByText('Top agents')).toBeInTheDocument(),
     );
+    expect(screen.queryByText('Top agents · 90d')).toBeNull();
     expect(screen.queryByText('web-01')).not.toBeInTheDocument();
 
     stream.push({ type: 'delta', content: 'here they are' });
@@ -1240,6 +1253,9 @@ describe('ChatPage — feedback while a turn runs', () => {
       expect(screen.getByText('here they are')).toBeInTheDocument(),
     );
     expect(screen.getByText('web-01')).toBeInTheDocument();
+    // The table (and its provenance) has now committed and moved into the result card's own
+    // header — the chip shows its real window there.
+    expect(screen.getByText('Top agents · 90d')).toBeInTheDocument();
   });
 
   it('still shows a held table when the turn ends without any answer text', async () => {
@@ -1303,15 +1319,15 @@ describe('ChatPage — feedback while a turn runs', () => {
       },
     });
 
-    // No table event this turn, so the chip's label is derived purely from the tool call itself:
-    // its humanized name plus the default 90-day time window.
+    // No table event this turn, so no provenance either — issue #9008 rework: the chip must
+    // name the call alone, with no window invented from its (here time-range-less) `arguments`.
     await waitFor(() =>
-      expect(screen.getByText('Wazuh data · 90d')).toBeInTheDocument(),
+      expect(screen.getByText('Wazuh data')).toBeInTheDocument(),
     );
     // Raw arguments are one click deeper, not on screen unbidden.
     expect(screen.queryByText(/wazuh-alerts-\*/)).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByText('Wazuh data · 90d'));
+    fireEvent.click(screen.getByText('Wazuh data'));
     expect(await screen.findByText(/wazuh-alerts-\*/)).toBeInTheDocument();
   });
 
@@ -1343,9 +1359,9 @@ describe('ChatPage — feedback while a turn runs', () => {
     await waitFor(() =>
       expect(screen.getByText('42 alerts')).toBeInTheDocument(),
     );
-    // No discover info on this restored table, but the chip's label doesn't need it — it's
-    // derived from the tool call itself, same as on a live turn.
-    expect(screen.getByText('Wazuh data · 90d')).toBeInTheDocument();
+    // No table (and so no provenance) was ever persisted for this turn, same as a live turn with
+    // no table event — the restored chip names the call alone, nothing invented for it.
+    expect(screen.getByText('Wazuh data')).toBeInTheDocument();
   });
 });
 
@@ -1524,7 +1540,20 @@ describe('ChatPage — an empty table never clobbers a populated one (issue #892
       type: 'tool_call',
       toolCall: { id: 't1', name: 'get_top_agents', arguments: {} },
     });
-    stream.push({ type: 'table', spec: EMPTY_SPEC });
+    // Issue #9008 rework: the chip's window text is now a server-recorded fact
+    // (`TableSpec.provenance`), so this empty spec carries one matching `t1` — same shape
+    // executor.ts actually attaches, rather than relying on any client-side inference.
+    stream.push({
+      type: 'table',
+      spec: {
+        ...EMPTY_SPEC,
+        provenance: {
+          toolCallId: 't1',
+          effectiveRange: { gte: 'now-90d', lte: 'now' },
+          clamped: false,
+        },
+      },
+    });
     stream.push({ type: 'delta', content: 'Nothing matched.' });
     stream.push({ type: 'done' });
     stream.end();

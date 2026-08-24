@@ -3016,6 +3016,15 @@ export async function* orchestrate(
             }
           }
 
+          // Issue #9008 rework (blocker 3): a multi-call turn can run several tool calls before
+          // landing on a table, and the client renders one chip per call — attach THIS call's own
+          // id to its provenance so the chip that actually produced this table is the only one the
+          // client enriches with it (message-bubble.tsx matches on this id, never on position).
+          // Set here rather than in executor.ts: this is where `event.toolCall.id` is in scope,
+          // and executor.ts has no notion of "which call in the turn" it is being invoked for.
+          if (outcome.tableEvent.spec.provenance) {
+            outcome.tableEvent.spec.provenance.toolCallId = event.toolCall.id;
+          }
           yield outcome.tableEvent;
           if (outcome.tableEvent.spec.rows.length > 0) {
             // Table-suppression activation (markdown-table-filter.ts): from this point on in the
