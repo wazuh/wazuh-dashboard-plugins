@@ -58,7 +58,7 @@
     "wazuhAiAssistant.resultTable.tableCaptionTotal": "Esta tabla contiene {total, plural, one {# fila} other {# filas}}.",
     "wazuhAiAssistant.resultTable.tableCaptionPaged": "Esta tabla contiene {total, plural, one {# fila} other {# filas}}. Mostrando las filas {start}-{end}, página {page} de {pageCount}.",
     "wazuhAiAssistant.resultTable.openInDiscover": "Abrir en Discover",
-    "wazuhAiAssistant.resultTable.openInDiscoverDefaultRange": "Abrir en Discover (rango predeterminado: {window})",
+    "wazuhAiAssistant.resultTable.openInDiscoverFullHistory": "Abrir en Discover (todo el historial)",
     "wazuhAiAssistant.resultTable.severity.critical": "Crítico",
     "wazuhAiAssistant.resultTable.severity.high": "Alto",
     "wazuhAiAssistant.resultTable.severity.medium": "Medio",

@@ -5,6 +5,8 @@ import {
   buildDiscoverUrl,
   hasExplicitTimeRange,
   rangeBoundsFromDsl,
+  resolveDiscoverTimeRange,
+  UNBOUNDED_TIME_RANGE,
 } from './discover-url';
 
 test('risonEncode: plain string is single-quoted', () => {
@@ -239,4 +241,57 @@ test('buildDiscoverUrl: produces the expected rison-encoded, encodeURI-escaped h
     !url.includes('%27'),
     'single quotes must survive encodeURI unescaped',
   );
+});
+
+// --- resolveDiscoverTimeRange: the window the "Open in Discover" link actually carries ---------
+
+test('resolveDiscoverTimeRange: the server-recorded effective range wins over the dsl clause', () => {
+  // The two normally agree (both are read off the executed body), so this asserts the PRECEDENCE:
+  // if they ever disagree, the link must open the window the server recorded executing — the same
+  // fact the evidence popover states — never one re-derived client-side.
+  assert.deepEqual(
+    resolveDiscoverTimeRange({
+      dsl: { range: { '@timestamp': { gte: 'now-24h', lte: 'now' } } },
+      effectiveRange: { gte: 'now-90d', lte: 'now' },
+    }),
+    { from: 'now-90d', to: 'now' },
+  );
+});
+
+test('resolveDiscoverTimeRange: falls back to the dsl clause when no range was recorded', () => {
+  assert.deepEqual(
+    resolveDiscoverTimeRange({
+      dsl: { bool: { filter: { range: { timestamp: { gte: 'now-7d' } } } } },
+    }),
+    { from: 'now-7d', to: 'now' },
+  );
+});
+
+test('resolveDiscoverTimeRange: a time-unbounded query opens on all of history, not last-24h', () => {
+  // The defect this closes: a query with no time filter matched the whole index, but the link
+  // narrowed Discover to 24 hours, so Discover showed a smaller total than the answer above it.
+  assert.deepEqual(
+    resolveDiscoverTimeRange({ dsl: { match_all: {} } }),
+    UNBOUNDED_TIME_RANGE,
+  );
+  assert.deepEqual(resolveDiscoverTimeRange({}), UNBOUNDED_TIME_RANGE);
+  assert.notEqual(UNBOUNDED_TIME_RANGE.from, 'now-24h');
+});
+
+test('resolveDiscoverTimeRange: the unbounded lower bound is an instant Discover can resolve', () => {
+  assert.ok(!Number.isNaN(Date.parse(UNBOUNDED_TIME_RANGE.from)));
+  assert.equal(UNBOUNDED_TIME_RANGE.to, 'now');
+});
+
+test('buildDiscoverUrl: carries the resolved window into _g time, not a fixed default', () => {
+  const url = buildDiscoverUrl({
+    discoverAppUrl: 'https://osd.example/app/data-explorer/discover',
+    indexPatternId: 'abc-123',
+    dsl: { match_all: {} },
+    timeRange: resolveDiscoverTimeRange({
+      effectiveRange: { gte: 'now-90d', lte: 'now' },
+    }),
+  });
+  assert.ok(url.includes("time:(from:'now-90d',to:'now')"));
+  assert.ok(!url.includes("from:'now-24h'"));
 });

@@ -14,6 +14,27 @@ export interface TimeRange {
 
 export const DEFAULT_TIME_RANGE: TimeRange = { from: 'now-24h', to: 'now' };
 
+/**
+ * The window a time-UNBOUNDED query must open Discover to: everything, not `DEFAULT_TIME_RANGE`.
+ *
+ * A query whose DSL carries no range clause at all was not "a last-24-hours query with the bound
+ * left implicit" — it had no time filter, so its totals cover the whole index. Handing Discover
+ * `DEFAULT_TIME_RANGE` for that case narrowed the link to a 24-hour slice of the same query,
+ * guaranteeing a smaller total than the answer above it the moment any matching document is older
+ * than a day. An epoch lower bound reproduces the executed query exactly; it is an absolute ISO
+ * instant rather than date-math (`now-99y`) because OSD resolves date-math against the browser's
+ * clock and a bound that far out is not expressible as a fixed shorthand.
+ *
+ * `DEFAULT_TIME_RANGE` is deliberately left as-is: `extractTimeRange` fills a ONE-SIDED clause's
+ * missing edge from it (a query that stated `gte: now-7d` and no upper bound really does mean "up
+ * to now"), and server/tools/suggest-discover-query.ts reads it for its own disclosure text.
+ * Only the fully range-less case changes.
+ */
+export const UNBOUNDED_TIME_RANGE: TimeRange = {
+  from: '1970-01-01T00:00:00.000Z',
+  to: 'now',
+};
+
 // Time fields a tool's DSL range clause might use, to reconstruct the Discover time window:
 // @timestamp (Wazuh 5.0 findings-v5/events-v5), state.modified_at (the wazuh-states-* families),
 // and legacy `timestamp` (4.14). extractTimeRange scans for whichever is present.
@@ -260,6 +281,37 @@ export function rangeBoundsFromDsl(
     return undefined;
   }
   return findRawTimeRangeClause(dsl);
+}
+
+/**
+ * The window the "Open in Discover" link must carry, resolved from what the SERVER recorded about
+ * the query it actually ran rather than from a client-side default:
+ *
+ *  1. `effectiveRange` — `TableSpec.provenance.effectiveRange`, the post-guardrail `{gte, lte}` the
+ *     executor read off the executed body (see `TableSpec.provenance` in common/types.ts). This is
+ *     the same fact the evidence popover states as "the window this ran against", so taking it
+ *     first makes it structurally impossible for the link to open a window the popover contradicts
+ *     — even if `discover.dsl` and the recorded provenance ever stop being derived from the same
+ *     body.
+ *  2. A range clause read out of `dsl` itself (`extractTimeRange`) — the path for a table persisted
+ *     before provenance existed, which still carries its DSL.
+ *  3. `UNBOUNDED_TIME_RANGE` — no recorded range and no clause in the DSL means the query had no
+ *     time filter, so the link opens on all of history rather than silently narrowing to
+ *     `DEFAULT_TIME_RANGE`'s 24 hours and under-counting the answer it sits under.
+ *
+ * Case 3 is the behavior change: cases 1 and 2 agree on every query whose DSL states a window
+ * (they are read off the same body), so this only ever moves the range-less case.
+ */
+export function resolveDiscoverTimeRange(params: {
+  dsl?: Record<string, unknown>;
+  effectiveRange?: { gte: string; lte: string };
+}): TimeRange {
+  const { dsl, effectiveRange } = params;
+  if (effectiveRange) {
+    return { from: effectiveRange.gte, to: effectiveRange.lte };
+  }
+  const fromDsl = dsl ? findTimeRangeClause(dsl) : undefined;
+  return fromDsl ?? UNBOUNDED_TIME_RANGE;
 }
 
 /**

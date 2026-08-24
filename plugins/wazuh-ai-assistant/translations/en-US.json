@@ -58,7 +58,7 @@
     "wazuhAiAssistant.resultTable.tableCaptionTotal": "This table contains {total, plural, one {# row} other {# rows}}.",
     "wazuhAiAssistant.resultTable.tableCaptionPaged": "This table contains {total, plural, one {# row} other {# rows}}. Showing rows {start}-{end}, page {page} of {pageCount}.",
     "wazuhAiAssistant.resultTable.openInDiscover": "Open in Discover",
-    "wazuhAiAssistant.resultTable.openInDiscoverDefaultRange": "Open in Discover (default range: {window})",
+    "wazuhAiAssistant.resultTable.openInDiscoverFullHistory": "Open in Discover (all time)",
     "wazuhAiAssistant.resultTable.severity.critical": "Critical",
     "wazuhAiAssistant.resultTable.severity.high": "High",
     "wazuhAiAssistant.resultTable.severity.medium": "Medium",

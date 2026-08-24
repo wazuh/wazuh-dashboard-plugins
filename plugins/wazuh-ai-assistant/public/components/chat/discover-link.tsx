@@ -5,9 +5,8 @@ import { CoreStart } from '../../../../../src/core/public';
 import { TableSpec } from '../../../common/types';
 import {
   buildDiscoverUrl,
-  DEFAULT_TIME_RANGE,
-  extractTimeRange,
   hasExplicitTimeRange,
+  resolveDiscoverTimeRange,
 } from '../../../common/discover-url';
 
 export type ResolveDiscoverUrl = (spec: TableSpec) => Promise<string | null>;
@@ -72,7 +71,14 @@ export function createDiscoverUrlResolver(core: CoreStart): ResolveDiscoverUrl {
     const discoverAppUrl = core.http.basePath.prepend(
       '/app/data-explorer/discover',
     );
-    const timeRange = extractTimeRange(spec.discover.dsl);
+    // The window comes from what the server recorded executing this query, falling back to the
+    // DSL's own clause and finally to an UNBOUNDED window — never to a 24-hour default that would
+    // under-count the answer this link sits under. See `resolveDiscoverTimeRange`'s doc comment
+    // (common/discover-url.ts) for the full precedence and why case 3 changed.
+    const timeRange = resolveDiscoverTimeRange({
+      dsl: spec.discover.dsl,
+      effectiveRange: spec.provenance?.effectiveRange,
+    });
     return buildDiscoverUrl({
       discoverAppUrl,
       indexPatternId,
@@ -85,16 +91,6 @@ export function createDiscoverUrlResolver(core: CoreStart): ResolveDiscoverUrl {
 interface DiscoverLinkProps {
   spec: TableSpec;
   resolveDiscoverUrl: ResolveDiscoverUrl;
-}
-
-/** `now-24h` -> "24h": the same date-math shorthand every other window label in this plugin uses
- * (tool-call-label.ts's `shortDateMath`). Derived from `DEFAULT_TIME_RANGE.from`
- * (common/discover-url.ts) rather than a hardcoded "24h" literal, so the fallback label can never
- * silently drift from the actual default window it is describing. Falls back to the raw
- * date-math string on the off chance `DEFAULT_TIME_RANGE` ever stops being that shape. */
-function defaultRangeWindowLabel(): string {
-  const match = /^now-(\d+[dhm])$/.exec(DEFAULT_TIME_RANGE.from);
-  return match ? match[1] : DEFAULT_TIME_RANGE.from;
 }
 
 /**
@@ -132,14 +128,16 @@ export const DiscoverLink: React.FC<DiscoverLinkProps> = ({
     return null;
   }
 
-  // Issue #9008 (I5): `resolveDiscoverUrl` (above) falls back to the last-24h default window
-  // ONLY when `spec.discover.dsl` carries no explicit, recognizable time-range clause at all
-  // (`hasExplicitTimeRange` / `extractTimeRange`, common/discover-url.ts) — every other query
-  // opens Discover to the SAME window it actually ran against. The QA E2E review's broader claim
-  // that this link "hardcodes now-24h" was checked and is inaccurate; the real, narrower gap is
-  // that this range-less fallback case looked identical to every other link, giving no hint the
-  // window it opens to may not match the one the answer above it used.
-  const isRangeLessFallback = !hasExplicitTimeRange(spec.discover?.dsl);
+  // A query with no recognizable time-range clause AND no server-recorded effective range had no
+  // time filter at all, so `resolveDiscoverTimeRange` opens the link on all of history rather than
+  // on a 24-hour default that would under-count the answer above it (issue #9008 item I5 covered
+  // only the LABEL for this case; the window itself still narrowed). The label says so, because
+  // "all of history" is a materially different reading experience from the bounded window every
+  // other link opens — and because a reader who expected a bounded view deserves to know before
+  // clicking, not after Discover has loaded the whole index.
+  const isUnboundedWindow =
+    !spec.provenance?.effectiveRange &&
+    !hasExplicitTimeRange(spec.discover?.dsl);
 
   return (
     <EuiButtonEmpty
@@ -149,13 +147,10 @@ export const DiscoverLink: React.FC<DiscoverLinkProps> = ({
       target='_blank'
       rel='noopener noreferrer'
     >
-      {isRangeLessFallback
+      {isUnboundedWindow
         ? i18n.translate(
-            'wazuhAiAssistant.resultTable.openInDiscoverDefaultRange',
-            {
-              defaultMessage: 'Open in Discover (default range: {window})',
-              values: { window: defaultRangeWindowLabel() },
-            },
+            'wazuhAiAssistant.resultTable.openInDiscoverFullHistory',
+            { defaultMessage: 'Open in Discover (all time)' },
           )
         : i18n.translate('wazuhAiAssistant.resultTable.openInDiscover', {
             defaultMessage: 'Open in Discover',
