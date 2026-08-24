@@ -1169,11 +1169,28 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
      *   3. everything already loaded (sidebar conversation switch) — likewise the request, which is
      *      why it must be state with a fresh identity rather than a ref.
      *
-     * Waits for `providersLoaded` rather than for a non-empty list: a user with genuinely no
-     * providers configured would otherwise leave the request parked forever.
+     * `providersLoaded` alone is NOT enough to act on, because it does not mean "the provider list
+     * is known" — `useProviders` (public/hooks/use-providers.ts) also sets it from its 20s load
+     * DEADLINE and from a rejected `list()`, in both cases leaving `providers` empty and
+     * `providersError` set. Neither is an authoritative answer, and the timeout case is explicitly
+     * recoverable: the deadline does not cancel the in-flight request, so a slow `list()` can still
+     * resolve afterwards and fill the list in. Spending the request against that empty list would
+     * conclude "this conversation's provider no longer exists" from a network hiccup and then have
+     * nothing left to correct itself with when the real list arrived.
+     *
+     * So the request is only spent on an AUTHORITATIVE list: a non-empty one, or an empty one that
+     * came back cleanly (`!providersError`) — which is the genuine "no providers configured" case
+     * and rightly has nothing to restore. An empty list carrying an error parks the request instead,
+     * for the late success or the next `PROVIDERS_CHANGED_EVENT` refresh to resolve.
      */
     useEffect(() => {
-      if (!providerRestoreRequest || !providersLoaded) {
+      const providerListIsAuthoritative =
+        providers.length > 0 || !providersError;
+      if (
+        !providerRestoreRequest ||
+        !providersLoaded ||
+        !providerListIsAuthoritative
+      ) {
         return;
       }
       // Consumed exactly once, before anything is decided: whether a candidate matches or not, this
@@ -1195,7 +1212,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       // which is precisely the path that must CANCEL a pending restore, not apply it (see
       // `handleUserProviderChange`).
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [providerRestoreRequest, providers, providersLoaded]);
+    }, [providerRestoreRequest, providers, providersLoaded, providersError]);
 
     // Per-conversation privacy default: resolved once settings AND a selected
     // provider are both known, and never recomputed after the user's first manual toggle — switching

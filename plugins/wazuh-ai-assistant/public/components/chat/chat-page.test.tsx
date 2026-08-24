@@ -3349,6 +3349,81 @@ describe('ChatPage — provider provenance and per-conversation memory', () => {
     await waitFor(() => expect(onProviderChange).toHaveBeenCalledWith('p2'));
   });
 
+  it('survives a provider-load timeout and restores when the late list arrives', async () => {
+    // `providersLoaded` does not mean "the list is known": use-providers.ts also sets it from its
+    // 20s load deadline, leaving `providers` empty and `providersError` set — and that deadline does
+    // NOT cancel the in-flight request, so a slow `list()` can still resolve afterwards. Spending
+    // the request against that empty list would conclude "this conversation's provider no longer
+    // exists" from a network hiccup, with nothing left to correct itself when the real list landed.
+    const onProviderChange = jest.fn();
+    const view = renderDeepLinkRestore(
+      'p2',
+      [PROVIDER, GROQ],
+      onProviderChange,
+    );
+    await settleRestore();
+
+    // The 20s deadline fires: loaded, but empty and carrying an error.
+    view.rerenderWith({
+      providers: [],
+      providersLoaded: true,
+      providersError:
+        'Loading the configured providers timed out. Reload the page, or check the Settings tab.',
+      selectedProviderId: '',
+    });
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(onProviderChange).not.toHaveBeenCalled();
+
+    // The slow request lands after all: the request must still be there to spend.
+    view.rerenderWith({
+      providers: [PROVIDER, GROQ],
+      providersLoaded: true,
+      providersError: null,
+      selectedProviderId: PROVIDER.id,
+    });
+
+    await waitFor(() => expect(onProviderChange).toHaveBeenCalledWith('p2'));
+  });
+
+  it('spends the request on a cleanly-empty provider list (nothing configured), not parking forever', async () => {
+    // The other half of the same gate: an empty list with NO error is an authoritative "no providers
+    // configured", which genuinely has nothing to restore. It must consume the request rather than
+    // park it, or a provider added later would silently re-point the picker at an old conversation's
+    // provider.
+    const onProviderChange = jest.fn();
+    const view = renderDeepLinkRestore(
+      'p2',
+      [PROVIDER, GROQ],
+      onProviderChange,
+    );
+    await settleRestore();
+
+    view.rerenderWith({
+      providers: [],
+      providersLoaded: true,
+      providersError: null,
+      selectedProviderId: '',
+    });
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(onProviderChange).not.toHaveBeenCalled();
+
+    // Providers appear later (a PROVIDERS_CHANGED_EVENT refresh). The request is already spent.
+    view.rerenderWith({
+      providers: [PROVIDER, GROQ],
+      providersLoaded: true,
+      providersError: null,
+      selectedProviderId: PROVIDER.id,
+    });
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(onProviderChange).not.toHaveBeenCalled();
+  });
+
   it('never re-applies a spent restore when the reader later picks a provider', async () => {
     // The failure mode this guards: a restore request that outlives the render it was made for, and
     // then fires on some LATER render — snapping the picker back to the remembered provider after
