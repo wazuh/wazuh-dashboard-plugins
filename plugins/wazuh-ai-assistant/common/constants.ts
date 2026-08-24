@@ -27,9 +27,10 @@ export const API_PATHS = {
   /** Persistent conversations: owner-scoped CRUD over the
    * `wazuh-ai-assistant-sessions` index alias (server/routes/conversations.ts,
    * server/conversation-store.ts). GET lists the caller's own conversations (summaries only —
-   * id/title/updatedAt, never `messages`); POST creates one; GET/PUT/DELETE `{id}` operate on a
-   * single conversation and 404 (never 403) when it exists but belongs to a different owner, so
-   * existence is never leaked cross-owner. */
+   * id/title/updatedAt, never `messages`); POST creates one; GET/PUT/PATCH/DELETE `{id}` operate on
+   * a single conversation and 404 (never 403) when it exists but belongs to a different owner, so
+   * existence is never leaked cross-owner. PATCH is title-only (rename); PUT replaces the full
+   * title+messages transcript. */
   CONVERSATIONS: `${API_ROOT}/conversations`,
   CONVERSATION_BY_ID: (id: string) => `${API_ROOT}/conversations/${id}`,
 } as const;
