@@ -50,18 +50,48 @@ const DEFAULT_PAGE_SIZE = 10;
 const PAGE_SIZE_OPTIONS = [5, 10, 25, 50];
 
 /**
- * Issue #9009 (J1): container width, in px, below which the results card switches to "narrow
- * mode" — only the first `NARROW_MAX_VISIBLE_COLUMNS` columns render, and their text truncates
- * with a tooltip instead of wrapping. Matches the QA E2E review's reproduction width (~480px AI
- * Assistant sidecar); chosen with headroom rather than as a strict cutoff; the trigger is the
- * component's OWN measured width (see `cardRef`'s ResizeObserver below), not the viewport, so the
- * same table renders full-page and inside the narrow sidecar correctly either way.
+ * Issue #9009 (J1, follow-up): the fixed 560px narrow-mode threshold only ever accounted for the
+ * QA E2E review's ~480px repro width. A live finding on the deployed build showed a 6-column
+ * table still wrapping every cell at ~600-800px (a docked sidecar squeezing the main surface) —
+ * 560px is comfortable for a 3-column table but nowhere near enough for 6, so a single fixed
+ * pixel threshold can never be right for every column count. The rule is now adaptive: go narrow
+ * whenever the card cannot give each would-be-visible column at least `MIN_COLUMN_WIDTH_PX` —
+ * an id/date/short-value column's readable floor, not a strict character budget — i.e.
+ * `width < candidateColumnCount * MIN_COLUMN_WIDTH_PX` (see `candidateColumnCount` below). A
+ * 6-column table now goes narrow under ~720px, a 3-column table stays full down to ~360px, and
+ * the original 480px repro (>= 3 candidate columns) stays narrow either way.
  */
-const NARROW_CONTAINER_WIDTH_PX = 560;
+const MIN_COLUMN_WIDTH_PX = 120;
 /** Issue #9009 (J1): column budget in narrow mode — "first 2-3 columns from the tool's existing
  * column order", the same order `MAX_VISIBLE_COLUMNS` already respects at full width. Every
  * demoted column stays reachable through the row expander, same as `MAX_VISIBLE_COLUMNS` above. */
 const NARROW_MAX_VISIBLE_COLUMNS = 3;
+/**
+ * Issue #9009 (J1, follow-up): the ResizeObserver below stores state in QUANTIZED buckets of this
+ * many px rather than the raw measured width, for the same reason the old code stored only a
+ * boolean — the sidecar's own drag-resize fires the observer on every pixel, and re-rendering the
+ * table on every single one of those (rather than only when the reader crosses a real bucket) is
+ * a render storm for no visible benefit. The adaptive rule needs the actual width (not just a
+ * boolean) because the threshold itself now depends on the spec's column count, so a plain
+ * boolean can no longer be computed inside the observer callback alone — quantizing is the
+ * middle ground that keeps state updates rare while still letting `isNarrow` be derived at
+ * render time for whatever column count the current spec has. Buckets round DOWN (`Math.floor`),
+ * never up: rounding up could quantize a genuinely-narrow width past its own threshold and
+ * misreport it as full (e.g. 700px rounding up to 720px would clear the 6-column table's exact
+ * 720px threshold) — rounding down only ever errs toward triggering narrow mode a few px early,
+ * never toward missing it.
+ */
+const WIDTH_QUANTUM_PX = 40;
+
+/** `0` stays `0` (unmeasured/not-yet-observed, same sentinel the old boolean's `width > 0` guard
+ * used), everything else buckets down to the nearest `WIDTH_QUANTUM_PX` — see that constant's
+ * doc comment for why down rather than to the nearest. */
+function quantizeWidthPx(width: number): number {
+  if (width <= 0) {
+    return 0;
+  }
+  return Math.floor(width / WIDTH_QUANTUM_PX) * WIDTH_QUANTUM_PX;
+}
 
 /**
  * The card's height ceiling, in the only frame of reference that is actually correct: the
@@ -675,29 +705,56 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   // inside the AI Assistant sidecar (as narrow as ~480px in the QA E2E review), and only the
   // container it actually lives in can tell those two apart. Same guarded pattern as the pane
   // height effect above (and the rest of this plugin, e.g. chat-page.tsx's rail-width measurement):
-  // jsdom has no `ResizeObserver`, so `isNarrow` stays `false` and every existing test renders in
-  // (non-narrow) full-width mode, matching what they already assert.
+  // jsdom has no `ResizeObserver`, so `quantizedWidthPx` stays `0` and every existing test renders
+  // in (non-narrow) full-width mode, matching what they already assert.
   //
-  // Stores the derived BOOLEAN, not the raw width (review, required minor): the sidecar's own
-  // drag-resize fires the observer on every pixel, and re-rendering the table's columns/cells on
-  // every one of those (rather than only on the rare crossing of the narrow threshold) would be a
-  // render storm for no visible benefit — `setIsNarrow` only actually triggers a re-render on the
-  // side of the threshold actually changing.
-  const [isNarrow, setIsNarrow] = useState(false);
+  // Stores the QUANTIZED width, not a derived boolean (issue #9009 follow-up) — see
+  // `WIDTH_QUANTUM_PX`'s doc comment for why: the render-storm concern that used to justify storing
+  // only a boolean still applies, but the threshold itself now depends on the spec's column count
+  // (`candidateColumnCount` below), which the observer callback has no way to know, so the boolean
+  // can no longer be computed in here. `isNarrow` is derived from this quantized width at render
+  // time instead, below.
+  const [quantizedWidthPx, setQuantizedWidthPx] = useState(0);
   useLayoutEffect(() => {
     const card = cardRef.current;
     if (!card || typeof ResizeObserver === 'undefined') {
       return;
     }
     const measure = () => {
-      const width = card.offsetWidth;
-      setIsNarrow(width > 0 && width < NARROW_CONTAINER_WIDTH_PX);
+      const quantized = quantizeWidthPx(card.offsetWidth);
+      // Same early-out as the old boolean version: a resize that doesn't cross a 40px bucket
+      // boundary sets identical state and triggers no re-render.
+      setQuantizedWidthPx(previous =>
+        previous === quantized ? previous : quantized,
+      );
     };
     const observer = new ResizeObserver(measure);
     observer.observe(card);
     measure();
     return () => observer.disconnect();
   }, []);
+
+  /**
+   * Issue #9009 (J1, follow-up): how many columns the spec would show at FULL width — the same
+   * `MAX_VISIBLE_COLUMNS` budget `effectiveMaxVisibleColumns` below applies, computed here first
+   * because narrow mode's own threshold depends on it. Deliberately the full-mode count, not the
+   * raw `spec.columns.length` — a 20-column spec is already capped to `MAX_VISIBLE_COLUMNS` at
+   * full width, so its narrow threshold should be sized for the columns that would actually
+   * render, not for columns nothing ever shows a `<th>` for.
+   */
+  const candidateColumnCount = Math.min(
+    spec.columns.length,
+    MAX_VISIBLE_COLUMNS,
+  );
+
+  // Issue #9009 (J1, follow-up): adaptive threshold — narrow mode triggers whenever the card
+  // cannot give each candidate column at least `MIN_COLUMN_WIDTH_PX`, rather than at one fixed
+  // pixel width regardless of column count (see `MIN_COLUMN_WIDTH_PX`'s doc comment for the live
+  // finding this replaces). `quantizedWidthPx === 0` means "not yet measured" (jsdom, or before
+  // the observer's first callback), same sentinel the old `width > 0` guard used.
+  const isNarrow =
+    quantizedWidthPx > 0 &&
+    quantizedWidthPx < candidateColumnCount * MIN_COLUMN_WIDTH_PX;
 
   // The most conservative measured pane height: the card can never claim more than the pane it
   // actually lives in, whichever source reported the smaller number. Zero when nothing has been

@@ -1153,11 +1153,13 @@ describe('ResultTable', () => {
    * Issue #9009 (J1): at ~480px (the AI Assistant sidecar's reproduction width from the QA E2E
    * review) an untruncated cell wraps onto several lines and the table becomes unreadable. The
    * fix detects the CARD'S OWN measured width (not the viewport, since the same generic renderer
-   * mounts both full-page and inside the narrow sidecar) and, below `NARROW_CONTAINER_WIDTH_PX`,
-   * shows only the first `NARROW_MAX_VISIBLE_COLUMNS` columns with truncate-plus-tooltip cells and
-   * no horizontal scroll. Same stub pattern chat-page.test.tsx already uses for its own
-   * ResizeObserver-driven rail-width responsiveness: jsdom has no real ResizeObserver, so the
-   * width has to be injected by hand.
+   * mounts both full-page and inside the narrow sidecar) and, once the card can no longer give
+   * every candidate column at least `MIN_COLUMN_WIDTH_PX` (the adaptive threshold — issue #9009
+   * follow-up, see that constant's doc comment), shows only the first
+   * `NARROW_MAX_VISIBLE_COLUMNS` columns with truncate-plus-tooltip cells and no horizontal
+   * scroll. Same stub pattern chat-page.test.tsx already uses for its own ResizeObserver-driven
+   * rail-width responsiveness: jsdom has no real ResizeObserver, so the width has to be injected
+   * by hand.
    */
   describe('narrow container mode (J1)', () => {
     function stubContainerWidth(width: number) {
@@ -1216,7 +1218,10 @@ describe('ResultTable', () => {
     });
 
     it('shows only the first NARROW_MAX_VISIBLE_COLUMNS (3) columns once the container measures narrow', () => {
-      const restore = stubContainerWidth(480);
+      // wideColumnSpec has 4 columns, so its adaptive threshold is 4 * MIN_COLUMN_WIDTH_PX (120)
+      // = 480px — comfortably below it, rather than exactly at it, so this test isn't sitting on
+      // the boundary itself (that's covered separately below).
+      const restore = stubContainerWidth(400);
       try {
         render(<ResultTable spec={wideColumnSpec()} />);
         const headerTexts = screen
@@ -1247,7 +1252,7 @@ describe('ResultTable', () => {
     });
 
     it('truncates long cell text with a tooltip instead of wrapping, in narrow mode', () => {
-      const restore = stubContainerWidth(480);
+      const restore = stubContainerWidth(400);
       try {
         render(<ResultTable spec={wideColumnSpec()} />);
         const cell = screen.getByText(
@@ -1271,7 +1276,7 @@ describe('ResultTable', () => {
     });
 
     it('keeps every field reachable via the row expander even with columns demoted in narrow mode', () => {
-      const restore = stubContainerWidth(480);
+      const restore = stubContainerWidth(400);
       try {
         render(<ResultTable spec={wideColumnSpec()} />);
         fireEvent.click(screen.getByRole('button', { name: 'Expand row' }));
@@ -1283,6 +1288,162 @@ describe('ResultTable', () => {
       } finally {
         restore();
       }
+    });
+
+    /**
+     * Issue #9009 (J1, follow-up): a live finding on the deployed build showed a 6-column table
+     * still wrapping every cell at ~600-800px card widths — the old FIXED 560px threshold only
+     * ever covered the original ~480px repro's column count. The threshold is now adaptive:
+     * `isNarrow = width < candidateColumnCount * MIN_COLUMN_WIDTH_PX` (120), where
+     * `candidateColumnCount` is the number of columns full-width mode would actually render for
+     * this spec (capped by `MAX_VISIBLE_COLUMNS`, not the raw field count). These cases lock the
+     * three concrete widths this fix exists for: a 6-column table now goes narrow well above the
+     * old 560px cutoff, while a 3-column table — which already fits comfortably at widths the old
+     * fixed threshold used to needlessly narrow — stays full down to a much smaller width.
+     */
+    describe('adaptive threshold (J1 follow-up)', () => {
+      function columnsSpec(count: number): TableSpec {
+        return {
+          columns: Array.from({ length: count }, (_, index) => ({
+            id: `field${index}`,
+            label: `Field ${index}`,
+          })),
+          rows: [
+            Object.fromEntries(
+              Array.from({ length: count }, (_, index) => [
+                `field${index}`,
+                `value ${index}`,
+              ]),
+            ),
+          ],
+        };
+      }
+
+      it('goes narrow for a 6-column table at 700px (below its 720px threshold)', () => {
+        const restore = stubContainerWidth(700);
+        try {
+          render(<ResultTable spec={columnsSpec(6)} />);
+          const headerTexts = screen
+            .getAllByRole('columnheader')
+            .map(header => header.textContent ?? '');
+          // Only the first NARROW_MAX_VISIBLE_COLUMNS (3) of the 6 columns render.
+          expect(headerTexts).toContain('Field 0');
+          expect(headerTexts).toContain('Field 1');
+          expect(headerTexts).toContain('Field 2');
+          expect(headerTexts).not.toContain('Field 3');
+        } finally {
+          restore();
+        }
+      });
+
+      it('stays full-width (no cell truncation) for a 3-column table at 500px (above its 360px threshold)', () => {
+        const restore = stubContainerWidth(500);
+        try {
+          render(
+            <ResultTable
+              spec={{
+                columns: [
+                  { id: 'field0', label: 'Field 0' },
+                  { id: 'field1', label: 'Field 1' },
+                  { id: 'field2', label: 'Field 2' },
+                ],
+                rows: [
+                  {
+                    field0: 'value 0',
+                    field1: 'value 1',
+                    field2:
+                      'a value long enough to reveal narrow-mode truncation',
+                  },
+                ],
+              }}
+            />,
+          );
+          const cell = screen.getByText(
+            'a value long enough to reveal narrow-mode truncation',
+          );
+          expect(cell).not.toHaveClass('wzResultsCellTruncate');
+        } finally {
+          restore();
+        }
+      });
+
+      it('goes narrow for a 6-column table at the original 480px repro width', () => {
+        const restore = stubContainerWidth(480);
+        try {
+          render(<ResultTable spec={columnsSpec(6)} />);
+          const headerTexts = screen
+            .getAllByRole('columnheader')
+            .map(header => header.textContent ?? '');
+          expect(headerTexts).not.toContain('Field 3');
+        } finally {
+          restore();
+        }
+      });
+
+      it('a raw column count above MAX_VISIBLE_COLUMNS uses the capped count, not the raw one', () => {
+        // 8 raw columns still only ever render 6 at full width (MAX_VISIBLE_COLUMNS), so the
+        // narrow threshold must be sized off that 6, not the raw 8 — otherwise this table would
+        // wrongly need 960px (8 * 120) to stay full instead of the correct 720px (6 * 120).
+        const restore = stubContainerWidth(700);
+        try {
+          render(<ResultTable spec={columnsSpec(8)} />);
+          const headerTexts = screen
+            .getAllByRole('columnheader')
+            .map(header => header.textContent ?? '');
+          expect(headerTexts).not.toContain('Field 3');
+        } finally {
+          restore();
+        }
+      });
+
+      // A spec with exactly 3 columns has candidateColumnCount === NARROW_MAX_VISIBLE_COLUMNS, so
+      // narrow mode renders the SAME 3 headers as full-width mode — the column-count signal the
+      // 6-column tests above use can't distinguish narrow from full here. Cell truncation
+      // (`wzResultsCellTruncate`, only applied in narrow mode) is the observable signal instead.
+      function threeColumnSpecWithLongCell(): TableSpec {
+        return {
+          columns: [
+            { id: 'field0', label: 'Field 0' },
+            { id: 'field1', label: 'Field 1' },
+            { id: 'field2', label: 'Field 2' },
+          ],
+          rows: [
+            {
+              field0: 'value 0',
+              field1: 'value 1',
+              field2: 'a value long enough to reveal narrow-mode truncation',
+            },
+          ],
+        };
+      }
+
+      it("boundary sanity: stays full exactly at a 3-column table's 360px threshold", () => {
+        // Strict `<`, not `<=`: a width exactly AT the threshold still gives every candidate
+        // column its minimum, so it must not be narrow.
+        const restore = stubContainerWidth(360);
+        try {
+          render(<ResultTable spec={threeColumnSpecWithLongCell()} />);
+          const cell = screen.getByText(
+            'a value long enough to reveal narrow-mode truncation',
+          );
+          expect(cell).not.toHaveClass('wzResultsCellTruncate');
+        } finally {
+          restore();
+        }
+      });
+
+      it('boundary sanity: goes narrow just one quantization bucket below that threshold', () => {
+        const restore = stubContainerWidth(320);
+        try {
+          render(<ResultTable spec={threeColumnSpecWithLongCell()} />);
+          const cell = screen.getByText(
+            'a value long enough to reveal narrow-mode truncation',
+          );
+          expect(cell).toHaveClass('wzResultsCellTruncate');
+        } finally {
+          restore();
+        }
+      });
     });
   });
 
