@@ -24,7 +24,6 @@ import {
   getFileIntegrityMonitoringInventoryFilesUrl,
   getFileIntegrityMonitoringUrl,
 } from '../../utils/navigation';
-import { CARD_MIN_WIDTH } from '../../lib/constants';
 import { DataGroupResult } from '../../interfaces/data-group';
 import { ThreatIntelEnrichments, TopItem } from '../../interfaces/types';
 import { getCore } from '../../../../../../kibana-services';
@@ -63,7 +62,7 @@ const EndpointSecuritySectionComponent: React.FC<
         description='Harden configurations, detect malware, and monitor file integrity across your fleet.'
       />
       <EuiFlexGroup wrap responsive={false}>
-        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
+        <EuiFlexItem>
           <WidgetGroup
             status={sca.status}
             errorLabel={sca.error?.message}
@@ -106,7 +105,7 @@ const EndpointSecuritySectionComponent: React.FC<
             )}
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
+        <EuiFlexItem>
           <WidgetGroup
             status={fim.status}
             errorLabel={fim.error?.message}
@@ -146,7 +145,7 @@ const EndpointSecuritySectionComponent: React.FC<
             )}
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
+        <EuiFlexItem>
           <MalwareDetectionPanel
             iocMatches={iocMatches}
             feedByType={feedByType}

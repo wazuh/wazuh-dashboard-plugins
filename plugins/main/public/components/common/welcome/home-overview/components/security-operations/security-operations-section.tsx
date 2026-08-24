@@ -129,8 +129,8 @@ const SecurityOperationsSectionComponent: React.FC<
 
       <EuiSpacer size='m' />
 
-      <EuiFlexGroup wrap responsive={false}>
-        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
+      <EuiFlexGroup>
+        <EuiFlexItem>
           <WidgetGroup
             status={topOs.status}
             errorLabel={topOs.error?.message}
@@ -160,7 +160,7 @@ const SecurityOperationsSectionComponent: React.FC<
             )}
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
+        <EuiFlexItem>
           <WidgetGroup
             status={topServices.status}
             errorLabel={topServices.error?.message}

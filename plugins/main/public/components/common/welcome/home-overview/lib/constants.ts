@@ -51,9 +51,9 @@ export const TOP_N = 5;
 export const VALUE_PLACEHOLDER = '-';
 
 /**
- * Wrap floor for the cards sharing a row. `EuiFlexItem` is `flex-basis: 0`, so
- * without a floor a `wrap` row never wraps: the cards just shrink past being
- * readable (three at 156px on a 800px viewport). `100%` keeps a viewport
- * narrower than the floor from overflowing.
+ * Wrap floor for the cards on the Regulatory Compliance row. `EuiFlexItem` is
+ * `flex-basis: 0`, so without a floor its `wrap` never wraps: the cards shrink
+ * instead, and the compliance chip grid never gets to reflow. `100%` keeps a
+ * viewport narrower than the floor from overflowing.
  */
 export const CARD_MIN_WIDTH = 'min(320px, 100%)';

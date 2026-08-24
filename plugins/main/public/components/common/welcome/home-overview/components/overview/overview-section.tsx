@@ -22,7 +22,6 @@ import {
   getDiscoverFindingsBySeverityUrl,
 } from '../../utils/navigation';
 import { FINDING_SEVERITY_FIELD } from '../../lib/fields';
-import { CARD_MIN_WIDTH } from '../../lib/constants';
 import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
 
 export interface OverviewSectionProps {
@@ -37,8 +36,8 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
 
   return (
     <div>
-      <EuiFlexGroup wrap responsive={false}>
-        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
+      <EuiFlexGroup>
+        <EuiFlexItem style={{ minWidth: 0 }}>
           <WidgetGroup
             status={agents.status}
             errorLabel={agents.error?.message}
@@ -57,7 +56,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             )}
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
+        <EuiFlexItem style={{ minWidth: 0 }}>
           <WidgetGroup
             status={findings.status}
             errorLabel={findings.error?.message}

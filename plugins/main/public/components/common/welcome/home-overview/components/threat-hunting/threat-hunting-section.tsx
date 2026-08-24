@@ -18,7 +18,6 @@ import {
   useFindingsOverview,
   useVulnerabilityOverview,
 } from '../../hooks/use-overview-data';
-import { CARD_MIN_WIDTH } from '../../lib/constants';
 import {
   getMitreIntelligenceResourceUrl,
   getMitreUrl,
@@ -45,7 +44,7 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
         description='Hunt for threats, map activity to MITRE ATT&CK, and detect known vulnerabilities.'
       />
       <EuiFlexGroup wrap responsive={false}>
-        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
+        <EuiFlexItem>
           <WidgetGroup
             status={findings.status}
             errorLabel={findings.error?.message}
@@ -82,7 +81,7 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
             )}
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
+        <EuiFlexItem>
           <WidgetGroup
             status={findings.status}
             errorLabel={findings.error?.message}
@@ -122,7 +121,7 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
             )}
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
+        <EuiFlexItem>
           <WidgetGroup
             status={vulnerabilities.status}
             errorLabel={vulnerabilities.error?.message}
