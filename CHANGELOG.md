@@ -138,6 +138,7 @@
 | [#8708](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8708)   | Fixed Home KPI's visualization persistent filters                                                                                                                                             |
 | [#8766](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8766) | Fixed Server Management Settings crashing or showing a blank page for users without permission to read the manager configuration                                                              |
 | [#8775](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8775) | Fixed MITRE ATT&CK Framework tab not applying the date range and fetch filters                                                                                                                |
+| [#9015](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9015) | Fixed the Controls tab showing 0 results by adding missing regulatory compliance requirement definitions for PCI DSS, GDPR, HIPAA, NIST 800-53, FedRAMP, ISO 27001, CMMC, TSC, and NIS2       |
 
 ### Removed
 

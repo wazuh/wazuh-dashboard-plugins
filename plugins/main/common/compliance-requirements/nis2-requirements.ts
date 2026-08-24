@@ -97,7 +97,7 @@ export const nis2RequirementsFile = {
     'Protect internal voice, video and text communications through end-to-end encryption or equivalent security controls.',
   '21.2.j.3':
     'Establish and maintain secured out-of-band emergency communication channels that remain operational during a cybersecurity incident.',
-
+  '23': 'Reporting obligations. Essential and important entities shall notify, without undue delay, the competent authority or the CSIRT of any incident that has a significant impact on the provision of their services (a significant incident).',
   '23.1':
     "Notify the competent authority or CSIRT without undue delay, and in any event within 24 hours of becoming aware, of any significant incident affecting the provision of the entity's services.",
   '23.2':
