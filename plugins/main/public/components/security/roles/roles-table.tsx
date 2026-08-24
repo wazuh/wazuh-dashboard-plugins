@@ -26,6 +26,7 @@ export const RolesTable = ({
   pageSize,
   totalItems,
   onTableChange,
+  sorting,
 }) => {
   const [rolesState, setRolesState] = useState([]);
 
@@ -139,7 +140,6 @@ export const RolesTable = ({
           )) || <EuiLoadingSpinner size='m' />
         );
       },
-      sortable: true,
     },
     {
       field: 'id',
@@ -183,13 +183,6 @@ export const RolesTable = ({
       ),
     },
   ];
-
-  const sorting = {
-    sort: {
-      field: 'id',
-      direction: 'asc',
-    },
-  };
 
   const pagination = {
     pageIndex,

@@ -6,7 +6,6 @@ import {
   EuiFlexItem,
   EuiFlexGroup,
   EuiBasicTableColumn,
-  SortDirection,
 } from '@elastic/eui';
 import { ErrorHandler } from '../../../../react-services/error-handler';
 import { WzButtonPermissionsModalConfirm } from '../../../common/buttons';
@@ -29,6 +28,7 @@ export const RolesMappingTable = ({
   pageSize,
   totalItems,
   onTableChange,
+  sorting,
 }) => {
   const [rulesState, setRulesState] = useState([]);
 
@@ -87,7 +87,6 @@ export const RolesMappingTable = ({
     {
       field: 'roles',
       name: 'Roles',
-      sortable: true,
       render: item => {
         const tmpRoles = item.map((role, idx) => {
           return (
@@ -160,13 +159,6 @@ export const RolesMappingTable = ({
       ),
     },
   ];
-
-  const sorting = {
-    sort: {
-      field: 'id',
-      direction: SortDirection.ASC,
-    },
-  };
 
   const pagination = {
     pageIndex,

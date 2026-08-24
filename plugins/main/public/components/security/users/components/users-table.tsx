@@ -6,7 +6,6 @@ import {
   EuiLoadingSpinner,
   EuiFlexItem,
   EuiBasicTableColumn,
-  SortDirection,
 } from '@elastic/eui';
 import { WzButtonPermissionsModalConfirm } from '../../../common/buttons';
 import UsersServices from '../services';
@@ -27,6 +26,7 @@ export const UsersTable = ({
   totalItems,
   onTableChange,
   onSave,
+  sorting,
 }) => {
   const [userState, setUserState] = useState([]);
   const getRowProps = item => {
@@ -77,7 +77,8 @@ export const UsersTable = ({
     {
       field: 'allow_run_as',
       name: 'Allow run as ',
-      sortable: true,
+      // Not sortable: the Server API only allows sorting /security/users by
+      // `username` and `id`. Any other field is rejected with a bad request.
       truncateText: true,
     },
     {
@@ -102,7 +103,6 @@ export const UsersTable = ({
           </EuiFlexGroup>
         );
       },
-      sortable: true,
     },
     {
       align: 'right',
@@ -135,13 +135,6 @@ export const UsersTable = ({
       ),
     },
   ];
-
-  const sorting = {
-    sort: {
-      field: 'username',
-      direction: SortDirection.ASC,
-    },
-  };
 
   const pagination = {
     pageIndex,
