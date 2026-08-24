@@ -44,7 +44,9 @@ const helpLinks = [
   },
   {
     text: 'Remote configuration reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/remote.html'),
+    href: webDocumentationLink(
+      'user-manual/manager/wazuh-manager-services.html#agent-connection-service',
+    ),
   },
 ];
 
