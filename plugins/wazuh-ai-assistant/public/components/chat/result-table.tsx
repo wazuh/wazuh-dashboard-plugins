@@ -500,10 +500,10 @@ const ProvenanceChip: React.FC<{ chip: ResultTableProvenanceChip }> = ({
                 values: { label: chip.fullLabel },
               },
             )}
-            // Belt-and-braces alongside the wrapping div above: focus is still on the badge the
-            // instant the popover opens (EUI moves it into the panel only asynchronously), so this
-            // catches an Escape pressed in that brief window too.
-            onKeyDown={closeOnEscape}
+            // No `onKeyDown` of its own (issue #9008 review, cleanup 5): the badge is a plain,
+            // non-portaled descendant of the wrapping div above, so a keydown while focus is still
+            // on it already bubbles to that one handler. A second copy here was a duplicate path
+            // to the same idempotent close, not extra coverage.
           >
             {chip.shortLabel}
           </EuiBadge>

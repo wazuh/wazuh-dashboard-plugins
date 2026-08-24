@@ -276,23 +276,50 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
    * server/routes/chat.ts (see `TableSpec.provenance`'s doc comment) to the specific call that
    * produced it. Only that one call's chip is passed the real `provenance` object; every other
    * call in the same turn renders name-only, with no index/range/badge invented for it.
+   *
+   * `message.table` is the source here, deliberately, rather than `renderedTable`: the two are the
+   * same object whenever a card renders (`renderedTable` IS `message.table`, just gated on row
+   * count), and the below-bubble chip row for a SUPPRESSED 0-row table still needs the suppressed
+   * spec's provenance — see that row's own comment. One source therefore serves both surfaces
+   * without a second, subtly different lookup.
+   *
+   * Computed ONCE per message, memoized (issue #9008 review, cleanup 4). Three surfaces read this
+   * — the result card's chips, the below-bubble chip row, and the raw view a chip opens — and each
+   * used to redo the same `describeProvenance`/`describeToolCall` derivation for the same call on
+   * every render, including renders driven by nothing but a popover opening.
    */
-  const provenanceForCall = (
-    toolCallId: string,
-  ): TableSpec['provenance'] | undefined =>
-    renderedTable?.provenance?.toolCallId === toolCallId
-      ? renderedTable.provenance
-      : undefined;
+  const toolCallDisplays = useMemo(() => {
+    const provenanceForCall = (
+      toolCallId: string,
+    ): TableSpec['provenance'] | undefined =>
+      message.table?.provenance?.toolCallId === toolCallId
+        ? message.table.provenance
+        : undefined;
+    return new Map(
+      toolCalls.map(toolCall => {
+        const provenance = provenanceForCall(toolCall.id);
+        // `describeToolCall` builds its chip text out of the same display object, so it is handed
+        // the computed one rather than deriving a second, identical copy.
+        const display = describeProvenance(provenance);
+        return [
+          toolCall.id,
+          { display, label: describeToolCall(toolCall, provenance, display) },
+        ] as const;
+      }),
+    );
+    // `toolCalls` is `message.toolCalls ?? []` — a fresh `[]` identity only in the no-calls case,
+    // where the map is empty anyway.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [message.toolCalls, message.table]);
   const tableProvenanceChips: ResultTableProvenanceChip[] | undefined =
     renderedTable
       ? toolCalls.map(toolCall => {
-          const provenance = provenanceForCall(toolCall.id);
-          const { short, full } = describeToolCall(toolCall, provenance);
-          const display = describeProvenance(provenance);
+          const entry = toolCallDisplays.get(toolCall.id);
+          const display = entry?.display ?? {};
           return {
             id: toolCall.id,
-            shortLabel: short,
-            fullLabel: full,
+            shortLabel: entry?.label.short ?? toolCall.name,
+            fullLabel: entry?.label.full ?? toolCall.name,
             toolName: toolCall.name,
             argumentsJson: toolCall.arguments,
             index: display.index,
@@ -581,17 +608,16 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
         </EuiFlexItem>
         {!isUser &&
           metaRowToolCalls.map(toolCall => {
-            // `message.table` here, deliberately NOT `renderedTable`: this is the one place the
-            // suppressed 0-row spec is still worth reading, because it is the only place left to
-            // check what the turn actually queried — precisely when the answer is "nothing was
-            // found". Same `toolCallId` match as the rendered-table case above (issue #9008
-            // blocker 3): a multi-call turn's chip only carries provenance for the ONE call
-            // `message.table.provenance.toolCallId` actually names, never for the others.
-            const provenance =
-              message.table?.provenance?.toolCallId === toolCall.id
-                ? message.table.provenance
-                : undefined;
-            const { short, full } = describeToolCall(toolCall, provenance);
+            // `toolCallDisplays` reads `message.table`, deliberately NOT `renderedTable`: this is
+            // the one place the suppressed 0-row spec is still worth reading, because it is the
+            // only place left to check what the turn actually queried — precisely when the answer
+            // is "nothing was found". Its `toolCallId` match (issue #9008 blocker 3) means a
+            // multi-call turn's chip only carries provenance for the ONE call the spec names.
+            const { short, full } = toolCallDisplays.get(toolCall.id)
+              ?.label ?? {
+              short: toolCall.name,
+              full: toolCall.name,
+            };
             const isRawOpen = openRawIds.has(toolCall.id);
             return (
               <EuiFlexItem grow={false} key={toolCall.id}>
@@ -627,14 +653,10 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
             // Issue #9008 review, minor 7: the same Index/Time-range lines the rendered-table
             // popover shows (ProvenanceChip, result-table.tsx) belong here too — this raw view IS
             // the popover's equivalent for a turn whose table is suppressed (0 rows) or absent,
-            // and "which index did it read?" matters most exactly there. Same `toolCallId` match
-            // as the chip row above: only the call that actually produced `message.table` gets a
-            // real `provenance` object.
-            const provenance =
-              message.table?.provenance?.toolCallId === toolCall.id
-                ? message.table.provenance
-                : undefined;
-            const display = describeProvenance(provenance);
+            // and "which index did it read?" matters most exactly there. Reads the SAME memoized
+            // entry the chip above it does, so only the call that actually produced `message.table`
+            // carries real provenance, and it is derived once per render rather than twice.
+            const display = toolCallDisplays.get(toolCall.id)?.display ?? {};
             return (
               <div
                 key={toolCall.id}
