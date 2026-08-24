@@ -273,6 +273,10 @@ const App: React.FC<{
                           `${SETTINGS_PATH}?${ADD_PROVIDER_PARAM}=true`,
                         )
                       }
+                      // Plain Settings visit (iteration-4 item 2's "Manage providers" footer
+                      // item) — reuses the SAME tab-switch helper the visible Settings tab click
+                      // already goes through, rather than a second hardcoded `SETTINGS_PATH` push.
+                      onManageProviders={() => navigateTo('settings')}
                       onGeneratingChange={handleGeneratingChange}
                     />
                   </div>

@@ -5,6 +5,7 @@ import {
   buildNearMissIncludePattern,
   extractRequestedAgentNames,
   findNearMissSiblings,
+  findUnmatchedAgentNames,
   normalizeAgentName,
 } from './entity-resolution';
 
@@ -92,6 +93,38 @@ test('findNearMissSiblings: handles multiple requested names independently', () 
   assert.deepEqual(results, [
     { requested: 'wazuh-aio-05', siblings: ['wazuh-aio-5'] },
   ]);
+});
+
+// --- findUnmatchedAgentNames (CV-028/CV-033 fix) ------------------------------------------------
+
+test('findUnmatchedAgentNames: a category word with zero matches (exact or near-miss) is unmatched', () => {
+  const results = findUnmatchedAgentNames(
+    ['cloud-services'],
+    ['wazuh-aio-5', 'web-prod-01'],
+  );
+  assert.deepEqual(results, ['cloud-services']);
+});
+
+test('findUnmatchedAgentNames: an exact indexed match is not unmatched', () => {
+  const results = findUnmatchedAgentNames(['wazuh-aio-5'], ['wazuh-aio-5']);
+  assert.deepEqual(results, []);
+});
+
+test(
+  'findUnmatchedAgentNames: a zero-padding/case/separator near-miss variant is not unmatched -- ' +
+    'it is the SAME agent by normalization, just spelled differently',
+  () => {
+    const results = findUnmatchedAgentNames(['wazuh-aio-05'], ['wazuh-aio-5']);
+    assert.deepEqual(results, []);
+  },
+);
+
+test('findUnmatchedAgentNames: handles multiple requested names independently', () => {
+  const results = findUnmatchedAgentNames(
+    ['wazuh-aio-05', 'network-activity'],
+    ['wazuh-aio-5'],
+  );
+  assert.deepEqual(results, ['network-activity']);
 });
 
 // --- extractRequestedAgentNames -----------------------------------------------------------------

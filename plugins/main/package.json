@@ -1,7 +1,7 @@
 {
   "name": "wazuh",
   "version": "5.0.0",
-  "revision": "05",
+  "revision": "06",
   "pluginPlatform": {
     "version": "3.6.0"
   },
@@ -60,7 +60,7 @@
     "fix:ndjson-descriptions": "node ../../scripts/check-ndjson-descriptions/index.mjs --fix"
   },
   "dependencies": {
-    "dompurify": "3.4.0",
+    "dompurify": "3.4.11",
     "install": "^0.13.0",
     "js2xmlparser": "^5.0.0",
     "jsdom": "^16.6.0",

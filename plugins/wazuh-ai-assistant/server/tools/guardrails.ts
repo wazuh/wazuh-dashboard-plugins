@@ -127,19 +127,101 @@ const MAX_TREE_DEPTH = 100;
 // catalog today (`index` is enum-locked at the tool-schema level), but this function is the
 // standalone boundary and must hold on its own.
 //
-// `threatintel-(rules|decoders|integrations|policies|filters|kvdbs)` is enumerated explicitly,
-// NOT a bare `threatintel-[^,\s]*`: this plugin has NO tool touching `wazuh-threatintel-enrichments`
-// (228k IOC docs — deliberately out of scope, see get-rules.ts/get-threat-intel-
-// components.ts's doc comments for why). This allowlist is documented as the standalone boundary
-// that must hold on its own, independent of what today's tool schemas happen to permit — opening
-// the whole prefix would silently authorize `enrichments` at this layer the day someone adds it to
-// an enum elsewhere, without anyone consciously deciding to widen it.
+// `threatintel-(rules|decoders|integrations|policies|filters|kvdbs)` is enumerated explicitly
+// (a sub-family list, not a bare `threatintel-[^,\s]*`), so opening a NEW sub-family always
+// requires a conscious edit here rather than silently inheriting from the wildcard prefix. This
+// allowlist is documented as the standalone boundary that must hold on its own, independent of
+// what today's tool schemas happen to permit.
+//
+// Workstream A1a (AI/plan/coverage-validation-design.md, TC-8/MS-6/MS-7): widened past the
+// original 3-family + threatintel-{rules..kvdbs} + sap-detectors-config set left by workstream B.
+// Every addition below is a family/index with REAL data on `wazuh-aio-5` (live-verified 2026-08-19,
+// see this branch's own verification notes) and no owning typed tool -- the mission is "every
+// family with real data is queryable by construction", not "a new typed tool per family", so these
+// widen the SAME escape hatch (`search_wazuh_data`) rather than spawning one-off tools. Each entry
+// below documents its own live evidence; entries considered and DELIBERATELY EXCLUDED are
+// documented immediately after the regex so "why isn't X in here" is answerable without git log
+// archaeology.
+//
+//  - `wazuh-metrics-[^,\s]*` -- covers `wazuh-metrics-comms`/`wazuh-metrics-agents`/
+//    `wazuh-metrics-normalization`/`wazuh-metrics-comms-v4` as one family (coverage doc's open gap
+//    G1: fleet-health/comms metrics, real data -- 1,040/716/16,620/0 docs respectively on this VM
+//    at verification time -- and no workstream owned it before this one). One wildcard rather than
+//    four literals: all four are the plugin's own emitted operational-metrics data streams (no
+//    tool ever needs to see one without being able to see the others), and `comms-v4`'s live doc
+//    count is volatile (drift noted in the coverage doc, 0 here vs 1,032 observed elsewhere) so a
+//    literal would have to be re-verified on every drift; the wildcard is stable regardless.
+//  - `\.wazuh-cti-consumers` / `\.wazuh-content-manager-jobs` -- CTI freshness status (coverage
+//    doc MS-6/MS-7, retiers CV-050 from "can't diagnose" to answerable): live-verified 3 docs
+//    (per-feed `status`/`local_offset`/`remote_offset`) and 2 docs (sync-schedule metadata) --
+//    config/status documents written by the content-manager service itself, never
+//    analyst/attacker-supplied.
+//  - `\.opensearch-sap-[^,\s]*-findings` -- the 15 per-log-type Security Analytics findings
+//    indices (coverage doc G2, "findings now flowing after the `alert_finding_enabled=true`
+//    fix"), live-verified reachable via their aliases (`.opensearch-sap-wazuh-generic-findings`
+//    etc., `_cat/aliases` confirms one alias per family, no ambiguity with the sibling
+//    `-detectors-queries-optimized-<uuid>` internal artifact indices, which end in a UUID suffix
+//    and a differently-worded family name, never `-findings`). Deliberately does NOT open
+//    `-alerts` (see exclusions below) or the `-detectors-queries-optimized-*` compiled-query
+//    indices (already out of scope per the coverage doc's own appendix -- an internal artifact,
+//    not a question surface).
+//  - `\.opensearch-sap-pre-packaged-rules-config` -- the 1,472-doc pre-packaged Sigma catalog
+//    (coverage doc G3, live-verified 126 docs at re-check time -- count drift, still real,
+//    non-empty). Vendor-curated rule metadata, same class as `get_rules`'s own corpus.
+//  - `\.opensearch-sap-correlation-metadata` -- coverage doc MS-12 correction: NOT empty like its
+//    correlation-alerts/history siblings (live-verified 2 docs: `root`/`counter`/`finding1`/
+//    `finding2`/`logType`/`timestamp`, internal correlation bookkeeping, not analyst data).
+//  - `\.wazuh-threatintel-vulnerabilities-a` -- the raw CTI CVE feed (coverage doc, "one of only
+//    two cover-now rows with production-shaped volume", TC-8 sequences it first). Live-verified
+//    372,301 docs, public CVE-record JSON (cveMetadata/containers.cna, the same public NVD-sourced
+//    schema `get_rules`' own vendor content descends from).
+//  - `wazuh-threatintel-enrichments-a` -- IOC enrichment feed (coverage doc, same TC-8 sequencing
+//    as vulnerabilities-a above). REVERSES the prior "deliberately out of scope" decision recorded
+//    on this same line by workstream B/earlier phases (see `guardrails.test.ts`'s prior assertion,
+//    now updated) -- that decision predates the A1a mission ("every family with real data must be
+//    queryable by construction") and TC-8's explicit resequencing of this exact row to cover-now.
+//    Live-verified 257,071+ docs, third-party threat-intel indicator records (domain/hash/IP
+//    values IDENTIFYING KNOWN-MALICIOUS INFRASTRUCTURE, not the customer's own network -- see this
+//    branch's `privacy.ts` additions for why these are 'allow', not anonymized).
+//
+// DELIBERATELY EXCLUDED (documented so a future reader doesn't silently rediscover the same
+// live-checks and reach a different conclusion):
+//  - `.opendistro-ism-config` (retention-policy config, coverage doc G8) -- live-verified BLOCKED:
+//    `_cat/indices` reports 82 docs, but `_search`/`_count` against it both return 0 hits/0 count
+//    for the plugin's own `admin` credential (same behavior verified live against
+//    `.opendistro_security`, a known system-protected index) -- OpenSearch Security's system-index
+//    protection filters document reads even for an admin REST credential. Skipped per this
+//    workstream's own instruction ("verify live and skip with a note if perms block it") rather
+//    than allowlisted-but-nonfunctional; G8 remains an open product-decision gap, unresolved by
+//    this branch.
+//  - `wazuh-ai-assistant-sessions` -- explicitly excluded (privacy: this plugin's own chat-history
+//    store; a user must never be able to read another user's session content, including through
+//    this escape hatch -- coverage doc MS-1, "not a coverage gap, a security assertion").
+//  - `.opendistro_security` / any other `.opendistro-security`-family index -- explicitly excluded
+//    (internal authz plane; reading it directly IS the information leak the RBAC-troubleshooting
+//    decline exists to prevent -- coverage doc MS-11's corrected reasoning).
+//  - `.opensearch-sap-*-alerts` / `.opensearch-sap-correlation-alerts` /
+//    `.opensearch-sap-correlation-history*` -- left out: all are empty on this VM by a provisioning
+//    defect (`triggers: []` on every detector, coverage doc G2) rather than by design, so allowing
+//    the pattern would let the model run a real query that can only ever return zero -- no
+//    escape-hatch value until the provisioning defect is fixed upstream.
+//  - `.opendistro-alerting-config` / `.opensearch-notifications-config` -- open product-decision
+//    gaps (coverage doc G7/G9) with no workstream ownership assigned; NOT this workstream's call to
+//    make unilaterally, so left closed pending that decision.
 // `.opensearch-sap-detectors-config` (get_detectors.ts) is an exact single index, not a wildcard
 // family -- OpenSearch Security Analytics' own config store for detector definitions, confirmed
 // live to be indexer-reachable and to hold no analyst/attacker-supplied data (name/type/schedule/
 // enabled/source, all vendor- or admin-configured).
+// P-10 (AI/plan/a1a-review.md): the wildcard suffix was `[^,\s]*`, which excludes only a comma or
+// whitespace -- permitting `/` and `.` through, so a crafted value like
+// "wazuh-findings-v5-*/../.opendistro_security" matched this regex (unreachable via
+// search_wazuh_data today because schema-validator.ts's `enum` is the actual gate on that
+// parameter, but this function is documented as a standalone boundary and
+// suggest-discover-query.ts also calls it directly). Tightened to the explicit index-name
+// charset OpenSearch itself allows (letters/digits/`._-*`), which cannot express a
+// path-traversal segment or smuggle a second index name.
 const INDEX_ALLOWLIST_RE =
-  /^wazuh-(events-v5|findings-v5|states|threatintel-(rules|decoders|integrations|policies|filters|kvdbs))[^,\s]*$|^\.opensearch-sap-detectors-config$/;
+  /^wazuh-(events-v5|findings-v5|states|threatintel-(rules|decoders|integrations|policies|filters|kvdbs)|metrics)[A-Za-z0-9._*-]*$|^wazuh-threatintel-enrichments-a$|^\.opensearch-sap-detectors-config$|^\.opensearch-sap-pre-packaged-rules-config$|^\.opensearch-sap-correlation-metadata$|^\.opensearch-sap-[A-Za-z0-9._*-]*-findings$|^\.wazuh-cti-consumers$|^\.wazuh-content-manager-jobs$|^\.wazuh-threatintel-vulnerabilities-a$/;
 
 /** The escape hatch's (and every catalog tool's) index-pattern allowlist. */
 export function checkIndexAllowlist(index: string): GuardrailCheck {
@@ -148,8 +230,11 @@ export function checkIndexAllowlist(index: string): GuardrailCheck {
       ok: false,
       reason:
         `Index "${index}" is not in the allowed set (wazuh-events-v5-*, wazuh-findings-v5-*, ` +
-        'wazuh-states-*, wazuh-threatintel-{rules,decoders,integrations,policies,filters,kvdbs}-*, ' +
-        '.opensearch-sap-detectors-config).',
+        'wazuh-states-*, wazuh-metrics-*, ' +
+        'wazuh-threatintel-{rules,decoders,integrations,policies,filters,kvdbs,enrichments}-*, ' +
+        '.wazuh-threatintel-vulnerabilities-a, .wazuh-cti-consumers, .wazuh-content-manager-jobs, ' +
+        '.opensearch-sap-detectors-config, .opensearch-sap-*-findings, ' +
+        '.opensearch-sap-pre-packaged-rules-config, .opensearch-sap-correlation-metadata).',
     };
   }
   return { ok: true };
@@ -402,11 +487,14 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // same framing as this block's header comment above.
   'check.name',
   // Syscollector ports: this repo's IT Hygiene network dashboard runs a real terms agg on it
-  // (plugins/main/public/components/overview/it-hygiene/dashboards/dashboard-panels.ts) — live
-  // values include "Inactive"/"Unknown".
+  // (plugins/main/public/components/overview/it-hygiene/dashboards/dashboard-panels.ts). Code
+  // review B10: this comment previously claimed live values include "Inactive"/"Unknown" --
+  // corrected per live spot-check (AI/plan/b-review.md P1.3): actual values are
+  // "established"/"listening"/"time_wait"/"close_wait".
   'interface.state',
-  // Syscollector ports: aggregated by the IT Hygiene services/traffic dashboards; live values
-  // are uppercase ("TCP"/"UDP").
+  // Syscollector ports: aggregated by the IT Hygiene services/traffic dashboards. Code review B10:
+  // this comment previously claimed live values are uppercase ("TCP"/"UDP") -- corrected per live
+  // spot-check (AI/plan/b-review.md P1.3): actual values are lowercase "tcp"/"tcp6"/"udp".
   'network.transport',
   // Entity-pivot fields for "noisiest/top X" questions (GA benchmark gap: this allowlist only
   // ever listed wazuh-findings-v5 field names, so a terms/composite/multi_terms agg on the
@@ -460,7 +548,70 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // Privacy-off (the default) surfaces raw IPs in buckets, same as it already does in
   // every finding-hits tool's digest samples via `FINDING_DIGEST_EXTRA_COLUMNS` -- no new exposure.
   'source.ip',
+  // Code review B1 (CEO-scenario dead-end, AI/plan/b-review.md P1.1): the three fields below are
+  // the POPULATED `wazuh.agent.host.*`/`wazuh.integration.*` twins of already-listed
+  // findings/events-side fields (`host.os.name`/`host.os.platform` above, which are largely
+  // UNPOPULATED on findings/events -- see FIELD_ALIASES in common/field-catalog.ts). Without these,
+  // the model could enumerate the empty field but was guardrail-blocked from ever reaching the
+  // twin that actually carries the answer. All three verified live on this v31 environment as
+  // `keyword`-mapped, aggregatable, single-digit-to-low cardinality -- safer than `host.os.name`,
+  // which is already on this list:
+  //
+  // - `wazuh.agent.host.os.name` / `wazuh.agent.host.os.platform` (wazuh-findings-v5*/
+  //   wazuh-events-v5*): live terms agg returns `ubuntu` 2,825 (single dominant bucket) on this
+  //   fleet's findings retention -- coarser, lower-cardinality than the already-listed
+  //   `host.os.name`/`host.os.platform` pair, same finite OS taxonomy, just on the surface that is
+  //   actually populated.
+  // - `wazuh.integration.name` (wazuh-findings-v5*/wazuh-events-v5*): live terms agg returns
+  //   `linux` 2,022, `wazuh-vd` 796, `wazuh-fim` 10, `wazuh-sca` 8, `wazuh-it-hygiene` 2 -- a
+  //   finite, single-digit-cardinality integration catalog, same class and shape as the
+  //   already-listed `wazuh.integration.category` ("system-activity"/"security"/...), just one
+  //   level more specific.
+  WAZUH_FIELD.AGENT_OS_NAME,
+  WAZUH_FIELD.AGENT_OS_PLATFORM,
+  WAZUH_FIELD.INTEGRATION_NAME,
+  // BLOCKER FIX (CV-033, 2026-08-19/20 adjudicated runs): `wazuh.integration.category` (already
+  // above, findings-v5's own category taxonomy) has no events-v5 counterpart on this list, even
+  // though `event.category` is the events-v5 family's OWN finite category taxonomy for the exact
+  // same "browse the real category values before filtering" use case the "verify before filter"
+  // system-prompt rule asks the model to follow (prompts.ts). Before this fix, a `get_field_values`
+  // probe on `event.category` was rejected by `checkAggs` below with `aggFieldViolation` -- a
+  // guardrail rejection with NO tableEvent/digest -- which the caller's generic empty-result
+  // fallback (`chat.ts`'s `noTextFallbackMessage`/`NO_MATCHING_RESULTS_MESSAGE`) then rendered as
+  // an ordinary "no matching results" sentence, indistinguishable from a genuine zero-row answer.
+  // That silently hid an internal capability gap (an allowlist omission) behind copy that reads as
+  // an honest empty-data outcome -- exactly the forbidden silent-empty class. `event.category` is
+  // already a reviewed, `allow`-policy PRIVACY field (privacy.ts's field policy) and is already
+  // read as a real aggregation dimension by `get-events-by-agent.ts`'s own `breakdownDimensions`
+  // fallback (`['event.category', 'event.outcome']`) -- this list was simply never updated to match
+  // when that field was wired up elsewhere, a genuine omission rather than a deliberate exclusion.
+  // `event.outcome` is added alongside it for the same reason and the same existing `allow` policy
+  // entry (privacy.ts) -- both are finite ECS enums (event.category: a closed taxonomy of
+  // authentication/network/process/... kinds; event.outcome: success/failure/unknown), the same
+  // cardinality class as the already-listed `wazuh.integration.category`.
+  'event.category',
+  'event.outcome',
 ]);
+
+/**
+ * Read-only accessor for `AGG_FIELD_ALLOWLIST` (workstream B, get_field_values -- server/tools/
+ * catalog/get-field-values.ts): that tool must refuse a `field` this allowlist would reject
+ * anyway, with a helpful message, INSTEAD OF letting the call reach `lintDsl`/`checkAggs` and come
+ * back as an opaque guardrail rejection -- the same "fail with a useful message, not a generic
+ * guardrail error" shape every other typed tool's own parameter validation already gets. Kept as
+ * a function rather than exporting the `Set` itself so this file stays the only place that can
+ * mutate the allowlist.
+ */
+export function isAggAllowedField(field: string): boolean {
+  return AGG_FIELD_ALLOWLIST.has(field);
+}
+
+/** The allowlist's members as a stable, sorted array -- for `get_field_values`'s "closest known
+ * field" suggestion when a caller's `field` is not on the list (a plain prefix/substring scan
+ * needs something iterable; the `Set` itself is fine for membership checks but awkward to scan). */
+export function listAggAllowedFields(): string[] {
+  return [...AGG_FIELD_ALLOWLIST].sort();
+}
 
 /**
  * Exact-match ID lookup fields shared by `find_document_by_field` (and any `term`/`terms`/`ids`

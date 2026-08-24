@@ -133,6 +133,42 @@ export function findNearMissSiblings(
 }
 
 /**
+ * BLOCKER FIX (CV-028/CV-033, 2026-08-19 adjudicated run): "category-word misread as agent name"
+ * class. A free-text token the model believed was a host name (e.g. "cloud-services",
+ * "network-activity" -- both plausible-looking hostnames, but actually category/domain vocabulary)
+ * gets passed as `agent_name`/`agent_names` and the filtered query returns 0 rows. Until this fix,
+ * a 0-row agent-name filter with NO near-miss sibling (`findNearMissSiblings` above returns empty)
+ * produced no disclosure at all -- the model was left with a bare zero-row digest and, per CV-033,
+ * sometimes surfaced a generic "no matching results" sentence that reads exactly like an ordinary
+ * empty-data outcome, never stating that the name itself matched no known agent.
+ *
+ * `findUnmatchedAgentNames` closes that gap: given the SAME population probe
+ * `appendEntityNearMissHint` already runs (a candidate-scoped, population-independent terms
+ * aggregation over the requested names' normalization pattern -- see `buildNearMissIncludePattern`),
+ * it reports which requested names have ZERO match of ANY kind in that population -- not an exact
+ * hit, not a zero-padding/separator near-miss variant, nothing. That is the deterministic,
+ * candidate-lookup-backed signal the fix is built on: a name is only ever treated as a genuine
+ * agent-name filter (for the purposes of THIS disclosure) once it is checked against the indexed
+ * population of real agent names, never assumed correct just because the model formatted it as
+ * `agent_name`.
+ *
+ * Scoped to "zero match in the probed population", not "zero match in the whole Manager fleet" --
+ * the probe is index-scoped (see `appendEntityNearMissHint`'s own doc comment), so an agent that is
+ * registered but has no documents in THIS index/window is indistinguishable here from an agent that
+ * does not exist at all. The caller-facing wording this function's result feeds must stay honest to
+ * that scope ("does not appear in this data", never "does not exist in your fleet").
+ */
+export function findUnmatchedAgentNames(
+  requestedNames: string[],
+  indexedNames: string[],
+): string[] {
+  const normalizedIndexed = new Set(indexedNames.map(normalizeAgentName));
+  return requestedNames.filter(
+    requested => !normalizedIndexed.has(normalizeAgentName(requested)),
+  );
+}
+
+/**
  * Reads every agent-name param shape a tool's validated params can carry (see
  * `AGENT_NAME_PARAM_KEYS`): a single string (`agent_name`, or get_vulnerabilities_by_agent's
  * `agent_identifier` -- which may also hold a numeric agent ID, harmless here: an ID's

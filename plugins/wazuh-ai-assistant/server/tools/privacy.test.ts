@@ -609,6 +609,37 @@ test('applyFieldPolicy: "never" field is dropped from samples', () => {
   assert.equal(out.samples[0]['rule.id'], '100');
 });
 
+test('applyFieldPolicy: "never" drops the field name from the columns schema hint too (probe P4)', () => {
+  // Wire capture 2026-08-14 (/vagrant/qa-out/privacy-p4.jsonl): with package.version set to
+  // 'never' the VALUES were correctly gone, but the digest's `columns` hint still named the
+  // field -- the action's contract says even the field's existence is hidden.
+  const policy: FieldPolicyEntry[] = [
+    { field: 'package.version', action: 'never' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    columns: ['package.name', 'package.version', 'package.architecture'],
+    samples: [{ 'package.name': 'lxd', 'package.version': '5.0.8' }],
+  });
+  const out = applyFieldPolicy(digest, policy, p);
+  assert.deepEqual(out.columns, ['package.name', 'package.architecture']);
+  assert.ok(!('package.version' in out.samples[0]));
+});
+
+test('applyFieldPolicy: anonymize/allow keep their columns entries (a schema-hint name is not a value)', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'agent.name', action: 'anonymize' },
+    { field: 'rule.id', action: 'allow' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    columns: ['agent.name', 'rule.id'],
+    samples: [{ 'agent.name': 'web-01.corp', 'rule.id': '100' }],
+  });
+  const out = applyFieldPolicy(digest, policy, p);
+  assert.deepEqual(out.columns, ['agent.name', 'rule.id']);
+});
+
 test('applyFieldPolicy: "anonymize" field is pseudonymized', () => {
   const policy: FieldPolicyEntry[] = [
     { field: 'agent.name', action: 'anonymize' },
@@ -767,7 +798,12 @@ test('applyFieldPolicy: a packages-kind get_agent_inventory digest anonymizes pa
   assert.equal(out.samples[0]['package.name'], 'openssl');
   assert.equal(out.samples[0]['package.version'], '3.0.2');
   assert.equal(out.samples[0]['package.architecture'], 'amd64');
-  assert.match(out.samples[0]['package.vendor'] as string, /^VAL_\d+$/);
+  // package.vendor is 'allow-scan' since the #8912 follow-through (its entry's own comment
+  // promised the change once that landed): the distributor NAME stays readable while the
+  // embedded address is caught by the value-shape scan.
+  const vendor = out.samples[0]['package.vendor'] as string;
+  assert.match(vendor, /^Ubuntu Developers /);
+  assert.doesNotMatch(vendor, /lists\.ubuntu\.com/);
 });
 
 test('applyFieldPolicy: a ports-kind get_agent_inventory digest still anonymizes source.ip/destination.ip', () => {
@@ -1032,8 +1068,10 @@ test('applyFieldPolicy: get_agent_inventory packages breakdown anonymizes packag
   const arch = out.breakdown!.find(b => b.agg === 'package.architecture')!;
   const vendor = out.breakdown!.find(b => b.agg === 'package.vendor')!;
   assert.equal(arch.key, 'amd64');
-  assert.match(vendor.key, /^VAL_\d+$/);
-  // The real vendor STRING (email address included) never appears in the scrubbed digest.
+  // allow-scan (the #8912 follow-through): the distributor name survives, the embedded
+  // address does not.
+  assert.match(vendor.key as string, /^Ubuntu Developers /);
+  // The real ADDRESS (the part that identifies infrastructure) never appears in the digest.
   assert.doesNotMatch(JSON.stringify(out), /lists\.ubuntu\.com/);
 });
 
@@ -1725,4 +1763,206 @@ test('FIELD_POLICY_DEFAULTS: wazuh.rule.title has an explicit entry, not allow-b
   // Reviewed 'allow' (see the entry's own comment in privacy.ts for the reasoning and the
   // residual risk) -- an intentional decision, not a default.
   assert.equal(entry!.action, 'allow');
+});
+
+// --- Workstream A1a: newly reachable families through search_wazuh_data's deriveColumns/
+// isEscapeHatch fail-closed default, against the REAL FIELD_POLICY_DEFAULTS -- same style as the
+// get_agent_inventory group above, pinning both the 'allow' fields and the ones that correctly
+// stay anonymized on this same escape hatch. ------------------------------------------------------
+
+test('applyFieldPolicy: search_wazuh_data keeps wazuh-metrics-agents identity/OS fields readable but anonymizes the new register.ip', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'search_wazuh_data',
+    samples: [
+      {
+        'wazuh.agent.status': 'active',
+        'wazuh.agent.version': 'v5.0.0',
+        'wazuh.agent.host.os.platform': 'ubuntu',
+        // P-2 (AI/plan/a1a-review.md): real docs carry this as an ARRAY
+        // ("wazuh-metrics-agents": `{"agent":{"groups":["default"]}}`), not the bare string the
+        // pre-review test asserted (a shape real data never produces) -- 'allow' means unscanned
+        // passthrough regardless of shape, so the array survives untouched.
+        'wazuh.agent.groups': ['default'],
+        'wazuh.agent.register.ip': '203.0.113.7',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    'search_wazuh_data',
+    true, // isEscapeHatch: true, matching search_wazuh_data's deriveColumns: true
+  );
+  assert.equal(out.samples[0]['wazuh.agent.status'], 'active');
+  assert.equal(out.samples[0]['wazuh.agent.version'], 'v5.0.0');
+  assert.equal(out.samples[0]['wazuh.agent.host.os.platform'], 'ubuntu');
+  assert.deepEqual(out.samples[0]['wazuh.agent.groups'], ['default']);
+  assert.match(out.samples[0]['wazuh.agent.register.ip'] as string, /^IP_\d+$/);
+});
+
+// --- P-2 (AI/plan/a1a-review.md): array/object privacy bypass regression tests -----------------
+
+test('P-2 regression: an array-valued anonymize field is anonymized element-wise, not passed through raw', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'search_wazuh_data',
+    samples: [
+      {
+        // Real shape on wazuh-metrics-agents: "host": {"ip": ["127.0.0.1", "10.0.0.5"]}.
+        [WAZUH_FIELD.AGENT_IP]: ['127.0.0.1', '10.0.0.5'],
+      },
+    ],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    'search_wazuh_data',
+    true,
+  );
+  const scrubbed = out.samples[0][WAZUH_FIELD.AGENT_IP] as string[];
+  assert.equal(scrubbed.length, 2);
+  assert.match(scrubbed[0], /^IP_\d+$/);
+  assert.match(scrubbed[1], /^IP_\d+$/);
+  assert.notEqual(scrubbed[0], scrubbed[1]);
+  assert.doesNotMatch(JSON.stringify(scrubbed), /127\.0\.0\.1|10\.0\.0\.5/);
+});
+
+test('P-2 regression: an unlisted object value under the escape hatch fail-closed default is omitted, not passed through raw', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'search_wazuh_data',
+    samples: [
+      {
+        // Real shape when `_source: ["document"]` is requested on
+        // .wazuh-threatintel-vulnerabilities-a: `document` itself has no policy entry (only its
+        // dotted children do), so under fail-closed it must be omitted, never shipped raw.
+        document: { unlistedNested: 'attacker-influenced free text' },
+      },
+    ],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    'search_wazuh_data',
+    true,
+  );
+  assert.equal('document' in out.samples[0], false);
+});
+
+test('P-2 regression: an unlisted non-empty array of objects under the escape hatch fail-closed default is omitted', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'search_wazuh_data',
+    samples: [
+      {
+        // Real shape when `_source: ["queries"]` is requested on an .opensearch-sap-*-findings
+        // document: `queries` itself is an array of objects with no bare policy entry.
+        queries: [{ id: 'q1', query: 'srcip:1.2.3.4' }],
+      },
+    ],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    'search_wazuh_data',
+    true,
+  );
+  assert.equal('queries' in out.samples[0], false);
+});
+
+test('applyFieldPolicy: search_wazuh_data keeps CTI status fields (.wazuh-cti-consumers) readable', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'search_wazuh_data',
+    samples: [
+      {
+        name: 'public-ruleset-5',
+        context: 'beta3-t1-ruleset-5',
+        status: 'ready',
+        local_offset: 663,
+        remote_offset: 663,
+      },
+    ],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    'search_wazuh_data',
+    true,
+  );
+  assert.equal(out.samples[0].name, 'public-ruleset-5');
+  assert.equal(out.samples[0].status, 'ready');
+  assert.equal(out.samples[0].local_offset, 663);
+  assert.equal(out.samples[0].remote_offset, 663);
+});
+
+test('applyFieldPolicy: search_wazuh_data keeps threatintel enrichment/vulnerability indicator fields readable (third-party content, not customer data)', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'search_wazuh_data',
+    samples: [
+      {
+        'document.name': 'codespring.purecode.in.net',
+        'document.type': 'url_domain',
+        'document.provider': 'threat-fox',
+        'hash.sha256':
+          '43213038f6dd23be380e9ee07e339e33b27a1da94ebd6e35af3258d2f1374951',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    'search_wazuh_data',
+    true,
+  );
+  assert.equal(out.samples[0]['document.name'], 'codespring.purecode.in.net');
+  assert.equal(out.samples[0]['document.type'], 'url_domain');
+  assert.equal(out.samples[0]['document.provider'], 'threat-fox');
+  assert.equal(
+    out.samples[0]['hash.sha256'],
+    '43213038f6dd23be380e9ee07e339e33b27a1da94ebd6e35af3258d2f1374951',
+  );
+});
+
+test('applyFieldPolicy: search_wazuh_data still anonymizes an unlisted field on a newly-opened family (fail-closed default holds)', () => {
+  // The mechanism-limit note in privacy.ts explains why some fields on the newly-opened families
+  // (e.g. a CVE record's free-text rejectedReasons) are deliberately NOT given an 'allow' entry.
+  // This pins that the fail-closed default actually still applies to them -- not a bug, the
+  // intended outcome for a field the reviewer could not confidently classify as safe.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'search_wazuh_data',
+    samples: [
+      {
+        'document.containers.cna.rejectedReasons':
+          'REJECT: duplicate of CVE-2024-32111',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    'search_wazuh_data',
+    true,
+  );
+  assert.match(
+    out.samples[0]['document.containers.cna.rejectedReasons'] as string,
+    /^VAL_\d+$/,
+  );
 });

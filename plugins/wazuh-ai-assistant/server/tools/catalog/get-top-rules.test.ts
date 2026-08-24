@@ -28,17 +28,24 @@ test('get_top_rules: buildRequest targets wazuh-findings-v5* with a bounded @tim
 // sub-aggs that turn that sample into an honest one, and BOTH must merge into the row via
 // digest.ts's existing metric-/filter-sub-agg branches with no digest.ts change (verified: a
 // `cardinality` sub-agg is a metric agg with a `{value}` shape, a `filter` sub-agg has a bare
-// `{doc_count}` shape -- see digest.ts's `bucketsToRows` doc comment).
-test('get_top_rules: aggregates by wazuh.rule.id with a sample title, distinct_titles, and a high/critical count', () => {
+// `{doc_count}` shape -- see digest.ts's `bucketsToRows` doc comment). `wazuh.rule.level` rides
+// the SAME `sample_doc` top_hits sample (issue #8921's "missing severity" item -- see this file's
+// top-of-file doc comment), guarded by its own `distinct_levels` cardinality sub-agg exactly like
+// the title is guarded by `distinct_titles`.
+test('get_top_rules: aggregates by wazuh.rule.id with a sample title+level, distinct_titles, distinct_levels, and a high/critical count', () => {
   const request = build({ limit: 10 });
   assert.deepEqual(request.body.aggs, {
     top_rules: {
       terms: { field: 'wazuh.rule.id', size: 10 },
       aggs: {
         sample_doc: {
-          top_hits: { size: 1, _source: ['wazuh.rule.title'] },
+          top_hits: {
+            size: 1,
+            _source: ['wazuh.rule.title', 'wazuh.rule.level'],
+          },
         },
         distinct_titles: { cardinality: { field: 'wazuh.rule.title' } },
+        distinct_levels: { cardinality: { field: 'wazuh.rule.level' } },
         high_or_critical: {
           filter: { terms: { 'wazuh.rule.level': ['high', 'critical'] } },
         },
@@ -55,11 +62,12 @@ test('get_top_rules: clamps limit to the guardrails aggregation cap, not a large
   assert.equal(topRulesSize(build({ limit: 0 })), 1);
 });
 
-test('get_top_rules: tableSpec column order is meaning -> magnitude -> spread -> identity, with the numeric rule id demoted (not deleted) to last', () => {
+test('get_top_rules: tableSpec column order is meaning -> severity -> magnitude -> spread -> identity, with the numeric rule id demoted (not deleted) to last', () => {
   assert.deepEqual(
     getTopRulesTool.tableSpec.columns.map(column => column.field),
     [
       'wazuh.rule.title',
+      'wazuh.rule.level',
       'doc_count',
       'distinct_titles',
       'high_or_critical',
@@ -77,12 +85,28 @@ test('get_top_rules: tableSpec column order is meaning -> magnitude -> spread ->
   );
 });
 
-test('get_top_rules: digest.sampleColumns keeps "key" (demoted-not-deleted) and adds the two new spread/severity columns', () => {
+// Issue #8921's "missing severity" item: the top-rules table rendered zero badge elements even
+// though the same digest already aggregates a high/critical count -- `wazuh.rule.level` (a sample
+// off the same document `wazuh.rule.title` samples) is marked `severity: true` so result-table.tsx
+// renders it with the SAME EuiBadge component/pattern the vulnerability table uses, and sits at
+// index 1 -- well inside the client's MAX_VISIBLE_RESULT_COLUMNS budget of 6, asserted
+// registry-wide by visible-column-budget-coverage.test.ts.
+test('get_top_rules: wazuh.rule.level is flagged as the severity column', () => {
+  const severityColumn = getTopRulesTool.tableSpec.columns.find(
+    column => column.severity,
+  );
+  assert.equal(severityColumn?.field, 'wazuh.rule.level');
+  assert.equal(severityColumn?.label, 'Level (sample)');
+});
+
+test('get_top_rules: digest.sampleColumns keeps "key" (demoted-not-deleted) and adds the spread/severity columns, including the level sample and its distinct_levels guard', () => {
   assert.deepEqual(getTopRulesTool.digest.sampleColumns, [
     'key',
     'doc_count',
     'wazuh.rule.title',
+    'wazuh.rule.level',
     'distinct_titles',
+    'distinct_levels',
     'high_or_critical',
   ]);
 });

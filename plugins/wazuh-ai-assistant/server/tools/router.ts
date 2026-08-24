@@ -78,6 +78,9 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   get_vulnerabilities_by_agent: 'vulnerabilities',
   get_vulnerability_by_cve: 'vulnerabilities',
   get_critical_vulnerabilities: 'vulnerabilities',
+  // get_cve_intel (workstream A1b) keys off a CVE id like get_vulnerability_by_cve -- same
+  // category, no extra stage-1 line.
+  get_cve_intel: 'vulnerabilities',
 
   // fim
   get_fim_files: 'fim',
@@ -103,10 +106,23 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   get_rules: 'security_analytics',
   get_threat_intel_components: 'security_analytics',
   get_detectors: 'security_analytics',
+  // lookup_indicator/get_cti_status (workstream A1b) are threat-intel-pipeline-content questions
+  // ("is this a known indicator", "is the feed up to date"), the same domain as the rule/decoder/
+  // detector catalog above, not the customer's own observed data -- filed here rather than a new
+  // category to avoid one more stage-1 routing line.
+  lookup_indicator: 'security_analytics',
+  get_cti_status: 'security_analytics',
 
   // free_search (escape hatch + generic ID lookup)
   find_document_by_field: 'free_search',
   search_wazuh_data: 'free_search',
+  // get_field_values (workstream B) is the "verify before filter" discovery tool: it is useful
+  // regardless of which data family a question ultimately routes to (a bad guess at a rule level,
+  // a check result, an OS name can happen from any category), so -- like search_wazuh_data -- it
+  // is always appended to the resolved tool list in `resolveStage2Tools` below rather than gated
+  // behind one category. Filed under 'free_search' here only for `assertRegistryConsistency`'s
+  // bookkeeping and documentation; the always-on behavior is what actually makes it reachable.
+  get_field_values: 'free_search',
 };
 
 /** Fixed menu order for both the enum on the wire and the routing prompt's category list. */
@@ -136,7 +152,9 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
     'the raw/normalized event stream ("everything that happened", matched or not). NOT automated ' +
     'actions Wazuh took in response (active response/blocking/quarantine) -- no category covers that.',
   vulnerabilities:
-    'CVE/vulnerability data: by agent, by CVE ID, solved, or critical only.',
+    'CVE/vulnerability data: by agent, by CVE ID, solved, or critical only -- plus the CTI ' +
+    "feed's own catalog knowledge about a specific CVE (description, severity, affected " +
+    'software), separate from what is actually detected on this deployment.',
   fim: 'File Integrity Monitoring: current state of monitored files (path, mtime, owner, hashes).',
   sca:
     'Security Configuration Assessment (SCA): per-agent compliance benchmark results (e.g. CIS ' +
@@ -152,11 +170,21 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
     'NIS2, NIST 800-171/800-53, FedRAMP, CMMC, TSC).',
   security_analytics:
     'The Security Analytics ruleset and pipeline content itself — rules (name/level/status/' +
-    'technique), components (decoders, integrations, policies, filters, KVDBs), and detector ' +
-    'definitions (which detectors exist, enabled state, monitored indices). Pipeline ' +
-    'configuration, NOT findings that fired and NOT SCA compliance benchmarks.',
+    'technique), components (decoders, integrations, policies, filters, KVDBs), detector ' +
+    'definitions (which detectors exist, enabled state, monitored indices, findings counts), ' +
+    'whether a specific IP/hash/URL/domain is a known indicator (IOC) per the threat-intel feed, ' +
+    'and whether the CTI content feeds are up to date. Also covers Security Analytics SPACES -- ' +
+    'the content-grouping/tenancy concept for this pipeline content (e.g. "what spaces exist and ' +
+    'what does each contain") -- this is a different "space" than an RBAC/dashboard permission ' +
+    'space. Pipeline/threat-intel-catalog content, NOT findings that fired and NOT SCA compliance ' +
+    'benchmarks.',
   free_search:
-    'Anything else about Wazuh finding/vulnerability/state data (last resort).',
+    'Anything else about Wazuh finding/vulnerability/state data, PLUS operational metrics, ' +
+    'Security Analytics detector findings, and browsing/counting the raw CVE/IOC threat-intel ' +
+    'feeds (last resort — always offered regardless of which category is picked, so this ' +
+    'rarely needs to be picked for its own sake). For IOC lookup, CTI feed freshness, or CVE ' +
+    'feed knowledge about ONE specific indicator/CVE, prefer lookup_indicator/get_cti_status/' +
+    'get_cve_intel (security_analytics/vulnerabilities categories) over this escape hatch.',
   general:
     'Greetings, thanks, or questions about the assistant itself. If the user asks anything about ' +
     'their own environment - however vaguely - do NOT pick general.',
@@ -217,7 +245,107 @@ function assertRegistryConsistency(): void {
   }
 }
 
+/**
+ * Declared chain pairs: a summary/list tool name mapped to the cross-category (or same-category)
+ * DETAIL tools a follow-up question naturally reaches for right after it, surveyed against two
+ * measured consumers:
+ *
+ * Failure A ("not offered"): the detail tool was never in the turn's tool list at all, so the
+ * model could not call it even if it wanted to -- e.g. `get_agents` alone never offers
+ * `get_vulnerabilities_by_agent` (the "what's going on with aio-05" miss), `get_vulnerabilities`
+ * alone never offers `get_agent_inventory` (hotfixes), and a findings/rule-title/tag search never
+ * offers `find_document_by_field` for a specific row.
+ *
+ * Failure B ("nothing compels"): the detail tool WAS offered, but the model gave the summary
+ * numbers and then OFFERED the detail call in prose instead of making it -- measured on
+ * `get_sca_results` -> `get_sca_checks` (see `findOfferedFollowUpTool`'s metadata-fallback branch
+ * in server/routes/chat.ts, which keys off this same map for offers that never name a tool).
+ *
+ * `resolveStage2Tools` below appends every entry's detail tools to stage 2's resolved list
+ * whenever the summary tool is present, closing Failure A; the chat.ts consumer closes Failure B
+ * using the same map so the two never drift apart.
+ *
+ * Kept as tool NAMES (not RouterCategory) since several pairs are same-category refinements
+ * (`get_sca_results` -> `get_sca_checks`, both `sca`) that a category-level co-routing (see
+ * `CO_ROUTED_CATEGORIES` above) cannot express -- that mechanism only ever offers a WHOLE sibling
+ * category's tools, not "this one specific tool given that one specific summary was called".
+ * `assertChainPairsConsistency` below verifies every name (key and value) against the registry at
+ * module load, same pattern as `assertRegistryConsistency`: a typo here must throw at plugin
+ * start, not silently 404 mid-turn.
+ */
+export const CHAIN_PAIRS: Record<string, readonly string[]> = {
+  get_sca_results: ['get_sca_checks'],
+  get_agents: [
+    'get_vulnerabilities_by_agent',
+    'get_sca_results',
+    'get_agent_inventory',
+    'search_findings_by_agent',
+  ],
+  get_top_agents: ['search_findings_by_agent', 'get_events_by_agent'],
+  get_top_rules: [
+    'search_findings_by_rule_title',
+    'search_findings_by_rule_tag',
+  ],
+  get_mitre_summary: ['get_mitre_findings'],
+  get_compliance_summary: ['get_compliance_alerts'],
+  get_security_summary: ['get_findings_by_time'],
+  get_vulnerabilities: [
+    'get_vulnerability_by_cve',
+    'get_vulnerabilities_by_agent',
+    'get_agent_inventory',
+  ],
+  get_critical_vulnerabilities: [
+    'get_vulnerability_by_cve',
+    'get_vulnerabilities_by_agent',
+    'get_agent_inventory',
+  ],
+  // Closes the Failure A instance this map's own doc comment above already names ("a
+  // findings/rule-title/tag search never offers find_document_by_field for a specific row") --
+  // these three are the finding-ROW producers (as opposed to the aggregate-only summary tools
+  // like get_top_rules/get_security_summary), so a specific row from any of them is the natural
+  // next lookup. NOT the free_search CATEGORY: resolveStage2Tools only ever appends the single
+  // `search_wazuh_data` name unconditionally (see its doc comment), never the whole free_search
+  // category, so find_document_by_field was previously reachable only when free_search was
+  // itself the routed category -- these entries are what actually closes that gap.
+  search_findings_by_agent: ['find_document_by_field'],
+  search_findings_by_rule_title: ['find_document_by_field'],
+  search_findings_by_rule_tag: ['find_document_by_field'],
+};
+
+/**
+ * `CHAIN_PAIRS` consistency guard, same rationale/shape as `assertRegistryConsistency` above: every
+ * name it mentions -- both the summary-tool keys and every detail tool in each value array -- must
+ * be a real registry tool name, or a typo here would silently never chain (key side) or throw a
+ * confusing "unknown tool" failure only once a turn actually reaches it (value side), instead of
+ * failing loudly at plugin start.
+ */
+function assertChainPairsConsistency(): void {
+  const registryToolNames = new Set(
+    listToolDefinitions().map(def => def.spec.name),
+  );
+  const unknown = new Set<string>();
+  for (const [summaryTool, detailTools] of Object.entries(CHAIN_PAIRS)) {
+    if (!registryToolNames.has(summaryTool)) {
+      unknown.add(summaryTool);
+    }
+    for (const detailTool of detailTools) {
+      if (!registryToolNames.has(detailTool)) {
+        unknown.add(detailTool);
+      }
+    }
+  }
+  if (unknown.size > 0) {
+    throw new Error(
+      'wazuhAiAssistant router: CHAIN_PAIRS names tool(s) not present in the registry: ' +
+        `${Array.from(unknown).join(
+          ', ',
+        )}. Fix server/tools/router.ts's CHAIN_PAIRS or the registry.`,
+    );
+  }
+}
+
 assertRegistryConsistency();
+assertChainPairsConsistency();
 
 /**
  * Stage-1's single synthetic tool. Internal only: server/routes/chat.ts's orchestration loop must
@@ -357,6 +485,9 @@ export function resolveStage2Tools(categories: string[]): ToolSpec[] {
   if (routed.length === 1 && routed[0] === 'general') {
     // Minimal recovery set (see doc comment above): `general` alone maps to no tool category in
     // `TOOL_CATEGORY`/`CATEGORY_TOOLS`, so without this branch the union below would be empty.
+    // Deliberately NOT run through the chain-pairs expansion below: that minimal set must stay
+    // exactly `{get_security_summary, search_wazuh_data}`, since it is the no-data-path escape
+    // hatch, not a routed category union a follow-up chain should widen.
     toolNames.add('get_security_summary');
   } else {
     for (const category of routed) {
@@ -364,10 +495,45 @@ export function resolveStage2Tools(categories: string[]): ToolSpec[] {
         toolNames.add(toolName);
       }
     }
+    // Chain pairs (see `CHAIN_PAIRS`'s doc comment): append every detail tool whose SUMMARY tool
+    // is already in this turn's resolved category union, so a cross-category (or same-category)
+    // follow-up is reachable in the SAME turn rather than requiring a second stage-1 route.
+    // Expanded to a FIXED POINT, not just one hop: a detail tool that is ITSELF a `CHAIN_PAIRS`
+    // key (e.g. `get_sca_results`, added here for `agents`, is also a summary key for
+    // `get_sca_checks`) must chain onward too, or the very "what's going on with aio-05" witness
+    // this map cites in its own doc comment (get_agents -> get_sca_results -> get_sca_checks)
+    // would stop one hop short of the SCA detail tool. `frontier` starts as the category union
+    // and each pass only visits NEWLY added names, so no name is expanded twice; termination is
+    // structural (the tool catalog is finite and every name enters the Set at most once), so no
+    // cycle guard is needed even if a future edit introduced a `CHAIN_PAIRS` cycle. Order stays
+    // stable for the router's stage-2 cache key: the loop only ever appends, in a fixed
+    // breadth-first pass order, never reorders or removes what the category union above produced.
+    let frontier = Array.from(toolNames);
+    while (frontier.length > 0) {
+      const nextFrontier: string[] = [];
+      for (const summaryTool of frontier) {
+        for (const detailTool of CHAIN_PAIRS[summaryTool] ?? []) {
+          if (!toolNames.has(detailTool)) {
+            toolNames.add(detailTool);
+            nextFrontier.push(detailTool);
+          }
+        }
+      }
+      frontier = nextFrontier;
+    }
   }
+
   // Always-on escape hatch, deduped via the Set regardless of whether
   // `free_search` was itself one of the routed categories.
   toolNames.add('search_wazuh_data');
+  // Always-on discovery tool (workstream B) -- see TOOL_CATEGORY's get_field_values entry above
+  // for why this mirrors search_wazuh_data's unconditional placement instead of a category gate.
+  // DELIBERATE product decision, not a side effect (code review B11): this adds ~1.5 KB of
+  // description + 4 params to EVERY stage-2 call, including `general`, where field discovery is
+  // rarely relevant. Accepted because the alternative -- gating it per category -- would silently
+  // reintroduce the "model guesses a filter value" failure mode B1 exists to close, on whichever
+  // category someone forgets to add it to.
+  toolNames.add('get_field_values');
 
   const specs: ToolSpec[] = [];
   for (const name of toolNames) {

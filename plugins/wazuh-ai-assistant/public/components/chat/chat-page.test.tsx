@@ -11,6 +11,7 @@ import {
 import '@testing-library/jest-dom';
 import { createBrowserHistory } from 'history';
 import { ChatPage, CONVERSATIONS_CHANGED_EVENT } from './chat-page';
+import { ASSISTANT_SETTINGS_CHANGED_EVENT } from '../../services/settings-service';
 import {
   ConversationRecord,
   PersistedChatMessage,
@@ -64,6 +65,10 @@ jest.mock('../../services/conversations-service', () => ({
 }));
 
 jest.mock('../../services/settings-service', () => ({
+  // Keeps the module's real constants — notably `ASSISTANT_SETTINGS_CHANGED_EVENT`, which the
+  // component subscribes to and the tests below dispatch. Stubbing them out would make both sides
+  // agree on `undefined` and prove nothing.
+  ...jest.requireActual('../../services/settings-service'),
   SettingsService: jest.fn().mockImplementation(() => ({
     getAssistantSettings: () => mockSettingsService.getAssistantSettings(),
     getSettingsAccess: () => mockSettingsService.getSettingsAccess(),
@@ -162,6 +167,7 @@ function renderChatPage(
     selectedProviderId: PROVIDER.id,
     onProviderChange: jest.fn(),
     onNavigateToSettings: jest.fn(),
+    onManageProviders: jest.fn(),
     // A real browser history, backed by jsdom's own `window.history`/`window.location` — reads
     // whatever path a test seeded via `window.history.replaceState` before mounting, and its own
     // `history.replace` calls are real `replaceState`s a test can assert on via `window.location`.
@@ -1358,9 +1364,15 @@ describe('ChatPage — feedback while a turn runs', () => {
  *
  * This is the UI-layer equivalent of the registry-wide coverage tests elsewhere in this codebase
  * (see server/tools/catalog/agg-size-coverage.test.ts): the class here is "orderings of table
- * events within one turn", and the five scenarios below enumerate it exhaustively for the
+ * events within one turn", and the scenarios below enumerate it exhaustively for the
  * single-table-per-message model — every place an empty `table` event can land relative to a
- * non-empty one, plus the one honest-empty case that must still render.
+ * non-empty one, plus the honest-empty cases.
+ *
+ * The honest-empty cells changed shape with C4 (CEO item 6) and did not go away: a turn whose FINAL
+ * table has zero rows still commits that spec (so the saved conversation still says a query ran and
+ * matched nothing) but renders no card — the assistant's prose carries the answer, and a turn with
+ * no prose gets one quiet subdued line instead. The suppression mechanism this describe covers is
+ * unchanged; only what a committed empty spec looks like on screen is.
  */
 describe('ChatPage — an empty table never clobbers a populated one (issue #8920 item 7)', () => {
   const ROWS_SPEC = {
@@ -1433,7 +1445,15 @@ describe('ChatPage — an empty table never clobbers a populated one (issue #892
     await waitFor(() => expect(screen.getByText('web-01')).toBeInTheDocument());
   });
 
-  it('still shows an honest empty table when it is the only table this turn', async () => {
+  /**
+   * C4 (CEO item 6): the honest-empty case still COMMITS its spec — that is the turn's record of
+   * having queried and matched nothing, and it is what gets persisted — but it no longer draws a
+   * card: message-bubble.tsx suppresses a 0-row table and, when the turn produced no prose of its
+   * own, shows one quiet line in its place. This test used to assert the card ("Results (0 rows)");
+   * its premise moved rather than disappeared, so it now pins the replacement end state through the
+   * SAME event sequence, keeping this describe's matrix of table-event orderings complete.
+   */
+  it('shows the quiet no-rows line, not a table card, when the only table this turn is empty and no prose arrived', async () => {
     const stream = createControllableStream();
     mockStreamChat.mockImplementation(
       (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
@@ -1447,8 +1467,72 @@ describe('ChatPage — an empty table never clobbers a populated one (issue #892
     stream.end();
 
     await waitFor(() =>
-      expect(screen.getByText('Results (0 rows)')).toBeInTheDocument(),
+      expect(
+        screen.getByText('The query returned no rows.'),
+      ).toBeInTheDocument(),
     );
+    expect(screen.queryByText('Results (0 rows)')).not.toBeInTheDocument();
+    // EuiBasicTable's stock empty body went with the card that held it.
+    expect(screen.queryByText('No items found')).not.toBeInTheDocument();
+  });
+
+  it('drops the empty table silently when the turn narrated its own answer', async () => {
+    // The common shape of a zero-result turn: the tool returns nothing and the model says so in
+    // words. That prose IS the answer (CEO decision: suppress entirely), so neither the card nor the
+    // fallback line may appear — the line is the guarantee for a turn with NO prose, never a second
+    // answer stapled under one that already has it.
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('top agents?');
+
+    stream.push({ type: 'table', spec: EMPTY_SPEC });
+    stream.push({
+      type: 'delta',
+      content: 'No agents matched that filter in the last 24 hours.',
+    });
+    stream.push({ type: 'done' });
+    stream.end();
+
+    await waitFor(() =>
+      expect(
+        screen.getByText('No agents matched that filter in the last 24 hours.'),
+      ).toBeInTheDocument(),
+    );
+    expect(screen.queryByText('Results (0 rows)')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('The query returned no rows.'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('keeps the executed-query chip reachable on a suppressed empty result', async () => {
+    // Provenance normally moves UP into the result card's header (layout contract §4). With the card
+    // suppressed there is no header to move it into, so the below-bubble chip has to stay — "what
+    // did it actually look for?" is the first question a reader asks of a zero-result answer.
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('top agents?');
+
+    stream.push({
+      type: 'tool_call',
+      toolCall: { id: 't1', name: 'get_top_agents', arguments: {} },
+    });
+    stream.push({ type: 'table', spec: EMPTY_SPEC });
+    stream.push({ type: 'delta', content: 'Nothing matched.' });
+    stream.push({ type: 'done' });
+    stream.end();
+
+    await waitFor(() =>
+      expect(screen.getByText('Nothing matched.')).toBeInTheDocument(),
+    );
+    expect(screen.getByText('Top agents · 90d')).toBeInTheDocument();
   });
 
   it('keeps the populated table when an empty one arrives and the turn then errors', async () => {
@@ -1800,6 +1884,225 @@ describe('ChatPage — two-row grid pane (contract §1)', () => {
   });
 });
 
+/**
+ * C2 (ux-iter3): the "jump to latest" affordance that pairs with stick-to-bottom scrolling in every
+ * streaming chat UI (ux-research.md §B). The PINNING logic itself is untouched and untested here —
+ * jsdom lays out no boxes, so `scrollHeight`/`clientHeight` are 0 and every element reads as pinned;
+ * these tests stub those three numbers on the pane so the component's own predicate
+ * (`scrollHeight - scrollTop - clientHeight < 160`) resolves to a real answer, and pin the STRUCTURE
+ * plus the state transitions around it.
+ */
+describe('ChatPage — jump to latest (C2)', () => {
+  /**
+   * Makes the transcript pane read as scrolled up. jsdom hardcodes `scrollTop`/`scrollHeight`/
+   * `clientHeight` to 0 and ignores writes to `scrollTop`, so all three are redefined as own
+   * properties on the instance; `configurable` so a later call can move the pane back down.
+   */
+  function stubPaneScroll(
+    pane: HTMLElement,
+    metrics: { scrollHeight: number; clientHeight: number; scrollTop: number },
+  ) {
+    Object.entries(metrics).forEach(([name, value]) => {
+      Object.defineProperty(pane, name, {
+        value,
+        writable: true,
+        configurable: true,
+      });
+    });
+  }
+
+  function transcriptPane(): HTMLElement {
+    return screen.getByRole('region', { name: 'Chat' });
+  }
+
+  const jumpButton = () =>
+    screen.queryByRole('button', { name: 'Jump to latest' });
+
+  async function renderWithOneTurn() {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+    const view = renderChatPage();
+    await sendMessage('top agents?');
+    stream.push({ type: 'delta', content: 'here they are' });
+    await waitFor(() =>
+      expect(screen.getByText('here they are')).toBeInTheDocument(),
+    );
+    return view;
+  }
+
+  it('renders nothing while the reader is following the conversation', async () => {
+    await renderWithOneTurn();
+    expect(jumpButton()).toBeNull();
+
+    // A scroll event that lands INSIDE the 160px pin threshold must not raise the button either —
+    // this is the "table render shifted the pane by a few pixels" case the threshold exists for.
+    const pane = transcriptPane();
+    stubPaneScroll(pane, {
+      scrollHeight: 2000,
+      clientHeight: 900,
+      scrollTop: 1050,
+    });
+    fireEvent.scroll(pane);
+    expect(jumpButton()).toBeNull();
+  });
+
+  it('holds its state inside the hysteresis band instead of flickering', async () => {
+    // The unpin threshold carries extra slack over the re-pin one (SCROLL_UNPIN_SLACK_PX):
+    // a distance between the two must keep whatever state the pane already had, so a layout
+    // shift of a few dozen pixels right on the boundary can never toggle the button.
+    await renderWithOneTurn();
+    const pane = transcriptPane();
+
+    // Pinned, then a scroll landing between 160 and 200 (distance 180): stays pinned.
+    stubPaneScroll(pane, {
+      scrollHeight: 2000,
+      clientHeight: 900,
+      scrollTop: 920,
+    });
+    fireEvent.scroll(pane);
+    expect(jumpButton()).toBeNull();
+
+    // Unpin for real (distance 1500), then the same in-band distance: stays UNpinned.
+    stubPaneScroll(pane, {
+      scrollHeight: 2000,
+      clientHeight: 500,
+      scrollTop: 0,
+    });
+    fireEvent.scroll(pane);
+    expect(jumpButton()).not.toBeNull();
+    stubPaneScroll(pane, {
+      scrollHeight: 2000,
+      clientHeight: 900,
+      scrollTop: 920,
+    });
+    fireEvent.scroll(pane);
+    expect(jumpButton()).not.toBeNull();
+  });
+
+  it('appears once the reader scrolls up, outside the pin threshold', async () => {
+    await renderWithOneTurn();
+    const pane = transcriptPane();
+    stubPaneScroll(pane, {
+      scrollHeight: 2000,
+      clientHeight: 500,
+      scrollTop: 0,
+    });
+    fireEvent.scroll(pane);
+
+    expect(jumpButton()).not.toBeNull();
+  });
+
+  it('lives beside the transcript, not inside it and not inside the composer', async () => {
+    // Structural, because it is what makes the button behave: a child of the scroll container would
+    // scroll away with the content, and the pane-level grid row is what keeps it clear of the
+    // composer without any offset tracking the composer's variable height. Same reasoning as the
+    // two-row grid tests above — jsdom cannot check the pixels, only the structure they rest on.
+    await renderWithOneTurn();
+    const pane = transcriptPane();
+    stubPaneScroll(pane, {
+      scrollHeight: 2000,
+      clientHeight: 500,
+      scrollTop: 0,
+    });
+    fireEvent.scroll(pane);
+
+    const button = jumpButton() as HTMLElement;
+    expect(pane.contains(button)).toBe(false);
+    expect(button.closest('.wzJumpToLatest')).not.toBeNull();
+    // Same grid parent as the transcript (`.wzChatPane`), so `grid-row: 1` can put it back into the
+    // transcript's own row.
+    expect(button.closest('.wzChatPane')).toBe(pane.parentElement);
+    expect(button.closest('.wzComposerRow')).toBeNull();
+  });
+
+  it('shares the transcript grid CELL explicitly, so appearing moves nothing on either axis', () => {
+    // Two bugs in sequence pin this shape (css-audit-full.md §3.2 and the re-audit's §3.1):
+    // with NEITHER item placed, the button pushed the composer into an implicit third ROW
+    // (36px vertical shove); with only `grid-row: 1` on both, the button's auto COLUMN created
+    // an implicit 40px second column instead — the surface narrowed 40px and every message
+    // shifted 20px left when it appeared. The invariant that matters is that transcript and
+    // button share the full CELL (grid-area 1/1) inside an explicit single-column grid.
+    //
+    // jsdom lays out no grid, so the mechanism is pinned where it lives: all three declarations
+    // must be present, because any one missing is a broken state we have already shipped once.
+    const scssRules = fs
+      .readFileSync(path.join(__dirname, 'chat-page.scss'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/^\s*\/\/.*$/gm, '');
+
+    expect(scssRules).toMatch(
+      /\.wzChatPane \{[^}]*grid-template-columns:\s*1fr/,
+    );
+    expect(scssRules).toMatch(/\.wzChatTranscript \{[^}]*grid-area:\s*1 \/ 1/);
+    expect(scssRules).toMatch(/\.wzJumpToLatest \{[^}]*grid-area:\s*1 \/ 1/);
+    // Centred over the measure, not parked in the row's inline-end corner — and with no
+    // inline-end margin left over from the corner placement (§3.2).
+    expect(scssRules).toMatch(/\.wzJumpToLatest \{[^}]*justify-self:\s*center/);
+    expect(scssRules).not.toMatch(
+      /margin-inline-end:\s*\$wzScrollGutter \+ 24px/,
+    );
+  });
+
+  it('scrolls to the newest content and re-pins when clicked', async () => {
+    await renderWithOneTurn();
+    const pane = transcriptPane();
+    stubPaneScroll(pane, {
+      scrollHeight: 2000,
+      clientHeight: 500,
+      scrollTop: 0,
+    });
+    // `Element.prototype.scrollTo` is not implemented in jsdom, so the component feature-detects it
+    // and falls back to a direct `scrollTop` assignment (which jsdom ignores). Supplying the mock is
+    // what makes the smooth path observable at all.
+    const scrollTo = jest.fn();
+    Object.defineProperty(pane, 'scrollTo', {
+      value: scrollTo,
+      writable: true,
+      configurable: true,
+    });
+    fireEvent.scroll(pane);
+
+    fireEvent.click(jumpButton() as HTMLElement);
+
+    expect(scrollTo).toHaveBeenCalledWith({ top: 2000, behavior: 'smooth' });
+    // Re-pinned: the button removes itself immediately on click rather than waiting for the smooth
+    // scroll's own trailing scroll event, so it can never be left floating over a pinned transcript.
+    expect(jumpButton()).toBeNull();
+  });
+
+  it('re-pins on send, so a new turn never leaves the button on screen', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+    renderChatPage();
+    await sendMessage('first question');
+    const pane = transcriptPane();
+    stubPaneScroll(pane, {
+      scrollHeight: 2000,
+      clientHeight: 500,
+      scrollTop: 0,
+    });
+    fireEvent.scroll(pane);
+    expect(jumpButton()).not.toBeNull();
+
+    stream.push({ type: 'done' });
+    stream.end();
+    // The composer swaps Send for Stop while a turn generates, so waiting for Send to come back is
+    // also how this waits for the first turn to have finished.
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Send' })).toBeInTheDocument(),
+    );
+    await sendMessage('second question');
+
+    // `startTurn` force-repins (the one case where overriding the reader's scroll position is what
+    // they expect), and the button's own mirror follows it through `repinToBottom`.
+    expect(jumpButton()).toBeNull();
+  });
+});
+
 describe('ChatPage — welcome centers only when there is room (contract §3)', () => {
   it('gives the welcome cluster its own centering box inside the transcript row', async () => {
     renderChatPage();
@@ -1814,19 +2117,383 @@ describe('ChatPage — welcome centers only when there is room (contract §3)', 
     expect(transcript.contains(welcomeBox)).toBe(true);
   });
 
-  it('groups the example prompts as horizontal cards inside one bordered container (variation 1a)', async () => {
+  it('offers the example prompts as horizontal cards, with no wrapper panel and no pill header', async () => {
     renderChatPage();
     await screen.findByText('Ask the AI Assistant something');
 
-    // The pill header groups the cards under one container, replacing the old three-cards-with-
-    // no-grouping-container layout.
-    expect(screen.getByText('Try one of these')).toBeInTheDocument();
-    // The full question is now the card's description (no longer truncated to one line), and the
-    // title is shown separately — both readable without truncation.
+    // The full question is the card's description and the short title is shown separately — both
+    // readable, neither truncated.
     expect(
-      screen.getByText('Show me the critical findings of the last 24 hours'),
+      screen.getByText('Critical findings in the last 24 hours'),
     ).toBeInTheDocument();
-    expect(screen.getByText('Critical findings')).toBeInTheDocument();
+    const title = screen.getByText('Critical findings');
+    expect(title).toBeInTheDocument();
+
+    // The grouping container and the "Try one of these" pill that used to head it are BOTH gone
+    // (css-audit-full.md §1.2/§1.3): the outer EuiPanel had the identical border, radius and fill as
+    // the cards inside it — a card-in-a-card carrying no information — and the pill was a third
+    // instructional line under a title and subtitle that already say what to do.
+    expect(screen.queryByText('Try one of these')).toBeNull();
+    const grid = title.closest('.wzExampleCardsGrid') as HTMLElement;
+    expect(grid).not.toBeNull();
+    // The grid's own parent is the plain welcome column, not a panel wrapped around the cards. The
+    // cards themselves are still bordered EuiPanels — that is what groups them now.
+    expect(grid.parentElement?.className).toContain('wzWelcomeCenter');
+    expect(grid.closest('.euiPanel')).toBeNull();
+    // ...and each card carries the shared container radius rather than EuiCard's own 4px (§6).
+    expect(title.closest('.euiCard')).toHaveClass('wzWelcomeCard');
+  });
+});
+
+/**
+ * C1 (ux-iter3, AI/ux-iter3/gemini-motion-spec.md): the Gemini-style empty state — greeting,
+ * example cards and composer as ONE vertically centred group — and the one-time transition that
+ * docks the composer on the first send.
+ *
+ * jsdom runs no transitions and lays out no boxes, so what these pin is the STATE MACHINE and the
+ * structure it drives (which classes exist in which state, what is in flow when the first message
+ * lands, and both settle paths), exactly as the two-row-grid tests above pin the grid's structure
+ * rather than its pixels. Every measured delta is 0 here — `getBoundingClientRect` returns zeros —
+ * which is why the inverted transform below is asserted as `translateY(0px)`: the value is the
+ * environment's, the fact that the mechanism ran is the point.
+ */
+describe('ChatPage — welcome composer and first-send transition (C1)', () => {
+  const chatPane = () => document.querySelector('.wzChatPane') as HTMLElement;
+  const composerRow = () =>
+    document.querySelector('.wzComposerRow') as HTMLElement;
+  const welcomeGroup = () =>
+    document.querySelector('.wzWelcomeCenter') as HTMLElement | null;
+
+  /** Presses Send WITHOUT awaiting the turn: the docking frame is set up synchronously inside the
+   * click, and the assertions about it have to run before anything else is flushed. */
+  function pressSend(text: string) {
+    fireEvent.change(screen.getByLabelText('Chat message'), {
+      target: { value: text },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Send' }));
+  }
+
+  function stubStream() {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+    return stream;
+  }
+
+  /**
+   * Dispatches a real `transitionend`, built by hand. `fireEvent.transitionEnd(el, {propertyName})`
+   * cannot be used: jsdom implements no `TransitionEvent` constructor, so dom-testing-library falls
+   * back to plain `Event`, which silently drops unknown init fields — and `propertyName` is exactly
+   * what the component filters on, so the settle would never be reached.
+   */
+  function fireTransitionEnd(element: HTMLElement, propertyName: string) {
+    const event = new Event('transitionend', { bubbles: true });
+    Object.defineProperty(event, 'propertyName', { value: propertyName });
+    fireEvent(element, event);
+  }
+
+  it('centres the greeting, the cards and the composer as one group', async () => {
+    renderChatPage();
+    await screen.findByText('Ask the AI Assistant something');
+
+    // The pane itself is the centring container, which is what makes the cluster and the composer
+    // ONE group without the composer leaving its own grid row / DOM position.
+    expect(chatPane().className).toBe('wzChatPane wzChatPane--welcome');
+    const input = screen.getByLabelText('Chat message');
+    expect(chatPane().contains(input)).toBe(true);
+    expect(chatPane().contains(welcomeGroup())).toBe(true);
+    // The compact centred measure hangs off this class (chat-page.scss); the shared measure class
+    // stays on the same element, so the docked width needs no second element to fall back to.
+    const measure = input.closest('.wzComposerMeasure');
+    expect(measure).not.toBeNull();
+    expect(measure?.classList.contains('wzContentMeasure')).toBe(true);
+    // Nothing may be wedged between the cluster and the composer: `grid-row: 1` means nothing in a
+    // flex column, so the jump button is withheld until there is a conversation to jump to.
+    expect(screen.queryByRole('button', { name: 'Jump to latest' })).toBeNull();
+  });
+
+  it('never centres in the embedded docked panel', async () => {
+    // assistant-chat-panel.tsx passes exactly this: the sidecar keeps today's always-docked
+    // composer, with no centred state and no transition to run in a 600px column.
+    renderChatPage({ enableWelcomeComposer: false });
+    await screen.findByText('Ask the AI Assistant something');
+
+    expect(chatPane().className).toBe('wzChatPane');
+    // The welcome content itself is unchanged there — only the composer's position is.
+    expect(welcomeGroup()?.className).toBe('wzWelcomeCenter');
+    expect(
+      screen.getByText('Critical findings in the last 24 hours'),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText('Chat message')).toBeVisible();
+  });
+
+  // Iteration-4 item 1 (option A): the two-row composer floor is scoped to the full-page surface
+  // via `.wzComposerRow--roomy`, derived from the same `enableWelcomeComposer` prop this describe
+  // block already uses to distinguish the full-page surface from the header's docked sidecar.
+  it('marks the composer row roomy on the full-page surface only', async () => {
+    renderChatPage();
+    await screen.findByText('Ask the AI Assistant something');
+    expect(composerRow().classList.contains('wzComposerRow--roomy')).toBe(true);
+  });
+
+  it('never marks the composer row roomy in the embedded docked panel', async () => {
+    renderChatPage({ enableWelcomeComposer: false });
+    await screen.findByText('Ask the AI Assistant something');
+    expect(composerRow().classList.contains('wzComposerRow--roomy')).toBe(
+      false,
+    );
+  });
+
+  // Iteration-4 item 1 (option C): greeting, example cards and composer all narrow to the same
+  // 840px cluster width under `.wzChatPane--welcome`, via `.wzWelcomeMeasure` and
+  // `.wzComposerMeasure` specifically — NOT the bare `.wzContentMeasure` those two also carry,
+  // which the sticky status-callout band's own measure carries too with no welcome-specific class
+  // of its own; an unscoped rule on the bare class would narrow that band right along with the
+  // welcome cluster.
+  it('caps the welcome cluster width via .wzWelcomeMeasure/.wzComposerMeasure, not the bare .wzContentMeasure', () => {
+    const scssPath = path.join(__dirname, 'chat-page.scss');
+    const scssSource = fs
+      .readFileSync(scssPath, 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '');
+    expect(scssSource).toMatch(
+      /\.wzChatPane--welcome \.wzWelcomeMeasure,\s*\n\s*\.wzChatPane--welcome \.wzComposerMeasure\s*\{\s*max-width:\s*\$wzWelcomeGroupMaxWidth;/,
+    );
+    expect(scssSource).not.toMatch(
+      /\.wzChatPane--welcome \.wzContentMeasure\s*\{/,
+    );
+  });
+
+  it('renders the welcome cluster with .wzWelcomeMeasure, not just the bare .wzContentMeasure the status band also carries', async () => {
+    renderChatPage();
+    await screen.findByText('Ask the AI Assistant something');
+
+    const measure = welcomeGroup()?.closest('.wzContentMeasure');
+    expect(measure?.classList.contains('wzWelcomeMeasure')).toBe(true);
+  });
+
+  it('animates the composer measure open on dock, but keeps the welcome measure pinned at 840px through the same bridge', () => {
+    const scssPath = path.join(__dirname, 'chat-page.scss');
+    const scssSource = fs
+      .readFileSync(scssPath, 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '');
+    // The composer's OWN measure is the one that tweens the cap open — no scoping to a pane state,
+    // so the transition is armed regardless of which class swap (`--welcome` leaving or
+    // `--docking` arriving) actually changes the computed max-width.
+    expect(scssSource).toMatch(
+      /\.wzComposerMeasure\s*\{\s*transition:\s*max-width \$wzDockTravel \$wzDockEase;/,
+    );
+    // The welcome cluster's own measure ancestor — the containing block its `--leaving` ghost
+    // fades against — stays pinned at the SAME cap through the docking bridge instead, so the
+    // ghost's box never resizes out from under it mid-fade.
+    expect(scssSource).toMatch(
+      /\.wzChatPane--docking \.wzWelcomeMeasure\s*\{\s*max-width:\s*\$wzWelcomeGroupMaxWidth;/,
+    );
+  });
+
+  it('moves through docking and settles docked on the first send', async () => {
+    const stream = stubStream();
+    renderChatPage();
+    await screen.findByText('Ask the AI Assistant something');
+
+    pressSend('first question');
+
+    // The bridge is entered in the same click that sends, before any await — the composer's final
+    // (docked) layout is committed immediately and the travel is the inverted transform below.
+    expect(chatPane().className).toBe('wzChatPane wzChatPane--docking');
+    expect(composerRow().style.transform).toBe('translateY(0px)');
+    // Inverted with transitions OFF, so the jump back to the old position is instant; the next
+    // animation frame releases both and `.wzChatPane--docking`'s own transition takes over.
+    expect(composerRow().style.transition).toBe('none');
+
+    // The fading cluster is out of flow (`--leaving`) and no longer stretches the measure box, so
+    // the transcript is already laid out at its final height when the user's message lands in it.
+    const leaving = welcomeGroup() as HTMLElement;
+    expect(leaving.className).toContain('wzWelcomeCenter--leaving');
+    expect(leaving.closest('.wzContentMeasure')?.className).not.toContain(
+      'wzContentMeasure--stretch',
+    );
+
+    await waitFor(() => expect(mockStreamChat).toHaveBeenCalled());
+    expect(screen.getByText('first question')).toBeInTheDocument();
+
+    // Fast settle path: the row's own transform transition finishing.
+    fireTransitionEnd(composerRow(), 'transform');
+
+    // Byte-identical end state: the bare docked pane, no modifier and no leftover inline styles.
+    expect(chatPane().className).toBe('wzChatPane');
+    expect(composerRow().style.transform).toBe('');
+    expect(composerRow().style.transition).toBe('');
+    expect(welcomeGroup()).toBeNull();
+    stream.end();
+  });
+
+  it('ignores a nested transition and settles on the timer instead', async () => {
+    const stream = stubStream();
+    renderChatPage();
+    await screen.findByText('Ask the AI Assistant something');
+
+    pressSend('first question');
+
+    // A descendant's own transition (an EUI button hover, the textarea's height) bubbles to the same
+    // handler and must not end the travel early. Fired synchronously, before anything is awaited, so
+    // this can never race the fallback timer below.
+    fireTransitionEnd(screen.getByLabelText('Chat message'), 'height');
+    expect(chatPane().className).toBe('wzChatPane wzChatPane--docking');
+    await waitFor(() => expect(mockStreamChat).toHaveBeenCalled());
+
+    // Real timers, not fake ones: the fallback timer is the PRIMARY settle path (a browser can
+    // swallow `transitionend`, and jsdom never fires one on its own), so this waits it out for real
+    // rather than mocking away the very mechanism under test.
+    await waitFor(() => expect(chatPane().className).toBe('wzChatPane'), {
+      timeout: 3000,
+    });
+    expect(composerRow().style.transform).toBe('');
+    stream.end();
+  });
+
+  it('hard-cuts to the docked layout under prefers-reduced-motion', async () => {
+    const original = window.matchMedia;
+    // Only the reduced-motion query answers `true`, and the returned object carries the whole
+    // MediaQueryList surface: EUI's own responsive helpers call `matchMedia` too, and a bare
+    // `{ matches }` stub would throw the moment one of them attached a listener.
+    Object.defineProperty(window, 'matchMedia', {
+      value: jest.fn().mockImplementation((query: string) => ({
+        matches: query.includes('prefers-reduced-motion'),
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        dispatchEvent: jest.fn(),
+      })),
+      writable: true,
+      configurable: true,
+    });
+    try {
+      const stream = stubStream();
+      renderChatPage();
+      await screen.findByText('Ask the AI Assistant something');
+      expect(chatPane().className).toBe('wzChatPane wzChatPane--welcome');
+
+      pressSend('first question');
+
+      // No `docking` frame at all: no travel, no ghost, no inline transform — the composer is
+      // simply where it will stay.
+      expect(chatPane().className).toBe('wzChatPane');
+      expect(composerRow().style.transform).toBe('');
+      expect(welcomeGroup()?.className).not.toContain('--leaving');
+      await waitFor(() => expect(mockStreamChat).toHaveBeenCalled());
+      stream.end();
+    } finally {
+      Object.defineProperty(window, 'matchMedia', {
+        value: original,
+        writable: true,
+        configurable: true,
+      });
+    }
+  });
+
+  it('starts docked, with no transition, for a conversation restored on mount', async () => {
+    window.history.replaceState(null, '', '/conversation/conv-b');
+
+    renderChatPage();
+    await waitFor(() =>
+      expect(screen.getByText('earlier question')).toBeInTheDocument(),
+    );
+
+    // A restored conversation has messages, so it never passes through the centred state and has no
+    // bridge to animate — `docked` is the machine's initial value precisely for this case.
+    expect(chatPane().className).toBe('wzChatPane');
+    expect(welcomeGroup()).toBeNull();
+    expect(composerRow().style.transform).toBe('');
+  });
+
+  it('returns to the centred welcome after New conversation', async () => {
+    const stream = stubStream();
+    renderChatPage();
+    await screen.findByText('Ask the AI Assistant something');
+    await sendMessage('first question');
+    stream.push({ type: 'done' });
+    stream.end();
+    // Send coming back is how the composer reports the turn has finished.
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Send' })).toBeInTheDocument(),
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'New conversation' }));
+
+    // The transition is once per conversation, not once per session: an empty transcript is offered
+    // the centred composer again. Waited for, because a still-settling bridge owns the machine
+    // until its own settle lands.
+    await waitFor(
+      () => expect(chatPane().className).toBe('wzChatPane wzChatPane--welcome'),
+      { timeout: 3000 },
+    );
+    expect(
+      screen.getByText('Ask the AI Assistant something'),
+    ).toBeInTheDocument();
+  });
+
+  it('keeps the centred state and the travel in the stylesheet, not in JS', () => {
+    // Same reasoning (and same `path.join`/`fs` route around `moduleNameMapper`) as the
+    // two-row-grid stylesheet test above: the mechanism lives in CSS, so the CSS is what gets
+    // pinned.
+    const scssPath = path.join(__dirname, 'chat-page.scss');
+    const scssRules = fs
+      .readFileSync(scssPath, 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/^\s*\/\/.*$/gm, '');
+
+    // The centred state is a flex column that centres the pair.
+    expect(scssRules).toMatch(/\.wzChatPane--welcome\s*\{/);
+    expect(scssRules).toMatch(/justify-content:\s*center/);
+    // The composer has NO measure of its own DISTINCT from the shared one any more — it shares
+    // `.wzContentMeasure`'s system (via `.wzComposerMeasure`) in both states, which is what gives
+    // the empty state a single alignment edge (css-audit-full.md §1.1). The OLD 680px-pill
+    // mechanism (a private `$wzWelcomeComposerMaxWidth`, a width tween between two DIFFERENT pill
+    // widths) is pinned as absent — a silently-restored 680px pill would be exactly that
+    // regression. A `max-width` transition on `.wzComposerMeasure` DOES legitimately exist now,
+    // though (assertion below): it interpolates the shared measure's OWN two caps, 840px centred
+    // vs 1060px docked, which is a different mechanism from the removed pill and is covered by its
+    // own SCSS test above ('animates the composer measure open on dock...').
+    expect(scssRules).not.toMatch(/\$wzWelcomeComposerMaxWidth/);
+    expect(scssRules).toMatch(
+      /\.wzComposerMeasure\s*\{\s*transition:\s*max-width \$wzDockTravel \$wzDockEase;/,
+    );
+    // What the class carries instead: the composer's own BLOCK gutter (8px, 16px block-start in
+    // the centred state so greeting → cards → composer are one evenly-spaced group — §1.5). The
+    // 24px INLINE half moved to `.wzComposerRow` instead (live-audit follow-up, item 3): keeping
+    // it on `.wzComposerMeasure` shrank the visible panel to 840 - 2×24 = 792px while the welcome
+    // cluster's own padding-less measure reached the full 840, a 48px edge mismatch the two
+    // shared-measure elements must not have.
+    expect(scssRules).toMatch(
+      /\.wzComposerMeasure\s*\{\s*padding-block:\s*8px/,
+    );
+    expect(scssRules).not.toMatch(
+      /\.wzComposerMeasure\s*\{\s*padding:\s*8px 24px/,
+    );
+    expect(scssRules).toMatch(
+      /\.wzChatPane--welcome \.wzComposerMeasure\s*\{\s*padding-block-start:\s*16px/,
+    );
+    expect(scssRules).toMatch(
+      /\.wzComposerRow\s*\{[\s\S]*?padding-inline:\s*24px/,
+    );
+    // The travel is a transform transition on the composer row, and the fading cluster leaves the
+    // flow instead of pushing the incoming message down.
+    expect(scssRules).toMatch(
+      /\.wzChatPane--docking > \.wzComposerRow \{\s*transition: transform/,
+    );
+    expect(scssRules).toMatch(
+      /\.wzWelcomeCenter--leaving \{[\s\S]*?position: absolute/,
+    );
+    // Motion stays opt-in: the travel/fade declarations live inside a reduced-motion block, so a
+    // reduced-motion user gets the layout without any of it.
+    expect(scssRules).toMatch(
+      /@media \(prefers-reduced-motion: no-preference\)/,
+    );
+    expect(scssRules).toMatch(/animation: wzFadeOut/);
   });
 });
 
@@ -2077,5 +2744,614 @@ describe('ChatPage — conversation rail display mode (layout contract §5/§6)'
     } finally {
       stub.restore();
     }
+  });
+
+  /**
+   * `railDisplayModeOverride` (the docked header panel's own toolbar toggle — assistant-chat-
+   * panel.tsx has no other way to reach ConversationList's inline collapse/expand controls) forces
+   * the mode the same way ConversationList's own affordances already do, going through the SAME
+   * `railManualOverrideRef` — so it wins over whatever the width alone would pick, and (below
+   * RAIL_FLYOUT_AT with `allowRailFlyout={false}`, the sidecar's own band) SURVIVES a later resize
+   * that lands in the same band, instead of being silently wiped back to 'collapsed'.
+   */
+  it('forces the rail expanded via railDisplayModeOverride even under the collapse threshold', async () => {
+    const stub = stubResizeObserver(1000);
+    try {
+      renderChatPage({ railDisplayModeOverride: 'expanded' });
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('260px');
+      });
+    } finally {
+      stub.restore();
+    }
+  });
+
+  it('forces the rail collapsed via railDisplayModeOverride even above the expand threshold', async () => {
+    const stub = stubResizeObserver(1200);
+    try {
+      renderChatPage({ railDisplayModeOverride: 'collapsed' });
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('48px');
+      });
+    } finally {
+      stub.restore();
+    }
+  });
+
+  it('keeps an expanded override alive across a resize inside the docked panel band (allowRailFlyout=false)', async () => {
+    // The docked sidecar's own default width (assistant-chat-panel.tsx) sits well under
+    // RAIL_FLYOUT_AT — exactly the band that used to force 'collapsed' and wipe any override on
+    // every resize tick, which would have silently undone the panel's own toolbar toggle the
+    // moment the user dragged the sidecar to a new (still narrow) width.
+    const stub = stubResizeObserver(500);
+    try {
+      const view = renderChatPage({
+        allowRailFlyout: false,
+        railDisplayModeOverride: 'expanded',
+      });
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('260px');
+      });
+
+      stub.resize(600);
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('260px');
+      });
+
+      view.rerenderWith({
+        allowRailFlyout: false,
+        railDisplayModeOverride: 'collapsed',
+      });
+      await waitFor(() => {
+        const rail = screen.getByRole('region', {
+          name: 'Saved conversations',
+        });
+        expect(rail.style.width).toBe('48px');
+      });
+    } finally {
+      stub.restore();
+    }
+  });
+});
+
+// Iteration-4 item 2: the composer's provider control is now `ProviderPicker` (provider-picker.tsx)
+// rather than an inline `EuiSelect` — these pin the wiring at the ChatPage level (the picker's own
+// popover/selection/manage-providers behaviour is covered by provider-picker.test.tsx).
+describe('ChatPage — provider picker wiring', () => {
+  it('renders the picker instead of a raw <select>, and its trigger shows the provider name', async () => {
+    renderChatPage();
+    await screen.findByLabelText('Chat message');
+    expect(screen.queryByRole('combobox')).toBeNull();
+    expect(
+      screen.getByRole('button', { name: /Test provider/i }),
+    ).toBeInTheDocument();
+  });
+
+  it('routes provider selection through the same onProviderChange handler as before', async () => {
+    const onProviderChange = jest.fn();
+    const secondProvider = { ...PROVIDER, id: 'p2', name: 'Second provider' };
+    renderChatPage({
+      providers: [PROVIDER, secondProvider],
+      onProviderChange,
+    });
+    await screen.findByLabelText('Chat message');
+
+    fireEvent.click(screen.getByRole('button', { name: /Test provider/i }));
+    fireEvent.click(screen.getByText('Second provider'));
+
+    expect(onProviderChange).toHaveBeenCalledWith('p2');
+  });
+
+  it('calls the dedicated onManageProviders callback, not onNavigateToSettings', async () => {
+    const onManageProviders = jest.fn();
+    const onNavigateToSettings = jest.fn();
+    renderChatPage({ onManageProviders, onNavigateToSettings });
+    await screen.findByLabelText('Chat message');
+
+    fireEvent.click(screen.getByRole('button', { name: /Test provider/i }));
+    fireEvent.click(screen.getByText('Manage providers'));
+
+    expect(onManageProviders).toHaveBeenCalledTimes(1);
+    expect(onNavigateToSettings).not.toHaveBeenCalled();
+  });
+});
+
+// This codebase's element-lookup convention is `data-test-subj` (37 uses across the plugin), not
+// React Testing Library's own `data-testid` — the component below wires up `data-test-subj`, so
+// these two helpers query DOM directly instead of `findByTestId`/`findAllByTestId`, which look for
+// the wrong attribute and would never resolve.
+function findPrivacyChip(): Promise<HTMLElement> {
+  return waitFor(() => {
+    const el = document.querySelector('[data-test-subj="wzPrivacyChip"]');
+    expect(el).not.toBeNull();
+    return el as HTMLElement;
+  });
+}
+
+// Each test in this describe block mounts a SECOND, separate ChatPage instance (via a fresh
+// `renderChatPage()` call rather than `rerenderWith`) without unmounting the first, to exercise a
+// brand-new component picking up a changed settings mock — so both chips coexist in `document`
+// once the second instance's own settings fetch resolves. Selecting by the modifier class the
+// second mount is expected to land on (rather than "whichever chip appeared last") avoids a race
+// where `waitFor` resolves on the FIRST mount's still-present, stale-state chip before the second
+// mount's own async fetch has finished and re-rendered its badge.
+function findPrivacyChipWithModifier(
+  modifier: 'on' | 'off',
+): Promise<HTMLElement> {
+  return waitFor(() => {
+    const el = document.querySelector(
+      `[data-test-subj="wzPrivacyChip"].wzPrivacyChip--${modifier}`,
+    );
+    expect(el).not.toBeNull();
+    return el as HTMLElement;
+  });
+}
+
+describe('ChatPage — composer privacy chip (iteration 4)', () => {
+  it('renders as a single wzPrivacyChip badge carrying the --off/--on modifier for the current setting', async () => {
+    renderChatPage();
+    const offChip = await findPrivacyChip();
+    expect(offChip).toHaveClass('wzPrivacyChip--off');
+    expect(offChip).not.toHaveClass('wzPrivacyChip--on');
+
+    mockSettingsService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: true,
+      privacyDefaultPerProvider: {},
+      userCanOverride: true,
+      conversationRetentionDays: 0,
+    });
+    renderChatPage();
+    const onChip = await findPrivacyChipWithModifier('on');
+    expect(onChip).toHaveClass('wzPrivacyChip--on');
+    expect(onChip).not.toHaveClass('wzPrivacyChip--off');
+  });
+
+  it('toggles privacy on click when the admin left it overridable, and is not clickable when fixed', async () => {
+    renderChatPage();
+    const chip = await findPrivacyChip();
+    // A clickable EuiBadge renders its outer element as a <button> (onClick/onClickAriaLabel are
+    // spread onto it); a non-clickable one renders a plain <span> — asserting the tag name is the
+    // same "is this actually clickable" check a screen-reader/keyboard user relies on.
+    expect(chip.tagName).toBe('BUTTON');
+
+    fireEvent.click(chip);
+    await waitFor(() => expect(chip).toHaveClass('wzPrivacyChip--on'));
+
+    mockSettingsService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: false,
+      privacyDefaultPerProvider: {},
+      userCanOverride: false,
+      conversationRetentionDays: 0,
+    });
+    renderChatPage();
+    // The first chip was just clicked to `--on` above, so `--off` can only match the SECOND
+    // mount's own chip — no risk of picking up the first mount's stale element here.
+    const fixedChip = await findPrivacyChipWithModifier('off');
+    expect(fixedChip.tagName).not.toBe('BUTTON');
+
+    fireEvent.click(fixedChip);
+    expect(fixedChip).toHaveClass('wzPrivacyChip--off');
+  });
+});
+
+// The full explainer used to live in an EuiToolTip WRAPPING the pill itself, which meant hovering
+// the pill to click it also forced a wall of text. It now lives on a separate, discrete ⓘ
+// (EuiIconTip) placed right after the pill — this only needs to prove that affordance exists;
+// the pill's own click/toggle behavior is already covered by the describe block above.
+describe('ChatPage — privacy explainer moved off the pill onto a discrete ⓘ (iteration-4 batch 2 item 1)', () => {
+  it('renders a discrete info affordance beside the pill, separate from the pill itself', async () => {
+    renderChatPage();
+    const chip = await findPrivacyChip();
+
+    const infoTip = screen.getByLabelText(/about privacy mode/i);
+    expect(infoTip).toBeInTheDocument();
+    expect(infoTip).not.toBe(chip);
+  });
+});
+
+/**
+ * Admin privacy policy changes have to reach an ALREADY-MOUNTED chat. Both views stay mounted
+ * behind `display: none` (application.tsx), so the mount-only settings load held a stale policy
+ * until a full page reload. The Settings page now dispatches
+ * `ASSISTANT_SETTINGS_CHANGED_EVENT` after every successful save, and the chat also refetches when
+ * it becomes visible again.
+ */
+describe('ChatPage — admin privacy policy applies without a reload', () => {
+  /** Every case here mounts the full ChatPage and then drives two or three settings round-trips
+   * through it. That is comfortably under Jest's 5s default in isolation, but the whole suite runs
+   * `--runInBand` alongside 99 others and the slowest observed full-gate run took roughly twice as
+   * long per render, which tipped these over. Explicit headroom instead of a global bump, so a
+   * genuinely hung test still fails rather than stalling the gate. */
+  const PRIVACY_POLICY_TEST_TIMEOUT_MS = 30_000;
+  /**
+   * Scoped through jest.setTimeout rather than a per-test third argument, which Prettier expands
+   * into a far noisier shape.
+   *
+   * Jest exposes no public getter for the configured test timeout, so the previous budget is read
+   * off the jasmine global (present under the jasmine2 runner, which is what the platform's Jest
+   * config uses) and restored afterwards. Nothing is hardcoded: if that global is ever absent the
+   * raised budget simply stays in effect, which is harmless because this is the LAST describe in
+   * the file — keep it last, or capture and restore explicitly.
+   */
+  const jasmineGlobal = () =>
+    (globalThis as { jasmine?: { DEFAULT_TIMEOUT_INTERVAL?: number } }).jasmine;
+  let previousTimeout: number | undefined;
+  beforeEach(() => {
+    previousTimeout = jasmineGlobal()?.DEFAULT_TIMEOUT_INTERVAL;
+    jest.setTimeout(PRIVACY_POLICY_TEST_TIMEOUT_MS);
+  });
+  afterEach(() => {
+    if (typeof previousTimeout === 'number') {
+      jest.setTimeout(previousTimeout);
+    }
+  });
+
+  const settings = (overrides: Record<string, unknown>) => ({
+    privacyDefaultOn: false,
+    privacyDefaultPerProvider: {},
+    userCanOverride: true,
+    conversationRetentionDays: 0,
+    ...overrides,
+  });
+
+  /** A save announced WITHOUT a payload, so the listener has to fall back to its own GET. */
+  const announceSettingsSaved = () =>
+    act(() => {
+      window.dispatchEvent(new Event(ASSISTANT_SETTINGS_CHANGED_EVENT));
+    });
+
+  /** A save announced the way settings-page.tsx really does it: the document the PUT returned
+   * travels as `detail`, so no GET is needed (and a GET could still see the pre-save doc). */
+  const announceSettingsSavedWith = (detail: unknown) =>
+    act(() => {
+      window.dispatchEvent(
+        new CustomEvent(ASSISTANT_SETTINGS_CHANGED_EVENT, { detail }),
+      );
+    });
+
+  /** Drives `document.visibilityState`, which jsdom exposes as a read-only getter, then fires the
+   * event the component listens for. Restored to 'visible' after each case below. */
+  const setDocumentVisibility = (state: 'visible' | 'hidden') => {
+    Object.defineProperty(document, 'visibilityState', {
+      configurable: true,
+      get: () => state,
+    });
+    act(() => {
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+  };
+
+  afterEach(() => {
+    Object.defineProperty(document, 'visibilityState', {
+      configurable: true,
+      get: () => 'visible',
+    });
+  });
+
+  /** A stream that opens and stays open, so a turn reaches `streamChat` and parks there — enough
+   * for the send-path assertions below, which only care about the request body. */
+  const mockOpenStream = () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId: unknown, _messages: unknown, signal: AbortSignal) =>
+        stream.generate(signal),
+    );
+    return stream;
+  };
+
+  it('locks the chip — and overrides the user own toggle — when the admin revokes overrides', async () => {
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: true, privacyDefaultOn: false }),
+    );
+    renderChatPage();
+    const offChip = await findPrivacyChipWithModifier('off');
+    expect(offChip.tagName).toBe('BUTTON');
+
+    // The user makes their own choice, which normally freezes the default resolution.
+    fireEvent.click(offChip);
+    await findPrivacyChipWithModifier('on');
+
+    // The admin now revokes overrides with the global default OFF. The lock has to bind the
+    // CURRENT conversation too, so the user's manual "On" must not survive it.
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: false, privacyDefaultOn: false }),
+    );
+    announceSettingsSaved();
+
+    const lockedChip = await findPrivacyChipWithModifier('off');
+    expect(lockedChip.tagName).not.toBe('BUTTON');
+    expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(2);
+  });
+
+  it('applies a newly locked-ON policy to the live conversation', async () => {
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: true, privacyDefaultOn: false }),
+    );
+    renderChatPage();
+    await findPrivacyChipWithModifier('off');
+
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: false, privacyDefaultOn: true }),
+    );
+    announceSettingsSaved();
+
+    const chip = await findPrivacyChipWithModifier('on');
+    expect(chip.tagName).not.toBe('BUTTON');
+  });
+
+  it('re-enables the chip when the admin gives overrides back (the unlock case)', async () => {
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: false, privacyDefaultOn: true }),
+    );
+    renderChatPage();
+    const lockedChip = await findPrivacyChipWithModifier('on');
+    expect(lockedChip.tagName).not.toBe('BUTTON');
+
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: true, privacyDefaultOn: true }),
+    );
+    announceSettingsSaved();
+
+    // The modifier class stays `--on` through this transition (only clickability changes), so a
+    // plain class-selector wait can resolve on the stale, still-`--on` SPAN from before the
+    // refetch — wait for the tag itself to actually flip to BUTTON.
+    const chip = await waitFor(() => {
+      const el = document.querySelector(
+        '[data-test-subj="wzPrivacyChip"].wzPrivacyChip--on',
+      ) as HTMLElement;
+      expect(el).not.toBeNull();
+      expect(el.tagName).toBe('BUTTON');
+      return el;
+    });
+    // And it is genuinely interactive again, not just visually enabled.
+    fireEvent.click(chip);
+    await findPrivacyChipWithModifier('off');
+  });
+
+  it('leaves a user-chosen value alone while overrides stay allowed', async () => {
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: true, privacyDefaultOn: false }),
+    );
+    renderChatPage();
+    const offChip = await findPrivacyChipWithModifier('off');
+
+    fireEvent.click(offChip);
+    await findPrivacyChipWithModifier('on');
+
+    // An unrelated admin save (still allowing overrides) must not undo the user's own choice.
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: true, privacyDefaultOn: false }),
+    );
+    announceSettingsSaved();
+
+    await waitFor(() =>
+      expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(2),
+    );
+    const chip = await findPrivacyChipWithModifier('on');
+    expect(chip.tagName).toBe('BUTTON');
+  });
+
+  it('refetches when the Chat view becomes visible again, and not on the first render', async () => {
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: true }),
+    );
+    const view = renderChatPage({ isActive: true });
+    await waitFor(() =>
+      expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(1),
+    );
+
+    // Switching to Settings and back: only the false -> true transition refetches.
+    view.rerenderWith({ isActive: false });
+    expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(1);
+
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: false, privacyDefaultOn: true }),
+    );
+    view.rerenderWith({ isActive: true });
+
+    await waitFor(() =>
+      expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(2),
+    );
+    const chip = await findPrivacyChipWithModifier('on');
+    expect(chip.tagName).not.toBe('BUTTON');
+  });
+
+  it('stops listening once unmounted', async () => {
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: true }),
+    );
+    const { unmount } = renderChatPage();
+    await waitFor(() =>
+      expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(1),
+    );
+
+    unmount();
+    window.dispatchEvent(new Event(ASSISTANT_SETTINGS_CHANGED_EVENT));
+
+    expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the applied policy when the refetch fails', async () => {
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: false, privacyDefaultOn: true }),
+    );
+    renderChatPage();
+    const chip = await findPrivacyChipWithModifier('on');
+    expect(chip.tagName).not.toBe('BUTTON');
+
+    mockSettingsService.getAssistantSettings.mockRejectedValue(httpError(503));
+    announceSettingsSaved();
+
+    await waitFor(() =>
+      expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(2),
+    );
+    const chipAfter = await findPrivacyChipWithModifier('on');
+    expect(chipAfter.tagName).not.toBe('BUTTON');
+  });
+  it('applies the event payload directly, without re-reading the settings', async () => {
+    // M4 read-after-write: a GET issued microseconds after the PUT can still return the PRE-save
+    // document, which would silently reinstate the policy the admin just changed. The payload the
+    // Settings page attaches is authoritative, so no second GET may happen at all.
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: true, privacyDefaultOn: false }),
+    );
+    renderChatPage();
+    const offChip = await findPrivacyChipWithModifier('off');
+    expect(offChip.tagName).toBe('BUTTON');
+
+    // Deliberately leave the GET returning the STALE document: if the listener re-read, the chip
+    // would stay unlocked and this test would fail.
+    announceSettingsSavedWith(
+      settings({ userCanOverride: false, privacyDefaultOn: true }),
+    );
+
+    const chip = await findPrivacyChipWithModifier('on');
+    expect(chip.tagName).not.toBe('BUTTON');
+    expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(1);
+  });
+
+  it('falls back to a GET when the event payload is missing or malformed', async () => {
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: true, privacyDefaultOn: false }),
+    );
+    renderChatPage();
+    await findPrivacyChipWithModifier('off');
+
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: false, privacyDefaultOn: true }),
+    );
+    // A shape that must NOT be trusted as a settings document.
+    announceSettingsSavedWith({ nonsense: true });
+
+    await waitFor(() =>
+      expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(2),
+    );
+    const chip = await findPrivacyChipWithModifier('on');
+    expect(chip.tagName).not.toBe('BUTTON');
+  });
+
+  it('refetches when the document becomes visible again', async () => {
+    // H1(b): an admin saving in a DIFFERENT browser reaches no window event here, so an idle chat
+    // left open would keep honouring a stale policy. Coming back to the tab has to correct it.
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: true, privacyDefaultOn: false }),
+    );
+    renderChatPage();
+    await findPrivacyChipWithModifier('off');
+
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: false, privacyDefaultOn: true }),
+    );
+    setDocumentVisibility('hidden');
+    setDocumentVisibility('visible');
+
+    await waitFor(() =>
+      expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(2),
+    );
+    const chip = await findPrivacyChipWithModifier('on');
+    expect(chip.tagName).not.toBe('BUTTON');
+  });
+
+  it('does not refetch when the document merely becomes hidden', async () => {
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: true }),
+    );
+    renderChatPage();
+    await waitFor(() =>
+      expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(1),
+    );
+
+    setDocumentVisibility('hidden');
+
+    expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(1);
+  });
+
+  it('stops listening to visibility changes once unmounted', async () => {
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: true }),
+    );
+    const { unmount } = renderChatPage();
+    await waitFor(() =>
+      expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(1),
+    );
+
+    unmount();
+    setDocumentVisibility('hidden');
+    setDocumentVisibility('visible');
+
+    expect(mockSettingsService.getAssistantSettings).toHaveBeenCalledTimes(1);
+  });
+
+  it('re-reads the policy before sending, and sends what the server will enforce', async () => {
+    // H1(a) — the headline gap. A user on a different machine sees no window event at all, so at
+    // the moment it actually matters (pressing Send) the policy is re-read and the request body is
+    // built from THAT, not from a chip that may be minutes stale.
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: true, privacyDefaultOn: false }),
+    );
+    mockOpenStream();
+    renderChatPage();
+    await findPrivacyChipWithModifier('off');
+
+    // An admin elsewhere locks privacy ON. Nothing in this browser knows yet.
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: false, privacyDefaultOn: true }),
+    );
+
+    await sendMessage('what happened last night?');
+
+    // The privacy payload is the 4th argument of streamChat.
+    expect(mockStreamChat.mock.calls[0][3]).toEqual({ enabled: true, map: [] });
+    // ...and the chip now tells the truth too.
+    const chip = await findPrivacyChipWithModifier('on');
+    expect(chip.tagName).not.toBe('BUTTON');
+  });
+
+  it('still sends when the pre-send policy re-read fails', async () => {
+    // Fail-soft is load-bearing: a failing settings GET must never block the user from sending.
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: true, privacyDefaultOn: true }),
+    );
+    mockOpenStream();
+    renderChatPage();
+    await findPrivacyChipWithModifier('on');
+
+    mockSettingsService.getAssistantSettings.mockRejectedValue(httpError(503));
+
+    await sendMessage('still works?');
+
+    expect(mockStreamChat).toHaveBeenCalled();
+    // The policy already in state is kept — never silently downgraded to "off", which is the
+    // direction that would leak.
+    expect(mockStreamChat.mock.calls[0][3]).toEqual({ enabled: true, map: [] });
+  });
+
+  it('keeps a user-chosen privacy value through the pre-send re-read', async () => {
+    mockSettingsService.getAssistantSettings.mockResolvedValue(
+      settings({ userCanOverride: true, privacyDefaultOn: false }),
+    );
+    mockOpenStream();
+    renderChatPage();
+    const offChip = await findPrivacyChipWithModifier('off');
+
+    // The user turns privacy on for this conversation; overrides stay allowed server-side.
+    fireEvent.click(offChip);
+    await findPrivacyChipWithModifier('on');
+
+    await sendMessage('respect my choice');
+
+    expect(mockStreamChat.mock.calls[0][3]).toEqual({ enabled: true, map: [] });
   });
 });

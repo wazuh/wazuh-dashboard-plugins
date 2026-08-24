@@ -16,7 +16,10 @@ import { UnsupportedComponents } from '../utils/components-os-support';
 export function getAgentOSType(agent?: Agent) {
   if (agent?.os?.type?.toLowerCase().includes(WAZUH_AGENTS_OS_TYPE.LINUX)) {
     return WAZUH_AGENTS_OS_TYPE.LINUX;
-  } else if (agent?.os?.platform === WAZUH_AGENTS_OS_TYPE.WINDOWS) {
+  } else if (
+    agent?.os?.platform === WAZUH_AGENTS_OS_TYPE.WINDOWS ||
+    agent?.os?.type === WAZUH_AGENTS_OS_TYPE.WINDOWS
+  ) {
     return WAZUH_AGENTS_OS_TYPE.WINDOWS;
   } else if (agent?.os?.platform === WAZUH_AGENTS_OS_TYPE.SUNOS) {
     return WAZUH_AGENTS_OS_TYPE.SUNOS;

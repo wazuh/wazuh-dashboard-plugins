@@ -259,13 +259,35 @@ const MAX_FIELD_VALUE_LENGTH = 500;
  * than allowed to crowd out the data it annotates. */
 const MAX_HINT_LENGTH = 1000;
 
-function getByPath(source: Record<string, unknown>, path: string): unknown {
-  return path.split('.').reduce<unknown>((acc, segment) => {
-    if (acc && typeof acc === 'object' && !Array.isArray(acc)) {
-      return (acc as Record<string, unknown>)[segment];
+/**
+ * Resolves one dotted path segment-by-segment against `source`. Unlike a plain reduce, a segment
+ * hit on an ARRAY does not stop resolution (P-2, AI/plan/a1a-review.md — "getByPath must traverse
+ * arrays"): it maps the REMAINING path over every array element and returns the array of
+ * per-element results, so e.g. `"queries.id"` resolves through the `queries` array (one entry per
+ * SAP finding's compiled query) instead of returning `undefined` the moment the walk reaches the
+ * array, and `"wazuh.agent.host.ip"` resolves to the real IP array instead of vanishing before the
+ * field policy ever sees it. A nested array-of-arrays result is left as an array of arrays rather
+ * than flattened — no field shape reachable today produces one, and flattening would blur which
+ * element came from which parent. Object/scalar segments resolve exactly as before this fix.
+ */
+export function getByPath(source: unknown, path: string): unknown {
+  const segments = path.split('.');
+  function resolve(value: unknown, index: number): unknown {
+    if (index >= segments.length) {
+      return value;
+    }
+    if (Array.isArray(value)) {
+      return value.map(item => resolve(item, index));
+    }
+    if (value && typeof value === 'object') {
+      return resolve(
+        (value as Record<string, unknown>)[segments[index]],
+        index + 1,
+      );
     }
     return undefined;
-  }, source);
+  }
+  return resolve(source, 0);
 }
 
 /**
@@ -329,6 +351,73 @@ function hitsToRows(
  * form travels via `Digest.metrics` (see its doc comment), which is also populated alongside the
  * bucket rows when a bucket agg IS present, so a sibling metric is never dropped either way.
  */
+/**
+ * Picks the element that belongs to a bucket out of a sampled document's PARALLEL multi-value
+ * arrays (UI run 2026-08-14, finding 7). get_mitre_summary buckets on
+ * `wazuh.rule.mitre.technique.id`, and its `top_hits` sample carries the id, name and tactic
+ * arrays of one document — arrays that are parallel by construction, which is precisely why that
+ * tool adds the id itself to its `_source` (see get-mitre-summary.ts's column-design comment:
+ * "a consumer can zip them and pick the name whose index matches the bucket key"). Nothing ever
+ * did the zip: `Object.assign` merged the arrays whole, so a document co-tagged with two
+ * techniques displayed BOTH names on BOTH rows — T1190 and T1068 rendered the identical name
+ * pair, and a seven-technique document rendered all seven names against one id, none of them
+ * attributable.
+ *
+ * Generic and shape-driven, not tool-specific: find an array field of the sample that CONTAINS
+ * the bucket key, then project every other array field of the SAME length down to that index.
+ * Arrays of a different length are not parallel and are left whole rather than guessed at; a
+ * sample with no matching array (every other tool's single-value `top_hits`) returns unchanged,
+ * so this is a no-op everywhere it does not apply.
+ */
+function alignParallelArrays(
+  sampleSource: Record<string, unknown>,
+  bucketKey: unknown,
+): Record<string, unknown> {
+  if (typeof bucketKey !== 'string' && typeof bucketKey !== 'number') {
+    return sampleSource;
+  }
+  // `_source` comes back NESTED ({wazuh: {rule: {mitre: {technique: {name: [...]}}}}}), never as
+  // flat dotted keys -- the same shape `getByPath` walks. So both passes below recurse.
+  let matchIndex = -1;
+  let matchLength = -1;
+  const findIndex = (node: unknown): void => {
+    if (matchIndex !== -1 || !node || typeof node !== 'object') {
+      return;
+    }
+    if (Array.isArray(node)) {
+      const index = node.indexOf(bucketKey);
+      if (index !== -1) {
+        matchIndex = index;
+        matchLength = node.length;
+      }
+      return;
+    }
+    for (const value of Object.values(node as Record<string, unknown>)) {
+      findIndex(value);
+    }
+  };
+  findIndex(sampleSource);
+  if (matchIndex === -1) {
+    return sampleSource;
+  }
+  const project = (node: unknown): unknown => {
+    if (Array.isArray(node)) {
+      return node.length === matchLength ? node[matchIndex] : node;
+    }
+    if (!node || typeof node !== 'object') {
+      return node;
+    }
+    const out: Record<string, unknown> = {};
+    for (const [field, value] of Object.entries(
+      node as Record<string, unknown>,
+    )) {
+      out[field] = project(value);
+    }
+    return out;
+  };
+  return project(sampleSource) as Record<string, unknown>;
+}
+
 function bucketsToRows(
   result: unknown,
 ): Array<Record<string, unknown>> | undefined {
@@ -380,7 +469,7 @@ function bucketsToRows(
       const sampleSource = (subAggValue as TopHitsShape | undefined)?.hits
         ?.hits?.[0]?._source;
       if (sampleSource) {
-        Object.assign(row, sampleSource);
+        Object.assign(row, alignParallelArrays(sampleSource, row.key));
         continue;
       }
       if (isMetricAggValue(subAggValue)) {
@@ -658,16 +747,50 @@ function deriveResultColumns(
   return columns.slice(0, DERIVED_COLUMN_CAP);
 }
 
-/** Last path segment, capitalized (e.g. "wazuh.rule.title" -> "Title"); falls back to the
- * full path when two derived columns share a last segment (e.g. two differently-nested "id"s). */
+/** Segments whose conventional rendering is an acronym rather than a capitalized word (e.g.
+ * "ip" -> "IP", not "Ip") — issue #8921's inconsistent-labels item: a derived column's label must
+ * read like the hand-written labels the static-column tools use (get_vulnerabilities' "CVE"/
+ * "Architecture"), not like a raw field segment with its first letter capitalized. */
+const LABEL_ACRONYMS: Record<string, string> = {
+  ip: 'IP',
+  id: 'ID',
+  os: 'OS',
+  pid: 'PID',
+  cve: 'CVE',
+};
+
+function capitalizeSegment(segment: string): string {
+  return (
+    LABEL_ACRONYMS[segment.toLowerCase()] ??
+    segment.charAt(0).toUpperCase() + segment.slice(1)
+  );
+}
+
+/**
+ * Last path segment, capitalized (e.g. "wazuh.rule.title" -> "Title"). Issue #8921's
+ * inconsistent-labels item: two derived columns sharing a last segment (e.g. get_agent_inventory's
+ * `ports` kind — "source.port" and "destination.port" both end in "port") used to fall back to the
+ * RAW dot-path for BOTH, so a reader saw friendly labels ("State", "Name", "Transport") sitting
+ * next to un-humanized ones ("source.port", "destination.ip", "source.ip") in the same header row.
+ * A collision is disambiguated with the PARENT segment instead ("Source Port"/"Destination Port"),
+ * which stays a real label rather than degrading to the raw path — the raw path remains one hover
+ * away via the column header's `title` tooltip (result-table.tsx), so nothing about the field's
+ * real dot-path name is lost, only demoted from "always visible" to "on demand".
+ */
 function deriveColumnLabel(path: string, allPaths: string[]): string {
-  const lastSegment = path.split('.').pop() ?? path;
-  const label = lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1);
+  const segments = path.split('.');
+  const lastSegment = segments[segments.length - 1] ?? path;
   const isDuplicate = allPaths.some(
     other =>
       other !== path && (other.split('.').pop() ?? other) === lastSegment,
   );
-  return isDuplicate ? path : label;
+  const label = capitalizeSegment(lastSegment);
+  if (!isDuplicate) {
+    return label;
+  }
+  const parentSegment =
+    segments.length > 1 ? segments[segments.length - 2] : undefined;
+  return parentSegment ? `${capitalizeSegment(parentSegment)} ${label}` : label;
 }
 
 /**
@@ -723,6 +846,44 @@ export function buildTableSpec(
     }
     return out;
   });
+
+  // Bucket-row fallthrough guard (UI run 2026-08-14, A2): a fixed-column tool whose response had
+  // ZERO hits but a populated aggregation (get_sca_checks with a `search` fragment -- the
+  // post_filter moved the fragment out of the query, so hits are empty by design and
+  // `bucketsToRows` supplies the rows) projects hit-document columns onto bucket-shaped rows.
+  // Every cell resolves undefined, the client renders a full table of em-dashes, and the row
+  // expander shows `{}` (JSON.stringify drops undefined). When NO declared column resolved on ANY
+  // row, the rows are structurally not what the columns describe -- fall back to the derived
+  // projection (same one deriveColumns tools use), which renders the rows as what they ARE
+  // (key/doc_count and any sub-agg counters) instead of an all-empty grid. A table with even one
+  // resolving declared column keeps the declared shape unchanged.
+  const anyDeclaredColumnResolved = tableRows.some(row =>
+    def.tableSpec.columns.some(column => row[column.field] !== undefined),
+  );
+  if (tableRows.length > 0 && !anyDeclaredColumnResolved) {
+    // requestBody deliberately NOT passed: deriveResultColumns' priority-2 branch returns the
+    // request's `_source` list before ever looking at the rows -- which for THESE rows (bucket
+    // shapes, the very reason the declared columns all missed) reproduces the empty grid with
+    // different column headers (caught live, first deploy of this fallback). Deriving from the
+    // rows alone lands in the key/doc_count branch and renders what the rows actually hold.
+    const columnPaths = deriveResultColumns(capped, undefined);
+    return {
+      columns: columnPaths.map(path => ({
+        id: path,
+        label: deriveColumnLabel(path, columnPaths),
+      })),
+      rows: capped.map(row => {
+        const out: Record<string, unknown> = {};
+        for (const path of columnPaths) {
+          const value = getByPath(row, path);
+          if (value !== undefined) {
+            out[path] = value;
+          }
+        }
+        return out;
+      }),
+    };
+  }
 
   return {
     columns: def.tableSpec.columns.map(column => ({
@@ -1652,7 +1813,7 @@ export function buildDigest(
     ...(coverage ? { coverage } : {}),
   };
 
-  return capDigest(digest);
+  return capDigest(digest, def.digest.sampleFieldMaxLength);
 }
 
 /** Strips ASCII control characters (code points 0-31, and 127/DEL) — a tool-derived string field
@@ -1717,13 +1878,23 @@ function capKeyValue(key: unknown): unknown {
  * preprocessing pass before capDigest's row-drop fallback below, since one oversized field (e.g. a
  * raw log line) shouldn't cost an entire row when trimming just that field is enough. Also caps
  * (length + control-char strip, via `capFieldValue`/`capKeyValue`) the two other previously-
- * unbounded string fields: the Manager `message` and each `breakdown[].key`. */
-function truncateLongFieldValues(digest: Digest): void {
+ * unbounded string fields: the Manager `message` and each `breakdown[].key`.
+ *
+ * `sampleFieldMaxLength` (from `ToolDefinition.digest.sampleFieldMaxLength`, e.g. SCA's
+ * `check.rationale`/`check.remediation` — see `get-sca-checks.ts`) lets a specific column be
+ * capped tighter than the shared `MAX_FIELD_VALUE_LENGTH` default without lowering that default
+ * for every other tool. A key absent from the map (or the map itself being `undefined`, every
+ * tool but SCA) falls back to `MAX_FIELD_VALUE_LENGTH` unchanged. */
+function truncateLongFieldValues(
+  digest: Digest,
+  sampleFieldMaxLength?: Record<string, number>,
+): void {
   for (const sample of digest.samples) {
     for (const key of Object.keys(sample)) {
       const value = sample[key];
-      if (typeof value === 'string' && value.length > MAX_FIELD_VALUE_LENGTH) {
-        sample[key] = `${value.slice(0, MAX_FIELD_VALUE_LENGTH)}…`;
+      const maxLength = sampleFieldMaxLength?.[key] ?? MAX_FIELD_VALUE_LENGTH;
+      if (typeof value === 'string' && value.length > maxLength) {
+        sample[key] = `${value.slice(0, maxLength)}…`;
       }
     }
   }
@@ -1752,6 +1923,11 @@ function truncateLongFieldValues(digest: Digest): void {
  * breakdown are both fully exhausted and the digest is STILL oversized, dropping the one
  * remaining small field is enough (there is nothing left to partially trim).
  *
+ * `sampleFieldMaxLength` is forwarded to `truncateLongFieldValues` unchanged (see that function's
+ * doc comment) — every re-run below (executor.ts) passes the SAME calling tool's
+ * `def.digest.sampleFieldMaxLength`, so the per-field cap stays in force across the
+ * pre-privacy and post-privacy-substitution passes alike.
+ *
  * Exported (not just an inline step of `buildDigest` above) so server/tools/executor.ts can re-run
  * it after server/tools/privacy.ts's `applyFieldPolicy` substitutes pseudonyms for real values:
  * pseudonym tokens ("HOST_3") are usually shorter than the real value they replace but are not
@@ -1776,8 +1952,11 @@ function truncateLongFieldValues(digest: Digest): void {
  * post-privacy-substitution too, see above, where the original row/bucket counts are no longer at
  * hand). A future fix would need to move disclosure to run AFTER this cap, not before it.
  */
-export function capDigest(digest: Digest): Digest {
-  truncateLongFieldValues(digest);
+export function capDigest(
+  digest: Digest,
+  sampleFieldMaxLength?: Record<string, number>,
+): Digest {
+  truncateLongFieldValues(digest, sampleFieldMaxLength);
   while (
     JSON.stringify(digest).length > DIGEST_CHAR_CAP &&
     digest.samples.length > 0

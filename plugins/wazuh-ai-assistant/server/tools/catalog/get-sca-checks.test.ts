@@ -6,7 +6,9 @@ import {
   ANSWER_BUCKET_CAP,
   BREAKDOWN_BUCKET_CAP,
   buildDigest,
+  DIGEST_CHAR_CAP,
 } from '../digest';
+import { CONTEXT_CHAR_BUDGET } from '../../routes/chat';
 
 /**
  * Unit tests for get_sca_checks (SCA per-check drill-down), rewritten for the Wazuh 5.0 port:
@@ -464,22 +466,139 @@ test('get_sca_checks: the request (with its new aggs clause) passes applySafetyV
 test('get_sca_checks: tableSpec/digest declare the locked 5.0 columns/rowFields/sampleColumns', () => {
   assert.deepEqual(
     getScaChecksTool.tableSpec.columns.map(c => c.field),
-    ['check.id', 'check.name', 'check.result', 'check.reason'],
+    // check.rationale, not check.reason -- the latter is mapped but empty in every live
+    // document (2026-08-14), so the Reason column was an em-dash on every row it ever had.
+    ['check.id', 'check.name', 'check.result', 'check.rationale'],
   );
+  // Workstream D (coverage doc CV-054): rationale/remediation joined the row expander (still
+  // row-only, not a table column -- the browser table itself is unchanged) so the analyst can
+  // read the CIS/benchmark's own WHY/WHAT-to-do text without a second tool call.
   assert.deepEqual(getScaChecksTool.tableSpec.rowFields, [
+    'check.rationale',
     'check.remediation',
     'check.rules',
   ]);
+  // Workstream D: rationale/remediation now ALSO ride in the digest sample rows (previously
+  // row-expander-only, i.e. never sent to the model at all) -- the model cannot lead an
+  // interpreted SCA answer with "why this matters"/"what to do" from a sample that never carried
+  // either field. `check.reason` (the SCA engine's own short pass/fail note, already a table
+  // column) is left out of the sample on purpose -- it duplicates `check.result` for most checks
+  // and adds nothing rationale/remediation don't already cover for synthesis.
   assert.deepEqual(getScaChecksTool.digest.sampleColumns, [
     'check.id',
     'check.name',
     'check.result',
+    'check.rationale',
+    'check.remediation',
   ]);
-  // Long-text fields stay out of the digest (token-budget decision, unchanged from 4.14).
-  assert.ok(
-    !getScaChecksTool.digest.sampleColumns.includes('check.remediation'),
-  );
+  // `check.description` (the benchmark's own restatement of the check's title, not interpretive
+  // content) stays out of the digest — unchanged token-budget decision from 4.14/pre-D.
   assert.ok(
     !getScaChecksTool.digest.sampleColumns.includes('check.description'),
+  );
+});
+
+// Generic sole-candidate parameter resolution (template: #8913's resolveDeicticAgentParams in
+// get-agent-inventory.ts): both agent_id and policy_id are schema-OPTIONAL, each resolving via the
+// generic resolver (param-resolution.ts) that registry.ts attaches automatically. policy_id
+// scopes ITS OWN lookup on whichever agent_id resolves first (declared order) -- see
+// param-resolution.test.ts's scopedBy-cascade tests for the resolution mechanics.
+
+test('get_sca_checks: neither agent_id nor policy_id is schema-required', () => {
+  const schema = getScaChecksTool.spec.parameters as { required?: string[] };
+  assert.ok(
+    !schema.required || schema.required.length === 0,
+    'agent_id/policy_id must not be schema-required -- server-side resolution needs both omittable',
+  );
+});
+
+test('get_sca_checks: agent_id/policy_id descriptions explain server-side resolution on omission', () => {
+  const schema = getScaChecksTool.spec.parameters as {
+    properties: Record<string, { description?: string }>;
+  };
+  assert.match(
+    schema.properties.agent_id.description ?? '',
+    /Optional: omit this.*resolves to the only active agent automatically/s,
+  );
+  assert.match(
+    schema.properties.policy_id.description ?? '',
+    /Optional: omit this when the agent has exactly one SCA policy/,
+  );
+});
+
+test('get_sca_checks: declares agent_id (manager-agents) then policy_id (indexer-terms, scoped by agent_id) in that order', () => {
+  assert.deepEqual(getScaChecksTool.soleCandidateParams, [
+    { param: 'agent_id', source: { kind: 'manager-agents' } },
+    {
+      param: 'policy_id',
+      source: {
+        kind: 'indexer-terms',
+        index: 'wazuh-states-sca*',
+        field: 'policy.id',
+        scopedBy: { param: 'agent_id', field: 'wazuh.agent.id' },
+      },
+    },
+  ]);
+});
+
+test('get_sca_checks: sampleFieldMaxLength caps rationale/remediation tighter than the generic field cap', () => {
+  assert.deepEqual(getScaChecksTool.digest.sampleFieldMaxLength, {
+    'check.rationale': 200,
+    'check.remediation': 240,
+  });
+});
+
+test('get_sca_checks: review D1 — a 5-row digest of LIVE-SIZED rationale/remediation text stays under DIGEST_CHAR_CAP, and no sample row is popped', () => {
+  // Review finding D1 (AI/plan/d-review.md): the live wazuh-aio-5 document that surfaced this had
+  // check.rationale at 604 chars and check.remediation at 597 -- both past digest.ts's generic
+  // MAX_FIELD_VALUE_LENGTH (500), which without get-sca-checks.ts's sampleFieldMaxLength cap would
+  // truncate every long row to EXACTLY 500 chars (the cap becomes the typical size), pushing a
+  // 5-row digest to ~5,890 chars -- within capDigest's pop-a-row range of DIGEST_CHAR_CAP (6,000)
+  // -- and popping 1-2 of the 5 rows while samplesNote (computed pre-cap) still claimed 5.
+  const rationale = 'r'.repeat(604);
+  const remediation = 'm'.repeat(597);
+  const hits = Array.from({ length: 5 }, (_, i) => ({
+    _source: {
+      check: {
+        id: `check_${i}`,
+        name: 'Ensure sshd PermitRootLogin is disabled',
+        result: 'failed',
+        rationale,
+        remediation,
+      },
+    },
+  }));
+  const response = {
+    hits: { total: { value: 5 }, hits },
+    aggregations: { results: { buckets: [{ key: 'failed', doc_count: 5 }] } },
+  };
+  const digest = buildDigest('get_sca_checks', response, getScaChecksTool);
+
+  // All 5 rows survive: capDigest's row-drop loop never triggers because the per-field cap keeps
+  // the whole digest under DIGEST_CHAR_CAP without it.
+  assert.equal(digest.samples.length, 5, 'no sample row should be popped');
+  assert.ok(
+    !digest.samplesNote,
+    'no truncation to caveat when all 5 rows survive',
+  );
+  for (const sample of digest.samples) {
+    assert.equal((sample['check.rationale'] as string).length, 201); // 200 chars + ellipsis
+    assert.equal((sample['check.remediation'] as string).length, 241); // 240 chars + ellipsis
+  }
+
+  const digestChars = JSON.stringify(digest).length;
+  assert.ok(
+    digestChars < DIGEST_CHAR_CAP,
+    `expected a single get_sca_checks digest (${digestChars} chars) to stay under DIGEST_CHAR_CAP (${DIGEST_CHAR_CAP})`,
+  );
+
+  // The CEO's CV-069 5-agent sweep (chat.ts's CONTEXT_CHAR_BUDGET calibration comment): 4
+  // accumulated single-agent digests must stay under the budget so round 5 is not forced
+  // tools-off. Pre-D1 fix this failed: 4 x ~6,000 = 24,000 >= CONTEXT_CHAR_BUDGET.
+  assert.ok(
+    digestChars * 4 < CONTEXT_CHAR_BUDGET,
+    `expected 4 accumulated get_sca_checks digests (${
+      digestChars * 4
+    } chars) to stay under CONTEXT_CHAR_BUDGET (${CONTEXT_CHAR_BUDGET}), preserving the CV-069 5-agent sweep`,
   );
 });
