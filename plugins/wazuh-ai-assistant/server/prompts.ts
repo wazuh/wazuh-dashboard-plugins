@@ -37,10 +37,9 @@ export function buildSystemPrompt(nowIso: string): string {
     // BLOCKER FIX (CV-017, residual single-digest collapse): a single successful tool call, same
     // as a multi-call sweep, still needs an actual synthesized answer -- "the table below has the
     // details" with nothing else is never a substitute for stating what was found, even for one
-    // call. ADAPTATION (branch 8997): the source commit pairs this prompt nudge with a
-    // deterministic-fallback backstop (chat.ts's `summarizeDigestForFallback` naming the domain
-    // and row fields) that lives on the iter-4/#8977-only synthesis mechanism this branch does
-    // not carry -- this line is the nudge alone, with no such backstop behind it here.
+    // call. This is the light nudge half of the fix; the deterministic fallback
+    // (`summarizeDigestForFallback`, chat.ts) now also names the domain and row fields itself as a
+    // backstop for exactly the case this line is aimed at preventing from being needed at all.
     'Even when only ONE tool call was needed to answer, still write a real answer from its ' +
       'result: name what was found (the count, and the specific thing(s) it identifies -- a ' +
       'detector, a rule, an agent, a CVE), not merely that "the table below has the details". A ' +
@@ -398,8 +397,12 @@ export function buildSystemPrompt(nowIso: string): string {
       'finding tools: their results include source.user.name, destination.user.name, source.ip and ' +
       'process.command_line. If you do use search_wazuh_data for such a question, you MUST ' +
       'include those fields in the "_source" list or your result will not contain them.',
-    'get_sca_checks needs a policy_id from get_sca_results first; use result="failed" for ' +
-      '"which checks fail" questions.',
+    'get_sca_checks prefers a policy_id from a prior get_sca_results call for this agent when you ' +
+      'already have one, or when the agent has more than one SCA policy (it will report the ' +
+      'candidate policy ids if you omit policy_id and more than one exists). If you do not have a ' +
+      'policy_id and have no reason to think there is more than one policy, you may call ' +
+      'get_sca_checks directly without it -- it resolves automatically when the agent has exactly ' +
+      'one SCA policy. Use result="failed" for "which checks fail" questions.',
     // Workstream D (coverage doc CV-054, "the CEO can't get an explanation out of the SCA
     // module"): the root cause was never missing data (check.rationale/check.remediation are
     // already in the digest sample — see get-sca-checks.ts) or routing; it was that nothing told
@@ -424,61 +427,59 @@ export function buildSystemPrompt(nowIso: string): string {
       'returned for that check" rather than inventing a reason; never claim to have verified the ' +
       'live host configuration yourself beyond what the SCA result already reported (SCA is a ' +
       'point-in-time scan result, not a live re-check).',
-    // #8913: a bare deictic reference to the host ("this box/host/machine/server/system") with no
-    // agent named earlier in the conversation left the model asking the user for an agent id
-    // instead of resolving it. get_agent_inventory now resolves this itself, server-side (its
-    // `resolveParams` hook, tools/catalog/get-agent-inventory.ts) whenever it is called with
-    // neither agent_id nor agent_name -- so for THAT tool the right instruction is "call it
-    // directly", not "look the agent up first". A live diagnostic run (branch
-    // diag/8913-router-logging, never shipped) proved stage-1 routing was never the problem --
-    // get_agent_inventory was offered in 5/5 runs of the issue's own worked example ("What
-    // software does this box have installed?") -- but THIS instruction's prior wording told the
-    // model to "call get_agents first", a DIFFERENT tool that the router only offers under the
-    // separate 'agents' category, which stage-1 has no reason to also pick for an inventory-only
-    // question. The model could not obey an instruction naming a tool it had not been given and
-    // fell back to asking the user or improvising with search_wazuh_data -- 0/5 calls to either
-    // get_agents or get_agent_inventory, on that exact worked example, with this exact
-    // (pre-fix) wording in place. No OTHER agent-scoped tool in the catalog has this server-side
-    // AGENT resolution (get_field_values also implements `resolveParams`, but for the unrelated
-    // field-alias hint of code review B1, not agent-id inference), so the get-agents-first
-    // instruction further below is still needed for every other tool -- BUT (follow-up audit,
-    // never independently reproduced live, caught by inspection before it repeated the same
-    // mistake) it must not repeat the exact bug this whole fix exists for: telling the model to
-    // call a tool the router may not have offered THIS turn. get_agents is its own 'agents'
-    // category; a question that deictically names the host for some OTHER agent-scoped tool
-    // (e.g. "what vulnerabilities does this box have") plausibly routes to that tool's own
-    // category alone (e.g. 'vulnerabilities'), not 'agents' -- so "call get_agents first" can be
-    // just as unreachable here as it was for get_agent_inventory. Made conditional on the tool
-    // actually being available this turn instead of unconditional.
-    'If the user asks about installed software/packages, OS details, open ports, running ' +
-      'processes, or hotfixes for the host deictically ("this box", "this host", "this ' +
-      'machine", "this server", "this system") with no agent named or numbered earlier in the ' +
-      'conversation, call get_agent_inventory directly WITHOUT agent_id or agent_name -- do NOT ' +
-      'call get_agents first for this case. It resolves to the only active agent automatically ' +
-      'and tells you which one it assumed; state that assumption in your answer. If it instead ' +
-      'reports more than one active agent, list the candidates it gives you and ask the user ' +
-      'which one they mean -- never guess among several.',
-    'For any OTHER deictic reference to the host ("this box"/"this host"/"this machine"/"this ' +
-      'server"/"this system") with a tool BESIDES get_agent_inventory that needs an agent_id, ' +
-      'and no agent has been named or numbered earlier in the conversation: if get_agents is ' +
-      'among the tools available to you this turn, call it first. If exactly one ACTIVE agent ' +
-      'exists, proceed with it and state that assumption in your answer (e.g. "Assuming you ' +
-      'mean agent 003 (web-prod-01), the only active agent"). If more than one active agent ' +
-      'exists, do not guess: briefly list the candidates (id and name) and ask the user which ' +
-      'one they mean. If get_agents is NOT among the tools available to you this turn, do not ' +
-      'try to call it -- ask the user which agent they mean instead.',
     'For "how many DISTINCT X" questions (e.g. distinct hosts/agents affected), a plain hit count ' +
       '(hits.total) overcounts when the same host appears in multiple documents -- it is NOT a ' +
       'distinct count. Use search_wazuh_data with a "cardinality" aggregation on an allowlisted ' +
       'keyword field such as wazuh.agent.name instead (the allowlist is fixed and may grow over ' +
       'time; an arbitrary field like source.user.name or file.path will be rejected).',
-    // ADAPTATION (branch 8997): the original commit generalized the deictic/descriptive-host
-    // "call it directly" rule from get_agent_inventory alone to five tools, four of which resolve
-    // their agent param through param-resolution.ts's generic sole-candidate resolver -- that
-    // module is iter-4/#8977-only infrastructure this branch does not carry, so the
-    // generalization is dropped here. The pre-existing get_agent_inventory-only rule (and its
-    // "any OTHER deictic reference" sibling) a few lines above are unchanged and still cover this
-    // branch's actual tool set.
+    // #8913 + generic sole-candidate parameter resolution: a bare deictic reference to the host
+    // ("this box/host/machine/server/system", or a descriptive one like "my auditor wants proof
+    // of SSH hardening") with no agent named earlier in the conversation used to leave the model
+    // asking the user for an agent id instead of resolving it. get_agent_inventory,
+    // get_sca_results, get_sca_checks, get_vulnerabilities_by_agent, and search_findings_by_agent
+    // ALL now resolve their agent-identifying param themselves, server-side (either
+    // get_agent_inventory's own hand-written `resolveParams` hook, #8913, or the generic
+    // param-resolution.ts resolver every other one of these five declares via
+    // `soleCandidateParams`) whenever that param is omitted -- so for these FIVE tools the right
+    // instruction is "call it directly", never "look the agent up first". A live diagnostic run
+    // (branch diag/8913-router-logging, never shipped) proved stage-1 routing was never the
+    // problem for get_agent_inventory specifically -- it was offered in 5/5 runs of the issue's
+    // own worked example -- but THIS instruction's prior wording told the model to "call
+    // get_agents first", a DIFFERENT tool that the router only offers under the separate 'agents'
+    // category, which stage-1 has no reason to also pick for a single-category question. The
+    // model could not obey an instruction naming a tool it had not been given and fell back to
+    // asking the user or improvising -- 0/5 calls to either tool, on that exact worked example,
+    // with this exact (pre-fix) wording in place. No OTHER agent-scoped tool in the catalog has
+    // this server-side resolution, so the get-agents-first instruction further below is still
+    // needed for every other tool -- BUT (follow-up audit, never independently reproduced live,
+    // caught by inspection before it repeated the same mistake) it must not repeat the exact bug
+    // this whole fix exists for: telling the model to call a tool the router may not have offered
+    // THIS turn. get_agents is its own 'agents' category; a question that deictically names the
+    // host for some OTHER agent-scoped tool (e.g. "what vulnerabilities does this box have",
+    // before this generalization) plausibly routes to that tool's own category alone, not
+    // 'agents' -- so "call get_agents first" can be just as unreachable there. Made conditional on
+    // the tool actually being available this turn instead of unconditional.
+    'If the user asks about installed software/packages, OS details, open ports, running ' +
+      'processes, hotfixes, SCA/compliance results or checks, vulnerabilities, or security ' +
+      'findings for a host referred to deictically ("this box", "this host", "this machine", ' +
+      '"this server", "this system") or descriptively (e.g. "the internet-facing box", "my ' +
+      'auditor wants proof of SSH hardening" -- no exact name or id given) with no agent named or ' +
+      'numbered earlier in the conversation, call the matching tool directly (get_agent_inventory, ' +
+      'get_sca_results, get_sca_checks, get_vulnerabilities_by_agent, or search_findings_by_agent) ' +
+      'WITHOUT its agent-identifying parameter (agent_id/agent_identifier/agent_name) -- do NOT ' +
+      'call get_agents first for these five tools. Each resolves to the only active agent ' +
+      'automatically and tells you which one it assumed; state that assumption in your answer. If ' +
+      "a call instead reports more than one active agent (or, for get_sca_checks's policy_id, " +
+      'more than one policy), list the candidates it gives you and ask the user which one they ' +
+      'mean -- never guess among several.',
+    'For any OTHER deictic or descriptive reference to a host with a tool BESIDES the five listed ' +
+      'above that needs an agent id/name, and no agent has been named or numbered earlier in the ' +
+      'conversation: if get_agents is among the tools available to you this turn, call it first. ' +
+      'If exactly one ACTIVE agent exists, proceed with it and state that assumption in your ' +
+      'answer (e.g. "Assuming you mean agent 003 (web-prod-01), the only active agent"). If more ' +
+      'than one active agent exists, do not guess: briefly list the candidates (id and name) and ' +
+      'ask the user which one they mean. If get_agents is NOT among the tools available to you ' +
+      'this turn, do not try to call it -- ask the user which agent they mean instead.',
     // BLOCKER FIX (CV-039, 2026-08-19/20 adjudicated runs): get_agent_inventory implements only
     // FIVE syscollector kinds (os, packages, ports, processes, hotfixes); groups, users, network
     // interfaces, hardware, protocols, services, and browser-extensions are real, live-verified
@@ -535,6 +536,18 @@ export function buildSystemPrompt(nowIso: string): string {
       'answer first, in your own words, saying plainly what you checked and what you could not ' +
       'confirm — never invent or assume the missing rows — then call suggest_discover_query so ' +
       'the user gets a Discover link instead of a dead end.',
+    // Issue C4: a single answer can span several tool-calling rounds (chat.ts's `orchestrate`,
+    // MAX_TOOL_ROUNDS), and every earlier round's prose is now fed back as that round's own
+    // assistant history message (see chat.ts's `roundTextConsumed`) -- the model CAN see it was
+    // already said, but seeing it is not the same as knowing not to say it again; this line makes
+    // the "don't repeat" behavior explicit instead of assuming it follows from visibility alone.
+    'Within a single answer, never repeat or re-explain a sentence you already wrote earlier in ' +
+      'this same answer -- continue from where you left off instead of restarting the narration. ' +
+      'This applies with equal force when a tool call comes back with zero rows: state that ' +
+      'absence -- and any scope caveat that goes with it (e.g. the index, agent, or time range ' +
+      'you checked) -- exactly ONCE, then move on; do not restate the same "nothing found" ' +
+      'finding a second time later in the answer using different wording, even if it feels like ' +
+      'a natural way to summarize or conclude.',
     // Workstream B ("verify before filter"): AI/plan/qa-rules-decoders-rootcause.md's root cause
     // for "the assistant can't show rules or decoders" was never routing or missing data — it was
     // filtering on a GUESSED value with no way to check it first. get_field_values closes that
@@ -571,17 +584,5 @@ export function buildSystemPrompt(nowIso: string): string {
       '"Zero rows — verifying the field actually holds that value.") — never longer, never more ' +
       'than one line, and never a guess or speculation about what a field is probably named or ' +
       'what a value probably is; state only what you already checked or are about to check next.',
-    // Issue C4: a single answer can span several tool-calling rounds (chat.ts's `orchestrate`,
-    // MAX_TOOL_ROUNDS), and every earlier round's prose is now fed back as that round's own
-    // assistant history message (see chat.ts's `roundTextConsumed`) -- the model CAN see it was
-    // already said, but seeing it is not the same as knowing not to say it again; this line makes
-    // the "don't repeat" behavior explicit instead of assuming it follows from visibility alone.
-    'Within a single answer, never repeat or re-explain a sentence you already wrote earlier in ' +
-      'this same answer -- continue from where you left off instead of restarting the narration. ' +
-      'This applies with equal force when a tool call comes back with zero rows: state that ' +
-      'absence -- and any scope caveat that goes with it (e.g. the index, agent, or time range ' +
-      'you checked) -- exactly ONCE, then move on; do not restate the same "nothing found" ' +
-      'finding a second time later in the answer using different wording, even if it feels like ' +
-      'a natural way to summarize or conclude.',
   ].join('\n');
 }

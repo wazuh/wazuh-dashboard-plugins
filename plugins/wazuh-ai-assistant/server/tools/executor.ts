@@ -17,7 +17,12 @@ import {
 } from './guardrails';
 import { buildDigest, buildTableSpec, capDigest, Digest } from './digest';
 import { validateQueryFields } from './field-validation';
-import { IndexerRequest, ManagerRequest, ToolDefinition } from './types';
+import {
+  IndexerRequest,
+  ManagerRequest,
+  ResolvedToolParams,
+  ToolDefinition,
+} from './types';
 import {
   AggFieldSpec,
   applyFieldPolicy,
@@ -54,6 +59,39 @@ export interface ToolExecutionOutcome {
 export interface PrivacyContext {
   pseudonymizer: Pseudonymizer;
   fieldPolicy: FieldPolicyEntry[];
+}
+
+/**
+ * Pseudonymizes the identifier values a `resolveParams` hook declared inside its assumption note
+ * (types.ts's `ResolvedToolParams.noteEntities` — see that doc comment for the wire-level capture
+ * that motivates this) before the note reaches `buildDigest`. No-op without privacy mode, without
+ * a note, or without declared entities — byte-identical to before this existed in all three
+ * cases. Every occurrence of each entity is replaced (split/join, not a regex — entity values are
+ * data, not patterns), longest value first so a shorter entity that is a substring of a longer
+ * one (the "DB03"/"DB03-PRIMARY" case scrubKnownEntities already documents) cannot corrupt the
+ * longer match. Exported for unit testing only, same convention as the other pure helpers here.
+ */
+export function scrubAssumptionNote(
+  note: string | undefined,
+  noteEntities: ResolvedToolParams['noteEntities'],
+  privacy: PrivacyContext | undefined,
+): string | undefined {
+  if (!note || !privacy || !noteEntities || noteEntities.length === 0) {
+    return note;
+  }
+  let scrubbed = note;
+  const byLengthDesc = [...noteEntities].sort(
+    (a, b) => b.value.length - a.value.length,
+  );
+  for (const entity of byLengthDesc) {
+    if (!entity.value) {
+      continue;
+    }
+    scrubbed = scrubbed
+      .split(entity.value)
+      .join(privacy.pseudonymizer.pseudonymize(entity.value, entity.kind));
+  }
+  return scrubbed;
 }
 
 /** Applies field policy to a digest (when `privacy` is given) immediately before it is
@@ -934,7 +972,15 @@ export async function executeToolCall(
         return { toolResultContent: toolErrorContent(resolved.reason) };
       }
       params = resolved.resolved.params;
-      assumptionNote = resolved.resolved.note;
+      // Scrubbed HERE, at the single choke point every resolver's note passes through, rather
+      // than in each resolver: resolvers have no privacy context, and the capture probe (P3,
+      // 2026-08-14) proved an unscrubbed note carries the resolved hostname to the provider in
+      // the clear under privacy mode — past every downstream scan.
+      assumptionNote = scrubAssumptionNote(
+        resolved.resolved.note,
+        resolved.resolved.noteEntities,
+        privacy,
+      );
     } catch (error) {
       return {
         toolResultContent: toolErrorContent(
