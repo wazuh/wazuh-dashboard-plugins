@@ -82,13 +82,21 @@ on provider/settings reads and writes, owner scoping on conversations):
 
 ## Internationalization
 
-English is the source language: every UI string carries its English text in the `defaultMessage` of
-its `i18n.translate(...)` call, which is what the dashboard renders at the default `i18n.locale`
-(`en`). Spanish is the one translated catalog, `translations/es-ES.json`, loaded only when the
-dashboard runs with `i18n.locale: es-ES`; `plugins/wazuh-ai-assistant/common/translation-catalog.test.ts`
-keeps it in step with the source (same ids, same ICU placeholders). Server-composed strings — route
-errors and tool status messages — are English regardless of locale.
+**The UI chrome is English-only.** Every UI string carries its English text in the `defaultMessage`
+of its `i18n.translate(...)` call, and the plugin ships no translation catalogs, so the interface
+renders in English at every `i18n.locale`. Server-composed strings — route errors and tool status
+messages — are English too.
 
-The catalog covers UI chrome only. Model answers are not translated: the system prompt instructs the
-assistant to answer in the language of the user's most recent message (Spanish or English), so the
-chat replies in Spanish to a Spanish question even on an English dashboard, and vice versa.
+Localization is deferred to a general, dashboard-wide effort rather than done one plugin at a time:
+a single localized plugin is inconsistent for users and puts a translation cost on every unrelated
+PR. The plugin did previously carry `en-US.json` and `es-ES.json`, but neither ever reached a user —
+`en-US` is never consulted for the default locale `en`, and `es-ES` was not registered on packaged
+installs because the archive did not include the plugin's `.i18nrc.json` — while both had drifted
+badly from the source. `plugins/wazuh-ai-assistant/common/i18n-strings.test.ts` now keeps the source
+strings sound (namespaced ids, no id reused for two messages, every message valid ICU) and fails if
+a catalog is reintroduced outside that wider effort.
+
+**Model answers are a separate matter and are not affected.** The system prompt instructs the
+assistant to answer in the language of the user's most recent message, so a Spanish question gets a
+Spanish answer even though the surrounding interface is in English, and an English question gets an
+English answer. That behaviour comes from the model, not from i18n.
