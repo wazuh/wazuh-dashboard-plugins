@@ -141,6 +141,7 @@
 | [#8766](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8766) | Fixed Server Management Settings crashing or showing a blank page for users without permission to read the manager configuration                                                              |
 | [#8775](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8775) | Fixed MITRE ATT&CK Framework tab not applying the date range and fetch filters                                                                                                                |
 | [#9005](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9005) | Fixed AI Assistant privacy-mode gaps where conversation history captured before privacy was enabled, or resumed from a saved conversation, could reach the AI provider unmasked, along with related gaps where an explicitly `anonymize`/`allow-scan` field's array/object value could bypass its own policy and a previously-seen identifier could reach the provider unmasked when the user retyped it bare in chat; also clarified the privacy toggle copy so it no longer implies user-typed text is automatically protected |
+| [#9029](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9029) | Fixed the AI Assistant chat composer not describing itself: the privacy control is a labelled switch with persistent help, answers name their provider, and failed turns keep a retry marker  |
 
 ### Removed
 
