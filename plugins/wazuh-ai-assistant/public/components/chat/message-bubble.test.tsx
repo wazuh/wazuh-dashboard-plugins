@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import {
   MessageBubble,
@@ -196,6 +196,34 @@ describe('MessageBubble', () => {
     expect(
       streamingContainer.querySelector('.euiLoadingContent'),
     ).not.toBeNull();
+  });
+
+  it('pairs the status label with a live spinner, inside the same aria-live region', () => {
+    // The label changes at most three times over a turn that can run for tens of seconds, so on
+    // its own it reads as a frozen line rather than work in progress. The spinner is the motion;
+    // the label is what gets announced, so the spinner must be aria-hidden and the pair must sit
+    // inside the streaming bubble's own live region.
+    const { container } = render(
+      <MessageBubble
+        message={baseMessage({
+          role: 'assistant',
+          content: '',
+          isStreaming: true,
+          statusMessage: 'Querying get_agent_inventory…',
+        })}
+        resolveDiscoverUrl={noopResolveDiscoverUrl}
+        resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+      />,
+    );
+
+    const statusLine = container.querySelector(
+      '[data-test-subj="wzTurnStatusLine"]',
+    );
+    expect(statusLine).not.toBeNull();
+    const spinner = statusLine?.querySelector('.euiLoadingSpinner');
+    expect(spinner).not.toBeNull();
+    expect(spinner?.getAttribute('aria-hidden')).toBe('true');
+    expect(statusLine?.closest('[aria-live="polite"]')).not.toBeNull();
   });
 
   it('renders a ResultTable underneath the bubble when message.table is present', () => {
@@ -645,5 +673,178 @@ describe('sanitizeAssistantMarkdown (#8890)', () => {
     expect(out).toContain('click me');
     expect(out).not.toContain('[rel]');
     expect(out).toContain('rel');
+  });
+});
+
+/**
+ * A failed turn used to leave NOTHING on the turn itself: the assistant placeholder was deleted and
+ * the reason lived only in the dismissible callout above the transcript, which the next question
+ * cleared. These pin the permanent, per-turn record that replaced it.
+ */
+describe('MessageBubble — failed turn honesty', () => {
+  it('marks a failed turn permanently and keeps the reason collapsed until asked for', () => {
+    render(
+      <MessageBubble
+        message={baseMessage({
+          role: 'assistant',
+          content: '',
+          failureReason: 'provider stream failed: 502 upstream',
+        })}
+        resolveDiscoverUrl={noopResolveDiscoverUrl}
+        resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+      />,
+    );
+
+    expect(screen.getByText('This turn failed')).toBeInTheDocument();
+    // Collapsed: a provider error can be a paragraph of upstream JSON, and the transcript is not a
+    // log viewer.
+    expect(
+      screen.queryByText('provider stream failed: 502 upstream'),
+    ).toBeNull();
+
+    const toggle = screen.getByText('Show reason');
+    expect(toggle.closest('button')?.getAttribute('aria-expanded')).toBe(
+      'false',
+    );
+    fireEvent.click(toggle);
+    expect(
+      screen.getByText('provider stream failed: 502 upstream'),
+    ).toBeInTheDocument();
+    expect(
+      screen
+        .getByText('Hide reason')
+        .closest('button')
+        ?.getAttribute('aria-expanded'),
+    ).toBe('true');
+  });
+
+  it('offers the retry action on a failed turn, with the caller-supplied label', () => {
+    const onRetry = jest.fn();
+    render(
+      <MessageBubble
+        message={baseMessage({
+          role: 'assistant',
+          content: '',
+          failureReason: 'boom',
+        })}
+        onRetry={onRetry}
+        retryLabel='Ask again'
+        resolveDiscoverUrl={noopResolveDiscoverUrl}
+        resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+      />,
+    );
+
+    fireEvent.click(screen.getByText('Ask again'));
+    expect(onRetry).toHaveBeenCalledTimes(1);
+  });
+
+  it('reports the failure reason rather than the generic interrupted notice when both flags are set', () => {
+    // An error mid-stream also never reaches `done`, so chat-page.tsx can end up with both marks on
+    // one message. The specific reason is strictly more useful than "Response interrupted".
+    render(
+      <MessageBubble
+        message={baseMessage({
+          role: 'assistant',
+          content: 'partial',
+          failureReason: 'rate limited',
+          interrupted: true,
+        })}
+        resolveDiscoverUrl={noopResolveDiscoverUrl}
+        resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+      />,
+    );
+
+    expect(screen.getByText('This turn failed')).toBeInTheDocument();
+    expect(screen.queryByText('Response interrupted')).toBeNull();
+  });
+
+  it('shows no marker at all while the turn is still streaming', () => {
+    render(
+      <MessageBubble
+        message={baseMessage({
+          role: 'assistant',
+          content: 'writing',
+          failureReason: 'boom',
+          isStreaming: true,
+        })}
+        resolveDiscoverUrl={noopResolveDiscoverUrl}
+        resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+      />,
+    );
+
+    expect(screen.queryByText('This turn failed')).toBeNull();
+  });
+});
+
+/**
+ * Provider provenance: a conversation can legitimately span several providers, and without a stamp
+ * every answer presents as though one anonymous "AI" produced all of them.
+ */
+describe('MessageBubble — provider provenance', () => {
+  it('names the provider and model that produced an assistant answer', () => {
+    render(
+      <MessageBubble
+        message={baseMessage({
+          role: 'assistant',
+          content: 'Six today.',
+          providerId: 'p1',
+          providerName: 'Claude test',
+          providerModel: 'claude-sonnet-4',
+        })}
+        resolveDiscoverUrl={noopResolveDiscoverUrl}
+        resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+      />,
+    );
+
+    expect(
+      screen.getByText('Claude test · claude-sonnet-4'),
+    ).toBeInTheDocument();
+  });
+
+  it('falls back to the provider name alone when no model was stamped', () => {
+    render(
+      <MessageBubble
+        message={baseMessage({
+          role: 'assistant',
+          content: 'Six today.',
+          providerId: 'p1',
+          providerName: 'Claude test',
+        })}
+        resolveDiscoverUrl={noopResolveDiscoverUrl}
+        resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+      />,
+    );
+
+    expect(screen.getByText('Claude test')).toBeInTheDocument();
+  });
+
+  it('renders nothing for a turn saved before the stamp existed, and never on a user turn', () => {
+    const { container: assistantContainer } = render(
+      <MessageBubble
+        message={baseMessage({ role: 'assistant', content: 'Six today.' })}
+        resolveDiscoverUrl={noopResolveDiscoverUrl}
+        resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+      />,
+    );
+    expect(
+      assistantContainer.querySelector(
+        '[data-test-subj="wzMsgProviderProvenance"]',
+      ),
+    ).toBeNull();
+
+    const { container: userContainer } = render(
+      <MessageBubble
+        message={baseMessage({
+          role: 'user',
+          content: 'How many?',
+          providerName: 'Claude test',
+        })}
+        resolveDiscoverUrl={noopResolveDiscoverUrl}
+        resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+      />,
+    );
+    expect(
+      userContainer.querySelector('[data-test-subj="wzMsgProviderProvenance"]'),
+    ).toBeNull();
   });
 });

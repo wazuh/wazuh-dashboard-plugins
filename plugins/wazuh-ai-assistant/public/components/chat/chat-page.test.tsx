@@ -439,7 +439,7 @@ describe('ChatPage — turn abandoned mid-stream', () => {
       expect(screen.getByText('partial answer')).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Stop generating' }));
 
     // Stop is NOT abandonment: what streamed in stays on screen and is saved as this
     // conversation's first turn, so the next turn updates that same row instead of creating a
@@ -880,7 +880,7 @@ describe('ChatPage — interrupted turns and failed saves', () => {
       expect(screen.getByText('half an ans')).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Stop generating' }));
 
     await waitFor(() =>
       expect(screen.getByText('Response interrupted')).toBeInTheDocument(),
@@ -931,7 +931,7 @@ describe('ChatPage — interrupted turns and failed saves', () => {
     await waitFor(() =>
       expect(screen.getByText('half an ans')).toBeInTheDocument(),
     );
-    fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Stop generating' }));
     await waitFor(() =>
       expect(screen.getByText('Response interrupted')).toBeInTheDocument(),
     );
@@ -2962,8 +2962,9 @@ describe('ChatPage — composer privacy chip (iteration 4)', () => {
 });
 
 // The full explainer used to live in an EuiToolTip WRAPPING the pill itself, which meant hovering
-// the pill to click it also forced a wall of text. It now lives on a separate, discrete ⓘ
-// (EuiIconTip) placed right after the pill — this only needs to prove that affordance exists;
+// the pill to click it also forced a wall of text. It now lives on a separate, discrete ⓘ button
+// (an EuiPopover — see "privacy control legibility" below for its click/keyboard behaviour) placed
+// right after the pill — this only needs to prove that affordance exists;
 // the pill's own click/toggle behavior is already covered by the describe block above.
 describe('ChatPage — privacy explainer moved off the pill onto a discrete ⓘ (iteration-4 batch 2 item 1)', () => {
   it('renders a discrete info affordance beside the pill, separate from the pill itself', async () => {
@@ -2973,6 +2974,333 @@ describe('ChatPage — privacy explainer moved off the pill onto a discrete ⓘ 
     const infoTip = screen.getByLabelText(/about privacy mode/i);
     expect(infoTip).toBeInTheDocument();
     expect(infoTip).not.toBe(chip);
+  });
+});
+
+/**
+ * QA read the composer's privacy pill as saying only "Off" beside a padlock, and its explanation
+ * was reachable only by hovering a 16px glyph. These pin what the control now states, in text and
+ * in ARIA, and that the explanation can be opened and kept open.
+ */
+describe('ChatPage — privacy control legibility', () => {
+  it('is a real switch that states its own state in text and reports it to assistive tech', async () => {
+    renderChatPage();
+    const chip = await findPrivacyChip();
+
+    expect(chip.getAttribute('role')).toBe('switch');
+    expect(chip.getAttribute('aria-checked')).toBe('false');
+    // Visible text names the setting, not just its value.
+    expect(chip.textContent).toContain('Privacy: Off');
+    // The accessible name says what the control DOES; the state is the role's job, so it must not
+    // be a second copy of the same word.
+    expect(chip.getAttribute('aria-label')).toBe(
+      'Privacy mode: pseudonymize sensitive data before sending to the AI provider',
+    );
+
+    fireEvent.click(chip);
+    await waitFor(() => expect(chip.getAttribute('aria-checked')).toBe('true'));
+    expect(chip.textContent).toContain('Privacy: On');
+  });
+
+  it('shows a visible administrator attribution when the policy is locked, and keeps the control perceivable', async () => {
+    mockSettingsService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: true,
+      privacyDefaultPerProvider: {},
+      userCanOverride: false,
+      conversationRetentionDays: 0,
+    });
+    renderChatPage();
+    const chip = await findPrivacyChipWithModifier('on');
+
+    // NOT a `disabled` button: a disabled control is skipped by keyboard navigation and often not
+    // announced at all, so the reader who most needs to know the policy is locked could not find
+    // out. It stays focusable, stays a switch, and points at the visible reason.
+    expect(chip.getAttribute('aria-disabled')).toBe('true');
+    expect(chip.getAttribute('tabindex')).toBe('0');
+    expect(chip.getAttribute('role')).toBe('switch');
+    expect(chip.getAttribute('aria-checked')).toBe('true');
+
+    const noteId = chip.getAttribute('aria-describedby');
+    expect(noteId).toBeTruthy();
+    const note = document.getElementById(noteId as string);
+    expect(note).not.toBeNull();
+    expect(note?.textContent).toBe('Privacy on — set by administrator');
+  });
+
+  it('opens the explanation on click and keeps it open, instead of a hover-only tooltip', async () => {
+    renderChatPage();
+    await findPrivacyChip();
+
+    // Nothing on screen until asked for.
+    expect(
+      document.querySelector('[data-test-subj="wzPrivacyHelpPanel"]'),
+    ).toBeNull();
+
+    const helpButton = screen.getByLabelText(/about privacy mode/i);
+    expect(helpButton.getAttribute('aria-expanded')).toBe('false');
+    fireEvent.click(helpButton);
+
+    await waitFor(() =>
+      expect(
+        document.querySelector('[data-test-subj="wzPrivacyHelpPanel"]'),
+      ).not.toBeNull(),
+    );
+    expect(helpButton.getAttribute('aria-expanded')).toBe('true');
+    expect(
+      document.querySelector('[data-test-subj="wzPrivacyHelpPanel"]')
+        ?.textContent,
+    ).toContain('is sent as-is');
+  });
+});
+
+/**
+ * Provider provenance and per-conversation provider memory. A conversation can legitimately span
+ * several providers; without a stamp every answer presents as though one anonymous "AI" produced
+ * all of them, and a resumed conversation silently continued on whatever the picker defaulted to.
+ */
+describe('ChatPage — provider provenance and per-conversation memory', () => {
+  it('stamps the answering provider onto the assistant turn, and persists it', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('how many alerts?');
+    stream.push({ type: 'delta', content: 'Six today.' });
+    stream.push({ type: 'done' });
+    stream.end();
+
+    await waitFor(() =>
+      expect(screen.getByText('Test provider')).toBeInTheDocument(),
+    );
+    await waitFor(() =>
+      expect(mockConversationsService.create).toHaveBeenCalled(),
+    );
+    const saved = lastSavedMessages(mockConversationsService.create);
+    const answer = saved.find(message => message.role === 'assistant');
+    expect(answer?.providerId).toBe('p1');
+    expect(answer?.providerName).toBe('Test provider');
+    // The question is never stamped — it was not produced by a provider.
+    expect(
+      saved.find(message => message.role === 'user')?.providerId,
+    ).toBeUndefined();
+  });
+
+  it('restores the provider a resumed conversation was last answered by', async () => {
+    const onProviderChange = jest.fn();
+    mockConversationsService.get.mockResolvedValue(
+      conversationRecord({
+        messages: [
+          { role: 'user', content: 'earlier question', createdAt: 1 },
+          {
+            role: 'assistant',
+            content: 'earlier answer',
+            createdAt: 2,
+            providerId: 'p2',
+            providerName: 'Groq',
+          },
+        ],
+      }),
+    );
+    window.history.replaceState(null, '', '/conversation/conv-b');
+
+    renderChatPage({
+      providers: [
+        PROVIDER,
+        { id: 'p2', name: 'Groq', type: 'openai_compatible' } as never,
+      ],
+      onProviderChange,
+    });
+
+    await waitFor(() =>
+      expect(screen.getByText('earlier answer')).toBeInTheDocument(),
+    );
+    expect(onProviderChange).toHaveBeenCalledWith('p2');
+  });
+
+  it('keeps the current selection when the conversation’s provider no longer exists', async () => {
+    const onProviderChange = jest.fn();
+    mockConversationsService.get.mockResolvedValue(
+      conversationRecord({
+        messages: [
+          { role: 'user', content: 'earlier question', createdAt: 1 },
+          {
+            role: 'assistant',
+            content: 'earlier answer',
+            createdAt: 2,
+            providerId: 'deleted-provider',
+            providerName: 'Deleted provider',
+          },
+        ],
+      }),
+    );
+    window.history.replaceState(null, '', '/conversation/conv-b');
+
+    renderChatPage({ onProviderChange });
+
+    await waitFor(() =>
+      expect(screen.getByText('earlier answer')).toBeInTheDocument(),
+    );
+    expect(onProviderChange).not.toHaveBeenCalled();
+    // The turn's own stamp still tells the truth about what answered it, deleted or not.
+    expect(screen.getByText('Deleted provider')).toBeInTheDocument();
+  });
+});
+
+/**
+ * The failure used to live only in the callout band above the transcript, which `handleSend`
+ * clears — so asking anything else erased the only evidence the turn had ever failed.
+ */
+describe('ChatPage — a failed turn stays visible after the next question', () => {
+  it('keeps the failed turn marked, and keeps an "Ask again" action on it, once a later turn succeeds', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('any agents down?');
+    stream.push({ type: 'error', message: 'provider stream failed' });
+    stream.end();
+
+    await waitFor(() =>
+      expect(screen.getByText('This turn failed')).toBeInTheDocument(),
+    );
+
+    const secondStream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) =>
+        secondStream.generate(signal),
+    );
+    await sendMessage('and findings?');
+    secondStream.push({ type: 'delta', content: 'Six today.' });
+    secondStream.push({ type: 'done' });
+    secondStream.end();
+
+    await waitFor(() =>
+      expect(screen.getByText('Six today.')).toBeInTheDocument(),
+    );
+    // The whole point: the marker survives the next question.
+    expect(screen.getByText('This turn failed')).toBeInTheDocument();
+    expect(screen.getByText('Ask again')).toBeInTheDocument();
+  });
+
+  it('re-asks the failed turn’s own question, appended as a new turn', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('any agents down?');
+    stream.push({ type: 'error', message: 'provider stream failed' });
+    stream.end();
+    await waitFor(() =>
+      expect(screen.getByText('This turn failed')).toBeInTheDocument(),
+    );
+
+    const secondStream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) =>
+        secondStream.generate(signal),
+    );
+    await sendMessage('and findings?');
+    secondStream.push({ type: 'delta', content: 'Six today.' });
+    secondStream.push({ type: 'done' });
+    secondStream.end();
+    await waitFor(() =>
+      expect(screen.getByText('Six today.')).toBeInTheDocument(),
+    );
+
+    const callsBefore = mockStreamChat.mock.calls.length;
+    fireEvent.click(screen.getByText('Ask again'));
+
+    await waitFor(() =>
+      expect(mockStreamChat.mock.calls.length).toBe(callsBefore + 1),
+    );
+    // The failed turn's question is asked again — the transcript now holds two copies of it, and
+    // the failed turn itself was NOT rewritten out of the middle.
+    expect(screen.getAllByText('any agents down?').length).toBe(2);
+    expect(screen.getByText('This turn failed')).toBeInTheDocument();
+  });
+});
+
+/**
+ * "Routing…" is an orchestrator word, and it was the only thing a reader saw for the whole of a
+ * multi-call turn. The status line now moves through user-facing steps.
+ */
+describe('ChatPage — progressive generation status', () => {
+  it('renders the translated step label for each phase, not the server’s own wording', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('how many alerts?');
+
+    stream.push({
+      type: 'status',
+      message: 'Routing…',
+      step: 'understanding',
+    });
+    await waitFor(() =>
+      expect(
+        screen.getByText('Understanding your question…'),
+      ).toBeInTheDocument(),
+    );
+    expect(screen.queryByText('Routing…')).toBeNull();
+
+    stream.push({
+      type: 'status',
+      message: 'Querying Wazuh…',
+      step: 'querying',
+      detail: 'get_agent_inventory',
+    });
+    await waitFor(() =>
+      expect(
+        screen.getByText('Querying get_agent_inventory…'),
+      ).toBeInTheDocument(),
+    );
+
+    stream.push({
+      type: 'status',
+      message: 'Writing the answer…',
+      step: 'writing',
+    });
+    await waitFor(() =>
+      expect(screen.getByText('Writing the answer…')).toBeInTheDocument(),
+    );
+
+    // The first real token retires the status line entirely.
+    stream.push({ type: 'delta', content: 'Six today.' });
+    stream.push({ type: 'done' });
+    stream.end();
+    await waitFor(() =>
+      expect(screen.getByText('Six today.')).toBeInTheDocument(),
+    );
+    expect(screen.queryByText('Writing the answer…')).toBeNull();
+  });
+
+  it('shows an unclassified status verbatim (a provider retry notice is already reader-facing)', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('how many alerts?');
+    stream.push({
+      type: 'status',
+      message: 'Provider rate limit reached — retrying in 5s',
+    });
+
+    await waitFor(() =>
+      expect(
+        screen.getByText('Provider rate limit reached — retrying in 5s'),
+      ).toBeInTheDocument(),
+    );
   });
 });
 
