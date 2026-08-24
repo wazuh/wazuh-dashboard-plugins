@@ -232,6 +232,28 @@ describe('ConversationList', () => {
       fireEvent.change(searchField, { target: { value: '' } });
       expect(screen.getByText('Disconnected agents')).toBeInTheDocument();
     });
+
+    it("carries `wzConvoRailSearchRow` on the search row at rest, so it opts out of EuiFlexGroup's default flex-grow (#9010 review regression: this row is a direct child of the column-flex `.wzConvoRail`, and an un-neutralised grow made it absorb ~50% of the rail's free space)", () => {
+      // Layout itself is not testable in jsdom (no layout engine) — the class is what
+      // conversation-list.scss's `.wzConvoRailSearchRow { flex-grow: 0; }` rule targets, so its
+      // presence is the regression guard.
+      render(
+        <ConversationList
+          conversations={[conversation()]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+        />,
+      );
+
+      const searchRow = screen
+        .getByPlaceholderText('Search conversations')
+        .closest('.euiFlexGroup') as HTMLElement;
+      expect(searchRow).not.toBeNull();
+      expect(searchRow.className).toMatch(/wzConvoRailSearchRow/);
+    });
   });
 
   describe('date grouping (TODAY / YESTERDAY boundary)', () => {
@@ -1041,6 +1063,30 @@ describe('ConversationList', () => {
       expect(
         toolbar.contains(screen.getByRole('button', { name: 'Delete (0)' })),
       ).toBe(true);
+    });
+
+    it("carries `wzConvoRailSearchRow` on the select-mode toolbar too, so it also opts out of EuiFlexGroup's default flex-grow (#9010 review regression)", () => {
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Selectable' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={noop}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      );
+
+      const toolbar = screen
+        .getByText('0 selected')
+        .closest('.euiFlexGroup') as HTMLElement;
+      expect(toolbar).not.toBeNull();
+      expect(toolbar.className).toMatch(/wzConvoRailSearchRow/);
     });
 
     it('entering select mode shows a checkbox per row and hides the delete/rename icons', () => {

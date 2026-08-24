@@ -133,16 +133,23 @@
   list-style: none;
 }
 
-/** `margin-bottom` replaces the `<EuiSpacer size="xs" />` (4px) that used to sit between rows when
+/** `padding-bottom` replaces the `<EuiSpacer size="xs" />` (4px) that used to sit between rows when
  * they were flat siblings rather than `<li>`s — same visual gap, now expressed as the list item's
  * own spacing rather than an extra DOM node between each pair. Applied unconditionally, with no
  * `:last-child` exception (F-10, #9010 review — the previous wording here claimed the opposite):
  * the PRE-existing markup rendered that same `<EuiSpacer size="xs" />` after EVERY conversation,
  * including the last one in each date group, so this rule matching that unconditionally is what
- * keeps the gap byte-identical, not an exception to it. */
+ * keeps the gap byte-identical, not an exception to it.
+ *
+ * `padding-bottom`, NOT `margin-bottom` (#9010 review, F-11): a margin on the last `<li>` of one
+ * group's `<ul>` collapses through that `<ul>`'s own end into the next group's 10px
+ * `margin-top` (`.wzConvoRailGroupHeader` above), CSS margin-collapsing rules that don't apply to
+ * an element with no visible box between siblings — so the measured gap at every group boundary
+ * was 10px, not the intended 14px. Padding never collapses, and the `<li>` paints no background
+ * or border, so this reads visually identical to the row above it either way. */
 .wzConvoRailListItem {
-  margin: 0 0 4px;
-  padding: 0;
+  margin: 0;
+  padding: 0 0 4px;
   list-style: none;
 }
 
@@ -163,4 +170,15 @@
   transform: translateY(-50%);
   background: var(--wz-accent-hover);
   border-radius: 4px;
+}
+
+/** EUI's `.euiFlexGroup` carries `flex-grow: 1`. These two rows are direct children of
+ * `.wzConvoRail`, a height:100% COLUMN flex container, so an un-neutralised grow made the
+ * search/select row absorb ~50% of the rail's free space (measured 218px instead of 32px)
+ * and centre the field inside it. */
+.wzConvoRailSearchRow {
+  flex-grow: 0;
+  /* gutterSize's negative margin bled 2px past .wzConvoRail's overflow:hidden, clipping the
+     select button's focus ring on the right. */
+  padding: 0 2px;
 }
