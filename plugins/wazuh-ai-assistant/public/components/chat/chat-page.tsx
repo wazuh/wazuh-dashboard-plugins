@@ -500,15 +500,27 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       htmlIdGenerator('wzPrivacyLockNote')(),
     );
     /**
-     * Provider ids stamped on a just-restored conversation's assistant turns, newest first — a
-     * REQUEST to switch the picker, waiting for the provider list to arrive so it can be checked
-     * against what still exists. `null` means nothing pending.
+     * A pending request to point the provider picker at whatever provider a just-restored
+     * conversation was last answered by: `candidates` holds the provider ids stamped on its
+     * assistant turns, newest first, waiting to be checked against the providers that still exist.
+     * `null` means nothing pending.
      *
-     * A ref, not state: it is consumed exactly once by the effect below and must not itself cause a
-     * render. See `applyLoadedConversation` for why the check cannot happen where the request is
-     * made.
+     * STATE, not a ref, and wrapped in an object rather than being a bare array — both deliberate,
+     * because the effect that applies it has to RE-RUN when a request is made:
+     *
+     * - A ref cannot be an effect dependency, so a request made after the provider list had already
+     *   settled (the sidebar switch, and the mount restore whenever the GET resolves after the
+     *   providers do) never woke the effect at all, and then fired later against whatever unrelated
+     *   render did wake it — snapping the picker back to a stale candidate.
+     * - A fresh object identity per request is what makes even a REPEAT request observable: two
+     *   conversations answered by the same provider produce equal `candidates` arrays, and a bare
+     *   array (or an id string) would compare equal and be silently skipped.
+     *
+     * See `applyLoadedConversation` for why the check cannot happen where the request is made.
      */
-    const pendingProviderRestoreRef = useRef<string[] | null>(null);
+    const [providerRestoreRequest, setProviderRestoreRequest] = useState<{
+      candidates: string[];
+    } | null>(null);
     // Set on the user's first manual toggle so the settings-driven default effect below stops
     // recomputing it (e.g. if the top-level provider selector changes later in the same session).
     const privacyTouchedRef = useRef(false);
@@ -1146,31 +1158,44 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
      *
      * Split out of `applyLoadedConversation` because that function can run BEFORE `providers` has
      * loaded (the mount-time restore's `.then()`), which is precisely the reload/deep-link case this
-     * whole feature exists for — see the ref's own assignment there. Keyed on `providers` so it runs
-     * again the moment the list arrives.
+     * whole feature exists for — see the request state's own doc comment there.
+     *
+     * Keyed on BOTH the request and the provider list, because either can arrive second and all
+     * three real orderings have to work:
+     *   1. conversation first, providers second (reload / deep link) — the request parks, and
+     *      `providersLoaded` flipping wakes this;
+     *   2. providers first, conversation second (a slower GET on the same mount) — the request
+     *      itself wakes this;
+     *   3. everything already loaded (sidebar conversation switch) — likewise the request, which is
+     *      why it must be state with a fresh identity rather than a ref.
      *
      * Waits for `providersLoaded` rather than for a non-empty list: a user with genuinely no
-     * providers configured would otherwise leave the pending candidates parked forever, and the
-     * request has to be dropped so a LATER conversation switch cannot pick up a stale one.
+     * providers configured would otherwise leave the request parked forever.
      */
     useEffect(() => {
-      const candidates = pendingProviderRestoreRef.current;
-      if (!candidates || !providersLoaded) {
+      if (!providerRestoreRequest || !providersLoaded) {
         return;
       }
-      pendingProviderRestoreRef.current = null;
+      // Consumed exactly once, before anything is decided: whether a candidate matches or not, this
+      // request is spent. Leaving it pending on a no-match would let it fire against a later,
+      // unrelated render.
+      setProviderRestoreRequest(null);
       // Guarded on the provider still EXISTING: a conversation whose provider has since been deleted
       // keeps the current selection rather than pointing the picker at an id nothing resolves. The
       // stamps on the restored messages are untouched either way — they record what really answered
       // each turn and stay true for a deleted provider.
-      const restoredProviderId = candidates.find(candidateId =>
-        providers.some(provider => provider.id === candidateId),
+      const restoredProviderId = providerRestoreRequest.candidates.find(
+        candidateId => providers.some(provider => provider.id === candidateId),
       );
       if (restoredProviderId && restoredProviderId !== selectedProviderId) {
         onProviderChange(restoredProviderId);
       }
+      // `selectedProviderId` is read but deliberately NOT a dependency: it is only used to skip a
+      // redundant call, and including it would make a manual provider change re-enter this effect —
+      // which is precisely the path that must CANCEL a pending restore, not apply it (see
+      // `handleUserProviderChange`).
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [providers, providersLoaded, selectedProviderId]);
+    }, [providerRestoreRequest, providers, providersLoaded]);
 
     // Per-conversation privacy default: resolved once settings AND a selected
     // provider are both known, and never recomputed after the user's first manual toggle — switching
@@ -1449,16 +1474,21 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       // different model, with nothing on screen saying so, made answers in one conversation
       // inconsistent for no reason the reader could see.
       //
-      // This only RECORDS the candidates; the effect below is what applies one. It deliberately does
+      // This only RECORDS the candidates; the effect above is what applies one. It deliberately does
       // NOT read `providers` here: the mount-time restore path calls this function from a `.then()`
       // inside a `[]`-deps effect, so everything it closes over is the FIRST render's value — and on
       // a reload or a deep link (the primary resume path) the provider list has not arrived yet, so
       // `providers` is `[]` and every candidate would be rejected as "no longer exists". Newest
       // first, so the effect picks the most recent surviving provider.
-      pendingProviderRestoreRef.current = [...restored.messages]
+      const restoreCandidates = [...restored.messages]
         .reverse()
         .filter(message => message.role === 'assistant' && message.providerId)
         .map(message => message.providerId as string);
+      // A conversation with no stamped provider (saved before the stamp existed) clears any request
+      // instead of making one — it has nothing to say about which provider to use.
+      setProviderRestoreRequest(
+        restoreCandidates.length > 0 ? { candidates: restoreCandidates } : null,
+      );
       // Replay-leak fix (Fix 3): NOT `restored.turnRecords` — see this function's doc comment above
       // for why replaying another session's pseudonym-form digest content against a freshly emptied
       // map (right below) is unsafe. The resumed conversation is fully READABLE (restored.messages
@@ -1565,9 +1595,31 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
      * `updateMessages` call it still has queued targets a message id that no longer exists in the
      * list this replaces it with.
      */
+    /**
+     * The provider picker's own change handler: cancels any pending provider-restore request, then
+     * reports the change up exactly as before.
+     *
+     * The cancellation is the point. A restore request can still be pending when the reader reaches
+     * for the picker — the provider list is what it is waiting for, and on a slow load that is the
+     * same moment the picker becomes usable. Without this, the reader's explicit pick would be
+     * silently reverted to the restored conversation's provider a moment later (and could drag the
+     * privacy chip's per-provider default along with it). An explicit choice outranks a remembered
+     * one.
+     *
+     * Wired ONLY to the picker, so it distinguishes a user's pick from the app shell merely
+     * reporting the selection this component's own restore just asked for.
+     */
+    const handleUserProviderChange = (providerId: string) => {
+      setProviderRestoreRequest(null);
+      onProviderChange(providerId);
+    };
+
     const handleNewConversation = () => {
       abandonActiveStream();
       repinToBottom();
+      // A brand-new conversation has no provider to remember, so a request still waiting on the
+      // provider list must not outlive the conversation that made it.
+      setProviderRestoreRequest(null);
       // C1: a brand-new conversation gets the centred welcome composer back (the effect above picks
       // this up as soon as `messages` is empty again) — the transition is once per conversation, not
       // once per session.
@@ -3697,7 +3749,10 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                               <ProviderPicker
                                 providers={providers}
                                 selectedProviderId={selectedProviderId}
-                                onProviderChange={onProviderChange}
+                                // Not the raw `onProviderChange` prop: a pick made HERE is the
+                                // reader's own explicit choice and cancels any pending
+                                // provider-restore request — see `handleUserProviderChange`.
+                                onProviderChange={handleUserProviderChange}
                                 onManageProviders={onManageProviders}
                                 activeConversationId={activeConversationId}
                               />

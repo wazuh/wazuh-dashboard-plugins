@@ -344,6 +344,54 @@ describe('ChatPage — turn abandoned mid-stream', () => {
     ]);
   });
 
+  it('persists the failure of a turn that was abandoned and then failed, with nothing else to show', async () => {
+    // The abandoned path was the one route by which a failure could vanish from a saved conversation
+    // entirely. Two things had to be true for it: the `error` branch bails out before stamping
+    // anything once the turn is no longer active, and the abandoned transcript then DROPPED an
+    // assistant message with no content and no table — which is exactly what a turn that failed
+    // before producing any text is.
+    //
+    // Deliberately no delta at all, so the failure reason is the only content the turn has and the
+    // drop-empty-placeholder filter is genuinely the thing being exercised.
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+    mockConversationsService.list.mockResolvedValue([
+      { id: 'conv-b', title: 'Older conversation', updatedAt: '2024-01-01' },
+    ]);
+
+    renderChatPage();
+    await waitFor(() =>
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
+    );
+    await sendMessage('first question');
+
+    // The real race this covers: a provider error frame arriving at the same moment the reader
+    // switches away. Whichever side wins — the error observed while the turn is still active, or
+    // after it has been abandoned — the reason is recorded before any bail-out, and the transcript
+    // that gets SAVED is the abandoned one either way (the `finally` branch is chosen at unwind,
+    // after the switch). So this asserts on the saved record rather than on which path ran.
+    const leaving = leaveForConversation('Older conversation');
+    stream.push({ type: 'error', message: 'provider stream failed' });
+    stream.end();
+    await leaving;
+
+    await waitFor(() =>
+      expect(mockConversationsService.update).toHaveBeenCalledTimes(1),
+    );
+    // Saved against the conversation the turn started in, like every other abandoned turn.
+    expect(mockConversationsService.update.mock.calls[0][0]).toBe('conv-new');
+    const saved = lastSavedMessages(mockConversationsService.update);
+    const answer = saved.find(message => message.role === 'assistant');
+    // Survived the filter, and carries the reason as its whole content.
+    expect(answer).toBeDefined();
+    expect(answer?.content).toBe('');
+    expect(answer?.failureReason).toBe('provider stream failed');
+    // The question is still there too — a failed turn is a turn, not a gap.
+    expect(saved.some(message => message.role === 'user')).toBe(true);
+  });
+
   it('saves the question before generating, so a turn cut short still has it', async () => {
     const stream = createControllableStream();
     mockStreamChat.mockImplementation(
@@ -3229,6 +3277,124 @@ describe('ChatPage — provider provenance and per-conversation memory', () => {
       document.querySelector('[data-test-subj="wzMsgProviderProvenance"]')
         ?.textContent,
     ).toBe('Groq');
+  });
+
+  it('restores the provider when the provider list was ALREADY loaded before the conversation arrived', async () => {
+    // The mirror of the case above, and the one a request-as-a-ref could never serve: nothing about
+    // the provider list changes after the conversation lands, so the restore has to be woken by the
+    // REQUEST itself. A slower `GET` on the same mount produces exactly this ordering.
+    const onProviderChange = jest.fn();
+    mockConversationsService.get.mockResolvedValue(
+      conversationRecord({
+        messages: [
+          { role: 'user', content: 'earlier question', createdAt: 1 },
+          {
+            role: 'assistant',
+            content: 'earlier answer',
+            createdAt: 2,
+            providerId: 'p2',
+            providerName: 'Groq',
+          },
+        ],
+      }),
+    );
+    window.history.replaceState(null, '', '/conversation/conv-b');
+
+    renderChatPage({
+      providers: [PROVIDER, GROQ],
+      providersLoaded: true,
+      selectedProviderId: PROVIDER.id,
+      onProviderChange,
+    });
+
+    await waitFor(() => expect(onProviderChange).toHaveBeenCalledWith('p2'));
+  });
+
+  it('restores the provider on a sidebar conversation switch, with everything already loaded', async () => {
+    // The regression case: switching conversations changes neither `providers` nor
+    // `providersLoaded`, so a restore keyed only on those never ran at all — worse than before the
+    // feature, since the code it replaced called `onProviderChange` directly here and worked.
+    const onProviderChange = jest.fn();
+    mockConversationsService.list.mockResolvedValue([
+      { id: 'conv-b', title: 'Older conversation', updatedAt: '2024-01-01' },
+    ]);
+    mockConversationsService.get.mockResolvedValue(
+      conversationRecord({
+        messages: [
+          { role: 'user', content: 'earlier question', createdAt: 1 },
+          {
+            role: 'assistant',
+            content: 'earlier answer',
+            createdAt: 2,
+            providerId: 'p2',
+            providerName: 'Groq',
+          },
+        ],
+      }),
+    );
+
+    renderChatPage({
+      providers: [PROVIDER, GROQ],
+      providersLoaded: true,
+      selectedProviderId: PROVIDER.id,
+      onProviderChange,
+    });
+    await waitFor(() =>
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
+    );
+    expect(onProviderChange).not.toHaveBeenCalled();
+
+    await leaveForConversation('Older conversation');
+
+    await waitFor(() => expect(onProviderChange).toHaveBeenCalledWith('p2'));
+  });
+
+  it('never re-applies a spent restore when the reader later picks a provider', async () => {
+    // The failure mode this guards: a restore request that outlives the render it was made for, and
+    // then fires on some LATER render — snapping the picker back to the remembered provider after
+    // the reader has deliberately chosen a different one, and dragging the privacy chip's
+    // per-provider default with it. A request is consumed exactly once, so a manual pick afterwards
+    // must produce exactly one call: the reader's own.
+    const onProviderChange = jest.fn();
+    const view = renderDeepLinkRestore(
+      'p2',
+      [PROVIDER, GROQ],
+      onProviderChange,
+    );
+    await settleRestore();
+    view.rerenderWith({
+      providers: [PROVIDER, GROQ],
+      providersLoaded: true,
+      selectedProviderId: PROVIDER.id,
+    });
+    await waitFor(() => expect(onProviderChange).toHaveBeenCalledWith('p2'));
+    // The shell reacts, exactly as it does in the real app.
+    view.rerenderWith({
+      providers: [PROVIDER, GROQ],
+      providersLoaded: true,
+      selectedProviderId: 'p2',
+    });
+    onProviderChange.mockClear();
+
+    // The reader now picks the other provider, through the real picker.
+    fireEvent.click(screen.getByRole('button', { name: /AI provider: Groq/i }));
+    fireEvent.click(await screen.findByText(PROVIDER.name));
+
+    await waitFor(() =>
+      expect(onProviderChange).toHaveBeenCalledWith(PROVIDER.id),
+    );
+    view.rerenderWith({
+      providers: [PROVIDER, GROQ],
+      providersLoaded: true,
+      selectedProviderId: PROVIDER.id,
+    });
+
+    // Nothing pulls it back to 'p2'. Asserting on the call LIST, not just the last call: a
+    // re-application would show up as a second, unrequested call.
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(onProviderChange.mock.calls).toEqual([[PROVIDER.id]]);
   });
 });
 
