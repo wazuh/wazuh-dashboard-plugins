@@ -271,7 +271,7 @@
     "wazuhAiAssistant.settings.updateSuccess": "Proveedor \"{name}\" actualizado.",
     "wazuhAiAssistant.settings.createSuccess": "Proveedor \"{name}\" agregado.",
     "wazuhAiAssistant.settings.setDefaultSuccess": "\"{name}\" es ahora el proveedor predeterminado.",
-    "wazuhAiAssistant.settings.testCouldNotVerifyBadge": "No verificado",
+    "wazuhAiAssistant.settings.testCouldNotVerifyBadge": "Sin verificar",
     "wazuhAiAssistant.settings.providers.emptyTitle": "No hay un proveedor de IA configurado",
     "wazuhAiAssistant.settings.providers.emptyBody": "AI Assistant necesita al menos un proveedor conectado (compatible con OpenAI o Anthropic) antes de poder responder preguntas. Agrega uno para empezar.",
     "wazuhAiAssistant.settings.providers.emptyAction": "Agregar un proveedor",
