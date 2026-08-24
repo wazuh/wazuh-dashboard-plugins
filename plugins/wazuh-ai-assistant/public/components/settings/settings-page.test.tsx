@@ -77,6 +77,30 @@ const SettingsPageWithRouter: React.FC<
   </MemoryRouter>
 );
 
+/**
+ * Drives the "My OpenAI" row's menu Delete action through its confirmation modal. The modal's
+ * confirm button is reached by its own `data-test-subj` rather than by role+name: the row menu's
+ * "Delete" item is also a button named "Delete", and whether EUI has finished unmounting the
+ * popover by the time the modal renders is a race — querying by name hits both and fails
+ * intermittently ("Found multiple elements with the role button and name /^delete$/i").
+ */
+async function deleteProviderThroughRowMenu(): Promise<void> {
+  fireEvent.click(
+    await screen.findByRole('button', { name: /actions for my openai/i }),
+  );
+  fireEvent.click(await screen.findByText(/^delete$/i));
+  const confirmButton = await waitFor(() => {
+    const button = document.querySelector(
+      '[data-test-subj="confirmModalConfirmButton"]',
+    );
+    if (!button) {
+      throw new Error('delete confirmation modal not open');
+    }
+    return button;
+  });
+  fireEvent.click(confirmButton);
+}
+
 beforeEach(() => {
   jest.clearAllMocks();
   mockService.list.mockResolvedValue([]);
@@ -1716,58 +1740,61 @@ describe('SettingsPage — announcing saved changes to the mounted chat', () => 
     }
   });
 
-  it('dispatches PROVIDERS_CHANGED_EVENT when a provider is deleted', async () => {
-    mockService.list.mockResolvedValue([PROVIDER]);
-    mockService.remove.mockResolvedValue(undefined);
-    const heard = listenFor(PROVIDERS_CHANGED_EVENT);
+  // Both delete cases go through `deleteProviderThroughRowMenu` (module scope) and carry an
+  // explicit timeout: they used to query the modal's confirm button by name, which intermittently
+  // matched the row menu's own "Delete" item as well, and rendering this whole page plus a popover
+  // and a modal in jsdom overruns jest's 5 s default on a loaded machine.
+  it(
+    'dispatches PROVIDERS_CHANGED_EVENT when a provider is deleted',
+    async () => {
+      mockService.list.mockResolvedValue([PROVIDER]);
+      mockService.remove.mockResolvedValue(undefined);
+      const heard = listenFor(PROVIDERS_CHANGED_EVENT);
 
-    try {
-      render(
-        <SettingsPageWithRouter
-          core={coreWithToasts}
-          onProvidersChanged={jest.fn()}
-        />,
-      );
-      // Delete lives behind the row's actions popover.
-      fireEvent.click(
-        await screen.findByRole('button', { name: /actions for my openai/i }),
-      );
-      fireEvent.click(await screen.findByText(/^delete$/i));
-      fireEvent.click(await screen.findByRole('button', { name: /^delete$/i }));
+      try {
+        render(
+          <SettingsPageWithRouter
+            core={coreWithToasts}
+            onProvidersChanged={jest.fn()}
+          />,
+        );
+        await deleteProviderThroughRowMenu();
 
-      await waitFor(() =>
-        expect(mockService.remove).toHaveBeenCalledWith('p1'),
-      );
-      await waitFor(() => expect(heard.count()).toBe(1));
-    } finally {
-      heard.stop();
-    }
-  });
+        await waitFor(() =>
+          expect(mockService.remove).toHaveBeenCalledWith('p1'),
+        );
+        await waitFor(() => expect(heard.count()).toBe(1));
+      } finally {
+        heard.stop();
+      }
+    },
+    30000,
+  );
 
-  it('does not announce a provider change when the delete fails', async () => {
-    mockService.list.mockResolvedValue([PROVIDER]);
-    mockService.remove.mockRejectedValue(new Error('403'));
-    const heard = listenFor(PROVIDERS_CHANGED_EVENT);
+  it(
+    'does not announce a provider change when the delete fails',
+    async () => {
+      mockService.list.mockResolvedValue([PROVIDER]);
+      mockService.remove.mockRejectedValue(new Error('403'));
+      const heard = listenFor(PROVIDERS_CHANGED_EVENT);
 
-    try {
-      render(
-        <SettingsPageWithRouter
-          core={coreWithToasts}
-          onProvidersChanged={jest.fn()}
-        />,
-      );
-      fireEvent.click(
-        await screen.findByRole('button', { name: /actions for my openai/i }),
-      );
-      fireEvent.click(await screen.findByText(/^delete$/i));
-      fireEvent.click(await screen.findByRole('button', { name: /^delete$/i }));
+      try {
+        render(
+          <SettingsPageWithRouter
+            core={coreWithToasts}
+            onProvidersChanged={jest.fn()}
+          />,
+        );
+        await deleteProviderThroughRowMenu();
 
-      await waitFor(() => expect(mockService.remove).toHaveBeenCalled());
-      expect(heard.count()).toBe(0);
-    } finally {
-      heard.stop();
-    }
-  });
+        await waitFor(() => expect(mockService.remove).toHaveBeenCalled());
+        expect(heard.count()).toBe(0);
+      } finally {
+        heard.stop();
+      }
+    },
+    30000,
+  );
 });
 
 /** UX wave 2, PR A: the providers table and the conversation-history field. */
@@ -1791,52 +1818,58 @@ describe('SettingsPage — provider table feedback and retention validation', ()
     addSuccess.mockClear();
   });
 
-  it('confirms a provider delete with a toast naming it', async () => {
-    // Delete was the only mutation on this page that just made a row vanish in silence, which
-    // reads the same as a failure that closed the modal without saying anything.
-    mockService.list.mockResolvedValue([PROVIDER]);
-    mockService.remove.mockResolvedValue(undefined);
+  // The explicit timeouts on the two delete cases below are environmental, not a slow assertion:
+  // rendering this whole page and driving a popover plus a modal through jsdom overruns jest's 5 s
+  // default on a loaded machine, which is what makes the pre-existing delete cases in the suite
+  // above flake too.
+  it(
+    'confirms a provider delete with a toast naming it',
+    async () => {
+      // Delete was the only mutation on this page that just made a row vanish in silence, which
+      // reads the same as a failure that closed the modal without saying anything.
+      mockService.list.mockResolvedValue([PROVIDER]);
+      mockService.remove.mockResolvedValue(undefined);
 
-    render(
-      <SettingsPageWithRouter
-        core={coreWithToasts}
-        onProvidersChanged={jest.fn()}
-      />,
-    );
+      render(
+        <SettingsPageWithRouter
+          core={coreWithToasts}
+          onProvidersChanged={jest.fn()}
+        />,
+      );
 
-    fireEvent.click(
-      await screen.findByRole('button', { name: /actions for my openai/i }),
-    );
-    fireEvent.click(await screen.findByText(/^delete$/i));
-    fireEvent.click(await screen.findByRole('button', { name: /^delete$/i }));
+      await deleteProviderThroughRowMenu();
 
-    await waitFor(() =>
-      expect(addSuccess).toHaveBeenCalledWith('Provider "My OpenAI" deleted.'),
-    );
-  });
+      await waitFor(() =>
+        expect(addSuccess).toHaveBeenCalledWith(
+          'Provider "My OpenAI" deleted.',
+        ),
+      );
+    },
+    30000,
+  );
 
-  it('says nothing on a failed delete', async () => {
-    mockService.list.mockResolvedValue([PROVIDER]);
-    mockService.remove.mockRejectedValue(new Error('403'));
+  it(
+    'says nothing on a failed delete',
+    async () => {
+      mockService.list.mockResolvedValue([PROVIDER]);
+      mockService.remove.mockRejectedValue(new Error('403'));
 
-    render(
-      <SettingsPageWithRouter
-        core={coreWithToasts}
-        onProvidersChanged={jest.fn()}
-      />,
-    );
+      render(
+        <SettingsPageWithRouter
+          core={coreWithToasts}
+          onProvidersChanged={jest.fn()}
+        />,
+      );
 
-    fireEvent.click(
-      await screen.findByRole('button', { name: /actions for my openai/i }),
-    );
-    fireEvent.click(await screen.findByText(/^delete$/i));
-    fireEvent.click(await screen.findByRole('button', { name: /^delete$/i }));
+      await deleteProviderThroughRowMenu();
 
-    await waitFor(() => expect(mockService.remove).toHaveBeenCalled());
-    expect(addSuccess).not.toHaveBeenCalledWith(
-      expect.stringContaining('deleted'),
-    );
-  });
+      await waitFor(() => expect(mockService.remove).toHaveBeenCalled());
+      expect(addSuccess).not.toHaveBeenCalledWith(
+        expect.stringContaining('deleted'),
+      );
+    },
+    30000,
+  );
 
   it('shows a spinner and a Testing state in the Status cell while a test is in flight', async () => {
     // A test that never resolves keeps the row in the in-flight state for the assertion.
