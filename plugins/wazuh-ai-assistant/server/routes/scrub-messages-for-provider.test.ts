@@ -36,10 +36,7 @@ test('NF-1: a previously-minted bare hostname is masked when the user retypes it
     p,
   );
 
-  assert.equal(
-    scrubbed.content,
-    `can you check on ${pseudonym} for me?`,
-  );
+  assert.equal(scrubbed.content, `can you check on ${pseudonym} for me?`);
   assert.doesNotMatch(scrubbed.content, /dbprod07/i);
 });
 
@@ -210,16 +207,25 @@ test('F10: a bare identifier minted via the TOOL path on turn N (never typed by 
     p,
   );
 
-  assert.equal(reScrubbedTurnN.content, `can you check on ${pseudonym} for me?`);
+  assert.equal(
+    reScrubbedTurnN.content,
+    `can you check on ${pseudonym} for me?`,
+  );
   assert.doesNotMatch(reScrubbedTurnN.content, /dbprod07/i);
-  assert.equal(scrubbedTurnNPlus1.content, `is it still noisy on ${pseudonym}?`);
+  assert.equal(
+    scrubbedTurnNPlus1.content,
+    `is it still noisy on ${pseudonym}?`,
+  );
   assert.doesNotMatch(scrubbedTurnNPlus1.content, /dbprod07/i);
 });
 
 test('NF-1: the system message is never scrubbed (unchanged behavior)', () => {
   const p = new Pseudonymizer();
   p.pseudonymize('dbprod07', 'HOST');
-  const system: ChatMessage = { role: 'system', content: 'talk about dbprod07' };
+  const system: ChatMessage = {
+    role: 'system',
+    content: 'talk about dbprod07',
+  };
 
   const [scrubbed] = scrubMessagesForProvider([system], p);
 
@@ -318,7 +324,8 @@ test('MOST IMPORTANT: privacy-toggled-mid-conversation -- no real IP/dotted-host
           name: 'search_wazuh_data',
           arguments: {
             index_pattern: 'wazuh-alerts-*',
-            filter: 'source.ip: 203.0.113.9 and host: dbprod07.corp.example.com',
+            filter:
+              'source.ip: 203.0.113.9 and host: dbprod07.corp.example.com',
           },
         },
       ],

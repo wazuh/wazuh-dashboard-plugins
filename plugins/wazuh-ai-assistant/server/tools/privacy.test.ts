@@ -1617,7 +1617,9 @@ test('F1: identifiersOnly masks all four NF-1 scenario values, in any casing', (
   const jsmith = p.pseudonymize('jsmith', 'USER');
 
   assert.equal(
-    scrubKnownEntities('checking on DBPROD07 now', p, { identifiersOnly: true }),
+    scrubKnownEntities('checking on DBPROD07 now', p, {
+      identifiersOnly: true,
+    }),
     `checking on ${dbprod07} now`,
   );
   assert.equal(
@@ -2128,7 +2130,10 @@ test('NF-2: an array of OBJECTS under an anonymize entry is deep-scrubbed, not p
   // SAME 'IP' kind the entry specifies. This is the deliberate, conservative fail-closed choice:
   // better an unrelated string gets an IP-kind pseudonym than a real value slips through raw.
   assert.match(value[1].tag, /^IP_\d+$/);
-  assert.doesNotMatch(JSON.stringify(value), /127\.0\.0\.1|10\.0\.0\.5|primary/);
+  assert.doesNotMatch(
+    JSON.stringify(value),
+    /127\.0\.0\.1|10\.0\.0\.5|primary/,
+  );
 });
 
 test('NF-2: a NESTED ARRAY under an anonymize entry is deep-scrubbed, not passed through raw', () => {
@@ -2284,7 +2289,9 @@ test('NF-2 regression: a scalar string under an anonymize entry is unchanged', (
 
 test('NF-2 regression: a "never" field is still dropped regardless of container shape', () => {
   const p = new Pseudonymizer();
-  const neverPolicy: FieldPolicyEntry[] = [{ field: 'secret.blob', action: 'never' }];
+  const neverPolicy: FieldPolicyEntry[] = [
+    { field: 'secret.blob', action: 'never' },
+  ];
   const result = scrubFieldValue(
     'secret.blob',
     [{ any: 'shape' }, 'x', 1, null],

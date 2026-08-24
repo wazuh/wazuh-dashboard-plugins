@@ -1798,7 +1798,10 @@ function deepScrubContainer(
       return value;
     }
     if (action === 'anonymize') {
-      return pseudonymizer.pseudonymize(value, kind ?? inferPseudonymKind(field));
+      return pseudonymizer.pseudonymize(
+        value,
+        kind ?? inferPseudonymKind(field),
+      );
     }
     if (action === 'allow-scan') {
       return scrubKnownEntities(
@@ -1810,7 +1813,11 @@ function deepScrubContainer(
     // scrubFieldValue's scalar `!entry` string branch exactly.
     return prescanAndMint(value, pseudonymizer);
   }
-  if (value === null || typeof value === 'number' || typeof value === 'boolean') {
+  if (
+    value === null ||
+    typeof value === 'number' ||
+    typeof value === 'boolean'
+  ) {
     return value;
   }
   if (Array.isArray(value)) {

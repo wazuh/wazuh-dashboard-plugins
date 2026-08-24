@@ -300,7 +300,11 @@ test('excludePrivacyOffHistory: a historical turn flagged privacy-ON (pseudonym-
 
   const out = excludePrivacyOffHistory(messages, true);
 
-  assert.deepEqual(out, messages, 'nothing eligible should be dropped or altered');
+  assert.deepEqual(
+    out,
+    messages,
+    'nothing eligible should be dropped or altered',
+  );
 });
 
 test('excludePrivacyOffHistory: a missing/unknown privacyEnabled flag (an older persisted conversation) is excluded -- fail closed, not fail open', () => {
@@ -318,7 +322,10 @@ test('excludePrivacyOffHistory: a missing/unknown privacyEnabled flag (an older 
 
   const out = excludePrivacyOffHistory(messages, true);
 
-  assert.deepEqual(out.map(m => m.role), ['user']);
+  assert.deepEqual(
+    out.map(m => m.role),
+    ['user'],
+  );
 });
 
 test('excludePrivacyOffHistory: privacy OFF for the current turn -- everything replays exactly as before (no behavior change)', () => {
@@ -342,21 +349,37 @@ test('excludePrivacyOffHistory: privacy OFF for the current turn -- everything r
 test('excludePrivacyOffHistory: a standalone assistant PROSE message (no toolCalls) is dropped under the same fail-closed rule', () => {
   const messages: ChatMessage[] = [
     { role: 'user', content: 'q' },
-    { role: 'assistant', content: 'privacy-off narration', privacyEnabled: false },
-    { role: 'assistant', content: 'privacy-on narration', privacyEnabled: true },
+    {
+      role: 'assistant',
+      content: 'privacy-off narration',
+      privacyEnabled: false,
+    },
+    {
+      role: 'assistant',
+      content: 'privacy-on narration',
+      privacyEnabled: true,
+    },
   ];
 
   const out = excludePrivacyOffHistory(messages, true);
 
   assert.deepEqual(out, [
     { role: 'user', content: 'q' },
-    { role: 'assistant', content: 'privacy-on narration', privacyEnabled: true },
+    {
+      role: 'assistant',
+      content: 'privacy-on narration',
+      privacyEnabled: true,
+    },
   ]);
 });
 
 test('excludePrivacyOffHistory: user messages are NEVER dropped by this mechanism, regardless of flag', () => {
   const messages: ChatMessage[] = [
-    { role: 'user', content: 'a question mentioning wazuh-aio-5', privacyEnabled: false },
+    {
+      role: 'user',
+      content: 'a question mentioning wazuh-aio-5',
+      privacyEnabled: false,
+    },
   ];
   const out = excludePrivacyOffHistory(messages, true);
   assert.deepEqual(out, messages);
@@ -395,7 +418,12 @@ test('buildOutgoingMessages: privacy currently ON keeps a privacy-ON-flagged his
   assert.deepEqual(outgoing, [
     { role: 'user', content: 'q' },
     { role: 'assistant', content: '', toolCalls: [toolCall('t1')] },
-    { role: 'tool', toolCallId: 't1', content: 'HOST_1 digest', privacyEnabled: true },
+    {
+      role: 'tool',
+      toolCallId: 't1',
+      content: 'HOST_1 digest',
+      privacyEnabled: true,
+    },
     { role: 'assistant', content: 'HOST_1 answer', privacyEnabled: true },
     { role: 'user', content: 'follow-up' },
   ]);

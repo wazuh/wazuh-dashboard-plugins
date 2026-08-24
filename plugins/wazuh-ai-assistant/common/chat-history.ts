@@ -692,7 +692,9 @@ export function excludePrivacyOffHistory(
       const next = messages[index + 1];
       const toolCallId = message.toolCalls[0].id;
       if (next && next.role === 'tool' && next.toolCallId === toolCallId) {
-        if (isHistoryEntryEligible(next.privacyEnabled, currentPrivacyEnabled)) {
+        if (
+          isHistoryEntryEligible(next.privacyEnabled, currentPrivacyEnabled)
+        ) {
           result.push(message, next);
         }
         index += 1; // Consumes the paired `tool` message too, whether kept or dropped.
