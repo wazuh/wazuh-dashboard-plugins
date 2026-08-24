@@ -13,6 +13,7 @@ import {
   EuiPopover,
   EuiText,
   EuiTextColor,
+  EuiToolTip,
   EuiSpacer,
   htmlIdGenerator,
 } from '@elastic/eui';
@@ -38,18 +39,67 @@ const AUTO_EXPAND_ROW_THRESHOLD = 200;
 type ResultRow = Record<string, unknown> & { __rowId: string };
 /** Default page size and the choices offered in the card footer's row-count control.
  *
- * Five, not twenty-five: the page size IS the height control now that the table body scrolls
- * inside a height-capped card (layout contract §4) rather than growing unbounded. Five rows answer
- * "what did it find?" inside the conversation without needing the card's own scroll, and the
- * reader can page through or open the full set in Discover. It also keeps the DOM small for a
- * 500-row result, which is why pagination was here to begin with. `TALL_TRANSCRIPT_PAGE_SIZE` is
- * the "steps 5 → 10 above 900px of transcript height" half of that same contract point — see
- * `transcriptHeightPx` below for why it is only ever a STARTING default, not a live-resize.
+ * Issue #9009 (A4): was 5, which split every 6-10 row answer onto a hidden page 2 — the QA E2E
+ * review caught a factually wrong AI prose summary that resulted from exactly that (a row silently
+ * left off-page). Ten is the standard EUI default page size and is large enough that the vast
+ * majority of tool results (which top out well under it) never paginate at all; the reader can
+ * still page through — or pick a smaller/larger size — for genuinely large results, and it keeps
+ * the DOM small for a 500-row one, which is why pagination was here to begin with.
  */
-const DEFAULT_PAGE_SIZE = 5;
-const TALL_TRANSCRIPT_PAGE_SIZE = 10;
-const TALL_TRANSCRIPT_HEIGHT_PX = 900;
+const DEFAULT_PAGE_SIZE = 10;
 const PAGE_SIZE_OPTIONS = [5, 10, 25, 50];
+
+/**
+ * Issue #9009 (J1, follow-up): the fixed 560px narrow-mode threshold only ever accounted for the
+ * QA E2E review's ~480px repro width. A live finding on the deployed build showed a 6-column
+ * table still wrapping every cell at ~600-800px (a docked sidecar squeezing the main surface) —
+ * 560px is comfortable for a 3-column table but nowhere near enough for 6, so a single fixed
+ * pixel threshold can never be right for every column count. The rule is now adaptive: go narrow
+ * whenever the card cannot give each would-be-visible column at least `MIN_COLUMN_WIDTH_PX` —
+ * an id/date/short-value column's readable floor, not a strict character budget — i.e.
+ * `width < candidateColumnCount * MIN_COLUMN_WIDTH_PX` (see `candidateColumnCount` below).
+ *
+ * Issue #9009 (J1, second follow-up): 120 was still too tight. A live repro on the deployed build
+ * measured the card at ~728px with a 6-column table — the quantizer (see `WIDTH_QUANTUM_PX`)
+ * floors that to 720, and `720 < 6 * 120 = 720` is false by exactly the boundary, so the table
+ * stayed full-width and wrapped every cell vertically anyway. And the real columns this renderer
+ * actually carries — an id/UUID, a rule/finding title, a formatted timestamp — need noticeably
+ * more than 120px per column to read on one line regardless of the boundary math. Raised to 140:
+ * a 6-column table now goes narrow under ~840px (comfortably clearing the 728px repro), a
+ * 3-column table stays full down to ~420px, and the original 480px repro (>= 3 candidate columns)
+ * stays narrow either way.
+ */
+const MIN_COLUMN_WIDTH_PX = 140;
+/** Issue #9009 (J1): column budget in narrow mode — "first 2-3 columns from the tool's existing
+ * column order", the same order `MAX_VISIBLE_COLUMNS` already respects at full width. Every
+ * demoted column stays reachable through the row expander, same as `MAX_VISIBLE_COLUMNS` above. */
+const NARROW_MAX_VISIBLE_COLUMNS = 3;
+/**
+ * Issue #9009 (J1, follow-up): the ResizeObserver below stores state in QUANTIZED buckets of this
+ * many px rather than the raw measured width, for the same reason the old code stored only a
+ * boolean — the sidecar's own drag-resize fires the observer on every pixel, and re-rendering the
+ * table on every single one of those (rather than only when the reader crosses a real bucket) is
+ * a render storm for no visible benefit. The adaptive rule needs the actual width (not just a
+ * boolean) because the threshold itself now depends on the spec's column count, so a plain
+ * boolean can no longer be computed inside the observer callback alone — quantizing is the
+ * middle ground that keeps state updates rare while still letting `isNarrow` be derived at
+ * render time for whatever column count the current spec has. Buckets round DOWN (`Math.floor`),
+ * never up: rounding up could quantize a genuinely-narrow width past its own threshold and
+ * misreport it as full (e.g. 700px rounding up to 720px would clear the 6-column table's exact
+ * 720px threshold) — rounding down only ever errs toward triggering narrow mode a few px early,
+ * never toward missing it.
+ */
+const WIDTH_QUANTUM_PX = 40;
+
+/** `0` stays `0` (unmeasured/not-yet-observed, same sentinel the old boolean's `width > 0` guard
+ * used), everything else buckets down to the nearest `WIDTH_QUANTUM_PX` — see that constant's
+ * doc comment for why down rather than to the nearest. */
+function quantizeWidthPx(width: number): number {
+  if (width <= 0) {
+    return 0;
+  }
+  return Math.floor(width / WIDTH_QUANTUM_PX) * WIDTH_QUANTUM_PX;
+}
 
 /**
  * The card's height ceiling, in the only frame of reference that is actually correct: the
@@ -230,6 +280,25 @@ function renderDefaultCell(value: unknown): React.ReactNode {
     return value as React.ReactNode;
   }
   return formatCellValue(value);
+}
+
+/**
+ * Issue #9009 (J1): narrow-mode cell wrapper — truncates the formatted text to one line with an
+ * ellipsis and puts the untruncated value in an `EuiToolTip`, the same truncate-plus-tooltip idiom
+ * the providers table already uses (settings-page.tsx's `anchorClassName`-bounded `EuiToolTip`).
+ * Only applied to plain string/number cells: the absent-value placeholder and the severity badge
+ * are already short and are left as `renderDefaultCell`/`renderSeverityBadge` render them.
+ */
+function renderNarrowTruncatedCell(value: unknown): React.ReactNode {
+  if (isAbsentValue(value)) {
+    return renderAbsentPlaceholder();
+  }
+  const text = formatCellValue(value);
+  return (
+    <EuiToolTip content={text} anchorClassName='wzResultsCellTruncateAnchor'>
+      <span className='wzResultsCellTruncate'>{text}</span>
+    </EuiToolTip>
+  );
 }
 
 /**
@@ -524,15 +593,12 @@ interface ResultTableProps {
    * link when `resolveDiscoverUrl` is omitted. */
   provenanceChips?: ResultTableProvenanceChip[];
   /**
-   * Real measured height (px) of the scrolling transcript pane, for layout contract §4's "page
-   * size steps 5 → 10 above 900px of transcript height". chat-page.tsx measures the pane with a
-   * `ResizeObserver` and threads the result straight through MessageList → MessageBubble → here
-   * (confirmed by reading it — see its `transcriptHeightPx` state), so the taller page size is
-   * live in the real app. Still optional: jsdom has no `ResizeObserver`, so it stays `undefined`
-   * in tests and the pre-redesign default of 5 applies there, which is what the existing tests
-   * expect. Read only ONCE, to pick the table's INITIAL page size — not a live-resize binding, so a
-   * reader mid-way through a wide window resize never has their current page silently renumbered
-   * underneath them.
+   * Real measured height (px) of the scrolling transcript pane, for layout contract §4's card
+   * height ceiling (`measuredCardMaxHeight` below) — the card can never claim more than the pane
+   * it actually lives in. chat-page.tsx measures the pane with a `ResizeObserver` and threads the
+   * result straight through MessageList → MessageBubble → here (confirmed by reading it — see its
+   * `transcriptHeightPx` state). Still optional: jsdom has no `ResizeObserver`, so it stays
+   * `undefined` in tests and the stylesheet's own fallback cap applies there.
    */
   transcriptHeightPx?: number;
   /**
@@ -591,16 +657,10 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   // indexes, so `itemIdToExpandedRowMap` and the expander column stay correct across pages —
   // paging never renumbers a row. Initial size only (see `transcriptHeightPx`'s doc comment).
   const [pageIndex, setPageIndex] = useState(0);
-  const [pageSize, setPageSize] = useState(() =>
-    transcriptHeightPx && transcriptHeightPx > TALL_TRANSCRIPT_HEIGHT_PX
-      ? TALL_TRANSCRIPT_PAGE_SIZE
-      : DEFAULT_PAGE_SIZE,
-  );
-  // Set ONLY by `handlePageSizeChange` below — i.e. only by the reader actually picking a size
-  // in the footer control. `pageSize` above also gets bumped to `TALL_TRANSCRIPT_PAGE_SIZE` on
-  // mount for a tall transcript, with no user action involved; without this flag THAT bump alone
-  // satisfied `pageSize > DEFAULT_PAGE_SIZE` and silently expanded the card's height ceiling to
-  // 900px on every long transcript, which is the "expanded" state (see `isExpanded` below).
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  // Set ONLY by `handlePageSizeChange` below — i.e. only by the reader actually picking a size in
+  // the footer control — never by the default page size itself, so a 10-row default never counts
+  // as a user "opting in" to the expanded card ceiling below.
   const [userPickedPageSize, setUserPickedPageSize] = useState(false);
 
   // Unlike the page size above, this one IS a live binding: re-capping the card as the transcript
@@ -609,9 +669,9 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   // measured (jsdom has no ResizeObserver, so `transcriptHeightPx` stays 0 there) — the stylesheet's
   // own `min(460px, 52dvh)` then applies exactly as before.
   // "Card grows" (iteration-4 item 3): once the reader has explicitly chosen a page size above
-  // the 5-row default (`userPickedPageSize`, NOT merely the size having drifted above it), the
-  // ceiling this clamps against switches to the expanded twin — see that constant's own doc
-  // comment for why 900px is a safe ceiling rather than a real ceiling.
+  // the default (`userPickedPageSize`, NOT merely the size having drifted above it), the ceiling
+  // this clamps against switches to the expanded twin — see that constant's own doc comment for
+  // why 900px is a safe ceiling rather than a real ceiling.
   const isExpanded = userPickedPageSize && pageSize > DEFAULT_PAGE_SIZE;
   const cardMaxHeightCeilingPx = isExpanded
     ? RESULTS_CARD_MAX_HEIGHT_EXPANDED_PX
@@ -648,6 +708,62 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
     return () => observer.disconnect();
   }, []);
 
+  // Issue #9009 (J1): the card's OWN measured width, for narrow-mode column reduction. Deliberately
+  // the component's own width, not the viewport — the same generic renderer mounts full-page and
+  // inside the AI Assistant sidecar (as narrow as ~480px in the QA E2E review), and only the
+  // container it actually lives in can tell those two apart. Same guarded pattern as the pane
+  // height effect above (and the rest of this plugin, e.g. chat-page.tsx's rail-width measurement):
+  // jsdom has no `ResizeObserver`, so `quantizedWidthPx` stays `0` and every existing test renders
+  // in (non-narrow) full-width mode, matching what they already assert.
+  //
+  // Stores the QUANTIZED width, not a derived boolean (issue #9009 follow-up) — see
+  // `WIDTH_QUANTUM_PX`'s doc comment for why: the render-storm concern that used to justify storing
+  // only a boolean still applies, but the threshold itself now depends on the spec's column count
+  // (`candidateColumnCount` below), which the observer callback has no way to know, so the boolean
+  // can no longer be computed in here. `isNarrow` is derived from this quantized width at render
+  // time instead, below.
+  const [quantizedWidthPx, setQuantizedWidthPx] = useState(0);
+  useLayoutEffect(() => {
+    const card = cardRef.current;
+    if (!card || typeof ResizeObserver === 'undefined') {
+      return;
+    }
+    const measure = () => {
+      const quantized = quantizeWidthPx(card.offsetWidth);
+      // Same early-out as the old boolean version: a resize that doesn't cross a 40px bucket
+      // boundary sets identical state and triggers no re-render.
+      setQuantizedWidthPx(previous =>
+        previous === quantized ? previous : quantized,
+      );
+    };
+    const observer = new ResizeObserver(measure);
+    observer.observe(card);
+    measure();
+    return () => observer.disconnect();
+  }, []);
+
+  /**
+   * Issue #9009 (J1, follow-up): how many columns the spec would show at FULL width — the same
+   * `MAX_VISIBLE_COLUMNS` budget `effectiveMaxVisibleColumns` below applies, computed here first
+   * because narrow mode's own threshold depends on it. Deliberately the full-mode count, not the
+   * raw `spec.columns.length` — a 20-column spec is already capped to `MAX_VISIBLE_COLUMNS` at
+   * full width, so its narrow threshold should be sized for the columns that would actually
+   * render, not for columns nothing ever shows a `<th>` for.
+   */
+  const candidateColumnCount = Math.min(
+    spec.columns.length,
+    MAX_VISIBLE_COLUMNS,
+  );
+
+  // Issue #9009 (J1, follow-up): adaptive threshold — narrow mode triggers whenever the card
+  // cannot give each candidate column at least `MIN_COLUMN_WIDTH_PX`, rather than at one fixed
+  // pixel width regardless of column count (see `MIN_COLUMN_WIDTH_PX`'s doc comment for the live
+  // finding this replaces). `quantizedWidthPx === 0` means "not yet measured" (jsdom, or before
+  // the observer's first callback), same sentinel the old `width > 0` guard used.
+  const isNarrow =
+    quantizedWidthPx > 0 &&
+    quantizedWidthPx < candidateColumnCount * MIN_COLUMN_WIDTH_PX;
+
   // The most conservative measured pane height: the card can never claim more than the pane it
   // actually lives in, whichever source reported the smaller number. Zero when nothing has been
   // measured (both the prop and the live reading absent), which keeps the stylesheet fallback in
@@ -677,8 +793,8 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
 
   // Scrolling body ref (iteration-4 item 3). The actual scroll-to-top reset lives in the
   // `useLayoutEffect` below, keyed on `[safePageIndex, pageSize]` — that runs for a page-size
-  // change (including going back to the 5-row default) AND for a plain next/previous-page click,
-  // which used to leave the body scrolled wherever it was on the PREVIOUS page.
+  // change (including going back to the default) AND for a plain next/previous-page click, which
+  // used to leave the body scrolled wherever it was on the PREVIOUS page.
   const bodyRef = useRef<HTMLDivElement | null>(null);
   const handlePageSizeChange = (size: number) => {
     setUserPickedPageSize(true);
@@ -694,17 +810,25 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   };
 
   /**
-   * Whether the pagination footer has anything to offer. The footer used to render for ANY
-   * non-empty result, so a one-row table still got "Rows per page: 5 10 25 50" and "Page 1 of 1":
-   * four controls that cannot change what is on screen, since every offered size already holds the
-   * whole result. Only the empty case was suppressed.
+   * Whether the pagination footer has anything to offer. Issue #9009 (A4): compared against the
+   * CURRENT page size rather than the smallest offered option — at or below it, the whole result
+   * already fits on one page, so there is nothing to page and no reason to show the "Page 1 of 1"
+   * control the QA E2E review flagged as noise (a one-row table used to render the full "Rows per
+   * page: 5 10 25 50" footer for nothing). With the default page size now 10, this is also what
+   * hides the pager for the 6-10 row results whose off-page rows previously produced a factually
+   * wrong AI summary (the finding this fix exists for).
    *
-   * Compared against the SMALLEST offered size rather than the current one: at or below it, no
-   * choice of page size produces a second page, so there is nothing to page and nothing to resize.
-   * Above it, the footer earns its row even when the current size happens to fit everything —
-   * picking a smaller size is then a real action.
+   * The second clause (review, MAJOR-1) covers a trapdoor the first clause alone falls into: a
+   * reader who explicitly PICKS a page size that happens to be >= the row count (e.g. 25 rows,
+   * pick page size 25) would otherwise make `spec.rows.length > pageSize` false and unmount the
+   * WHOLE footer — including the size selector itself — with no way back to a smaller size short
+   * of a remount. Once the reader has ever picked a size (`userPickedPageSize`), the footer stays
+   * as long as the result exceeds the SMALLEST offered option, so the selector that got them into
+   * this state can always get them back out of it.
    */
-  const needsPagination = spec.rows.length > PAGE_SIZE_OPTIONS[0];
+  const needsPagination =
+    spec.rows.length > pageSize ||
+    (userPickedPageSize && spec.rows.length > PAGE_SIZE_OPTIONS[0]);
 
   const toggleRow = (rowIndex: number) => {
     setExpandedRowIds(previous => {
@@ -741,21 +865,36 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
         if (!Number.isFinite(rowIndex)) {
           return null;
         }
+        // Issue #9009 (A3): the toggle used to keep the aria-label 'Expand row' after opening and
+        // exposed no `aria-expanded`, so neither a screen-reader nor a returning user could tell an
+        // open row from a closed one from the control itself — the same pattern the providers table
+        // (settings-page.tsx) already gets right: flip the accessible name AND set `aria-expanded`.
+        const isRowExpanded = expandedRowIds.has(rowIndex);
         return (
           <EuiButtonIcon
             onClick={() => toggleRow(rowIndex)}
-            aria-label={i18n.translate(
-              'wazuhAiAssistant.resultTable.expandRow',
-              {
-                defaultMessage: 'Expand row',
-              },
-            )}
-            iconType={expandedRowIds.has(rowIndex) ? 'arrowUp' : 'arrowDown'}
+            aria-label={
+              isRowExpanded
+                ? i18n.translate('wazuhAiAssistant.resultTable.collapseRow', {
+                    defaultMessage: 'Collapse row',
+                  })
+                : i18n.translate('wazuhAiAssistant.resultTable.expandRow', {
+                    defaultMessage: 'Expand row',
+                  })
+            }
+            aria-expanded={isRowExpanded}
+            // Review, required minor: only set once the target actually exists in the DOM — the
+            // `itemIdToExpandedRowMap` entry (and its matching `id`) below is only populated for a
+            // row that IS expanded, so pointing at it while collapsed would reference nothing.
+            aria-controls={
+              isRowExpanded ? `${bodyId}-expanded-row-${rowIndex}` : undefined
+            }
+            iconType={isRowExpanded ? 'arrowUp' : 'arrowDown'}
           />
         );
       },
     }),
-    [expandedRowIds],
+    [expandedRowIds, bodyId],
   );
 
   // Column widths and timestamp formatting are DISPLAY concerns only — same columns, same values,
@@ -766,13 +905,20 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   // Only the first MAX_VISIBLE_COLUMNS spec columns become visible table columns — see that
   // constant's doc comment. `spec.rows` is untouched (every spec-column field is still in each
   // row object), so a hidden column stays reachable through the row expander below.
+  // Issue #9009 (J1): narrow mode shrinks the visible-column budget further, from 6 down to 3 —
+  // "first 2-3 columns from the tool's existing column order" — reusing the exact same
+  // demoted-not-deleted mechanism `MAX_VISIBLE_COLUMNS` already relies on: a column past the
+  // budget stays reachable through the row expander below, it just doesn't get its own <th>.
+  const effectiveMaxVisibleColumns = isNarrow
+    ? Math.min(NARROW_MAX_VISIBLE_COLUMNS, MAX_VISIBLE_COLUMNS)
+    : MAX_VISIBLE_COLUMNS;
   const visibleColumns = useMemo(
-    () => spec.columns.slice(0, MAX_VISIBLE_COLUMNS),
-    [spec.columns],
+    () => spec.columns.slice(0, effectiveMaxVisibleColumns),
+    [spec.columns, effectiveMaxVisibleColumns],
   );
   const hiddenColumnCount = Math.max(
     0,
-    spec.columns.length - MAX_VISIBLE_COLUMNS,
+    spec.columns.length - effectiveMaxVisibleColumns,
   );
 
   const fieldColumns: EuiBasicTableColumn<ResultRow>[] = useMemo(
@@ -823,10 +969,13 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
           ...(isShortValueColumn(spec.rows, column.id)
             ? { width: SHORT_COLUMN_WIDTH }
             : {}),
-          render: renderDefaultCell,
+          // Issue #9009 (J1): narrow mode truncates the free-text columns with a tooltip instead of
+          // wrapping — the reproduction was cells wrapping onto several lines at ~480px, making the
+          // whole table unreadable. Full width keeps the existing renderer unchanged.
+          render: isNarrow ? renderNarrowTruncatedCell : renderDefaultCell,
         };
       }),
-    [visibleColumns, spec.severityColumn, spec.rows],
+    [visibleColumns, spec.severityColumn, spec.rows, isNarrow],
   );
 
   const columns: EuiBasicTableColumn<ResultRow>[] = useMemo(
@@ -847,15 +996,24 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
         // only exists because the reader deliberately expanded the row — cutting it off behind a
         // third scrollbar defeats the click they just made. EuiCodeBlock's own fullscreen control
         // handles a genuinely huge document.
+        // `id` (review, required minor): lets the expander button's own `aria-controls` point at
+        // exactly this content, the same relationship EUI's own expanding-row examples establish.
         map[String(rowIndex)] = (
-          <EuiCodeBlock language='json' paddingSize='s' fontSize='s' isCopyable>
-            {JSON.stringify(row, null, 2)}
-          </EuiCodeBlock>
+          <div id={`${bodyId}-expanded-row-${rowIndex}`}>
+            <EuiCodeBlock
+              language='json'
+              paddingSize='s'
+              fontSize='s'
+              isCopyable
+            >
+              {JSON.stringify(row, null, 2)}
+            </EuiCodeBlock>
+          </div>
         );
       }
     });
     return map;
-  }, [spec.rows, expandedRowIds]);
+  }, [spec.rows, expandedRowIds, bodyId]);
 
   const items = useMemo(
     () =>
@@ -890,9 +1048,43 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
     [items, pageStart, pageSize],
   );
 
+  // Issue #9009 (A1): EuiBasicTable's own default screen-reader caption is built from `items`
+  // alone — the CURRENT page's rows, since this component paginates by hand rather than through
+  // EuiBasicTable's own `pagination` prop — so a screen-reader user was told "This table contains
+  // 5 rows" on a 6-row result while the visible header said "Results (6 rows)". An explicit
+  // `tableCaption` always states the TOTAL (with the same plural handling as `titleText` above),
+  // plus the page position whenever the result actually spans more than one page.
+  //
+  // Review, required minor: `tableCaptionPaged` is its OWN self-contained message with every
+  // value as a plain ICU argument, rather than interpolating the ALREADY-TRANSLATED
+  // `tableCaptionTotal` string into it — nesting one translated string inside another freezes the
+  // sentence order the first translator chose, leaving a later translator no way to reorder
+  // "total" relative to "showing rows X-Y" for their language's grammar.
+  const tableCaption =
+    pageCount > 1
+      ? i18n.translate('wazuhAiAssistant.resultTable.tableCaptionPaged', {
+          defaultMessage:
+            'This table contains {total, plural, one {# row} other {# rows}}. ' +
+            'Showing rows {start}-{end}, page {page} of {pageCount}.',
+          values: {
+            total: spec.rows.length,
+            start: pageStart + 1,
+            end: Math.min(pageStart + pageSize, spec.rows.length),
+            page: safePageIndex + 1,
+            pageCount,
+          },
+        })
+      : i18n.translate('wazuhAiAssistant.resultTable.tableCaptionTotal', {
+          defaultMessage:
+            'This table contains {total, plural, one {# row} other {# rows}}.',
+          values: { total: spec.rows.length },
+        });
+
   const titleText =
+    // Issue #9009 (A2): was a literal 'Results ({count} rows)' with no plural handling — a
+    // single-row result read as the ungrammatical 'Results (1 rows)'. ICU plural via i18n.
     i18n.translate('wazuhAiAssistant.resultTable.accordionSummary', {
-      defaultMessage: 'Results ({count} rows)',
+      defaultMessage: 'Results ({count, plural, one {# row} other {# rows}})',
       values: { count: spec.rows.length },
     }) +
     // Column-budget disclosure (issue #8921): a column demoted past MAX_VISIBLE_COLUMNS is NOT
@@ -986,6 +1178,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
             itemIdToExpandedRowMap={itemIdToExpandedRowMap}
             isExpandable
             hasActions
+            tableCaption={tableCaption}
           />
         </div>
       ) : null}
@@ -994,13 +1187,13 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
           className='wzResultsCardFooter'
           style={{ display: isOpen ? undefined : 'none' }}
         >
-          {/* Hand-built pagination (not EuiTablePagination — see this component's PR/handoff
-              notes: this worktree has no installed node_modules to confirm that component's exact
-              prop shape against the OSD-bundled EUI version, and every element used below
-              (EuiButtonIcon/EuiButtonEmpty/EuiText) is already used/verified elsewhere in this
-              same file). Pinned in its own grid row (`wzResultsCardFooter`, never inside the
-              scrolling body), which is the acceptance check this whole rewrite exists for: "page 2
-              of 6 [must be] reachable without resizing the window". */}
+          {/* Hand-built pagination (not EuiTablePagination): pinned in its own grid row
+              (`wzResultsCardFooter`, never inside the scrolling body) is the acceptance check this
+              whole rewrite exists for — "page 2 of 6 [must be] reachable without resizing the
+              window" — and a hand-built footer keeps that pinned-row placement fully under this
+              component's own control rather than however EuiTablePagination happens to lay itself
+              out. Every element used below (EuiButtonIcon/EuiButtonEmpty/EuiText) is already
+              used/verified elsewhere in this same file. */}
           <EuiFlexGroup
             responsive={false}
             alignItems='center'

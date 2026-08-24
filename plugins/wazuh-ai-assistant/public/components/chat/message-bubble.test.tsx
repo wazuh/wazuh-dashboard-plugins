@@ -297,7 +297,7 @@ describe('MessageBubble', () => {
         />,
       );
 
-      expect(screen.getByText('Results (1 rows)')).toBeInTheDocument();
+      expect(screen.getByText('Results (1 row)')).toBeInTheDocument();
       expect(screen.getByText('web-01')).toBeInTheDocument();
       expect(screen.queryByText('The query returned no rows.')).toBeNull();
     });
@@ -329,6 +329,26 @@ describe('MessageBubble', () => {
       // "What did it actually look for?" is the first question a reader asks of a zero-result
       // answer, and the suppressed card is where that chip would otherwise have lived.
       expect(screen.getByText('Top agents · 90d')).toBeInTheDocument();
+    });
+
+    it('shows the tool name alone (no invented window) when the server recorded no provenance', () => {
+      // Issue #9008 blocker 1: `arguments: {}` used to make the OLD implementation default the
+      // window to "90d" itself; the rework must never do that — no `provenance` means no window.
+      render(
+        <MessageBubble
+          message={baseMessage({
+            role: 'assistant',
+            content: 'Nothing matched.',
+            table: EMPTY_TABLE,
+            toolCalls: [{ id: 't1', name: 'get_top_agents', arguments: {} }],
+          })}
+          resolveDiscoverUrl={noopResolveDiscoverUrl}
+          resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+        />,
+      );
+
+      expect(screen.getByText('Top agents')).toBeInTheDocument();
+      expect(screen.queryByText(/Top agents · /)).toBeNull();
     });
 
     // Issue #9008 review, minor 7: this raw view IS the popover's equivalent for a turn whose
@@ -588,7 +608,7 @@ describe('MessageBubble', () => {
       );
 
       const bubbleItem = screen
-        .getByText('Results (1 rows)')
+        .getByText('Results (1 row)')
         .closest('.euiFlexItem') as HTMLElement;
       // Breaking out means declining the 68ch prose measure and filling whatever the ROW allows —
       // which is now the shared content column ($wzContentMaxWidth), still wider than the prose. The
