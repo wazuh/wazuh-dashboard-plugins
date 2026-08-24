@@ -177,9 +177,20 @@ function timeFieldForIndex(index: string): string {
   return index.startsWith('wazuh-states') ? 'state.modified_at' : '@timestamp';
 }
 
-/** Builds the "index + time range only" fallback clause: everything field-level is dropped, only
- * the time bound survives (falling back to `extractTimeRange`'s own last-24-hours default when the
- * original `dsl` carried no recognizable range at all). */
+/**
+ * Builds the "index + time range only" fallback clause: everything field-level is dropped, only the
+ * time bound survives, read through `extractTimeRange` (common/discover-url.ts).
+ *
+ * What that reader substitutes for a bound the original `dsl` did not state is NOT uniform, and
+ * this function materializes whatever it returns into a real `range` clause the user will run:
+ *  - No recognizable range clause at all -> `extractTimeRange`'s last-24-hours `DEFAULT_TIME_RANGE`.
+ *  - A `gte`-only clause -> the stated lower bound, upper bound filled as `now`.
+ *  - An `lte`-only clause -> the stated upper bound, lower bound filled from the UNBOUNDED window
+ *    (epoch), not from `DEFAULT_TIME_RANGE.from`. Filling it with `now-24h` produced `gte` AFTER
+ *    `lte` for a clause bounded at a past instant — an inverted range matching nothing at all,
+ *    which is worse than a wide one. So an `lte`-only suggestion is emitted as `gte: 1970-01-01…`,
+ *    deliberately: "everything up to the stated instant" is what the clause actually meant.
+ */
 function buildTimeRangeOnlyDsl(
   index: string,
   dsl: Record<string, unknown>,
