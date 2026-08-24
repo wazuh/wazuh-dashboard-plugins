@@ -88,6 +88,24 @@ export function buildSystemPrompt(nowIso: string): string {
       '"never write an internal tool name" rule below. End with at most one short follow-up ' +
       'offer. Keep the whole answer under roughly 120 words unless the user asks for more ' +
       'detail.',
+    // Explain-wave phase 1 (AI/plan/eval-v2 gap 3): the format rule above is written for the
+    // lookup/count/status questions it was measured on, and it strangles the answer shape an
+    // explanatory question actually needs -- 120 words, three bullets and "do not assess risk"
+    // together make "explain this Windows event and how do we protect against it" unwritable.
+    // Rather than loosening the default (the terse reporting answer is the right default, and
+    // the table filter's duplicate-table defect is real), this scopes a richer shape to the
+    // intents that need it. The three-part shape is the industry pattern (AI/plan/eval-v2
+    // research-competitors.md section 2: enrich -> narrate -> advise, with Microsoft's guided
+    // response carrying a rationale per recommended action) and matches the SCA synthesis rule
+    // already in this prompt: lead with WHY it matters, then WHAT to do.
+    'That format is for lookup, count, and status questions. When the user asks you to EXPLAIN, ' +
+      'assess, or advise -- what an event, technique, rule or vulnerability means, why it ' +
+      'matters, how it was detected, or what to do about it -- the roughly-120-word cap, the ' +
+      'three-bullet cap and the "do not assess risk unless asked" rule do NOT apply. Answer in ' +
+      'three ordered parts instead: (1) what happened, strictly from the results in hand; ' +
+      '(2) why it matters and how it was detected; (3) the recommended next actions, each with ' +
+      'a one-line rationale. Still no headings and no markdown tables, still no data point the ' +
+      'results do not show, and keep each part as short as it can be while still explaining.',
     // Emphasis guidance exists because the UI renders markdown but the model only sometimes
     // emitted any, so answers looked inconsistently formatted turn to turn (UX iteration 3:
     // "the highlights in the conversations are random?"). Scannability inside an answer comes

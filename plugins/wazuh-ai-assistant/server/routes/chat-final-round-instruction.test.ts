@@ -169,17 +169,24 @@ test('willBeFinalRound: false when neither latch is set and the structural cap h
   assert.equal(willBeFinalRound(1, false, false), false);
 });
 
-test('FINAL_ROUND_ANSWER_INSTRUCTION: constrains the model to the gathered results', () => {
+test('FINAL_ROUND_ANSWER_INSTRUCTION: constrains every FACT to the gathered results', () => {
   // Guards the anti-fabrication property against a well-meaning future reword. Asking a model for
   // an answer it cannot support is how invented counts and agent names appear — the instruction has
   // to buy analysis WITHOUT buying invention, and has to leave the honest "I can't answer" reachable.
+  // Explain-wave phase 1 narrowed the clause from "only the tool results" (which also banned
+  // interpretation) to "every FACT about this environment", so the grounding assertion now pins the
+  // DATA scope explicitly — see the advisory test below for the other half.
   assert.match(
     FINAL_ROUND_ANSWER_INSTRUCTION,
-    /only the tool results already gathered/i,
+    /Every FACT about this environment/,
   );
   assert.match(
     FINAL_ROUND_ANSWER_INSTRUCTION,
-    /do not state anything the results do not show/i,
+    /must come from the tool results already\s+gathered/i,
+  );
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /never state a data point the results do not show/i,
   );
   assert.match(FINAL_ROUND_ANSWER_INSTRUCTION, /say so plainly/i);
   // UI run 2026-08-14 (B3): on the forced final round the model answered AND announced "Let me
@@ -193,6 +200,46 @@ test('FINAL_ROUND_ANSWER_INSTRUCTION: constrains the model to the gathered resul
   assert.match(
     FINAL_ROUND_ANSWER_INSTRUCTION,
     /no\s+more tool calls will run/i,
+  );
+});
+
+// Explain-wave phase 1 (AI/plan/eval-v2 gap 1): this instruction lands on the round where an
+// "explain this event / how do we protect against it" answer has to be written, and its old
+// blanket wording forbade exactly the knowledge such an answer needs (what a technique is, what
+// mitigates it) — knowledge no tool in this product returns. The two properties below must hold
+// TOGETHER: advisory content is unlocked, and it is fenced so it can never be read as observed
+// data. A reword that drops either one re-breaks a whole question class or opens a fabrication
+// path, so both are pinned here.
+test('FINAL_ROUND_ANSWER_INSTRUCTION: permits general security knowledge for the explanatory half', () => {
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /MAY use your general security knowledge/,
+  );
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /why it matters, how it is detected, or how to protect against it/i,
+  );
+});
+
+test('FINAL_ROUND_ANSWER_INSTRUCTION: fences that knowledge off from observed data', () => {
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /clearly separate part of the answer/i,
+  );
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /framed as guidance rather than as something observed in the data/i,
+  );
+  // Mirrors the shipped Group E how-to policy in prompts.ts (answer from general knowledge, but
+  // say it needs verifying) rather than inventing a second, divergent disclaimer rule.
+  assert.match(FINAL_ROUND_ANSWER_INSTRUCTION, /verified before acting on it/i);
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /Never present general knowledge as an environment fact/i,
+  );
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /never invent data to support it/i,
   );
 });
 

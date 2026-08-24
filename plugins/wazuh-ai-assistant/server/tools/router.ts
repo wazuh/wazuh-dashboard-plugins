@@ -310,6 +310,18 @@ export const CHAIN_PAIRS: Record<string, readonly string[]> = {
   search_findings_by_agent: ['find_document_by_field'],
   search_findings_by_rule_title: ['find_document_by_field'],
   search_findings_by_rule_tag: ['find_document_by_field'],
+  // Explain-wave phase 1 (AI/plan/eval-v2 gap 5). `mitre` and `get_events_by_agent` were the two
+  // row-producing routes with no way out of their own category: an "explain this MITRE incident --
+  // when was it detected and how" turn could list technique rows but never pivot to the document
+  // behind one, and an events turn could never do so either, because resolveStage2Tools only ever
+  // appends `search_wazuh_data` unconditionally, never the whole free_search category (see its doc
+  // comment). get_rules is the detection-side companion: the technique row names a rule, and
+  // get_rules is the only tool that returns a rule DESCRIPTION (document.metadata.description) to
+  // explain what it detects. Note it reads the Security Analytics catalog, not the Wazuh Manager
+  // ruleset -- the prompt already tells the model to say so, so this edge widens reach without
+  // implying a coverage it does not have.
+  get_mitre_findings: ['find_document_by_field', 'get_rules'],
+  get_events_by_agent: ['find_document_by_field'],
 };
 
 /**

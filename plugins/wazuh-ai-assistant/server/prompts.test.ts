@@ -848,3 +848,58 @@ test(
     );
   },
 );
+
+// --- Explain-wave phase 1: intent-conditional answer format (AI/plan/eval-v2 gap 3) -------------
+//
+// The default answer-format rule (roughly 120 words, at most three bullets, no headings, "do not
+// assess risk unless asked") was written for lookup/count/status questions and made an
+// explanatory answer unwritable. The relaxation is scoped BY INTENT rather than applied globally,
+// so these tests pin both halves: the tight default must survive, and the explain/assess/advise
+// intents must escape it with a named answer shape.
+
+test('explain-wave: the tight default answer format is still stated for lookup-style questions', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /Keep the whole answer under roughly 120 words unless the user asks for more/,
+  );
+  assert.match(prompt, /at most three short bullet points/);
+  assert.match(
+    prompt,
+    /That format is for lookup, count, and status questions/,
+    'the relaxation must name the intents the tight format keeps, or it reads as a global lift',
+  );
+});
+
+test('explain-wave: explain/assess/advise intents are exempted from the word, bullet and risk caps', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /When the user asks you to EXPLAIN, assess, or advise/);
+  assert.match(
+    prompt,
+    /the roughly-120-word cap, the\s+three-bullet cap and the "do not assess risk unless asked" rule do NOT apply/,
+  );
+});
+
+test('explain-wave: the explanatory answer shape is what happened -> why it matters/how detected -> actions with rationale', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /\(1\) what happened, strictly from the results in hand/,
+  );
+  assert.match(prompt, /\(2\) why it matters and how it was detected/);
+  assert.match(
+    prompt,
+    /\(3\) the recommended next actions, each with\s+a one-line rationale/,
+  );
+});
+
+test('explain-wave: the relaxation does not lift the no-headings, no-table or grounding rules', () => {
+  // The markdown-table filter (markdown-table-filter.ts) still strips tables from prose, and the
+  // grounding rule is the one thing no intent may relax -- a richer SHAPE must not become a licence
+  // to state data the results do not contain.
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /Still no headings and no markdown tables, still no data point the\s+results do not show/,
+  );
+});

@@ -518,11 +518,21 @@ const NO_ANSWER_MESSAGE =
  * itself make.
  *
  * Every clause is load-bearing, so edit with care:
- *  - "using only the tool results already gathered" and "Do not state anything the results do not
- *    show" keep this from becoming a fabrication prompt. Asking a model to produce an answer it
- *    could not support is exactly how invented numbers and agent names appear, and the fallbacks
- *    above exist precisely because an honest silence was preferable to that. The instruction has
- *    to buy analysis WITHOUT buying invention.
+ *  - the DATA half ("every fact about this environment ... must come from the tool results already
+ *    gathered", "never state a data point the results do not show") keeps this from becoming a
+ *    fabrication prompt. Asking a model to produce an answer it could not support is exactly how
+ *    invented numbers and agent names appear, and the fallbacks above exist precisely because an
+ *    honest silence was preferable to that. The instruction has to buy analysis WITHOUT buying
+ *    invention.
+ *  - the ADVISORY half (explain-wave phase 1, AI/plan/eval-v2 gap 1) is what makes an
+ *    explanation writable at all. The earlier blanket "using only the tool results ... do not
+ *    state anything the results do not show" landed on the very round where an "explain this
+ *    event / how do we protect against it" answer has to be written, so the model was told not to
+ *    say what a technique IS or what mitigates it -- knowledge no tool in this product returns.
+ *    The split is between FACTS ABOUT THIS ENVIRONMENT (grounded, no exceptions) and
+ *    INTERPRETATION (general security knowledge, permitted but clearly separated and hedged),
+ *    which is the same shape as the shipped Group E how-to policy in prompts.ts: answer from
+ *    general knowledge, mark it, never dress it up as observed fact.
  *  - "If they do not answer the question, say so plainly" gives the model a licensed exit, so the
  *    honest outcome stays reachable rather than being squeezed out by the request for text.
  *  - no mention of tools being unavailable: the round already omits `tools` entirely, and naming
@@ -556,9 +566,16 @@ const NO_ANSWER_MESSAGE =
 export const ROUND_TEXT_SEPARATOR = '\n\n';
 
 export const FINAL_ROUND_ANSWER_INSTRUCTION =
-  "Now answer the user's question directly, using only the tool results already gathered in " +
-  'this conversation. Do not state anything the results do not show. If they do not answer the ' +
-  'question, say so plainly and state what is missing. This is your final step here: do ' +
+  "Now answer the user's question directly. Every FACT about this environment -- counts, " +
+  'names, ids, entities, timestamps, statuses -- must come from the tool results already ' +
+  'gathered in this conversation: never state a data point the results do not show, and if ' +
+  'they do not answer the question, say so plainly and state what is missing. Explanation and ' +
+  'recommendations are the exception: when the question asks what an event, technique, rule or ' +
+  'vulnerability means, why it matters, how it is detected, or how to protect against it, you ' +
+  'MAY use your general security knowledge -- keep it in a clearly separate part of the answer, ' +
+  'framed as guidance rather than as something observed in the data, and note that it should be ' +
+  'verified before acting on it. Never present general knowledge as an environment fact, and ' +
+  'never invent data to support it. This is your final step here: do ' +
   'not announce further data pulls or say you will now fetch/break down anything else — no ' +
   'more tool calls will run. Offering the user a follow-up they can ASK for is fine. Then ' +
   'state plainly what the gathered results do and do not cover (for example, which agents, ' +
