@@ -47,7 +47,7 @@ server/            Server plugin
   crypto/              api-key-cipher.ts (AES-256-GCM, enc:v1 read/write)
   saved_objects/       provider-settings, conversation, assistant-settings (all hidden types)
   prompts.ts           the system prompt
-translations/      en-US.json / es-ES.json
+translations/      es-ES.json (English is the source language, in each `defaultMessage`)
 eval/              Test + measurement harness (see eval/README.md)
 docs/              ENCRYPTION.md (API-key encryption at rest), CI.md (test gates & harness)
 ```

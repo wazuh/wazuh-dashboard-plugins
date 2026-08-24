@@ -82,5 +82,13 @@ on provider/settings reads and writes, owner scoping on conversations):
 
 ## Internationalization
 
-The UI ships with full English/Spanish parity (`translations/en-US.json`, `es-ES.json`), and the
-assistant answers in the language of the question.
+English is the source language: every UI string carries its English text in the `defaultMessage` of
+its `i18n.translate(...)` call, which is what the dashboard renders at the default `i18n.locale`
+(`en`). Spanish is the one translated catalog, `translations/es-ES.json`, loaded only when the
+dashboard runs with `i18n.locale: es-ES`; `plugins/wazuh-ai-assistant/common/translation-catalog.test.ts`
+keeps it in step with the source (same ids, same ICU placeholders). Server-composed strings — route
+errors and tool status messages — are English regardless of locale.
+
+The catalog covers UI chrome only. Model answers are not translated: the system prompt instructs the
+assistant to answer in the language of the user's most recent message (Spanish or English), so the
+chat replies in Spanish to a Spanish question even on an English dashboard, and vice versa.
