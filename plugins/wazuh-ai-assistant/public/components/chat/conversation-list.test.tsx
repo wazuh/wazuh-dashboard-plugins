@@ -677,9 +677,7 @@ describe('ConversationList', () => {
       expect(row?.contains(pencil)).toBe(true);
       expect(flexGroup?.contains(pencil)).toBe(false);
 
-      const overlay = pencil.closest(
-        '.wzConvoRowRenameOverlay',
-      ) as HTMLElement;
+      const overlay = pencil.closest('.wzConvoRowRenameOverlay') as HTMLElement;
       expect(overlay).not.toBeNull();
       expect(overlay.style.opacity).toBe('0');
       expect(overlay.style.pointerEvents).toBe('none');
@@ -708,9 +706,7 @@ describe('ConversationList', () => {
       const pencil = screen.getByRole('button', {
         name: 'Rename conversation',
       });
-      const overlay = pencil.closest(
-        '.wzConvoRowRenameOverlay',
-      ) as HTMLElement;
+      const overlay = pencil.closest('.wzConvoRowRenameOverlay') as HTMLElement;
       // Selected but neither hovered nor focused -- must still be at rest, unlike the pre-fix
       // condition which also checked `isSelected`.
       expect(overlay.style.opacity).toBe('0');
@@ -1042,9 +1038,9 @@ describe('ConversationList', () => {
         toolbar.querySelector('[aria-label="Cancel selection"]'),
       ).not.toBeNull();
       expect(screen.getByRole('button', { name: 'Delete (0)' })).toBeTruthy();
-      expect(toolbar.contains(screen.getByRole('button', { name: 'Delete (0)' }))).toBe(
-        true,
-      );
+      expect(
+        toolbar.contains(screen.getByRole('button', { name: 'Delete (0)' })),
+      ).toBe(true);
     });
 
     it('entering select mode shows a checkbox per row and hides the delete/rename icons', () => {

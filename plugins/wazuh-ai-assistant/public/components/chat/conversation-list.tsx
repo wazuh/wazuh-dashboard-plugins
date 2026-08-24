@@ -732,11 +732,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
         // EuiButtonEmpty so its own translated string can never be the thing that overflows, and
         // Delete keeps its short `Delete ({count})` label, which already fits both locales at
         // both known toolbar widths (260px inline rail / ~288px docked popover).
-        <EuiFlexGroup
-          responsive={false}
-          alignItems='center'
-          gutterSize='s'
-        >
+        <EuiFlexGroup responsive={false} alignItems='center' gutterSize='s'>
           <EuiFlexItem grow style={{ minWidth: 0 }}>
             <EuiText size='xs' color='subdued' style={truncateTextStyle}>
               {i18n.translate(
@@ -1142,9 +1138,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                               onFocus={() => setFocusedId(conversation.id)}
                               onBlur={() =>
                                 setFocusedId(current =>
-                                  current === conversation.id
-                                    ? null
-                                    : current,
+                                  current === conversation.id ? null : current,
                                 )
                               }
                             />
