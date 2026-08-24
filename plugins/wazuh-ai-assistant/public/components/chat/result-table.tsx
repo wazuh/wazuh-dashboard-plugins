@@ -57,11 +57,19 @@ const PAGE_SIZE_OPTIONS = [5, 10, 25, 50];
  * pixel threshold can never be right for every column count. The rule is now adaptive: go narrow
  * whenever the card cannot give each would-be-visible column at least `MIN_COLUMN_WIDTH_PX` —
  * an id/date/short-value column's readable floor, not a strict character budget — i.e.
- * `width < candidateColumnCount * MIN_COLUMN_WIDTH_PX` (see `candidateColumnCount` below). A
- * 6-column table now goes narrow under ~720px, a 3-column table stays full down to ~360px, and
- * the original 480px repro (>= 3 candidate columns) stays narrow either way.
+ * `width < candidateColumnCount * MIN_COLUMN_WIDTH_PX` (see `candidateColumnCount` below).
+ *
+ * Issue #9009 (J1, second follow-up): 120 was still too tight. A live repro on the deployed build
+ * measured the card at ~728px with a 6-column table — the quantizer (see `WIDTH_QUANTUM_PX`)
+ * floors that to 720, and `720 < 6 * 120 = 720` is false by exactly the boundary, so the table
+ * stayed full-width and wrapped every cell vertically anyway. And the real columns this renderer
+ * actually carries — an id/UUID, a rule/finding title, a formatted timestamp — need noticeably
+ * more than 120px per column to read on one line regardless of the boundary math. Raised to 140:
+ * a 6-column table now goes narrow under ~840px (comfortably clearing the 728px repro), a
+ * 3-column table stays full down to ~420px, and the original 480px repro (>= 3 candidate columns)
+ * stays narrow either way.
  */
-const MIN_COLUMN_WIDTH_PX = 120;
+const MIN_COLUMN_WIDTH_PX = 140;
 /** Issue #9009 (J1): column budget in narrow mode — "first 2-3 columns from the tool's existing
  * column order", the same order `MAX_VISIBLE_COLUMNS` already respects at full width. Every
  * demoted column stays reachable through the row expander, same as `MAX_VISIBLE_COLUMNS` above. */

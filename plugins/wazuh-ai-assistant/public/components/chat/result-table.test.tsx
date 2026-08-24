@@ -1218,8 +1218,8 @@ describe('ResultTable', () => {
     });
 
     it('shows only the first NARROW_MAX_VISIBLE_COLUMNS (3) columns once the container measures narrow', () => {
-      // wideColumnSpec has 4 columns, so its adaptive threshold is 4 * MIN_COLUMN_WIDTH_PX (120)
-      // = 480px — comfortably below it, rather than exactly at it, so this test isn't sitting on
+      // wideColumnSpec has 4 columns, so its adaptive threshold is 4 * MIN_COLUMN_WIDTH_PX (140)
+      // = 560px — comfortably below it, rather than exactly at it, so this test isn't sitting on
       // the boundary itself (that's covered separately below).
       const restore = stubContainerWidth(400);
       try {
@@ -1294,12 +1294,17 @@ describe('ResultTable', () => {
      * Issue #9009 (J1, follow-up): a live finding on the deployed build showed a 6-column table
      * still wrapping every cell at ~600-800px card widths — the old FIXED 560px threshold only
      * ever covered the original ~480px repro's column count. The threshold is now adaptive:
-     * `isNarrow = width < candidateColumnCount * MIN_COLUMN_WIDTH_PX` (120), where
+     * `isNarrow = width < candidateColumnCount * MIN_COLUMN_WIDTH_PX` (140), where
      * `candidateColumnCount` is the number of columns full-width mode would actually render for
-     * this spec (capped by `MAX_VISIBLE_COLUMNS`, not the raw field count). These cases lock the
-     * three concrete widths this fix exists for: a 6-column table now goes narrow well above the
-     * old 560px cutoff, while a 3-column table — which already fits comfortably at widths the old
-     * fixed threshold used to needlessly narrow — stays full down to a much smaller width.
+     * this spec (capped by `MAX_VISIBLE_COLUMNS`, not the raw field count).
+     *
+     * Issue #9009 (J1, second follow-up): a further live finding showed the 120px-per-column
+     * version of this same rule still failing at the exact boundary — a ~728px card with 6
+     * columns quantizes to 720, and `720 < 6 * 120 = 720` is false by exactly one quantization
+     * step, so the table stayed full-width and wrapped anyway. `MIN_COLUMN_WIDTH_PX` is now 140
+     * (real id/title/timestamp columns need that much to read on one line), which raises the
+     * 6-column threshold to 840 and the 3-column threshold to 420 and clears that repro with
+     * room to spare. These cases lock the concrete widths this fix exists for.
      */
     describe('adaptive threshold (J1 follow-up)', () => {
       function columnsSpec(count: number): TableSpec {
@@ -1319,8 +1324,8 @@ describe('ResultTable', () => {
         };
       }
 
-      it('goes narrow for a 6-column table at 700px (below its 720px threshold)', () => {
-        const restore = stubContainerWidth(700);
+      it('goes narrow for a 6-column table at 800px (below its 840px threshold)', () => {
+        const restore = stubContainerWidth(800);
         try {
           render(<ResultTable spec={columnsSpec(6)} />);
           const headerTexts = screen
@@ -1336,7 +1341,22 @@ describe('ResultTable', () => {
         }
       });
 
-      it('stays full-width (no cell truncation) for a 3-column table at 500px (above its 360px threshold)', () => {
+      it('stays full-width for a 6-column table at 860px (quantizes to 840, at its threshold)', () => {
+        // The live-repro boundary case (see the describe block's doc comment): 860 quantizes down
+        // to 840, exactly the 6-column threshold, so it must stay full rather than narrow.
+        const restore = stubContainerWidth(860);
+        try {
+          render(<ResultTable spec={columnsSpec(6)} />);
+          const headerTexts = screen
+            .getAllByRole('columnheader')
+            .map(header => header.textContent ?? '');
+          expect(headerTexts).toContain('Field 3');
+        } finally {
+          restore();
+        }
+      });
+
+      it('stays full-width (no cell truncation) for a 3-column table at 500px (above its 420px threshold)', () => {
         const restore = stubContainerWidth(500);
         try {
           render(
@@ -1380,11 +1400,24 @@ describe('ResultTable', () => {
         }
       });
 
+      it('goes narrow for a 6-column table at the live-repro 700px card width (still below its 840px threshold)', () => {
+        const restore = stubContainerWidth(700);
+        try {
+          render(<ResultTable spec={columnsSpec(6)} />);
+          const headerTexts = screen
+            .getAllByRole('columnheader')
+            .map(header => header.textContent ?? '');
+          expect(headerTexts).not.toContain('Field 3');
+        } finally {
+          restore();
+        }
+      });
+
       it('a raw column count above MAX_VISIBLE_COLUMNS uses the capped count, not the raw one', () => {
         // 8 raw columns still only ever render 6 at full width (MAX_VISIBLE_COLUMNS), so the
         // narrow threshold must be sized off that 6, not the raw 8 — otherwise this table would
-        // wrongly need 960px (8 * 120) to stay full instead of the correct 720px (6 * 120).
-        const restore = stubContainerWidth(700);
+        // wrongly need 1120px (8 * 140) to stay full instead of the correct 840px (6 * 140).
+        const restore = stubContainerWidth(800);
         try {
           render(<ResultTable spec={columnsSpec(8)} />);
           const headerTexts = screen
@@ -1417,10 +1450,12 @@ describe('ResultTable', () => {
         };
       }
 
-      it("boundary sanity: stays full exactly at a 3-column table's 360px threshold", () => {
-        // Strict `<`, not `<=`: a width exactly AT the threshold still gives every candidate
-        // column its minimum, so it must not be narrow.
-        const restore = stubContainerWidth(360);
+      it("boundary sanity: stays full at the first quantization bucket (440px) at/above the 3-column table's 420px threshold", () => {
+        // 420 is not itself a multiple of the 40px quantization bucket, so there is no width that
+        // quantizes to exactly 420 — the real boundary is the bucket edge either side of it: 440
+        // quantizes to 440 (>= 420, stays full), 400 quantizes to 400 (< 420, goes narrow; see the
+        // next case). Strict `<`, not `<=`, on the (already-quantized) width vs. the threshold.
+        const restore = stubContainerWidth(440);
         try {
           render(<ResultTable spec={threeColumnSpecWithLongCell()} />);
           const cell = screen.getByText(
@@ -1432,8 +1467,8 @@ describe('ResultTable', () => {
         }
       });
 
-      it('boundary sanity: goes narrow just one quantization bucket below that threshold', () => {
-        const restore = stubContainerWidth(320);
+      it('boundary sanity: goes narrow just one quantization bucket below that threshold (400px)', () => {
+        const restore = stubContainerWidth(400);
         try {
           render(<ResultTable spec={threeColumnSpecWithLongCell()} />);
           const cell = screen.getByText(
