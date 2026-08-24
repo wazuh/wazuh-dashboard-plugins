@@ -9,6 +9,7 @@ import {
   describeTimeRangeCoverage,
   extractTimeRange,
 } from '../../../common/discover-url';
+import { shortDateMath } from './tool-call-label';
 
 export type ResolveDiscoverUrl = (spec: TableSpec) => Promise<string | null>;
 
@@ -72,7 +73,17 @@ export function createDiscoverUrlResolver(core: CoreStart): ResolveDiscoverUrl {
     const discoverAppUrl = core.http.basePath.prepend(
       '/app/data-explorer/discover',
     );
-    const timeRange = extractTimeRange(spec.discover.dsl);
+    // `provenance.executedAt` is the reference the SERVER resolved this DSL's own window against
+    // when it recorded `provenance.effectiveRange` (executor.ts). Passing it back in is what makes
+    // the window this link opens and the window the evidence popover states the same computation
+    // over the same clauses — a multi-clause DSL whose bounds mix date-math and ISO can only be
+    // intersected identically on both sides if both sides order it against the same instant
+    // (issue #9008 review, F1). Absent on a conversation persisted before that field existed, in
+    // which case both sides fall back to the same unordered result.
+    const timeRange = extractTimeRange(
+      spec.discover.dsl,
+      spec.provenance?.executedAt,
+    );
     return buildDiscoverUrl({
       discoverAppUrl,
       indexPatternId,
@@ -99,26 +110,46 @@ function defaultRangeWindowLabel(): string {
 
 /**
  * Short rendering of the ONE bound a one-sided range clause stated, for the partial-range
- * disclosure below. Date-math (`now`, `now-7d`) is kept literal — it is already the shortest and
- * most familiar form; an ISO instant becomes a locale date with NO time-of-day, unlike
- * tool-call-label.ts's `formatInstant` which needs it. That is deliberate rather than shared code:
- * this string goes inside a button label that already carries "Open in Discover" plus the
- * disclosure wording, and the whole label has to stay short enough not to wrap in the narrow
- * (sidecar) panel — a full ISO instant alone is 24 characters. Anything unparseable is passed
- * through untouched rather than guessed at.
+ * disclosure below.
+ *
+ * A date-math bound goes through `shortDateMath` — the SAME shorthand the provenance chip beside
+ * this button renders its window with (issue #9008 review, F5), so `now-90d` reads "90d" in both
+ * places rather than "90d" on the chip and "now-90d" one control away. `now` itself is not that
+ * shape and stays literal.
+ *
+ * An ISO instant becomes a locale date with NO time-of-day, unlike tool-call-label.ts's
+ * `formatInstant` which needs it: this string goes inside a button label that already carries
+ * "Open in Discover" plus the disclosure wording, and the whole label has to stay short enough not
+ * to wrap in the narrow (sidecar) panel — a full ISO instant alone is 24 characters.
+ *
+ * The locale is OSD's own (`i18n.getLocale()`, guarded exactly as conversation-list.tsx's
+ * `formatRelativeTime` guards it — the test environment's i18n stub does not implement it), NOT
+ * `undefined`, which would hand `Intl` the host's locale and print an English month name inside a
+ * Spanish sentence (issue #9008 review, F4). Anything unparseable is passed through untouched
+ * rather than guessed at.
  */
 function shortBoundLabel(value: string): string {
-  if (/^now(-\d+[dhm])?$/.test(value)) {
-    return value;
+  const dateMath = shortDateMath(value);
+  if (dateMath) {
+    return dateMath;
   }
   const parsed = Date.parse(value);
-  return Number.isNaN(parsed)
-    ? value
-    : new Intl.DateTimeFormat(undefined, {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      }).format(new Date(parsed));
+  if (Number.isNaN(parsed)) {
+    return value;
+  }
+  const locale =
+    typeof i18n.getLocale === 'function' ? i18n.getLocale() : undefined;
+  try {
+    return new Intl.DateTimeFormat(locale, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(new Date(parsed));
+  } catch {
+    // Same defensive shape as `formatRelativeTime`: an unsupported locale tag must never take the
+    // whole result card's header down with it.
+    return new Date(parsed).toLocaleDateString();
+  }
 }
 
 /**
@@ -139,8 +170,11 @@ function shortBoundLabel(value: string): string {
  *    out loud which edge the query left open, in the same label slot and style as the other
  *    disclosure (no second UI element), and short enough not to wrap in the narrow panel.
  */
-function discoverLinkLabel(dsl: Record<string, unknown> | undefined): string {
-  const { coverage, statedBound } = describeTimeRangeCoverage(dsl);
+function discoverLinkLabel(
+  dsl: Record<string, unknown> | undefined,
+  executedAt: number | undefined,
+): string {
+  const { coverage, statedBound } = describeTimeRangeCoverage(dsl, executedAt);
   switch (coverage) {
     case 'defaulted': {
       return i18n.translate(
@@ -212,6 +246,14 @@ export const DiscoverLink: React.FC<DiscoverLinkProps> = ({
     return null;
   }
 
+  // One label slot, four wordings — see `discoverLinkLabel` above for what each discloses. Same
+  // `executedAt` reference the href was resolved with, so the label can only ever describe the
+  // window this button actually opens.
+  const label = discoverLinkLabel(
+    spec.discover?.dsl,
+    spec.provenance?.executedAt,
+  );
+
   return (
     <EuiButtonEmpty
       size='xs'
@@ -219,9 +261,12 @@ export const DiscoverLink: React.FC<DiscoverLinkProps> = ({
       href={url}
       target='_blank'
       rel='noopener noreferrer'
+      // The label ellipses in a narrow container (result-table.scss's `.wzResultsCardActions`),
+      // so the full wording has to stay reachable somewhere: `title` is that somewhere, and it
+      // costs nothing when the label fits.
+      title={label}
     >
-      {/* One label slot, four wordings — see `discoverLinkLabel` above for what each discloses. */}
-      {discoverLinkLabel(spec.discover?.dsl)}
+      {label}
     </EuiButtonEmpty>
   );
 };

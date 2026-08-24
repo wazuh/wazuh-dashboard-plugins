@@ -1116,7 +1116,13 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
           </EuiFlexItem>
         ))}
         {resolveDiscoverUrl && spec.discover ? (
-          <EuiFlexItem grow={false}>
+          // `minWidth: 0` (issue #9008 review, F6): a flex item's default `min-width: auto` refuses
+          // to shrink below its content, so the partial-range disclosure — the longest label this
+          // slot can carry, up to ~60 characters — pushed the actions row past the card's width in
+          // a narrow (sidecar) container instead of ellipsing. Paired with
+          // `.wzResultsCardActions`'s own truncation rule (result-table.scss), which is what the
+          // shrink actually resolves to; the untruncated text stays reachable as the link's title.
+          <EuiFlexItem grow={false} style={{ minWidth: 0 }}>
             <DiscoverLink spec={spec} resolveDiscoverUrl={resolveDiscoverUrl} />
           </EuiFlexItem>
         ) : null}

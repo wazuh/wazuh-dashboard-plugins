@@ -43,8 +43,10 @@ function humanizeToolName(name: string): string {
 /** `now-24h` -> "24h", `now-90d` -> "90d". This is the SAME date-math shorthand reader used
  * everywhere a bound needs a short label — a bound that is not this shape (a plain ISO instant,
  * or literal "now") returns `undefined` rather than being approximated, so the only other path
- * (`spanShortLabel` below) is the one that ever computes a duration from two resolved instants. */
-function shortDateMath(value: string): string | undefined {
+ * (`spanShortLabel` below) is the one that ever computes a duration from two resolved instants.
+ * Exported for discover-link.tsx, whose partial-range disclosure sits directly beside a provenance
+ * chip and must not render the same date-math bound in a second, different shorthand. */
+export function shortDateMath(value: string): string | undefined {
   const match = /^now-(\d+[dhm])$/.exec(value);
   return match ? match[1] : undefined;
 }
@@ -76,6 +78,13 @@ export interface ToolCallLabel {
  * wrong. Now: zero-length reads `0m`, and an inverted span returns `undefined` so `spanShortLabel`
  * falls back to printing the two literal bounds — which shows the reader the inversion itself
  * ("Jan 8 → Jan 1") rather than a duration that was never real. Nothing here invents a sign.
+ *
+ * `0m` is reserved for an EXACTLY zero-length window (issue #9008 review, F3). Any non-empty span
+ * shorter than a minute reads `<1m` instead, and is never rounded into the minute bucket: rounding
+ * put "matched a single instant" and "20 seconds wide" behind one indistinguishable `0m`, and
+ * rounded a 40-second window UP to a `1m` it never covered — the same collapsing of distinct states
+ * the `1d` floor above was, at the other end of the scale. `<1m` is the only approximate label this
+ * function emits, and it says so.
  */
 function formatDurationShort(durationMs: number): string | undefined {
   if (durationMs < 0) {
@@ -83,6 +92,9 @@ function formatDurationShort(durationMs: number): string | undefined {
   }
   if (durationMs === 0) {
     return '0m';
+  }
+  if (durationMs < MS_PER_UNIT.m) {
+    return '<1m';
   }
   const units: Array<[string, number]> = [
     ['y', MS_PER_UNIT.y],
@@ -101,6 +113,7 @@ function formatDurationShort(durationMs: number): string | undefined {
     'm',
     MS_PER_UNIT.m,
   ];
+  // Never rounds to 0: everything below a minute already returned `<1m` above.
   return `${Math.round(durationMs / unitMs)}${unit}`;
 }
 

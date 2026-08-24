@@ -412,11 +412,135 @@ test('rangeBoundsFromDsl: an unorderable pair keeps the first clause rather than
   assert.deepEqual(rangeBoundsFromDsl(dsl), { gte: 'now-90d', lte: 'now' });
 });
 
-test('rangeBoundsFromDsl: a one-sided clause is dropped, not intersected with a bounded one', () => {
+test('rangeBoundsFromDsl: a one-sided clause contributes the bound it DID state', () => {
+  // Every clause here sits in `bool.filter`, so the rows that came back satisfied all of them: the
+  // lone `lte` really does cap the window, even though that clause states nothing about the lower
+  // edge. Nothing is invented — the reported `gte` is the one the other clause stated.
+  const dsl = {
+    bool: {
+      filter: [
+        { range: { '@timestamp': { lte: '2026-02-15T00:00:00.000Z' } } },
+        {
+          range: {
+            '@timestamp': {
+              gte: '2026-02-01T00:00:00.000Z',
+              lte: '2026-03-01T00:00:00.000Z',
+            },
+          },
+        },
+      ],
+    },
+  };
+  assert.deepEqual(rangeBoundsFromDsl(dsl), {
+    gte: '2026-02-01T00:00:00.000Z',
+    lte: '2026-02-15T00:00:00.000Z',
+  });
+});
+
+test('rangeBoundsFromDsl: two complementary one-sided clauses together bound both edges', () => {
   const dsl = {
     bool: {
       filter: [
         { range: { '@timestamp': { lte: '2026-01-01T00:00:00.000Z' } } },
+        { range: { '@timestamp': { gte: '2025-01-01T00:00:00.000Z' } } },
+      ],
+    },
+  };
+  assert.deepEqual(rangeBoundsFromDsl(dsl), {
+    gte: '2025-01-01T00:00:00.000Z',
+    lte: '2026-01-01T00:00:00.000Z',
+  });
+});
+
+test('rangeBoundsFromDsl: undefined when every clause leaves the SAME side open', () => {
+  // Two `lte`s bound only the upper edge however many there are, so no lower bound was ever
+  // stated and none is reported — the "never invent a bound" rule, unchanged.
+  const dsl = {
+    bool: {
+      filter: [
+        { range: { '@timestamp': { lte: '2026-01-01T00:00:00.000Z' } } },
+        { range: { '@timestamp': { lte: '2025-06-01T00:00:00.000Z' } } },
+      ],
+    },
+  };
+  assert.equal(rangeBoundsFromDsl(dsl), undefined);
+  // ...but the LINK still needs an openable window, and it takes the narrower of the two uppers.
+  assert.deepEqual(extractTimeRange(dsl), {
+    from: UNBOUNDED_TIME_RANGE.from,
+    to: '2025-06-01T00:00:00.000Z',
+  });
+});
+
+// --- Issue #9008 review, F2: clauses are partitioned BY FIELD before being intersected -----------
+// A DSL bounding two different timestamp fields describes two independent axes. Taking the latest
+// lower of one against the earliest upper of the other produces a window that exists in neither --
+// routinely an INVERTED one, which would then be recorded as a provenance FACT. That would be a
+// regression against the first-clause-wins behaviour this intersection replaced.
+
+const TWO_FIELD_DSL = {
+  bool: {
+    filter: [
+      {
+        range: {
+          '@timestamp': {
+            gte: '2026-02-01T00:00:00.000Z',
+            lte: '2026-03-01T00:00:00.000Z',
+          },
+        },
+      },
+      {
+        range: {
+          'state.modified_at': {
+            gte: '2020-01-01T00:00:00.000Z',
+            lte: '2020-06-01T00:00:00.000Z',
+          },
+        },
+      },
+    ],
+  },
+};
+
+test('rangeBoundsFromDsl: two fields report the priority field OWN window, never a mix', () => {
+  // '@timestamp' comes first in TIMESTAMP_FIELDS, so it wins; `state.modified_at`'s clause is
+  // dropped exactly as first-clause-wins dropped it.
+  assert.deepEqual(rangeBoundsFromDsl(TWO_FIELD_DSL), {
+    gte: '2026-02-01T00:00:00.000Z',
+    lte: '2026-03-01T00:00:00.000Z',
+  });
+});
+
+test('rangeBoundsFromDsl: the cross-field INVERTED window is never produced', () => {
+  const bounds = rangeBoundsFromDsl(TWO_FIELD_DSL);
+  assert.ok(bounds);
+  // The mix this guards against is max(lower of @timestamp) with min(upper of state.modified_at):
+  // gte 2026-02-01 / lte 2020-06-01, a window whose start is nearly six years after its end.
+  assert.notEqual(bounds!.lte, '2020-06-01T00:00:00.000Z');
+  assert.ok(
+    Date.parse(bounds!.gte) <= Date.parse(bounds!.lte),
+    'a cross-field mix would report an inverted window as a recorded fact',
+  );
+});
+
+test('rangeBoundsFromDsl: the priority field is intersected within ITSELF across clauses', () => {
+  const dsl = {
+    bool: {
+      filter: [
+        {
+          range: {
+            '@timestamp': {
+              gte: '2026-01-01T00:00:00.000Z',
+              lte: '2026-04-01T00:00:00.000Z',
+            },
+          },
+        },
+        {
+          range: {
+            'state.modified_at': {
+              gte: '2020-01-01T00:00:00.000Z',
+              lte: '2020-06-01T00:00:00.000Z',
+            },
+          },
+        },
         {
           range: {
             '@timestamp': {
@@ -434,16 +558,114 @@ test('rangeBoundsFromDsl: a one-sided clause is dropped, not intersected with a 
   });
 });
 
-test('rangeBoundsFromDsl: undefined when every clause present is one-sided', () => {
+test('rangeBoundsFromDsl: a lone non-priority field is still read', () => {
+  // Field PRIORITY only decides between fields that are both present -- it never makes a DSL that
+  // bounds only `state.modified_at` (the wazuh-states-* families) look range-less.
+  const dsl = {
+    range: {
+      'state.modified_at': {
+        gte: '2020-01-01T00:00:00.000Z',
+        lte: '2020-06-01T00:00:00.000Z',
+      },
+    },
+  };
+  assert.deepEqual(rangeBoundsFromDsl(dsl), {
+    gte: '2020-01-01T00:00:00.000Z',
+    lte: '2020-06-01T00:00:00.000Z',
+  });
+});
+
+// --- Issue #9008 review, F1: the link, its label and the provenance record are ONE resolution ----
+// `extractTimeRange` (what the button OPENS), `describeTimeRangeCoverage` (what its label SAYS) and
+// `rangeBoundsFromDsl` (what the popover STATES) used to take clauses[0] for the first two while
+// the third intersected, so a two-clause DSL opened the wider window and stated the narrower one --
+// the exact link-vs-popover disagreement this change exists to eliminate.
+
+test('extractTimeRange and rangeBoundsFromDsl agree on a multi-clause DSL', () => {
   const dsl = {
     bool: {
       filter: [
-        { range: { '@timestamp': { lte: '2026-01-01T00:00:00.000Z' } } },
-        { range: { '@timestamp': { gte: '2025-01-01T00:00:00.000Z' } } },
+        {
+          range: {
+            '@timestamp': {
+              gte: '2026-01-01T00:00:00.000Z',
+              lte: '2026-04-01T00:00:00.000Z',
+            },
+          },
+        },
+        {
+          range: {
+            '@timestamp': {
+              gte: '2026-02-01T00:00:00.000Z',
+              lte: '2026-03-01T00:00:00.000Z',
+            },
+          },
+        },
       ],
     },
   };
-  assert.equal(rangeBoundsFromDsl(dsl), undefined);
+  const linkWindow = extractTimeRange(dsl);
+  const recorded = rangeBoundsFromDsl(dsl);
+  assert.deepEqual(
+    { gte: linkWindow.from, lte: linkWindow.to },
+    recorded,
+    'the window the link opens must be the window the popover states',
+  );
+  // ...and specifically the INTERSECTION, not the first clause the walk reached.
+  assert.deepEqual(linkWindow, {
+    from: '2026-02-01T00:00:00.000Z',
+    to: '2026-03-01T00:00:00.000Z',
+  });
+});
+
+test('extractTimeRange and rangeBoundsFromDsl agree on a two-FIELD DSL too', () => {
+  const linkWindow = extractTimeRange(TWO_FIELD_DSL);
+  assert.deepEqual(
+    { gte: linkWindow.from, lte: linkWindow.to },
+    rangeBoundsFromDsl(TWO_FIELD_DSL),
+  );
+});
+
+test('describeTimeRangeCoverage reads the intersected result, not the first clause', () => {
+  // The first clause the walk reaches is one-sided, but a later clause on the same field states the
+  // lower bound -- so between them the query DID bound both edges and there is nothing to disclose.
+  const dsl = {
+    bool: {
+      filter: [
+        { range: { '@timestamp': { lte: '2026-03-01T00:00:00.000Z' } } },
+        { range: { '@timestamp': { gte: '2026-02-01T00:00:00.000Z' } } },
+      ],
+    },
+  };
+  assert.deepEqual(describeTimeRangeCoverage(dsl), { coverage: 'stated' });
+});
+
+test('the shared nowMs reference orders the intersection identically for link and record', () => {
+  const nowMs = Date.parse('2026-03-01T00:00:00.000Z');
+  const dsl = {
+    bool: {
+      filter: [
+        { range: { '@timestamp': { gte: 'now-90d', lte: 'now' } } },
+        {
+          range: {
+            '@timestamp': {
+              gte: '2026-02-01T00:00:00.000Z',
+              lte: '2026-02-15T00:00:00.000Z',
+            },
+          },
+        },
+      ],
+    },
+  };
+  const linkWindow = extractTimeRange(dsl, nowMs);
+  assert.deepEqual(
+    { gte: linkWindow.from, lte: linkWindow.to },
+    rangeBoundsFromDsl(dsl, nowMs),
+  );
+  assert.deepEqual(linkWindow, {
+    from: '2026-02-01T00:00:00.000Z',
+    to: '2026-02-15T00:00:00.000Z',
+  });
 });
 
 // --- resolveBoundMs: moved here from tool-call-label.ts (public/) so this module can order two

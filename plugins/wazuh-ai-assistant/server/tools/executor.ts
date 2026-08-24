@@ -748,11 +748,14 @@ async function executeIndexerRequest(
     // Issue #9008 rework: provenance FACTS for the evidence popover — see `TableSpec.provenance`'s
     // doc comment (common/types.ts). `requestedRange`/`effectiveRange` read the SAME dsl shape
     // `discover.dsl` above does (`buildDiscoverDsl`), just off the pre- and post-clamp bodies
-    // respectively, through the one reader (`rangeBoundsFromDsl`) that owns "what window did this
-    // DSL state" for the whole plugin — so this can never derive a window differently from the
-    // "Open in Discover" link built off the same body. `toolCallId` is left unset here;
-    // server/routes/chat.ts's stream loop attaches it, since that is where the streaming tool
-    // call's own id is in scope.
+    // respectively. `rangeBoundsFromDsl` and the `extractTimeRange` the "Open in Discover" link is
+    // built with are two views of ONE resolution (common/discover-url.ts's `effectiveRangeClause`:
+    // clauses partitioned by timestamp field, then intersected within it), so given the same body
+    // and the same `executedAt` reference they cannot report different windows — the link and this
+    // record agree by construction, not by two implementations happening to match. That reference
+    // is why `executedAt` is stored on the spec: discover-link.tsx passes it back in.
+    // `toolCallId` is left unset here; server/routes/chat.ts's stream loop attaches it, since
+    // that is where the streaming tool call's own id is in scope.
     tableSpec.provenance = {
       index: indexerRequest.index,
       // `?? body`: unreachable in practice (the try block above always sets `requestedRangeBody`

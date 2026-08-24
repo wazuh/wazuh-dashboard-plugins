@@ -283,6 +283,36 @@ describe('describeProvenance', () => {
     expect(display.windowBadgeLabel).not.toBe('1d');
   });
 
+  // Issue #9008 review, F3: the minute bucket used to swallow every sub-minute span in one
+  // direction or the other -- a 20-second window rounded down into the same '0m' the exactly-zero
+  // case uses, and a 40-second window rounded UP to a '1m' it never covered.
+  it.each([
+    ['20 seconds (used to round down into the 0m sentinel)', '00:00:20.000'],
+    [
+      '40 seconds (used to round up to a minute it never covered)',
+      '00:00:40.000',
+    ],
+  ])('renders a sub-minute window as <1m: %s', (_label, lteTime) => {
+    const display = describeProvenance({
+      effectiveRange: {
+        gte: '2026-01-01T00:00:00.000Z',
+        lte: `2026-01-01T${lteTime}Z`,
+      },
+      clamped: false,
+    });
+    expect(display.windowBadgeLabel).toBe('<1m');
+  });
+
+  it('keeps 0m for an exactly zero-length window, distinct from <1m', () => {
+    const instant = '2026-01-01T00:00:00.000Z';
+    const display = describeProvenance({
+      effectiveRange: { gte: instant, lte: instant },
+      clamped: false,
+    });
+    expect(display.windowBadgeLabel).toBe('0m');
+    expect(display.windowBadgeLabel).not.toBe('<1m');
+  });
+
   it('states a sub-day span in the unit it actually reaches, not rounded up to 1d', () => {
     const display = describeProvenance({
       effectiveRange: {
