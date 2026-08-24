@@ -27,12 +27,17 @@
  *   2. every source id is present in the catalog (no untranslated strings);
  *   3. the ICU argument names in a translation match the source `defaultMessage` exactly -- a
  *      renamed or dropped placeholder renders as literal text for that locale only;
- *   4. every message is valid ICU MessageFormat (an unbalanced brace or a malformed `plural`
- *      throws at render time, in that locale only);
+ *   4. every message actually renders through `@osd/i18n` under its own locale, so an unbalanced
+ *      brace or a `plural`/`select` missing its `other` branch fails here rather than at runtime,
+ *      in that locale only;
  *   5. the raw JSON has no duplicate ids (`JSON.parse` keeps the last one silently).
  *
- * `REQUIRED_LOCALES` is asserted against the directory listing rather than derived from it: a
- * catalog that is deleted or renamed must fail here, not quietly reduce the suite to zero checks.
+ * `REQUIRED_LOCALES` is asserted against BOTH the directory listing and the `translations` array of
+ * `.i18nrc.json`, rather than derived from either. A catalog that is deleted or renamed must fail
+ * here instead of quietly reducing the suite to zero checks -- and so must a catalog dropped from
+ * `.i18nrc.json` while the file stays on disk, which is the failure mode with no symptom at all:
+ * every check below would still pass while the platform silently stopped loading that locale (see
+ * `getTranslationPaths` in `src/legacy/server/i18n`, which reads only that array).
  *
  * Extraction is a TypeScript AST walk rather than a regex so that concatenated messages
  * (`'a ' + 'b'`), apostrophes and JSX text cannot desync it, and so that a NON-static id or
@@ -43,10 +48,12 @@
  * another name, or an aliased `@osd/i18n` import. None exist today; the point is that the day one
  * appears, this gate says so instead of silently extracting nothing from it.
  *
- * ICU validity uses `intl-messageformat-parser`, the parser `@osd/i18n` itself formats messages
- * with. It is not declared in this plugin's `package.json` for the same reason `@osd/i18n`,
- * `react` and `@elastic/eui` are not: the plugin takes everything from the host `wazuh-dashboard`
- * bundle (see the "zero npm runtime dependencies" note in README.md). No dependency is added.
+ * Message validity goes through `@osd/i18n`'s own `init()` + `translate()` -- the same public API
+ * the plugin already calls in `public/` and `common/nav-categories.ts` -- rather than reaching for
+ * an ICU parser package directly. Formatting, not just parsing, is what production does, and it is
+ * strictly stronger: a `plural` missing its `other` branch parses cleanly and only blows up when a
+ * value selects the branch that is not there. Each message is therefore rendered once per entry in
+ * `PLURAL_PROBES`.
  *
  * If a string is deliberately left untranslated for a locale, add its id to that catalog with the
  * English text rather than relaxing rule 2 -- the entry then documents the decision. Each failure
@@ -62,11 +69,12 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
-import icuParser from 'intl-messageformat-parser';
+import { i18n } from '@osd/i18n';
 
 const PLUGIN_ROOT = path.resolve(__dirname, '..');
 const SOURCE_DIRS = ['common', 'public', 'server'];
 const TRANSLATIONS_DIR = path.join(PLUGIN_ROOT, 'translations');
+const I18NRC_PATH = path.join(PLUGIN_ROOT, '.i18nrc.json');
 const ID_PREFIX = 'wazuhAiAssistant.';
 
 /**
@@ -74,6 +82,12 @@ const ID_PREFIX = 'wazuhAiAssistant.';
  * language, carried in each `defaultMessage`. Adding a locale means adding it here.
  */
 const REQUIRED_LOCALES = ['es-ES'];
+
+/**
+ * Values fed to every ICU argument in turn, chosen to drive a `plural` down both its `one` and its
+ * `other` branch: a message whose `other` is missing renders fine for 1 and throws for 2.
+ */
+const PLURAL_PROBES = [1, 2];
 
 const TRANSLATE_HINT =
   'Translate each id above, or add it to the catalog with the English text to document a ' +
@@ -373,14 +387,39 @@ function icuPlaceholders(message: string): string[] {
   return names.sort();
 }
 
-/** The ICU parse error for a message, or undefined when it is valid. */
-function icuParseError(message: string): string | undefined {
-  try {
-    icuParser.parse(message);
-    return undefined;
-  } catch (error) {
-    return error instanceof Error ? error.message : String(error);
+/**
+ * Renders every `[id, message]` through `@osd/i18n` under `locale`, once per `PLURAL_PROBES` value,
+ * and returns one line per message that failed. `loaded` is what `i18n.init` registers: pass the
+ * catalog to exercise the translations, or `{}` so `translate` falls back to each `defaultMessage`.
+ */
+function renderFailures(
+  locale: string,
+  loaded: Record<string, string>,
+  entries: Array<[string, string]>,
+): string[] {
+  i18n.init({ locale, messages: loaded });
+  const problems: string[] = [];
+  for (const [id, message] of entries) {
+    for (const probe of PLURAL_PROBES) {
+      const values: Record<string, number> = {};
+      for (const name of icuPlaceholders(message)) {
+        values[name] = probe;
+      }
+      try {
+        i18n.translate(id, { defaultMessage: message, values });
+      } catch (error) {
+        const detail = error instanceof Error ? error.message : String(error);
+        problems.push(
+          `${id} (every argument = ${probe}): ${detail.replace(
+            /\s*\n\s*/g,
+            ' ',
+          )}`,
+        );
+        break;
+      }
+    }
   }
+  return problems;
 }
 
 /**
@@ -429,16 +468,21 @@ describe('i18n source strings', () => {
     );
   });
 
-  it('every source defaultMessage is valid ICU', () => {
-    const invalid: string[] = [];
+  it('renders every source defaultMessage', () => {
+    const entries: Array<[string, string]> = [];
+    const locations = new Map<string, string>();
     sourceMessages().forEach((message, id) => {
-      const error = icuParseError(message.defaultMessage);
-      if (error) {
-        invalid.push(`${id} (${message.location}): ${error}`);
-      }
+      entries.push([id, message.defaultMessage]);
+      locations.set(id, message.location);
+    });
+    // Empty `messages`, so `translate` falls back to each `defaultMessage` -- exactly what the
+    // dashboard renders at the default locale.
+    const problems = renderFailures('en', {}, entries).map(problem => {
+      const id = problem.slice(0, Math.max(problem.indexOf(' '), 0));
+      return `${problem} [${locations.get(id) ?? 'unknown location'}]`;
     });
     assertNoProblems(
-      invalid,
+      problems,
       'Fix the ICU syntax of each defaultMessage above.',
     );
   });
@@ -453,6 +497,19 @@ describe('i18n source strings', () => {
       .filter(name => name.endsWith('.json'))
       .sort();
     expect(present).toEqual(REQUIRED_LOCALES.map(locale => `${locale}.json`));
+  });
+
+  it('registers exactly those catalogs in .i18nrc.json', () => {
+    // The platform loads a catalog only if it is listed here: `getTranslationPaths` in
+    // src/legacy/server/i18n reads this array and nothing else. Dropping an entry while leaving the
+    // file on disk silently stops that locale from loading, and every other check in this file
+    // would still pass -- so it has to be asserted, not inferred from the directory listing.
+    const i18nrc = JSON.parse(fs.readFileSync(I18NRC_PATH, 'utf8')) as {
+      translations?: string[];
+    };
+    expect(i18nrc.translations).toEqual(
+      REQUIRED_LOCALES.map(locale => `translations/${locale}.json`),
+    );
   });
 });
 
@@ -533,18 +590,18 @@ describe.each(REQUIRED_LOCALES)('translation catalog %s', locale => {
     assertNoProblems(mismatches, PLACEHOLDER_HINT);
   });
 
-  it('has valid ICU in every translation', () => {
+  it('renders every translation under its own locale', () => {
     const { messages } = readCatalog();
-    const invalid: string[] = [];
-    Object.keys(messages).forEach(id => {
-      const error = icuParseError(messages[id]);
-      if (error) {
-        invalid.push(`${id}: ${error}`);
-      }
-    });
+    // The catalog IS the loaded translation set here, so `translate` formats the Spanish string --
+    // the same path a dashboard running `i18n.locale: es-ES` takes.
+    const problems = renderFailures(
+      locale,
+      messages,
+      Object.keys(messages).map(id => [id, messages[id]]),
+    );
     assertNoProblems(
-      invalid,
-      'An invalid ICU message throws when rendered, in this locale only.',
+      problems,
+      'A message that fails to format throws when rendered, in this locale only.',
     );
   });
 });
