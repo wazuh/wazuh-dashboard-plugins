@@ -761,9 +761,9 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
 
   /**
    * The spec's columns minus the ones this particular result leaves empty in every row
-   * (`isEmptyColumn`). Every downstream column decision — the narrow-mode threshold below, the
-   * visible-column budget, the hidden-column count — reads THIS list rather than `spec.columns`,
-   * so a column of em dashes stops consuming a `<th>` and the fixed table's width, and whatever
+   * (`isEmptyColumn`). Both downstream column decisions — the narrow-mode threshold below and the
+   * visible-column budget it feeds — read THIS list rather than `spec.columns`, so a column of em
+   * dashes stops consuming a `<th>` and the fixed table's width, and whatever
    * populated column sat immediately past the budget is promoted into the freed slot by the same
    * `slice` that demoted it. Nothing is lost: an empty column's field is still in every row
    * object, so it remains visible in the row expander like any other demoted column.

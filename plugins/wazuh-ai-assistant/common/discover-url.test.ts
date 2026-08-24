@@ -6,6 +6,7 @@ import {
   hasExplicitTimeRange,
   rangeBoundsFromDsl,
   resolveDiscoverTimeRange,
+  DEFAULT_TIME_RANGE,
   UNBOUNDED_TIME_RANGE,
 } from './discover-url';
 
@@ -281,6 +282,24 @@ test('resolveDiscoverTimeRange: a time-unbounded query opens on all of history, 
 test('resolveDiscoverTimeRange: the unbounded lower bound is an instant Discover can resolve', () => {
   assert.ok(!Number.isNaN(Date.parse(UNBOUNDED_TIME_RANGE.from)));
   assert.equal(UNBOUNDED_TIME_RANGE.to, 'now');
+});
+
+test('resolveDiscoverTimeRange: a ONE-SIDED clause still fills its missing edge from the default', () => {
+  // The unbounded fallback replaces `DEFAULT_TIME_RANGE` only for a query with NO range clause at
+  // all. A clause that states one bound really does mean "up to now" on the other side, so that
+  // path is deliberately unchanged -- asserted here so the two cases can't be conflated later.
+  assert.deepEqual(
+    resolveDiscoverTimeRange({
+      dsl: { range: { '@timestamp': { gte: 'now-7d' } } },
+    }),
+    { from: 'now-7d', to: DEFAULT_TIME_RANGE.to },
+  );
+  assert.deepEqual(
+    resolveDiscoverTimeRange({
+      dsl: { range: { '@timestamp': { lte: 'now' } } },
+    }),
+    { from: DEFAULT_TIME_RANGE.from, to: 'now' },
+  );
 });
 
 test('buildDiscoverUrl: carries the resolved window into _g time, not a fixed default', () => {
