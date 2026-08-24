@@ -1,4 +1,5 @@
 import { TableSpec, ToolCall } from '../../../common/types';
+import { MS_PER_UNIT, resolveBoundMs } from '../../../common/discover-url';
 
 /**
  * Human-worded provenance chip labels for the tool calls a turn ran.
@@ -62,19 +63,6 @@ export interface ToolCallLabel {
   full: string;
 }
 
-/** Millisecond span of the date-math units `shortDateMath` above recognizes (day/hour/minute),
- * plus a year bucket for a genuinely long ISO-to-ISO span — deliberately NO week/month bucket
- * (issue #9008 review, minor 5): a week/month approximation would format the guardrail's exact
- * 90-day lookback cap as something other than "90d". These feed only a human-worded DURATION
- * label for an ABSOLUTE (ISO) span; a date-math bound is always rendered via `shortDateMath`
- * instead, never through this table. */
-const MS_PER_UNIT = {
-  m: 60_000,
-  h: 3_600_000,
-  d: 86_400_000,
-  y: 365 * 86_400_000,
-} as const;
-
 /** Formats a millisecond duration as the coarsest whole unit that divides it exactly, falling back
  * to whole days when nothing divides evenly. Only ever called on the span between two RESOLVED
  * instants (see `spanShortLabel`) — never a substitute for `shortDateMath`'s literal rendering of
@@ -93,36 +81,6 @@ function formatDurationShort(durationMs: number): string {
     }
   }
   return `${Math.max(1, Math.round(abs / MS_PER_UNIT.d))}d`;
-}
-
-/**
- * Resolves a date-math (`now`, `now-90d`) or ISO-8601 bound to an absolute epoch ms.
- *
- * `executedAt` is the FACT the server recorded (`TableSpec.provenance.executedAt`) for the
- * instant the query actually ran — issue #9008 review, blocker 2: a date-math bound only means
- * something relative to WHEN it ran, so resolving `now`/`now-90d` against the render-time clock
- * instead (the pre-fix behavior) showed a restored conversation a window the query never ran
- * against. When `executedAt` is `undefined` (a conversation persisted before this field existed),
- * a date-math bound is left UNRESOLVED — `undefined`, never a guess against the current clock —
- * so callers fall back to the literal bound string instead of a fabricated absolute instant. An
- * ISO-8601 bound needs no "now" reference at all and resolves the same either way.
- */
-function resolveBoundMs(
-  value: string,
-  executedAt: number | undefined,
-): number | undefined {
-  if (value === 'now') {
-    return executedAt;
-  }
-  const match = /^now-(\d+)([dhm])$/.exec(value);
-  if (match) {
-    return executedAt === undefined
-      ? undefined
-      : executedAt -
-          Number(match[1]) * MS_PER_UNIT[match[2] as 'd' | 'h' | 'm'];
-  }
-  const parsed = Date.parse(value);
-  return Number.isNaN(parsed) ? undefined : parsed;
 }
 
 /**

@@ -284,21 +284,56 @@ test('resolveDiscoverTimeRange: the unbounded lower bound is an instant Discover
   assert.equal(UNBOUNDED_TIME_RANGE.to, 'now');
 });
 
-test('resolveDiscoverTimeRange: a ONE-SIDED clause still fills its missing edge from the default', () => {
-  // The unbounded fallback replaces `DEFAULT_TIME_RANGE` only for a query with NO range clause at
-  // all. A clause that states one bound really does mean "up to now" on the other side, so that
-  // path is deliberately unchanged -- asserted here so the two cases can't be conflated later.
+test('resolveDiscoverTimeRange: a gte-only clause fills its missing UPPER bound with "now"', () => {
+  // A clause that states only a lower bound really does mean "up to now", so that edge fills from
+  // `DEFAULT_TIME_RANGE.to` and is deliberately unchanged.
   assert.deepEqual(
     resolveDiscoverTimeRange({
       dsl: { range: { '@timestamp': { gte: 'now-7d' } } },
     }),
     { from: 'now-7d', to: DEFAULT_TIME_RANGE.to },
   );
+});
+
+test('resolveDiscoverTimeRange: an lte-only clause fills its missing LOWER bound unbounded, never inverted', () => {
+  // The bug: the missing lower bound used to fill from `DEFAULT_TIME_RANGE.from` ('now-24h'), so an
+  // lte-only clause bounded at a PAST instant produced from > to -- a window Discover shows nothing
+  // at all for. A missing lower bound means "from the beginning".
+  const range = resolveDiscoverTimeRange({
+    dsl: { range: { '@timestamp': { lte: '2026-01-01T00:00:00.000Z' } } },
+  });
+  assert.deepEqual(range, {
+    from: UNBOUNDED_TIME_RANGE.from,
+    to: '2026-01-01T00:00:00.000Z',
+  });
+  assert.ok(
+    Date.parse(range.from) < Date.parse(range.to),
+    'the resolved window must not be inverted',
+  );
+});
+
+test('resolveDiscoverTimeRange: date-math is pinned to the instant the query ran, not the render clock', () => {
+  // OSD resolves `now-90d` in _g against the BROWSER's clock at click time, so an unpinned bound
+  // opened a window shifted by however long ago the conversation happened -- disagreeing with both
+  // the evidence popover and the answer's own total.
+  const executedAt = Date.parse('2026-03-01T00:00:00.000Z');
+  const range = resolveDiscoverTimeRange({
+    effectiveRange: { gte: 'now-90d', lte: 'now' },
+    executedAt,
+  });
+  assert.equal(range.to, '2026-03-01T00:00:00.000Z');
+  assert.equal(range.from, '2025-12-01T00:00:00.000Z');
+  assert.equal(Date.parse(range.to) - Date.parse(range.from), 90 * 86_400_000);
+});
+
+test('resolveDiscoverTimeRange: without executedAt the literal date-math bound is kept', () => {
+  // A conversation persisted before `executedAt` existed: the literal bound is still better than
+  // an instant fabricated against the reader's clock.
   assert.deepEqual(
     resolveDiscoverTimeRange({
-      dsl: { range: { '@timestamp': { lte: 'now' } } },
+      effectiveRange: { gte: 'now-90d', lte: 'now' },
     }),
-    { from: DEFAULT_TIME_RANGE.from, to: 'now' },
+    { from: 'now-90d', to: 'now' },
   );
 });
 

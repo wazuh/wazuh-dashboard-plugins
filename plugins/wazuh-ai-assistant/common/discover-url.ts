@@ -96,8 +96,17 @@ export function risonEncode(value: unknown): string {
   return risonString(String(value));
 }
 
-/** Reads a `{range: {<field>: {gte, lte}}}` clause for one of the recognized timestamp fields,
- * returning the recognized bound(s) (missing gte/lte falls back to the default window's edge). */
+/**
+ * Reads a `{range: {<field>: {gte, lte}}}` clause for one of the recognized timestamp fields,
+ * returning the recognized bound(s) with a missing side filled in.
+ *
+ * The two sides fill from DIFFERENT defaults, because a one-sided clause means different things in
+ * each direction. A missing UPPER bound means "up to now" — `DEFAULT_TIME_RANGE.to`. A missing
+ * LOWER bound means "from the beginning", so it fills from `UNBOUNDED_TIME_RANGE.from`, NOT from
+ * `DEFAULT_TIME_RANGE.from`: an `lte`-only clause filled with `now-24h` produced a window whose
+ * start was AFTER its end (`from: now-24h`, `to: <some past instant>`) — an inverted range Discover
+ * shows nothing for.
+ */
 function rangeFromClause(clause: unknown): TimeRange | undefined {
   if (!clause || typeof clause !== 'object') {
     return undefined;
@@ -118,7 +127,10 @@ function rangeFromClause(clause: unknown): TimeRange | undefined {
       const upper = bounds.lte ?? bounds.lt ?? bounds.to;
       if (lower !== undefined || upper !== undefined) {
         return {
-          from: lower !== undefined ? String(lower) : DEFAULT_TIME_RANGE.from,
+          from:
+            lower !== undefined
+              ? String(lower)
+              : UNBOUNDED_TIME_RANGE.from /* see this function's doc comment */,
           to: upper !== undefined ? String(upper) : DEFAULT_TIME_RANGE.to,
         };
       }
@@ -283,6 +295,66 @@ export function rangeBoundsFromDsl(
   return findRawTimeRangeClause(dsl);
 }
 
+/** Millisecond span of the date-math units `resolveBoundMs` recognizes, plus a year bucket used
+ * only by tool-call-label.ts's duration formatter. Deliberately NO week/month bucket (issue #9008
+ * review, minor 5): a week/month approximation would format the guardrail's exact 90-day lookback
+ * cap as something other than "90d". Lives here rather than in tool-call-label.ts (`public/`) so
+ * `resolveBoundMs` below — which this module needs — can stay isomorphic; that file imports both
+ * from here. */
+export const MS_PER_UNIT = {
+  m: 60_000,
+  h: 3_600_000,
+  d: 86_400_000,
+  y: 365 * 86_400_000,
+} as const;
+
+/**
+ * Resolves a date-math (`now`, `now-90d`) or ISO-8601 bound to an absolute epoch ms.
+ *
+ * `executedAt` is the FACT the server recorded (`TableSpec.provenance.executedAt`) for the instant
+ * the query actually ran — a date-math bound only means something relative to WHEN it ran, so
+ * resolving `now`/`now-90d` against the render-time clock instead would describe (and, for the
+ * Discover link, OPEN) a window the query never ran against. When `executedAt` is `undefined` (a
+ * conversation persisted before that field existed), a date-math bound is left UNRESOLVED —
+ * `undefined`, never a guess against the current clock — so callers fall back to the literal bound
+ * string instead of a fabricated absolute instant. An ISO-8601 bound needs no "now" reference at
+ * all and resolves the same either way.
+ *
+ * Moved here from tool-call-label.ts (`public/`) so the evidence popover and the "Open in Discover"
+ * link resolve a bound through ONE function: the popover stating "ran against Jun 1 - Aug 30" while
+ * the link opened `now-90d` re-resolved against the reader's clock was exactly the divergence this
+ * prevents.
+ */
+export function resolveBoundMs(
+  value: string,
+  executedAt: number | undefined,
+): number | undefined {
+  if (value === 'now') {
+    return executedAt;
+  }
+  const match = /^now-(\d+)([dhm])$/.exec(value);
+  if (match) {
+    return executedAt === undefined
+      ? undefined
+      : executedAt -
+          Number(match[1]) * MS_PER_UNIT[match[2] as 'd' | 'h' | 'm'];
+  }
+  const parsed = Date.parse(value);
+  return Number.isNaN(parsed) ? undefined : parsed;
+}
+
+/**
+ * Pins one bound to the absolute instant it meant WHEN THE QUERY RAN, so a link clicked later opens
+ * the window the query actually used rather than the same date-math re-resolved against the
+ * reader's clock. Falls back to the literal bound when it cannot be resolved (no `executedAt` on a
+ * conversation persisted before that field existed) — the pre-existing behavior, and still better
+ * than a fabricated instant.
+ */
+function pinBound(value: string, executedAt: number | undefined): string {
+  const resolved = resolveBoundMs(value, executedAt);
+  return resolved === undefined ? value : new Date(resolved).toISOString();
+}
+
 /**
  * The window the "Open in Discover" link must carry, resolved from what the SERVER recorded about
  * the query it actually ran rather than from a client-side default:
@@ -301,17 +373,27 @@ export function rangeBoundsFromDsl(
  *
  * Case 3 is the behavior change: cases 1 and 2 agree on every query whose DSL states a window
  * (they are read off the same body), so this only ever moves the range-less case.
+ *
+ * Whichever case wins, a date-math bound is PINNED to the absolute instant it meant at
+ * `executedAt` (`pinBound`). OSD resolves `now-90d` in `_g` against the browser's clock at click
+ * time, so an unpinned bound made a conversation reopened a week later open a window shifted a week
+ * forward — a different window from the one the evidence popover states for the same query, and a
+ * different total from the answer. `executedAt` comes from `TableSpec.provenance.executedAt`; with
+ * no `executedAt` recorded the literal bound is kept, exactly as before.
  */
 export function resolveDiscoverTimeRange(params: {
   dsl?: Record<string, unknown>;
   effectiveRange?: { gte: string; lte: string };
+  executedAt?: number;
 }): TimeRange {
-  const { dsl, effectiveRange } = params;
-  if (effectiveRange) {
-    return { from: effectiveRange.gte, to: effectiveRange.lte };
-  }
-  const fromDsl = dsl ? findTimeRangeClause(dsl) : undefined;
-  return fromDsl ?? UNBOUNDED_TIME_RANGE;
+  const { dsl, effectiveRange, executedAt } = params;
+  const resolved = effectiveRange
+    ? { from: effectiveRange.gte, to: effectiveRange.lte }
+    : (dsl ? findTimeRangeClause(dsl) : undefined) ?? UNBOUNDED_TIME_RANGE;
+  return {
+    from: pinBound(resolved.from, executedAt),
+    to: pinBound(resolved.to, executedAt),
+  };
 }
 
 /**

@@ -270,6 +270,26 @@ function formatCellValue(value: unknown): string {
   return String(value);
 }
 
+/**
+ * `JSON.stringify` replacer that serializes an `undefined` property value as `null` instead of
+ * OMITTING the key entirely.
+ *
+ * `buildTableSpec` (server/tools/digest.ts) writes `out[column.field] = getByPath(row, field)` for
+ * every spec column, so a field the document does not have lands in the row object as `undefined`.
+ * Plain `JSON.stringify` drops such keys, which means the expanded-row JSON silently said nothing
+ * at all about that field. That was survivable while the column still had a `<th>` full of em
+ * dashes; once `populatedColumns` drops an all-empty column, the field would have disappeared from
+ * the header AND the expander, leaving no way to tell "this field is empty" from "this field was
+ * never asked for". Emitting `null` keeps the field visible as explicitly empty.
+ *
+ * The `key === ''` guard is the top-level call `JSON.stringify` makes with the whole object before
+ * it walks any property — without it, a row that was itself `undefined` would serialize as `null`
+ * rather than being left alone.
+ */
+function nullForUndefined(key: string, value: unknown): unknown {
+  return key !== '' && value === undefined ? null : value;
+}
+
 function renderDefaultCell(value: unknown): React.ReactNode {
   if (isAbsentValue(value)) {
     return renderAbsentPlaceholder();
@@ -343,11 +363,34 @@ function isTimestampColumn(
 }
 
 /**
- * True when EVERY row of the current result leaves this column absent (`undefined`/`null`/`''` —
- * `isAbsentValue`, so a genuine `0`/`false` keeps the column). Such a column spends a `<th>` and a
- * share of the fixed table width on a full column of em dashes: the live run showed a findings
- * table whose Description column was empty for all 26 rows while a populated, high-value field
- * (`vulnerability.score.base`) sat past the visible-column budget with no `<th>` of its own.
+ * True when a value carries no information for a reader to see in a cell: absent
+ * (`isAbsentValue`), an empty array, or an empty object.
+ *
+ * Broader than `isAbsentValue` on purpose, and deliberately NOT expressed as
+ * "`formatCellValue(value) === ''`": that test catches `[]` (which joins to the empty string) but
+ * not `{}` (which serializes to the visible-but-useless literal `{}`), so the two empty containers
+ * would have been judged differently for no reason a reader could perceive. A genuine `0`/`false`
+ * is information and is not covered here — `renderDefaultCell` shows them as "0"/"No".
+ */
+function isVacuousValue(value: unknown): boolean {
+  if (isAbsentValue(value)) {
+    return true;
+  }
+  if (Array.isArray(value)) {
+    return value.length === 0;
+  }
+  if (typeof value === 'object' && value !== null) {
+    return Object.keys(value as Record<string, unknown>).length === 0;
+  }
+  return false;
+}
+
+/**
+ * True when EVERY row of the current result renders this column as nothing (`isVacuousValue`). Such
+ * a column spends a `<th>` and a share of the fixed table width on a full column of em dashes: the
+ * live run showed a findings table whose Description column was empty for all 26 rows while a
+ * populated, high-value field (`vulnerability.score.base`) sat past the visible-column budget with
+ * no `<th>` of its own.
  *
  * Requires at least one row to have been seen: a zero-row result would vacuously report every
  * column empty and leave the table with no columns at all (see `populatedColumns`' own guard).
@@ -356,7 +399,7 @@ function isEmptyColumn(
   rows: Array<Record<string, unknown>>,
   field: string,
 ): boolean {
-  return rows.length > 0 && rows.every(row => isAbsentValue(row[field]));
+  return rows.length > 0 && rows.every(row => isVacuousValue(row[field]));
 }
 
 /**
@@ -765,8 +808,13 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
    * visible-column budget it feeds — read THIS list rather than `spec.columns`, so a column of em
    * dashes stops consuming a `<th>` and the fixed table's width, and whatever
    * populated column sat immediately past the budget is promoted into the freed slot by the same
-   * `slice` that demoted it. Nothing is lost: an empty column's field is still in every row
-   * object, so it remains visible in the row expander like any other demoted column.
+   * `slice` that demoted it.
+   *
+   * The field itself is not lost — it stays in every row object and so stays visible in the row
+   * expander, like any other demoted column — but that only holds because the expander serializes
+   * `undefined` as `null` (`nullForUndefined`). Without that, `JSON.stringify` would omit the key
+   * and a dropped column's field would vanish from the header AND the expander, which is a real
+   * loss rather than a demotion.
    *
    * Two guards. `spec.rows.length === 0` short-circuits (`isEmptyColumn` reports false for a
    * zero-row result anyway, but returning the spec's own array keeps the identity stable for the
@@ -964,8 +1012,8 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   );
 
   /**
-   * How many DISTINCT extra fields an expanded row actually reveals: every key present on any row
-   * that is not one of the visible columns.
+   * How many extra fields an expanded row actually reveals — the MAXIMUM, over the rows, of the
+   * keys that row carries beyond the visible columns.
    *
    * Previously this disclosure counted only `spec.columns.length - budget` — spec columns demoted
    * past the visible-column budget. But a row carries more than its spec columns: `buildTableSpec`
@@ -974,23 +1022,26 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
    * `rowFields` disclosed nothing at all, while a 9-spec-column table disclosed "+3 more fields" —
    * the same expander offering extra fields in both cases, advertised in only one of them. Counting
    * what the expander will really show makes the hint appear on exactly the tables that have
-   * something extra behind it, which is also why it now covers the columns
-   * `populatedColumns` dropped for being empty.
+   * something extra behind it, which is also why it now covers the columns `populatedColumns`
+   * dropped for being empty.
+   *
+   * A max over rows rather than the UNION of every row's keys, because the label says "per row":
+   * `rowFields` are written sparsely (digest.ts skips an absent one to keep rows JSON-sparse), so a
+   * union could promise more extra fields than any single expander will ever show.
    *
    * `__rowId` is this component's own synthetic key (added in `items` below, not by the server);
    * excluded here so an internal bookkeeping field can never be advertised as data.
    */
   const extraRowFieldCount = useMemo(() => {
     const visible = new Set(visibleColumns.map(column => column.id));
-    const extra = new Set<string>();
+    let maximum = 0;
     for (const row of spec.rows) {
-      for (const key of Object.keys(row)) {
-        if (key !== '__rowId' && !visible.has(key)) {
-          extra.add(key);
-        }
-      }
+      const extra = Object.keys(row).filter(
+        key => key !== '__rowId' && !visible.has(key),
+      ).length;
+      maximum = Math.max(maximum, extra);
     }
-    return extra.size;
+    return maximum;
   }, [spec.rows, visibleColumns]);
 
   const fieldColumns: EuiBasicTableColumn<ResultRow>[] = useMemo(
@@ -1078,7 +1129,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
               fontSize='s'
               isCopyable
             >
-              {JSON.stringify(row, null, 2)}
+              {JSON.stringify(row, nullForUndefined, 2)}
             </EuiCodeBlock>
           </div>
         );

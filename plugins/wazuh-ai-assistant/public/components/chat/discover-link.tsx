@@ -78,6 +78,9 @@ export function createDiscoverUrlResolver(core: CoreStart): ResolveDiscoverUrl {
     const timeRange = resolveDiscoverTimeRange({
       dsl: spec.discover.dsl,
       effectiveRange: spec.provenance?.effectiveRange,
+      // Pins date-math bounds to the instant the query ran, so a link clicked days later opens the
+      // window the answer used rather than the same shorthand re-resolved against today's clock.
+      executedAt: spec.provenance?.executedAt,
     });
     return buildDiscoverUrl({
       discoverAppUrl,

@@ -1037,7 +1037,7 @@ describe('ResultTable', () => {
       ).toBeInTheDocument();
     });
 
-    it('counts each extra field once across rows, not once per row', () => {
+    it('counts each extra field once per row, not once per occurrence across rows', () => {
       render(
         <ResultTable
           spec={spec({
@@ -1053,6 +1053,28 @@ describe('ResultTable', () => {
       expect(
         screen.getByText(
           'Results (3 rows) (+1 more field per row. Expand a row to see them.)',
+        ),
+      ).toBeInTheDocument();
+    });
+
+    it('promises no more extra fields than the richest single row actually has', () => {
+      // `rowFields` are written sparsely (digest.ts skips an absent one), so different rows carry
+      // different extras. The label says "per row", so it must report the MAXIMUM any one expander
+      // will show -- not the union across rows, which here would over-promise 3.
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'agent', label: 'Agent' }],
+            rows: [
+              { agent: 'web-01', 'data.srcip': '10.0.0.1' },
+              { agent: 'web-02', 'data.dstport': 443, 'rule.id': '5710' },
+            ],
+          })}
+        />,
+      );
+      expect(
+        screen.getByText(
+          'Results (2 rows) (+2 more fields per row. Expand a row to see them.)',
         ),
       ).toBeInTheDocument();
     });
@@ -1159,6 +1181,75 @@ describe('ResultTable', () => {
       render(<ResultTable spec={specWithEmptyColumn()} />);
       fireEvent.click(screen.getByRole('button', { name: 'Expand row' }));
       expect(screen.getByText(/"description": ""/)).toBeInTheDocument();
+    });
+
+    it('keeps an UNDEFINED-valued dropped column visible in the expander, as null', () => {
+      // `buildTableSpec` writes `undefined` for a field the document lacks, and plain
+      // `JSON.stringify` OMITS such keys -- so dropping the column would have removed the field
+      // from the header and the expander both, leaving no way to tell "empty" from "never asked
+      // for". The serializer emits `null` instead.
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'agent', label: 'Agent' },
+              { id: 'description', label: 'Description' },
+            ],
+            rows: [{ agent: 'web-01', description: undefined }],
+          })}
+        />,
+      );
+      expect(
+        screen.getAllByRole('columnheader').map(h => h.textContent ?? ''),
+      ).not.toContain('Description');
+      fireEvent.click(screen.getByRole('button', { name: 'Expand row' }));
+      expect(screen.getByText(/"description": null/)).toBeInTheDocument();
+    });
+
+    it('drops a column whose every value is an empty array or an empty object', () => {
+      // Neither is "absent", so both survived an absence-only check: `[]` drew a column of blank
+      // cells and `{}` a column of the visible-but-useless literal "{}".
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'agent', label: 'Agent' },
+              { id: 'tags', label: 'Tags' },
+              { id: 'meta', label: 'Meta' },
+            ],
+            rows: [
+              { agent: 'web-01', tags: [], meta: {} },
+              { agent: 'web-02', tags: [], meta: {} },
+            ],
+          })}
+        />,
+      );
+      const headers = screen
+        .getAllByRole('columnheader')
+        .map(h => h.textContent ?? '');
+      expect(headers).toContain('Agent');
+      expect(headers).not.toContain('Tags');
+      expect(headers).not.toContain('Meta');
+    });
+
+    it('keeps a column whose arrays are non-empty on at least one row', () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'agent', label: 'Agent' },
+              { id: 'tags', label: 'Tags' },
+            ],
+            rows: [
+              { agent: 'web-01', tags: [] },
+              { agent: 'web-02', tags: ['pci'] },
+            ],
+          })}
+        />,
+      );
+      expect(
+        screen.getAllByRole('columnheader').map(h => h.textContent ?? ''),
+      ).toContain('Tags');
     });
   });
 
