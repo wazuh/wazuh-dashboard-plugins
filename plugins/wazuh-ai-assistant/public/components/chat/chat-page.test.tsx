@@ -3071,9 +3071,15 @@ describe('ChatPage — provider provenance and per-conversation memory', () => {
     stream.push({ type: 'done' });
     stream.end();
 
-    await waitFor(() =>
-      expect(screen.getByText('Test provider')).toBeInTheDocument(),
-    );
+    // Scoped to the provenance element: the provider picker's own trigger carries the same name,
+    // so a bare text query matches two unrelated things.
+    await waitFor(() => {
+      const provenance = document.querySelector(
+        '[data-test-subj="wzMsgProviderProvenance"]',
+      );
+      expect(provenance).not.toBeNull();
+      expect(provenance?.textContent).toBe('Test provider');
+    });
     await waitFor(() =>
       expect(mockConversationsService.create).toHaveBeenCalled(),
     );
