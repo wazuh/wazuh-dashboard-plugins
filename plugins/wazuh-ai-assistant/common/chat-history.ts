@@ -183,10 +183,16 @@ export function detectNavigationType(): NavigationType {
 export const CONVERSATION_TITLE_MAX_LENGTH = 60;
 
 /**
- * Auto-save title: the first USER message, truncated to `CONVERSATION_TITLE_MAX_LENGTH`
- * chars. Recomputed on every auto-save (not just at creation) — idempotent, since the first user
- * message of an already-created conversation never changes, and there is no rename UI yet that
- * this could ever clobber.
+ * Auto-save title: the first USER message, truncated to `CONVERSATION_TITLE_MAX_LENGTH` chars.
+ *
+ * ONLY called for a brand-new conversation's CREATE (server/routes/conversations.ts's POST), via
+ * `persistConversationTurn` (chat-page.tsx) — NOT on every auto-save any more. It used to be
+ * recomputed on every save and resent on the PUT that updates an existing conversation, which
+ * silently reverted any rename the user had made (issue #9010, finding E2): the very next
+ * auto-save overwrote the custom title back to this auto-generated one. `persistConversationTurn`
+ * now omits `title` from every PUT, and the PUT route (`updateBodySchema`'s doc comment) carries
+ * the stored title over unchanged when it is absent — so a rename is stable once made, and this
+ * function's output only ever matters at the moment a conversation is first created.
  *
  * `untitledLabel` is the already-i18n-translated "Untitled conversation" string — see the module
  * doc comment above for why the translation itself happens at the call site, not in here.

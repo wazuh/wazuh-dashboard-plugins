@@ -1,11 +1,13 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiButton,
   EuiButtonEmpty,
   EuiButtonIcon,
+  EuiCheckbox,
   EuiFieldSearch,
+  EuiFieldText,
   EuiText,
   EuiTitle,
   EuiSpacer,
@@ -31,6 +33,16 @@ interface ConversationListProps {
   onSelect: (id: string) => void;
   onNewConversation: () => void;
   onDelete: (id: string) => void;
+  /** Inline rename (issue #9010, finding E2). Optional, like `onCollapse`/`onExpand` below: a
+   * caller that hasn't wired renaming yet simply never sees the pencil affordance rendered at all
+   * (see the row rendering below), rather than throwing on a missing handler. */
+  onRename?: (id: string, title: string) => void;
+  /** Bulk delete (issue #9010, finding E3): called once with every selected conversation id after
+   * the "Delete N conversations?" confirm modal is accepted. Same optionality reasoning as
+   * `onRename` above — no handler means no "Select conversations" entry point is rendered. The
+   * caller decides how to apply it (sequential awaits, `Promise.allSettled`, a bulk endpoint...);
+   * this component's own job ends at handing over the id list. */
+  onBulkDelete?: (ids: string[]) => void;
   /**
    * How the page grid is presenting the rail (layout contract §5). Optional, defaulting to
    * 'expanded' — every pre-redesign call site (and every pre-redesign test) keeps rendering the
@@ -255,6 +267,8 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   onSelect,
   onNewConversation,
   onDelete,
+  onRename,
+  onBulkDelete,
   displayMode = 'expanded',
   onCollapse,
   onExpand,
@@ -271,6 +285,51 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // The rail's own scroll container (below) doubles as a focus target after a delete/bulk-delete
+  // closes its confirm modal (m12): EUI's modal otherwise tries to return focus to the row/button
+  // that opened it, which the delete just removed, silently dropping focus to `<body>`.
+  // `tabIndex={-1}` (set on the element below) makes a plain `<div>` programmatically focusable
+  // without adding it to the Tab order.
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Separate from `hoveredId` (F-3, WCAG 2.4.11): the pencil/trash icons used to reveal on
+  // `hoveredId` alone, which the row's OWN `onMouseEnter`/`onMouseLeave` also drive -- so a
+  // keyboard user who tabs to row A's pencil (revealing it via that button's own `onFocus`
+  // setting `hoveredId`), then merely moves the MOUSE over row B, saw row A's pencil collapse out
+  // from under their still-live focus ring the instant `onMouseEnter` overwrote `hoveredId` with
+  // row B's id. `focusedId` tracks keyboard/programmatic focus independently, so a focused
+  // control's reveal survives the pointer wandering elsewhere; each icon reveals on
+  // `isHovered || isFocused`.
+  const [focusedId, setFocusedId] = useState<string | null>(null);
+
+  // Inline rename (E2): which row (if any) currently shows an input instead of its title text, and
+  // that input's own in-progress value. Only one row can be renaming at a time.
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState('');
+  // Mirrors `renamingId` but updated SYNCHRONOUSLY (state updates are not) -- see `commitRename`'s
+  // doc comment below for why the commit-on-blur behavior needs this to avoid double-committing.
+  const renamingIdRef = useRef<string | null>(null);
+  // F-5: a mousedown on the row body while renaming blurs the input FIRST -- committing, via
+  // `onBlur={commitRename}` below -- and only THEN does the click itself fire (the browser's
+  // default mousedown action moves focus, hence blur, before mouseup/click). By that point
+  // `renamingIdRef.current` has ALREADY been cleared by the commit, so checking it in the row's
+  // own onClick (below) is not enough on its own -- the click would still read "not renaming" and
+  // fire `onSelect`, navigating away in the same gesture that just committed the rename. This ref
+  // is what `commitRename`'s `onBlur` case (specifically -- NOT its Enter/keyboard case, which
+  // has no click to race) stamps with the id whose blur-triggered commit a click might be about
+  // to follow; the row's onClick (below) consumes and clears it to suppress exactly that one
+  // click, and a queued microtask clears it on its own if no click ever claims it (e.g. the user
+  // tabbed away instead of clicking), so it can never linger and wrongly swallow some LATER,
+  // unrelated click on the same row.
+  const justCommittedViaBlurIdRef = useRef<string | null>(null);
+
+  // Bulk delete (E3): an explicit select mode a "Select conversations" button enters/exits — rows
+  // never show checkboxes outside of it. `selectedIds` is cleared both on entry and on exit, so a
+  // stale selection from a previous select-mode session never survives into the next one.
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
+
   // Hooks run unconditionally on every render (rules of hooks) even though `displayMode ===
   // 'collapsed'` below returns a much smaller tree that never uses most of this state — the
   // collapsed strip's content is a rendering choice, not a reason to skip hooks.
@@ -284,6 +343,38 @@ export const ConversationList: React.FC<ConversationListProps> = ({
     );
   }, [conversations, searchTerm]);
 
+  // A rename in progress belongs to ONE specific conversation id -- switching to a different
+  // conversation (the row's own onSelect already fired) leaves it pointed at a row that is no
+  // longer the point of focus, so clear it rather than let a stale edit linger off-screen.
+  useEffect(() => {
+    renamingIdRef.current = null;
+    setRenamingId(null);
+  }, [activeConversationId]);
+
+  // Prune `selectedIds` (m13) whenever the caller's own `conversations` list changes -- a refresh
+  // after a delete elsewhere (another tab, the single-delete flow) can drop an id this rail still
+  // had checked; keeping it selected would let a later "Delete (N)" confirm try to delete an id
+  // that no longer exists. A no-op (same `Set` reference returned) when nothing needs pruning, so
+  // this never triggers an extra render on every ordinary list refresh.
+  useEffect(() => {
+    setSelectedIds(current => {
+      if (current.size === 0) {
+        return current;
+      }
+      const validIds = new Set(conversations.map(c => c.id));
+      const next = new Set<string>();
+      let changed = false;
+      current.forEach(id => {
+        if (validIds.has(id)) {
+          next.add(id);
+        } else {
+          changed = true;
+        }
+      });
+      return changed ? next : current;
+    });
+  }, [conversations]);
+
   // `new Date(Date.now())`, not a bare `new Date()`: the latter is NOT guaranteed to consult a
   // mocked `Date.now` (engines implement the no-arg constructor as its own native "current time"
   // read, independent of the `Date.now` static property), which would make the TODAY/YESTERDAY
@@ -293,6 +384,26 @@ export const ConversationList: React.FC<ConversationListProps> = ({
     () => groupByDate(filteredConversations, new Date(Date.now())),
     [filteredConversations],
   );
+
+  // m12: after a delete/bulk-delete closes its confirm modal, park focus on the rail's own scroll
+  // container rather than let it fall through to `<body>` -- EUI's modal tries to restore focus to
+  // whatever opened it (the trash icon / "Delete (N)" button), which the action just deleted along
+  // with its row. Deferred one frame: EUI's own focus-restoration runs as part of the SAME
+  // dismissal, and would otherwise win a synchronous race against this.
+  //
+  // F-1: same fallback chat-page.tsx's own dock-animation effect uses for a missing
+  // `requestAnimationFrame` -- without it, an environment lacking rAF would simply never run the
+  // callback at all, silently dropping focus after the delete instead of just doing it a frame
+  // late.
+  const focusRailContainer = () => {
+    if (typeof window.requestAnimationFrame !== 'function') {
+      scrollContainerRef.current?.focus();
+      return;
+    }
+    window.requestAnimationFrame(() => {
+      scrollContainerRef.current?.focus();
+    });
+  };
 
   const requestDelete = (
     event: React.MouseEvent,
@@ -308,6 +419,113 @@ export const ConversationList: React.FC<ConversationListProps> = ({
       onDelete(deleteTarget.id);
     }
     setDeleteTarget(null);
+    focusRailContainer();
+  };
+
+  // --- Inline rename (E2) ---------------------------------------------------------------------
+
+  const clearRename = () => {
+    renamingIdRef.current = null;
+    setRenamingId(null);
+  };
+
+  const startRename = (
+    event: React.MouseEvent,
+    conversation: ConversationSummary,
+  ) => {
+    // Same reason as `requestDelete`'s stopPropagation: never let the row's own onClick (resume)
+    // fire alongside the pencil icon's click.
+    event.stopPropagation();
+    renamingIdRef.current = conversation.id;
+    setRenamingId(conversation.id);
+    setRenameValue(conversation.title);
+  };
+
+  /**
+   * Commits via `renamingIdRef` (NOT the `renamingId` state variable) so this can be called from
+   * BOTH Enter and `onBlur` (m6: commit-on-blur, the mainstream inline-rename convention) without
+   * double-committing. Enter clears the ref synchronously before the resulting re-render unmounts
+   * the input; when a browser removes a focused element from the DOM it also fires a `blur` event
+   * on it as part of that removal, and this function running a second time off THAT blur -- with
+   * the ref already cleared -- is a deliberate no-op rather than a second `onRename` call with a
+   * stale closure's values. A "real" blur (the user clicked or tabbed away without pressing
+   * Enter/Escape) still finds the ref pointing at this row and commits normally.
+   */
+  const commitRename = () => {
+    const id = renamingIdRef.current;
+    if (!id) {
+      return;
+    }
+    const nextTitle = renameValue.trim();
+    clearRename();
+    // An empty (or whitespace-only) title commits nothing rather than saving a blank title — the
+    // row simply reverts to showing its previous title, same as Escape would.
+    if (nextTitle) {
+      onRename?.(id, nextTitle);
+    }
+  };
+
+  /**
+   * The rename input's own `onBlur` (m6: commit-on-blur) calls THIS, not `commitRename` directly
+   * (F-5) -- it additionally stamps `justCommittedViaBlurIdRef` with the id whose commit this
+   * blur just performed, so the row's own onClick (below), if a click follows this exact blur in
+   * the same gesture, can suppress navigating away instead of also firing `onSelect` right after
+   * the commit. Enter's own keydown handler calls `commitRename` directly instead of this
+   * wrapper: an Enter keypress never has a click racing it, so it has nothing to suppress.
+   * Cleared via a queued microtask if no click claims it within this same synchronous turn (a
+   * "real" blur with nothing to suppress, e.g. Tab), so a stale flag can never wrongly swallow
+   * some LATER, unrelated click on the same row.
+   */
+  const handleRenameBlur = () => {
+    const id = renamingIdRef.current;
+    commitRename();
+    if (id) {
+      justCommittedViaBlurIdRef.current = id;
+      queueMicrotask(() => {
+        if (justCommittedViaBlurIdRef.current === id) {
+          justCommittedViaBlurIdRef.current = null;
+        }
+      });
+    }
+  };
+
+  const cancelRename = () => {
+    clearRename();
+  };
+
+  // --- Bulk delete / select mode (E3) -----------------------------------------------------------
+
+  const enterSelectMode = () => {
+    // m6: a rename in progress and select mode are mutually exclusive UI states (the row's rename
+    // affordance is hidden while selectMode is true anyway) -- clear rather than leave it dangling.
+    clearRename();
+    setSelectMode(true);
+    setSelectedIds(new Set());
+  };
+
+  const exitSelectMode = () => {
+    setSelectMode(false);
+    setSelectedIds(new Set());
+  };
+
+  const toggleSelected = (id: string) => {
+    setSelectedIds(current => {
+      const next = new Set(current);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const confirmBulkDelete = () => {
+    const ids = Array.from(selectedIds);
+    setBulkDeleteConfirmOpen(false);
+    exitSelectMode();
+    onBulkDelete?.(ids);
+    focusRailContainer();
   };
 
   const deleteModal = deleteTarget && (
@@ -339,6 +557,41 @@ export const ConversationList: React.FC<ConversationListProps> = ({
             defaultMessage:
               'This will permanently delete the conversation "{title}". This action cannot be undone.',
             values: { title: deleteTarget.title },
+          },
+        )}
+      </p>
+    </EuiConfirmModal>
+  );
+
+  const bulkDeleteModal = bulkDeleteConfirmOpen && (
+    <EuiConfirmModal
+      title={i18n.translate(
+        'wazuhAiAssistant.chat.conversations.bulkDeleteConfirm.title',
+        {
+          defaultMessage:
+            '{count, plural, one {Delete conversation?} other {Delete {count} conversations?}}',
+          values: { count: selectedIds.size },
+        },
+      )}
+      onCancel={() => setBulkDeleteConfirmOpen(false)}
+      onConfirm={confirmBulkDelete}
+      cancelButtonText={i18n.translate(
+        'wazuhAiAssistant.chat.conversations.bulkDeleteConfirm.cancel',
+        { defaultMessage: 'Cancel' },
+      )}
+      confirmButtonText={i18n.translate(
+        'wazuhAiAssistant.chat.conversations.bulkDeleteConfirm.confirm',
+        { defaultMessage: 'Delete' },
+      )}
+      buttonColor='danger'
+    >
+      <p>
+        {i18n.translate(
+          'wazuhAiAssistant.chat.conversations.bulkDeleteConfirm.body',
+          {
+            defaultMessage:
+              'This will permanently delete the selected {count, plural, one {conversation} other {conversations}}. This action cannot be undone.',
+            values: { count: selectedIds.size },
           },
         )}
       </p>
@@ -396,47 +649,97 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   }
 
   return (
-    <>
+    // `display: 'contents'`: purely an event-listener wrapper (m11 -- Escape exits select mode
+    // from anywhere in the rail, not only from a row) with zero layout/visual effect -- the
+    // element renders no box of its own, so it cannot be what "byte-identical row layout at rest"
+    // is checked against; every child below lays out exactly as if this wrapper were the
+    // Fragment it replaces.
+    <div
+      style={{ display: 'contents' }}
+      onKeyDown={event => {
+        if (event.key === 'Escape' && selectMode) {
+          exitSelectMode();
+        }
+      }}
+    >
       {showHeader && (
         <>
           <div className='wzConvoRailHeader'>
+            {/* Select-mode entry point lives HERE, right-aligned against the "Conversations"
+              label, not in the search row below (#9010 review decision): the search row goes
+              back to a bare, upstream-shaped field with nothing beside it. This outer group is a
+              direct child of `.wzConvoRailHeader` -- a plain block div, not a flex container --
+              so it never inherits `.wzConvoRail`'s column-flex grow bug the way the search row
+              itself did; `wzConvoRailSearchRow` is still applied defensively in case that wrapper
+              div is ever flattened away. */}
             <EuiFlexGroup
               responsive={false}
               alignItems='center'
               justifyContent='spaceBetween'
-              gutterSize='s'
+              gutterSize='none'
+              className='wzConvoRailSearchRow'
             >
               <EuiFlexItem grow={false}>
-                <EuiTitle size='xxs'>
-                  <h3 className='wzConvoRailTitle'>
-                    {i18n.translate(
-                      'wazuhAiAssistant.chat.conversations.title',
-                      {
-                        defaultMessage: 'Conversations',
-                      },
+                <EuiFlexGroup
+                  responsive={false}
+                  alignItems='center'
+                  gutterSize='s'
+                >
+                  <EuiFlexItem grow={false}>
+                    <EuiTitle size='xxs'>
+                      <h3 className='wzConvoRailTitle'>
+                        {i18n.translate(
+                          'wazuhAiAssistant.chat.conversations.title',
+                          {
+                            defaultMessage: 'Conversations',
+                          },
+                        )}
+                      </h3>
+                    </EuiTitle>
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false}>
+                    {isLoading && (
+                      <EuiLoadingSpinner
+                        size='s'
+                        aria-label={i18n.translate(
+                          'wazuhAiAssistant.chat.conversations.loading',
+                          {
+                            defaultMessage: 'Loading conversations',
+                          },
+                        )}
+                      />
                     )}
-                  </h3>
-                </EuiTitle>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
               </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                {isLoading && (
-                  <EuiLoadingSpinner
-                    size='s'
-                    aria-label={i18n.translate(
-                      'wazuhAiAssistant.chat.conversations.loading',
-                      {
-                        defaultMessage: 'Loading conversations',
-                      },
+              {/* Hidden once select mode is entered: the toolbar that replaces the search row
+                below already carries its own "Cancel selection" control, so a second entry point
+                here would be redundant (and, mid-selection, ambiguous). */}
+              {onBulkDelete && conversations.length > 0 && !selectMode && (
+                <EuiFlexItem grow={false}>
+                  <EuiToolTip
+                    content={i18n.translate(
+                      'wazuhAiAssistant.chat.conversations.selectMode.enter',
+                      { defaultMessage: 'Select conversations' },
                     )}
-                  />
-                )}
-              </EuiFlexItem>
+                  >
+                    <EuiButtonIcon
+                      iconType='listAdd'
+                      aria-label={i18n.translate(
+                        'wazuhAiAssistant.chat.conversations.selectMode.enter',
+                        { defaultMessage: 'Select conversations' },
+                      )}
+                      onClick={enterSelectMode}
+                    />
+                  </EuiToolTip>
+                </EuiFlexItem>
+              )}
             </EuiFlexGroup>
           </div>
           <EuiSpacer size='s' />
         </>
       )}
-      {showNewConversationButton && (
+      {showNewConversationButton && !selectMode && (
         <>
           <EuiButton
             iconType='plusInCircle'
@@ -453,27 +756,165 @@ export const ConversationList: React.FC<ConversationListProps> = ({
           <EuiSpacer size='s' />
         </>
       )}
-      <EuiFieldSearch
-        placeholder={i18n.translate(
-          'wazuhAiAssistant.chat.conversations.searchPlaceholder',
-          { defaultMessage: 'Search conversations' },
-        )}
-        aria-label={i18n.translate(
-          'wazuhAiAssistant.chat.conversations.searchPlaceholder',
-          { defaultMessage: 'Search conversations' },
-        )}
-        value={searchTerm}
-        onChange={event => setSearchTerm(event.target.value)}
-        fullWidth
-        compressed
-        isClearable
-      />
+      {selectMode ? (
+        // Bulk-delete toolbar (E3): replaces the search field row for the duration of select
+        // mode — searching and bulk-selecting at once is out of scope, and this keeps the row's
+        // layout footprint identical to the search row it stands in for.
+        //
+        // Compact ONE-ROW toolbar (#9010 review, fixing the F-6 `wrap` attempt): `wrap` let the
+        // count/cancel/delete controls stack into a sparse 3-line column at 260-288px instead of
+        // fitting on one line -- the opposite of what a "dense rail" redesign wants. The count
+        // text truncates instead of pushing the buttons off (`minWidth: 0` + ellipsis, same
+        // pattern the row titles already use), "Cancel selection" is an icon button (a `cross`,
+        // same convention as the collapsed-rail affordances above) rather than a full-sentence
+        // EuiButtonEmpty so its own translated string can never be the thing that overflows, and
+        // Delete keeps its short `Delete ({count})` label, which already fits both locales at
+        // both known toolbar widths (260px inline rail / ~288px docked popover).
+        <EuiFlexGroup
+          responsive={false}
+          alignItems='center'
+          gutterSize='s'
+          className='wzConvoRailSearchRow'
+        >
+          <EuiFlexItem grow style={{ minWidth: 0 }}>
+            <EuiText size='xs' color='subdued' style={truncateTextStyle}>
+              {i18n.translate(
+                'wazuhAiAssistant.chat.conversations.selectMode.selectedCount',
+                {
+                  defaultMessage: '{count} selected',
+                  values: { count: selectedIds.size },
+                },
+              )}
+            </EuiText>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiToolTip
+              content={i18n.translate(
+                'wazuhAiAssistant.chat.conversations.selectMode.cancel',
+                { defaultMessage: 'Cancel selection' },
+              )}
+            >
+              <EuiButtonIcon
+                iconType='cross'
+                size='xs'
+                aria-label={i18n.translate(
+                  'wazuhAiAssistant.chat.conversations.selectMode.cancel',
+                  { defaultMessage: 'Cancel selection' },
+                )}
+                onClick={exitSelectMode}
+              />
+            </EuiToolTip>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButton
+              size='s'
+              color='danger'
+              fill
+              isDisabled={selectedIds.size === 0}
+              onClick={() => setBulkDeleteConfirmOpen(true)}
+            >
+              {i18n.translate(
+                'wazuhAiAssistant.chat.conversations.selectMode.deleteButton',
+                {
+                  defaultMessage: 'Delete ({count})',
+                  values: { count: selectedIds.size },
+                },
+              )}
+            </EuiButton>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      ) : showHeader ? (
+        // Bare, full-width field -- exactly upstream's own structure (#9010 review decision): the
+        // select-mode entry point now lives in the header above, so this row no longer needs to
+        // wrap the field in a flex group to make room for that icon beside it. A plain direct
+        // child of `.wzConvoRail`, same as `EuiButton`/`EuiSpacer` elsewhere in this render, never
+        // an `EuiFlexGroup` (which is exactly what needed the `wzConvoRailSearchRow` flex-grow
+        // override in the first place -- so that class stays OFF this row now).
+        <EuiFieldSearch
+          placeholder={i18n.translate(
+            'wazuhAiAssistant.chat.conversations.searchPlaceholder',
+            { defaultMessage: 'Search conversations' },
+          )}
+          aria-label={i18n.translate(
+            'wazuhAiAssistant.chat.conversations.searchPlaceholder',
+            { defaultMessage: 'Search conversations' },
+          )}
+          value={searchTerm}
+          onChange={event => {
+            setSearchTerm(event.target.value);
+            // m6: a rename in progress belongs to a specific row that a new search term may
+            // filter out of view entirely -- clear it rather than leave an edit open on a row
+            // the user can no longer see. (select mode has no search field to begin with --
+            // see the toolbar's own comment above -- so there is no equivalent case there.)
+            clearRename();
+          }}
+          fullWidth
+          compressed
+          isClearable
+        />
+      ) : (
+        // `showHeader === false` (the docked popover, assistant-chat-panel.tsx): that surface
+        // never renders `.wzConvoRailHeader`, so the select-mode entry point has no header to
+        // live in there. m14 (#9010 review) decided this popover is a PRIMARY surface for the
+        // rail, entitled to the SAME bulk-delete affordance as the inline rail -- dropping the
+        // icon here entirely (to match the bare-field row above) would silently regress that
+        // decision, so this keeps the pre-existing wrapped layout (field + inline icon) as the
+        // fallback placement for this one context.
+        <EuiFlexGroup
+          responsive={false}
+          alignItems='center'
+          gutterSize='xs'
+          className='wzConvoRailSearchRow'
+        >
+          <EuiFlexItem grow>
+            <EuiFieldSearch
+              placeholder={i18n.translate(
+                'wazuhAiAssistant.chat.conversations.searchPlaceholder',
+                { defaultMessage: 'Search conversations' },
+              )}
+              aria-label={i18n.translate(
+                'wazuhAiAssistant.chat.conversations.searchPlaceholder',
+                { defaultMessage: 'Search conversations' },
+              )}
+              value={searchTerm}
+              onChange={event => {
+                setSearchTerm(event.target.value);
+                clearRename();
+              }}
+              fullWidth
+              compressed
+              isClearable
+            />
+          </EuiFlexItem>
+          {onBulkDelete && conversations.length > 0 && (
+            <EuiFlexItem grow={false}>
+              <EuiToolTip
+                content={i18n.translate(
+                  'wazuhAiAssistant.chat.conversations.selectMode.enter',
+                  { defaultMessage: 'Select conversations' },
+                )}
+              >
+                <EuiButtonIcon
+                  iconType='listAdd'
+                  aria-label={i18n.translate(
+                    'wazuhAiAssistant.chat.conversations.selectMode.enter',
+                    { defaultMessage: 'Select conversations' },
+                  )}
+                  onClick={enterSelectMode}
+                />
+              </EuiToolTip>
+            </EuiFlexItem>
+          )}
+        </EuiFlexGroup>
+      )}
       <EuiSpacer size='m' />
 
       {/* Only this section scrolls (`.wzConvoRailScroll`): with the whole rail scrolling instead,
           a long history pushed the pinned "Collapse" control below the fold and put a second
-          scrollbar around the search field that never needed one. */}
-      <div className='wzConvoRailScroll'>
+          scrollbar around the search field that never needed one. `tabIndex={-1}` + the ref (m12)
+          make this a valid focus TARGET (after a delete/bulk-delete closes its confirm modal)
+          without adding it to the Tab order itself. */}
+      <div className='wzConvoRailScroll' ref={scrollContainerRef} tabIndex={-1}>
         {filteredConversations.length === 0 ? (
           <EuiText size='xs' color='subdued'>
             <p>
@@ -490,124 +931,304 @@ export const ConversationList: React.FC<ConversationListProps> = ({
         ) : (
           groups.map(group => (
             <React.Fragment key={group.key}>
-              <div className='wzConvoRailGroupHeader'>{group.label}</div>
-              {group.items.map(conversation => {
-                const isSelected = conversation.id === activeConversationId;
-                const isHovered = conversation.id === hoveredId;
-                return (
-                  <React.Fragment key={conversation.id}>
-                    {/* Plain `div` (not EuiFlexGroup) carries the interactive/a11y attributes,
-                      since EUI's own prop types don't guarantee accepting arbitrary
-                      role/tabIndex/onKeyDown passthrough — EuiFlexGroup nested inside is purely
-                      for the row's layout. */}
-                    <div
-                      role='button'
-                      tabIndex={0}
-                      // Programmatic indication of the single-select list's current item, for
-                      // assistive tech — the selected row is also signaled visually (the soft-tinted
-                      // pill fill below, plus bold text), but this is what a screen reader can key
-                      // off of.
-                      aria-current={isSelected ? 'true' : undefined}
-                      onClick={() => onSelect(conversation.id)}
-                      onKeyDown={event => {
-                        if (event.key === 'Enter' || event.key === ' ') {
-                          event.preventDefault();
-                          onSelect(conversation.id);
+              {/* `role='heading'`/`aria-level` (m7): a screen reader should announce "Today" the
+                  same way it announces the panel's own "Conversations" title (a REAL `<h3>` above)
+                  -- one level down, since this heads a sub-section of that title, not a sibling of
+                  it -- rather than as an unstructured run of text before the list that follows it.
+                  Zero visual change: still the same `<div>` + `wzConvoRailGroupHeader` class: only
+                  an ARIA role/level is added, nothing about markup tag or styling. */}
+              <div
+                className='wzConvoRailGroupHeader'
+                role='heading'
+                aria-level={4}
+              >
+                {group.label}
+              </div>
+              {/* Real list markup (E5/#9010): each date group is its own native `<ul>` of `<li>`
+                  rows, so a screen reader announces "list, N items" the way EUI's own
+                  `EuiListGroup` does — rather than the previous plain `<div>`s, which read as an
+                  undifferentiated run of generic elements. `.wzConvoRailGroupList`/
+                  `.wzConvoRailListItem` (conversation-list.scss) reset the browser's default
+                  list marker/indent so this is a markup-only change with no visual effect.
+                  No `aria-label` here (F-9): the `role='heading'` div right above already
+                  announces this group's name -- an `aria-label` repeating the SAME text on the
+                  list itself would make a screen reader announce "Today" twice back to back. */}
+              <ul className='wzConvoRailGroupList'>
+                {group.items.map(conversation => {
+                  const isSelected = conversation.id === activeConversationId;
+                  const isHovered = conversation.id === hoveredId;
+                  const isFocused = conversation.id === focusedId;
+                  const isRenaming = conversation.id === renamingId;
+                  const isChecked = selectedIds.has(conversation.id);
+                  return (
+                    <li key={conversation.id} className='wzConvoRailListItem'>
+                      {/* Plain `div` (not EuiFlexGroup) carries the interactive/a11y attributes,
+                        since EUI's own prop types don't guarantee accepting arbitrary
+                        role/tabIndex/onKeyDown passthrough — EuiFlexGroup nested inside is purely
+                        for the row's layout. In select mode the row toggles this conversation's
+                        checkbox instead of resuming it. */}
+                      <div
+                        role={selectMode ? undefined : 'button'}
+                        tabIndex={selectMode ? undefined : 0}
+                        // Programmatic indication of the single-select list's current item, for
+                        // assistive tech — the selected row is also signaled visually (the soft-tinted
+                        // pill fill below, plus bold text), but this is what a screen reader can key
+                        // off of. Only meaningful outside select mode (select mode has its own
+                        // multi-select semantics via each row's checkbox).
+                        aria-current={
+                          !selectMode && isSelected ? 'true' : undefined
                         }
-                      }}
-                      onMouseEnter={() => setHoveredId(conversation.id)}
-                      onMouseLeave={() =>
-                        setHoveredId(current =>
-                          current === conversation.id ? null : current,
-                        )
-                      }
-                      // wzConvoRow (chat-page.scss) supplies a reduced-motion-safe transition timing
-                      // for the background/border-color changes below — the colors themselves stay
-                      // driven by this row's own hover/selected state, unchanged.
-                      className='wzConvoRow'
-                      style={{
-                        cursor: 'pointer',
-                        padding: '8px',
-                        // "Soft-tinted pill on the active row" (design language, "Navigation"): a
-                        // filled, well-rounded highlight rather than the old left-border indicator —
-                        // font-weight 600 plus `aria-current` above are what carry the
-                        // non-color-reliant signal now.
-                        borderRadius: 8,
-                        background: isSelected
-                          ? 'var(--wz-accent-soft)'
-                          : isHovered
-                          ? 'var(--wz-accent-hover)'
-                          : 'transparent',
-                      }}
-                    >
-                      <EuiFlexGroup
-                        responsive={false}
-                        alignItems='center'
-                        gutterSize='xs'
+                        onClick={() => {
+                          if (selectMode) {
+                            toggleSelected(conversation.id);
+                            return;
+                          }
+                          // F-5: a click that immediately follows this exact row's blur-triggered
+                          // commit (see `handleRenameBlur`'s own doc comment) is suppressed here,
+                          // once, rather than also firing `onSelect` and navigating away in the
+                          // same gesture that just committed the rename.
+                          if (
+                            justCommittedViaBlurIdRef.current ===
+                            conversation.id
+                          ) {
+                            justCommittedViaBlurIdRef.current = null;
+                            return;
+                          }
+                          // Reads the synchronous `renamingIdRef`, NOT the `isRenaming`
+                          // state-derived flag above, for the same reason: by the time a click
+                          // dispatches, a blur that already ran has already cleared this ref
+                          // (and re-rendered, flipping `isRenaming` too) — either way, "not
+                          // renaming any more" is the correct read for a click that ISN'T the one
+                          // suppressed above.
+                          if (renamingIdRef.current !== conversation.id) {
+                            onSelect(conversation.id);
+                          }
+                        }}
+                        onKeyDown={event => {
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            if (selectMode) {
+                              toggleSelected(conversation.id);
+                            } else if (
+                              renamingIdRef.current !== conversation.id
+                            ) {
+                              onSelect(conversation.id);
+                            }
+                          }
+                        }}
+                        onMouseEnter={() => setHoveredId(conversation.id)}
+                        onMouseLeave={() =>
+                          setHoveredId(current =>
+                            current === conversation.id ? null : current,
+                          )
+                        }
+                        // wzConvoRow (chat-page.scss) supplies a reduced-motion-safe transition timing
+                        // for the background/border-color changes below — the colors themselves stay
+                        // driven by this row's own hover/selected state, unchanged.
+                        className='wzConvoRow'
+                        style={{
+                          position: 'relative',
+                          cursor: selectMode ? 'default' : 'pointer',
+                          padding: '8px',
+                          // "Soft-tinted pill on the active row" (design language, "Navigation"): a
+                          // filled, well-rounded highlight rather than the old left-border indicator —
+                          // font-weight 600 plus `aria-current` above are what carry the
+                          // non-color-reliant signal now.
+                          borderRadius: 8,
+                          background:
+                            !selectMode && isSelected
+                              ? 'var(--wz-accent-soft)'
+                              : isHovered
+                              ? 'var(--wz-accent-hover)'
+                              : 'transparent',
+                        }}
                       >
-                        <EuiFlexItem grow style={{ minWidth: 0 }}>
-                          <EuiText
-                            size='s'
-                            style={{
-                              ...truncateTextStyle,
-                              fontWeight: isSelected ? 600 : undefined,
-                            }}
-                            title={conversation.title}
-                          >
-                            {conversation.title}
-                          </EuiText>
-                        </EuiFlexItem>
-                        {/* The relative timestamp moves onto the row's own line (design gap "a
-                          whole line spent on a relative timestamp") — `flexShrink: 0` and
-                          `whiteSpace: 'nowrap'` keep it from ever wrapping under the truncated
-                          title beside it. */}
-                        <EuiFlexItem grow={false}>
-                          <EuiText
-                            size='xs'
-                            color='subdued'
-                            style={{
-                              fontVariantNumeric: 'tabular-nums',
-                              whiteSpace: 'nowrap',
-                              flexShrink: 0,
-                            }}
-                          >
-                            {formatRelativeTime(conversation.updatedAt)}
-                          </EuiText>
-                        </EuiFlexItem>
-                        <EuiFlexItem
-                          grow={false}
-                          // 0 at rest (never a mid-opacity resting state that fails WCAG 1.4.11's
-                          // 3:1 contrast requirement for a control) — 1 on hover, selection, OR
-                          // keyboard focus, so a keyboard/switch user can find and reach this
-                          // control too.
-                          style={{ opacity: isHovered || isSelected ? 1 : 0 }}
+                        <EuiFlexGroup
+                          responsive={false}
+                          alignItems='center'
+                          gutterSize='xs'
                         >
-                          <EuiButtonIcon
-                            iconType='trash'
-                            color='danger'
-                            aria-label={i18n.translate(
-                              'wazuhAiAssistant.chat.conversations.delete',
-                              {
-                                defaultMessage: 'Delete conversation',
-                              },
+                          {selectMode && (
+                            <EuiFlexItem
+                              grow={false}
+                              // The row's own onClick above ALSO toggles selection in select mode
+                              // (so clicking anywhere on the row works, not only the checkbox
+                              // itself) -- without stopping propagation here, a click on the
+                              // checkbox would bubble into that same handler and toggle twice,
+                              // net effect: nothing changes.
+                              onClick={event => event.stopPropagation()}
+                            >
+                              <EuiCheckbox
+                                id={`wzConvoSelect-${conversation.id}`}
+                                checked={isChecked}
+                                onChange={() => toggleSelected(conversation.id)}
+                                label=''
+                                aria-label={i18n.translate(
+                                  'wazuhAiAssistant.chat.conversations.selectMode.selectRow',
+                                  {
+                                    defaultMessage: 'Select "{title}"',
+                                    values: { title: conversation.title },
+                                  },
+                                )}
+                              />
+                            </EuiFlexItem>
+                          )}
+                          <EuiFlexItem grow style={{ minWidth: 0 }}>
+                            {isRenaming ? (
+                              <EuiFieldText
+                                compressed
+                                autoFocus
+                                value={renameValue}
+                                aria-label={i18n.translate(
+                                  'wazuhAiAssistant.chat.conversations.renameInputLabel',
+                                  { defaultMessage: 'Conversation title' },
+                                )}
+                                onClick={event => event.stopPropagation()}
+                                onChange={event =>
+                                  setRenameValue(event.target.value)
+                                }
+                                onKeyDown={event => {
+                                  // Never let Enter/Escape/Space bubble to the row's own
+                                  // onKeyDown above (Space would otherwise re-trigger onSelect).
+                                  event.stopPropagation();
+                                  if (event.key === 'Enter') {
+                                    event.preventDefault();
+                                    commitRename();
+                                  } else if (event.key === 'Escape') {
+                                    event.preventDefault();
+                                    cancelRename();
+                                  }
+                                }}
+                                // m6: commit on blur (clicking/tabbing away), the mainstream
+                                // inline-rename convention — `handleRenameBlur` (not
+                                // `commitRename` directly, F-5) both commits (safe to ALSO run
+                                // after an Enter-triggered unmount's own synthetic blur, without
+                                // double-committing — see `commitRename`'s own doc comment) AND
+                                // arms the one-click navigation suppression a mousedown-triggered
+                                // blur needs — see that function's own doc comment.
+                                onBlur={handleRenameBlur}
+                              />
+                            ) : (
+                              <EuiText
+                                size='s'
+                                style={{
+                                  ...truncateTextStyle,
+                                  fontWeight: isSelected ? 600 : undefined,
+                                }}
+                                title={conversation.title}
+                              >
+                                {conversation.title}
+                              </EuiText>
                             )}
-                            onClick={(event: React.MouseEvent) =>
-                              requestDelete(event, conversation)
-                            }
-                            onFocus={() => setHoveredId(conversation.id)}
-                            onBlur={() =>
-                              setHoveredId(current =>
-                                current === conversation.id ? null : current,
-                              )
-                            }
-                          />
-                        </EuiFlexItem>
-                      </EuiFlexGroup>
-                    </div>
-                    <EuiSpacer size='xs' />
-                  </React.Fragment>
-                );
-              })}
+                          </EuiFlexItem>
+                          {!selectMode && !isRenaming && (
+                            <>
+                              {/* The relative timestamp moves onto the row's own line (design gap "a
+                                whole line spent on a relative timestamp") — `flexShrink: 0` and
+                                `whiteSpace: 'nowrap'` keep it from ever wrapping under the truncated
+                                title beside it. */}
+                              <EuiFlexItem grow={false}>
+                                <EuiText
+                                  size='xs'
+                                  color='subdued'
+                                  style={{
+                                    fontVariantNumeric: 'tabular-nums',
+                                    whiteSpace: 'nowrap',
+                                    flexShrink: 0,
+                                  }}
+                                >
+                                  {formatRelativeTime(conversation.updatedAt)}
+                                </EuiText>
+                              </EuiFlexItem>
+                              <EuiFlexItem
+                                grow={false}
+                                // 0 at rest (never a mid-opacity resting state that fails WCAG 1.4.11's
+                                // 3:1 contrast requirement for a control) — 1 on hover, selection, OR
+                                // keyboard focus (F-3: `isFocused`, not `isHovered`, is what survives
+                                // the pointer moving to a different row), so a keyboard/switch user
+                                // can find and reach this control too.
+                                style={{
+                                  opacity:
+                                    isHovered || isSelected || isFocused
+                                      ? 1
+                                      : 0,
+                                }}
+                              >
+                                <EuiButtonIcon
+                                  iconType='trash'
+                                  color='danger'
+                                  aria-label={i18n.translate(
+                                    'wazuhAiAssistant.chat.conversations.delete',
+                                    {
+                                      defaultMessage: 'Delete conversation',
+                                    },
+                                  )}
+                                  onClick={(event: React.MouseEvent) =>
+                                    requestDelete(event, conversation)
+                                  }
+                                  onFocus={() => setFocusedId(conversation.id)}
+                                  onBlur={() =>
+                                    setFocusedId(current =>
+                                      current === conversation.id
+                                        ? null
+                                        : current,
+                                    )
+                                  }
+                                />
+                              </EuiFlexItem>
+                            </>
+                          )}
+                        </EuiFlexGroup>
+                        {/* M3 fix (#9010 review): the pencil used to be a zero-width EuiFlexItem
+                          INSIDE the EuiFlexGroup above. EUI's `gutterSize='xs'` is implemented as
+                          a margin on every flex item, including a collapsed `width: 0` one — so
+                          that item still cost the row ~4px of dead gutter at rest, on top of the
+                          upstream row's own [title][timestamp][trash] gutters (compare
+                          `upstream/5.0.0`'s own row markup: three items, this one's own margin
+                          included). Taking the pencil OUT of the flex flow entirely and rendering
+                          it as this absolutely-positioned overlay (anchored to `position:
+                          relative` on the row div above) is what makes the row's OWN flex
+                          group — title/timestamp/trash, nothing else — byte-identical to
+                          upstream's at rest, not merely visually close to it.
+                          `pointerEvents: 'none'` at rest, not just `opacity: 0`: this sits on top
+                          of the timestamp/trash's own hit area, so an invisible-but-still-clickable
+                          overlay would silently steal clicks meant for them between hovers.
+                          Reveal condition unchanged from before (`isHovered || isFocused`, F-3),
+                          and the background is the SAME `--wz-accent-hover` token the row itself
+                          paints on hover (conversation-list.scss) — no new color — so a title
+                          character the pencil happens to sit over never bleeds through it. */}
+                        {onRename && !selectMode && !isRenaming && (
+                          <div
+                            className='wzConvoRowRenameOverlay'
+                            style={{
+                              opacity: isHovered || isFocused ? 1 : 0,
+                              pointerEvents:
+                                isHovered || isFocused ? 'auto' : 'none',
+                            }}
+                          >
+                            <EuiButtonIcon
+                              iconType='pencil'
+                              aria-label={i18n.translate(
+                                'wazuhAiAssistant.chat.conversations.rename',
+                                { defaultMessage: 'Rename conversation' },
+                              )}
+                              onClick={(event: React.MouseEvent) =>
+                                startRename(event, conversation)
+                              }
+                              onFocus={() => setFocusedId(conversation.id)}
+                              onBlur={() =>
+                                setFocusedId(current =>
+                                  current === conversation.id ? null : current,
+                                )
+                              }
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
             </React.Fragment>
           ))
         )}
@@ -631,6 +1252,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
       )}
 
       {deleteModal}
-    </>
+      {bulkDeleteModal}
+    </div>
   );
 };
