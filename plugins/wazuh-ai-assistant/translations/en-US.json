@@ -122,7 +122,7 @@
     "wazuhAiAssistant.settings.privacy.defaultOnLabel": "Enable privacy mode by default",
     "wazuhAiAssistant.settings.privacy.userCanOverrideLabel": "Allow users to override privacy mode from the chat page",
     "wazuhAiAssistant.settings.privacy.fieldPolicyTitle": "Field policy",
-    "wazuhAiAssistant.settings.privacy.fieldPolicyHelp": "Controls which finding fields are anonymized (or dropped entirely) before reaching the AI provider when privacy mode is on.",
+    "wazuhAiAssistant.settings.privacy.fieldPolicyHelp": "What the AI provider gets per field: the value (Allow — in privacy mode, known identifiers in it are still pseudonymized), a pseudonym (Anonymize), or nothing (Never send).",
     "wazuhAiAssistant.settings.privacy.fieldPolicyFoundCount": "{count} found",
     "wazuhAiAssistant.settings.privacy.fieldPolicyShowMore": "Show {count} more",
     "wazuhAiAssistant.settings.privacy.fieldPolicyShowLess": "Show less",

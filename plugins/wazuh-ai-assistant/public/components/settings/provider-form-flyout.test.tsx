@@ -1517,12 +1517,62 @@ describe('ProviderFormFlyout — required-field validation', () => {
     expect(baseProps.onSubmit).not.toHaveBeenCalled();
   });
 
+  it('validates the same way when EDITING an existing provider', async () => {
+    // The edit flow reaches submit with values already in the fields, so emptying them is the only
+    // way to reach the required-field checks there — and it is a real path: an admin clearing a
+    // field to retype it and clicking Save & test too early.
+    render(
+      <ProviderFormFlyout {...baseProps} editingProvider={editingProvider} />,
+    );
+
+    fireEvent.change(screen.getByLabelText(/^name/i), {
+      target: { value: '  ' },
+    });
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: '' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+
+    expect(
+      await screen.findByText(/enter a name for this provider/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/enter the endpoint url for this provider/i),
+    ).toBeInTheDocument();
+    expect(document.activeElement).toBe(screen.getByLabelText(/^name/i));
+    expect(baseProps.onSubmit).not.toHaveBeenCalled();
+  });
+
   it('marks the model combo box as required for assistive technology', () => {
     // The red asterisk on the label is `aria-hidden` decoration, so without this the one required
     // field that is not a plain input was never announced as required.
     render(<ProviderFormFlyout {...baseProps} />);
 
     expect(modelSearchInput()).toHaveAttribute('aria-required', 'true');
+  });
+
+  it('puts the model error on the input submit moves focus to', async () => {
+    // EuiFormRow clones its a11y props onto the combo box WRAPPER and EuiComboBox does not forward
+    // them to the search input, so without wiring these by hand the field that just received focus
+    // would announce nothing about why it was rejected.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+    await screen.findByText(/enter a name for this provider/i);
+
+    const input = modelSearchInput();
+    expect(input).toHaveAttribute('aria-invalid', 'true');
+    const describedBy = input.getAttribute('aria-describedby');
+    expect(describedBy).toBeTruthy();
+    expect(document.getElementById(describedBy as string)?.textContent).toMatch(
+      /pick a suggestion, or type a model id and press enter\./i,
+    );
+
+    // And they come off again once the field is satisfied.
+    fireEvent.change(input, { target: { value: 'gpt-4o' } });
+    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
+    expect(modelSearchInput()).not.toHaveAttribute('aria-invalid');
+    expect(modelSearchInput()).not.toHaveAttribute('aria-describedby');
   });
 
   it('blocks Save while the model combo box holds uncommitted search text', async () => {
@@ -1652,6 +1702,105 @@ describe('ProviderFormFlyout — endpoint URL validation', () => {
     expect(baseProps.onSubmit).not.toHaveBeenCalled();
   });
 
+  it('accepts a gateway URL that legitimately carries a scheme in its query', async () => {
+    // A passthrough/gateway endpoint names its upstream in its own path or query, and the server's
+    // url-guard accepts exactly that. A "second scheme anywhere" rule would refuse such a provider
+    // outright — and, since every save runs this check, would also make an already-stored one
+    // impossible to re-save.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/^name/i), {
+      target: { value: 'Corp gateway' },
+    });
+    const field = screen.getByLabelText(/endpoint url/i);
+    fireEvent.change(field, {
+      target: {
+        value: 'https://gw.internal/proxy?upstream=https://api.openai.com',
+      },
+    });
+    fireEvent.blur(field);
+    expect(
+      screen.queryByText(/contains http:\/\/ or https:\/\/ more than once/i),
+    ).toBeNull();
+
+    fireEvent.change(modelSearchInput(), { target: { value: 'gpt-4o' } });
+    fireEvent.keyDown(modelSearchInput(), { key: 'Enter', code: 'Enter' });
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+
+    await waitFor(() =>
+      expect(baseProps.onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          baseUrl: 'https://gw.internal/proxy?upstream=https://api.openai.com',
+        }),
+      ),
+    );
+  });
+
+  it('keeps a submit-raised required error through a click into the empty field', async () => {
+    // Blur must not erase what submit reported: the ternary this replaced hit its null arm for any
+    // empty value, so tabbing through the field cleared the very error that stopped the save.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+    const error = await screen.findByText(
+      /enter the endpoint url for this provider/i,
+    );
+
+    const field = screen.getByLabelText(/endpoint url/i);
+    fireEvent.focus(field);
+    fireEvent.blur(field);
+
+    expect(error).toBeInTheDocument();
+  });
+
+  it('clears a stale endpoint error when a type switch rewrites the value', async () => {
+    // The error belongs to the value that produced it. A type switch only rewrites a field the
+    // admin has not typed into (empty here, after a submit raised the required error), and
+    // switching to Anthropic prefills its one real endpoint — leaving the old error on that marked
+    // a perfectly good field as invalid while Save would then have found nothing wrong.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+    expect(
+      await screen.findByText(/enter the endpoint url for this provider/i),
+    ).toBeInTheDocument();
+
+    fireEvent.click(providerTypeOption('anthropic'));
+
+    expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
+      'https://api.anthropic.com',
+    );
+    expect(
+      screen.queryByText(/enter the endpoint url for this provider/i),
+    ).toBeNull();
+  });
+
+  it('leaves the error alone when a type switch does NOT rewrite the value', async () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    // Typing marks the field as the admin's, so a type switch must not touch it.
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'not-a-url' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+    await screen.findByText(/valid URL starting with http/i);
+
+    fireEvent.click(providerTypeOption('anthropic'));
+
+    expect(screen.getByLabelText(/endpoint url/i)).toHaveValue('not-a-url');
+    expect(
+      screen.getByText(/valid URL starting with http/i),
+    ).toBeInTheDocument();
+  });
+
+  /**
+   * What these cases can and cannot prove: jsdom does not model the caret or a text selection, so
+   * the half of this fix that matters most for a MOUSE user — the mouseup completing the click
+   * collapsing the selection `select()` just made, which is why the field calls `preventDefault()`
+   * on that one mouseup — is not observable here. These assert the decision (is this value
+   * selected at all, and is exactly one mouseup suppressed); the caret behaviour itself is a
+   * live-browser check.
+   */
   it('selects a still-suggested prefilled endpoint on focus, so typing replaces it', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
@@ -1664,6 +1813,12 @@ describe('ProviderFormFlyout — endpoint URL validation', () => {
     fireEvent.focus(field);
     expect(select).toHaveBeenCalled();
     select.mockRestore();
+
+    // `fireEvent` returns false when a handler called preventDefault. The mouseup completing THAT
+    // click is suppressed, so it cannot collapse the selection...
+    expect(fireEvent.mouseUp(field)).toBe(false);
+    // ...but only that one — a later click must still be able to place a caret.
+    expect(fireEvent.mouseUp(field)).toBe(true);
   });
 
   it('does not select a value the admin typed themselves', () => {
@@ -1675,6 +1830,30 @@ describe('ProviderFormFlyout — endpoint URL validation', () => {
     const select = jest.spyOn(field, 'select');
     fireEvent.focus(field);
     expect(select).not.toHaveBeenCalled();
+    expect(fireEvent.mouseUp(field)).toBe(true);
+    select.mockRestore();
+  });
+
+  it('never selects the endpoint of an existing provider being edited', () => {
+    // The data-loss case: a STORED endpoint that happens to read exactly like today's placeholder
+    // must not be selected-and-replaced by the first keystroke of an admin who clicked in only to
+    // inspect it. `baseUrlTouched` starting true for an edit is what keeps this off.
+    render(
+      <ProviderFormFlyout
+        {...baseProps}
+        editingProvider={{
+          ...editingProvider,
+          type: 'anthropic',
+          baseUrl: 'https://api.anthropic.com',
+        }}
+      />,
+    );
+
+    const field = screen.getByLabelText(/endpoint url/i) as HTMLInputElement;
+    const select = jest.spyOn(field, 'select');
+    fireEvent.focus(field);
+    expect(select).not.toHaveBeenCalled();
+    expect(fireEvent.mouseUp(field)).toBe(true);
     select.mockRestore();
   });
 });

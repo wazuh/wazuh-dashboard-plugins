@@ -521,14 +521,29 @@ function isValidEndpointUrl(value: string): boolean {
 }
 
 /**
- * A second `http://`/`https://` anywhere after the first one. This is what a paste on top of the
- * type-prefilled default produces (`https://api.anthropic.comhttps://my-gateway/v1`, or the same
- * with the caret left mid-string), and `isValidEndpointUrl` above happily accepts it: it starts
- * with a scheme and is non-empty, and `new URL()` parses it too — the whole tail just becomes part
- * of the host/path. So without this check the admin gets no field error at all and instead waits
- * for an opaque connection-test failure against a host they never meant to type.
+ * A second scheme inside the AUTHORITY — i.e. between `https://` and the first `/`, `?` or `#`.
+ * That is what a paste on top of the type-prefilled default produces
+ * (`https://api.anthropic.comhttps://my-gateway/v1`, or the same with the caret left mid-string),
+ * and `isValidEndpointUrl` above happily accepts it: it starts with a scheme and is non-empty, and
+ * `new URL()` parses it too — the whole tail just becomes part of the host. So without this check
+ * the admin gets no field error at all and instead waits for an opaque connection-test failure
+ * against a host they never meant to type.
+ *
+ * Scoped to the authority on purpose. A scheme LATER in the URL is perfectly legitimate — a
+ * gateway or passthrough endpoint carries the upstream in its own path or query
+ * (`https://gw.internal/proxy?upstream=https://api.openai.com`), the server's own url-guard
+ * accepts exactly that, and a blanket "second scheme anywhere" rule would not only refuse such a
+ * provider but permanently block re-saving one already stored — every `handleSave` path runs this
+ * check, including an edit that changes nothing about the URL.
  */
-const REPEATED_SCHEME_PATTERN = /^\s*https?:\/\/.*https?:\/\//i;
+function hasRepeatedSchemeInAuthority(value: string): boolean {
+  const authority = /^\s*https?:\/\/([^/?#]*)/i.exec(value)?.[1];
+  // `https?:` rather than `https?://`: the doubled paste leaves the second scheme's own slashes on
+  // the other side of the authority boundary (`api.anthropic.comhttps:` above), so requiring them
+  // here would match nothing. A real hostname cannot contain a colon-terminated scheme — the only
+  // colon a host may carry is the port separator, followed by digits.
+  return Boolean(authority && /https?:/i.test(authority));
+}
 
 /**
  * The endpoint field's single source of validation truth, shared by submit AND blur (previously
@@ -546,7 +561,7 @@ function getEndpointUrlError(value: string): string | null {
       defaultMessage: 'Enter the endpoint URL for this provider.',
     });
   }
-  if (REPEATED_SCHEME_PATTERN.test(trimmed)) {
+  if (hasRepeatedSchemeInAuthority(trimmed)) {
     return i18n.translate(
       'wazuhAiAssistant.settings.form.baseUrlRepeatedScheme',
       {
@@ -568,7 +583,8 @@ function getEndpointUrlError(value: string): string | null {
  * placeholder Anthropic is prefilled with, or one of the "Examples:" chips). Those values are
  * indistinguishable on screen from something the admin typed, which is the prefill-vs-example
  * confusion: the field looks filled in, so the admin clicks into it and types — appending to the
- * default instead of replacing it (see `REPEATED_SCHEME_PATTERN` above for the result). Selecting
+ * default instead of replacing it (see `hasRepeatedSchemeInAuthority` above for the result).
+ * Selecting
  * the text on focus makes the first keystroke replace it, which is the cheapest fix that leaves the
  * field itself alone.
  */
@@ -597,6 +613,14 @@ function getModelSearchInput(): HTMLInputElement | null {
     `[data-test-subj="${MODEL_COMBO_TEST_SUBJ}"] input`,
   );
 }
+
+/** `EuiFormRow` renders its own error text with the id `<row id>-error-<index>` and pushes that id
+ * into the `describedByIds` it clones onto its child — but the child here is the combo box WRAPPER,
+ * and `EuiComboBox` does not forward `aria-describedby` (or `aria-invalid`) to the search input
+ * inside it. So the field the submit handler just moved focus to would announce nothing at all
+ * about why it was rejected. This is the row's own first error id, wired onto that input by hand. */
+const MODEL_ROW_ID = 'wz-ai-provider-model';
+const MODEL_ERROR_ID = `${MODEL_ROW_ID}-error-0`;
 
 /** Collapses the (potentially multi-service, for openai_compatible) docs links behind a single
  * trigger rather than inlining them all in the help text — inlining every link for every provider
@@ -726,6 +750,10 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   // footer button hunting for which of the errors above it appeared.
   const nameInputRef = useRef<HTMLInputElement | null>(null);
   const baseUrlInputRef = useRef<HTMLInputElement | null>(null);
+  // Set when the endpoint field's focus handler selected a still-suggested value, so the mouseup
+  // that completes the very same click can be stopped from collapsing that selection. See the
+  // field's own `onFocus`/`onMouseUp` below.
+  const suppressNextMouseUpRef = useRef(false);
   // Tracks whether the admin has typed into the endpoint URL field themselves (see the field's own
   // `onChange` below), so a provider-type switch (`handleTypeChange` above) only ever resets the
   // base URL while the field is still empty or holds one of the OLD type's own known defaults —
@@ -785,6 +813,25 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
     getModelSearchInput()?.setAttribute('aria-required', 'true');
   }, []);
 
+  // The invalid state and the error text, on the same input, for the same reason (see
+  // `MODEL_ERROR_ID`): submit moves focus here, and a focused input that is silent about its own
+  // rejection is exactly the case a screen-reader user cannot recover from. Safe to remove the
+  // attributes when the error clears — `EuiComboBox` never sets either of them itself, so there is
+  // nothing of EUI's to clobber.
+  useEffect(() => {
+    const input = getModelSearchInput();
+    if (!input) {
+      return;
+    }
+    if (modelError) {
+      input.setAttribute('aria-invalid', 'true');
+      input.setAttribute('aria-describedby', MODEL_ERROR_ID);
+    } else {
+      input.removeAttribute('aria-invalid');
+      input.removeAttribute('aria-describedby');
+    }
+  }, [modelError]);
+
   // Deliberately does NOT set `baseUrlTouched` — this fills the field from one of the type's own
   // "Examples:" chips, which is still just a suggested value (see `handleTypeChange` above), not
   // something the admin hand-typed. Only the field's own `onChange` marks it touched.
@@ -835,31 +882,37 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   // `fillBaseUrl` (example-chip selections): picking a suggested example is exactly the kind of
   // "still just a suggestion" value this reset is meant to catch on the next type switch.
   const handleTypeChange = (nextType: ProviderInput['type']) => {
-    setForm(current => {
-      const oldGuidance =
-        PROVIDER_URL_GUIDANCE[current.type] ??
-        PROVIDER_URL_GUIDANCE.openai_compatible;
-      const trimmedBaseUrl = current.baseUrl.trim();
-      const isOldTypeDefault =
-        trimmedBaseUrl === '' ||
-        trimmedBaseUrl === oldGuidance.placeholder ||
-        oldGuidance.examples.includes(trimmedBaseUrl);
-      const shouldReset = !baseUrlTouched && isOldTypeDefault;
-      // Anthropic effectively has one real endpoint, so switching TO it prefills the field with
-      // that value outright. Every other type covers multiple vendors (OpenAI, Gemini, Bedrock,
-      // Ollama, a private gateway...) with no single "the" default to fill in, so clearing the
-      // field and letting its own `placeholder` attribute show the new type's example is the
-      // equivalent behavior there.
-      const resetBaseUrl =
-        nextType === 'anthropic'
-          ? PROVIDER_URL_GUIDANCE.anthropic.placeholder
-          : '';
-      return {
-        ...current,
-        type: nextType,
-        baseUrl: shouldReset ? resetBaseUrl : current.baseUrl,
-      };
-    });
+    const oldGuidance =
+      PROVIDER_URL_GUIDANCE[form.type] ??
+      PROVIDER_URL_GUIDANCE.openai_compatible;
+    const trimmedBaseUrl = form.baseUrl.trim();
+    const isOldTypeDefault =
+      trimmedBaseUrl === '' ||
+      trimmedBaseUrl === oldGuidance.placeholder ||
+      oldGuidance.examples.includes(trimmedBaseUrl);
+    const shouldReset = !baseUrlTouched && isOldTypeDefault;
+    // Anthropic effectively has one real endpoint, so switching TO it prefills the field with
+    // that value outright. Every other type covers multiple vendors (OpenAI, Gemini, Bedrock,
+    // Ollama, a private gateway...) with no single "the" default to fill in, so clearing the
+    // field and letting its own `placeholder` attribute show the new type's example is the
+    // equivalent behavior there.
+    const resetBaseUrl =
+      nextType === 'anthropic'
+        ? PROVIDER_URL_GUIDANCE.anthropic.placeholder
+        : '';
+    const nextBaseUrl = shouldReset ? resetBaseUrl : form.baseUrl;
+    setForm({ ...form, type: nextType, baseUrl: nextBaseUrl });
+    // A displayed error belongs to the value that produced it. When this handler REWRITES the
+    // value, that error no longer describes what is in the field — leaving it there marked a
+    // freshly prefilled, perfectly valid Anthropic endpoint as invalid, and Save would then have
+    // said nothing was wrong. Re-derived rather than blindly cleared, so a rewrite that is still
+    // unusable keeps an accurate message; an emptied field drops back to "no error yet", which is
+    // this field's untouched-and-empty state (required-ness is submit's business).
+    if (baseUrlError && nextBaseUrl !== form.baseUrl) {
+      setBaseUrlError(
+        nextBaseUrl.trim() ? getEndpointUrlError(nextBaseUrl) : null,
+      );
+    }
   };
 
   const handleSave = async () => {
@@ -1357,17 +1410,32 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                       isSuggestedEndpointValue(form.baseUrl, urlGuidance)
                     ) {
                       event.target.select();
+                      // A click is focus THEN mouseup, and that mouseup places the caret, which
+                      // collapses the selection this just made — so for the mouse user (the whole
+                      // point of the fix) `select()` alone is a no-op. The flag below lets the one
+                      // mouseup that completes THIS click be suppressed, and only that one:
+                      // suppressing every mouseup would make the field impossible to click into.
+                      suppressNextMouseUpRef.current = true;
+                    }
+                  }}
+                  onMouseUp={event => {
+                    if (suppressNextMouseUpRef.current) {
+                      suppressNextMouseUpRef.current = false;
+                      event.preventDefault();
                     }
                   }}
                   onBlur={() => {
                     // Validate on blur too, not only on submit: leaving a wrong URL behind is the
-                    // moment the admin can still fix it cheaply. An untouched EMPTY field is left
-                    // unmarked — required-ness is submit's business, nagging on tab-through is not.
-                    setBaseUrlError(
-                      form.baseUrl.trim()
-                        ? getEndpointUrlError(form.baseUrl)
-                        : null,
-                    );
+                    // moment the admin can still fix it cheaply.
+                    suppressNextMouseUpRef.current = false;
+                    if (!form.baseUrl.trim()) {
+                      // An empty field raises nothing on blur — required-ness is submit's business
+                      // and nagging on a tab-through is not — but it must not ERASE an error
+                      // either: submit's own "Enter the endpoint URL" has to survive the admin
+                      // clicking into the field and back out again.
+                      return;
+                    }
+                    setBaseUrlError(getEndpointUrlError(form.baseUrl));
                   }}
                   onChange={event => {
                     const { value } = event.target;
@@ -1407,7 +1475,8 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
               }}
             >
               <EuiFormRow
-                id='wz-ai-provider-model'
+                // Shared with `MODEL_ERROR_ID`, which derives the error text's own id from it.
+                id={MODEL_ROW_ID}
                 fullWidth
                 label={
                   <RequiredLabel

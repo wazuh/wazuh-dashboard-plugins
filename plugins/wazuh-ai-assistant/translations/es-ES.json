@@ -123,7 +123,7 @@
     "wazuhAiAssistant.settings.privacy.defaultOnLabel": "Activar el modo de privacidad de forma predeterminada",
     "wazuhAiAssistant.settings.privacy.userCanOverrideLabel": "Permitir que los usuarios cambien el modo de privacidad desde la página de chat",
     "wazuhAiAssistant.settings.privacy.fieldPolicyTitle": "Política de campos",
-    "wazuhAiAssistant.settings.privacy.fieldPolicyHelp": "Controla qué campos de los hallazgos se anonimizan (o se eliminan por completo) antes de llegar al proveedor de IA cuando el modo de privacidad está activado.",
+    "wazuhAiAssistant.settings.privacy.fieldPolicyHelp": "Qué recibe el proveedor de IA por campo: el valor (Permitir — con el modo de privacidad activado, los identificadores conocidos que contenga se seudonimizan igualmente), un seudónimo (Anonimizar) o nada (No enviar nunca).",
     "wazuhAiAssistant.settings.privacy.fieldPolicyFoundCount": "{count} encontrados",
     "wazuhAiAssistant.settings.privacy.fieldPolicyShowMore": "Mostrar {count} más",
     "wazuhAiAssistant.settings.privacy.fieldPolicyShowLess": "Mostrar menos",

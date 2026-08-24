@@ -78,6 +78,27 @@ const SettingsPageWithRouter: React.FC<
 );
 
 /**
+ * One provider fixture and one `core` carrying toast spies, shared by every case below that needs
+ * them — both used to be redeclared per describe. The global `beforeEach`'s `jest.clearAllMocks()`
+ * resets the spies between cases, so no per-describe reset is needed.
+ */
+const PROVIDER = {
+  id: 'p1',
+  name: 'My OpenAI',
+  type: 'openai_compatible',
+  baseUrl: 'https://api.openai.com/v1',
+  model: 'gpt-4o',
+  isDefault: false,
+};
+
+const toasts = { addSuccess: jest.fn(), addDanger: jest.fn() };
+
+const coreWithToasts = {
+  http: {},
+  notifications: { toasts },
+} as unknown as CoreStart;
+
+/**
  * Drives the "My OpenAI" row's menu Delete action through its confirmation modal. The modal's
  * confirm button is reached by its own `data-test-subj` rather than by role+name: the row menu's
  * "Delete" item is also a button named "Delete", and whether EUI has finished unmounting the
@@ -1498,13 +1519,6 @@ describe('SettingsPage — in-card layout and hierarchy (audit §4)', () => {
  * dispatch side.
  */
 describe('SettingsPage — announcing saved changes to the mounted chat', () => {
-  const coreWithToasts = {
-    http: {},
-    notifications: {
-      toasts: { addSuccess: jest.fn(), addDanger: jest.fn() },
-    },
-  } as unknown as CoreStart;
-
   /** Records every dispatch of `eventName` for the duration of one test. */
   function listenFor(eventName: string): {
     count: () => number;
@@ -1520,15 +1534,6 @@ describe('SettingsPage — announcing saved changes to the mounted chat', () => 
       stop: () => window.removeEventListener(eventName, handler),
     };
   }
-
-  const PROVIDER = {
-    id: 'p1',
-    name: 'My OpenAI',
-    type: 'openai_compatible',
-    baseUrl: 'https://api.openai.com/v1',
-    model: 'gpt-4o',
-    isDefault: false,
-  };
 
   it('dispatches ASSISTANT_SETTINGS_CHANGED_EVENT after a successful privacy save', async () => {
     // With no providers the page renders the "No AI provider configured" empty prompt instead of
@@ -1744,132 +1749,97 @@ describe('SettingsPage — announcing saved changes to the mounted chat', () => 
   // explicit timeout: they used to query the modal's confirm button by name, which intermittently
   // matched the row menu's own "Delete" item as well, and rendering this whole page plus a popover
   // and a modal in jsdom overruns jest's 5 s default on a loaded machine.
-  it(
-    'dispatches PROVIDERS_CHANGED_EVENT when a provider is deleted',
-    async () => {
-      mockService.list.mockResolvedValue([PROVIDER]);
-      mockService.remove.mockResolvedValue(undefined);
-      const heard = listenFor(PROVIDERS_CHANGED_EVENT);
+  it('dispatches PROVIDERS_CHANGED_EVENT when a provider is deleted', async () => {
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.remove.mockResolvedValue(undefined);
+    const heard = listenFor(PROVIDERS_CHANGED_EVENT);
 
-      try {
-        render(
-          <SettingsPageWithRouter
-            core={coreWithToasts}
-            onProvidersChanged={jest.fn()}
-          />,
-        );
-        await deleteProviderThroughRowMenu();
+    try {
+      render(
+        <SettingsPageWithRouter
+          core={coreWithToasts}
+          onProvidersChanged={jest.fn()}
+        />,
+      );
+      await deleteProviderThroughRowMenu();
 
-        await waitFor(() =>
-          expect(mockService.remove).toHaveBeenCalledWith('p1'),
-        );
-        await waitFor(() => expect(heard.count()).toBe(1));
-      } finally {
-        heard.stop();
-      }
-    },
-    30000,
-  );
+      await waitFor(() =>
+        expect(mockService.remove).toHaveBeenCalledWith('p1'),
+      );
+      await waitFor(() => expect(heard.count()).toBe(1));
+    } finally {
+      heard.stop();
+    }
+  }, 30000);
 
-  it(
-    'does not announce a provider change when the delete fails',
-    async () => {
-      mockService.list.mockResolvedValue([PROVIDER]);
-      mockService.remove.mockRejectedValue(new Error('403'));
-      const heard = listenFor(PROVIDERS_CHANGED_EVENT);
+  it('does not announce a provider change when the delete fails', async () => {
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.remove.mockRejectedValue(new Error('403'));
+    const heard = listenFor(PROVIDERS_CHANGED_EVENT);
 
-      try {
-        render(
-          <SettingsPageWithRouter
-            core={coreWithToasts}
-            onProvidersChanged={jest.fn()}
-          />,
-        );
-        await deleteProviderThroughRowMenu();
+    try {
+      render(
+        <SettingsPageWithRouter
+          core={coreWithToasts}
+          onProvidersChanged={jest.fn()}
+        />,
+      );
+      await deleteProviderThroughRowMenu();
 
-        await waitFor(() => expect(mockService.remove).toHaveBeenCalled());
-        expect(heard.count()).toBe(0);
-      } finally {
-        heard.stop();
-      }
-    },
-    30000,
-  );
+      await waitFor(() => expect(mockService.remove).toHaveBeenCalled());
+      expect(heard.count()).toBe(0);
+    } finally {
+      heard.stop();
+    }
+  }, 30000);
 });
 
 /** UX wave 2, PR A: the providers table and the conversation-history field. */
 describe('SettingsPage — provider table feedback and retention validation', () => {
-  const addSuccess = jest.fn();
-  const coreWithToasts = {
-    http: {},
-    notifications: { toasts: { addSuccess, addDanger: jest.fn() } },
-  } as unknown as CoreStart;
-
-  const PROVIDER = {
-    id: 'p1',
-    name: 'My OpenAI',
-    type: 'openai_compatible',
-    baseUrl: 'https://api.openai.com/v1',
-    model: 'gpt-4o',
-    isDefault: false,
-  };
-
-  beforeEach(() => {
-    addSuccess.mockClear();
-  });
-
   // The explicit timeouts on the two delete cases below are environmental, not a slow assertion:
   // rendering this whole page and driving a popover plus a modal through jsdom overruns jest's 5 s
   // default on a loaded machine, which is what makes the pre-existing delete cases in the suite
   // above flake too.
-  it(
-    'confirms a provider delete with a toast naming it',
-    async () => {
-      // Delete was the only mutation on this page that just made a row vanish in silence, which
-      // reads the same as a failure that closed the modal without saying anything.
-      mockService.list.mockResolvedValue([PROVIDER]);
-      mockService.remove.mockResolvedValue(undefined);
+  it('confirms a provider delete with a toast naming it', async () => {
+    // Delete was the only mutation on this page that just made a row vanish in silence, which
+    // reads the same as a failure that closed the modal without saying anything.
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.remove.mockResolvedValue(undefined);
 
-      render(
-        <SettingsPageWithRouter
-          core={coreWithToasts}
-          onProvidersChanged={jest.fn()}
-        />,
-      );
+    render(
+      <SettingsPageWithRouter
+        core={coreWithToasts}
+        onProvidersChanged={jest.fn()}
+      />,
+    );
 
-      await deleteProviderThroughRowMenu();
+    await deleteProviderThroughRowMenu();
 
-      await waitFor(() =>
-        expect(addSuccess).toHaveBeenCalledWith(
-          'Provider "My OpenAI" deleted.',
-        ),
-      );
-    },
-    30000,
-  );
+    await waitFor(() =>
+      expect(toasts.addSuccess).toHaveBeenCalledWith(
+        'Provider "My OpenAI" deleted.',
+      ),
+    );
+  }, 30000);
 
-  it(
-    'says nothing on a failed delete',
-    async () => {
-      mockService.list.mockResolvedValue([PROVIDER]);
-      mockService.remove.mockRejectedValue(new Error('403'));
+  it('says nothing on a failed delete', async () => {
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.remove.mockRejectedValue(new Error('403'));
 
-      render(
-        <SettingsPageWithRouter
-          core={coreWithToasts}
-          onProvidersChanged={jest.fn()}
-        />,
-      );
+    render(
+      <SettingsPageWithRouter
+        core={coreWithToasts}
+        onProvidersChanged={jest.fn()}
+      />,
+    );
 
-      await deleteProviderThroughRowMenu();
+    await deleteProviderThroughRowMenu();
 
-      await waitFor(() => expect(mockService.remove).toHaveBeenCalled());
-      expect(addSuccess).not.toHaveBeenCalledWith(
-        expect.stringContaining('deleted'),
-      );
-    },
-    30000,
-  );
+    await waitFor(() => expect(mockService.remove).toHaveBeenCalled());
+    expect(toasts.addSuccess).not.toHaveBeenCalledWith(
+      expect.stringContaining('deleted'),
+    );
+  }, 30000);
 
   it('shows a spinner and a Testing state in the Status cell while a test is in flight', async () => {
     // A test that never resolves keeps the row in the in-flight state for the assertion.
@@ -1965,6 +1935,78 @@ describe('SettingsPage — provider table feedback and retention validation', ()
     expect(
       screen.queryByText(/retention must be 0 or a positive number of days/i),
     ).toBeNull();
+  });
+
+  it('titles a url-guard rejection on the providers card too', async () => {
+    // The same mapping as the flyout's own callout. Driven here through a refused set-default,
+    // simply because it is the cheapest provider mutation to fail from a test — what is being
+    // asserted is that this callout and the flyout's agree on the title, so an admin never sees
+    // one failure described two ways.
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.setDefault.mockRejectedValue({
+      body: {
+        message:
+          'Provider request rejected: this host is a blocked cloud-metadata endpoint.',
+      },
+    });
+
+    render(
+      <SettingsPageWithRouter
+        core={coreWithToasts}
+        onProvidersChanged={jest.fn()}
+      />,
+    );
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: /set as default provider/i }),
+    );
+
+    expect(await screen.findByText('Endpoint blocked')).toBeInTheDocument();
+    expect(
+      screen.getByText(/blocked cloud-metadata endpoint/i),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Something went wrong')).toBeNull();
+  });
+
+  it('keeps an unsaved retention draft when the Privacy tab is saved', async () => {
+    // Both tabs stay mounted, so an admin can type a retention value, switch to Privacy, save
+    // that, and come back. Resyncing the retention field from the save's own echo would throw
+    // that unsaved edit away.
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: false,
+      userCanOverride: true,
+      privacyDefaultPerProvider: {},
+      fieldPolicy: [],
+      conversationRetentionDays: 30,
+    });
+
+    render(
+      <SettingsPageWithRouter
+        core={coreWithToasts}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=retention']}
+      />,
+    );
+
+    const days = await screen.findByRole('spinbutton');
+    fireEvent.change(days, { target: { value: '90' } });
+
+    // Switch to Privacy, dirty it, save it.
+    fireEvent.click(screen.getByRole('tab', { name: /privacy/i }));
+    fireEvent.click(
+      await screen.findByText(/allow users to override privacy mode/i),
+    );
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
+    await waitFor(() =>
+      expect(mockService.updateAssistantSettings).toHaveBeenCalled(),
+    );
+
+    // Back on the Conversation history tab, the draft is still the admin's. (Coming back is part of
+    // the scenario, and also the only way to read the field: the inactive tab's card stays mounted
+    // behind `display: none`, which takes it out of the accessibility tree.)
+    fireEvent.click(screen.getByRole('tab', { name: /conversation history/i }));
+    expect(await screen.findByRole('spinbutton')).toHaveValue(90);
   });
 
   it.each([
