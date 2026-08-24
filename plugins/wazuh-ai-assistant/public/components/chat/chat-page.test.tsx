@@ -3080,10 +3080,12 @@ describe('ChatPage — provider provenance and per-conversation memory', () => {
       expect(provenance).not.toBeNull();
       expect(provenance?.textContent).toBe('Test provider');
     });
+    // The pre-turn save (`create`) holds the QUESTION only — the answer does not exist yet — so
+    // the stamp can only be checked on the post-turn `update`.
     await waitFor(() =>
-      expect(mockConversationsService.create).toHaveBeenCalled(),
+      expect(mockConversationsService.update).toHaveBeenCalled(),
     );
-    const saved = lastSavedMessages(mockConversationsService.create);
+    const saved = lastSavedMessages(mockConversationsService.update);
     const answer = saved.find(message => message.role === 'assistant');
     expect(answer?.providerId).toBe('p1');
     expect(answer?.providerName).toBe('Test provider');
