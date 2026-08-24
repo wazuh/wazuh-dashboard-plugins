@@ -499,6 +499,16 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
     const [privacyLockNoteId] = useState(() =>
       htmlIdGenerator('wzPrivacyLockNote')(),
     );
+    /**
+     * Provider ids stamped on a just-restored conversation's assistant turns, newest first — a
+     * REQUEST to switch the picker, waiting for the provider list to arrive so it can be checked
+     * against what still exists. `null` means nothing pending.
+     *
+     * A ref, not state: it is consumed exactly once by the effect below and must not itself cause a
+     * render. See `applyLoadedConversation` for why the check cannot happen where the request is
+     * made.
+     */
+    const pendingProviderRestoreRef = useRef<string[] | null>(null);
     // Set on the user's first manual toggle so the settings-driven default effect below stops
     // recomputing it (e.g. if the top-level provider selector changes later in the same session).
     const privacyTouchedRef = useRef(false);
@@ -1131,9 +1141,48 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    /**
+     * Applies the provider a just-restored conversation last used, once the provider list is known.
+     *
+     * Split out of `applyLoadedConversation` because that function can run BEFORE `providers` has
+     * loaded (the mount-time restore's `.then()`), which is precisely the reload/deep-link case this
+     * whole feature exists for — see the ref's own assignment there. Keyed on `providers` so it runs
+     * again the moment the list arrives.
+     *
+     * Waits for `providersLoaded` rather than for a non-empty list: a user with genuinely no
+     * providers configured would otherwise leave the pending candidates parked forever, and the
+     * request has to be dropped so a LATER conversation switch cannot pick up a stale one.
+     */
+    useEffect(() => {
+      const candidates = pendingProviderRestoreRef.current;
+      if (!candidates || !providersLoaded) {
+        return;
+      }
+      pendingProviderRestoreRef.current = null;
+      // Guarded on the provider still EXISTING: a conversation whose provider has since been deleted
+      // keeps the current selection rather than pointing the picker at an id nothing resolves. The
+      // stamps on the restored messages are untouched either way — they record what really answered
+      // each turn and stay true for a deleted provider.
+      const restoredProviderId = candidates.find(candidateId =>
+        providers.some(provider => provider.id === candidateId),
+      );
+      if (restoredProviderId && restoredProviderId !== selectedProviderId) {
+        onProviderChange(restoredProviderId);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [providers, providersLoaded, selectedProviderId]);
+
     // Per-conversation privacy default: resolved once settings AND a selected
     // provider are both known, and never recomputed after the user's first manual toggle — switching
     // providers mid-conversation does not retroactively change an already-chosen value.
+    //
+    // Provider RESTORE (above) deliberately flows through this same path: the privacy chip must show
+    // the policy of the provider that will actually answer the next turn, so resuming a conversation
+    // onto its own provider re-resolves that provider's admin default. An explicit user toggle still
+    // wins — `privacyTouchedRef` is what protects it, exactly as it does for a manual provider
+    // switch. (There is no persisted conversation-level privacy state to contradict: the
+    // `privacyEnabled` flag on saved messages is per-turn history bookkeeping, never the UI's value
+    // — see `ChatMessage.privacyEnabled` in common/types.ts.)
     useEffect(() => {
       if (
         !assistantSettings ||
@@ -1400,21 +1449,16 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       // different model, with nothing on screen saying so, made answers in one conversation
       // inconsistent for no reason the reader could see.
       //
-      // Guarded on the provider still EXISTING (`providers`): a conversation whose provider has
-      // since been deleted keeps the current selection rather than pointing the picker at an id
-      // nothing resolves. Deliberately does not touch the stamps already on the restored messages —
-      // those record what really answered each turn and stay true even for a deleted provider.
-      const rememberedProviderId = [...restored.messages]
+      // This only RECORDS the candidates; the effect below is what applies one. It deliberately does
+      // NOT read `providers` here: the mount-time restore path calls this function from a `.then()`
+      // inside a `[]`-deps effect, so everything it closes over is the FIRST render's value — and on
+      // a reload or a deep link (the primary resume path) the provider list has not arrived yet, so
+      // `providers` is `[]` and every candidate would be rejected as "no longer exists". Newest
+      // first, so the effect picks the most recent surviving provider.
+      pendingProviderRestoreRef.current = [...restored.messages]
         .reverse()
-        .find(
-          message =>
-            message.role === 'assistant' &&
-            message.providerId &&
-            providers.some(provider => provider.id === message.providerId),
-        )?.providerId;
-      if (rememberedProviderId && rememberedProviderId !== selectedProviderId) {
-        onProviderChange(rememberedProviderId);
-      }
+        .filter(message => message.role === 'assistant' && message.providerId)
+        .map(message => message.providerId as string);
       // Replay-leak fix (Fix 3): NOT `restored.turnRecords` — see this function's doc comment above
       // for why replaying another session's pseudonym-form digest content against a freshly emptied
       // map (right below) is unsafe. The resumed conversation is fully READABLE (restored.messages
@@ -2007,6 +2051,13 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
        * as though it were complete.
        */
       let turnCompleted = false;
+      /**
+       * The `error` event's message, if this turn produced one — recorded unconditionally, including
+       * for a turn the user has already walked away from, so the `finally` block below can stamp it
+       * onto whichever transcript it ends up saving. Local to this stream call, like
+       * `turnCompleted`: nothing outside this function reads it.
+       */
+      let turnFailureReason: string | undefined;
 
       // Delta batching (typing-lag/streaming-jank fix): a fast-streaming provider can
       // emit a `delta` event per token, and without batching EVERY one committed its own React state
@@ -2182,6 +2233,10 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
             turnCompleted = true;
           } else if (event.type === 'error') {
             turnCompleted = true;
+            // Recorded BEFORE the abandoned-turn bail-out below, so the `finally` block can stamp it
+            // onto an abandoned turn's own transcript too — a turn the user walked away from still
+            // failed, and its saved record has to say so.
+            turnFailureReason = event.message;
             flushPendingEmptyTable();
             // Released before the placeholder cleanup below, which drops an assistant message with
             // neither content nor table — a turn whose tool succeeded and whose narration then failed
@@ -2206,10 +2261,19 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
             // on the turn itself, and it is persisted with the conversation, so a reload keeps it
             // too. The banner still appears — it is how a failure announces itself the moment it
             // happens; this is what remains afterwards.
+            // `statusMessage: undefined` alongside it: the status line and its spinner are cleared
+            // only by the first `delta` of real text (`flushPendingDelta`), and a turn that fails
+            // before producing any text never gets one — so without this the failed turn kept a
+            // live spinner reading "Writing the answer…" above its own failure marker, inside the
+            // `aria-live` region, for as long as the conversation stayed open.
             updateMessages(current =>
               current.map(message =>
                 message.id === assistantMessageId
-                  ? { ...message, failureReason: event.message }
+                  ? {
+                      ...message,
+                      failureReason: event.message,
+                      statusMessage: undefined,
+                    }
                   : message,
               ),
             );
@@ -2268,17 +2332,25 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                       : {}),
                     isStreaming: false,
                     ...(turnCompleted ? {} : { interrupted: true }),
+                    // An abandoned turn that then FAILED still failed — see `turnFailureReason`.
+                    // Without this the abandoned path was the one route by which a failure could
+                    // vanish from a saved conversation entirely: the `error` branch above bails out
+                    // before stamping anything once the turn is no longer active.
+                    ...(turnFailureReason
+                      ? { failureReason: turnFailureReason }
+                      : {}),
                   }
                 : message,
             )
-            // Same rule the `error` branch applies to the visible list: an assistant placeholder that
-            // never received anything is not worth persisting.
+            // An assistant placeholder that never received anything is not worth persisting — UNLESS
+            // it carries a failure reason, which is the whole content of a failed turn's record.
             .filter(
               message =>
                 !(
                   message.id === assistantMessageId &&
                   message.content === '' &&
-                  !message.table
+                  !message.table &&
+                  !turnFailureReason
                 ),
             );
           void persistConversationTurn({
@@ -2293,12 +2365,17 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
           if (detectManagerAuthError(accumulatedContent)) {
             setManagerAuthHint(true);
           }
+          // `statusMessage: undefined` unconditionally: this is the turn's terminal update, and no
+          // step label is true of a turn that has stopped. Only a `delta` ever cleared it before, so
+          // Stop pressed (or a dropped connection) during a tool call left a live spinner reading
+          // "Querying …" on a turn that had already ended.
           updateMessages(current =>
             current.map(message =>
               message.id === assistantMessageId
                 ? {
                     ...message,
                     isStreaming: false,
+                    statusMessage: undefined,
                     ...(turnCompleted ? {} : { interrupted: true }),
                   }
                 : message,

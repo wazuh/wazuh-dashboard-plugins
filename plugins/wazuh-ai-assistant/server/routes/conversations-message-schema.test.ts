@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { chatMessageSchema } from './conversations';
+import { CONVERSATION_MAX_FAILURE_REASON_LENGTH } from '../../common/constants';
 
 /**
  * Same class of guard as `conversations-table-schema.test.ts`, one level up: every field
@@ -39,13 +40,21 @@ test('chatMessageSchema: accepts provider provenance on an assistant message', (
   );
 });
 
-test('chatMessageSchema: rejects an unbounded failure reason', () => {
-  // The bound exists so the field cannot be an unbounded write vector, not to constrain real use.
+test('chatMessageSchema: accepts a failure reason at exactly the shared limit and rejects one past it', () => {
+  // Read off the shared constant, not a literal: this is the bound `toPersistedMessages` clamps to,
+  // and the two drifting apart is the silent-save-failure bug (see the constant's doc comment).
+  assert.doesNotThrow(() =>
+    chatMessageSchema.validate({
+      role: 'assistant',
+      content: '',
+      failureReason: 'x'.repeat(CONVERSATION_MAX_FAILURE_REASON_LENGTH),
+    }),
+  );
   assert.throws(() =>
     chatMessageSchema.validate({
       role: 'assistant',
       content: '',
-      failureReason: 'x'.repeat(2001),
+      failureReason: 'x'.repeat(CONVERSATION_MAX_FAILURE_REASON_LENGTH + 1),
     }),
   );
 });

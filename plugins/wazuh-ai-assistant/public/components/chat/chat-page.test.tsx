@@ -3027,6 +3027,29 @@ describe('ChatPage — privacy control legibility', () => {
     expect(note?.textContent).toBe('Privacy on — set by administrator');
   });
 
+  it('does not flip when the policy is locked, however it is activated', async () => {
+    // The lock is enforced in OUR code (no `onClick` is wired at all), not by the platform: a
+    // `disabled` button would be enforced by the browser, and this deliberately is not one — see
+    // the locked case's own comment in chat-page.tsx. That makes "clicking it does nothing" a
+    // behaviour that needs pinning rather than a property of the widget.
+    mockSettingsService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: true,
+      privacyDefaultPerProvider: {},
+      userCanOverride: false,
+      conversationRetentionDays: 0,
+    });
+    renderChatPage();
+    const chip = await findPrivacyChipWithModifier('on');
+
+    fireEvent.click(chip);
+    fireEvent.keyDown(chip, { key: 'Enter' });
+    fireEvent.keyDown(chip, { key: ' ' });
+
+    expect(chip.getAttribute('aria-checked')).toBe('true');
+    expect(chip).toHaveClass('wzPrivacyChip--on');
+    expect(chip.textContent).toContain('Privacy: On');
+  });
+
   it('opens the explanation on click and keeps it open, instead of a hover-only tooltip', async () => {
     renderChatPage();
     await findPrivacyChip();
@@ -3095,8 +3118,146 @@ describe('ChatPage — provider provenance and per-conversation memory', () => {
     ).toBeUndefined();
   });
 
-  it('restores the provider a resumed conversation was last answered by', async () => {
+  /**
+   * Mounts a deep-link restore the way the real app does it: the provider list is loaded
+   * ASYNCHRONOUSLY by the app shell, so the mount-time restore's `conversationsService.get` can
+   * (and on a reload normally does) resolve BEFORE any provider is known.
+   *
+   * This shape is the point of the test, not incidental setup. Passing the loaded list as a mount
+   * prop — the obvious way to write it — hides the only bug this feature can really have: a restore
+   * that checks the stamped id against an empty list and rejects it as "no longer exists".
+   */
+  function renderDeepLinkRestore(
+    stampedProviderId: string,
+    providersOnceLoaded: ProviderSummary[],
+    onProviderChange: jest.Mock,
+  ) {
+    mockConversationsService.get.mockResolvedValue(
+      conversationRecord({
+        messages: [
+          { role: 'user', content: 'earlier question', createdAt: 1 },
+          {
+            role: 'assistant',
+            content: 'earlier answer',
+            createdAt: 2,
+            providerId: stampedProviderId,
+            providerName: 'Groq',
+          },
+        ],
+      }),
+    );
+    window.history.replaceState(null, '', '/conversation/conv-b');
+    return renderChatPage({
+      providers: [],
+      providersLoaded: false,
+      selectedProviderId: '',
+      onProviderChange,
+    });
+  }
+
+  const GROQ = {
+    id: 'p2',
+    name: 'Groq',
+    type: 'openai_compatible',
+  } as ProviderSummary;
+
+  /**
+   * Lets the mount-time restore's `conversationsService.get().then(...).finally(...)` chain settle.
+   *
+   * Deliberately NOT a DOM assertion: while `providersLoaded` is false the component renders its
+   * loading state, so nothing from the restored transcript is on screen yet — which is exactly the
+   * window the bug lived in, and exactly why waiting on the transcript here would be waiting for
+   * something that cannot appear until after the rerender below.
+   */
+  async function settleRestore() {
+    await waitFor(() =>
+      expect(mockConversationsService.get).toHaveBeenCalledTimes(1),
+    );
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+  }
+
+  it('restores the provider a resumed conversation was last answered by, once the provider list arrives', async () => {
     const onProviderChange = jest.fn();
+    const view = renderDeepLinkRestore(
+      'p2',
+      [PROVIDER, GROQ],
+      onProviderChange,
+    );
+
+    await settleRestore();
+    // Nothing yet: the conversation is restored but no provider is known, so there is nothing to
+    // check the stamp against. The request must be HELD, not resolved against an empty list — which
+    // is what the old implementation did, silently, on every reload and every deep link.
+    expect(onProviderChange).not.toHaveBeenCalled();
+
+    view.rerenderWith({
+      providers: [PROVIDER, GROQ],
+      providersLoaded: true,
+      selectedProviderId: PROVIDER.id,
+    });
+
+    await waitFor(() => expect(onProviderChange).toHaveBeenCalledWith('p2'));
+    // And the conversation really was restored, not merely requested.
+    expect(screen.getByText('earlier answer')).toBeInTheDocument();
+  });
+
+  it('keeps the current selection when the conversation’s provider no longer exists', async () => {
+    const onProviderChange = jest.fn();
+    const view = renderDeepLinkRestore(
+      'deleted-provider',
+      [PROVIDER],
+      onProviderChange,
+    );
+
+    await settleRestore();
+    view.rerenderWith({
+      providers: [PROVIDER],
+      providersLoaded: true,
+      selectedProviderId: PROVIDER.id,
+    });
+
+    await waitFor(() =>
+      expect(screen.getByText('earlier answer')).toBeInTheDocument(),
+    );
+    expect(onProviderChange).not.toHaveBeenCalled();
+    // The turn's own stamp still tells the truth about what answered it, deleted or not — the
+    // provenance line reads the persisted NAME, which is why it survives the provider's deletion.
+    expect(
+      document.querySelector('[data-test-subj="wzMsgProviderProvenance"]')
+        ?.textContent,
+    ).toBe('Groq');
+  });
+});
+
+/**
+ * Restoring a conversation's provider flows through the same per-provider privacy default a manual
+ * provider switch does. Both halves are pinned deliberately, because "which one wins" is a product
+ * decision and not obvious from the code:
+ *
+ * - Untouched: the chip MUST follow the restored provider. It states the policy that will apply to
+ *   the next turn, and showing a different provider's default would be a false statement about
+ *   where the reader's data is about to go.
+ * - Touched: an explicit user toggle survives, exactly as it survives a manual provider switch
+ *   (`privacyTouchedRef`).
+ */
+describe('ChatPage — privacy default follows a restored provider', () => {
+  const PRIVATE_PROVIDER = {
+    id: 'p2',
+    name: 'Groq',
+    type: 'openai_compatible',
+  } as ProviderSummary;
+
+  function renderRestoreWithPerProviderPrivacy() {
+    mockSettingsService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: false,
+      // The restored provider's own admin default disagrees with the global one.
+      privacyDefaultPerProvider: { p2: true },
+      userCanOverride: true,
+      conversationRetentionDays: 0,
+    });
     mockConversationsService.get.mockResolvedValue(
       conversationRecord({
         messages: [
@@ -3112,47 +3273,52 @@ describe('ChatPage — provider provenance and per-conversation memory', () => {
       }),
     );
     window.history.replaceState(null, '', '/conversation/conv-b');
-
-    renderChatPage({
-      providers: [
-        PROVIDER,
-        { id: 'p2', name: 'Groq', type: 'openai_compatible' } as never,
-      ],
-      onProviderChange,
+    // Mounted with the provider list already loaded, unlike the deep-link tests above: what is under
+    // test here is the CONSEQUENCE of the restore (the selection changing to p2), so the composer —
+    // and the chip in it — has to be on screen the whole time. The async-providers window itself is
+    // covered by "restores the provider … once the provider list arrives".
+    return renderChatPage({
+      providers: [PROVIDER, PRIVATE_PROVIDER],
+      providersLoaded: true,
+      selectedProviderId: PROVIDER.id,
+      onProviderChange: jest.fn(),
     });
+  }
 
+  it('re-resolves the chip to the restored provider’s own admin default', async () => {
+    const view = renderRestoreWithPerProviderPrivacy();
     await waitFor(() =>
       expect(screen.getByText('earlier answer')).toBeInTheDocument(),
     );
-    expect(onProviderChange).toHaveBeenCalledWith('p2');
+    // The global default is OFF, so this is the pre-restore state.
+    const chip = await findPrivacyChip();
+    expect(chip.getAttribute('aria-checked')).toBe('false');
+
+    // The app shell's own state change, which is what a real `onProviderChange('p2')` produces.
+    view.rerenderWith({ selectedProviderId: 'p2' });
+
+    await waitFor(() => expect(chip.getAttribute('aria-checked')).toBe('true'));
+    expect(chip).toHaveClass('wzPrivacyChip--on');
   });
 
-  it('keeps the current selection when the conversation’s provider no longer exists', async () => {
-    const onProviderChange = jest.fn();
-    mockConversationsService.get.mockResolvedValue(
-      conversationRecord({
-        messages: [
-          { role: 'user', content: 'earlier question', createdAt: 1 },
-          {
-            role: 'assistant',
-            content: 'earlier answer',
-            createdAt: 2,
-            providerId: 'deleted-provider',
-            providerName: 'Deleted provider',
-          },
-        ],
-      }),
+  it('never overrides an explicit user toggle', async () => {
+    const view = renderRestoreWithPerProviderPrivacy();
+    const chip = await findPrivacyChip();
+    // The reader turns privacy ON, then OFF: an explicit choice of "off", which the restored
+    // provider's admin default (`on`) must not silently reverse.
+    fireEvent.click(chip);
+    await waitFor(() => expect(chip.getAttribute('aria-checked')).toBe('true'));
+    fireEvent.click(chip);
+    await waitFor(() =>
+      expect(chip.getAttribute('aria-checked')).toBe('false'),
     );
-    window.history.replaceState(null, '', '/conversation/conv-b');
 
-    renderChatPage({ onProviderChange });
+    view.rerenderWith({ selectedProviderId: 'p2' });
 
     await waitFor(() =>
       expect(screen.getByText('earlier answer')).toBeInTheDocument(),
     );
-    expect(onProviderChange).not.toHaveBeenCalled();
-    // The turn's own stamp still tells the truth about what answered it, deleted or not.
-    expect(screen.getByText('Deleted provider')).toBeInTheDocument();
+    expect(chip.getAttribute('aria-checked')).toBe('false');
   });
 });
 
@@ -3235,6 +3401,40 @@ describe('ChatPage — a failed turn stays visible after the next question', () 
 });
 
 /**
+ * Backward compatibility with every conversation already stored: `messages` is an opaque, unindexed
+ * blob, so there is no migration and a pre-existing record simply lacks the new fields. This drives
+ * the REAL load path (`conversationsService.get` → `applyLoadedConversation`) rather than asserting
+ * on `reconstructConversation` alone, so the component's own reaction to their absence is covered.
+ */
+describe('ChatPage — a conversation saved before the new fields existed', () => {
+  it('resumes unchanged: no provenance line, no failure marker, no provider switch', async () => {
+    const onProviderChange = jest.fn();
+    mockConversationsService.get.mockResolvedValue(
+      conversationRecord({
+        messages: [
+          // Exactly the old shape: role/content/createdAt and nothing else.
+          { role: 'user', content: 'earlier question', createdAt: 1 },
+          { role: 'assistant', content: 'earlier answer', createdAt: 2 },
+        ],
+      }),
+    );
+    window.history.replaceState(null, '', '/conversation/conv-b');
+
+    renderChatPage({ onProviderChange });
+
+    await waitFor(() =>
+      expect(screen.getByText('earlier answer')).toBeInTheDocument(),
+    );
+    expect(
+      document.querySelector('[data-test-subj="wzMsgProviderProvenance"]'),
+    ).toBeNull();
+    expect(screen.queryByText('This turn failed')).toBeNull();
+    expect(screen.queryByText('Response interrupted')).toBeNull();
+    expect(onProviderChange).not.toHaveBeenCalled();
+  });
+});
+
+/**
  * "Routing…" is an orchestrator word, and it was the only thing a reader saw for the whole of a
  * multi-call turn. The status line now moves through user-facing steps.
  */
@@ -3289,6 +3489,69 @@ describe('ChatPage — progressive generation status', () => {
       expect(screen.getByText('Six today.')).toBeInTheDocument(),
     );
     expect(screen.queryByText('Writing the answer…')).toBeNull();
+  });
+
+  it('retires the status line and its spinner when the turn FAILS before producing any text', async () => {
+    // The status line was only ever cleared by the first `delta`, and a turn that fails before any
+    // text arrives never gets one — so the failed turn kept a live spinner reading "Writing the
+    // answer…" above its own failure marker, inside the aria-live region, indefinitely.
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('how many alerts?');
+    stream.push({
+      type: 'status',
+      message: 'Writing the answer…',
+      step: 'writing',
+    });
+    await waitFor(() =>
+      expect(screen.getByText('Writing the answer…')).toBeInTheDocument(),
+    );
+
+    stream.push({ type: 'error', message: 'provider stream failed' });
+    stream.end();
+
+    await waitFor(() =>
+      expect(screen.getByText('This turn failed')).toBeInTheDocument(),
+    );
+    expect(screen.queryByText('Writing the answer…')).toBeNull();
+    expect(
+      document.querySelector('[data-test-subj="wzTurnStatusLine"]'),
+    ).toBeNull();
+  });
+
+  it('retires the status line when the turn is STOPPED mid tool call', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('how many alerts?');
+    stream.push({
+      type: 'status',
+      message: 'Querying Wazuh…',
+      step: 'querying',
+      detail: 'get_agent_inventory',
+    });
+    await waitFor(() =>
+      expect(
+        screen.getByText('Querying get_agent_inventory…'),
+      ).toBeInTheDocument(),
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Stop generating' }));
+
+    await waitFor(() =>
+      expect(screen.getByText('Response interrupted')).toBeInTheDocument(),
+    );
+    expect(screen.queryByText('Querying get_agent_inventory…')).toBeNull();
+    expect(
+      document.querySelector('[data-test-subj="wzTurnStatusLine"]'),
+    ).toBeNull();
   });
 
   it('shows an unclassified status verbatim (a provider retry notice is already reader-facing)', async () => {

@@ -144,6 +144,19 @@ export const CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH = 100_000;
 export const CONVERSATION_MAX_MESSAGES = 1000;
 
 /**
+ * Longest persisted turn-failure reason (`PersistedChatMessage.failureReason`). Lives here, with the
+ * three limits above, for exactly the reason their doc comment gives: this value is a PROVIDER error
+ * message, and adapters echo upstream response bodies verbatim (see
+ * `server/providers/openai-compatible.ts`), so it is genuinely unbounded at the source. A
+ * server-only bound would reintroduce the silent-save-failure bug — one oversized error string would
+ * 400 every subsequent save of that conversation, with auto-save swallowing each rejection.
+ *
+ * Generous relative to a real error (a sentence or two, sometimes a chunk of JSON); the point is
+ * only that it cannot be unbounded.
+ */
+export const CONVERSATION_MAX_FAILURE_REASON_LENGTH = 2000;
+
+/**
  * Rows kept when a result table is persisted alongside the message it was shown with
  * (`PersistedChatMessage.table`). The live table is already capped at 500 rows server-side
  * (server/tools/digest.ts's `TABLE_ROW_CAP`); this second, tighter cap exists because a saved

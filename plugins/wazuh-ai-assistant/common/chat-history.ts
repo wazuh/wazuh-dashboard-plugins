@@ -33,6 +33,7 @@ import {
 } from './types';
 import { NavigationType } from './draft-stash';
 import {
+  CONVERSATION_MAX_FAILURE_REASON_LENGTH,
   CONVERSATION_MAX_MESSAGES,
   CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH,
   CONVERSATION_MAX_SERIALIZED_BYTES,
@@ -300,8 +301,22 @@ export function toPersistedMessages(
       // A failed turn's marker and its provider provenance both have to survive a reload, or the
       // transcript goes back to hiding its own failures and misattributing its own answers — see
       // `PersistedChatMessage.failureReason`/`providerId`.
+      //
+      // `failureReason` is CLAMPED here for the same reason `content` above is, and against the same
+      // failure mode: the route rejects anything longer than
+      // `CONVERSATION_MAX_FAILURE_REASON_LENGTH` with a 400, the client treats a failed save as a
+      // non-fatal hiccup, and auto-save resends the same over-long value on every following turn —
+      // so one unbounded provider error string (openai-compatible.ts echoes upstream response bodies
+      // verbatim) would silently stop the whole conversation from ever being saved again. The three
+      // provider fields need no clamp: an id, a display name and a model identifier are all bounded
+      // at their source by the provider CRUD API's own limits.
       ...(message.failureReason
-        ? { failureReason: message.failureReason }
+        ? {
+            failureReason: message.failureReason.slice(
+              0,
+              CONVERSATION_MAX_FAILURE_REASON_LENGTH,
+            ),
+          }
         : {}),
       ...(message.providerId ? { providerId: message.providerId } : {}),
       ...(message.providerName ? { providerName: message.providerName } : {}),

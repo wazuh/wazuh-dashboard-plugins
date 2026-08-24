@@ -2995,13 +2995,26 @@ export async function* orchestrate(
       }
     }
 
-    // Third and last step label of the turn: this round ran tool calls and did not terminate, so
-    // the NEXT provider call is the one that turns those results into the answer. Emitted at the
-    // very end of the round body — after every early `return` above — so it can never claim the
-    // assistant is writing an answer that is not actually coming. Purely advisory: the client
-    // discards it the instant the first `delta` of real text arrives (chat-page.tsx's
-    // `flushPendingDelta` clears `statusMessage`).
-    if (roundHadRealToolCall) {
+    // Third and last step label of the turn: the NEXT provider call is the one that turns the tool
+    // results into the answer. Emitted at the very end of the round body — after every early
+    // `return` above — so it can never claim the assistant is writing an answer that is not
+    // actually coming. Purely advisory: the client discards it the instant the first `delta` of
+    // real text arrives (chat-page.tsx's `flushPendingDelta` clears `statusMessage`).
+    //
+    // Gated on the NEXT round actually being the final (tools-off) one, using the same
+    // `willBeFinalRound` predicate the loop head itself uses. Without that gate a turn running
+    // several tool rounds walked the label BACKWARDS — "Writing the answer…" then "Querying …"
+    // again, once per round — which reads as the assistant changing its mind rather than as
+    // progress. `round + 1` with the flags as they stand after this round's own bookkeeping above
+    // is exactly the question "is the next round the last one".
+    if (
+      roundHadRealToolCall &&
+      willBeFinalRound(
+        round + 1,
+        forceFinalRoundEarly,
+        budgetForcesFinalRoundEarly,
+      )
+    ) {
       yield {
         type: 'status',
         message: 'Writing the answer…',

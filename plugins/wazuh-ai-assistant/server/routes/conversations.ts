@@ -9,6 +9,7 @@ import {
 } from '../../../../src/core/server';
 import {
   API_PATHS,
+  CONVERSATION_MAX_FAILURE_REASON_LENGTH,
   CONVERSATION_MAX_MESSAGES,
   CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH,
   CONVERSATION_MAX_TABLE_ROWS,
@@ -199,10 +200,11 @@ const MAX_TABLE_LABEL_LENGTH = 256;
 /** A displayed table has a handful of columns, never dozens. */
 const MAX_TABLE_COLUMNS = 50;
 
-/** Longest persisted turn-failure reason. A provider error message is a sentence or two; some
- * adapters echo a chunk of the upstream JSON body, hence the generous headroom. Bounded only so
- * the field cannot be an unbounded write vector. */
-const MAX_FAILURE_REASON_LENGTH = 2000;
+/** Longest persisted turn-failure reason. Re-exported from `common/constants.ts` (like the three
+ * limits above) rather than defined here, because the CLIENT must clamp to the exact same number
+ * before it builds a payload — see that constant's own doc comment for the silent-save-failure bug
+ * a server-only bound would reintroduce. */
+const MAX_FAILURE_REASON_LENGTH = CONVERSATION_MAX_FAILURE_REASON_LENGTH;
 /** Longest persisted provider id / display name / model identifier. */
 const MAX_PROVIDER_FIELD_LENGTH = 256;
 

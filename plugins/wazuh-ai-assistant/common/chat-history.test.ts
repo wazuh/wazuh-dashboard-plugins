@@ -17,6 +17,7 @@ import {
   toPersistedMessages,
 } from './chat-history';
 import {
+  CONVERSATION_MAX_FAILURE_REASON_LENGTH,
   CONVERSATION_MAX_MESSAGES,
   CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH,
   CONVERSATION_MAX_SERIALIZED_BYTES,
@@ -1024,6 +1025,25 @@ test('toPersistedMessages/reconstructConversation: provider provenance survives 
   assert.equal(restored.messages[1].providerId, 'p1');
   assert.equal(restored.messages[1].providerName, 'Claude test');
   assert.equal(restored.messages[1].providerModel, 'claude-sonnet-4');
+});
+
+test('toPersistedMessages: an unbounded provider error string is clamped to the limit the route enforces', () => {
+  // Not cosmetic: the route 400s anything longer, auto-save swallows the rejection, and the same
+  // over-long value is resent on every following turn — so one unbounded provider error would
+  // silently stop the whole conversation from ever being saved again.
+  const persisted = toPersistedMessages([
+    {
+      id: 'b',
+      role: 'assistant',
+      content: '',
+      createdAt: 2,
+      failureReason: 'x'.repeat(CONVERSATION_MAX_FAILURE_REASON_LENGTH + 500),
+    },
+  ]);
+  assert.equal(
+    persisted[0].failureReason?.length,
+    CONVERSATION_MAX_FAILURE_REASON_LENGTH,
+  );
 });
 
 test('toPersistedMessages: a message with neither a failure nor a provider stamp is shaped exactly as before (no undefined own properties)', () => {
