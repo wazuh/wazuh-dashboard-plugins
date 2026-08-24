@@ -17,11 +17,13 @@ import IApiResponse from '../../../../react-services/interfaces/api-response.int
 const GetRulesService = async (
   offset = 0,
   limit = 10,
+  sort = '+id',
 ): Promise<{ rules: Rule[]; total: number }> => {
-  const response = (await WzRequest.apiReq('GET', '/security/rules?sort=name', {
+  const response = (await WzRequest.apiReq('GET', '/security/rules', {
     params: {
       offset,
       limit,
+      ...(sort ? { sort } : {}),
     },
   })) as IApiResponse<Rule>;
   const rules = ((response.data || {}).data || {}).affected_items || [];
