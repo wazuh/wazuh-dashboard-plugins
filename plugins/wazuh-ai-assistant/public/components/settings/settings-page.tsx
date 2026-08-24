@@ -53,6 +53,7 @@ import { ProviderFormFlyout } from './provider-form-flyout';
 import {
   ProviderTestOutcome,
   describeHttpError,
+  isEndpointBlockedError,
   outcomeFromTestError,
   outcomeFromTestResult,
 } from './provider-status';
@@ -241,6 +242,43 @@ function buildSettingsPayload(
     ...overrides,
   };
 }
+
+/**
+ * The retention field's parse-and-validate step, kept as a pure function so both the field's own
+ * blur check and the save handler ask the same question. Returns the day count, or `null` for
+ * anything that is not a whole, non-negative number of days — including an EMPTY field, which is
+ * allowed to exist transiently while editing but is never a value that can be saved.
+ *
+ * Deliberately not `Number()` alone: `Number('')` is `0`, and the field's old `onChange` fed that
+ * straight back as the field's value, so clearing the box to type "14" reset it to "0" first and
+ * left the admin looking at "014" — and, worse, a garbage entry was silently CLAMPED to 0, which is
+ * the one value that means "keep every conversation forever". A rejected input must be reported,
+ * never quietly reinterpreted as the most permissive setting.
+ */
+export function parseRetentionDays(raw: string): number | null {
+  const trimmed = raw.trim();
+  // Digits only: rejects '', '-1', '1.5', '1e3' and 'abc' — all of which `Number()` would either
+  // accept or turn into a number nobody typed.
+  if (!/^\d+$/.test(trimmed)) {
+    return null;
+  }
+  const parsed = Number(trimmed);
+  return Number.isSafeInteger(parsed) ? parsed : null;
+}
+
+/** Shown under the retention field for anything `parseRetentionDays` refuses, and on the save
+ * attempt it blocks — one string for both, so the two can never disagree about what is wrong. */
+const RETENTION_INVALID_MESSAGE = i18n.translate(
+  'wazuhAiAssistant.settings.retention.daysInvalid',
+  {
+    defaultMessage: 'Retention must be 0 or a positive number of days.',
+  },
+);
+
+/** Stable hook for moving focus to the retention field when a save is rejected. `EuiFieldNumber`
+ * forwards unknown props to the `<input>` itself, so this attribute lands on the element to
+ * focus. */
+const RETENTION_DAYS_TEST_SUBJ = 'wzRetentionDays';
 
 /**
  * Middle-truncates a long value (e.g. an endpoint URL) so the tail — usually the most
@@ -531,6 +569,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   // `updateAssistantSettings` round-trip. `retention.isDirty` is derived from comparing
   // `retention.value` against the last loaded/saved baseline, rather than a hand-toggled flag.
   const retention = useDirtyFormState<number | null>(null);
+  // The field's RAW text, so it can be transiently empty (or mid-typing) without the page having to
+  // reinterpret it as a number on every keystroke — see `parseRetentionDays`. `null` means "not
+  // loaded yet", matching `retention.value`'s own loading sentinel.
+  const [retentionInput, setRetentionInput] = useState<string | null>(null);
+  const [retentionValidationError, setRetentionValidationError] = useState<
+    string | null
+  >(null);
   const [retentionSaveError, setRetentionSaveError] = useState<string | null>(
     null,
   );
@@ -568,6 +613,16 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   // it drops while disabled (audit §4.4). Two copies of the same expression on one element is how
   // the two would drift into disagreeing about which state the button is in.
   const privacySaveDisabled = hasEmptyFieldPolicyRow || !privacy.isDirty;
+  // Dirtiness of the retention section is measured on the field's TEXT, not on the parsed number:
+  // an entry the parser refuses leaves `retention.value` sitting at the last valid number, so
+  // `retention.isDirty` would be false and the Save button would go dead with nothing on screen
+  // saying why. Comparing text keeps the button live for a changed-but-invalid entry, and clicking
+  // it produces the field error (`handleSaveRetentionSettings`) instead of silence.
+  const retentionBaseline = loadedAssistantSettings?.conversationRetentionDays;
+  const retentionDirty =
+    retentionInput !== null &&
+    retentionBaseline !== undefined &&
+    retentionInput.trim() !== String(retentionBaseline);
   // Approximates EuiInMemoryTable's own (uncontrolled) default search — a case-insensitive
   // substring match against every column's own text — closely enough to know which rows "Test
   // all" should act on. Only used for that; the table keeps filtering itself independently.
@@ -600,6 +655,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           fieldPolicy: loaded.fieldPolicy,
         });
         retention.commit(loaded.conversationRetentionDays);
+        setRetentionInput(String(loaded.conversationRetentionDays));
+        setRetentionValidationError(null);
         setSettingsLoadError(null);
       })
       .catch(() =>
@@ -632,17 +689,33 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     if (retention.value === null || !loadedAssistantSettings) {
       return;
     }
+    // Reject rather than clamp (see `parseRetentionDays`): an unparseable entry gets a field-level
+    // error and focus, and nothing is written. The button stays enabled for a changed-but-invalid
+    // entry precisely so this path can explain itself, instead of the admin facing a dead button
+    // with no stated reason.
+    const parsedRetention = parseRetentionDays(retentionInput ?? '');
+    if (parsedRetention === null) {
+      setRetentionValidationError(RETENTION_INVALID_MESSAGE);
+      document
+        .querySelector<HTMLInputElement>(
+          `[data-test-subj="${RETENTION_DAYS_TEST_SUBJ}"]`,
+        )
+        ?.focus();
+      return;
+    }
+    setRetentionValidationError(null);
     setRetentionSaveError(null);
     setIsSavingRetention(true);
     try {
       const saved = await service.updateAssistantSettings(
         buildSettingsPayload(loadedAssistantSettings, {
-          conversationRetentionDays: retention.value,
+          conversationRetentionDays: parsedRetention,
         }),
       );
       setLoadedAssistantSettings(saved);
       notifyAssistantSettingsChanged(saved);
       retention.commit(saved.conversationRetentionDays);
+      setRetentionInput(String(saved.conversationRetentionDays));
       core.notifications.toasts.addSuccess(
         i18n.translate('wazuhAiAssistant.settings.retention.saveSuccess', {
           defaultMessage: 'Conversation history settings saved.',
@@ -752,6 +825,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         fieldPolicy: saved.fieldPolicy,
       });
       retention.setValue(saved.conversationRetentionDays);
+      // Keep the retention field's own text in step with the number the save echoed back — the two
+      // are the same document, and a stale text draft here would leave the retention section
+      // reading as dirty against a baseline that had just moved.
+      setRetentionInput(String(saved.conversationRetentionDays));
+      setRetentionValidationError(null);
       core.notifications.toasts.addSuccess(
         i18n.translate('wazuhAiAssistant.settings.privacy.saveSuccess', {
           defaultMessage: 'Privacy settings saved.',
@@ -982,6 +1060,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       return;
     }
     const providerId = deleteTarget.id;
+    // Captured before the modal state is cleared below, so the confirmation toast can name the
+    // provider that is no longer in the list.
+    const providerName = deleteTarget.name;
     setError(null);
     try {
       await service.remove(providerId);
@@ -1002,6 +1083,15 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     }
     clearTestResult(providerId);
     setDeleteTarget(null);
+    // Every other mutation on this page confirms itself with a toast (create, update, set default,
+    // both settings saves); delete was the one that just made a row vanish, which reads the same as
+    // a failure that closed the modal without saying anything.
+    core.notifications.toasts.addSuccess(
+      i18n.translate('wazuhAiAssistant.settings.deleteSuccess', {
+        defaultMessage: 'Provider "{name}" deleted.',
+        values: { name: providerName },
+      }),
+    );
     // Prune any per-provider privacy override tied to the JUST-DELETED provider (S3): the wire
     // shape has no FK relating `privacyDefaultPerProvider`'s keys back to real providers, so a
     // stale entry otherwise stayed there forever — primed to reappear as a phantom on/off
@@ -1585,12 +1675,19 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             {error && !isFormOpen && (
               <>
                 <EuiCallOut
-                  title={i18n.translate(
-                    'wazuhAiAssistant.settings.errorTitle',
-                    {
-                      defaultMessage: 'Something went wrong',
-                    },
-                  )}
+                  // Same split as the flyout's own error callout: a URL the SSRF/URL policy refused
+                  // is titled for what it is, since the reason line below already says which rule
+                  // it hit and no amount of retrying will change the answer.
+                  title={
+                    isEndpointBlockedError(error)
+                      ? i18n.translate(
+                          'wazuhAiAssistant.settings.endpointBlockedTitle',
+                          { defaultMessage: 'Endpoint blocked' },
+                        )
+                      : i18n.translate('wazuhAiAssistant.settings.errorTitle', {
+                          defaultMessage: 'Something went wrong',
+                        })
+                  }
                   color='danger'
                   iconType='alert'
                 >
@@ -2210,16 +2307,35 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                           defaultMessage: 'Keep saved conversations for (days)',
                         },
                       )}
+                      isInvalid={Boolean(retentionValidationError)}
+                      error={retentionValidationError}
                     >
                       <EuiFieldNumber
                         min={0}
-                        value={retention.value}
+                        data-test-subj={RETENTION_DAYS_TEST_SUBJ}
+                        isInvalid={Boolean(retentionValidationError)}
+                        // The raw text, so an empty field stays empty while the admin retypes
+                        // instead of snapping back to 0 (which is what produced "014").
+                        value={retentionInput ?? ''}
                         onChange={event => {
-                          const parsed = Number(event.target.value);
-                          retention.setValue(
-                            Number.isNaN(parsed) ? 0 : Math.max(0, parsed),
-                          );
+                          const raw = event.target.value;
+                          setRetentionInput(raw);
+                          const parsed = parseRetentionDays(raw);
+                          if (parsed === null) {
+                            // Stay quiet while editing — blur and save are where an unusable value
+                            // gets reported (below, and in `handleSaveRetentionSettings`).
+                            return;
+                          }
+                          retention.setValue(parsed);
+                          setRetentionValidationError(null);
                         }}
+                        onBlur={() =>
+                          setRetentionValidationError(
+                            parseRetentionDays(retentionInput ?? '') === null
+                              ? RETENTION_INVALID_MESSAGE
+                              : null,
+                          )
+                        }
                       />
                     </EuiFormRow>
                   </EuiFlexItem>
@@ -2251,8 +2367,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 <EuiButton
                   onClick={handleSaveRetentionSettings}
                   isLoading={isSavingRetention}
-                  isDisabled={!retention.isDirty}
-                  fill={retention.isDirty}
+                  isDisabled={!retentionDirty}
+                  fill={retentionDirty}
                 >
                   {i18n.translate('wazuhAiAssistant.settings.retention.save', {
                     defaultMessage: 'Save conversation history settings',

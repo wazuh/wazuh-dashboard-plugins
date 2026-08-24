@@ -53,7 +53,7 @@ jest.mock('../../services/settings-service', () => ({
   SettingsService: jest.fn(() => mockService),
 }));
 
-import { SettingsPage } from './settings-page';
+import { SettingsPage, parseRetentionDays } from './settings-page';
 import {
   ASSISTANT_SETTINGS_CHANGED_EVENT,
   PROVIDERS_CHANGED_EVENT,
@@ -1767,5 +1767,219 @@ describe('SettingsPage — announcing saved changes to the mounted chat', () => 
     } finally {
       heard.stop();
     }
+  });
+});
+
+/** UX wave 2, PR A: the providers table and the conversation-history field. */
+describe('SettingsPage — provider table feedback and retention validation', () => {
+  const addSuccess = jest.fn();
+  const coreWithToasts = {
+    http: {},
+    notifications: { toasts: { addSuccess, addDanger: jest.fn() } },
+  } as unknown as CoreStart;
+
+  const PROVIDER = {
+    id: 'p1',
+    name: 'My OpenAI',
+    type: 'openai_compatible',
+    baseUrl: 'https://api.openai.com/v1',
+    model: 'gpt-4o',
+    isDefault: false,
+  };
+
+  beforeEach(() => {
+    addSuccess.mockClear();
+  });
+
+  it('confirms a provider delete with a toast naming it', async () => {
+    // Delete was the only mutation on this page that just made a row vanish in silence, which
+    // reads the same as a failure that closed the modal without saying anything.
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.remove.mockResolvedValue(undefined);
+
+    render(
+      <SettingsPageWithRouter
+        core={coreWithToasts}
+        onProvidersChanged={jest.fn()}
+      />,
+    );
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: /actions for my openai/i }),
+    );
+    fireEvent.click(await screen.findByText(/^delete$/i));
+    fireEvent.click(await screen.findByRole('button', { name: /^delete$/i }));
+
+    await waitFor(() =>
+      expect(addSuccess).toHaveBeenCalledWith('Provider "My OpenAI" deleted.'),
+    );
+  });
+
+  it('says nothing on a failed delete', async () => {
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.remove.mockRejectedValue(new Error('403'));
+
+    render(
+      <SettingsPageWithRouter
+        core={coreWithToasts}
+        onProvidersChanged={jest.fn()}
+      />,
+    );
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: /actions for my openai/i }),
+    );
+    fireEvent.click(await screen.findByText(/^delete$/i));
+    fireEvent.click(await screen.findByRole('button', { name: /^delete$/i }));
+
+    await waitFor(() => expect(mockService.remove).toHaveBeenCalled());
+    expect(addSuccess).not.toHaveBeenCalledWith(
+      expect.stringContaining('deleted'),
+    );
+  });
+
+  it('shows a spinner and a Testing state in the Status cell while a test is in flight', async () => {
+    // A test that never resolves keeps the row in the in-flight state for the assertion.
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.test.mockReturnValue(new Promise(() => undefined));
+
+    render(
+      <SettingsPageWithRouter
+        core={coreWithToasts}
+        onProvidersChanged={jest.fn()}
+      />,
+    );
+
+    const statusChip = await screen.findByText(/testing/i);
+    expect(statusChip).toBeInTheDocument();
+    expect(document.querySelector('.wzStatusChip__spinner')).not.toBeNull();
+  });
+
+  it('rejects an unparseable retention value instead of clamping it to 0', async () => {
+    // Clamping sent the field to 0 — the one value that means "keep everything forever" — for any
+    // input the old `Number()` parse did not like.
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: false,
+      userCanOverride: true,
+      privacyDefaultPerProvider: {},
+      fieldPolicy: [],
+      conversationRetentionDays: 30,
+    });
+
+    render(
+      <SettingsPageWithRouter
+        core={coreWithToasts}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=retention']}
+      />,
+    );
+
+    const days = await screen.findByRole('spinbutton');
+    fireEvent.change(days, { target: { value: '-5' } });
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: /save conversation history settings/i,
+      }),
+    );
+
+    expect(
+      await screen.findByText(
+        /retention must be 0 or a positive number of days/i,
+      ),
+    ).toBeInTheDocument();
+    expect(mockService.updateAssistantSettings).not.toHaveBeenCalled();
+    // The field keeps what was typed — it is not silently rewritten to 0.
+    expect(days).toHaveValue(-5);
+  });
+
+  it('lets the field be transiently empty while editing, without inventing a 0', async () => {
+    // Clearing the box to retype used to snap the value to 0, so typing "14" produced "014".
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: false,
+      userCanOverride: true,
+      privacyDefaultPerProvider: {},
+      fieldPolicy: [],
+      conversationRetentionDays: 30,
+    });
+
+    render(
+      <SettingsPageWithRouter
+        core={coreWithToasts}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=retention']}
+      />,
+    );
+
+    const days = await screen.findByRole('spinbutton');
+    fireEvent.change(days, { target: { value: '' } });
+    expect(days).toHaveValue(null);
+    // No error while editing — only on blur or save.
+    expect(
+      screen.queryByText(/retention must be 0 or a positive number of days/i),
+    ).toBeNull();
+
+    fireEvent.blur(days);
+    expect(
+      await screen.findByText(
+        /retention must be 0 or a positive number of days/i,
+      ),
+    ).toBeInTheDocument();
+
+    fireEvent.change(days, { target: { value: '14' } });
+    expect(days).toHaveValue(14);
+    expect(
+      screen.queryByText(/retention must be 0 or a positive number of days/i),
+    ).toBeNull();
+  });
+
+  it.each([
+    ['0', 0],
+    ['30', 30],
+    ['  7  ', 7],
+  ])('parses %p as %p days', (raw, expected) => {
+    expect(parseRetentionDays(raw as string)).toBe(expected);
+  });
+
+  it.each(['', '   ', '-1', '1.5', '1e3', 'abc', '0x10'])(
+    'refuses %p rather than reinterpreting it',
+    raw => {
+      // `Number('')` is 0 and `Number('1e3')` is 1000 — neither is a value anybody typed as days.
+      expect(parseRetentionDays(raw)).toBeNull();
+    },
+  );
+
+  it('still saves a valid retention value', async () => {
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: false,
+      userCanOverride: true,
+      privacyDefaultPerProvider: {},
+      fieldPolicy: [],
+      conversationRetentionDays: 30,
+    });
+
+    render(
+      <SettingsPageWithRouter
+        core={coreWithToasts}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=retention']}
+      />,
+    );
+
+    const days = await screen.findByRole('spinbutton');
+    fireEvent.change(days, { target: { value: '0' } });
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: /save conversation history settings/i,
+      }),
+    );
+
+    await waitFor(() =>
+      expect(mockService.updateAssistantSettings).toHaveBeenCalledWith(
+        expect.objectContaining({ conversationRetentionDays: 0 }),
+      ),
+    );
   });
 });
