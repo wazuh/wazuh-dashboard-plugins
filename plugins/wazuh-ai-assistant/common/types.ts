@@ -223,6 +223,15 @@ export interface TableSpec {
   };
 }
 
+/**
+ * The three user-facing phases one turn moves through, in order. Deliberately a tiny, closed set
+ * rather than one label per internal round: the reader needs to know WHAT the assistant is doing,
+ * not how many provider round-trips the orchestrator budgeted. `understanding` covers the stage-1
+ * routing call, `querying` each tool execution, `writing` the answer round that follows tool
+ * results.
+ */
+export type TurnStatusStep = 'understanding' | 'querying' | 'writing';
+
 export interface StreamUsage {
   inputTokens?: number;
   outputTokens?: number;
@@ -253,7 +262,26 @@ export type StreamEvent =
   /**
    * Transient progress line (e.g. "querying Wazuh") shown between deltas while the engine works.
    */
-  | { type: 'status'; message: string }
+  | {
+      type: 'status';
+      message: string;
+      /**
+       * Which user-facing STEP of the turn this status belongs to. The `message` above stays the
+       * authoritative, always-present payload (server-authored English, unchanged for every
+       * existing producer and for the eval harness that reads it); `step` is the optional,
+       * translatable classification the browser prefers when it recognizes it — see
+       * `public/components/chat/turn-status.ts`'s `describeTurnStatus`. A producer that emits no
+       * `step` (retry.ts's rate-limit/invalid-tool-call notices) still renders exactly as before.
+       */
+      step?: TurnStatusStep;
+      /**
+       * Free-form subject of a `querying` step — the tool name whose call is executing. Rendered
+       * inside the translated step label ("Querying get_agent_inventory…"); when absent the label
+       * degrades to the generic "Querying your data…". Never a pseudonym-bearing value: a tool
+       * NAME is catalog vocabulary, not customer data.
+       */
+      detail?: string;
+    }
   /**
    * Privacy mode: every NEW pseudonym-map entry minted server-side this turn (not the ones
    * already seeded from the request's `privacy.map`), streamed once per turn before `done` so the
@@ -345,6 +373,32 @@ export interface PersistedChatMessage extends ChatMessage {
   /** The answer was cut short (Stop, navigation, a dropped connection) rather than completed, so a
    * resumed conversation can label it instead of presenting a partial answer as a finished one. */
   interrupted?: boolean;
+  /**
+   * Why this turn FAILED, as the provider/orchestrator reported it (an `error` stream event's
+   * message). Distinct from `interrupted`, which means "stopped, on purpose or by circumstance":
+   * a failed turn never had a chance to finish at all.
+   *
+   * Persisted because the failure used to live only in a dismissible banner above the transcript
+   * that the next `handleSend` cleared — so a conversation containing a failed turn read, both
+   * immediately afterwards and forever after a reload, as though the question had simply never
+   * been asked. Set on `role:'assistant'` only.
+   */
+  failureReason?: string;
+  /**
+   * Which provider actually produced this message, stamped at turn start. All three are display
+   * provenance, never re-sent to any provider (`buildOutgoingMessages` builds wire messages
+   * field-by-field and reads none of them).
+   *
+   * `providerId` doubles as the per-conversation provider memory: resuming a conversation restores
+   * the provider of its most recent assistant message that still exists (chat-page.tsx's
+   * `applyLoadedConversation`), instead of silently answering the next follow-up with the default
+   * provider — a different model, on the same thread, with no visible sign of the switch.
+   * `providerName`/`providerModel` are copied rather than looked up, so a turn produced by a
+   * provider that has since been renamed or deleted still reports what really answered it.
+   */
+  providerId?: string;
+  providerName?: string;
+  providerModel?: string;
 }
 
 export interface ConversationRecord extends ConversationSummary {

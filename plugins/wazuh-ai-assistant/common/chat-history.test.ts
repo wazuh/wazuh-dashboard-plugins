@@ -976,3 +976,96 @@ test('reconstructConversation: a tool pair never carries over into a later turn'
     restored.messages[0].id,
   );
 });
+
+test('toPersistedMessages/reconstructConversation: a failed turn keeps its reason across a save-and-reload round trip', () => {
+  // Without this the transcript goes back to hiding its own failures the moment the page reloads.
+  const persisted = toPersistedMessages([
+    { id: 'a', role: 'user', content: 'any agents down?', createdAt: 1 },
+    {
+      id: 'b',
+      role: 'assistant',
+      content: '',
+      createdAt: 2,
+      failureReason: 'provider stream failed: 502 upstream',
+    },
+  ]);
+  assert.equal(
+    persisted[1].failureReason,
+    'provider stream failed: 502 upstream',
+  );
+
+  const restored = reconstructConversation(persisted);
+  assert.equal(
+    restored.messages[1].failureReason,
+    'provider stream failed: 502 upstream',
+  );
+});
+
+test('toPersistedMessages/reconstructConversation: provider provenance survives a save-and-reload round trip', () => {
+  const persisted = toPersistedMessages([
+    { id: 'a', role: 'user', content: 'how many?', createdAt: 1 },
+    {
+      id: 'b',
+      role: 'assistant',
+      content: 'Six today.',
+      createdAt: 2,
+      providerId: 'p1',
+      providerName: 'Claude test',
+      providerModel: 'claude-sonnet-4',
+    },
+  ]);
+  assert.equal(persisted[1].providerId, 'p1');
+  assert.equal(persisted[1].providerName, 'Claude test');
+  assert.equal(persisted[1].providerModel, 'claude-sonnet-4');
+  // Never stamped on the question.
+  assert.equal(persisted[0].providerId, undefined);
+
+  const restored = reconstructConversation(persisted);
+  assert.equal(restored.messages[1].providerId, 'p1');
+  assert.equal(restored.messages[1].providerName, 'Claude test');
+  assert.equal(restored.messages[1].providerModel, 'claude-sonnet-4');
+});
+
+test('toPersistedMessages: a message with neither a failure nor a provider stamp is shaped exactly as before (no undefined own properties)', () => {
+  // A strict deep-equality check is what a conversation-merge comparison does, so an explicit
+  // `failureReason: undefined` own property would be a real behaviour change for pre-existing data.
+  const persisted = toPersistedMessages([
+    { id: 'a', role: 'assistant', content: 'Six today.', createdAt: 2 },
+  ]);
+  assert.deepEqual(persisted, [
+    { role: 'assistant', content: 'Six today.', createdAt: 2 },
+  ]);
+});
+
+test('buildOutgoingMessages: a failed turn (marker-only, no prose) is never sent as history', () => {
+  // An assistant message with empty content is not a history entry any provider can use —
+  // Anthropic rejects an empty text block outright. The marker is for the reader, not the model.
+  const outgoing = buildOutgoingMessages(
+    [
+      { id: 'a', role: 'user', content: 'any agents down?', createdAt: 1 },
+      {
+        id: 'b',
+        role: 'assistant',
+        content: '',
+        createdAt: 2,
+        failureReason: 'provider stream failed',
+      },
+      { id: 'c', role: 'user', content: 'and findings?', createdAt: 3 },
+    ],
+    [],
+    false,
+  );
+  assert.deepEqual(outgoing, [
+    { role: 'user', content: 'any agents down?' },
+    { role: 'user', content: 'and findings?' },
+  ]);
+});
+
+test('buildOutgoingMessages: a whitespace-only user message is still sent (the skip is assistant-only)', () => {
+  const outgoing = buildOutgoingMessages(
+    [{ id: 'a', role: 'user', content: '   ', createdAt: 1 }],
+    [],
+    false,
+  );
+  assert.deepEqual(outgoing, [{ role: 'user', content: '   ' }]);
+});
