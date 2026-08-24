@@ -233,10 +233,85 @@ describe('ConversationList', () => {
       expect(screen.getByText('Disconnected agents')).toBeInTheDocument();
     });
 
-    it("carries `wzConvoRailSearchRow` on the search row at rest, so it opts out of EuiFlexGroup's default flex-grow (#9010 review regression: this row is a direct child of the column-flex `.wzConvoRail`, and an un-neutralised grow made it absorb ~50% of the rail's free space)", () => {
-      // Layout itself is not testable in jsdom (no layout engine) — the class is what
-      // conversation-list.scss's `.wzConvoRailSearchRow { flex-grow: 0; }` rule targets, so its
-      // presence is the regression guard.
+    it("renders the search field as a bare, full-width control with no wrapping flex group (#9010 review decision: the select-mode entry point moved into the header, so this row goes back to upstream's own bare shape)", () => {
+      render(
+        <ConversationList
+          conversations={[conversation()]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={noop}
+        />,
+      );
+
+      const searchField = screen.getByPlaceholderText('Search conversations');
+      expect(searchField.closest('.euiFlexGroup')).toBeNull();
+    });
+  });
+
+  describe('select-mode entry point lives in the rail header, not the search row (#9010 review decision)', () => {
+    it('renders the "Select conversations" icon inside the header row, right-aligned against the "Conversations" label', () => {
+      render(
+        <ConversationList
+          conversations={[conversation()]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={noop}
+        />,
+      );
+
+      const title = screen.getByText('Conversations');
+      const icon = screen.getByRole('button', {
+        name: 'Select conversations',
+      });
+      const headerRow = title.closest('.wzConvoRailHeader') as HTMLElement;
+      expect(headerRow).not.toBeNull();
+      expect(headerRow.contains(icon)).toBe(true);
+      expect(
+        screen
+          .getByPlaceholderText('Search conversations')
+          .closest('.wzConvoRailHeader'),
+      ).toBeNull();
+
+      // The OUTER flex row (label group + icon) is what carries the flex-grow guard class --
+      // `title`'s nearest `.euiFlexGroup` ancestor is actually the INNER title+spinner
+      // sub-group, one level down.
+      const headerFlexRow = headerRow.querySelector(
+        '.euiFlexGroup',
+      ) as HTMLElement;
+      expect(headerFlexRow).not.toBeNull();
+      expect(headerFlexRow.className).toMatch(/wzConvoRailSearchRow/);
+      expect(headerFlexRow.contains(icon)).toBe(true);
+    });
+
+    it('hides the header\'s select-mode icon once select mode is entered (the toolbar\'s own "Cancel selection" replaces it)', () => {
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Selectable' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={noop}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      );
+
+      expect(
+        screen.queryByRole('button', { name: 'Select conversations' }),
+      ).toBeNull();
+    });
+
+    it('does not render the icon in the header when onBulkDelete is not supplied', () => {
       render(
         <ConversationList
           conversations={[conversation()]}
@@ -248,10 +323,35 @@ describe('ConversationList', () => {
         />,
       );
 
+      expect(
+        screen.queryByRole('button', { name: 'Select conversations' }),
+      ).toBeNull();
+    });
+
+    it('falls back to the old placement (search row, inline icon) when the header itself is not rendered (`showHeader={false}`, the docked popover -- m14/#9010 review: that surface is a PRIMARY rail surface entitled to the same bulk-delete affordance as the inline rail)', () => {
+      render(
+        <ConversationList
+          conversations={[conversation()]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={noop}
+          showHeader={false}
+          showNewConversationButton={false}
+        />,
+      );
+
+      expect(screen.queryByText('Conversations')).toBeNull();
+      const icon = screen.getByRole('button', {
+        name: 'Select conversations',
+      });
       const searchRow = screen
         .getByPlaceholderText('Search conversations')
         .closest('.euiFlexGroup') as HTMLElement;
       expect(searchRow).not.toBeNull();
+      expect(searchRow.contains(icon)).toBe(true);
       expect(searchRow.className).toMatch(/wzConvoRailSearchRow/);
     });
   });

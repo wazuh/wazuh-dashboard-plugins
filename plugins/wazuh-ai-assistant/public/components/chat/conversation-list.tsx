@@ -665,37 +665,75 @@ export const ConversationList: React.FC<ConversationListProps> = ({
       {showHeader && (
         <>
           <div className='wzConvoRailHeader'>
+            {/* Select-mode entry point lives HERE, right-aligned against the "Conversations"
+              label, not in the search row below (#9010 review decision): the search row goes
+              back to a bare, upstream-shaped field with nothing beside it. This outer group is a
+              direct child of `.wzConvoRailHeader` -- a plain block div, not a flex container --
+              so it never inherits `.wzConvoRail`'s column-flex grow bug the way the search row
+              itself did; `wzConvoRailSearchRow` is still applied defensively in case that wrapper
+              div is ever flattened away. */}
             <EuiFlexGroup
               responsive={false}
               alignItems='center'
               justifyContent='spaceBetween'
-              gutterSize='s'
+              gutterSize='none'
+              className='wzConvoRailSearchRow'
             >
               <EuiFlexItem grow={false}>
-                <EuiTitle size='xxs'>
-                  <h3 className='wzConvoRailTitle'>
-                    {i18n.translate(
-                      'wazuhAiAssistant.chat.conversations.title',
-                      {
-                        defaultMessage: 'Conversations',
-                      },
+                <EuiFlexGroup
+                  responsive={false}
+                  alignItems='center'
+                  gutterSize='s'
+                >
+                  <EuiFlexItem grow={false}>
+                    <EuiTitle size='xxs'>
+                      <h3 className='wzConvoRailTitle'>
+                        {i18n.translate(
+                          'wazuhAiAssistant.chat.conversations.title',
+                          {
+                            defaultMessage: 'Conversations',
+                          },
+                        )}
+                      </h3>
+                    </EuiTitle>
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false}>
+                    {isLoading && (
+                      <EuiLoadingSpinner
+                        size='s'
+                        aria-label={i18n.translate(
+                          'wazuhAiAssistant.chat.conversations.loading',
+                          {
+                            defaultMessage: 'Loading conversations',
+                          },
+                        )}
+                      />
                     )}
-                  </h3>
-                </EuiTitle>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
               </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                {isLoading && (
-                  <EuiLoadingSpinner
-                    size='s'
-                    aria-label={i18n.translate(
-                      'wazuhAiAssistant.chat.conversations.loading',
-                      {
-                        defaultMessage: 'Loading conversations',
-                      },
+              {/* Hidden once select mode is entered: the toolbar that replaces the search row
+                below already carries its own "Cancel selection" control, so a second entry point
+                here would be redundant (and, mid-selection, ambiguous). */}
+              {onBulkDelete && conversations.length > 0 && !selectMode && (
+                <EuiFlexItem grow={false}>
+                  <EuiToolTip
+                    content={i18n.translate(
+                      'wazuhAiAssistant.chat.conversations.selectMode.enter',
+                      { defaultMessage: 'Select conversations' },
                     )}
-                  />
-                )}
-              </EuiFlexItem>
+                  >
+                    <EuiButtonIcon
+                      iconType='listAdd'
+                      aria-label={i18n.translate(
+                        'wazuhAiAssistant.chat.conversations.selectMode.enter',
+                        { defaultMessage: 'Select conversations' },
+                      )}
+                      onClick={enterSelectMode}
+                    />
+                  </EuiToolTip>
+                </EuiFlexItem>
+              )}
             </EuiFlexGroup>
           </div>
           <EuiSpacer size='s' />
@@ -785,7 +823,43 @@ export const ConversationList: React.FC<ConversationListProps> = ({
             </EuiButton>
           </EuiFlexItem>
         </EuiFlexGroup>
+      ) : showHeader ? (
+        // Bare, full-width field -- exactly upstream's own structure (#9010 review decision): the
+        // select-mode entry point now lives in the header above, so this row no longer needs to
+        // wrap the field in a flex group to make room for that icon beside it. A plain direct
+        // child of `.wzConvoRail`, same as `EuiButton`/`EuiSpacer` elsewhere in this render, never
+        // an `EuiFlexGroup` (which is exactly what needed the `wzConvoRailSearchRow` flex-grow
+        // override in the first place -- so that class stays OFF this row now).
+        <EuiFieldSearch
+          placeholder={i18n.translate(
+            'wazuhAiAssistant.chat.conversations.searchPlaceholder',
+            { defaultMessage: 'Search conversations' },
+          )}
+          aria-label={i18n.translate(
+            'wazuhAiAssistant.chat.conversations.searchPlaceholder',
+            { defaultMessage: 'Search conversations' },
+          )}
+          value={searchTerm}
+          onChange={event => {
+            setSearchTerm(event.target.value);
+            // m6: a rename in progress belongs to a specific row that a new search term may
+            // filter out of view entirely -- clear it rather than leave an edit open on a row
+            // the user can no longer see. (select mode has no search field to begin with --
+            // see the toolbar's own comment above -- so there is no equivalent case there.)
+            clearRename();
+          }}
+          fullWidth
+          compressed
+          isClearable
+        />
       ) : (
+        // `showHeader === false` (the docked popover, assistant-chat-panel.tsx): that surface
+        // never renders `.wzConvoRailHeader`, so the select-mode entry point has no header to
+        // live in there. m14 (#9010 review) decided this popover is a PRIMARY surface for the
+        // rail, entitled to the SAME bulk-delete affordance as the inline rail -- dropping the
+        // icon here entirely (to match the bare-field row above) would silently regress that
+        // decision, so this keeps the pre-existing wrapped layout (field + inline icon) as the
+        // fallback placement for this one context.
         <EuiFlexGroup
           responsive={false}
           alignItems='center'
@@ -805,10 +879,6 @@ export const ConversationList: React.FC<ConversationListProps> = ({
               value={searchTerm}
               onChange={event => {
                 setSearchTerm(event.target.value);
-                // m6: a rename in progress belongs to a specific row that a new search term may
-                // filter out of view entirely -- clear it rather than leave an edit open on a row
-                // the user can no longer see. (select mode has no search field to begin with --
-                // see the toolbar's own comment above -- so there is no equivalent case there.)
                 clearRename();
               }}
               fullWidth
