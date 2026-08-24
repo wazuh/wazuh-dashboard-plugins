@@ -373,14 +373,36 @@ function sourceMessages(): Map<string, SourceMessage> {
   return sourceScan().messages;
 }
 
-/** Top-level ICU argument names of a message: `{name}`, `{count, plural, ...}`. */
+/**
+ * Top-level ICU argument names of a message: `{name}`, `{count, plural, ...}`.
+ *
+ * Only braces opened at nesting depth 0 name an argument. The bodies of a `plural`/`select`
+ * branch are LITERAL TEXT, so a single-word branch such as the `one {conversation}` in
+ * "the selected {count, plural, one {conversation} other {conversations}}" must not be read as
+ * two extra arguments named `conversation`/`conversations` -- a depth-blind scan did exactly that,
+ * and since a translation renders those words in its OWN language it could never match, which
+ * demanded English words inside the Spanish string to pass. Nested arguments are still compared
+ * through their top-level parent, whose name is what a caller actually has to supply.
+ */
 function icuPlaceholders(message: string): string[] {
   const found = new Set<string>();
-  const pattern = /\{\s*([A-Za-z0-9_$]+)\s*[,}]/g;
-  let match = pattern.exec(message);
-  while (match !== null) {
-    found.add(match[1]);
-    match = pattern.exec(message);
+  let depth = 0;
+  for (let index = 0; index < message.length; index += 1) {
+    const char = message[index];
+    if (char === '}') {
+      depth = Math.max(0, depth - 1);
+      continue;
+    }
+    if (char !== '{') {
+      continue;
+    }
+    if (depth === 0) {
+      const name = /^\{\s*([A-Za-z0-9_$]+)\s*[,}]/.exec(message.slice(index));
+      if (name) {
+        found.add(name[1]);
+      }
+    }
+    depth += 1;
   }
   const names: string[] = [];
   found.forEach(name => names.push(name));
@@ -439,6 +461,53 @@ function rawCatalogIds(text: string): string[] {
   }
   return ids;
 }
+
+describe('icuPlaceholders', () => {
+  it('names only the arguments a caller has to supply', () => {
+    expect(icuPlaceholders('Ask about {name}')).toEqual(['name']);
+    expect(icuPlaceholders('Request failed (HTTP {status}): {detail}')).toEqual(
+      ['detail', 'status'],
+    );
+    expect(icuPlaceholders('Nothing to interpolate')).toEqual([]);
+  });
+
+  it('ignores plural and select branch bodies', () => {
+    // Regression: a depth-blind scan read the single-word branch bodies as arguments, so this
+    // English message yielded {conversation, conversations, count} and its translation could
+    // never match -- the branch bodies are literal text, in each locale's own words.
+    const english =
+      'Delete the selected {count, plural, one {conversation} other {conversations}}?';
+    const spanish =
+      'Eliminar {count, plural, one {la conversacion} other {las conversaciones}} seleccionada?';
+    expect(icuPlaceholders(english)).toEqual(['count']);
+    expect(icuPlaceholders(spanish)).toEqual(['count']);
+    expect(icuPlaceholders(english)).toEqual(icuPlaceholders(spanish));
+
+    expect(
+      icuPlaceholders('{kind, select, chat {chat} other {other}}'),
+    ).toEqual(['kind']);
+    // The `#` form was never affected, since `# more field` cannot look like an argument name.
+    expect(
+      icuPlaceholders(
+        ' (+{count, plural, one {# more field} other {# more fields}} per row.)',
+      ),
+    ).toEqual(['count']);
+  });
+
+  it('still sees arguments that follow a nested block', () => {
+    expect(
+      icuPlaceholders(
+        '{count, plural, one {one thing} other {# things}} for {name}',
+      ),
+    ).toEqual(['count', 'name']);
+  });
+
+  it('does not derail on unbalanced braces', () => {
+    // Malformed messages are the render check's job; this must not throw or mis-scan the rest.
+    expect(icuPlaceholders('Algo {salio mal')).toEqual([]);
+    expect(icuPlaceholders('Stray } then {name}')).toEqual(['name']);
+  });
+});
 
 describe('i18n source strings', () => {
   it('extracts every message from the plugin source', () => {
