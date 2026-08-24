@@ -1639,8 +1639,9 @@ describe('ProviderFormFlyout — required-field validation', () => {
 
 /**
  * UX wave 2, PR A: the endpoint URL is validated on blur as well as on submit, its error survives
- * the first keystroke, a doubled scheme is caught, and a still-suggested value is selected on focus
- * so the first keystroke replaces it.
+ * the first keystroke, and a scheme glued onto a value the admin typed over is caught — which is
+ * the whole protection for typing on top of a prefilled endpoint, since select-on-focus was
+ * measured inert in Chromium and removed (see `hasGluedSecondScheme` in the component).
  */
 describe('ProviderFormFlyout — endpoint URL validation', () => {
   it('validates on blur, not only on submit', async () => {
@@ -1853,95 +1854,6 @@ describe('ProviderFormFlyout — endpoint URL validation', () => {
     expect(
       screen.getByText(/valid URL starting with http/i),
     ).toBeInTheDocument();
-  });
-
-  /**
-   * What these cases can and cannot prove: jsdom does not model the caret or a text selection, so
-   * the half of this fix that matters most for a MOUSE user — the mouseup completing the click
-   * collapsing the selection `select()` just made, which is why the field calls `preventDefault()`
-   * on that one mouseup — is not observable here. These assert the decision (is this value
-   * selected at all, and is exactly one mouseup suppressed); the caret behaviour itself is a
-   * live-browser check.
-   */
-  it('selects a still-suggested prefilled endpoint on focus, so typing replaces it', () => {
-    render(<ProviderFormFlyout {...baseProps} />);
-
-    // Switching to Anthropic prefills its single real endpoint.
-    fireEvent.click(providerTypeOption('anthropic'));
-    const field = screen.getByLabelText(/endpoint url/i) as HTMLInputElement;
-    expect(field).toHaveValue('https://api.anthropic.com');
-
-    const select = jest.spyOn(field, 'select');
-    // A real click is mousedown → focus → mouseup, and only that sequence arms the suppression.
-    fireEvent.mouseDown(field);
-    fireEvent.focus(field);
-    expect(select).toHaveBeenCalled();
-    select.mockRestore();
-
-    // `fireEvent` returns false when a handler called preventDefault. The mouseup completing THAT
-    // click is suppressed, so it cannot collapse the selection...
-    expect(fireEvent.mouseUp(field)).toBe(false);
-    // ...but only that one — a later click must still be able to place a caret.
-    expect(fireEvent.mouseUp(field)).toBe(true);
-  });
-
-  it('does not let a Tab-in arm the suppression for a later click', () => {
-    // The flag has to live inside a pointer sequence. Armed on focus instead, a Tab-in left it set
-    // and the next click spent it, swallowing the caret that click asked for.
-    render(<ProviderFormFlyout {...baseProps} />);
-
-    fireEvent.click(providerTypeOption('anthropic'));
-    const field = screen.getByLabelText(/endpoint url/i) as HTMLInputElement;
-
-    // Keyboard arrival: focus only, no mousedown. A real `.focus()` rather than `fireEvent.focus`,
-    // because this case turns on the field actually BEING `document.activeElement` afterwards —
-    // which is what tells the later mousedown that it is not the click bringing focus.
-    const select = jest.spyOn(field, 'select');
-    field.focus();
-    expect(document.activeElement).toBe(field);
-    expect(select).toHaveBeenCalled();
-    select.mockRestore();
-
-    // A click in the now-focused field places its caret: mousedown does not arm (the field already
-    // has focus), so the mouseup is not suppressed.
-    fireEvent.mouseDown(field);
-    expect(fireEvent.mouseUp(field)).toBe(true);
-  });
-
-  it('does not select a value the admin typed themselves', () => {
-    render(<ProviderFormFlyout {...baseProps} />);
-
-    const field = screen.getByLabelText(/endpoint url/i) as HTMLInputElement;
-    fireEvent.change(field, { target: { value: 'https://my-gateway/v1' } });
-
-    const select = jest.spyOn(field, 'select');
-    fireEvent.focus(field);
-    expect(select).not.toHaveBeenCalled();
-    expect(fireEvent.mouseUp(field)).toBe(true);
-    select.mockRestore();
-  });
-
-  it('never selects the endpoint of an existing provider being edited', () => {
-    // The data-loss case: a STORED endpoint that happens to read exactly like today's placeholder
-    // must not be selected-and-replaced by the first keystroke of an admin who clicked in only to
-    // inspect it. `baseUrlTouched` starting true for an edit is what keeps this off.
-    render(
-      <ProviderFormFlyout
-        {...baseProps}
-        editingProvider={{
-          ...editingProvider,
-          type: 'anthropic',
-          baseUrl: 'https://api.anthropic.com',
-        }}
-      />,
-    );
-
-    const field = screen.getByLabelText(/endpoint url/i) as HTMLInputElement;
-    const select = jest.spyOn(field, 'select');
-    fireEvent.focus(field);
-    expect(select).not.toHaveBeenCalled();
-    expect(fireEvent.mouseUp(field)).toBe(true);
-    select.mockRestore();
   });
 });
 

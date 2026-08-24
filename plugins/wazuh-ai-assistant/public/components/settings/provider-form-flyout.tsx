@@ -544,6 +544,16 @@ function isValidEndpointUrl(value: string): boolean {
  * `hasRepeatedSchemeInAuthority` composes with this rather than being replaced by it: the two catch
  * different shapes (a scheme pasted in FRONT of the value — `https://https://gw` — is preceded by a
  * delimiter, so only the authority check sees it).
+ *
+ * This validation is the WHOLE protection for the prefill-vs-example confusion, deliberately. The
+ * obvious alternative — selecting the prefilled value on focus so the first keystroke replaces it —
+ * was implemented and then removed: measured in Chromium on the deployed build, clicking into the
+ * field left `selectionStart === selectionEnd === 14`, i.e. no selection at all, and typing still
+ * inserted mid-value. Chromium's caret placement spans the whole mousedown→mouseup sequence, so a
+ * `select()` from `focus` is undone by the click that caused it, and the usual workarounds
+ * (`preventDefault` on mouseup, re-selecting from a frame callback) either did not hold or would
+ * fight a deliberate drag-select. Catching the damage is reliable where preventing it was not; do
+ * not re-add select-on-focus without a live measurement showing it sticks.
  */
 const GLUED_SECOND_SCHEME_PATTERN = /[A-Za-z0-9._~%-]https?:\/\//i;
 
@@ -602,27 +612,6 @@ function getEndpointUrlError(value: string): string | null {
     );
   }
   return null;
-}
-
-/**
- * True while the endpoint field still holds one of the SELECTED type's own suggested values (the
- * placeholder Anthropic is prefilled with, or one of the "Examples:" chips). Those values are
- * indistinguishable on screen from something the admin typed, which is the prefill-vs-example
- * confusion: the field looks filled in, so the admin clicks into it and types — appending to the
- * default instead of replacing it (see `hasRepeatedSchemeInAuthority` above for the result).
- * Selecting
- * the text on focus makes the first keystroke replace it, which is the cheapest fix that leaves the
- * field itself alone.
- */
-function isSuggestedEndpointValue(
-  value: string,
-  guidance: { placeholder: string; examples: string[] },
-): boolean {
-  const trimmed = value.trim();
-  return (
-    trimmed !== '' &&
-    (trimmed === guidance.placeholder || guidance.examples.includes(trimmed))
-  );
 }
 
 /**
@@ -776,10 +765,6 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   // footer button hunting for which of the errors above it appeared.
   const nameInputRef = useRef<HTMLInputElement | null>(null);
   const baseUrlInputRef = useRef<HTMLInputElement | null>(null);
-  // Set by the endpoint field's `onMouseDown` when the click it starts will both focus the field
-  // and select a still-suggested value, so the mouseup completing that same click can be stopped
-  // from collapsing the selection. See the field's own handlers below.
-  const suppressNextMouseUpRef = useRef(false);
   // Whatever the model combo box's search input had in `aria-describedby` before this form added
   // its own error to it — `''` for "nothing", `null` for "no error has been shown yet". See the
   // effect that maintains those attributes below.
@@ -1447,47 +1432,9 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                   inputRef={node => {
                     baseUrlInputRef.current = node;
                   }}
-                  onMouseDown={event => {
-                    // A click is mousedown → focus → mouseup, and that final mouseup places the
-                    // caret, which collapses the selection `onFocus` below is about to make — so
-                    // for the mouse user (the whole point of the fix) `select()` alone is a no-op.
-                    // Arming here rather than in `onFocus` is what keeps the suppression inside a
-                    // POINTER sequence: a Tab-in also fires focus, and a flag left armed by it was
-                    // spent later on an unrelated click, swallowing the caret that click asked for.
-                    //
-                    // `activeElement` is the other half: only a mousedown that will ALSO bring
-                    // focus arms it, so clicking again in an already-focused field places the caret
-                    // normally — including the click after a Tab-in.
-                    if (
-                      document.activeElement !== event.currentTarget &&
-                      !baseUrlTouched &&
-                      isSuggestedEndpointValue(form.baseUrl, urlGuidance)
-                    ) {
-                      suppressNextMouseUpRef.current = true;
-                    }
-                  }}
-                  onFocus={event => {
-                    // Selecting a still-suggested value makes the first keystroke REPLACE it. A
-                    // prefilled default is visually identical to a value the admin entered, so
-                    // clicking in and typing used to append to it. See
-                    // `isSuggestedEndpointValue`.
-                    if (
-                      !baseUrlTouched &&
-                      isSuggestedEndpointValue(form.baseUrl, urlGuidance)
-                    ) {
-                      event.target.select();
-                    }
-                  }}
-                  onMouseUp={event => {
-                    if (suppressNextMouseUpRef.current) {
-                      suppressNextMouseUpRef.current = false;
-                      event.preventDefault();
-                    }
-                  }}
                   onBlur={() => {
                     // Validate on blur too, not only on submit: leaving a wrong URL behind is the
                     // moment the admin can still fix it cheaply.
-                    suppressNextMouseUpRef.current = false;
                     if (!form.baseUrl.trim()) {
                       // An empty field raises nothing on blur — required-ness is submit's business
                       // and nagging on a tab-through is not — but it must not ERASE an error
