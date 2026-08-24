@@ -1557,6 +1557,11 @@ describe('ProviderFormFlyout — required-field validation', () => {
     // would announce nothing about why it was rejected.
     render(<ProviderFormFlyout {...baseProps} />);
 
+    // Pin the assumption the restore path rests on: EUI describes this input with nothing of its
+    // own, so the error id below is the only value the attribute ever carries — and if a future EUI
+    // starts adding one, this is the case that says so.
+    expect(modelSearchInput()).not.toHaveAttribute('aria-describedby');
+
     fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
     await screen.findByText(/enter a name for this provider/i);
 
@@ -1702,6 +1707,63 @@ describe('ProviderFormFlyout — endpoint URL validation', () => {
     expect(baseProps.onSubmit).not.toHaveBeenCalled();
   });
 
+  it.each([
+    // The two prefill shapes an admin types on top of. Anthropic's default is bare, so the pasted
+    // scheme lands in the authority; every openai_compatible example ends in a path like `/v1`, so
+    // it lands in the PATH — which an authority-only check would miss.
+    ['https://api.anthropic.comhttps://my-gateway/v1'],
+    ['https://api.openai.com/v1https://my-gateway/v1'],
+    // Pasted in FRONT of the existing value.
+    ['https://https://my-gateway/v1'],
+  ])('flags a scheme glued onto the value: %s', async value => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    const field = screen.getByLabelText(/endpoint url/i);
+    fireEvent.change(field, { target: { value } });
+    fireEvent.blur(field);
+
+    expect(
+      await screen.findByText(
+        /contains http:\/\/ or https:\/\/ more than once/i,
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it.each([
+    // Delimiter in front of the second scheme: the admin put it there on purpose, and the server's
+    // own url-guard accepts these.
+    ['https://gw.internal/proxy?upstream=https://api.openai.com'],
+    ['https://gw.internal/proxy/https://api.openai.com'],
+    ['https://gw.internal/p?a=1&upstream=https://api.openai.com'],
+  ])('leaves a deliberately passed-through upstream alone: %s', value => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    const field = screen.getByLabelText(/endpoint url/i);
+    fireEvent.change(field, { target: { value } });
+    fireEvent.blur(field);
+
+    expect(
+      screen.queryByText(/contains http:\/\/ or https:\/\/ more than once/i),
+    ).toBeNull();
+  });
+
+  it('reports junk in front of the scheme as a bad URL, not a repetition', async () => {
+    // Ordering check: `xhttps://gw` is not a URL at all, and the doubled-scheme message would send
+    // the admin hunting for a repetition instead of at the junk.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    const field = screen.getByLabelText(/endpoint url/i);
+    fireEvent.change(field, { target: { value: 'xhttps://my-gateway/v1' } });
+    fireEvent.blur(field);
+
+    expect(
+      await screen.findByText(/valid URL starting with http/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/contains http:\/\/ or https:\/\/ more than once/i),
+    ).toBeNull();
+  });
+
   it('accepts a gateway URL that legitimately carries a scheme in its query', async () => {
     // A passthrough/gateway endpoint names its upstream in its own path or query, and the server's
     // url-guard accepts exactly that. A "second scheme anywhere" rule would refuse such a provider
@@ -1810,6 +1872,8 @@ describe('ProviderFormFlyout — endpoint URL validation', () => {
     expect(field).toHaveValue('https://api.anthropic.com');
 
     const select = jest.spyOn(field, 'select');
+    // A real click is mousedown → focus → mouseup, and only that sequence arms the suppression.
+    fireEvent.mouseDown(field);
     fireEvent.focus(field);
     expect(select).toHaveBeenCalled();
     select.mockRestore();
@@ -1818,6 +1882,29 @@ describe('ProviderFormFlyout — endpoint URL validation', () => {
     // click is suppressed, so it cannot collapse the selection...
     expect(fireEvent.mouseUp(field)).toBe(false);
     // ...but only that one — a later click must still be able to place a caret.
+    expect(fireEvent.mouseUp(field)).toBe(true);
+  });
+
+  it('does not let a Tab-in arm the suppression for a later click', () => {
+    // The flag has to live inside a pointer sequence. Armed on focus instead, a Tab-in left it set
+    // and the next click spent it, swallowing the caret that click asked for.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.click(providerTypeOption('anthropic'));
+    const field = screen.getByLabelText(/endpoint url/i) as HTMLInputElement;
+
+    // Keyboard arrival: focus only, no mousedown. A real `.focus()` rather than `fireEvent.focus`,
+    // because this case turns on the field actually BEING `document.activeElement` afterwards —
+    // which is what tells the later mousedown that it is not the click bringing focus.
+    const select = jest.spyOn(field, 'select');
+    field.focus();
+    expect(document.activeElement).toBe(field);
+    expect(select).toHaveBeenCalled();
+    select.mockRestore();
+
+    // A click in the now-focused field places its caret: mousedown does not arm (the field already
+    // has focus), so the mouseup is not suppressed.
+    fireEvent.mouseDown(field);
     expect(fireEvent.mouseUp(field)).toBe(true);
   });
 

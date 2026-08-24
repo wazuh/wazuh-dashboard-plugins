@@ -521,27 +521,49 @@ function isValidEndpointUrl(value: string): boolean {
 }
 
 /**
- * A second scheme inside the AUTHORITY — i.e. between `https://` and the first `/`, `?` or `#`.
- * That is what a paste on top of the type-prefilled default produces
- * (`https://api.anthropic.comhttps://my-gateway/v1`, or the same with the caret left mid-string),
- * and `isValidEndpointUrl` above happily accepts it: it starts with a scheme and is non-empty, and
- * `new URL()` parses it too — the whole tail just becomes part of the host. So without this check
- * the admin gets no field error at all and instead waits for an opaque connection-test failure
- * against a host they never meant to type.
+ * A second scheme GLUED onto the end of a value rather than deliberately placed in a path or query
+ * — the signature of a paste on top of the type-prefilled default. `isValidEndpointUrl` above
+ * happily accepts that: it starts with a scheme and is non-empty, and `new URL()` parses it too,
+ * the whole tail just becoming part of the host or path. So without this check the admin gets no
+ * field error at all and instead waits for an opaque connection-test failure against an endpoint
+ * they never meant to type.
  *
- * Scoped to the authority on purpose. A scheme LATER in the URL is perfectly legitimate — a
- * gateway or passthrough endpoint carries the upstream in its own path or query
- * (`https://gw.internal/proxy?upstream=https://api.openai.com`), the server's own url-guard
- * accepts exactly that, and a blanket "second scheme anywhere" rule would not only refuse such a
- * provider but permanently block re-saving one already stored — every `handleSave` path runs this
- * check, including an edit that changes nothing about the URL.
+ * "Glued" is what separates the accident from the legitimate case, and it is the character in front
+ * of the second scheme that says which:
+ *
+ * - `…anthropic.comhttps://gw/v1`, `…openai.com/v1https://gw/v1` — preceded by a host/path
+ *   character, i.e. the admin typed into a field whose existing value was never cleared. Flagged.
+ *   (Both prefill shapes matter: Anthropic's default is bare, every openai_compatible example ends
+ *   in a path like `/v1`, so the second scheme lands in the PATH there, not in the authority.)
+ * - `…/proxy?upstream=https://api.openai.com`, `…/proxy/https://api.openai.com` — preceded by a
+ *   delimiter (`/ = & ?`), i.e. a gateway or passthrough endpoint naming its upstream on purpose.
+ *   The server's own url-guard accepts exactly these, and refusing them would not only reject such
+ *   a provider but permanently block re-saving one already stored — every `handleSave` path runs
+ *   this check, including an edit that changes nothing about the URL. Left alone.
+ *
+ * `hasRepeatedSchemeInAuthority` composes with this rather than being replaced by it: the two catch
+ * different shapes (a scheme pasted in FRONT of the value — `https://https://gw` — is preceded by a
+ * delimiter, so only the authority check sees it).
+ */
+const GLUED_SECOND_SCHEME_PATTERN = /[A-Za-z0-9._~%-]https?:\/\//i;
+
+function hasGluedSecondScheme(value: string): boolean {
+  // The leading scheme is stripped first so it can never be read as the "second" one.
+  const afterFirstScheme = value.trim().replace(/^https?:\/\//i, '');
+  return GLUED_SECOND_SCHEME_PATTERN.test(afterFirstScheme);
+}
+
+/**
+ * A second scheme inside the AUTHORITY — between `https://` and the first `/`, `?` or `#`. Catches
+ * the paste that landed in front of, or in the middle of, the host (`https://https://gw/v1`,
+ * `https://api.anthropic.comhttps://gw`), including the shapes `hasGluedSecondScheme` above leaves
+ * to the delimiter rule.
  */
 function hasRepeatedSchemeInAuthority(value: string): boolean {
   const authority = /^\s*https?:\/\/([^/?#]*)/i.exec(value)?.[1];
-  // `https?:` rather than `https?://`: the doubled paste leaves the second scheme's own slashes on
-  // the other side of the authority boundary (`api.anthropic.comhttps:` above), so requiring them
-  // here would match nothing. A real hostname cannot contain a colon-terminated scheme — the only
-  // colon a host may carry is the port separator, followed by digits.
+  // `https?:` rather than `https?://`: a second scheme's own slashes end the authority, so
+  // requiring them here would match nothing. A real hostname cannot contain a colon-terminated
+  // scheme — the only colon a host may carry is the port separator, followed by digits.
   return Boolean(authority && /https?:/i.test(authority));
 }
 
@@ -561,7 +583,16 @@ function getEndpointUrlError(value: string): string | null {
       defaultMessage: 'Enter the endpoint URL for this provider.',
     });
   }
-  if (hasRepeatedSchemeInAuthority(trimmed)) {
+  // "Does it even start with a scheme" comes FIRST: a value like `xhttps://gw` is simply not a URL,
+  // and the doubled-scheme message would send the admin looking for a repetition rather than at the
+  // junk in front. Anything that reaches the checks below is scheme-prefixed, so a second scheme
+  // there really is a second one.
+  if (!isValidEndpointUrl(trimmed)) {
+    return i18n.translate('wazuhAiAssistant.settings.form.baseUrlInvalid', {
+      defaultMessage: 'Enter a valid URL starting with http:// or https://',
+    });
+  }
+  if (hasGluedSecondScheme(trimmed) || hasRepeatedSchemeInAuthority(trimmed)) {
     return i18n.translate(
       'wazuhAiAssistant.settings.form.baseUrlRepeatedScheme',
       {
@@ -569,11 +600,6 @@ function getEndpointUrlError(value: string): string | null {
           'This URL contains http:// or https:// more than once. Enter a single endpoint URL.',
       },
     );
-  }
-  if (!isValidEndpointUrl(trimmed)) {
-    return i18n.translate('wazuhAiAssistant.settings.form.baseUrlInvalid', {
-      defaultMessage: 'Enter a valid URL starting with http:// or https://',
-    });
   }
   return null;
 }
@@ -750,10 +776,14 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   // footer button hunting for which of the errors above it appeared.
   const nameInputRef = useRef<HTMLInputElement | null>(null);
   const baseUrlInputRef = useRef<HTMLInputElement | null>(null);
-  // Set when the endpoint field's focus handler selected a still-suggested value, so the mouseup
-  // that completes the very same click can be stopped from collapsing that selection. See the
-  // field's own `onFocus`/`onMouseUp` below.
+  // Set by the endpoint field's `onMouseDown` when the click it starts will both focus the field
+  // and select a still-suggested value, so the mouseup completing that same click can be stopped
+  // from collapsing the selection. See the field's own handlers below.
   const suppressNextMouseUpRef = useRef(false);
+  // Whatever the model combo box's search input had in `aria-describedby` before this form added
+  // its own error to it — `''` for "nothing", `null` for "no error has been shown yet". See the
+  // effect that maintains those attributes below.
+  const describedByBeforeErrorRef = useRef<string | null>(null);
   // Tracks whether the admin has typed into the endpoint URL field themselves (see the field's own
   // `onChange` below), so a provider-type switch (`handleTypeChange` above) only ever resets the
   // base URL while the field is still empty or holds one of the OLD type's own known defaults —
@@ -815,20 +845,37 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
 
   // The invalid state and the error text, on the same input, for the same reason (see
   // `MODEL_ERROR_ID`): submit moves focus here, and a focused input that is silent about its own
-  // rejection is exactly the case a screen-reader user cannot recover from. Safe to remove the
-  // attributes when the error clears — `EuiComboBox` never sets either of them itself, so there is
-  // nothing of EUI's to clobber.
+  // rejection is exactly the case a screen-reader user cannot recover from.
+  //
+  // `aria-describedby` is saved and restored rather than simply removed. EUI sets nothing there
+  // today (the test file pins that), but a future EUI could start describing this input itself, and
+  // then a blind `removeAttribute` on the clear path would quietly delete EUI's description
+  // instead of just our error.
   useEffect(() => {
     const input = getModelSearchInput();
     if (!input) {
       return;
     }
     if (modelError) {
+      if (describedByBeforeErrorRef.current === null) {
+        describedByBeforeErrorRef.current =
+          input.getAttribute('aria-describedby') ?? '';
+      }
+      const existing = describedByBeforeErrorRef.current;
       input.setAttribute('aria-invalid', 'true');
-      input.setAttribute('aria-describedby', MODEL_ERROR_ID);
+      input.setAttribute(
+        'aria-describedby',
+        existing ? `${existing} ${MODEL_ERROR_ID}` : MODEL_ERROR_ID,
+      );
     } else {
       input.removeAttribute('aria-invalid');
-      input.removeAttribute('aria-describedby');
+      const existing = describedByBeforeErrorRef.current;
+      if (existing) {
+        input.setAttribute('aria-describedby', existing);
+      } else {
+        input.removeAttribute('aria-describedby');
+      }
+      describedByBeforeErrorRef.current = null;
     }
   }, [modelError]);
 
@@ -1400,6 +1447,25 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                   inputRef={node => {
                     baseUrlInputRef.current = node;
                   }}
+                  onMouseDown={event => {
+                    // A click is mousedown → focus → mouseup, and that final mouseup places the
+                    // caret, which collapses the selection `onFocus` below is about to make — so
+                    // for the mouse user (the whole point of the fix) `select()` alone is a no-op.
+                    // Arming here rather than in `onFocus` is what keeps the suppression inside a
+                    // POINTER sequence: a Tab-in also fires focus, and a flag left armed by it was
+                    // spent later on an unrelated click, swallowing the caret that click asked for.
+                    //
+                    // `activeElement` is the other half: only a mousedown that will ALSO bring
+                    // focus arms it, so clicking again in an already-focused field places the caret
+                    // normally — including the click after a Tab-in.
+                    if (
+                      document.activeElement !== event.currentTarget &&
+                      !baseUrlTouched &&
+                      isSuggestedEndpointValue(form.baseUrl, urlGuidance)
+                    ) {
+                      suppressNextMouseUpRef.current = true;
+                    }
+                  }}
                   onFocus={event => {
                     // Selecting a still-suggested value makes the first keystroke REPLACE it. A
                     // prefilled default is visually identical to a value the admin entered, so
@@ -1410,12 +1476,6 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                       isSuggestedEndpointValue(form.baseUrl, urlGuidance)
                     ) {
                       event.target.select();
-                      // A click is focus THEN mouseup, and that mouseup places the caret, which
-                      // collapses the selection this just made — so for the mouse user (the whole
-                      // point of the fix) `select()` alone is a no-op. The flag below lets the one
-                      // mouseup that completes THIS click be suppressed, and only that one:
-                      // suppressing every mouseup would make the field impossible to click into.
-                      suppressNextMouseUpRef.current = true;
                     }
                   }}
                   onMouseUp={event => {

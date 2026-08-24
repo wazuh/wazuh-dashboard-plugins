@@ -2009,6 +2009,64 @@ describe('SettingsPage — provider table feedback and retention validation', ()
     expect(await screen.findByRole('spinbutton')).toHaveValue(90);
   });
 
+  it('keeps a retention edit made WHILE the privacy save is in flight', async () => {
+    // The guard has to read the current draft, not the one the handler captured before its await:
+    // the retention field is on a mounted tab and can be typed into while the request is open.
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: false,
+      userCanOverride: true,
+      privacyDefaultPerProvider: {},
+      fieldPolicy: [],
+      conversationRetentionDays: 30,
+    });
+    let resolveSave: () => void = () => undefined;
+    mockService.updateAssistantSettings.mockImplementation(
+      payload =>
+        new Promise(resolve => {
+          resolveSave = () => resolve(payload);
+        }),
+    );
+
+    render(
+      <SettingsPageWithRouter
+        core={coreWithToasts}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=privacy']}
+      />,
+    );
+
+    // Start the privacy save and leave it hanging.
+    fireEvent.click(
+      await screen.findByText(/allow users to override privacy mode/i),
+    );
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
+    await waitFor(() =>
+      expect(mockService.updateAssistantSettings).toHaveBeenCalled(),
+    );
+
+    // Type a new retention value while it is still open.
+    fireEvent.click(screen.getByRole('tab', { name: /conversation history/i }));
+    const days = await screen.findByRole('spinbutton');
+    fireEvent.change(days, { target: { value: '45' } });
+
+    try {
+      // Now let the save land, flushing the microtasks its `then` chain queues.
+      await act(async () => {
+        resolveSave();
+        await Promise.resolve();
+      });
+
+      expect(screen.getByRole('spinbutton')).toHaveValue(45);
+    } finally {
+      // `jest.clearAllMocks()` clears calls but not implementations, and this one is set at module
+      // scope — restore it so the deferred promise above cannot leak into a later case.
+      mockService.updateAssistantSettings.mockImplementation(payload =>
+        Promise.resolve(payload),
+      );
+    }
+  });
+
   it.each([
     ['0', 0],
     ['30', 30],

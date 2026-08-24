@@ -847,15 +847,19 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       // admin can type a new retention value, switch to Privacy, save that, and come back — and
       // an unguarded resync would silently throw the unsaved retention edit away and leave the
       // saved number in its place. A dirty draft is the admin's, and this save was not about it.
-      if (
-        !isRetentionDirty(
-          retentionInput,
-          loadedAssistantSettings.conversationRetentionDays,
-        )
-      ) {
-        setRetentionInput(String(saved.conversationRetentionDays));
-        setRetentionValidationError(null);
-      }
+      //
+      // The decision is made INSIDE the updater, against `current`, not against the `retentionInput`
+      // this closure captured before the await: the admin can perfectly well type into the
+      // retention field while the privacy request is in flight, and a pre-await read would not see
+      // that edit and would overwrite it.
+      setRetentionInput(current =>
+        isRetentionDirty(current, saved.conversationRetentionDays)
+          ? current
+          : String(saved.conversationRetentionDays),
+      );
+      // No `setRetentionValidationError(null)` to go with it: a value the parser refuses always
+      // differs from the saved number, so an invalid field is by definition dirty and keeps both
+      // its text and its error here, while a clean field never had an error to clear.
       core.notifications.toasts.addSuccess(
         i18n.translate('wazuhAiAssistant.settings.privacy.saveSuccess', {
           defaultMessage: 'Privacy settings saved.',
