@@ -1,4 +1,5 @@
 import { TableSpec, ToolCall } from '../../../common/types';
+import { MS_PER_UNIT, resolveBoundMs } from '../../../common/discover-url';
 
 /**
  * Human-worded provenance chip labels for the tool calls a turn ran.
@@ -62,25 +63,27 @@ export interface ToolCallLabel {
   full: string;
 }
 
-/** Millisecond span of the date-math units `shortDateMath` above recognizes (day/hour/minute),
- * plus a year bucket for a genuinely long ISO-to-ISO span — deliberately NO week/month bucket
- * (issue #9008 review, minor 5): a week/month approximation would format the guardrail's exact
- * 90-day lookback cap as something other than "90d". These feed only a human-worded DURATION
- * label for an ABSOLUTE (ISO) span; a date-math bound is always rendered via `shortDateMath`
- * instead, never through this table. */
-const MS_PER_UNIT = {
-  m: 60_000,
-  h: 3_600_000,
-  d: 86_400_000,
-  y: 365 * 86_400_000,
-} as const;
-
-/** Formats a millisecond duration as the coarsest whole unit that divides it exactly, falling back
- * to whole days when nothing divides evenly. Only ever called on the span between two RESOLVED
- * instants (see `spanShortLabel`) — never a substitute for `shortDateMath`'s literal rendering of
- * a date-math bound. */
-function formatDurationShort(durationMs: number): string {
-  const abs = Math.abs(durationMs);
+/**
+ * Formats a millisecond duration as the coarsest whole unit that divides it exactly. Only ever
+ * called on the span between two RESOLVED instants (see `spanShortLabel`) — never a substitute for
+ * `shortDateMath`'s literal rendering of a date-math bound. `MS_PER_UNIT` (common/discover-url.ts)
+ * carries no week/month bucket on purpose; see its own doc comment.
+ *
+ * A DEGENERATE window is never dressed up as a plausible one (issue #9008 review, finding 3). This
+ * used to run `Math.abs` over the span and floor the leftover case at `1d`, so a zero-length window
+ * (`gte === lte`) and an INVERTED one (`gte > lte`, which a clamp bug could produce) both rendered
+ * as a believable "1d" badge while the popover showed "later – earlier" with no hint anything was
+ * wrong. Now: zero-length reads `0m`, and an inverted span returns `undefined` so `spanShortLabel`
+ * falls back to printing the two literal bounds — which shows the reader the inversion itself
+ * ("Jan 8 → Jan 1") rather than a duration that was never real. Nothing here invents a sign.
+ */
+function formatDurationShort(durationMs: number): string | undefined {
+  if (durationMs < 0) {
+    return undefined;
+  }
+  if (durationMs === 0) {
+    return '0m';
+  }
   const units: Array<[string, number]> = [
     ['y', MS_PER_UNIT.y],
     ['d', MS_PER_UNIT.d],
@@ -88,44 +91,17 @@ function formatDurationShort(durationMs: number): string {
     ['m', MS_PER_UNIT.m],
   ];
   for (const [unit, unitMs] of units) {
-    if (abs >= unitMs && abs % unitMs === 0) {
-      return `${Math.round(abs / unitMs)}${unit}`;
+    if (durationMs >= unitMs && durationMs % unitMs === 0) {
+      return `${Math.round(durationMs / unitMs)}${unit}`;
     }
   }
-  return `${Math.max(1, Math.round(abs / MS_PER_UNIT.d))}d`;
-}
-
-/**
- * Resolves a date-math (`now`, `now-90d`) or ISO-8601 bound to an absolute epoch ms.
- *
- * `executedAt` is the FACT the server recorded (`TableSpec.provenance.executedAt`) for the
- * instant the query actually ran — issue #9008 review, blocker 2: a date-math bound only means
- * something relative to WHEN it ran, so resolving `now`/`now-90d` against the render-time clock
- * instead (the pre-fix behavior) showed a restored conversation a window the query never ran
- * against. When `executedAt` is `undefined` (a conversation persisted before this field existed),
- * a date-math bound is left UNRESOLVED — `undefined`, never a guess against the current clock.
- * The two callers react to that differently: `spanShortLabel`'s last-resort path falls back to
- * the literal bound STRING (never blank), while `formatAbsoluteRangeLabel` has no such string
- * fallback and simply returns `undefined`, which is what makes the popover's "Time range:" line
- * OMITTED entirely rather than showing a fabricated absolute instant. An ISO-8601 bound needs no
- * "now" reference at all and resolves the same either way, `executedAt` present or not.
- */
-function resolveBoundMs(
-  value: string,
-  executedAt: number | undefined,
-): number | undefined {
-  if (value === 'now') {
-    return executedAt;
-  }
-  const match = /^now-(\d+)([dhm])$/.exec(value);
-  if (match) {
-    return executedAt === undefined
-      ? undefined
-      : executedAt -
-          Number(match[1]) * MS_PER_UNIT[match[2] as 'd' | 'h' | 'm'];
-  }
-  const parsed = Date.parse(value);
-  return Number.isNaN(parsed) ? undefined : parsed;
+  // Nothing divides evenly: round within the coarsest unit the span actually REACHES, never up to
+  // a whole day a sub-day span never covered (a 90-minute window used to read "1d").
+  const [unit, unitMs] = units.find(([, ms]) => durationMs >= ms) ?? [
+    'm',
+    MS_PER_UNIT.m,
+  ];
+  return `${Math.round(durationMs / unitMs)}${unit}`;
 }
 
 /**
@@ -151,7 +127,12 @@ function spanShortLabel(
   const gteMs = resolveBoundMs(range.gte, executedAt);
   const lteMs = resolveBoundMs(range.lte, executedAt);
   if (gteMs !== undefined && lteMs !== undefined) {
-    return formatDurationShort(lteMs - gteMs);
+    const duration = formatDurationShort(lteMs - gteMs);
+    // `undefined` only for an INVERTED span, which has no honest duration — fall through to the
+    // literal bounds below, where the reader can see the inversion for themselves (finding 3).
+    if (duration !== undefined) {
+      return duration;
+    }
   }
   return `${range.gte} → ${range.lte}`;
 }
@@ -252,13 +233,19 @@ export function describeProvenance(provenance: Provenance): ProvenanceDisplay {
  * the chip itself (issue #9008 review, major 4: the dual-window text must be visible without
  * opening the popover). A call with no matching provenance renders its name alone; nothing about
  * its window is ever guessed.
+ *
+ * `display` is an already-computed `describeProvenance(provenance)` for the same call, accepted so
+ * a caller that needs both (message-bubble.tsx renders the chip AND the popover lines from it) can
+ * compute it once per render instead of twice (issue #9008 review, cleanup 4). Omitting it is
+ * equivalent, just not shared.
  */
 export function describeToolCall(
   toolCall: ToolCall,
   provenance: Provenance,
+  display: ProvenanceDisplay = describeProvenance(provenance),
 ): ToolCallLabel {
   const readable = humanizeToolName(toolCall.name);
-  const { index, windowBadgeLabel } = describeProvenance(provenance);
+  const { index, windowBadgeLabel } = display;
 
   // Issue #9008 review, major 3: truncate only the NAME segment, then append the window text
   // (which can carry a clamp numeral like "720d") un-truncated — truncating the composed string

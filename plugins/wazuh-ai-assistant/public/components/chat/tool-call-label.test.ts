@@ -251,4 +251,57 @@ describe('describeProvenance', () => {
     // No absolute instant could be resolved for `gte` either, so no resolved range label.
     expect(display.resolvedRangeLabel).toBeUndefined();
   });
+
+  // --- Issue #9008 review, finding 3: a DEGENERATE window must be visible -----------------------
+  // `formatDurationShort` used to run `Math.abs` over the span and floor its leftover case at
+  // `1d`, so a zero-length window and an INVERTED one both rendered as a believable "1d" badge
+  // while the popover showed "later – earlier" with nothing marking it as wrong.
+
+  it('renders a zero-length window as 0m, not as a plausible 1d', () => {
+    const instant = '2026-01-01T00:00:00.000Z';
+    const display = describeProvenance({
+      effectiveRange: { gte: instant, lte: instant },
+      clamped: false,
+    });
+    expect(display.windowBadgeLabel).toBe('0m');
+  });
+
+  it('does not dress an INVERTED window up as a duration', () => {
+    const display = describeProvenance({
+      effectiveRange: {
+        gte: '2026-01-08T00:00:00.000Z',
+        lte: '2026-01-01T00:00:00.000Z',
+      },
+      clamped: false,
+    });
+    // No fabricated span at all: the two literal bounds, in the order the record carries them, so
+    // the reader sees the inversion itself.
+    expect(display.windowBadgeLabel).toBe(
+      '2026-01-08T00:00:00.000Z → 2026-01-01T00:00:00.000Z',
+    );
+    expect(display.windowBadgeLabel).not.toBe('7d');
+    expect(display.windowBadgeLabel).not.toBe('1d');
+  });
+
+  it('states a sub-day span in the unit it actually reaches, not rounded up to 1d', () => {
+    const display = describeProvenance({
+      effectiveRange: {
+        gte: '2026-01-01T00:00:00.000Z',
+        lte: '2026-01-01T01:30:00.000Z',
+      },
+      clamped: false,
+    });
+    expect(display.windowBadgeLabel).toBe('90m');
+  });
+
+  it('states an over-a-day span that no whole day divides in hours, not as 1d', () => {
+    const display = describeProvenance({
+      effectiveRange: {
+        gte: '2026-01-01T00:00:00.000Z',
+        lte: '2026-01-02T12:00:00.000Z',
+      },
+      clamped: false,
+    });
+    expect(display.windowBadgeLabel).toBe('36h');
+  });
 });

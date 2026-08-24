@@ -206,9 +206,15 @@ export interface TableSpec {
    *  - `index`: the concrete index queried (same value as `discover.index` above).
    *  - `requestedRange`/`effectiveRange`: the `{gte, lte}` pair read directly off the query DSL,
    *    before and after the 90-day lookback guardrail (`guardrails.ts`'s `clampLookbackWindow`)
-   *    ran — via `common/discover-url.ts`'s `rangeBoundsFromDsl`, the same reader the "Open in
-   *    Discover" link uses. `undefined` when that DSL carried no recognizable range clause at
-   *    all (most catalog tools have no time-range concept and never will), NOT a default.
+   *    ran — via `common/discover-url.ts`'s `rangeBoundsFromDsl`, which is where "what window did
+   *    this DSL state" is decided for the whole plugin (the "Open in Discover" link resolves its
+   *    own openable window through `extractTimeRange`, a different entry point over the same one
+   *    clause walk — see that module). `undefined` when the DSL carried no recognizable range
+   *    clause at all, or only one-sided ones (most catalog tools have no time-range concept and
+   *    never will), NOT a default. Where a DSL carries SEVERAL required range clauses these are
+   *    their intersection, which is what the returned rows actually satisfied.
+   *    The CLIENT never re-reads the DSL for any of this: tool-call-label.ts's
+   *    `describeProvenance` renders these recorded fields and nothing else.
    *  - `clamped`: true only when `clampLookbackWindow` actually narrowed the query.
    *  - `toolCallId`: attached by server/routes/chat.ts (which is where the streaming tool call's
    *    id is in scope), not by the executor — it is what lets the client attribute this table to

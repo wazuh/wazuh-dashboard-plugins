@@ -6,8 +6,8 @@ import { TableSpec } from '../../../common/types';
 import {
   buildDiscoverUrl,
   DEFAULT_TIME_RANGE,
+  describeTimeRangeCoverage,
   extractTimeRange,
-  hasExplicitTimeRange,
 } from '../../../common/discover-url';
 
 export type ResolveDiscoverUrl = (spec: TableSpec) => Promise<string | null>;
@@ -98,6 +98,86 @@ function defaultRangeWindowLabel(): string {
 }
 
 /**
+ * Short rendering of the ONE bound a one-sided range clause stated, for the partial-range
+ * disclosure below. Date-math (`now`, `now-7d`) is kept literal — it is already the shortest and
+ * most familiar form; an ISO instant becomes a locale date with NO time-of-day, unlike
+ * tool-call-label.ts's `formatInstant` which needs it. That is deliberate rather than shared code:
+ * this string goes inside a button label that already carries "Open in Discover" plus the
+ * disclosure wording, and the whole label has to stay short enough not to wrap in the narrow
+ * (sidecar) panel — a full ISO instant alone is 24 characters. Anything unparseable is passed
+ * through untouched rather than guessed at.
+ */
+function shortBoundLabel(value: string): string {
+  if (/^now(-\d+[dhm])?$/.test(value)) {
+    return value;
+  }
+  const parsed = Date.parse(value);
+  return Number.isNaN(parsed)
+    ? value
+    : new Intl.DateTimeFormat(undefined, {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      }).format(new Date(parsed));
+}
+
+/**
+ * The button's label, disclosing whatever the link had to fill in that the query did not state
+ * (`describeTimeRangeCoverage`, common/discover-url.ts):
+ *
+ *  - `stated` — the query bounded both edges, so the link opens exactly the window it ran against
+ *    and there is nothing to disclose.
+ *  - `defaulted` — no range clause at all, so the whole window is `DEFAULT_TIME_RANGE`. Issue #9008
+ *    (I5): the QA E2E review's broader claim that this link "hardcodes now-24h" was checked and is
+ *    inaccurate; the real, narrower gap was that this one case looked identical to every other
+ *    link, giving no hint the window it opens may not match the one the answer above it used.
+ *  - `openStart`/`openEnd` — a ONE-SIDED clause ("findings before X"). Issue #9008 review, finding
+ *    1: this case used to render the plain label, because the query HAD stated a window and the
+ *    default-range check only fires when none was stated at all. Worse, the missing lower bound was
+ *    filled from `now-24h`, so an `lte`-only clause bounded in the past opened an inverted window
+ *    Discover showed nothing for. The fill direction is fixed in `UNBOUNDED_TIME_RANGE`; this says
+ *    out loud which edge the query left open, in the same label slot and style as the other
+ *    disclosure (no second UI element), and short enough not to wrap in the narrow panel.
+ */
+function discoverLinkLabel(dsl: Record<string, unknown> | undefined): string {
+  const { coverage, statedBound } = describeTimeRangeCoverage(dsl);
+  switch (coverage) {
+    case 'defaulted': {
+      return i18n.translate(
+        'wazuhAiAssistant.resultTable.openInDiscoverDefaultRange',
+        {
+          defaultMessage: 'Open in Discover (default range: {window})',
+          values: { window: defaultRangeWindowLabel() },
+        },
+      );
+    }
+    case 'openStart': {
+      return i18n.translate(
+        'wazuhAiAssistant.resultTable.openInDiscoverOpenStart',
+        {
+          defaultMessage: 'Open in Discover (up to {bound} — no start date)',
+          values: { bound: shortBoundLabel(statedBound ?? '') },
+        },
+      );
+    }
+    case 'openEnd': {
+      return i18n.translate(
+        'wazuhAiAssistant.resultTable.openInDiscoverOpenEnd',
+        {
+          defaultMessage: 'Open in Discover (from {bound} — no end date)',
+          values: { bound: shortBoundLabel(statedBound ?? '') },
+        },
+      );
+    }
+    default: {
+      return i18n.translate('wazuhAiAssistant.resultTable.openInDiscover', {
+        defaultMessage: 'Open in Discover',
+      });
+    }
+  }
+}
+
+/**
  * Small "Open in Discover" action rendered in a result card's header (result-table.tsx) when its
  * spec carries `discover` (Indexer-backed tables only). Resolves the target URL eagerly on mount
  * rather than on first expand — the underlying lookup is cheap and cached (module-level Map above),
@@ -132,15 +212,6 @@ export const DiscoverLink: React.FC<DiscoverLinkProps> = ({
     return null;
   }
 
-  // Issue #9008 (I5): `resolveDiscoverUrl` (above) falls back to the last-24h default window
-  // ONLY when `spec.discover.dsl` carries no explicit, recognizable time-range clause at all
-  // (`hasExplicitTimeRange` / `extractTimeRange`, common/discover-url.ts) — every other query
-  // opens Discover to the SAME window it actually ran against. The QA E2E review's broader claim
-  // that this link "hardcodes now-24h" was checked and is inaccurate; the real, narrower gap is
-  // that this range-less fallback case looked identical to every other link, giving no hint the
-  // window it opens to may not match the one the answer above it used.
-  const isRangeLessFallback = !hasExplicitTimeRange(spec.discover?.dsl);
-
   return (
     <EuiButtonEmpty
       size='xs'
@@ -149,17 +220,8 @@ export const DiscoverLink: React.FC<DiscoverLinkProps> = ({
       target='_blank'
       rel='noopener noreferrer'
     >
-      {isRangeLessFallback
-        ? i18n.translate(
-            'wazuhAiAssistant.resultTable.openInDiscoverDefaultRange',
-            {
-              defaultMessage: 'Open in Discover (default range: {window})',
-              values: { window: defaultRangeWindowLabel() },
-            },
-          )
-        : i18n.translate('wazuhAiAssistant.resultTable.openInDiscover', {
-            defaultMessage: 'Open in Discover',
-          })}
+      {/* One label slot, four wordings — see `discoverLinkLabel` above for what each discloses. */}
+      {discoverLinkLabel(spec.discover?.dsl)}
     </EuiButtonEmpty>
   );
 };

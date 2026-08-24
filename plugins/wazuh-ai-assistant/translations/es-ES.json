@@ -59,6 +59,8 @@
     "wazuhAiAssistant.resultTable.tableCaptionPaged": "Esta tabla contiene {total, plural, one {# fila} other {# filas}}. Mostrando las filas {start}-{end}, página {page} de {pageCount}.",
     "wazuhAiAssistant.resultTable.openInDiscover": "Abrir en Discover",
     "wazuhAiAssistant.resultTable.openInDiscoverDefaultRange": "Abrir en Discover (rango predeterminado: {window})",
+    "wazuhAiAssistant.resultTable.openInDiscoverOpenStart": "Abrir en Discover (hasta {bound} — sin fecha de inicio)",
+    "wazuhAiAssistant.resultTable.openInDiscoverOpenEnd": "Abrir en Discover (desde {bound} — sin fecha de fin)",
     "wazuhAiAssistant.resultTable.severity.critical": "Crítico",
     "wazuhAiAssistant.resultTable.severity.high": "Alto",
     "wazuhAiAssistant.resultTable.severity.medium": "Medio",
