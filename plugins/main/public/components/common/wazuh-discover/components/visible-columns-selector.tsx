@@ -34,10 +34,15 @@ export const DataGridVisibleColumnsSelector = ({
 
   const searchValueLowerCase = searchValue.toLowerCase();
 
+  // `name` is not part of the EuiDataGridColumn specification, it is added by
+  // the data grid service. Fall back to the column `id` so a column without it
+  // is still searchable and labelled instead of breaking the selector.
+  const getColumnLabel = ({ name, id }: EuiDataGridColumn) => name ?? id;
+
   const filteredColumns = (
     searchValue
-      ? availableColumns.filter(({ name }) =>
-          name.toLowerCase().includes(searchValueLowerCase),
+      ? availableColumns.filter(column =>
+          getColumnLabel(column).toLowerCase().includes(searchValueLowerCase),
         )
       : availableColumns
   ).slice(0, maxAvailableColumns);
@@ -105,7 +110,8 @@ export const DataGridVisibleColumnsSelector = ({
         />
       </EuiPopoverTitle>
       <div className='euiDataGrid__controlScroll'>
-        {filteredColumns.map(({ name, id }) => {
+        {filteredColumns.map(column => {
+          const { id } = column;
           return (
             <div key={id} className='euiDataGridColumnSelector__item'>
               <EuiFlexGroup
@@ -116,7 +122,7 @@ export const DataGridVisibleColumnsSelector = ({
                 <EuiFlexItem>
                   <EuiSwitch
                     name={id}
-                    label={name}
+                    label={getColumnLabel(column)}
                     checked={visibleColumns.includes(id)}
                     compressed
                     className='euiSwitch--mini'

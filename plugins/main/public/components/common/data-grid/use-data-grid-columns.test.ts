@@ -155,6 +155,35 @@ describe('useDataGridColumns', () => {
     );
   });
 
+  // Regression test for https://github.com/wazuh/wazuh-dashboard-plugins/issues/8300
+  // A persisted column that the index pattern does not define has no schema
+  // definition. Spreading the missing definition produced a column without
+  // `id`, and the data grid column selector crashed rendering it with
+  // `TypeError: Cannot read properties of undefined (reading 'toLowerCase')`.
+  it('should discard visible columns without a schema definition', () => {
+    mockRetrieveState.mockReturnValue({
+      columns: ['col1', 'removed-field', 'col2'],
+      columnWidths: {},
+      pageSize: 10,
+    });
+
+    const { result } = renderHook(() =>
+      useDataGridColumns({
+        moduleId,
+        defaultColumns,
+        columnSchemaDefinitionsMap,
+        indexPatternExists: true,
+        dataGridStatePersistenceManager: mockDataGridStatePersistenceManager,
+      }),
+    );
+
+    expect(result.current.columns.map(({ id }) => id)).toEqual([
+      'col1',
+      'col2',
+    ]);
+    expect(result.current.columns.every(({ id }) => id)).toBe(true);
+  });
+
   it('should persist column width when onColumnResize is called', () => {
     const testColumnId = 'col1';
     const testColumnWidth = 150;

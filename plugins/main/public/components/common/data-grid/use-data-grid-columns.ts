@@ -177,8 +177,18 @@ function useDataGridColumns({
     }
   };
 
+  // A visible column can reference a field the index pattern does not define,
+  // for example a module default column that is missing from the current index
+  // or a column persisted by a previous version. Those have no schema
+  // definition, and spreading the missing definition builds a column without
+  // `id` that breaks the data grid column selector. Discard them, the same way
+  // `setVisibleColumnsHandler` discards them before persisting the state.
+  const visibleColumnsWithSchema = visibleColumns.filter(
+    (columnId: string) => columnSchemaDefinitionsMap[columnId],
+  );
+
   // Don't use `useMemo` here because otherwise the DataGrid cell filter doesn't work
-  const retrieveVisibleDataGridColumns = visibleColumns.map(
+  const retrieveVisibleDataGridColumns = visibleColumnsWithSchema.map(
     (columnId: string) => {
       let column = { ...columnSchemaDefinitionsMap[columnId] };
       const savedColumnWidth =
