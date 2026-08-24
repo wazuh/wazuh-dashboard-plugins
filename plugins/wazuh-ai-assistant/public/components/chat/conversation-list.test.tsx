@@ -641,13 +641,16 @@ describe('ConversationList', () => {
       ).toBeNull();
     });
 
-    it('M3 REGRESSION: the pencil reserves ZERO width at rest, so the row is byte-identical to before it existed', () => {
-      // Screenshot-equivalent DOM check: rather than a real layout engine (jsdom has none),
-      // this asserts the exact inline style values conversation-list.tsx computes for the
-      // pencil's wrapping element -- `width`/`minWidth` collapsed to 0 (not merely `opacity: 0`,
-      // which still occupies its box) at rest, expanding only once the row is hovered. A regressed
-      // opacity-only implementation would leave `width` unset/`auto` here even at rest, which this
-      // would catch.
+    it('M3 REGRESSION: at rest, the pencil sits OUTSIDE the row flex group -- the row is byte-identical to upstream/5.0.0', () => {
+      // Screenshot-equivalent DOM check: rather than a real layout engine (jsdom has none), this
+      // asserts the actual STRUCTURE the M3 fix relies on. The pencil used to be a zero-width
+      // EuiFlexItem inside the row's `gutterSize='xs'` EuiFlexGroup -- but EUI gutters are margins
+      // on every flex item, so even a collapsed one still cost the row a few px of dead gutter at
+      // rest, on top of the reflow it caused. The fix takes it out of the flex flow entirely and
+      // renders it as an absolutely-positioned overlay anchored to the row, so the row's OWN flex
+      // group is left with exactly the three items upstream/5.0.0's own row markup has --
+      // [title][timestamp][trash], nothing else -- proving the at-rest row is structurally
+      // identical to upstream, not just "close" to it.
       render(
         <ConversationList
           conversations={[conversation({ id: 'c1', title: 'Rename me' })]}
@@ -660,21 +663,33 @@ describe('ConversationList', () => {
         />,
       );
 
+      const row = screen.getByText('Rename me').closest('.wzConvoRow');
+      const flexGroup = row?.querySelector(':scope > .euiFlexGroup');
+      expect(flexGroup).not.toBeNull();
+      // Exactly [title][timestamp][trash] -- no pencil item, no extra gutter contributor.
+      expect(flexGroup?.children).toHaveLength(3);
+
       const pencil = screen.getByRole('button', {
         name: 'Rename conversation',
       });
-      const wrapper = pencil.closest('[style]') as HTMLElement;
-      expect(wrapper.style.width).toBe('0px');
-      // jsdom's CSSStyleDeclaration normalizes a zero `min-width` without a unit (unlike `width`
-      // above) -- both represent the same "collapsed to nothing" value.
-      expect(wrapper.style.minWidth).toBe('0');
-      expect(wrapper.style.opacity).toBe('0');
+      // The pencil is a DESCENDANT of the row (still reachable/focusable), but not of its flex
+      // group -- it renders as the row's own absolutely-positioned sibling overlay instead.
+      expect(row?.contains(pencil)).toBe(true);
+      expect(flexGroup?.contains(pencil)).toBe(false);
 
-      fireEvent.mouseEnter(pencil.closest('.wzConvoRow') as HTMLElement);
+      const overlay = pencil.closest(
+        '.wzConvoRowRenameOverlay',
+      ) as HTMLElement;
+      expect(overlay).not.toBeNull();
+      expect(overlay.style.opacity).toBe('0');
+      expect(overlay.style.pointerEvents).toBe('none');
 
-      expect(wrapper.style.width).toBe('auto');
-      expect(wrapper.style.minWidth).toBe('auto');
-      expect(wrapper.style.opacity).toBe('1');
+      fireEvent.mouseEnter(row as HTMLElement);
+
+      expect(overlay.style.opacity).toBe('1');
+      expect(overlay.style.pointerEvents).toBe('auto');
+      // Hovering never adds/removes a flex item either -- no title reflow on hover.
+      expect(flexGroup?.children).toHaveLength(3);
     });
 
     it('M3 REGRESSION: the pencil is NOT permanently shown on the active/selected row -- hover or focus only', () => {
@@ -693,11 +708,13 @@ describe('ConversationList', () => {
       const pencil = screen.getByRole('button', {
         name: 'Rename conversation',
       });
-      const wrapper = pencil.closest('[style]') as HTMLElement;
+      const overlay = pencil.closest(
+        '.wzConvoRowRenameOverlay',
+      ) as HTMLElement;
       // Selected but neither hovered nor focused -- must still be at rest, unlike the pre-fix
       // condition which also checked `isSelected`.
-      expect(wrapper.style.width).toBe('0px');
-      expect(wrapper.style.opacity).toBe('0');
+      expect(overlay.style.opacity).toBe('0');
+      expect(overlay.style.pointerEvents).toBe('none');
     });
 
     it('clicking the pencil icon swaps the title for an input, without triggering onSelect', () => {
@@ -991,6 +1008,43 @@ describe('ConversationList', () => {
       expect(
         screen.queryByRole('button', { name: 'Select conversations' }),
       ).toBeNull();
+    });
+
+    it('the select-mode toolbar is ONE compact flex row (count, cancel, delete), not a wrapped stack', () => {
+      // #9010 review: the previous `wrap` toolbar spread "N selected" / "Cancel selection" /
+      // "Delete (N)" across a sparse 3-line column. The fix keeps all three inside a single,
+      // non-wrapping `EuiFlexGroup` -- this asserts the STRUCTURE (one row, three controls),
+      // not pixels jsdom has no layout engine to measure anyway.
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Selectable' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={noop}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      );
+
+      const countText = screen.getByText('0 selected');
+      const toolbar = countText.closest('.euiFlexGroup') as HTMLElement;
+      expect(toolbar).not.toBeNull();
+      // Never wraps to a second line.
+      expect(toolbar.className).not.toMatch(/wrap/i);
+      // Exactly the three controls, in one row: count, cancel, delete.
+      expect(toolbar.children).toHaveLength(3);
+      expect(
+        toolbar.querySelector('[aria-label="Cancel selection"]'),
+      ).not.toBeNull();
+      expect(screen.getByRole('button', { name: 'Delete (0)' })).toBeTruthy();
+      expect(toolbar.contains(screen.getByRole('button', { name: 'Delete (0)' }))).toBe(
+        true,
+      );
     });
 
     it('entering select mode shows a checkbox per row and hides the delete/rename icons', () => {

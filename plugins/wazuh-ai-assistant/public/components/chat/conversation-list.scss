@@ -145,3 +145,22 @@
   padding: 0;
   list-style: none;
 }
+
+/**
+ * The inline-rename pencil (M3 fix, #9010 review), anchored to `.wzConvoRow`'s own
+ * `position: relative` (conversation-list.tsx) rather than living inside the row's flex group —
+ * a zero-width flex item still cost the row a `gutterSize='xs'` margin at rest (EUI gutters are
+ * margins, not padding), which this avoids entirely by never entering the flex flow. Positioned
+ * over the timestamp/trash corner of the row: `right` clears the trash button's own box so the
+ * two controls don't sit on top of each other when both are visible on hover, but a hovered
+ * pencil is still expected to sit over part of the (glance-only) timestamp text — the background
+ * below is the row's OWN hover tint, not a new color, so no text bleeds through it.
+ */
+.wzConvoRowRenameOverlay {
+  position: absolute;
+  top: 50%;
+  right: 40px;
+  transform: translateY(-50%);
+  background: var(--wz-accent-hover);
+  border-radius: 4px;
+}

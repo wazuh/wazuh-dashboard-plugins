@@ -723,21 +723,22 @@ export const ConversationList: React.FC<ConversationListProps> = ({
         // mode — searching and bulk-selecting at once is out of scope, and this keeps the row's
         // layout footprint identical to the search row it stands in for.
         //
-        // `wrap` (F-6, #9010 review): the docked sidecar popover is narrower (320px, its own
-        // padding) than the inline rail, and the es-ES strings for this row ("Cancelar
-        // selección", "Eliminar (N)") run longer than their English originals -- without `wrap`
-        // the three items could get squeezed or clipped by `.wzConvoRail`'s own
-        // `overflow: hidden`. Wrapping to a second line only grows this row's own height (the
-        // scroll region below it shrinks to make room, via its `flex: 1 1 auto`); nothing
-        // clips.
+        // Compact ONE-ROW toolbar (#9010 review, fixing the F-6 `wrap` attempt): `wrap` let the
+        // count/cancel/delete controls stack into a sparse 3-line column at 260-288px instead of
+        // fitting on one line -- the opposite of what a "dense rail" redesign wants. The count
+        // text truncates instead of pushing the buttons off (`minWidth: 0` + ellipsis, same
+        // pattern the row titles already use), "Cancel selection" is an icon button (a `cross`,
+        // same convention as the collapsed-rail affordances above) rather than a full-sentence
+        // EuiButtonEmpty so its own translated string can never be the thing that overflows, and
+        // Delete keeps its short `Delete ({count})` label, which already fits both locales at
+        // both known toolbar widths (260px inline rail / ~288px docked popover).
         <EuiFlexGroup
           responsive={false}
-          wrap
           alignItems='center'
-          gutterSize='xs'
+          gutterSize='s'
         >
-          <EuiFlexItem grow>
-            <EuiText size='xs' color='subdued'>
+          <EuiFlexItem grow style={{ minWidth: 0 }}>
+            <EuiText size='xs' color='subdued' style={truncateTextStyle}>
               {i18n.translate(
                 'wazuhAiAssistant.chat.conversations.selectMode.selectedCount',
                 {
@@ -748,12 +749,22 @@ export const ConversationList: React.FC<ConversationListProps> = ({
             </EuiText>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiButtonEmpty size='xs' onClick={exitSelectMode}>
-              {i18n.translate(
+            <EuiToolTip
+              content={i18n.translate(
                 'wazuhAiAssistant.chat.conversations.selectMode.cancel',
                 { defaultMessage: 'Cancel selection' },
               )}
-            </EuiButtonEmpty>
+            >
+              <EuiButtonIcon
+                iconType='cross'
+                size='xs'
+                aria-label={i18n.translate(
+                  'wazuhAiAssistant.chat.conversations.selectMode.cancel',
+                  { defaultMessage: 'Cancel selection' },
+                )}
+                onClick={exitSelectMode}
+              />
+            </EuiToolTip>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiButton
@@ -940,6 +951,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                         // driven by this row's own hover/selected state, unchanged.
                         className='wzConvoRow'
                         style={{
+                          position: 'relative',
                           cursor: selectMode ? 'default' : 'pointer',
                           padding: '8px',
                           // "Soft-tinted pill on the active row" (design language, "Navigation"): a
@@ -1052,63 +1064,6 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                                   {formatRelativeTime(conversation.updatedAt)}
                                 </EuiText>
                               </EuiFlexItem>
-                              {onRename && (
-                                <EuiFlexItem
-                                  grow={false}
-                                  // M3 (#9010 review): unlike the trash icon below (a PRE-EXISTING
-                                  // control this change did not touch, kept as-is), this one is
-                                  // NEW, so `opacity` alone was a real regression — an
-                                  // `opacity: 0` element still occupies its layout box, which
-                                  // permanently shrank every row's title column by this icon's
-                                  // full width even at rest. Collapsing `width`/`minWidth` to 0
-                                  // (with `overflow: hidden` to clip the button while collapsed)
-                                  // removes that reserved space entirely at rest — "NO REDESIGN"
-                                  // means the row's resting layout must stay byte-identical to
-                                  // before the pencil existed. `minWidth: 0` specifically is
-                                  // required, not just `width: 0`: a flex item's default
-                                  // `min-width` is derived from its CONTENT size, which would
-                                  // otherwise force the button's intrinsic width back in despite
-                                  // `width: 0`.
-                                  //
-                                  // Reveal is `isHovered || isFocused`, deliberately WITHOUT
-                                  // `isSelected` (unlike the trash icon's condition): the
-                                  // active/selected row must not show this permanently either —
-                                  // hover or keyboard focus, nothing else. `isFocused` (not
-                                  // `isHovered` doubling for both, F-3/WCAG 2.4.11) is what keeps
-                                  // this visible while it holds keyboard focus even if the mouse
-                                  // then wanders over a DIFFERENT row — see `focusedId`'s own doc
-                                  // comment above for why sharing one flag between hover and focus
-                                  // let a focus ring collapse out from under itself.
-                                  style={{
-                                    width: isHovered || isFocused ? 'auto' : 0,
-                                    minWidth:
-                                      isHovered || isFocused ? 'auto' : 0,
-                                    overflow: 'hidden',
-                                    opacity: isHovered || isFocused ? 1 : 0,
-                                  }}
-                                >
-                                  <EuiButtonIcon
-                                    iconType='pencil'
-                                    aria-label={i18n.translate(
-                                      'wazuhAiAssistant.chat.conversations.rename',
-                                      { defaultMessage: 'Rename conversation' },
-                                    )}
-                                    onClick={(event: React.MouseEvent) =>
-                                      startRename(event, conversation)
-                                    }
-                                    onFocus={() =>
-                                      setFocusedId(conversation.id)
-                                    }
-                                    onBlur={() =>
-                                      setFocusedId(current =>
-                                        current === conversation.id
-                                          ? null
-                                          : current,
-                                      )
-                                    }
-                                  />
-                                </EuiFlexItem>
-                              )}
                               <EuiFlexItem
                                 grow={false}
                                 // 0 at rest (never a mid-opacity resting state that fails WCAG 1.4.11's
@@ -1148,6 +1103,53 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                             </>
                           )}
                         </EuiFlexGroup>
+                        {/* M3 fix (#9010 review): the pencil used to be a zero-width EuiFlexItem
+                          INSIDE the EuiFlexGroup above. EUI's `gutterSize='xs'` is implemented as
+                          a margin on every flex item, including a collapsed `width: 0` one — so
+                          that item still cost the row ~4px of dead gutter at rest, on top of the
+                          upstream row's own [title][timestamp][trash] gutters (compare
+                          `upstream/5.0.0`'s own row markup: three items, this one's own margin
+                          included). Taking the pencil OUT of the flex flow entirely and rendering
+                          it as this absolutely-positioned overlay (anchored to `position:
+                          relative` on the row div above) is what makes the row's OWN flex
+                          group — title/timestamp/trash, nothing else — byte-identical to
+                          upstream's at rest, not merely visually close to it.
+                          `pointerEvents: 'none'` at rest, not just `opacity: 0`: this sits on top
+                          of the timestamp/trash's own hit area, so an invisible-but-still-clickable
+                          overlay would silently steal clicks meant for them between hovers.
+                          Reveal condition unchanged from before (`isHovered || isFocused`, F-3),
+                          and the background is the SAME `--wz-accent-hover` token the row itself
+                          paints on hover (conversation-list.scss) — no new color — so a title
+                          character the pencil happens to sit over never bleeds through it. */}
+                        {onRename && !selectMode && !isRenaming && (
+                          <div
+                            className='wzConvoRowRenameOverlay'
+                            style={{
+                              opacity: isHovered || isFocused ? 1 : 0,
+                              pointerEvents:
+                                isHovered || isFocused ? 'auto' : 'none',
+                            }}
+                          >
+                            <EuiButtonIcon
+                              iconType='pencil'
+                              aria-label={i18n.translate(
+                                'wazuhAiAssistant.chat.conversations.rename',
+                                { defaultMessage: 'Rename conversation' },
+                              )}
+                              onClick={(event: React.MouseEvent) =>
+                                startRename(event, conversation)
+                              }
+                              onFocus={() => setFocusedId(conversation.id)}
+                              onBlur={() =>
+                                setFocusedId(current =>
+                                  current === conversation.id
+                                    ? null
+                                    : current,
+                                )
+                              }
+                            />
+                          </div>
+                        )}
                       </div>
                     </li>
                   );
