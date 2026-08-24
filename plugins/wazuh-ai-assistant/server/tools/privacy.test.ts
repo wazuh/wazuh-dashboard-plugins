@@ -2993,8 +2993,15 @@ test('applyFieldPolicy: a prose field resolved through a TOOL-SCOPED entry keeps
 
 test('applyFieldPolicy: a NON-prose digest is byte-identical, pseudonym counter numbers included', () => {
   // The pre-mint is gated on the digest carrying a prose field. This pins that (a) a digest without
-  // one is unaffected, and (b) adding a prose field does not perturb the tokens the OTHER fields
-  // get -- the property that makes the gate safe to rely on.
+  // one is unaffected, and (b) adding a prose field does not perturb THESE fields' tokens.
+  //
+  // (b) is deliberately a claim about this sample only, not a universal property. Pre-minting DOES
+  // reorder mint calls, so a digest whose key order puts a NON-premintable fresh mint of some kind K
+  // before a premintable one of the same kind K would see that kind's counter numbering shift. Every
+  // field in this sample is either premintable (the two user fields, host.hostname) or of a kind no
+  // premintable field shares (source.ip -> IP), and counters are per-kind, so nothing can move here.
+  // A genuinely universal guarantee would need the pre-mint to not mint at all, which is not what it
+  // is for.
   const sample = {
     'source.user.name': 'jsmith',
     'destination.user.name': 'ahmed',

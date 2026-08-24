@@ -397,6 +397,17 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // customer identifier can appear here. `queries.id`/`queries.tags`/`queries.query_field_names`
   // stay out: an id is machine-generated, and tags/field-name lists are closed vocabularies (a
   // field NAME, never a field value).
+  //
+  // ACCEPTED RESIDUAL on the query BODY specifically: the dictionary scan's boundary rule treats a
+  // hyphen as a token boundary and matches case-insensitively (both deliberate -- see
+  // `scrubKnownEntities`), so a hyphen-glued VENDOR literal inside a query can be rewritten when an
+  // account happens to share one of its segments: with a real account named `sysmon`,
+  // `"Microsoft-Windows-Sysmon/Operational"` becomes `"Microsoft-Windows-USER_n/Operational"`. The
+  // query stays syntactically valid (a pseudonym is a plain token), and in a live session the model
+  // never sees a broken channel name in its own answer because the inbound reversal restores it --
+  // but the model reasons over the masked form for that turn, and a PERSISTED digest keeps the masked
+  // form. Judged clearly preferable to shipping a real account name: the loss is one vendor channel
+  // literal reading oddly, not a wrong answer about the customer's data.
   { field: 'queries.id', action: 'allow' },
   { field: 'queries.name', action: 'allow' },
   { field: 'queries.query', action: 'allow' },
@@ -2214,7 +2225,15 @@ function scrubAggKey(
  * (`top`, `find`, `git`, `cron`). Pre-minting that class would both churn HOST counter numbering
  * across every digest and widen the dictionary with prose-colliding junk. Every entry here has an
  * explicit `anonymize` + `kind: 'HOST'` entry in `FIELD_POLICY_DEFAULTS`, i.e. is a REVIEWED
- * hostname field, and `field-policy-coverage`-style pairing is pinned by a test. */
+ * hostname field, and `field-policy-coverage`-style pairing is pinned by a test.
+ *
+ * `get_agents/name` is FUTURE-PROOFING, not a live path: a `get_agents` digest carries no member of
+ * `IDENTIFIER_BEARING_FREE_TEXT_FIELDS` today, so the gate in `applyFieldPolicy` never even calls the
+ * pre-mint for that tool. It is listed so the entry already exists if that tool ever samples a prose
+ * column, and it is what the tool-scoped lookup below exists to resolve. Be aware of what that means
+ * for the tests: the pairing test covers it (it has the right policy entry), but there is no
+ * BEHAVIOURAL test for it, because there is no reachable behavior to assert. The two behavioural
+ * pre-mint tests exercise `wazuh.agent.name` and `host.hostname`. */
 export const PREMINT_HOST_FIELDS = new Set<string>([
   WAZUH_FIELD.AGENT_NAME,
   'host.hostname',
