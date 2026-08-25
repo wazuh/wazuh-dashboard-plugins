@@ -41,6 +41,7 @@ import { getApiKeyCipher } from '../plugin-services';
 import { resolveWazuhUsername } from '../identity';
 import {
   buildRoutingPrompt,
+  CHAIN_PAIRS,
   resolveStage2Tools,
   ROUTE_QUESTION_TOOL,
   ROUTER_ENABLED,
@@ -553,13 +554,19 @@ const NO_ANSWER_MESSAGE =
  * mechanism itself can see and this instruction must never expose per F11) was judged the simpler,
  * equally-safe choice; this comment is the record the review asked for if the deviation is kept.
  */
+/** Blank line inserted between two ROUNDS' text within one turn — see `separateRoundText`. Not a
+ * newline: the client renders markdown, where a single newline is not a paragraph break. */
+export const ROUND_TEXT_SEPARATOR = '\n\n';
+
 export const FINAL_ROUND_ANSWER_INSTRUCTION =
   "Now answer the user's question directly, using only the tool results already gathered in " +
   'this conversation. Do not state anything the results do not show. If they do not answer the ' +
-  'question, say so plainly and state what is missing. Then state plainly what the gathered ' +
-  'results do and do not cover (for example, which agents, hosts, rules, or items were ' +
-  'retrieved and which were not) — describe only the coverage itself, not the process that ' +
-  'produced it.';
+  'question, say so plainly and state what is missing. This is your final step here: do ' +
+  'not announce further data pulls or say you will now fetch/break down anything else — no ' +
+  'more tool calls will run. Offering the user a follow-up they can ASK for is fine. Then ' +
+  'state plainly what the gathered results do and do not cover (for example, which agents, ' +
+  'hosts, rules, or items were retrieved and which were not) — describe only the coverage ' +
+  'itself, not the process that produced it.';
 
 /**
  * Appends FINAL_ROUND_ANSWER_INSTRUCTION to the messages bound for the provider, but only on the
@@ -804,9 +811,16 @@ export function willBeFinalRound(
 }
 
 /** Picks which of the three no-text fallbacks above fits a turn that ended without any `delta`
- * text — shared by every `!roundSawAnyDelta` exit point below (the normal per-round `done` branch,
- * the forced-round dead-stream guard, and the round-budget-exhausted path) so the same three-way
- * decision lives in exactly one place. */
+ * text and does NOT qualify for (or fell through) the forced-synthesis retry below — shared by
+ * every `!roundSawAnyDelta` exit point in `orchestrate` (via `emitNoTextFallback`: the normal
+ * per-round `done` branch, the forced-round dead-stream guard, and the round-budget-exhausted
+ * path) so this decision lives in exactly one place. The `toolUsedThisTurn && sawNonEmptyTable`
+ * case (a real, non-empty table with no narration) no longer resolves here first:
+ * `emitNoTextFallback` intercepts that case and only falls back to NO_ANALYSIS_TEXT_MESSAGE if
+ * forced synthesis produced nothing AND there was no digest to derive a truthful sentence from
+ * either (structurally unreachable in practice, since a non-empty table always yields a `digest`
+ * event — kept as a defensive last resort, not a live path). Still exported for its own unit
+ * test. */
 export function noTextFallbackMessage(
   toolUsedThisTurn: boolean,
   sawNonEmptyTable: boolean,
@@ -843,6 +857,378 @@ function hasMeaningfulText(content: string): boolean {
   return content.trim().length > 0;
 }
 
+/**
+ * FORCED SYNTHESIS (measured design, see the "No additional analysis — see the results above."
+ * live failure this replaces): one executed tool call's digest this turn, recorded right where
+ * `orchestrate`'s real-tool branch already yields the `digest` StreamEvent -- `content` is that
+ * same `outcome.toolResultContent`-derived JSON string (pseudonym-form when privacy is on), so
+ * this carries no new data, only the tool's name alongside it for `summarizeDigestForFallback`
+ * below.
+ */
+export interface DigestRecord {
+  toolName: string;
+  content: string;
+}
+
+/** Narrow shape this module reads out of a digest JSON blob -- see digest.ts's `Digest` for the
+ * full shape; typed narrowly here so a future digest field never needs a matching change in this
+ * unrelated fallback-copy code. `columns` (Group D fix, CV-017) is read too now -- see
+ * `summarizeDigestForFallback`'s doc comment for why schema-only (field NAMES, never sample
+ * VALUES) is the safe, sufficient enrichment here. */
+type SummarizableDigestForFallback = {
+  counts?: { total?: number; returned: number; truncated?: boolean };
+  columns?: unknown;
+};
+
+/** Bounds how many column names the enriched sentence names -- a wide escape-hatch result can
+ * carry a long `_source` column list, and this sentence is meant to give the reader a sense of
+ * what the row SHAPE is, not enumerate every field. */
+const FALLBACK_CONTENT_COLUMN_LIMIT = 5;
+
+/** Renders a digest's `columns` (if present, a non-empty string array) as a short, human-facing
+ * clause naming what fields the row(s) actually carry -- e.g. " (fields: detector.name,
+ * wazuh.rule.title, @timestamp)". Returns `''` for a missing/malformed/empty `columns`, so a
+ * digest shape that predates this field degrades to exactly the pre-fix sentence. Field NAMES
+ * only, never sample VALUES: `record.content` is pseudonym-form under privacy mode (see
+ * `DigestRecord`'s doc comment), and this text is emitted directly as a `delta` StreamEvent
+ * outside the normal per-round depseudonymization pipeline -- reading only schema (never a
+ * pseudonym or a real identifier) keeps this fallback privacy-safe without needing to thread it
+ * through that pipeline.
+ */
+function describeDigestColumns(columns: unknown): string {
+  if (!Array.isArray(columns) || columns.length === 0) {
+    return '';
+  }
+  const names = columns.filter((c): c is string => typeof c === 'string');
+  if (names.length === 0) {
+    return '';
+  }
+  const shown = names.slice(0, FALLBACK_CONTENT_COLUMN_LIMIT);
+  const more = names.length - shown.length;
+  return ` (fields: ${shown.join(', ')}${more > 0 ? `, +${more} more` : ''})`;
+}
+
+/**
+ * Truthful, deterministic sentence derived ONLY from a digest's own `counts`/`columns`/tool name
+ * -- never invents a number or a field the digest did not already carry. Used by
+ * `synthesizeNoTextFallback` below when the model-authored retry (case (a)) errors or produces no
+ * usable text (case (b)): the turn must still end with something that does not contradict the
+ * non-empty table already on screen, and unlike NO_ANALYSIS_TEXT_MESSAGE this never claims "no
+ * additional analysis" over a real result.
+ *
+ * BLOCKER FIX (CV-017, 2026-08-19/20 adjudicated runs, "residual single-digest answer collapse"):
+ * the overnight fix (`summarizeDigestsForFallback` below) covers a multi-digest SWEEP, but a turn
+ * whose forced-synthesis retry (a) also fails ends up here on a SINGLE digest even when that
+ * digest is a real, on-topic result (CV-017's shape: one `search_wazuh_data` call against
+ * `.opensearch-sap-*-findings` returning exactly the findings asked about). Before this fix, the
+ * sentence named only the row count -- "The query returned 1 row; the table below has the
+ * details." -- discarding the domain (which tool/data family) and the row shape (which fields)
+ * even though both were already sitting in the same digest, unused. Now names the tool's
+ * plain-language domain (`describeToolDomain`, already used by `buildNoMatchingResultsMessage`
+ * for the empty-result sibling of this same fallback family) and the row schema
+ * (`describeDigestColumns`) alongside the counts that were already here -- still nothing beyond
+ * what the digest itself carries.
+ */
+export function summarizeDigestForFallback(record: DigestRecord): string {
+  let parsed: SummarizableDigestForFallback | undefined;
+  try {
+    parsed = JSON.parse(record.content) as SummarizableDigestForFallback;
+  } catch {
+    // Should not happen -- `content` is always this same route's own `JSON.stringify`'d digest.
+    // Degrade to a still-truthful, non-contradictory sentence rather than throwing out of a
+    // fallback path whose entire job is to never leave the turn silent or lying.
+    return `The ${record.toolName} results are shown in the table below.`;
+  }
+  const returned = parsed.counts?.returned;
+  const total = parsed.counts?.total;
+  if (typeof returned !== 'number') {
+    return `The ${record.toolName} results are shown in the table below.`;
+  }
+  const domain = describeToolDomain(record.toolName);
+  const rowWord = returned === 1 ? 'row' : 'rows';
+  const totalPhrase =
+    typeof total === 'number' && total !== returned ? ` of ${total} total` : '';
+  // `counts.truncated` (digest.ts) is read here too -- the digest already knows the page it
+  // returned was cut short, and staying silent about that would omit data the digest carries
+  // without inventing anything new.
+  const truncatedPhrase = parsed.counts?.truncated ? ' (truncated)' : '';
+  const columnsPhrase = describeDigestColumns(parsed.columns);
+  return `The ${domain} query returned ${returned} ${rowWord}${totalPhrase}${truncatedPhrase}${columnsPhrase}; the table below has the details.`;
+}
+
+/**
+ * Appended as a `system` message for the forced-synthesis retry call (case (a) below) only --
+ * never added to `messages` itself, same "outbound copy only" rule as
+ * `withFinalRoundAnswerInstruction`'s FINAL_ROUND_ANSWER_INSTRUCTION. Every clause is load-bearing
+ * for the same reason that instruction's are: "using only the tool results already gathered" and
+ * "Do not state anything the results do not show" keep this from becoming a fabrication prompt;
+ * "Do not call any tools" is redundant with `tools` being omitted from this call's `streamOptions`
+ * but stated anyway so a model that somehow still emits a tool-call-shaped delta reads an explicit
+ * instruction not to; "do not say there is nothing to add" directly targets the measured failure
+ * this whole mechanism exists to replace.
+ */
+export const NO_TEXT_SYNTHESIS_INSTRUCTION =
+  'The tool call(s) above already returned results, but no written answer followed. Using only ' +
+  'the tool results already gathered in this conversation, write 2 to 4 plain sentences stating ' +
+  'the totals and key observations from those results. Do not state anything the results do not ' +
+  'show. Do not call any tools. Do not say there is nothing to add.';
+
+/** What `synthesizeNoTextFallback` reports back to `orchestrate` once it finishes -- mirrors
+ * `Stage1Result`'s shape/reasoning: `usage` is `undefined` on every path that never actually made
+ * the retry call (no digest to synthesize from, or the turn was aborted), so `addUsage` (which
+ * treats `undefined` as zero) never fabricates spend for a call that never happened. */
+export interface NoTextSynthesisResult {
+  usage?: StreamUsage;
+}
+
+/**
+ * BLOCKER FIX (round-budget sweep collapse, CV-069/CV-079/CV-080 -- 2026-08-19 adjudicated run):
+ * when a multi-tool sweep turn ends with no model-authored text on EITHER the final-round call
+ * (`FINAL_ROUND_ANSWER_INSTRUCTION`) or the one forced-synthesis retry
+ * (`NO_TEXT_SYNTHESIS_INSTRUCTION`), the only fallback available was `summarizeDigestForFallback`
+ * over a SINGLE digest (`pickDigestForFallback`'s "last non-empty record") -- truthful about that
+ * one tool, but silently discarding every OTHER tool call's results the turn already gathered
+ * (CV-069: 5 successful calls, fallback described only the 5th). That is exactly the
+ * "incomplete-without-coverage-statement" failure class the round-budget redesign's final-round
+ * instruction exists to prevent, reached here because the DETERMINISTIC last-resort text never
+ * covered more than one call to begin with, no matter how well the two model-authored attempts
+ * above were prompted.
+ *
+ * This function replaces that single-digest sentence with a coverage statement spanning EVERY
+ * digest recorded this turn: one truthful, digest-derived clause per tool call, so a sweep that
+ * gathered 5 results and got no narration still tells the user what was and was not covered,
+ * instead of collapsing to the last tool's row count as if that were the whole answer. Still never
+ * invents anything the digests themselves do not carry -- same non-fabrication contract as
+ * `summarizeDigestForFallback`, just applied per-record instead of to one record only.
+ */
+export function summarizeDigestsForFallback(records: DigestRecord[]): string {
+  if (records.length === 0) {
+    return 'The results are shown in the tables below.';
+  }
+  if (records.length === 1) {
+    return summarizeDigestForFallback(records[0]);
+  }
+  const clauses = records.map(record => {
+    let parsed: SummarizableDigestForFallback | undefined;
+    try {
+      parsed = JSON.parse(record.content) as SummarizableDigestForFallback;
+    } catch {
+      parsed = undefined;
+    }
+    const returned = parsed?.counts?.returned;
+    if (typeof returned !== 'number') {
+      return `${record.toolName} (see table)`;
+    }
+    const total = parsed?.counts?.total;
+    const rowWord = returned === 1 ? 'row' : 'rows';
+    const totalPhrase =
+      typeof total === 'number' && total !== returned
+        ? ` of ${total} total`
+        : '';
+    const truncatedPhrase = parsed?.counts?.truncated ? ' (truncated)' : '';
+    return `${record.toolName}: ${returned} ${rowWord}${totalPhrase}${truncatedPhrase}`;
+  });
+  return `Retrieved results for all ${
+    records.length
+  } requested parts of this question -- ${clauses.join(
+    '; ',
+  )}; the tables below have the full details for each.`;
+}
+
+/** Picks the digest `summarizeDigestForFallback` should describe: the LAST record whose own
+ * `counts.returned` is a positive number, falling back to the last record overall when none
+ * qualifies (an unparseable/shape-mismatched digest, which `summarizeDigestForFallback` already
+ * degrades gracefully for). Plain "last of the array" would risk describing a LATER zero-row tool
+ * call's digest even though an EARLIER one this same turn produced the non-empty table that got
+ * `sawNonEmptyTable` (and therefore this whole mechanism) triggered in the first place -- a
+ * technically-true-about-the-wrong-tool sentence is still a regression against the honest goal
+ * here. */
+function pickDigestForFallback(
+  digests: DigestRecord[],
+): DigestRecord | undefined {
+  for (let i = digests.length - 1; i >= 0; i -= 1) {
+    const record = digests[i];
+    try {
+      const parsed = JSON.parse(
+        record.content,
+      ) as SummarizableDigestForFallback;
+      if (
+        typeof parsed.counts?.returned === 'number' &&
+        parsed.counts.returned > 0
+      ) {
+        return record;
+      }
+    } catch {
+      // Unparseable -- not a match, keep scanning further back.
+    }
+  }
+  return digests[digests.length - 1];
+}
+
+/**
+ * Forced synthesis (a): the ONE retry this mechanism is allowed per turn (bound enforced by the
+ * caller's `noTextSynthesisAttempted` flag, not here -- this function itself is stateless and
+ * would happily run again if called again, same division of responsibility as
+ * `shouldConsiderDeferredOffer`/its caller). Called only when `orchestrate` has already
+ * established `toolUsedThisTurn && sawNonEmptyTable` -- i.e. exactly the case the live failure
+ * this replaces used to hand NO_ANALYSIS_TEXT_MESSAGE regardless of whether there was something to
+ * analyze.
+ *
+ * Makes ONE extra `adapter.chatStream` call with NO `tools` offered (structurally unable to
+ * re-enter the tool loop -- (c)'s "cannot re-enter" bound), asking the model to narrate the
+ * results already gathered. Every delta is run through the SAME scrub/depseudonymize/
+ * table-suppression pipeline the turn's own rounds use, so the retry's text is held to the exact
+ * same privacy and duplicate-table guarantees as everything else this turn streamed.
+ *
+ * (b): if the retry call errors, or ends without ever producing meaningful text, this falls back
+ * to `summarizeDigestForFallback` on the LAST digest recorded this turn -- truthful and
+ * deterministic, never the layout-lying NO_ANALYSIS_TEXT_MESSAGE.
+ *
+ * (c) abort-safety: checked before the retry call is even attempted -- an aborted turn makes no
+ * extra provider call, though it still yields the deterministic digest sentence below (never an
+ * extra MODEL-authored answer -- that is the "no extra text" this guarantees); the caller's own
+ * `!roundSawAnyDelta` guard chain already covers the (rare, defensive) case of `digests` being empty
+ * despite `sawNonEmptyTable` being true.
+ */
+export async function* synthesizeNoTextFallback(
+  adapter: ProviderAdapter,
+  providerConfig: ProviderConfig,
+  messages: ChatMessage[],
+  signal: AbortSignal,
+  privacyCtx: PrivacyContext | undefined,
+  digests: DigestRecord[],
+): AsyncGenerator<StreamEvent, NoTextSynthesisResult, void> {
+  const lastDigest = pickDigestForFallback(digests);
+
+  // Abort-safety (c) and the defensive no-digest case: neither attempts the extra call.
+  if (signal.aborted || !lastDigest) {
+    if (lastDigest) {
+      // BLOCKER FIX (CV-069/079/080): cover EVERY digest gathered this turn, not just the last
+      // one -- see `summarizeDigestsForFallback`'s doc comment.
+      yield { type: 'delta', content: summarizeDigestsForFallback(digests) };
+    }
+    return { usage: undefined };
+  }
+
+  const retryMessages: ChatMessage[] = [
+    ...messages,
+    { role: 'system', content: NO_TEXT_SYNTHESIS_INSTRUCTION },
+  ];
+  // Outbound scrub, same as every other adapter.chatStream call this turn makes.
+  const outboundMessages = privacyCtx
+    ? scrubMessagesForProvider(retryMessages, privacyCtx.pseudonymizer)
+    : retryMessages;
+  // Inbound un-scrub and duplicate-table suppression, same pipeline as every round of the main
+  // loop -- a non-empty table is already on screen (this function is only ever called when
+  // `sawNonEmptyTable` is true), so the suppressor starts ACTIVE, not lazily instantiated.
+  const depseudonymizer = privacyCtx
+    ? new StreamDepseudonymizer(privacyCtx.pseudonymizer)
+    : undefined;
+  const tableSuppressor = new MarkdownTableSuppressor();
+
+  /** Same drain contract as the main loop's `drainRoundBuffers` (this file, ~line 1678): flushes
+   * the depseudonymizer's leftover buffer THROUGH the table suppressor before releasing the table
+   * suppressor's own remainder, so held-back text is never lost on any exit from the loop below --
+   * error, mid-stream abort, or a normal 'done'. */
+  function drainBuffers(): string {
+    let text = depseudonymizer ? depseudonymizer.flush() : '';
+    text = tableSuppressor.push(text) + tableSuppressor.flush();
+    return text;
+  }
+
+  let producedText = false;
+  let usage: StreamUsage | undefined;
+
+  try {
+    for await (const event of adapter.chatStream(
+      providerConfig,
+      outboundMessages,
+      signal,
+      {}, // (c): no `tools` offered -- this round cannot re-enter the tool loop.
+    )) {
+      if (signal.aborted) {
+        // Mid-stream abort: still drain whatever the depseudonymizer/table suppressor are
+        // holding back so the client is never left mid-word or mid-table-row -- the same reason
+        // every exit of the main round loop routes through `drainRoundBuffers`.
+        const trailing = drainBuffers();
+        if (trailing) {
+          if (hasMeaningfulText(trailing)) {
+            producedText = true;
+          }
+          yield { type: 'delta', content: trailing };
+        }
+        return { usage };
+      }
+      if (event.type === 'delta') {
+        // Reasoning-channel fallback text (openai-compatible.ts's `reasoningFallback`) is raw
+        // deliberation, not an answer -- same reason the main loop's deferred-offer interception
+        // excludes it (`roundHadReasoningFallback`). Letting it set `producedText` here would let
+        // deliberation displace the truthful digest sentence, which is strictly worse.
+        let content = depseudonymizer
+          ? depseudonymizer.push(event.content)
+          : event.content;
+        if (content) {
+          content = tableSuppressor.push(content);
+        }
+        if (content) {
+          if (hasMeaningfulText(content) && !event.reasoningFallback) {
+            producedText = true;
+          }
+          yield { type: 'delta', content };
+        }
+        continue;
+      }
+      if (event.type === 'done') {
+        const trailing = drainBuffers();
+        if (trailing) {
+          if (hasMeaningfulText(trailing)) {
+            producedText = true;
+          }
+          yield { type: 'delta', content: trailing };
+        }
+        usage = event.usage;
+        break;
+      }
+      if (event.type === 'error') {
+        // (b): flush first -- any text already streamed this retry must not be lost -- then fall
+        // through to the deterministic digest sentence below (only if that flush did not already
+        // count as `producedText`). Never surfaced to the client as an 'error' event, since the
+        // turn already has a complete, non-empty table on screen and this retry is purely
+        // additive narration, not something the user asked for.
+        const trailing = drainBuffers();
+        if (trailing) {
+          if (hasMeaningfulText(trailing)) {
+            producedText = true;
+          }
+          yield { type: 'delta', content: trailing };
+        }
+        break;
+      }
+      // tool_call/status/table/etc. should never occur (no tools were offered) -- ignore
+      // defensively rather than crash a fallback path whose entire job is to never leave the
+      // turn worse off.
+    }
+  } catch {
+    // Same policy as the 'error' branch above: flush before swallowing so a retry that had
+    // already produced meaningful text does not get truncated mid-word/mid-row.
+    const trailing = drainBuffers();
+    if (trailing) {
+      if (hasMeaningfulText(trailing)) {
+        producedText = true;
+      }
+      yield { type: 'delta', content: trailing };
+    }
+  }
+
+  if (!producedText) {
+    // BLOCKER FIX (CV-069/079/080): same coverage-statement fix as the abort-safety branch above --
+    // describe every tool call this turn gathered, not only the one `pickDigestForFallback` chose.
+    yield { type: 'delta', content: summarizeDigestsForFallback(digests) };
+  }
+
+  return { usage };
+}
+
 /** Sentence boundary for the offer-shape gate: end punctuation followed by whitespace, or a line
  * break. Coarse on purpose -- the gate only needs the offer marker and the tool name to share ONE
  * sentence-ish span, not a full sentence parse. */
@@ -868,6 +1254,38 @@ const OFFER_MARKER_RE =
  * holds and that the name still exists in the registry, so a rename cannot silently void it).
  */
 const FORCE_EXEMPT_TOOL_NAMES = new Set(['search_wazuh_data']);
+
+/**
+ * Metadata-fallback RELEVANCE gate (integration-review fix, see the fallback's own doc comment
+ * below): the name-based path's `\bname\b` match is itself the relevance gate that keeps
+ * `OFFER_MARKER_RE`'s near-universal closing vocabulary ("let me know", "happy to", "i can") from
+ * force-calling a tool on ordinary boilerplate -- "Let me know if you need anything else." matches
+ * `OFFER_MARKER_RE` but names no tool, so the name-based path is inert on it. The metadata fallback
+ * has no name to match against, so without an equivalent gate it force-calls
+ * `CHAIN_PAIRS[lastSuccessfulToolName][0]` on THAT EXACT sentence and on every other unnamed
+ * closer, on every turn that ran a `CHAIN_PAIRS`-keyed summary tool. This requires the offer
+ * sentence to actually reference MORE/SPECIFIC/FURTHER data before the fallback may fire --
+ * a generic "let me know if you need anything else" has none of that vocabulary and now degrades
+ * to base behaviour, same as an unrecognized offer phrasing already does.
+ */
+const METADATA_FALLBACK_DETAIL_RE =
+  /\b(more|further|specific|additional|extra|detail|details|breakdown|full list|individual|underlying|exact|failing checks)\b/i;
+
+/**
+ * Metadata-fallback ESCAPE-HATCH exclusion (integration-review fix): `FORCE_EXEMPT_TOOL_NAMES`
+ * only protects the `search_wazuh_data` offer when the offer NAMES it -- prompts.ts's designed
+ * offer ("say so and offer to query it with search_wazuh_data instead of speculating" for a field
+ * a typed result lacks) can be paraphrased without the literal tool name ("I can run a custom
+ * query for those fields if you'd like"), which the name-based exemption cannot see at all. That
+ * paraphrase still matches `METADATA_FALLBACK_DETAIL_RE` above (it says "those fields"), so
+ * without this second gate it would be force-called into whatever `CHAIN_PAIRS` detail tool the
+ * last summary tool happens to declare -- voiding the exemption's intent for exactly the phrasing
+ * class it exists to cover. Matches the field/custom-query vocabulary prompts.ts's own escape-hatch
+ * instruction uses, so an offer shaped like that instruction degrades to base behaviour here
+ * instead of being misattributed to an unrelated chained tool.
+ */
+const METADATA_FALLBACK_ESCAPE_HATCH_RE =
+  /\b(custom quer(?:y|ies)|raw quer(?:y|ies)|those fields|that field|these fields|specific fields|additional fields|missing fields)\b/i;
 
 /**
  * DEFERRED-OFFER INTERCEPTION, detection half (issue #8935 item I3 -- see `orchestrate`'s
@@ -914,17 +1332,22 @@ const FORCE_EXEMPT_TOOL_NAMES = new Set(['search_wazuh_data']);
  * exactly one tool. A listing is therefore left alone and the turn terminates normally.
  *
  * Residuals, stated honestly: (a) an offer that never NAMES a tool ("I can query the details
- * further") is undetectable at this layer -- the measured 0/3 failure named `get_sca_checks`
- * verbatim, so this covers the witnessed class, not every conceivable phrasing of "want me to?";
- * (b) `OFFER_MARKER_RE` is a finite vocabulary over the model's own prose, so an unusual offer
- * phrasing simply degrades to base behaviour (the turn ends on the offer) -- the trigger is
- * end-to-end only as deterministic as the text it reads, which is why the DELIVERY half
- * (`toolChoice: {name}`) is the part this item counts as guaranteed.
+ * further") was ORIGINALLY undetectable at this layer -- the measured 0/3 failure named
+ * `get_sca_checks` verbatim, so the name-token gate alone covered only the witnessed class. The
+ * METADATA FALLBACK below (issue #8935's second measured consumer, "nothing compels") narrows that
+ * residual for the specific case where the un-named offer follows a `CHAIN_PAIRS`-declared summary
+ * tool (server/tools/router.ts) -- it still degrades to base behaviour for any offer that names no
+ * tool AND whose preceding summary tool has no chain-pair entry; (b) `OFFER_MARKER_RE` is a finite
+ * vocabulary over the model's own prose, so an unusual offer phrasing simply degrades to base
+ * behaviour (the turn ends on the offer) -- the trigger is end-to-end only as deterministic as the
+ * text it reads, which is why the DELIVERY half (`toolChoice: {name}`) is the part this item
+ * counts as guaranteed.
  */
 export function findOfferedFollowUpTool(
   roundText: string,
   offeredTools: ToolSpec[],
   executedToolNames: ReadonlySet<string>,
+  lastSuccessfulToolName?: string,
 ): string | undefined {
   const offerSentences = roundText
     .split(SENTENCE_SPLIT_RE)
@@ -940,6 +1363,52 @@ export function findOfferedFollowUpTool(
     const nameRe = new RegExp(`\\b${tool.name}\\b`);
     return offerSentences.some(sentence => nameRe.test(sentence));
   });
+  if (mentioned.length === 0) {
+    // METADATA FALLBACK (issue #8935 Failure B, "nothing compels"): offer-shaped text exists, but
+    // it names NO tool at all -- e.g. "I can pull the specific failing checks if you'd like" gives
+    // the model no tool token for the name-based gate above to catch. Fall back to
+    // `CHAIN_PAIRS` (server/tools/router.ts), keyed by the LAST tool that succeeded THIS turn: the
+    // measured witness (get_sca_results -> get_sca_checks) is exactly this shape, a summary tool
+    // whose result the round text is narrating right before the vague offer. Bounded by the same
+    // three gates the name-based path applies -- offered this turn, not the suggest-discover
+    // handoff, not already executed -- PLUS two gates the name-based path does not need because a
+    // named tool IS its own relevance/exemption signal: the offer sentence must reference
+    // more/specific/further data (METADATA_FALLBACK_DETAIL_RE) and must not be the field/
+    // custom-query phrasing the search_wazuh_data escape hatch is designed to produce
+    // (METADATA_FALLBACK_ESCAPE_HATCH_RE) -- so an un-chained (or already-run) summary tool, a
+    // generic closing sentence, or an unnamed search_wazuh_data-shaped offer all degrade to base
+    // behaviour exactly like an unrecognized offer phrasing does.
+    if (!lastSuccessfulToolName) {
+      return undefined;
+    }
+    // Relevance gate (see METADATA_FALLBACK_DETAIL_RE/METADATA_FALLBACK_ESCAPE_HATCH_RE's doc
+    // comments above): at least one offer-shaped sentence must ALSO reference more/specific/
+    // further data, and that same sentence must NOT be the field/custom-query phrasing the
+    // search_wazuh_data escape hatch is designed to produce. Without this, every unnamed offer
+    // sentence -- including ordinary closing boilerplate like "Let me know if you need anything
+    // else." -- would force-call CHAIN_PAIRS[lastSuccessfulToolName][0] purely because
+    // OFFER_MARKER_RE's closing-phrase vocabulary matched somewhere in the round.
+    const relevantOfferSentences = offerSentences.filter(
+      sentence =>
+        METADATA_FALLBACK_DETAIL_RE.test(sentence) &&
+        !METADATA_FALLBACK_ESCAPE_HATCH_RE.test(sentence),
+    );
+    if (relevantOfferSentences.length === 0) {
+      return undefined;
+    }
+    const offeredNames = new Set(offeredTools.map(tool => tool.name));
+    for (const detailToolName of CHAIN_PAIRS[lastSuccessfulToolName] ?? []) {
+      if (
+        offeredNames.has(detailToolName) &&
+        detailToolName !== SUGGEST_DISCOVER_QUERY_TOOL.name &&
+        !FORCE_EXEMPT_TOOL_NAMES.has(detailToolName) &&
+        !executedToolNames.has(detailToolName)
+      ) {
+        return detailToolName;
+      }
+    }
+    return undefined;
+  }
   if (mentioned.length !== 1) {
     return undefined;
   }
@@ -1785,7 +2254,10 @@ export async function* runStage1Routing(
     ? scrubMessagesForProvider(stage1Messages, privacyCtx.pseudonymizer)
     : stage1Messages;
 
-  yield { type: 'status', message: 'Routing…' };
+  // `step` classifies this for the browser, which renders a translated label instead of the raw
+  // English below (public/components/chat/turn-status.ts). `message` stays exactly what it always
+  // was: the eval harness and every log reader still see "Routing…".
+  yield { type: 'status', message: 'Routing…', step: 'understanding' };
 
   let sawRouteCall = false;
   let routeArgs: Record<string, unknown> | undefined;
@@ -1947,6 +2419,22 @@ export async function* orchestrate(
   // re-`let`-declared inside the loop body) so it still holds the LAST round's value once the loop
   // exits, for the post-loop round-budget-exhaustion check.
   let roundSawAnyDelta = false;
+  // Round separation for the CLIENT's single message bubble (UI run 2026-08-14, finding 6). Every
+  // round's text is appended into the same bubble, so a round that narrates before calling a tool
+  // ("I'll check the SCA results for this box.") ran straight into the next round's answer with no
+  // separator at all -- measured live as "...for it.The most frequent finding...", two sentences
+  // fused mid-word, and one bubble restating itself with two different counts. The model cannot fix
+  // this: from its side each round is a fresh completion that legitimately starts at column 0.
+  // A blank line is the minimum that makes them separate paragraphs in the rendered markdown.
+  // Orthogonal to `roundSawAnyDelta` above (a separator decision, not a fallback-selection one) --
+  // safe to keep tracking across the same per-round resets.
+  let lastTextRound = -1;
+  function* separateRoundText(round: number): Generator<StreamEvent> {
+    if (lastTextRound !== -1 && lastTextRound !== round) {
+      yield { type: 'delta', content: ROUND_TEXT_SEPARATOR };
+    }
+    lastTextRound = round;
+  }
   let toolUsedThisTurn = false;
   // Bounds the suggest_discover_query self-correction loop to ONE retry per turn (issue #8920 item
   // 9): the first `unknown_fields` resolution this turn is returned as a tool error instead of a
@@ -1985,6 +2473,11 @@ export async function* orchestrate(
   // final narration actually makes good use of the forced tool's result. Those two remain
   // model-side and are not guaranteed by this code.
   const executedToolNames = new Set<string>();
+  // The LAST real tool that executed SUCCESSFULLY this turn (set right alongside
+  // `executedToolNames.add` below, never for a rejected/errored call) -- feeds the metadata
+  // fallback in `findOfferedFollowUpTool` (issue #8935 Failure B) so an offer that names no tool
+  // can still be keyed to `CHAIN_PAIRS` by the summary tool the model is narrating.
+  let lastSuccessfulToolName: string | undefined;
   let forcedFollowUpTool: string | undefined;
   let forcedFollowUpSpent = false;
   // Issue #8911: whole-turn tracking for `shouldEnterFinalRoundEarly` above — `true` once any EARLIER
@@ -2064,6 +2557,14 @@ export async function* orchestrate(
   // lives in its own dependency-free module.
   let usageTotals = ZERO_USAGE_TOTALS;
 
+  /** Every real tool call's digest yielded this turn, in order -- fed to `synthesizeNoTextFallback`
+   * (`summarizeDigestForFallback` reads the LAST one) so the forced-synthesis mechanism below has
+   * something truthful to fall back to. Pushed alongside the existing `digest` StreamEvent yield
+   * in the real-tool branch, never for the `SUGGEST_DISCOVER_QUERY_TOOL` handoff (which never
+   * yields a `digest` event either -- see that branch's own doc comment on why it does not set
+   * `toolUsedThisTurn`). */
+  const turnDigests: DigestRecord[] = [];
+
   /** Yields a `privacy_map` event for any pseudonym entries minted so far this turn, but only
    * once total ("once per turn... when newEntries() is non-empty") — guarded
    * by this flag since both the stage-1 detour and the main round loop below reach a `done` exit
@@ -2078,6 +2579,48 @@ export async function* orchestrate(
       privacyMapEmitted = true;
       yield { type: 'privacy_map', entries };
     }
+  }
+
+  /** FORCED SYNTHESIS (a)/(b)/(c) -- see `synthesizeNoTextFallback`'s doc comment above for the
+   * mechanism itself. This closure is the single call site every `!roundSawAnyDelta` exit point
+   * below goes through, and it is what enforces (c)'s "at most one retry per turn" bound: the very
+   * first qualifying call flips `noTextSynthesisAttempted`, so even though three DIFFERENT exit
+   * points in this function each reach `!roundSawAnyDelta` (only one of which can ever fire per
+   * turn, since each is itself a terminating exit -- but the flag is kept anyway as a structural,
+   * not merely positional, guarantee). Turns that do not qualify (`!toolUsedThisTurn`, or a
+   * genuinely empty table) are untouched -- they still resolve through the original deterministic
+   * `noTextFallbackMessage`, exactly as before this mechanism existed. */
+  let noTextSynthesisAttempted = false;
+  async function* emitNoTextFallback(
+    roundsExhausted: boolean,
+  ): AsyncGenerator<StreamEvent> {
+    if (
+      toolUsedThisTurn &&
+      sawNonEmptyTable &&
+      !noTextSynthesisAttempted &&
+      turnDigests.length > 0
+    ) {
+      noTextSynthesisAttempted = true;
+      const result = yield* synthesizeNoTextFallback(
+        adapter,
+        providerConfig,
+        messages,
+        signal,
+        privacyCtx,
+        turnDigests,
+      );
+      usageTotals = addUsage(usageTotals, result.usage);
+      return;
+    }
+    yield {
+      type: 'delta',
+      content: noTextFallbackMessage(
+        toolUsedThisTurn,
+        sawNonEmptyTable,
+        roundsExhausted,
+        lastAttemptedToolCall,
+      ),
+    };
   }
 
   if (adapter.supportsTools === false) {
@@ -2324,6 +2867,7 @@ export async function* orchestrate(
         }
         if (content) {
           if (hasMeaningfulText(content)) {
+            yield* separateRoundText(round);
             roundSawAnyDelta = true;
           }
           roundText += content;
@@ -2343,6 +2887,10 @@ export async function* orchestrate(
           const trailing = drainRoundBuffers();
           if (trailing) {
             if (hasMeaningfulText(trailing)) {
+              // Same round separation as the main delta path: a round whose text arrives ONLY
+              // through this drain (the depseudonymizer holds back the tail of every chunk) still
+              // needs the blank line before it.
+              yield* separateRoundText(round);
               roundSawAnyDelta = true;
             }
             roundText += trailing;
@@ -2563,7 +3111,16 @@ export async function* orchestrate(
         // Carries the REVERSED (real) args: local display is trusted.
         yield { type: 'tool_call', toolCall: toolCallForClient };
 
-        yield { type: 'status', message: 'Querying Wazuh…' };
+        // `detail` names the tool whose call is running, so the reader sees WHICH question is
+        // being asked of the data rather than one undifferentiated "Querying Wazuh…" for a turn
+        // that runs four calls. A tool name is catalog vocabulary — never customer data — so it is
+        // safe to surface regardless of privacy mode.
+        yield {
+          type: 'status',
+          message: 'Querying Wazuh…',
+          step: 'querying',
+          detail: event.toolCall.name,
+        };
 
         let outcome: ToolExecutionOutcome;
         try {
@@ -2615,6 +3172,7 @@ export async function* orchestrate(
         // risks loops -- recorded as a deliberate bound of this mechanism, not an oversight.
         if (!isToolResultError(outcome.toolResultContent)) {
           executedToolNames.add(event.toolCall.name);
+          lastSuccessfulToolName = event.toolCall.name;
         }
 
         // BLOCKER FIX (empty-answer audit, 2026-08-20, CV-033/CV-066; ported from deploy commit
@@ -2663,6 +3221,15 @@ export async function* orchestrate(
             }
           }
 
+          // Issue #9008 rework (blocker 3): a multi-call turn can run several tool calls before
+          // landing on a table, and the client renders one chip per call — attach THIS call's own
+          // id to its provenance so the chip that actually produced this table is the only one the
+          // client enriches with it (message-bubble.tsx matches on this id, never on position).
+          // Set here rather than in executor.ts: this is where `event.toolCall.id` is in scope,
+          // and executor.ts has no notion of "which call in the turn" it is being invoked for.
+          if (outcome.tableEvent.spec.provenance) {
+            outcome.tableEvent.spec.provenance.toolCallId = event.toolCall.id;
+          }
           yield outcome.tableEvent;
           if (outcome.tableEvent.spec.rows.length > 0) {
             // Table-suppression activation (markdown-table-filter.ts): from this point on in the
@@ -2684,6 +3251,10 @@ export async function* orchestrate(
             toolCallId: event.toolCall.id,
             content: toolResultContentForModel,
           };
+          turnDigests.push({
+            toolName: event.toolCall.name,
+            content: toolResultContentForModel,
+          });
         }
 
         {
@@ -2723,6 +3294,10 @@ export async function* orchestrate(
           const trailing = drainRoundBuffers();
           if (trailing) {
             if (hasMeaningfulText(trailing)) {
+              // Same round separation as the main delta path: a round whose text arrives ONLY
+              // through this drain (the depseudonymizer holds back the tail of every chunk) still
+              // needs the blank line before it.
+              yield* separateRoundText(round);
               roundSawAnyDelta = true;
             }
             roundText += trailing;
@@ -2773,7 +3348,12 @@ export async function* orchestrate(
           !roundHadReasoningFallback
         ) {
           const offeredTool = tools
-            ? findOfferedFollowUpTool(roundText, tools, executedToolNames)
+            ? findOfferedFollowUpTool(
+                roundText,
+                tools,
+                executedToolNames,
+                lastSuccessfulToolName,
+              )
             : undefined;
           if (offeredTool) {
             forcedFollowUpTool = offeredTool;
@@ -2813,15 +3393,7 @@ export async function* orchestrate(
         // copy fits depends on whether a tool ran earlier this turn; if none did, there is no
         // table and no query to reference, so NO_ANSWER_MESSAGE is used instead.
         if (!roundSawAnyDelta) {
-          yield {
-            type: 'delta',
-            content: noTextFallbackMessage(
-              toolUsedThisTurn,
-              sawNonEmptyTable,
-              isFinalRound,
-              lastAttemptedToolCall,
-            ),
-          };
+          yield* emitNoTextFallback(isFinalRound);
         }
         yield* emitPrivacyMapOnce();
         // The SUM across every round (and stage 1) this turn made, not this round's own
@@ -2880,15 +3452,7 @@ export async function* orchestrate(
         // strictly worse than base. Emit the clean termination the suppressed 'done' owed the
         // client (same policy as the forced-round 'error' branch above).
         if (!roundSawAnyDelta) {
-          yield {
-            type: 'delta',
-            content: noTextFallbackMessage(
-              toolUsedThisTurn,
-              sawNonEmptyTable,
-              false,
-              lastAttemptedToolCall,
-            ),
-          };
+          yield* emitNoTextFallback(false);
         }
         yield* emitPrivacyMapOnce();
         yield { type: 'done', usage: toStreamUsage(usageTotals) };
@@ -2982,6 +3546,33 @@ export async function* orchestrate(
         }
       }
     }
+
+    // Third and last step label of the turn: the NEXT provider call is the one that turns the tool
+    // results into the answer. Emitted at the very end of the round body — after every early
+    // `return` above — so it can never claim the assistant is writing an answer that is not
+    // actually coming. Purely advisory: the client discards it the instant the first `delta` of
+    // real text arrives (chat-page.tsx's `flushPendingDelta` clears `statusMessage`).
+    //
+    // Gated on the NEXT round actually being the final (tools-off) one, using the same
+    // `willBeFinalRound` predicate the loop head itself uses. Without that gate a turn running
+    // several tool rounds walked the label BACKWARDS — "Writing the answer…" then "Querying …"
+    // again, once per round — which reads as the assistant changing its mind rather than as
+    // progress. `round + 1` with the flags as they stand after this round's own bookkeeping above
+    // is exactly the question "is the next round the last one".
+    if (
+      roundHadRealToolCall &&
+      willBeFinalRound(
+        round + 1,
+        forceFinalRoundEarly,
+        budgetForcesFinalRoundEarly,
+      )
+    ) {
+      yield {
+        type: 'status',
+        message: 'Writing the answer…',
+        step: 'writing',
+      };
+    }
   }
 
   // Exhausted the round budget and the forced-final (no-tools) round still didn't end cleanly
@@ -2989,15 +3580,7 @@ export async function* orchestrate(
   // main 'done' branch above — a model that never produced text deserves a written answer, not a
   // bare done, regardless of whether a tool ran.
   if (!roundSawAnyDelta) {
-    yield {
-      type: 'delta',
-      content: noTextFallbackMessage(
-        toolUsedThisTurn,
-        sawNonEmptyTable,
-        true,
-        lastAttemptedToolCall,
-      ),
-    };
+    yield* emitNoTextFallback(true);
   }
   yield* emitPrivacyMapOnce();
   yield { type: 'done', usage: toStreamUsage(usageTotals) };

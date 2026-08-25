@@ -22,6 +22,12 @@ export const cmmcRequirementsFile = {
   // ── Access Control (AC) ─────────────────────────────────────────────────────
 
   // Level 1 — FAR Clause 52.204-21
+  'AC.L1-3.1.1':
+    'Limit system access to authorized users, processes acting on behalf of authorized users, and devices (including other systems).',
+  'AC.L1-3.1.2':
+    'Limit system access to the types of transactions and functions that authorized users are permitted to execute.',
+  'AC.L1-3.1.3':
+    'Control the flow of CUI in accordance with approved authorizations.',
   'AC.L1-b.1.i':
     'Limit information system access to authorized users, processes acting on behalf of authorized users, or devices (including other information systems).',
   'AC.L1-b.1.ii':
@@ -78,7 +84,7 @@ export const cmmcRequirementsFile = {
   'AC.L3-3.1.3e':
     'Employ secure information transfer solutions to control information flows between security domains on connected systems.',
 
-  // ── Awareness and Training (AT) ──────────────────────────────────────────────
+  // ── Awareness and Training (AT) ─────────────────────────────────────────────
 
   // Level 2 — NIST SP 800-171 Rev 2
   'AT.L2-3.2.1':
@@ -94,7 +100,7 @@ export const cmmcRequirementsFile = {
   'AT.L3-3.2.2e':
     'Include practical exercises in awareness training for all users, tailored by roles, to include general users, users with specialized roles, and privileged users, that are aligned with current threat scenarios and provide feedback to individuals involved in the training and their supervisors.',
 
-  // ── Audit and Accountability (AU) ────────────────────────────────────────────
+  // ── Audit and Accountability (AU) ───────────────────────────────────────────
 
   // Level 2 — NIST SP 800-171 Rev 2
   'AU.L2-3.3.1':
@@ -143,9 +149,11 @@ export const cmmcRequirementsFile = {
   'CM.L3-3.4.3e':
     'Employ automated discovery and management tools to maintain an up-to-date, complete, accurate, and readily available inventory of system components.',
 
-  // ── Identification and Authentication (IA) ───────────────────────────────────
+  // ── Identification and Authentication (IA) ──────────────────────────────────
 
   // Level 1 — FAR Clause 52.204-21
+  'IA.L1-3.5.1':
+    'Identify system users, processes acting on behalf of users, and devices.',
   'IA.L1-b.1.v':
     'Identify information system users, processes acting on behalf of users, or devices.',
   'IA.L1-b.1.vi':
@@ -178,7 +186,7 @@ export const cmmcRequirementsFile = {
   'IA.L3-3.5.3e':
     'Employ automated or manual/procedural mechanisms to prohibit system components from connecting to organizational systems unless the components are known, authenticated, in a properly configured state, or in a trust profile.',
 
-  // ── Incident Response (IR) ───────────────────────────────────────────────────
+  // ── Incident Response (IR) ──────────────────────────────────────────────────
 
   // Level 2 — NIST SP 800-171 Rev 2
   'IR.L2-3.6.1':
@@ -193,7 +201,7 @@ export const cmmcRequirementsFile = {
   'IR.L3-3.6.2e':
     'Establish and maintain a cyber incident response team that can be deployed by the organization within 24 hours.',
 
-  // ── Maintenance (MA) ─────────────────────────────────────────────────────────
+  // ── Maintenance (MA) ────────────────────────────────────────────────────────
 
   // Level 2 — NIST SP 800-171 Rev 2
   'MA.L2-3.7.1': 'Perform maintenance on organizational systems.',
@@ -208,7 +216,7 @@ export const cmmcRequirementsFile = {
   'MA.L2-3.7.6':
     'Supervise the maintenance activities of maintenance personnel without required access authorization.',
 
-  // ── Media Protection (MP) ────────────────────────────────────────────────────
+  // ── Media Protection (MP) ───────────────────────────────────────────────────
 
   // Level 1 — FAR Clause 52.204-21
   'MP.L1-b.1.vii':
@@ -232,7 +240,7 @@ export const cmmcRequirementsFile = {
   'MP.L2-3.8.9':
     'Protect the confidentiality of backup CUI at storage locations.',
 
-  // ── Personnel Security (PS) ──────────────────────────────────────────────────
+  // ── Personnel Security (PS) ─────────────────────────────────────────────────
 
   // Level 2 — NIST SP 800-171 Rev 2
   'PS.L2-3.9.1':
@@ -244,13 +252,13 @@ export const cmmcRequirementsFile = {
   'PS.L3-3.9.2e':
     'Protect organizational systems when adverse information develops or is obtained about individuals with access to CUI.',
 
-  // ── Physical Protection (PE) ─────────────────────────────────────────────────
+  // ── Physical Protection (PE) ────────────────────────────────────────────────
 
   // Level 1 — FAR Clause 52.204-21
-  'PE.L1-b.1.viii':
-    'Limit physical access to organizational information systems, equipment, and the respective operating environments to authorized individuals.',
   'PE.L1-b.1.ix':
     'Escort visitors and monitor visitor activity; maintain audit logs of physical access; and control and manage physical access devices.',
+  'PE.L1-b.1.viii':
+    'Limit physical access to organizational information systems, equipment, and the respective operating environments to authorized individuals.',
 
   // Level 2 — NIST SP 800-171 Rev 2
   'PE.L2-3.10.1':
@@ -263,7 +271,7 @@ export const cmmcRequirementsFile = {
   'PE.L2-3.10.6':
     'Enforce safeguarding measures for CUI at alternate work sites.',
 
-  // ── Risk Assessment (RA) ─────────────────────────────────────────────────────
+  // ── Risk Assessment (RA) ────────────────────────────────────────────────────
 
   // Level 2 — NIST SP 800-171 Rev 2
   'RA.L2-3.11.1':
@@ -289,7 +297,7 @@ export const cmmcRequirementsFile = {
   'RA.L3-3.11.7e':
     'Develop a plan for managing supply chain risks associated with organizational systems and system components; update the plan at least annually, and upon receipt of relevant cyber threat information, or in response to a relevant cyber incident.',
 
-  // ── Security Assessment (CA) ─────────────────────────────────────────────────
+  // ── Security Assessment (CA) ────────────────────────────────────────────────
 
   // Level 2 — NIST SP 800-171 Rev 2
   'CA.L2-3.12.1':
@@ -305,9 +313,13 @@ export const cmmcRequirementsFile = {
   'CA.L3-3.12.1e':
     'Conduct penetration testing at least annually or when significant security changes are made to the system, leveraging automated scanning tools and ad hoc tests using subject matter experts.',
 
-  // ── System and Communications Protection (SC) ────────────────────────────────
+  // ── System and Communications Protection (SC) ───────────────────────────────
 
   // Level 1 — FAR Clause 52.204-21
+  'SC.L1-3.13.1':
+    'Monitor, control, and protect organizational communications (i.e., information transmitted or received by organizational information systems) at the external boundaries and key internal boundaries of the information systems.',
+  'SC.L1-3.13.8':
+    'Implement cryptographic mechanisms to prevent unauthorized disclosure of CUI during transmission unless otherwise protected by alternative physical safeguards.',
   'SC.L1-b.1.x':
     'Monitor, control, and protect organizational communications (i.e., information transmitted or received by organizational information systems) at the external boundaries and key internal boundaries of the information systems.',
   'SC.L1-b.1.xi':
@@ -348,7 +360,7 @@ export const cmmcRequirementsFile = {
   'SC.L3-3.13.4e':
     'Employ physical isolation techniques or logical isolation techniques or both in organizational systems and system components.',
 
-  // ── System and Information Integrity (SI) ────────────────────────────────────
+  // ── System and Information Integrity (SI) ───────────────────────────────────
 
   // Level 1 — FAR Clause 52.204-21
   'SI.L1-b.1.xii':

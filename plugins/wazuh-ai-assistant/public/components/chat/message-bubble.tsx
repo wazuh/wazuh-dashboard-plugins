@@ -12,6 +12,7 @@ import {
   EuiCallOut,
   EuiCodeBlock,
   EuiLoadingContent,
+  EuiLoadingSpinner,
   EuiMarkdownFormat,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
@@ -19,7 +20,7 @@ import { ChatRole, TableSpec, ToolCall } from '../../../common/types';
 import { ResultTable, ResultTableProvenanceChip } from './result-table';
 import { DiscoverLink, ResolveDiscoverUrl } from './discover-link';
 import { ResolveSecurityAnalyticsUrl } from './security-analytics-link';
-import { describeToolCall } from './tool-call-label';
+import { describeProvenance, describeToolCall } from './tool-call-label';
 
 /**
  * "This turn was cut short" affordance, rendered in two places: inside an interrupted assistant
@@ -27,9 +28,13 @@ import { describeToolCall } from './tool-call-label';
  * reload or a navigation mid-answer kills the page before anything can mark the assistant message,
  * so the only evidence left is a conversation that ends with an unanswered question.
  */
-export const InterruptedTurnNotice: React.FC<{ onRetry?: () => void }> = ({
-  onRetry,
-}) => (
+export const InterruptedTurnNotice: React.FC<{
+  onRetry?: () => void;
+  /** Overrides the default "Retry" action label. An older turn cannot be retried IN PLACE without
+   * rewriting the middle of the conversation, so `message-list.tsx` labels it "Ask again" there —
+   * see `MessageListProps.onRetryTurn`. */
+  retryLabel?: string;
+}> = ({ onRetry, retryLabel }) => (
   <EuiFlexGroup
     gutterSize='s'
     alignItems='center'
@@ -52,15 +57,105 @@ export const InterruptedTurnNotice: React.FC<{ onRetry?: () => void }> = ({
           flush='both'
           iconType='refresh'
           onClick={onRetry}
+          data-test-subj='wzTurnRetry'
         >
-          {i18n.translate('wazuhAiAssistant.chat.retry', {
-            defaultMessage: 'Retry',
-          })}
+          {retryLabel ??
+            i18n.translate('wazuhAiAssistant.chat.retry', {
+              defaultMessage: 'Retry',
+            })}
         </EuiButtonEmpty>
       </EuiFlexItem>
     )}
   </EuiFlexGroup>
 );
+
+/**
+ * "This turn failed" — the permanent, per-turn record of a failure.
+ *
+ * The failure used to be reported ONLY by the dismissible callout band above the transcript, which
+ * `handleSend` clears on the next question (chat-page.tsx). So a reader who asked again — the
+ * single most likely next action — was left with a transcript in which their failed question simply
+ * has no answer and nothing anywhere says why, and a reload lost even the banner. This notice is
+ * anchored to the turn instead, persists with it (`UiChatMessage.failureReason`), and keeps its own
+ * retry action reachable however many questions follow it.
+ *
+ * Collapsed by default: a provider error can be a paragraph of upstream JSON, and a transcript is
+ * not a log viewer. The one-line summary is always visible; the reason itself is one click away and
+ * wired with `aria-expanded`/`aria-controls`, like the query chips in the meta row.
+ */
+export const FailedTurnNotice: React.FC<{
+  reason: string;
+  detailsId: string;
+  onRetry?: () => void;
+  retryLabel?: string;
+}> = ({ reason, detailsId, onRetry, retryLabel }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div data-test-subj='wzFailedTurnNotice'>
+      <EuiFlexGroup
+        gutterSize='s'
+        alignItems='center'
+        responsive={false}
+        justifyContent='flexStart'
+        wrap
+      >
+        <EuiFlexItem grow={false}>
+          <EuiText size='xs'>
+            <EuiTextColor color='subdued'>
+              {i18n.translate('wazuhAiAssistant.chat.turnFailed', {
+                defaultMessage: 'This turn failed',
+              })}
+            </EuiTextColor>
+          </EuiText>
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiButtonEmpty
+            size='xs'
+            flush='both'
+            iconType={isOpen ? 'arrowUp' : 'arrowDown'}
+            onClick={() => setIsOpen(current => !current)}
+            aria-expanded={isOpen}
+            aria-controls={detailsId}
+            data-test-subj='wzFailedTurnDetailsToggle'
+          >
+            {isOpen
+              ? i18n.translate('wazuhAiAssistant.chat.turnFailedHideReason', {
+                  defaultMessage: 'Hide reason',
+                })
+              : i18n.translate('wazuhAiAssistant.chat.turnFailedShowReason', {
+                  defaultMessage: 'Show reason',
+                })}
+          </EuiButtonEmpty>
+        </EuiFlexItem>
+        {onRetry && (
+          <EuiFlexItem grow={false}>
+            <EuiButtonEmpty
+              size='xs'
+              flush='both'
+              iconType='refresh'
+              onClick={onRetry}
+              data-test-subj='wzTurnRetry'
+            >
+              {retryLabel ??
+                i18n.translate('wazuhAiAssistant.chat.retry', {
+                  defaultMessage: 'Retry',
+                })}
+            </EuiButtonEmpty>
+          </EuiFlexItem>
+        )}
+      </EuiFlexGroup>
+      {isOpen && (
+        <div id={detailsId}>
+          <EuiText size='xs' color='subdued'>
+            <p style={{ margin: '4px 0 0', whiteSpace: 'pre-wrap' }}>
+              {reason}
+            </p>
+          </EuiText>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export interface UiChatMessage {
   id: string;
@@ -100,6 +195,17 @@ export interface UiChatMessage {
    * one instead of presenting it as finished.
    */
   interrupted?: boolean;
+  /**
+   * This turn FAILED, with this reason. Rendered as a compact, permanent marker on the turn itself
+   * (`FailedTurnNotice` below) instead of only as a dismissible banner over the transcript that the
+   * next question cleared — see `common/types.ts`'s `PersistedChatMessage.failureReason`.
+   */
+  failureReason?: string;
+  /** Which provider produced this answer, stamped at turn start and shown in the meta row — see
+   * `common/types.ts`'s `PersistedChatMessage.providerId`. */
+  providerId?: string;
+  providerName?: string;
+  providerModel?: string;
   /** Wire-proof fix: whether privacy was ON for the turn that produced this message — display-only
    * here (never shown in the UI), just carried on the object so `buildOutgoingMessages`
    * (common/chat-history.ts) can fail-closed-exclude a privacy-off turn's prose from later history
@@ -121,6 +227,8 @@ interface MessageBubbleProps {
    * case the interrupted notice is shown without an action.
    */
   onRetry?: () => void;
+  /** Label for the `onRetry` action — see `InterruptedTurnNotice.retryLabel`. */
+  retryLabel?: string;
   /** Passed straight through to this message's ResultTable — see that component's own doc
    * comment on the same-named prop for how it steps the table's initial page size. Threaded here
    * from MessageList, which gets it from chat-page.tsx's real `ResizeObserver` measurement; it
@@ -212,6 +320,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   resolveDiscoverUrl,
   resolveSecurityAnalyticsUrl,
   onRetry,
+  retryLabel,
   transcriptHeightPx,
   onTableRowsPerPageChange,
 }) => {
@@ -273,16 +382,64 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   // chips have to stay — that is the only place left to check what the turn actually queried, which
   // matters most precisely when the answer is "nothing was found".
   const metaRowToolCalls = renderedTable ? [] : toolCalls;
+  /**
+   * Issue #9008 (blocker 3): a multi-call turn runs several tool calls before landing on the one
+   * table that gets rendered, but `message.toolCalls` lists ALL of them — mapping every call to
+   * `renderedTable`'s provenance unconditionally attributed call 1's chip with call 2's index and
+   * time range (or vice-versa) whenever a turn ran more than one Indexer call. `renderedTable`
+   * itself is authoritative about exactly ONE call: `provenance.toolCallId`, attached by
+   * server/routes/chat.ts (see `TableSpec.provenance`'s doc comment) to the specific call that
+   * produced it. Only that one call's chip is passed the real `provenance` object; every other
+   * call in the same turn renders name-only, with no index/range/badge invented for it.
+   *
+   * `message.table` is the source here, deliberately, rather than `renderedTable`: the two are the
+   * same object whenever a card renders (`renderedTable` IS `message.table`, just gated on row
+   * count), and the below-bubble chip row for a SUPPRESSED 0-row table still needs the suppressed
+   * spec's provenance — see that row's own comment. One source therefore serves both surfaces
+   * without a second, subtly different lookup.
+   *
+   * Computed ONCE per message, memoized (issue #9008 review, cleanup 4). Three surfaces read this
+   * — the result card's chips, the below-bubble chip row, and the raw view a chip opens — and each
+   * used to redo the same `describeProvenance`/`describeToolCall` derivation for the same call on
+   * every render, including renders driven by nothing but a popover opening.
+   */
+  const toolCallDisplays = useMemo(() => {
+    const provenanceForCall = (
+      toolCallId: string,
+    ): TableSpec['provenance'] | undefined =>
+      message.table?.provenance?.toolCallId === toolCallId
+        ? message.table.provenance
+        : undefined;
+    return new Map(
+      toolCalls.map(toolCall => {
+        const provenance = provenanceForCall(toolCall.id);
+        // `describeToolCall` builds its chip text out of the same display object, so it is handed
+        // the computed one rather than deriving a second, identical copy.
+        const display = describeProvenance(provenance);
+        return [
+          toolCall.id,
+          { display, label: describeToolCall(toolCall, provenance, display) },
+        ] as const;
+      }),
+    );
+    // `toolCalls` is `message.toolCalls ?? []` — a fresh `[]` identity only in the no-calls case,
+    // where the map is empty anyway.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [message.toolCalls, message.table]);
   const tableProvenanceChips: ResultTableProvenanceChip[] | undefined =
     renderedTable
       ? toolCalls.map(toolCall => {
-          const { short, full } = describeToolCall(toolCall, renderedTable);
+          const entry = toolCallDisplays.get(toolCall.id);
+          const display = entry?.display ?? {};
           return {
             id: toolCall.id,
-            shortLabel: short,
-            fullLabel: full,
+            shortLabel: entry?.label.short ?? toolCall.name,
+            fullLabel: entry?.label.full ?? toolCall.name,
             toolName: toolCall.name,
             argumentsJson: toolCall.arguments,
+            index: display.index,
+            resolvedRangeLabel: display.resolvedRangeLabel,
+            windowBadgeLabel: display.windowBadgeLabel,
           };
         })
       : undefined;
@@ -370,9 +527,24 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
             : {})}
         >
           <EuiText size='s'>
-            {/* Shown only before real content has arrived; a delta event clears statusMessage. */}
+            {/* Shown only before real content has arrived; a delta event clears statusMessage.
+                  The spinner is what makes this a LIVE indicator rather than a line of text that
+                  could equally well be a stalled turn: the label changes at most three times over a
+                  turn that can run for tens of seconds, so on its own it read as frozen. It sits
+                  inside the same `aria-live` region as the label (the wrapping div above), and is
+                  itself decorative — the announced text is the step label. */}
             {message.statusMessage && !message.content && (
-              <p style={{ margin: 0, fontStyle: 'italic' }}>
+              <p
+                style={{
+                  margin: 0,
+                  fontStyle: 'italic',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+                data-test-subj='wzTurnStatusLine'
+              >
+                <EuiLoadingSpinner size='s' aria-hidden='true' />
                 <EuiTextColor color='subdued'>
                   {message.statusMessage}
                 </EuiTextColor>
@@ -539,11 +711,32 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
         justifyContent={isUser ? 'flexEnd' : 'flexStart'}
         wrap
       >
-        {!isUser && message.interrupted && !message.isStreaming && (
+        {/* A turn is either failed or interrupted, never both: `failureReason` is set by the
+              `error` stream event, `interrupted` by a stream that stopped without one
+              (chat-page.tsx). Failure is checked first so a turn that errored mid-stream — and so
+              also never reached `done` — reports the reason it has rather than the generic
+              "interrupted". */}
+        {!isUser && message.failureReason && !message.isStreaming && (
           <EuiFlexItem grow={false}>
-            <InterruptedTurnNotice onRetry={onRetry} />
+            <FailedTurnNotice
+              reason={message.failureReason}
+              detailsId={`wzFailedTurnReason-${message.id}`}
+              onRetry={onRetry}
+              retryLabel={retryLabel}
+            />
           </EuiFlexItem>
         )}
+        {!isUser &&
+          !message.failureReason &&
+          message.interrupted &&
+          !message.isStreaming && (
+            <EuiFlexItem grow={false}>
+              <InterruptedTurnNotice
+                onRetry={onRetry}
+                retryLabel={retryLabel}
+              />
+            </EuiFlexItem>
+          )}
         <EuiFlexItem grow={false}>
           <EuiText
             size='xs'
@@ -564,14 +757,51 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
             </p>
           </EuiText>
         </EuiFlexItem>
+        {/* Provider provenance: WHICH model wrote this answer. A conversation can legitimately span
+              several providers (the picker is right there in the composer, and a retried turn may
+              well be retried against a different one), and without this the transcript presents
+              every answer as though one anonymous "AI" produced all of them — so a reader comparing
+              two answers, or reporting a bad one, has no way to say what produced either. Plain
+              subdued text at the timestamp's own size, deliberately not a badge: it is a fact about
+              the turn, not an action. Rendered only when the stamp exists, so every turn saved
+              before this field did stays exactly as it was. */}
+        {!isUser && message.providerName && (
+          <EuiFlexItem grow={false}>
+            <EuiText
+              size='xs'
+              color='subdued'
+              className='wzMsgProviderProvenance'
+              data-test-subj='wzMsgProviderProvenance'
+            >
+              <p style={{ margin: '4px 0 0' }}>
+                {message.providerModel
+                  ? i18n.translate(
+                      'wazuhAiAssistant.chat.providerProvenanceWithModel',
+                      {
+                        defaultMessage: '{provider} · {model}',
+                        values: {
+                          provider: message.providerName,
+                          model: message.providerModel,
+                        },
+                      },
+                    )
+                  : message.providerName}
+              </p>
+            </EuiText>
+          </EuiFlexItem>
+        )}
         {!isUser &&
           metaRowToolCalls.map(toolCall => {
-            // `message.table` here, deliberately NOT `renderedTable`: this is the one place the
-            // suppressed 0-row spec is still worth reading, because `describeToolCall` uses it for
-            // exactly one thing — naming the index in the chip's hover title. A suppressed empty
-            // result is precisely when "which index did it read?" matters, and dropping the spec
-            // here would quietly shorten that tooltip. It cannot affect the visible chip text.
-            const { short, full } = describeToolCall(toolCall, message.table);
+            // `toolCallDisplays` reads `message.table`, deliberately NOT `renderedTable`: this is
+            // the one place the suppressed 0-row spec is still worth reading, because it is the
+            // only place left to check what the turn actually queried — precisely when the answer
+            // is "nothing was found". Its `toolCallId` match (issue #9008 blocker 3) means a
+            // multi-call turn's chip only carries provenance for the ONE call the spec names.
+            const { short, full } = toolCallDisplays.get(toolCall.id)
+              ?.label ?? {
+              short: toolCall.name,
+              full: toolCall.name,
+            };
             const isRawOpen = openRawIds.has(toolCall.id);
             return (
               <EuiFlexItem grow={false} key={toolCall.id}>
@@ -603,27 +833,58 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
       {!isUser &&
         metaRowToolCalls
           .filter(toolCall => openRawIds.has(toolCall.id))
-          .map(toolCall => (
-            <div
-              key={toolCall.id}
-              id={`${rawViewId}-${toolCall.id}`}
-              className={PROSE_MEASURE_CLASS}
-            >
-              <EuiSpacer size='xs' />
-              <EuiText size='xs'>
-                <strong>{toolCall.name}</strong>
-              </EuiText>
-              <EuiSpacer size='xs' />
-              <EuiCodeBlock
-                language='json'
-                paddingSize='s'
-                fontSize='s'
-                isCopyable
+          .map(toolCall => {
+            // Issue #9008 review, minor 7: the same Index/Time-range lines the rendered-table
+            // popover shows (ProvenanceChip, result-table.tsx) belong here too — this raw view IS
+            // the popover's equivalent for a turn whose table is suppressed (0 rows) or absent,
+            // and "which index did it read?" matters most exactly there. Reads the SAME memoized
+            // entry the chip above it does, so only the call that actually produced `message.table`
+            // carries real provenance, and it is derived once per render rather than twice.
+            const display = toolCallDisplays.get(toolCall.id)?.display ?? {};
+            return (
+              <div
+                key={toolCall.id}
+                id={`${rawViewId}-${toolCall.id}`}
+                className={PROSE_MEASURE_CLASS}
               >
-                {JSON.stringify(toolCall.arguments, null, 2)}
-              </EuiCodeBlock>
-            </div>
-          ))}
+                <EuiSpacer size='xs' />
+                <EuiText size='xs'>
+                  <strong>{toolCall.name}</strong>
+                </EuiText>
+                {display.index && (
+                  <EuiText size='xs' color='subdued'>
+                    {i18n.translate(
+                      'wazuhAiAssistant.resultTable.provenanceIndex',
+                      {
+                        defaultMessage: 'Index: {index}',
+                        values: { index: display.index },
+                      },
+                    )}
+                  </EuiText>
+                )}
+                {display.resolvedRangeLabel && (
+                  <EuiText size='xs' color='subdued'>
+                    {i18n.translate(
+                      'wazuhAiAssistant.resultTable.provenanceTimeRange',
+                      {
+                        defaultMessage: 'Time range: {range}',
+                        values: { range: display.resolvedRangeLabel },
+                      },
+                    )}
+                  </EuiText>
+                )}
+                <EuiSpacer size='xs' />
+                <EuiCodeBlock
+                  language='json'
+                  paddingSize='s'
+                  fontSize='s'
+                  isCopyable
+                >
+                  {JSON.stringify(toolCall.arguments, null, 2)}
+                </EuiCodeBlock>
+              </div>
+            );
+          })}
     </EuiFlexItem>
   );
 

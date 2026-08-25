@@ -52,6 +52,184 @@ test('buildDigest: bare-string affected_items are normalized to {item} rows', ()
   assert.equal(digest.counts.truncated, false);
 });
 
+// UI run 2026-08-14 (A2): get_sca_checks called with a `search` fragment has ZERO hits by design
+// (the fragment lives in post_filter, #8955) but a populated terms aggregation -- so
+// bucketsToRows supplies {key, doc_count} rows while the tool's FIXED columns describe hit
+// documents (check.id/check.name/...). Every declared column resolved undefined on every row:
+// the client rendered 102 em-dashes and `{}` in the row expander. When NO declared column
+// resolves on ANY row, the table must fall back to the derived projection and render the rows
+// as what they are.
+test('buildTableSpec: bucket rows under a fixed-column tool fall back to derived columns instead of an all-empty grid', () => {
+  const def = buildToolDef({
+    tableSpec: {
+      columns: [
+        { field: 'check.id', label: 'Check ID' },
+        { field: 'check.name', label: 'Check' },
+      ],
+    },
+  });
+  const result = {
+    hits: { total: { value: 0 }, hits: [] },
+    aggregations: {
+      matching_checks: {
+        buckets: [
+          { key: 'Ensure sshd is hardened.', doc_count: 1 },
+          { key: 'Ensure sshd DisableForwarding is enabled.', doc_count: 1 },
+        ],
+      },
+    },
+  };
+  // requestBody present WITH a _source list -- the live shape (first deploy caught this: the
+  // fallback derived the _source columns and reproduced the empty grid under new headers).
+  const table = buildTableSpec(result, def, {
+    _source: ['check.id', 'check.name', 'check.result'],
+    size: 50,
+  });
+  assert.equal(table.rows.length, 2);
+  // Derived FROM THE ROWS, never from the request's _source list.
+  const ids = table.columns.map(c => c.id);
+  assert.ok(
+    ids.includes('key'),
+    `derived columns must include "key", got ${ids.join(',')}`,
+  );
+  assert.ok(!ids.includes('check.id'));
+  assert.ok(
+    !ids.includes('check.result'),
+    '_source must not drive the fallback columns',
+  );
+  // The rows carry real values -- the em-dash grid is the regression.
+  assert.equal(table.rows[0].key, 'Ensure sshd is hardened.');
+  assert.equal(table.rows[0].doc_count, 1);
+});
+
+test('buildTableSpec: one resolving declared column keeps the declared shape (no fallback)', () => {
+  const def = buildToolDef({
+    tableSpec: {
+      columns: [
+        { field: 'check.id', label: 'Check ID' },
+        { field: 'check.missing', label: 'Never populated' },
+      ],
+    },
+  });
+  const result = {
+    hits: {
+      total: { value: 1 },
+      hits: [{ _id: 'a', _source: { check: { id: '28500' } } }],
+    },
+  };
+  const table = buildTableSpec(result, def);
+  assert.deepEqual(
+    table.columns.map(c => c.id),
+    ['check.id', 'check.missing'],
+  );
+  assert.equal(table.rows[0]['check.id'], '28500');
+});
+
+// UI run 2026-08-14 (finding 7): get_mitre_summary buckets on technique id and samples a
+// document whose id/name/tactic arrays are parallel. bucketsToRows merged them whole, so T1190
+// and T1068 both displayed the identical name pair and a seven-technique document showed all
+// seven names against one id. The tool's own design comment says a consumer should zip the
+// arrays and pick the index matching the bucket key -- nothing did. `_source` is NESTED (the
+// shape getByPath walks), which is why the alignment recurses.
+test('bucketsToRows: a bucket key inside a parallel array picks the matching element from its siblings', () => {
+  const def = buildToolDef({
+    tableSpec: {
+      columns: [
+        { field: 'key', label: 'Technique ID' },
+        { field: 'wazuh.rule.mitre.technique.name', label: 'Technique' },
+      ],
+    },
+  });
+  const result = {
+    aggregations: {
+      technique_ids: {
+        buckets: [
+          {
+            key: 'T1068',
+            doc_count: 796,
+            sample: {
+              hits: {
+                hits: [
+                  {
+                    _source: {
+                      wazuh: {
+                        rule: {
+                          mitre: {
+                            technique: {
+                              id: ['T1190', 'T1068'],
+                              name: [
+                                'Exploit Public-Facing Application',
+                                'Exploitation for Privilege Escalation',
+                              ],
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      },
+    },
+  };
+  const table = buildTableSpec(result, def);
+  assert.equal(
+    table.rows[0]['wazuh.rule.mitre.technique.name'],
+    'Exploitation for Privilege Escalation',
+    'the name at the SAME index as the bucket key, not the whole array',
+  );
+});
+
+test('bucketsToRows: arrays of a different length are left whole, never guessed at', () => {
+  const def = buildToolDef({
+    tableSpec: {
+      columns: [
+        { field: 'key', label: 'ID' },
+        { field: 'wazuh.rule.mitre.tactic.name', label: 'Tactic' },
+      ],
+    },
+  });
+  const result = {
+    aggregations: {
+      ids: {
+        buckets: [
+          {
+            key: 'T1078',
+            doc_count: 3,
+            sample: {
+              hits: {
+                hits: [
+                  {
+                    _source: {
+                      wazuh: {
+                        rule: {
+                          mitre: {
+                            technique: { id: ['T1078'] },
+                            // A technique can belong to two tactics: NOT parallel to the id.
+                            tactic: { name: ['Persistence', 'Initial Access'] },
+                          },
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      },
+    },
+  };
+  const table = buildTableSpec(result, def);
+  assert.deepEqual(table.rows[0]['wazuh.rule.mitre.tactic.name'], [
+    'Persistence',
+    'Initial Access',
+  ]);
+});
+
 test('buildTableSpec: bare-string affected_items also normalize to {item} rows in the table', () => {
   const def = buildToolDef({
     tableSpec: { columns: [{ field: 'item', label: 'Item' }] },
@@ -297,6 +475,47 @@ test("buildTableSpec: deriveColumns tools prefer the request body's explicit _so
     table.columns.map(c => c.id),
     ['a', 'c'],
   );
+});
+
+// Issue #8921's inconsistent-labels item: get_agent_inventory's `ports` kind derives its columns
+// from its `_source` list (byte-for-byte, get-agent-inventory.ts's own doc comment) -- "source.port"
+// and "destination.port" collide on last segment ("port"), same as "destination.ip"/"source.ip"
+// colliding on "ip". Before this fix both members of a collision fell back to the RAW dot-path
+// label, sitting inconsistently next to non-colliding columns' friendly labels ("State"/"Name"/
+// "Transport" in the same header row). Now every column gets a real label -- a collision is
+// disambiguated with its parent segment instead of degrading to the raw path.
+test('buildTableSpec: deriveColumns tools disambiguate a colliding last segment with the parent segment, never the raw path', () => {
+  const def = buildToolDef({ deriveColumns: true });
+  const result = { hits: { hits: [{ _source: {} }] } };
+  const requestBody = {
+    _source: [
+      'source.port',
+      'interface.state',
+      'process.name',
+      'network.transport',
+      'destination.ip',
+      'source.ip',
+      'destination.port',
+      'process.pid',
+    ],
+  };
+  const table = buildTableSpec(result, def, requestBody);
+  assert.deepEqual(
+    Object.fromEntries(table.columns.map(c => [c.id, c.label])),
+    {
+      'source.port': 'Source Port',
+      'interface.state': 'State',
+      'process.name': 'Name',
+      'network.transport': 'Transport',
+      'destination.ip': 'Destination IP',
+      'source.ip': 'Source IP',
+      'destination.port': 'Destination Port',
+      'process.pid': 'PID',
+    },
+  );
+  // Neither colliding label is ever the bare raw dot-path -- the exact regression this fixes.
+  assert.ok(!table.columns.map(c => c.label).includes('source.port'));
+  assert.ok(!table.columns.map(c => c.label).includes('destination.ip'));
 });
 
 // --- capDigest -------------------------------------------------------------------------------------

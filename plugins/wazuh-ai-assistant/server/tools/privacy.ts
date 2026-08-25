@@ -197,6 +197,10 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'package.name', action: 'allow-scan' },
   { field: 'package.version', action: 'allow' },
   { field: 'package.type', action: 'allow' },
+  // The vulnerability scanner's own fix-bound sentence ("Package less than 5.21.4") -- written by
+  // Wazuh's scanner from CTI data, never analyst/attacker-supplied. Surfaced (2026-08-14) so the
+  // model can state the fixed version instead of offering an update check no tool can perform.
+  { field: 'vulnerability.scanner.condition', action: 'allow' },
   // NOT 'allow', unlike package.name/architecture/type/version above: a vendor/distributor string
   // ("Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>", "Debian Sysadmin Team
   // <debian-admin@lists.debian.org>") routinely embeds a maintainer/team EMAIL ADDRESS -- personal
@@ -214,9 +218,10 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // field on a deriveColumns tool, and would have silently stopped protecting this field the
   // moment it was ever read by a non-deriveColumns tool (allow-by-omission there means real value,
   // untouched). See field-policy-coverage.test.ts's `requireExplicitEntry` for the coverage-test
-  // fix that closes that gap. Revisit this to 'allow-scan' once #8912 lands, to preserve the
-  // distributor name while still catching the embedded address.
-  { field: 'package.vendor', action: 'anonymize', kind: 'VAL' },
+  // fix that closed that gap. #8912 landed (merged as #8933), so this is now the 'allow-scan'
+  // that comment promised: the distributor name ("Ubuntu Developers") stays readable while the
+  // embedded address/FQDN (the <...@lists.ubuntu.com> part) is caught by the value-shape scan.
+  { field: 'package.vendor', action: 'allow-scan' },
   // A hotfix/KB identifier (e.g. "KB5034441"), not a person or a network address.
   { field: 'package.hotfix.name', action: 'allow' },
   // OS identity -- NOT host.hostname (above), which is the agent's network identity and stays
@@ -1973,6 +1978,56 @@ export function scrubFieldValue(
     // by omission.
     return { keep: false, value: undefined };
   }
+  if (
+    !entry &&
+    !isEscapeHatch &&
+    (Array.isArray(value) || (value !== null && typeof value === 'object'))
+  ) {
+    // F3 (adversarial validation of NF-2's container hardening): NF-2 closed the escape hatch's
+    // container gap (the `isEscapeHatch` branch above) and the explicit anonymize/allow-scan
+    // container gap (the branch near the top of this function), but its "drop any OTHER container
+    // that reaches the terminal passthrough" hardening (now below) fired for THIS case too — an
+    // unlisted field on a typed (non-escape-hatch) tool whose value happens to be a container, e.g.
+    // `document.mitre.technique.id` (an array of technique ids, get-rules.ts) or
+    // `document.enrichments` (get-threat-intel-components.ts). Those fields are certified as
+    // allow-by-omission-safe (`field-policy-coverage.test.ts`'s `KNOWN_SAFE_STRUCTURAL_FIELDS`) and
+    // used to pass through RAW before NF-2; after NF-2 they were silently DELETED from the digest
+    // instead — privacy ON and privacy OFF now disagreed about which columns even exist, not just
+    // their values. Deep-SCAN instead of dropping: apply the exact same shape-only scan the scalar
+    // allow-by-omission branch above applies to a bare string (`prescanAndMint`, no dictionary
+    // scan — this is still allow-by-omission, not a reviewed anonymize/allow-scan decision) to
+    // every string leaf, via `deepScrubContainer`'s `'scan-shape'` action. This still never lets a
+    // leaf through un-scanned, so fail-closed intent is preserved, but no longer loses the column.
+    return {
+      keep: true,
+      value: deepScrubContainer(
+        value,
+        'scan-shape',
+        undefined,
+        field,
+        pseudonymizer,
+      ),
+    };
+  }
+  if (entry?.action === 'allow') {
+    // Explicit 'allow' (branch 6 in this function's doc comment): completely unscanned passthrough
+    // is the deliberate, curated outcome for these fields — including when the value is a
+    // container (e.g. `wazuh.rule.compliance.*`, `check.result`). Must stay ahead of the
+    // container-drop guard below, which exists precisely to stop OTHER, unhandled containers from
+    // inheriting this same raw passthrough by omission.
+    return { keep: true, value };
+  }
+  if (Array.isArray(value) || (value !== null && typeof value === 'object')) {
+    // NF-2 hardening, narrowed by F3: every branch above that is entitled to pass a container
+    // through (explicit 'allow') or that must scrub one (explicit 'anonymize'/'allow-scan', the
+    // escape hatch's fail-closed drop, or — since F3 — the typed-tool allow-by-omission
+    // scan-shape branch above) has already returned. Reaching here with an array/object means the
+    // field is unlisted AND on the escape hatch's own tool-scope path with a shape this file's
+    // isNonEmptyObjectOrArray guard did not already catch (e.g. an empty array/object, or a shape
+    // this function genuinely has no handling for) — fail closed rather than let it inherit "raw"
+    // by omission.
+    return { keep: false, value: undefined };
+  }
   return { keep: true, value };
 }
 
@@ -2320,8 +2375,10 @@ function premintProseScanIdentifiers(
 /**
  * Applies field policy to one digest, right before it is serialized as `toolResultContent`
  * (called from server/tools/executor.ts, immediately before `JSON.stringify`). `columns` (schema
- * hint labels) are left untouched per the design note — only data leaves through `samples`,
- * `breakdown`, and `message`.
+ * hint labels) pass through with ONE filter: a field whose policy action is 'never' loses its
+ * column entry too, per that action's "even the fact the field exists" contract (probe P4,
+ * 2026-08-14, caught the name leaking while the values were gone). Other actions leave the
+ * hint untouched — a schema-hint NAME is not a value.
  *
  * - `samples`: 'never' fields are dropped from the sample object entirely; 'anonymize' string
  *   values are pseudonymized (kind inferred from the field name); an explicit 'allow' field
@@ -2492,6 +2549,16 @@ export function applyFieldPolicy(
 
   const scrubbedDigest: Digest = {
     ...digest,
+    // 'never' hides even the FIELD'S EXISTENCE (the action's contract above: "drops its name from
+    // the `columns` schema hint") -- the wire capture of probe P4 (2026-08-14) showed the column
+    // name still reaching the provider while the values were correctly gone, because this
+    // function's earlier doc claimed columns were "left untouched per the design note" and the
+    // implementation followed THAT sentence. The two docs now agree: names of 'never' fields are
+    // filtered here; every other action keeps its column entry (a schema-hint NAME is not a
+    // value, so anonymize/allow/allow-scan have nothing to scrub in it).
+    columns: digest.columns.filter(
+      field => resolveFieldEntry(field, policy, toolName)?.action !== 'never',
+    ),
     samples,
     // `...digest` already spread the raw `message` through untouched when present; this explicit
     // key runs it through the whole-text scrub and overrides that spread (object spread is

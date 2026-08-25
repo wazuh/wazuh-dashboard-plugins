@@ -9,6 +9,7 @@ import {
 } from '../../../../src/core/server';
 import {
   API_PATHS,
+  CONVERSATION_MAX_FAILURE_REASON_LENGTH,
   CONVERSATION_MAX_MESSAGES,
   CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH,
   CONVERSATION_MAX_TABLE_ROWS,
@@ -55,9 +56,9 @@ import {
  * resolve a real user" signal, left for each CALLER to act on. It must never fall back to
  * `CONVERSATION_OWNER_FALLBACK` (common/constants.ts, the `'_shared'` sentinel) the way the chat
  * route does — bucketing every unresolved-identity caller into one shared owner would let them
- * read, overwrite and delete each other's saved conversations. The four
- * owner-CHECKING routes below (list/get/put/delete) fail closed (403, `ownerUnresolvedResponse`)
- * on `undefined` rather than ever comparing against a shared bucket value. `create` has nothing
+ * read, overwrite and delete each other's saved conversations. The five owner-CHECKING routes
+ * below (list/get/put/patch/delete) fail closed (403, `ownerUnresolvedResponse`) on `undefined`
+ * rather than ever comparing against a shared bucket value. `create` has nothing
  * to check yet (only to stamp) and is deliberately NOT in that fail-closed set — see its call site
  * for why falling back to `CONVERSATION_OWNER_FALLBACK` there is still safe.
  *
@@ -88,9 +89,9 @@ export async function resolveOwner(
 }
 
 /** Exact 403 body every owner-CHECKING route below returns when `resolveOwner` signals
- * it could not determine a real user, factored out so the four call sites (list/get/put/delete)
- * can't drift out of sync — mirrors this file's existing convention of factoring out an exact
- * repeated shape (e.g. `toSummary`/`toRecord` below). */
+ * it could not determine a real user, factored out so the five call sites
+ * (list/get/put/patch/delete) can't drift out of sync — mirrors this file's existing convention of
+ * factoring out an exact repeated shape (e.g. `toSummary`/`toRecord` below). */
 function ownerUnresolvedResponse(
   response: OpenSearchDashboardsResponseFactory,
 ): IOpenSearchDashboardsResponse {
@@ -199,6 +200,14 @@ const MAX_TABLE_LABEL_LENGTH = 256;
 /** A displayed table has a handful of columns, never dozens. */
 const MAX_TABLE_COLUMNS = 50;
 
+/** Longest persisted turn-failure reason. Re-exported from `common/constants.ts` (like the three
+ * limits above) rather than defined here, because the CLIENT must clamp to the exact same number
+ * before it builds a payload — see that constant's own doc comment for the silent-save-failure bug
+ * a server-only bound would reintroduce. */
+const MAX_FAILURE_REASON_LENGTH = CONVERSATION_MAX_FAILURE_REASON_LENGTH;
+/** Longest persisted provider id / display name / model identifier. */
+const MAX_PROVIDER_FIELD_LENGTH = 256;
+
 /**
  * The result table a message was displayed with (`common/types.ts`'s `TableSpec`), persisted so a
  * resumed conversation still shows it. Row VALUES are `any` — they are whatever fields the query
@@ -236,6 +245,34 @@ export const tableSpecSchema = schema.object({
     schema.object({
       label: schema.string({ maxLength: MAX_TABLE_LABEL_LENGTH }),
       url: schema.string({ maxLength: MAX_TABLE_LABEL_LENGTH }),
+    }),
+  ),
+  /** Issue #9008 rework -- `common/types.ts`'s `TableSpec.provenance`: server-recorded index/
+   * time-range FACTS for the evidence popover. A range bound is free-form date-math or ISO-8601
+   * (see server/tools/catalog/common.ts's `timeRangeProperties`), hence `schema.string()` rather
+   * than a stricter format. */
+  provenance: schema.maybe(
+    schema.object({
+      toolCallId: schema.maybe(schema.string()),
+      index: schema.maybe(schema.string({ maxLength: MAX_TABLE_LABEL_LENGTH })),
+      requestedRange: schema.maybe(
+        schema.object({
+          gte: schema.string({ maxLength: MAX_TABLE_LABEL_LENGTH }),
+          lte: schema.string({ maxLength: MAX_TABLE_LABEL_LENGTH }),
+        }),
+      ),
+      effectiveRange: schema.maybe(
+        schema.object({
+          gte: schema.string({ maxLength: MAX_TABLE_LABEL_LENGTH }),
+          lte: schema.string({ maxLength: MAX_TABLE_LABEL_LENGTH }),
+        }),
+      ),
+      clamped: schema.boolean(),
+      // Issue #9008 review, blocker 2: the instant the query actually ran, so a resumed
+      // conversation resolves a date-math bound against WHEN it ran, never against the render
+      // clock. `min: 0` only rejects a nonsensical negative instant (same convention as
+      // `chatMessageSchema`'s own `createdAt` above).
+      executedAt: schema.maybe(schema.number({ min: 0 })),
     }),
   ),
 });
@@ -283,6 +320,23 @@ export const chatMessageSchema = schema.object({
   createdAt: schema.maybe(schema.number({ min: 0 })),
   table: schema.maybe(tableSpecSchema),
   interrupted: schema.maybe(schema.boolean()),
+  /** Why a turn failed, and which provider produced a message (common/types.ts's
+   * `PersistedChatMessage.failureReason`/`providerId`). All optional, so a conversation saved
+   * before they existed is accepted unchanged. Bounded like every other persisted string here:
+   * the reason is a provider error message (a sentence, not a payload), and the three provider
+   * fields are ids/names/model identifiers. */
+  failureReason: schema.maybe(
+    schema.string({ maxLength: MAX_FAILURE_REASON_LENGTH }),
+  ),
+  providerId: schema.maybe(
+    schema.string({ maxLength: MAX_PROVIDER_FIELD_LENGTH }),
+  ),
+  providerName: schema.maybe(
+    schema.string({ maxLength: MAX_PROVIDER_FIELD_LENGTH }),
+  ),
+  providerModel: schema.maybe(
+    schema.string({ maxLength: MAX_PROVIDER_FIELD_LENGTH }),
+  ),
   // Wire-proof fix (common/types.ts's `ChatMessage.privacyEnabled` doc comment): persisted on a
   // role:'tool' digest message and on a role:'assistant' prose message so a LATER resume/reload can
   // still fail-closed-exclude a privacy-off turn's history — common/chat-history.ts's
@@ -291,18 +345,66 @@ export const chatMessageSchema = schema.object({
   privacyEnabled: schema.maybe(schema.boolean()),
 });
 
+/** `minLength: 1` alone lets a whitespace-only string like `'   '` through (it has length 3), so
+ * this `validate` closure is what actually rejects it -- `createOrReplaceBodySchema.title`
+ * (create, below), `renameBodySchema` (rename, further below), and `updateBodySchema.title` (PUT,
+ * further below: only reached when a title is sent at all -- see that field's own doc comment)
+ * all share it, so none of the three can drift on what counts as "no real title" (F-7, #9010
+ * review -- create and rename/update used to disagree). Returning a string (not throwing) is
+ * `@osd/config-schema`'s contract for a custom validator: a non-empty return value IS the
+ * rejection, surfaced as a 400. The create/rename handlers additionally trim before storing
+ * (m10) -- this only rejects what trimming would reduce to nothing. */
+function rejectWhitespaceOnly(value: string): string | void {
+  if (!value.trim()) {
+    return 'must not be empty or contain only whitespace';
+  }
+}
+
 const createOrReplaceBodySchema = schema.object({
-  title: schema.string({ minLength: 1, maxLength: MAX_TITLE_LENGTH }),
+  title: schema.string({
+    minLength: 1,
+    maxLength: MAX_TITLE_LENGTH,
+    validate: rejectWhitespaceOnly,
+  }),
   messages: schema.arrayOf(chatMessageSchema, {
     maxSize: MAX_MESSAGES_PER_CONVERSATION,
   }),
 });
 
+/** PATCH-only body for the rename route below: title only, never `messages` — a rename never
+ * touches the transcript, so the client never has to hold (or resend) the full messages array just
+ * to change a title. Exported for the same reason `tableSpecSchema` is: so
+ * conversations-rename-schema.test.ts can validate against it directly. */
+export const renameBodySchema = schema.object({
+  title: schema.string({
+    minLength: 1,
+    maxLength: MAX_TITLE_LENGTH,
+    validate: rejectWhitespaceOnly,
+  }),
+});
+
 /** PUT-only body: everything `createOrReplaceBodySchema` has, plus the optional
  * optimistic-concurrency token. A brand-new conversation (POST) has no prior version to conflict
- * with, so this field only ever makes sense on an update. */
+ * with, so this field only ever makes sense on an update.
+ *
+ * `title` is `schema.maybe` here (NOT required, unlike `createOrReplaceBodySchema`'s copy of this
+ * same field) -- fixing a real bug (issue #9010): every auto-save used to recompute
+ * `buildConversationTitle` and resend it on EVERY turn, which silently reverted any rename the
+ * user had just made (the next auto-save's PUT overwrote it back to the auto-generated title, and
+ * on the OPEN conversation, the resulting stale-version 409 also triggered a false "merged from
+ * another tab" notice). `persistConversationTurn` (public/components/chat/chat-page.tsx) now
+ * builds a title ONLY for CREATE (POST); every PUT omits the field entirely, and the handler below
+ * carries the existing stored title over unchanged when it is absent -- the same "carry over every
+ * field this request isn't changing" convention `user`/`created_at` already used. `common/
+ * chat-history.ts`'s `buildConversationTitle` doc comment is updated to stop claiming otherwise. */
 const updateBodySchema = schema.object({
-  title: schema.string({ minLength: 1, maxLength: MAX_TITLE_LENGTH }),
+  title: schema.maybe(
+    schema.string({
+      minLength: 1,
+      maxLength: MAX_TITLE_LENGTH,
+      validate: rejectWhitespaceOnly,
+    }),
+  ),
   messages: schema.arrayOf(chatMessageSchema, {
     maxSize: MAX_MESSAGES_PER_CONVERSATION,
   }),
@@ -381,7 +483,7 @@ export function registerConversationRoutes(
     },
     withInternalErrorHandling(async (context, request, response) => {
       // Create is NOT owner-CHECKING (nothing pre-existing to compare against, unlike the
-      // four routes below), so it is deliberately excluded from the fail-closed set — an
+      // five routes below), so it is deliberately excluded from the fail-closed set — an
       // unresolved identity here still stamps the shared `CONVERSATION_OWNER_FALLBACK` sentinel,
       // exactly the prior behavior. This is a safe dead end: every owner-CHECKING route below now
       // fails closed for an unresolved identity, so a conversation stamped with the shared
@@ -440,9 +542,9 @@ export function registerConversationRoutes(
     }),
   );
 
-  // Update: full replace of title + messages (mirrors the settings singleton's "send the whole
-  // thing every time" convention); `created_at`/`user` are carried over untouched, `updated_at` is
-  // always server-recomputed (never trusts a client-sent timestamp).
+  // Update: full replace of messages (title is OPTIONAL now, see updateBodySchema's doc comment
+  // above for why); `created_at`/`user`/`title` (when omitted) are carried over untouched,
+  // `updated_at` is always server-recomputed (never trusts a client-sent timestamp).
   //
   // Optimistic concurrency is not optional here, in either sense of the word: a data stream
   // rejects an unconditional `index` request sent directly against one of its backing indices
@@ -494,7 +596,11 @@ export function registerConversationRoutes(
       // @timestamp) from the already-resolved `existing.source` rather than omitting them.
       const nextDocument: ConversationDocument = {
         ...existing.source,
-        title: request.body.title,
+        // Carried over unchanged when the client omits `title` (every current client does, on
+        // every PUT -- see updateBodySchema's doc comment): `existing.source.title` already IS
+        // the fallback via the spread above, this line only applies when a title was actually
+        // sent (an older client, or a future caller with a real reason to).
+        title: request.body.title ?? existing.source.title,
         messages,
         updated_at: updatedAt,
       };
@@ -530,6 +636,85 @@ export function registerConversationRoutes(
           nextDocument,
           encodeVersion(written.seqNo, written.primaryTerm),
         ),
+      });
+    }),
+  );
+
+  // Rename: title-only partial update, owner-checked exactly like GET/PUT/DELETE (resolveOwner +
+  // ownerUnresolvedResponse + findConversationHit -- same fail-closed/404-on-wrong-owner behavior,
+  // see this file's top doc comment). Deliberately NOT the full PUT above: the rail only ever has
+  // a `ConversationSummary` (id/title/updatedAt) in hand when a user renames a row, never the full
+  // `messages` transcript -- requiring the client to GET the whole conversation first just to
+  // rename it would be wasted work and a needless place for a stale-transcript overwrite bug.
+  // `messages`/`created_at`/`user` are carried over untouched from `existing.source`, mirroring the
+  // PUT route's own "carry over every field this request isn't changing" convention.
+  //
+  // `updated_at` is DELIBERATELY carried over unchanged, NOT recomputed (m9): a rename is not
+  // conversation activity, and bumping it would jump the row into the rail's "Today" group purely
+  // because its title changed, which reads as a lie about when it was last actually used.
+  //
+  // Optimistic concurrency still applies (same reason as PUT's doc comment: the backing data stream
+  // rejects an unconditional write), using this request's own just-fetched seqNo/primaryTerm --
+  // there is no client-supplied `expectedVersion` for a rename, so a genuine conflict (someone else
+  // saved/deleted the conversation between this request's GET and its write) 409s the same way.
+  // The response carries the WRITE's own fresh version (`encodeVersion`), not the pre-write one --
+  // chat-page.tsx's `handleRenameConversation` stamps this onto `conversationVersionRef` when the
+  // renamed conversation is the active one, so the very next auto-save does not 409 against a
+  // version this rename just moved past.
+  router.patch(
+    {
+      path: API_PATHS.CONVERSATION_BY_ID(`{id}`),
+      validate: {
+        params: schema.object({ id: schema.string() }),
+        body: renameBodySchema,
+      },
+    },
+    withInternalErrorHandling(async (context, request, response) => {
+      const owner = await resolveOwner(context, request);
+      if (owner === undefined) {
+        return ownerUnresolvedResponse(response);
+      }
+      const existing = await findConversationHit(
+        context,
+        owner,
+        request.params.id,
+      );
+      if (!existing) {
+        return response.notFound();
+      }
+      // Trimmed server-side (m10) -- the schema's `rejectWhitespaceOnly` validator above has
+      // already ruled out a title that TRIMS to nothing, but a title with real content plus
+      // incidental leading/trailing whitespace (a stray space from a paste) should not be stored
+      // with that whitespace baked in.
+      const nextDocument: ConversationDocument = {
+        ...existing.source,
+        title: request.body.title.trim(),
+      };
+
+      let written;
+      try {
+        written = await updateConversation(context, existing, nextDocument, {
+          ifSeqNo: existing.seqNo,
+          ifPrimaryTerm: existing.primaryTerm,
+        });
+      } catch (error) {
+        if (isVersionConflictError(error)) {
+          return response.customError({
+            statusCode: 409,
+            body: {
+              message:
+                'Conversation was updated by another session since you last loaded it. Refresh and retry.',
+            },
+          });
+        }
+        throw error;
+      }
+
+      return response.ok({
+        body: {
+          ...toSummary(request.params.id, nextDocument),
+          version: encodeVersion(written.seqNo, written.primaryTerm),
+        },
       });
     }),
   );

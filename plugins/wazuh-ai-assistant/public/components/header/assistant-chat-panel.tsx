@@ -322,6 +322,16 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
                   }}
                   onNewConversation={handleNewConversation}
                   onDelete={id => chatPageRef.current?.deleteConversation(id)}
+                  // m14 (#9010 review): this docked popover is a PRIMARY surface for the
+                  // conversation rail, not a secondary one -- it gets the same rename/bulk-delete
+                  // affordances the inline rail already has, routed through the same imperative
+                  // handle `onDelete` above already uses.
+                  onRename={(id, title) =>
+                    chatPageRef.current?.renameConversation(id, title)
+                  }
+                  onBulkDelete={ids =>
+                    chatPageRef.current?.bulkDeleteConversations(ids)
+                  }
                   displayMode='flyout'
                   // The header's own icon buttons above cover both: no reason to repeat a
                   // "Conversations" title or a second "New conversation" button inside the popover.

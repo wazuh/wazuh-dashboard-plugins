@@ -68,42 +68,47 @@ test("buildSystemPrompt: the language rule explicitly overrides an earlier turn'
   );
 });
 
-// #8913: deictic host references ("this box") produced no tool call -- the model asked the user
-// for an agent id/name instead of resolving it itself. A live diagnostic (branch
-// diag/8913-router-logging) proved WHY the original single instruction below still failed 0/5 on
-// its own worked example ("What software does this box have installed?") even after the reword
-// pinned by these tests first shipped: stage-1 routing correctly offered get_agent_inventory every
-// time, but this instruction told the model to call get_agents first -- a tool the router does not
-// offer alongside a lone 'inventory' route, so the model could not obey it and fell back to asking
-// the user or improvising with search_wazuh_data instead. The fix splits this into two
-// instructions: get_agent_inventory (which resolves a deictic agent reference itself via its
-// server-side resolveParams hook, unlike every other agent-scoped tool) gets
-// its own "call it directly, do not call get_agents" rule; every other agent-scoped tool keeps a
+// #8913 + generic sole-candidate parameter resolution: deictic host references ("this box") --
+// and, since the generalization, DESCRIPTIVE ones ("the internet-facing box", "my auditor wants
+// proof of SSH hardening") -- produced no tool call for a strictly-required agent param -- the
+// model asked the user for an agent id/name instead of resolving it itself. A live diagnostic
+// (branch diag/8913-router-logging) proved WHY the original single instruction below still failed
+// 0/5 on its own worked example ("What software does this box have installed?") even after the
+// reword pinned by these tests first shipped: stage-1 routing correctly offered
+// get_agent_inventory every time, but this instruction told the model to call get_agents first --
+// a tool the router does not offer alongside a lone 'inventory' route, so the model could not obey
+// it and fell back to asking the user or improvising with search_wazuh_data instead. The fix
+// splits this into two instructions: the five tools with server-side param resolution
+// (get_agent_inventory's own hand-written resolveParams, plus get_sca_results/get_sca_checks/
+// get_vulnerabilities_by_agent/search_findings_by_agent's generic param-resolution.ts resolver)
+// get one "call it directly, do not call get_agents" rule; every other agent-scoped tool keeps a
 // get-agents-first rule, since none of them can resolve a deictic reference on their own -- BUT
 // (follow-up audit fix, same bug class, caught before it was independently reproduced live) that
 // rule is now CONDITIONAL on get_agents actually being offered this turn, not unconditional: a
-// question like "what vulnerabilities does this box have" can just as plausibly route to
-// 'vulnerabilities' alone as an inventory question routes to 'inventory' alone, leaving get_agents
+// question like "what brute-force attempts hit this box" can just as plausibly route to some other
+// single category as an inventory question routes to 'inventory' alone, leaving get_agents
 // unavailable there too.
 
-test('buildSystemPrompt: instructs the model to call get_agent_inventory directly (not get_agents) for a deictic inventory question', () => {
+test('buildSystemPrompt: instructs the model to call the five self-resolving tools directly (not get_agents) for a deictic/descriptive agent question', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
     /this box.*this host.*this machine.*this server.*this system/,
   );
+  assert.match(prompt, /the internet-facing box/);
+  assert.match(prompt, /my\s+auditor wants proof of SSH hardening/);
   assert.match(
     prompt,
-    /no agent named or numbered earlier in the\s+conversation, call get_agent_inventory directly WITHOUT agent_id or agent_name/,
+    /call the matching tool directly \(get_agent_inventory,\s+get_sca_results, get_sca_checks, get_vulnerabilities_by_agent, or search_findings_by_agent\)/,
   );
-  assert.match(prompt, /do NOT\s+call get_agents first for this case/);
+  assert.match(prompt, /do NOT\s+call get_agents first for these five tools/);
 });
 
 test('buildSystemPrompt: instructs the model to call get_agents first for every OTHER agent-scoped tool ONLY when it is actually offered this turn', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
-    /with a tool BESIDES get_agent_inventory that needs an agent_id,\s+and no agent has been named or numbered earlier in the\s+conversation: if\s+get_agents is\s+among the tools available to you this turn, call it first/,
+    /with a tool BESIDES the five listed\s+above that needs an agent id\/name,\s+and no agent has been named or numbered earlier in the\s+conversation: if get_agents is among the tools available to you this turn, call it first/,
   );
 });
 
@@ -379,6 +384,37 @@ test('buildSystemPrompt: the verbatim-identifier rule does not contradict docume
   );
   assert.match(prompt, /report every row a tool like that actually returns/);
   assert.match(prompt, /not you substituting a different\s+one/);
+});
+
+// Issue C4: within one turn, the orchestration loop (chat.ts's `orchestrate`) can run several
+// tool rounds, and each round's delta text is streamed straight to the client. Without an
+// explicit rule the model re-narrated the same sentences (e.g. the suggest_discover_query
+// handoff's "Let me hand you a Discover query…") on every retry round.
+
+test('buildSystemPrompt: instructs the model not to repeat earlier sentences within the same answer', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /never repeat or re-explain a sentence you already wrote earlier in\s+this same answer/,
+  );
+  assert.match(
+    prompt,
+    /continue from where you left off instead of restarting the narration/,
+  );
+});
+
+// Live-audit finding (item 8a): a T1134 zero-rule answer restated the same "no matching rules
+// found" finding twice, in different wording, elsewhere in the same answer -- the generic
+// no-repeat rule above did not name this specific shape of the mistake explicitly enough to stop
+// it. This asserts the sharpened, zero-result-specific addition stays in the prompt.
+test('buildSystemPrompt: instructs the model to state a zero-row finding once, not restate it later in different wording', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /zero rows/);
+  assert.match(prompt, /state that absence[\s\S]*exactly ONCE/);
+  assert.match(
+    prompt,
+    /do not restate the same "nothing found" finding a second time later in the answer/,
+  );
 });
 
 // Workstream B ("verify before filter" / honest-empty / inter-round narration) --
@@ -812,34 +848,3 @@ test(
     );
   },
 );
-
-// Issue C4: within one turn, the orchestration loop (chat.ts's `orchestrate`) can run several
-// tool rounds, and each round's delta text is streamed straight to the client. Without an
-// explicit rule the model re-narrated the same sentences (e.g. the suggest_discover_query
-// handoff's "Let me hand you a Discover query…") on every retry round.
-
-test('buildSystemPrompt: instructs the model not to repeat earlier sentences within the same answer', () => {
-  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
-  assert.match(
-    prompt,
-    /never repeat or re-explain a sentence you already wrote earlier in\s+this same answer/,
-  );
-  assert.match(
-    prompt,
-    /continue from where you left off instead of restarting the narration/,
-  );
-});
-
-// Live-audit finding (item 8a): a T1134 zero-rule answer restated the same "no matching rules
-// found" finding twice, in different wording, elsewhere in the same answer -- the generic
-// no-repeat rule above did not name this specific shape of the mistake explicitly enough to stop
-// it. This asserts the sharpened, zero-result-specific addition stays in the prompt.
-test('buildSystemPrompt: instructs the model to state a zero-row finding once, not restate it later in different wording', () => {
-  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
-  assert.match(prompt, /zero rows/);
-  assert.match(prompt, /state that absence[\s\S]*exactly ONCE/);
-  assert.match(
-    prompt,
-    /do not restate the same "nothing found" finding a second time later in the answer/,
-  );
-});

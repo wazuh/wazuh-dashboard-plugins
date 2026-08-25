@@ -52,11 +52,8 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
               findings.error?.kind === 'index-pattern-missing'
             }
             isPermissionDenied={findings.error?.kind === 'permission-denied'}
-            title={
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={getMitreUrl()}>MITRE ATT&amp;CK</EuiLink>
-              </RedirectAppLinks>
-            }
+            title='MITRE ATT&CK'
+            titleLink={{ href: getMitreUrl() }}
             caption='Last 24 hours'
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-techniques'
@@ -92,11 +89,8 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
               findings.error?.kind === 'index-pattern-missing'
             }
             isPermissionDenied={findings.error?.kind === 'permission-denied'}
-            title={
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={getThreatHuntingUrl()}>Threat Hunting</EuiLink>
-              </RedirectAppLinks>
-            }
+            title='Threat Hunting'
+            titleLink={{ href: getThreatHuntingUrl() }}
             caption='Last 24 hours'
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-threat-hunting-findings'
@@ -137,13 +131,8 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
             isPermissionDenied={
               vulnerabilities.error?.kind === 'permission-denied'
             }
-            title={
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={getVulnerabilityDetectionUrl()}>
-                  Vulnerability Detection
-                </EuiLink>
-              </RedirectAppLinks>
-            }
+            title='Vulnerability Detection'
+            titleLink={{ href: getVulnerabilityDetectionUrl() }}
             caption='Current state'
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-vulnerabilities'
