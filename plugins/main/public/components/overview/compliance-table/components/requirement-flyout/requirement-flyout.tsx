@@ -326,13 +326,7 @@ export const RequirementFlyout = connect(mapStateToProps)(
                                 }
                                 onClickAriaLabel={`Filter by ${bucket.key}`}
                               >
-                                {bucket.key}{' '}
-                                <EuiNotificationBadge
-                                  size='s'
-                                  color={isSelected ? 'accent' : 'subdued'}
-                                >
-                                  {bucket.doc_count}
-                                </EuiNotificationBadge>
+                                {bucket.key}
                               </EuiBadge>
                             </EuiToolTip>
                           </EuiFlexItem>

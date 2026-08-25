@@ -190,6 +190,8 @@ export class ComplianceSubrequirements extends Component {
         const tooltipContent = item.isOthers
           ? 'View details of Others. This count sums occurrences of unknown requirement values — a finding tagged with more than one unknown value is counted once per value, so the total can exceed the number of distinct findings.'
           : `View details of ${item.id}`;
+        const tooltipNoOthersContent =
+          'There are no findings matching this requirement';
         const toolTipAnchorClass =
           'wz-display-inline-grid' +
           (this.state.hover === item.id ? ' wz-mitre-width' : ' ');
@@ -209,6 +211,7 @@ export class ComplianceSubrequirements extends Component {
               anchorClassName='wz-width-100'
               button={
                 <EuiFacetButton
+                  disabled={item.quantity === 0 && item.isOthers}
                   style={{
                     width: '100%',
                     padding: '0 5px 0 5px',
@@ -218,12 +221,17 @@ export class ComplianceSubrequirements extends Component {
                   quantity={item.quantity}
                   className={'module-table'}
                   onClick={() => {
-                    this.showFlyout(item.id, item.isOthers);
+                    if (item.quantity > 0 || !item.isOthers)
+                      this.showFlyout(item.id, item.isOthers);
                   }}
                 >
                   <EuiToolTip
                     position='top'
-                    content={tooltipContent}
+                    content={
+                      item.quantity > 0 || !item.isOthers
+                        ? tooltipContent
+                        : tooltipNoOthersContent
+                    }
                     anchorClassName={toolTipAnchorClass}
                   >
                     <span
