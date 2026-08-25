@@ -39,7 +39,23 @@ export interface ResolvedToolParams {
 
 export type ResolveParamsResult =
   | { ok: true; resolved: ResolvedToolParams }
-  | { ok: false; reason: string };
+  | {
+      ok: false;
+      reason: string;
+      /**
+       * EXPLAIN-WAVE PHASE 3: identifier values interpolated into `reason`, same contract and same
+       * motivation as `ResolvedToolParams.noteEntities` -- an AMBIGUITY reason that enumerates
+       * candidate hostnames is as much a wire-visible identifier disclosure as a resolved-value
+       * note is, and until this existed only the note half was scrubbed. `executor.ts` pseudonymizes
+       * these before the reason becomes the tool error the provider sees. Optional: a resolver that
+       * names no identifiers (and every pre-existing failure path that names none) omits it and is
+       * byte-identical to before.
+       */
+      reasonEntities?: Array<{
+        value: string;
+        kind: 'HOST' | 'IP' | 'USER' | 'URL' | 'VAL';
+      }>;
+    };
 
 /**
  * Declarative "this param resolves to whichever value is the sole live candidate" spec (the
@@ -89,6 +105,19 @@ export interface SoleCandidateParamSpec {
         /** Narrows the aggregation to documents whose `field` equals whatever value the named
          * earlier param resolved to (or was already supplied as). Omitted means unscoped. */
         scopedBy?: { param: string; field: string };
+        /**
+         * EXPLAIN-WAVE PHASE 3: entity kind of the values this field holds, declared so
+         * `param-resolution.ts` can hand them to `ResolvedToolParams.noteEntities` /
+         * `reasonEntities` and `executor.ts`'s scrub chokepoint can pseudonymize them under
+         * privacy mode. REQUIRED for any `indexer-terms` field whose values are IDENTIFIERS (a
+         * hostname, an IP, a username): the original `indexer-terms` source resolved only SCA
+         * policy ids, which are catalog identifiers with nothing to declare, and leaving an
+         * agent-name field undeclared re-opens capture probe P3's leak for that tool (an
+         * unscrubbed assumption note carrying a real hostname to the provider in the clear).
+         * Omitted keeps the pre-existing "nothing to declare" behavior. `manager-agents` needs no
+         * equivalent -- that branch declares its own HOST entities unconditionally.
+         */
+        noteEntityKind?: 'HOST' | 'IP' | 'USER' | 'URL' | 'VAL';
       };
   valueFrom?: 'id' | 'name' | 'id-or-name';
 }

@@ -41,8 +41,10 @@ export const searchFindingsByAgentTool: ToolDefinition = {
           type: 'string',
           description:
             'Exact agent name to filter by. Optional: omit this for a deictic host reference ' +
-            '("this box"/"this server") with no known name -- the call resolves to the only ' +
-            'active agent automatically.',
+            '("this box"/"this server") with no known name -- the call resolves automatically ' +
+            'when exactly one agent appears in the findings data, and is rejected with the ' +
+            'candidate names when more than one does. If the question names or describes a host ' +
+            'at all, pass that host here rather than omitting it.',
         },
         severity: severityProperty(),
         severity_comparison: severityComparisonProperty(),
@@ -60,13 +62,34 @@ export const searchFindingsByAgentTool: ToolDefinition = {
   // Issue: generic sole-candidate parameter resolution (template: #8913's
   // resolveDeicticAgentParams in get-agent-inventory.ts). A strictly-required `agent_name`
   // measured 0/40 invocations on deictic findings questions ("what happened on this host").
-  // `valueFrom: 'name'` since this param is matched as free text against `wazuh.agent.name`
-  // (see buildRequest below), not a numeric Manager id.
+  //
+  // EXPLAIN-WAVE PHASE 3 (eval run 20260825-163607, EV2-FND-006 "Anything bad on the domain
+  // controller?"): the source moved from `manager-agents` to an `indexer-terms` aggregation over
+  // the EXACT index and field this tool's own `buildRequest` filters on. The two universes are not
+  // the same, and when they disagree the manager-agents lookup resolved silently and wrongly: in
+  // the eval environment the Manager API knows exactly ONE agent (the manager node
+  // `wazuh-manager-master-0`), while `wazuh-findings-v5*` carries eight distinct
+  // `wazuh.agent.name` values -- so an omitted `agent_name` took the `kind: 'single'` path and
+  // filtered findings by the manager node, which has none. The ambiguity-enumerate branch that
+  // exists precisely to refuse this ("N agents exist, so which one is meant cannot be assumed.
+  // Candidates: ...") could never fire, because it was counting the wrong population. Aggregating
+  // the field the query itself matches makes "is this ambiguous" a question about the data being
+  // searched: a genuinely single-agent deployment still resolves (and now resolves to an agent
+  // that actually HAS findings), and a multi-agent one gets the candidate list instead of a
+  // silent guess. `valueFrom` is dropped -- it is meaningful only for `manager-agents`; an
+  // indexer-terms bucket key IS the agent name this param is matched as. `noteEntityKind: 'HOST'`
+  // is mandatory here, not decorative: `wazuh.agent.name` values are hostnames, and without the
+  // declaration neither the assumption note nor the candidate list would be pseudonymized under
+  // privacy mode (capture probe P3).
   soleCandidateParams: [
     {
       param: 'agent_name',
-      source: { kind: 'manager-agents' },
-      valueFrom: 'name',
+      source: {
+        kind: 'indexer-terms',
+        index: 'wazuh-findings-v5*',
+        field: 'wazuh.agent.name',
+        noteEntityKind: 'HOST',
+      },
     },
   ],
   buildRequest(params) {

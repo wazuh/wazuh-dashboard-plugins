@@ -174,16 +174,59 @@ test("search_findings_by_agent: agent_name's description explains server-side re
   };
   assert.match(
     schema.properties.agent_name.description ?? '',
-    /Optional: omit this.*resolves to the only active agent automatically/s,
+    /Optional: omit this.*resolves automatically when exactly one agent appears in the findings data/s,
+  );
+  // EXPLAIN-WAVE PHASE 3 (EV2-FND-006): the description must also push a NAMED or DESCRIBED host
+  // into the param instead of inviting omission -- "the domain controller" is a referent, and
+  // omitting it is what let the resolver substitute a different agent.
+  assert.match(
+    schema.properties.agent_name.description ?? '',
+    /If the question names or describes a host at all, pass that host here/,
   );
 });
 
-test('search_findings_by_agent: declares agent_name as a manager-agents sole-candidate param, valueFrom "name"', () => {
+test('search_findings_by_agent: resolves agent_name from the findings index it actually queries, not the Manager agent list', () => {
+  // EV2-FND-006 root cause: the Manager API's active-agent list and `wazuh-findings-v5*`'s
+  // `wazuh.agent.name` values are different populations. When the Manager knows exactly one agent
+  // (the manager node) and the findings index carries several, `manager-agents` took the
+  // sole-candidate path and silently filtered by an agent with no findings, while the
+  // ambiguity-enumerate branch counted the wrong population and never fired.
   assert.deepEqual(searchFindingsByAgentTool.soleCandidateParams, [
     {
       param: 'agent_name',
-      source: { kind: 'manager-agents' },
-      valueFrom: 'name',
+      source: {
+        kind: 'indexer-terms',
+        index: 'wazuh-findings-v5*',
+        field: 'wazuh.agent.name',
+        noteEntityKind: 'HOST',
+      },
     },
   ]);
+});
+
+test('search_findings_by_agent: the sole-candidate lookup aggregates the SAME index and field buildRequest filters on', () => {
+  // The invariant that makes the fix above self-consistent rather than a swap of one guess for
+  // another: if buildRequest is ever retargeted, this test fails until the lookup follows.
+  const spec = searchFindingsByAgentTool.soleCandidateParams?.[0]?.source as {
+    kind: string;
+    index: string;
+    field: string;
+  };
+  const built = searchFindingsByAgentTool.buildRequest({
+    agent_name: 'win-dc-01',
+  }) as {
+    index: string;
+    body: { query: { bool: { filter: Record<string, unknown>[] } } };
+  };
+
+  assert.equal(spec.index, built.index);
+  assert.ok(
+    built.body.query.bool.filter.some(
+      clause =>
+        (clause as { match?: Record<string, unknown> }).match &&
+        Object.keys((clause as { match: Record<string, unknown> }).match)[0] ===
+          spec.field,
+    ),
+    'the aggregated field must be the one the query matches on',
+  );
 });

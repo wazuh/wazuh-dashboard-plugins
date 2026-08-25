@@ -6,6 +6,7 @@ import {
   summarizeDigestForFallback,
   summarizeDigestsForFallback,
   synthesizeNoTextFallback,
+  withNoTextSynthesisInstruction,
 } from './chat';
 import { Pseudonymizer } from '../tools/privacy';
 import { PrivacyContext } from '../tools/executor';
@@ -297,7 +298,9 @@ test('synthesizeNoTextFallback: retries with NO tools offered and the synthesis 
     'the retry offers no tools -- it cannot re-enter the tool loop',
   );
   const lastOutbound = calls[0].messages[calls[0].messages.length - 1];
-  assert.equal(lastOutbound.role, 'system');
+  // EXPLAIN-WAVE PHASE 3: `user`, not `system` -- see `withNoTextSynthesisInstruction`'s doc
+  // comment for the Anthropic system-hoisting root cause this role change fixes.
+  assert.equal(lastOutbound.role, 'user');
   assert.equal(lastOutbound.content, NO_TEXT_SYNTHESIS_INSTRUCTION);
   assert.equal(
     calls[0].messages.length,
@@ -919,5 +922,90 @@ test('synthesizeNoTextFallback: with a table on screen the suppressor still stri
     text,
     /\| agent \| level \|/,
     'default (tableOnScreen) behaviour is unchanged: a duplicate of the rendered table is held back',
+  );
+});
+
+// --- EXPLAIN-WAVE PHASE 3: the instruction must land at the CONVERSATION TAIL, not in `system` --
+
+test('withNoTextSynthesisInstruction: appends the instruction as a trailing USER message, so it survives the Anthropic system-hoist', () => {
+  const out = withNoTextSynthesisInstruction(TURN_MESSAGES, true);
+
+  assert.equal(out.length, TURN_MESSAGES.length + 1);
+  assert.deepEqual(
+    out.slice(0, TURN_MESSAGES.length),
+    TURN_MESSAGES,
+    'outbound COPY only -- the turn history itself is untouched',
+  );
+  const last = out[out.length - 1];
+  // The whole point: anthropic.ts filters every `system`-role message OUT of `messages` and joins
+  // them into the top-level `system` field, so a `system` instruction never reaches the tail.
+  assert.equal(last.role, 'user');
+  assert.equal(last.content, NO_TEXT_SYNTHESIS_INSTRUCTION);
+  assert.notEqual(
+    last.role,
+    'system',
+    'a system-role instruction is hoisted into the prompt prefix on the Anthropic wire',
+  );
+});
+
+test('withNoTextSynthesisInstruction: picks the zero-row copy when no table is on screen', () => {
+  const out = withNoTextSynthesisInstruction(TURN_MESSAGES, false);
+  const last = out[out.length - 1];
+
+  assert.equal(last.role, 'user');
+  assert.equal(last.content, NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY);
+});
+
+test('NO_TEXT_SYNTHESIS_INSTRUCTION: asks for an answer to the QUESTION, not only row totals, and for rejected calls to be disclosed', () => {
+  // The row-count boilerplate shape (EV2-INV-005/EV2-TI-001/EV2-EXP-014) is what a totals-only
+  // instruction produces even when it works; the multi-part shape (EV2-NEG-003/EV2-EXP-008/
+  // EV2-EXP-012) is its multi-digest sibling. Both are answers to the wrong question.
+  assert.match(
+    NO_TEXT_SYNTHESIS_INSTRUCTION,
+    /answer the question in its own terms/i,
+  );
+  assert.match(NO_TEXT_SYNTHESIS_INSTRUCTION, /rejected or errored/i);
+  // Non-fabrication fences stay exactly where they were.
+  assert.match(
+    NO_TEXT_SYNTHESIS_INSTRUCTION,
+    /Using only the tool results already gathered/i,
+  );
+  assert.match(
+    NO_TEXT_SYNTHESIS_INSTRUCTION,
+    /Do not state anything the results do not show/i,
+  );
+  assert.match(NO_TEXT_SYNTHESIS_INSTRUCTION, /Do not call any tools/i);
+});
+
+test('synthesizeNoTextFallback: the instruction is appended AFTER the outbound scrub, so the pseudonymizer never rewrites our own copy', async () => {
+  // 'results' is registered as a pseudonym VALUE, so a prescan over the instruction text would
+  // mangle it. Appending after the scrub is what makes that structurally impossible.
+  const pseudonymizer = new Pseudonymizer([
+    { value: 'results', pseudonym: 'HOST_9' },
+  ]);
+  const privacyCtx: PrivacyContext = { pseudonymizer, fieldPolicy: [] };
+  const { adapter, calls } = scriptedAdapter([
+    { type: 'delta', content: 'Fifteen critical findings.' },
+    { type: 'done', usage: { inputTokens: 10, outputTokens: 5 } },
+  ]);
+  const controller = new AbortController();
+
+  await drain(
+    synthesizeNoTextFallback(
+      adapter,
+      PROVIDER_CONFIG,
+      TURN_MESSAGES,
+      controller.signal,
+      privacyCtx,
+      [nonEmptyDigest()],
+    ),
+  );
+
+  const last = calls[0].messages[calls[0].messages.length - 1];
+  assert.equal(last.role, 'user');
+  assert.equal(
+    last.content,
+    NO_TEXT_SYNTHESIS_INSTRUCTION,
+    'our own first-party copy reaches the provider byte-identical',
   );
 });

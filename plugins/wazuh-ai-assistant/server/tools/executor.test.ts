@@ -1175,3 +1175,115 @@ test('bound disclosure: a request already within the 90-day cap gets no disclosu
     !(digest.hint as string | undefined)?.includes('Time window capped'),
   );
 });
+
+// --- EXPLAIN-WAVE PHASE 3: the resolveParams FAILURE half goes through the same scrub as the
+// success half. An ambiguity reason enumerates candidate hostnames by name and becomes the tool
+// error the provider reads, so before this it carried them in the clear under privacy mode -- the
+// same shape capture probe P3 found on the note side, on the other branch of the same `if`. ----
+
+/** Context whose Indexer `search` answers a sole-candidate terms probe with `buckets`, so
+ * `search_findings_by_agent`'s omitted `agent_name` reaches the 'many' ambiguity branch. */
+function fakeTermsProbeContext(names: string[]): ExecContext {
+  return {
+    core: {
+      opensearch: {
+        client: {
+          asCurrentUser: {
+            search: () =>
+              Promise.resolve({
+                body: {
+                  aggregations: {
+                    candidates: {
+                      buckets: names.map(key => ({ key, doc_count: 1 })),
+                    },
+                  },
+                },
+              }),
+          },
+        },
+      },
+    },
+  } as unknown as ExecContext;
+}
+
+test('executeToolCall: an ambiguous param-resolution error is pseudonymized before it becomes the tool error', async () => {
+  const privacy: PrivacyContext = {
+    pseudonymizer: new Pseudonymizer([]),
+    fieldPolicy: FIELD_POLICY_DEFAULTS,
+  };
+  const outcome = await executeToolCall(
+    { id: 'call-1', name: 'search_findings_by_agent', arguments: {} },
+    fakeTermsProbeContext(['win-dc-01', 'lin-bastion-01']),
+    fakeRequest,
+    privacy,
+  );
+
+  const { error } = JSON.parse(outcome.toolResultContent) as { error: string };
+  assert.ok(error, 'the ambiguous lookup must fail, not resolve silently');
+  assert.doesNotMatch(error, /win-dc-01/);
+  assert.doesNotMatch(error, /lin-bastion-01/);
+  // Still an ambiguity disclosure -- the candidates are named, just as pseudonyms.
+  assert.match(error, /HOST_\d/);
+  assert.match(error, /cannot be assumed/);
+});
+
+test('executeToolCall: with privacy OFF the same ambiguity error names the candidates in the clear, unchanged', async () => {
+  const outcome = await executeToolCall(
+    { id: 'call-1', name: 'search_findings_by_agent', arguments: {} },
+    fakeTermsProbeContext(['win-dc-01', 'lin-bastion-01']),
+    fakeRequest,
+    undefined,
+  );
+
+  const { error } = JSON.parse(outcome.toolResultContent) as { error: string };
+  assert.match(error, /win-dc-01/);
+  assert.match(error, /lin-bastion-01/);
+});
+
+test('executeToolCall: a single-candidate agent_name lookup resolves and its note is pseudonymized', async () => {
+  const privacy: PrivacyContext = {
+    pseudonymizer: new Pseudonymizer([]),
+    fieldPolicy: FIELD_POLICY_DEFAULTS,
+  };
+  // First call is the terms probe (buckets), every later call is the real search (hits).
+  let calls = 0;
+  const context = {
+    core: {
+      opensearch: {
+        client: {
+          asCurrentUser: {
+            search: () => {
+              calls += 1;
+              return Promise.resolve({
+                body:
+                  calls === 1
+                    ? {
+                        aggregations: {
+                          candidates: {
+                            buckets: [{ key: 'win-dc-01', doc_count: 3 }],
+                          },
+                        },
+                      }
+                    : { hits: { total: { value: 0 }, hits: [] } },
+              });
+            },
+          },
+        },
+      },
+    },
+  } as unknown as ExecContext;
+
+  const outcome = await executeToolCall(
+    { id: 'call-1', name: 'search_findings_by_agent', arguments: {} },
+    context,
+    fakeRequest,
+    privacy,
+  );
+
+  const digest = JSON.parse(outcome.toolResultContent) as {
+    assumptionNote?: string;
+  };
+  assert.ok(digest.assumptionNote, 'the assumption must be disclosed');
+  assert.doesNotMatch(digest.assumptionNote as string, /win-dc-01/);
+  assert.match(digest.assumptionNote as string, /HOST_\d/);
+});

@@ -983,9 +983,11 @@ export function summarizeDigestForFallback(record: DigestRecord): string {
 }
 
 /**
- * Appended as a `system` message for the forced-synthesis retry call (case (a) below) only --
- * never added to `messages` itself, same "outbound copy only" rule as
- * `withFinalRoundAnswerInstruction`'s FINAL_ROUND_ANSWER_INSTRUCTION. Every clause is load-bearing
+ * Appended as a trailing `user` message for the forced-synthesis retry call (case (a) below) only
+ * -- never added to `messages` itself, same "outbound copy only" rule as
+ * `withFinalRoundAnswerInstruction`'s FINAL_ROUND_ANSWER_INSTRUCTION; see
+ * `withNoTextSynthesisInstruction` below for why the role is `user` and not `system`. Every clause
+ * is load-bearing
  * for the same reason that instruction's are: "using only the tool results already gathered" and
  * "Do not state anything the results do not show" keep this from becoming a fabrication prompt;
  * "Do not call any tools" is redundant with `tools` being omitted from this call's `streamOptions`
@@ -995,9 +997,11 @@ export function summarizeDigestForFallback(record: DigestRecord): string {
  */
 export const NO_TEXT_SYNTHESIS_INSTRUCTION =
   'The tool call(s) above already returned results, but no written answer followed. Using only ' +
-  'the tool results already gathered in this conversation, write 2 to 4 plain sentences stating ' +
-  'the totals and key observations from those results. Do not state anything the results do not ' +
-  'show. Do not call any tools. Do not say there is nothing to add.';
+  'the tool results already gathered in this conversation, write 2 to 4 plain sentences that ' +
+  'answer the question in its own terms, stating the totals and key observations from those ' +
+  'results. If a tool call above was rejected or errored, say what could not be checked. Do not ' +
+  'state anything the results do not show. Do not call any tools. Do not say there is nothing ' +
+  'to add.';
 
 /**
  * ZERO-ROW sibling of NO_TEXT_SYNTHESIS_INSTRUCTION above, used when the turn's tool calls all came
@@ -1026,6 +1030,46 @@ export const NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY =
   '(for a "how many" question, that means zero), naming the filters that were actually searched. ' +
   'Do not speculate about why the result is empty and do not state anything the results do not ' +
   'show. Do not call any tools. Do not say there is nothing to add.';
+
+/**
+ * EXPLAIN-WAVE PHASE 3 (eval run 20260825-163607, the 9 remaining code-synthesised answers):
+ * delivers the forced-synthesis instruction as a trailing **user** message on the outbound COPY,
+ * never as a `system` message and never into `messages` itself.
+ *
+ * ROOT CAUSE this fixes. Phase 2 appended the instruction as `{role: 'system'}`, which reads as
+ * "the last thing in the conversation" only on a wire that keeps system messages inside the
+ * message list. The Anthropic Messages API does not: `server/providers/anthropic.ts` filters every
+ * `system`-role message out of `messages` and joins them into the request's TOP-LEVEL `system`
+ * field, appended after prompts.ts's full system prompt. So on an Anthropic provider -- the one
+ * this was measured on -- the instruction never appeared at the conversation tail at all; it was
+ * concatenated onto the end of a multi-thousand-token system prompt, while the last actual
+ * conversation entry stayed a `tool_result` the model was free to treat as a finished turn. All 9
+ * remaining boilerplate answers in that run reached `synthesizeNoTextFallback` case (b), i.e. both
+ * the final round's FINAL_ROUND_ANSWER_INSTRUCTION and this retry produced no text -- consistent
+ * with neither instruction being where the code believed it was.
+ *
+ * A trailing `user` message lands at the conversation tail on EVERY adapter: Anthropic maps a
+ * `tool` message to `role: 'user'` too, and consecutive same-role messages are explicitly allowed
+ * there (they are combined into one turn), so this is a request the model has to answer rather than
+ * a preference buried in the prompt prefix. `withFinalRoundAnswerInstruction`'s own `system`
+ * delivery is deliberately left alone: it fires on every successful tool turn, so changing its
+ * wire position would move answers that are already good, and this retry is the path whose floor is
+ * boilerplate either way -- see the commit message for that scope decision.
+ */
+export function withNoTextSynthesisInstruction(
+  messages: ChatMessage[],
+  tableOnScreen: boolean,
+): ChatMessage[] {
+  return [
+    ...messages,
+    {
+      role: 'user',
+      content: tableOnScreen
+        ? NO_TEXT_SYNTHESIS_INSTRUCTION
+        : NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY,
+    },
+  ];
+}
 
 /** What `synthesizeNoTextFallback` reports back to `orchestrate` once it finishes -- mirrors
  * `Stage1Result`'s shape/reasoning: `usage` is `undefined` on every path that never actually made
@@ -1182,19 +1226,18 @@ export async function* synthesizeNoTextFallback(
     return { usage: undefined };
   }
 
-  const retryMessages: ChatMessage[] = [
-    ...messages,
-    {
-      role: 'system',
-      content: tableOnScreen
-        ? NO_TEXT_SYNTHESIS_INSTRUCTION
-        : NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY,
-    },
-  ];
-  // Outbound scrub, same as every other adapter.chatStream call this turn makes.
-  const outboundMessages = privacyCtx
-    ? scrubMessagesForProvider(retryMessages, privacyCtx.pseudonymizer)
-    : retryMessages;
+  // Outbound scrub, same as every other adapter.chatStream call this turn makes. The instruction
+  // itself is appended AFTER the scrub (`withNoTextSynthesisInstruction` below): it is static
+  // first-party text with no user data in it, so there is nothing for the pseudonymizer to find,
+  // and running it through would only risk `prescanAndMint` mangling a word in our own copy --
+  // the same reasoning `withFinalRoundAnswerInstruction` records for FINAL_ROUND_ANSWER_INSTRUCTION.
+  const scrubbedMessages = privacyCtx
+    ? scrubMessagesForProvider(messages, privacyCtx.pseudonymizer)
+    : messages;
+  const outboundMessages = withNoTextSynthesisInstruction(
+    scrubbedMessages,
+    tableOnScreen,
+  );
   // Inbound un-scrub and duplicate-table suppression, same pipeline as every round of the main
   // loop. The suppressor starts ACTIVE only when a non-empty table is already on screen (the
   // original, `sawNonEmptyTable === true` case) -- on the zero-row turn this mechanism newly covers
