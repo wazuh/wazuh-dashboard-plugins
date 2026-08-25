@@ -182,6 +182,16 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // Wazuh's scanner from CTI data, never analyst/attacker-supplied. Surfaced (2026-08-14) so the
   // model can state the fixed version instead of offering an update check no tool can perform.
   { field: 'vulnerability.scanner.condition', action: 'allow' },
+  // EXPLAIN-WAVE PHASE 4: the CVE's own description, now a digest sampleColumn on the
+  // vulnerability tools (catalog/common.ts's VULN_DIGEST_SAMPLE_COLUMNS) so a remediation answer
+  // can state what the flaw is. NOT 'allow', unlike the scanner/OS-curated fields around it: this
+  // is THIRD-PARTY feed prose (CNA/NVD-authored, arriving through the CTI content pipeline), the
+  // same untrusted-text class get-cve-intel.ts's own A-3 hardening treats with care. It describes
+  // a CVE, never this deployment, so it carries no local identifier by design -- but it is long
+  // free text from outside, so 'allow-scan' (issue #8912) is the right classification: the value
+  // stays readable while every embedded IP/FQDN shape is minted and every identifier already
+  // pseudonymized elsewhere in this conversation is caught by the dictionary scan.
+  { field: 'vulnerability.description', action: 'allow-scan' },
   // NOT 'allow', unlike package.name/architecture/type/version above: a vendor/distributor string
   // ("Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>", "Debian Sysadmin Team
   // <debian-admin@lists.debian.org>") routinely embeds a maintainer/team EMAIL ADDRESS -- personal

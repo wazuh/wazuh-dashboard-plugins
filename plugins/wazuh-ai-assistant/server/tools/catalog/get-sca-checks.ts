@@ -5,6 +5,7 @@ import {
   objectSchema,
   optionalStringParam,
   requireNonEmptyString,
+  SCA_CURRENT_STATE_NOTE,
   validateAgentId,
 } from './common';
 import { ANSWER_BUCKET_CAP, BREAKDOWN_BUCKET_CAP } from '../digest';
@@ -113,7 +114,7 @@ const getScaChecksToolBase: ToolDefinition = {
       'fragment via search (e.g. "ssh") together with result="failed": the digest breakdown\'s ' +
       '"matching_failed_checks" entries name the matching checks over the full result set ' +
       '(alphabetical; if more match than the list carries, the digest says how many were cut — ' +
-      'narrow the fragment to see them all).',
+      `narrow the fragment to see them all). ${SCA_CURRENT_STATE_NOTE}`,
     parameters: objectSchema(
       {
         agent_id: {

@@ -607,6 +607,22 @@ export const FINAL_ROUND_ANSWER_INSTRUCTION =
  * answer and there are no gathered results to reason over, so the instruction would be a lie.
  * That path's silence is a different defect with its own fix (the reasoning-channel fallback in
  * openai-compatible.ts) and its own fallback copy (NO_ANSWER_MESSAGE above).
+ *
+ * EXPLAIN-WAVE PHASE 4: the role is `user`, not `system`, for exactly the reason
+ * `withNoTextSynthesisInstruction` below records for the forced-synthesis retry -- read that doc
+ * comment for the full root cause. In short: `server/providers/anthropic.ts` filters every
+ * `system`-role message OUT of `messages` and joins them into the request's TOP-LEVEL `system`
+ * field, so a `system`-delivered instruction is appended to the end of prompts.ts's
+ * multi-thousand-token system prompt instead of landing at the conversation tail, while the last
+ * actual conversation entry stays a `tool_result` the model is free to treat as a finished turn.
+ * Phase 3 fixed that for the retry path only, deliberately leaving this one alone because it fires
+ * on every successful tool turn and moving it would move answers that were already good. Phase 3's
+ * own measurement is what changed the call: the retry moved to the tail and stopped producing
+ * boilerplate (code-synthesised answers 9 -> 1 of 63), while THIS instruction -- the one that runs
+ * first, on every tool-using turn -- was still being delivered to the place phase 3 proved the
+ * model does not read it as a request. The wording is unchanged, byte for byte; only the wire
+ * position moves. A trailing `user` message is the tail on every adapter (Anthropic maps a `tool`
+ * message to `role: 'user'` too, and consecutive same-role messages are explicitly allowed there).
  */
 export function withFinalRoundAnswerInstruction(
   messages: ChatMessage[],
@@ -616,10 +632,7 @@ export function withFinalRoundAnswerInstruction(
   if (!isFinalRound || !toolUsedThisTurn) {
     return messages;
   }
-  return [
-    ...messages,
-    { role: 'system', content: FINAL_ROUND_ANSWER_INSTRUCTION },
-  ];
+  return [...messages, { role: 'user', content: FINAL_ROUND_ANSWER_INSTRUCTION }];
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1051,10 +1064,11 @@ export const NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY =
  * A trailing `user` message lands at the conversation tail on EVERY adapter: Anthropic maps a
  * `tool` message to `role: 'user'` too, and consecutive same-role messages are explicitly allowed
  * there (they are combined into one turn), so this is a request the model has to answer rather than
- * a preference buried in the prompt prefix. `withFinalRoundAnswerInstruction`'s own `system`
- * delivery is deliberately left alone: it fires on every successful tool turn, so changing its
- * wire position would move answers that are already good, and this retry is the path whose floor is
- * boilerplate either way -- see the commit message for that scope decision.
+ * a preference buried in the prompt prefix. `withFinalRoundAnswerInstruction`'s own delivery was
+ * deliberately left as `system` by this phase (it fires on every successful tool turn, so changing
+ * its wire position risked moving answers that were already good, while this retry is the path
+ * whose floor is boilerplate either way) -- phase 4 then moved it too, on the strength of this
+ * change's own measurement; see that function's doc comment for the hoist decision.
  */
 export function withNoTextSynthesisInstruction(
   messages: ChatMessage[],

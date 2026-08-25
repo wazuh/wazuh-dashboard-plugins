@@ -2054,6 +2054,23 @@ test("buildDigest: a tool's OWN sampleFieldMaxLength still overrides the shared 
   );
 });
 
+// EXPLAIN-WAVE PHASE 4: `vulnerability.description` joins the same shared cap layer, for the same
+// reason -- it is now a digest sample column on every vulnerability tool
+// (catalog/common.ts's VULN_DIGEST_SAMPLE_COLUMNS) so a "how do we remediate this" answer can say
+// what the flaw is, and it is third-party CNA/NVD prose that can run long.
+test('buildDigest: vulnerability.description is capped at 240 chars, not the generic 500', () => {
+  const def = buildToolDef({
+    digest: { sampleColumns: ['vulnerability.description'] },
+  });
+  const digest = digestWithSample(
+    { vulnerability: { description: 'v'.repeat(900) } },
+    def,
+  );
+  const value = digest.samples[0]['vulnerability.description'] as string;
+  assert.equal(value.length, 241);
+  assert.ok(value.endsWith('…'));
+});
+
 test('buildDigest: an unlisted field still falls back to the generic 500-char cap', () => {
   const def = buildToolDef({ digest: { sampleColumns: ['other'] } });
   const digest = digestWithSample({ other: 'z'.repeat(900) }, def);

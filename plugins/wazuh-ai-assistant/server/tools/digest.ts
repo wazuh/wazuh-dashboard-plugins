@@ -281,6 +281,15 @@ const MAX_FIELD_VALUE_LENGTH = 500;
 const DIGEST_FIELD_MAX_LENGTH_DEFAULTS: Record<string, number> = {
   'wazuh.rule.description': 240,
   'process.command_line': 200,
+  // EXPLAIN-WAVE PHASE 4: `vulnerability.description` joins the vulnerability tools' digest
+  // sampleColumns (catalog/common.ts's VULN_DIGEST_SAMPLE_COLUMNS) so a "how do we remediate this"
+  // answer can say what the flaw actually is instead of only naming the CVE id. Same 240 as
+  // `wazuh.rule.description` and the same arithmetic: live corpus values run 120-260 chars (one
+  // CNA/NVD sentence), so 240 keeps essentially every real description whole while bounding a
+  // pathological one, and 5 sample rows grow by at most ~1,200 chars -- the vulnerability digest's
+  // other 9 columns are short scalars (ids, versions, scores), so it stays inside DIGEST_CHAR_CAP
+  // with all 5 rows intact.
+  'vulnerability.description': 240,
 };
 /** Hard length cap on `Digest.hint`. The hint accumulates by concatenation (this file's zero-row
  * hint + unrepresentable-aggregation note, plus executor.ts's window-recount and near-miss

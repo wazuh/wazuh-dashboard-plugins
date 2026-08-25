@@ -821,7 +821,7 @@ test(
 
 test(
   'CV-058 fix: Windows registry FIM questions get a dedicated honest-empty decline (no tool ' +
-    'AND zero documents on a Linux-only fleet), not a bare zero-row table',
+    'reads it), not a bare zero-row table',
   () => {
     const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
     assert.match(
@@ -830,10 +830,39 @@ test(
     );
     assert.match(
       prompt,
-      /this deployment's monitored hosts are Linux-only, so no registry documents exist here/,
+      /I don't have Windows registry change data — that's not available in the AI assistant at the moment\./,
     );
   },
 );
+
+// EXPLAIN-WAVE PHASE 4 -- the one fabrication the judge flagged in eval run 20260825-174333 was
+// this decline's own copy, recited verbatim. It used to assert "this deployment's monitored hosts
+// are Linux-only, so no registry documents exist here either": a claim about the customer's fleet
+// hardcoded in a first-party prompt string, true only of whatever deployment CV-058 was written
+// against. On EV2-EXP-002 the model repeated it on a fleet with four Windows hosts and scored 1/10
+// on groundedness. No tool call ran on that turn, so no synthesis path is implicated -- the
+// sentence was authored in this file. The product limit is real and stays; the environment claim
+// must never come back, here or in any other decline's copy.
+test('phase 4: no decline copy asserts what platforms this deployment monitors', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.doesNotMatch(prompt, /Linux-only/);
+  assert.doesNotMatch(prompt, /monitored hosts are/);
+  assert.match(
+    prompt,
+    /never assert anything about which platforms this deployment monitors or whether registry documents exist here/,
+  );
+});
+
+// Same answer, second defect: it opened with "This is one of the five fixed-scope decline cases:",
+// leaking this prompt's own bookkeeping into user-facing copy. The decline block told the model
+// which words to use but never that the numbering exists only for its own benefit.
+test('phase 4: the decline block forbids narrating that a list of declines exists', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /never tell the user that a list, class, category or numbered set of declines exists, and never label your answer as one of them/,
+  );
+});
 
 // --- Group F: check.result casing (CV-094) ------------------------------------------------------
 
@@ -982,4 +1011,66 @@ test('buildSystemPrompt: the new resolution clause names no tool to call', () =>
   const sentence = clause.slice(0, clause.indexOf('unscoped.'));
   assert.doesNotMatch(sentence, /call get_agents/);
   assert.match(sentence, /any tool available to you this turn that accepts an agent name/);
+});
+
+// --- EXPLAIN-WAVE PHASE 4: cite the concrete fix, and the state-vs-history surface split --------
+
+// Class E ("how do we remediate this item") was the worst-scoring judged class in eval run
+// 20260825-174333 (~4/10 mean), and the split inside it is what this clause targets: EV2-EXP-013
+// scored 9/10 on actionability because the digest happened to carry the scanner's fix bound and the
+// model quoted it ("install KB5034763"), while EV2-EXP-016 wrote generic prioritisation advice and
+// never touched the failing check it was asked about, nor that the check's remediation field was
+// empty. Both halves are pinned: quote the fix when there is one, disclose the silence when there
+// is not.
+test('phase 4: part (3) must cite a concrete fix from the results before any general advice', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /When a result in hand carries a CONCRETE fix -- a fixed or patched version, a KB or advisory id, a scanner fix condition, a remediation text -- part \(3\) must cite that specific fix first/,
+  );
+  assert.match(prompt, /quoting the value, before any general advice/);
+});
+
+test('phase 4: an empty fix field must be disclosed, not filled with the model\u2019s own steps', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /when the item has such a field and it is empty or absent, say plainly that no fix was supplied for it rather than presenting your own general steps as the product's remediation/,
+  );
+});
+
+// The SCA-specific sibling of the clause above: the CV-054 synthesis rule already told the model
+// what to do when check.rationale is missing, but said nothing about a missing check.remediation --
+// the exact field EV2-EXP-014/EV2-EXP-016's answer key turns on ("Wazuh supplies no remediation
+// guidance for check 28508").
+test('phase 4: an empty check.remediation is stated plainly, and own steps are marked as guidance', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /if check\.remediation is empty or absent, say plainly that no remediation text was returned for that check before offering any steps of your own/,
+  );
+  assert.match(prompt, /never present them as the check's own remediation/);
+  // The pre-existing rationale half must survive the addition.
+  assert.match(prompt, /no rationale text was returned for that check/);
+});
+
+// EV2-VUL-001 asked which agents have a CVE-2024-21412 detection "in the findings history" and was
+// answered from wazuh-states-vulnerabilities (two hosts; the findings stream records one). The
+// model even disclosed the substitution and still answered from the wrong surface, so the gap was
+// never honesty -- nothing said the two surfaces answer different questions.
+test('phase 4: current state and detection history are named as non-substitutable surfaces', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /Current state and detection history are two different surfaces and never substitute for one another/,
+  );
+  assert.match(
+    prompt,
+    /the wazuh-states-\* data \(vulnerabilities, SCA, inventory\) is what IS true now, while findings are what WAS detected, and when/,
+  );
+  assert.match(prompt, /the wording of the question picks the surface/);
+  assert.match(
+    prompt,
+    /If only the other surface is reachable this turn, name the one you actually read and say it answers a different question/,
+  );
 });

@@ -107,6 +107,17 @@ export function buildSystemPrompt(nowIso: string): string {
     // typically detected is knowledge. The two obligations the format bullet above carries that a
     // longer answer does not outgrow -- disclosing truncation, and not enumerating rows or
     // timestamps in prose -- are re-stated so this paragraph cannot be read as dropping them.
+    //
+    // EXPLAIN-WAVE PHASE 4 (the cite-the-fix clause in part (3)): remediation-tied-to-item
+    // questions were the worst-scoring judged class in eval run 20260825-174333 (~4/10 mean), and
+    // the split INSIDE that class is the whole reason this clause exists. EV2-EXP-013 scored 9/10
+    // on actionability because the digest happened to carry the scanner's own fix bound and the
+    // model quoted it ("install KB5034763"); EV2-EXP-016, on the same corpus, wrote generic
+    // prioritisation advice while never touching the failing check it was asked about, nor the
+    // fact that that check's remediation field was EMPTY. Naming the fix-bearing fields
+    // explicitly is what turns the first behaviour from luck into the rule, and the empty-field
+    // half is what stops the model from filling that silence with its own advice presented as the
+    // product's own remediation.
     'That format is for lookup, count, and status questions. When the user asks you to EXPLAIN, ' +
       'assess, or advise -- what an event, technique, rule or vulnerability means, why it ' +
       'matters, or what to do about it -- the roughly-120-word cap, the three-bullet cap and ' +
@@ -115,7 +126,12 @@ export function buildSystemPrompt(nowIso: string): string {
       'detectors, and every other fact about this environment strictly from the results in ' +
       'hand -- if the results do not name what detected it, say so instead of guessing); ' +
       '(2) why it matters, and how this class of activity is typically detected or abused in ' +
-      'general; (3) the recommended next actions, each with a one-line rationale. Parts (2) ' +
+      'general; (3) the recommended next actions, each with a one-line rationale. When a result ' +
+      'in hand carries a CONCRETE fix -- a fixed or patched version, a KB or advisory id, a ' +
+      'scanner fix condition, a remediation text -- part (3) must cite that specific fix first, ' +
+      'quoting the value, before any general advice; when the item has such a field and it is ' +
+      'empty or absent, say plainly that no fix was supplied for it rather than presenting your ' +
+      'own general steps as the product\'s remediation. Parts (2) ' +
       'and (3) may draw on your general security knowledge: keep them clearly separate from ' +
       'part (1), frame them as guidance rather than as something observed in this environment, ' +
       'and say they should be verified before acting on them -- never present general ' +
@@ -269,7 +285,9 @@ export function buildSystemPrompt(nowIso: string): string {
       'at all, no matter how closely a tool name or a piece of data resembles the topic — so ' +
       "don't guess, don't substitute an adjacent tool's data as an approximation, and don't " +
       'mention tiers, roadmap status, or internal codenames; state the limit plainly and point ' +
-      'at the right dashboard page, in almost these exact words:\n' +
+      'at the right dashboard page, in almost these exact words. Write the copy itself and ' +
+      'nothing else: never tell the user that a list, class, category or numbered set of ' +
+      'declines exists, and never label your answer as one of them.\n' +
       '  1. Simulating or tracing decode/rule evaluation for a specific log line ("why didn\'t ' +
       'rule X fire"): "I can\'t simulate or trace decode/rule evaluation for a specific log line ' +
       "— that's not available in the AI assistant at the moment. You can test this directly in " +
@@ -338,14 +356,28 @@ export function buildSystemPrompt(nowIso: string): string {
       'in the AI assistant at the moment. You can review configured channels under Server ' +
       'management > Settings > Notifications."\n' +
       // BLOCKER FIX (CV-058, coverage-validation-design.md row 493): Windows registry FIM has no
-      // tool AND, on a Linux-only fleet, zero documents -- both halves of the honest-empty must be
-      // stated, never a bare zero-row table (get_fim_files does not cover registry data at all).
-      '  - Windows registry FIM changes (registry keys/values): no tool reads this, and it is a ' +
-      'Windows-only surface -- on a Linux-only deployment, zero such documents exist either way. ' +
-      'State BOTH plainly rather than returning an unrelated file-path table: "I don\'t have ' +
-      "Windows registry change data — that's not available in the AI assistant at the moment, " +
-      "and this deployment's monitored hosts are Linux-only, so no registry documents exist here " +
-      'either. You can review File Integrity Monitoring configuration under Server management > ' +
+      // tool, so the honest-empty must be stated rather than a bare zero-row table (get_fim_files
+      // does not cover registry data at all).
+      //
+      // EXPLAIN-WAVE PHASE 4 -- THE ONLY FABRICATION THE JUDGE FLAGGED IN EVAL RUN
+      // 20260825-174333 CAME OUT OF THIS SENTENCE, VERBATIM. The copy used to continue "and this
+      // deployment's monitored hosts are Linux-only, so no registry documents exist here either",
+      // a claim about the CUSTOMER'S FLEET baked into a first-party prompt string -- true only of
+      // the deployment that happened to be in front of whoever wrote CV-058. On EV2-EXP-002
+      // ("our analyst flagged a registry change on win-ws-014 under the Run key") the model
+      // recited it on a fleet whose monitored hosts include four Windows machines, and the judge
+      // scored the turn 1/10 on groundedness for asserting a deployment fact no tool had checked.
+      // Note what this was NOT: no tool call ran, so neither NO_TEXT_SYNTHESIS_INSTRUCTION nor any
+      // other synthesis path is implicated -- the fabricated sentence was authored HERE and merely
+      // repeated. The product limit (no tool reads registry FIM) is real and stays; the claim
+      // about what this deployment monitors is gone, and the rule that no decline may assert one
+      // is stated so the shape cannot come back in another decline's copy.
+      '  - Windows registry FIM changes (registry keys/values): no tool reads this. State that ' +
+      'limit plainly rather than returning an unrelated file-path table, and never assert ' +
+      'anything about which platforms this deployment monitors or whether registry documents ' +
+      'exist here -- no tool available to you can check either: "I don\'t have ' +
+      "Windows registry change data — that's not available in the AI assistant at the moment. " +
+      'You can review File Integrity Monitoring configuration under Server management > ' +
       'File Integrity Monitoring."\n' +
       '  - Security Analytics detector ALERTS specifically (".opensearch-sap-*-alerts" — still ' +
       'blocked, distinct from the detector findings/rule-catalog indices you CAN query): "I ' +
@@ -404,6 +436,23 @@ export function buildSystemPrompt(nowIso: string): string {
       'get_critical_vulnerabilities, get_vulnerabilities_by_agent, get_vulnerability_by_cve); ' +
       'they read the vulnerability state index directly. Vulnerability data is current-state ' +
       'only: there is no "solved/resolved vulnerabilities" history available.',
+    // EXPLAIN-WAVE PHASE 4 (eval items EV2-VUL-001, EV2-EXP-013): the model answered a question
+    // explicitly scoped to the FINDINGS HISTORY ("which agents have a CVE-2024-21412 detection in
+    // the findings history") from wazuh-states-vulnerabilities, which lists two hosts where the
+    // detection stream records one -- and did the reverse elsewhere. It even disclosed the
+    // substitution ("this reflects current vulnerability state only, not historical detections")
+    // and still answered from the wrong surface, so the missing piece was never honesty: nothing
+    // told it the two surfaces answer different questions and that the wording of the question
+    // picks one. Stated once, generically, here; the tool descriptions carry the matching sentence
+    // at tool-choice time (catalog/common.ts's FINDING_SCOPE_NOTE / VULN_CURRENT_STATE_NOTE /
+    // SCA_CURRENT_STATE_NOTE).
+    'Current state and detection history are two different surfaces and never substitute for one ' +
+      'another: the wazuh-states-* data (vulnerabilities, SCA, inventory) is what IS true now, ' +
+      'while findings are what WAS detected, and when. Send a "what is vulnerable/failing/' +
+      'installed now" question to a state tool and a "what was detected", "in the findings ' +
+      'history", or "when did we first see it" question to a findings tool -- the wording of the ' +
+      'question picks the surface. If only the other surface is reachable this turn, name the one ' +
+      'you actually read and say it answers a different question.',
     'wazuh.rule.title is an EXACT keyword field: a match query with partial words silently ' +
       'returns 0 rows. To filter findings by kind, use wazuh.rule.tags terms or wazuh.rule.id - ' +
       'only use wazuh.rule.title with the exact, complete title string.',
@@ -460,7 +509,10 @@ export function buildSystemPrompt(nowIso: string): string {
       'its own. When counts.returned is less than counts.total, say explicitly that the checks ' +
       'you grouped and explained are a sample, not the full set of failures. If check.rationale ' +
       'is unavailable for a check, say the mechanism-free equivalent of "no rationale text was ' +
-      'returned for that check" rather than inventing a reason; never claim to have verified the ' +
+      'returned for that check" rather than inventing a reason; if check.remediation is empty or ' +
+      'absent, say plainly that no remediation text was returned for that check before offering ' +
+      'any steps of your own, and mark those steps as your general guidance -- never present them ' +
+      "as the check's own remediation; never claim to have verified the " +
       'live host configuration yourself beyond what the SCA result already reported (SCA is a ' +
       'point-in-time scan result, not a live re-check).',
     'For "how many DISTINCT X" questions (e.g. distinct hosts/agents affected), a plain hit count ' +

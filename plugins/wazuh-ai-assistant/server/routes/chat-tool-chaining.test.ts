@@ -1024,7 +1024,10 @@ test('orchestrate: an unprompted single-tool offer with rounds remaining is forc
   // instruction; only the genuinely last (no-tools) round does.
   const finalRoundMessages = callMessages[5];
   const lastMessage = finalRoundMessages[finalRoundMessages.length - 1];
-  assert.equal(lastMessage.role, 'system');
+  // EXPLAIN-WAVE PHASE 4: 'user', not 'system' -- a system-role message is hoisted out of
+  // `messages` into the request's top-level `system` field by providers/anthropic.ts, so it never
+  // reaches the conversation tail at all. See withFinalRoundAnswerInstruction's doc comment.
+  assert.equal(lastMessage.role, 'user');
   assert.equal(lastMessage.content, FINAL_ROUND_ANSWER_INSTRUCTION);
   // And the FORCED round's outbound messages do NOT carry it (it is not the final round).
   const forcedRoundMessages = callMessages[3];

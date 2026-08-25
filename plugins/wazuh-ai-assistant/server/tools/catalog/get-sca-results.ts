@@ -3,6 +3,7 @@ import {
   aggLimitProperty,
   clampAggLimit,
   objectSchema,
+  SCA_CURRENT_STATE_NOTE,
   validateAgentId,
 } from './common';
 
@@ -41,7 +42,8 @@ export const getScaResultsTool: ToolDefinition = {
       'The compliance ratio is passed/(passed+failed). NOT for Security Analytics pipeline ' +
       'policies -- SCA is a per-agent scan result, unrelated to that pipeline configuration; if ' +
       'the question is actually about pipeline policies and get_threat_intel_components (with ' +
-      'component_type="policies") is available to you this turn, use that one instead.',
+      'component_type="policies") is available to you this turn, use that one instead. ' +
+      SCA_CURRENT_STATE_NOTE,
     parameters: objectSchema(
       {
         agent_id: {

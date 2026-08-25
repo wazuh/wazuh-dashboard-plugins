@@ -48,9 +48,34 @@ test('withFinalRoundAnswerInstruction: appends the instruction on the final roun
     'exactly one message is added, never more',
   );
   assert.deepEqual(out[out.length - 1], {
-    role: 'system',
+    role: 'user',
     content: FINAL_ROUND_ANSWER_INSTRUCTION,
   });
+});
+
+// EXPLAIN-WAVE PHASE 4: the role is the fix, not a detail. A `system`-role message is NOT at the
+// conversation tail on the Anthropic Messages API -- providers/anthropic.ts filters every system
+// message out of `messages` and joins them into the request's top-level `system` field, appended
+// after prompts.ts's multi-thousand-token system prompt -- so for the whole life of this
+// instruction it was delivered to the prompt PREFIX while the last thing the model actually read
+// stayed a `tool_result` it was free to treat as a finished turn. Phase 3 proved the point on the
+// sibling path (`withNoTextSynthesisInstruction`): moving the identical wording to a trailing
+// `user` message took code-synthesised answers from 9 to 1 of 63. This test pins the wire position
+// so a future "tidy the roles up" edit cannot silently hoist it back into the system field.
+test('withFinalRoundAnswerInstruction: the instruction is delivered as a trailing USER message, never a system one', () => {
+  const out = withFinalRoundAnswerInstruction(conversation(), true, true);
+  assert.equal(
+    out[out.length - 1].role,
+    'user',
+    'a system-role message is hoisted out of the conversation by anthropic.ts and never reaches the tail',
+  );
+  assert.ok(
+    !out.some(
+      message =>
+        message.role === 'system' &&
+        message.content === FINAL_ROUND_ANSWER_INSTRUCTION,
+    ),
+  );
 });
 
 test('withFinalRoundAnswerInstruction: the instruction goes LAST, after the tool results', () => {
