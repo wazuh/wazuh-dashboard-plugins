@@ -1,8 +1,6 @@
 import React from 'react';
 import {
   EuiPanel,
-  EuiFlexGroup,
-  EuiFlexItem,
   EuiTitle,
   EuiLink,
   EuiLoadingContent,
@@ -17,10 +15,16 @@ import { ErrorValuePlaceholder } from './tab-number';
 import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
-export interface WidgetGroupHeaderLink {
-  label: string;
+export interface WidgetGroupTitleLink {
+  /** Destination URL, built by `../../utils/navigation`. */
   href?: string;
   onClick?: () => void;
+  /**
+   * Module the title navigates to, named in the tooltip. Only needed when the
+   * title itself isn't the module name ("Top 5 operating systems" navigating to
+   * IT Hygiene); otherwise the title is used.
+   */
+  destination?: string;
 }
 
 export const WIDGET_LOADING_MIN_HEIGHT = {
@@ -155,12 +159,34 @@ export const WidgetGroupBody: React.FC<WidgetGroupBodyProps> = ({
   );
 };
 
+/**
+ * Title as the card's link into its module, with a tooltip spelling out where
+ * the click lands — the top-right "see more" links this replaced said it in the
+ * label instead.
+ */
+const WidgetGroupTitle: React.FC<{
+  title: string;
+  link: WidgetGroupTitleLink;
+}> = ({ title, link }) => (
+  <RedirectAppLinks application={getCore().application}>
+    <EuiToolTip position='top' content={`Go to ${link.destination ?? title}`}>
+      <EuiLink href={link.href} onClick={link.onClick}>
+        {title}
+      </EuiLink>
+    </EuiToolTip>
+  </RedirectAppLinks>
+);
+
 export interface WidgetGroupProps {
   status: DataGroupStatus;
-  title: React.ReactNode;
+  title: string;
   /** Optional time-semantics caption ("Last 24 hours" / "Current"). */
   caption?: string;
-  headerLink?: WidgetGroupHeaderLink;
+  /**
+   * Makes the title the card's only navigation affordance: no redundant
+   * top-right link, so every card exposes one way into its module.
+   */
+  titleLink?: WidgetGroupTitleLink;
   errorLabel?: string;
   /** See WidgetGroupBody: only rendered on `unavailable`. */
   showManageIndexPatternsLink?: boolean;
@@ -185,7 +211,7 @@ export const WidgetGroup: React.FC<WidgetGroupProps> = ({
   status,
   title,
   caption,
-  headerLink,
+  titleLink,
   errorLabel,
   showManageIndexPatternsLink,
   isPermissionDenied,
@@ -203,22 +229,15 @@ export const WidgetGroup: React.FC<WidgetGroupProps> = ({
       style={{ display: 'flex', flexDirection: 'column' }}
     >
       <div style={{ flexGrow: 0 }}>
-        <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false}>
-          <EuiFlexItem>
-            <EuiTitle size='xxs'>
-              <h3>{title}</h3>
-            </EuiTitle>
-          </EuiFlexItem>
-          {headerLink && (
-            <EuiFlexItem grow={false}>
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={headerLink.href} onClick={headerLink.onClick}>
-                  {headerLink.label}
-                </EuiLink>
-              </RedirectAppLinks>
-            </EuiFlexItem>
-          )}
-        </EuiFlexGroup>
+        <EuiTitle size='xxs'>
+          <h3>
+            {titleLink ? (
+              <WidgetGroupTitle title={title} link={titleLink} />
+            ) : (
+              title
+            )}
+          </h3>
+        </EuiTitle>
         {caption && (
           <EuiText size='xs' color='subdued'>
             {caption}
