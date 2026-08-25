@@ -74,3 +74,30 @@ test('excluded surfaces are NOT present (decline-tier / open product gaps / priv
     );
   }
 });
+
+// EXPLAIN-WAVE PHASE 5. `wazuh-states-*` has covered wazuh-states-fim-registry-keys/-values since
+// the day it shipped, but its label said only "FIM", which reads as the files surface get_fim_files
+// already owns. On eval run 20260825-193632 the model declined two registry questions outright
+// (EV2-FIM-002: zero tool calls; EV2-EXP-002: 2.6/10) rather than aim this pattern at the registry
+// indices. The enum VALUE is untouched -- that is the wire contract -- but the label now says what
+// the pattern has always covered.
+test('the wazuh-states-* label names the registry half of FIM, not just files', () => {
+  const states = GENERIC_QUERY_FAMILIES.find(
+    family => family.pattern === 'wazuh-states-*',
+  );
+  assert.ok(states, 'wazuh-states-* must remain an offered family');
+  assert.match(states.label, /Windows registry/);
+  assert.match(states.label, /file state/);
+});
+
+test('wazuh-states-fim-registry-* is reachable through the wazuh-states-* family', () => {
+  // The concrete indices the label now points at must actually pass the guardrail, or the routing
+  // rule the system prompt states would send the model at a query that can never execute.
+  for (const index of [
+    'wazuh-states-fim-registry-keys',
+    'wazuh-states-fim-registry-values',
+  ]) {
+    assert.equal(checkIndexAllowlist(index).ok, true, index);
+  }
+  assert.ok(GENERIC_QUERY_INDEX_PATTERNS.includes('wazuh-states-*'));
+});

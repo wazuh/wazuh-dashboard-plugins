@@ -355,30 +355,6 @@ export function buildSystemPrompt(nowIso: string): string {
       "\"I don't have a way to list configured notification channels yet — that's not available " +
       'in the AI assistant at the moment. You can review configured channels under Server ' +
       'management > Settings > Notifications."\n' +
-      // BLOCKER FIX (CV-058, coverage-validation-design.md row 493): Windows registry FIM has no
-      // tool, so the honest-empty must be stated rather than a bare zero-row table (get_fim_files
-      // does not cover registry data at all).
-      //
-      // EXPLAIN-WAVE PHASE 4 -- THE ONLY FABRICATION THE JUDGE FLAGGED IN EVAL RUN
-      // 20260825-174333 CAME OUT OF THIS SENTENCE, VERBATIM. The copy used to continue "and this
-      // deployment's monitored hosts are Linux-only, so no registry documents exist here either",
-      // a claim about the CUSTOMER'S FLEET baked into a first-party prompt string -- true only of
-      // the deployment that happened to be in front of whoever wrote CV-058. On EV2-EXP-002
-      // ("our analyst flagged a registry change on win-ws-014 under the Run key") the model
-      // recited it on a fleet whose monitored hosts include four Windows machines, and the judge
-      // scored the turn 1/10 on groundedness for asserting a deployment fact no tool had checked.
-      // Note what this was NOT: no tool call ran, so neither NO_TEXT_SYNTHESIS_INSTRUCTION nor any
-      // other synthesis path is implicated -- the fabricated sentence was authored HERE and merely
-      // repeated. The product limit (no tool reads registry FIM) is real and stays; the claim
-      // about what this deployment monitors is gone, and the rule that no decline may assert one
-      // is stated so the shape cannot come back in another decline's copy.
-      '  - Windows registry FIM changes (registry keys/values): no tool reads this. State that ' +
-      'limit plainly rather than returning an unrelated file-path table, and never assert ' +
-      'anything about which platforms this deployment monitors or whether registry documents ' +
-      'exist here -- no tool available to you can check either: "I don\'t have ' +
-      "Windows registry change data — that's not available in the AI assistant at the moment. " +
-      'You can review File Integrity Monitoring configuration under Server management > ' +
-      'File Integrity Monitoring."\n' +
       '  - Security Analytics detector ALERTS specifically (".opensearch-sap-*-alerts" — still ' +
       'blocked, distinct from the detector findings/rule-catalog indices you CAN query): "I ' +
       "don't have alert data for that detector — that's not available in the AI assistant at " +
@@ -478,6 +454,37 @@ export function buildSystemPrompt(nowIso: string): string {
       'typed tools. If you build a search_wazuh_data query directly against wazuh-states-sca* with ' +
       'a check.result term filter, you must use the exact capitalized value yourself -- a lowercase ' +
       'term filter will silently match zero rows.',
+    // EXPLAIN-WAVE PHASE 5 -- ROOT CAUSE OF THE TWO WORST-SCORING ITEMS IN EVAL RUN
+    // 20260825-193632 (EV2-EXP-002 2.6/10, EV2-FIM-002 a hard regression to ZERO tool calls).
+    // This clause replaces what used to be a DECLINE in the no-tool/no-data block above ("Windows
+    // registry FIM changes (registry keys/values): no tool reads this"). That decline was written
+    // for CV-058, when it was true, and it has been factually wrong since workstream A1a widened
+    // `search_wazuh_data`'s index_pattern enum: `wazuh-states-*` reaches
+    // `wazuh-states-fim-registry-keys` / `wazuh-states-fim-registry-values` (both allowlisted by
+    // guardrails.ts's INDEX_ALLOWLIST_RE, both offered in the escape hatch's own enum via
+    // generic-query-families.ts). Because the decline fired BEFORE any query, the model never saw
+    // FIM-registry state that demonstrably exists -- on EV2-FIM-002 ("did anything write to a Run
+    // key on win-ws-014?") the answer was the decline copy verbatim, zero tool calls, while the
+    // `HKEY_LOCAL_MACHINE\...\CurrentVersion\Run\SecurityUpdater` value sat one escape-hatch query
+    // away. A decline whose premise a tool can disprove is worse than no decline at all, so this
+    // is now a ROUTE, stated positively, with the absence claim gated behind an actual zero-row
+    // result. The phase-4 no-environment-claims rule is carried over verbatim rather than dropped
+    // with the decline it was attached to: the fabrication it closed ("this deployment's monitored
+    // hosts are Linux-only") is a shape that must stay forbidden wherever registry FIM is
+    // discussed, query or no query.
+    'NO typed tool reads Windows registry FIM (registry keys and values) -- get_fim_files covers ' +
+      'FILE state only -- but the data IS reachable, so never decline a registry question before ' +
+      'querying it. Route it to search_wazuh_data with index_pattern "wazuh-states-*", which ' +
+      'covers the registry state indices (wazuh-states-fim-registry-keys for monitored keys, ' +
+      'wazuh-states-fim-registry-values for the values under them). The fields are registry.hive, ' +
+      'registry.key, registry.path (hive + key joined), registry.value (the value NAME, e.g. a ' +
+      'Run entry), registry.data.type, registry.data.hash.sha256 and registry.mtime; scope with ' +
+      'wazuh.agent.name or wazuh.agent.id and include the registry.* fields you need in ' +
+      '"_source". Only after such a query comes back with zero rows may you state an absence, and ' +
+      'then state the narrow fact ("no monitored registry value matches that key on that host"), ' +
+      'never a product limit -- and never assert anything about which platforms this deployment ' +
+      'monitors or whether registry documents exist here beyond what the query you actually ran ' +
+      'returned.',
     'For questions about WHICH users, IPs, commands or programs were involved, prefer the typed ' +
       'finding tools: their results include source.user.name, destination.user.name, source.ip and ' +
       'process.command_line. If you do use search_wazuh_data for such a question, you MUST ' +
@@ -571,8 +578,12 @@ export function buildSystemPrompt(nowIso: string): string {
     // EXPLAIN-WAVE PHASE 2 (eval item EV2-SCA-002, run 20260825-150326): both instructions above
     // cover the case where NO host is named. Neither covers the opposite, and more common, case --
     // the user names the host outright ("the failed SCA checks on lin-web-01") while the tool that
-    // answers it takes a NUMERIC agent_id only (get_sca_checks, get_sca_results, get_fim_files;
-    // every other agent-scoped tool accepts a name). The measured failure is not that the model
+    // answers it takes a NUMERIC agent_id only (get_sca_checks, get_sca_results; every other
+    // agent-scoped tool accepts a name -- get_fim_files was in this list until explain-wave phase
+    // 5, which gave it an `agent_name` parameter precisely because pricing that detour into the
+    // schema is what drove the model to the escape hatch instead on EV2-FIM-001). The clause
+    // itself is unchanged and stays tool-agnostic; only this list of witnesses shrank. The
+    // measured failure is not that the model
     // asked for an id: it called get_sca_checks(result: "failed") with the agent parameter simply
     // OMITTED, as if omitting it meant "across all agents". It does not -- omission triggers
     // sole-active-agent resolution (see the paragraph above), so the call silently answered about
@@ -630,6 +641,25 @@ export function buildSystemPrompt(nowIso: string): string {
       'search_findings_by_rule_tag with a wazuh.rule.tags value, or aggregate by rule first with ' +
       'get_top_rules to discover ids. If a narrowly-filtered query returns 0 rows for activity ' +
       'that plausibly exists, retry once with a broader filter before concluding there were none.',
+    // EXPLAIN-WAVE PHASE 5 -- the single dominant failure class left in eval run 20260825-193632:
+    // seven of the thirteen judged items still below target (EV2-EXP-001/002/006/008/012/014/018)
+    // issued ONE over-narrow or malformed query, got zero rows, and abstained. A "retry once with
+    // a broader filter" clause already existed, but only as the tail of the rule-ids rule below,
+    // where it reads as advice about rule ids specifically -- and, more importantly, the model
+    // could not obey it: chat.ts's futility stop took the tools away for the next round the moment
+    // a round's only successful call came back empty. `shouldGrantZeroRowWideningRound` (chat.ts)
+    // now leaves exactly one tool-bearing round open for this, so this clause is the half that
+    // says what to spend it on. Stated as ONE attempt, with the three concrete moves, because the
+    // affordance is one round and the latency tail is already the phase-4 build's stated cost.
+    'When a query comes back with zero rows and you believe the thing asked about plausibly ' +
+      'exists, make EXACTLY ONE more attempt before saying you found nothing -- one, not a series. ' +
+      'Spend it on whichever of these fits: drop the narrowest filter (the tightest time window, ' +
+      'the severity, the one extra term), correct a filter VALUE you suspect was wrong (check it ' +
+      'with get_field_values rather than guessing a second spelling), or switch to the surface ' +
+      'that actually holds the data (state indices vs findings vs events). If that second attempt ' +
+      'is also empty, stop and report the absence -- name both queries you ran so the user can ' +
+      'see the scope you actually covered. Never make a third variation, and never abstain on the ' +
+      'first zero-row result alone.',
     // #8915: suggest_discover_query is attached to the tool list on every tool-bearing round, but
     // measured live traffic showed it was NEVER invoked — including on the turns it exists for:
     // an empty domain, a zero-row result, or a truncated sample. Nothing here named WHEN calling

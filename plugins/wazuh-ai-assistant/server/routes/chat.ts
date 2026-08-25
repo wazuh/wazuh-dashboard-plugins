@@ -695,6 +695,50 @@ export function isRoundFutile(
 }
 
 /**
+ * ZERO-ROW WIDENING GRACE (explain-wave phase 5) -- exactly ONE extra tool-bearing round after the
+ * turn's FIRST all-zero-row round, and never more.
+ *
+ * The measured defect (eval run 20260825-193632, RESULTS.md "every judged item still below 8"):
+ * seven of the thirteen below-target items -- EV2-EXP-001/002/006/008/012/014/018 -- stop after a
+ * SINGLE over-narrow or malformed query and then abstain, and the reason is mechanical rather than
+ * a prompt-compliance failure. `isRoundFutile` above treats "every successful call returned zero
+ * rows" identically to "every successful call was a duplicate", latching
+ * `budgetForcesFinalRoundEarly` at the call site below; the next round is therefore offered NO
+ * tools, so the model physically cannot act on the system prompt's own standing instruction to
+ * "retry once with a broader filter before concluding there were none". The instruction was
+ * already there. The affordance was not.
+ *
+ * The two halves are genuinely different findings: a duplicate proves the model is re-issuing a
+ * query it already ran (spinning -- stop it immediately, as originally designed), while a zero-row
+ * result proves only that the FILTER VALUE did not match, which the prompt elsewhere is explicit
+ * is NOT the same as the data being absent. The first zero-row round is exactly where one widened
+ * or corrected attempt (drop the narrowest filter, fix a suspected wrong value, switch surface) is
+ * worth its latency.
+ *
+ * HARD-BOUNDED, deliberately, because latency is already the phase-4 build's stated cost (total
+ * p95 32.5 s -> 52.4 s):
+ *  - `alreadyGranted` is a per-TURN latch, so the grace is given at most once no matter how many
+ *    zero-row rounds follow -- the second futile round latches the final round exactly as before;
+ *  - a round containing ANY duplicate call is refused outright (that is the spinning shape, and
+ *    granting a retry to it is what would turn this into a loop);
+ *  - the caller still charges the round's cost first and still forces the final round when the
+ *    budget ceiling is spent, so this can never buy a round the budget cannot pay for.
+ *
+ * Returns `true` only when the round should be allowed one more tool-bearing round. Callers must
+ * pass only the round's SUCCESSFUL calls, the same array `isRoundFutile` reads, and must only ask
+ * once `isRoundFutile` has already returned `true`.
+ */
+export function shouldGrantZeroRowWideningRound(opts: {
+  successfulCalls: ReadonlyArray<{ hadRows: boolean; isDuplicate: boolean }>;
+  alreadyGranted: boolean;
+}): boolean {
+  if (opts.alreadyGranted || opts.successfulCalls.length === 0) {
+    return false;
+  }
+  return opts.successfulCalls.every(call => !call.isDuplicate && !call.hadRows);
+}
+
+/**
  * ENUMERABLE-REMAINING heuristic (product design item 3b) -- the CHEAPEST SOUND form, scoped
  * deliberately narrowly rather than attempting general list-detection:
  *
@@ -2469,6 +2513,11 @@ export async function* orchestrate(
   // remains #8911's own, narrower concern -- see `isRoundFutile`'s doc comment for why the two
   // never overlap).
   let budgetForcesFinalRoundEarly = false;
+  // EXPLAIN-WAVE PHASE 5: per-TURN latch for the one-and-only-one zero-row widening round (see
+  // `shouldGrantZeroRowWideningRound`). Set the first time the grace is granted and never reset,
+  // so the second all-zero-row round of a turn closes it out exactly as every futile round did
+  // before -- this is the whole bound that keeps the mechanism from becoming a retry loop.
+  let zeroRowWideningRoundGranted = false;
   // Enumerable-remaining heuristic (product design item 3b): computed ONCE, from the turn's
   // CURRENT (most recent) user message, never re-derived mid-turn (see
   // `extractEnumeratedTargets`'s doc comment for exactly what it does and does not detect).
@@ -3490,7 +3539,27 @@ export async function* orchestrate(
           target => !coveredEnumerationTargets.has(target.toLowerCase()),
         );
       if (isRoundFutile(roundSuccessfulCalls) && !sweepInProgress) {
-        budgetForcesFinalRoundEarly = true;
+        // EXPLAIN-WAVE PHASE 5: the zero-row half of futility gets ONE widening round before the
+        // turn is closed out -- see `shouldGrantZeroRowWideningRound`'s doc comment for the
+        // measured defect (7 of 13 below-target judged items abstained after a single over-narrow
+        // query, unable to obey the prompt's own "retry once with a broader filter" rule because
+        // this branch had already taken the tools away) and for every bound that keeps it to one
+        // round. The duplicate half, and every subsequent futile round, still stop immediately.
+        if (
+          shouldGrantZeroRowWideningRound({
+            successfulCalls: roundSuccessfulCalls,
+            alreadyGranted: zeroRowWideningRoundGranted,
+          })
+        ) {
+          zeroRowWideningRoundGranted = true;
+          // The grace buys a ROUND, never budget: if this round's cost exhausted the ceiling the
+          // turn still ends here, exactly as it would have without the grace.
+          if (totalSpentUnits >= budgetCeiling) {
+            budgetForcesFinalRoundEarly = true;
+          }
+        } else {
+          budgetForcesFinalRoundEarly = true;
+        }
       } else if (totalSpentUnits >= budgetCeiling) {
         const roundHadNewInfo = roundSuccessfulCalls.some(
           call => !call.isDuplicate && call.hadRows,

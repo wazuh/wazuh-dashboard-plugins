@@ -42,7 +42,17 @@ const ORIGINAL_FAMILIES: GenericQueryFamily[] = [
   },
   {
     pattern: 'wazuh-states-*',
-    label: 'current-state data: vulnerabilities, FIM, SCA, inventory',
+    // EXPLAIN-WAVE PHASE 5: the LABEL (not the `pattern`) now names the registry half of FIM
+    // explicitly. The invariant above is about the enum VALUE -- that is the wire contract, and it
+    // is untouched. This string only ever reaches the model as parameter-description prose, and the
+    // bare word "FIM" was reliably read as "the files surface get_fim_files already owns": on eval
+    // run 20260825-193632 the model declined two registry questions outright rather than aim this
+    // pattern at `wazuh-states-fim-registry-*`, which it has covered since this pattern shipped.
+    // The system prompt now carries the full routing rule; this makes the tool's own schema agree
+    // with it instead of quietly implying the narrower reading.
+    label:
+      'current-state data: vulnerabilities, FIM (both file state and Windows registry ' +
+      'keys/values), SCA, inventory',
   },
 ];
 

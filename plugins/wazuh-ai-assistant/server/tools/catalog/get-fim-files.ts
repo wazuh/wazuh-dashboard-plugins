@@ -25,17 +25,41 @@ export const getFimFilesTool: ToolDefinition = {
     description:
       'Lists files tracked by File Integrity Monitoring (FIM) with their CURRENT state — path, ' +
       'last modification time, size, owner, hashes — most recently modified first. Use for ' +
-      '"what monitored files changed recently" or "FIM state of file/path X" questions. Note: ' +
-      'this is current state, not a change-event history.',
+      '"what monitored files changed recently" or "FIM state of file/path X" questions, ' +
+      'including when the host is named rather than numbered ("what changed on win-ws-014"): ' +
+      'scope it with "agent_name" directly, no id lookup needed. Note: this is current state, ' +
+      'not a change-event history, and it covers FILES only — Windows registry keys/values are a ' +
+      'different surface (wazuh-states-fim-registry-*, reachable through search_wazuh_data).',
     parameters: objectSchema(
       {
         agent_id: {
           type: 'string',
           description:
             'Optional numeric Wazuh agent ID to scope to one agent, e.g. "003". Numeric ids only: ' +
-            'an agent NAME here is rejected, so when the user named a host resolve that name to ' +
-            'its id first and pass the id. Leaving this out searches every agent, not the named ' +
-            'one.',
+            'an agent NAME here is rejected -- pass the name as "agent_name" instead, this tool ' +
+            'resolves it itself. Leaving BOTH out searches every agent, not the named one.',
+        },
+        // EXPLAIN-WAVE PHASE 5 -- root cause of the EV2-FIM-001 escape-hatch drift in eval run
+        // 20260825-193632 (tool_selection 1.00 -> 0.00, params 1.00 -> 0.00, and the whole `fim`
+        // family drop). The question -- "which files changed on agent win-ws-014 according to file
+        // integrity monitoring?" -- names the agent by NAME, and until now this tool accepted only
+        // a numeric id. The baseline reached it anyway, but only by burning THREE rounds
+        // (get_field_values -> search_wazuh_data -> get_fim_files "002"); phase 4 then added a
+        // schema line telling the model to "resolve that name to its id first and pass the id",
+        // which priced that detour explicitly and pushed the model to the escape hatch instead,
+        // where `wazuh.agent.name` can simply be filtered in one call. The answer stayed correct
+        // and got FASTER, so no prompt clause telling the model to prefer the named tool was ever
+        // going to hold against that -- the honest fix is to remove the reason: the typed tool now
+        // takes the identifier the user actually said. Same `agent_id`-wins precedence and the same
+        // `match` clause get_agent_inventory's `resolveAgentFilter` uses, and `agent_name` is
+        // already an entity-resolution.ts AGENT_NAME_PARAM_KEYS entry, so the pseudonymization
+        // path that every other agent-name-taking tool gets applies here with no extra wiring.
+        agent_name: {
+          type: 'string',
+          description:
+            'Optional agent NAME to scope to one agent, e.g. "win-ws-014" -- use this whenever ' +
+            'the user named the host rather than numbering it; there is no need to look its id up ' +
+            'first. If both this and "agent_id" are given, "agent_id" wins.',
         },
         path_prefix: {
           type: 'string',
@@ -63,6 +87,16 @@ export const getFimFilesTool: ToolDefinition = {
       typeof params.agent_id === 'string' && params.agent_id.trim() !== ''
         ? validateAgentId(params.agent_id.trim())
         : undefined;
+    // `agent_id` wins when both are supplied -- an exact Manager-API identifier beats the fuzzier
+    // `match`, the same precedence and the same clause shape get_agent_inventory's
+    // `resolveAgentFilter` uses. Read only when no id was given, so an id-scoped call builds a
+    // byte-identical request to the one it built before this parameter existed.
+    const agentName =
+      !agentId &&
+      typeof params.agent_name === 'string' &&
+      params.agent_name.trim() !== ''
+        ? params.agent_name.trim()
+        : undefined;
     const pathPrefix =
       typeof params.path_prefix === 'string' && params.path_prefix.trim() !== ''
         ? params.path_prefix.trim()
@@ -75,8 +109,13 @@ export const getFimFilesTool: ToolDefinition = {
           bool: {
             filter: [
               ...(agentId ? [{ term: { 'wazuh.agent.id': agentId } }] : []),
+              ...(agentName
+                ? [{ match: { 'wazuh.agent.name': agentName } }]
+                : []),
               ...(pathPrefix ? [{ prefix: { 'file.path': pathPrefix } }] : []),
-              ...(!agentId && !pathPrefix ? [{ match_all: {} }] : []),
+              ...(!agentId && !agentName && !pathPrefix
+                ? [{ match_all: {} }]
+                : []),
             ],
           },
         },

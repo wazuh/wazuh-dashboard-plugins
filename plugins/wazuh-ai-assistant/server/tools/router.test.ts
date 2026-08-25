@@ -441,3 +441,29 @@ test('CHAIN_PAIRS: get_events_by_agent chains to find_document_by_field', () => 
   assert.ok(names.includes('get_events_by_agent'));
   assert.ok(names.includes('find_document_by_field'));
 });
+
+// --- EXPLAIN-WAVE PHASE 5: registry FIM must have a category that claims it -------------------
+//
+// Eval run 20260825-193632: EV2-FIM-002 ("did anything write to a Run key on win-ws-014?") made
+// ZERO tool calls -- the sharpest regression in the run -- and EV2-EXP-002 scored 2.6/10 on the
+// same shape. The `fim` category described itself as "current state of monitored files", so
+// nothing in the routing menu claimed Windows registry keys/values, even though the data is
+// reachable: search_wazuh_data is appended to every resolved list and `wazuh-states-*` covers
+// wazuh-states-fim-registry-keys/-values.
+
+test('the fim routing category claims Windows registry keys/values, not only files', () => {
+  const prompt = buildRoutingPrompt('2026-01-01T00:00:00.000Z');
+  const fimLine = prompt.split('\n').find(line => line.startsWith('- fim:'));
+  assert.ok(fimLine, 'the fim category must appear in the routing menu');
+  assert.match(fimLine, /Windows registry keys\/values/);
+  assert.match(fimLine, /Run-key/);
+});
+
+test('routing to fim still resolves a tool that can actually reach the registry surface', () => {
+  // No typed tool reads registry FIM, so the whole route depends on the always-on escape hatch
+  // travelling with the fim category. If that ever stops being true, the prompt's registry
+  // routing rule becomes an instruction the model cannot obey.
+  const names = resolveStage2Tools(['fim']).map(spec => spec.name);
+  assert.ok(names.includes('search_wazuh_data'));
+  assert.ok(names.includes('get_fim_files'));
+});

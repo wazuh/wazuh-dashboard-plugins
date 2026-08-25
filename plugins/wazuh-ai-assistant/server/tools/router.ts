@@ -155,7 +155,15 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
     'CVE/vulnerability data: by agent, by CVE ID, solved, or critical only -- plus the CTI ' +
     "feed's own catalog knowledge about a specific CVE (description, severity, affected " +
     'software), separate from what is actually detected on this deployment.',
-  fim: 'File Integrity Monitoring: current state of monitored files (path, mtime, owner, hashes).',
+  // EXPLAIN-WAVE PHASE 5: "monitored files" alone left Windows registry FIM (Run keys, registry
+  // values) with no category that claims it, so a registry question had to fall through to a
+  // category whose tools cannot answer it. The registry surface has no typed tool, but it IS
+  // reachable -- `search_wazuh_data` is appended to every resolved list (see `resolveStage2Tools`)
+  // and `wazuh-states-*` covers `wazuh-states-fim-registry-*` -- so naming registry HERE is what
+  // makes the reachable route actually reachable from routing.
+  fim:
+    'File Integrity Monitoring: current state of monitored files (path, mtime, owner, hashes), ' +
+    'and Windows registry keys/values (e.g. Run-key writes).',
   sca:
     'Security Configuration Assessment (SCA): per-agent compliance benchmark results (e.g. CIS ' +
     'Ubuntu), NOT Security Analytics pipeline policies.',

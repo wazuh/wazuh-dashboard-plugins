@@ -15,6 +15,7 @@ import {
   noTextFallbackMessage,
   orchestrate,
   shouldGrantBudgetExtension,
+  shouldGrantZeroRowWideningRound,
   toolCallCostUnits,
 } from './chat';
 import { getToolCostClass, getToolDefinition } from '../tools/registry';
@@ -130,6 +131,88 @@ test('isRoundFutile: at least one successful call had new, non-duplicate rows --
       { hadRows: true, isDuplicate: false },
     ]),
     false,
+  );
+});
+
+// --- shouldGrantZeroRowWideningRound: the ONE widening round (explain-wave phase 5) ---------
+//
+// Measured defect (eval run 20260825-193632): seven of the thirteen judged items still below
+// target -- EV2-EXP-001/002/006/008/012/014/018 -- issued a single over-narrow query, got zero
+// rows and abstained. `isRoundFutile` above latched the final round on that first empty result, so
+// the system prompt's own "retry once with a broader filter" instruction was unobeyable: the next
+// round was offered no tools. These tests pin every bound that keeps the fix to exactly one round.
+
+test('zero-row widening: the FIRST all-zero-row round of a turn earns one more round', () => {
+  assert.equal(
+    shouldGrantZeroRowWideningRound({
+      successfulCalls: [{ hadRows: false, isDuplicate: false }],
+      alreadyGranted: false,
+    }),
+    true,
+  );
+});
+
+test('zero-row widening: granted at most ONCE per turn -- the second empty round stops', () => {
+  // The whole latency bound. Without this the mechanism is a retry loop, and total p95 is already
+  // +61% on the phase-4 build.
+  assert.equal(
+    shouldGrantZeroRowWideningRound({
+      successfulCalls: [{ hadRows: false, isDuplicate: false }],
+      alreadyGranted: true,
+    }),
+    false,
+  );
+});
+
+test('zero-row widening: a round containing a DUPLICATE call earns nothing', () => {
+  // Duplicate = the model is re-issuing a query it already ran (spinning). That is the half of
+  // futility the original design is right about; only the zero-row half gets the grace.
+  assert.equal(
+    shouldGrantZeroRowWideningRound({
+      successfulCalls: [
+        { hadRows: false, isDuplicate: false },
+        { hadRows: false, isDuplicate: true },
+      ],
+      alreadyGranted: false,
+    }),
+    false,
+  );
+});
+
+test("zero-row widening: a round that returned rows is not this mechanism's concern", () => {
+  assert.equal(
+    shouldGrantZeroRowWideningRound({
+      successfulCalls: [{ hadRows: true, isDuplicate: false }],
+      alreadyGranted: false,
+    }),
+    false,
+  );
+});
+
+test('zero-row widening: an all-rejected round (no successful calls) earns nothing', () => {
+  // Same non-overlap `isRoundFutile` keeps with #8911: an all-rejected round is
+  // shouldEnterFinalRoundEarly's territory and has its own retry allowance already.
+  assert.equal(
+    shouldGrantZeroRowWideningRound({
+      successfulCalls: [],
+      alreadyGranted: false,
+    }),
+    false,
+  );
+});
+
+test('zero-row widening: only fires where isRoundFutile already said the round was futile', () => {
+  // The call site asks this question strictly inside the `isRoundFutile` branch, so every input
+  // that earns the grace must also be futile -- otherwise the grace would silently widen a
+  // productive round's budget too.
+  const granted = [{ hadRows: false, isDuplicate: false }];
+  assert.equal(isRoundFutile(granted), true);
+  assert.equal(
+    shouldGrantZeroRowWideningRound({
+      successfulCalls: granted,
+      alreadyGranted: false,
+    }),
+    true,
   );
 });
 

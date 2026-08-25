@@ -819,31 +819,64 @@ test(
   },
 );
 
-test(
-  'CV-058 fix: Windows registry FIM questions get a dedicated honest-empty decline (no tool ' +
-    'reads it), not a bare zero-row table',
-  () => {
-    const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
-    assert.match(
-      prompt,
-      /Windows registry FIM changes \(registry keys\/values\)/,
-    );
-    assert.match(
-      prompt,
-      /I don't have Windows registry change data — that's not available in the AI assistant at the moment\./,
-    );
-  },
-);
+// EXPLAIN-WAVE PHASE 5 -- CV-058's registry-FIM DECLINE is gone, replaced by a ROUTE.
+//
+// The decline ("Windows registry FIM changes (registry keys/values): no tool reads this") was true
+// when CV-058 wrote it and has been false since workstream A1a widened search_wazuh_data's
+// index_pattern enum: `wazuh-states-*` covers wazuh-states-fim-registry-keys/-values, both
+// allowlisted by guardrails.ts. Because the decline fired BEFORE any query, the model never
+// reached data that exists -- on eval run 20260825-193632 EV2-FIM-002 ("did anything write to a
+// Run key on win-ws-014?") emitted the decline copy verbatim with ZERO tool calls while the
+// HKLM\...\CurrentVersion\Run\SecurityUpdater value sat one escape-hatch query away, and
+// EV2-EXP-002 scored 2.6/10 for the same reason. These tests hold the replacement in place: the
+// route must be stated, the decline copy must be gone, and the absence claim must stay gated
+// behind an actual zero-row result.
+test('phase 5: registry FIM is ROUTED to the escape hatch, never declined up front', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /never decline a registry question before querying it/);
+  assert.match(
+    prompt,
+    /search_wazuh_data with index_pattern "wazuh-states-\*"/,
+  );
+  assert.match(prompt, /wazuh-states-fim-registry-keys/);
+  assert.match(prompt, /wazuh-states-fim-registry-values/);
+});
+
+test('phase 5: the old registry decline copy is gone from the prompt entirely', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.doesNotMatch(
+    prompt,
+    /I don't have Windows registry change data/,
+    'the decline copy EV2-FIM-002 recited verbatim, with zero tool calls',
+  );
+  assert.doesNotMatch(
+    prompt,
+    /Windows registry FIM changes \(registry keys\/values\)/,
+  );
+});
+
+test('phase 5: an absence claim about registry data is gated behind a real zero-row result', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /Only after such a query comes back with zero rows may you state an absence/,
+  );
+  assert.match(
+    prompt,
+    /never a product limit/,
+    'the narrow "nothing matched" fact is not the same claim as "the product cannot read this"',
+  );
+});
 
 // EXPLAIN-WAVE PHASE 4 -- the one fabrication the judge flagged in eval run 20260825-174333 was
-// this decline's own copy, recited verbatim. It used to assert "this deployment's monitored hosts
-// are Linux-only, so no registry documents exist here either": a claim about the customer's fleet
-// hardcoded in a first-party prompt string, true only of whatever deployment CV-058 was written
-// against. On EV2-EXP-002 the model repeated it on a fleet with four Windows hosts and scored 1/10
-// on groundedness. No tool call ran on that turn, so no synthesis path is implicated -- the
-// sentence was authored in this file. The product limit is real and stays; the environment claim
-// must never come back, here or in any other decline's copy.
-test('phase 4: no decline copy asserts what platforms this deployment monitors', () => {
+// the registry decline's own copy, recited verbatim. It used to assert "this deployment's
+// monitored hosts are Linux-only, so no registry documents exist here either": a claim about the
+// customer's fleet hardcoded in a first-party prompt string, true only of whatever deployment
+// CV-058 was written against. On EV2-EXP-002 the model repeated it on a fleet with four Windows
+// hosts and scored 1/10 on groundedness. Phase 5 deleted the decline that carried it, so this test
+// now guards the RULE rather than the decline: the ban travelled onto the replacement route
+// deliberately, because the fabrication shape is about registry FIM, not about declining.
+test('phase 4/5: no copy asserts what platforms this deployment monitors', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.doesNotMatch(prompt, /Linux-only/);
   assert.doesNotMatch(prompt, /monitored hosts are/);
@@ -851,6 +884,44 @@ test('phase 4: no decline copy asserts what platforms this deployment monitors',
     prompt,
     /never assert anything about which platforms this deployment monitors or whether registry documents exist here/,
   );
+});
+
+// --- EXPLAIN-WAVE PHASE 5: the bounded widening retry -------------------------------------------
+// Seven of the thirteen judged items still below target in run 20260825-193632
+// (EV2-EXP-001/002/006/008/012/014/018) stopped after ONE zero-row query. The prompt half of the
+// fix is this clause; the affordance half is chat.ts's `shouldGrantZeroRowWideningRound`, without
+// which the model has no tool-bearing round left to obey it in.
+test('phase 5: one widened attempt is required before declaring nothing found', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /make EXACTLY ONE more attempt before saying you found nothing/,
+  );
+  assert.match(prompt, /never abstain on the first zero-row result alone/);
+});
+
+test('phase 5: the widening clause is hard-capped at one retry, not a loop', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  const clause = prompt.slice(
+    prompt.indexOf('When a query comes back with zero rows'),
+  );
+  const sentence = clause.slice(
+    0,
+    clause.indexOf('first zero-row result alone'),
+  );
+  assert.match(
+    sentence,
+    /one, not a series/,
+    'latency tail is already the phase-4 build cost -- the cap has to be stated, not implied',
+  );
+  assert.match(sentence, /Never make a third variation/);
+});
+
+test('phase 5: the widening clause names the three concrete moves to spend the retry on', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /drop the narrowest filter/);
+  assert.match(prompt, /correct a filter VALUE you suspect was wrong/);
+  assert.match(prompt, /switch to the surface that actually holds the data/);
 });
 
 // Same answer, second defect: it opened with "This is one of the five fixed-scope decline cases:",
