@@ -182,7 +182,16 @@ test('FINAL_ROUND_ANSWER_INSTRUCTION: constrains every FACT to the gathered resu
   );
   assert.match(
     FINAL_ROUND_ANSWER_INSTRUCTION,
-    /must come from the tool results already\s+gathered/i,
+    /must come from the tool results already gathered/i,
+  );
+  // The enumeration must stay OPEN. A closed list ("counts, names, ids, entities, timestamps,
+  // statuses") is narrower than the blanket ban it replaced: CVSS scores, package versions, IPs,
+  // ports, file paths and SCA control numbers all fall outside it, and a model reads a closed list
+  // as the boundary of the rule. Pin the non-exhaustiveness and the catch-all, not the examples.
+  assert.match(FINAL_ROUND_ANSWER_INSTRUCTION, /including but not limited to/i);
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /any other data point describing what is in this deployment/i,
   );
   assert.match(
     FINAL_ROUND_ANSWER_INSTRUCTION,
@@ -217,7 +226,18 @@ test('FINAL_ROUND_ANSWER_INSTRUCTION: permits general security knowledge for the
   );
   assert.match(
     FINAL_ROUND_ANSWER_INSTRUCTION,
-    /why it matters, how it is detected, or how to protect against it/i,
+    /why it matters, how that class of activity is typically detected, or how to protect against it/i,
+  );
+  // Detection provenance is NOT on the advisory side. "How it is detected" as a licensed knowledge
+  // topic invites an invented rule id or detector name when only get_mitre_findings ran, so the
+  // generic case is knowledge and the deployment-specific one stays a grounded fact.
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /What detected something HERE \(rule ids, rule titles, detectors\) is one of those facts, not general knowledge/,
+  );
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /if the results do not name it, say so instead of guessing/i,
   );
 });
 

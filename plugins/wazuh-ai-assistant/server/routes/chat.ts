@@ -532,7 +532,14 @@ const NO_ANSWER_MESSAGE =
  *    The split is between FACTS ABOUT THIS ENVIRONMENT (grounded, no exceptions) and
  *    INTERPRETATION (general security knowledge, permitted but clearly separated and hedged),
  *    which is the same shape as the shipped Group E how-to policy in prompts.ts: answer from
- *    general knowledge, mark it, never dress it up as observed fact.
+ *    general knowledge, mark it, never dress it up as observed fact. Two details are load-bearing
+ *    there: the DATA list is explicitly non-exhaustive ("including but not limited to ... any
+ *    other data point"), because a closed list lets CVSS scores, versions, IPs, ports and paths
+ *    fall through the ban the blanket wording used to cover; and detection provenance is on the
+ *    DATA side -- how a class of activity is TYPICALLY detected is knowledge, but what detected
+ *    this HERE is a rule id or detector name, which is exactly the kind of fact a model will
+ *    happily invent. The fence itself is duplicated in buildSystemPrompt because this instruction
+ *    only fires on a final, tool-using round, while the allowance there applies to every round.
  *  - "If they do not answer the question, say so plainly" gives the model a licensed exit, so the
  *    honest outcome stays reachable rather than being squeezed out by the request for text.
  *  - no mention of tools being unavailable: the round already omits `tools` entirely, and naming
@@ -566,12 +573,16 @@ const NO_ANSWER_MESSAGE =
 export const ROUND_TEXT_SEPARATOR = '\n\n';
 
 export const FINAL_ROUND_ANSWER_INSTRUCTION =
-  "Now answer the user's question directly. Every FACT about this environment -- counts, " +
-  'names, ids, entities, timestamps, statuses -- must come from the tool results already ' +
-  'gathered in this conversation: never state a data point the results do not show, and if ' +
-  'they do not answer the question, say so plainly and state what is missing. Explanation and ' +
-  'recommendations are the exception: when the question asks what an event, technique, rule or ' +
-  'vulnerability means, why it matters, how it is detected, or how to protect against it, you ' +
+  "Now answer the user's question directly. Every FACT about this environment -- including but " +
+  'not limited to counts, names, ids, entities, timestamps, statuses, versions, scores, ' +
+  'addresses, ports, paths, control numbers, and any other data point describing what is in ' +
+  'this deployment -- must come from the tool results already gathered in this conversation: ' +
+  'never state a data point the results do not show, and if they do not answer the question, ' +
+  'say so plainly and state what is missing. What detected something HERE (rule ids, rule ' +
+  'titles, detectors) is one of those facts, not general knowledge: if the results do not name ' +
+  'it, say so instead of guessing. Explanation and recommendations are the exception: when the ' +
+  'question asks what an event, technique, rule or vulnerability means, why it matters, how ' +
+  'that class of activity is typically detected, or how to protect against it, you ' +
   'MAY use your general security knowledge -- keep it in a clearly separate part of the answer, ' +
   'framed as guidance rather than as something observed in the data, and note that it should be ' +
   'verified before acting on it. Never present general knowledge as an environment fact, and ' +

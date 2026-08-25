@@ -880,26 +880,66 @@ test('explain-wave: explain/assess/advise intents are exempted from the word, bu
   );
 });
 
-test('explain-wave: the explanatory answer shape is what happened -> why it matters/how detected -> actions with rationale', () => {
+test('explain-wave: the explanatory answer shape is what happened/how detected -> why it matters -> actions with rationale', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  // Detection provenance belongs to the GROUNDED part. Listing "how it was detected" among the
+  // knowledge topics licenses an invented rule id or detector name when nothing returned one, so
+  // part (1) owns what detected it here and part (2) owns only the generic pattern.
+  assert.match(
+    prompt,
+    /\(1\) what happened AND how it was detected here \(rule ids, rule titles, detectors, and every other fact about this environment strictly from the results in hand/,
+  );
+  assert.match(
+    prompt,
+    /if the results do not name what detected it, say so instead of guessing/,
+  );
+  assert.match(
+    prompt,
+    /\(2\) why it matters, and how this class of activity is typically detected or abused in general/,
+  );
+  assert.match(
+    prompt,
+    /\(3\) the recommended next actions, each with a one-line rationale/,
+  );
+});
+
+test('explain-wave: the system-prompt allowance carries its own fence, so a non-final round is safe too', () => {
+  // The door and the fence must ship together. FINAL_ROUND_ANSWER_INSTRUCTION only fires when a
+  // round is BOTH final and tool-using, while this paragraph is in every round's system prompt --
+  // so a round-1 answer (the common case) would get the knowledge allowance with none of the
+  // safety clauses if they lived only in chat.ts. Each clause is pinned here.
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
-    /\(1\) what happened, strictly from the results in hand/,
+    /Parts \(2\) and \(3\) may draw on your general security knowledge/,
   );
-  assert.match(prompt, /\(2\) why it matters and how it was detected/);
+  assert.match(prompt, /keep them clearly separate from part \(1\)/);
   assert.match(
     prompt,
-    /\(3\) the recommended next actions, each with\s+a one-line rationale/,
+    /frame them as guidance rather than as something observed in this environment/,
   );
+  assert.match(prompt, /say they should be verified before acting on them/);
+  assert.match(
+    prompt,
+    /never present general knowledge as an environment fact/,
+  );
+  assert.match(prompt, /never invent data to support it/);
 });
 
 test('explain-wave: the relaxation does not lift the no-headings, no-table or grounding rules', () => {
   // The markdown-table filter (markdown-table-filter.ts) still strips tables from prose, and the
   // grounding rule is the one thing no intent may relax -- a richer SHAPE must not become a licence
-  // to state data the results do not contain.
+  // to state data the results do not contain. The grounding clause is scoped to environment data
+  // rather than to "anything the results do not show", which parts (2) and (3) contradict.
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
-    /Still no headings and no markdown tables, still no data point the\s+results do not show/,
+    /Still no headings and no markdown tables, still no data point about this environment that the results do not show/,
+  );
+  // A longer answer does not outgrow the two obligations the default format bullet carries, and
+  // the three-part paragraph supersedes that bullet, so it has to re-state them itself.
+  assert.match(
+    prompt,
+    /the truncation disclosure and the ban on enumerating individual rows or timestamps in prose still apply/,
   );
 });

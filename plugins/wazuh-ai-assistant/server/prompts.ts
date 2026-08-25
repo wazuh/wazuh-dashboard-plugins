@@ -98,14 +98,32 @@ export function buildSystemPrompt(nowIso: string): string {
     // research-competitors.md section 2: enrich -> narrate -> advise, with Microsoft's guided
     // response carrying a rationale per recommended action) and matches the SCA synthesis rule
     // already in this prompt: lead with WHY it matters, then WHAT to do.
+    //
+    // The allowance carries its own fence, deliberately duplicating FINAL_ROUND_ANSWER_INSTRUCTION
+    // (chat.ts): that instruction only fires when a round is BOTH final and tool-using, so a
+    // round-1 answer -- the common case -- would otherwise get the licence with none of the safety
+    // clauses. Detection provenance sits in part (1), not part (2): what detected something HERE
+    // (rule id, rule title, detector) is an environment fact, and only how a class of activity is
+    // typically detected is knowledge. The two obligations the format bullet above carries that a
+    // longer answer does not outgrow -- disclosing truncation, and not enumerating rows or
+    // timestamps in prose -- are re-stated so this paragraph cannot be read as dropping them.
     'That format is for lookup, count, and status questions. When the user asks you to EXPLAIN, ' +
       'assess, or advise -- what an event, technique, rule or vulnerability means, why it ' +
-      'matters, how it was detected, or what to do about it -- the roughly-120-word cap, the ' +
-      'three-bullet cap and the "do not assess risk unless asked" rule do NOT apply. Answer in ' +
-      'three ordered parts instead: (1) what happened, strictly from the results in hand; ' +
-      '(2) why it matters and how it was detected; (3) the recommended next actions, each with ' +
-      'a one-line rationale. Still no headings and no markdown tables, still no data point the ' +
-      'results do not show, and keep each part as short as it can be while still explaining.',
+      'matters, or what to do about it -- the roughly-120-word cap, the three-bullet cap and ' +
+      'the "do not assess risk unless asked" rule do NOT apply. Answer in three ordered parts ' +
+      'instead: (1) what happened AND how it was detected here (rule ids, rule titles, ' +
+      'detectors, and every other fact about this environment strictly from the results in ' +
+      'hand -- if the results do not name what detected it, say so instead of guessing); ' +
+      '(2) why it matters, and how this class of activity is typically detected or abused in ' +
+      'general; (3) the recommended next actions, each with a one-line rationale. Parts (2) ' +
+      'and (3) may draw on your general security knowledge: keep them clearly separate from ' +
+      'part (1), frame them as guidance rather than as something observed in this environment, ' +
+      'and say they should be verified before acting on them -- never present general ' +
+      'knowledge as an environment fact and never invent data to support it. Still no headings ' +
+      'and no markdown tables, still no data point about this environment that the results do ' +
+      'not show, and the truncation disclosure and the ban on enumerating individual rows or ' +
+      'timestamps in prose still apply. Keep each part as short as it can be while still ' +
+      'explaining.',
     // Emphasis guidance exists because the UI renders markdown but the model only sometimes
     // emitted any, so answers looked inconsistently formatted turn to turn (UX iteration 3:
     // "the highlights in the conversations are random?"). Scannability inside an answer comes
