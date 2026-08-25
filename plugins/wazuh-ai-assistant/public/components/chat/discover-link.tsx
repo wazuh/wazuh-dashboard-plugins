@@ -6,9 +6,10 @@ import { TableSpec } from '../../../common/types';
 import {
   buildDiscoverUrl,
   DEFAULT_TIME_RANGE,
+  describeTimeRangeCoverage,
   extractTimeRange,
-  hasExplicitTimeRange,
 } from '../../../common/discover-url';
+import { shortDateMath } from './tool-call-label';
 
 export type ResolveDiscoverUrl = (spec: TableSpec) => Promise<string | null>;
 
@@ -72,7 +73,17 @@ export function createDiscoverUrlResolver(core: CoreStart): ResolveDiscoverUrl {
     const discoverAppUrl = core.http.basePath.prepend(
       '/app/data-explorer/discover',
     );
-    const timeRange = extractTimeRange(spec.discover.dsl);
+    // `provenance.executedAt` is the reference the SERVER resolved this DSL's own window against
+    // when it recorded `provenance.effectiveRange` (executor.ts). Passing it back in is what makes
+    // the window this link opens and the window the evidence popover states the same computation
+    // over the same clauses — a multi-clause DSL whose bounds mix date-math and ISO can only be
+    // intersected identically on both sides if both sides order it against the same instant
+    // (issue #9008 review, F1). Absent on a conversation persisted before that field existed, in
+    // which case both sides fall back to the same unordered result.
+    const timeRange = extractTimeRange(
+      spec.discover.dsl,
+      spec.provenance?.executedAt,
+    );
     return buildDiscoverUrl({
       discoverAppUrl,
       indexPatternId,
@@ -95,6 +106,109 @@ interface DiscoverLinkProps {
 function defaultRangeWindowLabel(): string {
   const match = /^now-(\d+[dhm])$/.exec(DEFAULT_TIME_RANGE.from);
   return match ? match[1] : DEFAULT_TIME_RANGE.from;
+}
+
+/**
+ * Short rendering of the ONE bound a one-sided range clause stated, for the partial-range
+ * disclosure below.
+ *
+ * A date-math bound goes through `shortDateMath` — the SAME shorthand the provenance chip beside
+ * this button renders its window with (issue #9008 review, F5), so `now-90d` reads "90d" in both
+ * places rather than "90d" on the chip and "now-90d" one control away. `now` itself is not that
+ * shape and stays literal.
+ *
+ * An ISO instant becomes a locale date with NO time-of-day, unlike tool-call-label.ts's
+ * `formatInstant` which needs it: this string goes inside a button label that already carries
+ * "Open in Discover" plus the disclosure wording, and the whole label has to stay short enough not
+ * to wrap in the narrow (sidecar) panel — a full ISO instant alone is 24 characters.
+ *
+ * The locale is OSD's own (`i18n.getLocale()`, guarded exactly as conversation-list.tsx's
+ * `formatRelativeTime` guards it — the test environment's i18n stub does not implement it), NOT
+ * `undefined`, which would hand `Intl` the host's locale and print an English month name inside a
+ * Spanish sentence (issue #9008 review, F4). Anything unparseable is passed through untouched
+ * rather than guessed at.
+ */
+function shortBoundLabel(value: string): string {
+  const dateMath = shortDateMath(value);
+  if (dateMath) {
+    return dateMath;
+  }
+  const parsed = Date.parse(value);
+  if (Number.isNaN(parsed)) {
+    return value;
+  }
+  const locale =
+    typeof i18n.getLocale === 'function' ? i18n.getLocale() : undefined;
+  try {
+    return new Intl.DateTimeFormat(locale, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(new Date(parsed));
+  } catch {
+    // Same defensive shape as `formatRelativeTime`: an unsupported locale tag must never take the
+    // whole result card's header down with it.
+    return new Date(parsed).toLocaleDateString();
+  }
+}
+
+/**
+ * The button's label, disclosing whatever the link had to fill in that the query did not state
+ * (`describeTimeRangeCoverage`, common/discover-url.ts):
+ *
+ *  - `stated` — the query bounded both edges, so the link opens exactly the window it ran against
+ *    and there is nothing to disclose.
+ *  - `defaulted` — no range clause at all, so the whole window is `DEFAULT_TIME_RANGE`. Issue #9008
+ *    (I5): the QA E2E review's broader claim that this link "hardcodes now-24h" was checked and is
+ *    inaccurate; the real, narrower gap was that this one case looked identical to every other
+ *    link, giving no hint the window it opens may not match the one the answer above it used.
+ *  - `openStart`/`openEnd` — a ONE-SIDED clause ("findings before X"). Issue #9008 review, finding
+ *    1: this case used to render the plain label, because the query HAD stated a window and the
+ *    default-range check only fires when none was stated at all. Worse, the missing lower bound was
+ *    filled from `now-24h`, so an `lte`-only clause bounded in the past opened an inverted window
+ *    Discover showed nothing for. The fill direction is fixed in `UNBOUNDED_TIME_RANGE`; this says
+ *    out loud which edge the query left open, in the same label slot and style as the other
+ *    disclosure (no second UI element), and short enough not to wrap in the narrow panel.
+ */
+function discoverLinkLabel(
+  dsl: Record<string, unknown> | undefined,
+  executedAt: number | undefined,
+): string {
+  const { coverage, statedBound } = describeTimeRangeCoverage(dsl, executedAt);
+  switch (coverage) {
+    case 'defaulted': {
+      return i18n.translate(
+        'wazuhAiAssistant.resultTable.openInDiscoverDefaultRange',
+        {
+          defaultMessage: 'Open in Discover (default range: {window})',
+          values: { window: defaultRangeWindowLabel() },
+        },
+      );
+    }
+    case 'openStart': {
+      return i18n.translate(
+        'wazuhAiAssistant.resultTable.openInDiscoverOpenStart',
+        {
+          defaultMessage: 'Open in Discover (up to {bound} — no start date)',
+          values: { bound: shortBoundLabel(statedBound ?? '') },
+        },
+      );
+    }
+    case 'openEnd': {
+      return i18n.translate(
+        'wazuhAiAssistant.resultTable.openInDiscoverOpenEnd',
+        {
+          defaultMessage: 'Open in Discover (from {bound} — no end date)',
+          values: { bound: shortBoundLabel(statedBound ?? '') },
+        },
+      );
+    }
+    default: {
+      return i18n.translate('wazuhAiAssistant.resultTable.openInDiscover', {
+        defaultMessage: 'Open in Discover',
+      });
+    }
+  }
 }
 
 /**
@@ -132,14 +246,13 @@ export const DiscoverLink: React.FC<DiscoverLinkProps> = ({
     return null;
   }
 
-  // Issue #9008 (I5): `resolveDiscoverUrl` (above) falls back to the last-24h default window
-  // ONLY when `spec.discover.dsl` carries no explicit, recognizable time-range clause at all
-  // (`hasExplicitTimeRange` / `extractTimeRange`, common/discover-url.ts) — every other query
-  // opens Discover to the SAME window it actually ran against. The QA E2E review's broader claim
-  // that this link "hardcodes now-24h" was checked and is inaccurate; the real, narrower gap is
-  // that this range-less fallback case looked identical to every other link, giving no hint the
-  // window it opens to may not match the one the answer above it used.
-  const isRangeLessFallback = !hasExplicitTimeRange(spec.discover?.dsl);
+  // One label slot, four wordings — see `discoverLinkLabel` above for what each discloses. Same
+  // `executedAt` reference the href was resolved with, so the label can only ever describe the
+  // window this button actually opens.
+  const label = discoverLinkLabel(
+    spec.discover?.dsl,
+    spec.provenance?.executedAt,
+  );
 
   return (
     <EuiButtonEmpty
@@ -148,18 +261,12 @@ export const DiscoverLink: React.FC<DiscoverLinkProps> = ({
       href={url}
       target='_blank'
       rel='noopener noreferrer'
+      // The label ellipses in a narrow container (result-table.scss's `.wzResultsCardActions`),
+      // so the full wording has to stay reachable somewhere: `title` is that somewhere, and it
+      // costs nothing when the label fits.
+      title={label}
     >
-      {isRangeLessFallback
-        ? i18n.translate(
-            'wazuhAiAssistant.resultTable.openInDiscoverDefaultRange',
-            {
-              defaultMessage: 'Open in Discover (default range: {window})',
-              values: { window: defaultRangeWindowLabel() },
-            },
-          )
-        : i18n.translate('wazuhAiAssistant.resultTable.openInDiscover', {
-            defaultMessage: 'Open in Discover',
-          })}
+      {label}
     </EuiButtonEmpty>
   );
 };
