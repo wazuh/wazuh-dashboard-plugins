@@ -12,6 +12,8 @@ import {
   scrubFieldValue,
   FieldPolicyEntry,
   FIELD_POLICY_DEFAULTS,
+  IDENTIFIER_BEARING_FREE_TEXT_FIELDS,
+  PREMINT_HOST_FIELDS,
 } from './privacy';
 import { Digest } from './digest';
 import { WAZUH_FIELD } from '../../common/wazuh-fields';
@@ -2639,4 +2641,502 @@ test('applyFieldPolicy: search_wazuh_data still anonymizes an unlisted field on 
     out.samples[0]['document.containers.cna.rejectedReasons'] as string,
     /^VAL_\d+$/,
   );
+});
+
+// --- #8974: usernames quoted inside an `allow` prose field (rule.title & co) --------------------
+// The reported leak: with privacy mode ON, `wazuh.rule.title` reached the provider as
+// "Successful user authentication - vagrant". `rule.title` is explicit 'allow' (unscanned by
+// design), and the shape scan that runs over it downstream only matches IP/FQDN shapes -- a bare,
+// dotless username has no shape. These tests pin the two halves of the fix (the prose fields'
+// identifier-only dictionary scan, and the same-digest username pre-mint that makes sample key
+// order irrelevant) plus the false-positive guards that keep ordinary words out of it.
+
+test('applyFieldPolicy: a bare username in rule.title is scrubbed when the same digest carries it in a user field', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_findings',
+    samples: [
+      {
+        // Deliberately BEFORE the user field: the title used to be scrubbed while `vagrant` was
+        // still unknown to the pseudonymizer, which is exactly what `premintProseScanIdentifiers` fixes.
+        [WAZUH_FIELD.RULE_TITLE]: 'Successful user authentication - vagrant',
+        'source.user.name': 'vagrant',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  const title = out.samples[0][WAZUH_FIELD.RULE_TITLE] as string;
+  assert.doesNotMatch(title, /vagrant/i);
+  const token = out.samples[0]['source.user.name'] as string;
+  assert.match(token, /^USER_\d+$/);
+  // Same pseudonym in both places -- the title reuses the mint, never a second one.
+  assert.equal(title, `Successful user authentication - ${token}`);
+  assert.equal(
+    p.reverseText(title),
+    'Successful user authentication - vagrant',
+  );
+});
+
+test('applyFieldPolicy: the username pre-mint also works when the user field comes FIRST in the sample', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_findings',
+    samples: [
+      {
+        'source.user.name': 'auditbot',
+        [WAZUH_FIELD.RULE_TITLE]: 'Failed authentication attempt - auditbot',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  const title = out.samples[0][WAZUH_FIELD.RULE_TITLE] as string;
+  assert.doesNotMatch(title, /auditbot/i);
+  assert.match(title, /^Failed authentication attempt - USER_\d+$/);
+});
+
+test('applyFieldPolicy: a username minted in an EARLIER turn is scrubbed from rule.title with no user field present', () => {
+  // The conversation-scoped case: the pseudonymizer is constructed per request but SEEDED from the
+  // client-held map, so a username minted last turn is still in the dictionary this turn -- which is
+  // the reported scenario, where the finding itself carries no `source.user.name`.
+  const p = new Pseudonymizer([{ value: 'vagrant', pseudonym: 'USER_1' }]);
+  const digest = baseDigest({
+    tool: 'get_findings',
+    samples: [
+      { [WAZUH_FIELD.RULE_TITLE]: 'Successful user authentication - vagrant' },
+    ],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    'Successful user authentication - USER_1',
+  );
+});
+
+test('applyFieldPolicy: a never-seen username in rule.title is the documented remaining residual (unchanged)', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_findings',
+    samples: [
+      { [WAZUH_FIELD.RULE_TITLE]: 'Successful user authentication - vagrant' },
+    ],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    'Successful user authentication - vagrant',
+  );
+});
+
+test('applyFieldPolicy: a common-word username is NOT scrubbed out of prose (stop-list guard)', () => {
+  // "root" is a plausible real account AND an ordinary English word; masking it would corrupt far
+  // more titles than it protects (the F1 failure mode on IDENTIFIER_STOP_WORDS). The user FIELD is
+  // still pseudonymized -- only the prose scan declines it.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_findings',
+    samples: [
+      {
+        [WAZUH_FIELD.RULE_TITLE]: 'Possible root cause: privilege escalation',
+        'source.user.name': 'root',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    'Possible root cause: privilege escalation',
+  );
+  assert.match(out.samples[0]['source.user.name'] as string, /^USER_\d+$/);
+});
+
+test('applyFieldPolicy: the prose scan matches whole tokens only, never a substring of a longer word', () => {
+  const p = new Pseudonymizer([{ value: 'vagrant', pseudonym: 'USER_1' }]);
+  const digest = baseDigest({
+    tool: 'get_findings',
+    samples: [
+      { [WAZUH_FIELD.RULE_TITLE]: 'Rule fired for vagrantbox provisioning' },
+    ],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    'Rule fired for vagrantbox provisioning',
+  );
+});
+
+test('applyFieldPolicy: a non-prose explicit "allow" field is still completely unscanned', () => {
+  // The prose scan is scoped to IDENTIFIER_BEARING_FREE_TEXT_FIELDS -- a curated closed-vocabulary
+  // 'allow' field (here rule.category) keeps its byte-identical passthrough even with its own value
+  // sitting in the dictionary.
+  const p = new Pseudonymizer([
+    { value: 'authentication', pseudonym: 'USER_1' },
+  ]);
+  const digest = baseDigest({
+    tool: 'get_findings',
+    samples: [{ [WAZUH_FIELD.RULE_CATEGORY]: 'authentication' }],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  assert.equal(out.samples[0][WAZUH_FIELD.RULE_CATEGORY], 'authentication');
+});
+
+test('applyFieldPolicy: document.metadata.description gets the prose scan while document.name keeps an FQDN-shaped indicator readable', () => {
+  const p = new Pseudonymizer([{ value: 'dbprod07', pseudonym: 'HOST_1' }]);
+  const digest = baseDigest({
+    tool: 'get_rules',
+    samples: [
+      {
+        'document.metadata.description':
+          'Detects failed logins on dbprod07 hosts',
+        // 'document.name' is a prose member too, but deliberately gets NO shape scan added, so a
+        // third-party threat-intel indicator name stays verbatim.
+        'document.name': 'evil-indicator.example.com',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  assert.equal(
+    out.samples[0]['document.metadata.description'],
+    'Detects failed logins on HOST_1 hosts',
+  );
+  assert.equal(out.samples[0]['document.name'], 'evil-indicator.example.com');
+});
+
+test('FIELD_POLICY_DEFAULTS: every IDENTIFIER_BEARING_FREE_TEXT_FIELDS member has an explicit "allow" entry', () => {
+  // The prose scan is an ADDITION to `allow`, so a member that ever moved to anonymize/never (or
+  // lost its entry) would make this set misleading rather than wrong -- pin the pairing.
+  for (const field of IDENTIFIER_BEARING_FREE_TEXT_FIELDS) {
+    const entry = FIELD_POLICY_DEFAULTS.find(item => item.field === field);
+    assert.ok(entry, `no FIELD_POLICY_DEFAULTS entry for ${field}`);
+    assert.equal(entry?.action, 'allow', `${field} is no longer 'allow'`);
+  }
+});
+
+test('applyFieldPolicy: EVERY prose-set member actually receives the dictionary scan', () => {
+  // Behavioural counterpart to the pairing test above: iterating the set only proves the entries
+  // exist. This drives each member through applyFieldPolicy with a known identifier in the
+  // dictionary, so dropping a member from the set fails here instead of silently reducing coverage.
+  for (const field of IDENTIFIER_BEARING_FREE_TEXT_FIELDS) {
+    const p = new Pseudonymizer([{ value: 'dbprod07', pseudonym: 'HOST_1' }]);
+    const out = applyFieldPolicy(
+      baseDigest({ samples: [{ [field]: 'raised for dbprod07 overnight' }] }),
+      FIELD_POLICY_DEFAULTS,
+      p,
+    );
+    assert.equal(
+      out.samples[0][field],
+      'raised for HOST_1 overnight',
+      `${field} did not get the prose dictionary scan`,
+    );
+  }
+});
+
+test('applyFieldPolicy: the prose set covers each field family the delta review named', () => {
+  // Pins membership itself, so a member cannot be quietly removed: rule/Sigma titles, rule
+  // documentation, custom rule/decoder names, detector monitor names, stored query bodies, and the
+  // CTI consumer endpoint/context (private-mirror hostnames).
+  for (const field of [
+    WAZUH_FIELD.RULE_TITLE,
+    'document.metadata.description',
+    'document.name',
+    'rule.metadata.title',
+    'monitor_name',
+    'queries.name',
+    'queries.query',
+    'rule.queries.value',
+    'resource',
+    'context',
+  ]) {
+    assert.ok(
+      IDENTIFIER_BEARING_FREE_TEXT_FIELDS.has(field),
+      `${field} is no longer a prose-scanned field`,
+    );
+  }
+});
+
+test('scrubFieldValue: a prose field with no policy entry at all still gets the dictionary scan', () => {
+  // Defence in depth for a stored/edited policy that no longer carries the field's own entry: the
+  // allow-by-omission branch composes the dictionary scan on top of its shape scan, for these
+  // fields only.
+  const p = new Pseudonymizer([{ value: 'dbprod07', pseudonym: 'HOST_1' }]);
+  const result = scrubFieldValue(
+    WAZUH_FIELD.RULE_TITLE,
+    'Brute force against dbprod07',
+    [],
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, true);
+  assert.equal(result.value, 'Brute force against HOST_1');
+});
+
+// --- #8974 delta review: curated HOST pre-mint, admin-action interaction, stop-list widening ------
+
+test('applyFieldPolicy: a hostname from a CURATED host field is scrubbed from rule.title in the same digest', () => {
+  // Item 1 of the delta review. The load-bearing case is the PERSISTED digest: whatever text is
+  // baked in here is replayed on every resumed turn with an empty client map, so an unscrubbed
+  // hostname would leak repeatedly. Title deliberately precedes the host field in key order.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_findings',
+    samples: [
+      {
+        [WAZUH_FIELD.RULE_TITLE]: 'Brute force against dbprod07',
+        [WAZUH_FIELD.AGENT_NAME]: 'dbprod07',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  const token = out.samples[0][WAZUH_FIELD.AGENT_NAME] as string;
+  assert.match(token, /^HOST_\d+$/);
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    `Brute force against ${token}`,
+  );
+});
+
+test('applyFieldPolicy: host.hostname is pre-minted for the prose scan too', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_agent_inventory',
+    samples: [
+      {
+        [WAZUH_FIELD.RULE_TITLE]: 'Configuration drift on srv-app-04',
+        'host.hostname': 'srv-app-04',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  const token = out.samples[0]['host.hostname'] as string;
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    `Configuration drift on ${token}`,
+  );
+});
+
+test('applyFieldPolicy: a HOST-kind field OUTSIDE the curated pre-mint list is not pre-minted', () => {
+  // The narrowing that keeps `inferPseudonymKind`'s `.name` -> HOST convention (process.name,
+  // package.name, service.name -- values like "top"/"git") from widening the dictionary and
+  // churning HOST counter numbering. `service.name` is anonymized by its own entry either way; it
+  // is only the PROSE scan that does not see it when the title is scrubbed first.
+  const policy: FieldPolicyEntry[] = [
+    { field: WAZUH_FIELD.RULE_TITLE, action: 'allow' },
+    { field: 'service.name', action: 'anonymize', kind: 'HOST' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    samples: [
+      {
+        [WAZUH_FIELD.RULE_TITLE]: 'Service nagios3 stopped unexpectedly',
+        'service.name': 'nagios3',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(digest, policy, p);
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    'Service nagios3 stopped unexpectedly',
+  );
+  assert.match(out.samples[0]['service.name'] as string, /^HOST_\d+$/);
+});
+
+test('FIELD_POLICY_DEFAULTS: every curated pre-mint host field has an explicit anonymize/HOST entry', () => {
+  // The pre-mint must never invent a mint the samples loop was not already going to make -- so each
+  // curated field has to be a REVIEWED hostname field, not just a plausible name.
+  for (const field of PREMINT_HOST_FIELDS) {
+    const entry = FIELD_POLICY_DEFAULTS.find(item => item.field === field);
+    assert.ok(entry, `no FIELD_POLICY_DEFAULTS entry for ${field}`);
+    assert.equal(entry?.action, 'anonymize', `${field} is not 'anonymize'`);
+    assert.equal(entry?.kind, 'HOST', `${field} is not kind HOST`);
+  }
+});
+
+test('applyFieldPolicy: an admin "never" entry on a prose field still drops it entirely', () => {
+  // The prose scan sits behind every stricter branch, so it can never resurrect a dropped field.
+  const policy: FieldPolicyEntry[] = [
+    { field: WAZUH_FIELD.RULE_TITLE, action: 'never' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    samples: [{ [WAZUH_FIELD.RULE_TITLE]: 'Successful login - vagrant' }],
+  });
+  const out = applyFieldPolicy(digest, policy, p);
+  assert.ok(!(WAZUH_FIELD.RULE_TITLE in out.samples[0]));
+});
+
+test('applyFieldPolicy: an admin "anonymize" entry on a prose field still fully pseudonymizes it', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: WAZUH_FIELD.RULE_TITLE, action: 'anonymize' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    samples: [{ [WAZUH_FIELD.RULE_TITLE]: 'Successful login - vagrant' }],
+  });
+  const out = applyFieldPolicy(digest, policy, p);
+  assert.match(out.samples[0][WAZUH_FIELD.RULE_TITLE] as string, /^VAL_\d+$/);
+});
+
+test('applyFieldPolicy: an admin "allow-scan" entry on a prose field gets the FULL dictionary, not identifiersOnly', () => {
+  // Branch ordering check: `allow-scan` is resolved before the prose branch, so an admin who picks
+  // it gets the stronger (full-dictionary) scan, including VAL-kind entries the prose scan skips.
+  const policy: FieldPolicyEntry[] = [
+    { field: WAZUH_FIELD.RULE_TITLE, action: 'allow-scan' },
+  ];
+  const p = new Pseudonymizer([
+    { value: 'authentication', pseudonym: 'VAL_1' },
+  ]);
+  const digest = baseDigest({
+    samples: [{ [WAZUH_FIELD.RULE_TITLE]: 'Successful authentication' }],
+  });
+  const out = applyFieldPolicy(digest, policy, p);
+  assert.equal(out.samples[0][WAZUH_FIELD.RULE_TITLE], 'Successful VAL_1');
+});
+
+test('applyFieldPolicy: a prose field resolved through a TOOL-SCOPED entry keeps tool-scoped semantics', () => {
+  // A tool-scoped entry wins over the bare one (resolveFieldEntry), and the prose branch resolves
+  // through that same lookup -- so `never` on get_rules/wazuh.rule.title drops the field there while
+  // the bare 'allow' entry still governs any other tool.
+  const policy: FieldPolicyEntry[] = [
+    { field: `get_rules/${WAZUH_FIELD.RULE_TITLE}`, action: 'never' },
+    { field: WAZUH_FIELD.RULE_TITLE, action: 'allow' },
+  ];
+  const p = new Pseudonymizer([{ value: 'vagrant', pseudonym: 'USER_1' }]);
+  const digest = baseDigest({
+    samples: [{ [WAZUH_FIELD.RULE_TITLE]: 'Successful login - vagrant' }],
+  });
+
+  const scoped = applyFieldPolicy(
+    digest,
+    policy,
+    p,
+    undefined,
+    'get_rules',
+    false,
+  );
+  assert.ok(!(WAZUH_FIELD.RULE_TITLE in scoped.samples[0]));
+
+  const other = applyFieldPolicy(
+    digest,
+    policy,
+    p,
+    undefined,
+    'get_findings',
+    false,
+  );
+  assert.equal(
+    other.samples[0][WAZUH_FIELD.RULE_TITLE],
+    'Successful login - USER_1',
+  );
+});
+
+test('applyFieldPolicy: a NON-prose digest is byte-identical, pseudonym counter numbers included', () => {
+  // The pre-mint is gated on the digest carrying a prose field. This pins that (a) a digest without
+  // one is unaffected, and (b) adding a prose field does not perturb THESE fields' tokens.
+  //
+  // (b) is deliberately a claim about this sample only, not a universal property. Pre-minting DOES
+  // reorder mint calls, so a digest whose key order puts a NON-premintable fresh mint of some kind K
+  // before a premintable one of the same kind K would see that kind's counter numbering shift. Every
+  // field in this sample is either premintable (the two user fields, host.hostname) or of a kind no
+  // premintable field shares (source.ip -> IP), and counters are per-kind, so nothing can move here.
+  // A genuinely universal guarantee would need the pre-mint to not mint at all, which is not what it
+  // is for.
+  const sample = {
+    'source.user.name': 'jsmith',
+    'destination.user.name': 'ahmed',
+    'host.hostname': 'srv-app-04',
+    'source.ip': '10.0.2.15',
+  };
+
+  const withoutProse = applyFieldPolicy(
+    baseDigest({ samples: [{ ...sample }] }),
+    FIELD_POLICY_DEFAULTS,
+    new Pseudonymizer(),
+  );
+  assert.deepEqual(withoutProse.samples[0], {
+    'source.user.name': 'USER_1',
+    'destination.user.name': 'USER_2',
+    'host.hostname': 'HOST_1',
+    'source.ip': 'IP_1',
+  });
+
+  const withProse = applyFieldPolicy(
+    baseDigest({
+      samples: [{ ...sample, [WAZUH_FIELD.RULE_TITLE]: 'Nothing to scrub' }],
+    }),
+    FIELD_POLICY_DEFAULTS,
+    new Pseudonymizer(),
+  );
+  for (const key of Object.keys(sample)) {
+    assert.equal(
+      withProse.samples[0][key],
+      withoutProse.samples[0][key],
+      `${key} token changed when a prose field was present`,
+    );
+  }
+});
+
+test('applyFieldPolicy: a common SERVICE-ACCOUNT name is not scrubbed out of prose, but its own field still is', () => {
+  // Item 4 of the delta review. "postgres" is a real account on every PostgreSQL host AND the name
+  // of the software, so it appears in rule titles constantly while identifying nothing specific to
+  // this customer. The stop list applies at SCAN time only -- the account's own field is unaffected.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_findings',
+    samples: [
+      {
+        [WAZUH_FIELD.RULE_TITLE]:
+          'PostgreSQL authentication failure - postgres',
+        'source.user.name': 'postgres',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    'PostgreSQL authentication failure - postgres',
+  );
+  assert.match(out.samples[0]['source.user.name'] as string, /^USER_\d+$/);
+});
+
+test('scrubKnownEntities: each newly stop-listed service account is left alone in prose', () => {
+  for (const account of [
+    'apache',
+    'nginx',
+    'postgres',
+    'mysql',
+    'redis',
+    'jenkins',
+    'tomcat',
+    'backup',
+    'monitor',
+    'www-data',
+    'oracle',
+    'git',
+    'mongodb',
+    'elastic',
+  ]) {
+    const p = new Pseudonymizer();
+    p.pseudonymize(account, 'USER');
+    const text = `service ${account} restarted`;
+    assert.equal(
+      scrubKnownEntities(text, p, { identifiersOnly: true }),
+      text,
+      `${account} was masked in prose`,
+    );
+  }
+});
+
+test('scrubKnownEntities: a genuine identifier is still masked after the stop-list widening', () => {
+  // Guard against the widened list swallowing real values: these must still be caught.
+  for (const value of ['dbprod07', 'jsmith', 'srv-app-04', 'auditbot']) {
+    const p = new Pseudonymizer();
+    const token = p.pseudonymize(value, 'USER');
+    assert.equal(
+      scrubKnownEntities(`login by ${value} failed`, p, {
+        identifiersOnly: true,
+      }),
+      `login by ${token} failed`,
+      `${value} was NOT masked`,
+    );
+  }
 });
