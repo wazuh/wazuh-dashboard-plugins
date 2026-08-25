@@ -138,6 +138,7 @@
 | [#8708](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8708)   | Fixed Home KPI's visualization persistent filters                                                                                                                                             |
 | [#8766](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8766) | Fixed Server Management Settings crashing or showing a blank page for users without permission to read the manager configuration                                                              |
 | [#8775](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8775) | Fixed MITRE ATT&CK Framework tab not applying the date range and fetch filters                                                                                                                |
+| [#9026](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9026) | Fixed the AI Assistant "Open in Discover" link narrowing a time-unfiltered query to the last 24 hours; the results table drops all-empty columns and discloses every extra expander field     |
 
 ### Removed
 

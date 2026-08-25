@@ -372,10 +372,17 @@ export function hasExplicitTimeRange(
 }
 
 /** How completely a DSL states its own time window — what the "Open in Discover" link's disclosure
- * label is driven by (discover-link.tsx):
+ * label is driven by (discover-link.tsx). This describes only what the DSL SAID; what each case
+ * then opens is `resolveDiscoverTimeRange`'s decision, and the two no longer agree for the last one:
  *  - `stated`: a clause with both bounds. The link opens exactly the window the query ran.
  *  - `openStart`/`openEnd`: a one-sided clause. The link has to fill the other side, so it says so.
- *  - `defaulted`: no clause at all, so the whole window is `DEFAULT_TIME_RANGE`. */
+ *  - `defaulted`: no clause at all — "the query stated no window", NOT "the 24h default applies".
+ *    The name predates issue #9026, which changed that case to open the UNBOUNDED window (all of
+ *    history) precisely because `DEFAULT_TIME_RANGE` under-counted a query that had no time filter;
+ *    the label reads "all time". The value is kept as-is because it names the DSL fact this enum is
+ *    about, and renaming it would churn every caller for no gain — only the doc was ever wrong.
+ *    `DEFAULT_TIME_RANGE` still applies for a missing UPPER bound and in
+ *    server/tools/suggest-discover-query.ts. */
 export type TimeRangeCoverage =
   | 'stated'
   | 'openStart'
