@@ -489,7 +489,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
     conversation: ConversationSummary,
   ) => {
     // Same reason as `requestDelete`'s stopPropagation: never let the row's own onClick (resume)
-    // fire alongside the pencil icon's click.
+    // fire alongside the action's own click.
     event.stopPropagation();
     renamingIdRef.current = conversation.id;
     setRenamingId(conversation.id);
@@ -1301,7 +1301,12 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                                             'Conversation actions',
                                         },
                                       )}
-                                      aria-haspopup='menu'
+                                      // `true`, not `'menu'`: `EuiContextMenuPanel` renders plain
+                                      // buttons, not `role="menu"`/`role="menuitem"`, and naming a
+                                      // role the DOM does not carry would send a screen reader
+                                      // looking for menu semantics that are not there. EUI's own
+                                      // examples use `true` for the same reason.
+                                      aria-haspopup='true'
                                       aria-expanded={isMenuOpen}
                                       onClick={(event: React.MouseEvent) =>
                                         toggleRowMenu(event, conversation)
@@ -1319,14 +1324,18 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                                     />
                                   }
                                 >
-                                  {/* Rendered ONLY while open, deliberately. `EuiPopover` mounts
-                                    its panel on first open and then KEEPS it in the DOM, hiding it
-                                    with CSS — which would leave every row the user has ever opened
-                                    carrying two permanently-hidden but still focusable buttons, so
-                                    a keyboard user tabbing the rail would walk through actions for
-                                    rows whose menus are shut. Unmounting the entries with the menu
-                                    keeps the tab order honest and the DOM proportional to what is
-                                    actually on screen. */}
+                                  {/* Rendered ONLY while open, deliberately — a narrow win, not a
+                                    leak fix. `EuiPopover` does eventually unmount its own panel:
+                                    it renders while `isOpen || isClosing` and clears `isClosing`
+                                    on a 250ms `closingTransitionTimeout` (EUI's popover.js), so
+                                    nothing accumulates. What this avoids is that 250ms window, in
+                                    which the panel is still mounted with two focusable entries a
+                                    keyboard user could tab into for a menu they just dismissed.
+                                    Gating on `isMenuOpen` empties it in the same tick as the close
+                                    instead. Re-mounting on each open also re-arms
+                                    `EuiContextMenuPanel`'s initial focus/arrow-key state, which
+                                    EUI otherwise resets only when that same timeout fires — so
+                                    reopening a menu inside 250ms would find it un-armed. */}
                                   {isMenuOpen ? (
                                     <EuiContextMenuPanel
                                       items={rowMenuItems(conversation)}

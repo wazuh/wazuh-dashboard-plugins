@@ -847,7 +847,9 @@ describe('ConversationList', () => {
 
     it('marks the trigger as opening a menu, and tracks open state for assistive tech', () => {
       const trigger = renderOneRow();
-      expect(trigger).toHaveAttribute('aria-haspopup', 'menu');
+      // `true`, not `'menu'`: EuiContextMenuPanel renders plain buttons rather than
+      // role="menu"/role="menuitem", so promising a menu role would be a lie to assistive tech.
+      expect(trigger).toHaveAttribute('aria-haspopup', 'true');
       expect(trigger).toHaveAttribute('aria-expanded', 'false');
 
       openRowMenu();
