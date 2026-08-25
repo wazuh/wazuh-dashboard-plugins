@@ -15,18 +15,29 @@ export interface TimeRange {
 export const DEFAULT_TIME_RANGE: TimeRange = { from: 'now-24h', to: 'now' };
 
 /**
- * The lower edge a range clause that states no lower bound resolves to: the beginning of time, NOT
- * `DEFAULT_TIME_RANGE.from`.
+ * "The beginning of time" — the lower edge used wherever a query did not state one. TWO
+ * independent defects converge on this one constant:
  *
- * Issue #9008 review, finding 1: an `lte`-only clause ("findings before 2020-01-01") whose missing
- * lower bound was filled from `DEFAULT_TIME_RANGE.from` produced `from: 'now-24h', to:
- * '2020-01-01T00:00:00.000Z'` — a window whose start is AFTER its end, which Discover shows zero
- * rows for while the answer above it showed rows. A missing lower bound means "from the beginning",
- * so it fills from here instead; a missing UPPER bound still fills from `DEFAULT_TIME_RANGE.to`,
- * because a clause stating only `gte` really does mean "up to now".
+ * 1. A ONE-SIDED clause (issue #9008 review, finding 1). An `lte`-only clause ("findings before
+ *    2020-01-01") whose missing lower bound was filled from `DEFAULT_TIME_RANGE.from` produced
+ *    `from: 'now-24h', to: '2020-01-01T00:00:00.000Z'` — a window whose start is AFTER its end,
+ *    which Discover shows zero rows for while the answer above it showed rows. A missing lower
+ *    bound means "from the beginning", so `readRangeClause` fills it from here.
+ * 2. A query with NO range clause at all (issue #9026). That was not "a last-24-hours query with
+ *    the bound left implicit" — it had no time filter, so its totals cover the whole index. Opening
+ *    the link on `DEFAULT_TIME_RANGE` narrowed it to a 24-hour slice of the same query, guaranteeing
+ *    a smaller total than the answer above it the moment any matching document was older than a day.
+ *    `resolveDiscoverTimeRange` opens that case here instead.
  *
  * An absolute ISO instant rather than date-math (`now-99y`): OSD resolves date-math in `_g` against
- * the browser's clock, and a bound this far out is not expressible as a fixed shorthand anyway.
+ * the browser's clock, and a bound that far out is not expressible as a fixed shorthand anyway.
+ *
+ * `DEFAULT_TIME_RANGE` survives for the two places that still legitimately mean "last 24 hours": the
+ * missing UPPER edge of a one-sided clause (a query stating `gte: now-7d` and no upper bound really
+ * does mean "up to now" — that direction is unchanged), and server/tools/suggest-discover-query.ts,
+ * which materializes a range-less suggestion into a runnable clause and reads it for its own
+ * disclosure text.
+
  */
 export const UNBOUNDED_TIME_RANGE: TimeRange = {
   from: '1970-01-01T00:00:00.000Z',
@@ -62,6 +73,11 @@ export const MS_PER_UNIT = {
  * UNRESOLVED — `undefined`, never a guess — and callers fall back to the literal bound string
  * rather than a fabricated instant. An ISO-8601 bound needs no "now" reference at all and resolves
  * the same either way.
+ *
+ * Lives here, not in tool-call-label.ts (`public/`), so the evidence popover and the "Open in
+ * Discover" link resolve a bound through ONE function: the popover stating "ran against Jun 1 –
+ * Aug 30" while the link opened `now-90d` re-resolved against the reader's clock is exactly the
+ * divergence that shared use prevents.
  */
 export function resolveBoundMs(
   value: string,
@@ -440,6 +456,68 @@ export function rangeBoundsFromDsl(
     return undefined;
   }
   return { gte: clause.window.from, lte: clause.window.to };
+}
+
+/**
+ * Pins one bound to the absolute instant it meant WHEN THE QUERY RAN, so a link clicked later opens
+ * the window the query actually used rather than the same date-math re-resolved against the
+ * reader's clock. Falls back to the literal bound when it cannot be resolved (no `executedAt` on a
+ * conversation persisted before that field existed) — the pre-existing behavior, and still better
+ * than a fabricated instant.
+ */
+function pinBound(value: string, executedAt: number | undefined): string {
+  const resolved = resolveBoundMs(value, executedAt);
+  return resolved === undefined ? value : new Date(resolved).toISOString();
+}
+
+/**
+ * The window the "Open in Discover" link must carry, resolved from what the SERVER recorded about
+ * the query it actually ran rather than from a client-side default:
+ *
+ *  1. `effectiveRange` — `TableSpec.provenance.effectiveRange`, the post-guardrail `{gte, lte}` the
+ *     executor read off the executed body (see `TableSpec.provenance` in common/types.ts). This is
+ *     the same fact the evidence popover states as "the window this ran against", so taking it
+ *     first makes it structurally impossible for the link to open a window the popover contradicts
+ *     — even if `discover.dsl` and the recorded provenance ever stop being derived from the same
+ *     body.
+ *  2. A range clause read out of `dsl` itself — the path for a table persisted before provenance
+ *     existed, which still carries its DSL. Read through `effectiveRangeClause`, so this inherits
+ *     that function's field partitioning and multi-clause intersection: a DSL with two
+ *     `@timestamp` clauses opens the window they actually agree on, the same one the popover
+ *     states. Deliberately NOT `extractTimeRange`, whose own no-clause fallback is
+ *     `DEFAULT_TIME_RANGE` — routing through it would swallow case 3 below before it could fire.
+ *  3. `UNBOUNDED_TIME_RANGE` — no recorded range and no clause in the DSL means the query had no
+ *     time filter, so the link opens on all of history rather than silently narrowing to
+ *     `DEFAULT_TIME_RANGE`'s 24 hours and under-counting the answer it sits under.
+ *
+ * Case 3 is the behavior change: cases 1 and 2 agree on every query whose DSL states a window
+ * (they are read off the same body), so this only ever moves the range-less case.
+ *
+ * `executedAt` does double duty: it pins the bounds below, and it is the reference
+ * `effectiveRangeClause` orders date-math against when intersecting case 2's clauses — the same
+ * reference server/tools/executor.ts recorded the provenance with, so the two cannot intersect the
+ * same DSL differently.
+ *
+ * Whichever case wins, a date-math bound is PINNED to the absolute instant it meant at
+ * `executedAt` (`pinBound`). OSD resolves `now-90d` in `_g` against the browser's clock at click
+ * time, so an unpinned bound made a conversation reopened a week later open a window shifted a week
+ * forward — a different window from the one the evidence popover states for the same query, and a
+ * different total from the answer. `executedAt` comes from `TableSpec.provenance.executedAt`; with
+ * no `executedAt` recorded the literal bound is kept, exactly as before.
+ */
+export function resolveDiscoverTimeRange(params: {
+  dsl?: Record<string, unknown>;
+  effectiveRange?: { gte: string; lte: string };
+  executedAt?: number;
+}): TimeRange {
+  const { dsl, effectiveRange, executedAt } = params;
+  const resolved = effectiveRange
+    ? { from: effectiveRange.gte, to: effectiveRange.lte }
+    : effectiveRangeClause(dsl, executedAt)?.window ?? UNBOUNDED_TIME_RANGE;
+  return {
+    from: pinBound(resolved.from, executedAt),
+    to: pinBound(resolved.to, executedAt),
+  };
 }
 
 /**
