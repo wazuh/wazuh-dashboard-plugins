@@ -101,6 +101,18 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // prescanAndMintToolContent over every tool-result string value (this one included) before it
   // reaches the provider, so an embedded IP/FQDN in a custom title is still pseudonymized there.
   { field: WAZUH_FIELD.RULE_TITLE, action: 'allow' },
+  // EXPLAIN-WAVE PHASE 2 (AI/plan/eval-v2/tooling-gap-map.md gap 2): wazuh.rule.description is
+  // newly in every finding-hits tool's digest sample columns (catalog/common.ts's
+  // FINDING_DIGEST_EXTRA_COLUMNS), so it needs an explicit decision here rather than reaching the
+  // provider by omission. Reviewed 'allow' on exactly wazuh.rule.title's reasoning above and
+  // document.metadata.description's below -- it is the ruleset's own prose about what a rule
+  // detects (findings-v5 carries the same text the Manager rule does), the model cannot explain a
+  // detection without it, and anonymizing it would replace every distinct explanation with an
+  // opaque VAL_n. Same residual risk as both of those fields (a custom rule's description can
+  // interpolate a decoder capture group) and the same mitigation: chat.ts's
+  // scrubMessagesForProvider runs prescanAndMintToolContent over every tool-result string value,
+  // so an embedded IP/FQDN is still pseudonymized before it reaches the provider.
+  { field: 'wazuh.rule.description', action: 'allow' },
   // Wildcard covers every compliance framework (pci_dss, hipaa, gdpr, iso_27001, nis2,
   // nist_800_171, nist_800_53, fedramp, cmmc, tsc, ...), not just the one this plugin has a
   // dedicated tool for — all are curated requirement-tag lists, equally not

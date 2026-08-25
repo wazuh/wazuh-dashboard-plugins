@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {
   DigestRecord,
   NO_TEXT_SYNTHESIS_INSTRUCTION,
+  NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY,
   summarizeDigestForFallback,
   summarizeDigestsForFallback,
   synthesizeNoTextFallback,
@@ -739,4 +740,184 @@ test('synthesizeNoTextFallback: aborting MID-STREAM stops forwarding further del
     .map(e => e.content)
     .join('');
   assert.doesNotMatch(text, /second sentence/);
+});
+
+// --- EXPLAIN-WAVE PHASE 2: the ZERO-ROW turn is synthesizable too ------------------------------
+//
+// Eval run 20260825-150326: 21 of 63 answers carried no model text at all, and 15 of those were
+// the all-empty shape -- every tool call returned 0 rows and the turn ended on
+// `buildNoMatchingResultsMessage`'s canned line, without the model ever being ASKED for an answer
+// (`emitNoTextFallback`'s gate required a non-empty table). These pin the three things that change
+// for that shape: which instruction is sent, that duplicate-table suppression stays OFF, and that a
+// failed retry degrades to the caller's own copy rather than to a "table below" sentence pointing
+// at an empty table.
+
+function emptyDigest(): DigestRecord {
+  return {
+    toolName: 'get_critical_findings',
+    content: JSON.stringify({
+      tool: 'get_critical_findings',
+      counts: { total: 0, returned: 0, truncated: false },
+      hint: '0 rows. Filters applied: wazuh.rule.level, @timestamp.',
+      samples: [],
+    }),
+  };
+}
+
+test('synthesizeNoTextFallback: a zero-row turn gets the EMPTY-result instruction, not the totals one', async () => {
+  const { adapter, calls } = scriptedAdapter([
+    {
+      type: 'delta',
+      content: 'No findings at critical severity were recorded in the last 24 hours.',
+    },
+    { type: 'done', usage: { inputTokens: 30, outputTokens: 9 } },
+  ]);
+  const controller = new AbortController();
+
+  const { events } = await drain(
+    synthesizeNoTextFallback(
+      adapter,
+      PROVIDER_CONFIG,
+      TURN_MESSAGES,
+      controller.signal,
+      undefined,
+      [emptyDigest()],
+      { tableOnScreen: false, lastResortMessage: 'CANNED NO-MATCH COPY' },
+    ),
+  );
+
+  assert.equal(calls.length, 1, 'the zero-row turn now gets its one retry too');
+  const lastOutbound = calls[0].messages[calls[0].messages.length - 1];
+  assert.equal(lastOutbound.content, NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY);
+  assert.notEqual(
+    lastOutbound.content,
+    NO_TEXT_SYNTHESIS_INSTRUCTION,
+    'the non-empty instruction asks for totals and observations, which an empty result has none of',
+  );
+  assert.deepEqual(calls[0].options, {}, 'still no tools offered');
+  const text = events
+    .filter(
+      (e): e is Extract<StreamEvent, { type: 'delta' }> => e.type === 'delta',
+    )
+    .map(e => e.content)
+    .join('');
+  assert.match(text, /No findings at critical severity/);
+  assert.doesNotMatch(
+    text,
+    /CANNED NO-MATCH COPY/,
+    'the model answered, so the deterministic last resort must not also be appended',
+  );
+});
+
+test('NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY: asks for a plain answer and fences speculation', () => {
+  assert.match(NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY, /no matching rows/i);
+  assert.match(NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY, /Do not speculate about why/i);
+  assert.match(NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY, /Do not call any tools/i);
+  assert.doesNotMatch(
+    NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY,
+    /the table below/i,
+    'there is no table on screen for an all-empty turn -- the copy must never point at one',
+  );
+});
+
+test('synthesizeNoTextFallback: a failed zero-row retry degrades to the CALLER copy, never a "table below" sentence', async () => {
+  const { adapter } = scriptedAdapter([
+    { type: 'done', usage: { inputTokens: 12, outputTokens: 0 } },
+  ]);
+  const controller = new AbortController();
+
+  const { events } = await drain(
+    synthesizeNoTextFallback(
+      adapter,
+      PROVIDER_CONFIG,
+      TURN_MESSAGES,
+      controller.signal,
+      undefined,
+      [emptyDigest()],
+      {
+        tableOnScreen: false,
+        lastResortMessage:
+          'No matching results were found for that query. (Searched: critical findings.)',
+      },
+    ),
+  );
+
+  const text = events
+    .filter(
+      (e): e is Extract<StreamEvent, { type: 'delta' }> => e.type === 'delta',
+    )
+    .map(e => e.content)
+    .join('');
+  assert.equal(
+    text,
+    'No matching results were found for that query. (Searched: critical findings.)',
+    'the floor never drops below the answer this shape already shipped',
+  );
+  assert.doesNotMatch(text, /the table below has the details/);
+});
+
+test('synthesizeNoTextFallback: with NO table on screen a model-written markdown table is NOT suppressed', async () => {
+  const { adapter } = scriptedAdapter([
+    { type: 'delta', content: 'Nothing matched. For reference:\n' },
+    { type: 'delta', content: '| policy | failed |\n| --- | --- |\n| cis | 0 |\n' },
+    { type: 'done', usage: { inputTokens: 10, outputTokens: 10 } },
+  ]);
+  const controller = new AbortController();
+
+  const { events } = await drain(
+    synthesizeNoTextFallback(
+      adapter,
+      PROVIDER_CONFIG,
+      TURN_MESSAGES,
+      controller.signal,
+      undefined,
+      [emptyDigest()],
+      { tableOnScreen: false, lastResortMessage: 'CANNED' },
+    ),
+  );
+
+  const text = events
+    .filter(
+      (e): e is Extract<StreamEvent, { type: 'delta' }> => e.type === 'delta',
+    )
+    .map(e => e.content)
+    .join('');
+  assert.match(
+    text,
+    /\| policy \| failed \|/,
+    'with nothing rendered there is no duplicate to suppress, so the suppressor must stay off',
+  );
+});
+
+test('synthesizeNoTextFallback: with a table on screen the suppressor still strips a duplicate table', async () => {
+  const { adapter } = scriptedAdapter([
+    { type: 'delta', content: 'Fifteen critical findings.\n' },
+    { type: 'delta', content: '| agent | level |\n| --- | --- |\n| a | high |\n' },
+    { type: 'done', usage: { inputTokens: 10, outputTokens: 10 } },
+  ]);
+  const controller = new AbortController();
+
+  const { events } = await drain(
+    synthesizeNoTextFallback(
+      adapter,
+      PROVIDER_CONFIG,
+      TURN_MESSAGES,
+      controller.signal,
+      undefined,
+      [nonEmptyDigest()],
+    ),
+  );
+
+  const text = events
+    .filter(
+      (e): e is Extract<StreamEvent, { type: 'delta' }> => e.type === 'delta',
+    )
+    .map(e => e.content)
+    .join('');
+  assert.match(text, /Fifteen critical findings/);
+  assert.doesNotMatch(
+    text,
+    /\| agent \| level \|/,
+    'default (tableOnScreen) behaviour is unchanged: a duplicate of the rendered table is held back',
+  );
 });

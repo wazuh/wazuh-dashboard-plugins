@@ -943,3 +943,43 @@ test('explain-wave: the relaxation does not lift the no-headings, no-table or gr
     /the truncation disclosure and the ban on enumerating individual rows or timestamps in prose still apply/,
   );
 });
+
+// --- EXPLAIN-WAVE PHASE 2: a NAMED host must reach an id-only tool as an id --------------------
+// Eval item EV2-SCA-002 (run 20260825-150326): the question named the host outright ("the failed
+// SCA checks on lin-web-01") and the model called get_sca_checks(result: "failed") with the agent
+// parameter simply omitted -- reading omission as "across all agents" when it actually triggers
+// sole-active-agent resolution, so the call answered about a different host and returned nothing.
+// EV2-EXP-002 is the sibling shape: get_fim_files(agent_id: "win-ws-014"), a NAME in a numeric
+// parameter, rejected outright. Both prompt paragraphs that existed covered only the case where NO
+// host is named.
+
+test('buildSystemPrompt: tells the model to resolve a NAMED host to an id for agent_id-only tools', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /When the user DOES name a host and the tool you need takes a numeric agent id only/,
+  );
+  assert.match(prompt, /resolve that name to its id first/);
+  assert.match(
+    prompt,
+    /do not put the name itself in a numeric agent_id/i,
+    'the EV2-EXP-002 shape: a name in a numeric parameter is rejected by validateAgentId',
+  );
+  assert.match(
+    prompt,
+    /an omitted agent id either scopes the call to one agent chosen for you or drops the host scope entirely/,
+    'must state what omission really does -- the wrong reading is what produced the regression',
+  );
+});
+
+test('buildSystemPrompt: the new resolution clause names no tool to call', () => {
+  // Same trap the two paragraphs above it were rewritten for (#8913's diagnostic run): telling the
+  // model to call a specific lookup tool is useless when stage-1 routing did not offer it.
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  const clause = prompt.slice(
+    prompt.indexOf('When the user DOES name a host'),
+  );
+  const sentence = clause.slice(0, clause.indexOf('unscoped.'));
+  assert.doesNotMatch(sentence, /call get_agents/);
+  assert.match(sentence, /any tool available to you this turn that accepts an agent name/);
+});

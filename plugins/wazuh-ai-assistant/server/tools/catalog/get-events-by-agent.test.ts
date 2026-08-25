@@ -110,7 +110,24 @@ test('table/digest columns stay within the fields verified present on the seeded
     'event.action',
     'event.outcome',
   ]);
-  assert.deepEqual(getEventsByAgentTool.digest.sampleColumns, columnFields);
+  // The digest is no longer column-for-column identical to the table (explain-wave phase 2): it
+  // adds the two process fields the events mapping defines and live event docs carry, so an
+  // explanatory answer has something to explain from. The VISIBLE table is deliberately unchanged
+  // -- that is what this test's "verified present on the seeded docs" bound is really about, and a
+  // sample column that is absent from a given document is simply omitted from the sample row
+  // (`buildDigest` skips `undefined`), never rendered as an empty column.
+  for (const field of columnFields) {
+    assert.ok(
+      getEventsByAgentTool.digest.sampleColumns.includes(field),
+      `${field} must stay a digest sample column`,
+    );
+  }
+  assert.deepEqual(
+    getEventsByAgentTool.digest.sampleColumns.filter(
+      field => !columnFields.includes(field),
+    ),
+    ['process.name', 'process.command_line'],
+  );
 });
 
 // Issue #8920 item 1 (population-disclosure): this tool sorts by @timestamp desc with no real
@@ -121,4 +138,35 @@ test('digest opts into the synthetic event.category/event.outcome breakdown fall
     'event.category',
     'event.outcome',
   ]);
+});
+
+// --- EXPLAIN-WAVE PHASE 2: the digest must carry what actually ran ----------------------------
+// (AI/plan/eval-v2/tooling-gap-map.md gap 2 case (a), "explain a malicious Windows event": the five
+// original sample columns name that something happened and how it ended, never WHAT ran.)
+
+test('digest sampleColumns: carry process.name and process.command_line', () => {
+  const columns = getEventsByAgentTool.digest.sampleColumns;
+  assert.ok(columns.includes('process.command_line'));
+  assert.ok(columns.includes('process.name'));
+  // The original five must all survive -- this is an addition, not a replacement.
+  for (const field of [
+    '@timestamp',
+    'wazuh.agent.name',
+    'event.category',
+    'event.action',
+    'event.outcome',
+  ]) {
+    assert.ok(columns.includes(field), `${field} must remain a sample column`);
+  }
+});
+
+test('digest sampleColumns: no _source restriction is needed for the new fields', () => {
+  // The tool sends no `_source`, so every field of the matched document is available to
+  // `buildDigest`'s `getByPath` -- if a future change adds an allowlist, these two must be on it.
+  const req = buildIndexer({});
+  assert.equal(
+    (req.body as Record<string, unknown>)._source,
+    undefined,
+    'adding a _source allowlist here would silently empty the new digest columns',
+  );
 });

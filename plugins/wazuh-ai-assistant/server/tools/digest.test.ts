@@ -1980,3 +1980,82 @@ test('getByPath: unchanged behavior for a plain object/scalar path (no array on 
   assert.equal(getByPath(row, 'wazuh.rule.title'), 'x');
   assert.equal(getByPath(row, 'wazuh.rule.missing'), undefined);
 });
+
+// --- DIGEST_FIELD_MAX_LENGTH_DEFAULTS: cross-tool per-field caps -------------------------------
+// Explain-wave phase 2 (AI/plan/eval-v2/tooling-gap-map.md gap 2): `wazuh.rule.description` and
+// `process.command_line` are newly in finding/event digest samples, both free prose. They are capped
+// tighter than MAX_FIELD_VALUE_LENGTH here rather than in each of the eleven finding tools, so a
+// twelfth one cannot add the columns and forget the cap. The tool's own `sampleFieldMaxLength`
+// (SCA's shipped precedent) still wins.
+
+/** `getByPath` (digest.ts) splits a dotted column on '.', so a sample source must be NESTED --
+ * a flat `{'wazuh.rule.description': ...}` key would never be found. */
+function ruleDescription(text: string): Record<string, unknown> {
+  return { wazuh: { rule: { description: text } } };
+}
+
+function digestWithSample(
+  sample: Record<string, unknown>,
+  def: ToolDefinition,
+): Digest {
+  return buildDigest(
+    'test_tool',
+    { data: { affected_items: [sample], total_affected_items: 1 } },
+    def,
+  );
+}
+
+test('buildDigest: wazuh.rule.description is capped at 240 chars, not the generic 500', () => {
+  const def = buildToolDef({
+    digest: { sampleColumns: ['wazuh.rule.description'] },
+  });
+  const digest = digestWithSample(ruleDescription('d'.repeat(400)), def);
+  const value = digest.samples[0]['wazuh.rule.description'] as string;
+  // 240 characters plus the one-character ellipsis the truncation appends.
+  assert.equal(value.length, 241);
+  assert.ok(value.endsWith('…'));
+});
+
+test('buildDigest: process.command_line is capped at 200 chars', () => {
+  const def = buildToolDef({
+    digest: { sampleColumns: ['process.command_line'] },
+  });
+  const digest = digestWithSample(
+    { process: { command_line: `/bin/sh -c ${'x'.repeat(400)}` } },
+    def,
+  );
+  const value = digest.samples[0]['process.command_line'] as string;
+  assert.equal(value.length, 201);
+});
+
+test('buildDigest: a short real description is left untouched', () => {
+  const real =
+    'Detects execution of a command via sudo privilege escalation on Linux/macOS. While common in ' +
+    'legitimate administration, sudo usage by unexpected users, at unusual hours, or for sensitive ' +
+    'commands warrants investigation.';
+  const def = buildToolDef({
+    digest: { sampleColumns: ['wazuh.rule.description'] },
+  });
+  const digest = digestWithSample(ruleDescription(real), def);
+  assert.equal(digest.samples[0]['wazuh.rule.description'], real);
+});
+
+test("buildDigest: a tool's OWN sampleFieldMaxLength still overrides the shared default", () => {
+  const def = buildToolDef({
+    digest: {
+      sampleColumns: ['wazuh.rule.description'],
+      sampleFieldMaxLength: { 'wazuh.rule.description': 20 },
+    },
+  });
+  const digest = digestWithSample(ruleDescription('d'.repeat(400)), def);
+  assert.equal(
+    (digest.samples[0]['wazuh.rule.description'] as string).length,
+    21,
+  );
+});
+
+test('buildDigest: an unlisted field still falls back to the generic 500-char cap', () => {
+  const def = buildToolDef({ digest: { sampleColumns: ['other'] } });
+  const digest = digestWithSample({ other: 'z'.repeat(900) }, def);
+  assert.equal((digest.samples[0].other as string).length, 501);
+});

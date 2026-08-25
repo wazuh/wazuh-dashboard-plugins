@@ -602,3 +602,18 @@ test('get_sca_checks: review D1 — a 5-row digest of LIVE-SIZED rationale/remed
     } chars) to stay under CONTEXT_CHAR_BUDGET (${CONTEXT_CHAR_BUDGET}), preserving the CV-069 5-agent sweep`,
   );
 });
+
+test('get_sca_checks: the agent_id description tells the model to resolve a NAMED host to an id', () => {
+  // EXPLAIN-WAVE PHASE 2 (eval item EV2-SCA-002, run 20260825-150326): the description only ever
+  // explained when to OMIT agent_id, so "the failed SCA checks on lin-web-01" was answered by
+  // get_sca_checks(result: "failed") with no agent scope at all -- omission does not search across
+  // agents, it resolves to one, so the call answered about the wrong host and returned 0 rows.
+  const properties = getScaChecksTool.spec.parameters.properties as Record<
+    string,
+    { description?: string }
+  >;
+  const description = properties.agent_id.description ?? '';
+  assert.match(description, /If the user named a host/);
+  assert.match(description, /resolve that name to its numeric id first/);
+  assert.match(description, /does NOT search across agents/);
+});

@@ -479,10 +479,27 @@ export const FINDING_BREAKDOWN_AGGS: Record<string, unknown> =
 
 /**
  * Fields added to every finding-hits tool's digest `sampleColumns` — the model-facing subset of
- * the investigation row set (deliberately narrower: `source.port`/`process.command_line` stay
- * row-only, not sent to the model). Every one of these has a `server/tools/privacy.ts`
- * `FIELD_POLICY_DEFAULTS` entry before it reaches a digest. These are the ECS
- * findings-v5 field names.
+ * the investigation row set (`source.port` stays row-only, not sent to the model). Every one of
+ * these has a `server/tools/privacy.ts` `FIELD_POLICY_DEFAULTS` entry before it reaches a digest.
+ * These are the ECS findings-v5 field names.
+ *
+ * EXPLAIN-WAVE PHASE 2 (AI/plan/eval-v2/tooling-gap-map.md gap 2): `wazuh.rule.description` and
+ * `process.command_line` are new here, and `process.command_line` REVERSES this list's previous
+ * "stays row-only, not sent to the model" decision. The measured reason: an explanatory question
+ * ("explain this event and what to do about it") was answerable only from a rule TITLE, which on
+ * findings-v5 is a short templated label — the model could name the finding but never say what the
+ * detection actually is or what ran, and `FINAL_ROUND_ANSWER_INSTRUCTION` correctly forbids
+ * inventing either. `wazuh.rule.description` is the ruleset's own prose about the detection (the
+ * same text the Manager rule carries, gap 4) and is curated, not analyst/attacker input — reviewed
+ * `allow`, on `wazuh.rule.title`'s reasoning. `process.command_line` is the one field that says
+ * WHAT ran; it keeps its `anonymize` policy, so under privacy mode it reaches the model as a
+ * pseudonym exactly as it does in the row expander (a documented explanation-quality tradeoff of
+ * privacy mode, gap-map item 11 — not a new leak: `applyFieldPolicy` runs over the digest in
+ * `executor.ts` regardless of which columns are declared here).
+ *
+ * BUDGET: both fields are free prose that can run long, so both are capped tighter than
+ * `MAX_FIELD_VALUE_LENGTH` by `DIGEST_FIELD_MAX_LENGTH_DEFAULTS` (digest.ts) — see that constant
+ * for the per-row arithmetic against `DIGEST_CHAR_CAP`/`CONTEXT_CHAR_BUDGET`.
  */
 export const FINDING_DIGEST_EXTRA_COLUMNS = [
   'wazuh.rule.tags',
@@ -490,6 +507,8 @@ export const FINDING_DIGEST_EXTRA_COLUMNS = [
   'source.user.name',
   'source.ip',
   'wazuh.rule.mitre.technique.id',
+  'wazuh.rule.description',
+  'process.command_line',
 ];
 
 /**

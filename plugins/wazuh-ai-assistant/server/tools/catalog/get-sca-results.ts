@@ -49,7 +49,10 @@ export const getScaResultsTool: ToolDefinition = {
           description:
             'Numeric Wazuh agent ID, e.g. "003". Optional: omit this for a deictic host ' +
             'reference ("this box"/"this server") with no known id -- the call resolves to the ' +
-            'only active agent automatically.',
+            'only active agent automatically. If the user named a host (e.g. "lin-web-01"), ' +
+            'resolve that name to its numeric id first and pass it here: omitting this parameter ' +
+            'does NOT search across agents, it resolves to a single agent, so an unscoped call ' +
+            'answers about the wrong host.',
         },
         limit: aggLimitProperty('SCA policies', 20),
       },

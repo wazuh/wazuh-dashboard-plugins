@@ -251,6 +251,37 @@ export const DIGEST_CHAR_CAP = 6000;
  * rows are dropped. Also the cap applied to the Manager `message` field and each
  * `breakdown[].key` — see `capFieldValue` below. */
 const MAX_FIELD_VALUE_LENGTH = 500;
+/**
+ * Per-field caps that apply to EVERY tool whose digest samples happen to carry these fields,
+ * without lowering `MAX_FIELD_VALUE_LENGTH` for anything else. A tool's own
+ * `digest.sampleFieldMaxLength` still wins (see `truncateLongFieldValues`), so this is a default
+ * layer under the shipped SCA precedent (`get-sca-checks.ts`'s `check.rationale`/
+ * `check.remediation`), not a replacement for it.
+ *
+ * Both entries are explain-wave phase 2 additions (AI/plan/eval-v2/tooling-gap-map.md gap 2) that
+ * `catalog/common.ts`'s `FINDING_DIGEST_EXTRA_COLUMNS` and `get-events-by-agent.ts` put into
+ * digests for the first time; no other tool surfaces either field in a sample today, so this map
+ * changes nothing that already ships. Shared here rather than repeated in each of the eleven
+ * finding-hits tool definitions for the same reason `FINDING_DIGEST_EXTRA_COLUMNS` itself is
+ * shared: a twelfth finding tool must not be able to add the columns and forget the cap.
+ *
+ * ARITHMETIC (the `get-sca-checks.ts:379-394` calculation, redone for these two fields against
+ * live corpus values): `wazuh.rule.description` runs 190-260 chars in the ruleset's own prose (one
+ * "what this detects / why it warrants investigation" paragraph), so 240 keeps essentially every
+ * real description whole while bounding a pathological one; relying on `MAX_FIELD_VALUE_LENGTH`
+ * (500) instead would make 500 the typical size, not a rare backstop. `process.command_line`
+ * observed at 35-80 chars, capped at 200 — enough for a real invocation plus arguments, short
+ * enough that a padded one cannot dominate a row. Worst case per sample row is therefore +440
+ * chars over the pre-change row; a 5-row finding digest grows by ~2,200 chars to ~5,600, still
+ * under `DIGEST_CHAR_CAP` (6,000) with all 5 sample rows intact, and `capDigest` drops rows rather
+ * than busting the cap if a given tool's other columns run wide. `CONTEXT_CHAR_BUDGET` (24,000,
+ * chat.ts) is the cumulative bound and is unchanged: it now admits ~4 such digests per turn
+ * instead of ~5-6 before forcing the final round, which is the deliberate cost of the enrichment.
+ */
+const DIGEST_FIELD_MAX_LENGTH_DEFAULTS: Record<string, number> = {
+  'wazuh.rule.description': 240,
+  'process.command_line': 200,
+};
 /** Hard length cap on `Digest.hint`. The hint accumulates by concatenation (this file's zero-row
  * hint + unrepresentable-aggregation note, plus executor.ts's window-recount and near-miss
  * disclosures), and `capDigest`'s drop stages deliberately never remove it — an unbounded hint
@@ -1884,7 +1915,9 @@ function capKeyValue(key: unknown): unknown {
  * `check.rationale`/`check.remediation` — see `get-sca-checks.ts`) lets a specific column be
  * capped tighter than the shared `MAX_FIELD_VALUE_LENGTH` default without lowering that default
  * for every other tool. A key absent from the map (or the map itself being `undefined`, every
- * tool but SCA) falls back to `MAX_FIELD_VALUE_LENGTH` unchanged. */
+ * tool but SCA) falls back to `DIGEST_FIELD_MAX_LENGTH_DEFAULTS` (the cross-tool per-field layer,
+ * see that constant) and then to `MAX_FIELD_VALUE_LENGTH` unchanged. The calling tool's own map is
+ * consulted FIRST, so a tool that declares its own cap for one of those fields still wins. */
 function truncateLongFieldValues(
   digest: Digest,
   sampleFieldMaxLength?: Record<string, number>,
@@ -1892,7 +1925,10 @@ function truncateLongFieldValues(
   for (const sample of digest.samples) {
     for (const key of Object.keys(sample)) {
       const value = sample[key];
-      const maxLength = sampleFieldMaxLength?.[key] ?? MAX_FIELD_VALUE_LENGTH;
+      const maxLength =
+        sampleFieldMaxLength?.[key] ??
+        DIGEST_FIELD_MAX_LENGTH_DEFAULTS[key] ??
+        MAX_FIELD_VALUE_LENGTH;
       if (typeof value === 'string' && value.length > maxLength) {
         sample[key] = `${value.slice(0, maxLength)}…`;
       }

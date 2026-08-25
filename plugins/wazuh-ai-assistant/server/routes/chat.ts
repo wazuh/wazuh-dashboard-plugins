@@ -839,9 +839,10 @@ export function willBeFinalRound(
  * text and does NOT qualify for (or fell through) the forced-synthesis retry below — shared by
  * every `!roundSawAnyDelta` exit point in `orchestrate` (via `emitNoTextFallback`: the normal
  * per-round `done` branch, the forced-round dead-stream guard, and the round-budget-exhausted
- * path) so this decision lives in exactly one place. The `toolUsedThisTurn && sawNonEmptyTable`
- * case (a real, non-empty table with no narration) no longer resolves here first:
- * `emitNoTextFallback` intercepts that case and only falls back to NO_ANALYSIS_TEXT_MESSAGE if
+ * path) so this decision lives in exactly one place. Any `toolUsedThisTurn` turn that recorded a
+ * digest -- a real non-empty table with no narration, and since explain-wave phase 2 an all-empty
+ * turn too -- no longer resolves here first:
+ * `emitNoTextFallback` intercepts that case and only falls back to this copy if
  * forced synthesis produced nothing AND there was no digest to derive a truthful sentence from
  * either (structurally unreachable in practice, since a non-empty table always yields a `digest`
  * event — kept as a defensive last resort, not a live path). Still exported for its own unit
@@ -998,6 +999,34 @@ export const NO_TEXT_SYNTHESIS_INSTRUCTION =
   'the totals and key observations from those results. Do not state anything the results do not ' +
   'show. Do not call any tools. Do not say there is nothing to add.';
 
+/**
+ * ZERO-ROW sibling of NO_TEXT_SYNTHESIS_INSTRUCTION above, used when the turn's tool calls all came
+ * back EMPTY (no non-empty table was ever rendered).
+ *
+ * EXPLAIN-WAVE PHASE 2 (eval run 20260825-150326): 15 of the 21 code-synthesised answers in that
+ * run were this shape -- every tool call returned 0 rows, the model wrote nothing, and the turn
+ * ended on `buildNoMatchingResultsMessage`'s canned line ("No matching results were found for that
+ * query. (Searched: critical findings.)"). That line is truthful but question-blind: it never says
+ * what the empty result MEANS for what was asked, which for a counting or negative-control question
+ * ("how many findings does agent lin-monitor-01 have") is the entire answer ("none"). The zero-row
+ * case had no forced-synthesis retry at all before this change -- `emitNoTextFallback`'s gate
+ * required a non-empty table -- so the one shape that most needed a written answer was the one
+ * shape the model was never asked for.
+ *
+ * Worded separately from the non-empty instruction because the honest content is the opposite: the
+ * non-empty version asks for totals and observations, this one must NOT invite the model to explain
+ * an absence it cannot verify. "state plainly that nothing matched" plus "answer the question in
+ * its own terms" is the whole job; "Do not speculate about why" is the load-bearing fence -- an
+ * empty result has many possible causes (a filter, a time window, genuinely nothing there) and the
+ * digest's own `hint` already says so without the model guessing among them.
+ */
+export const NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY =
+  'The tool call(s) above returned no matching rows, and no written answer followed. In 1 to 3 ' +
+  'plain sentences, state plainly that nothing matched and answer the question in its own terms ' +
+  '(for a "how many" question, that means zero), naming the filters that were actually searched. ' +
+  'Do not speculate about why the result is empty and do not state anything the results do not ' +
+  'show. Do not call any tools. Do not say there is nothing to add.';
+
 /** What `synthesizeNoTextFallback` reports back to `orchestrate` once it finishes -- mirrors
  * `Stage1Result`'s shape/reasoning: `usage` is `undefined` on every path that never actually made
  * the retry call (no digest to synthesize from, or the turn was aborted), so `addUsage` (which
@@ -1095,9 +1124,11 @@ function pickDigestForFallback(
  * caller's `noTextSynthesisAttempted` flag, not here -- this function itself is stateless and
  * would happily run again if called again, same division of responsibility as
  * `shouldConsiderDeferredOffer`/its caller). Called only when `orchestrate` has already
- * established `toolUsedThisTurn && sawNonEmptyTable` -- i.e. exactly the case the live failure
- * this replaces used to hand NO_ANALYSIS_TEXT_MESSAGE regardless of whether there was something to
- * analyze.
+ * established `toolUsedThisTurn` and recorded at least one digest -- i.e. exactly the case the live
+ * failure this replaces used to hand NO_ANALYSIS_TEXT_MESSAGE regardless of whether there was
+ * something to analyze. `opts.tableOnScreen` says whether the turn ended with a NON-EMPTY table or
+ * with every call empty (explain-wave phase 2): both are synthesizable from their digests, they
+ * just need different instructions, different suppression and a different last resort.
  *
  * Makes ONE extra `adapter.chatStream` call with NO `tools` offered (structurally unable to
  * re-enter the tool loop -- (c)'s "cannot re-enter" bound), asking the model to narrate the
@@ -1105,15 +1136,16 @@ function pickDigestForFallback(
  * table-suppression pipeline the turn's own rounds use, so the retry's text is held to the exact
  * same privacy and duplicate-table guarantees as everything else this turn streamed.
  *
- * (b): if the retry call errors, or ends without ever producing meaningful text, this falls back
- * to `summarizeDigestForFallback` on the LAST digest recorded this turn -- truthful and
- * deterministic, never the layout-lying NO_ANALYSIS_TEXT_MESSAGE.
+ * (b): if the retry call errors, or ends without ever producing meaningful text, this falls back to
+ * `opts.lastResortMessage` -- by default the digests' own coverage statement, and on a zero-row turn
+ * the caller's `noTextFallbackMessage` copy -- truthful and deterministic either way, never the
+ * layout-lying NO_ANALYSIS_TEXT_MESSAGE.
  *
  * (c) abort-safety: checked before the retry call is even attempted -- an aborted turn makes no
- * extra provider call, though it still yields the deterministic digest sentence below (never an
+ * extra provider call, though it still yields the deterministic sentence below (never an
  * extra MODEL-authored answer -- that is the "no extra text" this guarantees); the caller's own
- * `!roundSawAnyDelta` guard chain already covers the (rare, defensive) case of `digests` being empty
- * despite `sawNonEmptyTable` being true.
+ * `!roundSawAnyDelta` guard chain already covers the (rare, defensive) case of `digests` being
+ * empty.
  */
 export async function* synthesizeNoTextFallback(
   adapter: ProviderAdapter,
@@ -1122,34 +1154,58 @@ export async function* synthesizeNoTextFallback(
   signal: AbortSignal,
   privacyCtx: PrivacyContext | undefined,
   digests: DigestRecord[],
+  // EXPLAIN-WAVE PHASE 2: optional, appended last, defaulting to the exact pre-change behaviour
+  // (a non-empty table on screen, deterministic last resort = the digest coverage statement), so
+  // every pre-existing call site -- including this file's own and all twelve in
+  // chat-no-text-synthesis.test.ts -- keeps its meaning unchanged without being touched.
+  //  - `tableOnScreen: false` is the zero-row turn this mechanism newly covers: it selects the
+  //    empty-result instruction AND leaves the duplicate-table suppressor OFF (with no table
+  //    rendered there is no duplicate to suppress, and an active suppressor would silently eat a
+  //    legitimate table the model writes -- see `MarkdownTableSuppressor`'s contract).
+  //  - `lastResortMessage` is what case (b) yields when the retry produces nothing, so the caller
+  //    keeps owning the fallback-copy decision (`noTextFallbackMessage`) instead of this function
+  //    growing a second copy of it.
+  opts?: { tableOnScreen?: boolean; lastResortMessage?: string },
 ): AsyncGenerator<StreamEvent, NoTextSynthesisResult, void> {
   const lastDigest = pickDigestForFallback(digests);
+  const tableOnScreen = opts?.tableOnScreen ?? true;
+  const lastResortMessage =
+    opts?.lastResortMessage ?? summarizeDigestsForFallback(digests);
 
   // Abort-safety (c) and the defensive no-digest case: neither attempts the extra call.
   if (signal.aborted || !lastDigest) {
     if (lastDigest) {
       // BLOCKER FIX (CV-069/079/080): cover EVERY digest gathered this turn, not just the last
       // one -- see `summarizeDigestsForFallback`'s doc comment.
-      yield { type: 'delta', content: summarizeDigestsForFallback(digests) };
+      yield { type: 'delta', content: lastResortMessage };
     }
     return { usage: undefined };
   }
 
   const retryMessages: ChatMessage[] = [
     ...messages,
-    { role: 'system', content: NO_TEXT_SYNTHESIS_INSTRUCTION },
+    {
+      role: 'system',
+      content: tableOnScreen
+        ? NO_TEXT_SYNTHESIS_INSTRUCTION
+        : NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY,
+    },
   ];
   // Outbound scrub, same as every other adapter.chatStream call this turn makes.
   const outboundMessages = privacyCtx
     ? scrubMessagesForProvider(retryMessages, privacyCtx.pseudonymizer)
     : retryMessages;
   // Inbound un-scrub and duplicate-table suppression, same pipeline as every round of the main
-  // loop -- a non-empty table is already on screen (this function is only ever called when
-  // `sawNonEmptyTable` is true), so the suppressor starts ACTIVE, not lazily instantiated.
+  // loop. The suppressor starts ACTIVE only when a non-empty table is already on screen (the
+  // original, `sawNonEmptyTable === true` case) -- on the zero-row turn this mechanism newly covers
+  // there is nothing rendered to duplicate, so suppression is left off rather than silently
+  // swallowing a table the model legitimately writes.
   const depseudonymizer = privacyCtx
     ? new StreamDepseudonymizer(privacyCtx.pseudonymizer)
     : undefined;
-  const tableSuppressor = new MarkdownTableSuppressor();
+  const tableSuppressor = tableOnScreen
+    ? new MarkdownTableSuppressor()
+    : undefined;
 
   /** Same drain contract as the main loop's `drainRoundBuffers` (this file, ~line 1678): flushes
    * the depseudonymizer's leftover buffer THROUGH the table suppressor before releasing the table
@@ -1157,7 +1213,9 @@ export async function* synthesizeNoTextFallback(
    * error, mid-stream abort, or a normal 'done'. */
   function drainBuffers(): string {
     let text = depseudonymizer ? depseudonymizer.flush() : '';
-    text = tableSuppressor.push(text) + tableSuppressor.flush();
+    if (tableSuppressor) {
+      text = tableSuppressor.push(text) + tableSuppressor.flush();
+    }
     return text;
   }
 
@@ -1192,7 +1250,7 @@ export async function* synthesizeNoTextFallback(
         let content = depseudonymizer
           ? depseudonymizer.push(event.content)
           : event.content;
-        if (content) {
+        if (content && tableSuppressor) {
           content = tableSuppressor.push(content);
         }
         if (content) {
@@ -1248,7 +1306,10 @@ export async function* synthesizeNoTextFallback(
   if (!producedText) {
     // BLOCKER FIX (CV-069/079/080): same coverage-statement fix as the abort-safety branch above --
     // describe every tool call this turn gathered, not only the one `pickDigestForFallback` chose.
-    yield { type: 'delta', content: summarizeDigestsForFallback(digests) };
+    // On a zero-row turn the caller supplies `noTextFallbackMessage`'s own copy instead, so a
+    // failed retry there degrades to EXACTLY the pre-change answer, never to a "the table below has
+    // the details" sentence pointing at an empty table.
+    yield { type: 'delta', content: lastResortMessage };
   }
 
   return { usage };
@@ -2419,16 +2480,31 @@ export async function* orchestrate(
    * first qualifying call flips `noTextSynthesisAttempted`, so even though three DIFFERENT exit
    * points in this function each reach `!roundSawAnyDelta` (only one of which can ever fire per
    * turn, since each is itself a terminating exit -- but the flag is kept anyway as a structural,
-   * not merely positional, guarantee). Turns that do not qualify (`!toolUsedThisTurn`, or a
-   * genuinely empty table) are untouched -- they still resolve through the original deterministic
-   * `noTextFallbackMessage`, exactly as before this mechanism existed. */
+   * not merely positional, guarantee). Turns that do not qualify (`!toolUsedThisTurn`, or no
+   * digest at all to ground a summary in) are untouched -- they still resolve through the original
+   * deterministic `noTextFallbackMessage`, exactly as before this mechanism existed. */
   let noTextSynthesisAttempted = false;
   async function* emitNoTextFallback(
     roundsExhausted: boolean,
   ): AsyncGenerator<StreamEvent> {
+    const deterministicMessage = noTextFallbackMessage(
+      toolUsedThisTurn,
+      sawNonEmptyTable,
+      roundsExhausted,
+      lastAttemptedToolCall,
+    );
+    // EXPLAIN-WAVE PHASE 2 (eval run 20260825-150326, 21 of 63 answers code-synthesised): the gate
+    // no longer requires `sawNonEmptyTable`. A turn whose tool calls all came back EMPTY was the
+    // single most common no-text shape (15 of those 21) and was the one shape that never got a
+    // model-authored attempt -- it went straight to `buildNoMatchingResultsMessage`'s canned,
+    // question-blind line. A zero-row result is still an ANSWER ("none of your agents has a finding
+    // matching that"), and the digest that proves it is already in `turnDigests`, so the same one
+    // retry per turn is now spent there too. Everything else about the bound is unchanged:
+    // `toolUsedThisTurn` (a no-tool turn has nothing to synthesise from), a digest to ground it in,
+    // and once per turn. If the retry produces nothing, `lastResortMessage` hands back exactly the
+    // deterministic copy this function would have emitted before, so the floor never drops.
     if (
       toolUsedThisTurn &&
-      sawNonEmptyTable &&
       !noTextSynthesisAttempted &&
       turnDigests.length > 0
     ) {
@@ -2440,18 +2516,22 @@ export async function* orchestrate(
         signal,
         privacyCtx,
         turnDigests,
+        {
+          tableOnScreen: sawNonEmptyTable,
+          // Only the zero-row case overrides the digest coverage statement: with a real table on
+          // screen that statement is the better last resort (it names every tool call this turn
+          // made), which is what CV-069/079/080 established.
+          ...(sawNonEmptyTable
+            ? {}
+            : { lastResortMessage: deterministicMessage }),
+        },
       );
       usageTotals = addUsage(usageTotals, result.usage);
       return;
     }
     yield {
       type: 'delta',
-      content: noTextFallbackMessage(
-        toolUsedThisTurn,
-        sawNonEmptyTable,
-        roundsExhausted,
-        lastAttemptedToolCall,
-      ),
+      content: deterministicMessage,
     };
   }
 

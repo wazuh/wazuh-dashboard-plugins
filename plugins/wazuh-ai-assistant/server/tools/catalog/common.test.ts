@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import {
   FINDING_BREAKDOWN_AGGS,
   FINDING_BREAKDOWN_DIMENSIONS,
+  FINDING_DIGEST_EXTRA_COLUMNS,
+  findingDigestColumns,
   nameFilterClause,
   nameFilterProperty,
   severitiesAtOrAbove,
@@ -11,6 +13,7 @@ import {
   VULN_BREAKDOWN_DIMENSIONS,
 } from './common';
 import { BREAKDOWN_BUCKET_CAP } from '../digest';
+import { FIELD_POLICY_DEFAULTS } from '../privacy';
 
 // --- nameFilterClause / nameFilterProperty: shared name filter for the catalog tools ----------
 // (review a0-review.md, findings F1/F4/F5)
@@ -208,4 +211,56 @@ test('VULN_BREAKDOWN_AGGS declares one terms aggregation per VULN_BREAKDOWN_DIME
     assert.equal(agg.terms?.field, field);
     assert.equal(agg.terms?.size, BREAKDOWN_BUCKET_CAP);
   }
+});
+
+// --- FINDING_DIGEST_EXTRA_COLUMNS: explain-wave phase 2 digest enrichment ----------------------
+// (AI/plan/eval-v2/tooling-gap-map.md gap 2: the model saw a templated rule TITLE and nothing that
+// says what the detection is or what actually ran, so an explanatory answer had nothing grounded to
+// draw on and the final-round instruction correctly forbade inventing it.)
+
+test('FINDING_DIGEST_EXTRA_COLUMNS: carries the two explanation-critical fields', () => {
+  assert.ok(
+    FINDING_DIGEST_EXTRA_COLUMNS.includes('wazuh.rule.description'),
+    'the ruleset prose about what the rule detects',
+  );
+  assert.ok(
+    FINDING_DIGEST_EXTRA_COLUMNS.includes('process.command_line'),
+    'the one field that says WHAT ran',
+  );
+});
+
+test('FINDING_DIGEST_EXTRA_COLUMNS: every entry has an explicit privacy policy entry', () => {
+  // Restates, at this list's own boundary, the rule field-policy-coverage.test.ts enforces across
+  // the catalog: a new digest column without a classification is a leak when privacy is on.
+  const classified = new Set(FIELD_POLICY_DEFAULTS.map(entry => entry.field));
+  for (const field of FINDING_DIGEST_EXTRA_COLUMNS) {
+    assert.ok(
+      classified.has(field),
+      `${field} is sent to the model but has no FIELD_POLICY_DEFAULTS entry`,
+    );
+  }
+});
+
+test('privacy policy: rule.description is allowed, command_line stays anonymized', () => {
+  const policy = (field: string) =>
+    FIELD_POLICY_DEFAULTS.find(entry => entry.field === field)?.action;
+  assert.equal(policy('wazuh.rule.description'), 'allow');
+  assert.equal(
+    policy('process.command_line'),
+    'anonymize',
+    'putting command_line in the digest must NOT relax its policy -- under privacy mode the model ' +
+      'sees a pseudonym, exactly as the row expander already did',
+  );
+});
+
+test('findingDigestColumns: appends the extras without duplicating a tool-declared column', () => {
+  const columns = findingDigestColumns([
+    '@timestamp',
+    'wazuh.rule.description',
+  ]);
+  assert.equal(
+    columns.filter(field => field === 'wazuh.rule.description').length,
+    1,
+  );
+  assert.ok(columns.includes('process.command_line'));
 });

@@ -516,6 +516,29 @@ export function buildSystemPrompt(nowIso: string): string {
       'than one active agent exists, do not guess: briefly list the candidates (id and name) and ' +
       'ask the user which one they mean. If get_agents is NOT among the tools available to you ' +
       'this turn, do not try to call it -- ask the user which agent they mean instead.',
+    // EXPLAIN-WAVE PHASE 2 (eval item EV2-SCA-002, run 20260825-150326): both instructions above
+    // cover the case where NO host is named. Neither covers the opposite, and more common, case --
+    // the user names the host outright ("the failed SCA checks on lin-web-01") while the tool that
+    // answers it takes a NUMERIC agent_id only (get_sca_checks, get_sca_results, get_fim_files;
+    // every other agent-scoped tool accepts a name). The measured failure is not that the model
+    // asked for an id: it called get_sca_checks(result: "failed") with the agent parameter simply
+    // OMITTED, as if omitting it meant "across all agents". It does not -- omission triggers
+    // sole-active-agent resolution (see the paragraph above), so the call silently answered about
+    // some other host and returned nothing. That reading is easy to arrive at because those
+    // parameters' own descriptions only ever explain when to omit them, so this states the missing
+    // half: a named host must reach the call as an id, and the id must be looked up, not guessed.
+    // Deliberately does not name which tool to look it up with -- the available lookup differs per
+    // turn (get_agents, get_agent_inventory, any agent-name-accepting tool, or the escape hatch),
+    // and naming a tool the router may not have offered is the exact bug the two paragraphs above
+    // were rewritten to stop repeating.
+    'When the user DOES name a host and the tool you need takes a numeric agent id only ' +
+      '(agent_id), resolve that name to its id first -- with any tool available to you this turn ' +
+      'that accepts an agent name, or by looking the agent up -- and pass the id. Do not put the ' +
+      'name itself in a numeric agent_id (it is rejected), and do not leave the parameter out ' +
+      'because a name is all you have: an omitted agent id either scopes the call to one agent ' +
+      'chosen for you or drops the host scope entirely, and both answer a different question than ' +
+      'the one asked. If you cannot resolve the name to an id, say so instead of running the call ' +
+      'unscoped.',
     // BLOCKER FIX (CV-039, 2026-08-19/20 adjudicated runs): get_agent_inventory implements only
     // FIVE syscollector kinds (os, packages, ports, processes, hotfixes); groups, users, network
     // interfaces, hardware, protocols, services, and browser-extensions are real, live-verified

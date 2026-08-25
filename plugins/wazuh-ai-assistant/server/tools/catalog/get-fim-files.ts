@@ -32,7 +32,10 @@ export const getFimFilesTool: ToolDefinition = {
         agent_id: {
           type: 'string',
           description:
-            'Optional numeric Wazuh agent ID to scope to one agent, e.g. "003".',
+            'Optional numeric Wazuh agent ID to scope to one agent, e.g. "003". Numeric ids only: ' +
+            'an agent NAME here is rejected, so when the user named a host resolve that name to ' +
+            'its id first and pass the id. Leaving this out searches every agent, not the named ' +
+            'one.',
         },
         path_prefix: {
           type: 'string',
