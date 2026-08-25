@@ -177,19 +177,30 @@ function timeFieldForIndex(index: string): string {
   return index.startsWith('wazuh-states') ? 'state.modified_at' : '@timestamp';
 }
 
-/** Builds the "index + time range only" fallback clause: everything field-level is dropped, only
- * the time bound survives (falling back to `extractTimeRange`'s own last-24-hours default when the
- * original `dsl` carried no recognizable range at all).
+/**
+ * Builds the "index + time range only" fallback clause: everything field-level is dropped, only the
+ * time bound survives, read through `extractTimeRange` (common/discover-url.ts).
  *
- * Issue #9008 review: `extractTimeRange` now fills a missing LOWER bound from the epoch rather than
- * from `now-24h`, which changes what happens if the suggestion this emits is later RE-RUN through a
- * real tool. For an `lte`-only original, the re-emitted clause used to be `gte: now-24h` against a
- * PAST `lte` — inverted, and rejected by `lintDsl` with "upper bound before its lower bound". It is
- * now `gte: <epoch>` against that same `lte`: a well-formed but very wide window, which
- * `clampLookbackWindow` narrows to the last 90 days before that `lte` and DISCLOSES, so the re-run
- * succeeds instead of being rejected (`lintDsl`'s 90-day span rejection is what it meets only on a
- * call site that skips the clamp). Strictly better — the suggestion now describes a window that can
- * actually be executed — but it is a different downstream path, not the same one with new text. */
+ * What that reader substitutes for a bound the original `dsl` did not state is NOT uniform, and
+ * this function materializes whatever it returns into a real `range` clause the user will run:
+ *  - No recognizable range clause at all -> `extractTimeRange`'s last-24-hours `DEFAULT_TIME_RANGE`.
+ *    (Only this function still defaults that way. The "Open in Discover" LINK no longer does — see
+ *    `resolveDiscoverTimeRange`, which opens a range-less query on all of history instead.)
+ *  - A `gte`-only clause -> the stated lower bound, upper bound filled as `now`.
+ *  - An `lte`-only clause -> the stated upper bound, lower bound filled from the UNBOUNDED window
+ *    (epoch), not from `DEFAULT_TIME_RANGE.from`. Filling it with `now-24h` produced `gte` AFTER
+ *    `lte` for a clause bounded at a past instant — an inverted range matching nothing at all,
+ *    which is worse than a wide one. So an `lte`-only suggestion is emitted as `gte: 1970-01-01…`,
+ *    deliberately: "everything up to the stated instant" is what the clause actually meant.
+ *
+ * That last case also moved the DOWNSTREAM path a re-run suggestion takes. The old inverted clause
+ * was rejected by `lintDsl` ("upper bound before its lower bound"); the epoch-lower clause is
+ * well-formed but very wide, so `clampLookbackWindow` narrows it to the last 90 days before the
+ * stated `lte` and DISCLOSES that, and the re-run succeeds instead of being rejected (`lintDsl`'s
+ * 90-day span rejection is what it meets only on a call site that skips the clamp). Strictly
+ * better — the suggestion now describes a window that can actually be executed — but it is a
+ * different path, not the same one with new text.
+ */
 function buildTimeRangeOnlyDsl(
   index: string,
   dsl: Record<string, unknown>,

@@ -5,9 +5,8 @@ import { CoreStart } from '../../../../../src/core/public';
 import { TableSpec } from '../../../common/types';
 import {
   buildDiscoverUrl,
-  DEFAULT_TIME_RANGE,
   describeTimeRangeCoverage,
-  extractTimeRange,
+  resolveDiscoverTimeRange,
 } from '../../../common/discover-url';
 import { shortDateMath } from './tool-call-label';
 
@@ -73,17 +72,20 @@ export function createDiscoverUrlResolver(core: CoreStart): ResolveDiscoverUrl {
     const discoverAppUrl = core.http.basePath.prepend(
       '/app/data-explorer/discover',
     );
-    // `provenance.executedAt` is the reference the SERVER resolved this DSL's own window against
-    // when it recorded `provenance.effectiveRange` (executor.ts). Passing it back in is what makes
-    // the window this link opens and the window the evidence popover states the same computation
-    // over the same clauses — a multi-clause DSL whose bounds mix date-math and ISO can only be
-    // intersected identically on both sides if both sides order it against the same instant
-    // (issue #9008 review, F1). Absent on a conversation persisted before that field existed, in
-    // which case both sides fall back to the same unordered result.
-    const timeRange = extractTimeRange(
-      spec.discover.dsl,
-      spec.provenance?.executedAt,
-    );
+    // The window comes from what the server recorded executing this query, falling back to the
+    // DSL's own clause and finally to an UNBOUNDED window — never to a 24-hour default that would
+    // under-count the answer this link sits under. See `resolveDiscoverTimeRange`'s doc comment
+    // (common/discover-url.ts) for the full precedence and why case 3 changed.
+    const timeRange = resolveDiscoverTimeRange({
+      dsl: spec.discover.dsl,
+      effectiveRange: spec.provenance?.effectiveRange,
+      // Pins date-math bounds to the instant the query ran, so a link clicked days later opens the
+      // window the answer used rather than the same shorthand re-resolved against today's clock.
+      // It is ALSO the reference the DSL fallback intersects its clauses against — the same one
+      // executor.ts recorded the provenance with, so a multi-clause DSL mixing date-math and ISO
+      // cannot resolve one way here and another way in the evidence popover.
+      executedAt: spec.provenance?.executedAt,
+    });
     return buildDiscoverUrl({
       discoverAppUrl,
       indexPatternId,
@@ -96,16 +98,6 @@ export function createDiscoverUrlResolver(core: CoreStart): ResolveDiscoverUrl {
 interface DiscoverLinkProps {
   spec: TableSpec;
   resolveDiscoverUrl: ResolveDiscoverUrl;
-}
-
-/** `now-24h` -> "24h": the same date-math shorthand every other window label in this plugin uses
- * (tool-call-label.ts's `shortDateMath`). Derived from `DEFAULT_TIME_RANGE.from`
- * (common/discover-url.ts) rather than a hardcoded "24h" literal, so the fallback label can never
- * silently drift from the actual default window it is describing. Falls back to the raw
- * date-math string on the off chance `DEFAULT_TIME_RANGE` ever stops being that shape. */
-function defaultRangeWindowLabel(): string {
-  const match = /^now-(\d+[dhm])$/.exec(DEFAULT_TIME_RANGE.from);
-  return match ? match[1] : DEFAULT_TIME_RANGE.from;
 }
 
 /**
@@ -153,36 +145,49 @@ function shortBoundLabel(value: string): string {
 }
 
 /**
- * The button's label, disclosing whatever the link had to fill in that the query did not state
- * (`describeTimeRangeCoverage`, common/discover-url.ts):
+ * The button's label. It describes the window `resolveDiscoverTimeRange` (common/discover-url.ts)
+ * ACTUALLY OPENS, case for case — the two are read together deliberately, because a label that
+ * disclosed one window while its own button opened another would be worse than no label at all:
  *
- *  - `stated` — the query bounded both edges, so the link opens exactly the window it ran against
- *    and there is nothing to disclose.
- *  - `defaulted` — no range clause at all, so the whole window is `DEFAULT_TIME_RANGE`. Issue #9008
- *    (I5): the QA E2E review's broader claim that this link "hardcodes now-24h" was checked and is
- *    inaccurate; the real, narrower gap was that this one case looked identical to every other
- *    link, giving no hint the window it opens may not match the one the answer above it used.
- *  - `openStart`/`openEnd` — a ONE-SIDED clause ("findings before X"). Issue #9008 review, finding
- *    1: this case used to render the plain label, because the query HAD stated a window and the
- *    default-range check only fires when none was stated at all. Worse, the missing lower bound was
- *    filled from `now-24h`, so an `lte`-only clause bounded in the past opened an inverted window
- *    Discover showed nothing for. The fill direction is fixed in `UNBOUNDED_TIME_RANGE`; this says
- *    out loud which edge the query left open, in the same label slot and style as the other
- *    disclosure (no second UI element), and short enough not to wrap in the narrow panel.
+ *  - A server-recorded `effectiveRange` (that function's case 1) — the link opens exactly the
+ *    window the executor observed running, the same fact the evidence popover states. Nothing was
+ *    filled in, so there is nothing to disclose and the plain label stands. (A clamp, if one fired,
+ *    is disclosed by the provenance chip's own badge rather than here.)
+ *  - No recorded range, and the DSL bounded BOTH edges (`stated`) — same story, plain label.
+ *  - No recorded range, and a ONE-SIDED clause (`openStart`/`openEnd`, e.g. "findings before X").
+ *    Issue #9008 review, finding 1: this used to render the plain label, because the query HAD
+ *    stated a window and the only disclosure fired when none was stated at all — while the missing
+ *    lower bound was filled from `now-24h`, so an `lte`-only clause bounded in the past opened an
+ *    inverted window Discover showed nothing for. The fill direction is fixed in
+ *    `UNBOUNDED_TIME_RANGE`; this says out loud which edge the query left open.
+ *  - No recorded range and no clause at all (`defaulted`) — issue #9026: the link opens ALL OF
+ *    HISTORY, because a query with no time filter really did cover the whole index and a 24-hour
+ *    default under-counted the answer above it. "All time" is a materially different reading
+ *    experience from every other link here, and a reader deserves to know that before clicking
+ *    rather than after Discover has loaded the whole index. The old "default range: 24h" wording
+ *    is gone with the behavior it described.
+ *
+ * Every wording shares this one label slot and style — no second UI element — and stays short
+ * enough not to wrap in the narrow (sidecar) panel.
  */
-function discoverLinkLabel(
-  dsl: Record<string, unknown> | undefined,
-  executedAt: number | undefined,
-): string {
-  const { coverage, statedBound } = describeTimeRangeCoverage(dsl, executedAt);
+function discoverLinkLabel(spec: TableSpec): string {
+  const plainLabel = (): string =>
+    i18n.translate('wazuhAiAssistant.resultTable.openInDiscover', {
+      defaultMessage: 'Open in Discover',
+    });
+  // Case 1: the server recorded the window it ran, so the link reproduces it verbatim.
+  if (spec.provenance?.effectiveRange) {
+    return plainLabel();
+  }
+  const { coverage, statedBound } = describeTimeRangeCoverage(
+    spec.discover?.dsl,
+    spec.provenance?.executedAt,
+  );
   switch (coverage) {
     case 'defaulted': {
       return i18n.translate(
-        'wazuhAiAssistant.resultTable.openInDiscoverDefaultRange',
-        {
-          defaultMessage: 'Open in Discover (default range: {window})',
-          values: { window: defaultRangeWindowLabel() },
-        },
+        'wazuhAiAssistant.resultTable.openInDiscoverFullHistory',
+        { defaultMessage: 'Open in Discover (all time)' },
       );
     }
     case 'openStart': {
@@ -204,9 +209,7 @@ function discoverLinkLabel(
       );
     }
     default: {
-      return i18n.translate('wazuhAiAssistant.resultTable.openInDiscover', {
-        defaultMessage: 'Open in Discover',
-      });
+      return plainLabel();
     }
   }
 }
@@ -246,13 +249,10 @@ export const DiscoverLink: React.FC<DiscoverLinkProps> = ({
     return null;
   }
 
-  // One label slot, four wordings — see `discoverLinkLabel` above for what each discloses. Same
-  // `executedAt` reference the href was resolved with, so the label can only ever describe the
-  // window this button actually opens.
-  const label = discoverLinkLabel(
-    spec.discover?.dsl,
-    spec.provenance?.executedAt,
-  );
+  // One label slot, four wordings, read off the SAME spec (and so the same `effectiveRange` and
+  // `executedAt`) the href above was resolved from — see `discoverLinkLabel` for how each case
+  // maps onto the window `resolveDiscoverTimeRange` actually opens.
+  const label = discoverLinkLabel(spec);
 
   return (
     <EuiButtonEmpty

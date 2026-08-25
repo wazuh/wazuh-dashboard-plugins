@@ -7,6 +7,7 @@ import {
   hasExplicitTimeRange,
   rangeBoundsFromDsl,
   resolveBoundMs,
+  resolveDiscoverTimeRange,
   DEFAULT_TIME_RANGE,
   UNBOUNDED_TIME_RANGE,
 } from './discover-url';
@@ -714,4 +715,110 @@ test('buildDiscoverUrl: produces the expected rison-encoded, encodeURI-escaped h
     !url.includes('%27'),
     'single quotes must survive encodeURI unescaped',
   );
+});
+
+// --- resolveDiscoverTimeRange: the window the "Open in Discover" link actually carries ---------
+
+test('resolveDiscoverTimeRange: the server-recorded effective range wins over the dsl clause', () => {
+  // The two normally agree (both are read off the executed body), so this asserts the PRECEDENCE:
+  // if they ever disagree, the link must open the window the server recorded executing — the same
+  // fact the evidence popover states — never one re-derived client-side.
+  assert.deepEqual(
+    resolveDiscoverTimeRange({
+      dsl: { range: { '@timestamp': { gte: 'now-24h', lte: 'now' } } },
+      effectiveRange: { gte: 'now-90d', lte: 'now' },
+    }),
+    { from: 'now-90d', to: 'now' },
+  );
+});
+
+test('resolveDiscoverTimeRange: falls back to the dsl clause when no range was recorded', () => {
+  assert.deepEqual(
+    resolveDiscoverTimeRange({
+      dsl: { bool: { filter: { range: { timestamp: { gte: 'now-7d' } } } } },
+    }),
+    { from: 'now-7d', to: 'now' },
+  );
+});
+
+test('resolveDiscoverTimeRange: a time-unbounded query opens on all of history, not last-24h', () => {
+  // The defect this closes: a query with no time filter matched the whole index, but the link
+  // narrowed Discover to 24 hours, so Discover showed a smaller total than the answer above it.
+  assert.deepEqual(
+    resolveDiscoverTimeRange({ dsl: { match_all: {} } }),
+    UNBOUNDED_TIME_RANGE,
+  );
+  assert.deepEqual(resolveDiscoverTimeRange({}), UNBOUNDED_TIME_RANGE);
+  assert.notEqual(UNBOUNDED_TIME_RANGE.from, 'now-24h');
+});
+
+test('resolveDiscoverTimeRange: the unbounded lower bound is an instant Discover can resolve', () => {
+  assert.ok(!Number.isNaN(Date.parse(UNBOUNDED_TIME_RANGE.from)));
+  assert.equal(UNBOUNDED_TIME_RANGE.to, 'now');
+});
+
+test('resolveDiscoverTimeRange: a gte-only clause fills its missing UPPER bound with "now"', () => {
+  // A clause that states only a lower bound really does mean "up to now", so that edge fills from
+  // `DEFAULT_TIME_RANGE.to` and is deliberately unchanged.
+  assert.deepEqual(
+    resolveDiscoverTimeRange({
+      dsl: { range: { '@timestamp': { gte: 'now-7d' } } },
+    }),
+    { from: 'now-7d', to: DEFAULT_TIME_RANGE.to },
+  );
+});
+
+test('resolveDiscoverTimeRange: an lte-only clause fills its missing LOWER bound unbounded, never inverted', () => {
+  // The bug: the missing lower bound used to fill from `DEFAULT_TIME_RANGE.from` ('now-24h'), so an
+  // lte-only clause bounded at a PAST instant produced from > to -- a window Discover shows nothing
+  // at all for. A missing lower bound means "from the beginning".
+  const range = resolveDiscoverTimeRange({
+    dsl: { range: { '@timestamp': { lte: '2026-01-01T00:00:00.000Z' } } },
+  });
+  assert.deepEqual(range, {
+    from: UNBOUNDED_TIME_RANGE.from,
+    to: '2026-01-01T00:00:00.000Z',
+  });
+  assert.ok(
+    Date.parse(range.from) < Date.parse(range.to),
+    'the resolved window must not be inverted',
+  );
+});
+
+test('resolveDiscoverTimeRange: date-math is pinned to the instant the query ran, not the render clock', () => {
+  // OSD resolves `now-90d` in _g against the BROWSER's clock at click time, so an unpinned bound
+  // opened a window shifted by however long ago the conversation happened -- disagreeing with both
+  // the evidence popover and the answer's own total.
+  const executedAt = Date.parse('2026-03-01T00:00:00.000Z');
+  const range = resolveDiscoverTimeRange({
+    effectiveRange: { gte: 'now-90d', lte: 'now' },
+    executedAt,
+  });
+  assert.equal(range.to, '2026-03-01T00:00:00.000Z');
+  assert.equal(range.from, '2025-12-01T00:00:00.000Z');
+  assert.equal(Date.parse(range.to) - Date.parse(range.from), 90 * 86_400_000);
+});
+
+test('resolveDiscoverTimeRange: without executedAt the literal date-math bound is kept', () => {
+  // A conversation persisted before `executedAt` existed: the literal bound is still better than
+  // an instant fabricated against the reader's clock.
+  assert.deepEqual(
+    resolveDiscoverTimeRange({
+      effectiveRange: { gte: 'now-90d', lte: 'now' },
+    }),
+    { from: 'now-90d', to: 'now' },
+  );
+});
+
+test('buildDiscoverUrl: carries the resolved window into _g time, not a fixed default', () => {
+  const url = buildDiscoverUrl({
+    discoverAppUrl: 'https://osd.example/app/data-explorer/discover',
+    indexPatternId: 'abc-123',
+    dsl: { match_all: {} },
+    timeRange: resolveDiscoverTimeRange({
+      effectiveRange: { gte: 'now-90d', lte: 'now' },
+    }),
+  });
+  assert.ok(url.includes("time:(from:'now-90d',to:'now')"));
+  assert.ok(!url.includes("from:'now-24h'"));
 });

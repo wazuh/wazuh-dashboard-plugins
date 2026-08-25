@@ -21,29 +21,42 @@ import { UNBOUNDED_TIME_RANGE } from '../../../common/discover-url';
  * OWN index name, or a later test is served an earlier test's cached id.
  */
 
-/** Minimal `CoreStart` stand-in: only the two surfaces the resolver actually touches. */
-function coreMock(): CoreStart {
+/** Minimal `CoreStart` stand-in: only the two surfaces the resolver actually touches. `found:
+ * false` makes the index-pattern lookup come back empty, the one case that must resolve to `null`
+ * rather than to a link pointing at a pattern that does not exist. */
+function coreMock(options: { found: boolean } = { found: true }): CoreStart {
   return {
     http: { basePath: { prepend: (path: string) => `/base${path}` } },
     savedObjects: {
       client: {
         find: ({ search }: { search: string }) =>
           Promise.resolve({
-            savedObjects: [
-              {
-                // `search` arrives quoted ("\"<index>\""); the id only has to be recognizable.
-                id: `pattern-for-${search.replace(/"/g, '')}`,
-                attributes: { title: search.replace(/"/g, '') },
-              },
-            ],
+            savedObjects: options.found
+              ? [
+                  {
+                    // `search` arrives quoted ("\"<index>\""); the id only has to be recognizable.
+                    id: `pattern-for-${search.replace(/"/g, '')}`,
+                    attributes: { title: search.replace(/"/g, '') },
+                  },
+                ]
+              : [],
           }),
       },
     },
   } as unknown as CoreStart;
 }
 
-function specWith(index: string, dsl: Record<string, unknown>): TableSpec {
-  return { columns: [], rows: [], discover: { index, dsl } };
+function specWith(
+  index: string,
+  dsl: Record<string, unknown>,
+  provenance?: TableSpec['provenance'],
+): TableSpec {
+  return {
+    columns: [],
+    rows: [],
+    discover: { index, dsl },
+    ...(provenance ? { provenance } : {}),
+  };
 }
 
 /** Renders the button and waits for its (asynchronously resolved) label. */
@@ -95,6 +108,68 @@ describe('DiscoverLink window', () => {
     );
     expect(url).toContain("time:(from:'now-7d',to:'now')");
   });
+
+  // Issue #9026: the seam between a spec's recorded provenance and the URL `buildDiscoverUrl`
+  // produces. `common/discover-url.test.ts` covers `resolveDiscoverTimeRange`'s precedence and
+  // pinning rules in isolation; what those cannot catch is this resolver forgetting to PASS one of
+  // them — dropping `effectiveRange` or `executedAt` from the call leaves every unit test green
+  // while the link silently reverts to re-deriving its window from the DSL. Hence these assert on
+  // the final `_g` bounds, reached through the real resolver.
+  it('threads provenance.effectiveRange into the _g time range', async () => {
+    const url = await createDiscoverUrlResolver(coreMock())(
+      specWith(
+        'wazuh-findings-effective*',
+        // A DSL stating a DIFFERENT window from the provenance, so a passing assertion can only
+        // mean the recorded provenance was the value actually used.
+        { range: { '@timestamp': { gte: 'now-24h', lte: 'now' } } },
+        { clamped: false, effectiveRange: { gte: 'now-90d', lte: 'now' } },
+      ),
+    );
+    expect(url).toContain("time:(from:'now-90d',to:'now')");
+    expect(url).not.toContain("from:'now-24h'");
+  });
+
+  it('threads provenance.executedAt through, pinning date-math to absolute instants', async () => {
+    const url = await createDiscoverUrlResolver(coreMock())(
+      specWith(
+        'wazuh-findings-pinned*',
+        { range: { '@timestamp': { gte: 'now-24h', lte: 'now' } } },
+        {
+          clamped: false,
+          effectiveRange: { gte: 'now-90d', lte: 'now' },
+          executedAt: Date.parse('2026-03-01T00:00:00.000Z'),
+        },
+      ),
+    );
+    // Pinned, so reopening this conversation later cannot shift the window forward with the clock.
+    expect(url).toContain("from:'2025-12-01T00:00:00.000Z'");
+    expect(url).toContain("to:'2026-03-01T00:00:00.000Z'");
+    expect(url).not.toContain('now-90d');
+  });
+
+  it('falls back to the DSL clause when the spec records no provenance', async () => {
+    const url = await createDiscoverUrlResolver(coreMock())(
+      specWith('wazuh-findings-dsl-only*', {
+        range: { '@timestamp': { gte: 'now-24h', lte: 'now' } },
+      }),
+    );
+    expect(url).toContain("time:(from:'now-24h',to:'now')");
+  });
+
+  it('opens a time-unbounded query on all of history, not the 24h default', async () => {
+    const url = await createDiscoverUrlResolver(coreMock())(
+      specWith('wazuh-findings-unbounded*', { match_all: {} }),
+    );
+    expect(url).toContain(`from:'${UNBOUNDED_TIME_RANGE.from}'`);
+    expect(url).not.toContain("from:'now-24h'");
+  });
+
+  it('resolves to null when no index pattern matches, rather than building a broken link', async () => {
+    const url = await createDiscoverUrlResolver(coreMock({ found: false }))(
+      specWith('wazuh-findings-unmatched*', { match_all: {} }),
+    );
+    expect(url).toBeNull();
+  });
 });
 
 describe('DiscoverLink label', () => {
@@ -134,11 +209,36 @@ describe('DiscoverLink label', () => {
     expect(link).not.toHaveTextContent('default range');
   });
 
-  it('keeps the default-range label when the query stated no window at all', async () => {
+  it('says "all time" when the query stated no window at all', async () => {
+    // Issue #9026 changed what this case OPENS — all of history, not a 24-hour default — so the
+    // label changed with it. A "default range: 24h" wording here would now describe a window the
+    // button no longer opens.
     const link = await renderLabel(
       specWith('wazuh-findings-label-none*', { match_all: {} }),
     );
-    expect(link).toHaveTextContent('Open in Discover (default range: 24h)');
+    expect(link).toHaveTextContent('Open in Discover (all time)');
+    expect(link).not.toHaveTextContent('default range');
+  });
+
+  it('keeps the plain label when the server recorded the window it ran', async () => {
+    // Provenance case 1: nothing was filled in, so there is nothing to disclose — even though the
+    // DSL alone would have read as one-sided.
+    const link = await renderLabel(
+      specWith(
+        'wazuh-findings-label-recorded*',
+        { range: { '@timestamp': { lte: '2020-01-01T00:00:00.000Z' } } },
+        {
+          clamped: false,
+          effectiveRange: {
+            gte: '2019-01-01T00:00:00.000Z',
+            lte: '2020-01-01T00:00:00.000Z',
+          },
+        },
+      ),
+    );
+    expect(link).toHaveTextContent('Open in Discover');
+    expect(link).not.toHaveTextContent('no start date');
+    expect(link).not.toHaveTextContent('all time');
   });
 
   it('stays short enough not to wrap the narrow (sidecar) panel button', async () => {
