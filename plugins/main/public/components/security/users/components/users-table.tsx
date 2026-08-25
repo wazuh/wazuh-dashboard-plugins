@@ -106,7 +106,7 @@ export const UsersTable = ({
     },
     {
       align: 'right',
-      width: '5%',
+      width: '70',
       name: 'Actions',
       render: item => (
         <div onClick={ev => ev.stopPropagation()}>
