@@ -331,7 +331,12 @@ describe('AssistantChatPanel', () => {
     openConversationsPopover();
     const popover = await getPopoverPanel();
 
-    fireEvent.click(within(popover).getByLabelText('Delete conversation'));
+    // The row's actions live behind an overflow menu now; its panel is portaled out of this
+    // popover, so the entries are looked up on `screen` rather than within it.
+    fireEvent.click(within(popover).getByLabelText('Conversation actions'));
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Delete conversation' }),
+    );
     fireEvent.click(await screen.findByRole('button', { name: 'Delete' }));
 
     expect(mockDeleteConversation).toHaveBeenCalledWith('c1');
@@ -346,7 +351,10 @@ describe('AssistantChatPanel', () => {
     openConversationsPopover();
     const popover = await getPopoverPanel();
 
-    fireEvent.click(within(popover).getByLabelText('Rename conversation'));
+    fireEvent.click(within(popover).getByLabelText('Conversation actions'));
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Rename conversation' }),
+    );
     const input = within(popover).getByLabelText('Conversation title');
     fireEvent.change(input, { target: { value: 'New title' } });
     fireEvent.keyDown(input, { key: 'Enter' });

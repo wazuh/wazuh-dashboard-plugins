@@ -12,7 +12,11 @@ import {
   EuiTitle,
   EuiSpacer,
   EuiConfirmModal,
+  EuiContextMenuItem,
+  EuiContextMenuPanel,
+  EuiIcon,
   EuiLoadingSpinner,
+  EuiPopover,
   EuiToolTip,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
@@ -302,6 +306,22 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   // `isHovered || isFocused`.
   const [focusedId, setFocusedId] = useState<string | null>(null);
 
+  /**
+   * Which row's overflow ("kebab") menu is open, if any — at most one at a time, since opening a
+   * second row's menu closes the first.
+   *
+   * The row's per-row actions used to be two always-mounted icon buttons (a rename pencil and a
+   * delete trash) revealed together on hover. They are now ONE trigger opening this menu (team
+   * suggestion, matching how Claude's own conversation list does it): the row keeps a single quiet
+   * affordance however many actions it grows, and a third action costs a menu entry rather than
+   * another icon competing with the title for the same few pixels.
+   *
+   * This id also has to participate in the row's REVEAL condition. The trigger is hidden at rest
+   * and shown on hover/focus, so a menu left open while the pointer wanders off its row would
+   * otherwise have its own trigger fade out from under it.
+   */
+  const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
+
   // Inline rename (E2): which row (if any) currently shows an input instead of its title text, and
   // that input's own in-progress value. Only one row can be renaming at a time.
   const [renamingId, setRenamingId] = useState<string | null>(null);
@@ -395,23 +415,58 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   // `requestAnimationFrame` -- without it, an environment lacking rAF would simply never run the
   // callback at all, silently dropping focus after the delete instead of just doing it a frame
   // late.
-  const focusRailContainer = () => {
+  /**
+   * Runs `action` one frame later — the shared primitive for the two places that must let one of
+   * EUI's own focus handoffs finish before starting another (`focusRailContainer` just below, and
+   * `requestDelete`).
+   *
+   * F-1: falls back to running `action` immediately where `requestAnimationFrame` does not exist,
+   * rather than never running it at all. A frame late is a cosmetic problem; never is a lost focus.
+   */
+  const deferOneFrame = (action: () => void) => {
     if (typeof window.requestAnimationFrame !== 'function') {
-      scrollContainerRef.current?.focus();
+      action();
       return;
     }
-    window.requestAnimationFrame(() => {
-      scrollContainerRef.current?.focus();
-    });
+    window.requestAnimationFrame(action);
+  };
+
+  const focusRailContainer = () => {
+    deferOneFrame(() => scrollContainerRef.current?.focus());
   };
 
   const requestDelete = (
     event: React.MouseEvent,
     conversation: ConversationSummary,
   ) => {
-    // Never let the row's own onClick (resume) fire alongside the trash icon's click.
+    // Never let the row's own onClick (resume) fire alongside the action's own click. Synchronous,
+    // because propagation cannot be stopped a frame late.
     event.stopPropagation();
-    setDeleteTarget(conversation);
+    // The modal opens one frame later, deliberately. This is reached from inside the row's overflow
+    // menu, and `EuiPopover ownFocus` owns a focus trap that is still unwinding as the menu closes.
+    // Mounting the modal's own trap in the SAME frame left two competing: the popover's teardown
+    // pulled focus back into its own closing panel, and `focusRailContainer` (after the delete was
+    // confirmed) then had nothing left to hand the rail — focus fell through to `<body>`, which is
+    // exactly the m12/F-4 defect. One frame lets the menu finish closing so only one trap is ever
+    // live, which also restores the modal's own return target to the trigger that opened it.
+    deferOneFrame(() => setDeleteTarget(conversation));
+  };
+
+  // --- Per-row overflow menu ---------------------------------------------------------------------
+
+  const closeRowMenu = () => setMenuOpenId(null);
+
+  /** Toggles one row's menu. `stopPropagation` is what keeps the row's own onClick (resume the
+   * conversation) from firing in the same gesture — the trigger sits inside the row's hit area, so
+   * without it, opening the menu would also navigate away from underneath it. */
+  const toggleRowMenu = (
+    event: React.MouseEvent,
+    conversation: ConversationSummary,
+  ) => {
+    event.stopPropagation();
+    setMenuOpenId(current =>
+      current === conversation.id ? null : conversation.id,
+    );
   };
 
   const confirmDelete = () => {
@@ -493,12 +548,70 @@ export const ConversationList: React.FC<ConversationListProps> = ({
     clearRename();
   };
 
+  /**
+   * One row's overflow-menu entries, as an ARRAY so adding a future action is one push rather than
+   * another branch in the row's JSX (pin, duplicate, export…). Order is stable and the destructive
+   * entry stays last.
+   *
+   * Each entry closes the menu FIRST and then runs the existing flow untouched — `startRename`
+   * (inline editor) and `requestDelete` (confirm modal) are the very same functions the two icon
+   * buttons called, so neither flow changed shape; only how it is reached did. Closing first also
+   * means focus lands where the flow puts it (the rename input autofocuses, the confirm modal takes
+   * focus) instead of being pulled back to the trigger by the popover's own focus return.
+   *
+   * `onRename` is optional on this component, so the Rename entry appears only when a handler was
+   * supplied — the same condition that used to gate the pencil.
+   */
+  const rowMenuItems = (
+    conversation: ConversationSummary,
+  ): React.ReactElement[] => {
+    const items: React.ReactElement[] = [];
+    if (onRename) {
+      items.push(
+        <EuiContextMenuItem
+          key='rename'
+          icon='pencil'
+          onClick={(event: React.MouseEvent) => {
+            closeRowMenu();
+            startRename(event, conversation);
+          }}
+        >
+          {i18n.translate('wazuhAiAssistant.chat.conversations.rename', {
+            defaultMessage: 'Rename conversation',
+          })}
+        </EuiContextMenuItem>,
+      );
+    }
+    items.push(
+      <EuiContextMenuItem
+        key='delete'
+        // The danger tone lives on BOTH the icon and the label (`wzConvoRowMenuDanger`,
+        // conversation-list.scss): EuiContextMenuItem has no `color` prop, and colouring only the
+        // icon would leave the one destructive entry reading like the others at a glance.
+        icon={<EuiIcon type='trash' color='danger' />}
+        className='wzConvoRowMenuDanger'
+        onClick={(event: React.MouseEvent) => {
+          closeRowMenu();
+          requestDelete(event, conversation);
+        }}
+      >
+        {i18n.translate('wazuhAiAssistant.chat.conversations.delete', {
+          defaultMessage: 'Delete conversation',
+        })}
+      </EuiContextMenuItem>,
+    );
+    return items;
+  };
+
   // --- Bulk delete / select mode (E3) -----------------------------------------------------------
 
   const enterSelectMode = () => {
     // m6: a rename in progress and select mode are mutually exclusive UI states (the row's rename
     // affordance is hidden while selectMode is true anyway) -- clear rather than leave it dangling.
     clearRename();
+    // Same reasoning for an open overflow menu: select mode stops rendering the trigger this menu
+    // is anchored to, so leaving it "open" would strand a panel with no anchor.
+    closeRowMenu();
     setSelectMode(true);
     setSelectedIds(new Set());
   };
@@ -958,6 +1071,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                   const isSelected = conversation.id === activeConversationId;
                   const isHovered = conversation.id === hoveredId;
                   const isFocused = conversation.id === focusedId;
+                  const isMenuOpen = conversation.id === menuOpenId;
                   const isRenaming = conversation.id === renamingId;
                   const isChecked = selectedIds.has(conversation.id);
                   return (
@@ -1146,84 +1260,83 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                                 // 3:1 contrast requirement for a control) — 1 on hover, selection, OR
                                 // keyboard focus (F-3: `isFocused`, not `isHovered`, is what survives
                                 // the pointer moving to a different row), so a keyboard/switch user
-                                // can find and reach this control too.
+                                // can find and reach this control too. `isMenuOpen` is in there for
+                                // the pointer leaving the row while this row's own menu is open: the
+                                // trigger fading out from under an open menu it anchors would be
+                                // both jarring and a lost focus target when that menu closes.
                                 style={{
                                   opacity:
-                                    isHovered || isSelected || isFocused
+                                    isHovered ||
+                                    isSelected ||
+                                    isFocused ||
+                                    isMenuOpen
                                       ? 1
                                       : 0,
                                 }}
+                                // Escape while this menu is open closes the MENU and stops there.
+                                // Guarded on `isMenuOpen` so a closed menu's row never swallows an
+                                // Escape meant for an enclosing surface (the rail's own select-mode
+                                // exit, a docked flyout) — closed, this handler does nothing at all.
+                                onKeyDown={(event: React.KeyboardEvent) => {
+                                  if (event.key === 'Escape' && isMenuOpen) {
+                                    event.stopPropagation();
+                                    closeRowMenu();
+                                  }
+                                }}
                               >
-                                <EuiButtonIcon
-                                  iconType='trash'
-                                  color='danger'
-                                  aria-label={i18n.translate(
-                                    'wazuhAiAssistant.chat.conversations.delete',
-                                    {
-                                      defaultMessage: 'Delete conversation',
-                                    },
-                                  )}
-                                  onClick={(event: React.MouseEvent) =>
-                                    requestDelete(event, conversation)
+                                <EuiPopover
+                                  ownFocus
+                                  panelPaddingSize='none'
+                                  anchorPosition='leftUp'
+                                  isOpen={isMenuOpen}
+                                  closePopover={closeRowMenu}
+                                  button={
+                                    <EuiButtonIcon
+                                      iconType='boxesHorizontal'
+                                      color='text'
+                                      aria-label={i18n.translate(
+                                        'wazuhAiAssistant.chat.conversations.actionsMenu',
+                                        {
+                                          defaultMessage:
+                                            'Conversation actions',
+                                        },
+                                      )}
+                                      aria-haspopup='menu'
+                                      aria-expanded={isMenuOpen}
+                                      onClick={(event: React.MouseEvent) =>
+                                        toggleRowMenu(event, conversation)
+                                      }
+                                      onFocus={() =>
+                                        setFocusedId(conversation.id)
+                                      }
+                                      onBlur={() =>
+                                        setFocusedId(current =>
+                                          current === conversation.id
+                                            ? null
+                                            : current,
+                                        )
+                                      }
+                                    />
                                   }
-                                  onFocus={() => setFocusedId(conversation.id)}
-                                  onBlur={() =>
-                                    setFocusedId(current =>
-                                      current === conversation.id
-                                        ? null
-                                        : current,
-                                    )
-                                  }
-                                />
+                                >
+                                  {/* Rendered ONLY while open, deliberately. `EuiPopover` mounts
+                                    its panel on first open and then KEEPS it in the DOM, hiding it
+                                    with CSS — which would leave every row the user has ever opened
+                                    carrying two permanently-hidden but still focusable buttons, so
+                                    a keyboard user tabbing the rail would walk through actions for
+                                    rows whose menus are shut. Unmounting the entries with the menu
+                                    keeps the tab order honest and the DOM proportional to what is
+                                    actually on screen. */}
+                                  {isMenuOpen ? (
+                                    <EuiContextMenuPanel
+                                      items={rowMenuItems(conversation)}
+                                    />
+                                  ) : null}
+                                </EuiPopover>
                               </EuiFlexItem>
                             </>
                           )}
                         </EuiFlexGroup>
-                        {/* M3 fix (#9010 review): the pencil used to be a zero-width EuiFlexItem
-                          INSIDE the EuiFlexGroup above. EUI's `gutterSize='xs'` is implemented as
-                          a margin on every flex item, including a collapsed `width: 0` one — so
-                          that item still cost the row ~4px of dead gutter at rest, on top of the
-                          upstream row's own [title][timestamp][trash] gutters (compare
-                          `upstream/5.0.0`'s own row markup: three items, this one's own margin
-                          included). Taking the pencil OUT of the flex flow entirely and rendering
-                          it as this absolutely-positioned overlay (anchored to `position:
-                          relative` on the row div above) is what makes the row's OWN flex
-                          group — title/timestamp/trash, nothing else — byte-identical to
-                          upstream's at rest, not merely visually close to it.
-                          `pointerEvents: 'none'` at rest, not just `opacity: 0`: this sits on top
-                          of the timestamp/trash's own hit area, so an invisible-but-still-clickable
-                          overlay would silently steal clicks meant for them between hovers.
-                          Reveal condition unchanged from before (`isHovered || isFocused`, F-3),
-                          and the background is the SAME `--wz-accent-hover` token the row itself
-                          paints on hover (conversation-list.scss) — no new color — so a title
-                          character the pencil happens to sit over never bleeds through it. */}
-                        {onRename && !selectMode && !isRenaming && (
-                          <div
-                            className='wzConvoRowRenameOverlay'
-                            style={{
-                              opacity: isHovered || isFocused ? 1 : 0,
-                              pointerEvents:
-                                isHovered || isFocused ? 'auto' : 'none',
-                            }}
-                          >
-                            <EuiButtonIcon
-                              iconType='pencil'
-                              aria-label={i18n.translate(
-                                'wazuhAiAssistant.chat.conversations.rename',
-                                { defaultMessage: 'Rename conversation' },
-                              )}
-                              onClick={(event: React.MouseEvent) =>
-                                startRename(event, conversation)
-                              }
-                              onFocus={() => setFocusedId(conversation.id)}
-                              onBlur={() =>
-                                setFocusedId(current =>
-                                  current === conversation.id ? null : current,
-                                )
-                              }
-                            />
-                          </div>
-                        )}
                       </div>
                     </li>
                   );

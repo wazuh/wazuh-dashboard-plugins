@@ -164,6 +164,7 @@
     "wazuhAiAssistant.chat.conversations.new": "Nueva conversación",
     "wazuhAiAssistant.chat.conversations.empty": "Aún no hay conversaciones guardadas.",
     "wazuhAiAssistant.chat.conversations.delete": "Eliminar conversación",
+    "wazuhAiAssistant.chat.conversations.actionsMenu": "Acciones de la conversación",
     "wazuhAiAssistant.chat.conversations.untitled": "Conversación sin título",
     "wazuhAiAssistant.chat.conversations.loadError": "No se pudo cargar esa conversación.",
     "wazuhAiAssistant.chat.conversations.deleteError": "No se pudo eliminar esa conversación.",

@@ -3495,7 +3495,17 @@ describe('conversation rail: rename, bulk delete, and delete toasts (#9010)', ()
     );
 
     fireEvent.click(
+      screen.getByRole('button', { name: 'Conversation actions' }),
+    );
+    fireEvent.click(
       screen.getByRole('button', { name: 'Delete conversation' }),
+    );
+    // The confirm modal opens a frame after the menu entry is chosen — see `requestDelete`
+    // (conversation-list.tsx) for why the two focus traps are deliberately serialized.
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: 'Delete' }),
+      ).toBeInTheDocument(),
     );
     fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
 
@@ -3521,6 +3531,9 @@ describe('conversation rail: rename, bulk delete, and delete toasts (#9010)', ()
     );
 
     fireEvent.click(
+      screen.getByRole('button', { name: 'Conversation actions' }),
+    );
+    fireEvent.click(
       screen.getByRole('button', { name: 'Rename conversation' }),
     );
     const input = screen.getByLabelText('Conversation title');
@@ -3544,6 +3557,9 @@ describe('conversation rail: rename, bulk delete, and delete toasts (#9010)', ()
       expect(conversationRow('Old title')).toBeInTheDocument(),
     );
 
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Conversation actions' }),
+    );
     fireEvent.click(
       screen.getByRole('button', { name: 'Rename conversation' }),
     );

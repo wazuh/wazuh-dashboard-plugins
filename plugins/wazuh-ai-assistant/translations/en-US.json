@@ -163,6 +163,7 @@
     "wazuhAiAssistant.chat.conversations.new": "New conversation",
     "wazuhAiAssistant.chat.conversations.empty": "No saved conversations yet.",
     "wazuhAiAssistant.chat.conversations.delete": "Delete conversation",
+    "wazuhAiAssistant.chat.conversations.actionsMenu": "Conversation actions",
     "wazuhAiAssistant.chat.conversations.untitled": "Untitled conversation",
     "wazuhAiAssistant.chat.conversations.loadError": "Could not load that conversation.",
     "wazuhAiAssistant.chat.conversations.deleteError": "Could not delete that conversation.",
