@@ -145,7 +145,9 @@ test('isRoundFutile: at least one successful call had new, non-duplicate rows --
 test('zero-row widening: the FIRST all-zero-row round of a turn earns one more round', () => {
   assert.equal(
     shouldGrantZeroRowWideningRound({
-      successfulCalls: [{ hadRows: false, isDuplicate: false }],
+      successfulCalls: [
+        { toolName: 'get_sca_checks', hadRows: false, isDuplicate: false },
+      ],
       alreadyGranted: false,
     }),
     true,
@@ -157,7 +159,9 @@ test('zero-row widening: granted at most ONCE per turn -- the second empty round
   // +61% on the phase-4 build.
   assert.equal(
     shouldGrantZeroRowWideningRound({
-      successfulCalls: [{ hadRows: false, isDuplicate: false }],
+      successfulCalls: [
+        { toolName: 'get_sca_checks', hadRows: false, isDuplicate: false },
+      ],
       alreadyGranted: true,
     }),
     false,
@@ -170,8 +174,8 @@ test('zero-row widening: a round containing a DUPLICATE call earns nothing', () 
   assert.equal(
     shouldGrantZeroRowWideningRound({
       successfulCalls: [
-        { hadRows: false, isDuplicate: false },
-        { hadRows: false, isDuplicate: true },
+        { toolName: 'get_sca_checks', hadRows: false, isDuplicate: false },
+        { toolName: 'get_sca_checks', hadRows: false, isDuplicate: true },
       ],
       alreadyGranted: false,
     }),
@@ -182,7 +186,9 @@ test('zero-row widening: a round containing a DUPLICATE call earns nothing', () 
 test("zero-row widening: a round that returned rows is not this mechanism's concern", () => {
   assert.equal(
     shouldGrantZeroRowWideningRound({
-      successfulCalls: [{ hadRows: true, isDuplicate: false }],
+      successfulCalls: [
+        { toolName: 'get_sca_checks', hadRows: true, isDuplicate: false },
+      ],
       alreadyGranted: false,
     }),
     false,
@@ -205,7 +211,9 @@ test('zero-row widening: only fires where isRoundFutile already said the round w
   // The call site asks this question strictly inside the `isRoundFutile` branch, so every input
   // that earns the grace must also be futile -- otherwise the grace would silently widen a
   // productive round's budget too.
-  const granted = [{ hadRows: false, isDuplicate: false }];
+  const granted = [
+    { toolName: 'get_sca_checks', hadRows: false, isDuplicate: false },
+  ];
   assert.equal(isRoundFutile(granted), true);
   assert.equal(
     shouldGrantZeroRowWideningRound({
@@ -213,6 +221,72 @@ test('zero-row widening: only fires where isRoundFutile already said the round w
       alreadyGranted: false,
     }),
     true,
+  );
+});
+
+// --- EXPLAIN-WAVE PHASE 6: a DISCOVERY-only zero-row round earns nothing ----------------------
+//
+// EV2-SCA-003 (eval run 20260825-211841) is the measured cost of the phase-5 grace: round 1 was a
+// single `get_field_values` probe on `wazuh.rule.tags` that returned zero rows, the grace bought a
+// second tool-bearing round, and the model spent that round on ANOTHER `get_field_values` probe.
+// The typed SCA tool was never called -- tool_selection 1.00 -> 0.00, fidelity 1.00 -> 0.00 --
+// while the baseline arm had called `get_sca_results` and declined cleanly. A zero-row discovery
+// probe has ANSWERED the model ("this field carries nothing here"); it is not a retrieval attempt
+// that came up short, so it buys no extra round.
+
+test('phase 6: a round whose only successful call was a discovery probe earns nothing', () => {
+  assert.equal(
+    shouldGrantZeroRowWideningRound({
+      successfulCalls: [
+        { toolName: 'get_field_values', hadRows: false, isDuplicate: false },
+      ],
+      alreadyGranted: false,
+    }),
+    false,
+  );
+});
+
+test('phase 6: the refusal survives several discovery probes in the same round', () => {
+  assert.equal(
+    shouldGrantZeroRowWideningRound({
+      successfulCalls: [
+        { toolName: 'get_field_values', hadRows: false, isDuplicate: false },
+        { toolName: 'get_field_values', hadRows: false, isDuplicate: false },
+      ],
+      alreadyGranted: false,
+    }),
+    false,
+  );
+});
+
+test('phase 6: a zero-row round with ANY real data call still earns its widening round', () => {
+  // The aim is a PRECISE granted round, not a removed one: the phase-5 gains (zero-call items
+  // 6 -> 2) all came from real queries that came back empty, and those are untouched.
+  assert.equal(
+    shouldGrantZeroRowWideningRound({
+      successfulCalls: [
+        { toolName: 'get_field_values', hadRows: false, isDuplicate: false },
+        { toolName: 'search_wazuh_data', hadRows: false, isDuplicate: false },
+      ],
+      alreadyGranted: false,
+    }),
+    true,
+  );
+});
+
+test('phase 6: a discovery-only round is still futile -- only the GRACE is withheld', () => {
+  // `isRoundFutile` is unchanged: the round still stops the turn, it just stops it one round
+  // earlier than phase 5 did. That is where the median-latency saving comes from.
+  const discoveryOnly = [
+    { toolName: 'get_field_values', hadRows: false, isDuplicate: false },
+  ];
+  assert.equal(isRoundFutile(discoveryOnly), true);
+  assert.equal(
+    shouldGrantZeroRowWideningRound({
+      successfulCalls: discoveryOnly,
+      alreadyGranted: false,
+    }),
+    false,
   );
 });
 

@@ -924,6 +924,41 @@ test('phase 5: the widening clause names the three concrete moves to spend the r
   assert.match(prompt, /switch to the surface that actually holds the data/);
 });
 
+// --- EXPLAIN-WAVE PHASE 6: the widening retry is pinned to the SAME question -------------------
+// The phase-5 clause bought the round but never said what it must be ABOUT. EV2-SCA-003 (eval run
+// 20260825-211841) spent it on a second exploratory get_field_values probe and never called the
+// typed SCA tool: tool_selection 1.00 -> 0.00. chat.ts's `shouldGrantZeroRowWideningRound` now
+// refuses the grace to a discovery-only round; this is the prose half of the same fix.
+test('phase 6: the retry must target the same question with exactly one thing changed', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /THE SAME QUESTION with exactly ONE thing changed/);
+  assert.match(prompt, /never a fresh exploration of what might be available/);
+});
+
+test('phase 6: the retry may not be spent probing again after an empty probe', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /a discovery call that comes back empty has ANSWERED you/,
+  );
+  assert.match(prompt, /not a third guess at a field name/);
+});
+
+test('phase 6: the escape hatch is described as one enum value per state index', () => {
+  // The prompt used to name "-system_services", an index that does not exist on this platform,
+  // and told the model the wazuh-states-* wildcard was the route. Both are now wrong: the enum
+  // carries one value per physical index (see catalog/generic-query-families.ts).
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /ONE ENUM VALUE PER INDEX/);
+  assert.match(prompt, /wazuh-states-inventory-services\*/);
+  assert.doesNotMatch(prompt, /system_services/);
+});
+
+test('phase 6: verify-before-filter now claims the current-state surfaces too', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /This now covers the current-state surfaces as well/);
+});
+
 // Same answer, second defect: it opened with "This is one of the five fixed-scope decline cases:",
 // leaking this prompt's own bookkeeping into user-facing copy. The decline block told the model
 // which words to use but never that the numbering exists only for its own benefit.

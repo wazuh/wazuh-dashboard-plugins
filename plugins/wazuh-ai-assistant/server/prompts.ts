@@ -615,9 +615,12 @@ export function buildSystemPrompt(nowIso: string): string {
     'get_agent_inventory only implements the FIVE syscollector kinds named in its own schema (os, ' +
       'packages, ports, processes, hotfixes). Groups, users, network interfaces, hardware, ' +
       'protocols, services, and browser-extensions are NOT among them, but they ARE real, ' +
-      'queryable syscollector data on the wazuh-states-inventory-* indices (e.g. ' +
-      '"wazuh-states-inventory-groups", "-users", "-networks", "-hardware", "-protocols", ' +
-      '"-system_services"), part of the wazuh-states-* family search_wazuh_data can already read. ' +
+      'queryable syscollector data on the wazuh-states-inventory-* indices, and search_wazuh_data ' +
+      "now offers ONE ENUM VALUE PER INDEX -- pick the exact one from that parameter's own list " +
+      '(e.g. "wazuh-states-inventory-services*", "-users*", "-groups*", "-hardware*", ' +
+      '"-networks*", "-protocols*", "-interfaces*", "-browser-extensions*") instead of the ' +
+      'wazuh-states-* wildcard, which fans out over all eighteen state indices and returns a ' +
+      'sample dominated by the largest family rather than the one you asked about. ' +
       'Before declining a question about one of these absent kinds as a missing capability, ALWAYS ' +
       'try search_wazuh_data against the matching wazuh-states-inventory-* index first if it is ' +
       "available to you this turn -- get_agent_inventory's own kind enum lacking an option is only " +
@@ -651,15 +654,28 @@ export function buildSystemPrompt(nowIso: string): string {
     // now leaves exactly one tool-bearing round open for this, so this clause is the half that
     // says what to spend it on. Stated as ONE attempt, with the three concrete moves, because the
     // affordance is one round and the latency tail is already the phase-4 build's stated cost.
+    // EXPLAIN-WAVE PHASE 6 (eval run 20260825-211841): the clause worked -- zero-call items fell
+    // 6 -> 2 and rounds/item rose 0.46 -- but it never said what the retry must be ABOUT, and
+    // EV2-SCA-003 shows the cost of that omission: the model spent the extra round on a second
+    // exploratory get_field_values probe and never called the typed SCA tool at all
+    // (tool_selection 1.00 -> 0.00). The retry is now pinned to the SAME question with exactly ONE
+    // thing changed, and exploratory probing is named as the wrong way to spend it. chat.ts's
+    // `shouldGrantZeroRowWideningRound` enforces the matching half mechanically: a round made only
+    // of discovery calls no longer earns the extra round at all.
     'When a query comes back with zero rows and you believe the thing asked about plausibly ' +
       'exists, make EXACTLY ONE more attempt before saying you found nothing -- one, not a series. ' +
-      'Spend it on whichever of these fits: drop the narrowest filter (the tightest time window, ' +
-      'the severity, the one extra term), correct a filter VALUE you suspect was wrong (check it ' +
+      'That attempt must target THE SAME QUESTION with exactly ONE thing changed -- one filter, ' +
+      'one value, or one surface -- never a fresh exploration of what might be available. Spend ' +
+      'it on whichever of these fits: drop the narrowest filter (the tightest time window, the ' +
+      'severity, the one extra term), correct a filter VALUE you suspect was wrong (check it ' +
       'with get_field_values rather than guessing a second spelling), or switch to the surface ' +
-      'that actually holds the data (state indices vs findings vs events). If that second attempt ' +
-      'is also empty, stop and report the absence -- name both queries you ran so the user can ' +
-      'see the scope you actually covered. Never make a third variation, and never abstain on the ' +
-      'first zero-row result alone.',
+      'that actually holds the data (state indices vs findings vs events). Do NOT spend it on ' +
+      'another field/value probe when the empty result you are reacting to was itself a probe: a ' +
+      'discovery call that comes back empty has ANSWERED you -- that field carries nothing here -- ' +
+      'so the next call must be the real query against the tool that owns this question, not a ' +
+      'third guess at a field name. If that second attempt is also empty, stop and report the ' +
+      'absence -- name both queries you ran so the user can see the scope you actually covered. ' +
+      'Never make a third variation, and never abstain on the first zero-row result alone.',
     // #8915: suggest_discover_query is attached to the tool list on every tool-bearing round, but
     // measured live traffic showed it was NEVER invoked — including on the turns it exists for:
     // an empty domain, a zero-row result, or a truncated sample. Nothing here named WHEN calling
@@ -700,7 +716,15 @@ export function buildSystemPrompt(nowIso: string): string {
       'real values instead of guessing a spelling/casing/synonym. If a filtered call still comes ' +
       'back with zero rows for something that plausibly exists, call get_field_values on that ' +
       'same field before concluding it does not exist — a zero-row result proves the FILTER VALUE ' +
-      'did not match, not that the data is absent, and those are different findings to report.',
+      'did not match, not that the data is absent, and those are different findings to report. ' +
+      // EXPLAIN-WAVE PHASE 6: get_field_values now covers the wazuh-states-* inventory/FIM-registry
+      // surfaces too (guardrails.ts's allowlist, via state-families.ts). Before this, its `field`
+      // parameter rejected every state field, so on those surfaces the model had no choice but to
+      // guess -- and then read the rejection as evidence the field did not exist.
+      'This now covers the current-state surfaces as well (service, hardware, network, user, ' +
+      'group, browser-extension and registry fields, via the index_family parameter), so on those ' +
+      'indices too, check a field before deciding it is missing rather than inferring absence ' +
+      'from a name you guessed.',
     // Code review B1 (AI/plan/b-review.md P1.1): on this platform version, the ECS host fields on
     // findings/events are largely unpopulated even though they are queryable — a naive reading of
     // a high missing_count could wrongly conclude "no host OS data exists" instead of looking at

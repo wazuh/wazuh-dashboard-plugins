@@ -695,6 +695,21 @@ export function isRoundFutile(
 }
 
 /**
+ * Tools whose whole purpose is to ANSWER "what values/fields exist here" rather than to retrieve
+ * the rows an answer is built from. A zero-row result from one of these is a finding in itself,
+ * which is why `shouldGrantZeroRowWideningRound` below refuses to buy an extra round for a round
+ * made only of them. Kept as a named set rather than a single literal so the next discovery-class
+ * tool joins the rule by being listed, not by someone remembering this branch exists.
+ * `suggest_discover_query` is deliberately absent: it never produces a `tableEvent`, so it can
+ * never appear in a round's successful-call list at all (see that tool's own doc comment).
+ */
+const DISCOVERY_TOOL_NAMES: ReadonlySet<string> = new Set(['get_field_values']);
+
+function isDiscoveryToolCall(toolName: string): boolean {
+  return DISCOVERY_TOOL_NAMES.has(toolName);
+}
+
+/**
  * ZERO-ROW WIDENING GRACE (explain-wave phase 5) -- exactly ONE extra tool-bearing round after the
  * turn's FIRST all-zero-row round, and never more.
  *
@@ -724,15 +739,36 @@ export function isRoundFutile(
  *  - the caller still charges the round's cost first and still forces the final round when the
  *    budget ceiling is spent, so this can never buy a round the budget cannot pay for.
  *
+ * EXPLAIN-WAVE PHASE 6 -- the fourth bound, and the one the NEXT run's evidence asked for: a round
+ * whose only successful calls were DISCOVERY calls earns nothing. `EV2-SCA-003` (eval run
+ * 20260825-211841) is the whole argument. Baseline called `get_sca_results` and declined cleanly;
+ * phase 5 opened with a `get_field_values` probe on `wazuh.rule.tags` that returned zero rows,
+ * this grace handed it a second tool-bearing round, and it spent that round on ANOTHER
+ * `get_field_values` probe -- so tool_selection went 1.00 -> 0.00 and fidelity 1.00 -> 0.00, and
+ * the typed SCA tool was never called at all. A zero-row DISCOVERY probe is not a failed retrieval
+ * attempt: "this field has no values on this surface" IS the discovery answer, and it arrives with
+ * the model's real budget still unspent. Granting an extra round there does not widen a query that
+ * was too narrow -- it funds more probing, which is exactly what happened. Latency is the other
+ * half: this grace fires often enough to move the MEDIAN (p50 18.2 s -> 23.0 s, +26%), so the aim
+ * is to keep the round PRECISE, not to remove it -- a zero-row round with any real data call in it
+ * still earns its widening round exactly as before.
+ *
  * Returns `true` only when the round should be allowed one more tool-bearing round. Callers must
  * pass only the round's SUCCESSFUL calls, the same array `isRoundFutile` reads, and must only ask
  * once `isRoundFutile` has already returned `true`.
  */
 export function shouldGrantZeroRowWideningRound(opts: {
-  successfulCalls: ReadonlyArray<{ hadRows: boolean; isDuplicate: boolean }>;
+  successfulCalls: ReadonlyArray<{
+    toolName: string;
+    hadRows: boolean;
+    isDuplicate: boolean;
+  }>;
   alreadyGranted: boolean;
 }): boolean {
   if (opts.alreadyGranted || opts.successfulCalls.length === 0) {
+    return false;
+  }
+  if (opts.successfulCalls.every(call => isDiscoveryToolCall(call.toolName))) {
     return false;
   }
   return opts.successfulCalls.every(call => !call.isDuplicate && !call.hadRows);

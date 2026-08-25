@@ -90,6 +90,77 @@ test('the wazuh-states-* label names the registry half of FIM, not just files', 
   assert.match(states.label, /file state/);
 });
 
+// EXPLAIN-WAVE PHASE 6. Root cause A of eval run 20260825-211841: all eighteen wazuh-states-*
+// indices collapsed into ONE enum value, so a family-scoped query was unrepresentable -- the model
+// wrote a correct filter, the wildcard returned the union, and the sample carried none of the
+// requested fields. These tests pin the split and the two invariants that make it safe.
+test('every wazuh-states-* index is individually nameable, not just the wildcard', () => {
+  for (const pattern of [
+    'wazuh-states-inventory-users*',
+    'wazuh-states-inventory-groups*',
+    'wazuh-states-inventory-services*',
+    'wazuh-states-inventory-hardware*',
+    'wazuh-states-inventory-interfaces*',
+    'wazuh-states-inventory-networks*',
+    'wazuh-states-inventory-protocols*',
+    'wazuh-states-inventory-browser-extensions*',
+    'wazuh-states-inventory-system*',
+    'wazuh-states-inventory-packages*',
+    'wazuh-states-inventory-processes*',
+    'wazuh-states-inventory-ports*',
+    'wazuh-states-inventory-hotfixes*',
+    'wazuh-states-fim-files*',
+    'wazuh-states-fim-registry-keys*',
+    'wazuh-states-fim-registry-values*',
+    'wazuh-states-sca*',
+    'wazuh-states-vulnerabilities*',
+  ]) {
+    assert.ok(
+      GENERIC_QUERY_INDEX_PATTERNS.includes(pattern),
+      `expected "${pattern}" in GENERIC_QUERY_INDEX_PATTERNS`,
+    );
+  }
+});
+
+test('the wazuh-states-* wildcard still ships, and its label now warns about the fan-out', () => {
+  // The enum VALUE is the wire contract and is never removed (see this module's own invariant).
+  // What changed is that the label now says why a scoped pattern is the better choice -- the
+  // wildcard's union-dilution is what made eleven inventory answers come back "fields empty".
+  const states = GENERIC_QUERY_FAMILIES.find(
+    family => family.pattern === 'wazuh-states-*',
+  );
+  assert.ok(states);
+  assert.match(states.label, /eighteen/);
+  assert.match(states.label, /dominated by the largest family/);
+});
+
+test('each per-index state family label quotes signature fields the model can route on', () => {
+  // A bare index name is not enough: the model has to be able to tell "which surface holds a
+  // service state" from the parameter description alone.
+  const services = GENERIC_QUERY_FAMILIES.find(
+    family => family.pattern === 'wazuh-states-inventory-services*',
+  );
+  assert.ok(services);
+  assert.match(services.label, /service\.name/);
+  assert.match(services.label, /service\.state/);
+
+  const protocols = GENERIC_QUERY_FAMILIES.find(
+    family => family.pattern === 'wazuh-states-inventory-protocols*',
+  );
+  assert.ok(protocols);
+  assert.match(protocols.label, /network\.gateway/);
+});
+
+test('the original three families still lead the enum, in their original order', () => {
+  // The state families are inserted after the wildcard they refine; the pre-existing three must
+  // keep their long-standing precedence, per this module's own ordering rule.
+  assert.deepEqual(GENERIC_QUERY_INDEX_PATTERNS.slice(0, 3), [
+    'wazuh-findings-v5-*',
+    'wazuh-events-v5-*',
+    'wazuh-states-*',
+  ]);
+});
+
 test('wazuh-states-fim-registry-* is reachable through the wazuh-states-* family', () => {
   // The concrete indices the label now points at must actually pass the guardrail, or the routing
   // rule the system prompt states would send the model at a query that can never execute.

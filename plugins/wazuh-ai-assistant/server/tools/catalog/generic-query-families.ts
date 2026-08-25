@@ -8,11 +8,18 @@
  * out of sync the way `guardrails.ts`'s own module-header bound-disclosure audit warns against for
  * every other multiply-referenced bound in this plugin.
  *
- * Deliberately does NOT also become `get-field-values.ts`'s `FIELD_LOCATIONS` source: that map is
- * field-name -> {family, index} for a small vetted low-cardinality aggregation allowlist, a
- * different shape and a different (pre-existing, out of this workstream's scope) contract with its
- * own tests. This file only ever feeds the escape hatch's own enum/description.
+ * SCOPE AMENDMENT (explain-wave phase 6). This file's original note said it deliberately does NOT
+ * also feed `get-field-values.ts`'s `FIELD_LOCATIONS`, on the grounds that "which index carries
+ * this field" is a different contract from "which families may be named". That separation held for
+ * the ORIGINAL three families, and it still holds for them -- but it is exactly what let the
+ * `wazuh-states-*` surfaces fail in both places at once (eval run 20260825-211841: an index the
+ * enum could not name, whose fields could not be discovered either). The state families therefore
+ * now come from ONE shared row set, `../state-families.ts`, which feeds this enum, that map, and
+ * `guardrails.ts`'s aggregation allowlist together; see that file's doc comment for why splitting
+ * the three lists is what made the gap invisible. Everything else here is unchanged.
  */
+
+import { STATE_FAMILIES, stateFamilyLabel } from '../state-families';
 
 export interface GenericQueryFamily {
   /** The exact index pattern/name sent as `search_wazuh_data`'s `index_pattern` parameter — must
@@ -50,11 +57,42 @@ const ORIGINAL_FAMILIES: GenericQueryFamily[] = [
     // pattern at `wazuh-states-fim-registry-*`, which it has covered since this pattern shipped.
     // The system prompt now carries the full routing rule; this makes the tool's own schema agree
     // with it instead of quietly implying the narrower reading.
+    //
+    // EXPLAIN-WAVE PHASE 6: the value still ships (wire contract; a caller that has always sent it
+    // keeps working), but the label now says what it COSTS. This wildcard fans out over all
+    // eighteen state indices at once, and the returned sample is dominated by whichever family has
+    // the most documents -- which is why eleven inventory questions on eval run 20260825-211841
+    // came back "the fields I asked for were empty" against a corpus that holds them. The
+    // per-family patterns below are the answer to that, so this entry's job is now to send the
+    // model there.
     label:
-      'current-state data: vulnerabilities, FIM (both file state and Windows registry ' +
-      'keys/values), SCA, inventory',
+      'ALL current-state data at once: vulnerabilities, FIM (both file state and Windows registry ' +
+      'keys/values), SCA, inventory. Use a specific wazuh-states-... pattern below whenever you ' +
+      'know which surface you need -- this wildcard searches all eighteen state indices together ' +
+      'and its sample will be dominated by the largest family, not by the one you asked about; ' +
+      'that is the usual reason a correct filter here comes back with the requested fields empty',
   },
 ];
+
+/**
+ * EXPLAIN-WAVE PHASE 6 (eval run 20260825-211841, RESULTS.md "Root cause A"): one enum entry per
+ * physical `wazuh-states-*` index, derived from `../state-families.ts` so the enum, the
+ * field-discovery route (`get-field-values.ts`'s `FIELD_LOCATIONS`) and the aggregation allowlist
+ * (`guardrails.ts`) can never again list a different set of state surfaces from each other.
+ *
+ * Every pattern is accepted by `checkIndexAllowlist` today with no guardrail change: the existing
+ * `INDEX_ALLOWLIST_RE` alternative `^wazuh-(...|states|...)[A-Za-z0-9._*-]*$` already covers every
+ * `wazuh-states-`-prefixed name. That is precisely the failure mode this module's header warns
+ * about, in its second form -- these indices were ALLOWLISTED all along and simply not
+ * ENUMERABLE, so the model could not name one. This module's own test asserts the acceptance
+ * rather than trusting the reading.
+ */
+const STATE_INDEX_FAMILIES: GenericQueryFamily[] = STATE_FAMILIES.map(
+  family => ({
+    pattern: family.pattern,
+    label: stateFamilyLabel(family),
+  }),
+);
 
 /**
  * Workstream A1a additions (AI/plan/coverage-validation-design.md — TC-8, G1, MS-6/MS-7, G2, G3,
@@ -116,9 +154,12 @@ const A1A_FAMILIES: GenericQueryFamily[] = [
 ];
 
 /** All families the escape hatch can target, in the fixed order they're presented to the model
- * (original three first, so their long-standing behavior/precedence is unaffected). */
+ * (original three first, so their long-standing behavior/precedence is unaffected; the per-index
+ * state families immediately after the `wazuh-states-*` wildcard they refine, so the model reads
+ * the umbrella and its alternatives together). */
 export const GENERIC_QUERY_FAMILIES: GenericQueryFamily[] = [
   ...ORIGINAL_FAMILIES,
+  ...STATE_INDEX_FAMILIES,
   ...A1A_FAMILIES,
 ];
 
