@@ -281,7 +281,7 @@ test('findingDigestColumns: appends the extras without duplicating a tool-declar
 test('VULN_DIGEST_SAMPLE_COLUMNS: carries both fix-bearing fields the vulnerability docs have', () => {
   assert.ok(
     VULN_DIGEST_SAMPLE_COLUMNS.includes('vulnerability.scanner.condition'),
-    "the scanner's own fix bound (e.g. \"Package less than KB5034763\")",
+    'the scanner\'s own fix bound (e.g. "Package less than KB5034763")',
   );
   assert.ok(
     VULN_DIGEST_SAMPLE_COLUMNS.includes('vulnerability.description'),

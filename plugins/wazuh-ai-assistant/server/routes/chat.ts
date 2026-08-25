@@ -632,7 +632,10 @@ export function withFinalRoundAnswerInstruction(
   if (!isFinalRound || !toolUsedThisTurn) {
     return messages;
   }
-  return [...messages, { role: 'user', content: FINAL_ROUND_ANSWER_INSTRUCTION }];
+  return [
+    ...messages,
+    { role: 'user', content: FINAL_ROUND_ANSWER_INSTRUCTION },
+  ];
 }
 
 // ---------------------------------------------------------------------------------------------

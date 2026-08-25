@@ -131,7 +131,7 @@ export function buildSystemPrompt(nowIso: string): string {
       'scanner fix condition, a remediation text -- part (3) must cite that specific fix first, ' +
       'quoting the value, before any general advice; when the item has such a field and it is ' +
       'empty or absent, say plainly that no fix was supplied for it rather than presenting your ' +
-      'own general steps as the product\'s remediation. Parts (2) ' +
+      "own general steps as the product's remediation. Parts (2) " +
       'and (3) may draw on your general security knowledge: keep them clearly separate from ' +
       'part (1), frame them as guidance rather than as something observed in this environment, ' +
       'and say they should be verified before acting on them -- never present general ' +

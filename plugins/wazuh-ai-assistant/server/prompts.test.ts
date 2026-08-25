@@ -1005,12 +1005,13 @@ test('buildSystemPrompt: the new resolution clause names no tool to call', () =>
   // Same trap the two paragraphs above it were rewritten for (#8913's diagnostic run): telling the
   // model to call a specific lookup tool is useless when stage-1 routing did not offer it.
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
-  const clause = prompt.slice(
-    prompt.indexOf('When the user DOES name a host'),
-  );
+  const clause = prompt.slice(prompt.indexOf('When the user DOES name a host'));
   const sentence = clause.slice(0, clause.indexOf('unscoped.'));
   assert.doesNotMatch(sentence, /call get_agents/);
-  assert.match(sentence, /any tool available to you this turn that accepts an agent name/);
+  assert.match(
+    sentence,
+    /any tool available to you this turn that accepts an agent name/,
+  );
 });
 
 // --- EXPLAIN-WAVE PHASE 4: cite the concrete fix, and the state-vs-history surface split --------
