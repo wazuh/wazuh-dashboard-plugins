@@ -53,7 +53,7 @@ jest.mock('../../services/settings-service', () => ({
   SettingsService: jest.fn(() => mockService),
 }));
 
-import { SettingsPage } from './settings-page';
+import { SettingsPage, parseRetentionDays } from './settings-page';
 import {
   ASSISTANT_SETTINGS_CHANGED_EVENT,
   PROVIDERS_CHANGED_EVENT,
@@ -76,6 +76,51 @@ const SettingsPageWithRouter: React.FC<
     <SettingsPage {...props} />
   </MemoryRouter>
 );
+
+/**
+ * One provider fixture and one `core` carrying toast spies, shared by every case below that needs
+ * them — both used to be redeclared per describe. The global `beforeEach`'s `jest.clearAllMocks()`
+ * resets the spies between cases, so no per-describe reset is needed.
+ */
+const PROVIDER = {
+  id: 'p1',
+  name: 'My OpenAI',
+  type: 'openai_compatible',
+  baseUrl: 'https://api.openai.com/v1',
+  model: 'gpt-4o',
+  isDefault: false,
+};
+
+const toasts = { addSuccess: jest.fn(), addDanger: jest.fn() };
+
+const coreWithToasts = {
+  http: {},
+  notifications: { toasts },
+} as unknown as CoreStart;
+
+/**
+ * Drives the "My OpenAI" row's menu Delete action through its confirmation modal. The modal's
+ * confirm button is reached by its own `data-test-subj` rather than by role+name: the row menu's
+ * "Delete" item is also a button named "Delete", and whether EUI has finished unmounting the
+ * popover by the time the modal renders is a race — querying by name hits both and fails
+ * intermittently ("Found multiple elements with the role button and name /^delete$/i").
+ */
+async function deleteProviderThroughRowMenu(): Promise<void> {
+  fireEvent.click(
+    await screen.findByRole('button', { name: /actions for my openai/i }),
+  );
+  fireEvent.click(await screen.findByText(/^delete$/i));
+  const confirmButton = await waitFor(() => {
+    const button = document.querySelector(
+      '[data-test-subj="confirmModalConfirmButton"]',
+    );
+    if (!button) {
+      throw new Error('delete confirmation modal not open');
+    }
+    return button;
+  });
+  fireEvent.click(confirmButton);
+}
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -1482,13 +1527,6 @@ describe('SettingsPage — in-card layout and hierarchy (audit §4)', () => {
  * dispatch side.
  */
 describe('SettingsPage — announcing saved changes to the mounted chat', () => {
-  const coreWithToasts = {
-    http: {},
-    notifications: {
-      toasts: { addSuccess: jest.fn(), addDanger: jest.fn() },
-    },
-  } as unknown as CoreStart;
-
   /** Records every dispatch of `eventName` for the duration of one test. */
   function listenFor(eventName: string): {
     count: () => number;
@@ -1504,15 +1542,6 @@ describe('SettingsPage — announcing saved changes to the mounted chat', () => 
       stop: () => window.removeEventListener(eventName, handler),
     };
   }
-
-  const PROVIDER = {
-    id: 'p1',
-    name: 'My OpenAI',
-    type: 'openai_compatible',
-    baseUrl: 'https://api.openai.com/v1',
-    model: 'gpt-4o',
-    isDefault: false,
-  };
 
   it('dispatches ASSISTANT_SETTINGS_CHANGED_EVENT after a successful privacy save', async () => {
     // With no providers the page renders the "No AI provider configured" empty prompt instead of
@@ -1724,6 +1753,10 @@ describe('SettingsPage — announcing saved changes to the mounted chat', () => 
     }
   });
 
+  // Both delete cases go through `deleteProviderThroughRowMenu` (module scope) and carry an
+  // explicit timeout: they used to query the modal's confirm button by name, which intermittently
+  // matched the row menu's own "Delete" item as well, and rendering this whole page plus a popover
+  // and a modal in jsdom overruns jest's 5 s default on a loaded machine.
   it('dispatches PROVIDERS_CHANGED_EVENT when a provider is deleted', async () => {
     mockService.list.mockResolvedValue([PROVIDER]);
     mockService.remove.mockResolvedValue(undefined);
@@ -1736,12 +1769,7 @@ describe('SettingsPage — announcing saved changes to the mounted chat', () => 
           onProvidersChanged={jest.fn()}
         />,
       );
-      // Delete lives behind the row's actions popover.
-      fireEvent.click(
-        await screen.findByRole('button', { name: /actions for my openai/i }),
-      );
-      fireEvent.click(await screen.findByText(/^delete$/i));
-      fireEvent.click(await screen.findByRole('button', { name: /^delete$/i }));
+      await deleteProviderThroughRowMenu();
 
       await waitFor(() =>
         expect(mockService.remove).toHaveBeenCalledWith('p1'),
@@ -1750,7 +1778,7 @@ describe('SettingsPage — announcing saved changes to the mounted chat', () => 
     } finally {
       heard.stop();
     }
-  });
+  }, 30000);
 
   it('does not announce a provider change when the delete fails', async () => {
     mockService.list.mockResolvedValue([PROVIDER]);
@@ -1764,16 +1792,335 @@ describe('SettingsPage — announcing saved changes to the mounted chat', () => 
           onProvidersChanged={jest.fn()}
         />,
       );
-      fireEvent.click(
-        await screen.findByRole('button', { name: /actions for my openai/i }),
-      );
-      fireEvent.click(await screen.findByText(/^delete$/i));
-      fireEvent.click(await screen.findByRole('button', { name: /^delete$/i }));
+      await deleteProviderThroughRowMenu();
 
       await waitFor(() => expect(mockService.remove).toHaveBeenCalled());
       expect(heard.count()).toBe(0);
     } finally {
       heard.stop();
     }
+  }, 30000);
+});
+
+/** UX wave 2, PR A: the providers table and the conversation-history field. */
+describe('SettingsPage — provider table feedback and retention validation', () => {
+  // The explicit timeouts on the two delete cases below are environmental, not a slow assertion:
+  // rendering this whole page and driving a popover plus a modal through jsdom overruns jest's 5 s
+  // default on a loaded machine, which is what makes the pre-existing delete cases in the suite
+  // above flake too.
+  it('confirms a provider delete with a toast naming it', async () => {
+    // Delete was the only mutation on this page that just made a row vanish in silence, which
+    // reads the same as a failure that closed the modal without saying anything.
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.remove.mockResolvedValue(undefined);
+
+    render(
+      <SettingsPageWithRouter
+        core={coreWithToasts}
+        onProvidersChanged={jest.fn()}
+      />,
+    );
+
+    await deleteProviderThroughRowMenu();
+
+    await waitFor(() =>
+      expect(toasts.addSuccess).toHaveBeenCalledWith(
+        'Provider "My OpenAI" deleted.',
+      ),
+    );
+  }, 30000);
+
+  it('says nothing on a failed delete', async () => {
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.remove.mockRejectedValue(new Error('403'));
+
+    render(
+      <SettingsPageWithRouter
+        core={coreWithToasts}
+        onProvidersChanged={jest.fn()}
+      />,
+    );
+
+    await deleteProviderThroughRowMenu();
+
+    await waitFor(() => expect(mockService.remove).toHaveBeenCalled());
+    expect(toasts.addSuccess).not.toHaveBeenCalledWith(
+      expect.stringContaining('deleted'),
+    );
+  }, 30000);
+
+  it('shows a spinner and a Testing state in the Status cell while a test is in flight', async () => {
+    // A test that never resolves keeps the row in the in-flight state for the assertion.
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.test.mockReturnValue(new Promise(() => undefined));
+
+    render(
+      <SettingsPageWithRouter
+        core={coreWithToasts}
+        onProvidersChanged={jest.fn()}
+      />,
+    );
+
+    const statusChip = await screen.findByText(/testing/i);
+    expect(statusChip).toBeInTheDocument();
+    expect(document.querySelector('.wzStatusChip__spinner')).not.toBeNull();
+  });
+
+  it('rejects an unparseable retention value instead of clamping it to 0', async () => {
+    // Clamping sent the field to 0 — the one value that means "keep everything forever" — for any
+    // input the old `Number()` parse did not like.
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: false,
+      userCanOverride: true,
+      privacyDefaultPerProvider: {},
+      fieldPolicy: [],
+      conversationRetentionDays: 30,
+    });
+
+    render(
+      <SettingsPageWithRouter
+        core={coreWithToasts}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=retention']}
+      />,
+    );
+
+    const days = await screen.findByRole('spinbutton');
+    fireEvent.change(days, { target: { value: '-5' } });
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: /save conversation history settings/i,
+      }),
+    );
+
+    expect(
+      await screen.findByText(
+        /retention must be 0 or a positive number of days/i,
+      ),
+    ).toBeInTheDocument();
+    expect(mockService.updateAssistantSettings).not.toHaveBeenCalled();
+    // The field keeps what was typed — it is not silently rewritten to 0.
+    expect(days).toHaveValue(-5);
+  });
+
+  it('lets the field be transiently empty while editing, without inventing a 0', async () => {
+    // Clearing the box to retype used to snap the value to 0, so typing "14" produced "014".
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: false,
+      userCanOverride: true,
+      privacyDefaultPerProvider: {},
+      fieldPolicy: [],
+      conversationRetentionDays: 30,
+    });
+
+    render(
+      <SettingsPageWithRouter
+        core={coreWithToasts}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=retention']}
+      />,
+    );
+
+    const days = await screen.findByRole('spinbutton');
+    fireEvent.change(days, { target: { value: '' } });
+    expect(days).toHaveValue(null);
+    // No error while editing — only on blur or save.
+    expect(
+      screen.queryByText(/retention must be 0 or a positive number of days/i),
+    ).toBeNull();
+
+    fireEvent.blur(days);
+    expect(
+      await screen.findByText(
+        /retention must be 0 or a positive number of days/i,
+      ),
+    ).toBeInTheDocument();
+
+    fireEvent.change(days, { target: { value: '14' } });
+    expect(days).toHaveValue(14);
+    expect(
+      screen.queryByText(/retention must be 0 or a positive number of days/i),
+    ).toBeNull();
+  });
+
+  it('titles a url-guard rejection on the providers card too', async () => {
+    // The same mapping as the flyout's own callout. Driven here through a refused set-default,
+    // simply because it is the cheapest provider mutation to fail from a test — what is being
+    // asserted is that this callout and the flyout's agree on the title, so an admin never sees
+    // one failure described two ways.
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.setDefault.mockRejectedValue({
+      body: {
+        message:
+          'Provider request rejected: this host is a blocked cloud-metadata endpoint.',
+      },
+    });
+
+    render(
+      <SettingsPageWithRouter
+        core={coreWithToasts}
+        onProvidersChanged={jest.fn()}
+      />,
+    );
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: /set as default provider/i }),
+    );
+
+    expect(await screen.findByText('Endpoint blocked')).toBeInTheDocument();
+    expect(
+      screen.getByText(/blocked cloud-metadata endpoint/i),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Something went wrong')).toBeNull();
+  });
+
+  it('keeps an unsaved retention draft when the Privacy tab is saved', async () => {
+    // Both tabs stay mounted, so an admin can type a retention value, switch to Privacy, save
+    // that, and come back. Resyncing the retention field from the save's own echo would throw
+    // that unsaved edit away.
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: false,
+      userCanOverride: true,
+      privacyDefaultPerProvider: {},
+      fieldPolicy: [],
+      conversationRetentionDays: 30,
+    });
+
+    render(
+      <SettingsPageWithRouter
+        core={coreWithToasts}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=retention']}
+      />,
+    );
+
+    const days = await screen.findByRole('spinbutton');
+    fireEvent.change(days, { target: { value: '90' } });
+
+    // Switch to Privacy, dirty it, save it.
+    fireEvent.click(screen.getByRole('tab', { name: /privacy/i }));
+    fireEvent.click(
+      await screen.findByText(/allow users to override privacy mode/i),
+    );
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
+    await waitFor(() =>
+      expect(mockService.updateAssistantSettings).toHaveBeenCalled(),
+    );
+
+    // Back on the Conversation history tab, the draft is still the admin's. (Coming back is part of
+    // the scenario, and also the only way to read the field: the inactive tab's card stays mounted
+    // behind `display: none`, which takes it out of the accessibility tree.)
+    fireEvent.click(screen.getByRole('tab', { name: /conversation history/i }));
+    expect(await screen.findByRole('spinbutton')).toHaveValue(90);
+  });
+
+  it('keeps a retention edit made WHILE the privacy save is in flight', async () => {
+    // The guard has to read the current draft, not the one the handler captured before its await:
+    // the retention field is on a mounted tab and can be typed into while the request is open.
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: false,
+      userCanOverride: true,
+      privacyDefaultPerProvider: {},
+      fieldPolicy: [],
+      conversationRetentionDays: 30,
+    });
+    let resolveSave: () => void = () => undefined;
+    mockService.updateAssistantSettings.mockImplementation(
+      payload =>
+        new Promise(resolve => {
+          resolveSave = () => resolve(payload);
+        }),
+    );
+
+    render(
+      <SettingsPageWithRouter
+        core={coreWithToasts}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=privacy']}
+      />,
+    );
+
+    // Start the privacy save and leave it hanging.
+    fireEvent.click(
+      await screen.findByText(/allow users to override privacy mode/i),
+    );
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
+    await waitFor(() =>
+      expect(mockService.updateAssistantSettings).toHaveBeenCalled(),
+    );
+
+    // Type a new retention value while it is still open.
+    fireEvent.click(screen.getByRole('tab', { name: /conversation history/i }));
+    const days = await screen.findByRole('spinbutton');
+    fireEvent.change(days, { target: { value: '45' } });
+
+    try {
+      // Now let the save land, flushing the microtasks its `then` chain queues.
+      await act(async () => {
+        resolveSave();
+        await Promise.resolve();
+      });
+
+      expect(screen.getByRole('spinbutton')).toHaveValue(45);
+    } finally {
+      // `jest.clearAllMocks()` clears calls but not implementations, and this one is set at module
+      // scope — restore it so the deferred promise above cannot leak into a later case.
+      mockService.updateAssistantSettings.mockImplementation(payload =>
+        Promise.resolve(payload),
+      );
+    }
+  });
+
+  it.each([
+    ['0', 0],
+    ['30', 30],
+    ['  7  ', 7],
+  ])('parses %p as %p days', (raw, expected) => {
+    expect(parseRetentionDays(raw as string)).toBe(expected);
+  });
+
+  it.each(['', '   ', '-1', '1.5', '1e3', 'abc', '0x10'])(
+    'refuses %p rather than reinterpreting it',
+    raw => {
+      // `Number('')` is 0 and `Number('1e3')` is 1000 — neither is a value anybody typed as days.
+      expect(parseRetentionDays(raw)).toBeNull();
+    },
+  );
+
+  it('still saves a valid retention value', async () => {
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.getAssistantSettings.mockResolvedValue({
+      privacyDefaultOn: false,
+      userCanOverride: true,
+      privacyDefaultPerProvider: {},
+      fieldPolicy: [],
+      conversationRetentionDays: 30,
+    });
+
+    render(
+      <SettingsPageWithRouter
+        core={coreWithToasts}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=retention']}
+      />,
+    );
+
+    const days = await screen.findByRole('spinbutton');
+    fireEvent.change(days, { target: { value: '0' } });
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: /save conversation history settings/i,
+      }),
+    );
+
+    await waitFor(() =>
+      expect(mockService.updateAssistantSettings).toHaveBeenCalledWith(
+        expect.objectContaining({ conversationRetentionDays: 0 }),
+      ),
+    );
   });
 });
