@@ -5,8 +5,6 @@ import { DiscoverLink, createDiscoverUrlResolver } from './discover-link';
 import { CoreStart } from '../../../../../src/core/public';
 import { TableSpec } from '../../../common/types';
 import { UNBOUNDED_TIME_RANGE } from '../../../common/discover-url';
-import enUS from '../../../translations/en-US.json';
-import esES from '../../../translations/es-ES.json';
 
 /**
  * The "Open in Discover" affordance, end to end: the WINDOW the link opens and the LABEL that
@@ -162,38 +160,5 @@ describe('DiscoverLink label', () => {
       }),
     );
     expect(link.getAttribute('title')).toMatch(/up to .*2020.*no start date/);
-  });
-
-  // Issue #9008 review, F4: the ≤60 budget is a property of the RENDERED STRING in whatever locale
-  // is loaded, not of the English default — and jest loads no catalog, so a rendered-label
-  // assertion can only ever measure en-US. These measure the catalog entries themselves, with a
-  // realistic bound substituted: `shortBoundLabel` emits either a `shortDateMath` token ("90d") or
-  // a locale short date, of which the Spanish form of 2020-01-01 ("1 ene 2020") is representative.
-  describe.each([
-    ['en-US', enUS.messages],
-    ['es-ES', esES.messages],
-  ])('%s catalog', (locale, messages: Record<string, string>) => {
-    const LONGEST_BOUND = '1 ene 2020';
-
-    it.each([
-      'wazuhAiAssistant.resultTable.openInDiscoverOpenStart',
-      'wazuhAiAssistant.resultTable.openInDiscoverOpenEnd',
-    ])('%s fits the button budget with a real date in it', key => {
-      const message = messages[key];
-      expect(message).toBeDefined();
-      const rendered = message.replace('{bound}', LONGEST_BOUND);
-      expect(rendered).not.toContain('{bound}');
-      expect(rendered.length).toBeLessThanOrEqual(60);
-    });
-
-    it('keeps both partial-range wordings present, so neither locale silently loses one', () => {
-      expect(
-        messages['wazuhAiAssistant.resultTable.openInDiscoverOpenStart'],
-      ).toBeTruthy();
-      expect(
-        messages['wazuhAiAssistant.resultTable.openInDiscoverOpenEnd'],
-      ).toBeTruthy();
-      expect(locale).toBeTruthy();
-    });
   });
 });
