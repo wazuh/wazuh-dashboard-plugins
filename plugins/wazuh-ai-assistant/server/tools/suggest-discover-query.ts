@@ -62,10 +62,13 @@ export const SUGGEST_DISCOVER_QUERY_TOOL: ToolSpec = {
     'before you finish whenever: no other tool available to you covers what the user asked about ' +
     'at all; a tool call came back with zero rows and that zero is your whole answer; or the ' +
     'rows you would need were truncated away and the question depends on seeing every row. Shows ' +
-    'the user a query they can run themselves in Discover, with your reason shown alongside it — ' +
-    'say plainly what you could not check or confirm. This is NOT a way to fetch data yourself: ' +
-    'nothing here is executed on your behalf, and it never replaces answering with data you ' +
-    'already have — use it to close out only the parts you could not verify.',
+    'the user your reason plus an "Open in Discover" link they can click to run the query ' +
+    'themselves — no query text is displayed, only that link, so say plainly what you could not ' +
+    'check or confirm and, if you refer to the handoff at all, call it "the Discover link", never ' +
+    '"the query below" or any other description of a visible query block. This is NOT a way to ' +
+    'fetch data yourself: nothing here is executed on your behalf, and it never replaces ' +
+    'answering with data you already have — use it to close out only the parts you could not ' +
+    'verify.',
   parameters: {
     type: 'object',
     properties: {
@@ -174,9 +177,30 @@ function timeFieldForIndex(index: string): string {
   return index.startsWith('wazuh-states') ? 'state.modified_at' : '@timestamp';
 }
 
-/** Builds the "index + time range only" fallback clause: everything field-level is dropped, only
- * the time bound survives (falling back to `extractTimeRange`'s own last-24-hours default when the
- * original `dsl` carried no recognizable range at all). */
+/**
+ * Builds the "index + time range only" fallback clause: everything field-level is dropped, only the
+ * time bound survives, read through `extractTimeRange` (common/discover-url.ts).
+ *
+ * What that reader substitutes for a bound the original `dsl` did not state is NOT uniform, and
+ * this function materializes whatever it returns into a real `range` clause the user will run:
+ *  - No recognizable range clause at all -> `extractTimeRange`'s last-24-hours `DEFAULT_TIME_RANGE`.
+ *    (Only this function still defaults that way. The "Open in Discover" LINK no longer does — see
+ *    `resolveDiscoverTimeRange`, which opens a range-less query on all of history instead.)
+ *  - A `gte`-only clause -> the stated lower bound, upper bound filled as `now`.
+ *  - An `lte`-only clause -> the stated upper bound, lower bound filled from the UNBOUNDED window
+ *    (epoch), not from `DEFAULT_TIME_RANGE.from`. Filling it with `now-24h` produced `gte` AFTER
+ *    `lte` for a clause bounded at a past instant — an inverted range matching nothing at all,
+ *    which is worse than a wide one. So an `lte`-only suggestion is emitted as `gte: 1970-01-01…`,
+ *    deliberately: "everything up to the stated instant" is what the clause actually meant.
+ *
+ * That last case also moved the DOWNSTREAM path a re-run suggestion takes. The old inverted clause
+ * was rejected by `lintDsl` ("upper bound before its lower bound"); the epoch-lower clause is
+ * well-formed but very wide, so `clampLookbackWindow` narrows it to the last 90 days before the
+ * stated `lte` and DISCLOSES that, and the re-run succeeds instead of being rejected (`lintDsl`'s
+ * 90-day span rejection is what it meets only on a call site that skips the clamp). Strictly
+ * better — the suggestion now describes a window that can actually be executed — but it is a
+ * different path, not the same one with new text.
+ */
 function buildTimeRangeOnlyDsl(
   index: string,
   dsl: Record<string, unknown>,

@@ -9,7 +9,6 @@ plugins/wazuh-ai-assistant/
   common/            Shared contract: chat/stream event types, constants, pure helpers
   public/            React 18 app (EUI/OUI): chat UI, settings UI, SSE client
   server/            Routes, orchestration loop, tool registry, providers, crypto
-  translations/      en-US.json / es-ES.json (full i18n parity)
   eval/              Test and measurement harness (unit tests run under Jest)
   docs/              In-depth design and review records (see below)
 ```

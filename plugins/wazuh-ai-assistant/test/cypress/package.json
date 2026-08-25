@@ -1,0 +1,17 @@
+{
+  "name": "wazuh-ai-assistant-cypress",
+  "version": "1.0.0",
+  "description": "Cypress E2E specs for the wazuh-ai-assistant plugin.",
+  "private": true,
+  "scripts": {
+    "start": "cypress open",
+    "cypress:run": "cypress run --browser chrome",
+    "cypress:run-headless": "cypress run --headless --browser chrome"
+  },
+  "devDependencies": {
+    "cypress": "^13.3.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

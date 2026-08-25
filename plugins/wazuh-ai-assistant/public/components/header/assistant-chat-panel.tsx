@@ -322,6 +322,16 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
                   }}
                   onNewConversation={handleNewConversation}
                   onDelete={id => chatPageRef.current?.deleteConversation(id)}
+                  // m14 (#9010 review): this docked popover is a PRIMARY surface for the
+                  // conversation rail, not a secondary one -- it gets the same rename/bulk-delete
+                  // affordances the inline rail already has, routed through the same imperative
+                  // handle `onDelete` above already uses.
+                  onRename={(id, title) =>
+                    chatPageRef.current?.renameConversation(id, title)
+                  }
+                  onBulkDelete={ids =>
+                    chatPageRef.current?.bulkDeleteConversations(ids)
+                  }
                   displayMode='flyout'
                   // The header's own icon buttons above cover both: no reason to repeat a
                   // "Conversations" title or a second "New conversation" button inside the popover.
@@ -378,12 +388,31 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
             selectedProviderId={selectedProviderId}
             onProviderChange={setSelectedProviderId}
             onNavigateToSettings={openSettingsToAddProvider}
+            // Plain Settings visit (iteration-4 item 2's "Manage providers" footer item) — the
+            // same `openSettings` callback the panel's own settings toolbar button already uses,
+            // rather than a second hardcoded `#/settings` navigateToApp call.
+            onManageProviders={openSettings}
             onGeneratingChange={handleGeneratingChange}
             onConversationsChange={setConversationsSnapshot}
             // The saved-conversations UI now lives entirely in the header's own popover above —
             // ChatPage's inline rail/collapsed-strip/flyout would be a second, redundant way to
             // reach the same conversations from inside this same docked panel.
             showConversationSidebar={false}
+            // This panel's own width (`SIDEBAR_MIN_PANEL_WIDTH` above) routinely sits inside
+            // ChatPage's flyout band (600-900px) — an `EuiFlyout` there would cover the WHOLE
+            // dashboard, opening from the right, just to show a left-hand rail, out of a docked
+            // sidecar the user never asked to leave. Capped at the collapsed strip instead; see
+            // ChatPage's own `allowRailFlyout` doc comment. Moot today (the rail is always hidden
+            // above), kept as a safe default should this panel ever stop passing
+            // `showConversationSidebar={false}`.
+            allowRailFlyout={false}
+            // Same "no room for theatre" reasoning, different decision (see ChatPage's own
+            // `enableWelcomeComposer` doc comment): the full page can afford to centre the
+            // greeting, composer and example cards as one group and dock the composer on the first
+            // send, but this sidecar is a narrow column whose composer must simply be where the
+            // user last left it. Opting out keeps today's always-docked composer here, with no
+            // centred state and no transition.
+            enableWelcomeComposer={false}
           />
         </div>
       </div>

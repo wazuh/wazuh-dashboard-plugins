@@ -109,3 +109,35 @@ test('get_sca_results: names get_threat_intel_components only conditionally on i
     /\(use get_threat_intel_components with component_type="policies"\)/,
   );
 });
+
+// Generic sole-candidate parameter resolution (template: #8913's resolveDeicticAgentParams in
+// get-agent-inventory.ts): agent_id is schema-OPTIONAL here, with the omission story in its own
+// description, plus a soleCandidateParams declaration that lets registry.ts attach the generic
+// resolver (param-resolution.ts) automatically -- a strictly-required agent_id measured 0/40
+// invocations on deictic/descriptive SCA questions.
+
+test('get_sca_results: agent_id is schema-optional, not required', () => {
+  const schema = getScaResultsTool.spec.parameters as {
+    required?: string[];
+  };
+  assert.ok(
+    !schema.required || !schema.required.includes('agent_id'),
+    'agent_id must not be schema-required -- server-side resolution needs it omittable',
+  );
+});
+
+test("get_sca_results: agent_id's description explains server-side resolution on omission", () => {
+  const schema = getScaResultsTool.spec.parameters as {
+    properties: Record<string, { description?: string }>;
+  };
+  assert.match(
+    schema.properties.agent_id.description ?? '',
+    /Optional: omit this.*resolves to the only active agent automatically/s,
+  );
+});
+
+test('get_sca_results: declares agent_id as a manager-agents sole-candidate param', () => {
+  assert.deepEqual(getScaResultsTool.soleCandidateParams, [
+    { param: 'agent_id', source: { kind: 'manager-agents' } },
+  ]);
+});

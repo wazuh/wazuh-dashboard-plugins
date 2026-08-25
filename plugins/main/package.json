@@ -1,7 +1,7 @@
 {
   "name": "wazuh",
   "version": "5.0.0",
-  "revision": "05",
+  "revision": "06",
   "pluginPlatform": {
     "version": "3.6.0"
   },
@@ -52,6 +52,7 @@
     "test:jest": "node scripts/jest --runInBand",
     "test:jest:runner": "node scripts/runner test",
     "generate:api-data": "node scripts/generate-api-data.js --spec https://raw.githubusercontent.com/wazuh/wazuh/$(node -e \"console.log(require('./package.json').version)\")/api/api/spec/spec.yaml --output file --output-directory common/api-info --display-configuration",
+    "audit:compliance-requirements": "node scripts/audit-compliance-requirements.js",
     "prebuild": "node scripts/generate-build-version.js",
     "generate:indexer-resources": "if [ -f scripts/build-tools/update-indexer-resources ]; then bash scripts/build-tools/update-indexer-resources; else echo 'File does not exist. This could be related to the script file not being included at build time. Skipping...'; fi",
     "postinstall": "yarn run generate:indexer-resources",
@@ -60,7 +61,7 @@
     "fix:ndjson-descriptions": "node ../../scripts/check-ndjson-descriptions/index.mjs --fix"
   },
   "dependencies": {
-    "dompurify": "3.4.0",
+    "dompurify": "3.4.11",
     "install": "^0.13.0",
     "js2xmlparser": "^5.0.0",
     "jsdom": "^16.6.0",

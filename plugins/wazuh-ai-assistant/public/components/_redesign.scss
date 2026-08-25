@@ -14,18 +14,41 @@
    The reference is flat: a 1px hairline and nothing else. Shadow is reserved for things that
    genuinely float — popovers, the flyout, and the composer's top edge. Panels take a scoped 12px
    while controls keep EUI's 8px, because the felt difference between the reference and today is
-   padding, not radius. */
+   padding, not radius.
+
+   This is the doctrine — ONE container idiom at 12px — and the live CSS audit (AI/ux-iter3/
+   css-audit-full.md §6) found it losing on every surface it was supposed to own: a "radius zoo" of
+   2 (severity badge), 4 (raw EuiPanels, and the settings card where this token lost a specificity
+   tie), 12 (the results card alone) and an inline 14 invented for the user bubble. Every one of
+   those has since been reconciled to this token, qualified with the EUI class it competes with
+   (`.euiPanel.wzSettingsCard__panel`, `.euiPanel.wzComposerPanel`, `.euiCard.wzWelcomeCard`,
+   `.euiPanel.wzUserBubble`) so bundle order cannot decide it. The ONE other radius the surface
+   allows is 4px, for small inline chrome that is not a container — an inline-code chip, a callout —
+   and it is deliberately not a token: a value with three unrelated consumers and no shared meaning
+   is a literal, not a design decision. */
 $wzPanelRadius: 12px;
 $wzCardPadding: 20px;
 $wzCardPaddingRoomy: 24px;
 
 /* --- Measure and gutters (layout contract §5) --------------------------------------------------
    Prose and the composer share one centred column so they stay optically locked as the window
-   grows; only tables may break out. Extra width at 1920 goes to the rail and gutters, never to
-   line length. */
+   grows; a results table fills that same column to its right edge but is bounded by it (never past
+   the composer's right edge). Extra width at 1920 goes to the rail and gutters, never to line
+   length. */
 $wzContentMaxWidth: 1060px;
-$wzTableMaxWidth: 1300px;
+/* Welcome-only cluster width (iteration-4 item C): the empty state's greeting, example-card grid
+   and composer measure all cap here instead of the docked surface's 1060px — a live audit call
+   read the full-width welcome cluster as too spread out for three short lines of content. Narrower
+   than $wzContentMaxWidth, applied only under `.wzChatPane--welcome` (chat-page.scss); the docked
+   surface is untouched. */
+$wzWelcomeGroupMaxWidth: 840px;
 $wzProseMeasure: 68ch;
+/* Settings is its own page, not chat prose, so it does not share $wzContentMaxWidth: the
+   providers table has 9 fixed-percentage columns (settings-page.tsx) and needs more breathing
+   room than a centred column of prose or form fields would call for. Wider than
+   $wzContentMaxWidth — a whole page's own measure, not a chat turn bounded by the composer's
+   content column (a results table in the chat now fills $wzContentMaxWidth and stops there). */
+$wzSettingsMaxWidth: 1200px;
 
 /* --- Composer floor and ceiling (layout contract §2) -------------------------------------------
    The `vh` twin is a REQUIRED fallback, not a nicety: `dvh` only shipped in Safari 15.4, and a
@@ -43,6 +66,13 @@ $wzComposerMaxHeight: 30dvh;
 /* --- Results card (layout contract §4) ---------------------------------------------------------
    Header and pagination are pinned card rows; only the body scrolls. */
 $wzResultsMaxHeight: min(460px, 52dvh);
+/* Expanded ceiling (iteration-4 item 3, "card grows"): applied only via the
+   `.wzResultsCard--expanded` modifier (result-table.tsx) when the reader explicitly picks a page
+   size above the 5-row default — at the default size the card stays capped at
+   $wzResultsMaxHeight above, since a 5-row result never needed the extra room.
+   `RESULTS_CARD_MAX_HEIGHT_EXPANDED_PX` (result-table.tsx) is this token's JS twin for the
+   transcript-measured-height code path, same pairing as $wzResultsMaxHeight's own. */
+$wzResultsMaxHeightExpanded: 80dvh;
 
 /* --- Conversation rail (layout contract §5) ----------------------------------------------------
    NO width token lives here. Every rail width — expanded, collapsed, and both breakpoints — is read
@@ -88,6 +118,11 @@ $wzEase: ease-out;
   --wz-accent-soft: #{rgba($euiColorPrimary, 0.1)};
   --wz-accent-hover: #{rgba($euiColorPrimary, 0.06)};
   --wz-surface: #{$euiColorEmptyShade};
+  /* The OSD app-chrome gray behind the header/sidebar (`$euiPageBackgroundColor`), NOT the white
+     `--wz-surface` card tone above — for chrome sitting directly on the page background (e.g. the
+     chat pane's sticky status-callout band, chat-page.scss's `.wzStatusCallouts`), which has no
+     white ground of its own to match. */
+  --wz-chrome: #{$euiPageBackgroundColor};
   --wz-text-subdued: #{$euiTextSubduedColor};
   --wz-panel-radius: #{$wzPanelRadius};
 }

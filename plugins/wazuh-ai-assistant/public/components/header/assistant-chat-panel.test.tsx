@@ -14,6 +14,8 @@ import { AssistantChatPanel } from './assistant-chat-panel';
 const mockNewConversation = jest.fn();
 const mockSelectConversation = jest.fn();
 const mockDeleteConversation = jest.fn();
+const mockRenameConversation = jest.fn();
+const mockBulkDeleteConversations = jest.fn();
 
 jest.mock('../chat/chat-page', () => {
   // `jest.mock` factories statically forbid referencing any out-of-scope identifier that isn't a
@@ -37,6 +39,8 @@ jest.mock('../chat/chat-page', () => {
         onNavigateToSettings: () => void;
         onConversationsChange?: (state: ConversationsSnapshot) => void;
         showConversationSidebar?: boolean;
+        allowRailFlyout?: boolean;
+        enableWelcomeComposer?: boolean;
       },
       ref: React.Ref<unknown>,
     ) {
@@ -44,12 +48,18 @@ jest.mock('../chat/chat-page', () => {
         newConversation: mockNewConversation,
         selectConversation: mockSelectConversation,
         deleteConversation: mockDeleteConversation,
+        // m14 (#9010 review): the real `ChatPageHandle` contract now also carries these two, and
+        // the docked popover (assistant-chat-panel.tsx) calls straight through to them.
+        renameConversation: mockRenameConversation,
+        bulkDeleteConversations: mockBulkDeleteConversations,
       }));
       return mockReact.createElement(
         'div',
         {
           'data-test-subj': 'chat-page-stub',
           'data-sidebar': String(props.showConversationSidebar),
+          'data-allow-rail-flyout': String(props.allowRailFlyout),
+          'data-welcome-composer': String(props.enableWelcomeComposer),
         },
         mockReact.createElement(
           'button',
@@ -167,6 +177,16 @@ describe('AssistantChatPanel', () => {
     renderPanel();
 
     expect(chatPageStub()).toHaveAttribute('data-sidebar', 'false');
+  });
+
+  it('keeps the composer docked in this panel, with no centred welcome state', () => {
+    // C1 (AI/ux-iter3/gemini-motion-spec.md, "no room for theatre"): the centred greeting +
+    // composer + cards group and its dock-on-first-send transition are a FULL-PAGE affordance.
+    // This sidecar is a narrow column, so it opts out and keeps today's always-docked composer —
+    // a separate decision from `allowRailFlyout` above, hence a separate prop.
+    renderPanel();
+
+    expect(chatPageStub()).toHaveAttribute('data-welcome-composer', 'false');
   });
 
   it('routes the close button through the interrupt gate', () => {
@@ -315,6 +335,44 @@ describe('AssistantChatPanel', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Delete' }));
 
     expect(mockDeleteConversation).toHaveBeenCalledWith('c1');
+  });
+
+  // m14 (#9010 review): this docked popover is a PRIMARY surface for the rail, not a secondary
+  // one -- it must get the same rename/bulk-delete affordances the inline rail already has.
+  it("renaming a conversation from the popover calls ChatPage's renameConversation", async () => {
+    renderPanel();
+    fireEvent.click(screen.getByText('emit one conversation, active'));
+
+    openConversationsPopover();
+    const popover = await getPopoverPanel();
+
+    fireEvent.click(within(popover).getByLabelText('Rename conversation'));
+    const input = within(popover).getByLabelText('Conversation title');
+    fireEvent.change(input, { target: { value: 'New title' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+
+    expect(mockRenameConversation).toHaveBeenCalledWith('c1', 'New title');
+  });
+
+  it("bulk-deleting from the popover calls ChatPage's bulkDeleteConversations", async () => {
+    renderPanel();
+    fireEvent.click(screen.getByText('emit one conversation, active'));
+
+    openConversationsPopover();
+    const popover = await getPopoverPanel();
+
+    fireEvent.click(within(popover).getByLabelText('Select conversations'));
+    fireEvent.click(
+      within(popover).getByRole('checkbox', {
+        name: 'Select "Disconnected agents in production"',
+      }),
+    );
+    fireEvent.click(
+      within(popover).getByRole('button', { name: 'Delete (1)' }),
+    );
+    fireEvent.click(await screen.findByRole('button', { name: 'Delete' }));
+
+    expect(mockBulkDeleteConversations).toHaveBeenCalledWith(['c1']);
   });
 
   it('the popover never repeats the header\'s own "New conversation" button or a "Conversations" title', async () => {

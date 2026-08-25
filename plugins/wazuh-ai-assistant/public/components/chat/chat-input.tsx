@@ -130,7 +130,11 @@ export const ChatInput = React.forwardRef<ChatInputHandle, ChatInputProps>(
         rows={1}
         // Height transition (reduced-motion-guarded, chat-page.scss) lives on this class; the
         // overflow toggle above still applies inline since it depends on this field's own measured
-        // content, not something a stylesheet can express.
+        // content, not something a stylesheet can express. The two-row floor (iteration-4 item A)
+        // is scoped from the OUTSIDE, via the ancestor `.wzComposerRow--roomy` modifier ChatPage
+        // applies from its own `enableWelcomeComposer` prop — see
+        // `.wzComposerRow--roomy .wzComposerTextarea` (chat-page.scss) for why the 600-900px
+        // sidecar must not get it. Nothing here needs to know about that prop.
         className='wzComposerTextarea'
         disabled={disabled || isGenerating}
         value={value}

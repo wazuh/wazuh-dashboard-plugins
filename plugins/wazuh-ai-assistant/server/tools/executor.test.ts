@@ -4,6 +4,7 @@ import {
   executeToolCall,
   PrivacyContext,
   resolveSecurityAnalyticsSpace,
+  scrubAssumptionNote,
 } from './executor';
 import { FIELD_POLICY_DEFAULTS, Pseudonymizer } from './privacy';
 import { ToolCall } from '../../common/types';
@@ -86,15 +87,15 @@ test('executeToolCall: get_agent_inventory keeps package.name/package.version re
   assert.equal(digest.samples[0]['package.name'], 'adduser');
   assert.equal(digest.samples[0]['package.version'], '3.118ubuntu5');
   assert.equal(digest.samples[0]['package.architecture'], 'all');
-  // package.vendor has an explicit 'anonymize' FIELD_POLICY_DEFAULTS entry (a vendor/distributor
-  // string routinely embeds a maintainer email address -- see privacy.ts's comment on that entry)
-  // -- it comes back pseudonymized on that explicit basis, not via
-  // get_agent_inventory's `failClosedFieldPolicy: true` unlisted-field default (see the dedicated
-  // decoupling-proof test below for that case, which uses a genuinely unlisted field instead).
-  assert.match(
-    digest.samples[0]['package.vendor'] as string,
-    /^(HOST|IP|USER|URL|VAL)_\d+$/,
-  );
+  // package.vendor has an explicit 'allow-scan' FIELD_POLICY_DEFAULTS entry (the #8912
+  // follow-through its previous 'anonymize' entry's comment promised): the distributor name
+  // stays readable on that explicit basis -- not via get_agent_inventory's
+  // `failClosedFieldPolicy: true` unlisted-field default (see the dedicated decoupling-proof
+  // test below, which uses a genuinely unlisted field) -- while the embedded maintainer
+  // address is still caught by the value-shape scan.
+  const vendor = digest.samples[0]['package.vendor'] as string;
+  assert.match(vendor, /^Ubuntu Developers/);
+  assert.doesNotMatch(vendor, /lists\.ubuntu\.com/);
 });
 
 test('executeToolCall: privacy off leaves get_agent_inventory digest completely unscrubbed', async () => {
@@ -116,6 +117,133 @@ test('executeToolCall: privacy off leaves get_agent_inventory digest completely 
   };
   assert.equal(digest.samples[0]['package.name'], 'adduser');
   assert.equal(digest.samples[0]['package.version'], '3.118ubuntu5');
+});
+
+// --- Issue #9008 rework: `TableSpec.provenance` must carry only FACTS the executor actually
+// observed -- never a client-invented default, and never attributed to the wrong call. These
+// exercise the real `executeToolCall` -> `executeIndexerRequest`/`executeManagerRequest` wiring,
+// not a helper that could quietly omit a field. ---------------------------------------------------
+
+/** Minimal Manager-API context stub: `resolveApiHostId` (api-host.ts) needs
+ * `context.wazuh_core.manageHosts.get()` (no cookie on `request.headers`, so it always takes the
+ * first-configured-host fallback) and `context.wazuh_core.api.client.asCurrentUser.request` for
+ * the call itself. */
+function fakeManagerContext(
+  affectedItems: Array<Record<string, unknown>>,
+): ExecContext {
+  return {
+    wazuh_core: {
+      manageHosts: { get: () => Promise.resolve([{ id: 'default' }]) },
+      api: {
+        client: {
+          asCurrentUser: {
+            request: () =>
+              Promise.resolve({
+                data: {
+                  data: {
+                    affected_items: affectedItems,
+                    total_affected_items: affectedItems.length,
+                  },
+                },
+              }),
+          },
+        },
+      },
+    },
+  } as unknown as ExecContext;
+}
+const fakeManagerRequest = { headers: {} } as unknown as ExecRequest;
+
+test('executeToolCall: get_agent_inventory (no time-range concept) records no requestedRange/effectiveRange, and is not clamped', async () => {
+  // Blocker 1: 18 catalog tools carry no time_range_gte/lte parameter at all -- their DSL never
+  // has a range clause, so provenance must report NOTHING about a window, never a fabricated
+  // "now-90d" default.
+  const context = fakeSearchContext([{ package: { name: 'adduser' } }]);
+  const outcome = await executeToolCall(
+    {
+      id: 'call-1',
+      name: 'get_agent_inventory',
+      arguments: { agent_id: '001', kind: 'packages' },
+    },
+    context,
+    fakeRequest,
+    undefined,
+  );
+  const provenance = outcome.tableEvent?.spec.provenance;
+  assert.ok(provenance, 'expected a provenance object on the table event');
+  assert.equal(provenance?.index, 'wazuh-states-inventory-packages*');
+  assert.equal(provenance?.requestedRange, undefined);
+  assert.equal(provenance?.effectiveRange, undefined);
+  assert.equal(provenance?.clamped, false);
+});
+
+test('executeToolCall: get_critical_findings within the 90-day cap records matching, unclamped ranges', async () => {
+  const context = fakeSearchContext([{ 'wazuh.rule.level': 'critical' }]);
+  const outcome = await executeToolCall(
+    {
+      id: 'call-1',
+      name: 'get_critical_findings',
+      arguments: { time_range_gte: 'now-7d' },
+    },
+    context,
+    fakeRequest,
+    undefined,
+  );
+  const provenance = outcome.tableEvent?.spec.provenance;
+  assert.ok(provenance);
+  assert.equal(provenance?.clamped, false);
+  assert.deepEqual(provenance?.requestedRange, { gte: 'now-7d', lte: 'now' });
+  assert.deepEqual(provenance?.effectiveRange, { gte: 'now-7d', lte: 'now' });
+});
+
+test('executeToolCall: get_critical_findings past the 90-day cap is clamped, and provenance records BOTH windows', async () => {
+  // Blocker 1 fixture note: "now-2y" is not a value the server's own `validateTimeBound`
+  // (catalog/common.ts) ever accepts for a typed tool's time_range_gte -- only "now-N[dhm]" or
+  // ISO-8601. "now-720d" (≈2 years) is the reachable equivalent.
+  const context = fakeSearchContext([{ 'wazuh.rule.level': 'critical' }]);
+  // Captured BEFORE the call, not just after -- a real lower bound, so `executedAt` is pinned
+  // to the actual call window on both sides rather than only checked against an upper bound.
+  const before = Date.now();
+  const outcome = await executeToolCall(
+    {
+      id: 'call-1',
+      name: 'get_critical_findings',
+      arguments: { time_range_gte: 'now-720d' },
+    },
+    context,
+    fakeRequest,
+    undefined,
+  );
+  const after = Date.now();
+  const provenance = outcome.tableEvent?.spec.provenance;
+  assert.ok(provenance);
+  assert.equal(provenance?.clamped, true);
+  assert.deepEqual(provenance?.requestedRange, { gte: 'now-720d', lte: 'now' });
+  // The clamped effective window is rewritten to absolute ISO bounds spanning EXACTLY 90 days
+  // (guardrails.ts's `clampLookbackWindow`/`MAX_LOOKBACK_MS`) -- never the requested one.
+  const effective = provenance?.effectiveRange;
+  assert.ok(effective);
+  const spanMs = Date.parse(effective!.lte) - Date.parse(effective!.gte);
+  assert.equal(spanMs, 90 * 24 * 60 * 60 * 1000);
+  // Issue #9008 review, blocker 2: the instant the query actually ran, recorded as a plain
+  // number at creation time -- what `describeProvenance` (tool-call-label.ts) resolves a
+  // date-math bound against instead of the render-time clock.
+  assert.equal(typeof provenance?.executedAt, 'number');
+  assert.ok(provenance!.executedAt! >= before);
+  assert.ok(provenance!.executedAt! <= after);
+});
+
+test('executeToolCall: a Manager-API table carries no provenance at all (no index/DSL concept)', async () => {
+  const context = fakeManagerContext([{ id: '001', name: 'agent-1' }]);
+  const outcome = await executeToolCall(
+    { id: 'call-1', name: 'get_agents', arguments: {} },
+    context,
+    fakeManagerRequest,
+    undefined,
+  );
+  assert.equal(outcome.tableEvent?.spec.provenance, undefined);
+  // Sanity: this really did go through the Manager-API success path, not a swallowed error.
+  assert.equal(outcome.tableEvent?.spec.rows.length, 1);
 });
 
 test('executeToolCall: unlisted-field fail-closed tracks failClosedFieldPolicy, not deriveColumns (decoupling proof)', async () => {
@@ -214,6 +342,117 @@ test('executeToolCall: a resolveParams-minted assumption note reaches the digest
     assumptionNote?: string;
   };
   assert.match(digest.assumptionNote ?? '', /agent-one/);
+});
+
+// --- Privacy capture probe P3 (2026-08-14): the assumption note carried the resolved agent's
+// raw hostname to the provider under privacy mode -- a bare single-word token neither the shape
+// scan nor the known-entity scan can catch (nothing ever minted it; resolution exists precisely
+// because the caller never supplied the value). The fix: resolvers declare the identifiers their
+// note interpolates (`noteEntities`), and executeToolCall pseudonymizes them at its single choke
+// point via scrubAssumptionNote. These tests pin the pure helper AND the end-to-end wiring. ----
+
+test('scrubAssumptionNote: pseudonymizes each declared entity, every occurrence, under privacy mode', () => {
+  const privacy: PrivacyContext = {
+    pseudonymizer: new Pseudonymizer([]),
+    fieldPolicy: FIELD_POLICY_DEFAULTS,
+  };
+  const scrubbed = scrubAssumptionNote(
+    'resolved to "wazuh-aio-5" (id 001); wazuh-aio-5 was the only active agent.',
+    [{ value: 'wazuh-aio-5', kind: 'HOST' }],
+    privacy,
+  );
+  assert.ok(scrubbed);
+  assert.doesNotMatch(scrubbed as string, /wazuh-aio-5/);
+  const matches = (scrubbed as string).match(/HOST_1/g) ?? [];
+  assert.equal(matches.length, 2, 'both occurrences must be replaced');
+});
+
+test('scrubAssumptionNote: longest entity first, so a substring entity cannot corrupt a longer one', () => {
+  const privacy: PrivacyContext = {
+    pseudonymizer: new Pseudonymizer([]),
+    fieldPolicy: FIELD_POLICY_DEFAULTS,
+  };
+  const scrubbed = scrubAssumptionNote(
+    'candidates: DB03, DB03-PRIMARY.',
+    [
+      { value: 'DB03', kind: 'HOST' },
+      { value: 'DB03-PRIMARY', kind: 'HOST' },
+    ],
+    privacy,
+  );
+  assert.doesNotMatch(scrubbed as string, /DB03/);
+  // Two DISTINCT pseudonyms -- the longer name must not have been split by the shorter's
+  // substitution into "HOST_n-PRIMARY".
+  assert.doesNotMatch(scrubbed as string, /-PRIMARY/);
+});
+
+test('scrubAssumptionNote: no-op without privacy, without a note, or without entities', () => {
+  const privacy: PrivacyContext = {
+    pseudonymizer: new Pseudonymizer([]),
+    fieldPolicy: FIELD_POLICY_DEFAULTS,
+  };
+  const note = 'resolved to "wazuh-aio-5" (id 001).';
+  assert.equal(
+    scrubAssumptionNote(
+      note,
+      [{ value: 'wazuh-aio-5', kind: 'HOST' }],
+      undefined,
+    ),
+    note,
+  );
+  assert.equal(scrubAssumptionNote(undefined, [], privacy), undefined);
+  assert.equal(scrubAssumptionNote(note, [], privacy), note);
+  assert.equal(scrubAssumptionNote(note, undefined, privacy), note);
+});
+
+test('executeToolCall: under privacy mode the assumption note reaches the digest pseudonymized, never with the raw hostname', async () => {
+  const context = {
+    ...fakeSearchContext([{ package: { name: 'adduser', version: '1' } }]),
+    wazuh_core: {
+      manageHosts: { get: () => Promise.resolve([{ id: 'host-1' }]) },
+      api: {
+        client: {
+          asCurrentUser: {
+            request: () =>
+              Promise.resolve({
+                status: 200,
+                data: {
+                  data: {
+                    affected_items: [{ id: '001', name: 'agent-one' }],
+                    total_affected_items: 1,
+                  },
+                },
+              }),
+          },
+        },
+      },
+    },
+  } as unknown as ExecContext;
+  const outcome = await executeToolCall(
+    {
+      id: 'call-1',
+      name: 'get_agent_inventory',
+      arguments: { kind: 'packages' },
+    },
+    context,
+    fakeRequest,
+    {
+      pseudonymizer: new Pseudonymizer([]),
+      fieldPolicy: FIELD_POLICY_DEFAULTS,
+    },
+  );
+  const digest = JSON.parse(outcome.toolResultContent) as {
+    assumptionNote?: string;
+  };
+  assert.ok(digest.assumptionNote, 'the note itself must survive the scrub');
+  assert.doesNotMatch(
+    digest.assumptionNote as string,
+    /agent-one/,
+    'probe P3: the resolved hostname must never reach the provider raw',
+  );
+  assert.match(digest.assumptionNote as string, /HOST_\d+/);
+  // The agent ID is a reviewed 'allow' (wazuh.agent.id) and must stay readable.
+  assert.match(digest.assumptionNote as string, /001/);
 });
 
 test('resolveSecurityAnalyticsSpace: a single distinct space across all hits is used as-is', () => {
@@ -460,6 +699,133 @@ test('entity near-miss: agent names in the hint are pseudonymized when privacy m
   assert.ok(realValues.includes('wazuh-aio-05'));
   assert.ok(realValues.includes('wazuh-aio-5'));
 });
+
+test(
+  'entity near-miss: a category word with no near-miss sibling and no exact match is reported ' +
+    'unmatched, not a bare zero-row result (CV-028/CV-033 fix)',
+  async () => {
+    const { context, calls } = fakeContext((_call, index) =>
+      index === 0
+        ? { hits: { hits: [], total: { value: 0 } } }
+        : {
+            hits: { hits: [], total: { value: 0 } },
+            aggregations: { agent_names: { buckets: [] } },
+          },
+    );
+    const outcome = await executeToolCall(
+      toolCall('search_findings_by_agent', { agent_name: 'cloud-services' }),
+      context,
+      dummyRequest,
+    );
+    const digest = parseDigest(outcome);
+    assert.equal(calls.length, 2, 'the probe still fires on a 0-row call');
+    const hint = digest.hint as string;
+    assert.match(hint, /"cloud-services" has no match \(exact or near-miss\)/);
+    // REVIEW FIX A1 (groupA-regression-review.md): the hint must never assert the agent itself is
+    // absent or clean -- only that the NAME has no match, with both explanations (mistaken name vs.
+    // a real agent with genuinely no rows here) left open.
+    assert.doesNotMatch(hint, /not because that agent has no data/);
+    assert.match(hint, /this probe cannot\s+tell those apart/);
+    assert.match(
+      hint,
+      /never as a\s+claim that the agent itself is absent, clean, or has no data/,
+    );
+  },
+);
+
+test(
+  'entity near-miss: an ID-shaped agent_identifier with zero rows is NOT reported as an ' +
+    'unmatched name (REVIEW FIX A1, groupA-regression-review.md, HIGH) -- the probe only ' +
+    'aggregates wazuh.agent.name, so a numeric id can never appear in its buckets even for a ' +
+    'real, healthy agent that simply has no vulnerabilities in this window',
+  async () => {
+    const { context, calls } = fakeContext(() => ({
+      hits: { hits: [], total: { value: 0 } },
+      aggregations: { agent_names: { buckets: [] } },
+    }));
+    const outcome = await executeToolCall(
+      toolCall('get_vulnerabilities_by_agent', { agent_identifier: '001' }),
+      context,
+      dummyRequest,
+    );
+    const digest = parseDigest(outcome);
+    assert.equal(
+      calls.length,
+      2,
+      'the probe still runs (it degrades silently, not by skipping)',
+    );
+    // No false "no agent named 001" -- a clean host's honest zero must stay a plain zero-row result.
+    assert.equal(digest.hint, undefined);
+  },
+);
+
+test(
+  'entity near-miss: REVIEW FIX A2 (groupA-regression-review.md, MEDIUM) -- a multi-agent ' +
+    'sweep with ONE matching name and one unmatched (category-word) name still discloses the ' +
+    "unmatched one, even though the call's overall returned count is > 0",
+  async () => {
+    const findingHit = {
+      _source: {
+        'wazuh.agent.name': 'web-prod-01',
+        'wazuh.rule.level': 'high',
+      },
+    };
+    const { context, calls } = fakeContext((_call, index) =>
+      index === 0
+        ? { hits: { hits: [findingHit], total: { value: 1 } } }
+        : {
+            hits: { hits: [], total: { value: 0 } },
+            aggregations: {
+              agent_names: { buckets: [{ key: 'web-prod-01', doc_count: 1 }] },
+            },
+          },
+    );
+    const outcome = await executeToolCall(
+      toolCall('search_findings_by_multiple_agents', {
+        agent_names: ['web-prod-01', 'cloud-services'],
+      }),
+      context,
+      dummyRequest,
+    );
+    const digest = parseDigest(outcome);
+    assert.equal(calls.length, 2);
+    assert.ok((digest.counts as { returned: number }).returned > 0);
+    const hint = digest.hint as string;
+    assert.match(hint, /"cloud-services" has no match/);
+    // The matching name must never be reported as unmatched.
+    assert.doesNotMatch(hint, /"web-prod-01" has no match/);
+  },
+);
+
+test(
+  'entity near-miss: unmatched-name disclosure does not fire when the call actually returned ' +
+    'rows (the name DID match something)',
+  async () => {
+    const findingHit = {
+      _source: {
+        'wazuh.agent.name': 'wazuh-aio-5',
+        'wazuh.rule.level': 'high',
+      },
+    };
+    const { context } = fakeContext((_call, index) =>
+      index === 0
+        ? { hits: { hits: [findingHit], total: { value: 1 } } }
+        : {
+            hits: { hits: [], total: { value: 0 } },
+            aggregations: {
+              agent_names: { buckets: [{ key: 'wazuh-aio-5', doc_count: 1 }] },
+            },
+          },
+    );
+    const outcome = await executeToolCall(
+      toolCall('search_findings_by_agent', { agent_name: 'wazuh-aio-5' }),
+      context,
+      dummyRequest,
+    );
+    const digest = parseDigest(outcome);
+    assert.equal(digest.hint, undefined);
+  },
+);
 
 test('entity near-miss: does not fire for a tool call naming no agent at all', async () => {
   const { context, calls } = fakeContext(() => ({

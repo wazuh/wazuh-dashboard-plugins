@@ -248,7 +248,11 @@ function toAnthropicMessage(message: ChatMessage): Record<string, unknown> {
   }
   if (message.role === 'assistant' && message.toolCalls?.length) {
     const blocks: Array<Record<string, unknown>> = [];
-    if (message.content) {
+    // Defense in depth: chat.ts already trims round narration before it lands in history (issue
+    // C4 follow-up), but a whitespace-only `content` (e.g. a bare priming "\n\n" a model streams
+    // before a tool call) must never become a text block here either -- Anthropic's Messages API
+    // rejects a whitespace-only text block with a 400.
+    if (message.content && message.content.trim()) {
       blocks.push({ type: 'text', text: message.content });
     }
     for (const call of message.toolCalls) {

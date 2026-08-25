@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ConversationList } from './conversation-list';
 import { ConversationSummary } from '../../../common/types';
@@ -231,6 +231,128 @@ describe('ConversationList', () => {
 
       fireEvent.change(searchField, { target: { value: '' } });
       expect(screen.getByText('Disconnected agents')).toBeInTheDocument();
+    });
+
+    it("renders the search field as a bare, full-width control with no wrapping flex group (#9010 review decision: the select-mode entry point moved into the header, so this row goes back to upstream's own bare shape)", () => {
+      render(
+        <ConversationList
+          conversations={[conversation()]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={noop}
+        />,
+      );
+
+      const searchField = screen.getByPlaceholderText('Search conversations');
+      expect(searchField.closest('.euiFlexGroup')).toBeNull();
+    });
+  });
+
+  describe('select-mode entry point lives in the rail header, not the search row (#9010 review decision)', () => {
+    it('renders the "Select conversations" icon inside the header row, right-aligned against the "Conversations" label', () => {
+      render(
+        <ConversationList
+          conversations={[conversation()]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={noop}
+        />,
+      );
+
+      const title = screen.getByText('Conversations');
+      const icon = screen.getByRole('button', {
+        name: 'Select conversations',
+      });
+      const headerRow = title.closest('.wzConvoRailHeader') as HTMLElement;
+      expect(headerRow).not.toBeNull();
+      expect(headerRow.contains(icon)).toBe(true);
+      expect(
+        screen
+          .getByPlaceholderText('Search conversations')
+          .closest('.wzConvoRailHeader'),
+      ).toBeNull();
+
+      // The OUTER flex row (label group + icon) is what carries the flex-grow guard class --
+      // `title`'s nearest `.euiFlexGroup` ancestor is actually the INNER title+spinner
+      // sub-group, one level down.
+      const headerFlexRow = headerRow.querySelector(
+        '.euiFlexGroup',
+      ) as HTMLElement;
+      expect(headerFlexRow).not.toBeNull();
+      expect(headerFlexRow.className).toMatch(/wzConvoRailSearchRow/);
+      expect(headerFlexRow.contains(icon)).toBe(true);
+    });
+
+    it('hides the header\'s select-mode icon once select mode is entered (the toolbar\'s own "Cancel selection" replaces it)', () => {
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Selectable' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={noop}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      );
+
+      expect(
+        screen.queryByRole('button', { name: 'Select conversations' }),
+      ).toBeNull();
+    });
+
+    it('does not render the icon in the header when onBulkDelete is not supplied', () => {
+      render(
+        <ConversationList
+          conversations={[conversation()]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+        />,
+      );
+
+      expect(
+        screen.queryByRole('button', { name: 'Select conversations' }),
+      ).toBeNull();
+    });
+
+    it('falls back to the old placement (search row, inline icon) when the header itself is not rendered (`showHeader={false}`, the docked popover -- m14/#9010 review: that surface is a PRIMARY rail surface entitled to the same bulk-delete affordance as the inline rail)', () => {
+      render(
+        <ConversationList
+          conversations={[conversation()]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={noop}
+          showHeader={false}
+          showNewConversationButton={false}
+        />,
+      );
+
+      expect(screen.queryByText('Conversations')).toBeNull();
+      const icon = screen.getByRole('button', {
+        name: 'Select conversations',
+      });
+      const searchRow = screen
+        .getByPlaceholderText('Search conversations')
+        .closest('.euiFlexGroup') as HTMLElement;
+      expect(searchRow).not.toBeNull();
+      expect(searchRow.contains(icon)).toBe(true);
+      expect(searchRow.className).toMatch(/wzConvoRailSearchRow/);
     });
   });
 
@@ -578,6 +700,723 @@ describe('ConversationList', () => {
 
       expect(onDelete).toHaveBeenCalledWith('c1');
       expect(screen.queryByText(/permanently delete/)).toBeNull();
+    });
+
+    it('m12/F-4: focus lands on the rail scroll container after a confirmed delete, not lost to <body>', async () => {
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Delete me' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Delete conversation' }),
+      );
+      fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+
+      await waitFor(() => {
+        expect(document.activeElement).toHaveClass('wzConvoRailScroll');
+      });
+    });
+  });
+
+  describe('list semantics (WCAG/AT: a real list, not a run of generic divs) — E5', () => {
+    it('renders each date group as a native <ul>/<li> list', () => {
+      const { container } = render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Row one' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+        />,
+      );
+
+      const list = container.querySelector('ul.wzConvoRailGroupList');
+      expect(list).not.toBeNull();
+      expect(list?.querySelector('li.wzConvoRailListItem')).not.toBeNull();
+      expect(screen.getByText('Row one').closest('li')).not.toBeNull();
+    });
+  });
+
+  describe('inline rename (E2)', () => {
+    it('does not render a rename affordance when onRename is not supplied', () => {
+      render(
+        <ConversationList
+          conversations={[conversation({ title: 'No rename here' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+        />,
+      );
+
+      expect(
+        screen.queryByRole('button', { name: 'Rename conversation' }),
+      ).toBeNull();
+    });
+
+    it('M3 REGRESSION: at rest, the pencil sits OUTSIDE the row flex group -- the row is byte-identical to upstream/5.0.0', () => {
+      // Screenshot-equivalent DOM check: rather than a real layout engine (jsdom has none), this
+      // asserts the actual STRUCTURE the M3 fix relies on. The pencil used to be a zero-width
+      // EuiFlexItem inside the row's `gutterSize='xs'` EuiFlexGroup -- but EUI gutters are margins
+      // on every flex item, so even a collapsed one still cost the row a few px of dead gutter at
+      // rest, on top of the reflow it caused. The fix takes it out of the flex flow entirely and
+      // renders it as an absolutely-positioned overlay anchored to the row, so the row's OWN flex
+      // group is left with exactly the three items upstream/5.0.0's own row markup has --
+      // [title][timestamp][trash], nothing else -- proving the at-rest row is structurally
+      // identical to upstream, not just "close" to it.
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Rename me' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={noop}
+        />,
+      );
+
+      const row = screen.getByText('Rename me').closest('.wzConvoRow');
+      const flexGroup = row?.querySelector(':scope > .euiFlexGroup');
+      expect(flexGroup).not.toBeNull();
+      // Exactly [title][timestamp][trash] -- no pencil item, no extra gutter contributor.
+      expect(flexGroup?.children).toHaveLength(3);
+
+      const pencil = screen.getByRole('button', {
+        name: 'Rename conversation',
+      });
+      // The pencil is a DESCENDANT of the row (still reachable/focusable), but not of its flex
+      // group -- it renders as the row's own absolutely-positioned sibling overlay instead.
+      expect(row?.contains(pencil)).toBe(true);
+      expect(flexGroup?.contains(pencil)).toBe(false);
+
+      const overlay = pencil.closest('.wzConvoRowRenameOverlay') as HTMLElement;
+      expect(overlay).not.toBeNull();
+      expect(overlay.style.opacity).toBe('0');
+      expect(overlay.style.pointerEvents).toBe('none');
+
+      fireEvent.mouseEnter(row as HTMLElement);
+
+      expect(overlay.style.opacity).toBe('1');
+      expect(overlay.style.pointerEvents).toBe('auto');
+      // Hovering never adds/removes a flex item either -- no title reflow on hover.
+      expect(flexGroup?.children).toHaveLength(3);
+    });
+
+    it('M3 REGRESSION: the pencil is NOT permanently shown on the active/selected row -- hover or focus only', () => {
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'active', title: 'Active one' })]}
+          isLoading={false}
+          activeConversationId='active'
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={noop}
+        />,
+      );
+
+      const pencil = screen.getByRole('button', {
+        name: 'Rename conversation',
+      });
+      const overlay = pencil.closest('.wzConvoRowRenameOverlay') as HTMLElement;
+      // Selected but neither hovered nor focused -- must still be at rest, unlike the pre-fix
+      // condition which also checked `isSelected`.
+      expect(overlay.style.opacity).toBe('0');
+      expect(overlay.style.pointerEvents).toBe('none');
+    });
+
+    it('clicking the pencil icon swaps the title for an input, without triggering onSelect', () => {
+      const onSelect = jest.fn();
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Rename me' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={onSelect}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={noop}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      );
+
+      expect(onSelect).not.toHaveBeenCalled();
+      expect(screen.queryByText('Rename me')).toBeNull();
+      const input = screen.getByLabelText(
+        'Conversation title',
+      ) as HTMLInputElement;
+      expect(input.value).toBe('Rename me');
+    });
+
+    it('Enter commits the new title via onRename and closes the input', () => {
+      const onRename = jest.fn();
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Old title' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={onRename}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      );
+      const input = screen.getByLabelText('Conversation title');
+      fireEvent.change(input, { target: { value: 'New title' } });
+      fireEvent.keyDown(input, { key: 'Enter' });
+
+      expect(onRename).toHaveBeenCalledWith('c1', 'New title');
+      expect(screen.queryByLabelText('Conversation title')).toBeNull();
+    });
+
+    it('Escape cancels without calling onRename, restoring the original title', () => {
+      const onRename = jest.fn();
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Old title' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={onRename}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      );
+      const input = screen.getByLabelText('Conversation title');
+      fireEvent.change(input, { target: { value: 'Abandoned' } });
+      fireEvent.keyDown(input, { key: 'Escape' });
+
+      expect(onRename).not.toHaveBeenCalled();
+      expect(screen.getByText('Old title')).toBeInTheDocument();
+    });
+
+    it('an empty/whitespace-only title is not committed', () => {
+      const onRename = jest.fn();
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Old title' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={onRename}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      );
+      const input = screen.getByLabelText('Conversation title');
+      fireEvent.change(input, { target: { value: '   ' } });
+      fireEvent.keyDown(input, { key: 'Enter' });
+
+      expect(onRename).not.toHaveBeenCalled();
+    });
+
+    it('m6: commits on blur (clicking/tabbing away), without needing Enter', () => {
+      const onRename = jest.fn();
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Old title' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={onRename}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      );
+      const input = screen.getByLabelText('Conversation title');
+      fireEvent.change(input, { target: { value: 'Blurred title' } });
+      fireEvent.blur(input);
+
+      expect(onRename).toHaveBeenCalledWith('c1', 'Blurred title');
+      expect(onRename).toHaveBeenCalledTimes(1);
+    });
+
+    it('m6: Enter does not ALSO commit a second time via the unmount blur that follows it', () => {
+      const onRename = jest.fn();
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Old title' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={onRename}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      );
+      const input = screen.getByLabelText('Conversation title');
+      fireEvent.change(input, { target: { value: 'New title' } });
+      fireEvent.keyDown(input, { key: 'Enter' });
+      // The input is unmounted now (isRenaming false) -- simulates the blur a real browser fires
+      // when a focused element is removed from the DOM.
+      fireEvent.blur(input);
+
+      expect(onRename).toHaveBeenCalledTimes(1);
+      expect(onRename).toHaveBeenCalledWith('c1', 'New title');
+    });
+
+    it('F-5 REGRESSION: clicking the row body while renaming commits the edit but does NOT also navigate', () => {
+      // A real click on a different focusable element blurs the currently focused input FIRST
+      // (native default action on mousedown), THEN dispatches its own click -- by the time the
+      // row's onClick runs, the commit has already happened. Simulated explicitly here rather than
+      // relying on jsdom to chain these on its own, the same way the "Enter" test above simulates
+      // the unmount blur explicitly.
+      const onRename = jest.fn();
+      const onSelect = jest.fn();
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Old title' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={onSelect}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={onRename}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      );
+      const input = screen.getByLabelText('Conversation title');
+      fireEvent.change(input, { target: { value: 'New title' } });
+      const row = input.closest('[role="button"]') as HTMLElement;
+
+      fireEvent.mouseDown(row);
+      fireEvent.blur(input);
+      fireEvent.click(row);
+
+      expect(onRename).toHaveBeenCalledWith('c1', 'New title');
+      expect(onSelect).not.toHaveBeenCalled();
+    });
+
+    it('m6: entering select mode clears a rename in progress', () => {
+      const onRename = jest.fn();
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Old title' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={onRename}
+          onBulkDelete={noop}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      );
+      expect(screen.getByLabelText('Conversation title')).toBeInTheDocument();
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      );
+
+      expect(screen.queryByLabelText('Conversation title')).toBeNull();
+      expect(screen.getByText('Old title')).toBeInTheDocument();
+    });
+
+    it('m6: changing the search term clears a rename in progress', () => {
+      const onRename = jest.fn();
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Old title' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={onRename}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      );
+      fireEvent.change(screen.getByPlaceholderText('Search conversations'), {
+        target: { value: 'old' },
+      });
+
+      expect(screen.queryByLabelText('Conversation title')).toBeNull();
+    });
+
+    it('m6: switching the active conversation clears a rename in progress', () => {
+      const onRename = jest.fn();
+      const { rerender } = render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Old title' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={onRename}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      );
+      expect(screen.getByLabelText('Conversation title')).toBeInTheDocument();
+
+      rerender(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Old title' })]}
+          isLoading={false}
+          activeConversationId='c1'
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={onRename}
+        />,
+      );
+
+      expect(screen.queryByLabelText('Conversation title')).toBeNull();
+    });
+  });
+
+  describe('select mode / bulk delete (E3)', () => {
+    it('does not render a "Select conversations" entry point when onBulkDelete is not supplied', () => {
+      render(
+        <ConversationList
+          conversations={[conversation()]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+        />,
+      );
+
+      expect(
+        screen.queryByRole('button', { name: 'Select conversations' }),
+      ).toBeNull();
+    });
+
+    it('the select-mode toolbar is ONE compact flex row (count, cancel, delete), not a wrapped stack', () => {
+      // #9010 review: the previous `wrap` toolbar spread "N selected" / "Cancel selection" /
+      // "Delete (N)" across a sparse 3-line column. The fix keeps all three inside a single,
+      // non-wrapping `EuiFlexGroup` -- this asserts the STRUCTURE (one row, three controls),
+      // not pixels jsdom has no layout engine to measure anyway.
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Selectable' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={noop}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      );
+
+      const countText = screen.getByText('0 selected');
+      const toolbar = countText.closest('.euiFlexGroup') as HTMLElement;
+      expect(toolbar).not.toBeNull();
+      // Never wraps to a second line.
+      expect(toolbar.className).not.toMatch(/wrap/i);
+      // Exactly the three controls, in one row: count, cancel, delete.
+      expect(toolbar.children).toHaveLength(3);
+      expect(
+        toolbar.querySelector('[aria-label="Cancel selection"]'),
+      ).not.toBeNull();
+      expect(screen.getByRole('button', { name: 'Delete (0)' })).toBeTruthy();
+      expect(
+        toolbar.contains(screen.getByRole('button', { name: 'Delete (0)' })),
+      ).toBe(true);
+    });
+
+    it("carries `wzConvoRailSearchRow` on the select-mode toolbar too, so it also opts out of EuiFlexGroup's default flex-grow (#9010 review regression)", () => {
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Selectable' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={noop}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      );
+
+      const toolbar = screen
+        .getByText('0 selected')
+        .closest('.euiFlexGroup') as HTMLElement;
+      expect(toolbar).not.toBeNull();
+      expect(toolbar.className).toMatch(/wzConvoRailSearchRow/);
+    });
+
+    it('entering select mode shows a checkbox per row and hides the delete/rename icons', () => {
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Selectable' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={noop}
+          onBulkDelete={noop}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      );
+
+      expect(
+        screen.getByRole('checkbox', { name: 'Select "Selectable"' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Delete conversation' }),
+      ).toBeNull();
+      expect(
+        screen.queryByRole('button', { name: 'Rename conversation' }),
+      ).toBeNull();
+    });
+
+    it('"Cancel selection" exits select mode and clears the selection', () => {
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Selectable' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={noop}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      );
+      fireEvent.click(
+        screen.getByRole('checkbox', { name: 'Select "Selectable"' }),
+      );
+      fireEvent.click(screen.getByRole('button', { name: 'Cancel selection' }));
+
+      expect(
+        screen.queryByRole('checkbox', { name: 'Select "Selectable"' }),
+      ).toBeNull();
+      expect(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      ).toBeInTheDocument();
+    });
+
+    it('the delete button stays disabled until at least one row is checked', () => {
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Selectable' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={noop}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      );
+      expect(screen.getByRole('button', { name: 'Delete (0)' })).toBeDisabled();
+
+      fireEvent.click(
+        screen.getByRole('checkbox', { name: 'Select "Selectable"' }),
+      );
+      expect(
+        screen.getByRole('button', { name: 'Delete (1)' }),
+      ).not.toBeDisabled();
+    });
+
+    it('shows a "Delete N conversations?" confirm and calls onBulkDelete with every checked id', () => {
+      const onBulkDelete = jest.fn();
+      render(
+        <ConversationList
+          conversations={[
+            conversation({ id: 'c1', title: 'First' }),
+            conversation({ id: 'c2', title: 'Second' }),
+          ]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={onBulkDelete}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      );
+      fireEvent.click(screen.getByRole('checkbox', { name: 'Select "First"' }));
+      fireEvent.click(
+        screen.getByRole('checkbox', { name: 'Select "Second"' }),
+      );
+      fireEvent.click(screen.getByRole('button', { name: 'Delete (2)' }));
+
+      expect(screen.getByText('Delete 2 conversations?')).toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+
+      expect(onBulkDelete).toHaveBeenCalledTimes(1);
+      expect(new Set(onBulkDelete.mock.calls[0][0])).toEqual(
+        new Set(['c1', 'c2']),
+      );
+      // Confirming also leaves select mode.
+      expect(
+        screen.queryByRole('button', { name: 'Cancel selection' }),
+      ).toBeNull();
+    });
+
+    it('canceling the bulk-delete confirm calls neither onDelete nor onBulkDelete', () => {
+      const onBulkDelete = jest.fn();
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'First' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={onBulkDelete}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      );
+      fireEvent.click(screen.getByRole('checkbox', { name: 'Select "First"' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Delete (1)' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
+      expect(onBulkDelete).not.toHaveBeenCalled();
+    });
+
+    it('m11: Escape exits select mode from anywhere in the rail', () => {
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'First' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={noop}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      );
+      expect(
+        screen.getByRole('checkbox', { name: 'Select "First"' }),
+      ).toBeInTheDocument();
+
+      fireEvent.keyDown(
+        screen.getByRole('checkbox', { name: 'Select "First"' }),
+        { key: 'Escape' },
+      );
+
+      expect(
+        screen.queryByRole('checkbox', { name: 'Select "First"' }),
+      ).toBeNull();
+      expect(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      ).toBeInTheDocument();
+    });
+
+    it('m13: a selected id no longer present in `conversations` is pruned on the next render', () => {
+      const onBulkDelete = jest.fn();
+      const { rerender } = render(
+        <ConversationList
+          conversations={[
+            conversation({ id: 'c1', title: 'First' }),
+            conversation({ id: 'c2', title: 'Second' }),
+          ]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={onBulkDelete}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Select conversations' }),
+      );
+      fireEvent.click(screen.getByRole('checkbox', { name: 'Select "First"' }));
+      fireEvent.click(
+        screen.getByRole('checkbox', { name: 'Select "Second"' }),
+      );
+      expect(
+        screen.getByRole('button', { name: 'Delete (2)' }),
+      ).toBeInTheDocument();
+
+      // 'First' (c1) is removed from the list this component is given — e.g. a refresh after it
+      // was deleted through some other path (another tab, the single-delete flow).
+      rerender(
+        <ConversationList
+          conversations={[conversation({ id: 'c2', title: 'Second' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onBulkDelete={onBulkDelete}
+        />,
+      );
+
+      // The stale id is pruned -- the count drops to 1, not 2, and a confirm would only ever
+      // target the id that still exists.
+      expect(
+        screen.getByRole('button', { name: 'Delete (1)' }),
+      ).toBeInTheDocument();
     });
   });
 });

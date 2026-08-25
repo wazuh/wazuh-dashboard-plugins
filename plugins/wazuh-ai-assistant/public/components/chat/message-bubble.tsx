@@ -12,6 +12,7 @@ import {
   EuiCallOut,
   EuiCodeBlock,
   EuiLoadingContent,
+  EuiLoadingSpinner,
   EuiMarkdownFormat,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
@@ -19,7 +20,7 @@ import { ChatRole, TableSpec, ToolCall } from '../../../common/types';
 import { ResultTable, ResultTableProvenanceChip } from './result-table';
 import { DiscoverLink, ResolveDiscoverUrl } from './discover-link';
 import { ResolveSecurityAnalyticsUrl } from './security-analytics-link';
-import { describeToolCall } from './tool-call-label';
+import { describeProvenance, describeToolCall } from './tool-call-label';
 
 /**
  * "This turn was cut short" affordance, rendered in two places: inside an interrupted assistant
@@ -27,9 +28,13 @@ import { describeToolCall } from './tool-call-label';
  * reload or a navigation mid-answer kills the page before anything can mark the assistant message,
  * so the only evidence left is a conversation that ends with an unanswered question.
  */
-export const InterruptedTurnNotice: React.FC<{ onRetry?: () => void }> = ({
-  onRetry,
-}) => (
+export const InterruptedTurnNotice: React.FC<{
+  onRetry?: () => void;
+  /** Overrides the default "Retry" action label. An older turn cannot be retried IN PLACE without
+   * rewriting the middle of the conversation, so `message-list.tsx` labels it "Ask again" there —
+   * see `MessageListProps.onRetryTurn`. */
+  retryLabel?: string;
+}> = ({ onRetry, retryLabel }) => (
   <EuiFlexGroup
     gutterSize='s'
     alignItems='center'
@@ -52,15 +57,105 @@ export const InterruptedTurnNotice: React.FC<{ onRetry?: () => void }> = ({
           flush='both'
           iconType='refresh'
           onClick={onRetry}
+          data-test-subj='wzTurnRetry'
         >
-          {i18n.translate('wazuhAiAssistant.chat.retry', {
-            defaultMessage: 'Retry',
-          })}
+          {retryLabel ??
+            i18n.translate('wazuhAiAssistant.chat.retry', {
+              defaultMessage: 'Retry',
+            })}
         </EuiButtonEmpty>
       </EuiFlexItem>
     )}
   </EuiFlexGroup>
 );
+
+/**
+ * "This turn failed" — the permanent, per-turn record of a failure.
+ *
+ * The failure used to be reported ONLY by the dismissible callout band above the transcript, which
+ * `handleSend` clears on the next question (chat-page.tsx). So a reader who asked again — the
+ * single most likely next action — was left with a transcript in which their failed question simply
+ * has no answer and nothing anywhere says why, and a reload lost even the banner. This notice is
+ * anchored to the turn instead, persists with it (`UiChatMessage.failureReason`), and keeps its own
+ * retry action reachable however many questions follow it.
+ *
+ * Collapsed by default: a provider error can be a paragraph of upstream JSON, and a transcript is
+ * not a log viewer. The one-line summary is always visible; the reason itself is one click away and
+ * wired with `aria-expanded`/`aria-controls`, like the query chips in the meta row.
+ */
+export const FailedTurnNotice: React.FC<{
+  reason: string;
+  detailsId: string;
+  onRetry?: () => void;
+  retryLabel?: string;
+}> = ({ reason, detailsId, onRetry, retryLabel }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div data-test-subj='wzFailedTurnNotice'>
+      <EuiFlexGroup
+        gutterSize='s'
+        alignItems='center'
+        responsive={false}
+        justifyContent='flexStart'
+        wrap
+      >
+        <EuiFlexItem grow={false}>
+          <EuiText size='xs'>
+            <EuiTextColor color='subdued'>
+              {i18n.translate('wazuhAiAssistant.chat.turnFailed', {
+                defaultMessage: 'This turn failed',
+              })}
+            </EuiTextColor>
+          </EuiText>
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiButtonEmpty
+            size='xs'
+            flush='both'
+            iconType={isOpen ? 'arrowUp' : 'arrowDown'}
+            onClick={() => setIsOpen(current => !current)}
+            aria-expanded={isOpen}
+            aria-controls={detailsId}
+            data-test-subj='wzFailedTurnDetailsToggle'
+          >
+            {isOpen
+              ? i18n.translate('wazuhAiAssistant.chat.turnFailedHideReason', {
+                  defaultMessage: 'Hide reason',
+                })
+              : i18n.translate('wazuhAiAssistant.chat.turnFailedShowReason', {
+                  defaultMessage: 'Show reason',
+                })}
+          </EuiButtonEmpty>
+        </EuiFlexItem>
+        {onRetry && (
+          <EuiFlexItem grow={false}>
+            <EuiButtonEmpty
+              size='xs'
+              flush='both'
+              iconType='refresh'
+              onClick={onRetry}
+              data-test-subj='wzTurnRetry'
+            >
+              {retryLabel ??
+                i18n.translate('wazuhAiAssistant.chat.retry', {
+                  defaultMessage: 'Retry',
+                })}
+            </EuiButtonEmpty>
+          </EuiFlexItem>
+        )}
+      </EuiFlexGroup>
+      {isOpen && (
+        <div id={detailsId}>
+          <EuiText size='xs' color='subdued'>
+            <p style={{ margin: '4px 0 0', whiteSpace: 'pre-wrap' }}>
+              {reason}
+            </p>
+          </EuiText>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export interface UiChatMessage {
   id: string;
@@ -100,6 +195,23 @@ export interface UiChatMessage {
    * one instead of presenting it as finished.
    */
   interrupted?: boolean;
+  /**
+   * This turn FAILED, with this reason. Rendered as a compact, permanent marker on the turn itself
+   * (`FailedTurnNotice` below) instead of only as a dismissible banner over the transcript that the
+   * next question cleared — see `common/types.ts`'s `PersistedChatMessage.failureReason`.
+   */
+  failureReason?: string;
+  /** Which provider produced this answer, stamped at turn start and shown in the meta row — see
+   * `common/types.ts`'s `PersistedChatMessage.providerId`. */
+  providerId?: string;
+  providerName?: string;
+  providerModel?: string;
+  /** Wire-proof fix: whether privacy was ON for the turn that produced this message — display-only
+   * here (never shown in the UI), just carried on the object so `buildOutgoingMessages`
+   * (common/chat-history.ts) can fail-closed-exclude a privacy-off turn's prose from later history
+   * replay. See `common/types.ts`'s `ChatMessage.privacyEnabled` doc comment for the full
+   * mechanism. Only ever set on `role: 'assistant'`. */
+  privacyEnabled?: boolean;
 }
 
 interface MessageBubbleProps {
@@ -115,9 +227,17 @@ interface MessageBubbleProps {
    * case the interrupted notice is shown without an action.
    */
   onRetry?: () => void;
+  /** Label for the `onRetry` action — see `InterruptedTurnNotice.retryLabel`. */
+  retryLabel?: string;
   /** Passed straight through to this message's ResultTable — see that component's own doc
-   * comment on the same-named prop for why it is optional and currently always `undefined`. */
+   * comment on the same-named prop for how it steps the table's initial page size. Threaded here
+   * from MessageList, which gets it from chat-page.tsx's real `ResizeObserver` measurement; it
+   * stays optional because jsdom has no `ResizeObserver`, so it is `undefined` in tests. */
   transcriptHeightPx?: number;
+  /** Passed straight through to this message's ResultTable so a rows-per-page change can re-pin the
+   * transcript pane — see that component's own doc comment on the same-named prop. Threaded here
+   * from MessageList, which gets it from chat-page.tsx. */
+  onTableRowsPerPageChange?: () => void;
 }
 
 function formatTimestamp(epochMs: number): string {
@@ -200,12 +320,56 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   resolveDiscoverUrl,
   resolveSecurityAnalyticsUrl,
   onRetry,
+  retryLabel,
   transcriptHeightPx,
+  onTableRowsPerPageChange,
 }) => {
   const isUser = message.role === 'user';
   const isWaitingForFirstToken =
     !isUser && message.isStreaming === true && message.content === '';
   const toolCalls = message.toolCalls ?? [];
+  /**
+   * The table this turn actually DRAWS — `undefined` for a final table with zero rows.
+   *
+   * A header-only result card ("Results (0 rows)" over EuiBasicTable's stock "No items found") is
+   * never rendered (CEO item 6 / ux-research.md §E, which is also PatternFly's explicit "never
+   * render a header-only table"): the assistant's own prose already answers a zero-result question
+   * in words, and the card added a second, emptier answer underneath it.
+   *
+   * The gate lives HERE, in the renderer, rather than in chat-page.tsx's flush path, for two
+   * reasons: (1) `message.table` is persisted (server/conversation-store.ts), so a conversation
+   * SAVED before this change — or restored from any older release — carries 0-row specs that a
+   * stream-time gate would never see, and would still draw the empty card on resume; (2) the
+   * within-turn empty-table suppression in chat-page.tsx (`pendingEmptyTable`) is a STATE invariant
+   * about which spec a turn is remembered with, and it stays exactly as it was — an honest-empty
+   * turn is still recorded as having run a query that returned nothing, which is what keeps the
+   * saved conversation truthful; only the drawing of it changes.
+   *
+   * Every table-conditional RENDERING decision in this component reads THIS value, not
+   * `message.table`, so a suppressed table can never (a) strand its provenance chips in a card
+   * header that does not exist, or (b) leave a prose-only answer opted out of the reading measure.
+   * The one deliberate exception is the meta-row chip's hover title (see its own comment below),
+   * which reads the suppressed spec purely to keep naming the index it queried.
+   */
+  const renderedTable =
+    message.table && message.table.rows.length > 0 ? message.table : undefined;
+  /**
+   * The guarantee half of the suppression above: hiding the card must never leave a turn with no
+   * feedback at all. A turn that ends on a 0-row table AND produced no prose (the model stopped
+   * after the tool call, or Stop was pressed before it narrated anything) gets ONE quiet subdued
+   * line instead — no card, no icon, no illustration, since an illustration-scale empty state
+   * belongs to a page, not to one turn inside a conversation.
+   *
+   * `isStreaming` is excluded because a still-streaming bubble already shows its own placeholder
+   * lines; in the live path an empty spec only ever reaches a message at flush time (chat-page.tsx),
+   * by which point the turn is no longer streaming, so this is a guard against a future writer
+   * rather than a case reachable today.
+   */
+  const showEmptyResultNote =
+    message.table !== undefined &&
+    message.table.rows.length === 0 &&
+    message.content.trim() === '' &&
+    message.isStreaming !== true;
   // Provenance chips move UP into the result card's own header once a table exists (layout
   // contract §4: "the tool call renders BELOW the table it produced; it should become a chip in
   // the card header") — ResultTable renders them there instead. Below-bubble chips stay exactly
@@ -213,18 +377,69 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   // answer, a suggested-query handoff, or a table still held back by chat-page.tsx pending the
   // first answer token — see chat-page.test.tsx's "holds the result table back..." coverage: the
   // chip must still appear from `toolCalls` alone at that point, since `message.table` is not yet
-  // set on the message).
-  const metaRowToolCalls = message.table ? [] : toolCalls;
+  // set on the message). A turn whose only table was empty is a THIRD case of the same shape: the
+  // card that would have carried the chips is suppressed (see `renderedTable`), so the below-bubble
+  // chips have to stay — that is the only place left to check what the turn actually queried, which
+  // matters most precisely when the answer is "nothing was found".
+  const metaRowToolCalls = renderedTable ? [] : toolCalls;
+  /**
+   * Issue #9008 (blocker 3): a multi-call turn runs several tool calls before landing on the one
+   * table that gets rendered, but `message.toolCalls` lists ALL of them — mapping every call to
+   * `renderedTable`'s provenance unconditionally attributed call 1's chip with call 2's index and
+   * time range (or vice-versa) whenever a turn ran more than one Indexer call. `renderedTable`
+   * itself is authoritative about exactly ONE call: `provenance.toolCallId`, attached by
+   * server/routes/chat.ts (see `TableSpec.provenance`'s doc comment) to the specific call that
+   * produced it. Only that one call's chip is passed the real `provenance` object; every other
+   * call in the same turn renders name-only, with no index/range/badge invented for it.
+   *
+   * `message.table` is the source here, deliberately, rather than `renderedTable`: the two are the
+   * same object whenever a card renders (`renderedTable` IS `message.table`, just gated on row
+   * count), and the below-bubble chip row for a SUPPRESSED 0-row table still needs the suppressed
+   * spec's provenance — see that row's own comment. One source therefore serves both surfaces
+   * without a second, subtly different lookup.
+   *
+   * Computed ONCE per message, memoized (issue #9008 review, cleanup 4). Three surfaces read this
+   * — the result card's chips, the below-bubble chip row, and the raw view a chip opens — and each
+   * used to redo the same `describeProvenance`/`describeToolCall` derivation for the same call on
+   * every render, including renders driven by nothing but a popover opening.
+   */
+  const toolCallDisplays = useMemo(() => {
+    const provenanceForCall = (
+      toolCallId: string,
+    ): TableSpec['provenance'] | undefined =>
+      message.table?.provenance?.toolCallId === toolCallId
+        ? message.table.provenance
+        : undefined;
+    return new Map(
+      toolCalls.map(toolCall => {
+        const provenance = provenanceForCall(toolCall.id);
+        // `describeToolCall` builds its chip text out of the same display object, so it is handed
+        // the computed one rather than deriving a second, identical copy.
+        const display = describeProvenance(provenance);
+        return [
+          toolCall.id,
+          { display, label: describeToolCall(toolCall, provenance, display) },
+        ] as const;
+      }),
+    );
+    // `toolCalls` is `message.toolCalls ?? []` — a fresh `[]` identity only in the no-calls case,
+    // where the map is empty anyway.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [message.toolCalls, message.table]);
   const tableProvenanceChips: ResultTableProvenanceChip[] | undefined =
-    message.table
+    renderedTable
       ? toolCalls.map(toolCall => {
-          const { short, full } = describeToolCall(toolCall, message.table);
+          const entry = toolCallDisplays.get(toolCall.id);
+          const display = entry?.display ?? {};
           return {
             id: toolCall.id,
-            shortLabel: short,
-            fullLabel: full,
+            shortLabel: entry?.label.short ?? toolCall.name,
+            fullLabel: entry?.label.full ?? toolCall.name,
             toolName: toolCall.name,
             argumentsJson: toolCall.arguments,
+            index: display.index,
+            resolvedRangeLabel: display.resolvedRangeLabel,
+            windowBadgeLabel: display.windowBadgeLabel,
           };
         })
       : undefined;
@@ -259,21 +474,21 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   // reading queries. A second copy in the meta row was the same query at a lower abstraction
   // level, competing with the chips that answer the question people actually ask of an answer:
   // what did it look for?
-  // color="plain" keeps both avatars on the same neutral background, so the pair reads as one
-  // set instead of picking up EUI's auto-assigned per-name colors.
-  const avatar = isUser ? (
-    <EuiAvatar
-      size='m'
-      iconType='user'
-      color='plain'
-      name={i18n.translate('wazuhAiAssistant.chat.userAvatarName', {
-        defaultMessage: 'You',
-      })}
-    />
-  ) : (
-    // Initials, not an image: the Wazuh mark was dropped here because the app chrome already
-    // brands the page. `name` backs both the aria-label/title and the rendered initials, and
-    // initialsLength=2 keeps it as "AI" rather than EUI's default single-letter "A".
+  // ONE avatar per conversation, on the assistant side only.
+  //
+  // The user turn's own avatar is gone (audit §3.7): a 32px avatar plus its 12px gutter held the
+  // user bubble 16px in from the transcript's right edge, so the question's right edge and the
+  // composer's — the two things directly above one another on the surface — never lined up, on a
+  // screen whose whole premise is one shared alignment edge (rulebook D14/D22). It carried no
+  // information either: the bubble's own fill, border and right alignment already say "you said
+  // this", which is exactly how ChatGPT/Claude/Gemini render a user turn (rulebook F29). The
+  // assistant keeps its mark, because that side is undecorated prose and the avatar is the only
+  // thing marking where an answer begins.
+  //
+  // Initials, not an image: the Wazuh mark was dropped here because the app chrome already brands
+  // the page. `name` backs both the aria-label/title and the rendered initials, and
+  // initialsLength=2 keeps it as "AI" rather than EUI's default single-letter "A".
+  const avatar = (
     <EuiAvatar
       size='m'
       color='plain'
@@ -312,9 +527,24 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
             : {})}
         >
           <EuiText size='s'>
-            {/* Shown only before real content has arrived; a delta event clears statusMessage. */}
+            {/* Shown only before real content has arrived; a delta event clears statusMessage.
+                  The spinner is what makes this a LIVE indicator rather than a line of text that
+                  could equally well be a stalled turn: the label changes at most three times over a
+                  turn that can run for tens of seconds, so on its own it read as frozen. It sits
+                  inside the same `aria-live` region as the label (the wrapping div above), and is
+                  itself decorative — the announced text is the step label. */}
             {message.statusMessage && !message.content && (
-              <p style={{ margin: 0, fontStyle: 'italic' }}>
+              <p
+                style={{
+                  margin: 0,
+                  fontStyle: 'italic',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+                data-test-subj='wzTurnStatusLine'
+              >
+                <EuiLoadingSpinner size='s' aria-hidden='true' />
                 <EuiTextColor color='subdued'>
                   {message.statusMessage}
                 </EuiTextColor>
@@ -344,17 +574,36 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           </EuiText>
         </div>
       )}
-      {message.table && (
+      {renderedTable && (
         <>
-          <EuiSpacer size='s' />
+          {/* Iteration-4 audit, P1 item 5: 16px ('m'), not 8px ('s') — a card must not sit closer
+              to the sentence above it than two sentences sit to each other. */}
+          <EuiSpacer size='m' />
           <ResultTable
-            spec={message.table}
+            spec={renderedTable}
             resolveDiscoverUrl={resolveDiscoverUrl}
             resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
             provenanceChips={tableProvenanceChips}
             transcriptHeightPx={transcriptHeightPx}
+            onRowsPerPageChange={onTableRowsPerPageChange}
           />
         </>
+      )}
+      {/* The suppressed-card fallback line — see `showEmptyResultNote` above for exactly when this
+          is the turn's only feedback. Deliberately not an EuiCallOut/EuiEmptyPrompt: this is a
+          sentence, and the whole point of suppressing the card was to stop answering "nothing
+          matched" with a box. */}
+      {showEmptyResultNote && (
+        <div className={PROSE_MEASURE_CLASS}>
+          <EuiSpacer size='xs' />
+          <EuiText size='s' color='subdued'>
+            <p style={{ margin: 0 }}>
+              {i18n.translate('wazuhAiAssistant.chat.emptyResultNote', {
+                defaultMessage: 'The query returned no rows.',
+              })}
+            </p>
+          </EuiText>
+        </div>
       )}
       {/* Graceful-failure handoff (server/tools/suggest-discover-query.ts): the model's own reason
           text plus a link to run the query itself in Discover, in place of the table/answer it
@@ -364,7 +613,9 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           link already goes through (discover-link.tsx). */}
       {message.suggestedQuery && (
         <>
-          <EuiSpacer size='s' />
+          {/* Iteration-4 audit, P1 item 5: same 16px ('m') as the results-card spacer above, for
+              the same reason — this callout is a card too. */}
+          <EuiSpacer size='m' />
           <EuiCallOut
             size='s'
             iconType='iInCircle'
@@ -390,18 +641,32 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   const bubble = (
     <EuiFlexItem
       grow={false}
-      // The assistant's prose measure comes from the CLASS, not from a restated `68ch` — this file
-      // is not where `$wzProseMeasure` lives, and the comment above PROSE_MEASURE_CLASS already
-      // claimed the figure had exactly one home while an inline copy sat right here. A
-      // table-bearing turn takes no class: `.wzMessageRow--wide` (chat-page.scss) already caps the
-      // row at `min(100%, $wzTableMaxWidth)` one level up, so the `min(100%, 1300px)` that used to
-      // be inlined here was a second copy of that same number with nothing keeping the two in step.
-      className={!isUser && !message.table ? PROSE_MEASURE_CLASS : undefined}
+      // No `PROSE_MEASURE_CLASS` here (iteration-4 audit, P2 item 10): this item's own inline
+      // `maxWidth` below is ALWAYS set (`'75%'` or `'100%'`), and an inline style always wins over
+      // a class on specificity — so the class used to sit here doing nothing for either turn kind:
+      // dead weight for a table-bearing turn (its `'100%'` matched the class's own no-op) and,
+      // worse, misleading for a prose-only one, where it read as "the 68ch cap lives here" while
+      // the `'100%'` inline value silently overrode it. The real cap is (and always was) the INNER
+      // prose `<div className={PROSE_MEASURE_CLASS}>` a few lines below, which carries no inline
+      // style of its own to fight it.
       style={{
         // The user turn keeps its 75% share — a question is always prose, and the figure is
         // genuinely local to this decision, with no token or class behind it to drift from.
         maxWidth: isUser ? '75%' : '100%',
-        minWidth: 180,
+        minWidth: isUser ? 180 : 0,
+        // The assistant column is forced to a DETERMINISTIC width (the full row) instead of EUI's
+        // default shrink-to-fit sizing (audit item 2). Shrink-to-fit made this flex item's resolved
+        // width track whatever it happened to be rendering — 605px for a collapsed/prose-only turn,
+        // 1260px once a `wzResultsCard` was expanded — so the results card jogged ~115px sideways as
+        // it expanded/collapsed instead of just changing height, and a collapsed card hugged its own
+        // content rather than filling the wide row it was given.
+        // `flex: 1 1 auto` makes the item grow to fill the row like any other block, and `min-width: 0`
+        // is required alongside it — a flex item's automatic minimum is its content's, which for a
+        // wide `wzResultsCard` would otherwise refuse to shrink back down and re-introduce the same
+        // instability from the other direction. The user bubble is deliberately left out of this: it
+        // is a real chat bubble that is supposed to hug its own text up to the 75% cap above, and nothing
+        // about it collapses/expands the way a results card does.
+        ...(!isUser ? { flex: '1 1 auto', width: '100%' } : {}),
       }}
     >
       {isUser ? (
@@ -417,9 +682,12 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           paddingSize='m'
           hasShadow={false}
           hasBorder
-          // The one deliberate radius override on the surface: a conversation turn reads as a
-          // bubble, not as a data panel. Everything else uses EUI defaults (see chat-page.scss).
-          style={{ borderRadius: 14 }}
+          // Radius comes from `.euiPanel.wzUserBubble` (chat-page.scss), which folds this bubble
+          // onto the shared `$wzPanelRadius`. It used to be an inline `borderRadius: 14` with a
+          // comment claiming the rest of the surface "uses EUI defaults" — that was both a fifth
+          // radius invented for one element and a contradiction of the actual doctrine
+          // (_redesign.scss's "one container idiom, 12px"), which is the one that stands.
+          className='wzUserBubble'
         >
           {bubbleContent}
         </EuiPanel>
@@ -432,17 +700,43 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
             wired via aria-expanded/aria-controls). Anchoring the interrupted notice here instead
             of as its own floating line keeps it attached to the turn it belongs to. */}
       <EuiFlexGroup
+        // `wzMsgMetaRow`: a stable class marking the meta/footer row. A table-bearing (`--wide`)
+        // turn no longer needs to correct this row's inline-start — `.wzMessageRow--wide` anchors
+        // the whole row at the normal left edge (chat-page.scss) — but the class stays as the hook
+        // the transcript-geometry Cypress spec measures the footer's left edge from.
+        className='wzMsgMetaRow'
         gutterSize='xs'
         alignItems='center'
         responsive={false}
         justifyContent={isUser ? 'flexEnd' : 'flexStart'}
         wrap
       >
-        {!isUser && message.interrupted && !message.isStreaming && (
+        {/* A turn is either failed or interrupted, never both: `failureReason` is set by the
+              `error` stream event, `interrupted` by a stream that stopped without one
+              (chat-page.tsx). Failure is checked first so a turn that errored mid-stream — and so
+              also never reached `done` — reports the reason it has rather than the generic
+              "interrupted". */}
+        {!isUser && message.failureReason && !message.isStreaming && (
           <EuiFlexItem grow={false}>
-            <InterruptedTurnNotice onRetry={onRetry} />
+            <FailedTurnNotice
+              reason={message.failureReason}
+              detailsId={`wzFailedTurnReason-${message.id}`}
+              onRetry={onRetry}
+              retryLabel={retryLabel}
+            />
           </EuiFlexItem>
         )}
+        {!isUser &&
+          !message.failureReason &&
+          message.interrupted &&
+          !message.isStreaming && (
+            <EuiFlexItem grow={false}>
+              <InterruptedTurnNotice
+                onRetry={onRetry}
+                retryLabel={retryLabel}
+              />
+            </EuiFlexItem>
+          )}
         <EuiFlexItem grow={false}>
           <EuiText
             size='xs'
@@ -452,7 +746,10 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           >
             <p
               style={{
-                margin: '4px 4px 0',
+                // Iteration-4 audit, P1 item 6: no inline-end/start asymmetry — the old
+                // `'4px 4px 0'` put a 4px indent in front of the timestamp that put this row's own
+                // left edge 4px off the prose's (and, for an assistant turn, off the avatar's).
+                margin: '4px 0 0',
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
@@ -460,9 +757,51 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
             </p>
           </EuiText>
         </EuiFlexItem>
+        {/* Provider provenance: WHICH model wrote this answer. A conversation can legitimately span
+              several providers (the picker is right there in the composer, and a retried turn may
+              well be retried against a different one), and without this the transcript presents
+              every answer as though one anonymous "AI" produced all of them — so a reader comparing
+              two answers, or reporting a bad one, has no way to say what produced either. Plain
+              subdued text at the timestamp's own size, deliberately not a badge: it is a fact about
+              the turn, not an action. Rendered only when the stamp exists, so every turn saved
+              before this field did stays exactly as it was. */}
+        {!isUser && message.providerName && (
+          <EuiFlexItem grow={false}>
+            <EuiText
+              size='xs'
+              color='subdued'
+              className='wzMsgProviderProvenance'
+              data-test-subj='wzMsgProviderProvenance'
+            >
+              <p style={{ margin: '4px 0 0' }}>
+                {message.providerModel
+                  ? i18n.translate(
+                      'wazuhAiAssistant.chat.providerProvenanceWithModel',
+                      {
+                        defaultMessage: '{provider} · {model}',
+                        values: {
+                          provider: message.providerName,
+                          model: message.providerModel,
+                        },
+                      },
+                    )
+                  : message.providerName}
+              </p>
+            </EuiText>
+          </EuiFlexItem>
+        )}
         {!isUser &&
           metaRowToolCalls.map(toolCall => {
-            const { short, full } = describeToolCall(toolCall, message.table);
+            // `toolCallDisplays` reads `message.table`, deliberately NOT `renderedTable`: this is
+            // the one place the suppressed 0-row spec is still worth reading, because it is the
+            // only place left to check what the turn actually queried — precisely when the answer
+            // is "nothing was found". Its `toolCallId` match (issue #9008 blocker 3) means a
+            // multi-call turn's chip only carries provenance for the ONE call the spec names.
+            const { short, full } = toolCallDisplays.get(toolCall.id)
+              ?.label ?? {
+              short: toolCall.name,
+              full: toolCall.name,
+            };
             const isRawOpen = openRawIds.has(toolCall.id);
             return (
               <EuiFlexItem grow={false} key={toolCall.id}>
@@ -494,27 +833,58 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
       {!isUser &&
         metaRowToolCalls
           .filter(toolCall => openRawIds.has(toolCall.id))
-          .map(toolCall => (
-            <div
-              key={toolCall.id}
-              id={`${rawViewId}-${toolCall.id}`}
-              className={PROSE_MEASURE_CLASS}
-            >
-              <EuiSpacer size='xs' />
-              <EuiText size='xs'>
-                <strong>{toolCall.name}</strong>
-              </EuiText>
-              <EuiSpacer size='xs' />
-              <EuiCodeBlock
-                language='json'
-                paddingSize='s'
-                fontSize='s'
-                isCopyable
+          .map(toolCall => {
+            // Issue #9008 review, minor 7: the same Index/Time-range lines the rendered-table
+            // popover shows (ProvenanceChip, result-table.tsx) belong here too — this raw view IS
+            // the popover's equivalent for a turn whose table is suppressed (0 rows) or absent,
+            // and "which index did it read?" matters most exactly there. Reads the SAME memoized
+            // entry the chip above it does, so only the call that actually produced `message.table`
+            // carries real provenance, and it is derived once per render rather than twice.
+            const display = toolCallDisplays.get(toolCall.id)?.display ?? {};
+            return (
+              <div
+                key={toolCall.id}
+                id={`${rawViewId}-${toolCall.id}`}
+                className={PROSE_MEASURE_CLASS}
               >
-                {JSON.stringify(toolCall.arguments, null, 2)}
-              </EuiCodeBlock>
-            </div>
-          ))}
+                <EuiSpacer size='xs' />
+                <EuiText size='xs'>
+                  <strong>{toolCall.name}</strong>
+                </EuiText>
+                {display.index && (
+                  <EuiText size='xs' color='subdued'>
+                    {i18n.translate(
+                      'wazuhAiAssistant.resultTable.provenanceIndex',
+                      {
+                        defaultMessage: 'Index: {index}',
+                        values: { index: display.index },
+                      },
+                    )}
+                  </EuiText>
+                )}
+                {display.resolvedRangeLabel && (
+                  <EuiText size='xs' color='subdued'>
+                    {i18n.translate(
+                      'wazuhAiAssistant.resultTable.provenanceTimeRange',
+                      {
+                        defaultMessage: 'Time range: {range}',
+                        values: { range: display.resolvedRangeLabel },
+                      },
+                    )}
+                  </EuiText>
+                )}
+                <EuiSpacer size='xs' />
+                <EuiCodeBlock
+                  language='json'
+                  paddingSize='s'
+                  fontSize='s'
+                  isCopyable
+                >
+                  {JSON.stringify(toolCall.arguments, null, 2)}
+                </EuiCodeBlock>
+              </div>
+            );
+          })}
     </EuiFlexItem>
   );
 
@@ -522,7 +892,11 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   // alongside the in-bubble EuiLoadingContent skeleton/status line is gone — that pair read as two
   // independent "something is happening" signals for the same event.
   const avatarItem = (
-    <EuiFlexItem grow={false}>
+    // `wzMsgAvatarItem` (chat-page.scss): stable class carrying the avatar's small vertical nudge.
+    // A table-bearing (`--wide`) turn no longer breaks this item's inline-start out — the avatar
+    // keeps the same left x as on every other turn, since `.wzMessageRow--wide` anchors the whole
+    // row at the normal left edge (chat-page.scss) rather than correcting each element separately.
+    <EuiFlexItem grow={false} className='wzMsgAvatarItem'>
       <EuiFlexGroup direction='column' alignItems='center' gutterSize='xs'>
         <EuiFlexItem grow={false}>{avatar}</EuiFlexItem>
       </EuiFlexGroup>
@@ -542,11 +916,11 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
       gutterSize='s'
       responsive={false}
     >
+      {/* No avatar item at all on the user side — see the `avatar` comment above. The bubble is
+          then the row's only child, so `justifyContent='flexEnd'` puts its right edge exactly where
+          the composer's own right edge is. */}
       {isUser ? (
-        <>
-          {bubble}
-          {avatarItem}
-        </>
+        bubble
       ) : (
         <>
           {avatarItem}

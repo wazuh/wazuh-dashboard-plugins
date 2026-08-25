@@ -15,7 +15,7 @@ WORKDIR /opt/scripts-tests
 RUN npm install --no-audit --no-fund \
       jest \
       ts-jest \
-      typescript \
+      typescript@6.0.3 \
       @types/jest \
       babel-jest \
       @babel/core \

@@ -1,33 +1,41 @@
 import './chat-page.scss';
-import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   EuiSpacer,
   EuiEmptyPrompt,
   EuiButton,
-  EuiButtonEmpty,
+  EuiBadge,
   EuiButtonIcon,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiToolTip,
-  EuiIconTip,
+  EuiPopover,
   EuiText,
+  EuiToolTip,
   EuiTitle,
   EuiScreenReaderOnly,
-  EuiBadge,
   EuiCard,
   EuiLoadingSpinner,
   EuiPanel,
   EuiIcon,
-  EuiSelect,
   EuiFlyout,
   EuiFlyoutBody,
+  htmlIdGenerator,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { AppMountParameters, CoreStart } from '../../../../../src/core/public';
 import { ChatService } from '../../services/chat-service';
 import {
+  ASSISTANT_SETTINGS_CHANGED_EVENT,
   AssistantSettings,
   SettingsService,
+  isAssistantSettingsPayload,
 } from '../../services/settings-service';
 import { ensureManagerSession } from '../../services/session-heal';
 import { confirmInterruption } from '../../services/interrupt-confirm';
@@ -68,8 +76,10 @@ import { UiChatMessage } from './message-bubble';
 import { createDiscoverUrlResolver } from './discover-link';
 import { createSecurityAnalyticsUrlResolver } from './security-analytics-link';
 import { ChatInput, ChatInputHandle } from './chat-input';
+import { ProviderPicker } from './provider-picker';
 import { ConversationList } from './conversation-list';
 import { StatusCallout } from './status-callout';
+import { describeTurnStatus } from './turn-status';
 import { useSyncedState } from '../../hooks/use-synced-state';
 
 interface ChatPageProps {
@@ -85,6 +95,15 @@ interface ChatPageProps {
   /** The no-provider empty state's "Add a provider" CTA — its only caller. Owners wire it to
    * open Settings with the create-provider flyout (`#/settings?addProvider=true`). */
   onNavigateToSettings: () => void;
+  /** The provider picker's (chat-page.tsx, `ProviderPicker`) "Manage providers" footer item — a
+   * plain visit to the Settings app, deliberately a SEPARATE callback from `onNavigateToSettings`
+   * above rather than a reuse of it: that one always opens the create-provider flyout
+   * (`?addProvider=true`), which is the wrong behaviour for a reader who already has providers
+   * configured and just wants the table. Each embedding context wires this to the SAME helper it
+   * already uses for a plain Settings visit — application.tsx's tab-switch
+   * `navigateTo('settings')`, assistant-chat-panel.tsx's `openSettings` — rather than a new
+   * hardcoded path. */
+  onManageProviders: () => void;
   /** The app shell's router history (the same instance `<Router history={history}>` in
    * application.tsx uses) — used to read/write the open-conversation route below through
    * `history.replace` rather than the raw `window.history` API. */
@@ -124,6 +143,21 @@ interface ChatPageProps {
    */
   allowRailFlyout?: boolean;
   /**
+   * Whether the empty state may render as ONE vertically centred group (greeting + composer +
+   * example cards) that docks the composer to the bottom on the first send — C1, the Gemini-style
+   * empty state (AI/ux-iter3/gemini-motion-spec.md). Default true, i.e. the app shell's full-page
+   * chat gets it; the header's docked sidecar (assistant-chat-panel.tsx) passes `false` and keeps
+   * today's always-docked composer, per the spec's own "no room for theatre" note.
+   *
+   * A dedicated prop rather than piggy-backing on `allowRailFlyout === false` (the only other
+   * signal that currently distinguishes the sidecar): that prop answers "may the rail escalate to
+   * a full-screen overlay", which is a different question with a different answer surface — a
+   * future caller could well want a centred welcome AND no rail flyout, or the reverse. Same
+   * reasoning `allowRailFlyout`'s own doc comment gives for not sniffing `showConversationSidebar`:
+   * the embedding context is the CALLER's to declare, one explicit prop per decision.
+   */
+  enableWelcomeComposer?: boolean;
+  /**
    * Fires whenever the saved-conversations state this component owns (`conversations`,
    * `isLoadingConversations`, `activeConversationId`) changes — the sidecar header
    * (assistant-chat-panel.tsx) has its OWN conversations UI (a popover anchored to a header icon,
@@ -151,6 +185,62 @@ export interface ChatPageHandle {
   newConversation: () => void;
   selectConversation: (id: string) => void;
   deleteConversation: (id: string) => void;
+  /** m14 (#9010 review): the docked sidecar panel (header/assistant-chat-panel.tsx) is a PRIMARY
+   * surface for the conversation rail, not a secondary one — it needs the same rename/bulk-delete
+   * handlers the inline rail already gets directly as props, routed through this same imperative
+   * handle `deleteConversation` already uses. */
+  renameConversation: (id: string, title: string) => void;
+  bulkDeleteConversations: (ids: string[]) => void;
+}
+
+/**
+ * C1 composer position state machine (chat-page.scss carries the matching classes).
+ *
+ * - `centered` — the empty state: the pane is a centred flex column, so the transcript (holding
+ *   greeting + example cards) and the composer read as one group sitting slightly above the
+ *   vertical middle, with a compact composer measure.
+ * - `docking` — the one-time bridge, ~400ms: the pane is ALREADY back in its final
+ *   `grid-template-rows: 1fr auto` layout (so the transcript is laid out at full height before the
+ *   first user message lands in it), and the composer is carried from its old position to its new
+ *   one by an inverted transform (FLIP). The welcome group fades out of flow on top.
+ * - `docked` — today's layout, byte for byte: `.wzChatPane` with no modifier, no inline transform.
+ *   Every other state of this component (loading, no-provider, restored conversation, and the
+ *   embedded sidecar) is this one, so nothing about the existing surface depends on the machine.
+ *
+ * FLIP (measure → apply final layout → invert → release) rather than a pure CSS transition,
+ * because the two end states differ in `display` (flex vs grid) and in track sizing (`auto` vs
+ * `1fr`) — neither is interpolable, so there is no property a CSS transition could animate between
+ * them. Inverting a transform on the composer row is the only mechanism that gets the final layout
+ * committed immediately (which is what the transcript needs) while still showing the travel.
+ */
+type ComposerMode = 'centered' | 'docking' | 'docked';
+
+/** Pane classes per mode. A map, not a nested ternary in the JSX: the docked entry has to stay
+ * exactly `'wzChatPane'` (no modifier) and reading that off one table is what makes it obvious. */
+const PANE_CLASS_BY_COMPOSER_MODE: Record<ComposerMode, string> = {
+  centered: 'wzChatPane wzChatPane--welcome',
+  docking: 'wzChatPane wzChatPane--docking',
+  docked: 'wzChatPane',
+};
+
+/** Composer travel budget — the JS half of `$wzDockTravel` (chat-page.scss), which owns the actual
+ * `transition-duration`. This copy exists only for the settle FALLBACK below, so the two are
+ * allowed to differ slightly (the fallback is deliberately the longer of the two). */
+const DOCK_TRAVEL_MS = 400;
+/** `transitionend` can never be relied on alone: it does not fire when the animated property never
+ * actually changes (a zero-length travel — e.g. an already-bottom composer), when the element is
+ * hidden mid-flight (the sidecar's own tab switch), or in jsdom, which runs no transitions at all.
+ * The timer is therefore the primary settle path and the event is the fast path. */
+const DOCK_SETTLE_FALLBACK_MS = DOCK_TRAVEL_MS + 300;
+
+/** Reduced-motion probe. `matchMedia` is absent in jsdom, so it is optional-called rather than
+ * assumed; a missing implementation reads as "no preference", i.e. animate. Shared by the two
+ * places that need the preference in JS instead of CSS (smooth-scrolling the transcript, and the
+ * composer's dock travel) so they can never disagree. */
+function prefersReducedMotion(): boolean {
+  return (
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
+  );
 }
 
 /**
@@ -183,10 +273,67 @@ const RAIL_COLLAPSED_WIDTH = 48;
  * header panel) collapses the rail on its own. */
 const RAIL_COLLAPSE_AT = 1100;
 const RAIL_FLYOUT_AT = 900;
+/** How close to the bottom of the transcript still counts as "following the conversation" (see
+ * `pinnedToBottomRef` below). A table render or a late-arriving image can shift the pane by a few
+ * pixels, so an exact `=== 0` check would unpin spuriously and stop auto-scrolling mid-answer.
+ * Extracted from the two places that now read it (the pinning handler and the jump-to-latest
+ * button's own visibility, which is the same predicate inverted) rather than restated. */
+const SCROLL_PIN_THRESHOLD_PX = 160;
+/** Extra slack before an already-pinned pane UNpins (hysteresis). The pin predicate reads
+ * `clientHeight`, and anything that resizes the pane right on the pin boundary — in the audited
+ * bug it was the jump button owning its own 36px grid track; any future layout could reintroduce
+ * an equivalent — turns a single boundary crossing into show→resize→hide→resize flicker when both
+ * directions share one threshold. Unpinning at 160+40 while re-pinning at 160 keeps the
+ * predicate's output from ever feeding back into its own input. */
+const SCROLL_UNPIN_SLACK_PX = 40;
 /** Window event announcing a conversation create/update/delete; every mounted ChatPage listens
  * and refreshes, keeping the app shell's and the header flyout's sidebars in sync. */
 export const CONVERSATIONS_CHANGED_EVENT =
   'wazuhAiAssistant:conversationsChanged';
+
+/** Deadline for the pre-send policy refresh in `startTurn`. Short on purpose: its only job is to
+ * catch a policy changed elsewhere, and a user pressing Send must never wait on a slow settings
+ * GET — past this point the turn proceeds with the policy already in state. */
+const PRE_SEND_SETTINGS_TIMEOUT_MS = 1500;
+
+/**
+ * Resolves with `work`'s value, or `null` if it has not settled within `timeoutMs`.
+ *
+ * The timer is ALWAYS cleared, including on the fast path — a bare
+ * `Promise.race([work, new Promise(r => setTimeout(r, ms))])` leaves a live timer behind on every
+ * call, which keeps the event loop busy for the full deadline even though the answer already
+ * arrived. Harmless-looking in production, but it made every send in the test suite hold a 1.5s
+ * timer and turned a 39s suite into a 306s one.
+ */
+async function resolveWithinDeadline<T>(
+  work: Promise<T>,
+  timeoutMs: number,
+): Promise<T | null> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      work,
+      new Promise<null>(resolve => {
+        timer = setTimeout(() => resolve(null), timeoutMs);
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** The privacy default a settings document resolves to for one provider: the provider's own
+ * override if the admin set one, otherwise the global default. Shared by the default-resolution
+ * effect and the pre-send refresh so the two can never drift apart — server/routes/chat.ts's
+ * `resolvePrivacyEnabled` applies the same rule authoritatively. */
+function resolvePrivacyDefault(
+  settings: AssistantSettings,
+  providerId: string,
+): boolean {
+  return (
+    settings.privacyDefaultPerProvider[providerId] ?? settings.privacyDefaultOn
+  );
+}
 
 /**
  * Welcome-state example questions, now rendered as EuiCards (not plain badge chips) so the empty
@@ -204,8 +351,12 @@ const EXAMPLE_CARDS = [
         defaultMessage: 'Critical findings',
       },
     ),
+    // Deliberately the shortest of the three questions rather than the longest: rendered as a card
+    // description in a 3-up grid, the old "Show me the critical findings of the last 24 hours"
+    // wrapped to two lines while its two neighbours took one, so the row's cards had visibly
+    // different amounts of empty space in them (audit §1.6, rulebook D21).
     question: i18n.translate('wazuhAiAssistant.chat.example.criticalAlerts', {
-      defaultMessage: 'Show me the critical findings of the last 24 hours',
+      defaultMessage: 'Critical findings in the last 24 hours',
     }),
   },
   {
@@ -273,12 +424,14 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       selectedProviderId,
       onProviderChange,
       onNavigateToSettings,
+      onManageProviders,
       history,
       onGeneratingChange,
       isActive = true,
       showConversationSidebar = true,
       railDisplayModeOverride,
       allowRailFlyout = true,
+      enableWelcomeComposer = true,
       onConversationsChange,
     },
     ref,
@@ -328,20 +481,6 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
     const [conversationsService] = useState(
       () => new ConversationsService(core.http),
     );
-
-    // Optimistic concurrency: this tab's last-known saved-object `version` for whatever
-    // conversation is currently active — `undefined` for a brand-new, never-yet-saved conversation.
-    // A ref (not state): only ever read/written from `persistConversationAfterTurn`'s save path,
-    // never rendered directly. Reset alongside `activeConversationId` in `handleNewConversation` and
-    // `handleSelectConversation`.
-    const conversationVersionRef = useRef<string | undefined>(undefined);
-    // Shown after a 409 version conflict was reconciled (or failed to reconcile) on the last
-    // auto-save — see `saveConversationWithMerge` below. Reset whenever the user starts a fresh save
-    // attempt (`handleSend`) or switches conversations, same lifecycle as `error`/`managerAuthHint`.
-    const [mergeNotice, setMergeNotice] = useState<
-      'merged' | 'conflict' | null
-    >(null);
-
     // Privacy mode. `assistantSettings` is loaded once on mount; `privacyEnabled` and
     // `pseudonymMap` are per-conversation state that lives only in this component's own useState.
     // Besides an unmount/remount, `handleNewConversation` is now the other trigger that resets
@@ -350,9 +489,57 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       useState<AssistantSettings | null>(null);
     const [privacyEnabled, setPrivacyEnabled] = useState(false);
     const [pseudonymMap, setPseudonymMap] = useState<PseudonymEntry[]>([]);
+    /** Whether the composer's privacy-explanation popover is open. Purely presentational, and
+     * deliberately NOT reset by anything else in this component: it is the reader's own disclosure,
+     * so a conversation switch or an incoming answer must not close it under them. */
+    const [isPrivacyHelpOpen, setIsPrivacyHelpOpen] = useState(false);
+    /**
+     * Id of the visible "set by administrator" line, referenced by the privacy chip's
+     * `aria-describedby` when the policy is locked.
+     *
+     * Generated per instance rather than a fixed string: this component is mounted TWICE in a
+     * running dashboard — the app shell's full-page chat and the header's docked sidecar — and two
+     * elements sharing one DOM id is exactly the case `aria-describedby` cannot resolve correctly.
+     * Held in `useState`'s lazy-initializer form so it is minted once per mount, not per render.
+     */
+    const [privacyLockNoteId] = useState(() =>
+      htmlIdGenerator('wzPrivacyLockNote')(),
+    );
+    /**
+     * A pending request to point the provider picker at whatever provider a just-restored
+     * conversation was last answered by: `candidates` holds the provider ids stamped on its
+     * assistant turns, newest first, waiting to be checked against the providers that still exist.
+     * `null` means nothing pending.
+     *
+     * STATE, not a ref, and wrapped in an object rather than being a bare array — both deliberate,
+     * because the effect that applies it has to RE-RUN when a request is made:
+     *
+     * - A ref cannot be an effect dependency, so a request made after the provider list had already
+     *   settled (the sidebar switch, and the mount restore whenever the GET resolves after the
+     *   providers do) never woke the effect at all, and then fired later against whatever unrelated
+     *   render did wake it — snapping the picker back to a stale candidate.
+     * - A fresh object identity per request is what makes even a REPEAT request observable: two
+     *   conversations answered by the same provider produce equal `candidates` arrays, and a bare
+     *   array (or an id string) would compare equal and be silently skipped.
+     *
+     * See `applyLoadedConversation` for why the check cannot happen where the request is made.
+     */
+    const [providerRestoreRequest, setProviderRestoreRequest] = useState<{
+      candidates: string[];
+    } | null>(null);
     // Set on the user's first manual toggle so the settings-driven default effect below stops
     // recomputing it (e.g. if the top-level provider selector changes later in the same session).
     const privacyTouchedRef = useRef(false);
+    // Guards the settings refetch paths below (window event, tab activation, tab visibility,
+    // pre-send): all of them can resolve after this component has gone away — the header flyout's
+    // ChatPage in particular unmounts every time the flyout closes.
+    const isMountedRef = useRef(true);
+    useEffect(
+      () => () => {
+        isMountedRef.current = false;
+      },
+      [],
+    );
     // Per-turn tool_call/digest bookkeeping for history reconstruction. A ref, not
     // state: consulted only when building the NEXT request's body, never rendered.
     const turnHistoryRef = useRef<AssistantTurnRecord[]>([]);
@@ -457,12 +644,45 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       return () => observer.disconnect();
     }, []);
     const pinnedToBottomRef = useRef(true);
+    /**
+     * Render mirror of `pinnedToBottomRef`, and ONLY that: it exists so the "jump to latest" button
+     * (bottom-right of the transcript row, below) can appear the moment the user scrolls up and
+     * disappear the moment they are following again. The REF stays the single source of truth every
+     * scroll read goes through, so the streaming path keeps costing one cheap `scrollTop` assignment
+     * per flushed frame and never a re-render.
+     *
+     * Written only when the value actually FLIPS. A drag-scroll fires a scroll event per frame, and
+     * committing an identical value on each one would trade the ref's whole reason for existing for a
+     * render per frame (React would bail out of re-rendering an unchanged value, but only after the
+     * state update has already been scheduled and processed).
+     */
+    const [isPinnedToBottom, setIsPinnedToBottom] = useState(true);
+    /**
+     * Re-pins the pane to the newest content. Every "snap back to the latest turn" caller goes
+     * through this — sending a message, opening a saved conversation, starting a new one, and the
+     * jump button — so the ref and its render mirror can never disagree; a stale `true` mirror would
+     * leave the jump button hidden while the user sits scrolled up, and a stale `false` one would
+     * leave it floating over a transcript that is already at the bottom.
+     */
+    const repinToBottom = () => {
+      pinnedToBottomRef.current = true;
+      setIsPinnedToBottom(true);
+    };
     const handleScrollPane = () => {
       const pane = scrollPaneRef.current;
-      if (pane) {
-        pinnedToBottomRef.current =
-          pane.scrollHeight - pane.scrollTop - pane.clientHeight < 160;
+      if (!pane) {
+        return;
       }
+      const distance = pane.scrollHeight - pane.scrollTop - pane.clientHeight;
+      // Hysteresis: a pinned pane must travel PAST the threshold plus slack to unpin, while an
+      // unpinned one re-pins at the plain threshold — see SCROLL_UNPIN_SLACK_PX.
+      const pinned = pinnedToBottomRef.current
+        ? distance < SCROLL_PIN_THRESHOLD_PX + SCROLL_UNPIN_SLACK_PX
+        : distance < SCROLL_PIN_THRESHOLD_PX;
+      pinnedToBottomRef.current = pinned;
+      setIsPinnedToBottom(previous =>
+        previous === pinned ? previous : pinned,
+      );
     };
     useEffect(() => {
       const pane = scrollPaneRef.current;
@@ -470,6 +690,245 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
         pane.scrollTop = pane.scrollHeight;
       }
     }, [messages]);
+
+    /**
+     * Re-pin on card growth (layout contract §4, iteration-4 item 3). The effect above re-pins only on
+     * a `messages` change, but a result table's rows-per-page control grows its card WITHOUT changing
+     * `messages` — that growth is internal `ResultTable` state — so a reader who was following the
+     * bottom was left with the freshly-grown pagination footer sitting behind the composer until they
+     * scrolled down by hand (the browser-verified bug this fixes). `ResultTable` calls
+     * `handleTableRowsPerPageChange` in the SAME event as it grows the card, which bumps this nonce;
+     * the `useLayoutEffect` then runs AFTER React has committed the taller card and re-pins the pane to
+     * its new bottom — but only when the reader was still pinned (`pinnedToBottomRef`), never yanking
+     * one who had scrolled up to read. A layout effect, not `useEffect`, so the re-pin lands before
+     * paint and the footer is never seen behind the composer even for a frame. Stable via `useCallback`
+     * so passing it down through the memoized MessageList never defeats that memo.
+     */
+    const [tableGrowthNonce, setTableGrowthNonce] = useState(0);
+    const handleTableRowsPerPageChange = useCallback(() => {
+      setTableGrowthNonce(previous => previous + 1);
+    }, []);
+    useLayoutEffect(() => {
+      if (tableGrowthNonce === 0) {
+        return;
+      }
+      const pane = scrollPaneRef.current;
+      if (pane && pinnedToBottomRef.current) {
+        pane.scrollTop = pane.scrollHeight;
+      }
+    }, [tableGrowthNonce]);
+
+    /**
+     * "Jump to latest": the one convention the pinning logic above was missing (every streaming chat
+     * UI offers it — see AI/ux-iter3/ux-research.md §B). Scrolls to the newest content and re-pins, so
+     * the answer starts following again from here on.
+     *
+     * Smooth via `scrollTo`, NOT via a `scroll-behavior: smooth` rule on the pane: the effect above
+     * writes `scrollTop` on every flushed streaming frame, and a smooth container would animate each
+     * of those writes instead of tracking the stream — the pane would visibly lag behind the text.
+     * That also means `prefers-reduced-motion` has to be honoured here in JS (the `behavior` option
+     * ignores it), which is why this goes through `prefersReducedMotion()` above rather than relying
+     * on the stylesheet's own reduced-motion block. Both browser APIs are probed rather than assumed:
+     * `matchMedia` and `Element.prototype.scrollTo` are absent in jsdom, where this falls back to the
+     * same direct `scrollTop` assignment the streaming effect uses.
+     */
+    const handleJumpToLatest = () => {
+      repinToBottom();
+      const pane = scrollPaneRef.current;
+      if (!pane) {
+        return;
+      }
+      if (!prefersReducedMotion() && typeof pane.scrollTo === 'function') {
+        pane.scrollTo({ top: pane.scrollHeight, behavior: 'smooth' });
+        return;
+      }
+      pane.scrollTop = pane.scrollHeight;
+    };
+
+    const hasProviders = providers.length > 0;
+    const showNoProviderState = providersLoaded && !hasProviders;
+    // Initial mount, before the app shell's provider load has resolved either way: neither the
+    // no-provider nor the welcome state can render yet (both depend on `providersLoaded`), so without
+    // an explicit state here this window shows a blank pane. Restoring a conversation shows the same
+    // spinner, so a reload lands on "loading" and then the transcript, instead of flashing the
+    // welcome state at a user who is not starting from scratch.
+    const showLoadingState = !providersLoaded || isRestoringConversation;
+    const showWelcomeState =
+      hasProviders && messages.length === 0 && !showLoadingState;
+    // Declared HERE, above the handlers, rather than beside the JSX where they used to sit: the C1
+    // composer-mode machine below reads `showWelcomeState`, and `handleSend` further down reads the
+    // machine — with `no-use-before-define` (eslint.config.mjs) forbidding const hoisting, this is
+    // the one ordering that satisfies both. The JSX consumes all four exactly as before.
+
+    /**
+     * C1 — the composer's own position state (see `ComposerMode` above for what each state means and
+     * why the travel is a FLIP rather than a CSS transition).
+     *
+     * `docked` is the initial value on purpose: it is today's layout, so the very first paint of every
+     * embedding context (and of a page that is still loading providers or restoring a conversation)
+     * is exactly what it is now, and the centred state is only ever entered deliberately, by the
+     * effect below. A conversation restored on mount therefore never passes through `centered` and
+     * never animates — it has messages, so the effect leaves it `docked`.
+     */
+    const [composerMode, setComposerMode] = useState<ComposerMode>('docked');
+    /** The travelling element: the composer's grid ROW, not the panel inside it. The row is what the
+     * grid positions, and `.wzComposerRow` clips its own overflow (`overflow-y: auto`, the composer
+     * ceiling), so a transform on anything inside it would be cut off mid-flight. */
+    const composerRowRef = useRef<HTMLDivElement | null>(null);
+    /** The greeting + example-cards cluster, measured for the same inversion: it has to stay visually
+     * still while it fades, even though the layout underneath it has already changed. */
+    const welcomeGroupRef = useRef<HTMLDivElement | null>(null);
+    /** Viewport-relative tops captured in the LAST centred frame, i.e. the "First" half of FLIP. */
+    const dockOriginRef = useRef<{
+      composerTop: number;
+      welcomeTop: number | null;
+    } | null>(null);
+    /**
+     * "The centred welcome has already been dismissed for the conversation on screen." Without it,
+     * the settle below could hand control back to the effect while `messages` is still empty (the
+     * first `updateMessages` happens after `startTurn`'s awaited session probe, which is normally
+     * instant but is a network call), and the composer would fly back up to the centre a beat after
+     * it finished docking. Cleared wherever a genuinely fresh conversation appears
+     * (`handleNewConversation`) or a stored one is loaded (`applyLoadedConversation`).
+     */
+    const welcomeDismissedRef = useRef(false);
+
+    /**
+     * The only entry into `centered`, and the only automatic exit that is NOT the send transition
+     * (opening a saved conversation from the rail, whose messages make `showWelcomeState` false).
+     * Never runs while `docking`: the machine owns that window, and re-deriving from
+     * `showWelcomeState` inside it is exactly the flicker `welcomeDismissedRef` exists to prevent.
+     */
+    useEffect(() => {
+      if (composerMode === 'docking') {
+        return;
+      }
+      const shouldCenter =
+        enableWelcomeComposer &&
+        showWelcomeState &&
+        !welcomeDismissedRef.current;
+      if (shouldCenter && composerMode !== 'centered') {
+        setComposerMode('centered');
+      } else if (!shouldCenter && composerMode !== 'docked') {
+        setComposerMode('docked');
+      }
+    }, [composerMode, enableWelcomeComposer, showWelcomeState]);
+
+    /** Settles the machine: drops the inline FLIP styles and returns the pane to the plain docked
+     * layout. Idempotent, because both settle paths (the `transitionend` fast path and the timer
+     * fallback) can legitimately fire for the same travel. */
+    const settleDock = () => {
+      const row = composerRowRef.current;
+      if (row) {
+        row.style.transition = '';
+        row.style.transform = '';
+      }
+      dockOriginRef.current = null;
+      setComposerMode('docked');
+    };
+
+    /**
+     * Starts the bridge. Called from `handleSend` while centred, BEFORE it awaits anything, so the
+     * measurement below is taken from the frame the user actually pressed Send in.
+     *
+     * Reduced motion (and any environment where the composer row is not measurable) hard-cuts to
+     * `docked`: no travel, no fade, no `docking` frame at all — the spec's own reduced-motion rule.
+     */
+    const beginDocking = () => {
+      welcomeDismissedRef.current = true;
+      const row = composerRowRef.current;
+      if (!row || prefersReducedMotion()) {
+        setComposerMode('docked');
+        return;
+      }
+      dockOriginRef.current = {
+        composerTop: row.getBoundingClientRect().top,
+        welcomeTop:
+          welcomeGroupRef.current?.getBoundingClientRect().top ?? null,
+      };
+      setComposerMode('docking');
+    };
+
+    /**
+     * The "Invert" and "Play" halves of the FLIP, plus the settle fallback.
+     *
+     * `useLayoutEffect`, not `useEffect`: this runs after React has committed the docked layout but
+     * BEFORE the browser paints it, which is the whole reason the composer is never seen at the
+     * bottom for one frame. The inversion is applied with `transition: none` inline so the jump back
+     * up is instant, then released on the next animation frame — at which point `.wzChatPane--docking`
+     * (chat-page.scss) supplies the real `transition: transform $wzDockTravel` and the row travels
+     * down to its committed position. The welcome ghost is inverted the same way but never released:
+     * it only has to stay still while its own fade-out runs.
+     *
+     * An environment without `requestAnimationFrame` would otherwise be left holding the inverted
+     * transform for good, so it settles immediately instead (jsdom does provide rAF; a legacy browser
+     * simply gets the hard cut, same as reduced motion).
+     */
+    useLayoutEffect(() => {
+      if (composerMode !== 'docking') {
+        return undefined;
+      }
+      const origin = dockOriginRef.current;
+      const row = composerRowRef.current;
+      if (!origin || !row) {
+        settleDock();
+        return undefined;
+      }
+      const welcome = welcomeGroupRef.current;
+      if (welcome && origin.welcomeTop !== null) {
+        const welcomeDelta =
+          origin.welcomeTop - welcome.getBoundingClientRect().top;
+        welcome.style.transform = `translateY(${welcomeDelta}px)`;
+      }
+      const composerDelta =
+        origin.composerTop - row.getBoundingClientRect().top;
+      row.style.transition = 'none';
+      row.style.transform = `translateY(${composerDelta}px)`;
+
+      const timer = window.setTimeout(settleDock, DOCK_SETTLE_FALLBACK_MS);
+      if (typeof window.requestAnimationFrame !== 'function') {
+        settleDock();
+        return () => window.clearTimeout(timer);
+      }
+      const frame = window.requestAnimationFrame(() => {
+        row.style.transition = '';
+        row.style.transform = '';
+      });
+      return () => {
+        window.cancelAnimationFrame(frame);
+        window.clearTimeout(timer);
+      };
+      // Keyed on the mode only: every other value it reads is a ref, and re-running this on an
+      // unrelated re-render would restart the travel from wherever it had got to.
+    }, [composerMode]);
+
+    /** The fast settle path. Scoped to the row's OWN transform (a nested EUI transition — a button's
+     * hover, the textarea's height — bubbles to the same handler and must not end the travel early). */
+    const handleComposerTransitionEnd = (
+      event: React.TransitionEvent<HTMLDivElement>,
+    ) => {
+      if (
+        composerMode === 'docking' &&
+        event.target === event.currentTarget &&
+        event.propertyName === 'transform'
+      ) {
+        settleDock();
+      }
+    };
+
+    /**
+     * The welcome group (greeting + example cards) outlives `showWelcomeState` by exactly one
+     * transition: the moment the user's message is appended the welcome state is false, but the group
+     * still has a fade-out to run, so `docking` keeps it mounted.
+     *
+     * While it is fading it is NO LONGER in flow (`.wzWelcomeCenter--leaving` is out-of-flow, and the
+     * `--stretch` centring modifier comes off with it), which is what lets the transcript lay itself
+     * out at its final height immediately — streaming starts on send, so the first user message can
+     * land while the composer is still travelling, and it has to land in the position it will keep.
+     */
+    const welcomeIsInFlow = showWelcomeState && composerMode !== 'docking';
+    const isWelcomeGroupMounted =
+      showWelcomeState || composerMode === 'docking';
 
     /**
      * Conversation rail display mode (layout contract §5 / job item 6): expanded at >=1100px of
@@ -505,6 +964,19 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
     // where there is no inline rail to keep collapsed or expanded in the first place.
     const railManualOverrideRef = useRef<'expanded' | 'collapsed' | null>(null);
     const [isRailFlyoutOpen, setIsRailFlyoutOpen] = useState(false);
+
+    // Optimistic concurrency: this tab's last-known saved-object `version` for whatever
+    // conversation is currently active — `undefined` for a brand-new, never-yet-saved conversation.
+    // A ref (not state): only ever read/written from `persistConversationAfterTurn`'s save path,
+    // never rendered directly. Reset alongside `activeConversationId` in `handleNewConversation` and
+    // `handleSelectConversation`.
+    const conversationVersionRef = useRef<string | undefined>(undefined);
+    // Shown after a 409 version conflict was reconciled (or failed to reconcile) on the last
+    // auto-save — see `saveConversationWithMerge` below. Reset whenever the user starts a fresh save
+    // attempt (`handleSend`) or switches conversations, same lifecycle as `error`/`managerAuthHint`.
+    const [mergeNotice, setMergeNotice] = useState<
+      'merged' | 'conflict' | null
+    >(null);
 
     useEffect(() => {
       const element = chatRootRef.current;
@@ -579,10 +1051,77 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       setRailDisplayMode('expanded');
     };
 
+    /**
+     * Applies a freshly-obtained settings document to this component's privacy state.
+     *
+     * The non-obvious part is `privacyTouchedRef`: when the admin has just turned OFF
+     * `userCanOverride`, the policy has to bind the CURRENT conversation too, not only the next
+     * one — a lock a user's earlier manual toggle could sit above would not be a lock at all. So
+     * the "user already chose" flag is cleared, which re-arms the default-resolution effect below;
+     * that effect then recomputes `privacyEnabled` from the per-provider default (falling back to
+     * `privacyDefaultOn`) as soon as this new settings object lands.
+     *
+     * When `userCanOverride` is (still, or newly) true the flag is left exactly as it is: a value
+     * the user picked themselves survives an unrelated admin save, and an untouched one is
+     * re-resolved by that same effect anyway.
+     */
+    const applyAssistantSettings = (next: AssistantSettings) => {
+      // Nothing to apply to an unmounted component; setState would warn and the ref write would
+      // outlive the instance that owned it.
+      if (!isMountedRef.current) {
+        return;
+      }
+      if (!next.userCanOverride) {
+        privacyTouchedRef.current = false;
+      }
+      setAssistantSettings(next);
+    };
+
+    /** (Re)loads the plugin-wide assistant settings and re-applies the resulting privacy policy,
+     * resolving with the document that was applied (or `null` if the load failed).
+     * Fail-soft: a failed GET keeps whatever policy is already applied rather than degrading to a
+     * default, and never rejects — callers may safely ignore the returned promise. */
+    const refreshAssistantSettings = (): Promise<AssistantSettings | null> =>
+      settingsService
+        .getAssistantSettings()
+        .then(next => {
+          applyAssistantSettings(next);
+          return next;
+        })
+        .catch(() => {
+          // Same fail-soft as the initial load below: keep whatever policy is already applied.
+          return null;
+        });
+
+    /**
+     * The policy the server itself would resolve for this turn, used to make the chip and the
+     * outgoing request agree with the server at the one moment it matters — send time.
+     *
+     * `settings` is the just-refreshed document, or `null` when the refresh failed. A locked policy
+     * (`userCanOverride === false`) always wins; otherwise an untouched conversation follows the
+     * default and a conversation the user has toggled themselves keeps their choice. Falls back to
+     * the current state whenever there is nothing fresher to go on, so a failed GET can never flip
+     * privacy OFF — the direction that would leak.
+     */
+    const resolveEffectivePrivacy = (
+      settings: AssistantSettings | null,
+    ): boolean => {
+      if (!settings) {
+        return privacyEnabled;
+      }
+      if (!settings.userCanOverride || !privacyTouchedRef.current) {
+        return resolvePrivacyDefault(settings, selectedProviderId);
+      }
+      return privacyEnabled;
+    };
+
     useEffect(() => {
       settingsService
         .getAssistantSettings()
-        .then(setAssistantSettings)
+        // Routed through `applyAssistantSettings` like every later refresh, so the mount path picks
+        // up the same unmounted guard rather than setting state on a component the user has already
+        // navigated away from.
+        .then(applyAssistantSettings)
         .catch(() => {
           // Non-fatal: privacy mode simply stays off (mirrors server/routes/chat.ts's own
           // resolvePrivacyEnabled default when nothing overrides it) and the chip below stays
@@ -620,9 +1159,78 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    /**
+     * Applies the provider a just-restored conversation last used, once the provider list is known.
+     *
+     * Split out of `applyLoadedConversation` because that function can run BEFORE `providers` has
+     * loaded (the mount-time restore's `.then()`), which is precisely the reload/deep-link case this
+     * whole feature exists for — see the request state's own doc comment there.
+     *
+     * Keyed on BOTH the request and the provider list, because either can arrive second and all
+     * three real orderings have to work:
+     *   1. conversation first, providers second (reload / deep link) — the request parks, and
+     *      `providersLoaded` flipping wakes this;
+     *   2. providers first, conversation second (a slower GET on the same mount) — the request
+     *      itself wakes this;
+     *   3. everything already loaded (sidebar conversation switch) — likewise the request, which is
+     *      why it must be state with a fresh identity rather than a ref.
+     *
+     * `providersLoaded` alone is NOT enough to act on, because it does not mean "the provider list
+     * is known" — `useProviders` (public/hooks/use-providers.ts) also sets it from its 20s load
+     * DEADLINE and from a rejected `list()`, in both cases leaving `providers` empty and
+     * `providersError` set. Neither is an authoritative answer, and the timeout case is explicitly
+     * recoverable: the deadline does not cancel the in-flight request, so a slow `list()` can still
+     * resolve afterwards and fill the list in. Spending the request against that empty list would
+     * conclude "this conversation's provider no longer exists" from a network hiccup and then have
+     * nothing left to correct itself with when the real list arrived.
+     *
+     * So the request is only spent on an AUTHORITATIVE list: a non-empty one, or an empty one that
+     * came back cleanly (`!providersError`) — which is the genuine "no providers configured" case
+     * and rightly has nothing to restore. An empty list carrying an error parks the request instead,
+     * for the late success or the next `PROVIDERS_CHANGED_EVENT` refresh to resolve.
+     */
+    useEffect(() => {
+      const providerListIsAuthoritative =
+        providers.length > 0 || !providersError;
+      if (
+        !providerRestoreRequest ||
+        !providersLoaded ||
+        !providerListIsAuthoritative
+      ) {
+        return;
+      }
+      // Consumed exactly once, before anything is decided: whether a candidate matches or not, this
+      // request is spent. Leaving it pending on a no-match would let it fire against a later,
+      // unrelated render.
+      setProviderRestoreRequest(null);
+      // Guarded on the provider still EXISTING: a conversation whose provider has since been deleted
+      // keeps the current selection rather than pointing the picker at an id nothing resolves. The
+      // stamps on the restored messages are untouched either way — they record what really answered
+      // each turn and stay true for a deleted provider.
+      const restoredProviderId = providerRestoreRequest.candidates.find(
+        candidateId => providers.some(provider => provider.id === candidateId),
+      );
+      if (restoredProviderId && restoredProviderId !== selectedProviderId) {
+        onProviderChange(restoredProviderId);
+      }
+      // `selectedProviderId` is read but deliberately NOT a dependency: it is only used to skip a
+      // redundant call, and including it would make a manual provider change re-enter this effect —
+      // which is precisely the path that must CANCEL a pending restore, not apply it (see
+      // `handleUserProviderChange`).
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [providerRestoreRequest, providers, providersLoaded, providersError]);
+
     // Per-conversation privacy default: resolved once settings AND a selected
     // provider are both known, and never recomputed after the user's first manual toggle — switching
     // providers mid-conversation does not retroactively change an already-chosen value.
+    //
+    // Provider RESTORE (above) deliberately flows through this same path: the privacy chip must show
+    // the policy of the provider that will actually answer the next turn, so resuming a conversation
+    // onto its own provider re-resolves that provider's admin default. An explicit user toggle still
+    // wins — `privacyTouchedRef` is what protects it, exactly as it does for a manual provider
+    // switch. (There is no persisted conversation-level privacy state to contradict: the
+    // `privacyEnabled` flag on saved messages is per-turn history bookkeeping, never the UI's value
+    // — see `ChatMessage.privacyEnabled` in common/types.ts.)
     useEffect(() => {
       if (
         !assistantSettings ||
@@ -631,12 +1239,77 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       ) {
         return;
       }
-      const perProviderDefault =
-        assistantSettings.privacyDefaultPerProvider[selectedProviderId];
       setPrivacyEnabled(
-        perProviderDefault ?? assistantSettings.privacyDefaultOn,
+        resolvePrivacyDefault(assistantSettings, selectedProviderId),
       );
     }, [assistantSettings, selectedProviderId]);
+
+    /**
+     * Admin privacy policy changes have to land in the chat without a page reload: this view stays
+     * MOUNTED behind `display: none` when the Settings tab is showing (application.tsx), so the
+     * mount-only load above would otherwise hold a stale policy forever.
+     *
+     * Same-document saves arrive on ASSISTANT_SETTINGS_CHANGED_EVENT and carry the saved document
+     * as `detail`, which is applied DIRECTLY — a re-GET issued this soon after the write can still
+     * return the pre-save document and silently reinstate the old policy. A dispatch without a
+     * usable payload falls back to the GET.
+     *
+     * This event cannot cross a browser or a machine, so it is only one of three triggers; see the
+     * visibility effect below and the pre-send refresh in `handleSend` for the cases it misses.
+     * Deliberately no polling/interval anywhere.
+     */
+    useEffect(() => {
+      const onSettingsChanged = (event: Event) => {
+        const payload = (event as CustomEvent<unknown>).detail;
+        if (isAssistantSettingsPayload(payload)) {
+          applyAssistantSettings(payload);
+          return;
+        }
+        void refreshAssistantSettings();
+      };
+      window.addEventListener(
+        ASSISTANT_SETTINGS_CHANGED_EVENT,
+        onSettingsChanged,
+      );
+      return () =>
+        window.removeEventListener(
+          ASSISTANT_SETTINGS_CHANGED_EVENT,
+          onSettingsChanged,
+        );
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Cheap freshness on a Settings -> Chat tab switch. Skips its own first run: the mount effect
+    // above already issued that exact GET, so this only has to cover a LATER false -> true
+    // transition. This is an IN-APP tab toggle only — it says nothing about saves made elsewhere,
+    // which the visibility effect and the pre-send refresh below are what actually cover.
+    const assistantSettingsActiveSyncedRef = useRef(false);
+    useEffect(() => {
+      if (!assistantSettingsActiveSyncedRef.current) {
+        assistantSettingsActiveSyncedRef.current = true;
+        return;
+      }
+      if (isActive) {
+        void refreshAssistantSettings();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isActive]);
+
+    // A policy saved by an admin in a DIFFERENT browser or on a different machine reaches no window
+    // event here, so an idle chat left open would keep showing (and honouring) a stale chip
+    // indefinitely. Refetching when the document becomes visible again corrects it the moment the
+    // user comes back to the tab — still event-driven, no timer.
+    useEffect(() => {
+      const onVisibilityChange = () => {
+        if (document.visibilityState === 'visible') {
+          void refreshAssistantSettings();
+        }
+      };
+      document.addEventListener('visibilitychange', onVisibilityChange);
+      return () =>
+        document.removeEventListener('visibilitychange', onVisibilityChange);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleTogglePrivacy = () => {
       if (!assistantSettings?.userCanOverride) {
@@ -772,16 +1445,78 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
      * pseudonym state to resume (server/conversation-store.ts's PRIVACY INTERACTION doc
      * comment: the map is wire-only and never persisted) and no stored tool_call/digest pairs to
      * replay as history either.
+     *
+     * Replay-leak fix (Fix 3): this comment always SAID both reset, but the code underneath it only
+     * ever reset the pseudonym map — `turnHistoryRef.current` was restored from
+     * `restored.turnRecords`, not cleared. That mismatch was a real bug, not just a stale comment:
+     * `ToolExchange.digestContent` (common/chat-history.ts) is "already pseudonym-form when privacy
+     * was on for that turn" — i.e. it can contain tokens like `HOST_1`/`IP_2` minted by a PAST
+     * session's `Pseudonymizer`, referring to THAT session's real values. `Pseudonymizer`'s mint
+     * counters (privacy.ts's constructor) are derived only from the SEEDED map, so a resumed
+     * conversation's now-empty map means the next turn's server-side `Pseudonymizer` restarts every
+     * counter at 0 — its very first fresh mint this session is `IP_1`/`HOST_1` again, colliding with
+     * whatever `IP_1`/`HOST_1` already means in the replayed digest content from the OLD session.
+     * `buildOutgoingMessages` (chat-history.ts) would then resend that stale digest verbatim as
+     * history, and `StreamDepseudonymizer.reverseText` (privacy.ts) would reverse any model-echoed
+     * `IP_1`/`HOST_1` using THIS session's fresh mapping — silently substituting a DIFFERENT
+     * session's real host/IP for the one the stale token actually meant. Fixed by actually clearing
+     * `turnHistoryRef.current` here, matching what this comment always claimed: a resumed
+     * conversation drops its tool-call/digest replay bookkeeping along with the pseudonym map that
+     * digest content's tokens depend on. This does NOT affect what's on screen — `restored.messages`
+     * (below) is the reconstructed, already-real-valued DISPLAY text, entirely separate from
+     * `turnHistoryRef`'s replay-only bookkeeping; only the model's ability to reuse a resumed
+     * conversation's last couple of tool calls without re-running them is lost, not any visible
+     * history. `handleNewConversation` below already resets both together the same way; this brings
+     * `applyLoadedConversation` into line with that existing convention instead of being the one
+     * path that didn't.
+     *
+     * SCOPE of this fix, stated precisely: it closes the stale-token collision for DIGEST REPLAY
+     * only — the `turnHistoryRef`-driven `[assistant{toolCalls}, tool{digest}]` resend this
+     * function controls. A pseudonym-shaped token the MODEL itself hallucinated into its own prose
+     * (no real mapping ever backed it — nothing this codebase mints, just the model echoing
+     * something token-shaped) can still land in `record.messages`' persisted `assistant` content,
+     * survive `reconstructConversation` into `restored.messages` for DISPLAY, and later collide
+     * with a genuine fresh mint of that same token string after a subsequent resume. That is a
+     * DISPLAY-layer misattribution risk (the reconstructed transcript could render the wrong real
+     * value next to old prose) — not an exfiltration path, since it never puts a real value in
+     * front of the provider that shouldn't be there; out of scope for this fix.
      */
     const applyLoadedConversation = (record: ConversationRecord) => {
-      // A resumed conversation opens at its latest turn (bottom), like every chat client.
-      pinnedToBottomRef.current = true;
+      // A resumed conversation opens at its latest turn (bottom), like every chat client — through
+      // `repinToBottom` so the jump button's own mirror is repinned with it.
+      repinToBottom();
+      // C1: the loaded conversation decides the composer's position on its own — with messages it
+      // stays docked (no transition, it was never centred), and in the degenerate empty-transcript
+      // case the welcome composer is legitimately offered again.
+      welcomeDismissedRef.current = false;
       const restored = reconstructConversation(record.messages);
       updateMessages(restored.messages);
-      // Restoring the tool history is what makes a resumed conversation continuable rather than just
-      // readable: the model gets back the tool calls whose results its prose describes, instead of
-      // re-running the same queries on the next question.
-      turnHistoryRef.current = restored.turnRecords;
+      // Per-conversation provider memory: resuming a conversation restores the provider its most
+      // recent answer was produced by, instead of leaving whatever the picker happened to be
+      // showing (in practice the default) to answer the next follow-up. Continuing a thread with a
+      // different model, with nothing on screen saying so, made answers in one conversation
+      // inconsistent for no reason the reader could see.
+      //
+      // This only RECORDS the candidates; the effect above is what applies one. It deliberately does
+      // NOT read `providers` here: the mount-time restore path calls this function from a `.then()`
+      // inside a `[]`-deps effect, so everything it closes over is the FIRST render's value — and on
+      // a reload or a deep link (the primary resume path) the provider list has not arrived yet, so
+      // `providers` is `[]` and every candidate would be rejected as "no longer exists". Newest
+      // first, so the effect picks the most recent surviving provider.
+      const restoreCandidates = [...restored.messages]
+        .reverse()
+        .filter(message => message.role === 'assistant' && message.providerId)
+        .map(message => message.providerId as string);
+      // A conversation with no stamped provider (saved before the stamp existed) clears any request
+      // instead of making one — it has nothing to say about which provider to use.
+      setProviderRestoreRequest(
+        restoreCandidates.length > 0 ? { candidates: restoreCandidates } : null,
+      );
+      // Replay-leak fix (Fix 3): NOT `restored.turnRecords` — see this function's doc comment above
+      // for why replaying another session's pseudonym-form digest content against a freshly emptied
+      // map (right below) is unsafe. The resumed conversation is fully READABLE (restored.messages
+      // above), just not continuable-without-re-querying the way a same-session turn is.
+      turnHistoryRef.current = [];
       setPseudonymMap([]);
       setActiveConversationId(record.id);
       // Optimistic concurrency: this tab's last-known version starts at whatever the GET returned —
@@ -883,9 +1618,35 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
      * `updateMessages` call it still has queued targets a message id that no longer exists in the
      * list this replaces it with.
      */
+    /**
+     * The provider picker's own change handler: cancels any pending provider-restore request, then
+     * reports the change up exactly as before.
+     *
+     * The cancellation is the point. A restore request can still be pending when the reader reaches
+     * for the picker — the provider list is what it is waiting for, and on a slow load that is the
+     * same moment the picker becomes usable. Without this, the reader's explicit pick would be
+     * silently reverted to the restored conversation's provider a moment later (and could drag the
+     * privacy chip's per-provider default along with it). An explicit choice outranks a remembered
+     * one.
+     *
+     * Wired ONLY to the picker, so it distinguishes a user's pick from the app shell merely
+     * reporting the selection this component's own restore just asked for.
+     */
+    const handleUserProviderChange = (providerId: string) => {
+      setProviderRestoreRequest(null);
+      onProviderChange(providerId);
+    };
+
     const handleNewConversation = () => {
       abandonActiveStream();
-      pinnedToBottomRef.current = true;
+      repinToBottom();
+      // A brand-new conversation has no provider to remember, so a request still waiting on the
+      // provider list must not outlive the conversation that made it.
+      setProviderRestoreRequest(null);
+      // C1: a brand-new conversation gets the centred welcome composer back (the effect above picks
+      // this up as soon as `messages` is empty again) — the transition is once per conversation, not
+      // once per session.
+      welcomeDismissedRef.current = false;
       updateMessages([]);
       turnHistoryRef.current = [];
       setPseudonymMap([]);
@@ -929,11 +1690,102 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
           handleNewConversation();
         }
         notifyConversationsChanged();
+        // E4 (#9010): confirm the delete actually happened via the same toast mechanism
+        // settings-page.tsx already uses (core.notifications.toasts) — a confirm MODAL already
+        // gated the action (conversation-list.tsx), so this toast is purely a "it worked"
+        // acknowledgement, not a second confirmation.
+        core.notifications.toasts.addSuccess(
+          i18n.translate('wazuhAiAssistant.chat.conversations.deleteSuccess', {
+            defaultMessage: 'Conversation deleted.',
+          }),
+        );
       } catch {
         setError(
           i18n.translate('wazuhAiAssistant.chat.conversations.deleteError', {
             defaultMessage: 'Could not delete that conversation.',
           }),
+        );
+      }
+    };
+
+    /** Inline rename (#9010, finding E2): title-only PATCH (conversations-service.ts's `rename`,
+     * server/routes/conversations.ts's PATCH route) — never round-trips the full transcript just to
+     * change a title.
+     *
+     * Stamps the WRITE's own fresh version onto `conversationVersionRef` when the renamed
+     * conversation is the active one on screen: without this, the very next auto-save's PUT would
+     * check its optimistic-concurrency pair against the PRE-rename version, 409, and pay for an
+     * avoidable merge round-trip (`saveConversationWithMerge`) purely because this rename moved the
+     * version on. Not stamped when the renamed row is not the active conversation — there is no
+     * live `conversationVersionRef` for a conversation that is not on screen to begin with. */
+    const handleRenameConversation = async (id: string, title: string) => {
+      try {
+        const renamed = await conversationsService.rename(id, title);
+        if (activeConversationIdRef.current === id) {
+          conversationVersionRef.current = renamed.version;
+        }
+        notifyConversationsChanged();
+      } catch {
+        setError(
+          i18n.translate('wazuhAiAssistant.chat.conversations.renameError', {
+            defaultMessage: 'Could not rename that conversation.',
+          }),
+        );
+      }
+    };
+
+    /**
+     * Bulk delete (#9010, finding E3): reuses the existing single-delete endpoint client-side —
+     * `Promise.allSettled` so one failing delete never stops the rest from completing — rather than
+     * adding a bulk server route. If the currently open conversation is among the deleted ids, it
+     * gets the same "start a new conversation" treatment `handleDeleteConversation` gives a single
+     * delete of the active conversation -- but ONLY when that specific id's own delete actually
+     * SUCCEEDED (results are indexed against `ids` positionally, since `Promise.allSettled`
+     * preserves input order). Without this check, a partial failure that happened to include the
+     * active conversation among the FAILED ids would still kick the user out of a conversation
+     * that is, in fact, still there — starting a new one for no reason and hiding the very
+     * conversation the failure banner below is about.
+     */
+    const handleBulkDeleteConversations = async (ids: string[]) => {
+      if (ids.length === 0) {
+        return;
+      }
+      const results = await Promise.allSettled(
+        ids.map(id => conversationsService.remove(id)),
+      );
+      const failedCount = results.filter(
+        result => result.status === 'rejected',
+      ).length;
+      const succeededCount = ids.length - failedCount;
+      const activeId = activeConversationIdRef.current;
+      const activeIndex = activeId ? ids.indexOf(activeId) : -1;
+      const activeConversationWasDeleted =
+        activeIndex !== -1 && results[activeIndex].status === 'fulfilled';
+
+      if (activeConversationWasDeleted) {
+        handleNewConversation();
+      }
+      if (succeededCount > 0) {
+        notifyConversationsChanged();
+        core.notifications.toasts.addSuccess(
+          i18n.translate(
+            'wazuhAiAssistant.chat.conversations.bulkDeleteSuccess',
+            {
+              defaultMessage:
+                '{count, plural, one {Conversation deleted.} other {{count} conversations deleted.}}',
+              values: { count: succeededCount },
+            },
+          ),
+        );
+      }
+      if (failedCount > 0) {
+        setError(
+          i18n.translate(
+            'wazuhAiAssistant.chat.conversations.bulkDeleteError',
+            {
+              defaultMessage: 'Could not delete one or more conversations.',
+            },
+          ),
         );
       }
     };
@@ -955,6 +1807,10 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
         void confirmIfGenerating(() => void handleSelectConversation(id));
       },
       deleteConversation: (id: string) => void handleDeleteConversation(id),
+      renameConversation: (id: string, title: string) =>
+        void handleRenameConversation(id, title),
+      bulkDeleteConversations: (ids: string[]) =>
+        void handleBulkDeleteConversations(ids),
     }));
 
     useEffect(() => {
@@ -996,15 +1852,16 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
      */
     const saveConversationWithMerge = async (
       id: string,
-      title: string,
       localMessages: PersistedChatMessage[],
       expectedVersion: string | undefined,
       reflectInUi: boolean,
     ): Promise<ConversationRecord> => {
       try {
+        // NO title argument (issue #9010): every PUT through this method omits it, so the server
+        // carries the stored title over unchanged — see conversations-service.ts's `update` doc
+        // comment for why a resent, freshly recomputed title used to silently revert renames.
         return await conversationsService.update(
           id,
-          title,
           localMessages,
           expectedVersion,
         );
@@ -1023,7 +1880,6 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       try {
         const retried = await conversationsService.update(
           id,
-          title,
           merged,
           serverRecord.version,
         );
@@ -1087,20 +1943,13 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
             ? conversationVersionRef.current
             : target.version;
         try {
-          // The untitled-fallback label is resolved here (not inside buildConversationTitle, which is
-          // now a dependency-free common/ helper — see its own doc comment) via the same
-          // i18n.translate call this file always made for it.
-          const title = buildConversationTitle(
-            args.messages,
-            i18n.translate('wazuhAiAssistant.chat.conversations.untitled', {
-              defaultMessage: 'Untitled conversation',
-            }),
-          );
           const toPersist = toPersistedMessages(args.messages, turnRecords);
           if (conversationId) {
+            // NO title here (issue #9010): once a conversation exists, its every save is a PUT
+            // through `saveConversationWithMerge`, which never sends a title at all any more —
+            // see that function's own comment for why (a rename must survive the next auto-save).
             const record = await saveConversationWithMerge(
               conversationId,
-              title,
               toPersist,
               expectedVersion,
               args.adoptAsActive,
@@ -1115,6 +1964,18 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
             }
             target.version = record.version;
           } else {
+            // Title is built ONLY here, for the one-time CREATE (POST) — see
+            // `buildConversationTitle`'s doc comment (common/chat-history.ts) for why it must
+            // never be recomputed again on a later PUT of the same conversation. The
+            // untitled-fallback label is resolved here (not inside buildConversationTitle, which
+            // is a dependency-free common/ helper — see its own doc comment) via the same
+            // i18n.translate call this file always made for it.
+            const title = buildConversationTitle(
+              args.messages,
+              i18n.translate('wazuhAiAssistant.chat.conversations.untitled', {
+                defaultMessage: 'Untitled conversation',
+              }),
+            );
             const created = await conversationsService.create(title, toPersist);
             // The turn now owns this row: its later saves update it instead of creating another.
             target.conversationId = created.id;
@@ -1210,6 +2071,13 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       target: TurnConversationTarget;
       outgoingMessages: ChatMessage[];
       privacyPayload: ChatRequest['privacy'];
+      /** Wire-proof fix: this turn's own resolved privacy state, stamped onto every `ToolExchange`
+       * this turn records (`common/chat-history.ts`'s `ToolExchange.privacyEnabled` doc comment) so
+       * a LATER turn's `buildOutgoingMessages` call can fail-closed-exclude it if privacy has been
+       * turned off again by then. Passed separately from `privacyPayload` rather than derived from
+       * it (`privacyPayload` is `undefined` in the common "privacy off, nothing minted yet" case,
+       * which would make deriving "was privacy on" from its mere presence fragile). */
+      privacyEnabledForTurn: boolean;
     }) => {
       const {
         assistantMessageId,
@@ -1217,6 +2085,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
         target,
         outgoingMessages,
         privacyPayload,
+        privacyEnabledForTurn,
       } = args;
 
       setIsGenerating(true);
@@ -1357,6 +2226,13 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
        * as though it were complete.
        */
       let turnCompleted = false;
+      /**
+       * The `error` event's message, if this turn produced one — recorded unconditionally, including
+       * for a turn the user has already walked away from, so the `finally` block below can stamp it
+       * onto whichever transcript it ends up saving. Local to this stream call, like
+       * `turnCompleted`: nothing outside this function reads it.
+       */
+      let turnFailureReason: string | undefined;
 
       // Delta batching (typing-lag/streaming-jank fix): a fast-streaming provider can
       // emit a `delta` event per token, and without batching EVERY one committed its own React state
@@ -1454,12 +2330,14 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
               pendingTable = event.spec;
             }
           } else if (event.type === 'status' && isTurnStillActive()) {
-            // Transient progress line (e.g. "Querying Wazuh...") from the orchestration loop; no
-            // engine emits this yet, but the bubble already knows how to show it once one does.
+            // Progressive step label for the turn in flight. `describeTurnStatus` prefers the
+            // event's translated `step` classification over its raw English `message` — see that
+            // function's own doc comment (turn-status.ts) for why the server sends both.
+            const statusText = describeTurnStatus(event);
             updateMessages(current =>
               current.map(message =>
                 message.id === assistantMessageId
-                  ? { ...message, statusMessage: event.message }
+                  ? { ...message, statusMessage: statusText }
                   : message,
               ),
             );
@@ -1467,7 +2345,12 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
             // Digest-in-history bookkeeping only — never rendered as a UI message (message_bubble.tsx
             // has no bubble type for it; it lives in this turn's record until a LATER turn's
             // buildOutgoingMessages call resends it, or until the turn is saved).
-            turnRecord?.toolExchanges.push({ toolCall: event.toolCall });
+            // Wire-proof fix: `privacyEnabledForTurn` stamped here, not derived later — see
+            // ToolExchange.privacyEnabled's doc comment (common/chat-history.ts).
+            turnRecord?.toolExchanges.push({
+              toolCall: event.toolCall,
+              privacyEnabled: privacyEnabledForTurn,
+            });
             // Also surfaced in the bubble (message-bubble.tsx's collapsed "queries executed" panel),
             // so the reader can check the query behind the answer as it runs.
             committedToolCalls = [...committedToolCalls, event.toolCall];
@@ -1525,6 +2408,10 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
             turnCompleted = true;
           } else if (event.type === 'error') {
             turnCompleted = true;
+            // Recorded BEFORE the abandoned-turn bail-out below, so the `finally` block can stamp it
+            // onto an abandoned turn's own transcript too — a turn the user walked away from still
+            // failed, and its saved record has to say so.
+            turnFailureReason = event.message;
             flushPendingEmptyTable();
             // Released before the placeholder cleanup below, which drops an assistant message with
             // neither content nor table — a turn whose tool succeeded and whose narration then failed
@@ -1540,16 +2427,29 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
             } else {
               setError(event.message);
             }
-            // Drop the assistant placeholder if no content ever arrived for it; keep it if
-            // partial deltas (or a table) already streamed in before the error happened.
+            // The placeholder is KEPT and marked failed, not dropped. It used to be removed
+            // whenever nothing had streamed into it, which left the failure recorded only in the
+            // callout band above the transcript — and `handleSend` clears that band, so asking
+            // anything else (the most likely next action) erased the only evidence the turn had
+            // ever failed, leaving a question sitting in the transcript with no answer and no
+            // explanation. `failureReason` is what `FailedTurnNotice` (message-bubble.tsx) renders
+            // on the turn itself, and it is persisted with the conversation, so a reload keeps it
+            // too. The banner still appears — it is how a failure announces itself the moment it
+            // happens; this is what remains afterwards.
+            // `statusMessage: undefined` alongside it: the status line and its spinner are cleared
+            // only by the first `delta` of real text (`flushPendingDelta`), and a turn that fails
+            // before producing any text never gets one — so without this the failed turn kept a
+            // live spinner reading "Writing the answer…" above its own failure marker, inside the
+            // `aria-live` region, for as long as the conversation stayed open.
             updateMessages(current =>
-              current.filter(
-                message =>
-                  !(
-                    message.id === assistantMessageId &&
-                    message.content === '' &&
-                    !message.table
-                  ),
+              current.map(message =>
+                message.id === assistantMessageId
+                  ? {
+                      ...message,
+                      failureReason: event.message,
+                      statusMessage: undefined,
+                    }
+                  : message,
               ),
             );
           } else if (event.type === 'auth_expired') {
@@ -1607,17 +2507,25 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                       : {}),
                     isStreaming: false,
                     ...(turnCompleted ? {} : { interrupted: true }),
+                    // An abandoned turn that then FAILED still failed — see `turnFailureReason`.
+                    // Without this the abandoned path was the one route by which a failure could
+                    // vanish from a saved conversation entirely: the `error` branch above bails out
+                    // before stamping anything once the turn is no longer active.
+                    ...(turnFailureReason
+                      ? { failureReason: turnFailureReason }
+                      : {}),
                   }
                 : message,
             )
-            // Same rule the `error` branch applies to the visible list: an assistant placeholder that
-            // never received anything is not worth persisting.
+            // An assistant placeholder that never received anything is not worth persisting — UNLESS
+            // it carries a failure reason, which is the whole content of a failed turn's record.
             .filter(
               message =>
                 !(
                   message.id === assistantMessageId &&
                   message.content === '' &&
-                  !message.table
+                  !message.table &&
+                  !turnFailureReason
                 ),
             );
           void persistConversationTurn({
@@ -1632,12 +2540,17 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
           if (detectManagerAuthError(accumulatedContent)) {
             setManagerAuthHint(true);
           }
+          // `statusMessage: undefined` unconditionally: this is the turn's terminal update, and no
+          // step label is true of a turn that has stopped. Only a `delta` ever cleared it before, so
+          // Stop pressed (or a dropped connection) during a tool call left a live spinner reading
+          // "Querying …" on a turn that had already ended.
           updateMessages(current =>
             current.map(message =>
               message.id === assistantMessageId
                 ? {
                     ...message,
                     isStreaming: false,
+                    statusMessage: undefined,
                     ...(turnCompleted ? {} : { interrupted: true }),
                   }
                 : message,
@@ -1663,9 +2576,9 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
     // conversation that has never enabled privacy mode and never minted a pseudonym. The route
     // treats an absent key and a disabled one identically, so sending nothing keeps the request
     // body minimal for the common case.
-    const privacyPayload =
-      privacyEnabled || pseudonymMap.length > 0
-        ? { enabled: privacyEnabled, map: pseudonymMap }
+    const buildPrivacyPayload = (enabled: boolean): ChatRequest['privacy'] =>
+      enabled || pseudonymMap.length > 0
+        ? { enabled, map: pseudonymMap }
         : undefined;
 
     /**
@@ -1680,13 +2593,48 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       // during rapid back-and-forth; `detectManagerAuthError` below stays the mid-turn backstop.
       await ensureManagerSession(core.http, { maxAgeMs: 60_000 });
 
+      // Pre-send policy refresh — the one trigger that does not depend on this browser having seen
+      // the admin's save. Neither the window event nor the visibility/tab refreshes can cross a
+      // browser or a machine, so without this a user on another workstation could hold a chip
+      // reading "Off"/"On" that disagrees with the policy the server will actually enforce, and
+      // (worse) believe unmasked data was masked. Bounded and fail-soft: a slow or failing GET must
+      // never be able to block sending, so it is raced against a short deadline and a `null` result
+      // simply keeps the current state. The server re-resolves the policy authoritatively either
+      // way (server/routes/chat.ts) — this is what keeps the UI honest about it.
+      const freshSettings = await resolveWithinDeadline(
+        refreshAssistantSettings(),
+        PRE_SEND_SETTINGS_TIMEOUT_MS,
+      );
+      const effectivePrivacyEnabled = resolveEffectivePrivacy(freshSettings);
+      const privacyPayload = buildPrivacyPayload(effectivePrivacyEnabled);
+
       const assistantMessageId = nextMessageId();
+      // Provider provenance, stamped at turn start from the picker's CURRENT selection — before any
+      // await that could let the reader change it mid-turn, so the stamp always names the provider
+      // the request actually went to (`runChatStream` sends `selectedProviderId` from this same
+      // render). Name and model are COPIED, not looked up at render time, so an answer keeps
+      // reporting what produced it even after that provider is renamed or deleted. See
+      // `PersistedChatMessage.providerId`.
+      const turnProvider = providers.find(
+        provider => provider.id === selectedProviderId,
+      );
       const assistantMessage: UiChatMessage = {
         id: assistantMessageId,
         role: 'assistant',
         content: '',
         isStreaming: true,
         createdAt: Date.now(),
+        ...(selectedProviderId ? { providerId: selectedProviderId } : {}),
+        ...(turnProvider
+          ? {
+              providerName: turnProvider.name,
+              providerModel: turnProvider.model,
+            }
+          : {}),
+        // Wire-proof fix: stamped once at creation and preserved through every later spread-update
+        // (delta/done/etc. never touch this field) — see UiChatMessage.privacyEnabled's doc
+        // comment (message-bubble.tsx).
+        privacyEnabled: effectivePrivacyEnabled,
       };
 
       // Built from turnHistoryRef BEFORE this turn's own (still-empty) record is registered below, so
@@ -1694,6 +2642,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       const outgoingMessages = buildOutgoingMessages(
         history,
         turnHistoryRef.current,
+        effectivePrivacyEnabled,
       );
       turnHistoryRef.current = [
         ...turnHistoryRef.current,
@@ -1702,7 +2651,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
 
       // Sending always snaps the pane to the new turn, even if the user had scrolled up — the one
       // case where overriding their scroll position is what they expect (see pinnedToBottomRef).
-      pinnedToBottomRef.current = true;
+      repinToBottom();
       const baseMessages = [...history, assistantMessage];
       updateMessages(baseMessages);
 
@@ -1729,6 +2678,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
         target,
         outgoingMessages,
         privacyPayload,
+        privacyEnabledForTurn: effectivePrivacyEnabled,
       });
     };
 
@@ -1748,6 +2698,15 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       setMergeNotice(null);
       setSessionExpired(false);
       setSaveFailed(false);
+      // C1: the first send of a centred conversation is what docks the composer. Started here, before
+      // the first `await`, for two reasons: the FLIP measurement has to be taken from the frame the
+      // user pressed Send in, and the transcript has to be in its final (docked) layout before the
+      // user's own message lands in it — `startTurn` appends that message after an awaited session
+      // probe, so anything scheduled later could race it. Deliberately AFTER the no-provider guard
+      // above: a send that never happens must not move the composer.
+      if (composerMode === 'centered') {
+        beginDocking();
+      }
       await startTurn([
         ...messages,
         {
@@ -1797,18 +2756,50 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       await startTurn(history);
     };
 
-    const hasProviders = providers.length > 0;
-    const showNoProviderState = providersLoaded && !hasProviders;
-    // Initial mount, before the app shell's provider load has resolved either way: neither the
-    // no-provider nor the welcome state can render yet (both depend on `providersLoaded`), so without
-    // an explicit state here this window shows a blank pane. Restoring a conversation shows the same
-    // spinner, so a reload lands on "loading" and then the transcript, instead of flashing the
-    // welcome state at a user who is not starting from scratch.
-    const showLoadingState = !providersLoaded || isRestoringConversation;
-    const showWelcomeState =
-      hasProviders && messages.length === 0 && !showLoadingState;
+    /**
+     * Re-asks the question behind an OLDER failed/interrupted turn, by APPENDING it as a new turn at
+     * the end of the conversation rather than replacing the old one in place.
+     *
+     * The failed turn stays in the transcript with its marker: it happened, and hiding it once the
+     * reader works around it is exactly the dishonesty the marker exists to fix. Appending (rather
+     * than `handleRetryLastTurn`'s in-place replacement) is what makes this safe for a turn with
+     * later turns on top of it — every one of those was built on the transcript as it stands, and
+     * rewriting its middle would invalidate their own tool history.
+     *
+     * The question is the nearest preceding `role:'user'` message: a turn is always [question,
+     * answer], so walking back from the failed answer finds the question it belongs to. If there
+     * isn't one (a transcript trimmed by `toPersistedMessages` can begin mid-turn), the action
+     * simply does nothing rather than guessing at what was asked.
+     */
+    const handleAskAgain = async (messageId: string) => {
+      if (isGenerating) {
+        return;
+      }
+      const failedIndex = messages.findIndex(
+        message => message.id === messageId,
+      );
+      if (failedIndex < 0) {
+        return;
+      }
+      let question: string | undefined;
+      for (let index = failedIndex - 1; index >= 0; index -= 1) {
+        if (messages[index].role === 'user') {
+          question = messages[index].content;
+          break;
+        }
+      }
+      if (!question) {
+        return;
+      }
+      await handleSend(question);
+    };
+
     /** `error` is the send-path failure; `providersError` the app shell's provider-load failure. One
      * callout reports whichever is current, so dismissal is tracked against this one value. */
+    // Composer control-row spec (iteration-4): the Send button's own disabled/enabled state, split
+    // out once so both the `disabled` prop and the `display` (filled only when it would actually
+    // do something) read the same condition instead of re-deriving it in two places.
+    const canSend = hasProviders && Boolean(inputText.trim());
     const activeError = error ?? providersError;
     const showErrorCallout =
       Boolean(activeError) && activeError !== dismissedError;
@@ -1843,24 +2834,86 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
           defaultMessage: 'Off',
         });
     const privacyBadgeIcon = privacyEnabled ? 'lock' : 'lockOpen';
-    const privacyBadge = assistantSettings?.userCanOverride ? (
-      <EuiButtonEmpty
-        size='s'
-        color={privacyEnabled ? 'success' : 'text'}
+    // Single pill replacing the old padlock EuiButtonEmpty + floating EuiIconTip pair (iteration-4
+    // composer control-row spec): the icon + "Privacy: On/Off" label carries the state, and —
+    // only when the admin has left it overridable — the click affordance to flip it. `onClick`/
+    // `onClickAriaLabel` are spread in together rather than each defaulting to `undefined`, since
+    // OuiBadge warns if `onClickAriaLabel` is present without `onClick` (and vice versa reads as a
+    // badge that looks clickable but isn't). The explanation of what the state does to the user's
+    // data used to live in a hover tooltip wrapping this whole pill, which meant hovering to click
+    // it also forced a wall of text — it now lives on a separate, discrete ⓘ button (an
+    // `EuiPopover`, click-openable and keyboard-reachable) placed right after the pill, so it is
+    // available on demand without blocking the click gesture.
+    // EUI types onClick/onClickAriaLabel as an ExclusiveUnion against the non-clickable badge
+    // variant; spreading the conditional pair in flattens that union into plain optional props,
+    // which satisfies neither union member structurally — hence rendering through an untyped
+    // component reference rather than fighting the union with a props cast.
+    const ClickableEuiBadge = EuiBadge as React.ComponentType<
+      Record<string, unknown>
+    >;
+
+    /**
+     * What the control DOES, as its accessible name — not what state it is in.
+     *
+     * The visible text ("Privacy: On") states the state; a screen-reader user given only that same
+     * text, plus `role='switch'`'s own "on/off" announcement, was told the state twice and told what
+     * the setting governs never. This names the behaviour once, in the accessible name, where the
+     * state is already announced separately by the role.
+     */
+    const privacySwitchAriaLabel = i18n.translate(
+      'wazuhAiAssistant.chat.privacy.switchAriaLabel',
+      {
+        defaultMessage:
+          'Privacy mode: pseudonymize sensitive data before sending to the AI provider',
+      },
+    );
+    const canTogglePrivacy = assistantSettings?.userCanOverride === true;
+
+    // A real switch, not a badge that happens to be clickable (`role='switch'` +
+    // `aria-checked`): the control has two states, it is the reader's to flip, and until now it
+    // announced as a plain button whose only clue to its state was the same word that was already
+    // painted on it. Visuals are untouched — this is the same `.wzPrivacyChip` pill in the same
+    // slot; only its semantics and its label wording change.
+    //
+    // The LOCKED case is deliberately NOT a `disabled` button. A disabled control is skipped by
+    // keyboard navigation and, in most screen-reader modes, is not announced at all — so the one
+    // reader who most needs to know that privacy is administrator-controlled was the one who could
+    // not find out. `aria-disabled` keeps it in the tab order and announced (it is still a switch,
+    // still reporting on/off), `tabIndex={0}` makes the non-interactive span focusable to receive
+    // that focus, and `aria-describedby` points at the VISIBLE attribution line beside it rather
+    // than hiding the reason in a tooltip.
+    const privacyChip = (
+      <ClickableEuiBadge
+        className={`wzPrivacyChip wzPrivacyChip--${
+          privacyEnabled ? 'on' : 'off'
+        }`}
+        color='hollow'
         iconType={privacyBadgeIcon}
-        onClick={handleTogglePrivacy}
+        data-test-subj='wzPrivacyChip'
+        role='switch'
+        aria-checked={privacyEnabled}
+        aria-label={privacySwitchAriaLabel}
+        {...(canTogglePrivacy
+          ? {
+              onClick: handleTogglePrivacy,
+              // EuiBadge requires this alongside `onClick`; it is the same behaviour statement as
+              // `aria-label` above, which EUI's own badge renders it into.
+              onClickAriaLabel: privacySwitchAriaLabel,
+            }
+          : {
+              'aria-disabled': true,
+              tabIndex: 0,
+              'aria-describedby': privacyLockNoteId,
+            })}
       >
-        {privacyBadgeLabel}
-      </EuiButtonEmpty>
-    ) : (
-      <EuiButtonEmpty
-        size='s'
-        color={privacyEnabled ? 'success' : 'text'}
-        iconType={privacyBadgeIcon}
-        isDisabled
-      >
-        {privacyBadgeLabel}
-      </EuiButtonEmpty>
+        {i18n.translate('wazuhAiAssistant.chat.privacy.chipLabel', {
+          // "Privacy: On" rather than the previous "Privacy · Off": an interpuncted pair reads as
+          // two labels sitting next to each other, and QA readers reported the pill as saying only
+          // "Off". A colon says the second word is this label's value.
+          defaultMessage: 'Privacy: {state}',
+          values: { state: privacyBadgeLabel },
+        })}
+      </ClickableEuiBadge>
     );
 
     // The badge alone only ever said
@@ -1868,14 +2921,34 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
     // chat-page half of that disclosure — the concrete field categories are named once here and
     // once more in the admin Settings page description (settings-page.tsx); wording intentionally
     // matches between the two.
+    //
+    // NF-1 UX fix: the previous wording ("... are pseudonymized before being sent") named the field
+    // categories without saying WHOSE data they come from, which read as a blanket guarantee over
+    // everything reaching the provider — including text the user types into chat, which is only
+    // ever covered by the narrower, best-effort scan described in scrubMessagesForProvider's doc
+    // comment (server/routes/chat.ts), not the full field-policy pipeline. Reworded to scope the
+    // promise to Wazuh data explicitly and call out that the user's own typed text isn't covered by
+    // it the same way.
     const privacyExplainerText = privacyEnabled
       ? i18n.translate('wazuhAiAssistant.chat.privacy.explainOn', {
+          // F9: the previous wording ("Text you type yourself is not automatically masked.")
+          // flatly denied any protection for typed text, which under-promises and contradicts the
+          // actual pipeline: prescanAndMint already catches typed IPs/dotted FQDNs, and NF-1's fix
+          // additionally catches a bare identifier already known from earlier this session
+          // (scrubKnownEntities). Replaced with an accurate, still-short statement of what IS and
+          // is NOT covered — see scrubMessagesForProvider's doc comment (server/routes/chat.ts) for
+          // the full, precise residual this summarizes.
+          // Adversarial round 2: "hostnames" in the first clause over-promised — a FRESH bare
+          // hostname the user types (no dotted suffix) is never unconditionally scanned, only a
+          // dotted domain name/FQDN is (prescanAndMint's shape scan) or an already-known bare
+          // identifier is (the second clause, scrubKnownEntities). Narrowed the first clause to
+          // "domain names" so it names only what is ALWAYS scanned regardless of prior mint.
           defaultMessage:
-            'Privacy on: hostnames, IP addresses, usernames, process command lines, and finding/rule text are pseudonymized before being sent to the configured AI provider.',
+            'Privacy on: Wazuh data sent to the AI provider — hostnames, IP addresses, usernames, process command lines, and finding/rule text — is pseudonymized. Text you type is scanned for IP addresses, domain names, and identifiers already seen in this session; other identifiers you type may reach the provider unmasked.',
         })
       : i18n.translate('wazuhAiAssistant.chat.privacy.explainOff', {
           defaultMessage:
-            'Privacy off: hostnames, IP addresses, usernames, process command lines, and finding/rule text are sent to the configured AI provider as-is.',
+            'Privacy off: Wazuh data sent to the AI provider — hostnames, IP addresses, usernames, process command lines, and finding/rule text — is sent as-is.',
         });
 
     // Conversation header title: the active conversation's own saved title when one is open
@@ -1886,16 +2959,6 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
           conversation => conversation.id === activeConversationId,
         )?.title
       : undefined;
-
-    const providerOptions = providers.map(provider => ({
-      value: provider.id,
-      text: provider.isDefault
-        ? i18n.translate('wazuhAiAssistant.chat.providerOptionDefault', {
-            defaultMessage: '{name} (default)',
-            values: { name: provider.name },
-          })
-        : provider.name,
-    }));
 
     return (
       // Iteration 2 layout: EuiPage/EuiPageSideBar rendered as an unreliable hairline sliver in this
@@ -1996,6 +3059,8 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                   void confirmIfGenerating(handleNewConversation)
                 }
                 onDelete={handleDeleteConversation}
+                onRename={handleRenameConversation}
+                onBulkDelete={handleBulkDeleteConversations}
                 // Rail prop contract agreed with the ConversationList owner (job item 6): all three
                 // are optional with defaults, so this call is safe to ship whether or not
                 // conversation-list.tsx has picked them up yet.
@@ -2072,6 +3137,8 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                         })
                       }
                       onDelete={handleDeleteConversation}
+                      onRename={handleRenameConversation}
+                      onBulkDelete={handleBulkDeleteConversations}
                       displayMode='flyout'
                       onCollapse={handleRailCollapse}
                       onExpand={handleRailExpand}
@@ -2086,8 +3153,16 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
           `position: sticky` composer this replaces. Row 1 (`.wzChatTranscript` below) is the ONLY
           scroll container; row 2 (`.wzComposerRow` below) stays in normal flow. That grid boundary
           — not a tuned padding/gradient pair — is what makes the composer/welcome overlap this
-          redesign fixes structurally impossible instead of merely rare. */}
-          <div className='wzChatPane' style={{ flex: 1, minWidth: 0 }}>
+          redesign fixes structurally impossible instead of merely rare.
+
+          C1 adds exactly two temporary modifiers to that pane (`PANE_CLASS_BY_COMPOSER_MODE`
+          above): `--welcome` while the empty state is one centred group, and `--docking` for the
+          ~400ms bridge. The `docked` entry is the bare `wzChatPane` this always was, so the end
+          state of every conversation — and every state of the embedded sidecar — is unchanged. */}
+          <div
+            className={PANE_CLASS_BY_COMPOSER_MODE[composerMode]}
+            style={{ flex: 1, minWidth: 0 }}
+          >
             {/* The conversation's ONE scroll container — scrollbar belongs at the pane's far edge
             like any chat app, and should only exist once content overflows (no permanently
             reserved gutter). The auto-scroll pinning refs above target it; overflowAnchor keeps
@@ -2105,13 +3180,18 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
               className='wzChatTranscript'
             >
               {/* `.wzTranscriptContent` (chat-page.scss): the full-width wrapper that owns the ONE
-              shared `16px 24px 0` gutter — `.wzContentMeasure` below (header/callouts/welcome) and
-              `MessageList` (rendered as ITS sibling further down, not its descendant) both sit
+              shared `24px 24px 24px` gutter — `.wzContentMeasure` below (header/callouts/welcome)
+              and `MessageList` (rendered as ITS sibling further down, not its descendant) both sit
               inside it, which is what lets a table-bearing turn's own row measure past
               `.wzContentMeasure`'s 1060px cap instead of being clipped to it (layout contract §5). */}
               <div
                 className='wzTranscriptContent'
-                style={{ padding: '16px 24px 0' }}
+                // Restores lead breath at the top (16 -> 24px) and adds the tail breath the
+                // transcript never had at all (0 -> 24px) so the last turn is not flush against the
+                // composer's own hairline (iteration-4 audit, P1 item 7). See `.wzStatusCallouts`
+                // (chat-page.scss) for why the top half of this still scrolls out from under the
+                // sticky band rather than staying visible above it.
+                style={{ padding: '24px 24px 24px' }}
               >
                 {/* `.wzContentMeasure` (chat-page.scss): the ONE centred column transcript prose and
               the composer share (layout contract §5) — reads `$wzContentMaxWidth` off the shared
@@ -2321,10 +3401,15 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                 )}
 
                 <div
+                  // `wzWelcomeMeasure` (chat-page.scss), not the bare `.wzContentMeasure` this also
+                  // carries: the 840px welcome-cluster cap is scoped to THIS class specifically,
+                  // because the sticky status-callout band above (`.wzStatusCallouts`) wraps its own
+                  // content in a plain `.wzContentMeasure` too — an unscoped `.wzChatPane--welcome
+                  // .wzContentMeasure` rule narrowed that band as an unrelated side effect.
                   className={
-                    showWelcomeState
-                      ? 'wzContentMeasure wzContentMeasure--stretch'
-                      : 'wzContentMeasure'
+                    welcomeIsInFlow
+                      ? 'wzContentMeasure wzContentMeasure--stretch wzWelcomeMeasure'
+                      : 'wzContentMeasure wzWelcomeMeasure'
                   }
                 >
                   {/* The view's `<h1>`, for assistive tech only. The chat column had no heading at all,
@@ -2419,9 +3504,29 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                     tall viewport centres the cluster; a short one has nowhere to grow into, so this
                     stops at the content's own height and the transcript's own `overflow-y: auto`
                     takes over — nothing here can ever reach the composer, which is a grid sibling
-                    of the transcript, never a descendant of it. */}
-                  {showWelcomeState && (
-                    <div className='wzWelcomeCenter'>
+                    of the transcript, never a descendant of it.
+
+                    C1 layers on top WITHOUT moving any of this: in the centred state the pane
+                    itself becomes the centring container (`.wzChatPane--welcome`), so this cluster
+                    and the composer read as one group while each stays exactly where it already
+                    lived in the DOM. That is deliberate — the composer must remain ONE React
+                    instance across the transition (re-parenting it into this subtree would remount
+                    ChatInput, dropping focus and the textarea's autogrow height, and an element
+                    cannot animate across a remount). The order inside the group is therefore
+                    greeting → cards → composer rather than the recording's greeting → composer:
+                    Gemini shows no cards at all, and putting ours BELOW the composer would need a
+                    second render site for them plus a pane row underneath the travelling composer
+                    for the transition to pass through. Group composition and motion match the spec;
+                    the internal order is the one the existing DOM already gives. */}
+                  {isWelcomeGroupMounted && (
+                    <div
+                      ref={welcomeGroupRef}
+                      className={
+                        welcomeIsInFlow
+                          ? 'wzWelcomeCenter'
+                          : 'wzWelcomeCenter wzWelcomeCenter--leaving'
+                      }
+                    >
                       <EuiEmptyPrompt
                         // No `icon`: this chat already lives inside the Wazuh app chrome, so a Wazuh
                         // mark on the welcome screen only repeated branding the user can already see.
@@ -2429,6 +3534,17 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                           // EUI's own type scale (size='m') instead of an inline fontSize/weight/
                           // letter-spacing override — the whole point of this pass is to stop
                           // fighting EuiEmptyPrompt's built-in typography with inline styles.
+                          //
+                          // Page-title scale, decided: this greeting stays at EuiTitle `m` (24px)
+                          // while the settings page's H1 is 28. The live audit (§6) flagged the two
+                          // as an inconsistency and offered either "pick 28 everywhere" or "make the
+                          // greeting a deliberate hero" — this is the second. The greeting is not a
+                          // page title doing a navigational job; it is the one large element on an
+                          // otherwise empty canvas (rulebook B7: only 1–2 large elements per view),
+                          // and it shares its screen with nothing else that competes for that rank,
+                          // so 24 is the size that keeps the cluster feeling like a group rather than
+                          // like a page header with content under it. Settings, which really does
+                          // have a header over three sections, keeps 28.
                           <EuiTitle size='m'>
                             <h2>
                               {i18n.translate(
@@ -2460,76 +3576,62 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                           </EuiText>
                         }
                       />
-                      <EuiSpacer size='l' />
-                      {/* Welcome variation 1a (design's own recommendation): ONE bordered, shadowless
-                        container with a centred pill header, holding three horizontal cards —
-                        icon-left, title plus the full question as a two-line description, hairline
-                        border — the Home Overview idiom, replacing the old icon-top/150px/
-                        one-truncated-line cards that floated on the page background with no
-                        grouping container. Clicking a card still only fills the input (unchanged
-                        `setInputText` call), never auto-sends. */}
-                      {/* `grow={false}`: EuiPanel's `grow` DEFAULTS TO TRUE (flex-grow: 1), and
-                        this panel is a flex item of the welcome's centring column — left at
-                        the default it stretched to the full transcript height, so the cards
-                        sat at the top of a tall empty box instead of the cluster sitting
-                        centred. Same trap as the conversation rail's own panel above. */}
-                      <EuiPanel
-                        hasBorder
-                        hasShadow={false}
-                        paddingSize='l'
-                        grow={false}
-                      >
-                        <EuiFlexGroup
-                          gutterSize='none'
-                          justifyContent='center'
-                          responsive={false}
-                        >
-                          <EuiFlexItem grow={false}>
-                            <EuiBadge color='hollow'>
-                              {i18n.translate(
-                                'wazuhAiAssistant.chat.welcome.body',
-                                {
-                                  defaultMessage: 'Try one of these',
-                                },
-                              )}
-                            </EuiBadge>
-                          </EuiFlexItem>
-                        </EuiFlexGroup>
-                        <EuiSpacer size='m' />
-                        {/* `.wzExampleCardsGrid` (chat-page.scss): `repeat(auto-fit,
-                          minmax(min(240px, 100%), 1fr))` — 3-up, 2-up, 1-up, shrinking below
-                          240px only once the container itself is narrower than that (a docked
-                          sidecar panel at its own minimum width), so this never overflows its own
-                          wrapper regardless of pane width (contract §3). */}
-                        <div className='wzExampleCardsGrid'>
-                          {EXAMPLE_CARDS.map(card => (
-                            <EuiCard
-                              key={card.id}
-                              layout='horizontal'
-                              display='plain'
-                              hasBorder
-                              icon={
-                                <EuiIcon
-                                  type={card.icon}
-                                  size='l'
-                                  color='primary'
-                                />
-                              }
-                              title={card.title}
-                              description={card.question}
-                              onClick={() => setInputText(card.question)}
-                            />
-                          ))}
-                        </div>
-                      </EuiPanel>
+                      {/* 16, not 24: greeting → cards → composer are now one evenly-spaced group
+                        (audit §1.5 / rulebook C16 — the trio was 24/9, i.e. neither even nor on the
+                        ladder). The composer's own half of that step lives in
+                        `.wzChatPane--welcome .wzComposerMeasure` (chat-page.scss). */}
+                      <EuiSpacer size='m' />
+                      {/* Three horizontal cards — icon-left, short title, the full question as the
+                        description. Clicking a card only fills the input (unchanged `setInputText`
+                        call), never auto-sends.
+
+                        NO grouping panel around them, and no "Try one of these" pill header. Both
+                        were variation 1a's original shape and both were measured as failures
+                        (audit §1.2/§1.3): the outer `EuiPanel` had the identical fill, hairline and
+                        radius as the `EuiCard`s inside it, so the group read as a card-in-a-card
+                        with no information in the outer one; and the pill was a THIRD piece of
+                        instructional copy under a title and subtitle that already say what to do,
+                        centred over left-aligned cards. The cards' own borders group them perfectly
+                        well — this is a plain layout div now, carrying only the grid. */}
+                      {/* `.wzExampleCardsGrid` (chat-page.scss): `repeat(auto-fit,
+                        minmax(min(240px, 100%), 1fr))` — 3-up, 2-up, 1-up, shrinking below
+                        240px only once the container itself is narrower than that (a docked
+                        sidecar panel at its own minimum width), so this never overflows its own
+                        wrapper regardless of pane width (contract §3). */}
+                      <div className='wzExampleCardsGrid'>
+                        {EXAMPLE_CARDS.map(card => (
+                          <EuiCard
+                            key={card.id}
+                            className='wzWelcomeCard'
+                            layout='horizontal'
+                            display='plain'
+                            hasBorder
+                            // `xs` (16px), down from EuiCard's default `s` (18px): the card titles
+                            // used to be BIGGER and bolder than the greeting they sit under
+                            // (18/500 vs 24/400), which inverted the screen's own hierarchy — the
+                            // eye landed on a card title first (audit §1.4, rulebook B8).
+                            titleSize='xs'
+                            icon={
+                              <EuiIcon
+                                type={card.icon}
+                                size='l'
+                                color='primary'
+                              />
+                            }
+                            title={card.title}
+                            description={card.question}
+                            onClick={() => setInputText(card.question)}
+                          />
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
                 {/* `MessageList` is `.wzContentMeasure`'s SIBLING inside `.wzTranscriptContent`, not its
-              descendant — see this file's `.wzTranscriptContent` doc comment above. Nesting it
-              inside `.wzContentMeasure` (the pre-fix shape) capped every row's own breakout width
-              against that element's 1060px measure, which is why a table-bearing turn could never
-              actually reach `min(100%, $wzTableMaxWidth)` regardless of window width. */}
+              descendant — see this file's `.wzTranscriptContent` doc comment above. Each message row
+              centres on the content measure independently (`.wzMessageRow`), so a table-bearing turn
+              fills that column to its right edge (bounded by the composer's own column) instead of
+              being nested inside another copy of it. */}
                 {!showLoadingState &&
                   !showNoProviderState &&
                   !showWelcomeState && (
@@ -2538,14 +3640,68 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                       messages={messages}
                       resolveDiscoverUrl={resolveDiscoverUrl}
                       resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
+                      onTableRowsPerPageChange={handleTableRowsPerPageChange}
                       // Withheld while generating: retrying would abandon the turn already running.
                       onRetryLastTurn={
                         isGenerating ? undefined : handleRetryLastTurn
                       }
+                      // Same gate, for the same reason: an older failed turn's "Ask again" would
+                      // also collide with a turn already in flight.
+                      onRetryTurn={isGenerating ? undefined : handleAskAgain}
                     />
                   )}
               </div>
             </div>
+
+            {/* "Jump to latest" (ux-research.md §B: the affordance every streaming chat UI pairs with
+            stick-to-bottom scrolling). Shown whenever the user is unpinned — not only while a turn
+            is streaming, which is what Claude/ChatGPT do: after an answer finishes, "take me back
+            to the end" is exactly as useful as it was mid-stream, and gating on `isGenerating`
+            would make the control blink out from under the pointer the moment the stream ended.
+            The pinning logic itself is untouched (`pinnedToBottomRef` above); this only renders its
+            state and calls the same re-pin the send path already used.
+
+            A SIBLING of the transcript in `.wzChatPane`, explicitly placed back into the grid's
+            first row by `.wzJumpToLatest` (chat-page.scss) — NOT a child of the scroll container,
+            which would scroll away with the content, and NOT viewport-fixed, which would float over
+            whatever else the page is showing when this same ChatPage is embedded in the header's
+            docked panel (assistant-chat-panel.tsx). Sharing the transcript's grid row is what keeps
+            it above the composer's own `auto` row by construction: there is no offset to keep in
+            sync with the composer's variable height.
+
+            Withheld in the centred empty state (C1): there is no conversation to jump to yet, and
+            `grid-row: 1` means nothing while the pane is a flex column — the button would become a
+            third flex item wedged between the welcome group and the composer, breaking the very
+            grouping the centred state exists to create. */}
+            {!showLoadingState &&
+              !showNoProviderState &&
+              composerMode !== 'centered' &&
+              !isPinnedToBottom && (
+                <div className='wzJumpToLatest'>
+                  <EuiButtonIcon
+                    className='wzJumpToLatestButton'
+                    // `arrowDown`, not `sortDown`: both read correctly, but this one is already used
+                    // elsewhere in this plugin (result-table.tsx's row expander), so it is proven
+                    // present in whichever EUI version the host platform bundles.
+                    iconType='arrowDown'
+                    display='base'
+                    // `m` (32px), not EUI's default `s` (24): at 24 the circle was smaller than the
+                    // 32px comfortable-hit-target floor and read as a stray glyph floating over the
+                    // transcript rather than as a control (audit §3.2). It is also centred over the
+                    // measure now (`.wzJumpToLatest`, chat-page.scss) instead of parked in the
+                    // corner.
+                    size='m'
+                    color='text'
+                    onClick={handleJumpToLatest}
+                    aria-label={i18n.translate(
+                      'wazuhAiAssistant.chat.jumpToLatest',
+                      {
+                        defaultMessage: 'Jump to latest',
+                      },
+                    )}
+                  />
+                </div>
+              )}
 
             {/* Composer row: the grid's `auto` row (`.wzChatPane` above), a real flow sibling of the
             transcript, never an overlay — see the layout-contract comment above `privacyBadgeLabel`.
@@ -2554,22 +3710,39 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
             autogrow cap lives in chat-input.tsx. */}
             {!showLoadingState && !showNoProviderState && (
               <div
-                className={
-                  hasProviders
-                    ? 'wzComposerRow'
-                    : 'wzComposerRow wzComposerRow-isDisabled'
-                }
+                ref={composerRowRef}
+                onTransitionEnd={handleComposerTransitionEnd}
+                // `wzComposerRow--roomy` (iteration-4 item A) is derived straight from
+                // `enableWelcomeComposer` rather than a new prop of its own: that prop already IS the
+                // "is this the full-page surface or the 600-900px header sidecar" signal (see its own
+                // doc comment above), and the docked composer's two-row floor is exactly the thing the
+                // sidecar cannot afford. `.wzComposerRow--roomy .wzComposerTextarea` (chat-page.scss)
+                // is the only rule this class exists to scope.
+                className={[
+                  'wzComposerRow',
+                  hasProviders ? '' : 'wzComposerRow-isDisabled',
+                  enableWelcomeComposer ? 'wzComposerRow--roomy' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
               >
-                <div
-                  className='wzContentMeasure'
-                  style={{ padding: '8px 24px' }}
-                >
+                {/* `.wzComposerMeasure` alongside the shared measure class: it owns the composer's
+                own gutters (chat-page.scss), which is all it is left carrying now that the composer
+                shares ONE measure with the transcript in both states. It used to hold a compact
+                `min(90%, 680px)` centred width that tweened back to the shared measure over the
+                travel; that width was the empty state's third competing edge (audit §1.1), so it is
+                gone and the tween with it. The vertical FLIP travel is untouched. */}
+                <div className='wzContentMeasure wzComposerMeasure'>
+                  {/* `.wzComposerPanel` (chat-page.scss) supplies the shared `wzPanel` idiom — the
+                  redesign's 12px radius and an 8px inset — in place of a raw EuiPanel's own 4px
+                  radius plus an inline `marginBottom`. `paddingSize`/`hasBorder`/`hasShadow` stay
+                  as the props EUI needs to not paint its own competing chrome. */}
                   <EuiPanel
+                    className='wzComposerPanel'
                     color='plain'
                     hasBorder
                     hasShadow={false}
                     paddingSize='s'
-                    style={{ marginBottom: 8 }}
                   >
                     {/* Composer floor and ceiling (contract §2): the textarea (chat-input.tsx) owns
                     its own one-line floor and 5-row autogrow cap; the controls row below it is a
@@ -2584,7 +3757,10 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                       isGenerating={isGenerating}
                       onSend={handleSend}
                     />
-                    <EuiSpacer size='xs' />
+                    {/* No `EuiSpacer` here any more (iteration-4 item A): the field's own bottom
+                    padding plus the controls row's `gutterSize='s'` already separated them, and
+                    the spacer on top of that was the extra few px that made the docked composer
+                    feel taller than its "2-row floor" was supposed to read. */}
                     <EuiFlexGroup
                       alignItems='center'
                       gutterSize='s'
@@ -2592,102 +3768,180 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                       wrap
                     >
                       {hasProviders && assistantSettings && (
-                        <EuiFlexItem grow={false}>
-                          {assistantSettings.userCanOverride ? (
-                            privacyBadge
-                          ) : (
-                            <EuiToolTip
-                              content={i18n.translate(
-                                'wazuhAiAssistant.chat.privacy.adminSet',
-                                {
-                                  defaultMessage: 'Set by administrator',
-                                },
-                              )}
-                            >
-                              {privacyBadge}
-                            </EuiToolTip>
+                        <>
+                          {/* The pill itself no longer carries the full explainer as a hover
+                          tooltip — that turned "click to toggle" into "hover through a wall
+                          of text first". `onClickAriaLabel` (set on `privacyChip` above) still
+                          covers the click affordance for a11y. The explanation now lives on the
+                          discrete ⓘ immediately after it, on demand. */}
+                          <EuiFlexItem grow={false}>{privacyChip}</EuiFlexItem>
+                          {/* Locked policy: a VISIBLE attribution, in the composer, next to the
+                          control it explains. It used to be one line inside the ⓘ's hover tooltip,
+                          which meant the single most consequential fact about the control — that
+                          the reader cannot change it and someone else decided — was discoverable
+                          only by hovering a 16px glyph. It is also this element that
+                          `aria-describedby` on the chip points at, so the same words reach a screen
+                          reader on focus. */}
+                          {!assistantSettings.userCanOverride && (
+                            <EuiFlexItem grow={false}>
+                              <EuiText
+                                size='xs'
+                                color='subdued'
+                                id={privacyLockNoteId}
+                                data-test-subj='wzPrivacyLockNote'
+                              >
+                                <span>
+                                  {privacyEnabled
+                                    ? i18n.translate(
+                                        'wazuhAiAssistant.chat.privacy.lockedOn',
+                                        {
+                                          defaultMessage:
+                                            'Privacy on — set by administrator',
+                                        },
+                                      )
+                                    : i18n.translate(
+                                        'wazuhAiAssistant.chat.privacy.lockedOff',
+                                        {
+                                          defaultMessage:
+                                            'Privacy off — set by administrator',
+                                        },
+                                      )}
+                                </span>
+                              </EuiText>
+                            </EuiFlexItem>
                           )}
-                        </EuiFlexItem>
-                      )}
-                      {hasProviders && assistantSettings && (
-                        <EuiFlexItem grow={false}>
-                          <EuiIconTip
-                            type='iInCircle'
-                            color='subdued'
-                            content={privacyExplainerText}
-                            aria-label={i18n.translate(
-                              'wazuhAiAssistant.chat.privacy.explainAriaLabel',
-                              {
-                                defaultMessage:
-                                  'What privacy mode does to your data',
-                              },
-                            )}
-                          />
-                        </EuiFlexItem>
+                          {/* The explanation of what privacy mode does to the reader's data was an
+                          `EuiIconTip` — hover-only, so it could not be reached by keyboard at all,
+                          dismissed itself the moment the pointer moved, and could not be read at
+                          leisure or copied. It is now a real popover on a real button: click or
+                          Enter opens it, it stays open, and Escape/outside-click closes it. */}
+                          <EuiFlexItem grow={false}>
+                            <EuiPopover
+                              isOpen={isPrivacyHelpOpen}
+                              closePopover={() => setIsPrivacyHelpOpen(false)}
+                              anchorPosition='upCenter'
+                              panelPaddingSize='s'
+                              button={
+                                <EuiButtonIcon
+                                  /* `size='s'` renders this 16px-grid glyph below its native size,
+                                  so the thin circle stroke falls between device pixels and reads
+                                  blurry next to the crisp pill. `m` is the glyph's own 16px grid —
+                                  crisp — and still discrete beside the 32px privacy chip. */
+                                  iconSize='m'
+                                  iconType='iInCircle'
+                                  color='text'
+                                  display='empty'
+                                  data-test-subj='wzPrivacyHelpButton'
+                                  aria-expanded={isPrivacyHelpOpen}
+                                  aria-label={i18n.translate(
+                                    'wazuhAiAssistant.chat.privacy.explainerAriaLabel',
+                                    {
+                                      defaultMessage: 'About privacy mode',
+                                    },
+                                  )}
+                                  onClick={() =>
+                                    setIsPrivacyHelpOpen(current => !current)
+                                  }
+                                />
+                              }
+                            >
+                              <EuiText
+                                size='xs'
+                                className='wzPrivacyHelpPanel'
+                                data-test-subj='wzPrivacyHelpPanel'
+                              >
+                                <p style={{ margin: 0 }}>
+                                  {privacyExplainerText}
+                                </p>
+                              </EuiText>
+                            </EuiPopover>
+                          </EuiFlexItem>
+                        </>
                       )}
                       {/* Explicit grow spacer (was a bare `<EuiFlexItem />` relying on `grow`
-                          defaulting to true) pushes the provider/send cluster to the far right;
-                          that cluster now sits behind its own hairline left border, so the two
-                          concerns (privacy controls vs. provider/send) read as visually separate
-                          groups instead of one undivided row. */}
+                          defaulting to true) pushes the provider/send cluster to the far right.
+                          The hairline divider that used to separate it from the privacy controls
+                          is gone (iteration-4 item 2): the picker is now its own clickable text
+                          button rather than an inline `<select>`, and reads as a distinct control
+                          without needing a rule drawn next to it. */}
                       <EuiFlexItem grow />
                       <EuiFlexItem grow={false}>
                         <EuiFlexGroup
                           alignItems='center'
                           gutterSize='s'
                           responsive={false}
-                          style={{
-                            borderLeft: '1px solid var(--wz-hairline)',
-                            paddingLeft: 8,
-                          }}
                         >
                           {hasProviders && (
                             <EuiFlexItem grow={false}>
-                              <EuiSelect
-                                id='wzAiAssistantProviderSelect'
-                                compressed
-                                prepend={i18n.translate(
-                                  'wazuhAiAssistant.chat.providerLabel',
-                                  {
-                                    defaultMessage: 'Provider',
-                                  },
-                                )}
-                                options={providerOptions}
-                                value={selectedProviderId}
-                                onChange={event =>
-                                  onProviderChange(event.target.value)
-                                }
-                                aria-label={i18n.translate(
-                                  'wazuhAiAssistant.chat.providerSelect',
-                                  {
-                                    defaultMessage: 'Provider',
-                                  },
-                                )}
+                              <ProviderPicker
+                                providers={providers}
+                                selectedProviderId={selectedProviderId}
+                                // Not the raw `onProviderChange` prop: a pick made HERE is the
+                                // reader's own explicit choice and cancels any pending
+                                // provider-restore request — see `handleUserProviderChange`.
+                                onProviderChange={handleUserProviderChange}
+                                onManageProviders={onManageProviders}
+                                activeConversationId={activeConversationId}
                               />
                             </EuiFlexItem>
                           )}
                           <EuiFlexItem grow={false}>
                             {isGenerating ? (
-                              <EuiButtonIcon
-                                iconType='cross'
-                                color='danger'
-                                size='s'
-                                onClick={handleStop}
-                                aria-label={i18n.translate(
-                                  'wazuhAiAssistant.chat.stopButton',
-                                  {
-                                    defaultMessage: 'Stop',
-                                  },
+                              /* The send button turning into a red ✕ mid-answer is not
+                              self-explanatory — a cross in the composer reads at least as much like
+                              "clear what I typed" as like "stop generating", and it appears without
+                              warning the moment an answer starts. The tooltip names the action on
+                              hover and on keyboard focus (EuiToolTip covers both); the aria-label
+                              below carries the same words for screen readers. */
+                              <EuiToolTip
+                                position='top'
+                                content={i18n.translate(
+                                  'wazuhAiAssistant.chat.stopButtonTooltip',
+                                  { defaultMessage: 'Stop generating' },
                                 )}
-                              />
+                              >
+                                <EuiButtonIcon
+                                  className='wzComposerSendButton'
+                                  iconType='cross'
+                                  color='danger'
+                                  // 'm', matching the Send button's own size (iteration-4 item
+                                  // A) — this button replaces Send in the exact same row slot
+                                  // while generating, and a smaller icon here shrank that slot's
+                                  // height between the two states.
+                                  size='m'
+                                  // 'base' (bordered, unfilled) — a deliberate step down from the
+                                  // Send button's filled 'fill': Stop is a real interrupt but not
+                                  // the row's primary action, and a second filled/colored button
+                                  // in the same slot the instant generation starts would read as
+                                  // the composer's emphasis flipping to "danger" by default.
+                                  // Verified against this fork's OUI build (button_icon.tsx's
+                                  // `displayToClassNameMap`), which does define 'base' alongside
+                                  // 'empty'/'fill' — same three-value `display` union EUI ships.
+                                  display='base'
+                                  onClick={handleStop}
+                                  aria-label={i18n.translate(
+                                    'wazuhAiAssistant.chat.stopButton',
+                                    {
+                                      defaultMessage: 'Stop generating',
+                                    },
+                                  )}
+                                />
+                              </EuiToolTip>
                             ) : (
                               <EuiButtonIcon
+                                className='wzComposerSendButton'
                                 iconType='arrowUp'
                                 color='primary'
-                                size='s'
-                                display='fill'
+                                // 'm', not 's' (iteration-4 item A): against the roomier two-row
+                                // field the small size read as undersized for the row's own height.
+                                size='m'
+                                // Filled only once there is something to send (`canSend`); an empty
+                                // composer now gets the same unfilled 'empty' display Stop's sibling
+                                // slot uses instead of a filled-but-disabled button, which used to
+                                // read as broken rather than "nothing typed yet".
+                                display={canSend ? 'fill' : 'empty'}
                                 onClick={() => chatInputRef.current?.send()}
-                                disabled={!hasProviders || !inputText.trim()}
+                                disabled={!canSend}
                                 aria-label={i18n.translate(
                                   'wazuhAiAssistant.chat.sendButton',
                                   {

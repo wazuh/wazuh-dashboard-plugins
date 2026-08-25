@@ -260,6 +260,32 @@ function scaContext(): {
         results: { buckets: [{ key: 'Failed', doc_count: 102 }] },
       },
     },
+    // A THIRD response, same shape as the first -- used by the main end-to-end test's extra
+    // duplicate get_sca_results round (workstream C: the cost-budget redesign's futility-stop
+    // needs a repeated identical call to demonstrate the "duplicate query" trigger).
+    {
+      hits: { hits: [], total: { value: 207 } },
+      aggregations: {
+        policies: {
+          buckets: [
+            {
+              key: 'cis_ubuntu_2004',
+              doc_count: 207,
+              policy_sample: {
+                hits: {
+                  hits: [
+                    { _source: { policy: { name: 'CIS Ubuntu Linux 20.04' } } },
+                  ],
+                },
+              },
+              passed: { doc_count: 95 },
+              failed: { doc_count: 102 },
+              not_applicable: { doc_count: 10 },
+            },
+          ],
+        },
+      },
+    },
   ];
   const context = {
     core: {
@@ -486,6 +512,135 @@ test('findOfferedFollowUpTool: no name mentioned at all -> undefined', () => {
   );
 });
 
+// --- metadata fallback (issue #8935 Failure B, "nothing compels"): CHAIN_PAIRS keyed by the last
+// successful summary tool, for an offer that never names a tool at all -----------------------
+
+test('findOfferedFollowUpTool: metadata fallback -- an offer naming no tool chains via CHAIN_PAIRS', () => {
+  assert.equal(
+    findOfferedFollowUpTool(
+      'CIS Ubuntu: 95 passed, 102 failed. I can pull the specific failing checks if you would ' +
+        'like.',
+      SCA_TOOLS,
+      new Set(),
+      'get_sca_results',
+    ),
+    'get_sca_checks',
+  );
+});
+
+test('findOfferedFollowUpTool: metadata fallback -- no lastSuccessfulToolName -> undefined', () => {
+  assert.equal(
+    findOfferedFollowUpTool(
+      'I can pull more detail if you would like.',
+      SCA_TOOLS,
+      new Set(),
+      undefined,
+    ),
+    undefined,
+  );
+});
+
+test('findOfferedFollowUpTool: metadata fallback -- lastSuccessfulToolName has no CHAIN_PAIRS entry -> undefined', () => {
+  assert.equal(
+    findOfferedFollowUpTool(
+      'I can pull more detail if you would like.',
+      SCA_TOOLS,
+      new Set(),
+      'search_wazuh_data',
+    ),
+    undefined,
+  );
+});
+
+test('findOfferedFollowUpTool: metadata fallback -- the chained detail tool must actually be OFFERED this turn', () => {
+  // get_sca_results chains to get_sca_checks, but this turn's offered list does not include it --
+  // the fallback must not name a tool the model could not have called anyway.
+  assert.equal(
+    findOfferedFollowUpTool(
+      'I can pull more detail if you would like.',
+      [tool('get_sca_results'), tool('search_wazuh_data')],
+      new Set(),
+      'get_sca_results',
+    ),
+    undefined,
+  );
+});
+
+test('findOfferedFollowUpTool: metadata fallback -- the chained detail tool already executed is excluded', () => {
+  assert.equal(
+    findOfferedFollowUpTool(
+      'I can pull more detail if you would like.',
+      SCA_TOOLS,
+      new Set(['get_sca_checks']),
+      'get_sca_results',
+    ),
+    undefined,
+  );
+});
+
+test('findOfferedFollowUpTool: metadata fallback -- ordinary closing boilerplate is NOT force-called', () => {
+  // Integration-review fix: "Let me know if you need anything else." matches OFFER_MARKER_RE
+  // ("let me know") and names no tool, so without the relevance gate this force-calls
+  // CHAIN_PAIRS['get_sca_results'][0] (get_sca_checks) on every turn that ran get_sca_results and
+  // ended with this near-universal closer. The sentence has no more/specific/further/detail
+  // vocabulary, so the relevance gate must degrade this to base behaviour.
+  assert.equal(
+    findOfferedFollowUpTool(
+      'CIS Ubuntu: 95 passed, 102 failed. Let me know if you need anything else.',
+      SCA_TOOLS,
+      new Set(),
+      'get_sca_results',
+    ),
+    undefined,
+  );
+});
+
+test('findOfferedFollowUpTool: metadata fallback -- "happy to help with anything else" is NOT force-called', () => {
+  // Same false-positive class, different closer from the same OFFER_MARKER_RE vocabulary
+  // ("happy to"), also lacking any more/specific/further vocabulary.
+  assert.equal(
+    findOfferedFollowUpTool(
+      'CIS Ubuntu: 95 passed, 102 failed. Happy to help with anything else.',
+      SCA_TOOLS,
+      new Set(),
+      'get_sca_results',
+    ),
+    undefined,
+  );
+});
+
+test('findOfferedFollowUpTool: metadata fallback -- a paraphrased search_wazuh_data offer is NOT force-called into an unrelated tool', () => {
+  // Integration-review fix: prompts.ts orders the model to offer search_wazuh_data in prose for a
+  // field a typed result lacks; FORCE_EXEMPT_TOOL_NAMES only protects that offer when it NAMES the
+  // tool. A paraphrase ("a custom query for those fields") matches the detail-vocabulary gate (it
+  // says "those fields") but must still be excluded by the escape-hatch exclusion, or it would be
+  // force-called into get_sca_checks -- a tool the offer was never about.
+  assert.equal(
+    findOfferedFollowUpTool(
+      'CIS Ubuntu: 95 passed, 102 failed. The result does not include the exact remediation ' +
+        'text -- I can run a custom query for those fields if you would like.',
+      SCA_TOOLS,
+      new Set(),
+      'get_sca_results',
+    ),
+    undefined,
+  );
+});
+
+test('findOfferedFollowUpTool: a NON-offer round (no OFFER_MARKER_RE marker) is untouched by the fallback', () => {
+  // No offer-shaped sentence at all -- the metadata fallback must never fire just because a
+  // chained summary tool ran; the offer-shape gate is checked FIRST, same as the name-based path.
+  assert.equal(
+    findOfferedFollowUpTool(
+      'CIS Ubuntu: 95 passed, 102 failed, 10 not applicable.',
+      SCA_TOOLS,
+      new Set(),
+      'get_sca_results',
+    ),
+    undefined,
+  );
+});
+
 // --- registry-wide coverage: nothing exempt by default (same standard as
 // agg-size-coverage.test.ts / field-policy-coverage.test.ts) ------------------------------------
 
@@ -572,7 +727,196 @@ test('registry-wide coverage: no catalog tool is ever returned when it is the ON
   );
 });
 
+// --- orchestrate: issue C4 -- a round's own narration must survive into the NEXT round's history
+// instead of being discarded as `content: ''` on the assistant message that carries its tool_call
+// (otherwise the model has no record of having already said it and re-narrates on a later round).
+
+test("orchestrate: a round's streamed prose is carried into the NEXT round's history on the assistant message that made the tool_call", async () => {
+  const { context } = scaContext();
+  const narration = 'Let me check the SCA results for agent 001.';
+  const { callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      // round 0: narrates, THEN calls get_sca_results -- on base this narration is dropped
+      // (the pushed assistant message used `content: ''`).
+      [
+        { type: 'delta', content: narration },
+        {
+          type: 'tool_call',
+          toolCall: {
+            id: 'call_sca_results',
+            name: 'get_sca_results',
+            arguments: { agent_id: '001' },
+          },
+        },
+        { type: 'done', usage: { inputTokens: 20, outputTokens: 10 } },
+      ],
+      // round 1: closes out with no further tool call.
+      textOnlyScript('CIS Ubuntu: 95 passed, 102 failed, 10 N/A.'),
+    ],
+    context,
+  );
+
+  // callMessages[0] = stage1, [1] = round 0's own outbound (only INITIAL_MESSAGES, pre-narration),
+  // [2] = round 1's outbound -- the first call that could possibly see round 0's narration echoed
+  // back as history.
+  const round1Messages = callMessages[2];
+  const toolCallMessage = round1Messages.find(
+    message =>
+      message.role === 'assistant' &&
+      message.toolCalls?.[0]?.id === 'call_sca_results',
+  );
+  assert.ok(
+    toolCallMessage,
+    "expected round 0's [assistant{toolCalls}, tool{content}] pair in round 1's history",
+  );
+  assert.equal(
+    toolCallMessage?.content,
+    narration,
+    "round 0's already-streamed narration must be the assistant message's own content, not " +
+      'discarded as an empty string',
+  );
+});
+
+test('orchestrate: two tool_calls in the SAME round each get only the narration that preceded them, not the whole round repeated twice', async () => {
+  // Guards the `roundTextConsumed` slicing (chat.ts): a round with narration, a tool_call, MORE
+  // narration, then a second tool_call must attribute each slice once, not double-attribute the
+  // first slice to the second message too.
+  const context = rejectingContext();
+  const { callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      [
+        { type: 'delta', content: 'First, checking SCA. ' },
+        {
+          type: 'tool_call',
+          toolCall: { id: 'call_1', name: 'get_sca_results', arguments: {} },
+        },
+        { type: 'delta', content: 'Now checking a second thing.' },
+        {
+          type: 'tool_call',
+          toolCall: { id: 'call_2', name: 'search_wazuh_data', arguments: {} },
+        },
+        { type: 'done', usage: { inputTokens: 10, outputTokens: 4 } },
+      ],
+      textOnlyScript('Done.'),
+    ],
+    context,
+  );
+
+  const round1Messages = callMessages[2];
+  const firstToolMessage = round1Messages.find(
+    m => m.role === 'assistant' && m.toolCalls?.[0]?.id === 'call_1',
+  );
+  const secondToolMessage = round1Messages.find(
+    m => m.role === 'assistant' && m.toolCalls?.[0]?.id === 'call_2',
+  );
+  // Trimmed, not the raw streamed slice with its trailing space: per-tool-call slices are now
+  // trimmed before being attributed (a later, deliberate fix — a whitespace-padded/whitespace-
+  // only content string is a 400 on the Anthropic API).
+  assert.equal(firstToolMessage?.content, 'First, checking SCA.');
+  assert.equal(secondToolMessage?.content, 'Now checking a second thing.');
+});
+
+test('orchestrate: a round that streams only whitespace before its tool_call produces content: "" in history, never a whitespace string', async () => {
+  // Adversarial-review finding: models routinely emit a bare priming newline run ("\n\n") right
+  // before a tool call. The C4 slice (`roundText.slice(roundTextConsumed)`) used to carry that
+  // whitespace straight into the assistant message's `content`, and anthropic.ts pushes any
+  // truthy `content` as a `text` block -- Anthropic's Messages API 400s on a whitespace-only
+  // text block. The fix trims the slice; this pins the orchestration-level contract the adapter
+  // relies on: whitespace-only round text must become an empty string, not survive as "\n\n".
+  const { context } = scaContext();
+  const { callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      [
+        { type: 'delta', content: '\n\n' },
+        {
+          type: 'tool_call',
+          toolCall: {
+            id: 'call_sca_results',
+            name: 'get_sca_results',
+            arguments: { agent_id: '001' },
+          },
+        },
+        { type: 'done', usage: { inputTokens: 20, outputTokens: 10 } },
+      ],
+      textOnlyScript('CIS Ubuntu: 95 passed, 102 failed, 10 N/A.'),
+    ],
+    context,
+  );
+
+  const round1Messages = callMessages[2];
+  const toolCallMessage = round1Messages.find(
+    message =>
+      message.role === 'assistant' &&
+      message.toolCalls?.[0]?.id === 'call_sca_results',
+  );
+  assert.ok(toolCallMessage);
+  assert.equal(
+    toolCallMessage?.content,
+    '',
+    'whitespace-only round text preceding a tool_call must be trimmed to an empty string, not ' +
+      'passed through as "\\n\\n"',
+  );
+});
+
+// --- orchestrate: round-tail narration -- text streamed AFTER a round's LAST tool_call ---------
+
+test("orchestrate: text streamed AFTER a round's last tool_call is carried into history as its own assistant message", async () => {
+  // Residual gap flagged in adversarial review: the C4 fix only attributes narration that
+  // arrives BEFORE each tool_call (`roundTextConsumed` slicing). Text streamed after the LAST
+  // tool_call of a round -- before that round's `done` -- was still silently dropped, because the
+  // 'done' handler for a tool-bearing round only accumulated usage and broke to the next round.
+  const { context } = scaContext();
+  const { callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      [
+        {
+          type: 'tool_call',
+          toolCall: {
+            id: 'call_sca_results',
+            name: 'get_sca_results',
+            arguments: { agent_id: '001' },
+          },
+        },
+        { type: 'delta', content: 'That query is running now.' },
+        { type: 'done', usage: { inputTokens: 20, outputTokens: 10 } },
+      ],
+      textOnlyScript('CIS Ubuntu: 95 passed, 102 failed, 10 N/A.'),
+    ],
+    context,
+  );
+
+  const round1Messages = callMessages[2];
+  const tailMessage = round1Messages.find(
+    message =>
+      message.role === 'assistant' &&
+      !message.toolCalls?.length &&
+      message.content === 'That query is running now.',
+  );
+  assert.ok(
+    tailMessage,
+    "text streamed after a round's last tool_call must be appended to history as its own " +
+      'assistant message, not silently dropped',
+  );
+});
+
 // --- orchestrate: main end-to-end case -- FAILS ON BASE -----------------------------------------
+//
+// WORKSTREAM C NOTE: under the old fixed `MAX_TOOL_ROUNDS = 3`, round index 3 was UNCONDITIONALLY
+// final regardless of how much real tool work had happened. Under the cost-budget redesign, a
+// round only becomes final once the budget (BASE_BUDGET_UNITS = 6) is spent or the futility stop
+// fires -- and this scenario's first two real tool calls (get_sca_results cost 1, get_sca_checks
+// cost 2 -- see registry.ts's `getToolCostClass`) only spend 3, leaving budget remaining. A THIRD
+// round -- the model re-running get_sca_results with the SAME arguments -- is added so the
+// scenario now also exercises the futility stop's "duplicate of a previous round's identical
+// query" trigger (chat.ts's `isRoundFutile`): that duplicate is what makes round 4 the genuinely
+// final one, not a bare round-count coincidence. This is the exact "update the script, keep what
+// it proves" adjustment the redesign calls for -- the test still proves I3 (deferred-offer
+// interception) and #8893 (final-round-answer instruction) compose correctly; it now ALSO proves
+// the budget mechanism recognizes a real stopping point instead of guessing from round count.
 
 test('orchestrate: an unprompted single-tool offer with rounds remaining is forced into a chained call, not left to end the turn', async () => {
   const { context } = scaContext();
@@ -614,7 +958,23 @@ test('orchestrate: an unprompted single-tool offer with rounds remaining is forc
         },
         { type: 'done', usage: { inputTokens: 25, outputTokens: 12 } },
       ],
-      // round 3: final (no-tools) round closes out the answer.
+      // round 3 (workstream C addition): the model re-runs get_sca_results with the IDENTICAL
+      // arguments as round 0 -- a duplicate query, cost-budget-wise still charged (cost 1, running
+      // total 1+2+1=4, still under BASE_BUDGET_UNITS=6) but flagged futile by `isRoundFutile`
+      // (every successful call this round is a duplicate), which forces round 4 to be the final
+      // (tools-off) round regardless of the 2 units of budget still nominally left.
+      [
+        {
+          type: 'tool_call',
+          toolCall: {
+            id: 'call_sca_results_repeat',
+            name: 'get_sca_results',
+            arguments: { agent_id: '001' },
+          },
+        },
+        { type: 'done', usage: { inputTokens: 15, outputTokens: 6 } },
+      ],
+      // round 4: final (no-tools) round closes out the answer.
       textOnlyScript(
         'The three highest-impact failed checks are SSH root login, password expiration, ' +
           'and (see table above).',
@@ -624,12 +984,12 @@ test('orchestrate: an unprompted single-tool offer with rounds remaining is forc
   );
 
   // On base: orchestrate yields 'done' immediately after round 1 (3 chatStream calls total:
-  // stage1, round0, round1) -- this turn instead runs all 5 scripted calls.
+  // stage1, round0, round1) -- this turn instead runs all 6 scripted calls.
   assert.equal(
     callMessages.length,
-    5,
-    'expected stage1 + 4 rounds (get_sca_results, the offer, the forced get_sca_checks, the ' +
-      `final round) -- got ${callMessages.length} chatStream calls`,
+    6,
+    'expected stage1 + 5 rounds (get_sca_results, the offer, the forced get_sca_checks, the ' +
+      `duplicate get_sca_results, the final round) -- got ${callMessages.length} chatStream calls`,
   );
 
   // Exactly one 'done' StreamEvent ends the turn -- the round-1 offer's 'done' must be suppressed,
@@ -644,22 +1004,25 @@ test('orchestrate: an unprompted single-tool offer with rounds remaining is forc
   // The 4th chatStream call (0-indexed 3: stage1=0, round0=1, offer=2, forced=3) is the forced
   // round, and its options.toolChoice names get_sca_checks specifically -- not 'auto'.
   assert.deepEqual(callOptions[3]?.toolChoice, { name: 'get_sca_checks' });
+  // Round 3 (the duplicate query, index 4) is an ordinary round, not a forced one -- 'auto'.
+  assert.equal(callOptions[4]?.toolChoice, 'auto');
 
-  // Both real tools actually ran (forwarded as tool_call StreamEvents with the reversed/real args
-  // -- privacy is off in this test, so real args are the only form).
+  // All three real tool calls actually ran (forwarded as tool_call StreamEvents with the
+  // reversed/real args -- privacy is off in this test, so real args are the only form).
   const toolCallEvents = events.filter(
     (e): e is Extract<StreamEvent, { type: 'tool_call' }> =>
       e.type === 'tool_call',
   );
   assert.deepEqual(
     toolCallEvents.map(e => e.toolCall.name),
-    ['get_sca_results', 'get_sca_checks'],
+    ['get_sca_results', 'get_sca_checks', 'get_sca_results'],
   );
 
   // #8893 pin: the final round's outbound messages still end with FINAL_ROUND_ANSWER_INSTRUCTION.
-  // This must survive item I3 unchanged -- the forced round is a normal tool round, not the final
-  // one, so it does NOT carry the instruction; only the genuinely last (no-tools) round does.
-  const finalRoundMessages = callMessages[4];
+  // This must survive item I3 (and the budget redesign) unchanged -- the forced round and the
+  // duplicate round are both normal tool rounds, not the final one, so neither carries the
+  // instruction; only the genuinely last (no-tools) round does.
+  const finalRoundMessages = callMessages[5];
   const lastMessage = finalRoundMessages[finalRoundMessages.length - 1];
   assert.equal(lastMessage.role, 'system');
   assert.equal(lastMessage.content, FINAL_ROUND_ANSWER_INSTRUCTION);
@@ -669,10 +1032,17 @@ test('orchestrate: an unprompted single-tool offer with rounds remaining is forc
     forcedRoundMessages[forcedRoundMessages.length - 1].content,
     FINAL_ROUND_ANSWER_INSTRUCTION,
   );
+  // Nor does the duplicate round's -- it is the round whose OWN futility forces the round AFTER
+  // it, never itself.
+  const duplicateRoundMessages = callMessages[4];
+  assert.notEqual(
+    duplicateRoundMessages[duplicateRoundMessages.length - 1].content,
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+  );
 
-  // The offer text the user already read is IN the forced round's and the final round's history
-  // (integration review: without it, the forced call and the final answer are authored blind of
-  // the summary-plus-offer on screen, and the turn ships two independently-authored summaries).
+  // The offer text the user already read is IN the forced round's, the duplicate round's, and the
+  // final round's history (integration review: without it, later rounds are authored blind of the
+  // summary-plus-offer on screen, and the turn ships two independently-authored summaries).
   const offerText =
     'CIS Ubuntu: 95 passed, 102 failed, 10 N/A. I can run get_sca_checks to list the ' +
     'failing checks — want me to?';
@@ -686,12 +1056,138 @@ test('orchestrate: an unprompted single-tool offer with rounds remaining is forc
   );
   assert.ok(
     hasOfferMessage(callMessages[4]),
+    "the duplicate round's history must carry the already-streamed offer text",
+  );
+  assert.ok(
+    hasOfferMessage(callMessages[5]),
     "the final round's history must carry the already-streamed offer text",
   );
   assert.ok(
     !hasOfferMessage(callMessages[2]),
     'the offer round itself is authored before its own text exists',
   );
+});
+
+test('orchestrate: an unnamed offer is forced via the CHAIN_PAIRS metadata fallback', async () => {
+  // Failure B's un-named shape: the offer never says "get_sca_checks" at all, so the name-based
+  // gate above sees zero mentions -- only the metadata fallback (keyed by the last SUCCESSFUL
+  // tool this turn, get_sca_results) can force this one.
+  const { context } = scaContext();
+  const { events, callMessages, callOptions } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      [
+        {
+          type: 'tool_call',
+          toolCall: {
+            id: 'call_sca_results',
+            name: 'get_sca_results',
+            arguments: { agent_id: '001' },
+          },
+        },
+        { type: 'done', usage: { inputTokens: 20, outputTokens: 10 } },
+      ],
+      offerScript(
+        'CIS Ubuntu: 95 passed, 102 failed, 10 N/A. I can pull the specific failing checks if ' +
+          'you would like.',
+      ),
+      [
+        {
+          type: 'tool_call',
+          toolCall: {
+            id: 'call_sca_checks',
+            name: 'get_sca_checks',
+            arguments: {
+              agent_id: '001',
+              policy_id: 'cis_ubuntu_2004',
+              result: 'failed',
+            },
+          },
+        },
+        { type: 'done', usage: { inputTokens: 25, outputTokens: 12 } },
+      ],
+      textOnlyScript(
+        'The three highest-impact failed checks are listed above.',
+      ),
+    ],
+    context,
+  );
+
+  assert.equal(
+    callMessages.length,
+    5,
+    'the un-named offer must still be forced into a chained get_sca_checks round',
+  );
+  assert.deepEqual(callOptions[3]?.toolChoice, { name: 'get_sca_checks' });
+  const toolCallEvents = events.filter(
+    (e): e is Extract<StreamEvent, { type: 'tool_call' }> =>
+      e.type === 'tool_call',
+  );
+  assert.deepEqual(
+    toolCallEvents.map(e => e.toolCall.name),
+    ['get_sca_results', 'get_sca_checks'],
+  );
+  assert.equal(events.filter(e => e.type === 'done').length, 1);
+});
+
+test('orchestrate: an unnamed offer on the LAST tool-bearing round is not forced (round budget respected)', async () => {
+  // Same budget fence as the name-based path's own test, but for the metadata fallback: an
+  // unnamed offer landing on the last tool-bearing round must not spend a round the budget does
+  // not have. Integration-review fix: a script filled entirely with REJECTED_SEARCH_ROUND never
+  // sets `lastSuccessfulToolName` (rejected calls never reach the executed/success site), so that
+  // version of this test would pass identically even with the round-budget gate deleted -- it
+  // never gave the fallback a chance to fire in the first place. The LAST filler round here is
+  // instead a SUCCESSFUL get_sca_results call (a real CHAIN_PAIRS summary key), so the fallback
+  // has a genuine chain to key off and the round-budget gate is what must stop it from firing.
+  const { context } = scaContext();
+  const fillerRounds = Array.from(
+    { length: MAX_TOOL_ROUNDS - 2 },
+    () => REJECTED_SEARCH_ROUND,
+  );
+  const { events, callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      ...fillerRounds,
+      // The last tool-bearing round: a SUCCESSFUL get_sca_results call, so
+      // `lastSuccessfulToolName` is genuinely set going into the offer round below.
+      [
+        {
+          type: 'tool_call',
+          toolCall: {
+            id: 'call_sca_results',
+            name: 'get_sca_results',
+            arguments: { agent_id: '001' },
+          },
+        },
+        { type: 'done', usage: { inputTokens: 20, outputTokens: 10 } },
+      ],
+      offerScript('I can pull the specific failing checks if you would like.'),
+    ],
+    context,
+  );
+
+  assert.equal(callMessages.length, MAX_TOOL_ROUNDS + 1);
+  assert.equal(events.filter(e => e.type === 'done').length, 1);
+});
+
+test('orchestrate: an unnamed offer with no chained summary tool this turn is not forced', async () => {
+  // No tool ran this turn at all (rejected call only), so `lastSuccessfulToolName` is never set --
+  // the metadata fallback must not fire off a stale/absent summary tool.
+  const { events, callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      REJECTED_SCA_RESULTS_ROUND,
+      offerScript('I can pull more detail if you would like.'),
+    ],
+    rejectingContext(),
+  );
+
+  assert.equal(
+    callMessages.length,
+    3,
+    'no chained tool was successfully run this turn, so nothing should be forced',
+  );
+  assert.equal(events.filter(e => e.type === 'done').length, 1);
 });
 
 test('orchestrate: an offer to RETRY a rejected tool IS forced (a failed call must not immunize the tool)', async () => {
@@ -971,10 +1467,11 @@ test('orchestrate: a second offer after one force was already spent this turn do
       // round 1: offers get_sca_checks -- forces round 2.
       offerScript('I can run get_sca_checks — want me to?'),
       // round 2 (forced): instead of complying, the model offers a DIFFERENT unexecuted tool.
-      // Round 2 also happens to be the last tool-bearing round at MAX_TOOL_ROUNDS=3, so this
-      // fences BOTH forcedFollowUpSpent and the round-budget gate at once -- see this file's own
-      // header note on why the fixed round budget makes the two impossible to isolate cleanly in
-      // one scripted scenario.
+      // This fences `forcedFollowUpSpent` alone (workstream C: every call in this script is
+      // rejected/offer-only, so the cost budget never spends anything and never enters the
+      // picture -- see chat.ts's `toolCallCostUnits` doc comment for why a validation-rejected
+      // call is free against that budget) -- unlike the main end-to-end test above, this scenario
+      // does not also need to fence the round-budget gate.
       offerScript('I could also run search_wazuh_data — want me to?'),
     ],
     rejectingContext(),

@@ -93,6 +93,13 @@ const SAMPLED_LABEL_ONE_TO_ONE: Record<string, string> = {
  * uses — this test does not care about size clamping, only aggregation SHAPE.
  */
 function sampleValue(name: string, prop: JsonSchemaProperty): unknown {
+  // get_field_values' `field` param is restricted to guardrails.ts's AGG_FIELD_ALLOWLIST.
+  // "wazuh.agent.id" is chosen because its FIELD_LOCATIONS include "events", the family this
+  // file's own generic enum heuristic samples first for `index_family` (alphabetical
+  // `enumValues[0]`).
+  if (name === 'field') {
+    return 'wazuh.agent.id';
+  }
   if ((prop as { jsonString?: true }).jsonString) {
     return JSON.stringify({
       query: {

@@ -5,8 +5,10 @@ import { CoreStart } from '../../../../../src/core/public';
 import { TableSpec } from '../../../common/types';
 import {
   buildDiscoverUrl,
-  extractTimeRange,
+  describeTimeRangeCoverage,
+  resolveDiscoverTimeRange,
 } from '../../../common/discover-url';
+import { shortDateMath } from './tool-call-label';
 
 export type ResolveDiscoverUrl = (spec: TableSpec) => Promise<string | null>;
 
@@ -70,7 +72,20 @@ export function createDiscoverUrlResolver(core: CoreStart): ResolveDiscoverUrl {
     const discoverAppUrl = core.http.basePath.prepend(
       '/app/data-explorer/discover',
     );
-    const timeRange = extractTimeRange(spec.discover.dsl);
+    // The window comes from what the server recorded executing this query, falling back to the
+    // DSL's own clause and finally to an UNBOUNDED window — never to a 24-hour default that would
+    // under-count the answer this link sits under. See `resolveDiscoverTimeRange`'s doc comment
+    // (common/discover-url.ts) for the full precedence and why case 3 changed.
+    const timeRange = resolveDiscoverTimeRange({
+      dsl: spec.discover.dsl,
+      effectiveRange: spec.provenance?.effectiveRange,
+      // Pins date-math bounds to the instant the query ran, so a link clicked days later opens the
+      // window the answer used rather than the same shorthand re-resolved against today's clock.
+      // It is ALSO the reference the DSL fallback intersects its clauses against — the same one
+      // executor.ts recorded the provenance with, so a multi-clause DSL mixing date-math and ISO
+      // cannot resolve one way here and another way in the evidence popover.
+      executedAt: spec.provenance?.executedAt,
+    });
     return buildDiscoverUrl({
       discoverAppUrl,
       indexPatternId,
@@ -83,6 +98,120 @@ export function createDiscoverUrlResolver(core: CoreStart): ResolveDiscoverUrl {
 interface DiscoverLinkProps {
   spec: TableSpec;
   resolveDiscoverUrl: ResolveDiscoverUrl;
+}
+
+/**
+ * Short rendering of the ONE bound a one-sided range clause stated, for the partial-range
+ * disclosure below.
+ *
+ * A date-math bound goes through `shortDateMath` — the SAME shorthand the provenance chip beside
+ * this button renders its window with (issue #9008 review, F5), so `now-90d` reads "90d" in both
+ * places rather than "90d" on the chip and "now-90d" one control away. `now` itself is not that
+ * shape and stays literal.
+ *
+ * An ISO instant becomes a locale date with NO time-of-day, unlike tool-call-label.ts's
+ * `formatInstant` which needs it: this string goes inside a button label that already carries
+ * "Open in Discover" plus the disclosure wording, and the whole label has to stay short enough not
+ * to wrap in the narrow (sidecar) panel — a full ISO instant alone is 24 characters.
+ *
+ * The locale is OSD's own (`i18n.getLocale()`, guarded exactly as conversation-list.tsx's
+ * `formatRelativeTime` guards it — the test environment's i18n stub does not implement it), NOT
+ * `undefined`, which would hand `Intl` the host's locale and print an English month name inside a
+ * Spanish sentence (issue #9008 review, F4). Anything unparseable is passed through untouched
+ * rather than guessed at.
+ */
+function shortBoundLabel(value: string): string {
+  const dateMath = shortDateMath(value);
+  if (dateMath) {
+    return dateMath;
+  }
+  const parsed = Date.parse(value);
+  if (Number.isNaN(parsed)) {
+    return value;
+  }
+  const locale =
+    typeof i18n.getLocale === 'function' ? i18n.getLocale() : undefined;
+  try {
+    return new Intl.DateTimeFormat(locale, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(new Date(parsed));
+  } catch {
+    // Same defensive shape as `formatRelativeTime`: an unsupported locale tag must never take the
+    // whole result card's header down with it.
+    return new Date(parsed).toLocaleDateString();
+  }
+}
+
+/**
+ * The button's label. It describes the window `resolveDiscoverTimeRange` (common/discover-url.ts)
+ * ACTUALLY OPENS, case for case — the two are read together deliberately, because a label that
+ * disclosed one window while its own button opened another would be worse than no label at all:
+ *
+ *  - A server-recorded `effectiveRange` (that function's case 1) — the link opens exactly the
+ *    window the executor observed running, the same fact the evidence popover states. Nothing was
+ *    filled in, so there is nothing to disclose and the plain label stands. (A clamp, if one fired,
+ *    is disclosed by the provenance chip's own badge rather than here.)
+ *  - No recorded range, and the DSL bounded BOTH edges (`stated`) — same story, plain label.
+ *  - No recorded range, and a ONE-SIDED clause (`openStart`/`openEnd`, e.g. "findings before X").
+ *    Issue #9008 review, finding 1: this used to render the plain label, because the query HAD
+ *    stated a window and the only disclosure fired when none was stated at all — while the missing
+ *    lower bound was filled from `now-24h`, so an `lte`-only clause bounded in the past opened an
+ *    inverted window Discover showed nothing for. The fill direction is fixed in
+ *    `UNBOUNDED_TIME_RANGE`; this says out loud which edge the query left open.
+ *  - No recorded range and no clause at all (`defaulted`) — issue #9026: the link opens ALL OF
+ *    HISTORY, because a query with no time filter really did cover the whole index and a 24-hour
+ *    default under-counted the answer above it. "All time" is a materially different reading
+ *    experience from every other link here, and a reader deserves to know that before clicking
+ *    rather than after Discover has loaded the whole index. The old "default range: 24h" wording
+ *    is gone with the behavior it described.
+ *
+ * Every wording shares this one label slot and style — no second UI element — and stays short
+ * enough not to wrap in the narrow (sidecar) panel.
+ */
+function discoverLinkLabel(spec: TableSpec): string {
+  const plainLabel = (): string =>
+    i18n.translate('wazuhAiAssistant.resultTable.openInDiscover', {
+      defaultMessage: 'Open in Discover',
+    });
+  // Case 1: the server recorded the window it ran, so the link reproduces it verbatim.
+  if (spec.provenance?.effectiveRange) {
+    return plainLabel();
+  }
+  const { coverage, statedBound } = describeTimeRangeCoverage(
+    spec.discover?.dsl,
+    spec.provenance?.executedAt,
+  );
+  switch (coverage) {
+    case 'defaulted': {
+      return i18n.translate(
+        'wazuhAiAssistant.resultTable.openInDiscoverFullHistory',
+        { defaultMessage: 'Open in Discover (all time)' },
+      );
+    }
+    case 'openStart': {
+      return i18n.translate(
+        'wazuhAiAssistant.resultTable.openInDiscoverOpenStart',
+        {
+          defaultMessage: 'Open in Discover (up to {bound} — no start date)',
+          values: { bound: shortBoundLabel(statedBound ?? '') },
+        },
+      );
+    }
+    case 'openEnd': {
+      return i18n.translate(
+        'wazuhAiAssistant.resultTable.openInDiscoverOpenEnd',
+        {
+          defaultMessage: 'Open in Discover (from {bound} — no end date)',
+          values: { bound: shortBoundLabel(statedBound ?? '') },
+        },
+      );
+    }
+    default: {
+      return plainLabel();
+    }
+  }
 }
 
 /**
@@ -120,6 +249,11 @@ export const DiscoverLink: React.FC<DiscoverLinkProps> = ({
     return null;
   }
 
+  // One label slot, four wordings, read off the SAME spec (and so the same `effectiveRange` and
+  // `executedAt`) the href above was resolved from — see `discoverLinkLabel` for how each case
+  // maps onto the window `resolveDiscoverTimeRange` actually opens.
+  const label = discoverLinkLabel(spec);
+
   return (
     <EuiButtonEmpty
       size='xs'
@@ -127,10 +261,12 @@ export const DiscoverLink: React.FC<DiscoverLinkProps> = ({
       href={url}
       target='_blank'
       rel='noopener noreferrer'
+      // The label ellipses in a narrow container (result-table.scss's `.wzResultsCardActions`),
+      // so the full wording has to stay reachable somewhere: `title` is that somewhere, and it
+      // costs nothing when the label fits.
+      title={label}
     >
-      {i18n.translate('wazuhAiAssistant.resultTable.openInDiscover', {
-        defaultMessage: 'Open in Discover',
-      })}
+      {label}
     </EuiButtonEmpty>
   );
 };

@@ -27,9 +27,10 @@ export const API_PATHS = {
   /** Persistent conversations: owner-scoped CRUD over the
    * `wazuh-ai-assistant-sessions` index alias (server/routes/conversations.ts,
    * server/conversation-store.ts). GET lists the caller's own conversations (summaries only —
-   * id/title/updatedAt, never `messages`); POST creates one; GET/PUT/DELETE `{id}` operate on a
-   * single conversation and 404 (never 403) when it exists but belongs to a different owner, so
-   * existence is never leaked cross-owner. */
+   * id/title/updatedAt, never `messages`); POST creates one; GET/PUT/PATCH/DELETE `{id}` operate on
+   * a single conversation and 404 (never 403) when it exists but belongs to a different owner, so
+   * existence is never leaked cross-owner. PATCH is title-only (rename); PUT replaces the full
+   * title+messages transcript. */
   CONVERSATIONS: `${API_ROOT}/conversations`,
   CONVERSATION_BY_ID: (id: string) => `${API_ROOT}/conversations/${id}`,
 } as const;
@@ -117,7 +118,14 @@ export type ProviderType = (typeof PROVIDER_TYPES)[number];
 export { SEVERITY_LEVELS } from './wazuh-fields';
 export type { SeverityLevel } from './wazuh-fields';
 
-export const DEFAULT_ANTHROPIC_MAX_TOKENS = 4096;
+// 16384, not the API's old 4096 default: the model suggestions now lead with claude-sonnet-5 /
+// claude-opus-5, which have adaptive "extended thinking" ON by default whenever `thinking` is
+// omitted from the request (as this adapter does -- see anthropic.ts), and `max_tokens` on the
+// Anthropic Messages API caps thinking tokens AND the visible answer together. At 4096 a model
+// that spends a chunk of the budget thinking can truncate the user-visible answer mid-sentence.
+// Raising the cap does not touch the thinking parameter itself (adaptive thinking stays on --
+// that is wanted for answer quality); it only removes the shared-budget truncation risk.
+export const DEFAULT_ANTHROPIC_MAX_TOKENS = 16384;
 export const DEFAULT_ANTHROPIC_VERSION = '2023-06-01';
 
 /**
@@ -135,6 +143,19 @@ export const DEFAULT_ANTHROPIC_VERSION = '2023-06-01';
 export const CONVERSATION_MAX_TITLE_LENGTH = 200;
 export const CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH = 100_000;
 export const CONVERSATION_MAX_MESSAGES = 1000;
+
+/**
+ * Longest persisted turn-failure reason (`PersistedChatMessage.failureReason`). Lives here, with the
+ * three limits above, for exactly the reason their doc comment gives: this value is a PROVIDER error
+ * message, and adapters echo upstream response bodies verbatim (see
+ * `server/providers/openai-compatible.ts`), so it is genuinely unbounded at the source. A
+ * server-only bound would reintroduce the silent-save-failure bug — one oversized error string would
+ * 400 every subsequent save of that conversation, with auto-save swallowing each rejection.
+ *
+ * Generous relative to a real error (a sentence or two, sometimes a chunk of JSON); the point is
+ * only that it cannot be unbounded.
+ */
+export const CONVERSATION_MAX_FAILURE_REASON_LENGTH = 2000;
 
 /**
  * Rows kept when a result table is persisted alongside the message it was shown with

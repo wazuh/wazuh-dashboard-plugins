@@ -18,12 +18,57 @@
   grid-template-rows: auto minmax(0, 1fr) auto;
   /* Fallback first: `dvh` only shipped in Safari 15.4, and a browser that drops the line
      below would lose the cap entirely — which is exactly how the "pagination below the
-     fold" bug returns, on the browser family this redesign was written for. */
+     fold" bug returns, on the browser family this redesign was written for.
+     This is also, separately, the PRE-MEASURE fallback: result-table.tsx sets an inline
+     `style.maxHeight` once `transcriptHeightPx` is actually measured, and that inline style
+     always beats this stylesheet value — see the `--expanded` variant below for the full
+     explanation. */
   max-height: 460px;
   max-height: $wzResultsMaxHeight;
   // The card's own border/radius (from wzPanel) needs the grid to respect it instead of letting a
   // tall body row bleed past the rounded corners.
   overflow: hidden;
+
+  /**
+   * "Card grows" (iteration-4 item 3): applied only once the reader explicitly picks a page size
+   * above the current default (result-table.tsx's `userPickedPageSize` flag) — a result that
+   * already fits the default page size never needed more than the default cap, so the card only
+   * grows on a choice that actually produced more rows to show. Same fallback-then-`dvh` pair as
+   * the default cap above, for the same reason.
+   *
+   * This `max-height` (like the default cap above) is only the PRE-MEASURE fallback: whenever
+   * `transcriptHeightPx` has actually been measured, `result-table.tsx` sets an inline
+   * `style.maxHeight` on this same element, and an inline style always wins over any stylesheet
+   * rule regardless of specificity — this class's `max-height` then only ever applies before that
+   * measurement lands (or in an environment with no `ResizeObserver`, e.g. these Jest tests).
+   */
+  &.wzResultsCard--expanded {
+    max-height: 80vh;
+    max-height: $wzResultsMaxHeightExpanded;
+  }
+
+  /**
+   * Issue #9009 (J1): narrow-mode cell truncation. At ~480px (the QA E2E review's reproduction
+   * width) an untruncated cell wraps onto several lines and makes the whole table unreadable; this
+   * clips it to one line with an ellipsis instead, with the full value one `EuiToolTip` away — the
+   * same truncate-plus-tooltip idiom the providers table already uses (settings-page.scss).
+   * `anchorClassName` (passed on the `EuiToolTip` in result-table.tsx) bounds the tooltip's own
+   * wrapper span the same way, so THAT span doesn't grow wider than the cell either. Nested here
+   * (rather than a bare top-level class) because both classes only ever apply to cells inside this
+   * card.
+   */
+  .wzResultsCellTruncate {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+
+  .wzResultsCellTruncateAnchor {
+    display: block;
+    max-width: 100%;
+  }
 }
 
 .wzResultsCardHeader {
@@ -73,6 +118,66 @@
  * line the way `flex-wrap: wrap` above intends. */
 .wzResultsCardActions {
   flex-shrink: 0;
+
+  /**
+   * The "Open in Discover" label can run to ~60 characters once it carries a partial-range
+   * disclosure ("Open in Discover (up to Jan 1, 2020 — no start date)", issue #9008 review), and
+   * in a narrow sidecar container that is wider than the card. EUI puts a button's text in its own
+   * `.euiButtonEmpty__text` span, which has to be told to ellipse itself — a `min-width: 0` on the
+   * flex item alone (result-table.tsx) only permits the shrink, it does not decide what the text
+   * does with it. `min-width: 0` again on the button because it is itself a flex container.
+   *
+   * The label is never the only way to read the window: the popover beside it states the range in
+   * full, and the link keeps its own `title`.
+   */
+  .euiButtonEmpty {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .euiButtonEmpty__text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/**
+ * Column heads take the redesign's own micro-label idiom — the one `wzMicroLabel`
+ * (public/components/_redesign.scss) documents as being FOR "section headers and table column
+ * heads", and which every table in this plugin was nevertheless ignoring (audit §3.6): they rendered
+ * at body size and weight, so a header row read as another data row.
+ *
+ * The inner `font: inherit` is the same mechanism `.wzProviderFlyout__exampleChip` uses on its
+ * `<code>`: EUI puts the text in its own `.euiTableCellContent__text` span with its own size/weight,
+ * so the span has to be told to inherit or the `th`'s declarations never reach the glyphs.
+ */
+.wzResultsCard .euiTableHeaderCell {
+  @include wzMicroLabel;
+
+  .euiTableCellContent__text {
+    font: inherit;
+    color: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+  }
+}
+
+/**
+ * Severity chip. Takes the SHAPE of the `wzStatusChip` idiom the rest of the redesign uses (fully
+ * round, 11px semibold, no border) so a severity is visibly the same class of object as a provider
+ * status chip, instead of EUI's default 2px-radius rectangle (audit §3.5).
+ *
+ * Only the shape: the FILL stays the solid platform severity color result-table.tsx passes in — see
+ * the comment at `renderSeverityBadge` for why the tinted-role half of `wzStatusChip` is deliberately
+ * NOT adopted here. Qualified with `.euiBadge` for the specificity reason
+ * `.euiBadge.wzStatusChip` (settings-page.scss) documents at length.
+ */
+.euiBadge.wzSeverityChip {
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  border: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {

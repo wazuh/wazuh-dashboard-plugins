@@ -1,9 +1,33 @@
 import assert from 'node:assert/strict';
 import {
   describeHttpError,
+  isEndpointBlockedError,
   outcomeFromTestError,
   outcomeFromTestResult,
 } from './provider-status';
+
+test('isEndpointBlockedError: recognizes every url-guard rejection reason', () => {
+  for (const message of [
+    'Provider request rejected: this host is a blocked cloud-metadata endpoint.',
+    'Provider request rejected: only http(s) URLs are allowed by policy.',
+    'Provider request rejected: the configured URL could not be parsed.',
+    '  Provider request rejected: this host is in the blocked link-local/metadata address range.',
+  ]) {
+    assert.equal(isEndpointBlockedError(message), true);
+  }
+});
+
+test('isEndpointBlockedError: leaves every other failure to the generic title', () => {
+  for (const message of [
+    null,
+    '',
+    'Could not save the provider.',
+    'A provider named "Claude staging" already exists.',
+    'Request failed with status code 500',
+  ]) {
+    assert.equal(isEndpointBlockedError(message), false);
+  }
+});
 
 test('outcomeFromTestResult: a successful test maps to ok with the measured latency', () => {
   const outcome = outcomeFromTestResult({ success: true, latencyMs: 237 });
