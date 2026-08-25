@@ -5,6 +5,8 @@ import {
   FINDING_DIGEST_EXTRA_COLUMNS,
   FINDING_SCOPE_NOTE,
   findingDigestColumns,
+  STANDARD_FINDING_SAMPLE_COLUMNS,
+  STANDARD_FINDING_TABLE_COLUMNS,
   nameFilterClause,
   nameFilterProperty,
   SCA_CURRENT_STATE_NOTE,
@@ -340,4 +342,31 @@ test('VULN_CURRENT_STATE_NOTE: points a history question at the findings tools',
 test('SCA_CURRENT_STATE_NOTE: same split for the compliance surface', () => {
   assert.match(SCA_CURRENT_STATE_NOTE, /latest SCA scan state/);
   assert.match(SCA_CURRENT_STATE_NOTE, /use the findings tools/);
+});
+
+// --- EXPLAIN-WAVE PHASE 7: the detection channel reaches the MODEL, not only the table ---------
+// The wrong-incident answer: asked about sign-in failures on one detection channel, the model
+// narrated a different authentication incident that shared the agent and the technique tags. The
+// discriminator (`wazuh.integration.category`) was a visible table column all along -- the user
+// could see it, the model never could, because it was missing from the sample columns.
+
+test('STANDARD_FINDING_SAMPLE_COLUMNS: the model sees the same detection-channel column the table shows', () => {
+  assert.ok(
+    STANDARD_FINDING_SAMPLE_COLUMNS.includes('wazuh.integration.category'),
+    'without it the model cannot tell two unrelated incidents in one result set apart',
+  );
+  assert.ok(
+    STANDARD_FINDING_TABLE_COLUMNS.some(
+      column => column.field === 'wazuh.integration.category',
+    ),
+    'the table already showed it -- the two surfaces must not disagree',
+  );
+});
+
+test('findingDigestColumns: every finding-hits tool inherits the category column, without duplicating it', () => {
+  const columns = findingDigestColumns(STANDARD_FINDING_SAMPLE_COLUMNS);
+  assert.equal(
+    columns.filter(field => field === 'wazuh.integration.category').length,
+    1,
+  );
 });

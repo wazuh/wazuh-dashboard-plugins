@@ -1181,3 +1181,88 @@ test('phase 4: current state and detection history are named as non-substitutabl
     /If only the other surface is reachable this turn, name the one you actually read and say it answers a different question/,
   );
 });
+
+// --- EXPLAIN-WAVE PHASE 7 ----------------------------------------------------------------------
+// Three answer-level defects measured on the phase-6 arm, each fixed at the layer that produced
+// it: a severity stated from inference rather than from the row (the only fabrication left in the
+// arm), an answer narrating a different incident than the one asked about, and an explanatory item
+// that answered with a clarification request and zero tool calls.
+
+test('phase 7: a severity must be quoted from the item own row, never inferred', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /A severity, level or score is a quoted FACT, never an inference/,
+  );
+  assert.match(
+    prompt,
+    /never derived from the\s+technique, the rule wording, the incident around it, or how\s+serious the activity sounds/,
+  );
+  assert.match(
+    prompt,
+    /An item in a serious chain can legitimately carry a low\s+level/,
+  );
+});
+
+test('phase 7: a severity breakdown may not be read as the severity of a named item', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /how many\s+rows carry each level, never WHICH row carries which/,
+  );
+  assert.match(
+    prompt,
+    /never attach a level from a\s+breakdown to a named item/,
+  );
+  assert.match(
+    prompt,
+    /say its severity was not in the results rather than assigning one/,
+  );
+});
+
+test('phase 7: the answer must be about the incident asked about, not the biggest one in the result set', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /When the question names a particular incident, activity class, or detection channel/,
+  );
+  assert.match(prompt, /wazuh\.integration\.category and rule title/);
+  assert.match(
+    prompt,
+    /never narrate the largest or most alarming\s+one as if it were the one asked about/,
+  );
+});
+
+test('phase 7: an integration-sourced finding names its collector, not a victim host', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /the host whose agent\s+INGESTED the record/);
+  assert.match(
+    prompt,
+    /Never conclude from such a row alone that the agent it is\s+filed under was itself attacked or compromised/,
+  );
+});
+
+test('phase 7: a deictic INCIDENT reference earns one scoped attempt, not a clarification request', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /A deictic reference to an INCIDENT rather than a host/);
+  assert.match(
+    prompt,
+    /is NOT a\s+reason to answer with a clarification request and no tool call/,
+  );
+  assert.match(
+    prompt,
+    /Make ONE scoped attempt at the\s+most reasonable default/,
+  );
+});
+
+test('phase 7: the scoped attempt carries the shipped assumption-note pattern, and clarification stays a post-result move', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /state in your answer the assumption you made \(e\.g\. "Assuming you\s+mean/,
+  );
+  assert.match(
+    prompt,
+    /only when a result you\s+already have in hand shows several equally plausible candidates -- never in place of the\s+first call/,
+  );
+});

@@ -426,6 +426,18 @@ export const STANDARD_FINDING_SAMPLE_COLUMNS = [
   'wazuh.agent.name',
   'wazuh.rule.title',
   'wazuh.rule.level',
+  // EXPLAIN-WAVE PHASE 7 (the wrong-incident answer): `wazuh.integration.category` is the field
+  // that says WHICH detection channel a finding came from, and it has been a visible table column
+  // for all of these tools from the start -- but it was never in the model-facing sample rows, so
+  // the model saw the user's own discriminator only in prose it could not read. Asked about
+  // sign-in failures on one channel, it narrated a different authentication incident that happened
+  // to share the same agent and the same technique tags, because from its side the two row sets
+  // were indistinguishable. A result set scoped to a host or an IP routinely mixes several
+  // unrelated incidents; this is the one column that separates them. Curated Wazuh taxonomy word
+  // (same class as `wazuh.rule.level`), one short enum value per row, and already on
+  // `guardrails.ts`'s aggregation allowlist -- see `server/prompts.ts`'s matching instruction,
+  // which tells the model what to DO with it.
+  'wazuh.integration.category',
 ];
 
 /**

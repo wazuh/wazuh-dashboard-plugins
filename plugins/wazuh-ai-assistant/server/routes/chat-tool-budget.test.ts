@@ -897,7 +897,7 @@ function bigTopAgentsContext(): RequestHandlerContext {
                             ],
                           },
                         },
-                        distinct_names: { value: 1 },
+                        distinct_name_count: { value: 1 },
                       })),
                     },
                   },

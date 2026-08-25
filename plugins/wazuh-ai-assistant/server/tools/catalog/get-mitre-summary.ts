@@ -24,7 +24,7 @@ import {
  * are parallel by construction, so a consumer can zip them and pick the name whose index matches
  * the bucket key; the visible columns are relabeled "(sample)" so the sampling is legible.
  *
- * DELIBERATELY NOT SHIPPED: a `distinct_names`/`distinct_tactics` cardinality guard (the
+ * DELIBERATELY NOT SHIPPED: a `distinct_name_count`/`distinct_tactics` cardinality guard (the
  * instrument get-top-rules.ts uses for its sampled title). It is the WRONG instrument here, and
  * would itself be a new falsehood: within a bucket, `cardinality(technique.name)` counts the
  * names of EVERY technique co-tagged on the bucket's documents — so a technique that by ATT&CK
