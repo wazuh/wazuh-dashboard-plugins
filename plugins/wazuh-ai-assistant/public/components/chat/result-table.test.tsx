@@ -607,6 +607,25 @@ describe('ResultTable', () => {
         expect(document.querySelector('.euiPopover__panel-isOpen')).toBeNull(),
       );
     });
+
+    // Issue #9008 review round 2, major 4: the original guard-less handler called
+    // `stopPropagation` unconditionally, so an Escape fired while the popover was ALREADY
+    // closed still swallowed the keystroke — meant for an enclosing surface (a docked
+    // sidecar/flyout) that never got to see it. The fix only acts (and only stops propagation)
+    // while `isOpen`; a closed chip must let the event bubble untouched.
+    it('does not swallow Escape when the popover is already closed', () => {
+      const ancestorHandler = jest.fn();
+      render(
+        <div onKeyDown={ancestorHandler}>
+          <ResultTable spec={spec()} provenanceChips={[chip()]} />
+        </div>,
+      );
+
+      const badge = screen.getByText('Critical findings · 90d');
+      fireEvent.keyDown(badge, { key: 'Escape' });
+
+      expect(ancestorHandler).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('severity badge rendering', () => {

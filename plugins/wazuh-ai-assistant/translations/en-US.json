@@ -59,6 +59,8 @@
     "wazuhAiAssistant.resultTable.tableCaptionPaged": "This table contains {total, plural, one {# row} other {# rows}}. Showing rows {start}-{end}, page {page} of {pageCount}.",
     "wazuhAiAssistant.resultTable.openInDiscover": "Open in Discover",
     "wazuhAiAssistant.resultTable.openInDiscoverFullHistory": "Open in Discover (all time)",
+    "wazuhAiAssistant.resultTable.openInDiscoverOpenStart": "Open in Discover (up to {bound} — no start date)",
+    "wazuhAiAssistant.resultTable.openInDiscoverOpenEnd": "Open in Discover (from {bound} — no end date)",
     "wazuhAiAssistant.resultTable.severity.critical": "Critical",
     "wazuhAiAssistant.resultTable.severity.high": "High",
     "wazuhAiAssistant.resultTable.severity.medium": "Medium",

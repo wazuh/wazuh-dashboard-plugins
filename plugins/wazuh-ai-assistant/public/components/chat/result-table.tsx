@@ -560,10 +560,10 @@ const ProvenanceChip: React.FC<{ chip: ResultTableProvenanceChip }> = ({
                 values: { label: chip.fullLabel },
               },
             )}
-            // Belt-and-braces alongside the wrapping div above: focus is still on the badge the
-            // instant the popover opens (EUI moves it into the panel only asynchronously), so this
-            // catches an Escape pressed in that brief window too.
-            onKeyDown={closeOnEscape}
+            // No `onKeyDown` of its own (issue #9008 review, cleanup 5): the badge is a plain,
+            // non-portaled descendant of the wrapping div above, so a keydown while focus is still
+            // on it already bubbles to that one handler. A second copy here was a duplicate path
+            // to the same idempotent close, not extra coverage.
           >
             {chip.shortLabel}
           </EuiBadge>
@@ -1242,7 +1242,13 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
           </EuiFlexItem>
         ))}
         {resolveDiscoverUrl && spec.discover ? (
-          <EuiFlexItem grow={false}>
+          // `minWidth: 0` (issue #9008 review, F6): a flex item's default `min-width: auto` refuses
+          // to shrink below its content, so the partial-range disclosure — the longest label this
+          // slot can carry, up to ~60 characters — pushed the actions row past the card's width in
+          // a narrow (sidecar) container instead of ellipsing. Paired with
+          // `.wzResultsCardActions`'s own truncation rule (result-table.scss), which is what the
+          // shrink actually resolves to; the untruncated text stays reachable as the link's title.
+          <EuiFlexItem grow={false} style={{ minWidth: 0 }}>
             <DiscoverLink spec={spec} resolveDiscoverUrl={resolveDiscoverUrl} />
           </EuiFlexItem>
         ) : null}

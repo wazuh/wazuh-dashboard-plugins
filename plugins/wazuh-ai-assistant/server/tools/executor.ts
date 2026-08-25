@@ -18,7 +18,12 @@ import {
 } from './guardrails';
 import { buildDigest, buildTableSpec, capDigest, Digest } from './digest';
 import { validateQueryFields } from './field-validation';
-import { IndexerRequest, ManagerRequest, ToolDefinition } from './types';
+import {
+  IndexerRequest,
+  ManagerRequest,
+  ResolvedToolParams,
+  ToolDefinition,
+} from './types';
 import {
   AggFieldSpec,
   applyFieldPolicy,
@@ -55,6 +60,39 @@ export interface ToolExecutionOutcome {
 export interface PrivacyContext {
   pseudonymizer: Pseudonymizer;
   fieldPolicy: FieldPolicyEntry[];
+}
+
+/**
+ * Pseudonymizes the identifier values a `resolveParams` hook declared inside its assumption note
+ * (types.ts's `ResolvedToolParams.noteEntities` — see that doc comment for the wire-level capture
+ * that motivates this) before the note reaches `buildDigest`. No-op without privacy mode, without
+ * a note, or without declared entities — byte-identical to before this existed in all three
+ * cases. Every occurrence of each entity is replaced (split/join, not a regex — entity values are
+ * data, not patterns), longest value first so a shorter entity that is a substring of a longer
+ * one (the "DB03"/"DB03-PRIMARY" case scrubKnownEntities already documents) cannot corrupt the
+ * longer match. Exported for unit testing only, same convention as the other pure helpers here.
+ */
+export function scrubAssumptionNote(
+  note: string | undefined,
+  noteEntities: ResolvedToolParams['noteEntities'],
+  privacy: PrivacyContext | undefined,
+): string | undefined {
+  if (!note || !privacy || !noteEntities || noteEntities.length === 0) {
+    return note;
+  }
+  let scrubbed = note;
+  const byLengthDesc = [...noteEntities].sort(
+    (a, b) => b.value.length - a.value.length,
+  );
+  for (const entity of byLengthDesc) {
+    if (!entity.value) {
+      continue;
+    }
+    scrubbed = scrubbed
+      .split(entity.value)
+      .join(privacy.pseudonymizer.pseudonymize(entity.value, entity.kind));
+  }
+  return scrubbed;
 }
 
 /** Applies field policy to a digest (when `privacy` is given) immediately before it is
@@ -700,13 +738,24 @@ async function executeIndexerRequest(
       index: indexerRequest.index,
       dsl: buildDiscoverDsl(body),
     };
+    // Issue #9008 review, blocker 2: recorded HERE, at creation time -- a date-math bound
+    // ("now-90d") only means something relative to when the query actually ran, so resolving it
+    // against the render-time clock instead (the pre-fix behavior) showed a restored conversation a
+    // window the query never ran against. `describeProvenance` (tool-call-label.ts) resolves
+    // date-math against this stored instant, never `Date.now()`. Held in a local first so the two
+    // `rangeBoundsFromDsl` calls below order their bounds against the SAME instant they record.
+    const executedAt = Date.now();
     // Issue #9008 rework: provenance FACTS for the evidence popover — see `TableSpec.provenance`'s
     // doc comment (common/types.ts). `requestedRange`/`effectiveRange` read the SAME dsl shape
     // `discover.dsl` above does (`buildDiscoverDsl`), just off the pre- and post-clamp bodies
-    // respectively, through the one shared reader (`rangeBoundsFromDsl`) the client's popover also
-    // uses — neither side may derive a window this call differently. `toolCallId` is left unset
-    // here; server/routes/chat.ts's stream loop attaches it, since that is where the streaming
-    // tool call's own id is in scope.
+    // respectively. `rangeBoundsFromDsl` and the `extractTimeRange` the "Open in Discover" link is
+    // built with are two views of ONE resolution (common/discover-url.ts's `effectiveRangeClause`:
+    // clauses partitioned by timestamp field, then intersected within it), so given the same body
+    // and the same `executedAt` reference they cannot report different windows — the link and this
+    // record agree by construction, not by two implementations happening to match. That reference
+    // is why `executedAt` is stored on the spec: discover-link.tsx passes it back in.
+    // `toolCallId` is left unset here; server/routes/chat.ts's stream loop attaches it, since
+    // that is where the streaming tool call's own id is in scope.
     tableSpec.provenance = {
       index: indexerRequest.index,
       // `?? body`: unreachable in practice (the try block above always sets `requestedRangeBody`
@@ -714,15 +763,13 @@ async function executeIndexerRequest(
       // `Record<string, unknown>` for `buildDiscoverDsl` without an unsafe `!` assertion.
       requestedRange: rangeBoundsFromDsl(
         buildDiscoverDsl(requestedRangeBody ?? body),
+        executedAt,
       ),
-      effectiveRange: rangeBoundsFromDsl(buildDiscoverDsl(body)),
+      // Issue #9008 review, cleanup 3: `tableSpec.discover.dsl` above IS `buildDiscoverDsl(body)`
+      // — reuse it rather than building the same object a second time.
+      effectiveRange: rangeBoundsFromDsl(tableSpec.discover.dsl, executedAt),
       clamped: lookbackDisclosure !== undefined,
-      // Issue #9008 review, blocker 2: recorded HERE, at creation time -- a date-math bound
-      // ("now-90d") only means something relative to when the query actually ran, so resolving
-      // it against the render-time clock instead (the pre-fix behavior) showed a restored
-      // conversation a window the query never ran against. `describeProvenance`
-      // (tool-call-label.ts) resolves date-math against this stored instant, never `Date.now()`.
-      executedAt: Date.now(),
+      executedAt,
     };
     if (def.buildSecurityAnalyticsLink) {
       const space = resolveSecurityAnalyticsSpace(
@@ -965,7 +1012,15 @@ export async function executeToolCall(
         return { toolResultContent: toolErrorContent(resolved.reason) };
       }
       params = resolved.resolved.params;
-      assumptionNote = resolved.resolved.note;
+      // Scrubbed HERE, at the single choke point every resolver's note passes through, rather
+      // than in each resolver: resolvers have no privacy context, and the capture probe (P3,
+      // 2026-08-14) proved an unscrubbed note carries the resolved hostname to the provider in
+      // the clear under privacy mode — past every downstream scan.
+      assumptionNote = scrubAssumptionNote(
+        resolved.resolved.note,
+        resolved.resolved.noteEntities,
+        privacy,
+      );
     } catch (error) {
       return {
         toolResultContent: toolErrorContent(

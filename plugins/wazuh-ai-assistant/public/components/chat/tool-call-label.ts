@@ -43,8 +43,10 @@ function humanizeToolName(name: string): string {
 /** `now-24h` -> "24h", `now-90d` -> "90d". This is the SAME date-math shorthand reader used
  * everywhere a bound needs a short label — a bound that is not this shape (a plain ISO instant,
  * or literal "now") returns `undefined` rather than being approximated, so the only other path
- * (`spanShortLabel` below) is the one that ever computes a duration from two resolved instants. */
-function shortDateMath(value: string): string | undefined {
+ * (`spanShortLabel` below) is the one that ever computes a duration from two resolved instants.
+ * Exported for discover-link.tsx, whose partial-range disclosure sits directly beside a provenance
+ * chip and must not render the same date-math bound in a second, different shorthand. */
+export function shortDateMath(value: string): string | undefined {
   const match = /^now-(\d+[dhm])$/.exec(value);
   return match ? match[1] : undefined;
 }
@@ -63,12 +65,37 @@ export interface ToolCallLabel {
   full: string;
 }
 
-/** Formats a millisecond duration as the coarsest whole unit that divides it exactly, falling back
- * to whole days when nothing divides evenly. Only ever called on the span between two RESOLVED
- * instants (see `spanShortLabel`) — never a substitute for `shortDateMath`'s literal rendering of
- * a date-math bound. */
-function formatDurationShort(durationMs: number): string {
-  const abs = Math.abs(durationMs);
+/**
+ * Formats a millisecond duration as the coarsest whole unit that divides it exactly. Only ever
+ * called on the span between two RESOLVED instants (see `spanShortLabel`) — never a substitute for
+ * `shortDateMath`'s literal rendering of a date-math bound. `MS_PER_UNIT` (common/discover-url.ts)
+ * carries no week/month bucket on purpose; see its own doc comment.
+ *
+ * A DEGENERATE window is never dressed up as a plausible one (issue #9008 review, finding 3). This
+ * used to run `Math.abs` over the span and floor the leftover case at `1d`, so a zero-length window
+ * (`gte === lte`) and an INVERTED one (`gte > lte`, which a clamp bug could produce) both rendered
+ * as a believable "1d" badge while the popover showed "later – earlier" with no hint anything was
+ * wrong. Now: zero-length reads `0m`, and an inverted span returns `undefined` so `spanShortLabel`
+ * falls back to printing the two literal bounds — which shows the reader the inversion itself
+ * ("Jan 8 → Jan 1") rather than a duration that was never real. Nothing here invents a sign.
+ *
+ * `0m` is reserved for an EXACTLY zero-length window (issue #9008 review, F3). Any non-empty span
+ * shorter than a minute reads `<1m` instead, and is never rounded into the minute bucket: rounding
+ * put "matched a single instant" and "20 seconds wide" behind one indistinguishable `0m`, and
+ * rounded a 40-second window UP to a `1m` it never covered — the same collapsing of distinct states
+ * the `1d` floor above was, at the other end of the scale. `<1m` is the only approximate label this
+ * function emits, and it says so.
+ */
+function formatDurationShort(durationMs: number): string | undefined {
+  if (durationMs < 0) {
+    return undefined;
+  }
+  if (durationMs === 0) {
+    return '0m';
+  }
+  if (durationMs < MS_PER_UNIT.m) {
+    return '<1m';
+  }
   const units: Array<[string, number]> = [
     ['y', MS_PER_UNIT.y],
     ['d', MS_PER_UNIT.d],
@@ -76,11 +103,18 @@ function formatDurationShort(durationMs: number): string {
     ['m', MS_PER_UNIT.m],
   ];
   for (const [unit, unitMs] of units) {
-    if (abs >= unitMs && abs % unitMs === 0) {
-      return `${Math.round(abs / unitMs)}${unit}`;
+    if (durationMs >= unitMs && durationMs % unitMs === 0) {
+      return `${Math.round(durationMs / unitMs)}${unit}`;
     }
   }
-  return `${Math.max(1, Math.round(abs / MS_PER_UNIT.d))}d`;
+  // Nothing divides evenly: round within the coarsest unit the span actually REACHES, never up to
+  // a whole day a sub-day span never covered (a 90-minute window used to read "1d").
+  const [unit, unitMs] = units.find(([, ms]) => durationMs >= ms) ?? [
+    'm',
+    MS_PER_UNIT.m,
+  ];
+  // Never rounds to 0: everything below a minute already returned `<1m` above.
+  return `${Math.round(durationMs / unitMs)}${unit}`;
 }
 
 /**
@@ -106,7 +140,12 @@ function spanShortLabel(
   const gteMs = resolveBoundMs(range.gte, executedAt);
   const lteMs = resolveBoundMs(range.lte, executedAt);
   if (gteMs !== undefined && lteMs !== undefined) {
-    return formatDurationShort(lteMs - gteMs);
+    const duration = formatDurationShort(lteMs - gteMs);
+    // `undefined` only for an INVERTED span, which has no honest duration — fall through to the
+    // literal bounds below, where the reader can see the inversion for themselves (finding 3).
+    if (duration !== undefined) {
+      return duration;
+    }
   }
   return `${range.gte} → ${range.lte}`;
 }
@@ -207,13 +246,19 @@ export function describeProvenance(provenance: Provenance): ProvenanceDisplay {
  * the chip itself (issue #9008 review, major 4: the dual-window text must be visible without
  * opening the popover). A call with no matching provenance renders its name alone; nothing about
  * its window is ever guessed.
+ *
+ * `display` is an already-computed `describeProvenance(provenance)` for the same call, accepted so
+ * a caller that needs both (message-bubble.tsx renders the chip AND the popover lines from it) can
+ * compute it once per render instead of twice (issue #9008 review, cleanup 4). Omitting it is
+ * equivalent, just not shared.
  */
 export function describeToolCall(
   toolCall: ToolCall,
   provenance: Provenance,
+  display: ProvenanceDisplay = describeProvenance(provenance),
 ): ToolCallLabel {
   const readable = humanizeToolName(toolCall.name);
-  const { index, windowBadgeLabel } = describeProvenance(provenance);
+  const { index, windowBadgeLabel } = display;
 
   // Issue #9008 review, major 3: truncate only the NAME segment, then append the window text
   // (which can carry a clamp numeral like "720d") un-truncated — truncating the composed string
