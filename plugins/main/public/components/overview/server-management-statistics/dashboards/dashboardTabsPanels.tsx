@@ -96,7 +96,7 @@ export const DashboardTabsPanels = ({
 
   const infoMessage: Record<string, string> = {
     remoted:
-      'Statistics are cumulative, this means that the information shown is since the data exists.',
+      'Statistics are cumulative, this means that the information shown is since the data exists. Comms metrics only refer to 4.x agents.',
     // TODO: analysisd tab is commented out until analysisd metrics have a new data stream
     // analysisd:
     //   "Analysisd statistics refer to the data stored from the period indicated in the variable 'analysisd.state_interval'.",

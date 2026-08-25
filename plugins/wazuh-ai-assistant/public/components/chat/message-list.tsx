@@ -1,5 +1,6 @@
 import React from 'react';
 import { EuiSpacer } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import {
   InterruptedTurnNotice,
   MessageBubble,
@@ -15,11 +16,23 @@ interface MessageListProps {
   /** Threaded down to every MessageBubble's ResultTable; see security-analytics-link.tsx. */
   resolveSecurityAnalyticsUrl: ResolveSecurityAnalyticsUrl;
   /**
-   * Re-asks the last question. Applies to the LAST turn only — retrying an older one would mean
-   * rewriting the middle of the conversation, which nothing here supports. `undefined` while a turn
-   * is generating.
+   * Re-asks the last question IN PLACE: the unfinished answer is dropped and replaced.
+   * `undefined` while a turn is generating.
    */
   onRetryLastTurn?: () => void;
+  /**
+   * Re-asks the question behind an OLDER failed/interrupted turn, by appending it to the end of the
+   * conversation as a new turn (`chat-page.tsx`'s `handleAskAgain`).
+   *
+   * Why an append and not an in-place retry: a failed turn stops being the last one the moment the
+   * reader asks anything else, and until now that silently took its retry action away with it — the
+   * one turn most likely to need retrying was the one that could no longer be retried, and the only
+   * route back was to retype the question. Rewriting the middle of a transcript is genuinely not
+   * something this component supports (every later turn's tool history was built on top of it), so
+   * the action asks the same question AGAIN, at the end, where the answer belongs. `undefined`
+   * while a turn is generating.
+   */
+  onRetryTurn?: (messageId: string) => void;
   /**
    * Real measured height (px) of the scrolling transcript pane — layout contract §4's "page size
    * steps 5 → 10 above 900px of transcript height". Threaded straight through to every
@@ -69,10 +82,17 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
   resolveDiscoverUrl,
   resolveSecurityAnalyticsUrl,
   onRetryLastTurn,
+  onRetryTurn,
   transcriptHeightPx,
   onTableRowsPerPageChange,
 }) {
   const lastMessage = messages[messages.length - 1];
+  /** Distinct from "Retry" on purpose: an older turn is re-asked at the END of the conversation
+   * (see `onRetryTurn`), and calling that "Retry" would promise an in-place replacement it does not
+   * perform. */
+  const askAgainLabel = i18n.translate('wazuhAiAssistant.chat.askAgain', {
+    defaultMessage: 'Ask again',
+  });
   return (
     // `.wzTranscriptContent` (chat-page.scss/chat-page.tsx): this component is now that wrapper's
     // sibling, not `.wzContentMeasure`'s descendant — each row below centres itself independently
@@ -96,8 +116,21 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
               message={message}
               resolveDiscoverUrl={resolveDiscoverUrl}
               resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
+              // The last turn keeps the in-place retry it always had. An OLDER unfinished turn
+              // (failed or interrupted) now keeps an action too — "Ask again", which appends the
+              // question instead of rewriting the middle of the transcript. A completed older turn
+              // gets nothing, exactly as before.
               onRetry={
-                index === messages.length - 1 ? onRetryLastTurn : undefined
+                index === messages.length - 1
+                  ? onRetryLastTurn
+                  : onRetryTurn &&
+                    message.role === 'assistant' &&
+                    (message.failureReason || message.interrupted)
+                  ? () => onRetryTurn(message.id)
+                  : undefined
+              }
+              retryLabel={
+                index === messages.length - 1 ? undefined : askAgainLabel
               }
               transcriptHeightPx={transcriptHeightPx}
               onTableRowsPerPageChange={onTableRowsPerPageChange}

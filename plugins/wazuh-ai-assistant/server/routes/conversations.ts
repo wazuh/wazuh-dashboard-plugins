@@ -9,6 +9,7 @@ import {
 } from '../../../../src/core/server';
 import {
   API_PATHS,
+  CONVERSATION_MAX_FAILURE_REASON_LENGTH,
   CONVERSATION_MAX_MESSAGES,
   CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH,
   CONVERSATION_MAX_TABLE_ROWS,
@@ -199,6 +200,14 @@ const MAX_TABLE_LABEL_LENGTH = 256;
 /** A displayed table has a handful of columns, never dozens. */
 const MAX_TABLE_COLUMNS = 50;
 
+/** Longest persisted turn-failure reason. Re-exported from `common/constants.ts` (like the three
+ * limits above) rather than defined here, because the CLIENT must clamp to the exact same number
+ * before it builds a payload — see that constant's own doc comment for the silent-save-failure bug
+ * a server-only bound would reintroduce. */
+const MAX_FAILURE_REASON_LENGTH = CONVERSATION_MAX_FAILURE_REASON_LENGTH;
+/** Longest persisted provider id / display name / model identifier. */
+const MAX_PROVIDER_FIELD_LENGTH = 256;
+
 /**
  * The result table a message was displayed with (`common/types.ts`'s `TableSpec`), persisted so a
  * resumed conversation still shows it. Row VALUES are `any` — they are whatever fields the query
@@ -311,6 +320,29 @@ export const chatMessageSchema = schema.object({
   createdAt: schema.maybe(schema.number({ min: 0 })),
   table: schema.maybe(tableSpecSchema),
   interrupted: schema.maybe(schema.boolean()),
+  /** Why a turn failed, and which provider produced a message (common/types.ts's
+   * `PersistedChatMessage.failureReason`/`providerId`). All optional, so a conversation saved
+   * before they existed is accepted unchanged. Bounded like every other persisted string here:
+   * the reason is a provider error message (a sentence, not a payload), and the three provider
+   * fields are ids/names/model identifiers. */
+  failureReason: schema.maybe(
+    schema.string({ maxLength: MAX_FAILURE_REASON_LENGTH }),
+  ),
+  providerId: schema.maybe(
+    schema.string({ maxLength: MAX_PROVIDER_FIELD_LENGTH }),
+  ),
+  providerName: schema.maybe(
+    schema.string({ maxLength: MAX_PROVIDER_FIELD_LENGTH }),
+  ),
+  providerModel: schema.maybe(
+    schema.string({ maxLength: MAX_PROVIDER_FIELD_LENGTH }),
+  ),
+  // Wire-proof fix (common/types.ts's `ChatMessage.privacyEnabled` doc comment): persisted on a
+  // role:'tool' digest message and on a role:'assistant' prose message so a LATER resume/reload can
+  // still fail-closed-exclude a privacy-off turn's history — common/chat-history.ts's
+  // `excludePrivacyOffHistory`/`reconstructConversation`. Optional, so a conversation saved before
+  // this field existed is still accepted (and reads back as "unknown", which fails closed).
+  privacyEnabled: schema.maybe(schema.boolean()),
 });
 
 /** `minLength: 1` alone lets a whitespace-only string like `'   '` through (it has length 3), so

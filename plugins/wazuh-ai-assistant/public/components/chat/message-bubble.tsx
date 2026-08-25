@@ -12,6 +12,7 @@ import {
   EuiCallOut,
   EuiCodeBlock,
   EuiLoadingContent,
+  EuiLoadingSpinner,
   EuiMarkdownFormat,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
@@ -27,9 +28,13 @@ import { describeProvenance, describeToolCall } from './tool-call-label';
  * reload or a navigation mid-answer kills the page before anything can mark the assistant message,
  * so the only evidence left is a conversation that ends with an unanswered question.
  */
-export const InterruptedTurnNotice: React.FC<{ onRetry?: () => void }> = ({
-  onRetry,
-}) => (
+export const InterruptedTurnNotice: React.FC<{
+  onRetry?: () => void;
+  /** Overrides the default "Retry" action label. An older turn cannot be retried IN PLACE without
+   * rewriting the middle of the conversation, so `message-list.tsx` labels it "Ask again" there —
+   * see `MessageListProps.onRetryTurn`. */
+  retryLabel?: string;
+}> = ({ onRetry, retryLabel }) => (
   <EuiFlexGroup
     gutterSize='s'
     alignItems='center'
@@ -52,15 +57,105 @@ export const InterruptedTurnNotice: React.FC<{ onRetry?: () => void }> = ({
           flush='both'
           iconType='refresh'
           onClick={onRetry}
+          data-test-subj='wzTurnRetry'
         >
-          {i18n.translate('wazuhAiAssistant.chat.retry', {
-            defaultMessage: 'Retry',
-          })}
+          {retryLabel ??
+            i18n.translate('wazuhAiAssistant.chat.retry', {
+              defaultMessage: 'Retry',
+            })}
         </EuiButtonEmpty>
       </EuiFlexItem>
     )}
   </EuiFlexGroup>
 );
+
+/**
+ * "This turn failed" — the permanent, per-turn record of a failure.
+ *
+ * The failure used to be reported ONLY by the dismissible callout band above the transcript, which
+ * `handleSend` clears on the next question (chat-page.tsx). So a reader who asked again — the
+ * single most likely next action — was left with a transcript in which their failed question simply
+ * has no answer and nothing anywhere says why, and a reload lost even the banner. This notice is
+ * anchored to the turn instead, persists with it (`UiChatMessage.failureReason`), and keeps its own
+ * retry action reachable however many questions follow it.
+ *
+ * Collapsed by default: a provider error can be a paragraph of upstream JSON, and a transcript is
+ * not a log viewer. The one-line summary is always visible; the reason itself is one click away and
+ * wired with `aria-expanded`/`aria-controls`, like the query chips in the meta row.
+ */
+export const FailedTurnNotice: React.FC<{
+  reason: string;
+  detailsId: string;
+  onRetry?: () => void;
+  retryLabel?: string;
+}> = ({ reason, detailsId, onRetry, retryLabel }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div data-test-subj='wzFailedTurnNotice'>
+      <EuiFlexGroup
+        gutterSize='s'
+        alignItems='center'
+        responsive={false}
+        justifyContent='flexStart'
+        wrap
+      >
+        <EuiFlexItem grow={false}>
+          <EuiText size='xs'>
+            <EuiTextColor color='subdued'>
+              {i18n.translate('wazuhAiAssistant.chat.turnFailed', {
+                defaultMessage: 'This turn failed',
+              })}
+            </EuiTextColor>
+          </EuiText>
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiButtonEmpty
+            size='xs'
+            flush='both'
+            iconType={isOpen ? 'arrowUp' : 'arrowDown'}
+            onClick={() => setIsOpen(current => !current)}
+            aria-expanded={isOpen}
+            aria-controls={detailsId}
+            data-test-subj='wzFailedTurnDetailsToggle'
+          >
+            {isOpen
+              ? i18n.translate('wazuhAiAssistant.chat.turnFailedHideReason', {
+                  defaultMessage: 'Hide reason',
+                })
+              : i18n.translate('wazuhAiAssistant.chat.turnFailedShowReason', {
+                  defaultMessage: 'Show reason',
+                })}
+          </EuiButtonEmpty>
+        </EuiFlexItem>
+        {onRetry && (
+          <EuiFlexItem grow={false}>
+            <EuiButtonEmpty
+              size='xs'
+              flush='both'
+              iconType='refresh'
+              onClick={onRetry}
+              data-test-subj='wzTurnRetry'
+            >
+              {retryLabel ??
+                i18n.translate('wazuhAiAssistant.chat.retry', {
+                  defaultMessage: 'Retry',
+                })}
+            </EuiButtonEmpty>
+          </EuiFlexItem>
+        )}
+      </EuiFlexGroup>
+      {isOpen && (
+        <div id={detailsId}>
+          <EuiText size='xs' color='subdued'>
+            <p style={{ margin: '4px 0 0', whiteSpace: 'pre-wrap' }}>
+              {reason}
+            </p>
+          </EuiText>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export interface UiChatMessage {
   id: string;
@@ -100,6 +195,23 @@ export interface UiChatMessage {
    * one instead of presenting it as finished.
    */
   interrupted?: boolean;
+  /**
+   * This turn FAILED, with this reason. Rendered as a compact, permanent marker on the turn itself
+   * (`FailedTurnNotice` below) instead of only as a dismissible banner over the transcript that the
+   * next question cleared — see `common/types.ts`'s `PersistedChatMessage.failureReason`.
+   */
+  failureReason?: string;
+  /** Which provider produced this answer, stamped at turn start and shown in the meta row — see
+   * `common/types.ts`'s `PersistedChatMessage.providerId`. */
+  providerId?: string;
+  providerName?: string;
+  providerModel?: string;
+  /** Wire-proof fix: whether privacy was ON for the turn that produced this message — display-only
+   * here (never shown in the UI), just carried on the object so `buildOutgoingMessages`
+   * (common/chat-history.ts) can fail-closed-exclude a privacy-off turn's prose from later history
+   * replay. See `common/types.ts`'s `ChatMessage.privacyEnabled` doc comment for the full
+   * mechanism. Only ever set on `role: 'assistant'`. */
+  privacyEnabled?: boolean;
 }
 
 interface MessageBubbleProps {
@@ -115,6 +227,8 @@ interface MessageBubbleProps {
    * case the interrupted notice is shown without an action.
    */
   onRetry?: () => void;
+  /** Label for the `onRetry` action — see `InterruptedTurnNotice.retryLabel`. */
+  retryLabel?: string;
   /** Passed straight through to this message's ResultTable — see that component's own doc
    * comment on the same-named prop for how it steps the table's initial page size. Threaded here
    * from MessageList, which gets it from chat-page.tsx's real `ResizeObserver` measurement; it
@@ -206,6 +320,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   resolveDiscoverUrl,
   resolveSecurityAnalyticsUrl,
   onRetry,
+  retryLabel,
   transcriptHeightPx,
   onTableRowsPerPageChange,
 }) => {
@@ -412,9 +527,24 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
             : {})}
         >
           <EuiText size='s'>
-            {/* Shown only before real content has arrived; a delta event clears statusMessage. */}
+            {/* Shown only before real content has arrived; a delta event clears statusMessage.
+                  The spinner is what makes this a LIVE indicator rather than a line of text that
+                  could equally well be a stalled turn: the label changes at most three times over a
+                  turn that can run for tens of seconds, so on its own it read as frozen. It sits
+                  inside the same `aria-live` region as the label (the wrapping div above), and is
+                  itself decorative — the announced text is the step label. */}
             {message.statusMessage && !message.content && (
-              <p style={{ margin: 0, fontStyle: 'italic' }}>
+              <p
+                style={{
+                  margin: 0,
+                  fontStyle: 'italic',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+                data-test-subj='wzTurnStatusLine'
+              >
+                <EuiLoadingSpinner size='s' aria-hidden='true' />
                 <EuiTextColor color='subdued'>
                   {message.statusMessage}
                 </EuiTextColor>
@@ -581,11 +711,32 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
         justifyContent={isUser ? 'flexEnd' : 'flexStart'}
         wrap
       >
-        {!isUser && message.interrupted && !message.isStreaming && (
+        {/* A turn is either failed or interrupted, never both: `failureReason` is set by the
+              `error` stream event, `interrupted` by a stream that stopped without one
+              (chat-page.tsx). Failure is checked first so a turn that errored mid-stream — and so
+              also never reached `done` — reports the reason it has rather than the generic
+              "interrupted". */}
+        {!isUser && message.failureReason && !message.isStreaming && (
           <EuiFlexItem grow={false}>
-            <InterruptedTurnNotice onRetry={onRetry} />
+            <FailedTurnNotice
+              reason={message.failureReason}
+              detailsId={`wzFailedTurnReason-${message.id}`}
+              onRetry={onRetry}
+              retryLabel={retryLabel}
+            />
           </EuiFlexItem>
         )}
+        {!isUser &&
+          !message.failureReason &&
+          message.interrupted &&
+          !message.isStreaming && (
+            <EuiFlexItem grow={false}>
+              <InterruptedTurnNotice
+                onRetry={onRetry}
+                retryLabel={retryLabel}
+              />
+            </EuiFlexItem>
+          )}
         <EuiFlexItem grow={false}>
           <EuiText
             size='xs'
@@ -606,6 +757,39 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
             </p>
           </EuiText>
         </EuiFlexItem>
+        {/* Provider provenance: WHICH model wrote this answer. A conversation can legitimately span
+              several providers (the picker is right there in the composer, and a retried turn may
+              well be retried against a different one), and without this the transcript presents
+              every answer as though one anonymous "AI" produced all of them — so a reader comparing
+              two answers, or reporting a bad one, has no way to say what produced either. Plain
+              subdued text at the timestamp's own size, deliberately not a badge: it is a fact about
+              the turn, not an action. Rendered only when the stamp exists, so every turn saved
+              before this field did stays exactly as it was. */}
+        {!isUser && message.providerName && (
+          <EuiFlexItem grow={false}>
+            <EuiText
+              size='xs'
+              color='subdued'
+              className='wzMsgProviderProvenance'
+              data-test-subj='wzMsgProviderProvenance'
+            >
+              <p style={{ margin: '4px 0 0' }}>
+                {message.providerModel
+                  ? i18n.translate(
+                      'wazuhAiAssistant.chat.providerProvenanceWithModel',
+                      {
+                        defaultMessage: '{provider} · {model}',
+                        values: {
+                          provider: message.providerName,
+                          model: message.providerModel,
+                        },
+                      },
+                    )
+                  : message.providerName}
+              </p>
+            </EuiText>
+          </EuiFlexItem>
+        )}
         {!isUser &&
           metaRowToolCalls.map(toolCall => {
             // `toolCallDisplays` reads `message.table`, deliberately NOT `renderedTable`: this is

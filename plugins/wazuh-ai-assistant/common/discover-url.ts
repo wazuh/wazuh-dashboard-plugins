@@ -37,7 +37,6 @@ export const DEFAULT_TIME_RANGE: TimeRange = { from: 'now-24h', to: 'now' };
  * does mean "up to now" — that direction is unchanged), and server/tools/suggest-discover-query.ts,
  * which materializes a range-less suggestion into a runnable clause and reads it for its own
  * disclosure text.
-
  */
 export const UNBOUNDED_TIME_RANGE: TimeRange = {
   from: '1970-01-01T00:00:00.000Z',
