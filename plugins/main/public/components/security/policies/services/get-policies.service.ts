@@ -31,11 +31,13 @@ interface GetPoliciesResult {
 const GetPoliciesService = async (
   offset = 0,
   limit = 10,
+  sort = '+id',
 ): Promise<GetPoliciesResult> => {
   const response = (await WzRequest.apiReq('GET', '/security/policies', {
     params: {
       offset,
       limit,
+      ...(sort ? { sort } : {}),
     },
   })) as IApiResponse<Policy>;
   const data = ((response.data || {}).data || {}).affected_items || [];

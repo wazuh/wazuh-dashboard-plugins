@@ -64,7 +64,11 @@ export const RolesMapping = withUserAuthorizationPrompt([
     getData,
     refreshCurrentPage,
     onTableChange: handleTableChange,
-  } = usePagination(RulesServices.GetRules, handlePaginationError);
+    sorting,
+  } = usePagination(RulesServices.GetRules, handlePaginationError, {
+    field: 'id',
+    direction: 'asc',
+  });
 
   useEffect(() => {
     initData();
@@ -203,6 +207,7 @@ export const RolesMapping = withUserAuthorizationPrompt([
           pageSize={pageSize}
           totalItems={totalItems}
           onTableChange={handleTableChange}
+          sorting={sorting}
         ></RolesMappingTable>
       </EuiPageContentBody>
     </EuiPageContent>

@@ -10,6 +10,7 @@ import { RolesTable } from './roles-table';
 import { WzRequest } from '../../../react-services/wz-request';
 import { CreateRole } from './create-role';
 import { EditRole } from './edit-role';
+import { usePagination } from '../../common/hooks/usePagination';
 import { withUserAuthorizationPrompt } from '../../common/hocs';
 import { WzButtonPermissions } from '../../common/permissions/button';
 import { closeFlyout } from '../../common/flyouts/close-flyout-security';
@@ -21,61 +22,55 @@ export const Roles = withUserAuthorizationPrompt([
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
   const [isEditFlyoutVisible, setIsEditFlyoutVisible] = useState(false);
   const [editingRole, setEditingRole] = useState(false);
-  const [roles, setRoles] = useState([]);
   const [policiesData, setPoliciesData] = useState([]);
-  const [loadingTable, setLoadingTable] = useState(false);
-  const [pageIndex, setPageIndex] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
-  const [totalItems, setTotalItems] = useState(0);
 
-  async function getData(pageIndex = 0, pageSize = 10) {
-    setLoadingTable(true);
-    try {
-      const offset = pageIndex * pageSize;
-      const rolesRequest = await WzRequest.apiReq('GET', '/security/roles', {
-        params: {
-          offset,
-          limit: pageSize,
-        },
-      });
-      const roles = rolesRequest?.data?.data?.affected_items || [];
-      const total = rolesRequest?.data?.data?.total_affected_items || 0;
-      setRoles(roles);
-      setTotalItems(total);
-      setPageIndex(pageIndex);
-      setPageSize(pageSize);
+  const fetchRoles = useCallback(async (offset, limit, sort) => {
+    const rolesRequest = await WzRequest.apiReq('GET', '/security/roles', {
+      params: {
+        offset,
+        limit,
+        ...(sort ? { sort } : {}),
+      },
+    });
+    const roles = rolesRequest?.data?.data?.affected_items || [];
+    const total = rolesRequest?.data?.data?.total_affected_items || 0;
 
-      // Only fetch policies that are actually used by the roles in this page
-      const policyIds = [
-        ...new Set(roles.flatMap(role => role.policies || [])),
-      ];
-      if (policyIds.length > 0) {
-        const policiesRequest = await WzRequest.apiReq(
-          'GET',
-          '/security/policies',
-          {
-            params: {
-              policy_ids: policyIds.join(','),
-            },
+    // Only fetch policies that are actually used by the roles in this page
+    const policyIds = [...new Set(roles.flatMap(role => role.policies || []))];
+    if (policyIds.length > 0) {
+      const policiesRequest = await WzRequest.apiReq(
+        'GET',
+        '/security/policies',
+        {
+          params: {
+            policy_ids: policyIds.join(','),
           },
-        );
-        const policiesData = policiesRequest?.data?.data?.affected_items || [];
-        setPoliciesData(policiesData);
-      } else {
-        setPoliciesData([]);
-      }
-    } finally {
-      setLoadingTable(false);
+        },
+      );
+      setPoliciesData(policiesRequest?.data?.data?.affected_items || []);
+    } else {
+      setPoliciesData([]);
     }
-  }
+
+    return { data: roles, total };
+  }, []);
+
+  const {
+    items: roles,
+    loading: loadingTable,
+    pageIndex,
+    pageSize,
+    totalItems,
+    getData,
+    refreshCurrentPage,
+    onTableChange: handleTableChange,
+    sorting,
+  } = usePagination(fetchRoles, undefined, { field: 'id', direction: 'asc' });
 
   useEffect(() => {
     getData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const refreshCurrentPage = useCallback(() => {
-    return getData(pageIndex, pageSize);
-  }, [pageIndex, pageSize]);
 
   const closeEditingFlyout = useCallback(
     needRefresh => {
@@ -105,14 +100,6 @@ export const Roles = withUserAuthorizationPrompt([
   const editRole = item => {
     setEditingRole(item);
     setIsEditFlyoutVisible(true);
-  };
-
-  const handleTableChange = ({ page }) => {
-    if (page) {
-      // If pageSize changed, reset to first page
-      const newPageIndex = page.size !== pageSize ? 0 : page.index;
-      getData(newPageIndex, page.size);
-    }
   };
 
   let editFlyout;
@@ -161,6 +148,7 @@ export const Roles = withUserAuthorizationPrompt([
           pageSize={pageSize}
           totalItems={totalItems}
           onTableChange={handleTableChange}
+          sorting={sorting}
         ></RolesTable>
       </EuiPageContentBody>
     </EuiPageContent>
