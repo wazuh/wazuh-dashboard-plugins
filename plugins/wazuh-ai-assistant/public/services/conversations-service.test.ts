@@ -155,16 +155,17 @@ describe('ConversationsService', () => {
   });
 
   describe('update', () => {
-    it('omits expectedVersion from the body entirely when not passed', async () => {
+    it('never sends a title (issue #9010: a resent title on every auto-save used to revert renames)', async () => {
       const http = makeHttp();
       http.put.mockResolvedValue({});
       const service = new ConversationsService(http as unknown as HttpSetup);
 
-      await service.update('c1', 'Title', messages);
+      await service.update('c1', messages);
 
       const [, options] = http.put.mock.calls[0];
       const body = JSON.parse(options.body);
-      expect(body).toEqual({ title: 'Title', messages });
+      expect(body).toEqual({ messages });
+      expect(body).not.toHaveProperty('title');
       expect(body).not.toHaveProperty('expectedVersion');
     });
 
@@ -173,13 +174,12 @@ describe('ConversationsService', () => {
       http.put.mockResolvedValue({});
       const service = new ConversationsService(http as unknown as HttpSetup);
 
-      await service.update('c1', 'Title', messages, 'WzEsMV0=');
+      await service.update('c1', messages, 'WzEsMV0=');
 
       const [url, options] = http.put.mock.calls[0];
       expect(url).toBe('/api/wazuh_ai_assistant/conversations/c1');
       const body = JSON.parse(options.body);
       expect(body).toEqual({
-        title: 'Title',
         messages,
         expectedVersion: 'WzEsMV0=',
       });
@@ -192,8 +192,33 @@ describe('ConversationsService', () => {
       const service = new ConversationsService(http as unknown as HttpSetup);
 
       await expect(
-        service.update('c1', 'Title', messages, 'stale-version'),
+        service.update('c1', messages, 'stale-version'),
       ).rejects.toBe(conflict);
+    });
+  });
+
+  describe('rename', () => {
+    it('PATCHes only the title, and returns the response body (summary + version)', async () => {
+      const http = makeHttp();
+      const renamed = {
+        id: 'c1',
+        title: 'New title',
+        updatedAt: '2024-01-01',
+        version: '4:1',
+      };
+      const patch = jest.fn().mockResolvedValue(renamed);
+      const service = new ConversationsService({
+        ...http,
+        patch,
+      } as unknown as HttpSetup);
+
+      const result = await service.rename('c1', 'New title');
+
+      expect(result).toBe(renamed);
+      expect(patch).toHaveBeenCalledWith(
+        '/api/wazuh_ai_assistant/conversations/c1',
+        { body: JSON.stringify({ title: 'New title' }) },
+      );
     });
   });
 

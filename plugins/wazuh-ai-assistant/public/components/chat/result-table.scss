@@ -31,10 +31,10 @@
 
   /**
    * "Card grows" (iteration-4 item 3): applied only once the reader explicitly picks a page size
-   * above the 5-row default (result-table.tsx's `userPickedPageSize` flag) — a 5-row result never
-   * needed more than the default cap, so the card only grows on a choice that actually produced
-   * more rows to show. Same fallback-then-`dvh` pair as the default cap above, for the same
-   * reason.
+   * above the current default (result-table.tsx's `userPickedPageSize` flag) — a result that
+   * already fits the default page size never needed more than the default cap, so the card only
+   * grows on a choice that actually produced more rows to show. Same fallback-then-`dvh` pair as
+   * the default cap above, for the same reason.
    *
    * This `max-height` (like the default cap above) is only the PRE-MEASURE fallback: whenever
    * `transcriptHeightPx` has actually been measured, `result-table.tsx` sets an inline
@@ -45,6 +45,29 @@
   &.wzResultsCard--expanded {
     max-height: 80vh;
     max-height: $wzResultsMaxHeightExpanded;
+  }
+
+  /**
+   * Issue #9009 (J1): narrow-mode cell truncation. At ~480px (the QA E2E review's reproduction
+   * width) an untruncated cell wraps onto several lines and makes the whole table unreadable; this
+   * clips it to one line with an ellipsis instead, with the full value one `EuiToolTip` away — the
+   * same truncate-plus-tooltip idiom the providers table already uses (settings-page.scss).
+   * `anchorClassName` (passed on the `EuiToolTip` in result-table.tsx) bounds the tooltip's own
+   * wrapper span the same way, so THAT span doesn't grow wider than the cell either. Nested here
+   * (rather than a bare top-level class) because both classes only ever apply to cells inside this
+   * card.
+   */
+  .wzResultsCellTruncate {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+
+  .wzResultsCellTruncateAnchor {
+    display: block;
+    max-width: 100%;
   }
 }
 
