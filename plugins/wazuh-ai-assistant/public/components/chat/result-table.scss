@@ -118,6 +118,28 @@
  * line the way `flex-wrap: wrap` above intends. */
 .wzResultsCardActions {
   flex-shrink: 0;
+
+  /**
+   * The "Open in Discover" label can run to ~60 characters once it carries a partial-range
+   * disclosure ("Open in Discover (up to Jan 1, 2020 — no start date)", issue #9008 review), and
+   * in a narrow sidecar container that is wider than the card. EUI puts a button's text in its own
+   * `.euiButtonEmpty__text` span, which has to be told to ellipse itself — a `min-width: 0` on the
+   * flex item alone (result-table.tsx) only permits the shrink, it does not decide what the text
+   * does with it. `min-width: 0` again on the button because it is itself a flex container.
+   *
+   * The label is never the only way to read the window: the popover beside it states the range in
+   * full, and the link keeps its own `title`.
+   */
+  .euiButtonEmpty {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .euiButtonEmpty__text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 /**

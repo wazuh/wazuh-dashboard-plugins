@@ -122,6 +122,30 @@ export interface ChatMessage {
    * never sends message-level extras.
    */
   vendorExtras?: Record<string, unknown>;
+  /**
+   * Wire-proof fix (build 7d822b465's residual, AI/qa/wire-proof-v35/capture.jsonl): replay-history
+   * bookkeeping ONLY, never forwarded to the provider — every adapter's `to*Message` (e.g.
+   * openai-compatible.ts's `toOpenAiMessage`) builds a fresh wire object field-by-field from a known
+   * allowlist, so an extra field here is simply never one of the fields any adapter reads.
+   *
+   * True when the digest/prose this message carries was captured while privacy mode was ON for the
+   * turn that produced it; `false` or ABSENT means it was captured with privacy OFF (a conversation
+   * persisted by a build that predates this field also reads as absent, indistinguishable from
+   * "off"). Set on a `role:'tool'` history message (the digest) and on a `role:'assistant'` PROSE
+   * message (the model's own narration for that turn) — never meaningful on `role:'user'` (the
+   * user's own question is a separate, already-documented residual, not dropped by this mechanism)
+   * or `role:'system'`.
+   *
+   * Consulted by `common/chat-history.ts`'s `excludePrivacyOffHistory`, which BOTH
+   * `buildOutgoingMessages` (client, courtesy/bandwidth) and `server/routes/chat.ts` (server, the
+   * actual authority) call before any privacy-ON turn's history reaches the provider: only
+   * `=== true` is trusted, so a missing/unknown flag fails CLOSED (excluded), never open. This
+   * closes the specific wire-proven leak where a bare (non-dotted) real value with no shape a regex
+   * can single out — most commonly `wazuh.agent.name` — survived the shape-scan-only replay path
+   * because the field policy that would normally anonymize it only ever runs when a digest is
+   * CREATED, not when a client-supplied one is replayed.
+   */
+  privacyEnabled?: boolean;
 }
 
 /** One client-held pseudonym mapping entry: a real value and
@@ -206,9 +230,15 @@ export interface TableSpec {
    *  - `index`: the concrete index queried (same value as `discover.index` above).
    *  - `requestedRange`/`effectiveRange`: the `{gte, lte}` pair read directly off the query DSL,
    *    before and after the 90-day lookback guardrail (`guardrails.ts`'s `clampLookbackWindow`)
-   *    ran — via `common/discover-url.ts`'s `rangeBoundsFromDsl`, the same reader the "Open in
-   *    Discover" link uses. `undefined` when that DSL carried no recognizable range clause at
-   *    all (most catalog tools have no time-range concept and never will), NOT a default.
+   *    ran — via `common/discover-url.ts`'s `rangeBoundsFromDsl`, which is where "what window did
+   *    this DSL state" is decided for the whole plugin (the "Open in Discover" link resolves its
+   *    own openable window through `extractTimeRange`, a different entry point over the same one
+   *    clause walk — see that module). `undefined` when the DSL carried no recognizable range
+   *    clause at all, or only one-sided ones (most catalog tools have no time-range concept and
+   *    never will), NOT a default. Where a DSL carries SEVERAL required range clauses these are
+   *    their intersection, which is what the returned rows actually satisfied.
+   *    The CLIENT never re-reads the DSL for any of this: tool-call-label.ts's
+   *    `describeProvenance` renders these recorded fields and nothing else.
    *  - `clamped`: true only when `clampLookbackWindow` actually narrowed the query.
    *  - `toolCallId`: attached by server/routes/chat.ts (which is where the streaming tool call's
    *    id is in scope), not by the executor — it is what lets the client attribute this table to
@@ -219,7 +249,9 @@ export interface TableSpec {
    *    restored conversation a window the query never ran against. `describeProvenance`
    *    (tool-call-label.ts) resolves date-math bounds against this stored instant, never against
    *    `Date.now()`. `undefined` only for a conversation persisted before this field existed --
-   *    the client shows the literal bound strings rather than an absolute instant in that case.
+   *    a date-math bound then stays unresolved, so the popover's "Time range:" line is simply
+   *    OMITTED (never a fabricated absolute instant); the clamp badge still renders from the
+   *    literal date-math bounds, since that path needs no absolute instant at all.
    */
   provenance?: {
     toolCallId?: string;
@@ -230,6 +262,15 @@ export interface TableSpec {
     executedAt?: number;
   };
 }
+
+/**
+ * The three user-facing phases one turn moves through, in order. Deliberately a tiny, closed set
+ * rather than one label per internal round: the reader needs to know WHAT the assistant is doing,
+ * not how many provider round-trips the orchestrator budgeted. `understanding` covers the stage-1
+ * routing call, `querying` each tool execution, `writing` the answer round that follows tool
+ * results.
+ */
+export type TurnStatusStep = 'understanding' | 'querying' | 'writing';
 
 export interface StreamUsage {
   inputTokens?: number;
@@ -261,7 +302,26 @@ export type StreamEvent =
   /**
    * Transient progress line (e.g. "querying Wazuh") shown between deltas while the engine works.
    */
-  | { type: 'status'; message: string }
+  | {
+      type: 'status';
+      message: string;
+      /**
+       * Which user-facing STEP of the turn this status belongs to. The `message` above stays the
+       * authoritative, always-present payload (server-authored English, unchanged for every
+       * existing producer and for the eval harness that reads it); `step` is the optional,
+       * translatable classification the browser prefers when it recognizes it — see
+       * `public/components/chat/turn-status.ts`'s `describeTurnStatus`. A producer that emits no
+       * `step` (retry.ts's rate-limit/invalid-tool-call notices) still renders exactly as before.
+       */
+      step?: TurnStatusStep;
+      /**
+       * Free-form subject of a `querying` step — the tool name whose call is executing. Rendered
+       * inside the translated step label ("Querying get_agent_inventory…"); when absent the label
+       * degrades to the generic "Querying your data…". Never a pseudonym-bearing value: a tool
+       * NAME is catalog vocabulary, not customer data.
+       */
+      detail?: string;
+    }
   /**
    * Privacy mode: every NEW pseudonym-map entry minted server-side this turn (not the ones
    * already seeded from the request's `privacy.map`), streamed once per turn before `done` so the
@@ -363,6 +423,32 @@ export interface PersistedChatMessage extends ChatMessage {
   /** The answer was cut short (Stop, navigation, a dropped connection) rather than completed, so a
    * resumed conversation can label it instead of presenting a partial answer as a finished one. */
   interrupted?: boolean;
+  /**
+   * Why this turn FAILED, as the provider/orchestrator reported it (an `error` stream event's
+   * message). Distinct from `interrupted`, which means "stopped, on purpose or by circumstance":
+   * a failed turn never had a chance to finish at all.
+   *
+   * Persisted because the failure used to live only in a dismissible banner above the transcript
+   * that the next `handleSend` cleared — so a conversation containing a failed turn read, both
+   * immediately afterwards and forever after a reload, as though the question had simply never
+   * been asked. Set on `role:'assistant'` only.
+   */
+  failureReason?: string;
+  /**
+   * Which provider actually produced this message, stamped at turn start. All three are display
+   * provenance, never re-sent to any provider (`buildOutgoingMessages` builds wire messages
+   * field-by-field and reads none of them).
+   *
+   * `providerId` doubles as the per-conversation provider memory: resuming a conversation restores
+   * the provider of its most recent assistant message that still exists (chat-page.tsx's
+   * `applyLoadedConversation`), instead of silently answering the next follow-up with the default
+   * provider — a different model, on the same thread, with no visible sign of the switch.
+   * `providerName`/`providerModel` are copied rather than looked up, so a turn produced by a
+   * provider that has since been renamed or deleted still reports what really answered it.
+   */
+  providerId?: string;
+  providerName?: string;
+  providerModel?: string;
 }
 
 export interface ConversationRecord extends ConversationSummary {

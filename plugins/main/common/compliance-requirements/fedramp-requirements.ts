@@ -19,6 +19,10 @@ export const fedrampRequirementsFile = {
     'Access Enforcement: Enforce approved authorizations for logical access to information and system resources.',
   'AC-4':
     'Information Flow Enforcement: Control the flow of information within the system and between connected systems based on security policies.',
+  'AC-6':
+    'Least Privilege: Employ the principle of least privilege, allowing only authorized accesses necessary to accomplish assigned tasks.',
+  'AC-7':
+    'Unsuccessful Logon Attempts: Enforce a limit of consecutive invalid logon attempts and automatically lock the account or delay the next logon prompt when the limit is exceeded.',
   'AC-12':
     'Session Termination: Automatically terminate user sessions after a defined period of inactivity.',
   'AC-17':
@@ -27,34 +31,86 @@ export const fedrampRequirementsFile = {
     'Wireless Access: Establish usage restrictions, configuration/connection requirements, and implementation guidance for wireless access.',
   'AC-19':
     'Access Control for Mobile Devices: Establish usage restrictions and implementation guidance for mobile devices.',
+  'AT-2':
+    'Security Awareness: Provide basic security awareness training to all users before system access and annually thereafter.',
+  'AT-3':
+    'Role-based Security Training: Provide specialized security training to personnel with specific roles (admins/developers).',
   'AU-1':
     'Policy and Procedures: Develop and maintain a formal audit and accountability policy and implementation procedures.',
   'AU-2':
     'Event Logging: Identify the list of events to be logged and ensure the system is capable of auditing those events.',
   'AU-6':
     'Audit Record Review: Review and analyze system audit records for indications of inappropriate or unusual activity.',
+  'AU-9':
+    'Protection of Audit Information: Protect audit information and audit tools from unauthorized access, modification, and deletion.',
   'AU-11':
     'Audit Record Retention: Retain audit records for at least one year to provide support for after-the-fact investigations.',
+  'AU-14':
+    'Session Audit: Provide the capability for authorized users to select a user session to capture, record, or view.',
+  'CA-2':
+    'Control Assessments: Conduct periodic assessments of security controls to determine effectiveness.',
+  'CA-7':
+    'Continuous Monitoring: Implement a strategy to monitor control effectiveness and report findings monthly.',
   'CM-2':
     'Baseline Configuration: Maintain a documented, current baseline configuration of the system.',
   'CM-3':
     'Configuration Change Control: Review and approve proposed changes to the system before implementation.',
   'CM-6':
     'Configuration Settings: Establish and enforce security configuration settings (e.g., CIS Benchmarks) for IT products.',
+  'CM-7':
+    'Least Functionality: Configure the system to provide only essential capabilities and prohibit or restrict the use of unnecessary functions, ports, protocols, and services.',
   'CM-8':
     'System Component Inventory: Maintain an inventory of all system components with enough detail for tracking and control.',
+  'CP-9':
+    'System Backup: Conduct regular backups of user-level and system-level information and protect their integrity.',
+  'CP-10':
+    'System Recovery and Reconstitution: Restore the system to a known-good state after a failure or compromise.',
   'IA-2':
     'Identification and Authentication: Implement Multi-Factor Authentication (MFA) for all network and local access.',
+  'IA-4':
+    'Identifier Management: Manage system identifiers by receiving authorization, selecting, assigning, and preventing reuse of identifiers.',
   'IA-5':
     'Authenticator Management: Manage system authenticators (passwords, tokens, PKI) according to federal complexity standards.',
   'IA-7':
     'Cryptographic Module Authentication: Authenticate to cryptographic modules based on FIPS-validated standards.',
+  'IR-4':
+    'Incident Handling: Implement incident detection, analysis, and containment capabilities.',
+  'IR-5':
+    'Incident Monitoring: Track and document information security incidents.',
+  'IR-6':
+    'Incident Reporting: Report security incidents to the FedRAMP PMO and CISA within required timeframes.',
+  'IR-7':
+    'Incident Response Testing: Test the incident response capability for the system annually.',
+  'IR-8':
+    'Incident Response Plan: Develop and distribute an incident response plan that provides a roadmap for implementing the incident response capability.',
+  'MA-4':
+    'Remote Maintenance: Approve, monitor, and control any remote maintenance activities.',
+  'MP-6':
+    'Media Sanitization: Sanitize or destroy digital/physical media prior to disposal using NIST 800-88 standards.',
+  'PE-3':
+    'Physical Access Control: Maintain logs and physical barriers for the facility housing the information system.',
+  'PL-2':
+    'System Security Plan: Develop and maintain a comprehensive SSP describing all security controls.',
+  'PM-5':
+    'System Inventory: Maintain a high-level organization-wide inventory of all information systems.',
+  'PS-3':
+    'Personnel Termination: Disable all system access within 24 hours of an employee’s termination or transfer.',
+  'PT-3':
+    'PII Processing: Document exactly what PII is processed and ensure it is limited to the minimum necessary.',
+  'RA-3':
+    'Risk Assessment: Conduct and document a risk assessment, including the likelihood and magnitude of harm from unauthorized access, use, disclosure, disruption, modification, or destruction of the system.',
+  'RA-5':
+    'Vulnerability Monitoring: Perform monthly authenticated vulnerability scans on systems, applications, and databases.',
+  'SA-11':
+    'Developer Testing: Perform SAST, DAST, and vulnerability testing on all custom code before production.',
   'SC-5':
     'Denial of Service Protection: Protect against or limit the effects of denial-of-service attacks.',
   'SC-7':
     'Boundary Protection: Monitor and control communications at the external and internal boundaries of the system.',
   'SC-8':
     'Transmission Confidentiality and Integrity: Protect data in transit using FIPS-validated encryption (TLS 1.2+).',
+  'SC-12':
+    'Cryptographic Key Establishment and Management: Establish and manage cryptographic keys in accordance with FIPS-validated requirements for key generation, distribution, storage, and destruction.',
   'SC-13':
     'Cryptographic Protection: Use FIPS 140-3 validated cryptography to protect the confidentiality and integrity of information.',
   'SC-28':
@@ -65,44 +121,12 @@ export const fedrampRequirementsFile = {
     'Malicious Code Protection: Implement anti-virus and anti-malware at system entry and exit points.',
   'SI-4':
     'Information System Monitoring: Monitor the system to detect attacks and unauthorized connections (IDS/IPS).',
+  'SI-4(4)':
+    'Information System Monitoring | Inbound and Outbound Communications Traffic: Monitor inbound and outbound communications traffic for unusual or unauthorized activities or conditions.',
+  'SI-4(5)':
+    'Information System Monitoring | System-Generated Alerts: Alert designated personnel when indications of compromise or potential compromise occur.',
   'SI-7':
     'Software, Firmware, and Information Integrity: Implement File Integrity Monitoring (FIM) to detect unauthorized changes.',
-  'CP-9':
-    'System Backup: Conduct regular backups of user-level and system-level information and protect their integrity.',
-  'CP-10':
-    'System Recovery and Reconstitution: Restore the system to a known-good state after a failure or compromise.',
-  'RA-5':
-    'Vulnerability Monitoring: Perform monthly authenticated vulnerability scans on systems, applications, and databases.',
-  'AT-2':
-    'Security Awareness: Provide basic security awareness training to all users before system access and annually thereafter.',
-  'AT-3':
-    'Role-based Security Training: Provide specialized security training to personnel with specific roles (admins/developers).',
-  'CA-2':
-    'Control Assessments: Conduct periodic assessments of security controls to determine effectiveness.',
-  'CA-7':
-    'Continuous Monitoring: Implement a strategy to monitor control effectiveness and report findings monthly.',
-  'IR-4':
-    'Incident Handling: Implement incident detection, analysis, and containment capabilities.',
-  'IR-6':
-    'Incident Reporting: Report security incidents to the FedRAMP PMO and CISA within required timeframes.',
-  'IR-7':
-    'Incident Response Testing: Test the incident response capability for the system annually.',
-  'MA-4':
-    'Remote Maintenance: Approve, monitor, and control any remote maintenance activities.',
-  'MP-6':
-    'Media Sanitization: Sanitize or destroy digital/physical media prior to disposal using NIST 800-88 standards.',
-  'PE-3':
-    'Physical Access Control: Maintain logs and physical barriers for the facility housing the information system.',
-  'PL-2':
-    'System Security Plan: Develop and maintain a comprehensive SSP describing all security controls.',
-  'PS-3':
-    'Personnel Termination: Disable all system access within 24 hours of an employee’s termination or transfer.',
-  'PT-3':
-    'PII Processing: Document exactly what PII is processed and ensure it is limited to the minimum necessary.',
-  'SA-11':
-    'Developer Testing: Perform SAST, DAST, and vulnerability testing on all custom code before production.',
   'SR-3':
     'Supply Chain Controls: Vet all 3rd party vendors and maintain a Software Bill of Materials (SBOM).',
-  'PM-5':
-    'System Inventory: Maintain a high-level organization-wide inventory of all information systems.',
 };

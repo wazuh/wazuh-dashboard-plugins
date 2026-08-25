@@ -170,18 +170,14 @@ describe('WidgetGroup', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('renders a header link and fires its onClick', () => {
+  it('turns the title into a link and fires its onClick', () => {
     const onClick = jest.fn();
     render(
-      <WidgetGroup
-        status='available'
-        title='My widget'
-        headerLink={{ label: 'Threat Hunting', onClick }}
-      >
+      <WidgetGroup status='available' title='My widget' titleLink={{ onClick }}>
         {child}
       </WidgetGroup>,
     );
-    fireEvent.click(screen.getByText('Threat Hunting'));
+    fireEvent.click(screen.getByText('My widget'));
     expect(onClick).toHaveBeenCalled();
   });
 });
