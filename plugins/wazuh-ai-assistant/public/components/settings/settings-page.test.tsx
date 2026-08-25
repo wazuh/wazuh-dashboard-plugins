@@ -53,6 +53,15 @@ jest.mock('../../services/settings-service', () => ({
   SettingsService: jest.fn(() => mockService),
 }));
 
+jest.mock('../../plugin-services', () => ({
+  getWazuhCore: jest.fn().mockReturnValue({
+    utils: {
+      webDocumentationLink: (urlPath: string) =>
+        `https://documentation.wazuh.com/5.0/${urlPath}`,
+    },
+  }),
+}));
+
 import { SettingsPage, parseRetentionDays } from './settings-page';
 import {
   ASSISTANT_SETTINGS_CHANGED_EVENT,
@@ -142,6 +151,21 @@ beforeEach(() => {
     success: true,
     latencyMs: 50,
     message: null,
+  });
+});
+
+describe('SettingsPage — documentation link', () => {
+  it('links to the AI assistant section of the dashboard configuration docs', async () => {
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
+    );
+
+    const link = await screen.findByRole('link', { name: /documentation/i });
+    expect(link).toHaveAttribute(
+      'href',
+      'https://documentation.wazuh.com/5.0/user-manual/wazuh-dashboard/wazuh-dashboard-configurations.html#ai-assistant',
+    );
+    expect(link).toHaveAttribute('target', '_blank');
   });
 });
 
