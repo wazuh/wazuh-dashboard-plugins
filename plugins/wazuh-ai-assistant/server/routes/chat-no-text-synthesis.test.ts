@@ -771,7 +771,8 @@ test('synthesizeNoTextFallback: a zero-row turn gets the EMPTY-result instructio
   const { adapter, calls } = scriptedAdapter([
     {
       type: 'delta',
-      content: 'No findings at critical severity were recorded in the last 24 hours.',
+      content:
+        'No findings at critical severity were recorded in the last 24 hours.',
     },
     { type: 'done', usage: { inputTokens: 30, outputTokens: 9 } },
   ]);
@@ -814,7 +815,10 @@ test('synthesizeNoTextFallback: a zero-row turn gets the EMPTY-result instructio
 
 test('NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY: asks for a plain answer and fences speculation', () => {
   assert.match(NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY, /no matching rows/i);
-  assert.match(NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY, /Do not speculate about why/i);
+  assert.match(
+    NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY,
+    /Do not speculate about why/i,
+  );
   assert.match(NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY, /Do not call any tools/i);
   assert.doesNotMatch(
     NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY,
@@ -862,7 +866,10 @@ test('synthesizeNoTextFallback: a failed zero-row retry degrades to the CALLER c
 test('synthesizeNoTextFallback: with NO table on screen a model-written markdown table is NOT suppressed', async () => {
   const { adapter } = scriptedAdapter([
     { type: 'delta', content: 'Nothing matched. For reference:\n' },
-    { type: 'delta', content: '| policy | failed |\n| --- | --- |\n| cis | 0 |\n' },
+    {
+      type: 'delta',
+      content: '| policy | failed |\n| --- | --- |\n| cis | 0 |\n',
+    },
     { type: 'done', usage: { inputTokens: 10, outputTokens: 10 } },
   ]);
   const controller = new AbortController();
@@ -895,7 +902,10 @@ test('synthesizeNoTextFallback: with NO table on screen a model-written markdown
 test('synthesizeNoTextFallback: with a table on screen the suppressor still strips a duplicate table', async () => {
   const { adapter } = scriptedAdapter([
     { type: 'delta', content: 'Fifteen critical findings.\n' },
-    { type: 'delta', content: '| agent | level |\n| --- | --- |\n| a | high |\n' },
+    {
+      type: 'delta',
+      content: '| agent | level |\n| --- | --- |\n| a | high |\n',
+    },
     { type: 'done', usage: { inputTokens: 10, outputTokens: 10 } },
   ]);
   const controller = new AbortController();

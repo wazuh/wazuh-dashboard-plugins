@@ -289,7 +289,8 @@ test('orchestrate: a zero-row turn whose retry DOES write an answer ships that a
   const retryScript: StreamEvent[] = [
     {
       type: 'delta',
-      content: 'Nothing changed on agent 001 in the last week: the search matched no events.',
+      content:
+        'Nothing changed on agent 001 in the last week: the search matched no events.',
     },
     { type: 'done', usage: { inputTokens: 25, outputTokens: 14 } },
   ];
@@ -326,5 +327,9 @@ test('orchestrate: the zero-row retry is still bounded to ONE extra call per tur
     fakeSearchContext(0),
   );
 
-  assert.equal(callCount, 4, 'never a fifth call -- the retry is once per turn');
+  assert.equal(
+    callCount,
+    4,
+    'never a fifth call -- the retry is once per turn',
+  );
 });
