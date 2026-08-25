@@ -479,12 +479,12 @@ describe('MessageBubble', () => {
     expect(
       screen.getByText('This index is outside what I can query directly.'),
     ).toBeInTheDocument();
-    // dsl `{ bool: { filter: [] } }` carries no explicit time-range clause, so this link falls
-    // back to the last-24h default window (discover-link.tsx) — issue #9008 (I5) requires the
-    // label to say so rather than reading identically to a link that opened the answer's own
-    // resolved window.
+    // dsl `{ bool: { filter: [] } }` carries no explicit time-range clause and the synthetic spec
+    // this callout builds records no provenance, so the suggested query has no time filter at all:
+    // the link opens on all of history rather than narrowing to a last-24h default the suggestion
+    // never asked for, and the label says so (discover-link.tsx).
     const link = await screen.findByRole('link', {
-      name: 'Open in Discover (default range: 24h)',
+      name: 'Open in Discover (all time)',
     });
     expect(link).toHaveAttribute(
       'href',
