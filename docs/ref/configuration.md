@@ -70,6 +70,35 @@ wazuh_core.hosts:
     ca: '/etc/wazuh-dashboard/certs/root-ca.pem'
 ```
 
+## Session cookies
+
+The Wazuh dashboard sets two groups of session cookies:
+
+- `security_authentication` — the platform session, set by the OpenSearch Dashboards Security plugin.
+- `wz-token`, `wz-user`, `wz-api` — the Wazuh server API session, set by the Wazuh plugin.
+
+### SameSite
+
+The `opensearch_security.cookie.isSameSite` setting applies to **both** groups: the Wazuh server API cookies mirror whatever value the platform session cookie uses, so a deployment has a single cookie policy to manage.
+
+| Value           | Effect                                                                                                                                            |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Lax` (default) | The browser does not send the cookies with a cross-site POST. Inbound links keep working. This is the value shipped in the default configuration. |
+| `Strict`        | The browser also drops the cookies when a user follows a link from an email, a report or a ticket, and breaks SAML HTTP-POST binding.             |
+| `None`          | The browser sends the cookies on every cross-site request. Use it only to embed the dashboard in a cross-origin iframe. Requires HTTPS.           |
+
+If the setting is unset, or the Security plugin is not installed, the Wazuh server API cookies use `Lax`.
+
+`SameSite=None` is rejected by browsers unless the cookie is also `Secure`. When `None` is configured on a dashboard that does not serve HTTPS, the Wazuh server API cookies fall back to `Lax` and the reason is written to the log.
+
+### Secure
+
+The `Secure` flag is derived from the protocol the dashboard listens on, so an HTTPS deployment needs no setting. Set `opensearch_security.cookie.secure` explicitly only when a reverse proxy terminates TLS in front of the dashboard: there the dashboard itself speaks plain HTTP and cannot detect that the browser connection is encrypted.
+
+### Response headers
+
+The dashboard sends `X-Frame-Options: sameorigin` and `X-Content-Type-Options: nosniff` on every response, and `Strict-Transport-Security: max-age=31536000` when it serves HTTPS. A deployment behind a TLS-terminating proxy must send `Strict-Transport-Security` from the proxy instead.
+
 ## SSL/TLS client certificate configuration
 
 When the Wazuh server API is configured to require client certificate authentication (via `use_ca: True` in the server `api.yaml`), the dashboard must present a valid client certificate on each connection. The `key`, `cert`, and `ca` fields on each host entry control this behavior.
