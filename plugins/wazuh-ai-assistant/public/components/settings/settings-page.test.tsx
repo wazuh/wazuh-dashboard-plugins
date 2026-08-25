@@ -520,7 +520,15 @@ describe('SettingsPage — field policy action select (symmetry pass, item 5)', 
       name: /^action$/i,
     });
     expect(actionSelect).toHaveValue('allow');
-    expect(screen.queryByText(/scanned/i)).not.toBeInTheDocument();
+    // Scoped to this field row specifically (not the whole document): the privacy tab's own
+    // top-level description now legitimately uses the word "scanned" (F9 — it accurately
+    // describes what typed chat text goes through), so a page-wide query would false-positive on
+    // that unrelated text. What this test actually guards is narrower: THIS row's own controls
+    // must not leak the internal "allow-scan" action name/wording anywhere near the collapsed
+    // "Allow" display.
+    const row = actionSelect.closest('.euiFlexGroup') as HTMLElement;
+    expect(row).not.toBeNull();
+    expect(within(row).queryByText(/scanned/i)).not.toBeInTheDocument();
   });
 
   it('saves an untouched allow-scan row back unchanged, not coerced to allow', async () => {

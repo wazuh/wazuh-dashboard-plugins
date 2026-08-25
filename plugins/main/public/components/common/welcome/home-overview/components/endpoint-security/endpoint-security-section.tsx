@@ -70,13 +70,8 @@ const EndpointSecuritySectionComponent: React.FC<
               sca.error?.kind === 'index-pattern-missing'
             }
             isPermissionDenied={sca.error?.kind === 'permission-denied'}
-            title={
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={getConfigurationAssessmentUrl()}>
-                  Configuration Assessment
-                </EuiLink>
-              </RedirectAppLinks>
-            }
+            title='Configuration Assessment'
+            titleLink={{ href: getConfigurationAssessmentUrl() }}
             caption='Current state'
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-sca'
@@ -118,13 +113,8 @@ const EndpointSecuritySectionComponent: React.FC<
               fim.error?.kind === 'index-pattern-missing'
             }
             isPermissionDenied={fim.error?.kind === 'permission-denied'}
-            title={
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={getFileIntegrityMonitoringUrl()}>
-                  File Integrity Monitoring
-                </EuiLink>
-              </RedirectAppLinks>
-            }
+            title='File Integrity Monitoring'
+            titleLink={{ href: getFileIntegrityMonitoringUrl() }}
             caption='Current state'
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-fim'

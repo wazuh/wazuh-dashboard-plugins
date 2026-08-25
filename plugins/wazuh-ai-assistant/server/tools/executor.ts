@@ -4,6 +4,7 @@ import {
 } from '../../../../src/core/server';
 import { StreamEvent, ToolCall } from '../../common/types';
 import { describeError } from '../../common/errors';
+import { rangeBoundsFromDsl } from '../../common/discover-url';
 import { validate } from './schema-validator';
 import { getToolDefinition } from './registry';
 import {
@@ -569,11 +570,17 @@ async function executeIndexerRequest(
   // successful digest's `hint` further down -- see that call site for why this must be the
   // SUCCESSFUL call's own data rather than a rejection the model has to remember to relay.
   let lookbackDisclosure: string | undefined;
+  // Issue #9008 rework: the body BEFORE `clampLookbackWindow` runs, captured purely so
+  // `tableSpec.provenance.requestedRange` (below) can read the query's own pre-clamp range
+  // clause — a FACT the DSL itself contained, never a client-side default. Left `undefined` if
+  // the valve rejects the body first (no provenance is ever attached to a rejected call).
+  let requestedRangeBody: Record<string, unknown> | undefined;
   try {
     const valved = applySafetyValves(indexerRequest.body);
     if (!valved.ok) {
       return { toolResultContent: toolErrorContent(valved.reason) };
     }
+    requestedRangeBody = valved.body;
 
     // Issue #8935 item I4: clamp-and-disclose an over-wide @timestamp span BEFORE lintDsl, so a
     // request whose only problem is exceeding the 90-day cap becomes a SUCCESSFUL, capped call
@@ -730,6 +737,39 @@ async function executeIndexerRequest(
     tableSpec.discover = {
       index: indexerRequest.index,
       dsl: buildDiscoverDsl(body),
+    };
+    // Issue #9008 review, blocker 2: recorded HERE, at creation time -- a date-math bound
+    // ("now-90d") only means something relative to when the query actually ran, so resolving it
+    // against the render-time clock instead (the pre-fix behavior) showed a restored conversation a
+    // window the query never ran against. `describeProvenance` (tool-call-label.ts) resolves
+    // date-math against this stored instant, never `Date.now()`. Held in a local first so the two
+    // `rangeBoundsFromDsl` calls below order their bounds against the SAME instant they record.
+    const executedAt = Date.now();
+    // Issue #9008 rework: provenance FACTS for the evidence popover — see `TableSpec.provenance`'s
+    // doc comment (common/types.ts). `requestedRange`/`effectiveRange` read the SAME dsl shape
+    // `discover.dsl` above does (`buildDiscoverDsl`), just off the pre- and post-clamp bodies
+    // respectively. `rangeBoundsFromDsl` and the `extractTimeRange` the "Open in Discover" link is
+    // built with are two views of ONE resolution (common/discover-url.ts's `effectiveRangeClause`:
+    // clauses partitioned by timestamp field, then intersected within it), so given the same body
+    // and the same `executedAt` reference they cannot report different windows — the link and this
+    // record agree by construction, not by two implementations happening to match. That reference
+    // is why `executedAt` is stored on the spec: discover-link.tsx passes it back in.
+    // `toolCallId` is left unset here; server/routes/chat.ts's stream loop attaches it, since
+    // that is where the streaming tool call's own id is in scope.
+    tableSpec.provenance = {
+      index: indexerRequest.index,
+      // `?? body`: unreachable in practice (the try block above always sets `requestedRangeBody`
+      // before it can throw past the point of no return), kept only so this stays a plain
+      // `Record<string, unknown>` for `buildDiscoverDsl` without an unsafe `!` assertion.
+      requestedRange: rangeBoundsFromDsl(
+        buildDiscoverDsl(requestedRangeBody ?? body),
+        executedAt,
+      ),
+      // Issue #9008 review, cleanup 3: `tableSpec.discover.dsl` above IS `buildDiscoverDsl(body)`
+      // — reuse it rather than building the same object a second time.
+      effectiveRange: rangeBoundsFromDsl(tableSpec.discover.dsl, executedAt),
+      clamped: lookbackDisclosure !== undefined,
+      executedAt,
     };
     if (def.buildSecurityAnalyticsLink) {
       const space = resolveSecurityAnalyticsSpace(
