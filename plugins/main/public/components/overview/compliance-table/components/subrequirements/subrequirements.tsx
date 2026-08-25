@@ -36,6 +36,13 @@ import {
   TAB_VIEW_NAME_EVENTS,
   WAZUH_MODULES_ID,
 } from '../../../../../../common/constants';
+import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
+
+// Sentinel id for the synthetic "Others" tile. Only used for this
+// component's own bookkeeping (showFlyout/state) - never compared against
+// real requirement codes or looked up in `descriptions`.
+const OTHERS_REQUIREMENT_ID = 'others';
+const OTHERS_REQUIREMENT_LABEL = 'Others';
 
 export class ComplianceSubrequirements extends Component {
   _isMount = false;
@@ -155,10 +162,34 @@ export class ComplianceSubrequirements extends Component {
       }
     });
 
+    // Synthetic tile for findings whose requirement value isn't one of the
+    // known codes for this framework. Not tied to any complianceObject
+    // group/complianceObject key (it doesn't belong to one), always
+    // considered - just subject to the same search-text and hide-alerts
+    // rules as every other tile.
+    const othersQuantity = this.props.othersCount || 0;
+    if (
+      !this.state.searchValue ||
+      OTHERS_REQUIREMENT_LABEL.toLowerCase().includes(
+        this.state.searchValue.toLowerCase(),
+      )
+    ) {
+      if (!this.state.hideAlerts || othersQuantity > 0) {
+        tacticsToRender.push({
+          id: OTHERS_REQUIREMENT_ID,
+          label: OTHERS_REQUIREMENT_LABEL,
+          quantity: othersQuantity,
+          isOthers: true,
+        });
+      }
+    }
+
     const tacticsToRenderOrdered = tacticsToRender
       .sort((a, b) => b.quantity - a.quantity)
       .map((item, idx) => {
-        const tooltipContent = `View details of ${item.id}`;
+        const tooltipContent = item.isOthers
+          ? 'View details of Others. This count sums occurrences of unknown requirement values — a finding tagged with more than one unknown value is counted once per value, so the total can exceed the number of distinct findings.'
+          : `View details of ${item.id}`;
         const toolTipAnchorClass =
           'wz-display-inline-grid' +
           (this.state.hover === item.id ? ' wz-mitre-width' : ' ');
@@ -187,7 +218,7 @@ export class ComplianceSubrequirements extends Component {
                   quantity={item.quantity}
                   className={'module-table'}
                   onClick={() => {
-                    this.showFlyout(item.id);
+                    this.showFlyout(item.id, item.isOthers);
                   }}
                 >
                   <EuiToolTip
@@ -203,11 +234,13 @@ export class ComplianceSubrequirements extends Component {
                         textOverflow: 'ellipsis',
                       }}
                     >
-                      {item.id} - {this.props.descriptions[item.id]}
+                      {item.isOthers
+                        ? item.label
+                        : `${item.id} - ${this.props.descriptions[item.id]}`}
                     </span>
                   </EuiToolTip>
 
-                  {this.state.hover === item.id && (
+                  {!item.isOthers && this.state.hover === item.id && (
                     <span style={{ float: 'right', position: 'fixed' }}>
                       <EuiToolTip
                         position='top'
@@ -286,9 +319,10 @@ export class ComplianceSubrequirements extends Component {
     this.setState({ flyoutOn: false });
   }
 
-  showFlyout(requirement) {
+  showFlyout(requirement, isOthers = false) {
     this.setState({
       selectedRequirement: requirement,
+      isOthersSelected: isOthers,
       flyoutOn: true,
     });
   }
@@ -353,20 +387,43 @@ export class ComplianceSubrequirements extends Component {
         {this.state.flyoutOn && (
           <RequirementFlyout
             currentRequirement={this.state.selectedRequirement}
+            title={
+              this.state.isOthersSelected
+                ? 'Other requirements'
+                : `Requirement ${this.state.selectedRequirement}`
+            }
+            isOthers={this.state.isOthersSelected}
+            othersBuckets={
+              this.state.isOthersSelected ? this.props.othersBuckets : []
+            }
+            indexPatternId={this.props.indexPatternId}
             onChangeFlyout={this.onChangeFlyout}
             description={
-              this.props.descriptions[this.state.selectedRequirement]
+              this.state.isOthersSelected
+                ? `Findings whose compliance requirement value does not match any of the known, documented ${
+                    WAZUH_MODULES[this.props.section]?.title || ''
+                  } requirement identifiers.`
+                : this.props.descriptions[this.state.selectedRequirement]
             }
             getRequirementKey={() => {
               return this.getRequirementKey();
             }}
-            fetchFilters={[
-              ...this.props.fetchFilters,
-              ...this.props.getRegulatoryComplianceRequirementFilter(
-                this.getRequirementKey(),
-                this.state.selectedRequirement,
-              ),
-            ]}
+            fetchFilters={
+              this.state.isOthersSelected
+                ? [
+                    ...this.props.fetchFilters,
+                    ...this.props.getRegulatoryComplianceOtherRequirementsFilter(
+                      this.getRequirementKey(),
+                    ),
+                  ]
+                : [
+                    ...this.props.fetchFilters,
+                    ...this.props.getRegulatoryComplianceRequirementFilter(
+                      this.getRequirementKey(),
+                      this.state.selectedRequirement,
+                    ),
+                  ]
+            }
             openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
             openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
             filters={this.props.filters}

@@ -22,6 +22,8 @@ import {
   EuiText,
   EuiFlexItem,
   EuiSpacer,
+  EuiBadge,
+  EuiNotificationBadge,
 } from '@elastic/eui';
 import { AppState } from '../../../../../react-services/app-state';
 import { requirementGoal } from '../../requirement-goal';
@@ -32,7 +34,11 @@ import {
 } from '../../../../../../../../src/plugins/data/public/';
 import { WzFlyout } from '../../../../../components/common/flyouts';
 import { WazuhFlyoutDiscover } from '../../../../common/wazuh-discover/wz-flyout-discover';
-import { PatternDataSource } from '../../../../common/data-source';
+import {
+  PatternDataSource,
+  PatternDataSourceFilterManager,
+  FILTER_OPERATOR,
+} from '../../../../common/data-source';
 import { formatUIDate } from '../../../../../react-services';
 import TechniqueRowDetails from '../../../mitre/framework/components/techniques/components/flyout-technique/technique-row-details';
 import {
@@ -46,6 +52,7 @@ import {
   TAB_VIEW_ID_EVENTS,
   TAB_VIEW_NAME_DASHBOARD,
   TAB_VIEW_NAME_EVENTS,
+  DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_OTHER_REQUIREMENT_VALUE,
 } from '../../../../../../common/constants';
 
 const mapStateToProps = state => ({
@@ -63,8 +70,41 @@ export const RequirementFlyout = connect(mapStateToProps)(
 
     constructor(props) {
       super(props);
-      this.state = {};
+      this.state = { selectedOtherValues: [] };
       this.filterManager = new FilterManager(getUiSettings());
+    }
+
+    onOtherValueChipClick(value: string) {
+      const selectedOtherValues = this.state.selectedOtherValues.includes(value)
+        ? this.state.selectedOtherValues.filter(v => v !== value)
+        : [...this.state.selectedOtherValues, value];
+
+      // FilterManager.removeFilter() matches by deep-equality of meta/query,
+      // but addFilters()/setFilters() run filters through mapFilter(), which
+      // mutates meta.value/meta.params - so a freshly rebuilt filter never
+      // matches the one actually stored. Instead, identify our own filter by
+      // its controlledBy tag and replace the filter list directly.
+      const remainingFilters = this.filterManager
+        .getFilters()
+        .filter(
+          filter =>
+            filter.meta?.controlledBy !==
+            DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_OTHER_REQUIREMENT_VALUE,
+        );
+      const newFilter = selectedOtherValues.length
+        ? PatternDataSourceFilterManager.createFilter(
+            FILTER_OPERATOR.IS_ONE_OF,
+            this.props.getRequirementKey(),
+            selectedOtherValues,
+            this.props.indexPatternId,
+            DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_OTHER_REQUIREMENT_VALUE,
+          )
+        : null;
+
+      this.filterManager.setFilters(
+        newFilter ? [...remainingFilters, newFilter] : remainingFilters,
+      );
+      this.setState({ selectedOtherValues });
     }
 
     componentDidMount() {
@@ -132,7 +172,7 @@ export const RequirementFlyout = connect(mapStateToProps)(
     }
 
     renderHeader() {
-      const { currentRequirement } = this.props;
+      const { currentRequirement, title } = this.props;
       return (
         <EuiFlyoutHeader hasBorder style={{ padding: '12px 16px' }}>
           {(!currentRequirement && (
@@ -141,7 +181,7 @@ export const RequirementFlyout = connect(mapStateToProps)(
             </div>
           )) || (
             <EuiTitle size='m'>
-              <h2 id='flyoutSmallTitle'>Requirement {currentRequirement}</h2>
+              <h2 id='flyoutSmallTitle'>{title}</h2>
             </EuiTitle>
           )}
         </EuiFlyoutHeader>
@@ -252,6 +292,56 @@ export const RequirementFlyout = connect(mapStateToProps)(
                   </EuiText>
                 </EuiFlexItem>
               </EuiFlexGroup>
+
+              {this.props.isOthers && this.props.othersBuckets?.length > 0 && (
+                <>
+                  <EuiSpacer size='s' />
+                  <EuiText style={{ marginLeft: 8, fontSize: 14 }}>
+                    <p style={{ fontWeight: 500, marginBottom: 2 }}>
+                      Unknown requirement values
+                    </p>
+                  </EuiText>
+                  <EuiSpacer size='xs' />
+                  <EuiFlexGroup wrap responsive={false} gutterSize='xs'>
+                    {[...this.props.othersBuckets]
+                      .sort((a, b) => b.doc_count - a.doc_count)
+                      .map(bucket => {
+                        const isSelected =
+                          this.state.selectedOtherValues.includes(bucket.key);
+                        return (
+                          <EuiFlexItem key={bucket.key} grow={false}>
+                            <EuiToolTip
+                              position='top'
+                              content={
+                                isSelected
+                                  ? `Remove filter by ${bucket.key}`
+                                  : `Filter by ${bucket.key}`
+                              }
+                            >
+                              <EuiBadge
+                                title={undefined}
+                                color={isSelected ? 'primary' : 'hollow'}
+                                onClick={() =>
+                                  this.onOtherValueChipClick(bucket.key)
+                                }
+                                onClickAriaLabel={`Filter by ${bucket.key}`}
+                              >
+                                {bucket.key}{' '}
+                                <EuiNotificationBadge
+                                  size='s'
+                                  color={isSelected ? 'accent' : 'subdued'}
+                                >
+                                  {bucket.doc_count}
+                                </EuiNotificationBadge>
+                              </EuiBadge>
+                            </EuiToolTip>
+                          </EuiFlexItem>
+                        );
+                      })}
+                  </EuiFlexGroup>
+                </>
+              )}
+
               <EuiSpacer size='xs' />
             </div>
           </EuiAccordion>
@@ -265,39 +355,40 @@ export const RequirementFlyout = connect(mapStateToProps)(
               <EuiTitle size='s'>
                 <h3>
                   Recent events
-                  {this.props.view !== TAB_VIEW_ID_EVENTS && (
-                    <span style={{ marginLeft: 16 }}>
-                      <span>
-                        <EuiToolTip
-                          position='top'
-                          content={`Show ${currentRequirement} in ${TAB_VIEW_NAME_DASHBOARD}`}
-                        >
-                          <EuiIcon
-                            onMouseDown={e => {
-                              this.props.openDashboard(e, currentRequirement);
-                              e.stopPropagation();
-                            }}
-                            color='primary'
-                            type='visualizeApp'
-                            style={{ marginRight: '10px' }}
-                          ></EuiIcon>
-                        </EuiToolTip>
-                        <EuiToolTip
-                          position='top'
-                          content={`Inspect ${currentRequirement} in ${TAB_VIEW_NAME_EVENTS}`}
-                        >
-                          <EuiIcon
-                            onMouseDown={e => {
-                              this.props.openDiscover(e, currentRequirement);
-                              e.stopPropagation();
-                            }}
-                            color='primary'
-                            type='discoverApp'
-                          ></EuiIcon>
-                        </EuiToolTip>
+                  {!this.props.isOthers &&
+                    this.props.view !== TAB_VIEW_ID_EVENTS && (
+                      <span style={{ marginLeft: 16 }}>
+                        <span>
+                          <EuiToolTip
+                            position='top'
+                            content={`Show ${currentRequirement} in ${TAB_VIEW_NAME_DASHBOARD}`}
+                          >
+                            <EuiIcon
+                              onMouseDown={e => {
+                                this.props.openDashboard(e, currentRequirement);
+                                e.stopPropagation();
+                              }}
+                              color='primary'
+                              type='visualizeApp'
+                              style={{ marginRight: '10px' }}
+                            ></EuiIcon>
+                          </EuiToolTip>
+                          <EuiToolTip
+                            position='top'
+                            content={`Inspect ${currentRequirement} in ${TAB_VIEW_NAME_EVENTS}`}
+                          >
+                            <EuiIcon
+                              onMouseDown={e => {
+                                this.props.openDiscover(e, currentRequirement);
+                                e.stopPropagation();
+                              }}
+                              color='primary'
+                              type='discoverApp'
+                            ></EuiIcon>
+                          </EuiToolTip>
+                        </span>
                       </span>
-                    </span>
-                  )}
+                    )}
                 </h3>
               </EuiTitle>
             }
