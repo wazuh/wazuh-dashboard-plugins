@@ -15,8 +15,9 @@ import {
   EuiButtonIcon,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiIconTip,
+  EuiPopover,
   EuiText,
+  EuiToolTip,
   EuiTitle,
   EuiScreenReaderOnly,
   EuiCard,
@@ -25,6 +26,7 @@ import {
   EuiIcon,
   EuiFlyout,
   EuiFlyoutBody,
+  htmlIdGenerator,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { AppMountParameters, CoreStart } from '../../../../../src/core/public';
@@ -77,6 +79,7 @@ import { ChatInput, ChatInputHandle } from './chat-input';
 import { ProviderPicker } from './provider-picker';
 import { ConversationList } from './conversation-list';
 import { StatusCallout } from './status-callout';
+import { describeTurnStatus } from './turn-status';
 import { useSyncedState } from '../../hooks/use-synced-state';
 
 interface ChatPageProps {
@@ -486,6 +489,44 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       useState<AssistantSettings | null>(null);
     const [privacyEnabled, setPrivacyEnabled] = useState(false);
     const [pseudonymMap, setPseudonymMap] = useState<PseudonymEntry[]>([]);
+    /** Whether the composer's privacy-explanation popover is open. Purely presentational, and
+     * deliberately NOT reset by anything else in this component: it is the reader's own disclosure,
+     * so a conversation switch or an incoming answer must not close it under them. */
+    const [isPrivacyHelpOpen, setIsPrivacyHelpOpen] = useState(false);
+    /**
+     * Id of the visible "set by administrator" line, referenced by the privacy chip's
+     * `aria-describedby` when the policy is locked.
+     *
+     * Generated per instance rather than a fixed string: this component is mounted TWICE in a
+     * running dashboard — the app shell's full-page chat and the header's docked sidecar — and two
+     * elements sharing one DOM id is exactly the case `aria-describedby` cannot resolve correctly.
+     * Held in `useState`'s lazy-initializer form so it is minted once per mount, not per render.
+     */
+    const [privacyLockNoteId] = useState(() =>
+      htmlIdGenerator('wzPrivacyLockNote')(),
+    );
+    /**
+     * A pending request to point the provider picker at whatever provider a just-restored
+     * conversation was last answered by: `candidates` holds the provider ids stamped on its
+     * assistant turns, newest first, waiting to be checked against the providers that still exist.
+     * `null` means nothing pending.
+     *
+     * STATE, not a ref, and wrapped in an object rather than being a bare array — both deliberate,
+     * because the effect that applies it has to RE-RUN when a request is made:
+     *
+     * - A ref cannot be an effect dependency, so a request made after the provider list had already
+     *   settled (the sidebar switch, and the mount restore whenever the GET resolves after the
+     *   providers do) never woke the effect at all, and then fired later against whatever unrelated
+     *   render did wake it — snapping the picker back to a stale candidate.
+     * - A fresh object identity per request is what makes even a REPEAT request observable: two
+     *   conversations answered by the same provider produce equal `candidates` arrays, and a bare
+     *   array (or an id string) would compare equal and be silently skipped.
+     *
+     * See `applyLoadedConversation` for why the check cannot happen where the request is made.
+     */
+    const [providerRestoreRequest, setProviderRestoreRequest] = useState<{
+      candidates: string[];
+    } | null>(null);
     // Set on the user's first manual toggle so the settings-driven default effect below stops
     // recomputing it (e.g. if the top-level provider selector changes later in the same session).
     const privacyTouchedRef = useRef(false);
@@ -1118,9 +1159,78 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    /**
+     * Applies the provider a just-restored conversation last used, once the provider list is known.
+     *
+     * Split out of `applyLoadedConversation` because that function can run BEFORE `providers` has
+     * loaded (the mount-time restore's `.then()`), which is precisely the reload/deep-link case this
+     * whole feature exists for — see the request state's own doc comment there.
+     *
+     * Keyed on BOTH the request and the provider list, because either can arrive second and all
+     * three real orderings have to work:
+     *   1. conversation first, providers second (reload / deep link) — the request parks, and
+     *      `providersLoaded` flipping wakes this;
+     *   2. providers first, conversation second (a slower GET on the same mount) — the request
+     *      itself wakes this;
+     *   3. everything already loaded (sidebar conversation switch) — likewise the request, which is
+     *      why it must be state with a fresh identity rather than a ref.
+     *
+     * `providersLoaded` alone is NOT enough to act on, because it does not mean "the provider list
+     * is known" — `useProviders` (public/hooks/use-providers.ts) also sets it from its 20s load
+     * DEADLINE and from a rejected `list()`, in both cases leaving `providers` empty and
+     * `providersError` set. Neither is an authoritative answer, and the timeout case is explicitly
+     * recoverable: the deadline does not cancel the in-flight request, so a slow `list()` can still
+     * resolve afterwards and fill the list in. Spending the request against that empty list would
+     * conclude "this conversation's provider no longer exists" from a network hiccup and then have
+     * nothing left to correct itself with when the real list arrived.
+     *
+     * So the request is only spent on an AUTHORITATIVE list: a non-empty one, or an empty one that
+     * came back cleanly (`!providersError`) — which is the genuine "no providers configured" case
+     * and rightly has nothing to restore. An empty list carrying an error parks the request instead,
+     * for the late success or the next `PROVIDERS_CHANGED_EVENT` refresh to resolve.
+     */
+    useEffect(() => {
+      const providerListIsAuthoritative =
+        providers.length > 0 || !providersError;
+      if (
+        !providerRestoreRequest ||
+        !providersLoaded ||
+        !providerListIsAuthoritative
+      ) {
+        return;
+      }
+      // Consumed exactly once, before anything is decided: whether a candidate matches or not, this
+      // request is spent. Leaving it pending on a no-match would let it fire against a later,
+      // unrelated render.
+      setProviderRestoreRequest(null);
+      // Guarded on the provider still EXISTING: a conversation whose provider has since been deleted
+      // keeps the current selection rather than pointing the picker at an id nothing resolves. The
+      // stamps on the restored messages are untouched either way — they record what really answered
+      // each turn and stay true for a deleted provider.
+      const restoredProviderId = providerRestoreRequest.candidates.find(
+        candidateId => providers.some(provider => provider.id === candidateId),
+      );
+      if (restoredProviderId && restoredProviderId !== selectedProviderId) {
+        onProviderChange(restoredProviderId);
+      }
+      // `selectedProviderId` is read but deliberately NOT a dependency: it is only used to skip a
+      // redundant call, and including it would make a manual provider change re-enter this effect —
+      // which is precisely the path that must CANCEL a pending restore, not apply it (see
+      // `handleUserProviderChange`).
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [providerRestoreRequest, providers, providersLoaded, providersError]);
+
     // Per-conversation privacy default: resolved once settings AND a selected
     // provider are both known, and never recomputed after the user's first manual toggle — switching
     // providers mid-conversation does not retroactively change an already-chosen value.
+    //
+    // Provider RESTORE (above) deliberately flows through this same path: the privacy chip must show
+    // the policy of the provider that will actually answer the next turn, so resuming a conversation
+    // onto its own provider re-resolves that provider's admin default. An explicit user toggle still
+    // wins — `privacyTouchedRef` is what protects it, exactly as it does for a manual provider
+    // switch. (There is no persisted conversation-level privacy state to contradict: the
+    // `privacyEnabled` flag on saved messages is per-turn history bookkeeping, never the UI's value
+    // — see `ChatMessage.privacyEnabled` in common/types.ts.)
     useEffect(() => {
       if (
         !assistantSettings ||
@@ -1381,6 +1491,27 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       welcomeDismissedRef.current = false;
       const restored = reconstructConversation(record.messages);
       updateMessages(restored.messages);
+      // Per-conversation provider memory: resuming a conversation restores the provider its most
+      // recent answer was produced by, instead of leaving whatever the picker happened to be
+      // showing (in practice the default) to answer the next follow-up. Continuing a thread with a
+      // different model, with nothing on screen saying so, made answers in one conversation
+      // inconsistent for no reason the reader could see.
+      //
+      // This only RECORDS the candidates; the effect above is what applies one. It deliberately does
+      // NOT read `providers` here: the mount-time restore path calls this function from a `.then()`
+      // inside a `[]`-deps effect, so everything it closes over is the FIRST render's value — and on
+      // a reload or a deep link (the primary resume path) the provider list has not arrived yet, so
+      // `providers` is `[]` and every candidate would be rejected as "no longer exists". Newest
+      // first, so the effect picks the most recent surviving provider.
+      const restoreCandidates = [...restored.messages]
+        .reverse()
+        .filter(message => message.role === 'assistant' && message.providerId)
+        .map(message => message.providerId as string);
+      // A conversation with no stamped provider (saved before the stamp existed) clears any request
+      // instead of making one — it has nothing to say about which provider to use.
+      setProviderRestoreRequest(
+        restoreCandidates.length > 0 ? { candidates: restoreCandidates } : null,
+      );
       // Replay-leak fix (Fix 3): NOT `restored.turnRecords` — see this function's doc comment above
       // for why replaying another session's pseudonym-form digest content against a freshly emptied
       // map (right below) is unsafe. The resumed conversation is fully READABLE (restored.messages
@@ -1487,9 +1618,31 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
      * `updateMessages` call it still has queued targets a message id that no longer exists in the
      * list this replaces it with.
      */
+    /**
+     * The provider picker's own change handler: cancels any pending provider-restore request, then
+     * reports the change up exactly as before.
+     *
+     * The cancellation is the point. A restore request can still be pending when the reader reaches
+     * for the picker — the provider list is what it is waiting for, and on a slow load that is the
+     * same moment the picker becomes usable. Without this, the reader's explicit pick would be
+     * silently reverted to the restored conversation's provider a moment later (and could drag the
+     * privacy chip's per-provider default along with it). An explicit choice outranks a remembered
+     * one.
+     *
+     * Wired ONLY to the picker, so it distinguishes a user's pick from the app shell merely
+     * reporting the selection this component's own restore just asked for.
+     */
+    const handleUserProviderChange = (providerId: string) => {
+      setProviderRestoreRequest(null);
+      onProviderChange(providerId);
+    };
+
     const handleNewConversation = () => {
       abandonActiveStream();
       repinToBottom();
+      // A brand-new conversation has no provider to remember, so a request still waiting on the
+      // provider list must not outlive the conversation that made it.
+      setProviderRestoreRequest(null);
       // C1: a brand-new conversation gets the centred welcome composer back (the effect above picks
       // this up as soon as `messages` is empty again) — the transition is once per conversation, not
       // once per session.
@@ -2073,6 +2226,13 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
        * as though it were complete.
        */
       let turnCompleted = false;
+      /**
+       * The `error` event's message, if this turn produced one — recorded unconditionally, including
+       * for a turn the user has already walked away from, so the `finally` block below can stamp it
+       * onto whichever transcript it ends up saving. Local to this stream call, like
+       * `turnCompleted`: nothing outside this function reads it.
+       */
+      let turnFailureReason: string | undefined;
 
       // Delta batching (typing-lag/streaming-jank fix): a fast-streaming provider can
       // emit a `delta` event per token, and without batching EVERY one committed its own React state
@@ -2170,12 +2330,14 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
               pendingTable = event.spec;
             }
           } else if (event.type === 'status' && isTurnStillActive()) {
-            // Transient progress line (e.g. "Querying Wazuh...") from the orchestration loop; no
-            // engine emits this yet, but the bubble already knows how to show it once one does.
+            // Progressive step label for the turn in flight. `describeTurnStatus` prefers the
+            // event's translated `step` classification over its raw English `message` — see that
+            // function's own doc comment (turn-status.ts) for why the server sends both.
+            const statusText = describeTurnStatus(event);
             updateMessages(current =>
               current.map(message =>
                 message.id === assistantMessageId
-                  ? { ...message, statusMessage: event.message }
+                  ? { ...message, statusMessage: statusText }
                   : message,
               ),
             );
@@ -2246,6 +2408,10 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
             turnCompleted = true;
           } else if (event.type === 'error') {
             turnCompleted = true;
+            // Recorded BEFORE the abandoned-turn bail-out below, so the `finally` block can stamp it
+            // onto an abandoned turn's own transcript too — a turn the user walked away from still
+            // failed, and its saved record has to say so.
+            turnFailureReason = event.message;
             flushPendingEmptyTable();
             // Released before the placeholder cleanup below, which drops an assistant message with
             // neither content nor table — a turn whose tool succeeded and whose narration then failed
@@ -2261,16 +2427,29 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
             } else {
               setError(event.message);
             }
-            // Drop the assistant placeholder if no content ever arrived for it; keep it if
-            // partial deltas (or a table) already streamed in before the error happened.
+            // The placeholder is KEPT and marked failed, not dropped. It used to be removed
+            // whenever nothing had streamed into it, which left the failure recorded only in the
+            // callout band above the transcript — and `handleSend` clears that band, so asking
+            // anything else (the most likely next action) erased the only evidence the turn had
+            // ever failed, leaving a question sitting in the transcript with no answer and no
+            // explanation. `failureReason` is what `FailedTurnNotice` (message-bubble.tsx) renders
+            // on the turn itself, and it is persisted with the conversation, so a reload keeps it
+            // too. The banner still appears — it is how a failure announces itself the moment it
+            // happens; this is what remains afterwards.
+            // `statusMessage: undefined` alongside it: the status line and its spinner are cleared
+            // only by the first `delta` of real text (`flushPendingDelta`), and a turn that fails
+            // before producing any text never gets one — so without this the failed turn kept a
+            // live spinner reading "Writing the answer…" above its own failure marker, inside the
+            // `aria-live` region, for as long as the conversation stayed open.
             updateMessages(current =>
-              current.filter(
-                message =>
-                  !(
-                    message.id === assistantMessageId &&
-                    message.content === '' &&
-                    !message.table
-                  ),
+              current.map(message =>
+                message.id === assistantMessageId
+                  ? {
+                      ...message,
+                      failureReason: event.message,
+                      statusMessage: undefined,
+                    }
+                  : message,
               ),
             );
           } else if (event.type === 'auth_expired') {
@@ -2328,17 +2507,25 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                       : {}),
                     isStreaming: false,
                     ...(turnCompleted ? {} : { interrupted: true }),
+                    // An abandoned turn that then FAILED still failed — see `turnFailureReason`.
+                    // Without this the abandoned path was the one route by which a failure could
+                    // vanish from a saved conversation entirely: the `error` branch above bails out
+                    // before stamping anything once the turn is no longer active.
+                    ...(turnFailureReason
+                      ? { failureReason: turnFailureReason }
+                      : {}),
                   }
                 : message,
             )
-            // Same rule the `error` branch applies to the visible list: an assistant placeholder that
-            // never received anything is not worth persisting.
+            // An assistant placeholder that never received anything is not worth persisting — UNLESS
+            // it carries a failure reason, which is the whole content of a failed turn's record.
             .filter(
               message =>
                 !(
                   message.id === assistantMessageId &&
                   message.content === '' &&
-                  !message.table
+                  !message.table &&
+                  !turnFailureReason
                 ),
             );
           void persistConversationTurn({
@@ -2353,12 +2540,17 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
           if (detectManagerAuthError(accumulatedContent)) {
             setManagerAuthHint(true);
           }
+          // `statusMessage: undefined` unconditionally: this is the turn's terminal update, and no
+          // step label is true of a turn that has stopped. Only a `delta` ever cleared it before, so
+          // Stop pressed (or a dropped connection) during a tool call left a live spinner reading
+          // "Querying …" on a turn that had already ended.
           updateMessages(current =>
             current.map(message =>
               message.id === assistantMessageId
                 ? {
                     ...message,
                     isStreaming: false,
+                    statusMessage: undefined,
                     ...(turnCompleted ? {} : { interrupted: true }),
                   }
                 : message,
@@ -2417,12 +2609,28 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       const privacyPayload = buildPrivacyPayload(effectivePrivacyEnabled);
 
       const assistantMessageId = nextMessageId();
+      // Provider provenance, stamped at turn start from the picker's CURRENT selection — before any
+      // await that could let the reader change it mid-turn, so the stamp always names the provider
+      // the request actually went to (`runChatStream` sends `selectedProviderId` from this same
+      // render). Name and model are COPIED, not looked up at render time, so an answer keeps
+      // reporting what produced it even after that provider is renamed or deleted. See
+      // `PersistedChatMessage.providerId`.
+      const turnProvider = providers.find(
+        provider => provider.id === selectedProviderId,
+      );
       const assistantMessage: UiChatMessage = {
         id: assistantMessageId,
         role: 'assistant',
         content: '',
         isStreaming: true,
         createdAt: Date.now(),
+        ...(selectedProviderId ? { providerId: selectedProviderId } : {}),
+        ...(turnProvider
+          ? {
+              providerName: turnProvider.name,
+              providerModel: turnProvider.model,
+            }
+          : {}),
         // Wire-proof fix: stamped once at creation and preserved through every later spread-update
         // (delta/done/etc. never touch this field) — see UiChatMessage.privacyEnabled's doc
         // comment (message-bubble.tsx).
@@ -2548,6 +2756,44 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       await startTurn(history);
     };
 
+    /**
+     * Re-asks the question behind an OLDER failed/interrupted turn, by APPENDING it as a new turn at
+     * the end of the conversation rather than replacing the old one in place.
+     *
+     * The failed turn stays in the transcript with its marker: it happened, and hiding it once the
+     * reader works around it is exactly the dishonesty the marker exists to fix. Appending (rather
+     * than `handleRetryLastTurn`'s in-place replacement) is what makes this safe for a turn with
+     * later turns on top of it — every one of those was built on the transcript as it stands, and
+     * rewriting its middle would invalidate their own tool history.
+     *
+     * The question is the nearest preceding `role:'user'` message: a turn is always [question,
+     * answer], so walking back from the failed answer finds the question it belongs to. If there
+     * isn't one (a transcript trimmed by `toPersistedMessages` can begin mid-turn), the action
+     * simply does nothing rather than guessing at what was asked.
+     */
+    const handleAskAgain = async (messageId: string) => {
+      if (isGenerating) {
+        return;
+      }
+      const failedIndex = messages.findIndex(
+        message => message.id === messageId,
+      );
+      if (failedIndex < 0) {
+        return;
+      }
+      let question: string | undefined;
+      for (let index = failedIndex - 1; index >= 0; index -= 1) {
+        if (messages[index].role === 'user') {
+          question = messages[index].content;
+          break;
+        }
+      }
+      if (!question) {
+        return;
+      }
+      await handleSend(question);
+    };
+
     /** `error` is the send-path failure; `providersError` the app shell's provider-load failure. One
      * callout reports whichever is current, so dismissal is tracked against this one value. */
     // Composer control-row spec (iteration-4): the Send button's own disabled/enabled state, split
@@ -2589,14 +2835,15 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
         });
     const privacyBadgeIcon = privacyEnabled ? 'lock' : 'lockOpen';
     // Single pill replacing the old padlock EuiButtonEmpty + floating EuiIconTip pair (iteration-4
-    // composer control-row spec): the icon + "Privacy · On/Off" label carries the state, and —
+    // composer control-row spec): the icon + "Privacy: On/Off" label carries the state, and —
     // only when the admin has left it overridable — the click affordance to flip it. `onClick`/
     // `onClickAriaLabel` are spread in together rather than each defaulting to `undefined`, since
     // OuiBadge warns if `onClickAriaLabel` is present without `onClick` (and vice versa reads as a
     // badge that looks clickable but isn't). The explanation of what the state does to the user's
     // data used to live in a hover tooltip wrapping this whole pill, which meant hovering to click
-    // it also forced a wall of text — it now lives on a separate, discrete ⓘ (`EuiIconTip`) placed
-    // right after the pill, so it is available on demand without blocking the click gesture.
+    // it also forced a wall of text — it now lives on a separate, discrete ⓘ button (an
+    // `EuiPopover`, click-openable and keyboard-reachable) placed right after the pill, so it is
+    // available on demand without blocking the click gesture.
     // EUI types onClick/onClickAriaLabel as an ExclusiveUnion against the non-clickable badge
     // variant; spreading the conditional pair in flattens that union into plain optional props,
     // which satisfies neither union member structurally — hence rendering through an untyped
@@ -2605,6 +2852,36 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       Record<string, unknown>
     >;
 
+    /**
+     * What the control DOES, as its accessible name — not what state it is in.
+     *
+     * The visible text ("Privacy: On") states the state; a screen-reader user given only that same
+     * text, plus `role='switch'`'s own "on/off" announcement, was told the state twice and told what
+     * the setting governs never. This names the behaviour once, in the accessible name, where the
+     * state is already announced separately by the role.
+     */
+    const privacySwitchAriaLabel = i18n.translate(
+      'wazuhAiAssistant.chat.privacy.switchAriaLabel',
+      {
+        defaultMessage:
+          'Privacy mode: pseudonymize sensitive data before sending to the AI provider',
+      },
+    );
+    const canTogglePrivacy = assistantSettings?.userCanOverride === true;
+
+    // A real switch, not a badge that happens to be clickable (`role='switch'` +
+    // `aria-checked`): the control has two states, it is the reader's to flip, and until now it
+    // announced as a plain button whose only clue to its state was the same word that was already
+    // painted on it. Visuals are untouched — this is the same `.wzPrivacyChip` pill in the same
+    // slot; only its semantics and its label wording change.
+    //
+    // The LOCKED case is deliberately NOT a `disabled` button. A disabled control is skipped by
+    // keyboard navigation and, in most screen-reader modes, is not announced at all — so the one
+    // reader who most needs to know that privacy is administrator-controlled was the one who could
+    // not find out. `aria-disabled` keeps it in the tab order and announced (it is still a switch,
+    // still reporting on/off), `tabIndex={0}` makes the non-interactive span focusable to receive
+    // that focus, and `aria-describedby` points at the VISIBLE attribution line beside it rather
+    // than hiding the reason in a tooltip.
     const privacyChip = (
       <ClickableEuiBadge
         className={`wzPrivacyChip wzPrivacyChip--${
@@ -2613,21 +2890,27 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
         color='hollow'
         iconType={privacyBadgeIcon}
         data-test-subj='wzPrivacyChip'
-        {...(assistantSettings?.userCanOverride
+        role='switch'
+        aria-checked={privacyEnabled}
+        aria-label={privacySwitchAriaLabel}
+        {...(canTogglePrivacy
           ? {
               onClick: handleTogglePrivacy,
-              onClickAriaLabel: privacyEnabled
-                ? i18n.translate('wazuhAiAssistant.chat.privacy.toggleToOff', {
-                    defaultMessage: 'Turn privacy mode off',
-                  })
-                : i18n.translate('wazuhAiAssistant.chat.privacy.toggleToOn', {
-                    defaultMessage: 'Turn privacy mode on',
-                  }),
+              // EuiBadge requires this alongside `onClick`; it is the same behaviour statement as
+              // `aria-label` above, which EUI's own badge renders it into.
+              onClickAriaLabel: privacySwitchAriaLabel,
             }
-          : {})}
+          : {
+              'aria-disabled': true,
+              tabIndex: 0,
+              'aria-describedby': privacyLockNoteId,
+            })}
       >
         {i18n.translate('wazuhAiAssistant.chat.privacy.chipLabel', {
-          defaultMessage: 'Privacy · {state}',
+          // "Privacy: On" rather than the previous "Privacy · Off": an interpuncted pair reads as
+          // two labels sitting next to each other, and QA readers reported the pill as saying only
+          // "Off". A colon says the second word is this label's value.
+          defaultMessage: 'Privacy: {state}',
           values: { state: privacyBadgeLabel },
         })}
       </ClickableEuiBadge>
@@ -3362,6 +3645,9 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                       onRetryLastTurn={
                         isGenerating ? undefined : handleRetryLastTurn
                       }
+                      // Same gate, for the same reason: an older failed turn's "Ask again" would
+                      // also collide with a turn already in flight.
+                      onRetryTurn={isGenerating ? undefined : handleAskAgain}
                     />
                   )}
               </div>
@@ -3489,38 +3775,86 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                           covers the click affordance for a11y. The explanation now lives on the
                           discrete ⓘ immediately after it, on demand. */}
                           <EuiFlexItem grow={false}>{privacyChip}</EuiFlexItem>
+                          {/* Locked policy: a VISIBLE attribution, in the composer, next to the
+                          control it explains. It used to be one line inside the ⓘ's hover tooltip,
+                          which meant the single most consequential fact about the control — that
+                          the reader cannot change it and someone else decided — was discoverable
+                          only by hovering a 16px glyph. It is also this element that
+                          `aria-describedby` on the chip points at, so the same words reach a screen
+                          reader on focus. */}
+                          {!assistantSettings.userCanOverride && (
+                            <EuiFlexItem grow={false}>
+                              <EuiText
+                                size='xs'
+                                color='subdued'
+                                id={privacyLockNoteId}
+                                data-test-subj='wzPrivacyLockNote'
+                              >
+                                <span>
+                                  {privacyEnabled
+                                    ? i18n.translate(
+                                        'wazuhAiAssistant.chat.privacy.lockedOn',
+                                        {
+                                          defaultMessage:
+                                            'Privacy on — set by administrator',
+                                        },
+                                      )
+                                    : i18n.translate(
+                                        'wazuhAiAssistant.chat.privacy.lockedOff',
+                                        {
+                                          defaultMessage:
+                                            'Privacy off — set by administrator',
+                                        },
+                                      )}
+                                </span>
+                              </EuiText>
+                            </EuiFlexItem>
+                          )}
+                          {/* The explanation of what privacy mode does to the reader's data was an
+                          `EuiIconTip` — hover-only, so it could not be reached by keyboard at all,
+                          dismissed itself the moment the pointer moved, and could not be read at
+                          leisure or copied. It is now a real popover on a real button: click or
+                          Enter opens it, it stays open, and Escape/outside-click closes it. */}
                           <EuiFlexItem grow={false}>
-                            <EuiIconTip
-                              type='iInCircle'
-                              color='subdued'
-                              /* `size='s'` renders this 16px-grid glyph below its native size, so the
-                               thin circle stroke falls between device pixels and reads blurry next
-                               to the crisp pill. `m` is the glyph's own 16px grid — crisp — and
-                               still discrete beside the 32px privacy chip. */
-                              size='m'
-                              aria-label={i18n.translate(
-                                'wazuhAiAssistant.chat.privacy.explainerAriaLabel',
-                                {
-                                  defaultMessage: 'About privacy mode',
-                                },
-                              )}
-                              content={
-                                assistantSettings.userCanOverride ? (
-                                  privacyExplainerText
-                                ) : (
-                                  <>
-                                    {privacyExplainerText}
-                                    <br />
-                                    {i18n.translate(
-                                      'wazuhAiAssistant.chat.privacy.adminSet',
-                                      {
-                                        defaultMessage: 'Set by administrator',
-                                      },
-                                    )}
-                                  </>
-                                )
+                            <EuiPopover
+                              isOpen={isPrivacyHelpOpen}
+                              closePopover={() => setIsPrivacyHelpOpen(false)}
+                              anchorPosition='upCenter'
+                              panelPaddingSize='s'
+                              button={
+                                <EuiButtonIcon
+                                  /* `size='s'` renders this 16px-grid glyph below its native size,
+                                  so the thin circle stroke falls between device pixels and reads
+                                  blurry next to the crisp pill. `m` is the glyph's own 16px grid —
+                                  crisp — and still discrete beside the 32px privacy chip. */
+                                  iconSize='m'
+                                  iconType='iInCircle'
+                                  color='text'
+                                  display='empty'
+                                  data-test-subj='wzPrivacyHelpButton'
+                                  aria-expanded={isPrivacyHelpOpen}
+                                  aria-label={i18n.translate(
+                                    'wazuhAiAssistant.chat.privacy.explainerAriaLabel',
+                                    {
+                                      defaultMessage: 'About privacy mode',
+                                    },
+                                  )}
+                                  onClick={() =>
+                                    setIsPrivacyHelpOpen(current => !current)
+                                  }
+                                />
                               }
-                            />
+                            >
+                              <EuiText
+                                size='xs'
+                                className='wzPrivacyHelpPanel'
+                                data-test-subj='wzPrivacyHelpPanel'
+                              >
+                                <p style={{ margin: 0 }}>
+                                  {privacyExplainerText}
+                                </p>
+                              </EuiText>
+                            </EuiPopover>
                           </EuiFlexItem>
                         </>
                       )}
@@ -3542,7 +3876,10 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                               <ProviderPicker
                                 providers={providers}
                                 selectedProviderId={selectedProviderId}
-                                onProviderChange={onProviderChange}
+                                // Not the raw `onProviderChange` prop: a pick made HERE is the
+                                // reader's own explicit choice and cancels any pending
+                                // provider-restore request — see `handleUserProviderChange`.
+                                onProviderChange={handleUserProviderChange}
                                 onManageProviders={onManageProviders}
                                 activeConversationId={activeConversationId}
                               />
@@ -3550,32 +3887,46 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                           )}
                           <EuiFlexItem grow={false}>
                             {isGenerating ? (
-                              <EuiButtonIcon
-                                className='wzComposerSendButton'
-                                iconType='cross'
-                                color='danger'
-                                // 'm', matching the Send button's own size (iteration-4 item A) —
-                                // this button replaces Send in the exact same row slot while
-                                // generating, and a smaller icon here shrank that slot's height
-                                // between the two states.
-                                size='m'
-                                // 'base' (bordered, unfilled) — a deliberate step down from the
-                                // Send button's filled 'fill': Stop is a real interrupt but not the
-                                // row's primary action, and a second filled/colored button in the
-                                // same slot the instant generation starts would read as the
-                                // composer's emphasis flipping to "danger" by default. Verified
-                                // against this fork's OUI build (button_icon.tsx's
-                                // `displayToClassNameMap`), which does define 'base' alongside
-                                // 'empty'/'fill' — same three-value `display` union EUI ships.
-                                display='base'
-                                onClick={handleStop}
-                                aria-label={i18n.translate(
-                                  'wazuhAiAssistant.chat.stopButton',
-                                  {
-                                    defaultMessage: 'Stop',
-                                  },
+                              /* The send button turning into a red ✕ mid-answer is not
+                              self-explanatory — a cross in the composer reads at least as much like
+                              "clear what I typed" as like "stop generating", and it appears without
+                              warning the moment an answer starts. The tooltip names the action on
+                              hover and on keyboard focus (EuiToolTip covers both); the aria-label
+                              below carries the same words for screen readers. */
+                              <EuiToolTip
+                                position='top'
+                                content={i18n.translate(
+                                  'wazuhAiAssistant.chat.stopButtonTooltip',
+                                  { defaultMessage: 'Stop generating' },
                                 )}
-                              />
+                              >
+                                <EuiButtonIcon
+                                  className='wzComposerSendButton'
+                                  iconType='cross'
+                                  color='danger'
+                                  // 'm', matching the Send button's own size (iteration-4 item
+                                  // A) — this button replaces Send in the exact same row slot
+                                  // while generating, and a smaller icon here shrank that slot's
+                                  // height between the two states.
+                                  size='m'
+                                  // 'base' (bordered, unfilled) — a deliberate step down from the
+                                  // Send button's filled 'fill': Stop is a real interrupt but not
+                                  // the row's primary action, and a second filled/colored button
+                                  // in the same slot the instant generation starts would read as
+                                  // the composer's emphasis flipping to "danger" by default.
+                                  // Verified against this fork's OUI build (button_icon.tsx's
+                                  // `displayToClassNameMap`), which does define 'base' alongside
+                                  // 'empty'/'fill' — same three-value `display` union EUI ships.
+                                  display='base'
+                                  onClick={handleStop}
+                                  aria-label={i18n.translate(
+                                    'wazuhAiAssistant.chat.stopButton',
+                                    {
+                                      defaultMessage: 'Stop generating',
+                                    },
+                                  )}
+                                />
+                              </EuiToolTip>
                             ) : (
                               <EuiButtonIcon
                                 className='wzComposerSendButton'

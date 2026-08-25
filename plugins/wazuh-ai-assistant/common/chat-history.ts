@@ -33,6 +33,7 @@ import {
 } from './types';
 import { NavigationType } from './draft-stash';
 import {
+  CONVERSATION_MAX_FAILURE_REASON_LENGTH,
   CONVERSATION_MAX_MESSAGES,
   CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH,
   CONVERSATION_MAX_SERIALIZED_BYTES,
@@ -50,6 +51,12 @@ export interface ChatHistoryMessage {
   table?: TableSpec;
   /** The answer was cut short rather than completed — see `PersistedChatMessage.interrupted`. */
   interrupted?: boolean;
+  /** The turn failed outright, with this reason — see `PersistedChatMessage.failureReason`. */
+  failureReason?: string;
+  /** Which provider produced this message — see `PersistedChatMessage.providerId`. */
+  providerId?: string;
+  providerName?: string;
+  providerModel?: string;
   /** The tool calls this turn ran, for display only (message-bubble.tsx's "queries executed"
    * panel). Never persisted from here: `toPersistedMessages` writes the model-facing
    * `[assistant{toolCalls}, tool{digest}]` pairs from the turn records instead, and
@@ -297,6 +304,31 @@ export function toPersistedMessages(
           : message.content,
       createdAt: message.createdAt,
       ...(message.interrupted ? { interrupted: true } : {}),
+      // A failed turn's marker and its provider provenance both have to survive a reload, or the
+      // transcript goes back to hiding its own failures and misattributing its own answers — see
+      // `PersistedChatMessage.failureReason`/`providerId`.
+      //
+      // `failureReason` is CLAMPED here for the same reason `content` above is, and against the same
+      // failure mode: the route rejects anything longer than
+      // `CONVERSATION_MAX_FAILURE_REASON_LENGTH` with a 400, the client treats a failed save as a
+      // non-fatal hiccup, and auto-save resends the same over-long value on every following turn —
+      // so one unbounded provider error string (openai-compatible.ts echoes upstream response bodies
+      // verbatim) would silently stop the whole conversation from ever being saved again. The three
+      // provider fields need no clamp: an id, a display name and a model identifier are all bounded
+      // at their source by the provider CRUD API's own limits.
+      ...(message.failureReason
+        ? {
+            failureReason: message.failureReason.slice(
+              0,
+              CONVERSATION_MAX_FAILURE_REASON_LENGTH,
+            ),
+          }
+        : {}),
+      ...(message.providerId ? { providerId: message.providerId } : {}),
+      ...(message.providerName ? { providerName: message.providerName } : {}),
+      ...(message.providerModel
+        ? { providerModel: message.providerModel }
+        : {}),
       // Wire-proof fix: persists whether privacy was ON for this message's own turn, so a LATER
       // resume/reload can still fail-closed-exclude a privacy-off turn's prose from history —
       // see ChatMessage.privacyEnabled's doc comment (common/types.ts). Only ever set on
@@ -460,6 +492,16 @@ export function reconstructConversation(
       createdAt: message.createdAt ?? Date.now(),
       ...(message.table ? { table: message.table } : {}),
       ...(message.interrupted ? { interrupted: true } : {}),
+      // Inverse of `toPersistedMessages`' own stamping above: a reloaded transcript keeps both its
+      // failure markers and each answer's provider provenance.
+      ...(message.failureReason
+        ? { failureReason: message.failureReason }
+        : {}),
+      ...(message.providerId ? { providerId: message.providerId } : {}),
+      ...(message.providerName ? { providerName: message.providerName } : {}),
+      ...(message.providerModel
+        ? { providerModel: message.providerModel }
+        : {}),
       // Wire-proof fix: restores which turn's prose this was, for the same reason as above —
       // only ever meaningful (and only ever set by toPersistedMessages) on role:'assistant'.
       ...(message.privacyEnabled !== undefined
@@ -602,6 +644,16 @@ export function buildOutgoingMessages(
             : {}),
         });
       }
+    }
+    // A failed turn is kept in the TRANSCRIPT as a marker-only assistant message (no prose ever
+    // arrived — see `ChatHistoryMessage.failureReason`), and an assistant message with empty
+    // content is not a history entry any provider can use: Anthropic rejects an empty text block
+    // outright, and every other adapter would replay a blank turn for no benefit. Skipped here
+    // rather than never recorded, because the marker is exactly what the READER needs to see.
+    // Narrow on purpose: only a `role:'assistant'` message with no text at all, so a normal answer
+    // (and every user message, blank or not) is untouched.
+    if (uiMessage.role === 'assistant' && uiMessage.content.trim() === '') {
+      continue;
     }
     outgoing.push({
       role: uiMessage.role,

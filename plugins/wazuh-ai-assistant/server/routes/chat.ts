@@ -2254,7 +2254,10 @@ export async function* runStage1Routing(
     ? scrubMessagesForProvider(stage1Messages, privacyCtx.pseudonymizer)
     : stage1Messages;
 
-  yield { type: 'status', message: 'Routing…' };
+  // `step` classifies this for the browser, which renders a translated label instead of the raw
+  // English below (public/components/chat/turn-status.ts). `message` stays exactly what it always
+  // was: the eval harness and every log reader still see "Routing…".
+  yield { type: 'status', message: 'Routing…', step: 'understanding' };
 
   let sawRouteCall = false;
   let routeArgs: Record<string, unknown> | undefined;
@@ -3108,7 +3111,16 @@ export async function* orchestrate(
         // Carries the REVERSED (real) args: local display is trusted.
         yield { type: 'tool_call', toolCall: toolCallForClient };
 
-        yield { type: 'status', message: 'Querying Wazuh…' };
+        // `detail` names the tool whose call is running, so the reader sees WHICH question is
+        // being asked of the data rather than one undifferentiated "Querying Wazuh…" for a turn
+        // that runs four calls. A tool name is catalog vocabulary — never customer data — so it is
+        // safe to surface regardless of privacy mode.
+        yield {
+          type: 'status',
+          message: 'Querying Wazuh…',
+          step: 'querying',
+          detail: event.toolCall.name,
+        };
 
         let outcome: ToolExecutionOutcome;
         try {
@@ -3533,6 +3545,33 @@ export async function* orchestrate(
           budgetForcesFinalRoundEarly = true;
         }
       }
+    }
+
+    // Third and last step label of the turn: the NEXT provider call is the one that turns the tool
+    // results into the answer. Emitted at the very end of the round body — after every early
+    // `return` above — so it can never claim the assistant is writing an answer that is not
+    // actually coming. Purely advisory: the client discards it the instant the first `delta` of
+    // real text arrives (chat-page.tsx's `flushPendingDelta` clears `statusMessage`).
+    //
+    // Gated on the NEXT round actually being the final (tools-off) one, using the same
+    // `willBeFinalRound` predicate the loop head itself uses. Without that gate a turn running
+    // several tool rounds walked the label BACKWARDS — "Writing the answer…" then "Querying …"
+    // again, once per round — which reads as the assistant changing its mind rather than as
+    // progress. `round + 1` with the flags as they stand after this round's own bookkeeping above
+    // is exactly the question "is the next round the last one".
+    if (
+      roundHadRealToolCall &&
+      willBeFinalRound(
+        round + 1,
+        forceFinalRoundEarly,
+        budgetForcesFinalRoundEarly,
+      )
+    ) {
+      yield {
+        type: 'status',
+        message: 'Writing the answer…',
+        step: 'writing',
+      };
     }
   }
 
