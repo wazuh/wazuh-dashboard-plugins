@@ -19,12 +19,23 @@ export interface SecurityAnalyticsTilesProps {
   filters: DataGroupResult<number>;
 }
 
+/**
+ * Ordered by the Security Analytics side menu: Overview (Integrations, with
+ * Filters as its second tab), then Normalization (Decoders, KVDBs), then
+ * Detection (Detectors, Rules).
+ */
 const TILES: ReadonlyArray<StatTileSpec<keyof SecurityAnalyticsTilesProps>> = [
   {
-    key: 'rules',
-    label: 'Rules',
-    testSubj: 'security-analytics-tile-rules',
-    onSelect: getRulesUrl,
+    key: 'integrations',
+    label: 'Integrations',
+    testSubj: 'security-analytics-tile-integrations',
+    onSelect: getIntegrationsUrl,
+  },
+  {
+    key: 'filters',
+    label: 'Filters',
+    testSubj: 'security-analytics-tile-filters',
+    onSelect: getFiltersUrl,
   },
   {
     key: 'decoders',
@@ -33,28 +44,22 @@ const TILES: ReadonlyArray<StatTileSpec<keyof SecurityAnalyticsTilesProps>> = [
     onSelect: getDecodersUrl,
   },
   {
-    key: 'detectors',
-    label: 'Detectors',
-    testSubj: 'security-analytics-tile-detectors',
-    onSelect: getDetectorsUrl,
-  },
-  {
-    key: 'integrations',
-    label: 'Integrations',
-    testSubj: 'security-analytics-tile-integrations',
-    onSelect: getIntegrationsUrl,
-  },
-  {
     key: 'kvdbs',
     label: 'KVDBs',
     testSubj: 'security-analytics-tile-kvdbs',
     onSelect: getKvdbsUrl,
   },
   {
-    key: 'filters',
-    label: 'Filters',
-    testSubj: 'security-analytics-tile-filters',
-    onSelect: getFiltersUrl,
+    key: 'detectors',
+    label: 'Detectors',
+    testSubj: 'security-analytics-tile-detectors',
+    onSelect: getDetectorsUrl,
+  },
+  {
+    key: 'rules',
+    label: 'Rules',
+    testSubj: 'security-analytics-tile-rules',
+    onSelect: getRulesUrl,
   },
 ];
 

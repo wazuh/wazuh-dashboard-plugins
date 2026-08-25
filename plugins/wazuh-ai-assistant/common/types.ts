@@ -221,6 +221,46 @@ export interface TableSpec {
     label: string;
     url: string;
   };
+  /**
+   * Issue #9008 rework: server-recorded provenance FACTS for the evidence popover, the sole
+   * source the client may render index/time-range detail from — the client must never infer or
+   * default any of this itself. Populated in server/tools/executor.ts's `executeIndexerRequest`
+   * from exactly what it observed executing the query (absent entirely for a Manager-API table,
+   * which has no index/DSL concept at all):
+   *  - `index`: the concrete index queried (same value as `discover.index` above).
+   *  - `requestedRange`/`effectiveRange`: the `{gte, lte}` pair read directly off the query DSL,
+   *    before and after the 90-day lookback guardrail (`guardrails.ts`'s `clampLookbackWindow`)
+   *    ran — via `common/discover-url.ts`'s `rangeBoundsFromDsl`, which is where "what window did
+   *    this DSL state" is decided for the whole plugin (the "Open in Discover" link resolves its
+   *    own openable window through `extractTimeRange`, a different entry point over the same one
+   *    clause walk — see that module). `undefined` when the DSL carried no recognizable range
+   *    clause at all, or only one-sided ones (most catalog tools have no time-range concept and
+   *    never will), NOT a default. Where a DSL carries SEVERAL required range clauses these are
+   *    their intersection, which is what the returned rows actually satisfied.
+   *    The CLIENT never re-reads the DSL for any of this: tool-call-label.ts's
+   *    `describeProvenance` renders these recorded fields and nothing else.
+   *  - `clamped`: true only when `clampLookbackWindow` actually narrowed the query.
+   *  - `toolCallId`: attached by server/routes/chat.ts (which is where the streaming tool call's
+   *    id is in scope), not by the executor — it is what lets the client attribute this table to
+   *    the exact one tool call that produced it, rather than to every call in a multi-call turn.
+   *  - `executedAt`: the epoch ms the query actually ran at, recorded by the executor at creation
+   *    time. Issue #9008 review, blocker 2: a date-math bound ("now-90d") only means something
+   *    relative to WHEN it ran -- resolving it against the render-time clock instead would show a
+   *    restored conversation a window the query never ran against. `describeProvenance`
+   *    (tool-call-label.ts) resolves date-math bounds against this stored instant, never against
+   *    `Date.now()`. `undefined` only for a conversation persisted before this field existed --
+   *    a date-math bound then stays unresolved, so the popover's "Time range:" line is simply
+   *    OMITTED (never a fabricated absolute instant); the clamp badge still renders from the
+   *    literal date-math bounds, since that path needs no absolute instant at all.
+   */
+  provenance?: {
+    toolCallId?: string;
+    index?: string;
+    requestedRange?: { gte: string; lte: string };
+    effectiveRange?: { gte: string; lte: string };
+    clamped: boolean;
+    executedAt?: number;
+  };
 }
 
 /**
@@ -345,6 +385,16 @@ export interface ConversationSummary {
   id: string;
   title: string;
   updatedAt: string;
+}
+
+/** Response shape of the rename (PATCH) route (server/routes/conversations.ts) -- a
+ * `ConversationSummary` plus the WRITE's own fresh optimistic-concurrency token (same
+ * `encodeVersion` opaque string `ConversationRecord.version` carries). chat-page.tsx's
+ * `handleRenameConversation` stamps `version` onto `conversationVersionRef` when the renamed
+ * conversation is the active one, so the next auto-save's PUT does not 409 against a version this
+ * rename just moved past (issue #9010). */
+export interface ConversationRenameResult extends ConversationSummary {
+  version: string;
 }
 
 /**

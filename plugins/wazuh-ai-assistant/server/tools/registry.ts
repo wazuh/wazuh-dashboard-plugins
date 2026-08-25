@@ -1,5 +1,6 @@
 import { ToolSpec } from '../../common/types';
 import { ToolDefinition } from './types';
+import { buildGenericResolveParams } from './param-resolution';
 import { getAgentsTool } from './catalog/get-agents';
 import { getCriticalFindingsTool } from './catalog/get-critical-findings';
 import { searchFindingsByAgentTool } from './catalog/search-findings-by-agent';
@@ -123,8 +124,23 @@ const CATALOG: ToolDefinition[] = [
   searchWazuhDataTool,
 ];
 
+/**
+ * Attaches the generic sole-candidate-param resolver (param-resolution.ts, generalizing issue
+ * #8913's hand-written `resolveDeicticAgentParams`) to any catalog tool that declares
+ * `soleCandidateParams` but no `resolveParams` of its own -- `get_agent_inventory` keeps its
+ * hand-written hook untouched (it already declares `resolveParams` directly, so this leaves it
+ * alone) rather than being re-declared through the generic metadata. Every other tool in
+ * `CATALOG` is unaffected: `undefined` `soleCandidateParams` (the default) means this map is a
+ * no-op identity pass for it.
+ */
+const RESOLVED_CATALOG: ToolDefinition[] = CATALOG.map(tool =>
+  tool.soleCandidateParams && !tool.resolveParams
+    ? { ...tool, resolveParams: buildGenericResolveParams(tool) }
+    : tool,
+);
+
 const registry = new Map<string, ToolDefinition>(
-  CATALOG.map(tool => [tool.spec.name, tool]),
+  RESOLVED_CATALOG.map(tool => [tool.spec.name, tool]),
 );
 
 export function getToolDefinition(name: string): ToolDefinition | undefined {
@@ -132,7 +148,7 @@ export function getToolDefinition(name: string): ToolDefinition | undefined {
 }
 
 export function listToolDefinitions(): ToolDefinition[] {
-  return CATALOG;
+  return RESOLVED_CATALOG;
 }
 
 /**
@@ -154,6 +170,15 @@ export function listToolSpecs(): ToolSpec[] {
  * `suggest_discover_query`, which are never executed via `executeToolCall` and so never reach this
  * lookup in practice, or a stale name from a scripted test) -- never throws, never returns
  * `undefined`, so every call site can charge a cost unconditionally.
+ *
+ * M4 (LOW, AI/plan/d-review.md): this is priced per PROVIDER ROUND, not per backend read. A tool
+ * whose `resolveParams` hook (types.ts) makes its own secondary Indexer/Manager read to infer a
+ * parameter (e.g. `get_cve_intel`/`get_cti_status`/`get_detectors`) is charged nothing extra for
+ * that read -- it consumes neither a provider round nor an additional model-visible digest (its
+ * result rides in on `Digest.assumptionNote`), so pricing it would double-charge one call. This is
+ * deliberate, not a gap: every current secondary read is hardcoded-shape and bounded per call
+ * (≤1-2), so total secondary backend load per turn stays bounded by
+ * `MAX_TOOL_ROUNDS × calls-per-round × 2` even though this budget itself never counts it.
  */
 export function getToolCostClass(name: string): 1 | 2 | 3 {
   return getToolDefinition(name)?.costClass ?? 2;

@@ -14,6 +14,12 @@ import type {
  * conversations.ts's `ownerUnresolvedResponse`, used by list/get/put/delete; `create` is the one
  * deliberate exception, see its call site).
  *
+ * `resolveOwner` gates FIVE routes now, not four: list/get/put/delete, plus the rename (PATCH)
+ * route added for issue #9010 -- see that route's own doc comment in conversations.ts for why it
+ * copies this exact resolveOwner/ownerUnresolvedResponse/findConversationHit sequence rather than
+ * inventing its own. Every case below therefore also documents that fifth route's authorization,
+ * with no separate rename-specific owner test needed.
+ *
  * These cases exercise `resolveOwner` directly, the same convention
  * conversations-version-conflict.test.ts uses for `isVersionConflictError`: the plugin
  * has no request/response-mocking layer for OpenSearch Dashboards routes, so route-level behavior

@@ -185,6 +185,12 @@ export interface ChatPageHandle {
   newConversation: () => void;
   selectConversation: (id: string) => void;
   deleteConversation: (id: string) => void;
+  /** m14 (#9010 review): the docked sidecar panel (header/assistant-chat-panel.tsx) is a PRIMARY
+   * surface for the conversation rail, not a secondary one — it needs the same rename/bulk-delete
+   * handlers the inline rail already gets directly as props, routed through this same imperative
+   * handle `deleteConversation` already uses. */
+  renameConversation: (id: string, title: string) => void;
+  bulkDeleteConversations: (ids: string[]) => void;
 }
 
 /**
@@ -1684,11 +1690,102 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
           handleNewConversation();
         }
         notifyConversationsChanged();
+        // E4 (#9010): confirm the delete actually happened via the same toast mechanism
+        // settings-page.tsx already uses (core.notifications.toasts) — a confirm MODAL already
+        // gated the action (conversation-list.tsx), so this toast is purely a "it worked"
+        // acknowledgement, not a second confirmation.
+        core.notifications.toasts.addSuccess(
+          i18n.translate('wazuhAiAssistant.chat.conversations.deleteSuccess', {
+            defaultMessage: 'Conversation deleted.',
+          }),
+        );
       } catch {
         setError(
           i18n.translate('wazuhAiAssistant.chat.conversations.deleteError', {
             defaultMessage: 'Could not delete that conversation.',
           }),
+        );
+      }
+    };
+
+    /** Inline rename (#9010, finding E2): title-only PATCH (conversations-service.ts's `rename`,
+     * server/routes/conversations.ts's PATCH route) — never round-trips the full transcript just to
+     * change a title.
+     *
+     * Stamps the WRITE's own fresh version onto `conversationVersionRef` when the renamed
+     * conversation is the active one on screen: without this, the very next auto-save's PUT would
+     * check its optimistic-concurrency pair against the PRE-rename version, 409, and pay for an
+     * avoidable merge round-trip (`saveConversationWithMerge`) purely because this rename moved the
+     * version on. Not stamped when the renamed row is not the active conversation — there is no
+     * live `conversationVersionRef` for a conversation that is not on screen to begin with. */
+    const handleRenameConversation = async (id: string, title: string) => {
+      try {
+        const renamed = await conversationsService.rename(id, title);
+        if (activeConversationIdRef.current === id) {
+          conversationVersionRef.current = renamed.version;
+        }
+        notifyConversationsChanged();
+      } catch {
+        setError(
+          i18n.translate('wazuhAiAssistant.chat.conversations.renameError', {
+            defaultMessage: 'Could not rename that conversation.',
+          }),
+        );
+      }
+    };
+
+    /**
+     * Bulk delete (#9010, finding E3): reuses the existing single-delete endpoint client-side —
+     * `Promise.allSettled` so one failing delete never stops the rest from completing — rather than
+     * adding a bulk server route. If the currently open conversation is among the deleted ids, it
+     * gets the same "start a new conversation" treatment `handleDeleteConversation` gives a single
+     * delete of the active conversation -- but ONLY when that specific id's own delete actually
+     * SUCCEEDED (results are indexed against `ids` positionally, since `Promise.allSettled`
+     * preserves input order). Without this check, a partial failure that happened to include the
+     * active conversation among the FAILED ids would still kick the user out of a conversation
+     * that is, in fact, still there — starting a new one for no reason and hiding the very
+     * conversation the failure banner below is about.
+     */
+    const handleBulkDeleteConversations = async (ids: string[]) => {
+      if (ids.length === 0) {
+        return;
+      }
+      const results = await Promise.allSettled(
+        ids.map(id => conversationsService.remove(id)),
+      );
+      const failedCount = results.filter(
+        result => result.status === 'rejected',
+      ).length;
+      const succeededCount = ids.length - failedCount;
+      const activeId = activeConversationIdRef.current;
+      const activeIndex = activeId ? ids.indexOf(activeId) : -1;
+      const activeConversationWasDeleted =
+        activeIndex !== -1 && results[activeIndex].status === 'fulfilled';
+
+      if (activeConversationWasDeleted) {
+        handleNewConversation();
+      }
+      if (succeededCount > 0) {
+        notifyConversationsChanged();
+        core.notifications.toasts.addSuccess(
+          i18n.translate(
+            'wazuhAiAssistant.chat.conversations.bulkDeleteSuccess',
+            {
+              defaultMessage:
+                '{count, plural, one {Conversation deleted.} other {{count} conversations deleted.}}',
+              values: { count: succeededCount },
+            },
+          ),
+        );
+      }
+      if (failedCount > 0) {
+        setError(
+          i18n.translate(
+            'wazuhAiAssistant.chat.conversations.bulkDeleteError',
+            {
+              defaultMessage: 'Could not delete one or more conversations.',
+            },
+          ),
         );
       }
     };
@@ -1710,6 +1807,10 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
         void confirmIfGenerating(() => void handleSelectConversation(id));
       },
       deleteConversation: (id: string) => void handleDeleteConversation(id),
+      renameConversation: (id: string, title: string) =>
+        void handleRenameConversation(id, title),
+      bulkDeleteConversations: (ids: string[]) =>
+        void handleBulkDeleteConversations(ids),
     }));
 
     useEffect(() => {
@@ -1751,15 +1852,16 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
      */
     const saveConversationWithMerge = async (
       id: string,
-      title: string,
       localMessages: PersistedChatMessage[],
       expectedVersion: string | undefined,
       reflectInUi: boolean,
     ): Promise<ConversationRecord> => {
       try {
+        // NO title argument (issue #9010): every PUT through this method omits it, so the server
+        // carries the stored title over unchanged — see conversations-service.ts's `update` doc
+        // comment for why a resent, freshly recomputed title used to silently revert renames.
         return await conversationsService.update(
           id,
-          title,
           localMessages,
           expectedVersion,
         );
@@ -1778,7 +1880,6 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       try {
         const retried = await conversationsService.update(
           id,
-          title,
           merged,
           serverRecord.version,
         );
@@ -1842,20 +1943,13 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
             ? conversationVersionRef.current
             : target.version;
         try {
-          // The untitled-fallback label is resolved here (not inside buildConversationTitle, which is
-          // now a dependency-free common/ helper — see its own doc comment) via the same
-          // i18n.translate call this file always made for it.
-          const title = buildConversationTitle(
-            args.messages,
-            i18n.translate('wazuhAiAssistant.chat.conversations.untitled', {
-              defaultMessage: 'Untitled conversation',
-            }),
-          );
           const toPersist = toPersistedMessages(args.messages, turnRecords);
           if (conversationId) {
+            // NO title here (issue #9010): once a conversation exists, its every save is a PUT
+            // through `saveConversationWithMerge`, which never sends a title at all any more —
+            // see that function's own comment for why (a rename must survive the next auto-save).
             const record = await saveConversationWithMerge(
               conversationId,
-              title,
               toPersist,
               expectedVersion,
               args.adoptAsActive,
@@ -1870,6 +1964,18 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
             }
             target.version = record.version;
           } else {
+            // Title is built ONLY here, for the one-time CREATE (POST) — see
+            // `buildConversationTitle`'s doc comment (common/chat-history.ts) for why it must
+            // never be recomputed again on a later PUT of the same conversation. The
+            // untitled-fallback label is resolved here (not inside buildConversationTitle, which
+            // is a dependency-free common/ helper — see its own doc comment) via the same
+            // i18n.translate call this file always made for it.
+            const title = buildConversationTitle(
+              args.messages,
+              i18n.translate('wazuhAiAssistant.chat.conversations.untitled', {
+                defaultMessage: 'Untitled conversation',
+              }),
+            );
             const created = await conversationsService.create(title, toPersist);
             // The turn now owns this row: its later saves update it instead of creating another.
             target.conversationId = created.id;
@@ -2953,6 +3059,8 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                   void confirmIfGenerating(handleNewConversation)
                 }
                 onDelete={handleDeleteConversation}
+                onRename={handleRenameConversation}
+                onBulkDelete={handleBulkDeleteConversations}
                 // Rail prop contract agreed with the ConversationList owner (job item 6): all three
                 // are optional with defaults, so this call is safe to ship whether or not
                 // conversation-list.tsx has picked them up yet.
@@ -3029,6 +3137,8 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                         })
                       }
                       onDelete={handleDeleteConversation}
+                      onRename={handleRenameConversation}
+                      onBulkDelete={handleBulkDeleteConversations}
                       displayMode='flyout'
                       onCollapse={handleRailCollapse}
                       onExpand={handleRailExpand}

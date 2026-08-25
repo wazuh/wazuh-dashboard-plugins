@@ -96,15 +96,15 @@ describe('OverviewSection', () => {
     );
   });
 
-  it('navigates to Threat Hunting from the findings header link', () => {
+  it('navigates to Threat Hunting from the Findings card title', () => {
     render(<OverviewSection findings={findingsAvailable} />);
-    fireEvent.click(screen.getByText('Threat Hunting'));
+    fireEvent.click(screen.getByText('Findings'));
     expect(navigation.getThreatHuntingUrl).toHaveBeenCalled();
   });
 
-  it('navigates to Agents from the "Agents by status" header link', () => {
+  it('navigates to Agents from the "Agents by status" card title', () => {
     render(<OverviewSection findings={findingsAvailable} />);
-    fireEvent.click(screen.getByText('Agents'));
+    fireEvent.click(screen.getByText('Agents by status'));
     expect(navigation.getAgentsUrl).toHaveBeenCalled();
   });
 

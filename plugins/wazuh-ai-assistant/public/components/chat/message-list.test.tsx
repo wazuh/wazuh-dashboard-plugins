@@ -63,7 +63,7 @@ describe('MessageList — per-row measure (layout contract §5)', () => {
       />,
     );
 
-    const row = screen.getByText('Results (1 rows)').closest('.wzMessageRow');
+    const row = screen.getByText('Results (1 row)').closest('.wzMessageRow');
     expect(row).not.toBeNull();
     expect(row).toHaveClass('wzMessageRow--wide');
   });
@@ -93,7 +93,7 @@ describe('MessageList — per-row measure (layout contract §5)', () => {
       .getByText('Any agents down?')
       .closest('.wzMessageRow');
     const tableRow = screen
-      .getByText('Results (1 rows)')
+      .getByText('Results (1 row)')
       .closest('.wzMessageRow');
     expect(userRow).not.toHaveClass('wzMessageRow--wide');
     expect(tableRow).toHaveClass('wzMessageRow--wide');

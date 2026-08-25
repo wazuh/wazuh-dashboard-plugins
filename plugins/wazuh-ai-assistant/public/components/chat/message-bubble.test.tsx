@@ -325,12 +325,43 @@ describe('MessageBubble', () => {
         />,
       );
 
-      expect(screen.getByText('Results (1 rows)')).toBeInTheDocument();
+      expect(screen.getByText('Results (1 row)')).toBeInTheDocument();
       expect(screen.getByText('web-01')).toBeInTheDocument();
       expect(screen.queryByText('The query returned no rows.')).toBeNull();
     });
 
     it('keeps the below-bubble provenance chip, since there is no card header to move it into', () => {
+      render(
+        <MessageBubble
+          message={baseMessage({
+            role: 'assistant',
+            content: 'Nothing matched.',
+            // `provenance.toolCallId` matches the below call — issue #9008 rework: the chip's
+            // window text is a server-recorded FACT now, not inferred from `arguments`.
+            table: {
+              ...EMPTY_TABLE,
+              provenance: {
+                toolCallId: 't1',
+                index: 'wazuh-agents-index-*',
+                effectiveRange: { gte: 'now-90d', lte: 'now' },
+                clamped: false,
+              },
+            },
+            toolCalls: [{ id: 't1', name: 'get_top_agents', arguments: {} }],
+          })}
+          resolveDiscoverUrl={noopResolveDiscoverUrl}
+          resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+        />,
+      );
+
+      // "What did it actually look for?" is the first question a reader asks of a zero-result
+      // answer, and the suppressed card is where that chip would otherwise have lived.
+      expect(screen.getByText('Top agents · 90d')).toBeInTheDocument();
+    });
+
+    it('shows the tool name alone (no invented window) when the server recorded no provenance', () => {
+      // Issue #9008 blocker 1: `arguments: {}` used to make the OLD implementation default the
+      // window to "90d" itself; the rework must never do that — no `provenance` means no window.
       render(
         <MessageBubble
           message={baseMessage({
@@ -344,9 +375,69 @@ describe('MessageBubble', () => {
         />,
       );
 
-      // "What did it actually look for?" is the first question a reader asks of a zero-result
-      // answer, and the suppressed card is where that chip would otherwise have lived.
-      expect(screen.getByText('Top agents · 90d')).toBeInTheDocument();
+      expect(screen.getByText('Top agents')).toBeInTheDocument();
+      expect(screen.queryByText(/Top agents · /)).toBeNull();
+    });
+
+    // Issue #9008 review, minor 7: this raw view IS the popover's equivalent for a turn whose
+    // table is suppressed (0 rows) — "which index did it read?" matters most exactly here, so it
+    // must show the same Index/Time-range lines the rendered-table popover does (ProvenanceChip,
+    // result-table.tsx), not just the tool name and raw arguments.
+    it('shows the Index and Time-range lines in the suppressed-table raw view once opened', () => {
+      render(
+        <MessageBubble
+          message={baseMessage({
+            role: 'assistant',
+            content: 'Nothing matched.',
+            table: {
+              ...EMPTY_TABLE,
+              provenance: {
+                toolCallId: 't1',
+                index: 'wazuh-agents-index-*',
+                effectiveRange: { gte: 'now-90d', lte: 'now' },
+                clamped: false,
+                // `executedAt` required for the Time-range line to resolve at all (issue #9008
+                // blocker 2) -- without it a date-math bound stays unresolved and that line is
+                // simply omitted, which is exactly what a colocated test below covers instead.
+                executedAt: Date.now(),
+              },
+            },
+            toolCalls: [{ id: 't1', name: 'get_top_agents', arguments: {} }],
+          })}
+          resolveDiscoverUrl={noopResolveDiscoverUrl}
+          resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+        />,
+      );
+
+      // Closed by default -- neither line is on screen unbidden.
+      expect(screen.queryByText(/^Index:/)).toBeNull();
+
+      fireEvent.click(screen.getByText('Top agents · 90d'));
+
+      expect(
+        screen.getByText('Index: wazuh-agents-index-*'),
+      ).toBeInTheDocument();
+      expect(screen.getByText(/^Time range:/)).toBeInTheDocument();
+    });
+
+    it('shows the tool name alone (no invented window) when the server recorded no provenance', () => {
+      // Issue #9008 blocker 1: `arguments: {}` used to make the OLD implementation default the
+      // window to "90d" itself; the rework must never do that — no `provenance` means no window.
+      render(
+        <MessageBubble
+          message={baseMessage({
+            role: 'assistant',
+            content: 'Nothing matched.',
+            table: EMPTY_TABLE,
+            toolCalls: [{ id: 't1', name: 'get_top_agents', arguments: {} }],
+          })}
+          resolveDiscoverUrl={noopResolveDiscoverUrl}
+          resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+        />,
+      );
+
+      expect(screen.getByText('Top agents')).toBeInTheDocument();
+      expect(screen.queryByText(/Top agents · /)).toBeNull();
     });
 
     it('holds a suppressed-table answer to the prose measure, like any other prose-only turn', () => {
@@ -416,7 +507,13 @@ describe('MessageBubble', () => {
     expect(
       screen.getByText('This index is outside what I can query directly.'),
     ).toBeInTheDocument();
-    const link = await screen.findByRole('link', { name: 'Open in Discover' });
+    // dsl `{ bool: { filter: [] } }` carries no explicit time-range clause, so this link falls
+    // back to the last-24h default window (discover-link.tsx) — issue #9008 (I5) requires the
+    // label to say so rather than reading identically to a link that opened the answer's own
+    // resolved window.
+    const link = await screen.findByRole('link', {
+      name: 'Open in Discover (default range: 24h)',
+    });
     expect(link).toHaveAttribute(
       'href',
       'https://example.test/app/data-explorer/discover#?_a=...',
@@ -539,7 +636,7 @@ describe('MessageBubble', () => {
       );
 
       const bubbleItem = screen
-        .getByText('Results (1 rows)')
+        .getByText('Results (1 row)')
         .closest('.euiFlexItem') as HTMLElement;
       // Breaking out means declining the 68ch prose measure and filling whatever the ROW allows —
       // which is now the shared content column ($wzContentMaxWidth), still wider than the prose. The
@@ -558,6 +655,12 @@ describe('MessageBubble', () => {
       const table: TableSpec = {
         columns: [{ id: 'agent', label: 'Agent' }],
         rows: [{ agent: 'web-01' }],
+        provenance: {
+          toolCallId: 't1',
+          index: 'wazuh-findings-v5*',
+          effectiveRange: { gte: 'now-90d', lte: 'now' },
+          clamped: false,
+        },
       };
       render(
         <MessageBubble
@@ -574,9 +677,9 @@ describe('MessageBubble', () => {
         />,
       );
 
-      // The chip still exists — just inside the result card's header, not below the bubble.
-      // Label includes the default 90-day window, same as describeToolCall (tool-call-label.ts)
-      // has always produced for a call with no explicit time_range_gte/lte.
+      // The chip still exists — just inside the result card's header, not below the bubble. Its
+      // window text comes from `table.provenance` (a server-recorded fact, issue #9008 rework),
+      // never from the call's own (here empty) `arguments`.
       expect(screen.getByText('Critical findings · 90d')).toBeInTheDocument();
       // Only one instance: it was not ALSO left behind in the below-bubble meta row.
       expect(screen.getAllByText('Critical findings · 90d')).toHaveLength(1);
@@ -597,7 +700,44 @@ describe('MessageBubble', () => {
         />,
       );
 
-      expect(screen.getByText('Critical findings · 90d')).toBeInTheDocument();
+      // No table at all -> no provenance -> the chip names the call, nothing invented for it.
+      expect(screen.getByText('Critical findings')).toBeInTheDocument();
+    });
+
+    // Issue #9008 blocker 3: a multi-call turn must attribute provenance ONLY to the call whose id
+    // matches `table.provenance.toolCallId` — every other call's chip renders name-only.
+    it('attributes provenance only to the producing call in a multi-call turn', () => {
+      const table: TableSpec = {
+        columns: [{ id: 'agent', label: 'Agent' }],
+        rows: [{ agent: 'web-01' }],
+        provenance: {
+          toolCallId: 't2',
+          index: 'wazuh-findings-v5*',
+          effectiveRange: { gte: 'now-7d', lte: 'now' },
+          clamped: false,
+        },
+      };
+      render(
+        <MessageBubble
+          message={baseMessage({
+            role: 'assistant',
+            content: 'Here are the results:',
+            table,
+            toolCalls: [
+              { id: 't1', name: 'get_agents', arguments: {} },
+              { id: 't2', name: 'get_critical_findings', arguments: {} },
+            ],
+          })}
+          resolveDiscoverUrl={noopResolveDiscoverUrl}
+          resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+        />,
+      );
+
+      // t2 (the actual producer) shows the real window.
+      expect(screen.getByText('Critical findings · 7d')).toBeInTheDocument();
+      // t1 must NOT inherit t2's index/window — it renders name-only.
+      expect(screen.getByText('Agents')).toBeInTheDocument();
+      expect(screen.queryByText(/Agents · /)).toBeNull();
     });
   });
 

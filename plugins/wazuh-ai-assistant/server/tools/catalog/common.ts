@@ -433,6 +433,14 @@ export const FINDING_INVESTIGATION_ROW_FIELDS = [
 export const FINDING_BREAKDOWN_DIMENSIONS = [
   'wazuh.agent.name',
   'wazuh.rule.title',
+  // Severity (2026-08-14, UI run C8): "how many findings by severity" is the most obvious
+  // aggregative question a security product gets, and with only the two dimensions above no
+  // finding-hits tool could answer it in one call -- the model fanned out one filtered call per
+  // severity, spent the whole MAX_TOOL_ROUNDS budget on three of the five levels, and (honestly)
+  // reported low/informational as never requested. A closed five-word vocabulary
+  // (informational..critical), so the extra terms agg is five buckets of overhead at most, and
+  // the field is already on field-policy-coverage.test.ts's reviewed known-safe list.
+  'wazuh.rule.level',
 ];
 
 /** Derives a valid, unique OpenSearch top-level aggregation name from a dot-path field — agg names
@@ -521,6 +529,14 @@ export const VULN_DIGEST_SAMPLE_COLUMNS = [
   'package.version',
   'package.architecture',
   'vulnerability.score.base',
+  // The two fields whose ABSENCE produced a measured capability over-promise (UI run 2026-08-14,
+  // A3/B2): without them the model offered to "check whether an updated lxd package is
+  // available" (no tool can) and recommended apt for a snap. `scanner.condition` carries the
+  // scanner's own fix bound ("Package less than 5.21.4") -- the honest form of that offer -- and
+  // `package.type` (deb/snap/pypi/npm) picks the right remediation channel. Both are
+  // scanner/OS-curated metadata, not analyst/attacker free text.
+  'vulnerability.scanner.condition',
+  'package.type',
 ];
 
 /**

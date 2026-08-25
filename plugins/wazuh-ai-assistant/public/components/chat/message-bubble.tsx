@@ -20,7 +20,7 @@ import { ChatRole, TableSpec, ToolCall } from '../../../common/types';
 import { ResultTable, ResultTableProvenanceChip } from './result-table';
 import { DiscoverLink, ResolveDiscoverUrl } from './discover-link';
 import { ResolveSecurityAnalyticsUrl } from './security-analytics-link';
-import { describeToolCall } from './tool-call-label';
+import { describeProvenance, describeToolCall } from './tool-call-label';
 
 /**
  * "This turn was cut short" affordance, rendered in two places: inside an interrupted assistant
@@ -382,16 +382,64 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   // chips have to stay — that is the only place left to check what the turn actually queried, which
   // matters most precisely when the answer is "nothing was found".
   const metaRowToolCalls = renderedTable ? [] : toolCalls;
+  /**
+   * Issue #9008 (blocker 3): a multi-call turn runs several tool calls before landing on the one
+   * table that gets rendered, but `message.toolCalls` lists ALL of them — mapping every call to
+   * `renderedTable`'s provenance unconditionally attributed call 1's chip with call 2's index and
+   * time range (or vice-versa) whenever a turn ran more than one Indexer call. `renderedTable`
+   * itself is authoritative about exactly ONE call: `provenance.toolCallId`, attached by
+   * server/routes/chat.ts (see `TableSpec.provenance`'s doc comment) to the specific call that
+   * produced it. Only that one call's chip is passed the real `provenance` object; every other
+   * call in the same turn renders name-only, with no index/range/badge invented for it.
+   *
+   * `message.table` is the source here, deliberately, rather than `renderedTable`: the two are the
+   * same object whenever a card renders (`renderedTable` IS `message.table`, just gated on row
+   * count), and the below-bubble chip row for a SUPPRESSED 0-row table still needs the suppressed
+   * spec's provenance — see that row's own comment. One source therefore serves both surfaces
+   * without a second, subtly different lookup.
+   *
+   * Computed ONCE per message, memoized (issue #9008 review, cleanup 4). Three surfaces read this
+   * — the result card's chips, the below-bubble chip row, and the raw view a chip opens — and each
+   * used to redo the same `describeProvenance`/`describeToolCall` derivation for the same call on
+   * every render, including renders driven by nothing but a popover opening.
+   */
+  const toolCallDisplays = useMemo(() => {
+    const provenanceForCall = (
+      toolCallId: string,
+    ): TableSpec['provenance'] | undefined =>
+      message.table?.provenance?.toolCallId === toolCallId
+        ? message.table.provenance
+        : undefined;
+    return new Map(
+      toolCalls.map(toolCall => {
+        const provenance = provenanceForCall(toolCall.id);
+        // `describeToolCall` builds its chip text out of the same display object, so it is handed
+        // the computed one rather than deriving a second, identical copy.
+        const display = describeProvenance(provenance);
+        return [
+          toolCall.id,
+          { display, label: describeToolCall(toolCall, provenance, display) },
+        ] as const;
+      }),
+    );
+    // `toolCalls` is `message.toolCalls ?? []` — a fresh `[]` identity only in the no-calls case,
+    // where the map is empty anyway.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [message.toolCalls, message.table]);
   const tableProvenanceChips: ResultTableProvenanceChip[] | undefined =
     renderedTable
       ? toolCalls.map(toolCall => {
-          const { short, full } = describeToolCall(toolCall, renderedTable);
+          const entry = toolCallDisplays.get(toolCall.id);
+          const display = entry?.display ?? {};
           return {
             id: toolCall.id,
-            shortLabel: short,
-            fullLabel: full,
+            shortLabel: entry?.label.short ?? toolCall.name,
+            fullLabel: entry?.label.full ?? toolCall.name,
             toolName: toolCall.name,
             argumentsJson: toolCall.arguments,
+            index: display.index,
+            resolvedRangeLabel: display.resolvedRangeLabel,
+            windowBadgeLabel: display.windowBadgeLabel,
           };
         })
       : undefined;
@@ -744,12 +792,16 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
         )}
         {!isUser &&
           metaRowToolCalls.map(toolCall => {
-            // `message.table` here, deliberately NOT `renderedTable`: this is the one place the
-            // suppressed 0-row spec is still worth reading, because `describeToolCall` uses it for
-            // exactly one thing — naming the index in the chip's hover title. A suppressed empty
-            // result is precisely when "which index did it read?" matters, and dropping the spec
-            // here would quietly shorten that tooltip. It cannot affect the visible chip text.
-            const { short, full } = describeToolCall(toolCall, message.table);
+            // `toolCallDisplays` reads `message.table`, deliberately NOT `renderedTable`: this is
+            // the one place the suppressed 0-row spec is still worth reading, because it is the
+            // only place left to check what the turn actually queried — precisely when the answer
+            // is "nothing was found". Its `toolCallId` match (issue #9008 blocker 3) means a
+            // multi-call turn's chip only carries provenance for the ONE call the spec names.
+            const { short, full } = toolCallDisplays.get(toolCall.id)
+              ?.label ?? {
+              short: toolCall.name,
+              full: toolCall.name,
+            };
             const isRawOpen = openRawIds.has(toolCall.id);
             return (
               <EuiFlexItem grow={false} key={toolCall.id}>
@@ -781,27 +833,58 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
       {!isUser &&
         metaRowToolCalls
           .filter(toolCall => openRawIds.has(toolCall.id))
-          .map(toolCall => (
-            <div
-              key={toolCall.id}
-              id={`${rawViewId}-${toolCall.id}`}
-              className={PROSE_MEASURE_CLASS}
-            >
-              <EuiSpacer size='xs' />
-              <EuiText size='xs'>
-                <strong>{toolCall.name}</strong>
-              </EuiText>
-              <EuiSpacer size='xs' />
-              <EuiCodeBlock
-                language='json'
-                paddingSize='s'
-                fontSize='s'
-                isCopyable
+          .map(toolCall => {
+            // Issue #9008 review, minor 7: the same Index/Time-range lines the rendered-table
+            // popover shows (ProvenanceChip, result-table.tsx) belong here too — this raw view IS
+            // the popover's equivalent for a turn whose table is suppressed (0 rows) or absent,
+            // and "which index did it read?" matters most exactly there. Reads the SAME memoized
+            // entry the chip above it does, so only the call that actually produced `message.table`
+            // carries real provenance, and it is derived once per render rather than twice.
+            const display = toolCallDisplays.get(toolCall.id)?.display ?? {};
+            return (
+              <div
+                key={toolCall.id}
+                id={`${rawViewId}-${toolCall.id}`}
+                className={PROSE_MEASURE_CLASS}
               >
-                {JSON.stringify(toolCall.arguments, null, 2)}
-              </EuiCodeBlock>
-            </div>
-          ))}
+                <EuiSpacer size='xs' />
+                <EuiText size='xs'>
+                  <strong>{toolCall.name}</strong>
+                </EuiText>
+                {display.index && (
+                  <EuiText size='xs' color='subdued'>
+                    {i18n.translate(
+                      'wazuhAiAssistant.resultTable.provenanceIndex',
+                      {
+                        defaultMessage: 'Index: {index}',
+                        values: { index: display.index },
+                      },
+                    )}
+                  </EuiText>
+                )}
+                {display.resolvedRangeLabel && (
+                  <EuiText size='xs' color='subdued'>
+                    {i18n.translate(
+                      'wazuhAiAssistant.resultTable.provenanceTimeRange',
+                      {
+                        defaultMessage: 'Time range: {range}',
+                        values: { range: display.resolvedRangeLabel },
+                      },
+                    )}
+                  </EuiText>
+                )}
+                <EuiSpacer size='xs' />
+                <EuiCodeBlock
+                  language='json'
+                  paddingSize='s'
+                  fontSize='s'
+                  isCopyable
+                >
+                  {JSON.stringify(toolCall.arguments, null, 2)}
+                </EuiCodeBlock>
+              </div>
+            );
+          })}
     </EuiFlexItem>
   );
 
