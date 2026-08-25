@@ -311,6 +311,12 @@ export const chatMessageSchema = schema.object({
   createdAt: schema.maybe(schema.number({ min: 0 })),
   table: schema.maybe(tableSpecSchema),
   interrupted: schema.maybe(schema.boolean()),
+  // Wire-proof fix (common/types.ts's `ChatMessage.privacyEnabled` doc comment): persisted on a
+  // role:'tool' digest message and on a role:'assistant' prose message so a LATER resume/reload can
+  // still fail-closed-exclude a privacy-off turn's history — common/chat-history.ts's
+  // `excludePrivacyOffHistory`/`reconstructConversation`. Optional, so a conversation saved before
+  // this field existed is still accepted (and reads back as "unknown", which fails closed).
+  privacyEnabled: schema.maybe(schema.boolean()),
 });
 
 /** `minLength: 1` alone lets a whitespace-only string like `'   '` through (it has length 3), so

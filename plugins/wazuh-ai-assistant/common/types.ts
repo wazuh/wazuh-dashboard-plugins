@@ -122,6 +122,30 @@ export interface ChatMessage {
    * never sends message-level extras.
    */
   vendorExtras?: Record<string, unknown>;
+  /**
+   * Wire-proof fix (build 7d822b465's residual, AI/qa/wire-proof-v35/capture.jsonl): replay-history
+   * bookkeeping ONLY, never forwarded to the provider — every adapter's `to*Message` (e.g.
+   * openai-compatible.ts's `toOpenAiMessage`) builds a fresh wire object field-by-field from a known
+   * allowlist, so an extra field here is simply never one of the fields any adapter reads.
+   *
+   * True when the digest/prose this message carries was captured while privacy mode was ON for the
+   * turn that produced it; `false` or ABSENT means it was captured with privacy OFF (a conversation
+   * persisted by a build that predates this field also reads as absent, indistinguishable from
+   * "off"). Set on a `role:'tool'` history message (the digest) and on a `role:'assistant'` PROSE
+   * message (the model's own narration for that turn) — never meaningful on `role:'user'` (the
+   * user's own question is a separate, already-documented residual, not dropped by this mechanism)
+   * or `role:'system'`.
+   *
+   * Consulted by `common/chat-history.ts`'s `excludePrivacyOffHistory`, which BOTH
+   * `buildOutgoingMessages` (client, courtesy/bandwidth) and `server/routes/chat.ts` (server, the
+   * actual authority) call before any privacy-ON turn's history reaches the provider: only
+   * `=== true` is trusted, so a missing/unknown flag fails CLOSED (excluded), never open. This
+   * closes the specific wire-proven leak where a bare (non-dotted) real value with no shape a regex
+   * can single out — most commonly `wazuh.agent.name` — survived the shape-scan-only replay path
+   * because the field policy that would normally anonymize it only ever runs when a digest is
+   * CREATED, not when a client-supplied one is replayed.
+   */
+  privacyEnabled?: boolean;
 }
 
 /** One client-held pseudonym mapping entry: a real value and

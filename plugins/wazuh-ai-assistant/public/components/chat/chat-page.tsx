@@ -1335,6 +1335,41 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
      * pseudonym state to resume (server/conversation-store.ts's PRIVACY INTERACTION doc
      * comment: the map is wire-only and never persisted) and no stored tool_call/digest pairs to
      * replay as history either.
+     *
+     * Replay-leak fix (Fix 3): this comment always SAID both reset, but the code underneath it only
+     * ever reset the pseudonym map — `turnHistoryRef.current` was restored from
+     * `restored.turnRecords`, not cleared. That mismatch was a real bug, not just a stale comment:
+     * `ToolExchange.digestContent` (common/chat-history.ts) is "already pseudonym-form when privacy
+     * was on for that turn" — i.e. it can contain tokens like `HOST_1`/`IP_2` minted by a PAST
+     * session's `Pseudonymizer`, referring to THAT session's real values. `Pseudonymizer`'s mint
+     * counters (privacy.ts's constructor) are derived only from the SEEDED map, so a resumed
+     * conversation's now-empty map means the next turn's server-side `Pseudonymizer` restarts every
+     * counter at 0 — its very first fresh mint this session is `IP_1`/`HOST_1` again, colliding with
+     * whatever `IP_1`/`HOST_1` already means in the replayed digest content from the OLD session.
+     * `buildOutgoingMessages` (chat-history.ts) would then resend that stale digest verbatim as
+     * history, and `StreamDepseudonymizer.reverseText` (privacy.ts) would reverse any model-echoed
+     * `IP_1`/`HOST_1` using THIS session's fresh mapping — silently substituting a DIFFERENT
+     * session's real host/IP for the one the stale token actually meant. Fixed by actually clearing
+     * `turnHistoryRef.current` here, matching what this comment always claimed: a resumed
+     * conversation drops its tool-call/digest replay bookkeeping along with the pseudonym map that
+     * digest content's tokens depend on. This does NOT affect what's on screen — `restored.messages`
+     * (below) is the reconstructed, already-real-valued DISPLAY text, entirely separate from
+     * `turnHistoryRef`'s replay-only bookkeeping; only the model's ability to reuse a resumed
+     * conversation's last couple of tool calls without re-running them is lost, not any visible
+     * history. `handleNewConversation` below already resets both together the same way; this brings
+     * `applyLoadedConversation` into line with that existing convention instead of being the one
+     * path that didn't.
+     *
+     * SCOPE of this fix, stated precisely: it closes the stale-token collision for DIGEST REPLAY
+     * only — the `turnHistoryRef`-driven `[assistant{toolCalls}, tool{digest}]` resend this
+     * function controls. A pseudonym-shaped token the MODEL itself hallucinated into its own prose
+     * (no real mapping ever backed it — nothing this codebase mints, just the model echoing
+     * something token-shaped) can still land in `record.messages`' persisted `assistant` content,
+     * survive `reconstructConversation` into `restored.messages` for DISPLAY, and later collide
+     * with a genuine fresh mint of that same token string after a subsequent resume. That is a
+     * DISPLAY-layer misattribution risk (the reconstructed transcript could render the wrong real
+     * value next to old prose) — not an exfiltration path, since it never puts a real value in
+     * front of the provider that shouldn't be there; out of scope for this fix.
      */
     const applyLoadedConversation = (record: ConversationRecord) => {
       // A resumed conversation opens at its latest turn (bottom), like every chat client — through
@@ -1346,10 +1381,11 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       welcomeDismissedRef.current = false;
       const restored = reconstructConversation(record.messages);
       updateMessages(restored.messages);
-      // Restoring the tool history is what makes a resumed conversation continuable rather than just
-      // readable: the model gets back the tool calls whose results its prose describes, instead of
-      // re-running the same queries on the next question.
-      turnHistoryRef.current = restored.turnRecords;
+      // Replay-leak fix (Fix 3): NOT `restored.turnRecords` — see this function's doc comment above
+      // for why replaying another session's pseudonym-form digest content against a freshly emptied
+      // map (right below) is unsafe. The resumed conversation is fully READABLE (restored.messages
+      // above), just not continuable-without-re-querying the way a same-session turn is.
+      turnHistoryRef.current = [];
       setPseudonymMap([]);
       setActiveConversationId(record.id);
       // Optimistic concurrency: this tab's last-known version starts at whatever the GET returned —
@@ -1882,6 +1918,13 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       target: TurnConversationTarget;
       outgoingMessages: ChatMessage[];
       privacyPayload: ChatRequest['privacy'];
+      /** Wire-proof fix: this turn's own resolved privacy state, stamped onto every `ToolExchange`
+       * this turn records (`common/chat-history.ts`'s `ToolExchange.privacyEnabled` doc comment) so
+       * a LATER turn's `buildOutgoingMessages` call can fail-closed-exclude it if privacy has been
+       * turned off again by then. Passed separately from `privacyPayload` rather than derived from
+       * it (`privacyPayload` is `undefined` in the common "privacy off, nothing minted yet" case,
+       * which would make deriving "was privacy on" from its mere presence fragile). */
+      privacyEnabledForTurn: boolean;
     }) => {
       const {
         assistantMessageId,
@@ -1889,6 +1932,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
         target,
         outgoingMessages,
         privacyPayload,
+        privacyEnabledForTurn,
       } = args;
 
       setIsGenerating(true);
@@ -2139,7 +2183,12 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
             // Digest-in-history bookkeeping only — never rendered as a UI message (message_bubble.tsx
             // has no bubble type for it; it lives in this turn's record until a LATER turn's
             // buildOutgoingMessages call resends it, or until the turn is saved).
-            turnRecord?.toolExchanges.push({ toolCall: event.toolCall });
+            // Wire-proof fix: `privacyEnabledForTurn` stamped here, not derived later — see
+            // ToolExchange.privacyEnabled's doc comment (common/chat-history.ts).
+            turnRecord?.toolExchanges.push({
+              toolCall: event.toolCall,
+              privacyEnabled: privacyEnabledForTurn,
+            });
             // Also surfaced in the bubble (message-bubble.tsx's collapsed "queries executed" panel),
             // so the reader can check the query behind the answer as it runs.
             committedToolCalls = [...committedToolCalls, event.toolCall];
@@ -2374,6 +2423,10 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
         content: '',
         isStreaming: true,
         createdAt: Date.now(),
+        // Wire-proof fix: stamped once at creation and preserved through every later spread-update
+        // (delta/done/etc. never touch this field) — see UiChatMessage.privacyEnabled's doc
+        // comment (message-bubble.tsx).
+        privacyEnabled: effectivePrivacyEnabled,
       };
 
       // Built from turnHistoryRef BEFORE this turn's own (still-empty) record is registered below, so
@@ -2381,6 +2434,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       const outgoingMessages = buildOutgoingMessages(
         history,
         turnHistoryRef.current,
+        effectivePrivacyEnabled,
       );
       turnHistoryRef.current = [
         ...turnHistoryRef.current,
@@ -2416,6 +2470,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
         target,
         outgoingMessages,
         privacyPayload,
+        privacyEnabledForTurn: effectivePrivacyEnabled,
       });
     };
 
@@ -2583,14 +2638,34 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
     // chat-page half of that disclosure — the concrete field categories are named once here and
     // once more in the admin Settings page description (settings-page.tsx); wording intentionally
     // matches between the two.
+    //
+    // NF-1 UX fix: the previous wording ("... are pseudonymized before being sent") named the field
+    // categories without saying WHOSE data they come from, which read as a blanket guarantee over
+    // everything reaching the provider — including text the user types into chat, which is only
+    // ever covered by the narrower, best-effort scan described in scrubMessagesForProvider's doc
+    // comment (server/routes/chat.ts), not the full field-policy pipeline. Reworded to scope the
+    // promise to Wazuh data explicitly and call out that the user's own typed text isn't covered by
+    // it the same way.
     const privacyExplainerText = privacyEnabled
       ? i18n.translate('wazuhAiAssistant.chat.privacy.explainOn', {
+          // F9: the previous wording ("Text you type yourself is not automatically masked.")
+          // flatly denied any protection for typed text, which under-promises and contradicts the
+          // actual pipeline: prescanAndMint already catches typed IPs/dotted FQDNs, and NF-1's fix
+          // additionally catches a bare identifier already known from earlier this session
+          // (scrubKnownEntities). Replaced with an accurate, still-short statement of what IS and
+          // is NOT covered — see scrubMessagesForProvider's doc comment (server/routes/chat.ts) for
+          // the full, precise residual this summarizes.
+          // Adversarial round 2: "hostnames" in the first clause over-promised — a FRESH bare
+          // hostname the user types (no dotted suffix) is never unconditionally scanned, only a
+          // dotted domain name/FQDN is (prescanAndMint's shape scan) or an already-known bare
+          // identifier is (the second clause, scrubKnownEntities). Narrowed the first clause to
+          // "domain names" so it names only what is ALWAYS scanned regardless of prior mint.
           defaultMessage:
-            'Privacy on: hostnames, IP addresses, usernames, process command lines, and finding/rule text are pseudonymized before being sent to the configured AI provider.',
+            'Privacy on: Wazuh data sent to the AI provider — hostnames, IP addresses, usernames, process command lines, and finding/rule text — is pseudonymized. Text you type is scanned for IP addresses, domain names, and identifiers already seen in this session; other identifiers you type may reach the provider unmasked.',
         })
       : i18n.translate('wazuhAiAssistant.chat.privacy.explainOff', {
           defaultMessage:
-            'Privacy off: hostnames, IP addresses, usernames, process command lines, and finding/rule text are sent to the configured AI provider as-is.',
+            'Privacy off: Wazuh data sent to the AI provider — hostnames, IP addresses, usernames, process command lines, and finding/rule text — is sent as-is.',
         });
 
     // Conversation header title: the active conversation's own saved title when one is open
