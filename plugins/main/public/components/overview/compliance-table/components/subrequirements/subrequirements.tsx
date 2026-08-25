@@ -307,7 +307,7 @@ export class ComplianceSubrequirements extends Component {
             <EuiFlexGroup>
               <EuiFlexItem grow={false}>
                 <EuiText grow={false}>
-                  <span>Hide requirements with no alerts </span> &nbsp;
+                  <span>Hide requirements with no findings </span> &nbsp;
                   <EuiSwitch
                     label=''
                     checked={this.state.hideAlerts}
