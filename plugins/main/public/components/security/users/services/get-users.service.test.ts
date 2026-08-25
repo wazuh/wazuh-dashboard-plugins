@@ -33,7 +33,7 @@ describe('GetUsersService', () => {
     });
   });
 
-  it('keeps the previous default sort when none is provided', async () => {
+  it('defaults to ascending username, matching the table default sort', async () => {
     await GetUsersService();
 
     expect(apiReq.mock.calls[0][2].params.sort).toBe('+username');

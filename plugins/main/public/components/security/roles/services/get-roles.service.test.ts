@@ -22,13 +22,13 @@ describe('GetRolesService', () => {
     expect(apiReq.mock.calls[0][1]).toBe('/security/roles');
   });
 
-  it('keeps the previous default sort when called without options', async () => {
+  it('defaults to ascending name, the order the role selectors expect', async () => {
     await GetRolesService();
 
     expect(apiReq.mock.calls[0][2].params.sort).toBe('+name');
   });
 
-  it('keeps the default when called with an empty options object', async () => {
+  it('keeps the ascending name default when called with an empty options object', async () => {
     // useApiService invokes the service as service({})
     await GetRolesService({});
 
