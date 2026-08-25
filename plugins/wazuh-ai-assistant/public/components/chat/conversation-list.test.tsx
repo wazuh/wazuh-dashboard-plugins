@@ -812,6 +812,130 @@ describe('ConversationList', () => {
       expect(flexGroup?.children).toHaveLength(3);
     });
 
+    // #9018 review (Ian, screenshot): "The edit button is located above some text, which makes it
+    // hard to see." The pencil overlay's background was `--wz-accent-hover` -- a 6% tint, i.e. 94%
+    // transparent -- so the text it sat on read straight through the icon. jsdom has no layout
+    // engine and does not compile the SCSS, so what is assertable here is the STRUCTURE the fix
+    // hangs off: the overlay still carries the class the opaque-pill rule targets, the timestamp
+    // now carries the class that reserves the width the overlay sits over, and that reservation is
+    // present at rest (a width that only appeared on hover would reflow the title on hover, which
+    // is exactly what the M3 overlay exists to avoid). The rendered colors themselves are a visual
+    // check -- see the PR's evidence pass.
+    it('#9018: the rename overlay and the width it reserves are both wired at rest', () => {
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Rename me' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={noop}
+        />,
+      );
+
+      const row = screen.getByText('Rename me').closest('.wzConvoRow');
+      const pencil = screen.getByRole('button', {
+        name: 'Rename conversation',
+      });
+      // The opaque-pill rule (conversation-list.scss) is keyed on this class, and it is on the
+      // overlay unconditionally -- so it applies to BOTH reveal paths this branch ships, pointer
+      // hover and keyboard focus, not only to hover.
+      expect(pencil.closest('.wzConvoRowRenameOverlay')).not.toBeNull();
+
+      // The reserved timestamp slot: present before any hover, and inside the row's own flex group
+      // (so it is real reserved layout, not another overlay).
+      const flexGroup = row?.querySelector(':scope > .euiFlexGroup');
+      const timestampSlot = flexGroup?.querySelector('.wzConvoRowTimestamp');
+      expect(timestampSlot).not.toBeNull();
+
+      // Hovering reveals the pencil without adding, removing or re-classing a single flex item --
+      // the reservation is the same one it was at rest.
+      fireEvent.mouseEnter(row as HTMLElement);
+      expect(flexGroup?.children).toHaveLength(3);
+      expect(flexGroup?.querySelectorAll('.wzConvoRowTimestamp')).toHaveLength(
+        1,
+      );
+    });
+
+    // #9018 review G1: the pill used to hardcode the hover tint, so it matched the row only while
+    // hovered-and-unselected -- on a SELECTED row it under-painted a 10% tint at 6% and read as a
+    // lighter patch. The row now PUBLISHES the background it paints and the pill re-paints that same
+    // value over its own opaque ground, so the two match in every state by construction.
+    //
+    // Only the PUBLISHED value is asserted here. The painted one is not readable in this
+    // environment: jsdom's `background` shorthand parser drops a `var()` value outright, so
+    // `style.background` reports whatever last parsed rather than what React set -- asserting it
+    // would test jsdom's CSS parser, not this component. That the two agree is structural (one
+    // `const` feeds both), and the rendered colors are a visual check for the evidence pass.
+    it('#9018: the row publishes the background it paints, in every state', () => {
+      const { rerender } = render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Publish me' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={noop}
+        />,
+      );
+
+      const rowOf = () =>
+        screen.getByText('Publish me').closest('.wzConvoRow') as HTMLElement;
+      const publishedBg = (element: HTMLElement) =>
+        element.style.getPropertyValue('--wz-convo-row-bg');
+
+      // At rest: transparent, and published as such -- the pill then resolves to bare surface,
+      // which is exactly what an unhighlighted row renders as over that same ground.
+      const atRest = publishedBg(rowOf());
+      expect(atRest).toBe('transparent');
+
+      // Hovered: the hover tint, published.
+      fireEvent.mouseEnter(rowOf());
+      const hovered = publishedBg(rowOf());
+      expect(hovered).toBe('var(--wz-accent-hover)');
+
+      // SELECTED: the 10% tint the pill used to under-paint at 6%. This is the state G1 is about.
+      rerender(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Publish me' })]}
+          isLoading={false}
+          activeConversationId='c1'
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={noop}
+        />,
+      );
+      const selected = publishedBg(rowOf());
+      expect(selected).toBe('var(--wz-accent-soft)');
+
+      // Three states, three DIFFERENT published values -- so a pill following this property tracks
+      // all of them, where the hardcoded tint could only ever match one.
+      expect(new Set([atRest, hovered, selected]).size).toBe(3);
+    });
+
+    // #9018 review nit: the row's padding is the figure the overlay's geometry is derived from, so
+    // it lives in the stylesheet as one SCSS constant rather than as an inline literal here.
+    it('#9018: the row takes its padding from the stylesheet, not an inline literal', () => {
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Pad me' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={noop}
+        />,
+      );
+
+      const row = screen.getByText('Pad me').closest('.wzConvoRow');
+      expect(row).toHaveClass('wzConvoRowLayout');
+      expect((row as HTMLElement).style.padding).toBe('');
+    });
+
     it('M3 REGRESSION: the pencil is NOT permanently shown on the active/selected row -- hover or focus only', () => {
       render(
         <ConversationList

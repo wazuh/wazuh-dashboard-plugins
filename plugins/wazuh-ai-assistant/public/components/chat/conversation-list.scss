@@ -66,6 +66,19 @@
 /** The expanded rail is a full-height flex column so the collapse control above can be pinned and
   * the conversation list itself is the part that scrolls. */
 .wzConvoRail {
+  /**
+   * The ground the DOCKED rail paints, republished for `.wzConvoRowRenameOverlay`'s opaque pill.
+   *
+   * chat-page.tsx renders this rail as `<EuiPanel color='subdued'>`, and EUI maps `subdued` to
+   * `$euiPageBackgroundColor` (its `$ouiPanelBackgroundColorModifiers`) — the SAME value
+   * `_redesign.scss` already publishes as `--wz-chrome`, so this names an existing token rather
+   * than restating a hex or guessing at a shade. `--wz-surface` (the white card tone) is a
+   * different color in both themes: measured on the v9 light theme, the rail paints #F0F2F4 while
+   * `--wz-surface` is #FCFEFF, so a pill grounded in `--wz-surface` was a permanently lighter
+   * rectangle sitting in the docked rail — visible at rest and on focus-without-hover, where the
+   * row's own tint is transparent and the ground is all the pill has.
+   */
+  --wz-convo-rail-bg: var(--wz-chrome, #{$euiPageBackgroundColor});
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -96,6 +109,18 @@
  */
 .wzConvoRailFlyout {
   @include wzSurfaceTokens;
+  /**
+   * The flyout's ground is NOT the docked rail's. `EuiFlyout` paints `$euiColorEmptyShade` (the
+   * white card tone, `--wz-surface`), where the docked `EuiPanel color='subdued'` paints
+   * `$euiPageBackgroundColor` — measured on v9 light, #FCFEFF against #F0F2F4. The rename pill has
+   * to be grounded in whichever one it is actually sitting on, so each container publishes its own
+   * and the pill just reads `--wz-convo-rail-bg` without knowing which rail it is in.
+   *
+   * No specificity fight with `.wzConvoRail` above: chat-page.tsx renders the rail EITHER as that
+   * docked panel OR inside this flyout wrapper, never one nested in the other, so exactly one of
+   * these two declarations is ever an ancestor of a given row.
+   */
+  --wz-convo-rail-bg: var(--wz-surface, #{$euiColorEmptyShade});
 }
 
 .wzConvoRailCollapsed {
@@ -153,23 +178,134 @@
   list-style: none;
 }
 
+/** One `EuiButtonIcon`'s box (EUI's default `size='m'`), named once so the rename overlay's offset
+ * and the timestamp's reserved width below are derived from the same figure rather than from two
+ * hand-copied numbers that can drift apart. */
+$wzConvoRowActionSize: 32px;
+/** The row's own padding. Emitted as a custom property by `.wzConvoRowLayout` below and consumed
+ * from there by the row itself, so this SCSS value is the single definition (#9018 review nit) —
+ * it used to be restated as an inline `padding: '8px'` in conversation-list.tsx, where nothing
+ * stopped the two from drifting apart and silently invalidating the overlay geometry derived from
+ * it. */
+$wzConvoRowPadding: 8px;
+/** `EuiFlexGroup gutterSize='xs'`, the gap between the row's own flex items. */
+$wzConvoRowGutter: 4px;
+/**
+ * Width reserved for the relative timestamp — sized to the WIDEST value `formatRelativeTime`
+ * (conversation-list.tsx) can produce, which is its >7-day branch: a localized `{month: 'short',
+ * day: 'numeric'}` date, "Jul 26" / "26 jul" / "26.07.", around 40px at this type size. The other
+ * branches ("now", "59m", "23h", "Mon") are all far narrower.
+ *
+ * #9018 review G2: sizing this to the ICON instead (28px) left the wide branch's leading glyphs
+ * sticking out to the left of the pill that is supposed to mask them. A FIXED width, not a
+ * `min-width`, is what makes the pill's coverage provable rather than approximate — the slot cannot
+ * grow past what the pill spans — and anything wider than the branches above (an unusually verbose
+ * locale) ellipses inside it instead of pushing out.
+ */
+$wzConvoRowTimestampSlot: 48px;
+
+/**
+ * The row's own box. Split out from `.wzConvoRow` (chat-page.scss, which this component consumes
+ * but does not own) so the padding above and the geometry derived from it live together in one
+ * file.
+ */
+.wzConvoRowLayout {
+  --wz-convo-row-padding: #{$wzConvoRowPadding};
+  padding: var(--wz-convo-row-padding, #{$wzConvoRowPadding});
+}
+
 /**
  * The inline-rename pencil (M3 fix, #9010 review), anchored to `.wzConvoRow`'s own
  * `position: relative` (conversation-list.tsx) rather than living inside the row's flex group —
  * a zero-width flex item still cost the row a `gutterSize='xs'` margin at rest (EUI gutters are
- * margins, not padding), which this avoids entirely by never entering the flex flow. Positioned
- * over the timestamp/trash corner of the row: `right` clears the trash button's own box so the
- * two controls don't sit on top of each other when both are visible on hover, but a hovered
- * pencil is still expected to sit over part of the (glance-only) timestamp text — the background
- * below is the row's OWN hover tint, not a new color, so no text bleeds through it.
+ * margins, not padding), which this avoids entirely by never entering the flex flow. `right`
+ * clears the trash button's own box (the row's padding plus one icon) so the two controls never
+ * sit on top of each other when both are revealed.
+ *
+ * #9018 review: the pencil rendered ON TOP of the row's text and was, in the reviewer's words,
+ * "hard to see". The comment here used to claim the background stopped anything bleeding through,
+ * but `--wz-accent-hover` is `rgba($euiColorPrimary, 0.06)` — a 6% tint, i.e. 94% transparent — so
+ * the timestamp (and, on a row whose timestamp is short, the tail of the title) showed straight
+ * through the icon. The pill is now genuinely OPAQUE, in two layers:
+ *
+ *  - `background-color` is `--wz-convo-rail-bg`: THE GROUND THIS RAIL ACTUALLY SITS ON, which the
+ *    two rail containers publish for themselves below. It has to be opaque and it has to be the
+ *    right opaque, or the pill is a permanent lighter rectangle — see those two rules for why the
+ *    rail has two different grounds and why naming one of them here would be wrong.
+ *  - `background-image` re-applies THE ROW'S OWN computed background on top of that ground, read
+ *    from `--wz-convo-row-bg` — a custom property the row publishes alongside the background it
+ *    actually paints (conversation-list.tsx). Because both come from one expression, the pill
+ *    matches the row in every state by construction: hovered (`--wz-accent-hover`), SELECTED
+ *    (`--wz-accent-soft`, a 10% tint the pill used to under-paint at 6% and so showed as a lighter
+ *    patch), and focus-without-hover (`transparent`, where the pill correctly resolves to bare
+ *    surface — exactly what an unhighlighted row renders as over that same ground). #9018 review
+ *    G1: the previous version hardcoded the hover tint here, which matched only one of those three.
+ *
+ * Both layers are unconditional on the class, so they apply to every reveal path this branch
+ * ships — pointer hover AND keyboard focus (`isFocused`, F-3) — not only to hover.
+ *
+ * The pill spans the whole reserved timestamp slot plus its gutter, not just the icon's own box
+ * (#9018 review G2): masking only 32px of a 48px slot left the wide "Jul 26" branch's leading
+ * glyphs peeking out beside it. `justify-content: flex-end` keeps the icon itself exactly where it
+ * has always sat — flush against the trash button — while the backdrop extends left across
+ * everything it needs to cover.
+ *
+ * Every `var()` carries a fallback, for the same reason `_redesign.scss`'s own mixins do: an
+ * unresolved `var()` invalidates the WHOLE declaration, which here would silently restore the
+ * see-through pill this fixes. `--wz-convo-row-bg` falls back to `transparent`, which degrades to
+ * the plain ground rather than to nothing.
+ *
+ * `inset-inline-end` rather than `right`, and `text-align: end` on the slot below: the row is a
+ * plain flex row, so in an RTL locale its `[title][timestamp][trash]` order mirrors and the whole
+ * action corner moves to the left — a physical `right` would strand the pill on the side the
+ * controls just left. The logical property follows them.
  */
 .wzConvoRowRenameOverlay {
   position: absolute;
   top: 50%;
-  right: 40px;
+  inset-inline-end: $wzConvoRowPadding + $wzConvoRowActionSize;
+  width: $wzConvoRowGutter + $wzConvoRowTimestampSlot;
+  display: flex;
+  justify-content: flex-end;
   transform: translateY(-50%);
-  background: var(--wz-accent-hover);
   border-radius: 4px;
+  background-color: var(--wz-convo-rail-bg, #{$euiColorEmptyShade});
+  background-image: linear-gradient(
+    var(--wz-convo-row-bg, transparent),
+    var(--wz-convo-row-bg, transparent)
+  );
+}
+
+/**
+ * The relative timestamp beside the trash button — the ONE thing the revealed pencil is allowed to
+ * cover, since it is glance-only and the pill above masks it completely.
+ *
+ * The reserved width is what keeps that promise honest (#9018 review). The pill spans from
+ * `right: 40px` leftwards across this slot and its gutter; without a reservation, a timestamp
+ * narrower than that span — "2m", "5h" — left the pencil hanging past the timestamp and over the
+ * TITLE's last glyphs, and one WIDER than it (the "Jul 26" branch, G2) pushed its own leading
+ * glyphs out to the left of the pill. A fixed `$wzConvoRowTimestampSlot` pins both ends: the slot
+ * is exactly as wide as the pill covers, so the pencil never reaches title text and never leaves
+ * timestamp text showing beside it.
+ *
+ * Reserved UNCONDITIONALLY, not only while the icons are revealed: the whole point of the M3
+ * overlay is that hovering a row reflows nothing, and a width that appeared on hover would put the
+ * title reflow straight back. `text-align: right` keeps a short timestamp hugging the trash button,
+ * exactly where it sat before this reservation existed; the truncation is the backstop for a locale
+ * whose date form runs wider than the slot, which ellipses rather than escaping it.
+ */
+.wzConvoRowTimestamp {
+  width: $wzConvoRowTimestampSlot;
+  flex-shrink: 0;
+  /* `end`, not `right`: mirrors with the row in RTL, same reason as the overlay's
+     `inset-inline-end` above. */
+  text-align: end;
+  overflow: hidden;
+
+  .euiText {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 /** EUI's `.euiFlexGroup` carries `flex-grow: 1`. These two rows are direct children of

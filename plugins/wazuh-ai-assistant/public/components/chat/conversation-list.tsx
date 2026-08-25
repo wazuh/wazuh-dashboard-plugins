@@ -960,6 +960,30 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                   const isFocused = conversation.id === focusedId;
                   const isRenaming = conversation.id === renamingId;
                   const isChecked = selectedIds.has(conversation.id);
+                  // "Soft-tinted pill on the active row" (design language, "Navigation"): a filled,
+                  // well-rounded highlight rather than the old left-border indicator — font-weight
+                  // 600 plus `aria-current` below are what carry the non-color-reliant signal now.
+                  const rowBackground =
+                    !selectMode && isSelected
+                      ? 'var(--wz-accent-soft)'
+                      : isHovered
+                      ? 'var(--wz-accent-hover)'
+                      : 'transparent';
+                  // ONE expression, painted here and PUBLISHED as `--wz-convo-row-bg` for the
+                  // rename overlay to re-paint over its own opaque ground
+                  // (conversation-list.scss). #9018 review G1: the overlay used to hardcode the
+                  // hover tint, so it matched the row only while hovered-and-unselected — on a
+                  // SELECTED row (a 10% tint it under-painted at 6%) it read as a lighter patch.
+                  // Publishing the value instead of restating it makes the two agree in every
+                  // state, including any state added later.
+                  const rowStyle: React.CSSProperties &
+                    Record<'--wz-convo-row-bg', string> = {
+                    position: 'relative',
+                    cursor: selectMode ? 'default' : 'pointer',
+                    borderRadius: 8,
+                    background: rowBackground,
+                    '--wz-convo-row-bg': rowBackground,
+                  };
                   return (
                     <li key={conversation.id} className='wzConvoRailListItem'>
                       {/* Plain `div` (not EuiFlexGroup) carries the interactive/a11y attributes,
@@ -1025,23 +1049,11 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                         // wzConvoRow (chat-page.scss) supplies a reduced-motion-safe transition timing
                         // for the background/border-color changes below — the colors themselves stay
                         // driven by this row's own hover/selected state, unchanged.
-                        className='wzConvoRow'
-                        style={{
-                          position: 'relative',
-                          cursor: selectMode ? 'default' : 'pointer',
-                          padding: '8px',
-                          // "Soft-tinted pill on the active row" (design language, "Navigation"): a
-                          // filled, well-rounded highlight rather than the old left-border indicator —
-                          // font-weight 600 plus `aria-current` above are what carry the
-                          // non-color-reliant signal now.
-                          borderRadius: 8,
-                          background:
-                            !selectMode && isSelected
-                              ? 'var(--wz-accent-soft)'
-                              : isHovered
-                              ? 'var(--wz-accent-hover)'
-                              : 'transparent',
-                        }}
+                        // wzConvoRowLayout (conversation-list.scss) owns the row's padding, which
+                        // the rename overlay's geometry is derived from: restating it as an inline
+                        // literal here let the two drift (#9018 review nit).
+                        className='wzConvoRow wzConvoRowLayout'
+                        style={rowStyle}
                       >
                         <EuiFlexGroup
                           responsive={false}
@@ -1126,8 +1138,13 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                               {/* The relative timestamp moves onto the row's own line (design gap "a
                                 whole line spent on a relative timestamp") — `flexShrink: 0` and
                                 `whiteSpace: 'nowrap'` keep it from ever wrapping under the truncated
-                                title beside it. */}
-                              <EuiFlexItem grow={false}>
+                                title beside it. `wzConvoRowTimestamp` (conversation-list.scss)
+                                reserves the width the revealed rename pencil sits over, so that
+                                overlay can never reach the title's glyphs — see that rule. */}
+                              <EuiFlexItem
+                                grow={false}
+                                className='wzConvoRowTimestamp'
+                              >
                                 <EuiText
                                   size='xs'
                                   color='subdued'
