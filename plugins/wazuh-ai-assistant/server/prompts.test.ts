@@ -825,10 +825,10 @@ test(
 // when CV-058 wrote it and has been false since workstream A1a widened search_wazuh_data's
 // index_pattern enum: `wazuh-states-*` covers wazuh-states-fim-registry-keys/-values, both
 // allowlisted by guardrails.ts. Because the decline fired BEFORE any query, the model never
-// reached data that exists -- on eval run 20260825-193632 EV2-FIM-002 ("did anything write to a
-// Run key on win-ws-014?") emitted the decline copy verbatim with ZERO tool calls while the
-// HKLM\...\CurrentVersion\Run\SecurityUpdater value sat one escape-hatch query away, and
-// EV2-EXP-002 scored 2.6/10 for the same reason. These tests hold the replacement in place: the
+// reached data that exists -- asked whether anything had written to a Run key on a named Windows
+// host, it emitted the decline copy verbatim with ZERO tool calls while the matching
+// HKLM\...\CurrentVersion\Run value sat one escape-hatch query away, and the same premise sank
+// every other registry answer. These tests hold the replacement in place: the
 // route must be stated, the decline copy must be gone, and the absence claim must stay gated
 // behind an actual zero-row result.
 test('phase 5: registry FIM is ROUTED to the escape hatch, never declined up front', () => {
@@ -847,7 +847,7 @@ test('phase 5: the old registry decline copy is gone from the prompt entirely', 
   assert.doesNotMatch(
     prompt,
     /I don't have Windows registry change data/,
-    'the decline copy EV2-FIM-002 recited verbatim, with zero tool calls',
+    'the decline copy the model recited verbatim, with zero tool calls',
   );
   assert.doesNotMatch(
     prompt,
@@ -868,12 +868,13 @@ test('phase 5: an absence claim about registry data is gated behind a real zero-
   );
 });
 
-// EXPLAIN-WAVE PHASE 4 -- the one fabrication the judge flagged in eval run 20260825-174333 was
+// EXPLAIN-WAVE PHASE 4 -- the one measured fabrication was
 // the registry decline's own copy, recited verbatim. It used to assert "this deployment's
 // monitored hosts are Linux-only, so no registry documents exist here either": a claim about the
 // customer's fleet hardcoded in a first-party prompt string, true only of whatever deployment
-// CV-058 was written against. On EV2-EXP-002 the model repeated it on a fleet with four Windows
-// hosts and scored 1/10 on groundedness. Phase 5 deleted the decline that carried it, so this test
+// CV-058 was written against. The model repeated it verbatim on a fleet that does run Windows
+// hosts, which is a groundedness failure however the question is phrased. Phase 5 deleted the
+// decline that carried it, so this test
 // now guards the RULE rather than the decline: the ban travelled onto the replacement route
 // deliberately, because the fabrication shape is about registry FIM, not about declining.
 test('phase 4/5: no copy asserts what platforms this deployment monitors', () => {
@@ -887,8 +888,7 @@ test('phase 4/5: no copy asserts what platforms this deployment monitors', () =>
 });
 
 // --- EXPLAIN-WAVE PHASE 5: the bounded widening retry -------------------------------------------
-// Seven of the thirteen judged items still below target in run 20260825-193632
-// (EV2-EXP-001/002/006/008/012/014/018) stopped after ONE zero-row query. The prompt half of the
+// Most below-target explanatory answers stopped after ONE zero-row query. The prompt half of the
 // fix is this clause; the affordance half is chat.ts's `shouldGrantZeroRowWideningRound`, without
 // which the model has no tool-bearing round left to obey it in.
 test('phase 5: one widened attempt is required before declaring nothing found', () => {
@@ -925,9 +925,10 @@ test('phase 5: the widening clause names the three concrete moves to spend the r
 });
 
 // --- EXPLAIN-WAVE PHASE 6: the widening retry is pinned to the SAME question -------------------
-// The phase-5 clause bought the round but never said what it must be ABOUT. EV2-SCA-003 (eval run
-// 20260825-211841) spent it on a second exploratory get_field_values probe and never called the
-// typed SCA tool: tool_selection 1.00 -> 0.00. chat.ts's `shouldGrantZeroRowWideningRound` now
+// The phase-5 clause bought the round but never said what it must be ABOUT. On an SCA question
+// the model spent it on a second exploratory get_field_values probe and never called the
+// typed SCA tool, turning a correct tool selection into a wrong one. chat.ts's
+// `shouldGrantZeroRowWideningRound` now
 // refuses the grace to a discovery-only round; this is the prose half of the same fix.
 test('phase 6: the retry must target the same question with exactly one thing changed', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
@@ -1080,11 +1081,11 @@ test('explain-wave: the relaxation does not lift the no-headings, no-table or gr
 });
 
 // --- EXPLAIN-WAVE PHASE 2: a NAMED host must reach an id-only tool as an id --------------------
-// Eval item EV2-SCA-002 (run 20260825-150326): the question named the host outright ("the failed
-// SCA checks on lin-web-01") and the model called get_sca_checks(result: "failed") with the agent
+// The measured shape: the question named the host outright ("the failed SCA checks on <host>")
+// and the model called get_sca_checks(result: "failed") with the agent
 // parameter simply omitted -- reading omission as "across all agents" when it actually triggers
 // sole-active-agent resolution, so the call answered about a different host and returned nothing.
-// EV2-EXP-002 is the sibling shape: get_fim_files(agent_id: "win-ws-014"), a NAME in a numeric
+// The sibling shape is get_fim_files(agent_id: "<host name>"), a NAME in a numeric
 // parameter, rejected outright. Both prompt paragraphs that existed covered only the case where NO
 // host is named.
 
@@ -1098,7 +1099,7 @@ test('buildSystemPrompt: tells the model to resolve a NAMED host to an id for ag
   assert.match(
     prompt,
     /do not put the name itself in a numeric agent_id/i,
-    'the EV2-EXP-002 shape: a name in a numeric parameter is rejected by validateAgentId',
+    'a name in a numeric parameter is rejected by validateAgentId',
   );
   assert.match(
     prompt,
@@ -1122,13 +1123,12 @@ test('buildSystemPrompt: the new resolution clause names no tool to call', () =>
 
 // --- EXPLAIN-WAVE PHASE 4: cite the concrete fix, and the state-vs-history surface split --------
 
-// Class E ("how do we remediate this item") was the worst-scoring judged class in eval run
-// 20260825-174333 (~4/10 mean), and the split inside it is what this clause targets: EV2-EXP-013
-// scored 9/10 on actionability because the digest happened to carry the scanner's fix bound and the
-// model quoted it ("install KB5034763"), while EV2-EXP-016 wrote generic prioritisation advice and
-// never touched the failing check it was asked about, nor that the check's remediation field was
-// empty. Both halves are pinned: quote the fix when there is one, disclose the silence when there
-// is not.
+// "How do we remediate this item" is the weakest answer class, and the split inside it is what
+// this clause targets: an answer is actionable only when the digest happens to carry the scanner's
+// fix bound and the model quotes it, while the same class also produces generic prioritisation
+// advice that never touches the failing check it was asked about, nor that the check's remediation
+// field was empty. Both halves are pinned: quote the fix when there is one, disclose the
+// silence when there is not.
 test('phase 4: part (3) must cite a concrete fix from the results before any general advice', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
@@ -1148,8 +1148,8 @@ test('phase 4: an empty fix field must be disclosed, not filled with the model\u
 
 // The SCA-specific sibling of the clause above: the CV-054 synthesis rule already told the model
 // what to do when check.rationale is missing, but said nothing about a missing check.remediation --
-// the exact field EV2-EXP-014/EV2-EXP-016's answer key turns on ("Wazuh supplies no remediation
-// guidance for check 28508").
+// the exact field a remediation answer turns on ("Wazuh supplies no remediation guidance for
+// this check").
 test('phase 4: an empty check.remediation is stated plainly, and own steps are marked as guidance', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
@@ -1161,8 +1161,8 @@ test('phase 4: an empty check.remediation is stated plainly, and own steps are m
   assert.match(prompt, /no rationale text was returned for that check/);
 });
 
-// EV2-VUL-001 asked which agents have a CVE-2024-21412 detection "in the findings history" and was
-// answered from wazuh-states-vulnerabilities (two hosts; the findings stream records one). The
+// A question asking which agents have a given CVE detection "in the findings history" was
+// answered from wazuh-states-vulnerabilities, whose host list for that CVE differs. The
 // model even disclosed the substitution and still answered from the wrong surface, so the gap was
 // never honesty -- nothing said the two surfaces answer different questions.
 test('phase 4: current state and detection history are named as non-substitutable surfaces', () => {

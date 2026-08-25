@@ -136,9 +136,9 @@ test('isRoundFutile: at least one successful call had new, non-duplicate rows --
 
 // --- shouldGrantZeroRowWideningRound: the ONE widening round (explain-wave phase 5) ---------
 //
-// Measured defect (eval run 20260825-193632): seven of the thirteen judged items still below
-// target -- EV2-EXP-001/002/006/008/012/014/018 -- issued a single over-narrow query, got zero
-// rows and abstained. `isRoundFutile` above latched the final round on that first empty result, so
+// Measured defect: most below-target explanatory answers issued a single over-narrow query, got
+// zero rows and abstained. `isRoundFutile` above latched the final round on that first empty
+// result, so
 // the system prompt's own "retry once with a broader filter" instruction was unobeyable: the next
 // round was offered no tools. These tests pin every bound that keeps the fix to exactly one round.
 
@@ -226,11 +226,11 @@ test('zero-row widening: only fires where isRoundFutile already said the round w
 
 // --- EXPLAIN-WAVE PHASE 6: a DISCOVERY-only zero-row round earns nothing ----------------------
 //
-// EV2-SCA-003 (eval run 20260825-211841) is the measured cost of the phase-5 grace: round 1 was a
+// The measured cost of the phase-5 grace, on an SCA question: round 1 was a
 // single `get_field_values` probe on `wazuh.rule.tags` that returned zero rows, the grace bought a
 // second tool-bearing round, and the model spent that round on ANOTHER `get_field_values` probe.
-// The typed SCA tool was never called -- tool_selection 1.00 -> 0.00, fidelity 1.00 -> 0.00 --
-// while the baseline arm had called `get_sca_results` and declined cleanly. A zero-row discovery
+// The typed SCA tool was never called, so a correct tool selection became a wrong one, while the
+// baseline arm had called `get_sca_results` and declined cleanly. A zero-row discovery
 // probe has ANSWERED the model ("this field carries nothing here"); it is not a retrieval attempt
 // that came up short, so it buys no extra round.
 

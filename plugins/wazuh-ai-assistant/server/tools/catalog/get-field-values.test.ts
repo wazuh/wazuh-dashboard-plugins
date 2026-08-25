@@ -113,7 +113,7 @@ test(
     'added to the allowlist elsewhere -- this tool has its own closed location map',
   () => {
     // EXPLAIN-WAVE PHASE 6: this test used "source.port", which `state-families.ts` has since
-    // opened for the ports surface deliberately (EV2-INV-017 -- a listener's port lives there).
+    // opened for the ports surface deliberately -- a listener's own port lives there.
     // "process.command_line" replaces it as the example and is a strictly better one: a real WCS
     // field, on a family this tool now reaches, that must NEVER become enumerable -- it is
     // unbounded free text AND privacy.ts anonymizes it. If a future widening makes this test fail,
@@ -254,8 +254,8 @@ test(
 
 // --- EXPLAIN-WAVE PHASE 6: field discovery on the wazuh-states-* surfaces ---------------------
 //
-// Root cause B of eval run 20260825-211841: this tool's vetted field set covered none of the state
-// schema, so on eleven inventory questions the model guessed field names -- and then read the
+// Root cause B of the unreachable state surfaces: this tool's vetted field set covered none of the
+// state schema, so on inventory questions the model guessed field names -- and then read the
 // rejection ("not one of this tool's vetted fields") as evidence the field did not exist. Every
 // field asserted below is live in the mapping and was reported by the assistant as missing.
 
@@ -369,9 +369,9 @@ test('phase 6: the index_family enum offers every state surface that has fields'
 });
 
 test('phase 6: both port fields are discoverable, so the RDP question is answerable', () => {
-  // EV2-INV-017 filtered `destination.port: 3389` and got 0 rows: on this schema a listener's port
-  // is `source.port` and `destination.port` is 0. Enumerating either has to be possible before the
-  // model can see that, instead of reading the empty result as "RDP is not exposed".
+  // Filtering `destination.port` for an exposure question returns 0 rows: on this schema a
+  // listener's port is `source.port` and `destination.port` is 0. Enumerating either has to be
+  // possible before the model can see that, instead of reading the empty result as "not exposed".
   assert.equal(
     build({ field: 'source.port' }).index,
     'wazuh-states-inventory-ports*',

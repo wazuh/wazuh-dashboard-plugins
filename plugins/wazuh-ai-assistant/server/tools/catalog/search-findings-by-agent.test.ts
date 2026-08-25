@@ -176,7 +176,7 @@ test("search_findings_by_agent: agent_name's description explains server-side re
     schema.properties.agent_name.description ?? '',
     /Optional: omit this.*resolves automatically when exactly one agent appears in the findings data/s,
   );
-  // EXPLAIN-WAVE PHASE 3 (EV2-FND-006): the description must also push a NAMED or DESCRIBED host
+  // EXPLAIN-WAVE PHASE 3: the description must also push a NAMED or DESCRIBED host
   // into the param instead of inviting omission -- "the domain controller" is a referent, and
   // omitting it is what let the resolver substitute a different agent.
   assert.match(
@@ -186,7 +186,7 @@ test("search_findings_by_agent: agent_name's description explains server-side re
 });
 
 test('search_findings_by_agent: resolves agent_name from the findings index it actually queries, not the Manager agent list', () => {
-  // EV2-FND-006 root cause: the Manager API's active-agent list and `wazuh-findings-v5*`'s
+  // Root cause: the Manager API's active-agent list and `wazuh-findings-v5*`'s
   // `wazuh.agent.name` values are different populations. When the Manager knows exactly one agent
   // (the manager node) and the findings index carries several, `manager-agents` took the
   // sole-candidate path and silently filtered by an agent with no findings, while the
@@ -213,7 +213,7 @@ test('search_findings_by_agent: the sole-candidate lookup aggregates the SAME in
     field: string;
   };
   const built = searchFindingsByAgentTool.buildRequest({
-    agent_name: 'win-dc-01',
+    agent_name: 'dc-01',
   }) as {
     index: string;
     body: { query: { bool: { filter: Record<string, unknown>[] } } };

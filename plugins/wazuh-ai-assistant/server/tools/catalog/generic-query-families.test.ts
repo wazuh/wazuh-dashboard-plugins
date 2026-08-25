@@ -77,8 +77,8 @@ test('excluded surfaces are NOT present (decline-tier / open product gaps / priv
 
 // EXPLAIN-WAVE PHASE 5. `wazuh-states-*` has covered wazuh-states-fim-registry-keys/-values since
 // the day it shipped, but its label said only "FIM", which reads as the files surface get_fim_files
-// already owns. On eval run 20260825-193632 the model declined two registry questions outright
-// (EV2-FIM-002: zero tool calls; EV2-EXP-002: 2.6/10) rather than aim this pattern at the registry
+// already owns. On that reading the model declined registry questions outright -- one of them
+// without a single tool call -- rather than aim this pattern at the registry
 // indices. The enum VALUE is untouched -- that is the wire contract -- but the label now says what
 // the pattern has always covered.
 test('the wazuh-states-* label names the registry half of FIM, not just files', () => {
@@ -90,7 +90,7 @@ test('the wazuh-states-* label names the registry half of FIM, not just files', 
   assert.match(states.label, /file state/);
 });
 
-// EXPLAIN-WAVE PHASE 6. Root cause A of eval run 20260825-211841: all eighteen wazuh-states-*
+// EXPLAIN-WAVE PHASE 6. Root cause A of the unreachable state surfaces: all eighteen wazuh-states-*
 // indices collapsed into ONE enum value, so a family-scoped query was unrepresentable -- the model
 // wrote a correct filter, the wildcard returned the union, and the sample carried none of the
 // requested fields. These tests pin the split and the two invariants that make it safe.

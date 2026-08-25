@@ -444,9 +444,10 @@ test('CHAIN_PAIRS: get_events_by_agent chains to find_document_by_field', () => 
 
 // --- EXPLAIN-WAVE PHASE 5: registry FIM must have a category that claims it -------------------
 //
-// Eval run 20260825-193632: EV2-FIM-002 ("did anything write to a Run key on win-ws-014?") made
-// ZERO tool calls -- the sharpest regression in the run -- and EV2-EXP-002 scored 2.6/10 on the
-// same shape. The `fim` category described itself as "current state of monitored files", so
+// Asked whether anything had written to a Run key on a named Windows host, the model made
+// ZERO tool calls -- the sharpest regression measured -- and every sibling registry question
+// failed the same way. The `fim` category described itself as "current state of monitored
+// files", so
 // nothing in the routing menu claimed Windows registry keys/values, even though the data is
 // reachable: search_wazuh_data is appended to every resolved list and `wazuh-states-*` covers
 // wazuh-states-fim-registry-keys/-values.

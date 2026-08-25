@@ -12,8 +12,8 @@
  * also feed `get-field-values.ts`'s `FIELD_LOCATIONS`, on the grounds that "which index carries
  * this field" is a different contract from "which families may be named". That separation held for
  * the ORIGINAL three families, and it still holds for them -- but it is exactly what let the
- * `wazuh-states-*` surfaces fail in both places at once (eval run 20260825-211841: an index the
- * enum could not name, whose fields could not be discovered either). The state families therefore
+ * `wazuh-states-*` surfaces fail in both places at once: an index the
+ * enum could not name, whose fields could not be discovered either. The state families therefore
  * now come from ONE shared row set, `../state-families.ts`, which feeds this enum, that map, and
  * `guardrails.ts`'s aggregation allowlist together; see that file's doc comment for why splitting
  * the three lists is what made the gap invisible. Everything else here is unchanged.
@@ -52,8 +52,8 @@ const ORIGINAL_FAMILIES: GenericQueryFamily[] = [
     // EXPLAIN-WAVE PHASE 5: the LABEL (not the `pattern`) now names the registry half of FIM
     // explicitly. The invariant above is about the enum VALUE -- that is the wire contract, and it
     // is untouched. This string only ever reaches the model as parameter-description prose, and the
-    // bare word "FIM" was reliably read as "the files surface get_fim_files already owns": on eval
-    // run 20260825-193632 the model declined two registry questions outright rather than aim this
+    // bare word "FIM" was reliably read as "the files surface get_fim_files already owns", and on
+    // that reading the model declined registry questions outright rather than aim this
     // pattern at `wazuh-states-fim-registry-*`, which it has covered since this pattern shipped.
     // The system prompt now carries the full routing rule; this makes the tool's own schema agree
     // with it instead of quietly implying the narrower reading.
@@ -61,8 +61,8 @@ const ORIGINAL_FAMILIES: GenericQueryFamily[] = [
     // EXPLAIN-WAVE PHASE 6: the value still ships (wire contract; a caller that has always sent it
     // keeps working), but the label now says what it COSTS. This wildcard fans out over all
     // eighteen state indices at once, and the returned sample is dominated by whichever family has
-    // the most documents -- which is why eleven inventory questions on eval run 20260825-211841
-    // came back "the fields I asked for were empty" against a corpus that holds them. The
+    // the most documents -- which is why inventory questions came back
+    // "the fields I asked for were empty" against a corpus that holds them. The
     // per-family patterns below are the answer to that, so this entry's job is now to send the
     // model there.
     label:
@@ -75,7 +75,7 @@ const ORIGINAL_FAMILIES: GenericQueryFamily[] = [
 ];
 
 /**
- * EXPLAIN-WAVE PHASE 6 (eval run 20260825-211841, RESULTS.md "Root cause A"): one enum entry per
+ * EXPLAIN-WAVE PHASE 6 (root cause A of the unreachable state surfaces): one enum entry per
  * physical `wazuh-states-*` index, derived from `../state-families.ts` so the enum, the
  * field-discovery route (`get-field-values.ts`'s `FIELD_LOCATIONS`) and the aggregation allowlist
  * (`guardrails.ts`) can never again list a different set of state surfaces from each other.

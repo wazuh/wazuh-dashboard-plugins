@@ -713,8 +713,7 @@ function isDiscoveryToolCall(toolName: string): boolean {
  * ZERO-ROW WIDENING GRACE (explain-wave phase 5) -- exactly ONE extra tool-bearing round after the
  * turn's FIRST all-zero-row round, and never more.
  *
- * The measured defect (eval run 20260825-193632, RESULTS.md "every judged item still below 8"):
- * seven of the thirteen below-target items -- EV2-EXP-001/002/006/008/012/014/018 -- stop after a
+ * The measured defect: most below-target explanatory answers stop after a
  * SINGLE over-narrow or malformed query and then abstain, and the reason is mechanical rather than
  * a prompt-compliance failure. `isRoundFutile` above treats "every successful call returned zero
  * rows" identically to "every successful call was a duplicate", latching
@@ -739,13 +738,13 @@ function isDiscoveryToolCall(toolName: string): boolean {
  *  - the caller still charges the round's cost first and still forces the final round when the
  *    budget ceiling is spent, so this can never buy a round the budget cannot pay for.
  *
- * EXPLAIN-WAVE PHASE 6 -- the fourth bound, and the one the NEXT run's evidence asked for: a round
- * whose only successful calls were DISCOVERY calls earns nothing. `EV2-SCA-003` (eval run
- * 20260825-211841) is the whole argument. Baseline called `get_sca_results` and declined cleanly;
- * phase 5 opened with a `get_field_values` probe on `wazuh.rule.tags` that returned zero rows,
- * this grace handed it a second tool-bearing round, and it spent that round on ANOTHER
- * `get_field_values` probe -- so tool_selection went 1.00 -> 0.00 and fidelity 1.00 -> 0.00, and
- * the typed SCA tool was never called at all. A zero-row DISCOVERY probe is not a failed retrieval
+ * EXPLAIN-WAVE PHASE 6 -- the fourth bound, and the one phase 5's own regressions asked for: a
+ * round whose only successful calls were DISCOVERY calls earns nothing. The witness shape is an
+ * SCA question that, before phase 5, called `get_sca_results` and declined cleanly. With the grace
+ * in place it opened instead with a `get_field_values` probe on `wazuh.rule.tags` that returned
+ * zero rows, was handed a second tool-bearing round, and spent that round on ANOTHER
+ * `get_field_values` probe -- so a correct tool selection became a wrong one and the typed SCA
+ * tool was never called at all. A zero-row DISCOVERY probe is not a failed retrieval
  * attempt: "this field has no values on this surface" IS the discovery answer, and it arrives with
  * the model's real budget still unspent. Granting an extra round there does not widen a query that
  * was too narrow -- it funds more probing, which is exactly what happened. Latency is the other
@@ -1103,12 +1102,12 @@ export const NO_TEXT_SYNTHESIS_INSTRUCTION =
  * ZERO-ROW sibling of NO_TEXT_SYNTHESIS_INSTRUCTION above, used when the turn's tool calls all came
  * back EMPTY (no non-empty table was ever rendered).
  *
- * EXPLAIN-WAVE PHASE 2 (eval run 20260825-150326): 15 of the 21 code-synthesised answers in that
- * run were this shape -- every tool call returned 0 rows, the model wrote nothing, and the turn
+ * EXPLAIN-WAVE PHASE 2: most code-synthesised (no model text at all) answers are this shape --
+ * every tool call returned 0 rows, the model wrote nothing, and the turn
  * ended on `buildNoMatchingResultsMessage`'s canned line ("No matching results were found for that
  * query. (Searched: critical findings.)"). That line is truthful but question-blind: it never says
  * what the empty result MEANS for what was asked, which for a counting or negative-control question
- * ("how many findings does agent lin-monitor-01 have") is the entire answer ("none"). The zero-row
+ * ("how many findings does this agent have") is the entire answer ("none"). The zero-row
  * case had no forced-synthesis retry at all before this change -- `emitNoTextFallback`'s gate
  * required a non-empty table -- so the one shape that most needed a written answer was the one
  * shape the model was never asked for.
@@ -1128,7 +1127,7 @@ export const NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY =
   'show. Do not call any tools. Do not say there is nothing to add.';
 
 /**
- * EXPLAIN-WAVE PHASE 3 (eval run 20260825-163607, the 9 remaining code-synthesised answers):
+ * EXPLAIN-WAVE PHASE 3 (the code-synthesised answers phase 2 did not reach):
  * delivers the forced-synthesis instruction as a trailing **user** message on the outbound COPY,
  * never as a `system` message and never into `messages` itself.
  *
@@ -1139,8 +1138,8 @@ export const NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY =
  * field, appended after prompts.ts's full system prompt. So on an Anthropic provider -- the one
  * this was measured on -- the instruction never appeared at the conversation tail at all; it was
  * concatenated onto the end of a multi-thousand-token system prompt, while the last actual
- * conversation entry stayed a `tool_result` the model was free to treat as a finished turn. All 9
- * remaining boilerplate answers in that run reached `synthesizeNoTextFallback` case (b), i.e. both
+ * conversation entry stayed a `tool_result` the model was free to treat as a finished turn. Every
+ * remaining boilerplate answer reached `synthesizeNoTextFallback` case (b), i.e. both
  * the final round's FINAL_ROUND_ANSWER_INSTRUCTION and this retry produced no text -- consistent
  * with neither instruction being where the code believed it was.
  *
@@ -2638,9 +2637,9 @@ export async function* orchestrate(
       roundsExhausted,
       lastAttemptedToolCall,
     );
-    // EXPLAIN-WAVE PHASE 2 (eval run 20260825-150326, 21 of 63 answers code-synthesised): the gate
+    // EXPLAIN-WAVE PHASE 2: the gate
     // no longer requires `sawNonEmptyTable`. A turn whose tool calls all came back EMPTY was the
-    // single most common no-text shape (15 of those 21) and was the one shape that never got a
+    // single most common no-text shape and was the one shape that never got a
     // model-authored attempt -- it went straight to `buildNoMatchingResultsMessage`'s canned,
     // question-blind line. A zero-row result is still an ANSWER ("none of your agents has a finding
     // matching that"), and the digest that proves it is already in `turnDigests`, so the same one

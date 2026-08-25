@@ -108,16 +108,15 @@ export function buildSystemPrompt(nowIso: string): string {
     // longer answer does not outgrow -- disclosing truncation, and not enumerating rows or
     // timestamps in prose -- are re-stated so this paragraph cannot be read as dropping them.
     //
-    // EXPLAIN-WAVE PHASE 4 (the cite-the-fix clause in part (3)): remediation-tied-to-item
-    // questions were the worst-scoring judged class in eval run 20260825-174333 (~4/10 mean), and
-    // the split INSIDE that class is the whole reason this clause exists. EV2-EXP-013 scored 9/10
-    // on actionability because the digest happened to carry the scanner's own fix bound and the
-    // model quoted it ("install KB5034763"); EV2-EXP-016, on the same corpus, wrote generic
-    // prioritisation advice while never touching the failing check it was asked about, nor the
-    // fact that that check's remediation field was EMPTY. Naming the fix-bearing fields
-    // explicitly is what turns the first behaviour from luck into the rule, and the empty-field
-    // half is what stops the model from filling that silence with its own advice presented as the
-    // product's own remediation.
+    // EXPLAIN-WAVE PHASE 4 (the cite-the-fix clause in part (3)): "how do we remediate this item"
+    // is the weakest answer class, and the split INSIDE that class is the whole reason this clause
+    // exists. An answer is actionable only when the digest happens to carry the scanner's own fix
+    // bound -- a fixed version, a patch or advisory id, a remediation text -- and the model quotes
+    // it; without this clause that is luck, not a rule. The same class also produces generic
+    // prioritisation advice that never touches the item it was asked about, nor the fact that the
+    // item's remediation field is EMPTY. Naming the fix-bearing fields explicitly turns the first
+    // behaviour into the rule, and the empty-field half stops the model from filling that silence
+    // with its own advice presented as the product's own remediation.
     'That format is for lookup, count, and status questions. When the user asks you to EXPLAIN, ' +
       'assess, or advise -- what an event, technique, rule or vulnerability means, why it ' +
       'matters, or what to do about it -- the roughly-120-word cap, the three-bullet cap and ' +
@@ -412,10 +411,10 @@ export function buildSystemPrompt(nowIso: string): string {
       'get_critical_vulnerabilities, get_vulnerabilities_by_agent, get_vulnerability_by_cve); ' +
       'they read the vulnerability state index directly. Vulnerability data is current-state ' +
       'only: there is no "solved/resolved vulnerabilities" history available.',
-    // EXPLAIN-WAVE PHASE 4 (eval items EV2-VUL-001, EV2-EXP-013): the model answered a question
-    // explicitly scoped to the FINDINGS HISTORY ("which agents have a CVE-2024-21412 detection in
-    // the findings history") from wazuh-states-vulnerabilities, which lists two hosts where the
-    // detection stream records one -- and did the reverse elsewhere. It even disclosed the
+    // EXPLAIN-WAVE PHASE 4: the model answered a question explicitly scoped to the FINDINGS
+    // HISTORY ("which agents have a detection for this CVE in the findings history") from
+    // wazuh-states-vulnerabilities, whose host list for a given CVE does not match the detection
+    // stream's -- and did the reverse elsewhere. It even disclosed the
     // substitution ("this reflects current vulnerability state only, not historical detections")
     // and still answered from the wrong surface, so the missing piece was never honesty: nothing
     // told it the two surfaces answer different questions and that the wording of the question
@@ -454,8 +453,8 @@ export function buildSystemPrompt(nowIso: string): string {
       'typed tools. If you build a search_wazuh_data query directly against wazuh-states-sca* with ' +
       'a check.result term filter, you must use the exact capitalized value yourself -- a lowercase ' +
       'term filter will silently match zero rows.',
-    // EXPLAIN-WAVE PHASE 5 -- ROOT CAUSE OF THE TWO WORST-SCORING ITEMS IN EVAL RUN
-    // 20260825-193632 (EV2-EXP-002 2.6/10, EV2-FIM-002 a hard regression to ZERO tool calls).
+    // EXPLAIN-WAVE PHASE 5 -- ROOT CAUSE OF THE WORST REGISTRY-FIM ANSWERS, INCLUDING A HARD
+    // REGRESSION TO ZERO TOOL CALLS.
     // This clause replaces what used to be a DECLINE in the no-tool/no-data block above ("Windows
     // registry FIM changes (registry keys/values): no tool reads this"). That decline was written
     // for CV-058, when it was true, and it has been factually wrong since workstream A1a widened
@@ -463,10 +462,10 @@ export function buildSystemPrompt(nowIso: string): string {
     // `wazuh-states-fim-registry-keys` / `wazuh-states-fim-registry-values` (both allowlisted by
     // guardrails.ts's INDEX_ALLOWLIST_RE, both offered in the escape hatch's own enum via
     // generic-query-families.ts). Because the decline fired BEFORE any query, the model never saw
-    // FIM-registry state that demonstrably exists -- on EV2-FIM-002 ("did anything write to a Run
-    // key on win-ws-014?") the answer was the decline copy verbatim, zero tool calls, while the
-    // `HKEY_LOCAL_MACHINE\...\CurrentVersion\Run\SecurityUpdater` value sat one escape-hatch query
-    // away. A decline whose premise a tool can disprove is worse than no decline at all, so this
+    // FIM-registry state that demonstrably exists: asked whether anything had written to a Run key
+    // on a named Windows host, it emitted the decline copy verbatim with zero tool calls, while the
+    // matching `HKEY_LOCAL_MACHINE\...\CurrentVersion\Run` value sat one escape-hatch query away.
+    // A decline whose premise a tool can disprove is worse than no decline at all, so this
     // is now a ROUTE, stated positively, with the absence claim gated behind an actual zero-row
     // result. The phase-4 no-environment-claims rule is carried over verbatim rather than dropped
     // with the decline it was attached to: the fabrication it closed ("this deployment's monitored
@@ -575,15 +574,14 @@ export function buildSystemPrompt(nowIso: string): string {
       'than one active agent exists, do not guess: briefly list the candidates (id and name) and ' +
       'ask the user which one they mean. If get_agents is NOT among the tools available to you ' +
       'this turn, do not try to call it -- ask the user which agent they mean instead.',
-    // EXPLAIN-WAVE PHASE 2 (eval item EV2-SCA-002, run 20260825-150326): both instructions above
-    // cover the case where NO host is named. Neither covers the opposite, and more common, case --
-    // the user names the host outright ("the failed SCA checks on lin-web-01") while the tool that
-    // answers it takes a NUMERIC agent_id only (get_sca_checks, get_sca_results; every other
-    // agent-scoped tool accepts a name -- get_fim_files was in this list until explain-wave phase
-    // 5, which gave it an `agent_name` parameter precisely because pricing that detour into the
-    // schema is what drove the model to the escape hatch instead on EV2-FIM-001). The clause
-    // itself is unchanged and stays tool-agnostic; only this list of witnesses shrank. The
-    // measured failure is not that the model
+    // EXPLAIN-WAVE PHASE 2: both instructions above cover the case where NO host is named. Neither
+    // covers the opposite, and more common, case -- the user names the host outright ("the failed
+    // SCA checks on <host>") while the tool that answers it takes a NUMERIC agent_id only
+    // (get_sca_checks, get_sca_results; every other agent-scoped tool accepts a name --
+    // get_fim_files was in this list until explain-wave phase 5, which gave it an `agent_name`
+    // parameter precisely because pricing that detour into the schema is what drove the model to
+    // the escape hatch instead). The clause itself is unchanged and stays tool-agnostic; only this
+    // list of witnesses shrank. The measured failure is not that the model
     // asked for an id: it called get_sca_checks(result: "failed") with the agent parameter simply
     // OMITTED, as if omitting it meant "across all agents". It does not -- omission triggers
     // sole-active-agent resolution (see the paragraph above), so the call silently answered about
@@ -644,8 +642,8 @@ export function buildSystemPrompt(nowIso: string): string {
       'search_findings_by_rule_tag with a wazuh.rule.tags value, or aggregate by rule first with ' +
       'get_top_rules to discover ids. If a narrowly-filtered query returns 0 rows for activity ' +
       'that plausibly exists, retry once with a broader filter before concluding there were none.',
-    // EXPLAIN-WAVE PHASE 5 -- the single dominant failure class left in eval run 20260825-193632:
-    // seven of the thirteen judged items still below target (EV2-EXP-001/002/006/008/012/014/018)
+    // EXPLAIN-WAVE PHASE 5 -- the single dominant failure class left after phase 4: most of the
+    // below-target explanatory answers
     // issued ONE over-narrow or malformed query, got zero rows, and abstained. A "retry once with
     // a broader filter" clause already existed, but only as the tail of the rule-ids rule below,
     // where it reads as advice about rule ids specifically -- and, more importantly, the model
@@ -654,11 +652,11 @@ export function buildSystemPrompt(nowIso: string): string {
     // now leaves exactly one tool-bearing round open for this, so this clause is the half that
     // says what to spend it on. Stated as ONE attempt, with the three concrete moves, because the
     // affordance is one round and the latency tail is already the phase-4 build's stated cost.
-    // EXPLAIN-WAVE PHASE 6 (eval run 20260825-211841): the clause worked -- zero-call items fell
-    // 6 -> 2 and rounds/item rose 0.46 -- but it never said what the retry must be ABOUT, and
-    // EV2-SCA-003 shows the cost of that omission: the model spent the extra round on a second
-    // exploratory get_field_values probe and never called the typed SCA tool at all
-    // (tool_selection 1.00 -> 0.00). The retry is now pinned to the SAME question with exactly ONE
+    // EXPLAIN-WAVE PHASE 6: the clause worked -- items that gave up without calling any tool fell
+    // sharply -- but it never said what the retry must be ABOUT, and that omission has its own
+    // cost: on an SCA question the model spent the extra round on a second exploratory
+    // get_field_values probe and never called the typed SCA tool at all, turning a correct tool
+    // selection into a wrong one. The retry is now pinned to the SAME question with exactly ONE
     // thing changed, and exploratory probing is named as the wrong way to spend it. chat.ts's
     // `shouldGrantZeroRowWideningRound` enforces the matching half mechanically: a round made only
     // of discovery calls no longer earns the extra round at all.

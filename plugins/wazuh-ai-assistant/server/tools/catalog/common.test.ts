@@ -272,8 +272,8 @@ test('findingDigestColumns: appends the extras without duplicating a tool-declar
 });
 
 // --- EXPLAIN-WAVE PHASE 4: the vulnerability digest carries the CVE's own description ----------
-// Class-E ("how do we remediate this item") answers were the worst-scoring judged class in eval
-// run 20260825-174333. `wazuh-states-vulnerabilities` has no dedicated fixed-version/remediation
+// "How do we remediate this item" is the weakest answer class.
+// `wazuh-states-vulnerabilities` has no dedicated fixed-version/remediation
 // field -- the fix bound lives in `vulnerability.scanner.condition`, already sampled -- so the one
 // prescriptive field the docs carry and the digest dropped is the description: requested in
 // `_source`, rendered in get_cve_intel's table, never sent to the model.
@@ -281,7 +281,7 @@ test('findingDigestColumns: appends the extras without duplicating a tool-declar
 test('VULN_DIGEST_SAMPLE_COLUMNS: carries both fix-bearing fields the vulnerability docs have', () => {
   assert.ok(
     VULN_DIGEST_SAMPLE_COLUMNS.includes('vulnerability.scanner.condition'),
-    'the scanner\'s own fix bound (e.g. "Package less than KB5034763")',
+    'the scanner\'s own fix bound (e.g. "Package less than 5.21.4")',
   );
   assert.ok(
     VULN_DIGEST_SAMPLE_COLUMNS.includes('vulnerability.description'),
@@ -313,8 +313,8 @@ test('privacy policy: the CVE description is allow-SCAN, not the plain allow the
 });
 
 // --- EXPLAIN-WAVE PHASE 4: the state-vs-history surface split ----------------------------------
-// EV2-VUL-001 asked which agents have a CVE detection "in the findings history" and was answered
-// from wazuh-states-vulnerabilities (two hosts; the findings stream records one). The model even
+// A question asking which agents have a CVE detection "in the findings history" was answered
+// from wazuh-states-vulnerabilities, whose host list for that CVE differs. The model even
 // disclosed the substitution and still answered from the wrong surface, so the distinction has to
 // be stated where the tool is CHOSEN, not only in the system prompt.
 

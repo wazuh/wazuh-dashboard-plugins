@@ -1213,15 +1213,15 @@ test('executeToolCall: an ambiguous param-resolution error is pseudonymized befo
   };
   const outcome = await executeToolCall(
     { id: 'call-1', name: 'search_findings_by_agent', arguments: {} },
-    fakeTermsProbeContext(['win-dc-01', 'lin-bastion-01']),
+    fakeTermsProbeContext(['dc-01', 'bastion-01']),
     fakeRequest,
     privacy,
   );
 
   const { error } = JSON.parse(outcome.toolResultContent) as { error: string };
   assert.ok(error, 'the ambiguous lookup must fail, not resolve silently');
-  assert.doesNotMatch(error, /win-dc-01/);
-  assert.doesNotMatch(error, /lin-bastion-01/);
+  assert.doesNotMatch(error, /dc-01/);
+  assert.doesNotMatch(error, /bastion-01/);
   // Still an ambiguity disclosure -- the candidates are named, just as pseudonyms.
   assert.match(error, /HOST_\d/);
   assert.match(error, /cannot be assumed/);
@@ -1230,14 +1230,14 @@ test('executeToolCall: an ambiguous param-resolution error is pseudonymized befo
 test('executeToolCall: with privacy OFF the same ambiguity error names the candidates in the clear, unchanged', async () => {
   const outcome = await executeToolCall(
     { id: 'call-1', name: 'search_findings_by_agent', arguments: {} },
-    fakeTermsProbeContext(['win-dc-01', 'lin-bastion-01']),
+    fakeTermsProbeContext(['dc-01', 'bastion-01']),
     fakeRequest,
     undefined,
   );
 
   const { error } = JSON.parse(outcome.toolResultContent) as { error: string };
-  assert.match(error, /win-dc-01/);
-  assert.match(error, /lin-bastion-01/);
+  assert.match(error, /dc-01/);
+  assert.match(error, /bastion-01/);
 });
 
 test('executeToolCall: a single-candidate agent_name lookup resolves and its note is pseudonymized', async () => {
@@ -1260,7 +1260,7 @@ test('executeToolCall: a single-candidate agent_name lookup resolves and its not
                     ? {
                         aggregations: {
                           candidates: {
-                            buckets: [{ key: 'win-dc-01', doc_count: 3 }],
+                            buckets: [{ key: 'dc-01', doc_count: 3 }],
                           },
                         },
                       }
@@ -1284,6 +1284,6 @@ test('executeToolCall: a single-candidate agent_name lookup resolves and its not
     assumptionNote?: string;
   };
   assert.ok(digest.assumptionNote, 'the assumption must be disclosed');
-  assert.doesNotMatch(digest.assumptionNote as string, /win-dc-01/);
+  assert.doesNotMatch(digest.assumptionNote as string, /dc-01/);
   assert.match(digest.assumptionNote as string, /HOST_\d/);
 });

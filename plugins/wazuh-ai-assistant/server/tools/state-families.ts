@@ -4,9 +4,8 @@ import { FIELD_CATALOG, isKnownField } from '../../common/field-catalog';
  * Single source of truth for the `wazuh-states-*` CURRENT-STATE surfaces: one entry per physical
  * index, carrying everything the three consumers need to reach it.
  *
- * WHY THIS FILE EXISTS (eval run 20260825-211841, RESULTS.md "New surfaces: what the assistant can
- * and cannot answer"). Eleven inventory/state questions could not be answered on a corpus that
- * holds the data, and the report root-caused it to exactly two mechanical gaps -- both of which
+ * WHY THIS FILE EXISTS. A whole class of inventory/state questions could not be answered against
+ * a corpus that holds the data, and the cause was two mechanical gaps -- both of which
  * are one missing entry in a list, and both of which are about the SAME index:
  *
  *  - Root cause A: all eighteen `wazuh-states-*` indices collapsed into ONE `search_wazuh_data`
@@ -71,7 +70,7 @@ export interface StateFamily {
 
 /**
  * Every `wazuh-states-*` index, in the order they are presented to the model: the ten surfaces NO
- * typed tool owns first (those are the gap RESULTS.md measured), then the eight a typed tool
+ * typed tool owns first (those are the measured gap), then the eight a typed tool
  * already covers, each naming that tool.
  */
 const DECLARED_STATE_FAMILIES: StateFamily[] = [
@@ -198,7 +197,7 @@ const DECLARED_STATE_FAMILIES: StateFamily[] = [
     toolFamily: 'inventory_browser_extensions',
     summary: 'installed browser extensions',
     signatureFields: [
-      // RESULTS.md EV2-INV-016: the model guessed `browser.extension.name`, which does not exist.
+      // The model guesses `browser.extension.name` here, which does not exist.
       // The extension's own name is `package.name`; `browser.name` is the BROWSER (Chrome/Safari).
       'package.name',
       'package.version',
@@ -246,7 +245,7 @@ const DECLARED_STATE_FAMILIES: StateFamily[] = [
   // --- Surfaces a typed tool already owns -----------------------------------------------------
   // Listed anyway, because the ALTERNATIVE to a scoped pattern here is not the typed tool -- it is
   // the `wazuh-states-*` wildcard, which the model reaches with no reminder that a typed tool
-  // exists at all (RESULTS.md EV2-EXP-012: it left `get_sca_checks` for the wildcard). Each label
+  // exists at all -- measured: it left `get_sca_checks` for the wildcard. Each label
   // below names the owning tool, so opening the family STRENGTHENS routing rather than competing
   // with it.
   {
@@ -308,8 +307,8 @@ const DECLARED_STATE_FAMILIES: StateFamily[] = [
     signatureFields: ['source.port', 'interface.state', 'network.transport'],
     typedTool: 'get_agent_inventory (kind "ports")',
     aggFields: [
-      // RESULTS.md EV2-INV-017: the model filtered `destination.port: 3389` for "is RDP exposed"
-      // and got 0 rows, because on this schema every listener carries its port in `source.port`
+      // The model filters `destination.port` for "is this port exposed" questions
+      // and gets 0 rows, because on this schema every listener carries its port in `source.port`
       // and `destination.port: 0`. Both are opened so the model can SEE that distribution instead
       // of inferring absence from the wrong field.
       'source.port',

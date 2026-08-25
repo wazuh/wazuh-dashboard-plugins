@@ -12,8 +12,8 @@ import { ChatStreamOptions, ProviderAdapter } from '../providers/types';
 /**
  * FORCED SYNTHESIS (measured design) -- orchestrate-LEVEL gating: proves the retry fires only for a
  * turn that actually ran a tool and recorded a digest (`toolUsedThisTurn` + `turnDigests`, whether
- * the result was non-empty or empty -- the zero-row half is explain-wave phase 2, eval run
- * 20260825-150326), and never more than once, through the REAL `orchestrate` loop
+ * the result was non-empty or empty -- the zero-row half is explain-wave phase
+ * 2), and never more than once, through the REAL `orchestrate` loop
  * (not a reimplementation), same harness pattern as chat-capability-honesty.test.ts /
  * chat-tool-chaining.test.ts. The mechanism's own contract (scrub pipeline, deterministic
  * fallback, hard bounds) is unit-tested directly against `synthesizeNoTextFallback` in
@@ -242,8 +242,8 @@ test('orchestrate: no tool ran this turn -> NO_ANSWER_MESSAGE, unaffected, no ex
 
 test('orchestrate: a tool ran, returned zero rows, and the retry writes nothing -> the canned no-match copy, unchanged', async () => {
   // EXPLAIN-WAVE PHASE 2: this case USED to assert `callCount === 3` ("a genuinely empty result
-  // has nothing to synthesize"). Eval run 20260825-150326 disproved that premise -- 15 of the 21
-  // code-synthesised answers were exactly this shape, and a zero-row result IS an answer ("none").
+  // has nothing to synthesize"). Measurement disproved that premise -- most code-synthesised
+  // answers were exactly this shape, and a zero-row result IS an answer ("none").
   // The retry now fires here too; what this test pins is the FLOOR: when the retry produces no
   // text, the user sees byte-for-byte what they saw before the change.
   const { events, callCount } = await runOrchestrate(

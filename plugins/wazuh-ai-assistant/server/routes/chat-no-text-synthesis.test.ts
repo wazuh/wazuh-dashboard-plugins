@@ -747,7 +747,7 @@ test('synthesizeNoTextFallback: aborting MID-STREAM stops forwarding further del
 
 // --- EXPLAIN-WAVE PHASE 2: the ZERO-ROW turn is synthesizable too ------------------------------
 //
-// Eval run 20260825-150326: 21 of 63 answers carried no model text at all, and 15 of those were
+// A third of measured answers carried no model text at all, and most of those were
 // the all-empty shape -- every tool call returned 0 rows and the turn ended on
 // `buildNoMatchingResultsMessage`'s canned line, without the model ever being ASKED for an answer
 // (`emitNoTextFallback`'s gate required a non-empty table). These pin the three things that change
@@ -957,9 +957,9 @@ test('withNoTextSynthesisInstruction: picks the zero-row copy when no table is o
 });
 
 test('NO_TEXT_SYNTHESIS_INSTRUCTION: asks for an answer to the QUESTION, not only row totals, and for rejected calls to be disclosed', () => {
-  // The row-count boilerplate shape (EV2-INV-005/EV2-TI-001/EV2-EXP-014) is what a totals-only
-  // instruction produces even when it works; the multi-part shape (EV2-NEG-003/EV2-EXP-008/
-  // EV2-EXP-012) is its multi-digest sibling. Both are answers to the wrong question.
+  // The row-count boilerplate shape ("the search returned 12 rows") is what a totals-only
+  // instruction produces even when it works; the multi-part shape, one totals sentence per
+  // digest, is its multi-digest sibling. Both are answers to the wrong question.
   assert.match(
     NO_TEXT_SYNTHESIS_INSTRUCTION,
     /answer the question in its own terms/i,

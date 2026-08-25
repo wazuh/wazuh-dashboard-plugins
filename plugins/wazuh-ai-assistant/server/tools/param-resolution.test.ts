@@ -680,7 +680,7 @@ test('resolveScaCheckParams: agent_id and policy_id already supplied bypasses ch
 // --- EXPLAIN-WAVE PHASE 3: identifier-bearing indexer-terms fields must declare their entities --
 
 test('buildGenericResolveParams (indexer-terms): a noteEntityKind field declares its resolved value for pseudonymization', async () => {
-  // EV2-FND-006's fix moves search_findings_by_agent's agent_name onto an indexer-terms lookup
+  // The phase-3 fix moves search_findings_by_agent's agent_name onto an indexer-terms lookup
   // over `wazuh.agent.name`. Those values are HOSTNAMES, so unlike an SCA policy id they must be
   // declared -- otherwise executor.ts's scrubAssumptionNote has nothing to scrub and capture
   // probe P3's leak (a real hostname reaching the provider in the clear) returns for this tool.
@@ -696,17 +696,17 @@ test('buildGenericResolveParams (indexer-terms): a noteEntityKind field declares
     },
   ]);
   const resolve: ResolveParams = buildGenericResolveParams(tool);
-  const { context } = fakeContext({ termBuckets: ['win-dc-01'] });
+  const { context } = fakeContext({ termBuckets: ['dc-01'] });
   const result = await resolve({}, context, fakeRequest);
 
   assert.equal(result.ok, true);
   if (!result.ok) {
     return;
   }
-  assert.equal(result.resolved.params.agent_name, 'win-dc-01');
-  assert.match(result.resolved.note ?? '', /win-dc-01/);
+  assert.equal(result.resolved.params.agent_name, 'dc-01');
+  assert.match(result.resolved.note ?? '', /dc-01/);
   assert.deepEqual(result.resolved.noteEntities, [
-    { value: 'win-dc-01', kind: 'HOST' },
+    { value: 'dc-01', kind: 'HOST' },
   ]);
 });
 
@@ -724,7 +724,7 @@ test('buildGenericResolveParams (indexer-terms): an ambiguous noteEntityKind fie
   ]);
   const resolve: ResolveParams = buildGenericResolveParams(tool);
   const { context } = fakeContext({
-    termBuckets: ['win-dc-01', 'lin-bastion-01'],
+    termBuckets: ['dc-01', 'bastion-01'],
   });
   const result = await resolve({}, context, fakeRequest);
 
@@ -732,13 +732,13 @@ test('buildGenericResolveParams (indexer-terms): an ambiguous noteEntityKind fie
   if (result.ok) {
     return;
   }
-  // Enumerating the candidates is the point (the model can then pick "win-dc-01" for "the domain
+  // Enumerating the candidates is the point (the model can then pick "dc-01" for "the domain
   // controller" itself) -- but the enumeration is an identifier disclosure and must be declared.
-  assert.match(result.reason, /win-dc-01/);
-  assert.match(result.reason, /lin-bastion-01/);
+  assert.match(result.reason, /dc-01/);
+  assert.match(result.reason, /bastion-01/);
   assert.deepEqual(result.reasonEntities, [
-    { value: 'win-dc-01', kind: 'HOST' },
-    { value: 'lin-bastion-01', kind: 'HOST' },
+    { value: 'dc-01', kind: 'HOST' },
+    { value: 'bastion-01', kind: 'HOST' },
   ]);
 });
 
@@ -784,8 +784,8 @@ test('buildGenericResolveParams (manager-agents): an ambiguous agent lookup now 
   const { context } = fakeContext({
     agents: {
       items: [
-        { id: '001', name: 'win-dc-01' },
-        { id: '002', name: 'lin-bastion-01' },
+        { id: '001', name: 'dc-01' },
+        { id: '002', name: 'bastion-01' },
       ],
     },
   });
@@ -796,8 +796,8 @@ test('buildGenericResolveParams (manager-agents): an ambiguous agent lookup now 
     return;
   }
   assert.deepEqual(result.reasonEntities, [
-    { value: 'win-dc-01', kind: 'HOST' },
-    { value: 'lin-bastion-01', kind: 'HOST' },
+    { value: 'dc-01', kind: 'HOST' },
+    { value: 'bastion-01', kind: 'HOST' },
   ]);
 });
 
@@ -818,7 +818,7 @@ test('buildGenericResolveParams (indexer-terms): a TIME-BASED index probe is tim
     },
   ]);
   const resolve: ResolveParams = buildGenericResolveParams(tool);
-  const { context, searchCalls } = fakeContext({ termBuckets: ['win-dc-01'] });
+  const { context, searchCalls } = fakeContext({ termBuckets: ['dc-01'] });
   const result = await resolve(
     { time_range_gte: 'now-7d', time_range_lte: 'now' },
     context,

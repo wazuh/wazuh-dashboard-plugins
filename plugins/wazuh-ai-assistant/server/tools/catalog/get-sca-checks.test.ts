@@ -604,8 +604,8 @@ test('get_sca_checks: review D1 — a 5-row digest of LIVE-SIZED rationale/remed
 });
 
 test('get_sca_checks: the agent_id description tells the model to resolve a NAMED host to an id', () => {
-  // EXPLAIN-WAVE PHASE 2 (eval item EV2-SCA-002, run 20260825-150326): the description only ever
-  // explained when to OMIT agent_id, so "the failed SCA checks on lin-web-01" was answered by
+  // EXPLAIN-WAVE PHASE 2: the description only ever
+  // explained when to OMIT agent_id, so "the failed SCA checks on <host>" was answered by
   // get_sca_checks(result: "failed") with no agent scope at all -- omission does not search across
   // agents, it resolves to one, so the call answered about the wrong host and returned 0 rows.
   const properties = getScaChecksTool.spec.parameters.properties as Record<

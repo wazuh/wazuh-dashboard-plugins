@@ -2,18 +2,19 @@ import assert from 'node:assert/strict';
 import { getFimFilesTool } from './get-fim-files';
 
 /**
- * EXPLAIN-WAVE PHASE 2 (eval item EV2-EXP-002, run 20260825-150326): the model called
- * `get_fim_files({ agent_id: 'win-ws-014' })` -- an agent NAME in a numeric-id-only parameter --
+ * EXPLAIN-WAVE PHASE 2: the model called
+ * `get_fim_files({ agent_id: '<host name>' })` -- an agent NAME in a numeric-id-only parameter --
  * which `validateAgentId` rejects, so the round produced no table and no digest and the turn ended
  * on synthesised copy. The parameter's description was widened to say so.
  *
- * EXPLAIN-WAVE PHASE 5 (eval item EV2-FIM-001, run 20260825-193632) is the follow-up that phase 2
+ * EXPLAIN-WAVE PHASE 5 is the follow-up that phase 2
  * caused: telling the model to "resolve that name to its id first and pass the id" priced the
- * detour explicitly, and on a question that names the host ("which files changed on agent
- * win-ws-014 according to file integrity monitoring?") the model simply went to the
- * `search_wazuh_data` escape hatch instead, where `wazuh.agent.name` is one filter -- tool_selection
- * 1.00 -> 0.00, params 1.00 -> 0.00, and the whole `fim` family drop. The baseline reached this
- * tool only by burning three rounds (get_field_values -> search_wazuh_data -> get_fim_files "002"),
+ * detour explicitly, and on a question that names the host ("which files changed on agent <name>
+ * according to file integrity monitoring?") the model simply went to the
+ * `search_wazuh_data` escape hatch instead, where `wazuh.agent.name` is one filter -- collapsing
+ * both tool selection and parameter fidelity, and costing this tool its whole `fim` family. The
+ * baseline reached this tool only by burning three rounds (get_field_values -> search_wazuh_data
+ * -> get_fim_files with the resolved id),
  * so the escape hatch was genuinely the cheaper route and no prompt clause was going to beat it.
  * The fix removes the reason instead: this tool now accepts the identifier the user actually said.
  *
@@ -66,8 +67,8 @@ test('get_fim_files: agent_name is offered for the named-host case, with no id l
 
 test('get_fim_files: an agent_name scopes the query with a wazuh.agent.name match clause', () => {
   // Same clause shape get_agent_inventory's `resolveAgentFilter` uses for its own agent_name.
-  assert.deepEqual(filterClauses({ agent_name: 'win-ws-014' }), [
-    { match: { 'wazuh.agent.name': 'win-ws-014' } },
+  assert.deepEqual(filterClauses({ agent_name: 'web-server-01' }), [
+    { match: { 'wazuh.agent.name': 'web-server-01' } },
   ]);
 });
 
@@ -75,7 +76,7 @@ test('get_fim_files: agent_id wins when both identifiers are supplied', () => {
   // An exact Manager-API identifier beats the fuzzier `match`, and the request stays byte-identical
   // to the one an id-only call built before agent_name existed.
   assert.deepEqual(
-    filterClauses({ agent_id: '002', agent_name: 'win-ws-014' }),
+    filterClauses({ agent_id: '002', agent_name: 'web-server-01' }),
     [{ term: { 'wazuh.agent.id': '002' } }],
   );
 });
@@ -88,9 +89,9 @@ test('get_fim_files: an id-only call is unchanged by the new parameter', () => {
 
 test('get_fim_files: agent_name combines with path_prefix rather than replacing it', () => {
   assert.deepEqual(
-    filterClauses({ agent_name: 'win-ws-014', path_prefix: 'C:\\Windows' }),
+    filterClauses({ agent_name: 'web-server-01', path_prefix: 'C:\\Windows' }),
     [
-      { match: { 'wazuh.agent.name': 'win-ws-014' } },
+      { match: { 'wazuh.agent.name': 'web-server-01' } },
       { prefix: { 'file.path': 'C:\\Windows' } },
     ],
   );
@@ -118,7 +119,7 @@ test('get_fim_files: with neither identifier nor a path prefix, the query stays 
 test('get_fim_files: the tool description scopes it to FILES and names the registry surface', () => {
   // The registry half of FIM has no typed tool but IS reachable (wazuh-states-fim-registry-*, via
   // search_wazuh_data on wazuh-states-*). Saying so here is what stops "FIM" reading as "this
-  // tool" for a Run-key question -- the EV2-FIM-002 / EV2-EXP-002 shape.
+  // tool" for a Run-key question.
   const description = getFimFilesTool.spec.description;
   assert.match(description, /covers FILES only/);
   assert.match(description, /wazuh-states-fim-registry-\*/);

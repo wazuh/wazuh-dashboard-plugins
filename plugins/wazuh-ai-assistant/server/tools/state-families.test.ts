@@ -88,10 +88,10 @@ test('every STATE_AGG_FIELDS entry is actually accepted by the aggregation guard
   }
 });
 
-// The specific fields RESULTS.md (eval run 20260825-211841) recorded the model reporting as
+// The specific fields the model was measured reporting as
 // non-existent while they were live in the mapping. Each one is a question the product could not
 // answer; pinned by name so a future trim of the allowlist has to argue with the evidence.
-test('the state fields the eval measured as unreachable are now discoverable', () => {
+test('the state fields measured as unreachable are now discoverable', () => {
   for (const field of [
     'service.name',
     'service.state',
@@ -114,7 +114,7 @@ test('the state fields the eval measured as unreachable are now discoverable', (
 });
 
 test('browser extensions name the extension via package.name, not a guessed browser.* field', () => {
-  // EV2-INV-016: the model tried `browser.extension.name` (does not exist) and concluded the data
+  // The model tries `browser.extension.name` (does not exist) and concludes the data
   // was unavailable. The signature fields in the enum label are what prevent the guess.
   const extensions = STATE_FAMILIES.find(
     family => family.catalogFamily === 'inventory.browser_extensions',
@@ -129,7 +129,7 @@ test('browser extensions name the extension via package.name, not a guessed brow
 });
 
 test('the ports family label states that a listener carries its port in source.port', () => {
-  // EV2-INV-017 filtered `destination.port: 3389` for "is RDP exposed" and got 0 rows, because on
+  // Filtering `destination.port` for "is this port exposed" returns 0 rows, because on
   // this schema every listener has destination.port 0. The semantics have to be IN the label --
   // the field names alone do not carry them.
   const ports = STATE_FAMILIES.find(

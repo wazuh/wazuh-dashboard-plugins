@@ -592,13 +592,13 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // cardinality class as the already-listed `wazuh.integration.category`.
   'event.category',
   'event.outcome',
-  // EXPLAIN-WAVE PHASE 6 (eval run 20260825-211841, RESULTS.md "Root cause B"): the whole
+  // EXPLAIN-WAVE PHASE 6 (root cause B of the unreachable state surfaces): the whole
   // `wazuh-states-*` schema was absent from this list, so `get_field_values` -- the tool whose
   // entire job is "check the real values before you filter" -- could not be pointed at any state
   // surface. The model therefore GUESSED field names there, and every field it reported as
   // non-existent (`service.state`, `host.cpu.name`, `network.gateway`, `user.name`, `package.name`
-  // on browser extensions) is present in the live mapping. Eleven inventory questions failed on a
-  // corpus that holds the data.
+  // on browser extensions) is present in the live mapping, so a whole class of inventory
+  // questions failed on a corpus that holds the data.
   //
   // Derived, not hand-listed: `state-families.ts` declares the aggregation-safe field set PER
   // index and filters every path through `common/field-catalog.ts` (the generated WCS catalog) at

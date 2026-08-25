@@ -368,10 +368,10 @@ export function objectSchema(
 export const FINDING_SCOPE_NOTE =
   'Covers rule-matched detections (alerts/hits/signals) only -- never the raw, unmatched event ' +
   'stream; if this returns 0 rows, say so plainly rather than reporting nothing happened. ' +
-  // EXPLAIN-WAVE PHASE 4 (eval items EV2-VUL-001, EV2-EXP-013): the surface half. A question
-  // scoped to detection history ("which agents have a CVE-2024-21412 detection in the findings
-  // history") was answered from `wazuh-states-vulnerabilities`, which lists two hosts where the
-  // findings stream records one -- the model disclosed the substitution and still answered the
+  // EXPLAIN-WAVE PHASE 4: the surface half. A question scoped to detection history ("which agents
+  // have a detection for this CVE in the findings history") was answered from
+  // `wazuh-states-vulnerabilities`, whose host list for a CVE does not match the findings
+  // stream's -- the model disclosed the substitution and still answered the
   // wrong surface, so the distinction has to be visible at tool-choice time, not only afterwards.
   'Findings are detection HISTORY (what was detected, and when), not current state.';
 
@@ -381,7 +381,7 @@ export const FINDING_SCOPE_NOTE =
  * tool-choice time too, not only after a tool is already picked. */
 export const VULN_CURRENT_STATE_NOTE =
   'Reflects current vulnerability state only -- no patched/unpatched history over time. ' +
-  // EXPLAIN-WAVE PHASE 4 (eval items EV2-VUL-001, EV2-EXP-013): the other half of the surface
+  // EXPLAIN-WAVE PHASE 4: the other half of the surface
   // split FINDING_SCOPE_NOTE now names. "Current state only" said what this surface is NOT a
   // timeline of, but never that another surface answers the history question -- so a detection-
   // history question stayed here and came back with the wrong host set.
@@ -580,17 +580,18 @@ export const VULN_DIGEST_SAMPLE_COLUMNS = [
   // scanner/OS-curated metadata, not analyst/attacker free text.
   'vulnerability.scanner.condition',
   'package.type',
-  // EXPLAIN-WAVE PHASE 4 (class-E "remediate this item" answers, judged ~4/10 in eval run
-  // 20260825-174333). `wazuh-states-vulnerabilities` has NO dedicated fixed-version or remediation
-  // field -- the live 5.0 mapping (checked against this eval env's index) carries the fix bound in
-  // `vulnerability.scanner.condition` above ("Package less than KB5034763") and nothing else
+  // EXPLAIN-WAVE PHASE 4 (the weak "how do we remediate this item" answers).
+  // `wazuh-states-vulnerabilities` has NO dedicated fixed-version or remediation
+  // field -- the live 5.0 mapping carries the fix bound in
+  // `vulnerability.scanner.condition` above and nothing else
   // prescriptive -- so the enrichment available here is the one field the docs DO carry and the
   // digest was silently dropping: `vulnerability.description`, already requested in
   // `VULN_SOURCE_FIELDS` below and rendered in get_cve_intel's TABLE, but never sent to the model.
   // Without it part (2) of an explanatory answer ("why it matters") has to come entirely from the
   // model's own recall of the CVE, and part (3)'s fix is stated with no idea what the flaw is. The
-  // measured contrast is EV2-EXP-013, which scored 9/10 on actionability purely because
-  // `scanner.condition` named `KB5034763` -- the same lever, one field wider. Third-party feed
+  // measured contrast is that the only answers that scored well on actionability were the ones
+  // where `scanner.condition` happened to name a concrete patch -- the same lever, one field
+  // wider. Third-party feed
   // prose, so capped by DIGEST_FIELD_MAX_LENGTH_DEFAULTS (digest.ts) and classified `allow-scan`
   // in privacy.ts rather than the plain `allow` the scanner/OS-curated fields above get.
   'vulnerability.description',

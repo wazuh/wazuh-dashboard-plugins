@@ -26,7 +26,7 @@ export const getFimFilesTool: ToolDefinition = {
       'Lists files tracked by File Integrity Monitoring (FIM) with their CURRENT state — path, ' +
       'last modification time, size, owner, hashes — most recently modified first. Use for ' +
       '"what monitored files changed recently" or "FIM state of file/path X" questions, ' +
-      'including when the host is named rather than numbered ("what changed on win-ws-014"): ' +
+      'including when the host is named rather than numbered ("what changed on web-server-01"): ' +
       'scope it with "agent_name" directly, no id lookup needed. Note: this is current state, ' +
       'not a change-event history, and it covers FILES only — Windows registry keys/values are a ' +
       'different surface (wazuh-states-fim-registry-*, reachable through search_wazuh_data).',
@@ -39,12 +39,13 @@ export const getFimFilesTool: ToolDefinition = {
             'an agent NAME here is rejected -- pass the name as "agent_name" instead, this tool ' +
             'resolves it itself. Leaving BOTH out searches every agent, not the named one.',
         },
-        // EXPLAIN-WAVE PHASE 5 -- root cause of the EV2-FIM-001 escape-hatch drift in eval run
-        // 20260825-193632 (tool_selection 1.00 -> 0.00, params 1.00 -> 0.00, and the whole `fim`
-        // family drop). The question -- "which files changed on agent win-ws-014 according to file
-        // integrity monitoring?" -- names the agent by NAME, and until now this tool accepted only
+        // EXPLAIN-WAVE PHASE 5 -- root cause of the escape-hatch drift that cost this tool its
+        // whole `fim` family: both tool selection and parameter fidelity collapsed on the most
+        // ordinary FIM question there is -- "which files changed on agent <name> according to file
+        // integrity monitoring?" -- which names the agent by NAME, while this tool accepted only
         // a numeric id. The baseline reached it anyway, but only by burning THREE rounds
-        // (get_field_values -> search_wazuh_data -> get_fim_files "002"); phase 4 then added a
+        // (get_field_values -> search_wazuh_data -> get_fim_files with the resolved id); phase 4
+        // then added a
         // schema line telling the model to "resolve that name to its id first and pass the id",
         // which priced that detour explicitly and pushed the model to the escape hatch instead,
         // where `wazuh.agent.name` can simply be filtered in one call. The answer stayed correct
@@ -57,7 +58,7 @@ export const getFimFilesTool: ToolDefinition = {
         agent_name: {
           type: 'string',
           description:
-            'Optional agent NAME to scope to one agent, e.g. "win-ws-014" -- use this whenever ' +
+            'Optional agent NAME to scope to one agent, e.g. "web-server-01" -- use this whenever ' +
             'the user named the host rather than numbering it; there is no need to look its id up ' +
             'first. If both this and "agent_id" are given, "agent_id" wins.',
         },

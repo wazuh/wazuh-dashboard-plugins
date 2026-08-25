@@ -144,10 +144,10 @@ for (const field of Object.values(COMPLIANCE_FRAMEWORK_FIELDS)) {
 }
 
 /**
- * EXPLAIN-WAVE PHASE 6 (eval run 20260825-211841, RESULTS.md "Root cause B"). The map above knew
+ * EXPLAIN-WAVE PHASE 6 (root cause B of the unreachable state surfaces). The map above knew
  * three state surfaces -- vulnerabilities, sca, and three inventory kinds -- and nothing else, so
  * "which values does `service.state` actually take" had no route at all and the model was left
- * guessing field names on eleven questions whose data was live in the mapping the whole time.
+ * guessing field names on questions whose data was live in the mapping the whole time.
  *
  * Derived from `../state-families.ts` rather than hand-written here, because the SAME rows also
  * produce `search_wazuh_data`'s enum and `guardrails.ts`'s aggregation allowlist: a field that can

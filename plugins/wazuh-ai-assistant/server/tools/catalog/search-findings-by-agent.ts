@@ -63,12 +63,13 @@ export const searchFindingsByAgentTool: ToolDefinition = {
   // resolveDeicticAgentParams in get-agent-inventory.ts). A strictly-required `agent_name`
   // measured 0/40 invocations on deictic findings questions ("what happened on this host").
   //
-  // EXPLAIN-WAVE PHASE 3 (eval run 20260825-163607, EV2-FND-006 "Anything bad on the domain
-  // controller?"): the source moved from `manager-agents` to an `indexer-terms` aggregation over
+  // EXPLAIN-WAVE PHASE 3 (deictic questions that name a role rather than a host, e.g. "anything
+  // bad on the domain controller?"): the source moved from `manager-agents` to an
+  // `indexer-terms` aggregation over
   // the EXACT index and field this tool's own `buildRequest` filters on. The two universes are not
-  // the same, and when they disagree the manager-agents lookup resolved silently and wrongly: in
-  // the eval environment the Manager API knows exactly ONE agent (the manager node
-  // `wazuh-manager-master-0`), while `wazuh-findings-v5*` carries eight distinct
+  // the same, and when they disagree the manager-agents lookup resolved silently and wrongly: a
+  // deployment whose Manager API knows exactly ONE agent (the manager node itself) can still have
+  // `wazuh-findings-v5*` carrying many distinct
   // `wazuh.agent.name` values -- so an omitted `agent_name` took the `kind: 'single'` path and
   // filtered findings by the manager node, which has none. The ambiguity-enumerate branch that
   // exists precisely to refuse this ("N agents exist, so which one is meant cannot be assumed.
