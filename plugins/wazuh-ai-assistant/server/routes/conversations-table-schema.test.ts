@@ -76,6 +76,7 @@ test('tableSpecSchema: accepts a table carrying provenance (issue #9008 rework)'
         requestedRange: { gte: 'now-720d', lte: 'now' },
         effectiveRange: { gte: '2026-05-23T00:00:00.000Z', lte: 'now' },
         clamped: true,
+        executedAt: Date.now(),
       },
     }),
   );

@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { formatSorting, SortField } from '../tables/format-sorting';
 
 /**
  * @interface PaginationResult
@@ -26,9 +27,10 @@ interface PaginationResult<T> {
  * @property {number} pageIndex - Current page index (0-based)
  * @property {number} pageSize - Number of items per page
  * @property {number} totalItems - Total number of items in the API
- * @property {(pageIndex?: number, pageSize?: number) => Promise<void>} getData - Function to fetch paginated data
+ * @property {(pageIndex?: number, pageSize?: number, sort?: SortField) => Promise<void>} getData - Function to fetch paginated data
  * @property {() => Promise<void>} refreshCurrentPage - Function to refresh the current page
- * @property {(change: any) => void} onTableChange - Handler for table pagination changes
+ * @property {(change: any) => void} onTableChange - Handler for table pagination and sorting changes
+ * @property {{ sort: SortField }} sorting - Controlled sorting prop for EuiBasicTable
  */
 interface UsePaginationReturn<T> {
   items: T[];
@@ -36,9 +38,14 @@ interface UsePaginationReturn<T> {
   pageIndex: number;
   pageSize: number;
   totalItems: number;
-  getData: (pageIndex?: number, pageSize?: number) => Promise<void>;
+  getData: (
+    pageIndex?: number,
+    pageSize?: number,
+    sort?: SortField,
+  ) => Promise<void>;
   refreshCurrentPage: () => Promise<void>;
   onTableChange: (change: any) => void;
+  sorting: { sort: SortField };
 }
 
 /**
@@ -47,6 +54,7 @@ interface UsePaginationReturn<T> {
  * @template T - The type of items in the paginated response
  * @param {function} fetchFunction - Async function that fetches paginated data. Should return {data: T[], total: number}
  * @param {function} [onError] - Optional callback function called when an error occurs during data fetching
+ * @param {SortField} [initialSort] - Optional initial sort. Each table keeps its own default; when omitted no `sort` is sent
  *
  * @returns {UsePaginationReturn<T>} Object containing pagination state and methods
  *
@@ -82,26 +90,34 @@ export function usePagination<T>(
   fetchFunction: (
     offset: number,
     limit: number,
+    sort?: string,
   ) => Promise<PaginationResult<T>>,
   onError?: (error: any) => void,
+  initialSort: SortField = {},
 ): UsePaginationReturn<T> {
   const [items, setItems] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
+  const [sort, setSort] = useState<SortField>(initialSort);
 
   /**
    * Fetches paginated data from the API
    * @param {number} [pageIndex=0] - Page index (0-based)
    * @param {number} [pageSize=10] - Number of items per page
+   * @param {SortField} [nextSort] - Sort to apply. Defaults to the current sort state
    */
   const getData = useCallback(
-    async (pageIndex = 0, pageSize = 10) => {
+    async (pageIndex = 0, pageSize = 10, nextSort: SortField = sort) => {
       setLoading(true);
       try {
         const offset = pageIndex * pageSize;
-        const result = await fetchFunction(offset, pageSize);
+        const result = await fetchFunction(
+          offset,
+          pageSize,
+          formatSorting(nextSort) || undefined,
+        );
 
         // Extract items from any property (data, users, rules, etc.)
         let itemsData: T[] = [];
@@ -125,6 +141,7 @@ export function usePagination<T>(
         setTotalItems(result.total);
         setPageIndex(pageIndex);
         setPageSize(pageSize);
+        setSort(nextSort);
       } catch (error) {
         setItems([]);
         if (onError) {
@@ -134,7 +151,7 @@ export function usePagination<T>(
         setLoading(false);
       }
     },
-    [fetchFunction, onError],
+    [fetchFunction, onError, sort],
   );
 
   /**
@@ -147,21 +164,34 @@ export function usePagination<T>(
 
   /**
    * Handler for EuiBasicTable onChange event
-   * Manages page changes and page size changes
-   * Resets to first page when page size changes
+   * Manages page changes, page size changes and sorting changes
+   * Resets to first page when the page size or the sort changes
    *
    * @param {object} change - Change object from EuiBasicTable
    * @param {object} change.page - Page object containing index and size
+   * @param {object} change.sort - Sort object containing field and direction
    */
   const onTableChange = useCallback(
-    ({ page }: any) => {
-      if (page) {
-        // Reset to first page if page size changed
-        const newPageIndex = page.size !== pageSize ? 0 : page.index;
-        getData(newPageIndex, page.size);
+    ({ page, sort: nextSort }: any) => {
+      const sortChanged =
+        !!nextSort &&
+        (nextSort.field !== sort.field ||
+          nextSort.direction !== sort.direction);
+      const appliedSort = nextSort ?? sort;
+
+      if (!page) {
+        if (sortChanged) {
+          getData(0, pageSize, appliedSort);
+        }
+        return;
       }
+
+      // Reset to the first page if the page size or the sort changed
+      const newPageIndex =
+        page.size !== pageSize || sortChanged ? 0 : page.index;
+      getData(newPageIndex, page.size, appliedSort);
     },
-    [getData, pageSize],
+    [getData, pageSize, sort],
   );
 
   return {
@@ -173,5 +203,6 @@ export function usePagination<T>(
     getData,
     refreshCurrentPage,
     onTableChange,
+    sorting: { sort },
   };
 }

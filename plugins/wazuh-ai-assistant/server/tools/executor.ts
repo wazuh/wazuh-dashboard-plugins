@@ -738,13 +738,24 @@ async function executeIndexerRequest(
       index: indexerRequest.index,
       dsl: buildDiscoverDsl(body),
     };
+    // Issue #9008 review, blocker 2: recorded HERE, at creation time -- a date-math bound
+    // ("now-90d") only means something relative to when the query actually ran, so resolving it
+    // against the render-time clock instead (the pre-fix behavior) showed a restored conversation a
+    // window the query never ran against. `describeProvenance` (tool-call-label.ts) resolves
+    // date-math against this stored instant, never `Date.now()`. Held in a local first so the two
+    // `rangeBoundsFromDsl` calls below order their bounds against the SAME instant they record.
+    const executedAt = Date.now();
     // Issue #9008 rework: provenance FACTS for the evidence popover — see `TableSpec.provenance`'s
     // doc comment (common/types.ts). `requestedRange`/`effectiveRange` read the SAME dsl shape
     // `discover.dsl` above does (`buildDiscoverDsl`), just off the pre- and post-clamp bodies
-    // respectively, through the one shared reader (`rangeBoundsFromDsl`) the client's popover also
-    // uses — neither side may derive a window this call differently. `toolCallId` is left unset
-    // here; server/routes/chat.ts's stream loop attaches it, since that is where the streaming
-    // tool call's own id is in scope.
+    // respectively. `rangeBoundsFromDsl` and the `extractTimeRange` the "Open in Discover" link is
+    // built with are two views of ONE resolution (common/discover-url.ts's `effectiveRangeClause`:
+    // clauses partitioned by timestamp field, then intersected within it), so given the same body
+    // and the same `executedAt` reference they cannot report different windows — the link and this
+    // record agree by construction, not by two implementations happening to match. That reference
+    // is why `executedAt` is stored on the spec: discover-link.tsx passes it back in.
+    // `toolCallId` is left unset here; server/routes/chat.ts's stream loop attaches it, since
+    // that is where the streaming tool call's own id is in scope.
     tableSpec.provenance = {
       index: indexerRequest.index,
       // `?? body`: unreachable in practice (the try block above always sets `requestedRangeBody`
@@ -752,15 +763,13 @@ async function executeIndexerRequest(
       // `Record<string, unknown>` for `buildDiscoverDsl` without an unsafe `!` assertion.
       requestedRange: rangeBoundsFromDsl(
         buildDiscoverDsl(requestedRangeBody ?? body),
+        executedAt,
       ),
-      effectiveRange: rangeBoundsFromDsl(buildDiscoverDsl(body)),
+      // Issue #9008 review, cleanup 3: `tableSpec.discover.dsl` above IS `buildDiscoverDsl(body)`
+      // — reuse it rather than building the same object a second time.
+      effectiveRange: rangeBoundsFromDsl(tableSpec.discover.dsl, executedAt),
       clamped: lookbackDisclosure !== undefined,
-      // Issue #9008 review, blocker 2: recorded HERE, at creation time -- a date-math bound
-      // ("now-90d") only means something relative to when the query actually ran, so resolving
-      // it against the render-time clock instead (the pre-fix behavior) showed a restored
-      // conversation a window the query never ran against. `describeProvenance`
-      // (tool-call-label.ts) resolves date-math against this stored instant, never `Date.now()`.
-      executedAt: Date.now(),
+      executedAt,
     };
     if (def.buildSecurityAnalyticsLink) {
       const space = resolveSecurityAnalyticsSpace(
@@ -1000,7 +1009,20 @@ export async function executeToolCall(
     try {
       const resolved = await def.resolveParams(params, context, request);
       if (!resolved.ok) {
-        return { toolResultContent: toolErrorContent(resolved.reason) };
+        // The FAILURE half must go through the same scrub as the success half below: a resolver that
+        // cannot pick between candidates enumerates them by name in `reason`
+        // (param-resolution.ts's two 'many' branches), and that reason becomes the tool error the
+        // provider reads -- so an unscrubbed one carries real hostnames in the clear under privacy
+        // mode. Same helper, same chokepoint, no-op when the resolver declared no entities.
+        return {
+          toolResultContent: toolErrorContent(
+            scrubAssumptionNote(
+              resolved.reason,
+              resolved.reasonEntities,
+              privacy,
+            ) ?? resolved.reason,
+          ),
+        };
       }
       params = resolved.resolved.params;
       // Scrubbed HERE, at the single choke point every resolver's note passes through, rather

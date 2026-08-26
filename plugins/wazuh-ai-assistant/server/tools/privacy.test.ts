@@ -9,8 +9,11 @@ import {
   prescanAndMint,
   prescanAndMintToolContent,
   scrubKnownEntities,
+  scrubFieldValue,
   FieldPolicyEntry,
   FIELD_POLICY_DEFAULTS,
+  IDENTIFIER_BEARING_FREE_TEXT_FIELDS,
+  PREMINT_HOST_FIELDS,
 } from './privacy';
 import { Digest } from './digest';
 import { WAZUH_FIELD } from '../../common/wazuh-fields';
@@ -300,6 +303,27 @@ test('prescanAndMintToolContent: still pseudonymizes a hostname/IP in a string V
   assert.doesNotMatch(out, /attacker\.evil\.com/);
 });
 
+test('F4: prescanAndMintToolContent preserves a JSON-derived "__proto__" key as an own property (no prototype pollution)', () => {
+  // `JSON.parse('{"__proto__": ...}')` hands back "__proto__" as a perfectly ordinary own key of
+  // the parsed object. Rebuilding that object with a plain `out[key] = value` assignment does not
+  // create a property at all for that one key -- it invokes Object.prototype's `__proto__`
+  // setter, silently dropping the value and rewriting the rebuilt object's own prototype.
+  const p = new Pseudonymizer();
+  const digest = '{"__proto__": {"message": "polluted"}, "safe": "value"}';
+  const out = prescanAndMintToolContent(digest, p);
+  const parsedOut = JSON.parse(out);
+  assert.equal(Object.getPrototypeOf(parsedOut), Object.prototype);
+  assert.ok(
+    Object.prototype.hasOwnProperty.call(parsedOut, '__proto__'),
+    '"__proto__" must survive as an own property',
+  );
+  assert.deepEqual(
+    Object.getOwnPropertyDescriptor(parsedOut, '__proto__')?.value,
+    { message: 'polluted' },
+  );
+  assert.equal(parsedOut.safe, 'value');
+});
+
 test('prescanAndMintToolContent: falls back to flat scan for non-JSON (plain error string)', () => {
   const p = new Pseudonymizer();
   const out = prescanAndMintToolContent(
@@ -533,6 +557,24 @@ test('Pseudonymizer: applyToObject deep-maps nested structures', () => {
   assert.equal(out.list[0], pseudonym);
   assert.equal(out.list[1], 'unrelated');
   assert.equal(out.nested.deeper.name, pseudonym);
+});
+
+test('F4: applyToObject (deepMapStrings) preserves a "__proto__" key as an own property (no prototype pollution)', () => {
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('web-01.corp', 'HOST');
+  // Simulates a tool-call argument object shaped like `JSON.parse` output with a "__proto__" own
+  // key -- e.g. a model echoing back an object it was handed. Built via `JSON.parse` of a STRING
+  // (not an object literal, where a bare `__proto__:` key is special-cased by JS syntax itself to
+  // set the prototype rather than create an own property) so this actually exercises the same
+  // "__proto__ as an ordinary own key" shape JSON.parse produces. A plain `out[key] = value`
+  // rebuild would run Object.prototype's `__proto__` setter here instead of creating a property.
+  const input = JSON.parse('{"__proto__": {"name": "web-01.corp"}}');
+  const out = p.applyToObject(input) as Record<string, unknown>;
+  assert.equal(Object.getPrototypeOf(out), Object.prototype);
+  assert.ok(Object.prototype.hasOwnProperty.call(out, '__proto__'));
+  assert.deepEqual(Object.getOwnPropertyDescriptor(out, '__proto__')?.value, {
+    name: pseudonym,
+  });
 });
 
 test('Pseudonymizer: seeded entries are reused and counters continue from the seed', () => {
@@ -1595,6 +1637,226 @@ test('scrubKnownEntities: longest known value wins so a shorter one does not cor
   assert.notEqual(shortPseudonym, longPseudonym);
 });
 
+// --- F1/F2 (adversarial validation): scrubKnownEntities's `identifiersOnly` filter --------------
+//
+// Live-reproduced defect (F1): "Which Ubuntu agents are critical? root cause please" became
+// "Which VAL_2 agents are VAL_3? USER_4 cause please" once "ubuntu"/"critical"/"root" had each
+// been minted from unrelated fields earlier in the conversation -- the unfiltered dictionary scan
+// treated every minted string as a search-and-replace target over the user's own words. F2 is the
+// same root cause turned on an already-inserted pseudonym token: a minted "1" corrupts "HOST_1"
+// into "HOST_VAL_7" because "_" is a valid boundary. `identifiersOnly: true` (the mode the
+// USER-TEXT call site in chat.ts's scrubMessagesForProvider now always passes) is the fix under
+// test here; the tool-value call sites (scrubFieldValue's allow-scan branch, deepScrubContainer)
+// pass no options and keep today's unfiltered behavior, covered by the pre-existing tests above.
+
+test('F1: identifiersOnly masks all four NF-1 scenario values, in any casing', () => {
+  const p = new Pseudonymizer();
+  const dbprod07 = p.pseudonymize('dbprod07', 'HOST');
+  const dbprimary03 = p.pseudonymize('DBPRIMARY03', 'HOST');
+  const dbPrimaryDashed = p.pseudonymize('db-primary-03', 'HOST');
+  const jsmith = p.pseudonymize('jsmith', 'USER');
+
+  assert.equal(
+    scrubKnownEntities('checking on DBPROD07 now', p, {
+      identifiersOnly: true,
+    }),
+    `checking on ${dbprod07} now`,
+  );
+  assert.equal(
+    scrubKnownEntities('agent dbprimary03 is noisy', p, {
+      identifiersOnly: true,
+    }),
+    `agent ${dbprimary03} is noisy`,
+  );
+  assert.equal(
+    scrubKnownEntities('mysql-server-DB-PRIMARY-03-config', p, {
+      identifiersOnly: true,
+    }),
+    `mysql-server-${dbPrimaryDashed}-config`,
+  );
+  assert.equal(
+    scrubKnownEntities('what did JSMITH do yesterday', p, {
+      identifiersOnly: true,
+    }),
+    `what did ${jsmith} do yesterday`,
+  );
+});
+
+test('F1: identifiersOnly leaves minted common words untouched (kind-filtered out)', () => {
+  const p = new Pseudonymizer();
+  // Mirrors the live repro exactly: "ubuntu"/"critical" minted as the generic VAL kind (the
+  // escape hatch's fail-closed default for a field name with no host/ip/user keyword), "root"
+  // minted as USER (a real "root" user is a plausible value of a user.name-shaped field) but too
+  // short to pass the identifier-shape check, and a bare "3" excluded on both counts.
+  p.pseudonymize('ubuntu', 'VAL');
+  p.pseudonymize('critical', 'VAL');
+  p.pseudonymize('root', 'USER');
+  p.pseudonymize('3', 'VAL');
+
+  const text = 'Which Ubuntu agents are critical? root cause please';
+  const out = scrubKnownEntities(text, p, { identifiersOnly: true });
+  assert.equal(out, text);
+});
+
+test('F1: without identifiersOnly (tool-value call sites), the same common words WOULD be corrupted -- proving the option is the fix', () => {
+  const p = new Pseudonymizer();
+  p.pseudonymize('ubuntu', 'VAL');
+  p.pseudonymize('critical', 'VAL');
+  p.pseudonymize('root', 'USER');
+
+  const text = 'Which Ubuntu agents are critical? root cause please';
+  const out = scrubKnownEntities(text, p); // identifiersOnly defaults to false
+  assert.notEqual(out, text);
+});
+
+test('F2: identifiersOnly excludes a short/numeric minted value, so it cannot corrupt an already-inserted HOST_n token', () => {
+  const p = new Pseudonymizer();
+  p.pseudonymize('1', 'VAL'); // the short/numeric value that used to corrupt HOST_1
+  const hostPseudonym = p.pseudonymize('dbprod07', 'HOST');
+  assert.equal(hostPseudonym, 'HOST_1');
+
+  const text = `why is ${hostPseudonym} noisy`;
+  const out = scrubKnownEntities(text, p, { identifiersOnly: true });
+  assert.equal(out, text);
+  assert.doesNotMatch(out, /HOST_VAL_\d+/);
+});
+
+test('F2: the shape filter alone (not just the kind filter) excludes a short value even when it carries an IP/HOST/USER-kind pseudonym', () => {
+  // Isolates the SHAPE half of the identifiersOnly filter: a pathological short value minted
+  // under a recoverable kind (HOST) must still be excluded by looksLikeIdentifierValue's length
+  // floor, not merely by the kind check -- otherwise a short HOST/USER/IP value could still
+  // corrupt another pseudonym token the same way F2's "1" did.
+  const p = new Pseudonymizer();
+  const shortHostPseudonym = p.pseudonymize('1', 'HOST'); // pathological: length-1 value, HOST kind
+  assert.equal(shortHostPseudonym, 'HOST_1');
+  const realHostPseudonym = p.pseudonymize('dbprod07', 'IP');
+  assert.equal(realHostPseudonym, 'IP_1');
+
+  const text = `why is ${realHostPseudonym} noisy`;
+  const out = scrubKnownEntities(text, p, { identifiersOnly: true });
+  assert.equal(out, text);
+});
+
+// --- Round-2 adversarial validation: the length/shape floor under-masked real SHORT identifiers
+// (a genuine regression vs. shipped upstream, where the `user` branch's unfiltered `applyToText`
+// masked ANY exact-case retype regardless of length). `looksLikeIdentifierValue` was rewritten from
+// a length/shape floor to a curated stop-list: any IP/HOST/USER-kind value of length >= 3 is now
+// treated as an identifier UNLESS it exactly (case-insensitively) matches `IDENTIFIER_STOP_WORDS`.
+
+test('round 2: identifiersOnly masks real SHORT identifiers ("jdoe", "titan", "bob") in any casing that the old length floor missed', () => {
+  const p = new Pseudonymizer();
+  const jdoe = p.pseudonymize('jdoe', 'USER'); // 4 chars -- the old floor required 5+
+  const titan = p.pseudonymize('titan', 'HOST'); // 5 chars, alpha-only -- the old floor required 6+
+  const bob = p.pseudonymize('bob', 'USER'); // 3 chars -- the old floor required 5+
+
+  assert.equal(
+    scrubKnownEntities('and what did JDOE do?', p, { identifiersOnly: true }),
+    `and what did ${jdoe} do?`,
+  );
+  assert.equal(
+    scrubKnownEntities('is TITAN still noisy', p, { identifiersOnly: true }),
+    `is ${titan} still noisy`,
+  );
+  assert.equal(
+    scrubKnownEntities('ask Bob about it', p, { identifiersOnly: true }),
+    `ask ${bob} about it`,
+  );
+});
+
+// --- F-I1 (answer-quality adversarial validation): `inferPseudonymKind` mints HOST for ANY field
+// ending in a bare `.name` segment, not just genuine hostname fields -- `process.name`/
+// `file.name`/`package.name` etc. routinely mint ordinary short words ("top", "find", "make",
+// "less") as HOST. Live-verified: "show me the top 10 and find all" became
+// "show me the HOST_9 10 and HOST_10 USER_2" once those words had been minted this way elsewhere in
+// the conversation -- invisible to the analyst, since the reverse pass restores them in the MODEL's
+// own answer; they just see the assistant seem to misunderstand an ordinary question.
+
+test('F-I1: short plain-alphabetic HOST-kind command/process names are NOT replaced in prose', () => {
+  const p = new Pseudonymizer();
+  p.pseudonymize('top', 'HOST'); // e.g. minted from an unlisted process.name field
+  p.pseudonymize('find', 'HOST');
+  p.pseudonymize('make', 'HOST');
+  p.pseudonymize('less', 'HOST');
+
+  const text = 'show me the top 10 and find all, then make it less noisy';
+  const out = scrubKnownEntities(text, p, { identifiersOnly: true });
+  assert.equal(out, text);
+});
+
+test('F-I1: the fix does not regress masking of real short identifiers ("jdoe"/"bob" USER, "titan" HOST-5, "db1" HOST-digit)', () => {
+  const p = new Pseudonymizer();
+  const jdoe = p.pseudonymize('jdoe', 'USER');
+  const bob = p.pseudonymize('bob', 'USER');
+  const titan = p.pseudonymize('titan', 'HOST');
+  const db1 = p.pseudonymize('db1', 'HOST');
+
+  assert.equal(
+    scrubKnownEntities('ping jdoe about the outage', p, {
+      identifiersOnly: true,
+    }),
+    `ping ${jdoe} about the outage`,
+  );
+  assert.equal(
+    scrubKnownEntities('ask bob too', p, { identifiersOnly: true }),
+    `ask ${bob} too`,
+  );
+  assert.equal(
+    scrubKnownEntities('is titan still up', p, { identifiersOnly: true }),
+    `is ${titan} still up`,
+  );
+  assert.equal(
+    scrubKnownEntities('check db1 again', p, { identifiersOnly: true }),
+    `check ${db1} again`,
+  );
+});
+
+test('F-I1: without the pseudonym-kind check, a short HOST-kind command name WOULD be replaced -- proving the fix is load-bearing', () => {
+  const p = new Pseudonymizer();
+  p.pseudonymize('top', 'HOST');
+  const text = 'show me the top 10';
+  // Unfiltered dictionary scan (identifiersOnly: false/omitted) has no length/kind exemption at
+  // all -- this is the allow-scan tool-value behavior, deliberately unchanged by F-I1.
+  const out = scrubKnownEntities(text, p);
+  assert.notEqual(out, text);
+});
+
+test('round 2: identifiersOnly leaves stop-listed common words untouched even though they clear the length floor', () => {
+  const p = new Pseudonymizer();
+  p.pseudonymize('root', 'USER');
+  p.pseudonymize('admin', 'USER');
+  p.pseudonymize('system', 'HOST');
+  p.pseudonymize('unknown', 'HOST');
+
+  const text = 'the root and admin accounts on this system are unknown to me';
+  const out = scrubKnownEntities(text, p, { identifiersOnly: true });
+  assert.equal(out, text);
+});
+
+test('round 2: the >= 3 character floor (not the stop-list) is what saves an inserted HOST_1 token from a minted "1"', () => {
+  // Fixes a tautological predecessor of this test: minting only a STOP-LISTED value ("system")
+  // plus an UNRELATED value ("dbprod07" — never appears in the asserted text) proved nothing,
+  // because no minted value was ever a candidate to match inside the token either way — the
+  // assertion would have passed identically with the whole `identifiersOnly` filter deleted. This
+  // version mints the actual corrupting value from F2's own live repro ("1", NOT stop-listed, NOT
+  // excluded by kind) and shows the length floor is what stops it: "1" clears the kind filter
+  // (HOST) but fails length < 3, so it's excluded from the dictionary scan and the boundary match
+  // that would otherwise turn "why is HOST_1 noisy" into "why is HOSTHOST_1_1 noisy"-shaped
+  // corruption never gets the chance to fire.
+  const p = new Pseudonymizer();
+  const shortHostPseudonym = p.pseudonymize('1', 'HOST');
+  assert.equal(shortHostPseudonym, 'HOST_1');
+
+  const text = `why is ${shortHostPseudonym} noisy`;
+  const out = scrubKnownEntities(text, p, { identifiersOnly: true });
+  assert.equal(out, text);
+
+  // Prove the floor is actually load-bearing here (not vacuously true for some other reason):
+  // without `identifiersOnly`, the SAME minted value DOES corrupt the token, boundary rules and
+  // all — grounding the claim that `identifiersOnly`'s length floor is what changes the outcome.
+  const corrupted = scrubKnownEntities(text, p);
+  assert.notEqual(corrupted, text);
+});
+
 // --- applyFieldPolicy: 'allow-scan' action (#8912) ----------------------------------------------
 
 test('applyFieldPolicy: "allow-scan" field replaces a known dictionary hit with its existing pseudonym', () => {
@@ -1879,6 +2141,420 @@ test('P-2 regression: an unlisted non-empty array of objects under the escape ha
   assert.equal('queries' in out.samples[0], false);
 });
 
+// --- NF-2: scrubFieldValue container-shape hardening (a security-validation finding) ------------
+//
+// The P-2 array-recursion branch above only ever matched an array where EVERY element was a
+// string. Any other container shape (array of objects, nested array, mixed-type array, plain
+// object) under an EXPLICIT 'anonymize'/'allow-scan' policy entry missed every scanned branch and
+// fell through to the terminal passthrough, reaching the provider raw -- making a curated field
+// LESS protected than an unlisted one. These tests drive `scrubFieldValue` directly (exported
+// purely for this) rather than via a full Digest, since the fix is entirely inside that function.
+
+test('NF-2: an array of OBJECTS under an anonymize entry is deep-scrubbed, not passed through raw', () => {
+  const p = new Pseudonymizer();
+  const result = scrubFieldValue(
+    WAZUH_FIELD.AGENT_IP, // FIELD_POLICY_DEFAULTS: action 'anonymize', kind 'IP'
+    [{ addr: '127.0.0.1' }, { addr: '10.0.0.5', tag: 'primary' }],
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, true);
+  const value = result.value as Array<Record<string, string>>;
+  assert.match(value[0].addr, /^IP_\d+$/);
+  assert.match(value[1].addr, /^IP_\d+$/);
+  // Every STRING LEAF under this entry's subtree gets the entry's action -- deepScrubContainer
+  // does not try to guess which nested key "is" the IP and leave siblings alone (there is no
+  // reliable signal to do that from), so a sibling string field is pseudonymized too, with the
+  // SAME 'IP' kind the entry specifies. This is the deliberate, conservative fail-closed choice:
+  // better an unrelated string gets an IP-kind pseudonym than a real value slips through raw.
+  assert.match(value[1].tag, /^IP_\d+$/);
+  assert.doesNotMatch(
+    JSON.stringify(value),
+    /127\.0\.0\.1|10\.0\.0\.5|primary/,
+  );
+});
+
+test('NF-2: a NESTED ARRAY under an anonymize entry is deep-scrubbed, not passed through raw', () => {
+  const p = new Pseudonymizer();
+  const result = scrubFieldValue(
+    WAZUH_FIELD.AGENT_IP,
+    [['127.0.0.1', '10.0.0.5'], ['192.168.1.1']],
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, true);
+  const value = result.value as string[][];
+  assert.match(value[0][0], /^IP_\d+$/);
+  assert.match(value[0][1], /^IP_\d+$/);
+  assert.match(value[1][0], /^IP_\d+$/);
+  assert.doesNotMatch(
+    JSON.stringify(value),
+    /127\.0\.0\.1|10\.0\.0\.5|192\.168\.1\.1/,
+  );
+});
+
+test('NF-2: a MIXED-TYPE array (a single null/number breaks the old .every guard) is deep-scrubbed', () => {
+  const p = new Pseudonymizer();
+  const result = scrubFieldValue(
+    WAZUH_FIELD.AGENT_IP,
+    ['127.0.0.1', null, 42, '10.0.0.5'],
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, true);
+  const value = result.value as unknown[];
+  assert.match(value[0] as string, /^IP_\d+$/);
+  assert.equal(value[1], null);
+  assert.equal(value[2], 42);
+  assert.match(value[3] as string, /^IP_\d+$/);
+});
+
+test('F4: deepScrubContainer preserves a "__proto__" key as an own property (no prototype pollution)', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'wazuh.custom.blob', action: 'anonymize', kind: 'VAL' },
+  ];
+  const p = new Pseudonymizer();
+  // Same JSON.parse-of-a-string construction as the deepMapStrings/prescanAndMintToolContent
+  // tests above -- an object-literal `{ __proto__: ... }` would set the prototype instead of
+  // creating an own key, which is not the shape this fix protects against.
+  const value = JSON.parse('{"__proto__": "attacker value", "safe": "ok"}');
+  const result = scrubFieldValue(
+    'wazuh.custom.blob',
+    value,
+    policy,
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, true);
+  const out = result.value as Record<string, unknown>;
+  assert.equal(Object.getPrototypeOf(out), Object.prototype);
+  assert.ok(Object.prototype.hasOwnProperty.call(out, '__proto__'));
+  assert.match(
+    Object.getOwnPropertyDescriptor(out, '__proto__')?.value as string,
+    /^VAL_\d+$/,
+  );
+});
+
+test('NF-2: a plain OBJECT under an anonymize entry is deep-scrubbed, not passed through raw', () => {
+  const p = new Pseudonymizer();
+  const result = scrubFieldValue(
+    WAZUH_FIELD.AGENT_IP,
+    { primary: '127.0.0.1', secondary: '10.0.0.5', count: 2 },
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, true);
+  const value = result.value as Record<string, unknown>;
+  assert.match(value.primary as string, /^IP_\d+$/);
+  assert.match(value.secondary as string, /^IP_\d+$/);
+  assert.equal(value.count, 2);
+});
+
+test('NF-2: an array of objects under an allow-scan entry is deep-scanned (shape + known-entity), not passed through raw', () => {
+  const p = new Pseudonymizer();
+  // Seed a known entity so the known-entity dictionary half of allow-scan has something to hit.
+  p.pseudonymize('DBPRIMARY03', 'HOST');
+  const result = scrubFieldValue(
+    'package.name', // FIELD_POLICY_DEFAULTS: action 'allow-scan'
+    [
+      { name: 'custom-build-for-DBPRIMARY03' },
+      { name: 'reaches-out-to-10.0.0.9' },
+    ],
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, true);
+  const value = result.value as Array<Record<string, string>>;
+  assert.doesNotMatch(value[0].name, /DBPRIMARY03/i);
+  assert.doesNotMatch(value[1].name, /10\.0\.0\.9/);
+});
+
+test('NF-2: a plain object under an allow-scan entry is deep-scanned, not passed through raw', () => {
+  const p = new Pseudonymizer();
+  const result = scrubFieldValue(
+    'package.name',
+    { primary: 'reaches-out-to-10.0.0.9', label: 'ok' },
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, true);
+  const value = result.value as Record<string, string>;
+  assert.doesNotMatch(value.primary, /10\.0\.0\.9/);
+  assert.equal(value.label, 'ok');
+});
+
+test('NF-2 regression: a flat string array under an anonymize entry still recurses element-wise (P-2 behavior preserved)', () => {
+  const p = new Pseudonymizer();
+  const result = scrubFieldValue(
+    WAZUH_FIELD.AGENT_IP,
+    ['127.0.0.1', '10.0.0.5'],
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, true);
+  const value = result.value as string[];
+  assert.match(value[0], /^IP_\d+$/);
+  assert.match(value[1], /^IP_\d+$/);
+  assert.notEqual(value[0], value[1]);
+});
+
+test('NF-2 regression: a scalar string under an anonymize entry is unchanged', () => {
+  const p = new Pseudonymizer();
+  const result = scrubFieldValue(
+    WAZUH_FIELD.AGENT_IP,
+    '127.0.0.1',
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, true);
+  assert.match(result.value as string, /^IP_\d+$/);
+});
+
+test('NF-2 regression: a "never" field is still dropped regardless of container shape', () => {
+  const p = new Pseudonymizer();
+  const neverPolicy: FieldPolicyEntry[] = [
+    { field: 'secret.blob', action: 'never' },
+  ];
+  const result = scrubFieldValue(
+    'secret.blob',
+    [{ any: 'shape' }, 'x', 1, null],
+    neverPolicy,
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, false);
+  assert.equal(result.value, undefined);
+});
+
+test('F3: an unlisted field (no entry, not the escape hatch) with an object value is shape-scanned and KEPT, not dropped', () => {
+  // F3 (adversarial validation of NF-2): this container used to fall through to the final
+  // `return { keep: true, value }` untouched (pre-NF-2), then NF-2 over-corrected and started
+  // dropping it entirely -- silently deleting a column that is present when privacy is off. It is
+  // now shape-scanned (prescanAndMint over every string leaf, the same allow-by-omission scan a
+  // scalar string gets) and KEPT, so the column survives with its IP/FQDN leaves pseudonymized and
+  // everything else untouched.
+  const p = new Pseudonymizer();
+  const result = scrubFieldValue(
+    'totally.unlisted.field',
+    { nested: 'reaches out to 203.0.113.9 sometimes' },
+    [],
+    p,
+    undefined,
+    false, // isEscapeHatch: false -- allow-by-omission path, not the escape hatch
+  );
+  assert.equal(result.keep, true);
+  const nested = (result.value as Record<string, unknown>).nested as string;
+  assert.doesNotMatch(nested, /203\.0\.113\.9/);
+  assert.match(nested, /IP_\d+/);
+});
+
+test('F3: an unlisted field with an object value carrying no scannable shape is kept byte-identical', () => {
+  const p = new Pseudonymizer();
+  const result = scrubFieldValue(
+    'totally.unlisted.field',
+    { nested: 'plain text, nothing to scan' },
+    [],
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, true);
+  assert.deepEqual(result.value, { nested: 'plain text, nothing to scan' });
+});
+
+test('NF-2 regression: an empty array under an anonymize entry is unchanged (still empty, still kept)', () => {
+  const p = new Pseudonymizer();
+  const result = scrubFieldValue(
+    WAZUH_FIELD.AGENT_IP,
+    [],
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, true);
+  assert.deepEqual(result.value, []);
+});
+
+test('NF-2 regression: numbers/booleans under an anonymize entry are unchanged', () => {
+  const p = new Pseudonymizer();
+  assert.equal(
+    scrubFieldValue(
+      WAZUH_FIELD.AGENT_IP,
+      42,
+      FIELD_POLICY_DEFAULTS,
+      p,
+      undefined,
+      false,
+    ).value,
+    42,
+  );
+  assert.equal(
+    scrubFieldValue(
+      WAZUH_FIELD.AGENT_IP,
+      true,
+      FIELD_POLICY_DEFAULTS,
+      p,
+      undefined,
+      false,
+    ).value,
+    true,
+  );
+});
+
+test('NF-2: an explicit "allow" entry still passes a container through completely unscanned (curated passthrough preserved)', () => {
+  const p = new Pseudonymizer();
+  const result = scrubFieldValue(
+    WAZUH_FIELD.RULE_MITRE_TECHNIQUE_ID, // FIELD_POLICY_DEFAULTS: action 'allow'
+    ['T1059.001', 'T1548.002.001'],
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, true);
+  assert.deepEqual(result.value, ['T1059.001', 'T1548.002.001']);
+});
+
+test('NF-2/F3: an escape-hatch unlisted container is still dropped outright (fail-closed default unchanged)', () => {
+  // F3 only added a scan-shape path for the NON-escape-hatch (typed-tool allow-by-omission) case.
+  // The escape hatch's own fail-closed default -- any finding field can be surfaced through
+  // search_wazuh_data, so an unlisted one is never trusted as safe-by-omission -- must still drop
+  // an unlisted container outright, exactly as NF-2 left it.
+  const p = new Pseudonymizer();
+  const result = scrubFieldValue(
+    'escape.hatch.object',
+    { a: 1 },
+    [],
+    p,
+    undefined,
+    true, // isEscapeHatch: true
+  );
+  assert.equal(result.keep, false);
+});
+
+test('F3: an unlisted, non-escape-hatch container is scan-shaped and kept, not dropped as a raw container', () => {
+  // Companion to the escape-hatch case above: on a typed tool (isEscapeHatch: false), the SAME
+  // unlisted-field/container-value combination is no longer dropped -- it survives, shape-scanned
+  // (see the F3 tests above for the full scan-shape behavior).
+  const p = new Pseudonymizer();
+  const cases: Array<[string, unknown]> = [
+    ['unlisted.object', { a: 1 }],
+    ['unlisted.array', [{ a: 1 }]],
+  ];
+  for (const [field, value] of cases) {
+    const result = scrubFieldValue(field, value, [], p, undefined, false);
+    assert.equal(result.keep, true, `expected ${field} to be kept`);
+    assert.ok(
+      Array.isArray(result.value) || typeof result.value === 'object',
+      `expected ${field} to still be a container`,
+    );
+  }
+});
+
+// --- F3 end-to-end: the REAL unlisted container fields this defect actually affected -----------
+// document.mitre.technique.id (get-rules.ts) and document.enrichments (get-threat-intel-
+// components.ts) are both `KNOWN_SAFE_STRUCTURAL_FIELDS`-certified digest sampleColumns on
+// NON-deriveColumns tools -- i.e. allow-by-omission, no explicit policy entry -- so before this
+// fix a Sigma rule's array of MITRE technique ids (or an enrichment record's array of enrichment
+// objects) was silently DELETED from the digest under privacy ON while still present under
+// privacy OFF (privacy OFF never calls applyFieldPolicy at all).
+
+test('F3: document.mitre.technique.id (an array, allow-by-omission) survives privacy ON with its leaves shape-scanned', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_rules',
+    samples: [
+      {
+        'document.mitre.technique.id': ['T1059.001', 'T1548.002.001'],
+      },
+    ],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    'get_rules',
+    false, // isEscapeHatch: false -- get_rules is a typed, non-deriveColumns tool
+  );
+  // privacy ON: the column survives (not dropped) -- same column key present as privacy OFF.
+  assert.ok('document.mitre.technique.id' in out.samples[0]);
+  // Values are unaffected by the shape scan: MITRE ids have no IP/FQDN shape.
+  assert.deepEqual(out.samples[0]['document.mitre.technique.id'], [
+    'T1059.001',
+    'T1548.002.001',
+  ]);
+});
+
+test('F3: document.enrichments (an array of objects, allow-by-omission) survives privacy ON, string leaves shape-scanned', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_threat_intel_components',
+    samples: [
+      {
+        'document.enrichments': [
+          { type: 'ip', value: 'reaches out to 203.0.113.9' },
+        ],
+      },
+    ],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    'get_threat_intel_components',
+    false,
+  );
+  const enrichments = out.samples[0]['document.enrichments'] as Array<
+    Record<string, unknown>
+  >;
+  // privacy ON: the column (and its row) survives -- not dropped.
+  assert.equal(enrichments.length, 1);
+  assert.equal(enrichments[0].type, 'ip');
+  // The embedded IP inside a string leaf is still shape-scanned.
+  assert.doesNotMatch(enrichments[0].value as string, /203\.0\.113\.9/);
+  assert.match(enrichments[0].value as string, /IP_\d+/);
+});
+
+test('F3: an escape-hatch (search_wazuh_data) unlisted container field is still dropped, not scan-shaped', () => {
+  // Confirms the escape hatch's fail-closed default is untouched by F3 -- only the typed-tool
+  // allow-by-omission path (isEscapeHatch: false) gained the scan-shape behavior above.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'search_wazuh_data',
+    samples: [{ 'some.unlisted.container.field': ['a', 'b'] }],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    'search_wazuh_data',
+    true, // isEscapeHatch: true
+  );
+  assert.equal('some.unlisted.container.field' in out.samples[0], false);
+});
+
 test('applyFieldPolicy: search_wazuh_data keeps CTI status fields (.wazuh-cti-consumers) readable', () => {
   const p = new Pseudonymizer();
   const digest = baseDigest({
@@ -1965,4 +2641,502 @@ test('applyFieldPolicy: search_wazuh_data still anonymizes an unlisted field on 
     out.samples[0]['document.containers.cna.rejectedReasons'] as string,
     /^VAL_\d+$/,
   );
+});
+
+// --- #8974: usernames quoted inside an `allow` prose field (rule.title & co) --------------------
+// The reported leak: with privacy mode ON, `wazuh.rule.title` reached the provider as
+// "Successful user authentication - vagrant". `rule.title` is explicit 'allow' (unscanned by
+// design), and the shape scan that runs over it downstream only matches IP/FQDN shapes -- a bare,
+// dotless username has no shape. These tests pin the two halves of the fix (the prose fields'
+// identifier-only dictionary scan, and the same-digest username pre-mint that makes sample key
+// order irrelevant) plus the false-positive guards that keep ordinary words out of it.
+
+test('applyFieldPolicy: a bare username in rule.title is scrubbed when the same digest carries it in a user field', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_findings',
+    samples: [
+      {
+        // Deliberately BEFORE the user field: the title used to be scrubbed while `vagrant` was
+        // still unknown to the pseudonymizer, which is exactly what `premintProseScanIdentifiers` fixes.
+        [WAZUH_FIELD.RULE_TITLE]: 'Successful user authentication - vagrant',
+        'source.user.name': 'vagrant',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  const title = out.samples[0][WAZUH_FIELD.RULE_TITLE] as string;
+  assert.doesNotMatch(title, /vagrant/i);
+  const token = out.samples[0]['source.user.name'] as string;
+  assert.match(token, /^USER_\d+$/);
+  // Same pseudonym in both places -- the title reuses the mint, never a second one.
+  assert.equal(title, `Successful user authentication - ${token}`);
+  assert.equal(
+    p.reverseText(title),
+    'Successful user authentication - vagrant',
+  );
+});
+
+test('applyFieldPolicy: the username pre-mint also works when the user field comes FIRST in the sample', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_findings',
+    samples: [
+      {
+        'source.user.name': 'auditbot',
+        [WAZUH_FIELD.RULE_TITLE]: 'Failed authentication attempt - auditbot',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  const title = out.samples[0][WAZUH_FIELD.RULE_TITLE] as string;
+  assert.doesNotMatch(title, /auditbot/i);
+  assert.match(title, /^Failed authentication attempt - USER_\d+$/);
+});
+
+test('applyFieldPolicy: a username minted in an EARLIER turn is scrubbed from rule.title with no user field present', () => {
+  // The conversation-scoped case: the pseudonymizer is constructed per request but SEEDED from the
+  // client-held map, so a username minted last turn is still in the dictionary this turn -- which is
+  // the reported scenario, where the finding itself carries no `source.user.name`.
+  const p = new Pseudonymizer([{ value: 'vagrant', pseudonym: 'USER_1' }]);
+  const digest = baseDigest({
+    tool: 'get_findings',
+    samples: [
+      { [WAZUH_FIELD.RULE_TITLE]: 'Successful user authentication - vagrant' },
+    ],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    'Successful user authentication - USER_1',
+  );
+});
+
+test('applyFieldPolicy: a never-seen username in rule.title is the documented remaining residual (unchanged)', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_findings',
+    samples: [
+      { [WAZUH_FIELD.RULE_TITLE]: 'Successful user authentication - vagrant' },
+    ],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    'Successful user authentication - vagrant',
+  );
+});
+
+test('applyFieldPolicy: a common-word username is NOT scrubbed out of prose (stop-list guard)', () => {
+  // "root" is a plausible real account AND an ordinary English word; masking it would corrupt far
+  // more titles than it protects (the F1 failure mode on IDENTIFIER_STOP_WORDS). The user FIELD is
+  // still pseudonymized -- only the prose scan declines it.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_findings',
+    samples: [
+      {
+        [WAZUH_FIELD.RULE_TITLE]: 'Possible root cause: privilege escalation',
+        'source.user.name': 'root',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    'Possible root cause: privilege escalation',
+  );
+  assert.match(out.samples[0]['source.user.name'] as string, /^USER_\d+$/);
+});
+
+test('applyFieldPolicy: the prose scan matches whole tokens only, never a substring of a longer word', () => {
+  const p = new Pseudonymizer([{ value: 'vagrant', pseudonym: 'USER_1' }]);
+  const digest = baseDigest({
+    tool: 'get_findings',
+    samples: [
+      { [WAZUH_FIELD.RULE_TITLE]: 'Rule fired for vagrantbox provisioning' },
+    ],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    'Rule fired for vagrantbox provisioning',
+  );
+});
+
+test('applyFieldPolicy: a non-prose explicit "allow" field is still completely unscanned', () => {
+  // The prose scan is scoped to IDENTIFIER_BEARING_FREE_TEXT_FIELDS -- a curated closed-vocabulary
+  // 'allow' field (here rule.category) keeps its byte-identical passthrough even with its own value
+  // sitting in the dictionary.
+  const p = new Pseudonymizer([
+    { value: 'authentication', pseudonym: 'USER_1' },
+  ]);
+  const digest = baseDigest({
+    tool: 'get_findings',
+    samples: [{ [WAZUH_FIELD.RULE_CATEGORY]: 'authentication' }],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  assert.equal(out.samples[0][WAZUH_FIELD.RULE_CATEGORY], 'authentication');
+});
+
+test('applyFieldPolicy: document.metadata.description gets the prose scan while document.name keeps an FQDN-shaped indicator readable', () => {
+  const p = new Pseudonymizer([{ value: 'dbprod07', pseudonym: 'HOST_1' }]);
+  const digest = baseDigest({
+    tool: 'get_rules',
+    samples: [
+      {
+        'document.metadata.description':
+          'Detects failed logins on dbprod07 hosts',
+        // 'document.name' is a prose member too, but deliberately gets NO shape scan added, so a
+        // third-party threat-intel indicator name stays verbatim.
+        'document.name': 'evil-indicator.example.com',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  assert.equal(
+    out.samples[0]['document.metadata.description'],
+    'Detects failed logins on HOST_1 hosts',
+  );
+  assert.equal(out.samples[0]['document.name'], 'evil-indicator.example.com');
+});
+
+test('FIELD_POLICY_DEFAULTS: every IDENTIFIER_BEARING_FREE_TEXT_FIELDS member has an explicit "allow" entry', () => {
+  // The prose scan is an ADDITION to `allow`, so a member that ever moved to anonymize/never (or
+  // lost its entry) would make this set misleading rather than wrong -- pin the pairing.
+  for (const field of IDENTIFIER_BEARING_FREE_TEXT_FIELDS) {
+    const entry = FIELD_POLICY_DEFAULTS.find(item => item.field === field);
+    assert.ok(entry, `no FIELD_POLICY_DEFAULTS entry for ${field}`);
+    assert.equal(entry?.action, 'allow', `${field} is no longer 'allow'`);
+  }
+});
+
+test('applyFieldPolicy: EVERY prose-set member actually receives the dictionary scan', () => {
+  // Behavioural counterpart to the pairing test above: iterating the set only proves the entries
+  // exist. This drives each member through applyFieldPolicy with a known identifier in the
+  // dictionary, so dropping a member from the set fails here instead of silently reducing coverage.
+  for (const field of IDENTIFIER_BEARING_FREE_TEXT_FIELDS) {
+    const p = new Pseudonymizer([{ value: 'dbprod07', pseudonym: 'HOST_1' }]);
+    const out = applyFieldPolicy(
+      baseDigest({ samples: [{ [field]: 'raised for dbprod07 overnight' }] }),
+      FIELD_POLICY_DEFAULTS,
+      p,
+    );
+    assert.equal(
+      out.samples[0][field],
+      'raised for HOST_1 overnight',
+      `${field} did not get the prose dictionary scan`,
+    );
+  }
+});
+
+test('applyFieldPolicy: the prose set covers each field family the delta review named', () => {
+  // Pins membership itself, so a member cannot be quietly removed: rule/Sigma titles, rule
+  // documentation, custom rule/decoder names, detector monitor names, stored query bodies, and the
+  // CTI consumer endpoint/context (private-mirror hostnames).
+  for (const field of [
+    WAZUH_FIELD.RULE_TITLE,
+    'document.metadata.description',
+    'document.name',
+    'rule.metadata.title',
+    'monitor_name',
+    'queries.name',
+    'queries.query',
+    'rule.queries.value',
+    'resource',
+    'context',
+  ]) {
+    assert.ok(
+      IDENTIFIER_BEARING_FREE_TEXT_FIELDS.has(field),
+      `${field} is no longer a prose-scanned field`,
+    );
+  }
+});
+
+test('scrubFieldValue: a prose field with no policy entry at all still gets the dictionary scan', () => {
+  // Defence in depth for a stored/edited policy that no longer carries the field's own entry: the
+  // allow-by-omission branch composes the dictionary scan on top of its shape scan, for these
+  // fields only.
+  const p = new Pseudonymizer([{ value: 'dbprod07', pseudonym: 'HOST_1' }]);
+  const result = scrubFieldValue(
+    WAZUH_FIELD.RULE_TITLE,
+    'Brute force against dbprod07',
+    [],
+    p,
+    undefined,
+    false,
+  );
+  assert.equal(result.keep, true);
+  assert.equal(result.value, 'Brute force against HOST_1');
+});
+
+// --- #8974 delta review: curated HOST pre-mint, admin-action interaction, stop-list widening ------
+
+test('applyFieldPolicy: a hostname from a CURATED host field is scrubbed from rule.title in the same digest', () => {
+  // Item 1 of the delta review. The load-bearing case is the PERSISTED digest: whatever text is
+  // baked in here is replayed on every resumed turn with an empty client map, so an unscrubbed
+  // hostname would leak repeatedly. Title deliberately precedes the host field in key order.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_findings',
+    samples: [
+      {
+        [WAZUH_FIELD.RULE_TITLE]: 'Brute force against dbprod07',
+        [WAZUH_FIELD.AGENT_NAME]: 'dbprod07',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  const token = out.samples[0][WAZUH_FIELD.AGENT_NAME] as string;
+  assert.match(token, /^HOST_\d+$/);
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    `Brute force against ${token}`,
+  );
+});
+
+test('applyFieldPolicy: host.hostname is pre-minted for the prose scan too', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_agent_inventory',
+    samples: [
+      {
+        [WAZUH_FIELD.RULE_TITLE]: 'Configuration drift on srv-app-04',
+        'host.hostname': 'srv-app-04',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  const token = out.samples[0]['host.hostname'] as string;
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    `Configuration drift on ${token}`,
+  );
+});
+
+test('applyFieldPolicy: a HOST-kind field OUTSIDE the curated pre-mint list is not pre-minted', () => {
+  // The narrowing that keeps `inferPseudonymKind`'s `.name` -> HOST convention (process.name,
+  // package.name, service.name -- values like "top"/"git") from widening the dictionary and
+  // churning HOST counter numbering. `service.name` is anonymized by its own entry either way; it
+  // is only the PROSE scan that does not see it when the title is scrubbed first.
+  const policy: FieldPolicyEntry[] = [
+    { field: WAZUH_FIELD.RULE_TITLE, action: 'allow' },
+    { field: 'service.name', action: 'anonymize', kind: 'HOST' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    samples: [
+      {
+        [WAZUH_FIELD.RULE_TITLE]: 'Service nagios3 stopped unexpectedly',
+        'service.name': 'nagios3',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(digest, policy, p);
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    'Service nagios3 stopped unexpectedly',
+  );
+  assert.match(out.samples[0]['service.name'] as string, /^HOST_\d+$/);
+});
+
+test('FIELD_POLICY_DEFAULTS: every curated pre-mint host field has an explicit anonymize/HOST entry', () => {
+  // The pre-mint must never invent a mint the samples loop was not already going to make -- so each
+  // curated field has to be a REVIEWED hostname field, not just a plausible name.
+  for (const field of PREMINT_HOST_FIELDS) {
+    const entry = FIELD_POLICY_DEFAULTS.find(item => item.field === field);
+    assert.ok(entry, `no FIELD_POLICY_DEFAULTS entry for ${field}`);
+    assert.equal(entry?.action, 'anonymize', `${field} is not 'anonymize'`);
+    assert.equal(entry?.kind, 'HOST', `${field} is not kind HOST`);
+  }
+});
+
+test('applyFieldPolicy: an admin "never" entry on a prose field still drops it entirely', () => {
+  // The prose scan sits behind every stricter branch, so it can never resurrect a dropped field.
+  const policy: FieldPolicyEntry[] = [
+    { field: WAZUH_FIELD.RULE_TITLE, action: 'never' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    samples: [{ [WAZUH_FIELD.RULE_TITLE]: 'Successful login - vagrant' }],
+  });
+  const out = applyFieldPolicy(digest, policy, p);
+  assert.ok(!(WAZUH_FIELD.RULE_TITLE in out.samples[0]));
+});
+
+test('applyFieldPolicy: an admin "anonymize" entry on a prose field still fully pseudonymizes it', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: WAZUH_FIELD.RULE_TITLE, action: 'anonymize' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    samples: [{ [WAZUH_FIELD.RULE_TITLE]: 'Successful login - vagrant' }],
+  });
+  const out = applyFieldPolicy(digest, policy, p);
+  assert.match(out.samples[0][WAZUH_FIELD.RULE_TITLE] as string, /^VAL_\d+$/);
+});
+
+test('applyFieldPolicy: an admin "allow-scan" entry on a prose field gets the FULL dictionary, not identifiersOnly', () => {
+  // Branch ordering check: `allow-scan` is resolved before the prose branch, so an admin who picks
+  // it gets the stronger (full-dictionary) scan, including VAL-kind entries the prose scan skips.
+  const policy: FieldPolicyEntry[] = [
+    { field: WAZUH_FIELD.RULE_TITLE, action: 'allow-scan' },
+  ];
+  const p = new Pseudonymizer([
+    { value: 'authentication', pseudonym: 'VAL_1' },
+  ]);
+  const digest = baseDigest({
+    samples: [{ [WAZUH_FIELD.RULE_TITLE]: 'Successful authentication' }],
+  });
+  const out = applyFieldPolicy(digest, policy, p);
+  assert.equal(out.samples[0][WAZUH_FIELD.RULE_TITLE], 'Successful VAL_1');
+});
+
+test('applyFieldPolicy: a prose field resolved through a TOOL-SCOPED entry keeps tool-scoped semantics', () => {
+  // A tool-scoped entry wins over the bare one (resolveFieldEntry), and the prose branch resolves
+  // through that same lookup -- so `never` on get_rules/wazuh.rule.title drops the field there while
+  // the bare 'allow' entry still governs any other tool.
+  const policy: FieldPolicyEntry[] = [
+    { field: `get_rules/${WAZUH_FIELD.RULE_TITLE}`, action: 'never' },
+    { field: WAZUH_FIELD.RULE_TITLE, action: 'allow' },
+  ];
+  const p = new Pseudonymizer([{ value: 'vagrant', pseudonym: 'USER_1' }]);
+  const digest = baseDigest({
+    samples: [{ [WAZUH_FIELD.RULE_TITLE]: 'Successful login - vagrant' }],
+  });
+
+  const scoped = applyFieldPolicy(
+    digest,
+    policy,
+    p,
+    undefined,
+    'get_rules',
+    false,
+  );
+  assert.ok(!(WAZUH_FIELD.RULE_TITLE in scoped.samples[0]));
+
+  const other = applyFieldPolicy(
+    digest,
+    policy,
+    p,
+    undefined,
+    'get_findings',
+    false,
+  );
+  assert.equal(
+    other.samples[0][WAZUH_FIELD.RULE_TITLE],
+    'Successful login - USER_1',
+  );
+});
+
+test('applyFieldPolicy: a NON-prose digest is byte-identical, pseudonym counter numbers included', () => {
+  // The pre-mint is gated on the digest carrying a prose field. This pins that (a) a digest without
+  // one is unaffected, and (b) adding a prose field does not perturb THESE fields' tokens.
+  //
+  // (b) is deliberately a claim about this sample only, not a universal property. Pre-minting DOES
+  // reorder mint calls, so a digest whose key order puts a NON-premintable fresh mint of some kind K
+  // before a premintable one of the same kind K would see that kind's counter numbering shift. Every
+  // field in this sample is either premintable (the two user fields, host.hostname) or of a kind no
+  // premintable field shares (source.ip -> IP), and counters are per-kind, so nothing can move here.
+  // A genuinely universal guarantee would need the pre-mint to not mint at all, which is not what it
+  // is for.
+  const sample = {
+    'source.user.name': 'jsmith',
+    'destination.user.name': 'ahmed',
+    'host.hostname': 'srv-app-04',
+    'source.ip': '10.0.2.15',
+  };
+
+  const withoutProse = applyFieldPolicy(
+    baseDigest({ samples: [{ ...sample }] }),
+    FIELD_POLICY_DEFAULTS,
+    new Pseudonymizer(),
+  );
+  assert.deepEqual(withoutProse.samples[0], {
+    'source.user.name': 'USER_1',
+    'destination.user.name': 'USER_2',
+    'host.hostname': 'HOST_1',
+    'source.ip': 'IP_1',
+  });
+
+  const withProse = applyFieldPolicy(
+    baseDigest({
+      samples: [{ ...sample, [WAZUH_FIELD.RULE_TITLE]: 'Nothing to scrub' }],
+    }),
+    FIELD_POLICY_DEFAULTS,
+    new Pseudonymizer(),
+  );
+  for (const key of Object.keys(sample)) {
+    assert.equal(
+      withProse.samples[0][key],
+      withoutProse.samples[0][key],
+      `${key} token changed when a prose field was present`,
+    );
+  }
+});
+
+test('applyFieldPolicy: a common SERVICE-ACCOUNT name is not scrubbed out of prose, but its own field still is', () => {
+  // Item 4 of the delta review. "postgres" is a real account on every PostgreSQL host AND the name
+  // of the software, so it appears in rule titles constantly while identifying nothing specific to
+  // this customer. The stop list applies at SCAN time only -- the account's own field is unaffected.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_findings',
+    samples: [
+      {
+        [WAZUH_FIELD.RULE_TITLE]:
+          'PostgreSQL authentication failure - postgres',
+        'source.user.name': 'postgres',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    'PostgreSQL authentication failure - postgres',
+  );
+  assert.match(out.samples[0]['source.user.name'] as string, /^USER_\d+$/);
+});
+
+test('scrubKnownEntities: each newly stop-listed service account is left alone in prose', () => {
+  for (const account of [
+    'apache',
+    'nginx',
+    'postgres',
+    'mysql',
+    'redis',
+    'jenkins',
+    'tomcat',
+    'backup',
+    'monitor',
+    'www-data',
+    'oracle',
+    'git',
+    'mongodb',
+    'elastic',
+  ]) {
+    const p = new Pseudonymizer();
+    p.pseudonymize(account, 'USER');
+    const text = `service ${account} restarted`;
+    assert.equal(
+      scrubKnownEntities(text, p, { identifiersOnly: true }),
+      text,
+      `${account} was masked in prose`,
+    );
+  }
+});
+
+test('scrubKnownEntities: a genuine identifier is still masked after the stop-list widening', () => {
+  // Guard against the widened list swallowing real values: these must still be caught.
+  for (const value of ['dbprod07', 'jsmith', 'srv-app-04', 'auditbot']) {
+    const p = new Pseudonymizer();
+    const token = p.pseudonymize(value, 'USER');
+    assert.equal(
+      scrubKnownEntities(`login by ${value} failed`, p, {
+        identifiersOnly: true,
+      }),
+      `login by ${token} failed`,
+      `${value} was NOT masked`,
+    );
+  }
 });

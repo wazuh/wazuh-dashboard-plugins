@@ -55,7 +55,10 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
             status='available'
             title='Security analytics'
             caption='Current state'
-            headerLink={{ label: 'Manage content', href: getIntegrationsUrl() }}
+            titleLink={{
+              href: getIntegrationsUrl(),
+              destination: 'Security Analytics',
+            }}
             centerBody
             data-test-subj='home-overview-security-analytics'
           >

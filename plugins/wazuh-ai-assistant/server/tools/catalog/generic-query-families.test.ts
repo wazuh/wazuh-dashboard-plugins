@@ -74,3 +74,99 @@ test('excluded surfaces are NOT present (decline-tier / open product gaps / priv
     );
   }
 });
+
+// `wazuh-states-*` covers wazuh-states-fim-registry-keys/-values, but a label saying only "FIM"
+// reads as the files surface get_fim_files owns, and on that reading a registry question never
+// reaches this pattern. The enum VALUE is the wire contract and stays untouched; only the label
+// changes.
+test('the wazuh-states-* label names the registry half of FIM, not just files', () => {
+  const states = GENERIC_QUERY_FAMILIES.find(
+    family => family.pattern === 'wazuh-states-*',
+  );
+  assert.ok(states, 'wazuh-states-* must remain an offered family');
+  assert.match(states.label, /Windows registry/);
+  assert.match(states.label, /file state/);
+});
+
+// With every wazuh-states-* index collapsed into ONE enum value a family-scoped query is
+// unrepresentable: the filter is correct, the wildcard returns the union, and the sample carries
+// none of the requested fields. These tests pin the per-index split and the two invariants that
+// make it safe.
+test('every wazuh-states-* index is individually nameable, not just the wildcard', () => {
+  for (const pattern of [
+    'wazuh-states-inventory-users*',
+    'wazuh-states-inventory-groups*',
+    'wazuh-states-inventory-services*',
+    'wazuh-states-inventory-hardware*',
+    'wazuh-states-inventory-interfaces*',
+    'wazuh-states-inventory-networks*',
+    'wazuh-states-inventory-protocols*',
+    'wazuh-states-inventory-browser-extensions*',
+    'wazuh-states-inventory-system*',
+    'wazuh-states-inventory-packages*',
+    'wazuh-states-inventory-processes*',
+    'wazuh-states-inventory-ports*',
+    'wazuh-states-inventory-hotfixes*',
+    'wazuh-states-fim-files*',
+    'wazuh-states-fim-registry-keys*',
+    'wazuh-states-fim-registry-values*',
+    'wazuh-states-sca*',
+    'wazuh-states-vulnerabilities*',
+  ]) {
+    assert.ok(
+      GENERIC_QUERY_INDEX_PATTERNS.includes(pattern),
+      `expected "${pattern}" in GENERIC_QUERY_INDEX_PATTERNS`,
+    );
+  }
+});
+
+test('the wazuh-states-* wildcard still ships, and its label now warns about the fan-out', () => {
+  // The enum VALUE is the wire contract and is never removed (see this module's own invariant); the
+  // label has to say why a scoped pattern is the better choice, because the wildcard's union-dilution
+  // is what makes an inventory answer come back "fields empty".
+  const states = GENERIC_QUERY_FAMILIES.find(
+    family => family.pattern === 'wazuh-states-*',
+  );
+  assert.ok(states);
+  assert.match(states.label, /eighteen/);
+  assert.match(states.label, /dominated by the largest family/);
+});
+
+test('each per-index state family label quotes signature fields the model can route on', () => {
+  // A bare index name is not enough: the model has to be able to tell "which surface holds a
+  // service state" from the parameter description alone.
+  const services = GENERIC_QUERY_FAMILIES.find(
+    family => family.pattern === 'wazuh-states-inventory-services*',
+  );
+  assert.ok(services);
+  assert.match(services.label, /service\.name/);
+  assert.match(services.label, /service\.state/);
+
+  const protocols = GENERIC_QUERY_FAMILIES.find(
+    family => family.pattern === 'wazuh-states-inventory-protocols*',
+  );
+  assert.ok(protocols);
+  assert.match(protocols.label, /network\.gateway/);
+});
+
+test('the original three families still lead the enum, in their original order', () => {
+  // The state families are inserted after the wildcard they refine; the pre-existing three must
+  // keep their long-standing precedence, per this module's own ordering rule.
+  assert.deepEqual(GENERIC_QUERY_INDEX_PATTERNS.slice(0, 3), [
+    'wazuh-findings-v5-*',
+    'wazuh-events-v5-*',
+    'wazuh-states-*',
+  ]);
+});
+
+test('wazuh-states-fim-registry-* is reachable through the wazuh-states-* family', () => {
+  // The concrete indices the label now points at must actually pass the guardrail, or the routing
+  // rule the system prompt states would send the model at a query that can never execute.
+  for (const index of [
+    'wazuh-states-fim-registry-keys',
+    'wazuh-states-fim-registry-values',
+  ]) {
+    assert.equal(checkIndexAllowlist(index).ok, true, index);
+  }
+  assert.ok(GENERIC_QUERY_INDEX_PATTERNS.includes('wazuh-states-*'));
+});

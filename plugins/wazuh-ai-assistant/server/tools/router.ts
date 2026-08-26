@@ -155,7 +155,14 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
     'CVE/vulnerability data: by agent, by CVE ID, solved, or critical only -- plus the CTI ' +
     "feed's own catalog knowledge about a specific CVE (description, severity, affected " +
     'software), separate from what is actually detected on this deployment.',
-  fim: 'File Integrity Monitoring: current state of monitored files (path, mtime, owner, hashes).',
+  // Registry FIM (Run keys, registry values) must be claimed by name here: with the category
+  // described as "monitored files" only, a registry question falls through to a category whose
+  // tools cannot answer it. The surface has no typed tool but IS reachable -- `search_wazuh_data`
+  // is appended to every resolved list (see `resolveStage2Tools`) and `wazuh-states-*` covers
+  // `wazuh-states-fim-registry-*`.
+  fim:
+    'File Integrity Monitoring: current state of monitored files (path, mtime, owner, hashes), ' +
+    'and Windows registry keys/values (e.g. Run-key writes).',
   sca:
     'Security Configuration Assessment (SCA): per-agent compliance benchmark results (e.g. CIS ' +
     'Ubuntu), NOT Security Analytics pipeline policies.',
@@ -310,6 +317,16 @@ export const CHAIN_PAIRS: Record<string, readonly string[]> = {
   search_findings_by_agent: ['find_document_by_field'],
   search_findings_by_rule_title: ['find_document_by_field'],
   search_findings_by_rule_tag: ['find_document_by_field'],
+  // `mitre` and `get_events_by_agent` are row-producing routes with no way out of their own
+  // category: `resolveStage2Tools` appends only `search_wazuh_data`, never the whole free_search
+  // category (see its doc comment), so without these edges an "explain this MITRE incident" turn
+  // can list technique rows but never pivot to the document behind one. get_rules is the
+  // detection-side companion -- the only tool that returns a rule DESCRIPTION
+  // (document.metadata.description). It reads the Security Analytics catalog, NOT the Wazuh Manager
+  // ruleset; the prompt already requires the model to say so, so this edge widens reach without
+  // implying coverage the product does not have.
+  get_mitre_findings: ['find_document_by_field', 'get_rules'],
+  get_events_by_agent: ['find_document_by_field'],
 };
 
 /**

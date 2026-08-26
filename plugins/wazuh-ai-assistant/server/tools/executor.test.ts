@@ -201,6 +201,9 @@ test('executeToolCall: get_critical_findings past the 90-day cap is clamped, and
   // (catalog/common.ts) ever accepts for a typed tool's time_range_gte -- only "now-N[dhm]" or
   // ISO-8601. "now-720d" (≈2 years) is the reachable equivalent.
   const context = fakeSearchContext([{ 'wazuh.rule.level': 'critical' }]);
+  // Captured BEFORE the call, not just after -- a real lower bound, so `executedAt` is pinned
+  // to the actual call window on both sides rather than only checked against an upper bound.
+  const before = Date.now();
   const outcome = await executeToolCall(
     {
       id: 'call-1',
@@ -211,6 +214,7 @@ test('executeToolCall: get_critical_findings past the 90-day cap is clamped, and
     fakeRequest,
     undefined,
   );
+  const after = Date.now();
   const provenance = outcome.tableEvent?.spec.provenance;
   assert.ok(provenance);
   assert.equal(provenance?.clamped, true);
@@ -224,9 +228,9 @@ test('executeToolCall: get_critical_findings past the 90-day cap is clamped, and
   // Issue #9008 review, blocker 2: the instant the query actually ran, recorded as a plain
   // number at creation time -- what `describeProvenance` (tool-call-label.ts) resolves a
   // date-math bound against instead of the render-time clock.
-  const before = Date.now();
   assert.equal(typeof provenance?.executedAt, 'number');
-  assert.ok(provenance!.executedAt! <= before);
+  assert.ok(provenance!.executedAt! >= before);
+  assert.ok(provenance!.executedAt! <= after);
 });
 
 test('executeToolCall: a Manager-API table carries no provenance at all (no index/DSL concept)', async () => {
@@ -1174,4 +1178,116 @@ test('bound disclosure: a request already within the 90-day cap gets no disclosu
   assert.ok(
     !(digest.hint as string | undefined)?.includes('Time window capped'),
   );
+});
+
+// --- The resolveParams FAILURE half goes through the same scrub as the success half ------------
+// An ambiguity reason enumerates candidate hostnames by name and becomes the tool error the provider
+// reads, so an unscrubbed one carries them in the clear under privacy mode -- the same shape as the
+// note side, on the other branch of the same `if`.
+
+/** Context whose Indexer `search` answers a sole-candidate terms probe with `buckets`, so
+ * `search_findings_by_agent`'s omitted `agent_name` reaches the 'many' ambiguity branch. */
+function fakeTermsProbeContext(names: string[]): ExecContext {
+  return {
+    core: {
+      opensearch: {
+        client: {
+          asCurrentUser: {
+            search: () =>
+              Promise.resolve({
+                body: {
+                  aggregations: {
+                    candidates: {
+                      buckets: names.map(key => ({ key, doc_count: 1 })),
+                    },
+                  },
+                },
+              }),
+          },
+        },
+      },
+    },
+  } as unknown as ExecContext;
+}
+
+test('executeToolCall: an ambiguous param-resolution error is pseudonymized before it becomes the tool error', async () => {
+  const privacy: PrivacyContext = {
+    pseudonymizer: new Pseudonymizer([]),
+    fieldPolicy: FIELD_POLICY_DEFAULTS,
+  };
+  const outcome = await executeToolCall(
+    { id: 'call-1', name: 'search_findings_by_agent', arguments: {} },
+    fakeTermsProbeContext(['dc-01', 'bastion-01']),
+    fakeRequest,
+    privacy,
+  );
+
+  const { error } = JSON.parse(outcome.toolResultContent) as { error: string };
+  assert.ok(error, 'the ambiguous lookup must fail, not resolve silently');
+  assert.doesNotMatch(error, /dc-01/);
+  assert.doesNotMatch(error, /bastion-01/);
+  // Still an ambiguity disclosure -- the candidates are named, just as pseudonyms.
+  assert.match(error, /HOST_\d/);
+  assert.match(error, /cannot be assumed/);
+});
+
+test('executeToolCall: with privacy OFF the same ambiguity error names the candidates in the clear, unchanged', async () => {
+  const outcome = await executeToolCall(
+    { id: 'call-1', name: 'search_findings_by_agent', arguments: {} },
+    fakeTermsProbeContext(['dc-01', 'bastion-01']),
+    fakeRequest,
+    undefined,
+  );
+
+  const { error } = JSON.parse(outcome.toolResultContent) as { error: string };
+  assert.match(error, /dc-01/);
+  assert.match(error, /bastion-01/);
+});
+
+test('executeToolCall: a single-candidate agent_name lookup resolves and its note is pseudonymized', async () => {
+  const privacy: PrivacyContext = {
+    pseudonymizer: new Pseudonymizer([]),
+    fieldPolicy: FIELD_POLICY_DEFAULTS,
+  };
+  // First call is the terms probe (buckets), every later call is the real search (hits).
+  let calls = 0;
+  const context = {
+    core: {
+      opensearch: {
+        client: {
+          asCurrentUser: {
+            search: () => {
+              calls += 1;
+              return Promise.resolve({
+                body:
+                  calls === 1
+                    ? {
+                        aggregations: {
+                          candidates: {
+                            buckets: [{ key: 'dc-01', doc_count: 3 }],
+                          },
+                        },
+                      }
+                    : { hits: { total: { value: 0 }, hits: [] } },
+              });
+            },
+          },
+        },
+      },
+    },
+  } as unknown as ExecContext;
+
+  const outcome = await executeToolCall(
+    { id: 'call-1', name: 'search_findings_by_agent', arguments: {} },
+    context,
+    fakeRequest,
+    privacy,
+  );
+
+  const digest = JSON.parse(outcome.toolResultContent) as {
+    assumptionNote?: string;
+  };
+  assert.ok(digest.assumptionNote, 'the assumption must be disclosed');
+  assert.doesNotMatch(digest.assumptionNote as string, /dc-01/);
+  assert.match(digest.assumptionNote as string, /HOST_\d/);
 });

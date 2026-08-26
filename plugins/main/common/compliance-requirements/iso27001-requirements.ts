@@ -318,4 +318,19 @@ export const iso27001RequirementsFile = {
     'Compliance with security policies and standards - Managers shall regularly review compliance of information processing and procedures with security policies, standards, and requirements.',
   'A.18.2.3':
     'Technical compliance review - Information systems shall be regularly reviewed for compliance with the organization’s information security policies and standards.',
+  // ISO/IEC 27001:2022 Annex A numbering
+  'A.5.17':
+    'Authentication information - Allocation and management of authentication information shall be controlled by a management process, including advising personnel on the appropriate handling of authentication information.',
+  'A.5.18':
+    'Access rights - Access rights to information and other associated assets shall be provisioned, reviewed, modified and removed in accordance with the organization’s topic-specific policy on and rules for access control.',
+  'A.5.24':
+    'Information security incident management planning and preparation - The organization shall plan and prepare for managing information security incidents by defining, establishing and communicating information security incident management processes, roles and responsibilities.',
+  'A.5.30':
+    'ICT readiness for business continuity - ICT readiness shall be planned, implemented, maintained and tested based on business continuity objectives and ICT continuity requirements.',
+  'A.8.9':
+    'Configuration management - Configurations, including security configurations, of hardware, software, services and networks shall be established, documented, implemented, monitored and reviewed.',
+  'A.8.16':
+    'Monitoring activities - Networks, systems and applications shall be monitored for anomalous behaviour and appropriate actions taken to evaluate potential information security incidents.',
+  'A.8.23':
+    'Web filtering - Access to external websites shall be managed to reduce exposure to malicious content.',
 };

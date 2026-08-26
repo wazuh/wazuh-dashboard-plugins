@@ -31,7 +31,7 @@ test('get_top_agents: aggregates by wazuh.agent.id with a top_hits agent-name sa
         sample_doc: {
           top_hits: { size: 1, _source: ['wazuh.agent.name'] },
         },
-        distinct_names: {
+        distinct_name_count: {
           cardinality: { field: 'wazuh.agent.name' },
         },
       },

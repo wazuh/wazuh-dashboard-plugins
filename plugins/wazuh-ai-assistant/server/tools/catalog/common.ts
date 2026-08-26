@@ -367,14 +367,32 @@ export function objectSchema(
  */
 export const FINDING_SCOPE_NOTE =
   'Covers rule-matched detections (alerts/hits/signals) only -- never the raw, unmatched event ' +
-  'stream; if this returns 0 rows, say so plainly rather than reporting nothing happened.';
+  'stream; if this returns 0 rows, say so plainly rather than reporting nothing happened. ' +
+  // The state and findings surfaces carry different host lists for the same CVE, so the
+  // distinction has to be visible at tool-choice time, not only in the system prompt.
+  'Findings are detection HISTORY (what was detected, and when), not current state.';
 
 /** Current-state note appended to the 4 vulnerability tools' descriptions: `wazuh-states-
  * vulnerabilities*` is a snapshot, not a timeline, so there is no "solved/resolved" history to
  * report -- see also `server/prompts.ts`'s matching instruction, which this makes visible at
  * tool-choice time too, not only after a tool is already picked. */
 export const VULN_CURRENT_STATE_NOTE =
-  'Reflects current vulnerability state only -- no patched/unpatched history over time.';
+  'Reflects current vulnerability state only -- no patched/unpatched history over time. ' +
+  // The other half of the split FINDING_SCOPE_NOTE names: saying what this surface is NOT a
+  // timeline of is not enough, it must also point at the surface that answers the history
+  // question.
+  'This is what IS vulnerable right now; for what WAS detected, and when, use the findings tools.';
+
+/**
+ * Current-state note appended to the two SCA tools' descriptions (get_sca_results,
+ * get_sca_checks). Same surface split as `VULN_CURRENT_STATE_NOTE` / `FINDING_SCOPE_NOTE` above:
+ * `wazuh-states-sca` holds the LATEST scan verdict per check, while an SCA-check finding on the
+ * findings stream records that a check was seen failing at a point in time. Without the note, a
+ * compliance question reaches whichever of the two the router happened to offer.
+ */
+export const SCA_CURRENT_STATE_NOTE =
+  'Reflects the latest SCA scan state (what passes/fails now), not a history of when a check ' +
+  'started failing; for that, use the findings tools.';
 
 /** Current-state note appended to the syscollector inventory tools' descriptions (and, from issue
  * 12's consolidation onward, to `get_agent_inventory`'s): `wazuh-states-inventory-*` is a snapshot
@@ -403,6 +421,14 @@ export const STANDARD_FINDING_SAMPLE_COLUMNS = [
   'wazuh.agent.name',
   'wazuh.rule.title',
   'wazuh.rule.level',
+  // Says WHICH detection channel a finding came from. A result set scoped to a host, an IP or a
+  // technique routinely mixes several unrelated incidents, and this is the one column that
+  // separates them -- it must be model-facing, not merely a visible table column, or the model
+  // cannot tell two row sets apart. Curated Wazuh taxonomy word (same class as
+  // `wazuh.rule.level`), one short enum value per row, already on `guardrails.ts`'s aggregation
+  // allowlist. `server/prompts.ts` carries the matching instruction telling the model what to do
+  // with it.
+  'wazuh.integration.category',
 ];
 
 /**
@@ -479,10 +505,22 @@ export const FINDING_BREAKDOWN_AGGS: Record<string, unknown> =
 
 /**
  * Fields added to every finding-hits tool's digest `sampleColumns` — the model-facing subset of
- * the investigation row set (deliberately narrower: `source.port`/`process.command_line` stay
- * row-only, not sent to the model). Every one of these has a `server/tools/privacy.ts`
- * `FIELD_POLICY_DEFAULTS` entry before it reaches a digest. These are the ECS
- * findings-v5 field names.
+ * the investigation row set (`source.port` stays row-only, not sent to the model). Every one of
+ * these has a `server/tools/privacy.ts` `FIELD_POLICY_DEFAULTS` entry before it reaches a digest.
+ * These are the ECS findings-v5 field names.
+ *
+ * `process.command_line` is a deliberate exception to the "stays row-only" rule above: a rule
+ * TITLE on findings-v5 is a short templated label, so without it an explanatory answer can name a
+ * finding but never say what actually ran, which `FINAL_ROUND_ANSWER_INSTRUCTION` forbids
+ * inventing. It keeps its `anonymize` policy, so under privacy mode it reaches the model as a
+ * pseudonym — an accepted explanation-quality tradeoff of privacy mode, not a leak
+ * (`applyFieldPolicy` runs over the digest in `executor.ts` regardless of which columns are
+ * declared here). `wazuh.rule.description` is the ruleset's own curated prose about the detection,
+ * never analyst/attacker input, so it is `allow` on `wazuh.rule.title`'s reasoning.
+ *
+ * BUDGET: both fields are free prose that can run long, so both are capped tighter than
+ * `MAX_FIELD_VALUE_LENGTH` by `DIGEST_FIELD_MAX_LENGTH_DEFAULTS` (digest.ts) — see that constant
+ * for the per-row arithmetic against `DIGEST_CHAR_CAP`/`CONTEXT_CHAR_BUDGET`.
  */
 export const FINDING_DIGEST_EXTRA_COLUMNS = [
   'wazuh.rule.tags',
@@ -490,6 +528,8 @@ export const FINDING_DIGEST_EXTRA_COLUMNS = [
   'source.user.name',
   'source.ip',
   'wazuh.rule.mitre.technique.id',
+  'wazuh.rule.description',
+  'process.command_line',
 ];
 
 /**
@@ -518,8 +558,9 @@ export function findingDigestColumns(
 
 /**
  * Shared `digest.sampleColumns` for the 4 vulnerability tools (get_vulnerabilities,
- * get_critical_vulnerabilities, get_vulnerabilities_by_agent, get_vulnerability_by_cve) —
- * Identical across all four call sites.
+ * get_critical_vulnerabilities, get_vulnerabilities_by_agent, get_vulnerability_by_cve) — and for
+ * get_cve_intel, whose local-detection request body mirrors get_vulnerability_by_cve's.
+ * Identical across all five call sites.
  */
 export const VULN_DIGEST_SAMPLE_COLUMNS = [
   'wazuh.agent.name',
@@ -537,17 +578,24 @@ export const VULN_DIGEST_SAMPLE_COLUMNS = [
   // scanner/OS-curated metadata, not analyst/attacker free text.
   'vulnerability.scanner.condition',
   'package.type',
+  // `wazuh-states-vulnerabilities` has NO dedicated fixed-version or remediation field: the fix
+  // bound lives in `vulnerability.scanner.condition` above and nothing else on the mapping is
+  // prescriptive, so the description is the only field that says what the flaw IS. Without it a
+  // remediation answer states a fix with no idea what it fixes. Third-party feed prose, so capped
+  // by DIGEST_FIELD_MAX_LENGTH_DEFAULTS (digest.ts) and classified `allow-scan` in privacy.ts
+  // rather than the plain `allow` the scanner/OS-curated fields above get.
+  'vulnerability.description',
 ];
 
 /**
  * Shared outbound `_source` list for get_vulnerabilities and get_critical_vulnerabilities —
  * Identical (same fields, same order) at every call site.
  * Part of the outbound Indexer request: order and contents must stay exactly as below.
+ *
+ * `vulnerability.description` needs no explicit append: it is a digest column itself (see above),
+ * so this list is exactly the digest set and appending it would duplicate a `_source` entry.
  */
-export const VULN_SOURCE_FIELDS = [
-  ...VULN_DIGEST_SAMPLE_COLUMNS,
-  'vulnerability.description',
-];
+export const VULN_SOURCE_FIELDS = [...VULN_DIGEST_SAMPLE_COLUMNS];
 
 /**
  * Shared outbound `_source` list for get_vulnerabilities_by_agent and get_vulnerability_by_cve —

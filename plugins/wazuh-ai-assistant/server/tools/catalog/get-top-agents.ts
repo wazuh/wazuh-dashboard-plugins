@@ -27,8 +27,8 @@ function resolveIndexFamily(value: unknown): IndexFamily {
  * Same shape as `get-top-rules.ts`: a `terms` aggregation on `wazuh.agent.id` (on the guardrail's
  * bounded-bucket-safe allowlist -- see `WAZUH_FIELD.AGENT_ID` in `guardrails.ts`) with a `top_hits`
  * sub-aggregation sampling one `wazuh.agent.name` per bucket, `size: 0` (aggregation-only, no hit
- * documents fetched) -- and, like that tool's `distinct_titles`, a sibling `cardinality` sub-agg
- * (`distinct_names`) whose value is DISPLAYED, because the sampled name is one of possibly several
+ * documents fetched) -- and, like that tool's `distinct_title_count`, a sibling `cardinality` sub-agg
+ * (`distinct_name_count`) whose value is DISPLAYED, because the sampled name is one of possibly several
  * for a given agent id (rename/re-enrollment) and that spread must be disclosed rather than hidden
  * behind one arbitrary sample. `index` selects which timeline family to rank agents over:
  * `findings` (rule-matched detections, the default -- "which agents are triggering the most
@@ -41,8 +41,8 @@ function resolveIndexFamily(value: unknown): IndexFamily {
  *
  * Same sampled-label-falsehood risk as `get-top-rules.ts`'s rule title (issue #8921): an agent can
  * be renamed while keeping the same `wazuh.agent.id` (re-registration, inventory sync, ...), so a
- * bucket's `doc_count` events may not all carry the sampled name. `distinct_names` (a sibling
- * `cardinality` sub-agg on `wazuh.agent.name`) discloses that spread the same way `distinct_titles`
+ * bucket's `doc_count` events may not all carry the sampled name. `distinct_name_count` (a sibling
+ * `cardinality` sub-agg on `wazuh.agent.name`) discloses that spread the same way `distinct_title_count`
  * does there, rather than asserting a 1:1 exemption that does not actually hold over an agent's
  * lifetime.
  */
@@ -52,7 +52,8 @@ export const getTopAgentsTool: ToolDefinition = {
     description:
       'Aggregates the noisiest/most active agents within a time range, with a sample agent name ' +
       'per agent ID. The name shown is a sample -- one agent id can span more than one name if ' +
-      'the agent was renamed; distinct_names gives the spread. The obvious choice for "which ' +
+      "the agent was renamed; distinct_name_count COUNTS how many different names the bucket's " +
+      'rows carry. The obvious choice for "which ' +
       'agents are noisiest", "top N agents by findings/events", or "most active hosts" ' +
       'questions. Defaults to ranking by rule-matched findings; set index to "events" to rank ' +
       'by raw event/telemetry volume instead.',
@@ -95,12 +96,12 @@ export const getTopAgentsTool: ToolDefinition = {
                 top_hits: { size: 1, _source: ['wazuh.agent.name'] },
               },
               // Spread disclosure for the sampled name above, the same instrument
-              // `get-top-rules.ts` uses for `distinct_titles` (see sampled-label-coverage.test.ts).
+              // `get-top-rules.ts` uses for `distinct_title_count` (see sampled-label-coverage.test.ts).
               // `wazuh.agent.id` -> `wazuh.agent.name` is NOT 1:1 over a time range: an agent can
               // be renamed, or re-enrolled under a reused id, so one id's bucket can span several
               // names and `sample_doc` shows only one. Displaying the count makes that visible
               // instead of presenting one arbitrary name as if it were the bucket's only one.
-              distinct_names: {
+              distinct_name_count: {
                 cardinality: { field: 'wazuh.agent.name' },
               },
             },
@@ -115,10 +116,15 @@ export const getTopAgentsTool: ToolDefinition = {
       { field: 'key', label: 'Agent ID' },
       { field: 'doc_count', label: 'Count' },
       { field: 'wazuh.agent.name', label: 'Agent (sample)' },
-      { field: 'distinct_names', label: 'Distinct names' },
+      { field: 'distinct_name_count', label: 'Distinct names' },
     ],
   },
   digest: {
-    sampleColumns: ['key', 'doc_count', 'wazuh.agent.name', 'distinct_names'],
+    sampleColumns: [
+      'key',
+      'doc_count',
+      'wazuh.agent.name',
+      'distinct_name_count',
+    ],
   },
 };

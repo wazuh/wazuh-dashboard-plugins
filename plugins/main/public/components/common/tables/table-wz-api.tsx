@@ -32,6 +32,7 @@ import {
   useEffectEnsureComponentMounted,
 } from '../hooks';
 import { formatUINumber } from '../../../react-services/format-number';
+import { formatSorting } from './format-sorting';
 
 /**
  * Search input custom filter button
@@ -49,13 +50,6 @@ interface Filters {
 const getFilters = (filters: Filters) => {
   const { default: defaultFilters, ...restFilters } = filters;
   return Object.keys(restFilters).length ? restFilters : defaultFilters;
-};
-
-const formatSorting = sorting => {
-  if (!sorting.field || !sorting.direction) {
-    return '';
-  }
-  return `${sorting.direction === 'asc' ? '+' : '-'}${sorting.field}`;
 };
 
 export function TableWzAPI({
