@@ -2496,8 +2496,29 @@ export const PREMINT_HOST_FIELDS = new Set<string>([
  * - Only called when the digest actually has a prose field to protect, so a digest without one is
  *   byte-identical to before this existed (pseudonym counter numbering included — pinned by a test).
  *
- * `breakdown` is not walked: a bucket digest's samples are `{key, doc_count}` rows, so a prose field
- * and a breakdown bucket never coexist in the same digest.
+ * ISSUE #1524 — the aggregation half, and why the original "breakdown is not walked" note was
+ * wrong. That note read: "a bucket digest's samples are `{key, doc_count}` rows, so a prose field
+ * and a breakdown bucket never coexist in the same digest". The wire disproves it — the reported
+ * leak's own payload is a bucket digest whose rows carry BOTH:
+ *
+ *   {"doc_count":10,"wazuh.rule.title":"Secret or credential accessed from vault - AI-QA-AGENT-WIN$",
+ *    "wazuh.rule.level":"medium","distinct_titles":1}
+ *
+ * `AI-QA-AGENT-WIN` is the estate's real NetBIOS hostname, embedded in the title by the rule itself.
+ * Two things kept it out of the dictionary: a bucket row's identity lives under the key `key` (a
+ * VALUE of the aggregated field — resolving it by the literal name "key" matches no policy entry,
+ * the same asymmetry `scrubAggKey` exists to fix in the scrub loop), and a top-agents digest's agent
+ * names live in `breakdown`, which `applyFieldPolicy` only scrubs AFTER the samples loop has already
+ * sent the prose field through. This function now pre-mints both, so a hostname the SAME response
+ * payload carries as a value is known before any prose in it is scanned.
+ *
+ * This stays KNOWN-ROSTER scrubbing with no new matching heuristic: nothing new is guessed from the
+ * prose. Only values a premintable identity field in this payload was ALREADY going to be
+ * pseudonymized under (same field, same kind) enter the dictionary, and `scrubKnownEntities` still
+ * only replaces exact, whole-token, boundary-delimited occurrences of them — so an agent name that
+ * appears nowhere in the payload as a value is still (by construction) untouched, and a common word
+ * that is not a real minted identity can never match. The residual is unchanged and documented on
+ * `scrubKnownEntities`: an identifier both shapeless AND never minted anywhere still passes.
  */
 function premintProseScanIdentifiers(
   digest: Digest,
@@ -2505,32 +2526,99 @@ function premintProseScanIdentifiers(
   pseudonymizer: Pseudonymizer,
   toolName: string | undefined,
   isEscapeHatch: boolean,
+  aggFields?: Record<string, AggFieldSpec | undefined>,
 ): void {
+  /** Mints `value` under `field`'s policy, but ONLY when that field is one the samples loop was
+   * already going to pseudonymize AND is a trusted identity field — the exact `premintable` test
+   * documented on this function and on `PREMINT_HOST_FIELDS`. */
+  const premintUnder = (field: string, value: unknown): void => {
+    if (typeof value !== 'string' || value.length === 0) {
+      return;
+    }
+    const entry = resolveFieldEntry(field, policy, toolName);
+    const willPseudonymize =
+      entry?.action === 'anonymize' || (!entry && isEscapeHatch);
+    if (!willPseudonymize) {
+      return;
+    }
+    const kind = entry?.kind ?? inferPseudonymKind(field);
+    // A USER-kind field is trusted by its name alone; a HOST-kind one only if explicitly curated.
+    // Both the bare field path and the `tool/field` scoped spelling are accepted, since
+    // `get_agents/name` is stored scoped while `wazuh.agent.name` is not.
+    const premintable =
+      kind === 'USER' ||
+      (kind === 'HOST' &&
+        (PREMINT_HOST_FIELDS.has(field) ||
+          (toolName !== undefined &&
+            PREMINT_HOST_FIELDS.has(`${toolName}/${field}`))));
+    if (!premintable) {
+      return;
+    }
+    pseudonymizer.pseudonymize(value, kind);
+  };
+
+  /** The field(s) an aggregation's bucket key holds values OF, for `premintUnder`. `multi`/
+   * `composite` keys are arrays/objects whose components pair positionally/by name with the spec —
+   * only the component that resolves to a premintable field is minted, exactly as `scrubAggKey`
+   * scrubs them component-wise. */
+  const premintAggKey = (
+    rawKey: unknown,
+    spec: AggFieldSpec | undefined,
+  ): void => {
+    if (!spec) {
+      return;
+    }
+    if (spec.kind === 'scalar') {
+      premintUnder(spec.field, rawKey);
+      return;
+    }
+    if (spec.kind === 'multi') {
+      if (Array.isArray(rawKey) && rawKey.length === spec.fields.length) {
+        spec.fields.forEach((field, index) =>
+          premintUnder(field, rawKey[index]),
+        );
+      }
+      return;
+    }
+    if (
+      rawKey !== null &&
+      typeof rawKey === 'object' &&
+      !Array.isArray(rawKey)
+    ) {
+      for (const [source, field] of Object.entries(spec.fields)) {
+        premintUnder(field, (rawKey as Record<string, unknown>)[source]);
+      }
+    }
+  };
+
   for (const sample of digest.samples) {
     for (const [sampleKey, value] of Object.entries(sample)) {
-      if (typeof value !== 'string' || value.length === 0) {
+      // Issue #1524: an AGGREGATION row's `key` holds a VALUE of the aggregated field, not of a
+      // field literally called "key" — the same asymmetry `applyFieldPolicy`'s samples loop
+      // resolves through `scrubAggKey`. Resolving it by name here matched no policy entry, so a
+      // top-agents digest's own agent names were not pre-minted and the prose scan over
+      // `wazuh.rule.title` in the SAME row could not see them.
+      if (sampleKey === 'key' && aggFields !== undefined) {
+        premintAggKey(
+          value,
+          Object.values(aggFields).find(field => field !== undefined),
+        );
         continue;
       }
-      const entry = resolveFieldEntry(sampleKey, policy, toolName);
-      const willPseudonymize =
-        entry?.action === 'anonymize' || (!entry && isEscapeHatch);
-      if (!willPseudonymize) {
-        continue;
-      }
-      const kind = entry?.kind ?? inferPseudonymKind(sampleKey);
-      // A USER-kind field is trusted by its name alone; a HOST-kind one only if explicitly curated.
-      // Both the bare field path and the `tool/field` scoped spelling are accepted, since
-      // `get_agents/name` is stored scoped while `wazuh.agent.name` is not.
-      const premintable =
-        kind === 'USER' ||
-        (kind === 'HOST' &&
-          (PREMINT_HOST_FIELDS.has(sampleKey) ||
-            (toolName !== undefined &&
-              PREMINT_HOST_FIELDS.has(`${toolName}/${sampleKey}`))));
-      if (!premintable) {
-        continue;
-      }
-      pseudonymizer.pseudonymize(value, kind);
+      premintUnder(sampleKey, value);
+    }
+  }
+
+  // Issue #1524, the other half of "elsewhere in the same response payload": a bucket digest
+  // carries its identities in `breakdown`, one key over from the samples the prose field rides in
+  // (a top-agents terms agg's bucket keys ARE the agent names). Those buckets are scrubbed AFTER
+  // the samples loop in `applyFieldPolicy`, so without this pass an agent name present in the very
+  // same payload was still unknown when the rule title was scanned — and, per this function's
+  // durability argument, stayed verbatim in the PERSISTED digest forever.
+  if (digest.breakdown && aggFields) {
+    const firstAggName = Object.keys(aggFields)[0];
+    for (const bucket of digest.breakdown) {
+      premintAggKey(bucket.key, aggFields[bucket.agg ?? firstAggName]);
     }
   }
 }
@@ -2642,6 +2730,7 @@ export function applyFieldPolicy(
       pseudonymizer,
       toolName,
       isEscapeHatch,
+      aggFields,
     );
   }
 

@@ -3019,6 +3019,99 @@ test('applyFieldPolicy: host.hostname is pre-minted for the prose scan too', () 
   );
 });
 
+// --- #1524: the aggregation half of the prose pre-mint ----------------------------------------
+//
+// Reported: with privacy ON, `wazuh.rule.title` reached the provider as
+// "Secret or credential accessed from vault - AI-QA-AGENT-WIN$" — the estate's real NetBIOS
+// hostname, in a BUCKET digest whose rows carry `{key, doc_count, wazuh.rule.title, ...}` and whose
+// agent names live under the agg `key` / in `breakdown`. Neither position was pre-minted, so the
+// dictionary was empty when the title was scanned.
+
+test('applyFieldPolicy: #1524 an agent name in the agg bucket key scrubs the rule title too', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_top_agents',
+    samples: [
+      {
+        key: 'AI-QA-AGENT-WIN',
+        doc_count: 10,
+        [WAZUH_FIELD.RULE_TITLE]:
+          'Secret or credential accessed from vault - AI-QA-AGENT-WIN$',
+      },
+    ],
+    columns: ['key', 'doc_count', WAZUH_FIELD.RULE_TITLE],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p, {
+    by_agent: scalarSpec(WAZUH_FIELD.AGENT_NAME),
+  });
+  const token = out.samples[0].key as string;
+  assert.match(token, /^HOST_\d+$/);
+  // Cross-field pseudonym CONSISTENCY: the title carries the same token the key does, not a second
+  // mint — and the real hostname is gone from both.
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    `Secret or credential accessed from vault - ${token}$`,
+  );
+  assert.doesNotMatch(JSON.stringify(out), /AI-QA-AGENT-WIN/i);
+});
+
+test('applyFieldPolicy: #1524 an agent name carried only by BREAKDOWN scrubs the rule title', () => {
+  // The name never appears as a sample value at all — it is one key over, in the bucket list of the
+  // same response payload. Before the pre-mint walked `breakdown`, the samples loop scrubbed the
+  // title while the name was still unknown.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_top_agents',
+    samples: [
+      {
+        doc_count: 10,
+        [WAZUH_FIELD.RULE_TITLE]:
+          'Successful user authentication - AI-QA-AGENT-WIN',
+      },
+    ],
+    columns: ['doc_count', WAZUH_FIELD.RULE_TITLE],
+    breakdown: [{ key: 'AI-QA-AGENT-WIN', count: 10, agg: 'by_agent' }],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p, {
+    by_agent: scalarSpec(WAZUH_FIELD.AGENT_NAME),
+  });
+  const token = out.breakdown?.[0].key as unknown as string;
+  assert.match(token, /^HOST_\d+$/);
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    `Successful user authentication - ${token}`,
+  );
+  assert.doesNotMatch(JSON.stringify(out), /AI-QA-AGENT-WIN/i);
+});
+
+test('applyFieldPolicy: #1524 a hostname NEVER carried by the payload is still left verbatim', () => {
+  // The by-construction false-positive guard, stated as a limitation: this is KNOWN-ROSTER
+  // scrubbing. Nothing is guessed from prose, so a bare name the payload never carries as a value
+  // (and no earlier turn minted) is untouched — and, the point of the guard, an ordinary word in a
+  // title can never be replaced either.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_top_agents',
+    samples: [
+      {
+        key: 'AI-QA-AGENT-WIN',
+        doc_count: 10,
+        [WAZUH_FIELD.RULE_TITLE]:
+          'Secret or credential accessed from vault on some-other-host',
+      },
+    ],
+    columns: ['key', 'doc_count', WAZUH_FIELD.RULE_TITLE],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p, {
+    by_agent: scalarSpec(WAZUH_FIELD.AGENT_NAME),
+  });
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    'Secret or credential accessed from vault on some-other-host',
+  );
+  assert.match(out.samples[0].key as string, /^HOST_\d+$/);
+});
+
 test('applyFieldPolicy: a HOST-kind field OUTSIDE the curated pre-mint list is not pre-minted', () => {
   // The narrowing that keeps `inferPseudonymKind`'s `.name` -> HOST convention (process.name,
   // package.name, service.name -- values like "top"/"git") from widening the dictionary and
