@@ -296,6 +296,12 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   // without adding it to the Tab order.
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  // Per-row "Conversation actions" trigger buttons, keyed by conversation id -- lets the Escape
+  // handler below (F-2) explicitly return focus to the trigger it came from once its menu closes.
+  // A plain Map is enough since at most one row's menu (and therefore trigger-to-refocus) is ever
+  // relevant at a time.
+  const triggerRefs = useRef(new Map<string, HTMLButtonElement | null>());
+
   // Separate from `hoveredId` (F-3, WCAG 2.4.11): the pencil/trash icons used to reveal on
   // `hoveredId` alone, which the row's OWN `onMouseEnter`/`onMouseLeave` also drive -- so a
   // keyboard user who tabs to row A's pencil (revealing it via that button's own `onFocus`
@@ -1273,14 +1279,44 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                                       ? 1
                                       : 0,
                                 }}
-                                // Escape while this menu is open closes the MENU and stops there.
-                                // Guarded on `isMenuOpen` so a closed menu's row never swallows an
-                                // Escape meant for an enclosing surface (the rail's own select-mode
-                                // exit, a docked flyout) — closed, this handler does nothing at all.
+                                // Guards every control this wrapper anchors -- the trigger AND,
+                                // once open, the Rename/Delete menu items -- from the ROW's own
+                                // `onKeyDown` further below. `EuiPopover` renders its panel through
+                                // a React portal, so those menu items live elsewhere in the real
+                                // DOM, but React still bubbles their events through this component
+                                // tree, not the portal's -- the row would otherwise see their
+                                // Enter/Space too and `preventDefault()` the control's own native
+                                // activation before it can fire, treating it as "resume this
+                                // conversation" instead. Escape while this menu is open closes the
+                                // MENU and stops there; guarded on `isMenuOpen` so a closed menu's
+                                // row never swallows an Escape meant for an enclosing surface (the
+                                // rail's own select-mode exit, a docked flyout) — closed, this
+                                // handler does nothing at all beyond the Enter/Space guard.
                                 onKeyDown={(event: React.KeyboardEvent) => {
+                                  if (
+                                    event.key === 'Enter' ||
+                                    event.key === ' '
+                                  ) {
+                                    event.stopPropagation();
+                                    return;
+                                  }
                                   if (event.key === 'Escape' && isMenuOpen) {
                                     event.stopPropagation();
                                     closeRowMenu();
+                                    // `stopPropagation` above is what keeps this Escape from also
+                                    // closing an enclosing popover (see the comment above), but it
+                                    // has a side effect: it stops the native keydown before it ever
+                                    // reaches `EuiPopover`'s own focus-trap library, which is what
+                                    // normally returns focus to the trigger on close. Closing the
+                                    // popover ourselves via `closeRowMenu()` above bypasses that
+                                    // return-focus step entirely, so we do it ourselves -- deferred
+                                    // one frame for the same reason `requestDelete` below defers its
+                                    // modal: the trap isn't done unwinding on this tick yet.
+                                    deferOneFrame(() =>
+                                      triggerRefs.current
+                                        .get(conversation.id)
+                                        ?.focus(),
+                                    );
                                   }
                                 }}
                               >
@@ -1310,6 +1346,12 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                                       aria-expanded={isMenuOpen}
                                       onClick={(event: React.MouseEvent) =>
                                         toggleRowMenu(event, conversation)
+                                      }
+                                      buttonRef={node =>
+                                        triggerRefs.current.set(
+                                          conversation.id,
+                                          node,
+                                        )
                                       }
                                       onFocus={() =>
                                         setFocusedId(conversation.id)

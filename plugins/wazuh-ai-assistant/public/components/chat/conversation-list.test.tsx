@@ -7,6 +7,7 @@ import {
   within,
 } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import userEvent from '@testing-library/user-event';
 import { ConversationList } from './conversation-list';
 import { ConversationSummary } from '../../../common/types';
 
@@ -858,6 +859,82 @@ describe('ConversationList', () => {
       ).toHaveAttribute('aria-expanded', 'true');
     });
 
+    it('opens on Enter at the trigger, instead of resuming the conversation', async () => {
+      // `fireEvent.keyDown` doesn't simulate a real browser's own "Enter on a focused
+      // button fires a click" behavior the way `userEvent` does -- needed here since this
+      // relies on the trigger's native activation, not a JS-side key handler of its own.
+      const user = userEvent.setup();
+      const onSelect = jest.fn();
+      const trigger = renderOneRow(onSelect);
+
+      trigger.focus();
+      await user.keyboard('{Enter}');
+
+      expect(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      ).toBeInTheDocument();
+      expect(onSelect).not.toHaveBeenCalled();
+    });
+
+    /**
+     * `EuiPopover` renders its menu panel through a React portal -- elsewhere in the real DOM,
+     * but still a React-tree descendant of the row, so its own Enter/Space were ALSO reaching
+     * the row's `onKeyDown` and getting `preventDefault`-ed before Rename/Delete's own native
+     * activation could fire (the same bug the trigger itself had, one layer deeper).
+     *
+     * Reaches a menu item by real Tabs rather than an imperative `.focus()` straight onto it:
+     * `EuiContextMenuPanel` tracks its own "current item" for arrow/Enter handling alongside
+     * real DOM focus, and only its own Tab/arrow-key navigation keeps the two in sync -- an
+     * external `.focus()` call can leave that internal index stale (Enter then does nothing,
+     * or activates the wrong entry) even though the browser's own focus ring looks correct.
+     * How many Tabs the trap's own focus-management inserts before a given item is an EUI/jsdom
+     * implementation detail this test shouldn't hardcode a count for -- live-verified with
+     * agent-browser against a running dashboard, this exact flow (keyboard-open, Tab, Enter)
+     * reaches and activates both entries.
+     */
+    async function tabToMenuItem(
+      user: ReturnType<typeof userEvent.setup>,
+      name: string,
+    ): Promise<void> {
+      /* eslint-disable no-await-in-loop -- each Tab depends on where the previous one landed */
+      for (
+        let tabs = 0;
+        tabs < 5 &&
+        screen.getByRole('button', { name }) !== document.activeElement;
+        tabs++
+      ) {
+        await user.keyboard('{Tab}');
+      }
+      /* eslint-enable no-await-in-loop */
+      expect(screen.getByRole('button', { name })).toHaveFocus();
+    }
+
+    it('activates Rename on Enter at the menu item, not just on click', async () => {
+      const user = userEvent.setup();
+      const trigger = renderOneRow();
+      trigger.focus();
+      await user.keyboard('{Enter}');
+      await tabToMenuItem(user, 'Rename conversation');
+
+      await user.keyboard('{Enter}');
+
+      expect(screen.getByLabelText('Conversation title')).toBeInTheDocument();
+    });
+
+    it('activates Delete on Enter at the menu item, not just on click', async () => {
+      const user = userEvent.setup();
+      const trigger = renderOneRow();
+      trigger.focus();
+      await user.keyboard('{Enter}');
+      await tabToMenuItem(user, 'Delete conversation');
+
+      await user.keyboard('{Enter}');
+
+      await waitFor(() =>
+        expect(screen.getByText(/permanently delete/)).toBeInTheDocument(),
+      );
+    });
+
     it('is closed at rest: neither action is reachable until the trigger is clicked', () => {
       renderOneRow();
       expect(
@@ -890,7 +967,7 @@ describe('ConversationList', () => {
       expect(entries).toEqual(['Rename conversation', 'Delete conversation']);
     });
 
-    it('closes on Escape without exiting to an enclosing surface', () => {
+    it('closes on Escape without exiting to an enclosing surface, and returns focus to the trigger', async () => {
       const trigger = renderOneRow();
       openRowMenu();
       expect(
@@ -902,6 +979,11 @@ describe('ConversationList', () => {
       expect(
         screen.queryByRole('button', { name: 'Rename conversation' }),
       ).toBeNull();
+      // The refocus is deferred one frame (see the Escape handler's own comment in
+      // conversation-list.tsx) -- same reason `chooseDeleteFromMenu` above has to `await` its modal.
+      await waitFor(() => {
+        expect(document.activeElement).toBe(trigger);
+      });
     });
 
     it('closes when Rename is chosen, and hands over to the inline editor', () => {
@@ -1584,7 +1666,9 @@ describe('ConversationList', () => {
 
       fireEvent.keyDown(
         screen.getByRole('checkbox', { name: 'Select "First"' }),
-        { key: 'Escape' },
+        {
+          key: 'Escape',
+        },
       );
 
       expect(
