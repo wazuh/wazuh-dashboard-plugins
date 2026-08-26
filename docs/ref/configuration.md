@@ -74,7 +74,7 @@ wazuh_core.hosts:
 
 The Wazuh dashboard sets two groups of session cookies:
 
-- `security_authentication` — the platform session, set by the OpenSearch Dashboards Security plugin.
+- `security_authentication` — the platform session, set by the security plugin.
 - `wz-token`, `wz-user`, `wz-api` — the Wazuh server API session, set by the Wazuh plugin.
 
 All of them are `HttpOnly`, and all of them get the `Secure` flag when the dashboard serves HTTPS. The flag is derived from the protocol the server listens on, so no setting is needed. Set `opensearch_security.cookie.secure` explicitly only when a reverse proxy terminates TLS in front of the dashboard: there the dashboard itself speaks plain HTTP and cannot detect that the browser connection is encrypted.
