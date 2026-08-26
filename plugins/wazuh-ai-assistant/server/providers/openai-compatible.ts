@@ -15,7 +15,10 @@ import {
   trimTrailingSlash,
 } from './types';
 import { widenNumericTypes } from './wire-schema';
-import { iterateSseLines } from './sse-utils';
+import {
+  iterateSseLines,
+  PROVIDER_STREAM_TRUNCATED_MESSAGE,
+} from './sse-utils';
 import {
   fetchProviderWithRetry,
   describeToolUseFailedStreamMessage,
@@ -204,6 +207,12 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
     // in a tool call by design) reported `usage: undefined` right up to the round loop's accumulator,
     // leaving only the last, tool-free round's usage to sum.
     let toolCallsFinalized = false;
+    // Set the moment any choice carries a non-null `finish_reason` (see where it is assigned
+    // below). The loop-end tail reads it to tell a stream the provider ENDED from a stream that
+    // was CUT: `[DONE]` and the terminal usage frame both `return` from inside the loop, so
+    // reaching the tail means neither arrived, and a `finish_reason` is then the only remaining
+    // evidence that the provider meant to stop.
+    let sawFinishReason = false;
     // Inline-markup filter (issue 18-strip-inline-reasoning-markup.md): some reasoning models
     // (qwen3.x, measured 6/8 leaked answers) put their `<think>...</think>` deliberation, and
     // sometimes `<tool_call>`/`<function=...>`/`<parameter=...>` text standing in for a real tool
@@ -352,6 +361,18 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
         );
         accumulateToolCallDeltas(toolCalls, choice?.delta?.tool_calls);
 
+        // ANY non-null `finish_reason` means the provider deliberately ended this choice --
+        // 'stop', 'length', 'tool_calls', 'content_filter'. Recorded (not just the 'tool_calls'
+        // value the branch below reads) because it is the only per-choice evidence that the
+        // stream's end was intentional, which is what the loop-end tail has to decide on. See the
+        // dropped-stream guard on that tail.
+        if (
+          typeof choice?.finish_reason === 'string' &&
+          choice.finish_reason !== ''
+        ) {
+          sawFinishReason = true;
+        }
+
         if (choice?.finish_reason === 'tool_calls' && !toolCallsFinalized) {
           // Flush before finalizing the tool call, same ordering rule chat.ts's own
           // `drainRoundBuffers()` follows: whatever text preceded the call must be fully resolved
@@ -393,6 +414,33 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
           };
           return;
         }
+      }
+      // DROPPED-STREAM GUARD. Falling out of the `for await` means the socket closed without
+      // `[DONE]` and without a terminal usage frame -- both of those exits `return` from inside the
+      // loop above. Reaching here after the provider streamed ANSWER TEXT but never sent a
+      // `finish_reason` is not a completed answer: it is a connection that was cut mid-sentence.
+      // This tail used to be shared with the normal end-of-stream path and yielded a bare
+      // `{ type: 'done' }`, so the client committed the partial text and rendered it as final --
+      // no error, no retry, nothing to tell the reader the answer stops mid-thought. The `catch`
+      // below cannot cover it either: a clean socket close throws nothing.
+      //
+      // Deliberately NARROW, so the paths that already recover are untouched:
+      //  - `sawContent` gates it to the mid-ANSWER window. A stream that drops BEFORE the first
+      //    delta still falls through to `done` with no text, which is what lets chat.ts's
+      //    `synthesizeNoTextFallback` no-tools retry fire -- a recovery that works today and must
+      //    keep working.
+      //  - `toolCallsFinalized` excludes a round that produced a tool call: that round's answer is
+      //    still to come on a LATER round, so its text is not the truncated thing here.
+      //  - a `finish_reason` on any choice means the provider deliberately ended the choice
+      //    ('stop'/'length'/...), so a provider that ends that way and simply omits `[DONE]` is
+      //    still treated as complete -- no new failure mode for well-behaved endpoints.
+      //
+      // The partial text is KEPT (it is already on screen) and the error is emitted BESIDE it, so
+      // the UI can mark the answer incomplete rather than final.
+      if (sawContent && !sawFinishReason && !toolCallsFinalized) {
+        yield* flushInlineMarkupFilter();
+        yield { type: 'error', message: PROVIDER_STREAM_TRUNCATED_MESSAGE };
+        return;
       }
       if (!toolCallsFinalized) {
         yield* flushInlineMarkupFilter();

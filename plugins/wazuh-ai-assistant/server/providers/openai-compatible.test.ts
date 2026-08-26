@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { OpenAiCompatibleAdapter } from './openai-compatible';
 import { ChatMessage, ProviderConfig, StreamEvent } from '../../common/types';
+import { PROVIDER_STREAM_TRUNCATED_MESSAGE } from './sse-utils';
 
 // Covers three fixes that all land on this adapter's request/response handling:
 //  - the reasoning-channel fallback (issue 02-read-reasoning-delta.md): some reasoning models
@@ -1247,5 +1248,113 @@ test('chatStream: a message-level extra attaches only to a round’s first tool_
     toolCallEvents[1].messageVendorExtras,
     undefined,
     'the SECOND tool_call event of the same round must not also carry it (no fan-out)',
+  );
+});
+
+
+// --- dropped stream (fault injection) ---------------------------------------------------------
+// A provider connection that drops AFTER the answer starts streaming used to be finalized as a
+// normal turn: the partial text was committed and a bare `done` was emitted, with no `error` and
+// no retry, so a truncated answer was indistinguishable from a complete one. Reproduced 3/3
+// against a fault-injection endpoint that streams content deltas and then closes the socket with
+// no `[DONE]` frame and no `finish_reason`. The `catch` in the adapter cannot see it, because a
+// clean socket close throws nothing.
+
+/** SSE body with NO `[DONE]` sentinel and no terminal usage frame -- the wire shape of a socket
+ * closed mid-stream, as opposed to `sseBody` above which always terminates properly. */
+function truncatedSseBody(chunks: Array<Record<string, unknown>>): string {
+  return chunks.map(chunk => `data: ${JSON.stringify(chunk)}
+
+`).join('');
+}
+
+test('chatStream: a stream that ends mid-answer emits an error instead of a bare done', async () => {
+  const body = truncatedSseBody([
+    {
+      choices: [
+        {
+          index: 0,
+          delta: { content: 'Here are the top rules for today: ' },
+        },
+      ],
+    },
+    {
+      choices: [
+        { index: 0, delta: { content: 'the busiest is rule 5501 (PAM login). ' } },
+      ],
+    },
+  ]);
+  const events = await withFakeFetch(body, () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(
+        BASE_CONFIG,
+        [userMessage('what are the top rules today?')],
+        controller.signal,
+      ),
+    );
+  });
+  assert.deepEqual(
+    events.map(event => event.type),
+    ['delta', 'delta', 'error'],
+    'a cut stream must terminate with an error, never with done',
+  );
+  assert.equal(
+    (events[2] as { message: string }).message,
+    PROVIDER_STREAM_TRUNCATED_MESSAGE,
+  );
+  // The partial text is deliberately KEPT and the error emitted beside it, so the UI can mark the
+  // answer incomplete rather than silently dropping what the user already read.
+  assert.equal(
+    events
+      .filter(event => event.type === 'delta')
+      .map(event => (event as { content: string }).content)
+      .join(''),
+    'Here are the top rules for today: the busiest is rule 5501 (PAM login). ',
+  );
+});
+
+test('chatStream: a provider that sends finish_reason but omits [DONE] is still a completed answer', async () => {
+  const body = truncatedSseBody([
+    { choices: [{ index: 0, delta: { content: 'That is the full picture.' } }] },
+    { choices: [{ index: 0, delta: {}, finish_reason: 'stop' }] },
+  ]);
+  const events = await withFakeFetch(body, () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(
+        BASE_CONFIG,
+        [userMessage('anything else?')],
+        controller.signal,
+      ),
+    );
+  });
+  assert.deepEqual(
+    events.map(event => event.type),
+    ['delta', 'done'],
+    'a deliberate finish_reason must not be misread as a dropped connection',
+  );
+});
+
+test('chatStream: a stream that drops BEFORE any text still ends in done, so the no-text retry can fire', async () => {
+  // This path already recovers today (chat.ts falls back to a no-tools retry when a round
+  // produced no text) and must keep doing so -- the guard is scoped to the mid-ANSWER window.
+  const events = await withFakeFetch(truncatedSseBody([]), () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(
+        BASE_CONFIG,
+        [userMessage('what happened?')],
+        controller.signal,
+      ),
+    );
+  });
+  assert.deepEqual(
+    events.map(event => event.type),
+    ['done'],
+    'an empty cut stream must not be turned into an error -- the no-text fallback owns it',
   );
 });
