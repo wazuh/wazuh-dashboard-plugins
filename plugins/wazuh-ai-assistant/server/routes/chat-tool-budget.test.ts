@@ -15,6 +15,7 @@ import {
   noTextFallbackMessage,
   orchestrate,
   shouldGrantBudgetExtension,
+  shouldGrantZeroRowWideningRound,
   toolCallCostUnits,
 } from './chat';
 import { getToolCostClass, getToolDefinition } from '../tools/registry';
@@ -129,6 +130,156 @@ test('isRoundFutile: at least one successful call had new, non-duplicate rows --
       { hadRows: false, isDuplicate: false },
       { hadRows: true, isDuplicate: false },
     ]),
+    false,
+  );
+});
+
+// --- shouldGrantZeroRowWideningRound: the ONE widening round -----------------------------------
+//
+// `isRoundFutile` latches the final round on the first all-zero-row result, which makes the system
+// prompt's own "retry once with a broader filter" instruction unobeyable -- the next round is
+// offered no tools. These tests pin every bound that keeps the fix to exactly one round.
+
+test('zero-row widening: the FIRST all-zero-row round of a turn earns one more round', () => {
+  assert.equal(
+    shouldGrantZeroRowWideningRound({
+      successfulCalls: [
+        { toolName: 'get_sca_checks', hadRows: false, isDuplicate: false },
+      ],
+      alreadyGranted: false,
+    }),
+    true,
+  );
+});
+
+test('zero-row widening: granted at most ONCE per turn -- the second empty round stops', () => {
+  // The whole latency bound: without this latch the mechanism is a retry loop.
+  assert.equal(
+    shouldGrantZeroRowWideningRound({
+      successfulCalls: [
+        { toolName: 'get_sca_checks', hadRows: false, isDuplicate: false },
+      ],
+      alreadyGranted: true,
+    }),
+    false,
+  );
+});
+
+test('zero-row widening: a round containing a DUPLICATE call earns nothing', () => {
+  // Duplicate = the model is re-issuing a query it already ran (spinning). That is the half of
+  // futility the original design is right about; only the zero-row half gets the grace.
+  assert.equal(
+    shouldGrantZeroRowWideningRound({
+      successfulCalls: [
+        { toolName: 'get_sca_checks', hadRows: false, isDuplicate: false },
+        { toolName: 'get_sca_checks', hadRows: false, isDuplicate: true },
+      ],
+      alreadyGranted: false,
+    }),
+    false,
+  );
+});
+
+test("zero-row widening: a round that returned rows is not this mechanism's concern", () => {
+  assert.equal(
+    shouldGrantZeroRowWideningRound({
+      successfulCalls: [
+        { toolName: 'get_sca_checks', hadRows: true, isDuplicate: false },
+      ],
+      alreadyGranted: false,
+    }),
+    false,
+  );
+});
+
+test('zero-row widening: an all-rejected round (no successful calls) earns nothing', () => {
+  // Same non-overlap `isRoundFutile` keeps with #8911: an all-rejected round is
+  // shouldEnterFinalRoundEarly's territory and has its own retry allowance.
+  assert.equal(
+    shouldGrantZeroRowWideningRound({
+      successfulCalls: [],
+      alreadyGranted: false,
+    }),
+    false,
+  );
+});
+
+test('zero-row widening: only fires where isRoundFutile already said the round was futile', () => {
+  // The call site asks this question strictly inside the `isRoundFutile` branch, so every input
+  // that earns the grace must also be futile -- otherwise the grace would silently widen a
+  // productive round's budget too.
+  const granted = [
+    { toolName: 'get_sca_checks', hadRows: false, isDuplicate: false },
+  ];
+  assert.equal(isRoundFutile(granted), true);
+  assert.equal(
+    shouldGrantZeroRowWideningRound({
+      successfulCalls: granted,
+      alreadyGranted: false,
+    }),
+    true,
+  );
+});
+
+// --- A DISCOVERY-only zero-row round earns nothing --------------------------------------------
+//
+// A zero-row discovery probe has ANSWERED the model ("this field carries nothing here"); it is not a
+// retrieval attempt that came up short. Granting it an extra round funds another probe instead of
+// widening a query that was too narrow, and the typed tool that owns the question never gets
+// called.
+
+test('a round whose only successful call was a discovery probe earns nothing', () => {
+  assert.equal(
+    shouldGrantZeroRowWideningRound({
+      successfulCalls: [
+        { toolName: 'get_field_values', hadRows: false, isDuplicate: false },
+      ],
+      alreadyGranted: false,
+    }),
+    false,
+  );
+});
+
+test('the refusal survives several discovery probes in the same round', () => {
+  assert.equal(
+    shouldGrantZeroRowWideningRound({
+      successfulCalls: [
+        { toolName: 'get_field_values', hadRows: false, isDuplicate: false },
+        { toolName: 'get_field_values', hadRows: false, isDuplicate: false },
+      ],
+      alreadyGranted: false,
+    }),
+    false,
+  );
+});
+
+test('a zero-row round with ANY real data call still earns its widening round', () => {
+  // The aim is a PRECISE granted round, not a removed one: a zero-row round with any real data call
+  // in it still earns its widening round.
+  assert.equal(
+    shouldGrantZeroRowWideningRound({
+      successfulCalls: [
+        { toolName: 'get_field_values', hadRows: false, isDuplicate: false },
+        { toolName: 'search_wazuh_data', hadRows: false, isDuplicate: false },
+      ],
+      alreadyGranted: false,
+    }),
+    true,
+  );
+});
+
+test('a discovery-only round is still futile -- only the GRACE is withheld', () => {
+  // `isRoundFutile` is unaffected: such a round still stops the turn, one round earlier than a
+  // granted one would.
+  const discoveryOnly = [
+    { toolName: 'get_field_values', hadRows: false, isDuplicate: false },
+  ];
+  assert.equal(isRoundFutile(discoveryOnly), true);
+  assert.equal(
+    shouldGrantZeroRowWideningRound({
+      successfulCalls: discoveryOnly,
+      alreadyGranted: false,
+    }),
     false,
   );
 });
@@ -740,7 +891,7 @@ function bigTopAgentsContext(): RequestHandlerContext {
                             ],
                           },
                         },
-                        distinct_names: { value: 1 },
+                        distinct_name_count: { value: 1 },
                       })),
                     },
                   },

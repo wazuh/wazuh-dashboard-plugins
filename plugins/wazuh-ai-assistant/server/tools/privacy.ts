@@ -117,6 +117,16 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // conversation — there is no pseudonym to reuse and this file never mints from a prose field. See
   // `IDENTIFIER_BEARING_FREE_TEXT_FIELDS` and `premintProseScanIdentifiers`.
   { field: WAZUH_FIELD.RULE_TITLE, action: 'allow' },
+  // In every finding-hits tool's digest sample columns (catalog/common.ts's
+  // FINDING_DIGEST_EXTRA_COLUMNS), so it needs an explicit decision here rather than reaching the
+  // provider by omission. 'allow' on exactly wazuh.rule.title's reasoning above and
+  // document.metadata.description's below -- it is the ruleset's own prose about what a rule
+  // detects, the model cannot explain a detection without it, and anonymizing it would replace
+  // every distinct explanation with an opaque VAL_n. Same residual risk as both of those fields (a
+  // custom rule's description can interpolate a decoder capture group) and the same mitigation:
+  // chat.ts's scrubMessagesForProvider runs prescanAndMintToolContent over every tool-result string
+  // value, so an embedded IP/FQDN is still pseudonymized before it reaches the provider.
+  { field: 'wazuh.rule.description', action: 'allow' },
   // Wildcard covers every compliance framework (pci_dss, hipaa, gdpr, iso_27001, nis2,
   // nist_800_171, nist_800_53, fedramp, cmmc, tsc, ...), not just the one this plugin has a
   // dedicated tool for — all are curated requirement-tag lists, equally not
@@ -201,6 +211,15 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // Wazuh's scanner from CTI data, never analyst/attacker-supplied. Surfaced (2026-08-14) so the
   // model can state the fixed version instead of offering an update check no tool can perform.
   { field: 'vulnerability.scanner.condition', action: 'allow' },
+  // A digest sampleColumn on the vulnerability tools (catalog/common.ts's
+  // VULN_DIGEST_SAMPLE_COLUMNS). NOT 'allow', unlike the scanner/OS-curated fields around it: this
+  // is THIRD-PARTY feed prose (CNA/NVD-authored, arriving through the CTI content pipeline), the
+  // same untrusted-text class get-cve-intel.ts treats with care. It describes a CVE, never this
+  // deployment, so it carries no local identifier by design -- but it is long free text from
+  // outside, so 'allow-scan' (issue #8912) is the right classification: the value stays readable
+  // while every embedded IP/FQDN shape is minted and every identifier already pseudonymized
+  // elsewhere in this conversation is caught by the dictionary scan.
+  { field: 'vulnerability.description', action: 'allow-scan' },
   // NOT 'allow', unlike package.name/architecture/type/version above: a vendor/distributor string
   // ("Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>", "Debian Sysadmin Team
   // <debian-admin@lists.debian.org>") routinely embeds a maintainer/team EMAIL ADDRESS -- personal
@@ -255,6 +274,99 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'event.category', action: 'allow' },
   { field: 'event.action', action: 'allow' },
   { field: 'event.outcome', action: 'allow' },
+
+  // --- The wazuh-states-* discovery surfaces -------------------------------------------------
+  // `guardrails.ts`'s AGG_FIELD_ALLOWLIST (via `state-families.ts`) lets `get_field_values`
+  // enumerate the state schema, so every field below reaches the provider as an aggregation BUCKET
+  // KEY. `applyFieldPolicy`'s breakdown loop resolves each bucket's aggregation field through
+  // `extractAggFields`/`scrubAggKey` and applies THIS list to the key (the mechanism `source.ip`'s
+  // comment above documents), so a field opened for aggregation and left unclassified here ships
+  // raw usernames and IP addresses into a bucket list under privacy mode. Every entry below must
+  // stay an explicit decision, never allow-by-omission.
+
+  // Services (wazuh-states-inventory-services). A service NAME is admin/vendor-defined identity
+  // ("ssh.service", "WinDefend"), the same class as package.name above -- 'allow-scan', not a
+  // rubber-stamp 'allow', because a site-authored unit name can embed a hostname. The rest are
+  // closed enums: state running/stopped, sub_state running/dead, enabled yes/no,
+  // start_type enabled/auto/manual, type systemd/win32_own_process.
+  { field: 'service.name', action: 'allow-scan' },
+  { field: 'service.state', action: 'allow' },
+  { field: 'service.sub_state', action: 'allow' },
+  { field: 'service.enabled', action: 'allow' },
+  { field: 'service.start_type', action: 'allow' },
+  { field: 'service.type', action: 'allow' },
+
+  // Hardware (wazuh-states-inventory-hardware): a CPU model string and two byte/core counts.
+  // Hardware identity, not a person or a network address -- the same class as the OS-identity
+  // fields above. `host.serial_number` is deliberately NOT opened for aggregation and so needs no
+  // entry: a serial IS a per-machine identifier.
+  { field: 'host.cpu.name', action: 'allow' },
+  { field: 'host.cpu.cores', action: 'allow' },
+  { field: 'host.memory.total', action: 'allow' },
+  { field: 'host.architecture', action: 'allow' },
+
+  // Interfaces/networks/protocols (wazuh-states-inventory-interfaces/-networks/-protocols).
+  // An interface NAME ("eth0", "Ethernet0") and its link state/type are local device mechanics.
+  // The two ADDRESS fields are not: `network.ip` is the host's own address and `network.gateway`
+  // is the network's default route -- both infrastructure identifiers of exactly the shape
+  // `source.ip`/`destination.ip` above already anonymize, so they get the same treatment rather
+  // than an exception for being "our own" addresses. `network.dhcp` is 0/1 and `network.netmask`
+  // is a mask, neither of which identifies a host.
+  { field: 'interface.name', action: 'allow' },
+  { field: 'interface.type', action: 'allow' },
+  { field: 'network.ip', action: 'anonymize', kind: 'IP' },
+  { field: 'network.gateway', action: 'anonymize', kind: 'IP' },
+  { field: 'network.netmask', action: 'allow' },
+  { field: 'network.dhcp', action: 'allow' },
+  { field: 'network.type', action: 'allow' },
+
+  // Users and groups (wazuh-states-inventory-users/-groups) -- the most sensitive surface this
+  // phase opens, and the only one where the answer is 'anonymize'. `user.name` is a local account
+  // name, the same personal identifier `source.user.name`/`destination.user.name` above already
+  // anonymize; this is simply the syscollector-side literal for it.
+  { field: 'user.name', action: 'anonymize', kind: 'USER' },
+  // `group.name`/`group.users` are anonymized as USER, not allowed as "admin taxonomy": on Linux,
+  // USER-PRIVATE GROUPS mean a group name routinely IS an account name (useradd creates a group
+  // named after the user), and `group.users` is a membership list of account names outright
+  // (root, Administrator, builder). Classifying either as allow would
+  // leak the same personal identifier `user.name` protects, through a different field name. The
+  // cost is real and accepted: under privacy mode a group listing reads as pseudonyms.
+  { field: 'group.name', action: 'anonymize', kind: 'USER' },
+  { field: 'group.users', action: 'anonymize', kind: 'USER' },
+  // Numeric ids and account metadata: `user.groups` carries GIDs (not names) on this schema,
+  // `group.id` is a GID, `login.status` is 0/1, `user.type` is user/administrator/service, and
+  // `user.shell` is a path to a shell binary (/bin/bash, C:\Windows\system32\cmd.exe) -- a program
+  // location, never a home directory, so it carries no account name.
+  { field: 'user.groups', action: 'allow' },
+  { field: 'user.type', action: 'allow' },
+  { field: 'user.shell', action: 'allow' },
+  { field: 'group.id', action: 'allow' },
+  { field: 'login.status', action: 'allow' },
+
+  // Browser extensions (wazuh-states-inventory-browser-extensions): the extension's own name and
+  // version are `package.name`/`package.version` (already classified above); `browser.name` is
+  // the browser ("Chrome"/"Safari") and `package.enabled` is 0/1. Neither identifies a person --
+  // `user.id`, which this index also carries, is deliberately NOT opened for aggregation.
+  { field: 'browser.name', action: 'allow' },
+  { field: 'package.enabled', action: 'allow' },
+
+  // Windows registry state (wazuh-states-fim-registry-keys/-values). The hive is a closed
+  // enumeration (HKEY_LOCAL_MACHINE/...) and `registry.data.type` is a REG_* type constant. The
+  // key path and the value name are 'allow-scan' rather than 'allow': both are usually pure OS
+  // structure ("SOFTWARE\Microsoft\Windows\CurrentVersion\Run", "SecurityHealth"), but a key under
+  // HKEY_USERS is indexed by SID and a value name is attacker-CHOSEN on exactly the persistence
+  // findings these questions are about -- readable, but scanned.
+  { field: 'registry.hive', action: 'allow' },
+  { field: 'registry.data.type', action: 'allow' },
+  { field: 'registry.key', action: 'allow-scan' },
+  { field: 'registry.value', action: 'allow-scan' },
+
+  // Vulnerability/SCA catalog coordinates newly aggregatable by name. Public CVE identifiers and
+  // benchmark policy ids -- vendor catalog data, never analyst-supplied, the same reviewed 'allow'
+  // as `check.id`/`policy.name` above.
+  { field: 'vulnerability.id', action: 'allow' },
+  { field: 'vulnerability.severity', action: 'allow' },
+  { field: 'policy.id', action: 'allow' },
 
   // --- Workstream A1a (AI/plan/coverage-validation-design.md) -------------------------------
   // Every family below is newly reachable through `search_wazuh_data` (guardrails.ts's

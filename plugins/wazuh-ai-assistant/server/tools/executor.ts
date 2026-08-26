@@ -1009,7 +1009,20 @@ export async function executeToolCall(
     try {
       const resolved = await def.resolveParams(params, context, request);
       if (!resolved.ok) {
-        return { toolResultContent: toolErrorContent(resolved.reason) };
+        // The FAILURE half must go through the same scrub as the success half below: a resolver that
+        // cannot pick between candidates enumerates them by name in `reason`
+        // (param-resolution.ts's two 'many' branches), and that reason becomes the tool error the
+        // provider reads -- so an unscrubbed one carries real hostnames in the clear under privacy
+        // mode. Same helper, same chokepoint, no-op when the resolver declared no entities.
+        return {
+          toolResultContent: toolErrorContent(
+            scrubAssumptionNote(
+              resolved.reason,
+              resolved.reasonEntities,
+              privacy,
+            ) ?? resolved.reason,
+          ),
+        };
       }
       params = resolved.resolved.params;
       // Scrubbed HERE, at the single choke point every resolver's note passes through, rather

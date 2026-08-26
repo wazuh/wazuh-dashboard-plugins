@@ -9,7 +9,13 @@ import {
   ToolDefinition,
 } from './types';
 import { resolveApiHostId } from './api-host';
-import { applySafetyValves, checkIndexAllowlist, lintDsl } from './guardrails';
+import {
+  applySafetyValves,
+  checkIndexAllowlist,
+  lintDsl,
+  requiresBoundedTimeRange,
+} from './guardrails';
+import { resolveTimeRange } from './catalog/common';
 
 /**
  * Generic sole-candidate parameter resolution (issue: "generic sole-candidate parameter
@@ -45,10 +51,12 @@ import { applySafetyValves, checkIndexAllowlist, lintDsl } from './guardrails';
  * assumption after a wire capture (privacy probe P3, 2026-08-14) proved it false: a bare
  * single-word hostname in the note reached the provider in the clear -- it is not address-shaped
  * (the shape scan's documented limitation) and was never minted (resolution exists precisely
- * because the caller never supplied the value), so both downstream scans missed it. The "which
- * one?" candidate lists in FAILED outcomes travel as tool-result error text, not as a digest
- * note, and remain covered by `chat.ts`'s `prescanAndMintToolContent` pass plus the same bare-name
- * limitation -- a residual documented in the privacy issue, not silently assumed away.
+ * because the caller never supplied the value), so both downstream scans missed it.
+ *
+ * The "which one?" candidate lists in FAILED outcomes are the other half of the same hole: they
+ * reach the provider as tool-result error text, where `chat.ts`'s `prescanAndMintToolContent` pass
+ * is known not to catch a bare host name. They therefore declare `reasonEntities` the same way a
+ * resolved note declares `noteEntities`, and `executor.ts` scrubs them at the same choke point.
  */
 
 /** How many named candidates a "which one?" error lists, for either lookup kind -- bounded so a
@@ -211,16 +219,37 @@ export async function lookupIndexerTermsCandidate(
   index: string,
   field: string,
   scopeFilter: Record<string, unknown>[],
+  // The `@timestamp` bounds to add when `index` is a TIME-BASED family
+  // (`requiresBoundedTimeRange`, guardrails.ts); optional and ignored for a `wazuh-states-*`
+  // index.
+  timeRange?: { gte: string; lte: string },
 ): Promise<IndexerTermsLookupResult> {
   try {
     const allowlistCheck = checkIndexAllowlist(index);
     if (!allowlistCheck.ok) {
       return { kind: 'error' };
     }
+    // A rangeless probe against wazuh-findings-v5*/wazuh-events-v5* fails `lintDsl`, and the
+    // `catch`/early-return below swallows that as `{kind: 'error'}` -- so without the bounds the
+    // whole sole-candidate feature silently disappears for a time-based index, with no visible
+    // error. The bounds come from the CALLER's own params (`resolveOneParam` below), so the
+    // candidate universe is the same window the tool's real query will search.
+    const timeFilter =
+      requiresBoundedTimeRange(index) && timeRange
+        ? [
+            {
+              range: {
+                '@timestamp': { gte: timeRange.gte, lte: timeRange.lte },
+              },
+            },
+          ]
+        : [];
+    const filterClauses = [...scopeFilter, ...timeFilter];
     const probeBody: Record<string, unknown> = {
       query: {
         bool: {
-          filter: scopeFilter.length > 0 ? scopeFilter : [{ match_all: {} }],
+          filter:
+            filterClauses.length > 0 ? filterClauses : [{ match_all: {} }],
         },
       },
       size: 0,
@@ -454,7 +483,17 @@ async function resolveOneParam(
         kind: 'HOST' | 'IP' | 'USER' | 'URL' | 'VAL';
       }>;
     }
-  | { status: 'failed'; reason: string }
+  | {
+      status: 'failed';
+      reason: string;
+      /** Identifier values interpolated into `reason` -- see `ResolveParamsResult`'s own
+       * `reasonEntities` doc comment (types.ts) for why an ambiguity reason needs the same
+       * pseudonymization the resolved-value note already got. */
+      reasonEntities?: Array<{
+        value: string;
+        kind: 'HOST' | 'IP' | 'USER' | 'URL' | 'VAL';
+      }>;
+    }
 > {
   const existing = params[spec.param];
   if (typeof existing === 'string' && existing.trim() !== '') {
@@ -500,6 +539,13 @@ async function resolveOneParam(
           } active agents exist, so which one ` +
           `is meant cannot be assumed. Candidates: ${named.join(', ')}` +
           `${remaining > 0 ? `, and ${remaining} more` : ''}.)`,
+        // The candidate hostnames this reason enumerates -- declared for the same reason the
+        // 'single' branch above declares its resolved name: undeclared, they reach the provider
+        // in the clear under privacy mode, past every downstream scan.
+        reasonEntities: result.candidates.map(candidate => ({
+          value: candidate.name,
+          kind: 'HOST' as const,
+        })),
       };
     }
     return { status: 'failed', reason: boundedErrorFor(spec.param) };
@@ -518,6 +564,17 @@ async function resolveOneParam(
     spec.source.index,
     spec.source.field,
     scopeFilter,
+    // `resolveTimeRange` applies the catalog's own defaults when the caller named no window, so a
+    // time-based probe is always bounded and always bounded the SAME way the tool's own
+    // `buildRequest` will bound it. Wrapped: it throws on a malformed bound, and this resolver's
+    // contract is "never throw, degrade to a bounded error".
+    (() => {
+      try {
+        return resolveTimeRange(params);
+      } catch {
+        return undefined;
+      }
+    })(),
   );
   if (result.kind === 'single') {
     return {
@@ -527,10 +584,12 @@ async function resolveOneParam(
         `No "${spec.param}" was given, so this call was resolved to the only matching value, ` +
         `"${result.value}". State this assumption to the user rather than presenting the ` +
         'result as if that value had been named.',
-      // A terms-source value is a catalog identifier (an SCA policy id), not a host/user/network
-      // identifier -- nothing to declare. If a future spec resolves an identifier-bearing field
-      // this way, it must declare it here or the P3 leak returns for that tool.
-      noteEntities: [],
+      // A terms-source value is USUALLY a catalog identifier (an SCA policy id) with nothing to
+      // declare -- but a spec whose field holds identifiers (an agent name) must declare its kind
+      // via `noteEntityKind` (types.ts), or the name reaches the provider unscrubbed.
+      noteEntities: spec.source.noteEntityKind
+        ? [{ value: result.value, kind: spec.source.noteEntityKind }]
+        : [],
     };
   }
   if (result.kind === 'none') {
@@ -559,6 +618,22 @@ async function resolveOneParam(
           ', ',
         )}` +
         `${hasMore ? ', and possibly more' : ''}.)`,
+      // Same reasoning as the manager-agents 'many' branch above, gated on the spec's own
+      // declaration: an SCA-policy-id candidate list has nothing to declare, an agent-name one
+      // does.
+      ...(spec.source.noteEntityKind
+        ? {
+            reasonEntities: result.candidates.map(value => ({
+              value,
+              kind: spec.source.noteEntityKind as
+                | 'HOST'
+                | 'IP'
+                | 'USER'
+                | 'URL'
+                | 'VAL',
+            })),
+          }
+        : {}),
     };
   }
   return { status: 'failed', reason: boundedErrorFor(spec.param) };
@@ -601,7 +676,13 @@ export function buildGenericResolveParams(
         continue;
       }
       if (outcome.status === 'failed') {
-        return { ok: false, reason: outcome.reason };
+        return {
+          ok: false,
+          reason: outcome.reason,
+          ...(outcome.reasonEntities && outcome.reasonEntities.length > 0
+            ? { reasonEntities: outcome.reasonEntities }
+            : {}),
+        };
       }
       nextParams = { ...nextParams, [spec.param]: outcome.value };
       notes.push(outcome.note);

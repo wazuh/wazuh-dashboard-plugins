@@ -76,12 +76,21 @@ export const getEventsByAgentTool: ToolDefinition = {
     rowFields: ['wazuh.agent.id', 'event.module'],
   },
   digest: {
+    // The five columns above name that something happened and how it ended, never WHAT ran, so
+    // an explanatory answer about an event has nothing to explain from and the final-round
+    // instruction correctly forbids inventing it. `process.command_line` carries the substance;
+    // `process.name` rides along because it is the one piece of process identity that survives
+    // privacy mode (policy `allow`, privacy.ts) while `command_line` is pseudonymized
+    // (`anonymize` -- the digest passes through `applyFieldPolicy` in executor.ts like every
+    // other column). Length-bounded by `DIGEST_FIELD_MAX_LENGTH_DEFAULTS` (digest.ts).
     sampleColumns: [
       '@timestamp',
       'wazuh.agent.name',
       'event.category',
       'event.action',
       'event.outcome',
+      'process.name',
+      'process.command_line',
     ],
     // Synthetic fallback, not a real aggregation (issue #8920 item 1): this tool sorts by
     // @timestamp desc, so its 5-row `samples` slice is the newest events only -- "what kinds of

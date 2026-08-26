@@ -154,22 +154,20 @@
 }
 
 /**
- * The inline-rename pencil (M3 fix, #9010 review), anchored to `.wzConvoRow`'s own
- * `position: relative` (conversation-list.tsx) rather than living inside the row's flex group —
- * a zero-width flex item still cost the row a `gutterSize='xs'` margin at rest (EUI gutters are
- * margins, not padding), which this avoids entirely by never entering the flex flow. Positioned
- * over the timestamp/trash corner of the row: `right` clears the trash button's own box so the
- * two controls don't sit on top of each other when both are visible on hover, but a hovered
- * pencil is still expected to sit over part of the (glance-only) timestamp text — the background
- * below is the row's OWN hover tint, not a new color, so no text bleeds through it.
+ * The destructive entry in a row's overflow menu (conversation-list.tsx's `rowMenuItems`).
+ *
+ * `EuiContextMenuItem` takes no `color` prop, so the danger tone has to be applied here. It goes on
+ * the LABEL; the icon carries its own `color='danger'` at the call site. Colouring only the icon
+ * left the one irreversible action reading exactly like the others at a glance, which is the
+ * opposite of what a destructive entry in a menu owes the reader.
+ *
+ * `$euiColorDangerText`, not `$euiColorDanger`: the former is the theme's text-on-background danger
+ * value and is the one that holds its contrast ratio in both themes — the fill colour does not.
+ * A SASS value rather than a `var()` because it is compiled per theme already and this rule has no
+ * runtime state to track.
  */
-.wzConvoRowRenameOverlay {
-  position: absolute;
-  top: 50%;
-  right: 40px;
-  transform: translateY(-50%);
-  background: var(--wz-accent-hover);
-  border-radius: 4px;
+.wzConvoRowMenuDanger .euiContextMenuItem__text {
+  color: $euiColorDangerText;
 }
 
 /** EUI's `.euiFlexGroup` carries `flex-grow: 1`. These two rows are direct children of

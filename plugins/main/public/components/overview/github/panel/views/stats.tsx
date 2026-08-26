@@ -11,16 +11,20 @@
  */
 
 import React from 'react';
-import { EuiDescriptionList, EuiPanel } from '@elastic/eui';
+import { EuiDescriptionList, EuiPanel, EuiText } from '@elastic/eui';
 import { PanelModuleConfiguration } from '../../../../common/modules/panel';
-import { renderValueNoThenEnabled } from '../../../../../controllers/management/components/management/configuration/utils/utils';
+import { renderValueYesThenEnabled } from '../../../../../controllers/management/components/management/configuration/utils/utils';
 import { LogoGitHub } from '../../../../common/logos';
+import {
+  mapModuleContentToRenderProperties,
+  toApiAuthEntries,
+} from '../../../../common/modules/panel/components/module-configuration-mapping';
 
 const settings = [
   {
     field: 'enabled',
     label: 'Service status',
-    render: renderValueNoThenEnabled,
+    render: renderValueYesThenEnabled,
   },
   {
     field: 'only_future_events',
@@ -43,32 +47,38 @@ const settings = [
   {
     field: 'api_auth',
     label: 'Credentials',
-    render: value =>
-      value
-        .map(v => (
-          <EuiPanel
-            paddingSize='s'
-            key={`module_configuration_api_auth_${v.org_name}_${v.client_id}`}
-          >
-            <EuiDescriptionList
-              listItems={[
-                { title: 'Organization', description: v.org_name },
-                { title: 'Token', description: v.api_token },
-              ].filter(item => typeof item.description !== 'undefined')}
-            />
-          </EuiPanel>
-        ))
-        .reduce(
-          (prev, cur) => [
-            prev,
-            <div
-              key={`padding-len-${prev.length}`}
-              style={{ marginTop: '8px' }}
-            />,
-            cur,
-          ],
-          [],
-        ),
+    render: value => {
+      const entries = toApiAuthEntries(value);
+      return entries.length ? (
+        entries
+          .map(v => (
+            <EuiPanel
+              paddingSize='s'
+              key={`module_configuration_api_auth_${v.org_name}_${v.client_id}`}
+            >
+              <EuiDescriptionList
+                listItems={[
+                  { title: 'Organization', description: v.org_name },
+                  { title: 'Token', description: v.api_token },
+                ].filter(item => typeof item.description !== 'undefined')}
+              />
+            </EuiPanel>
+          ))
+          .reduce(
+            (prev, cur) => [
+              prev,
+              <div
+                key={`padding-len-${prev.length}`}
+                style={{ marginTop: '8px' }}
+              />,
+              cur,
+            ],
+            [],
+          )
+      ) : (
+        <EuiText>No credentials configured</EuiText>
+      );
+    },
   },
 ];
 
@@ -96,10 +106,11 @@ export const ModuleConfiguration = props => (
     moduleIconType={LogoGitHub}
     settings={settings}
     configurationAPIPartialPath='/wmodules/wmodules'
+    documentationPath='cloud-security/github/index.html'
     mapResponseConfiguration={(response, type, params) => {
       return type === 'agent'
-        ? mapWModuleConfigurationToRenderProperties(
-            response.data.data.wmodules,
+        ? mapModuleContentToRenderProperties(
+            response,
             'github',
             'Agent',
             params.name,

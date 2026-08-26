@@ -521,11 +521,23 @@ const NO_ANSWER_MESSAGE =
  * itself make.
  *
  * Every clause is load-bearing, so edit with care:
- *  - "using only the tool results already gathered" and "Do not state anything the results do not
- *    show" keep this from becoming a fabrication prompt. Asking a model to produce an answer it
- *    could not support is exactly how invented numbers and agent names appear, and the fallbacks
- *    above exist precisely because an honest silence was preferable to that. The instruction has
- *    to buy analysis WITHOUT buying invention.
+ *  - the DATA half ("every fact about this environment ... must come from the tool results already
+ *    gathered", "never state a data point the results do not show") keeps this from becoming a
+ *    fabrication prompt. Asking a model to produce an answer it could not support is exactly how
+ *    invented numbers and agent names appear, and the fallbacks above exist precisely because an
+ *    honest silence was preferable to that. The instruction has to buy analysis WITHOUT buying
+ *    invention.
+ *  - the ADVISORY half is what makes an explanation writable at all: a blanket "state nothing the
+ *    results do not show" also bans saying what a technique IS or what mitigates it, knowledge no
+ *    tool in this product returns. The split is between FACTS ABOUT THIS ENVIRONMENT (grounded, no
+ *    exceptions) and INTERPRETATION (general security knowledge, separated and hedged) -- the same
+ *    shape as the Group E how-to policy in prompts.ts. Two details are load-bearing: the DATA list
+ *    must stay explicitly non-exhaustive ("including but not limited to ... any other data point"),
+ *    because a closed list lets CVSS scores, versions, IPs, ports and paths fall through the ban;
+ *    and detection provenance is on the DATA side -- how a class of activity is TYPICALLY detected
+ *    is knowledge, but what detected this HERE is a rule id or detector name. The fence is
+ *    duplicated in buildSystemPrompt because this instruction only fires on a final, tool-using
+ *    round while the allowance there applies to every round; the two must stay in sync.
  *  - "If they do not answer the question, say so plainly" gives the model a licensed exit, so the
  *    honest outcome stays reachable rather than being squeezed out by the request for text.
  *  - no mention of tools being unavailable: the round already omits `tools` entirely, and naming
@@ -559,9 +571,20 @@ const NO_ANSWER_MESSAGE =
 export const ROUND_TEXT_SEPARATOR = '\n\n';
 
 export const FINAL_ROUND_ANSWER_INSTRUCTION =
-  "Now answer the user's question directly, using only the tool results already gathered in " +
-  'this conversation. Do not state anything the results do not show. If they do not answer the ' +
-  'question, say so plainly and state what is missing. This is your final step here: do ' +
+  "Now answer the user's question directly. Every FACT about this environment -- including but " +
+  'not limited to counts, names, ids, entities, timestamps, statuses, versions, scores, ' +
+  'addresses, ports, paths, control numbers, and any other data point describing what is in ' +
+  'this deployment -- must come from the tool results already gathered in this conversation: ' +
+  'never state a data point the results do not show, and if they do not answer the question, ' +
+  'say so plainly and state what is missing. What detected something HERE (rule ids, rule ' +
+  'titles, detectors) is one of those facts, not general knowledge: if the results do not name ' +
+  'it, say so instead of guessing. Explanation and recommendations are the exception: when the ' +
+  'question asks what an event, technique, rule or vulnerability means, why it matters, how ' +
+  'that class of activity is typically detected, or how to protect against it, you ' +
+  'MAY use your general security knowledge -- keep it in a clearly separate part of the answer, ' +
+  'framed as guidance rather than as something observed in the data, and note that it should be ' +
+  'verified before acting on it. Never present general knowledge as an environment fact, and ' +
+  'never invent data to support it. This is your final step here: do ' +
   'not announce further data pulls or say you will now fetch/break down anything else — no ' +
   'more tool calls will run. Offering the user a follow-up they can ASK for is fine. Then ' +
   'state plainly what the gathered results do and do not cover (for example, which agents, ' +
@@ -582,6 +605,15 @@ export const FINAL_ROUND_ANSWER_INSTRUCTION =
  * answer and there are no gathered results to reason over, so the instruction would be a lie.
  * That path's silence is a different defect with its own fix (the reasoning-channel fallback in
  * openai-compatible.ts) and its own fallback copy (NO_ANSWER_MESSAGE above).
+ *
+ * The role must stay `user`, never `system`: `server/providers/anthropic.ts` filters every
+ * `system`-role message OUT of `messages` and joins them into the request's TOP-LEVEL `system`
+ * field, so a `system`-delivered instruction is appended to the end of the multi-thousand-token
+ * system prompt instead of landing at the conversation tail -- leaving a `tool_result` as the last
+ * thing the model reads, which it is free to treat as a finished turn. A trailing `user` message is
+ * the tail on every adapter (Anthropic maps a `tool` message to `role: 'user'` too, and
+ * consecutive same-role messages are explicitly allowed there). Same reasoning applies to
+ * `withNoTextSynthesisInstruction` below.
  */
 export function withFinalRoundAnswerInstruction(
   messages: ChatMessage[],
@@ -593,7 +625,7 @@ export function withFinalRoundAnswerInstruction(
   }
   return [
     ...messages,
-    { role: 'system', content: FINAL_ROUND_ANSWER_INSTRUCTION },
+    { role: 'user', content: FINAL_ROUND_ANSWER_INSTRUCTION },
   ];
 }
 
@@ -651,6 +683,65 @@ export function isRoundFutile(
     return false;
   }
   return successfulCalls.every(call => call.isDuplicate || !call.hadRows);
+}
+
+/**
+ * Tools whose whole purpose is to ANSWER "what values/fields exist here" rather than to retrieve
+ * the rows an answer is built from. A zero-row result from one of these is a finding in itself,
+ * which is why `shouldGrantZeroRowWideningRound` below refuses to buy an extra round for a round
+ * made only of them. Kept as a named set rather than a single literal so the next discovery-class
+ * tool joins the rule by being listed, not by someone remembering this branch exists.
+ * `suggest_discover_query` is deliberately absent: it never produces a `tableEvent`, so it can
+ * never appear in a round's successful-call list at all (see that tool's own doc comment).
+ */
+const DISCOVERY_TOOL_NAMES: ReadonlySet<string> = new Set(['get_field_values']);
+
+function isDiscoveryToolCall(toolName: string): boolean {
+  return DISCOVERY_TOOL_NAMES.has(toolName);
+}
+
+/**
+ * ZERO-ROW WIDENING GRACE -- exactly ONE extra tool-bearing round after the turn's FIRST
+ * all-zero-row round, and never more.
+ *
+ * Why it exists: `isRoundFutile` above treats "every successful call returned zero rows"
+ * identically to "every successful call was a duplicate" and latches
+ * `budgetForcesFinalRoundEarly` at the call site below, so the next round is offered NO tools --
+ * making the system prompt's own "retry once with a broader filter" instruction unobeyable. The
+ * two halves are different findings: a duplicate proves the model is spinning, while a zero-row
+ * result proves only that the FILTER VALUE did not match, which is not the same as the data being
+ * absent.
+ *
+ * Every bound below is load-bearing; without them this becomes a retry loop, and the grace already
+ * costs latency on every turn it fires:
+ *  - `alreadyGranted` is a per-TURN latch, so the grace is given at most once no matter how many
+ *    zero-row rounds follow -- the second futile round latches the final round exactly as before;
+ *  - a round containing ANY duplicate call is refused outright (the spinning shape);
+ *  - a round whose only successful calls were DISCOVERY calls earns nothing: a zero-row discovery
+ *    probe has ANSWERED the model ("this field carries nothing here"), so an extra round there
+ *    funds more probing instead of widening a query that was too narrow;
+ *  - the caller still charges the round's cost first and still forces the final round when the
+ *    budget ceiling is spent, so this can never buy a round the budget cannot pay for.
+ *
+ * Returns `true` only when the round should be allowed one more tool-bearing round. Callers must
+ * pass only the round's SUCCESSFUL calls, the same array `isRoundFutile` reads, and must only ask
+ * once `isRoundFutile` has already returned `true`.
+ */
+export function shouldGrantZeroRowWideningRound(opts: {
+  successfulCalls: ReadonlyArray<{
+    toolName: string;
+    hadRows: boolean;
+    isDuplicate: boolean;
+  }>;
+  alreadyGranted: boolean;
+}): boolean {
+  if (opts.alreadyGranted || opts.successfulCalls.length === 0) {
+    return false;
+  }
+  if (opts.successfulCalls.every(call => isDiscoveryToolCall(call.toolName))) {
+    return false;
+  }
+  return opts.successfulCalls.every(call => !call.isDuplicate && !call.hadRows);
 }
 
 /**
@@ -814,9 +905,10 @@ export function willBeFinalRound(
  * text and does NOT qualify for (or fell through) the forced-synthesis retry below — shared by
  * every `!roundSawAnyDelta` exit point in `orchestrate` (via `emitNoTextFallback`: the normal
  * per-round `done` branch, the forced-round dead-stream guard, and the round-budget-exhausted
- * path) so this decision lives in exactly one place. The `toolUsedThisTurn && sawNonEmptyTable`
- * case (a real, non-empty table with no narration) no longer resolves here first:
- * `emitNoTextFallback` intercepts that case and only falls back to NO_ANALYSIS_TEXT_MESSAGE if
+ * path) so this decision lives in exactly one place. Any `toolUsedThisTurn` turn that recorded a
+ * digest -- a real non-empty table with no narration, or an all-empty turn -- no longer resolves
+ * here first:
+ * `emitNoTextFallback` intercepts that case and only falls back to this copy if
  * forced synthesis produced nothing AND there was no digest to derive a truthful sentence from
  * either (structurally unreachable in practice, since a non-empty table always yields a `digest`
  * event — kept as a defensive last resort, not a live path). Still exported for its own unit
@@ -957,9 +1049,11 @@ export function summarizeDigestForFallback(record: DigestRecord): string {
 }
 
 /**
- * Appended as a `system` message for the forced-synthesis retry call (case (a) below) only --
- * never added to `messages` itself, same "outbound copy only" rule as
- * `withFinalRoundAnswerInstruction`'s FINAL_ROUND_ANSWER_INSTRUCTION. Every clause is load-bearing
+ * Appended as a trailing `user` message for the forced-synthesis retry call (case (a) below) only
+ * -- never added to `messages` itself, same "outbound copy only" rule as
+ * `withFinalRoundAnswerInstruction`'s FINAL_ROUND_ANSWER_INSTRUCTION; see
+ * `withNoTextSynthesisInstruction` below for why the role is `user` and not `system`. Every clause
+ * is load-bearing
  * for the same reason that instruction's are: "using only the tool results already gathered" and
  * "Do not state anything the results do not show" keep this from becoming a fabrication prompt;
  * "Do not call any tools" is redundant with `tools` being omitted from this call's `streamOptions`
@@ -969,9 +1063,66 @@ export function summarizeDigestForFallback(record: DigestRecord): string {
  */
 export const NO_TEXT_SYNTHESIS_INSTRUCTION =
   'The tool call(s) above already returned results, but no written answer followed. Using only ' +
-  'the tool results already gathered in this conversation, write 2 to 4 plain sentences stating ' +
-  'the totals and key observations from those results. Do not state anything the results do not ' +
+  'the tool results already gathered in this conversation, write 2 to 4 plain sentences that ' +
+  'answer the question in its own terms, stating the totals and key observations from those ' +
+  'results. If a tool call above was rejected or errored, say what could not be checked. Do not ' +
+  'state anything the results do not show. Do not call any tools. Do not say there is nothing ' +
+  'to add.';
+
+/**
+ * ZERO-ROW sibling of NO_TEXT_SYNTHESIS_INSTRUCTION above, used when the turn's tool calls all came
+ * back EMPTY (no non-empty table was ever rendered).
+ *
+ * The alternative on this path is `buildNoMatchingResultsMessage`'s canned line, which is truthful
+ * but question-blind: it never says what the empty result MEANS for what was asked, which for a
+ * counting or negative-control question ("how many findings does this agent have") is the entire
+ * answer ("none").
+ *
+ * Worded separately from the non-empty instruction because the honest content is the opposite: the
+ * non-empty version asks for totals and observations, this one must NOT invite the model to explain
+ * an absence it cannot verify. "state plainly that nothing matched" plus "answer the question in
+ * its own terms" is the whole job; "Do not speculate about why" is the load-bearing fence -- an
+ * empty result has many possible causes (a filter, a time window, genuinely nothing there) and the
+ * digest's own `hint` already says so without the model guessing among them.
+ */
+export const NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY =
+  'The tool call(s) above returned no matching rows, and no written answer followed. In 1 to 3 ' +
+  'plain sentences, state plainly that nothing matched and answer the question in its own terms ' +
+  '(for a "how many" question, that means zero), naming the filters that were actually searched. ' +
+  'Do not speculate about why the result is empty and do not state anything the results do not ' +
   'show. Do not call any tools. Do not say there is nothing to add.';
+
+/**
+ * Delivers the forced-synthesis instruction as a trailing **user** message on the outbound COPY,
+ * never as a `system` message and never into `messages` itself.
+ *
+ * The role is the whole point and must not be "tidied" to `system`: the Anthropic Messages API does
+ * not keep system messages inside the message list -- `server/providers/anthropic.ts` filters every
+ * `system`-role message out of `messages` and joins them into the request's TOP-LEVEL `system`
+ * field, appended after the full system prompt. A `system`-delivered instruction therefore never
+ * reaches the conversation tail at all, leaving a `tool_result` as the last conversation entry,
+ * which the model is free to treat as a finished turn.
+ *
+ * A trailing `user` message lands at the tail on EVERY adapter: Anthropic maps a `tool` message to
+ * `role: 'user'` too, and consecutive same-role messages are explicitly allowed there (they are
+ * combined into one turn), so this is a request the model has to answer rather than a preference
+ * buried in the prompt prefix. `withFinalRoundAnswerInstruction` is delivered the same way, for the
+ * same reason.
+ */
+export function withNoTextSynthesisInstruction(
+  messages: ChatMessage[],
+  tableOnScreen: boolean,
+): ChatMessage[] {
+  return [
+    ...messages,
+    {
+      role: 'user',
+      content: tableOnScreen
+        ? NO_TEXT_SYNTHESIS_INSTRUCTION
+        : NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY,
+    },
+  ];
+}
 
 /** What `synthesizeNoTextFallback` reports back to `orchestrate` once it finishes -- mirrors
  * `Stage1Result`'s shape/reasoning: `usage` is `undefined` on every path that never actually made
@@ -1070,9 +1221,11 @@ function pickDigestForFallback(
  * caller's `noTextSynthesisAttempted` flag, not here -- this function itself is stateless and
  * would happily run again if called again, same division of responsibility as
  * `shouldConsiderDeferredOffer`/its caller). Called only when `orchestrate` has already
- * established `toolUsedThisTurn && sawNonEmptyTable` -- i.e. exactly the case the live failure
- * this replaces used to hand NO_ANALYSIS_TEXT_MESSAGE regardless of whether there was something to
- * analyze.
+ * established `toolUsedThisTurn` and recorded at least one digest -- i.e. exactly the case the live
+ * failure this replaces used to hand NO_ANALYSIS_TEXT_MESSAGE regardless of whether there was
+ * something to analyze. `opts.tableOnScreen` says whether the turn ended with a NON-EMPTY table or
+ * with every call empty: both are synthesizable from their digests, they just need different
+ * instructions, different suppression and a different last resort.
  *
  * Makes ONE extra `adapter.chatStream` call with NO `tools` offered (structurally unable to
  * re-enter the tool loop -- (c)'s "cannot re-enter" bound), asking the model to narrate the
@@ -1080,15 +1233,16 @@ function pickDigestForFallback(
  * table-suppression pipeline the turn's own rounds use, so the retry's text is held to the exact
  * same privacy and duplicate-table guarantees as everything else this turn streamed.
  *
- * (b): if the retry call errors, or ends without ever producing meaningful text, this falls back
- * to `summarizeDigestForFallback` on the LAST digest recorded this turn -- truthful and
- * deterministic, never the layout-lying NO_ANALYSIS_TEXT_MESSAGE.
+ * (b): if the retry call errors, or ends without ever producing meaningful text, this falls back to
+ * `opts.lastResortMessage` -- by default the digests' own coverage statement, and on a zero-row turn
+ * the caller's `noTextFallbackMessage` copy -- truthful and deterministic either way, never the
+ * layout-lying NO_ANALYSIS_TEXT_MESSAGE.
  *
  * (c) abort-safety: checked before the retry call is even attempted -- an aborted turn makes no
- * extra provider call, though it still yields the deterministic digest sentence below (never an
+ * extra provider call, though it still yields the deterministic sentence below (never an
  * extra MODEL-authored answer -- that is the "no extra text" this guarantees); the caller's own
- * `!roundSawAnyDelta` guard chain already covers the (rare, defensive) case of `digests` being empty
- * despite `sawNonEmptyTable` being true.
+ * `!roundSawAnyDelta` guard chain already covers the (rare, defensive) case of `digests` being
+ * empty.
  */
 export async function* synthesizeNoTextFallback(
   adapter: ProviderAdapter,
@@ -1097,34 +1251,54 @@ export async function* synthesizeNoTextFallback(
   signal: AbortSignal,
   privacyCtx: PrivacyContext | undefined,
   digests: DigestRecord[],
+  // Optional; the defaults are "non-empty table on screen, last resort = the digest coverage
+  // statement".
+  //  - `tableOnScreen: false` is the zero-row turn: it selects the empty-result instruction AND
+  //    leaves the duplicate-table suppressor OFF -- with no table rendered there is no duplicate to
+  //    suppress, and an active suppressor would silently eat a legitimate table the model writes
+  //    (see `MarkdownTableSuppressor`'s contract).
+  //  - `lastResortMessage` is what case (b) yields when the retry produces nothing, so the caller
+  //    keeps owning the fallback-copy decision (`noTextFallbackMessage`) instead of this function
+  //    growing a second copy of it.
+  opts?: { tableOnScreen?: boolean; lastResortMessage?: string },
 ): AsyncGenerator<StreamEvent, NoTextSynthesisResult, void> {
   const lastDigest = pickDigestForFallback(digests);
+  const tableOnScreen = opts?.tableOnScreen ?? true;
+  const lastResortMessage =
+    opts?.lastResortMessage ?? summarizeDigestsForFallback(digests);
 
   // Abort-safety (c) and the defensive no-digest case: neither attempts the extra call.
   if (signal.aborted || !lastDigest) {
     if (lastDigest) {
       // BLOCKER FIX (CV-069/079/080): cover EVERY digest gathered this turn, not just the last
       // one -- see `summarizeDigestsForFallback`'s doc comment.
-      yield { type: 'delta', content: summarizeDigestsForFallback(digests) };
+      yield { type: 'delta', content: lastResortMessage };
     }
     return { usage: undefined };
   }
 
-  const retryMessages: ChatMessage[] = [
-    ...messages,
-    { role: 'system', content: NO_TEXT_SYNTHESIS_INSTRUCTION },
-  ];
-  // Outbound scrub, same as every other adapter.chatStream call this turn makes.
-  const outboundMessages = privacyCtx
-    ? scrubMessagesForProvider(retryMessages, privacyCtx.pseudonymizer)
-    : retryMessages;
+  // Outbound scrub, same as every other adapter.chatStream call this turn makes. The instruction
+  // itself is appended AFTER the scrub (`withNoTextSynthesisInstruction` below): it is static
+  // first-party text with no user data in it, so there is nothing for the pseudonymizer to find,
+  // and running it through would only risk `prescanAndMint` mangling a word in our own copy --
+  // the same reasoning `withFinalRoundAnswerInstruction` records for FINAL_ROUND_ANSWER_INSTRUCTION.
+  const scrubbedMessages = privacyCtx
+    ? scrubMessagesForProvider(messages, privacyCtx.pseudonymizer)
+    : messages;
+  const outboundMessages = withNoTextSynthesisInstruction(
+    scrubbedMessages,
+    tableOnScreen,
+  );
   // Inbound un-scrub and duplicate-table suppression, same pipeline as every round of the main
-  // loop -- a non-empty table is already on screen (this function is only ever called when
-  // `sawNonEmptyTable` is true), so the suppressor starts ACTIVE, not lazily instantiated.
+  // loop. The suppressor starts ACTIVE only when a non-empty table is already on screen: on a
+  // zero-row turn there is nothing rendered to duplicate, so suppression must stay off rather than
+  // silently swallowing a table the model legitimately writes.
   const depseudonymizer = privacyCtx
     ? new StreamDepseudonymizer(privacyCtx.pseudonymizer)
     : undefined;
-  const tableSuppressor = new MarkdownTableSuppressor();
+  const tableSuppressor = tableOnScreen
+    ? new MarkdownTableSuppressor()
+    : undefined;
 
   /** Same drain contract as the main loop's `drainRoundBuffers` (this file, ~line 1678): flushes
    * the depseudonymizer's leftover buffer THROUGH the table suppressor before releasing the table
@@ -1132,7 +1306,9 @@ export async function* synthesizeNoTextFallback(
    * error, mid-stream abort, or a normal 'done'. */
   function drainBuffers(): string {
     let text = depseudonymizer ? depseudonymizer.flush() : '';
-    text = tableSuppressor.push(text) + tableSuppressor.flush();
+    if (tableSuppressor) {
+      text = tableSuppressor.push(text) + tableSuppressor.flush();
+    }
     return text;
   }
 
@@ -1167,7 +1343,7 @@ export async function* synthesizeNoTextFallback(
         let content = depseudonymizer
           ? depseudonymizer.push(event.content)
           : event.content;
-        if (content) {
+        if (content && tableSuppressor) {
           content = tableSuppressor.push(content);
         }
         if (content) {
@@ -1223,7 +1399,10 @@ export async function* synthesizeNoTextFallback(
   if (!producedText) {
     // BLOCKER FIX (CV-069/079/080): same coverage-statement fix as the abort-safety branch above --
     // describe every tool call this turn gathered, not only the one `pickDigestForFallback` chose.
-    yield { type: 'delta', content: summarizeDigestsForFallback(digests) };
+    // On a zero-row turn the caller supplies `noTextFallbackMessage`'s own copy instead, so a
+    // failed retry there degrades to EXACTLY the pre-change answer, never to a "the table below has
+    // the details" sentence pointing at an empty table.
+    yield { type: 'delta', content: lastResortMessage };
   }
 
   return { usage };
@@ -2516,6 +2695,11 @@ export async function* orchestrate(
   // remains #8911's own, narrower concern -- see `isRoundFutile`'s doc comment for why the two
   // never overlap).
   let budgetForcesFinalRoundEarly = false;
+  // Per-TURN latch for the one-and-only-one zero-row widening round (see
+  // `shouldGrantZeroRowWideningRound`). Set the first time the grace is granted and never reset, so
+  // the turn's second all-zero-row round closes it out like any other futile round -- this latch is
+  // the whole bound that keeps the mechanism from becoming a retry loop.
+  let zeroRowWideningRoundGranted = false;
   // Enumerable-remaining heuristic (product design item 3b): computed ONCE, from the turn's
   // CURRENT (most recent) user message, never re-derived mid-turn (see
   // `extractEnumeratedTargets`'s doc comment for exactly what it does and does not detect).
@@ -2587,16 +2771,27 @@ export async function* orchestrate(
    * first qualifying call flips `noTextSynthesisAttempted`, so even though three DIFFERENT exit
    * points in this function each reach `!roundSawAnyDelta` (only one of which can ever fire per
    * turn, since each is itself a terminating exit -- but the flag is kept anyway as a structural,
-   * not merely positional, guarantee). Turns that do not qualify (`!toolUsedThisTurn`, or a
-   * genuinely empty table) are untouched -- they still resolve through the original deterministic
-   * `noTextFallbackMessage`, exactly as before this mechanism existed. */
+   * not merely positional, guarantee). Turns that do not qualify (`!toolUsedThisTurn`, or no
+   * digest at all to ground a summary in) are untouched -- they still resolve through the original
+   * deterministic `noTextFallbackMessage`, exactly as before this mechanism existed. */
   let noTextSynthesisAttempted = false;
   async function* emitNoTextFallback(
     roundsExhausted: boolean,
   ): AsyncGenerator<StreamEvent> {
+    const deterministicMessage = noTextFallbackMessage(
+      toolUsedThisTurn,
+      sawNonEmptyTable,
+      roundsExhausted,
+      lastAttemptedToolCall,
+    );
+    // The gate deliberately does NOT require `sawNonEmptyTable`: a zero-row result is still an
+    // ANSWER ("none of your agents has a finding matching that") and the digest proving it is
+    // already in `turnDigests`. The three bounds that do matter: `toolUsedThisTurn` (a no-tool turn
+    // has nothing to synthesise from), at least one digest to ground the answer in, and once per
+    // turn. If the retry produces nothing, `lastResortMessage` hands back the deterministic copy,
+    // so the floor never drops.
     if (
       toolUsedThisTurn &&
-      sawNonEmptyTable &&
       !noTextSynthesisAttempted &&
       turnDigests.length > 0
     ) {
@@ -2608,18 +2803,22 @@ export async function* orchestrate(
         signal,
         privacyCtx,
         turnDigests,
+        {
+          tableOnScreen: sawNonEmptyTable,
+          // Only the zero-row case overrides the digest coverage statement: with a real table on
+          // screen that statement is the better last resort, because it names every tool call this
+          // turn made.
+          ...(sawNonEmptyTable
+            ? {}
+            : { lastResortMessage: deterministicMessage }),
+        },
       );
       usageTotals = addUsage(usageTotals, result.usage);
       return;
     }
     yield {
       type: 'delta',
-      content: noTextFallbackMessage(
-        toolUsedThisTurn,
-        sawNonEmptyTable,
-        roundsExhausted,
-        lastAttemptedToolCall,
-      ),
+      content: deterministicMessage,
     };
   }
 
@@ -3527,7 +3726,24 @@ export async function* orchestrate(
           target => !coveredEnumerationTargets.has(target.toLowerCase()),
         );
       if (isRoundFutile(roundSuccessfulCalls) && !sweepInProgress) {
-        budgetForcesFinalRoundEarly = true;
+        // The zero-row half of futility gets ONE widening round before the turn is closed out --
+        // see `shouldGrantZeroRowWideningRound`'s doc comment for every bound that keeps it to one.
+        // The duplicate half, and every subsequent futile round, still stop immediately.
+        if (
+          shouldGrantZeroRowWideningRound({
+            successfulCalls: roundSuccessfulCalls,
+            alreadyGranted: zeroRowWideningRoundGranted,
+          })
+        ) {
+          zeroRowWideningRoundGranted = true;
+          // The grace buys a ROUND, never budget: if this round's cost exhausted the ceiling the
+          // turn still ends here, exactly as it would have without the grace.
+          if (totalSpentUnits >= budgetCeiling) {
+            budgetForcesFinalRoundEarly = true;
+          }
+        } else {
+          budgetForcesFinalRoundEarly = true;
+        }
       } else if (totalSpentUnits >= budgetCeiling) {
         const roundHadNewInfo = roundSuccessfulCalls.some(
           call => !call.isDuplicate && call.hadRows,

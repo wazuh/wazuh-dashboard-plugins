@@ -41,8 +41,10 @@ export const searchFindingsByAgentTool: ToolDefinition = {
           type: 'string',
           description:
             'Exact agent name to filter by. Optional: omit this for a deictic host reference ' +
-            '("this box"/"this server") with no known name -- the call resolves to the only ' +
-            'active agent automatically.',
+            '("this box"/"this server") with no known name -- the call resolves automatically ' +
+            'when exactly one agent appears in the findings data, and is rejected with the ' +
+            'candidate names when more than one does. If the question names or describes a host ' +
+            'at all, pass that host here rather than omitting it.',
         },
         severity: severityProperty(),
         severity_comparison: severityComparisonProperty(),
@@ -60,13 +62,29 @@ export const searchFindingsByAgentTool: ToolDefinition = {
   // Issue: generic sole-candidate parameter resolution (template: #8913's
   // resolveDeicticAgentParams in get-agent-inventory.ts). A strictly-required `agent_name`
   // measured 0/40 invocations on deictic findings questions ("what happened on this host").
-  // `valueFrom: 'name'` since this param is matched as free text against `wazuh.agent.name`
-  // (see buildRequest below), not a numeric Manager id.
+  //
+  // The candidate source MUST be an `indexer-terms` aggregation over the exact index and field this
+  // tool's own `buildRequest` filters on, never `manager-agents`: the Manager's active-agent list and
+  // `wazuh-findings-v5*`'s `wazuh.agent.name` values are different populations. A deployment whose
+  // Manager API knows exactly ONE agent (the manager node) can still have many distinct agent names
+  // in the findings index, so a manager-agents lookup takes the `kind: 'single'` path and silently
+  // filters by an agent with no findings, while the ambiguity-enumerate branch that exists to refuse
+  // exactly that never fires because it counted the wrong population. Aggregating the field the query
+  // itself matches makes "is this ambiguous" a question about the data being searched.
+  //
+  // `valueFrom` is meaningless here -- an indexer-terms bucket key IS the agent name this param is
+  // matched as. `noteEntityKind: 'HOST'` is mandatory, not decorative: `wazuh.agent.name` values are
+  // hostnames, and without the declaration neither the assumption note nor the candidate list is
+  // pseudonymized under privacy mode.
   soleCandidateParams: [
     {
       param: 'agent_name',
-      source: { kind: 'manager-agents' },
-      valueFrom: 'name',
+      source: {
+        kind: 'indexer-terms',
+        index: 'wazuh-findings-v5*',
+        field: 'wazuh.agent.name',
+        noteEntityKind: 'HOST',
+      },
     },
   ],
   buildRequest(params) {

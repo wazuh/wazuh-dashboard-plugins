@@ -39,7 +39,21 @@ export interface ResolvedToolParams {
 
 export type ResolveParamsResult =
   | { ok: true; resolved: ResolvedToolParams }
-  | { ok: false; reason: string };
+  | {
+      ok: false;
+      reason: string;
+      /**
+       * Identifier values interpolated into `reason`, same contract as
+       * `ResolvedToolParams.noteEntities`: an AMBIGUITY reason that enumerates candidate hostnames is as
+       * much a wire-visible identifier disclosure as a resolved-value note is. `executor.ts`
+       * pseudonymizes these before the reason becomes the tool error the provider sees. Optional -- a
+       * resolver that names no identifiers omits it.
+       */
+      reasonEntities?: Array<{
+        value: string;
+        kind: 'HOST' | 'IP' | 'USER' | 'URL' | 'VAL';
+      }>;
+    };
 
 /**
  * Declarative "this param resolves to whichever value is the sole live candidate" spec (the
@@ -89,6 +103,17 @@ export interface SoleCandidateParamSpec {
         /** Narrows the aggregation to documents whose `field` equals whatever value the named
          * earlier param resolved to (or was already supplied as). Omitted means unscoped. */
         scopedBy?: { param: string; field: string };
+        /**
+         * Entity kind of the values this field holds, declared so `param-resolution.ts` can hand them to
+         * `ResolvedToolParams.noteEntities` / `reasonEntities` and `executor.ts`'s scrub chokepoint can
+         * pseudonymize them under privacy mode. REQUIRED for any `indexer-terms` field whose values are
+         * IDENTIFIERS (a hostname, an IP, a username): leaving one undeclared sends a real hostname to the
+         * provider in the clear, in an assumption note or a candidate list, under privacy mode. Omit it
+         * only when the values are catalog identifiers with nothing to declare (an SCA policy id).
+         * `manager-agents` needs no equivalent -- that branch declares its own HOST entities
+         * unconditionally.
+         */
+        noteEntityKind?: 'HOST' | 'IP' | 'USER' | 'URL' | 'VAL';
       };
   valueFrom?: 'id' | 'name' | 'id-or-name';
 }

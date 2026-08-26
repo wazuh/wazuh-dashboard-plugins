@@ -76,7 +76,12 @@ export const searchWazuhDataTool: ToolDefinition = {
       'parameter below for every family this can reach: findings, events, current-state ' +
       '(vulnerabilities/FIM/SCA/inventory), operational metrics, CTI feed status, Security ' +
       'Analytics findings/rule catalog, and the raw threat-intel CVE/IOC feeds). Prefer a typed ' +
-      'tool first when one matches the question — this tool never overrides one. Executes a ' +
+      'tool first when one matches the question — this tool never overrides one. Use it ONLY ' +
+      'when no dedicated tool covers the surface the question is about: a typed tool returns ' +
+      'curated, labelled columns and population-true totals this tool cannot, so reaching here ' +
+      'while a named tool covers the ask produces a worse answer even when both find the same ' +
+      "rows. In particular, never pick this tool merely to avoid a typed tool's parameters. " +
+      'Executes a ' +
       'read-only _search; nothing is written or modified. All constraints below are re-checked ' +
       'and clamped server-side, and a violation is returned to you as an error you can correct ' +
       'and retry once: use filter context (bool.filter; "must" is accepted but ' +

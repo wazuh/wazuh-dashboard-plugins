@@ -331,7 +331,12 @@ describe('AssistantChatPanel', () => {
     openConversationsPopover();
     const popover = await getPopoverPanel();
 
-    fireEvent.click(within(popover).getByLabelText('Delete conversation'));
+    // The row's actions live behind an overflow menu now; its panel is portaled out of this
+    // popover, so the entries are looked up on `screen` rather than within it.
+    fireEvent.click(within(popover).getByLabelText('Conversation actions'));
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Delete conversation' }),
+    );
     fireEvent.click(await screen.findByRole('button', { name: 'Delete' }));
 
     expect(mockDeleteConversation).toHaveBeenCalledWith('c1');
@@ -346,12 +351,60 @@ describe('AssistantChatPanel', () => {
     openConversationsPopover();
     const popover = await getPopoverPanel();
 
-    fireEvent.click(within(popover).getByLabelText('Rename conversation'));
+    fireEvent.click(within(popover).getByLabelText('Conversation actions'));
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Rename conversation' }),
+    );
     const input = within(popover).getByLabelText('Conversation title');
     fireEvent.change(input, { target: { value: 'New title' } });
     fireEvent.keyDown(input, { key: 'Enter' });
 
     expect(mockRenameConversation).toHaveBeenCalledWith('c1', 'New title');
+  });
+
+  /**
+   * Two nested popovers, one Escape. This surface is the only place they stack — the row's overflow
+   * menu opens INSIDE the docked conversations popover — so it is where an EUI bump is most likely
+   * to break something quietly: an Escape meant for the inner menu dismissing the whole
+   * conversations panel and losing the user's place.
+   *
+   * SCOPE, measured not assumed: only the FIRST half of that is assertable here. This pins that
+   * Escape closes the inner menu while nested inside the outer popover — remove
+   * `closeRowMenu()` from the row's handler and this fails.
+   *
+   * The second half — the outer popover surviving — is NOT testable in jsdom, and a test claiming
+   * to cover it would be vacuous. Verified by mutation: deleting the `event.stopPropagation()` that
+   * protects the outer panel changes nothing here, because `fireEvent.keyDown` does not move focus
+   * into the panel, so EUI's outer focus trap never treats the Escape as its own and never begins
+   * closing (its `euiPopover__panel-isOpen` class is still set 400ms later, guard or no guard). In a
+   * real browser `ownFocus` has moved focus inside, which is exactly the condition jsdom cannot
+   * reproduce. That half stays a manual check on the evidence pass: open a conversation's menu in
+   * the docked panel, press Escape, confirm the panel is still open behind it.
+   */
+  it('Escape inside a nested row menu closes that menu', async () => {
+    renderPanel();
+    fireEvent.click(screen.getByText('emit one conversation, active'));
+
+    openConversationsPopover();
+    const popover = await getPopoverPanel();
+
+    const trigger = within(popover).getByLabelText('Conversation actions');
+    fireEvent.click(trigger);
+    expect(
+      await screen.findByRole('button', { name: 'Rename conversation' }),
+    ).toBeInTheDocument();
+
+    fireEvent.keyDown(trigger, { key: 'Escape' });
+
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('button', { name: 'Rename conversation' }),
+      ).toBeNull(),
+    );
+    // The row itself is untouched by the dismissal — its trigger is still there to reopen.
+    expect(
+      within(popover).getByLabelText('Conversation actions'),
+    ).toBeInTheDocument();
   });
 
   it("bulk-deleting from the popover calls ChatPage's bulkDeleteConversations", async () => {

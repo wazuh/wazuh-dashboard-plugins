@@ -3,6 +3,7 @@ import {
   aggLimitProperty,
   clampAggLimit,
   objectSchema,
+  SCA_CURRENT_STATE_NOTE,
   validateAgentId,
 } from './common';
 
@@ -41,7 +42,8 @@ export const getScaResultsTool: ToolDefinition = {
       'The compliance ratio is passed/(passed+failed). NOT for Security Analytics pipeline ' +
       'policies -- SCA is a per-agent scan result, unrelated to that pipeline configuration; if ' +
       'the question is actually about pipeline policies and get_threat_intel_components (with ' +
-      'component_type="policies") is available to you this turn, use that one instead.',
+      'component_type="policies") is available to you this turn, use that one instead. ' +
+      SCA_CURRENT_STATE_NOTE,
     parameters: objectSchema(
       {
         agent_id: {
@@ -49,7 +51,10 @@ export const getScaResultsTool: ToolDefinition = {
           description:
             'Numeric Wazuh agent ID, e.g. "003". Optional: omit this for a deictic host ' +
             'reference ("this box"/"this server") with no known id -- the call resolves to the ' +
-            'only active agent automatically.',
+            'only active agent automatically. If the user named a host (e.g. "web-server-01"), ' +
+            'resolve that name to its numeric id first and pass it here: omitting this parameter ' +
+            'does NOT search across agents, it resolves to a single agent, so an unscoped call ' +
+            'answers about the wrong host.',
         },
         limit: aggLimitProperty('SCA policies', 20),
       },
