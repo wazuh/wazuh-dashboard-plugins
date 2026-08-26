@@ -1189,54 +1189,72 @@ function expandToFullToken(
  * that runs after it. */
 const TECHNIQUE_ID_TOKEN_RE = /^T\d+(?:\.\d+)+$/;
 
-/** Every dot-path SEGMENT word appearing in a Wazuh/ECS field name known to this plugin — drawn
- * from three sources, all lowercased: `WAZUH_FIELD`'s values, every plain field in
- * `FIELD_POLICY_DEFAULTS` (a tool-scope "toolName/" prefix and the trailing ".*" wildcard are
- * stripped first, since those aren't part of the path itself), and — since issue #1529 — every path
- * in `FIELD_CATALOG`, the generated Wazuh Common Schema catalog (`common/field-catalog.ts`).
- * Self-updating: a field added to any of the three is automatically recognized here — no separate
- * list to hand-maintain. Used by `isFieldPathToken` below.
- *
- * WHY THE CATALOG HAD TO BE ADDED (issue #1529): the first two sources only carry the ~10 fields
- * the field policy curates, so the surviving set was not "field names" but "field names assembled
- * entirely from words the plugin's own policy happens to ship". Any other indexed field whose LEAF
- * word was new got minted as a HOST_n — live-captured on the wire as
- * `"columns": ["HOST_1","HOST_2","HOST_3","wazuh.agent.name","HOST_4"]`, where `related.hosts`
- * (`related`/`hosts`: neither word appears in a policy row), `related.ip`, `related.user` and
- * `wazuh.cluster.node` (`node` appears in no `WAZUH_FIELD` value) were all mangled while the
- * sibling `wazuh.cluster.name` survived. The model is then handed a table whose columns are named
- * `HOST_1`..`HOST_n` and cannot tell what any of them holds. The catalog is the full set of indexed
- * WCS paths (5388 of them), so it recognizes every field a query can actually return.
- *
- * WHY THIS DOES NOT WEAKEN THE VALUE SCAN — the property that keeps this safe is
- * `isFieldPathToken`'s ALL-segments rule combined with what the catalog does NOT contain: no
- * public TLD or hostname-suffix word (`com`, `net`, `org`, `local`, `lan`, `internal`, `www`,
- * `mail`, `corp`, `example`) is a WCS path segment. A real dotted hostname VALUE therefore always
- * ends in a segment outside this vocabulary and keeps minting — pinned by the value-position tests
- * in privacy.test.ts. What the widening does exclude is exactly the class this fix targets: dotted
- * tokens whose every segment is a schema word, i.e. field NAMES. */
+/** The curated field paths this plugin's own policy ships, normalized: a tool-scope "toolName/"
+ * prefix and a trailing ".*" wildcard are stripped (neither is part of the path itself), then
+ * lowercased. Feeds both sets below. */
+const CURATED_FIELD_PATHS: ReadonlyArray<string> = [
+  ...Object.values(WAZUH_FIELD),
+  ...FIELD_POLICY_DEFAULTS.map(entry => entry.field),
+]
+  .map(field => field.split('/').pop() as string)
+  .map(field => field.replace(/\.\*$/, '').toLowerCase());
+
+/** Every dot-path SEGMENT word appearing in a CURATED field name — see `CURATED_FIELD_PATHS`.
+ * Self-updating: a field added to either source is automatically recognized here. Used by
+ * `isFieldPathToken` below, whose ALL-segments rule is deliberately kept on this SMALL vocabulary
+ * only (~30 words); see the exact-path set below for why it was not widened to the catalog. */
 const FIELD_PATH_WORDS: ReadonlySet<string> = new Set(
-  [
-    ...Object.values(WAZUH_FIELD),
-    ...FIELD_POLICY_DEFAULTS.map(entry => entry.field),
-    ...Object.values(FIELD_CATALOG).flat(),
-  ]
-    .map(field => field.split('/').pop() as string) // drop a "toolName/" scoping prefix, if any
-    .flatMap(field => field.replace(/\.\*$/, '').split('.'))
-    .map(segment => segment.toLowerCase())
-    .filter(segment => segment.length > 0),
+  CURATED_FIELD_PATHS.flatMap(field => field.split('.')).filter(
+    segment => segment.length > 0,
+  ),
 );
 
-/** True when every '.'-separated segment of `token` is a known field-path word (see
- * `FIELD_PATH_WORDS`) — i.e. `token` reads as the user NAMING A FIELD (e.g. typing
- * "wazuh.agent.name" or "wazuh.rule.id" into their own question), not an actual hostname.
- * Deliberately requires ALL segments to match, not just one: a real hostname composed entirely of
- * words that also happen to be field-path vocabulary is exotic enough to accept the (favorable)
- * tradeoff of never mangling a user's own field-path mention into a broken HOST_n token. */
+/** Every field path this plugin knows to EXIST, as a whole lowercased path: the curated ones plus —
+ * since issue #1529 — every path in `FIELD_CATALOG`, the generated Wazuh Common Schema catalog
+ * (`common/field-catalog.ts`, the full set of indexed WCS paths).
+ *
+ * WHY THE CATALOG IS NEEDED (issue #1529): `FIELD_PATH_WORDS` only carries the words of the ~10
+ * fields the field policy curates, so the tokens surviving the outbound FQDN scan were not "field
+ * names" but "field names assembled entirely from words the plugin's own policy happens to ship".
+ * Any other indexed field whose LEAF word was new got minted as a HOST_n — live-captured on the
+ * wire as `"columns": ["HOST_1","HOST_2","HOST_3","wazuh.agent.name","HOST_4"]`, where
+ * `related.hosts` (`related`/`hosts`: neither word appears in a policy row), `related.ip`,
+ * `related.user` and `wazuh.cluster.node` (`node` appears in no `WAZUH_FIELD` value) were all
+ * mangled while the sibling `wazuh.cluster.name` survived. The model is then handed a table whose
+ * columns are named `HOST_1`..`HOST_n` and cannot tell what any of them holds.
+ *
+ * WHY WHOLE-PATH AND NOT THE ALL-SEGMENTS RULE — this is the narrower of the two options and the
+ * reason the value scan is not weakened at all. Flattening the catalog into SEGMENT words would add
+ * ~550 words to the ALL-segments vocabulary, and those words include ordinary hostname material:
+ * `host`, `hostname`, `server`, `home`, `dns`, `data`, `log`, `cloud`, `network`, and the real TLD
+ * `io`. Dotted hostname VALUES such as `server.home` (a router-assigned local name) or `data.io`
+ * would then have every segment "known" and would stop being pseudonymized — a value-position
+ * privacy regression traded for no extra coverage, since every field name in the #1529 capture is
+ * an EXACT catalog path. Matching the whole path admits exactly the field names that exist and
+ * nothing else; both properties are pinned by tests in privacy.test.ts. */
+const KNOWN_FIELD_PATHS: ReadonlySet<string> = new Set([
+  ...CURATED_FIELD_PATHS,
+  ...Object.values(FIELD_CATALOG)
+    .flat()
+    .map(field => field.toLowerCase()),
+]);
+
+/** True when `token` reads as the user NAMING A FIELD (e.g. typing "wazuh.agent.name" or
+ * "related.hosts" into their own question, or a digest's `columns` hint listing them), not an
+ * actual hostname. Two ways to qualify:
+ *
+ * 1. `token` IS a known field path (`KNOWN_FIELD_PATHS`) — exact, so it can never match a value.
+ * 2. every '.'-separated segment of `token` is a curated field-path word (`FIELD_PATH_WORDS`).
+ *    Requires ALL segments, not just one: on that small curated vocabulary, a real hostname
+ *    composed entirely of policy words is exotic enough to accept the (favorable) tradeoff of never
+ *    mangling a user's own field-path mention into a broken HOST_n token. Kept for field mentions
+ *    that are real but absent from the catalog (a tool-shaped path, a newer field). */
 function isFieldPathToken(token: string): boolean {
-  return token
-    .split('.')
-    .every(segment => FIELD_PATH_WORDS.has(segment.toLowerCase()));
+  const lower = token.toLowerCase();
+  return (
+    KNOWN_FIELD_PATHS.has(lower) ||
+    lower.split('.').every(segment => FIELD_PATH_WORDS.has(segment))
+  );
 }
 
 /**
@@ -1878,8 +1896,7 @@ export function extractAggFields(
   // the escape hatch passes the model's raw body through. Reading only `aggs` would leave the
   // breakdown of an `aggregations`-spelled query unattributed, and therefore unscrubbed.
   const aggs = (body?.aggs ?? body?.aggregations) as
-    | Record<string, unknown>
-    | undefined;
+    Record<string, unknown> | undefined;
   if (!aggs) {
     return undefined;
   }

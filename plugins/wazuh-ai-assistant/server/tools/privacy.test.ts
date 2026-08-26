@@ -166,9 +166,8 @@ test('prescanAndMint: a whole digest columns hint survives the schema vocabulary
 });
 
 test('prescanAndMint: schema vocabulary still mints real dotted hostname VALUES', () => {
-  // The safety property behind the widening: no public TLD / hostname-suffix word is a WCS path
-  // segment, and `isFieldPathToken` requires EVERY segment to be a schema word — so a value in a
-  // value position keeps minting even when its leading labels are schema-ish words.
+  // The safety property: the WCS catalog is consulted as WHOLE PATHS, so a value can only be
+  // spared by the small curated-word vocabulary — never by a catalog path's segment words.
   for (const hostname of [
     'ai-qa-aio-node.corp.example.com',
     'lists.ubuntu.com',
@@ -176,6 +175,14 @@ test('prescanAndMint: schema vocabulary still mints real dotted hostname VALUES'
     'host.agent.local',
     'user.process.internal',
     'agent.name.example.net',
+    // QA regression guard: these are assembled ENTIRELY from WCS path segment words — "server" /
+    // "home", "data" / "io" ("io" is also a real TLD, ".home" a real router-assigned local
+    // suffix), "dns" / "cloud" / "host". Had the catalog been flattened into the ALL-segments
+    // vocabulary instead of matched whole-path, every segment would have counted as "known" and
+    // these would have stopped being pseudonymized. None is a field path, so all must still mint.
+    'server.home',
+    'data.io',
+    'dns.cloud.host',
   ]) {
     const p = new Pseudonymizer();
     const out = prescanAndMint(`connect to ${hostname} now`, p);
@@ -842,7 +849,9 @@ test('applyFieldPolicy: wazuh.cluster.node is pseudonymized as a HOST while wazu
   const p = new Pseudonymizer();
   const digest = baseDigest({
     columns: ['wazuh.cluster.name', 'wazuh.cluster.node'],
-    samples: [{ 'wazuh.cluster.name': 'wazuh', 'wazuh.cluster.node': 'a-node' }],
+    samples: [
+      { 'wazuh.cluster.name': 'wazuh', 'wazuh.cluster.node': 'a-node' },
+    ],
   });
   const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
   // The configured label is curated vocabulary -- it stays readable so the model can still tell
@@ -861,9 +870,7 @@ test('applyFieldPolicy: wazuh.cluster.node is pseudonymized as a HOST while wazu
 test('applyFieldPolicy: the same host reaching the digest twice gets ONE pseudonym across both fields', () => {
   const p = new Pseudonymizer();
   const digest = baseDigest({
-    samples: [
-      { 'wazuh.agent.name': 'a-node', 'wazuh.cluster.node': 'a-node' },
-    ],
+    samples: [{ 'wazuh.agent.name': 'a-node', 'wazuh.cluster.node': 'a-node' }],
   });
   const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
   assert.equal(
