@@ -130,6 +130,67 @@ test('prescanAndMint: still mints a real hostname that is not field-path or vers
   assert.doesNotMatch(out, /backup-vault\.internal\.corp/);
 });
 
+// --- prescanAndMint: #1529 schema-vocabulary widening (WCS catalog) ---------------------------
+//
+// The reported corruption: the field policy curates ~10 fields, so `FIELD_PATH_WORDS` only knew
+// THOSE paths' words and every other indexed field name was minted as a hostname. Wire capture:
+//   "samples": [{"wazuh.agent.name":"HOST_5","HOST_4":"ai-qa-aio-node"}],
+//   "columns": ["HOST_1","HOST_2","HOST_3","wazuh.agent.name","HOST_4"]
+// with related.hosts -> HOST_1, related.ip -> HOST_2, related.user -> HOST_3,
+// wazuh.cluster.node -> HOST_4. The vocabulary is now unioned with `FIELD_CATALOG`, so a token
+// whose every '.'-segment is a known SCHEMA word is never minted.
+
+test('prescanAndMint: leaves the #1529 reported field names untouched', () => {
+  for (const fieldName of [
+    'related.hosts',
+    'related.ip',
+    'related.user',
+    'wazuh.cluster.node',
+    // The sibling that already survived — pinned so the union cannot regress it.
+    'wazuh.cluster.name',
+  ]) {
+    const p = new Pseudonymizer();
+    const out = prescanAndMint(`the ${fieldName} column is empty`, p);
+    assert.doesNotMatch(out, /HOST_\d+/, `${fieldName} was minted`);
+    assert.ok(out.includes(fieldName), `${fieldName} was rewritten`);
+    assert.equal(p.newEntries().length, 0);
+  }
+});
+
+test('prescanAndMint: a whole digest columns hint survives the schema vocabulary', () => {
+  const p = new Pseudonymizer();
+  const columnsHint =
+    '["related.hosts","related.ip","related.user","wazuh.agent.name","wazuh.cluster.node"]';
+  assert.equal(prescanAndMint(columnsHint, p), columnsHint);
+  assert.equal(p.newEntries().length, 0);
+});
+
+test('prescanAndMint: schema vocabulary still mints real dotted hostname VALUES', () => {
+  // The safety property: the WCS catalog is consulted as WHOLE PATHS, so a value can only be
+  // spared by the small curated-word vocabulary — never by a catalog path's segment words.
+  for (const hostname of [
+    'ai-qa-aio-node.corp.example.com',
+    'lists.ubuntu.com',
+    // Leading labels ARE schema words ("host", "agent", "user", "process"); the suffixes are not.
+    'host.agent.local',
+    'user.process.internal',
+    'agent.name.example.net',
+    // QA regression guard: these are assembled ENTIRELY from WCS path segment words — "server" /
+    // "home", "data" / "io" ("io" is also a real TLD, ".home" a real router-assigned local
+    // suffix), "dns" / "cloud" / "host". Had the catalog been flattened into the ALL-segments
+    // vocabulary instead of matched whole-path, every segment would have counted as "known" and
+    // these would have stopped being pseudonymized. None is a field path, so all must still mint.
+    'server.home',
+    'data.io',
+    'dns.cloud.host',
+  ]) {
+    const p = new Pseudonymizer();
+    const out = prescanAndMint(`connect to ${hostname} now`, p);
+    assert.match(out, /HOST_\d+/, `${hostname} was not minted`);
+    assert.ok(!out.includes(hostname), `${hostname} survived verbatim`);
+  }
+});
+
 // --- prescanAndMint / prescanAndMintToolContent: #8920 item 8 version-grammar coverage --------
 //
 // The reported instances were two Ubuntu `dpkg -l` versions ("3.118ubuntu5",
@@ -778,6 +839,57 @@ test('applyFieldPolicy: explicit "allow" entry is unaffected by isEscapeHatch', 
 });
 
 // --- get_agent_inventory's deriveColumns/isEscapeHatch fail-closed default, against the REAL
+// The cluster node name reached the provider in clear under privacy mode ON, because a single
+// `wazuh.cluster.*` wildcard swept the cluster's configured LABEL and a machine's HOSTNAME into
+// one `allow`. The compensating value-shape scan could not catch it either: `FQDN_TOKEN_RE`
+// requires a dot, so a bare single-word node name is never minted by shape, and the documented
+// fallback for a bare-word hostname is the field-policy scrub -- which was this `allow`.
+
+test('applyFieldPolicy: wazuh.cluster.node is pseudonymized as a HOST while wazuh.cluster.name stays readable', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    columns: ['wazuh.cluster.name', 'wazuh.cluster.node'],
+    samples: [
+      { 'wazuh.cluster.name': 'wazuh', 'wazuh.cluster.node': 'a-node' },
+    ],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  // The configured label is curated vocabulary -- it stays readable so the model can still tell
+  // which cluster a document belongs to.
+  assert.equal(out.samples[0]['wazuh.cluster.name'], 'wazuh');
+  // The node name is a real machine's hostname: replaced, and with a HOST-kind pseudonym so it
+  // shares a namespace with wazuh.agent.name/host.hostname rather than minting a second token for
+  // the same host.
+  assert.notEqual(out.samples[0]['wazuh.cluster.node'], 'a-node');
+  assert.match(String(out.samples[0]['wazuh.cluster.node']), /^HOST_\d+$/);
+  // The KEY must survive: the reported symptom was exactly inverted -- the value stayed in clear
+  // while the field NAME arrived as HOST_1, so the model could not tell what the column meant.
+  assert.deepEqual(out.columns, ['wazuh.cluster.name', 'wazuh.cluster.node']);
+});
+
+test('applyFieldPolicy: the same host reaching the digest twice gets ONE pseudonym across both fields', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    samples: [{ 'wazuh.agent.name': 'a-node', 'wazuh.cluster.node': 'a-node' }],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  assert.equal(
+    out.samples[0]['wazuh.cluster.node'],
+    out.samples[0]['wazuh.agent.name'],
+  );
+});
+
+// Order matters: `resolveFieldEntry` returns the FIRST matching entry, so the two exact entries
+// have to sit ABOVE the surviving `wazuh.cluster.*` wildcard or the wildcard would still win.
+test('FIELD_POLICY_DEFAULTS: the exact wazuh.cluster entries precede the wildcard', () => {
+  const index = (field: string) =>
+    FIELD_POLICY_DEFAULTS.findIndex(entry => entry.field === field);
+  const wildcard = index('wazuh.cluster.*');
+  assert.ok(wildcard >= 0, 'the wildcard is still present as the catch-all');
+  assert.ok(index('wazuh.cluster.name') < wildcard);
+  assert.ok(index('wazuh.cluster.node') < wildcard);
+});
+
 // FIELD_POLICY_DEFAULTS (not a hand-built test-local policy): confirms the explicit 'allow'
 // entries added for it actually land where they need to, and that the fields which must stay
 // anonymized on this same tool still do. Regression guard for the "which fields are safe to allow
@@ -2912,6 +3024,99 @@ test('applyFieldPolicy: host.hostname is pre-minted for the prose scan too', () 
     out.samples[0][WAZUH_FIELD.RULE_TITLE],
     `Configuration drift on ${token}`,
   );
+});
+
+// --- #1524: the aggregation half of the prose pre-mint ----------------------------------------
+//
+// Reported: with privacy ON, `wazuh.rule.title` reached the provider as
+// "Secret or credential accessed from vault - AI-QA-AGENT-WIN$" — the estate's real NetBIOS
+// hostname, in a BUCKET digest whose rows carry `{key, doc_count, wazuh.rule.title, ...}` and whose
+// agent names live under the agg `key` / in `breakdown`. Neither position was pre-minted, so the
+// dictionary was empty when the title was scanned.
+
+test('applyFieldPolicy: #1524 an agent name in the agg bucket key scrubs the rule title too', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_top_agents',
+    samples: [
+      {
+        key: 'AI-QA-AGENT-WIN',
+        doc_count: 10,
+        [WAZUH_FIELD.RULE_TITLE]:
+          'Secret or credential accessed from vault - AI-QA-AGENT-WIN$',
+      },
+    ],
+    columns: ['key', 'doc_count', WAZUH_FIELD.RULE_TITLE],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p, {
+    by_agent: scalarSpec(WAZUH_FIELD.AGENT_NAME),
+  });
+  const token = out.samples[0].key as string;
+  assert.match(token, /^HOST_\d+$/);
+  // Cross-field pseudonym CONSISTENCY: the title carries the same token the key does, not a second
+  // mint — and the real hostname is gone from both.
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    `Secret or credential accessed from vault - ${token}$`,
+  );
+  assert.doesNotMatch(JSON.stringify(out), /AI-QA-AGENT-WIN/i);
+});
+
+test('applyFieldPolicy: #1524 an agent name carried only by BREAKDOWN scrubs the rule title', () => {
+  // The name never appears as a sample value at all — it is one key over, in the bucket list of the
+  // same response payload. Before the pre-mint walked `breakdown`, the samples loop scrubbed the
+  // title while the name was still unknown.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_top_agents',
+    samples: [
+      {
+        doc_count: 10,
+        [WAZUH_FIELD.RULE_TITLE]:
+          'Successful user authentication - AI-QA-AGENT-WIN',
+      },
+    ],
+    columns: ['doc_count', WAZUH_FIELD.RULE_TITLE],
+    breakdown: [{ key: 'AI-QA-AGENT-WIN', count: 10, agg: 'by_agent' }],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p, {
+    by_agent: scalarSpec(WAZUH_FIELD.AGENT_NAME),
+  });
+  const token = out.breakdown?.[0].key as unknown as string;
+  assert.match(token, /^HOST_\d+$/);
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    `Successful user authentication - ${token}`,
+  );
+  assert.doesNotMatch(JSON.stringify(out), /AI-QA-AGENT-WIN/i);
+});
+
+test('applyFieldPolicy: #1524 a hostname NEVER carried by the payload is still left verbatim', () => {
+  // The by-construction false-positive guard, stated as a limitation: this is KNOWN-ROSTER
+  // scrubbing. Nothing is guessed from prose, so a bare name the payload never carries as a value
+  // (and no earlier turn minted) is untouched — and, the point of the guard, an ordinary word in a
+  // title can never be replaced either.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_top_agents',
+    samples: [
+      {
+        key: 'AI-QA-AGENT-WIN',
+        doc_count: 10,
+        [WAZUH_FIELD.RULE_TITLE]:
+          'Secret or credential accessed from vault on some-other-host',
+      },
+    ],
+    columns: ['key', 'doc_count', WAZUH_FIELD.RULE_TITLE],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p, {
+    by_agent: scalarSpec(WAZUH_FIELD.AGENT_NAME),
+  });
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    'Secret or credential accessed from vault on some-other-host',
+  );
+  assert.match(out.samples[0].key as string, /^HOST_\d+$/);
 });
 
 test('applyFieldPolicy: a HOST-kind field OUTSIDE the curated pre-mint list is not pre-minted', () => {

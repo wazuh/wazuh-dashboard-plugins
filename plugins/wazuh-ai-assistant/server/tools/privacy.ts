@@ -1,4 +1,5 @@
 import { Digest } from './digest';
+import { FIELD_CATALOG } from '../../common/field-catalog';
 import { WAZUH_FIELD } from '../../common/wazuh-fields';
 
 /**
@@ -152,6 +153,13 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // `IDENTIFIER_BEARING_FREE_TEXT_FIELDS` now gets (this field is one; see rule.title's note above
   // for exactly which part of the residual that closes and which part stays).
   { field: 'document.metadata.description', action: 'allow' },
+  // The Sigma rule document's own UUID, newly projected/sampled by get_rules so an answer can
+  // cite the id it was asked about (and so a "list the rules with their UUIDs" question is
+  // answerable at all). Reviewed 'allow': it is a vendor-minted identifier for a RULESET
+  // document, not for anything in the customer's estate -- it names no host, account, address or
+  // file. Pseudonymizing it would defeat the point (the answer could not name the rule the user
+  // asked about, and the user typed the value in the question) while protecting nothing.
+  { field: 'document.id', action: 'allow' },
   // Curated benchmark/policy content (CIS etc.), not analyst/attacker-supplied — reviewed 'allow'.
   { field: 'check.id', action: 'allow' },
   { field: 'check.name', action: 'allow' },
@@ -436,8 +444,29 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'wazuh.agent.config.group.synced', action: 'allow' },
 
   // wazuh-metrics-comms / wazuh-metrics-agents / wazuh-metrics-normalization (shared fields):
-  // manager cluster identity -- admin-configured infra naming (e.g. "wazuh"), not a person or a
-  // network address; same class as `policy.name`/`document.name` above, not `host.hostname`.
+  // manager cluster identity. The single `wazuh.cluster.*` wildcard used to sweep both members of
+  // this object into one `allow`, and they are NOT the same class:
+  //
+  // - `wazuh.cluster.name` is the cluster's CONFIGURED LABEL, commonly the default "wazuh" -- the
+  //   curated-vocabulary case `allow` is reserved for, same class as `policy.name`/`document.name`
+  //   above.
+  // - `wazuh.cluster.node` is a HOSTNAME the operator chose for a specific machine, and it
+  //   identifies that machine on every single document carrying it. That is `host.hostname`'s
+  //   class, not a curated label, and the model never needs the real value to answer anything.
+  //
+  // Under `allow` the node name reached the provider completely unscanned even with privacy mode
+  // ON, and the second layer could not compensate: `prescanAndMintToolContent`'s
+  // `FQDN_TOKEN_RE` requires at least one dot, so a bare single-word node name is never minted by
+  // shape, and the documented fallback for a bare-word hostname is the field-policy scrub -- which
+  // was this `allow`. The two gaps covered for each other, so the value passed both. Worse, a
+  // pseudonym for the same host minted from a sibling field meant the KEY was rewritten to
+  // `HOST_n` while the VALUE stayed in clear: exactly inverted.
+  //
+  // Both exact entries must precede the wildcard -- `resolveFieldEntry` takes the FIRST matching
+  // entry, so a wildcard listed above them would still win. The wildcard is kept below them so
+  // any other member of this object keeps its previous treatment rather than silently changing.
+  { field: 'wazuh.cluster.name', action: 'allow' },
+  { field: 'wazuh.cluster.node', action: 'anonymize', kind: 'HOST' },
   { field: 'wazuh.cluster.*', action: 'allow' },
   { field: 'wazuh.schema.version', action: 'allow' },
   // wazuh-metrics-normalization: tenant/space label (admin-configured), and the ECS event/metric
@@ -1160,32 +1189,72 @@ function expandToFullToken(
  * that runs after it. */
 const TECHNIQUE_ID_TOKEN_RE = /^T\d+(?:\.\d+)+$/;
 
-/** Every dot-path SEGMENT word appearing in a curated Wazuh/ECS field name — drawn from
- * `WAZUH_FIELD`'s values and every plain field in `FIELD_POLICY_DEFAULTS` (a tool-scope
- * "toolName/" prefix and the trailing ".*" wildcard are stripped first, since those aren't part of
- * the path itself), all lowercased. Self-updating: a field added to either source is automatically
- * recognized here — no separate list to hand-maintain. Used by `isFieldPathToken` below. */
+/** The curated field paths this plugin's own policy ships, normalized: a tool-scope "toolName/"
+ * prefix and a trailing ".*" wildcard are stripped (neither is part of the path itself), then
+ * lowercased. Feeds both sets below. */
+const CURATED_FIELD_PATHS: ReadonlyArray<string> = [
+  ...Object.values(WAZUH_FIELD),
+  ...FIELD_POLICY_DEFAULTS.map(entry => entry.field),
+]
+  .map(field => field.split('/').pop() as string)
+  .map(field => field.replace(/\.\*$/, '').toLowerCase());
+
+/** Every dot-path SEGMENT word appearing in a CURATED field name — see `CURATED_FIELD_PATHS`.
+ * Self-updating: a field added to either source is automatically recognized here. Used by
+ * `isFieldPathToken` below, whose ALL-segments rule is deliberately kept on this SMALL vocabulary
+ * only (~30 words); see the exact-path set below for why it was not widened to the catalog. */
 const FIELD_PATH_WORDS: ReadonlySet<string> = new Set(
-  [
-    ...Object.values(WAZUH_FIELD),
-    ...FIELD_POLICY_DEFAULTS.map(entry => entry.field),
-  ]
-    .map(field => field.split('/').pop() as string) // drop a "toolName/" scoping prefix, if any
-    .flatMap(field => field.replace(/\.\*$/, '').split('.'))
-    .map(segment => segment.toLowerCase())
-    .filter(segment => segment.length > 0),
+  CURATED_FIELD_PATHS.flatMap(field => field.split('.')).filter(
+    segment => segment.length > 0,
+  ),
 );
 
-/** True when every '.'-separated segment of `token` is a known field-path word (see
- * `FIELD_PATH_WORDS`) — i.e. `token` reads as the user NAMING A FIELD (e.g. typing
- * "wazuh.agent.name" or "wazuh.rule.id" into their own question), not an actual hostname.
- * Deliberately requires ALL segments to match, not just one: a real hostname composed entirely of
- * words that also happen to be field-path vocabulary is exotic enough to accept the (favorable)
- * tradeoff of never mangling a user's own field-path mention into a broken HOST_n token. */
+/** Every field path this plugin knows to EXIST, as a whole lowercased path: the curated ones plus —
+ * since issue #1529 — every path in `FIELD_CATALOG`, the generated Wazuh Common Schema catalog
+ * (`common/field-catalog.ts`, the full set of indexed WCS paths).
+ *
+ * WHY THE CATALOG IS NEEDED (issue #1529): `FIELD_PATH_WORDS` only carries the words of the ~10
+ * fields the field policy curates, so the tokens surviving the outbound FQDN scan were not "field
+ * names" but "field names assembled entirely from words the plugin's own policy happens to ship".
+ * Any other indexed field whose LEAF word was new got minted as a HOST_n — live-captured on the
+ * wire as `"columns": ["HOST_1","HOST_2","HOST_3","wazuh.agent.name","HOST_4"]`, where
+ * `related.hosts` (`related`/`hosts`: neither word appears in a policy row), `related.ip`,
+ * `related.user` and `wazuh.cluster.node` (`node` appears in no `WAZUH_FIELD` value) were all
+ * mangled while the sibling `wazuh.cluster.name` survived. The model is then handed a table whose
+ * columns are named `HOST_1`..`HOST_n` and cannot tell what any of them holds.
+ *
+ * WHY WHOLE-PATH AND NOT THE ALL-SEGMENTS RULE — this is the narrower of the two options and the
+ * reason the value scan is not weakened at all. Flattening the catalog into SEGMENT words would add
+ * ~550 words to the ALL-segments vocabulary, and those words include ordinary hostname material:
+ * `host`, `hostname`, `server`, `home`, `dns`, `data`, `log`, `cloud`, `network`, and the real TLD
+ * `io`. Dotted hostname VALUES such as `server.home` (a router-assigned local name) or `data.io`
+ * would then have every segment "known" and would stop being pseudonymized — a value-position
+ * privacy regression traded for no extra coverage, since every field name in the #1529 capture is
+ * an EXACT catalog path. Matching the whole path admits exactly the field names that exist and
+ * nothing else; both properties are pinned by tests in privacy.test.ts. */
+const KNOWN_FIELD_PATHS: ReadonlySet<string> = new Set([
+  ...CURATED_FIELD_PATHS,
+  ...Object.values(FIELD_CATALOG)
+    .flat()
+    .map(field => field.toLowerCase()),
+]);
+
+/** True when `token` reads as the user NAMING A FIELD (e.g. typing "wazuh.agent.name" or
+ * "related.hosts" into their own question, or a digest's `columns` hint listing them), not an
+ * actual hostname. Two ways to qualify:
+ *
+ * 1. `token` IS a known field path (`KNOWN_FIELD_PATHS`) — exact, so it can never match a value.
+ * 2. every '.'-separated segment of `token` is a curated field-path word (`FIELD_PATH_WORDS`).
+ *    Requires ALL segments, not just one: on that small curated vocabulary, a real hostname
+ *    composed entirely of policy words is exotic enough to accept the (favorable) tradeoff of never
+ *    mangling a user's own field-path mention into a broken HOST_n token. Kept for field mentions
+ *    that are real but absent from the catalog (a tool-shaped path, a newer field). */
 function isFieldPathToken(token: string): boolean {
-  return token
-    .split('.')
-    .every(segment => FIELD_PATH_WORDS.has(segment.toLowerCase()));
+  const lower = token.toLowerCase();
+  return (
+    KNOWN_FIELD_PATHS.has(lower) ||
+    lower.split('.').every(segment => FIELD_PATH_WORDS.has(segment))
+  );
 }
 
 /**
@@ -2445,8 +2514,29 @@ export const PREMINT_HOST_FIELDS = new Set<string>([
  * - Only called when the digest actually has a prose field to protect, so a digest without one is
  *   byte-identical to before this existed (pseudonym counter numbering included — pinned by a test).
  *
- * `breakdown` is not walked: a bucket digest's samples are `{key, doc_count}` rows, so a prose field
- * and a breakdown bucket never coexist in the same digest.
+ * ISSUE #1524 — the aggregation half, and why the original "breakdown is not walked" note was
+ * wrong. That note read: "a bucket digest's samples are `{key, doc_count}` rows, so a prose field
+ * and a breakdown bucket never coexist in the same digest". The wire disproves it — the reported
+ * leak's own payload is a bucket digest whose rows carry BOTH:
+ *
+ *   {"doc_count":10,"wazuh.rule.title":"Secret or credential accessed from vault - AI-QA-AGENT-WIN$",
+ *    "wazuh.rule.level":"medium","distinct_titles":1}
+ *
+ * `AI-QA-AGENT-WIN` is the estate's real NetBIOS hostname, embedded in the title by the rule itself.
+ * Two things kept it out of the dictionary: a bucket row's identity lives under the key `key` (a
+ * VALUE of the aggregated field — resolving it by the literal name "key" matches no policy entry,
+ * the same asymmetry `scrubAggKey` exists to fix in the scrub loop), and a top-agents digest's agent
+ * names live in `breakdown`, which `applyFieldPolicy` only scrubs AFTER the samples loop has already
+ * sent the prose field through. This function now pre-mints both, so a hostname the SAME response
+ * payload carries as a value is known before any prose in it is scanned.
+ *
+ * This stays KNOWN-ROSTER scrubbing with no new matching heuristic: nothing new is guessed from the
+ * prose. Only values a premintable identity field in this payload was ALREADY going to be
+ * pseudonymized under (same field, same kind) enter the dictionary, and `scrubKnownEntities` still
+ * only replaces exact, whole-token, boundary-delimited occurrences of them — so an agent name that
+ * appears nowhere in the payload as a value is still (by construction) untouched, and a common word
+ * that is not a real minted identity can never match. The residual is unchanged and documented on
+ * `scrubKnownEntities`: an identifier both shapeless AND never minted anywhere still passes.
  */
 function premintProseScanIdentifiers(
   digest: Digest,
@@ -2454,32 +2544,99 @@ function premintProseScanIdentifiers(
   pseudonymizer: Pseudonymizer,
   toolName: string | undefined,
   isEscapeHatch: boolean,
+  aggFields?: Record<string, AggFieldSpec | undefined>,
 ): void {
+  /** Mints `value` under `field`'s policy, but ONLY when that field is one the samples loop was
+   * already going to pseudonymize AND is a trusted identity field — the exact `premintable` test
+   * documented on this function and on `PREMINT_HOST_FIELDS`. */
+  const premintUnder = (field: string, value: unknown): void => {
+    if (typeof value !== 'string' || value.length === 0) {
+      return;
+    }
+    const entry = resolveFieldEntry(field, policy, toolName);
+    const willPseudonymize =
+      entry?.action === 'anonymize' || (!entry && isEscapeHatch);
+    if (!willPseudonymize) {
+      return;
+    }
+    const kind = entry?.kind ?? inferPseudonymKind(field);
+    // A USER-kind field is trusted by its name alone; a HOST-kind one only if explicitly curated.
+    // Both the bare field path and the `tool/field` scoped spelling are accepted, since
+    // `get_agents/name` is stored scoped while `wazuh.agent.name` is not.
+    const premintable =
+      kind === 'USER' ||
+      (kind === 'HOST' &&
+        (PREMINT_HOST_FIELDS.has(field) ||
+          (toolName !== undefined &&
+            PREMINT_HOST_FIELDS.has(`${toolName}/${field}`))));
+    if (!premintable) {
+      return;
+    }
+    pseudonymizer.pseudonymize(value, kind);
+  };
+
+  /** The field(s) an aggregation's bucket key holds values OF, for `premintUnder`. `multi`/
+   * `composite` keys are arrays/objects whose components pair positionally/by name with the spec —
+   * only the component that resolves to a premintable field is minted, exactly as `scrubAggKey`
+   * scrubs them component-wise. */
+  const premintAggKey = (
+    rawKey: unknown,
+    spec: AggFieldSpec | undefined,
+  ): void => {
+    if (!spec) {
+      return;
+    }
+    if (spec.kind === 'scalar') {
+      premintUnder(spec.field, rawKey);
+      return;
+    }
+    if (spec.kind === 'multi') {
+      if (Array.isArray(rawKey) && rawKey.length === spec.fields.length) {
+        spec.fields.forEach((field, index) =>
+          premintUnder(field, rawKey[index]),
+        );
+      }
+      return;
+    }
+    if (
+      rawKey !== null &&
+      typeof rawKey === 'object' &&
+      !Array.isArray(rawKey)
+    ) {
+      for (const [source, field] of Object.entries(spec.fields)) {
+        premintUnder(field, (rawKey as Record<string, unknown>)[source]);
+      }
+    }
+  };
+
   for (const sample of digest.samples) {
     for (const [sampleKey, value] of Object.entries(sample)) {
-      if (typeof value !== 'string' || value.length === 0) {
+      // Issue #1524: an AGGREGATION row's `key` holds a VALUE of the aggregated field, not of a
+      // field literally called "key" — the same asymmetry `applyFieldPolicy`'s samples loop
+      // resolves through `scrubAggKey`. Resolving it by name here matched no policy entry, so a
+      // top-agents digest's own agent names were not pre-minted and the prose scan over
+      // `wazuh.rule.title` in the SAME row could not see them.
+      if (sampleKey === 'key' && aggFields !== undefined) {
+        premintAggKey(
+          value,
+          Object.values(aggFields).find(field => field !== undefined),
+        );
         continue;
       }
-      const entry = resolveFieldEntry(sampleKey, policy, toolName);
-      const willPseudonymize =
-        entry?.action === 'anonymize' || (!entry && isEscapeHatch);
-      if (!willPseudonymize) {
-        continue;
-      }
-      const kind = entry?.kind ?? inferPseudonymKind(sampleKey);
-      // A USER-kind field is trusted by its name alone; a HOST-kind one only if explicitly curated.
-      // Both the bare field path and the `tool/field` scoped spelling are accepted, since
-      // `get_agents/name` is stored scoped while `wazuh.agent.name` is not.
-      const premintable =
-        kind === 'USER' ||
-        (kind === 'HOST' &&
-          (PREMINT_HOST_FIELDS.has(sampleKey) ||
-            (toolName !== undefined &&
-              PREMINT_HOST_FIELDS.has(`${toolName}/${sampleKey}`))));
-      if (!premintable) {
-        continue;
-      }
-      pseudonymizer.pseudonymize(value, kind);
+      premintUnder(sampleKey, value);
+    }
+  }
+
+  // Issue #1524, the other half of "elsewhere in the same response payload": a bucket digest
+  // carries its identities in `breakdown`, one key over from the samples the prose field rides in
+  // (a top-agents terms agg's bucket keys ARE the agent names). Those buckets are scrubbed AFTER
+  // the samples loop in `applyFieldPolicy`, so without this pass an agent name present in the very
+  // same payload was still unknown when the rule title was scanned — and, per this function's
+  // durability argument, stayed verbatim in the PERSISTED digest forever.
+  if (digest.breakdown && aggFields) {
+    const firstAggName = Object.keys(aggFields)[0];
+    for (const bucket of digest.breakdown) {
+      premintAggKey(bucket.key, aggFields[bucket.agg ?? firstAggName]);
     }
   }
 }
@@ -2591,6 +2748,7 @@ export function applyFieldPolicy(
       pseudonymizer,
       toolName,
       isEscapeHatch,
+      aggFields,
     );
   }
 

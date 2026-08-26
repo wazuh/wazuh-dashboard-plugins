@@ -8,6 +8,7 @@ import {
   findOfferedFollowUpTool,
   MAX_TOOL_ROUNDS,
   FINAL_ROUND_ANSWER_INSTRUCTION,
+  FINAL_ROUND_CONTINUATION_INSTRUCTION,
   orchestrate,
   shouldConsiderDeferredOffer,
 } from './chat';
@@ -1018,17 +1019,29 @@ test('orchestrate: an unprompted single-tool offer with rounds remaining is forc
     ['get_sca_results', 'get_sca_checks', 'get_sca_results'],
   );
 
-  // #8893 pin: the final round's outbound messages still end with FINAL_ROUND_ANSWER_INSTRUCTION.
-  // This must survive item I3 (and the budget redesign) unchanged -- the forced round and the
-  // duplicate round are both normal tool rounds, not the final one, so neither carries the
-  // instruction; only the genuinely last (no-tools) round does.
+  // #8893 pin: the final round's outbound messages still end with a final-round instruction, and
+  // the forced round and the duplicate round -- both ordinary tool rounds, not the final one --
+  // still carry none; only the genuinely last (no-tools) round does.
+  //
+  // WHICH instruction changed with issue wazuh-dashboard#1527. This turn IS the interception turn:
+  // round 1 streamed a complete answer to the screen and the deferred-offer interception extended
+  // the turn anyway, so the final round is now told to CONTINUE that answer instead of being told
+  // "Now answer the user's question directly" -- being given the latter here is what shipped two
+  // complete answers in the report. The #8893 guarantee is unaffected: the anti-fabrication
+  // grounding body is shared verbatim between the two instructions, asserted below.
   const finalRoundMessages = callMessages[5];
   const lastMessage = finalRoundMessages[finalRoundMessages.length - 1];
   // 'user', not 'system' -- a system-role message is hoisted out of `messages` into the request's
   // top-level `system` field by providers/anthropic.ts, so it never reaches the conversation tail at
   // all. See withFinalRoundAnswerInstruction's doc comment.
   assert.equal(lastMessage.role, 'user');
-  assert.equal(lastMessage.content, FINAL_ROUND_ANSWER_INSTRUCTION);
+  assert.equal(lastMessage.content, FINAL_ROUND_CONTINUATION_INSTRUCTION);
+  assert.ok(
+    (lastMessage.content as string).includes(
+      'must come from the tool results already gathered in this conversation',
+    ),
+    'the final round lost the #8893 grounding clauses',
+  );
   // And the FORCED round's outbound messages do NOT carry it (it is not the final round).
   const forcedRoundMessages = callMessages[3];
   assert.notEqual(
