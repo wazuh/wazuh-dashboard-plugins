@@ -1,4 +1,5 @@
 import { Digest } from './digest';
+import { FIELD_CATALOG } from '../../common/field-catalog';
 import { WAZUH_FIELD } from '../../common/wazuh-fields';
 
 /**
@@ -1188,15 +1189,37 @@ function expandToFullToken(
  * that runs after it. */
 const TECHNIQUE_ID_TOKEN_RE = /^T\d+(?:\.\d+)+$/;
 
-/** Every dot-path SEGMENT word appearing in a curated Wazuh/ECS field name — drawn from
- * `WAZUH_FIELD`'s values and every plain field in `FIELD_POLICY_DEFAULTS` (a tool-scope
- * "toolName/" prefix and the trailing ".*" wildcard are stripped first, since those aren't part of
- * the path itself), all lowercased. Self-updating: a field added to either source is automatically
- * recognized here — no separate list to hand-maintain. Used by `isFieldPathToken` below. */
+/** Every dot-path SEGMENT word appearing in a Wazuh/ECS field name known to this plugin — drawn
+ * from three sources, all lowercased: `WAZUH_FIELD`'s values, every plain field in
+ * `FIELD_POLICY_DEFAULTS` (a tool-scope "toolName/" prefix and the trailing ".*" wildcard are
+ * stripped first, since those aren't part of the path itself), and — since issue #1529 — every path
+ * in `FIELD_CATALOG`, the generated Wazuh Common Schema catalog (`common/field-catalog.ts`).
+ * Self-updating: a field added to any of the three is automatically recognized here — no separate
+ * list to hand-maintain. Used by `isFieldPathToken` below.
+ *
+ * WHY THE CATALOG HAD TO BE ADDED (issue #1529): the first two sources only carry the ~10 fields
+ * the field policy curates, so the surviving set was not "field names" but "field names assembled
+ * entirely from words the plugin's own policy happens to ship". Any other indexed field whose LEAF
+ * word was new got minted as a HOST_n — live-captured on the wire as
+ * `"columns": ["HOST_1","HOST_2","HOST_3","wazuh.agent.name","HOST_4"]`, where `related.hosts`
+ * (`related`/`hosts`: neither word appears in a policy row), `related.ip`, `related.user` and
+ * `wazuh.cluster.node` (`node` appears in no `WAZUH_FIELD` value) were all mangled while the
+ * sibling `wazuh.cluster.name` survived. The model is then handed a table whose columns are named
+ * `HOST_1`..`HOST_n` and cannot tell what any of them holds. The catalog is the full set of indexed
+ * WCS paths (5388 of them), so it recognizes every field a query can actually return.
+ *
+ * WHY THIS DOES NOT WEAKEN THE VALUE SCAN — the property that keeps this safe is
+ * `isFieldPathToken`'s ALL-segments rule combined with what the catalog does NOT contain: no
+ * public TLD or hostname-suffix word (`com`, `net`, `org`, `local`, `lan`, `internal`, `www`,
+ * `mail`, `corp`, `example`) is a WCS path segment. A real dotted hostname VALUE therefore always
+ * ends in a segment outside this vocabulary and keeps minting — pinned by the value-position tests
+ * in privacy.test.ts. What the widening does exclude is exactly the class this fix targets: dotted
+ * tokens whose every segment is a schema word, i.e. field NAMES. */
 const FIELD_PATH_WORDS: ReadonlySet<string> = new Set(
   [
     ...Object.values(WAZUH_FIELD),
     ...FIELD_POLICY_DEFAULTS.map(entry => entry.field),
+    ...Object.values(FIELD_CATALOG).flat(),
   ]
     .map(field => field.split('/').pop() as string) // drop a "toolName/" scoping prefix, if any
     .flatMap(field => field.replace(/\.\*$/, '').split('.'))

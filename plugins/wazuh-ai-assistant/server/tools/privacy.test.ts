@@ -130,6 +130,60 @@ test('prescanAndMint: still mints a real hostname that is not field-path or vers
   assert.doesNotMatch(out, /backup-vault\.internal\.corp/);
 });
 
+// --- prescanAndMint: #1529 schema-vocabulary widening (WCS catalog) ---------------------------
+//
+// The reported corruption: the field policy curates ~10 fields, so `FIELD_PATH_WORDS` only knew
+// THOSE paths' words and every other indexed field name was minted as a hostname. Wire capture:
+//   "samples": [{"wazuh.agent.name":"HOST_5","HOST_4":"ai-qa-aio-node"}],
+//   "columns": ["HOST_1","HOST_2","HOST_3","wazuh.agent.name","HOST_4"]
+// with related.hosts -> HOST_1, related.ip -> HOST_2, related.user -> HOST_3,
+// wazuh.cluster.node -> HOST_4. The vocabulary is now unioned with `FIELD_CATALOG`, so a token
+// whose every '.'-segment is a known SCHEMA word is never minted.
+
+test('prescanAndMint: leaves the #1529 reported field names untouched', () => {
+  for (const fieldName of [
+    'related.hosts',
+    'related.ip',
+    'related.user',
+    'wazuh.cluster.node',
+    // The sibling that already survived — pinned so the union cannot regress it.
+    'wazuh.cluster.name',
+  ]) {
+    const p = new Pseudonymizer();
+    const out = prescanAndMint(`the ${fieldName} column is empty`, p);
+    assert.doesNotMatch(out, /HOST_\d+/, `${fieldName} was minted`);
+    assert.ok(out.includes(fieldName), `${fieldName} was rewritten`);
+    assert.equal(p.newEntries().length, 0);
+  }
+});
+
+test('prescanAndMint: a whole digest columns hint survives the schema vocabulary', () => {
+  const p = new Pseudonymizer();
+  const columnsHint =
+    '["related.hosts","related.ip","related.user","wazuh.agent.name","wazuh.cluster.node"]';
+  assert.equal(prescanAndMint(columnsHint, p), columnsHint);
+  assert.equal(p.newEntries().length, 0);
+});
+
+test('prescanAndMint: schema vocabulary still mints real dotted hostname VALUES', () => {
+  // The safety property behind the widening: no public TLD / hostname-suffix word is a WCS path
+  // segment, and `isFieldPathToken` requires EVERY segment to be a schema word — so a value in a
+  // value position keeps minting even when its leading labels are schema-ish words.
+  for (const hostname of [
+    'ai-qa-aio-node.corp.example.com',
+    'lists.ubuntu.com',
+    // Leading labels ARE schema words ("host", "agent", "user", "process"); the suffixes are not.
+    'host.agent.local',
+    'user.process.internal',
+    'agent.name.example.net',
+  ]) {
+    const p = new Pseudonymizer();
+    const out = prescanAndMint(`connect to ${hostname} now`, p);
+    assert.match(out, /HOST_\d+/, `${hostname} was not minted`);
+    assert.ok(!out.includes(hostname), `${hostname} survived verbatim`);
+  }
+});
+
 // --- prescanAndMint / prescanAndMintToolContent: #8920 item 8 version-grammar coverage --------
 //
 // The reported instances were two Ubuntu `dpkg -l` versions ("3.118ubuntu5",
