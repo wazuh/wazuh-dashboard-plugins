@@ -443,8 +443,29 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'wazuh.agent.config.group.synced', action: 'allow' },
 
   // wazuh-metrics-comms / wazuh-metrics-agents / wazuh-metrics-normalization (shared fields):
-  // manager cluster identity -- admin-configured infra naming (e.g. "wazuh"), not a person or a
-  // network address; same class as `policy.name`/`document.name` above, not `host.hostname`.
+  // manager cluster identity. The single `wazuh.cluster.*` wildcard used to sweep both members of
+  // this object into one `allow`, and they are NOT the same class:
+  //
+  // - `wazuh.cluster.name` is the cluster's CONFIGURED LABEL, commonly the default "wazuh" -- the
+  //   curated-vocabulary case `allow` is reserved for, same class as `policy.name`/`document.name`
+  //   above.
+  // - `wazuh.cluster.node` is a HOSTNAME the operator chose for a specific machine, and it
+  //   identifies that machine on every single document carrying it. That is `host.hostname`'s
+  //   class, not a curated label, and the model never needs the real value to answer anything.
+  //
+  // Under `allow` the node name reached the provider completely unscanned even with privacy mode
+  // ON, and the second layer could not compensate: `prescanAndMintToolContent`'s
+  // `FQDN_TOKEN_RE` requires at least one dot, so a bare single-word node name is never minted by
+  // shape, and the documented fallback for a bare-word hostname is the field-policy scrub -- which
+  // was this `allow`. The two gaps covered for each other, so the value passed both. Worse, a
+  // pseudonym for the same host minted from a sibling field meant the KEY was rewritten to
+  // `HOST_n` while the VALUE stayed in clear: exactly inverted.
+  //
+  // Both exact entries must precede the wildcard -- `resolveFieldEntry` takes the FIRST matching
+  // entry, so a wildcard listed above them would still win. The wildcard is kept below them so
+  // any other member of this object keeps its previous treatment rather than silently changing.
+  { field: 'wazuh.cluster.name', action: 'allow' },
+  { field: 'wazuh.cluster.node', action: 'anonymize', kind: 'HOST' },
   { field: 'wazuh.cluster.*', action: 'allow' },
   { field: 'wazuh.schema.version', action: 'allow' },
   // wazuh-metrics-normalization: tenant/space label (admin-configured), and the ECS event/metric

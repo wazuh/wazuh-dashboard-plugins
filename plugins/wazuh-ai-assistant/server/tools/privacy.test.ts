@@ -778,6 +778,57 @@ test('applyFieldPolicy: explicit "allow" entry is unaffected by isEscapeHatch', 
 });
 
 // --- get_agent_inventory's deriveColumns/isEscapeHatch fail-closed default, against the REAL
+// The cluster node name reached the provider in clear under privacy mode ON, because a single
+// `wazuh.cluster.*` wildcard swept the cluster's configured LABEL and a machine's HOSTNAME into
+// one `allow`. The compensating value-shape scan could not catch it either: `FQDN_TOKEN_RE`
+// requires a dot, so a bare single-word node name is never minted by shape, and the documented
+// fallback for a bare-word hostname is the field-policy scrub -- which was this `allow`.
+
+test('applyFieldPolicy: wazuh.cluster.node is pseudonymized as a HOST while wazuh.cluster.name stays readable', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    columns: ['wazuh.cluster.name', 'wazuh.cluster.node'],
+    samples: [{ 'wazuh.cluster.name': 'wazuh', 'wazuh.cluster.node': 'a-node' }],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  // The configured label is curated vocabulary -- it stays readable so the model can still tell
+  // which cluster a document belongs to.
+  assert.equal(out.samples[0]['wazuh.cluster.name'], 'wazuh');
+  // The node name is a real machine's hostname: replaced, and with a HOST-kind pseudonym so it
+  // shares a namespace with wazuh.agent.name/host.hostname rather than minting a second token for
+  // the same host.
+  assert.notEqual(out.samples[0]['wazuh.cluster.node'], 'a-node');
+  assert.match(String(out.samples[0]['wazuh.cluster.node']), /^HOST_\d+$/);
+  // The KEY must survive: the reported symptom was exactly inverted -- the value stayed in clear
+  // while the field NAME arrived as HOST_1, so the model could not tell what the column meant.
+  assert.deepEqual(out.columns, ['wazuh.cluster.name', 'wazuh.cluster.node']);
+});
+
+test('applyFieldPolicy: the same host reaching the digest twice gets ONE pseudonym across both fields', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    samples: [
+      { 'wazuh.agent.name': 'a-node', 'wazuh.cluster.node': 'a-node' },
+    ],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  assert.equal(
+    out.samples[0]['wazuh.cluster.node'],
+    out.samples[0]['wazuh.agent.name'],
+  );
+});
+
+// Order matters: `resolveFieldEntry` returns the FIRST matching entry, so the two exact entries
+// have to sit ABOVE the surviving `wazuh.cluster.*` wildcard or the wildcard would still win.
+test('FIELD_POLICY_DEFAULTS: the exact wazuh.cluster entries precede the wildcard', () => {
+  const index = (field: string) =>
+    FIELD_POLICY_DEFAULTS.findIndex(entry => entry.field === field);
+  const wildcard = index('wazuh.cluster.*');
+  assert.ok(wildcard >= 0, 'the wildcard is still present as the catch-all');
+  assert.ok(index('wazuh.cluster.name') < wildcard);
+  assert.ok(index('wazuh.cluster.node') < wildcard);
+});
+
 // FIELD_POLICY_DEFAULTS (not a hand-built test-local policy): confirms the explicit 'allow'
 // entries added for it actually land where they need to, and that the fields which must stay
 // anonymized on this same tool still do. Regression guard for the "which fields are safe to allow
