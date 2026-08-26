@@ -140,6 +140,7 @@
 | [#8775](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8775) | Fixed MITRE ATT&CK Framework tab not applying the date range and fetch filters                                                                                                                                                                                                        |
 | [#9015](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9015) | Fixed the Controls tab showing 0 results by adding missing regulatory compliance requirement definitions for PCI DSS, GDPR, HIPAA, NIST 800-53, FedRAMP, ISO 27001, CMMC, TSC, and NIS2, and added an "Others" breakdown showing findings tagged with unrecognized requirement values |
 | [#9023](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9023) | Fixed sorting not working in the Server management > Security tables (Roles, Policies, Users and Roles mapping), and removed the sort affordance from columns the server API cannot sort                                                                                              |
+| [#9037](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9037) | Fixed the Findings data grid crashing and losing every column when a configured column's field does not exist in the index pattern                                                                                                                                                    |
 
 ### Removed
 
