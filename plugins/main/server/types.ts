@@ -17,28 +17,12 @@
  * under the License.
  */
 
-import { Observable } from 'rxjs';
-
 export interface WazuhPluginSetup {}
 
 export interface WazuhPluginStart {}
 
-/**
- * Subset of the OpenSearch Dashboards Security plugin setup contract that we
- * consume. The plugin returns `{ config$, securityConfigClient }` from its
- * `setup()`, but types it as an empty interface, so we declare the shape here.
- * Every access is optional: the plugin is an optional dependency, and the
- * contract is undocumented, so a future upstream change must degrade to the
- * caller's default rather than throw.
- */
-export interface SecurityDashboardsSetup {
-  config$?: Observable<{
-    cookie?: { isSameSite?: 'Strict' | 'Lax' | 'None' | false };
-  }>;
-}
-
 export type PluginSetup = {
-  securityDashboards?: SecurityDashboardsSetup;
+  securityDashboards?: {}; // TODO: Add OpenSearch Dashboards Security interface
   wazuhCore: {};
   // Optional Notifications Dashboards plugin contract presence check
   notificationsDashboards?: {};

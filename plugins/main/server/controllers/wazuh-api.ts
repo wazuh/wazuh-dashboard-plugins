@@ -110,16 +110,13 @@ export class WazuhApiCtrl {
       if (context.wazuh.server.info.protocol === 'https') {
         textSecure = ';Secure';
       }
-      // Mirrors opensearch_security.cookie.isSameSite so the platform session
-      // cookie and these share one policy. Resolved once in the plugin setup.
-      const textSameSite = `;SameSite=${context.wazuh.server.cookieSameSite}`;
       const encodedUser = encodeURIComponent(username);
       return response.ok({
         headers: {
           'set-cookie': [
-            `wz-token=${token};Path=/;HttpOnly${textSecure}${textSameSite}`,
-            `wz-user=${encodedUser};Path=/;HttpOnly${textSecure}${textSameSite}`,
-            `wz-api=${idHost};Path=/;HttpOnly${textSecure}${textSameSite}`,
+            `wz-token=${token};Path=/;HttpOnly${textSecure}`,
+            `wz-user=${encodedUser};Path=/;HttpOnly${textSecure}`,
+            `wz-api=${idHost};Path=/;HttpOnly${textSecure}`,
           ],
         },
         body: { token },

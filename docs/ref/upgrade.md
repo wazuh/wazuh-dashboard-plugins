@@ -72,14 +72,6 @@ If the configuration file was replaced when the package was installed, follow th
 uiSettings.overrides.defaultRoute: /app/wz-home
 ```
 
-4.3. If the configuration file was kept instead of replaced, add the session cookie policy. The package does not add it to an existing file:
-
-```yaml
-opensearch_security.cookie.isSameSite: Lax
-```
-
-This value applies to the platform session cookie and to the Wazuh server API cookies. See [Session cookies](configuration.md#session-cookies).
-
 5. Restart the Wazuh dashboard:
 
    **Systemd:**
