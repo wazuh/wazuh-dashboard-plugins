@@ -208,6 +208,59 @@ describe('ChatInput', () => {
     );
   });
 
+  // The field is inert while `isGenerating` too, so the blur a streaming turn causes has to be
+  // undone the same way a `disabled` -> enabled transition is. Regression guard: the re-focus
+  // effect depended on `disabled` alone while the rendered attribute was `disabled ||
+  // isGenerating`, so it never re-ran here and the caret stayed lost after every turn.
+  it('returns focus to the textarea once isGenerating flips back to false', () => {
+    const { rerender } = render(
+      <ChatInput
+        value=''
+        onChange={noop}
+        disabled={false}
+        isGenerating
+        onSend={noop}
+      />,
+    );
+    const textarea = screen.getByRole('textbox', { name: 'Chat message' });
+    expect(textarea).toBeDisabled();
+    expect(document.activeElement).not.toBe(textarea);
+
+    rerender(
+      <ChatInput
+        value=''
+        onChange={noop}
+        disabled={false}
+        isGenerating={false}
+        onSend={noop}
+      />,
+    );
+
+    expect(screen.getByRole('textbox', { name: 'Chat message' })).not
+      .toBeDisabled();
+    expect(document.activeElement).toBe(
+      screen.getByRole('textbox', { name: 'Chat message' }),
+    );
+  });
+
+  // The mirror case: while a stream is still in flight the field must stay blurred, so the guard
+  // above cannot be satisfied by simply focusing on every render.
+  it('does not focus the textarea while isGenerating is true', () => {
+    render(
+      <ChatInput
+        value=''
+        onChange={noop}
+        disabled={false}
+        isGenerating
+        onSend={noop}
+      />,
+    );
+
+    expect(document.activeElement).not.toBe(
+      screen.getByRole('textbox', { name: 'Chat message' }),
+    );
+  });
+
   it('exposes an imperative focus() handle that focuses the underlying textarea', () => {
     const ref = React.createRef<ChatInputHandle>();
     render(
