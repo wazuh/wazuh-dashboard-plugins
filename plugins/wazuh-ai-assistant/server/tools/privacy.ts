@@ -1896,7 +1896,8 @@ export function extractAggFields(
   // the escape hatch passes the model's raw body through. Reading only `aggs` would leave the
   // breakdown of an `aggregations`-spelled query unattributed, and therefore unscrubbed.
   const aggs = (body?.aggs ?? body?.aggregations) as
-    Record<string, unknown> | undefined;
+    | Record<string, unknown>
+    | undefined;
   if (!aggs) {
     return undefined;
   }

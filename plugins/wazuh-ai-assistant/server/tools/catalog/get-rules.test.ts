@@ -63,10 +63,7 @@ test('get_rules: id is trimmed', () => {
   assert.deepEqual(clauses[0], {
     bool: {
       minimum_should_match: 1,
-      should: [
-        { ids: { values: [uuid] } },
-        { term: { 'document.id': uuid } },
-      ],
+      should: [{ ids: { values: [uuid] } }, { term: { 'document.id': uuid } }],
     },
   });
 });

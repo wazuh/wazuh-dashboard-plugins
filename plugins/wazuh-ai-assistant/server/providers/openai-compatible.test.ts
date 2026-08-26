@@ -1251,7 +1251,6 @@ test('chatStream: a message-level extra attaches only to a round’s first tool_
   );
 });
 
-
 // --- dropped stream (fault injection) ---------------------------------------------------------
 // A provider connection that drops AFTER the answer starts streaming used to be finalized as a
 // normal turn: the partial text was committed and a bare `done` was emitted, with no `error` and
@@ -1263,9 +1262,13 @@ test('chatStream: a message-level extra attaches only to a round’s first tool_
 /** SSE body with NO `[DONE]` sentinel and no terminal usage frame -- the wire shape of a socket
  * closed mid-stream, as opposed to `sseBody` above which always terminates properly. */
 function truncatedSseBody(chunks: Array<Record<string, unknown>>): string {
-  return chunks.map(chunk => `data: ${JSON.stringify(chunk)}
+  return chunks
+    .map(
+      chunk => `data: ${JSON.stringify(chunk)}
 
-`).join('');
+`,
+    )
+    .join('');
 }
 
 test('chatStream: a stream that ends mid-answer emits an error instead of a bare done', async () => {
@@ -1280,7 +1283,10 @@ test('chatStream: a stream that ends mid-answer emits an error instead of a bare
     },
     {
       choices: [
-        { index: 0, delta: { content: 'the busiest is rule 5501 (PAM login). ' } },
+        {
+          index: 0,
+          delta: { content: 'the busiest is rule 5501 (PAM login). ' },
+        },
       ],
     },
   ]);
@@ -1317,7 +1323,9 @@ test('chatStream: a stream that ends mid-answer emits an error instead of a bare
 
 test('chatStream: a provider that sends finish_reason but omits [DONE] is still a completed answer', async () => {
   const body = truncatedSseBody([
-    { choices: [{ index: 0, delta: { content: 'That is the full picture.' } }] },
+    {
+      choices: [{ index: 0, delta: { content: 'That is the full picture.' } }],
+    },
     { choices: [{ index: 0, delta: {}, finish_reason: 'stop' }] },
   ]);
   const events = await withFakeFetch(body, () => {

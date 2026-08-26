@@ -145,8 +145,8 @@ export const getRulesTool: ToolDefinition = {
     const enabled = enabledSupplied
       ? (params.enabled as string)
       : id
-        ? 'any'
-        : 'enabled';
+      ? 'any'
+      : 'enabled';
     const status =
       typeof params.status === 'string' ? params.status.trim() : undefined;
     const level =

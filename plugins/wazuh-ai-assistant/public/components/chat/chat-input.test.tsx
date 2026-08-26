@@ -236,8 +236,9 @@ describe('ChatInput', () => {
       />,
     );
 
-    expect(screen.getByRole('textbox', { name: 'Chat message' })).not
-      .toBeDisabled();
+    expect(
+      screen.getByRole('textbox', { name: 'Chat message' }),
+    ).not.toBeDisabled();
     expect(document.activeElement).toBe(
       screen.getByRole('textbox', { name: 'Chat message' }),
     );
