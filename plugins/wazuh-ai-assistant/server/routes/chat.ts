@@ -570,8 +570,13 @@ const NO_ANSWER_MESSAGE =
  * newline: the client renders markdown, where a single newline is not a paragraph break. */
 export const ROUND_TEXT_SEPARATOR = '\n\n';
 
-export const FINAL_ROUND_ANSWER_INSTRUCTION =
-  "Now answer the user's question directly. Every FACT about this environment -- including but " +
+/**
+ * Shared, verbatim body of both final-round instructions below (the grounding/no-fabrication/
+ * coverage clauses documented above). Split out so the CONTINUATION variant cannot drift away from
+ * the anti-hallucination wording -- only the OPENING sentence differs between the two.
+ */
+const FINAL_ROUND_GROUNDING_BODY =
+  'Every FACT about this environment -- including but ' +
   'not limited to counts, names, ids, entities, timestamps, statuses, versions, scores, ' +
   'addresses, ports, paths, control numbers, and any other data point describing what is in ' +
   'this deployment -- must come from the tool results already gathered in this conversation: ' +
@@ -590,6 +595,34 @@ export const FINAL_ROUND_ANSWER_INSTRUCTION =
   'state plainly what the gathered results do and do not cover (for example, which agents, ' +
   'hosts, rules, or items were retrieved and which were not) — describe only the coverage ' +
   'itself, not the process that produced it.';
+
+/**
+ * DUPLICATE-ANSWER FIX (issue wazuh-dashboard#1527). Sent INSTEAD of
+ * FINAL_ROUND_ANSWER_INSTRUCTION on a final round of a turn that has ALREADY streamed a complete
+ * answer to the user's screen — today exactly the deferred-offer interception's turns (issue #8935
+ * item I3), the one mechanism that grants a further provider call after a round produced final text
+ * and no tool call. On those turns the interception appends that already-read text to the outbound
+ * history as an `assistant` message (see `orchestrate`'s forced-follow-up site) and the final round
+ * was then told "Now answer the user's question directly" — an instruction to answer a question the
+ * model can see it just answered, which is precisely how the reported turn shipped TWO complete
+ * answers, the second one opening "As noted above…". The mechanism is code-side (which string is
+ * appended), not a hope about phrasing: the re-synthesis order is simply no longer given.
+ *
+ * The grounding body is shared verbatim with FINAL_ROUND_ANSWER_INSTRUCTION — the fabrication
+ * guardrails are unchanged, only the framing is. Silence is deliberately NOT offered as an option
+ * ("in one short paragraph"): a final round that emits no text at all trips the
+ * `!roundSawAnyDelta` fallback and appends NO_ANALYSIS_TEXT_MESSAGE, which would read as a defect
+ * of its own.
+ */
+export const FINAL_ROUND_CONTINUATION_INSTRUCTION =
+  'You have already written the answer the user is reading on screen in this same turn. Do NOT ' +
+  'write it again: no second version of it, no "as noted above" recap, no re-listing of findings ' +
+  'you already reported. Continue that message instead — in one short paragraph, add only what ' +
+  'the results gathered since then actually add, and if they add nothing, say just that. ' +
+  FINAL_ROUND_GROUNDING_BODY;
+
+export const FINAL_ROUND_ANSWER_INSTRUCTION =
+  "Now answer the user's question directly. " + FINAL_ROUND_GROUNDING_BODY;
 
 /**
  * Appends FINAL_ROUND_ANSWER_INSTRUCTION to the messages bound for the provider, but only on the
@@ -619,13 +652,21 @@ export function withFinalRoundAnswerInstruction(
   messages: ChatMessage[],
   isFinalRound: boolean,
   toolUsedThisTurn: boolean,
+  answerAlreadyStreamedThisTurn = false,
 ): ChatMessage[] {
   if (!isFinalRound || !toolUsedThisTurn) {
     return messages;
   }
   return [
     ...messages,
-    { role: 'user', content: FINAL_ROUND_ANSWER_INSTRUCTION },
+    {
+      role: 'user',
+      // Issue wazuh-dashboard#1527: a turn that already delivered a complete answer to the screen
+      // must not be ordered to answer again — see FINAL_ROUND_CONTINUATION_INSTRUCTION.
+      content: answerAlreadyStreamedThisTurn
+        ? FINAL_ROUND_CONTINUATION_INSTRUCTION
+        : FINAL_ROUND_ANSWER_INSTRUCTION,
+    },
   ];
 }
 
@@ -2659,6 +2700,18 @@ export async function* orchestrate(
   let lastSuccessfulToolName: string | undefined;
   let forcedFollowUpTool: string | undefined;
   let forcedFollowUpSpent = false;
+  // DUPLICATE-ANSWER LATCH (issue wazuh-dashboard#1527). `true` once a round of THIS turn produced
+  // a complete answer on the user's screen and the turn was nevertheless extended by the
+  // deferred-offer interception — the one path that grants a further provider call after a round
+  // that streamed final text and made NO tool call. Once latched, the final round is given
+  // FINAL_ROUND_CONTINUATION_INSTRUCTION instead of the "Now answer the user's question directly"
+  // order, which is what made the reported turn ship a second, complete "As noted above…" answer.
+  //
+  // Deliberately NOT latched by the ordinary `sawToolCall` path: a round that wrote text and then
+  // called a tool wrote PARTIAL text ("let me check X"), the user has not been answered yet, and
+  // the final round still owes them the whole answer. Set only where the mechanism itself decided
+  // to keep the turn alive past a finished answer.
+  let answerAlreadyStreamedThisTurn = false;
   // Issue #8911: whole-turn tracking for `shouldEnterFinalRoundEarly` above — `true` once any EARLIER
   // round in this turn had at least one successful (non-rejected/non-errored) tool call, and set
   // when the round loop below should make its NEXT iteration the final round early.
@@ -2963,6 +3016,7 @@ export async function* orchestrate(
       scrubbedMessages,
       isFinalRound,
       toolUsedThisTurn,
+      answerAlreadyStreamedThisTurn,
     );
     // Inbound un-scrub: this is why the ANSWER the analyst reads carries real hostnames/IPs even
     // with privacy mode on — every delta is run back through the pseudonym map here, so `HOST_1`
@@ -3566,6 +3620,12 @@ export async function* orchestrate(
             // pseudonym map to assistant content on every outbound call, so known entities go
             // back out as the same pseudonyms the model produced.
             messages = [...messages, { role: 'assistant', content: roundText }];
+            // Issue wazuh-dashboard#1527: that same text is on the user's screen. Latch it so the
+            // final round of this turn is asked to CONTINUE it rather than to answer again — see
+            // `answerAlreadyStreamedThisTurn`/FINAL_ROUND_CONTINUATION_INSTRUCTION. Without this,
+            // appending the answer to history (just above) plus the "Now answer the user's
+            // question directly" order below is the exact recipe for two complete answers.
+            answerAlreadyStreamedThisTurn = true;
             // Suppress this 'done' exactly like the sawToolCall branch above: no privacy_map, no
             // no-text fallback, no client-visible 'done' -- the turn is NOT over, it is being
             // redirected into one more forced tool round.
