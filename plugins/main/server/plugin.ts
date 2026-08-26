@@ -30,6 +30,7 @@ import { ILegacyClusterClient } from '../../../src/core/server';
 
 import { WazuhPluginSetup, WazuhPluginStart, PluginSetup } from './types';
 import { setupRoutes } from './routes';
+import { resolveCookieSecure } from './lib/cookie';
 import { jobInitializeRun, jobQueueRun } from './start';
 import { first } from 'rxjs/operators';
 import {
@@ -679,6 +680,11 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
 
     const serverInfo = core.http.getServerInfo();
 
+    const cookieSecure = await resolveCookieSecure(
+      plugins,
+      serverInfo.protocol === 'https',
+    );
+
     core.http.registerRouteHandlerContext('wazuh', (context, request) => ({
       // Create a custom logger with a tag composed of HTTP method and path endpoint
       logger: this.logger.get(
@@ -686,6 +692,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       ),
       server: {
         info: serverInfo,
+        cookieSecure,
       },
       plugins,
       security: plugins.wazuhCore.dashboardSecurity,
@@ -694,9 +701,19 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
 
     // Add custom headers to the responses
     core.http.registerOnPreResponse((request, response, toolkit) => {
-      const additionalHeaders = {
+      const additionalHeaders: Record<string, string> = {
         'x-frame-options': 'sameorigin',
+        'x-content-type-options': 'nosniff',
       };
+
+      // HSTS is only honoured by browsers over TLS. Emitting it from a plain
+      // HTTP listener would be a no-op, and a deployment that terminates TLS at
+      // a proxy must set the header there, where the real protocol is known.
+      // `includeSubDomains` is deliberately omitted: a browser pins it for the
+      // whole max-age and it would reach unrelated hosts on sibling subdomains.
+      if (serverInfo.protocol === 'https') {
+        additionalHeaders['strict-transport-security'] = 'max-age=31536000';
+      }
 
       return toolkit.next({ headers: additionalHeaders });
     });

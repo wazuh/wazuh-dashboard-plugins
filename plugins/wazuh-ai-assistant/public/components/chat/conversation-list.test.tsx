@@ -1,8 +1,48 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import '@testing-library/jest-dom';
+import userEvent from '@testing-library/user-event';
 import { ConversationList } from './conversation-list';
 import { ConversationSummary } from '../../../common/types';
+
+/**
+ * Opens one row's overflow menu — the gate every per-row action now sits behind (#9018 follow-up:
+ * the rename pencil and delete trash were consolidated into a single kebab trigger).
+ *
+ * `EuiContextMenuItem` renders a `<button>`, so once the menu is open the existing
+ * `getByRole('button', { name: 'Rename conversation' })` lookups keep working unchanged — which is
+ * why almost every action test below needed only this one extra line rather than a rewrite.
+ *
+ * Pass `rowTitle` when more than one row is rendered, to scope the trigger lookup to that row.
+ */
+function openRowMenu(rowTitle?: string): void {
+  const scope = rowTitle
+    ? within(screen.getByText(rowTitle).closest('.wzConvoRow') as HTMLElement)
+    : screen;
+  fireEvent.click(scope.getByRole('button', { name: 'Conversation actions' }));
+}
+
+/**
+ * Opens a row's menu, chooses Delete, and waits for the confirm modal to arrive.
+ *
+ * The modal deliberately opens ONE FRAME after the click — see `requestDelete`
+ * (conversation-list.tsx): the menu's own focus trap has to finish unwinding before the modal's
+ * starts, or the two fight and focus ends up on `<body>` after the delete. So the delete flow is
+ * asynchronous from a test's point of view and cannot be asserted in the same tick as the click.
+ */
+async function chooseDeleteFromMenu(rowTitle?: string): Promise<void> {
+  openRowMenu(rowTitle);
+  fireEvent.click(screen.getByRole('button', { name: 'Delete conversation' }));
+  await waitFor(() =>
+    expect(screen.getByText(/permanently delete/)).toBeInTheDocument(),
+  );
+}
 
 function conversation(
   overrides: Partial<ConversationSummary> = {},
@@ -584,7 +624,7 @@ describe('ConversationList', () => {
     });
   });
 
-  describe('delete button visibility (WCAG 1.4.11)', () => {
+  describe('actions trigger visibility (WCAG 1.4.11)', () => {
     it('is invisible at rest (opacity 0, never a low-contrast in-between value)', () => {
       render(
         <ConversationList
@@ -597,12 +637,12 @@ describe('ConversationList', () => {
         />,
       );
 
-      const deleteButton = screen.getByRole('button', {
-        name: 'Delete conversation',
+      const trigger = screen.getByRole('button', {
+        name: 'Conversation actions',
       });
-      expect(
-        (deleteButton.closest('[style]') as HTMLElement).style.opacity,
-      ).toBe('0');
+      expect((trigger.closest('[style]') as HTMLElement).style.opacity).toBe(
+        '0',
+      );
     });
 
     it('becomes visible on keyboard focus, not just mouse hover', () => {
@@ -617,23 +657,73 @@ describe('ConversationList', () => {
         />,
       );
 
-      const deleteButton = screen.getByRole('button', {
-        name: 'Delete conversation',
+      const trigger = screen.getByRole('button', {
+        name: 'Conversation actions',
       });
-      fireEvent.focus(deleteButton);
-      expect(
-        (deleteButton.closest('[style]') as HTMLElement).style.opacity,
-      ).toBe('1');
+      fireEvent.focus(trigger);
+      expect((trigger.closest('[style]') as HTMLElement).style.opacity).toBe(
+        '1',
+      );
 
-      fireEvent.blur(deleteButton);
-      expect(
-        (deleteButton.closest('[style]') as HTMLElement).style.opacity,
-      ).toBe('0');
+      fireEvent.blur(trigger);
+      expect((trigger.closest('[style]') as HTMLElement).style.opacity).toBe(
+        '0',
+      );
+    });
+
+    it('stays visible while its own menu is open, even after the pointer leaves the row', () => {
+      // The trigger anchors the open panel, so fading it out from under one would both look broken
+      // and destroy the element focus returns to when the menu closes.
+      render(
+        <ConversationList
+          conversations={[conversation({ title: 'Menu row' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={noop}
+        />,
+      );
+
+      const row = screen.getByText('Menu row').closest('.wzConvoRow');
+      const trigger = screen.getByRole('button', {
+        name: 'Conversation actions',
+      });
+
+      fireEvent.mouseEnter(row as HTMLElement);
+      openRowMenu();
+      fireEvent.mouseLeave(row as HTMLElement);
+
+      expect((trigger.closest('[style]') as HTMLElement).style.opacity).toBe(
+        '1',
+      );
+    });
+
+    it('remains reachable on the ACTIVE row, which is where a rename or delete is most likely', () => {
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'active', title: 'Active one' })]}
+          isLoading={false}
+          activeConversationId='active'
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={noop}
+        />,
+      );
+
+      const trigger = screen.getByRole('button', {
+        name: 'Conversation actions',
+      });
+      expect((trigger.closest('[style]') as HTMLElement).style.opacity).toBe(
+        '1',
+      );
     });
   });
 
   describe('delete flow', () => {
-    it('clicking the trash icon opens a confirm modal without triggering onSelect', () => {
+    it('choosing Delete opens a confirm modal without triggering onSelect', async () => {
       const onSelect = jest.fn();
       render(
         <ConversationList
@@ -646,9 +736,7 @@ describe('ConversationList', () => {
         />,
       );
 
-      fireEvent.click(
-        screen.getByRole('button', { name: 'Delete conversation' }),
-      );
+      await chooseDeleteFromMenu();
 
       expect(onSelect).not.toHaveBeenCalled();
       expect(
@@ -658,7 +746,7 @@ describe('ConversationList', () => {
       ).toBeInTheDocument();
     });
 
-    it('Cancel closes the modal without calling onDelete', () => {
+    it('Cancel closes the modal without calling onDelete', async () => {
       const onDelete = jest.fn();
       render(
         <ConversationList
@@ -671,16 +759,14 @@ describe('ConversationList', () => {
         />,
       );
 
-      fireEvent.click(
-        screen.getByRole('button', { name: 'Delete conversation' }),
-      );
+      await chooseDeleteFromMenu();
       fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
       expect(onDelete).not.toHaveBeenCalled();
       expect(screen.queryByText(/permanently delete/)).toBeNull();
     });
 
-    it('confirming the modal calls onDelete with the conversation id and closes the modal', () => {
+    it('confirming the modal calls onDelete with the conversation id and closes the modal', async () => {
       const onDelete = jest.fn();
       render(
         <ConversationList
@@ -693,9 +779,7 @@ describe('ConversationList', () => {
         />,
       );
 
-      fireEvent.click(
-        screen.getByRole('button', { name: 'Delete conversation' }),
-      );
+      await chooseDeleteFromMenu();
       fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
 
       expect(onDelete).toHaveBeenCalledWith('c1');
@@ -703,6 +787,9 @@ describe('ConversationList', () => {
     });
 
     it('m12/F-4: focus lands on the rail scroll container after a confirmed delete, not lost to <body>', async () => {
+      // The regression this pins got HARDER once the delete moved behind the overflow menu: two
+      // focus traps (the menu's popover and the modal) now unwind in sequence, and an earlier cut
+      // of that change left focus on `<body>` because they overlapped. See `requestDelete`.
       render(
         <ConversationList
           conversations={[conversation({ id: 'c1', title: 'Delete me' })]}
@@ -714,9 +801,7 @@ describe('ConversationList', () => {
         />,
       );
 
-      fireEvent.click(
-        screen.getByRole('button', { name: 'Delete conversation' }),
-      );
+      await chooseDeleteFromMenu();
       fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
 
       await waitFor(() => {
@@ -745,8 +830,221 @@ describe('ConversationList', () => {
     });
   });
 
+  describe('row overflow menu (#9018 follow-up)', () => {
+    function renderOneRow(onSelect: () => void = noop) {
+      render(
+        <ConversationList
+          conversations={[conversation({ id: 'c1', title: 'Menu row' })]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={onSelect}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={noop}
+        />,
+      );
+      return screen.getByRole('button', { name: 'Conversation actions' });
+    }
+
+    it('marks the trigger as opening a menu, and tracks open state for assistive tech', () => {
+      const trigger = renderOneRow();
+      // `true`, not `'menu'`: EuiContextMenuPanel renders plain buttons rather than
+      // role="menu"/role="menuitem", so promising a menu role would be a lie to assistive tech.
+      expect(trigger).toHaveAttribute('aria-haspopup', 'true');
+      expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+      openRowMenu();
+      expect(
+        screen.getByRole('button', { name: 'Conversation actions' }),
+      ).toHaveAttribute('aria-expanded', 'true');
+    });
+
+    it('opens on Enter at the trigger, instead of resuming the conversation', async () => {
+      // `fireEvent.keyDown` doesn't simulate a real browser's own "Enter on a focused
+      // button fires a click" behavior the way `userEvent` does -- needed here since this
+      // relies on the trigger's native activation, not a JS-side key handler of its own.
+      const user = userEvent.setup();
+      const onSelect = jest.fn();
+      const trigger = renderOneRow(onSelect);
+
+      trigger.focus();
+      await user.keyboard('{Enter}');
+
+      expect(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      ).toBeInTheDocument();
+      expect(onSelect).not.toHaveBeenCalled();
+    });
+
+    /**
+     * `EuiPopover` renders its menu panel through a React portal -- elsewhere in the real DOM,
+     * but still a React-tree descendant of the row, so its own Enter/Space were ALSO reaching
+     * the row's `onKeyDown` and getting `preventDefault`-ed before Rename/Delete's own native
+     * activation could fire (the same bug the trigger itself had, one layer deeper).
+     *
+     * Reaches a menu item by real Tabs rather than an imperative `.focus()` straight onto it:
+     * `EuiContextMenuPanel` tracks its own "current item" for arrow/Enter handling alongside
+     * real DOM focus, and only its own Tab/arrow-key navigation keeps the two in sync -- an
+     * external `.focus()` call can leave that internal index stale (Enter then does nothing,
+     * or activates the wrong entry) even though the browser's own focus ring looks correct.
+     * How many Tabs the trap's own focus-management inserts before a given item is an EUI/jsdom
+     * implementation detail this test shouldn't hardcode a count for -- live-verified with
+     * agent-browser against a running dashboard, this exact flow (keyboard-open, Tab, Enter)
+     * reaches and activates both entries.
+     */
+    async function tabToMenuItem(
+      user: ReturnType<typeof userEvent.setup>,
+      name: string,
+    ): Promise<void> {
+      /* eslint-disable no-await-in-loop -- each Tab depends on where the previous one landed */
+      for (
+        let tabs = 0;
+        tabs < 5 &&
+        screen.getByRole('button', { name }) !== document.activeElement;
+        tabs++
+      ) {
+        await user.keyboard('{Tab}');
+      }
+      /* eslint-enable no-await-in-loop */
+      expect(screen.getByRole('button', { name })).toHaveFocus();
+    }
+
+    it('activates Rename on Enter at the menu item, not just on click', async () => {
+      const user = userEvent.setup();
+      const trigger = renderOneRow();
+      trigger.focus();
+      await user.keyboard('{Enter}');
+      await tabToMenuItem(user, 'Rename conversation');
+
+      await user.keyboard('{Enter}');
+
+      expect(screen.getByLabelText('Conversation title')).toBeInTheDocument();
+    });
+
+    it('activates Delete on Enter at the menu item, not just on click', async () => {
+      const user = userEvent.setup();
+      const trigger = renderOneRow();
+      trigger.focus();
+      await user.keyboard('{Enter}');
+      await tabToMenuItem(user, 'Delete conversation');
+
+      await user.keyboard('{Enter}');
+
+      await waitFor(() =>
+        expect(screen.getByText(/permanently delete/)).toBeInTheDocument(),
+      );
+    });
+
+    it('is closed at rest: neither action is reachable until the trigger is clicked', () => {
+      renderOneRow();
+      expect(
+        screen.queryByRole('button', { name: 'Rename conversation' }),
+      ).toBeNull();
+      expect(
+        screen.queryByRole('button', { name: 'Delete conversation' }),
+      ).toBeNull();
+
+      openRowMenu();
+      expect(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Delete conversation' }),
+      ).toBeInTheDocument();
+    });
+
+    it('offers Rename before Delete, so the destructive entry is not the default target', () => {
+      renderOneRow();
+      openRowMenu();
+
+      const entries = screen
+        .getAllByRole('button')
+        .map(button => button.textContent)
+        .filter(
+          text =>
+            text === 'Rename conversation' || text === 'Delete conversation',
+        );
+      expect(entries).toEqual(['Rename conversation', 'Delete conversation']);
+    });
+
+    it('closes on Escape without exiting to an enclosing surface, and returns focus to the trigger', async () => {
+      const trigger = renderOneRow();
+      openRowMenu();
+      expect(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      ).toBeInTheDocument();
+
+      fireEvent.keyDown(trigger, { key: 'Escape' });
+
+      expect(
+        screen.queryByRole('button', { name: 'Rename conversation' }),
+      ).toBeNull();
+      // The refocus is deferred one frame (see the Escape handler's own comment in
+      // conversation-list.tsx) -- same reason `chooseDeleteFromMenu` above has to `await` its modal.
+      await waitFor(() => {
+        expect(document.activeElement).toBe(trigger);
+      });
+    });
+
+    it('closes when Rename is chosen, and hands over to the inline editor', () => {
+      renderOneRow();
+      openRowMenu();
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      );
+
+      // Menu gone, editor in its place — the existing rename flow, unchanged.
+      expect(
+        screen.queryByRole('button', { name: 'Delete conversation' }),
+      ).toBeNull();
+      expect(
+        screen.getByRole('textbox', { name: 'Conversation title' }),
+      ).toBeInTheDocument();
+    });
+
+    it('closes when Delete is chosen, and hands over to the confirm modal', async () => {
+      renderOneRow();
+      await chooseDeleteFromMenu();
+
+      // Menu entries unmounted with the menu; the modal owns the surface now.
+      expect(
+        screen.queryByRole('button', { name: 'Rename conversation' }),
+      ).toBeNull();
+      expect(
+        screen.getByRole('button', { name: 'Delete' }),
+      ).toBeInTheDocument();
+    });
+
+    it("opening one row's menu closes another's, so only one panel is ever live", () => {
+      render(
+        <ConversationList
+          conversations={[
+            conversation({ id: 'a', title: 'Row A' }),
+            conversation({ id: 'b', title: 'Row B' }),
+          ]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+          onRename={noop}
+        />,
+      );
+
+      openRowMenu('Row A');
+      expect(
+        screen.getAllByRole('button', { name: 'Rename conversation' }),
+      ).toHaveLength(1);
+
+      openRowMenu('Row B');
+      expect(
+        screen.getAllByRole('button', { name: 'Rename conversation' }),
+      ).toHaveLength(1);
+    });
+  });
+
   describe('inline rename (E2)', () => {
-    it('does not render a rename affordance when onRename is not supplied', () => {
+    it('offers no Rename entry when onRename is not supplied, but still offers Delete', () => {
       render(
         <ConversationList
           conversations={[conversation({ title: 'No rename here' })]}
@@ -758,21 +1056,24 @@ describe('ConversationList', () => {
         />,
       );
 
+      openRowMenu();
       expect(
         screen.queryByRole('button', { name: 'Rename conversation' }),
       ).toBeNull();
+      // The menu itself is not conditional on `onRename` — only that one entry is.
+      expect(
+        screen.getByRole('button', { name: 'Delete conversation' }),
+      ).toBeInTheDocument();
     });
 
-    it('M3 REGRESSION: at rest, the pencil sits OUTSIDE the row flex group -- the row is byte-identical to upstream/5.0.0', () => {
-      // Screenshot-equivalent DOM check: rather than a real layout engine (jsdom has none), this
-      // asserts the actual STRUCTURE the M3 fix relies on. The pencil used to be a zero-width
-      // EuiFlexItem inside the row's `gutterSize='xs'` EuiFlexGroup -- but EUI gutters are margins
-      // on every flex item, so even a collapsed one still cost the row a few px of dead gutter at
-      // rest, on top of the reflow it caused. The fix takes it out of the flex flow entirely and
-      // renders it as an absolutely-positioned overlay anchored to the row, so the row's OWN flex
-      // group is left with exactly the three items upstream/5.0.0's own row markup has --
-      // [title][timestamp][trash], nothing else -- proving the at-rest row is structurally
-      // identical to upstream, not just "close" to it.
+    it('NO-REFLOW REGRESSION: one action slot in the row flex group, unchanged by hover', () => {
+      // Screenshot-equivalent DOM check (jsdom has no layout engine). The row's actions used to be
+      // a trash button in the flex group PLUS a pencil in an absolutely-positioned overlay, the
+      // overlay existing purely so a second in-flow item would not cost the row another
+      // `gutterSize='xs'` margin at rest. Consolidating both into ONE trigger removes that tension
+      // outright: the trigger takes the trash's own slot, so the group is still exactly
+      // [title][timestamp][actions] — the same three items upstream/5.0.0's row has — and there is
+      // no overlay left to sit on top of anyone's text.
       render(
         <ConversationList
           conversations={[conversation({ id: 'c1', title: 'Rename me' })]}
@@ -788,51 +1089,43 @@ describe('ConversationList', () => {
       const row = screen.getByText('Rename me').closest('.wzConvoRow');
       const flexGroup = row?.querySelector(':scope > .euiFlexGroup');
       expect(flexGroup).not.toBeNull();
-      // Exactly [title][timestamp][trash] -- no pencil item, no extra gutter contributor.
       expect(flexGroup?.children).toHaveLength(3);
 
-      const pencil = screen.getByRole('button', {
-        name: 'Rename conversation',
+      const trigger = screen.getByRole('button', {
+        name: 'Conversation actions',
       });
-      // The pencil is a DESCENDANT of the row (still reachable/focusable), but not of its flex
-      // group -- it renders as the row's own absolutely-positioned sibling overlay instead.
-      expect(row?.contains(pencil)).toBe(true);
-      expect(flexGroup?.contains(pencil)).toBe(false);
+      // IN the flex group now, not an overlay layered over the row.
+      expect(flexGroup?.contains(trigger)).toBe(true);
+      expect(row?.querySelector('.wzConvoRowRenameOverlay')).toBeNull();
 
-      const overlay = pencil.closest('.wzConvoRowRenameOverlay') as HTMLElement;
-      expect(overlay).not.toBeNull();
-      expect(overlay.style.opacity).toBe('0');
-      expect(overlay.style.pointerEvents).toBe('none');
-
+      // Hovering reveals it without adding or removing a flex item — no title reflow on hover.
       fireEvent.mouseEnter(row as HTMLElement);
-
-      expect(overlay.style.opacity).toBe('1');
-      expect(overlay.style.pointerEvents).toBe('auto');
-      // Hovering never adds/removes a flex item either -- no title reflow on hover.
       expect(flexGroup?.children).toHaveLength(3);
+      expect(
+        screen.getByRole('button', { name: 'Conversation actions' }),
+      ).toBeInTheDocument();
     });
 
-    it('M3 REGRESSION: the pencil is NOT permanently shown on the active/selected row -- hover or focus only', () => {
+    it('the trigger stops propagation, so opening the menu does not also resume the conversation', () => {
+      const onSelect = jest.fn();
       render(
         <ConversationList
-          conversations={[conversation({ id: 'active', title: 'Active one' })]}
+          conversations={[conversation({ id: 'c1', title: 'Rename me' })]}
           isLoading={false}
-          activeConversationId='active'
-          onSelect={noop}
+          activeConversationId={null}
+          onSelect={onSelect}
           onNewConversation={noop}
           onDelete={noop}
           onRename={noop}
         />,
       );
 
-      const pencil = screen.getByRole('button', {
-        name: 'Rename conversation',
-      });
-      const overlay = pencil.closest('.wzConvoRowRenameOverlay') as HTMLElement;
-      // Selected but neither hovered nor focused -- must still be at rest, unlike the pre-fix
-      // condition which also checked `isSelected`.
-      expect(overlay.style.opacity).toBe('0');
-      expect(overlay.style.pointerEvents).toBe('none');
+      openRowMenu();
+
+      expect(onSelect).not.toHaveBeenCalled();
+      expect(
+        screen.getByRole('button', { name: 'Rename conversation' }),
+      ).toBeInTheDocument();
     });
 
     it('clicking the pencil icon swaps the title for an input, without triggering onSelect', () => {
@@ -849,6 +1142,7 @@ describe('ConversationList', () => {
         />,
       );
 
+      openRowMenu();
       fireEvent.click(
         screen.getByRole('button', { name: 'Rename conversation' }),
       );
@@ -875,6 +1169,7 @@ describe('ConversationList', () => {
         />,
       );
 
+      openRowMenu();
       fireEvent.click(
         screen.getByRole('button', { name: 'Rename conversation' }),
       );
@@ -900,6 +1195,7 @@ describe('ConversationList', () => {
         />,
       );
 
+      openRowMenu();
       fireEvent.click(
         screen.getByRole('button', { name: 'Rename conversation' }),
       );
@@ -925,6 +1221,7 @@ describe('ConversationList', () => {
         />,
       );
 
+      openRowMenu();
       fireEvent.click(
         screen.getByRole('button', { name: 'Rename conversation' }),
       );
@@ -949,6 +1246,7 @@ describe('ConversationList', () => {
         />,
       );
 
+      openRowMenu();
       fireEvent.click(
         screen.getByRole('button', { name: 'Rename conversation' }),
       );
@@ -974,6 +1272,7 @@ describe('ConversationList', () => {
         />,
       );
 
+      openRowMenu();
       fireEvent.click(
         screen.getByRole('button', { name: 'Rename conversation' }),
       );
@@ -1008,6 +1307,7 @@ describe('ConversationList', () => {
         />,
       );
 
+      openRowMenu();
       fireEvent.click(
         screen.getByRole('button', { name: 'Rename conversation' }),
       );
@@ -1038,6 +1338,7 @@ describe('ConversationList', () => {
         />,
       );
 
+      openRowMenu();
       fireEvent.click(
         screen.getByRole('button', { name: 'Rename conversation' }),
       );
@@ -1065,6 +1366,7 @@ describe('ConversationList', () => {
         />,
       );
 
+      openRowMenu();
       fireEvent.click(
         screen.getByRole('button', { name: 'Rename conversation' }),
       );
@@ -1089,6 +1391,7 @@ describe('ConversationList', () => {
         />,
       );
 
+      openRowMenu();
       fireEvent.click(
         screen.getByRole('button', { name: 'Rename conversation' }),
       );
@@ -1189,7 +1492,7 @@ describe('ConversationList', () => {
       expect(toolbar.className).toMatch(/wzConvoRailSearchRow/);
     });
 
-    it('entering select mode shows a checkbox per row and hides the delete/rename icons', () => {
+    it('entering select mode shows a checkbox per row and hides the actions trigger', () => {
       render(
         <ConversationList
           conversations={[conversation({ id: 'c1', title: 'Selectable' })]}
@@ -1210,6 +1513,10 @@ describe('ConversationList', () => {
       expect(
         screen.getByRole('checkbox', { name: 'Select "Selectable"' }),
       ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Conversation actions' }),
+      ).toBeNull();
+      // ...and with the trigger gone there is no way to reach the per-row actions either.
       expect(
         screen.queryByRole('button', { name: 'Delete conversation' }),
       ).toBeNull();
@@ -1359,7 +1666,9 @@ describe('ConversationList', () => {
 
       fireEvent.keyDown(
         screen.getByRole('checkbox', { name: 'Select "First"' }),
-        { key: 'Escape' },
+        {
+          key: 'Escape',
+        },
       );
 
       expect(

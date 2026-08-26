@@ -464,9 +464,6 @@ export const ComplianceTable = compose(
                     <EuiFlexItem style={{ width: '15%' }}>
                       <ComplianceSubrequirements
                         section={props.section}
-                        onSelectedTabChanged={id =>
-                          props.onSelectedTabChanged(id)
-                        }
                         requirementsCount={action.data || []}
                         loadingAlerts={action.running}
                         fetchFilters={dataSource.fetchFilters}

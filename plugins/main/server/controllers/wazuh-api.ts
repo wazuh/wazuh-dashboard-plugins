@@ -106,17 +106,17 @@ export class WazuhApiCtrl {
         idHost,
       );
 
-      let textSecure = '';
-      if (context.wazuh.server.info.protocol === 'https') {
-        textSecure = ';Secure';
-      }
+      // Derived from the listener protocol, or from
+      // opensearch_security.cookie.secure when an administrator set it, so
+      // these cookies match the platform session cookie behind a TLS proxy.
+      const textSecure = context.wazuh.server.cookieSecure ? ';Secure' : '';
       const encodedUser = encodeURIComponent(username);
       return response.ok({
         headers: {
           'set-cookie': [
             `wz-token=${token};Path=/;HttpOnly${textSecure}`,
             `wz-user=${encodedUser};Path=/;HttpOnly${textSecure}`,
-            `wz-api=${idHost};Path=/;HttpOnly`,
+            `wz-api=${idHost};Path=/;HttpOnly${textSecure}`,
           ],
         },
         body: { token },
