@@ -47,6 +47,20 @@ describe('useDataGridColumns', () => {
     isStateMatchingDefaults: false,
   };
 
+  const renderColumns = (
+    overrides: Partial<Parameters<typeof useDataGridColumns>[0]> = {},
+  ) =>
+    renderHook(() =>
+      useDataGridColumns({
+        moduleId,
+        defaultColumns,
+        columnSchemaDefinitionsMap,
+        indexPatternExists: true,
+        dataGridStatePersistenceManager: mockDataGridStatePersistenceManager,
+        ...overrides,
+      }),
+    );
+
   beforeEach(() => {
     jest.clearAllMocks();
 
@@ -64,18 +78,14 @@ describe('useDataGridColumns', () => {
   });
 
   it('should initialize with default columns', () => {
-    const { result } = renderHook(() =>
-      useDataGridColumns({
-        moduleId,
-        defaultColumns,
-        columnSchemaDefinitionsMap,
-        indexPatternExists: true,
-        dataGridStatePersistenceManager: mockDataGridStatePersistenceManager,
-      }),
-    );
+    const { result } = renderColumns();
 
-    expect(result.current.columns).toHaveLength(0);
-    expect(result.current.columnVisibility.visibleColumns).toEqual([]);
+    expect(result.current.columnVisibility.visibleColumns).toEqual(
+      defaultColumns.map(column => column.id),
+    );
+    expect(result.current.columns.map(column => column.id)).toEqual(
+      defaultColumns.map(column => column.id),
+    );
   });
 
   it('should load persisted columns when available', () => {
@@ -87,15 +97,7 @@ describe('useDataGridColumns', () => {
       pageSize: 10,
     });
 
-    const { result } = renderHook(() =>
-      useDataGridColumns({
-        moduleId,
-        defaultColumns,
-        columnSchemaDefinitionsMap,
-        indexPatternExists: true,
-        dataGridStatePersistenceManager: mockDataGridStatePersistenceManager,
-      }),
-    );
+    const { result } = renderColumns();
 
     expect(result.current.columnVisibility.visibleColumns).toEqual(
       persistedColumns,
@@ -103,15 +105,7 @@ describe('useDataGridColumns', () => {
   });
 
   it('should update visible columns when setVisibleColumns is called', () => {
-    const { result } = renderHook(() =>
-      useDataGridColumns({
-        moduleId,
-        defaultColumns,
-        columnSchemaDefinitionsMap,
-        indexPatternExists: true,
-        dataGridStatePersistenceManager: mockDataGridStatePersistenceManager,
-      }),
-    );
+    const { result } = renderColumns();
     const newVisibleColumns = ['col2', 'col3'];
 
     act(() => {
@@ -134,15 +128,7 @@ describe('useDataGridColumns', () => {
       pageSize: 10,
     });
 
-    const { result } = renderHook(() =>
-      useDataGridColumns({
-        moduleId,
-        defaultColumns,
-        columnSchemaDefinitionsMap,
-        indexPatternExists: true,
-        dataGridStatePersistenceManager: mockDataGridStatePersistenceManager,
-      }),
-    );
+    const { result } = renderColumns();
 
     // First columns should be the visible ones in the correct order
     expect(result.current.columnsAvailable[0].id).toBe('col2');
@@ -169,15 +155,7 @@ describe('useDataGridColumns', () => {
       pageSize: 10,
     });
 
-    const { result } = renderHook(() =>
-      useDataGridColumns({
-        moduleId,
-        defaultColumns,
-        columnSchemaDefinitionsMap,
-        indexPatternExists: true,
-        dataGridStatePersistenceManager: mockDataGridStatePersistenceManager,
-      }),
-    );
+    const { result } = renderColumns();
 
     act(() => {
       result.current.onColumnResize({
@@ -207,15 +185,7 @@ describe('useDataGridColumns', () => {
       pageSize: 10,
     });
 
-    const { result } = renderHook(() =>
-      useDataGridColumns({
-        moduleId,
-        defaultColumns,
-        columnSchemaDefinitionsMap,
-        indexPatternExists: true,
-        dataGridStatePersistenceManager: mockDataGridStatePersistenceManager,
-      }),
-    );
+    const { result } = renderColumns();
 
     act(() => {
       result.current.onColumnResize({
@@ -241,15 +211,7 @@ describe('useDataGridColumns', () => {
       pageSize: 10,
     });
 
-    const { result } = renderHook(() =>
-      useDataGridColumns({
-        moduleId,
-        defaultColumns,
-        columnSchemaDefinitionsMap,
-        indexPatternExists: true,
-        dataGridStatePersistenceManager: mockDataGridStatePersistenceManager,
-      }),
-    );
+    const { result } = renderColumns();
     const testColumnId = 'col1';
     const testColumnWidth = 150;
 
@@ -279,15 +241,7 @@ describe('useDataGridColumns', () => {
       pageSize: 10,
     });
 
-    const { result } = renderHook(() =>
-      useDataGridColumns({
-        moduleId,
-        defaultColumns,
-        columnSchemaDefinitionsMap,
-        indexPatternExists: true,
-        dataGridStatePersistenceManager: mockDataGridStatePersistenceManager,
-      }),
-    );
+    const { result } = renderColumns();
 
     // First resize
     act(() => {
@@ -340,15 +294,7 @@ describe('useDataGridColumns', () => {
       pageSize: 10,
     });
 
-    const { result } = renderHook(() =>
-      useDataGridColumns({
-        moduleId,
-        defaultColumns,
-        columnSchemaDefinitionsMap,
-        indexPatternExists: true,
-        dataGridStatePersistenceManager: mockDataGridStatePersistenceManager,
-      }),
-    );
+    const { result } = renderColumns();
 
     // Resize with invalid column ID
     act(() => {
@@ -361,42 +307,183 @@ describe('useDataGridColumns', () => {
     expect(mockUpdateState).toHaveBeenCalledTimes(0);
   });
 
-  it('should handle missing columns gracefully', () => {
-    // Constants for readability
-    const validColumnId = 'col1';
-    const nonexistentColumnId = 'nonexistent';
-    const mockPersistedColumns = [validColumnId, nonexistentColumnId];
+  it('should drop the column whose field is missing and persist only the valid ones', () => {
+    const mockPersistedColumns = ['col1', 'nonexistent'];
 
-    // Mock retrieving columns that don't exist in the schema
     mockRetrieveState.mockReturnValue({
       columns: mockPersistedColumns,
       columnWidths: {},
       pageSize: 10,
     });
 
-    const { result } = renderHook(() =>
-      useDataGridColumns({
-        moduleId,
-        defaultColumns,
-        columnSchemaDefinitionsMap,
-        indexPatternExists: true,
-        dataGridStatePersistenceManager: mockDataGridStatePersistenceManager,
-      }),
-    );
+    const { result } = renderColumns();
 
-    // It should filter out non-existent columns when persisting
-    expect(result.current.columnVisibility.visibleColumns).toEqual(
-      mockPersistedColumns,
+    expect(result.current.columnVisibility.visibleColumns).toEqual(['col1']);
+    expect(result.current.columns).toEqual([
+      expect.objectContaining({ id: 'col1' }),
+    ]);
+    expect(result.current.columns.every(column => Boolean(column.id))).toBe(
+      true,
     );
 
     act(() => {
-      // This will trigger filtering of invalid columns
       result.current.columnVisibility.setVisibleColumns(mockPersistedColumns);
     });
 
-    // Only the valid column should be persisted
-    expect(mockUpdateState).toHaveBeenCalledWith({
-      columns: [validColumnId],
+    expect(mockUpdateState).toHaveBeenCalledWith({ columns: ['col1'] });
+  });
+
+  it('should not filter columns while the index pattern has not loaded yet', () => {
+    const mockPersistedColumns = ['col1', 'nonexistent'];
+
+    mockRetrieveState.mockReturnValue({
+      columns: mockPersistedColumns,
+      columnWidths: {},
+      pageSize: 10,
     });
+
+    const { result } = renderColumns({ indexPatternExists: false });
+
+    expect(result.current.columnVisibility.visibleColumns).toEqual(
+      defaultColumns.map(column => column.id),
+    );
+  });
+
+  it('should not filter columns while the schema definitions map is empty', () => {
+    mockRetrieveState.mockReturnValue({
+      columnWidths: {},
+      pageSize: 10,
+    });
+
+    const { result } = renderColumns({ columnSchemaDefinitionsMap: {} });
+
+    expect(result.current.columnVisibility.visibleColumns).toEqual(
+      defaultColumns.map(column => column.id),
+    );
+  });
+
+  it('should keep the output unchanged when all configured fields exist (no-op regression guard)', () => {
+    const mockPersistedColumns = ['col2', 'col1'];
+
+    mockRetrieveState.mockReturnValue({
+      columns: mockPersistedColumns,
+      columnWidths: {},
+      pageSize: 10,
+    });
+
+    const { result } = renderColumns();
+
+    expect(result.current.columnVisibility.visibleColumns).toEqual(
+      mockPersistedColumns,
+    );
+    expect(result.current.columns.map(column => column.id)).toEqual(
+      mockPersistedColumns,
+    );
+  });
+
+  it('should preserve persisted column widths for surviving columns after filtering', () => {
+    const mockPersistedColumns = ['col1', 'nonexistent'];
+
+    mockRetrieveState.mockReturnValue({
+      columns: mockPersistedColumns,
+      columnWidths: {
+        col1: 275,
+      },
+      pageSize: 10,
+    });
+
+    const { result } = renderColumns();
+
+    expect(result.current.columns).toEqual([
+      expect.objectContaining({ id: 'col1', initialWidth: 275 }),
+    ]);
+  });
+
+  it('should return empty columns and visibleColumns when all configured fields are missing', () => {
+    const mockPersistedColumns = ['nonexistent1', 'nonexistent2'];
+
+    mockRetrieveState.mockReturnValue({
+      columns: mockPersistedColumns,
+      columnWidths: {},
+      pageSize: 10,
+    });
+
+    const { result } = renderColumns();
+
+    expect(result.current.columnVisibility.visibleColumns).toEqual([]);
+    expect(result.current.columns).toEqual([]);
+  });
+
+  it('should keep columnsAvailable consistent with the filtered visible set', () => {
+    const mockPersistedColumns = ['col1', 'nonexistent'];
+
+    mockRetrieveState.mockReturnValue({
+      columns: mockPersistedColumns,
+      columnWidths: {},
+      pageSize: 10,
+    });
+
+    const { result } = renderColumns();
+
+    const availableIds = result.current.columnsAvailable.map(
+      column => column.id,
+    );
+
+    expect(availableIds).toEqual(
+      expect.arrayContaining(['col1', 'col2', 'col3']),
+    );
+    expect(availableIds).not.toContain('nonexistent');
+    expect(result.current.columnsAvailable.length).toBe(
+      columnSchemaDefinitions.length,
+    );
+  });
+
+  it('should keep the visible columns when the persisted state was reset to an empty list', () => {
+    mockRetrieveState.mockReturnValue({
+      columns: [],
+      columnWidths: {},
+      pageSize: 10,
+    });
+
+    const { result } = renderColumns();
+
+    expect(result.current.columnVisibility.visibleColumns).toEqual(
+      defaultColumns.map(column => column.id),
+    );
+  });
+
+  it('should self-heal and show the column again once its field appears in the schema map', () => {
+    const mockPersistedColumns = ['col1', 'col3'];
+
+    mockRetrieveState.mockReturnValue({
+      columns: mockPersistedColumns,
+      columnWidths: {},
+      pageSize: 10,
+    });
+
+    const partialSchemaMap = {
+      col1: { id: 'col1', display: 'Column 1' },
+    };
+
+    const { result, rerender } = renderHook(
+      ({ columnSchemaDefinitionsMap: schemaMap }) =>
+        useDataGridColumns({
+          moduleId,
+          defaultColumns,
+          columnSchemaDefinitionsMap: schemaMap,
+          indexPatternExists: true,
+          dataGridStatePersistenceManager: mockDataGridStatePersistenceManager,
+        }),
+      { initialProps: { columnSchemaDefinitionsMap: partialSchemaMap } },
+    );
+
+    expect(result.current.columnVisibility.visibleColumns).toEqual(['col1']);
+
+    rerender({ columnSchemaDefinitionsMap });
+
+    expect(result.current.columnVisibility.visibleColumns).toEqual([
+      'col1',
+      'col3',
+    ]);
   });
 });
