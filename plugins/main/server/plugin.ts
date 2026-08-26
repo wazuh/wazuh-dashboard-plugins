@@ -30,6 +30,7 @@ import { ILegacyClusterClient } from '../../../src/core/server';
 
 import { WazuhPluginSetup, WazuhPluginStart, PluginSetup } from './types';
 import { setupRoutes } from './routes';
+import { resolveCookieSecure } from './lib/cookie';
 import { jobInitializeRun, jobQueueRun } from './start';
 import { first } from 'rxjs/operators';
 import {
@@ -679,6 +680,11 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
 
     const serverInfo = core.http.getServerInfo();
 
+    const cookieSecure = await resolveCookieSecure(
+      plugins,
+      serverInfo.protocol === 'https',
+    );
+
     core.http.registerRouteHandlerContext('wazuh', (context, request) => ({
       // Create a custom logger with a tag composed of HTTP method and path endpoint
       logger: this.logger.get(
@@ -686,6 +692,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       ),
       server: {
         info: serverInfo,
+        cookieSecure,
       },
       plugins,
       security: plugins.wazuhCore.dashboardSecurity,
