@@ -17,6 +17,7 @@ import {
   EuiFlexGroup,
   EuiTitle,
   EuiCallOut,
+  EuiLink,
   EuiIcon,
   EuiSpacer,
   EuiProgress,
@@ -27,6 +28,7 @@ import { WzRequest } from '../../../../../react-services';
 import { connect } from 'react-redux';
 import { useAsyncAction } from '../../../hooks';
 import { withGuard } from '../../../hocs';
+import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { compose } from 'redux';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import {
@@ -36,22 +38,47 @@ import {
   UILogLevel,
 } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { getAgentReportedConfiguration } from '../../../../../controllers/management/components/management/configuration/utils/agent-config-service';
 import './module_configuration.scss';
 
 const mapStateToProps = state => ({
   agent: state.appStateReducers.currentAgentData,
 });
 
-const getMapConfigurationToState = async (
+export const AGENT_CONFIGURATION_NOT_REPORTED = Object.freeze({
+  status: 'agent-configuration-not-reported' as const,
+});
+export type AgentConfigurationNotReported =
+  typeof AGENT_CONFIGURATION_NOT_REPORTED;
+
+const getAgentConfigurationToState = async (
+  mapResponseConfiguration,
+  agent: { id: string; name?: string },
+): Promise<
+  [Record<string, unknown>] | AgentConfigurationNotReported | null
+> => {
+  const report = await getAgentReportedConfiguration(agent.id);
+
+  if (report === null) {
+    return AGENT_CONFIGURATION_NOT_REPORTED;
+  }
+
+  const configuration = mapResponseConfiguration(
+    report.content,
+    'agent',
+    agent,
+  );
+
+  return configuration ? [configuration] : null;
+};
+
+const getManagerConfigurationToState = async (
   type: string,
   configurationAPIPartialPath: string,
   mapResponseConfiguration,
   params?: any,
-): Promise<[any] | string> => {
-  const prefixEndpoint =
-    type === 'agent'
-      ? `/agents/${params.id}/config`
-      : `/cluster/${params.name}/configuration`;
+): Promise<[any] | null> => {
+  const prefixEndpoint = `/cluster/${params.name}/configuration`;
   const response = await WzRequest.apiReq(
     'GET',
     `${prefixEndpoint}${configurationAPIPartialPath}`,
@@ -69,6 +96,7 @@ export const PanelModuleConfiguration: FunctionalComponent<{ h: string }> =
     ({
       agent,
       configurationAPIPartialPath,
+      documentationPath,
       mapResponseConfiguration,
       moduleTitle,
       moduleIconType = '',
@@ -78,13 +106,10 @@ export const PanelModuleConfiguration: FunctionalComponent<{ h: string }> =
         try {
           if (agent.id) {
             // Get the module configuration for the pinned agent
-            const configuration = await getMapConfigurationToState(
-              'agent',
-              configurationAPIPartialPath,
+            return await getAgentConfigurationToState(
               mapResponseConfiguration,
               agent,
             );
-            return configuration ? [configuration] : null;
           } else {
             const nodesResponse = await WzRequest.apiReq(
               'GET',
@@ -94,7 +119,7 @@ export const PanelModuleConfiguration: FunctionalComponent<{ h: string }> =
             const nodesConfigurationResponses = await Promise.all(
               nodesResponse.data.data.affected_items.map(
                 async node =>
-                  await getMapConfigurationToState(
+                  await getManagerConfigurationToState(
                     'cluster_node',
                     configurationAPIPartialPath,
                     mapResponseConfiguration,
@@ -153,6 +178,9 @@ export const PanelModuleConfiguration: FunctionalComponent<{ h: string }> =
                 settings={settings}
                 loading={asyncAction.running}
                 error={asyncAction.error}
+                moduleTitle={moduleTitle}
+                documentationPath={documentationPath}
+                isAgent={Boolean(agent.id)}
               />
             </EuiFlexItem>
           </EuiFlexGroup>
@@ -180,14 +208,48 @@ const ConfigurationWrapper = compose(
     ),
   ),
   withGuard(
-    ({ configurations }) => !configurations,
+    ({ configurations }) => configurations === AGENT_CONFIGURATION_NOT_REPORTED,
     () => (
       <EuiCallOut
         className='office-stats-callout-warning'
-        title='Module configuration unavailable'
+        title='This agent has not reported its configuration.'
         color='warning'
         iconType='alert'
       />
+    ),
+  ),
+  withGuard(
+    ({ configurations, isAgent }) => !configurations && !isAgent,
+    ({ moduleTitle }) => (
+      <EuiCallOut
+        className='office-stats-callout-warning'
+        title='No agent is selected'
+        color='warning'
+        iconType='alert'
+      >
+        {`Select an agent to see its ${moduleTitle} configuration.`}
+      </EuiCallOut>
+    ),
+  ),
+  withGuard(
+    ({ configurations }) => !configurations,
+    ({ moduleTitle, documentationPath }) => (
+      <EuiCallOut
+        className='office-stats-callout-warning'
+        title={`The ${moduleTitle} module is not configured on this agent`}
+        color='warning'
+        iconType='alert'
+      >
+        {documentationPath ? (
+          <EuiLink
+            href={webDocumentationLink(documentationPath)}
+            target='_blank'
+            external
+          >
+            Check the documentation
+          </EuiLink>
+        ) : null}
+      </EuiCallOut>
     ),
   ),
 )(({ configurations, settings }) => {
