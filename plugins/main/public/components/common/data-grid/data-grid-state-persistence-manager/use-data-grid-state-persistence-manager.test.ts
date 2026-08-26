@@ -87,7 +87,7 @@ describe('useDataGridStatePersistenceManager', () => {
     });
   });
 
-  it('should reset columns when invalid column ids are found', () => {
+  it('should remove invalid column ids and keep the valid ones', () => {
     const persistedState = {
       columns: ['col1', 'nonExistentColumn'],
     };
@@ -109,7 +109,7 @@ describe('useDataGridStatePersistenceManager', () => {
     });
 
     expect(mockStateManagement.retrieveState).toHaveBeenCalled();
-    expect(retrievedState.columns).toEqual([]);
+    expect(retrievedState.columns).toEqual(['col1']);
   });
 
   it('should reset column widths when invalid', () => {
@@ -214,6 +214,33 @@ describe('useDataGridStatePersistenceManager', () => {
       ...currentState,
       ...updatePayload,
     });
+  });
+
+  it('should drop only the invalid columns and persist the sanitized list', () => {
+    mockStateManagement.retrieveState.mockReturnValue({
+      columns: ['col1', 'missing-field', 'col3'],
+      columnWidths: { col1: 150 },
+      pageSize: 50,
+    });
+
+    const { result } = renderHook(() =>
+      useDataGridStatePersistenceManager({
+        stateManagement: mockStateManagement,
+        defaultState,
+        columnSchemaDefinitionsMap,
+        indexPatternExists: true,
+      }),
+    );
+
+    let retrievedState;
+    act(() => {
+      retrievedState = result.current.retrieveState();
+    });
+
+    expect(retrievedState.columns).toEqual(['col1', 'col3']);
+    expect(mockStateManagement.persistState).toHaveBeenCalledWith(
+      expect.objectContaining({ columns: ['col1', 'col3'] }),
+    );
   });
 
   it('should clear state correctly', () => {
