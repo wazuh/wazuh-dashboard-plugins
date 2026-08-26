@@ -824,7 +824,7 @@ test(
 // BEFORE any query so it cuts the model off from data that exists. These tests pin all three
 // halves: the route is stated, no decline copy survives, and the absence claim stays gated behind
 // an actual zero-row result.
-test('phase 5: registry FIM is ROUTED to the escape hatch, never declined up front', () => {
+test('registry FIM is ROUTED to the escape hatch, never declined up front', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(prompt, /never decline a registry question before querying it/);
   assert.match(
@@ -835,7 +835,7 @@ test('phase 5: registry FIM is ROUTED to the escape hatch, never declined up fro
   assert.match(prompt, /wazuh-states-fim-registry-values/);
 });
 
-test('phase 5: the old registry decline copy is gone from the prompt entirely', () => {
+test('the old registry decline copy is gone from the prompt entirely', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.doesNotMatch(
     prompt,
@@ -848,7 +848,7 @@ test('phase 5: the old registry decline copy is gone from the prompt entirely', 
   );
 });
 
-test('phase 5: an absence claim about registry data is gated behind a real zero-row result', () => {
+test('an absence claim about registry data is gated behind a real zero-row result', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
@@ -865,7 +865,7 @@ test('phase 5: an absence claim about registry data is gated behind a real zero-
 // ("monitored hosts are Linux-only") makes every answer that recites it a fabrication on a fleet
 // where it is false. The ban is on the shape, so it has to hold wherever registry FIM is
 // discussed, not only inside a decline.
-test('phase 4/5: no copy asserts what platforms this deployment monitors', () => {
+test('no copy asserts what platforms this deployment monitors', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.doesNotMatch(prompt, /Linux-only/);
   assert.doesNotMatch(prompt, /monitored hosts are/);
@@ -879,7 +879,7 @@ test('phase 4/5: no copy asserts what platforms this deployment monitors', () =>
 // The prompt half only works with the affordance half: chat.ts's
 // `shouldGrantZeroRowWideningRound` is what leaves a tool-bearing round for the model to obey this
 // clause in.
-test('phase 5: one widened attempt is required before declaring nothing found', () => {
+test('one widened attempt is required before declaring nothing found', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
@@ -888,7 +888,7 @@ test('phase 5: one widened attempt is required before declaring nothing found', 
   assert.match(prompt, /never abstain on the first zero-row result alone/);
 });
 
-test('phase 5: the widening clause is hard-capped at one retry, not a loop', () => {
+test('the widening clause is hard-capped at one retry, not a loop', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   const clause = prompt.slice(
     prompt.indexOf('When a query comes back with zero rows'),
@@ -900,12 +900,12 @@ test('phase 5: the widening clause is hard-capped at one retry, not a loop', () 
   assert.match(
     sentence,
     /one, not a series/,
-    'latency tail is already the phase-4 build cost -- the cap has to be stated, not implied',
+    'the widening retry adds a latency tail, so the cap has to be stated, not implied',
   );
   assert.match(sentence, /Never make a third variation/);
 });
 
-test('phase 5: the widening clause names the three concrete moves to spend the retry on', () => {
+test('the widening clause names the three concrete moves to spend the retry on', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(prompt, /drop the narrowest filter/);
   assert.match(prompt, /correct a filter VALUE you suspect was wrong/);
@@ -916,13 +916,13 @@ test('phase 5: the widening clause names the three concrete moves to spend the r
 // Buying the round is not enough: unpinned, the retry is spent on another exploratory probe and the
 // typed tool is never called. chat.ts's `shouldGrantZeroRowWideningRound` refuses the grace to a
 // discovery-only round; this is the prose half of the same rule.
-test('phase 6: the retry must target the same question with exactly one thing changed', () => {
+test('the retry must target the same question with exactly one thing changed', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(prompt, /THE SAME QUESTION with exactly ONE thing changed/);
   assert.match(prompt, /never a fresh exploration of what might be available/);
 });
 
-test('phase 6: the retry may not be spent probing again after an empty probe', () => {
+test('the retry may not be spent probing again after an empty probe', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
@@ -931,7 +931,7 @@ test('phase 6: the retry may not be spent probing again after an empty probe', (
   assert.match(prompt, /not a third guess at a field name/);
 });
 
-test('phase 6: the escape hatch is described as one enum value per state index', () => {
+test('the escape hatch is described as one enum value per state index', () => {
   // The enum carries one value per physical index (see catalog/generic-query-families.ts), so the
   // prompt must not name a non-existent index or point at the wildcard as the route.
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
@@ -940,14 +940,14 @@ test('phase 6: the escape hatch is described as one enum value per state index',
   assert.doesNotMatch(prompt, /system_services/);
 });
 
-test('phase 6: verify-before-filter now claims the current-state surfaces too', () => {
+test('verify-before-filter now claims the current-state surfaces too', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(prompt, /This now covers the current-state surfaces as well/);
 });
 
 // The decline block's numbering is internal bookkeeping: without this rule the model quotes it
 // ("this is one of the five fixed-scope decline cases") into user-facing copy.
-test('phase 4: the decline block forbids narrating that a list of declines exists', () => {
+test('the decline block forbids narrating that a list of declines exists', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
@@ -976,7 +976,7 @@ test(
 // relaxation is scoped BY INTENT, so both halves need pinning: the tight default must survive, and
 // the explain/assess/advise intents must escape it with a named answer shape.
 
-test('explain-wave: the tight default answer format is still stated for lookup-style questions', () => {
+test('the tight default answer format is still stated for lookup-style questions', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
@@ -990,7 +990,7 @@ test('explain-wave: the tight default answer format is still stated for lookup-s
   );
 });
 
-test('explain-wave: explain/assess/advise intents are exempted from the word, bullet and risk caps', () => {
+test('explain/assess/advise intents are exempted from the word, bullet and risk caps', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(prompt, /When the user asks you to EXPLAIN, assess, or advise/);
   assert.match(
@@ -999,7 +999,7 @@ test('explain-wave: explain/assess/advise intents are exempted from the word, bu
   );
 });
 
-test('explain-wave: the explanatory answer shape is what happened/how detected -> why it matters -> actions with rationale', () => {
+test('the explanatory answer shape is what happened/how detected -> why it matters -> actions with rationale', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   // Detection provenance belongs to the GROUNDED part. Listing "how it was detected" among the
   // knowledge topics licenses an invented rule id or detector name when nothing returned one, so
@@ -1022,7 +1022,7 @@ test('explain-wave: the explanatory answer shape is what happened/how detected -
   );
 });
 
-test('explain-wave: the system-prompt allowance carries its own fence, so a non-final round is safe too', () => {
+test('the system-prompt allowance carries its own fence, so a non-final round is safe too', () => {
   // The door and the fence must ship together. FINAL_ROUND_ANSWER_INSTRUCTION only fires when a
   // round is BOTH final and tool-using, while this paragraph is in every round's system prompt --
   // so a round-1 answer (the common case) would get the knowledge allowance with none of the
@@ -1045,7 +1045,7 @@ test('explain-wave: the system-prompt allowance carries its own fence, so a non-
   assert.match(prompt, /never invent data to support it/);
 });
 
-test('explain-wave: the relaxation does not lift the no-headings, no-table or grounding rules', () => {
+test('the relaxation does not lift the no-headings, no-table or grounding rules', () => {
   // The markdown-table filter (markdown-table-filter.ts) still strips tables from prose, and the
   // grounding rule is the one thing no intent may relax -- a richer SHAPE must not become a licence
   // to state data the results do not contain. The grounding clause is scoped to environment data
@@ -1106,7 +1106,7 @@ test('buildSystemPrompt: the new resolution clause names no tool to call', () =>
 // Both halves of the clause are pinned: quote the scanner's own fix bound when a result carries
 // one, and disclose the silence when the item's remediation field is empty -- otherwise the answer
 // is generic advice that never touches the item it was asked about.
-test('phase 4: part (3) must cite a concrete fix from the results before any general advice', () => {
+test('part (3) must cite a concrete fix from the results before any general advice', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
@@ -1115,7 +1115,7 @@ test('phase 4: part (3) must cite a concrete fix from the results before any gen
   assert.match(prompt, /quoting the value, before any general advice/);
 });
 
-test('phase 4: an empty fix field must be disclosed, not filled with the model\u2019s own steps', () => {
+test('an empty fix field must be disclosed, not filled with the model\u2019s own steps', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
@@ -1125,7 +1125,7 @@ test('phase 4: an empty fix field must be disclosed, not filled with the model\u
 
 // The SCA-specific sibling of the clause above: the synthesis rule covers a missing
 // check.rationale, and a remediation answer turns on the separate check.remediation field.
-test('phase 4: an empty check.remediation is stated plainly, and own steps are marked as guidance', () => {
+test('an empty check.remediation is stated plainly, and own steps are marked as guidance', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
@@ -1138,7 +1138,7 @@ test('phase 4: an empty check.remediation is stated plainly, and own steps are m
 
 // The state and findings surfaces carry different host lists for the same CVE, so disclosing a
 // substitution is not enough: the prompt has to say the two surfaces answer different questions.
-test('phase 4: current state and detection history are named as non-substitutable surfaces', () => {
+test('current state and detection history are named as non-substitutable surfaces', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
@@ -1160,7 +1160,7 @@ test('phase 4: current state and detection history are named as non-substitutabl
 // asked about rather than a neighbouring one; and a deictic incident reference must not end the turn
 // in a clarification request with no tool call.
 
-test('phase 7: a severity must be quoted from the item own row, never inferred', () => {
+test('a severity must be quoted from the item own row, never inferred', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
@@ -1176,7 +1176,7 @@ test('phase 7: a severity must be quoted from the item own row, never inferred',
   );
 });
 
-test('phase 7: a severity breakdown may not be read as the severity of a named item', () => {
+test('a severity breakdown may not be read as the severity of a named item', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
@@ -1192,7 +1192,7 @@ test('phase 7: a severity breakdown may not be read as the severity of a named i
   );
 });
 
-test('phase 7: the answer must be about the incident asked about, not the biggest one in the result set', () => {
+test('the answer must be about the incident asked about, not the biggest one in the result set', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
@@ -1205,7 +1205,7 @@ test('phase 7: the answer must be about the incident asked about, not the bigges
   );
 });
 
-test('phase 7: an integration-sourced finding names its collector, not a victim host', () => {
+test('an integration-sourced finding names its collector, not a victim host', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(prompt, /the host whose agent\s+INGESTED the record/);
   assert.match(
@@ -1214,7 +1214,7 @@ test('phase 7: an integration-sourced finding names its collector, not a victim 
   );
 });
 
-test('phase 7: a deictic INCIDENT reference earns one scoped attempt, not a clarification request', () => {
+test('a deictic INCIDENT reference earns one scoped attempt, not a clarification request', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(prompt, /A deictic reference to an INCIDENT rather than a host/);
   assert.match(
@@ -1227,7 +1227,7 @@ test('phase 7: a deictic INCIDENT reference earns one scoped attempt, not a clar
   );
 });
 
-test('phase 7: the scoped attempt carries the shipped assumption-note pattern, and clarification stays a post-result move', () => {
+test('the scoped attempt carries the shipped assumption-note pattern, and clarification stays a post-result move', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,

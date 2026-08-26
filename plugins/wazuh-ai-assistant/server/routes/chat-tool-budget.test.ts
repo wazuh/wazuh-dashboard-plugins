@@ -228,7 +228,7 @@ test('zero-row widening: only fires where isRoundFutile already said the round w
 // widening a query that was too narrow, and the typed tool that owns the question never gets
 // called.
 
-test('phase 6: a round whose only successful call was a discovery probe earns nothing', () => {
+test('a round whose only successful call was a discovery probe earns nothing', () => {
   assert.equal(
     shouldGrantZeroRowWideningRound({
       successfulCalls: [
@@ -240,7 +240,7 @@ test('phase 6: a round whose only successful call was a discovery probe earns no
   );
 });
 
-test('phase 6: the refusal survives several discovery probes in the same round', () => {
+test('the refusal survives several discovery probes in the same round', () => {
   assert.equal(
     shouldGrantZeroRowWideningRound({
       successfulCalls: [
@@ -253,7 +253,7 @@ test('phase 6: the refusal survives several discovery probes in the same round',
   );
 });
 
-test('phase 6: a zero-row round with ANY real data call still earns its widening round', () => {
+test('a zero-row round with ANY real data call still earns its widening round', () => {
   // The aim is a PRECISE granted round, not a removed one: a zero-row round with any real data call
   // in it still earns its widening round.
   assert.equal(
@@ -268,7 +268,7 @@ test('phase 6: a zero-row round with ANY real data call still earns its widening
   );
 });
 
-test('phase 6: a discovery-only round is still futile -- only the GRACE is withheld', () => {
+test('a discovery-only round is still futile -- only the GRACE is withheld', () => {
   // `isRoundFutile` is unaffected: such a round still stops the turn, one round earlier than a
   // granted one would.
   const discoveryOnly = [

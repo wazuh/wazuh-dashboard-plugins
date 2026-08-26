@@ -36,7 +36,7 @@ test('get_fim_files: agent_id is documented as numeric-only and points at agent_
   assert.match(
     description,
     /pass the name as "agent_name" instead/,
-    'phase 5: the old copy sent the model off to resolve an id, which is what cost the routing',
+    'the old copy sent the model off to resolve an id, which is what cost the routing',
   );
 });
 

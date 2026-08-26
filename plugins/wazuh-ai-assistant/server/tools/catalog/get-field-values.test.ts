@@ -257,7 +257,7 @@ test(
 // model to guess field names -- and it reads the rejection ("not one of this tool's vetted fields")
 // as evidence the field does not exist. Every field asserted below is live in the mapping.
 
-test('phase 6: a state field routes to its own index, not to the wazuh-states-* union', () => {
+test('a state field routes to its own index, not to the wazuh-states-* union', () => {
   const request = build({ field: 'service.state' });
   assert.equal(request.index, 'wazuh-states-inventory-services*');
   assert.deepEqual(request.body.aggs, {
@@ -276,7 +276,7 @@ test('phase 6: a state field routes to its own index, not to the wazuh-states-* 
   }
 });
 
-test('phase 6: every state surface the eval could not reach now resolves to its index', () => {
+test('every state surface the eval could not reach now resolves to its index', () => {
   for (const [field, index] of [
     ['service.name', 'wazuh-states-inventory-services*'],
     ['host.cpu.name', 'wazuh-states-inventory-hardware*'],
@@ -295,7 +295,7 @@ test('phase 6: every state surface the eval could not reach now resolves to its 
   }
 });
 
-test('phase 6: pre-existing defaults are untouched -- the new families only widen the choice', () => {
+test('pre-existing defaults are untouched -- the new families only widen the choice', () => {
   // FIELD_LOCATIONS is append-only and de-duplicated by tool family, so a field that already had a
   // default keeps it. `interface.state` is the sharp case: it now also exists on the interfaces
   // family, but "which ports are listening" must still be the default reading.
@@ -315,7 +315,7 @@ test('phase 6: pre-existing defaults are untouched -- the new families only wide
   assert.equal(build({ field: 'wazuh.agent.id' }).index, 'wazuh-findings-v5*');
 });
 
-test('phase 6: index_family disambiguates a field carried by several state surfaces', () => {
+test('index_family disambiguates a field carried by several state surfaces', () => {
   assert.equal(
     build({ field: 'interface.name', index_family: 'inventory_protocols' })
       .index,
@@ -339,7 +339,7 @@ test('phase 6: index_family disambiguates a field carried by several state surfa
   );
 });
 
-test('phase 6: the index_family enum offers every state surface that has fields', () => {
+test('the index_family enum offers every state surface that has fields', () => {
   const families = (
     getFieldValuesTool.spec.parameters.properties.index_family as {
       enum: string[];
@@ -366,7 +366,7 @@ test('phase 6: the index_family enum offers every state surface that has fields'
   }
 });
 
-test('phase 6: both port fields are discoverable, so the RDP question is answerable', () => {
+test('both port fields are discoverable, so the RDP question is answerable', () => {
   // Filtering `destination.port` for an exposure question returns 0 rows: on this schema a
   // listener's port is `source.port` and `destination.port` is 0. Enumerating either has to be
   // possible before the model can see that, instead of reading the empty result as "not exposed".
@@ -380,7 +380,7 @@ test('phase 6: both port fields are discoverable, so the RDP question is answera
   );
 });
 
-test('phase 6: a state field still gets no alias note -- the alias hook is findings/events only', async () => {
+test('a state field still gets no alias note -- the alias hook is findings/events only', async () => {
   const resolved = await resolve({ field: 'service.name' });
   assert.equal(resolved.note, undefined);
 });
