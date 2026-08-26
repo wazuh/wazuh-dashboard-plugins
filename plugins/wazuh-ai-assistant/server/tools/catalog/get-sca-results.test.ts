@@ -141,3 +141,17 @@ test('get_sca_results: declares agent_id as a manager-agents sole-candidate para
     { param: 'agent_id', source: { kind: 'manager-agents' } },
   ]);
 });
+
+test('get_sca_results: the agent_id description tells the model to resolve a NAMED host to an id', () => {
+  // Sibling of the same rule on get_sca_checks: this tool has the identical numeric-only agent_id
+  // plus sole-candidate resolution, so it carries the identical mis-reading risk ("omit it to cover
+  // every agent").
+  const properties = getScaResultsTool.spec.parameters.properties as Record<
+    string,
+    { description?: string }
+  >;
+  const description = properties.agent_id.description ?? '';
+  assert.match(description, /If the user named a host/);
+  assert.match(description, /resolve that name to its numeric id first/);
+  assert.match(description, /does NOT search across agents/);
+});

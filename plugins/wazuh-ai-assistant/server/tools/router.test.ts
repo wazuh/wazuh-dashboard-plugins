@@ -398,3 +398,70 @@ test('resolveStage2Tools: get_security_summary chains to get_findings_by_time ou
   assert.ok(names.includes('get_security_summary'));
   assert.ok(names.includes('get_findings_by_time'));
 });
+
+// --- mitre/events escape their own category ---------------------------------------------------
+//
+// "Explain this MITRE incident -- when was it detected and how" needs the document behind a
+// technique row (find_document_by_field) and the detection side (get_rules, the only tool that
+// returns a rule description). Both live outside the `mitre` category, and resolveStage2Tools widens
+// a route only through CHAIN_PAIRS, so without these edges a mitre-routed turn can list technique
+// rows and go no further. Same for get_events_by_agent, which sits in `findings` with no row-level
+// pivot of its own.
+
+test('resolveStage2Tools: a mitre route reaches find_document_by_field and get_rules via CHAIN_PAIRS', () => {
+  const names = resolveStage2Tools(['mitre']).map(spec => spec.name);
+  assert.ok(
+    names.includes('get_mitre_findings'),
+    'the routed category own tools must survive the expansion',
+  );
+  assert.ok(
+    names.includes('find_document_by_field'),
+    'a mitre-routed turn must be able to open the document behind a technique row',
+  );
+  assert.ok(
+    names.includes('get_rules'),
+    'a mitre-routed turn must be able to reach the detection-rule side of "how was it detected"',
+  );
+});
+
+test('CHAIN_PAIRS: get_mitre_findings declares its detail tools in a fixed, pinned order', () => {
+  // Same load-bearing reason as the get_agents pin above: chat.ts's `findOfferedFollowUpTool`
+  // metadata fallback forces the FIRST eligible detail tool when an offer names no tool, so the
+  // row lookup must stay ahead of the rule lookup -- an unnamed "I can dig into that" offer after
+  // a technique listing should open the finding, not the Sigma catalog.
+  assert.deepEqual(CHAIN_PAIRS.get_mitre_findings, [
+    'find_document_by_field',
+    'get_rules',
+  ]);
+});
+
+test('CHAIN_PAIRS: get_events_by_agent chains to find_document_by_field', () => {
+  assert.deepEqual(CHAIN_PAIRS.get_events_by_agent, ['find_document_by_field']);
+  const names = resolveStage2Tools(['findings']).map(spec => spec.name);
+  assert.ok(names.includes('get_events_by_agent'));
+  assert.ok(names.includes('find_document_by_field'));
+});
+
+// --- Registry FIM must have a category that claims it -----------------------------------------
+//
+// With the `fim` category described as "current state of monitored files", nothing in the routing
+// menu claims Windows registry keys/values, so a registry question reaches no tool that can answer
+// it -- even though the data is reachable: search_wazuh_data is appended to every resolved list and
+// `wazuh-states-*` covers wazuh-states-fim-registry-keys/-values.
+
+test('the fim routing category claims Windows registry keys/values, not only files', () => {
+  const prompt = buildRoutingPrompt('2026-01-01T00:00:00.000Z');
+  const fimLine = prompt.split('\n').find(line => line.startsWith('- fim:'));
+  assert.ok(fimLine, 'the fim category must appear in the routing menu');
+  assert.match(fimLine, /Windows registry keys\/values/);
+  assert.match(fimLine, /Run-key/);
+});
+
+test('routing to fim still resolves a tool that can actually reach the registry surface', () => {
+  // No typed tool reads registry FIM, so the whole route depends on the always-on escape hatch
+  // travelling with the fim category. If that ever stops being true, the prompt's registry
+  // routing rule becomes an instruction the model cannot obey.
+  const names = resolveStage2Tools(['fim']).map(spec => spec.name);
+  assert.ok(names.includes('search_wazuh_data'));
+  assert.ok(names.includes('get_fim_files'));
+});
