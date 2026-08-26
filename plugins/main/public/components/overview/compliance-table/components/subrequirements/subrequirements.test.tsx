@@ -11,7 +11,7 @@
  */
 import React from 'react';
 import { shallow } from 'enzyme';
-import { EuiPopover } from '@elastic/eui';
+import { EuiFlexGrid, EuiPopover } from '@elastic/eui';
 import { ComplianceSubrequirements } from './subrequirements';
 import { RequirementFlyout } from '../requirement-flyout';
 
@@ -21,14 +21,29 @@ import { RequirementFlyout } from '../requirement-flyout';
 const getFacetButtons = wrapper =>
   wrapper.find(EuiPopover).map(popover => popover.prop('button'));
 
+const mockAddFilters = jest.fn();
+const mockUpdateAndNavigateSearchParams = jest.fn();
+
 jest.mock('../../../../../kibana-services', () => ({
   getDataPlugin: () => ({
-    query: { filterManager: { addFilters: jest.fn() } },
+    query: { filterManager: { addFilters: mockAddFilters } },
   }),
 }));
 
+jest.mock('../../../../../react-services/navigation-service', () => ({
+  __esModule: true,
+  default: {
+    getInstance: () => ({
+      updateAndNavigateSearchParams: mockUpdateAndNavigateSearchParams,
+    }),
+  },
+}));
+
+// requirement-flyout.tsx (imported transitively) uses AppState.getClusterInfo(),
+// and the real app-state module has import-time side effects that need
+// browser cookies unavailable in this test environment.
 jest.mock('../../../../../react-services/app-state', () => ({
-  AppState: { getCurrentPattern: () => 'test-pattern' },
+  AppState: { getClusterInfo: () => ({ cluster: 'test-cluster' }) },
 }));
 
 const baseProps = () => ({
@@ -42,7 +57,7 @@ const baseProps = () => ({
   fetchFilters: [],
   getRegulatoryComplianceRequirementFilter: jest.fn(() => []),
   getRegulatoryComplianceOtherRequirementsFilter: jest.fn(() => []),
-  onSelectedTabChanged: jest.fn(),
+  indexPatternId: 'test-index-pattern',
   filters: [],
   setFilters: jest.fn(),
 });
@@ -99,5 +114,69 @@ describe('ComplianceSubrequirements - Others tile', () => {
     wrapper.instance().hideAlerts();
     wrapper.update();
     expect(getFacetButtons(wrapper)).toHaveLength(0);
+  });
+});
+
+describe('ComplianceSubrequirements - Show in dashboard / Inspect in findings', () => {
+  beforeEach(() => {
+    mockAddFilters.mockClear();
+    mockUpdateAndNavigateSearchParams.mockClear();
+  });
+
+  it('navigates to the dashboard tab and filters by the current data source index pattern', () => {
+    const wrapper = shallow(<ComplianceSubrequirements {...baseProps()} />);
+    wrapper.instance().openDashboard({}, '1.1');
+
+    expect(mockAddFilters).toHaveBeenCalledWith([
+      expect.objectContaining({
+        meta: expect.objectContaining({ index: 'test-index-pattern' }),
+      }),
+    ]);
+    expect(mockUpdateAndNavigateSearchParams).toHaveBeenCalledWith({
+      tabSubView: 'dashboard',
+    });
+  });
+
+  it('navigates to the events tab and filters by the current data source index pattern', () => {
+    const wrapper = shallow(<ComplianceSubrequirements {...baseProps()} />);
+    wrapper.instance().openDiscover({}, '1.1');
+
+    expect(mockAddFilters).toHaveBeenCalledWith([
+      expect.objectContaining({
+        meta: expect.objectContaining({ index: 'test-index-pattern' }),
+      }),
+    ]);
+    expect(mockUpdateAndNavigateSearchParams).toHaveBeenCalledWith({
+      tabSubView: 'findings',
+    });
+  });
+});
+
+describe('ComplianceSubrequirements - hover icons on scroll', () => {
+  const propsWithOneRequirement = () => ({
+    ...baseProps(),
+    complianceObject: { '1.1': ['1.1'] },
+    descriptions: { '1.1': 'Some requirement' },
+    selectedRequirements: { '1.1': true },
+  });
+
+  it('clears the hovered tile (closing its icons and any open tooltip) when the requirements grid scrolls', () => {
+    const wrapper = shallow(
+      <ComplianceSubrequirements {...propsWithOneRequirement()} />,
+    );
+    wrapper.instance().setState({ hover: '1.1' });
+    wrapper.update();
+    expect(wrapper.state('hover')).toBe('1.1');
+
+    wrapper.find(EuiFlexGrid).simulate('scroll');
+    wrapper.update();
+    expect(wrapper.state('hover')).toBe('');
+  });
+
+  it('does not throw when scrolling while no tile is hovered', () => {
+    const wrapper = shallow(
+      <ComplianceSubrequirements {...propsWithOneRequirement()} />,
+    );
+    expect(() => wrapper.find(EuiFlexGrid).simulate('scroll')).not.toThrow();
   });
 });
