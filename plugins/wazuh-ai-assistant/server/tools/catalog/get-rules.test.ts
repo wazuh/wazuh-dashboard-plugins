@@ -16,6 +16,7 @@ test('get_rules: defaults to enabled=true, no other filters, size 20', () => {
   assert.equal(request.body.size, 20);
   assert.deepEqual(request.body.sort, ['_doc']);
   assert.deepEqual(request.body._source, [
+    'document.id',
     'document.metadata.title',
     'document.metadata.description',
     'document.level',
@@ -27,6 +28,82 @@ test('get_rules: defaults to enabled=true, no other filters, size 20', () => {
     'document.logsource.category',
     'space.name',
   ]);
+});
+
+// The reported false negative: the tool's own description says these rules are identified by a
+// UUID and directs the model here for "what does rule X detect", but there was no parameter that
+// could match a UUID -- `name` matches the human title, so `get_rules {name: "<uuid>"}` returned
+// 0 rows and the assistant reported the rule does not exist.
+test('get_rules: id matches the UUID against _id OR the business-level id field', () => {
+  const uuid = 'ad97a19d-24a5-43c4-a749-1f8f0a9172bc';
+  const request = build({ id: uuid, enabled: 'any' });
+  assert.deepEqual(request.body.query, {
+    bool: {
+      filter: [
+        {
+          bool: {
+            minimum_should_match: 1,
+            should: [
+              { ids: { values: [uuid] } },
+              { term: { 'document.id': uuid } },
+            ],
+          },
+        },
+      ],
+    },
+  });
+});
+
+test('get_rules: id is trimmed', () => {
+  const uuid = 'ad97a19d-24a5-43c4-a749-1f8f0a9172bc';
+  const request = build({ id: `  ${uuid}  `, enabled: 'any' });
+  const clauses = (
+    request.body.query as { bool: { filter: Record<string, unknown>[] } }
+  ).bool.filter;
+  assert.deepEqual(clauses[0], {
+    bool: {
+      minimum_should_match: 1,
+      should: [
+        { ids: { values: [uuid] } },
+        { term: { 'document.id': uuid } },
+      ],
+    },
+  });
+});
+
+// An id lookup names ONE specific document, so the `enabled` default must not hide it -- letting
+// it apply would reproduce the same "the rule does not exist" false negative for every disabled
+// rule, which is exactly what this parameter exists to remove.
+test('get_rules: id suppresses the enabled default, so a disabled rule is still found', () => {
+  const request = build({ id: 'ad97a19d-24a5-43c4-a749-1f8f0a9172bc' });
+  const clauses = (
+    request.body.query as { bool: { filter: Record<string, unknown>[] } }
+  ).bool.filter;
+  assert.ok(
+    !clauses.some(clause =>
+      JSON.stringify(clause).includes('document.enabled'),
+    ),
+    'an id lookup must not carry the enabled default',
+  );
+});
+
+test('get_rules: an EXPLICIT enabled alongside id is still honored', () => {
+  const request = build({
+    id: 'ad97a19d-24a5-43c4-a749-1f8f0a9172bc',
+    enabled: 'enabled',
+  });
+  const clauses = (
+    request.body.query as { bool: { filter: Record<string, unknown>[] } }
+  ).bool.filter;
+  assert.deepEqual(clauses[0], { term: { 'document.enabled': true } });
+});
+
+// The id was missing from the returned columns as well as from the filters, so the assistant
+// correctly reported it had no UUID field to report when asked to list rules with their UUIDs.
+test('get_rules: the rule UUID is projected and sampled into the digest so it can be cited', () => {
+  assert.ok((build({}).body._source as string[]).includes('document.id'));
+  assert.ok(getRulesTool.digest?.sampleColumns?.includes('document.id'));
+  assert.ok(getRulesTool.tableSpec?.rowFields?.includes('document.id'));
 });
 
 test('get_rules: buildSecurityAnalyticsLink points to the rules app with the resolved space', () => {

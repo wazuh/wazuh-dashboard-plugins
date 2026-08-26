@@ -152,6 +152,13 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // `IDENTIFIER_BEARING_FREE_TEXT_FIELDS` now gets (this field is one; see rule.title's note above
   // for exactly which part of the residual that closes and which part stays).
   { field: 'document.metadata.description', action: 'allow' },
+  // The Sigma rule document's own UUID, newly projected/sampled by get_rules so an answer can
+  // cite the id it was asked about (and so a "list the rules with their UUIDs" question is
+  // answerable at all). Reviewed 'allow': it is a vendor-minted identifier for a RULESET
+  // document, not for anything in the customer's estate -- it names no host, account, address or
+  // file. Pseudonymizing it would defeat the point (the answer could not name the rule the user
+  // asked about, and the user typed the value in the question) while protecting nothing.
+  { field: 'document.id', action: 'allow' },
   // Curated benchmark/policy content (CIS etc.), not analyst/attacker-supplied — reviewed 'allow'.
   { field: 'check.id', action: 'allow' },
   { field: 'check.name', action: 'allow' },
