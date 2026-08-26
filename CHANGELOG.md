@@ -141,6 +141,7 @@
 | [#8775](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8775) | Fixed MITRE ATT&CK Framework tab not applying the date range and fetch filters                                                                                                                                                                                                        |
 | [#9015](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9015) | Fixed the Controls tab showing 0 results by adding missing regulatory compliance requirement definitions for PCI DSS, GDPR, HIPAA, NIST 800-53, FedRAMP, ISO 27001, CMMC, TSC, and NIS2, and added an "Others" breakdown showing findings tagged with unrecognized requirement values |
 | [#9023](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9023) | Fixed sorting not working in the Server management > Security tables (Roles, Policies, Users and Roles mapping), and removed the sort affordance from columns the server API cannot sort                                                                                              |
+| [#9044](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9044) | Fixed AI assistant defects found in team review: a rule can now be looked up by its UUID, a single SCA check question no longer returns a policy-wide sample, the cluster node name is pseudonymized under privacy mode, a provider connection dropped mid-answer is reported instead of finalized as a complete answer, and the message box regains focus when an answer finishes |
 
 ### Removed
 
