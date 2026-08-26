@@ -95,11 +95,11 @@ test('get_agent_inventory states current-state-only scope', () => {
   }
 });
 
-// EXPLAIN-WAVE PHASE 4: the SCA surface gets the same state-vs-history sentence the vulnerability
-// and findings tools now carry -- `wazuh-states-sca` holds the LATEST verdict per check, while an
-// SCA-check finding records that a check was seen failing at a point in time. Same regression-guard
-// shape as the three assertions above: a future description edit that drops the clause from one of
-// the two tools fails here rather than only in a live model re-run.
+// The SCA surface carries the same state-vs-history sentence as the vulnerability and findings
+// tools: `wazuh-states-sca` holds the LATEST verdict per check, while an SCA-check finding records
+// that a check was seen failing at a point in time. Same regression-guard shape as the three
+// assertions above -- a description edit that drops the clause from one of the two tools fails here
+// rather than only in a live model run.
 const SCA_TOOLS = [getScaResultsTool, getScaChecksTool];
 
 test('both SCA tools state latest-scan-state scope and point history questions at findings', () => {

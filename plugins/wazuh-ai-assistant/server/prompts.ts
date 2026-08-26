@@ -88,35 +88,25 @@ export function buildSystemPrompt(nowIso: string): string {
       '"never write an internal tool name" rule below. End with at most one short follow-up ' +
       'offer. Keep the whole answer under roughly 120 words unless the user asks for more ' +
       'detail.',
-    // Explain-wave phase 1 (AI/plan/eval-v2 gap 3): the format rule above is written for the
-    // lookup/count/status questions it was measured on, and it strangles the answer shape an
-    // explanatory question actually needs -- 120 words, three bullets and "do not assess risk"
-    // together make "explain this Windows event and how do we protect against it" unwritable.
-    // Rather than loosening the default (the terse reporting answer is the right default, and
-    // the table filter's duplicate-table defect is real), this scopes a richer shape to the
-    // intents that need it. The three-part shape is the industry pattern (AI/plan/eval-v2
-    // research-competitors.md section 2: enrich -> narrate -> advise, with Microsoft's guided
-    // response carrying a rationale per recommended action) and matches the SCA synthesis rule
-    // already in this prompt: lead with WHY it matters, then WHAT to do.
+    // The terse format above is the right default for lookup/count/status questions, but its
+    // 120-word cap, three-bullet cap and "do not assess risk" rule together make an explanatory
+    // answer unwritable. The richer shape is therefore scoped BY INTENT rather than loosened
+    // globally.
     //
-    // The allowance carries its own fence, deliberately duplicating FINAL_ROUND_ANSWER_INSTRUCTION
-    // (chat.ts): that instruction only fires when a round is BOTH final and tool-using, so a
-    // round-1 answer -- the common case -- would otherwise get the licence with none of the safety
-    // clauses. Detection provenance sits in part (1), not part (2): what detected something HERE
-    // (rule id, rule title, detector) is an environment fact, and only how a class of activity is
-    // typically detected is knowledge. The two obligations the format bullet above carries that a
-    // longer answer does not outgrow -- disclosing truncation, and not enumerating rows or
-    // timestamps in prose -- are re-stated so this paragraph cannot be read as dropping them.
+    // Three constraints in this paragraph are load-bearing:
+    //  - the fence deliberately duplicates FINAL_ROUND_ANSWER_INSTRUCTION (chat.ts), which only
+    //    fires when a round is BOTH final and tool-using; without the duplicate, a round-1 answer
+    //    would get the knowledge allowance with none of the safety clauses. Keep them in sync.
+    //  - detection provenance belongs to part (1), not part (2): what detected something HERE (a
+    //    rule id, rule title, detector) is an environment fact and must be grounded; only how a
+    //    class of activity is typically detected is general knowledge.
+    //  - the two obligations the format bullet above carries -- disclose truncation, do not
+    //    enumerate rows or timestamps in prose -- are re-stated because this paragraph supersedes
+    //    that bullet and would otherwise be read as dropping them.
     //
-    // EXPLAIN-WAVE PHASE 4 (the cite-the-fix clause in part (3)): "how do we remediate this item"
-    // is the weakest answer class, and the split INSIDE that class is the whole reason this clause
-    // exists. An answer is actionable only when the digest happens to carry the scanner's own fix
-    // bound -- a fixed version, a patch or advisory id, a remediation text -- and the model quotes
-    // it; without this clause that is luck, not a rule. The same class also produces generic
-    // prioritisation advice that never touches the item it was asked about, nor the fact that the
-    // item's remediation field is EMPTY. Naming the fix-bearing fields explicitly turns the first
-    // behaviour into the rule, and the empty-field half stops the model from filling that silence
-    // with its own advice presented as the product's own remediation.
+    // The cite-the-fix clause in part (3) has two halves and needs both: quote the concrete fix
+    // when a result carries one, and disclose the silence when the item's fix field is empty --
+    // otherwise the model fills it with its own advice presented as the product's remediation.
     'That format is for lookup, count, and status questions. When the user asks you to EXPLAIN, ' +
       'assess, or advise -- what an event, technique, rule or vulnerability means, why it ' +
       'matters, or what to do about it -- the roughly-120-word cap, the three-bullet cap and ' +
@@ -411,16 +401,10 @@ export function buildSystemPrompt(nowIso: string): string {
       'get_critical_vulnerabilities, get_vulnerabilities_by_agent, get_vulnerability_by_cve); ' +
       'they read the vulnerability state index directly. Vulnerability data is current-state ' +
       'only: there is no "solved/resolved vulnerabilities" history available.',
-    // EXPLAIN-WAVE PHASE 4: the model answered a question explicitly scoped to the FINDINGS
-    // HISTORY ("which agents have a detection for this CVE in the findings history") from
-    // wazuh-states-vulnerabilities, whose host list for a given CVE does not match the detection
-    // stream's -- and did the reverse elsewhere. It even disclosed the
-    // substitution ("this reflects current vulnerability state only, not historical detections")
-    // and still answered from the wrong surface, so the missing piece was never honesty: nothing
-    // told it the two surfaces answer different questions and that the wording of the question
-    // picks one. Stated once, generically, here; the tool descriptions carry the matching sentence
-    // at tool-choice time (catalog/common.ts's FINDING_SCOPE_NOTE / VULN_CURRENT_STATE_NOTE /
-    // SCA_CURRENT_STATE_NOTE).
+    // State and detection history are different surfaces whose host lists for the same CVE do NOT
+    // match, so answering one from the other is wrong even when the substitution is disclosed.
+    // Stated generically here; the matching sentence must also reach the model at tool-choice time
+    // (catalog/common.ts's FINDING_SCOPE_NOTE / VULN_CURRENT_STATE_NOTE / SCA_CURRENT_STATE_NOTE).
     'Current state and detection history are two different surfaces and never substitute for one ' +
       'another: the wazuh-states-* data (vulnerabilities, SCA, inventory) is what IS true now, ' +
       'while findings are what WAS detected, and when. Send a "what is vulnerable/failing/' +
@@ -428,17 +412,12 @@ export function buildSystemPrompt(nowIso: string): string {
       'history", or "when did we first see it" question to a findings tool -- the wording of the ' +
       'question picks the surface. If only the other surface is reachable this turn, name the one ' +
       'you actually read and say it answers a different question.',
-    // EXPLAIN-WAVE PHASE 7 -- the wrong-incident answer. Asked to explain failed sign-ins on one
-    // detection channel, the model answered from a host-scoped finding search whose rows mixed two
-    // unrelated authentication incidents sharing the same agent and the same T1110 tags. It
-    // narrated the bigger, on-host one end to end, concluded that host was compromised, and never
-    // mentioned the incident actually asked about -- with every fact correctly quoted, so no
-    // fabrication rule catches it. Two mechanisms close it: `wazuh.integration.category` now
-    // reaches the model in every finding-hits sample row (catalog/common.ts's
-    // STANDARD_FINDING_SAMPLE_COLUMNS), and this clause says what to do with it. The collector
-    // half is the second, subtler error the same answer made: for an integration-sourced finding,
-    // the agent is whichever host ingested the record, so treating that agent as the victim
-    // inverts the incident.
+    // This clause is only obeyable while `wazuh.integration.category` is actually in the
+    // model-facing finding sample rows (catalog/common.ts's STANDARD_FINDING_SAMPLE_COLUMNS): a
+    // host- or technique-scoped result set routinely mixes unrelated incidents, and that field is
+    // the discriminator. The collector half is separate and just as load-bearing: for an
+    // integration-sourced finding the agent is whichever host INGESTED the record, so reading it
+    // as the victim inverts the incident.
     'When the question names a particular incident, activity class, or detection channel (e.g. ' +
       'cloud/identity sign-ins as opposed to logins on the host itself), answer from the rows ' +
       "that actually match it -- read each row's wazuh.integration.category and rule title before " +
@@ -460,18 +439,10 @@ export function buildSystemPrompt(nowIso: string): string {
       'set severity_comparison to at_or_above/at_or_below when the user explicitly says "or ' +
       'above"/"or higher"/"or below"/"or lower" (or an equivalent phrase); otherwise leave it ' +
       'unset for an exact match.',
-    // EXPLAIN-WAVE PHASE 7 -- the only fabrication left in the phase-6 measurement, and the one
-    // defect class that auto-fails an answer no matter how good the rest of it is. An answer
-    // upgraded one finding's severity to "high" while that finding's own digest row carried the
-    // level verbatim, and the same digest's severity breakdown accounted for every high-level row
-    // elsewhere. So nothing was missing from the data: the level was in the row the model was
-    // looking at. The failure is provenance, not reach -- the severity was inferred from how
-    // serious the surrounding activity read (a persistence service in the middle of an intrusion
-    // chain "must" be high) instead of being copied. A rule that says "quote it" is therefore the
-    // right layer; another column would add nothing. The breakdown half matters just as much: a
-    // severity breakdown is a per-LEVEL count over the whole match set and says nothing about
-    // which row carries which level, yet it reads like a severity source when a named item is at
-    // hand.
+    // A severity breakdown is a per-LEVEL count over the whole match set, so it says nothing about
+    // which row carries which level -- but it reads like a severity source when a named item is at
+    // hand, which is why the breakdown half of this rule is stated separately from the quote-it
+    // half.
     "A severity, level or score is a quoted FACT, never an inference. State an item's severity " +
       "only from that item's own field in the result you were given (wazuh.rule.level on a " +
       'finding row, vulnerability.severity on a vulnerability row), copied exactly as it appears ' +
@@ -497,24 +468,13 @@ export function buildSystemPrompt(nowIso: string): string {
       'typed tools. If you build a search_wazuh_data query directly against wazuh-states-sca* with ' +
       'a check.result term filter, you must use the exact capitalized value yourself -- a lowercase ' +
       'term filter will silently match zero rows.',
-    // EXPLAIN-WAVE PHASE 5 -- ROOT CAUSE OF THE WORST REGISTRY-FIM ANSWERS, INCLUDING A HARD
-    // REGRESSION TO ZERO TOOL CALLS.
-    // This clause replaces what used to be a DECLINE in the no-tool/no-data block above ("Windows
-    // registry FIM changes (registry keys/values): no tool reads this"). That decline was written
-    // for CV-058, when it was true, and it has been factually wrong since workstream A1a widened
-    // `search_wazuh_data`'s index_pattern enum: `wazuh-states-*` reaches
-    // `wazuh-states-fim-registry-keys` / `wazuh-states-fim-registry-values` (both allowlisted by
-    // guardrails.ts's INDEX_ALLOWLIST_RE, both offered in the escape hatch's own enum via
-    // generic-query-families.ts). Because the decline fired BEFORE any query, the model never saw
-    // FIM-registry state that demonstrably exists: asked whether anything had written to a Run key
-    // on a named Windows host, it emitted the decline copy verbatim with zero tool calls, while the
-    // matching `HKEY_LOCAL_MACHINE\...\CurrentVersion\Run` value sat one escape-hatch query away.
-    // A decline whose premise a tool can disprove is worse than no decline at all, so this
-    // is now a ROUTE, stated positively, with the absence claim gated behind an actual zero-row
-    // result. The phase-4 no-environment-claims rule is carried over verbatim rather than dropped
-    // with the decline it was attached to: the fabrication it closed ("this deployment's monitored
-    // hosts are Linux-only") is a shape that must stay forbidden wherever registry FIM is
-    // discussed, query or no query.
+    // Registry FIM has no typed tool but IS reachable: `wazuh-states-*` covers
+    // wazuh-states-fim-registry-keys/-values, both accepted by guardrails.ts's INDEX_ALLOWLIST_RE
+    // and both offered in the escape hatch's enum (generic-query-families.ts). This must stay a
+    // positive ROUTE and never become a decline -- a decline here fires before any query, so the
+    // model never reaches data that exists. The absence claim is deliberately gated behind an
+    // actual zero-row result, and the no-environment-claims sentence must survive any rewording:
+    // claiming what platforms this deployment monitors is a fabrication whether a query ran or not.
     'NO typed tool reads Windows registry FIM (registry keys and values) -- get_fim_files covers ' +
       'FILE state only -- but the data IS reachable, so never decline a registry question before ' +
       'querying it. Route it to search_wazuh_data with index_pattern "wazuh-states-*", which ' +
@@ -618,15 +578,10 @@ export function buildSystemPrompt(nowIso: string): string {
       'than one active agent exists, do not guess: briefly list the candidates (id and name) and ' +
       'ask the user which one they mean. If get_agents is NOT among the tools available to you ' +
       'this turn, do not try to call it -- ask the user which agent they mean instead.',
-    // EXPLAIN-WAVE PHASE 7 -- the last explanatory item that still answered with ZERO tool calls.
-    // The question referred to an incident deictically ("was this attack detected in time") with
-    // nothing named earlier in the conversation, and both rules above cover only a deictic HOST,
-    // so the model fell back to a pure clarification request: honest, and of no investigative use.
-    // A clarification is the right move only once a call has produced several equally plausible
-    // candidates -- before any call it hands the whole turn back for a question that has a
-    // perfectly reasonable default reading. The remedy is the assumption-note pattern this prompt
-    // already uses for a deictic host ("state that assumption in your answer"), applied one level
-    // up: attempt, disclose the assumption, offer to narrow.
+    // The two rules above cover a deictic HOST only; a deictic INCIDENT needs its own rule, or the
+    // turn ends in a clarification request with no tool call. Same attempt-disclose-offer pattern
+    // as the deictic-host rules: a clarification is only correct once a call in hand has produced
+    // several equally plausible candidates.
     'A deictic reference to an INCIDENT rather than a host ("this attack", "this alert", "the ' +
       'incident", "was it caught in time") with no finding, host or time named earlier in the ' +
       'conversation is NOT a reason to answer with a clarification request and no tool call. ' +
@@ -636,24 +591,16 @@ export function buildSystemPrompt(nowIso: string): string {
       'specific host, rule or time. Ask the user which incident they mean only when a result you ' +
       'already have in hand shows several equally plausible candidates -- never in place of the ' +
       'first call.',
-    // EXPLAIN-WAVE PHASE 2: both instructions above cover the case where NO host is named. Neither
-    // covers the opposite, and more common, case -- the user names the host outright ("the failed
-    // SCA checks on <host>") while the tool that answers it takes a NUMERIC agent_id only
-    // (get_sca_checks, get_sca_results; every other agent-scoped tool accepts a name --
-    // get_fim_files was in this list until explain-wave phase 5, which gave it an `agent_name`
-    // parameter precisely because pricing that detour into the schema is what drove the model to
-    // the escape hatch instead). The clause itself is unchanged and stays tool-agnostic; only this
-    // list of witnesses shrank. The measured failure is not that the model
-    // asked for an id: it called get_sca_checks(result: "failed") with the agent parameter simply
-    // OMITTED, as if omitting it meant "across all agents". It does not -- omission triggers
-    // sole-active-agent resolution (see the paragraph above), so the call silently answered about
-    // some other host and returned nothing. That reading is easy to arrive at because those
-    // parameters' own descriptions only ever explain when to omit them, so this states the missing
-    // half: a named host must reach the call as an id, and the id must be looked up, not guessed.
-    // Deliberately does not name which tool to look it up with -- the available lookup differs per
-    // turn (get_agents, get_agent_inventory, any agent-name-accepting tool, or the escape hatch),
-    // and naming a tool the router may not have offered is the exact bug the two paragraphs above
-    // were rewritten to stop repeating.
+    // The two rules above cover the case where NO host is named. This one covers the opposite: the
+    // user names the host while the tool takes a NUMERIC agent_id only (get_sca_checks,
+    // get_sca_results -- every other agent-scoped tool accepts a name). Omitting the parameter is
+    // NOT "across all agents": it triggers sole-active-agent resolution, so the call silently
+    // answers about a different host. Those parameters' own descriptions only explain when to omit
+    // them, which is why the other half has to be stated here.
+    //
+    // Deliberately does not name which tool to resolve the id with: the available lookup differs
+    // per turn (get_agents, get_agent_inventory, any agent-name-accepting tool, the escape hatch),
+    // and naming a tool the router may not have offered is an instruction the model cannot obey.
     'When the user DOES name a host and the tool you need takes a numeric agent id only ' +
       '(agent_id), resolve that name to its id first -- with any tool available to you this turn ' +
       'that accepts an agent name, or by looking the agent up -- and pass the id. Do not put the ' +
@@ -704,24 +651,12 @@ export function buildSystemPrompt(nowIso: string): string {
       'search_findings_by_rule_tag with a wazuh.rule.tags value, or aggregate by rule first with ' +
       'get_top_rules to discover ids. If a narrowly-filtered query returns 0 rows for activity ' +
       'that plausibly exists, retry once with a broader filter before concluding there were none.',
-    // EXPLAIN-WAVE PHASE 5 -- the single dominant failure class left after phase 4: most of the
-    // below-target explanatory answers
-    // issued ONE over-narrow or malformed query, got zero rows, and abstained. A "retry once with
-    // a broader filter" clause already existed, but only as the tail of the rule-ids rule below,
-    // where it reads as advice about rule ids specifically -- and, more importantly, the model
-    // could not obey it: chat.ts's futility stop took the tools away for the next round the moment
-    // a round's only successful call came back empty. `shouldGrantZeroRowWideningRound` (chat.ts)
-    // now leaves exactly one tool-bearing round open for this, so this clause is the half that
-    // says what to spend it on. Stated as ONE attempt, with the three concrete moves, because the
-    // affordance is one round and the latency tail is already the phase-4 build's stated cost.
-    // EXPLAIN-WAVE PHASE 6: the clause worked -- items that gave up without calling any tool fell
-    // sharply -- but it never said what the retry must be ABOUT, and that omission has its own
-    // cost: on an SCA question the model spent the extra round on a second exploratory
-    // get_field_values probe and never called the typed SCA tool at all, turning a correct tool
-    // selection into a wrong one. The retry is now pinned to the SAME question with exactly ONE
-    // thing changed, and exploratory probing is named as the wrong way to spend it. chat.ts's
-    // `shouldGrantZeroRowWideningRound` enforces the matching half mechanically: a round made only
-    // of discovery calls no longer earns the extra round at all.
+    // This clause is only obeyable because chat.ts's `shouldGrantZeroRowWideningRound` leaves
+    // exactly ONE tool-bearing round open after a turn's first all-zero-row round -- the futility
+    // stop otherwise takes the tools away before the model can retry. Keep the two in step: the
+    // wording says ONE attempt because the affordance is one round, and it pins the retry to the
+    // SAME question with one thing changed because that helper also refuses the grace to a round
+    // made only of discovery probes.
     'When a query comes back with zero rows and you believe the thing asked about plausibly ' +
       'exists, make EXACTLY ONE more attempt before saying you found nothing -- one, not a series. ' +
       'That attempt must target THE SAME QUESTION with exactly ONE thing changed -- one filter, ' +
@@ -777,10 +712,10 @@ export function buildSystemPrompt(nowIso: string): string {
       'back with zero rows for something that plausibly exists, call get_field_values on that ' +
       'same field before concluding it does not exist — a zero-row result proves the FILTER VALUE ' +
       'did not match, not that the data is absent, and those are different findings to report. ' +
-      // EXPLAIN-WAVE PHASE 6: get_field_values now covers the wazuh-states-* inventory/FIM-registry
-      // surfaces too (guardrails.ts's allowlist, via state-families.ts). Before this, its `field`
-      // parameter rejected every state field, so on those surfaces the model had no choice but to
-      // guess -- and then read the rejection as evidence the field did not exist.
+      // True only while get_field_values' allowlist covers the wazuh-states-* surfaces
+      // (guardrails.ts, via state-families.ts). If that coverage is narrowed, this sentence sends
+      // the model at a `field` value the tool rejects -- which it reads as "the field does not
+      // exist".
       'This now covers the current-state surfaces as well (service, hardware, network, user, ' +
       'group, browser-extension and registry fields, via the index_family parameter), so on those ' +
       'indices too, check a field before deciding it is missing rather than inferring absence ' +

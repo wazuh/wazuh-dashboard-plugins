@@ -11,14 +11,10 @@ test('search_wazuh_data: deriveColumns and failClosedFieldPolicy are both explic
   assert.equal(searchWazuhDataTool.failClosedFieldPolicy, true);
 });
 
-// EXPLAIN-WAVE PHASE 5 -- escape-hatch drift on named-agent FIM questions. The answer
-// was correct and FASTER, but it came from this tool instead of get_fim_files, collapsing both
-// tool selection and parameter fidelity and costing get_fim_files its whole `fim` family.
-// "Prefer a typed tool first"
-// was already here and lost to a real cost difference, so the primary fix is get_fim_files' new
-// `agent_name` parameter (which removes that difference). This clause is the second half: it says
-// WHY the typed tool still wins when both can find the same rows -- curated columns and
-// population-true totals this tool cannot produce -- rather than restating a preference.
+// "Prefer a typed tool first" loses to a real cost difference on its own, so this clause has to say
+// WHY the typed tool wins when both can find the same rows -- curated columns and population-true
+// totals this tool cannot produce -- rather than restating the preference. The other half of the
+// same rule is get_fim_files' `agent_name` parameter, which removes the cost difference.
 test('search_wazuh_data: the description scopes it to gaps a typed tool does not cover', () => {
   const description = searchWazuhDataTool.spec.description;
   assert.match(

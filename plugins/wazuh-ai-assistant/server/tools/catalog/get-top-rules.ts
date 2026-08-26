@@ -54,17 +54,12 @@ import {
  * own visible column, since the 6-column visible-column budget (`MAX_VISIBLE_RESULT_COLUMNS`) is
  * now fully spent by title + level + hits + distinct_title_count + high_or_critical + key.
  *
- * EXPLAIN-WAVE PHASE 7 (the field was renamed from `distinct_titles`): the guard worked as a
- * guard — the model read the number and did not claim the sampled title owned the whole bucket —
- * but it then MISREAD what the number counts, telling the user the rule had "3 distinct title
- * variants, meaning each occurrence recorded a slightly different failure message". That is the
- * wrong mechanism: rule titles are templated and interpolate the ENTITY involved (a user, host,
- * address or file), so a spread above 1 almost always means the rule fired for that many different
- * subjects, not that the wording drifted. A plural noun invites the "variants" reading; a `_count`
- * suffix names the number for what it is, and the tool description now states the mechanism
- * outright. Fixing the label the model reads beats adding a prompt line telling it how to read a
- * label that misleads: the same rename is applied to `distinct_level_count` here and
- * `distinct_name_count` in get-top-agents.ts so the family keeps one convention.
+ * The `_count` suffix is load-bearing, not cosmetic: rule titles are templated and interpolate the
+ * ENTITY involved (a user, host, address or file), so a spread above 1 almost always means the rule
+ * fired for that many different SUBJECTS, not that the wording drifted. A plural noun (`distinct_
+ * titles`) invites the wrong reading, and the tool description states the mechanism outright for the
+ * same reason. `distinct_level_count` here and `distinct_name_count` in get-top-agents.ts follow the
+ * same convention.
  */
 export const getTopRulesTool: ToolDefinition = {
   spec: {

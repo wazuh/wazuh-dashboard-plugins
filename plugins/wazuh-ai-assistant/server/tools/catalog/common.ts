@@ -368,11 +368,8 @@ export function objectSchema(
 export const FINDING_SCOPE_NOTE =
   'Covers rule-matched detections (alerts/hits/signals) only -- never the raw, unmatched event ' +
   'stream; if this returns 0 rows, say so plainly rather than reporting nothing happened. ' +
-  // EXPLAIN-WAVE PHASE 4: the surface half. A question scoped to detection history ("which agents
-  // have a detection for this CVE in the findings history") was answered from
-  // `wazuh-states-vulnerabilities`, whose host list for a CVE does not match the findings
-  // stream's -- the model disclosed the substitution and still answered the
-  // wrong surface, so the distinction has to be visible at tool-choice time, not only afterwards.
+  // The state and findings surfaces carry different host lists for the same CVE, so the
+  // distinction has to be visible at tool-choice time, not only in the system prompt.
   'Findings are detection HISTORY (what was detected, and when), not current state.';
 
 /** Current-state note appended to the 4 vulnerability tools' descriptions: `wazuh-states-
@@ -381,19 +378,17 @@ export const FINDING_SCOPE_NOTE =
  * tool-choice time too, not only after a tool is already picked. */
 export const VULN_CURRENT_STATE_NOTE =
   'Reflects current vulnerability state only -- no patched/unpatched history over time. ' +
-  // EXPLAIN-WAVE PHASE 4: the other half of the surface
-  // split FINDING_SCOPE_NOTE now names. "Current state only" said what this surface is NOT a
-  // timeline of, but never that another surface answers the history question -- so a detection-
-  // history question stayed here and came back with the wrong host set.
+  // The other half of the split FINDING_SCOPE_NOTE names: saying what this surface is NOT a
+  // timeline of is not enough, it must also point at the surface that answers the history
+  // question.
   'This is what IS vulnerable right now; for what WAS detected, and when, use the findings tools.';
 
 /**
  * Current-state note appended to the two SCA tools' descriptions (get_sca_results,
- * get_sca_checks). EXPLAIN-WAVE PHASE 4: same surface split as `VULN_CURRENT_STATE_NOTE` /
- * `FINDING_SCOPE_NOTE` above -- `wazuh-states-sca` holds the LATEST scan verdict per check, while
- * an SCA-check finding on the findings stream records that a check was seen failing at a point in
- * time. Nothing told the model those were different surfaces, and a compliance question phrased
- * either way reached whichever tool the router happened to offer.
+ * get_sca_checks). Same surface split as `VULN_CURRENT_STATE_NOTE` / `FINDING_SCOPE_NOTE` above:
+ * `wazuh-states-sca` holds the LATEST scan verdict per check, while an SCA-check finding on the
+ * findings stream records that a check was seen failing at a point in time. Without the note, a
+ * compliance question reaches whichever of the two the router happened to offer.
  */
 export const SCA_CURRENT_STATE_NOTE =
   'Reflects the latest SCA scan state (what passes/fails now), not a history of when a check ' +
@@ -426,17 +421,13 @@ export const STANDARD_FINDING_SAMPLE_COLUMNS = [
   'wazuh.agent.name',
   'wazuh.rule.title',
   'wazuh.rule.level',
-  // EXPLAIN-WAVE PHASE 7 (the wrong-incident answer): `wazuh.integration.category` is the field
-  // that says WHICH detection channel a finding came from, and it has been a visible table column
-  // for all of these tools from the start -- but it was never in the model-facing sample rows, so
-  // the model saw the user's own discriminator only in prose it could not read. Asked about
-  // sign-in failures on one channel, it narrated a different authentication incident that happened
-  // to share the same agent and the same technique tags, because from its side the two row sets
-  // were indistinguishable. A result set scoped to a host or an IP routinely mixes several
-  // unrelated incidents; this is the one column that separates them. Curated Wazuh taxonomy word
-  // (same class as `wazuh.rule.level`), one short enum value per row, and already on
-  // `guardrails.ts`'s aggregation allowlist -- see `server/prompts.ts`'s matching instruction,
-  // which tells the model what to DO with it.
+  // Says WHICH detection channel a finding came from. A result set scoped to a host, an IP or a
+  // technique routinely mixes several unrelated incidents, and this is the one column that
+  // separates them -- it must be model-facing, not merely a visible table column, or the model
+  // cannot tell two row sets apart. Curated Wazuh taxonomy word (same class as
+  // `wazuh.rule.level`), one short enum value per row, already on `guardrails.ts`'s aggregation
+  // allowlist. `server/prompts.ts` carries the matching instruction telling the model what to do
+  // with it.
   'wazuh.integration.category',
 ];
 
@@ -518,19 +509,14 @@ export const FINDING_BREAKDOWN_AGGS: Record<string, unknown> =
  * these has a `server/tools/privacy.ts` `FIELD_POLICY_DEFAULTS` entry before it reaches a digest.
  * These are the ECS findings-v5 field names.
  *
- * EXPLAIN-WAVE PHASE 2 (AI/plan/eval-v2/tooling-gap-map.md gap 2): `wazuh.rule.description` and
- * `process.command_line` are new here, and `process.command_line` REVERSES this list's previous
- * "stays row-only, not sent to the model" decision. The measured reason: an explanatory question
- * ("explain this event and what to do about it") was answerable only from a rule TITLE, which on
- * findings-v5 is a short templated label — the model could name the finding but never say what the
- * detection actually is or what ran, and `FINAL_ROUND_ANSWER_INSTRUCTION` correctly forbids
- * inventing either. `wazuh.rule.description` is the ruleset's own prose about the detection (the
- * same text the Manager rule carries, gap 4) and is curated, not analyst/attacker input — reviewed
- * `allow`, on `wazuh.rule.title`'s reasoning. `process.command_line` is the one field that says
- * WHAT ran; it keeps its `anonymize` policy, so under privacy mode it reaches the model as a
- * pseudonym exactly as it does in the row expander (a documented explanation-quality tradeoff of
- * privacy mode, gap-map item 11 — not a new leak: `applyFieldPolicy` runs over the digest in
- * `executor.ts` regardless of which columns are declared here).
+ * `process.command_line` is a deliberate exception to the "stays row-only" rule above: a rule
+ * TITLE on findings-v5 is a short templated label, so without it an explanatory answer can name a
+ * finding but never say what actually ran, which `FINAL_ROUND_ANSWER_INSTRUCTION` forbids
+ * inventing. It keeps its `anonymize` policy, so under privacy mode it reaches the model as a
+ * pseudonym — an accepted explanation-quality tradeoff of privacy mode, not a leak
+ * (`applyFieldPolicy` runs over the digest in `executor.ts` regardless of which columns are
+ * declared here). `wazuh.rule.description` is the ruleset's own curated prose about the detection,
+ * never analyst/attacker input, so it is `allow` on `wazuh.rule.title`'s reasoning.
  *
  * BUDGET: both fields are free prose that can run long, so both are capped tighter than
  * `MAX_FIELD_VALUE_LENGTH` by `DIGEST_FIELD_MAX_LENGTH_DEFAULTS` (digest.ts) — see that constant
@@ -592,20 +578,12 @@ export const VULN_DIGEST_SAMPLE_COLUMNS = [
   // scanner/OS-curated metadata, not analyst/attacker free text.
   'vulnerability.scanner.condition',
   'package.type',
-  // EXPLAIN-WAVE PHASE 4 (the weak "how do we remediate this item" answers).
-  // `wazuh-states-vulnerabilities` has NO dedicated fixed-version or remediation
-  // field -- the live 5.0 mapping carries the fix bound in
-  // `vulnerability.scanner.condition` above and nothing else
-  // prescriptive -- so the enrichment available here is the one field the docs DO carry and the
-  // digest was silently dropping: `vulnerability.description`, already requested in
-  // `VULN_SOURCE_FIELDS` below and rendered in get_cve_intel's TABLE, but never sent to the model.
-  // Without it part (2) of an explanatory answer ("why it matters") has to come entirely from the
-  // model's own recall of the CVE, and part (3)'s fix is stated with no idea what the flaw is. The
-  // measured contrast is that the only answers that scored well on actionability were the ones
-  // where `scanner.condition` happened to name a concrete patch -- the same lever, one field
-  // wider. Third-party feed
-  // prose, so capped by DIGEST_FIELD_MAX_LENGTH_DEFAULTS (digest.ts) and classified `allow-scan`
-  // in privacy.ts rather than the plain `allow` the scanner/OS-curated fields above get.
+  // `wazuh-states-vulnerabilities` has NO dedicated fixed-version or remediation field: the fix
+  // bound lives in `vulnerability.scanner.condition` above and nothing else on the mapping is
+  // prescriptive, so the description is the only field that says what the flaw IS. Without it a
+  // remediation answer states a fix with no idea what it fixes. Third-party feed prose, so capped
+  // by DIGEST_FIELD_MAX_LENGTH_DEFAULTS (digest.ts) and classified `allow-scan` in privacy.ts
+  // rather than the plain `allow` the scanner/OS-curated fields above get.
   'vulnerability.description',
 ];
 
@@ -614,9 +592,8 @@ export const VULN_DIGEST_SAMPLE_COLUMNS = [
  * Identical (same fields, same order) at every call site.
  * Part of the outbound Indexer request: order and contents must stay exactly as below.
  *
- * `vulnerability.description` used to be appended here BECAUSE it was table-only and therefore
- * absent from the digest columns; it is now a digest column itself (see above), so this list is
- * exactly the digest set and the explicit append would be a duplicate `_source` entry.
+ * `vulnerability.description` needs no explicit append: it is a digest column itself (see above),
+ * so this list is exactly the digest set and appending it would duplicate a `_source` entry.
  */
 export const VULN_SOURCE_FIELDS = [...VULN_DIGEST_SAMPLE_COLUMNS];
 

@@ -2,21 +2,11 @@ import assert from 'node:assert/strict';
 import { getFimFilesTool } from './get-fim-files';
 
 /**
- * EXPLAIN-WAVE PHASE 2: the model called
- * `get_fim_files({ agent_id: '<host name>' })` -- an agent NAME in a numeric-id-only parameter --
- * which `validateAgentId` rejects, so the round produced no table and no digest and the turn ended
- * on synthesised copy. The parameter's description was widened to say so.
- *
- * EXPLAIN-WAVE PHASE 5 is the follow-up that phase 2
- * caused: telling the model to "resolve that name to its id first and pass the id" priced the
- * detour explicitly, and on a question that names the host ("which files changed on agent <name>
- * according to file integrity monitoring?") the model simply went to the
- * `search_wazuh_data` escape hatch instead, where `wazuh.agent.name` is one filter -- collapsing
- * both tool selection and parameter fidelity, and costing this tool its whole `fim` family. The
- * baseline reached this tool only by burning three rounds (get_field_values -> search_wazuh_data
- * -> get_fim_files with the resolved id),
- * so the escape hatch was genuinely the cheaper route and no prompt clause was going to beat it.
- * The fix removes the reason instead: this tool now accepts the identifier the user actually said.
+ * This tool accepts an agent NAME as well as a numeric id. An id-only schema rejects
+ * `get_fim_files({ agent_id: '<host name>' })` outright (`validateAgentId`), and telling the model
+ * to resolve the name first only prices the detour -- making the `search_wazuh_data` escape hatch,
+ * where `wazuh.agent.name` is one filter, the genuinely cheaper route. No prompt clause preferring
+ * the typed tool beats a real cost difference, so the schema removes the difference.
  *
  * Unlike get_sca_checks/get_sca_results, this tool has NO `soleCandidateParams`, so omitting BOTH
  * identifiers genuinely means "every agent" -- the description must say that, not the

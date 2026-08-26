@@ -167,11 +167,10 @@ test(
     // "check.rationale" is a FIELD_CATALOG.sca entry with no get-field-values.ts tool field of its
     // own -- simulate it as dropped/renamed while every tool-facing field stays present.
     //
-    // EXPLAIN-WAVE PHASE 6: this fixture used "check.id" until `state-families.ts` opened the
-    // state schema to get_field_values, which made check.id (and policy.name) genuinely
-    // TOOL-FACING for the sca family. The old choice would now correctly warn, so the fixture
-    // moved to a field that is still catalog-only -- the test's subject is the warn/debug
-    // DEMOTION, not which particular field happens to be untooled this month.
+    // The fixture needs a field that is catalog-only and NOT tool-facing; "check.id" and
+    // "policy.name" no longer qualify, because `state-families.ts` opened the sca family's state
+    // schema to get_field_values. The test's subject is the warn/debug DEMOTION, not which particular
+    // field happens to be untooled.
     const properties = await buildScaProperties(['check.rationale']);
     const client = clientReturning({
       'wazuh-states-sca*': {

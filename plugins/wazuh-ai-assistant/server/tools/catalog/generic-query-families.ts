@@ -8,15 +8,12 @@
  * out of sync the way `guardrails.ts`'s own module-header bound-disclosure audit warns against for
  * every other multiply-referenced bound in this plugin.
  *
- * SCOPE AMENDMENT (explain-wave phase 6). This file's original note said it deliberately does NOT
- * also feed `get-field-values.ts`'s `FIELD_LOCATIONS`, on the grounds that "which index carries
- * this field" is a different contract from "which families may be named". That separation held for
- * the ORIGINAL three families, and it still holds for them -- but it is exactly what let the
- * `wazuh-states-*` surfaces fail in both places at once: an index the
- * enum could not name, whose fields could not be discovered either. The state families therefore
- * now come from ONE shared row set, `../state-families.ts`, which feeds this enum, that map, and
- * `guardrails.ts`'s aggregation allowlist together; see that file's doc comment for why splitting
- * the three lists is what made the gap invisible. Everything else here is unchanged.
+ * SCOPE. This enum deliberately does NOT feed `get-field-values.ts`'s `FIELD_LOCATIONS` for the
+ * original three families: "which index carries this field" is a different contract from "which
+ * families may be named". The `wazuh-states-*` families are the exception -- they come from ONE
+ * shared row set, `../state-families.ts`, which feeds this enum, that map and `guardrails.ts`'s
+ * aggregation allowlist together, because a state index the enum cannot name and whose fields
+ * cannot be discovered fails in both places at once.
  */
 
 import { STATE_FAMILIES, stateFamilyLabel } from '../state-families';
@@ -49,22 +46,13 @@ const ORIGINAL_FAMILIES: GenericQueryFamily[] = [
   },
   {
     pattern: 'wazuh-states-*',
-    // EXPLAIN-WAVE PHASE 5: the LABEL (not the `pattern`) now names the registry half of FIM
-    // explicitly. The invariant above is about the enum VALUE -- that is the wire contract, and it
-    // is untouched. This string only ever reaches the model as parameter-description prose, and the
-    // bare word "FIM" was reliably read as "the files surface get_fim_files already owns", and on
-    // that reading the model declined registry questions outright rather than aim this
-    // pattern at `wazuh-states-fim-registry-*`, which it has covered since this pattern shipped.
-    // The system prompt now carries the full routing rule; this makes the tool's own schema agree
-    // with it instead of quietly implying the narrower reading.
-    //
-    // EXPLAIN-WAVE PHASE 6: the value still ships (wire contract; a caller that has always sent it
-    // keeps working), but the label now says what it COSTS. This wildcard fans out over all
-    // eighteen state indices at once, and the returned sample is dominated by whichever family has
-    // the most documents -- which is why inventory questions came back
-    // "the fields I asked for were empty" against a corpus that holds them. The
-    // per-family patterns below are the answer to that, so this entry's job is now to send the
-    // model there.
+    // The LABEL must name the registry half of FIM explicitly: the bare word "FIM" reads as the
+    // files surface get_fim_files owns, and on that reading a registry question never reaches this
+    // pattern -- which has covered `wazuh-states-fim-registry-*` since it shipped. The label must
+    // also say what the wildcard COSTS, because it fans out over every state index at once and the
+    // sample is dominated by the largest family; the per-family patterns below are the alternative
+    // it has to point at. The enum VALUE is the wire contract (see the invariant above) and stays
+    // untouched -- only this parameter-description prose changes.
     label:
       'ALL current-state data at once: vulnerabilities, FIM (both file state and Windows registry ' +
       'keys/values), SCA, inventory. Use a specific wazuh-states-... pattern below whenever you ' +
@@ -75,17 +63,14 @@ const ORIGINAL_FAMILIES: GenericQueryFamily[] = [
 ];
 
 /**
- * EXPLAIN-WAVE PHASE 6 (root cause A of the unreachable state surfaces): one enum entry per
- * physical `wazuh-states-*` index, derived from `../state-families.ts` so the enum, the
- * field-discovery route (`get-field-values.ts`'s `FIELD_LOCATIONS`) and the aggregation allowlist
- * (`guardrails.ts`) can never again list a different set of state surfaces from each other.
+ * One enum entry per physical `wazuh-states-*` index, derived from `../state-families.ts` so the
+ * enum, the field-discovery route (`get-field-values.ts`'s `FIELD_LOCATIONS`) and the aggregation
+ * allowlist (`guardrails.ts`) can never list a different set of state surfaces from each other.
  *
- * Every pattern is accepted by `checkIndexAllowlist` today with no guardrail change: the existing
- * `INDEX_ALLOWLIST_RE` alternative `^wazuh-(...|states|...)[A-Za-z0-9._*-]*$` already covers every
- * `wazuh-states-`-prefixed name. That is precisely the failure mode this module's header warns
- * about, in its second form -- these indices were ALLOWLISTED all along and simply not
- * ENUMERABLE, so the model could not name one. This module's own test asserts the acceptance
- * rather than trusting the reading.
+ * Every pattern is accepted by `checkIndexAllowlist` with no guardrail change: `INDEX_ALLOWLIST_RE`
+ * already covers every `wazuh-states-`-prefixed name. Allowlisted is NOT the same as enumerable --
+ * an index the enum cannot name is unreachable however permissive the guardrail is -- so this
+ * module's own test asserts the acceptance rather than trusting the reading of the regex.
  */
 const STATE_INDEX_FAMILIES: GenericQueryFamily[] = STATE_FAMILIES.map(
   family => ({

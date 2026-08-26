@@ -53,13 +53,10 @@ import { resolveTimeRange } from './catalog/common';
  * (the shape scan's documented limitation) and was never minted (resolution exists precisely
  * because the caller never supplied the value), so both downstream scans missed it.
  *
- * EXPLAIN-WAVE PHASE 3 closes the other half of that hole. The "which one?" candidate lists in
- * FAILED outcomes were documented here as a residual (tool-result error text, covered only by
- * `chat.ts`'s `prescanAndMintToolContent` pass plus the same bare-name limitation that let P3
- * through in the first place). They now declare `reasonEntities` the same way a resolved note
- * declares `noteEntities`, and `executor.ts` scrubs them at the same choke point -- so an
- * ambiguity error naming five real hostnames is pseudonymized rather than relying on a scan that
- * is already known not to catch a bare host name.
+ * The "which one?" candidate lists in FAILED outcomes are the other half of the same hole: they
+ * reach the provider as tool-result error text, where `chat.ts`'s `prescanAndMintToolContent` pass
+ * is known not to catch a bare host name. They therefore declare `reasonEntities` the same way a
+ * resolved note declares `noteEntities`, and `executor.ts` scrubs them at the same choke point.
  */
 
 /** How many named candidates a "which one?" error lists, for either lookup kind -- bounded so a
@@ -222,9 +219,9 @@ export async function lookupIndexerTermsCandidate(
   index: string,
   field: string,
   scopeFilter: Record<string, unknown>[],
-  // EXPLAIN-WAVE PHASE 3: the `@timestamp` bounds to add when `index` is a TIME-BASED family
-  // (`requiresBoundedTimeRange`, guardrails.ts). Optional and ignored for a `wazuh-states-*` index
-  // (the only family this lookup served before), so the SCA policy-id probe is byte-identical.
+  // The `@timestamp` bounds to add when `index` is a TIME-BASED family
+  // (`requiresBoundedTimeRange`, guardrails.ts); optional and ignored for a `wazuh-states-*`
+  // index.
   timeRange?: { gte: string; lte: string },
 ): Promise<IndexerTermsLookupResult> {
   try {
@@ -233,11 +230,10 @@ export async function lookupIndexerTermsCandidate(
       return { kind: 'error' };
     }
     // A rangeless probe against wazuh-findings-v5*/wazuh-events-v5* fails `lintDsl`, and the
-    // `catch`/early-return below then swallows that as `{kind: 'error'}` -- so the whole
-    // sole-candidate feature would silently disappear for a time-based index, which is the exact
-    // failure mode `requiresBoundedTimeRange`'s own doc comment exists to warn about. The bounds
-    // come from the CALLER's own params (`resolveOneParam` below), so the candidate universe is
-    // the same window the tool's real query will search, not a wider or narrower one.
+    // `catch`/early-return below swallows that as `{kind: 'error'}` -- so without the bounds the
+    // whole sole-candidate feature silently disappears for a time-based index, with no visible
+    // error. The bounds come from the CALLER's own params (`resolveOneParam` below), so the
+    // candidate universe is the same window the tool's real query will search.
     const timeFilter =
       requiresBoundedTimeRange(index) && timeRange
         ? [
@@ -544,9 +540,8 @@ async function resolveOneParam(
           `is meant cannot be assumed. Candidates: ${named.join(', ')}` +
           `${remaining > 0 ? `, and ${remaining} more` : ''}.)`,
         // The candidate hostnames this reason enumerates -- declared for the same reason the
-        // 'single' branch above declares its resolved name (capture probe P3): before this, an
-        // ambiguity error carried every candidate's real hostname to the provider in the clear
-        // under privacy mode, past every downstream scan.
+        // 'single' branch above declares its resolved name: undeclared, they reach the provider
+        // in the clear under privacy mode, past every downstream scan.
         reasonEntities: result.candidates.map(candidate => ({
           value: candidate.name,
           kind: 'HOST' as const,
@@ -590,9 +585,8 @@ async function resolveOneParam(
         `"${result.value}". State this assumption to the user rather than presenting the ` +
         'result as if that value had been named.',
       // A terms-source value is USUALLY a catalog identifier (an SCA policy id) with nothing to
-      // declare -- but a spec whose field holds identifiers (an agent name) declares its kind via
-      // `noteEntityKind` (types.ts), because leaving it undeclared is exactly capture probe P3's
-      // leak for that tool.
+      // declare -- but a spec whose field holds identifiers (an agent name) must declare its kind
+      // via `noteEntityKind` (types.ts), or the name reaches the provider unscrubbed.
       noteEntities: spec.source.noteEntityKind
         ? [{ value: result.value, kind: spec.source.noteEntityKind }]
         : [],
@@ -624,7 +618,7 @@ async function resolveOneParam(
           ', ',
         )}` +
         `${hasMore ? ', and possibly more' : ''}.)`,
-      // Same P3 reasoning as the manager-agents 'many' branch above, gated on the spec's own
+      // Same reasoning as the manager-agents 'many' branch above, gated on the spec's own
       // declaration: an SCA-policy-id candidate list has nothing to declare, an agent-name one
       // does.
       ...(spec.source.noteEntityKind

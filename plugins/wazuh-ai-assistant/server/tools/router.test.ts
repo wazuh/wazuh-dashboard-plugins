@@ -399,14 +399,14 @@ test('resolveStage2Tools: get_security_summary chains to get_findings_by_time ou
   assert.ok(names.includes('get_findings_by_time'));
 });
 
-// --- Explain-wave phase 1: mitre/events escape their own category (AI/plan/eval-v2 gap 5) -------
+// --- mitre/events escape their own category ---------------------------------------------------
 //
 // "Explain this MITRE incident -- when was it detected and how" needs the document behind a
 // technique row (find_document_by_field) and the detection side (get_rules, the only tool that
-// returns a rule description). Both live outside the `mitre` category, and resolveStage2Tools
-// widens a route only through CHAIN_PAIRS, so before these edges a mitre-routed turn could list
-// technique rows and go no further. Same for get_events_by_agent, which sits in `findings` but had
-// no row-level pivot of its own.
+// returns a rule description). Both live outside the `mitre` category, and resolveStage2Tools widens
+// a route only through CHAIN_PAIRS, so without these edges a mitre-routed turn can list technique
+// rows and go no further. Same for get_events_by_agent, which sits in `findings` with no row-level
+// pivot of its own.
 
 test('resolveStage2Tools: a mitre route reaches find_document_by_field and get_rules via CHAIN_PAIRS', () => {
   const names = resolveStage2Tools(['mitre']).map(spec => spec.name);
@@ -442,15 +442,12 @@ test('CHAIN_PAIRS: get_events_by_agent chains to find_document_by_field', () => 
   assert.ok(names.includes('find_document_by_field'));
 });
 
-// --- EXPLAIN-WAVE PHASE 5: registry FIM must have a category that claims it -------------------
+// --- Registry FIM must have a category that claims it -----------------------------------------
 //
-// Asked whether anything had written to a Run key on a named Windows host, the model made
-// ZERO tool calls -- the sharpest regression measured -- and every sibling registry question
-// failed the same way. The `fim` category described itself as "current state of monitored
-// files", so
-// nothing in the routing menu claimed Windows registry keys/values, even though the data is
-// reachable: search_wazuh_data is appended to every resolved list and `wazuh-states-*` covers
-// wazuh-states-fim-registry-keys/-values.
+// With the `fim` category described as "current state of monitored files", nothing in the routing
+// menu claims Windows registry keys/values, so a registry question reaches no tool that can answer
+// it -- even though the data is reachable: search_wazuh_data is appended to every resolved list and
+// `wazuh-states-*` covers wazuh-states-fim-registry-keys/-values.
 
 test('the fim routing category claims Windows registry keys/values, not only files', () => {
   const prompt = buildRoutingPrompt('2026-01-01T00:00:00.000Z');

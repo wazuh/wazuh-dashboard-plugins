@@ -677,13 +677,13 @@ test('resolveScaCheckParams: agent_id and policy_id already supplied bypasses ch
   assert.equal(managerCallLog.length, 0);
 });
 
-// --- EXPLAIN-WAVE PHASE 3: identifier-bearing indexer-terms fields must declare their entities --
+// --- Identifier-bearing indexer-terms fields must declare their entities ----------------------
 
 test('buildGenericResolveParams (indexer-terms): a noteEntityKind field declares its resolved value for pseudonymization', async () => {
-  // The phase-3 fix moves search_findings_by_agent's agent_name onto an indexer-terms lookup
-  // over `wazuh.agent.name`. Those values are HOSTNAMES, so unlike an SCA policy id they must be
-  // declared -- otherwise executor.ts's scrubAssumptionNote has nothing to scrub and capture
-  // probe P3's leak (a real hostname reaching the provider in the clear) returns for this tool.
+  // search_findings_by_agent's agent_name resolves through an indexer-terms lookup over
+  // `wazuh.agent.name`, whose values are HOSTNAMES. Unlike an SCA policy id they must be declared,
+  // or executor.ts's scrubAssumptionNote has nothing to scrub and a real hostname reaches the
+  // provider in the clear.
   const tool = stubTool([
     {
       param: 'agent_name',
@@ -771,8 +771,8 @@ test('buildGenericResolveParams (indexer-terms): a field WITHOUT noteEntityKind 
 });
 
 test('buildGenericResolveParams (manager-agents): an ambiguous agent lookup now declares the candidate hostnames it names', async () => {
-  // Pre-existing residual closed by the same change: this branch has always enumerated real agent
-  // names into the tool error, and only the resolved-value NOTE was ever scrubbed.
+  // This branch enumerates real agent names into the tool error, so it needs the same scrub the
+  // resolved-value NOTE gets.
   const tool = stubTool([
     {
       param: 'agent_name',

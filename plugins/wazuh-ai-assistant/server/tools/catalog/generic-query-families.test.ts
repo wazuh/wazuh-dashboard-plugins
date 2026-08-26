@@ -75,12 +75,10 @@ test('excluded surfaces are NOT present (decline-tier / open product gaps / priv
   }
 });
 
-// EXPLAIN-WAVE PHASE 5. `wazuh-states-*` has covered wazuh-states-fim-registry-keys/-values since
-// the day it shipped, but its label said only "FIM", which reads as the files surface get_fim_files
-// already owns. On that reading the model declined registry questions outright -- one of them
-// without a single tool call -- rather than aim this pattern at the registry
-// indices. The enum VALUE is untouched -- that is the wire contract -- but the label now says what
-// the pattern has always covered.
+// `wazuh-states-*` covers wazuh-states-fim-registry-keys/-values, but a label saying only "FIM"
+// reads as the files surface get_fim_files owns, and on that reading a registry question never
+// reaches this pattern. The enum VALUE is the wire contract and stays untouched; only the label
+// changes.
 test('the wazuh-states-* label names the registry half of FIM, not just files', () => {
   const states = GENERIC_QUERY_FAMILIES.find(
     family => family.pattern === 'wazuh-states-*',
@@ -90,10 +88,10 @@ test('the wazuh-states-* label names the registry half of FIM, not just files', 
   assert.match(states.label, /file state/);
 });
 
-// EXPLAIN-WAVE PHASE 6. Root cause A of the unreachable state surfaces: all eighteen wazuh-states-*
-// indices collapsed into ONE enum value, so a family-scoped query was unrepresentable -- the model
-// wrote a correct filter, the wildcard returned the union, and the sample carried none of the
-// requested fields. These tests pin the split and the two invariants that make it safe.
+// With every wazuh-states-* index collapsed into ONE enum value a family-scoped query is
+// unrepresentable: the filter is correct, the wildcard returns the union, and the sample carries
+// none of the requested fields. These tests pin the per-index split and the two invariants that
+// make it safe.
 test('every wazuh-states-* index is individually nameable, not just the wildcard', () => {
   for (const pattern of [
     'wazuh-states-inventory-users*',
@@ -123,9 +121,9 @@ test('every wazuh-states-* index is individually nameable, not just the wildcard
 });
 
 test('the wazuh-states-* wildcard still ships, and its label now warns about the fan-out', () => {
-  // The enum VALUE is the wire contract and is never removed (see this module's own invariant).
-  // What changed is that the label now says why a scoped pattern is the better choice -- the
-  // wildcard's union-dilution is what made eleven inventory answers come back "fields empty".
+  // The enum VALUE is the wire contract and is never removed (see this module's own invariant); the
+  // label has to say why a scoped pattern is the better choice, because the wildcard's union-dilution
+  // is what makes an inventory answer come back "fields empty".
   const states = GENERIC_QUERY_FAMILIES.find(
     family => family.pattern === 'wazuh-states-*',
   );

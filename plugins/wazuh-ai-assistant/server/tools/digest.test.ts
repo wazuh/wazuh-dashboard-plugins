@@ -1981,12 +1981,11 @@ test('getByPath: unchanged behavior for a plain object/scalar path (no array on 
   assert.equal(getByPath(row, 'wazuh.rule.missing'), undefined);
 });
 
-// --- DIGEST_FIELD_MAX_LENGTH_DEFAULTS: cross-tool per-field caps -------------------------------
-// Explain-wave phase 2 (AI/plan/eval-v2/tooling-gap-map.md gap 2): `wazuh.rule.description` and
-// `process.command_line` are newly in finding/event digest samples, both free prose. They are capped
-// tighter than MAX_FIELD_VALUE_LENGTH here rather than in each of the eleven finding tools, so a
-// twelfth one cannot add the columns and forget the cap. The tool's own `sampleFieldMaxLength`
-// (SCA's shipped precedent) still wins.
+// --- DIGEST_FIELD_MAX_LENGTH_DEFAULTS: cross-tool per-field caps ------------------------------
+// `wazuh.rule.description` and `process.command_line` are free prose in finding/event digest
+// samples. They are capped tighter than MAX_FIELD_VALUE_LENGTH here rather than in each of the
+// eleven finding tools, so a twelfth one cannot add the columns and forget the cap. The tool's own
+// `sampleFieldMaxLength` (SCA's precedent) still wins.
 
 /** `getByPath` (digest.ts) splits a dotted column on '.', so a sample source must be NESTED --
  * a flat `{'wazuh.rule.description': ...}` key would never be found. */
@@ -2054,10 +2053,9 @@ test("buildDigest: a tool's OWN sampleFieldMaxLength still overrides the shared 
   );
 });
 
-// EXPLAIN-WAVE PHASE 4: `vulnerability.description` joins the same shared cap layer, for the same
-// reason -- it is now a digest sample column on every vulnerability tool
-// (catalog/common.ts's VULN_DIGEST_SAMPLE_COLUMNS) so a "how do we remediate this" answer can say
-// what the flaw is, and it is third-party CNA/NVD prose that can run long.
+// `vulnerability.description` is on the same shared cap layer for the same reason: it is a digest
+// sample column on every vulnerability tool (catalog/common.ts's VULN_DIGEST_SAMPLE_COLUMNS) and it
+// is third-party CNA/NVD prose that can run long.
 test('buildDigest: vulnerability.description is capped at 240 chars, not the generic 500', () => {
   const def = buildToolDef({
     digest: { sampleColumns: ['vulnerability.description'] },

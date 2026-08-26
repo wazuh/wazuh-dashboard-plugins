@@ -63,25 +63,19 @@ export const searchFindingsByAgentTool: ToolDefinition = {
   // resolveDeicticAgentParams in get-agent-inventory.ts). A strictly-required `agent_name`
   // measured 0/40 invocations on deictic findings questions ("what happened on this host").
   //
-  // EXPLAIN-WAVE PHASE 3 (deictic questions that name a role rather than a host, e.g. "anything
-  // bad on the domain controller?"): the source moved from `manager-agents` to an
-  // `indexer-terms` aggregation over
-  // the EXACT index and field this tool's own `buildRequest` filters on. The two universes are not
-  // the same, and when they disagree the manager-agents lookup resolved silently and wrongly: a
-  // deployment whose Manager API knows exactly ONE agent (the manager node itself) can still have
-  // `wazuh-findings-v5*` carrying many distinct
-  // `wazuh.agent.name` values -- so an omitted `agent_name` took the `kind: 'single'` path and
-  // filtered findings by the manager node, which has none. The ambiguity-enumerate branch that
-  // exists precisely to refuse this ("N agents exist, so which one is meant cannot be assumed.
-  // Candidates: ...") could never fire, because it was counting the wrong population. Aggregating
-  // the field the query itself matches makes "is this ambiguous" a question about the data being
-  // searched: a genuinely single-agent deployment still resolves (and now resolves to an agent
-  // that actually HAS findings), and a multi-agent one gets the candidate list instead of a
-  // silent guess. `valueFrom` is dropped -- it is meaningful only for `manager-agents`; an
-  // indexer-terms bucket key IS the agent name this param is matched as. `noteEntityKind: 'HOST'`
-  // is mandatory here, not decorative: `wazuh.agent.name` values are hostnames, and without the
-  // declaration neither the assumption note nor the candidate list would be pseudonymized under
-  // privacy mode (capture probe P3).
+  // The candidate source MUST be an `indexer-terms` aggregation over the exact index and field this
+  // tool's own `buildRequest` filters on, never `manager-agents`: the Manager's active-agent list and
+  // `wazuh-findings-v5*`'s `wazuh.agent.name` values are different populations. A deployment whose
+  // Manager API knows exactly ONE agent (the manager node) can still have many distinct agent names
+  // in the findings index, so a manager-agents lookup takes the `kind: 'single'` path and silently
+  // filters by an agent with no findings, while the ambiguity-enumerate branch that exists to refuse
+  // exactly that never fires because it counted the wrong population. Aggregating the field the query
+  // itself matches makes "is this ambiguous" a question about the data being searched.
+  //
+  // `valueFrom` is meaningless here -- an indexer-terms bucket key IS the agent name this param is
+  // matched as. `noteEntityKind: 'HOST'` is mandatory, not decorative: `wazuh.agent.name` values are
+  // hostnames, and without the declaration neither the assumption note nor the candidate list is
+  // pseudonymized under privacy mode.
   soleCandidateParams: [
     {
       param: 'agent_name',

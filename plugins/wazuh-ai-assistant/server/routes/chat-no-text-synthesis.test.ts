@@ -298,8 +298,8 @@ test('synthesizeNoTextFallback: retries with NO tools offered and the synthesis 
     'the retry offers no tools -- it cannot re-enter the tool loop',
   );
   const lastOutbound = calls[0].messages[calls[0].messages.length - 1];
-  // EXPLAIN-WAVE PHASE 3: `user`, not `system` -- see `withNoTextSynthesisInstruction`'s doc
-  // comment for the Anthropic system-hoisting root cause this role change fixes.
+  // `user`, not `system` -- see `withNoTextSynthesisInstruction`'s doc comment for the Anthropic
+  // system-hoisting reason the role matters.
   assert.equal(lastOutbound.role, 'user');
   assert.equal(lastOutbound.content, NO_TEXT_SYNTHESIS_INSTRUCTION);
   assert.equal(
@@ -745,15 +745,13 @@ test('synthesizeNoTextFallback: aborting MID-STREAM stops forwarding further del
   assert.doesNotMatch(text, /second sentence/);
 });
 
-// --- EXPLAIN-WAVE PHASE 2: the ZERO-ROW turn is synthesizable too ------------------------------
+// --- The ZERO-ROW turn is synthesizable too ----------------------------------------------------
 //
-// A third of measured answers carried no model text at all, and most of those were
-// the all-empty shape -- every tool call returned 0 rows and the turn ended on
-// `buildNoMatchingResultsMessage`'s canned line, without the model ever being ASKED for an answer
-// (`emitNoTextFallback`'s gate required a non-empty table). These pin the three things that change
-// for that shape: which instruction is sent, that duplicate-table suppression stays OFF, and that a
-// failed retry degrades to the caller's own copy rather than to a "table below" sentence pointing
-// at an empty table.
+// An all-empty turn (every tool call returned 0 rows) must still be ASKED for an answer rather than
+// ending on `buildNoMatchingResultsMessage`'s canned line. Three things are pinned for that shape:
+// which instruction is sent, that duplicate-table suppression stays OFF, and that a failed retry
+// degrades to the caller's own copy rather than to a "table below" sentence pointing at an empty
+// table.
 
 function emptyDigest(): DigestRecord {
   return {
@@ -935,7 +933,7 @@ test('synthesizeNoTextFallback: with a table on screen the suppressor still stri
   );
 });
 
-// --- EXPLAIN-WAVE PHASE 3: the instruction must land at the CONVERSATION TAIL, not in `system` --
+// --- The instruction must land at the CONVERSATION TAIL, not in `system` -----------------------
 
 test('withNoTextSynthesisInstruction: appends the instruction as a trailing USER message, so it survives the Anthropic system-hoist', () => {
   const out = withNoTextSynthesisInstruction(TURN_MESSAGES, true);

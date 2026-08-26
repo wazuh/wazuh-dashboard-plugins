@@ -133,11 +133,10 @@ test('get_top_rules: still passes lintDsl at its maximum advertised limit', () =
   assert.equal(result.ok, true, result.ok ? '' : result.reason);
 });
 
-// EXPLAIN-WAVE PHASE 7: the guard number was read correctly and INTERPRETED wrongly -- an answer
-// described "3 distinct title variants" as three differently-worded versions of one message, when
-// a templated rule title interpolates the entity involved, so the spread counts SUBJECTS. The name
-// the model reads is the fix: a plural noun invites "variants", a `_count` suffix does not, and the
-// description now states the mechanism instead of leaving it to be guessed.
+// The field NAME is what stops the guard number being misread: a templated rule title interpolates
+// the entity involved, so the spread counts SUBJECTS, not differently-worded versions of one
+// message. A plural noun invites the "variants" reading; a `_count` suffix does not, and the
+// description states the mechanism rather than leaving it to be guessed.
 test('get_top_rules: the spread guards are named as counts, on the model-facing surface and the table alike', () => {
   const aggs = build({ limit: 10 }).body.aggs as {
     top_rules: { aggs: Record<string, unknown> };

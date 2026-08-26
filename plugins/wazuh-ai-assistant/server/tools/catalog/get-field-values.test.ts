@@ -112,12 +112,11 @@ test(
   'get_field_values: a field with no known FIELD_LOCATIONS entry is rejected even if hypothetically ' +
     'added to the allowlist elsewhere -- this tool has its own closed location map',
   () => {
-    // EXPLAIN-WAVE PHASE 6: this test used "source.port", which `state-families.ts` has since
-    // opened for the ports surface deliberately -- a listener's own port lives there.
-    // "process.command_line" replaces it as the example and is a strictly better one: a real WCS
-    // field, on a family this tool now reaches, that must NEVER become enumerable -- it is
-    // unbounded free text AND privacy.ts anonymizes it. If a future widening makes this test fail,
-    // that is the widening to argue with, not this assertion.
+    // "process.command_line" is the example on purpose: a real WCS field, on a family this tool
+    // reaches, that must NEVER become enumerable -- it is unbounded free text AND privacy.ts anonymizes
+    // it. If a future widening makes this test fail, argue with the widening, not this assertion.
+    // ("source.port" cannot serve as the example: state-families.ts opens it deliberately, because a
+    // listener's own port lives there.)
     assert.throws(
       () => build({ field: 'process.command_line' }),
       /not one of this tool's vetted, bounded-cardinality fields/,
@@ -252,12 +251,11 @@ test(
   },
 );
 
-// --- EXPLAIN-WAVE PHASE 6: field discovery on the wazuh-states-* surfaces ---------------------
+// --- Field discovery on the wazuh-states-* surfaces -------------------------------------------
 //
-// Root cause B of the unreachable state surfaces: this tool's vetted field set covered none of the
-// state schema, so on inventory questions the model guessed field names -- and then read the
-// rejection ("not one of this tool's vetted fields") as evidence the field did not exist. Every
-// field asserted below is live in the mapping and was reported by the assistant as missing.
+// With none of the state schema in this tool's vetted field set, an inventory question forces the
+// model to guess field names -- and it reads the rejection ("not one of this tool's vetted fields")
+// as evidence the field does not exist. Every field asserted below is live in the mapping.
 
 test('phase 6: a state field routes to its own index, not to the wazuh-states-* union', () => {
   const request = build({ field: 'service.state' });
@@ -332,8 +330,8 @@ test('phase 6: index_family disambiguates a field carried by several state surfa
     build({ field: 'process.name', index_family: 'inventory_ports' }).index,
     'wazuh-states-inventory-ports*',
   );
-  // Per-family agent pivots ("how many hosts report hardware at all") are the coverage questions
-  // the eval's honesty controls turn on.
+  // Per-family agent pivots ("how many hosts report hardware at all") are coverage questions, so the
+  // agent fields have to be enumerable on every family.
   assert.equal(
     build({ field: 'wazuh.agent.name', index_family: 'inventory_hardware' })
       .index,

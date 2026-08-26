@@ -9,11 +9,11 @@ import {
 import { checkIndexAllowlist, isAggAllowedField } from './guardrails';
 import { FIELD_CATALOG } from '../../common/field-catalog';
 
-// EXPLAIN-WAVE PHASE 6. These tests pin the two claims this module makes that are not visible by
-// reading it: that every declared field actually EXISTS (per the generated WCS catalog, not per
-// the author's memory), and that every declared index is actually REACHABLE (per the guardrail,
-// not per the regex reading true). Both are the "widen it in one list, forget the other" drift
-// `generic-query-families.ts`'s own header calls out -- with one more list now in the set.
+// These tests pin the two claims this module makes that are not visible by reading it: that every
+// declared field actually EXISTS (per the generated WCS catalog, not the author's memory), and that
+// every declared index is actually REACHABLE (per the guardrail, not per the regex reading true).
+// Both are the "widen it in one list, forget the other" drift `generic-query-families.ts`'s own
+// header calls out.
 
 test('every declared state field is a known field of its catalog family', () => {
   assert.deepEqual(
@@ -30,9 +30,8 @@ test('every declared catalog family exists in FIELD_CATALOG', () => {
 });
 
 test('every state family pattern is accepted by checkIndexAllowlist', () => {
-  // The exact failure this whole phase exists to fix, in its second form: these indices were
-  // allowlisted all along and simply not enumerable. Assert the acceptance rather than trusting
-  // the reading of INDEX_ALLOWLIST_RE.
+  // Allowlisted is not the same as enumerable: assert the acceptance rather than trusting the reading
+  // of INDEX_ALLOWLIST_RE.
   for (const family of STATE_FAMILIES) {
     assert.equal(
       checkIndexAllowlist(family.pattern).ok,
@@ -88,9 +87,8 @@ test('every STATE_AGG_FIELDS entry is actually accepted by the aggregation guard
   }
 });
 
-// The specific fields the model was measured reporting as
-// non-existent while they were live in the mapping. Each one is a question the product could not
-// answer; pinned by name so a future trim of the allowlist has to argue with the evidence.
+// Fields that are live in the mapping but were unreachable without this allowlist -- each one a
+// question the product could not answer. Pinned by name so a future trim has to argue with them.
 test('the state fields measured as unreachable are now discoverable', () => {
   for (const field of [
     'service.name',
@@ -114,8 +112,8 @@ test('the state fields measured as unreachable are now discoverable', () => {
 });
 
 test('browser extensions name the extension via package.name, not a guessed browser.* field', () => {
-  // The model tries `browser.extension.name` (does not exist) and concludes the data
-  // was unavailable. The signature fields in the enum label are what prevent the guess.
+  // There is no `browser.extension.name` on this schema, so without the signature fields in the enum
+  // label the model guesses it and concludes the data was unavailable.
   const extensions = STATE_FAMILIES.find(
     family => family.catalogFamily === 'inventory.browser_extensions',
   );

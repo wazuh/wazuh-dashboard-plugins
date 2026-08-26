@@ -34,9 +34,9 @@ const KNOWN_SAFE_STRUCTURAL_FIELDS = new Set<string>([
   'wazuh.rule.title',
   'wazuh.rule.mitre.technique.id',
   'wazuh.rule.mitre.technique.name',
-  // The integration/channel taxonomy word a finding carries (already a visible table column on
-  // every finding-hits tool; added to their model-facing sample columns by explain-wave phase 7).
-  // A curated Wazuh enum, exactly like `wazuh.rule.level`, never analyst/attacker free text.
+  // The integration/channel taxonomy word a finding carries -- a visible table column on every
+  // finding-hits tool and one of their model-facing sample columns. A curated Wazuh enum, exactly like
+  // `wazuh.rule.level`, never analyst/attacker free text.
   'wazuh.integration.category',
   // Aggregation-bucket shape (get_top_rules and the *_summary tools).
   'key',

@@ -39,22 +39,15 @@ export const getFimFilesTool: ToolDefinition = {
             'an agent NAME here is rejected -- pass the name as "agent_name" instead, this tool ' +
             'resolves it itself. Leaving BOTH out searches every agent, not the named one.',
         },
-        // EXPLAIN-WAVE PHASE 5 -- root cause of the escape-hatch drift that cost this tool its
-        // whole `fim` family: both tool selection and parameter fidelity collapsed on the most
-        // ordinary FIM question there is -- "which files changed on agent <name> according to file
-        // integrity monitoring?" -- which names the agent by NAME, while this tool accepted only
-        // a numeric id. The baseline reached it anyway, but only by burning THREE rounds
-        // (get_field_values -> search_wazuh_data -> get_fim_files with the resolved id); phase 4
-        // then added a
-        // schema line telling the model to "resolve that name to its id first and pass the id",
-        // which priced that detour explicitly and pushed the model to the escape hatch instead,
-        // where `wazuh.agent.name` can simply be filtered in one call. The answer stayed correct
-        // and got FASTER, so no prompt clause telling the model to prefer the named tool was ever
-        // going to hold against that -- the honest fix is to remove the reason: the typed tool now
-        // takes the identifier the user actually said. Same `agent_id`-wins precedence and the same
-        // `match` clause get_agent_inventory's `resolveAgentFilter` uses, and `agent_name` is
-        // already an entity-resolution.ts AGENT_NAME_PARAM_KEYS entry, so the pseudonymization
-        // path that every other agent-name-taking tool gets applies here with no extra wiring.
+        // This tool must accept an agent NAME, not only a numeric id: the ordinary FIM question
+        // ("which files changed on agent <name>") names the host by name, and an id-only schema makes
+        // the typed tool strictly more expensive than filtering `wazuh.agent.name` through the
+        // `search_wazuh_data` escape hatch -- which is where the model goes, correctly, costing this
+        // tool its whole `fim` family. No prompt clause preferring the typed tool holds against a real
+        // cost difference; removing the difference is the fix. Same `agent_id`-wins precedence and the
+        // same `match` clause get_agent_inventory's `resolveAgentFilter` uses, and `agent_name` is
+        // already an entity-resolution.ts AGENT_NAME_PARAM_KEYS entry, so the pseudonymization path
+        // every other agent-name-taking tool gets applies here with no extra wiring.
         agent_name: {
           type: 'string',
           description:

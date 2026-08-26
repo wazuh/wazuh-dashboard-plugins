@@ -176,9 +176,9 @@ test("search_findings_by_agent: agent_name's description explains server-side re
     schema.properties.agent_name.description ?? '',
     /Optional: omit this.*resolves automatically when exactly one agent appears in the findings data/s,
   );
-  // EXPLAIN-WAVE PHASE 3: the description must also push a NAMED or DESCRIBED host
-  // into the param instead of inviting omission -- "the domain controller" is a referent, and
-  // omitting it is what let the resolver substitute a different agent.
+  // The description must push a NAMED or DESCRIBED host into the param instead of inviting omission:
+  // "the domain controller" is a referent, and omitting it lets the resolver substitute a different
+  // agent.
   assert.match(
     schema.properties.agent_name.description ?? '',
     /If the question names or describes a host at all, pass that host here/,

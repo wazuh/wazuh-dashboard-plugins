@@ -819,18 +819,11 @@ test(
   },
 );
 
-// EXPLAIN-WAVE PHASE 5 -- CV-058's registry-FIM DECLINE is gone, replaced by a ROUTE.
-//
-// The decline ("Windows registry FIM changes (registry keys/values): no tool reads this") was true
-// when CV-058 wrote it and has been false since workstream A1a widened search_wazuh_data's
-// index_pattern enum: `wazuh-states-*` covers wazuh-states-fim-registry-keys/-values, both
-// allowlisted by guardrails.ts. Because the decline fired BEFORE any query, the model never
-// reached data that exists -- asked whether anything had written to a Run key on a named Windows
-// host, it emitted the decline copy verbatim with ZERO tool calls while the matching
-// HKLM\...\CurrentVersion\Run value sat one escape-hatch query away, and the same premise sank
-// every other registry answer. These tests hold the replacement in place: the
-// route must be stated, the decline copy must be gone, and the absence claim must stay gated
-// behind an actual zero-row result.
+// Registry FIM must be ROUTED, never declined: `wazuh-states-*` reaches
+// wazuh-states-fim-registry-keys/-values, both allowlisted by guardrails.ts, and a decline fires
+// BEFORE any query so it cuts the model off from data that exists. These tests pin all three
+// halves: the route is stated, no decline copy survives, and the absence claim stays gated behind
+// an actual zero-row result.
 test('phase 5: registry FIM is ROUTED to the escape hatch, never declined up front', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(prompt, /never decline a registry question before querying it/);
@@ -868,15 +861,10 @@ test('phase 5: an absence claim about registry data is gated behind a real zero-
   );
 });
 
-// EXPLAIN-WAVE PHASE 4 -- the one measured fabrication was
-// the registry decline's own copy, recited verbatim. It used to assert "this deployment's
-// monitored hosts are Linux-only, so no registry documents exist here either": a claim about the
-// customer's fleet hardcoded in a first-party prompt string, true only of whatever deployment
-// CV-058 was written against. The model repeated it verbatim on a fleet that does run Windows
-// hosts, which is a groundedness failure however the question is phrased. Phase 5 deleted the
-// decline that carried it, so this test
-// now guards the RULE rather than the decline: the ban travelled onto the replacement route
-// deliberately, because the fabrication shape is about registry FIM, not about declining.
+// No prompt string may claim what platforms this deployment monitors: hardcoding a fleet fact
+// ("monitored hosts are Linux-only") makes every answer that recites it a fabrication on a fleet
+// where it is false. The ban is on the shape, so it has to hold wherever registry FIM is
+// discussed, not only inside a decline.
 test('phase 4/5: no copy asserts what platforms this deployment monitors', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.doesNotMatch(prompt, /Linux-only/);
@@ -887,10 +875,10 @@ test('phase 4/5: no copy asserts what platforms this deployment monitors', () =>
   );
 });
 
-// --- EXPLAIN-WAVE PHASE 5: the bounded widening retry -------------------------------------------
-// Most below-target explanatory answers stopped after ONE zero-row query. The prompt half of the
-// fix is this clause; the affordance half is chat.ts's `shouldGrantZeroRowWideningRound`, without
-// which the model has no tool-bearing round left to obey it in.
+// --- The bounded widening retry -----------------------------------------------------------------
+// The prompt half only works with the affordance half: chat.ts's
+// `shouldGrantZeroRowWideningRound` is what leaves a tool-bearing round for the model to obey this
+// clause in.
 test('phase 5: one widened attempt is required before declaring nothing found', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
@@ -924,12 +912,10 @@ test('phase 5: the widening clause names the three concrete moves to spend the r
   assert.match(prompt, /switch to the surface that actually holds the data/);
 });
 
-// --- EXPLAIN-WAVE PHASE 6: the widening retry is pinned to the SAME question -------------------
-// The phase-5 clause bought the round but never said what it must be ABOUT. On an SCA question
-// the model spent it on a second exploratory get_field_values probe and never called the
-// typed SCA tool, turning a correct tool selection into a wrong one. chat.ts's
-// `shouldGrantZeroRowWideningRound` now
-// refuses the grace to a discovery-only round; this is the prose half of the same fix.
+// --- The widening retry is pinned to the SAME question ------------------------------------------
+// Buying the round is not enough: unpinned, the retry is spent on another exploratory probe and the
+// typed tool is never called. chat.ts's `shouldGrantZeroRowWideningRound` refuses the grace to a
+// discovery-only round; this is the prose half of the same rule.
 test('phase 6: the retry must target the same question with exactly one thing changed', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(prompt, /THE SAME QUESTION with exactly ONE thing changed/);
@@ -946,9 +932,8 @@ test('phase 6: the retry may not be spent probing again after an empty probe', (
 });
 
 test('phase 6: the escape hatch is described as one enum value per state index', () => {
-  // The prompt used to name "-system_services", an index that does not exist on this platform,
-  // and told the model the wazuh-states-* wildcard was the route. Both are now wrong: the enum
-  // carries one value per physical index (see catalog/generic-query-families.ts).
+  // The enum carries one value per physical index (see catalog/generic-query-families.ts), so the
+  // prompt must not name a non-existent index or point at the wildcard as the route.
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(prompt, /ONE ENUM VALUE PER INDEX/);
   assert.match(prompt, /wazuh-states-inventory-services\*/);
@@ -960,9 +945,8 @@ test('phase 6: verify-before-filter now claims the current-state surfaces too', 
   assert.match(prompt, /This now covers the current-state surfaces as well/);
 });
 
-// Same answer, second defect: it opened with "This is one of the five fixed-scope decline cases:",
-// leaking this prompt's own bookkeeping into user-facing copy. The decline block told the model
-// which words to use but never that the numbering exists only for its own benefit.
+// The decline block's numbering is internal bookkeeping: without this rule the model quotes it
+// ("this is one of the five fixed-scope decline cases") into user-facing copy.
 test('phase 4: the decline block forbids narrating that a list of declines exists', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
@@ -985,13 +969,12 @@ test(
   },
 );
 
-// --- Explain-wave phase 1: intent-conditional answer format (AI/plan/eval-v2 gap 3) -------------
+// --- Intent-conditional answer format -----------------------------------------------------------
 //
-// The default answer-format rule (roughly 120 words, at most three bullets, no headings, "do not
-// assess risk unless asked") was written for lookup/count/status questions and made an
-// explanatory answer unwritable. The relaxation is scoped BY INTENT rather than applied globally,
-// so these tests pin both halves: the tight default must survive, and the explain/assess/advise
-// intents must escape it with a named answer shape.
+// The default format rule (roughly 120 words, three bullets, "do not assess risk unless asked") is
+// correct for lookup/count/status questions and makes an explanatory answer unwritable. The
+// relaxation is scoped BY INTENT, so both halves need pinning: the tight default must survive, and
+// the explain/assess/advise intents must escape it with a named answer shape.
 
 test('explain-wave: the tight default answer format is still stated for lookup-style questions', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
@@ -1080,14 +1063,11 @@ test('explain-wave: the relaxation does not lift the no-headings, no-table or gr
   );
 });
 
-// --- EXPLAIN-WAVE PHASE 2: a NAMED host must reach an id-only tool as an id --------------------
-// The measured shape: the question named the host outright ("the failed SCA checks on <host>")
-// and the model called get_sca_checks(result: "failed") with the agent
-// parameter simply omitted -- reading omission as "across all agents" when it actually triggers
-// sole-active-agent resolution, so the call answered about a different host and returned nothing.
-// The sibling shape is get_fim_files(agent_id: "<host name>"), a NAME in a numeric
-// parameter, rejected outright. Both prompt paragraphs that existed covered only the case where NO
-// host is named.
+// --- A NAMED host must reach an id-only tool as an id -------------------------------------------
+// Two failure shapes this pins: omitting the agent parameter (which triggers sole-active-agent
+// resolution, NOT "across all agents", so the call answers about a different host), and passing a
+// NAME in a numeric agent_id (rejected outright). The prompt's other host rules cover only the case
+// where no host is named.
 
 test('buildSystemPrompt: tells the model to resolve a NAMED host to an id for agent_id-only tools', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
@@ -1109,8 +1089,8 @@ test('buildSystemPrompt: tells the model to resolve a NAMED host to an id for ag
 });
 
 test('buildSystemPrompt: the new resolution clause names no tool to call', () => {
-  // Same trap the two paragraphs above it were rewritten for (#8913's diagnostic run): telling the
-  // model to call a specific lookup tool is useless when stage-1 routing did not offer it.
+  // Telling the model to call a specific lookup tool is useless when stage-1 routing did not offer
+  // it (see #8913), so the clause has to stay tool-agnostic.
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   const clause = prompt.slice(prompt.indexOf('When the user DOES name a host'));
   const sentence = clause.slice(0, clause.indexOf('unscoped.'));
@@ -1121,14 +1101,11 @@ test('buildSystemPrompt: the new resolution clause names no tool to call', () =>
   );
 });
 
-// --- EXPLAIN-WAVE PHASE 4: cite the concrete fix, and the state-vs-history surface split --------
+// --- Cite the concrete fix, and the state-vs-history surface split ------------------------------
 
-// "How do we remediate this item" is the weakest answer class, and the split inside it is what
-// this clause targets: an answer is actionable only when the digest happens to carry the scanner's
-// fix bound and the model quotes it, while the same class also produces generic prioritisation
-// advice that never touches the failing check it was asked about, nor that the check's remediation
-// field was empty. Both halves are pinned: quote the fix when there is one, disclose the
-// silence when there is not.
+// Both halves of the clause are pinned: quote the scanner's own fix bound when a result carries
+// one, and disclose the silence when the item's remediation field is empty -- otherwise the answer
+// is generic advice that never touches the item it was asked about.
 test('phase 4: part (3) must cite a concrete fix from the results before any general advice', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
@@ -1146,10 +1123,8 @@ test('phase 4: an empty fix field must be disclosed, not filled with the model\u
   );
 });
 
-// The SCA-specific sibling of the clause above: the CV-054 synthesis rule already told the model
-// what to do when check.rationale is missing, but said nothing about a missing check.remediation --
-// the exact field a remediation answer turns on ("Wazuh supplies no remediation guidance for
-// this check").
+// The SCA-specific sibling of the clause above: the synthesis rule covers a missing
+// check.rationale, and a remediation answer turns on the separate check.remediation field.
 test('phase 4: an empty check.remediation is stated plainly, and own steps are marked as guidance', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
@@ -1161,10 +1136,8 @@ test('phase 4: an empty check.remediation is stated plainly, and own steps are m
   assert.match(prompt, /no rationale text was returned for that check/);
 });
 
-// A question asking which agents have a given CVE detection "in the findings history" was
-// answered from wazuh-states-vulnerabilities, whose host list for that CVE differs. The
-// model even disclosed the substitution and still answered from the wrong surface, so the gap was
-// never honesty -- nothing said the two surfaces answer different questions.
+// The state and findings surfaces carry different host lists for the same CVE, so disclosing a
+// substitution is not enough: the prompt has to say the two surfaces answer different questions.
 test('phase 4: current state and detection history are named as non-substitutable surfaces', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
@@ -1182,11 +1155,10 @@ test('phase 4: current state and detection history are named as non-substitutabl
   );
 });
 
-// --- EXPLAIN-WAVE PHASE 7 ----------------------------------------------------------------------
-// Three answer-level defects measured on the phase-6 arm, each fixed at the layer that produced
-// it: a severity stated from inference rather than from the row (the only fabrication left in the
-// arm), an answer narrating a different incident than the one asked about, and an explanatory item
-// that answered with a clarification request and zero tool calls.
+// --- Three answer-level rules, each pinned at the layer that owns it ---------------------------
+// A severity must be quoted from the row rather than inferred; an answer must narrate the incident
+// asked about rather than a neighbouring one; and a deictic incident reference must not end the turn
+// in a clarification request with no tool call.
 
 test('phase 7: a severity must be quoted from the item own row, never inferred', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');

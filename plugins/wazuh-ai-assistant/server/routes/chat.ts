@@ -527,22 +527,17 @@ const NO_ANSWER_MESSAGE =
  *    invented numbers and agent names appear, and the fallbacks above exist precisely because an
  *    honest silence was preferable to that. The instruction has to buy analysis WITHOUT buying
  *    invention.
- *  - the ADVISORY half (explain-wave phase 1, AI/plan/eval-v2 gap 1) is what makes an
- *    explanation writable at all. The earlier blanket "using only the tool results ... do not
- *    state anything the results do not show" landed on the very round where an "explain this
- *    event / how do we protect against it" answer has to be written, so the model was told not to
- *    say what a technique IS or what mitigates it -- knowledge no tool in this product returns.
- *    The split is between FACTS ABOUT THIS ENVIRONMENT (grounded, no exceptions) and
- *    INTERPRETATION (general security knowledge, permitted but clearly separated and hedged),
- *    which is the same shape as the shipped Group E how-to policy in prompts.ts: answer from
- *    general knowledge, mark it, never dress it up as observed fact. Two details are load-bearing
- *    there: the DATA list is explicitly non-exhaustive ("including but not limited to ... any
- *    other data point"), because a closed list lets CVSS scores, versions, IPs, ports and paths
- *    fall through the ban the blanket wording used to cover; and detection provenance is on the
- *    DATA side -- how a class of activity is TYPICALLY detected is knowledge, but what detected
- *    this HERE is a rule id or detector name, which is exactly the kind of fact a model will
- *    happily invent. The fence itself is duplicated in buildSystemPrompt because this instruction
- *    only fires on a final, tool-using round, while the allowance there applies to every round.
+ *  - the ADVISORY half is what makes an explanation writable at all: a blanket "state nothing the
+ *    results do not show" also bans saying what a technique IS or what mitigates it, knowledge no
+ *    tool in this product returns. The split is between FACTS ABOUT THIS ENVIRONMENT (grounded, no
+ *    exceptions) and INTERPRETATION (general security knowledge, separated and hedged) -- the same
+ *    shape as the Group E how-to policy in prompts.ts. Two details are load-bearing: the DATA list
+ *    must stay explicitly non-exhaustive ("including but not limited to ... any other data point"),
+ *    because a closed list lets CVSS scores, versions, IPs, ports and paths fall through the ban;
+ *    and detection provenance is on the DATA side -- how a class of activity is TYPICALLY detected
+ *    is knowledge, but what detected this HERE is a rule id or detector name. The fence is
+ *    duplicated in buildSystemPrompt because this instruction only fires on a final, tool-using
+ *    round while the allowance there applies to every round; the two must stay in sync.
  *  - "If they do not answer the question, say so plainly" gives the model a licensed exit, so the
  *    honest outcome stays reachable rather than being squeezed out by the request for text.
  *  - no mention of tools being unavailable: the round already omits `tools` entirely, and naming
@@ -611,21 +606,14 @@ export const FINAL_ROUND_ANSWER_INSTRUCTION =
  * That path's silence is a different defect with its own fix (the reasoning-channel fallback in
  * openai-compatible.ts) and its own fallback copy (NO_ANSWER_MESSAGE above).
  *
- * EXPLAIN-WAVE PHASE 4: the role is `user`, not `system`, for exactly the reason
- * `withNoTextSynthesisInstruction` below records for the forced-synthesis retry -- read that doc
- * comment for the full root cause. In short: `server/providers/anthropic.ts` filters every
+ * The role must stay `user`, never `system`: `server/providers/anthropic.ts` filters every
  * `system`-role message OUT of `messages` and joins them into the request's TOP-LEVEL `system`
- * field, so a `system`-delivered instruction is appended to the end of prompts.ts's
- * multi-thousand-token system prompt instead of landing at the conversation tail, while the last
- * actual conversation entry stays a `tool_result` the model is free to treat as a finished turn.
- * Phase 3 fixed that for the retry path only, deliberately leaving this one alone because it fires
- * on every successful tool turn and moving it would move answers that were already good. Phase 3's
- * own measurement is what changed the call: the retry moved to the tail and stopped producing
- * boilerplate (code-synthesised answers 9 -> 1 of 63), while THIS instruction -- the one that runs
- * first, on every tool-using turn -- was still being delivered to the place phase 3 proved the
- * model does not read it as a request. The wording is unchanged, byte for byte; only the wire
- * position moves. A trailing `user` message is the tail on every adapter (Anthropic maps a `tool`
- * message to `role: 'user'` too, and consecutive same-role messages are explicitly allowed there).
+ * field, so a `system`-delivered instruction is appended to the end of the multi-thousand-token
+ * system prompt instead of landing at the conversation tail -- leaving a `tool_result` as the last
+ * thing the model reads, which it is free to treat as a finished turn. A trailing `user` message is
+ * the tail on every adapter (Anthropic maps a `tool` message to `role: 'user'` too, and
+ * consecutive same-role messages are explicitly allowed there). Same reasoning applies to
+ * `withNoTextSynthesisInstruction` below.
  */
 export function withFinalRoundAnswerInstruction(
   messages: ChatMessage[],
@@ -713,47 +701,27 @@ function isDiscoveryToolCall(toolName: string): boolean {
 }
 
 /**
- * ZERO-ROW WIDENING GRACE (explain-wave phase 5) -- exactly ONE extra tool-bearing round after the
- * turn's FIRST all-zero-row round, and never more.
+ * ZERO-ROW WIDENING GRACE -- exactly ONE extra tool-bearing round after the turn's FIRST
+ * all-zero-row round, and never more.
  *
- * The measured defect: most below-target explanatory answers stop after a
- * SINGLE over-narrow or malformed query and then abstain, and the reason is mechanical rather than
- * a prompt-compliance failure. `isRoundFutile` above treats "every successful call returned zero
- * rows" identically to "every successful call was a duplicate", latching
- * `budgetForcesFinalRoundEarly` at the call site below; the next round is therefore offered NO
- * tools, so the model physically cannot act on the system prompt's own standing instruction to
- * "retry once with a broader filter before concluding there were none". The instruction was
- * already there. The affordance was not.
+ * Why it exists: `isRoundFutile` above treats "every successful call returned zero rows"
+ * identically to "every successful call was a duplicate" and latches
+ * `budgetForcesFinalRoundEarly` at the call site below, so the next round is offered NO tools --
+ * making the system prompt's own "retry once with a broader filter" instruction unobeyable. The
+ * two halves are different findings: a duplicate proves the model is spinning, while a zero-row
+ * result proves only that the FILTER VALUE did not match, which is not the same as the data being
+ * absent.
  *
- * The two halves are genuinely different findings: a duplicate proves the model is re-issuing a
- * query it already ran (spinning -- stop it immediately, as originally designed), while a zero-row
- * result proves only that the FILTER VALUE did not match, which the prompt elsewhere is explicit
- * is NOT the same as the data being absent. The first zero-row round is exactly where one widened
- * or corrected attempt (drop the narrowest filter, fix a suspected wrong value, switch surface) is
- * worth its latency.
- *
- * HARD-BOUNDED, deliberately, because latency is already the phase-4 build's stated cost (total
- * p95 32.5 s -> 52.4 s):
+ * Every bound below is load-bearing; without them this becomes a retry loop, and the grace already
+ * costs latency on every turn it fires:
  *  - `alreadyGranted` is a per-TURN latch, so the grace is given at most once no matter how many
  *    zero-row rounds follow -- the second futile round latches the final round exactly as before;
- *  - a round containing ANY duplicate call is refused outright (that is the spinning shape, and
- *    granting a retry to it is what would turn this into a loop);
+ *  - a round containing ANY duplicate call is refused outright (the spinning shape);
+ *  - a round whose only successful calls were DISCOVERY calls earns nothing: a zero-row discovery
+ *    probe has ANSWERED the model ("this field carries nothing here"), so an extra round there
+ *    funds more probing instead of widening a query that was too narrow;
  *  - the caller still charges the round's cost first and still forces the final round when the
  *    budget ceiling is spent, so this can never buy a round the budget cannot pay for.
- *
- * EXPLAIN-WAVE PHASE 6 -- the fourth bound, and the one phase 5's own regressions asked for: a
- * round whose only successful calls were DISCOVERY calls earns nothing. The witness shape is an
- * SCA question that, before phase 5, called `get_sca_results` and declined cleanly. With the grace
- * in place it opened instead with a `get_field_values` probe on `wazuh.rule.tags` that returned
- * zero rows, was handed a second tool-bearing round, and spent that round on ANOTHER
- * `get_field_values` probe -- so a correct tool selection became a wrong one and the typed SCA
- * tool was never called at all. A zero-row DISCOVERY probe is not a failed retrieval
- * attempt: "this field has no values on this surface" IS the discovery answer, and it arrives with
- * the model's real budget still unspent. Granting an extra round there does not widen a query that
- * was too narrow -- it funds more probing, which is exactly what happened. Latency is the other
- * half: this grace fires often enough to move the MEDIAN (p50 18.2 s -> 23.0 s, +26%), so the aim
- * is to keep the round PRECISE, not to remove it -- a zero-row round with any real data call in it
- * still earns its widening round exactly as before.
  *
  * Returns `true` only when the round should be allowed one more tool-bearing round. Callers must
  * pass only the round's SUCCESSFUL calls, the same array `isRoundFutile` reads, and must only ask
@@ -938,8 +906,8 @@ export function willBeFinalRound(
  * every `!roundSawAnyDelta` exit point in `orchestrate` (via `emitNoTextFallback`: the normal
  * per-round `done` branch, the forced-round dead-stream guard, and the round-budget-exhausted
  * path) so this decision lives in exactly one place. Any `toolUsedThisTurn` turn that recorded a
- * digest -- a real non-empty table with no narration, and since explain-wave phase 2 an all-empty
- * turn too -- no longer resolves here first:
+ * digest -- a real non-empty table with no narration, or an all-empty turn -- no longer resolves
+ * here first:
  * `emitNoTextFallback` intercepts that case and only falls back to this copy if
  * forced synthesis produced nothing AND there was no digest to derive a truthful sentence from
  * either (structurally unreachable in practice, since a non-empty table always yields a `digest`
@@ -1105,15 +1073,10 @@ export const NO_TEXT_SYNTHESIS_INSTRUCTION =
  * ZERO-ROW sibling of NO_TEXT_SYNTHESIS_INSTRUCTION above, used when the turn's tool calls all came
  * back EMPTY (no non-empty table was ever rendered).
  *
- * EXPLAIN-WAVE PHASE 2: most code-synthesised (no model text at all) answers are this shape --
- * every tool call returned 0 rows, the model wrote nothing, and the turn
- * ended on `buildNoMatchingResultsMessage`'s canned line ("No matching results were found for that
- * query. (Searched: critical findings.)"). That line is truthful but question-blind: it never says
- * what the empty result MEANS for what was asked, which for a counting or negative-control question
- * ("how many findings does this agent have") is the entire answer ("none"). The zero-row
- * case had no forced-synthesis retry at all before this change -- `emitNoTextFallback`'s gate
- * required a non-empty table -- so the one shape that most needed a written answer was the one
- * shape the model was never asked for.
+ * The alternative on this path is `buildNoMatchingResultsMessage`'s canned line, which is truthful
+ * but question-blind: it never says what the empty result MEANS for what was asked, which for a
+ * counting or negative-control question ("how many findings does this agent have") is the entire
+ * answer ("none").
  *
  * Worded separately from the non-empty instruction because the honest content is the opposite: the
  * non-empty version asks for totals and observations, this one must NOT invite the model to explain
@@ -1130,30 +1093,21 @@ export const NO_TEXT_SYNTHESIS_INSTRUCTION_EMPTY =
   'show. Do not call any tools. Do not say there is nothing to add.';
 
 /**
- * EXPLAIN-WAVE PHASE 3 (the code-synthesised answers phase 2 did not reach):
- * delivers the forced-synthesis instruction as a trailing **user** message on the outbound COPY,
+ * Delivers the forced-synthesis instruction as a trailing **user** message on the outbound COPY,
  * never as a `system` message and never into `messages` itself.
  *
- * ROOT CAUSE this fixes. Phase 2 appended the instruction as `{role: 'system'}`, which reads as
- * "the last thing in the conversation" only on a wire that keeps system messages inside the
- * message list. The Anthropic Messages API does not: `server/providers/anthropic.ts` filters every
+ * The role is the whole point and must not be "tidied" to `system`: the Anthropic Messages API does
+ * not keep system messages inside the message list -- `server/providers/anthropic.ts` filters every
  * `system`-role message out of `messages` and joins them into the request's TOP-LEVEL `system`
- * field, appended after prompts.ts's full system prompt. So on an Anthropic provider -- the one
- * this was measured on -- the instruction never appeared at the conversation tail at all; it was
- * concatenated onto the end of a multi-thousand-token system prompt, while the last actual
- * conversation entry stayed a `tool_result` the model was free to treat as a finished turn. Every
- * remaining boilerplate answer reached `synthesizeNoTextFallback` case (b), i.e. both
- * the final round's FINAL_ROUND_ANSWER_INSTRUCTION and this retry produced no text -- consistent
- * with neither instruction being where the code believed it was.
+ * field, appended after the full system prompt. A `system`-delivered instruction therefore never
+ * reaches the conversation tail at all, leaving a `tool_result` as the last conversation entry,
+ * which the model is free to treat as a finished turn.
  *
- * A trailing `user` message lands at the conversation tail on EVERY adapter: Anthropic maps a
- * `tool` message to `role: 'user'` too, and consecutive same-role messages are explicitly allowed
- * there (they are combined into one turn), so this is a request the model has to answer rather than
- * a preference buried in the prompt prefix. `withFinalRoundAnswerInstruction`'s own delivery was
- * deliberately left as `system` by this phase (it fires on every successful tool turn, so changing
- * its wire position risked moving answers that were already good, while this retry is the path
- * whose floor is boilerplate either way) -- phase 4 then moved it too, on the strength of this
- * change's own measurement; see that function's doc comment for the hoist decision.
+ * A trailing `user` message lands at the tail on EVERY adapter: Anthropic maps a `tool` message to
+ * `role: 'user'` too, and consecutive same-role messages are explicitly allowed there (they are
+ * combined into one turn), so this is a request the model has to answer rather than a preference
+ * buried in the prompt prefix. `withFinalRoundAnswerInstruction` is delivered the same way, for the
+ * same reason.
  */
 export function withNoTextSynthesisInstruction(
   messages: ChatMessage[],
@@ -1270,8 +1224,8 @@ function pickDigestForFallback(
  * established `toolUsedThisTurn` and recorded at least one digest -- i.e. exactly the case the live
  * failure this replaces used to hand NO_ANALYSIS_TEXT_MESSAGE regardless of whether there was
  * something to analyze. `opts.tableOnScreen` says whether the turn ended with a NON-EMPTY table or
- * with every call empty (explain-wave phase 2): both are synthesizable from their digests, they
- * just need different instructions, different suppression and a different last resort.
+ * with every call empty: both are synthesizable from their digests, they just need different
+ * instructions, different suppression and a different last resort.
  *
  * Makes ONE extra `adapter.chatStream` call with NO `tools` offered (structurally unable to
  * re-enter the tool loop -- (c)'s "cannot re-enter" bound), asking the model to narrate the
@@ -1297,14 +1251,12 @@ export async function* synthesizeNoTextFallback(
   signal: AbortSignal,
   privacyCtx: PrivacyContext | undefined,
   digests: DigestRecord[],
-  // EXPLAIN-WAVE PHASE 2: optional, appended last, defaulting to the exact pre-change behaviour
-  // (a non-empty table on screen, deterministic last resort = the digest coverage statement), so
-  // every pre-existing call site -- including this file's own and all twelve in
-  // chat-no-text-synthesis.test.ts -- keeps its meaning unchanged without being touched.
-  //  - `tableOnScreen: false` is the zero-row turn this mechanism newly covers: it selects the
-  //    empty-result instruction AND leaves the duplicate-table suppressor OFF (with no table
-  //    rendered there is no duplicate to suppress, and an active suppressor would silently eat a
-  //    legitimate table the model writes -- see `MarkdownTableSuppressor`'s contract).
+  // Optional; the defaults are "non-empty table on screen, last resort = the digest coverage
+  // statement".
+  //  - `tableOnScreen: false` is the zero-row turn: it selects the empty-result instruction AND
+  //    leaves the duplicate-table suppressor OFF -- with no table rendered there is no duplicate to
+  //    suppress, and an active suppressor would silently eat a legitimate table the model writes
+  //    (see `MarkdownTableSuppressor`'s contract).
   //  - `lastResortMessage` is what case (b) yields when the retry produces nothing, so the caller
   //    keeps owning the fallback-copy decision (`noTextFallbackMessage`) instead of this function
   //    growing a second copy of it.
@@ -1338,10 +1290,9 @@ export async function* synthesizeNoTextFallback(
     tableOnScreen,
   );
   // Inbound un-scrub and duplicate-table suppression, same pipeline as every round of the main
-  // loop. The suppressor starts ACTIVE only when a non-empty table is already on screen (the
-  // original, `sawNonEmptyTable === true` case) -- on the zero-row turn this mechanism newly covers
-  // there is nothing rendered to duplicate, so suppression is left off rather than silently
-  // swallowing a table the model legitimately writes.
+  // loop. The suppressor starts ACTIVE only when a non-empty table is already on screen: on a
+  // zero-row turn there is nothing rendered to duplicate, so suppression must stay off rather than
+  // silently swallowing a table the model legitimately writes.
   const depseudonymizer = privacyCtx
     ? new StreamDepseudonymizer(privacyCtx.pseudonymizer)
     : undefined;
@@ -2744,10 +2695,10 @@ export async function* orchestrate(
   // remains #8911's own, narrower concern -- see `isRoundFutile`'s doc comment for why the two
   // never overlap).
   let budgetForcesFinalRoundEarly = false;
-  // EXPLAIN-WAVE PHASE 5: per-TURN latch for the one-and-only-one zero-row widening round (see
-  // `shouldGrantZeroRowWideningRound`). Set the first time the grace is granted and never reset,
-  // so the second all-zero-row round of a turn closes it out exactly as every futile round did
-  // before -- this is the whole bound that keeps the mechanism from becoming a retry loop.
+  // Per-TURN latch for the one-and-only-one zero-row widening round (see
+  // `shouldGrantZeroRowWideningRound`). Set the first time the grace is granted and never reset, so
+  // the turn's second all-zero-row round closes it out like any other futile round -- this latch is
+  // the whole bound that keeps the mechanism from becoming a retry loop.
   let zeroRowWideningRoundGranted = false;
   // Enumerable-remaining heuristic (product design item 3b): computed ONCE, from the turn's
   // CURRENT (most recent) user message, never re-derived mid-turn (see
@@ -2833,16 +2784,12 @@ export async function* orchestrate(
       roundsExhausted,
       lastAttemptedToolCall,
     );
-    // EXPLAIN-WAVE PHASE 2: the gate
-    // no longer requires `sawNonEmptyTable`. A turn whose tool calls all came back EMPTY was the
-    // single most common no-text shape and was the one shape that never got a
-    // model-authored attempt -- it went straight to `buildNoMatchingResultsMessage`'s canned,
-    // question-blind line. A zero-row result is still an ANSWER ("none of your agents has a finding
-    // matching that"), and the digest that proves it is already in `turnDigests`, so the same one
-    // retry per turn is now spent there too. Everything else about the bound is unchanged:
-    // `toolUsedThisTurn` (a no-tool turn has nothing to synthesise from), a digest to ground it in,
-    // and once per turn. If the retry produces nothing, `lastResortMessage` hands back exactly the
-    // deterministic copy this function would have emitted before, so the floor never drops.
+    // The gate deliberately does NOT require `sawNonEmptyTable`: a zero-row result is still an
+    // ANSWER ("none of your agents has a finding matching that") and the digest proving it is
+    // already in `turnDigests`. The three bounds that do matter: `toolUsedThisTurn` (a no-tool turn
+    // has nothing to synthesise from), at least one digest to ground the answer in, and once per
+    // turn. If the retry produces nothing, `lastResortMessage` hands back the deterministic copy,
+    // so the floor never drops.
     if (
       toolUsedThisTurn &&
       !noTextSynthesisAttempted &&
@@ -2859,8 +2806,8 @@ export async function* orchestrate(
         {
           tableOnScreen: sawNonEmptyTable,
           // Only the zero-row case overrides the digest coverage statement: with a real table on
-          // screen that statement is the better last resort (it names every tool call this turn
-          // made), which is what CV-069/079/080 established.
+          // screen that statement is the better last resort, because it names every tool call this
+          // turn made.
           ...(sawNonEmptyTable
             ? {}
             : { lastResortMessage: deterministicMessage }),
@@ -3779,12 +3726,9 @@ export async function* orchestrate(
           target => !coveredEnumerationTargets.has(target.toLowerCase()),
         );
       if (isRoundFutile(roundSuccessfulCalls) && !sweepInProgress) {
-        // EXPLAIN-WAVE PHASE 5: the zero-row half of futility gets ONE widening round before the
-        // turn is closed out -- see `shouldGrantZeroRowWideningRound`'s doc comment for the
-        // measured defect (7 of 13 below-target judged items abstained after a single over-narrow
-        // query, unable to obey the prompt's own "retry once with a broader filter" rule because
-        // this branch had already taken the tools away) and for every bound that keeps it to one
-        // round. The duplicate half, and every subsequent futile round, still stop immediately.
+        // The zero-row half of futility gets ONE widening round before the turn is closed out --
+        // see `shouldGrantZeroRowWideningRound`'s doc comment for every bound that keeps it to one.
+        // The duplicate half, and every subsequent futile round, still stop immediately.
         if (
           shouldGrantZeroRowWideningRound({
             successfulCalls: roundSuccessfulCalls,

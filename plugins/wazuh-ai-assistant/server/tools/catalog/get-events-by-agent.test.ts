@@ -110,12 +110,10 @@ test('table/digest columns stay within the fields verified present on the seeded
     'event.action',
     'event.outcome',
   ]);
-  // The digest is no longer column-for-column identical to the table (explain-wave phase 2): it
-  // adds the two process fields the events mapping defines and live event docs carry, so an
-  // explanatory answer has something to explain from. The VISIBLE table is deliberately unchanged
-  // -- that is what this test's "verified present on the seeded docs" bound is really about, and a
-  // sample column that is absent from a given document is simply omitted from the sample row
-  // (`buildDigest` skips `undefined`), never rendered as an empty column.
+  // The digest is deliberately NOT column-for-column identical to the table: it adds the two process
+  // fields the events mapping defines so an explanatory answer has something to explain from, while
+  // the VISIBLE table stays unchanged. A sample column absent from a given document is omitted from
+  // the sample row (`buildDigest` skips `undefined`), never rendered as an empty column.
   for (const field of columnFields) {
     assert.ok(
       getEventsByAgentTool.digest.sampleColumns.includes(field),
@@ -140,9 +138,9 @@ test('digest opts into the synthetic event.category/event.outcome breakdown fall
   ]);
 });
 
-// --- EXPLAIN-WAVE PHASE 2: the digest must carry what actually ran ----------------------------
-// (AI/plan/eval-v2/tooling-gap-map.md gap 2 case (a), "explain a malicious Windows event": the five
-// original sample columns name that something happened and how it ended, never WHAT ran.)
+// --- The digest must carry what actually ran --------------------------------------------------
+// The five original sample columns name that something happened and how it ended, never WHAT ran,
+// which is the one thing an explanatory answer about an event needs.
 
 test('digest sampleColumns: carry process.name and process.command_line', () => {
   const columns = getEventsByAgentTool.digest.sampleColumns;

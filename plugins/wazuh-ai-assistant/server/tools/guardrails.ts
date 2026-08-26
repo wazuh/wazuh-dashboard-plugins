@@ -592,27 +592,21 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // cardinality class as the already-listed `wazuh.integration.category`.
   'event.category',
   'event.outcome',
-  // EXPLAIN-WAVE PHASE 6 (root cause B of the unreachable state surfaces): the whole
-  // `wazuh-states-*` schema was absent from this list, so `get_field_values` -- the tool whose
-  // entire job is "check the real values before you filter" -- could not be pointed at any state
-  // surface. The model therefore GUESSED field names there, and every field it reported as
-  // non-existent (`service.state`, `host.cpu.name`, `network.gateway`, `user.name`, `package.name`
-  // on browser extensions) is present in the live mapping, so a whole class of inventory
-  // questions failed on a corpus that holds the data.
+  // The `wazuh-states-*` schema. Without these entries `get_field_values` -- the tool whose whole
+  // job is "check the real values before you filter" -- cannot be pointed at any state surface, so
+  // the model guesses field names there and reads the rejection as proof the field does not exist.
   //
-  // Derived, not hand-listed: `state-families.ts` declares the aggregation-safe field set PER
-  // index and filters every path through `common/field-catalog.ts` (the generated WCS catalog) at
-  // module load, so a platform-side rename fails a test instead of leaving a phantom entry here.
-  // Each path was live-verified with a real `terms` aggregation against a 18-index state corpus
-  // (57 probes, all returning buckets), which is the same evidence bar every hand-written entry
-  // above cites -- "probably keyword" is not enough, since a terms agg on a `text` mapping is a
-  // hard 400 the model can only read as an opaque failure. Cardinality safety is the same argument
-  // this Set's header comment already makes for `source.ip`: MAX_AGG_SIZE (100) caps the returned
-  // bucket count whatever the underlying field's cardinality is. PRIVACY is a separate boundary
-  // and is handled where it belongs -- `privacy.ts` gained an explicit classification for every
-  // field added here, anonymizing the identifying ones (`user.name`, `group.name`/`group.users`,
-  // `network.ip`, `network.gateway`) exactly as `applyFieldPolicy`'s bucket-key path already does
-  // for `source.ip`.
+  // Derived, not hand-listed: `state-families.ts` declares the aggregation-safe field set PER index
+  // and filters every path through `common/field-catalog.ts` (the generated WCS catalog) at module
+  // load, so a platform-side rename fails a test instead of leaving a phantom entry here. Each path
+  // was verified with a real `terms` aggregation, the same evidence bar every hand-written entry
+  // above cites -- "probably keyword" is not enough, since a terms agg on a `text` mapping is a hard
+  // 400 the model can only read as an opaque failure. Cardinality safety is the same argument this
+  // Set's header comment makes for `source.ip`: MAX_AGG_SIZE (100) caps the returned bucket count
+  // whatever the field's cardinality is. PRIVACY is a separate boundary: every field added here
+  // needs an explicit `privacy.ts` classification, anonymizing the identifying ones (`user.name`,
+  // `group.name`/`group.users`, `network.ip`, `network.gateway`) exactly as `applyFieldPolicy`'s
+  // bucket-key path does for `source.ip`.
   ...STATE_AGG_FIELDS,
 ]);
 

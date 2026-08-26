@@ -1180,10 +1180,10 @@ test('bound disclosure: a request already within the 90-day cap gets no disclosu
   );
 });
 
-// --- EXPLAIN-WAVE PHASE 3: the resolveParams FAILURE half goes through the same scrub as the
-// success half. An ambiguity reason enumerates candidate hostnames by name and becomes the tool
-// error the provider reads, so before this it carried them in the clear under privacy mode -- the
-// same shape capture probe P3 found on the note side, on the other branch of the same `if`. ----
+// --- The resolveParams FAILURE half goes through the same scrub as the success half ------------
+// An ambiguity reason enumerates candidate hostnames by name and becomes the tool error the provider
+// reads, so an unscrubbed one carries them in the clear under privacy mode -- the same shape as the
+// note side, on the other branch of the same `if`.
 
 /** Context whose Indexer `search` answers a sole-candidate terms probe with `buckets`, so
  * `search_findings_by_agent`'s omitted `agent_name` reaches the 'many' ambiguity branch. */

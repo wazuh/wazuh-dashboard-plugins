@@ -117,17 +117,15 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // conversation — there is no pseudonym to reuse and this file never mints from a prose field. See
   // `IDENTIFIER_BEARING_FREE_TEXT_FIELDS` and `premintProseScanIdentifiers`.
   { field: WAZUH_FIELD.RULE_TITLE, action: 'allow' },
-  // EXPLAIN-WAVE PHASE 2 (AI/plan/eval-v2/tooling-gap-map.md gap 2): wazuh.rule.description is
-  // newly in every finding-hits tool's digest sample columns (catalog/common.ts's
+  // In every finding-hits tool's digest sample columns (catalog/common.ts's
   // FINDING_DIGEST_EXTRA_COLUMNS), so it needs an explicit decision here rather than reaching the
-  // provider by omission. Reviewed 'allow' on exactly wazuh.rule.title's reasoning above and
+  // provider by omission. 'allow' on exactly wazuh.rule.title's reasoning above and
   // document.metadata.description's below -- it is the ruleset's own prose about what a rule
-  // detects (findings-v5 carries the same text the Manager rule does), the model cannot explain a
-  // detection without it, and anonymizing it would replace every distinct explanation with an
-  // opaque VAL_n. Same residual risk as both of those fields (a custom rule's description can
-  // interpolate a decoder capture group) and the same mitigation: chat.ts's
-  // scrubMessagesForProvider runs prescanAndMintToolContent over every tool-result string value,
-  // so an embedded IP/FQDN is still pseudonymized before it reaches the provider.
+  // detects, the model cannot explain a detection without it, and anonymizing it would replace
+  // every distinct explanation with an opaque VAL_n. Same residual risk as both of those fields (a
+  // custom rule's description can interpolate a decoder capture group) and the same mitigation:
+  // chat.ts's scrubMessagesForProvider runs prescanAndMintToolContent over every tool-result string
+  // value, so an embedded IP/FQDN is still pseudonymized before it reaches the provider.
   { field: 'wazuh.rule.description', action: 'allow' },
   // Wildcard covers every compliance framework (pci_dss, hipaa, gdpr, iso_27001, nis2,
   // nist_800_171, nist_800_53, fedramp, cmmc, tsc, ...), not just the one this plugin has a
@@ -213,15 +211,14 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // Wazuh's scanner from CTI data, never analyst/attacker-supplied. Surfaced (2026-08-14) so the
   // model can state the fixed version instead of offering an update check no tool can perform.
   { field: 'vulnerability.scanner.condition', action: 'allow' },
-  // EXPLAIN-WAVE PHASE 4: the CVE's own description, now a digest sampleColumn on the
-  // vulnerability tools (catalog/common.ts's VULN_DIGEST_SAMPLE_COLUMNS) so a remediation answer
-  // can state what the flaw is. NOT 'allow', unlike the scanner/OS-curated fields around it: this
+  // A digest sampleColumn on the vulnerability tools (catalog/common.ts's
+  // VULN_DIGEST_SAMPLE_COLUMNS). NOT 'allow', unlike the scanner/OS-curated fields around it: this
   // is THIRD-PARTY feed prose (CNA/NVD-authored, arriving through the CTI content pipeline), the
-  // same untrusted-text class get-cve-intel.ts's own A-3 hardening treats with care. It describes
-  // a CVE, never this deployment, so it carries no local identifier by design -- but it is long
-  // free text from outside, so 'allow-scan' (issue #8912) is the right classification: the value
-  // stays readable while every embedded IP/FQDN shape is minted and every identifier already
-  // pseudonymized elsewhere in this conversation is caught by the dictionary scan.
+  // same untrusted-text class get-cve-intel.ts treats with care. It describes a CVE, never this
+  // deployment, so it carries no local identifier by design -- but it is long free text from
+  // outside, so 'allow-scan' (issue #8912) is the right classification: the value stays readable
+  // while every embedded IP/FQDN shape is minted and every identifier already pseudonymized
+  // elsewhere in this conversation is caught by the dictionary scan.
   { field: 'vulnerability.description', action: 'allow-scan' },
   // NOT 'allow', unlike package.name/architecture/type/version above: a vendor/distributor string
   // ("Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>", "Debian Sysadmin Team
@@ -278,21 +275,19 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'event.action', action: 'allow' },
   { field: 'event.outcome', action: 'allow' },
 
-  // --- EXPLAIN-WAVE PHASE 6: the wazuh-states-* discovery surfaces --------------------------
-  // `guardrails.ts`'s AGG_FIELD_ALLOWLIST (via `state-families.ts`) newly lets `get_field_values`
-  // enumerate the state schema, and `search_wazuh_data` newly offers one enum value per state
-  // index -- so every field below now reaches the provider as an aggregation BUCKET KEY.
-  // `applyFieldPolicy`'s breakdown loop resolves each bucket's aggregation field through
+  // --- The wazuh-states-* discovery surfaces -------------------------------------------------
+  // `guardrails.ts`'s AGG_FIELD_ALLOWLIST (via `state-families.ts`) lets `get_field_values`
+  // enumerate the state schema, so every field below reaches the provider as an aggregation BUCKET
+  // KEY. `applyFieldPolicy`'s breakdown loop resolves each bucket's aggregation field through
   // `extractAggFields`/`scrubAggKey` and applies THIS list to the key (the mechanism `source.ip`'s
-  // comment above documents), which means an unclassified field here would ship raw usernames and
-  // IP addresses into a bucket list under privacy mode. Each entry below is an explicit decision,
-  // not allow-by-omission; the identifying ones stay anonymized exactly like the
-  // host.hostname/source.ip pairs above.
+  // comment above documents), so a field opened for aggregation and left unclassified here ships
+  // raw usernames and IP addresses into a bucket list under privacy mode. Every entry below must
+  // stay an explicit decision, never allow-by-omission.
 
   // Services (wazuh-states-inventory-services). A service NAME is admin/vendor-defined identity
   // ("ssh.service", "WinDefend"), the same class as package.name above -- 'allow-scan', not a
   // rubber-stamp 'allow', because a site-authored unit name can embed a hostname. The rest are
-  // closed enums, live-verified: state running/stopped, sub_state running/dead, enabled yes/no,
+  // closed enums: state running/stopped, sub_state running/dead, enabled yes/no,
   // start_type enabled/auto/manual, type systemd/win32_own_process.
   { field: 'service.name', action: 'allow-scan' },
   { field: 'service.state', action: 'allow' },
@@ -333,7 +328,7 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // `group.name`/`group.users` are anonymized as USER, not allowed as "admin taxonomy": on Linux,
   // USER-PRIVATE GROUPS mean a group name routinely IS an account name (useradd creates a group
   // named after the user), and `group.users` is a membership list of account names outright
-  // (live buckets on this corpus: root, Administrator, builder). Classifying either as allow would
+  // (root, Administrator, builder). Classifying either as allow would
   // leak the same personal identifier `user.name` protects, through a different field name. The
   // cost is real and accepted: under privacy mode a group listing reads as pseudonyms.
   { field: 'group.name', action: 'anonymize', kind: 'USER' },

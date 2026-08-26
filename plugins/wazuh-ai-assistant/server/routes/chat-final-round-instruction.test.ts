@@ -53,15 +53,12 @@ test('withFinalRoundAnswerInstruction: appends the instruction on the final roun
   });
 });
 
-// EXPLAIN-WAVE PHASE 4: the role is the fix, not a detail. A `system`-role message is NOT at the
-// conversation tail on the Anthropic Messages API -- providers/anthropic.ts filters every system
-// message out of `messages` and joins them into the request's top-level `system` field, appended
-// after prompts.ts's multi-thousand-token system prompt -- so for the whole life of this
-// instruction it was delivered to the prompt PREFIX while the last thing the model actually read
-// stayed a `tool_result` it was free to treat as a finished turn. Phase 3 proved the point on the
-// sibling path (`withNoTextSynthesisInstruction`): moving the identical wording to a trailing
-// `user` message took code-synthesised answers from 9 to 1 of 63. This test pins the wire position
-// so a future "tidy the roles up" edit cannot silently hoist it back into the system field.
+// The role is the mechanism, not a detail: a `system`-role message is NOT at the conversation tail
+// on the Anthropic Messages API -- providers/anthropic.ts filters every system message out of
+// `messages` and joins them into the request's top-level `system` field, so the instruction lands in
+// the prompt PREFIX while the last thing the model reads stays a `tool_result` it may treat as a
+// finished turn. This test pins the wire position so a "tidy the roles up" edit cannot hoist it back
+// into the system field.
 test('withFinalRoundAnswerInstruction: the instruction is delivered as a trailing USER message, never a system one', () => {
   const out = withFinalRoundAnswerInstruction(conversation(), true, true);
   assert.equal(
@@ -198,9 +195,9 @@ test('FINAL_ROUND_ANSWER_INSTRUCTION: constrains every FACT to the gathered resu
   // Guards the anti-fabrication property against a well-meaning future reword. Asking a model for
   // an answer it cannot support is how invented counts and agent names appear — the instruction has
   // to buy analysis WITHOUT buying invention, and has to leave the honest "I can't answer" reachable.
-  // Explain-wave phase 1 narrowed the clause from "only the tool results" (which also banned
-  // interpretation) to "every FACT about this environment", so the grounding assertion now pins the
-  // DATA scope explicitly — see the advisory test below for the other half.
+  // The grounding clause is scoped to "every FACT about this environment", not to "only the tool
+  // results" (which also bans interpretation), so this assertion pins the DATA scope explicitly --
+  // see the advisory test below for the other half.
   assert.match(
     FINAL_ROUND_ANSWER_INSTRUCTION,
     /Every FACT about this environment/,
@@ -237,13 +234,12 @@ test('FINAL_ROUND_ANSWER_INSTRUCTION: constrains every FACT to the gathered resu
   );
 });
 
-// Explain-wave phase 1 (AI/plan/eval-v2 gap 1): this instruction lands on the round where an
-// "explain this event / how do we protect against it" answer has to be written, and its old
-// blanket wording forbade exactly the knowledge such an answer needs (what a technique is, what
-// mitigates it) — knowledge no tool in this product returns. The two properties below must hold
-// TOGETHER: advisory content is unlocked, and it is fenced so it can never be read as observed
-// data. A reword that drops either one re-breaks a whole question class or opens a fabrication
-// path, so both are pinned here.
+// This instruction lands on the round where an "explain this event / how do we protect against it"
+// answer has to be written, and a blanket grounding rule forbids exactly the knowledge such an
+// answer needs (what a technique is, what mitigates it) -- knowledge no tool in this product
+// returns. The two properties below must hold TOGETHER: advisory content is unlocked, and it is
+// fenced so it can never be read as observed data. A reword that drops either one breaks a whole
+// question class or opens a fabrication path.
 test('FINAL_ROUND_ANSWER_INSTRUCTION: permits general security knowledge for the explanatory half', () => {
   assert.match(
     FINAL_ROUND_ANSWER_INSTRUCTION,

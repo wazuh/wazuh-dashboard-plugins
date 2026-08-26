@@ -221,10 +221,10 @@ test('VULN_BREAKDOWN_AGGS declares one terms aggregation per VULN_BREAKDOWN_DIME
   }
 });
 
-// --- FINDING_DIGEST_EXTRA_COLUMNS: explain-wave phase 2 digest enrichment ----------------------
-// (AI/plan/eval-v2/tooling-gap-map.md gap 2: the model saw a templated rule TITLE and nothing that
-// says what the detection is or what actually ran, so an explanatory answer had nothing grounded to
-// draw on and the final-round instruction correctly forbade inventing it.)
+// --- FINDING_DIGEST_EXTRA_COLUMNS -------------------------------------------------------------
+// A templated rule TITLE says neither what the detection is nor what actually ran, so without these
+// columns an explanatory answer has nothing grounded to draw on and the final-round instruction
+// correctly forbids inventing it.
 
 test('FINDING_DIGEST_EXTRA_COLUMNS: carries the two explanation-critical fields', () => {
   assert.ok(
@@ -273,12 +273,10 @@ test('findingDigestColumns: appends the extras without duplicating a tool-declar
   assert.ok(columns.includes('process.command_line'));
 });
 
-// --- EXPLAIN-WAVE PHASE 4: the vulnerability digest carries the CVE's own description ----------
-// "How do we remediate this item" is the weakest answer class.
-// `wazuh-states-vulnerabilities` has no dedicated fixed-version/remediation
-// field -- the fix bound lives in `vulnerability.scanner.condition`, already sampled -- so the one
-// prescriptive field the docs carry and the digest dropped is the description: requested in
-// `_source`, rendered in get_cve_intel's table, never sent to the model.
+// --- The vulnerability digest carries the CVE's own description -------------------------------
+// `wazuh-states-vulnerabilities` has no dedicated fixed-version/remediation field -- the fix bound
+// lives in `vulnerability.scanner.condition`, already sampled -- so the description is the only
+// other prescriptive field, and a remediation answer needs it to say what the flaw IS.
 
 test('VULN_DIGEST_SAMPLE_COLUMNS: carries both fix-bearing fields the vulnerability docs have', () => {
   assert.ok(
@@ -292,8 +290,8 @@ test('VULN_DIGEST_SAMPLE_COLUMNS: carries both fix-bearing fields the vulnerabil
 });
 
 test('VULN_SOURCE_FIELDS: requests the description exactly once, not twice', () => {
-  // It used to be appended here BECAUSE it was table-only; now that it is a digest column, the
-  // append would be a duplicate `_source` entry on every vulnerability request.
+  // It needs no explicit append: as a digest column it is already in the list, and appending it would
+  // duplicate a `_source` entry.
   assert.equal(
     VULN_SOURCE_FIELDS.filter(field => field === 'vulnerability.description')
       .length,
@@ -304,21 +302,19 @@ test('VULN_SOURCE_FIELDS: requests the description exactly once, not twice', () 
 });
 
 test('privacy policy: the CVE description is allow-SCAN, not the plain allow the scanner fields get', () => {
-  // Registry-wide coverage is field-policy-coverage.test.ts's job; what matters here is the
-  // ACTION. `vulnerability.description` is third-party CNA/NVD prose arriving through the CTI
-  // content pipeline, not Wazuh's own scanner/OS-curated metadata, so it stays readable but is
-  // shape- and dictionary-scanned on the way out.
+  // Registry-wide coverage is field-policy-coverage.test.ts's job; what matters here is the ACTION.
+  // `vulnerability.description` is third-party CNA/NVD prose, not Wazuh's own scanner/OS-curated
+  // metadata, so it stays readable but is shape- and dictionary-scanned on the way out.
   const policy = (field: string) =>
     FIELD_POLICY_DEFAULTS.find(entry => entry.field === field)?.action;
   assert.equal(policy('vulnerability.description'), 'allow-scan');
   assert.equal(policy('vulnerability.scanner.condition'), 'allow');
 });
 
-// --- EXPLAIN-WAVE PHASE 4: the state-vs-history surface split ----------------------------------
-// A question asking which agents have a CVE detection "in the findings history" was answered
-// from wazuh-states-vulnerabilities, whose host list for that CVE differs. The model even
-// disclosed the substitution and still answered from the wrong surface, so the distinction has to
-// be stated where the tool is CHOSEN, not only in the system prompt.
+// --- The state-vs-history surface split -------------------------------------------------------
+// The two surfaces carry different host lists for the same CVE, and disclosing a substitution is not
+// enough, so the distinction has to be stated where the tool is CHOSEN, not only in the system
+// prompt.
 
 test('FINDING_SCOPE_NOTE: names findings as detection history, not current state', () => {
   assert.match(FINDING_SCOPE_NOTE, /detection HISTORY/);
@@ -344,11 +340,10 @@ test('SCA_CURRENT_STATE_NOTE: same split for the compliance surface', () => {
   assert.match(SCA_CURRENT_STATE_NOTE, /use the findings tools/);
 });
 
-// --- EXPLAIN-WAVE PHASE 7: the detection channel reaches the MODEL, not only the table ---------
-// The wrong-incident answer: asked about sign-in failures on one detection channel, the model
-// narrated a different authentication incident that shared the agent and the technique tags. The
-// discriminator (`wazuh.integration.category`) was a visible table column all along -- the user
-// could see it, the model never could, because it was missing from the sample columns.
+// --- The detection channel reaches the MODEL, not only the table ------------------------------
+// `wazuh.integration.category` is the discriminator between two incidents that share an agent and
+// technique tags. A visible table column is not enough: unless it is in the sample columns the model
+// cannot tell the row sets apart, even though the user can.
 
 test('STANDARD_FINDING_SAMPLE_COLUMNS: the model sees the same detection-channel column the table shows', () => {
   assert.ok(

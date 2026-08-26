@@ -134,13 +134,11 @@ test('isRoundFutile: at least one successful call had new, non-duplicate rows --
   );
 });
 
-// --- shouldGrantZeroRowWideningRound: the ONE widening round (explain-wave phase 5) ---------
+// --- shouldGrantZeroRowWideningRound: the ONE widening round -----------------------------------
 //
-// Measured defect: most below-target explanatory answers issued a single over-narrow query, got
-// zero rows and abstained. `isRoundFutile` above latched the final round on that first empty
-// result, so
-// the system prompt's own "retry once with a broader filter" instruction was unobeyable: the next
-// round was offered no tools. These tests pin every bound that keeps the fix to exactly one round.
+// `isRoundFutile` latches the final round on the first all-zero-row result, which makes the system
+// prompt's own "retry once with a broader filter" instruction unobeyable -- the next round is
+// offered no tools. These tests pin every bound that keeps the fix to exactly one round.
 
 test('zero-row widening: the FIRST all-zero-row round of a turn earns one more round', () => {
   assert.equal(
@@ -155,8 +153,7 @@ test('zero-row widening: the FIRST all-zero-row round of a turn earns one more r
 });
 
 test('zero-row widening: granted at most ONCE per turn -- the second empty round stops', () => {
-  // The whole latency bound. Without this the mechanism is a retry loop, and total p95 is already
-  // +61% on the phase-4 build.
+  // The whole latency bound: without this latch the mechanism is a retry loop.
   assert.equal(
     shouldGrantZeroRowWideningRound({
       successfulCalls: [
@@ -197,7 +194,7 @@ test("zero-row widening: a round that returned rows is not this mechanism's conc
 
 test('zero-row widening: an all-rejected round (no successful calls) earns nothing', () => {
   // Same non-overlap `isRoundFutile` keeps with #8911: an all-rejected round is
-  // shouldEnterFinalRoundEarly's territory and has its own retry allowance already.
+  // shouldEnterFinalRoundEarly's territory and has its own retry allowance.
   assert.equal(
     shouldGrantZeroRowWideningRound({
       successfulCalls: [],
@@ -224,15 +221,12 @@ test('zero-row widening: only fires where isRoundFutile already said the round w
   );
 });
 
-// --- EXPLAIN-WAVE PHASE 6: a DISCOVERY-only zero-row round earns nothing ----------------------
+// --- A DISCOVERY-only zero-row round earns nothing --------------------------------------------
 //
-// The measured cost of the phase-5 grace, on an SCA question: round 1 was a
-// single `get_field_values` probe on `wazuh.rule.tags` that returned zero rows, the grace bought a
-// second tool-bearing round, and the model spent that round on ANOTHER `get_field_values` probe.
-// The typed SCA tool was never called, so a correct tool selection became a wrong one, while the
-// baseline arm had called `get_sca_results` and declined cleanly. A zero-row discovery
-// probe has ANSWERED the model ("this field carries nothing here"); it is not a retrieval attempt
-// that came up short, so it buys no extra round.
+// A zero-row discovery probe has ANSWERED the model ("this field carries nothing here"); it is not a
+// retrieval attempt that came up short. Granting it an extra round funds another probe instead of
+// widening a query that was too narrow, and the typed tool that owns the question never gets
+// called.
 
 test('phase 6: a round whose only successful call was a discovery probe earns nothing', () => {
   assert.equal(
@@ -260,8 +254,8 @@ test('phase 6: the refusal survives several discovery probes in the same round',
 });
 
 test('phase 6: a zero-row round with ANY real data call still earns its widening round', () => {
-  // The aim is a PRECISE granted round, not a removed one: the phase-5 gains (zero-call items
-  // 6 -> 2) all came from real queries that came back empty, and those are untouched.
+  // The aim is a PRECISE granted round, not a removed one: a zero-row round with any real data call
+  // in it still earns its widening round.
   assert.equal(
     shouldGrantZeroRowWideningRound({
       successfulCalls: [
@@ -275,8 +269,8 @@ test('phase 6: a zero-row round with ANY real data call still earns its widening
 });
 
 test('phase 6: a discovery-only round is still futile -- only the GRACE is withheld', () => {
-  // `isRoundFutile` is unchanged: the round still stops the turn, it just stops it one round
-  // earlier than phase 5 did. That is where the median-latency saving comes from.
+  // `isRoundFutile` is unaffected: such a round still stops the turn, one round earlier than a
+  // granted one would.
   const discoveryOnly = [
     { toolName: 'get_field_values', hadRows: false, isDuplicate: false },
   ];

@@ -4,38 +4,27 @@ import { FIELD_CATALOG, isKnownField } from '../../common/field-catalog';
  * Single source of truth for the `wazuh-states-*` CURRENT-STATE surfaces: one entry per physical
  * index, carrying everything the three consumers need to reach it.
  *
- * WHY THIS FILE EXISTS. A whole class of inventory/state questions could not be answered against
- * a corpus that holds the data, and the cause was two mechanical gaps -- both of which
- * are one missing entry in a list, and both of which are about the SAME index:
+ * WHY ONE FILE. A state surface is only usable when it is BOTH namable and discoverable: an index
+ * `search_wazuh_data`'s enum can name but whose fields `get_field_values` cannot enumerate is
+ * unanswerable, and a field that can be enumerated on an index the enum cannot name is unreachable.
+ * Those two lists used to be separate, so widening one without the other left the surface broken
+ * either way. The enum (`generic-query-families.ts`), the field-discovery route
+ * (`get-field-values.ts`'s `FIELD_LOCATIONS`) and the aggregation allowlist (`guardrails.ts`) all
+ * derive from the rows below so they cannot drift apart.
  *
- *  - Root cause A: all eighteen `wazuh-states-*` indices collapsed into ONE `search_wazuh_data`
- *    enum value, `wazuh-states-*`. A family-scoped query was therefore UNREPRESENTABLE: the model
- *    wrote a correct filter, the wildcard returned the union (FIM files, vulnerabilities and SCA
- *    dominate the row count), the returned sample carried none of the requested fields, and the
- *    model correctly reported that the fields "came back empty".
- *  - Root cause B: `get_field_values`'s vetted aggregation allowlist covered none of the state
- *    schema, so the model GUESSED field names for these surfaces -- and every field it reported as
- *    "not found" (`service.name`, `service.state`, `host.cpu.name`, `network.gateway`,
- *    `network.ip`, `user.name`, `package.name` on browser extensions) is present in the live
- *    mapping.
+ * A single wildcard entry is not a substitute for per-index entries: `wazuh-states-*` fans out over
+ * every state index at once and the returned sample is dominated by whichever family has the most
+ * documents, so a family-scoped question comes back with the requested fields empty.
  *
- * The two gaps had two separate lists, which is why closing one without the other kept happening:
- * an index the enum can name but whose fields cannot be discovered is still unanswerable, and a
- * field that can be enumerated on an index the enum cannot name is unreachable. Both now derive
- * from the rows below, so they cannot drift apart again -- the same argument
- * `generic-query-families.ts` already makes for the enum and `guardrails.ts`'s
- * `INDEX_ALLOWLIST_RE`, extended one list further.
- *
- * `aggFields` IS CURATED, NOT MECHANICALLY DERIVED, and deliberately so. `FIELD_CATALOG` is the
+ * `aggFields` IS CURATED, NOT MECHANICALLY DERIVED, and must stay that way. `FIELD_CATALOG` is the
  * authority on which fields EXIST -- every path below is filtered through it at module load (see
  * `STATE_FAMILY_UNKNOWN_FIELDS`), so a platform-side rename turns into a failing test rather than a
  * phantom allowlist entry -- but it says nothing about whether a terms aggregation on a field is
  * SAFE or even legal. Taking a family's whole catalog list would pull in `message`,
  * `process.command_line`, `file.path` and every `*.hash.*`: a terms agg on a `text` mapping is a
  * hard 400 ("Fielddata is disabled"), which the model can only read as an opaque failure. Every
- * path below was live-verified with a real `terms` aggregation against this eval corpus (18
- * indices, 57 probes, all returning buckets) rather than assumed keyword-mapped -- the same
- * evidence bar `guardrails.ts`'s `AGG_FIELD_ALLOWLIST` sets for its own entries.
+ * path below was verified with a real `terms` aggregation rather than assumed keyword-mapped -- the
+ * same evidence bar `guardrails.ts`'s `AGG_FIELD_ALLOWLIST` sets for its own entries.
  */
 export interface StateFamily {
   /** `common/field-catalog.ts` key documenting this index's fields -- the existence authority for
@@ -69,12 +58,11 @@ export interface StateFamily {
 }
 
 /**
- * Every `wazuh-states-*` index, in the order they are presented to the model: the ten surfaces NO
- * typed tool owns first (those are the measured gap), then the eight a typed tool
- * already covers, each naming that tool.
+ * Every `wazuh-states-*` index, in the order they are presented to the model: the surfaces NO
+ * typed tool owns first, then the ones a typed tool already covers, each naming that tool.
  */
 const DECLARED_STATE_FAMILIES: StateFamily[] = [
-  // --- Surfaces with no typed tool: the measured gap ------------------------------------------
+  // --- Surfaces with no typed tool -----------------------------------------------------------
   {
     catalogFamily: 'inventory.users',
     pattern: 'wazuh-states-inventory-users*',
@@ -85,8 +73,8 @@ const DECLARED_STATE_FAMILIES: StateFamily[] = [
       'user.name',
       'user.type',
       'user.shell',
-      // Numeric GIDs on this schema (live buckets: 513, 0, 1000), not group NAMES -- resolve a
-      // name through the groups family below.
+      // Numeric GIDs on this schema, not group NAMES -- resolve a name through the groups family
+      // below.
       'user.groups',
       'login.status',
       'wazuh.agent.id',
@@ -197,8 +185,8 @@ const DECLARED_STATE_FAMILIES: StateFamily[] = [
     toolFamily: 'inventory_browser_extensions',
     summary: 'installed browser extensions',
     signatureFields: [
-      // The model guesses `browser.extension.name` here, which does not exist.
-      // The extension's own name is `package.name`; `browser.name` is the BROWSER (Chrome/Safari).
+      // There is no `browser.extension.name` on this schema: the extension's own name is
+      // `package.name`, and `browser.name` is the BROWSER (Chrome/Safari).
       'package.name',
       'package.version',
       'browser.name',
@@ -243,11 +231,10 @@ const DECLARED_STATE_FAMILIES: StateFamily[] = [
   },
 
   // --- Surfaces a typed tool already owns -----------------------------------------------------
-  // Listed anyway, because the ALTERNATIVE to a scoped pattern here is not the typed tool -- it is
-  // the `wazuh-states-*` wildcard, which the model reaches with no reminder that a typed tool
-  // exists at all -- measured: it left `get_sca_checks` for the wildcard. Each label
-  // below names the owning tool, so opening the family STRENGTHENS routing rather than competing
-  // with it.
+  // Listed anyway: the alternative to a scoped pattern here is not the typed tool, it is the
+  // `wazuh-states-*` wildcard, which the model reaches with no reminder that a typed tool exists at
+  // all. Each label below names the owning tool, so opening the family strengthens routing rather
+  // than competing with it.
   {
     catalogFamily: 'inventory.system',
     pattern: 'wazuh-states-inventory-system*',
@@ -289,9 +276,6 @@ const DECLARED_STATE_FAMILIES: StateFamily[] = [
     typedTool: 'get_agent_inventory (kind "processes")',
     aggFields: [
       'process.name',
-      // `guardrails.ts`'s AGG_FIELD_ALLOWLIST previously held this field back with "not until a
-      // live terms agg on wazuh-states-inventory-processes is verified". It is now verified: the
-      // live probe returns `running: 32`.
       'process.state',
       'wazuh.agent.id',
       'wazuh.agent.name',
