@@ -17,6 +17,7 @@ import {
   ToolSpec,
 } from '../../common/types';
 import { describeError } from '../../common/errors';
+import { excludePrivacyOffHistory } from '../../common/chat-history';
 import { getProviderAdapter } from '../providers/registry';
 import { ChatStreamOptions, ProviderAdapter } from '../providers/types';
 import { buildSystemPrompt } from '../prompts';
@@ -28,9 +29,11 @@ import {
 } from '../tools/executor';
 import { validate } from '../tools/schema-validator';
 import {
+  deepMapStrings,
   prescanAndMint,
   prescanAndMintToolContent,
   Pseudonymizer,
+  scrubKnownEntities,
   StreamDepseudonymizer,
 } from '../tools/privacy';
 import { MarkdownTableSuppressor } from '../tools/markdown-table-filter';
@@ -1940,6 +1943,51 @@ function resolvePrivacyEnabled(
  * turn): `applyToText` only replaces substrings it recognizes as a REAL value it has a mapping for,
  * so text that is already in pseudonym form is left alone.
  *
+ * SECURITY PRINCIPLE (replay-leak fix, live-proven gap): the SERVER NEVER TRUSTS client-replayed
+ * content to already be protected. Two trust boundaries exist here — the tool digest reaching the
+ * provider (`applyFieldPolicy` in privacy.ts, server-internal, unaffected by any of this) and this
+ * function's boundary, CLIENT -> SERVER REPLAY: the browser hands back real-valued `assistant`
+ * prose, `toolCalls[].arguments` (kept in REAL form server-side by design — see chat-history.ts),
+ * and a resumed conversation's whole history, and the server used to assume the client-held
+ * pseudonym map (re-seeded into `pseudonymizer` from the request body) already protects it. That
+ * map is emptied by two entirely ordinary client actions: resuming a saved conversation
+ * (chat-page.tsx's `applyLoadedConversation`, `setPseudonymMap([])`), and — far more likely in
+ * practice, since privacy ships OFF by default (index-settings-provider.ts's
+ * `privacyDefaultOn: false`) — a user chatting with privacy off, then toggling it ON mid-
+ * conversation, which resends the ENTIRE accumulated real-valued history against a map that has
+ * never minted anything. Against an empty/stale map, a pure map-SUBSTITUTION pass (`applyToText`,
+ * `applyToObject`) is a no-op by construction — there is nothing yet to substitute. So EVERY inbound
+ * role/shape now gets an unconditional SHAPE SCAN (`prescanAndMint`/`prescanAndMintToolContent`,
+ * IPv4/IPv6/dotted-FQDN) first, independent of what the map does or doesn't contain, with the map
+ * substitution layered on top as a reuse/consistency optimization, never as the sole mechanism this
+ * boundary depends on. `user`/`tool` content already had this (see "First-mention pre-scan" below);
+ * `assistant` content and `toolCalls[].arguments` did not, and are fixed by this same principle.
+ *
+ * WIRE-PROOF FOLLOW-UP (AI/qa/wire-proof-v35/capture.jsonl): the shape scan above has a real blind
+ * spot — a bare, non-dotted real value (most commonly a Wazuh AGENT NAME, e.g. `wazuh-aio-5`) has
+ * no shape a regex can single out, and the field policy that would normally anonymize
+ * `wazuh.agent.name` only ever runs when a digest is CREATED, never when a client-supplied one is
+ * REPLAYED. Rather than trying to shape-scan harder, the owner-chosen fix is structural: a digest
+ * or assistant-prose history entry captured while privacy was OFF is never resent at all once
+ * privacy is ON for the CURRENT turn — see `excludePrivacyOffHistory`'s doc comment
+ * (common/chat-history.ts) for the exact mechanism, which THIS function's caller (below,
+ * `initialMessages`) applies as the server-side authority before any of this function even runs.
+ * Practical consequence, worth being explicit about: turning privacy ON mid-conversation
+ * intentionally COSTS CONTEXT — the model loses its own prior tool results (and, for the same
+ * privacy-off turns, its own prior narration) and may re-run a query it already ran, rather than
+ * risk resending real-valued history disguised as safe.
+ *
+ * ONE DELIBERATE EXCEPTION to "EVERY inbound role/shape": below, `toolCalls.map(call => ({ ...call,
+ * arguments: ... }))` spreads `call` before overwriting only `arguments` — so `ToolCall.vendorExtras`
+ * / `functionVendorExtras` (common/types.ts) are forwarded completely untouched, no shape scan and
+ * no map substitution. This is intentional, not an oversight: those fields are opaque, PROVIDER-
+ * origin passthrough blobs (the motivating case is Gemini's `thought_signature`, which the provider
+ * rejects the next request outright if it comes back even slightly altered) that must round-trip
+ * byte-identical for the adapter contract they exist for to keep working — running them through a
+ * scan/substitution pass built for CUSTOMER-origin text would risk corrupting a value this function
+ * has no business interpreting at all, for a boundary (provider-issued opaque tokens) that was never
+ * customer data to begin with.
+ *
  * First-mention pre-scan: for `user`/`tool` role content ONLY, `content`
  * is first run through `privacy.ts`'s pre-scan — flat `prescanAndMint` for user free text,
  * `prescanAndMintToolContent` (JSON-aware, string VALUES only, never keys) for tool digests —
@@ -1949,10 +1997,88 @@ function resolvePrivacyEnabled(
  * a no-op for it), (b) already reflected in `newEntries()`, so it flows through the existing
  * `privacy_map` SSE emission unchanged, and (c) reverses correctly out of a model-echoed tool-call
  * argument via the existing `reverseObject` path — no second emission/reversal path needed.
- * `assistant` content is left to the `applyToText`-only path: it is the model's own prior narration,
- * out of scope here (see `prescanAndMint`'s doc comment for what it does and does not catch).
+ * `assistant` content gets the SAME shape-scan-first treatment as of the replay-leak fix above (see
+ * the `else` branch below) — it is no longer `applyToText`-only.
+ *
+ * NF-1 fix (live-proven gap): for `user` content specifically, `prescanAndMint` alone only mints
+ * IPv4/IPv6 addresses and DOTTED hostnames — a BARE hostname the user types without its domain
+ * suffix (`dbprod07`), or a username (`jsmith`), has no shape a regex can single out and used to
+ * reach the provider verbatim even with privacy on, regardless of whether that same identifier had
+ * already been minted from Wazuh data earlier in the conversation (case variance between how the
+ * indexer rendered it and how the user retyped it defeats `applyToText`'s case-sensitive exact
+ * match). Closed by additionally running `scrubKnownEntities` — the same known-entity dictionary
+ * scan `scrubFieldValue`'s `allow-scan` branch already uses — over the pre-scanned user text.
+ *
+ * F1 correction (adversarial validation): the ORIGINAL NF-1 fix additionally ran the general,
+ * UNFILTERED `applyToText` pass after `scrubKnownEntities` — reasoned at the time to be "a harmless
+ * no-op for anything `scrubKnownEntities` just replaced". That reasoning missed that `applyToText`
+ * matches EVERY known value's EXACT case, not just the ones `scrubKnownEntities` had just replaced:
+ * a value minted under the generic VAL kind (the escape hatch's fail-closed default for a field
+ * with no host/ip/user keyword — see `scrubKnownEntities`'s own doc comment) that happens to equal
+ * an ordinary English word IN THE SAME CASE it was minted (a lowercase "critical" or "root" is a
+ * completely ordinary way to type either word) was reintroduced as a corruption vector by
+ * `applyToText` itself, even after `scrubKnownEntities` was correctly restricted with
+ * `identifiersOnly: true` below. For `user` content, `applyToText`'s unfiltered pass is therefore
+ * REMOVED entirely rather than layered on top: `scrubKnownEntities({ identifiersOnly: true })`
+ * already subsumes everything `applyToText` would do FOR THE KINDS this path trusts (its
+ * case-insensitive boundary match is a strict superset of `applyToText`'s case-sensitive one), and
+ * a freshly-minted IP/FQDN from `prescanAndMint` above is already substituted in place by that same
+ * call — there is nothing left for a further `applyToText` pass to legitimately catch that
+ * `identifiersOnly` did not already deliberately exclude. The accepted residual: a `user` message
+ * that happens to retype, EXACTLY, some OTHER already-minted VAL/URL-kind value (e.g. a full
+ * `process.command_line` string) no longer gets masked via this path — the same class of residual
+ * `scrubKnownEntities`'s own doc comment already documents for VAL/URL kinds, just extended from
+ * "never scanned" to "never scanned OR exact-matched" for `user` content specifically. `tool`/
+ * `assistant` content is unaffected: only the `user` branch below had this call removed.
+ *
+ * What this closes: a previously-minted entity (any kind — HOST/IP/USER/VAL — from Wazuh tool data,
+ * or from a prior `user` message) retyped bare, in ANY casing, later in the SAME MOUNTED SESSION —
+ * NOT "the same conversation" in the sense of the conversation record stored server-side. The
+ * dictionary this closes against lives entirely client-side (chat-page.tsx's `pseudonymMap`
+ * useState) and is explicitly reset to empty both on `handleNewConversation` and on loading a
+ * conversation's history back from storage (chat-page.tsx:1347's `setPseudonymMap([])` inside the
+ * conversation-restore path), and is lost outright on unmount (this component — the chat flyout's
+ * contents — unmounts whenever the flyout closes). So the precise residual is: reopen the flyout,
+ * or reload/reopen a stored conversation, and its restored history is RE-SENT to this same function
+ * with a freshly empty pseudonym map — every identifier that conversation ever minted has to be
+ * re-discovered (shape scan only; the dictionary scan below has nothing left to match) before it is
+ * masked again, exactly as if the conversation were brand new.
+ *
+ * F1/F2 (adversarial validation): for `user` content specifically, `scrubKnownEntities` is called
+ * with `{ identifiersOnly: true }` — narrower than the dictionary scan `scrubFieldValue`'s
+ * `allow-scan` branch runs over already-curated tool-value fields — because arbitrary user prose
+ * has no field-policy review behind it at all; see `scrubKnownEntities`'s own doc comment for the
+ * exact IP/HOST/USER-kind + identifier-shape filter this applies and why.
+ *
+ * What this does NOT close (the accepted residual — see `scrubKnownEntities`'s own doc comment for
+ * why a general bare-token masker is deliberately not attempted): a bare identifier that has never
+ * been minted anywhere in this session — the very first time the user types it, or the first retype
+ * after a flyout reopen/conversation reload emptied the map — has no dictionary entry to match and
+ * no recognizable shape, so it reaches the provider unmasked. A pasted secret/credential is the
+ * same residual: nothing here classifies free text as sensitive by content, only by prior mint or
+ * IP/FQDN shape.
+ *
+ * A SECOND, honestly-documented residual in the OPPOSITE direction (over-masking, a quality issue
+ * rather than a leak): `scrubKnownEntities`'s `IDENTIFIER_STOP_WORDS` list is curated and short, not
+ * exhaustive. The dominant real-world instance of this residual — see F-I1's fix in
+ * `looksLikeIdentifierValue`'s own doc comment for the live-verified repro and the length/kind
+ * mitigation applied — is a SHORT, plain process/file/package NAME minted as HOST via
+ * `inferPseudonymKind`'s bare-`.name`-segment rule (`process.name`/`file.name`/`package.name`/
+ * `service.name`/`group.name` all qualify): common Unix command names like "top"/"find"/"make"/
+ * "less" are exactly this shape, which is why that mitigation exists. What that mitigation does
+ * NOT close, and remains an honest residual, is any LONGER (>= 5 char) or non-`*.name`-sourced
+ * ordinary word not on the stop-list — "database", "primary", "backup", "cluster", and plenty of
+ * others — that happens to have been minted under the HOST/USER kind and is still masked if the
+ * user later retypes it in an unrelated sentence. This is the accepted trade-off of a curated
+ * stop-list (plus the length/kind mitigation) over either extreme (a raw length/shape floor, which
+ * under-masked real short identifiers — see `IDENTIFIER_STOP_WORDS`'s own doc comment for why that
+ * was tried and reverted — or no filter at all, which is F1's original defect): some sentence
+ * corruption on an uncommon word is preferable to a real short identifier (a username like `jdoe`,
+ * a hostname like `titan`) reaching the provider unmasked.
  */
-function scrubMessagesForProvider(
+// Exported purely so a colocated test can drive this directly with a scripted Pseudonymizer,
+// same rationale as this file's exported chatRequestMessageSchema.
+export function scrubMessagesForProvider(
   messages: ChatMessage[],
   pseudonymizer: Pseudonymizer,
 ): ChatMessage[] {
@@ -1965,15 +2091,47 @@ function scrubMessagesForProvider(
     // never minted as hostnames (see prescanAndMintToolContent's doc comment).
     let content: string;
     if (message.role === 'user') {
-      content = pseudonymizer.applyToText(
+      // NF-1: shape scan (prescanAndMint) THEN known-entity dictionary scan (scrubKnownEntities,
+      // catches a previously-minted identifier retyped bare/in different casing) — see this
+      // function's doc comment for the residual this does not cover.
+      // F1: `identifiersOnly: true` restricts the dictionary scan to IP/HOST/USER-kind,
+      // identifier-shaped entries — arbitrary user prose has no field-policy review behind it, so
+      // this must not treat every string the pseudonymizer ever minted as a search-and-replace
+      // target (see scrubKnownEntities's doc comment for the exact filter and the corruption this
+      // closes). The general, UNFILTERED `applyToText` pass the ORIGINAL NF-1 fix chained after
+      // this is deliberately NOT run for `user` content any more — see this function's "F1
+      // correction" doc comment for why it reintroduced the same corruption `identifiersOnly` was
+      // just added to close.
+      content = scrubKnownEntities(
         prescanAndMint(message.content, pseudonymizer),
+        pseudonymizer,
+        { identifiersOnly: true },
       );
     } else if (message.role === 'tool') {
       content = pseudonymizer.applyToText(
         prescanAndMintToolContent(message.content, pseudonymizer),
       );
     } else {
-      content = pseudonymizer.applyToText(message.content);
+      // Replay-leak fix (Fix 1): this is `assistant` content — the model's OWN prior narration,
+      // which the client resends verbatim on every subsequent turn as part of the accumulated
+      // history (never persisted/re-scrubbed server-side in between). This used to run through
+      // `applyToText` ONLY, which is a SUBSTITUTION, not a scan: it can only replace a value this
+      // `pseudonymizer` instance already holds a mapping for. The server has no way to verify the
+      // client-held pseudonym map it was seeded from is non-empty or even accurate for THIS
+      // content — a user can toggle privacy mode ON mid-conversation (privacy ships OFF by
+      // default, see index-settings-provider.ts's `privacyDefaultOn: false`), at which point every
+      // assistant message accumulated so far is real-valued prose that has never been scrubbed by
+      // anything, and gets resent with an effectively empty map. Closed the same way the `user`
+      // and `tool` branches already are: an unconditional shape scan (`prescanAndMint`) runs
+      // FIRST, regardless of what the map does or does not contain, so a real IP/dotted-FQDN in
+      // replayed assistant prose is caught even with a map that has nothing relevant in it.
+      // Principle (see this function's header doc comment too): the server never trusts
+      // client-replayed content to already be protected — every inbound role gets an
+      // unconditional shape scan; the pseudonym map is a REUSE/consistency optimization on top of
+      // that, never the sole mechanism a boundary depends on.
+      content = pseudonymizer.applyToText(
+        prescanAndMint(message.content, pseudonymizer),
+      );
     }
     return {
       ...message,
@@ -1982,7 +2140,26 @@ function scrubMessagesForProvider(
         ? {
             toolCalls: message.toolCalls.map(call => ({
               ...call,
-              arguments: pseudonymizer.applyToObject(call.arguments),
+              // Replay-leak fix (Fix 2): tool-call arguments are kept in REAL form server-side by
+              // design (see chat-history.ts's doc comments on why — the client needs real-valued
+              // arguments to render the tool-call panel, and `reverseObject` puts them back to
+              // real form for that on the way out). chat-history.ts's own doc comment is explicit
+              // that this is safe ONLY because `scrubMessagesForProvider` re-scrubs them before
+              // every outbound call — i.e. THIS function is the one place that promise has to
+              // hold. `applyToObject` alone is a pure substitution against the pseudonymizer's
+              // map, same limitation as `applyToText` above: against an empty/stale map (privacy
+              // toggled on mid-conversation, or a resumed conversation) it is a no-op, and a real
+              // IP/hostname sitting in an earlier tool call's arguments would reach the provider
+              // verbatim. Closed with the same unconditional shape-scan-first principle as Fix 1,
+              // applied to every string leaf of the arguments object via `deepMapStrings`-over-
+              // `prescanAndMint` (reusing `Pseudonymizer.applyToObject`'s own deep-map machinery,
+              // just with the shape scan as the mapping function) before the existing
+              // map-substitution pass.
+              arguments: pseudonymizer.applyToObject(
+                deepMapStrings(call.arguments, value =>
+                  prescanAndMint(value, pseudonymizer),
+                ) as Record<string, unknown>,
+              ),
             })),
           }
         : {}),
@@ -2034,6 +2211,11 @@ export const chatRequestMessageSchema = schema.object({
   ),
   // Present on role:'tool' messages: which toolCalls[].id this result answers.
   toolCallId: schema.maybe(schema.string()),
+  // Wire-proof fix (common/types.ts's `ChatMessage.privacyEnabled` doc comment): the client resends
+  // this on every replayed history entry so `excludePrivacyOffHistory` (common/chat-history.ts) can
+  // fail closed on a privacy-off-captured digest/prose message once privacy is on for this request.
+  // `@osd/config-schema` rejects unknown keys by default, so this needs an explicit place here too.
+  privacyEnabled: schema.maybe(schema.boolean()),
 });
 
 export function registerChatRoutes(router: IRouter, logger: Logger): void {
@@ -2172,11 +2354,22 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
       // enabled) the stage-1 routing prompt, so the two agree on "now" for a single turn.
       const nowIso = new Date().toISOString();
 
+      // Wire-proof fix (AI/qa/wire-proof-v35/capture.jsonl): the SERVER-SIDE authority for the
+      // "never replay privacy-off history once privacy is on" rule -- common/chat-history.ts's
+      // `excludePrivacyOffHistory` doc comment has the full mechanism and why the client-side call
+      // in `buildOutgoingMessages` is not enough on its own to depend on. Applied to the CLIENT-SENT
+      // history only, once, right here, before any of it seeds the orchestration loop's own
+      // accumulator -- everything that loop appends afterwards is this request's own live activity,
+      // never client-replayed, and is already correctly protected by `scrubMessagesForProvider` on
+      // every round regardless.
       const initialMessages: ChatMessage[] = [
         // Per-request only: never persisted, never echoed back by the client. Any system message
         // the client itself sent (it doesn't today) is dropped so ours is always the sole one.
         { role: 'system', content: buildSystemPrompt(nowIso) },
-        ...messages.filter(message => message.role !== 'system'),
+        ...excludePrivacyOffHistory(
+          messages.filter(message => message.role !== 'system'),
+          privacyEnabled,
+        ),
       ];
 
       // `response.ok(...)` MUST stay inside this try. The acquired slot is released on three
@@ -2289,7 +2482,10 @@ export async function* runStage1Routing(
     ? scrubMessagesForProvider(stage1Messages, privacyCtx.pseudonymizer)
     : stage1Messages;
 
-  yield { type: 'status', message: 'Routing…' };
+  // `step` classifies this for the browser, which renders a translated label instead of the raw
+  // English below (public/components/chat/turn-status.ts). `message` stays exactly what it always
+  // was: the eval harness and every log reader still see "Routing…".
+  yield { type: 'status', message: 'Routing…', step: 'understanding' };
 
   let sawRouteCall = false;
   let routeArgs: Record<string, unknown> | undefined;
@@ -3167,7 +3363,16 @@ export async function* orchestrate(
         // Carries the REVERSED (real) args: local display is trusted.
         yield { type: 'tool_call', toolCall: toolCallForClient };
 
-        yield { type: 'status', message: 'Querying Wazuh…' };
+        // `detail` names the tool whose call is running, so the reader sees WHICH question is
+        // being asked of the data rather than one undifferentiated "Querying Wazuh…" for a turn
+        // that runs four calls. A tool name is catalog vocabulary — never customer data — so it is
+        // safe to surface regardless of privacy mode.
+        yield {
+          type: 'status',
+          message: 'Querying Wazuh…',
+          step: 'querying',
+          detail: event.toolCall.name,
+        };
 
         let outcome: ToolExecutionOutcome;
         try {
@@ -3612,6 +3817,33 @@ export async function* orchestrate(
           budgetForcesFinalRoundEarly = true;
         }
       }
+    }
+
+    // Third and last step label of the turn: the NEXT provider call is the one that turns the tool
+    // results into the answer. Emitted at the very end of the round body — after every early
+    // `return` above — so it can never claim the assistant is writing an answer that is not
+    // actually coming. Purely advisory: the client discards it the instant the first `delta` of
+    // real text arrives (chat-page.tsx's `flushPendingDelta` clears `statusMessage`).
+    //
+    // Gated on the NEXT round actually being the final (tools-off) one, using the same
+    // `willBeFinalRound` predicate the loop head itself uses. Without that gate a turn running
+    // several tool rounds walked the label BACKWARDS — "Writing the answer…" then "Querying …"
+    // again, once per round — which reads as the assistant changing its mind rather than as
+    // progress. `round + 1` with the flags as they stand after this round's own bookkeeping above
+    // is exactly the question "is the next round the last one".
+    if (
+      roundHadRealToolCall &&
+      willBeFinalRound(
+        round + 1,
+        forceFinalRoundEarly,
+        budgetForcesFinalRoundEarly,
+      )
+    ) {
+      yield {
+        type: 'status',
+        message: 'Writing the answer…',
+        step: 'writing',
+      };
     }
   }
 

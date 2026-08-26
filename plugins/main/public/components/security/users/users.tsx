@@ -61,7 +61,11 @@ export const Users = withUserAuthorizationPrompt([
     getData,
     refreshCurrentPage,
     onTableChange: handleTableChange,
-  } = usePagination(UsersServices.GetUsers, handlePaginationError);
+    sorting,
+  } = usePagination(UsersServices.GetUsers, handlePaginationError, {
+    field: 'username',
+    direction: 'asc',
+  });
 
   useEffect(() => {
     getData();
@@ -160,6 +164,7 @@ export const Users = withUserAuthorizationPrompt([
           pageSize={pageSize}
           totalItems={totalItems}
           onTableChange={handleTableChange}
+          sorting={sorting}
           onSave={refreshCurrentPage}
         ></UsersTable>
       </EuiPageContentBody>

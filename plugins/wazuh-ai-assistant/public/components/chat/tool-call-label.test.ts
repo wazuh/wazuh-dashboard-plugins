@@ -70,7 +70,7 @@ describe('describeToolCall', () => {
   // Issue #9008 review, major 3: the OLD implementation truncated the whole composed string at a
   // fixed length, which cut a clamp badge mid-numeral ("requested 7…" for "requested 720d") once
   // the tool name was long enough. The fix truncates only the name segment; the window text is
-  // always appended afterward, in full — this fixture's full label is 51 characters, comfortably
+  // always appended afterward, in full — this fixture's full label is 50 characters, comfortably
   // past where the old 48-char cap would have bitten.
   it('never truncates the window text, even for a long tool name plus a clamp badge', () => {
     const provenance: Provenance = {
@@ -250,5 +250,88 @@ describe('describeProvenance', () => {
     expect(display.windowBadgeLabel).toBe('not-a-real-bound → now');
     // No absolute instant could be resolved for `gte` either, so no resolved range label.
     expect(display.resolvedRangeLabel).toBeUndefined();
+  });
+
+  // --- Issue #9008 review, finding 3: a DEGENERATE window must be visible -----------------------
+  // `formatDurationShort` used to run `Math.abs` over the span and floor its leftover case at
+  // `1d`, so a zero-length window and an INVERTED one both rendered as a believable "1d" badge
+  // while the popover showed "later – earlier" with nothing marking it as wrong.
+
+  it('renders a zero-length window as 0m, not as a plausible 1d', () => {
+    const instant = '2026-01-01T00:00:00.000Z';
+    const display = describeProvenance({
+      effectiveRange: { gte: instant, lte: instant },
+      clamped: false,
+    });
+    expect(display.windowBadgeLabel).toBe('0m');
+  });
+
+  it('does not dress an INVERTED window up as a duration', () => {
+    const display = describeProvenance({
+      effectiveRange: {
+        gte: '2026-01-08T00:00:00.000Z',
+        lte: '2026-01-01T00:00:00.000Z',
+      },
+      clamped: false,
+    });
+    // No fabricated span at all: the two literal bounds, in the order the record carries them, so
+    // the reader sees the inversion itself.
+    expect(display.windowBadgeLabel).toBe(
+      '2026-01-08T00:00:00.000Z → 2026-01-01T00:00:00.000Z',
+    );
+    expect(display.windowBadgeLabel).not.toBe('7d');
+    expect(display.windowBadgeLabel).not.toBe('1d');
+  });
+
+  // Issue #9008 review, F3: the minute bucket used to swallow every sub-minute span in one
+  // direction or the other -- a 20-second window rounded down into the same '0m' the exactly-zero
+  // case uses, and a 40-second window rounded UP to a '1m' it never covered.
+  it.each([
+    ['20 seconds (used to round down into the 0m sentinel)', '00:00:20.000'],
+    [
+      '40 seconds (used to round up to a minute it never covered)',
+      '00:00:40.000',
+    ],
+  ])('renders a sub-minute window as <1m: %s', (_label, lteTime) => {
+    const display = describeProvenance({
+      effectiveRange: {
+        gte: '2026-01-01T00:00:00.000Z',
+        lte: `2026-01-01T${lteTime}Z`,
+      },
+      clamped: false,
+    });
+    expect(display.windowBadgeLabel).toBe('<1m');
+  });
+
+  it('keeps 0m for an exactly zero-length window, distinct from <1m', () => {
+    const instant = '2026-01-01T00:00:00.000Z';
+    const display = describeProvenance({
+      effectiveRange: { gte: instant, lte: instant },
+      clamped: false,
+    });
+    expect(display.windowBadgeLabel).toBe('0m');
+    expect(display.windowBadgeLabel).not.toBe('<1m');
+  });
+
+  it('states a sub-day span in the unit it actually reaches, not rounded up to 1d', () => {
+    const display = describeProvenance({
+      effectiveRange: {
+        gte: '2026-01-01T00:00:00.000Z',
+        lte: '2026-01-01T01:30:00.000Z',
+      },
+      clamped: false,
+    });
+    expect(display.windowBadgeLabel).toBe('90m');
+  });
+
+  it('states an over-a-day span that no whole day divides in hours, not as 1d', () => {
+    const display = describeProvenance({
+      effectiveRange: {
+        gte: '2026-01-01T00:00:00.000Z',
+        lte: '2026-01-02T12:00:00.000Z',
+      },
+      clamped: false,
+    });
+    expect(display.windowBadgeLabel).toBe('36h');
   });
 });

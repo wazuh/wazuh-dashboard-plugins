@@ -607,6 +607,25 @@ describe('ResultTable', () => {
         expect(document.querySelector('.euiPopover__panel-isOpen')).toBeNull(),
       );
     });
+
+    // Issue #9008 review round 2, major 4: the original guard-less handler called
+    // `stopPropagation` unconditionally, so an Escape fired while the popover was ALREADY
+    // closed still swallowed the keystroke — meant for an enclosing surface (a docked
+    // sidecar/flyout) that never got to see it. The fix only acts (and only stops propagation)
+    // while `isOpen`; a closed chip must let the event bubble untouched.
+    it('does not swallow Escape when the popover is already closed', () => {
+      const ancestorHandler = jest.fn();
+      render(
+        <div onKeyDown={ancestorHandler}>
+          <ResultTable spec={spec()} provenanceChips={[chip()]} />
+        </div>,
+      );
+
+      const badge = screen.getByText('Critical findings · 90d');
+      fireEvent.keyDown(badge, { key: 'Escape' });
+
+      expect(ancestorHandler).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('severity badge rendering', () => {
@@ -882,10 +901,10 @@ describe('ResultTable', () => {
     });
 
     it('renders once the resolver resolves, when the spec has discover info', async () => {
-      // Issue #9008 (I5): `dsl: { query: {} }` carries no explicit time-range clause, so this is
-      // the range-less fallback case — the label discloses the substituted last-24h window
-      // rather than reading identically to a link that opened the answer's own resolved window
-      // (see the next test for that case).
+      // `dsl: { query: {} }` carries no explicit time-range clause and the spec records no
+      // provenance, so the executed query had no time filter at all: the link opens on all of
+      // history (never a substituted last-24h window, which would under-count the answer) and the
+      // label says so. See the next two tests for the bounded cases.
       render(
         <ResultTable
           spec={spec({
@@ -898,9 +917,32 @@ describe('ResultTable', () => {
       );
       expect(
         await screen.findByRole('link', {
-          name: 'Open in Discover (default range: 24h)',
+          name: 'Open in Discover (all time)',
         }),
       ).toHaveAttribute('href', 'https://example.test/discover');
+    });
+
+    it('keeps the plain label when the server recorded an effective range, even for a range-less dsl', async () => {
+      // A table restored from history can carry a `provenance.effectiveRange` the server recorded
+      // while the DSL it was read from is not what reaches the client. The recorded range is a
+      // real, bounded window, so this is NOT the unbounded case and must not be labelled as one.
+      render(
+        <ResultTable
+          spec={spec({
+            discover: { index: 'wazuh-alerts-*', dsl: { query: {} } },
+            provenance: {
+              clamped: false,
+              effectiveRange: { gte: 'now-90d', lte: 'now' },
+            },
+          })}
+          resolveDiscoverUrl={() =>
+            Promise.resolve('https://example.test/discover')
+          }
+        />,
+      );
+      expect(
+        await screen.findByRole('link', { name: 'Open in Discover' }),
+      ).toBeInTheDocument();
     });
 
     it('keeps the plain label when the query carries its own explicit time range', async () => {
@@ -992,6 +1034,242 @@ describe('ResultTable', () => {
       render(<ResultTable spec={spec()} />);
       expect(screen.getByText('Results (1 row)')).toBeInTheDocument();
     });
+
+    it('discloses row-only fields that never had a column to be demoted from', () => {
+      // The inconsistency this closes: the note used to count only spec columns past the visible
+      // budget, so a table whose extra fields come from the tool's `tableSpec.rowFields`
+      // (server/tools/digest.ts writes those into every row WITHOUT a matching column) advertised
+      // nothing, while a table with more than 6 spec columns advertised "+N more fields" — the
+      // same expander carrying extra content in both cases.
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'agent', label: 'Agent' }],
+            rows: [{ agent: 'web-01', 'data.srcip': '10.0.0.1', rule: 'x' }],
+          })}
+        />,
+      );
+      expect(
+        screen.getByText(
+          'Results (1 row) (+2 more fields per row. Expand a row to see them.)',
+        ),
+      ).toBeInTheDocument();
+    });
+
+    it('counts each extra field once per row, not once per occurrence across rows', () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'agent', label: 'Agent' }],
+            rows: [
+              { agent: 'web-01', 'data.srcip': '10.0.0.1' },
+              { agent: 'web-02', 'data.srcip': '10.0.0.2' },
+              { agent: 'web-03' },
+            ],
+          })}
+        />,
+      );
+      expect(
+        screen.getByText(
+          'Results (3 rows) (+1 more field per row. Expand a row to see them.)',
+        ),
+      ).toBeInTheDocument();
+    });
+
+    it('promises no more extra fields than the richest single row actually has', () => {
+      // `rowFields` are written sparsely (digest.ts skips an absent one), so different rows carry
+      // different extras. The label says "per row", so it must report the MAXIMUM any one expander
+      // will show -- not the union across rows, which here would over-promise 3.
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'agent', label: 'Agent' }],
+            rows: [
+              { agent: 'web-01', 'data.srcip': '10.0.0.1' },
+              { agent: 'web-02', 'data.dstport': 443, 'rule.id': '5710' },
+            ],
+          })}
+        />,
+      );
+      expect(
+        screen.getByText(
+          'Results (2 rows) (+2 more fields per row. Expand a row to see them.)',
+        ),
+      ).toBeInTheDocument();
+    });
+  });
+
+  describe('empty columns are dropped and a populated field promoted', () => {
+    /** Seven columns: `description` is empty for every row, so it must lose its `<th>` — which
+     * frees the visible-column budget's 6th slot for `score`, the populated column that would
+     * otherwise have been demoted past it. */
+    function specWithEmptyColumn(): TableSpec {
+      return {
+        columns: [
+          { id: 'c1', label: 'One' },
+          { id: 'c2', label: 'Two' },
+          { id: 'description', label: 'Description' },
+          { id: 'c3', label: 'Three' },
+          { id: 'c4', label: 'Four' },
+          { id: 'c5', label: 'Five' },
+          { id: 'score', label: 'Score' },
+        ],
+        rows: [
+          {
+            c1: 'v1',
+            c2: 'v2',
+            description: '',
+            c3: 'v3',
+            c4: 'v4',
+            c5: 'v5',
+            score: 7.5,
+          },
+        ],
+      };
+    }
+
+    const headerTexts = () =>
+      screen
+        .getAllByRole('columnheader')
+        .map(header => header.textContent ?? '');
+
+    it('drops a column that is empty for every row of the result', () => {
+      render(<ResultTable spec={specWithEmptyColumn()} />);
+      expect(headerTexts()).not.toContain('Description');
+    });
+
+    it('promotes the populated column that the empty one was crowding out', () => {
+      render(<ResultTable spec={specWithEmptyColumn()} />);
+      expect(headerTexts()).toContain('Score');
+      expect(screen.getByText('7.5')).toBeInTheDocument();
+    });
+
+    it('keeps a column whose values are falsy but present (0 / false)', () => {
+      // `isAbsentValue` is undefined/null/'' only: a genuine zero count is data, not absence, and
+      // dropping its column would hide the very answer the reader asked for.
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'agent', label: 'Agent' },
+              { id: 'count', label: 'Count' },
+              { id: 'enabled', label: 'Enabled' },
+            ],
+            rows: [{ agent: 'web-01', count: 0, enabled: false }],
+          })}
+        />,
+      );
+      expect(headerTexts()).toContain('Count');
+      expect(headerTexts()).toContain('Enabled');
+    });
+
+    it('keeps every column when the result is empty (nothing to judge emptiness from)', () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'agent', label: 'Agent' },
+              { id: 'description', label: 'Description' },
+            ],
+            rows: [],
+          })}
+        />,
+      );
+      // A zero-row result renders no table body, but the columns it WOULD show must not be
+      // silently pruned on the strength of a vacuous "every row is empty".
+      expect(screen.getByText('Results (0 rows)')).toBeInTheDocument();
+    });
+
+    it('keeps every column when all of them are empty, rather than rendering a column-less table', () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'a', label: 'Alpha' },
+              { id: 'b', label: 'Beta' },
+            ],
+            rows: [{ a: null, b: '' }],
+          })}
+        />,
+      );
+      expect(headerTexts()).toContain('Alpha');
+      expect(headerTexts()).toContain('Beta');
+    });
+
+    it('leaves a dropped column reachable in the row expander', () => {
+      render(<ResultTable spec={specWithEmptyColumn()} />);
+      fireEvent.click(screen.getByRole('button', { name: 'Expand row' }));
+      expect(screen.getByText(/"description": ""/)).toBeInTheDocument();
+    });
+
+    it('keeps an UNDEFINED-valued dropped column visible in the expander, as null', () => {
+      // `buildTableSpec` writes `undefined` for a field the document lacks, and plain
+      // `JSON.stringify` OMITS such keys -- so dropping the column would have removed the field
+      // from the header and the expander both, leaving no way to tell "empty" from "never asked
+      // for". The serializer emits `null` instead.
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'agent', label: 'Agent' },
+              { id: 'description', label: 'Description' },
+            ],
+            rows: [{ agent: 'web-01', description: undefined }],
+          })}
+        />,
+      );
+      expect(
+        screen.getAllByRole('columnheader').map(h => h.textContent ?? ''),
+      ).not.toContain('Description');
+      fireEvent.click(screen.getByRole('button', { name: 'Expand row' }));
+      expect(screen.getByText(/"description": null/)).toBeInTheDocument();
+    });
+
+    it('drops a column whose every value is an empty array or an empty object', () => {
+      // Neither is "absent", so both survived an absence-only check: `[]` drew a column of blank
+      // cells and `{}` a column of the visible-but-useless literal "{}".
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'agent', label: 'Agent' },
+              { id: 'tags', label: 'Tags' },
+              { id: 'meta', label: 'Meta' },
+            ],
+            rows: [
+              { agent: 'web-01', tags: [], meta: {} },
+              { agent: 'web-02', tags: [], meta: {} },
+            ],
+          })}
+        />,
+      );
+      const headers = screen
+        .getAllByRole('columnheader')
+        .map(h => h.textContent ?? '');
+      expect(headers).toContain('Agent');
+      expect(headers).not.toContain('Tags');
+      expect(headers).not.toContain('Meta');
+    });
+
+    it('keeps a column whose arrays are non-empty on at least one row', () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'agent', label: 'Agent' },
+              { id: 'tags', label: 'Tags' },
+            ],
+            rows: [
+              { agent: 'web-01', tags: [] },
+              { agent: 'web-02', tags: ['pci'] },
+            ],
+          })}
+        />,
+      );
+      expect(
+        screen.getAllByRole('columnheader').map(h => h.textContent ?? ''),
+      ).toContain('Tags');
+    });
   });
 
   describe('column widths (css-audit-full.md §3.4: the free-text column gets the room)', () => {
@@ -1073,6 +1351,9 @@ describe('ResultTable', () => {
     });
 
     it('renders an absent severity value as "—", not an empty badge', () => {
+      // Two rows, only the second missing its severity: a column absent in EVERY row is dropped
+      // outright now (see "empty columns are dropped" above), and this test is about how an absent
+      // VALUE renders inside a column that does exist.
       render(
         <ResultTable
           spec={spec({
@@ -1080,13 +1361,18 @@ describe('ResultTable', () => {
               { id: 'agent', label: 'Agent' },
               { id: 'severity', label: 'Severity' },
             ],
-            rows: [{ agent: 'a', severity: undefined }],
+            rows: [
+              { agent: 'a', severity: 'critical' },
+              { agent: 'b', severity: undefined },
+            ],
             severityColumn: 'severity',
           })}
         />,
       );
       expect(screen.getByText('—')).toBeInTheDocument();
-      expect(document.querySelector('.euiBadge')).toBeNull();
+      // The absent cell renders the placeholder, not a badge — the populated row above it still
+      // gets its own badge, so this counts badges rather than asserting there are none.
+      expect(document.querySelectorAll('.euiBadge')).toHaveLength(1);
     });
 
     it('renders an absent value in an otherwise-timestamp column as "—"', () => {

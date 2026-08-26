@@ -190,28 +190,48 @@ describe('ProviderFormFlyout — unsaved changes confirmation', () => {
     dirtyTheForm();
     fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
 
-    expect(screen.getByText(/unsubmitted changes/i)).toBeInTheDocument();
+    expect(screen.getByText(/discard this provider\?/i)).toBeInTheDocument();
     expect(baseProps.onClose).not.toHaveBeenCalled();
   });
 
-  it('discards the changes and closes on an explicit "Yes, do it"', () => {
+  it('names both actions instead of asking a yes/no question', () => {
+    // "Yes, do it" / "No, don't do it" under a title of "Unsubmitted changes" left the admin to
+    // work out what "it" was, and made the destructive choice the affirmative one.
     render(<ProviderFormFlyout {...baseProps} />);
 
     dirtyTheForm();
     fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
-    fireEvent.click(screen.getByRole('button', { name: /yes, do it/i }));
+
+    expect(
+      screen.getByRole('button', { name: /discard changes/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /keep editing/i }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/yes, do it/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/unsubmitted changes/i)).not.toBeInTheDocument();
+  });
+
+  it('discards the changes and closes on "Discard changes"', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    dirtyTheForm();
+    fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
+    fireEvent.click(screen.getByRole('button', { name: /discard changes/i }));
 
     expect(baseProps.onClose).toHaveBeenCalled();
   });
 
-  it('keeps the flyout and the typed values on "No, don\'t do it"', () => {
+  it('keeps the flyout and the typed values on "Keep editing"', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
     dirtyTheForm();
     fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
-    fireEvent.click(screen.getByRole('button', { name: /no, don't do it/i }));
+    fireEvent.click(screen.getByRole('button', { name: /keep editing/i }));
 
-    expect(screen.queryByText(/unsubmitted changes/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/discard this provider\?/i),
+    ).not.toBeInTheDocument();
     expect(baseProps.onClose).not.toHaveBeenCalled();
     expect(screen.getByLabelText(/^name/i)).toHaveValue('Draft name');
   });
@@ -226,7 +246,9 @@ describe('ProviderFormFlyout — unsaved changes confirmation', () => {
     fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
 
     expect(baseProps.onClose).toHaveBeenCalled();
-    expect(screen.queryByText(/unsubmitted changes/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/discard this provider\?/i),
+    ).not.toBeInTheDocument();
   });
 
   it('guards the flyout close button (X) too, in edit mode', () => {
@@ -247,7 +269,7 @@ describe('ProviderFormFlyout — unsaved changes confirmation', () => {
       ) as Element,
     );
 
-    expect(screen.getByText(/unsubmitted changes/i)).toBeInTheDocument();
+    expect(screen.getByText(/discard this provider\?/i)).toBeInTheDocument();
     expect(baseProps.onClose).not.toHaveBeenCalled();
   });
 });
@@ -626,7 +648,9 @@ describe('ProviderFormFlyout — getting-started onboarding', () => {
       ),
     ).toEqual([
       'Pick a provider type.',
-      'Paste its API key.',
+      // The parenthetical is the difference between the two provider types this form offers: a
+      // local OpenAI-compatible runtime has no key to paste at all.
+      'Paste its API key (if the endpoint needs one).',
       'Pick a model.',
       'Test the connection.',
     ]);
@@ -1426,5 +1450,440 @@ describe('ProviderFormFlyout — duplicate provider names', () => {
     expect(
       screen.getByText('A provider named "Claude staging" already exists.'),
     ).toBeInTheDocument();
+  });
+});
+
+/** The combo box's search input: the Model field's real focus target, and the element that carries
+ * the field's `aria-required`. Reached through the combo box's own `data-test-subj` because
+ * `EuiFormRow`'s label association resolves to the combo box, not to this input. */
+function modelSearchInput(): HTMLInputElement {
+  const input = document.querySelector(
+    '[data-test-subj="wzProviderModelCombo"] input',
+  );
+  if (!input) {
+    throw new Error('model combo box search input not found');
+  }
+  return input as HTMLInputElement;
+}
+
+/**
+ * UX wave 2, PR A: every required field is validated on Save & test, not just the endpoint URL.
+ * Before this, an empty Name or Model produced a server round-trip and a generic red callout at the
+ * top of the flyout, leaving the admin to work out which field the 400 was about.
+ */
+describe('ProviderFormFlyout — required-field validation', () => {
+  it('shows an inline error under EVERY empty required field on one click', async () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+
+    expect(
+      await screen.findByText(/enter a name for this provider/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/enter the endpoint url for this provider/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /pick a suggestion, or type a model id and press enter\./i,
+      ),
+    ).toBeInTheDocument();
+    expect(baseProps.onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("moves focus to the first invalid field, in the form's own order", () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    // Nothing filled in: Name is the topmost problem.
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+    expect(document.activeElement).toBe(screen.getByLabelText(/^name/i));
+
+    // Name fixed, endpoint still wrong: focus moves down to the endpoint.
+    fireEvent.change(screen.getByLabelText(/^name/i), {
+      target: { value: 'Gemini lab' },
+    });
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'not-a-url' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+    expect(document.activeElement).toBe(screen.getByLabelText(/endpoint url/i));
+
+    // Only the model left: focus lands on the combo box's search input.
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://api.openai.com/v1' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+    expect(document.activeElement).toBe(modelSearchInput());
+    expect(baseProps.onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('validates the same way when EDITING an existing provider', async () => {
+    // The edit flow reaches submit with values already in the fields, so emptying them is the only
+    // way to reach the required-field checks there — and it is a real path: an admin clearing a
+    // field to retype it and clicking Save & test too early.
+    render(
+      <ProviderFormFlyout {...baseProps} editingProvider={editingProvider} />,
+    );
+
+    fireEvent.change(screen.getByLabelText(/^name/i), {
+      target: { value: '  ' },
+    });
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: '' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+
+    expect(
+      await screen.findByText(/enter a name for this provider/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/enter the endpoint url for this provider/i),
+    ).toBeInTheDocument();
+    expect(document.activeElement).toBe(screen.getByLabelText(/^name/i));
+    expect(baseProps.onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('marks the model combo box as required for assistive technology', () => {
+    // The red asterisk on the label is `aria-hidden` decoration, so without this the one required
+    // field that is not a plain input was never announced as required.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    expect(modelSearchInput()).toHaveAttribute('aria-required', 'true');
+  });
+
+  it('puts the model error on the input submit moves focus to', async () => {
+    // EuiFormRow clones its a11y props onto the combo box WRAPPER and EuiComboBox does not forward
+    // them to the search input, so without wiring these by hand the field that just received focus
+    // would announce nothing about why it was rejected.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    // Pin the assumption the restore path rests on: EUI describes this input with nothing of its
+    // own, so the error id below is the only value the attribute ever carries — and if a future EUI
+    // starts adding one, this is the case that says so.
+    expect(modelSearchInput()).not.toHaveAttribute('aria-describedby');
+
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+    await screen.findByText(/enter a name for this provider/i);
+
+    const input = modelSearchInput();
+    expect(input).toHaveAttribute('aria-invalid', 'true');
+    const describedBy = input.getAttribute('aria-describedby');
+    expect(describedBy).toBeTruthy();
+    expect(document.getElementById(describedBy as string)?.textContent).toMatch(
+      /pick a suggestion, or type a model id and press enter\./i,
+    );
+
+    // And they come off again once the field is satisfied.
+    fireEvent.change(input, { target: { value: 'gpt-4o' } });
+    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
+    expect(modelSearchInput()).not.toHaveAttribute('aria-invalid');
+    expect(modelSearchInput()).not.toHaveAttribute('aria-describedby');
+  });
+
+  it('blocks Save while the model combo box holds uncommitted search text', async () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/^name/i), {
+      target: { value: 'Gemini lab' },
+    });
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://api.openai.com/v1' },
+    });
+    // Typed, never committed with Enter — the field LOOKS filled in on screen.
+    fireEvent.change(modelSearchInput(), { target: { value: 'gpt-4o' } });
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+
+    expect(
+      await screen.findByText(/press enter to use "gpt-4o" as the model/i),
+    ).toBeInTheDocument();
+    expect(baseProps.onSubmit).not.toHaveBeenCalled();
+
+    // Committing it clears the error and lets the same click through.
+    fireEvent.keyDown(modelSearchInput(), { key: 'Enter', code: 'Enter' });
+    expect(
+      screen.queryByText(/press enter to use "gpt-4o" as the model/i),
+    ).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+    await waitFor(() =>
+      expect(baseProps.onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({ model: 'gpt-4o' }),
+      ),
+    );
+  });
+
+  it('offers an explicit custom-option row for text that matches no suggestion', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.focus(modelSearchInput());
+    fireEvent.change(modelSearchInput(), {
+      target: { value: 'my-private-model' },
+    });
+
+    // EUI splits `customOptionText` around the {searchValue} token, so read the row's full text.
+    const customOptionRow = screen.getByText(/as a custom model/i);
+    expect(customOptionRow.textContent).toContain('my-private-model');
+  });
+
+  it("tells the admin what to do with typed text in the field's own placeholder", () => {
+    // EuiComboBox paints its placeholder as its own element rather than as the search input's
+    // `placeholder` attribute, so this reads it where EUI actually renders it.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    // Class prefix matched loosely: the platform ships OUI's fork of EUI, whose class names carry
+    // the `oui` prefix.
+    expect(
+      document.querySelector('[class*="ComboBoxPlaceholder"]')?.textContent,
+    ).toBe('Pick a suggestion, or type a model id and press Enter');
+  });
+});
+
+/**
+ * UX wave 2, PR A: the endpoint URL is validated on blur as well as on submit, its error survives
+ * the first keystroke, and a scheme glued onto a value the admin typed over is caught — which is
+ * the whole protection for typing on top of a prefilled endpoint, since select-on-focus was
+ * measured inert in Chromium and removed (see `hasGluedSecondScheme` in the component).
+ */
+describe('ProviderFormFlyout — endpoint URL validation', () => {
+  it('validates on blur, not only on submit', async () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    const field = screen.getByLabelText(/endpoint url/i);
+    fireEvent.change(field, { target: { value: 'api.openai.com' } });
+    fireEvent.blur(field);
+
+    expect(
+      await screen.findByText(/valid URL starting with http/i),
+    ).toBeInTheDocument();
+  });
+
+  it('leaves an untouched empty field unmarked on blur', () => {
+    // Required-ness is submit's business; nagging on a tab-through is not.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.blur(screen.getByLabelText(/endpoint url/i));
+
+    expect(screen.queryByText(/valid URL starting with http/i)).toBeNull();
+    expect(
+      screen.queryByText(/enter the endpoint url for this provider/i),
+    ).toBeNull();
+  });
+
+  it('keeps the error visible while the value is still invalid', async () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    const field = screen.getByLabelText(/endpoint url/i);
+    fireEvent.change(field, { target: { value: 'not-a-url' } });
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+    expect(
+      await screen.findByText(/valid URL starting with http/i),
+    ).toBeInTheDocument();
+
+    // One keystroke used to clear the error, which reads as "fixed" while nothing was fixed.
+    fireEvent.change(field, { target: { value: 'not-a-urlh' } });
+    expect(
+      screen.getByText(/valid URL starting with http/i),
+    ).toBeInTheDocument();
+
+    // It clears only once the value is actually valid.
+    fireEvent.change(field, { target: { value: 'https://api.openai.com/v1' } });
+    expect(screen.queryByText(/valid URL starting with http/i)).toBeNull();
+  });
+
+  it('catches a repeated scheme, which the plain URL check accepts', async () => {
+    // What typing on top of the type-prefilled default produces.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    const field = screen.getByLabelText(/endpoint url/i);
+    fireEvent.change(field, {
+      target: { value: 'https://api.anthropic.comhttps://my-gateway/v1' },
+    });
+    fireEvent.blur(field);
+
+    expect(
+      await screen.findByText(
+        /contains http:\/\/ or https:\/\/ more than once/i,
+      ),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+    expect(baseProps.onSubmit).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    // The two prefill shapes an admin types on top of. Anthropic's default is bare, so the pasted
+    // scheme lands in the authority; every openai_compatible example ends in a path like `/v1`, so
+    // it lands in the PATH — which an authority-only check would miss.
+    ['https://api.anthropic.comhttps://my-gateway/v1'],
+    ['https://api.openai.com/v1https://my-gateway/v1'],
+    // Pasted in FRONT of the existing value.
+    ['https://https://my-gateway/v1'],
+  ])('flags a scheme glued onto the value: %s', async value => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    const field = screen.getByLabelText(/endpoint url/i);
+    fireEvent.change(field, { target: { value } });
+    fireEvent.blur(field);
+
+    expect(
+      await screen.findByText(
+        /contains http:\/\/ or https:\/\/ more than once/i,
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it.each([
+    // Delimiter in front of the second scheme: the admin put it there on purpose, and the server's
+    // own url-guard accepts these.
+    ['https://gw.internal/proxy?upstream=https://api.openai.com'],
+    ['https://gw.internal/proxy/https://api.openai.com'],
+    ['https://gw.internal/p?a=1&upstream=https://api.openai.com'],
+  ])('leaves a deliberately passed-through upstream alone: %s', value => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    const field = screen.getByLabelText(/endpoint url/i);
+    fireEvent.change(field, { target: { value } });
+    fireEvent.blur(field);
+
+    expect(
+      screen.queryByText(/contains http:\/\/ or https:\/\/ more than once/i),
+    ).toBeNull();
+  });
+
+  it('reports junk in front of the scheme as a bad URL, not a repetition', async () => {
+    // Ordering check: `xhttps://gw` is not a URL at all, and the doubled-scheme message would send
+    // the admin hunting for a repetition instead of at the junk.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    const field = screen.getByLabelText(/endpoint url/i);
+    fireEvent.change(field, { target: { value: 'xhttps://my-gateway/v1' } });
+    fireEvent.blur(field);
+
+    expect(
+      await screen.findByText(/valid URL starting with http/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/contains http:\/\/ or https:\/\/ more than once/i),
+    ).toBeNull();
+  });
+
+  it('accepts a gateway URL that legitimately carries a scheme in its query', async () => {
+    // A passthrough/gateway endpoint names its upstream in its own path or query, and the server's
+    // url-guard accepts exactly that. A "second scheme anywhere" rule would refuse such a provider
+    // outright — and, since every save runs this check, would also make an already-stored one
+    // impossible to re-save.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/^name/i), {
+      target: { value: 'Corp gateway' },
+    });
+    const field = screen.getByLabelText(/endpoint url/i);
+    fireEvent.change(field, {
+      target: {
+        value: 'https://gw.internal/proxy?upstream=https://api.openai.com',
+      },
+    });
+    fireEvent.blur(field);
+    expect(
+      screen.queryByText(/contains http:\/\/ or https:\/\/ more than once/i),
+    ).toBeNull();
+
+    fireEvent.change(modelSearchInput(), { target: { value: 'gpt-4o' } });
+    fireEvent.keyDown(modelSearchInput(), { key: 'Enter', code: 'Enter' });
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+
+    await waitFor(() =>
+      expect(baseProps.onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          baseUrl: 'https://gw.internal/proxy?upstream=https://api.openai.com',
+        }),
+      ),
+    );
+  });
+
+  it('keeps a submit-raised required error through a click into the empty field', async () => {
+    // Blur must not erase what submit reported: the ternary this replaced hit its null arm for any
+    // empty value, so tabbing through the field cleared the very error that stopped the save.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+    const error = await screen.findByText(
+      /enter the endpoint url for this provider/i,
+    );
+
+    const field = screen.getByLabelText(/endpoint url/i);
+    fireEvent.focus(field);
+    fireEvent.blur(field);
+
+    expect(error).toBeInTheDocument();
+  });
+
+  it('clears a stale endpoint error when a type switch rewrites the value', async () => {
+    // The error belongs to the value that produced it. A type switch only rewrites a field the
+    // admin has not typed into (empty here, after a submit raised the required error), and
+    // switching to Anthropic prefills its one real endpoint — leaving the old error on that marked
+    // a perfectly good field as invalid while Save would then have found nothing wrong.
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+    expect(
+      await screen.findByText(/enter the endpoint url for this provider/i),
+    ).toBeInTheDocument();
+
+    fireEvent.click(providerTypeOption('anthropic'));
+
+    expect(screen.getByLabelText(/endpoint url/i)).toHaveValue(
+      'https://api.anthropic.com',
+    );
+    expect(
+      screen.queryByText(/enter the endpoint url for this provider/i),
+    ).toBeNull();
+  });
+
+  it('leaves the error alone when a type switch does NOT rewrite the value', async () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    // Typing marks the field as the admin's, so a type switch must not touch it.
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'not-a-url' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+    await screen.findByText(/valid URL starting with http/i);
+
+    fireEvent.click(providerTypeOption('anthropic'));
+
+    expect(screen.getByLabelText(/endpoint url/i)).toHaveValue('not-a-url');
+    expect(
+      screen.getByText(/valid URL starting with http/i),
+    ).toBeInTheDocument();
+  });
+});
+
+describe('ProviderFormFlyout — endpoint blocked by policy', () => {
+  it('titles an SSRF/URL-policy rejection for what it is', () => {
+    // The server's own reason sentence is precise and permanent; "Something went wrong" made it
+    // read as a transient glitch worth retrying.
+    render(
+      <ProviderFormFlyout
+        {...baseProps}
+        error='Provider request rejected: this host is a blocked cloud-metadata endpoint.'
+      />,
+    );
+
+    expect(screen.getByText('Endpoint blocked')).toBeInTheDocument();
+    expect(
+      screen.getByText(/blocked cloud-metadata endpoint/i),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Something went wrong')).toBeNull();
+  });
+
+  it('keeps the generic title for any other save failure', () => {
+    render(
+      <ProviderFormFlyout
+        {...baseProps}
+        error='Could not save the provider.'
+      />,
+    );
+
+    expect(screen.getByText('Something went wrong')).toBeInTheDocument();
+    expect(screen.queryByText('Endpoint blocked')).toBeNull();
   });
 });
