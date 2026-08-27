@@ -23,6 +23,7 @@ import { isEncrypted } from '../crypto/api-key-cipher';
 import { resolveApiHostId } from '../tools/api-host';
 import {
   isPermissionDeniedError,
+  redactSensitiveDetail,
   paginationQuerySchema,
   resolvePagination,
   withInternalErrorHandling,
@@ -782,7 +783,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
         // instead of a bare 500.
         return response.customError({
           statusCode: 503,
-          body: { message: describeError(error) },
+          body: { message: redactSensitiveDetail(describeError(error)) },
         });
       }
     }, logger),

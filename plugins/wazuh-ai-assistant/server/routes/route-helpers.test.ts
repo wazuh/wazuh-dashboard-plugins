@@ -3,6 +3,7 @@ import {
   isPermissionDeniedError,
   PERMISSION_DENIED_MESSAGE,
   withInternalErrorHandling,
+  redactSensitiveDetail,
   RouteHandler,
 } from './route-helpers';
 
@@ -157,6 +158,75 @@ test('logger.error is called exactly once on the 500 branch, carrying the full d
   assert.equal(errors.length, 1);
   const serialized = JSON.stringify(errors[0]);
   assert.match(serialized, /boom/);
+});
+
+test('a non-403 security_exception (500 path) is redacted: no username/roles/action name in the body', async () => {
+  const error = rbacDeniedError() as Error & { statusCode: number };
+  error.statusCode = 500;
+  const { calls } = await runWrapped(error);
+
+  assert.equal(calls[0].statusCode, 500);
+  const serialized = JSON.stringify(calls[0]);
+  assert.doesNotMatch(serialized, /qauser/);
+  assert.doesNotMatch(serialized, /readall/);
+  assert.doesNotMatch(serialized, /kibana_user/);
+  assert.doesNotMatch(serialized, /backend_roles/);
+  assert.doesNotMatch(
+    serialized,
+    /cluster:admin\/ai_assistant\/settings\/read/,
+  );
+});
+
+test('logger.error still receives the FULL unredacted message on the 500 branch', async () => {
+  const error = rbacDeniedError() as Error & { statusCode: number };
+  error.statusCode = 500;
+  const { errors } = await runWrapped(error);
+
+  assert.equal(errors.length, 1);
+  const serialized = JSON.stringify(errors[0]);
+  assert.match(serialized, /qauser/);
+  assert.match(serialized, /readall/);
+  assert.match(serialized, /cluster:admin\/ai_assistant\/settings\/read/);
+});
+
+test('redactSensitiveDetail strips a nested-bracket User[...] identity block, including backend_roles', () => {
+  const message =
+    'no permissions for [cluster:admin/ai_assistant/settings/read] and User [name=qa9057, backend_roles=[readall, kibanauser], requestedTenant=null]';
+  const redacted = redactSensitiveDetail(message);
+
+  assert.doesNotMatch(redacted, /qa9057/);
+  assert.doesNotMatch(redacted, /readall/);
+  assert.doesNotMatch(redacted, /kibanauser/);
+  assert.doesNotMatch(redacted, /backend_roles/);
+  assert.match(redacted, /User \[redacted\]/);
+});
+
+test('redactSensitiveDetail replaces internal action names with [action]', () => {
+  const redacted = redactSensitiveDetail(
+    'no permissions for [cluster:admin/ai_assistant/settings/read]',
+  );
+  assert.doesNotMatch(redacted, /cluster:admin\/ai_assistant\/settings\/read/);
+  assert.match(redacted, /\[action\]/);
+});
+
+test('redactSensitiveDetail leaves an ordinary operational message unchanged', () => {
+  const message = 'Policy not found: wazuh-ai-assistant-sessions-policy';
+  assert.equal(redactSensitiveDetail(message), message);
+});
+
+test('redactSensitiveDetail: no match, empty string, and multiple occurrences', () => {
+  assert.equal(redactSensitiveDetail(''), '');
+  assert.equal(
+    redactSensitiveDetail('nothing sensitive here'),
+    'nothing sensitive here',
+  );
+
+  const twoActions =
+    'failed on [cluster:admin/ai_assistant/settings/read] then [indices:data/write/index]';
+  const redacted = redactSensitiveDetail(twoActions);
+  assert.doesNotMatch(redacted, /cluster:admin/);
+  assert.doesNotMatch(redacted, /indices:data\/write\/index/);
+  assert.equal((redacted.match(/\[action\]/g) || []).length, 2);
 });
 
 test('isPermissionDeniedError: only a strict statusCode===403 (top-level or meta) is true', () => {

@@ -25,6 +25,24 @@ export function isPermissionDeniedError(error: unknown): boolean {
   return (e?.statusCode ?? e?.meta?.statusCode) === 403;
 }
 
+/** Best-effort redaction for the non-403 (500/503) client-facing error paths (issue #9057 residual):
+ * the 403 branch already returns a fixed constant, but every other branch still forwards
+ * `describeError(error)` verbatim, and no exhaustive audit proves none of those carry an OpenSearch
+ * security identity block or internal action name. This is NOT an allowlist — an allowlist would
+ * blind operators to real operational detail (e.g. the ISM "policy not found" 503 message below,
+ * which must stay readable). It strips two known sensitive patterns and leaves the rest intact:
+ *  1. `User [name=..., backend_roles=[..., ...], requestedTenant=...]` → `User [redacted]`. The
+ *     regex matches ONE level of nested brackets (`backend_roles=[...]`) so it doesn't stop at the
+ *     first `]` and leave the roles/tenant exposed.
+ *  2. `cluster:.../...` / `indices:.../...` internal action names → `[action]`.
+ * The logger always receives the full, unredacted message — only the client-facing body is
+ * scrubbed here. */
+export function redactSensitiveDetail(message: string): string {
+  return message
+    .replace(/User \[(?:[^[\]]|\[[^\]]*\])*\]/g, 'User [redacted]')
+    .replace(/(?:cluster|indices):[^\s\]]+/g, '[action]');
+}
+
 /** Route handler shape accepted by `IRouter`'s `get`/`post`/`put`/`delete` methods (params/query/
  * body left generic so `withInternalErrorHandling` below can wrap a handler for any of the
  * `validate` schemas used in server/routes/settings.ts and server/routes/conversations.ts). */
@@ -70,7 +88,7 @@ export function withInternalErrorHandling<Params, Query, Body>(
       }
       return response.customError({
         statusCode: 500,
-        body: { message: describeError(error) },
+        body: { message: redactSensitiveDetail(describeError(error)) },
       });
     }
   };
