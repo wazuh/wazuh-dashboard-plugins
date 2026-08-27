@@ -43,7 +43,7 @@ export class WazuhAiAssistantPlugin
       // instead of the top-level `AI` one issue #8895 had given it.
       order: 2,
       // Joins the main `wazuh` plugin's existing `Home` category rather than a dedicated top-level
-      // one (CEO direction supersedes issue #8895: "Meter el AI assistant mejor en la home, no
+      // one (product direction supersedes issue #8895: "Meter el AI assistant mejor en la home, no
       // pongáis una sección AI solo para esto" — put the assistant into Home instead of carving out
       // an AI-only section for it). See common/nav-categories.ts's doc comment for the full
       // rationale and for why this category is duplicated here rather than imported cross-plugin.

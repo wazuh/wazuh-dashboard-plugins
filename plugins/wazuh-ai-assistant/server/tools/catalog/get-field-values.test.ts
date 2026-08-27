@@ -171,7 +171,7 @@ test(
 );
 
 test(
-  'get_field_values: CEO scenario end to end -- "findings for linux" pivots through ' +
+  'get_field_values: flagship scenario end to end -- "findings for linux" pivots through ' +
     'host.os.platform on the findings surface to the populated wazuh.agent.host.os.platform twin',
   async () => {
     // Step 1/2 of the scenario: the model asks for host.os.platform ON FINDINGS (previously
@@ -215,7 +215,7 @@ test(
     assert.match(resolved.note ?? '', /"host\.os\.platform"/);
 
     // The pivot target itself must now be reachable -- previously blocked by both
-    // AGG_FIELD_ALLOWLIST and FIELD_LOCATIONS (the CEO scenario's actual dead end).
+    // AGG_FIELD_ALLOWLIST and FIELD_LOCATIONS (the flagship scenario's actual dead end).
     const onTwin = build({
       field: 'wazuh.agent.host.os.platform',
       index_family: 'findings',

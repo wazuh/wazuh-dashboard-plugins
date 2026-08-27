@@ -412,7 +412,7 @@ describe('ResultTable', () => {
     });
 
     it('renders no pagination footer for an empty result set', () => {
-      // Kept, with its premise narrowed: as of C4 (CEO item 6) the CHAT SURFACE never hands this
+      // Kept, with its premise narrowed: as of C4 the CHAT SURFACE never hands this
       // component a 0-row spec — message-bubble.tsx suppresses the whole card for one and shows a
       // quiet line instead (covered in message-bubble.test.tsx). This component is still the generic
       // spec renderer, though, so what it does when a call site hands it one directly stays pinned:

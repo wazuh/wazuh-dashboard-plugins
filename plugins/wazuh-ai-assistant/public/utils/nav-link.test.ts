@@ -6,12 +6,13 @@ import {
 } from '../../common/nav-categories';
 
 /**
- * Guards the navigation placement decided by CEO direction, which supersedes issue #8895: "Meter
- * el AI assistant mejor en la home, no pongáis una sección AI solo para esto" — the assistant must
- * NOT sit in a dedicated AI-only section, classic or new navigation. It previously had its own
- * top-level `AI` category (and matching new-navigation nav-group category); both are gone. These
- * assertions exist so an edit that reintroduces a dedicated AI category, or drifts the shared
- * category id away from the main plugin's `Home` category, fails loudly here.
+ * Guards the navigation placement decided by product direction, which supersedes issue #8895:
+ * "Meter el AI assistant mejor en la home, no pongáis una sección AI solo para esto" — the
+ * assistant must NOT sit in a dedicated AI-only section, classic or new navigation. It
+ * previously had its own top-level `AI` category (and matching new-navigation nav-group
+ * category); both are gone. These assertions exist so an edit that reintroduces a dedicated
+ * AI category, or drifts the shared category id away from the main plugin's `Home` category,
+ * fails loudly here.
  */
 
 test('the classic-navigation category is the shared Home id, not a dedicated AI one', () => {
@@ -25,7 +26,7 @@ test('the classic-navigation category is the shared Home id, not a dedicated AI 
   assert.notEqual(
     WAZUH_HOME_CATEGORY_ID,
     'wazuh-ai',
-    'must not resurrect the dedicated AI-only category CEO direction removed',
+    'must not resurrect the dedicated AI-only category product direction removed',
   );
 });
 

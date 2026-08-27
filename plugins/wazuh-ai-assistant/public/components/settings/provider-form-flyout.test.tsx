@@ -72,8 +72,8 @@ describe('ProviderFormFlyout — create mode', () => {
   it('states the key requirement for the SELECTED provider type, not one line for both', () => {
     // One shared line used to serve both types, so an admin adding a Claude provider was told the
     // key was "optional for endpoints that don't require authentication (e.g. a local Ollama
-    // server without auth)": three claims, none of them true of Anthropic, on the very form the
-    // CEO already found confusing to sign an Anthropic key up on.
+    // server without auth)": three claims, none of them true of Anthropic, on the very form
+    // already found confusing to sign an Anthropic key up on.
     render(<ProviderFormFlyout {...baseProps} />);
 
     // openai_compatible is the default selection: optional, and Ollama is a real example here.
@@ -659,7 +659,7 @@ describe('ProviderFormFlyout — getting-started onboarding', () => {
   });
 
   it('no longer hedges the connection test before the form is even filled in', () => {
-    // Deleted copy (CEO item 2): "A green test confirms connection and key — it does not guarantee
+    // Deleted copy: "A green test confirms connection and key — it does not guarantee
     // every chat request will succeed." True, but a caveat about the outcome of step 4 read as
     // doubt about the whole feature on the surface that most needs to feel simple.
     render(<ProviderFormFlyout {...baseProps} />);
@@ -1178,8 +1178,8 @@ describe('ProviderFormFlyout — one tight column (audit §5)', () => {
 
   it('describes only the SELECTED provider type, not both at once', () => {
     // The old layout rendered both types' descriptions on screen simultaneously (one per card),
-    // which the audit flagged as confusing on the exact surface CEO feedback already called out
-    // as hard to get right (audit finding: description placement). The description now lives in
+    // which the audit flagged as confusing on the exact surface already called out as hard to
+    // get right (audit finding: description placement). The description now lives in
     // the button group's own EuiFormRow `helpText`, so only the current selection is described.
     render(<ProviderFormFlyout {...baseProps} />);
 
@@ -1197,7 +1197,7 @@ describe('ProviderFormFlyout — one tight column (audit §5)', () => {
 
   it('keeps the getting-started callout, restyled rather than deleted', () => {
     // The audit recommended DELETING this block (it restates the numbered group legends 20px
-    // below); the CEO's instruction is that it stays, so §5.3 lands as presentation only. The copy
+    // below); the decision is that it stays, so §5.3 lands as presentation only. The copy
     // is unchanged — see the getting-started describe above for the list itself.
     render(<ProviderFormFlyout {...baseProps} />);
     expect(screen.getByText(/getting started/i)).toBeInTheDocument();

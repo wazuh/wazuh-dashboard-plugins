@@ -11,7 +11,7 @@ import { PLUGIN_ID } from '../../common/constants';
  * instead, so an app that sets only its `category` is placed correctly in one navigation and left
  * ungrouped in the other. That asymmetry is why this file exists.
  *
- * Deliberately registered with NO `category` (CEO direction supersedes issue #8895 — see
+ * Deliberately registered with NO `category` (product direction supersedes issue #8895 — see
  * `common/nav-categories.ts`'s doc comment): the new navigation's own category mapping
  * (`CATEGORY_TO_NAV_CATEGORY` in `plugins/main/public/utils/nav-groups.ts`) does not map the
  * classic `wz-category-home` category this app now joins (see `plugin.ts`) to any nav-group

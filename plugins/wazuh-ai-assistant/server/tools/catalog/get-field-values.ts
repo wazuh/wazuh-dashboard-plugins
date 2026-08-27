@@ -122,7 +122,7 @@ export const FIELD_LOCATIONS: Record<string, FieldLocation[]> = {
   'package.name': [INVENTORY_PACKAGES],
   // Extended from `[INVENTORY_SYSTEM]` alone. Without
   // `FINDINGS`/`EVENTS` here, the model could never even OBSERVE the empty ECS twin on the surface
-  // the CEO scenario actually asks about (findings/events) -- it would silently get routed to
+  // the flagship scenario actually asks about (findings/events) -- it would silently get routed to
   // inventory_system instead, which answers a different question and hides the `missing_count`
   // this tool exists to surface. See `resolveParams` below for what points the model at the
   // populated `wazuh.agent.host.os.*` twin once it lands here.

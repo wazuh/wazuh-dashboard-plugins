@@ -429,8 +429,8 @@ test('orchestrate: suggest_discover_query unknown field -> bounded tool error, n
 });
 
 // --- (b2) issue C4: narration before the suggest_discover_query call must survive into the
-// RETRY round's history, not be discarded as `content: ''` -- this is the exact defect the CEO
-// review caught: "Let me hand you a Discover query…" repeated near-identically across rounds
+// RETRY round's history, not be discarded as `content: ''` -- this is the exact defect review
+// caught: "Let me hand you a Discover query…" repeated near-identically across rounds
 // because the model could not see it had already said it.
 
 test('orchestrate: narration before a suggest_discover_query call is carried into the retry round, not dropped', async () => {

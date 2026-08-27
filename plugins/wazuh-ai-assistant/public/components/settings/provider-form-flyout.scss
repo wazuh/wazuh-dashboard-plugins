@@ -5,7 +5,7 @@
  * `EuiFormFieldset` groups — plus the two presentation idioms the form owns: ONE help-text size and
  * ONE example-value chip. EUI's own fieldset/legend/checkable-card styling is left alone.
  *
- * Type scale (UX iteration 3, CEO item 1): the form has exactly two text sizes, each produced by a
+ * Type scale (UX iteration 3): the form has exactly two text sizes, each produced by a
  * single mechanism. Descriptions are `EuiText size='s'`; every piece of field-level help is EUI's
  * own `.euiFormHelpText` — inherited for free by plain elements inside an `EuiFormRow`'s `helpText`
  * slot, and restated by `.wzProviderFlyout__help` below for the two guidance blocks that cannot

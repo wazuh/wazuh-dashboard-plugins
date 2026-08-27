@@ -549,7 +549,7 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // Privacy-off (the default) surfaces raw IPs in buckets, same as it already does in
   // every finding-hits tool's digest samples via `FINDING_DIGEST_EXTRA_COLUMNS` -- no new exposure.
   'source.ip',
-  // CEO-scenario dead-end: the three fields below are
+  // Flagship-scenario dead-end: the three fields below are
   // the POPULATED `wazuh.agent.host.*`/`wazuh.integration.*` twins of already-listed
   // findings/events-side fields (`host.os.name`/`host.os.platform` above, which are largely
   // UNPOPULATED on findings/events -- see FIELD_ALIASES in common/field-catalog.ts). Without these,

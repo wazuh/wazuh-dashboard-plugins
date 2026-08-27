@@ -497,7 +497,7 @@ export function buildSystemPrompt(nowIso: string): string {
       'policy_id and have no reason to think there is more than one policy, you may call ' +
       'get_sca_checks directly without it -- it resolves automatically when the agent has exactly ' +
       'one SCA policy. Use result="failed" for "which checks fail" questions.',
-    // "The CEO can't get an explanation out of the SCA module" -- the root cause was never
+    // "Can't get an explanation out of the SCA module" -- the root cause was never
     // missing data (check.rationale/check.remediation are
     // already in the digest sample — see get-sca-checks.ts) or routing; it was that nothing told
     // the model HOW to use those two fields once it had them, so a "why did this fail" question

@@ -3,8 +3,8 @@ import { i18n } from '@osd/i18n';
 /**
  * Wazuh navigation placement for the AI Assistant app.
  *
- * CEO direction supersedes issue #8895: "Meter el AI assistant mejor en la home, no pongáis una
- * sección AI solo para esto" (put the AI Assistant into Home instead — do not carve out an
+ * Product direction supersedes issue #8895: "Meter el AI assistant mejor en la home, no pongáis
+ * una sección AI solo para esto" (put the AI Assistant into Home instead — do not carve out an
  * AI-only section just for this). #8895 had given the assistant its own top-level `AI` category
  * (classic navigation) and nav group category (new navigation); both are deleted by this change.
  * There is now no AI-only navigation section anywhere.

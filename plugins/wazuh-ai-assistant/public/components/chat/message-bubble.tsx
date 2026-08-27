@@ -332,7 +332,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
    * The table this turn actually DRAWS — `undefined` for a final table with zero rows.
    *
    * A header-only result card ("Results (0 rows)" over EuiBasicTable's stock "No items found") is
-   * never rendered (CEO item 6 / ux-research.md §E, which is also PatternFly's explicit "never
+   * never rendered (ux-research.md §E, which is also PatternFly's explicit "never
    * render a header-only table"): the assistant's own prose already answers a zero-result question
    * in words, and the card added a second, emptier answer underneath it.
    *

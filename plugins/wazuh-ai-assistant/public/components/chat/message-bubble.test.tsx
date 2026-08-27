@@ -248,7 +248,7 @@ describe('MessageBubble', () => {
   });
 
   /**
-   * C4 (CEO item 6 / ux-research.md §E, and PatternFly's explicit "never render a header-only
+   * C4 (ux-research.md §E, and PatternFly's explicit "never render a header-only
    * table"): a FINAL table with zero rows draws no card at all. The gate is here, in the renderer,
    * rather than in chat-page.tsx's flush path, because `message.table` is persisted — a conversation
    * saved before this change carries 0-row specs a stream-time gate would never see, and would still

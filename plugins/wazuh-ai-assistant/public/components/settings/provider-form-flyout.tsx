@@ -57,8 +57,8 @@ const PROVIDER_TYPE_FORM_LABELS: Record<string, string> = {
 };
 
 /** One-line description shown under the provider type selector so the choice is self-explanatory
- * without opening either form label's parenthetical — CEO feedback was specifically that signing
- * up an Anthropic key was confusing, and part of that was not knowing which type to pick. */
+ * without opening either form label's parenthetical — feedback flagged that signing up an
+ * Anthropic key was confusing, and part of that was not knowing which type to pick. */
 const PROVIDER_TYPE_DESCRIPTIONS: Record<ProviderInput['type'], string> = {
   anthropic: i18n.translate(
     'wazuhAiAssistant.settings.type.anthropicDescription',
@@ -1154,8 +1154,8 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
             </>
           )}
           {/* Only shown for a brand-new provider — an admin editing an existing one already
-              knows how to fill this form in. CEO feedback was specifically that signing up an
-              Anthropic key was confusing; this is the shortest possible map of the four steps. */}
+              knows how to fill this form in. Feedback flagged that signing up an Anthropic key
+              was confusing; this is the shortest possible map of the four steps. */}
           {!editingProvider && (
             <>
               <EuiCallOut
@@ -1195,7 +1195,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
               {/* A segmented control, not a pair of huge cards (UX iteration 4 item 1): a binary
                   choice does not need ~450px of card real estate, and the old layout rendered
                   BOTH types' descriptions at once while only one was ever selected — confusing on
-                  the exact surface CEO feedback already flagged as hard to get right. The
+                  the exact surface already flagged as hard to get right. The
                   selection-dependent description now lives in this EuiFormRow's own `helpText`,
                   so only the type actually chosen is ever described. */}
               <EuiFormRow

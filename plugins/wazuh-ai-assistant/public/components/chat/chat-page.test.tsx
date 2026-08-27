@@ -1466,8 +1466,8 @@ describe('ChatPage — feedback while a turn runs', () => {
  * single-table-per-message model — every place an empty `table` event can land relative to a
  * non-empty one, plus the honest-empty cases.
  *
- * The honest-empty cells changed shape with C4 (CEO item 6) and did not go away: a turn whose FINAL
- * table has zero rows still commits that spec (so the saved conversation still says a query ran and
+ * The honest-empty cells changed shape with C4 and did not go away: a turn whose FINAL table
+ * has zero rows still commits that spec (so the saved conversation still says a query ran and
  * matched nothing) but renders no card — the assistant's prose carries the answer, and a turn with
  * no prose gets one quiet subdued line instead. The suppression mechanism this describe covers is
  * unchanged; only what a committed empty spec looks like on screen is.
@@ -1544,7 +1544,7 @@ describe('ChatPage — an empty table never clobbers a populated one (issue #892
   });
 
   /**
-   * C4 (CEO item 6): the honest-empty case still COMMITS its spec — that is the turn's record of
+   * C4: the honest-empty case still COMMITS its spec — that is the turn's record of
    * having queried and matched nothing, and it is what gets persisted — but it no longer draws a
    * card: message-bubble.tsx suppresses a 0-row table and, when the turn produced no prose of its
    * own, shows one quiet line in its place. This test used to assert the card ("Results (0 rows)");
@@ -1576,7 +1576,7 @@ describe('ChatPage — an empty table never clobbers a populated one (issue #892
 
   it('drops the empty table silently when the turn narrated its own answer', async () => {
     // The common shape of a zero-result turn: the tool returns nothing and the model says so in
-    // words. That prose IS the answer (CEO decision: suppress entirely), so neither the card nor the
+    // words. That prose IS the answer (product decision: suppress entirely), so neither the card nor the
     // fallback line may appear — the line is the guarantee for a turn with NO prose, never a second
     // answer stapled under one that already has it.
     const stream = createControllableStream();
