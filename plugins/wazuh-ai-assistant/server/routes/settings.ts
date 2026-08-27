@@ -22,6 +22,7 @@ import { getApiKeyCipher } from '../plugin-services';
 import { isEncrypted } from '../crypto/api-key-cipher';
 import { resolveApiHostId } from '../tools/api-host';
 import {
+  isPermissionDeniedError,
   paginationQuerySchema,
   resolvePagination,
   withInternalErrorHandling,
@@ -294,7 +295,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
           perPage,
         },
       });
-    }),
+    }, logger),
   );
 
   // Create a provider. The first provider ever created automatically becomes the default;
@@ -388,7 +389,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
         await clearOtherDefaults(context, providerId);
       }
       return response.ok({ body: toSummary(providerId, attributes) });
-    }),
+    }, logger),
   );
 
   // Update a provider. Sending an empty/absent apiKey keeps the previously stored one.
@@ -504,7 +505,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       return response.ok({
         body: toSummary(request.params.id, nextAttributes),
       });
-    }),
+    }, logger),
   );
 
   // Set a provider as the default, clearing the flag on every other provider.
@@ -513,7 +514,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       path: API_PATHS.PROVIDER_SET_DEFAULT(`{id}`),
       validate: { params: schema.object({ id: schema.string() }) },
     },
-    async (context, request, response) => {
+    withInternalErrorHandling(async (context, request, response) => {
       const { aiProviders } = context.wazuh_ai_assistant;
       const existing = await aiProviders.get(context, request.params.id);
       if (!existing) {
@@ -531,7 +532,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       return response.ok({
         body: toSummary(request.params.id, nextAttributes),
       });
-    },
+    }, logger),
   );
 
   // Delete a provider.
@@ -546,7 +547,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
         request.params.id,
       );
       return response.ok({ body: { deleted: true } });
-    }),
+    }, logger),
   );
 
   // Minimal connectivity test: send a one-line "say ok" prompt through the real adapter and
@@ -664,7 +665,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
           context,
         );
       return response.ok({ body: settings });
-    }),
+    }, logger),
   );
 
   // Manager-session liveness probe, called on app mount and before Manager-path work
@@ -754,11 +755,12 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
         }),
       },
     },
-    async (context, request, response) => {
+    withInternalErrorHandling(async (context, request, response) => {
       // Ensures every provider's backend exists (first-ever PUT with no prior GET) before
       // updating it. The actual write goes through the CURRENT user for every provider, unlike
       // the read above (`getOrCreateSettings`) — see server/settings/opensearch-user.ts's doc
-      // comment.
+      // comment. Wrapped by `withInternalErrorHandling` (issue #9057) so an RBAC-denied indexer
+      // 403 here is sanitized too, not just from `updateSettings` below.
       const { assistantSettings } = context.wazuh_ai_assistant;
       await assistantSettings.getOrCreateSettings(context);
       try {
@@ -768,6 +770,12 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
         );
         return response.ok({ body: updated });
       } catch (error) {
+        // An RBAC-denied indexer 403 must be sanitized by the outer wrapper's single mapping
+        // path, not the actionable-503 path below — rethrow so it reaches
+        // `withInternalErrorHandling`'s catch.
+        if (isPermissionDeniedError(error)) {
+          throw error;
+        }
         // Surfaces `IsmSettingsProvider`'s "policy not found"/"no delete transition" failures
         // (expected on any deployment where `CONVERSATION_SESSIONS_ISM_POLICY_ID` — see
         // common/constants.ts — hasn't been provisioned indexer-side yet) as an actionable 503
@@ -777,6 +785,6 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
           body: { message: describeError(error) },
         });
       }
-    },
+    }, logger),
   );
 }

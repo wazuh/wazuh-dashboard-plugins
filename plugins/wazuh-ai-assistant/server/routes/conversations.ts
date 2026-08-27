@@ -432,7 +432,7 @@ const updateBodySchema = schema.object({
  */
 export function registerConversationRoutes(
   router: IRouter,
-  _logger: Logger,
+  logger: Logger,
 ): void {
   // List: summaries only (id/title/updatedAt) — never `messages`, so listing never pulls every
   // saved transcript over the wire just to render a sidebar.
@@ -469,7 +469,7 @@ export function registerConversationRoutes(
       return response.ok({
         body: { conversations, total, page, perPage },
       });
-    }),
+    }, logger),
   );
 
   // Create: stamps owner + both timestamps server-side. Empty conversations are the CALLER's
@@ -513,7 +513,7 @@ export function registerConversationRoutes(
       };
       const id = await createConversation(context, document);
       return response.ok({ body: toRecord(id, document) });
-    }),
+    }, logger),
   );
 
   // Fetch one conversation's full transcript (resume). 404s both when the id doesn't exist at all
@@ -539,7 +539,7 @@ export function registerConversationRoutes(
           encodeVersion(hit.seqNo, hit.primaryTerm),
         ),
       });
-    }),
+    }, logger),
   );
 
   // Update: full replace of messages (title is OPTIONAL now, see updateBodySchema's doc comment
@@ -637,7 +637,7 @@ export function registerConversationRoutes(
           encodeVersion(written.seqNo, written.primaryTerm),
         ),
       });
-    }),
+    }, logger),
   );
 
   // Rename: title-only partial update, owner-checked exactly like GET/PUT/DELETE (resolveOwner +
@@ -716,7 +716,7 @@ export function registerConversationRoutes(
           version: encodeVersion(written.seqNo, written.primaryTerm),
         },
       });
-    }),
+    }, logger),
   );
 
   // Delete: owner-checked the same way as GET/PUT above.
@@ -740,6 +740,6 @@ export function registerConversationRoutes(
       }
       await deleteConversation(context, existing);
       return response.ok({ body: { deleted: true } });
-    }),
+    }, logger),
   );
 }

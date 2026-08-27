@@ -1,11 +1,29 @@
 import { schema } from '@osd/config-schema';
 import {
+  Logger,
   OpenSearchDashboardsRequest,
   OpenSearchDashboardsResponseFactory,
   IOpenSearchDashboardsResponse,
   RequestHandlerContext,
 } from '../../../../src/core/server';
 import { describeError } from '../../common/errors';
+
+/** Single neutral message for every RBAC-denied indexer call (issue #9057). Deliberately NOT
+ * parameterized with the action name, subsystem, or any detail from the underlying error: any
+ * such detail is exactly what leaked to unauthorized callers before this fix. The full error is
+ * still logged server-side — see `withInternalErrorHandling` below. */
+export const PERMISSION_DENIED_MESSAGE =
+  'You do not have permission to perform this action.';
+
+/** Any indexer 403 is an authorization failure. Read from BOTH shapes: the plugin's own
+ * `isNotFoundError`-style helpers read `error.statusCode`, wazuh-elastic.ts reads
+ * `error.meta.statusCode`. Deliberately NOT gated on `meta.body.error.type ===
+ * 'security_exception'`: a DLS/FLS 403 carries a different `type` yet the same user/role-bearing
+ * text, and would fall through to the leaking 500 branch. `type` is logged, never returned. */
+export function isPermissionDeniedError(error: unknown): boolean {
+  const e = error as { statusCode?: unknown; meta?: { statusCode?: unknown } };
+  return (e?.statusCode ?? e?.meta?.statusCode) === 403;
+}
 
 /** Route handler shape accepted by `IRouter`'s `get`/`post`/`put`/`delete` methods (params/query/
  * body left generic so `withInternalErrorHandling` below can wrap a handler for any of the
@@ -17,17 +35,39 @@ export type RouteHandler<Params = unknown, Query = unknown, Body = unknown> = (
 ) => Promise<IOpenSearchDashboardsResponse>;
 
 /** Wraps a route handler with the byte-identical outer `try/catch` every mutating route in
- * server/routes/settings.ts and server/routes/conversations.ts used to repeat inline: any error
- * thrown by the handler becomes the same 500 `{message: describeError(error)}` customError
- * response. Purely a de-duplication of that boilerplate — no behavior change for callers.
- * Handlers' own inner try/catches (e.g. conversations.ts's get-then-404 pattern) are untouched. */
+ * server/routes/settings.ts and server/routes/conversations.ts used to repeat inline. Every
+ * caught error is logged in FULL (issue #9057's `security_exception` action name/username/backend
+ * roles must stay available to operators server-side), then mapped to a response: an indexer 403
+ * (`isPermissionDeniedError`) becomes a sanitized `403 { message: PERMISSION_DENIED_MESSAGE }` —
+ * never the raw error text — and everything else keeps the pre-existing `500
+ * {message: describeError(error)}`. `logger` is REQUIRED so no call site can silently regress to
+ * an unlogged/unsanitized handler. Handlers' own inner try/catches (e.g. conversations.ts's
+ * get-then-404 pattern, settings.ts's PUT SETTINGS ISM-503 mapping) are untouched. */
 export function withInternalErrorHandling<Params, Query, Body>(
   handler: RouteHandler<Params, Query, Body>,
+  logger: Logger,
 ): RouteHandler<Params, Query, Body> {
   return async (context, request, response) => {
     try {
       return await handler(context, request, response);
     } catch (error) {
+      const e = error as {
+        statusCode?: unknown;
+        meta?: { statusCode?: unknown; body?: { error?: { type?: unknown } } };
+      };
+      const statusCode = e?.statusCode ?? e?.meta?.statusCode;
+      const type = e?.meta?.body?.error?.type;
+      logger.error(
+        `wazuhAiAssistant: route error (${statusCode ?? 'unknown'}, type=${
+          type ?? 'unknown'
+        }): ${describeError(error)}`,
+      );
+      if (isPermissionDeniedError(error)) {
+        return response.customError({
+          statusCode: 403,
+          body: { message: PERMISSION_DENIED_MESSAGE },
+        });
+      }
       return response.customError({
         statusCode: 500,
         body: { message: describeError(error) },
