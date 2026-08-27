@@ -1,9 +1,8 @@
 /**
- * MITRE sub-technique rollup, as a CHOKEPOINT transform (issue #8920 item 2): a bare parent
- * technique id ("T1059") filtered with a plain `term` matches only its own exact bucket and
- * silently excludes every "T1059.NNN" sub-technique finding — MITRE ATT&CK itself treats a
- * parent technique as covering its children, so "how many T1059 findings" is undercounted (the
- * reported instance: 3 exact-parent docs shown, 9 T1059.001 docs hidden).
+ * MITRE sub-technique rollup, as a CHOKEPOINT transform: a bare parent technique id ("T1059")
+ * filtered with a plain `term` matches only its own exact bucket and silently excludes every
+ * "T1059.NNN" sub-technique finding — MITRE ATT&CK itself treats a parent technique as covering
+ * its children, so "how many T1059 findings" is undercounted.
  *
  * get-mitre-findings.ts builds the rolled-up shape itself (its own doc comment explains the
  * shape), but a tool-local fix leaves the same class open on every OTHER path that can filter on
@@ -11,12 +10,11 @@
  * hand-written `{term: {"wazuh.rule.mitre.technique.id": "T1059"}}` is executed verbatim. This
  * transform therefore runs in executor.ts on the EXECUTED (post-`applySafetyValves`) body of
  * every indexer request, so typed tools and the escape hatch share one deterministic guarantee
- * with no per-tool opt-in. It is idempotent, but NOT for the reason an earlier version of this
- * comment gave: the rolled shape below contains a bare-parent `term` as its own first `should`
- * member, so a naive second pass re-rolls it and nests one `bool` inside another. Idempotence comes
- * from `isRolledUpClause` recognizing that exact emitted shape and leaving it alone. It matters
- * because a typed tool (get-mitre-findings.ts) may already have rolled up before this chokepoint
- * runs on the executed body.
+ * with no per-tool opt-in. It is idempotent: the rolled shape below contains a bare-parent `term`
+ * as its own first `should` member, so a naive second pass would re-roll it and nest one `bool`
+ * inside another. Idempotence comes from `isRolledUpClause` recognizing that exact emitted shape
+ * and leaving it alone. It matters because a typed tool (get-mitre-findings.ts) may already have
+ * rolled up before this chokepoint runs on the executed body.
  *
  * What it rewrites: any single-key `{term: {<field ending in "technique.id">: "T<digits>"}}`
  * clause, anywhere in `body.query`, becomes
@@ -100,10 +98,9 @@ function singleFieldClause(
 /**
  * True for the EXACT shape `rolledUpClause` emits. Needed because that shape deliberately contains
  * a bare-parent `term` as its first `should` member: without this check the walker re-rolls its own
- * output and nests one `bool` inside another on a second pass. (This module's header previously
- * claimed idempotence on the grounds that "an already-rolled shape carries no bare `term` on a
- * parent id" — it carries exactly that, which is why `technique-rollup-coverage.test.ts` pins the
- * twice-applied case.) A second pass now returns the node untouched, and the walker does not
+ * output and nests one `bool` inside another on a second pass -- an already-rolled shape DOES carry
+ * a bare `term` on a parent id, which is why `technique-rollup-coverage.test.ts` pins the
+ * twice-applied case. A second pass returns the node untouched, and the walker does not
  * descend into it — the inner clauses are this function's own output, never a caller's filter.
  */
 function isRolledUpClause(record: Record<string, unknown>): boolean {

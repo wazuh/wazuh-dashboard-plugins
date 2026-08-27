@@ -5,31 +5,25 @@
  * outbound `_search`, regardless of whether the query came from a typed catalog tool (defense in
  * depth) or the future free-DSL escape hatch (its only line of defense).
  *
- * BOUND-DISCLOSURE AUDIT (issue #8935 item I4). Every bound the model can hit against the
- * Indexer/Manager through this plugin, as of this base commit — kept as one list because the
- * class issue #8935 targets is "an unmarked bound", and a single list is what makes "did we miss
- * one" answerable at a glance rather than scattered across call sites. Cross-references are by
- * SYMBOL name, never line number (line numbers in an audit rot the moment code is inserted above
- * them — integration review found every number in the first cut already stale).
+ * BOUND-DISCLOSURE AUDIT. Every bound the model can hit against the Indexer/Manager through this
+ * plugin — kept as one list so an unmarked bound is answerable at a glance rather than scattered
+ * across call sites. Cross-references are by SYMBOL name, never line number (line numbers in an
+ * audit rot the moment code is inserted above them).
  *
  * - MAX_SIZE=500 (hits `size`) — `applySafetyValves`: silent clamp, but STRUCTURALLY disclosed
  *   (`Digest.counts` carries {total, returned, truncated} plus a `samplesNote`). Adequate; no
  *   change.
  * - MAX_FROM=1000 (`from`) — `applySafetyValves`: rejection with reason — disclosed (the model
  *   sees why and can self-correct).
- * - track_total_hits=10000 — `applySafetyValves`: SILENT on this base — digest.ts's count
- *   extraction reads `hits.total.value` and ignores `relation: 'gte'`, so a >10k result set
- *   reports exactly 10000 unmarked (only `appendWindowRecountHint`'s own probe words it "at
- *   least N"). NOT FIXED HERE: issue #8909 removes this clamp and merges ahead of this branch in
- *   the team's stated order — re-fixing here guarantees a conflict. Recorded as "silent on this
- *   base, resolved upstream by #8909".
- * - MAX_LOOKBACK_MS (90d time-range span) — `checkDateRanges`: THE DEFECT this item fixes. The
- *   rejection reaches the model as an error, but a bare retry inside the cap is indistinguishable
- *   from a default-window query — nothing marks the eventual ANSWER as capped. Fixed by
- *   `clampLookbackWindow` below (required-context clauses only): clamp-and-disclose on the
- *   successful call's own digest, the layer measured at 3/3 (not the prompt layer, measured 0/3).
- *   The span REJECTION itself is UNCHANGED for every other clause shape — `lintDsl` is the
- *   documented standalone boundary and still guards any call site that skips the clamp.
+ * - track_total_hits=10000 — `applySafetyValves`: SILENT — digest.ts's count extraction reads
+ *   `hits.total.value` and ignores `relation: 'gte'`, so a >10k result set reports exactly 10000
+ *   unmarked (only `appendWindowRecountHint`'s own probe words it "at least N").
+ * - MAX_LOOKBACK_MS (90d time-range span) — `checkDateRanges`: the rejection reaches the model as
+ *   an error, but a bare retry inside the cap is indistinguishable from a default-window query —
+ *   nothing marks the eventual ANSWER as capped. `clampLookbackWindow` below (required-context
+ *   clauses only) clamps and discloses on the successful call's own digest rather than at the
+ *   prompt layer. The span REJECTION itself is UNCHANGED for every other clause shape — `lintDsl`
+ *   is the documented standalone boundary and still guards any call site that skips the clamp.
  * - MAX_AGG_SIZE=100 (terms/composite/multi_terms/top_hits `size`) — `checkAggs`: rejection with
  *   reason — disclosed.
  * - MAX_TOP_LEVEL_AGGS=5 — `checkTopLevelAggCount`: rejection with reason — disclosed.
@@ -39,8 +33,7 @@
  * - Request-side `terms` size truncation (more distinct values than the agg `size`) —
  *   cluster-side, not this file: disclosed via `sum_other_doc_count` -> digest.ts's
  *   `breakdownNote` (case 2). The SYNTHETIC-breakdown top-5 trim (`buildSyntheticBreakdown` in
- *   digest.ts) is a SEPARATE instance owned and fixed by issue #8935 item I1 — cross-referenced,
- *   not duplicated here.
+ *   digest.ts) is a SEPARATE instance, cross-referenced here rather than duplicated.
  * - MAX_SAMPLES=5 (digest sample rows) — digest.ts: `samplesNote` — disclosed.
  * - MAX_FIELD_VALUE_LENGTH / MAX_HINT_LENGTH — digest.ts: visible "…" ellipsis — disclosed
  *   inline. NOTE: this item's own lookback disclosure adds up to ~MAX_LOOKBACK_DISCLOSURES
@@ -50,13 +43,13 @@
  *   ahead of longer hints).
  * - `capDigest` drop stages (samples beyond the worded samplesNote count; breakdown buckets
  *   beyond the disclosed count) — digest.ts: SILENT RESIDUAL — a sample/breakdown bucket popped
- *   by the hard char cap can fall below what the ALREADY-EMITTED note claims. Rare after item
- *   I1's char-budgeted carry; recorded, deliberately NOT fixed here — a fix needs note
- *   recomputation from INSIDE the cap loop, a digest.ts change out of this item's file list.
+ *   by the hard char cap can fall below what the ALREADY-EMITTED note claims. Rare after
+ *   digest.ts's char-budgeted carry; recorded, deliberately NOT fixed here — a fix needs note
+ *   recomputation from INSIDE the cap loop, a digest.ts change out of scope here.
  * - `clampManagerParams` limit -> MAX_SIZE (Manager API `limit`) — this file: silent clamp,
  *   disclosed structurally via Manager digest counts (`total_affected_items` vs `returned`).
- * - MAX_TOOL_ROUNDS — orchestration layer (not this file): owned by issue #8893's final-round
- *   instruction and issue #8935 item I3 — out of scope here.
+ * - MAX_TOOL_ROUNDS — orchestration layer (not this file): governed by the final-round instruction
+ *   in the chat route — out of scope here.
  * - TABLE_ROW_CAP / DERIVED_COLUMN_CAP — client rendering / row schema: never model-facing
  *   completeness (the table renders locally and never reaches the model, per executor.ts's own
  *   comment on that boundary) — noted only, nothing to disclose to the model.
@@ -134,81 +127,63 @@ const MAX_TREE_DEPTH = 100;
 // allowlist is documented as the standalone boundary that must hold on its own, independent of
 // what today's tool schemas happen to permit.
 //
-// TC-8/MS-6/MS-7: widened past the
-// original 3-family + threatintel-{rules..kvdbs} + sap-detectors-config set left by workstream B.
-// Every addition below is a family/index with REAL data on `wazuh-aio-5` (live-verified 2026-08-19,
-// see this branch's own verification notes) and no owning typed tool -- the mission is "every
-// family with real data is queryable by construction", not "a new typed tool per family", so these
-// widen the SAME escape hatch (`search_wazuh_data`) rather than spawning one-off tools. Each entry
-// below documents its own live evidence; entries considered and DELIBERATELY EXCLUDED are
+// Beyond the original 3-family + threatintel-{rules..kvdbs} + sap-detectors-config set, each
+// addition below is a family/index with REAL data and no owning typed tool -- the mission is
+// "every family with real data is queryable by construction", not "a new typed tool per family",
+// so these widen the SAME escape hatch (`search_wazuh_data`) rather than spawning one-off tools.
+// Each entry documents its own evidence; entries considered and DELIBERATELY EXCLUDED are
 // documented immediately after the regex so "why isn't X in here" is answerable without git log
 // archaeology.
 //
 //  - `wazuh-metrics-[^,\s]*` -- covers `wazuh-metrics-comms`/`wazuh-metrics-agents`/
-//    `wazuh-metrics-normalization`/`wazuh-metrics-comms-v4` as one family (coverage doc's open gap
-//    G1: fleet-health/comms metrics, real data -- 1,040/716/16,620/0 docs respectively on this VM
-//    at verification time -- and no workstream owned it before this one). One wildcard rather than
-//    four literals: all four are the plugin's own emitted operational-metrics data streams (no
-//    tool ever needs to see one without being able to see the others), and `comms-v4`'s live doc
-//    count is volatile (drift noted in the coverage doc, 0 here vs 1,032 observed elsewhere) so a
-//    literal would have to be re-verified on every drift; the wildcard is stable regardless.
-//  - `\.wazuh-cti-consumers` / `\.wazuh-content-manager-jobs` -- CTI freshness status (coverage
-//    doc MS-6/MS-7, retiers this row from "can't diagnose" to answerable): live-verified 3 docs
-//    (per-feed `status`/`local_offset`/`remote_offset`) and 2 docs (sync-schedule metadata) --
-//    config/status documents written by the content-manager service itself, never
-//    analyst/attacker-supplied.
-//  - `\.opensearch-sap-[^,\s]*-findings` -- the 15 per-log-type Security Analytics findings
-//    indices (coverage doc G2, "findings now flowing after the `alert_finding_enabled=true`
-//    fix"), live-verified reachable via their aliases (`.opensearch-sap-wazuh-generic-findings`
-//    etc., `_cat/aliases` confirms one alias per family, no ambiguity with the sibling
+//    `wazuh-metrics-normalization`/`wazuh-metrics-comms-v4` as one family: fleet-health/comms
+//    metrics with real data and no dedicated tool. One wildcard rather than four literals: all
+//    four are the plugin's own emitted operational-metrics data streams (no tool ever needs to see
+//    one without being able to see the others), and doc counts across the family drift over time,
+//    so a literal would need re-verifying on every drift; the wildcard is stable regardless.
+//  - `\.wazuh-cti-consumers` / `\.wazuh-content-manager-jobs` -- CTI freshness status: per-feed
+//    `status`/`local_offset`/`remote_offset` documents and sync-schedule metadata -- config/status
+//    documents written by the content-manager service itself, never analyst/attacker-supplied.
+//  - `\.opensearch-sap-[^,\s]*-findings` -- the per-log-type Security Analytics findings indices,
+//    reachable via their aliases (`.opensearch-sap-wazuh-generic-findings` etc., `_cat/aliases`
+//    confirms one alias per family, no ambiguity with the sibling
 //    `-detectors-queries-optimized-<uuid>` internal artifact indices, which end in a UUID suffix
 //    and a differently-worded family name, never `-findings`). Deliberately does NOT open
 //    `-alerts` (see exclusions below) or the `-detectors-queries-optimized-*` compiled-query
-//    indices (already out of scope per the coverage doc's own appendix -- an internal artifact,
-//    not a question surface).
-//  - `\.opensearch-sap-pre-packaged-rules-config` -- the 1,472-doc pre-packaged Sigma catalog
-//    (coverage doc G3, live-verified 126 docs at re-check time -- count drift, still real,
-//    non-empty). Vendor-curated rule metadata, same class as `get_rules`'s own corpus.
-//  - `\.opensearch-sap-correlation-metadata` -- coverage doc MS-12 correction: NOT empty like its
-//    correlation-alerts/history siblings (live-verified 2 docs: `root`/`counter`/`finding1`/
-//    `finding2`/`logType`/`timestamp`, internal correlation bookkeeping, not analyst data).
-//  - `\.wazuh-threatintel-vulnerabilities-a` -- the raw CTI CVE feed (coverage doc, "one of only
-//    two cover-now rows with production-shaped volume", TC-8 sequences it first). Live-verified
-//    372,301 docs, public CVE-record JSON (cveMetadata/containers.cna, the same public NVD-sourced
-//    schema `get_rules`' own vendor content descends from).
-//  - `wazuh-threatintel-enrichments-a` -- IOC enrichment feed (coverage doc, same TC-8 sequencing
-//    as vulnerabilities-a above). REVERSES the prior "deliberately out of scope" decision recorded
-//    on this same line by workstream B/earlier phases (see `guardrails.test.ts`'s prior assertion,
-//    now updated) -- that decision predates the A1a mission ("every family with real data must be
-//    queryable by construction") and TC-8's explicit resequencing of this exact row to cover-now.
-//    Live-verified 257,071+ docs, third-party threat-intel indicator records (domain/hash/IP
-//    values IDENTIFYING KNOWN-MALICIOUS INFRASTRUCTURE, not the customer's own network -- see this
-//    branch's `privacy.ts` additions for why these are 'allow', not anonymized).
+//    indices, an internal artifact rather than a question surface.
+//  - `\.opensearch-sap-pre-packaged-rules-config` -- the pre-packaged Sigma catalog. Vendor-curated
+//    rule metadata, same class as `get_rules`'s own corpus.
+//  - `\.opensearch-sap-correlation-metadata` -- unlike its correlation-alerts/history siblings,
+//    this index is NOT empty (`root`/`counter`/`finding1`/`finding2`/`logType`/`timestamp`
+//    documents, internal correlation bookkeeping, not analyst data).
+//  - `\.wazuh-threatintel-vulnerabilities-a` -- the raw CTI CVE feed, public CVE-record JSON
+//    (cveMetadata/containers.cna, the same public NVD-sourced schema `get_rules`' own vendor
+//    content descends from).
+//  - `wazuh-threatintel-enrichments-a` -- IOC enrichment feed, third-party threat-intel indicator
+//    records (domain/hash/IP values IDENTIFYING KNOWN-MALICIOUS INFRASTRUCTURE, not the customer's
+//    own network -- see `privacy.ts`'s field policy for why these are 'allow', not anonymized).
 //
 // DELIBERATELY EXCLUDED (documented so a future reader doesn't silently rediscover the same
-// live-checks and reach a different conclusion):
-//  - `.opendistro-ism-config` (retention-policy config, coverage doc G8) -- live-verified BLOCKED:
-//    `_cat/indices` reports 82 docs, but `_search`/`_count` against it both return 0 hits/0 count
-//    for the plugin's own `admin` credential (same behavior verified live against
-//    `.opendistro_security`, a known system-protected index) -- OpenSearch Security's system-index
-//    protection filters document reads even for an admin REST credential. Skipped per this
-//    workstream's own instruction ("verify live and skip with a note if perms block it") rather
-//    than allowlisted-but-nonfunctional; G8 remains an open product-decision gap, unresolved by
-//    this branch.
+// evidence and reach a different conclusion):
+//  - `.opendistro-ism-config` (retention-policy config) -- BLOCKED: `_cat/indices` reports
+//    documents present, but `_search`/`_count` against it both return 0 hits/0 count for the
+//    plugin's own `admin` credential (the same behavior holds against `.opendistro_security`, a
+//    known system-protected index) -- OpenSearch Security's system-index protection filters
+//    document reads even for an admin REST credential. Skipped rather than allowlisted-but-
+//    nonfunctional.
 //  - `wazuh-ai-assistant-sessions` -- explicitly excluded (privacy: this plugin's own chat-history
 //    store; a user must never be able to read another user's session content, including through
-//    this escape hatch -- coverage doc MS-1, "not a coverage gap, a security assertion").
+//    this escape hatch -- a security assertion, not a coverage gap).
 //  - `.opendistro_security` / any other `.opendistro-security`-family index -- explicitly excluded
 //    (internal authz plane; reading it directly IS the information leak the RBAC-troubleshooting
-//    decline exists to prevent -- coverage doc MS-11's corrected reasoning).
+//    decline exists to prevent).
 //  - `.opensearch-sap-*-alerts` / `.opensearch-sap-correlation-alerts` /
-//    `.opensearch-sap-correlation-history*` -- left out: all are empty on this VM by a provisioning
-//    defect (`triggers: []` on every detector, coverage doc G2) rather than by design, so allowing
-//    the pattern would let the model run a real query that can only ever return zero -- no
-//    escape-hatch value until the provisioning defect is fixed upstream.
+//    `.opensearch-sap-correlation-history*` -- left out: all are empty by a provisioning defect
+//    (`triggers: []` on every detector) rather than by design, so allowing the pattern would let
+//    the model run a real query that can only ever return zero -- no escape-hatch value until the
+//    provisioning defect is fixed upstream.
 //  - `.opendistro-alerting-config` / `.opensearch-notifications-config` -- open product-decision
-//    gaps (coverage doc G7/G9) with no workstream ownership assigned; NOT this workstream's call to
-//    make unilaterally, so left closed pending that decision.
+//    gaps with no ownership assigned; left closed pending that decision.
 // `.opensearch-sap-detectors-config` (get_detectors.ts) is an exact single index, not a wildcard
 // family -- OpenSearch Security Analytics' own config store for detector definitions, confirmed
 // live to be indexer-reachable and to hold no analyst/attacker-supplied data (name/type/schedule/
@@ -457,7 +432,7 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // low-cardinality — a handful of benchmark policies per agent; mapping live-verified against
   // wazuh-states-sca on 5.0.0-beta3).
   'policy.id',
-  // Issue #8920 item 1 (population-disclosure): the three fields below back the per-kind/per-tool
+  // Population-disclosure: the three fields below back the per-kind/per-tool
   // breakdown aggregations added to close the "sample narrated as population" class ("named 2 of
   // 10 failed checks" on get_sca_checks; a truncated ports inventory page with no view of the
   // closed-set field's true distribution). This is a PERFORMANCE guard widening (aggregation
@@ -478,7 +453,7 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // keyword-mapped (a `term` filter with those exact capitalized values on a text mapping would
   // never match).
   'check.result',
-  // SCA check NAME enumeration (#8935 item I2, scoped-enumeration): keyword-mapped, proven by
+  // SCA check NAME enumeration (scoped-enumeration): keyword-mapped, proven by
   // this tool's own checked-in `prefix` clause on `check.name` in get-sca-checks.ts's `search`
   // filter -- a `prefix` clause on a text-mapped field would not behave as a prefix match, and
   // the 5.0 field-rename comment at the top of that file records the live mapping verification
@@ -488,25 +463,23 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // same framing as this block's header comment above.
   'check.name',
   // Syscollector ports: this repo's IT Hygiene network dashboard runs a real terms agg on it
-  // (plugins/main/public/components/overview/it-hygiene/dashboards/dashboard-panels.ts). Code
-  // review B10: this comment previously claimed live values include "Inactive"/"Unknown" --
-  // corrected per live spot-check: actual values are
+  // (plugins/main/public/components/overview/it-hygiene/dashboards/dashboard-panels.ts). Live
+  // spot-check: values are
   // "established"/"listening"/"time_wait"/"close_wait".
   'interface.state',
-  // Syscollector ports: aggregated by the IT Hygiene services/traffic dashboards. Code review B10:
-  // this comment previously claimed live values are uppercase ("TCP"/"UDP") -- corrected per live
-  // spot-check: actual values are lowercase "tcp"/"tcp6"/"udp".
+  // Syscollector ports: aggregated by the IT Hygiene services/traffic dashboards. Live
+  // spot-check: values are lowercase "tcp"/"tcp6"/"udp".
   'network.transport',
-  // Entity-pivot fields for "noisiest/top X" questions (GA benchmark gap: this allowlist only
-  // ever listed wazuh-findings-v5 field names, so a terms/composite/multi_terms agg on the
-  // wazuh-events-v5 and wazuh-states-* families' own entity fields was rejected even though
-  // WAZUH_FIELD.AGENT_ID/AGENT_NAME above already cover the *agent* pivot on those families --
-  // `wazuh.agent.id`/`wazuh.agent.name` are the SAME field names on findings-v5, events-v5, and
-  // every wazuh-states-* index (confirmed identical field literals in get-events-by-agent.ts:54
-  // `wazuh.agent.name`, get-agent-os.ts:36/get-agent-packages.ts:43/get-fim-files.ts:72/
-  // get-vulnerabilities.ts:63/get-vulnerabilities-by-agent.ts:56-57 `wazuh.agent.id`/
-  // `wazuh.agent.name`) and this Set is a flat, non-index-scoped allowlist (checkAggs has no
-  // `index` argument), so no new entry was needed for that pivot -- it was already unblocked.
+  // Entity-pivot fields for "noisiest/top X" questions: this allowlist mostly lists
+  // wazuh-findings-v5 field names, but a terms/composite/multi_terms agg on the
+  // wazuh-events-v5 and wazuh-states-* families' own entity fields needs no separate entry for
+  // the *agent* pivot on those families, since WAZUH_FIELD.AGENT_ID/AGENT_NAME above already
+  // cover it -- `wazuh.agent.id`/`wazuh.agent.name` are the SAME field names on findings-v5,
+  // events-v5, and every wazuh-states-* index (confirmed identical field literals in
+  // get-events-by-agent.ts:54 `wazuh.agent.name`, get-agent-os.ts:36/get-agent-packages.ts:43/
+  // get-fim-files.ts:72/get-vulnerabilities.ts:63/get-vulnerabilities-by-agent.ts:56-57
+  // `wazuh.agent.id`/`wazuh.agent.name`) and this Set is a flat, non-index-scoped allowlist
+  // (checkAggs has no `index` argument), so that pivot is already unblocked without a new entry.
   // The two pivots below are genuinely NEW field names, both `wazuh-states-*`-only (not present
   // on findings-v5/events-v5 at all) and both cardinality-safe regardless of MAX_AGG_SIZE's
   // (100) bucket cap, which bounds every terms/composite/multi_terms agg on this list anyway:
@@ -611,7 +584,7 @@ const AGG_FIELD_ALLOWLIST = new Set([
 ]);
 
 /**
- * Read-only accessor for `AGG_FIELD_ALLOWLIST` (workstream B, get_field_values -- server/tools/
+ * Read-only accessor for `AGG_FIELD_ALLOWLIST` (get_field_values -- server/tools/
  * catalog/get-field-values.ts): that tool must refuse a `field` this allowlist would reject
  * anyway, with a helpful message, INSTEAD OF letting the call reach `lintDsl`/`checkAggs` and come
  * back as an opaque guardrail rejection -- the same "fail with a useful message, not a generic
@@ -724,7 +697,7 @@ const MAX_LOOKBACK_MS = 90 * 24 * 60 * 60 * 1000;
  * (executor.ts runs `lintDsl` unconditionally — a typed catalog tool is not exempt).
  *
  * Exported because a catalog tool that derives an aggregation `size` from its own `limit` parameter
- * must clamp to the SAME number, and hard-coding it a second time is how issue #8894 happened:
+ * must clamp to the SAME number, and hard-coding it a second time is how this can happen:
  * `get_sca_results` clamped `limit` to 500, fed it to a `terms` size, and every call in the 101-500
  * range was rejected here — while its parameter description advertised 500 to the model, so a
  * compliant model was steered straight into the failure. Catalog code must reach this value through
@@ -861,8 +834,8 @@ function findNumericRangeOnKeywordField(
 // categories ALWAYS offered whenever any tools are offered at all (resolveStage2Tools always adds
 // search_wazuh_data). The four named tools below, though, all live in the separate
 // `vulnerabilities` category, which stage-1 routing has no obligation to also offer on the SAME
-// turn -- an unconditional "use the vulnerability tools" here would be the same "instruction names
-// a tool that may not be offered" shape as issue #8913. Worded conditionally, with an explicit
+// turn -- an unconditional "use the vulnerability tools" here would carry the same "instruction
+// names a tool that may not be offered" risk. Worded conditionally, with an explicit
 // fallback, so the model degrades to telling the user about the gap instead of stalling on tools
 // it was not given.
 const VULN_FIELD_ON_FINDINGS_REASON =
@@ -1191,22 +1164,21 @@ function walkRequiredForTimeRange(node: unknown, required: boolean): boolean {
 /** How many clamped-window sentences one disclosure may carry. digest.ts's MAX_HINT_LENGTH
  * invariant is "every hint writer contributes bounded, sentence-sized text" — six clamped clauses
  * once produced a 1,499-char disclosure that evicted the zero-row recount hint and truncated
- * mid-timestamp (issue #8935 integration review). Identical (requested, clamped) pairs are
+ * mid-timestamp. Identical (requested, clamped) pairs are
  * de-duplicated before this cap applies; anything beyond it is summarized in one counted tail. */
 const MAX_LOOKBACK_DISCLOSURES = 2;
 
 /**
- * Clamp-and-disclose for a time-range span above `MAX_LOOKBACK_MS` (the fix for the one row
- * marked THE DEFECT in this file's module-header bound-disclosure audit). Returns a NEW body —
+ * Clamp-and-disclose for a time-range span above `MAX_LOOKBACK_MS` (see the MAX_LOOKBACK_MS row
+ * in this file's module-header bound-disclosure audit). Returns a NEW body —
  * `applySafetyValves`'s and `normalizeMustToFilter`'s no-mutation convention — plus a
  * `disclosure` whenever at least one clause was actually clamped.
  *
  * SCOPE: REQUIRED query context ONLY — `body.query` through `bool.filter`/`bool.must` chains,
  * exactly the context-tracking `walkRequiredForTimeRange` above applies. `bool.should`,
  * `bool.must_not`, `aggs`-nested filters and `post_filter` are passed through UNTOUCHED and left
- * to `checkDateRanges`'s existing span REJECTION. This deliberately REVERSES the first cut of
- * this fix, which clamped every clause in the tree "for scope parity with checkDateRanges"
- * (integration review): the disclosure asserts a property of the RESULT SET ("results cover X to
+ * to `checkDateRanges`'s existing span REJECTION, deliberately not clamped for scope parity with
+ * it: the disclosure asserts a property of the RESULT SET ("results cover X to
  * Y"), and that claim is only derivable from a clause that BOUNDS what the query matches — for a
  * `should` clause it is irrelevant-and-false, and for `must_not` it is exactly INVERTED (the
  * named window would be the one window the results exclude, and the clamp would silently NARROW
@@ -1227,7 +1199,7 @@ const MAX_LOOKBACK_DISCLOSURES = 2;
  * Resolving BOTH bounds to absolute ISO timestamps up front removes the second `Date.now()` call
  * from the equation entirely: `Date.parse` on an ISO string never depends on when it runs.
  *
- * Bound-key handling on a clamped clause (integration review, all three):
+ * Bound-key handling on a clamped clause (all three):
  *  - the inclusive/exclusive spelling (`gte`/`gt`, `lte`/`lt`) is preserved;
  *  - when BOTH spellings of one side are present, the non-preferred one is DROPPED — leaving a
  *    stale `gt: now-400d` beside the clamped `gte` would let the engine pick the wider bound

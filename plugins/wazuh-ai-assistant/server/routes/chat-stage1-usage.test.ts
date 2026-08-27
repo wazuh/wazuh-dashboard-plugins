@@ -10,9 +10,8 @@ import { ChatStreamOptions, ProviderAdapter } from '../providers/types';
  * actually carries the stage-1 adapter call's `usage` out to `orchestrate`, rather than only
  * proving the pure accumulator (`addUsage`/`toStreamUsage`) sums correctly once given real
  * numbers. Stage 1 always ends in a forced tool call (`toolChoice: {name: 'route_question'}`), so
- * before the openai-compatible.ts fix (issue 8875) it always hit the exact
- * `finish_reason === 'tool_calls'` early-return bug -- meaning stage-1 usage was ALWAYS dropped
- * for that adapter, on every routed turn, not just an edge case.
+ * correctly reading the terminal usage frame after a `finish_reason: 'tool_calls'` exit matters
+ * on every routed turn, not just an edge case.
  *
  * NOTE (needs the OSD tree to actually run): like chat-stream-limiter.test.ts, this file imports
  * `./chat`, which imports `@osd/config-schema` -- unresolvable outside the full wazuh-dashboard
@@ -71,7 +70,7 @@ async function runStage1(events: StreamEvent[]): Promise<Stage1Result> {
   return step.value;
 }
 
-test('runStage1Routing: threads the stage-1 call usage through to Stage1Result (the fixed adapter shape -- tool_call then done+usage)', async () => {
+test('runStage1Routing: threads the stage-1 call usage through to Stage1Result (tool_call then done+usage)', async () => {
   const result = await runStage1([
     {
       type: 'tool_call',

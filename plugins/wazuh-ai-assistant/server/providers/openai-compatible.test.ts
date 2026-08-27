@@ -3,13 +3,12 @@ import { OpenAiCompatibleAdapter } from './openai-compatible';
 import { ChatMessage, ProviderConfig, StreamEvent } from '../../common/types';
 import { PROVIDER_STREAM_TRUNCATED_MESSAGE } from './sse-utils';
 
-// Covers three fixes that all land on this adapter's request/response handling:
-//  - the reasoning-channel fallback (issue 02-read-reasoning-delta.md): some reasoning models
-//    (gpt-oss, qwen3.x) stream their entire answer on `delta.reasoning` instead of
-//    `delta.content`, which this adapter previously discarded outright, producing a
-//    billed-but-blank answer;
-//  - the final-round tools/tool_choice omission (issue 03-tool-choice-none-final-round.md);
-//  - the outbound `temperature` plumbing (issue 05-set-temperature-for-tool-calls.md).
+// Covers this adapter's request/response handling:
+//  - the reasoning-channel fallback: some reasoning models (gpt-oss, qwen3.x) stream their
+//    entire answer on `delta.reasoning` instead of `delta.content`, which this adapter must
+//    surface rather than discard, so it does not produce a billed-but-blank answer;
+//  - the final-round tools/tool_choice omission;
+//  - the outbound `temperature` plumbing.
 
 function userMessage(content: string): ChatMessage {
   return { role: 'user', content };
@@ -63,7 +62,7 @@ function withFakeFetch<T>(
 }
 
 /** Same as withFakeFetch, but also captures every outbound request body -- needed to assert on
- * what the adapter actually sent (issue 03's final-round shape, issue 05's temperature). */
+ * what the adapter actually sent (the final-round shape, the temperature field). */
 function withFakeFetchCapturingBody(
   responseBody: string,
   run: (capturedBodies: Array<Record<string, unknown>>) => Promise<unknown>,
@@ -83,8 +82,7 @@ function withFakeFetchCapturingBody(
   }) as unknown as typeof fetch;
   // Resolves with the CAPTURED BODIES, not `run`'s own result: every caller writes
   // `const capturedBodies = await withFakeFetchCapturingBody(...)` and asserts on the outbound
-  // request bodies. (An earlier version resolved with run()'s drained events instead, which made
-  // all four body-shape assertions inspect StreamEvents -- caught by the first real jest run.)
+  // request bodies.
   return run(capturedBodies)
     .then(() => capturedBodies)
     .finally(() => {
@@ -92,7 +90,7 @@ function withFakeFetchCapturingBody(
     });
 }
 
-// --- in-stream tool_use_failed classification (issue #8855) ------------------------------------
+// --- in-stream tool_use_failed classification ---------------------------------------------------
 // Groq (and OpenAI-compatible providers with a similar contract) sometimes report a malformed
 // tool call as an in-stream SSE `error` frame on HTTP 200, rather than a pre-stream HTTP 400 --
 // this must be classified the same way the HTTP-400 path already is.
@@ -311,8 +309,8 @@ test('chatStream: a stream with neither content nor reasoning still ends cleanly
   );
 });
 
-// --- final-round tools/tool_choice omission (issue 03-tool-choice-none-final-round.md) --------
-// chat.ts's orchestrate() now sends `{}` (no `tools` at all) instead of
+// --- final-round tools/tool_choice omission -----------------------------------------------------
+// chat.ts's orchestrate() sends `{}` (no `tools` at all) instead of
 // `{tools, toolChoice: 'none'}` on the final round, relying on this adapter's existing
 // `if (options?.tools?.length)` guard to drop `tools`/`tool_choice` from the wire body for free.
 
@@ -370,7 +368,7 @@ test('chatStream: with `tools` present, the outbound body still carries `tools` 
   assert.equal(capturedBodies[0].tool_choice, 'auto');
 });
 
-// --- temperature plumbing (issue 05-set-temperature-for-tool-calls.md) ------------------------
+// --- temperature plumbing ------------------------------------------------------------------------
 // chat.ts sets 0 for the stage-1 router call and 0.2 on tool-bearing orchestrate rounds; this
 // adapter's job is just to forward whatever is given, verbatim, including a literal 0.
 
@@ -497,14 +495,12 @@ test('chatStream: a usage-only final frame (empty `choices`) is reported on the 
   );
 });
 
-// --- terminal usage frame after a tool-call finish (issue 8875) --------------------------------
-// The bug the previous two tests did not catch: `stream_options.include_usage` makes the terminal
-// usage frame arrive as one more chunk AFTER the one carrying `finish_reason: 'tool_calls'`. The
-// old code returned the moment it saw that finish_reason, discarding a bare `{type: 'done'}` with
-// no usage and never reading the trailing frame at all -- so every tool-bearing round (and the
-// stage-1 router call, which always ends in a tool call by construction) reported no usage,
-// leaving only the turn's last, tool-free round for chat.ts's accumulator to sum. Fixed by letting
-// the stream keep reading past `finish_reason: 'tool_calls'` instead of returning right there.
+// --- terminal usage frame after a tool-call finish ----------------------------------------------
+// `stream_options.include_usage` makes the terminal usage frame arrive as one more chunk AFTER the
+// one carrying `finish_reason: 'tool_calls'`, so the stream must keep reading past that
+// finish_reason instead of returning as soon as it is seen -- otherwise every tool-bearing round
+// (and the stage-1 router call, which always ends in a tool call by construction) would report no
+// usage, leaving only the turn's last, tool-free round for chat.ts's accumulator to sum.
 
 test('chatStream: a round that ends via finish_reason:"tool_calls" still reports the usage frame that follows it', async () => {
   const body = sseBody([
@@ -547,8 +543,7 @@ test('chatStream: a round that ends via finish_reason:"tool_calls" still reports
   assert.deepEqual(
     (done as Extract<StreamEvent, { type: 'done' }>).usage,
     { inputTokens: 812, outputTokens: 41 },
-    'the usage frame arriving AFTER finish_reason:"tool_calls" must still reach the done event ' +
-      '-- this is the exact defect issue 8875 describes',
+    'the usage frame arriving AFTER finish_reason:"tool_calls" must still reach the done event',
   );
 });
 
@@ -601,8 +596,8 @@ test('chatStream: a tool-call round with no trailing usage frame still terminate
 
 test('chatStream: buffered reasoning ahead of a finish_reason:"tool_calls" round is still suppressed once the usage frame arrives later', async () => {
   // Same invariant "Suppress reasoning fallback on tool-call exits" protects at the immediate
-  // finish_reason exit -- now also checked one chunk later, at the usage-frame exit this fix
-  // makes reachable for a tool-call round for the first time.
+  // finish_reason exit -- this test checks it again one chunk later, at the usage-frame exit
+  // that follows a tool-call round.
   const body = sseBody([
     {
       choices: [
@@ -652,12 +647,12 @@ test('chatStream: buffered reasoning ahead of a finish_reason:"tool_calls" round
   );
 });
 
-// --- temperature rejection: retry-once + per-process cache (issue seen live against a Bedrock
-// `openai_compatible` gateway serving `openai.gpt-oss-120b`, which answers HTTP 400
-// "`temperature` is deprecated for this model" whenever the stage-1 router's `temperature: 0` is
-// forwarded). The fix must retry the SAME turn once without `temperature` instead of dying, and
-// remember the finding for that provider+model so every later call -- including every stage-1
-// router call -- skips straight to omitting it. -------------------------------------------------
+// --- temperature rejection: retry-once + per-process cache ---------------------------------------
+// Seen live against a Bedrock `openai_compatible` gateway serving `openai.gpt-oss-120b`, which
+// answers HTTP 400 "`temperature` is deprecated for this model" whenever the stage-1 router's
+// `temperature: 0` is forwarded. The adapter retries the SAME turn once without `temperature`
+// instead of failing, and remembers the finding for that provider+model so every later call --
+// including every stage-1 router call -- skips straight to omitting it.
 
 /** Builds a fetch mock that returns each entry of `responses` in order (the last entry repeats
  * once exhausted) and records every outbound request body it was called with. */
@@ -924,11 +919,12 @@ test('chatStream: a 400 mentioning temperature on a temperature-FREE call is not
 // Gemini's OpenAI-compatible endpoint attaches a `thought_signature` field to assistant tool-call
 // messages and REQUIRES it echoed back on the next request's `tool_calls[]` entry, or the follow-up
 // 400s with "Function call is missing a thought_signature in functionCall parts". This adapter
-// rebuilds `messages` from canonical `ChatMessage[]` on every request (`toOpenAiMessage`), which
-// previously dropped any field it didn't explicitly know about. The fix is generic passthrough
-// (`ToolCall.vendorExtras`/`functionVendorExtras`, `ChatMessage.vendorExtras`), not a Gemini
-// special-case -- these tests exercise the mechanism directly against `toOpenAiMessage`'s output
-// (the outbound request body), independent of which provider happened to populate the fields.
+// rebuilds `messages` from canonical `ChatMessage[]` on every request (`toOpenAiMessage`), and
+// uses generic passthrough (`ToolCall.vendorExtras`/`functionVendorExtras`,
+// `ChatMessage.vendorExtras`) rather than a Gemini special-case, so any provider-specific field
+// round-trips the same way -- these tests exercise the mechanism directly against
+// `toOpenAiMessage`'s output (the outbound request body), independent of which provider happened
+// to populate the fields.
 
 function uniqueVendorExtrasConfig(id: string): ProviderConfig {
   return {
@@ -1039,16 +1035,15 @@ test('chatStream: no vendor extras produces a byte-equivalent body (no new keys)
         },
       ],
     },
-    'a provider/history that never carried vendor extras must produce the exact same shape as ' +
-      'before this fix -- no stray keys added anywhere',
+    'a provider/history that never carried vendor extras must produce the exact same shape as a ' +
+      'plain tool call -- no stray keys added anywhere',
   );
 });
 
-// Issue C4: chat.ts now carries a round's own narration (already streamed to the user) into its
-// own history turn alongside the tool call, instead of discarding it as `content: ''`. This
-// adapter must pass a non-empty `content` straight through next to `tool_calls`, not collapse it
-// to `null` -- the `content: null` case above pins the pre-existing empty-string behavior, this
-// pins the new non-empty one.
+// chat.ts carries a round's own narration (already streamed to the user) into its own history
+// turn alongside the tool call, instead of discarding it as `content: ''`. This adapter must pass
+// a non-empty `content` straight through next to `tool_calls`, not collapse it to `null` -- the
+// `content: null` case above covers the empty-string case, this one covers non-empty content.
 test('chatStream: an assistant message with narration text and tool_calls passes the text through as content', async () => {
   const config = uniqueVendorExtrasConfig('narration-plus-tool-calls');
   const { capturedBodies } = await withFakeFetchSequence(
@@ -1105,8 +1100,8 @@ test('chatStream: a streamed thought_signature is captured onto the ToolCall', a
                   index: 0,
                   id: 'call-1',
                   // Gemini-shaped extras: one on the tool_calls[] entry itself, one nested inside
-                  // its `function` object -- the fix captures both locations independently (see
-                  // ToolCall.vendorExtras / functionVendorExtras doc comments).
+                  // its `function` object -- the adapter captures both locations independently
+                  // (see ToolCall.vendorExtras / functionVendorExtras doc comments).
                   thought_signature: 'sig-on-delta',
                   function: {
                     name: 'list_agents',
@@ -1251,13 +1246,14 @@ test('chatStream: a message-level extra attaches only to a round’s first tool_
   );
 });
 
-// --- dropped stream (fault injection) ---------------------------------------------------------
-// A provider connection that drops AFTER the answer starts streaming used to be finalized as a
-// normal turn: the partial text was committed and a bare `done` was emitted, with no `error` and
-// no retry, so a truncated answer was indistinguishable from a complete one. Reproduced 3/3
-// against a fault-injection endpoint that streams content deltas and then closes the socket with
-// no `[DONE]` frame and no `finish_reason`. The `catch` in the adapter cannot see it, because a
-// clean socket close throws nothing.
+// --- dropped stream (fault injection) -------------------------------------------------------------
+// The hazard this guards against: a provider connection can drop AFTER the answer starts
+// streaming without ever sending a `[DONE]` frame or `finish_reason`, and a clean socket close
+// throws nothing, so the adapter's `catch` cannot see it on its own -- left undetected, the
+// partial text would be committed and a bare `done` emitted, with no `error` and no retry, making
+// a truncated answer indistinguishable from a complete one. Verified against a fault-injection
+// endpoint that streams content deltas and then closes the socket with no `[DONE]` frame and no
+// `finish_reason`.
 
 /** SSE body with NO `[DONE]` sentinel and no terminal usage frame -- the wire shape of a socket
  * closed mid-stream, as opposed to `sseBody` above which always terminates properly. */

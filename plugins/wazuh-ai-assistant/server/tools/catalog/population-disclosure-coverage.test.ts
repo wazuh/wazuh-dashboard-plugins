@@ -5,7 +5,7 @@ import { ToolDefinition, IndexerRequest } from '../types';
 import { BREAKDOWN_BUCKET_CAP } from '../digest';
 
 /**
- * Class-level guard for issue #8920 item 1 ("sample narrated as population"): a tool whose digest
+ * Class-level guard for "sample narrated as population": a tool whose digest
  * samples are a strict subset of its rows gives the model no population-true view of any
  * categorical dimension, so completeness/absence claims ("named 2 of 10 failed checks", "no
  * high-severity vulnerabilities") get made from a handful of sample rows instead of the actual
@@ -74,13 +74,12 @@ const POPULATION_DISCLOSURE_EXEMPT: Record<string, string> = {
     'Escape hatch: the query body (including any "aggs") is model-authored, not built by this ' +
     'catalog -- the population-disclosure guarantee for a hand-authored aggregation is the ' +
     "model's own responsibility, same boundary as every other guardrail on this tool's output.",
-  // The ORIGINAL reason here ("at most a handful of records") was
-  // live-proven false -- one indicator (124.70.213.43) returns 55 records on wazuh-aio-5, and the
-  // (pre-A-1-fix) unanchored prefix arm made the result set open-ended by construction. The
-  // exemption's CONCLUSION still holds -- `counts.total`/`counts.truncated` are computed by
-  // `buildDigest` (digest.ts) for every tool including this one, so the model is never told a
-  // truncated sample is the whole population -- but the reason must cite that disclosure, not a
-  // row-count claim this tool's own live data contradicts.
+  // A row-count-based reason ("at most a handful of records") does not hold -- one indicator
+  // (124.70.213.43) returns 55 records, and an unanchored prefix arm would make the result set
+  // open-ended by construction. The exemption holds for a different reason --
+  // `counts.total`/`counts.truncated` are computed by `buildDigest` (digest.ts) for every tool
+  // including this one, so the model is never told a truncated sample is the whole population --
+  // so the reason cites that disclosure, not a row-count claim this tool's own data contradicts.
   lookup_indicator:
     'Exact-or-prefix lookup for one specific indicator value (document.name) -- the result set ' +
     'is not fixed-size (a heavily-reused indicator can return many records) and is not exempt ' +

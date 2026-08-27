@@ -1,15 +1,15 @@
 import { listToolDefinitions } from './tools/registry';
 
 /**
- * The full catalog's tool names, one compact registry-DERIVED line (issue #8920 item 4's
- * unrouted-tool half): the per-turn tool list is a routed SUBSET, and the model has repeatedly
- * concluded "the product cannot check X" for capabilities that simply were not offered that turn
- * (the issue's headline witness: "CIS compliance checks are not covered by the current tools",
- * while get_sca_results existed and answered the very next question). A generated list is the
- * only mechanism that can be held registry-wide by a test (prompts.test.ts asserts every
- * registered tool name appears here), unlike a hand-written sentence that silently rots as
- * tools are added. Computed once at module load — the registry is static for the process
- * lifetime. NOTE: like every prompt line, delivery is guaranteed but obedience is not (#8913).
+ * The full catalog's tool names, one compact registry-DERIVED line: the per-turn tool list is a
+ * routed SUBSET, and the model can otherwise conclude "the product cannot check X" for
+ * capabilities that simply were not offered that turn (e.g. stating that CIS compliance checks
+ * are not covered by the current tools, while get_sca_results existed and answered the very next
+ * question). A generated list is the only mechanism that can be held registry-wide by a test
+ * (prompts.test.ts asserts every registered tool name appears here), unlike a hand-written
+ * sentence that silently rots as tools are added. Computed once at module load — the registry is
+ * static for the process lifetime. NOTE: like every prompt line, delivery is guaranteed but
+ * obedience is not.
  */
 const CAPABILITY_INVENTORY = listToolDefinitions()
   .map(def => def.spec.name)

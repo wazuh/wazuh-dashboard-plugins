@@ -23,15 +23,14 @@ test('get_top_rules: buildRequest targets wazuh-findings-v5* with a bounded @tim
   assert.equal(request.body.size, 0);
 });
 
-// Issue #8921 (the "796 hits for a 1-doc title" falsehood): `wazuh.rule.title` is only ever a
-// SAMPLE of one document in the bucket -- `distinct_title_count` and `high_or_critical` are the
-// sub-aggs that turn that sample into an honest one, and BOTH must merge into the row via
-// digest.ts's existing metric-/filter-sub-agg branches with no digest.ts change (verified: a
-// `cardinality` sub-agg is a metric agg with a `{value}` shape, a `filter` sub-agg has a bare
-// `{doc_count}` shape -- see digest.ts's `bucketsToRows` doc comment). `wazuh.rule.level` rides
-// the SAME `sample_doc` top_hits sample (issue #8921's "missing severity" item -- see this file's
-// top-of-file doc comment), guarded by its own `distinct_level_count` cardinality sub-agg exactly like
-// the title is guarded by `distinct_title_count`.
+// `wazuh.rule.title` is only ever a SAMPLE of one document in the bucket -- `distinct_title_count`
+// and `high_or_critical` are the sub-aggs that turn that sample into an honest one, and BOTH must
+// merge into the row via digest.ts's existing metric-/filter-sub-agg branches with no digest.ts
+// change (verified: a `cardinality` sub-agg is a metric agg with a `{value}` shape, a `filter`
+// sub-agg has a bare `{doc_count}` shape -- see digest.ts's `bucketsToRows` doc comment).
+// `wazuh.rule.level` rides the SAME `sample_doc` top_hits sample (see this file's top-of-file doc
+// comment), guarded by its own `distinct_level_count` cardinality sub-agg exactly like the title
+// is guarded by `distinct_title_count`.
 test('get_top_rules: aggregates by wazuh.rule.id with a sample title+level, distinct_title_count, distinct_level_count, and a high/critical count', () => {
   const request = build({ limit: 10 });
   assert.deepEqual(request.body.aggs, {

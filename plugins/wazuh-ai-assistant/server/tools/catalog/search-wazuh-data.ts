@@ -30,9 +30,9 @@ import {
  * true` (below) opts this tool into `field-validation.ts`'s LIVE `_field_caps` check, which
  * already generalizes to every index pattern this tool can ever target with no per-family code —
  * a real mapping check (not a schema guess) with the same "closest known field" suggestion
- * mechanism workstream B built for `get_field_values` (`findNearMisses` there / `suggestCloseFields`
- * here — same shape, same intent: never make the model spend its bounded retry on a bare "zero
- * rows" with no hint of what it actually should have asked for).
+ * mechanism `get_field_values` uses (`findNearMisses` there / `suggestCloseFields` here — same
+ * shape, same intent: never make the model spend its bounded retry on a bare "zero rows" with no
+ * hint of what it actually should have asked for).
  *
  * This tool does NOT lint or clamp anything itself beyond that. `executeIndexerRequest` in
  * executor.ts runs `checkIndexAllowlist` + `applySafetyValves` + `lintDsl` on every indexer
@@ -48,7 +48,7 @@ import {
  * so this is the one call site where a made-up field name (e.g. "agent.name.keyword") is actually
  * reachable.
  *
- * CHAINING (mission item 5): the model's own bounded-retry loop is this codebase's "declared
+ * CHAINING: the model's own bounded-retry loop is this codebase's "declared
  * chain" mechanism (there is no separate registry-level chain graph — see e.g. guardrails.ts's
  * `VULN_FIELD_ON_FINDINGS_REASON`, which redirects a misrouted query to the right tool BY NAME in
  * its rejection text). This tool's own description below names `get_field_values` explicitly for
@@ -168,9 +168,9 @@ export const searchWazuhDataTool: ToolDefinition = {
   digest: { sampleColumns: [] },
   deriveColumns: true,
   // The genuine escape hatch: the model's own DSL can put ANY finding/event/state field into the
-  // digest, so an unlisted field must fail closed (issue #8917 -- see
-  // `ToolDefinition.failClosedFieldPolicy`'s doc comment, types.ts; this used to be inherited from
-  // `deriveColumns` above, now explicit). Do not set this to `false` -- that would remove the
+  // digest, so an unlisted field must fail closed (see
+  // `ToolDefinition.failClosedFieldPolicy`'s doc comment, types.ts -- set explicitly here rather
+  // than inherited from `deriveColumns` above). Do not set this to `false` -- that would remove the
   // fail-closed protection this tool has always had.
   failClosedFieldPolicy: true,
   validateFieldNames: true,

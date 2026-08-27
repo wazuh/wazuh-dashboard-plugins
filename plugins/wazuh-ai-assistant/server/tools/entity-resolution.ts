@@ -1,5 +1,5 @@
 /**
- * No-silent-entity-substitution disclosure (issue #8920 item 6): the server has no way to see the
+ * No-silent-entity-substitution disclosure: the server has no way to see the
  * user's ORIGINAL wording -- only the agent-name string(s) the model already resolved and passed
  * as tool-call params (see `AGENT_NAME_PARAM_KEYS`). So it cannot detect "the model silently
  * substituted a different host" directly; the honest, deterministic guarantee it CAN give is a

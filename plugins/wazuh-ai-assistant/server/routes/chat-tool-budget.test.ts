@@ -102,11 +102,11 @@ test('toolCallCostUnits: a successful call costs exactly its registry class', ()
   assert.equal(toolCallCostUnits('search_wazuh_data', true), 3);
 });
 
-// --- isRoundFutile: the early futility stop (product design item 4) ------------------------
+// --- isRoundFutile: the early futility stop --------------------------------------------------
 
 test("isRoundFutile: no successful calls this round -- not this mechanism's concern (returns false)", () => {
-  // An all-rejected round is #8911's (shouldEnterFinalRoundEarly) territory, never this one's --
-  // see the function's own doc comment for why the two must not overlap.
+  // An all-rejected round is shouldEnterFinalRoundEarly's territory, never this one's -- see the
+  // function's own doc comment for why the two must not overlap.
   assert.equal(isRoundFutile([]), false);
 });
 
@@ -193,7 +193,7 @@ test("zero-row widening: a round that returned rows is not this mechanism's conc
 });
 
 test('zero-row widening: an all-rejected round (no successful calls) earns nothing', () => {
-  // Same non-overlap `isRoundFutile` keeps with #8911: an all-rejected round is
+  // Same non-overlap `isRoundFutile` keeps: an all-rejected round is
   // shouldEnterFinalRoundEarly's territory and has its own retry allowance.
   assert.equal(
     shouldGrantZeroRowWideningRound({
@@ -331,11 +331,9 @@ test('extractEnumeratedTargets: no cue word at all is NOT enumerable', () => {
 
 test('extractEnumeratedTargets: the sentence-terminating period after the last token is not part of it', () => {
   // Regression: the token charset deliberately allows '.' (so an id like "v1.2" survives), which
-  // let the LAST token in the list also swallow the question's own closing period -- this file's
-  // F1 parse failure hid the fact that the very first test above ("...004 and 005.") was already
-  // asserting the correct trimmed value and had never actually run. A trailing '?' needs no
-  // equivalent trim: '?' is not in the token charset at all, so it is never captured in the first
-  // place.
+  // lets the LAST token in the list also swallow the question's own closing period. A trailing '?'
+  // needs no equivalent trim: '?' is not in the token charset at all, so it is never captured in
+  // the first place.
   assert.deepEqual(
     extractEnumeratedTargets('Check on agents 001, 002 and 003.'),
     ['001', '002', '003'],
@@ -346,10 +344,10 @@ test('extractEnumeratedTargets: the sentence-terminating period after the last t
   );
 });
 
-// Before the identifier-shape requirement, every one of these was a
-// measured false positive -- an ordinary English "X, Y and Z" list near a cue word, with no digit
-// in any item, silently tripling the turn's budget. Each must now be rejected.
-test('extractEnumeratedTargets: F5 false-positive table -- ordinary prose lists near a cue word are rejected', () => {
+// Each of these is an ordinary English "X, Y and Z" list near a cue word, with no digit in any
+// item -- exactly the shape that would silently triple the turn's budget without the
+// identifier-shape requirement. Each must be rejected.
+test('extractEnumeratedTargets: false-positive table -- ordinary prose lists near a cue word are rejected', () => {
   const proseQuestions = [
     'Which agents are offline, disconnected and never registered?',
     'Show me the agents with high, medium and low severity alerts',
@@ -367,7 +365,7 @@ test('extractEnumeratedTargets: F5 false-positive table -- ordinary prose lists 
 });
 
 test('extractEnumeratedTargets: an identifier list still matches even when it is not immediately adjacent to the cue word', () => {
-  // The tightened 8-char gap (F5) still allows "agents" directly followed by a short qualifier
+  // The tightened 8-char gap still allows "agents" directly followed by a short qualifier
   // before the list, as long as it stays within the identifier-list shape.
   assert.deepEqual(
     extractEnumeratedTargets('Check agents 001, 002 and 003 for drift.'),
@@ -375,7 +373,7 @@ test('extractEnumeratedTargets: an identifier list still matches even when it is
   );
 });
 
-// --- shouldGrantBudgetExtension: the silent-extension gate (product design item 3) ----------
+// --- shouldGrantBudgetExtension: the silent-extension gate ------------------------------------
 
 const ENUMERATED = ['001', '002', '003', '004', '005'];
 
@@ -456,14 +454,13 @@ test('HARD_CEILING_UNITS is exactly 3x BASE_BUDGET_UNITS', () => {
 });
 
 test('MAX_TOOL_ROUNDS is a structural backstop, deliberately independent of the cost budget', () => {
-  // MAX_TOOL_ROUNDS (6, lowered from the original design's "e.g. 8" by review fix D1) is NOT sized
-  // to guarantee the hard ceiling (18) is reachable -- it exists to bound a PATHOLOGICAL loop of
-  // free (cost-0, rejected/errored) calls, which never spends the cost budget at all (see
-  // BASE_BUDGET_UNITS's doc comment; review fix F3 additionally bounds that specific shape with
-  // its own independent, tighter `MAX_CONSECUTIVE_REJECTED_ROUNDS`). A turn doing genuine cost-2
-  // work can still hit this round cap before HARD_CEILING_UNITS is spent (6 rounds x 2 units =
-  // 12 < 18) -- an accepted, deliberate tradeoff, not a bug; this test just pins the constants so a
-  // future edit to either one is a conscious choice.
+  // MAX_TOOL_ROUNDS (6) is NOT sized to guarantee the hard ceiling (18) is reachable -- it exists
+  // to bound a PATHOLOGICAL loop of free (cost-0, rejected/errored) calls, which never spends the
+  // cost budget at all (see BASE_BUDGET_UNITS's doc comment; `MAX_CONSECUTIVE_REJECTED_ROUNDS`
+  // additionally bounds that specific shape with its own independent, tighter limit). A turn
+  // doing genuine cost-2 work can still hit this round cap before HARD_CEILING_UNITS is spent
+  // (6 rounds x 2 units = 12 < 18) -- an accepted, deliberate tradeoff, not a bug; this test just
+  // pins the constants so a future edit to either one is a conscious choice.
   assert.equal(MAX_TOOL_ROUNDS, 6);
   assert.ok(MAX_TOOL_ROUNDS * 2 < HARD_CEILING_UNITS);
 });
@@ -492,7 +489,7 @@ test('mechanism silence: FINAL_ROUND_ANSWER_INSTRUCTION never names the internal
     FINAL_ROUND_ANSWER_INSTRUCTION,
     /\b(round|budget|limit|unit|threshold|quota|cost|turn)\b/i,
   );
-  // And the coverage-statement clause (product design item 5) is actually present.
+  // And the coverage-statement clause is actually present.
   assert.match(FINAL_ROUND_ANSWER_INSTRUCTION, /do and do not cover/i);
 });
 
@@ -706,10 +703,10 @@ test('budget stress: a 5-agent SCA sweep spends past the base budget via silent 
   );
 });
 
-// --- F6 fix: the enumerable-remaining heuristic reads the CURRENT question, not a stale one -----
+// --- The enumerable-remaining heuristic reads the CURRENT question, not a stale one -------------
 
 test("orchestrate: a follow-up turn is gated by the CURRENT question's agent list, not an earlier turn's", async () => {
-  // Review fix F6: `initialMessages` is the full resent conversation history, so reading the
+  // `initialMessages` is the full resent conversation history, so reading the
   // FIRST `user` message (the old bug) would gate this turn's extension on turn 1's question --
   // which names no agents at all here -- instead of the actual, list-bearing follow-up question.
   // If the bug were still present, `extractEnumeratedTargets` would find nothing, the silent
@@ -834,9 +831,9 @@ test('orchestrate: with the extension granted, MAX_TOOL_ROUNDS (not the cost bud
     );
 
     // The LAST provider call is the forced final round -- its outbound messages must end with
-    // FINAL_ROUND_ANSWER_INSTRUCTION (issue #8893), proving the exhaustion path actually appends
-    // it, not just the "model chose to stop, tools were still offered" path the budget-stress
-    // test above covers.
+    // FINAL_ROUND_ANSWER_INSTRUCTION, proving the exhaustion path actually appends it, not just
+    // the "model chose to stop, tools were still offered" path the budget-stress test above
+    // covers.
     const finalRoundMessages = callMessages[callMessages.length - 1];
     assert.equal(
       finalRoundMessages[finalRoundMessages.length - 1].content,

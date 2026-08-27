@@ -126,11 +126,11 @@ export const getFimFilesTool: ToolDefinition = {
         sort: [{ 'file.mtime': { order: 'desc' } }],
         size: limit,
         // Population-true "which agents have monitored files" breakdown over the FULL matched
-        // set (issue #8920 item 1): this tool sorts by file.mtime desc over thousands of FIM
-        // state docs against a default limit of 20, so a page-scoped view of the agent list is
-        // exactly the sample-narrated-as-population defect. wazuh.agent.name is on
-        // AGG_FIELD_ALLOWLIST and wazuh-states-fim-files* is not a time-based index, so this
-        // passes checkAggs/lintDsl unchanged — the population-true option is free here.
+        // set: this tool sorts by file.mtime desc over thousands of FIM state docs against a
+        // default limit of 20, so a page-scoped view of the agent list would misrepresent the
+        // full population. wazuh.agent.name is on AGG_FIELD_ALLOWLIST and
+        // wazuh-states-fim-files* is not a time-based index, so this passes checkAggs/lintDsl
+        // unchanged — the population-true option is free here.
         aggs: {
           [aggNameForField('wazuh.agent.name')]: {
             terms: { field: 'wazuh.agent.name', size: BREAKDOWN_BUCKET_CAP },

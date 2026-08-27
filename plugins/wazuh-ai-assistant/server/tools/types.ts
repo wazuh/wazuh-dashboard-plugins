@@ -5,8 +5,8 @@ import {
 import { ToolSpec } from '../../common/types';
 
 /**
- * Outcome of an optional `ToolDefinition.resolveParams` hook (see that field's doc comment below;
- * added for issue #8913). Not itself a `ToolRequest` -- exactly one outbound request still
+ * Outcome of an optional `ToolDefinition.resolveParams` hook (see that field's doc comment
+ * below). Not itself a `ToolRequest` -- exactly one outbound request still
  * executes per tool call (`executor.ts`'s `executeToolCall`); this is the result of a live lookup
  * that happens BEFORE that request is built, used to patch/validate `params`.
  */
@@ -26,7 +26,7 @@ export interface ResolvedToolParams {
    * bare single-word token, so neither the shape scan (not address-shaped; privacy.ts's
    * documented bare-hostname limitation) nor the known-entity scan (nothing minted it — the
    * whole point of resolution is that the caller never supplied the value) can catch it. Proven
-   * on the wire 2026-08-14: the note carried the raw agent name while
+   * on the wire: the note carried the raw agent name while
    * `HOST_` appeared nowhere in the outbound body. Same treatment as the near-miss hint's
    * explicit HOST pseudonymization (executor.ts's appendEntityNearMissHint PRIVACY note) — a
    * resolver that names an identifier in prose must also declare it here. Omitted when the note
@@ -57,7 +57,7 @@ export type ResolveParamsResult =
 
 /**
  * Declarative "this param resolves to whichever value is the sole live candidate" spec (the
- * generic form of issue #8913's `resolveDeicticAgentParams`; see `param-resolution.ts`'s header
+ * generic form of `resolveDeicticAgentParams`; see `param-resolution.ts`'s header
  * comment for the measured prompt-vs-code result that motivates this). A tool lists one entry per
  * param it wants this treatment for in `ToolDefinition.soleCandidateParams`; `registry.ts`
  * attaches `param-resolution.ts`'s `buildGenericResolveParams` as that tool's `resolveParams` hook
@@ -170,7 +170,7 @@ export interface ToolDefinition {
    */
   buildRequest(params: Record<string, unknown>): ToolRequest;
   /**
-   * Opt-in async pre-`buildRequest` hook (currently only get_agent_inventory, issue #8913):
+   * Opt-in async pre-`buildRequest` hook (currently only get_agent_inventory):
    * resolves/validates params against a live source (e.g. the Manager API's active-agent list)
    * BEFORE `buildRequest` runs, for a caller that omitted a param `buildRequest` alone has no way
    * to infer (it is purely synchronous and has no execution context). `executor.ts`'s
@@ -220,7 +220,7 @@ export interface ToolDefinition {
      * search. `undefined` (every other tool) reproduces today's breakdown-only-from-real-aggs
      * behavior exactly.
      *
-     * Since #8870's fix, every one of these 8 tools ALSO attaches a real `terms` aggregation per
+     * Every one of these 8 tools ALSO attaches a real `terms` aggregation per
      * dimension to its own request (`catalog/common.ts`'s `FINDING_BREAKDOWN_AGGS` — OpenSearch
      * computes it over the full matched set regardless of `size`), so `buildBreakdown` normally
      * satisfies `breakdown` before this synthetic path is ever reached; this dot-path list remains
@@ -252,20 +252,20 @@ export interface ToolDefinition {
    *
    * This flag is ONLY about how columns are computed for the table/digest shape — it says nothing
    * about how RISKY the tool's field surface is for privacy purposes. See `failClosedFieldPolicy`
-   * below, which used to be silently derived from this one (issue #8917) and must be set
+   * below, which is a separate flag, not derived from this one, and must be set
    * independently.
    */
   deriveColumns?: boolean;
   /**
-   * Privacy-mode field-policy default for a field with NO `FIELD_POLICY_DEFAULTS` entry (issue
-   * #8917): `true` fails closed (server/tools/privacy.ts's `applyFieldPolicy`, this file's
+   * Privacy-mode field-policy default for a field with NO `FIELD_POLICY_DEFAULTS` entry:
+   * `true` fails closed (server/tools/privacy.ts's `applyFieldPolicy`, this file's
    * `isEscapeHatch` argument) pseudonymizes an unlisted string field, kind inferred from its name)
    * instead of the normal allow-by-omission default every other typed tool gets. `undefined`/
    * `false` (the default) reproduces today's allow-by-omission behavior.
    *
-   * Deliberately a SEPARATE flag from `deriveColumns` above, not derived from it. Before #8917
-   * this was `def.deriveColumns` itself, threaded straight into `applyFieldPolicy`'s
-   * `isEscapeHatch` argument at executor.ts's call site — which conflated two unrelated
+   * Deliberately a SEPARATE flag from `deriveColumns` above, not derived from it: threading
+   * `deriveColumns` itself straight into `applyFieldPolicy`'s
+   * `isEscapeHatch` argument at executor.ts's call site would conflate two unrelated
    * questions: "does this tool need per-response column derivation" and "can this tool's fields
    * be an arbitrary, uncurated set that must fail closed by default". `get_agent_inventory` needs
    * `deriveColumns: true` purely because one `ToolDefinition` cannot declare a single static
@@ -300,9 +300,9 @@ export interface ToolDefinition {
    */
   soleCandidateParams?: SoleCandidateParamSpec[];
   /**
-   * Cost-budget class for chat.ts's tool-round COST budget (workstream C, the fixed-3-round ->
-   * cost-unit redesign; see chat.ts's `BASE_BUDGET_UNITS` doc comment for the calibration this
-   * scale is measured against). A deliberately explicit, per-tool, testable classification instead
+   * Cost-budget class for chat.ts's tool-round COST budget (see chat.ts's `BASE_BUDGET_UNITS`
+   * doc comment for the calibration this scale is measured against). A deliberately explicit,
+   * per-tool, testable classification instead
    * of guessing a cost from request shape at call time:
    *   1 = aggregation-only request -- a top-level `size: 0` body whose ONLY output is
    *       aggregation buckets, no hit documents (e.g. get_top_rules, get_top_agents,

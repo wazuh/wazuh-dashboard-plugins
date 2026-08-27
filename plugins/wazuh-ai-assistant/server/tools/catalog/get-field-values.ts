@@ -101,14 +101,10 @@ export const FIELD_LOCATIONS: Record<string, FieldLocation[]> = {
   [WAZUH_FIELD.RULE_MITRE_TECHNIQUE_NAME]: [FINDINGS],
   [WAZUH_FIELD.RULE_MITRE_TACTIC_NAME]: [FINDINGS],
   [WAZUH_FIELD.INTEGRATION_CATEGORY]: [FINDINGS, EVENTS],
-  // `event.category` was added to
-  // `guardrails.ts`'s `AGG_FIELD_ALLOWLIST` (it is events-v5's own finite category taxonomy --
-  // 11 values over 258k live docs, verified) but had NO entry here, so `isAggAllowedField` passed
-  // while `FIELD_LOCATIONS[field] === undefined` still failed the same guard clause -- the call
-  // could only ever hit the "not one of this tool's vetted fields" error branch, an INCORRECT
-  // message for a field that genuinely is allowlisted, and a wasted round trip for the model.
-  // `event.outcome` is added alongside it for the same reason (success/failure/unknown, same
-  // finite-enum class) and the same events-v5 surface.
+  // `event.category` is in `guardrails.ts`'s `AGG_FIELD_ALLOWLIST` (it is events-v5's own finite
+  // category taxonomy, 11 values) and maps here to `EVENTS`, so `isAggAllowedField` and this
+  // field-location lookup agree. `event.outcome` is included alongside it for the same reason
+  // (success/failure/unknown, same finite-enum class) and the same events-v5 surface.
   'event.category': [EVENTS],
   'event.outcome': [EVENTS],
   [WAZUH_FIELD.AGENT_ID]: [FINDINGS, EVENTS, VULNERABILITIES, SCA],
@@ -120,12 +116,11 @@ export const FIELD_LOCATIONS: Record<string, FieldLocation[]> = {
   'interface.state': [INVENTORY_PORTS],
   'network.transport': [INVENTORY_PORTS],
   'package.name': [INVENTORY_PACKAGES],
-  // Extended from `[INVENTORY_SYSTEM]` alone. Without
-  // `FINDINGS`/`EVENTS` here, the model could never even OBSERVE the empty ECS twin on the surface
-  // the flagship scenario actually asks about (findings/events) -- it would silently get routed to
-  // inventory_system instead, which answers a different question and hides the `missing_count`
-  // this tool exists to surface. See `resolveParams` below for what points the model at the
-  // populated `wazuh.agent.host.os.*` twin once it lands here.
+  // Without `FINDINGS`/`EVENTS` here, the model could never even OBSERVE the empty ECS twin on
+  // the surface the flagship scenario actually asks about (findings/events) -- it would silently
+  // get routed to inventory_system instead, which answers a different question and hides the
+  // `missing_count` this tool exists to surface. See `resolveParams` below for what points the
+  // model at the populated `wazuh.agent.host.os.*` twin once it lands here.
   'host.os.name': [INVENTORY_SYSTEM, FINDINGS, EVENTS],
   'host.os.platform': [INVENTORY_SYSTEM, FINDINGS, EVENTS],
   'source.ip': [FINDINGS, EVENTS],

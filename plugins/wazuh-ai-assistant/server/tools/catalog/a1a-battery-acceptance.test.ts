@@ -4,15 +4,13 @@ import { checkIndexAllowlist, applySafetyValves, lintDsl } from '../guardrails';
 import { GENERIC_QUERY_INDEX_PATTERNS } from './generic-query-families';
 
 /**
- * Acceptance-shaped tests for three
- * validation-battery rows the design doc itself marks as "no tool today" / "no workstream (G1)"
- * that ONLY this generic query layer (not a new one-off typed tool, not another workstream) makes
- * answerable, end to end through the real guardrail pipeline (`checkIndexAllowlist` ->
- * `applySafetyValves` -> `lintDsl`, the same sequence `executor.ts`'s `executeIndexerRequest` runs
- * unconditionally). These do not invoke a live model or a live cluster (this is a unit-test tier
- * suite) -- they prove the mechanical path a real turn would take is actually open: the index is
- * allowlisted, the request survives every safety valve, and the DSL lints clean, for exactly the
- * request shape that question implies.
+ * Acceptance-shaped tests for three questions answerable ONLY through this generic query layer
+ * (not a one-off typed tool), end to end through the real guardrail pipeline
+ * (`checkIndexAllowlist` -> `applySafetyValves` -> `lintDsl`, the same sequence `executor.ts`'s
+ * `executeIndexerRequest` runs unconditionally). These do not invoke a live model or a live
+ * cluster (this is a unit-test tier suite) -- they prove the mechanical path a real turn would
+ * take is actually open: the index is allowlisted, the request survives every safety valve, and
+ * the DSL lints clean, for exactly the request shape that question implies.
  */
 
 /** Builds and fully validates a search_wazuh_data request the way executor.ts would, returning
@@ -55,10 +53,10 @@ function buildAndValidate(
   return { index: request.index, body: clampedBody };
 }
 
-// --- "How healthy is agent-manager communication right now?" (metrics-comms, coverage
-// doc's open gap G1 -- "no workstream", decline-today). This branch's guardrails.ts widening
-// (wazuh-metrics-* added to INDEX_ALLOWLIST_RE) and generic-query-families.ts's new enum entry
-// together make this answerable through search_wazuh_data, with no new typed tool. -------------
+// --- "How healthy is agent-manager communication right now?" (metrics-comms). This branch's
+// guardrails.ts widening (wazuh-metrics-* added to INDEX_ALLOWLIST_RE) and
+// generic-query-families.ts's new enum entry together make this answerable through
+// search_wazuh_data, with no new typed tool. ----------------------------------------------------
 
 test('"how healthy is agent-manager communication right now" is answerable via search_wazuh_data (wazuh-metrics-comms)', () => {
   assert.ok(GENERIC_QUERY_INDEX_PATTERNS.includes('wazuh-metrics-*'));
@@ -83,10 +81,9 @@ test('"how healthy is agent-manager communication right now" is answerable via s
 });
 
 // --- "How fresh is our threat intel? Has the CVE/ruleset/IOC feed synced recently?"
-// (.wazuh-cti-consumers + .wazuh-content-manager-jobs, coverage doc TC-7/MS-6/MS-7). The design
-// doc names a hypothetical new typed tool (`get_cti_status`) for this; the product decision this
-// workstream implements instead is ONE generic tool, so this proves the SAME row is answerable
-// without it. ---------------------------------------------------------------------------------
+// (.wazuh-cti-consumers + .wazuh-content-manager-jobs). A hypothetical new typed tool
+// (`get_cti_status`) could answer this; the alternative is ONE generic tool, so this proves the
+// SAME row is answerable without it. -------------------------------------------------------------
 
 test('"how fresh is our threat intel" is answerable via search_wazuh_data (.wazuh-cti-consumers)', () => {
   assert.ok(GENERIC_QUERY_INDEX_PATTERNS.includes('.wazuh-cti-consumers'));
@@ -112,10 +109,8 @@ test('schedule half: the content-manager sync schedule is answerable via search_
 });
 
 // --- "Is IP/hash/URL X known-malicious per our threat intel?" (wazuh-threatintel-
-// enrichments-a, coverage doc TC-8 -- one of the two "production-shaped volume" cover-now rows,
-// explicitly sequenced first). Previously an unconditional decline (guardrails.ts's own prior
-// comment called this "deliberately out of scope"); this branch reverses that per the coverage
-// doc's resequencing. ---------------------------------------------------------------------------
+// enrichments-a) is answerable through search_wazuh_data now that the index is allowlisted.
+// ---------------------------------------------------------------------------------------------
 
 test('"is IP/hash/URL X known-malicious" is answerable via search_wazuh_data (wazuh-threatintel-enrichments-a)', () => {
   assert.ok(
@@ -125,8 +120,8 @@ test('"is IP/hash/URL X known-malicious" is answerable via search_wazuh_data (wa
   // that root field is the RECORD'S OWN content hash (a sibling of `document`, e.g.
   // `{"hash":{"sha256":"4321..."}, "document":{"name":"<the actual indicator>", "type":
   // "hash_sha256"}}`), unrelated to the indicator being looked up. A `term` filter on `hash.sha256`
-  // lints clean and passes this test, but against real data it returns 0 hits forever -- this
-  // exemplar previously filtered the wrong field. Filtering `document.name` (with `document.type`
+  // lints clean and passes this test, but against real data it returns 0 hits forever.
+  // Filtering `document.name` (with `document.type`
   // narrowing to the indicator kind) is what actually matches the live terms-agg population
   // (`document.type`: url_domain 107,653 / connection 95,252 / url_full 28,704 / hash_sha256
   // 10,734 / hash_md5 8,167 / hash_sha1 6,559).

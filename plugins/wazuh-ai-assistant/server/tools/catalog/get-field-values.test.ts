@@ -31,19 +31,15 @@ test("get_field_values: defaults to the field's first known surface with a bound
   assert.equal(request.body.size, 0);
 });
 
-test(
-  'get_field_values: event.category resolves to the events surface (was previously absent ' +
-    'from FIELD_LOCATIONS despite being agg-allowlisted)',
-  () => {
-    const request = build({ field: 'event.category' });
-    assert.equal(request.index, 'wazuh-events-v5*');
-    assert.deepEqual(
-      (request.body.aggs as { values: { terms: Record<string, unknown> } })
-        .values.terms,
-      { field: 'event.category', size: 50 },
-    );
-  },
-);
+test('get_field_values: event.category resolves to the events surface (agg-allowlisted)', () => {
+  const request = build({ field: 'event.category' });
+  assert.equal(request.index, 'wazuh-events-v5*');
+  assert.deepEqual(
+    (request.body.aggs as { values: { terms: Record<string, unknown> } }).values
+      .terms,
+    { field: 'event.category', size: 50 },
+  );
+});
 
 test('get_field_values: event.outcome resolves to the events surface (same fix, same reason)', () => {
   const request = build({ field: 'event.outcome' });
@@ -159,24 +155,19 @@ test('get_field_values: tableSpec and digest surface the bucket key/count', () =
   ]);
 });
 
-test(
-  'get_field_values: "prefix" longer than the max is rejected with a clear parameter error ' +
-    '(code review B9)',
-  () => {
-    assert.throws(
-      () => build({ field: 'check.result', prefix: 'a'.repeat(65) }),
-      /Parameter "prefix" is 65 characters long; the maximum is 64/,
-    );
-  },
-);
+test('get_field_values: "prefix" longer than the max is rejected with a clear parameter error', () => {
+  assert.throws(
+    () => build({ field: 'check.result', prefix: 'a'.repeat(65) }),
+    /Parameter "prefix" is 65 characters long; the maximum is 64/,
+  );
+});
 
 test(
   'get_field_values: flagship scenario end to end -- "findings for linux" pivots through ' +
     'host.os.platform on the findings surface to the populated wazuh.agent.host.os.platform twin',
   async () => {
-    // Step 1/2 of the scenario: the model asks for host.os.platform ON FINDINGS (previously
-    // guardrail-rejected -- FIELD_LOCATIONS only mapped it to inventory_system). It must now
-    // succeed, run against the real findings index, stay time-bounded, and expose missing_count so
+    // Step 1/2 of the scenario: the model asks for host.os.platform ON FINDINGS. It succeeds,
+    // runs against the real findings index, stays time-bounded, and exposes missing_count so
     // the model can see the field is largely empty there.
     const onFindings = build({
       field: 'host.os.platform',
@@ -214,8 +205,8 @@ test(
     assert.match(resolved.note ?? '', /wazuh\.agent\.host\.os\.platform/);
     assert.match(resolved.note ?? '', /"host\.os\.platform"/);
 
-    // The pivot target itself must now be reachable -- previously blocked by both
-    // AGG_FIELD_ALLOWLIST and FIELD_LOCATIONS (the flagship scenario's actual dead end).
+    // The pivot target itself is reachable: both AGG_FIELD_ALLOWLIST and FIELD_LOCATIONS allow
+    // it, resolving the flagship scenario's dead end.
     const onTwin = build({
       field: 'wazuh.agent.host.os.platform',
       index_family: 'findings',

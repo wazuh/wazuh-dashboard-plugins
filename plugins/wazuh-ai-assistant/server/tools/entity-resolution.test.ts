@@ -161,15 +161,12 @@ test('extractRequestedAgentNames: empty for a call naming no agent at all', () =
 });
 
 /**
- * Registry-driven coverage (issue #8920 item 6): every DECLARED tool parameter whose name looks
- * agent-name-shaped must be one extractRequestedAgentNames actually reads. The previous version
- * of this test filtered the registry on the exact keys the extractor already knew about and then
- * asserted a hand-built literal -- which is structurally incapable of failing for a param under
- * any OTHER name, and is exactly how get_vulnerabilities_by_agent's `agent_identifier` (the
- * reported instance's own vulnerability leg) slipped through. This version derives the
- * candidates from a LOOSE name-shape regex over each tool's real declared params, so a future
- * `agent_hostname`/`agent_display_name` param fails here until AGENT_NAME_PARAM_KEYS (and
- * therefore the extractor) covers it.
+ * Every DECLARED tool parameter whose name looks agent-name-shaped must be one
+ * extractRequestedAgentNames actually reads. The candidates are derived from a LOOSE
+ * name-shape regex over each tool's real declared params -- not a hand-built literal list --
+ * so a param under any name, such as get_vulnerabilities_by_agent's `agent_identifier`, is
+ * covered. A future `agent_hostname`/`agent_display_name` param fails here until
+ * AGENT_NAME_PARAM_KEYS (and therefore the extractor) covers it.
  */
 const AGENT_NAMEISH_PARAM_RE = /agent.*(name|identifier|host)/i;
 

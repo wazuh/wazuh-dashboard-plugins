@@ -93,23 +93,19 @@ function providerPath(id?: string): string {
  * AI provider (OpenAI/Anthropic endpoint) configuration, sourced from — and, on write, pushed
  * back into — the Wazuh indexer's `/_plugins/_setup/ai_assistant/providers*` endpoints (see
  * `WAZUH_INDEXER_AI_ASSISTANT_PROVIDERS_PATH`'s doc comment, common/constants.ts, for the
- * OpenAPI spec link). Replaces the direct `.wazuh-ai-assistant-settings` index access
- * `server/settings-store.ts` used before this endpoint existed (wazuh-dashboard-plugins#500).
+ * OpenAPI spec link).
  *
- * Two contract gaps versus the raw index access this replaces, both handled below rather than
- * papered over:
+ * Two contract gaps in that endpoint, both handled below rather than papered over:
  *
  * - No get-one/count endpoint: `GET {WAZUH_INDEXER_AI_ASSISTANT_PROVIDERS_PATH}` is a standalone
  *   list with no pagination or query capability of its own, and no per-id `GET` exists at all
  *   (only `PUT`/`DELETE` under `.../providers/{id}`). `list`/`count`/`get` below all fetch that
- *   SAME full response (`fetchAll`) and slice/search it in memory — one full round trip per call,
- *   same as the raw-index code this replaces made one `.search()`/`.get()` call per read.
+ *   SAME full response (`fetchAll`) and slice/search it in memory — one full round trip per call.
  *   Providers are capped at ~200 (see `list`'s `perPage` in server/routes/settings.ts), so the
  *   response size is bounded and this is not a scaling concern.
- * - No partial-update primitive: `PUT .../providers/{id}` is a full create-or-update, unlike the
- *   old `.update({doc: {...}})` this replaces. Every write below sends the COMPLETE provider body;
- *   server/routes/settings.ts's `clearOtherDefaults` (previously a partial `is_default`-only flip)
- *   now re-sends each affected provider's full attributes with `isDefault: false` via `update`.
+ * - No partial-update primitive: `PUT .../providers/{id}` is a full create-or-update. Every write
+ *   below sends the COMPLETE provider body; server/routes/settings.ts's `clearOtherDefaults`
+ *   re-sends each affected provider's full attributes with `isDefault: false` via `update`.
  */
 export class AiProvidersClient {
   private async fetch(

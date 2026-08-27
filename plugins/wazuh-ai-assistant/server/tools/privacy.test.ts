@@ -204,32 +204,32 @@ test('prescanAndMint: schema vocabulary still mints real dotted hostname VALUES'
 // below) since the two boundaries have independent code paths.
 
 /** Real Debian/RPM/semver version strings. Every one of these must reach the model UNCHANGED —
- * minting a HOST_n for a version string breaks a `package.version:{allow}`-style query. Includes
- * the two previously-leaking wire-capture tokens (letters fused into a dot-label with no leading
- * "-") and the two previously-passing ones (plain "-suffix" and a "~"-broken compound token), so a
- * regression in either direction shows up here. */
+ * minting a HOST_n for a version string breaks a `package.version:{allow}`-style query. Covers
+ * wire-capture token shapes on both sides of the boundary -- letters fused into a dot-label with no
+ * leading "-", a plain "-suffix", and a "~"-broken compound token -- so a regression in either
+ * direction shows up here. */
 const VERSION_GRAMMAR_CORPUS = [
-  '3.118ubuntu5', // previously leaked: letter-fused label, no "-" prefix
-  '3.20191218.1ubuntu2.3', // previously leaked: same shape, 4 labels
+  '3.118ubuntu5', // letter-fused label, no "-" prefix
+  '3.20191218.1ubuntu2.3', // same shape, 4 labels
   '1.1.1k', // NON-Ubuntu letter-fused label (openssl) -- blocks a distro-hardcoded reversion
   '1.1.1k-9.el8', // openssl on RHEL8: letter-fused label + dist-tag revision
   '1.9.9p1', // sudo's patchlevel notation
-  '0.21-4ubuntu4', // previously passing: plain digit labels + "-suffix"
+  '0.21-4ubuntu4', // plain digit labels + "-suffix"
   '11.4.0-1ubuntu1~22.04.3', // "~" splits it; residues are version/all-numeric shaped
   '5.2.5-2ubuntu1',
   '1.21.1-1ubuntu2~22.04.2',
   '2.4.41-4+deb11u1', // Debian NMU/backport revision ("+deb11u1")
   'v1.2.3',
   '4.15.0-213.224', // kernel-style dotted revision
-  '5.15.0-91-generic', // previously leaked: SECOND hyphen (kernel/linux-image family --
+  '5.15.0-91-generic', // SECOND hyphen (kernel/linux-image family --
   // agent.os.kernel carries exactly this string for every Ubuntu agent)
   '5.4.0-150-generic',
   '5.15.0-91-lowlatency',
-  '2.4.37-43.module+el8.5.0+1022+b541f3b1', // previously leaked: RHEL modular build, "+" splits
+  '2.4.37-43.module+el8.5.0+1022+b541f3b1', // RHEL modular build, "+" splits
   // off the FQDN-shaped "el8.5.0" -- covered by the whole-token compound check
-  '1.0+git20200101.abc1234-1', // previously leaked: git snapshot version
-  '1.0.0+build.5', // previously leaked: semver build metadata
-  '0.9.8+really0.9.7-1', // previously leaked: Debian "+really" convention
+  '1.0+git20200101.abc1234-1', // git snapshot version
+  '1.0.0+build.5', // semver build metadata
+  '0.9.8+really0.9.7-1', // Debian "+really" convention
   // NOTE: '1.2.3' never reaches VERSION_LIKE_TOKEN_RE at all -- ALL_NUMERIC_DOTTED_RE catches it
   // first. Kept as an anchor that the two exclusions do not fight each other.
   '1.2.3',
@@ -476,9 +476,9 @@ test('inferPseudonymKind: infers kind prefixes from field names', () => {
   assert.equal(inferPseudonymKind('GeoLocation.country_name'), 'VAL');
 });
 
-test('inferPseudonymKind: #8889 no longer misclassifies "description" as an IP field', () => {
+test('inferPseudonymKind: does not misclassify "description" as an IP field', () => {
   // 'wazuh.rule.description'.includes('ip') is true ("descr-IP-tion") under raw substring
-  // matching -- the bug this fix closes. A description field is generic free text (VAL), not IP.
+  // matching. A description field is generic free text (VAL), not IP.
   assert.equal(inferPseudonymKind('wazuh.rule.description'), 'VAL');
   // Same substring trap, different word: "recipient" also contains "ip" mid-word.
   assert.equal(inferPseudonymKind('email.recipient'), 'VAL');
@@ -546,11 +546,11 @@ test('Pseudonymizer: applyToText replaces every known value, longest first', () 
   assert.match(out, /^Traffic from IP_\d+ and IP_\d+ was observed\.$/);
 });
 
-// #8916: applyToText previously did a plain substring replace, so a pseudonymized word could
-// corrupt an unrelated value it merely happened to appear inside of — observed live: "ubuntu"
-// (pseudonymized from host.os.platform) turned the package version "7.81.0-1ubuntu1.14" into
-// "7.81.0-1VAL_21.14". These pin the word-boundary discipline (boundary = any non-alphanumeric
-// character) that fixes it without breaking the cases that must keep working.
+// applyToText must not let a pseudonymized word corrupt an unrelated value it merely happens to
+// appear inside of — e.g. "ubuntu" (pseudonymized from host.os.platform) must not turn the package
+// version "7.81.0-1ubuntu1.14" into "7.81.0-1VAL_21.14". These pin the word-boundary discipline
+// (boundary = any non-alphanumeric character) that guarantees this without breaking the cases that
+// must keep working.
 
 test('Pseudonymizer: applyToText leaves a pseudonymized word untouched when it is glued inside a larger alphanumeric run (version string)', () => {
   const p = new Pseudonymizer();
@@ -1350,13 +1350,12 @@ test('extractAggFields: returns undefined when body has no aggs', () => {
 
 // --- applyFieldPolicy: breakdown SECURITY REGRESSIONS for multi_terms / composite ----------------
 //
-// HIGH severity finding: extractAggFields previously resolved only terms/significant_terms/
-// cardinality; a multi_terms or composite aggregation's field was always "unresolvable", and the
-// breakdown loop's `if (!field) { scrubbed.push(bucket); continue; }` passed every such bucket's
-// RAW key through untouched, WITH PRIVACY ON — a multi_terms/composite pivot on source.ip leaked
-// real IPs regardless of the field's own 'anonymize' policy entry. Fixed by teaching
-// extractAggFields to resolve both shapes (see the extractAggFields tests above) and by
-// `scrubAggKey` handling each bucket key structurally instead of only ever handling a bare string.
+// extractAggFields must resolve multi_terms and composite aggregation fields, not just
+// terms/significant_terms/cardinality: otherwise the breakdown loop's
+// `if (!field) { scrubbed.push(bucket); continue; }` passes every such bucket's RAW key through
+// untouched, WITH PRIVACY ON — a multi_terms/composite pivot on source.ip would leak real IPs
+// regardless of the field's own 'anonymize' policy entry. `scrubAggKey` handles each bucket key
+// structurally rather than only ever handling a bare string (see the extractAggFields tests above).
 
 test('applyFieldPolicy: multi_terms on source.ip + wazuh.agent.id pseudonymizes both positions', () => {
   const policy: FieldPolicyEntry[] = [
@@ -1823,7 +1822,7 @@ test('F1: without identifiersOnly (tool-value call sites), the same common words
 
 test('F2: identifiersOnly excludes a short/numeric minted value, so it cannot corrupt an already-inserted HOST_n token', () => {
   const p = new Pseudonymizer();
-  p.pseudonymize('1', 'VAL'); // the short/numeric value that used to corrupt HOST_1
+  p.pseudonymize('1', 'VAL'); // the short/numeric value that would corrupt HOST_1 if matched
   const hostPseudonym = p.pseudonymize('dbprod07', 'HOST');
   assert.equal(hostPseudonym, 'HOST_1');
 
@@ -2457,12 +2456,10 @@ test('NF-2 regression: a "never" field is still dropped regardless of container 
 });
 
 test('F3: an unlisted field (no entry, not the escape hatch) with an object value is shape-scanned and KEPT, not dropped', () => {
-  // F3 (adversarial validation of NF-2): this container used to fall through to the final
-  // `return { keep: true, value }` untouched (pre-NF-2), then NF-2 over-corrected and started
-  // dropping it entirely -- silently deleting a column that is present when privacy is off. It is
-  // now shape-scanned (prescanAndMint over every string leaf, the same allow-by-omission scan a
-  // scalar string gets) and KEPT, so the column survives with its IP/FQDN leaves pseudonymized and
-  // everything else untouched.
+  // An unlisted field's object value must not be dropped outright -- that would silently delete a
+  // column that is present when privacy is off. It is shape-scanned (prescanAndMint over every
+  // string leaf, the same allow-by-omission scan a scalar string gets) and KEPT, so the column
+  // survives with its IP/FQDN leaves pseudonymized and everything else untouched.
   const p = new Pseudonymizer();
   const result = scrubFieldValue(
     'totally.unlisted.field',

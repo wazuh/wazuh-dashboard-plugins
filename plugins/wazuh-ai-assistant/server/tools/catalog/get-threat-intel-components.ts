@@ -74,7 +74,7 @@ const COMPONENT_SECURITY_ANALYTICS_PATH: Record<
  * tool's own `security_analytics`. Stage-1 only offers one turn's routed categories at a time, so a
  * route of `security_analytics` alone (plausible: "policy"/"policies" is genuinely overloaded
  * between an SCA benchmark and a pipeline policy) would leave `get_sca_results` unavailable -- the
- * same "instruction names a tool that may not be offered" shape as issue #8913, between two data
+ * same "instruction names a tool that may not be offered" shape, between two data
  * tools' descriptions rather than the system prompt. Worded conditionally ("if ... is available to
  * you this turn") rather than an unconditional "use X instead" so the model degrades to admitting
  * the gap instead of stalling on a tool it was not given. `get_rules` is untouched: it shares this
@@ -253,8 +253,8 @@ export const getThreatIntelComponentsTool: ToolDefinition = {
       'document.index_discarded_events',
       'document.index_unclassified_events',
     ],
-    // Synthetic fallback (issue #8920 item 1): "which pipeline components are enabled / what
-    // categories exist" was answered from 5 sample rows on a limit-truncated page. Both fields
+    // Synthetic fallback: without this, "which pipeline components are enabled / what
+    // categories exist" would be answered from 5 sample rows on a limit-truncated page. Both fields
     // are already in `_source` (getByPath groups the RETURNED rows — no AGG_FIELD_ALLOWLIST entry
     // or live mapping check needed for the digest-level grouping) and are vendor-curated config
     // enums, structurally safe under privacy. Page-scoped with `breakdownNote` when truncated.

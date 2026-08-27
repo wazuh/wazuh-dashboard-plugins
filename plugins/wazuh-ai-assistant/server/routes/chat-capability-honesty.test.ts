@@ -17,7 +17,7 @@ import { ChatMessage, ProviderConfig, StreamEvent } from '../../common/types';
 import { ChatStreamOptions, ProviderAdapter } from '../providers/types';
 
 /**
- * Issue #8920 items 4/9 -- the CAPABILITY-DENIAL GUARD's deterministic half (chat.ts's
+ * Covers the CAPABILITY-DENIAL GUARD's deterministic half (chat.ts's
  * `augmentToolError`/`CAPABILITY_DENIAL_NOTE`) and the suggest_discover_query handoff-validation
  * interception (chat.ts's `SUGGEST_DISCOVER_QUERY_TOOL.name` branch, backed by
  * suggest-discover-query.ts's `SuggestedDslResolution`).
@@ -360,18 +360,8 @@ test('orchestrate: a real tool call rejected by a GUARDRAIL (missing time range)
   );
 });
 
-// NOTE (test-integrity pass): a test named 'orchestrate: a SUCCESSFUL real tool call is NOT
-// augmented with the capability-denial note' used to live here. It never called `orchestrate` --
-// it only called `augmentToolError` on a synthetic success-shaped payload, which is byte-for-byte
-// the same exercise as 'augmentToolError: is a no-op for non-error content' above (just a
-// different literal). A misleadingly-named duplicate is worse than no test: a reader (or a future
-// diff) sees "orchestrate" and "SUCCESSFUL real tool call" and believes the success path is
-// covered end-to-end, when it is not. Standing up a genuine successful real-tool call through
-// `orchestrate` would need a much fuller Indexer/Manager client fake than this route-harness file
-// builds elsewhere (the test's own comment already said as much), so rather than bend the name to
-// fit the shallow check, or bolt on a heavier fake under time pressure, it is deleted here. The
-// success-path guarantee remains covered by the two `augmentToolError: ... no-op ...` tests above,
-// which test the actual chokepoint function directly and accurately describe what they check.
+// The success path is covered by the two `augmentToolError: ... no-op ...` tests above, which
+// test the actual chokepoint function directly.
 
 // --- (b) an unknown-fields handoff produces a tool error, not a suggested_query event ----------
 
@@ -547,7 +537,7 @@ test('orchestrate: a SECOND unknown_fields resolution emits stripped DSL + discl
   assert.match(event.reason, /link opens with a time-range-only query\.\)/);
   // The model's DSL carried no readable time range, so the stripped link opens the DEFAULT
   // window -- the disclosure must say THAT too, or the strip silently replaces the promised
-  // window (issue #8920 item 9's time-range half).
+  // window.
   assert.match(
     event.reason,
     /suggested time window could not be read either, so the link opens the last 24 hours/,
@@ -598,9 +588,9 @@ test('orchestrate: a SECOND unknown_fields resolution emits stripped DSL + discl
 // --- (d) default-deny clause analysis, reason-vs-DSL validation, honest no-strip handling ------
 
 test('orchestrate: a query_string clause -> bounded rewrite error, never shipped unvalidated', async () => {
-  // The literal finding-16 field (wazuh.module, which does not exist in 5.0) expressed through
-  // the single most likely clause for a Discover handoff: Discover's own query bar is a query
-  // string. The allowlist-only walk used to collect ZERO field names from it and resolve
+  // The wazuh.module field (which does not exist in 5.0) expressed through the single most
+  // likely clause for a Discover handoff: Discover's own query bar is a query string. Without
+  // validation, the allowlist-only walk would collect ZERO field names from it and resolve
   // 'verified' -- shipping the invented field with an unmodified reason.
   const context = fakeContext(() => Promise.resolve({ body: { fields: {} } }));
   const { events, callMessages } = await runOrchestrate(
@@ -653,8 +643,8 @@ test('orchestrate: a query_string clause -> bounded rewrite error, never shipped
 });
 
 test('orchestrate: a reason naming a REAL field the DSL never filters on gains a mismatch disclosure', async () => {
-  // The issue's literal witness, MODEL-authored: a range-only DSL whose prose names a field.
-  // Only a token _field_caps confirms as a real index field counts as a promised filter.
+  // A MODEL-authored range-only DSL whose prose names a field is the literal case this guards
+  // against. Only a token _field_caps confirms as a real index field counts as a promised filter.
   const context = fakeContext(() =>
     Promise.resolve({
       body: { fields: { 'wazuh.threat_intel': { keyword: {} } } },
