@@ -8,13 +8,13 @@ import {
 } from '../../../../src/core/server';
 import { describeError } from '../../common/errors';
 
-/** Fixed message for every RBAC denial. Not parameterized: any detail from the underlying error
- * is what leaked before (issue #9057). */
+/** Fixed message for every RBAC denial. Not parameterized: any detail from the underlying error is
+ * what leaked to unauthorized callers before. */
 export const PERMISSION_DENIED_MESSAGE =
   'You do not have permission to perform this action.';
 
-/** Both shapes are read because OpenSearch `ResponseError` exposes the status on either. Not
- * gated on `type === 'security_exception'`: a DLS/FLS 403 carries a different type but the same
+/** Both shapes are read because OpenSearch `ResponseError` exposes the status on either. Not gated
+ * on `type === 'security_exception'`: a DLS/FLS 403 carries a different type but the same
  * user-bearing text, and would fall through to the 500 branch. */
 export function isPermissionDeniedError(error: unknown): boolean {
   const e = error as { statusCode?: unknown; meta?: { statusCode?: unknown } };
@@ -40,9 +40,9 @@ export type RouteHandler<Params = unknown, Query = unknown, Body = unknown> = (
   response: OpenSearchDashboardsResponseFactory,
 ) => Promise<IOpenSearchDashboardsResponse>;
 
-/** Wraps a route handler with the outer `try/catch` the mutating routes used to repeat inline.
- * Logs every caught error in full, then maps it: an indexer 403 to a fixed-message 403, anything
- * else to the pre-existing 500. `logger` is required so no call site can regress to an unlogged
+/** Wraps a route handler with the outer `try/catch` the mutating routes used to repeat inline. Logs
+ * every caught error in full, then maps it: an indexer 403 to a fixed-message 403, anything else
+ * to the pre-existing 500. `logger` is required so no call site can regress to an unlogged
  * handler. Handlers' own inner try/catches are untouched. */
 export function withInternalErrorHandling<Params, Query, Body>(
   handler: RouteHandler<Params, Query, Body>,
@@ -77,8 +77,8 @@ export function withInternalErrorHandling<Params, Query, Body>(
   };
 }
 
-/** Pagination CONTRACT (shared by server/routes/settings.ts and server/routes/conversations.ts,
- * and mirrored by public/services/{settings,conversations}_service.ts): `page` defaults to 1,
+/** Pagination CONTRACT (shared by server/routes/settings.ts and server/routes/conversations.ts, and
+ * mirrored by public/services/{settings,conversations}_service.ts): `page` defaults to 1,
  * `perPage` defaults to 100. Both are accepted as raw numbers here (no `min`/`max` on the schema
  * itself — an out-of-range value must be CLAMPED, not rejected with a 400) and clamped in
  * `resolvePagination` below. */
@@ -87,9 +87,9 @@ export const paginationQuerySchema = schema.object({
   perPage: schema.number({ defaultValue: 100 }),
 });
 
-/** Clamps a raw `{page, perPage}` query to the pagination CONTRACT's bounds: `page >= 1`,
- * `1 <= perPage <= 100`. Non-finite/garbage input (e.g. `NaN` from a malformed query string that
- * still parsed as a number) falls back to the same defaults as an absent query param. */
+/** Clamps a raw `{page, perPage}` query to the pagination CONTRACT's bounds: `page >= 1`, `1 <=
+ * perPage <= 100`. Non-finite/garbage input (e.g. `NaN` from a malformed query string that still
+ * parsed as a number) falls back to the same defaults as an absent query param. */
 export function resolvePagination(query: { page: number; perPage: number }): {
   page: number;
   perPage: number;

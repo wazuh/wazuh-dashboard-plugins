@@ -8,7 +8,7 @@ import {
 } from './route-helpers';
 
 /**
- * Issue #9057. The security cases assert ABSENCE: a body carrying the new message proves nothing
+ * The security cases assert ABSENCE: a body carrying the new message proves nothing
  * on its own, since the leaked text could still be there alongside it.
  *
  * No OSD route-mocking harness exists in this plugin, so the wrapper is driven directly with a
@@ -74,9 +74,7 @@ async function runWrapped(error: unknown): Promise<{
 }> {
   const { calls, factory } = fakeResponse();
   const { errors, logger } = fakeLogger();
-  const handler: RouteHandler = async () => {
-    throw error;
-  };
+  const handler: RouteHandler = () => Promise.reject(error);
   const wrapped = withInternalErrorHandling(
     handler,
     logger as unknown as Parameters<typeof withInternalErrorHandling>[1],
@@ -187,10 +185,10 @@ test('logger.error still receives the FULL unredacted message on the 500 branch'
 
 test('redactSensitiveDetail strips a nested-bracket User[...] identity block, including backend_roles', () => {
   const message =
-    'no permissions for [cluster:admin/ai_assistant/settings/read] and User [name=qa9057, backend_roles=[readall, kibanauser], requestedTenant=null]';
+    'no permissions for [cluster:admin/ai_assistant/settings/read] and User [name=qauser, backend_roles=[readall, kibanauser], requestedTenant=null]';
   const redacted = redactSensitiveDetail(message);
 
-  assert.doesNotMatch(redacted, /qa9057/);
+  assert.doesNotMatch(redacted, /qauser/);
   assert.doesNotMatch(redacted, /readall/);
   assert.doesNotMatch(redacted, /kibanauser/);
   assert.doesNotMatch(redacted, /backend_roles/);
