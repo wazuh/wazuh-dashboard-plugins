@@ -120,6 +120,29 @@ with `#<n>` or the full issue URL; **internal-devel-requests issue → do not
 reference the issue at all** (see "Issue source" above). UI changes require
 evidence under `### Results and Evidence`.
 
+> That closing keyword is not just prose — it is what creates the actual
+> GitHub "linked pull request" reference on the issue, for **public** issues,
+> which is exactly what shows up in the PR's own **"Development"** section on
+> the issue's GitHub UI page. Verified directly: a PR opened with
+> `Closes #9052` in its description showed up in issue #9052's timeline as a
+> `ConnectedEvent`, and the PR's `closingIssuesReferences` listed the issue —
+> both immediately on open, and independent of the PR's base branch (this
+> repo's PRs target version branches like `5.0.0`, not the default branch,
+> and the link still forms). Internal-devel-requests issues intentionally get
+> no link this way, since no issue reference is exposed in their PR body at
+> all — that is the expected privacy trade-off, not a gap to fix.
+>
+> There is **no REST or GraphQL API to create or manage this link directly**
+> — a documented, still-open gap in GitHub's public API. The closing keyword
+> above is the supported mechanism this skill uses. The only other way to
+> populate the Development section is to link a branch to the issue _before_
+> opening the PR (via the GitHub UI, or `gh issue develop <issue-number>`) —
+> any PR later opened from that branch is auto-linked regardless of its
+> description text. That's a heavier workflow change (branch creation, not
+> just PR body text) and isn't what this skill does today; it's noted here
+> only as the alternative to reach for if a closing keyword alone is ever
+> insufficient (e.g. it gets edited out of the PR description later).
+
 **Default deliverable — pre-flight report.** Unless the user asked you to create the
 PR, stop here and output the filled body plus this report for the human to act on:
 
@@ -132,7 +155,8 @@ PR pre-flight
 - Issue source: public (<url>) / internal-devel-requests (link withheld)
 - CHANGELOG: entry added (links to issue) / not needed (internal / `no changelog`)
 - UI change: yes → evidence attached? / no
-- Command to open it: gh pr create --draft --base <base> ...
+- Assignee: <user> (via --assignee @me)
+- Command to open it: gh pr create --draft --base <base> --assignee @me ...
 ```
 
 ### 6. Create as Draft — only when explicitly asked
@@ -145,8 +169,14 @@ PR is created with the empty placeholder text.
 gh pr create --draft \
   --base <version-branch> \
   --title "<Imperative, capitalized subject>" \
-  --body-file /tmp/pr-body.md
+  --body-file /tmp/pr-body.md \
+  --assignee @me
 ```
+
+`--assignee @me` assigns the PR to the person doing the work. Don't rely on
+repo automation to do this implicitly — it may not exist in every repo this
+skill is reused in. If the PR was already created without it, fix it with
+`gh pr edit <pr-number> --add-assignee @me`.
 
 ### 7. Mark Ready for review — only when explicitly asked
 
