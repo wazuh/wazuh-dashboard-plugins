@@ -344,7 +344,7 @@ test('executeToolCall: a resolveParams-minted assumption note reaches the digest
   assert.match(digest.assumptionNote ?? '', /agent-one/);
 });
 
-// --- Privacy capture probe P3 (2026-08-14): the assumption note carried the resolved agent's
+// --- Privacy: the assumption note carried the resolved agent's
 // raw hostname to the provider under privacy mode -- a bare single-word token neither the shape
 // scan nor the known-entity scan can catch (nothing ever minted it; resolution exists precisely
 // because the caller never supplied the value). The fix: resolvers declare the identifiers their
@@ -702,7 +702,7 @@ test('entity near-miss: agent names in the hint are pseudonymized when privacy m
 
 test(
   'entity near-miss: a category word with no near-miss sibling and no exact match is reported ' +
-    'unmatched, not a bare zero-row result (CV-028/CV-033 fix)',
+    'unmatched, not a bare zero-row result',
   async () => {
     const { context, calls } = fakeContext((_call, index) =>
       index === 0

@@ -95,7 +95,7 @@ test('findNearMissSiblings: handles multiple requested names independently', () 
   ]);
 });
 
-// --- findUnmatchedAgentNames (CV-028/CV-033 fix) ------------------------------------------------
+// --- findUnmatchedAgentNames -------------------------------------------------------------------
 
 test('findUnmatchedAgentNames: a category word with zero matches (exact or near-miss) is unmatched', () => {
   const results = findUnmatchedAgentNames(

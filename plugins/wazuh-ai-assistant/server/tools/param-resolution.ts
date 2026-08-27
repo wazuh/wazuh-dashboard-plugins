@@ -354,16 +354,16 @@ export type ScaCheckOwnerLookupResult =
   | { kind: 'error' };
 
 /**
- * BLOCKER FIX (CV-053/CV-052/CV-088 turn 3 -- 2026-08-19 adjudicated run, "more than one active
- * agent exists" false-premise refusal): `get_sca_checks` used to require `agent_id` to resolve
- * FIRST against the Manager's fleet-wide active-agent list (`lookupManagerAgentsCandidate` above)
- * even when the caller already named a specific `check_id` -- a value that, on its own, uniquely
- * identifies the SCA document (and therefore the owning agent+policy) the caller is asking about.
- * Verified live (adjudication note): `wazuh-states-sca` holds exactly ONE document for check
- * `28500`, yet the fleet-wide active-agent count the OLD path depended on was ambiguous, so the
- * call refused before ever looking at the one document that actually answers "which agent/policy".
+ * Fix for a "more than one active agent exists" false-premise refusal: `get_sca_checks` used to
+ * require `agent_id` to resolve FIRST against the Manager's fleet-wide active-agent list
+ * (`lookupManagerAgentsCandidate` above) even when the caller already named a specific `check_id`
+ * -- a value that, on its own, uniquely identifies the SCA document (and therefore the owning
+ * agent+policy) the caller is asking about. Verified live: `wazuh-states-sca` holds exactly ONE
+ * document for check `28500`, yet the fleet-wide active-agent count the OLD path depended on was
+ * ambiguous, so the call refused before ever looking at the one document that actually answers
+ * "which agent/policy".
  *
- * This is the "resolve from the question's own scope" fix the review calls for: given a
+ * This resolves from the question's own scope instead: given a
  * `check_id`, query `wazuh-states-sca*` DIRECTLY for `check.id: check_id` (unscoped by agent) and
  * read `wazuh.agent.id`/`policy.id` straight off the matching document(s) -- never touching the
  * fleet-wide agent list at all. A `check_id` inherently narrows the candidate space far more than
@@ -476,8 +476,8 @@ async function resolveOneParam(
       note: string;
       /** Identifier values interpolated into `note`, threaded up to
        * `ResolvedToolParams.noteEntities` (types.ts) so executor.ts pseudonymizes them under
-       * privacy mode (capture probe P3, 2026-08-14: an undeclared resolved hostname reached
-       * the provider in the clear). Empty for values that are not identifiers (a policy id). */
+       * privacy mode (an undeclared resolved hostname otherwise reaches the provider in the
+       * clear). Empty for values that are not identifiers (a policy id). */
       noteEntities: Array<{
         value: string;
         kind: 'HOST' | 'IP' | 'USER' | 'URL' | 'VAL';
@@ -700,7 +700,7 @@ export function buildGenericResolveParams(
 }
 
 /**
- * BLOCKER FIX (CV-053/CV-052/CV-088 turn 3): `get_sca_checks`-specific `resolveParams`, wrapping
+ * `get_sca_checks`-specific `resolveParams`, wrapping
  * `buildGenericResolveParams` rather than replacing it. When the caller supplies a `check_id` AND
  * is missing `agent_id` and/or `policy_id`, resolves BOTH from the check's own document
  * (`lookupScaCheckOwner` above) instead of falling through to the fleet-wide, potentially-ambiguous

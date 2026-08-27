@@ -933,7 +933,7 @@ test('lintDsl: still rejects a non-allowlisted events-v5 field (e.g. a hand-buil
 });
 
 test(
-  'lintDsl: passes a terms aggregation on event.category/event.outcome (CV-033 fix -- the ' +
+  'lintDsl: passes a terms aggregation on event.category/event.outcome (the ' +
     'events-v5 category taxonomy, get_field_values verify-before-filter probe)',
   () => {
     const byCategory = {
@@ -1121,8 +1121,8 @@ test('checkIndexAllowlist: accepts the 6 named wazuh-threatintel-* sub-families 
   }
 });
 
-// REVERSED by workstream A1a (AI/plan/coverage-validation-design.md, TC-8): the prior ADR-1
-// decision predates the "every family with real data must be queryable by construction" mission
+// TC-8 reverses the prior ADR-1 decision: that decision predates the
+// "every family with real data must be queryable by construction" mission
 // and the coverage doc's explicit resequencing of this exact row to cover-now (372,301/257,071-doc
 // corpora, two of only two production-shaped-volume gaps). The exact literal
 // `wazuh-threatintel-enrichments-a` is now allowed (see guardrails.ts's INDEX_ALLOWLIST_RE
@@ -1257,7 +1257,7 @@ test('checkIndexAllowlist: rejects .opensearch-sap-correlation-alerts/-history (
   );
 });
 
-// P-10 (AI/plan/a1a-review.md): the wildcard suffix used to be `[^,\s]*`, which let `/` and `.`
+// The wildcard suffix used to be `[^,\s]*`, which let `/` and `.`
 // through -- so a path-traversal-shaped value could match the regex even though it is not
 // reachable via search_wazuh_data's own JSON-schema `enum` today. Tightened to the explicit
 // index-name charset; this pins that the standalone boundary now rejects it directly too.

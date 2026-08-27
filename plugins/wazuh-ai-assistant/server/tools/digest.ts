@@ -293,7 +293,7 @@ const MAX_HINT_LENGTH = 1000;
 
 /**
  * Resolves one dotted path segment-by-segment against `source`. Unlike a plain reduce, a segment
- * hit on an ARRAY does not stop resolution (P-2, AI/plan/a1a-review.md — "getByPath must traverse
+ * hit on an ARRAY does not stop resolution ("getByPath must traverse
  * arrays"): it maps the REMAINING path over every array element and returns the array of
  * per-element results, so e.g. `"queries.id"` resolves through the `queries` array (one entry per
  * SAP finding's compiled query) instead of returning `undefined` the moment the walk reaches the

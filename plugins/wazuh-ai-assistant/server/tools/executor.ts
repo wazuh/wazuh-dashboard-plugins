@@ -449,7 +449,7 @@ async function appendEntityNearMissHint(
           ),
       );
     }
-    // BLOCKER FIX (CV-028/CV-033, category-word-misread-as-agent-name class): a requested name
+    // This handles the category-word-misread-as-agent-name class of bug: a requested name
     // with no near-miss sibling can still be a token that never named a real agent at all (a
     // category/domain word the model mistook for a host name). Fires independently of the
     // near-miss branch above (a name can have zero near-miss SIBLINGS while still having zero
@@ -482,7 +482,7 @@ async function appendEntityNearMissHint(
     // REVIEW FIX A2 (groupA-regression-review.md, MEDIUM, multi-agent coverage gap): this used to
     // be gated on `digest.counts.returned === 0` for the WHOLE call, so a multi-name sweep
     // (search_findings_by_multiple_agents: "compare web-01 and cloud-services") where ONE name
-    // matched never disclosed the OTHER, unmatched one -- CV-028's exact shape, just with a
+    // matched never disclosed the OTHER, unmatched one -- the same underlying bug shape, just with a
     // sibling that succeeds masking it. `findUnmatchedAgentNames` is already computed PER
     // REQUESTED NAME against the same population probe regardless of the call's aggregate row
     // count, so removing that outer gate is sufficient to close the gap for every
@@ -1026,9 +1026,9 @@ export async function executeToolCall(
       }
       params = resolved.resolved.params;
       // Scrubbed HERE, at the single choke point every resolver's note passes through, rather
-      // than in each resolver: resolvers have no privacy context, and the capture probe (P3,
-      // 2026-08-14) proved an unscrubbed note carries the resolved hostname to the provider in
-      // the clear under privacy mode — past every downstream scan.
+      // than in each resolver: resolvers have no privacy context, and an unscrubbed note
+      // carries the resolved hostname to the provider in the clear under privacy mode — past
+      // every downstream scan.
       assumptionNote = scrubAssumptionNote(
         resolved.resolved.note,
         resolved.resolved.noteEntities,

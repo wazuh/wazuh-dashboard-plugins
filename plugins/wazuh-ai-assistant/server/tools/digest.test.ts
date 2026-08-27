@@ -1954,7 +1954,7 @@ test('buildDigest: a sample that IS the whole set is not described as a sample',
   assert.doesNotMatch(digest.coverage!, /a sample of/);
 });
 
-// --- P-2 (AI/plan/a1a-review.md): getByPath must traverse arrays -------------------------------
+// --- getByPath must traverse arrays -------------------------------------------------------------
 
 test('getByPath: resolves a dotted path through an array instead of stopping at it', () => {
   const row = {

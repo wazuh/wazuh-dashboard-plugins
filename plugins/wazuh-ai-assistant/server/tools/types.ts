@@ -26,7 +26,7 @@ export interface ResolvedToolParams {
    * bare single-word token, so neither the shape scan (not address-shaped; privacy.ts's
    * documented bare-hostname limitation) nor the known-entity scan (nothing minted it — the
    * whole point of resolution is that the caller never supplied the value) can catch it. Proven
-   * on the wire 2026-08-14 (privacy capture probe P3): the note carried the raw agent name while
+   * on the wire 2026-08-14: the note carried the raw agent name while
    * `HOST_` appeared nowhere in the outbound body. Same treatment as the near-miss hint's
    * explicit HOST pseudonymization (executor.ts's appendEntityNearMissHint PRIVACY note) — a
    * resolver that names an identifier in prose must also declare it here. Omitted when the note

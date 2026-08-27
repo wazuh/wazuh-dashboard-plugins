@@ -14,9 +14,9 @@ import {
  * `generic-query-families.ts` is this tool's own single source of truth for which families that
  * is, kept in lockstep with `guardrails.ts`'s `checkIndexAllowlist`.
  *
- * Workstream A1a (AI/plan/coverage-validation-design.md): the product decision is ONE tool that
- * grows to cover every family with real data, not a new one-off typed tool per family — see that
- * file's mission statement. The families a typed tool already owns (findings-v5/events-v5's ~30
+ * The product decision is ONE tool that
+ * grows to cover every family with real data, not a new one-off typed tool per family. The
+ * families a typed tool already owns (findings-v5/events-v5's ~30
  * curated tools, the threatintel rules/decoders/integrations/policies/filters/kvdbs sub-families,
  * `.opensearch-sap-detectors-config`) are deliberately NOT re-listed in this tool's own enum: this
  * escape hatch only ever grows into a gap a typed tool leaves open, never competes with one for

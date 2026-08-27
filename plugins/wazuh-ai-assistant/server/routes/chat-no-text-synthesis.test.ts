@@ -146,7 +146,7 @@ test('summarizeDigestForFallback: singular "row" for exactly one result', () => 
   assert.match(sentence, /returned 1 row;/);
 });
 
-// --- BLOCKER FIX (CV-017, residual single-digest collapse) -------------------------------------
+// --- BLOCKER FIX: residual single-digest collapse -----------------------------------------------
 
 test(
   "summarizeDigestForFallback: names the tool's plain-language domain, not just the bare " +
@@ -163,7 +163,7 @@ test(
 
 test(
   'summarizeDigestForFallback: names the row schema (field names) when the digest carries ' +
-    "columns -- CV-017's exact shape (a single search_wazuh_data findings result)",
+    'columns (a single search_wazuh_data findings result)',
   () => {
     const sentence = summarizeDigestForFallback({
       toolName: 'search_wazuh_data',
@@ -213,7 +213,7 @@ test('summarizeDigestForFallback: degrades gracefully on unparseable digest cont
   assert.doesNotMatch(sentence, /No additional analysis/);
 });
 
-// --- summarizeDigestsForFallback: BLOCKER FIX (CV-069/079/080 sweep collapse) -------------------
+// --- summarizeDigestsForFallback: BLOCKER FIX for a sweep collapse -------------------------------
 
 test('summarizeDigestsForFallback: single digest degrades to the same sentence as summarizeDigestForFallback', () => {
   const digest = nonEmptyDigest({
@@ -225,7 +225,7 @@ test('summarizeDigestsForFallback: single digest degrades to the same sentence a
   );
 });
 
-test('summarizeDigestsForFallback: covers EVERY tool call, not just the last one (CV-069 shape)', () => {
+test('summarizeDigestsForFallback: covers EVERY tool call, not just the last one', () => {
   const digests: DigestRecord[] = [
     {
       toolName: 'get_top_rules',
@@ -249,8 +249,8 @@ test('summarizeDigestsForFallback: covers EVERY tool call, not just the last one
     },
   ];
   const sentence = summarizeDigestsForFallback(digests);
-  // Every tool's own result must be named, not just get_field_values' (the CV-069 live failure:
-  // "The query returned 3 rows" described ONLY the last of five successful calls).
+  // Every tool's own result must be named, not just get_field_values' (previously "The query
+  // returned 3 rows" described ONLY the last of five successful calls).
   assert.match(sentence, /get_top_rules/);
   assert.match(sentence, /get_critical_findings/);
   assert.match(sentence, /get_top_agents/);
@@ -354,7 +354,7 @@ test('synthesizeNoTextFallback: streams the retry text through the SAME depseudo
 
 // --- synthesizeNoTextFallback: case (b) — errors or empty retry fall back to the digest sentence
 
-test('synthesizeNoTextFallback: CV-069 regression — a 5-digest sweep whose retry produces no text still names EVERY tool, not just the last one', async () => {
+test('synthesizeNoTextFallback: a 5-digest sweep whose retry produces no text still names EVERY tool, not just the last one', async () => {
   const { adapter } = scriptedAdapter([
     { type: 'done', usage: { inputTokens: 20, outputTokens: 0 } },
   ]);

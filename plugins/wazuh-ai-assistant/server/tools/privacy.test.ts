@@ -2139,7 +2139,7 @@ test('FIELD_POLICY_DEFAULTS: wazuh.rule.title has an explicit entry, not allow-b
   assert.equal(entry!.action, 'allow');
 });
 
-// --- Workstream A1a: newly reachable families through search_wazuh_data's deriveColumns/
+// --- Newly reachable families through search_wazuh_data's deriveColumns/
 // isEscapeHatch fail-closed default, against the REAL FIELD_POLICY_DEFAULTS -- same style as the
 // get_agent_inventory group above, pinning both the 'allow' fields and the ones that correctly
 // stay anonymized on this same escape hatch. ------------------------------------------------------
@@ -2153,7 +2153,7 @@ test('applyFieldPolicy: search_wazuh_data keeps wazuh-metrics-agents identity/OS
         'wazuh.agent.status': 'active',
         'wazuh.agent.version': 'v5.0.0',
         'wazuh.agent.host.os.platform': 'ubuntu',
-        // P-2 (AI/plan/a1a-review.md): real docs carry this as an ARRAY
+        // Real docs carry this as an ARRAY
         // ("wazuh-metrics-agents": `{"agent":{"groups":["default"]}}`), not the bare string the
         // pre-review test asserted (a shape real data never produces) -- 'allow' means unscanned
         // passthrough regardless of shape, so the array survives untouched.
@@ -2177,7 +2177,7 @@ test('applyFieldPolicy: search_wazuh_data keeps wazuh-metrics-agents identity/OS
   assert.match(out.samples[0]['wazuh.agent.register.ip'] as string, /^IP_\d+$/);
 });
 
-// --- P-2 (AI/plan/a1a-review.md): array/object privacy bypass regression tests -----------------
+// --- P-2: array/object privacy bypass regression tests -----------------
 
 test('P-2 regression: an array-valued anonymize field is anonymized element-wise, not passed through raw', () => {
   const p = new Pseudonymizer();

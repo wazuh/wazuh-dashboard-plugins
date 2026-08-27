@@ -104,11 +104,11 @@ const CATALOG: ToolDefinition[] = [
   getThreatIntelComponentsTool,
   getDetectorsTool,
 
-  // IOC/indicator lookup against the CTI enrichment feed (workstream A1b, coverage doc CV-049) --
-  // filed adjacent to the Security Analytics content tools above since it is the same "Security
-  // Analytics / threat-intel pipeline knowledge" domain, not the customer's own observed data.
+  // IOC/indicator lookup against the CTI enrichment feed -- filed adjacent to the Security
+  // Analytics content tools above since it is the same "Security Analytics / threat-intel
+  // pipeline knowledge" domain, not the customer's own observed data.
   lookupIndicatorTool,
-  // CTI content freshness (workstream A1b, coverage doc CV-078/MS-6/MS-7) -- same domain as above.
+  // CTI content freshness -- same domain as above.
   getCtiStatusTool,
 
   // Generic exact-ID lookup (document _id or a business-level UUID field, tried automatically)
@@ -171,7 +171,7 @@ export function listToolSpecs(): ToolSpec[] {
  * lookup in practice, or a stale name from a scripted test) -- never throws, never returns
  * `undefined`, so every call site can charge a cost unconditionally.
  *
- * M4 (LOW, AI/plan/d-review.md): this is priced per PROVIDER ROUND, not per backend read. A tool
+ * This is priced per PROVIDER ROUND, not per backend read. A tool
  * whose `resolveParams` hook (types.ts) makes its own secondary Indexer/Manager read to infer a
  * parameter (e.g. `get_cve_intel`/`get_cti_status`/`get_detectors`) is charged nothing extra for
  * that read -- it consumes neither a provider round nor an additional model-visible digest (its

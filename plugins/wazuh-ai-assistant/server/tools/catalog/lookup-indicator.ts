@@ -7,14 +7,14 @@ import {
 } from './common';
 
 /**
- * IOC (indicator of compromise) lookup against the CTI indicator-enrichment feed (coverage doc
- * CV-049, workstream A1b). `wazuh-threatintel-enrichments-a` is a THIRD-PARTY threat-intel
+ * IOC (indicator of compromise) lookup against the CTI indicator-enrichment feed.
+ * `wazuh-threatintel-enrichments-a` is a THIRD-PARTY threat-intel
  * catalog, not the customer's own observed traffic -- see the privacy.ts entries covering
  * `document.*` on this family for why the indicator VALUE itself is 'allow' (never anonymized): a
  * domain/hash/IP here identifies KNOWN-MALICIOUS PUBLIC INFRASTRUCTURE, not the customer's own
  * network.
  *
- * P-5 (AI/plan/a1a-review.md) is the reason this tool exists at all: the indicator VALUE lives in
+ * P-5 is the reason this tool exists at all: the indicator VALUE lives in
  * `document.name`, not `hash.sha256` (that root-level field is the RECORD's own content hash, a
  * sibling of `document`, never the indicator). Live-verified 2026-08-19 on wazuh-aio-5
  * (257k+ docs): a terms agg on `document.type` returns `url_domain` (107,653), `connection`
@@ -35,7 +35,7 @@ import {
  * `nameFilterClause` (catalog/common.ts) already documents for the Security Analytics content
  * tools. A prefix match only ever anchors at the START of `document.name`.
  *
- * A-1 (AI/plan/a1b-review.md): an EARLIER version of this tool ran the prefix clause unanchored
+ * A-1: an EARLIER version of this tool ran the prefix clause unanchored
  * and unconditionally (`prefix: { 'document.name': indicator }`), which live-proved a false
  * "known-malicious" verdict for benign values -- `124.70.213.4` returned 55 hits that all belonged
  * to the DIFFERENT ip `124.70.213.43`, and `google.com` returned 2 hits for

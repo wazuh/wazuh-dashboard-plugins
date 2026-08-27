@@ -102,8 +102,7 @@ export const getRulesTool: ToolDefinition = {
           'this field actually holds (confirmed live). There is deliberately no separate ' +
           '`technique_id` parameter: the tool used to expose one against ' +
           "`document.mitre.technique.id`, but that path is absent from this index's mapping " +
-          'and can only ever return 0 rows (see ' +
-          'AI/plan/qa-rules-decoders-rootcause.md, defect #2) -- removed rather than fixed onto ' +
+          'and can only ever return 0 rows -- removed rather than fixed onto ' +
           'this field, because `technique.id` here is a real MAPPED keyword that is simply ' +
           'unpopulated (0 docs), so a filter on it would be silently, permanently empty too. ' +
           '`document.mitre.technique.id` stays queryable via the "Technique" table column (a ' +

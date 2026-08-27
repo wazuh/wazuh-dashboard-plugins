@@ -133,7 +133,7 @@ function suggestedQueryReasonMismatchDisclosure(fields: string[]): string {
 }
 
 /**
- * TOOL-ROUND COST BUDGET (workstream C -- replaces the old fixed `MAX_TOOL_ROUNDS = 3` count).
+ * TOOL-ROUND COST BUDGET -- replaces the old fixed `MAX_TOOL_ROUNDS = 3` count.
  * Rounds are no longer bounded by a plain count: each EXECUTED, SUCCESSFUL real tool call this
  * turn (one that actually reached the Indexer/Manager and produced a `tableEvent` -- see
  * `chargeableToolCallCost` below) spends `getToolCostClass(name)` units (1 aggregation-only / 2
@@ -171,49 +171,46 @@ export const HARD_CEILING_UNITS = BASE_BUDGET_UNITS * 3;
  * last-tool-bearing-round test) instead of hardcoding the round count, which would silently start
  * testing a different round on any budget change.
  *
- * REVIEW AMENDMENT (AI/plan/c-review.md D1): lowered from the original design's "e.g. 8" to 6.
- * The design concern measured that raising this from the OLD fixed-round count (3) to 8 pushed the
- * worst-case single-request tool-result context ~2.7x (~4.5k -> ~12k tokens) and the whole-turn
- * transferred tool-digest tokens ~6x (~9k -> ~54k), straight into the Groq-413 ("request entity
- * too large") regime already measured on tool-heavy turns under the OLD 3-round bound. 6 was
- * chosen because it still completes the CV-069 5-agent sweep exactly (5 tool rounds + 1 final),
- * the concrete scenario the raised ceiling exists to serve, while cutting the worst-case
+ * Lowered from the original design's "e.g. 8" to 6. Raising this from the OLD fixed-round count
+ * (3) to 8 pushed the worst-case single-request tool-result context ~2.7x (~4.5k -> ~12k tokens)
+ * and the whole-turn transferred tool-digest tokens ~6x (~9k -> ~54k), straight into the Groq-413
+ * ("request entity too large") regime already measured on tool-heavy turns under the OLD 3-round
+ * bound. 6 was chosen because it still completes a 5-agent sweep exactly (5 tool rounds + 1
+ * final), the concrete scenario the raised ceiling exists to serve, while cutting the worst-case
  * single-request context by 25% and worst-case provider calls from 9 to 7 relative to 8. See
  * CONTEXT_CHAR_BUDGET below for the direct, model-independent fix to the same concern. */
 export const MAX_TOOL_ROUNDS = 6;
 
 /**
- * CONTEXT-CHAR STOP (review amendment, AI/plan/c-review.md D1): an orthogonal, model-independent
- * bound on how much tool-result text this turn may re-send to the provider, on top of the cost
- * budget above. The cost budget prices BACKEND query weight; nothing before this priced PROVIDER
- * CONTEXT, and every round re-sends the entire accumulated history -- so a turn that stays under
- * budget in cost units can still grow its provider-bound context unboundedly in cheap-tool-heavy
- * turns (see D1's "6 tool rounds pre-extension, 8 post" cost-1 case). This tracks the running sum
- * of every `toolResultContentForModel` character count appended to `messages` this turn and forces
- * the NEXT round to be the final (tools-off) one once the sum exceeds this value -- the direct fix
+ * An orthogonal, model-independent bound on how much tool-result text this turn may re-send to
+ * the provider, on top of the cost budget above. The cost budget prices BACKEND query weight;
+ * nothing before this priced PROVIDER CONTEXT, and every round re-sends the entire accumulated
+ * history -- so a turn that stays under budget in cost units can still grow its provider-bound
+ * context unboundedly in cheap-tool-heavy turns. This tracks the running sum of every
+ * `toolResultContentForModel` character count appended to `messages` this turn and forces the
+ * NEXT round to be the final (tools-off) one once the sum exceeds this value -- the direct fix
  * for the measured Groq 413, independent of which/how-cheap the tools were.
  *
- * CALIBRATION ARITHMETIC (mirrors the review's own 2.7x/6x table): with `DIGEST_CHAR_CAP = 6000`
- * chars per tool digest, the OLD fixed `MAX_TOOL_ROUNDS = 3` design's worst case was 3 rounds x one
- * digest each = 3 x 6000 = 18,000 chars accumulated in the largest single request (the final,
- * tools-off round, which resends every prior digest). `CONTEXT_CHAR_BUDGET` is set to 24,000 --
- * about 4 digests, i.e. `18,000 * 1.33`. That is deliberately in the SAME ORDER OF MAGNITUDE as the
- * old worst case (not the 2.7x/6x figures the review measured against the un-mitigated 6/8-round
- * ceiling) precisely so this stop, not the round/cost ceiling, is what now bounds worst-case
- * request size: 4 digests comfortably covers the CV-069 5-agent sweep's cost-2 `get_sca_checks`
- * calls (5 x ~1-2k chars per single-agent digest, well under 24,000 long before round 5), while
- * still forcing a final round before a cost-1-heavy turn's 6 rounds of full-catalog aggregation
- * digests (each easily 6000 chars) could reach anywhere near the 2.7x/6x regime the review
- * measured. This is a STOP, not a per-round truncation: it only decides when tool-gathering ends,
- * it never drops or shrinks any digest already appended to `messages`.
+ * CALIBRATION ARITHMETIC: with `DIGEST_CHAR_CAP = 6000` chars per tool digest, the OLD fixed
+ * `MAX_TOOL_ROUNDS = 3` design's worst case was 3 rounds x one digest each = 3 x 6000 = 18,000
+ * chars accumulated in the largest single request (the final, tools-off round, which resends
+ * every prior digest). `CONTEXT_CHAR_BUDGET` is set to 24,000 -- about 4 digests, i.e.
+ * `18,000 * 1.33`. That is deliberately in the SAME ORDER OF MAGNITUDE as the old worst case
+ * precisely so this stop, not the round/cost ceiling, is what now bounds worst-case request size:
+ * 4 digests comfortably covers a 5-agent sweep's cost-2 `get_sca_checks` calls (5 x ~1-2k chars
+ * per single-agent digest, well under 24,000 long before round 5), while still forcing a final
+ * round before a cost-1-heavy turn's 6 rounds of full-catalog aggregation digests (each easily
+ * 6000 chars) could reach anywhere near that regime. This is a STOP, not a per-round truncation:
+ * it only decides when tool-gathering ends, it never drops or shrinks any digest already appended
+ * to `messages`.
  */
 export const CONTEXT_CHAR_BUDGET = 24_000;
 
 /**
- * F3 fix (AI/plan/c-review.md): independent bound on a turn whose tool calls are ALL rejected or
- * errored -- one that NEVER has a single successful round -- which `shouldEnterFinalRoundEarly`
- * (#8911) deliberately does not cover (it requires `hadSuccessfulRoundEarlier`). Before this fix
- * the only bound on that shape was `MAX_TOOL_ROUNDS` itself; this gives it its own, tighter,
+ * Independent bound on a turn whose tool calls are ALL rejected or errored -- one that NEVER has
+ * a single successful round -- which `shouldEnterFinalRoundEarly` (#8911) deliberately does not
+ * cover (it requires `hadSuccessfulRoundEarlier`). Before this fix the only bound on that shape
+ * was `MAX_TOOL_ROUNDS` itself; this gives it its own, tighter,
  * round-count-independent ceiling so raising `MAX_TOOL_ROUNDS` again later cannot silently widen
  * this pathology's worst case back out. 3 consecutive real-tool-call rounds with zero success
  * (reset the moment any round succeeds) force the next round to be final -- one more attempt than
@@ -237,8 +234,8 @@ const NO_MATCHING_RESULTS_MESSAGE =
   'No matching results were found for that query.';
 
 /**
- * N1 fix (AI/plan/qa-battery-v31.md, proven live on A0/#8935: "the canned empty-copy says
- * nothing about what was searched"). `NO_MATCHING_RESULTS_MESSAGE` alone reads identically for
+ * Fix for "the canned empty-copy says nothing about what was searched" (#8935).
+ * `NO_MATCHING_RESULTS_MESSAGE` alone reads identically for
  * every zero-row turn regardless of what was actually asked — a scoped SCA/vulnerability/agent
  * search and a wide-open one both produce the exact same sentence, so the user has no way to
  * tell "nothing matched this narrow filter" from "something may be broken." This appends what
@@ -290,7 +287,7 @@ const FILTER_KEY_LABELS: Record<string, string> = {
   cve_id: 'CVE',
   detector_type: 'detector type',
   rule_id: 'rule',
-  // D4 fix (AI/plan/d-review.md): NOT mapped to 'indicator' here on purpose -- for
+  // NOT mapped to 'indicator' here on purpose -- for
   // `lookup_indicator`, `describeToolDomain('lookup_indicator')` already resolves to "indicator"
   // (the verb-prefix strip leaves just that one word), so an explicit entry here produced the
   // doubled "(Searched: indicator, filtered to indicator 124.70.213.43.)" copy bug. The fallback
@@ -298,7 +295,7 @@ const FILTER_KEY_LABELS: Record<string, string> = {
   // this entry changes nothing about the label itself -- it only removes the redundant mapping.
 };
 /** Never part of the user-facing filter description: `limit` is a page-size mechanism, not
- * something the user asked to narrow by. `query_dsl` (D3 fix, AI/plan/d-review.md) is
+ * something the user asked to narrow by. `query_dsl` is
  * `search_wazuh_data`'s escape-hatch parameter — declared `type: 'string'` in its schema, but the
  * string it carries is raw Elasticsearch DSL JSON, not a user-meaningful value. Excluding objects
  * and arrays (the type guard below) does not catch it because the DSL rides in as a STRING; left
@@ -370,9 +367,7 @@ function describeSearchFilters(args: Record<string, unknown>): string[] {
 const TOOL_ERROR_MESSAGE_MAX_LENGTH = 300;
 
 /**
- * REVIEW FIX F1 (groupA-regression-review.md, REQUIRED) folded in directly (ported from deploy
- * commit aa75dc38a alongside CV-033/CV-066's original errorMessage plumbing, deploy commit
- * 424164be7): `buildNoMatchingResultsMessage` must never render an arbitrary `{error: "..."}`
+ * `buildNoMatchingResultsMessage` must never render an arbitrary `{error: "..."}`
  * tool result verbatim into user-facing copy -- that channel also carries guardrail-violation text
  * and raw `sanitizeError()` output, both of which may echo mechanism vocabulary or a
  * privacy-mode pseudonym (this text renders outside the per-round depseudonymization pipeline).
@@ -411,8 +406,7 @@ function buildNoMatchingResultsMessage(
   if (!lastToolCall) {
     return NO_MATCHING_RESULTS_MESSAGE;
   }
-  // BLOCKER FIX (empty-answer audit, 2026-08-20, CV-033/CV-066; ported deploy commits
-  // 424164be7 + aa75dc38a's F1 fix folded together): a REJECTED/ERRORED call (a bad parameter, an
+  // A REJECTED/ERRORED call (a bad parameter, an
   // unknown field, an invalid field/family pairing) is a different finding from a valid call that
   // genuinely matched nothing, and only a narrow, vetted allowlist of error shapes
   // (`classifyToolErrorForFallback`) is ever surfaced here -- never the raw error channel.
@@ -428,7 +422,7 @@ function buildNoMatchingResultsMessage(
     return `The ${domain} lookup could not run as asked: ${shown}`;
   }
   const domain = describeToolDomain(lastToolCall.name);
-  // D4 fix (AI/plan/d-review.md): for `lookup_indicator`, `domain` is already "indicator" (the
+  // For `lookup_indicator`, `domain` is already "indicator" (the
   // verb-prefix strip leaves just that one word) and its own filter clause would ALSO read
   // "indicator <value>" -- rendering both produced the doubled "(Searched: indicator, filtered
   // to indicator 124.70.213.43.)" copy bug. A filter clause whose label is exactly the domain word
@@ -445,15 +439,14 @@ function buildNoMatchingResultsMessage(
 }
 
 /**
- * BLOCKER FIX (backlog CV-017 residual, "stale digest after silent mid-turn error"; ported from
- * deploy commit 872704fd4): the NO_ANALYSIS_TEXT_MESSAGE/NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE
- * copy below (the `sawNonEmptyTable === true` branch of `noTextFallbackMessage`) only ever says
- * "see the results above" — it has no idea whether the table on screen actually reflects the
- * question that was asked. CV-017's live shape: an EARLIER, broader call already rendered a
- * (real, non-empty) table, but the actual LAST call this turn attempted — a narrower, correctly-
- * scoped follow-up the question needed — errored silently. Without this, the fallback sentence
- * describes that earlier, broader table as though it were the answer, with no hint that the real,
- * scoped lookup never completed.
+ * Handles "stale digest after silent mid-turn error": the NO_ANALYSIS_TEXT_MESSAGE/
+ * NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE copy below (the `sawNonEmptyTable === true` branch of
+ * `noTextFallbackMessage`) only ever says "see the results above" — it has no idea whether the
+ * table on screen actually reflects the question that was asked. The failure shape: an EARLIER,
+ * broader call already rendered a (real, non-empty) table, but the actual LAST call this turn
+ * attempted — a narrower, correctly-scoped follow-up the question needed — errored silently.
+ * Without this, the fallback sentence describes that earlier, broader table as though it were the
+ * answer, with no hint that the real, scoped lookup never completed.
  *
  * `lastToolCall.errorMessage` is set ONLY on an error outcome (see `lastAttemptedToolCall`'s
  * assignment site above), so its mere presence already proves the LAST attempt this turn did not
@@ -494,11 +487,11 @@ function describeErroredLastAttempt(
  * accounting that decided the turn was done must stay invisible to the reader (see
  * chat-no-text-fallback-message.test.ts's mechanism-silence test).
  */
-// REVIEW FIX (AI/plan/c-review.md F11): "This turn ended..." used internal orchestration
-// vocabulary ("turn") the reader has no model for, and the silence test's word list did not even
-// cover it -- see NO_TEXT_FALLBACK/FINAL_ROUND silence tests, which now include "turn". Rewritten
-// to describe the user-visible SHAPE of what happened (a partial answer, more to see above,
-// something to continue) rather than naming the mechanism or the internal unit of work.
+// The original "This turn ended..." copy used internal orchestration vocabulary ("turn") the
+// reader has no model for, and the silence test's word list did not even cover it -- see
+// NO_TEXT_FALLBACK/FINAL_ROUND silence tests, which now include "turn". Rewritten to describe the
+// user-visible SHAPE of what happened (a partial answer, more to see above, something to
+// continue) rather than naming the mechanism or the internal unit of work.
 const NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE =
   'A full answer could not be written for this question. See the results above for what was ' +
   'found — a follow-up question can continue from there.';
@@ -543,28 +536,27 @@ const NO_ANSWER_MESSAGE =
  *  - no mention of tools being unavailable: the round already omits `tools` entirely, and naming
  *    the absent capability invites the model to narrate the mechanism ("I cannot query further…")
  *    instead of answering.
- *  - the trailing coverage-statement clause (workstream C, the cost-budget redesign's exhaustion
+ *  - the trailing coverage-statement clause (the cost-budget redesign's exhaustion
  *    contract) asks for exactly WHAT was and was not covered ("covers agents 001-003; 004 and 007
  *    not retrieved" is the shape), never HOW OR WHY that coverage ended where it did -- "describe
  *    only the coverage itself, not the process that produced it" is what keeps this
  *    mechanism-free: the model has no internal round/budget/limit/turn vocabulary to reach for
  *    because the instruction never offers it one, on purpose (see
  *    NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE's doc comment for the matching code-side rule --
- *    review fix F11 removed the earlier wording's own "how or why the turn ended" phrase, which
+ *    an earlier fix removed the earlier wording's own "how or why the turn ended" phrase, which
  *    handed the model exactly the "the turn ended" framing the product decision forbids). This is
  *    a request only -- same as every other clause here, the model's compliance is not guaranteed
  *    by this code.
  *
- * RECORDED DECISION (F12, AI/plan/c-review.md): the design's original wording scoped the
- * coverage-statement clause to a BUDGET-EXHAUSTION final round specifically. This implementation
- * deliberately applies it to every final round of a tool-using turn instead, including one #8911
- * or the F3 bound forces after an all-rejected run where nothing was actually gathered -- asking
- * for a coverage statement over an empty set degrades, at worst, to the model saying "no results
- * were retrieved," which is itself an honest and useful coverage statement, not a fabrication risk
- * the way the other clauses guard against. Keeping ONE instruction string for every final round
- * (rather than branching final rounds into "exhausted" vs. "not" -- a distinction only the
- * mechanism itself can see and this instruction must never expose per F11) was judged the simpler,
- * equally-safe choice; this comment is the record the review asked for if the deviation is kept.
+ * The design's original wording scoped the coverage-statement clause to a BUDGET-EXHAUSTION final
+ * round specifically. This implementation deliberately applies it to every final round of a
+ * tool-using turn instead, including one #8911 or the all-rejected-round bound forces after an
+ * all-rejected run where nothing was actually gathered -- asking for a coverage statement over an
+ * empty set degrades, at worst, to the model saying "no results were retrieved," which is itself
+ * an honest and useful coverage statement, not a fabrication risk the way the other clauses guard
+ * against. Keeping ONE instruction string for every final round (rather than branching final
+ * rounds into "exhausted" vs. "not" -- a distinction only the mechanism itself can see and this
+ * instruction must never expose) was judged the simpler, equally-safe choice.
  */
 /** Blank line inserted between two ROUNDS' text within one turn — see `separateRoundText`. Not a
  * newline: the client renders markdown, where a single newline is not a paragraph break. */
@@ -671,7 +663,7 @@ export function withFinalRoundAnswerInstruction(
 }
 
 // ---------------------------------------------------------------------------------------------
-// TOOL-ROUND COST BUDGET (workstream C) -- pure, testable pieces of the mechanism wired into
+// TOOL-ROUND COST BUDGET -- pure, testable pieces of the mechanism wired into
 // `orchestrate`'s round loop below. See BASE_BUDGET_UNITS/HARD_CEILING_UNITS/MAX_TOOL_ROUNDS'
 // doc comments above for the overall shape; this section is the decision logic three call sites
 // in the loop each need: how much a call costs, whether a round was futile, and whether an
@@ -697,8 +689,7 @@ export function toolCallCostUnits(
 /**
  * EARLY FUTILITY STOP (product design item 4): a round whose tool calls all came back with
  * nothing new must not spend further budget on variations -- this is the fix for the QA
- * worst-transcript pattern (AI/plan/qa-rules-decoders-rootcause.md, "3 rounds burned on 0-row
- * calls").
+ * worst-transcript pattern ("3 rounds burned on 0-row calls").
  *
  * Takes only the SUCCESSFUL calls this round (a caller-side filter, same shape as
  * `roundHadSuccessfulToolCall` elsewhere in this file) -- a round with zero successful calls
@@ -795,15 +786,15 @@ export function shouldGrantZeroRowWideningRound(opts: {
  * e.g. "check agents 001, 003, and 007" or "hosts web-01, web-02 and db-01" yields
  * `['001', '003', '007']` / `['web-01', 'web-02', 'db-01']`.
  *
- * REVIEW FIX (AI/plan/c-review.md F5): the token shape now REQUIRES at least one digit
- * (`ENUMERATED_TOKEN_RE`), and the gap between the cue word and the list start is tightened from
- * 24 to 8 characters. Measured against the review's table, every listed false positive is prose
- * with no digit in its items ("offline, disconnected, never" / "high, medium, low" / "SCA, FIM" /
- * "production, staging, dev" / "password, lockout, audit" / "Europe, Asia") and is now rejected,
- * while identifier lists like `001, 002, 003` and `web-01, web-02, db-01` still match.
+ * The token shape REQUIRES at least one digit (`ENUMERATED_TOKEN_RE`), and the gap between the
+ * cue word and the list start is tightened from 24 to 8 characters. Every false positive found is
+ * prose with no digit in its items ("offline, disconnected, never" / "high, medium, low" /
+ * "SCA, FIM" / "production, staging, dev" / "password, lockout, audit" / "Europe, Asia") and is
+ * now rejected, while identifier lists like `001, 002, 003` and `web-01, web-02, db-01` still
+ * match.
  *
  * Deliberately does NOT: parse ranges ("agents 001-010"), read any message OTHER than the CURRENT
- * one (see F6: `orchestrate` passes the LAST `user` message, not the first, so a follow-up turn is
+ * one (`orchestrate` passes the LAST `user` message, not the first, so a follow-up turn is
  * never gated by a stale list from an earlier question), or infer a list from the MODEL's own
  * prose/tool-call pattern -- every one of those would need either a second, fuzzier extraction
  * pass or trusting model-authored text as the source of a budget decision, and a false POSITIVE
@@ -919,7 +910,7 @@ export function shouldEnterFinalRoundEarly(
 }
 
 /**
- * F2 fix (AI/plan/c-review.md): the SINGLE predicate for "will round N offer no tools" -- shared
+ * The SINGLE predicate for "will round N offer no tools" -- shared
  * by the round loop's own `isFinalRound` computation (for round `round`) and by the
  * `suggest_discover_query` round-aware retry gate (for round `round + 1`, i.e. "if I convert this
  * into a tool error, will there be a tool-bearing round left to retry in"). Before this fix the
@@ -973,8 +964,8 @@ export function noTextFallbackMessage(
   if (!sawNonEmptyTable) {
     return buildNoMatchingResultsMessage(lastToolCall);
   }
-  // CV-017 residual fix: append the honest "last attempt errored" clause (empty string when the
-  // last attempt succeeded, or there was none) — see `describeErroredLastAttempt`'s doc comment.
+  // Appends the honest "last attempt errored" clause (empty string when the last attempt
+  // succeeded, or there was none) — see `describeErroredLastAttempt`'s doc comment.
   return (
     (roundsExhausted
       ? NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE
@@ -1005,7 +996,7 @@ export interface DigestRecord {
 
 /** Narrow shape this module reads out of a digest JSON blob -- see digest.ts's `Digest` for the
  * full shape; typed narrowly here so a future digest field never needs a matching change in this
- * unrelated fallback-copy code. `columns` (Group D fix, CV-017) is read too now -- see
+ * unrelated fallback-copy code. `columns` is read too now -- see
  * `summarizeDigestForFallback`'s doc comment for why schema-only (field NAMES, never sample
  * VALUES) is the safe, sufficient enrichment here. */
 type SummarizableDigestForFallback = {
@@ -1049,10 +1040,10 @@ function describeDigestColumns(columns: unknown): string {
  * non-empty table already on screen, and unlike NO_ANALYSIS_TEXT_MESSAGE this never claims "no
  * additional analysis" over a real result.
  *
- * BLOCKER FIX (CV-017, 2026-08-19/20 adjudicated runs, "residual single-digest answer collapse"):
- * the overnight fix (`summarizeDigestsForFallback` below) covers a multi-digest SWEEP, but a turn
- * whose forced-synthesis retry (a) also fails ends up here on a SINGLE digest even when that
- * digest is a real, on-topic result (CV-017's shape: one `search_wazuh_data` call against
+ * Fix for "residual single-digest answer collapse": the overnight fix
+ * (`summarizeDigestsForFallback` below) covers a multi-digest SWEEP, but a turn whose
+ * forced-synthesis retry (a) also fails ends up here on a SINGLE digest even when that digest is
+ * a real, on-topic result (one `search_wazuh_data` call against
  * `.opensearch-sap-*-findings` returning exactly the findings asked about). Before this fix, the
  * sentence named only the row count -- "The query returned 1 row; the table below has the
  * details." -- discarding the domain (which tool/data family) and the row shape (which fields)
@@ -1174,17 +1165,16 @@ export interface NoTextSynthesisResult {
 }
 
 /**
- * BLOCKER FIX (round-budget sweep collapse, CV-069/CV-079/CV-080 -- 2026-08-19 adjudicated run):
- * when a multi-tool sweep turn ends with no model-authored text on EITHER the final-round call
- * (`FINAL_ROUND_ANSWER_INSTRUCTION`) or the one forced-synthesis retry
- * (`NO_TEXT_SYNTHESIS_INSTRUCTION`), the only fallback available was `summarizeDigestForFallback`
- * over a SINGLE digest (`pickDigestForFallback`'s "last non-empty record") -- truthful about that
- * one tool, but silently discarding every OTHER tool call's results the turn already gathered
- * (CV-069: 5 successful calls, fallback described only the 5th). That is exactly the
- * "incomplete-without-coverage-statement" failure class the round-budget redesign's final-round
- * instruction exists to prevent, reached here because the DETERMINISTIC last-resort text never
- * covered more than one call to begin with, no matter how well the two model-authored attempts
- * above were prompted.
+ * Fix for round-budget sweep collapse: when a multi-tool sweep turn ends with no model-authored
+ * text on EITHER the final-round call (`FINAL_ROUND_ANSWER_INSTRUCTION`) or the one
+ * forced-synthesis retry (`NO_TEXT_SYNTHESIS_INSTRUCTION`), the only fallback available was
+ * `summarizeDigestForFallback` over a SINGLE digest (`pickDigestForFallback`'s "last non-empty
+ * record") -- truthful about that one tool, but silently discarding every OTHER tool call's
+ * results the turn already gathered (a 5-successful-call sweep's fallback described only the
+ * 5th). That is exactly the "incomplete-without-coverage-statement" failure class the
+ * round-budget redesign's final-round instruction exists to prevent, reached here because the
+ * DETERMINISTIC last-resort text never covered more than one call to begin with, no matter how
+ * well the two model-authored attempts above were prompted.
  *
  * This function replaces that single-digest sentence with a coverage statement spanning EVERY
  * digest recorded this turn: one truthful, digest-derived clause per tool call, so a sweep that
@@ -1311,8 +1301,8 @@ export async function* synthesizeNoTextFallback(
   // Abort-safety (c) and the defensive no-digest case: neither attempts the extra call.
   if (signal.aborted || !lastDigest) {
     if (lastDigest) {
-      // BLOCKER FIX (CV-069/079/080): cover EVERY digest gathered this turn, not just the last
-      // one -- see `summarizeDigestsForFallback`'s doc comment.
+      // Covers EVERY digest gathered this turn, not just the last one -- see
+      // `summarizeDigestsForFallback`'s doc comment.
       yield { type: 'delta', content: lastResortMessage };
     }
     return { usage: undefined };
@@ -1438,8 +1428,8 @@ export async function* synthesizeNoTextFallback(
   }
 
   if (!producedText) {
-    // BLOCKER FIX (CV-069/079/080): same coverage-statement fix as the abort-safety branch above --
-    // describe every tool call this turn gathered, not only the one `pickDigestForFallback` chose.
+    // Same coverage-statement fix as the abort-safety branch above -- describe every tool call
+    // this turn gathered, not only the one `pickDigestForFallback` chose.
     // On a zero-row turn the caller supplies `noTextFallbackMessage`'s own copy instead, so a
     // failed retry there degrades to EXACTLY the pre-change answer, never to a "the table below has
     // the details" sentence pointing at an empty table.
@@ -1664,11 +1654,10 @@ function isToolResultError(content: string): boolean {
 }
 
 /**
- * BLOCKER FIX (empty-answer audit, 2026-08-20, CV-033/CV-066; ported from deploy commit
- * 424164be7): extracts the bounded error string from a `{error: "..."}` tool-result payload, or
- * `undefined` when `content` is not that shape (same shape test as `isToolResultError` -- kept as
- * a separate function rather than having that one return the string too, so its existing boolean
- * call sites are untouched).
+ * Extracts the bounded error string from a `{error: "..."}` tool-result payload, or `undefined`
+ * when `content` is not that shape (same shape test as `isToolResultError` -- kept as a separate
+ * function rather than having that one return the string too, so its existing boolean call sites
+ * are untouched).
  *
  * WHY THIS EXISTS: `get_field_values`'s own `buildRequest` already throws a specific, genuinely
  * useful error for an unknown field or an invalid field/family pairing -- "Closest known fields:
@@ -1703,7 +1692,7 @@ function extractToolErrorMessage(content: string): string | undefined {
  * testable without scripting a whole turn (issue #8935 integration review: under the OLD
  * MAX_TOOL_ROUNDS=3, `forcedFollowUpSpent` was unreachable-as-true -- only round 1 could ever
  * intercept, and only once -- so no orchestrate-level script could exercise it; as a pure function
- * its bound was pinned directly. Under the workstream C cost budget (now MAX_TOOL_ROUNDS=6 plus
+ * its bound was pinned directly. Under the current cost budget (now MAX_TOOL_ROUNDS=6 plus
  * the cost/context/futility triggers), this IS load-bearing: `round < maxRounds - 1` alone admits
  * several rounds, and the actual number that offer tools is additionally gated by budget/futility
  * state this function does not see, same as `willBeFinalRound` above -- this gate is intentionally
@@ -2608,7 +2597,7 @@ export async function* orchestrate(
   let tools: ToolSpec[] | undefined = listToolSpecs();
   let messages = initialMessages;
   let sawNonEmptyTable = false;
-  // N1 fix (AI/plan/qa-battery-v31.md): the most recent REAL tool call this turn attempted to
+  // The most recent REAL tool call this turn attempted to
   // execute (name + real/reversed arguments), regardless of outcome — the only state
   // `noTextFallbackMessage`'s zero-row branch has available to describe WHAT was searched when
   // the model itself never wrote a word (see `describeEmptySearchScope` below, and that
@@ -2626,8 +2615,8 @@ export async function* orchestrate(
   // exactly the case a `general`-routed reasoning-only stream produces (issue
   // 02-read-reasoning-delta.md), and it deserves a sentence, not a silently empty bubble.
   //
-  // BLOCKER FIX (backlog CV-039 residual, "sweep ends without closing text"; ported from deploy
-  // commit 872704fd4): this used to be a WHOLE-TURN flag (`sawAnyDelta`, set once and never
+  // Fix for "sweep ends without closing text": this used to be a WHOLE-TURN flag
+  // (`sawAnyDelta`, set once and never
   // cleared) instead of a round-scoped one. A multi-kind inventory sweep routinely narrates once
   // early ("I checked the agent list... let me pull that data") and then spends every remaining
   // round on back-to-back tool_calls with no further text, so by the time the round budget closes
@@ -2675,7 +2664,7 @@ export async function* orchestrate(
   // (forcing `toolChoice:{name:...}` instead of `'auto'`) and cleared immediately after — so a
   // forced call can only ever happen once per detected offer. `forcedFollowUpSpent` bounds this
   // to ONE forced round per WHOLE TURN (not per offer). HONESTY NOTE (integration review):
-  // load-bearing under the workstream C round budget (MAX_TOOL_ROUNDS=6 plus the cost/context/
+  // load-bearing under the round budget (MAX_TOOL_ROUNDS=6 plus the cost/context/
   // futility triggers) -- several rounds can now genuinely offer tools, so a turn CAN reach the
   // deferred-offer check more than once, and this flag is what keeps the forced round to exactly
   // one per turn. Its bound is pinned through the pure `shouldConsiderDeferredOffer` helper rather
@@ -2720,7 +2709,7 @@ export async function* orchestrate(
   // sit here fed only the C-owned futility stop dropped above (see the ADAPTATION note near
   // isRoundFutile) -- removed as dead state along with it.
   let forceFinalRoundEarly = false;
-  // F3 fix (AI/plan/c-review.md): independent bound on a turn that NEVER succeeds even once (see
+  // Independent bound on a turn that NEVER succeeds even once (see
   // `MAX_CONSECUTIVE_REJECTED_ROUNDS`'s doc comment for why #8911 above does not cover this shape).
   // Incremented at round-end whenever the round had a real tool call and none of them succeeded;
   // reset to 0 the moment any round succeeds. Deliberately untouched by a round that only ran a
@@ -2733,7 +2722,7 @@ export async function* orchestrate(
   // BACKEND query weight; this prices PROVIDER CONTEXT, which the cost budget does not see at
   // all). Grows monotonically; never reset mid-turn.
   let cumulativeToolResultChars = 0;
-  // TOOL-ROUND COST BUDGET (workstream C) state -- see the doc comments right above
+  // TOOL-ROUND COST BUDGET state -- see the doc comments right above
   // `BASE_BUDGET_UNITS`/`HARD_CEILING_UNITS`/`MAX_TOOL_ROUNDS` near the top of this file for the
   // overall shape. `budgetCeiling` starts at the base and is raised
   // ONCE, straight to the hard ceiling, the first time `shouldGrantBudgetExtension` allows it --
@@ -2759,7 +2748,7 @@ export async function* orchestrate(
   // `undefined` when no explicit literal list was found -- the safe default that keeps
   // `shouldGrantBudgetExtension` from ever firing.
   //
-  // REVIEW FIX (AI/plan/c-review.md F6): `initialMessages` is the FULL client-sent conversation
+  // `initialMessages` is the FULL client-sent conversation
   // history (every turn's messages, resent verbatim -- see this route's `messages.filter` above),
   // not just this turn's question, so taking the FIRST `user` message (the old behavior) returned
   // whatever was asked on turn 1 of the conversation on every later follow-up turn -- gating the
@@ -2911,7 +2900,7 @@ export async function* orchestrate(
     tools = [...tools, SUGGEST_DISCOVER_QUERY_TOOL];
   }
 
-  // TERMINATION (workstream C constraint: prove this loop cannot spin forever):
+  // TERMINATION (prove this loop cannot spin forever):
   //  1. `round` is a plain incrementing counter with a fixed upper bound (`round += 1` every
   //     iteration, loop condition `round <= MAX_TOOL_ROUNDS`) -- this alone already bounds the
   //     loop to at most `MAX_TOOL_ROUNDS + 1` iterations regardless of anything else below, the
@@ -2943,7 +2932,7 @@ export async function* orchestrate(
     // Issue #8911: `forceFinalRoundEarly` (set at the end of the PREVIOUS round below) short-circuits
     // the normal `round === MAX_TOOL_ROUNDS` budget check once a fully-rejected round has already
     // followed an earlier successful one this turn — see `shouldEnterFinalRoundEarly`'s doc comment.
-    // `budgetForcesFinalRoundEarly` (workstream C, set at the end of the PREVIOUS round below) is
+    // `budgetForcesFinalRoundEarly` (set at the end of the PREVIOUS round below) is
     // the cost-budget's own early trigger -- either the futility stop or an exhausted budget with
     // no extension granted (see that flag's own declaration above for why it never overlaps
     // #8911's narrower "every call failed" case). `round === MAX_TOOL_ROUNDS` remains the
@@ -3085,7 +3074,7 @@ export async function* orchestrate(
     // as a "fully rejected round".
     let roundHadRealToolCall = false;
     let roundHadSuccessfulToolCall = false;
-    // TOOL-ROUND COST BUDGET (workstream C), round-scoped: one entry per SUCCESSFUL real tool
+    // TOOL-ROUND COST BUDGET, round-scoped: one entry per SUCCESSFUL real tool
     // call this round -- `isRoundFutile` reads this array at round-end, and its cost is folded
     // into `totalSpentUnits` there too. A rejected/errored call never gets an entry (it costs 0
     // and cannot be "futile" in this mechanism's sense -- see `isRoundFutile`'s doc comment).
@@ -3184,8 +3173,8 @@ export async function* orchestrate(
             );
 
             // ROUND-AWARE retry gate: converting a correctable resolution into a tool error only
-            // helps if a FUTURE tool-bearing round exists to retry in. F2 fix (AI/plan/c-review.md):
-            // this must ask the SAME question `isFinalRound` asks for the round after this one --
+            // helps if a FUTURE tool-bearing round exists to retry in. This must ask the SAME
+            // question `isFinalRound` asks for the round after this one --
             // not just "is there another round by INDEX" (the old `round < MAX_TOOL_ROUNDS - 1`),
             // which knew nothing about the cost budget or futility triggers and could therefore
             // promise a retry round that the budget/futility logic had already decided would offer
@@ -3428,8 +3417,7 @@ export async function* orchestrate(
           lastSuccessfulToolName = event.toolCall.name;
         }
 
-        // BLOCKER FIX (empty-answer audit, 2026-08-20, CV-033/CV-066; ported from deploy commit
-        // 424164be7): backfill the specific error text onto the already-recorded
+        // Backfills the specific error text onto the already-recorded
         // `lastAttemptedToolCall` (set before `outcome` existed, above) now that it does. Only
         // ever set for the error shape -- `extractToolErrorMessage` returns `undefined` for a
         // real result, leaving `errorMessage` unset so `buildNoMatchingResultsMessage`'s generic
@@ -3447,7 +3435,7 @@ export async function* orchestrate(
           // actually succeed" signal `shouldEnterFinalRoundEarly` needs below.
           roundHadSuccessfulToolCall = true;
 
-          // TOOL-ROUND COST BUDGET (workstream C): this call reached the backend and produced a
+          // TOOL-ROUND COST BUDGET: this call reached the backend and produced a
           // real result, so (and only so) it is chargeable -- see `toolCallCostUnits`'s doc
           // comment for why a rejected/errored call never reaches this branch at all.
           const callSignature = `${event.toolCall.name}|${JSON.stringify(
@@ -3733,7 +3721,7 @@ export async function* orchestrate(
     hadSuccessfulRoundEarlier =
       hadSuccessfulRoundEarlier || roundHadSuccessfulToolCall;
 
-    // F3 fix (AI/plan/c-review.md): independent bound on a turn that NEVER succeeds even once --
+    // Independent bound on a turn that NEVER succeeds even once --
     // see `MAX_CONSECUTIVE_REJECTED_ROUNDS`'s doc comment. Reset the moment any round succeeds;
     // otherwise increment and, once the bound is reached, force the next round final regardless of
     // `hadSuccessfulRoundEarlier` (which #8911's own gate above requires and this one does not).
@@ -3755,12 +3743,13 @@ export async function* orchestrate(
       budgetForcesFinalRoundEarly = true;
     }
 
-    // TOOL-ROUND COST BUDGET (workstream C): charge this round's successful real-tool-call cost,
+    // TOOL-ROUND COST BUDGET: charge this round's successful real-tool-call cost,
     // then decide whether the NEXT round must be forced tools-off -- either because this round
     // was futile (product design item 4, checked FIRST: a futile round must stop immediately
     // regardless of remaining budget) or because charging its cost exhausted the current ceiling
     // with no extension granted (item 3). Skipped entirely once `forceFinalRoundEarly` (#8911 or
-    // the F3 bound just above) already forces the next round early on its own narrower ground --
+    // the all-rejected-round bound just above) already forces the next round early on its own
+    // narrower ground --
     // no need to layer a second reason on top, and `isRoundFutile([])` would return `false` for an
     // all-rejected round anyway (see that function's doc comment), so this would be a no-op here
     // regardless.
@@ -3769,7 +3758,7 @@ export async function* orchestrate(
         (sum, call) => sum + call.cost,
         0,
       );
-      // DESIGN AMENDMENT (F4 / D2, AI/plan/c-review.md): as originally locked, "futile = all
+      // As originally designed, "futile = all
       // successful calls are duplicates OR zero-row" aborted exactly the enumerable sweep the
       // extension mechanism exists to finish -- a single empty agent mid-sweep (agent 007 has no
       // failing SCA checks) is the ORDINARY case, not the corner case, and `isRoundFutile` would

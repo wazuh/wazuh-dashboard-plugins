@@ -147,7 +147,7 @@ test('get_rules: status/level/tag/logsource_product/space each add exactly one f
   });
 });
 
-// Defect #2 (AI/plan/qa-rules-decoders-rootcause.md): `document.mitre.technique.id` is absent
+// `document.mitre.technique.id` is absent
 // from the live mapping (`dynamic: false`, confirmed live), so a `term` filter against it could
 // only ever return 0 rows. There is no separate `document.threat.technique.id` fix either: that
 // path IS mapped but is populated on 0 documents on this dataset (live-confirmed), so a filter on

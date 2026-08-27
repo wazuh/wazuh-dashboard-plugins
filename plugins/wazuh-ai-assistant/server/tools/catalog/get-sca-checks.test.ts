@@ -521,7 +521,7 @@ test('get_sca_checks: tableSpec/digest declare the locked 5.0 columns/rowFields/
     // document (2026-08-14), so the Reason column was an em-dash on every row it ever had.
     ['check.id', 'check.name', 'check.result', 'check.rationale'],
   );
-  // Workstream D (coverage doc CV-054): rationale/remediation joined the row expander (still
+  // Rationale/remediation joined the row expander (still
   // row-only, not a table column -- the browser table itself is unchanged) so the analyst can
   // read the CIS/benchmark's own WHY/WHAT-to-do text without a second tool call.
   assert.deepEqual(getScaChecksTool.tableSpec.rowFields, [
@@ -600,7 +600,7 @@ test('get_sca_checks: sampleFieldMaxLength caps rationale/remediation tighter th
 });
 
 test('get_sca_checks: review D1 — a 5-row digest of LIVE-SIZED rationale/remediation text stays under DIGEST_CHAR_CAP, and no sample row is popped', () => {
-  // Review finding D1 (AI/plan/d-review.md): the live wazuh-aio-5 document that surfaced this had
+  // The live wazuh-aio-5 document that surfaced this had
   // check.rationale at 604 chars and check.remediation at 597 -- both past digest.ts's generic
   // MAX_FIELD_VALUE_LENGTH (500), which without get-sca-checks.ts's sampleFieldMaxLength cap would
   // truncate every long row to EXACTLY 500 chars (the cap becomes the typical size), pushing a
@@ -643,14 +643,14 @@ test('get_sca_checks: review D1 — a 5-row digest of LIVE-SIZED rationale/remed
     `expected a single get_sca_checks digest (${digestChars} chars) to stay under DIGEST_CHAR_CAP (${DIGEST_CHAR_CAP})`,
   );
 
-  // The CEO's CV-069 5-agent sweep (chat.ts's CONTEXT_CHAR_BUDGET calibration comment): 4
+  // A 5-agent sweep (chat.ts's CONTEXT_CHAR_BUDGET calibration comment): 4
   // accumulated single-agent digests must stay under the budget so round 5 is not forced
   // tools-off. Pre-D1 fix this failed: 4 x ~6,000 = 24,000 >= CONTEXT_CHAR_BUDGET.
   assert.ok(
     digestChars * 4 < CONTEXT_CHAR_BUDGET,
     `expected 4 accumulated get_sca_checks digests (${
       digestChars * 4
-    } chars) to stay under CONTEXT_CHAR_BUDGET (${CONTEXT_CHAR_BUDGET}), preserving the CV-069 5-agent sweep`,
+    } chars) to stay under CONTEXT_CHAR_BUDGET (${CONTEXT_CHAR_BUDGET}), preserving the 5-agent sweep`,
   );
 });
 

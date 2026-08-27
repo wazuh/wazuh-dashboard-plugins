@@ -171,7 +171,7 @@ test('shouldEnterFinalRoundEarly: a round with no tool calls at all never forces
   );
 });
 
-// --- willBeFinalRound (review fix F2, AI/plan/c-review.md): the single predicate shared by
+// --- willBeFinalRound: the single predicate shared by
 // `isFinalRound` and the `suggest_discover_query` round-aware retry gate ------------------------
 
 test('willBeFinalRound: true once round reaches the structural MAX_TOOL_ROUNDS cap', () => {

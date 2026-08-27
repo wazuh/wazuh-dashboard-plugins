@@ -39,7 +39,7 @@ test('buildSystemPrompt: instructs the model to never assert a remediation/compl
   assert.match(prompt, /never from prose inside a result/);
 });
 
-// BLOCKER FIX (2026-08-19 adjudicated run, CV-028/CV-048/CV-081): three single-turn English
+// BLOCKER FIX: three single-turn English
 // questions -- no Spanish anywhere in the conversation -- were answered entirely in Spanish. The
 // old wording ("Reply in the same language the user wrote in") named no specific message, leaving
 // room to read "the user" as the conversation as a whole or to be swayed by non-English text
@@ -417,10 +417,9 @@ test('buildSystemPrompt: instructs the model to state a zero-row finding once, n
   );
 });
 
-// Workstream B ("verify before filter" / honest-empty / inter-round narration) --
-// AI/plan/qa-rules-decoders-rootcause.md's root cause for "the assistant can't show rules or
-// decoders" was filtering on a guessed value with no way to check it first, and confusing a
-// zero-row filtered result with the field itself being empty.
+// "Verify before filter" / honest-empty / inter-round narration -- the root cause for "the
+// assistant can't show rules or decoders" was filtering on a guessed value with no way to check
+// it first, and confusing a zero-row filtered result with the field itself being empty.
 
 test('buildSystemPrompt: instructs the model to call get_field_values before filtering on an unverified value', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
@@ -454,10 +453,9 @@ test('buildSystemPrompt: keeps "field is unpopulated" and "no documents match" a
   );
 });
 
-// Workstream A1a (AI/plan/coverage-validation-design.md): the generic-query-layer mission --
-// name the newly-reachable data families in user vocabulary, point the model at search_wazuh_data
-// when no typed tool fits, and narrow the decline list to exactly the five product-decided classes
-// (never mentioning tiers/roadmap/internal names).
+// The generic-query-layer mission -- name the newly-reachable data families in user vocabulary,
+// point the model at search_wazuh_data when no typed tool fits, and narrow the decline list to
+// exactly the five product-decided classes (never mentioning tiers/roadmap/internal names).
 
 test('buildSystemPrompt: names the newly-reachable data families in user vocabulary', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
@@ -465,9 +463,9 @@ test('buildSystemPrompt: names the newly-reachable data families in user vocabul
   assert.match(prompt, /Security\s+Analytics detector findings/);
 });
 
-// Workstream A1b (AI/plan/coverage-validation-design.md, CV-047/048/049/078): three of the
-// families A1a pointed at search_wazuh_data now have their own typed tool, named explicitly so
-// the model reaches for the precise tool instead of the escape hatch or a decline.
+// Three of the families earlier pointed at search_wazuh_data now have their own typed tool,
+// named explicitly so the model reaches for the precise tool instead of the escape hatch or a
+// decline.
 test('buildSystemPrompt: names the three new premium typed tools (IOC/CTI/CVE-feed) by name', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(prompt, /use lookup_indicator/);
@@ -499,10 +497,10 @@ test('buildSystemPrompt: names exactly five classes with EXACT required decline 
   assert.match(prompt, /5\. Authoring — drafting or generating a new rule/);
 });
 
-// P-8/P-9 (AI/plan/a1a-review.md): the five classes above have EXACT required copy, but the
-// coverage-validation-design.md §3 decline inventory has ~20 rows -- the still-valid data-gap
-// declines this workstream's widened search_wazuh_data enum does NOT close must stay in the
-// prompt, verbatim, so the model is never left thinking only five things are unanswerable.
+// The five classes above have EXACT required copy, but the coverage-validation-design.md §3
+// decline inventory has ~20 rows -- the still-valid data-gap declines the widened
+// search_wazuh_data enum does NOT close must stay in the prompt, verbatim, so the model is
+// never left thinking only five things are unanswerable.
 test('buildSystemPrompt: still names the data-gap declines this workstream does not close, verbatim', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(prompt, /raw, un-normalized event archive/);
@@ -589,10 +587,10 @@ test('buildSystemPrompt: caps inter-round status narration to one terse, action-
   );
 });
 
-// Workstream D (coverage doc CV-054): SCA/compliance results in hand must be INTERPRETED
-// (grouped by theme, led with why-it-matters/what-to-do from the check's own rationale/
-// remediation text) rather than recited as a bare pass/fail table with a compliance percentage.
-test('CV-054: buildSystemPrompt instructs interpreting SCA results, not reciting them', () => {
+// SCA/compliance results in hand must be INTERPRETED (grouped by theme, led with
+// why-it-matters/what-to-do from the check's own rationale/remediation text) rather than recited
+// as a bare pass/fail table with a compliance percentage.
+test('buildSystemPrompt instructs interpreting SCA results, not reciting them', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
@@ -600,7 +598,7 @@ test('CV-054: buildSystemPrompt instructs interpreting SCA results, not reciting
   );
 });
 
-test('CV-054: buildSystemPrompt tells the model to group failed SCA checks by theme', () => {
+test('buildSystemPrompt tells the model to group failed SCA checks by theme', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
@@ -608,7 +606,7 @@ test('CV-054: buildSystemPrompt tells the model to group failed SCA checks by th
   );
 });
 
-test('CV-054: buildSystemPrompt tells the model to lead with why/what-to-do and put compliance percentages second', () => {
+test('buildSystemPrompt tells the model to lead with why/what-to-do and put compliance percentages second', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(prompt, /lead with WHY it matters.*and WHAT to do about it/);
   assert.match(
@@ -617,7 +615,7 @@ test('CV-054: buildSystemPrompt tells the model to lead with why/what-to-do and 
   );
 });
 
-test('CV-054: buildSystemPrompt forbids claiming a live host re-check beyond the SCA scan result', () => {
+test('buildSystemPrompt forbids claiming a live host re-check beyond the SCA scan result', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
@@ -625,7 +623,7 @@ test('CV-054: buildSystemPrompt forbids claiming a live host re-check beyond the
   );
 });
 
-test('D2 fix (AI/plan/d-review.md): the group-by-theme instruction is scoped to the results actually in hand, and requires a sample disclosure when the page is not the whole result set', () => {
+test('the group-by-theme instruction is scoped to the results actually in hand, and requires a sample disclosure when the page is not the whole result set', () => {
   // get_sca_checks declares no breakdownDimensions, so a theme built from at most MAX_SAMPLES (5,
   // often fewer post-D1) sample rows has no whole-result-set aggregation behind it -- without this
   // scoping the instruction invited a confident-sounding generalization from a non-representative
@@ -729,10 +727,10 @@ test(
   },
 );
 
-// --- Group D: CV-017 (single-digest answer collapse) -- prompt-side nudge ----------------------
+// --- Group D: single-digest answer collapse -- prompt-side nudge ----------------------
 
 test(
-  'CV-017 fix: instructs writing a real synthesized answer even for a single tool call, ' +
+  'instructs writing a real synthesized answer even for a single tool call, ' +
     'not a bare row-count restatement',
   () => {
     const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
@@ -747,10 +745,10 @@ test(
   },
 );
 
-// --- Group B: CV-039 (inventory-kind escape hatch) / CV-076 (rule-corpus disclosure) -----------
+// --- Group B: inventory-kind escape hatch / rule-corpus disclosure -----------
 
 test(
-  'CV-039 fix: instructs trying search_wazuh_data on wazuh-states-inventory-* before ' +
+  'instructs trying search_wazuh_data on wazuh-states-inventory-* before ' +
     'declining an inventory kind get_agent_inventory does not implement',
   () => {
     const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
@@ -770,7 +768,7 @@ test(
 );
 
 test(
-  'CV-076 fix: instructs naming the rule corpus actually searched and disclosing the Manager ' +
+  'instructs naming the rule corpus actually searched and disclosing the Manager ' +
     'API was not queried',
   () => {
     const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
@@ -785,10 +783,10 @@ test(
   },
 );
 
-// --- Group C: decline-copy mapping fixes (CV-058/CV-077/CV-108) --------------------------------
+// --- Group C: decline-copy mapping fixes --------------------------------
 
 test(
-  'CV-077 fix: the RBAC/spaces decline is scoped away from a Security Analytics ' +
+  'the RBAC/spaces decline is scoped away from a Security Analytics ' +
     'content-listing question, and points it at get_threat_intel_components instead',
   () => {
     const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
@@ -804,7 +802,7 @@ test(
 );
 
 test(
-  'CV-108 fix: notification-channel questions get their own in-domain decline copy, never the ' +
+  'notification-channel questions get their own in-domain decline copy, never the ' +
     'out-of-domain/adversarial sentence',
   () => {
     const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
@@ -955,10 +953,10 @@ test('the decline block forbids narrating that a list of declines exists', () =>
   );
 });
 
-// --- Group F: check.result casing (CV-094) ------------------------------------------------------
+// --- Group F: check.result casing ------------------------------------------------------
 
 test(
-  'CV-094 fix: instructs the exact capitalized check.result values for a hand-built ' +
+  'instructs the exact capitalized check.result values for a hand-built ' +
     'search_wazuh_data query against wazuh-states-sca*',
   () => {
     const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');

@@ -24,12 +24,12 @@ import { ChatMessage, ProviderConfig, StreamEvent } from '../../common/types';
 import { ChatStreamOptions, ProviderAdapter } from '../providers/types';
 
 /**
- * Workstream C -- the tool-round COST BUDGET redesign (replaces the old fixed
+ * The tool-round COST BUDGET redesign (replaces the old fixed
  * `MAX_TOOL_ROUNDS = 3` count with cost-unit accounting; see chat.ts's `BASE_BUDGET_UNITS`,
  * `HARD_CEILING_UNITS`, `toolCallCostUnits`, `isRoundFutile`, `extractEnumeratedTargets`, and
  * `shouldGrantBudgetExtension` doc comments for the full design). This file pins the pure pieces
- * of that mechanism plus one full end-to-end "budget stress" scenario (the CV-069 battery item:
- * a 5-agent SCA sweep that must complete without ever asking the user to continue).
+ * of that mechanism plus one full end-to-end "budget stress" scenario:
+ * a 5-agent SCA sweep that must complete without ever asking the user to continue.
  *
  * NOTE (needs the OSD tree to actually run): like every other chat-*.test.ts file here, this
  * imports `./chat`, which imports `@osd/config-schema` -- unresolvable outside the full
@@ -66,7 +66,7 @@ test('getToolCostClass: an ordinary typed hits tool defaults to class 2', () => 
     'get_vulnerabilities',
     'get_agent_inventory',
   ]) {
-    // F13 fix (AI/plan/c-review.md): `getToolCostClass` returns 2 for an UNKNOWN name too (see the
+    // `getToolCostClass` returns 2 for an UNKNOWN name too (see the
     // very next test), so this assertion alone would pass whether or not the tool still exists --
     // a rename would silently keep this green. Assert the tool is still a real catalog entry first,
     // so a rename fails loudly here instead of just quietly costing 2 forever.
@@ -346,7 +346,7 @@ test('extractEnumeratedTargets: the sentence-terminating period after the last t
   );
 });
 
-// F5 fix (AI/plan/c-review.md): before the identifier-shape requirement, every one of these was a
+// Before the identifier-shape requirement, every one of these was a
 // measured false positive -- an ordinary English "X, Y and Z" list near a cue word, with no digit
 // in any item, silently tripling the turn's budget. Each must now be rejected.
 test('extractEnumeratedTargets: F5 false-positive table -- ordinary prose lists near a cue word are rejected', () => {
@@ -496,7 +496,7 @@ test('mechanism silence: FINAL_ROUND_ANSWER_INSTRUCTION never names the internal
   assert.match(FINAL_ROUND_ANSWER_INSTRUCTION, /do and do not cover/i);
 });
 
-// --- CV-069 budget-stress battery item: a 5-agent SCA sweep completes without user interaction
+// --- Budget-stress battery item: a 5-agent SCA sweep completes without user interaction
 
 function scriptedAdapter(scripts: StreamEvent[][]): {
   adapter: ProviderAdapter;
@@ -630,7 +630,7 @@ function textOnlyScript(text: string): StreamEvent[] {
   ];
 }
 
-test('CV-069 budget stress: a 5-agent SCA sweep spends past the base budget via silent extension and completes without any user interaction', async () => {
+test('budget stress: a 5-agent SCA sweep spends past the base budget via silent extension and completes without any user interaction', async () => {
   // get_sca_checks is cost class 2 (default) -- 5 successful calls cost 10 units total, which
   // exceeds BASE_BUDGET_UNITS (6) but stays comfortably under HARD_CEILING_UNITS (18). The user's
   // first message lists the 5 agent ids explicitly, so `extractEnumeratedTargets` finds them, and
@@ -769,12 +769,13 @@ test("orchestrate: a follow-up turn is gated by the CURRENT question's agent lis
 // --- F13 fix: end-to-end coverage of the STRUCTURAL cap and the exhaustion -> instruction path --
 
 test('orchestrate: with the extension granted, MAX_TOOL_ROUNDS (not the cost budget) is what ends the turn, and the final round carries FINAL_ROUND_ANSWER_INSTRUCTION', async () => {
-  // F13 (AI/plan/c-review.md): before this test, nothing drove `orchestrate` all the way to
-  // `round === MAX_TOOL_ROUNDS` with successful calls the whole way -- the CV-069 test above ends
-  // on a plain tools-offered round the model chose to answer in (never a FORCED final round), so it
-  // never exercised the exhaustion-to-instruction path either. This test grants the silent
-  // extension early (same mechanism as CV-069) specifically so the cost ceiling (raised to
-  // HARD_CEILING_UNITS = 18) stays well ahead of spend for the whole sweep, isolating the
+  // Before this test, nothing drove `orchestrate` all the way to
+  // `round === MAX_TOOL_ROUNDS` with successful calls the whole way -- the budget-stress test
+  // above ends on a plain tools-offered round the model chose to answer in (never a FORCED final
+  // round), so it never exercised the exhaustion-to-instruction path either. This test grants the
+  // silent extension early (same mechanism as the budget-stress test above) specifically so the
+  // cost ceiling (raised to HARD_CEILING_UNITS = 18) stays well ahead of spend for the whole
+  // sweep, isolating the
   // STRUCTURAL `MAX_TOOL_ROUNDS` cap as the actual reason the turn's 6th tool round is followed by
   // a forced, tools-less final round.
   {
@@ -834,7 +835,8 @@ test('orchestrate: with the extension granted, MAX_TOOL_ROUNDS (not the cost bud
 
     // The LAST provider call is the forced final round -- its outbound messages must end with
     // FINAL_ROUND_ANSWER_INSTRUCTION (issue #8893), proving the exhaustion path actually appends
-    // it, not just the "model chose to stop, tools were still offered" path CV-069 covers.
+    // it, not just the "model chose to stop, tools were still offered" path the budget-stress
+    // test above covers.
     const finalRoundMessages = callMessages[callMessages.length - 1];
     assert.equal(
       finalRoundMessages[finalRoundMessages.length - 1].content,

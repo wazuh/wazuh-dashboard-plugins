@@ -758,16 +758,14 @@ test('orchestrate: a range-only suggestion on a blocked index is NOT told its fi
 });
 
 test('orchestrate: an unknown_fields resolution on the round the F3 rejected-round bound forces final still emits the handoff', async () => {
-  // Round-aware retry gate (F2, AI/plan/c-review.md): converting to a tool error only helps if a
-  // FUTURE tool-bearing round exists to retry in. Review fix F3 added an independent bound
-  // (`MAX_CONSECUTIVE_REJECTED_ROUNDS`) for a turn that never succeeds even once -- tighter than
-  // the structural `MAX_TOOL_ROUNDS` cap this test used to exercise (5 filler rounds before F3;
-  // now the F3 bound of 3 consecutive rejected real-tool-call rounds fires first and is what
-  // actually decides "no more tool-bearing rounds" for an all-rejected turn like this one). The
-  // filler-round COUNT is derived from `MAX_CONSECUTIVE_REJECTED_ROUNDS` rather than hardcoded, for
-  // the same reason as before: a literal script array encodes "the bound is N" purely through
-  // array position, so a future change to that bound would silently start exercising a different
-  // round while this test kept passing, proving nothing.
+  // Converting to a tool error only helps if a FUTURE tool-bearing round exists to retry in.
+  // There's an independent bound (`MAX_CONSECUTIVE_REJECTED_ROUNDS`) for a turn that never
+  // succeeds even once -- tighter than the structural `MAX_TOOL_ROUNDS` cap: 3 consecutive
+  // rejected real-tool-call rounds fires first and is what actually decides "no more tool-bearing
+  // rounds" for an all-rejected turn like this one. The filler-round COUNT is derived from
+  // `MAX_CONSECUTIVE_REJECTED_ROUNDS` rather than hardcoded: a literal script array encodes "the
+  // bound is N" purely through array position, so a future change to that bound would silently
+  // start exercising a different round while this test kept passing, proving nothing.
   const rejectedSearchRound: StreamEvent[] = [
     {
       type: 'tool_call',

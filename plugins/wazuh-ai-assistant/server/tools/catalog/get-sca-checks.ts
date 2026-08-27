@@ -387,7 +387,7 @@ const getScaChecksToolBase: ToolDefinition = {
     // file/directory/command detail, per the matrix — the investigative payload of this tool).
     rowFields: ['check.rationale', 'check.remediation', 'check.rules'],
   },
-  // Workstream D (SCA interpretation, coverage doc CV-054): `check.rationale` (WHY the check
+  // `check.rationale` (WHY the check
   // exists/what it protects against) and `check.remediation` (WHAT to do about a failure) now
   // ride in the digest sample rows too, not just the row expander -- the model cannot lead an
   // interpreted answer with "why this matters" / "what to do" (prompts.ts's SCA synthesis
@@ -426,7 +426,7 @@ const getScaChecksToolBase: ToolDefinition = {
   },
 };
 
-// BLOCKER FIX (CV-053/CV-052/CV-088 turn 3): a hand-written `resolveParams`, wrapping
+// A hand-written `resolveParams`, wrapping
 // `resolveScaCheckParams` (param-resolution.ts), REPLACES the plain declarative
 // `soleCandidateParams`-only resolution `registry.ts` would otherwise attach. `soleCandidateParams`
 // above is still read (via `buildGenericResolveParams` inside `resolveScaCheckParams`) as the

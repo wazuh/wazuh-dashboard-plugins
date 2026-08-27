@@ -32,8 +32,8 @@ test("get_field_values: defaults to the field's first known surface with a bound
 });
 
 test(
-  'get_field_values: event.category resolves to the events surface (CV-033 fix -- was ' +
-    'previously absent from FIELD_LOCATIONS despite being agg-allowlisted)',
+  'get_field_values: event.category resolves to the events surface (was previously absent ' +
+    'from FIELD_LOCATIONS despite being agg-allowlisted)',
   () => {
     const request = build({ field: 'event.category' });
     assert.equal(request.index, 'wazuh-events-v5*');
@@ -172,8 +172,7 @@ test(
 
 test(
   'get_field_values: CEO scenario end to end -- "findings for linux" pivots through ' +
-    'host.os.platform on the findings surface to the populated wazuh.agent.host.os.platform twin ' +
-    '(code review B1, AI/plan/b-review.md P1.1)',
+    'host.os.platform on the findings surface to the populated wazuh.agent.host.os.platform twin',
   async () => {
     // Step 1/2 of the scenario: the model asks for host.os.platform ON FINDINGS (previously
     // guardrail-rejected -- FIELD_LOCATIONS only mapped it to inventory_system). It must now

@@ -179,7 +179,7 @@ export const getThreatIntelComponentsTool: ToolDefinition = {
         // `resolveSecurityAnalyticsSpace` to fill in `buildSecurityAnalyticsLink`'s `space`, and
         // also shown as its own "Space" table column (see tableSpec below).
         // `document.metadata.description` (mapped `text`, confirmed live on all 5 sub-indices)
-        // closes defect #4 of AI/plan/qa-rules-decoders-rootcause.md: it is the only field that
+        // is the only field that
         // answers "what does this decoder/integration do" -- kept out of `tableSpec.columns`
         // (too wide for a table cell) and surfaced via `rowFields`/`digest.sampleColumns` instead.
         _source: [

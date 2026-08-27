@@ -74,7 +74,7 @@ const POPULATION_DISCLOSURE_EXEMPT: Record<string, string> = {
     'Escape hatch: the query body (including any "aggs") is model-authored, not built by this ' +
     'catalog -- the population-disclosure guarantee for a hand-authored aggregation is the ' +
     "model's own responsibility, same boundary as every other guardrail on this tool's output.",
-  // A-6 (AI/plan/a1b-review.md): the ORIGINAL reason here ("at most a handful of records") was
+  // The ORIGINAL reason here ("at most a handful of records") was
   // live-proven false -- one indicator (124.70.213.43) returns 55 records on wazuh-aio-5, and the
   // (pre-A-1-fix) unanchored prefix arm made the result set open-ended by construction. The
   // exemption's CONCLUSION still holds -- `counts.total`/`counts.truncated` are computed by
@@ -90,7 +90,7 @@ const POPULATION_DISCLOSURE_EXEMPT: Record<string, string> = {
     'guarantee a single-indicator lookup does not already have from those counts. Breaking down ' +
     'by document.type/document.provider would first need AGG_FIELD_ALLOWLIST entries for those ' +
     'fields (they have privacy.ts `allow` entries but no agg-allowlist entries today).',
-  // Workstream A1b: exactly 3 possible rows total (one per CTI feed), a fixed, tiny, non-growing
+  // Exactly 3 possible rows total (one per CTI feed), a fixed, tiny, non-growing
   // set -- a categorical breakdown over 3 rows is not a meaningful population-disclosure concern
   // this mechanism exists to guard against (that concern is about large, open-ended result sets).
   get_cti_status:

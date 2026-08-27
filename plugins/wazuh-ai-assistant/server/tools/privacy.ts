@@ -137,10 +137,9 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: WAZUH_FIELD.RULE_MITRE_TECHNIQUE_NAME, action: 'allow' },
   { field: WAZUH_FIELD.RULE_MITRE_TACTIC, action: 'allow' },
   { field: WAZUH_FIELD.RULE_MITRE_TACTIC_NAME, action: 'allow' },
-  // Hotfix A0 (AI/plan/qa-rules-decoders-rootcause.md, defect #4): get_rules/
-  // get_threat_intel_components newly surface document.metadata.description (mapped `text`,
-  // populated on every rule/decoder/integration/policy/kvdb doc) so "what does rule/decoder X
-  // detect" is answerable at all -- previously the field was omitted from both tools' `_source`
+  // get_rules/get_threat_intel_components newly surface document.metadata.description (mapped
+  // `text`, populated on every rule/decoder/integration/policy/kvdb doc) so "what does rule/decoder
+  // X detect" is answerable at all -- previously the field was omitted from both tools' `_source`
   // entirely, so the model had no way to answer that question from the ruleset. Reviewed 'allow',
   // same reasoning and same residual-risk mitigation as WAZUH_FIELD.RULE_TITLE above: this is
   // Wazuh's own curated Sigma/pipeline documentation text, not analyst/attacker-supplied data, and
@@ -164,7 +163,7 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'check.id', action: 'allow' },
   { field: 'check.name', action: 'allow' },
   { field: 'check.result', action: 'allow' },
-  // Workstream D (coverage doc CV-054): get_sca_checks now also samples check.rationale/
+  // get_sca_checks now also samples check.rationale/
   // check.remediation into the digest (previously row-expander-only, see get-sca-checks.ts) --
   // same curated-benchmark/policy-content class as check.id/name/result above (CIS/benchmark
   // authored text describing WHY a check exists and WHAT to do about a failure), not
@@ -376,9 +375,9 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'vulnerability.severity', action: 'allow' },
   { field: 'policy.id', action: 'allow' },
 
-  // --- Workstream A1a (AI/plan/coverage-validation-design.md) -------------------------------
+  // --- Fields newly reachable through search_wazuh_data -------------------------------
   // Every family below is newly reachable through `search_wazuh_data` (guardrails.ts's
-  // `INDEX_ALLOWLIST_RE`, widened by this workstream) and that tool sets `deriveColumns: true` +
+  // `INDEX_ALLOWLIST_RE`, widened to cover them) and that tool sets `deriveColumns: true` +
   // `failClosedFieldPolicy: true` -- an unlisted field there is FAIL-CLOSED anonymized (the
   // opposite default from a typed tool's allow-by-omission), so every field an analyst should
   // actually be able to read needs a REAL entry here, not just a "looks harmless" structural
@@ -395,7 +394,7 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // dotted path unique to the family it was verified on (no other reachable family uses the same
   // literal), or (b) a bare, undotted top-level key.
   //
-  // P-1 (AI/plan/a1a-review.md): the (b) bare-name entries below were originally justified with the
+  // The (b) bare-name entries below were originally justified with the
   // claim "no existing WCS schema ever exposes a personal-shaped field bare at a document's root" --
   // that claim is FALSE as stated (live-verified: `.ds-wazuh-events-v5-security-000001`'s root leaves
   // include `message` (the raw log line), `related` (ECS `related.ip`/`related.user`), and `url` (an
@@ -481,7 +480,7 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // MS-6/MS-7): every field is written by the content-manager service itself describing ITS OWN
   // sync state/schedule -- never analyst- or attacker-supplied, and (per the mechanism-limit note
   // above) these bare root-level keys cannot collide with any WCS-schema field of the same name.
-  // P-6 (AI/plan/a1a-review.md): `resource` is a full vendor API URL and `context` a tenant/
+  // `resource` is a full vendor API URL and `context` a tenant/
   // context id -- vendor-side today (the SaaS CTI backend), but at a customer running a PRIVATE
   // CTI mirror `resource` would carry an INTERNAL hostname, and this is 'allow' (unscanned at the
   // digest boundary; the outbound shape scan in chat.ts still applies to it, same residual as
@@ -560,7 +559,7 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'queries.tags', action: 'allow' },
   { field: 'queries.query_field_names', action: 'allow' },
 
-  // .opensearch-sap-pre-packaged-rules-config (coverage doc G3): P-4 (AI/plan/a1a-review.md) --
+  // .opensearch-sap-pre-packaged-rules-config (coverage doc G3):
   // this index does NOT share `document.metadata.*` at all. Live mapping root is a single object,
   // `rule`: real paths are `rule.metadata.title/author/date/modified/references`, `rule.category`,
   // `rule.level`, `rule.status`, `rule.queries[].value`, `rule.document.id`, `rule.space`. The
@@ -616,7 +615,7 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // Indicator identity/metadata: a domain, hash, or IP string, but of a THIRD-PARTY indicator, not
   // the customer's own address space -- see the family-level reasoning above.
   //
-  // P-3 (AI/plan/a1a-review.md): this literal is NOT unique to the two threat-intel families named
+  // This literal is NOT unique to the two threat-intel families named
   // above -- `get_threat_intel_components.ts` reads the exact same `document.name` on
   // `wazuh-threatintel-{rules,decoders,kvdbs,filters,integrations}-a`, which are the indices a
   // CUSTOMER'S OWN custom rules/decoders/KVDBs land in (before this branch that field was
@@ -641,7 +640,7 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'document.type', action: 'allow' },
   { field: 'document.tags', action: 'allow' },
   { field: 'document.feed.name', action: 'allow' },
-  // P-4 (AI/plan/a1a-review.md): the branch's original entries were the bare `software.name`/
+  // The branch's original entries were the bare `software.name`/
   // `.type`/`.alias`, which match nothing on a real enrichment document -- the field is nested
   // under `document.software.*` (verified in a sampled live doc), not a top-level `software`
   // object. Corrected to the real paths so these three actually resolve instead of silently never
@@ -655,7 +654,7 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // body, not a closed vocabulary -- left fail-closed (anonymized) rather than assumed safe, same
   // "too risky to classify confidently" call as `type` above.
   //
-  // Workstream A1b (get-cve-intel.ts) deliberately adds NO entries here for
+  // get-cve-intel.ts deliberately adds NO entries here for
   // `document.containers.cna.descriptions/metrics/affected`: those paths never reach
   // `applyFieldPolicy` at all -- `get-cve-intel.ts`'s `resolveParams` reads them directly via the
   // opensearch client (bypassing the typed-tool digest/table path entirely, since `document` is
@@ -1954,7 +1953,7 @@ export function extractAggFields(
  *    — passthrough, completely unscanned. This is the ONLY branch that skips both scans; every
  *    other outcome above goes through at least one of them.
  *
- * P-2 (AI/plan/a1a-review.md) added two branches ahead of the ones above: a STRING ARRAY under an
+ * P-2 added two branches ahead of the ones above: a STRING ARRAY under an
  * 'anonymize'/'allow-scan' entry recurses element-wise through this same function (so a multi-valued
  * field like `wazuh.agent.host.ip` is no longer silently unscrubbed just because it is an array
  * instead of a scalar), and an unlisted OBJECT/non-empty-ARRAY value under the escape hatch's
@@ -1990,7 +1989,7 @@ export function scrubFieldValue(
   if (entry?.action === 'never') {
     return { keep: false, value: undefined };
   }
-  // P-2 (AI/plan/a1a-review.md), widened by NF-2: a container value (array or object, ANY shape —
+  // P-2, widened by NF-2: a container value (array or object, ANY shape —
   // a flat string array, an array of objects, a nested array, a mixed-type array, a plain object)
   // under an explicit 'anonymize'/'allow-scan' entry used to bypass its own field's policy — this
   // function only matched `typeof value === 'string'` (plus, after P-2, a flat string array), so

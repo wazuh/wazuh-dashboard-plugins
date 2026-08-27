@@ -84,7 +84,7 @@ test('lookup_indicator: a non-IP indicator (hash/url/domain) is exact-term only,
   });
 });
 
-// A-1 (AI/plan/a1b-review.md), live-proven 2026-08-19 on wazuh-aio-5: the OLD unanchored prefix
+// A-1, live-proven 2026-08-19 on wazuh-aio-5: the OLD unanchored prefix
 // arm made `prefix document.name = "124.70.213.4"` match all 55 "124.70.213.43:<port>" records --
 // a false known-malicious verdict for a distinct, benign IP. The anchored `${indicator}:` prefix
 // makes that structurally impossible: "124.70.213.4:" is never a prefix of "124.70.213.43:<port>"
@@ -134,7 +134,7 @@ test('lookup_indicator: trims the indicator and clamps limit to [1, 50]', () => 
   assert.equal(build({ indicator: 'x', limit: 0 }).body.size, 1);
 });
 
-// CV-049 (coverage-validation-design.md): the flagship "is this hash/IP/URL malicious" battery
+// The flagship "is this hash/IP/URL malicious" battery
 // item -- live-verified 2026-08-19 against wazuh-aio-5's real 257k-doc
 // wazuh-threatintel-enrichments-a: a known connection-type record's document.name is
 // "124.70.213.43:18386" (IP:port), a known hash_sha256 record's document.name is the bare hash
@@ -142,7 +142,7 @@ test('lookup_indicator: trims the indicator and clamps limit to [1, 50]', () => 
 // the DSL shape that reaches all three via the same should-clause, not that any specific value is
 // present (live presence was confirmed by direct curl during development, not re-asserted here so
 // this test does not depend on fixture data that can rotate).
-test('CV-049: default body passes checkIndexAllowlist and lintDsl (no time range required, no leading wildcard)', () => {
+test('default body passes checkIndexAllowlist and lintDsl (no time range required, no leading wildcard)', () => {
   const request = build({
     indicator:
       'e9a5fd60da9f1f94f1cefa43fe6b7dd80a7368c7cdba13528445724320fc4948',

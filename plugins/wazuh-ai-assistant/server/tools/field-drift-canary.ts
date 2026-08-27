@@ -9,7 +9,7 @@ import { fieldsForFamily } from './catalog/get-field-values';
  * what a live Wazuh Indexer maps. Neither can notice, on its own, the day a platform upgrade
  * renames or drops a field the tools still reference -- the failure mode is silent: a filter on a
  * renamed field returns zero rows forever, indistinguishable from "no matching data" (exactly the
- * class of bug `AI/plan/qa-rules-decoders-rootcause.md` catalogs for the ruleset tools). This
+ * class of bug that affects the ruleset tools too). This
  * module runs ONE bounded live `_mapping` check per process start and logs a warning for every
  * catalog/allowlist field that is no longer mapped, so that drift shows up in the server log on
  * the day it happens instead of months later in a QA report.
@@ -38,7 +38,7 @@ const MAX_MISSING_FIELDS_LOGGED_PER_FAMILY = 20;
  * `server/tools/router.ts`'s `TOOL_CATEGORY` index targets and `get-field-values.ts`'s
  * `FIELD_LOCATIONS` if either changes which indices are actually queried.
  *
- * Code review B2 (AI/plan/b-review.md): `fim.files`, `inventory.processes`, and
+ * `fim.files`, `inventory.processes`, and
  * `inventory.hotfixes` were previously listed WITHOUT an `allowlistFamily` -- meaning they had no
  * `get-field-values.ts` tool fields of their own, so once `checkFamily` below stopped diffing the
  * full WCS catalog (see that fix) they would check nothing at all. Dropped rather than kept as
@@ -170,7 +170,7 @@ interface FamilyDriftResult {
  * the pattern currently resolves to zero indices -- an empty environment/family is not drift, it
  * is simply nothing to check yet.
  *
- * Code review B2 (AI/plan/b-review.md): this used to union `FIELD_CATALOG[family]` (the full WCS
+ * This used to union `FIELD_CATALOG[family]` (the full WCS
  * schema) with the tool-facing fields and warn on ANY of them missing. WCS is the schema, not what
  * the live index TEMPLATE actually maps -- measured live, `events.main` alone had 2,121 WCS
  * fields the template never mapped, none of which any tool touches, producing ~2,100 false

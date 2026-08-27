@@ -197,7 +197,7 @@ test('the "inventory" category description covers "software" and vague host phra
 });
 
 /**
- * REVIEW FOLLOW-UP (CV-077, live battery re-run 2026-08-20): "What spaces exist and what does
+ * "What spaces exist and what does
  * each contain?" declined with "I don't have the tool needed... available in this turn" -- the
  * prompt-level decline-copy fix (prompts.ts, see the RBAC/spaces disambiguation note) correctly
  * stopped the WRONG (RBAC-permissions) decline from firing, but stage-1 routing still never

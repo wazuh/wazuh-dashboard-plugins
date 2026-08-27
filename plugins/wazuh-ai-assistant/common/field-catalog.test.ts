@@ -43,9 +43,9 @@ test('FIELD_CATALOG covers the index families the catalog tools query', () => {
 });
 
 test('every entry is a non-empty path string', () => {
-  // Code review footprint gate (AI/plan/b-review.md P1.2): FIELD_CATALOG entries were
-  // `{ path, type }` objects; `type` had no production consumer (only this test read it), so the
-  // catalog is now `ReadonlyArray<string>` (paths only) to shrink the compressed footprint.
+  // FIELD_CATALOG entries used to be `{ path, type }` objects; `type` had no production consumer
+  // (only this test read it), so the catalog is now `ReadonlyArray<string>` (paths only) to
+  // shrink the compressed footprint.
   for (const [family, paths] of Object.entries(FIELD_CATALOG)) {
     for (const path of paths) {
       assert.equal(typeof path, 'string', `${family}: non-string entry`);

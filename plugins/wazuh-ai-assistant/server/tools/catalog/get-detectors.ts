@@ -3,7 +3,7 @@ import { ResolveParamsResult, ToolDefinition } from '../types';
 import { checkIndexAllowlist } from '../guardrails';
 import { clampLimit, limitProperty, objectSchema } from './common';
 
-// A-2 (AI/plan/a1b-review.md): `detector_type` is model-controlled free text with no enum (live-
+// `detector_type` is model-controlled free text with no enum (live-
 // verified to have more distinct values than are worth curating -- see the doc comment below), so
 // it cannot be validated against a fixed list the way `ENABLED_VALUES`/`DETECTOR_SOURCES` are.
 // Instead it is validated against the exact charset OpenSearch index names allow before it is ever
@@ -28,7 +28,7 @@ const DETECTOR_SOURCES = ['custom', 'standard'] as const;
  * integration name, e.g. "suricata", "aws", "linux"), not a curated enum -- confirmed live to have
  * more distinct values than are worth enumerating.
  *
- * Workstream A1b (coverage doc G2/CV-016-018): this tool's own request stays a listing-only query
+ * This tool's own request stays a listing-only query
  * over `.opensearch-sap-detectors-config` -- it still does not itself execute a query against a
  * detector's findings/alerts index as part of `buildRequest` (that would need one MORE outbound
  * request per detector, and `types.ts` allows exactly one per tool call). What changed: when the

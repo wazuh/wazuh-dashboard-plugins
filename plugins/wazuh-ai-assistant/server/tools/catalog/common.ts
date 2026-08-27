@@ -672,8 +672,7 @@ export function validateAgentId(value: unknown): string {
 
 /**
  * Shared "name" filter for the two Security Analytics catalog tools (get_rules,
- * get_threat_intel_components) -- hotfix A0, root-caused in
- * `AI/plan/qa-rules-decoders-rootcause.md`: neither tool exposed ANY keyword filter, so a
+ * get_threat_intel_components): neither tool exposed ANY keyword filter, so a
  * QUALIFIED question ("is there a decoder for apache?", "the rule about SSTI") always fell back
  * to reading the full unfiltered page and admitting defeat, even though the underlying data
  * trivially answers it (live: 1 SSH decoder, 5 Apache decoders, 1 SSTI rule).

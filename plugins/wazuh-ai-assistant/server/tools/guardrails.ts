@@ -134,7 +134,7 @@ const MAX_TREE_DEPTH = 100;
 // allowlist is documented as the standalone boundary that must hold on its own, independent of
 // what today's tool schemas happen to permit.
 //
-// Workstream A1a (AI/plan/coverage-validation-design.md, TC-8/MS-6/MS-7): widened past the
+// TC-8/MS-6/MS-7: widened past the
 // original 3-family + threatintel-{rules..kvdbs} + sap-detectors-config set left by workstream B.
 // Every addition below is a family/index with REAL data on `wazuh-aio-5` (live-verified 2026-08-19,
 // see this branch's own verification notes) and no owning typed tool -- the mission is "every
@@ -153,7 +153,7 @@ const MAX_TREE_DEPTH = 100;
 //    count is volatile (drift noted in the coverage doc, 0 here vs 1,032 observed elsewhere) so a
 //    literal would have to be re-verified on every drift; the wildcard is stable regardless.
 //  - `\.wazuh-cti-consumers` / `\.wazuh-content-manager-jobs` -- CTI freshness status (coverage
-//    doc MS-6/MS-7, retiers CV-050 from "can't diagnose" to answerable): live-verified 3 docs
+//    doc MS-6/MS-7, retiers this row from "can't diagnose" to answerable): live-verified 3 docs
 //    (per-feed `status`/`local_offset`/`remote_offset`) and 2 docs (sync-schedule metadata) --
 //    config/status documents written by the content-manager service itself, never
 //    analyst/attacker-supplied.
@@ -213,7 +213,7 @@ const MAX_TREE_DEPTH = 100;
 // family -- OpenSearch Security Analytics' own config store for detector definitions, confirmed
 // live to be indexer-reachable and to hold no analyst/attacker-supplied data (name/type/schedule/
 // enabled/source, all vendor- or admin-configured).
-// P-10 (AI/plan/a1a-review.md): the wildcard suffix was `[^,\s]*`, which excludes only a comma or
+// The wildcard suffix was `[^,\s]*`, which excludes only a comma or
 // whitespace -- permitting `/` and `.` through, so a crafted value like
 // "wazuh-findings-v5-*/../.opendistro_security" matched this regex (unreachable via
 // search_wazuh_data today because schema-validator.ts's `enum` is the actual gate on that
@@ -490,12 +490,12 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // Syscollector ports: this repo's IT Hygiene network dashboard runs a real terms agg on it
   // (plugins/main/public/components/overview/it-hygiene/dashboards/dashboard-panels.ts). Code
   // review B10: this comment previously claimed live values include "Inactive"/"Unknown" --
-  // corrected per live spot-check (AI/plan/b-review.md P1.3): actual values are
+  // corrected per live spot-check: actual values are
   // "established"/"listening"/"time_wait"/"close_wait".
   'interface.state',
   // Syscollector ports: aggregated by the IT Hygiene services/traffic dashboards. Code review B10:
   // this comment previously claimed live values are uppercase ("TCP"/"UDP") -- corrected per live
-  // spot-check (AI/plan/b-review.md P1.3): actual values are lowercase "tcp"/"tcp6"/"udp".
+  // spot-check: actual values are lowercase "tcp"/"tcp6"/"udp".
   'network.transport',
   // Entity-pivot fields for "noisiest/top X" questions (GA benchmark gap: this allowlist only
   // ever listed wazuh-findings-v5 field names, so a terms/composite/multi_terms agg on the
@@ -549,7 +549,7 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // Privacy-off (the default) surfaces raw IPs in buckets, same as it already does in
   // every finding-hits tool's digest samples via `FINDING_DIGEST_EXTRA_COLUMNS` -- no new exposure.
   'source.ip',
-  // Code review B1 (CEO-scenario dead-end, AI/plan/b-review.md P1.1): the three fields below are
+  // CEO-scenario dead-end: the three fields below are
   // the POPULATED `wazuh.agent.host.*`/`wazuh.integration.*` twins of already-listed
   // findings/events-side fields (`host.os.name`/`host.os.platform` above, which are largely
   // UNPOPULATED on findings/events -- see FIELD_ALIASES in common/field-catalog.ts). Without these,
@@ -571,7 +571,7 @@ const AGG_FIELD_ALLOWLIST = new Set([
   WAZUH_FIELD.AGENT_OS_NAME,
   WAZUH_FIELD.AGENT_OS_PLATFORM,
   WAZUH_FIELD.INTEGRATION_NAME,
-  // BLOCKER FIX (CV-033, 2026-08-19/20 adjudicated runs): `wazuh.integration.category` (already
+  // Fix: `wazuh.integration.category` (already
   // above, findings-v5's own category taxonomy) has no events-v5 counterpart on this list, even
   // though `event.category` is the events-v5 family's OWN finite category taxonomy for the exact
   // same "browse the real category values before filtering" use case the "verify before filter"

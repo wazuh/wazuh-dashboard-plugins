@@ -4,7 +4,7 @@ import { checkIndexAllowlist, applySafetyValves, lintDsl } from '../guardrails';
 import { GENERIC_QUERY_INDEX_PATTERNS } from './generic-query-families';
 
 /**
- * Acceptance-shaped tests for workstream A1a (AI/plan/coverage-validation-design.md): three
+ * Acceptance-shaped tests for three
  * validation-battery rows the design doc itself marks as "no tool today" / "no workstream (G1)"
  * that ONLY this generic query layer (not a new one-off typed tool, not another workstream) makes
  * answerable, end to end through the real guardrail pipeline (`checkIndexAllowlist` ->
@@ -55,12 +55,12 @@ function buildAndValidate(
   return { index: request.index, body: clampedBody };
 }
 
-// --- CV-070: "How healthy is agent-manager communication right now?" (metrics-comms, coverage
+// --- "How healthy is agent-manager communication right now?" (metrics-comms, coverage
 // doc's open gap G1 -- "no workstream", decline-today). This branch's guardrails.ts widening
 // (wazuh-metrics-* added to INDEX_ALLOWLIST_RE) and generic-query-families.ts's new enum entry
 // together make this answerable through search_wazuh_data, with no new typed tool. -------------
 
-test('CV-070: "how healthy is agent-manager communication right now" is answerable via search_wazuh_data (wazuh-metrics-comms)', () => {
+test('"how healthy is agent-manager communication right now" is answerable via search_wazuh_data (wazuh-metrics-comms)', () => {
   assert.ok(GENERIC_QUERY_INDEX_PATTERNS.includes('wazuh-metrics-*'));
   const { index, body } = buildAndValidate('wazuh-metrics-*', {
     query: { bool: { filter: [] } },
@@ -82,13 +82,13 @@ test('CV-070: "how healthy is agent-manager communication right now" is answerab
   assert.equal((body.size as number) <= 500, true);
 });
 
-// --- CV-078: "How fresh is our threat intel? Has the CVE/ruleset/IOC feed synced recently?"
+// --- "How fresh is our threat intel? Has the CVE/ruleset/IOC feed synced recently?"
 // (.wazuh-cti-consumers + .wazuh-content-manager-jobs, coverage doc TC-7/MS-6/MS-7). The design
 // doc names a hypothetical new typed tool (`get_cti_status`) for this; the product decision this
 // workstream implements instead is ONE generic tool, so this proves the SAME row is answerable
 // without it. ---------------------------------------------------------------------------------
 
-test('CV-078: "how fresh is our threat intel" is answerable via search_wazuh_data (.wazuh-cti-consumers)', () => {
+test('"how fresh is our threat intel" is answerable via search_wazuh_data (.wazuh-cti-consumers)', () => {
   assert.ok(GENERIC_QUERY_INDEX_PATTERNS.includes('.wazuh-cti-consumers'));
   const { index, body } = buildAndValidate('.wazuh-cti-consumers', {
     query: { bool: { filter: [] } },
@@ -99,7 +99,7 @@ test('CV-078: "how fresh is our threat intel" is answerable via search_wazuh_dat
   assert.equal(typeof body.query, 'object');
 });
 
-test('CV-078 (schedule half): the content-manager sync schedule is answerable via search_wazuh_data (.wazuh-content-manager-jobs)', () => {
+test('schedule half: the content-manager sync schedule is answerable via search_wazuh_data (.wazuh-content-manager-jobs)', () => {
   assert.ok(
     GENERIC_QUERY_INDEX_PATTERNS.includes('.wazuh-content-manager-jobs'),
   );
@@ -111,17 +111,17 @@ test('CV-078 (schedule half): the content-manager sync schedule is answerable vi
   assert.equal(index, '.wazuh-content-manager-jobs');
 });
 
-// --- CV-049: "Is IP/hash/URL X known-malicious per our threat intel?" (wazuh-threatintel-
+// --- "Is IP/hash/URL X known-malicious per our threat intel?" (wazuh-threatintel-
 // enrichments-a, coverage doc TC-8 -- one of the two "production-shaped volume" cover-now rows,
 // explicitly sequenced first). Previously an unconditional decline (guardrails.ts's own prior
 // comment called this "deliberately out of scope"); this branch reverses that per the coverage
 // doc's resequencing. ---------------------------------------------------------------------------
 
-test('CV-049: "is IP/hash/URL X known-malicious" is answerable via search_wazuh_data (wazuh-threatintel-enrichments-a)', () => {
+test('"is IP/hash/URL X known-malicious" is answerable via search_wazuh_data (wazuh-threatintel-enrichments-a)', () => {
   assert.ok(
     GENERIC_QUERY_INDEX_PATTERNS.includes('wazuh-threatintel-enrichments-a'),
   );
-  // P-5 (AI/plan/a1a-review.md): the indicator VALUE lives in `document.name`, not `hash.sha256` --
+  // The indicator VALUE lives in `document.name`, not `hash.sha256` --
   // that root field is the RECORD'S OWN content hash (a sibling of `document`, e.g.
   // `{"hash":{"sha256":"4321..."}, "document":{"name":"<the actual indicator>", "type":
   // "hash_sha256"}}`), unrelated to the indicator being looked up. A `term` filter on `hash.sha256`
