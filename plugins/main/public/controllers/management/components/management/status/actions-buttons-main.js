@@ -117,7 +117,6 @@ class WzStatusActionButtons extends Component {
       ).toFixed(2);
 
       this.props.updateStats({
-        agentsCountByNode: agentsOverview?.data?.data?.nodes,
         agentsCount,
         agentsCoverage: isNaN(agentsActiveCoverage) ? 0 : agentsActiveCoverage,
       });
