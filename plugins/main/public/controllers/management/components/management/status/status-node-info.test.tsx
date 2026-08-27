@@ -12,6 +12,7 @@
  */
 
 import React from 'react';
+import '@testing-library/jest-dom';
 import { screen } from '@testing-library/react';
 import WzStatusNodeInfo from './status-node-info';
 import { renderWithProviders } from '../../../../../redux/render-with-redux-provider';
