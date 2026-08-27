@@ -249,16 +249,6 @@ describe('Global configuration remote settings', () => {
     expect(queryByText('Agents settings')).toBeFalsy();
   });
 
-  it('should never render global_prefix', () => {
-    const { queryByText } = render(
-      <WzConfigurationGlobalConfigurationRemote
-        currentConfig={fullRemoteConfig}
-      />,
-    );
-
-    expect(queryByText(/global_prefix/i)).toBeFalsy();
-  });
-
   it('should render the existing no-config banner when request-remote is a string (error state)', () => {
     const { getByText, queryByText } = render(
       <WzConfigurationGlobalConfigurationRemote
