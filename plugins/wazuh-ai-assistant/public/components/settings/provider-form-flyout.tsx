@@ -715,6 +715,12 @@ interface ProviderFormFlyoutProps {
    * no client-side duplicate check at all. */
   existingProviders?: ProviderSummary[];
   apiKeyEncryptionEnabled: boolean | null;
+  /** True when `wazuh_ai_assistant.settingsReadOnly` locks settings/providers
+   * (server/routes/settings.ts's `requireSettingsUnlocked`). Defense in depth: settings-page.tsx
+   * already keeps this flyout from opening in that case, but the flyout can still be showing
+   * from before the lock took effect (e.g. a stale probe), so it self-disables too. Optional —
+   * absent behaves exactly as before this prop existed: never locked. */
+  settingsLocked?: boolean;
   /** True while a save (+ the connection test it triggers) is in flight. Optional/absent behaves
    * exactly as before this prop existed: the Save button is never shown as loading. */
   isSaving?: boolean;
@@ -731,6 +737,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   error,
   existingProviders = [],
   apiKeyEncryptionEnabled,
+  settingsLocked = false,
   isSaving = false,
   testOutcome = null,
   onSubmit,
@@ -1124,6 +1131,31 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                   {'openssl rand -base64 32\n' +
                     'opensearch-dashboards-keystore add wazuh_ai_assistant.encryptionKey'}
                 </EuiCodeBlock>
+              </EuiCallOut>
+              <EuiSpacer size='m' />
+            </>
+          )}
+          {settingsLocked && (
+            <>
+              <EuiCallOut
+                color='warning'
+                iconType='lock'
+                title={i18n.translate(
+                  'wazuhAiAssistant.settings.form.settingsLockedTitle',
+                  { defaultMessage: 'Settings are locked' },
+                )}
+              >
+                <p>
+                  {i18n.translate(
+                    'wazuhAiAssistant.settings.form.settingsLockedBody',
+                    {
+                      defaultMessage:
+                        'AI Assistant settings are locked by your administrator and cannot ' +
+                        'be changed. Contact your administrator if you need a different ' +
+                        'configuration.',
+                    },
+                  )}
+                </p>
               </EuiCallOut>
               <EuiSpacer size='m' />
             </>
@@ -1750,7 +1782,9 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
               >
                 <EuiButton
                   onClick={handleSave}
-                  isDisabled={apiKeyBlockedByEncryption || isSaving}
+                  isDisabled={
+                    apiKeyBlockedByEncryption || isSaving || settingsLocked
+                  }
                   isLoading={isSaving}
                   fill
                 >

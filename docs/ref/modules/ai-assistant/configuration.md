@@ -11,10 +11,11 @@ The plugin's `configPath` is `wazuh_ai_assistant` (note: the config namespace, n
 `wazuhAiAssistant` plugin id). Keys go in `opensearch_dashboards.yml` or the OpenSearch
 Dashboards keystore:
 
-| Key                                | Default | Description                                                                                                                                                                                                                                         |
-| ---------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `wazuh_ai_assistant.enabled`       | `true`  | Enables/disables the plugin.                                                                                                                                                                                                                        |
-| `wazuh_ai_assistant.encryptionKey` | unset   | **Required to save provider API keys** — writes carrying a key are rejected without it. Base64-encoded 32-byte AES-256 key used to encrypt those keys at rest. Generate with `openssl rand -base64 32`. **Prefer the keystore** over the YAML file: |
+| Key                                   | Default | Description                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| ------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `wazuh_ai_assistant.enabled`          | `true`  | Enables/disables the plugin.                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `wazuh_ai_assistant.encryptionKey`    | unset   | **Required to save provider API keys** — writes carrying a key are rejected without it. Base64-encoded 32-byte AES-256 key used to encrypt those keys at rest. Generate with `openssl rand -base64 32`. **Prefer the keystore** over the YAML file:                                                                                                                                                                                        |
+| `wazuh_ai_assistant.settingsReadOnly` | `false` | Locks AI Assistant settings and providers so they cannot be created, edited, deleted, or changed from **AI Assistant → Settings** or the HTTP API — set once (keystore or YAML) to keep a fixed configuration across the environment, regardless of the calling user's own indexer RBAC. Read routes, `POST /providers/{id}/test`, and conversation history are unaffected. See [Settings view](#settings-view) and [HTTP API](#http-api). |
 
 ```
 sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore \
@@ -36,6 +37,13 @@ authenticated user. Whether a save actually succeeds depends on the calling user
 indexer backend role carrying the relevant `plugin:wazuh/ai_assistant/settings/{read,write}`
 permission (see [Security](./security.md#required-indexer-permissions)); a caller without it gets
 the indexer's own error message back.
+
+When `wazuh_ai_assistant.settingsReadOnly` is `true`, every write control on this page (add/edit/
+delete/set-default provider, save privacy settings, save conversation-history retention) is
+disabled and a banner explains the lock. `GET /settings/access` exposes this as `settingsLocked`
+for the page to react to; the underlying write routes independently reject with `403` regardless
+of the caller's own indexer RBAC — the lock is an additional operator-level control layered above
+that RBAC, not a replacement for it.
 
 ### Providers
 
@@ -70,15 +78,15 @@ Retention and housekeeping for the caller's stored conversations (per-user cap: 
 All routes live under `/api/wazuh_ai_assistant` and enforce the same rules as the UI (indexer RBAC
 on provider/settings reads and writes, owner scoping on conversations):
 
-| Route                                                           | Purpose                                                                                                             |
-| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `POST /chat`                                                    | Chat turn; responds as an SSE stream.                                                                               |
-| `GET/POST /providers`, `GET/PUT/DELETE /providers/{id}`         | Provider CRUD (writes need the indexer's `.../settings/write` permission; responses carry `hasApiKey`, never keys). |
-| `POST /providers/{id}/test`                                     | Connectivity test (same indexer write permission).                                                                  |
-| `POST /providers/{id}/default`                                  | Set the default provider (same indexer write permission).                                                           |
-| `GET/PUT /settings`                                             | Singleton assistant settings (PUT needs the same indexer write permission; GET creates defaults on first access).   |
-| `GET /settings/access`                                          | Non-403 Manager-session liveness probe (not an authorization check) plus capability flags for the Settings page.    |
-| `GET/POST /conversations`, `GET/PUT/DELETE /conversations/{id}` | Owner-scoped conversation CRUD.                                                                                     |
+| Route                                                           | Purpose                                                                                                                                                             |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST /chat`                                                    | Chat turn; responds as an SSE stream.                                                                                                                               |
+| `GET/POST /providers`, `GET/PUT/DELETE /providers/{id}`         | Provider CRUD (writes need the indexer's `.../settings/write` permission; responses carry `hasApiKey`, never keys). Writes also 403 when `settingsReadOnly` is set. |
+| `POST /providers/{id}/test`                                     | Connectivity test (same indexer write permission). Persists nothing, so it stays available even when `settingsReadOnly` is set.                                     |
+| `POST /providers/{id}/default`                                  | Set the default provider (same indexer write permission). 403 when `settingsReadOnly` is set.                                                                       |
+| `GET/PUT /settings`                                             | Singleton assistant settings (PUT needs the same indexer write permission; GET creates defaults on first access). PUT 403s when `settingsReadOnly` is set.          |
+| `GET /settings/access`                                          | Non-403 Manager-session liveness probe (not an authorization check) plus capability flags for the Settings page, including `settingsLocked`.                        |
+| `GET/POST /conversations`, `GET/PUT/DELETE /conversations/{id}` | Owner-scoped conversation CRUD.                                                                                                                                     |
 
 ## Internationalization
 

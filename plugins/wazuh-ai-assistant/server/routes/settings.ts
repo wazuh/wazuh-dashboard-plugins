@@ -18,7 +18,7 @@ import { describeError } from '../../common/errors';
 import { getProviderAdapter } from '../providers/registry';
 import { assertProviderUrlAllowed } from '../providers/url-guard';
 import { StoredProviderAttributes } from '../settings/ai-providers-client';
-import { getApiKeyCipher } from '../plugin-services';
+import { getApiKeyCipher, isSettingsReadOnly } from '../plugin-services';
 import { isEncrypted } from '../crypto/api-key-cipher';
 import { resolveApiHostId } from '../tools/api-host';
 import {
@@ -270,6 +270,28 @@ export function requireApiKeyEncryption(
   });
 }
 
+/** Backstop for direct API calls — the UI blocks these writes first (see the access probe's
+ * `settingsLocked`). Keep short; never reference repo files. */
+export const SETTINGS_LOCKED_MESSAGE =
+  'AI Assistant settings are locked by your administrator and cannot be changed from this ' +
+  'page. Contact your administrator if you need a different configuration.';
+
+/**
+ * Refuses every settings/provider WRITE with 403 when `wazuh_ai_assistant.settingsReadOnly` is
+ * set (server/plugin-services.ts's `isSettingsReadOnly`) — checked first, before any other gate
+ * (encryption, name uniqueness, existence). See docs/ref/modules/ai-assistant/configuration.md.
+ * Deliberately does NOT gate POST /providers/{id}/test (it persists nothing) or any GET route.
+ * Exported for unit testing only — the routes below call it directly.
+ */
+export function requireSettingsUnlocked(
+  response: OpenSearchDashboardsResponseFactory,
+): IOpenSearchDashboardsResponse | null {
+  if (!isSettingsReadOnly()) {
+    return null;
+  }
+  return response.forbidden({ body: { message: SETTINGS_LOCKED_MESSAGE } });
+}
+
 export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
   // List all configured providers. API keys never leave the server. Paginated:
   // `page`/`perPage` query params, response carries `total`/`page`/`perPage` alongside `providers` —
@@ -314,6 +336,10 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       },
     },
     withInternalErrorHandling(async (context, request, response) => {
+      const lockGate = requireSettingsUnlocked(response);
+      if (lockGate) {
+        return lockGate;
+      }
       // SSRF fail-fast. The fetch-time guard inside each adapter remains the security-critical
       // check — it re-validates on every request, including configs saved by an earlier version —
       // but rejecting an obviously-bad baseUrl at save time gives the admin an immediate,
@@ -409,6 +435,10 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       },
     },
     withInternalErrorHandling(async (context, request, response) => {
+      const lockGate = requireSettingsUnlocked(response);
+      if (lockGate) {
+        return lockGate;
+      }
       // This is the most sensitive mutation on the route: omitting `apiKey` from the body keeps
       // the stored key, so a caller without the indexer's own write permission on this endpoint —
       // rejected by `aiProviders.update`'s `asCurrentUser` call below — could otherwise redirect
@@ -514,6 +544,10 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       validate: { params: schema.object({ id: schema.string() }) },
     },
     async (context, request, response) => {
+      const lockGate = requireSettingsUnlocked(response);
+      if (lockGate) {
+        return lockGate;
+      }
       const { aiProviders } = context.wazuh_ai_assistant;
       const existing = await aiProviders.get(context, request.params.id);
       if (!existing) {
@@ -541,6 +575,10 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       validate: { params: schema.object({ id: schema.string() }) },
     },
     withInternalErrorHandling(async (context, request, response) => {
+      const lockGate = requireSettingsUnlocked(response);
+      if (lockGate) {
+        return lockGate;
+      }
       await context.wazuh_ai_assistant.aiProviders.delete(
         context,
         request.params.id,
@@ -695,6 +733,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
           message: sessionCheck.ok ? null : sessionCheck.message,
           defaultApiHostId,
           apiKeyEncryptionEnabled: getApiKeyCipher().enabled,
+          settingsLocked: isSettingsReadOnly(),
         },
       });
     },
@@ -755,6 +794,10 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       },
     },
     async (context, request, response) => {
+      const lockGate = requireSettingsUnlocked(response);
+      if (lockGate) {
+        return lockGate;
+      }
       // Ensures every provider's backend exists (first-ever PUT with no prior GET) before
       // updating it. The actual write goes through the CURRENT user for every provider, unlike
       // the read above (`getOrCreateSettings`) — see server/settings/opensearch-user.ts's doc

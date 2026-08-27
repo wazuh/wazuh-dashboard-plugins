@@ -9,6 +9,10 @@ export interface SettingsAccess {
   message: string | null;
   defaultApiHostId: string | null;
   apiKeyEncryptionEnabled: boolean;
+  /** `true` when `wazuh_ai_assistant.settingsReadOnly` is set server-side — the Settings page
+   * disables every write control and shows a banner instead of relying only on the server's
+   * 403 (server/routes/settings.ts's `requireSettingsUnlocked`). */
+  settingsLocked: boolean;
 }
 
 /**
