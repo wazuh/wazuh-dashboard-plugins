@@ -760,8 +760,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       // Ensures every provider's backend exists (first-ever PUT with no prior GET) before
       // updating it. The actual write goes through the CURRENT user for every provider, unlike
       // the read above (`getOrCreateSettings`) — see server/settings/opensearch-user.ts's doc
-      // comment. Wrapped by `withInternalErrorHandling` (issue #9057) so an RBAC-denied indexer
-      // 403 here is sanitized too, not just from `updateSettings` below.
+      // comment. Wrapped so a denial here is sanitized too, not just one from `updateSettings`.
       const { assistantSettings } = context.wazuh_ai_assistant;
       await assistantSettings.getOrCreateSettings(context);
       try {
@@ -771,9 +770,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
         );
         return response.ok({ body: updated });
       } catch (error) {
-        // An RBAC-denied indexer 403 must be sanitized by the outer wrapper's single mapping
-        // path, not the actionable-503 path below — rethrow so it reaches
-        // `withInternalErrorHandling`'s catch.
+        // Rethrow so the wrapper sanitizes it, instead of falling into the 503 below.
         if (isPermissionDeniedError(error)) {
           throw error;
         }

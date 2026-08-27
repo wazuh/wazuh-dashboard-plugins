@@ -8,15 +8,11 @@ import {
 } from './route-helpers';
 
 /**
- * Issue #9057: an RBAC-denied indexer call throws a `security_exception` whose `message`/`reason`
- * embeds the internal cluster action name, the caller's username, and their backend roles. Before
- * this fix, `withInternalErrorHandling` turned that into a `500 { message: describeError(error) }`
- * response, leaking all of it to any authenticated-but-unauthorized caller. These tests prove the
- * sanitized 403 replaces that leak while the full detail still reaches the server log.
+ * Issue #9057. The security cases assert ABSENCE: a body carrying the new message proves nothing
+ * on its own, since the leaked text could still be there alongside it.
  *
- * Same convention as provider-encryption-gate.test.ts: no OSD route-request/response-mocking
- * harness exists in this plugin, so `withInternalErrorHandling` is exercised directly with a
- * hand-rolled `response.customError` recorder and a fake `logger`.
+ * No OSD route-mocking harness exists in this plugin, so the wrapper is driven directly with a
+ * hand-rolled response recorder — same convention as provider-encryption-gate.test.ts.
  */
 
 type ResponseFactory = Parameters<RouteHandler>[2];
