@@ -11,7 +11,7 @@
  */
 
 import React from 'react';
-import { EuiDescriptionList, EuiPanel, EuiText } from '@elastic/eui';
+import { EuiDescriptionList, EuiText } from '@elastic/eui';
 import { PanelModuleConfiguration } from '../../../../common/modules/panel';
 import { renderValueYesThenEnabled } from '../../../../../controllers/management/components/management/configuration/utils/utils';
 import { LogoGitHub } from '../../../../common/logos';
@@ -46,41 +46,23 @@ const settings = [
   { field: 'event_type', label: 'Event type' },
   {
     field: 'api_auth',
-    label: 'Credentials',
+    label: 'Organizations',
     render: value => {
-      const entries = toApiAuthEntries(value);
-      return entries.length ? (
-        entries
-          .map((v, index) => {
-            const listItems = [
-              { title: 'Organization', description: v.org_name },
-            ].filter(item => typeof item.description !== 'undefined');
-            return (
-              <EuiPanel
-                paddingSize='s'
-                key={`module_configuration_api_auth_${index}`}
-              >
-                {listItems.length ? (
-                  <EuiDescriptionList listItems={listItems} />
-                ) : (
-                  <EuiText>No identification fields configured</EuiText>
-                )}
-              </EuiPanel>
-            );
-          })
-          .reduce(
-            (prev, cur) => [
-              prev,
-              <div
-                key={`padding-len-${prev.length}`}
-                style={{ marginTop: '8px' }}
-              />,
-              cur,
-            ],
-            [],
-          )
+      const organizations = toApiAuthEntries(value)
+        .map(v => v.org_name)
+        .filter(orgName => typeof orgName !== 'undefined');
+      return organizations.length ? (
+        organizations.map(orgName => (
+          <EuiDescriptionList
+            key={`module_configuration_api_auth_org_name_${orgName}`}
+            className='eui-textTruncate'
+            title={String(orgName)}
+          >
+            {String(orgName)}
+          </EuiDescriptionList>
+        ))
       ) : (
-        <EuiText>No credentials configured</EuiText>
+        <EuiText>No organizations configured</EuiText>
       );
     },
   },

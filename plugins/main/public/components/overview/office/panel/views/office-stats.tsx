@@ -12,7 +12,7 @@
  */
 
 import React from 'react';
-import { EuiDescriptionList, EuiPanel, EuiText } from '@elastic/eui';
+import { EuiDescriptionList, EuiText } from '@elastic/eui';
 import { PanelModuleConfiguration } from '../../../../common/modules/panel';
 import { LogoOffice365 } from '../../../../common/logos';
 import { renderValueYesThenEnabled } from '../../../../../controllers/management/components/management/configuration/utils/utils';
@@ -42,41 +42,23 @@ const settings = [
   },
   {
     field: 'api_auth',
-    label: 'Credentials',
+    label: 'Tenant IDs',
     render: value => {
-      const entries = toApiAuthEntries(value);
-      return entries.length ? (
-        entries
-          .map((v, index) => {
-            const listItems = [
-              { title: 'Tenant ID', description: v.tenant_id },
-            ].filter(item => typeof item.description !== 'undefined');
-            return (
-              <EuiPanel
-                paddingSize='s'
-                key={`module_configuration_api_auth_${index}`}
-              >
-                {listItems.length ? (
-                  <EuiDescriptionList listItems={listItems} />
-                ) : (
-                  <EuiText>No identification fields configured</EuiText>
-                )}
-              </EuiPanel>
-            );
-          })
-          .reduce(
-            (prev, cur) => [
-              prev,
-              <div
-                key={`padding-len-${prev.length}`}
-                style={{ marginTop: '8px' }}
-              />,
-              cur,
-            ],
-            [],
-          )
+      const tenantIDs = toApiAuthEntries(value)
+        .map(v => v.tenant_id)
+        .filter(tenantID => typeof tenantID !== 'undefined');
+      return tenantIDs.length ? (
+        tenantIDs.map(tenantID => (
+          <EuiDescriptionList
+            key={`module_configuration_api_auth_tenant_id_${tenantID}`}
+            className='eui-textTruncate'
+            title={String(tenantID)}
+          >
+            {String(tenantID)}
+          </EuiDescriptionList>
+        ))
       ) : (
-        <EuiText>No credentials configured</EuiText>
+        <EuiText>No tenant IDs configured</EuiText>
       );
     },
   },
