@@ -186,12 +186,11 @@ function splitCsvRows(csvText) {
 /** Parses one WCS `fields.csv` into a sorted list of PATHS, indexed fields only (a field with
  * `Indexed=false` cannot be filtered/aggregated, so it is out of scope for a "does this field
  * exist and is it queryable" catalog). Columns: ECS_Version, Indexed, Field_Set, Field, Type,
- * Level, Normalization, Example, Description. Code review footprint gate: `Type` is READ (still
- * required to validate the header shape) but no longer carried into the output -- the generated
- * catalog's only production consumer is a boolean "does this path exist" lookup
- * (`isKnownField`/`field-drift-canary.ts`), and `type` had no other reader (see the test file for
- * the sole exception, now removed). Dropping it takes the compressed catalog from ~1.10% of the
- * ~2.4 MB footprint gate to ~0.85%. */
+ * Level, Normalization, Example, Description. `Type` is read (required to validate the header
+ * shape) but not carried into the output: the generated catalog's only production consumer is a
+ * boolean "does this path exist" lookup (`isKnownField`/`field-drift-canary.ts`), and nothing
+ * else reads `type`. Dropping it keeps the compressed catalog at ~0.85% of the ~2.4 MB footprint
+ * gate instead of ~1.10%. */
 function parseFieldsCsv(csvText) {
   const rows = splitCsvRows(csvText).filter(
     row => row.length > 1 || row[0] !== '',
