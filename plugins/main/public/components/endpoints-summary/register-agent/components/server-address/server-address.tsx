@@ -183,10 +183,15 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
         <EuiFlexItem grow={true}>
           <InputForm
             {...serverPort}
-            label={<span className='registerAgentLabels'>Port - Optional</span>}
+            label={
+              <span className='registerAgentLabels'>
+                {`Port - `}
+                <em>optional</em>
+              </span>
+            }
             footer={
               <EndpointDefaultHint>
-                {`Leave empty to use ${AGENT_ENDPOINT_DEFAULT_PORT}`}
+                {`If left empty, ${AGENT_ENDPOINT_DEFAULT_PORT} default will be used`}
               </EndpointDefaultHint>
             }
             fullWidth={false}
@@ -198,12 +203,13 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
             {...serverPath}
             label={
               <span className='registerAgentLabels'>
-                Path prefix - Optional
+                {`Path prefix - `}
+                <em>optional</em>
               </span>
             }
             footer={
               <EndpointDefaultHint>
-                {`Leave empty to use ${AGENT_ENDPOINT_DEFAULT_PATH}`}
+                {`If left empty, ${AGENT_ENDPOINT_DEFAULT_PATH} default will be used`}
               </EndpointDefaultHint>
             }
             fullWidth={false}
