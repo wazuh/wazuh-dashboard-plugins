@@ -50,7 +50,6 @@ const settings = [
           .map((v, index) => {
             const listItems = [
               { title: 'Tenant ID', description: v.tenant_id },
-              { title: 'API type', description: v.api_type },
             ].filter(item => typeof item.description !== 'undefined');
             return (
               <EuiPanel

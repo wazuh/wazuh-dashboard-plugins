@@ -85,7 +85,7 @@ describe('Office 365 stats mapResponseConfiguration', () => {
     expect(queryByText('Path file of client secret')).not.toBeInTheDocument();
   });
 
-  it('renders the API type of the subscription plan', () => {
+  it('omits the API type and keeps only the tenant ID', () => {
     setContent({
       office365: {
         enabled: 'yes',
@@ -94,10 +94,12 @@ describe('Office 365 stats mapResponseConfiguration', () => {
       },
     });
 
-    const { getByText } = render(<ModuleConfiguration />);
+    const { getByText, queryByText } = render(<ModuleConfiguration />);
 
-    expect(getByText('API type')).toBeInTheDocument();
-    expect(getByText('gcc-high')).toBeInTheDocument();
+    expect(getByText('Tenant ID')).toBeInTheDocument();
+    expect(getByText('t')).toBeInTheDocument();
+    expect(queryByText('API type')).not.toBeInTheDocument();
+    expect(queryByText('gcc-high')).not.toBeInTheDocument();
   });
 
   it('renders no credentials text when api_auth is absent', () => {
@@ -149,15 +151,18 @@ describe('Office 365 stats mapResponseConfiguration', () => {
     setContent({
       office365: {
         enabled: 'yes',
-        api_auth: [{ client_id: 'c-1', client_secret: 's-1' }],
+        api_auth: [
+          { client_id: 'c-1', client_secret: 's-1', api_type: 'commercial' },
+        ],
         subscriptions: [],
       },
     });
 
-    const { getByText } = render(<ModuleConfiguration />);
+    const { getByText, queryByText } = render(<ModuleConfiguration />);
     expect(
       getByText('No identification fields configured'),
     ).toBeInTheDocument();
+    expect(queryByText('commercial')).not.toBeInTheDocument();
   });
 
   it('renders multiple api_auth entries with distinct panels', () => {
