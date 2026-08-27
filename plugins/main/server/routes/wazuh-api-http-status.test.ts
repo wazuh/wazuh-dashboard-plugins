@@ -114,9 +114,13 @@ describe('[endpoint] POST /api/request - upstream API error status mapping', () 
   };
 
   it.each`
-    upstreamStatus | message                                           | expectedStatusCode
-    ${403}         | ${'3013 - Permission denied: Resource type: *:*'} | ${HTTP_STATUS_CODES.FORBIDDEN}
-    ${401}         | ${'3000 - Invalid credentials'}                   | ${HTTP_STATUS_CODES.UNAUTHORIZED}
+    upstreamStatus | message                                            | expectedStatusCode
+    ${403}         | ${'3013 - Permission denied: Resource type: *:*'}  | ${HTTP_STATUS_CODES.FORBIDDEN}
+    ${401}         | ${'3000 - Invalid credentials'}                    | ${HTTP_STATUS_CODES.UNAUTHORIZED}
+    ${400}         | ${"'../evil' is not a 'group_names' - 'group_id'"} | ${HTTP_STATUS_CODES.BAD_REQUEST}
+    ${404}         | ${'404: Not Found'}                                | ${HTTP_STATUS_CODES.NOT_FOUND}
+    ${405}         | ${'405: Method Not Allowed'}                       | ${HTTP_STATUS_CODES.METHOD_NOT_ALLOWED}
+    ${409}         | ${'409: Conflict'}                                 | ${HTTP_STATUS_CODES.CONFLICT}
   `(
     'API error with upstream status $upstreamStatus responds $expectedStatusCode',
     async ({ upstreamStatus, message, expectedStatusCode }) => {
@@ -147,6 +151,38 @@ describe('[endpoint] POST /api/request - upstream API error status mapping', () 
       .set('Cookie', 'wz-api=default')
       .send(requestBody)
       .expect(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR);
+  });
+
+  it('does not leak a Wazuh internal error code into the status line', async () => {
+    // 3013 is a Wazuh code, not a status.
+    mockApiRequest.mockRejectedValue({
+      message: 'Unexpected error',
+      code: 3013,
+    });
+
+    await supertest(innerServer.listener)
+      .post('/api/request')
+      .set('Cookie', 'wz-api=default')
+      .send(requestBody)
+      .expect(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR);
+  });
+
+  it('keeps the axios message on a 401 so the client can refresh the token', async () => {
+    // The client spots an expired session by matching "status code 401".
+    mockApiRequest.mockRejectedValue({
+      isAxiosError: true,
+      message: 'Request failed with status code 401',
+      code: 'ERR_BAD_REQUEST',
+      response: { status: 401, data: { detail: 'Invalid credentials' } },
+    });
+
+    const response = await supertest(innerServer.listener)
+      .post('/api/request')
+      .set('Cookie', 'wz-api=default')
+      .send(requestBody)
+      .expect(HTTP_STATUS_CODES.UNAUTHORIZED);
+
+    expect(response.body.message).toContain('status code 401');
   });
 });
 
