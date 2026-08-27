@@ -48,9 +48,6 @@ interface IStepsProps {
   needsPassword: boolean;
   form: UseFormReturn;
   osCard: React.ReactElement;
-  connection: {
-    isUDP: boolean;
-  };
   wazuhPassword: string;
   canReadAuthdPassword: boolean;
 }
@@ -59,7 +56,6 @@ export const Steps = ({
   needsPassword,
   form,
   osCard,
-  connection,
   wazuhPassword,
   canReadAuthdPassword,
 }: IStepsProps) => {
@@ -74,7 +70,6 @@ export const Steps = ({
       agentName: '',
       serverAddress: '',
       wazuhPassword,
-      protocol: connection.isUDP ? 'UDP' : '',
     },
   } as IParseRegisterFormValues;
   const [missingStepsName, setMissingStepsName] = useState<tFormStepsLabel[]>(
@@ -155,7 +150,15 @@ export const Steps = ({
     },
     {
       title: 'Server address:',
-      children: <ServerAddress formField={form.fields.serverAddress} />,
+      children: (
+        <ServerAddress
+          formFields={{
+            serverAddress: form.fields.serverAddress,
+            serverPort: form.fields.serverPort,
+            serverPath: form.fields.serverPath,
+          }}
+        />
+      ),
       status: getServerAddressStepStatus(form.fields),
     },
     ...(needsPassword && !wazuhPassword

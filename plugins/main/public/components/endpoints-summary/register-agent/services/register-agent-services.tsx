@@ -5,20 +5,17 @@ import {
   tOptionalParameters,
 } from '../core/config/os-commands-definitions';
 import { RegisterAgentData } from '../interfaces/types';
-
-type Protocol = 'TCP' | 'UDP';
+import { composeAgentEndpoint } from '../../../../../common/services/agent-endpoint';
 
 type RemoteItem = {
   connection: 'syslog' | 'secure';
   ipv6: 'yes' | 'no';
-  protocol: Protocol[];
   allowed_ips?: string[];
   queue_size?: string;
 };
 
 type RemoteConfig = {
   name: string;
-  isUdp: boolean | null;
   haveSecureConnection: boolean | null;
 };
 
@@ -34,7 +31,6 @@ export type ServerAddressOptions = {
 async function getRemoteConfiguration(nodeName: string): Promise<RemoteConfig> {
   let config: RemoteConfig = {
     name: nodeName,
-    isUdp: false,
     haveSecureConnection: false,
   };
 
@@ -54,17 +50,6 @@ async function getRemoteConfiguration(nodeName: string): Promise<RemoteConfig> {
       remoteFiltered.length > 0
         ? (config.haveSecureConnection = true)
         : (config.haveSecureConnection = false);
-
-      let protocolsAvailable: Protocol[] = [];
-      remote.forEach((item: RemoteItem) => {
-        // get all protocols available
-        item.protocol.forEach(protocol => {
-          protocolsAvailable = protocolsAvailable.concat(protocol);
-        });
-      });
-
-      config.isUdp =
-        getRemoteProtocol(protocolsAvailable) === 'UDP' ? true : false;
     }
     return config;
   } catch (error) {
@@ -84,19 +69,7 @@ async function getAuthConfiguration(node: string) {
 }
 
 /**
- * Get the remote protocol available from list of protocols
- * @param protocols
- */
-function getRemoteProtocol(protocols: Protocol[]) {
-  if (protocols.length === 1) {
-    return protocols[0];
-  } else {
-    return !protocols.includes('TCP') ? 'UDP' : 'TCP';
-  }
-}
-
-/**
- * Get the remote configuration from nodes registered in the cluster and decide the protocol to setting up in deploy agent param
+ * Get the connection configuration from the nodes registered in the cluster
  * @param nodeSelected
  * @param defaultServerAddress
  */
@@ -111,20 +84,17 @@ async function getConnectionConfig(
       const remoteConfig = await getRemoteConfiguration(nodeName);
       return {
         serverAddress: nodeIp,
-        udpProtocol: remoteConfig.isUdp,
         connectionSecure: remoteConfig.haveSecureConnection,
       };
     } else {
       return {
         serverAddress: nodeName,
-        udpProtocol: false,
         connectionSecure: true,
       };
     }
   } else {
     return {
       serverAddress: defaultServerAddress,
-      udpProtocol: false,
       connectionSecure: true,
     };
   }
@@ -220,6 +190,8 @@ export const getRegisterAgentFormValues = (form: UseFormReturn) => {
   });
 };
 
+const ENDPOINT_FIELDS = ['serverAddress', 'serverPort', 'serverPath'];
+
 export interface IParseRegisterFormValues {
   operatingSystem: {
     name: tOperatingSystem['name'] | '';
@@ -246,8 +218,15 @@ export const parseRegisterAgentFormValues = (
       },
       optionalParams: {},
     } as IParseRegisterFormValues);
+  /* The wizard asks for the endpoint's address, port and path prefix apart so
+  each keeps its own validation, but the agent is installed with one value, so
+  they are joined back here. */
+  const endpointComponents: Record<string, string> = {};
+
   formValues.forEach(field => {
-    if (field.name === 'operatingSystemSelection') {
+    if (ENDPOINT_FIELDS.includes(field.name as string)) {
+      endpointComponents[field.name as string] = field.value;
+    } else if (field.name === 'operatingSystemSelection') {
       // search the architecture defined in architecture array and get the os name defined in title array in the same index
       const operatingSystem = OSOptionsDefined.find(os =>
         os.architecture.includes(field.value),
@@ -267,6 +246,12 @@ export const parseRegisterAgentFormValues = (
         parsedForm.optionalParams[field.name as any] = field.value;
       }
     }
+  });
+
+  parsedForm.optionalParams.serverAddress = composeAgentEndpoint({
+    address: endpointComponents.serverAddress,
+    port: endpointComponents.serverPort,
+    path: endpointComponents.serverPath,
   });
 
   return parsedForm;

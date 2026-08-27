@@ -364,4 +364,65 @@ export class SettingsValidator {
     }
     return undefined;
   }
+
+  /**
+   * Port component of the agent's `<manager><endpoint>` connection target.
+   *
+   * Optional: an empty value means the agent applies its own default
+   * (`AGENT_ENDPOINT_DEFAULT_PORT`), so the component is left out of the
+   * generated endpoint rather than written explicitly.
+   */
+  static serverEndpointPort(value: string): string | undefined {
+    if (!value) {
+      return undefined;
+    }
+
+    if (!/^\d+$/.test(value)) {
+      return 'It should be a number.';
+    }
+
+    const port = Number(value);
+
+    if (port < 1 || port > 65535) {
+      return 'It should be a port number between 1 and 65535.';
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Path prefix component of the agent's `<manager><endpoint>` connection
+   * target, which must route identically on the manager's
+   * `<remote><https><global_prefix>`. The grammar is the one both ends agreed
+   * on: a restricted charset, no empty segments, and no relative segments.
+   *
+   * Optional: an empty value means the agent applies its own default
+   * (`AGENT_ENDPOINT_DEFAULT_PATH`). A lone `/` is the explicit opt-out that
+   * serves unprefixed paths, so it is accepted rather than treated as empty.
+   */
+  static serverEndpointPathPrefix(value: string): string | undefined {
+    if (!value) {
+      return undefined;
+    }
+
+    if (value.length > 128) {
+      return 'It should be shorter than 129 characters.';
+    }
+
+    if (!/^\/?[\w.\-/]*$/.test(value)) {
+      return 'It should only contain letters, numbers, and the characters . _ - /';
+    }
+
+    const segments = value.split('/').filter(segment => segment !== '');
+
+    if (segments.some(segment => segment === '.' || segment === '..')) {
+      return 'It should not contain the segments . or ..';
+    }
+
+    if (/\/{2,}/.test(value)) {
+      return 'It should not contain empty segments.';
+    }
+
+    return undefined;
+  }
 }

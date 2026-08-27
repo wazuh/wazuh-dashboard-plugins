@@ -13,16 +13,12 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
-import { EuiBasicTable, EuiCallOut, EuiSpacer } from '@elastic/eui';
+import { EuiCallOut, EuiSpacer } from '@elastic/eui';
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
-import {
-  isString,
-  renderValueOrDefault,
-  renderValueOrNoValue,
-} from '../utils/utils';
+import { isString, renderValueOrNoValue } from '../utils/utils';
 import withWzConfig from '../util-hocs/wz-config';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
@@ -78,14 +74,13 @@ still reports them, but always with their default values. The HTTPS transport
 removed server rotation and the connection-retry loop, so the parser ignores
 whatever the user configures. Showing them would present a setting that has no
 effect as if it were live. */
-const columns = [
-  { field: 'address', name: 'Address', render: renderValueOrNoValue },
-  { field: 'port', name: 'Port', render: renderValueOrDefault('1514') },
+/* The agent reports one `endpoint` carrying the whole connection target -- host
+and, when the agent was given them, port and path prefix -- so it is shown as
+reported rather than split back into the parts the pre-5.0.0 `<address>`/
+`<port>` table rendered. */
+const serverSettings = [
+  { field: 'endpoint', label: 'Endpoint', render: renderValueOrNoValue },
 ];
-
-/* The manager block holds either a single manager or a list of them, depending
-on how the agent is configured. */
-const asArray = value => (Array.isArray(value) ? value : value ? [value] : []);
 
 class WzConfigurationClient extends Component {
   constructor(props) {
@@ -94,7 +89,7 @@ class WzConfigurationClient extends Component {
   render() {
     const { currentConfig } = this.props;
     const clientConfig = currentConfig?.agent?.agent;
-    const managers = asArray(clientConfig?.manager);
+    const endpoint = clientConfig?.manager?.endpoint;
 
     if (isString(clientConfig)) {
       return <WzNoConfig error={clientConfig} help={helpLinks} />;
@@ -117,13 +112,12 @@ class WzConfigurationClient extends Component {
           />
           <WzConfigurationSettingsHeader
             title='Server settings'
-            description='List of managers to connect'
+            description='Manager the agent connects to'
           />
-          {managers.length ? (
-            <EuiBasicTable
-              items={managers}
-              columns={columns}
-              tableLayout='auto'
+          {endpoint ? (
+            <WzConfigurationSettingsGroup
+              config={{ endpoint }}
+              items={serverSettings}
             />
           ) : (
             <EuiCallOut

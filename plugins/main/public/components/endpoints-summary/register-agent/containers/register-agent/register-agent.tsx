@@ -61,7 +61,6 @@ export const RegisterAgent = compose(
     (state: { appConfig: { data: any } }) => state.appConfig.data,
   );
   const [wazuhVersion, setWazuhVersion] = useState('');
-  const [haveUdpProtocol, setHaveUdpProtocol] = useState<boolean | null>(false);
   const [loading, setLoading] = useState(false);
   const [wazuhPassword, setWazuhPassword] = useState('');
   const [groups, setGroups] = useState([]);
@@ -89,6 +88,19 @@ export const RegisterAgent = compose(
         getWazuhCorePlugin().SettingsValidator
           .serverAddressHostnameFQDNIPv4IPv6,
     },
+    /* The port and the path prefix complete the endpoint the agent is
+    installed with. Both are optional: left empty, they are omitted from the
+    generated command and the agent applies its own defaults. */
+    serverPort: {
+      type: 'text',
+      initialValue: configuration['enrollment.port'] || '',
+      validate: getWazuhCorePlugin().SettingsValidator.serverEndpointPort,
+    },
+    serverPath: {
+      type: 'text',
+      initialValue: configuration['enrollment.path'] || '',
+      validate: getWazuhCorePlugin().SettingsValidator.serverEndpointPathPrefix,
+    },
     agentName: {
       type: 'text',
       initialValue: '',
@@ -110,11 +122,7 @@ export const RegisterAgent = compose(
   const form = useForm(initialFields);
 
   const getMasterConfig = async () => {
-    const masterConfig = await getMasterConfiguration();
-    if (masterConfig?.remote) {
-      setHaveUdpProtocol(masterConfig.remote.isUdp);
-    }
-    return masterConfig;
+    return await getMasterConfiguration();
   };
 
   useEffect(() => {
@@ -238,9 +246,6 @@ export const RegisterAgent = compose(
                       wazuhPassword={wazuhPassword}
                       canReadAuthdPassword={canReadAuthdPassword}
                       osCard={osCard}
-                      connection={{
-                        isUDP: haveUdpProtocol ? true : false,
-                      }}
                     />
                   </EuiFlexItem>
                 )}

@@ -383,6 +383,37 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
       SettingsValidator.serverAddressHostnameFQDNIPv4IPv6,
     ),
   },
+  /* The port and the path prefix are stored apart from the address rather than
+  folded into `enrollment.dns`: the agent takes them as one endpoint string, but
+  keeping them separate is what lets each keep its own validation -- the address
+  stays a hostname/FQDN/IP, which a combined value could no longer be checked
+  as. The deploy wizard joins the three when it generates the command. */
+  'enrollment.port': {
+    title: 'Enrollment port',
+    description:
+      'Specifies the port of the Wazuh registration server, used for the agent enrollment. Leave empty to use the agent default (1517).',
+    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.text,
+    defaultValue: '',
+    validate: SettingsValidator.compose(
+      SettingsValidator.isString,
+      SettingsValidator.serverEndpointPort,
+    ),
+  },
+  'enrollment.path': {
+    title: 'Enrollment path prefix',
+    description:
+      "Specifies the path prefix the agent prepends to every request sent to the Wazuh server. It must match the server's global prefix. Leave empty to use the agent default (/wazuh-manager/).",
+    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.text,
+    defaultValue: '',
+    validate: SettingsValidator.compose(
+      SettingsValidator.isString,
+      SettingsValidator.serverEndpointPathPrefix,
+    ),
+  },
   /* `# The following configuration is the default structure to define a host.
 #
 # hosts:
@@ -645,6 +676,8 @@ export const OSD_URL_STATE_STORAGE_ID = 'state:storeInSessionStorage';
 // uiSettings
 
 export const ENROLLMENT_DNS = 'enrollment.dns';
+export const ENROLLMENT_PORT = 'enrollment.port';
+export const ENROLLMENT_PATH = 'enrollment.path';
 export const ENROLLMENT_PASSWORD = 'enrollment.password';
 export const WAZUH_UPDATES_DISABLED = 'wazuh.updates.disabled';
 export const REQUEST_TIMEOUT = 'timeout';
