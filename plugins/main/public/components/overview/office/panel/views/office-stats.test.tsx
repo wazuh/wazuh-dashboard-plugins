@@ -52,7 +52,7 @@ const setContent = (content: unknown) => {
 };
 
 describe('Office 365 stats mapResponseConfiguration', () => {
-  it('picks content.office365 and renders the full settings table, including subscriptions', () => {
+  it('picks content.office365, renders retained fields and subscriptions, and omits secrets', () => {
     setContent({
       office365: {
         enabled: 'yes',
@@ -71,15 +71,18 @@ describe('Office 365 stats mapResponseConfiguration', () => {
       },
     });
 
-    const { getByText } = render(<ModuleConfiguration />);
+    const { getByText, queryByText } = render(<ModuleConfiguration />);
 
     expect(getByText('1048576')).toBeInTheDocument();
     expect(getByText('600')).toBeInTheDocument();
     expect(getByText('t-1')).toBeInTheDocument();
-    expect(getByText('c-1')).toBeInTheDocument();
-    expect(getByText('s-1')).toBeInTheDocument();
-    expect(getByText('/path/to/secret')).toBeInTheDocument();
     expect(getByText('Audit.AzureActiveDirectory')).toBeInTheDocument();
+    expect(queryByText('c-1')).not.toBeInTheDocument();
+    expect(queryByText('s-1')).not.toBeInTheDocument();
+    expect(queryByText('/path/to/secret')).not.toBeInTheDocument();
+    expect(queryByText('Client ID')).not.toBeInTheDocument();
+    expect(queryByText('Client secret')).not.toBeInTheDocument();
+    expect(queryByText('Path file of client secret')).not.toBeInTheDocument();
   });
 
   it('renders the API type of the subscription plan', () => {
@@ -123,7 +126,7 @@ describe('Office 365 stats mapResponseConfiguration', () => {
     expect(getByText('No credentials configured')).toBeInTheDocument();
   });
 
-  it('renders one credential panel without throwing when api_auth is a non-array object', () => {
+  it('renders one credential panel without throwing when api_auth is a non-array object, omitting secrets', () => {
     setContent({
       office365: {
         enabled: 'yes',
@@ -136,8 +139,39 @@ describe('Office 365 stats mapResponseConfiguration', () => {
       },
     });
 
+    const { getByText, queryByText } = render(<ModuleConfiguration />);
+    expect(getByText('t-1')).toBeInTheDocument();
+    expect(queryByText('c-1')).not.toBeInTheDocument();
+    expect(queryByText('s-1')).not.toBeInTheDocument();
+  });
+
+  it('renders a placeholder when an api_auth entry has no retained fields', () => {
+    setContent({
+      office365: {
+        enabled: 'yes',
+        api_auth: [{ client_id: 'c-1', client_secret: 's-1' }],
+        subscriptions: [],
+      },
+    });
+
+    const { getByText } = render(<ModuleConfiguration />);
+    expect(
+      getByText('No identification fields configured'),
+    ).toBeInTheDocument();
+  });
+
+  it('renders multiple api_auth entries with distinct panels', () => {
+    setContent({
+      office365: {
+        enabled: 'yes',
+        api_auth: [{ tenant_id: 't-1' }, { tenant_id: 't-2' }],
+        subscriptions: [],
+      },
+    });
+
     const { getByText } = render(<ModuleConfiguration />);
     expect(getByText('t-1')).toBeInTheDocument();
+    expect(getByText('t-2')).toBeInTheDocument();
   });
 
   it('renders subscriptions without throwing when the value is not an array', () => {

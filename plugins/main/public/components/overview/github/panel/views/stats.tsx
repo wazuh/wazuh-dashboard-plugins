@@ -51,19 +51,23 @@ const settings = [
       const entries = toApiAuthEntries(value);
       return entries.length ? (
         entries
-          .map(v => (
-            <EuiPanel
-              paddingSize='s'
-              key={`module_configuration_api_auth_${v.org_name}_${v.client_id}`}
-            >
-              <EuiDescriptionList
-                listItems={[
-                  { title: 'Organization', description: v.org_name },
-                  { title: 'Token', description: v.api_token },
-                ].filter(item => typeof item.description !== 'undefined')}
-              />
-            </EuiPanel>
-          ))
+          .map((v, index) => {
+            const listItems = [
+              { title: 'Organization', description: v.org_name },
+            ].filter(item => typeof item.description !== 'undefined');
+            return (
+              <EuiPanel
+                paddingSize='s'
+                key={`module_configuration_api_auth_${index}`}
+              >
+                {listItems.length ? (
+                  <EuiDescriptionList listItems={listItems} />
+                ) : (
+                  <EuiText>No identification fields configured</EuiText>
+                )}
+              </EuiPanel>
+            );
+          })
           .reduce(
             (prev, cur) => [
               prev,

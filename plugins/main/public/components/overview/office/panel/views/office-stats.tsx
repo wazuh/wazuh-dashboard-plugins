@@ -47,25 +47,24 @@ const settings = [
       const entries = toApiAuthEntries(value);
       return entries.length ? (
         entries
-          .map(v => (
-            <EuiPanel
-              paddingSize='s'
-              key={`module_configuration_api_auth_${v.tenant_id}_${v.client_id}`}
-            >
-              <EuiDescriptionList
-                listItems={[
-                  { title: 'Tenant ID', description: v.tenant_id },
-                  { title: 'Client ID', description: v.client_id },
-                  { title: 'Client secret', description: v.client_secret },
-                  {
-                    title: 'Path file of client secret',
-                    description: v.client_secret_path,
-                  },
-                  { title: 'API type', description: v.api_type },
-                ].filter(item => typeof item.description !== 'undefined')}
-              />
-            </EuiPanel>
-          ))
+          .map((v, index) => {
+            const listItems = [
+              { title: 'Tenant ID', description: v.tenant_id },
+              { title: 'API type', description: v.api_type },
+            ].filter(item => typeof item.description !== 'undefined');
+            return (
+              <EuiPanel
+                paddingSize='s'
+                key={`module_configuration_api_auth_${index}`}
+              >
+                {listItems.length ? (
+                  <EuiDescriptionList listItems={listItems} />
+                ) : (
+                  <EuiText>No identification fields configured</EuiText>
+                )}
+              </EuiPanel>
+            );
+          })
           .reduce(
             (prev, cur) => [
               prev,

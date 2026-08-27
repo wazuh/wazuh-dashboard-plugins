@@ -51,24 +51,27 @@ describe('GitHub stats mapResponseConfiguration', () => {
     expect(getByText('enabled')).toBeInTheDocument();
   });
 
-  it('picks content.github', () => {
+  it('picks content.github and omits the token', () => {
     (global as { __CONTENT__?: unknown }).__CONTENT__ = {
       github: { api_auth: [{ org_name: 'wazuh', api_token: 'tok-1' }] },
     };
 
-    const { getByText } = render(<ModuleConfiguration />);
+    const { getByText, queryByText } = render(<ModuleConfiguration />);
 
     expect(getByText('wazuh')).toBeInTheDocument();
+    expect(queryByText('tok-1')).not.toBeInTheDocument();
+    expect(queryByText('Token')).not.toBeInTheDocument();
   });
 
-  it('renders one credential panel when api_auth is a non-array object', () => {
+  it('renders one credential panel when api_auth is a non-array object, omitting the token', () => {
     (global as { __CONTENT__?: unknown }).__CONTENT__ = {
       github: { api_auth: { org_name: 'wazuh', api_token: 'tok-1' } },
     };
 
-    const { getByText } = render(<ModuleConfiguration />);
+    const { getByText, queryByText } = render(<ModuleConfiguration />);
 
     expect(getByText('wazuh')).toBeInTheDocument();
+    expect(queryByText('tok-1')).not.toBeInTheDocument();
   });
 
   it('renders "No credentials configured" when api_auth is empty', () => {
@@ -79,5 +82,30 @@ describe('GitHub stats mapResponseConfiguration', () => {
     const { getByText } = render(<ModuleConfiguration />);
 
     expect(getByText('No credentials configured')).toBeInTheDocument();
+  });
+
+  it('renders a placeholder when an api_auth entry has no organization', () => {
+    (global as { __CONTENT__?: unknown }).__CONTENT__ = {
+      github: { api_auth: [{ api_token: 'tok-1' }] },
+    };
+
+    const { getByText } = render(<ModuleConfiguration />);
+
+    expect(
+      getByText('No identification fields configured'),
+    ).toBeInTheDocument();
+  });
+
+  it('renders multiple api_auth entries with distinct panels', () => {
+    (global as { __CONTENT__?: unknown }).__CONTENT__ = {
+      github: {
+        api_auth: [{ org_name: 'wazuh' }, { org_name: 'wazuh-2' }],
+      },
+    };
+
+    const { getByText } = render(<ModuleConfiguration />);
+
+    expect(getByText('wazuh')).toBeInTheDocument();
+    expect(getByText('wazuh-2')).toBeInTheDocument();
   });
 });
