@@ -145,6 +145,38 @@ describe('Global configuration remote settings', () => {
     expect(getAllByDisplayValue('1517').length).toBe(1);
   });
 
+  it('should render a dash for the fields a section does not report', () => {
+    const { getByText, getByDisplayValue, getAllByDisplayValue } = render(
+      <WzConfigurationGlobalConfigurationRemote
+        currentConfig={{
+          'request-remote': {
+            remote: [{ https: { port: '1517' } }],
+          },
+        }}
+      />,
+    );
+
+    expect(getByText('HTTPS settings')).toBeInTheDocument();
+    expect(getByDisplayValue('1517')).toBeInTheDocument();
+    // bind_addr, certificate and key are absent: rendered as '-', never omitted
+    // and never replaced by a plausible-looking default.
+    expect(getAllByDisplayValue('-').length).toBe(3);
+  });
+
+  it('should render the protocol array as a readable string', () => {
+    const { getByDisplayValue } = render(
+      <WzConfigurationGlobalConfigurationRemote
+        currentConfig={{
+          'request-remote': {
+            remote: [{ legacy: { protocol: ['TCP', 'UDP'] } }],
+          },
+        }}
+      />,
+    );
+
+    expect(getByDisplayValue('TCP, UDP')).toBeInTheDocument();
+  });
+
   it('should render only the HTTPS group when legacy and agents are absent', () => {
     const { getByText, queryByText } = render(
       <WzConfigurationGlobalConfigurationRemote

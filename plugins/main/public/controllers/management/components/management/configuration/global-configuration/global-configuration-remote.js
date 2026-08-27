@@ -20,11 +20,6 @@ import WzNoConfig from '../util-components/no-config';
 import { hasSize, isString, renderValueOrNoValue } from '../utils/utils';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
-// `legacy.protocol` is an array (e.g. ["TCP"]) in the 5.x API response; join
-// it into a readable comma-separated string instead of dumping a raw array.
-const renderProtocol = value =>
-  Array.isArray(value) ? value.join(', ') : renderValueOrNoValue(value);
-
 const httpsSettings = [
   { field: 'https.port', label: 'Port', render: renderValueOrNoValue },
   {
@@ -43,7 +38,7 @@ const httpsSettings = [
 const legacySettings = [
   { field: 'legacy.enabled', label: 'Enabled', render: renderValueOrNoValue },
   { field: 'legacy.port', label: 'Port', render: renderValueOrNoValue },
-  { field: 'legacy.protocol', label: 'Protocol', render: renderProtocol },
+  { field: 'legacy.protocol', label: 'Protocol', render: renderValueOrNoValue },
   { field: 'legacy.ipv6', label: 'IPv6', render: renderValueOrNoValue },
   {
     field: 'legacy.local_ip',
