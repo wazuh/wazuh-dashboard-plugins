@@ -8,20 +8,54 @@ import {
 } from '../../../../src/core/server';
 import { describeError } from '../../common/errors';
 
-/** Fixed message for every RBAC denial. Not parameterized: any detail from the underlying error is
- * what leaked to unauthorized callers before. */
+/** Fixed opening line for every RBAC denial. */
 export const PERMISSION_DENIED_MESSAGE =
   'You do not have permission to perform this action.';
 
-/** Both shapes are read because OpenSearch `ResponseError` exposes the status on either. Not gated
- * on `type === 'security_exception'`: a DLS/FLS 403 carries a different type but the same
- * user-bearing text, and would fall through to the 500 branch.
+/** Guards what the message below can quote: an indexer action name, nothing else. The identity
+ * block's `name=...` and `backend_roles=[...]` do not match. */
+const INDEXER_ACTION_SHAPE = /^(?:cluster|indices):[\w/*.-]+$/;
+
+/**
+ * Fixed line, plus the denied action name when the reason carries one.
  *
- * `cause` is followed one level because the settings/providers clients do not always rethrow the
- * client's own error: when the indexer answers with a bare string body, both
- * `AiProvidersClient.fetch` and `IndexSettingsProvider.getSettings` raise
- * `new Error(body.error, { cause: originalError })`, and that wrapper carries no status of its own.
- * Without this the denial would degrade to the 500 branch. */
+ * The action name is the remediation: `plugin:wazuh/ai_assistant/settings/write` and
+ * `cluster:admin/opendistro/ism/policy/get` are granted separately and deny the same route, so
+ * without it an admin cannot tell which one to add. The username, backend roles, tenant and
+ * exception type stay out: the only text taken from the error is a bracketed entry passing
+ * `INDEXER_ACTION_SHAPE`, and the pattern stops at the first `]`, ahead of the `and User [...]`
+ * tail. An unrecognized reason yields the fixed line alone.
+ */
+export function permissionDeniedMessage(error: unknown): string {
+  // Follows `cause` for the same reason `isPermissionDeniedError` does: the clients rethrow a bare
+  // `Error` that may not carry the reason itself.
+  const messageOf = (candidate: unknown): string =>
+    String((candidate as { message?: unknown })?.message ?? '');
+  const reason = [
+    messageOf(error),
+    messageOf((error as { cause?: unknown })?.cause),
+  ].find(text => /no permissions for \[[^\]]/.test(text));
+  const actions = [
+    ...new Set(
+      (/no permissions for \[([^\]]*)\]/.exec(reason ?? '')?.[1] ?? '')
+        .split(',')
+        .map(action => action.trim())
+        .filter(action => INDEXER_ACTION_SHAPE.test(action)),
+    ),
+  ];
+  return actions.length > 0
+    ? `${PERMISSION_DENIED_MESSAGE} Missing indexer permission: ${actions.join(
+        ', ',
+      )}.`
+    : PERMISSION_DENIED_MESSAGE;
+}
+
+/** Reads both shapes because OpenSearch `ResponseError` exposes the status on either, and does not
+ * gate on `type === 'security_exception'`: a DLS/FLS 403 carries a different type.
+ *
+ * Follows `cause` one level because `AiProvidersClient.fetch` and
+ * `IndexSettingsProvider.getSettings` raise `new Error(body.error, { cause })` for a string body,
+ * and that wrapper has no status of its own. */
 export function isPermissionDeniedError(error: unknown): boolean {
   const statusOf = (candidate: unknown): unknown => {
     const e = candidate as {
@@ -36,10 +70,10 @@ export function isPermissionDeniedError(error: unknown): boolean {
   );
 }
 
-/** Best-effort scrub for the 500/503 responses, which still forward the underlying message so
- * operators keep actionable detail. Strips the identity block and internal action names; anything
- * else passes through. The first pattern spans one level of nested brackets so it does not stop at
- * the `]` closing `backend_roles` and leave the roles behind. The logger gets the full message. */
+/** Removes the identity block and action names from the 500/503 bodies, which still carry the
+ * underlying message so operators keep the operational detail. The rest passes through. The first
+ * pattern spans one level of nested brackets, so it does not stop at the `]` closing
+ * `backend_roles`. The logger receives the message unscrubbed. */
 export function redactSensitiveDetail(message: string): string {
   return message
     .replace(/User \[(?:[^[\]]|\[[^\]]*\])*\]/g, 'User [redacted]')
@@ -81,7 +115,7 @@ export function withInternalErrorHandling<Params, Query, Body>(
       if (isPermissionDeniedError(error)) {
         return response.customError({
           statusCode: 403,
-          body: { message: PERMISSION_DENIED_MESSAGE },
+          body: { message: permissionDeniedMessage(error) },
         });
       }
       return response.customError({

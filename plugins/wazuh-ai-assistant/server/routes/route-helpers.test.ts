@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {
   isPermissionDeniedError,
   PERMISSION_DENIED_MESSAGE,
+  permissionDeniedMessage,
   withInternalErrorHandling,
   redactSensitiveDetail,
   RouteHandler,
@@ -83,22 +84,21 @@ async function runWrapped(error: unknown): Promise<{
   return { calls, errors };
 }
 
-test('RBAC-denied security_exception (403) is sanitized to a neutral 403 message', async () => {
+test('RBAC-denied security_exception (403) is sanitized to a 403 built from the fixed line', async () => {
   const { calls } = await runWrapped(rbacDeniedError());
 
   assert.equal(calls.length, 1);
   assert.equal(calls[0].statusCode, 403);
-  assert.deepEqual(calls[0].body, { message: PERMISSION_DENIED_MESSAGE });
+  assert.ok(
+    calls[0].body.message.startsWith(PERMISSION_DENIED_MESSAGE),
+    'the response must be built from the fixed line, not from the error text',
+  );
 });
 
-test('the sanitized response body never contains the action name, username, roles, or exception type', async () => {
+test('the sanitized response body never contains the username, roles, or exception type', async () => {
   const { calls } = await runWrapped(rbacDeniedError());
 
   const serialized = JSON.stringify(calls[0]);
-  assert.doesNotMatch(
-    serialized,
-    /cluster:admin\/ai_assistant\/settings\/read/,
-  );
   assert.doesNotMatch(serialized, /qauser/);
   assert.doesNotMatch(serialized, /kibana_user/);
   assert.doesNotMatch(serialized, /readall/);
@@ -121,7 +121,7 @@ test('a 403 the client rethrew as a bare Error with the original as `cause` is s
 
   assert.equal(calls.length, 1);
   assert.equal(calls[0].statusCode, 403);
-  assert.deepEqual(calls[0].body, { message: PERMISSION_DENIED_MESSAGE });
+  assert.ok(calls[0].body.message.startsWith(PERMISSION_DENIED_MESSAGE));
 });
 
 test('the cause-wrapped denial leaks no identity either, despite carrying it in its own message', async () => {
@@ -130,10 +130,6 @@ test('the cause-wrapped denial leaks no identity either, despite carrying it in 
   const serialized = JSON.stringify(calls[0]);
   assert.doesNotMatch(serialized, /qauser/);
   assert.doesNotMatch(serialized, /backend_roles/);
-  assert.doesNotMatch(
-    serialized,
-    /cluster:admin\/ai_assistant\/settings\/read/,
-  );
   // The operator still gets the full text server-side.
   assert.match(JSON.stringify(errors[0]), /qauser/);
 });
@@ -148,6 +144,78 @@ test('a non-403 cause does not turn an unrelated failure into a permission denia
   const { calls } = await runWrapped(error);
 
   assert.equal(calls[0].statusCode, 500);
+});
+
+// The action name is returned; caller-specific detail is not. These two assert the second half by
+// absence, against a reason that carries the identity block.
+test('the 403 body names the missing indexer action', async () => {
+  const { calls } = await runWrapped(rbacDeniedError());
+
+  assert.match(
+    calls[0].body.message,
+    /Missing indexer permission: cluster:admin\/ai_assistant\/settings\/read\./,
+  );
+});
+
+test('naming the action does not bring the identity block with it', async () => {
+  const { calls } = await runWrapped(rbacDeniedError());
+
+  const serialized = JSON.stringify(calls[0]);
+  assert.doesNotMatch(serialized, /qauser/);
+  assert.doesNotMatch(serialized, /backend_roles/);
+  assert.doesNotMatch(serialized, /requestedTenant/);
+  assert.doesNotMatch(serialized, /security_exception/);
+});
+
+test('permissionDeniedMessage lists every denied action, deduplicated', () => {
+  const error = new Error(
+    'no permissions for [cluster:admin/ai_assistant/settings/read, ' +
+      'cluster:admin/ai_assistant/settings/read, indices:data/read/search] and ' +
+      'User [name=qauser, backend_roles=[readall], requestedTenant=null]',
+  );
+
+  const message = permissionDeniedMessage(error);
+
+  assert.equal(
+    message,
+    `${PERMISSION_DENIED_MESSAGE} Missing indexer permission: ` +
+      'cluster:admin/ai_assistant/settings/read, indices:data/read/search.',
+  );
+});
+
+test('permissionDeniedMessage falls back to the fixed line alone when nothing looks like an action', () => {
+  // An unrecognized reason must contribute nothing rather than pass through.
+  for (const reason of [
+    'unauthorized',
+    '',
+    'no permissions for [] and User [name=qauser]',
+    'no permissions for [name=qauser, backend_roles=[readall]]',
+    'no permissions for [DROP TABLE users]',
+  ]) {
+    assert.equal(
+      permissionDeniedMessage(new Error(reason)),
+      PERMISSION_DENIED_MESSAGE,
+      `leaked or altered for: ${reason}`,
+    );
+  }
+  assert.equal(permissionDeniedMessage(undefined), PERMISSION_DENIED_MESSAGE);
+  assert.equal(permissionDeniedMessage(null), PERMISSION_DENIED_MESSAGE);
+});
+
+test('permissionDeniedMessage never reads past the first bracket group', () => {
+  // The identity tail sits after `]`; a greedy pattern would swallow it.
+  const message = permissionDeniedMessage(
+    new Error(
+      'no permissions for [cluster:admin/opendistro/ism/policy/get] and ' +
+        'User [name=demo-settings, backend_roles=[kibana_user], requestedTenant=null]',
+    ),
+  );
+
+  assert.equal(
+    message,
+    `${PERMISSION_DENIED_MESSAGE} Missing indexer permission: ` +
+      'cluster:admin/opendistro/ism/policy/get.',
+  );
 });
 
 test('a 403 detected only via meta.statusCode (no top-level statusCode) is classified identically', async () => {

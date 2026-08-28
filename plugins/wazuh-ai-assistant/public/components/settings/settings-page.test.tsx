@@ -191,6 +191,44 @@ describe('SettingsPage — wazuh_brain hidden from provider type choices', () =>
   });
 });
 
+describe('SettingsPage — permission errors reach the user', () => {
+  // The routes answer an RBAC denial with the missing indexer permission (server/routes/
+  // route-helpers.ts). Replacing that with "Could not load providers." leaves the admin with
+  // nothing to act on.
+  const denial = {
+    body: {
+      message:
+        'You do not have permission to perform this action. Missing indexer ' +
+        'permission: cluster:admin/opendistro/ism/policy/get.',
+    },
+  };
+
+  it("shows the server's reason instead of the generic providers load error", async () => {
+    mockService.list.mockRejectedValue(denial);
+
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
+    );
+
+    await waitFor(() =>
+      expect(screen.getByText(denial.body.message)).toBeInTheDocument(),
+    );
+    expect(screen.queryByText('Could not load providers.')).toBeNull();
+  });
+
+  it('falls back to the generic message when the failure carries no reason', async () => {
+    mockService.list.mockRejectedValue(new Error(''));
+
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
+    );
+
+    await waitFor(() =>
+      expect(screen.getByText('Could not load providers.')).toBeInTheDocument(),
+    );
+  });
+});
+
 describe('SettingsPage — auto-test on load', () => {
   it('calls service.test for each provider immediately after loading', async () => {
     mockService.list.mockResolvedValue([
