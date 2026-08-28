@@ -678,11 +678,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         setRetentionValidationError(null);
         setSettingsLoadError(null);
       })
-      .catch(() =>
+      .catch((error: unknown) =>
         setSettingsLoadError(
-          i18n.translate('wazuhAiAssistant.settings.loadError', {
-            defaultMessage: 'Could not load settings.',
-          }),
+          describeHttpError(
+            error,
+            i18n.translate('wazuhAiAssistant.settings.loadError', {
+              defaultMessage: 'Could not load settings.',
+            }),
+          ),
         ),
       );
   };
@@ -898,11 +901,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     service
       .list()
       .then(setProviders)
-      .catch(() =>
+      .catch((error: unknown) =>
         setError(
-          i18n.translate('wazuhAiAssistant.settings.providers.loadError', {
-            defaultMessage: 'Could not load providers.',
-          }),
+          describeHttpError(
+            error,
+            i18n.translate('wazuhAiAssistant.settings.providers.loadError', {
+              defaultMessage: 'Could not load providers.',
+            }),
+          ),
         ),
       );
   };
@@ -941,11 +947,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         // green/red at a glance on every visit, without any user action.
         loaded.forEach(p => handleTest(p));
       })
-      .catch(() =>
+      .catch((error: unknown) =>
         setError(
-          i18n.translate('wazuhAiAssistant.settings.providers.loadError', {
-            defaultMessage: 'Could not load providers.',
-          }),
+          describeHttpError(
+            error,
+            i18n.translate('wazuhAiAssistant.settings.providers.loadError', {
+              defaultMessage: 'Could not load providers.',
+            }),
+          ),
         ),
       )
       .finally(() => setProvidersLoaded(true));

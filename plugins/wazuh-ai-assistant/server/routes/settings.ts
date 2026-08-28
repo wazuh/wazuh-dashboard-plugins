@@ -22,6 +22,8 @@ import { getApiKeyCipher, isSettingsReadOnly } from '../plugin-services';
 import { isEncrypted } from '../crypto/api-key-cipher';
 import { resolveApiHostId } from '../tools/api-host';
 import {
+  isPermissionDeniedError,
+  redactSensitiveDetail,
   paginationQuerySchema,
   resolvePagination,
   withInternalErrorHandling,
@@ -316,7 +318,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
           perPage,
         },
       });
-    }),
+    }, logger),
   );
 
   // Create a provider. The first provider ever created automatically becomes the default;
@@ -414,7 +416,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
         await clearOtherDefaults(context, providerId);
       }
       return response.ok({ body: toSummary(providerId, attributes) });
-    }),
+    }, logger),
   );
 
   // Update a provider. Sending an empty/absent apiKey keeps the previously stored one.
@@ -534,7 +536,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       return response.ok({
         body: toSummary(request.params.id, nextAttributes),
       });
-    }),
+    }, logger),
   );
 
   // Set a provider as the default, clearing the flag on every other provider.
@@ -543,7 +545,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       path: API_PATHS.PROVIDER_SET_DEFAULT(`{id}`),
       validate: { params: schema.object({ id: schema.string() }) },
     },
-    async (context, request, response) => {
+    withInternalErrorHandling(async (context, request, response) => {
       const lockGate = requireSettingsUnlocked(response);
       if (lockGate) {
         return lockGate;
@@ -565,7 +567,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       return response.ok({
         body: toSummary(request.params.id, nextAttributes),
       });
-    },
+    }, logger),
   );
 
   // Delete a provider.
@@ -584,7 +586,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
         request.params.id,
       );
       return response.ok({ body: { deleted: true } });
-    }),
+    }, logger),
   );
 
   // Minimal connectivity test: send a one-line "say ok" prompt through the real adapter and
@@ -594,7 +596,10 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       path: API_PATHS.PROVIDER_TEST(`{id}`),
       validate: { params: schema.object({ id: schema.string() }) },
     },
-    async (context, request, response) => {
+    // Wrapped like every other provider route: the `aiProviders.get` below reads the index as the
+    // calling user, so an RBAC denial here must map to the same sanitized 403 instead of reaching
+    // the platform uncaught and surfacing as a generic 500.
+    withInternalErrorHandling(async (context, request, response) => {
       // This route returns the provider's own response to the caller, which makes it a
       // read-capable SSRF primitive on top of the url-guard's network restrictions — the
       // indexer's own write permission on this endpoint is what actually authorizes it.
@@ -686,7 +691,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       return response.ok({
         body: { success, latencyMs, message: success ? undefined : message },
       });
-    },
+    }, logger),
   );
 
   // Plugin-wide settings singleton: privacy defaults/override/field policy. GET creates the
@@ -702,7 +707,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
           context,
         );
       return response.ok({ body: settings });
-    }),
+    }, logger),
   );
 
   // Manager-session liveness probe, called on app mount and before Manager-path work
@@ -793,7 +798,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
         }),
       },
     },
-    async (context, request, response) => {
+    withInternalErrorHandling(async (context, request, response) => {
       const lockGate = requireSettingsUnlocked(response);
       if (lockGate) {
         return lockGate;
@@ -801,7 +806,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       // Ensures every provider's backend exists (first-ever PUT with no prior GET) before
       // updating it. The actual write goes through the CURRENT user for every provider, unlike
       // the read above (`getOrCreateSettings`) — see server/settings/opensearch-user.ts's doc
-      // comment.
+      // comment. Wrapped so a denial here is sanitized too, not just one from `updateSettings`.
       const { assistantSettings } = context.wazuh_ai_assistant;
       await assistantSettings.getOrCreateSettings(context);
       try {
@@ -811,15 +816,19 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
         );
         return response.ok({ body: updated });
       } catch (error) {
+        // Rethrow so the wrapper sanitizes it, instead of falling into the 503 below.
+        if (isPermissionDeniedError(error)) {
+          throw error;
+        }
         // Surfaces `IsmSettingsProvider`'s "policy not found"/"no delete transition" failures
         // (expected on any deployment where `CONVERSATION_SESSIONS_ISM_POLICY_ID` — see
         // common/constants.ts — hasn't been provisioned indexer-side yet) as an actionable 503
         // instead of a bare 500.
         return response.customError({
           statusCode: 503,
-          body: { message: describeError(error) },
+          body: { message: redactSensitiveDetail(describeError(error)) },
         });
       }
-    },
+    }, logger),
   );
 }
