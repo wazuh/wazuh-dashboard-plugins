@@ -12,30 +12,66 @@
 
 import React, { Component, Fragment } from 'react';
 
-import { EuiBasicTable, EuiSpacer } from '@elastic/eui';
-
+import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
-import {
-  isString,
-  renderValueOrNoValue,
-  renderValueOrDefault,
-} from '../utils/utils';
+import { hasSize, isString, renderValueOrNoValue } from '../utils/utils';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
-const renderAllowedDeniedIPs = (items, label) => {
-  if (items) {
-    return (
-      <ul>
-        {items.map((item, key) => (
-          <li key={`remote-${label}-${key}`}>{item}</li>
-        ))}
-      </ul>
-    );
-  } else {
-    return '-';
-  }
-};
+const httpsSettings = [
+  { field: 'https.port', label: 'Port', render: renderValueOrNoValue },
+  {
+    field: 'https.bind_addr',
+    label: 'Bind address',
+    render: renderValueOrNoValue,
+  },
+  {
+    field: 'https.global_prefix',
+    label: 'Global prefix',
+    render: renderValueOrNoValue,
+  },
+  {
+    field: 'https.certificate',
+    label: 'Certificate',
+    render: renderValueOrNoValue,
+  },
+  { field: 'https.key', label: 'Key', render: renderValueOrNoValue },
+];
+
+const legacySettings = [
+  { field: 'legacy.enabled', label: 'Enabled', render: renderValueOrNoValue },
+  { field: 'legacy.port', label: 'Port', render: renderValueOrNoValue },
+  { field: 'legacy.protocol', label: 'Protocol', render: renderValueOrNoValue },
+  { field: 'legacy.ipv6', label: 'IPv6', render: renderValueOrNoValue },
+  {
+    field: 'legacy.local_ip',
+    label: 'Local IP address',
+    render: renderValueOrNoValue,
+  },
+  {
+    field: 'legacy.queue_size',
+    label: 'Queue size',
+    render: renderValueOrNoValue,
+  },
+  {
+    field: 'legacy.rids_closing_time',
+    label: 'RIDs closing time',
+    render: renderValueOrNoValue,
+  },
+  {
+    field: 'legacy.connection_overtake_time',
+    label: 'Connection overtake time',
+    render: renderValueOrNoValue,
+  },
+];
+
+const agentsSettings = [
+  {
+    field: 'agents.allow_higher_versions',
+    label: 'Allow higher versions',
+    render: renderValueOrNoValue,
+  },
+];
 
 const helpLinks = [
   {
@@ -53,39 +89,16 @@ const helpLinks = [
 class WzConfigurationGlobalConfigurationRemote extends Component {
   constructor(props) {
     super(props);
-    this.columns = [
-      { field: 'connection', name: 'Connection', render: renderValueOrNoValue },
-      { field: 'port', name: 'Port', render: renderValueOrNoValue },
-      {
-        field: 'protocol',
-        name: 'Protocol',
-        render: renderValueOrDefault('udp'),
-      },
-      { field: 'ipv6', name: 'IPv6', render: renderValueOrNoValue },
-      {
-        field: 'allowed-ips',
-        name: 'Allowed IP addresses',
-        render: item => renderAllowedDeniedIPs(item, 'allowed'),
-      },
-      {
-        field: 'denied-ips',
-        name: 'Denied IP addresses',
-        render: item => renderAllowedDeniedIPs(item, 'denied'),
-      },
-      {
-        field: 'local_ip',
-        name: 'Local IP address',
-        render: renderValueOrDefault('All interfaces'),
-      },
-      {
-        field: 'queue_size',
-        name: 'Queue size',
-        render: renderValueOrDefault('16384'),
-      },
-    ];
   }
   render() {
     const { currentConfig } = this.props;
+    const remoteConfig = currentConfig['request-remote'];
+    const remoteSettings = Array.isArray(remoteConfig?.remote)
+      ? remoteConfig.remote[0]
+      : undefined;
+    const hasHTTPSSettings = Boolean(hasSize(remoteSettings?.https));
+    const hasLegacySettings = Boolean(hasSize(remoteSettings?.legacy));
+    const hasAgentsSettings = Boolean(hasSize(remoteSettings?.agents));
     return (
       <Fragment>
         {currentConfig['request-remote'] &&
@@ -102,18 +115,44 @@ class WzConfigurationGlobalConfigurationRemote extends Component {
           )}
         {currentConfig['request-remote'] &&
           currentConfig['request-remote'].remote && (
-            <WzConfigurationSettingsHeader
-              title='Remote settings'
-              description='Configuration to listen for events from the agents or a syslog client'
-              help={helpLinks}
-            >
-              <EuiSpacer size='s' />
-              <EuiBasicTable
-                columns={this.columns}
-                items={currentConfig['request-remote'].remote}
-                tableLayout='auto'
-              />
-            </WzConfigurationSettingsHeader>
+            <Fragment>
+              {hasHTTPSSettings && (
+                <WzConfigurationSettingsHeader
+                  title='HTTPS settings'
+                  description='Listener the agents use to communicate with the manager over HTTPS'
+                  help={helpLinks}
+                >
+                  <WzConfigurationSettingsGroup
+                    config={remoteSettings}
+                    items={httpsSettings}
+                  />
+                </WzConfigurationSettingsHeader>
+              )}
+              {hasLegacySettings && (
+                <WzConfigurationSettingsHeader
+                  title='Legacy settings'
+                  description='Listener kept for agents that still communicate over the legacy protocol'
+                  help={helpLinks}
+                >
+                  <WzConfigurationSettingsGroup
+                    config={remoteSettings}
+                    items={legacySettings}
+                  />
+                </WzConfigurationSettingsHeader>
+              )}
+              {hasAgentsSettings && (
+                <WzConfigurationSettingsHeader
+                  title='Agents settings'
+                  description='Settings applied to the agents that connect to this manager'
+                  help={helpLinks}
+                >
+                  <WzConfigurationSettingsGroup
+                    config={remoteSettings}
+                    items={agentsSettings}
+                  />
+                </WzConfigurationSettingsHeader>
+              )}
+            </Fragment>
           )}
       </Fragment>
     );
