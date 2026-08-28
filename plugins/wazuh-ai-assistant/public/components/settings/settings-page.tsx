@@ -49,6 +49,7 @@ import {
 } from '../../services/settings-service';
 import { ProviderInput, ProviderSummary } from '../../../common/types';
 import { useDirtyFormState } from '../../hooks/use-dirty-form-state';
+import { getWazuhCore } from '../../plugin-services';
 import { ProviderFormFlyout } from './provider-form-flyout';
 import {
   ProviderTestOutcome,
@@ -1623,13 +1624,26 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           pageTitle={i18n.translate('wazuhAiAssistant.settings.pageTitle', {
             defaultMessage: 'AI Assistant settings',
           })}
-          description={i18n.translate(
-            'wazuhAiAssistant.settings.pageDescription',
-            {
-              defaultMessage:
-                'Manage AI providers, privacy and conversation history.',
-            },
-          )}
+          description={
+            <>
+              {i18n.translate('wazuhAiAssistant.settings.pageDescription', {
+                defaultMessage:
+                  'Manage AI providers, privacy and conversation history.',
+              })}{' '}
+              <EuiButtonIcon
+                href={getWazuhCore().utils.webDocumentationLink(
+                  'user-manual/wazuh-dashboard/wazuh-dashboard-configurations.html#ai-assistant',
+                )}
+                iconType='iInCircle'
+                target='_blank'
+                rel='noopener noreferrer'
+                aria-label={i18n.translate(
+                  'wazuhAiAssistant.settings.documentationLink',
+                  { defaultMessage: 'Documentation' },
+                )}
+              />
+            </>
+          }
           rightSideItems={[
             <EuiButton
               key='add-provider'

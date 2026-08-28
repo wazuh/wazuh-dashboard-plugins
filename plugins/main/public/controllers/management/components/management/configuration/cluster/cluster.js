@@ -73,12 +73,14 @@ const helpLinks = [
   {
     text: 'Configuring a cluster',
     href: webDocumentationLink(
-      'user-manual/wazuh-server-cluster/cluster-nodes-configuration.html',
+      'installation-guide/wazuh-server/step-by-step.html#cluster-configuration-for-multi-node-deployment',
     ),
   },
   {
     text: 'Cluster reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/cluster.html'),
+    href: webDocumentationLink(
+      'user-manual/manager/wazuh-manager-services.html#cluster-service',
+    ),
   },
 ];
 
