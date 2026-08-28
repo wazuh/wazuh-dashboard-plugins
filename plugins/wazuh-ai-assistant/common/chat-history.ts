@@ -33,6 +33,7 @@ import {
 } from './types';
 import { NavigationType } from './draft-stash';
 import {
+  CONVERSATION_MAX_FAILURE_REASON_LENGTH,
   CONVERSATION_MAX_MESSAGES,
   CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH,
   CONVERSATION_MAX_SERIALIZED_BYTES,
@@ -50,11 +51,21 @@ export interface ChatHistoryMessage {
   table?: TableSpec;
   /** The answer was cut short rather than completed — see `PersistedChatMessage.interrupted`. */
   interrupted?: boolean;
+  /** The turn failed outright, with this reason — see `PersistedChatMessage.failureReason`. */
+  failureReason?: string;
+  /** Which provider produced this message — see `PersistedChatMessage.providerId`. */
+  providerId?: string;
+  providerName?: string;
+  providerModel?: string;
   /** The tool calls this turn ran, for display only (message-bubble.tsx's "queries executed"
    * panel). Never persisted from here: `toPersistedMessages` writes the model-facing
    * `[assistant{toolCalls}, tool{digest}]` pairs from the turn records instead, and
    * `reconstructConversation` is what puts them back on the message for display. */
   toolCalls?: ToolCall[];
+  /** Wire-proof fix: whether privacy was ON when THIS message's turn ran — only ever set on
+   * `role: 'assistant'` prose. See `common/types.ts`'s `ChatMessage.privacyEnabled` doc comment for
+   * the full mechanism; `excludePrivacyOffHistory` below is what actually consults it. */
+  privacyEnabled?: boolean;
 }
 
 let messageCounter = 0;
@@ -85,6 +96,12 @@ export interface ToolExchange {
    * resent as history.
    */
   digestContent?: string;
+  /** Wire-proof fix: whether privacy was ON when THIS exchange's digest was captured — see
+   * `common/types.ts`'s `ChatMessage.privacyEnabled` doc comment for the full mechanism. Captured
+   * per-exchange (not per-turn) to mirror `digestContent`'s own granularity, even though today every
+   * exchange within one turn necessarily shares the same value (privacy is resolved once per HTTP
+   * request in `server/routes/chat.ts`, before any tool call runs). */
+  privacyEnabled?: boolean;
 }
 
 export interface AssistantTurnRecord {
@@ -183,10 +200,16 @@ export function detectNavigationType(): NavigationType {
 export const CONVERSATION_TITLE_MAX_LENGTH = 60;
 
 /**
- * Auto-save title: the first USER message, truncated to `CONVERSATION_TITLE_MAX_LENGTH`
- * chars. Recomputed on every auto-save (not just at creation) — idempotent, since the first user
- * message of an already-created conversation never changes, and there is no rename UI yet that
- * this could ever clobber.
+ * Auto-save title: the first USER message, truncated to `CONVERSATION_TITLE_MAX_LENGTH` chars.
+ *
+ * ONLY called for a brand-new conversation's CREATE (server/routes/conversations.ts's POST), via
+ * `persistConversationTurn` (chat-page.tsx) — NOT on every auto-save any more. It used to be
+ * recomputed on every save and resent on the PUT that updates an existing conversation, which
+ * silently reverted any rename the user had made (issue #9010, finding E2): the very next
+ * auto-save overwrote the custom title back to this auto-generated one. `persistConversationTurn`
+ * now omits `title` from every PUT, and the PUT route (`updateBodySchema`'s doc comment) carries
+ * the stored title over unchanged when it is absent — so a rename is stable once made, and this
+ * function's output only ever matters at the moment a conversation is first created.
  *
  * `untitledLabel` is the already-i18n-translated "Untitled conversation" string — see the module
  * doc comment above for why the translation itself happens at the call site, not in here.
@@ -281,6 +304,39 @@ export function toPersistedMessages(
           : message.content,
       createdAt: message.createdAt,
       ...(message.interrupted ? { interrupted: true } : {}),
+      // A failed turn's marker and its provider provenance both have to survive a reload, or the
+      // transcript goes back to hiding its own failures and misattributing its own answers — see
+      // `PersistedChatMessage.failureReason`/`providerId`.
+      //
+      // `failureReason` is CLAMPED here for the same reason `content` above is, and against the same
+      // failure mode: the route rejects anything longer than
+      // `CONVERSATION_MAX_FAILURE_REASON_LENGTH` with a 400, the client treats a failed save as a
+      // non-fatal hiccup, and auto-save resends the same over-long value on every following turn —
+      // so one unbounded provider error string (openai-compatible.ts echoes upstream response bodies
+      // verbatim) would silently stop the whole conversation from ever being saved again. The three
+      // provider fields need no clamp: an id, a display name and a model identifier are all bounded
+      // at their source by the provider CRUD API's own limits.
+      ...(message.failureReason
+        ? {
+            failureReason: message.failureReason.slice(
+              0,
+              CONVERSATION_MAX_FAILURE_REASON_LENGTH,
+            ),
+          }
+        : {}),
+      ...(message.providerId ? { providerId: message.providerId } : {}),
+      ...(message.providerName ? { providerName: message.providerName } : {}),
+      ...(message.providerModel
+        ? { providerModel: message.providerModel }
+        : {}),
+      // Wire-proof fix: persists whether privacy was ON for this message's own turn, so a LATER
+      // resume/reload can still fail-closed-exclude a privacy-off turn's prose from history —
+      // see ChatMessage.privacyEnabled's doc comment (common/types.ts). Only ever set on
+      // role:'assistant' (ChatHistoryMessage.privacyEnabled's own doc comment); `undefined` for
+      // 'user' is intentional, not an omission.
+      ...(message.privacyEnabled !== undefined
+        ? { privacyEnabled: message.privacyEnabled }
+        : {}),
     };
     const table = toPersistedTable(message.table);
     const toolEntries: PersistedChatMessage[] = [];
@@ -298,6 +354,11 @@ export function toPersistedMessages(
           role: 'tool',
           toolCallId: exchange.toolCall.id,
           content: exchange.digestContent,
+          // Wire-proof fix: the flag the digest itself was captured under — see
+          // ToolExchange.privacyEnabled's doc comment.
+          ...(exchange.privacyEnabled !== undefined
+            ? { privacyEnabled: exchange.privacyEnabled }
+            : {}),
         });
       }
     }
@@ -405,6 +466,17 @@ export function reconstructConversation(
       );
       if (exchange) {
         exchange.digestContent = message.content;
+        // Wire-proof fix: restores the flag this digest was captured under, so a resumed/reloaded
+        // conversation's history-replay decision (excludePrivacyOffHistory) still fails closed on
+        // a digest captured with privacy off, exactly as it does within one live session. Only
+        // assigned when present on the persisted message -- an explicit `privacyEnabled: undefined`
+        // own property (vs. the key being simply absent) is indistinguishable for every real
+        // consumer of this object, but IS distinguishable to a strict deep-equality check, so a
+        // conditional assignment keeps a pre-fix-persisted (flag-less) exchange object shaped
+        // exactly as it always was.
+        if (message.privacyEnabled !== undefined) {
+          exchange.privacyEnabled = message.privacyEnabled;
+        }
       }
       continue;
     }
@@ -420,6 +492,21 @@ export function reconstructConversation(
       createdAt: message.createdAt ?? Date.now(),
       ...(message.table ? { table: message.table } : {}),
       ...(message.interrupted ? { interrupted: true } : {}),
+      // Inverse of `toPersistedMessages`' own stamping above: a reloaded transcript keeps both its
+      // failure markers and each answer's provider provenance.
+      ...(message.failureReason
+        ? { failureReason: message.failureReason }
+        : {}),
+      ...(message.providerId ? { providerId: message.providerId } : {}),
+      ...(message.providerName ? { providerName: message.providerName } : {}),
+      ...(message.providerModel
+        ? { providerModel: message.providerModel }
+        : {}),
+      // Wire-proof fix: restores which turn's prose this was, for the same reason as above —
+      // only ever meaningful (and only ever set by toPersistedMessages) on role:'assistant'.
+      ...(message.privacyEnabled !== undefined
+        ? { privacyEnabled: message.privacyEnabled }
+        : {}),
     });
     if (message.role === 'assistant' && pendingExchanges.length > 0) {
       turnRecords.push({
@@ -492,10 +579,22 @@ export const TOOL_HISTORY_CHAR_BUDGET = 8000;
  * These reconstructed messages exist ONLY in the array this function returns (the POST body) —
  * `uiMessages` (and the `messages` React state it is derived from) is never mutated to include
  * them, so message_bubble.tsx/message_list.tsx need no changes to keep them off-screen.
+ *
+ * Wire-proof fix (AI/qa/wire-proof-v35/capture.jsonl): `currentPrivacyEnabled` is THIS turn's own
+ * privacy state — the same value `chat-page.tsx`'s `startTurn` already resolves before calling this
+ * function. Once every message above is assembled (unchanged from before this fix), the whole array
+ * is run through `excludePrivacyOffHistory` below, which fails closed on any privacy-OFF-captured
+ * digest/prose once privacy is ON for the turn being sent NOW — see that function's own doc comment
+ * for the exact mechanism and why history captured under privacy OFF can never simply be shape-
+ * scanned safe (a bare, non-dotted real value like an agent name has no shape a regex can single
+ * out). This is the CLIENT side of a two-layer defense: `server/routes/chat.ts` runs the identical
+ * function again on whatever this sends, since the server must never depend on the client having
+ * done this correctly.
  */
 export function buildOutgoingMessages(
   uiMessages: ChatHistoryMessage[],
   turnRecords: AssistantTurnRecord[],
+  currentPrivacyEnabled: boolean,
 ): ChatMessage[] {
   const eligibleTurns = turnRecords.slice(-TOOL_HISTORY_MAX_TURNS);
 
@@ -538,10 +637,136 @@ export function buildOutgoingMessages(
           role: 'tool',
           toolCallId: exchange.toolCall.id,
           content: exchange.digestContent,
+          // Wire-proof fix: carried through so excludePrivacyOffHistory (below) can fail closed
+          // on this pair once privacy is on for the CURRENT turn.
+          ...(exchange.privacyEnabled !== undefined
+            ? { privacyEnabled: exchange.privacyEnabled }
+            : {}),
         });
       }
     }
-    outgoing.push({ role: uiMessage.role, content: uiMessage.content });
+    // A failed turn is kept in the TRANSCRIPT as a marker-only assistant message (no prose ever
+    // arrived — see `ChatHistoryMessage.failureReason`), and an assistant message with empty
+    // content is not a history entry any provider can use: Anthropic rejects an empty text block
+    // outright, and every other adapter would replay a blank turn for no benefit. Skipped here
+    // rather than never recorded, because the marker is exactly what the READER needs to see.
+    // Narrow on purpose: only a `role:'assistant'` message with no text at all, so a normal answer
+    // (and every user message, blank or not) is untouched.
+    if (uiMessage.role === 'assistant' && uiMessage.content.trim() === '') {
+      continue;
+    }
+    outgoing.push({
+      role: uiMessage.role,
+      content: uiMessage.content,
+      // Wire-proof fix: only ever set on role:'assistant' (ChatHistoryMessage.privacyEnabled's own
+      // doc comment) — carried through for the same reason as the tool-message flag above.
+      ...(uiMessage.privacyEnabled !== undefined
+        ? { privacyEnabled: uiMessage.privacyEnabled }
+        : {}),
+    });
   }
-  return outgoing;
+  return excludePrivacyOffHistory(outgoing, currentPrivacyEnabled);
+}
+
+/**
+ * True when a history entry's own `privacyEnabled` flag is trustworthy enough to resend once the
+ * CURRENT turn's privacy is `currentPrivacyEnabled`. Fails CLOSED: if privacy is currently off,
+ * everything is eligible (no behavior change from before this fix); if privacy is currently on,
+ * only an entry EXPLICITLY flagged `privacyEnabled === true` is eligible — `false` (captured with
+ * privacy off) and `undefined` (unknown: a conversation persisted before this field existed, or an
+ * entry this code never bothered to stamp) are both excluded, deliberately treated identically.
+ */
+function isHistoryEntryEligible(
+  entryPrivacyEnabled: boolean | undefined,
+  currentPrivacyEnabled: boolean,
+): boolean {
+  return !currentPrivacyEnabled || entryPrivacyEnabled === true;
+}
+
+/**
+ * Wire-proof fix (AI/qa/wire-proof-v35/capture.jsonl, live capture on build 7d822b465): with
+ * privacy OFF, a user's conversation accumulates REAL-valued tool digests and assistant prose —
+ * completely correctly, that is what privacy off means. The proven leak was in what happens the
+ * FIRST time privacy is then turned ON mid-conversation (the shipped default is off, so this is the
+ * ordinary first-use flow, not an edge case): that entire real-valued history was still being
+ * resent as "history" on the very next turn, and the outbound shape scan (`prescanAndMint`/
+ * `prescanAndMintToolContent` in privacy.ts) only recognizes IPv4/IPv6 addresses and DOTTED
+ * hostnames — a bare, non-dotted value like a Wazuh agent name (`wazuh-aio-5` in the captured
+ * proof) has no shape a regex can single out, and the FIELD POLICY that would normally anonymize
+ * `wazuh.agent.name` only ever runs when a digest is CREATED (`applyFieldPolicy` in privacy.ts),
+ * never when a client-supplied one is REPLAYED. Two prior fixes in this same file (F1-F4, then the
+ * replay-leak fixes) closed every OTHER client-replay gap this same boundary has, but a bare
+ * identifier surviving a privacy-off-to-on toggle was missed by all of them, because none of them
+ * questioned whether privacy-off history should be resent AT ALL once privacy is on.
+ *
+ * OWNER'S CHOSEN FIX, implemented here: do not replay real-valued history once privacy is ON. Fail
+ * closed — this is a DENYLIST-of-safety, not an allowlist-of-danger, so anything not proven safe
+ * (an explicit `privacyEnabled === true`) is excluded. Operates on the FINAL, wire-shaped
+ * `ChatMessage[]` (not `ChatHistoryMessage[]`/`AssistantTurnRecord[]`) specifically so the identical
+ * function can run on BOTH sides of the client/server boundary: `buildOutgoingMessages` (above)
+ * calls it as a client-side courtesy (saves the round-trip entirely for excluded turns), and
+ * `server/routes/chat.ts` calls it again on whatever the client actually sent, which is the real
+ * enforcement — the server must never depend on the client having done this correctly, the same
+ * trust assumption that caused the original bug in the first place.
+ *
+ * Removes two shapes, matched by walking `messages` in order:
+ * 1. A `[assistant{content:'', toolCalls:[one call]}, tool{toolCallId: that call's id}]` pair (the
+ *    exact shape both `buildOutgoingMessages` above and `toPersistedMessages` produce for one tool
+ *    exchange) is dropped WHOLE when the `tool` message's `privacyEnabled` is not eligible — half a
+ *    pair (an assistant message with tool_calls but no matching result, or vice versa) would break
+ *    tool_call/tool_result pairing validation on every provider that enforces it (OpenAI,
+ *    Anthropic), so this only ever drops complete pairs, never one side of one.
+ * 2. A standalone `role:'assistant'` message with no `toolCalls` (real prose, not a history marker)
+ *    is dropped when its own `privacyEnabled` is not eligible — the "assess separately" residual
+ *    from the same investigation: a bare hostname in the model's OWN past narration has the exact
+ *    same shape-scan blind spot as a digest field does, and dropping it is cheap (unlike dropping
+ *    ALL prose, which would wreck conversation continuity) because the corresponding tool digest
+ *    for that same privacy-off turn is already being dropped by rule 1 above — there is very little
+ *    LEFT to lose by also dropping that turn's own answer text.
+ *
+ * `role:'user'` messages are NEVER dropped by this function, on purpose: the user's own question
+ * text has the same theoretical blind spot, but removing a user's own words from history is a much
+ * larger continuity cost for a residual that is separately documented (see
+ * `scrubMessagesForProvider`'s doc comment in chat.ts) rather than newly introduced here — the
+ * wire-proof this function closes is specifically about REPLAYED history, not fresh input.
+ * `role:'system'` is never part of this array in the first place (chat.ts filters it out before
+ * this function ever runs, and `buildOutgoingMessages` above never emits one).
+ */
+export function excludePrivacyOffHistory(
+  messages: ChatMessage[],
+  currentPrivacyEnabled: boolean,
+): ChatMessage[] {
+  if (!currentPrivacyEnabled) {
+    return messages;
+  }
+  const result: ChatMessage[] = [];
+  for (let index = 0; index < messages.length; index += 1) {
+    const message = messages[index];
+    if (
+      message.role === 'assistant' &&
+      message.content === '' &&
+      message.toolCalls?.length === 1
+    ) {
+      const next = messages[index + 1];
+      const toolCallId = message.toolCalls[0].id;
+      if (next && next.role === 'tool' && next.toolCallId === toolCallId) {
+        if (
+          isHistoryEntryEligible(next.privacyEnabled, currentPrivacyEnabled)
+        ) {
+          result.push(message, next);
+        }
+        index += 1; // Consumes the paired `tool` message too, whether kept or dropped.
+        continue;
+      }
+    }
+    if (
+      message.role === 'assistant' &&
+      !(message.toolCalls && message.toolCalls.length > 0) &&
+      !isHistoryEntryEligible(message.privacyEnabled, currentPrivacyEnabled)
+    ) {
+      continue;
+    }
+    result.push(message);
+  }
+  return result;
 }

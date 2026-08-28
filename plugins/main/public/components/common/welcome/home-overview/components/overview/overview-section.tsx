@@ -43,7 +43,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             errorLabel={agents.error?.message}
             isPermissionDenied={agents.error?.kind === 'permission-denied'}
             title='Agents by status'
-            headerLink={{ label: 'Agents', href: getAgentsUrl() }}
+            titleLink={{ href: getAgentsUrl(), destination: 'Agents' }}
             centerBody
             data-test-subj='home-overview-agents'
           >
@@ -63,9 +63,9 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             isPermissionDenied={findings.error?.kind === 'permission-denied'}
             title='Findings'
             caption='Last 24 hours'
-            headerLink={{
-              label: 'Threat Hunting',
+            titleLink={{
               href: getThreatHuntingUrl(),
+              destination: 'Threat Hunting',
             }}
             centerBody
             data-test-subj='home-overview-findings-severity'
@@ -101,7 +101,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             isPermissionDenied={findings.error?.kind === 'permission-denied'}
             title='MITRE ATT&CK top tactics'
             caption='Last 24 hours'
-            headerLink={{ label: 'MITRE ATT&CK', href: getMitreUrl() }}
+            titleLink={{ href: getMitreUrl(), destination: 'MITRE ATT&CK' }}
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
             data-test-subj='home-overview-mitre-tactics'
           >

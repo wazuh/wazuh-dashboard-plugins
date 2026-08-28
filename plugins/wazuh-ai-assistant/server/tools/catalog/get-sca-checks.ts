@@ -5,6 +5,7 @@ import {
   objectSchema,
   optionalStringParam,
   requireNonEmptyString,
+  SCA_CURRENT_STATE_NOTE,
   validateAgentId,
 } from './common';
 import { ANSWER_BUCKET_CAP, BREAKDOWN_BUCKET_CAP } from '../digest';
@@ -113,7 +114,7 @@ const getScaChecksToolBase: ToolDefinition = {
       'fragment via search (e.g. "ssh") together with result="failed": the digest breakdown\'s ' +
       '"matching_failed_checks" entries name the matching checks over the full result set ' +
       '(alphabetical; if more match than the list carries, the digest says how many were cut — ' +
-      'narrow the fragment to see them all).',
+      `narrow the fragment to see them all). ${SCA_CURRENT_STATE_NOTE}`,
     parameters: objectSchema(
       {
         agent_id: {
@@ -122,7 +123,10 @@ const getScaChecksToolBase: ToolDefinition = {
             'Numeric Wazuh agent ID, e.g. "003". Optional: omit this for a deictic host ' +
             'reference ("this box"/"this server") with no known id -- the call resolves to the ' +
             'only active agent automatically, or (when check_id is given instead) from that ' +
-            "check's own document.",
+            'check\'s own document. If the user named a host (e.g. "web-server-01"), resolve that ' +
+            'name to its numeric id first and pass it here: omitting this parameter does NOT ' +
+            'search across agents, it resolves to a single agent, so an unscoped call answers ' +
+            'about the wrong host.',
         },
         policy_id: {
           type: 'string',
@@ -137,10 +141,11 @@ const getScaChecksToolBase: ToolDefinition = {
           description:
             'Exact numeric check.id to look up (e.g. "28500"), when the user already names a ' +
             'specific check id (typically a remediation/drill-down question about that one ' +
-            'check). When supplied, agent_id and policy_id resolve automatically from that ' +
-            'check\'s own document -- this is the preferred way to answer "how do I remediate ' +
-            'failed check ID X" without first asking which agent, since the check id alone ' +
-            'already identifies which agent/policy it belongs to.',
+            'check). When supplied, the returned rows are narrowed to THAT check, and agent_id ' +
+            "and policy_id resolve automatically from that check's own document -- this is the " +
+            'preferred way to answer "how do I remediate failed check ID X" without first ' +
+            'asking which agent, since the check id alone already identifies which agent/policy ' +
+            'it belongs to.',
         },
         result: {
           type: 'string',
@@ -196,6 +201,19 @@ const getScaChecksToolBase: ToolDefinition = {
     const limit = clampLimit(params.limit, 20, 500);
     const result = optionalStringParam(params.result);
     const search = optionalStringParam(params.search);
+    // `check_id` must NARROW the executed query, not only resolve agent_id/policy_id.
+    // `resolveScaCheckParams` (param-resolution.ts) reads it to find the check's owning
+    // agent/policy and passes it through untouched, but nothing here put a `check.id` term into
+    // the request -- so a "how do I remediate check ID X" call returned a `limit`-truncated
+    // sample of the WHOLE policy (hundreds of checks) which usually did not contain check X at
+    // all, and the one field the question was about was absent from every row that came back.
+    // `check.id` is a keyword field in the wazuh-states-sca mapping (enumerated in
+    // common/field-catalog.ts), so an exact term is the right match; trimmed the same way the
+    // resolution path reads the same value. The term goes in `query.bool.filter`, not
+    // `post_filter`, deliberately: it is a scope narrowing (this ONE check), so the aggregations
+    // below must be computed inside it too -- a policy-wide `results` distribution beside a
+    // single check's row is the scope mismatch the `search` comment already records.
+    const checkId = optionalStringParam(params.check_id)?.trim() || undefined;
     // Normalized subject (#8935 item I2, integration review): trimmed, treated as ABSENT when
     // whitespace-only (a '   ' subject otherwise became include '.*\ \ \ .*' — matches nothing —
     // plus a prefix on the empty string), and length-capped so the per-character include
@@ -273,6 +291,7 @@ const getScaChecksToolBase: ToolDefinition = {
             filter: [
               { term: { 'wazuh.agent.id': agentId } },
               { term: { 'policy.id': policyId.trim() } },
+              ...(checkId ? [{ term: { 'check.id': checkId } }] : []),
               ...(result
                 ? [
                     {

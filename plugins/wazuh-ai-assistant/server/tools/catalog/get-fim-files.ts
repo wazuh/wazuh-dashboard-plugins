@@ -25,14 +25,35 @@ export const getFimFilesTool: ToolDefinition = {
     description:
       'Lists files tracked by File Integrity Monitoring (FIM) with their CURRENT state — path, ' +
       'last modification time, size, owner, hashes — most recently modified first. Use for ' +
-      '"what monitored files changed recently" or "FIM state of file/path X" questions. Note: ' +
-      'this is current state, not a change-event history.',
+      '"what monitored files changed recently" or "FIM state of file/path X" questions, ' +
+      'including when the host is named rather than numbered ("what changed on web-server-01"): ' +
+      'scope it with "agent_name" directly, no id lookup needed. Note: this is current state, ' +
+      'not a change-event history, and it covers FILES only — Windows registry keys/values are a ' +
+      'different surface (wazuh-states-fim-registry-*, reachable through search_wazuh_data).',
     parameters: objectSchema(
       {
         agent_id: {
           type: 'string',
           description:
-            'Optional numeric Wazuh agent ID to scope to one agent, e.g. "003".',
+            'Optional numeric Wazuh agent ID to scope to one agent, e.g. "003". Numeric ids only: ' +
+            'an agent NAME here is rejected -- pass the name as "agent_name" instead, this tool ' +
+            'resolves it itself. Leaving BOTH out searches every agent, not the named one.',
+        },
+        // This tool must accept an agent NAME, not only a numeric id: the ordinary FIM question
+        // ("which files changed on agent <name>") names the host by name, and an id-only schema makes
+        // the typed tool strictly more expensive than filtering `wazuh.agent.name` through the
+        // `search_wazuh_data` escape hatch -- which is where the model goes, correctly, costing this
+        // tool its whole `fim` family. No prompt clause preferring the typed tool holds against a real
+        // cost difference; removing the difference is the fix. Same `agent_id`-wins precedence and the
+        // same `match` clause get_agent_inventory's `resolveAgentFilter` uses, and `agent_name` is
+        // already an entity-resolution.ts AGENT_NAME_PARAM_KEYS entry, so the pseudonymization path
+        // every other agent-name-taking tool gets applies here with no extra wiring.
+        agent_name: {
+          type: 'string',
+          description:
+            'Optional agent NAME to scope to one agent, e.g. "web-server-01" -- use this whenever ' +
+            'the user named the host rather than numbering it; there is no need to look its id up ' +
+            'first. If both this and "agent_id" are given, "agent_id" wins.',
         },
         path_prefix: {
           type: 'string',
@@ -60,6 +81,16 @@ export const getFimFilesTool: ToolDefinition = {
       typeof params.agent_id === 'string' && params.agent_id.trim() !== ''
         ? validateAgentId(params.agent_id.trim())
         : undefined;
+    // `agent_id` wins when both are supplied -- an exact Manager-API identifier beats the fuzzier
+    // `match`, the same precedence and the same clause shape get_agent_inventory's
+    // `resolveAgentFilter` uses. Read only when no id was given, so an id-scoped call builds a
+    // byte-identical request to the one it built before this parameter existed.
+    const agentName =
+      !agentId &&
+      typeof params.agent_name === 'string' &&
+      params.agent_name.trim() !== ''
+        ? params.agent_name.trim()
+        : undefined;
     const pathPrefix =
       typeof params.path_prefix === 'string' && params.path_prefix.trim() !== ''
         ? params.path_prefix.trim()
@@ -72,8 +103,13 @@ export const getFimFilesTool: ToolDefinition = {
           bool: {
             filter: [
               ...(agentId ? [{ term: { 'wazuh.agent.id': agentId } }] : []),
+              ...(agentName
+                ? [{ match: { 'wazuh.agent.name': agentName } }]
+                : []),
               ...(pathPrefix ? [{ prefix: { 'file.path': pathPrefix } }] : []),
-              ...(!agentId && !pathPrefix ? [{ match_all: {} }] : []),
+              ...(!agentId && !agentName && !pathPrefix
+                ? [{ match_all: {} }]
+                : []),
             ],
           },
         },

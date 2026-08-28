@@ -66,6 +66,31 @@ test('tableSpecSchema: rejects a securityAnalyticsLink missing its url', () => {
   );
 });
 
+test('tableSpecSchema: accepts a table carrying provenance (issue #9008 rework)', () => {
+  assert.doesNotThrow(() =>
+    tableSpecSchema.validate({
+      ...MINIMAL_TABLE,
+      provenance: {
+        toolCallId: 'call-1',
+        index: 'wazuh-findings-v5*',
+        requestedRange: { gte: 'now-720d', lte: 'now' },
+        effectiveRange: { gte: '2026-05-23T00:00:00.000Z', lte: 'now' },
+        clamped: true,
+        executedAt: Date.now(),
+      },
+    }),
+  );
+});
+
+test('tableSpecSchema: accepts provenance with only `clamped` set (no range/index known)', () => {
+  assert.doesNotThrow(() =>
+    tableSpecSchema.validate({
+      ...MINIMAL_TABLE,
+      provenance: { clamped: false },
+    }),
+  );
+});
+
 test('tableSpecSchema: still rejects a genuinely unknown top-level key', () => {
   assert.throws(() =>
     tableSpecSchema.validate({

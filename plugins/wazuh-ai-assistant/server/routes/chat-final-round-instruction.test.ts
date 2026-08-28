@@ -48,9 +48,31 @@ test('withFinalRoundAnswerInstruction: appends the instruction on the final roun
     'exactly one message is added, never more',
   );
   assert.deepEqual(out[out.length - 1], {
-    role: 'system',
+    role: 'user',
     content: FINAL_ROUND_ANSWER_INSTRUCTION,
   });
+});
+
+// The role is the mechanism, not a detail: a `system`-role message is NOT at the conversation tail
+// on the Anthropic Messages API -- providers/anthropic.ts filters every system message out of
+// `messages` and joins them into the request's top-level `system` field, so the instruction lands in
+// the prompt PREFIX while the last thing the model reads stays a `tool_result` it may treat as a
+// finished turn. This test pins the wire position so a "tidy the roles up" edit cannot hoist it back
+// into the system field.
+test('withFinalRoundAnswerInstruction: the instruction is delivered as a trailing USER message, never a system one', () => {
+  const out = withFinalRoundAnswerInstruction(conversation(), true, true);
+  assert.equal(
+    out[out.length - 1].role,
+    'user',
+    'a system-role message is hoisted out of the conversation by anthropic.ts and never reaches the tail',
+  );
+  assert.ok(
+    !out.some(
+      message =>
+        message.role === 'system' &&
+        message.content === FINAL_ROUND_ANSWER_INSTRUCTION,
+    ),
+  );
 });
 
 test('withFinalRoundAnswerInstruction: the instruction goes LAST, after the tool results', () => {
@@ -169,17 +191,33 @@ test('willBeFinalRound: false when neither latch is set and the structural cap h
   assert.equal(willBeFinalRound(1, false, false), false);
 });
 
-test('FINAL_ROUND_ANSWER_INSTRUCTION: constrains the model to the gathered results', () => {
+test('FINAL_ROUND_ANSWER_INSTRUCTION: constrains every FACT to the gathered results', () => {
   // Guards the anti-fabrication property against a well-meaning future reword. Asking a model for
   // an answer it cannot support is how invented counts and agent names appear — the instruction has
   // to buy analysis WITHOUT buying invention, and has to leave the honest "I can't answer" reachable.
+  // The grounding clause is scoped to "every FACT about this environment", not to "only the tool
+  // results" (which also bans interpretation), so this assertion pins the DATA scope explicitly --
+  // see the advisory test below for the other half.
   assert.match(
     FINAL_ROUND_ANSWER_INSTRUCTION,
-    /only the tool results already gathered/i,
+    /Every FACT about this environment/,
   );
   assert.match(
     FINAL_ROUND_ANSWER_INSTRUCTION,
-    /do not state anything the results do not show/i,
+    /must come from the tool results already gathered/i,
+  );
+  // The enumeration must stay OPEN. A closed list ("counts, names, ids, entities, timestamps,
+  // statuses") is narrower than the blanket ban it replaced: CVSS scores, package versions, IPs,
+  // ports, file paths and SCA control numbers all fall outside it, and a model reads a closed list
+  // as the boundary of the rule. Pin the non-exhaustiveness and the catch-all, not the examples.
+  assert.match(FINAL_ROUND_ANSWER_INSTRUCTION, /including but not limited to/i);
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /any other data point describing what is in this deployment/i,
+  );
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /never state a data point the results do not show/i,
   );
   assert.match(FINAL_ROUND_ANSWER_INSTRUCTION, /say so plainly/i);
   // UI run 2026-08-14 (B3): on the forced final round the model answered AND announced "Let me
@@ -193,6 +231,56 @@ test('FINAL_ROUND_ANSWER_INSTRUCTION: constrains the model to the gathered resul
   assert.match(
     FINAL_ROUND_ANSWER_INSTRUCTION,
     /no\s+more tool calls will run/i,
+  );
+});
+
+// This instruction lands on the round where an "explain this event / how do we protect against it"
+// answer has to be written, and a blanket grounding rule forbids exactly the knowledge such an
+// answer needs (what a technique is, what mitigates it) -- knowledge no tool in this product
+// returns. The two properties below must hold TOGETHER: advisory content is unlocked, and it is
+// fenced so it can never be read as observed data. A reword that drops either one breaks a whole
+// question class or opens a fabrication path.
+test('FINAL_ROUND_ANSWER_INSTRUCTION: permits general security knowledge for the explanatory half', () => {
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /MAY use your general security knowledge/,
+  );
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /why it matters, how that class of activity is typically detected, or how to protect against it/i,
+  );
+  // Detection provenance is NOT on the advisory side. "How it is detected" as a licensed knowledge
+  // topic invites an invented rule id or detector name when only get_mitre_findings ran, so the
+  // generic case is knowledge and the deployment-specific one stays a grounded fact.
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /What detected something HERE \(rule ids, rule titles, detectors\) is one of those facts, not general knowledge/,
+  );
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /if the results do not name it, say so instead of guessing/i,
+  );
+});
+
+test('FINAL_ROUND_ANSWER_INSTRUCTION: fences that knowledge off from observed data', () => {
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /clearly separate part of the answer/i,
+  );
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /framed as guidance rather than as something observed in the data/i,
+  );
+  // Mirrors the shipped Group E how-to policy in prompts.ts (answer from general knowledge, but
+  // say it needs verifying) rather than inventing a second, divergent disclaimer rule.
+  assert.match(FINAL_ROUND_ANSWER_INSTRUCTION, /verified before acting on it/i);
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /Never present general knowledge as an environment fact/i,
+  );
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /never invent data to support it/i,
   );
 });
 

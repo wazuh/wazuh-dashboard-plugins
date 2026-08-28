@@ -4,6 +4,7 @@ import {
   SUGGEST_DISCOVER_QUERY_TOOL,
   validateSuggestDiscoverQueryArgs,
 } from './suggest-discover-query';
+import { UNBOUNDED_TIME_RANGE } from '../../common/discover-url';
 
 /**
  * Proves the graceful-failure handoff's server-side seam (issue 13-suggested-query-discover-
@@ -128,6 +129,54 @@ test('resolveSuggestedDsl: a disallowed index resolves unverifiable_index, never
         filter: [{ range: { '@timestamp': { gte: 'now-24h', lte: 'now' } } }],
       },
     });
+  }
+});
+
+test('resolveSuggestedDsl: an lte-only range materializes an unbounded gte, never an inverted window', async () => {
+  // A live path: a model-authored DSL is never run through `checkDateRanges`, so a one-sided range
+  // reaches `buildTimeRangeOnlyDsl` as written. It reads the bound through `extractTimeRange`,
+  // whose missing LOWER edge now fills from the unbounded window rather than `now-24h` — the old
+  // fill emitted `gte: now-24h, lte: <past instant>`, a range matching nothing at all, which the
+  // user would have been handed as a query to run themselves.
+  const { logger } = fakeLogger();
+  const context = fakeContext(() =>
+    Promise.resolve({ body: { fields: { '@timestamp': {} } } }),
+  );
+  const result = await resolveSuggestedDsl(
+    context,
+    'some-other-index-*',
+    { range: { '@timestamp': { lte: '2026-01-01T00:00:00.000Z' } } },
+    logger,
+  );
+  // Disallowed index + nothing field-level to lose: the stripped range-only DSL is emitted with no
+  // strip disclosure (see resolveSuggestedDsl's allowlist branch).
+  assert.equal(result.outcome, 'no_field_filters');
+  if (result.outcome === 'no_field_filters') {
+    assert.deepEqual(result.dsl, {
+      bool: {
+        filter: [
+          {
+            range: {
+              '@timestamp': {
+                gte: UNBOUNDED_TIME_RANGE.from,
+                lte: '2026-01-01T00:00:00.000Z',
+              },
+            },
+          },
+        ],
+      },
+    });
+    const emitted = (
+      result.dsl as {
+        bool: {
+          filter: Array<{ range: Record<string, Record<string, string>> }>;
+        };
+      }
+    ).bool.filter[0].range['@timestamp'];
+    assert.ok(
+      Date.parse(emitted.gte) < Date.parse(emitted.lte),
+      'the emitted range must not be inverted',
+    );
   }
 });
 

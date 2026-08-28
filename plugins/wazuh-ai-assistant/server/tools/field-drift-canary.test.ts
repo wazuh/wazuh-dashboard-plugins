@@ -164,10 +164,14 @@ test(
   'checkFieldDrift: warns for a CATALOG-ONLY field are demoted to debug, never warn -- code ' +
     'review B2/B3 (AI/plan/b-review.md)',
   async () => {
-    // "check.id" is a FIELD_CATALOG.sca entry with no get-field-values.ts tool field of its own
-    // (fieldsForFamily('sca') covers policy.id/check.result/check.name, not check.id) -- simulate
-    // it as dropped/renamed while every tool-facing field stays present.
-    const properties = await buildScaProperties(['check.id']);
+    // "check.rationale" is a FIELD_CATALOG.sca entry with no get-field-values.ts tool field of its
+    // own -- simulate it as dropped/renamed while every tool-facing field stays present.
+    //
+    // The fixture needs a field that is catalog-only and NOT tool-facing; "check.id" and
+    // "policy.name" no longer qualify, because `state-families.ts` opened the sca family's state
+    // schema to get_field_values. The test's subject is the warn/debug DEMOTION, not which particular
+    // field happens to be untooled.
+    const properties = await buildScaProperties(['check.rationale']);
     const client = clientReturning({
       'wazuh-states-sca*': {
         'wazuh-states-sca-000001': { mappings: { properties } },
@@ -178,8 +182,10 @@ test(
     await checkFieldDrift(client, logger as never);
     assert.deepEqual(logger.warnMessages, []);
     assert.ok(
-      logger.debugMessages.some(message => message.includes('"check.id"')),
-      'expected a DEBUG line naming the missing catalog-only "check.id" field',
+      logger.debugMessages.some(message =>
+        message.includes('"check.rationale"'),
+      ),
+      'expected a DEBUG line naming the missing catalog-only "check.rationale" field',
     );
   },
 );

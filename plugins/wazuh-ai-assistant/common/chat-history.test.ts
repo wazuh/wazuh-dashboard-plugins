@@ -8,6 +8,7 @@ import {
   ToolExchange,
   buildConversationTitle,
   buildOutgoingMessages,
+  excludePrivacyOffHistory,
   detectManagerAuthError,
   detectNavigationType,
   nextMessageId,
@@ -16,6 +17,7 @@ import {
   toPersistedMessages,
 } from './chat-history';
 import {
+  CONVERSATION_MAX_FAILURE_REASON_LENGTH,
   CONVERSATION_MAX_MESSAGES,
   CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH,
   CONVERSATION_MAX_SERIALIZED_BYTES,
@@ -40,14 +42,36 @@ function tableSpec(rowCount: number): TableSpec {
 function uiUser(id: string, content: string): ChatHistoryMessage {
   return { id, role: 'user', content, createdAt: Date.now() };
 }
-function uiAssistant(id: string, content: string): ChatHistoryMessage {
-  return { id, role: 'assistant', content, createdAt: Date.now() };
+function uiAssistant(
+  id: string,
+  content: string,
+  privacyEnabled?: boolean,
+): ChatHistoryMessage {
+  return {
+    id,
+    role: 'assistant',
+    content,
+    createdAt: Date.now(),
+    ...(privacyEnabled !== undefined ? { privacyEnabled } : {}),
+  };
 }
 function toolCall(id: string): ToolCall {
   return { id, name: 'get_findings', arguments: {} };
 }
-function exchange(toolCallId: string, digestContent?: string): ToolExchange {
-  return { toolCall: toolCall(toolCallId), digestContent };
+function exchange(
+  toolCallId: string,
+  digestContent?: string,
+  privacyEnabled?: boolean,
+): ToolExchange {
+  return {
+    toolCall: toolCall(toolCallId),
+    digestContent,
+    // Omitted entirely (not `privacyEnabled: undefined`) when the caller doesn't pass it, so a
+    // deep-equal against `reconstructConversation`'s output -- which now also OMITS the key rather
+    // than setting it to `undefined` (see that function's own doc comment) -- compares like for
+    // like instead of tripping over a present-but-undefined vs. absent key mismatch.
+    ...(privacyEnabled !== undefined ? { privacyEnabled } : {}),
+  };
 }
 function turn(
   assistantMessageId: string,
@@ -62,7 +86,7 @@ function turn(
 
 test('buildOutgoingMessages: no turn records at all just maps role/content straight through', () => {
   const uiMessages = [uiUser('u1', 'hi'), uiAssistant('a1', 'hello')];
-  const outgoing = buildOutgoingMessages(uiMessages, []);
+  const outgoing = buildOutgoingMessages(uiMessages, [], false);
   assert.deepEqual(outgoing, [
     { role: 'user', content: 'hi' },
     { role: 'assistant', content: 'hello' },
@@ -72,7 +96,7 @@ test('buildOutgoingMessages: no turn records at all just maps role/content strai
 test('buildOutgoingMessages: a turn with no tool exchanges at all contributes no pairs', () => {
   const uiMessages = [uiUser('u1', 'q'), uiAssistant('a1', 'answer')];
   const turns = [turn('a1', [])];
-  const outgoing = buildOutgoingMessages(uiMessages, turns);
+  const outgoing = buildOutgoingMessages(uiMessages, turns, false);
   assert.deepEqual(outgoing, [
     { role: 'user', content: 'q' },
     { role: 'assistant', content: 'answer' },
@@ -84,7 +108,7 @@ test("buildOutgoingMessages: [assistant{toolCalls}, tool{digest}] pair is placed
   const turns = [
     turn('a1', [exchange('t1', 'digest one'), exchange('t2', 'digest two')]),
   ];
-  const outgoing = buildOutgoingMessages(uiMessages, turns);
+  const outgoing = buildOutgoingMessages(uiMessages, turns, false);
   assert.deepEqual(outgoing, [
     { role: 'user', content: 'q' },
     { role: 'assistant', content: '', toolCalls: [toolCall('t1')] },
@@ -100,7 +124,7 @@ test('buildOutgoingMessages: an exchange with no digestContent (e.g. a guardrail
   const turns = [
     turn('a1', [exchange('t1', undefined), exchange('t2', 'has digest')]),
   ];
-  const outgoing = buildOutgoingMessages(uiMessages, turns);
+  const outgoing = buildOutgoingMessages(uiMessages, turns, false);
   assert.deepEqual(outgoing, [
     { role: 'user', content: 'q' },
     // Only t2's pair appears; t1 (no digestContent) is skipped entirely, not just its digest half.
@@ -125,7 +149,7 @@ test(`buildOutgoingMessages: only the newest TOOL_HISTORY_MAX_TURNS (=${TOOL_HIS
     turn('a2', [exchange('t2', 'd2')]),
     turn('a3', [exchange('t3', 'd3')]),
   ];
-  const outgoing = buildOutgoingMessages(uiMessages, turns);
+  const outgoing = buildOutgoingMessages(uiMessages, turns, false);
   // a1 (the oldest, 3rd-from-newest) is outside the last-2 window: its exchange never appears.
   assert.deepEqual(outgoing, [
     { role: 'user', content: 'q1' },
@@ -164,7 +188,7 @@ test('buildOutgoingMessages: TOOL_HISTORY_CHAR_BUDGET cutoff — the first (olde
     turn('a1', [exchange('t1', oldDigest)]),
     turn('a2', [exchange('t2', newDigest)]),
   ];
-  const outgoing = buildOutgoingMessages(uiMessages, turns);
+  const outgoing = buildOutgoingMessages(uiMessages, turns, false);
 
   // Only a2 (the newest) keeps its tool exchange; a1's is dropped even though, on its own, its
   // digest would easily fit under budget.
@@ -197,7 +221,7 @@ test('buildOutgoingMessages: a turn whose tool exchanges have zero digest chars 
     turn('a1', [exchange('t1', 'small digest')]),
     turn('a2', [exchange('t2', undefined)]),
   ];
-  const outgoing = buildOutgoingMessages(uiMessages, turns);
+  const outgoing = buildOutgoingMessages(uiMessages, turns, false);
   assert.deepEqual(outgoing, [
     { role: 'user', content: 'q1' },
     { role: 'assistant', content: '', toolCalls: [toolCall('t1')] },
@@ -211,10 +235,198 @@ test('buildOutgoingMessages: a turn whose tool exchanges have zero digest chars 
 test('buildOutgoingMessages: a turnRecord whose assistantMessageId has no matching uiMessage (already pruned/replaced) is harmless', () => {
   const uiMessages = [uiUser('u1', 'q1'), uiAssistant('a1', 'answer 1')];
   const turns = [turn('stale-id', [exchange('t1', 'digest')])];
-  const outgoing = buildOutgoingMessages(uiMessages, turns);
+  const outgoing = buildOutgoingMessages(uiMessages, turns, false);
   assert.deepEqual(outgoing, [
     { role: 'user', content: 'q1' },
     { role: 'assistant', content: 'answer 1' },
+  ]);
+});
+
+// ---------------------------------------------------------------------------
+// Wire-proof fix (AI/qa/wire-proof-v35/capture.jsonl): excludePrivacyOffHistory, and
+// buildOutgoingMessages's own use of it via its new `currentPrivacyEnabled` parameter.
+//
+// The live-captured leak: a real agent name (`wazuh-aio-5`, no dots -- invisible to the shape scan)
+// survived a privacy-off-to-on mid-conversation toggle because the digest that carried it was
+// resent as "history" unfiltered. All five tests below map 1:1 to the fix's required proof points.
+// ---------------------------------------------------------------------------
+
+test('excludePrivacyOffHistory: WIRE-PROOF regression -- a privacy-OFF-flagged tool digest containing a bare real agent name is absent from the outbound payload entirely', () => {
+  // The user's OWN question text deliberately does NOT mention the hostname here: this mechanism
+  // never drops role:'user' content (a separate, already-documented residual -- see
+  // excludePrivacyOffHistory's own doc comment), so a "no hostname anywhere" assertion must not be
+  // confounded by the user's own words. What this test isolates is specifically the digest and the
+  // model's own past narration, which DO get dropped.
+  const messages: ChatMessage[] = [
+    { role: 'user', content: 'how many alerts right now?' },
+    { role: 'assistant', content: '', toolCalls: [toolCall('t1')] },
+    {
+      role: 'tool',
+      toolCallId: 't1',
+      content: JSON.stringify({
+        samples: [{ id: '001', name: 'wazuh-aio-5', ip: 'IP_1' }],
+      }),
+      privacyEnabled: false, // captured while privacy was OFF for that turn
+    },
+    { role: 'assistant', content: '3 alerts on wazuh-aio-5.' },
+  ];
+
+  const out = excludePrivacyOffHistory(messages, true);
+
+  assert.deepEqual(
+    out.map(message => message.role),
+    ['user'],
+    'the whole [assistant{toolCalls}, tool{digest}] pair AND the privacy-off prose must be gone',
+  );
+  const serialized = JSON.stringify(out);
+  assert.doesNotMatch(
+    serialized,
+    /wazuh-aio-5/,
+    'the real agent name from the live wire-proof must not survive anywhere in the outbound payload',
+  );
+});
+
+test('excludePrivacyOffHistory: a historical turn flagged privacy-ON (pseudonym-form) is still replayed normally', () => {
+  const messages: ChatMessage[] = [
+    { role: 'user', content: 'and now?' },
+    { role: 'assistant', content: '', toolCalls: [toolCall('t1')] },
+    {
+      role: 'tool',
+      toolCallId: 't1',
+      content: '{"samples":[{"name":"HOST_1"}]}',
+      privacyEnabled: true,
+    },
+    { role: 'assistant', content: 'Still HOST_1.', privacyEnabled: true },
+  ];
+
+  const out = excludePrivacyOffHistory(messages, true);
+
+  assert.deepEqual(
+    out,
+    messages,
+    'nothing eligible should be dropped or altered',
+  );
+});
+
+test('excludePrivacyOffHistory: a missing/unknown privacyEnabled flag (an older persisted conversation) is excluded -- fail closed, not fail open', () => {
+  const messages: ChatMessage[] = [
+    { role: 'user', content: 'q' },
+    { role: 'assistant', content: '', toolCalls: [toolCall('t1')] },
+    {
+      role: 'tool',
+      toolCallId: 't1',
+      content: 'some digest',
+      // No `privacyEnabled` at all -- simulates a conversation persisted before this field existed.
+    },
+    { role: 'assistant', content: 'an old answer' /* also no flag */ },
+  ];
+
+  const out = excludePrivacyOffHistory(messages, true);
+
+  assert.deepEqual(
+    out.map(m => m.role),
+    ['user'],
+  );
+});
+
+test('excludePrivacyOffHistory: privacy OFF for the current turn -- everything replays exactly as before (no behavior change)', () => {
+  const messages: ChatMessage[] = [
+    { role: 'user', content: 'q' },
+    { role: 'assistant', content: '', toolCalls: [toolCall('t1')] },
+    {
+      role: 'tool',
+      toolCallId: 't1',
+      content: 'wazuh-aio-5',
+      privacyEnabled: false,
+    },
+    { role: 'assistant', content: 'answer about wazuh-aio-5' },
+  ];
+
+  const out = excludePrivacyOffHistory(messages, false);
+
+  assert.deepEqual(out, messages);
+});
+
+test('excludePrivacyOffHistory: a standalone assistant PROSE message (no toolCalls) is dropped under the same fail-closed rule', () => {
+  const messages: ChatMessage[] = [
+    { role: 'user', content: 'q' },
+    {
+      role: 'assistant',
+      content: 'privacy-off narration',
+      privacyEnabled: false,
+    },
+    {
+      role: 'assistant',
+      content: 'privacy-on narration',
+      privacyEnabled: true,
+    },
+  ];
+
+  const out = excludePrivacyOffHistory(messages, true);
+
+  assert.deepEqual(out, [
+    { role: 'user', content: 'q' },
+    {
+      role: 'assistant',
+      content: 'privacy-on narration',
+      privacyEnabled: true,
+    },
+  ]);
+});
+
+test('excludePrivacyOffHistory: user messages are NEVER dropped by this mechanism, regardless of flag', () => {
+  const messages: ChatMessage[] = [
+    {
+      role: 'user',
+      content: 'a question mentioning wazuh-aio-5',
+      privacyEnabled: false,
+    },
+  ];
+  const out = excludePrivacyOffHistory(messages, true);
+  assert.deepEqual(out, messages);
+});
+
+test('buildOutgoingMessages: WIRE-PROOF end-to-end -- privacy toggled on mid-conversation excludes the privacy-off turn (digest AND prose), keeping the current question', () => {
+  // As in the excludePrivacyOffHistory test above, the user's OWN question text deliberately does
+  // not mention the hostname -- only the digest and the model's own past narration carried it, and
+  // those (not user content) are what this fix drops.
+  const uiMessages = [
+    uiUser('u1', 'how many alerts right now?'),
+    uiAssistant('a1', '3 alerts on wazuh-aio-5.', false), // this turn ran with privacy OFF
+    uiUser('u2', 'and now, with privacy on?'),
+  ];
+  const turns = [turn('a1', [exchange('t1', 'wazuh-aio-5 digest', false)])];
+
+  const outgoing = buildOutgoingMessages(uiMessages, turns, true);
+
+  assert.deepEqual(outgoing, [
+    { role: 'user', content: 'how many alerts right now?' },
+    { role: 'user', content: 'and now, with privacy on?' },
+  ]);
+  assert.doesNotMatch(JSON.stringify(outgoing), /wazuh-aio-5/);
+});
+
+test('buildOutgoingMessages: privacy currently ON keeps a privacy-ON-flagged historical turn intact', () => {
+  const uiMessages = [
+    uiUser('u1', 'q'),
+    uiAssistant('a1', 'HOST_1 answer', true),
+    uiUser('u2', 'follow-up'),
+  ];
+  const turns = [turn('a1', [exchange('t1', 'HOST_1 digest', true)])];
+
+  const outgoing = buildOutgoingMessages(uiMessages, turns, true);
+
+  assert.deepEqual(outgoing, [
+    { role: 'user', content: 'q' },
+    { role: 'assistant', content: '', toolCalls: [toolCall('t1')] },
+    {
+      role: 'tool',
+      toolCallId: 't1',
+      content: 'HOST_1 digest',
+      privacyEnabled: true,
+    },
+    { role: 'assistant', content: 'HOST_1 answer', privacyEnabled: true },
+    { role: 'user', content: 'follow-up' },
   ]);
 });
 
@@ -551,6 +763,28 @@ test("toPersistedMessages: interleaves a turn's tool exchanges immediately befor
   assert.equal(out[2].toolCallId, 't1');
 });
 
+test('toPersistedMessages: persists privacyEnabled on both the digest message and the prose message it belongs to', () => {
+  const out = toPersistedMessages(
+    [uiAssistant('a1', 'answer text', false)],
+    [turn('a1', [exchange('t1', 'digest content', false)])],
+  );
+  const tool = out.find(m => m.role === 'tool');
+  const prose = out.find(m => m.role === 'assistant' && m.content !== '');
+  assert.equal(tool?.privacyEnabled, false);
+  assert.equal(prose?.privacyEnabled, false);
+});
+
+test('toPersistedMessages: omits privacyEnabled entirely (not written as `undefined`) when the source never set it', () => {
+  const out = toPersistedMessages(
+    [{ id: 'a1', role: 'assistant', content: 'answer', createdAt: 1 }],
+    [turn('a1', [exchange('t1', 'digest')])],
+  );
+  const tool = out.find(m => m.role === 'tool');
+  const prose = out.find(m => m.role === 'assistant' && m.content !== '');
+  assert.equal('privacyEnabled' in (tool ?? {}), false);
+  assert.equal('privacyEnabled' in (prose ?? {}), false);
+});
+
 test('toPersistedMessages: a tool exchange with no digest is not persisted', () => {
   const out = toPersistedMessages(
     [{ id: 'a1', role: 'assistant', content: 'sorry', createdAt: 1 }],
@@ -702,6 +936,21 @@ test('reconstructConversation: round-trips what toPersistedMessages produced', (
   );
 });
 
+test('reconstructConversation: round-trips privacyEnabled on both the digest and the prose message (the flag a LATER resume needs to fail closed)', () => {
+  const messages: ChatHistoryMessage[] = [
+    uiUser('u1', 'q'),
+    uiAssistant('a1', 'privacy-off answer', false),
+  ];
+  const records = [turn('a1', [exchange('t1', 'digest', false)])];
+
+  const restored = reconstructConversation(
+    toPersistedMessages(messages, records),
+  );
+
+  assert.equal(restored.messages[1].privacyEnabled, false);
+  assert.equal(restored.turnRecords[0].toolExchanges[0].privacyEnabled, false);
+});
+
 test('reconstructConversation: falls back to now for a conversation saved before timestamps were persisted', () => {
   const before = Date.now();
   const restored = reconstructConversation([
@@ -727,4 +976,116 @@ test('reconstructConversation: a tool pair never carries over into a later turn'
     restored.turnRecords[0].assistantMessageId,
     restored.messages[0].id,
   );
+});
+
+test('toPersistedMessages/reconstructConversation: a failed turn keeps its reason across a save-and-reload round trip', () => {
+  // Without this the transcript goes back to hiding its own failures the moment the page reloads.
+  const persisted = toPersistedMessages([
+    { id: 'a', role: 'user', content: 'any agents down?', createdAt: 1 },
+    {
+      id: 'b',
+      role: 'assistant',
+      content: '',
+      createdAt: 2,
+      failureReason: 'provider stream failed: 502 upstream',
+    },
+  ]);
+  assert.equal(
+    persisted[1].failureReason,
+    'provider stream failed: 502 upstream',
+  );
+
+  const restored = reconstructConversation(persisted);
+  assert.equal(
+    restored.messages[1].failureReason,
+    'provider stream failed: 502 upstream',
+  );
+});
+
+test('toPersistedMessages/reconstructConversation: provider provenance survives a save-and-reload round trip', () => {
+  const persisted = toPersistedMessages([
+    { id: 'a', role: 'user', content: 'how many?', createdAt: 1 },
+    {
+      id: 'b',
+      role: 'assistant',
+      content: 'Six today.',
+      createdAt: 2,
+      providerId: 'p1',
+      providerName: 'Claude test',
+      providerModel: 'claude-sonnet-4',
+    },
+  ]);
+  assert.equal(persisted[1].providerId, 'p1');
+  assert.equal(persisted[1].providerName, 'Claude test');
+  assert.equal(persisted[1].providerModel, 'claude-sonnet-4');
+  // Never stamped on the question.
+  assert.equal(persisted[0].providerId, undefined);
+
+  const restored = reconstructConversation(persisted);
+  assert.equal(restored.messages[1].providerId, 'p1');
+  assert.equal(restored.messages[1].providerName, 'Claude test');
+  assert.equal(restored.messages[1].providerModel, 'claude-sonnet-4');
+});
+
+test('toPersistedMessages: an unbounded provider error string is clamped to the limit the route enforces', () => {
+  // Not cosmetic: the route 400s anything longer, auto-save swallows the rejection, and the same
+  // over-long value is resent on every following turn — so one unbounded provider error would
+  // silently stop the whole conversation from ever being saved again.
+  const persisted = toPersistedMessages([
+    {
+      id: 'b',
+      role: 'assistant',
+      content: '',
+      createdAt: 2,
+      failureReason: 'x'.repeat(CONVERSATION_MAX_FAILURE_REASON_LENGTH + 500),
+    },
+  ]);
+  assert.equal(
+    persisted[0].failureReason?.length,
+    CONVERSATION_MAX_FAILURE_REASON_LENGTH,
+  );
+});
+
+test('toPersistedMessages: a message with neither a failure nor a provider stamp is shaped exactly as before (no undefined own properties)', () => {
+  // A strict deep-equality check is what a conversation-merge comparison does, so an explicit
+  // `failureReason: undefined` own property would be a real behaviour change for pre-existing data.
+  const persisted = toPersistedMessages([
+    { id: 'a', role: 'assistant', content: 'Six today.', createdAt: 2 },
+  ]);
+  assert.deepEqual(persisted, [
+    { role: 'assistant', content: 'Six today.', createdAt: 2 },
+  ]);
+});
+
+test('buildOutgoingMessages: a failed turn (marker-only, no prose) is never sent as history', () => {
+  // An assistant message with empty content is not a history entry any provider can use —
+  // Anthropic rejects an empty text block outright. The marker is for the reader, not the model.
+  const outgoing = buildOutgoingMessages(
+    [
+      { id: 'a', role: 'user', content: 'any agents down?', createdAt: 1 },
+      {
+        id: 'b',
+        role: 'assistant',
+        content: '',
+        createdAt: 2,
+        failureReason: 'provider stream failed',
+      },
+      { id: 'c', role: 'user', content: 'and findings?', createdAt: 3 },
+    ],
+    [],
+    false,
+  );
+  assert.deepEqual(outgoing, [
+    { role: 'user', content: 'any agents down?' },
+    { role: 'user', content: 'and findings?' },
+  ]);
+});
+
+test('buildOutgoingMessages: a whitespace-only user message is still sent (the skip is assistant-only)', () => {
+  const outgoing = buildOutgoingMessages(
+    [{ id: 'a', role: 'user', content: '   ', createdAt: 1 }],
+    [],
+    false,
+  );
+  assert.deepEqual(outgoing, [{ role: 'user', content: '   ' }]);
 });

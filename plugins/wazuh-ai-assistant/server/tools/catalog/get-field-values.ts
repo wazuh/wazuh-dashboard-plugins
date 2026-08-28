@@ -16,6 +16,7 @@ import {
   FIELD_ALIASES,
   resolveFieldAlias,
 } from '../../../common/field-catalog';
+import { STATE_FAMILIES } from '../state-families';
 import {
   objectSchema,
   optionalStringParam,
@@ -140,6 +141,37 @@ export const FIELD_LOCATIONS: Record<string, FieldLocation[]> = {
 // needs no change here.
 for (const field of Object.values(COMPLIANCE_FRAMEWORK_FIELDS)) {
   FIELD_LOCATIONS[field] = [FINDINGS];
+}
+
+/**
+ * The state surfaces' field-discovery routes. Derived from `../state-families.ts` rather than
+ * hand-written here, because the SAME rows also produce `search_wazuh_data`'s enum and
+ * `guardrails.ts`'s aggregation allowlist: a field that can be enumerated on an index the enum
+ * cannot name is unreachable, and an index the enum can name whose fields cannot be discovered is
+ * unanswerable. The header comment above still holds for the distinction it makes -- the WCS
+ * catalog says a field EXISTS, not which index carries it for this product -- and
+ * `state-families.ts` is where that second, product-owned fact lives for the state surfaces.
+ *
+ * APPEND-ONLY and de-duplicated by tool family, deliberately: a field's FIRST location is its
+ * default when the caller omits `index_family`, so every pre-existing default above is preserved
+ * exactly (e.g. `host.os.name` still defaults to inventory_system, `package.name` to
+ * inventory_packages, `interface.state` to inventory_ports) and the new families only ever widen
+ * the choice.
+ */
+for (const stateFamily of STATE_FAMILIES) {
+  const { toolFamily } = stateFamily;
+  if (!toolFamily) {
+    continue;
+  }
+  for (const field of stateFamily.aggFields) {
+    if (FIELD_LOCATIONS[field] === undefined) {
+      FIELD_LOCATIONS[field] = [];
+    }
+    const locations = FIELD_LOCATIONS[field];
+    if (!locations.some(location => location.family === toolFamily)) {
+      locations.push({ family: toolFamily, index: stateFamily.pattern });
+    }
+  }
 }
 
 const ALL_FAMILIES = Array.from(

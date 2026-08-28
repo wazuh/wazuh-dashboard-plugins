@@ -51,6 +51,57 @@ test('get_sca_checks: buildRequest targets wazuh-states-sca* with agent+policy t
   assert.equal(req.body.size, 20);
 });
 
+// `check_id` used to be a resolution-only input: `resolveScaCheckParams` read it to find the
+// owning agent/policy and `buildRequest` then ignored it, so a single-check question executed a
+// policy-wide query and got back a `limit`-truncated sample that usually did not contain the
+// requested check at all. These three guard that it now narrows the executed query.
+test('get_sca_checks: check_id becomes a term filter on check.id, narrowing the rows to that check', () => {
+  const req = buildIndexer({
+    agent_id: '001',
+    policy_id: 'cis_ubuntu24-04',
+    check_id: '35509',
+  });
+  assert.deepEqual(filters(req), [
+    { term: { 'wazuh.agent.id': '001' } },
+    { term: { 'policy.id': 'cis_ubuntu24-04' } },
+    { term: { 'check.id': '35509' } },
+  ]);
+  // In `query.bool.filter`, NOT `post_filter`: the narrowing has to scope the aggregations too,
+  // or a policy-wide result distribution is reported beside one check's single row.
+  assert.equal(postFilter(req), undefined);
+  // The field a remediation question is about has to be projected on this same call.
+  assert.ok(
+    (req.body._source as string[]).includes('check.remediation'),
+    'check.remediation must be in the projection for a remediation question',
+  );
+});
+
+test('get_sca_checks: check_id is trimmed, and combines with a result filter', () => {
+  const req = buildIndexer({
+    agent_id: '001',
+    policy_id: 'cis_ubuntu24-04',
+    check_id: '  35509  ',
+    result: 'failed',
+  });
+  assert.deepEqual(filters(req), [
+    { term: { 'wazuh.agent.id': '001' } },
+    { term: { 'policy.id': 'cis_ubuntu24-04' } },
+    { term: { 'check.id': '35509' } },
+    { term: { 'check.result': 'Failed' } },
+  ]);
+});
+
+test('get_sca_checks: an absent or whitespace-only check_id adds no filter clause', () => {
+  const bare = buildIndexer({ agent_id: '001', policy_id: 'cis_ubuntu24-04' });
+  assert.equal(filters(bare).length, 2);
+  const blank = buildIndexer({
+    agent_id: '001',
+    policy_id: 'cis_ubuntu24-04',
+    check_id: '   ',
+  });
+  assert.equal(filters(blank).length, 2);
+});
+
 test('get_sca_checks: result becomes a term filter; search becomes exact-OR-prefix in post_filter', () => {
   const req = buildIndexer({
     agent_id: '000',
@@ -601,4 +652,18 @@ test('get_sca_checks: review D1 — a 5-row digest of LIVE-SIZED rationale/remed
       digestChars * 4
     } chars) to stay under CONTEXT_CHAR_BUDGET (${CONTEXT_CHAR_BUDGET}), preserving the CV-069 5-agent sweep`,
   );
+});
+
+test('get_sca_checks: the agent_id description tells the model to resolve a NAMED host to an id', () => {
+  // A description that only explains when to OMIT agent_id invites a named-host question to be
+  // answered with no agent scope at all -- and omission does not search across agents, it resolves to
+  // one, so the call answers about the wrong host and returns 0 rows.
+  const properties = getScaChecksTool.spec.parameters.properties as Record<
+    string,
+    { description?: string }
+  >;
+  const description = properties.agent_id.description ?? '';
+  assert.match(description, /If the user named a host/);
+  assert.match(description, /resolve that name to its numeric id first/);
+  assert.match(description, /does NOT search across agents/);
 });

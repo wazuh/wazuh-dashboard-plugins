@@ -120,3 +120,63 @@
 .wzConvoRailCollapsedSpacer {
   flex: 1 1 auto;
 }
+
+/**
+ * Real list markup (E5/#9010, conversation-list.tsx): one `<ul>` per date group, so a screen
+ * reader announces "list, N items" the way `EuiListGroup` does — previously each row was a plain
+ * `<div>`, with no list semantics at all. Reset to zero visual effect: no browser default has any
+ * business showing up in a "no redesign" change, only the actual accessibility markup does.
+ */
+.wzConvoRailGroupList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/** `padding-bottom` replaces the `<EuiSpacer size="xs" />` (4px) that used to sit between rows when
+ * they were flat siblings rather than `<li>`s — same visual gap, now expressed as the list item's
+ * own spacing rather than an extra DOM node between each pair. Applied unconditionally, with no
+ * `:last-child` exception (F-10, #9010 review — the previous wording here claimed the opposite):
+ * the PRE-existing markup rendered that same `<EuiSpacer size="xs" />` after EVERY conversation,
+ * including the last one in each date group, so this rule matching that unconditionally is what
+ * keeps the gap byte-identical, not an exception to it.
+ *
+ * `padding-bottom`, NOT `margin-bottom` (#9010 review, F-11): a margin on the last `<li>` of one
+ * group's `<ul>` collapses through that `<ul>`'s own end into the next group's 10px
+ * `margin-top` (`.wzConvoRailGroupHeader` above), CSS margin-collapsing rules that don't apply to
+ * an element with no visible box between siblings — so the measured gap at every group boundary
+ * was 10px, not the intended 14px. Padding never collapses, and the `<li>` paints no background
+ * or border, so this reads visually identical to the row above it either way. */
+.wzConvoRailListItem {
+  margin: 0;
+  padding: 0 0 4px;
+  list-style: none;
+}
+
+/**
+ * The destructive entry in a row's overflow menu (conversation-list.tsx's `rowMenuItems`).
+ *
+ * `EuiContextMenuItem` takes no `color` prop, so the danger tone has to be applied here. It goes on
+ * the LABEL; the icon carries its own `color='danger'` at the call site. Colouring only the icon
+ * left the one irreversible action reading exactly like the others at a glance, which is the
+ * opposite of what a destructive entry in a menu owes the reader.
+ *
+ * `$euiColorDangerText`, not `$euiColorDanger`: the former is the theme's text-on-background danger
+ * value and is the one that holds its contrast ratio in both themes — the fill colour does not.
+ * A SASS value rather than a `var()` because it is compiled per theme already and this rule has no
+ * runtime state to track.
+ */
+.wzConvoRowMenuDanger .euiContextMenuItem__text {
+  color: $euiColorDangerText;
+}
+
+/** EUI's `.euiFlexGroup` carries `flex-grow: 1`. These two rows are direct children of
+ * `.wzConvoRail`, a height:100% COLUMN flex container, so an un-neutralised grow made the
+ * search/select row absorb ~50% of the rail's free space (measured 218px instead of 32px)
+ * and centre the field inside it. */
+.wzConvoRailSearchRow {
+  flex-grow: 0;
+  /* gutterSize's negative margin bled 2px past .wzConvoRail's overflow:hidden, clipping the
+     select button's focus ring on the right. */
+  padding: 0 2px;
+}

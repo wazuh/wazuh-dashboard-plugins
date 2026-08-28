@@ -119,6 +119,133 @@ test('executeToolCall: privacy off leaves get_agent_inventory digest completely 
   assert.equal(digest.samples[0]['package.version'], '3.118ubuntu5');
 });
 
+// --- Issue #9008 rework: `TableSpec.provenance` must carry only FACTS the executor actually
+// observed -- never a client-invented default, and never attributed to the wrong call. These
+// exercise the real `executeToolCall` -> `executeIndexerRequest`/`executeManagerRequest` wiring,
+// not a helper that could quietly omit a field. ---------------------------------------------------
+
+/** Minimal Manager-API context stub: `resolveApiHostId` (api-host.ts) needs
+ * `context.wazuh_core.manageHosts.get()` (no cookie on `request.headers`, so it always takes the
+ * first-configured-host fallback) and `context.wazuh_core.api.client.asCurrentUser.request` for
+ * the call itself. */
+function fakeManagerContext(
+  affectedItems: Array<Record<string, unknown>>,
+): ExecContext {
+  return {
+    wazuh_core: {
+      manageHosts: { get: () => Promise.resolve([{ id: 'default' }]) },
+      api: {
+        client: {
+          asCurrentUser: {
+            request: () =>
+              Promise.resolve({
+                data: {
+                  data: {
+                    affected_items: affectedItems,
+                    total_affected_items: affectedItems.length,
+                  },
+                },
+              }),
+          },
+        },
+      },
+    },
+  } as unknown as ExecContext;
+}
+const fakeManagerRequest = { headers: {} } as unknown as ExecRequest;
+
+test('executeToolCall: get_agent_inventory (no time-range concept) records no requestedRange/effectiveRange, and is not clamped', async () => {
+  // Blocker 1: 18 catalog tools carry no time_range_gte/lte parameter at all -- their DSL never
+  // has a range clause, so provenance must report NOTHING about a window, never a fabricated
+  // "now-90d" default.
+  const context = fakeSearchContext([{ package: { name: 'adduser' } }]);
+  const outcome = await executeToolCall(
+    {
+      id: 'call-1',
+      name: 'get_agent_inventory',
+      arguments: { agent_id: '001', kind: 'packages' },
+    },
+    context,
+    fakeRequest,
+    undefined,
+  );
+  const provenance = outcome.tableEvent?.spec.provenance;
+  assert.ok(provenance, 'expected a provenance object on the table event');
+  assert.equal(provenance?.index, 'wazuh-states-inventory-packages*');
+  assert.equal(provenance?.requestedRange, undefined);
+  assert.equal(provenance?.effectiveRange, undefined);
+  assert.equal(provenance?.clamped, false);
+});
+
+test('executeToolCall: get_critical_findings within the 90-day cap records matching, unclamped ranges', async () => {
+  const context = fakeSearchContext([{ 'wazuh.rule.level': 'critical' }]);
+  const outcome = await executeToolCall(
+    {
+      id: 'call-1',
+      name: 'get_critical_findings',
+      arguments: { time_range_gte: 'now-7d' },
+    },
+    context,
+    fakeRequest,
+    undefined,
+  );
+  const provenance = outcome.tableEvent?.spec.provenance;
+  assert.ok(provenance);
+  assert.equal(provenance?.clamped, false);
+  assert.deepEqual(provenance?.requestedRange, { gte: 'now-7d', lte: 'now' });
+  assert.deepEqual(provenance?.effectiveRange, { gte: 'now-7d', lte: 'now' });
+});
+
+test('executeToolCall: get_critical_findings past the 90-day cap is clamped, and provenance records BOTH windows', async () => {
+  // Blocker 1 fixture note: "now-2y" is not a value the server's own `validateTimeBound`
+  // (catalog/common.ts) ever accepts for a typed tool's time_range_gte -- only "now-N[dhm]" or
+  // ISO-8601. "now-720d" (≈2 years) is the reachable equivalent.
+  const context = fakeSearchContext([{ 'wazuh.rule.level': 'critical' }]);
+  // Captured BEFORE the call, not just after -- a real lower bound, so `executedAt` is pinned
+  // to the actual call window on both sides rather than only checked against an upper bound.
+  const before = Date.now();
+  const outcome = await executeToolCall(
+    {
+      id: 'call-1',
+      name: 'get_critical_findings',
+      arguments: { time_range_gte: 'now-720d' },
+    },
+    context,
+    fakeRequest,
+    undefined,
+  );
+  const after = Date.now();
+  const provenance = outcome.tableEvent?.spec.provenance;
+  assert.ok(provenance);
+  assert.equal(provenance?.clamped, true);
+  assert.deepEqual(provenance?.requestedRange, { gte: 'now-720d', lte: 'now' });
+  // The clamped effective window is rewritten to absolute ISO bounds spanning EXACTLY 90 days
+  // (guardrails.ts's `clampLookbackWindow`/`MAX_LOOKBACK_MS`) -- never the requested one.
+  const effective = provenance?.effectiveRange;
+  assert.ok(effective);
+  const spanMs = Date.parse(effective!.lte) - Date.parse(effective!.gte);
+  assert.equal(spanMs, 90 * 24 * 60 * 60 * 1000);
+  // Issue #9008 review, blocker 2: the instant the query actually ran, recorded as a plain
+  // number at creation time -- what `describeProvenance` (tool-call-label.ts) resolves a
+  // date-math bound against instead of the render-time clock.
+  assert.equal(typeof provenance?.executedAt, 'number');
+  assert.ok(provenance!.executedAt! >= before);
+  assert.ok(provenance!.executedAt! <= after);
+});
+
+test('executeToolCall: a Manager-API table carries no provenance at all (no index/DSL concept)', async () => {
+  const context = fakeManagerContext([{ id: '001', name: 'agent-1' }]);
+  const outcome = await executeToolCall(
+    { id: 'call-1', name: 'get_agents', arguments: {} },
+    context,
+    fakeManagerRequest,
+    undefined,
+  );
+  assert.equal(outcome.tableEvent?.spec.provenance, undefined);
+  // Sanity: this really did go through the Manager-API success path, not a swallowed error.
+  assert.equal(outcome.tableEvent?.spec.rows.length, 1);
+});
+
 test('executeToolCall: unlisted-field fail-closed tracks failClosedFieldPolicy, not deriveColumns (decoupling proof)', async () => {
   // Flips ONLY `failClosedFieldPolicy` on the real, registered get_agent_inventory tool --
   // `deriveColumns` stays `true` throughout. If the executor still keyed off `deriveColumns` (the
@@ -1051,4 +1178,116 @@ test('bound disclosure: a request already within the 90-day cap gets no disclosu
   assert.ok(
     !(digest.hint as string | undefined)?.includes('Time window capped'),
   );
+});
+
+// --- The resolveParams FAILURE half goes through the same scrub as the success half ------------
+// An ambiguity reason enumerates candidate hostnames by name and becomes the tool error the provider
+// reads, so an unscrubbed one carries them in the clear under privacy mode -- the same shape as the
+// note side, on the other branch of the same `if`.
+
+/** Context whose Indexer `search` answers a sole-candidate terms probe with `buckets`, so
+ * `search_findings_by_agent`'s omitted `agent_name` reaches the 'many' ambiguity branch. */
+function fakeTermsProbeContext(names: string[]): ExecContext {
+  return {
+    core: {
+      opensearch: {
+        client: {
+          asCurrentUser: {
+            search: () =>
+              Promise.resolve({
+                body: {
+                  aggregations: {
+                    candidates: {
+                      buckets: names.map(key => ({ key, doc_count: 1 })),
+                    },
+                  },
+                },
+              }),
+          },
+        },
+      },
+    },
+  } as unknown as ExecContext;
+}
+
+test('executeToolCall: an ambiguous param-resolution error is pseudonymized before it becomes the tool error', async () => {
+  const privacy: PrivacyContext = {
+    pseudonymizer: new Pseudonymizer([]),
+    fieldPolicy: FIELD_POLICY_DEFAULTS,
+  };
+  const outcome = await executeToolCall(
+    { id: 'call-1', name: 'search_findings_by_agent', arguments: {} },
+    fakeTermsProbeContext(['dc-01', 'bastion-01']),
+    fakeRequest,
+    privacy,
+  );
+
+  const { error } = JSON.parse(outcome.toolResultContent) as { error: string };
+  assert.ok(error, 'the ambiguous lookup must fail, not resolve silently');
+  assert.doesNotMatch(error, /dc-01/);
+  assert.doesNotMatch(error, /bastion-01/);
+  // Still an ambiguity disclosure -- the candidates are named, just as pseudonyms.
+  assert.match(error, /HOST_\d/);
+  assert.match(error, /cannot be assumed/);
+});
+
+test('executeToolCall: with privacy OFF the same ambiguity error names the candidates in the clear, unchanged', async () => {
+  const outcome = await executeToolCall(
+    { id: 'call-1', name: 'search_findings_by_agent', arguments: {} },
+    fakeTermsProbeContext(['dc-01', 'bastion-01']),
+    fakeRequest,
+    undefined,
+  );
+
+  const { error } = JSON.parse(outcome.toolResultContent) as { error: string };
+  assert.match(error, /dc-01/);
+  assert.match(error, /bastion-01/);
+});
+
+test('executeToolCall: a single-candidate agent_name lookup resolves and its note is pseudonymized', async () => {
+  const privacy: PrivacyContext = {
+    pseudonymizer: new Pseudonymizer([]),
+    fieldPolicy: FIELD_POLICY_DEFAULTS,
+  };
+  // First call is the terms probe (buckets), every later call is the real search (hits).
+  let calls = 0;
+  const context = {
+    core: {
+      opensearch: {
+        client: {
+          asCurrentUser: {
+            search: () => {
+              calls += 1;
+              return Promise.resolve({
+                body:
+                  calls === 1
+                    ? {
+                        aggregations: {
+                          candidates: {
+                            buckets: [{ key: 'dc-01', doc_count: 3 }],
+                          },
+                        },
+                      }
+                    : { hits: { total: { value: 0 }, hits: [] } },
+              });
+            },
+          },
+        },
+      },
+    },
+  } as unknown as ExecContext;
+
+  const outcome = await executeToolCall(
+    { id: 'call-1', name: 'search_findings_by_agent', arguments: {} },
+    context,
+    fakeRequest,
+    privacy,
+  );
+
+  const digest = JSON.parse(outcome.toolResultContent) as {
+    assumptionNote?: string;
+  };
+  assert.ok(digest.assumptionNote, 'the assumption must be disclosed');
+  assert.doesNotMatch(digest.assumptionNote as string, /dc-01/);
+  assert.match(digest.assumptionNote as string, /HOST_\d/);
 });

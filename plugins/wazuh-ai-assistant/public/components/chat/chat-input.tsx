@@ -62,13 +62,23 @@ export const ChatInput = React.forwardRef<ChatInputHandle, ChatInputProps>(
       [],
     );
 
-    // autoFocus only fires on mount; also focus when the input becomes enabled after providers
-    // finish loading (e.g. the Chat tab is opened before the provider list has resolved).
+    // The single source of truth for whether the field is actually inert. Both the rendered
+    // `disabled` attribute below and the re-focus effect must read THIS, never `disabled` alone:
+    // the effect used to depend on `[disabled]` while the attribute applied `disabled ||
+    // isGenerating`, so it never re-ran when a stream ended and `isGenerating` flipped back to
+    // false. Disabling a focused element blurs it, so that blur was never undone and the caret
+    // was lost on every turn — the parent's imperative `focus()` on turn completion lands in the
+    // same render pass, while the element is still disabled, and cannot fix it either.
+    const isInert = disabled || isGenerating;
+
+    // autoFocus only fires on mount; also focus when the field becomes editable again — after
+    // providers finish loading (e.g. the Chat tab is opened before the provider list has
+    // resolved), and after a streaming turn completes.
     useEffect(() => {
-      if (!disabled) {
+      if (!isInert) {
         textAreaRef.current?.focus();
       }
-    }, [disabled]);
+    }, [isInert]);
 
     // Autogrow, capped at WZ_COMPOSER_MAX_ROWS then scrolling internally (contract §2: "autogrow to 5 rows then
     // internal scroll"). `lineHeight`/padding are read from the field's OWN computed style rather
@@ -136,7 +146,7 @@ export const ChatInput = React.forwardRef<ChatInputHandle, ChatInputProps>(
         // `.wzComposerRow--roomy .wzComposerTextarea` (chat-page.scss) for why the 600-900px
         // sidecar must not get it. Nothing here needs to know about that prop.
         className='wzComposerTextarea'
-        disabled={disabled || isGenerating}
+        disabled={isInert}
         value={value}
         style={{
           border: 'none',

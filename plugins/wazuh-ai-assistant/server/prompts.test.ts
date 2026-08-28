@@ -819,21 +819,141 @@ test(
   },
 );
 
-test(
-  'CV-058 fix: Windows registry FIM questions get a dedicated honest-empty decline (no tool ' +
-    'AND zero documents on a Linux-only fleet), not a bare zero-row table',
-  () => {
-    const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
-    assert.match(
-      prompt,
-      /Windows registry FIM changes \(registry keys\/values\)/,
-    );
-    assert.match(
-      prompt,
-      /this deployment's monitored hosts are Linux-only, so no registry documents exist here/,
-    );
-  },
-);
+// Registry FIM must be ROUTED, never declined: `wazuh-states-*` reaches
+// wazuh-states-fim-registry-keys/-values, both allowlisted by guardrails.ts, and a decline fires
+// BEFORE any query so it cuts the model off from data that exists. These tests pin all three
+// halves: the route is stated, no decline copy survives, and the absence claim stays gated behind
+// an actual zero-row result.
+test('registry FIM is ROUTED to the escape hatch, never declined up front', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /never decline a registry question before querying it/);
+  assert.match(
+    prompt,
+    /search_wazuh_data with index_pattern "wazuh-states-\*"/,
+  );
+  assert.match(prompt, /wazuh-states-fim-registry-keys/);
+  assert.match(prompt, /wazuh-states-fim-registry-values/);
+});
+
+test('the old registry decline copy is gone from the prompt entirely', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.doesNotMatch(
+    prompt,
+    /I don't have Windows registry change data/,
+    'the decline copy the model recited verbatim, with zero tool calls',
+  );
+  assert.doesNotMatch(
+    prompt,
+    /Windows registry FIM changes \(registry keys\/values\)/,
+  );
+});
+
+test('an absence claim about registry data is gated behind a real zero-row result', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /Only after such a query comes back with zero rows may you state an absence/,
+  );
+  assert.match(
+    prompt,
+    /never a product limit/,
+    'the narrow "nothing matched" fact is not the same claim as "the product cannot read this"',
+  );
+});
+
+// No prompt string may claim what platforms this deployment monitors: hardcoding a fleet fact
+// ("monitored hosts are Linux-only") makes every answer that recites it a fabrication on a fleet
+// where it is false. The ban is on the shape, so it has to hold wherever registry FIM is
+// discussed, not only inside a decline.
+test('no copy asserts what platforms this deployment monitors', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.doesNotMatch(prompt, /Linux-only/);
+  assert.doesNotMatch(prompt, /monitored hosts are/);
+  assert.match(
+    prompt,
+    /never assert anything about which platforms this deployment monitors or whether registry documents exist here/,
+  );
+});
+
+// --- The bounded widening retry -----------------------------------------------------------------
+// The prompt half only works with the affordance half: chat.ts's
+// `shouldGrantZeroRowWideningRound` is what leaves a tool-bearing round for the model to obey this
+// clause in.
+test('one widened attempt is required before declaring nothing found', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /make EXACTLY ONE more attempt before saying you found nothing/,
+  );
+  assert.match(prompt, /never abstain on the first zero-row result alone/);
+});
+
+test('the widening clause is hard-capped at one retry, not a loop', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  const clause = prompt.slice(
+    prompt.indexOf('When a query comes back with zero rows'),
+  );
+  const sentence = clause.slice(
+    0,
+    clause.indexOf('first zero-row result alone'),
+  );
+  assert.match(
+    sentence,
+    /one, not a series/,
+    'the widening retry adds a latency tail, so the cap has to be stated, not implied',
+  );
+  assert.match(sentence, /Never make a third variation/);
+});
+
+test('the widening clause names the three concrete moves to spend the retry on', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /drop the narrowest filter/);
+  assert.match(prompt, /correct a filter VALUE you suspect was wrong/);
+  assert.match(prompt, /switch to the surface that actually holds the data/);
+});
+
+// --- The widening retry is pinned to the SAME question ------------------------------------------
+// Buying the round is not enough: unpinned, the retry is spent on another exploratory probe and the
+// typed tool is never called. chat.ts's `shouldGrantZeroRowWideningRound` refuses the grace to a
+// discovery-only round; this is the prose half of the same rule.
+test('the retry must target the same question with exactly one thing changed', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /THE SAME QUESTION with exactly ONE thing changed/);
+  assert.match(prompt, /never a fresh exploration of what might be available/);
+});
+
+test('the retry may not be spent probing again after an empty probe', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /a discovery call that comes back empty has ANSWERED you/,
+  );
+  assert.match(prompt, /not a third guess at a field name/);
+});
+
+test('the escape hatch is described as one enum value per state index', () => {
+  // The enum carries one value per physical index (see catalog/generic-query-families.ts), so the
+  // prompt must not name a non-existent index or point at the wildcard as the route.
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /ONE ENUM VALUE PER INDEX/);
+  assert.match(prompt, /wazuh-states-inventory-services\*/);
+  assert.doesNotMatch(prompt, /system_services/);
+});
+
+test('verify-before-filter now claims the current-state surfaces too', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /This now covers the current-state surfaces as well/);
+});
+
+// The decline block's numbering is internal bookkeeping: without this rule the model quotes it
+// ("this is one of the five fixed-scope decline cases") into user-facing copy.
+test('the decline block forbids narrating that a list of declines exists', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /never tell the user that a list, class, category or numbered set of declines exists, and never label your answer as one of them/,
+  );
+});
 
 // --- Group F: check.result casing (CV-094) ------------------------------------------------------
 
@@ -848,3 +968,273 @@ test(
     );
   },
 );
+
+// --- Intent-conditional answer format -----------------------------------------------------------
+//
+// The default format rule (roughly 120 words, three bullets, "do not assess risk unless asked") is
+// correct for lookup/count/status questions and makes an explanatory answer unwritable. The
+// relaxation is scoped BY INTENT, so both halves need pinning: the tight default must survive, and
+// the explain/assess/advise intents must escape it with a named answer shape.
+
+test('the tight default answer format is still stated for lookup-style questions', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /Keep the whole answer under roughly 120 words unless the user asks for more/,
+  );
+  assert.match(prompt, /at most three short bullet points/);
+  assert.match(
+    prompt,
+    /That format is for lookup, count, and status questions/,
+    'the relaxation must name the intents the tight format keeps, or it reads as a global lift',
+  );
+});
+
+test('explain/assess/advise intents are exempted from the word, bullet and risk caps', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /When the user asks you to EXPLAIN, assess, or advise/);
+  assert.match(
+    prompt,
+    /the roughly-120-word cap, the\s+three-bullet cap and the "do not assess risk unless asked" rule do NOT apply/,
+  );
+});
+
+test('the explanatory answer shape is what happened/how detected -> why it matters -> actions with rationale', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  // Detection provenance belongs to the GROUNDED part. Listing "how it was detected" among the
+  // knowledge topics licenses an invented rule id or detector name when nothing returned one, so
+  // part (1) owns what detected it here and part (2) owns only the generic pattern.
+  assert.match(
+    prompt,
+    /\(1\) what happened AND how it was detected here \(rule ids, rule titles, detectors, and every other fact about this environment strictly from the results in hand/,
+  );
+  assert.match(
+    prompt,
+    /if the results do not name what detected it, say so instead of guessing/,
+  );
+  assert.match(
+    prompt,
+    /\(2\) why it matters, and how this class of activity is typically detected or abused in general/,
+  );
+  assert.match(
+    prompt,
+    /\(3\) the recommended next actions, each with a one-line rationale/,
+  );
+});
+
+test('the system-prompt allowance carries its own fence, so a non-final round is safe too', () => {
+  // The door and the fence must ship together. FINAL_ROUND_ANSWER_INSTRUCTION only fires when a
+  // round is BOTH final and tool-using, while this paragraph is in every round's system prompt --
+  // so a round-1 answer (the common case) would get the knowledge allowance with none of the
+  // safety clauses if they lived only in chat.ts. Each clause is pinned here.
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /Parts \(2\) and \(3\) may draw on your general security knowledge/,
+  );
+  assert.match(prompt, /keep them clearly separate from part \(1\)/);
+  assert.match(
+    prompt,
+    /frame them as guidance rather than as something observed in this environment/,
+  );
+  assert.match(prompt, /say they should be verified before acting on them/);
+  assert.match(
+    prompt,
+    /never present general knowledge as an environment fact/,
+  );
+  assert.match(prompt, /never invent data to support it/);
+});
+
+test('the relaxation does not lift the no-headings, no-table or grounding rules', () => {
+  // The markdown-table filter (markdown-table-filter.ts) still strips tables from prose, and the
+  // grounding rule is the one thing no intent may relax -- a richer SHAPE must not become a licence
+  // to state data the results do not contain. The grounding clause is scoped to environment data
+  // rather than to "anything the results do not show", which parts (2) and (3) contradict.
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /Still no headings and no markdown tables, still no data point about this environment that the results do not show/,
+  );
+  // A longer answer does not outgrow the two obligations the default format bullet carries, and
+  // the three-part paragraph supersedes that bullet, so it has to re-state them itself.
+  assert.match(
+    prompt,
+    /the truncation disclosure and the ban on enumerating individual rows or timestamps in prose still apply/,
+  );
+});
+
+// --- A NAMED host must reach an id-only tool as an id -------------------------------------------
+// Two failure shapes this pins: omitting the agent parameter (which triggers sole-active-agent
+// resolution, NOT "across all agents", so the call answers about a different host), and passing a
+// NAME in a numeric agent_id (rejected outright). The prompt's other host rules cover only the case
+// where no host is named.
+
+test('buildSystemPrompt: tells the model to resolve a NAMED host to an id for agent_id-only tools', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /When the user DOES name a host and the tool you need takes a numeric agent id only/,
+  );
+  assert.match(prompt, /resolve that name to its id first/);
+  assert.match(
+    prompt,
+    /do not put the name itself in a numeric agent_id/i,
+    'a name in a numeric parameter is rejected by validateAgentId',
+  );
+  assert.match(
+    prompt,
+    /an omitted agent id either scopes the call to one agent chosen for you or drops the host scope entirely/,
+    'must state what omission really does -- the wrong reading is what produced the regression',
+  );
+});
+
+test('buildSystemPrompt: the new resolution clause names no tool to call', () => {
+  // Telling the model to call a specific lookup tool is useless when stage-1 routing did not offer
+  // it (see #8913), so the clause has to stay tool-agnostic.
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  const clause = prompt.slice(prompt.indexOf('When the user DOES name a host'));
+  const sentence = clause.slice(0, clause.indexOf('unscoped.'));
+  assert.doesNotMatch(sentence, /call get_agents/);
+  assert.match(
+    sentence,
+    /any tool available to you this turn that accepts an agent name/,
+  );
+});
+
+// --- Cite the concrete fix, and the state-vs-history surface split ------------------------------
+
+// Both halves of the clause are pinned: quote the scanner's own fix bound when a result carries
+// one, and disclose the silence when the item's remediation field is empty -- otherwise the answer
+// is generic advice that never touches the item it was asked about.
+test('part (3) must cite a concrete fix from the results before any general advice', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /When a result in hand carries a CONCRETE fix -- a fixed or patched version, a KB or advisory id, a scanner fix condition, a remediation text -- part \(3\) must cite that specific fix first/,
+  );
+  assert.match(prompt, /quoting the value, before any general advice/);
+});
+
+test('an empty fix field must be disclosed, not filled with the model\u2019s own steps', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /when the item has such a field and it is empty or absent, say plainly that no fix was supplied for it rather than presenting your own general steps as the product's remediation/,
+  );
+});
+
+// The SCA-specific sibling of the clause above: the synthesis rule covers a missing
+// check.rationale, and a remediation answer turns on the separate check.remediation field.
+test('an empty check.remediation is stated plainly, and own steps are marked as guidance', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /if check\.remediation is empty or absent, say plainly that no remediation text was returned for that check before offering any steps of your own/,
+  );
+  assert.match(prompt, /never present them as the check's own remediation/);
+  // The pre-existing rationale half must survive the addition.
+  assert.match(prompt, /no rationale text was returned for that check/);
+});
+
+// The state and findings surfaces carry different host lists for the same CVE, so disclosing a
+// substitution is not enough: the prompt has to say the two surfaces answer different questions.
+test('current state and detection history are named as non-substitutable surfaces', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /Current state and detection history are two different surfaces and never substitute for one another/,
+  );
+  assert.match(
+    prompt,
+    /the wazuh-states-\* data \(vulnerabilities, SCA, inventory\) is what IS true now, while findings are what WAS detected, and when/,
+  );
+  assert.match(prompt, /the wording of the question picks the surface/);
+  assert.match(
+    prompt,
+    /If only the other surface is reachable this turn, name the one you actually read and say it answers a different question/,
+  );
+});
+
+// --- Three answer-level rules, each pinned at the layer that owns it ---------------------------
+// A severity must be quoted from the row rather than inferred; an answer must narrate the incident
+// asked about rather than a neighbouring one; and a deictic incident reference must not end the turn
+// in a clarification request with no tool call.
+
+test('a severity must be quoted from the item own row, never inferred', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /A severity, level or score is a quoted FACT, never an inference/,
+  );
+  assert.match(
+    prompt,
+    /never derived from the\s+technique, the rule wording, the incident around it, or how\s+serious the activity sounds/,
+  );
+  assert.match(
+    prompt,
+    /An item in a serious chain can legitimately carry a low\s+level/,
+  );
+});
+
+test('a severity breakdown may not be read as the severity of a named item', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /how many\s+rows carry each level, never WHICH row carries which/,
+  );
+  assert.match(
+    prompt,
+    /never attach a level from a\s+breakdown to a named item/,
+  );
+  assert.match(
+    prompt,
+    /say its severity was not in the results rather than assigning one/,
+  );
+});
+
+test('the answer must be about the incident asked about, not the biggest one in the result set', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /When the question names a particular incident, activity class, or detection channel/,
+  );
+  assert.match(prompt, /wazuh\.integration\.category and rule title/);
+  assert.match(
+    prompt,
+    /never narrate the largest or most alarming\s+one as if it were the one asked about/,
+  );
+});
+
+test('an integration-sourced finding names its collector, not a victim host', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /the host whose agent\s+INGESTED the record/);
+  assert.match(
+    prompt,
+    /Never conclude from such a row alone that the agent it is\s+filed under was itself attacked or compromised/,
+  );
+});
+
+test('a deictic INCIDENT reference earns one scoped attempt, not a clarification request', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(prompt, /A deictic reference to an INCIDENT rather than a host/);
+  assert.match(
+    prompt,
+    /is NOT a\s+reason to answer with a clarification request and no tool call/,
+  );
+  assert.match(
+    prompt,
+    /Make ONE scoped attempt at the\s+most reasonable default/,
+  );
+});
+
+test('the scoped attempt carries the shipped assumption-note pattern, and clarification stays a post-result move', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /state in your answer the assumption you made \(e\.g\. "Assuming you\s+mean/,
+  );
+  assert.match(
+    prompt,
+    /only when a result you\s+already have in hand shows several equally plausible candidates -- never in place of the\s+first call/,
+  );
+});

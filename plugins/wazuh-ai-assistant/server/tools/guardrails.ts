@@ -67,6 +67,7 @@ import {
   SEVERITY_LEVELS,
   COMPLIANCE_FRAMEWORK_FIELDS,
 } from '../../common/wazuh-fields';
+import { STATE_AGG_FIELDS } from './state-families';
 
 export type GuardrailCheck = { ok: true } | { ok: false; reason: string };
 
@@ -591,6 +592,22 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // cardinality class as the already-listed `wazuh.integration.category`.
   'event.category',
   'event.outcome',
+  // The `wazuh-states-*` schema. Without these entries `get_field_values` -- the tool whose whole
+  // job is "check the real values before you filter" -- cannot be pointed at any state surface, so
+  // the model guesses field names there and reads the rejection as proof the field does not exist.
+  //
+  // Derived, not hand-listed: `state-families.ts` declares the aggregation-safe field set PER index
+  // and filters every path through `common/field-catalog.ts` (the generated WCS catalog) at module
+  // load, so a platform-side rename fails a test instead of leaving a phantom entry here. Each path
+  // was verified with a real `terms` aggregation, the same evidence bar every hand-written entry
+  // above cites -- "probably keyword" is not enough, since a terms agg on a `text` mapping is a hard
+  // 400 the model can only read as an opaque failure. Cardinality safety is the same argument this
+  // Set's header comment makes for `source.ip`: MAX_AGG_SIZE (100) caps the returned bucket count
+  // whatever the field's cardinality is. PRIVACY is a separate boundary: every field added here
+  // needs an explicit `privacy.ts` classification, anonymizing the identifying ones (`user.name`,
+  // `group.name`/`group.users`, `network.ip`, `network.gateway`) exactly as `applyFieldPolicy`'s
+  // bucket-key path does for `source.ip`.
+  ...STATE_AGG_FIELDS,
 ]);
 
 /**

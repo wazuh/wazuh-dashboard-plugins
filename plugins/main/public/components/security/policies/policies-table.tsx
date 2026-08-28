@@ -17,6 +17,7 @@ export const PoliciesTable = ({
   pageSize,
   totalItems,
   onTableChange,
+  sorting,
 }) => {
   const [policiesState, setPoliciesState] = useState([]);
 
@@ -89,7 +90,6 @@ export const PoliciesTable = ({
     {
       field: 'policy.actions',
       name: 'Actions',
-      sortable: true,
       render: actions => {
         return (actions || []).sort((a, b) => a.localeCompare(b)).join(', ');
       },
@@ -98,13 +98,11 @@ export const PoliciesTable = ({
     {
       field: 'policy.resources',
       name: 'Resources',
-      sortable: true,
       truncateText: true,
     },
     {
       field: 'policy.effect',
       name: 'Effect',
-      sortable: true,
       truncateText: true,
     },
     {
@@ -122,7 +120,7 @@ export const PoliciesTable = ({
     },
     {
       align: 'right',
-      width: '5%',
+      width: '70',
       name: 'Actions',
       render: item => (
         <div onClick={ev => ev.stopPropagation()}>
@@ -149,13 +147,6 @@ export const PoliciesTable = ({
       ),
     },
   ];
-
-  const sorting = {
-    sort: {
-      field: 'id',
-      direction: 'asc',
-    },
-  };
 
   const pagination = {
     pageIndex,

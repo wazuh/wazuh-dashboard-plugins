@@ -989,6 +989,26 @@ $wzMsgAvatarColumn: 40px;
     outline: 2px solid var(--wz-accent, #{$euiColorPrimary});
     outline-offset: 1px;
   }
+
+  // The administrator-locked pill is `aria-disabled` + `tabIndex=0`, not `disabled` (chat-page.tsx
+  // explains why), so EUI paints no clickable/hover state on it at all and it needs its own focus
+  // ring — otherwise a keyboard reader lands on it invisibly. Cursor says "read me, don't click
+  // me"; the visible attribution line beside it says who set it.
+  &[aria-disabled='true'] {
+    cursor: default;
+
+    &:focus-visible {
+      outline: 2px solid var(--wz-accent, #{$euiColorPrimary});
+      outline-offset: 1px;
+    }
+  }
+}
+
+// The privacy explainer is two or three sentences. Inside a popover with no measure of its own it
+// would either run the full width EUI allows or wrap to a sliver, depending on the anchor's room —
+// so it gets an explicit reading measure, capped to the viewport for the narrow docked sidecar.
+.wzPrivacyHelpPanel {
+  max-inline-size: min(360px, 80vw);
 }
 
 @media (prefers-reduced-motion: no-preference) {
