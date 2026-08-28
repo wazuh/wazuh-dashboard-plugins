@@ -1074,7 +1074,7 @@ test('capDigest: an oversized "columns" list forces the Manager message to be dr
   );
 });
 
-// --- #8920 item 5: top-level metric aggregations are no longer dropped -------------------------
+// --- top-level metric aggregations are not dropped -----------------------------------------------
 
 test('isMetricAggValue: accepts {value: number|null}, rejects buckets/hits/non-object shapes', () => {
   assert.equal(isMetricAggValue({ value: 6 }), true);
@@ -1298,8 +1298,8 @@ test('buildDigest: a metric-only response carries metrics AND the synthesized ro
 });
 
 test('buildDigest: a metric agg BEFORE a bucket agg in key order no longer masks the bucket rows', () => {
-  // Reproduces the exact pre-fix defect: Object.keys(aggregations)[0] was "distinct_agents" (no
-  // .buckets), so bucketsToRows used to bail out to `undefined` before ever looking at "by_rule".
+  // Object.keys(aggregations)[0] is "distinct_agents" (no .buckets); bucketsToRows must keep
+  // looking rather than bail out to `undefined` before reaching "by_rule".
   const def = buildToolDef({
     tableSpec: {
       columns: [
@@ -1604,10 +1604,9 @@ test('buildDigest: a 100-bucket long-key aggregation is carried up to the char b
 });
 
 test('buildDigest: a 100-bucket SHORT-key enumeration that fits the budget is carried WHOLE, no note', () => {
-  // Regression pin for the char-budget design itself (issue #8935 integration review): a flat
-  // 50-bucket count cap trimmed a ~2.8k-char rule-id enumeration that demonstrably fit — cutting
-  // by a number when the information fits is the exact class this issue exists to remove. Passes
-  // on base too (base is unbounded); it exists to fail against any future flat count cap.
+  // Regression pin for the char-budget design: a flat 50-bucket count cap would trim a ~2.8k-char
+  // rule-id enumeration that fits the budget — cutting by bucket count when the content fits is
+  // the class of bug this guards against. Exists to fail against any future flat count cap.
   const def = buildToolDef({ digest: { sampleColumns: ['key'] } });
   const result = {
     aggregations: {
@@ -1711,11 +1710,9 @@ test('buildDigest: a multi-agg carry trim attributes hidden buckets to the RIGHT
 });
 
 test('buildDigest: five 100-bucket aggregations stay inside DIGEST_CHAR_CAP with every agg represented', () => {
-  // The GLOBAL-budget pin (issue #8935 integration review): guardrails allows MAX_TOP_LEVEL_AGGS
-  // (5) top-level aggregations, and a PER-AGG cap of 50 long-key entries produced ~21.5k chars —
-  // capDigest then silently deleted whole trailing aggregations behind a note claiming a top-50
-  // list. FAILS ON BASE (500 entries ride through into capDigest's silent pop) and against the
-  // per-agg-flat-cap variant of this fix.
+  // The GLOBAL-budget pin: guardrails allows MAX_TOP_LEVEL_AGGS (5) top-level aggregations, and a
+  // PER-AGG cap of 50 long-key entries produces ~21.5k chars — capDigest must not silently delete
+  // whole trailing aggregations behind a note claiming a top-50 list.
   const def = buildToolDef();
   const aggregations: Record<string, unknown> = {};
   const aggNames = ['by_rule', 'by_agent', 'by_level', 'by_cat', 'by_tech'];
@@ -1894,7 +1891,7 @@ test('buildDigest: a synthetic breakdown with every dimension at or under BREAKD
   assert.ok(!('breakdownNote' in digest));
 });
 
-// --- issue #8935 Guarantee 2: the digest states what its numbers cover, in BOTH directions --------
+// --- the digest states what its numbers cover, in BOTH directions ---------------------------------
 
 test('buildDigest: a complete real breakdown claims the whole matched set and all distinct values', () => {
   // The point of the claim: OpenSearch computes an aggregation over every matched document, so these
@@ -1954,7 +1951,7 @@ test('buildDigest: a sample that IS the whole set is not described as a sample',
   assert.doesNotMatch(digest.coverage!, /a sample of/);
 });
 
-// --- P-2 (AI/plan/a1a-review.md): getByPath must traverse arrays -------------------------------
+// --- getByPath must traverse arrays -------------------------------------------------------------
 
 test('getByPath: resolves a dotted path through an array instead of stopping at it', () => {
   const row = {
@@ -1979,4 +1976,98 @@ test('getByPath: unchanged behavior for a plain object/scalar path (no array on 
   const row = { wazuh: { rule: { title: 'x' } } };
   assert.equal(getByPath(row, 'wazuh.rule.title'), 'x');
   assert.equal(getByPath(row, 'wazuh.rule.missing'), undefined);
+});
+
+// --- DIGEST_FIELD_MAX_LENGTH_DEFAULTS: cross-tool per-field caps ------------------------------
+// `wazuh.rule.description` and `process.command_line` are free prose in finding/event digest
+// samples. They are capped tighter than MAX_FIELD_VALUE_LENGTH here rather than in each of the
+// eleven finding tools, so a twelfth one cannot add the columns and forget the cap. The tool's own
+// `sampleFieldMaxLength` (SCA's precedent) still wins.
+
+/** `getByPath` (digest.ts) splits a dotted column on '.', so a sample source must be NESTED --
+ * a flat `{'wazuh.rule.description': ...}` key would never be found. */
+function ruleDescription(text: string): Record<string, unknown> {
+  return { wazuh: { rule: { description: text } } };
+}
+
+function digestWithSample(
+  sample: Record<string, unknown>,
+  def: ToolDefinition,
+): Digest {
+  return buildDigest(
+    'test_tool',
+    { data: { affected_items: [sample], total_affected_items: 1 } },
+    def,
+  );
+}
+
+test('buildDigest: wazuh.rule.description is capped at 240 chars, not the generic 500', () => {
+  const def = buildToolDef({
+    digest: { sampleColumns: ['wazuh.rule.description'] },
+  });
+  const digest = digestWithSample(ruleDescription('d'.repeat(400)), def);
+  const value = digest.samples[0]['wazuh.rule.description'] as string;
+  // 240 characters plus the one-character ellipsis the truncation appends.
+  assert.equal(value.length, 241);
+  assert.ok(value.endsWith('…'));
+});
+
+test('buildDigest: process.command_line is capped at 200 chars', () => {
+  const def = buildToolDef({
+    digest: { sampleColumns: ['process.command_line'] },
+  });
+  const digest = digestWithSample(
+    { process: { command_line: `/bin/sh -c ${'x'.repeat(400)}` } },
+    def,
+  );
+  const value = digest.samples[0]['process.command_line'] as string;
+  assert.equal(value.length, 201);
+});
+
+test('buildDigest: a short real description is left untouched', () => {
+  const real =
+    'Detects execution of a command via sudo privilege escalation on Linux/macOS. While common in ' +
+    'legitimate administration, sudo usage by unexpected users, at unusual hours, or for sensitive ' +
+    'commands warrants investigation.';
+  const def = buildToolDef({
+    digest: { sampleColumns: ['wazuh.rule.description'] },
+  });
+  const digest = digestWithSample(ruleDescription(real), def);
+  assert.equal(digest.samples[0]['wazuh.rule.description'], real);
+});
+
+test("buildDigest: a tool's OWN sampleFieldMaxLength still overrides the shared default", () => {
+  const def = buildToolDef({
+    digest: {
+      sampleColumns: ['wazuh.rule.description'],
+      sampleFieldMaxLength: { 'wazuh.rule.description': 20 },
+    },
+  });
+  const digest = digestWithSample(ruleDescription('d'.repeat(400)), def);
+  assert.equal(
+    (digest.samples[0]['wazuh.rule.description'] as string).length,
+    21,
+  );
+});
+
+// `vulnerability.description` is on the same shared cap layer for the same reason: it is a digest
+// sample column on every vulnerability tool (catalog/common.ts's VULN_DIGEST_SAMPLE_COLUMNS) and it
+// is third-party CNA/NVD prose that can run long.
+test('buildDigest: vulnerability.description is capped at 240 chars, not the generic 500', () => {
+  const def = buildToolDef({
+    digest: { sampleColumns: ['vulnerability.description'] },
+  });
+  const digest = digestWithSample(
+    { vulnerability: { description: 'v'.repeat(900) } },
+    def,
+  );
+  const value = digest.samples[0]['vulnerability.description'] as string;
+  assert.equal(value.length, 241);
+  assert.ok(value.endsWith('…'));
+});
+
+test('buildDigest: an unlisted field still falls back to the generic 500-char cap', () => {
+  const def = buildToolDef({ digest: { sampleColumns: ['other'] } });
+  const digest = digestWithSample({ other: 'z'.repeat(900) }, def);
+  assert.equal((digest.samples[0].other as string).length, 501);
 });

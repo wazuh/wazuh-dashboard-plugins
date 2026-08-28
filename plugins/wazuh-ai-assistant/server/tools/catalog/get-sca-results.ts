@@ -3,6 +3,7 @@ import {
   aggLimitProperty,
   clampAggLimit,
   objectSchema,
+  SCA_CURRENT_STATE_NOTE,
   validateAgentId,
 } from './common';
 
@@ -23,13 +24,12 @@ import {
  * a real 5.0 stack to be capitalized -- `"Passed"`/`"Failed"`/`"Not applicable"` -- NOT the
  * lowercase 4.14 values; a lowercase `term` filter here silently matches nothing.
  *
- * Population-disclosure note (issue #8920 item 1): unlike get_sca_checks (a plain hits search
- * until this same issue's fix), this tool already satisfies the invariant by construction --
+ * Population-disclosure note: this tool already satisfies the invariant by construction --
  * `size: 0` plus a `terms` aggregation on `policy.id` means every per-policy passed/failed/
  * not_applicable count digest.ts's `buildBreakdown` surfaces is computed by OpenSearch over the
- * FULL matched set, never a truncated page. No functional change needed here; see
- * `population-disclosure-coverage.test.ts`, which recognizes this size:0-plus-terms-agg shape as
- * satisfying the invariant by construction.
+ * FULL matched set, never a truncated page (unlike a plain hits search, where a `limit`-truncated
+ * page would not reflect the full result). See `population-disclosure-coverage.test.ts`, which
+ * recognizes this size:0-plus-terms-agg shape as satisfying the invariant by construction.
  */
 export const getScaResultsTool: ToolDefinition = {
   spec: {
@@ -41,7 +41,8 @@ export const getScaResultsTool: ToolDefinition = {
       'The compliance ratio is passed/(passed+failed). NOT for Security Analytics pipeline ' +
       'policies -- SCA is a per-agent scan result, unrelated to that pipeline configuration; if ' +
       'the question is actually about pipeline policies and get_threat_intel_components (with ' +
-      'component_type="policies") is available to you this turn, use that one instead.',
+      'component_type="policies") is available to you this turn, use that one instead. ' +
+      SCA_CURRENT_STATE_NOTE,
     parameters: objectSchema(
       {
         agent_id: {
@@ -49,7 +50,10 @@ export const getScaResultsTool: ToolDefinition = {
           description:
             'Numeric Wazuh agent ID, e.g. "003". Optional: omit this for a deictic host ' +
             'reference ("this box"/"this server") with no known id -- the call resolves to the ' +
-            'only active agent automatically.',
+            'only active agent automatically. If the user named a host (e.g. "web-server-01"), ' +
+            'resolve that name to its numeric id first and pass it here: omitting this parameter ' +
+            'does NOT search across agents, it resolves to a single agent, so an unscoped call ' +
+            'answers about the wrong host.',
         },
         limit: aggLimitProperty('SCA policies', 20),
       },
@@ -58,10 +62,10 @@ export const getScaResultsTool: ToolDefinition = {
   },
   target: 'indexer',
   tier: 'T1',
-  // Issue: generic sole-candidate parameter resolution (template: #8913's
-  // resolveDeicticAgentParams in get-agent-inventory.ts). A strictly-required `agent_id` measured
-  // 0/40 invocations on deictic SCA/compliance questions ("my auditor wants proof of SSH
-  // hardening") -- registry.ts attaches the generic resolver (param-resolution.ts) for this
+  // Issue: generic sole-candidate parameter resolution (template:
+  // resolveDeicticAgentParams in get-agent-inventory.ts). A strictly-required `agent_id` would
+  // reject deictic SCA/compliance questions ("my auditor wants proof of SSH hardening") that never
+  // name an agent -- registry.ts attaches the generic resolver (param-resolution.ts) for this
   // entry, resolving `agent_id` against the Manager API's active-agent list when omitted.
   soleCandidateParams: [
     { param: 'agent_id', source: { kind: 'manager-agents' } },

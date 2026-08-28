@@ -157,7 +157,7 @@ test('buildGenericResolveParams (manager-agents): exactly one active agent resol
   assert.equal(result.resolved.params.agent_id, '001');
   assert.match(result.resolved.note ?? '', /wazuh-aio-5/);
   assert.match(result.resolved.note ?? '', /001/);
-  // Privacy capture probe P3 (2026-08-14): the raw hostname in this note reached the provider in
+  // The raw hostname in this note reached the provider in
   // the clear under privacy mode. The resolver must DECLARE it so executor.ts's
   // scrubAssumptionNote can pseudonymize it -- an undeclared identifier here is the leak
   // recurring.
@@ -444,9 +444,9 @@ test('buildGenericResolveParams: a failed FIRST param short-circuits before the 
   );
 });
 
-// --- BLOCKER FIX (CV-053/CV-052/CV-088 turn 3): lookupScaCheckOwner / resolveScaCheckParams -----
+// --- BLOCKER FIX: lookupScaCheckOwner / resolveScaCheckParams -----------------------------------
 //
-// CV-053 ("How do I remediate failed check ID 28500?") refused with "more than one active agent
+// The question "How do I remediate failed check ID 28500?" refused with "more than one active agent
 // exists" even though the live `wazuh-states-sca` index holds exactly ONE document for that check
 // id -- the fleet-wide `manager-agents` lookup was consulted before the question's own scope (the
 // check id itself) ever was. These tests reproduce the "1 real agent + 2 unrelated seed docs"
@@ -593,7 +593,7 @@ function stubScaTool(): ToolDefinition {
   ]);
 }
 
-test('resolveScaCheckParams: CV-053 regression -- check_id alone resolves without ever consulting the fleet-wide agent list', async () => {
+test('resolveScaCheckParams: check_id alone resolves without ever consulting the fleet-wide agent list', async () => {
   const tool = stubScaTool();
   const resolve = resolveScaCheckParams(tool);
   const { context, managerCallLog } = fakeHitsContext({
@@ -675,4 +675,191 @@ test('resolveScaCheckParams: agent_id and policy_id already supplied bypasses ch
   assert.equal(result.resolved.params.agent_id, '005');
   assert.equal(searchCalls.length, 0);
   assert.equal(managerCallLog.length, 0);
+});
+
+// --- Identifier-bearing indexer-terms fields must declare their entities ----------------------
+
+test('buildGenericResolveParams (indexer-terms): a noteEntityKind field declares its resolved value for pseudonymization', async () => {
+  // search_findings_by_agent's agent_name resolves through an indexer-terms lookup over
+  // `wazuh.agent.name`, whose values are HOSTNAMES. Unlike an SCA policy id they must be declared,
+  // or executor.ts's scrubAssumptionNote has nothing to scrub and a real hostname reaches the
+  // provider in the clear.
+  const tool = stubTool([
+    {
+      param: 'agent_name',
+      source: {
+        kind: 'indexer-terms',
+        index: 'wazuh-findings-v5*',
+        field: 'wazuh.agent.name',
+        noteEntityKind: 'HOST',
+      },
+    },
+  ]);
+  const resolve: ResolveParams = buildGenericResolveParams(tool);
+  const { context } = fakeContext({ termBuckets: ['dc-01'] });
+  const result = await resolve({}, context, fakeRequest);
+
+  assert.equal(result.ok, true);
+  if (!result.ok) {
+    return;
+  }
+  assert.equal(result.resolved.params.agent_name, 'dc-01');
+  assert.match(result.resolved.note ?? '', /dc-01/);
+  assert.deepEqual(result.resolved.noteEntities, [
+    { value: 'dc-01', kind: 'HOST' },
+  ]);
+});
+
+test('buildGenericResolveParams (indexer-terms): an ambiguous noteEntityKind field declares every candidate it names', async () => {
+  const tool = stubTool([
+    {
+      param: 'agent_name',
+      source: {
+        kind: 'indexer-terms',
+        index: 'wazuh-findings-v5*',
+        field: 'wazuh.agent.name',
+        noteEntityKind: 'HOST',
+      },
+    },
+  ]);
+  const resolve: ResolveParams = buildGenericResolveParams(tool);
+  const { context } = fakeContext({
+    termBuckets: ['dc-01', 'bastion-01'],
+  });
+  const result = await resolve({}, context, fakeRequest);
+
+  assert.equal(result.ok, false);
+  if (result.ok) {
+    return;
+  }
+  // Enumerating the candidates is the point (the model can then pick "dc-01" for "the domain
+  // controller" itself) -- but the enumeration is an identifier disclosure and must be declared.
+  assert.match(result.reason, /dc-01/);
+  assert.match(result.reason, /bastion-01/);
+  assert.deepEqual(result.reasonEntities, [
+    { value: 'dc-01', kind: 'HOST' },
+    { value: 'bastion-01', kind: 'HOST' },
+  ]);
+});
+
+test('buildGenericResolveParams (indexer-terms): a field WITHOUT noteEntityKind declares nothing, exactly as before', async () => {
+  const tool = stubTool([
+    {
+      param: 'policy_id',
+      source: {
+        kind: 'indexer-terms',
+        index: 'wazuh-states-sca*',
+        field: 'policy.id',
+      },
+    },
+  ]);
+  const resolve: ResolveParams = buildGenericResolveParams(tool);
+  const { context } = fakeContext({
+    termBuckets: ['cis_ubuntu22-04', 'cis_rhel8'],
+  });
+  const result = await resolve({}, context, fakeRequest);
+
+  assert.equal(result.ok, false);
+  if (result.ok) {
+    return;
+  }
+  assert.equal(
+    result.reasonEntities,
+    undefined,
+    'an SCA policy id is a catalog identifier -- nothing to declare',
+  );
+});
+
+test('buildGenericResolveParams (manager-agents): an ambiguous agent lookup now declares the candidate hostnames it names', async () => {
+  // This branch enumerates real agent names into the tool error, so it needs the same scrub the
+  // resolved-value NOTE gets.
+  const tool = stubTool([
+    {
+      param: 'agent_name',
+      source: { kind: 'manager-agents' },
+      valueFrom: 'name',
+    },
+  ]);
+  const resolve: ResolveParams = buildGenericResolveParams(tool);
+  const { context } = fakeContext({
+    agents: {
+      items: [
+        { id: '001', name: 'dc-01' },
+        { id: '002', name: 'bastion-01' },
+      ],
+    },
+  });
+  const result = await resolve({}, context, fakeRequest);
+
+  assert.equal(result.ok, false);
+  if (result.ok) {
+    return;
+  }
+  assert.deepEqual(result.reasonEntities, [
+    { value: 'dc-01', kind: 'HOST' },
+    { value: 'bastion-01', kind: 'HOST' },
+  ]);
+});
+
+test('buildGenericResolveParams (indexer-terms): a TIME-BASED index probe is time-bounded, or lintDsl silently kills the whole feature', async () => {
+  // guardrails.ts requires a bounded @timestamp range on wazuh-findings-v5*/wazuh-events-v5*. A
+  // rangeless probe fails lintDsl, and lookupIndexerTermsCandidate's early return swallows that as
+  // {kind:'error'} -- so the sole-candidate resolution would just never work on those indices, with
+  // no visible error. This is the regression guard for exactly that.
+  const tool = stubTool([
+    {
+      param: 'agent_name',
+      source: {
+        kind: 'indexer-terms',
+        index: 'wazuh-findings-v5*',
+        field: 'wazuh.agent.name',
+        noteEntityKind: 'HOST',
+      },
+    },
+  ]);
+  const resolve: ResolveParams = buildGenericResolveParams(tool);
+  const { context, searchCalls } = fakeContext({ termBuckets: ['dc-01'] });
+  const result = await resolve(
+    { time_range_gte: 'now-7d', time_range_lte: 'now' },
+    context,
+    fakeRequest,
+  );
+
+  assert.equal(result.ok, true);
+  const body = searchCalls[0].body as {
+    query: { bool: { filter: Array<Record<string, unknown>> } };
+  };
+  const range = body.query.bool.filter.find(clause => clause.range) as
+    | { range: { '@timestamp': { gte: string; lte: string } } }
+    | undefined;
+  assert.ok(range, 'the probe must carry an @timestamp range');
+  // The caller's OWN window, so the candidate universe matches what the real query will search.
+  assert.equal(range.range['@timestamp'].gte, 'now-7d');
+  assert.equal(range.range['@timestamp'].lte, 'now');
+});
+
+test('buildGenericResolveParams (indexer-terms): a wazuh-states-* probe stays rangeless, byte-identical to before', async () => {
+  const tool = stubTool([
+    {
+      param: 'policy_id',
+      source: {
+        kind: 'indexer-terms',
+        index: 'wazuh-states-sca*',
+        field: 'policy.id',
+      },
+    },
+  ]);
+  const resolve: ResolveParams = buildGenericResolveParams(tool);
+  const { context, searchCalls } = fakeContext({
+    termBuckets: ['cis_ubuntu22-04'],
+  });
+  await resolve({}, context, fakeRequest);
+
+  const body = searchCalls[0].body as {
+    query: { bool: { filter: Array<Record<string, unknown>> } };
+  };
+  assert.ok(
+    !body.query.bool.filter.some(clause => clause.range),
+    'a current-state snapshot index has no event-time axis to bound',
+  );
 });

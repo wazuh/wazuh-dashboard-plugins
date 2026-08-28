@@ -27,10 +27,9 @@ import {
 } from './security-analytics-link';
 import './result-table.scss';
 
-/** Tables at or under this row count default to expanded. The threshold used to be 10, from a time
- * when a big result really did push the chat input off screen; the card now caps its own height
- * (`$wzResultsMaxHeight`) and scrolls internally, so length no longer costs the reader anything —
- * and the design's canonical Screen 2 is a 26-row table shown OPEN. Kept as a ceiling rather than
+/** Tables at or under this row count default to expanded. The card caps its own height
+ * (`$wzResultsMaxHeight`) and scrolls internally, so length doesn't cost the reader anything — and
+ * the design's canonical Screen 2 is a 26-row table shown OPEN. Kept as a ceiling rather than
  * removed so a pathological result still opens collapsed instead of rendering thousands of rows. */
 const AUTO_EXPAND_ROW_THRESHOLD = 200;
 
@@ -39,61 +38,57 @@ const AUTO_EXPAND_ROW_THRESHOLD = 200;
 type ResultRow = Record<string, unknown> & { __rowId: string };
 /** Default page size and the choices offered in the card footer's row-count control.
  *
- * Issue #9009 (A4): was 5, which split every 6-10 row answer onto a hidden page 2 — the QA E2E
- * review caught a factually wrong AI prose summary that resulted from exactly that (a row silently
- * left off-page). Ten is the standard EUI default page size and is large enough that the vast
- * majority of tool results (which top out well under it) never paginate at all; the reader can
- * still page through — or pick a smaller/larger size — for genuinely large results, and it keeps
- * the DOM small for a 500-row one, which is why pagination was here to begin with.
+ * A page size that splits a 6-10 row answer onto a hidden page 2 risks a factually wrong AI prose
+ * summary from a row silently left off-page. Ten is the standard EUI default page size and is
+ * large enough that the vast majority of tool results (which top out well under it) never
+ * paginate at all; the reader can still page through — or pick a smaller/larger size — for
+ * genuinely large results, and it keeps the DOM small for a 500-row one, which is why pagination
+ * exists here at all.
  */
 const DEFAULT_PAGE_SIZE = 10;
 const PAGE_SIZE_OPTIONS = [5, 10, 25, 50];
 
 /**
- * Issue #9009 (J1, follow-up): the fixed 560px narrow-mode threshold only ever accounted for the
- * QA E2E review's ~480px repro width. A live finding on the deployed build showed a 6-column
- * table still wrapping every cell at ~600-800px (a docked sidecar squeezing the main surface) —
- * 560px is comfortable for a 3-column table but nowhere near enough for 6, so a single fixed
- * pixel threshold can never be right for every column count. The rule is now adaptive: go narrow
- * whenever the card cannot give each would-be-visible column at least `MIN_COLUMN_WIDTH_PX` —
- * an id/date/short-value column's readable floor, not a strict character budget — i.e.
- * `width < candidateColumnCount * MIN_COLUMN_WIDTH_PX` (see `candidateColumnCount` below).
+ * A single fixed pixel threshold can never be right for every column count: 560px is comfortable
+ * for a 3-column table but nowhere near enough for a 6-column one, which still wraps every cell at
+ * ~600-800px in a docked sidecar squeezing the main surface. The rule is adaptive instead: go
+ * narrow whenever the card cannot give each would-be-visible column at least
+ * `MIN_COLUMN_WIDTH_PX` — an id/date/short-value column's readable floor, not a strict character
+ * budget — i.e. `width < candidateColumnCount * MIN_COLUMN_WIDTH_PX` (see `candidateColumnCount`
+ * below).
  *
- * Issue #9009 (J1, second follow-up): 120 was still too tight. A live repro on the deployed build
- * measured the card at ~728px with a 6-column table — the quantizer (see `WIDTH_QUANTUM_PX`)
- * floors that to 720, and `720 < 6 * 120 = 720` is false by exactly the boundary, so the table
- * stayed full-width and wrapped every cell vertically anyway. And the real columns this renderer
- * actually carries — an id/UUID, a rule/finding title, a formatted timestamp — need noticeably
- * more than 120px per column to read on one line regardless of the boundary math. Raised to 140:
- * a 6-column table now goes narrow under ~840px (comfortably clearing the 728px repro), a
- * 3-column table stays full down to ~420px, and the original 480px repro (>= 3 candidate columns)
- * stays narrow either way.
+ * 120px is too tight: at a card width of ~728px with a 6-column table, the quantizer (see
+ * `WIDTH_QUANTUM_PX`) floors that to 720, and `720 < 6 * 120 = 720` is false by exactly the
+ * boundary, so the table would stay full-width and wrap every cell vertically anyway. The real
+ * columns this renderer actually carries — an id/UUID, a rule/finding title, a formatted
+ * timestamp — need noticeably more than 120px per column to read on one line regardless of the
+ * boundary math. 140 fixes both: a 6-column table goes narrow under ~840px (comfortably clearing
+ * the 728px case above), a 3-column table stays full down to ~420px, and a ~480px card with
+ * >= 3 candidate columns stays narrow either way.
  */
 const MIN_COLUMN_WIDTH_PX = 140;
-/** Issue #9009 (J1): column budget in narrow mode — "first 2-3 columns from the tool's existing
- * column order", the same order `MAX_VISIBLE_COLUMNS` already respects at full width. Every
- * demoted column stays reachable through the row expander, same as `MAX_VISIBLE_COLUMNS` above. */
+/** Column budget in narrow mode — "first 2-3 columns from the tool's existing column order", the
+ * same order `MAX_VISIBLE_COLUMNS` already respects at full width. Every demoted column stays
+ * reachable through the row expander, same as `MAX_VISIBLE_COLUMNS` above. */
 const NARROW_MAX_VISIBLE_COLUMNS = 3;
 /**
- * Issue #9009 (J1, follow-up): the ResizeObserver below stores state in QUANTIZED buckets of this
- * many px rather than the raw measured width, for the same reason the old code stored only a
- * boolean — the sidecar's own drag-resize fires the observer on every pixel, and re-rendering the
- * table on every single one of those (rather than only when the reader crosses a real bucket) is
- * a render storm for no visible benefit. The adaptive rule needs the actual width (not just a
- * boolean) because the threshold itself now depends on the spec's column count, so a plain
- * boolean can no longer be computed inside the observer callback alone — quantizing is the
- * middle ground that keeps state updates rare while still letting `isNarrow` be derived at
- * render time for whatever column count the current spec has. Buckets round DOWN (`Math.floor`),
- * never up: rounding up could quantize a genuinely-narrow width past its own threshold and
- * misreport it as full (e.g. 700px rounding up to 720px would clear the 6-column table's exact
- * 720px threshold) — rounding down only ever errs toward triggering narrow mode a few px early,
- * never toward missing it.
+ * The ResizeObserver below stores state in QUANTIZED buckets of this many px rather than the raw
+ * measured width: the sidecar's own drag-resize fires the observer on every pixel, and
+ * re-rendering the table on every single one of those (rather than only when the reader crosses a
+ * real bucket) is a render storm for no visible benefit. The adaptive rule needs the actual width
+ * (not just a boolean) because the threshold itself depends on the spec's column count, so a
+ * plain boolean cannot be computed inside the observer callback alone — quantizing is the middle
+ * ground that keeps state updates rare while still letting `isNarrow` be derived at render time
+ * for whatever column count the current spec has. Buckets round DOWN (`Math.floor`), never up:
+ * rounding up could quantize a genuinely-narrow width past its own threshold and misreport it as
+ * full (e.g. 700px rounding up to 720px would clear the 6-column table's exact 720px threshold) —
+ * rounding down only ever errs toward triggering narrow mode a few px early, never toward missing
+ * it.
  */
 const WIDTH_QUANTUM_PX = 40;
 
-/** `0` stays `0` (unmeasured/not-yet-observed, same sentinel the old boolean's `width > 0` guard
- * used), everything else buckets down to the nearest `WIDTH_QUANTUM_PX` — see that constant's
- * doc comment for why down rather than to the nearest. */
+/** `0` stays `0` (unmeasured/not-yet-observed), everything else buckets down to the nearest
+ * `WIDTH_QUANTUM_PX` — see that constant's doc comment for why down rather than to the nearest. */
 function quantizeWidthPx(width: number): number {
   if (width <= 0) {
     return 0;
@@ -107,13 +102,13 @@ function quantizeWidthPx(width: number): number {
  *
  * `$wzResultsMaxHeight` (result-table.scss) reads `min(460px, 52dvh)`, and `dvh` resolves against
  * the VIEWPORT — ignoring the app frame's own offset, the tab bar, and above all the composer row,
- * which takes up to 30dvh of the same window. At the spec's own 1280x620 acceptance size that
- * arithmetic runs: frame 571 -> pane ~531 -> composer at its ceiling 186 -> transcript ~345, while
- * the card alone would still claim min(460, 322) = 322px. Twenty-three pixels left for the avatar
- * row, the answer prose and the turn's spacing, so the pinned pagination footer lands below the
- * transcript's fold — which is precisely the "page 2 of 6 unreachable" bug §4 exists to kill,
- * returning one level down from where it was fixed. `transcriptHeightPx` was already measured and
- * threaded all the way here for the page-size step; this makes the height use it too.
+ * which takes up to 30dvh of the same window. At a 1280x620 viewport that arithmetic runs: frame
+ * 571 -> pane ~531 -> composer at its ceiling 186 -> transcript ~345, while the card alone would
+ * still claim min(460, 322) = 322px. Twenty-three pixels left for the avatar row, the answer prose
+ * and the turn's spacing, so the pinned pagination footer would land below the transcript's fold —
+ * exactly the "page 2 of 6 unreachable" failure this ceiling exists to prevent.
+ * `transcriptHeightPx` was already measured and threaded all the way here for the page-size step;
+ * this makes the height use it too.
  *
  * The reserve is what the turn needs ABOVE the card: an avatar/label row plus two or three lines of
  * answer prose plus the row's own spacing. The floor is a card that can still show its header, two
@@ -122,9 +117,9 @@ function quantizeWidthPx(width: number): number {
  */
 const RESULTS_CARD_MAX_HEIGHT_PX = 460;
 /**
- * "Card grows" (iteration-4 item 3): the JS twin of `$wzResultsMaxHeightExpanded` (80dvh,
- * result-table.scss/_redesign.scss) for the transcript-measured-height code path above — that
- * `dvh` figure has no meaningful px equivalent here (this clamp works in the transcript's own
+ * The JS twin of `$wzResultsMaxHeightExpanded` (80dvh, result-table.scss/_redesign.scss) for the
+ * transcript-measured-height code path above — that `dvh` figure has no meaningful px equivalent
+ * here (this clamp works in the transcript's own
  * measured space, not the viewport), so this is a generous ceiling that in practice only ever
  * matters as an upper bound: `measuredCardMaxHeight` below still subtracts
  * `RESULTS_CARD_TRANSCRIPT_RESERVE_PX` from `transcriptHeightPx`, so the card can never actually
@@ -193,36 +188,33 @@ const ISO_TIMESTAMP_RE =
 const TIMESTAMP_COLUMN_WIDTH = '118px';
 /** Column width for the severity column: a badge plus its longest label ("Informational"). */
 const SEVERITY_COLUMN_WIDTH = '104px';
-/** Width for a column whose every value is short (see `isShortValueColumn`) — an agent name, an id,
- * a category. Enough for ~20 characters at the table's own font size; the free-text column takes the
- * remainder, which is the whole point (audit §3.4). */
+/** Width for a column whose every value is short (see `isShortValueColumn`) — an agent name, an
+ * id, a category. Enough for ~20 characters at the table's own font size; the free-text column
+ * takes the remainder, which is the whole point. */
 const SHORT_COLUMN_WIDTH = '140px';
 /** Longest rendered value that still counts as "short". Deliberately generous: a value that fits a
  * 140px cell on one line is what this is trying to identify, not a strict character budget. */
 const SHORT_COLUMN_MAX_CHARS = 20;
 
 /**
- * Column-count budget (issue #8921's "no table may need a horizontal scrollbar" item): a
- * rendering INVARIANT applied here, in the one generic table renderer, rather than per-tool —
- * every current and future tool's `tableSpec` inherits it automatically. The value lives in
- * common/types.ts (MAX_VISIBLE_RESULT_COLUMNS) so the server-side registry test can hold every
- * tool's severity column inside the same budget this renderer applies. Only the first
- * `MAX_VISIBLE_COLUMNS` of `spec.columns` become visible table columns; the rest are NOT dropped —
- * `buildTableSpec` (server/tools/digest.ts) already puts every spec-column field into each row
- * object regardless of visibility, so a hidden column stays reachable through the row expander
- * (the `EuiCodeBlock` JSON view below). Server-side column ORDER is therefore what decides which
- * fields win visibility; this cap decides only how many. `DERIVED_COLUMN_CAP` (digest.ts) stays 8
- * server-side on purpose — the model-facing digest and the client's visible-column budget are two
- * independent caps that are allowed to disagree, same as before this existed for the static-column
- * tools.
+ * Column-count budget: a rendering INVARIANT applied here, in the one generic table renderer,
+ * rather than per-tool — every current and future tool's `tableSpec` inherits it automatically.
+ * The value lives in common/types.ts (MAX_VISIBLE_RESULT_COLUMNS) so the server-side registry
+ * test can hold every tool's severity column inside the same budget this renderer applies. Only
+ * the first `MAX_VISIBLE_COLUMNS` of `spec.columns` become visible table columns; the rest are NOT
+ * dropped — `buildTableSpec` (server/tools/digest.ts) already puts every spec-column field into
+ * each row object regardless of visibility, so a hidden column stays reachable through the row
+ * expander (the `EuiCodeBlock` JSON view below). Server-side column ORDER is therefore what
+ * decides which fields win visibility; this cap decides only how many. `DERIVED_COLUMN_CAP`
+ * (digest.ts) stays 8 server-side on purpose — the model-facing digest and the client's
+ * visible-column budget are two independent caps that are allowed to disagree.
  */
 const MAX_VISIBLE_COLUMNS = MAX_VISIBLE_RESULT_COLUMNS;
 
 /** Rendered in place of an absent value (`undefined`/`null`/`''`) in every column render path
- * (default, severity, timestamp) — issue #8921's "absent is rendered as absent" item. An em dash,
- * not a blank cell, so a reader can tell "this field genuinely has no value" apart from "this cell
- * failed to render". Falsy-but-present values (`0`, `false`) are NOT absent and must render
- * normally — see `isAbsentValue` below. */
+ * (default, severity, timestamp): an em dash, not a blank cell, so a reader can tell "this field
+ * genuinely has no value" apart from "this cell failed to render". Falsy-but-present values (`0`,
+ * `false`) are NOT absent and must render normally — see `isAbsentValue` below. */
 const ABSENT_VALUE_PLACEHOLDER = '—';
 
 /** `undefined`/`null`/`''` only — deliberately NOT the broader JS-falsy check, so a genuine `0` or
@@ -303,11 +295,11 @@ function renderDefaultCell(value: unknown): React.ReactNode {
 }
 
 /**
- * Issue #9009 (J1): narrow-mode cell wrapper — truncates the formatted text to one line with an
- * ellipsis and puts the untruncated value in an `EuiToolTip`, the same truncate-plus-tooltip idiom
- * the providers table already uses (settings-page.tsx's `anchorClassName`-bounded `EuiToolTip`).
- * Only applied to plain string/number cells: the absent-value placeholder and the severity badge
- * are already short and are left as `renderDefaultCell`/`renderSeverityBadge` render them.
+ * Narrow-mode cell wrapper — truncates the formatted text to one line with an ellipsis and puts
+ * the untruncated value in an `EuiToolTip`, the same truncate-plus-tooltip idiom the providers
+ * table already uses (settings-page.tsx's `anchorClassName`-bounded `EuiToolTip`). Only applied to
+ * plain string/number cells: the absent-value placeholder and the severity badge are already
+ * short and are left as `renderDefaultCell`/`renderSeverityBadge` render them.
  */
 function renderNarrowTruncatedCell(value: unknown): React.ReactNode {
   if (isAbsentValue(value)) {
@@ -441,14 +433,14 @@ function renderSeverityBadge(value: unknown): React.ReactNode {
   const bucket = SEVERITY_BUCKETS[word as SeverityLevel] as
     | { color: string; label: string }
     | undefined;
-  // `.wzSeverityChip` (result-table.scss) gives every severity the wzStatusChip SHAPE — fully round,
-  // 11px semibold — so a severity reads as the same kind of object as the provider status chips on
-  // the settings page instead of as EUI's 2px-radius rectangle (audit §3.5). The FILL is deliberately
+  // `.wzSeverityChip` (result-table.scss) gives every severity the wzStatusChip SHAPE — fully
+  // round, 11px semibold — so a severity reads as the same kind of object as the provider status
+  // chips on the settings page instead of as EUI's 2px-radius rectangle. The FILL is deliberately
   // left as the platform's own `UI_COLOR_STATUS` hex (see SEVERITY_BUCKETS above), not swapped for
   // wzStatusChip's tinted-EUI-role wash: that palette is a cross-product agreement, and two of the
-  // five roles ($euiColorWarning for high, $euiColorPrimary for medium) are not legible as 11px text
-  // over their own 12% tint, which is the failure wzStatusChip's `$textTint` argument exists for and
-  // which no `*Text` twin covers for a raw hex.
+  // five roles ($euiColorWarning for high, $euiColorPrimary for medium) are not legible as 11px
+  // text over their own 12% tint, which is the failure wzStatusChip's `$textTint` argument exists
+  // for and which no `*Text` twin covers for a raw hex.
   if (!bucket) {
     return (
       <EuiBadge className='wzSeverityChip' color='default'>
@@ -464,12 +456,11 @@ function renderSeverityBadge(value: unknown): React.ReactNode {
 }
 
 /**
- * One provenance chip for the card header (layout contract §4's "provenance moves UP here"):
- * which tool call produced this table. `TableSpec` itself carries no tool-call linkage (that
- * lives on the message, in `common/types.ts`'s `ChatMessage.toolCalls` — not this component's
- * file to add a new cross-reference field to), so message-bubble.tsx builds this shape from its
- * own `message.toolCalls` (via tool-call-label.ts's `describeToolCall`, the same helper the old
- * below-bubble chip already used) and passes it down instead.
+ * One provenance chip for the card header: which tool call produced this table. `TableSpec`
+ * itself carries no tool-call linkage (that lives on the message, in `common/types.ts`'s
+ * `ChatMessage.toolCalls` — not this component's file to add a new cross-reference field to), so
+ * message-bubble.tsx builds this shape from its own `message.toolCalls` (via tool-call-label.ts's
+ * `describeToolCall`) and passes it down.
  */
 export interface ResultTableProvenanceChip {
   id: string;
@@ -482,58 +473,57 @@ export interface ResultTableProvenanceChip {
   /** The call's real-form arguments, shown verbatim (copyable) in the popover. */
   argumentsJson: Record<string, unknown>;
   /**
-   * Issue #9008 (G2, reworked after review): the concrete index the call queried, shown as a
-   * labelled line inside the popover itself rather than only in the chip's hover title — the QA
-   * E2E review found the popover unusable for a touch/keyboard reader, who never sees a hover
-   * tooltip at all. Sourced straight from `TableSpec.provenance.index` (a server-recorded FACT,
-   * `common/types.ts`) via `tool-call-label.ts`'s `describeProvenance` — never inferred
-   * client-side. `undefined` when the server recorded no provenance for this call at all (a
-   * Manager-API call, or a call other than the one that produced this table — see blocker 3's
-   * `toolCallId` match at the call site, message-bubble.tsx).
+   * The concrete index the call queried, shown as a labelled line inside the popover itself
+   * rather than only in the chip's hover title — a hover-only rendering is unusable for a
+   * touch/keyboard reader, who never sees a hover tooltip at all. Sourced straight from
+   * `TableSpec.provenance.index` (a server-recorded FACT, `common/types.ts`) via
+   * `tool-call-label.ts`'s `describeProvenance` — never inferred client-side. `undefined` when
+   * the server recorded no provenance for this call at all (a Manager-API call, or a call other
+   * than the one that produced this table — see the `toolCallId` match at the call site,
+   * message-bubble.tsx).
    */
   index?: string;
-  /** Issue #9008 (G2, reworked): the resolved, absolute time range the query actually ran
-   * against, straight from `TableSpec.provenance.effectiveRange`. `undefined` whenever the
-   * server recorded no `effectiveRange` at all (the query's DSL carried no recognizable
-   * time-range clause — most catalog tools have no time concept and this is the correct,
-   * fact-based absence, never a substituted default) or a bound could not resolve to an instant.
+  /** The resolved, absolute time range the query actually ran against, straight from
+   * `TableSpec.provenance.effectiveRange`. `undefined` whenever the server recorded no
+   * `effectiveRange` at all (the query's DSL carried no recognizable time-range clause — most
+   * catalog tools have no time concept and this is the correct, fact-based absence, never a
+   * substituted default) or a bound could not resolve to an instant.
    */
   resolvedRangeLabel?: string;
   /**
-   * Issue #9008 (G3, reworked): "90d" normally, or "90d · requested 720d" once the server reports
-   * `provenance.clamped: true` — ONE badge carrying both windows, replacing two separate
-   * near-identically-labelled chips that gave the reader no requested-vs-effective distinction.
-   * Also mirrored onto the chip's own collapsed `shortLabel` (`describeToolCall`) per the review's
-   * major 4: the dual-window text must be visible without opening the popover. `undefined`
-   * whenever `resolvedRangeLabel` is (nothing to label a window with).
+   * "90d" normally, or "90d · requested 720d" once the server reports `provenance.clamped: true`
+   * — ONE badge carrying both windows, replacing two separate near-identically-labelled chips
+   * that gave the reader no requested-vs-effective distinction. Also mirrored onto the chip's own
+   * collapsed `shortLabel` (`describeToolCall`): the dual-window text must be visible without
+   * opening the popover. `undefined` whenever `resolvedRangeLabel` is (nothing to label a window
+   * with).
    */
   windowBadgeLabel?: string;
 }
 
 /**
  * The header's provenance chip: an `EuiBadge` that opens a small popover with the tool name and
- * its raw (copyable) JSON arguments on click — replacing the old "click to reveal a raw view
- * rendered BELOW the table it produced" pattern (issue: "provenance after the fact"). Its own
- * open/closed state, not a shared one, so multiple chips on the same table (a turn that ran more
- * than one tool call before landing on this table) never fight over a single popover.
+ * its raw (copyable) JSON arguments on click, rather than a raw view rendered BELOW the table it
+ * produced. Its own open/closed state, not a shared one, so multiple chips on the same table (a
+ * turn that ran more than one tool call before landing on this table) never fight over a single
+ * popover.
  */
 const ProvenanceChip: React.FC<{ chip: ResultTableProvenanceChip }> = ({
   chip,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Issue #9008 (G1) review fix: the QA E2E run found the panel's own "hit escape to close"
-  // screen-reader announcement did not hold — Escape left the panel open, focus still on the
-  // badge. A single inner handler around only the popover's CHILDREN (the panel content) missed
-  // exactly that case: the badge (`button` prop below) is a SIBLING of that content, not a
-  // descendant of it, so a keydown while focus is still on the badge never reached it. This one
-  // handler is attached to a div wrapping the WHOLE `<EuiPopover>` — button and panel both — so it
-  // catches Escape regardless of which of the two currently has focus; React's synthetic events
-  // bubble along the COMPONENT tree, which reaches here even though EUI portals the panel
-  // elsewhere in the DOM. `stopPropagation` fires ONLY while `isOpen` — issue #9008 review,
-  // major 4: an unguarded `stopPropagation` swallowed every Escape this chip ever saw, even one
-  // meant for an enclosing surface (a docked sidecar/flyout) while the popover was already
-  // closed. Closed, this handler does nothing at all, exactly like having no handler here.
+  // A screen-reader "hit escape to close" announcement must hold even when focus is still on the
+  // badge, not just the panel content. A handler around only the popover's CHILDREN (the panel
+  // content) misses exactly that case: the badge (`button` prop below) is a SIBLING of that
+  // content, not a descendant of it, so a keydown while focus is still on the badge never reaches
+  // it. This one handler is attached to a div wrapping the WHOLE `<EuiPopover>` — button and panel
+  // both — so it catches Escape regardless of which of the two currently has focus; React's
+  // synthetic events bubble along the COMPONENT tree, which reaches here even though EUI portals
+  // the panel elsewhere in the DOM. `stopPropagation` fires ONLY while `isOpen`: an unguarded
+  // `stopPropagation` would swallow every Escape this chip sees, even one meant for an enclosing
+  // surface (a docked sidecar/flyout) while the popover is already closed. Closed, this handler
+  // does nothing at all, exactly like having no handler here.
   const closeOnEscape = (event: React.KeyboardEvent) => {
     if (event.key === 'Escape' && isOpen) {
       event.stopPropagation();
@@ -560,10 +550,10 @@ const ProvenanceChip: React.FC<{ chip: ResultTableProvenanceChip }> = ({
                 values: { label: chip.fullLabel },
               },
             )}
-            // No `onKeyDown` of its own (issue #9008 review, cleanup 5): the badge is a plain,
-            // non-portaled descendant of the wrapping div above, so a keydown while focus is still
-            // on it already bubbles to that one handler. A second copy here was a duplicate path
-            // to the same idempotent close, not extra coverage.
+            // No `onKeyDown` of its own: the badge is a plain, non-portaled descendant of the
+            // wrapping div above, so a keydown while focus is still on it already bubbles to that
+            // one handler. A second copy here would be a duplicate path to the same idempotent
+            // close, not extra coverage.
           >
             {chip.shortLabel}
           </EuiBadge>
@@ -573,10 +563,10 @@ const ProvenanceChip: React.FC<{ chip: ResultTableProvenanceChip }> = ({
           <EuiText size='xs'>
             <strong>{chip.toolName}</strong>
           </EuiText>
-          {/* Issue #9008 (G2): index and resolved time range as labelled lines INSIDE the popover —
-              previously only reachable via the chip's own hover `title`, which a touch/keyboard
-              reader never sees. Both are rendered only when the server actually reported them
-              (`ResultTableProvenanceChip`'s doc comment) — never a client-side guess. */}
+          {/* Index and resolved time range as labelled lines INSIDE the popover: a hover-only
+              `title` is never reachable to a touch/keyboard reader. Both are rendered only when
+              the server actually reported them (`ResultTableProvenanceChip`'s doc comment) —
+              never a client-side guess. */}
           {chip.index && (
             <EuiText size='xs' color='subdued'>
               {i18n.translate('wazuhAiAssistant.resultTable.provenanceIndex', {
@@ -599,11 +589,11 @@ const ProvenanceChip: React.FC<{ chip: ResultTableProvenanceChip }> = ({
           {chip.windowBadgeLabel && (
             <>
               <EuiSpacer size='xs' />
-              {/* Issue #9008 (G3): ONE badge stating both the effective and (when clamped) the
-                  requested window, e.g. "90d · requested 720d" — see `windowBadgeLabel`'s own doc
-                  comment (tool-call-label.ts) for why this replaced two separate near-identical
-                  chips. Also shown on the chip's own collapsed label (`describeToolCall`) so a
-                  reader never has to open the popover just to see which call was clamped. */}
+              {/* ONE badge stating both the effective and (when clamped) the requested window,
+                  e.g. "90d · requested 720d" — see `windowBadgeLabel`'s own doc comment
+                  (tool-call-label.ts) for why this replaces two separate near-identical chips.
+                  Also shown on the chip's own collapsed label (`describeToolCall`) so a reader
+                  never has to open the popover just to see which call was clamped. */}
               <EuiBadge color='hollow'>{chip.windowBadgeLabel}</EuiBadge>
             </>
           )}
@@ -653,16 +643,16 @@ interface ResultTableProps {
    * link when `resolveDiscoverUrl` is omitted. */
   provenanceChips?: ResultTableProvenanceChip[];
   /**
-   * Real measured height (px) of the scrolling transcript pane, for layout contract §4's card
-   * height ceiling (`measuredCardMaxHeight` below) — the card can never claim more than the pane
-   * it actually lives in. chat-page.tsx measures the pane with a `ResizeObserver` and threads the
-   * result straight through MessageList → MessageBubble → here (confirmed by reading it — see its
-   * `transcriptHeightPx` state). Still optional: jsdom has no `ResizeObserver`, so it stays
-   * `undefined` in tests and the stylesheet's own fallback cap applies there.
+   * Real measured height (px) of the scrolling transcript pane, for the card height ceiling
+   * (`measuredCardMaxHeight` below) — the card can never claim more than the pane it actually
+   * lives in. chat-page.tsx measures the pane with a `ResizeObserver` and threads the result
+   * straight through MessageList → MessageBubble → here — see its `transcriptHeightPx` state.
+   * Still optional: jsdom has no `ResizeObserver`, so it stays `undefined` in tests and the
+   * stylesheet's own fallback cap applies there.
    */
   transcriptHeightPx?: number;
   /**
-   * Fired when the reader changes the rows-per-page control (item 3, "card grows"). The card grows
+   * Fired when the reader changes the rows-per-page control ("card grows"). The card grows
    * downward when a larger page size is picked, but the card lives INSIDE chat-page.tsx's scrolling
    * transcript pane, and that pane only re-pins to its bottom on a `messages` change — a page-size
    * pick is internal `ResultTable` state, so nothing re-pinned and the freshly-grown pagination
@@ -677,8 +667,8 @@ interface ResultTableProps {
 /**
  * Renders a `table` stream event: spec-driven, with a severity column and expandable rows, inside
  * a card whose header and pagination are pinned rows and whose body is the only thing that
- * scrolls (layout contract §4 — the acceptance check this exists for is "page 2 of 6 [must be]
- * reachable without resizing the window").
+ * scrolls (the acceptance check this exists for is "page 2 of 6 [must be] reachable without
+ * resizing the window").
  */
 const ResultTableInner: React.FC<ResultTableProps> = ({
   spec,
@@ -768,20 +758,19 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
     return () => observer.disconnect();
   }, []);
 
-  // Issue #9009 (J1): the card's OWN measured width, for narrow-mode column reduction. Deliberately
-  // the component's own width, not the viewport — the same generic renderer mounts full-page and
-  // inside the AI Assistant sidecar (as narrow as ~480px in the QA E2E review), and only the
-  // container it actually lives in can tell those two apart. Same guarded pattern as the pane
-  // height effect above (and the rest of this plugin, e.g. chat-page.tsx's rail-width measurement):
-  // jsdom has no `ResizeObserver`, so `quantizedWidthPx` stays `0` and every existing test renders
-  // in (non-narrow) full-width mode, matching what they already assert.
+  // The card's OWN measured width, for narrow-mode column reduction. Deliberately the component's
+  // own width, not the viewport — the same generic renderer mounts full-page and inside the AI
+  // Assistant sidecar (as narrow as ~480px), and only the container it actually lives in can tell
+  // those two apart. Same guarded pattern as the pane height effect above (and the rest of this
+  // plugin, e.g. chat-page.tsx's rail-width measurement): jsdom has no `ResizeObserver`, so
+  // `quantizedWidthPx` stays `0` and every existing test renders in (non-narrow) full-width mode,
+  // matching what they already assert.
   //
-  // Stores the QUANTIZED width, not a derived boolean (issue #9009 follow-up) — see
-  // `WIDTH_QUANTUM_PX`'s doc comment for why: the render-storm concern that used to justify storing
-  // only a boolean still applies, but the threshold itself now depends on the spec's column count
-  // (`candidateColumnCount` below), which the observer callback has no way to know, so the boolean
-  // can no longer be computed in here. `isNarrow` is derived from this quantized width at render
-  // time instead, below.
+  // Stores the QUANTIZED width, not a derived boolean — see `WIDTH_QUANTUM_PX`'s doc comment for
+  // why: the render-storm concern applies regardless, but the threshold itself depends on the
+  // spec's column count (`candidateColumnCount` below), which the observer callback has no way to
+  // know, so a plain boolean cannot be computed in here. `isNarrow` is derived from this quantized
+  // width at render time instead, below.
   const [quantizedWidthPx, setQuantizedWidthPx] = useState(0);
   useLayoutEffect(() => {
     const card = cardRef.current;
@@ -790,8 +779,8 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
     }
     const measure = () => {
       const quantized = quantizeWidthPx(card.offsetWidth);
-      // Same early-out as the old boolean version: a resize that doesn't cross a 40px bucket
-      // boundary sets identical state and triggers no re-render.
+      // Early-out: a resize that doesn't cross a 40px bucket boundary sets identical state and
+      // triggers no re-render.
       setQuantizedWidthPx(previous =>
         previous === quantized ? previous : quantized,
       );
@@ -834,23 +823,22 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   }, [spec.columns, spec.rows]);
 
   /**
-   * Issue #9009 (J1, follow-up): how many columns the spec would show at FULL width — the same
-   * `MAX_VISIBLE_COLUMNS` budget `effectiveMaxVisibleColumns` below applies, computed here first
-   * because narrow mode's own threshold depends on it. Deliberately the full-mode count, not the
-   * raw column total — a 20-column spec is already capped to `MAX_VISIBLE_COLUMNS` at full width,
-   * so its narrow threshold should be sized for the columns that would actually render, not for
-   * columns nothing ever shows a `<th>` for.
+   * How many columns the spec would show at FULL width — the same `MAX_VISIBLE_COLUMNS` budget
+   * `effectiveMaxVisibleColumns` below applies, computed here first because narrow mode's own
+   * threshold depends on it. Deliberately the full-mode count, not the raw column total — a
+   * 20-column spec is already capped to `MAX_VISIBLE_COLUMNS` at full width, so its narrow
+   * threshold should be sized for the columns that would actually render, not for columns nothing
+   * ever shows a `<th>` for.
    */
   const candidateColumnCount = Math.min(
     populatedColumns.length,
     MAX_VISIBLE_COLUMNS,
   );
 
-  // Issue #9009 (J1, follow-up): adaptive threshold — narrow mode triggers whenever the card
-  // cannot give each candidate column at least `MIN_COLUMN_WIDTH_PX`, rather than at one fixed
-  // pixel width regardless of column count (see `MIN_COLUMN_WIDTH_PX`'s doc comment for the live
-  // finding this replaces). `quantizedWidthPx === 0` means "not yet measured" (jsdom, or before
-  // the observer's first callback), same sentinel the old `width > 0` guard used.
+  // Adaptive threshold — narrow mode triggers whenever the card cannot give each candidate column
+  // at least `MIN_COLUMN_WIDTH_PX`, rather than at one fixed pixel width regardless of column
+  // count (see `MIN_COLUMN_WIDTH_PX`'s doc comment for why). `quantizedWidthPx === 0` means "not
+  // yet measured" (jsdom, or before the observer's first callback).
   const isNarrow =
     quantizedWidthPx > 0 &&
     quantizedWidthPx < candidateColumnCount * MIN_COLUMN_WIDTH_PX;
@@ -882,10 +870,10 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
     [measuredPaneHeightPx, cardMaxHeightCeilingPx],
   );
 
-  // Scrolling body ref (iteration-4 item 3). The actual scroll-to-top reset lives in the
-  // `useLayoutEffect` below, keyed on `[safePageIndex, pageSize]` — that runs for a page-size
-  // change (including going back to the default) AND for a plain next/previous-page click, which
-  // used to leave the body scrolled wherever it was on the PREVIOUS page.
+  // Scrolling body ref. The actual scroll-to-top reset lives in the `useLayoutEffect` below, keyed
+  // on `[safePageIndex, pageSize]` — that runs for a page-size change (including going back to the
+  // default) AND for a plain next/previous-page click, so the body never stays scrolled wherever
+  // it was on the PREVIOUS page.
   const bodyRef = useRef<HTMLDivElement | null>(null);
   const handlePageSizeChange = (size: number) => {
     setUserPickedPageSize(true);
@@ -901,21 +889,20 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   };
 
   /**
-   * Whether the pagination footer has anything to offer. Issue #9009 (A4): compared against the
-   * CURRENT page size rather than the smallest offered option — at or below it, the whole result
-   * already fits on one page, so there is nothing to page and no reason to show the "Page 1 of 1"
-   * control the QA E2E review flagged as noise (a one-row table used to render the full "Rows per
-   * page: 5 10 25 50" footer for nothing). With the default page size now 10, this is also what
-   * hides the pager for the 6-10 row results whose off-page rows previously produced a factually
-   * wrong AI summary (the finding this fix exists for).
+   * Whether the pagination footer has anything to offer. Compared against the CURRENT page size
+   * rather than the smallest offered option — at or below it, the whole result already fits on one
+   * page, so there is nothing to page and no reason to show a "Page 1 of 1" control: a one-row
+   * table would otherwise render the full "Rows per page: 5 10 25 50" footer for nothing. With the
+   * default page size at 10, this also hides the pager for the 6-10 row results whose off-page rows
+   * would otherwise produce a factually wrong AI summary.
    *
-   * The second clause (review, MAJOR-1) covers a trapdoor the first clause alone falls into: a
-   * reader who explicitly PICKS a page size that happens to be >= the row count (e.g. 25 rows,
-   * pick page size 25) would otherwise make `spec.rows.length > pageSize` false and unmount the
-   * WHOLE footer — including the size selector itself — with no way back to a smaller size short
-   * of a remount. Once the reader has ever picked a size (`userPickedPageSize`), the footer stays
-   * as long as the result exceeds the SMALLEST offered option, so the selector that got them into
-   * this state can always get them back out of it.
+   * The second clause covers a trapdoor the first clause alone falls into: a reader who explicitly
+   * PICKS a page size that happens to be >= the row count (e.g. 25 rows, pick page size 25) would
+   * otherwise make `spec.rows.length > pageSize` false and unmount the WHOLE footer — including the
+   * size selector itself — with no way back to a smaller size short of a remount. Once the reader
+   * has ever picked a size (`userPickedPageSize`), the footer stays as long as the result exceeds
+   * the SMALLEST offered option, so the selector that got them into this state can always get them
+   * back out of it.
    */
   const needsPagination =
     spec.rows.length > pageSize ||
@@ -956,10 +943,9 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
         if (!Number.isFinite(rowIndex)) {
           return null;
         }
-        // Issue #9009 (A3): the toggle used to keep the aria-label 'Expand row' after opening and
-        // exposed no `aria-expanded`, so neither a screen-reader nor a returning user could tell an
-        // open row from a closed one from the control itself — the same pattern the providers table
-        // (settings-page.tsx) already gets right: flip the accessible name AND set `aria-expanded`.
+        // The toggle must flip the accessible name AND set `aria-expanded` — the same pattern the
+        // providers table (settings-page.tsx) already gets right — so a screen-reader or returning
+        // user can tell an open row from a closed one from the control itself.
         const isRowExpanded = expandedRowIds.has(rowIndex);
         return (
           <EuiButtonIcon
@@ -974,7 +960,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
                   })
             }
             aria-expanded={isRowExpanded}
-            // Review, required minor: only set once the target actually exists in the DOM — the
+            // Only set once the target actually exists in the DOM — the
             // `itemIdToExpandedRowMap` entry (and its matching `id`) below is only populated for a
             // row that IS expanded, so pointing at it while collapsed would reference nothing.
             aria-controls={
@@ -996,7 +982,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   // Only the first MAX_VISIBLE_COLUMNS spec columns become visible table columns — see that
   // constant's doc comment. `spec.rows` is untouched (every spec-column field is still in each
   // row object), so a hidden column stays reachable through the row expander below.
-  // Issue #9009 (J1): narrow mode shrinks the visible-column budget further, from 6 down to 3 —
+  // Narrow mode shrinks the visible-column budget further, from 6 down to 3 —
   // "first 2-3 columns from the tool's existing column order" — reusing the exact same
   // demoted-not-deleted mechanism `MAX_VISIBLE_COLUMNS` already relies on: a column past the
   // budget stays reachable through the row expander below, it just doesn't get its own <th>.
@@ -1015,15 +1001,15 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
    * How many extra fields an expanded row actually reveals — the MAXIMUM, over the rows, of the
    * keys that row carries beyond the visible columns.
    *
-   * Previously this disclosure counted only `spec.columns.length - budget` — spec columns demoted
-   * past the visible-column budget. But a row carries more than its spec columns: `buildTableSpec`
+   * Counting only `spec.columns.length - budget` — spec columns demoted past the visible-column
+   * budget — would undercount: a row carries more than its spec columns. `buildTableSpec`
    * (server/tools/digest.ts) also writes each tool's `tableSpec.rowFields`, the investigation-only
    * field set that never had a column to be demoted from. So a table with 4 spec columns and 6
-   * `rowFields` disclosed nothing at all, while a 9-spec-column table disclosed "+3 more fields" —
-   * the same expander offering extra fields in both cases, advertised in only one of them. Counting
-   * what the expander will really show makes the hint appear on exactly the tables that have
-   * something extra behind it, which is also why it now covers the columns `populatedColumns`
-   * dropped for being empty.
+   * `rowFields` would disclose nothing at all, while a 9-spec-column table would disclose "+3 more
+   * fields" — the same expander offering extra fields in both cases, advertised in only one of
+   * them. Counting what the expander will really show makes the hint appear on exactly the tables
+   * that have something extra behind it, which is also why it covers the columns `populatedColumns`
+   * drops for being empty.
    *
    * A max over rows rather than the UNION of every row's keys, because the label says "per row":
    * `rowFields` are written sparsely (digest.ts skips an absent one to keep rows JSON-sparse), so a
@@ -1083,18 +1069,18 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
           name: column.label,
           // A column whose every value is short gets a matching short width, so the ONE free-text
           // column in a findings table (the rule/finding title) inherits all the leftover room
-          // instead of the fixed layout dividing it evenly. The live audit (§3.4) measured the
-          // even split as three identical 324px slabs holding an agent name and a category each,
-          // while the title beside them wrapped onto three lines. Data-driven rather than keyed to
+          // instead of the fixed layout dividing it evenly. An even split renders three identical
+          // 324px slabs holding an agent name and a category each, while the title beside them
+          // wraps onto three lines. Data-driven rather than keyed to
           // field names: this renderer is generic (any tool's spec), so "how wide should this be"
           // can only come from what the column actually holds — the same way the timestamp and
           // severity cases above are detected rather than declared.
           ...(isShortValueColumn(spec.rows, column.id)
             ? { width: SHORT_COLUMN_WIDTH }
             : {}),
-          // Issue #9009 (J1): narrow mode truncates the free-text columns with a tooltip instead of
-          // wrapping — the reproduction was cells wrapping onto several lines at ~480px, making the
-          // whole table unreadable. Full width keeps the existing renderer unchanged.
+          // Narrow mode truncates the free-text columns with a tooltip instead of wrapping —
+          // unwrapped cells wrap onto several lines at ~480px, making the whole table unreadable.
+          // Full width keeps the existing renderer unchanged.
           render: isNarrow ? renderNarrowTruncatedCell : renderDefaultCell,
         };
       }),
@@ -1171,18 +1157,18 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
     [items, pageStart, pageSize],
   );
 
-  // Issue #9009 (A1): EuiBasicTable's own default screen-reader caption is built from `items`
-  // alone — the CURRENT page's rows, since this component paginates by hand rather than through
-  // EuiBasicTable's own `pagination` prop — so a screen-reader user was told "This table contains
-  // 5 rows" on a 6-row result while the visible header said "Results (6 rows)". An explicit
-  // `tableCaption` always states the TOTAL (with the same plural handling as `titleText` above),
-  // plus the page position whenever the result actually spans more than one page.
+  // EuiBasicTable's own default screen-reader caption is built from `items` alone — the CURRENT
+  // page's rows, since this component paginates by hand rather than through EuiBasicTable's own
+  // `pagination` prop — so a screen-reader user would be told "This table contains 5 rows" on a
+  // 6-row result while the visible header said "Results (6 rows)". An explicit `tableCaption`
+  // always states the TOTAL (with the same plural handling as `titleText` above), plus the page
+  // position whenever the result actually spans more than one page.
   //
-  // Review, required minor: `tableCaptionPaged` is its OWN self-contained message with every
-  // value as a plain ICU argument, rather than interpolating the ALREADY-TRANSLATED
-  // `tableCaptionTotal` string into it — nesting one translated string inside another freezes the
-  // sentence order the first translator chose, leaving a later translator no way to reorder
-  // "total" relative to "showing rows X-Y" for their language's grammar.
+  // `tableCaptionPaged` is its OWN self-contained message with every value as a plain ICU
+  // argument, rather than interpolating the ALREADY-TRANSLATED `tableCaptionTotal` string into
+  // it — nesting one translated string inside another freezes the sentence order the first
+  // translator chose, leaving a later translator no way to reorder "total" relative to "showing
+  // rows X-Y" for their language's grammar.
   const tableCaption =
     pageCount > 1
       ? i18n.translate('wazuhAiAssistant.resultTable.tableCaptionPaged', {
@@ -1204,18 +1190,18 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
         });
 
   const titleText =
-    // Issue #9009 (A2): was a literal 'Results ({count} rows)' with no plural handling — a
-    // single-row result read as the ungrammatical 'Results (1 rows)'. ICU plural via i18n.
+    // A literal 'Results ({count} rows)' has no plural handling — a single-row result would read
+    // as the ungrammatical 'Results (1 rows)'. ICU plural via i18n avoids that.
     i18n.translate('wazuhAiAssistant.resultTable.accordionSummary', {
       defaultMessage: 'Results ({count, plural, one {# row} other {# rows}})',
       values: { count: spec.rows.length },
     }) +
-    // Column-budget disclosure (issue #8921): a column demoted past MAX_VISIBLE_COLUMNS is NOT
-    // deleted — buildTableSpec (digest.ts) still puts its field into every row — so this tells
-    // the reader where to find it instead of leaving its disappearance unexplained. Now keyed on
+    // Column-budget disclosure: a column demoted past MAX_VISIBLE_COLUMNS is NOT deleted —
+    // buildTableSpec (digest.ts) still puts its field into every row — so this tells the reader
+    // where to find it instead of leaving its disappearance unexplained. Keyed on
     // `extraRowFieldCount` (every extra field the expander really shows) rather than on the
-    // demoted-spec-column count alone, so the hint no longer appears on some tables with extra
-    // fields and not others — see that value's own doc comment.
+    // demoted-spec-column count alone, so the hint's presence is consistent across every table
+    // that actually has extra fields — see that value's own doc comment.
     (extraRowFieldCount > 0
       ? i18n.translate('wazuhAiAssistant.resultTable.hiddenColumnsNote', {
           defaultMessage:
@@ -1242,12 +1228,12 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
           </EuiFlexItem>
         ))}
         {resolveDiscoverUrl && spec.discover ? (
-          // `minWidth: 0` (issue #9008 review, F6): a flex item's default `min-width: auto` refuses
-          // to shrink below its content, so the partial-range disclosure — the longest label this
-          // slot can carry, up to ~60 characters — pushed the actions row past the card's width in
-          // a narrow (sidecar) container instead of ellipsing. Paired with
-          // `.wzResultsCardActions`'s own truncation rule (result-table.scss), which is what the
-          // shrink actually resolves to; the untruncated text stays reachable as the link's title.
+          // `minWidth: 0`: a flex item's default `min-width: auto` refuses to shrink below its
+          // content, so the partial-range disclosure — the longest label this slot can carry, up
+          // to ~60 characters — would push the actions row past the card's width in a narrow
+          // (sidecar) container instead of ellipsing. Paired with `.wzResultsCardActions`'s own
+          // truncation rule (result-table.scss), which is what the shrink actually resolves to;
+          // the untruncated text stays reachable as the link's title.
           <EuiFlexItem grow={false} style={{ minWidth: 0 }}>
             <DiscoverLink spec={spec} resolveDiscoverUrl={resolveDiscoverUrl} />
           </EuiFlexItem>
@@ -1264,11 +1250,11 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
     ) : null;
 
   return (
-    // Layout contract §4: `grid-template-rows: auto minmax(0,1fr) auto` with a capped max-height —
-    // header and the pagination footer are pinned grid rows, only `.wzResultsCardBody` (the
-    // middle, `minmax(0,1fr)` row) scrolls. This is a plain styled `div`, not `EuiPanel` — EuiPanel
-    // wraps its content in markup this component does not control, which fought the exact 3-row
-    // grid this fix depends on; `wzResultsCard` (result-table.scss) applies the same bordered,
+    // `grid-template-rows: auto minmax(0,1fr) auto` with a capped max-height — header and the
+    // pagination footer are pinned grid rows, only `.wzResultsCardBody` (the middle,
+    // `minmax(0,1fr)` row) scrolls. This is a plain styled `div`, not `EuiPanel` — EuiPanel wraps
+    // its content in markup this component does not control, which would fight the exact 3-row
+    // grid this layout depends on; `wzResultsCard` (result-table.scss) applies the same bordered,
     // shadowless look via the shared `wzPanel` mixin instead, so the visual result is identical.
     <div
       ref={cardRef}

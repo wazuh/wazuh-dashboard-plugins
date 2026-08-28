@@ -5,6 +5,7 @@ import {
   objectSchema,
   optionalStringParam,
   requireNonEmptyString,
+  SCA_CURRENT_STATE_NOTE,
   validateAgentId,
 } from './common';
 import { ANSWER_BUCKET_CAP, BREAKDOWN_BUCKET_CAP } from '../digest';
@@ -73,22 +74,22 @@ function buildContainsIncludePattern(subject: string): string {
 /**
  * Upper bound on the normalized `search` subject. `optionalStringParam` does not bound length,
  * and every character of the subject becomes 1-4 characters of the `terms.include` regexp above —
- * a model-supplied 5k-char fragment would otherwise become an unbounded cluster-side regexp
- * (integration review of #8935 item I2). 200 chars comfortably covers the longest real 5.0 check
+ * a model-supplied 5k-char fragment would otherwise become an unbounded cluster-side regexp.
+ * 200 chars comfortably covers the longest real 5.0 check
  * name observed (~110 chars) plus headroom; anything longer cannot be a check-name fragment.
  */
 const MAX_SEARCH_SUBJECT_LENGTH = 200;
 
 /**
- * IN-BAND scope attribution for the enumeration aggregation (#8935 item I2, integration review):
- * every entry of a multi-aggregation digest breakdown is tagged with its aggregation NAME
- * (digest.ts's `buildBreakdown`), so the name itself is the one deterministic, code-level channel
- * that tells the model what the enumerated check names ARE. A `result`-filtered call scopes the
- * whole query — and therefore this aggregation — to that result, so the name says so
- * (`matching_failed_checks`); a fragment-only call enumerates across ALL results, and the name
- * says that too (`matching_checks_all_results`), so a "which SSH checks FAILED" answer cannot
- * silently present passed checks as failures. Relying on the model to also pass `result` was the
- * prompt layer — measured 0/3 — which is why the attribution rides in the data instead.
+ * IN-BAND scope attribution for the enumeration aggregation: every entry of a multi-aggregation
+ * digest breakdown is tagged with its aggregation NAME (digest.ts's `buildBreakdown`), so the name
+ * itself is the one deterministic, code-level channel that tells the model what the enumerated
+ * check names ARE. A `result`-filtered call scopes the whole query — and therefore this
+ * aggregation — to that result, so the name says so (`matching_failed_checks`); a fragment-only
+ * call enumerates across ALL results, and the name says that too (`matching_checks_all_results`),
+ * so a "which SSH checks FAILED" answer cannot silently present passed checks as failures.
+ * Relying on the model to also pass `result` in the prompt layer is unreliable, which is why the
+ * attribution rides in the data instead.
  */
 function matchingChecksAggName(result: string | undefined): string {
   return result
@@ -113,7 +114,7 @@ const getScaChecksToolBase: ToolDefinition = {
       'fragment via search (e.g. "ssh") together with result="failed": the digest breakdown\'s ' +
       '"matching_failed_checks" entries name the matching checks over the full result set ' +
       '(alphabetical; if more match than the list carries, the digest says how many were cut — ' +
-      'narrow the fragment to see them all).',
+      `narrow the fragment to see them all). ${SCA_CURRENT_STATE_NOTE}`,
     parameters: objectSchema(
       {
         agent_id: {
@@ -122,7 +123,10 @@ const getScaChecksToolBase: ToolDefinition = {
             'Numeric Wazuh agent ID, e.g. "003". Optional: omit this for a deictic host ' +
             'reference ("this box"/"this server") with no known id -- the call resolves to the ' +
             'only active agent automatically, or (when check_id is given instead) from that ' +
-            "check's own document.",
+            'check\'s own document. If the user named a host (e.g. "web-server-01"), resolve that ' +
+            'name to its numeric id first and pass it here: omitting this parameter does NOT ' +
+            'search across agents, it resolves to a single agent, so an unscoped call answers ' +
+            'about the wrong host.',
         },
         policy_id: {
           type: 'string',
@@ -137,10 +141,11 @@ const getScaChecksToolBase: ToolDefinition = {
           description:
             'Exact numeric check.id to look up (e.g. "28500"), when the user already names a ' +
             'specific check id (typically a remediation/drill-down question about that one ' +
-            'check). When supplied, agent_id and policy_id resolve automatically from that ' +
-            'check\'s own document -- this is the preferred way to answer "how do I remediate ' +
-            'failed check ID X" without first asking which agent, since the check id alone ' +
-            'already identifies which agent/policy it belongs to.',
+            'check). When supplied, the returned rows are narrowed to THAT check, and agent_id ' +
+            "and policy_id resolve automatically from that check's own document -- this is the " +
+            'preferred way to answer "how do I remediate failed check ID X" without first ' +
+            'asking which agent, since the check id alone already identifies which agent/policy ' +
+            'it belongs to.',
         },
         result: {
           type: 'string',
@@ -169,7 +174,7 @@ const getScaChecksToolBase: ToolDefinition = {
   },
   target: 'indexer',
   tier: 'T1',
-  // Issue: generic sole-candidate parameter resolution (template: #8913's
+  // Issue: generic sole-candidate parameter resolution (template:
   // resolveDeicticAgentParams in get-agent-inventory.ts). Both `agent_id` and `policy_id` measured
   // as blockers on deictic/topic-only SCA questions when strictly required. Order matters:
   // `agent_id` resolves first (unscoped, against the Manager API), then `policy_id` resolves
@@ -196,10 +201,23 @@ const getScaChecksToolBase: ToolDefinition = {
     const limit = clampLimit(params.limit, 20, 500);
     const result = optionalStringParam(params.result);
     const search = optionalStringParam(params.search);
-    // Normalized subject (#8935 item I2, integration review): trimmed, treated as ABSENT when
-    // whitespace-only (a '   ' subject otherwise became include '.*\ \ \ .*' — matches nothing —
-    // plus a prefix on the empty string), and length-capped so the per-character include
-    // expansion below stays bounded cluster-side.
+    // `check_id` must NARROW the executed query, not only resolve agent_id/policy_id.
+    // `resolveScaCheckParams` (param-resolution.ts) reads it to find the check's owning
+    // agent/policy and passes it through untouched, but nothing here put a `check.id` term into
+    // the request -- so a "how do I remediate check ID X" call returned a `limit`-truncated
+    // sample of the WHOLE policy (hundreds of checks) which usually did not contain check X at
+    // all, and the one field the question was about was absent from every row that came back.
+    // `check.id` is a keyword field in the wazuh-states-sca mapping (enumerated in
+    // common/field-catalog.ts), so an exact term is the right match; trimmed the same way the
+    // resolution path reads the same value. The term goes in `query.bool.filter`, not
+    // `post_filter`, deliberately: it is a scope narrowing (this ONE check), so the aggregations
+    // below must be computed inside it too -- a policy-wide `results` distribution beside a
+    // single check's row is the scope mismatch the `search` comment already records.
+    const checkId = optionalStringParam(params.check_id)?.trim() || undefined;
+    // Normalized subject: trimmed, treated as ABSENT when whitespace-only (a '   ' subject
+    // otherwise becomes include '.*\ \ \ .*' — matches nothing — plus a prefix on the empty
+    // string), and length-capped so the per-character include expansion below stays bounded
+    // cluster-side.
     const trimmedSearch = search?.trim().slice(0, MAX_SEARCH_SUBJECT_LENGTH);
     const subject =
       trimmedSearch && trimmedSearch.length > 0 ? trimmedSearch : undefined;
@@ -235,13 +253,13 @@ const getScaChecksToolBase: ToolDefinition = {
           },
         }
       : undefined;
-    // #8935 item I2: attached whenever `result` OR `search` is supplied -- the two drill-down
-    // shapes behind "which checks failed"/"which SSH checks failed". A bare listing call (neither
-    // supplied) attaches no enumeration agg at all, so its request body stays byte-identical to
-    // before this item. Scoped to `search`'s fragment via `buildContainsIncludePattern` when a
-    // fragment was supplied; unscoped (still capped at ANSWER_BUCKET_CAP) when only `result` was
-    // supplied, which is what closes the enumeration half of the HONEST SCOPE NOTE below. The agg
-    // NAME carries the result scope in-band — see matchingChecksAggName.
+    // Attached whenever `result` OR `search` is supplied -- the two drill-down shapes behind
+    // "which checks failed"/"which SSH checks failed". A bare listing call (neither supplied)
+    // attaches no enumeration agg at all. Scoped to `search`'s fragment via
+    // `buildContainsIncludePattern` when a fragment is supplied; unscoped (still capped at
+    // ANSWER_BUCKET_CAP) when only `result` is supplied, which is what closes the enumeration
+    // half of the HONEST SCOPE NOTE below. The agg NAME carries the result scope in-band -- see
+    // matchingChecksAggName.
     const matchingChecksAgg =
       result || subject
         ? {
@@ -249,13 +267,13 @@ const getScaChecksToolBase: ToolDefinition = {
               terms: {
                 field: 'check.name',
                 size: ANSWER_BUCKET_CAP,
-                // Alphabetical, EXPLICITLY (#8935 item I2, integration review): wazuh-states-sca
-                // holds one document per check per agent+policy, so every bucket's doc_count is 1
-                // and the default count ordering degenerates to its _key tie-break anyway —
-                // making the order explicit makes the cut DETERMINISTIC and honestly describable
-                // when more checks match than `size` can carry (the digest's trim/remainder note
-                // describes a first-N-in-response-order cut; "the alphabetically first N" is that,
-                // stated plainly, instead of an arbitrary cut a model could read as a top-N).
+                // Alphabetical, EXPLICITLY: wazuh-states-sca holds one document per check per
+                // agent+policy, so every bucket's doc_count is 1 and the default count ordering
+                // degenerates to its _key tie-break anyway — making the order explicit makes the
+                // cut DETERMINISTIC and honestly describable when more checks match than `size`
+                // can carry (the digest's trim/remainder note describes a first-N-in-response-order
+                // cut; "the alphabetically first N" is that, stated plainly, instead of an
+                // arbitrary cut a model could read as a top-N).
                 order: { _key: 'asc' },
                 ...(subject
                   ? { include: buildContainsIncludePattern(subject) }
@@ -273,6 +291,7 @@ const getScaChecksToolBase: ToolDefinition = {
             filter: [
               { term: { 'wazuh.agent.id': agentId } },
               { term: { 'policy.id': policyId.trim() } },
+              ...(checkId ? [{ term: { 'check.id': checkId } }] : []),
               ...(result
                 ? [
                     {
@@ -285,21 +304,21 @@ const getScaChecksToolBase: ToolDefinition = {
             ],
           },
         },
-        // `search`'s should-clause moved from `query.bool.filter` to `post_filter` (#8935 item
-        // I2). `post_filter` runs AFTER aggregations, filtering HITS (and hits.total) only -- so
-        // exact-name/prefix HITS behavior for a `search` caller is completely unchanged, while
-        // the enumeration agg below is computed over the full agent+policy+result matched set,
-        // unaffected by a fragment. Before this move, `search: "ssh"` (0 hits on a keyword field)
-        // put the search clause in `query.bool.filter`, so EVERY aggregation was also computed
-        // over that same empty set -- a topic fragment degenerated every aggregation to zero, not
-        // just the hits list. `hits.total` honoring `post_filter` (so a fragment still narrows
-        // the reported `counts.total`, just not the aggregations) is documented OpenSearch
-        // behavior, not a guess -- flagged here for the live-proof pass. The digest side is
-        // post_filter-AWARE: buildZeroRowHint (digest.ts) sees `post_filter` on the request body
-        // and tells the model the 0 rows are a post-filter artifact with the aggregations still
-        // population-true, instead of blaming the query filters (integration review: a fragment
-        // call otherwise reported "0 rows. Filters applied: wazuh.agent.id, policy.id,
-        // check.result" right beside a breakdown proving all three matched).
+        // `search`'s should-clause lives in `post_filter`, not `query.bool.filter`. `post_filter`
+        // runs AFTER aggregations, filtering HITS (and hits.total) only -- so exact-name/prefix
+        // HITS behavior for a `search` caller is unaffected, while the enumeration agg below is
+        // computed over the full agent+policy+result matched set, unaffected by a fragment.
+        // Putting the search clause in `query.bool.filter` instead would compute EVERY aggregation
+        // over that same filtered set too -- a topic fragment would degenerate every aggregation
+        // to zero along with the hits list whenever the fragment itself yields 0 hits (e.g.
+        // `search: "ssh"` against a keyword field). `hits.total` honors `post_filter` (so a
+        // fragment still narrows the reported `counts.total`, just not the aggregations) --
+        // documented OpenSearch behavior. The digest side is post_filter-AWARE: buildZeroRowHint
+        // (digest.ts) sees `post_filter` on the request body and tells the model the 0 rows are a
+        // post-filter artifact with the aggregations still population-true, instead of blaming the
+        // query filters (a fragment call would otherwise report "0 rows. Filters applied:
+        // wazuh.agent.id, policy.id, check.result" right beside a breakdown proving all three
+        // matched).
         ...(searchShould ? { post_filter: searchShould } : {}),
         _source: [
           'check.id',
@@ -312,27 +331,27 @@ const getScaChecksToolBase: ToolDefinition = {
         ],
         sort: ['_doc'],
         size: limit,
-        // Population-true Passed/Failed/Not-applicable distribution over the FULL matched set
-        // (issue #8920 item 1: "named 2 of 10 failed checks" -- this tool only ever ran a plain
-        // hits search, so a `limit`-truncated page gave the model no view of results outside it).
-        // OpenSearch computes `aggregations` over every matched doc regardless of `size`, so this
-        // stays correct even when `limit` truncates the returned rows. `check.result` is on
-        // guardrails.ts's AGG_FIELD_ALLOWLIST as a closed 3-value enum; digest.ts's `buildBreakdown`
-        // already reads any response's `aggregations` generically, so this needs no digest change.
+        // Population-true Passed/Failed/Not-applicable distribution over the FULL matched set --
+        // without it, a `limit`-truncated page answers "named 2 of 10 failed checks" with no view
+        // of results outside the page. OpenSearch computes `aggregations` over every matched doc
+        // regardless of `size`, so this stays correct even when `limit` truncates the returned
+        // rows. `check.result` is on guardrails.ts's AGG_FIELD_ALLOWLIST as a closed 3-value enum;
+        // digest.ts's `buildBreakdown` already reads any response's `aggregations` generically, so
+        // this needs no digest change.
         //
         // HONEST SCOPE NOTE: when the caller ALREADY filters by `result` (the natural call behind
         // "which SSH checks failed"), `results` is a single bucket equal to counts.total — it
         // adds category-count truth for UNFILTERED calls, but on its own it does NOT close the
         // enumeration half of the reported instance ("named 2 of 10 failed checks" with the count
-        // already present). #8935 item I2 closes that half: the matching_* agg below enumerates
-        // the actual check NAMES over the same full matched set, so a `result="failed"`
-        // (optionally `search`-scoped) call now gets both the count (from `results`) and the
-        // names population-true, inside ANSWER_BUCKET_CAP/MAX_AGG_SIZE and guardrails'
+        // already present). The matching_* agg below closes that half: it enumerates the actual
+        // check NAMES over the same full matched set, so a `result="failed"` (optionally
+        // `search`-scoped) call gets both the count (from `results`) and the names
+        // population-true, inside ANSWER_BUCKET_CAP/MAX_AGG_SIZE and guardrails'
         // MAX_TOP_LEVEL_AGGS (5).
         //
-        // `results` is DROPPED whenever a `search` subject is supplied (#8935 item I2,
-        // integration review): with the search clause in `post_filter`, `results` would count the
-        // WHOLE agent+policy(+result) scope while the question is about the subject — an
+        // `results` is DROPPED whenever a `search` subject is supplied: with the search clause in
+        // `post_filter`, `results` would count the WHOLE agent+policy(+result) scope while the
+        // question is about the subject — an
         // exact-name call would show "Failed: 102" beside its one matching check, and a fragment
         // call would place a policy-wide distribution beside a subject-scoped name list with
         // nothing in the payload distinguishing the two scopes. For a subject question the
@@ -359,27 +378,26 @@ const getScaChecksToolBase: ToolDefinition = {
       // column, not `severity: true` (same rationale as the 4.14 version of this tool).
       { field: 'check.result', label: 'Result' },
       // 'check.rationale', not 'check.reason': the reason field exists in the wazuh-states-sca
-      // mapping but is EMPTY in every live document (verified 2026-08-14) -- the populated
-      // explanation text lives in check.rationale, so a Reason column keyed on check.reason
-      // rendered an em-dash on every row that ever had this table.
+      // mapping but is EMPTY in every document -- the populated explanation text lives in
+      // check.rationale, so a Reason column keyed on check.reason would render an em-dash on
+      // every row.
       { field: 'check.rationale', label: 'Reason' },
     ],
     // Row expander: rationale/remediation + the raw rule text (where 5.0 folds the old
     // file/directory/command detail, per the matrix — the investigative payload of this tool).
     rowFields: ['check.rationale', 'check.remediation', 'check.rules'],
   },
-  // Workstream D (SCA interpretation, coverage doc CV-054): `check.rationale` (WHY the check
-  // exists/what it protects against) and `check.remediation` (WHAT to do about a failure) now
-  // ride in the digest sample rows too, not just the row expander -- the model cannot lead an
-  // interpreted answer with "why this matters" / "what to do" (prompts.ts's SCA synthesis
-  // guidance) from a sample that never carried either field. `check.description` stays excluded
-  // (same hundreds-of-words budget concern that originally excluded rationale/remediation too) --
-  // it is the benchmark's own restatement of the check's title, not additional interpretive
-  // content the synthesis guidance needs.
+  // `check.rationale` (WHY the check exists/what it protects against) and `check.remediation`
+  // (WHAT to do about a failure) ride in the digest sample rows, not just the row expander -- the
+  // model needs both fields in the sample to lead an interpreted answer with "why this matters" /
+  // "what to do" (prompts.ts's SCA synthesis guidance). `check.description` stays excluded (same
+  // hundreds-of-words budget concern as rationale/remediation) -- it is the benchmark's own
+  // restatement of the check's title, not additional interpretive content the synthesis guidance
+  // needs.
   //
-  // Both fields are free CIS/benchmark prose that routinely runs long -- live data (a
-  // `wazuh-states-sca` document pulled from `wazuh-aio-5`) has `check.rationale` at 604 chars and
-  // `check.remediation` at 597, both already past `digest.ts`'s generic `MAX_FIELD_VALUE_LENGTH`
+  // Both fields are free CIS/benchmark prose that routinely runs long -- a real `wazuh-states-sca`
+  // document has `check.rationale` at 604 chars and `check.remediation` at 597, both already past
+  // `digest.ts`'s generic `MAX_FIELD_VALUE_LENGTH`
   // (500). Relying on that generic cap alone means every long rationale/remediation is capped
   // AT EXACTLY 500 chars -- the cap becomes the typical size, not a rare backstop -- which pushes
   // a 5-sample-row digest to ~5,890 chars, within `capDigest`'s pop-a-sample-row range of
@@ -407,7 +425,7 @@ const getScaChecksToolBase: ToolDefinition = {
   },
 };
 
-// BLOCKER FIX (CV-053/CV-052/CV-088 turn 3): a hand-written `resolveParams`, wrapping
+// A hand-written `resolveParams`, wrapping
 // `resolveScaCheckParams` (param-resolution.ts), REPLACES the plain declarative
 // `soleCandidateParams`-only resolution `registry.ts` would otherwise attach. `soleCandidateParams`
 // above is still read (via `buildGenericResolveParams` inside `resolveScaCheckParams`) as the

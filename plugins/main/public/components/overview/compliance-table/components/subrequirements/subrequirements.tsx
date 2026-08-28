@@ -26,9 +26,9 @@ import {
   EuiIcon,
   EuiLoadingSpinner,
 } from '@elastic/eui';
-import { AppState } from '../../../../../react-services/app-state';
 import { RequirementFlyout } from '../requirement-flyout';
 import { getDataPlugin } from '../../../../../kibana-services';
+import NavigationService from '../../../../../react-services/navigation-service';
 import {
   TAB_VIEW_ID_DASHBOARD,
   TAB_VIEW_ID_EVENTS,
@@ -74,7 +74,6 @@ export class ComplianceSubrequirements extends Component {
     const { filterManager } = getDataPlugin().query;
     const matchPhrase = {};
     matchPhrase[filter.key] = filter.value;
-    const pattern = AppState.getCurrentPattern();
     const newFilter = {
       meta: {
         disabled: false,
@@ -82,7 +81,7 @@ export class ComplianceSubrequirements extends Component {
         params: { query: filter.value },
         type: 'phrase',
         negate: filter.negate || false,
-        index: pattern,
+        index: this.props.indexPatternId,
       },
       query: { match_phrase: matchPhrase },
       $state: { store: 'appState' },
@@ -112,7 +111,9 @@ export class ComplianceSubrequirements extends Component {
       value: requirementId,
       negate: false,
     });
-    this.props.onSelectedTabChanged(TAB_VIEW_ID_EVENTS);
+    NavigationService.getInstance().updateAndNavigateSearchParams({
+      tabSubView: TAB_VIEW_ID_EVENTS,
+    });
   }
 
   openDashboard(e, requirementId) {
@@ -121,7 +122,9 @@ export class ComplianceSubrequirements extends Component {
       value: requirementId,
       negate: false,
     });
-    this.props.onSelectedTabChanged(TAB_VIEW_ID_DASHBOARD);
+    NavigationService.getInstance().updateAndNavigateSearchParams({
+      tabSubView: TAB_VIEW_ID_DASHBOARD,
+    });
   }
 
   renderFacet() {
@@ -249,7 +252,9 @@ export class ComplianceSubrequirements extends Component {
                   </EuiToolTip>
 
                   {!item.isOthers && this.state.hover === item.id && (
-                    <span style={{ float: 'right', position: 'fixed' }}>
+                    <span
+                      style={{ display: 'inline-flex', alignItems: 'center' }}
+                    >
                       <EuiToolTip
                         position='top'
                         content={`Show ${item.id} in ${TAB_VIEW_NAME_DASHBOARD}`}
@@ -297,6 +302,7 @@ export class ComplianceSubrequirements extends Component {
         <EuiFlexGrid
           columns={4}
           gutterSize='s'
+          onScroll={() => this.state.hover && this.setState({ hover: '' })}
           style={{
             maxHeight: 'calc(100vh - 420px)',
             overflow: 'overlay',

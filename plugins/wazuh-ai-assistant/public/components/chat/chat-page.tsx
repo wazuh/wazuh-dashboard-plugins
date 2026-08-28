@@ -144,10 +144,10 @@ interface ChatPageProps {
   allowRailFlyout?: boolean;
   /**
    * Whether the empty state may render as ONE vertically centred group (greeting + composer +
-   * example cards) that docks the composer to the bottom on the first send — C1, the Gemini-style
-   * empty state (AI/ux-iter3/gemini-motion-spec.md). Default true, i.e. the app shell's full-page
-   * chat gets it; the header's docked sidecar (assistant-chat-panel.tsx) passes `false` and keeps
-   * today's always-docked composer, per the spec's own "no room for theatre" note.
+   * example cards) that docks the composer to the bottom on the first send — the Gemini-style
+   * empty state. Default true, i.e. the app shell's full-page chat gets it; the header's docked
+   * sidecar (assistant-chat-panel.tsx) passes `false` and keeps today's always-docked composer,
+   * since there is no room for that theatre in a docked panel.
    *
    * A dedicated prop rather than piggy-backing on `allowRailFlyout === false` (the only other
    * signal that currently distinguishes the sidecar): that prop answers "may the rail escalate to
@@ -185,16 +185,16 @@ export interface ChatPageHandle {
   newConversation: () => void;
   selectConversation: (id: string) => void;
   deleteConversation: (id: string) => void;
-  /** m14 (#9010 review): the docked sidecar panel (header/assistant-chat-panel.tsx) is a PRIMARY
-   * surface for the conversation rail, not a secondary one — it needs the same rename/bulk-delete
-   * handlers the inline rail already gets directly as props, routed through this same imperative
-   * handle `deleteConversation` already uses. */
+  /** The docked sidecar panel (header/assistant-chat-panel.tsx) is a PRIMARY surface for the
+   * conversation rail, not a secondary one — it needs the same rename/bulk-delete handlers the
+   * inline rail already gets directly as props, routed through this same imperative handle
+   * `deleteConversation` already uses. */
   renameConversation: (id: string, title: string) => void;
   bulkDeleteConversations: (ids: string[]) => void;
 }
 
 /**
- * C1 composer position state machine (chat-page.scss carries the matching classes).
+ * Composer position state machine (chat-page.scss carries the matching classes).
  *
  * - `centered` — the empty state: the pane is a centred flex column, so the transcript (holding
  *   greeting + example cards) and the composer read as one group sitting slightly above the
@@ -352,9 +352,9 @@ const EXAMPLE_CARDS = [
       },
     ),
     // Deliberately the shortest of the three questions rather than the longest: rendered as a card
-    // description in a 3-up grid, the old "Show me the critical findings of the last 24 hours"
-    // wrapped to two lines while its two neighbours took one, so the row's cards had visibly
-    // different amounts of empty space in them (audit §1.6, rulebook D21).
+    // description in a 3-up grid, a longer phrasing like "Show me the critical findings of the
+    // last 24 hours" would wrap to two lines while its two neighbours took one, so the row's cards
+    // would have visibly different amounts of empty space in them.
     question: i18n.translate('wazuhAiAssistant.chat.example.criticalAlerts', {
       defaultMessage: 'Critical findings in the last 24 hours',
     }),
@@ -557,9 +557,10 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
     // it gets its own distinct, persistent (not auto-dismissed) callout with a reload action.
     const [sessionExpired, setSessionExpired] = useState(false);
 
-    // A save failed and the conversation on screen is now ahead of what is stored. Auto-save used to
-    // swallow every failure silently, so a user could keep chatting for an hour believing their
-    // history was being kept when it had stopped being saved after the first rejection.
+    // A save failed and the conversation on screen is now ahead of what is stored. Auto-save
+    // failures must never be swallowed silently — otherwise a user could keep chatting for an hour
+    // believing their history was being kept when it had stopped being saved after the first
+    // rejection.
     const [saveFailed, setSaveFailed] = useState(false);
     // Drives the saveFailed callout's "Retry now" button: true only for the duration of a
     // manually-triggered retry, so the button shows a spinner and cannot be double-clicked into a
@@ -607,10 +608,9 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
     // spuriously); `handleSend` force-repins so sending always snaps to the new turn. The effect
     // keys on `messages`, which the rAF-batched delta flush updates at most once per frame, so
     // this adds no per-token work beyond one cheap scroll assignment. This is the ONLY auto-scroll
-    // mechanism — message-list.tsx's old sentinel/scrollIntoView version was removed with this fix
-    // (it detected the scroll container ONCE at mount, usually before anything overflowed, so it
-    // attached its "is the user near the bottom" listener to the wrong element and could fight
-    // this one).
+    // mechanism: a sentinel/scrollIntoView approach would detect the scroll container ONCE at
+    // mount, usually before anything overflowed, so it would attach its "is the user near the
+    // bottom" listener to the wrong element and could fight this one.
     const scrollPaneRef = useRef<HTMLDivElement | null>(null);
 
     // Height of the transcript pane, published so ResultTable can step its page size 5 -> 10 above
@@ -692,12 +692,12 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
     }, [messages]);
 
     /**
-     * Re-pin on card growth (layout contract §4, iteration-4 item 3). The effect above re-pins only on
-     * a `messages` change, but a result table's rows-per-page control grows its card WITHOUT changing
-     * `messages` — that growth is internal `ResultTable` state — so a reader who was following the
-     * bottom was left with the freshly-grown pagination footer sitting behind the composer until they
-     * scrolled down by hand (the browser-verified bug this fixes). `ResultTable` calls
-     * `handleTableRowsPerPageChange` in the SAME event as it grows the card, which bumps this nonce;
+     * Re-pin on card growth (layout contract §4). The effect above re-pins only on a `messages`
+     * change, but a result table's rows-per-page control grows its card WITHOUT changing `messages`
+     * — that growth is internal `ResultTable` state — so without this, a reader who was following
+     * the bottom would be left with the freshly-grown pagination footer sitting behind the composer
+     * until they scrolled down by hand. `ResultTable` calls `handleTableRowsPerPageChange` in the
+     * SAME event as it grows the card, which bumps this nonce;
      * the `useLayoutEffect` then runs AFTER React has committed the taller card and re-pins the pane to
      * its new bottom — but only when the reader was still pinned (`pinnedToBottomRef`), never yanking
      * one who had scrolled up to read. A layout effect, not `useEffect`, so the re-pin lands before
@@ -720,8 +720,8 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
 
     /**
      * "Jump to latest": the one convention the pinning logic above was missing (every streaming chat
-     * UI offers it — see AI/ux-iter3/ux-research.md §B). Scrolls to the newest content and re-pins, so
-     * the answer starts following again from here on.
+     * UI offers it). Scrolls to the newest content and re-pins, so the answer starts following
+     * again from here on.
      *
      * Smooth via `scrollTo`, NOT via a `scroll-behavior: smooth` rule on the pane: the effect above
      * writes `scrollTop` on every flushed streaming frame, and a smooth container would animate each
@@ -755,13 +755,13 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
     const showLoadingState = !providersLoaded || isRestoringConversation;
     const showWelcomeState =
       hasProviders && messages.length === 0 && !showLoadingState;
-    // Declared HERE, above the handlers, rather than beside the JSX where they used to sit: the C1
-    // composer-mode machine below reads `showWelcomeState`, and `handleSend` further down reads the
-    // machine — with `no-use-before-define` (eslint.config.mjs) forbidding const hoisting, this is
-    // the one ordering that satisfies both. The JSX consumes all four exactly as before.
+    // Declared HERE, above the handlers, so the composer-mode machine below can read
+    // `showWelcomeState`, and `handleSend` further down can read the machine — with
+    // `no-use-before-define` (eslint.config.mjs) forbidding const hoisting, this is the one
+    // ordering that satisfies both. The JSX consumes all four exactly as before.
 
     /**
-     * C1 — the composer's own position state (see `ComposerMode` above for what each state means and
+     * The composer's own position state (see `ComposerMode` above for what each state means and
      * why the travel is a FLIP rather than a CSS transition).
      *
      * `docked` is the initial value on purpose: it is today's layout, so the very first paint of every
@@ -832,7 +832,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
      * measurement below is taken from the frame the user actually pressed Send in.
      *
      * Reduced motion (and any environment where the composer row is not measurable) hard-cuts to
-     * `docked`: no travel, no fade, no `docking` frame at all — the spec's own reduced-motion rule.
+     * `docked`: no travel, no fade, no `docking` frame at all.
      */
     const beginDocking = () => {
       welcomeDismissedRef.current = true;
@@ -931,7 +931,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       showWelcomeState || composerMode === 'docking';
 
     /**
-     * Conversation rail display mode (layout contract §5 / job item 6): expanded at >=1100px of
+     * Conversation rail display mode (layout contract §5): expanded at >=1100px of
      * PANE width (not window width — `chatRootRef` is this component's own root, so an embedding
      * context that gives it less room, e.g. the docked header panel, collapses on its own), a 48px
      * collapsed strip below that, an `EuiFlyout` below 900px. `ConversationList` decides what to
@@ -987,12 +987,12 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
         const width = element.offsetWidth;
         // A hidden pane (`display: none`) measures 0 — the app shell (application.tsx) keeps ChatPage
         // MOUNTED behind that while the Settings tab is showing, so every Chat<->Settings round-trip
-        // used to run this callback against a width of 0. Treating that as "very narrow" flipped the
-        // mode to 'flyout' AND (via the branch below) wiped `railManualOverrideRef`, so a rail the
-        // user had collapsed by hand silently re-expanded on every trip back from Settings. A width of
-        // 0 carries no real information about the pane's actual size, so it is ignored outright —
-        // whatever mode/override is already in state stays exactly as it was until a genuine
-        // measurement arrives.
+        // would otherwise run this callback against a width of 0. Treating that as "very narrow"
+        // would flip the mode to 'flyout' AND (via the branch below) wipe
+        // `railManualOverrideRef`, so a rail the user had collapsed by hand would silently
+        // re-expand on every trip back from Settings. A width of 0 carries no real information
+        // about the pane's actual size, so it is ignored outright — whatever mode/override is
+        // already in state stays exactly as it was until a genuine measurement arrives.
         if (!width) {
           return;
         }
@@ -1446,46 +1446,43 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
      * comment: the map is wire-only and never persisted) and no stored tool_call/digest pairs to
      * replay as history either.
      *
-     * Replay-leak fix (Fix 3): this comment always SAID both reset, but the code underneath it only
-     * ever reset the pseudonym map — `turnHistoryRef.current` was restored from
-     * `restored.turnRecords`, not cleared. That mismatch was a real bug, not just a stale comment:
-     * `ToolExchange.digestContent` (common/chat-history.ts) is "already pseudonym-form when privacy
-     * was on for that turn" — i.e. it can contain tokens like `HOST_1`/`IP_2` minted by a PAST
-     * session's `Pseudonymizer`, referring to THAT session's real values. `Pseudonymizer`'s mint
-     * counters (privacy.ts's constructor) are derived only from the SEEDED map, so a resumed
-     * conversation's now-empty map means the next turn's server-side `Pseudonymizer` restarts every
-     * counter at 0 — its very first fresh mint this session is `IP_1`/`HOST_1` again, colliding with
-     * whatever `IP_1`/`HOST_1` already means in the replayed digest content from the OLD session.
-     * `buildOutgoingMessages` (chat-history.ts) would then resend that stale digest verbatim as
-     * history, and `StreamDepseudonymizer.reverseText` (privacy.ts) would reverse any model-echoed
+     * Both must reset together: `ToolExchange.digestContent` (common/chat-history.ts) is "already
+     * pseudonym-form when privacy was on for that turn" — i.e. it can contain tokens like
+     * `HOST_1`/`IP_2` minted by a PAST session's `Pseudonymizer`, referring to THAT session's real
+     * values. `Pseudonymizer`'s mint counters (privacy.ts's constructor) are derived only from the
+     * SEEDED map, so a resumed conversation's now-empty map means the next turn's server-side
+     * `Pseudonymizer` restarts every counter at 0 — its very first fresh mint this session is
+     * `IP_1`/`HOST_1` again, colliding with whatever `IP_1`/`HOST_1` already means in the replayed
+     * digest content from the OLD session. Leaving `turnHistoryRef.current` populated with
+     * `restored.turnRecords` instead of clearing it would let `buildOutgoingMessages`
+     * (chat-history.ts) resend that stale digest verbatim as history, and
+     * `StreamDepseudonymizer.reverseText` (privacy.ts) would reverse any model-echoed
      * `IP_1`/`HOST_1` using THIS session's fresh mapping — silently substituting a DIFFERENT
-     * session's real host/IP for the one the stale token actually meant. Fixed by actually clearing
-     * `turnHistoryRef.current` here, matching what this comment always claimed: a resumed
-     * conversation drops its tool-call/digest replay bookkeeping along with the pseudonym map that
-     * digest content's tokens depend on. This does NOT affect what's on screen — `restored.messages`
-     * (below) is the reconstructed, already-real-valued DISPLAY text, entirely separate from
-     * `turnHistoryRef`'s replay-only bookkeeping; only the model's ability to reuse a resumed
-     * conversation's last couple of tool calls without re-running them is lost, not any visible
-     * history. `handleNewConversation` below already resets both together the same way; this brings
-     * `applyLoadedConversation` into line with that existing convention instead of being the one
-     * path that didn't.
+     * session's real host/IP for the one the stale token actually meant. Clearing
+     * `turnHistoryRef.current` here means a resumed conversation drops its tool-call/digest replay
+     * bookkeeping along with the pseudonym map that digest content's tokens depend on. This does
+     * NOT affect what's on screen — `restored.messages` (below) is the reconstructed,
+     * already-real-valued DISPLAY text, entirely separate from `turnHistoryRef`'s replay-only
+     * bookkeeping; only the model's ability to reuse a resumed conversation's last couple of tool
+     * calls without re-running them is lost, not any visible history. `handleNewConversation` below
+     * resets both together the same way.
      *
-     * SCOPE of this fix, stated precisely: it closes the stale-token collision for DIGEST REPLAY
-     * only — the `turnHistoryRef`-driven `[assistant{toolCalls}, tool{digest}]` resend this
-     * function controls. A pseudonym-shaped token the MODEL itself hallucinated into its own prose
-     * (no real mapping ever backed it — nothing this codebase mints, just the model echoing
-     * something token-shaped) can still land in `record.messages`' persisted `assistant` content,
-     * survive `reconstructConversation` into `restored.messages` for DISPLAY, and later collide
-     * with a genuine fresh mint of that same token string after a subsequent resume. That is a
+     * SCOPE, stated precisely: this closes the stale-token collision for DIGEST REPLAY only — the
+     * `turnHistoryRef`-driven `[assistant{toolCalls}, tool{digest}]` resend this function
+     * controls. A pseudonym-shaped token the MODEL itself hallucinated into its own prose (no real
+     * mapping ever backed it — nothing this codebase mints, just the model echoing something
+     * token-shaped) can still land in `record.messages`' persisted `assistant` content, survive
+     * `reconstructConversation` into `restored.messages` for DISPLAY, and later collide with a
+     * genuine fresh mint of that same token string after a subsequent resume. That is a
      * DISPLAY-layer misattribution risk (the reconstructed transcript could render the wrong real
      * value next to old prose) — not an exfiltration path, since it never puts a real value in
-     * front of the provider that shouldn't be there; out of scope for this fix.
+     * front of the provider that shouldn't be there.
      */
     const applyLoadedConversation = (record: ConversationRecord) => {
       // A resumed conversation opens at its latest turn (bottom), like every chat client — through
       // `repinToBottom` so the jump button's own mirror is repinned with it.
       repinToBottom();
-      // C1: the loaded conversation decides the composer's position on its own — with messages it
+      // The loaded conversation decides the composer's position on its own — with messages it
       // stays docked (no transition, it was never centred), and in the degenerate empty-transcript
       // case the welcome composer is legitimately offered again.
       welcomeDismissedRef.current = false;
@@ -1512,10 +1509,10 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       setProviderRestoreRequest(
         restoreCandidates.length > 0 ? { candidates: restoreCandidates } : null,
       );
-      // Replay-leak fix (Fix 3): NOT `restored.turnRecords` — see this function's doc comment above
-      // for why replaying another session's pseudonym-form digest content against a freshly emptied
-      // map (right below) is unsafe. The resumed conversation is fully READABLE (restored.messages
-      // above), just not continuable-without-re-querying the way a same-session turn is.
+      // NOT `restored.turnRecords` — see this function's doc comment above for why replaying
+      // another session's pseudonym-form digest content against a freshly emptied map (right
+      // below) is unsafe. The resumed conversation is fully READABLE (restored.messages above),
+      // just not continuable-without-re-querying the way a same-session turn is.
       turnHistoryRef.current = [];
       setPseudonymMap([]);
       setActiveConversationId(record.id);
@@ -1528,10 +1525,10 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
     };
 
     /**
-     * Mount-time conversation restore: the open conversation used to live ONLY in this component's
-     * state, so a reload, a deep link, or coming back from another dashboard app landed on an empty
-     * chat with no way to tell which conversation the user had been in — and the next turn then
-     * created a second saved conversation instead of continuing theirs.
+     * Mount-time conversation restore. Without it, the open conversation would live ONLY in this
+     * component's state, so a reload, a deep link, or coming back from another dashboard app would
+     * land on an empty chat with no way to tell which conversation the user had been in — and the
+     * next turn would then create a second saved conversation instead of continuing theirs.
      *
      * The URL route wins over this tab's stored pointer, so a pasted/bookmarked link always opens what
      * it names. A conversation that is simply GONE (deleted in another tab, or pruned by the retention
@@ -1581,7 +1578,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
      * conversation is not a navigation the back button should have to walk back through turn by turn.
      *
      * The route is only written while the view is visible (`isActive`), and re-synced when it becomes
-     * visible again — a restore running behind Settings must not rewrite `/settings` (#8820).
+     * visible again — a restore running behind Settings must not rewrite `/settings`.
      *
      * Skipped until the mount-time restore above has settled — otherwise this effect's very first run
      * would overwrite the route it is supposed to read.
@@ -1643,7 +1640,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       // A brand-new conversation has no provider to remember, so a request still waiting on the
       // provider list must not outlive the conversation that made it.
       setProviderRestoreRequest(null);
-      // C1: a brand-new conversation gets the centred welcome composer back (the effect above picks
+      // A brand-new conversation gets the centred welcome composer back (the effect above picks
       // this up as soon as `messages` is empty again) — the transition is once per conversation, not
       // once per session.
       welcomeDismissedRef.current = false;
@@ -1690,10 +1687,10 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
           handleNewConversation();
         }
         notifyConversationsChanged();
-        // E4 (#9010): confirm the delete actually happened via the same toast mechanism
-        // settings-page.tsx already uses (core.notifications.toasts) — a confirm MODAL already
-        // gated the action (conversation-list.tsx), so this toast is purely a "it worked"
-        // acknowledgement, not a second confirmation.
+        // Confirm the delete actually happened via the same toast mechanism settings-page.tsx
+        // already uses (core.notifications.toasts) — a confirm MODAL already gated the action
+        // (conversation-list.tsx), so this toast is purely a "it worked" acknowledgement, not a
+        // second confirmation.
         core.notifications.toasts.addSuccess(
           i18n.translate('wazuhAiAssistant.chat.conversations.deleteSuccess', {
             defaultMessage: 'Conversation deleted.',
@@ -1708,7 +1705,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       }
     };
 
-    /** Inline rename (#9010, finding E2): title-only PATCH (conversations-service.ts's `rename`,
+    /** Inline rename: title-only PATCH (conversations-service.ts's `rename`,
      * server/routes/conversations.ts's PATCH route) — never round-trips the full transcript just to
      * change a title.
      *
@@ -1735,7 +1732,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
     };
 
     /**
-     * Bulk delete (#9010, finding E3): reuses the existing single-delete endpoint client-side —
+     * Bulk delete: reuses the existing single-delete endpoint client-side —
      * `Promise.allSettled` so one failing delete never stops the rest from completing — rather than
      * adding a bulk server route. If the currently open conversation is among the deleted ids, it
      * gets the same "start a new conversation" treatment `handleDeleteConversation` gives a single
@@ -1823,9 +1820,9 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
     }, [conversations, isLoadingConversations, activeConversationId]);
 
     /**
-     * PUT with optimistic concurrency and merge-on-conflict (two tabs on the SAME conversation
-     * previously last-write-wins, silently erasing the
-     * faster tab's turns). Sends `expectedVersion` (the caller's last-known version for THIS
+     * PUT with optimistic concurrency and merge-on-conflict — without it, two tabs on the SAME
+     * conversation would conflict last-write-wins, silently erasing the faster tab's turns. Sends
+     * `expectedVersion` (the caller's last-known version for THIS
      * conversation — the active conversation's `conversationVersionRef`, or the version captured when
      * an abandoned turn started); the server 409s when another tab's write landed first
      * (server/routes/conversations.ts).
@@ -1857,9 +1854,9 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       reflectInUi: boolean,
     ): Promise<ConversationRecord> => {
       try {
-        // NO title argument (issue #9010): every PUT through this method omits it, so the server
-        // carries the stored title over unchanged — see conversations-service.ts's `update` doc
-        // comment for why a resent, freshly recomputed title used to silently revert renames.
+        // NO title argument: every PUT through this method omits it, so the server carries the
+        // stored title over unchanged — see conversations-service.ts's `update` doc comment for why
+        // a resent, freshly recomputed title would silently revert renames.
         return await conversationsService.update(
           id,
           localMessages,
@@ -1945,9 +1942,9 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
         try {
           const toPersist = toPersistedMessages(args.messages, turnRecords);
           if (conversationId) {
-            // NO title here (issue #9010): once a conversation exists, its every save is a PUT
-            // through `saveConversationWithMerge`, which never sends a title at all any more —
-            // see that function's own comment for why (a rename must survive the next auto-save).
+            // NO title here: once a conversation exists, its every save is a PUT through
+            // `saveConversationWithMerge`, which never sends a title at all — see that function's
+            // own comment for why (a rename must survive the next auto-save).
             const record = await saveConversationWithMerge(
               conversationId,
               toPersist,
@@ -2098,10 +2095,10 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
        * one — every write into shared component state is gated on it. */
       const isTurnStillActive = () =>
         generation === streamGenerationRef.current;
-      // This turn's own tool-call record, held by reference rather than looked up per event: the
-      // `tool_call`/`digest` handlers below used to search `turnHistoryRef` by assistant message id,
-      // which finds nothing once the ref has been reset by a conversation switch — so an abandoned
-      // turn's tool exchanges were dropped instead of saved with it.
+      // This turn's own tool-call record, held by reference rather than looked up per event:
+      // looking it up per event by assistant message id would find nothing once the ref has been
+      // reset by a conversation switch — so an abandoned turn's tool exchanges would be dropped
+      // instead of saved with it.
       const turnRecord = turnHistoryRef.current.find(
         turn => turn.assistantMessageId === assistantMessageId,
       );
@@ -2221,9 +2218,9 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       /**
        * Whether this turn reached a terminal state of its own — a `done` frame, or an `error`/
        * `auth_expired` that has already been reported. Anything else means the stream simply STOPPED:
-       * Stop was pressed, the user navigated away, or the connection dropped. That case used to be
-       * indistinguishable from a finished answer, so a truncated response was saved and later resumed
-       * as though it were complete.
+       * Stop was pressed, the user navigated away, or the connection dropped. Without this
+       * distinction, that case would be indistinguishable from a finished answer, so a truncated
+       * response would be saved and later resumed as though it were complete.
        */
       let turnCompleted = false;
       /**
@@ -2392,9 +2389,9 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
               );
             }
           } else if (event.type === 'privacy_map' && isTurnStillActive()) {
-            // Gated: the pseudonym map is PER-CONVERSATION state. An abandoned turn's entries used to
-            // be merged into whatever conversation the user had just opened, and then sent up with
-            // that conversation's next request.
+            // Gated: the pseudonym map is PER-CONVERSATION state. Without this gate, an abandoned
+            // turn's entries would be merged into whatever conversation the user had just opened,
+            // and then sent up with that conversation's next request.
             setPseudonymMap(current => {
               const known = new Set(current.map(entry => entry.pseudonym));
               const additions = event.entries.filter(
@@ -2427,12 +2424,12 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
             } else {
               setError(event.message);
             }
-            // The placeholder is KEPT and marked failed, not dropped. It used to be removed
-            // whenever nothing had streamed into it, which left the failure recorded only in the
-            // callout band above the transcript — and `handleSend` clears that band, so asking
-            // anything else (the most likely next action) erased the only evidence the turn had
-            // ever failed, leaving a question sitting in the transcript with no answer and no
-            // explanation. `failureReason` is what `FailedTurnNotice` (message-bubble.tsx) renders
+            // The placeholder is KEPT and marked failed, not dropped: removing it whenever nothing
+            // had streamed into it would leave the failure recorded only in the callout band above
+            // the transcript — and `handleSend` clears that band, so asking anything else (the most
+            // likely next action) would erase the only evidence the turn had ever failed, leaving a
+            // question sitting in the transcript with no answer and no explanation. `failureReason`
+            // is what `FailedTurnNotice` (message-bubble.tsx) renders
             // on the turn itself, and it is persisted with the conversation, so a reload keeps it
             // too. The banner still appears — it is how a failure announces itself the moment it
             // happens; this is what remains afterwards.
@@ -2655,10 +2652,11 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       const baseMessages = [...history, assistantMessage];
       updateMessages(baseMessages);
 
-      // Persist the question BEFORE generating, not only after the turn completes. A reload, a
-      // navigation, or a crash mid-answer used to lose the question too — the conversation was only
-      // created once the turn ended, so the user came back to an empty chat with no trace that they
-      // had asked anything. `history` excludes the still-empty assistant placeholder. Both of this
+      // Persist the question BEFORE generating, not only after the turn completes. Otherwise a
+      // reload, a navigation, or a crash mid-answer would lose the question too — the conversation
+      // would only be created once the turn ended, so the user would come back to an empty chat
+      // with no trace that they had asked anything. `history` excludes the still-empty assistant
+      // placeholder. Both of this
       // turn's saves share `target`, so whichever runs first creates the row and the other updates it
       // — see `TurnConversationTarget`.
       const target: TurnConversationTarget = {
@@ -2698,7 +2696,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       setMergeNotice(null);
       setSessionExpired(false);
       setSaveFailed(false);
-      // C1: the first send of a centred conversation is what docks the composer. Started here, before
+      // The first send of a centred conversation is what docks the composer. Started here, before
       // the first `await`, for two reasons: the FLIP measurement has to be taken from the frame the
       // user pressed Send in, and the transcript has to be in its final (docked) layout before the
       // user's own message lands in it — `startTurn` appends that message after an awaited session
@@ -2796,9 +2794,9 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
 
     /** `error` is the send-path failure; `providersError` the app shell's provider-load failure. One
      * callout reports whichever is current, so dismissal is tracked against this one value. */
-    // Composer control-row spec (iteration-4): the Send button's own disabled/enabled state, split
-    // out once so both the `disabled` prop and the `display` (filled only when it would actually
-    // do something) read the same condition instead of re-deriving it in two places.
+    // The Send button's own disabled/enabled state, split out once so both the `disabled` prop and
+    // the `display` (filled only when it would actually do something) read the same condition
+    // instead of re-deriving it in two places.
     const canSend = hasProviders && Boolean(inputText.trim());
     const activeError = error ?? providersError;
     const showErrorCallout =
@@ -2816,8 +2814,8 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       mergeNotice === 'merged' ||
       mergeNotice === 'conflict';
 
-    // Layout contract §1 (AI/design/redesign-v2-spec.md): the composer (`.wzComposerRow` below) is
-    // the grid's own `auto` row, a real flow sibling of the transcript's `1fr` row — never an
+    // Layout contract §1: the composer (`.wzComposerRow` below) is the grid's own `auto` row, a
+    // real flow sibling of the transcript's `1fr` row — never an
     // absolutely/sticky-positioned overlay. That is what makes the old overlap (a fixed-height fade
     // gradient painted outside the sticky panel's own box, caught covering the last few pixels of the
     // transcript's final element — a table's pagination bar — even scrolled all the way down)
@@ -2834,16 +2832,16 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
           defaultMessage: 'Off',
         });
     const privacyBadgeIcon = privacyEnabled ? 'lock' : 'lockOpen';
-    // Single pill replacing the old padlock EuiButtonEmpty + floating EuiIconTip pair (iteration-4
-    // composer control-row spec): the icon + "Privacy: On/Off" label carries the state, and —
-    // only when the admin has left it overridable — the click affordance to flip it. `onClick`/
-    // `onClickAriaLabel` are spread in together rather than each defaulting to `undefined`, since
-    // OuiBadge warns if `onClickAriaLabel` is present without `onClick` (and vice versa reads as a
-    // badge that looks clickable but isn't). The explanation of what the state does to the user's
-    // data used to live in a hover tooltip wrapping this whole pill, which meant hovering to click
-    // it also forced a wall of text — it now lives on a separate, discrete ⓘ button (an
-    // `EuiPopover`, click-openable and keyboard-reachable) placed right after the pill, so it is
-    // available on demand without blocking the click gesture.
+    // Single pill replacing the old padlock EuiButtonEmpty + floating EuiIconTip pair: the icon +
+    // "Privacy: On/Off" label carries the state, and — only when the admin has left it overridable
+    // — the click affordance to flip it. `onClick`/`onClickAriaLabel` are spread in together rather
+    // than each defaulting to `undefined`, since OuiBadge warns if `onClickAriaLabel` is present
+    // without `onClick` (and vice versa reads as a badge that looks clickable but isn't). The
+    // explanation of what the state does to the user's data lives on a separate, discrete ⓘ button
+    // (an `EuiPopover`, click-openable and keyboard-reachable) placed right after the pill, rather
+    // than in a hover tooltip wrapping the whole pill, which would force hovering to click it into
+    // also triggering a wall of text — it is available on demand without blocking the click
+    // gesture.
     // EUI types onClick/onClickAriaLabel as an ExclusiveUnion against the non-clickable badge
     // variant; spreading the conditional pair in flattens that union into plain optional props,
     // which satisfies neither union member structurally — hence rendering through an untyped
@@ -3061,7 +3059,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                 onDelete={handleDeleteConversation}
                 onRename={handleRenameConversation}
                 onBulkDelete={handleBulkDeleteConversations}
-                // Rail prop contract agreed with the ConversationList owner (job item 6): all three
+                // Rail prop contract agreed with the ConversationList owner: all three
                 // are optional with defaults, so this call is safe to ship whether or not
                 // conversation-list.tsx has picked them up yet.
                 displayMode={railDisplayMode}
@@ -3072,10 +3070,9 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
           )}
 
           {/* Below the flyout threshold there is no room for an inline rail at all — a small
-          trigger opens ConversationList inside an EuiFlyout instead (variation 4a's own flyout
-          idiom, reused here for the rail rather than invented fresh). This button is new UI the
-          spec's layout contract implies but does not itself word — see this component's final
-          report for the exact i18n key. */}
+          trigger opens ConversationList inside an EuiFlyout instead, reused here for the rail
+          rather than invented fresh. This button is new UI the layout contract implies but does
+          not itself word. */}
           {showConversationSidebar && railDisplayMode === 'flyout' && (
             <div
               style={{
@@ -3155,10 +3152,11 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
           — not a tuned padding/gradient pair — is what makes the composer/welcome overlap this
           redesign fixes structurally impossible instead of merely rare.
 
-          C1 adds exactly two temporary modifiers to that pane (`PANE_CLASS_BY_COMPOSER_MODE`
-          above): `--welcome` while the empty state is one centred group, and `--docking` for the
-          ~400ms bridge. The `docked` entry is the bare `wzChatPane` this always was, so the end
-          state of every conversation — and every state of the embedded sidecar — is unchanged. */}
+          The composer-mode machine adds exactly two temporary modifiers to that pane
+          (`PANE_CLASS_BY_COMPOSER_MODE` above): `--welcome` while the empty state is one centred
+          group, and `--docking` for the ~400ms bridge. The `docked` entry is the bare `wzChatPane`
+          this always was, so the end state of every conversation — and every state of the
+          embedded sidecar — is unchanged. */}
           <div
             className={PANE_CLASS_BY_COMPOSER_MODE[composerMode]}
             style={{ flex: 1, minWidth: 0 }}
@@ -3188,16 +3186,15 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                 className='wzTranscriptContent'
                 // Restores lead breath at the top (16 -> 24px) and adds the tail breath the
                 // transcript never had at all (0 -> 24px) so the last turn is not flush against the
-                // composer's own hairline (iteration-4 audit, P1 item 7). See `.wzStatusCallouts`
-                // (chat-page.scss) for why the top half of this still scrolls out from under the
-                // sticky band rather than staying visible above it.
+                // composer's own hairline. See `.wzStatusCallouts` (chat-page.scss) for why the top
+                // half of this still scrolls out from under the sticky band rather than staying
+                // visible above it.
                 style={{ padding: '24px 24px 24px' }}
               >
                 {/* `.wzContentMeasure` (chat-page.scss): the ONE centred column transcript prose and
               the composer share (layout contract §5) — reads `$wzContentMaxWidth` off the shared
-              `_redesign.scss` token instead of restating it, which is what this file's old
-              `CONVERSATION_MAX_WIDTH = 860` constant used to do in parallel. `--stretch` only while
-              this holds the welcome state (see chat-page.scss's own comment on that modifier) — the
+              `_redesign.scss` token instead of restating it. `--stretch` only while this holds the
+              welcome state (see chat-page.scss's own comment on that modifier) — the
               ordinary message-list case stays a plain flow box so it never claims the whole
               transcript height for itself and pushes `MessageList`'s sibling row out of view. */}
                 {/* `.wzStatusCallouts` (chat-page.scss): the sticky status band. It is a DIRECT child
@@ -3363,8 +3360,8 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                             },
                           )}
                           // A successful merge is a good outcome, not a warning — the conflict
-                          // variant right below keeps 'warning'/'alert', so the two are no longer
-                          // visually identical for opposite results.
+                          // variant right below keeps 'warning'/'alert', so the two stay visually
+                          // distinct for opposite results.
                           color='success'
                           iconType='check'
                           body={i18n.translate(
@@ -3497,27 +3494,26 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
 
                   {/* Welcome centres only when there is room (contract §3): `.wzWelcomeCenter`
                     (chat-page.scss) is a `flex: 1 1 auto` column with `justify-content: center`,
-                    growing into whatever the transcript row leaves it. NOT the
-                    `display:grid; place-content:center` this comment used to describe — on a grid
-                    container `place-content` also sets `justify-content`, which packed the column
-                    track at its content width and collapsed the example cards to one per row. A
-                    tall viewport centres the cluster; a short one has nowhere to grow into, so this
-                    stops at the content's own height and the transcript's own `overflow-y: auto`
-                    takes over — nothing here can ever reach the composer, which is a grid sibling
-                    of the transcript, never a descendant of it.
+                    growing into whatever the transcript row leaves it. NOT
+                    `display:grid; place-content:center` — on a grid container `place-content` also
+                    sets `justify-content`, which would pack the column track at its content width
+                    and collapse the example cards to one per row. A tall viewport centres the
+                    cluster; a short one has nowhere to grow into, so this stops at the content's
+                    own height and the transcript's own `overflow-y: auto` takes over — nothing here
+                    can ever reach the composer, which is a grid sibling of the transcript, never a
+                    descendant of it.
 
-                    C1 layers on top WITHOUT moving any of this: in the centred state the pane
-                    itself becomes the centring container (`.wzChatPane--welcome`), so this cluster
-                    and the composer read as one group while each stays exactly where it already
-                    lived in the DOM. That is deliberate — the composer must remain ONE React
-                    instance across the transition (re-parenting it into this subtree would remount
-                    ChatInput, dropping focus and the textarea's autogrow height, and an element
-                    cannot animate across a remount). The order inside the group is therefore
-                    greeting → cards → composer rather than the recording's greeting → composer:
-                    Gemini shows no cards at all, and putting ours BELOW the composer would need a
-                    second render site for them plus a pane row underneath the travelling composer
-                    for the transition to pass through. Group composition and motion match the spec;
-                    the internal order is the one the existing DOM already gives. */}
+                    The composer-mode machine layers on top WITHOUT moving any of this: in the
+                    centred state the pane itself becomes the centring container
+                    (`.wzChatPane--welcome`), so this cluster and the composer read as one group
+                    while each stays exactly where it already lives in the DOM. That is deliberate —
+                    the composer must remain ONE React instance across the transition (re-parenting
+                    it into this subtree would remount ChatInput, dropping focus and the textarea's
+                    autogrow height, and an element cannot animate across a remount). The order
+                    inside the group is greeting → cards → composer: Gemini shows no cards at all,
+                    and putting ours BELOW the composer would need a second render site for them
+                    plus a pane row underneath the travelling composer for the transition to pass
+                    through. */}
                   {isWelcomeGroupMounted && (
                     <div
                       ref={welcomeGroupRef}
@@ -3536,15 +3532,13 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                           // fighting EuiEmptyPrompt's built-in typography with inline styles.
                           //
                           // Page-title scale, decided: this greeting stays at EuiTitle `m` (24px)
-                          // while the settings page's H1 is 28. The live audit (§6) flagged the two
-                          // as an inconsistency and offered either "pick 28 everywhere" or "make the
-                          // greeting a deliberate hero" — this is the second. The greeting is not a
-                          // page title doing a navigational job; it is the one large element on an
-                          // otherwise empty canvas (rulebook B7: only 1–2 large elements per view),
-                          // and it shares its screen with nothing else that competes for that rank,
-                          // so 24 is the size that keeps the cluster feeling like a group rather than
-                          // like a page header with content under it. Settings, which really does
-                          // have a header over three sections, keeps 28.
+                          // while the settings page's H1 is 28 — a deliberate hero rather than a
+                          // page title doing a navigational job. The greeting is the one large
+                          // element on an otherwise empty canvas, and it shares its screen with
+                          // nothing else that competes for that rank, so 24 is the size that keeps
+                          // the cluster feeling like a group rather than like a page header with
+                          // content under it. Settings, which really does have a header over three
+                          // sections, keeps 28.
                           <EuiTitle size='m'>
                             <h2>
                               {i18n.translate(
@@ -3576,23 +3570,22 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                           </EuiText>
                         }
                       />
-                      {/* 16, not 24: greeting → cards → composer are now one evenly-spaced group
-                        (audit §1.5 / rulebook C16 — the trio was 24/9, i.e. neither even nor on the
-                        ladder). The composer's own half of that step lives in
-                        `.wzChatPane--welcome .wzComposerMeasure` (chat-page.scss). */}
+                      {/* 16, not 24: greeting → cards → composer are one evenly-spaced group — 24/9
+                        would be neither even nor on the spacing scale. The composer's own half of
+                        that step lives in `.wzChatPane--welcome .wzComposerMeasure`
+                        (chat-page.scss). */}
                       <EuiSpacer size='m' />
                       {/* Three horizontal cards — icon-left, short title, the full question as the
                         description. Clicking a card only fills the input (unchanged `setInputText`
                         call), never auto-sends.
 
-                        NO grouping panel around them, and no "Try one of these" pill header. Both
-                        were variation 1a's original shape and both were measured as failures
-                        (audit §1.2/§1.3): the outer `EuiPanel` had the identical fill, hairline and
-                        radius as the `EuiCard`s inside it, so the group read as a card-in-a-card
-                        with no information in the outer one; and the pill was a THIRD piece of
+                        NO grouping panel around them, and no "Try one of these" pill header: an
+                        outer `EuiPanel` would have the identical fill, hairline and radius as the
+                        `EuiCard`s inside it, so the group would read as a card-in-a-card with no
+                        information in the outer one; and the pill would be a THIRD piece of
                         instructional copy under a title and subtitle that already say what to do,
                         centred over left-aligned cards. The cards' own borders group them perfectly
-                        well — this is a plain layout div now, carrying only the grid. */}
+                        well — this is a plain layout div, carrying only the grid. */}
                       {/* `.wzExampleCardsGrid` (chat-page.scss): `repeat(auto-fit,
                         minmax(min(240px, 100%), 1fr))` — 3-up, 2-up, 1-up, shrinking below
                         240px only once the container itself is narrower than that (a docked
@@ -3606,10 +3599,10 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                             layout='horizontal'
                             display='plain'
                             hasBorder
-                            // `xs` (16px), down from EuiCard's default `s` (18px): the card titles
-                            // used to be BIGGER and bolder than the greeting they sit under
-                            // (18/500 vs 24/400), which inverted the screen's own hierarchy — the
-                            // eye landed on a card title first (audit §1.4, rulebook B8).
+                            // `xs` (16px), down from EuiCard's default `s` (18px): at `s`, the card
+                            // titles would be BIGGER and bolder than the greeting they sit under
+                            // (18/500 vs 24/400), which would invert the screen's own hierarchy —
+                            // the eye would land on a card title first.
                             titleSize='xs'
                             icon={
                               <EuiIcon
@@ -3653,7 +3646,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
               </div>
             </div>
 
-            {/* "Jump to latest" (ux-research.md §B: the affordance every streaming chat UI pairs with
+            {/* "Jump to latest" (the affordance every streaming chat UI pairs with
             stick-to-bottom scrolling). Shown whenever the user is unpinned — not only while a turn
             is streaming, which is what Claude/ChatGPT do: after an answer finishes, "take me back
             to the end" is exactly as useful as it was mid-stream, and gating on `isGenerating`
@@ -3669,7 +3662,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
             it above the composer's own `auto` row by construction: there is no offset to keep in
             sync with the composer's variable height.
 
-            Withheld in the centred empty state (C1): there is no conversation to jump to yet, and
+            Withheld in the centred empty state: there is no conversation to jump to yet, and
             `grid-row: 1` means nothing while the pane is a flex column — the button would become a
             third flex item wedged between the welcome group and the composer, breaking the very
             grouping the centred state exists to create. */}
@@ -3687,9 +3680,8 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                     display='base'
                     // `m` (32px), not EUI's default `s` (24): at 24 the circle was smaller than the
                     // 32px comfortable-hit-target floor and read as a stray glyph floating over the
-                    // transcript rather than as a control (audit §3.2). It is also centred over the
-                    // measure now (`.wzJumpToLatest`, chat-page.scss) instead of parked in the
-                    // corner.
+                    // transcript rather than as a control. It is also centred over the measure now
+                    // (`.wzJumpToLatest`, chat-page.scss) instead of parked in the corner.
                     size='m'
                     color='text'
                     onClick={handleJumpToLatest}
@@ -3712,8 +3704,8 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
               <div
                 ref={composerRowRef}
                 onTransitionEnd={handleComposerTransitionEnd}
-                // `wzComposerRow--roomy` (iteration-4 item A) is derived straight from
-                // `enableWelcomeComposer` rather than a new prop of its own: that prop already IS the
+                // `wzComposerRow--roomy` is derived straight from `enableWelcomeComposer` rather
+                // than a new prop of its own: that prop already IS the
                 // "is this the full-page surface or the 600-900px header sidecar" signal (see its own
                 // doc comment above), and the docked composer's two-row floor is exactly the thing the
                 // sidecar cannot afford. `.wzComposerRow--roomy .wzComposerTextarea` (chat-page.scss)
@@ -3728,10 +3720,9 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
               >
                 {/* `.wzComposerMeasure` alongside the shared measure class: it owns the composer's
                 own gutters (chat-page.scss), which is all it is left carrying now that the composer
-                shares ONE measure with the transcript in both states. It used to hold a compact
-                `min(90%, 680px)` centred width that tweened back to the shared measure over the
-                travel; that width was the empty state's third competing edge (audit §1.1), so it is
-                gone and the tween with it. The vertical FLIP travel is untouched. */}
+                shares ONE measure with the transcript in both states — no separate centred width of
+                its own, which would be a third competing edge in the empty state. The vertical FLIP
+                travel is untouched. */}
                 <div className='wzContentMeasure wzComposerMeasure'>
                   {/* `.wzComposerPanel` (chat-page.scss) supplies the shared `wzPanel` idiom — the
                   redesign's 12px radius and an 8px inset — in place of a raw EuiPanel's own 4px
@@ -3757,10 +3748,10 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                       isGenerating={isGenerating}
                       onSend={handleSend}
                     />
-                    {/* No `EuiSpacer` here any more (iteration-4 item A): the field's own bottom
-                    padding plus the controls row's `gutterSize='s'` already separated them, and
-                    the spacer on top of that was the extra few px that made the docked composer
-                    feel taller than its "2-row floor" was supposed to read. */}
+                    {/* No `EuiSpacer` here: the field's own bottom padding plus the controls row's
+                    `gutterSize='s'` already separate them, and adding a spacer on top of that would
+                    be the extra few px that makes the docked composer feel taller than its "2-row
+                    floor" is supposed to read. */}
                     <EuiFlexGroup
                       alignItems='center'
                       gutterSize='s'
@@ -3769,19 +3760,18 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                     >
                       {hasProviders && assistantSettings && (
                         <>
-                          {/* The pill itself no longer carries the full explainer as a hover
-                          tooltip — that turned "click to toggle" into "hover through a wall
-                          of text first". `onClickAriaLabel` (set on `privacyChip` above) still
-                          covers the click affordance for a11y. The explanation now lives on the
-                          discrete ⓘ immediately after it, on demand. */}
+                          {/* The pill itself does not carry the full explainer as a hover tooltip
+                          — that would turn "click to toggle" into "hover through a wall of text
+                          first". `onClickAriaLabel` (set on `privacyChip` above) still covers the
+                          click affordance for a11y. The explanation lives on the discrete ⓘ
+                          immediately after it, on demand. */}
                           <EuiFlexItem grow={false}>{privacyChip}</EuiFlexItem>
                           {/* Locked policy: a VISIBLE attribution, in the composer, next to the
-                          control it explains. It used to be one line inside the ⓘ's hover tooltip,
-                          which meant the single most consequential fact about the control — that
-                          the reader cannot change it and someone else decided — was discoverable
-                          only by hovering a 16px glyph. It is also this element that
-                          `aria-describedby` on the chip points at, so the same words reach a screen
-                          reader on focus. */}
+                          control it explains — not folded into the ⓘ's hover tooltip, where the
+                          single most consequential fact about the control — that the reader cannot
+                          change it and someone else decided — would be discoverable only by
+                          hovering a 16px glyph. It is also this element that `aria-describedby` on
+                          the chip points at, so the same words reach a screen reader on focus. */}
                           {!assistantSettings.userCanOverride && (
                             <EuiFlexItem grow={false}>
                               <EuiText
@@ -3810,11 +3800,12 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                               </EuiText>
                             </EuiFlexItem>
                           )}
-                          {/* The explanation of what privacy mode does to the reader's data was an
-                          `EuiIconTip` — hover-only, so it could not be reached by keyboard at all,
-                          dismissed itself the moment the pointer moved, and could not be read at
-                          leisure or copied. It is now a real popover on a real button: click or
-                          Enter opens it, it stays open, and Escape/outside-click closes it. */}
+                          {/* The explanation of what privacy mode does to the reader's data is a
+                          real popover on a real button, not an `EuiIconTip` — hover-only would mean
+                          it could not be reached by keyboard at all, would dismiss itself the
+                          moment the pointer moved, and could not be read at leisure or copied.
+                          Click or Enter opens it, it stays open, and Escape/outside-click
+                          closes it. */}
                           <EuiFlexItem grow={false}>
                             <EuiPopover
                               isOpen={isPrivacyHelpOpen}
@@ -3858,12 +3849,10 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                           </EuiFlexItem>
                         </>
                       )}
-                      {/* Explicit grow spacer (was a bare `<EuiFlexItem />` relying on `grow`
-                          defaulting to true) pushes the provider/send cluster to the far right.
-                          The hairline divider that used to separate it from the privacy controls
-                          is gone (iteration-4 item 2): the picker is now its own clickable text
-                          button rather than an inline `<select>`, and reads as a distinct control
-                          without needing a rule drawn next to it. */}
+                      {/* Explicit grow spacer pushes the provider/send cluster to the far right.
+                          No hairline divider separates it from the privacy controls: the picker is
+                          its own clickable text button rather than an inline `<select>`, and reads
+                          as a distinct control without needing a rule drawn next to it. */}
                       <EuiFlexItem grow />
                       <EuiFlexItem grow={false}>
                         <EuiFlexGroup
@@ -3904,8 +3893,8 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                                   className='wzComposerSendButton'
                                   iconType='cross'
                                   color='danger'
-                                  // 'm', matching the Send button's own size (iteration-4 item
-                                  // A) — this button replaces Send in the exact same row slot
+                                  // 'm', matching the Send button's own size — this button
+                                  // replaces Send in the exact same row slot
                                   // while generating, and a smaller icon here shrank that slot's
                                   // height between the two states.
                                   size='m'
@@ -3932,12 +3921,12 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                                 className='wzComposerSendButton'
                                 iconType='arrowUp'
                                 color='primary'
-                                // 'm', not 's' (iteration-4 item A): against the roomier two-row
-                                // field the small size read as undersized for the row's own height.
+                                // 'm', not 's': against the roomier two-row field the small size
+                                // read as undersized for the row's own height.
                                 size='m'
                                 // Filled only once there is something to send (`canSend`); an empty
-                                // composer now gets the same unfilled 'empty' display Stop's sibling
-                                // slot uses instead of a filled-but-disabled button, which used to
+                                // composer gets the same unfilled 'empty' display Stop's sibling
+                                // slot uses instead of a filled-but-disabled button, which would
                                 // read as broken rather than "nothing typed yet".
                                 display={canSend ? 'fill' : 'empty'}
                                 onClick={() => chatInputRef.current?.send()}

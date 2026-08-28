@@ -23,7 +23,7 @@ export interface ChatStreamOptions {
    * server/routes/chat.ts sets 0 for the stage-1 router call (one structured pick out of a fixed
    * enum) and 0.2 on tool-bearing orchestrate rounds — Groq's tool-use guidance recommends 0.0-0.5
    * for tool calling and names their own default of 1.0 as a contributing cause of malformed tool
-   * calls (issue 05-set-temperature-for-tool-calls.md).
+   * calls.
    */
   temperature?: number;
 }

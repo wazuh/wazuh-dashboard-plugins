@@ -43,9 +43,9 @@ import {
 /**
  * Owner resolution. "One conversation per user" is enforced at two layers: OpenSearch Document
  * Level Security on the `wazuh-ai-assistant-sessions` index alias restricts each document to the
- * `user` it was written with (wazuh-indexer-plugins#1422), and every query/write below ALSO scopes
- * itself by that same value explicitly — this app must stay correct even where DLS isn't
- * configured, so it never relies on DLS alone.
+ * `user` it was written with, and every query/write below ALSO scopes itself by that same value
+ * explicitly — this app must stay correct even where DLS isn't configured, so it never relies on
+ * DLS alone.
  *
  * The shared `context.wazuh.security.getCurrentUser` lookup (untyped cast, string-vs-object
  * narrowing, defensive try/catch) lives in `server/identity.ts`'s `resolveWazuhUsername` — see that
@@ -174,11 +174,11 @@ export function isVersionConflictError(error: unknown): boolean {
 }
 
 /**
- * Unbounded conversation storage: an
- * authenticated user could previously create unlimited conversation documents with unbounded
- * title/message sizes. These constants bound that WITHOUT breaking real usage — each is generous
- * relative to legitimate traffic, just no longer infinite. Every limit lives here, named, so the
- * schemas below and `MAX_CONVERSATIONS_PER_OWNER` can't drift out of sync.
+ * Bounds on conversation storage: without these, an authenticated user could create unlimited
+ * conversation documents with unbounded title/message sizes. These constants bound that WITHOUT
+ * breaking real usage — each is generous relative to legitimate traffic, but finite. Every limit
+ * lives here, named, so the schemas below and `MAX_CONVERSATIONS_PER_OWNER` can't drift out of
+ * sync.
  */
 /** These three are re-exported from `common/constants.ts` rather than defined here because the
  * CLIENT must trim to the exact same numbers before it builds a payload; keeping them server-only
@@ -247,7 +247,7 @@ export const tableSpecSchema = schema.object({
       url: schema.string({ maxLength: MAX_TABLE_LABEL_LENGTH }),
     }),
   ),
-  /** Issue #9008 rework -- `common/types.ts`'s `TableSpec.provenance`: server-recorded index/
+  /** `common/types.ts`'s `TableSpec.provenance`: server-recorded index/
    * time-range FACTS for the evidence popover. A range bound is free-form date-math or ISO-8601
    * (see server/tools/catalog/common.ts's `timeRangeProperties`), hence `schema.string()` rather
    * than a stricter format. */
@@ -268,9 +268,9 @@ export const tableSpecSchema = schema.object({
         }),
       ),
       clamped: schema.boolean(),
-      // Issue #9008 review, blocker 2: the instant the query actually ran, so a resumed
-      // conversation resolves a date-math bound against WHEN it ran, never against the render
-      // clock. `min: 0` only rejects a nonsensical negative instant (same convention as
+      // The instant the query actually ran, so a resumed conversation resolves a date-math bound
+      // against WHEN it ran, never against the render clock. `min: 0` only rejects a nonsensical
+      // negative instant (same convention as
       // `chatMessageSchema`'s own `createdAt` above).
       executedAt: schema.maybe(schema.number({ min: 0 })),
     }),
@@ -349,11 +349,10 @@ export const chatMessageSchema = schema.object({
  * this `validate` closure is what actually rejects it -- `createOrReplaceBodySchema.title`
  * (create, below), `renameBodySchema` (rename, further below), and `updateBodySchema.title` (PUT,
  * further below: only reached when a title is sent at all -- see that field's own doc comment)
- * all share it, so none of the three can drift on what counts as "no real title" (F-7, #9010
- * review -- create and rename/update used to disagree). Returning a string (not throwing) is
- * `@osd/config-schema`'s contract for a custom validator: a non-empty return value IS the
- * rejection, surfaced as a 400. The create/rename handlers additionally trim before storing
- * (m10) -- this only rejects what trimming would reduce to nothing. */
+ * all share it, so none of the three can drift on what counts as "no real title". Returning a
+ * string (not throwing) is `@osd/config-schema`'s contract for a custom validator: a non-empty
+ * return value IS the rejection, surfaced as a 400. The create/rename handlers additionally trim
+ * before storing -- this only rejects what trimming would reduce to nothing. */
 function rejectWhitespaceOnly(value: string): string | void {
   if (!value.trim()) {
     return 'must not be empty or contain only whitespace';
@@ -388,15 +387,14 @@ export const renameBodySchema = schema.object({
  * with, so this field only ever makes sense on an update.
  *
  * `title` is `schema.maybe` here (NOT required, unlike `createOrReplaceBodySchema`'s copy of this
- * same field) -- fixing a real bug (issue #9010): every auto-save used to recompute
- * `buildConversationTitle` and resend it on EVERY turn, which silently reverted any rename the
- * user had just made (the next auto-save's PUT overwrote it back to the auto-generated title, and
- * on the OPEN conversation, the resulting stale-version 409 also triggered a false "merged from
- * another tab" notice). `persistConversationTurn` (public/components/chat/chat-page.tsx) now
- * builds a title ONLY for CREATE (POST); every PUT omits the field entirely, and the handler below
- * carries the existing stored title over unchanged when it is absent -- the same "carry over every
- * field this request isn't changing" convention `user`/`created_at` already used. `common/
- * chat-history.ts`'s `buildConversationTitle` doc comment is updated to stop claiming otherwise. */
+ * same field): if every auto-save resent a recomputed `buildConversationTitle` on every turn, it
+ * would silently revert any rename the user had just made (the next auto-save's PUT would
+ * overwrite it back to the auto-generated title, and on the OPEN conversation, the resulting
+ * stale-version 409 would also trigger a false "merged from another tab" notice).
+ * `persistConversationTurn` (public/components/chat/chat-page.tsx) builds a title ONLY for CREATE
+ * (POST); every PUT omits the field entirely, and the handler below carries the existing stored
+ * title over unchanged when it is absent -- the same "carry over every field this request isn't
+ * changing" convention `user`/`created_at` already use. */
 const updateBodySchema = schema.object({
   title: schema.maybe(
     schema.string({
@@ -453,9 +451,9 @@ export function registerConversationRoutes(
       // splitting either step out to run in JS afterwards would make `total`/pagination
       // meaningless.
       //
-      // No client-side retention pruning here any more: the index alias is a data stream managed
-      // by an ISM policy (wazuh-indexer-plugins#1422) that rotates and deletes old backing indices
-      // itself, so there is nothing left for this route to prune on access.
+      // No client-side retention pruning here: the index alias is a data stream managed by an
+      // ISM policy that rotates and deletes old backing indices itself, so there is nothing left
+      // for this route to prune on access.
       const { hits, total } = await listConversations(
         context,
         owner,

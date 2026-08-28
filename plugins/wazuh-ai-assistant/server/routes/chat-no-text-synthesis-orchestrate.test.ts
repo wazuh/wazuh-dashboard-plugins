@@ -10,8 +10,9 @@ import { ChatMessage, ProviderConfig, StreamEvent } from '../../common/types';
 import { ChatStreamOptions, ProviderAdapter } from '../providers/types';
 
 /**
- * FORCED SYNTHESIS (measured design) -- orchestrate-LEVEL gating: proves the retry fires only
- * for the exact `toolUsedThisTurn && sawNonEmptyTable` case, through the REAL `orchestrate` loop
+ * FORCED SYNTHESIS -- orchestrate-LEVEL gating: proves the retry fires only for a turn that
+ * actually ran a tool and recorded a digest (`toolUsedThisTurn` + `turnDigests`, whether the result
+ * was non-empty or empty), and never more than once, through the REAL `orchestrate` loop
  * (not a reimplementation), same harness pattern as chat-capability-honesty.test.ts /
  * chat-tool-chaining.test.ts. The mechanism's own contract (scrub pipeline, deterministic
  * fallback, hard bounds) is unit-tested directly against `synthesizeNoTextFallback` in
@@ -238,22 +239,24 @@ test('orchestrate: no tool ran this turn -> NO_ANSWER_MESSAGE, unaffected, no ex
   );
 });
 
-test('orchestrate: a tool ran but returned zero rows -> NO_MATCHING_RESULTS_MESSAGE, unaffected, no extra retry call', async () => {
+test('orchestrate: a tool ran, returned zero rows, and the retry writes nothing -> the canned no-match copy, unchanged', async () => {
+  // A zero-row result IS an answer ("none"), so the retry fires here too. What this test pins is the
+  // FLOOR: when the retry produces no text, the user sees the deterministic copy unchanged.
   const { events, callCount } = await runOrchestrate(
-    [STAGE1_SCRIPT, SEARCH_TOOL_CALL_ROUND, NO_TEXT_ROUND],
+    [STAGE1_SCRIPT, SEARCH_TOOL_CALL_ROUND, NO_TEXT_ROUND, NO_TEXT_ROUND],
     fakeSearchContext(0),
   );
 
   assert.equal(
     callCount,
-    3,
-    'no extra retry call: a genuinely empty result has nothing to synthesize',
+    4,
+    'stage1 + the tool round + the no-text round + exactly one zero-row retry',
   );
   const text = deltaText(events);
-  // N1 fix (AI/plan/qa-battery-v31.md): the zero-row fallback is enriched with what was actually
-  // searched (data domain + caller-supplied filters, derived from the last attempted tool call) --
-  // see noTextFallbackMessage's `lastToolCall` param and buildNoMatchingResultsMessage. This test
-  // predates that enrichment; it now asserts the enriched shape instead of the bare sentence.
+  // The zero-row fallback is enriched with what was actually searched (data domain +
+  // caller-supplied filters, derived from the last attempted tool call) -- see
+  // noTextFallbackMessage's `lastToolCall` param and buildNoMatchingResultsMessage. This test
+  // asserts the enriched shape rather than the bare sentence.
   assert.match(text, /^No matching results were found for that query\./);
   assert.match(
     text,
@@ -274,4 +277,55 @@ test('orchestrate: the forced-synthesis retry errors -> falls back to a truthful
   const text = deltaText(events);
   assert.match(text, /returned 1 row/);
   assert.doesNotMatch(text, /No additional analysis/);
+});
+
+test('orchestrate: a zero-row turn whose retry DOES write an answer ships that answer, not the canned copy', async () => {
+  // The point of extending the gate: the model can answer an empty result in the terms of the
+  // question ("none in the last week"), which the canned line structurally cannot.
+  const retryScript: StreamEvent[] = [
+    {
+      type: 'delta',
+      content:
+        'Nothing changed on agent 001 in the last week: the search matched no events.',
+    },
+    { type: 'done', usage: { inputTokens: 25, outputTokens: 14 } },
+  ];
+  const { events, callCount, callOptions } = await runOrchestrate(
+    [STAGE1_SCRIPT, SEARCH_TOOL_CALL_ROUND, NO_TEXT_ROUND, retryScript],
+    fakeSearchContext(0),
+  );
+
+  assert.equal(callCount, 4);
+  assert.deepEqual(
+    callOptions[3],
+    {},
+    'the zero-row retry offers no tools either -- it cannot re-enter the tool loop',
+  );
+  const text = deltaText(events);
+  assert.match(text, /Nothing changed on agent 001 in the last week/);
+  assert.doesNotMatch(
+    text,
+    /No matching results were found/,
+    'the model answered, so the canned line must not also be emitted',
+  );
+  assert.doesNotMatch(
+    text,
+    /the table below has the details/,
+    'no table was rendered -- the fallback must never point at one',
+  );
+});
+
+test('orchestrate: the zero-row retry is still bounded to ONE extra call per turn', async () => {
+  // Same bound as the non-empty case (`noTextSynthesisAttempted`): a retry that itself writes
+  // nothing must not trigger another retry.
+  const { callCount } = await runOrchestrate(
+    [STAGE1_SCRIPT, SEARCH_TOOL_CALL_ROUND, NO_TEXT_ROUND, NO_TEXT_ROUND],
+    fakeSearchContext(0),
+  );
+
+  assert.equal(
+    callCount,
+    4,
+    'never a fifth call -- the retry is once per turn',
+  );
 });

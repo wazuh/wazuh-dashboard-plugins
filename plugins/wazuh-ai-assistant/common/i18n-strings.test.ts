@@ -11,23 +11,21 @@
  */
 
 /**
- * Keeps this plugin's i18n strings sound, and keeps it English-only (issue #8975).
+ * Keeps this plugin's i18n strings sound, and keeps it English-only.
  *
  * The UI text lives in the `defaultMessage` of each `i18n.translate(...)` call and
  * `<FormattedMessage>` element. That is what the dashboard renders at the default `i18n.locale`
  * (`en`), and -- since this plugin ships no translation catalogs -- at every other locale too.
  *
- * WHY NO CATALOGS. The plugin used to carry `en-US.json` and `es-ES.json`. Neither ever reached a
- * user. `en-US.json` could not: `@osd/i18n`'s loader keys catalogs by file basename, so the default
- * locale `en` never looks at an `en-US` entry and renders `defaultMessage` instead. `es-ES.json`
- * could not either, on any packaged install: the platform discovers catalogs by globbing for an
- * `.i18nrc.json` in each plugin directory, and `osd-plugin-helpers` builds the archive from a
- * pattern list that matches no dotfile, so the installed plugin had `translations/` and no
- * `.i18nrc.json` to register it. Both had drifted badly from the source in the meantime -- 7 dead
- * ids, 8 entries translated from wording the source had since changed, 73 ids never covered -- with
- * nothing comparing them to anything. Localizing one plugin on its own also puts a per-PR
- * translation tax on every contributor. So the catalogs are gone, and localization is deferred to a
- * dashboard-wide effort that can decide the locale set and the workflow at once.
+ * WHY NO CATALOGS. `en-US.json` cannot work: `@osd/i18n`'s loader keys catalogs by file basename,
+ * so the default locale `en` never looks at an `en-US` entry and renders `defaultMessage` instead.
+ * `es-ES.json` cannot either, on any packaged install: the platform discovers catalogs by globbing
+ * for an `.i18nrc.json` in each plugin directory, and `osd-plugin-helpers` builds the archive from
+ * a pattern list that matches no dotfile, so an installed plugin has `translations/` and no
+ * `.i18nrc.json` to register it. Catalogs like these also drift easily from the source with
+ * nothing comparing them to anything, and localizing one plugin on its own puts a per-PR
+ * translation tax on every contributor. So this plugin ships no catalogs, and localization is
+ * deferred to a dashboard-wide effort that can decide the locale set and the workflow at once.
  *
  * Model answers are unaffected: the assistant replies in the language of the user's own question
  * (see the language rule in `server/prompts.ts`), which is the model's doing, not i18n's.

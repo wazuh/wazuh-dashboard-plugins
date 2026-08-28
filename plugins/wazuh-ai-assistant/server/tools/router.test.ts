@@ -22,8 +22,8 @@ test('resolveStage2Tools(general) returns the minimal set, never undefined/empty
   const specs = resolveStage2Tools(['general']);
   assert.ok(Array.isArray(specs), 'must return an array, never undefined');
   const names = specs.map(spec => spec.name).sort();
-  // get_field_values joins search_wazuh_data as an always-on tool (workstream B, "verify before
-  // filter") -- see router.ts's TOOL_CATEGORY/resolveStage2Tools doc comments.
+  // get_field_values joins search_wazuh_data as an always-on "verify before filter" tool -- see
+  // router.ts's TOOL_CATEGORY/resolveStage2Tools doc comments.
   assert.deepEqual(names, [
     'get_field_values',
     'get_security_summary',
@@ -40,8 +40,8 @@ test('resolveStage2Tools: a data category resolution includes its chain-pair det
   // itself a CHAIN_PAIRS key for `find_document_by_field`, so both are expected here too.
   const specs = resolveStage2Tools(['agents']);
   const names = specs.map(spec => spec.name).sort();
-  // get_field_values joins as an always-on tool (workstream B) on top of the CHAIN_PAIRS
-  // fixed-point expansion (workstream D adds get_sca_checks via get_sca_results).
+  // get_field_values joins as an always-on tool on top of the CHAIN_PAIRS fixed-point
+  // expansion (which adds get_sca_checks via get_sca_results).
   assert.deepEqual(names, [
     'find_document_by_field',
     'get_agent_inventory',
@@ -77,12 +77,12 @@ test('the "general" category description carries the explicit exclusion', () => 
   );
 });
 
-// --- issue #8935: deterministic co-routing for overlapping category vocabulary -------------------
+// --- deterministic co-routing for overlapping category vocabulary -------------------
 
 test('resolveStage2Tools: routing to compliance also offers the SCA tools', () => {
-  // The measured defect: "How badly are we failing CIS, in plain numbers?" routed to
-  // ["compliance"] on 3/3 instrumented runs, and get_sca_results -- which holds the answer -- was
-  // never offered, so the assistant truthfully reported that none of the tools it HAD covered CIS.
+  // Without co-routing, "How badly are we failing CIS, in plain numbers?" routes to
+  // ["compliance"], and get_sca_results -- which holds the answer -- is never offered, so the
+  // assistant truthfully reports that none of the tools it has covered CIS.
   const names = resolveStage2Tools(['compliance']).map(spec => spec.name);
   assert.ok(
     names.includes('get_sca_results'),
@@ -164,14 +164,14 @@ test('the "findings" category description mentions top/noisiest agents (get_top_
   );
 });
 /**
- * Issue #8913's own worked example ("What software does this box have installed?") measured
- * live at 0/5 for `get_agent_inventory` even AFTER the tool learned to self-resolve a missing
- * agent (see get-agent-inventory.ts's `resolveDeicticAgentParams`) -- because stage 1 never
- * routed to the `inventory` category in the first place, so the tool was never even offered in
- * stage 2 (`resolveStage2Tools`). The pre-fix `inventory` description said "installed packages"
- * but never the word "software", and had no note that a vague host reference ("this box") is
- * still an inventory-domain question rather than an identity question. Pin both additions here
- * so a future reword silently regresses this instead of failing loudly.
+ * The worked example "What software does this box have installed?" fails to reach
+ * `get_agent_inventory`, even though the tool can self-resolve a missing agent (see
+ * get-agent-inventory.ts's `resolveDeicticAgentParams`), whenever stage 1 does not route to the
+ * `inventory` category in the first place -- the tool is then never even offered in stage 2
+ * (`resolveStage2Tools`). An `inventory` description that says only "installed packages," never
+ * the word "software," and has no note that a vague host reference ("this box") is still an
+ * inventory-domain question rather than an identity question, misses this case. Pin both
+ * additions here so a future reword silently regresses this instead of failing loudly.
  */
 test('the "inventory" category description covers "software" and vague host phrasing', () => {
   const prompt = buildRoutingPrompt('2026-01-01T00:00:00.000Z');
@@ -186,7 +186,7 @@ test('the "inventory" category description covers "software" and vague host phra
     inventoryLine as string,
     /\bsoftware\b/i,
     'inventory description must literally say "software", not just "installed packages", to ' +
-      "match #8913's exact worked-example phrasing",
+      'match the worked-example phrasing above',
   );
   assert.match(
     inventoryLine as string,
@@ -197,7 +197,7 @@ test('the "inventory" category description covers "software" and vague host phra
 });
 
 /**
- * REVIEW FOLLOW-UP (CV-077, live battery re-run 2026-08-20): "What spaces exist and what does
+ * "What spaces exist and what does
  * each contain?" declined with "I don't have the tool needed... available in this turn" -- the
  * prompt-level decline-copy fix (prompts.ts, see the RBAC/spaces disambiguation note) correctly
  * stopped the WRONG (RBAC-permissions) decline from firing, but stage-1 routing still never
@@ -316,8 +316,8 @@ test('CHAIN_PAIRS: every summary and detail tool name is a real registry tool', 
 });
 
 test('resolveStage2Tools: get_sca_results chains to get_sca_checks (same-category detail)', () => {
-  // The measured Failure B witness (get_sca_results -> get_sca_checks) must also be a Failure A
-  // fix: get_sca_checks must be OFFERED whenever get_sca_results is, regardless of which category
+  // The Failure B witness (get_sca_results -> get_sca_checks) also guards Failure A:
+  // get_sca_checks must be OFFERED whenever get_sca_results is, regardless of which category
   // routed it there.
   const names = resolveStage2Tools(['sca']).map(spec => spec.name);
   assert.ok(names.includes('get_sca_results'));
@@ -325,8 +325,8 @@ test('resolveStage2Tools: get_sca_results chains to get_sca_checks (same-categor
 });
 
 test('resolveStage2Tools: get_agents chains to cross-category detail tools (Failure A)', () => {
-  // The measured miss: "what's going on with aio-05" needs get_vulnerabilities_by_agent, but
-  // routing to `agents` alone never offered it before this fix.
+  // "what's going on with aio-05" needs get_vulnerabilities_by_agent; routing to `agents` alone
+  // must still offer it.
   const names = resolveStage2Tools(['agents']).map(spec => spec.name);
   assert.ok(names.includes('get_agents'));
   assert.ok(names.includes('get_vulnerabilities_by_agent'));
@@ -384,8 +384,8 @@ test('resolveStage2Tools: chain-pair expansion does not widen the general-alone 
     .map(spec => spec.name)
     .sort();
   // get_field_values is appended unconditionally on every path, including general-alone (see
-  // resolveStage2Tools's always-on block below the general-alone branch) -- workstream B's
-  // addition, not part of the chain-pair expansion this test guards against.
+  // resolveStage2Tools's always-on block below the general-alone branch) -- not part of the
+  // chain-pair expansion this test guards against.
   assert.deepEqual(names, [
     'get_field_values',
     'get_security_summary',
@@ -397,4 +397,71 @@ test('resolveStage2Tools: get_security_summary chains to get_findings_by_time ou
   const names = resolveStage2Tools(['findings']).map(spec => spec.name);
   assert.ok(names.includes('get_security_summary'));
   assert.ok(names.includes('get_findings_by_time'));
+});
+
+// --- mitre/events escape their own category ---------------------------------------------------
+//
+// "Explain this MITRE incident -- when was it detected and how" needs the document behind a
+// technique row (find_document_by_field) and the detection side (get_rules, the only tool that
+// returns a rule description). Both live outside the `mitre` category, and resolveStage2Tools widens
+// a route only through CHAIN_PAIRS, so without these edges a mitre-routed turn can list technique
+// rows and go no further. Same for get_events_by_agent, which sits in `findings` with no row-level
+// pivot of its own.
+
+test('resolveStage2Tools: a mitre route reaches find_document_by_field and get_rules via CHAIN_PAIRS', () => {
+  const names = resolveStage2Tools(['mitre']).map(spec => spec.name);
+  assert.ok(
+    names.includes('get_mitre_findings'),
+    'the routed category own tools must survive the expansion',
+  );
+  assert.ok(
+    names.includes('find_document_by_field'),
+    'a mitre-routed turn must be able to open the document behind a technique row',
+  );
+  assert.ok(
+    names.includes('get_rules'),
+    'a mitre-routed turn must be able to reach the detection-rule side of "how was it detected"',
+  );
+});
+
+test('CHAIN_PAIRS: get_mitre_findings declares its detail tools in a fixed, pinned order', () => {
+  // Same load-bearing reason as the get_agents pin above: chat.ts's `findOfferedFollowUpTool`
+  // metadata fallback forces the FIRST eligible detail tool when an offer names no tool, so the
+  // row lookup must stay ahead of the rule lookup -- an unnamed "I can dig into that" offer after
+  // a technique listing should open the finding, not the Sigma catalog.
+  assert.deepEqual(CHAIN_PAIRS.get_mitre_findings, [
+    'find_document_by_field',
+    'get_rules',
+  ]);
+});
+
+test('CHAIN_PAIRS: get_events_by_agent chains to find_document_by_field', () => {
+  assert.deepEqual(CHAIN_PAIRS.get_events_by_agent, ['find_document_by_field']);
+  const names = resolveStage2Tools(['findings']).map(spec => spec.name);
+  assert.ok(names.includes('get_events_by_agent'));
+  assert.ok(names.includes('find_document_by_field'));
+});
+
+// --- Registry FIM must have a category that claims it -----------------------------------------
+//
+// With the `fim` category described as "current state of monitored files", nothing in the routing
+// menu claims Windows registry keys/values, so a registry question reaches no tool that can answer
+// it -- even though the data is reachable: search_wazuh_data is appended to every resolved list and
+// `wazuh-states-*` covers wazuh-states-fim-registry-keys/-values.
+
+test('the fim routing category claims Windows registry keys/values, not only files', () => {
+  const prompt = buildRoutingPrompt('2026-01-01T00:00:00.000Z');
+  const fimLine = prompt.split('\n').find(line => line.startsWith('- fim:'));
+  assert.ok(fimLine, 'the fim category must appear in the routing menu');
+  assert.match(fimLine, /Windows registry keys\/values/);
+  assert.match(fimLine, /Run-key/);
+});
+
+test('routing to fim still resolves a tool that can actually reach the registry surface', () => {
+  // No typed tool reads registry FIM, so the whole route depends on the always-on escape hatch
+  // travelling with the fim category. If that ever stops being true, the prompt's registry
+  // routing rule becomes an instruction the model cannot obey.
+  const names = resolveStage2Tools(['fim']).map(spec => spec.name);
+  assert.ok(names.includes('search_wazuh_data'));
+  assert.ok(names.includes('get_fim_files'));
 });

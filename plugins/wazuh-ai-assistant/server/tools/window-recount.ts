@@ -4,12 +4,12 @@ import {
 } from './catalog/common';
 
 /**
- * Narrowed-window zero-row disclosure (issue #8920 item 3): a 0-row result from a caller-narrowed
- * time window ("what happened in the last hour") is exactly as consistent with "genuinely
- * nothing in that window" as with "there IS data, just outside the window the model/user
- * happened to pick" -- and a model left to infer that distinction on its own has measurably
- * failed to (see #8913, which needed four attempts because three of them were prompt-level).
- * This module supplies the two PURE helpers executor.ts's `executeIndexerRequest` uses to make
+ * Narrowed-window zero-row disclosure: a 0-row result from a caller-narrowed time window
+ * ("what happened in the last hour") is exactly as consistent with "genuinely nothing in that
+ * window" as with "there IS data, just outside the window the model/user happened to pick" --
+ * and a model left to infer that distinction on its own cannot be relied on to get it right; a
+ * prompt-level instruction alone is not enough. This module supplies the two PURE helpers
+ * executor.ts's `executeIndexerRequest` uses to make
  * the distinction mechanical: locate the `@timestamp` range a query actually ran with, and build
  * a size:0/aggs-free recount of the SAME query against the plugin's own default window instead.
  *

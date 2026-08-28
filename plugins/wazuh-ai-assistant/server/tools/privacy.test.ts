@@ -130,6 +130,67 @@ test('prescanAndMint: still mints a real hostname that is not field-path or vers
   assert.doesNotMatch(out, /backup-vault\.internal\.corp/);
 });
 
+// --- prescanAndMint: #1529 schema-vocabulary widening (WCS catalog) ---------------------------
+//
+// The reported corruption: the field policy curates ~10 fields, so `FIELD_PATH_WORDS` only knew
+// THOSE paths' words and every other indexed field name was minted as a hostname. Wire capture:
+//   "samples": [{"wazuh.agent.name":"HOST_5","HOST_4":"ai-qa-aio-node"}],
+//   "columns": ["HOST_1","HOST_2","HOST_3","wazuh.agent.name","HOST_4"]
+// with related.hosts -> HOST_1, related.ip -> HOST_2, related.user -> HOST_3,
+// wazuh.cluster.node -> HOST_4. The vocabulary is now unioned with `FIELD_CATALOG`, so a token
+// whose every '.'-segment is a known SCHEMA word is never minted.
+
+test('prescanAndMint: leaves the #1529 reported field names untouched', () => {
+  for (const fieldName of [
+    'related.hosts',
+    'related.ip',
+    'related.user',
+    'wazuh.cluster.node',
+    // The sibling that already survived — pinned so the union cannot regress it.
+    'wazuh.cluster.name',
+  ]) {
+    const p = new Pseudonymizer();
+    const out = prescanAndMint(`the ${fieldName} column is empty`, p);
+    assert.doesNotMatch(out, /HOST_\d+/, `${fieldName} was minted`);
+    assert.ok(out.includes(fieldName), `${fieldName} was rewritten`);
+    assert.equal(p.newEntries().length, 0);
+  }
+});
+
+test('prescanAndMint: a whole digest columns hint survives the schema vocabulary', () => {
+  const p = new Pseudonymizer();
+  const columnsHint =
+    '["related.hosts","related.ip","related.user","wazuh.agent.name","wazuh.cluster.node"]';
+  assert.equal(prescanAndMint(columnsHint, p), columnsHint);
+  assert.equal(p.newEntries().length, 0);
+});
+
+test('prescanAndMint: schema vocabulary still mints real dotted hostname VALUES', () => {
+  // The safety property: the WCS catalog is consulted as WHOLE PATHS, so a value can only be
+  // spared by the small curated-word vocabulary — never by a catalog path's segment words.
+  for (const hostname of [
+    'ai-qa-aio-node.corp.example.com',
+    'lists.ubuntu.com',
+    // Leading labels ARE schema words ("host", "agent", "user", "process"); the suffixes are not.
+    'host.agent.local',
+    'user.process.internal',
+    'agent.name.example.net',
+    // QA regression guard: these are assembled ENTIRELY from WCS path segment words — "server" /
+    // "home", "data" / "io" ("io" is also a real TLD, ".home" a real router-assigned local
+    // suffix), "dns" / "cloud" / "host". Had the catalog been flattened into the ALL-segments
+    // vocabulary instead of matched whole-path, every segment would have counted as "known" and
+    // these would have stopped being pseudonymized. None is a field path, so all must still mint.
+    'server.home',
+    'data.io',
+    'dns.cloud.host',
+  ]) {
+    const p = new Pseudonymizer();
+    const out = prescanAndMint(`connect to ${hostname} now`, p);
+    assert.match(out, /HOST_\d+/, `${hostname} was not minted`);
+    assert.ok(!out.includes(hostname), `${hostname} survived verbatim`);
+  }
+});
+
 // --- prescanAndMint / prescanAndMintToolContent: #8920 item 8 version-grammar coverage --------
 //
 // The reported instances were two Ubuntu `dpkg -l` versions ("3.118ubuntu5",
@@ -143,32 +204,32 @@ test('prescanAndMint: still mints a real hostname that is not field-path or vers
 // below) since the two boundaries have independent code paths.
 
 /** Real Debian/RPM/semver version strings. Every one of these must reach the model UNCHANGED —
- * minting a HOST_n for a version string breaks a `package.version:{allow}`-style query. Includes
- * the two previously-leaking wire-capture tokens (letters fused into a dot-label with no leading
- * "-") and the two previously-passing ones (plain "-suffix" and a "~"-broken compound token), so a
- * regression in either direction shows up here. */
+ * minting a HOST_n for a version string breaks a `package.version:{allow}`-style query. Covers
+ * wire-capture token shapes on both sides of the boundary -- letters fused into a dot-label with no
+ * leading "-", a plain "-suffix", and a "~"-broken compound token -- so a regression in either
+ * direction shows up here. */
 const VERSION_GRAMMAR_CORPUS = [
-  '3.118ubuntu5', // previously leaked: letter-fused label, no "-" prefix
-  '3.20191218.1ubuntu2.3', // previously leaked: same shape, 4 labels
+  '3.118ubuntu5', // letter-fused label, no "-" prefix
+  '3.20191218.1ubuntu2.3', // same shape, 4 labels
   '1.1.1k', // NON-Ubuntu letter-fused label (openssl) -- blocks a distro-hardcoded reversion
   '1.1.1k-9.el8', // openssl on RHEL8: letter-fused label + dist-tag revision
   '1.9.9p1', // sudo's patchlevel notation
-  '0.21-4ubuntu4', // previously passing: plain digit labels + "-suffix"
+  '0.21-4ubuntu4', // plain digit labels + "-suffix"
   '11.4.0-1ubuntu1~22.04.3', // "~" splits it; residues are version/all-numeric shaped
   '5.2.5-2ubuntu1',
   '1.21.1-1ubuntu2~22.04.2',
   '2.4.41-4+deb11u1', // Debian NMU/backport revision ("+deb11u1")
   'v1.2.3',
   '4.15.0-213.224', // kernel-style dotted revision
-  '5.15.0-91-generic', // previously leaked: SECOND hyphen (kernel/linux-image family --
+  '5.15.0-91-generic', // SECOND hyphen (kernel/linux-image family --
   // agent.os.kernel carries exactly this string for every Ubuntu agent)
   '5.4.0-150-generic',
   '5.15.0-91-lowlatency',
-  '2.4.37-43.module+el8.5.0+1022+b541f3b1', // previously leaked: RHEL modular build, "+" splits
+  '2.4.37-43.module+el8.5.0+1022+b541f3b1', // RHEL modular build, "+" splits
   // off the FQDN-shaped "el8.5.0" -- covered by the whole-token compound check
-  '1.0+git20200101.abc1234-1', // previously leaked: git snapshot version
-  '1.0.0+build.5', // previously leaked: semver build metadata
-  '0.9.8+really0.9.7-1', // previously leaked: Debian "+really" convention
+  '1.0+git20200101.abc1234-1', // git snapshot version
+  '1.0.0+build.5', // semver build metadata
+  '0.9.8+really0.9.7-1', // Debian "+really" convention
   // NOTE: '1.2.3' never reaches VERSION_LIKE_TOKEN_RE at all -- ALL_NUMERIC_DOTTED_RE catches it
   // first. Kept as an anchor that the two exclusions do not fight each other.
   '1.2.3',
@@ -415,9 +476,9 @@ test('inferPseudonymKind: infers kind prefixes from field names', () => {
   assert.equal(inferPseudonymKind('GeoLocation.country_name'), 'VAL');
 });
 
-test('inferPseudonymKind: #8889 no longer misclassifies "description" as an IP field', () => {
+test('inferPseudonymKind: does not misclassify "description" as an IP field', () => {
   // 'wazuh.rule.description'.includes('ip') is true ("descr-IP-tion") under raw substring
-  // matching -- the bug this fix closes. A description field is generic free text (VAL), not IP.
+  // matching. A description field is generic free text (VAL), not IP.
   assert.equal(inferPseudonymKind('wazuh.rule.description'), 'VAL');
   // Same substring trap, different word: "recipient" also contains "ip" mid-word.
   assert.equal(inferPseudonymKind('email.recipient'), 'VAL');
@@ -485,11 +546,11 @@ test('Pseudonymizer: applyToText replaces every known value, longest first', () 
   assert.match(out, /^Traffic from IP_\d+ and IP_\d+ was observed\.$/);
 });
 
-// #8916: applyToText previously did a plain substring replace, so a pseudonymized word could
-// corrupt an unrelated value it merely happened to appear inside of — observed live: "ubuntu"
-// (pseudonymized from host.os.platform) turned the package version "7.81.0-1ubuntu1.14" into
-// "7.81.0-1VAL_21.14". These pin the word-boundary discipline (boundary = any non-alphanumeric
-// character) that fixes it without breaking the cases that must keep working.
+// applyToText must not let a pseudonymized word corrupt an unrelated value it merely happens to
+// appear inside of — e.g. "ubuntu" (pseudonymized from host.os.platform) must not turn the package
+// version "7.81.0-1ubuntu1.14" into "7.81.0-1VAL_21.14". These pin the word-boundary discipline
+// (boundary = any non-alphanumeric character) that guarantees this without breaking the cases that
+// must keep working.
 
 test('Pseudonymizer: applyToText leaves a pseudonymized word untouched when it is glued inside a larger alphanumeric run (version string)', () => {
   const p = new Pseudonymizer();
@@ -778,6 +839,57 @@ test('applyFieldPolicy: explicit "allow" entry is unaffected by isEscapeHatch', 
 });
 
 // --- get_agent_inventory's deriveColumns/isEscapeHatch fail-closed default, against the REAL
+// The cluster node name reached the provider in clear under privacy mode ON, because a single
+// `wazuh.cluster.*` wildcard swept the cluster's configured LABEL and a machine's HOSTNAME into
+// one `allow`. The compensating value-shape scan could not catch it either: `FQDN_TOKEN_RE`
+// requires a dot, so a bare single-word node name is never minted by shape, and the documented
+// fallback for a bare-word hostname is the field-policy scrub -- which was this `allow`.
+
+test('applyFieldPolicy: wazuh.cluster.node is pseudonymized as a HOST while wazuh.cluster.name stays readable', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    columns: ['wazuh.cluster.name', 'wazuh.cluster.node'],
+    samples: [
+      { 'wazuh.cluster.name': 'wazuh', 'wazuh.cluster.node': 'a-node' },
+    ],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  // The configured label is curated vocabulary -- it stays readable so the model can still tell
+  // which cluster a document belongs to.
+  assert.equal(out.samples[0]['wazuh.cluster.name'], 'wazuh');
+  // The node name is a real machine's hostname: replaced, and with a HOST-kind pseudonym so it
+  // shares a namespace with wazuh.agent.name/host.hostname rather than minting a second token for
+  // the same host.
+  assert.notEqual(out.samples[0]['wazuh.cluster.node'], 'a-node');
+  assert.match(String(out.samples[0]['wazuh.cluster.node']), /^HOST_\d+$/);
+  // The KEY must survive: the reported symptom was exactly inverted -- the value stayed in clear
+  // while the field NAME arrived as HOST_1, so the model could not tell what the column meant.
+  assert.deepEqual(out.columns, ['wazuh.cluster.name', 'wazuh.cluster.node']);
+});
+
+test('applyFieldPolicy: the same host reaching the digest twice gets ONE pseudonym across both fields', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    samples: [{ 'wazuh.agent.name': 'a-node', 'wazuh.cluster.node': 'a-node' }],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p);
+  assert.equal(
+    out.samples[0]['wazuh.cluster.node'],
+    out.samples[0]['wazuh.agent.name'],
+  );
+});
+
+// Order matters: `resolveFieldEntry` returns the FIRST matching entry, so the two exact entries
+// have to sit ABOVE the surviving `wazuh.cluster.*` wildcard or the wildcard would still win.
+test('FIELD_POLICY_DEFAULTS: the exact wazuh.cluster entries precede the wildcard', () => {
+  const index = (field: string) =>
+    FIELD_POLICY_DEFAULTS.findIndex(entry => entry.field === field);
+  const wildcard = index('wazuh.cluster.*');
+  assert.ok(wildcard >= 0, 'the wildcard is still present as the catch-all');
+  assert.ok(index('wazuh.cluster.name') < wildcard);
+  assert.ok(index('wazuh.cluster.node') < wildcard);
+});
+
 // FIELD_POLICY_DEFAULTS (not a hand-built test-local policy): confirms the explicit 'allow'
 // entries added for it actually land where they need to, and that the fields which must stay
 // anonymized on this same tool still do. Regression guard for the "which fields are safe to allow
@@ -1238,13 +1350,12 @@ test('extractAggFields: returns undefined when body has no aggs', () => {
 
 // --- applyFieldPolicy: breakdown SECURITY REGRESSIONS for multi_terms / composite ----------------
 //
-// HIGH severity finding: extractAggFields previously resolved only terms/significant_terms/
-// cardinality; a multi_terms or composite aggregation's field was always "unresolvable", and the
-// breakdown loop's `if (!field) { scrubbed.push(bucket); continue; }` passed every such bucket's
-// RAW key through untouched, WITH PRIVACY ON — a multi_terms/composite pivot on source.ip leaked
-// real IPs regardless of the field's own 'anonymize' policy entry. Fixed by teaching
-// extractAggFields to resolve both shapes (see the extractAggFields tests above) and by
-// `scrubAggKey` handling each bucket key structurally instead of only ever handling a bare string.
+// extractAggFields must resolve multi_terms and composite aggregation fields, not just
+// terms/significant_terms/cardinality: otherwise the breakdown loop's
+// `if (!field) { scrubbed.push(bucket); continue; }` passes every such bucket's RAW key through
+// untouched, WITH PRIVACY ON — a multi_terms/composite pivot on source.ip would leak real IPs
+// regardless of the field's own 'anonymize' policy entry. `scrubAggKey` handles each bucket key
+// structurally rather than only ever handling a bare string (see the extractAggFields tests above).
 
 test('applyFieldPolicy: multi_terms on source.ip + wazuh.agent.id pseudonymizes both positions', () => {
   const policy: FieldPolicyEntry[] = [
@@ -1711,7 +1822,7 @@ test('F1: without identifiersOnly (tool-value call sites), the same common words
 
 test('F2: identifiersOnly excludes a short/numeric minted value, so it cannot corrupt an already-inserted HOST_n token', () => {
   const p = new Pseudonymizer();
-  p.pseudonymize('1', 'VAL'); // the short/numeric value that used to corrupt HOST_1
+  p.pseudonymize('1', 'VAL'); // the short/numeric value that would corrupt HOST_1 if matched
   const hostPseudonym = p.pseudonymize('dbprod07', 'HOST');
   assert.equal(hostPseudonym, 'HOST_1');
 
@@ -2027,7 +2138,7 @@ test('FIELD_POLICY_DEFAULTS: wazuh.rule.title has an explicit entry, not allow-b
   assert.equal(entry!.action, 'allow');
 });
 
-// --- Workstream A1a: newly reachable families through search_wazuh_data's deriveColumns/
+// --- Newly reachable families through search_wazuh_data's deriveColumns/
 // isEscapeHatch fail-closed default, against the REAL FIELD_POLICY_DEFAULTS -- same style as the
 // get_agent_inventory group above, pinning both the 'allow' fields and the ones that correctly
 // stay anonymized on this same escape hatch. ------------------------------------------------------
@@ -2041,7 +2152,7 @@ test('applyFieldPolicy: search_wazuh_data keeps wazuh-metrics-agents identity/OS
         'wazuh.agent.status': 'active',
         'wazuh.agent.version': 'v5.0.0',
         'wazuh.agent.host.os.platform': 'ubuntu',
-        // P-2 (AI/plan/a1a-review.md): real docs carry this as an ARRAY
+        // Real docs carry this as an ARRAY
         // ("wazuh-metrics-agents": `{"agent":{"groups":["default"]}}`), not the bare string the
         // pre-review test asserted (a shape real data never produces) -- 'allow' means unscanned
         // passthrough regardless of shape, so the array survives untouched.
@@ -2065,7 +2176,7 @@ test('applyFieldPolicy: search_wazuh_data keeps wazuh-metrics-agents identity/OS
   assert.match(out.samples[0]['wazuh.agent.register.ip'] as string, /^IP_\d+$/);
 });
 
-// --- P-2 (AI/plan/a1a-review.md): array/object privacy bypass regression tests -----------------
+// --- P-2: array/object privacy bypass regression tests -----------------
 
 test('P-2 regression: an array-valued anonymize field is anonymized element-wise, not passed through raw', () => {
   const p = new Pseudonymizer();
@@ -2345,12 +2456,10 @@ test('NF-2 regression: a "never" field is still dropped regardless of container 
 });
 
 test('F3: an unlisted field (no entry, not the escape hatch) with an object value is shape-scanned and KEPT, not dropped', () => {
-  // F3 (adversarial validation of NF-2): this container used to fall through to the final
-  // `return { keep: true, value }` untouched (pre-NF-2), then NF-2 over-corrected and started
-  // dropping it entirely -- silently deleting a column that is present when privacy is off. It is
-  // now shape-scanned (prescanAndMint over every string leaf, the same allow-by-omission scan a
-  // scalar string gets) and KEPT, so the column survives with its IP/FQDN leaves pseudonymized and
-  // everything else untouched.
+  // An unlisted field's object value must not be dropped outright -- that would silently delete a
+  // column that is present when privacy is off. It is shape-scanned (prescanAndMint over every
+  // string leaf, the same allow-by-omission scan a scalar string gets) and KEPT, so the column
+  // survives with its IP/FQDN leaves pseudonymized and everything else untouched.
   const p = new Pseudonymizer();
   const result = scrubFieldValue(
     'totally.unlisted.field',
@@ -2912,6 +3021,99 @@ test('applyFieldPolicy: host.hostname is pre-minted for the prose scan too', () 
     out.samples[0][WAZUH_FIELD.RULE_TITLE],
     `Configuration drift on ${token}`,
   );
+});
+
+// --- #1524: the aggregation half of the prose pre-mint ----------------------------------------
+//
+// Reported: with privacy ON, `wazuh.rule.title` reached the provider as
+// "Secret or credential accessed from vault - AI-QA-AGENT-WIN$" — the estate's real NetBIOS
+// hostname, in a BUCKET digest whose rows carry `{key, doc_count, wazuh.rule.title, ...}` and whose
+// agent names live under the agg `key` / in `breakdown`. Neither position was pre-minted, so the
+// dictionary was empty when the title was scanned.
+
+test('applyFieldPolicy: #1524 an agent name in the agg bucket key scrubs the rule title too', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_top_agents',
+    samples: [
+      {
+        key: 'AI-QA-AGENT-WIN',
+        doc_count: 10,
+        [WAZUH_FIELD.RULE_TITLE]:
+          'Secret or credential accessed from vault - AI-QA-AGENT-WIN$',
+      },
+    ],
+    columns: ['key', 'doc_count', WAZUH_FIELD.RULE_TITLE],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p, {
+    by_agent: scalarSpec(WAZUH_FIELD.AGENT_NAME),
+  });
+  const token = out.samples[0].key as string;
+  assert.match(token, /^HOST_\d+$/);
+  // Cross-field pseudonym CONSISTENCY: the title carries the same token the key does, not a second
+  // mint — and the real hostname is gone from both.
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    `Secret or credential accessed from vault - ${token}$`,
+  );
+  assert.doesNotMatch(JSON.stringify(out), /AI-QA-AGENT-WIN/i);
+});
+
+test('applyFieldPolicy: #1524 an agent name carried only by BREAKDOWN scrubs the rule title', () => {
+  // The name never appears as a sample value at all — it is one key over, in the bucket list of the
+  // same response payload. Before the pre-mint walked `breakdown`, the samples loop scrubbed the
+  // title while the name was still unknown.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_top_agents',
+    samples: [
+      {
+        doc_count: 10,
+        [WAZUH_FIELD.RULE_TITLE]:
+          'Successful user authentication - AI-QA-AGENT-WIN',
+      },
+    ],
+    columns: ['doc_count', WAZUH_FIELD.RULE_TITLE],
+    breakdown: [{ key: 'AI-QA-AGENT-WIN', count: 10, agg: 'by_agent' }],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p, {
+    by_agent: scalarSpec(WAZUH_FIELD.AGENT_NAME),
+  });
+  const token = out.breakdown?.[0].key as unknown as string;
+  assert.match(token, /^HOST_\d+$/);
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    `Successful user authentication - ${token}`,
+  );
+  assert.doesNotMatch(JSON.stringify(out), /AI-QA-AGENT-WIN/i);
+});
+
+test('applyFieldPolicy: #1524 a hostname NEVER carried by the payload is still left verbatim', () => {
+  // The by-construction false-positive guard, stated as a limitation: this is KNOWN-ROSTER
+  // scrubbing. Nothing is guessed from prose, so a bare name the payload never carries as a value
+  // (and no earlier turn minted) is untouched — and, the point of the guard, an ordinary word in a
+  // title can never be replaced either.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_top_agents',
+    samples: [
+      {
+        key: 'AI-QA-AGENT-WIN',
+        doc_count: 10,
+        [WAZUH_FIELD.RULE_TITLE]:
+          'Secret or credential accessed from vault on some-other-host',
+      },
+    ],
+    columns: ['key', 'doc_count', WAZUH_FIELD.RULE_TITLE],
+  });
+  const out = applyFieldPolicy(digest, FIELD_POLICY_DEFAULTS, p, {
+    by_agent: scalarSpec(WAZUH_FIELD.AGENT_NAME),
+  });
+  assert.equal(
+    out.samples[0][WAZUH_FIELD.RULE_TITLE],
+    'Secret or credential accessed from vault on some-other-host',
+  );
+  assert.match(out.samples[0].key as string, /^HOST_\d+$/);
 });
 
 test('applyFieldPolicy: a HOST-kind field OUTSIDE the curated pre-mint list is not pre-minted', () => {

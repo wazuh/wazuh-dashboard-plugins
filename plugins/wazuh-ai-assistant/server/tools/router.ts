@@ -78,8 +78,8 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   get_vulnerabilities_by_agent: 'vulnerabilities',
   get_vulnerability_by_cve: 'vulnerabilities',
   get_critical_vulnerabilities: 'vulnerabilities',
-  // get_cve_intel (workstream A1b) keys off a CVE id like get_vulnerability_by_cve -- same
-  // category, no extra stage-1 line.
+  // get_cve_intel keys off a CVE id like get_vulnerability_by_cve -- same category, no extra
+  // stage-1 line.
   get_cve_intel: 'vulnerabilities',
 
   // fim
@@ -94,8 +94,8 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   get_mitre_summary: 'mitre',
 
   // inventory (syscollector) -- get_agent_os/get_agent_packages/get_agent_ports/
-  // get_agent_processes were consolidated into get_agent_inventory (issue: "Consolidate agent
-  // inventory into one tool"); this single entry replaces all four.
+  // get_agent_processes are consolidated into get_agent_inventory; this single entry replaces
+  // all four.
   get_agent_inventory: 'inventory',
 
   // compliance
@@ -106,7 +106,7 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   get_rules: 'security_analytics',
   get_threat_intel_components: 'security_analytics',
   get_detectors: 'security_analytics',
-  // lookup_indicator/get_cti_status (workstream A1b) are threat-intel-pipeline-content questions
+  // lookup_indicator/get_cti_status are threat-intel-pipeline-content questions
   // ("is this a known indicator", "is the feed up to date"), the same domain as the rule/decoder/
   // detector catalog above, not the customer's own observed data -- filed here rather than a new
   // category to avoid one more stage-1 routing line.
@@ -116,7 +116,7 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   // free_search (escape hatch + generic ID lookup)
   find_document_by_field: 'free_search',
   search_wazuh_data: 'free_search',
-  // get_field_values (workstream B) is the "verify before filter" discovery tool: it is useful
+  // get_field_values is the "verify before filter" discovery tool: it is useful
   // regardless of which data family a question ultimately routes to (a bad guess at a rule level,
   // a check result, an OS name can happen from any category), so -- like search_wazuh_data -- it
   // is always appended to the resolved tool list in `resolveStage2Tools` below rather than gated
@@ -155,7 +155,14 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
     'CVE/vulnerability data: by agent, by CVE ID, solved, or critical only -- plus the CTI ' +
     "feed's own catalog knowledge about a specific CVE (description, severity, affected " +
     'software), separate from what is actually detected on this deployment.',
-  fim: 'File Integrity Monitoring: current state of monitored files (path, mtime, owner, hashes).',
+  // Registry FIM (Run keys, registry values) must be claimed by name here: with the category
+  // described as "monitored files" only, a registry question falls through to a category whose
+  // tools cannot answer it. The surface has no typed tool but IS reachable -- `search_wazuh_data`
+  // is appended to every resolved list (see `resolveStage2Tools`) and `wazuh-states-*` covers
+  // `wazuh-states-fim-registry-*`.
+  fim:
+    'File Integrity Monitoring: current state of monitored files (path, mtime, owner, hashes), ' +
+    'and Windows registry keys/values (e.g. Run-key writes).',
   sca:
     'Security Configuration Assessment (SCA): per-agent compliance benchmark results (e.g. CIS ' +
     'Ubuntu), NOT Security Analytics pipeline policies.',
@@ -305,11 +312,21 @@ export const CHAIN_PAIRS: Record<string, readonly string[]> = {
   // like get_top_rules/get_security_summary), so a specific row from any of them is the natural
   // next lookup. NOT the free_search CATEGORY: resolveStage2Tools only ever appends the single
   // `search_wazuh_data` name unconditionally (see its doc comment), never the whole free_search
-  // category, so find_document_by_field was previously reachable only when free_search was
-  // itself the routed category -- these entries are what actually closes that gap.
+  // category, so find_document_by_field is otherwise reachable only when free_search is itself
+  // the routed category -- these entries are what actually closes that gap.
   search_findings_by_agent: ['find_document_by_field'],
   search_findings_by_rule_title: ['find_document_by_field'],
   search_findings_by_rule_tag: ['find_document_by_field'],
+  // `mitre` and `get_events_by_agent` are row-producing routes with no way out of their own
+  // category: `resolveStage2Tools` appends only `search_wazuh_data`, never the whole free_search
+  // category (see its doc comment), so without these edges an "explain this MITRE incident" turn
+  // can list technique rows but never pivot to the document behind one. get_rules is the
+  // detection-side companion -- the only tool that returns a rule DESCRIPTION
+  // (document.metadata.description). It reads the Security Analytics catalog, NOT the Wazuh Manager
+  // ruleset; the prompt already requires the model to say so, so this edge widens reach without
+  // implying coverage the product does not have.
+  get_mitre_findings: ['find_document_by_field', 'get_rules'],
+  get_events_by_agent: ['find_document_by_field'],
 };
 
 /**
@@ -399,23 +416,22 @@ export function buildRoutingPrompt(nowIso: string): string {
 
 /**
  * Categories whose QUESTION VOCABULARY genuinely overlaps, so routing to one must also offer the
- * other's tools. Deterministic, because the alternative (making the descriptions clearer) was
- * measured and lost.
+ * other's tools. Deterministic, because sharpening the category descriptions alone does not
+ * reliably resolve the ambiguity.
  *
- * EVIDENCE (issue #8935, instrumented on the deployed build, 3/3 runs identical): "How badly are we
- * failing CIS, in plain numbers?" routed to `["compliance"]`, which offers
- * `get_compliance_alerts` / `get_compliance_summary` / `search_wazuh_data`. `get_sca_results` --
- * which holds the answer, 102 failed / 95 passed / 10 not-applicable on `cis_ubuntu22-04` -- was
- * NEVER OFFERED. The assistant then said "none of the available compliance-framework tools include a
- * 'cis' tag", which was LITERALLY TRUE of the tools it had. It was not hallucinating a limitation; it
- * was accurately describing a tool list that did not contain SCA.
+ * Example: "How badly are we failing CIS, in plain numbers?" can route to `["compliance"]`, which
+ * offers `get_compliance_alerts` / `get_compliance_summary` / `search_wazuh_data`.
+ * `get_sca_results` -- which holds the answer -- would then never be offered, and the assistant
+ * would truthfully but unhelpfully report that none of the available compliance-framework tools
+ * include a 'cis' tag: it is not hallucinating a limitation, it is accurately describing a tool
+ * list that does not contain SCA.
  *
  * Note what this is NOT: `sca`'s own description already reads "per-agent compliance benchmark
- * results (e.g. CIS Ubuntu)" -- the vocabulary was already there and the router still chose
- * `compliance`. So sharpening prose is not the fix. Neither is a prompt instruction: the model cannot
- * call a tool it was not given, which is the same shape as issue #8913 (guidance naming `get_agents`
- * on a turn where the `agents` category was never routed) and #8919 (a tool description naming a tool
- * from another category).
+ * results (e.g. CIS Ubuntu)" -- the vocabulary is already there, and the router can still choose
+ * `compliance`. So sharpening prose is not the fix. Neither is a prompt instruction: the model
+ * cannot call a tool it was not given -- the same shape as `get_agents` guidance appearing on a
+ * turn where the `agents` category was never routed, or a tool description naming a tool from
+ * another category.
  *
  * Why co-routing rather than moving the vocabulary: in Wazuh a "compliance" question can legitimately
  * be answered from EITHER side -- SCA benchmark results (per-agent CIS/hardening checks) or
@@ -423,9 +439,9 @@ export function buildRoutingPrompt(nowIso: string): string {
  * to stop making it a choice. Symmetric on purpose: "which PCI controls are we failing" deserves the
  * SCA tools for the same reason "how badly are we failing CIS" deserves the compliance ones.
  *
- * Kept deliberately narrow -- one evidenced pair. This is NOT a place to relax routing generally: the
+ * Kept deliberately narrow -- one pair. This is NOT a place to relax routing generally: the
  * router exists to narrow ~30 tools to a handful, and every added category costs the model attention
- * on tools it does not need. Add a pair here only with a measured witness like the one above.
+ * on tools it does not need. Add a pair here only with clear evidence it is needed.
  */
 export const CO_ROUTED_CATEGORIES: Partial<
   Record<RouterCategory, readonly RouterCategory[]>
@@ -526,7 +542,7 @@ export function resolveStage2Tools(categories: string[]): ToolSpec[] {
   // Always-on escape hatch, deduped via the Set regardless of whether
   // `free_search` was itself one of the routed categories.
   toolNames.add('search_wazuh_data');
-  // Always-on discovery tool (workstream B) -- see TOOL_CATEGORY's get_field_values entry above
+  // Always-on discovery tool -- see TOOL_CATEGORY's get_field_values entry above
   // for why this mirrors search_wazuh_data's unconditional placement instead of a category gate.
   // DELIBERATE product decision, not a side effect (code review B11): this adds ~1.5 KB of
   // description + 4 params to EVERY stage-2 call, including `general`, where field discovery is
