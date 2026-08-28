@@ -28,6 +28,13 @@ what authorize each request (see [Required indexer permissions](#required-indexe
 below). `GET /providers` stays readable by any authenticated user regardless, because the Chat
 view needs the provider list — it never returns a key, only `hasApiKey`.
 
+An operator can additionally lock every settings/provider write with
+`wazuh_ai_assistant.settingsReadOnly` (see
+[Configuration](./configuration.md#dashboard-configuration-keys)) — a dashboard-process-only
+check (`requireSettingsUnlocked` in `server/routes/settings.ts`) layered _above_ the indexer RBAC
+above, not a replacement for it: it never grants access, only additionally refuses writes with
+`403` regardless of what the caller's own indexer role would otherwise permit.
+
 ## Required indexer permissions
 
 The RBAC boundary above is enforced by the calling user's own indexer backend role, not by this
