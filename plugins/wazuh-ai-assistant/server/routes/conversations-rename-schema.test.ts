@@ -3,8 +3,8 @@ import { renameBodySchema } from './conversations';
 import { CONVERSATION_MAX_TITLE_LENGTH } from '../../common/constants';
 
 /**
- * Request-contract guard for the rename (PATCH) route added for issue #9010 (finding E2). This
- * file is only about what the BODY schema itself accepts or rejects, the same convention
+ * Request-contract guard for the rename (PATCH) route. This file is only about what the BODY
+ * schema itself accepts or rejects, the same convention
  * conversations-table-schema.test.ts already uses for `tableSpecSchema` -- the route's
  * AUTHORIZATION (owner-resolution, wrong-owner 404, unresolved-identity 403) is exercised
  * end-to-end over a real HTTP request in conversations-patch-route.test.ts, not here.

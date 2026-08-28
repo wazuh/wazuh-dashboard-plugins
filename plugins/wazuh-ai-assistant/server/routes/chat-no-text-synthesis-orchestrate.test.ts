@@ -253,10 +253,10 @@ test('orchestrate: a tool ran, returned zero rows, and the retry writes nothing 
     'stage1 + the tool round + the no-text round + exactly one zero-row retry',
   );
   const text = deltaText(events);
-  // N1 fix (AI/plan/qa-battery-v31.md): the zero-row fallback is enriched with what was actually
-  // searched (data domain + caller-supplied filters, derived from the last attempted tool call) --
-  // see noTextFallbackMessage's `lastToolCall` param and buildNoMatchingResultsMessage. This test
-  // predates that enrichment; it now asserts the enriched shape instead of the bare sentence.
+  // The zero-row fallback is enriched with what was actually searched (data domain +
+  // caller-supplied filters, derived from the last attempted tool call) -- see
+  // noTextFallbackMessage's `lastToolCall` param and buildNoMatchingResultsMessage. This test
+  // asserts the enriched shape rather than the bare sentence.
   assert.match(text, /^No matching results were found for that query\./);
   assert.match(
     text,

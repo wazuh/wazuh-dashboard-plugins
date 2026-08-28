@@ -159,7 +159,7 @@ export const PLUGIN_PLATFORM_INSTALLATION_USER_GROUP = 'wazuh-dashboard';
 export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_UPGRADE_PLATFORM =
   'upgrade-guide';
 export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_APP_CONFIGURATION =
-  'user-manual/wazuh-dashboard/settings.html';
+  'user-manual/wazuh-dashboard/wazuh-dashboard-configurations.html';
 
 export const PLUGIN_PLATFORM_REQUEST_HEADERS = {
   'osd-xsrf': 'kibana',

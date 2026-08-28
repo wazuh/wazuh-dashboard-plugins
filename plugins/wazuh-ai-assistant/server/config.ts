@@ -18,6 +18,17 @@ export const configSchema = schema.object({
    * logged (server/plugin.ts's setup() logs only whether encryption is enabled, not the key).
    */
   encryptionKey: schema.maybe(schema.string()),
+  /**
+   * Locks AI Assistant settings/providers to their current configuration. When `true`, every
+   * write route in server/routes/settings.ts (provider create/update/delete/set-default, and
+   * PUT /settings) is rejected with 403 (`requireSettingsUnlocked`) before it reaches the
+   * indexer, regardless of the calling user's own indexer RBAC. Intended for environments where
+   * an admin configures the assistant once (provider, privacy defaults, retention) and wants it
+   * to stay fixed — see docs/ref/modules/ai-assistant/configuration.md. Read routes (GET
+   * /providers, GET /settings, GET /settings/access), the connectivity test (POST
+   * /providers/{id}/test — it persists nothing), and conversation CRUD are never affected.
+   */
+  settingsReadOnly: schema.boolean({ defaultValue: false }),
 });
 
 export type WazuhAiAssistantConfigType = TypeOf<typeof configSchema>;

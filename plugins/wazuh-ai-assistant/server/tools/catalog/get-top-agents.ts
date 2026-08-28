@@ -39,7 +39,7 @@ function resolveIndexFamily(value: unknown): IndexFamily {
  * index pattern itself. `wazuh-states-*` (package/OS pivots) is intentionally out of scope here:
  * those are current-state snapshots, not an event timeline to rank "noisiest" over.
  *
- * Same sampled-label-falsehood risk as `get-top-rules.ts`'s rule title (issue #8921): an agent can
+ * Same sampled-label-falsehood risk as `get-top-rules.ts`'s rule title: an agent can
  * be renamed while keeping the same `wazuh.agent.id` (re-registration, inventory sync, ...), so a
  * bucket's `doc_count` events may not all carry the sampled name. `distinct_name_count` (a sibling
  * `cardinality` sub-agg on `wazuh.agent.name`) discloses that spread the same way `distinct_title_count`

@@ -179,14 +179,14 @@ export interface TableColumn {
 }
 
 /**
- * Client-side column-count budget for rendered result tables (issue #8921: no table may need a
- * horizontal scrollbar): only the first MAX_VISIBLE_RESULT_COLUMNS of a `TableSpec.columns` list
+ * Client-side column-count budget for rendered result tables, so no table ever needs a horizontal
+ * scrollbar: only the first MAX_VISIBLE_RESULT_COLUMNS of a `TableSpec.columns` list
  * render as visible table columns; the rest stay reachable through the row expander, since
  * buildTableSpec (server/tools/digest.ts) puts every spec-column field into each row object
  * regardless of visibility. Lives in common/ because BOTH sides consult it: result-table.tsx
  * applies it, and server/tools/catalog/visible-column-budget-coverage.test.ts asserts every
  * tool's severity column sits INSIDE it — a severity badge demoted past the budget is invisible,
- * which is the exact "missing severity" defect the issue lists.
+ * which would be a "missing severity" defect.
  */
 export const MAX_VISIBLE_RESULT_COLUMNS = 6;
 
@@ -222,7 +222,7 @@ export interface TableSpec {
     url: string;
   };
   /**
-   * Issue #9008 rework: server-recorded provenance FACTS for the evidence popover, the sole
+   * Server-recorded provenance FACTS for the evidence popover, the sole
    * source the client may render index/time-range detail from — the client must never infer or
    * default any of this itself. Populated in server/tools/executor.ts's `executeIndexerRequest`
    * from exactly what it observed executing the query (absent entirely for a Manager-API table,
@@ -244,7 +244,7 @@ export interface TableSpec {
    *    id is in scope), not by the executor — it is what lets the client attribute this table to
    *    the exact one tool call that produced it, rather than to every call in a multi-call turn.
    *  - `executedAt`: the epoch ms the query actually ran at, recorded by the executor at creation
-   *    time. Issue #9008 review, blocker 2: a date-math bound ("now-90d") only means something
+   *    time. A date-math bound ("now-90d") only means something
    *    relative to WHEN it ran -- resolving it against the render-time clock instead would show a
    *    restored conversation a window the query never ran against. `describeProvenance`
    *    (tool-call-label.ts) resolves date-math bounds against this stored instant, never against
@@ -279,7 +279,7 @@ export interface StreamUsage {
 
 export type StreamEvent =
   /**
-   * `reasoningFallback` (issue #8935 item I3): set by openai-compatible.ts's reasoning-channel
+   * `reasoningFallback`: set by openai-compatible.ts's reasoning-channel
    * fallback ONLY — the one path where a provider's raw deliberation text is surfaced as the
    * answer because no real `content` ever arrived. The client renders it like any delta;
    * server-side orchestration (chat.ts) uses the flag to keep deliberation text — which routinely
@@ -350,7 +350,7 @@ export type StreamEvent =
    * explanation of what it could not check, shown to the user next to the link — but NOT always
    * verbatim: whenever `dsl` above lost field-level filters relative to what the model asked to
    * show, chat.ts appends a fixed disclosure sentence to `reason` so the two can never silently
-   * diverge (the link would otherwise promise a filter it does not carry — issue #8920 item 9).
+   * diverge (the link would otherwise promise a filter it does not carry).
    */
   | {
       type: 'suggested_query';
@@ -392,7 +392,7 @@ export interface ConversationSummary {
  * `encodeVersion` opaque string `ConversationRecord.version` carries). chat-page.tsx's
  * `handleRenameConversation` stamps `version` onto `conversationVersionRef` when the renamed
  * conversation is the active one, so the next auto-save's PUT does not 409 against a version this
- * rename just moved past (issue #9010). */
+ * rename just moved past. */
 export interface ConversationRenameResult extends ConversationSummary {
   version: string;
 }
@@ -428,10 +428,10 @@ export interface PersistedChatMessage extends ChatMessage {
    * message). Distinct from `interrupted`, which means "stopped, on purpose or by circumstance":
    * a failed turn never had a chance to finish at all.
    *
-   * Persisted because the failure used to live only in a dismissible banner above the transcript
-   * that the next `handleSend` cleared — so a conversation containing a failed turn read, both
-   * immediately afterwards and forever after a reload, as though the question had simply never
-   * been asked. Set on `role:'assistant'` only.
+   * Persisted so the failure survives more than a dismissible banner above the transcript that the
+   * next `handleSend` clears — without it, a conversation containing a failed turn would read,
+   * both immediately afterwards and forever after a reload, as though the question had simply
+   * never been asked. Set on `role:'assistant'` only.
    */
   failureReason?: string;
   /**
@@ -455,8 +455,8 @@ export interface ConversationRecord extends ConversationSummary {
   createdAt: string;
   messages: PersistedChatMessage[];
   /**
-   * Optimistic-concurrency token (two tabs on the
-   * same conversation previously overwrote each other, last-write-wins). Opaque — encodes
+   * Optimistic-concurrency token (without it, two tabs on the
+   * same conversation would overwrite each other, last-write-wins). Opaque — encodes
    * OpenSearch's `seq_no`/`primary_term` pair (server/conversation-store.ts's `encodeVersion`) —
    * never parsed or compared client-side, only round-tripped: the client remembers the value from
    * the last GET/POST/PUT response it saw for this conversation and sends it back as
@@ -464,7 +464,7 @@ export interface ConversationRecord extends ConversationSummary {
    * since-changed document 409s instead of silently overwriting it. `undefined` only in the
    * defensive case where a version token could not be decoded (does not happen in practice, but
    * the type stays honest about it). Deliberately absent from `ConversationSummary` — the list
-   * route never needed a version before this fix and still doesn't (only single-conversation
+   * route never needs a version and still doesn't (only single-conversation
    * GET/POST/PUT round-trip it).
    */
   version?: string;

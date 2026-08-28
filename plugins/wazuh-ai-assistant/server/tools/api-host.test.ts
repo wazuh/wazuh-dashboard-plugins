@@ -54,8 +54,8 @@ test('resolveApiHostId: falls back to the first configured host when no cookie i
   assert.equal(hostId, 'host-1');
 });
 
-// The core case: previously this exact input returned 'attacker-supplied-host'
-// verbatim with no check that it named anything real.
+// The core case: an unrecognized cookie value must not be returned verbatim -- it has to be
+// checked against the configured host list.
 test('resolveApiHostId: falls back to the first configured host when the cookie names an UNRECOGNIZED host', async () => {
   const context = fakeContext([{ id: 'host-1' }, { id: 'host-2' }]);
   const request = fakeRequest('wz-api=attacker-supplied-host');
@@ -80,7 +80,7 @@ test('resolveApiHostId: throws when no host is configured at all', async () => {
   );
 });
 
-// --- RFC 6265 quoted-string cookie-value stripping (correctness fix, found in review) -----------
+// --- RFC 6265 quoted-string cookie-value stripping ------------------------------------------
 
 test('resolveApiHostId: strips RFC 6265 quoted-string wrapping before validating against configured hosts', async () => {
   const context = fakeContext([{ id: 'host-2' }]);

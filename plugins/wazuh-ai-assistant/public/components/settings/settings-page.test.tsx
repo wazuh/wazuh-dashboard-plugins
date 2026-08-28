@@ -36,6 +36,7 @@ const mockService = {
     message: null,
     defaultApiHostId: 'default',
     apiKeyEncryptionEnabled: true,
+    settingsLocked: false,
   }),
   // Echoes its argument back (rather than an unconditional `{}`) so a test can assert what a
   // save round-trip left `loadedAssistantSettings`/the draft holding, and so a SECOND save in the
@@ -53,6 +54,15 @@ jest.mock('../../services/settings-service', () => ({
   SettingsService: jest.fn(() => mockService),
 }));
 
+jest.mock('../../plugin-services', () => ({
+  getWazuhCore: jest.fn().mockReturnValue({
+    utils: {
+      webDocumentationLink: (urlPath: string) =>
+        `https://documentation.wazuh.com/5.0/${urlPath}`,
+    },
+  }),
+}));
+
 import { SettingsPage, parseRetentionDays } from './settings-page';
 import {
   ASSISTANT_SETTINGS_CHANGED_EVENT,
@@ -63,8 +73,8 @@ import { CoreStart } from '../../../../../src/core/public';
 const coreMock = { http: {} } as unknown as CoreStart;
 
 /**
- * `SettingsPage` reads the active tab off the URL via `useLocation`/`useHistory` (UX iteration 4
- * item 2), which requires an ambient `<Router>` — in the real app that's application.tsx's own
+ * `SettingsPage` reads the active tab off the URL via `useLocation`/`useHistory`, which requires
+ * an ambient `<Router>` — in the real app that's application.tsx's own
  * `<Router history={history}>`, which this page is always rendered under. `initialEntries`
  * defaults to the bare settings path (no `?tab=`), i.e. the Providers tab, matching every
  * pre-existing test's assumption below unless a test overrides it to reach another tab.
@@ -78,9 +88,9 @@ const SettingsPageWithRouter: React.FC<
 );
 
 /**
- * One provider fixture and one `core` carrying toast spies, shared by every case below that needs
- * them — both used to be redeclared per describe. The global `beforeEach`'s `jest.clearAllMocks()`
- * resets the spies between cases, so no per-describe reset is needed.
+ * One provider fixture and one `core` carrying toast spies, shared by every case below rather
+ * than redeclared per describe. The global `beforeEach`'s `jest.clearAllMocks()` resets the
+ * spies between cases, so no per-describe reset is needed.
  */
 const PROVIDER = {
   id: 'p1',
@@ -137,11 +147,27 @@ beforeEach(() => {
     message: null,
     defaultApiHostId: 'default',
     apiKeyEncryptionEnabled: true,
+    settingsLocked: false,
   });
   mockService.test.mockResolvedValue({
     success: true,
     latencyMs: 50,
     message: null,
+  });
+});
+
+describe('SettingsPage — documentation link', () => {
+  it('links to the AI assistant section of the dashboard configuration docs', async () => {
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
+    );
+
+    const link = await screen.findByRole('link', { name: /documentation/i });
+    expect(link).toHaveAttribute(
+      'href',
+      'https://documentation.wazuh.com/5.0/user-manual/wazuh-dashboard/wazuh-dashboard-configurations.html#ai-assistant',
+    );
+    expect(link).toHaveAttribute('target', '_blank');
   });
 });
 
@@ -159,8 +185,8 @@ describe('SettingsPage — wazuh_brain hidden from provider type choices', () =>
     // Wait for the form to be visible (Name field is present)
     await screen.findByLabelText(/^name/i);
 
-    // Provider type (UX iteration 4 item 1) is an EuiButtonGroup of two options, each backed by
-    // a hidden native radio input — assert on those directly rather than on <option> elements.
+    // Provider type is an EuiButtonGroup of two options, each backed by a hidden native radio
+    // input — assert on those directly rather than on <option> elements.
     expect(screen.getAllByRole('radio')).toHaveLength(2);
     // The label is the type name alone now; the list of services it covers moved down into the
     // card's own description, which had the room for it (provider-form-flyout.tsx).
@@ -188,6 +214,44 @@ describe('SettingsPage — wazuh_brain hidden from provider type choices', () =>
     expect(
       document.querySelector('input[data-test-subj="wazuh_brain"]'),
     ).toBeNull();
+  });
+});
+
+describe('SettingsPage — permission errors reach the user', () => {
+  // The routes answer an RBAC denial with the missing indexer permission (server/routes/
+  // route-helpers.ts). Replacing that with "Could not load providers." leaves the admin with
+  // nothing to act on.
+  const denial = {
+    body: {
+      message:
+        'You do not have permission to perform this action. Missing indexer ' +
+        'permission: cluster:admin/opendistro/ism/policy/get.',
+    },
+  };
+
+  it("shows the server's reason instead of the generic providers load error", async () => {
+    mockService.list.mockRejectedValue(denial);
+
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
+    );
+
+    await waitFor(() =>
+      expect(screen.getByText(denial.body.message)).toBeInTheDocument(),
+    );
+    expect(screen.queryByText('Could not load providers.')).toBeNull();
+  });
+
+  it('falls back to the generic message when the failure carries no reason', async () => {
+    mockService.list.mockRejectedValue(new Error(''));
+
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
+    );
+
+    await waitFor(() =>
+      expect(screen.getByText('Could not load providers.')).toBeInTheDocument(),
+    );
   });
 });
 
@@ -471,13 +535,13 @@ describe('SettingsPage — field policy filter', () => {
   });
 });
 
-// Symmetry pass (iteration-4 batch 2 item 5): the per-field action select drops `allow-scan` from
-// the choices it OFFERS, while the server keeps it a valid STORED action (server/tools/privacy.ts,
-// #8912) so existing/default `allow-scan` fields keep working and keep their server-side injection
-// scan. These tests pin the three-way symmetry, the display-only "Allow" mapping, and — the part
-// most at risk of a careless implementation coercing it on load/display — that a row nobody
-// touched still round-trips as `allow-scan`, not `allow`.
-describe('SettingsPage — field policy action select (symmetry pass, item 5)', () => {
+// The per-field action select drops `allow-scan` from the choices it OFFERS, while the server
+// keeps it a valid STORED action (server/tools/privacy.ts) so existing/default `allow-scan`
+// fields keep working and keep their server-side injection scan. These tests pin the three-way
+// symmetry, the display-only "Allow" mapping, and — the part most at risk of a careless
+// implementation coercing it on load/display — that a row nobody touched still round-trips as
+// `allow-scan`, not `allow`.
+describe('SettingsPage — field policy action select (symmetry pass)', () => {
   const renderOnPrivacyTab = () =>
     render(
       <SettingsPageWithRouter
@@ -634,9 +698,9 @@ describe('SettingsPage — auto-open create-provider flyout (?addProvider=true)'
     expect(screen.queryByLabelText(/^name\s*\*?$/i)).not.toBeInTheDocument();
   });
 
-  // RC2 (issue #8827 review): the URL only ever reflected a deep link INTO the create flow —
-  // opening the same flyout from the page's own "Add provider" button left `?addProvider=true`
-  // out of the address bar entirely, so the state wasn't shareable/bookmarkable/refresh-safe.
+  // The URL only ever reflected a deep link INTO the create flow — opening the same flyout from
+  // the page's own "Add provider" button left `?addProvider=true` out of the address bar
+  // entirely, so the state wasn't shareable/bookmarkable/refresh-safe.
   it('reports the create form open when "Add provider" is clicked directly, not only via the URL flag', async () => {
     const onOpenChange = jest.fn();
 
@@ -752,12 +816,12 @@ describe('SettingsPage — the hidden tab must not keep a flyout on screen', () 
   });
 });
 
-describe('SettingsPage — settings tabs (UX iteration 4 item 2)', () => {
+describe('SettingsPage — settings tabs', () => {
   /**
    * True when the element sits inside a subtree hidden with `display: none` — the same idiom
    * application.test.tsx's own `isHidden` uses for the outer Chat/Settings tabs (application.tsx),
-   * now shared by these inner tabs (B1): all three cards stay MOUNTED at all times so
-   * EuiInMemoryTable's own uncontrolled search box never resets on a tab switch, so a plain
+   * shared by these inner tabs: all three cards stay MOUNTED at all times so EuiInMemoryTable's
+   * own uncontrolled search box never resets on a tab switch, so a plain
    * `queryByText(...).not.toBeInTheDocument()` no longer tells the other cards' content apart —
    * their text is still in the DOM, just hidden.
    */
@@ -949,10 +1013,10 @@ describe('SettingsPage — settings tabs (UX iteration 4 item 2)', () => {
     ).toHaveAttribute('aria-selected', 'true');
   });
 
-  it('lets a tab click through after Cancel closes the create form, and drops addProvider from the URL (item 1)', async () => {
+  it('lets a tab click through after Cancel closes the create form, and drops addProvider from the URL', async () => {
     // A real `history` so `onCreateFormOpenChange` can reproduce application.tsx's OWN history
     // write (it replaces the whole URL with just `?addProvider=true`/bare `/settings`, dropping
-    // `?tab=` entirely) — the exact second, racing history update item 1a's fix has to win against.
+    // `?tab=` entirely) — the exact second, racing history write this behavior must win against.
     const history = createMemoryHistory({
       initialEntries: ['/settings?tab=privacy'],
     });
@@ -1005,13 +1069,13 @@ describe('SettingsPage — settings tabs (UX iteration 4 item 2)', () => {
     );
   });
 
-  it('keeps the Providers filter box and its filtered "Test all" set intact across a tab round trip (B1)', async () => {
-    // The bug this pins: the Providers card used to UNMOUNT on a tab switch (`activeTabId ===
-    // 'providers' && (...)`), which reset EuiInMemoryTable's own uncontrolled search box on
+  it('keeps the Providers filter box and its filtered "Test all" set intact across a tab round trip', async () => {
+    // This pins: the Providers card must not UNMOUNT on a tab switch (`activeTabId ===
+    // 'providers' && (...)`), which would reset EuiInMemoryTable's own uncontrolled search box on
     // remount — while `providersFilterText` (page-level state, mirrored out of that search box
-    // purely to tell "Test all" which rows are visible) survived the switch untouched. Landing
-    // back on Providers therefore showed an EMPTY search box while "Test all" still silently
-    // acted on the STALE filtered subset from before the round trip.
+    // purely to tell "Test all" which rows are visible) survives the switch untouched. Landing
+    // back on Providers would otherwise show an EMPTY search box while "Test all" still silently
+    // acts on the STALE filtered subset from before the round trip.
     const threeProviders = [
       {
         id: 'p1',
@@ -1067,9 +1131,9 @@ describe('SettingsPage — settings tabs (UX iteration 4 item 2)', () => {
 
   it('sends the header "Add provider" button to the Providers tab, and back to the original tab when the flyout closes', async () => {
     // The header button (distinct from the Providers card's own empty-state "Add a provider"
-    // action) is visible on every tab, but the create form only ever lived on the Providers tab
-    // — clicking it from Privacy used to open the flyout ON TOP of the (still-selected) Privacy
-    // tab instead of taking the admin to the tab the form actually belongs to.
+    // action) is visible on every tab, but the create form only ever lives on the Providers tab
+    // — clicking it from Privacy must switch to the Providers tab rather than opening the flyout
+    // ON TOP of the (still-selected) Privacy tab.
     render(
       <SettingsPageWithRouter
         core={coreMock}
@@ -1097,7 +1161,7 @@ describe('SettingsPage — settings tabs (UX iteration 4 item 2)', () => {
   });
 });
 
-describe('SettingsPage — per-provider privacy override (UX iteration 4 item 3)', () => {
+describe('SettingsPage — per-provider privacy override', () => {
   const twoProviders = [
     {
       id: 'p1',
@@ -1327,14 +1391,14 @@ describe('SettingsPage — per-provider privacy override (UX iteration 4 item 3)
 });
 
 /**
- * Layout/hierarchy fixes from the live CSS audit (AI/ux-iter3/css-audit-full.md §4). The page's
- * 1200px measure was measured as CORRECT ("do not narrow it and do not widen it") — the void had
- * moved INSIDE the two form cards, and the hierarchy had inverted at the section tier.
+ * Layout/hierarchy invariants: the page's 1200px measure is CORRECT ("do not narrow it and do
+ * not widen it") — the void sits INSIDE the two form cards, and the hierarchy holds at the
+ * section tier.
  *
- * jsdom computes no layout, so the DOM tests below pin the STRUCTURE the fixes rest on and the
- * stylesheet tests pin the declarations, the same split chat-page.test.tsx uses for its grid.
+ * jsdom computes no layout, so the DOM tests below pin the STRUCTURE these invariants rest on and
+ * the stylesheet tests pin the declarations, the same split chat-page.test.tsx uses for its grid.
  */
-describe('SettingsPage — in-card layout and hierarchy (audit §4)', () => {
+describe('SettingsPage — in-card layout and hierarchy', () => {
   const scss = () =>
     fs.readFileSync(path.join(__dirname, 'settings-page.scss'), 'utf8');
 
@@ -1401,9 +1465,9 @@ describe('SettingsPage — in-card layout and hierarchy (audit §4)', () => {
   });
 
   it('drops the fill on a disabled Save button', async () => {
-    // Both cards' Save buttons read the same `fill={!disabled}` expression, but each now lives on
-    // its own tab (UX iteration 4 item 2), so this switches tabs between the two halves of the
-    // assertion instead of finding both buttons in one render.
+    // Both cards' Save buttons read the same `fill={!disabled}` expression, but each lives on its
+    // own tab, so this switches tabs between the two halves of the assertion instead of finding
+    // both buttons in one render.
     render(
       <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
     );
@@ -1520,11 +1584,11 @@ describe('SettingsPage — in-card layout and hierarchy (audit §4)', () => {
 });
 
 /**
- * Cross-view propagation (wazuh-dashboard#1512). Chat and Settings both stay mounted behind
- * `display: none` (application.tsx), and the header flyout holds a SECOND, independent ChatPage and
- * `useProviders` instance — so neither a saved privacy policy nor a provider CRUD action used to
- * reach them until a reload. Both are announced with a window event now; these cases prove the
- * dispatch side.
+ * Cross-view propagation. Chat and Settings both stay mounted behind `display: none`
+ * (application.tsx), and the header flyout holds a SECOND, independent ChatPage and
+ * `useProviders` instance — so neither a saved privacy policy nor a provider CRUD action would
+ * reach them without an explicit signal. Both are announced with a window event; these cases
+ * prove the dispatch side.
  */
 describe('SettingsPage — announcing saved changes to the mounted chat', () => {
   /** Records every dispatch of `eventName` for the duration of one test. */
@@ -1753,10 +1817,11 @@ describe('SettingsPage — announcing saved changes to the mounted chat', () => 
     }
   });
 
-  // Both delete cases go through `deleteProviderThroughRowMenu` (module scope) and carry an
-  // explicit timeout: they used to query the modal's confirm button by name, which intermittently
-  // matched the row menu's own "Delete" item as well, and rendering this whole page plus a popover
-  // and a modal in jsdom overruns jest's 5 s default on a loaded machine.
+  // Both delete cases go through `deleteProviderThroughRowMenu` (module scope), which carries an
+  // explicit timeout and queries the modal's confirm button by its `data-test-subj`, not by
+  // name — a by-name query intermittently matches the row menu's own "Delete" item as well, and
+  // rendering this whole page plus a popover and a modal in jsdom overruns jest's 5 s default on
+  // a loaded machine.
   it('dispatches PROVIDERS_CHANGED_EVENT when a provider is deleted', async () => {
     mockService.list.mockResolvedValue([PROVIDER]);
     mockService.remove.mockResolvedValue(undefined);
@@ -1905,7 +1970,8 @@ describe('SettingsPage — provider table feedback and retention validation', ()
   });
 
   it('lets the field be transiently empty while editing, without inventing a 0', async () => {
-    // Clearing the box to retype used to snap the value to 0, so typing "14" produced "014".
+    // Clearing the box to retype must not snap the value to 0 — that would make typing "14"
+    // produce "014".
     mockService.list.mockResolvedValue([PROVIDER]);
     mockService.getAssistantSettings.mockResolvedValue({
       privacyDefaultOn: false,
@@ -2122,5 +2188,114 @@ describe('SettingsPage — provider table feedback and retention validation', ()
         expect.objectContaining({ conversationRetentionDays: 0 }),
       ),
     );
+  });
+});
+
+describe('SettingsPage — settingsLocked', () => {
+  beforeEach(() => {
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.getSettingsAccess.mockResolvedValue({
+      managerSessionOk: true,
+      message: null,
+      defaultApiHostId: 'default',
+      apiKeyEncryptionEnabled: true,
+      settingsLocked: true,
+    });
+  });
+
+  it('shows the locked banner and disables the header Add provider button', async () => {
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
+    );
+
+    // The callout title and body both contain "locked by your administrator" — matched exactly
+    // against the title span to avoid an ambiguous multi-match.
+    expect(
+      await screen.findByText(/^settings are locked by your administrator$/i),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByRole('button', { name: /^add provider$/i }),
+    ).toBeDisabled();
+  });
+
+  it('disables the row menu Edit and Delete actions while leaving Test enabled', async () => {
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
+    );
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: /actions for my openai/i }),
+    );
+
+    // toBeDisabled() only recognizes actual form controls (or fieldset descendants) — the queried
+    // text sits in a <span> inside the item's <button>, so assert on that button ancestor.
+    const editItem = await screen.findByText(/^edit$/i);
+    const deleteItem = await screen.findByText(/^delete$/i);
+    const testItem = await screen.findByText(/^test$/i);
+    expect(editItem.closest('button')).toBeDisabled();
+    expect(deleteItem.closest('button')).toBeDisabled();
+    expect(testItem.closest('button')).not.toBeDisabled();
+  });
+
+  it('disables the default-provider star toggle', async () => {
+    mockService.list.mockResolvedValue([
+      { ...PROVIDER, id: 'p2', name: 'Second provider', isDefault: true },
+      PROVIDER,
+    ]);
+
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
+    );
+
+    expect(
+      await screen.findByRole('button', {
+        name: /set as default provider/i,
+      }),
+    ).toBeDisabled();
+  });
+
+  it('disables the Privacy tab Save changes button', async () => {
+    render(
+      <SettingsPageWithRouter
+        core={coreMock}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=privacy']}
+      />,
+    );
+
+    // Raises dirty state the same way settings-page.test.tsx's own "saves an untouched
+    // allow-scan row" case does: located by label text + DOM traversal to the `[role="switch"]`
+    // control, not by role+name (every tab's card stays mounted, so multiple EuiSwitch instances
+    // share this env's mocked htmlIdGenerator output and accessible-name-by-role resolves to the
+    // wrong switch).
+    const switchLabel = await screen.findByText(
+      /enable privacy mode by default/i,
+    );
+    fireEvent.click(
+      switchLabel.closest('.euiSwitch')!.querySelector('[role="switch"]')!,
+    );
+
+    expect(
+      await screen.findByRole('button', { name: /save changes/i }),
+    ).toBeDisabled();
+  });
+
+  it('disables the Conversation history Save button', async () => {
+    render(
+      <SettingsPageWithRouter
+        core={coreMock}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=retention']}
+      />,
+    );
+
+    const days = await screen.findByRole('spinbutton');
+    fireEvent.change(days, { target: { value: '5' } });
+
+    expect(
+      await screen.findByRole('button', {
+        name: /save conversation history settings/i,
+      }),
+    ).toBeDisabled();
   });
 });

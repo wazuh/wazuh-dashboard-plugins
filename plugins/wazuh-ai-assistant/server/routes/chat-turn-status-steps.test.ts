@@ -18,11 +18,10 @@ import { ChatStreamOptions, ProviderAdapter } from '../providers/types';
  * The progressive turn-status steps a turn emits (`StreamEvent`'s `status.step`), asserted as a
  * SEQUENCE rather than per-event.
  *
- * The defect this pins is specifically an ordering one: `writing` used to be emitted at the end of
- * every tool round, so a turn running several rounds walked the label backwards — "Writing the
- * answer…" then "Querying …" again, once per round — which reads as the assistant changing its mind
- * rather than as progress. Only the FINAL round's emission is legitimate, and `willBeFinalRound`
- * (chat.ts) is what decides that.
+ * This asserts an ordering invariant: `writing` is only emitted at the end of the FINAL round,
+ * decided by `willBeFinalRound` (chat.ts) — not at the end of every tool round, which would make a
+ * turn running several rounds walk the label backwards ("Writing the answer…" then "Querying …"
+ * again, once per round), reading as the assistant changing its mind rather than as progress.
  *
  * Same harness pattern and the same platform-runner caveat as
  * chat-capability-honesty.test.ts/chat-stage1-usage.test.ts: this file imports `./chat`, which

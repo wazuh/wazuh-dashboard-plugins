@@ -14,9 +14,9 @@ const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
 type Provenance = TableSpec['provenance'];
 
 describe('describeToolCall', () => {
-  // Issue #9008 blocker 1 (rework): the client must never invent a "requested" window from a
-  // call's own arguments — a call with no matching provenance (the ~18 catalog tools that carry
-  // no time-range concept at all, e.g. get_agents) renders its name ALONE, no window guessed.
+  // The client must never invent a "requested" window from a call's own arguments — a call with
+  // no matching provenance (the ~18 catalog tools that carry no time-range concept at all, e.g.
+  // get_agents) renders its name ALONE, no window guessed.
   it('renders the name alone, with no window, when no provenance is supplied', () => {
     const label = describeToolCall(
       call({ name: 'get_agents', arguments: {} }),
@@ -48,8 +48,8 @@ describe('describeToolCall', () => {
     expect(label.short).toBe('Findings by agent · 7d');
   });
 
-  // Issue #9008 review, major 4: the dual-window text must be visible on the CHIP itself, not
-  // only inside the popover — a reader must not have to open it to see which call was clamped.
+  // The dual-window text must be visible on the CHIP itself, not only inside the popover — a
+  // reader must not have to open it to see which call was clamped.
   it('shows the dual-window text on the chip itself once provenance reports a clamp', () => {
     const provenance: Provenance = {
       index: 'wazuh-findings-v5*',
@@ -67,11 +67,10 @@ describe('describeToolCall', () => {
     expect(label.short).toBe('Findings by time · 90d · requested 720d');
   });
 
-  // Issue #9008 review, major 3: the OLD implementation truncated the whole composed string at a
-  // fixed length, which cut a clamp badge mid-numeral ("requested 7…" for "requested 720d") once
-  // the tool name was long enough. The fix truncates only the name segment; the window text is
-  // always appended afterward, in full — this fixture's full label is 50 characters, comfortably
-  // past where the old 48-char cap would have bitten.
+  // Truncating the whole composed string at a fixed length would cut a clamp badge mid-numeral
+  // ("requested 7…" for "requested 720d") once the tool name is long enough. Only the name segment
+  // is truncated; the window text is always appended afterward, in full — this fixture's full
+  // label is 50 characters, comfortably past where a naive fixed-length cap would bite.
   it('never truncates the window text, even for a long tool name plus a clamp badge', () => {
     const provenance: Provenance = {
       index: 'wazuh-findings-v5*',
@@ -137,8 +136,8 @@ describe('describeProvenance', () => {
     expect(describeProvenance(undefined)).toEqual({});
   });
 
-  // Issue #9008 blocker 1: a table whose provenance carries an index but no effectiveRange (the
-  // DSL had no recognizable time-range clause) must show the index with NO range/badge invented.
+  // A table whose provenance carries an index but no effectiveRange (the DSL had no recognizable
+  // time-range clause) must show the index with NO range/badge invented.
   it('shows only the index when the server reported no effectiveRange', () => {
     const display = describeProvenance({
       index: 'wazuh-states-inventory-*',
@@ -159,11 +158,11 @@ describe('describeProvenance', () => {
     expect(display.resolvedRangeLabel).toContain('–');
   });
 
-  // Issue #9008 blocker 2 (review round 2): a date-math bound only means something relative to
-  // WHEN the query ran. Resolving it against the render-time clock instead of the server-recorded
-  // `executedAt` would show a restored conversation a window it never actually ran against — this
-  // pins that by mocking `Date.now()` to a wildly different instant and asserting the resolved
-  // range still reflects `executedAt`, never the mocked render clock.
+  // A date-math bound only means something relative to WHEN the query ran. Resolving it against
+  // the render-time clock instead of the server-recorded `executedAt` would show a restored
+  // conversation a window it never actually ran against — this pins that by mocking `Date.now()`
+  // to a wildly different instant and asserting the resolved range still reflects `executedAt`,
+  // never the mocked render clock.
   it('resolves date-math bounds against the recorded executedAt, never the render-time clock', () => {
     const executedAt = Date.parse('2026-01-15T00:00:00.000Z');
     const realDateNow = Date.now;
@@ -181,10 +180,10 @@ describe('describeProvenance', () => {
     }
   });
 
-  // The other half of blocker 2: an older persisted conversation carries no `executedAt` at all
-  // (saved before this field existed). A date-math bound must stay UNRESOLVED then — never a
-  // guess against whatever clock happens to be running at render time — while the shorthand
-  // badge (which needs no "now" reference at all) still renders normally.
+  // An older persisted conversation carries no `executedAt` at all (saved before this field
+  // existed). A date-math bound must stay UNRESOLVED then — never a guess against whatever clock
+  // happens to be running at render time — while the shorthand badge (which needs no "now"
+  // reference at all) still renders normally.
   it('does not resolve date-math to an absolute instant when executedAt is absent', () => {
     const display = describeProvenance({
       effectiveRange: { gte: 'now-90d', lte: 'now' },
@@ -194,8 +193,8 @@ describe('describeProvenance', () => {
     expect(display.resolvedRangeLabel).toBeUndefined();
   });
 
-  // Issue #9008 blocker 2: no `?? requested` fallback anywhere — a `requestedRange` present
-  // without `clamped: true` must never leak into the badge.
+  // No `?? requested` fallback anywhere — a `requestedRange` present without `clamped: true`
+  // must never leak into the badge.
   it('ignores requestedRange entirely when clamped is false', () => {
     const display = describeProvenance({
       requestedRange: { gte: 'now-720d', lte: 'now' },
@@ -218,9 +217,9 @@ describe('describeProvenance', () => {
     expect(display.resolvedRangeLabel).toContain('–');
   });
 
-  // Issue #9008 review, minor 6: a clamp whose requested and effective spans happen to render
-  // identically (e.g. both round to "90d") has nothing further to disclose — the dual badge must
-  // not degrade into "90d · requested 90d", which repeats itself without adding information.
+  // A clamp whose requested and effective spans happen to render identically (e.g. both round to
+  // "90d") has nothing further to disclose — the dual badge must not degrade into
+  // "90d · requested 90d", which repeats itself without adding information.
   it('omits the requested half when it renders identically to the effective window', () => {
     const display = describeProvenance({
       requestedRange: { gte: 'now-90d', lte: 'now' },
@@ -252,10 +251,10 @@ describe('describeProvenance', () => {
     expect(display.resolvedRangeLabel).toBeUndefined();
   });
 
-  // --- Issue #9008 review, finding 3: a DEGENERATE window must be visible -----------------------
-  // `formatDurationShort` used to run `Math.abs` over the span and floor its leftover case at
-  // `1d`, so a zero-length window and an INVERTED one both rendered as a believable "1d" badge
-  // while the popover showed "later – earlier" with nothing marking it as wrong.
+  // --- A DEGENERATE window must be visible ------------------------------------------------------
+  // Running `Math.abs` over the span and flooring its leftover case at `1d` would render a
+  // zero-length window and an INVERTED one both as a believable "1d" badge, while the popover
+  // showed "later – earlier" with nothing marking it as wrong.
 
   it('renders a zero-length window as 0m, not as a plausible 1d', () => {
     const instant = '2026-01-01T00:00:00.000Z';
@@ -283,15 +282,12 @@ describe('describeProvenance', () => {
     expect(display.windowBadgeLabel).not.toBe('1d');
   });
 
-  // Issue #9008 review, F3: the minute bucket used to swallow every sub-minute span in one
-  // direction or the other -- a 20-second window rounded down into the same '0m' the exactly-zero
-  // case uses, and a 40-second window rounded UP to a '1m' it never covered.
+  // A naive minute bucket would swallow every sub-minute span in one direction or the other -- a
+  // 20-second window rounding down into the same '0m' the exactly-zero case uses, and a 40-second
+  // window rounding UP to a '1m' it never covered.
   it.each([
-    ['20 seconds (used to round down into the 0m sentinel)', '00:00:20.000'],
-    [
-      '40 seconds (used to round up to a minute it never covered)',
-      '00:00:40.000',
-    ],
+    ['20 seconds (distinct from the 0m sentinel)', '00:00:20.000'],
+    ['40 seconds (distinct from a minute it never covered)', '00:00:40.000'],
   ])('renders a sub-minute window as <1m: %s', (_label, lteTime) => {
     const display = describeProvenance({
       effectiveRange: {

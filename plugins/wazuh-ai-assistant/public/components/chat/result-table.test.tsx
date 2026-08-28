@@ -17,9 +17,9 @@ function spec(overrides: Partial<TableSpec> = {}): TableSpec {
 
 describe('ResultTable', () => {
   it('shows a collapsed accordion for a pathological row count, mounting no table rows until opened', () => {
-    // Above AUTO_EXPAND_ROW_THRESHOLD. The ceiling moved from 10 to 200 once the card gained its
-    // own height cap and internal scroll: length no longer costs the reader anything, and the
-    // design's canonical Screen 2 is a 26-row table shown open.
+    // Above AUTO_EXPAND_ROW_THRESHOLD (200). The card has its own height cap and internal scroll,
+    // so row count costs the reader nothing, and the design's canonical Screen 2 is a 26-row
+    // table shown open.
     const manyRows = Array.from({ length: 201 }, (_unused, i) => ({
       agent: `agent-${i}`,
     }));
@@ -252,10 +252,9 @@ describe('ResultTable', () => {
       expect(screen.queryByText('agent-5')).toBeNull();
     });
 
-    // "Card grows" (iteration-4 item 3, F2): picking a page size ABOVE the 10-row default is what
-    // used to be imperceptible — the card stayed height-capped, so 50 rows just added an internal
-    // scrollbar. The approved fix lets the card itself grow past its default cap once the reader
-    // has deliberately asked for more rows than the default shows.
+    // Picking a page size ABOVE the 10-row default grows the card past its height cap, once the
+    // reader has deliberately asked for more rows than the default shows — without this, the card
+    // stays height-capped and extra rows just add an internal scrollbar.
     it('grows past the default cap once a larger page size is chosen, shrinks back at the default', () => {
       const { container } = render(<ResultTable spec={thirtyRowSpec()} />);
       const card = () =>
@@ -281,12 +280,12 @@ describe('ResultTable', () => {
       expect(body.scrollTop).toBe(0);
     });
 
-    // Re-pin hook (iteration-4 item 3, part A): the card grows downward when a larger page size is
-    // picked, and it lives inside chat-page.tsx's scrolling transcript pane. That pane only re-pins
-    // to its bottom on a `messages` change, so without this notification the freshly-grown
-    // pagination footer slid behind the composer until the reader scrolled by hand. The callback
-    // fires for a page-SIZE pick only — a plain next/previous-page click never grows the card, so it
-    // must not trigger a re-pin.
+    // Re-pin hook: the card grows downward when a larger page size is picked, and it lives inside
+    // chat-page.tsx's scrolling transcript pane. That pane only re-pins to its bottom on a
+    // `messages` change, so without this notification the freshly-grown pagination footer would
+    // slide behind the composer until the reader scrolled by hand. The callback fires for a
+    // page-SIZE pick only — a plain next/previous-page click never grows the card, so it must not
+    // trigger a re-pin.
     it('notifies the host on a rows-per-page change so the transcript can re-pin, but not on paging', () => {
       const onRowsPerPageChange = jest.fn();
       render(
@@ -307,9 +306,10 @@ describe('ResultTable', () => {
     });
 
     it('also scrolls the card body back to the top on a plain next/previous page click', () => {
-      // The reset used to live only in the page-SIZE change handler, so a reader who scrolled
-      // deep into page 1's rows and then clicked "Next page" (no size change at all) landed on
-      // page 2 still scrolled to wherever page 1 left off.
+      // The scroll reset applies to a plain next/previous-page click too, not only a page-SIZE
+      // change — otherwise a reader who scrolled deep into page 1's rows and then clicked "Next
+      // page" (no size change at all) would land on page 2 still scrolled to wherever page 1 left
+      // off.
       const { container } = render(<ResultTable spec={thirtyRowSpec()} />);
       const body = container.querySelector('.wzResultsCardBody') as HTMLElement;
       body.scrollTop = 120;
@@ -321,10 +321,9 @@ describe('ResultTable', () => {
     });
 
     it('renders no pagination footer when every offered page size already fits the result', () => {
-      // A one-row table used to get the full "Rows per page: 5 10 25 50" control plus
-      // "Page 1 of 1" — four controls that cannot change anything on screen, since the CURRENT
-      // page size (the 10-row default) already holds the whole result. Reported from the UI as
-      // looking broken.
+      // A "Rows per page: 5 10 25 50" control plus "Page 1 of 1" would be four controls that
+      // cannot change anything on screen, since the CURRENT page size (the 10-row default)
+      // already holds the whole one-row result.
       const { container } = render(
         <ResultTable
           spec={spec({
@@ -340,11 +339,10 @@ describe('ResultTable', () => {
       expect(screen.getByText('web-01')).toBeInTheDocument();
     });
 
-    // Issue #9009 (A4): the QA E2E review caught a factually wrong AI prose summary that resulted
-    // from exactly this — a 6-10 row answer used to split onto a hidden page 2 under the old
-    // 5-row default. With the default now 10, a 6-row result fits entirely on one page and the
-    // pager (and every row) must be visible with NO pagination footer at all.
-    it('shows every row with no pagination footer for a 6-row result (the A4 regression case)', () => {
+    // A 6-row answer fits entirely within the 10-row default page size, so the pager (and every
+    // row) must be visible with NO pagination footer at all — a smaller default would split it
+    // onto a hidden page 2, producing a factually wrong AI prose summary.
+    it('shows every row with no pagination footer for a 6-row result', () => {
       const sixRows = Array.from({ length: 6 }, (_unused, i) => ({
         agent: `agent-${i}`,
       }));
@@ -412,7 +410,7 @@ describe('ResultTable', () => {
     });
 
     it('renders no pagination footer for an empty result set', () => {
-      // Kept, with its premise narrowed: as of C4 (CEO item 6) the CHAT SURFACE never hands this
+      // Kept, with its premise narrowed: as of C4 the CHAT SURFACE never hands this
       // component a 0-row spec — message-bubble.tsx suppresses the whole card for one and shows a
       // quiet line instead (covered in message-bubble.test.tsx). This component is still the generic
       // spec renderer, though, so what it does when a call site hands it one directly stays pinned:
@@ -513,9 +511,9 @@ describe('ResultTable', () => {
       expect(container.querySelector('.euiBadge[title]')).toBeNull();
     });
 
-    // Issue #9008 (G2): the index and resolved time range were previously reachable only through
-    // the chip's hover `title` — never inside the popover a touch/keyboard reader can actually
-    // open. These assert the labelled lines render as real popover content.
+    // The index and resolved time range must be reachable inside the popover itself — not only
+    // through the chip's hover `title`, which a touch/keyboard reader can never open. These assert
+    // the labelled lines render as real popover content.
     it('shows the index and resolved time range as labelled lines inside the popover', () => {
       render(
         <ResultTable
@@ -550,8 +548,8 @@ describe('ResultTable', () => {
       expect(screen.queryByText(/^Time range:/)).toBeNull();
     });
 
-    // Issue #9008 (G3): ONE badge stating both windows, replacing two separate near-identical
-    // chips with no requested-vs-effective concept between them.
+    // ONE badge states both windows, rather than two separate near-identical chips with no
+    // requested-vs-effective concept between them.
     it('shows one combined badge for a clamped lookback, not two separate labels', () => {
       render(
         <ResultTable
@@ -565,9 +563,9 @@ describe('ResultTable', () => {
       expect(screen.getByText('90d · requested 720d')).toBeInTheDocument();
     });
 
-    // Issue #9008 (G1): the panel's own "hit escape to close" screen-reader announcement did not
-    // hold in the live QA run — Escape left the panel open, dismissible only by re-clicking the
-    // badge. This is a belt-and-braces handler on top of EUI's own popover keyboard handling.
+    // This is a belt-and-braces Escape handler on top of EUI's own popover keyboard handling,
+    // which does not reliably close the panel on its own — without it, Escape leaves the panel
+    // open, dismissible only by re-clicking the badge.
     it('closes the popover on Escape', async () => {
       render(<ResultTable spec={spec()} provenanceChips={[chip()]} />);
 
@@ -587,9 +585,9 @@ describe('ResultTable', () => {
       );
     });
 
-    // Issue #9008 review, major 6: the QA-reported failure was Escape doing nothing while focus
-    // was STILL on the badge (EUI only moves focus into the panel asynchronously) — this fires
-    // the key on the badge itself, not on panel content, to cover exactly that window.
+    // Escape must do something while focus is STILL on the badge (EUI only moves focus into the
+    // panel asynchronously) — this fires the key on the badge itself, not on panel content, to
+    // cover exactly that window.
     it('closes the popover on Escape fired on the badge anchor itself', async () => {
       render(<ResultTable spec={spec()} provenanceChips={[chip()]} />);
 
@@ -608,11 +606,10 @@ describe('ResultTable', () => {
       );
     });
 
-    // Issue #9008 review round 2, major 4: the original guard-less handler called
-    // `stopPropagation` unconditionally, so an Escape fired while the popover was ALREADY
-    // closed still swallowed the keystroke — meant for an enclosing surface (a docked
-    // sidecar/flyout) that never got to see it. The fix only acts (and only stops propagation)
-    // while `isOpen`; a closed chip must let the event bubble untouched.
+    // The handler only acts (and only stops propagation) while `isOpen` — a closed chip must let
+    // the event bubble untouched. A guard-less handler that called `stopPropagation`
+    // unconditionally would swallow an Escape meant for an enclosing surface (a docked
+    // sidecar/flyout) even while the popover was already closed.
     it('does not swallow Escape when the popover is already closed', () => {
       const ancestorHandler = jest.fn();
       render(
@@ -689,10 +686,10 @@ describe('ResultTable', () => {
     });
 
     it('renders "informational" and "low" with distinct, non-hollow background colors matching the platform severity palette', () => {
-      // Colors now mirror plugins/main's UI_COLOR_STATUS (see result-table.tsx's SEVERITY_BUCKETS
+      // Colors mirror plugins/main's UI_COLOR_STATUS (see result-table.tsx's SEVERITY_BUCKETS
       // comment): low is UI_COLOR_STATUS.success ('#007871'), informational is
-      // UI_COLOR_STATUS.disabled ('#646A77') — both are real background colors (neither renders
-      // as EUI's outline-only 'hollow' badge any more), and they must never collide.
+      // UI_COLOR_STATUS.disabled ('#646A77') — both are real background colors, not EUI's
+      // outline-only 'hollow' badge, and they must never collide.
       const { unmount } = render(
         <ResultTable
           spec={spec({
@@ -772,9 +769,9 @@ describe('ResultTable', () => {
       expect(screen.queryByText(/"extra": "detail"/)).toBeNull();
     });
 
-    // Issue #9009 (A3): the toggle used to keep the aria-label 'Expand row' after opening and
-    // exposed no `aria-expanded` at all, so a screen-reader/keyboard user got no feedback that a
-    // row had been opened. Both the attribute and the accessible name must flip with the state.
+    // Both the attribute and the accessible name must flip with the state — otherwise the toggle
+    // would keep the aria-label 'Expand row' after opening and expose no `aria-expanded` at all,
+    // giving a screen-reader/keyboard user no feedback that a row had been opened.
     it('flips aria-expanded and the accessible name when a row is expanded and collapsed', () => {
       render(
         <ResultTable
@@ -800,13 +797,13 @@ describe('ResultTable', () => {
     });
   });
 
-  // Issue #9009 (A1/A2): the table's accessible caption used to be EuiBasicTable's own default —
-  // built from the CURRENT PAGE's items, since this component paginates by hand rather than
-  // through EuiBasicTable's own `pagination` prop — so a screen-reader user was told "This table
-  // contains 5 rows" on a 6-row result while the visible header read "Results (6 rows)". An
-  // explicit `tableCaption` always states the total, with proper ICU pluralization, and adds the
-  // page position only when the result actually spans more than one page.
-  describe('accessible caption states the total, not the page slice (A1/A2)', () => {
+  // An explicit `tableCaption` always states the total, with proper ICU pluralization, and adds
+  // the page position only when the result actually spans more than one page. This matters
+  // because the component paginates by hand rather than through EuiBasicTable's own `pagination`
+  // prop — so EuiBasicTable's own default caption, built from the CURRENT PAGE's items, would tell
+  // a screen-reader user "This table contains 5 rows" on a 6-row result while the visible header
+  // reads "Results (6 rows)".
+  describe('accessible caption states the total, not the page slice', () => {
     // EuiBasicTable renders its `tableCaption` inside an `EuiDelayRender` (to avoid a flash for a
     // caption that never becomes visible on screen), so the `<caption>` element is present but
     // EMPTY on the very first render and only gets its text a tick later — hence `findByText`
@@ -965,7 +962,7 @@ describe('ResultTable', () => {
     });
   });
 
-  describe('column budget (issue #8921: no table may need a horizontal scrollbar)', () => {
+  describe('column budget (no table may need a horizontal scrollbar)', () => {
     function eightColumnSpec(): TableSpec {
       return {
         columns: [
@@ -1036,11 +1033,11 @@ describe('ResultTable', () => {
     });
 
     it('discloses row-only fields that never had a column to be demoted from', () => {
-      // The inconsistency this closes: the note used to count only spec columns past the visible
-      // budget, so a table whose extra fields come from the tool's `tableSpec.rowFields`
-      // (server/tools/digest.ts writes those into every row WITHOUT a matching column) advertised
-      // nothing, while a table with more than 6 spec columns advertised "+N more fields" — the
-      // same expander carrying extra content in both cases.
+      // The note counts row-only fields too, not just spec columns past the visible budget — a
+      // table whose extra fields come from the tool's `tableSpec.rowFields` (server/tools/digest.ts
+      // writes those into every row WITHOUT a matching column) advertises them the same way a
+      // table with more than 6 spec columns advertises "+N more fields", since the same expander
+      // carries extra content in both cases.
       render(
         <ResultTable
           spec={spec({
@@ -1333,7 +1330,7 @@ describe('ResultTable', () => {
     });
   });
 
-  describe('absent-value placeholder (issue #8921: absent is rendered as absent)', () => {
+  describe('absent-value placeholder (absent is rendered as absent)', () => {
     it('renders undefined/null/empty-string as a subdued "—" in a default (non-severity, non-timestamp) column', () => {
       render(
         <ResultTable
@@ -1436,18 +1433,17 @@ describe('ResultTable', () => {
   });
 
   /**
-   * Issue #9009 (J1): at ~480px (the AI Assistant sidecar's reproduction width from the QA E2E
-   * review) an untruncated cell wraps onto several lines and the table becomes unreadable. The
-   * fix detects the CARD'S OWN measured width (not the viewport, since the same generic renderer
-   * mounts both full-page and inside the narrow sidecar) and, once the card can no longer give
-   * every candidate column at least `MIN_COLUMN_WIDTH_PX` (the adaptive threshold — issue #9009
-   * follow-up, see that constant's doc comment), shows only the first
+   * At ~480px (the AI Assistant sidecar's width) an untruncated cell wraps onto several lines and
+   * the table becomes unreadable. This detects the CARD'S OWN measured width (not the viewport,
+   * since the same generic renderer mounts both full-page and inside the narrow sidecar) and,
+   * once the card can no longer give every candidate column at least `MIN_COLUMN_WIDTH_PX` (the
+   * adaptive threshold — see that constant's doc comment), shows only the first
    * `NARROW_MAX_VISIBLE_COLUMNS` columns with truncate-plus-tooltip cells and no horizontal
    * scroll. Same stub pattern chat-page.test.tsx already uses for its own ResizeObserver-driven
    * rail-width responsiveness: jsdom has no real ResizeObserver, so the width has to be injected
    * by hand.
    */
-  describe('narrow container mode (J1)', () => {
+  describe('narrow container mode', () => {
     function stubContainerWidth(width: number) {
       class ResizeObserverStub {
         callback: () => void;
@@ -1577,22 +1573,20 @@ describe('ResultTable', () => {
     });
 
     /**
-     * Issue #9009 (J1, follow-up): a live finding on the deployed build showed a 6-column table
-     * still wrapping every cell at ~600-800px card widths — the old FIXED 560px threshold only
-     * ever covered the original ~480px repro's column count. The threshold is now adaptive:
-     * `isNarrow = width < candidateColumnCount * MIN_COLUMN_WIDTH_PX` (140), where
+     * A 6-column table can still wrap every cell at ~600-800px card widths — a FIXED 560px
+     * threshold would only ever cover a narrower repro's column count. The threshold is adaptive
+     * instead: `isNarrow = width < candidateColumnCount * MIN_COLUMN_WIDTH_PX` (140), where
      * `candidateColumnCount` is the number of columns full-width mode would actually render for
      * this spec (capped by `MAX_VISIBLE_COLUMNS`, not the raw field count).
      *
-     * Issue #9009 (J1, second follow-up): a further live finding showed the 120px-per-column
-     * version of this same rule still failing at the exact boundary — a ~728px card with 6
+     * The per-column width matters at exact boundaries: at 120px-per-column, a ~728px card with 6
      * columns quantizes to 720, and `720 < 6 * 120 = 720` is false by exactly one quantization
-     * step, so the table stayed full-width and wrapped anyway. `MIN_COLUMN_WIDTH_PX` is now 140
-     * (real id/title/timestamp columns need that much to read on one line), which raises the
-     * 6-column threshold to 840 and the 3-column threshold to 420 and clears that repro with
-     * room to spare. These cases lock the concrete widths this fix exists for.
+     * step, so the table would stay full-width and wrap anyway. `MIN_COLUMN_WIDTH_PX` is 140 (real
+     * id/title/timestamp columns need that much to read on one line), which raises the 6-column
+     * threshold to 840 and the 3-column threshold to 420, clearing that case with room to spare.
+     * These tests lock the concrete widths this threshold exists for.
      */
-    describe('adaptive threshold (J1 follow-up)', () => {
+    describe('adaptive threshold', () => {
       function columnsSpec(count: number): TableSpec {
         return {
           columns: Array.from({ length: count }, (_, index) => ({

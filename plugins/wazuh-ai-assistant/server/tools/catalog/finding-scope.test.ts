@@ -22,14 +22,13 @@ import { getScaResultsTool } from './get-sca-results';
 import { getScaChecksTool } from './get-sca-checks';
 
 /**
- * Colocated regression test for the "State tool scope and analyst vocabulary" fix (issue 10): the
- * measured failure was two model families silently answering a narrower rule-matched-only
- * question ("everything that happened") with zero rows and no caveat. The fix adds a negative-
- * scope clause (and analyst-vocabulary synonyms) to `spec.description` for every finding-hits
- * tool, plus a current-state note for the vulnerability and syscollector-inventory tools -- this
- * test asserts the exact shared clause landed on every tool the issue names, so a future edit
- * that silently drops the clause from one tool's description fails loudly here instead of only
- * being caught by a live model re-run.
+ * Colocated regression test for finding-tool scope and analyst vocabulary: some model families
+ * silently answer a narrower rule-matched-only question ("everything that happened") with zero
+ * rows and no caveat. Every finding-hits tool's `spec.description` carries a negative-scope
+ * clause (and analyst-vocabulary synonyms), and the vulnerability and syscollector-inventory
+ * tools carry a current-state note -- this test asserts the exact shared clause is present on
+ * every tool listed here, so a future edit that silently drops the clause from one tool's
+ * description fails loudly here instead of only being caught by a live model re-run.
  */
 
 const FINDING_HITS_TOOLS = [
@@ -50,10 +49,10 @@ const VULN_TOOLS = [
   getVulnerabilityByCveTool,
 ];
 
-// The 4 pre-consolidation syscollector inventory tools (get_agent_os/get_agent_packages/
-// get_agent_ports/get_agent_processes) were folded into get_agent_inventory by issue 12 --
-// carrying INVENTORY_CURRENT_STATE_NOTE forward into the consolidated tool's description, so
-// this assertion targets that one tool instead of the 4 now-deleted files.
+// get_agent_inventory consolidates the 4 syscollector inventory tools (get_agent_os/
+// get_agent_packages/get_agent_ports/get_agent_processes), carrying INVENTORY_CURRENT_STATE_NOTE
+// forward into the consolidated tool's description, so this assertion targets that one tool
+// instead of the 4 removed files.
 const INVENTORY_TOOLS = [getAgentInventoryTool];
 
 test('every finding-hits tool description states the rule-matched-only negative scope', () => {

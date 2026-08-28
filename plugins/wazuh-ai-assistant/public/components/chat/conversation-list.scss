@@ -1,8 +1,7 @@
 /**
- * Conversation rail (layout contract §5 — AI/design/redesign-v2-spec.md, "Screen 1"). Row
- * highlighting/motion (`.wzConvoRow`) stays defined in chat-page.scss (this component only
- * consumes that class, it does not own that stylesheet); everything below is new markup this
- * redesign introduces on top of it.
+ * Conversation rail. Row highlighting/motion (`.wzConvoRow`) stays defined in chat-page.scss (this
+ * component only consumes that class, it does not own that stylesheet); everything below is new
+ * markup this redesign introduces on top of it.
  */
 @import '../redesign';
 
@@ -46,7 +45,7 @@
 }
 
 /**
- * Pinned at the bottom of the rail (design: "a collapse chevron pinned at the bottom"). `margin-top:
+ * Pinned at the bottom of the rail. `margin-top:
  * auto` only pins if the rail column actually fills the pane's height — `.wzConvoRail` below is what
  * supplies that. Without the pair, the control simply followed the last conversation, so a long list
  * pushed it out of view: the mechanism existed but was inert.
@@ -122,9 +121,9 @@
 }
 
 /**
- * Real list markup (E5/#9010, conversation-list.tsx): one `<ul>` per date group, so a screen
- * reader announces "list, N items" the way `EuiListGroup` does — previously each row was a plain
- * `<div>`, with no list semantics at all. Reset to zero visual effect: no browser default has any
+ * Real list markup (conversation-list.tsx): one `<ul>` per date group, so a screen
+ * reader announces "list, N items" the way `EuiListGroup` does, rather than as a plain `<div>`
+ * with no list semantics at all. Reset to zero visual effect: no browser default has any
  * business showing up in a "no redesign" change, only the actual accessibility markup does.
  */
 .wzConvoRailGroupList {
@@ -136,17 +135,16 @@
 /** `padding-bottom` replaces the `<EuiSpacer size="xs" />` (4px) that used to sit between rows when
  * they were flat siblings rather than `<li>`s — same visual gap, now expressed as the list item's
  * own spacing rather than an extra DOM node between each pair. Applied unconditionally, with no
- * `:last-child` exception (F-10, #9010 review — the previous wording here claimed the opposite):
- * the PRE-existing markup rendered that same `<EuiSpacer size="xs" />` after EVERY conversation,
- * including the last one in each date group, so this rule matching that unconditionally is what
- * keeps the gap byte-identical, not an exception to it.
+ * `:last-child` exception: the markup renders that same `<EuiSpacer size="xs" />` after EVERY
+ * conversation, including the last one in each date group, so this rule matching that
+ * unconditionally is what keeps the gap byte-identical, not an exception to it.
  *
- * `padding-bottom`, NOT `margin-bottom` (#9010 review, F-11): a margin on the last `<li>` of one
- * group's `<ul>` collapses through that `<ul>`'s own end into the next group's 10px
- * `margin-top` (`.wzConvoRailGroupHeader` above), CSS margin-collapsing rules that don't apply to
+ * `padding-bottom`, NOT `margin-bottom`: a margin on the last `<li>` of one group's `<ul>`
+ * collapses through that `<ul>`'s own end into the next group's 10px `margin-top`
+ * (`.wzConvoRailGroupHeader` above), CSS margin-collapsing rules that don't apply to
  * an element with no visible box between siblings — so the measured gap at every group boundary
- * was 10px, not the intended 14px. Padding never collapses, and the `<li>` paints no background
- * or border, so this reads visually identical to the row above it either way. */
+ * would be 10px, not the intended 14px. Padding never collapses, and the `<li>` paints no
+ * background or border, so this reads visually identical to the row above it either way. */
 .wzConvoRailListItem {
   margin: 0;
   padding: 0 0 4px;

@@ -5,14 +5,14 @@ import { SUPPORTED_METRIC_AGG_TYPES } from '../digest';
 import { IndexerRequest } from '../types';
 
 /**
- * Class-level guard for issue #8920 item 5: NO catalog tool may build a request whose aggregation
+ * Class-level guard: NO catalog tool may build a request whose aggregation
  * response digest.ts cannot represent.
  *
- * The defect this exists to prevent: `bucketsToRows` used to read only the FIRST top-level
+ * The defect this exists to prevent: `bucketsToRows` reads only the FIRST top-level
  * aggregation and only its `buckets` ARRAY, so any other aggregation shape — a metric agg sorted
- * first, a multi-value `stats`/`percentiles`, `filters` with named (object-keyed) buckets — was
- * silently discarded and the digest reported `returned: 0` for a query OpenSearch fully answered.
- * digest.ts now represents `{buckets: [...]}` bucket aggs, `{value}` metrics
+ * first, a multi-value `stats`/`percentiles`, `filters` with named (object-keyed) buckets — would
+ * be silently discarded and the digest would report `returned: 0` for a query OpenSearch fully
+ * answered. digest.ts represents `{buckets: [...]}` bucket aggs, `{value}` metrics
  * (`SUPPORTED_METRIC_AGG_TYPES`) and `{doc_count}` single-bucket counts, and hints on anything
  * else — but a TYPED tool must never rely on that last-resort hint: its builder is ours, so it
  * must only emit aggregation types whose response the digest fully represents.

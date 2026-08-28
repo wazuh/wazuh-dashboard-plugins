@@ -49,6 +49,7 @@ import {
 } from '../../services/settings-service';
 import { ProviderInput, ProviderSummary } from '../../../common/types';
 import { useDirtyFormState } from '../../hooks/use-dirty-form-state';
+import { getWazuhCore } from '../../plugin-services';
 import { ProviderFormFlyout } from './provider-form-flyout';
 import {
   ProviderTestOutcome,
@@ -58,12 +59,12 @@ import {
   outcomeFromTestResult,
 } from './provider-status';
 
-// Exactly three selectable options (symmetry pass, iteration-4 batch 2 item 5) — `allow-scan`
-// (#8912) is deliberately excluded here even though it stays a valid STORED action:
-// `server/tools/privacy.ts` keeps `allow-scan` in the server-side `FieldPolicyAction` type so
-// existing/default fields configured with it keep working and keep their server-side injection
-// scan; this select just no longer offers picking it. See `toSelectableFieldPolicyAction` below
-// for how an `allow-scan` row still displays (and round-trips) correctly.
+// Exactly three selectable options — `allow-scan` is deliberately excluded here even though it
+// stays a valid STORED action: `server/tools/privacy.ts` keeps `allow-scan` in the server-side
+// `FieldPolicyAction` type so existing/default fields configured with it keep working and keep
+// their server-side injection scan; this select just no longer offers picking it. See
+// `toSelectableFieldPolicyAction` below for how an `allow-scan` row still displays (and
+// round-trips) correctly.
 type SelectableFieldPolicyAction = Exclude<FieldPolicyAction, 'allow-scan'>;
 
 const FIELD_POLICY_ACTIONS: SelectableFieldPolicyAction[] = [
@@ -371,10 +372,9 @@ const STATUS_CHIP_TINT_CLASS: Record<
   pending: 'wzStatusChip--pending',
 };
 
-/** One status chip, four states (screen 3, variation 3a): same shape and position regardless of
- * outcome, colour alone carries the state. `provider-status.ts` already models these states (PR
- * #8936) — this only restyles their presentation. A hover/detail `reason` is optional: `ok` and
- * `pending` never have one. */
+/** One status chip, four states: same shape and position regardless of outcome, colour alone
+ * carries the state. `provider-status.ts` already models these states — this only restyles their
+ * presentation. A hover/detail `reason` is optional: `ok` and `pending` never have one. */
 const ProviderStatusChip: React.FC<{
   status: 'ok' | 'failed' | 'testing' | 'could-not-verify' | 'pending';
   label: string;
@@ -495,15 +495,15 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   }, [location.search, autoOpenCreateForm]);
 
   const switchTab = (tabId: SettingsTabId) => {
-    // No-op on the already-active tab: this used to still push a new history entry (and, before
-    // the fix below, still stomp any OTHER query params) for a click that changes nothing on
-    // screen, which made "back" after clicking the current tab a no-op the admin didn't expect.
+    // No-op on the already-active tab: pushing a new history entry (and stomping any OTHER query
+    // params) for a click that changes nothing on screen would make "back" after clicking the
+    // current tab a no-op the admin didn't expect.
     if (tabId === activeTabId) {
       return;
     }
     setActiveTabId(tabId);
     // Preserve any OTHER query params the URL is carrying (`?addProvider=true` in particular) —
-    // this used to rebuild `search` from scratch with only `?tab=`, silently dropping them.
+    // rebuilding `search` from scratch with only `?tab=` would silently drop them.
     const params = new URLSearchParams(location.search);
     if (tabId === DEFAULT_SETTINGS_TAB) {
       params.delete(TAB_PARAM);
@@ -660,6 +660,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   const [apiKeyEncryptionEnabled, setApiKeyEncryptionEnabled] = useState<
     boolean | null
   >(null);
+  // Fail-open default: a failed/omitted probe must never wrongly lock the page. The server's
+  // own 403 (`requireSettingsUnlocked`) is the real enforcement; this only pre-empts it in the UI.
+  const [settingsLocked, setSettingsLocked] = useState(false);
   const reloadPrivacySettings = () => {
     service
       .getAssistantSettings()
@@ -675,11 +678,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         setRetentionValidationError(null);
         setSettingsLoadError(null);
       })
-      .catch(() =>
+      .catch((error: unknown) =>
         setSettingsLoadError(
-          i18n.translate('wazuhAiAssistant.settings.loadError', {
-            defaultMessage: 'Could not load settings.',
-          }),
+          describeHttpError(
+            error,
+            i18n.translate('wazuhAiAssistant.settings.loadError', {
+              defaultMessage: 'Could not load settings.',
+            }),
+          ),
         ),
       );
   };
@@ -694,6 +700,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       .then(access => {
         // `!== false` stays fail-open when older servers omit the field.
         setApiKeyEncryptionEnabled(access.apiKeyEncryptionEnabled !== false);
+        setSettingsLocked(access.settingsLocked === true);
       })
       .catch(() => {
         // Fail open: leave `apiKeyEncryptionEnabled` at its `null` default.
@@ -894,11 +901,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     service
       .list()
       .then(setProviders)
-      .catch(() =>
+      .catch((error: unknown) =>
         setError(
-          i18n.translate('wazuhAiAssistant.settings.providers.loadError', {
-            defaultMessage: 'Could not load providers.',
-          }),
+          describeHttpError(
+            error,
+            i18n.translate('wazuhAiAssistant.settings.providers.loadError', {
+              defaultMessage: 'Could not load providers.',
+            }),
+          ),
         ),
       );
   };
@@ -937,11 +947,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         // green/red at a glance on every visit, without any user action.
         loaded.forEach(p => handleTest(p));
       })
-      .catch(() =>
+      .catch((error: unknown) =>
         setError(
-          i18n.translate('wazuhAiAssistant.settings.providers.loadError', {
-            defaultMessage: 'Could not load providers.',
-          }),
+          describeHttpError(
+            error,
+            i18n.translate('wazuhAiAssistant.settings.providers.loadError', {
+              defaultMessage: 'Could not load providers.',
+            }),
+          ),
         ),
       )
       .finally(() => setProvidersLoaded(true));
@@ -1271,8 +1284,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   defaultMessage: 'Set as default provider',
                 })
           }
-          onClick={isDefault ? undefined : () => handleSetDefault(provider)}
-          disabled={isDefault}
+          onClick={
+            isDefault || settingsLocked
+              ? undefined
+              : () => handleSetDefault(provider)
+          }
+          disabled={isDefault || settingsLocked}
         />
       ),
     },
@@ -1462,6 +1479,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             <EuiContextMenuItem
               key='edit'
               icon='pencil'
+              disabled={settingsLocked}
               onClick={() => {
                 setOpenMenuRowId(null);
                 openEditForm(provider);
@@ -1474,6 +1492,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             <EuiContextMenuItem
               key='delete'
               icon='trash'
+              disabled={settingsLocked}
               onClick={() => {
                 setOpenMenuRowId(null);
                 requestDelete(provider);
@@ -1600,7 +1619,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
               iconType='check'
               onClick={handleSavePrivacySettings}
               isLoading={isSavingPrivacy}
-              disabled={privacySaveDisabled}
+              disabled={privacySaveDisabled || settingsLocked}
             >
               {i18n.translate('wazuhAiAssistant.settings.privacy.save', {
                 defaultMessage: 'Save changes',
@@ -1624,18 +1643,32 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           pageTitle={i18n.translate('wazuhAiAssistant.settings.pageTitle', {
             defaultMessage: 'AI Assistant settings',
           })}
-          description={i18n.translate(
-            'wazuhAiAssistant.settings.pageDescription',
-            {
-              defaultMessage:
-                'Manage AI providers, privacy and conversation history.',
-            },
-          )}
+          description={
+            <>
+              {i18n.translate('wazuhAiAssistant.settings.pageDescription', {
+                defaultMessage:
+                  'Manage AI providers, privacy and conversation history.',
+              })}{' '}
+              <EuiButtonIcon
+                href={getWazuhCore().utils.webDocumentationLink(
+                  'user-manual/wazuh-dashboard/wazuh-dashboard-configurations.html#ai-assistant',
+                )}
+                iconType='iInCircle'
+                target='_blank'
+                rel='noopener noreferrer'
+                aria-label={i18n.translate(
+                  'wazuhAiAssistant.settings.documentationLink',
+                  { defaultMessage: 'Documentation' },
+                )}
+              />
+            </>
+          }
           rightSideItems={[
             <EuiButton
               key='add-provider'
               onClick={openCreateForm}
               iconType='plusInCircle'
+              isDisabled={settingsLocked}
               fill
             >
               {i18n.translate('wazuhAiAssistant.settings.addProvider', {
@@ -1646,16 +1679,38 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         />
         <EuiSpacer size='l' />
 
-        {/* Landmarks before more settings land (UX iteration 4 item 2): one tab per existing
-            SectionCard, deep-linkable via `?tab=`. Not a full router switch — all three cards stay
-            MOUNTED at all times (below, each wrapped in a plain `display: none` div rather than an
+        {settingsLocked && (
+          <>
+            <EuiCallOut
+              title={i18n.translate('wazuhAiAssistant.settings.lockedTitle', {
+                defaultMessage: 'Settings are locked by your administrator',
+              })}
+              color='warning'
+              iconType='lock'
+            >
+              <p>
+                {i18n.translate('wazuhAiAssistant.settings.lockedBody', {
+                  defaultMessage:
+                    'AI Assistant settings are locked by your administrator and cannot be ' +
+                    'changed from this page. Contact your administrator if you need a ' +
+                    'different configuration.',
+                })}
+              </p>
+            </EuiCallOut>
+            <EuiSpacer size='l' />
+          </>
+        )}
+
+        {/* Landmarks before more settings land: one tab per existing SectionCard, deep-linkable via
+            `?tab=`. Not a full router switch — all three cards stay MOUNTED at all times (below,
+            each wrapped in a plain `display: none` div rather than an
             `activeTabId === 'x' && (...)` conditional), the same way application.tsx's outer
-            Chat/Settings tabs already hide rather than unmount. Unmounting the non-active card was
-            the actual behavior here until this comment caught up with it: EuiInMemoryTable owns its
-            own (uncontrolled) search box internally, so unmounting the Providers card on a tab
-            switch reset that search box's text on remount — while `providersFilterText` above
-            (mirrored out via `search.onChange`) is page-level state that survived the switch, so
-            "Test all" kept computing against a filter the visible table no longer had applied. */}
+            Chat/Settings tabs already hide rather than unmount. Unmounting the non-active card
+            would break this: EuiInMemoryTable owns its own (uncontrolled) search box internally,
+            so unmounting the Providers card on a tab switch would reset that search box's text on
+            remount — while `providersFilterText` above (mirrored out via `search.onChange`) is
+            page-level state that survives the switch, so "Test all" would keep computing against a
+            filter the visible table no longer had applied. */}
         <EuiTabs>
           <EuiTab
             isSelected={activeTabId === 'providers'}
@@ -1754,7 +1809,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   </p>
                 }
                 actions={
-                  <EuiButton color='primary' fill onClick={openCreateForm}>
+                  <EuiButton
+                    color='primary'
+                    fill
+                    isDisabled={settingsLocked}
+                    onClick={openCreateForm}
+                  >
                     {i18n.translate(
                       'wazuhAiAssistant.settings.providers.emptyAction',
                       {
@@ -1781,9 +1841,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           </SectionCard>
         </div>
 
-        {/* No `xxl` spacer between the cards any more (it existed to separate two ADJACENT
-            cards — see the comment that used to sit here) — each card now owns a whole tab, so
-            there is never a second card directly below it to separate from. */}
+        {/* No `xxl` spacer between the cards: it would separate two ADJACENT cards, but each card
+            owns a whole tab, so there is never a second card directly below it to separate
+            from. */}
         <div
           style={{ display: activeTabId === 'privacy' ? undefined : 'none' }}
         >
@@ -1919,9 +1979,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 description={i18n.translate(
                   'wazuhAiAssistant.settings.privacy.fieldPolicyHelp',
                   {
-                    // "Allow" deliberately no longer promises the "real value": with privacy mode
+                    // "Allow" deliberately does not promise the "real value": with privacy mode
                     // on, an allowed prose field still has known identifiers pseudonymized by the
-                    // server-side scrub, so the old wording promised byte-verbatim delivery this
+                    // server-side scrub, so the copy avoids promising byte-verbatim delivery this
                     // product does not give.
                     defaultMessage:
                       'What the AI provider gets per field: the value (Allow — in privacy mode, known identifiers in it are still pseudonymized), a pseudonym (Anonymize), or nothing (Never send).',
@@ -2414,7 +2474,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 <EuiButton
                   onClick={handleSaveRetentionSettings}
                   isLoading={isSavingRetention}
-                  isDisabled={!retentionDirty}
+                  isDisabled={!retentionDirty || settingsLocked}
                   fill={retentionDirty}
                 >
                   {i18n.translate('wazuhAiAssistant.settings.retention.save', {
@@ -2435,6 +2495,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           error={error}
           existingProviders={providers}
           apiKeyEncryptionEnabled={apiKeyEncryptionEnabled}
+          settingsLocked={settingsLocked}
           isSaving={isSubmittingProvider}
           testOutcome={flyoutTestOutcome}
           onSubmit={handleSubmit}

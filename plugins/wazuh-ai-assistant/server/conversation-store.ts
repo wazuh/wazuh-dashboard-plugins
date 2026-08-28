@@ -33,15 +33,14 @@ type OpenSearchClient =
  * starting a brand new conversation — so privacy mode's on-the-wire protection (what reaches the
  * LLM going forward) is completely unaffected by persistence; the already-real digest/table history
  * from before a resume is NOT, in fact, re-sent un-pseudonymized on the next turn — two separate
- * fixes close this, at two separate layers, and both matter: (1) resuming a conversation clears
- * `turnHistoryRef` client-side (chat-page.tsx's `applyLoadedConversation`) rather than restoring it
- * from the persisted document, so a resumed conversation has no tool-call history to replay AT ALL
- * (it is still fully READABLE — this only affects what gets resent to the model); (2) independently
- * of resume, `common/chat-history.ts`'s `excludePrivacyOffHistory` (enforced server-side, in
- * server/routes/chat.ts) fails closed on any history entry not explicitly flagged
+ * mechanisms guarantee this, at two separate layers, and both matter: (1) resuming a conversation
+ * clears `turnHistoryRef` client-side (chat-page.tsx's `applyLoadedConversation`) rather than
+ * restoring it from the persisted document, so a resumed conversation has no tool-call history to
+ * replay AT ALL (it is still fully READABLE — this only affects what gets resent to the model);
+ * (2) independently of resume, `common/chat-history.ts`'s `excludePrivacyOffHistory` (enforced
+ * server-side, in server/routes/chat.ts) fails closed on any history entry not explicitly flagged
  * `privacyEnabled: true`, which also covers the same-session "privacy toggled on mid-conversation"
- * case this comment used to describe as an accepted residual (AI/qa/wire-proof-v35/capture.jsonl —
- * a live-captured real agent name that survived exactly that toggle).
+ * case.
  */
 export interface ConversationDocument {
   user: string;

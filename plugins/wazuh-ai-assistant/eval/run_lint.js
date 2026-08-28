@@ -162,7 +162,7 @@ function runCase(testCase, guardrails) {
 
   // Stage 3: static DSL lint. The index is passed through for the per-index checks (mandatory
   // time bound on time-based indices; vulnerability-field-on-findings/events-index). lintDsl takes
-  // (body, index) only — the 4.14 per-tool `toolName` exemption was retired in the 5.0 port.
+  // (body, index) only -- there is no per-tool `toolName` exemption.
   const lintResult = lintDsl(valved.body, testCase.index);
   if (!lintResult.ok) {
     if (testCase.expect !== 'reject') {

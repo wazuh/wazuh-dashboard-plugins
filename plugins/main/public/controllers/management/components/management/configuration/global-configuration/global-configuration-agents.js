@@ -24,7 +24,7 @@ const helpLinks = [
   {
     text: 'Agents times reference',
     href: webDocumentationLink(
-      'user-manual/reference/ossec-conf/global.html#agents-disconnection-time',
+      'user-manual/agent/agent-enrollment/agent-life-cycle.html#agent-connection-states',
     ),
   },
 ];

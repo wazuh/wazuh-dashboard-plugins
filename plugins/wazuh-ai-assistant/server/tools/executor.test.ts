@@ -51,9 +51,9 @@ function fakeSearchContext(hits: Array<Record<string, unknown>>): ExecContext {
 }
 const fakeRequest = {} as ExecRequest;
 
-// --- Issue #8917: end-to-end (executeToolCall, not just applyFieldPolicy in isolation) proof that
-// the executor threads a deriveColumns tool's OWN `failClosedFieldPolicy` flag into field policy,
-// not `deriveColumns` itself -- and that an explicit FIELD_POLICY_DEFAULTS entry wins over the
+// --- End-to-end (executeToolCall, not just applyFieldPolicy in isolation) proof that the executor
+// threads a deriveColumns tool's OWN `failClosedFieldPolicy` flag into field policy, not
+// `deriveColumns` itself -- and that an explicit FIELD_POLICY_DEFAULTS entry wins over the
 // fail-closed default for a real get_agent_inventory call. ---------------------------------------
 
 test('executeToolCall: get_agent_inventory keeps package.name/package.version readable under privacy mode, still anonymizing package.vendor', async () => {
@@ -119,10 +119,10 @@ test('executeToolCall: privacy off leaves get_agent_inventory digest completely 
   assert.equal(digest.samples[0]['package.version'], '3.118ubuntu5');
 });
 
-// --- Issue #9008 rework: `TableSpec.provenance` must carry only FACTS the executor actually
-// observed -- never a client-invented default, and never attributed to the wrong call. These
-// exercise the real `executeToolCall` -> `executeIndexerRequest`/`executeManagerRequest` wiring,
-// not a helper that could quietly omit a field. ---------------------------------------------------
+// --- `TableSpec.provenance` must carry only FACTS the executor actually observed -- never a
+// client-invented default, and never attributed to the wrong call. These exercise the real
+// `executeToolCall` -> `executeIndexerRequest`/`executeManagerRequest` wiring, not a helper that
+// could quietly omit a field. -----------------------------------------------------------------
 
 /** Minimal Manager-API context stub: `resolveApiHostId` (api-host.ts) needs
  * `context.wazuh_core.manageHosts.get()` (no cookie on `request.headers`, so it always takes the
@@ -225,9 +225,9 @@ test('executeToolCall: get_critical_findings past the 90-day cap is clamped, and
   assert.ok(effective);
   const spanMs = Date.parse(effective!.lte) - Date.parse(effective!.gte);
   assert.equal(spanMs, 90 * 24 * 60 * 60 * 1000);
-  // Issue #9008 review, blocker 2: the instant the query actually ran, recorded as a plain
-  // number at creation time -- what `describeProvenance` (tool-call-label.ts) resolves a
-  // date-math bound against instead of the render-time clock.
+  // The instant the query actually ran, recorded as a plain number at creation time -- what
+  // `describeProvenance` (tool-call-label.ts) resolves a date-math bound against instead of the
+  // render-time clock.
   assert.equal(typeof provenance?.executedAt, 'number');
   assert.ok(provenance!.executedAt! >= before);
   assert.ok(provenance!.executedAt! <= after);
@@ -248,9 +248,8 @@ test('executeToolCall: a Manager-API table carries no provenance at all (no inde
 
 test('executeToolCall: unlisted-field fail-closed tracks failClosedFieldPolicy, not deriveColumns (decoupling proof)', async () => {
   // Flips ONLY `failClosedFieldPolicy` on the real, registered get_agent_inventory tool --
-  // `deriveColumns` stays `true` throughout. If the executor still keyed off `deriveColumns` (the
-  // pre-#8917 bug this test guards against), this would have no effect and the unlisted field
-  // would still come back fail-closed.
+  // `deriveColumns` stays `true` throughout. If the executor keyed off `deriveColumns` instead,
+  // this would have no effect and the unlisted field would still come back fail-closed.
   //
   // Uses `kind: 'os'` / `host.os.full` rather than `kind: 'packages'` / `package.vendor` (this
   // test's original target): `package.vendor` gained its own explicit FIELD_POLICY_DEFAULTS
@@ -299,11 +298,11 @@ test('executeToolCall: unlisted-field fail-closed tracks failClosedFieldPolicy, 
   }
 });
 
-// --- Issue #8913: end-to-end (executeToolCall, not just resolveDeicticAgentParams in isolation)
-// proof that a resolveParams-minted assumption note reaches the digest the model sees. A merge
-// regression once dropped `assumptionNote` from `executeIndexerRequest`'s call to `buildDigest`
-// (`executeManagerRequest`'s sibling call already threaded it through) -- silently discarding the
-// note for every Indexer-backed tool while keeping it for Manager-API-backed ones. -------------
+// --- End-to-end (executeToolCall, not just resolveDeicticAgentParams in isolation) proof that a
+// resolveParams-minted assumption note reaches the digest the model sees: `executeIndexerRequest`
+// threads `assumptionNote` into its call to `buildDigest`, same as `executeManagerRequest`'s
+// sibling call, so the note reaches the digest for both Indexer-backed and Manager-API-backed
+// tools. --------------------------------------------------------------------------------------
 
 test('executeToolCall: a resolveParams-minted assumption note reaches the digest for an Indexer-backed tool', async () => {
   const context = {
@@ -344,7 +343,7 @@ test('executeToolCall: a resolveParams-minted assumption note reaches the digest
   assert.match(digest.assumptionNote ?? '', /agent-one/);
 });
 
-// --- Privacy capture probe P3 (2026-08-14): the assumption note carried the resolved agent's
+// --- Privacy: the assumption note carried the resolved agent's
 // raw hostname to the provider under privacy mode -- a bare single-word token neither the shape
 // scan nor the known-entity scan can catch (nothing ever minted it; resolution exists precisely
 // because the caller never supplied the value). The fix: resolvers declare the identifiers their
@@ -483,7 +482,7 @@ test('resolveSecurityAnalyticsSpace: falls back to "standard" when no hit carrie
   );
 });
 
-// --- issue #8920 items 3 & 6: narrowed-window recount + entity near-miss disclosure ------------
+// --- narrowed-window recount + entity near-miss disclosure ------------------------------------
 
 interface SearchCall {
   index: string;
@@ -702,7 +701,7 @@ test('entity near-miss: agent names in the hint are pseudonymized when privacy m
 
 test(
   'entity near-miss: a category word with no near-miss sibling and no exact match is reported ' +
-    'unmatched, not a bare zero-row result (CV-028/CV-033 fix)',
+    'unmatched, not a bare zero-row result',
   async () => {
     const { context, calls } = fakeContext((_call, index) =>
       index === 0
@@ -848,8 +847,8 @@ test('entity near-miss: does not fire for a tool call naming no agent at all', a
 test('entity near-miss: fires on a states index with NO @timestamp range injected', async () => {
   // get_agent_inventory reads wazuh-states-inventory-*: no event-time axis, lintDsl requires no
   // bound there, and a range injected on an unmapped @timestamp field would match NOTHING --
-  // silently disabling the disclosure for exactly the tools issue #8920 item 6 names. The probe
-  // must therefore go out rangeless for a rangeless executed body.
+  // silently disabling the disclosure. The probe must therefore go out rangeless for a rangeless
+  // executed body.
   const portsHit = {
     _source: { 'source.port': 22, 'interface.state': 'listen' },
   };
@@ -1027,8 +1026,8 @@ test('recount wording: a clamped total (relation "gte") is stated as "at least",
 
 test('sub-technique split: a breakdown carrying a dotted technique id gains the per-exact-id hint', async () => {
   // get_mitre_findings' technique_ids terms agg buckets per EXACT id; the hint is what tells the
-  // model a parent bucket does not include its children (issue #8920 item 2's disclosure half,
-  // applied at the digest chokepoint so get_mitre_summary and escape-hatch aggs inherit it too).
+  // model a parent bucket does not include its children, applied at the digest chokepoint so
+  // get_mitre_summary and escape-hatch aggs inherit it too.
   const findingHit = {
     _source: {
       '@timestamp': '2026-08-10T00:00:00Z',
@@ -1088,7 +1087,7 @@ test('buildDiscoverDsl: without a post_filter the DSL is body.query unchanged (m
   assert.deepEqual(buildDiscoverDsl({}), { match_all: {} });
 });
 
-// --- issue #8935 item I4: bound disclosure (lookback clamp) -------------------------------------
+// --- bound disclosure (lookback clamp) ----------------------------------------------------------
 
 test('bound disclosure: search_wazuh_data with a 180-day range is clamped-and-disclosed on a SUCCESSFUL call, not rejected', async () => {
   // ON BASE (before this item): this exact call's toolResultContent is

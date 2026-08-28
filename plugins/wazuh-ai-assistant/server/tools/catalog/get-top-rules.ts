@@ -13,7 +13,7 @@ import {
  * `top_hits` sub-aggregation sampling one `wazuh.rule.title` per bucket, `size: 0`
  * (aggregation-only, no hit documents fetched).
  *
- * Column design (issue #8921, the sampled-label-falsehood item): `wazuh.rule.id` is a bucket KEY,
+ * Column design (the sampled-label-falsehood item): `wazuh.rule.id` is a bucket KEY,
  * but `wazuh.rule.title` is only a SAMPLE of one document out of the bucket's full `doc_count` —
  * one rule id can legitimately fire under more than one title (templated/parameterized rule
  * text), so pairing a big `doc_count` next to a single sampled title reads as "this exact title
@@ -27,18 +27,18 @@ import {
  * `keyword` field, and OpenSearch rejects a numeric metric on a keyword field with an
  * `illegal_argument_exception` (live-verified) — and merging the bucket's own severity words as a
  * nested `terms` nested under `top_rules` would require digest.ts to understand a second bucketed
- * shape, which is A2's file, not this one. A count of how many of the bucket's hits were
+ * shape, out of scope here. A count of how many of the bucket's hits were
  * high/critical is a cheap, honest, data-driven proxy for "does this rule matter" without either.
  *
  * Column order is meaning -> severity -> magnitude -> spread -> identity: the sampled title (what
- * a reader scans first), then the severity badge (the at-a-glance triage signal issue #8921 flags
- * as missing whenever a finding tool has level data reachable — see `wazuh.rule.level` below),
+ * a reader scans first), then the severity badge (the at-a-glance triage signal that's missing
+ * whenever a finding tool has level data reachable — see `wazuh.rule.level` below),
  * then the hit count (how often), then the spread signals that qualify the title, with the numeric
  * rule id demoted to LAST rather than deleted — `sampleColumns` keeps `key` too, since the model's
  * own aggregate-then-lookup workflow (aggregate here, then look up a specific rule id with another
  * tool) depends on it staying visible.
  *
- * Severity column (issue #8921's "missing severity" item): the vulnerability table's Severity
+ * Severity column: the vulnerability table's Severity
  * badge column is per-DOCUMENT data (each vulnerability row carries its own `vulnerability.severity`).
  * A bucket here has no single severity — like the sampled title, `wazuh.rule.level` can only be
  * read off the one document `sample_doc` already samples, so it is exactly as much a SAMPLE as the

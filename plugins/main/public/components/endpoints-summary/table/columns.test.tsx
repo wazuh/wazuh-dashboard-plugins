@@ -11,7 +11,11 @@ const getColumn = (field: string, pendingUpgradeAgentIds?: Set<string>) => {
     () => {},
     () => {},
     '5.0.0',
-    { setIsRemoveModalVisible: () => {}, pendingUpgradeAgentIds },
+    {
+      setIsRemoveModalVisible: () => {},
+      setIsScanVulnerabilitiesModalVisible: () => {},
+      pendingUpgradeAgentIds,
+    },
   );
   return columns.find((column: any) => column.field === field) as any;
 };

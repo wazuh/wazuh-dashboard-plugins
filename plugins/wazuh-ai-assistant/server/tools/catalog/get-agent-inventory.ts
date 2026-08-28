@@ -18,7 +18,7 @@ import {
 import { BREAKDOWN_BUCKET_CAP } from '../digest';
 
 /**
- * The 5 kinds this tool implements tonight, out of the 13 real `wazuh-states-inventory-*`
+ * The 5 kinds this tool implements, out of the 13 real `wazuh-states-inventory-*`
  * surfaces (`plugins/main/common/constants.ts`'s `WAZUH_IT_HYGIENE_*`). Enum kept to exactly
  * these 5 rather than listing all 13 with the other 8 rejected at call time: a listed-but-
  * rejected enum value is a worse model experience than simply not offering it (the model wastes a
@@ -26,7 +26,7 @@ import { BREAKDOWN_BUCKET_CAP } from '../digest';
  * is itself a few fewer schema tokens on every routed turn -- the same token-conscious reasoning
  * this whole tool exists for. The other 8 (hardware, interfaces, networks, protocols, users,
  * groups, services, browser-extensions) each need their own live-mapping verification pass before
- * they can be added the same way `hotfixes` was tonight -- see this file's own doc comment on
+ * they can be added the same way `hotfixes` was -- see this file's own doc comment on
  * `INVENTORY_KIND_CONFIG` for what "verified" means in practice.
  */
 export const INVENTORY_KINDS = [
@@ -59,9 +59,9 @@ export interface InventoryKindConfig {
   fixedSize?: number;
   /**
    * Real `terms` aggregation(s) attached to `body.aggs` for a kind whose completeness question
-   * ("how many ports are listening vs closed") needs a population-true categorical breakdown
-   * (issue #8920 item 1: a plain hits search left a `limit`-truncated page silently narrated as
-   * if it were the whole inventory). OpenSearch computes `aggregations` over the FULL matched set
+   * ("how many ports are listening vs closed") needs a population-true categorical breakdown --
+   * a plain hits search would leave a `limit`-truncated page silently narrated as if it were the
+   * whole inventory. OpenSearch computes `aggregations` over the FULL matched set
    * regardless of `size`, so this stays correct even when `limit` truncates the returned rows;
    * digest.ts's `buildBreakdown` already reads any response's `aggregations` generically, so this
    * needs no digest change.
@@ -88,10 +88,9 @@ export interface InventoryKindConfig {
 }
 
 /**
- * `hotfixes` is the one kind added beyond the 4 folded-in ones (issue 12, step 2's first
- * addition): it pairs with the vulnerability tools for patch-management questions and was
- * previously invisible to the assistant entirely (zero prior mentions of "hotfix" in this
- * plugin). Its `_source` list is deliberately just the one field this repo can actually confirm
+ * `hotfixes` is the one kind added beyond the 4 folded-in ones: it pairs with the vulnerability
+ * tools for patch-management questions. Its `_source` list is deliberately just the one field
+ * this repo can actually confirm
  * live for `wazuh-states-inventory-hotfixes*`: `package.hotfix.name`, per `plugins/main`'s own
  * IT Hygiene hotfixes table (`public/components/overview/it-hygiene/packages/inventories/
  * hotfixes/table-columns.ts`) and sample-data generator (`server/lib/sample-data/dataset/
@@ -131,10 +130,10 @@ export const INVENTORY_KIND_CONFIG: Record<InventoryKind, InventoryKindConfig> =
     },
     ports: {
       index: 'wazuh-states-inventory-ports*',
-      // Order (issue #8921's column-budget item): `deriveResultColumns` (digest.ts) takes this
+      // Order: `deriveResultColumns` (digest.ts) takes this
       // `_source` list, byte-for-byte, as the derived column order -- and the client's
       // MAX_VISIBLE_COLUMNS budget (result-table.tsx) shows only the first 6 of them as visible
-      // table columns. The issue's 5 highest-value fields lead (source.port, interface.state,
+      // table columns. The 5 highest-value fields lead (source.port, interface.state,
       // process.name, network.transport, destination.ip), followed by source.ip as the 6th visible
       // column; destination.port/process.pid are demoted -- NOT deleted, still queried and still in
       // the row expander -- to positions 7-8. destination.ip stays ahead of them: on an established
@@ -202,8 +201,8 @@ function parseKind(value: unknown): InventoryKind {
 }
 
 /** Shared by `resolveAgentFilter`'s own throw (a direct `buildRequest` call with neither
- * identifier, e.g. from a unit test) and `resolveDeicticAgentParams`'s failure paths below (issue
- * #8913) so the two can never drift into different wording for the same underlying situation.
+ * identifier, e.g. from a unit test) and `resolveDeicticAgentParams`'s failure paths below so
+ * the two can never drift into different wording for the same underlying situation.
  *
  * Deliberately does NOT name `get_agents` (follow-up audit fix, same class of bug this whole
  * file exists to fix): `resolveDeicticAgentParams`'s zero-active-agents and lookup-failure
@@ -218,7 +217,7 @@ const NO_AGENT_IDENTIFIER_ERROR =
   'is required and could not be resolved automatically. Ask the user which agent/host they mean.';
 
 /**
- * Per-kind primary name field the optional `filter` param (issue #8910) narrows on, keyed the same
+ * Per-kind primary name field the optional `filter` param narrows on, keyed the same
  * as `INVENTORY_KIND_CONFIG`. Picked from that config's own `source` lists -- never a field invented
  * for this feature -- so every entry here is already a confirmed part of this tool's outbound
  * `_source`/query contract:
@@ -235,9 +234,8 @@ const NO_AGENT_IDENTIFIER_ERROR =
  *   contract than a uniform, if lower-value, one.
  * - `ports` has no single name field (see `buildInventoryFilterClause`'s own handling): a numeric
  *   filter matches `source.port`/`destination.port`AND prefers a listening `interface.state`
- *   (issue #8914 -- see `PORT_LISTENING_STATE_VALUES`'s doc comment below), a non-numeric one
- *   matches `process.name` (the process bound to the port), matching the issue's own worked
- *   example ("what process is on port 9200").
+ *   (see `PORT_LISTENING_STATE_VALUES`'s doc comment below), a non-numeric one
+ *   matches `process.name` (the process bound to the port), e.g. "what process is on port 9200".
  */
 const INVENTORY_FILTER_FIELDS: Partial<Record<InventoryKind, string[]>> = {
   os: ['host.hostname', 'host.os.name'],
@@ -302,25 +300,23 @@ function anyFieldMatches(
 /**
  * `interface.state` value(s) the syscollector ports schema uses for a bound/listening socket.
  *
- * Evidence (issue #8914, live query against a real wazuh-indexer deployment): a terms aggregation
+ * Evidence (live query against a real wazuh-indexer deployment): a terms aggregation
  * over `interface.state` on `wazuh-states-inventory-ports*` (84 docs) returned exactly
  * `listening` (14), `established` (59), `time_wait` (6), `close_wait` (3) -- lowercase, full
- * English words, NOT the `LISTEN`/`ESTABLISHED` short forms this constant previously held. That
- * mismatch was a live wrong-answer bug: a case-sensitive `term: { 'interface.state': 'LISTEN' }`
- * never matches real `listening` documents, so `get_agent_inventory(kind='ports',
- * filter='9200')` silently returned zero rows against a live cluster (the "OR field absent"
- * fallback below never firing either, since real documents DO carry `interface.state`) and the
- * assistant confidently reported nothing listening on a port that was, live, bound by `java`.
+ * English words, NOT the `LISTEN`/`ESTABLISHED` short forms. A case-sensitive
+ * `term: { 'interface.state': 'LISTEN' }` never matches real `listening` documents, so
+ * `get_agent_inventory(kind='ports', filter='9200')` would silently return zero rows against a
+ * live cluster (the "OR field absent" fallback below never firing either, since real documents DO
+ * carry `interface.state`).
  *
  * `plugins/main`'s own `states-inventory-ports` sample-data generator (`server/lib/sample-data/
  * dataset/states-inventory-ports/main.js`, `random.choice(['LISTEN', 'ESTABLISHED'])`) is
  * SYNTHETIC test fixture data, not a live-verified schema -- it does not match the real
  * wazuh-indexer vocabulary above and MUST NOT be treated as authoritative for this field's casing
- * or wording (this file's previous revision made exactly that mistake). Both `listening` (the
- * confirmed live value) and `listen` (in case an older/differently-provisioned indexer still
- * writes the sample-data generator's short form) are matched below, each case-insensitively, so
- * this survives casing differences in either vocabulary without having to guess which one a given
- * deployment actually writes.
+ * or wording. Both `listening` (the confirmed live value) and `listen` (in case an
+ * older/differently-provisioned indexer still writes the sample-data generator's short form) are
+ * matched below, each case-insensitively, so this survives casing differences in either
+ * vocabulary without having to guess which one a given deployment actually writes.
  */
 const PORT_LISTENING_STATE_VALUES = ['listening', 'listen'];
 
@@ -335,10 +331,9 @@ function listeningStateClause(value: string): Record<string, unknown> {
 }
 
 /**
- * Resolves the optional `filter` param (issue #8910) to zero or one extra `bool.filter` clause,
+ * Resolves the optional `filter` param to zero or one extra `bool.filter` clause,
  * appended by `buildRequest` after the agent clause. Returns `undefined` for an omitted/blank
- * filter (existing callers with no `filter` supplied get exactly the same request body as before
- * this existed) or the sanitized value collapses to '' after `sanitizeFilterValue` strips it.
+ * filter, or when the sanitized value collapses to '' after `sanitizeFilterValue` strips it.
  *
  * `ports` is the one kind with no single name field in `INVENTORY_FILTER_FIELDS` (its `_source` has
  * `source.port`/`destination.port` instead of one name field) -- handled here directly rather than
@@ -348,21 +343,18 @@ function listeningStateClause(value: string): Record<string, unknown> {
  * by "port 9200". A non-numeric filter ("which process is on port X" asked the other way, "what's
  * using nginx's port") falls back to the same `process.name` prefix match `processes` uses.
  *
- * Issue #8910: a numeric filter matched EITHER side of the socket with no state narrowing, so
- * "what's listening on port 9200" returned every connection touching 9200 (both the listener AND
- * every established peer connection through it) instead of just the listener(s). Issue #8914
- * narrows this: the outer clause is `bool.filter` on the port match (unchanged, still both sides --
- * a `source.port`/`destination.port` OR, since a caller-supplied port can legitimately be either
- * side of a real socket) AND (via a nested `bool.should`/`minimum_should_match: 1`) either
- * `interface.state` case-insensitively matches one of `PORT_LISTENING_STATE_VALUES` OR the
- * `interface.state` field is absent from that document. The "OR absent" arm is the graceful
- * fallback the issue asks for: `interface.state` is NOT made a hard requirement (a `must`/`filter`
- * on a listening-state term alone would silently return zero rows for any document that happens to
- * lack the field -- e.g. an older/partial doc from before the field existed), so a deployment where
- * some or all `ports` documents never carry `interface.state` still gets its port-only match back
- * exactly as before this fix, one document at a time, rather than the whole query going empty. A
- * document that DOES carry `interface.state` and holds a non-listening value (e.g. `established`)
- * is excluded -- that is the actual narrowing this issue exists for. See
+ * A numeric filter matches EITHER side of the socket. The outer clause is `bool.filter` on the
+ * port match (a `source.port`/`destination.port` OR, since a caller-supplied port can legitimately
+ * be either side of a real socket) AND (via a nested `bool.should`/`minimum_should_match: 1`)
+ * either `interface.state` case-insensitively matches one of `PORT_LISTENING_STATE_VALUES` OR the
+ * `interface.state` field is absent from that document. The "OR absent" arm is a graceful
+ * fallback: `interface.state` is NOT made a hard requirement (a `must`/`filter` on a
+ * listening-state term alone would silently return zero rows for any document that happens to
+ * lack the field -- e.g. an older/partial doc from before the field existed), so a deployment
+ * where some or all `ports` documents never carry `interface.state` still gets its port-only
+ * match back, one document at a time, rather than the whole query going empty. A document that
+ * DOES carry `interface.state` and holds a non-listening value (e.g. `established`) is excluded --
+ * that is the narrowing to "what's listening on port X" this clause provides. See
  * `PORT_LISTENING_STATE_VALUES`'s doc comment for why the match is a case-insensitive `term` (not
  * an exact-cased one) against two known spellings, not just the live-confirmed `listening` value
  * alone.
@@ -409,12 +401,10 @@ function buildInventoryFilterClause(
 }
 
 /**
- * Resolves the agent-identifying filter clause from `agent_id`/`agent_name` (issue #8873: a live
- * 40-question run invoked this tool 0/40 times, including on 3 questions statically targeting it,
- * because `agent_id` was strictly required and numeric while the target personas ask deictically
- * -- "this server", "the host" -- with no id the model can infer. Elsewhere in the SAME run the
- * model resolved an agent by calling `get_agents` first, unprompted, so the blocker was this
- * tool's schema, not model reluctance or routing).
+ * Resolves the agent-identifying filter clause from `agent_id`/`agent_name`. Both are optional so
+ * a deictic host reference -- "this server", "the host" -- with no id or name the model can infer
+ * is still callable; see `resolveDeicticAgentParams` below for how that case is resolved
+ * server-side.
  *
  * `agent_id` wins when both are supplied: it is an exact, unambiguous Manager-API identifier,
  * whereas `agent_name` resolves via a `match` clause (free-text, same precedent as
@@ -424,10 +414,10 @@ function buildInventoryFilterClause(
  * and `parseKind` below (the orchestration loop turns a thrown Error into a bounded tool_result
  * the model reads and can retry from).
  *
- * In normal (non-test) operation this "neither supplied" branch is no longer actually reachable
+ * In normal (non-test) operation this "neither supplied" branch is not actually reachable
  * for get_agent_inventory specifically: `resolveDeicticAgentParams` below always runs first (as
  * this tool's `resolveParams` hook) and either injects an `agent_id` or fails the call itself
- * before `buildRequest` -- see that function's doc comment for why (issue #8913). Left in place,
+ * before `buildRequest` -- see that function's doc comment for why. Left in place,
  * unchanged, as defense in depth and because a direct unit-level `buildRequest` call (this file's
  * own tests) bypasses `resolveParams` entirely.
  */
@@ -455,18 +445,13 @@ const MAX_LISTED_AGENT_CANDIDATES = 10;
 const AGENT_LOOKUP_LIMIT = MAX_LISTED_AGENT_CANDIDATES + 1;
 
 /**
- * `ToolDefinition.resolveParams` hook (issue #8913): resolves a deictic agent reference ("this
- * server", "the host") server-side instead of relying on the model to call `get_agents` first --
- * the system prompt used to instruct exactly that, but a live-verified N=5 run of the issue's own
- * worked example ("What software does this box have installed?") found the model followed it 0/5
- * times (4/5 asked the user to name an agent instead of looking one up; 1/5 called
- * `search_wazuh_data` and found nothing) -- a live diagnostic later traced this to `get_agents`
- * (its own 'agents' category) not even being offered alongside a lone 'inventory' route, so the
- * model could not have obeyed that instruction regardless of compliance. The system prompt's
- * get_agent_inventory-specific instruction (prompts.ts) was rewritten accordingly to say "call
- * this tool directly" instead of "call get_agents first". This hook is what makes that reworded
- * instruction actually correct rather than just differently wrong: prompt compliance alone can
- * never be guaranteed, so resolution happens here, server-side, independent of it.
+ * `ToolDefinition.resolveParams` hook: resolves a deictic agent reference ("this
+ * server", "the host") server-side instead of relying on the model to call `get_agents` first.
+ * The system prompt's get_agent_inventory-specific instruction (prompts.ts) tells the model to
+ * call this tool directly, with both `agent_id`/`agent_name` omitted, for a deictic reference --
+ * this hook is what makes that instruction actually correct rather than just aspirational: prompt
+ * compliance alone can never be guaranteed, so resolution happens here, server-side, independent
+ * of it.
  *
  * Only runs when NEITHER `agent_id` NOR `agent_name` was supplied -- a call that supplies either
  * returns `params` unchanged (`ok: true`, no note), so `resolveAgentFilter`'s existing validation
@@ -544,9 +529,8 @@ async function resolveDeicticAgentParams(
           `agent, "${resolvedName}" (id ${resolvedId}). State this assumption to the user rather ` +
           'than presenting the result as if a specific agent had been named.',
         // The hostname the note just interpolated -- declared so executor.ts's
-        // scrubAssumptionNote pseudonymizes it under privacy mode (capture probe P3's leak,
-        // 2026-08-14). The bare agent ID is not declared: wazuh.agent.id is a reviewed 'allow'
-        // in the field policy.
+        // scrubAssumptionNote pseudonymizes it under privacy mode. The bare agent ID is not
+        // declared: wazuh.agent.id is a reviewed 'allow' in the field policy.
         noteEntities: [{ value: resolvedName, kind: 'HOST' as const }],
       },
     };
@@ -570,11 +554,11 @@ async function resolveDeicticAgentParams(
 }
 
 /**
- * Replaces `get_agent_os`/`get_agent_packages`/`get_agent_ports`/`get_agent_processes` (issue:
- * "Consolidate agent inventory into one tool") with one tool taking `agent_id`/`agent_name` +
- * `kind` + `limit` (the `agent_id`-only original schema was later found, live, to make deictic
+ * Replaces `get_agent_os`/`get_agent_packages`/`get_agent_ports`/`get_agent_processes` with one
+ * tool taking `agent_id`/`agent_name` +
+ * `kind` + `limit` (an `agent_id`-only schema makes deictic
  * questions -- "what's installed on this server" -- uncallable; see `resolveAgentFilter`'s doc
- * comment and issue #8873).
+ * comment).
  * Drops the inventory category's schema count from 4 to 1 on every routed turn while raising
  * coverage from 4 of the 13 real `wazuh-states-inventory-*` surfaces to 5 (adds `hotfixes`).
  *
@@ -719,11 +703,11 @@ export const getAgentInventoryTool: ToolDefinition = {
   },
   deriveColumns: true,
   resolveParams: resolveDeicticAgentParams,
-  // Issue #8917: explicit, not inherited from `deriveColumns` above (see
+  // Explicit, not inherited from `deriveColumns` above (see
   // `ToolDefinition.failClosedFieldPolicy`'s doc comment, types.ts). This tool's 5 kinds each
   // read a small, fixed, reviewed `_source` list (`INVENTORY_KIND_CONFIG` above) rather than a
   // genuinely arbitrary caller-supplied field set -- but every one of those fields still needs
   // its own explicit `FIELD_POLICY_DEFAULTS` entry (privacy.ts) before it is safe to relax this,
-  // so it stays `true` today, same as before this flag existed.
+  // so it stays `true`.
   failClosedFieldPolicy: true,
 };

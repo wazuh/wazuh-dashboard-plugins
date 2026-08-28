@@ -4,7 +4,7 @@ import { listToolDefinitions } from '../registry';
 import { IndexerRequest } from '../types';
 
 /**
- * Registry-wide guard for the sampled-label-falsehood class (issue #8921): a `terms` aggregation's
+ * Registry-wide guard for the sampled-label-falsehood class: a `terms` aggregation's
  * bucket KEY does not, in general, determine the label a `top_hits` sub-aggregation samples inside
  * that bucket — one key can span many labels (get_top_rules' rule id -> many titles) or the
  * sampled document's field can itself be a multi-value array with no positional guarantee
@@ -34,8 +34,8 @@ import { IndexerRequest } from '../types';
  * key genuinely determines that label (verified against a live stack, not merely asserted).
  *
  * CRITICAL COMPOUNDING PROPERTY: this test runs registry-wide, driven from `listToolDefinitions()`
- * — a tool that does not exist on this base branch (e.g. #8909's `get_top_agents`, an unmerged
- * agent-name-sampling `terms`+`top_hits` aggregation) will, the moment it is registered, be walked
+ * — a tool that does not exist yet in the registry (e.g. a future agent-name-sampling
+ * `terms`+`top_hits` aggregation) will, the moment it is registered, be walked
  * by this SAME test and fail unless it either adds its own cardinality guard or is added to
  * `SAMPLED_LABEL_ONE_TO_ONE` with a real justification. The class stays closed for tools that do
  * not exist yet.

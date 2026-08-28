@@ -1,10 +1,8 @@
 /**
- * Results card (layout contract §4 — AI/design/redesign-v2-spec.md, "Screen 2"). The card is a
- * 3-row CSS grid: header and the pagination footer are pinned rows, only the middle
- * (`wzResultsCardBody`) row scrolls. This is what makes "page 2 of 6 unreachable without resizing
- * the window" — the BREAKING bug the spec calls out — structurally impossible instead of merely
- * rare: the footer can never end up below the viewport fold, because it is not laid out below an
- * unbounded-height body any more.
+ * Results card. The card is a 3-row CSS grid: header and the pagination footer are pinned rows,
+ * only the middle (`wzResultsCardBody`) row scrolls. This makes "page 2 of 6 unreachable without
+ * resizing the window" structurally impossible instead of merely rare: the footer can never end up
+ * below the viewport fold, because it is not laid out below an unbounded-height body.
  *
  * No `position: sticky` anywhere in here on purpose (Safari/high-DPR rule: "No position:sticky
  * inside an overflow:auto table body" — pinning the header/footer as their own grid rows is the
@@ -30,7 +28,7 @@
   overflow: hidden;
 
   /**
-   * "Card grows" (iteration-4 item 3): applied only once the reader explicitly picks a page size
+   * "Card grows": applied only once the reader explicitly picks a page size
    * above the current default (result-table.tsx's `userPickedPageSize` flag) — a result that
    * already fits the default page size never needed more than the default cap, so the card only
    * grows on a choice that actually produced more rows to show. Same fallback-then-`dvh` pair as
@@ -48,9 +46,9 @@
   }
 
   /**
-   * Issue #9009 (J1): narrow-mode cell truncation. At ~480px (the QA E2E review's reproduction
-   * width) an untruncated cell wraps onto several lines and makes the whole table unreadable; this
-   * clips it to one line with an ellipsis instead, with the full value one `EuiToolTip` away — the
+   * Narrow-mode cell truncation. At ~480px an untruncated cell wraps onto several lines and makes
+   * the whole table unreadable; this clips it to one line with an ellipsis instead, with the full
+   * value one `EuiToolTip` away — the
    * same truncate-plus-tooltip idiom the providers table already uses (settings-page.scss).
    * `anchorClassName` (passed on the `EuiToolTip` in result-table.tsx) bounds the tooltip's own
    * wrapper span the same way, so THAT span doesn't grow wider than the cell either. Nested here
@@ -121,7 +119,7 @@
 
   /**
    * The "Open in Discover" label can run to ~60 characters once it carries a partial-range
-   * disclosure ("Open in Discover (up to Jan 1, 2020 — no start date)", issue #9008 review), and
+   * disclosure ("Open in Discover (up to Jan 1, 2020 — no start date)"), and
    * in a narrow sidecar container that is wider than the card. EUI puts a button's text in its own
    * `.euiButtonEmpty__text` span, which has to be told to ellipse itself — a `min-width: 0` on the
    * flex item alone (result-table.tsx) only permits the shrink, it does not decide what the text
@@ -145,8 +143,8 @@
 /**
  * Column heads take the redesign's own micro-label idiom — the one `wzMicroLabel`
  * (public/components/_redesign.scss) documents as being FOR "section headers and table column
- * heads", and which every table in this plugin was nevertheless ignoring (audit §3.6): they rendered
- * at body size and weight, so a header row read as another data row.
+ * heads", and which every table in this plugin was nevertheless ignoring: they rendered at body
+ * size and weight, so a header row read as another data row.
  *
  * The inner `font: inherit` is the same mechanism `.wzProviderFlyout__exampleChip` uses on its
  * `<code>`: EUI puts the text in its own `.euiTableCellContent__text` span with its own size/weight,
@@ -166,7 +164,7 @@
 /**
  * Severity chip. Takes the SHAPE of the `wzStatusChip` idiom the rest of the redesign uses (fully
  * round, 11px semibold, no border) so a severity is visibly the same class of object as a provider
- * status chip, instead of EUI's default 2px-radius rectangle (audit §3.5).
+ * status chip, instead of EUI's default 2px-radius rectangle.
  *
  * Only the shape: the FILL stays the solid platform severity color result-table.tsx passes in — see
  * the comment at `renderSeverityBadge` for why the tinted-role half of `wzStatusChip` is deliberately

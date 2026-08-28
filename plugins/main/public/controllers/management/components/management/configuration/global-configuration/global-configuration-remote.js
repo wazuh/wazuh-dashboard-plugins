@@ -76,13 +76,13 @@ const agentsSettings = [
 const helpLinks = [
   {
     text: 'Remote daemon reference',
-    href: webDocumentationLink(
-      'user-manual/reference/daemons/wazuh-remoted.html',
-    ),
+    href: webDocumentationLink('user-manual/manager/reference.html#daemons'),
   },
   {
     text: 'Remote configuration reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/remote.html'),
+    href: webDocumentationLink(
+      'user-manual/manager/wazuh-manager-services.html#agent-connection-service',
+    ),
   },
 ];
 

@@ -32,6 +32,8 @@ export type ResponseUpgradeAgents = string;
 
 export type ResponseRemoveAgent = string;
 
+export type ResponseScanAgentsVulnerabilities = string;
+
 export type AgentInfoMinimal = {
   id: string;
   name: string;

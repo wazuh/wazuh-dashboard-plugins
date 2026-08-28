@@ -52,7 +52,7 @@ const popoverServerAddress = (
     Learn about{' '}
     <EuiLink
       href={webDocumentationLink(
-        'user-manual/reference/ossec-conf/client.html#manager-endpoint',
+        'user-manual/agent/agent-enrollment/enrollment-methods/via-agent-configuration/index.html',
         PLUGIN_VERSION_SHORT,
       )}
       target='_blank'
