@@ -18,13 +18,13 @@ export const DEFAULT_TIME_RANGE: TimeRange = { from: 'now-24h', to: 'now' };
  * "The beginning of time" — the lower edge used wherever a query did not state one. TWO
  * independent defects converge on this one constant:
  *
- * 1. A ONE-SIDED clause (issue #9008 review, finding 1). An `lte`-only clause ("findings before
+ * 1. A ONE-SIDED clause. An `lte`-only clause ("findings before
  *    2020-01-01") whose missing lower bound was filled from `DEFAULT_TIME_RANGE.from` produced
  *    `from: 'now-24h', to: '2020-01-01T00:00:00.000Z'` — a window whose start is AFTER its end,
  *    which Discover shows zero rows for while the answer above it showed rows. A missing lower
  *    bound means "from the beginning", so `readRangeClause` fills it from here.
- * 2. A query with NO range clause at all (issue #9026). That was not "a last-24-hours query with
- *    the bound left implicit" — it had no time filter, so its totals cover the whole index. Opening
+ * 2. A query with NO range clause at all. That is not "a last-24-hours query with
+ *    the bound left implicit" — it has no time filter, so its totals cover the whole index. Opening
  *    the link on `DEFAULT_TIME_RANGE` narrowed it to a 24-hour slice of the same query, guaranteeing
  *    a smaller total than the answer above it the moment any matching document was older than a day.
  *    `resolveDiscoverTimeRange` opens that case here instead.
@@ -49,8 +49,8 @@ export const UNBOUNDED_TIME_RANGE: TimeRange = {
 const TIMESTAMP_FIELDS = ['@timestamp', 'state.modified_at', 'timestamp'];
 
 /** Millisecond span of the date-math units `resolveBoundMs` recognizes, plus a year bucket used
- * only by tool-call-label.ts's duration formatter. Deliberately NO week/month bucket (issue #9008
- * review, minor 5): a week/month approximation would format the guardrail's exact 90-day lookback
+ * only by tool-call-label.ts's duration formatter. Deliberately NO week/month bucket: a week/month
+ * approximation would format the guardrail's exact 90-day lookback
  * cap as something other than "90d". Lives here rather than in tool-call-label.ts (`public/`) so
  * `resolveBoundMs` below — which this module itself needs, to order two bounds when intersecting
  * several range clauses — can stay isomorphic; that file imports both from here. */
@@ -156,20 +156,20 @@ export function risonEncode(value: unknown): string {
  * FIELD it bounds, the window it resolves to, and which of the two bounds it actually STATED.
  *
  * Carrying all of that in one shape is what lets a single leaf reader serve every caller in this
- * module (issue #9008 review, cleanup 1). There used to be two near-identical readers behind two
- * near-identical recursive walks — one filling a missing bound for the link, one refusing to for
- * the provenance FACT record — and a fix applied to one copy but not the other would silently
- * reintroduce the requested-vs-effective inconsistency this file exists to prevent.
+ * module. Two near-identical readers behind two near-identical recursive walks — one filling a
+ * missing bound for the link, one refusing to for the provenance FACT record — would let a fix
+ * applied to one copy but not the other silently reintroduce the requested-vs-effective
+ * inconsistency this file exists to prevent.
  *
- * There is now one reader, one walk, and — since issue #9008 review, finding 1 — one RESOLUTION:
- * every public entry point in this file goes through `effectiveRangeClause` below, so the window
+ * There is one reader, one walk, and one RESOLUTION: every public entry point in this file goes
+ * through `effectiveRangeClause` below, so the window
  * the Discover link opens, the coverage its label discloses, and the window recorded as provenance
  * are the same computation over the same clauses. They cannot disagree by construction; what
  * differs between the callers is only what each does with `statedLower`/`statedUpper`.
  */
 interface ReadRangeClause {
   /** The timestamp field this clause bounds — one of `TIMESTAMP_FIELDS`. Clauses are intersected
-   * WITHIN a field and never across two (finding 2); see `effectiveRangeClause`. */
+   * WITHIN a field and never across two; see `effectiveRangeClause`. */
   field: string;
   /**
    * The clause as an openable window, with a missing side filled in. The two sides fill from
@@ -200,8 +200,7 @@ function readRangeClause(clause: unknown): ReadRangeClause | undefined {
     if (fieldRange && typeof fieldRange === 'object') {
       // All three bound spellings OpenSearch accepts are read (gte/lte, the exclusive gt/lt,
       // and the legacy from/to): a model-authored range in any of them is a real window, and
-      // failing to read it silently replaced the promised window with the 24h default (issue
-      // #8920 item 9's time-range half).
+      // failing to read it would silently replace the promised window with the 24h default.
       const bounds = fieldRange as Record<string, unknown>;
       const lower = bounds.gte ?? bounds.gt ?? bounds.from;
       const upper = bounds.lte ?? bounds.lt ?? bounds.to;
@@ -227,8 +226,8 @@ function readRangeClause(clause: unknown): ReadRangeClause | undefined {
 /**
  * The ONE recursive DSL walk in this module: collects every recognized range clause, in the order
  * the walk reaches them. Walks `bool.filter`/`bool.must` whether each is a single clause OBJECT or
- * an array of them (both are legal DSL — the single-object form was previously unread, silently
- * defaulting the window), and follows a nested `bool` arbitrarily deep. `should`/`must_not` are
+ * an array of them (both are legal DSL — missing the single-object form would silently default
+ * the window), and follows a nested `bool` arbitrarily deep. `should`/`must_not` are
  * deliberately not walked: an optional or negated range does not bound what the query matches.
  *
  * A node that IS itself a range clause is not descended into further, so the first entry is exactly
@@ -288,16 +287,16 @@ function pickBound(
 
 /**
  * The ONE window a DSL resolves to — the single source of truth every public entry point in this
- * file reads (issue #9008 review, finding 1). `extractTimeRange` (what the Discover link OPENS),
+ * file reads. `extractTimeRange` (what the Discover link OPENS),
  * `describeTimeRangeCoverage` (what its label DISCLOSES) and `rangeBoundsFromDsl` (what the
  * evidence popover STATES as a recorded fact) all return a view of this same result, so the link
- * and the popover cannot describe the same query differently — the exact disagreement this whole
- * change exists to eliminate. They previously diverged the moment a DSL carried two range clauses:
- * the first two took `clauses[0]` while the third intersected.
+ * and the popover cannot describe the same query differently: computing the window via
+ * `clauses[0]` in one place and via intersection in another would let the two disagree the moment
+ * a DSL carries two range clauses.
  *
  * TWO rules decide the result:
  *
- * 1. FIELD PARTITIONING (finding 2). Clauses are intersected only WITHIN one timestamp field, never
+ * 1. FIELD PARTITIONING. Clauses are intersected only WITHIN one timestamp field, never
  *    across two. A DSL bounding both `@timestamp` and `state.modified_at` describes two independent
  *    axes; taking the latest lower of one against the earliest upper of the other produces a window
  *    that exists in neither — routinely an INVERTED one, which would then be recorded as a
@@ -363,7 +362,7 @@ function effectiveRangeClause(
  * A ONE-SIDED clause counts as explicit here, because the query really did state a window: what
  * the reader has to be told about that case is a different thing (which side was left open), and
  * `describeTimeRangeCoverage` below is what says it. Exported for suggest-discover-query.ts, whose
- * disclosure must SAY when the window was defaulted (issue #8920 item 9). */
+ * disclosure must SAY when the window was defaulted. */
 export function hasExplicitTimeRange(
   dsl: Record<string, unknown> | undefined,
 ): boolean {
@@ -372,14 +371,14 @@ export function hasExplicitTimeRange(
 
 /** How completely a DSL states its own time window — what the "Open in Discover" link's disclosure
  * label is driven by (discover-link.tsx). This describes only what the DSL SAID; what each case
- * then opens is `resolveDiscoverTimeRange`'s decision, and the two no longer agree for the last one:
+ * then opens is `resolveDiscoverTimeRange`'s decision, and the two disagree for the last one:
  *  - `stated`: a clause with both bounds. The link opens exactly the window the query ran.
  *  - `openStart`/`openEnd`: a one-sided clause. The link has to fill the other side, so it says so.
  *  - `defaulted`: no clause at all — "the query stated no window", NOT "the 24h default applies".
- *    The name predates issue #9026, which changed that case to open the UNBOUNDED window (all of
- *    history) precisely because `DEFAULT_TIME_RANGE` under-counted a query that had no time filter;
- *    the label reads "all time". The value is kept as-is because it names the DSL fact this enum is
- *    about, and renaming it would churn every caller for no gain — only the doc was ever wrong.
+ *    The link actually opens the UNBOUNDED window (all of history) for this case, precisely
+ *    because `DEFAULT_TIME_RANGE` would under-count a query that had no time filter; the label
+ *    reads "all time". The value keeps this name because it names the DSL fact this enum is
+ *    about, and renaming it would churn every caller for no gain.
  *    `DEFAULT_TIME_RANGE` still applies for a missing UPPER bound and in
  *    server/tools/suggest-discover-query.ts. */
 export type TimeRangeCoverage =
@@ -397,13 +396,13 @@ export interface TimeRangeDisclosure {
 }
 
 /**
- * Issue #9008 review, finding 1: a one-sided range clause used to be indistinguishable from a
- * fully-stated one in the UI. `hasExplicitTimeRange` returned `true` for it (correctly — the query
- * did state a window), so the link rendered a plain "Open in Discover" while quietly opening a
- * window with one edge the query never asked for. This is the fact the label needs to disclose
- * that case, read off the SAME `effectiveRangeClause` result `extractTimeRange` resolves the
- * link's window from — so a label can never describe a window other than the one its own button
- * opens. Pass the same `nowMs` (`provenance.executedAt`) the link is built with.
+ * A one-sided range clause is indistinguishable from a fully-stated one to `hasExplicitTimeRange`
+ * alone: it returns `true` for it (correctly — the query did state a window), so the link would
+ * render a plain "Open in Discover" while quietly opening a window with one edge the query never
+ * asked for. This function supplies the fact the label needs to disclose that case, read off the
+ * SAME `effectiveRangeClause` result `extractTimeRange` resolves the link's window from — so a
+ * label can never describe a window other than the one its own button opens. Pass the same
+ * `nowMs` (`provenance.executedAt`) the link is built with.
  */
 export function describeTimeRangeCoverage(
   dsl: Record<string, unknown> | undefined,
@@ -446,8 +445,8 @@ export function extractTimeRange(
  *
  * The same `effectiveRangeClause` result `extractTimeRange` above returns, differing ONLY in what
  * it does with a side the DSL never stated: the link owes Discover an openable window and so fills
- * it, while a FACT record has no such licence and reports nothing at all instead (issue #9008
- * review, major 5). So `undefined` here means "the DSL did not bound both edges" — no recognizable
+ * it, while a FACT record has no such licence and reports nothing at all instead. So `undefined`
+ * here means "the DSL did not bound both edges" — no recognizable
  * clause, or every clause it did carry left the same side open — never "the default window".
  *
  * `nowMs` orders date-math bounds while intersecting; pass the value recorded as

@@ -99,12 +99,12 @@ test('extractTimeRange: only gte present falls back to the default "to"', () => 
   assert.deepEqual(extractTimeRange(dsl), { from: 'now-1h', to: 'now' });
 });
 
-// --- Issue #9008 review, finding 1: the ONE-SIDED clause, in both directions -------------------
+// --- The ONE-SIDED clause, in both directions --------------------------------------------------
 // A missing UPPER bound fills from `DEFAULT_TIME_RANGE.to` ("up to now" — the test just above, and
 // deliberately unchanged). A missing LOWER bound must NOT fill from `DEFAULT_TIME_RANGE.from`: an
-// `lte`-only clause bounded at a PAST instant then produced `from: 'now-24h'` with an earlier `to`
-// — a window whose start is after its end, which Discover shows zero rows for while the answer
-// above the link showed rows. Reproduced live on the PR branch.
+// `lte`-only clause bounded at a PAST instant would then produce `from: 'now-24h'` with an earlier
+// `to` — a window whose start is after its end, which Discover shows zero rows for while the
+// answer above the link showed rows.
 
 test('extractTimeRange: only lte present fills the LOWER bound unbounded, not from now-24h', () => {
   const dsl = {
@@ -189,9 +189,9 @@ test('extractTimeRange: undefined dsl falls back to the default 24h window', () 
   assert.deepEqual(extractTimeRange(undefined), { from: 'now-24h', to: 'now' });
 });
 
-// --- rangeFromClause: the gt/lt/from/to bound spellings (issue #8920 item 9's time-range half) --
-// Previously only gte/lte were read; a model-authored range in any of the other three legal
-// OpenSearch spellings silently fell back to the 24h default instead of the real window.
+// --- rangeFromClause: the gt/lt/from/to bound spellings ----------------------------------------
+// A model-authored range in any of the gt/lt/from/to legal OpenSearch spellings must be read;
+// missing any of them would silently fall back to the 24h default instead of the real window.
 
 test('extractTimeRange: exclusive gt/lt bounds are read like gte/lte', () => {
   const dsl = { range: { timestamp: { gt: 'now-2h', lt: 'now' } } };
@@ -209,8 +209,8 @@ test('extractTimeRange: only gt present falls back to the default "to" (same as 
 });
 
 // --- findTimeRangeClause: single-clause-object bool.filter/bool.must, and one bool level deeper -
-// (issue #8920 item 9's time-range half). Both single-object clauses and a nested bool are legal
-// DSL shapes that the previous array-only, one-level walk in extractTimeRange never read.
+// Both single-object clauses and a nested bool are legal DSL shapes that extractTimeRange must
+// read.
 
 test('findTimeRangeClause: bool.filter as a SINGLE clause object (not an array) is still read', () => {
   const dsl = {
@@ -247,9 +247,8 @@ test('findTimeRangeClause: recurses one bool level deeper (a nested bool inside 
   assert.deepEqual(extractTimeRange(dsl), { from: 'now-3d', to: 'now' });
 });
 
-// --- hasExplicitTimeRange: no direct unit test existed at all before this pass. Exported for
-// suggest-discover-query.ts's window-defaulted disclosure (issue #8920 item 9) -- getting this
-// wrong (e.g. always true) would silently drop that disclosure.
+// --- hasExplicitTimeRange: exported for suggest-discover-query.ts's window-defaulted disclosure -
+// getting this wrong (e.g. always true) would silently drop that disclosure.
 
 test("hasExplicitTimeRange: true when extractTimeRange would find the model's own window", () => {
   const dsl = {
@@ -268,7 +267,7 @@ test('hasExplicitTimeRange: false for undefined dsl', () => {
   assert.equal(hasExplicitTimeRange(undefined), false);
 });
 
-// Issue #9008 rework: `rangeBoundsFromDsl` is the ONE function server (executor.ts's provenance
+// `rangeBoundsFromDsl` is the ONE function server (executor.ts's provenance
 // facts) and client (tool-call-label.ts's popover) both read a DSL's time window through, and it
 // must never substitute a default the DSL did not actually state.
 test('rangeBoundsFromDsl: reads the gte/lte pair when an explicit range clause is present', () => {
@@ -284,7 +283,7 @@ test('rangeBoundsFromDsl: undefined for undefined dsl', () => {
   assert.equal(rangeBoundsFromDsl(undefined), undefined);
 });
 
-// Issue #9008 review, major 5: `extractTimeRange` (the Discover LINK's own reader) fills a
+// `extractTimeRange` (the Discover LINK's own reader) fills a
 // missing bound from `DEFAULT_TIME_RANGE` so the link always has an openable window -- a
 // legitimate default for that caller. `rangeBoundsFromDsl` feeds `TableSpec.provenance`, a FACT
 // record, and must NOT inherit that default: an escape-hatch query with only an `lte` bound (no
@@ -299,7 +298,7 @@ test('rangeBoundsFromDsl: undefined for a one-sided clause (gte only, no lte)', 
   assert.equal(rangeBoundsFromDsl(dsl), undefined);
 });
 
-// --- Issue #9008 review, finding 2: SEVERAL required range clauses ------------------------------
+// --- SEVERAL required range clauses -------------------------------------------------------------
 // A query can legitimately carry more than one `@timestamp` range clause under bool.filter/must
 // (`clampLookbackWindow`'s own doc comment says so). Every returned row satisfied ALL of them, so
 // the window the provenance popover states must be their INTERSECTION — the latest lower bound and
@@ -472,7 +471,7 @@ test('rangeBoundsFromDsl: undefined when every clause leaves the SAME side open'
   });
 });
 
-// --- Issue #9008 review, F2: clauses are partitioned BY FIELD before being intersected -----------
+// --- Clauses are partitioned BY FIELD before being intersected ---------------------------------
 // A DSL bounding two different timestamp fields describes two independent axes. Taking the latest
 // lower of one against the earliest upper of the other produces a window that exists in neither --
 // routinely an INVERTED one, which would then be recorded as a provenance FACT. That would be a
@@ -576,11 +575,12 @@ test('rangeBoundsFromDsl: a lone non-priority field is still read', () => {
   });
 });
 
-// --- Issue #9008 review, F1: the link, its label and the provenance record are ONE resolution ----
+// --- The link, its label and the provenance record are ONE resolution --------------------------
 // `extractTimeRange` (what the button OPENS), `describeTimeRangeCoverage` (what its label SAYS) and
-// `rangeBoundsFromDsl` (what the popover STATES) used to take clauses[0] for the first two while
-// the third intersected, so a two-clause DSL opened the wider window and stated the narrower one --
-// the exact link-vs-popover disagreement this change exists to eliminate.
+// `rangeBoundsFromDsl` (what the popover STATES) all resolve through the same computation: taking
+// `clauses[0]` for the first two while intersecting for the third would let a two-clause DSL open
+// the wider window while stating the narrower one -- exactly the link-vs-popover disagreement this
+// file's single resolution eliminates.
 
 test('extractTimeRange and rangeBoundsFromDsl agree on a multi-clause DSL', () => {
   const dsl = {
@@ -769,9 +769,9 @@ test('resolveDiscoverTimeRange: a gte-only clause fills its missing UPPER bound 
 });
 
 test('resolveDiscoverTimeRange: an lte-only clause fills its missing LOWER bound unbounded, never inverted', () => {
-  // The bug: the missing lower bound used to fill from `DEFAULT_TIME_RANGE.from` ('now-24h'), so an
-  // lte-only clause bounded at a PAST instant produced from > to -- a window Discover shows nothing
-  // at all for. A missing lower bound means "from the beginning".
+  // The bug: filling the missing lower bound from `DEFAULT_TIME_RANGE.from` ('now-24h') would let
+  // an lte-only clause bounded at a PAST instant produce from > to -- a window Discover shows
+  // nothing at all for. A missing lower bound means "from the beginning".
   const range = resolveDiscoverTimeRange({
     dsl: { range: { '@timestamp': { lte: '2026-01-01T00:00:00.000Z' } } },
   });

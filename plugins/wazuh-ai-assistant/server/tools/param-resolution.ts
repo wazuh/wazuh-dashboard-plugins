@@ -18,12 +18,12 @@ import {
 import { resolveTimeRange } from './catalog/common';
 
 /**
- * Generic sole-candidate parameter resolution (issue: "generic sole-candidate parameter
- * resolution"). Template: issue #8913's `resolveDeicticAgentParams`
- * (catalog/get-agent-inventory.ts) -- a live-verified system-prompt-only instruction to call a
- * lookup tool first when a question refers deictically ("this server", "my auditor wants proof of
- * SSH hardening") measured 0/5; the code hook that resolves the missing parameter server-side,
- * against a live source, works and is the template this file generalizes so every catalog tool
+ * Generic sole-candidate parameter resolution. Template:
+ * `get-agent-inventory.ts`'s `resolveDeicticAgentParams` -- a system-prompt-only instruction to
+ * call a lookup tool first when a question refers deictically ("this server", "my auditor wants
+ * proof of SSH hardening") is not reliable on its own; the code hook that resolves the missing
+ * parameter server-side, against a live source, works and is the template this file generalizes
+ * so every catalog tool
  * with a `soleCandidateParams` declaration (types.ts) gets the same behavior without writing its
  * own `resolveParams` hook.
  *
@@ -82,7 +82,7 @@ export interface ManagerAgentSummary {
 /**
  * Fetches the active-agent list from the Manager API (`GET /agents`), the same source and filters
  * `get-agents.ts`'s own tool reads. Shared by `get-agent-inventory.ts`'s own
- * `resolveDeicticAgentParams` (issue #8913, unchanged wording -- see that file) and this module's
+ * `resolveDeicticAgentParams` (same wording -- see that file) and this module's
  * generic `manager-agents` resolution, so both read exactly the same notion of "the agent",
  * neither a new one. Throws on any lookup failure (network, auth, malformed response) -- callers
  * are expected to wrap this in their own try/catch and degrade to a plain bounded error, same
@@ -354,16 +354,16 @@ export type ScaCheckOwnerLookupResult =
   | { kind: 'error' };
 
 /**
- * BLOCKER FIX (CV-053/CV-052/CV-088 turn 3 -- 2026-08-19 adjudicated run, "more than one active
- * agent exists" false-premise refusal): `get_sca_checks` used to require `agent_id` to resolve
- * FIRST against the Manager's fleet-wide active-agent list (`lookupManagerAgentsCandidate` above)
- * even when the caller already named a specific `check_id` -- a value that, on its own, uniquely
- * identifies the SCA document (and therefore the owning agent+policy) the caller is asking about.
- * Verified live (adjudication note): `wazuh-states-sca` holds exactly ONE document for check
- * `28500`, yet the fleet-wide active-agent count the OLD path depended on was ambiguous, so the
- * call refused before ever looking at the one document that actually answers "which agent/policy".
+ * Fix for a "more than one active agent exists" false-premise refusal: `get_sca_checks` used to
+ * require `agent_id` to resolve FIRST against the Manager's fleet-wide active-agent list
+ * (`lookupManagerAgentsCandidate` above) even when the caller already named a specific `check_id`
+ * -- a value that, on its own, uniquely identifies the SCA document (and therefore the owning
+ * agent+policy) the caller is asking about. Verified live: `wazuh-states-sca` holds exactly ONE
+ * document for check `28500`, yet the fleet-wide active-agent count the OLD path depended on was
+ * ambiguous, so the call refused before ever looking at the one document that actually answers
+ * "which agent/policy".
  *
- * This is the "resolve from the question's own scope" fix the review calls for: given a
+ * This resolves from the question's own scope instead: given a
  * `check_id`, query `wazuh-states-sca*` DIRECTLY for `check.id: check_id` (unscoped by agent) and
  * read `wazuh.agent.id`/`policy.id` straight off the matching document(s) -- never touching the
  * fleet-wide agent list at all. A `check_id` inherently narrows the candidate space far more than
@@ -476,8 +476,8 @@ async function resolveOneParam(
       note: string;
       /** Identifier values interpolated into `note`, threaded up to
        * `ResolvedToolParams.noteEntities` (types.ts) so executor.ts pseudonymizes them under
-       * privacy mode (capture probe P3, 2026-08-14: an undeclared resolved hostname reached
-       * the provider in the clear). Empty for values that are not identifiers (a policy id). */
+       * privacy mode (an undeclared resolved hostname otherwise reaches the provider in the
+       * clear). Empty for values that are not identifiers (a policy id). */
       noteEntities: Array<{
         value: string;
         kind: 'HOST' | 'IP' | 'USER' | 'URL' | 'VAL';
@@ -642,7 +642,7 @@ async function resolveOneParam(
 /**
  * Builds a `ToolDefinition.resolveParams` hook from a tool's own `soleCandidateParams`
  * declaration (types.ts) -- the generic counterpart to `get-agent-inventory.ts`'s hand-written
- * `resolveDeicticAgentParams` (issue #8913), for every other catalog tool that needs the same
+ * `resolveDeicticAgentParams`, for every other catalog tool that needs the same
  * "resolve a deictic/omitted parameter against a live source" behavior without writing its own
  * hook. Attached automatically by `registry.ts` at load time for any tool that declares
  * `soleCandidateParams` and no hand-written `resolveParams` of its own.
@@ -700,7 +700,7 @@ export function buildGenericResolveParams(
 }
 
 /**
- * BLOCKER FIX (CV-053/CV-052/CV-088 turn 3): `get_sca_checks`-specific `resolveParams`, wrapping
+ * `get_sca_checks`-specific `resolveParams`, wrapping
  * `buildGenericResolveParams` rather than replacing it. When the caller supplies a `check_id` AND
  * is missing `agent_id` and/or `policy_id`, resolves BOTH from the check's own document
  * (`lookupScaCheckOwner` above) instead of falling through to the fleet-wide, potentially-ambiguous

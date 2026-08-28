@@ -12,6 +12,7 @@ import { Agent } from '../../types';
 import { EditAgentsGroupsModal } from './edit-groups/edit-groups-modal';
 import { UpgradeAgentsModal } from './upgrade/upgrade-modal';
 import { RemoveAgentsModal } from './remove/remove-modal';
+import { ScanVulnerabilitiesAgentsModal } from './scan-vulnerabilities/scan-vulnerabilities-modal';
 
 export interface AgentsTableGlobalActionsProps {
   selectedAgents: Agent[];
@@ -36,6 +37,10 @@ export const AgentsTableGlobalActions = ({
   const [isUpgradeAgentsVisible, setIsUpgradeAgentsVisible] = useState(false);
   const [isRemoveAgentsModalVisible, setIsRemoveAgentsModalVisible] =
     useState(false);
+  const [
+    isScanVulnerabilitiesAgentsVisible,
+    setIsScanVulnerabilitiesAgentsVisible,
+  ] = useState(false);
 
   const onButtonClick = () => {
     setPopover(!isPopoverOpen);
@@ -69,6 +74,7 @@ export const AgentsTableGlobalActions = ({
     addGroups: 'Add groups to agents',
     removeGroups: 'Remove groups from agents',
     upgrade: 'Upgrade agents',
+    scanVulnerabilities: 'Scan vulnerabilities of agents',
     remove: 'Remove agents',
   };
 
@@ -138,6 +144,23 @@ export const AgentsTableGlobalActions = ({
               </span>
             )}
           </EuiContextMenuItem>
+          <EuiContextMenuItem
+            icon='search'
+            disabled={!totalAgents}
+            onClick={() => {
+              closePopover();
+              setIsScanVulnerabilitiesAgentsVisible(true);
+            }}
+          >
+            {!totalAgents ? (
+              selectAgentsTooltip(actions.scanVulnerabilities)
+            ) : (
+              <span>
+                {actions.scanVulnerabilities}
+                {totalAgents ? ` (${totalAgents})` : ''}
+              </span>
+            )}
+          </EuiContextMenuItem>
           <EuiHorizontalRule margin='xs' />
           <EuiContextMenuItem
             icon='trash'
@@ -178,6 +201,17 @@ export const AgentsTableGlobalActions = ({
           reloadAgents={() => reloadAgents()}
           onClose={() => {
             setIsUpgradeAgentsVisible(false);
+          }}
+        />
+      ) : null}
+      {isScanVulnerabilitiesAgentsVisible ? (
+        <ScanVulnerabilitiesAgentsModal
+          selectedAgents={selectedAgents}
+          allAgentsSelected={allAgentsSelected}
+          filters={filters}
+          reloadAgents={() => reloadAgents()}
+          onClose={() => {
+            setIsScanVulnerabilitiesAgentsVisible(false);
           }}
         />
       ) : null}

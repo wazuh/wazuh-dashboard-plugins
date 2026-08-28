@@ -3,17 +3,16 @@ import { MAX_VISIBLE_RESULT_COLUMNS } from '../../../common/types';
 import { listToolDefinitions } from '../registry';
 
 /**
- * Registry-wide guard for the client-side column budget (issue #8921): result-table.tsx renders
+ * Registry-wide guard for the client-side column budget: result-table.tsx renders
  * only the first `MAX_VISIBLE_RESULT_COLUMNS` of a tool's `tableSpec.columns` as visible table
  * columns — anything after that is reachable only through the row expander. That budget is a
  * rendering invariant, but which columns fall past it is a SERVER-side ordering decision, and two
  * classes of column must never fall off the edge silently:
  *
- * 1. The SEVERITY column. The issue lists "missing severity" as a defect; a `severity: true`
- *    column demoted past the budget removes the one at-a-glance triage signal the badge exists
- *    for (the concrete regression this caught: get_mitre_findings' 7-column spec had Level at
- *    position 7 — the budget hid the severity badge from the exact tool whose findings are
- *    triaged by severity).
+ * 1. The SEVERITY column. A `severity: true` column demoted past the budget removes the one
+ *    at-a-glance triage signal the badge exists for (the concrete regression this caught:
+ *    get_mitre_findings' 7-column spec had Level at position 7 — the budget hid the severity
+ *    badge from the exact tool whose findings are triaged by severity).
  *
  * 2. Nothing else is asserted here BY DESIGN: which non-severity columns win visibility is a
  *    per-tool editorial decision (each reordered tool records its reasoning in its own file),

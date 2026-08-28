@@ -157,7 +157,7 @@ test('buildGenericResolveParams (manager-agents): exactly one active agent resol
   assert.equal(result.resolved.params.agent_id, '001');
   assert.match(result.resolved.note ?? '', /wazuh-aio-5/);
   assert.match(result.resolved.note ?? '', /001/);
-  // Privacy capture probe P3 (2026-08-14): the raw hostname in this note reached the provider in
+  // The raw hostname in this note reached the provider in
   // the clear under privacy mode. The resolver must DECLARE it so executor.ts's
   // scrubAssumptionNote can pseudonymize it -- an undeclared identifier here is the leak
   // recurring.
@@ -444,9 +444,9 @@ test('buildGenericResolveParams: a failed FIRST param short-circuits before the 
   );
 });
 
-// --- BLOCKER FIX (CV-053/CV-052/CV-088 turn 3): lookupScaCheckOwner / resolveScaCheckParams -----
+// --- BLOCKER FIX: lookupScaCheckOwner / resolveScaCheckParams -----------------------------------
 //
-// CV-053 ("How do I remediate failed check ID 28500?") refused with "more than one active agent
+// The question "How do I remediate failed check ID 28500?" refused with "more than one active agent
 // exists" even though the live `wazuh-states-sca` index holds exactly ONE document for that check
 // id -- the fleet-wide `manager-agents` lookup was consulted before the question's own scope (the
 // check id itself) ever was. These tests reproduce the "1 real agent + 2 unrelated seed docs"
@@ -593,7 +593,7 @@ function stubScaTool(): ToolDefinition {
   ]);
 }
 
-test('resolveScaCheckParams: CV-053 regression -- check_id alone resolves without ever consulting the fleet-wide agent list', async () => {
+test('resolveScaCheckParams: check_id alone resolves without ever consulting the fleet-wide agent list', async () => {
   const tool = stubScaTool();
   const resolve = resolveScaCheckParams(tool);
   const { context, managerCallLog } = fakeHitsContext({

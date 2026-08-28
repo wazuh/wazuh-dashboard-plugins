@@ -11,25 +11,24 @@ export interface Digest {
   tool: string;
   counts: { total?: number; returned: number; truncated: boolean };
   /** `agg` is set only when the executed query had more than one top-level aggregation — the
-   * search_wazuh_data escape hatch (a hand-built multi-agg query) and, since #8870's fix, every
-   * finding-hits typed tool (`catalog/common.ts`'s `FINDING_BREAKDOWN_AGGS` always attaches two:
-   * by agent name and by rule title) — naming which aggregation a bucket belongs to; single-agg
-   * digests stay byte-identical to before it existed. It also lets privacy.ts's field-policy pass
-   * attribute each bucket key to the right aggregation field. */
+   * search_wazuh_data escape hatch (a hand-built multi-agg query) and every finding-hits typed
+   * tool (`catalog/common.ts`'s `FINDING_BREAKDOWN_AGGS` always attaches two: by agent name and
+   * by rule title) — naming which aggregation a bucket belongs to; single-agg digests omit it.
+   * It also lets privacy.ts's field-policy pass attribute each bucket key to the right
+   * aggregation field. */
   breakdown?: Array<{ key: string; count: number; agg?: string }>;
   /** Set in exactly three situations, each a distinct honesty gap the model cannot see on its own:
    *
    * 1. `breakdown` was synthesized from the RETURNED page (`buildSyntheticBreakdown`) rather than
    *    a real OpenSearch aggregation over the full matched set (`buildBreakdown`), AND that page
    *    is not the whole matched set (`counts.truncated`) — i.e. an entity whose rows sort outside
-   *    the page is invisible to `breakdown`, the exact defect #8870's validation update
-   *    reproduced live (limit:20 on 26 matches synthesizing 13/7 and 11/9 while the true
-   *    distribution is 16/8/2 and 13/13). Tells the model `breakdown` is NOT authoritative for
-   *    the full result, unlike `samplesNote` (which caveats `samples` only).
+   *    the page is invisible to `breakdown` (e.g. limit:20 on 26 matches can synthesize 13/7 and
+   *    11/9 while the true distribution is 16/8/2 and 13/13). Tells the model `breakdown` is NOT
+   *    authoritative for the full result, unlike `samplesNote` (which caveats `samples` only).
    * 2. `breakdown` came from a REAL terms aggregation whose BUCKET LIST is truncated — either
    *    OpenSearch's own `sum_other_doc_count` > 0 (a request-side `size` truncation) or this
-   *    digest's own char-budgeted carry (`capBreakdownCarry`/`BREAKDOWN_CHAR_BUDGET` — issue
-   *    #8935 item 1, for an enumeration-sized aggregation like `get_sca_results`), or both,
+   *    digest's own char-budgeted carry (`capBreakdownCarry`/`BREAKDOWN_CHAR_BUDGET`, for an
+   *    enumeration-sized aggregation like `get_sca_results`), or both,
    *    merged into one figure (`mergeTruncation`). Per-bucket COUNTS are still exact and
    *    population-true, but the KEY SET is incomplete: presenting 5 agent-name buckets as "the
    *    agents affected" on a 12-agent deployment reproduces the exact
@@ -39,9 +38,9 @@ export interface Digest {
    *    when it was the digest that trimmed (`CARRY_TRIM_SENTENCE`).
    * 3. `breakdown` was synthesized and a dimension had more than `BREAKDOWN_BUCKET_CAP` distinct
    *    values — the same "top-N key set" gap as case 2, just arising from a JS `Map` cut instead
-   *    of an OpenSearch `sum_other_doc_count` (#8935's synthetic-breakdown silent-bind fix: the
-   *    base disclosed nothing here, because no request-side `sum_other_doc_count` equivalent
-   *    exists for a page grouped in memory). Over an UNTRUNCATED page with a KNOWN total
+   *    of an OpenSearch `sum_other_doc_count`: no request-side `sum_other_doc_count` equivalent
+   *    exists for a page grouped in memory, so this note is the only signal available. Over an
+   *    UNTRUNCATED page with a KNOWN total
    *    (`returned === total`) counts are exact and the note says top-by-count (provably true —
    *    the cut is sorted in this file); over a truncated or unknown-total page the case-1
    *    page-scope note gets the hidden-values sentence appended instead, with no exactness claim.
@@ -57,9 +56,9 @@ export interface Digest {
   /** Set only when `counts.returned` is 0 AND the executed query carried 2+ filter clauses — see
    * `buildZeroRowHint` below. A 0-row result is exactly as consistent with "a wrong field name" or
    * "an over-narrow filter" as with "genuinely no matching data"; the system prompt already tells
-   * the model to retry broader in that situation, but relying on it noticing on its own has
-   * measurably failed (see the issue this exists for), so this makes the ambiguity mechanical
-   * instead. A single-filter 0-row result is an ordinary, unambiguous "no data" and gets no hint. */
+   * the model to retry broader in that situation, but relying on it noticing on its own is
+   * unreliable, so this makes the ambiguity mechanical instead. A single-filter 0-row result is
+   * an ordinary, unambiguous "no data" and gets no hint. */
   hint?: string;
   samples: Array<Record<string, unknown>>;
   /** Set only when `samples.length < counts.returned` — see `buildSamplesNote`: a one-sentence
@@ -67,8 +66,8 @@ export interface Digest {
    * does not read an entity's absence from `samples` as a fact about the whole result set. */
   samplesNote?: string;
   /**
-   * POSITIVE coverage statement (issue #8935's Guarantee 2): what the numbers in this digest are
-   * computed over, said explicitly, in both directions.
+   * POSITIVE coverage statement: what the numbers in this digest are computed over, said
+   * explicitly, in both directions.
    *
    * Every other note here warns the model when something is NOT trustworthy. None of them ever said
    * the opposite — so even when a count was population-true (OpenSearch computes an aggregation over
@@ -96,8 +95,8 @@ export interface Digest {
   /**
    * Every metric-shaped (`isMetricAggValue`) or single-bucket-count (`isSingleBucketDocCount`)
    * TOP-LEVEL aggregation, keyed by the model's own agg name — populated UNCONDITIONALLY whenever
-   * at least one such aggregation is in the response (issue #8920 item 5, e.g. `aggs: {by_rule:
-   * {terms...}, distinct_agents: {cardinality...}}`). It is deliberately populated even for a
+   * at least one such aggregation is in the response (e.g. `aggs: {by_rule: {terms...},
+   * distinct_agents: {cardinality...}}`). It is deliberately populated even for a
    * metric-ONLY response, where `bucketsToRows`' synthesized row (see its doc comment) already
    * carries the same numbers: the synthesized row exists for the rendered table and is subject to
    * column projection (`deriveResultColumns`' `_source` priority, or a typed tool's static
@@ -211,10 +210,10 @@ export function isSingleBucketDocCount(v: unknown): v is { doc_count: number } {
  * `top_metrics`), OBJECT-keyed buckets (`filters` with named filters, `range`/`date_range` with
  * `keyed: true`), and a top-level `top_hits` — are reachable through the search_wazuh_data escape
  * hatch today (guardrails.ts's `checkAggs` restricts aggregation FIELDS and SIZES, never TYPES),
- * and used to serialize as a bare `returned: 0`: a silent lie about a query OpenSearch fully
- * answered. `buildDigest` turns this list into an explicit hint instead, so an unrepresentable
- * shape degrades to a disclosed gap the model can react to (rerun with a supported shape), never
- * to a fabricated "no data".
+ * and without this list would serialize as a bare `returned: 0` — a silent lie about a query
+ * OpenSearch fully answered. `buildDigest` turns this list into an explicit hint instead, so an
+ * unrepresentable shape degrades to a disclosed gap the model can react to (rerun with a
+ * supported shape), never to a fabricated "no data".
  */
 function findUnrepresentableAggs(result: unknown): string[] {
   const aggregations = (
@@ -293,7 +292,7 @@ const MAX_HINT_LENGTH = 1000;
 
 /**
  * Resolves one dotted path segment-by-segment against `source`. Unlike a plain reduce, a segment
- * hit on an ARRAY does not stop resolution (P-2, AI/plan/a1a-review.md — "getByPath must traverse
+ * hit on an ARRAY does not stop resolution ("getByPath must traverse
  * arrays"): it maps the REMAINING path over every array element and returns the array of
  * per-element results, so e.g. `"queries.id"` resolves through the `queries` array (one entry per
  * SAP finding's compiled query) instead of returning `undefined` the moment the walk reaches the
@@ -366,12 +365,12 @@ function hitsToRows(
  * bucket-shaping code needed.
  *
  * Which TOP-LEVEL aggregation supplies the buckets is resolved by scanning every top-level key IN
- * ORDER for the first one whose `.buckets` is an array — not just `Object.keys(aggregations)[0]`
- * (issue #8920 item 5). The escape hatch lets the model declare more than one top-level
- * aggregation in any order, so a metric agg (`aggs: {distinct_agents: {cardinality...}, by_rule:
- * {terms...}}`) that happens to sort first must not mask a bucket agg that comes after it — the
- * defect this fixes silently reported `returned: 0`/an empty table for that exact shape, even
- * though `by_rule`'s buckets were right there in the response.
+ * ORDER for the first one whose `.buckets` is an array — not just `Object.keys(aggregations)[0]`.
+ * The escape hatch lets the model declare more than one top-level aggregation in any order, so a
+ * metric agg (`aggs: {distinct_agents: {cardinality...}, by_rule: {terms...}}`) that happens to
+ * sort first must not mask a bucket agg that comes after it — otherwise that exact shape would
+ * silently report `returned: 0`/an empty table, even though `by_rule`'s buckets were right there
+ * in the response.
  *
  * When NO top-level aggregation has an ARRAY of buckets at all (a metric-only query, e.g. a bare
  * "how many distinct X" `cardinality` aggregation, or a bare `filter` count), a single row is
@@ -385,7 +384,7 @@ function hitsToRows(
  */
 /**
  * Picks the element that belongs to a bucket out of a sampled document's PARALLEL multi-value
- * arrays (UI run 2026-08-14, finding 7). get_mitre_summary buckets on
+ * arrays. get_mitre_summary buckets on
  * `wazuh.rule.mitre.technique.id`, and its `top_hits` sample carries the id, name and tactic
  * arrays of one document — arrays that are parallel by construction, which is precisely why that
  * tool adds the id itself to its `_source` (see get-mitre-summary.ts's column-design comment:
@@ -780,9 +779,9 @@ function deriveResultColumns(
 }
 
 /** Segments whose conventional rendering is an acronym rather than a capitalized word (e.g.
- * "ip" -> "IP", not "Ip") — issue #8921's inconsistent-labels item: a derived column's label must
- * read like the hand-written labels the static-column tools use (get_vulnerabilities' "CVE"/
- * "Architecture"), not like a raw field segment with its first letter capitalized. */
+ * "ip" -> "IP", not "Ip"): a derived column's label must read like the hand-written labels the
+ * static-column tools use (get_vulnerabilities' "CVE"/"Architecture"), not like a raw field
+ * segment with its first letter capitalized. */
 const LABEL_ACRONYMS: Record<string, string> = {
   ip: 'IP',
   id: 'ID',
@@ -799,11 +798,11 @@ function capitalizeSegment(segment: string): string {
 }
 
 /**
- * Last path segment, capitalized (e.g. "wazuh.rule.title" -> "Title"). Issue #8921's
- * inconsistent-labels item: two derived columns sharing a last segment (e.g. get_agent_inventory's
- * `ports` kind — "source.port" and "destination.port" both end in "port") used to fall back to the
- * RAW dot-path for BOTH, so a reader saw friendly labels ("State", "Name", "Transport") sitting
- * next to un-humanized ones ("source.port", "destination.ip", "source.ip") in the same header row.
+ * Last path segment, capitalized (e.g. "wazuh.rule.title" -> "Title"). Two derived columns
+ * sharing a last segment (e.g. get_agent_inventory's `ports` kind — "source.port" and
+ * "destination.port" both end in "port") would otherwise fall back to the RAW dot-path for BOTH,
+ * so a reader would see friendly labels ("State", "Name", "Transport") sitting next to
+ * un-humanized ones ("source.port", "destination.ip", "source.ip") in the same header row.
  * A collision is disambiguated with the PARENT segment instead ("Source Port"/"Destination Port"),
  * which stays a real label rather than degrading to the raw path — the raw path remains one hover
  * away via the column header's `title` tooltip (result-table.tsx), so nothing about the field's
@@ -879,7 +878,7 @@ export function buildTableSpec(
     return out;
   });
 
-  // Bucket-row fallthrough guard (UI run 2026-08-14, A2): a fixed-column tool whose response had
+  // Bucket-row fallthrough guard: a fixed-column tool whose response had
   // ZERO hits but a populated aggregation (get_sca_checks with a `search` fragment -- the
   // post_filter moved the fragment out of the query, so hits are empty by design and
   // `bucketsToRows` supplies the rows) projects hit-document columns onto bucket-shaped rows.
@@ -936,7 +935,7 @@ export function buildTableSpec(
  * aggregation's name) so the model can tell which aggregation a count belongs to — and so
  * privacy.ts's `applyFieldPolicy` can resolve each bucket key against the RIGHT aggregation's
  * field policy rather than only the first's. The rendered `table` event (buildTableSpec) still
- * only reflects the first BUCKET aggregation (`bucketsToRows`'s scan, since #8920 item 5 — a
+ * only reflects the first BUCKET aggregation (`bucketsToRows`'s scan — a
  * metric agg ahead of it in key order is skipped over rather than masking it) — documented as a
  * known limitation in search_wazuh_data.ts's tool description — so this is a digest-only
  * improvement.
@@ -1027,14 +1026,14 @@ function describeFilterClause(clause: unknown): string | undefined {
 const MIN_FILTERS_FOR_ZERO_ROW_HINT = 2;
 
 /**
- * Mechanical zero-row hint (issue: field-name validation's companion — one catches a wrong field
+ * Mechanical zero-row hint (field-name validation's companion — one catches a wrong field
  * name before the query runs, this catches an over-narrow filter on a field that DOES exist,
  * after the fact). Fires only at `returned === 0` and 2+ top-level `query.bool.filter` clauses;
  * a single-filter 0-row result is ordinary and gets no hint (no noise on a legitimately narrow,
  * correct query). `requestBody` is only ever passed for the Indexer path (see `buildDigest`'s call
  * sites in executor.ts) — Manager responses have no DSL filters to name, so this is a no-op there.
  *
- * POST_FILTER-AWARE (#8935 item I2): a `post_filter` narrows the HITS — and `hits.total` — AFTER
+ * POST_FILTER-AWARE: a `post_filter` narrows the HITS — and `hits.total` — AFTER
  * every aggregation is computed, so a 0 total through a post_filter is NOT evidence the query
  * matched nothing, and the wrong-field/over-narrow wording below would blame the query's own
  * filter clauses while the aggregations sit in the same digest holding the real, population-true
@@ -1102,19 +1101,20 @@ function buildZeroRowHint(
 export const BREAKDOWN_BUCKET_CAP = 5;
 
 /**
- * REQUEST-side `terms` size for an aggregation that IS the answer (issue #8935): the size a
+ * REQUEST-side `terms` size for an aggregation that IS the answer: the size a
  * catalog tool gives an enumeration aggregation ("name every matching check") when it does not
  * derive one from a caller `limit` via `clampAggLimit`. Exported for the same reason
  * `BREAKDOWN_BUCKET_CAP` is (catalog request sizing must reference the constant, not restate the
- * number — the #8894 drift class). 50 realistic ~45-char keys serialize to ~3,300 chars, so an
+ * number — see guardrails.ts's `MAX_AGG_SIZE` doc comment for why that drift matters). 50
+ * realistic ~45-char keys serialize to ~3,300 chars, so an
  * answer aggregation this size is carried essentially whole by the digest's char-budgeted carry
  * below (`BREAKDOWN_CHAR_BUDGET`); anything the carry cannot fit is disclosed, never dropped.
  *
  * This constant does NOT cap what the digest carries. The digest-side carry is char-budgeted
  * (`capBreakdownCarry` below), not count-capped: a flat count cap would trim a 100-bucket
  * short-key enumeration (e.g. rule ids, ~27 chars/entry, ~2,700 chars total) that demonstrably
- * fits — cutting by a number when the information fits is exactly the class this issue exists to
- * remove. Does not change `MAX_SAMPLES` (5) or `MAX_AGG_SIZE` (100).
+ * fits — cutting by a number when the information fits is exactly the class this constant exists
+ * to avoid. Does not change `MAX_SAMPLES` (5) or `MAX_AGG_SIZE` (100).
  */
 export const ANSWER_BUCKET_CAP = 50;
 
@@ -1124,7 +1124,7 @@ export const ANSWER_BUCKET_CAP = 50;
  * columns, notes and the `MAX_SAMPLES` sample rows (5 SCA sample rows serialize to roughly 500
  * chars). `capBreakdownCarry` fills each aggregation's fair share of this budget with buckets IN
  * RESPONSE ORDER and discloses whatever did not fit; it never re-ranks. A char budget rather than
- * a bucket count, in both directions deliberately (issue #8935 integration review):
+ * a bucket count, in both directions deliberately:
  *  - short keys fit MORE buckets: a 100-bucket rule-id enumeration (~2,700 chars) is carried
  *    whole, where a flat 50-bucket cap would have trimmed information that fits;
  *  - the budget is GLOBAL: guardrails allows up to `MAX_TOP_LEVEL_AGGS` (5) top-level
@@ -1150,9 +1150,9 @@ export const BREAKDOWN_CHAR_BUDGET = 3000;
  * have the exact same bucket-scrubbing logic apply as for a real aggregation's breakdown.
  *
  * Also returns, per dimension, how many DISTINCT VALUES beyond the top `BREAKDOWN_BUCKET_CAP` were
- * cut and the summed row count they represent (`hiddenPerDimension`) — issue #8935's silent-bind
- * fix: on the base, when a dimension has more than `BREAKDOWN_BUCKET_CAP` distinct values, the
- * top-5 cut silently drops the rest with no `sum_other_doc_count` equivalent to disclose it —
+ * cut and the summed row count they represent (`hiddenPerDimension`): without this, when a
+ * dimension has more than `BREAKDOWN_BUCKET_CAP` distinct values, the
+ * top-5 cut would silently drop the rest with no `sum_other_doc_count` equivalent to disclose it —
  * unlike a real terms aggregation, which always carries one. That holds on BOTH page shapes: over
  * an untruncated page the counts are population-exact yet the key list is still a cut, and over a
  * truncated page the page-scope note alone says nothing about values cut WITHIN the returned rows.
@@ -1208,10 +1208,10 @@ function buildSyntheticBreakdown(
 }
 
 /**
- * Hidden-distinct-values disclosure for a PAGE-SCOPED synthetic breakdown (issue #8935 item 1,
- * integration review — this is the COMMON branch of the silent bind, since a synthetic breakdown
- * mostly exists because the page IS truncated): `buildBreakdownNote` already labels the breakdown
- * page-only, but on the base nothing disclosed that the returned page ITSELF held more distinct
+ * Hidden-distinct-values disclosure for a PAGE-SCOPED synthetic breakdown — this is the COMMON
+ * case, since a synthetic breakdown mostly exists because the page IS truncated:
+ * `buildBreakdownNote` already labels the breakdown
+ * page-only, but without this, nothing discloses that the returned page ITSELF held more distinct
  * values per dimension than the `BREAKDOWN_BUCKET_CAP` keys listed. Deliberately does NOT open
  * with `buildBucketTruncationNote`'s "counts are exact" claim — counts here are page-scoped, and
  * the sums are of RETURNED rows (one page), so they are stated as exactly that.
@@ -1284,7 +1284,7 @@ function buildSamplesNote(
 
 /** One-sentence caveat for a `breakdown` synthesized from the returned page rather than a real
  * aggregation over the full matched set — see `Digest.breakdownNote`'s doc comment for why this is
- * a hard requirement (#8870's validation-gate update): a page-scoped breakdown presented without
+ * a hard requirement: a page-scoped breakdown presented without
  * this caveat is worse than no breakdown at all, because the model treats it as authoritative for
  * entities it never saw. */
 function buildBreakdownNote(
@@ -1351,7 +1351,7 @@ function soleAggKey(result: unknown): string | undefined {
 }
 
 /**
- * CHAR-BUDGETED carry of a REAL breakdown (issue #8935 item 1): fills each top-level
+ * CHAR-BUDGETED carry of a REAL breakdown: fills each top-level
  * aggregation's fair share of `BREAKDOWN_CHAR_BUDGET` (grouped by `entry.agg`; an untagged
  * single-aggregation breakdown is one group with the whole budget) with buckets IN RESPONSE
  * ORDER, so an enumeration-sized aggregation (`get_sca_results`' up-to-`MAX_AGG_SIZE` `policies`
@@ -1361,8 +1361,8 @@ function soleAggKey(result: unknown): string | undefined {
  * `doc_count` are returned in `trimmed` for `buildDigest` to fold into the same `breakdownNote` a
  * request-side `sum_other_doc_count` already produces (see `mergeTruncation` below).
  *
- * RESPONSE ORDER, deliberately, with the ordering disclosed rather than assumed (integration
- * review of the first cut of this fix): a default `terms` aggregation returns buckets
+ * RESPONSE ORDER, deliberately, with the ordering disclosed rather than assumed: a default
+ * `terms` aggregation returns buckets
  * count-descending, but `buildBreakdown` carries buckets from ANY top-level agg with a `buckets`
  * array — a `date_histogram` is key-ascending (oldest first), and the escape hatch can set an
  * explicit `terms` `order` — and this function has no request in hand to tell those apart. It
@@ -1641,7 +1641,7 @@ export function buildDigest(
   result: unknown,
   def: ToolDefinition,
   requestBody?: Record<string, unknown>,
-  // Issue #8913: threaded through from executor.ts's `executeToolCall`, which is the only place
+  // Threaded through from executor.ts's `executeToolCall`, which is the only place
   // that knows whether a `resolveParams` hook (types.ts) inferred a parameter -- this function
   // itself never resolves anything, it just carries the note into the Digest shape unchanged.
   assumptionNote?: string,
@@ -1674,7 +1674,7 @@ export function buildDigest(
   // case (see `buildSyntheticBreakdown`'s doc comment). That synthetic breakdown is exact only when
   // `returned === total` (grouping every returned row already covers the whole matched set); when
   // `truncated` (returned < total), it can only ever see the page the tool happened to return —
-  // the exact defect #8870's validation-gate update caught live — so it gets `breakdownNote`
+  // so it gets `breakdownNote`
   // labeling it as page-only instead of being presented as the population.
   const realBreakdown = buildBreakdown(result);
   let breakdown = realBreakdown;
@@ -1703,14 +1703,13 @@ export function buildDigest(
       // Page-scoped whenever the page is truncated OR `total` is UNKNOWN: with nothing to compare
       // `returned` against, `returned === total` cannot be established, and asserting exact
       // population counts over a population of unknown size is the confidently-wrong substitution
-      // this issue exists to prevent (integration review of this fix's first cut, which claimed
-      // exactness whenever `truncated` happened to be false — including the undefined-total case).
+      // this guards against.
       if (truncated || typeof total !== 'number') {
         breakdownNote = buildBreakdownNote(total, returned);
         syntheticPageScoped = true;
-        // #8935's silent-bind fix, PAGE-SCOPED branch — the COMMON one (a synthetic breakdown
+        // PAGE-SCOPED branch — the COMMON one (a synthetic breakdown
         // exists precisely because the page usually is truncated): the page-scope sentence above
-        // says rows outside the page are unseen, but on the base nothing said that distinct
+        // says rows outside the page are unseen, but without this, nothing said that distinct
         // values INSIDE the returned page were also cut at BREAKDOWN_BUCKET_CAP. Both binds must
         // be disclosed, or "which vendors ship packages here" silently loses every vendor beyond
         // the top 5 of the very rows the model was given.
@@ -1721,7 +1720,7 @@ export function buildDigest(
           )}`;
         }
       } else if (hidden.length > 0) {
-        // #8935's silent-bind fix, UNTRUNCATED branch: `returned === total` (established against
+        // UNTRUNCATED branch: `returned === total` (established against
         // a real numeric total), so every count is exact over the full matched set — but the KEY
         // LIST per dimension is still a top-`BREAKDOWN_BUCKET_CAP` cut of the distinct values
         // seen, exactly the same "exact counts, top-N key set" situation a real aggregation's
@@ -1743,7 +1742,7 @@ export function buildDigest(
       }
     }
   } else if (realBreakdown) {
-    // #8935 item 1: carry an enumeration-sized real breakdown up to its char budget instead of
+    // Carry an enumeration-sized real breakdown up to its char budget instead of
     // shipping it whole (base behavior — see `buildBreakdown`, which is itself unbounded) and
     // relying on `capDigest`'s char-cap pop to silently degrade it. Any bucket this carry hides
     // is folded into the same disclosure a request-side `sum_other_doc_count` produces, so the
@@ -1809,7 +1808,7 @@ export function buildDigest(
     listedBuckets: realBreakdown ? realBreakdown.length : 0,
     syntheticPageScoped,
   });
-  // Terminal class guard (#8920 item 5): an aggregation OpenSearch computed but no extractor in
+  // Terminal class guard: an aggregation OpenSearch computed but no extractor in
   // this file can represent must never be silently absent — a bare `returned: 0` (or a digest
   // missing a sibling agg's answer) reads as "no data" for a query that WAS answered. Named
   // explicitly in the hint so the model can rerun with a supported shape instead of fabricating
@@ -1973,17 +1972,17 @@ function truncateLongFieldValues(
  * that substitution. digest.ts itself stays privacy-agnostic (see privacy.ts's `extractAggFields`
  * comment for why); it only needs to expose this cap step for the caller to re-apply.
  *
- * KNOWN RESIDUAL (issue #8935 item 1): this loop's drops are UNDISCLOSED — a sample or breakdown
+ * KNOWN RESIDUAL: this loop's drops are UNDISCLOSED — a sample or breakdown
  * entry popped here is not folded into `samplesNote`/`breakdownNote`, both already worded before
  * this function runs. `capBreakdownCarry`'s char-budgeted carry (applied earlier, in
  * `buildDigest`) makes this residual rare by construction rather than eliminating it: the whole
  * carried breakdown is bounded at ~`BREAKDOWN_CHAR_BUDGET` (half of `DIGEST_CHAR_CAP`, global
- * across ALL top-level aggregations — never the 5 × per-agg-cap overrun the first cut of this fix
- * allowed), so this loop only pops breakdown entries when the per-agg
+ * across ALL top-level aggregations — never the 5 × per-agg-cap overrun an unbudgeted approach
+ * would allow), so this loop only pops breakdown entries when the per-agg
  * `BREAKDOWN_BUCKET_CAP`-entry floor is hit by keys running unusually long (approaching
  * `MAX_FIELD_VALUE_LENGTH`) or when another oversized field (a long sample column, a large
- * `hint`) has already consumed most of the budget — no longer the routine path an untrimmed
- * 100-bucket breakdown used to take on the base. Left as a residual rather than re-worded here
+ * `hint`) has already consumed most of the budget — not the routine path an untrimmed
+ * 100-bucket breakdown would otherwise take. Left as a residual rather than re-worded here
  * because doing so would mean recomputing `samplesNote`/`breakdownNote` inside this loop against
  * whatever got popped, which this function deliberately does not have the context for (it runs
  * post-privacy-substitution too, see above, where the original row/bucket counts are no longer at

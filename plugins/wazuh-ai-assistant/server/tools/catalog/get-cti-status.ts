@@ -3,7 +3,7 @@ import { ResolveParamsResult, ToolDefinition } from '../types';
 import { checkIndexAllowlist } from '../guardrails';
 import { clampLimit, limitProperty, objectSchema } from './common';
 
-// A-2 hardening (AI/plan/a1b-review.md): `.wazuh-content-manager-jobs` is a hardcoded literal, not
+// `.wazuh-content-manager-jobs` is a hardcoded literal, not
 // model-controlled, so this is "free" defense-in-depth rather than a fix for a reachable attack --
 // it keeps "every indexer read in this catalog goes through checkIndexAllowlist" a grep-able
 // invariant instead of an invariant with a silent exception.
@@ -22,8 +22,8 @@ const FEED_IDS: Record<string, string> = {
 const FEED_NAMES = Object.keys(FEED_IDS);
 
 /**
- * CTI content freshness (coverage doc MS-6/MS-7/CV-078, retiers CV-050's "can't diagnose sync
- * freshness" framing). `.wazuh-cti-consumers` (3 docs, live-verified 2026-08-19) holds each feed's
+ * CTI content freshness: resolves the earlier "can't diagnose sync freshness" gap.
+ * `.wazuh-cti-consumers` (3 docs, live-verified 2026-08-19) holds each feed's
  * own `status`/`local_offset`/`remote_offset` -- `local_offset === remote_offset` means fully
  * synced, a gap between them means the feed is behind. Live values on wazuh-aio-5: all three feeds
  * (`ruleset` 663/663, `iocs` 308829/308829, `vulnerabilities` 849527/849527) report

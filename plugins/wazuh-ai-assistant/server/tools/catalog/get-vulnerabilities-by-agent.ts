@@ -43,9 +43,9 @@ export const getVulnerabilitiesByAgentTool: ToolDefinition = {
   },
   target: 'indexer',
   tier: 'T1',
-  // Issue: generic sole-candidate parameter resolution (template: #8913's
-  // resolveDeicticAgentParams in get-agent-inventory.ts). A strictly-required `agent_identifier`
-  // measured 0/40 invocations on deictic vulnerability questions ("what CVEs affect this box").
+  // Generic sole-candidate parameter resolution (same pattern as resolveDeicticAgentParams in
+  // get-agent-inventory.ts). A strictly-required `agent_identifier` measured 0/40 invocations on
+  // deictic vulnerability questions ("what CVEs affect this box").
   // `valueFrom: 'id-or-name'` since this param already accepts either shape -- the resolved
   // agent's id is injected (exact, unambiguous).
   soleCandidateParams: [
@@ -80,15 +80,15 @@ export const getVulnerabilitiesByAgentTool: ToolDefinition = {
         _source: VULN_SOURCE_FIELDS_WITH_AGENT_ID,
         sort: ['_doc'],
         size: limit,
-        // Population-true severity/agent breakdown over the FULL matched set (issue #8920 item 1:
+        // Population-true severity/agent breakdown over the FULL matched set -- avoids reporting
         // "no high-severity vulnerabilities" on a host that actually has some, just sorted outside
-        // the returned page) -- see VULN_BREAKDOWN_AGGS's doc comment in common.ts.
+        // the returned page -- see VULN_BREAKDOWN_AGGS's doc comment in common.ts.
         aggs: VULN_BREAKDOWN_AGGS,
       },
     };
   },
   tableSpec: {
-    // Column order (issue #8921's budget item): this is a single-agent tool, so `wazuh.agent.id`
+    // Column order: this is a single-agent tool, so `wazuh.agent.id`
     // is constant across every row of one call -- a redundant leading identifier once the
     // human-readable Agent name is shown. The 6 columns that earn visibility under the client's
     // MAX_VISIBLE_COLUMNS budget (result-table.tsx) lead with Agent instead; Architecture and the

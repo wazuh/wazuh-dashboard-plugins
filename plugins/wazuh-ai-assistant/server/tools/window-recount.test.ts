@@ -197,8 +197,8 @@ function sampleParams(def: ToolDefinition): Record<string, unknown> {
  * Registry sweep (coverage, not just the unit matrix above): every indexer tool that declares
  * `time_range_gte`/`time_range_lte` params builds a request `widenToDefaultWindow` can actually
  * widen to EXACTLY the plugin defaults, given a narrow window -- proving executor.ts's recount
- * chokepoint (issue #8920 item 3) is reachable for every one of them with no per-tool opt-in, the
- * same "nothing exempt by default" standard as agg-size-coverage.test.ts.
+ * chokepoint is reachable for every one of them with no per-tool opt-in, the same "nothing
+ * exempt by default" standard as agg-size-coverage.test.ts.
  */
 test('every time-ranged indexer tool builds a request widenable to exactly the default window', () => {
   const timeRangedTools = listToolDefinitions().filter(

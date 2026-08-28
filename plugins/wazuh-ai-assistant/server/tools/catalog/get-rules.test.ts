@@ -147,7 +147,7 @@ test('get_rules: status/level/tag/logsource_product/space each add exactly one f
   });
 });
 
-// Defect #2 (AI/plan/qa-rules-decoders-rootcause.md): `document.mitre.technique.id` is absent
+// `document.mitre.technique.id` is absent
 // from the live mapping (`dynamic: false`, confirmed live), so a `term` filter against it could
 // only ever return 0 rows. There is no separate `document.threat.technique.id` fix either: that
 // path IS mapped but is populated on 0 documents on this dataset (live-confirmed), so a filter on
@@ -180,9 +180,8 @@ test('get_rules: technique lookups go through tag as "attack.<id>", per the tag 
   );
 });
 
-// Review finding F2: the description's example previously mapped "attack.t1190" to "T1110" --
-// a mismatched id that invites the model to invent its own transformation. The example id must
-// be internally consistent (T1190 -> attack.t1190).
+// The description's example id must be internally consistent (T1190 -> attack.t1190); a
+// mismatched id invites the model to invent its own transformation.
 test('get_rules: the tag description example maps attack.t1190 to T1190, not T1110', () => {
   const description = getRulesTool.spec.parameters.properties.tag
     .description as string;
@@ -190,9 +189,9 @@ test('get_rules: the tag description example maps attack.t1190 to T1190, not T11
   assert.doesNotMatch(description, /T1110/);
 });
 
-// Review finding F3: `document.tags` is a case-sensitive keyword whose live vocabulary is
-// entirely lowercase, while ATT&CK ids are conventionally written uppercase -- an "attack.*" tag
-// must be lowercased before it reaches the term filter, or an uppercase id silently returns 0.
+// `document.tags` is a case-sensitive keyword whose vocabulary is entirely lowercase, while
+// ATT&CK ids are conventionally written uppercase -- an "attack.*" tag must be lowercased before
+// it reaches the term filter, or an uppercase id silently returns 0.
 test('get_rules: an uppercase "attack.*" tag is lowercased before filtering', () => {
   const request = build({ enabled: 'any', tag: 'attack.T1190' });
   assert.deepEqual(request.body.query, {
@@ -264,10 +263,10 @@ test('get_rules: name builds a should-clause on title (term+prefix) and descript
   assert.equal(result.ok, true, result.ok ? '' : result.reason);
 });
 
-// Review finding F1: the description `match` must use `operator: 'and'`, not the default `or`.
-// Live-verified: with `or` (as originally shipped), `name="decoder/apache-access/0"` returned
-// 330 of 345 decoders (any one token matched) inside a non-scoring `bool.filter` sorted by
-// `_doc`, so the wanted row never appeared in the visible page; with `and` it returns exactly 1.
+// The description `match` must use `operator: 'and'`, not the default `or`. With `or`,
+// `name="decoder/apache-access/0"` returns 330 of 345 decoders (any one token matched) inside a
+// non-scoring `bool.filter` sorted by `_doc`, so the wanted row never appears in the visible
+// page; with `and` it returns exactly 1.
 test('get_rules: the description match uses operator "and" so multi-token names stay precise', () => {
   const request = build({
     enabled: 'any',

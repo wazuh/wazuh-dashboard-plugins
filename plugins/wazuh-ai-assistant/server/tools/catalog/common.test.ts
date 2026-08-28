@@ -199,7 +199,7 @@ test('FINDING_BREAKDOWN_AGGS declares one terms aggregation per FINDING_BREAKDOW
 });
 
 // --- VULN_BREAKDOWN_AGGS: real aggregations attached to the 3 hits-based vulnerability tools ----
-// (issue #8920 item 1: "no high-severity vulnerabilities" on a host that actually has some, just
+// (prevents reporting "no high-severity vulnerabilities" on a host that actually has some, just
 // sorted outside the returned page).
 
 test('VULN_BREAKDOWN_AGGS declares one terms aggregation per VULN_BREAKDOWN_DIMENSIONS', () => {

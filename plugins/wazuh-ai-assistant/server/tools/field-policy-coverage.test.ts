@@ -41,7 +41,7 @@ const KNOWN_SAFE_STRUCTURAL_FIELDS = new Set<string>([
   // Aggregation-bucket shape (get_top_rules and the *_summary tools).
   'key',
   'doc_count',
-  // Sampled-label-spread sub-aggs (issue #8921): `cardinality`/`filter` sub-agg counters merged
+  // Sampled-label-spread sub-aggs: `cardinality`/`filter` sub-agg counters merged
   // into a bucket row by digest.ts's existing metric-/filter-sub-agg branches — aggregation
   // counters over already-classified fields (wazuh.rule.title/wazuh.rule.level/
   // wazuh.agent.name), never analyst/attacker-supplied free text themselves.

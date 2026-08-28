@@ -12,8 +12,8 @@ import { ConversationList } from './conversation-list';
 import { ConversationSummary } from '../../../common/types';
 
 /**
- * Opens one row's overflow menu — the gate every per-row action now sits behind (#9018 follow-up:
- * the rename pencil and delete trash were consolidated into a single kebab trigger).
+ * Opens one row's overflow menu — the gate every per-row action now sits behind (the rename
+ * pencil and delete trash are consolidated into a single kebab trigger).
  *
  * `EuiContextMenuItem` renders a `<button>`, so once the menu is open the existing
  * `getByRole('button', { name: 'Rename conversation' })` lookups keep working unchanged — which is
@@ -273,7 +273,7 @@ describe('ConversationList', () => {
       expect(screen.getByText('Disconnected agents')).toBeInTheDocument();
     });
 
-    it("renders the search field as a bare, full-width control with no wrapping flex group (#9010 review decision: the select-mode entry point moved into the header, so this row goes back to upstream's own bare shape)", () => {
+    it("renders the search field as a bare, full-width control with no wrapping flex group (the select-mode entry point lives in the header, so this row goes back to upstream's own bare shape)", () => {
       render(
         <ConversationList
           conversations={[conversation()]}
@@ -291,7 +291,7 @@ describe('ConversationList', () => {
     });
   });
 
-  describe('select-mode entry point lives in the rail header, not the search row (#9010 review decision)', () => {
+  describe('select-mode entry point lives in the rail header, not the search row', () => {
     it('renders the "Select conversations" icon inside the header row, right-aligned against the "Conversations" label', () => {
       render(
         <ConversationList
@@ -368,7 +368,7 @@ describe('ConversationList', () => {
       ).toBeNull();
     });
 
-    it('falls back to the old placement (search row, inline icon) when the header itself is not rendered (`showHeader={false}`, the docked popover -- m14/#9010 review: that surface is a PRIMARY rail surface entitled to the same bulk-delete affordance as the inline rail)', () => {
+    it('falls back to the old placement (search row, inline icon) when the header itself is not rendered (`showHeader={false}`, the docked popover -- that surface is a PRIMARY rail surface entitled to the same bulk-delete affordance as the inline rail)', () => {
       render(
         <ConversationList
           conversations={[conversation()]}
@@ -786,10 +786,10 @@ describe('ConversationList', () => {
       expect(screen.queryByText(/permanently delete/)).toBeNull();
     });
 
-    it('m12/F-4: focus lands on the rail scroll container after a confirmed delete, not lost to <body>', async () => {
-      // The regression this pins got HARDER once the delete moved behind the overflow menu: two
-      // focus traps (the menu's popover and the modal) now unwind in sequence, and an earlier cut
-      // of that change left focus on `<body>` because they overlapped. See `requestDelete`.
+    it('focus lands on the rail scroll container after a confirmed delete, not lost to <body>', async () => {
+      // With the delete behind the overflow menu, two focus traps (the menu's popover and the
+      // modal) unwind in sequence; without deferring the modal by a frame, they overlap and leave
+      // focus on `<body>`. See `requestDelete`.
       render(
         <ConversationList
           conversations={[conversation({ id: 'c1', title: 'Delete me' })]}
@@ -810,7 +810,7 @@ describe('ConversationList', () => {
     });
   });
 
-  describe('list semantics (WCAG/AT: a real list, not a run of generic divs) — E5', () => {
+  describe('list semantics (WCAG/AT: a real list, not a run of generic divs)', () => {
     it('renders each date group as a native <ul>/<li> list', () => {
       const { container } = render(
         <ConversationList
@@ -830,7 +830,7 @@ describe('ConversationList', () => {
     });
   });
 
-  describe('row overflow menu (#9018 follow-up)', () => {
+  describe('row overflow menu', () => {
     function renderOneRow(onSelect: () => void = noop) {
       render(
         <ConversationList
@@ -1043,7 +1043,7 @@ describe('ConversationList', () => {
     });
   });
 
-  describe('inline rename (E2)', () => {
+  describe('inline rename', () => {
     it('offers no Rename entry when onRename is not supplied, but still offers Delete', () => {
       render(
         <ConversationList
@@ -1067,13 +1067,14 @@ describe('ConversationList', () => {
     });
 
     it('NO-REFLOW REGRESSION: one action slot in the row flex group, unchanged by hover', () => {
-      // Screenshot-equivalent DOM check (jsdom has no layout engine). The row's actions used to be
-      // a trash button in the flex group PLUS a pencil in an absolutely-positioned overlay, the
-      // overlay existing purely so a second in-flow item would not cost the row another
-      // `gutterSize='xs'` margin at rest. Consolidating both into ONE trigger removes that tension
-      // outright: the trigger takes the trash's own slot, so the group is still exactly
-      // [title][timestamp][actions] — the same three items upstream/5.0.0's row has — and there is
-      // no overlay left to sit on top of anyone's text.
+      // Screenshot-equivalent DOM check (jsdom has no layout engine). Without consolidating the
+      // row's actions into one trigger, the row would need a trash button in the flex group PLUS
+      // a pencil in an absolutely-positioned overlay, the overlay existing purely so a second
+      // in-flow item would not cost the row another `gutterSize='xs'` margin at rest.
+      // Consolidating both into ONE trigger removes that tension outright: the trigger takes the
+      // trash's own slot, so the group is still exactly [title][timestamp][actions] — the same
+      // three items upstream/5.0.0's row has — and there is no overlay left to sit on top of
+      // anyone's text.
       render(
         <ConversationList
           conversations={[conversation({ id: 'c1', title: 'Rename me' })]}
@@ -1232,7 +1233,7 @@ describe('ConversationList', () => {
       expect(onRename).not.toHaveBeenCalled();
     });
 
-    it('m6: commits on blur (clicking/tabbing away), without needing Enter', () => {
+    it('commits on blur (clicking/tabbing away), without needing Enter', () => {
       const onRename = jest.fn();
       render(
         <ConversationList
@@ -1258,7 +1259,7 @@ describe('ConversationList', () => {
       expect(onRename).toHaveBeenCalledTimes(1);
     });
 
-    it('m6: Enter does not ALSO commit a second time via the unmount blur that follows it', () => {
+    it('Enter does not ALSO commit a second time via the unmount blur that follows it', () => {
       const onRename = jest.fn();
       render(
         <ConversationList
@@ -1287,7 +1288,7 @@ describe('ConversationList', () => {
       expect(onRename).toHaveBeenCalledWith('c1', 'New title');
     });
 
-    it('F-5 REGRESSION: clicking the row body while renaming commits the edit but does NOT also navigate', () => {
+    it('clicking the row body while renaming commits the edit but does NOT also navigate', () => {
       // A real click on a different focusable element blurs the currently focused input FIRST
       // (native default action on mousedown), THEN dispatches its own click -- by the time the
       // row's onClick runs, the commit has already happened. Simulated explicitly here rather than
@@ -1323,7 +1324,7 @@ describe('ConversationList', () => {
       expect(onSelect).not.toHaveBeenCalled();
     });
 
-    it('m6: entering select mode clears a rename in progress', () => {
+    it('entering select mode clears a rename in progress', () => {
       const onRename = jest.fn();
       render(
         <ConversationList
@@ -1352,7 +1353,7 @@ describe('ConversationList', () => {
       expect(screen.getByText('Old title')).toBeInTheDocument();
     });
 
-    it('m6: changing the search term clears a rename in progress', () => {
+    it('changing the search term clears a rename in progress', () => {
       const onRename = jest.fn();
       render(
         <ConversationList
@@ -1377,7 +1378,7 @@ describe('ConversationList', () => {
       expect(screen.queryByLabelText('Conversation title')).toBeNull();
     });
 
-    it('m6: switching the active conversation clears a rename in progress', () => {
+    it('switching the active conversation clears a rename in progress', () => {
       const onRename = jest.fn();
       const { rerender } = render(
         <ConversationList
@@ -1413,7 +1414,7 @@ describe('ConversationList', () => {
     });
   });
 
-  describe('select mode / bulk delete (E3)', () => {
+  describe('select mode / bulk delete', () => {
     it('does not render a "Select conversations" entry point when onBulkDelete is not supplied', () => {
       render(
         <ConversationList
@@ -1432,10 +1433,10 @@ describe('ConversationList', () => {
     });
 
     it('the select-mode toolbar is ONE compact flex row (count, cancel, delete), not a wrapped stack', () => {
-      // #9010 review: the previous `wrap` toolbar spread "N selected" / "Cancel selection" /
-      // "Delete (N)" across a sparse 3-line column. The fix keeps all three inside a single,
-      // non-wrapping `EuiFlexGroup` -- this asserts the STRUCTURE (one row, three controls),
-      // not pixels jsdom has no layout engine to measure anyway.
+      // A `wrap` toolbar would spread "N selected" / "Cancel selection" / "Delete (N)" across a
+      // sparse 3-line column. Keeping all three inside a single, non-wrapping `EuiFlexGroup`
+      // avoids that -- this asserts the STRUCTURE (one row, three controls), not pixels jsdom has
+      // no layout engine to measure anyway.
       render(
         <ConversationList
           conversations={[conversation({ id: 'c1', title: 'Selectable' })]}
@@ -1468,7 +1469,7 @@ describe('ConversationList', () => {
       ).toBe(true);
     });
 
-    it("carries `wzConvoRailSearchRow` on the select-mode toolbar too, so it also opts out of EuiFlexGroup's default flex-grow (#9010 review regression)", () => {
+    it("carries `wzConvoRailSearchRow` on the select-mode toolbar too, so it also opts out of EuiFlexGroup's default flex-grow", () => {
       render(
         <ConversationList
           conversations={[conversation({ id: 'c1', title: 'Selectable' })]}
@@ -1644,7 +1645,7 @@ describe('ConversationList', () => {
       expect(onBulkDelete).not.toHaveBeenCalled();
     });
 
-    it('m11: Escape exits select mode from anywhere in the rail', () => {
+    it('Escape exits select mode from anywhere in the rail', () => {
       render(
         <ConversationList
           conversations={[conversation({ id: 'c1', title: 'First' })]}
@@ -1679,7 +1680,7 @@ describe('ConversationList', () => {
       ).toBeInTheDocument();
     });
 
-    it('m13: a selected id no longer present in `conversations` is pruned on the next render', () => {
+    it('a selected id no longer present in `conversations` is pruned on the next render', () => {
       const onBulkDelete = jest.fn();
       const { rerender } = render(
         <ConversationList

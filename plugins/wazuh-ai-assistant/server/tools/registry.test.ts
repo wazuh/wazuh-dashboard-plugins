@@ -11,8 +11,8 @@ import { getTopAgentsTool } from './catalog/get-top-agents';
  * Generic sole-candidate parameter resolution -- registry-wiring tests (types.ts's
  * `soleCandidateParams`, param-resolution.ts's `buildGenericResolveParams`). Three catalog tools
  * that declare `soleCandidateParams` without a hand-written `resolveParams` of their own get the
- * generic resolver attached automatically at load time; `get_agent_inventory` (issue #8913's
- * hand-written hook) and `get_sca_checks` (the CV-053 check_id fix below) are each left completely
+ * generic resolver attached automatically at load time; `get_agent_inventory` (its own
+ * hand-written hook) and `get_sca_checks` (the check_id fix below) are each left completely
  * alone with their own hook; a tool with neither is unaffected either way.
  */
 
@@ -39,10 +39,10 @@ test('registry: get_agent_inventory keeps its own hand-written resolveParams unt
   assert.equal(registered?.resolveParams, getAgentInventoryTool.resolveParams);
 });
 
-// BLOCKER FIX (CV-053): get_sca_checks now attaches its OWN hand-written resolveParams
-// (resolveScaCheckParams, wrapping buildGenericResolveParams as its no-check_id fallback) rather
-// than relying on registry.ts's automatic generic-resolver wiring -- same "left completely alone"
-// contract get_agent_inventory's hook already gets, so registry.ts must never overwrite it.
+// get_sca_checks attaches its OWN hand-written resolveParams (resolveScaCheckParams, wrapping
+// buildGenericResolveParams as its no-check_id fallback) rather than relying on registry.ts's
+// automatic generic-resolver wiring -- same "left completely alone" contract get_agent_inventory's
+// hook already gets, so registry.ts must never overwrite it.
 test('registry: get_sca_checks keeps its own hand-written resolveParams untouched (same function reference)', () => {
   assert.equal(
     typeof getScaChecksTool.resolveParams,

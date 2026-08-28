@@ -75,7 +75,7 @@ export function createDiscoverUrlResolver(core: CoreStart): ResolveDiscoverUrl {
     // The window comes from what the server recorded executing this query, falling back to the
     // DSL's own clause and finally to an UNBOUNDED window — never to a 24-hour default that would
     // under-count the answer this link sits under. See `resolveDiscoverTimeRange`'s doc comment
-    // (common/discover-url.ts) for the full precedence and why case 3 changed.
+    // (common/discover-url.ts) for the full precedence and why case 3 resolves this way.
     const timeRange = resolveDiscoverTimeRange({
       dsl: spec.discover.dsl,
       effectiveRange: spec.provenance?.effectiveRange,
@@ -105,7 +105,7 @@ interface DiscoverLinkProps {
  * disclosure below.
  *
  * A date-math bound goes through `shortDateMath` — the SAME shorthand the provenance chip beside
- * this button renders its window with (issue #9008 review, F5), so `now-90d` reads "90d" in both
+ * this button renders its window with, so `now-90d` reads "90d" in both
  * places rather than "90d" on the chip and "now-90d" one control away. `now` itself is not that
  * shape and stays literal.
  *
@@ -117,7 +117,7 @@ interface DiscoverLinkProps {
  * The locale is OSD's own (`i18n.getLocale()`, guarded exactly as conversation-list.tsx's
  * `formatRelativeTime` guards it — the test environment's i18n stub does not implement it), NOT
  * `undefined`, which would hand `Intl` the host's locale and print an English month name inside a
- * Spanish sentence (issue #9008 review, F4). Anything unparseable is passed through untouched
+ * Spanish sentence. Anything unparseable is passed through untouched
  * rather than guessed at.
  */
 function shortBoundLabel(value: string): string {
@@ -155,17 +155,15 @@ function shortBoundLabel(value: string): string {
  *    is disclosed by the provenance chip's own badge rather than here.)
  *  - No recorded range, and the DSL bounded BOTH edges (`stated`) — same story, plain label.
  *  - No recorded range, and a ONE-SIDED clause (`openStart`/`openEnd`, e.g. "findings before X").
- *    Issue #9008 review, finding 1: this used to render the plain label, because the query HAD
- *    stated a window and the only disclosure fired when none was stated at all — while the missing
- *    lower bound was filled from `now-24h`, so an `lte`-only clause bounded in the past opened an
- *    inverted window Discover showed nothing for. The fill direction is fixed in
- *    `UNBOUNDED_TIME_RANGE`; this says out loud which edge the query left open.
- *  - No recorded range and no clause at all (`defaulted`) — issue #9026: the link opens ALL OF
+ *    The plain label alone is not enough here: the missing bound is filled from `now-24h`, so an
+ *    `lte`-only clause bounded in the past would open an inverted window Discover shows nothing
+ *    for. The fill direction is fixed in `UNBOUNDED_TIME_RANGE`; this says out loud which edge the
+ *    query left open.
+ *  - No recorded range and no clause at all (`defaulted`) — the link opens ALL OF
  *    HISTORY, because a query with no time filter really did cover the whole index and a 24-hour
  *    default under-counted the answer above it. "All time" is a materially different reading
  *    experience from every other link here, and a reader deserves to know that before clicking
- *    rather than after Discover has loaded the whole index. The old "default range: 24h" wording
- *    is gone with the behavior it described.
+ *    rather than after Discover has loaded the whole index.
  *
  * Every wording shares this one label slot and style — no second UI element — and stays short
  * enough not to wrap in the narrow (sidecar) panel.

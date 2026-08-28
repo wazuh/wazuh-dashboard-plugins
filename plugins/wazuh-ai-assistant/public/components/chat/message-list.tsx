@@ -25,16 +25,17 @@ interface MessageListProps {
    * conversation as a new turn (`chat-page.tsx`'s `handleAskAgain`).
    *
    * Why an append and not an in-place retry: a failed turn stops being the last one the moment the
-   * reader asks anything else, and until now that silently took its retry action away with it — the
-   * one turn most likely to need retrying was the one that could no longer be retried, and the only
-   * route back was to retype the question. Rewriting the middle of a transcript is genuinely not
-   * something this component supports (every later turn's tool history was built on top of it), so
+   * reader asks anything else, which would otherwise silently take its retry action away with it —
+   * the one turn most likely to need retrying would be the one that could no longer be retried,
+   * with retyping the question the only route back. Rewriting the middle of a transcript is
+   * genuinely not something this component supports (every later turn's tool history was built on
+   * top of it), so
    * the action asks the same question AGAIN, at the end, where the answer belongs. `undefined`
    * while a turn is generating.
    */
   onRetryTurn?: (messageId: string) => void;
   /**
-   * Real measured height (px) of the scrolling transcript pane — layout contract §4's "page size
+   * Real measured height (px) of the scrolling transcript pane — "page size
    * steps 5 → 10 above 900px of transcript height". Threaded straight through to every
    * MessageBubble/ResultTable; see result-table.tsx's own doc comment on the same-named prop for
    * how it feeds the table's initial page size. chat-page.tsx measures the pane with a
@@ -55,11 +56,10 @@ interface MessageListProps {
 
 /**
  * Pure list rendering only — auto-scroll is owned by chat-page.tsx (its `scrollPaneRef` pinning
- * on the middle scroll-area div, the conversation's one true scroll container). This component
- * previously carried its own sentinel + `scrollIntoView` mechanism; it was removed because
- * it detected its scrollable ancestor ONCE at mount (usually
- * before the scroll area had anything to scroll), so its "is the user near the bottom" listener
- * attached to the wrong element and could fight the page-level pinning.
+ * on the middle scroll-area div, the conversation's one true scroll container). A sentinel +
+ * `scrollIntoView` mechanism owned by this component instead would detect its scrollable ancestor
+ * ONCE at mount (usually before the scroll area had anything to scroll), so its "is the user near
+ * the bottom" listener would attach to the wrong element and could fight the page-level pinning.
  *
  * Memoized (perf): ChatPage re-renders on every keystroke (the input's
  * text lives in its own useState there), which would otherwise re-render this whole list —
@@ -94,10 +94,10 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
     defaultMessage: 'Ask again',
   });
   return (
-    // `.wzTranscriptContent` (chat-page.scss/chat-page.tsx): this component is now that wrapper's
+    // `.wzTranscriptContent` (chat-page.scss/chat-page.tsx): this component is that wrapper's
     // sibling, not `.wzContentMeasure`'s descendant — each row below centres itself independently
     // via `.wzMessageRow`/`.wzMessageRow--wide`, which is what actually lets a table-bearing turn
-    // reach past the shared 1060px measure (layout contract §5).
+    // reach past the shared 1060px measure.
     <div>
       {messages.map((message, index) => (
         <React.Fragment key={message.id}>
@@ -136,10 +136,10 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
               onTableRowsPerPageChange={onTableRowsPerPageChange}
             />
           </div>
-          {/* One turn boundary = one 32px breath (EuiSpacer size='xl') — iteration-4 audit, P0 item
-              2: raised from 24px ('l') now that the P0 flow-root fix on `.wzMessageRow`
-              (chat-page.scss) stops this spacer from silently collapsing to 16px via the
-              margin-collapse leak. Intra-turn spacing inside a bubble stays 's'. */}
+          {/* One turn boundary = one 32px breath (EuiSpacer size='xl'): the flow-root fix on
+              `.wzMessageRow` (chat-page.scss) is what stops this spacer from silently
+              collapsing to 16px via the margin-collapse leak. Intra-turn spacing inside a bubble
+              stays 's'. */}
           {index < messages.length - 1 && <EuiSpacer size='xl' />}
         </React.Fragment>
       ))}
@@ -150,14 +150,14 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
           user was left staring at their own question with no way to ask it again. */}
       {lastMessage?.role === 'user' && (
         <>
-          {/* This spacer used to render at 0px instead of its intended 8px, via the same
-              margin-collapse leak the P0 flow-root fix on `.wzMessageRow` (chat-page.scss)
-              corrects — the leak was general to any `EuiFlexGroup`-rooted content sitting inside a
-              bare `.wzMessageRow`, and `InterruptedTurnNotice` below is exactly that. */}
+          {/* Without the flow-root fix on `.wzMessageRow` (chat-page.scss), this spacer would
+              collapse to 0px instead of its intended 8px via the same margin-collapse leak —
+              general to any `EuiFlexGroup`-rooted content sitting inside a bare `.wzMessageRow`,
+              and `InterruptedTurnNotice` below is exactly that. */}
           <EuiSpacer size='s' />
-          {/* `wzInterruptedNoticeRow` (chat-page.scss, iteration-4 audit P1 item 8): this standalone
-              notice has no avatar column of its own, so without it the text rendered at the row's
-              own left edge (avatarX) instead of the prose rail every other line above it sits on
+          {/* `wzInterruptedNoticeRow` (chat-page.scss): this standalone notice has no avatar
+              column of its own, so without it the text would render at the row's own left edge
+              (avatarX) instead of the prose rail every other line above it sits on
               (avatarX + 40px). */}
           <div className='wzMessageRow wzInterruptedNoticeRow'>
             <InterruptedTurnNotice onRetry={onRetryLastTurn} />
