@@ -10,7 +10,7 @@ import { UNBOUNDED_TIME_RANGE } from '../../../common/discover-url';
  * The "Open in Discover" affordance, end to end: the WINDOW the link opens and the LABEL that
  * discloses whatever the link had to fill in.
  *
- * Issue #9008 review, finding 1 (found live): a DSL stating only an upper bound ("findings before
+ * A DSL stating only an upper bound ("findings before
  * 2020-01-01") produced BOTH halves of the same defect at once — an inverted `_g` window
  * (`from: now-24h`, `to: <a past instant>`) that Discover shows zero rows for, and a plain "Open in
  * Discover" label that gave no hint a bound had been substituted at all. Both halves are asserted
@@ -109,7 +109,7 @@ describe('DiscoverLink window', () => {
     expect(url).toContain("time:(from:'now-7d',to:'now')");
   });
 
-  // Issue #9026: the seam between a spec's recorded provenance and the URL `buildDiscoverUrl`
+  // The seam between a spec's recorded provenance and the URL `buildDiscoverUrl`
   // produces. `common/discover-url.test.ts` covers `resolveDiscoverTimeRange`'s precedence and
   // pinning rules in isolation; what those cannot catch is this resolver forgetting to PASS one of
   // them — dropping `effectiveRange` or `executedAt` from the call leaves every unit test green
@@ -184,7 +184,7 @@ describe('DiscoverLink label', () => {
   });
 
   it("discloses the open END of a gte-only query, in the chip's date-math shorthand", async () => {
-    // Issue #9008 review, F5: this label sits directly beside a provenance chip that renders the
+    // This label sits directly beside a provenance chip that renders the
     // very same bound as "7d" (tool-call-label.ts's `shortDateMath`, now shared rather than
     // re-implemented here). Spelling it "now-7d" put two renderings of one window a few pixels
     // apart.
@@ -210,9 +210,8 @@ describe('DiscoverLink label', () => {
   });
 
   it('says "all time" when the query stated no window at all', async () => {
-    // Issue #9026 changed what this case OPENS — all of history, not a 24-hour default — so the
-    // label changed with it. A "default range: 24h" wording here would now describe a window the
-    // button no longer opens.
+    // This case OPENS all of history, not a 24-hour default, so the label must say so — a
+    // "default range: 24h" wording here would describe a window the button does not open.
     const link = await renderLabel(
       specWith('wazuh-findings-label-none*', { match_all: {} }),
     );

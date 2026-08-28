@@ -1,11 +1,11 @@
 /**
- * Add-provider flyout (Screen 4 of the redesign — variation 4a, numbered groups; see
- * AI/design/redesign-v2-spec.md). Tokens come from the shared `_redesign.scss` partial; this file
- * only adds the flyout's own layout touch — consistent spacing between the three numbered
- * `EuiFormFieldset` groups — plus the two presentation idioms the form owns: ONE help-text size and
- * ONE example-value chip. EUI's own fieldset/legend/checkable-card styling is left alone.
+ * Add-provider flyout, with numbered groups. Tokens come from the shared `_redesign.scss` partial;
+ * this file only adds the flyout's own layout touch — consistent spacing between the three
+ * numbered `EuiFormFieldset` groups — plus the two presentation idioms the form owns: ONE
+ * help-text size and ONE example-value chip. EUI's own fieldset/legend/checkable-card styling is
+ * left alone.
  *
- * Type scale (UX iteration 3): the form has exactly two text sizes, each produced by a
+ * Type scale: the form has exactly two text sizes, each produced by a
  * single mechanism. Descriptions are `EuiText size='s'`; every piece of field-level help is EUI's
  * own `.euiFormHelpText` — inherited for free by plain elements inside an `EuiFormRow`'s `helpText`
  * slot, and restated by `.wzProviderFlyout__help` below for the two guidance blocks that cannot
@@ -203,10 +203,9 @@
 /**
  * An illustrative value named in prose — the model id inside the tool-calling warning. Same code
  * face as the chip so the two read as the same kind of thing, but deliberately no chip chrome and
- * no pointer: this one is prose naming an example, not an action. (It used to say the same id was
- * "already offered as a real chip under the Model field"; that generic per-type Examples row has
- * since been removed — see provider-form-flyout.tsx's Model field — so this is now the only place
- * the id is NAMED, while the chips under the field are the endpoint's own vendor suggestions.)
+ * no pointer: this one is prose naming an example, not an action. This is the only place the id is
+ * NAMED — see provider-form-flyout.tsx's Model field — while the chips under the field are the
+ * endpoint's own vendor suggestions.
  */
 .wzProviderFlyout__inlineValue {
   font-family: $euiCodeFontFamily;

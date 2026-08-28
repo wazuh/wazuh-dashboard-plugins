@@ -26,10 +26,10 @@ import {
 /**
  * First colocated coverage for `chat-page.tsx`, aimed squarely at the ABANDONED-TURN path — what
  * happens to a turn that is still streaming when the user switches conversation, starts a new one,
- * or leaves the app. That path used to lose the answer outright: nothing aborted the stream, so
- * every remaining `updateMessages` call targeted an assistant message id that no longer existed in
- * the replaced list, the auto-save ran against the newly opened conversation's id, and the outgoing
- * turn's pseudonym entries were merged into it.
+ * or leaves the app. Left unguarded, that path loses the answer outright: nothing aborts the
+ * stream, so every remaining `updateMessages` call targets an assistant message id that no longer
+ * exists in the replaced list, the auto-save runs against the newly opened conversation's id, and
+ * the outgoing turn's pseudonym entries get merged into it.
  *
  * The mocked services are the three this component constructs itself (it takes no service props),
  * so they have to be replaced at the module level. Every factory below only references
@@ -214,8 +214,8 @@ function lastStreamSignal(): AbortSignal {
 }
 
 /** The `messages` array of the last create/update save, whichever ran last. Both land at index 1:
- * `create(title, messages)` and, since issue #9010's fix (`update` no longer sends a title —
- * conversations-service.ts's own doc comment), `update(id, messages, expectedVersion)` too. */
+ * `create(title, messages)` and `update(id, messages, expectedVersion)` — `update` does not send a
+ * title (conversations-service.ts's own doc comment). */
 function lastSavedMessages(mock: jest.Mock): PersistedChatMessage[] {
   const call = mock.mock.calls[mock.mock.calls.length - 1];
   return call[1] as PersistedChatMessage[];
@@ -1304,9 +1304,9 @@ describe('ChatPage — feedback while a turn runs', () => {
       spec: {
         columns: [{ id: 'agent', label: 'Agent' }],
         rows: [{ agent: 'web-01' }],
-        // Issue #9008 rework: the chip's window text is a server-recorded fact
-        // (`TableSpec.provenance`), matched to this call by `toolCallId` — not inferred from
-        // the call's own `arguments` (which are empty here).
+        // The chip's window text is a server-recorded fact (`TableSpec.provenance`), matched to
+        // this call by `toolCallId` — not inferred from the call's own `arguments` (which are
+        // empty here).
         provenance: {
           toolCallId: 't1',
           effectiveRange: { gte: 'now-90d', lte: 'now' },
@@ -1319,10 +1319,10 @@ describe('ChatPage — feedback while a turn runs', () => {
     stream.push({ type: 'digest', toolCallId: 't1', content: '{}' });
     // The below-bubble chip renders straight away from `toolCalls` alone (name only) — but the
     // spec itself (and so its `provenance`) is still sitting in chat-page.tsx's `pendingTable`
-    // buffer, NOT yet on `message.table`, until the table is actually committed below. Issue
-    // #9008 rework: with no `message.table` to match a `toolCallId` against yet, there is
-    // genuinely no provenance fact available to show, so the chip must not invent one — it
-    // names the call alone until the table (and its provenance) actually commits.
+    // buffer, NOT yet on `message.table`, until the table is actually committed below. With no
+    // `message.table` to match a `toolCallId` against yet, there is genuinely no provenance fact
+    // available to show, so the chip must not invent one — it names the call alone until the
+    // table (and its provenance) actually commits.
     await waitFor(() =>
       expect(screen.getByText('Top agents')).toBeInTheDocument(),
     );
@@ -1401,8 +1401,8 @@ describe('ChatPage — feedback while a turn runs', () => {
       },
     });
 
-    // No table event this turn, so no provenance either — issue #9008 rework: the chip must
-    // name the call alone, with no window invented from its (here time-range-less) `arguments`.
+    // No table event this turn, so no provenance either — the chip must name the call alone,
+    // with no window invented from its (here time-range-less) `arguments`.
     await waitFor(() =>
       expect(screen.getByText('Wazuh data')).toBeInTheDocument(),
     );
@@ -1448,17 +1448,17 @@ describe('ChatPage — feedback while a turn runs', () => {
 });
 
 /**
- * Coverage for issue #8920 item 7: a populated result table must never be overwritten by an empty
- * one at end-of-stream. `chat-page.tsx` flushes its held table buffers (`pendingTable`,
- * `pendingEmptyTable`) from three different call sites — `finally`, the `error` branch, and the
- * `auth_expired` branch — and they do not all flush in the same order (`finally`/`auth_expired`
- * flush the non-empty one first; `error` flushes the empty one first). On the unfixed code only
- * `finally` was reachably broken: `error`'s empty-first order happened to be benign (the later
- * non-empty commit won) and `auth_expired` fires on the initial POST's 401 before any SSE frame
- * is read, so it can never hold a table. "Happens to be benign" is still worth pinning.
- * The class fix is an order-INDEPENDENT invariant (see the `pendingEmptyTable` comment above it):
- * an empty spec is refused on arrival once a non-empty table exists for the turn, and
- * `flushPendingEmptyTable` independently yields to any pending/committed non-empty table.
+ * A populated result table must never be overwritten by an empty one at end-of-stream.
+ * `chat-page.tsx` flushes its held table buffers (`pendingTable`, `pendingEmptyTable`) from three
+ * different call sites — `finally`, the `error` branch, and the `auth_expired` branch — and they
+ * do not all flush in the same order (`finally`/`auth_expired` flush the non-empty one first;
+ * `error` flushes the empty one first). Of the three, only `finally`'s ordering can actually
+ * produce a clobber: `error`'s empty-first order happens to be benign (the later non-empty commit
+ * wins), and `auth_expired` fires on the initial POST's 401 before any SSE frame is read, so it
+ * can never hold a table in the first place. "Happens to be benign" is still worth pinning down.
+ * The invariant is order-INDEPENDENT (see the `pendingEmptyTable` comment above it): an empty spec
+ * is refused on arrival once a non-empty table exists for the turn, and `flushPendingEmptyTable`
+ * independently yields to any pending/committed non-empty table.
  *
  * This is the UI-layer equivalent of the registry-wide coverage tests elsewhere in this codebase
  * (see server/tools/catalog/agg-size-coverage.test.ts): the class here is "orderings of table
@@ -1466,13 +1466,12 @@ describe('ChatPage — feedback while a turn runs', () => {
  * single-table-per-message model — every place an empty `table` event can land relative to a
  * non-empty one, plus the honest-empty cases.
  *
- * The honest-empty cells changed shape with C4 and did not go away: a turn whose FINAL table
- * has zero rows still commits that spec (so the saved conversation still says a query ran and
- * matched nothing) but renders no card — the assistant's prose carries the answer, and a turn with
- * no prose gets one quiet subdued line instead. The suppression mechanism this describe covers is
- * unchanged; only what a committed empty spec looks like on screen is.
+ * The honest-empty case still COMMITS its spec (so the saved conversation still says a query ran
+ * and matched nothing) but renders no card — the assistant's prose carries the answer, and a turn
+ * with no prose gets one quiet subdued line instead. The suppression mechanism this describe
+ * covers applies regardless; only what a committed empty spec looks like on screen depends on it.
  */
-describe('ChatPage — an empty table never clobbers a populated one (issue #8920 item 7)', () => {
+describe('ChatPage — an empty table never clobbers a populated one', () => {
   const ROWS_SPEC = {
     columns: [{ id: 'agent', label: 'Agent' }],
     rows: [{ agent: 'web-01' }],
@@ -1544,12 +1543,11 @@ describe('ChatPage — an empty table never clobbers a populated one (issue #892
   });
 
   /**
-   * C4: the honest-empty case still COMMITS its spec — that is the turn's record of
-   * having queried and matched nothing, and it is what gets persisted — but it no longer draws a
-   * card: message-bubble.tsx suppresses a 0-row table and, when the turn produced no prose of its
-   * own, shows one quiet line in its place. This test used to assert the card ("Results (0 rows)");
-   * its premise moved rather than disappeared, so it now pins the replacement end state through the
-   * SAME event sequence, keeping this describe's matrix of table-event orderings complete.
+   * The honest-empty case still COMMITS its spec — that is the turn's record of having queried
+   * and matched nothing, and it is what gets persisted — but it draws no card: message-bubble.tsx
+   * suppresses a 0-row table and, when the turn produced no prose of its own, shows one quiet line
+   * in its place. This test pins that end state through the SAME event sequence, keeping this
+   * describe's matrix of table-event orderings complete.
    */
   it('shows the quiet no-rows line, not a table card, when the only table this turn is empty and no prose arrived', async () => {
     const stream = createControllableStream();
@@ -1622,9 +1620,9 @@ describe('ChatPage — an empty table never clobbers a populated one (issue #892
       type: 'tool_call',
       toolCall: { id: 't1', name: 'get_top_agents', arguments: {} },
     });
-    // Issue #9008 rework: the chip's window text is now a server-recorded fact
-    // (`TableSpec.provenance`), so this empty spec carries one matching `t1` — same shape
-    // executor.ts actually attaches, rather than relying on any client-side inference.
+    // The chip's window text is a server-recorded fact (`TableSpec.provenance`), so this empty
+    // spec carries one matching `t1` — same shape executor.ts actually attaches, rather than
+    // relying on any client-side inference.
     stream.push({
       type: 'table',
       spec: {
@@ -1829,7 +1827,7 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
   });
 });
 
-describe('ChatPage — pre-turn Manager session guard (issue #8826)', () => {
+describe('ChatPage — pre-turn Manager session guard', () => {
   it('ensures the Manager session (60s memo) before the chat stream fires', async () => {
     const stream = createControllableStream();
     mockStreamChat.mockImplementation(
@@ -1849,7 +1847,7 @@ describe('ChatPage — pre-turn Manager session guard (issue #8826)', () => {
     stream.end();
   });
 
-  it('does not run the mount-time access-probe heal any more', async () => {
+  it('never runs a mount-time access-probe heal', async () => {
     renderChatPage();
     await waitFor(() =>
       expect(mockSettingsService.getAssistantSettings).toHaveBeenCalled(),
@@ -1860,15 +1858,14 @@ describe('ChatPage — pre-turn Manager session guard (issue #8826)', () => {
 
 describe('ChatPage — two-row grid pane (contract §1)', () => {
   /**
-   * Regression guard for the composer/welcome overlap bug, and for the over-reservation bug a
-   * prior fix for it introduced. A live measurement once caught the sticky composer covering the
-   * bottom few pixels of the transcript's last element (a table's pagination bar) even once
-   * scrolled all the way down — `position: sticky` reserved the panel's own box in the flow, but
-   * not the fade gradient its `::before` painted further upward. The fix replaces that whole
-   * mechanism: the pane is now a `display: grid; grid-template-rows: 1fr auto` (`.wzChatPane`,
-   * chat-page.scss), so the transcript (`1fr`, scrolling) and the composer (`auto`, in flow) are
-   * independent grid rows with no overlap possible by construction — nothing to desync, no
-   * gradient, no compensating padding.
+   * Regression guard for composer/transcript overlap: `position: sticky` reserves the panel's own
+   * box in the flow, but not the fade gradient its `::before` paints further upward, so the sticky
+   * composer could cover the bottom few pixels of the transcript's last element (a table's
+   * pagination bar) even scrolled all the way down. The pane is a
+   * `display: grid; grid-template-rows: 1fr auto` (`.wzChatPane`, chat-page.scss), so the
+   * transcript (`1fr`, scrolling) and the composer (`auto`, in flow) are independent grid rows
+   * with no overlap possible by construction — nothing to desync, no gradient, no compensating
+   * padding.
    *
    * jsdom never lays out real boxes and does not evaluate the imported `.scss`, so no jsdom test
    * can pin actual pixel values or reproduce the real overlap. What these pin instead is the
@@ -1925,7 +1922,7 @@ describe('ChatPage — two-row grid pane (contract §1)', () => {
 
     renderChatPage();
     // A save-failed callout above the welcome content is exactly the kind of extra height that
-    // used to push the composer out of a centered flex box and off screen under the old layout.
+    // could push the composer out of a centered flex box and off screen.
     await sendMessage('first question');
     await waitFor(() =>
       expect(
@@ -1966,8 +1963,8 @@ describe('ChatPage — two-row grid pane (contract §1)', () => {
 
   it('removes the old sticky/gradient mechanism from the stylesheet entirely', () => {
     // `path.join` against `__dirname` sidesteps Jest's `moduleNameMapper` (which points `.scss`
-    // imports at `style_mock.js`) and reads the actual SCSS off disk, the same way the previous
-    // version of this test did to pin the mechanism it was checking.
+    // imports at `style_mock.js`) and reads the actual SCSS off disk to pin the mechanism being
+    // checked.
     const scssPath = path.join(__dirname, 'chat-page.scss');
     const scssSource = fs.readFileSync(scssPath, 'utf8');
     // Comments are stripped before matching: this file DOCUMENTS the removed mechanism by name
@@ -1977,12 +1974,11 @@ describe('ChatPage — two-row grid pane (contract §1)', () => {
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/^\s*\/\/.*$/gm, '');
 
-    // Scoped to the composer's own rule block rather than the whole file. This used to assert the
-    // file contained NO `position: sticky` anywhere, which was a fair proxy while the composer was
-    // the only thing that had ever been sticky — but `.wzStatusCallouts` is now legitimately sticky
-    // (a status band pinned inside the transcript's scroll container, an entirely different
-    // element and mechanism), so the file-wide form would fail on that unrelated rule. What this
-    // test actually protects is that the COMPOSER is a flow grid row and not a sticky overlay.
+    // Scoped to the composer's own rule block rather than the whole file: a file-wide
+    // `position: sticky` check would also fail on `.wzStatusCallouts`, which is legitimately
+    // sticky (a status band pinned inside the transcript's scroll container, an entirely different
+    // element and mechanism) even though the composer itself is not. What this test actually
+    // protects is that the COMPOSER is a flow grid row and not a sticky overlay.
     expect(ruleBlock(scssRules, '.wzComposerRow')).not.toMatch(
       /position:\s*sticky/,
     );
@@ -1996,14 +1992,14 @@ describe('ChatPage — two-row grid pane (contract §1)', () => {
 });
 
 /**
- * C2 (ux-iter3): the "jump to latest" affordance that pairs with stick-to-bottom scrolling in every
- * streaming chat UI (ux-research.md §B). The PINNING logic itself is untouched and untested here —
- * jsdom lays out no boxes, so `scrollHeight`/`clientHeight` are 0 and every element reads as pinned;
- * these tests stub those three numbers on the pane so the component's own predicate
- * (`scrollHeight - scrollTop - clientHeight < 160`) resolves to a real answer, and pin the STRUCTURE
- * plus the state transitions around it.
+ * The "jump to latest" affordance that pairs with stick-to-bottom scrolling in every streaming
+ * chat UI. The PINNING logic itself is untouched and untested here — jsdom lays out no boxes, so
+ * `scrollHeight`/`clientHeight` are 0 and every element reads as pinned; these tests stub those
+ * three numbers on the pane so the component's own predicate
+ * (`scrollHeight - scrollTop - clientHeight < 160`) resolves to a real answer, and pin the
+ * STRUCTURE plus the state transitions around it.
  */
-describe('ChatPage — jump to latest (C2)', () => {
+describe('ChatPage — jump to latest', () => {
   /**
    * Makes the transcript pane read as scrolled up. jsdom hardcodes `scrollTop`/`scrollHeight`/
    * `clientHeight` to 0 and ignores writes to `scrollTop`, so all three are redefined as own
@@ -2240,10 +2236,10 @@ describe('ChatPage — welcome centers only when there is room (contract §3)', 
     const title = screen.getByText('Critical findings');
     expect(title).toBeInTheDocument();
 
-    // The grouping container and the "Try one of these" pill that used to head it are BOTH gone
-    // (css-audit-full.md §1.2/§1.3): the outer EuiPanel had the identical border, radius and fill as
-    // the cards inside it — a card-in-a-card carrying no information — and the pill was a third
-    // instructional line under a title and subtitle that already say what to do.
+    // There is no grouping container and no "Try one of these" pill: an outer EuiPanel would
+    // carry the identical border, radius and fill as the cards inside it — a card-in-a-card
+    // carrying no information — and a pill would add a third instructional line under a title
+    // and subtitle that already say what to do.
     expect(screen.queryByText('Try one of these')).toBeNull();
     const grid = title.closest('.wzExampleCardsGrid') as HTMLElement;
     expect(grid).not.toBeNull();
@@ -2251,15 +2247,14 @@ describe('ChatPage — welcome centers only when there is room (contract §3)', 
     // cards themselves are still bordered EuiPanels — that is what groups them now.
     expect(grid.parentElement?.className).toContain('wzWelcomeCenter');
     expect(grid.closest('.euiPanel')).toBeNull();
-    // ...and each card carries the shared container radius rather than EuiCard's own 4px (§6).
+    // ...and each card carries the shared container radius rather than EuiCard's own 4px.
     expect(title.closest('.euiCard')).toHaveClass('wzWelcomeCard');
   });
 });
 
 /**
- * C1 (ux-iter3, AI/ux-iter3/gemini-motion-spec.md): the Gemini-style empty state — greeting,
- * example cards and composer as ONE vertically centred group — and the one-time transition that
- * docks the composer on the first send.
+ * The Gemini-style empty state — greeting, example cards and composer as ONE vertically centred
+ * group — and the one-time transition that docks the composer on the first send.
  *
  * jsdom runs no transitions and lays out no boxes, so what these pin is the STATE MACHINE and the
  * structure it drives (which classes exist in which state, what is in flow when the first message
@@ -2268,7 +2263,7 @@ describe('ChatPage — welcome centers only when there is room (contract §3)', 
  * which is why the inverted transform below is asserted as `translateY(0px)`: the value is the
  * environment's, the fact that the mechanism ran is the point.
  */
-describe('ChatPage — welcome composer and first-send transition (C1)', () => {
+describe('ChatPage — welcome composer and first-send transition', () => {
   const chatPane = () => document.querySelector('.wzChatPane') as HTMLElement;
   const composerRow = () =>
     document.querySelector('.wzComposerRow') as HTMLElement;
@@ -2560,12 +2555,12 @@ describe('ChatPage — welcome composer and first-send transition (C1)', () => {
     // The centred state is a flex column that centres the pair.
     expect(scssRules).toMatch(/\.wzChatPane--welcome\s*\{/);
     expect(scssRules).toMatch(/justify-content:\s*center/);
-    // The composer has NO measure of its own DISTINCT from the shared one any more — it shares
+    // The composer has NO measure of its own DISTINCT from the shared one — it shares
     // `.wzContentMeasure`'s system (via `.wzComposerMeasure`) in both states, which is what gives
-    // the empty state a single alignment edge (css-audit-full.md §1.1). The OLD 680px-pill
-    // mechanism (a private `$wzWelcomeComposerMaxWidth`, a width tween between two DIFFERENT pill
-    // widths) is pinned as absent — a silently-restored 680px pill would be exactly that
-    // regression. A `max-width` transition on `.wzComposerMeasure` DOES legitimately exist now,
+    // the empty state a single alignment edge. The OLD 680px-pill mechanism (a private
+    // `$wzWelcomeComposerMaxWidth`, a width tween between two DIFFERENT pill widths) is pinned as
+    // absent — a silently-restored 680px pill would be exactly that regression. A `max-width`
+    // transition on `.wzComposerMeasure` DOES legitimately exist,
     // though (assertion below): it interpolates the shared measure's OWN two caps, 840px centred
     // vs 1060px docked, which is a different mechanism from the removed pill and is covered by its
     // own SCSS test above ('animates the composer measure open on dock...').
@@ -2574,11 +2569,11 @@ describe('ChatPage — welcome composer and first-send transition (C1)', () => {
       /\.wzComposerMeasure\s*\{\s*transition:\s*max-width \$wzDockTravel \$wzDockEase;/,
     );
     // What the class carries instead: the composer's own BLOCK gutter (8px, 16px block-start in
-    // the centred state so greeting → cards → composer are one evenly-spaced group — §1.5). The
-    // 24px INLINE half moved to `.wzComposerRow` instead (live-audit follow-up, item 3): keeping
-    // it on `.wzComposerMeasure` shrank the visible panel to 840 - 2×24 = 792px while the welcome
-    // cluster's own padding-less measure reached the full 840, a 48px edge mismatch the two
-    // shared-measure elements must not have.
+    // the centred state so greeting → cards → composer are one evenly-spaced group). The 24px
+    // INLINE half lives on `.wzComposerRow` instead: keeping it on `.wzComposerMeasure` would
+    // shrink the visible panel to 840 - 2×24 = 792px while the welcome cluster's own padding-less
+    // measure reaches the full 840, a 48px edge mismatch the two shared-measure elements must not
+    // have.
     expect(scssRules).toMatch(
       /\.wzComposerMeasure\s*\{\s*padding-block:\s*8px/,
     );
@@ -2608,7 +2603,7 @@ describe('ChatPage — welcome composer and first-send transition (C1)', () => {
   });
 });
 
-describe('ChatPage — sidebar sync across instances (#8827)', () => {
+describe('ChatPage — sidebar sync across instances', () => {
   it('refreshes the conversation list when another instance announces a change', async () => {
     mockConversationsService.list.mockResolvedValue([]);
     renderChatPage();
@@ -2897,9 +2892,9 @@ describe('ChatPage — conversation rail display mode (layout contract §5/§6)'
 
   it('keeps an expanded override alive across a resize inside the docked panel band (allowRailFlyout=false)', async () => {
     // The docked sidecar's own default width (assistant-chat-panel.tsx) sits well under
-    // RAIL_FLYOUT_AT — exactly the band that used to force 'collapsed' and wipe any override on
-    // every resize tick, which would have silently undone the panel's own toolbar toggle the
-    // moment the user dragged the sidecar to a new (still narrow) width.
+    // RAIL_FLYOUT_AT — exactly the band that would otherwise force 'collapsed' and wipe any
+    // override on every resize tick, silently undoing the panel's own toolbar toggle the moment
+    // the user dragged the sidecar to a new (still narrow) width.
     const stub = stubResizeObserver(500);
     try {
       const view = renderChatPage({
@@ -3057,12 +3052,12 @@ describe('ChatPage — composer privacy chip (iteration 4)', () => {
   });
 });
 
-// The full explainer used to live in an EuiToolTip WRAPPING the pill itself, which meant hovering
-// the pill to click it also forced a wall of text. It now lives on a separate, discrete ⓘ button
-// (an EuiPopover — see "privacy control legibility" below for its click/keyboard behaviour) placed
-// right after the pill — this only needs to prove that affordance exists;
-// the pill's own click/toggle behavior is already covered by the describe block above.
-describe('ChatPage — privacy explainer moved off the pill onto a discrete ⓘ (iteration-4 batch 2 item 1)', () => {
+// The full explainer lives on a separate, discrete ⓘ button (an EuiPopover — see "privacy control
+// legibility" below for its click/keyboard behaviour) placed right after the pill, not in an
+// EuiToolTip wrapping the pill itself (which would force hovering the pill to click it to also
+// show a wall of text) — this only needs to prove that affordance exists; the pill's own
+// click/toggle behavior is already covered by the describe block above.
+describe('ChatPage — privacy explainer lives on a discrete ⓘ, separate from the pill', () => {
   it('renders a discrete info affordance beside the pill, separate from the pill itself', async () => {
     renderChatPage();
     const chip = await findPrivacyChip();
@@ -3285,8 +3280,8 @@ describe('ChatPage — provider provenance and per-conversation memory', () => {
 
     await settleRestore();
     // Nothing yet: the conversation is restored but no provider is known, so there is nothing to
-    // check the stamp against. The request must be HELD, not resolved against an empty list — which
-    // is what the old implementation did, silently, on every reload and every deep link.
+    // check the stamp against. The request must be HELD, not resolved against an empty list, which
+    // would silently misfire on every reload and every deep link.
     expect(onProviderChange).not.toHaveBeenCalled();
 
     view.rerenderWith({
@@ -3360,8 +3355,8 @@ describe('ChatPage — provider provenance and per-conversation memory', () => {
 
   it('restores the provider on a sidebar conversation switch, with everything already loaded', async () => {
     // The regression case: switching conversations changes neither `providers` nor
-    // `providersLoaded`, so a restore keyed only on those never ran at all — worse than before the
-    // feature, since the code it replaced called `onProviderChange` directly here and worked.
+    // `providersLoaded`, so a restore keyed only on those would never run at all, silently leaving
+    // the provider selection stale.
     const onProviderChange = jest.fn();
     mockConversationsService.list.mockResolvedValue([
       { id: 'conv-b', title: 'Older conversation', updatedAt: '2024-01-01' },
@@ -3612,8 +3607,9 @@ describe('ChatPage — privacy default follows a restored provider', () => {
 });
 
 /**
- * The failure used to live only in the callout band above the transcript, which `handleSend`
- * clears — so asking anything else erased the only evidence the turn had ever failed.
+ * If a failure lived only in the callout band above the transcript, `handleSend` clearing that
+ * band on the next question would erase the only evidence the turn had ever failed. The failed
+ * turn must stay marked in the transcript itself, regardless of the callout.
  */
 describe('ChatPage — a failed turn stays visible after the next question', () => {
   it('keeps the failed turn marked, and keeps an "Ask again" action on it, once a later turn succeeds', async () => {
@@ -4260,24 +4256,24 @@ describe('ChatPage — admin privacy policy applies without a reload', () => {
 });
 
 /**
- * Issue #9010, conversation-rail group (findings E2/E3/E4): chat-page.tsx's own wiring of
- * ConversationList's `onRename`/`onBulkDelete` handlers to ConversationsService, plus the
- * confirmation toast (E4) that fires after a successful single or bulk delete. conversation-list.
- * test.tsx already covers the component's own rename-input/select-mode/checkbox mechanics in
- * isolation; these tests are about what chat-page.tsx does once those callbacks actually fire.
+ * chat-page.tsx's own wiring of ConversationList's `onRename`/`onBulkDelete` handlers to
+ * ConversationsService, plus the confirmation toast that fires after a successful single or bulk
+ * delete. conversation-list.test.tsx already covers the component's own rename-input/select-mode/
+ * checkbox mechanics in isolation; these tests are about what chat-page.tsx does once those
+ * callbacks actually fire.
  */
-describe('conversation rail: rename, bulk delete, and delete toasts (#9010)', () => {
-  it('B1 REGRESSION: a rename survives the very next auto-save, with no spurious 409/merge', async () => {
-    // Before the fix, EVERY auto-save (this PUT included) resent a freshly recomputed
-    // `buildConversationTitle` -- so the answer-complete save below (a turn saves twice: once
-    // when the question is sent -- the POST that creates the row -- and once more when the
-    // answer finishes, a PUT) would have silently reverted the rename back to the auto-generated
-    // title, AND -- because the rename's own write moved the document's version on without
-    // chat-page.tsx ever learning about it -- this PUT's stale `expectedVersion` would have
-    // 409'd, triggering an unnecessary merge round-trip (and, on a conversation that really was
-    // open in only one tab, a FALSE "merged from another tab" notice). Asserting both `update`'s
-    // own arguments (no title in the call, the fresh post-rename version) and that `get`/`update`
-    // never had to react to a conflict is what catches either half of the regression coming back.
+describe('conversation rail: rename, bulk delete, and delete toasts', () => {
+  it('a rename survives the very next auto-save, with no spurious 409/merge', async () => {
+    // If every auto-save (this PUT included) resent a freshly recomputed
+    // `buildConversationTitle`, the answer-complete save below (a turn saves twice: once when the
+    // question is sent -- the POST that creates the row -- and once more when the answer finishes,
+    // a PUT) would silently revert the rename back to the auto-generated title. And because the
+    // rename's own write moves the document's version on, this PUT's stale `expectedVersion` would
+    // 409 if chat-page.tsx never learned about the new version, triggering an unnecessary merge
+    // round-trip (and, on a conversation that really is open in only one tab, a FALSE "merged from
+    // another tab" notice). Asserting both `update`'s own arguments (no title in the call, the
+    // fresh post-rename version) and that `get`/`update` never had to react to a conflict is what
+    // catches either half of this regression.
     const handleRef = React.createRef<ChatPageHandle>();
     const stream = createControllableStream();
     mockStreamChat.mockImplementationOnce(
@@ -4317,8 +4313,8 @@ describe('conversation rail: rename, bulk delete, and delete toasts (#9010)', ()
       ),
     );
 
-    // Finish the turn: this is the SECOND save (the first was the pre-send POST above), the one
-    // the fix is actually about -- an existing conversation's every save from here on is a PUT.
+    // Finish the turn: this is the SECOND save (the first was the pre-send POST above) -- an
+    // existing conversation's every save from here on is a PUT.
     await act(async () => {
       stream.push({ type: 'delta', content: 'an answer' });
       stream.end();
@@ -4330,7 +4326,7 @@ describe('conversation rail: rename, bulk delete, and delete toasts (#9010)', ()
 
     const updateCall = mockConversationsService.update.mock.calls[0];
     expect(updateCall[0]).toBe('conv-new');
-    // NO title argument at all -- `update`'s signature no longer accepts one (issue #9010).
+    // NO title argument at all -- `update`'s signature does not accept one.
     expect(updateCall).toHaveLength(3);
     // The expectedVersion this PUT checked against is the RENAME's fresh version, not the
     // pre-rename one -- proving `handleRenameConversation` stamped `conversationVersionRef`.

@@ -70,10 +70,10 @@ describe('ProviderFormFlyout — create mode', () => {
   });
 
   it('states the key requirement for the SELECTED provider type, not one line for both', () => {
-    // One shared line used to serve both types, so an admin adding a Claude provider was told the
-    // key was "optional for endpoints that don't require authentication (e.g. a local Ollama
-    // server without auth)": three claims, none of them true of Anthropic, on the very form
-    // already found confusing to sign an Anthropic key up on.
+    // A single shared line across both types would tell an admin adding a Claude provider that the
+    // key is "optional for endpoints that don't require authentication (e.g. a local Ollama server
+    // without auth)": three claims, none of them true of Anthropic, on the very form already found
+    // confusing to sign an Anthropic key up on.
     render(<ProviderFormFlyout {...baseProps} />);
 
     // openai_compatible is the default selection: optional, and Ollama is a real example here.
@@ -635,9 +635,9 @@ describe('ProviderFormFlyout — getting-started onboarding', () => {
   });
 
   it('lays the four steps out as a real ordered list, in order', () => {
-    // The steps used to be a single i18n message with the numbering baked into the copy
-    // ("1. Pick a provider type. 2. Paste its API key. ...") rendered as ONE inline paragraph, so a
-    // sequence neither scanned nor was announced as one. The numbers now come from the <ol>.
+    // The numbers come from the <ol>, not from a single i18n message with the numbering baked
+    // into the copy ("1. Pick a provider type. 2. Paste its API key. ...") rendered as ONE inline
+    // paragraph, where a sequence neither scans nor is announced as one.
     render(<ProviderFormFlyout {...baseProps} />);
 
     const list = gettingStartedCallout().querySelector('ol');
@@ -658,10 +658,10 @@ describe('ProviderFormFlyout — getting-started onboarding', () => {
     expect(list?.textContent).not.toMatch(/1\.\s*Pick a provider type/);
   });
 
-  it('no longer hedges the connection test before the form is even filled in', () => {
-    // Deleted copy: "A green test confirms connection and key — it does not guarantee
-    // every chat request will succeed." True, but a caveat about the outcome of step 4 read as
-    // doubt about the whole feature on the surface that most needs to feel simple.
+  it('does not hedge the connection test before the form is even filled in', () => {
+    // This copy is deliberately absent: "A green test confirms connection and key — it does not
+    // guarantee every chat request will succeed." True, but a caveat about the outcome of step 4
+    // reads as doubt about the whole feature on the surface that most needs to feel simple.
     render(<ProviderFormFlyout {...baseProps} />);
 
     expect(
@@ -676,10 +676,9 @@ describe('ProviderFormFlyout — getting-started onboarding', () => {
 
 describe('ProviderFormFlyout — one type scale for field guidance', () => {
   it('renders the in-slot examples label through EUI help text, not an ad-hoc EuiText size', () => {
-    // Three uncoordinated mechanisms used to produce "small text" on this form: EuiText size='s',
-    // raw elements in an EuiFormRow helpText slot, and EuiText size='xs'. The xs variant is gone —
-    // the "Examples:" label is a plain element inside the helpText slot, so it takes
-    // .euiFormHelpText and cannot drift from the API key field's help beside it.
+    // The "Examples:" label is a plain element inside the EuiFormRow helpText slot — not an
+    // EuiText size='s' or size='xs' component, and not a raw element outside the slot — so it
+    // takes .euiFormHelpText and cannot drift from the API key field's help beside it.
     render(<ProviderFormFlyout {...baseProps} />);
 
     // ONE label, the endpoint field's: the Model field's own generic examples row was removed
@@ -830,8 +829,8 @@ describe('ProviderFormFlyout — model help text does not recommend retiring mod
 
     expect(helpText.textContent).not.toMatch(/llama-3\.3-70b-versatile/);
     expect(helpText.textContent).not.toMatch(/llama-3\.1-8b-instant/);
-    // The example follows the selected provider type rather than being a fixed GPT-4o, which is
-    // what this line used to assert — see the per-type example test above.
+    // The example follows the selected provider type rather than a fixed GPT-4o — see the
+    // per-type example test above.
     expect(helpText.textContent).toMatch(/openai\.gpt-oss-120b/);
     expect(helpText.textContent).not.toMatch(
       /small or base models often fail/i,
@@ -844,9 +843,9 @@ describe('ProviderFormFlyout — model help text does not recommend retiring mod
     expect(
       screen.queryByText(/^llama-3\.3-70b-versatile$/),
     ).not.toBeInTheDocument();
-    // The per-type example the tool-calling callout NAMES is still the type's own first curated
-    // model — that list did not go away, only its chip row under the Model field did, so this is
-    // now the one place the id appears and it is prose rather than a fillable chip.
+    // The tool-calling callout names the type's own first curated model. The Model field has no
+    // chip row of its own, so this is the one place the id appears, and it appears as prose
+    // rather than a fillable chip.
     const named = screen.getAllByText(/^openai\.gpt-oss-120b$/);
     expect(named).toHaveLength(1);
     expect(named[0].closest('.euiCallOut')).not.toBeNull();
@@ -887,10 +886,9 @@ describe('ProviderFormFlyout — Model field guidance', () => {
     });
 
     // Anchored to the CHIP's own <code>: an unanchored getByText would match both the chip and the
-    // plain-text model example the tool-calling callout names. The chip is a vendor suggestion now
-    // (the generic per-type examples row is gone) — and claude-sonnet-5 reaching it at all is the
-    // point: it is in BOTH curated lists, and the dedupe that used to hide it here went with the
-    // row it was deduplicating against.
+    // plain-text model example the tool-calling callout names. The chip is a vendor suggestion —
+    // the Model field has no generic per-type examples row to dedupe against — and claude-sonnet-5
+    // reaching it at all is the point: it is in BOTH curated lists, with nothing hiding it here.
     expect(
       screen
         .getAllByText(/^claude-sonnet-5$/i)
@@ -917,16 +915,14 @@ describe('ProviderFormFlyout — type label and tool-support copy corrections', 
   it('names only providers this build actually supports, and separates hosted from local', () => {
     // Naming a service here is a support claim: it sends an admin off to configure it.
     //
-    // This assertion previously required that Gemini NOT be named, from a time when Gemini's
-    // OpenAI-compatible endpoint 400'd on every tool round-trip ("Function call is missing a
-    // thought_signature"). That adapter fix has since landed — `vendorExtras` round-trips in
-    // server/providers/openai-compatible.ts, common/types.ts and both route schemas — so the
-    // reason for excluding it is gone and it is named again.
+    // Gemini's OpenAI-compatible endpoint would 400 on a tool round-trip ("Function call is
+    // missing a thought_signature") without `vendorExtras` round-tripping through
+    // server/providers/openai-compatible.ts, common/types.ts and both route schemas — that
+    // plumbing is in place, so Gemini is named here.
     //
-    // Groq goes the other way: it was named as a recommended example and was measured returning
-    // 413 across its whole tier, so the UI was sending admins to a provider we knew failed.
-    // "Bedrock-Mantle" is an internal gateway name that should never have shipped in a product
-    // string.
+    // Groq is excluded: it measured returning 413 across its whole tier, so naming it as a
+    // recommended example would send admins to a provider known to fail. "Bedrock-Mantle" is an
+    // internal gateway name that should never appear in a product string.
     render(<ProviderFormFlyout {...baseProps} />);
 
     const label = screen.getByText(/openai-compatible/i);
@@ -1097,7 +1093,7 @@ describe('ProviderFormFlyout — Model field is an editable EuiComboBox', () => 
     expect(selectedModel()).toBe('my-custom-fine-tune');
   });
 
-  it('lists each suggested model once, including the ids the old dedupe used to hide', () => {
+  it('lists each suggested model once, including ids a naive dedupe would hide', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
     fireEvent.click(providerTypeOption('anthropic'));
@@ -1105,12 +1101,12 @@ describe('ProviderFormFlyout — Model field is an editable EuiComboBox', () => 
       target: { value: 'https://api.anthropic.com' },
     });
 
-    // claude-sonnet-5 is listed in both PROVIDER_MODEL_GUIDANCE and VENDOR_MODEL_SUGGESTIONS, and
-    // it used to be filtered OUT of the suggestions because the Model field also showed a generic
-    // examples row carrying it. That row is gone, so the filter is gone with it — dropping the
-    // vendor's own primary model from the only list still offering it would have been the real
-    // regression. The tool-calling callout names the same id in prose and is excluded here: the
-    // invariant is about the LIST, not about the string appearing once on the form.
+    // claude-sonnet-5 is listed in both PROVIDER_MODEL_GUIDANCE and VENDOR_MODEL_SUGGESTIONS.
+    // Filtering it OUT of the suggestions because the Model field's generic examples row also
+    // carries it would drop the vendor's own primary model from the only list still offering it —
+    // the Model field has no such generic examples row, so there is nothing to dedupe against. The
+    // tool-calling callout names the same id in prose and is excluded here: the invariant is about
+    // the LIST, not about the string appearing once on the form.
     const inTheList = screen
       .getAllByText('claude-sonnet-5')
       .filter(node => !node.closest('.euiCallOut'));
@@ -1121,12 +1117,11 @@ describe('ProviderFormFlyout — Model field is an editable EuiComboBox', () => 
 });
 
 /**
- * The live CSS audit (AI/ux-iter3/css-audit-full.md §5) called this flyout "the ONE genuinely
- * too-empty surface in the build": a 960px panel holding a 400px form, i.e. 500px of nothing beside
- * every field. These pin the shape that replaced it, plus the two idioms the audit found competing
- * inside it.
+ * This flyout renders as a capped reading-width column rather than a 960px panel holding a 400px
+ * form, i.e. 500px of nothing beside every field. These tests pin that shape, plus the
+ * provider-type control rendering as one thing at a time rather than two competing idioms.
  */
-describe('ProviderFormFlyout — one tight column (audit §5)', () => {
+describe('ProviderFormFlyout — one tight column', () => {
   it('caps the panel at a reading-width column', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
@@ -1166,10 +1161,10 @@ describe('ProviderFormFlyout — one tight column (audit §5)', () => {
   });
 
   it('is a segmented control (button group), not a pair of huge cards', () => {
-    // UX iteration 4 item 1: the binary provider-type choice used to be two ~282x211px
-    // EuiCheckableCards. It is now an EuiButtonGroup — still exposed as two radios (EUI wires a
-    // hidden native radio input per option for a `type="single"` group), so the count-based
-    // assertion from before still holds, but there is no `.euiCheckableCard` on the page any more.
+    // The binary provider-type choice renders as an EuiButtonGroup, not two ~282x211px
+    // EuiCheckableCards — still exposed as two radios (EUI wires a hidden native radio input per
+    // option for a `type="single"` group), so the count-based assertion holds, and there is no
+    // `.euiCheckableCard` on the page.
     render(<ProviderFormFlyout {...baseProps} />);
 
     expect(screen.getAllByRole('radio')).toHaveLength(2);
@@ -1177,10 +1172,9 @@ describe('ProviderFormFlyout — one tight column (audit §5)', () => {
   });
 
   it('describes only the SELECTED provider type, not both at once', () => {
-    // The old layout rendered both types' descriptions on screen simultaneously (one per card),
-    // which the audit flagged as confusing on the exact surface already called out as hard to
-    // get right (audit finding: description placement). The description now lives in
-    // the button group's own EuiFormRow `helpText`, so only the current selection is described.
+    // Rendering both types' descriptions on screen simultaneously (one per card) reads as
+    // confusing on the exact surface already hard to get right. The description lives in the
+    // button group's own EuiFormRow `helpText`, so only the current selection is described.
     render(<ProviderFormFlyout {...baseProps} />);
 
     // openai_compatible is the default selection.
@@ -1678,7 +1672,8 @@ describe('ProviderFormFlyout — endpoint URL validation', () => {
       await screen.findByText(/valid URL starting with http/i),
     ).toBeInTheDocument();
 
-    // One keystroke used to clear the error, which reads as "fixed" while nothing was fixed.
+    // A single keystroke that doesn't make the value valid must not clear the error — that would
+    // read as "fixed" while nothing was fixed.
     fireEvent.change(field, { target: { value: 'not-a-urlh' } });
     expect(
       screen.getByText(/valid URL starting with http/i),

@@ -1,9 +1,8 @@
 /**
- * Settings page (Screen 3 of the redesign — see AI/design/redesign-v2-spec.md). Sections become
- * bordered, shadowless cards under a centred pill title (the Home overview idiom), replacing the
- * plain heading + panel pair the page used before. Tokens come from the shared `_redesign.scss`
- * partial (see its own file-level doc comment) so this page never restates a value it already
- * defines.
+ * Settings page. Sections are bordered, shadowless cards under a centred pill title (the Home
+ * overview idiom) rather than a plain heading + panel pair. Tokens come from the shared
+ * `_redesign.scss` partial (see its own file-level doc comment) so this page never restates a
+ * value it already defines.
  */
 @import '../redesign';
 
@@ -129,16 +128,16 @@ $wzSettingsCardPillHeight: $wzSettingsCardPillLineHeight +
 }
 
 /**
- * Status chip (screen 3, variation 3a — "one chip, four states"): tinted fill, no border, fully
- * round, colour alone carries the state. Replaces the table's earlier three status languages
- * (EuiHealth dot, plain danger badge, spinner+text). `provider-status.ts` already models these
- * states (PR #8936) — this only restyles their presentation, it never re-derives them.
+ * Status chip — "one chip, four states": tinted fill, no border, fully
+ * round, colour alone carries the state. Consolidates the table's three status representations
+ * (EuiHealth dot, plain danger badge, spinner+text) into one visual language. `provider-status.ts`
+ * already models these states — this only restyles their presentation, it never re-derives them.
  */
 /* Qualified with `.euiBadge` deliberately. Every rule this block overrides lives on EUI's own
    `.euiBadge--hollow`, also a single class — a 0,1,0 vs 0,1,0 tie decided purely by which
    stylesheet the browser loaded last. Compounding the two classes the element already carries
    makes these 0,2,0 and takes bundle order out of it; without that, a future load-order change
-   silently reverts every chip to a hollow badge and variation 3a disappears from Screen 3. */
+   silently reverts every chip to a hollow badge. */
 .euiBadge.wzStatusChip {
   display: inline-flex;
   align-items: center;
@@ -182,8 +181,8 @@ $wzSettingsCardPillHeight: $wzSettingsCardPillLineHeight +
   margin-right: 2px;
 }
 
-/* Endpoint column (screen 3 gap: "Endpoints dominate the row"): `middleTruncate` (settings-
-   page.tsx) is the ONLY truncation mechanism — it already bounds the string length and keeps the
+/* Endpoint column: `middleTruncate` (settings-page.tsx) is the ONLY truncation mechanism — it
+   already bounds the string length and keeps the
    distinguishing tail visible, which a second, competing `text-overflow: ellipsis` here used to
    throw away by re-truncating from the end at narrow widths. `overflow: hidden` stays as a plain
    layout safety net (no ellipsis of its own), not a second truncation: with the table's

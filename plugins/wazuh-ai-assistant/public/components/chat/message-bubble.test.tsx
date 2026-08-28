@@ -34,15 +34,15 @@ describe('MessageBubble', () => {
     );
 
     expect(screen.getByText('How many alerts?')).toBeInTheDocument();
-    // The "You" avatar is gone (css-audit-full.md §3.7): its 32px plus the row gutter held the
-    // question's right edge 16px in from the transcript's, so the bubble and the composer directly
-    // below it never shared the surface's one alignment edge. It carried no information the
-    // bubble's own fill, border and right alignment do not already carry — which is exactly how
-    // every mainstream chat client renders a user turn.
+    // The "You" avatar is gone: its 32px plus the row gutter held the question's right edge 16px
+    // in from the transcript's, so the bubble and the composer directly below it never shared the
+    // surface's one alignment edge. It carried no information the bubble's own fill, border and
+    // right alignment do not already carry — which is exactly how every mainstream chat client
+    // renders a user turn.
     expect(container.querySelector('[title="You"]')).toBeNull();
     expect(container.querySelector('.euiAvatar')).toBeNull();
-    // The bubble itself is unchanged, and takes its radius from the shared container token rather
-    // than the inline `borderRadius: 14` it used to carry (§6).
+    // The bubble takes its radius from the shared container token, not an inline
+    // `borderRadius: 14`.
     const bubble = screen
       .getByText('How many alerts?')
       .closest('.euiPanel') as HTMLElement;
@@ -65,8 +65,8 @@ describe('MessageBubble', () => {
     expect(avatar).not.toBeNull();
     // initialsLength=2 — both letters, not EUI's default single "A".
     expect(avatar?.textContent).toBe('AI');
-    // The avatar is no longer an image: EuiAvatar's imageUrl renders as an inline
-    // background-image, and nothing in the bubble should point at the Wazuh mark any more.
+    // The avatar is not an image: EuiAvatar's imageUrl renders as an inline background-image, and
+    // nothing in the bubble points at the Wazuh mark.
     expect(container.innerHTML).not.toContain('background-image');
     expect(container.innerHTML).not.toContain('wazuh_mark');
   });
@@ -91,7 +91,7 @@ describe('MessageBubble', () => {
     expect(container.textContent).not.toContain('**bold**');
   });
 
-  it('#8890: renders a Markdown image and a raw <img> tag as inert — no <img> element mounts, and legitimate formatting survives', () => {
+  it('renders a Markdown image and a raw <img> tag as inert — no <img> element mounts, and legitimate formatting survives', () => {
     const { container } = render(
       <MessageBubble
         message={baseMessage({
@@ -177,10 +177,9 @@ describe('MessageBubble', () => {
   });
 
   it('never mounts a second, avatar-side loading spinner while streaming (one indicator only)', () => {
-    // The avatar-mounted EuiLoadingSpinner that used to run alongside the in-bubble
-    // EuiLoadingContent skeleton was removed — a streaming turn now shows exactly one loading
-    // affordance (the skeleton/status line inside the bubble, covered by the tests above), never
-    // two independent ones for the same event.
+    // A streaming turn shows exactly one loading affordance (the skeleton/status line inside the
+    // bubble, covered by the tests above), never a second, avatar-mounted spinner running
+    // alongside it for the same event.
     const { container: streamingContainer } = render(
       <MessageBubble
         message={baseMessage({
@@ -248,11 +247,10 @@ describe('MessageBubble', () => {
   });
 
   /**
-   * C4 (ux-research.md §E, and PatternFly's explicit "never render a header-only
-   * table"): a FINAL table with zero rows draws no card at all. The gate is here, in the renderer,
-   * rather than in chat-page.tsx's flush path, because `message.table` is persisted — a conversation
-   * saved before this change carries 0-row specs a stream-time gate would never see, and would still
-   * draw the empty card on resume.
+   * PatternFly's explicit "never render a header-only table" guidance: a FINAL table with zero
+   * rows draws no card at all. The gate is here, in the renderer, rather than in chat-page.tsx's
+   * flush path, because `message.table` is persisted — an older saved conversation can carry
+   * 0-row specs a stream-time gate would never see, and would still draw the empty card on resume.
    */
   describe('a zero-row table is never drawn as a card', () => {
     const EMPTY_TABLE: TableSpec = {
@@ -336,8 +334,8 @@ describe('MessageBubble', () => {
           message={baseMessage({
             role: 'assistant',
             content: 'Nothing matched.',
-            // `provenance.toolCallId` matches the below call — issue #9008 rework: the chip's
-            // window text is a server-recorded FACT now, not inferred from `arguments`.
+            // `provenance.toolCallId` matches the below call — the chip's window text is a
+            // server-recorded FACT, not inferred from `arguments`.
             table: {
               ...EMPTY_TABLE,
               provenance: {
@@ -360,8 +358,8 @@ describe('MessageBubble', () => {
     });
 
     it('shows the tool name alone (no invented window) when the server recorded no provenance', () => {
-      // Issue #9008 blocker 1: `arguments: {}` used to make the OLD implementation default the
-      // window to "90d" itself; the rework must never do that — no `provenance` means no window.
+      // Defaulting `arguments: {}` to a "90d" window would be inventing a window — no `provenance`
+      // means no window is shown.
       render(
         <MessageBubble
           message={baseMessage({
@@ -379,8 +377,8 @@ describe('MessageBubble', () => {
       expect(screen.queryByText(/Top agents · /)).toBeNull();
     });
 
-    // Issue #9008 review, minor 7: this raw view IS the popover's equivalent for a turn whose
-    // table is suppressed (0 rows) — "which index did it read?" matters most exactly here, so it
+    // This raw view IS the popover's equivalent for a turn whose table is suppressed (0 rows) —
+    // "which index did it read?" matters most exactly here, so it
     // must show the same Index/Time-range lines the rendered-table popover does (ProvenanceChip,
     // result-table.tsx), not just the tool name and raw arguments.
     it('shows the Index and Time-range lines in the suppressed-table raw view once opened', () => {
@@ -396,9 +394,9 @@ describe('MessageBubble', () => {
                 index: 'wazuh-agents-index-*',
                 effectiveRange: { gte: 'now-90d', lte: 'now' },
                 clamped: false,
-                // `executedAt` required for the Time-range line to resolve at all (issue #9008
-                // blocker 2) -- without it a date-math bound stays unresolved and that line is
-                // simply omitted, which is exactly what a colocated test below covers instead.
+                // `executedAt` required for the Time-range line to resolve at all -- without it a
+                // date-math bound stays unresolved and that line is simply omitted, which is
+                // exactly what a colocated test below covers instead.
                 executedAt: Date.now(),
               },
             },
@@ -421,8 +419,8 @@ describe('MessageBubble', () => {
     });
 
     it('shows the tool name alone (no invented window) when the server recorded no provenance', () => {
-      // Issue #9008 blocker 1: `arguments: {}` used to make the OLD implementation default the
-      // window to "90d" itself; the rework must never do that — no `provenance` means no window.
+      // Defaulting `arguments: {}` to a "90d" window would be inventing a window — no `provenance`
+      // means no window is shown.
       render(
         <MessageBubble
           message={baseMessage({
@@ -456,9 +454,9 @@ describe('MessageBubble', () => {
         />,
       );
 
-      // The measure lives on the inner prose container (iteration-4 audit item 10: the outer flex
-      // item's own inline `maxWidth` always wins over a class there, so it no longer carries this
-      // class at all — see the "prose measure vs. table breakout" tests below for that).
+      // The measure lives on the inner prose container: the outer flex item's own inline
+      // `maxWidth` always wins over a class there, so it does not carry this class at all — see
+      // the "prose measure vs. table breakout" tests below for that.
       const proseContainer = screen
         .getByText('Nothing matched.')
         .closest('.wzProseMeasure') as HTMLElement;
@@ -541,9 +539,9 @@ describe('MessageBubble', () => {
         .closest('.wzProseMeasure') as HTMLElement;
       expect(proseContainer).toHaveClass('wzProseMeasure');
 
-      // The OUTER flex item does NOT also carry the class (iteration-4 audit item 10): its own
-      // inline `maxWidth` (below) always wins over a class on specificity, so the class used to sit
-      // here doing nothing — dead weight for a table turn, misleading for a prose-only one.
+      // The OUTER flex item does NOT also carry the class: its own inline `maxWidth` (below)
+      // always wins over a class on specificity, so having the class here as well would be dead
+      // weight for a table turn, misleading for a prose-only one.
       const bubbleItem = screen
         .getByText('Six today.')
         .closest('.euiFlexItem') as HTMLElement;
@@ -566,19 +564,15 @@ describe('MessageBubble', () => {
     });
 
     it('keeps avatar, prose and meta on the same left edge in a table-carrying (--wide) row, bounded at the content column', () => {
-      // The drift this pins (css-audit-full.md §3.1 and the owner's live report that avatars sit
-      // further left on table answers): the earlier per-element scheme centred the wider row 120px
-      // further out and then tried to pull four separate edges back with per-element calc
-      // corrections, which left the avatar and card short of the prose rail. The wide row now
-      // instead ANCHORS its own inline-start edge at the normal row's (`margin-inline-start: max(0px,
-      // (100% - $wzContentMaxWidth) / 2)`, the same offset a normal row's `margin: 0 auto` produces)
-      // and takes any remaining room on the end side only (`width: auto; margin-inline-end: 0`), so
-      // the avatar, prose and meta all keep their normal x with no per-element correction. The cap is
-      // $wzContentMaxWidth — the SAME content column the composer uses (owner's iteration-4 call:
-      // bound the table by the chat box) — NOT a wider table-only $wzTableMaxWidth, so the card's
-      // right edge lands on the composer's right edge instead of overshooting it on wide windows. It
-      // reads the source directly because jest maps `.scss` to a style mock, so no rendered assertion
-      // can observe a value that came from a stylesheet.
+      // The wide row ANCHORS its own inline-start edge at the normal row's
+      // (`margin-inline-start: max(0px, (100% - $wzContentMaxWidth) / 2)`, the same offset a
+      // normal row's `margin: 0 auto` produces) and takes any remaining room on the end side only
+      // (`width: auto; margin-inline-end: 0`), so the avatar, prose and meta all keep their normal
+      // x with no per-element correction. The cap is $wzContentMaxWidth — the SAME content column
+      // the composer uses, bounding the table by the chat box — NOT a wider table-only
+      // $wzTableMaxWidth, so the card's right edge lands on the composer's right edge instead of
+      // overshooting it on wide windows. It reads the source directly because jest maps `.scss` to
+      // a style mock, so no rendered assertion can observe a value that came from a stylesheet.
       const scssSource = fs.readFileSync(
         path.join(__dirname, 'chat-page.scss'),
         'utf8',
@@ -588,12 +582,13 @@ describe('MessageBubble', () => {
       expect(scssSource).toMatch(
         /&\.wzMessageRow--wide \{[\s\S]*?width: auto;[\s\S]*?max-width: \$wzContentMaxWidth;[\s\S]*?margin-inline-start: max\(0px, calc\(\(100% - #\{\$wzContentMaxWidth\}\) \/ 2\)\);[\s\S]*?margin-inline-end: 0;/,
       );
-      // The retired table-only breakout is gone: no rule caps the wide row at $wzTableMaxWidth any
-      // more (the token itself is removed from _redesign.scss; only history-explaining comments here
-      // still name it). Matched as a DECLARATION, not a bare mention, so those comments pass.
+      // No rule caps the wide row at $wzTableMaxWidth — the token does not exist in
+      // _redesign.scss. Matched as a DECLARATION, not a bare mention, so a comment merely naming
+      // it elsewhere still passes.
       expect(scssSource).not.toMatch(/max-width:\s*\$wzTableMaxWidth/);
-      // The old per-element left corrections are gone: the avatar no longer breaks left, the card no
-      // longer breaks out to the avatar's edge, and prose/meta no longer carry a wide-row margin.
+      // None of the avatar, card, or prose/meta carry a per-element left correction in the wide
+      // row: the avatar does not break left, the card does not break out to the avatar's edge, and
+      // prose/meta carry no wide-row margin.
       expect(scssSource).not.toMatch(/\.wzMessageRow--wide \.wzProseMeasure/);
       expect(scssSource).not.toMatch(/\.wzMessageRow--wide \.wzMsgAvatarItem/);
       expect(scssSource).not.toMatch(/\.wzMessageRow--wide \.wzMsgMetaRow/);
@@ -678,8 +673,8 @@ describe('MessageBubble', () => {
       );
 
       // The chip still exists — just inside the result card's header, not below the bubble. Its
-      // window text comes from `table.provenance` (a server-recorded fact, issue #9008 rework),
-      // never from the call's own (here empty) `arguments`.
+      // window text comes from `table.provenance` (a server-recorded fact), never from the call's
+      // own (here empty) `arguments`.
       expect(screen.getByText('Critical findings · 90d')).toBeInTheDocument();
       // Only one instance: it was not ALSO left behind in the below-bubble meta row.
       expect(screen.getAllByText('Critical findings · 90d')).toHaveLength(1);
@@ -704,8 +699,8 @@ describe('MessageBubble', () => {
       expect(screen.getByText('Critical findings')).toBeInTheDocument();
     });
 
-    // Issue #9008 blocker 3: a multi-call turn must attribute provenance ONLY to the call whose id
-    // matches `table.provenance.toolCallId` — every other call's chip renders name-only.
+    // A multi-call turn must attribute provenance ONLY to the call whose id matches
+    // `table.provenance.toolCallId` — every other call's chip renders name-only.
     it('attributes provenance only to the producing call in a multi-call turn', () => {
       const table: TableSpec = {
         columns: [{ id: 'agent', label: 'Agent' }],
@@ -754,7 +749,7 @@ describe('MessageBubble', () => {
   });
 });
 
-describe('sanitizeAssistantMarkdown (#8890)', () => {
+describe('sanitizeAssistantMarkdown', () => {
   it('strips inline Markdown image syntax, including the URL', () => {
     const out = sanitizeAssistantMarkdown(
       'before ![alt](http://evil.example/x) after',
@@ -817,9 +812,9 @@ describe('sanitizeAssistantMarkdown (#8890)', () => {
 });
 
 /**
- * A failed turn used to leave NOTHING on the turn itself: the assistant placeholder was deleted and
- * the reason lived only in the dismissible callout above the transcript, which the next question
- * cleared. These pin the permanent, per-turn record that replaced it.
+ * A failed turn keeps a permanent, per-turn record: the assistant placeholder is not deleted, and
+ * the reason does not live only in a dismissible callout above the transcript that the next
+ * question would clear. These pin that permanent record.
  */
 describe('MessageBubble — failed turn honesty', () => {
   it('marks a failed turn permanently and keeps the reason collapsed until asked for', () => {

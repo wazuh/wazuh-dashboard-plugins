@@ -72,12 +72,12 @@ export const InterruptedTurnNotice: React.FC<{
 /**
  * "This turn failed" — the permanent, per-turn record of a failure.
  *
- * The failure used to be reported ONLY by the dismissible callout band above the transcript, which
- * `handleSend` clears on the next question (chat-page.tsx). So a reader who asked again — the
- * single most likely next action — was left with a transcript in which their failed question simply
- * has no answer and nothing anywhere says why, and a reload lost even the banner. This notice is
- * anchored to the turn instead, persists with it (`UiChatMessage.failureReason`), and keeps its own
- * retry action reachable however many questions follow it.
+ * A dismissible callout band above the transcript alone is not enough: `handleSend` clears it on
+ * the next question (chat-page.tsx), so a reader who asks again — the single most likely next
+ * action — would be left with a transcript in which their failed question simply has no answer
+ * and nothing anywhere says why, and a reload would lose even the banner. This notice is anchored
+ * to the turn instead, persists with it (`UiChatMessage.failureReason`), and keeps its own retry
+ * action reachable however many questions follow it.
  *
  * Collapsed by default: a provider error can be a paragraph of upstream JSON, and a transcript is
  * not a log viewer. The one-line summary is always visible; the reason itself is one click away and
@@ -248,7 +248,7 @@ function formatTimestamp(epochMs: number): string {
 }
 
 /**
- * SECURITY (#8890): the finished answer below is model output built from tool results, which
+ * SECURITY: the finished answer below is model output built from tool results, which
  * can themselves carry attacker-influenced text (a log line, a rule description, a filename).
  * `EuiMarkdownFormat` is otherwise given no plugin overrides, so its default renderer draws
  * `![alt](url)` as a live `<img>` (an uncontrolled outbound fetch to whatever URL ended up in
@@ -332,13 +332,13 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
    * The table this turn actually DRAWS — `undefined` for a final table with zero rows.
    *
    * A header-only result card ("Results (0 rows)" over EuiBasicTable's stock "No items found") is
-   * never rendered (ux-research.md §E, which is also PatternFly's explicit "never
-   * render a header-only table"): the assistant's own prose already answers a zero-result question
-   * in words, and the card added a second, emptier answer underneath it.
+   * never rendered (PatternFly's explicit "never render a header-only table" guidance): the
+   * assistant's own prose already answers a zero-result question in words, and the card would add
+   * a second, emptier answer underneath it.
    *
    * The gate lives HERE, in the renderer, rather than in chat-page.tsx's flush path, for two
-   * reasons: (1) `message.table` is persisted (server/conversation-store.ts), so a conversation
-   * SAVED before this change — or restored from any older release — carries 0-row specs that a
+   * reasons: (1) `message.table` is persisted (server/conversation-store.ts), so an older saved
+   * conversation — or one restored from any older release — can carry 0-row specs that a
    * stream-time gate would never see, and would still draw the empty card on resume; (2) the
    * within-turn empty-table suppression in chat-page.tsx (`pendingEmptyTable`) is a STATE invariant
    * about which spec a turn is remembered with, and it stays exactly as it was — an honest-empty
@@ -383,10 +383,10 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   // matters most precisely when the answer is "nothing was found".
   const metaRowToolCalls = renderedTable ? [] : toolCalls;
   /**
-   * Issue #9008 (blocker 3): a multi-call turn runs several tool calls before landing on the one
-   * table that gets rendered, but `message.toolCalls` lists ALL of them — mapping every call to
-   * `renderedTable`'s provenance unconditionally attributed call 1's chip with call 2's index and
-   * time range (or vice-versa) whenever a turn ran more than one Indexer call. `renderedTable`
+   * A multi-call turn runs several tool calls before landing on the one table that gets rendered,
+   * but `message.toolCalls` lists ALL of them — mapping every call to `renderedTable`'s provenance
+   * unconditionally would attribute call 1's chip with call 2's index and time range (or
+   * vice-versa) whenever a turn ran more than one Indexer call. `renderedTable`
    * itself is authoritative about exactly ONE call: `provenance.toolCallId`, attached by
    * server/routes/chat.ts (see `TableSpec.provenance`'s doc comment) to the specific call that
    * produced it. Only that one call's chip is passed the real `provenance` object; every other
@@ -398,10 +398,10 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
    * spec's provenance — see that row's own comment. One source therefore serves both surfaces
    * without a second, subtly different lookup.
    *
-   * Computed ONCE per message, memoized (issue #9008 review, cleanup 4). Three surfaces read this
-   * — the result card's chips, the below-bubble chip row, and the raw view a chip opens — and each
-   * used to redo the same `describeProvenance`/`describeToolCall` derivation for the same call on
-   * every render, including renders driven by nothing but a popover opening.
+   * Computed ONCE per message, memoized. Three surfaces read this — the result card's chips, the
+   * below-bubble chip row, and the raw view a chip opens — and without memoization each would redo
+   * the same `describeProvenance`/`describeToolCall` derivation for the same call on every render,
+   * including renders driven by nothing but a popover opening.
    */
   const toolCallDisplays = useMemo(() => {
     const provenanceForCall = (
@@ -566,7 +566,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
       ) : (
         <div className={PROSE_MEASURE_CLASS}>
           <EuiText size='s'>
-            {/* sanitizeAssistantMarkdown (#8890): the finished answer is model output built
+            {/* sanitizeAssistantMarkdown: the finished answer is model output built
                   from tool results that can carry attacker-influenced text — see that
                   function's doc comment for why this runs here instead of an EUI
                   processingPluginList override. */}
@@ -576,7 +576,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
       )}
       {renderedTable && (
         <>
-          {/* Iteration-4 audit, P1 item 5: 16px ('m'), not 8px ('s') — a card must not sit closer
+          {/* 16px ('m'), not 8px ('s') — a card must not sit closer
               to the sentence above it than two sentences sit to each other. */}
           <EuiSpacer size='m' />
           <ResultTable
@@ -641,25 +641,24 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   const bubble = (
     <EuiFlexItem
       grow={false}
-      // No `PROSE_MEASURE_CLASS` here (iteration-4 audit, P2 item 10): this item's own inline
-      // `maxWidth` below is ALWAYS set (`'75%'` or `'100%'`), and an inline style always wins over
-      // a class on specificity — so the class used to sit here doing nothing for either turn kind:
-      // dead weight for a table-bearing turn (its `'100%'` matched the class's own no-op) and,
-      // worse, misleading for a prose-only one, where it read as "the 68ch cap lives here" while
-      // the `'100%'` inline value silently overrode it. The real cap is (and always was) the INNER
-      // prose `<div className={PROSE_MEASURE_CLASS}>` a few lines below, which carries no inline
-      // style of its own to fight it.
+      // No `PROSE_MEASURE_CLASS` here: this item's own inline `maxWidth` below is ALWAYS set
+      // (`'75%'` or `'100%'`), and an inline style always wins over a class on specificity — so
+      // the class here would do nothing for either turn kind: dead weight for a table-bearing turn
+      // (its `'100%'` matches the class's own no-op) and, worse, misleading for a prose-only one,
+      // where it would read as "the 68ch cap lives here" while the `'100%'` inline value silently
+      // overrides it. The real cap is the INNER prose `<div className={PROSE_MEASURE_CLASS}>` a
+      // few lines below, which carries no inline style of its own to fight it.
       style={{
         // The user turn keeps its 75% share — a question is always prose, and the figure is
         // genuinely local to this decision, with no token or class behind it to drift from.
         maxWidth: isUser ? '75%' : '100%',
         minWidth: isUser ? 180 : 0,
         // The assistant column is forced to a DETERMINISTIC width (the full row) instead of EUI's
-        // default shrink-to-fit sizing (audit item 2). Shrink-to-fit made this flex item's resolved
-        // width track whatever it happened to be rendering — 605px for a collapsed/prose-only turn,
-        // 1260px once a `wzResultsCard` was expanded — so the results card jogged ~115px sideways as
-        // it expanded/collapsed instead of just changing height, and a collapsed card hugged its own
-        // content rather than filling the wide row it was given.
+        // default shrink-to-fit sizing. Shrink-to-fit would make this flex item's resolved width
+        // track whatever it happens to be rendering — 605px for a collapsed/prose-only turn, 1260px
+        // once a `wzResultsCard` is expanded — so the results card would jog ~115px sideways as it
+        // expands/collapses instead of just changing height, and a collapsed card would hug its own
+        // content rather than filling the wide row it is given.
         // `flex: 1 1 auto` makes the item grow to fill the row like any other block, and `min-width: 0`
         // is required alongside it — a flex item's automatic minimum is its content's, which for a
         // wide `wzResultsCard` would otherwise refuse to shrink back down and re-introduce the same
@@ -683,10 +682,8 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           hasShadow={false}
           hasBorder
           // Radius comes from `.euiPanel.wzUserBubble` (chat-page.scss), which folds this bubble
-          // onto the shared `$wzPanelRadius`. It used to be an inline `borderRadius: 14` with a
-          // comment claiming the rest of the surface "uses EUI defaults" — that was both a fifth
-          // radius invented for one element and a contradiction of the actual doctrine
-          // (_redesign.scss's "one container idiom, 12px"), which is the one that stands.
+          // onto the shared `$wzPanelRadius` — the one container-radius token the rest of the
+          // surface follows (_redesign.scss's "one container idiom, 12px").
           className='wzUserBubble'
         >
           {bubbleContent}
@@ -795,8 +792,8 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
             // `toolCallDisplays` reads `message.table`, deliberately NOT `renderedTable`: this is
             // the one place the suppressed 0-row spec is still worth reading, because it is the
             // only place left to check what the turn actually queried — precisely when the answer
-            // is "nothing was found". Its `toolCallId` match (issue #9008 blocker 3) means a
-            // multi-call turn's chip only carries provenance for the ONE call the spec names.
+            // is "nothing was found". Its `toolCallId` match means a multi-call turn's chip only
+            // carries provenance for the ONE call the spec names.
             const { short, full } = toolCallDisplays.get(toolCall.id)
               ?.label ?? {
               short: toolCall.name,
@@ -834,8 +831,8 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
         metaRowToolCalls
           .filter(toolCall => openRawIds.has(toolCall.id))
           .map(toolCall => {
-            // Issue #9008 review, minor 7: the same Index/Time-range lines the rendered-table
-            // popover shows (ProvenanceChip, result-table.tsx) belong here too — this raw view IS
+            // The same Index/Time-range lines the rendered-table popover shows (ProvenanceChip,
+            // result-table.tsx) belong here too — this raw view IS
             // the popover's equivalent for a turn whose table is suppressed (0 rows) or absent,
             // and "which index did it read?" matters most exactly there. Reads the SAME memoized
             // entry the chip above it does, so only the call that actually produced `message.table`
@@ -888,9 +885,9 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
     </EuiFlexItem>
   );
 
-  // One loading indicator while streaming, not two: the avatar-mounted spinner that used to sit
-  // alongside the in-bubble EuiLoadingContent skeleton/status line is gone — that pair read as two
-  // independent "something is happening" signals for the same event.
+  // One loading indicator while streaming, not two: an avatar-mounted spinner alongside the
+  // in-bubble EuiLoadingContent skeleton/status line would read as two independent "something is
+  // happening" signals for the same event.
   const avatarItem = (
     // `wzMsgAvatarItem` (chat-page.scss): stable class carrying the avatar's small vertical nudge.
     // A table-bearing (`--wide`) turn no longer breaks this item's inline-start out — the avatar

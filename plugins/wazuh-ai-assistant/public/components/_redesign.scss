@@ -1,5 +1,5 @@
 /**
- * Shared design tokens for the AI Assistant redesign (see AI/design/redesign-v2-spec.md).
+ * Shared design tokens for the AI Assistant redesign.
  *
  * Every component's own `.scss` imports THIS file rather than restating a value, so the four
  * screens cannot drift apart. Values here are the design's, expressed through EUI's own SASS
@@ -16,11 +16,10 @@
    while controls keep EUI's 8px, because the felt difference between the reference and today is
    padding, not radius.
 
-   This is the doctrine — ONE container idiom at 12px — and the live CSS audit (AI/ux-iter3/
-   css-audit-full.md §6) found it losing on every surface it was supposed to own: a "radius zoo" of
-   2 (severity badge), 4 (raw EuiPanels, and the settings card where this token lost a specificity
+   This is the doctrine — ONE container idiom at 12px — enforced against a "radius zoo" of 2
+   (severity badge), 4 (raw EuiPanels, and the settings card where this token loses a specificity
    tie), 12 (the results card alone) and an inline 14 invented for the user bubble. Every one of
-   those has since been reconciled to this token, qualified with the EUI class it competes with
+   those is reconciled to this token, qualified with the EUI class it competes with
    (`.euiPanel.wzSettingsCard__panel`, `.euiPanel.wzComposerPanel`, `.euiCard.wzWelcomeCard`,
    `.euiPanel.wzUserBubble`) so bundle order cannot decide it. The ONE other radius the surface
    allows is 4px, for small inline chrome that is not a container — an inline-code chip, a callout —
@@ -30,17 +29,16 @@ $wzPanelRadius: 12px;
 $wzCardPadding: 20px;
 $wzCardPaddingRoomy: 24px;
 
-/* --- Measure and gutters (layout contract §5) --------------------------------------------------
+/* --- Measure and gutters --------------------------------------------------------------------
    Prose and the composer share one centred column so they stay optically locked as the window
    grows; a results table fills that same column to its right edge but is bounded by it (never past
    the composer's right edge). Extra width at 1920 goes to the rail and gutters, never to line
    length. */
 $wzContentMaxWidth: 1060px;
-/* Welcome-only cluster width (iteration-4 item C): the empty state's greeting, example-card grid
-   and composer measure all cap here instead of the docked surface's 1060px — a live audit call
-   read the full-width welcome cluster as too spread out for three short lines of content. Narrower
-   than $wzContentMaxWidth, applied only under `.wzChatPane--welcome` (chat-page.scss); the docked
-   surface is untouched. */
+/* Welcome-only cluster width: the empty state's greeting, example-card grid and composer measure
+   all cap here instead of the docked surface's 1060px, since a full-width welcome cluster reads
+   as too spread out for three short lines of content. Narrower than $wzContentMaxWidth, applied
+   only under `.wzChatPane--welcome` (chat-page.scss); the docked surface is untouched. */
 $wzWelcomeGroupMaxWidth: 840px;
 $wzProseMeasure: 68ch;
 /* Settings is its own page, not chat prose, so it does not share $wzContentMaxWidth: the
@@ -50,7 +48,7 @@ $wzProseMeasure: 68ch;
    content column (a results table in the chat now fills $wzContentMaxWidth and stops there). */
 $wzSettingsMaxWidth: 1200px;
 
-/* --- Composer floor and ceiling (layout contract §2) -------------------------------------------
+/* --- Composer floor and ceiling ----------------------------------------------------------------
    The `vh` twin is a REQUIRED fallback, not a nicety: `dvh` only shipped in Safari 15.4, and a
    browser that drops the `dvh` declaration is left with no cap at all — at which point the
    composer's own `overflow-y: auto` never engages and a full-height field pushes the transcript
@@ -63,10 +61,10 @@ $wzSettingsMaxWidth: 1200px;
 $wzComposerMaxHeightFallback: 30vh;
 $wzComposerMaxHeight: 30dvh;
 
-/* --- Results card (layout contract §4) ---------------------------------------------------------
+/* --- Results card ---------------------------------------------------------------------------
    Header and pagination are pinned card rows; only the body scrolls. */
 $wzResultsMaxHeight: min(460px, 52dvh);
-/* Expanded ceiling (iteration-4 item 3, "card grows"): applied only via the
+/* Expanded ceiling: applied only via the
    `.wzResultsCard--expanded` modifier (result-table.tsx) when the reader explicitly picks a page
    size above the 5-row default — at the default size the card stays capped at
    $wzResultsMaxHeight above, since a 5-row result never needed the extra room.
@@ -74,16 +72,17 @@ $wzResultsMaxHeight: min(460px, 52dvh);
    transcript-measured-height code path, same pairing as $wzResultsMaxHeight's own. */
 $wzResultsMaxHeightExpanded: 80dvh;
 
-/* --- Conversation rail (layout contract §5) ----------------------------------------------------
+/* --- Conversation rail --------------------------------------------------------------------------
    NO width token lives here. Every rail width — expanded, collapsed, and both breakpoints — is read
    imperatively off the pane's own measured `offsetWidth` in chat-page.tsx
    (`CONVERSATION_SIDEBAR_WIDTH`, `RAIL_COLLAPSED_WIDTH`, `RAIL_COLLAPSE_AT`, `RAIL_FLYOUT_AT`) and
    applied as an inline style, because no CSS media/container query in this build can react to a
-   component's own measured width. `$wzRailCollapsedWidth` used to restate the collapsed 48px here,
-   and the duplicate did real damage: the panel applied 48px as its border-box width AND
-   `.wzConvoRailCollapsed` applied 48px again inside the panel's own 32px content box, so the strip
-   overflowed by 16px and `.wzConvoRail`'s `overflow: hidden` clipped it. The child now says
-   `width: 100%` and the panel is the single owner of the number. */
+   component's own measured width. A `$wzRailCollapsedWidth` token restating the collapsed 48px
+   here would duplicate the number the panel already owns: the panel applies 48px as its
+   border-box width, and `.wzConvoRailCollapsed` applying 48px again inside the panel's own 32px
+   content box would overflow the strip by 16px, which `.wzConvoRail`'s `overflow: hidden` would
+   then clip. The child says `width: 100%` instead, so the panel stays the single owner of the
+   number. */
 
 /* --- Scrollbars --------------------------------------------------------------------------------
    The reference draws no scrollbar chrome at all: its rail mockup is `overflow: hidden` and the

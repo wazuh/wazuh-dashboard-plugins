@@ -62,17 +62,17 @@ export class ConversationsService {
   }
 
   /**
-   * `expectedVersion` (Fix 1, optimistic concurrency — server/routes/conversations.ts's PUT):
+   * `expectedVersion` (optimistic concurrency — server/routes/conversations.ts's PUT):
    * omitted entirely (not sent as `undefined`) when the caller has no last-known version yet, so
-   * the request body stays byte-identical to before this field existed for that case. A 409
-   * rejection (version conflict) propagates as a normal promise rejection — same as any other
-   * non-2xx `http.put` failure — for the caller (chat-page.tsx's `saveConversationWithMerge`) to
-   * detect via `common/http-status.ts`'s `getHttpErrorStatus` and react to.
+   * the request body stays minimal for that case. A 409 rejection (version conflict) propagates
+   * as a normal promise rejection — same as any other non-2xx `http.put` failure — for the caller
+   * (chat-page.tsx's `saveConversationWithMerge`) to detect via `common/http-status.ts`'s
+   * `getHttpErrorStatus` and react to.
    *
-   * NO `title` parameter (issue #9010): a full-transcript PUT is what runs on every auto-save, and
-   * sending a freshly recomputed title on every one of those used to silently revert any rename
+   * NO `title` parameter: a full-transcript PUT is what runs on every auto-save, and sending a
+   * freshly recomputed title on every one of those would silently revert any rename
    * the user had made (see `buildConversationTitle`'s doc comment, common/chat-history.ts). The
-   * server's PUT route now carries the stored title over unchanged whenever the body omits it —
+   * server's PUT route carries the stored title over unchanged whenever the body omits it —
    * which every call through THIS method does, unconditionally. Renaming has its own method
    * (`rename`, below); this one never touches the title at all.
    */
