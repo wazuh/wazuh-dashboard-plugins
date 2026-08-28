@@ -138,7 +138,7 @@ Full detail in [`docs/dev/pull-requests.md`](docs/dev/pull-requests.md) and
   for review". Use squash merge for single-purpose PRs.
 - Update [`CHANGELOG.md`](CHANGELOG.md) for any user-facing change; the entry
   **links to the issue, not the PR**. Add no entry for `internal-devel-requests`
-  issues or tooling/doc/test-only PRs (use the `no changelog` label).
+  issues or tooling/doc/test-only PRs (use the `no-changelog` label).
 - Issues are shared as URLs and may live in another repo. Issues from
   `internal-devel-requests` are internal: don't expose their link in the PR
   (`## Description` omits it) and add no CHANGELOG entry.

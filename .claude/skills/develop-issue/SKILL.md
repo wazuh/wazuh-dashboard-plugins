@@ -73,7 +73,7 @@ For **public** issues, add an entry under the upcoming version in
 [`CHANGELOG.md`](../../../CHANGELOG.md) (`Added` / `Changed` / `Fixed` /
 `Removed`), with the link pointing to the **issue** (not the PR). Skip the entry
 for **internal-devel-requests** issues, and for tooling/docs/test-only changes
-(use the `no changelog` label on the PR).
+(use the `no-changelog` label on the PR).
 
 ### 6. Deliver (do NOT open the PR)
 
