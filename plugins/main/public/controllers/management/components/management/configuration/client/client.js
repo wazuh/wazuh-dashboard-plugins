@@ -82,6 +82,12 @@ const serverSettings = [
   { field: 'endpoint', label: 'Endpoint', render: renderValueOrNoValue },
 ];
 
+/* 5.0.0 allows a single `<manager>` block, so the reported value is read as one
+manager whether it arrives as an object or wrapped in a one-element array. A
+list is never rendered: multiple endpoints are an explicit non-goal of the
+agent-side change. */
+const readManager = value => (Array.isArray(value) ? value[0] : value);
+
 class WzConfigurationClient extends Component {
   constructor(props) {
     super(props);
@@ -89,7 +95,8 @@ class WzConfigurationClient extends Component {
   render() {
     const { currentConfig } = this.props;
     const clientConfig = currentConfig?.agent?.agent;
-    const endpoint = clientConfig?.manager?.endpoint;
+    const manager = readManager(clientConfig?.manager);
+    const endpoint = manager?.endpoint;
 
     if (isString(clientConfig)) {
       return <WzNoConfig error={clientConfig} help={helpLinks} />;
@@ -119,6 +126,21 @@ class WzConfigurationClient extends Component {
               config={{ endpoint }}
               items={serverSettings}
             />
+          ) : /* A manager reported without an endpoint is not an absent
+          configuration: it is one written in the pre-5.0.0 `<address>`/`<port>`
+          form, which this view cannot render. Saying so points at the agent
+          that has to be upgraded, instead of claiming nothing was configured. */
+          manager ? (
+            <EuiCallOut
+              title='Unsupported manager configuration'
+              color='warning'
+              iconType='alert'
+            >
+              <p>
+                The agent reported a manager configuration without an endpoint.
+                Endpoints are reported by agents from version 5.0.0 onwards.
+              </p>
+            </EuiCallOut>
           ) : (
             <EuiCallOut
               title='Client manager configuration error'

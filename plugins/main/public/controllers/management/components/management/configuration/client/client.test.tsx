@@ -23,6 +23,8 @@ jest.mock('../util-hocs/wz-config', () => () => Component => {
 
 const NOT_PRESENT = /not present on the configuration file/i;
 const EMPTY_MANAGER = /manager configuration is undefined or empty/i;
+const UNSUPPORTED_MANAGER =
+  /reported a manager configuration without an endpoint/i;
 
 /* Each setting renders as a read-only input labelled by its own name, so a
 value is asserted against the field that holds it rather than against the
@@ -72,8 +74,37 @@ describe('WzConfigurationClient', () => {
     expectSetting('endpoint', 'wazuh.manager:8443');
   });
 
-  it('warns when the agent reported no endpoint', () => {
+  it('reads a manager wrapped in a one-element array as a single manager', () => {
+    renderView({
+      agent: {
+        agent: {
+          manager: [{ endpoint: '192.168.0.60:1517/wazuh-manager/' }],
+        },
+      },
+    });
+
+    expectSetting('endpoint', '192.168.0.60:1517/wazuh-manager/');
+  });
+
+  it('says the manager configuration is unsupported rather than absent when an agent reports the pre-5.0.0 shape', () => {
+    renderView({
+      agent: {
+        agent: { manager: [{ address: 'wazuh.manager.local', port: 1517 }] },
+      },
+    });
+
+    screen.getByText(UNSUPPORTED_MANAGER);
+    expect(screen.queryByText(EMPTY_MANAGER)).not.toBeInTheDocument();
+  });
+
+  it('warns when the agent reported an empty manager block', () => {
     renderView(withEndpoint());
+
+    screen.getByText(UNSUPPORTED_MANAGER);
+  });
+
+  it('warns when the agent reported no manager at all', () => {
+    renderView({ agent: { agent: {} } });
 
     screen.getByText(EMPTY_MANAGER);
   });
@@ -81,6 +112,6 @@ describe('WzConfigurationClient', () => {
   it('warns when the reported endpoint is empty', () => {
     renderView(withEndpoint(''));
 
-    screen.getByText(EMPTY_MANAGER);
+    screen.getByText(UNSUPPORTED_MANAGER);
   });
 });
