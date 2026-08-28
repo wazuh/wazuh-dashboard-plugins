@@ -57,6 +57,13 @@ export const composeAgentEndpoint = ({
     return '';
   }
 
+  /* An IPv6 host is bracketed so its colons cannot be read as the port
+  separator. The agent requires the brackets and rejects a bare literal, but an
+  operator reads an address off a console without them, so they are added here
+  rather than demanded in the field. */
+  const bracketedHost =
+    host.includes(':') && !host.startsWith('[') ? `[${host}]` : host;
+
   const trimmedPort = (port || '').trim();
   const trimmedPath = (path || '').trim();
   /* A prefix is a path, so it is written from the root whether or not the
@@ -66,5 +73,7 @@ export const composeAgentEndpoint = ({
       ? `/${trimmedPath}`
       : trimmedPath;
 
-  return `${host}${trimmedPort ? `:${trimmedPort}` : ''}${normalizedPath}`;
+  return `${bracketedHost}${
+    trimmedPort ? `:${trimmedPort}` : ''
+  }${normalizedPath}`;
 };

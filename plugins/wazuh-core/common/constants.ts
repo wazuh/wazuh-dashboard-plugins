@@ -380,7 +380,7 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
     defaultValue: '',
     validate: SettingsValidator.compose(
       SettingsValidator.isString,
-      SettingsValidator.serverAddressHostnameFQDNIPv4IPv6,
+      SettingsValidator.serverEndpointAddress,
     ),
   },
   /* The port and the path prefix are stored apart from the address rather than

@@ -84,9 +84,7 @@ export const RegisterAgent = compose(
     serverAddress: {
       type: 'text',
       initialValue: configuration['enrollment.dns'] || '',
-      validate:
-        getWazuhCorePlugin().SettingsValidator
-          .serverAddressHostnameFQDNIPv4IPv6,
+      validate: getWazuhCorePlugin().SettingsValidator.serverEndpointAddress,
     },
     /* The port and the path prefix complete the endpoint the agent is
     installed with. Both are optional: left empty, they are omitted from the

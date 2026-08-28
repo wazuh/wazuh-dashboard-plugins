@@ -138,7 +138,6 @@ class WzConfigurationClient extends Component {
             >
               <p>
                 The agent reported a manager configuration without an endpoint.
-                Endpoints are reported by agents from version 5.0.0 onwards.
               </p>
             </EuiCallOut>
           ) : (

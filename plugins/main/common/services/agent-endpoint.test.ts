@@ -42,6 +42,40 @@ describe('composeAgentEndpoint', () => {
     ).toBe('wazuh.manager/wazuh-manager/');
   });
 
+  it.each([
+    ['a compressed IPv6 address', '2001:db8::1', '[2001:db8::1]:1517'],
+    [
+      'an uncompressed IPv6 address',
+      '2001:0db8:85a3:0000:0000:8a2e:0370:7334',
+      '[2001:0db8:85a3:0000:0000:8a2e:0370:7334]:1517',
+    ],
+    [
+      'an IPv6 address with a zone id',
+      'fe80::1%25eth0',
+      '[fe80::1%25eth0]:1517',
+    ],
+  ])(
+    'brackets %s so the port stays unambiguous',
+    (_title, address, expected) => {
+      expect(composeAgentEndpoint({ address, port: '1517' })).toBe(expected);
+    },
+  );
+
+  it('leaves an already bracketed IPv6 address alone', () => {
+    expect(
+      composeAgentEndpoint({ address: '[2001:db8::1]', port: '1517' }),
+    ).toBe('[2001:db8::1]:1517');
+  });
+
+  it('does not bracket a hostname or an IPv4 address', () => {
+    expect(composeAgentEndpoint({ address: 'wazuh.manager' })).toBe(
+      'wazuh.manager',
+    );
+    expect(composeAgentEndpoint({ address: '192.168.0.60' })).toBe(
+      '192.168.0.60',
+    );
+  });
+
   it('returns an empty string without an address', () => {
     expect(composeAgentEndpoint({ address: '', port: '1517' })).toBe('');
   });
