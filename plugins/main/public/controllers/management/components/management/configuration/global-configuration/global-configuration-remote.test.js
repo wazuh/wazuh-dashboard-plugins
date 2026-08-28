@@ -123,6 +123,21 @@ describe('Global configuration remote settings', () => {
     expect(getByText('Legacy settings')).toBeInTheDocument();
     expect(getByText('Agents settings')).toBeInTheDocument();
 
+    // Each group describes itself in plain text, not behind a hover tooltip.
+    expect(
+      getByText(
+        'Listener the agents use to communicate with the manager over HTTPS',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      getByText(
+        'Listener kept for agents that still communicate over the legacy protocol',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      getByText('Settings applied to the agents that connect to this manager'),
+    ).toBeInTheDocument();
+
     // HTTPS values
     expect(getByDisplayValue('1517')).toBeInTheDocument();
     expect(getByDisplayValue('0.0.0.0')).toBeInTheDocument();

@@ -12,7 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 
-import { EuiIconTip, EuiSpacer, EuiTitle } from '@elastic/eui';
+import { EuiSpacer } from '@elastic/eui';
 
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
@@ -70,36 +70,6 @@ const agentsSettings = [
   },
 ];
 
-/**
- * Subsection inside the Remote settings header.
- *
- * `WzConfigurationSettingsGroup` renders its `title` through
- * `WzConfigurationSettingsHeader`, the same component the section header uses,
- * so a titled group nested under a titled header produces two headings of equal
- * weight stacked on top of each other. These three blocks are parts of the
- * remote configuration rather than sections of their own, so they get a lighter
- * heading and no horizontal rule.
- */
-const RemoteSection = ({ title, info, children }) => (
-  <Fragment>
-    <EuiTitle size='xs'>
-      <h3>
-        {title}{' '}
-        <EuiIconTip
-          content={info}
-          type='iInCircle'
-          color='subdued'
-          size='m'
-          position='right'
-        />
-      </h3>
-    </EuiTitle>
-    <EuiSpacer size='s' />
-    {children}
-    <EuiSpacer size='l' />
-  </Fragment>
-);
-
 const helpLinks = [
   {
     text: 'Remote daemon reference',
@@ -148,37 +118,36 @@ class WzConfigurationGlobalConfigurationRemote extends Component {
               help={helpLinks}
             >
               {hasHTTPSSettings && (
-                <RemoteSection
-                  title='HTTPS settings'
-                  info='Listener the agents use to communicate with the manager over HTTPS.'
-                >
+                <Fragment>
                   <WzConfigurationSettingsGroup
+                    title='HTTPS settings'
+                    description='Listener the agents use to communicate with the manager over HTTPS'
                     config={remoteSettings}
                     items={httpsSettings}
                   />
-                </RemoteSection>
+                  <EuiSpacer size='m' />
+                </Fragment>
               )}
               {hasLegacySettings && (
-                <RemoteSection
-                  title='Legacy settings'
-                  info='Listener kept for agents that still communicate over the legacy protocol.'
-                >
+                <Fragment>
                   <WzConfigurationSettingsGroup
+                    title='Legacy settings'
+                    description='Listener kept for agents that still communicate over the legacy protocol'
                     config={remoteSettings}
                     items={legacySettings}
                   />
-                </RemoteSection>
+                  <EuiSpacer size='m' />
+                </Fragment>
               )}
               {hasAgentsSettings && (
-                <RemoteSection
-                  title='Agents settings'
-                  info='Settings applied to the agents that connect to this manager.'
-                >
+                <Fragment>
                   <WzConfigurationSettingsGroup
+                    title='Agents settings'
+                    description='Settings applied to the agents that connect to this manager'
                     config={remoteSettings}
                     items={agentsSettings}
                   />
-                </RemoteSection>
+                </Fragment>
               )}
             </WzConfigurationSettingsHeader>
           )}
