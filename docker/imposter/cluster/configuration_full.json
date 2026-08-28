@@ -11,11 +11,26 @@
         },
         "remote": [
           {
-            "connection": "secure",
-            "ipv6": "no",
-            "protocol": ["TCP"],
-            "port": "1514",
-            "queue_size": "131072"
+            "legacy": {
+              "enabled": "yes",
+              "port": "1514",
+              "protocol": ["TCP"],
+              "ipv6": "no",
+              "local_ip": "127.0.0.1",
+              "queue_size": "131072",
+              "rids_closing_time": "300",
+              "connection_overtake_time": "60"
+            },
+            "https": {
+              "port": "1517",
+              "bind_addr": "0.0.0.0",
+              "global_prefix": "/wazuh-manager/",
+              "certificate": "etc/certs/remoted.pem",
+              "key": "etc/certs/remoted-key.pem"
+            },
+            "agents": {
+              "allow_higher_versions": "no"
+            }
           }
         ],
         "vulnerability-detection": {
