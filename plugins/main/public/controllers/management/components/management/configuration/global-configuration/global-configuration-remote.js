@@ -26,6 +26,11 @@ const httpsSettings = [
     render: renderValueOrNoValue,
   },
   {
+    field: 'https.global_prefix',
+    label: 'Global prefix',
+    render: renderValueOrNoValue,
+  },
+  {
     field: 'https.certificate',
     label: 'Certificate',
     render: renderValueOrNoValue,

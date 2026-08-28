@@ -22,6 +22,7 @@ const fullRemoteConfig = {
         https: {
           port: '1517',
           bind_addr: '0.0.0.0',
+          global_prefix: '/wazuh-manager/',
           certificate: 'etc/certs/remoted.pem',
           key: 'etc/certs/remoted-key.pem',
         },
@@ -141,6 +142,7 @@ describe('Global configuration remote settings', () => {
     // HTTPS values
     expect(getByDisplayValue('1517')).toBeInTheDocument();
     expect(getByDisplayValue('0.0.0.0')).toBeInTheDocument();
+    expect(getByDisplayValue('/wazuh-manager/')).toBeInTheDocument();
     expect(getByDisplayValue('etc/certs/remoted.pem')).toBeInTheDocument();
     expect(getByDisplayValue('etc/certs/remoted-key.pem')).toBeInTheDocument();
 
@@ -194,9 +196,9 @@ describe('Global configuration remote settings', () => {
 
     expect(getByText('HTTPS settings')).toBeInTheDocument();
     expect(getByDisplayValue('1517')).toBeInTheDocument();
-    // bind_addr, certificate and key are absent: rendered as '-', never omitted
-    // and never replaced by a plausible-looking default.
-    expect(getAllByDisplayValue('-').length).toBe(3);
+    // bind_addr, global_prefix, certificate and key are absent: rendered as '-',
+    // never omitted and never replaced by a plausible-looking default.
+    expect(getAllByDisplayValue('-').length).toBe(4);
   });
 
   it('should render the protocol array as a readable string', () => {
