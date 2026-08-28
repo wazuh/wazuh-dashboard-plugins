@@ -27,7 +27,7 @@ describe('ScanVulnerabilitiesAgentsModal component', () => {
   });
 
   test('should return the component', () => {
-    const { container, getByText, getByRole } = render(
+    const { baseElement, getByText, getByRole } = render(
       <ScanVulnerabilitiesAgentsModal
         selectedAgents={selectedAgents}
         allAgentsSelected={false}
@@ -37,7 +37,7 @@ describe('ScanVulnerabilitiesAgentsModal component', () => {
       />,
     );
 
-    expect(container).toMatchSnapshot();
+    expect(baseElement).toMatchSnapshot();
 
     expect(getByText('2')).toBeInTheDocument();
     expect(getByRole('button', { name: 'Scan' })).toBeInTheDocument();

@@ -35,7 +35,7 @@ describe('ScanVulnerabilitiesAgentModal component', () => {
   });
 
   test('should return the component', () => {
-    const { container, getByText, getByRole } = render(
+    const { baseElement, getByText, getByRole } = render(
       <ScanVulnerabilitiesAgentModal
         agent={agent}
         onClose={() => {}}
@@ -43,7 +43,7 @@ describe('ScanVulnerabilitiesAgentModal component', () => {
       />,
     );
 
-    expect(container).toMatchSnapshot();
+    expect(baseElement).toMatchSnapshot();
 
     expect(getByText('001')).toBeInTheDocument();
     expect(getByText('agent1')).toBeInTheDocument();
