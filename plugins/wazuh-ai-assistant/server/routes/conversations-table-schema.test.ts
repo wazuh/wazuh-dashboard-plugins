@@ -66,7 +66,7 @@ test('tableSpecSchema: rejects a securityAnalyticsLink missing its url', () => {
   );
 });
 
-test('tableSpecSchema: accepts a table carrying provenance (issue #9008 rework)', () => {
+test('tableSpecSchema: accepts a table carrying provenance', () => {
   assert.doesNotThrow(() =>
     tableSpecSchema.validate({
       ...MINIMAL_TABLE,

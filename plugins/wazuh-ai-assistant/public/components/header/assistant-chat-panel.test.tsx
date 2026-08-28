@@ -48,7 +48,7 @@ jest.mock('../chat/chat-page', () => {
         newConversation: mockNewConversation,
         selectConversation: mockSelectConversation,
         deleteConversation: mockDeleteConversation,
-        // m14 (#9010 review): the real `ChatPageHandle` contract now also carries these two, and
+        // The real `ChatPageHandle` contract also carries these two, and
         // the docked popover (assistant-chat-panel.tsx) calls straight through to them.
         renameConversation: mockRenameConversation,
         bulkDeleteConversations: mockBulkDeleteConversations,
@@ -180,8 +180,8 @@ describe('AssistantChatPanel', () => {
   });
 
   it('keeps the composer docked in this panel, with no centred welcome state', () => {
-    // C1 (AI/ux-iter3/gemini-motion-spec.md, "no room for theatre"): the centred greeting +
-    // composer + cards group and its dock-on-first-send transition are a FULL-PAGE affordance.
+    // The centred greeting + composer + cards group and its dock-on-first-send transition are a
+    // FULL-PAGE affordance.
     // This sidecar is a narrow column, so it opts out and keeps today's always-docked composer —
     // a separate decision from `allowRailFlyout` above, hence a separate prop.
     renderPanel();
@@ -342,7 +342,7 @@ describe('AssistantChatPanel', () => {
     expect(mockDeleteConversation).toHaveBeenCalledWith('c1');
   });
 
-  // m14 (#9010 review): this docked popover is a PRIMARY surface for the rail, not a secondary
+  // This docked popover is a PRIMARY surface for the rail, not a secondary
   // one -- it must get the same rename/bulk-delete affordances the inline rail already has.
   it("renaming a conversation from the popover calls ChatPage's renameConversation", async () => {
     renderPanel();

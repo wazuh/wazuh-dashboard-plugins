@@ -115,7 +115,7 @@ describe('useProviders', () => {
    * reach (both views stay mounted side by side). The Settings page announces it with
    * `PROVIDERS_CHANGED_EVENT`; the hook refreshes on it.
    */
-  describe('cross-instance refresh (wazuh-dashboard#1512)', () => {
+  describe('cross-instance refresh', () => {
     it('refetches when a provider change is announced', async () => {
       mockList.mockResolvedValue([provider('a', true)]);
 

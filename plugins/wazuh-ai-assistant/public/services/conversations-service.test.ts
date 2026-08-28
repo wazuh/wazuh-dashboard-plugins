@@ -155,7 +155,7 @@ describe('ConversationsService', () => {
   });
 
   describe('update', () => {
-    it('never sends a title (issue #9010: a resent title on every auto-save used to revert renames)', async () => {
+    it('never sends a title (a resent title on every auto-save would revert renames)', async () => {
       const http = makeHttp();
       http.put.mockResolvedValue({});
       const service = new ConversationsService(http as unknown as HttpSetup);

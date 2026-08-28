@@ -167,7 +167,7 @@ test('AnthropicAdapter: a 400 rejecting temperature is retried once without it, 
     expect(bodies).toHaveLength(2);
     expect(bodies[0].temperature).toBe(0);
     expect('temperature' in bodies[1]).toBe(false);
-    // The turn must actually deliver an answer -- the whole bug was that it delivered nothing.
+    // The turn must actually deliver an answer, not merely avoid an error.
     expect(events.some(event => event.type === 'delta')).toBe(true);
     expect(events.some(event => event.type === 'error')).toBe(false);
   } finally {
@@ -212,16 +212,15 @@ test('AnthropicAdapter: a second turn on the same provider+model omits temperatu
   }
 });
 
-// --- wire shape: assistant messages carrying both narration text and tool calls (issue C4) ----
-// C4 changed history to carry the round's own narration alongside its tool call instead of
-// discarding it as `content: ''`. Neither adapter test previously covered the resulting wire
-// shape: an assistant ChatMessage with non-empty `content` AND `toolCalls` must become a `text`
-// block ahead of the `tool_use` block(s) (Anthropic requires blocks in emission order), and a
-// whitespace-only `content` (e.g. a bare "\n\n" a model streams as priming text right before a
+// --- wire shape: assistant messages carrying both narration text and tool calls ---------------
+// History carries the round's own narration alongside its tool call instead of discarding it as
+// `content: ''`. An assistant ChatMessage with non-empty `content` AND `toolCalls` must become a
+// `text` block ahead of the `tool_use` block(s) (Anthropic requires blocks in emission order), and
+// a whitespace-only `content` (e.g. a bare "\n\n" a model streams as priming text right before a
 // tool call) must never become a text block at all -- Anthropic 400s on a whitespace-only text
-// block. chat.ts now trims before writing history, but this adapter guards independently
-// (defense in depth) since it is the actual point where a `content: ''`/whitespace value would
-// otherwise reach the wire.
+// block. chat.ts trims before writing history, but this adapter guards independently (defense in
+// depth) since it is the actual point where a `content: ''`/whitespace value would otherwise
+// reach the wire.
 
 test('AnthropicAdapter: an assistant message with narration text and a tool call emits a text block before the tool_use block', async () => {
   const adapter = new AnthropicAdapter();

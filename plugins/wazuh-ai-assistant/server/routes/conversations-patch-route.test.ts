@@ -8,8 +8,8 @@ import { API_PATHS } from '../../common/constants';
 import { registerConversationRoutes } from './conversations';
 
 /**
- * Route-level authorization test for the rename (PATCH) endpoint (issue #9010, finding E2), using
- * the SAME real-`HttpServer` + `Router` + `supertest` pattern
+ * Route-level authorization test for the rename (PATCH) endpoint, using the SAME
+ * real-`HttpServer` + `Router` + `supertest` pattern
  * `plugins/wazuh-check-updates/server/routes/user-preferences/update-user-preferences.test.ts`
  * already uses -- unlike `conversations-owner-resolution.test.ts` and
  * `conversations-version-conflict.test.ts` (which exercise `resolveOwner`/

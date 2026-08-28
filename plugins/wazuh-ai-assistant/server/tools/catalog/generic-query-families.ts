@@ -1,6 +1,6 @@
 /**
- * Single source of truth for `search_wazuh_data`'s `index_pattern` enum (workstream A1a,
- * AI/plan/coverage-validation-design.md). Before this file, the escape hatch's three original
+ * Single source of truth for `search_wazuh_data`'s `index_pattern` enum. Before this file, the
+ * escape hatch's three original
  * enum values were a literal array inline in `search-wazuh-data.ts`; every new family this
  * workstream opens in `guardrails.ts`'s `INDEX_ALLOWLIST_RE` needs a matching enum entry there too
  * (an allowlisted-but-not-enumerable index is unreachable — the tool's JSON-schema `enum` is what
@@ -80,8 +80,7 @@ const STATE_INDEX_FAMILIES: GenericQueryFamily[] = STATE_FAMILIES.map(
 );
 
 /**
- * Workstream A1a additions (AI/plan/coverage-validation-design.md — TC-8, G1, MS-6/MS-7, G2, G3,
- * MS-12): every family below has real, live-verified data on `wazuh-aio-5` and no owning typed
+ * Every family below has real, live-verified data on `wazuh-aio-5` and no owning typed
  * tool. Each pattern is mirrored 1:1 in `guardrails.ts`'s `INDEX_ALLOWLIST_RE` — see that file's
  * own comment for the live-evidence citation per entry; not repeated here to avoid the two
  * comments drifting out of sync with each other instead of just staying in one place.

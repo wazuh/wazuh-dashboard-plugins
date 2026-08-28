@@ -139,7 +139,7 @@ test('validateQueryFields: rejects a field not present in the live mapping, nami
   }
 });
 
-test('validateQueryFields: rejection carries recovery guidance (issue #8911) — no-retry, answer-from-gathered, and honest-cannot-check', async () => {
+test('validateQueryFields: rejection carries recovery guidance — no-retry, answer-from-gathered, and honest-cannot-check', async () => {
   // Guards the anti-fabrication/anti-retry-loop property against a well-meaning future reword,
   // the same way chat.ts's FINAL_ROUND_ANSWER_INSTRUCTION test pins its own three clauses.
   const context = fakeContext(['agent.name', 'wazuh.agent.name', '@timestamp']);

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { FIELD_POLICY_DEFAULTS } from './privacy';
 
 /**
- * P-1 regression (AI/plan/a1a-review.md): pins the CHECKABLE claim privacy.ts's
+ * P-1 regression: pins the CHECKABLE claim privacy.ts's
  * `FIELD_POLICY_DEFAULTS` header comment relies on for its 19 bare-name CTI/content-manager/
  * Security-Analytics entries -- not "no WCS schema ever exposes a personal field bare at root"
  * (live-verified FALSE: `message`, `related`, `url` are all bare root leaves on
@@ -50,7 +50,7 @@ test('P-1 regression: no bare (dotless) FIELD_POLICY_DEFAULTS entry collides wit
         collisions.length === 1 ? 's' : ''
       } with a real ` +
       'customer-data family root leaf -- this would silently widen the entry to cover the ' +
-      "customer's own data. See P-1 in AI/plan/a1a-review.md.",
+      "customer's own data.",
   );
 });
 
