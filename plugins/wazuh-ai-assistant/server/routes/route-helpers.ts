@@ -15,10 +15,25 @@ export const PERMISSION_DENIED_MESSAGE =
 
 /** Both shapes are read because OpenSearch `ResponseError` exposes the status on either. Not gated
  * on `type === 'security_exception'`: a DLS/FLS 403 carries a different type but the same
- * user-bearing text, and would fall through to the 500 branch. */
+ * user-bearing text, and would fall through to the 500 branch.
+ *
+ * `cause` is followed one level because the settings/providers clients do not always rethrow the
+ * client's own error: when the indexer answers with a bare string body, both
+ * `AiProvidersClient.fetch` and `IndexSettingsProvider.getSettings` raise
+ * `new Error(body.error, { cause: originalError })`, and that wrapper carries no status of its own.
+ * Without this the denial would degrade to the 500 branch. */
 export function isPermissionDeniedError(error: unknown): boolean {
-  const e = error as { statusCode?: unknown; meta?: { statusCode?: unknown } };
-  return (e?.statusCode ?? e?.meta?.statusCode) === 403;
+  const statusOf = (candidate: unknown): unknown => {
+    const e = candidate as {
+      statusCode?: unknown;
+      meta?: { statusCode?: unknown };
+    };
+    return e?.statusCode ?? e?.meta?.statusCode;
+  };
+  return (
+    statusOf(error) === 403 ||
+    statusOf((error as { cause?: unknown })?.cause) === 403
+  );
 }
 
 /** Best-effort scrub for the 500/503 responses, which still forward the underlying message so

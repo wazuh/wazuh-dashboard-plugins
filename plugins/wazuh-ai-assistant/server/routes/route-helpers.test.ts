@@ -106,6 +106,50 @@ test('the sanitized response body never contains the action name, username, role
   assert.doesNotMatch(serialized, /backend_roles/);
 });
 
+// Both settings/providers clients turn an indexer answer whose `meta.body.error` is a bare string
+// into `new Error(thatString, { cause: originalError })`. The wrapper carries no status of its own,
+// so a denial reaching the route in this shape used to be classified as a 500.
+function wrappedRbacDeniedError(): unknown {
+  return new Error(
+    `no permissions for [cluster:admin/ai_assistant/settings/read] and User [name=qauser, backend_roles=[kibana_user, readall], requestedTenant=null]`,
+    { cause: rbacDeniedError() as Error },
+  );
+}
+
+test('a 403 the client rethrew as a bare Error with the original as `cause` is still a 403', async () => {
+  const { calls } = await runWrapped(wrappedRbacDeniedError());
+
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].statusCode, 403);
+  assert.deepEqual(calls[0].body, { message: PERMISSION_DENIED_MESSAGE });
+});
+
+test('the cause-wrapped denial leaks no identity either, despite carrying it in its own message', async () => {
+  const { calls, errors } = await runWrapped(wrappedRbacDeniedError());
+
+  const serialized = JSON.stringify(calls[0]);
+  assert.doesNotMatch(serialized, /qauser/);
+  assert.doesNotMatch(serialized, /backend_roles/);
+  assert.doesNotMatch(
+    serialized,
+    /cluster:admin\/ai_assistant\/settings\/read/,
+  );
+  // The operator still gets the full text server-side.
+  assert.match(JSON.stringify(errors[0]), /qauser/);
+});
+
+test('a non-403 cause does not turn an unrelated failure into a permission denial', async () => {
+  const unavailable = new Error('unavailable') as Error & {
+    statusCode: number;
+  };
+  unavailable.statusCode = 503;
+  const error = new Error('index write failed', { cause: unavailable });
+
+  const { calls } = await runWrapped(error);
+
+  assert.equal(calls[0].statusCode, 500);
+});
+
 test('a 403 detected only via meta.statusCode (no top-level statusCode) is classified identically', async () => {
   const error = {
     message: 'security_exception',

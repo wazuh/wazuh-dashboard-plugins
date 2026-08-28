@@ -558,7 +558,10 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       path: API_PATHS.PROVIDER_TEST(`{id}`),
       validate: { params: schema.object({ id: schema.string() }) },
     },
-    async (context, request, response) => {
+    // Wrapped like every other provider route: the `aiProviders.get` below reads the index as the
+    // calling user, so an RBAC denial here must map to the same sanitized 403 instead of reaching
+    // the platform uncaught and surfacing as a generic 500.
+    withInternalErrorHandling(async (context, request, response) => {
       // This route returns the provider's own response to the caller, which makes it a
       // read-capable SSRF primitive on top of the url-guard's network restrictions — the
       // indexer's own write permission on this endpoint is what actually authorizes it.
@@ -650,7 +653,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       return response.ok({
         body: { success, latencyMs, message: success ? undefined : message },
       });
-    },
+    }, logger),
   );
 
   // Plugin-wide settings singleton: privacy defaults/override/field policy. GET creates the
