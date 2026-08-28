@@ -12,7 +12,7 @@
  */
 
 import React from 'react';
-import { EuiDescriptionList, EuiPanel, EuiText } from '@elastic/eui';
+import { EuiDescriptionList, EuiText } from '@elastic/eui';
 import { PanelModuleConfiguration } from '../../../../common/modules/panel';
 import { LogoOffice365 } from '../../../../common/logos';
 import { renderValueYesThenEnabled } from '../../../../../controllers/management/components/management/configuration/utils/utils';
@@ -42,43 +42,23 @@ const settings = [
   },
   {
     field: 'api_auth',
-    label: 'Credentials',
+    label: 'Tenant IDs',
     render: value => {
-      const entries = toApiAuthEntries(value);
-      return entries.length ? (
-        entries
-          .map(v => (
-            <EuiPanel
-              paddingSize='s'
-              key={`module_configuration_api_auth_${v.tenant_id}_${v.client_id}`}
-            >
-              <EuiDescriptionList
-                listItems={[
-                  { title: 'Tenant ID', description: v.tenant_id },
-                  { title: 'Client ID', description: v.client_id },
-                  { title: 'Client secret', description: v.client_secret },
-                  {
-                    title: 'Path file of client secret',
-                    description: v.client_secret_path,
-                  },
-                  { title: 'API type', description: v.api_type },
-                ].filter(item => typeof item.description !== 'undefined')}
-              />
-            </EuiPanel>
-          ))
-          .reduce(
-            (prev, cur) => [
-              prev,
-              <div
-                key={`padding-len-${prev.length}`}
-                style={{ marginTop: '8px' }}
-              />,
-              cur,
-            ],
-            [],
-          )
+      const tenantIDs = toApiAuthEntries(value)
+        .map(v => v.tenant_id)
+        .filter(tenantID => typeof tenantID !== 'undefined');
+      return tenantIDs.length ? (
+        tenantIDs.map(tenantID => (
+          <EuiDescriptionList
+            key={`module_configuration_api_auth_tenant_id_${tenantID}`}
+            className='eui-textTruncate'
+            title={String(tenantID)}
+          >
+            {String(tenantID)}
+          </EuiDescriptionList>
+        ))
       ) : (
-        <EuiText>No credentials configured</EuiText>
+        <EuiText>No tenant IDs configured</EuiText>
       );
     },
   },

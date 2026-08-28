@@ -639,10 +639,26 @@ export class WazuhApiCtrl {
       if ((error || {}).code && ApiErrorEquivalence[error.code]) {
         error.message = ApiErrorEquivalence[error.code];
       }
+
+      /*
+        Answer with the status the Server API returned, so a rejected request is
+        not reported as a server error. Only a real HTTP error status is used:
+        error.code also holds axios codes and Wazuh codes, which are not statuses.
+      */
+      const upstreamStatus =
+        error?.response?.status ??
+        (typeof error?.code === 'number' ? error.code : undefined);
+      const statusCode =
+        typeof upstreamStatus === 'number' &&
+        upstreamStatus >= HTTP_STATUS_CODES.BAD_REQUEST &&
+        upstreamStatus < 600
+          ? upstreamStatus
+          : HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR;
+
       return ErrorResponse(
         errorMessage,
         error.code ? `API error: ${error.code}` : 3013,
-        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
+        statusCode,
         response,
       );
     }
