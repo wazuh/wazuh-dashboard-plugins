@@ -16,6 +16,7 @@ import {
   WazuhAiAssistantPluginStart,
   WazuhAiAssistantPluginStartDependencies,
 } from './types';
+import { setWazuhCore } from './plugin-services';
 
 export class WazuhAiAssistantPlugin
   implements
@@ -66,7 +67,11 @@ export class WazuhAiAssistantPlugin
     return {};
   }
 
-  public start(core: CoreStart): WazuhAiAssistantPluginStart {
+  public start(
+    core: CoreStart,
+    plugins: WazuhAiAssistantPluginStartDependencies,
+  ): WazuhAiAssistantPluginStart {
+    setWazuhCore(plugins.wazuhCore);
     registerAssistantHeaderButton(core);
 
     return {};

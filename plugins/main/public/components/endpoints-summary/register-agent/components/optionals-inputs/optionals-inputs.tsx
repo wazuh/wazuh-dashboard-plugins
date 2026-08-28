@@ -25,7 +25,7 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
     setIsPopoverAgentName(isPopoverAgentName => !isPopoverAgentName);
   const closeAgentName = () => setIsPopoverAgentName(false);
   const agentNameDocLink = webDocumentationLink(
-    'user-manual/reference/ossec-conf/client.html#enrollment-agent-name',
+    'user-manual/agent/agent-enrollment/enrollment-methods/via-agent-configuration/index.html',
     PLUGIN_VERSION_SHORT,
   );
   const popoverAgentName = (

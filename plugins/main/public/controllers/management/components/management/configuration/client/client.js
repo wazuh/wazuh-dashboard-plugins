@@ -35,7 +35,9 @@ const helpLinks = [
   },
   {
     text: 'Client reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/client.html'),
+    href: webDocumentationLink(
+      'user-manual/agent/agent-enrollment/enrollment-methods/via-agent-configuration/index.html',
+    ),
   },
 ];
 

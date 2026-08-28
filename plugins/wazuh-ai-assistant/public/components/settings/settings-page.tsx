@@ -49,6 +49,7 @@ import {
 } from '../../services/settings-service';
 import { ProviderInput, ProviderSummary } from '../../../common/types';
 import { useDirtyFormState } from '../../hooks/use-dirty-form-state';
+import { getWazuhCore } from '../../plugin-services';
 import { ProviderFormFlyout } from './provider-form-flyout';
 import {
   ProviderTestOutcome,
@@ -659,6 +660,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   const [apiKeyEncryptionEnabled, setApiKeyEncryptionEnabled] = useState<
     boolean | null
   >(null);
+  // Fail-open default: a failed/omitted probe must never wrongly lock the page. The server's
+  // own 403 (`requireSettingsUnlocked`) is the real enforcement; this only pre-empts it in the UI.
+  const [settingsLocked, setSettingsLocked] = useState(false);
   const reloadPrivacySettings = () => {
     service
       .getAssistantSettings()
@@ -696,6 +700,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       .then(access => {
         // `!== false` stays fail-open when older servers omit the field.
         setApiKeyEncryptionEnabled(access.apiKeyEncryptionEnabled !== false);
+        setSettingsLocked(access.settingsLocked === true);
       })
       .catch(() => {
         // Fail open: leave `apiKeyEncryptionEnabled` at its `null` default.
@@ -1279,8 +1284,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   defaultMessage: 'Set as default provider',
                 })
           }
-          onClick={isDefault ? undefined : () => handleSetDefault(provider)}
-          disabled={isDefault}
+          onClick={
+            isDefault || settingsLocked
+              ? undefined
+              : () => handleSetDefault(provider)
+          }
+          disabled={isDefault || settingsLocked}
         />
       ),
     },
@@ -1470,6 +1479,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             <EuiContextMenuItem
               key='edit'
               icon='pencil'
+              disabled={settingsLocked}
               onClick={() => {
                 setOpenMenuRowId(null);
                 openEditForm(provider);
@@ -1482,6 +1492,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             <EuiContextMenuItem
               key='delete'
               icon='trash'
+              disabled={settingsLocked}
               onClick={() => {
                 setOpenMenuRowId(null);
                 requestDelete(provider);
@@ -1608,7 +1619,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
               iconType='check'
               onClick={handleSavePrivacySettings}
               isLoading={isSavingPrivacy}
-              disabled={privacySaveDisabled}
+              disabled={privacySaveDisabled || settingsLocked}
             >
               {i18n.translate('wazuhAiAssistant.settings.privacy.save', {
                 defaultMessage: 'Save changes',
@@ -1632,18 +1643,32 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           pageTitle={i18n.translate('wazuhAiAssistant.settings.pageTitle', {
             defaultMessage: 'AI Assistant settings',
           })}
-          description={i18n.translate(
-            'wazuhAiAssistant.settings.pageDescription',
-            {
-              defaultMessage:
-                'Manage AI providers, privacy and conversation history.',
-            },
-          )}
+          description={
+            <>
+              {i18n.translate('wazuhAiAssistant.settings.pageDescription', {
+                defaultMessage:
+                  'Manage AI providers, privacy and conversation history.',
+              })}{' '}
+              <EuiButtonIcon
+                href={getWazuhCore().utils.webDocumentationLink(
+                  'user-manual/wazuh-dashboard/wazuh-dashboard-configurations.html#ai-assistant',
+                )}
+                iconType='iInCircle'
+                target='_blank'
+                rel='noopener noreferrer'
+                aria-label={i18n.translate(
+                  'wazuhAiAssistant.settings.documentationLink',
+                  { defaultMessage: 'Documentation' },
+                )}
+              />
+            </>
+          }
           rightSideItems={[
             <EuiButton
               key='add-provider'
               onClick={openCreateForm}
               iconType='plusInCircle'
+              isDisabled={settingsLocked}
               fill
             >
               {i18n.translate('wazuhAiAssistant.settings.addProvider', {
@@ -1653,6 +1678,28 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           ]}
         />
         <EuiSpacer size='l' />
+
+        {settingsLocked && (
+          <>
+            <EuiCallOut
+              title={i18n.translate('wazuhAiAssistant.settings.lockedTitle', {
+                defaultMessage: 'Settings are locked by your administrator',
+              })}
+              color='warning'
+              iconType='lock'
+            >
+              <p>
+                {i18n.translate('wazuhAiAssistant.settings.lockedBody', {
+                  defaultMessage:
+                    'AI Assistant settings are locked by your administrator and cannot be ' +
+                    'changed from this page. Contact your administrator if you need a ' +
+                    'different configuration.',
+                })}
+              </p>
+            </EuiCallOut>
+            <EuiSpacer size='l' />
+          </>
+        )}
 
         {/* Landmarks before more settings land: one tab per existing SectionCard, deep-linkable via
             `?tab=`. Not a full router switch — all three cards stay MOUNTED at all times (below,
@@ -1762,7 +1809,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   </p>
                 }
                 actions={
-                  <EuiButton color='primary' fill onClick={openCreateForm}>
+                  <EuiButton
+                    color='primary'
+                    fill
+                    isDisabled={settingsLocked}
+                    onClick={openCreateForm}
+                  >
                     {i18n.translate(
                       'wazuhAiAssistant.settings.providers.emptyAction',
                       {
@@ -2422,7 +2474,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 <EuiButton
                   onClick={handleSaveRetentionSettings}
                   isLoading={isSavingRetention}
-                  isDisabled={!retentionDirty}
+                  isDisabled={!retentionDirty || settingsLocked}
                   fill={retentionDirty}
                 >
                   {i18n.translate('wazuhAiAssistant.settings.retention.save', {
@@ -2443,6 +2495,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           error={error}
           existingProviders={providers}
           apiKeyEncryptionEnabled={apiKeyEncryptionEnabled}
+          settingsLocked={settingsLocked}
           isSaving={isSubmittingProvider}
           testOutcome={flyoutTestOutcome}
           onSubmit={handleSubmit}

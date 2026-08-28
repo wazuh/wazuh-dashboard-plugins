@@ -316,6 +316,24 @@ describe('ProviderFormFlyout — API key encryption gate', () => {
   });
 });
 
+describe('ProviderFormFlyout — settingsLocked', () => {
+  it('shows the locked callout and disables Save when settingsLocked is true', () => {
+    render(<ProviderFormFlyout {...baseProps} settingsLocked />);
+
+    // The callout title and body both contain "settings are locked" — matched exactly against
+    // the title to avoid an ambiguous multi-match.
+    expect(screen.getByText(/^settings are locked$/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /save & test/i })).toBeDisabled();
+  });
+
+  it('does not show the callout or disable Save when settingsLocked is absent/false', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    expect(screen.queryByText(/settings are locked/i)).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /save & test/i })).toBeEnabled();
+  });
+});
+
 describe('ProviderFormFlyout — endpoint URL guidance', () => {
   it('shows an OpenAI placeholder/example, with one docs link per covered service behind the documentation popover, by default (openai_compatible)', async () => {
     render(<ProviderFormFlyout {...baseProps} />);

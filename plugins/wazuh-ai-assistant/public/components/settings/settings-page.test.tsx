@@ -36,6 +36,7 @@ const mockService = {
     message: null,
     defaultApiHostId: 'default',
     apiKeyEncryptionEnabled: true,
+    settingsLocked: false,
   }),
   // Echoes its argument back (rather than an unconditional `{}`) so a test can assert what a
   // save round-trip left `loadedAssistantSettings`/the draft holding, and so a SECOND save in the
@@ -51,6 +52,15 @@ jest.mock('../../services/settings-service', () => ({
   // them out would make both sides agree on `undefined` and prove nothing.
   ...jest.requireActual('../../services/settings-service'),
   SettingsService: jest.fn(() => mockService),
+}));
+
+jest.mock('../../plugin-services', () => ({
+  getWazuhCore: jest.fn().mockReturnValue({
+    utils: {
+      webDocumentationLink: (urlPath: string) =>
+        `https://documentation.wazuh.com/5.0/${urlPath}`,
+    },
+  }),
 }));
 
 import { SettingsPage, parseRetentionDays } from './settings-page';
@@ -137,11 +147,27 @@ beforeEach(() => {
     message: null,
     defaultApiHostId: 'default',
     apiKeyEncryptionEnabled: true,
+    settingsLocked: false,
   });
   mockService.test.mockResolvedValue({
     success: true,
     latencyMs: 50,
     message: null,
+  });
+});
+
+describe('SettingsPage — documentation link', () => {
+  it('links to the AI assistant section of the dashboard configuration docs', async () => {
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
+    );
+
+    const link = await screen.findByRole('link', { name: /documentation/i });
+    expect(link).toHaveAttribute(
+      'href',
+      'https://documentation.wazuh.com/5.0/user-manual/wazuh-dashboard/wazuh-dashboard-configurations.html#ai-assistant',
+    );
+    expect(link).toHaveAttribute('target', '_blank');
   });
 });
 
@@ -2162,5 +2188,114 @@ describe('SettingsPage — provider table feedback and retention validation', ()
         expect.objectContaining({ conversationRetentionDays: 0 }),
       ),
     );
+  });
+});
+
+describe('SettingsPage — settingsLocked', () => {
+  beforeEach(() => {
+    mockService.list.mockResolvedValue([PROVIDER]);
+    mockService.getSettingsAccess.mockResolvedValue({
+      managerSessionOk: true,
+      message: null,
+      defaultApiHostId: 'default',
+      apiKeyEncryptionEnabled: true,
+      settingsLocked: true,
+    });
+  });
+
+  it('shows the locked banner and disables the header Add provider button', async () => {
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
+    );
+
+    // The callout title and body both contain "locked by your administrator" — matched exactly
+    // against the title span to avoid an ambiguous multi-match.
+    expect(
+      await screen.findByText(/^settings are locked by your administrator$/i),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByRole('button', { name: /^add provider$/i }),
+    ).toBeDisabled();
+  });
+
+  it('disables the row menu Edit and Delete actions while leaving Test enabled', async () => {
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
+    );
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: /actions for my openai/i }),
+    );
+
+    // toBeDisabled() only recognizes actual form controls (or fieldset descendants) — the queried
+    // text sits in a <span> inside the item's <button>, so assert on that button ancestor.
+    const editItem = await screen.findByText(/^edit$/i);
+    const deleteItem = await screen.findByText(/^delete$/i);
+    const testItem = await screen.findByText(/^test$/i);
+    expect(editItem.closest('button')).toBeDisabled();
+    expect(deleteItem.closest('button')).toBeDisabled();
+    expect(testItem.closest('button')).not.toBeDisabled();
+  });
+
+  it('disables the default-provider star toggle', async () => {
+    mockService.list.mockResolvedValue([
+      { ...PROVIDER, id: 'p2', name: 'Second provider', isDefault: true },
+      PROVIDER,
+    ]);
+
+    render(
+      <SettingsPageWithRouter core={coreMock} onProvidersChanged={jest.fn()} />,
+    );
+
+    expect(
+      await screen.findByRole('button', {
+        name: /set as default provider/i,
+      }),
+    ).toBeDisabled();
+  });
+
+  it('disables the Privacy tab Save changes button', async () => {
+    render(
+      <SettingsPageWithRouter
+        core={coreMock}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=privacy']}
+      />,
+    );
+
+    // Raises dirty state the same way settings-page.test.tsx's own "saves an untouched
+    // allow-scan row" case does: located by label text + DOM traversal to the `[role="switch"]`
+    // control, not by role+name (every tab's card stays mounted, so multiple EuiSwitch instances
+    // share this env's mocked htmlIdGenerator output and accessible-name-by-role resolves to the
+    // wrong switch).
+    const switchLabel = await screen.findByText(
+      /enable privacy mode by default/i,
+    );
+    fireEvent.click(
+      switchLabel.closest('.euiSwitch')!.querySelector('[role="switch"]')!,
+    );
+
+    expect(
+      await screen.findByRole('button', { name: /save changes/i }),
+    ).toBeDisabled();
+  });
+
+  it('disables the Conversation history Save button', async () => {
+    render(
+      <SettingsPageWithRouter
+        core={coreMock}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=retention']}
+      />,
+    );
+
+    const days = await screen.findByRole('spinbutton');
+    fireEvent.change(days, { target: { value: '5' } });
+
+    expect(
+      await screen.findByRole('button', {
+        name: /save conversation history settings/i,
+      }),
+    ).toBeDisabled();
   });
 });

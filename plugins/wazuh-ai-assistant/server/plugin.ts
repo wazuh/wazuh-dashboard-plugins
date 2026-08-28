@@ -7,7 +7,7 @@ import {
   Logger,
 } from '../../../src/core/server';
 import { registerRoutes } from './routes';
-import { setApiKeyCipher } from './plugin-services';
+import { setApiKeyCipher, setSettingsReadOnly } from './plugin-services';
 import { ApiKeyCipher, parseEncryptionKey } from './crypto/api-key-cipher';
 import { WazuhAiAssistantConfigType } from './config';
 import { createAssistantSettingsManager } from './settings/route-handler-context';
@@ -76,6 +76,17 @@ export class WazuhAiAssistantPlugin
           'base64 32-byte key as wazuh_ai_assistant.encryptionKey via the keystore (recommended: ' +
           'opensearch-dashboards-keystore add wazuh_ai_assistant.encryptionKey) or in ' +
           'opensearch_dashboards.yml.',
+      );
+    }
+
+    // Settings/providers admin lock (server/plugin-services.ts's getter/setter singleton,
+    // consumed by server/routes/settings.ts's `requireSettingsUnlocked`). Same
+    // read-config-once-in-setup pattern as the cipher above.
+    setSettingsReadOnly(pluginConfig.settingsReadOnly);
+    if (pluginConfig.settingsReadOnly) {
+      this.logger.info(
+        'wazuhAiAssistant: settings/providers are LOCKED (wazuh_ai_assistant.settingsReadOnly) ' +
+          '— provider and settings writes will be rejected with 403.',
       );
     }
 
