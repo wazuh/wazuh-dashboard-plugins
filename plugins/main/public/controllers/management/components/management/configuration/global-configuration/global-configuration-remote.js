@@ -12,8 +12,6 @@
 
 import React, { Component, Fragment } from 'react';
 
-import { EuiSpacer } from '@elastic/eui';
-
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
@@ -112,44 +110,44 @@ class WzConfigurationGlobalConfigurationRemote extends Component {
           )}
         {currentConfig['request-remote'] &&
           currentConfig['request-remote'].remote && (
-            <WzConfigurationSettingsHeader
-              title='Remote settings'
-              description='Configuration to listen for events from the agents or a syslog client'
-              help={helpLinks}
-            >
+            <Fragment>
               {hasHTTPSSettings && (
-                <Fragment>
+                <WzConfigurationSettingsHeader
+                  title='HTTPS settings'
+                  description='Listener the agents use to communicate with the manager over HTTPS'
+                  help={helpLinks}
+                >
                   <WzConfigurationSettingsGroup
-                    title='HTTPS settings'
-                    description='Listener the agents use to communicate with the manager over HTTPS'
                     config={remoteSettings}
                     items={httpsSettings}
                   />
-                  <EuiSpacer size='m' />
-                </Fragment>
+                </WzConfigurationSettingsHeader>
               )}
               {hasLegacySettings && (
-                <Fragment>
+                <WzConfigurationSettingsHeader
+                  title='Legacy settings'
+                  description='Listener kept for agents that still communicate over the legacy protocol'
+                  help={helpLinks}
+                >
                   <WzConfigurationSettingsGroup
-                    title='Legacy settings'
-                    description='Listener kept for agents that still communicate over the legacy protocol'
                     config={remoteSettings}
                     items={legacySettings}
                   />
-                  <EuiSpacer size='m' />
-                </Fragment>
+                </WzConfigurationSettingsHeader>
               )}
               {hasAgentsSettings && (
-                <Fragment>
+                <WzConfigurationSettingsHeader
+                  title='Agents settings'
+                  description='Settings applied to the agents that connect to this manager'
+                  help={helpLinks}
+                >
                   <WzConfigurationSettingsGroup
-                    title='Agents settings'
-                    description='Settings applied to the agents that connect to this manager'
                     config={remoteSettings}
                     items={agentsSettings}
                   />
-                </Fragment>
+                </WzConfigurationSettingsHeader>
               )}
-            </WzConfigurationSettingsHeader>
+            </Fragment>
           )}
       </Fragment>
     );

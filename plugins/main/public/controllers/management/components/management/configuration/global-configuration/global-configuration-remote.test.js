@@ -160,6 +160,27 @@ describe('Global configuration remote settings', () => {
     expect(getAllByDisplayValue('1517').length).toBe(1);
   });
 
+  it('should render each block as a section of its own, like the Global tab', () => {
+    const { queryAllByRole, getByRole } = render(
+      <WzConfigurationGlobalConfigurationRemote
+        currentConfig={fullRemoteConfig}
+      />,
+    );
+
+    // The Global tab stacks its sections as siblings rather than nesting them
+    // under a parent title, so no block outranks another here either.
+    expect(
+      getByRole('heading', { level: 2, name: 'HTTPS settings' }),
+    ).toBeInTheDocument();
+    expect(
+      getByRole('heading', { level: 2, name: 'Legacy settings' }),
+    ).toBeInTheDocument();
+    expect(
+      getByRole('heading', { level: 2, name: 'Agents settings' }),
+    ).toBeInTheDocument();
+    expect(queryAllByRole('heading', { level: 3 })).toHaveLength(0);
+  });
+
   it('should render a dash for the fields a section does not report', () => {
     const { getByText, getByDisplayValue, getAllByDisplayValue } = render(
       <WzConfigurationGlobalConfigurationRemote
