@@ -18,13 +18,13 @@ function baseMessage(overrides: Partial<UiChatMessage>): UiChatMessage {
   };
 }
 
-// Layout contract §5 ("one measure, one gutter"): each transcript row now centres itself
-// independently via `.wzMessageRow`/`.wzMessageRow--wide` (chat-page.scss) instead of the whole
-// list sharing `.wzContentMeasure`'s 1060px column. A table-bearing row still gets the `--wide`
-// marker so it fills that content column to its right edge with the results card (bounded by the
-// composer's own column, $wzContentMaxWidth — the owner's iteration-4 call), while a prose row
-// caps its text at 68ch inside the same measure.
-describe('MessageList — per-row measure (layout contract §5)', () => {
+// One measure, one gutter: each transcript row centres itself independently via
+// `.wzMessageRow`/`.wzMessageRow--wide` (chat-page.scss) instead of the whole list sharing
+// `.wzContentMeasure`'s 1060px column. A table-bearing row still gets the `--wide` marker so it
+// fills that content column to its right edge with the results card (bounded by the composer's
+// own column, $wzContentMaxWidth), while a prose row caps its text at 68ch inside the same
+// measure.
+describe('MessageList — per-row measure', () => {
   it('gives a prose-only turn the shared (non-wide) row measure', () => {
     const { container } = render(
       <MessageList
@@ -129,9 +129,9 @@ describe('MessageList — per-row measure (layout contract §5)', () => {
 });
 
 /**
- * A failed turn stops being the last one the moment the reader asks anything else — and until now
- * that silently took its retry action away with it. The turn most likely to need retrying was the
- * one that could no longer be retried, and the only route back was to retype the question.
+ * A failed turn stops being the last one the moment the reader asks anything else, which would
+ * otherwise silently take its retry action away with it. The turn most likely to need retrying
+ * would be the one that could no longer be retried, with retyping the question the only route back.
  */
 describe('MessageList — retry on an older failed/interrupted turn', () => {
   const failedThenAnswered: UiChatMessage[] = [

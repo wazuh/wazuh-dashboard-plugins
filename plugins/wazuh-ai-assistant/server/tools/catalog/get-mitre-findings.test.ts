@@ -5,8 +5,8 @@ import { BREAKDOWN_BUCKET_CAP } from '../digest';
 import { FINDING_BREAKDOWN_AGGS } from './common';
 
 /**
- * Unit tests for get_mitre_findings (issue #8920 item 2: sub-technique rollup). The registry-wide
- * class guard lives in technique-rollup-coverage.test.ts; these are this tool's own shape/wiring
+ * Unit tests for get_mitre_findings covering the sub-technique rollup. The registry-wide class
+ * guard lives in technique-rollup-coverage.test.ts; these are this tool's own shape/wiring
  * assertions.
  */
 
@@ -81,9 +81,9 @@ function techniqueIdsTerms(req: IndexerRequest): Record<string, unknown> {
 
 test('get_mitre_findings: always attaches a technique_ids terms agg for the exact-vs-rollup disclosure', () => {
   const noFilter = buildIndexer({});
-  // Alongside FINDING_BREAKDOWN_AGGS (issue #8920 item 1's agent/rule-title distribution) --
-  // asserted as a superset, so this test pins the technique disclosure without re-pinning the
-  // shared breakdown constant common.test.ts already owns.
+  // Alongside FINDING_BREAKDOWN_AGGS (the agent/rule-title distribution) -- asserted as a
+  // superset, so this test pins the technique disclosure without re-pinning the shared
+  // breakdown constant common.test.ts already owns.
   const aggs = noFilter.body.aggs as Record<string, unknown>;
   for (const [name, def] of Object.entries(FINDING_BREAKDOWN_AGGS)) {
     assert.deepEqual(aggs[name], def);

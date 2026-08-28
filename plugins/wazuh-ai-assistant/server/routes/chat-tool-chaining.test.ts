@@ -24,24 +24,22 @@ import {
 import { ChatStreamOptions, ProviderAdapter } from '../providers/types';
 
 /**
- * Issue #8935 item I3 -- DEFERRED-OFFER INTERCEPTION (chat.ts's `findOfferedFollowUpTool` and the
+ * DEFERRED-OFFER INTERCEPTION (chat.ts's `findOfferedFollowUpTool` and the
  * `forcedFollowUpTool`/`forcedFollowUpSpent` state in `orchestrate`'s round loop).
  *
- * The measured failure this pins: a turn correctly summarizes get_sca_results, then ENDS the turn
- * asking permission for an obvious next tool ("I can run get_sca_checks to list the failing
- * checks — want me to?") instead of just calling it, even though tool rounds remain unspent
- * (chat.ts's `done` branch at the time of writing, ~1378-1414, terminates on `sawToolCall===false`
- * unconditionally). This file drives the REAL `orchestrate` (not a reimplementation) with a
- * scripted fake adapter, same pattern as chat-capability-honesty.test.ts, extended to also capture
- * each call's `options` (that file's harness discards them -- the whole point here is asserting
- * `options.toolChoice` on the FORCED round).
+ * The failure this pins: a turn correctly summarizes get_sca_results, then ENDS the turn asking
+ * permission for an obvious next tool ("I can run get_sca_checks to list the failing checks —
+ * want me to?") instead of just calling it, even though tool rounds remain unspent (chat.ts's
+ * `done` branch terminates on `sawToolCall===false` unconditionally). This file drives the REAL
+ * `orchestrate` (not a reimplementation) with a scripted fake adapter, same pattern as
+ * chat-capability-honesty.test.ts, extended to also capture each call's `options` (that file's
+ * harness discards them -- the whole point here is asserting `options.toolChoice` on the FORCED
+ * round).
  *
  * NOTE (running outside the OSD tree): imports `./chat`, which imports `@osd/config-schema` --
  * unresolvable outside the full wazuh-dashboard checkout this repo is normally built against.
  * Same colocated-unit-test convention as every other chat-*.test.ts file in this directory; CI
- * runs it under the platform runner. The #8935 integration pass ALSO executed this whole file
- * standalone (tsc-compiled, plain Node, `@osd/config-schema` stubbed -- route registration is
- * never invoked by these tests, so the stub is inert) against the real `orchestrate`: 27/27.
+ * runs it under the platform runner.
  */
 
 // --- scriptedAdapter, extended to capture `options` -------------------------------------------
@@ -130,7 +128,7 @@ function textOnlyScript(text: string): StreamEvent[] {
 }
 
 /** An offer-shaped round: some narration, then a deferred-permission question naming a tool, then
- * `done` with NO tool call -- the exact shape of the measured failure. */
+ * `done` with NO tool call -- the exact shape the interception targets. */
 function offerScript(text: string): StreamEvent[] {
   return [
     { type: 'delta', content: text },
@@ -262,8 +260,8 @@ function scaContext(): {
       },
     },
     // A THIRD response, same shape as the first -- used by the main end-to-end test's extra
-    // duplicate get_sca_results round (workstream C: the cost-budget redesign's futility-stop
-    // needs a repeated identical call to demonstrate the "duplicate query" trigger).
+    // duplicate get_sca_results round: the cost-budget futility-stop needs a repeated identical
+    // call to demonstrate the "duplicate query" trigger.
     {
       hits: { hits: [], total: { value: 207 } },
       aggregations: {
@@ -411,8 +409,8 @@ test('findOfferedFollowUpTool: an already-executed tool is excluded even from an
 });
 
 test('findOfferedFollowUpTool: a NON-offer sentence never matches, even naming one unexecuted tool', () => {
-  // The sentence-level offer gate (integration review): a dismissive/negative mention must not
-  // read as an offer. No OFFER_MARKER_RE marker anywhere in this text.
+  // The sentence-level offer gate: a dismissive/negative mention must not read as an offer.
+  // No OFFER_MARKER_RE marker anywhere in this text.
   assert.equal(
     findOfferedFollowUpTool(
       'get_sca_checks would not answer a hardening question, so this summary covers only SCA.',
@@ -448,7 +446,7 @@ test('findOfferedFollowUpTool: search_wazuh_data (the escape hatch) is never ret
 
 test('findOfferedFollowUpTool: a listing where one option is exempt is STILL a listing (mention count precedes exclusions)', () => {
   // If exclusions ran before the exactly-one count, "get_sca_checks or search_wazuh_data" would
-  // collapse to one candidate and be force-called -- integration review of the gate ordering.
+  // collapse to one candidate and be force-called -- this pins the gate ordering.
   assert.equal(
     findOfferedFollowUpTool(
       'I can also run get_sca_checks or search_wazuh_data if that would help — want me to?',
@@ -513,8 +511,8 @@ test('findOfferedFollowUpTool: no name mentioned at all -> undefined', () => {
   );
 });
 
-// --- metadata fallback (issue #8935 Failure B, "nothing compels"): CHAIN_PAIRS keyed by the last
-// successful summary tool, for an offer that never names a tool at all -----------------------
+// --- metadata fallback: CHAIN_PAIRS keyed by the last successful summary tool, for an offer that
+// never names a tool at all ----------------------------------------------------------------
 
 test('findOfferedFollowUpTool: metadata fallback -- an offer naming no tool chains via CHAIN_PAIRS', () => {
   assert.equal(
@@ -580,8 +578,8 @@ test('findOfferedFollowUpTool: metadata fallback -- the chained detail tool alre
 });
 
 test('findOfferedFollowUpTool: metadata fallback -- ordinary closing boilerplate is NOT force-called', () => {
-  // Integration-review fix: "Let me know if you need anything else." matches OFFER_MARKER_RE
-  // ("let me know") and names no tool, so without the relevance gate this force-calls
+  // "Let me know if you need anything else." matches OFFER_MARKER_RE ("let me know") and names
+  // no tool, so without the relevance gate this force-calls
   // CHAIN_PAIRS['get_sca_results'][0] (get_sca_checks) on every turn that ran get_sca_results and
   // ended with this near-universal closer. The sentence has no more/specific/further/detail
   // vocabulary, so the relevance gate must degrade this to base behaviour.
@@ -611,8 +609,8 @@ test('findOfferedFollowUpTool: metadata fallback -- "happy to help with anything
 });
 
 test('findOfferedFollowUpTool: metadata fallback -- a paraphrased search_wazuh_data offer is NOT force-called into an unrelated tool', () => {
-  // Integration-review fix: prompts.ts orders the model to offer search_wazuh_data in prose for a
-  // field a typed result lacks; FORCE_EXEMPT_TOOL_NAMES only protects that offer when it NAMES the
+  // prompts.ts orders the model to offer search_wazuh_data in prose for a field a typed result
+  // lacks; FORCE_EXEMPT_TOOL_NAMES only protects that offer when it NAMES the
   // tool. A paraphrase ("a custom query for those fields") matches the detail-vocabulary gate (it
   // says "those fields") but must still be excluded by the escape-hatch exclusion, or it would be
   // force-called into get_sca_checks -- a tool the offer was never about.
@@ -646,15 +644,14 @@ test('findOfferedFollowUpTool: a NON-offer round (no OFFER_MARKER_RE marker) is 
 // agg-size-coverage.test.ts / field-policy-coverage.test.ts) ------------------------------------
 
 test('registry-wide coverage: EVERY catalog tool is detected when offered, named alone, and unexecuted — except the recorded exemption', () => {
-  // Class-level guard for issue #8935 item I3: the detector must work identically for every
-  // registered tool, not just the SCA pair the measured failure happened to name. Driven from the
-  // REAL `listToolSpecs()` (not a hand-picked list) so a future catalog tool is covered
-  // automatically -- the ONLY exemption is search_wazuh_data (FORCE_EXEMPT_TOOL_NAMES: prompts.ts
-  // orders the model to offer it in prose, and it is the strictest-guardrail surface), asserted
-  // here EXPLICITLY so the exemption list cannot silently grow. A tool whose name breaks the
-  // `\bname\b` regex construction, or a detector that silently degraded to a hardcoded per-tool
-  // allowlist instead of scanning the full offered list, fails this loop instead of shipping
-  // unnoticed.
+  // Class-level guard: the detector must work identically for every registered tool, not just
+  // the SCA pair. Driven from the REAL `listToolSpecs()` (not a hand-picked list) so a future
+  // catalog tool is covered automatically -- the ONLY exemption is search_wazuh_data
+  // (FORCE_EXEMPT_TOOL_NAMES: prompts.ts orders the model to offer it in prose, and it is the
+  // strictest-guardrail surface), asserted here EXPLICITLY so the exemption list cannot silently
+  // grow. A tool whose name breaks the `\bname\b` regex construction, or a detector that silently
+  // degraded to a hardcoded per-tool allowlist instead of scanning the full offered list, fails
+  // this loop instead of shipping unnoticed.
   const allTools = listToolSpecs();
   const offered = [...allTools, SUGGEST_DISCOVER_QUERY_TOOL];
   const failures: string[] = [];
@@ -682,8 +679,8 @@ test('registry-wide coverage: EVERY catalog tool is detected when offered, named
 
 test('registry-wide coverage: every tool name is the documented [a-z_]+ shape the detector depends on', () => {
   // The detector's privacy- and regex-safety argument (see findOfferedFollowUpTool's doc comment)
-  // leans on tool names being a closed [a-z_]+ vocabulary; before this test no invariant enforced
-  // that anywhere (integration review). A future dotted/uppercase/metacharacter name would break
+  // leans on tool names being a closed [a-z_]+ vocabulary; this is the only place that invariant
+  // is enforced. A future dotted/uppercase/metacharacter name would break
   // the \b word-boundary construction silently -- it breaks here loudly instead.
   const names = [...listToolSpecs(), SUGGEST_DISCOVER_QUERY_TOOL].map(
     spec => spec.name,
@@ -728,8 +725,8 @@ test('registry-wide coverage: no catalog tool is ever returned when it is the ON
   );
 });
 
-// --- orchestrate: issue C4 -- a round's own narration must survive into the NEXT round's history
-// instead of being discarded as `content: ''` on the assistant message that carries its tool_call
+// --- orchestrate: a round's own narration must survive into the NEXT round's history instead of
+// being discarded as `content: ''` on the assistant message that carries its tool_call
 // (otherwise the model has no record of having already said it and re-narrates on a later round).
 
 test("orchestrate: a round's streamed prose is carried into the NEXT round's history on the assistant message that made the tool_call", async () => {
@@ -820,12 +817,12 @@ test('orchestrate: two tool_calls in the SAME round each get only the narration 
 });
 
 test('orchestrate: a round that streams only whitespace before its tool_call produces content: "" in history, never a whitespace string', async () => {
-  // Adversarial-review finding: models routinely emit a bare priming newline run ("\n\n") right
-  // before a tool call. The C4 slice (`roundText.slice(roundTextConsumed)`) used to carry that
-  // whitespace straight into the assistant message's `content`, and anthropic.ts pushes any
-  // truthy `content` as a `text` block -- Anthropic's Messages API 400s on a whitespace-only
-  // text block. The fix trims the slice; this pins the orchestration-level contract the adapter
-  // relies on: whitespace-only round text must become an empty string, not survive as "\n\n".
+  // Models routinely emit a bare priming newline run ("\n\n") right before a tool call. If the
+  // slice (`roundText.slice(roundTextConsumed)`) carried that whitespace straight into the
+  // assistant message's `content`, anthropic.ts would push any truthy `content` as a `text`
+  // block -- Anthropic's Messages API 400s on a whitespace-only text block. Trimming the slice
+  // pins the orchestration-level contract the adapter relies on: whitespace-only round text must
+  // become an empty string, not survive as "\n\n".
   const { context } = scaContext();
   const { callMessages } = await runOrchestrate(
     [
@@ -865,10 +862,10 @@ test('orchestrate: a round that streams only whitespace before its tool_call pro
 // --- orchestrate: round-tail narration -- text streamed AFTER a round's LAST tool_call ---------
 
 test("orchestrate: text streamed AFTER a round's last tool_call is carried into history as its own assistant message", async () => {
-  // Residual gap flagged in adversarial review: the C4 fix only attributes narration that
-  // arrives BEFORE each tool_call (`roundTextConsumed` slicing). Text streamed after the LAST
-  // tool_call of a round -- before that round's `done` -- was still silently dropped, because the
-  // 'done' handler for a tool-bearing round only accumulated usage and broke to the next round.
+  // Narration attribution (`roundTextConsumed` slicing) only covers text that arrives BEFORE
+  // each tool_call. Text streamed after the LAST tool_call of a round -- before that round's
+  // `done` -- must not be silently dropped: the 'done' handler for a tool-bearing round
+  // accumulates usage and breaks to the next round, so trailing narration needs its own capture.
   const { context } = scaContext();
   const { callMessages } = await runOrchestrate(
     [
@@ -906,18 +903,15 @@ test("orchestrate: text streamed AFTER a round's last tool_call is carried into 
 
 // --- orchestrate: main end-to-end case -- FAILS ON BASE -----------------------------------------
 //
-// WORKSTREAM C NOTE: under the old fixed `MAX_TOOL_ROUNDS = 3`, round index 3 was UNCONDITIONALLY
-// final regardless of how much real tool work had happened. Under the cost-budget redesign, a
-// round only becomes final once the budget (BASE_BUDGET_UNITS = 6) is spent or the futility stop
-// fires -- and this scenario's first two real tool calls (get_sca_results cost 1, get_sca_checks
-// cost 2 -- see registry.ts's `getToolCostClass`) only spend 3, leaving budget remaining. A THIRD
-// round -- the model re-running get_sca_results with the SAME arguments -- is added so the
-// scenario now also exercises the futility stop's "duplicate of a previous round's identical
-// query" trigger (chat.ts's `isRoundFutile`): that duplicate is what makes round 4 the genuinely
-// final one, not a bare round-count coincidence. This is the exact "update the script, keep what
-// it proves" adjustment the redesign calls for -- the test still proves I3 (deferred-offer
-// interception) and #8893 (final-round-answer instruction) compose correctly; it now ALSO proves
-// the budget mechanism recognizes a real stopping point instead of guessing from round count.
+// A round only becomes final once the budget (BASE_BUDGET_UNITS = 6) is spent or the futility
+// stop fires -- and this scenario's first two real tool calls (get_sca_results cost 1,
+// get_sca_checks cost 2 -- see registry.ts's `getToolCostClass`) only spend 3, leaving budget
+// remaining. A THIRD round -- the model re-running get_sca_results with the SAME arguments -- is
+// added so the scenario also exercises the futility stop's "duplicate of a previous round's
+// identical query" trigger (chat.ts's `isRoundFutile`): that duplicate is what makes round 4 the
+// genuinely final one, not a bare round-count coincidence. The test proves deferred-offer
+// interception and the final-round-answer instruction compose correctly, and that the budget
+// mechanism recognizes a real stopping point instead of guessing from round count.
 
 test('orchestrate: an unprompted single-tool offer with rounds remaining is forced into a chained call, not left to end the turn', async () => {
   const { context } = scaContext();
@@ -936,8 +930,8 @@ test('orchestrate: an unprompted single-tool offer with rounds remaining is forc
         },
         { type: 'done', usage: { inputTokens: 20, outputTokens: 10 } },
       ],
-      // round 1: the MEASURED failure shape -- correct summary, then a deferred single-tool offer,
-      // no tool call, done. On base this 'done' ends the turn right here.
+      // round 1: correct summary, then a deferred single-tool offer, no tool call, done. On base
+      // this 'done' ends the turn right here.
       offerScript(
         'CIS Ubuntu: 95 passed, 102 failed, 10 N/A. I can run get_sca_checks to list the ' +
           'failing checks — want me to?',
@@ -959,7 +953,7 @@ test('orchestrate: an unprompted single-tool offer with rounds remaining is forc
         },
         { type: 'done', usage: { inputTokens: 25, outputTokens: 12 } },
       ],
-      // round 3 (workstream C addition): the model re-runs get_sca_results with the IDENTICAL
+      // round 3: the model re-runs get_sca_results with the IDENTICAL
       // arguments as round 0 -- a duplicate query, cost-budget-wise still charged (cost 1, running
       // total 1+2+1=4, still under BASE_BUDGET_UNITS=6) but flagged futile by `isRoundFutile`
       // (every successful call this round is a duplicate), which forces round 4 to be the final
@@ -1019,16 +1013,16 @@ test('orchestrate: an unprompted single-tool offer with rounds remaining is forc
     ['get_sca_results', 'get_sca_checks', 'get_sca_results'],
   );
 
-  // #8893 pin: the final round's outbound messages still end with a final-round instruction, and
-  // the forced round and the duplicate round -- both ordinary tool rounds, not the final one --
-  // still carry none; only the genuinely last (no-tools) round does.
+  // The final round's outbound messages still end with a final-round instruction, and the forced
+  // round and the duplicate round -- both ordinary tool rounds, not the final one -- still carry
+  // none; only the genuinely last (no-tools) round does.
   //
-  // WHICH instruction changed with issue wazuh-dashboard#1527. This turn IS the interception turn:
-  // round 1 streamed a complete answer to the screen and the deferred-offer interception extended
-  // the turn anyway, so the final round is now told to CONTINUE that answer instead of being told
-  // "Now answer the user's question directly" -- being given the latter here is what shipped two
-  // complete answers in the report. The #8893 guarantee is unaffected: the anti-fabrication
-  // grounding body is shared verbatim between the two instructions, asserted below.
+  // WHICH instruction depends on context: this turn IS the interception turn. Round 1 streamed a
+  // complete answer to the screen and the deferred-offer interception extended the turn anyway,
+  // so the final round is told to CONTINUE that answer instead of being told "Now answer the
+  // user's question directly" -- being given the latter here would ship two complete answers.
+  // The anti-fabrication grounding body is shared verbatim between the two instructions, asserted
+  // below.
   const finalRoundMessages = callMessages[5];
   const lastMessage = finalRoundMessages[finalRoundMessages.length - 1];
   // 'user', not 'system' -- a system-role message is hoisted out of `messages` into the request's
@@ -1040,7 +1034,7 @@ test('orchestrate: an unprompted single-tool offer with rounds remaining is forc
     (lastMessage.content as string).includes(
       'must come from the tool results already gathered in this conversation',
     ),
-    'the final round lost the #8893 grounding clauses',
+    'the final round lost the grounding clauses',
   );
   // And the FORCED round's outbound messages do NOT carry it (it is not the final round).
   const forcedRoundMessages = callMessages[3];
@@ -1057,8 +1051,8 @@ test('orchestrate: an unprompted single-tool offer with rounds remaining is forc
   );
 
   // The offer text the user already read is IN the forced round's, the duplicate round's, and the
-  // final round's history (integration review: without it, later rounds are authored blind of the
-  // summary-plus-offer on screen, and the turn ships two independently-authored summaries).
+  // final round's history: without it, later rounds are authored blind of the summary-plus-offer
+  // on screen, and the turn ships two independently-authored summaries.
   const offerText =
     'CIS Ubuntu: 95 passed, 102 failed, 10 N/A. I can run get_sca_checks to list the ' +
     'failing checks — want me to?';
@@ -1149,10 +1143,10 @@ test('orchestrate: an unnamed offer is forced via the CHAIN_PAIRS metadata fallb
 test('orchestrate: an unnamed offer on the LAST tool-bearing round is not forced (round budget respected)', async () => {
   // Same budget fence as the name-based path's own test, but for the metadata fallback: an
   // unnamed offer landing on the last tool-bearing round must not spend a round the budget does
-  // not have. Integration-review fix: a script filled entirely with REJECTED_SEARCH_ROUND never
-  // sets `lastSuccessfulToolName` (rejected calls never reach the executed/success site), so that
+  // not have. A script filled entirely with REJECTED_SEARCH_ROUND never sets
+  // `lastSuccessfulToolName` (rejected calls never reach the executed/success site), so that
   // version of this test would pass identically even with the round-budget gate deleted -- it
-  // never gave the fallback a chance to fire in the first place. The LAST filler round here is
+  // never gives the fallback a chance to fire in the first place. The LAST filler round here is
   // instead a SUCCESSFUL get_sca_results call (a real CHAIN_PAIRS summary key), so the fallback
   // has a genuine chain to key off and the round-budget gate is what must stop it from firing.
   const { context } = scaContext();
@@ -1287,8 +1281,8 @@ test('orchestrate: a DEAD adapter stream on the forced round still emits a termi
 });
 
 // --- orchestrate: negative / regression fences --------------------------------------------------
-// Each of these passes BOTH on base and after this change -- they exist to prove the mechanism
-// does not over-fire, not to reproduce the measured defect. (The budget-gate/spent-flag test and
+// Each of these passes BOTH on base and with the interception enabled -- they exist to prove the
+// mechanism does not over-fire. (The budget-gate/spent-flag test and
 // the retry-offer test live under their own headers further down: those FAIL on base, because
 // they assert a force that base never performs.)
 
@@ -1328,7 +1322,7 @@ test('orchestrate: an offer naming a SUCCESSFULLY-executed tool does not force a
 });
 
 test('orchestrate: a DISMISSIVE mention of an unexecuted tool does not force a call', async () => {
-  // FENCE for integration-review hole: prompts.ts's capability-honesty block pushes the model to
+  // FENCE: prompts.ts's capability-honesty block pushes the model to
   // NAME what it could not check -- a negative mention ("would not answer this") must not be
   // hijacked into running the very tool the model ruled out. The sentence-level offer gate in
   // findOfferedFollowUpTool is what this pins.
@@ -1353,7 +1347,7 @@ test('orchestrate: a DISMISSIVE mention of an unexecuted tool does not force a c
 });
 
 test('orchestrate: a reasoning-fallback round never triggers the interception', async () => {
-  // FENCE for integration-review hole: openai-compatible.ts's reasoningFallback surfaces raw
+  // FENCE: openai-compatible.ts's reasoningFallback surfaces raw
   // deliberation as one delta when a model streams only on the reasoning channel (gpt-oss/qwen3.x
   // -- the very model family in PROVIDER_CONFIG). Deliberation routinely names one tool the model
   // decided AGAINST; the flagged delta must disqualify the round from interception.
@@ -1384,7 +1378,7 @@ test('orchestrate: a reasoning-fallback round never triggers the interception', 
 });
 
 test('orchestrate: an offer naming search_wazuh_data (the escape hatch) is never forced', async () => {
-  // FENCE for integration-review hole: prompts.ts ORDERS the model to offer search_wazuh_data in
+  // FENCE: prompts.ts ORDERS the model to offer search_wazuh_data in
   // prose for fields a typed result lacks -- that designed behaviour must not become a forced
   // call into the strictest-guardrail surface (FORCE_EXEMPT_TOOL_NAMES in chat.ts).
   const { events, callMessages } = await runOrchestrate(
@@ -1471,9 +1465,9 @@ test('orchestrate: no tool ran this turn -- a mentioned tool name never forces a
 });
 
 // --- orchestrate: budget/spent-gate pin ----------------------------------------------------------
-// NOTE (integration review fixed the earlier mislabel): unlike the fences above, this test FAILS
-// ON BASE — it asserts the one force that base never performs (callOptions[3].toolChoice) on its
-// way to pinning that the SECOND offer is not forced.
+// NOTE: unlike the fences above, this test FAILS ON BASE — it asserts the one force that base
+// never performs (callOptions[3].toolChoice) on its way to pinning that the SECOND offer is not
+// forced.
 
 test('orchestrate: a second offer after one force was already spent this turn does not force again', async () => {
   const { events, callMessages, callOptions } = await runOrchestrate(
@@ -1483,11 +1477,11 @@ test('orchestrate: a second offer after one force was already spent this turn do
       // round 1: offers get_sca_checks -- forces round 2.
       offerScript('I can run get_sca_checks — want me to?'),
       // round 2 (forced): instead of complying, the model offers a DIFFERENT unexecuted tool.
-      // This fences `forcedFollowUpSpent` alone (workstream C: every call in this script is
-      // rejected/offer-only, so the cost budget never spends anything and never enters the
-      // picture -- see chat.ts's `toolCallCostUnits` doc comment for why a validation-rejected
-      // call is free against that budget) -- unlike the main end-to-end test above, this scenario
-      // does not also need to fence the round-budget gate.
+      // This fences `forcedFollowUpSpent` alone: every call in this script is rejected/offer-only,
+      // so the cost budget never spends anything and never enters the picture -- see chat.ts's
+      // `toolCallCostUnits` doc comment for why a validation-rejected call is free against that
+      // budget -- unlike the main end-to-end test above, this scenario does not also need to
+      // fence the round-budget gate.
       offerScript('I could also run search_wazuh_data — want me to?'),
     ],
     rejectingContext(),

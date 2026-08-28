@@ -243,15 +243,15 @@ test('buildOutgoingMessages: a turnRecord whose assistantMessageId has no matchi
 });
 
 // ---------------------------------------------------------------------------
-// Wire-proof fix (AI/qa/wire-proof-v35/capture.jsonl): excludePrivacyOffHistory, and
-// buildOutgoingMessages's own use of it via its new `currentPrivacyEnabled` parameter.
+// excludePrivacyOffHistory, and buildOutgoingMessages's own use of it via its
+// `currentPrivacyEnabled` parameter.
 //
-// The live-captured leak: a real agent name (`wazuh-aio-5`, no dots -- invisible to the shape scan)
-// survived a privacy-off-to-on mid-conversation toggle because the digest that carried it was
-// resent as "history" unfiltered. All five tests below map 1:1 to the fix's required proof points.
+// The leak this guards against: a real agent name (`wazuh-aio-5`, no dots -- invisible to the
+// shape scan) would survive a privacy-off-to-on mid-conversation toggle because the digest that
+// carried it gets resent as "history" unfiltered. The five tests below map to that guarantee.
 // ---------------------------------------------------------------------------
 
-test('excludePrivacyOffHistory: WIRE-PROOF regression -- a privacy-OFF-flagged tool digest containing a bare real agent name is absent from the outbound payload entirely', () => {
+test('excludePrivacyOffHistory: a privacy-OFF-flagged tool digest containing a bare real agent name is absent from the outbound payload entirely', () => {
   // The user's OWN question text deliberately does NOT mention the hostname here: this mechanism
   // never drops role:'user' content (a separate, already-documented residual -- see
   // excludePrivacyOffHistory's own doc comment), so a "no hostname anywhere" assertion must not be
@@ -282,7 +282,7 @@ test('excludePrivacyOffHistory: WIRE-PROOF regression -- a privacy-OFF-flagged t
   assert.doesNotMatch(
     serialized,
     /wazuh-aio-5/,
-    'the real agent name from the live wire-proof must not survive anywhere in the outbound payload',
+    'the real agent name must not survive anywhere in the outbound payload',
   );
 });
 
@@ -386,7 +386,7 @@ test('excludePrivacyOffHistory: user messages are NEVER dropped by this mechanis
   assert.deepEqual(out, messages);
 });
 
-test('buildOutgoingMessages: WIRE-PROOF end-to-end -- privacy toggled on mid-conversation excludes the privacy-off turn (digest AND prose), keeping the current question', () => {
+test('buildOutgoingMessages: privacy toggled on mid-conversation excludes the privacy-off turn (digest AND prose), keeping the current question', () => {
   // As in the excludePrivacyOffHistory test above, the user's OWN question text deliberately does
   // not mention the hostname -- only the digest and the model's own past narration carried it, and
   // those (not user content) are what this fix drops.

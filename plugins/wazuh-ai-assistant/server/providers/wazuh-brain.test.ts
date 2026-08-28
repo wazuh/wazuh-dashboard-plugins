@@ -38,7 +38,7 @@ test('deriveSessionId: the same conversation (same first message, growing length
   );
 });
 
-test('deriveSessionId: two DIFFERENT users whose conversations happen to have the same length no longer collide, as long as their first message differs (the fixed gap)', () => {
+test('deriveSessionId: two DIFFERENT users whose conversations happen to have the same length do not collide, as long as their first message differs', () => {
   const userOne = deriveSessionId([
     userMessage('host-alpha status?'),
     { role: 'assistant', content: 'ok' },
@@ -50,7 +50,8 @@ test('deriveSessionId: two DIFFERENT users whose conversations happen to have th
   assert.notEqual(
     userOne,
     userTwo,
-    'old bug: both were "wazuh-ai-assistant-2" regardless of content',
+    'without the length-plus-hash derivation, both would collide as "wazuh-ai-assistant-2" ' +
+      'regardless of content',
   );
 });
 

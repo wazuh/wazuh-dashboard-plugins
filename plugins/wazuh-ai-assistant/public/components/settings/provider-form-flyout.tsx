@@ -38,11 +38,10 @@ import { ProviderTestOutcome, isEndpointBlockedError } from './provider-status';
 
 /**
  * Provider names in this file are a support claim, not decoration: naming a service here sends an
- * admin off to configure it. Groq and "Bedrock-Mantle" used to appear in the card's description —
- * Groq was measured failing with a 413 across its whole tier, and Bedrock-Mantle is an internal
- * gateway name that does not belong in a product string. The enumeration now lives in the
- * description below (which has room for it) rather than in this label, which was wrapping to two
- * lines inside the card.
+ * admin off to configure it. Groq and "Bedrock-Mantle" do not appear in this label — Groq was
+ * measured failing with a 413 across its whole tier, and Bedrock-Mantle is an internal gateway
+ * name that does not belong in a product string. The enumeration lives in the description below
+ * (which has room for it), not in this label, which would wrap to two lines inside the card.
  */
 const PROVIDER_TYPE_FORM_LABELS: Record<string, string> = {
   openai_compatible: i18n.translate(
@@ -57,8 +56,8 @@ const PROVIDER_TYPE_FORM_LABELS: Record<string, string> = {
 };
 
 /** One-line description shown under the provider type selector so the choice is self-explanatory
- * without opening either form label's parenthetical — CEO feedback was specifically that signing
- * up an Anthropic key was confusing, and part of that was not knowing which type to pick. */
+ * without opening either form label's parenthetical — feedback flagged that signing up an
+ * Anthropic key was confusing, and part of that was not knowing which type to pick. */
 const PROVIDER_TYPE_DESCRIPTIONS: Record<ProviderInput['type'], string> = {
   anthropic: i18n.translate(
     'wazuhAiAssistant.settings.type.anthropicDescription',
@@ -193,9 +192,9 @@ const PROVIDER_URL_GUIDANCE: Record<
      *               admin might paste literally)
      * - Ollama      default port 11434 with its OpenAI-compatibility layer at /v1
      *
-     * Groq's endpoint is deliberately NOT an example any more. Its documentation link below stays:
-     * a link is reference for someone who has already chosen Groq, whereas an example is a
-     * suggestion, and Groq was measured returning 413 across its whole tier.
+     * Groq's endpoint is deliberately NOT an example. Its documentation link below stays: a link is
+     * reference for someone who has already chosen Groq, whereas an example is a suggestion, and
+     * Groq was measured returning 413 across its whole tier.
      */
     examples: [
       'https://api.openai.com/v1',
@@ -450,9 +449,9 @@ function getVendorModelSuggestions(
 
 /**
  * The four steps of the getting-started callout: one i18n message per step, so each is
- * translatable on its own and the numbering comes from the `<ol>` rather than from the copy. They
- * used to be a single message with "1. … 2. … 3. … 4. …" run together in one inline paragraph,
- * which is the shape a sequence should never take — it neither scans nor is announced as a list.
+ * translatable on its own and the numbering comes from the `<ol>` rather than from the copy. A
+ * single message with "1. … 2. … 3. … 4. …" run together in one inline paragraph is the shape a
+ * sequence should never take — it neither scans nor is announced as a list.
  */
 const GETTING_STARTED_STEPS: string[] = [
   i18n.translate('wazuhAiAssistant.settings.form.gettingStartedStepType', {
@@ -473,10 +472,9 @@ const GETTING_STARTED_STEPS: string[] = [
 ];
 
 /**
- * The form's ONE example-value chip. Four inline `EuiBadge` copies used to render this same idiom
- * across the form, which is how they drifted apart in the first place; TWO render sites are left
- * (the endpoint field's examples and the per-vendor model suggestions) now that the Model field's
- * generic per-type examples row is gone.
+ * The form's ONE example-value chip. TWO render sites use it — the endpoint field's examples and
+ * the per-vendor model suggestions — rather than each site rendering its own inline `EuiBadge`
+ * copy of the same idiom, which is how such copies drift apart across a form.
  *
  * Every value it ever shows is a URL or a model id, so it is set in the code face: the chip has to
  * read as a value you can click into the field, not as a label describing one. Clicking fills the
@@ -578,10 +576,10 @@ function hasRepeatedSchemeInAuthority(value: string): boolean {
 }
 
 /**
- * The endpoint field's single source of validation truth, shared by submit AND blur (previously
- * only submit ran it, so a wrong URL sat there unmarked until the admin clicked Save & test) and by
+ * The endpoint field's single source of validation truth, shared by submit AND blur (running it on
+ * blur too means a wrong URL never sits there unmarked until the admin clicks Save & test) and by
  * the "is it still wrong?" re-check on every keystroke — the error deliberately does NOT clear on
- * the first keystroke any more, only once the value actually becomes valid, because clearing it on
+ * the first keystroke, only once the value actually becomes valid, because clearing it on
  * keystroke one reads as "fixed" while the field is still just as invalid.
  *
  * Returns `null` when the value is acceptable, otherwise the message to show under the field.
@@ -816,12 +814,11 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   );
   // Feeds both the "Suggested models:" chips and the Model EuiComboBox's dropdown `options`.
   //
-  // No deduplication any more: this list used to be filtered against `modelGuidance.examples`,
-  // because an id curated in BOTH tables (Anthropic's claude-sonnet-5 is in each) rendered as two
-  // identical chips under two different headings. With the generic "Examples:" row gone (see the
-  // Model field below) there is nothing left to collide with — and keeping the filter would now do
-  // real damage, silently hiding the vendor's own primary model from the only list that still
-  // offers it.
+  // No deduplication against `modelGuidance.examples`: an id curated in BOTH tables (Anthropic's
+  // claude-sonnet-5 is in each) would otherwise need filtering to avoid two identical chips under
+  // two different headings, but with the generic "Examples:" row gone (see the Model field below)
+  // there is nothing left to collide with — and filtering it out would do real damage, silently
+  // hiding the vendor's own primary model from the only list that still offers it.
   const modelOptions = vendorModelSuggestions.map(model => ({ label: model }));
   const selectedModelOption = form.model ? [{ label: form.model }] : [];
 
@@ -1042,12 +1039,10 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
 
   const keepEditing = () => setShowCloseConfirm(false);
 
-  // Straight to `onClose` now. This used to inspect the click's own target for
-  // `confirmModalCancelButton`, because the modal's actions were wired backwards — the DESTRUCTIVE
-  // action sat on `onCancel`, which `EuiConfirmModal` also fires for Escape and for an overlay
-  // click, so the guard existed to stop those dismissals from throwing the form away. With the
-  // actions the right way round (discard on `onConfirm`, keep editing on `onCancel`) a dismissal
-  // is inherently the safe path and there is nothing left to disambiguate.
+  // Calls `onClose` directly, with no need to inspect the click's own target. The modal's actions
+  // are wired with the DESTRUCTIVE action on `onConfirm` and keep-editing on `onCancel` —
+  // `EuiConfirmModal` also fires `onCancel` for Escape and for an overlay click, so a dismissal is
+  // inherently the safe path and there is nothing left to disambiguate.
   const discardChanges = () => {
     setShowCloseConfirm(false);
     onClose();
@@ -1186,8 +1181,8 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
             </>
           )}
           {/* Only shown for a brand-new provider — an admin editing an existing one already
-              knows how to fill this form in. CEO feedback was specifically that signing up an
-              Anthropic key was confusing; this is the shortest possible map of the four steps. */}
+              knows how to fill this form in. Feedback flagged that signing up an Anthropic key
+              was confusing; this is the shortest possible map of the four steps. */}
           {!editingProvider && (
             <>
               <EuiCallOut
@@ -1201,10 +1196,10 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 {/* A real ordered list, not four sentences run together in one paragraph: the
                     numbers come from the `<ol>`, so they stay correct under translation and the
                     steps scan as a sequence. `EuiCallOut` already wraps its children in `EuiText`,
-                    which is what supplies the list styling. The caveat sentence that used to close
-                    this callout ("a green test confirms connection and key…") is gone: hedging the
-                    Test button before the admin has filled anything in was noise on the one
-                    surface that has to feel simple. */}
+                    which is what supplies the list styling. No caveat sentence closes this callout
+                    ("a green test confirms connection and key…"): hedging the Test button before
+                    the admin has filled anything in is noise on the one surface that has to feel
+                    simple. */}
                 <ol className='wzProviderFlyout__steps'>
                   {GETTING_STARTED_STEPS.map(step => (
                     <li key={step}>{step}</li>
@@ -1227,7 +1222,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
               {/* A segmented control, not a pair of huge cards (UX iteration 4 item 1): a binary
                   choice does not need ~450px of card real estate, and the old layout rendered
                   BOTH types' descriptions at once while only one was ever selected — confusing on
-                  the exact surface CEO feedback already flagged as hard to get right. The
+                  the exact surface already flagged as hard to get right. The
                   selection-dependent description now lives in this EuiFormRow's own `helpText`,
                   so only the type actually chosen is ever described. */}
               <EuiFormRow
@@ -1399,9 +1394,9 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 helpText={
                   <>
                     {/* A plain element, so it takes the `helpText` slot's own
-                        `.euiFormHelpText` size and color. It used to be an `EuiText size='xs'`,
-                        which produced the same visual size by a second, independent mechanism —
-                        the kind of near-miss that made this form read as sloppy. */}
+                        `.euiFormHelpText` size and color, rather than an `EuiText size='xs'`
+                        producing the same visual size by a second, independent mechanism — the
+                        kind of near-miss that reads as sloppy. */}
                     <div id='wz-ai-provider-baseurl-examples-label'>
                       <FormattedMessage
                         id='wazuhAiAssistant.settings.form.baseUrlExample'
@@ -1525,13 +1520,12 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     )}
                   />
                 }
-                // No generic "Examples:" chip row here any more (Miguel + UX decision, recorded in
-                // the audit's own "additional decided items"): the two ids it offered were
+                // No generic "Examples:" chip row here: the two ids such a row would offer are
                 // Bedrock-gateway model names, i.e. valid for exactly one of the many services this
-                // provider type covers, and they were shown on every endpoint — including one whose
-                // own vendor suggestions were listed 20px below under a second heading. What
-                // remains is everything that is actually keyed to the admin's endpoint: the combo
-                // box's own suggestions, the "Suggested models:" chips, and the vendor's model list
+                // provider type covers, and would be shown on every endpoint — including one whose
+                // own vendor suggestions are listed 20px below under a second heading. What remains
+                // is everything that is actually keyed to the admin's endpoint: the combo box's
+                // own suggestions, the "Suggested models:" chips, and the vendor's model list
                 // behind the link below. The endpoint field keeps its examples, because there an
                 // example is the fastest way to recognise the shape of the value being asked for.
                 isInvalid={Boolean(modelError)}
@@ -1681,17 +1675,17 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     'capability.'
                   }
                   values={{
-                    // The example follows the SELECTED provider type. It used to be a hardcoded
-                    // `gpt-4o`, so an admin configuring Claude was shown a GPT model as the
-                    // tool-calling example and one click filled the Model field with a value that
-                    // provider cannot serve. `modelGuidance.examples` is the same per-type list
-                    // the Examples chips two fields above already use.
+                    // The example follows the SELECTED provider type: a hardcoded `gpt-4o` would
+                    // show an admin configuring Claude a GPT model as the tool-calling example, and
+                    // one click would fill the Model field with a value that provider cannot serve.
+                    // `modelGuidance.examples` is the same per-type list the Examples chips two
+                    // fields above already use.
                     //
                     // Rendered as plain inline code, NOT as an `ExampleChip`: this one is
                     // illustrative prose ("a model like this one"), and the very same id is already
-                    // offered as a real fill-on-click chip under the Model field. A chip here looked
-                    // identical to those but sat mid-sentence inside a warning, so it advertised an
-                    // action where the surrounding text was only naming an example.
+                    // offered as a real fill-on-click chip under the Model field. A chip here would
+                    // look identical to those but sit mid-sentence inside a warning, advertising an
+                    // action where the surrounding text is only naming an example.
                     model: (
                       <code className='wzProviderFlyout__inlineValue'>
                         {toolCallingExampleModel}

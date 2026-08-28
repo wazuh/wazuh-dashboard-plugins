@@ -1,5 +1,5 @@
 /**
- * No-silent-entity-substitution disclosure (issue #8920 item 6): the server has no way to see the
+ * No-silent-entity-substitution disclosure: the server has no way to see the
  * user's ORIGINAL wording -- only the agent-name string(s) the model already resolved and passed
  * as tool-call params (see `AGENT_NAME_PARAM_KEYS`). So it cannot detect "the model silently
  * substituted a different host" directly; the honest, deterministic guarantee it CAN give is a
@@ -133,12 +133,12 @@ export function findNearMissSiblings(
 }
 
 /**
- * BLOCKER FIX (CV-028/CV-033, 2026-08-19 adjudicated run): "category-word misread as agent name"
+ * Handles the "category-word misread as agent name"
  * class. A free-text token the model believed was a host name (e.g. "cloud-services",
  * "network-activity" -- both plausible-looking hostnames, but actually category/domain vocabulary)
  * gets passed as `agent_name`/`agent_names` and the filtered query returns 0 rows. Until this fix,
  * a 0-row agent-name filter with NO near-miss sibling (`findNearMissSiblings` above returns empty)
- * produced no disclosure at all -- the model was left with a bare zero-row digest and, per CV-033,
+ * produced no disclosure at all -- the model was left with a bare zero-row digest and
  * sometimes surfaced a generic "no matching results" sentence that reads exactly like an ordinary
  * empty-data outcome, never stating that the name itself matched no known agent.
  *

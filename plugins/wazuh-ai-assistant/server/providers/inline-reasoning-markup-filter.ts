@@ -2,10 +2,9 @@
  * Server-side, model-agnostic backstop against reasoning models that inline their
  * chain-of-thought (or a failed attempt at a structured tool call) as literal TEXT in
  * `delta.content`, instead of on the dedicated `delta.reasoning` channel that
- * openai-compatible.ts's `reasoningFallback` already handles (see issue
- * 02-read-reasoning-delta.md). Measured on `qwen/qwen3.6-27b`: 6 of 8 successful answers leaked
- * this markup into the user's answer bubble (issue 18-strip-inline-reasoning-markup.md). Verbatim
- * example (a real captured answer):
+ * openai-compatible.ts's `reasoningFallback` already handles. Measured on `qwen/qwen3.6-27b`: 6 of
+ * 8 successful answers leaked this markup into the user's answer bubble. Verbatim example (a real
+ * captured answer):
  *
  *   <think>
  *   The user wants to know the RAM and CPU of "this host" ...
@@ -28,15 +27,15 @@
  * line-oriented -- a `<think>` block can open and close mid-line, and its body is arbitrary
  * multi-paragraph prose with no delimiter of its own.
  *
- * Deliberately narrow, per the issue's "prefer explicit known tag names over a generic
- * `<[^>]+>` sweep" instruction: only the known tag families below are ever treated as
- * markup. A legitimate answer mentioning `<script>` or comparing `size < 500` is untouched --
- * neither is a prefix of any recognized tag, so both fall straight through as plain text.
+ * Deliberately narrow -- explicit known tag names only, never a generic `<[^>]+>` sweep: only the
+ * known tag families below are ever treated as markup. A legitimate answer mentioning `<script>`
+ * or comparing `size < 500` is untouched -- neither is a prefix of any recognized tag, so both
+ * fall straight through as plain text.
  *
  * Also strips DeepSeek's `<｜DSML｜...｜>` gateway markup (note: those are FULLWIDTH VERTICAL LINE,
- * U+FF5C, not ASCII `|`). Measured live on `deepseek.v3.2` through an OpenAI-compatible gateway
- * (provider-matrix-bedrock-deepseek-v3-2.jsonl): unlike `<think>`/`<tool_call>`, this marker never
- * showed a closing tag in any captured sample -- real answer text runs on immediately after it,
+ * U+FF5C, not ASCII `|`). Measured live on `deepseek.v3.2` through an OpenAI-compatible gateway:
+ * unlike `<think>`/`<tool_call>`, this marker never showed a closing tag in any captured sample --
+ * real answer text runs on immediately after it,
  * same line, e.g. `...\n\n<｜DSML｜function_callsThere were no critical findings...`. Treating it as
  * a depth-incrementing opener (like `<think>`) would therefore suppress the entire rest of the
  * answer as if it were still-open reasoning, which is wrong: it is a zero-width glitch token, not a
@@ -45,7 +44,7 @@
  * One captured turn also leaked a verbatim fragment of our own system prompt immediately after this
  * marker ("Stop after you answer the question; do not preemptively continue..."). That is the model
  * parroting its instructions as prose, not a delimited tag -- there is no markup to match, so it
- * cannot be stripped by this filter (or any regex). Left as a known residual gap; see the issue.
+ * cannot be stripped by this filter (or any regex). Left as a known residual gap.
  */
 
 /** Tag families this filter recognizes as reasoning/tool-call-as-text markup, never as prose. */
@@ -154,8 +153,7 @@ function nextTagMatch(
  * seen while `depth > 0` is dropped, never emitted.
  *
  * An unclosed block (depth never returns to 0 before the stream ends) is suppressed all the way
- * to end of stream, per the issue's explicit requirement -- `flush()` simply never releases text
- * that was accumulated while `depth > 0`.
+ * to end of stream -- `flush()` simply never releases text that was accumulated while `depth > 0`.
  */
 export class InlineReasoningMarkupFilter {
   private buffer = '';

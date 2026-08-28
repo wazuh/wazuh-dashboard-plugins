@@ -196,12 +196,12 @@ test('lintDsl: steers a "prefix" clause on a vulnerability field away from the f
   }
 });
 
-// Cross-category tool audit (same bug shape as issue #8913): this reason reaches the model via
-// search_wazuh_data/find_document_by_field (`free_search`, always offered), but the four tools it
-// used to name unconditionally live in the separate `vulnerabilities` category, which is not
-// guaranteed to be offered on the same turn. Pins the conditional wording and the explicit
-// no-tools-available fallback so a future edit cannot silently reintroduce an unconditional
-// "use the vulnerability tools" instruction naming a tool set that may not exist this turn.
+// Cross-category tool audit: this reason reaches the model via search_wazuh_data/
+// find_document_by_field (`free_search`, always offered), but the four tools it names live in the
+// separate `vulnerabilities` category, which is not guaranteed to be offered on the same turn.
+// Pins the conditional wording and the explicit no-tools-available fallback so a future edit
+// cannot silently reintroduce an unconditional "use the vulnerability tools" instruction naming a
+// tool set that may not exist this turn.
 test('lintDsl: the vulnerability-field steering reason is conditional on those tools being offered, not unconditional', () => {
   const body = {
     query: {
@@ -334,7 +334,7 @@ test('lintDsl: wazuh-states-* is exempt from the mandatory time-range check', ()
   assert.equal(result.ok, true);
 });
 
-// --- clampLookbackWindow (issue #8935 item I4: bound disclosure) -------------------------------
+// --- clampLookbackWindow (bound disclosure) -----------------------------------------------------
 // GOAL: MAX_LOOKBACK_MS stays 90 days, but a wider request produces a SUCCESSFUL, capped answer
 // instead of a rejection the model must remember to relay. Not exported from guardrails.ts, so
 // this file hardcodes the documented 90-day contract rather than importing the constant -- same
@@ -933,7 +933,7 @@ test('lintDsl: still rejects a non-allowlisted events-v5 field (e.g. a hand-buil
 });
 
 test(
-  'lintDsl: passes a terms aggregation on event.category/event.outcome (CV-033 fix -- the ' +
+  'lintDsl: passes a terms aggregation on event.category/event.outcome (the ' +
     'events-v5 category taxonomy, get_field_values verify-before-filter probe)',
   () => {
     const byCategory = {
@@ -1121,14 +1121,10 @@ test('checkIndexAllowlist: accepts the 6 named wazuh-threatintel-* sub-families 
   }
 });
 
-// REVERSED by workstream A1a (AI/plan/coverage-validation-design.md, TC-8): the prior ADR-1
-// decision predates the "every family with real data must be queryable by construction" mission
-// and the coverage doc's explicit resequencing of this exact row to cover-now (372,301/257,071-doc
-// corpora, two of only two production-shaped-volume gaps). The exact literal
-// `wazuh-threatintel-enrichments-a` is now allowed (see guardrails.ts's INDEX_ALLOWLIST_RE
-// comment) -- but the bare wildcarded prefix is still rejected below: only the one real index name
-// is opened, not a whole new sub-family the way rules/decoders/etc. are.
-test('checkIndexAllowlist: accepts the exact wazuh-threatintel-enrichments-a index (A1a, TC-8)', () => {
+// The exact literal `wazuh-threatintel-enrichments-a` is allowed (see guardrails.ts's
+// INDEX_ALLOWLIST_RE comment) -- but the bare wildcarded prefix is still rejected below: only the
+// one real index name is opened, not a whole new sub-family the way rules/decoders/etc. are.
+test('checkIndexAllowlist: accepts the exact wazuh-threatintel-enrichments-a index', () => {
   assert.equal(checkIndexAllowlist('wazuh-threatintel-enrichments-a').ok, true);
 });
 
@@ -1145,26 +1141,26 @@ test('checkIndexAllowlist: rejects a bare wazuh-threatintel-* or an unrecognized
   assert.equal(checkIndexAllowlist('wazuh-threatintel-bogus-*').ok, false);
 });
 
-test('checkIndexAllowlist: accepts the exact .wazuh-threatintel-vulnerabilities-a index (A1a, TC-8)', () => {
+test('checkIndexAllowlist: accepts the exact .wazuh-threatintel-vulnerabilities-a index', () => {
   assert.equal(
     checkIndexAllowlist('.wazuh-threatintel-vulnerabilities-a').ok,
     true,
   );
 });
 
-test('checkIndexAllowlist: accepts wazuh-metrics-* (A1a, coverage doc open gap G1)', () => {
+test('checkIndexAllowlist: accepts wazuh-metrics-*', () => {
   assert.equal(checkIndexAllowlist('wazuh-metrics-comms').ok, true);
   assert.equal(checkIndexAllowlist('wazuh-metrics-agents').ok, true);
   assert.equal(checkIndexAllowlist('wazuh-metrics-normalization').ok, true);
   assert.equal(checkIndexAllowlist('wazuh-metrics-comms-v4').ok, true);
 });
 
-test('checkIndexAllowlist: accepts the CTI status indices (A1a, coverage doc MS-6/MS-7)', () => {
+test('checkIndexAllowlist: accepts the CTI status indices', () => {
   assert.equal(checkIndexAllowlist('.wazuh-cti-consumers').ok, true);
   assert.equal(checkIndexAllowlist('.wazuh-content-manager-jobs').ok, true);
 });
 
-test('checkIndexAllowlist: rejects .opendistro-ism-config (system-index read protection verified live, coverage doc G8)', () => {
+test('checkIndexAllowlist: rejects .opendistro-ism-config (system-index read protection verified live)', () => {
   const result = checkIndexAllowlist('.opendistro-ism-config');
   assert.equal(result.ok, false);
   if (!result.ok) {
@@ -1198,18 +1194,17 @@ test('checkIndexAllowlist: rejects a wildcard on the detectors-config index and 
     checkIndexAllowlist('.opensearch-sap-detectors-config*').ok,
     false,
   );
-  // -alerts stays closed (A1a, coverage doc G2): every detector's `triggers: []` provisioning
-  // defect means this can only ever return zero live data -- see guardrails.ts's exclusion note.
+  // -alerts stays closed: every detector's `triggers: []` provisioning defect means this can only
+  // ever return zero live data -- see guardrails.ts's exclusion note.
   assert.equal(
     checkIndexAllowlist('.opensearch-sap-suricata-alerts').ok,
     false,
   );
 });
 
-// REVERSED by workstream A1a (coverage doc G2: "findings now flowing after the
-// alert_finding_enabled=true fix" -- live-verified non-empty on wazuh-aio-5). Any prior assertion
-// that this family was rejected predates that fix.
-test('checkIndexAllowlist: accepts .opensearch-sap-*-findings (A1a, coverage doc G2)', () => {
+// -findings is open: the alert_finding_enabled=true fix makes this family flow live data
+// (verified non-empty on wazuh-aio-5).
+test('checkIndexAllowlist: accepts .opensearch-sap-*-findings', () => {
   assert.equal(
     checkIndexAllowlist('.opensearch-sap-suricata-findings').ok,
     true,
@@ -1257,7 +1252,7 @@ test('checkIndexAllowlist: rejects .opensearch-sap-correlation-alerts/-history (
   );
 });
 
-// P-10 (AI/plan/a1a-review.md): the wildcard suffix used to be `[^,\s]*`, which let `/` and `.`
+// The wildcard suffix used to be `[^,\s]*`, which let `/` and `.`
 // through -- so a path-traversal-shaped value could match the regex even though it is not
 // reachable via search_wazuh_data's own JSON-schema `enum` today. Tightened to the explicit
 // index-name charset; this pins that the standalone boundary now rejects it directly too.

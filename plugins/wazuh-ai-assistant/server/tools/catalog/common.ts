@@ -86,7 +86,7 @@ export function limitProperty(description: string): JsonSchemaProperty {
  * `MAX_AGG_SIZE` (server/tools/guardrails.ts) instead of taking a caller-chosen max.
  *
  * Use this, never `clampLimit(value, n, <literal>)`, whenever the clamped result is written into a
- * `terms`/`composite`/`multi_terms` `size`. Reason (issue #8894): `guardrails.ts`'s `checkAggs`
+ * `terms`/`composite`/`multi_terms` `size`. Reason: `guardrails.ts`'s `checkAggs`
  * rejects any aggregation size above `MAX_AGG_SIZE`, and `executor.ts` runs `lintDsl` on EVERY
  * indexer request with no per-tool exemption. So a tool that clamped its own limit to a larger
  * number did not get a bigger aggregation — it got a hard failure for the whole range above the cap.
@@ -106,10 +106,10 @@ export function clampAggLimit(value: unknown, defaultValue: number): number {
  * `limitProperty` for an aggregation-backed limit: builds the description so the advertised maximum
  * is READ FROM the same `MAX_AGG_SIZE` the guardrail enforces.
  *
- * The half of issue #8894 that actually misled the model was the description — it promised `max 500`
- * on a tool that failed above 100, so a model following the schema was steered into the broken
- * range. Generating the sentence removes the possibility of the two numbers disagreeing; a future
- * change to the cap updates every tool's advertised maximum automatically.
+ * What actually misled the model was the description — it promised `max 500` on a tool that failed
+ * above 100, so a model following the schema was steered into the broken range. Generating the
+ * sentence removes the possibility of the two numbers disagreeing; a future change to the cap
+ * updates every tool's advertised maximum automatically.
  */
 export function aggLimitProperty(
   subject: string,
@@ -242,13 +242,13 @@ export function timeRangeProperties(): Record<string, JsonSchemaProperty> {
 }
 
 /**
- * Optional artifact-filter parameters shared by the finding-hits tools (issue: "Add artifact
- * filters to finding tools"): `source.ip` is already returned in every finding-hits tool's
- * digest (`FINDING_DIGEST_EXTRA_COLUMNS` below) and named in `server/prompts.ts`'s guidance to
- * "prefer the typed finding tools" for IP/user/process questions, yet no typed tool could
- * actually filter on it -- the model's only option was hand-writing DSL via search_wazuh_data.
- * `destination.ip` is confirmed `ip`-mapped and `searchable` on `wazuh-findings-v5*` via a live
- * `_field_caps` check (see the issue) even though it is not itself in the digest yet; a filter on
+ * Optional artifact-filter parameters shared by the finding-hits tools: `source.ip` is already
+ * returned in every finding-hits tool's digest (`FINDING_DIGEST_EXTRA_COLUMNS` below) and named
+ * in `server/prompts.ts`'s guidance to "prefer the typed finding tools" for IP/user/process
+ * questions, yet no typed tool could actually filter on it -- the model's only option was
+ * hand-writing DSL via search_wazuh_data. `destination.ip` is confirmed `ip`-mapped and
+ * `searchable` on `wazuh-findings-v5*` via a live `_field_caps` check, even though it is not
+ * itself in the digest yet; a filter on
  * it is still correct (it narrows to documents that HAVE it), just possibly sparse. `process.name`
  * is already used internally by `get_suspicious_powershell.ts`'s own `buildRequest`, confirming
  * it is queryable on this index -- this exposes the same field as a caller-supplied filter
@@ -357,8 +357,8 @@ export function objectSchema(
 
 /**
  * Negative-scope + vocabulary note appended to every finding-hits tool's `spec.description` --
- * the fix for a measured failure ("give me everything that happened on X") where two different
- * model families silently substituted a narrower rule-matched-only search and reported "nothing
+ * without it, a "give me everything that happened on X" question risks two different model
+ * families silently substituting a narrower rule-matched-only search and reporting "nothing
  * happened" instead of saying no rule fired. Kept as one shared string so all 8 (see
  * `STANDARD_FINDING_TABLE_COLUMNS`'s doc comment below) finding-hits tools carry identical
  * wording rather than independently-drifting paraphrases -- every finding-hits tool description
@@ -394,10 +394,10 @@ export const SCA_CURRENT_STATE_NOTE =
   'Reflects the latest SCA scan state (what passes/fails now), not a history of when a check ' +
   'started failing; for that, use the findings tools.';
 
-/** Current-state note appended to the syscollector inventory tools' descriptions (and, from issue
- * 12's consolidation onward, to `get_agent_inventory`'s): `wazuh-states-inventory-*` is a snapshot
- * written at scan/collection time, not an event-time record, so it answers "what does agent X look
- * like now", never "what did it look like when finding Y fired". */
+/** Current-state note appended to the syscollector inventory tools' descriptions (and to
+ * `get_agent_inventory`'s): `wazuh-states-inventory-*` is a snapshot written at scan/collection
+ * time, not an event-time record, so it answers "what does agent X look like now", never "what
+ * did it look like when finding Y fired". */
 export const INVENTORY_CURRENT_STATE_NOTE =
   'Reflects current state only, not the state at any past event time.';
 
@@ -405,7 +405,7 @@ export const INVENTORY_CURRENT_STATE_NOTE =
  * Shared baseline `tableSpec.columns`/`digest.sampleColumns` for the 8 finding-hits tools
  * (get_critical_findings, get_findings_by_time, get_brute_force, get_suspicious_powershell,
  * search_findings_by_agent, search_findings_by_multiple_agents, search_findings_by_rule_title,
- * search_findings_by_rule_tag). Each previously kept its own identical copy.
+ * search_findings_by_rule_tag).
  */
 export const STANDARD_FINDING_TABLE_COLUMNS: ToolTableColumnSpec[] = [
   { field: '@timestamp', label: 'Time' },
@@ -452,20 +452,20 @@ export const FINDING_INVESTIGATION_ROW_FIELDS = [
 
 /**
  * Group-by dimensions for digest.ts's `buildSyntheticBreakdown` — shared by the same 8
- * finding-hits tools listed above. These two are the ones the issue this exists for names
- * verbatim ("which agents"/"which rules"); every finding row carries both regardless of which
- * columns the calling tool declares visible, so this is safe to share across all 8 unconditionally.
+ * finding-hits tools listed above. These two cover "which agents"/"which rules" breakdowns; every
+ * finding row carries both regardless of which columns the calling tool declares visible, so this
+ * is safe to share across all 8 unconditionally.
  */
 export const FINDING_BREAKDOWN_DIMENSIONS = [
   'wazuh.agent.name',
   'wazuh.rule.title',
-  // Severity (2026-08-14, UI run C8): "how many findings by severity" is the most obvious
-  // aggregative question a security product gets, and with only the two dimensions above no
-  // finding-hits tool could answer it in one call -- the model fanned out one filtered call per
-  // severity, spent the whole MAX_TOOL_ROUNDS budget on three of the five levels, and (honestly)
-  // reported low/informational as never requested. A closed five-word vocabulary
+  // Severity: "how many findings by severity" is the most obvious aggregative question a
+  // security product gets, and with only the two dimensions above no finding-hits tool could
+  // answer it in one call -- the model would have to fan out one filtered call per severity,
+  // spend the whole MAX_TOOL_ROUNDS budget on three of the five levels, and end up reporting
+  // low/informational as never requested. It's a closed five-word vocabulary
   // (informational..critical), so the extra terms agg is five buckets of overhead at most, and
-  // the field is already on field-policy-coverage.test.ts's reviewed known-safe list.
+  // the field is already on field-policy-coverage.test.ts's known-safe list.
   'wazuh.rule.level',
 ];
 
@@ -483,7 +483,7 @@ export function aggNameForField(field: string): string {
  * typed tool's request body (see e.g. get-critical-findings.ts's `buildRequest`) alongside the
  * existing `query`/`sort`/`size` — OpenSearch computes `aggregations` over the FULL MATCHED set of
  * a query regardless of `size`, independently of how many hits are actually returned. This closes
- * the #8870 validation-gate gap: a breakdown computed over only the RETURNED page
+ * the validation-gate gap where a breakdown computed over only the RETURNED page
  * (`buildSyntheticBreakdown`, digest.ts) is wrong whenever `size`/`limit` truncates the match set,
  * because the digest hands it to the model as if it were the population. With this `aggs` clause
  * present, `buildBreakdown` (digest.ts, unmodified — it already read `result.aggregations`
@@ -570,12 +570,12 @@ export const VULN_DIGEST_SAMPLE_COLUMNS = [
   'package.version',
   'package.architecture',
   'vulnerability.score.base',
-  // The two fields whose ABSENCE produced a measured capability over-promise (UI run 2026-08-14,
-  // A3/B2): without them the model offered to "check whether an updated lxd package is
-  // available" (no tool can) and recommended apt for a snap. `scanner.condition` carries the
-  // scanner's own fix bound ("Package less than 5.21.4") -- the honest form of that offer -- and
-  // `package.type` (deb/snap/pypi/npm) picks the right remediation channel. Both are
-  // scanner/OS-curated metadata, not analyst/attacker free text.
+  // The two fields whose ABSENCE produces a capability over-promise: without them the model
+  // offers to "check whether an updated lxd package is available" (no tool can) and recommends
+  // apt for a snap. `scanner.condition` carries the scanner's own fix bound ("Package less than
+  // 5.21.4") -- the honest form of that offer -- and `package.type` (deb/snap/pypi/npm) picks the
+  // right remediation channel. Both are scanner/OS-curated metadata, not analyst/attacker free
+  // text.
   'vulnerability.scanner.condition',
   'package.type',
   // `wazuh-states-vulnerabilities` has NO dedicated fixed-version or remediation field: the fix
@@ -608,11 +608,11 @@ export const VULN_SOURCE_FIELDS_WITH_AGENT_ID = [
 ];
 
 /**
- * Dimensions for the vulnerability-listing tools' population-true breakdown (issue #8920 item 1,
- * "sample narrated as population"): get_vulnerabilities/get_critical_vulnerabilities/
- * get_vulnerabilities_by_agent only ever ran a plain hits search, so a truncated result -- e.g. "no
- * high-severity vulnerabilities" on a host with 2 critical + 2 high, all sorted outside the
- * returned page -- had no population-true view of either dimension. Both fields are already on
+ * Dimensions for the vulnerability-listing tools' population-true breakdown: without it,
+ * get_vulnerabilities/get_critical_vulnerabilities/get_vulnerabilities_by_agent run only a plain
+ * hits search, so a truncated result -- e.g. "no high-severity vulnerabilities" on a host with 2
+ * critical + 2 high, all sorted outside the returned page -- has no population-true view of either
+ * dimension. Both fields are already on
  * `guardrails.ts`'s `AGG_FIELD_ALLOWLIST` (severity: a closed 4-value enum; agent name: shared with
  * `FINDING_BREAKDOWN_DIMENSIONS` above). `get_vulnerability_by_cve` attaches these same
  * aggregations too (its own buildRequest): both fields are allowlisted and its index is not
@@ -672,8 +672,7 @@ export function validateAgentId(value: unknown): string {
 
 /**
  * Shared "name" filter for the two Security Analytics catalog tools (get_rules,
- * get_threat_intel_components) -- hotfix A0, root-caused in
- * `AI/plan/qa-rules-decoders-rootcause.md`: neither tool exposed ANY keyword filter, so a
+ * get_threat_intel_components): neither tool exposed ANY keyword filter, so a
  * QUALIFIED question ("is there a decoder for apache?", "the rule about SSTI") always fell back
  * to reading the full unfiltered page and admitting defeat, even though the underlying data
  * trivially answers it (live: 1 SSH decoder, 5 Apache decoders, 1 SSTI rule).
@@ -701,7 +700,7 @@ export function validateAgentId(value: unknown): string {
  * decoders); `"ssh"` returns the 1 SSH decoder (plus one honest extra whose description also
  * names SSH); `"ssti"` returns the one rule ("Server side template injection strings...") that
  * burned Q8's whole round budget on `tag`/`technique_id` guesses that could only ever return 0.
- * The description `match` uses `operator: 'and'` (review finding F1): the default `or` operator
+ * The description `match` uses `operator: 'and'`: the default `or` operator
  * matches on ANY token, and because this whole clause sits in a non-scoring `bool.filter` sorted
  * by `_doc`, a multi-word `name` (e.g. "decoder/apache-access/0") returns hundreds of unranked,
  * mostly-irrelevant rows instead of the one row the caller meant -- live-verified 330 -> 1 hit for

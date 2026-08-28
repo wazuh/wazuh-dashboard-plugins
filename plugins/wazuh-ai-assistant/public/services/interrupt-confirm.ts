@@ -11,11 +11,9 @@ import { OverlayStart } from '../../../../src/core/public';
  *    way to pass button labels or a color through it.
  *  - Opening another conversation or starting a new one, which this plugin owns.
  *
- * The second used to be a locally rendered `EuiConfirmModal`, which meant two dialogs for one
- * decision, with different wording and a different button color — the platform's default is
- * `primary`, and a plugin-side modal has no way to make the platform's match it. Routing both
- * through `overlays.openConfirm` with the SAME copy and no styling overrides makes them literally
- * the same dialog, so they cannot drift.
+ * Both routes go through `overlays.openConfirm` with the SAME copy and no styling overrides, so
+ * they render as literally the same dialog — same wording, same button color as the platform's
+ * `primary` default — and cannot drift apart into two dialogs for one decision.
  */
 export function interruptConfirmationTitle(): string {
   return i18n.translate('wazuhAiAssistant.chat.interruptConfirm.title', {

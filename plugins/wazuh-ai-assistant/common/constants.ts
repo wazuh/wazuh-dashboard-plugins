@@ -44,15 +44,14 @@ export const MANAGER_SESSION_EXPIRED_COPY = 'session is missing or expired';
  * Paths (relative to the OpenSearch/Wazuh indexer HTTP root) of the Wazuh indexer Setup plugin's
  * `AI Assistant` endpoints — a REAL, documented contract, not a placeholder: see the `AI
  * Assistant` tag's `/ai_assistant/settings` and `/ai_assistant/providers`{, `/{id}`} paths in the
- * OpenAPI spec at
- * https://github.com/wazuh/wazuh-indexer-plugins/blob/enhancement/1422-create-ai-assistant-indices/plugins/setup/openapi.yml
+ * `wazuh-indexer-plugins` repo's `plugins/setup/openapi.yml` OpenAPI spec
  * (`getAiAssistantSettings`/`putAiAssistantSettings`/`listAiAssistantProviders`/
  * `createAiAssistantProvider`/`putAiAssistantProvider`/`deleteAiAssistantProvider` operations).
  *
  * The two are genuinely separate resources on the indexer side, each with its own reader/writer
- * here, neither ever calling OpenSearch's raw document APIs against the underlying hidden index
- * directly any more (wazuh-dashboard-plugins#500): `server/settings/index-settings-provider.ts`
- * for `GET`/`PUT {WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH}` (privacy defaults/override/field
+ * here, neither calling OpenSearch's raw document APIs against the underlying hidden index
+ * directly: `server/settings/index-settings-provider.ts` for `GET`/`PUT
+ * {WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH}` (privacy defaults/override/field
  * policy only — no providers in that response), `server/settings/ai-providers-client.ts` for
  * `{WAZUH_INDEXER_AI_ASSISTANT_PROVIDERS_PATH}`{, `/{id}`} (provider CRUD). Both reach it the same
  * way `IsmSettingsProvider` reaches `_plugins/_ism/*`: `context.core.opensearch.client.
@@ -80,26 +79,25 @@ export const PROVIDER_API_KEY_AAD_NAMESPACE = 'wazuh-ai-assistant-provider';
 
 /** Index alias backing persisted (resumable) conversations — one document per conversation: `user`
  * + title + timestamps + the full `ChatMessage[]` transcript. It is a data stream managed by an
- * ISM policy on the indexer side (wazuh-indexer-plugins#1422), rotated daily and pruned after 7
- * days; OpenSearch Document Level Security on it restricts each document to the `user` it belongs
- * to. Reached only through server/routes/conversations.ts's owner-scoped CRUD and
+ * ISM policy on the indexer side, rotated daily and pruned after 7 days; OpenSearch Document
+ * Level Security on it restricts each document to the `user` it belongs to. Reached only
+ * through server/routes/conversations.ts's owner-scoped CRUD and
  * server/conversation-store.ts's query/document helpers — never a raw client call elsewhere. */
 export const CONVERSATION_SESSIONS_INDEX_ALIAS = 'wazuh-ai-assistant-sessions';
 
 /** Id of the ISM policy governing `CONVERSATION_SESSIONS_INDEX_ALIAS`'s retention, provisioned
- * indexer-side (wazuh-indexer-plugins#1422) — `server/settings/ism-settings-provider.ts` is the
- * only reader/writer. */
+ * indexer-side — `server/settings/ism-settings-provider.ts` is the only reader/writer. */
 export const CONVERSATION_SESSIONS_ISM_POLICY_ID =
   'ai-assistant-sessions-policy';
 
 /** Sentinel owner value used when the authenticated username cannot be resolved (main plugin/
  * security not ready, or `context.wazuh` absent).
- * server/routes/conversations.ts's `resolveOwner` never returns this any more — it fails closed
- * with `undefined` instead, and the four owner-CHECKING routes (list/get/put/delete) 403 on that
- * rather than ever comparing against a shared bucket value. The ONLY remaining writer is that
- * file's CREATE route, which still stamps this sentinel on a document's `user` field when identity
+ * server/routes/conversations.ts's `resolveOwner` fails closed with `undefined` when identity
+ * can't be resolved, and the four owner-CHECKING routes (list/get/put/delete) 403 on that
+ * rather than ever comparing against a shared bucket value. The only writer is that
+ * file's CREATE route, which stamps this sentinel on a document's `user` field when identity
  * can't be resolved (see that route's comment for why that is still safe) — but since no route can
- * subsequently list, get, update, or delete a document stamped with it, this is now a create-only
+ * subsequently list, get, update, or delete a document stamped with it, this is a create-only
  * dead end: the document persists but is otherwise unreachable through this API.
  * Separately and unrelatedly, server/routes/chat.ts's `resolveChatStreamUser` reuses this same
  * string as its own fallback bucket KEY for the per-user concurrent-stream rate limit (not an

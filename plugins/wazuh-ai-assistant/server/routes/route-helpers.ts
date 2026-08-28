@@ -17,9 +17,8 @@ export type RouteHandler<Params = unknown, Query = unknown, Body = unknown> = (
 ) => Promise<IOpenSearchDashboardsResponse>;
 
 /** Wraps a route handler with the byte-identical outer `try/catch` every mutating route in
- * server/routes/settings.ts and server/routes/conversations.ts used to repeat inline: any error
- * thrown by the handler becomes the same 500 `{message: describeError(error)}` customError
- * response. Purely a de-duplication of that boilerplate — no behavior change for callers.
+ * server/routes/settings.ts and server/routes/conversations.ts needs: any error thrown by the
+ * handler becomes the same 500 `{message: describeError(error)}` customError response.
  * Handlers' own inner try/catches (e.g. conversations.ts's get-then-404 pattern) are untouched. */
 export function withInternalErrorHandling<Params, Query, Body>(
   handler: RouteHandler<Params, Query, Body>,

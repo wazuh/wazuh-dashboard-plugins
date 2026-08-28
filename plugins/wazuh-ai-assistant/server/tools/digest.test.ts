@@ -1074,7 +1074,7 @@ test('capDigest: an oversized "columns" list forces the Manager message to be dr
   );
 });
 
-// --- #8920 item 5: top-level metric aggregations are no longer dropped -------------------------
+// --- top-level metric aggregations are not dropped -----------------------------------------------
 
 test('isMetricAggValue: accepts {value: number|null}, rejects buckets/hits/non-object shapes', () => {
   assert.equal(isMetricAggValue({ value: 6 }), true);
@@ -1298,8 +1298,8 @@ test('buildDigest: a metric-only response carries metrics AND the synthesized ro
 });
 
 test('buildDigest: a metric agg BEFORE a bucket agg in key order no longer masks the bucket rows', () => {
-  // Reproduces the exact pre-fix defect: Object.keys(aggregations)[0] was "distinct_agents" (no
-  // .buckets), so bucketsToRows used to bail out to `undefined` before ever looking at "by_rule".
+  // Object.keys(aggregations)[0] is "distinct_agents" (no .buckets); bucketsToRows must keep
+  // looking rather than bail out to `undefined` before reaching "by_rule".
   const def = buildToolDef({
     tableSpec: {
       columns: [
@@ -1604,10 +1604,9 @@ test('buildDigest: a 100-bucket long-key aggregation is carried up to the char b
 });
 
 test('buildDigest: a 100-bucket SHORT-key enumeration that fits the budget is carried WHOLE, no note', () => {
-  // Regression pin for the char-budget design itself (issue #8935 integration review): a flat
-  // 50-bucket count cap trimmed a ~2.8k-char rule-id enumeration that demonstrably fit — cutting
-  // by a number when the information fits is the exact class this issue exists to remove. Passes
-  // on base too (base is unbounded); it exists to fail against any future flat count cap.
+  // Regression pin for the char-budget design: a flat 50-bucket count cap would trim a ~2.8k-char
+  // rule-id enumeration that fits the budget — cutting by bucket count when the content fits is
+  // the class of bug this guards against. Exists to fail against any future flat count cap.
   const def = buildToolDef({ digest: { sampleColumns: ['key'] } });
   const result = {
     aggregations: {
@@ -1711,11 +1710,9 @@ test('buildDigest: a multi-agg carry trim attributes hidden buckets to the RIGHT
 });
 
 test('buildDigest: five 100-bucket aggregations stay inside DIGEST_CHAR_CAP with every agg represented', () => {
-  // The GLOBAL-budget pin (issue #8935 integration review): guardrails allows MAX_TOP_LEVEL_AGGS
-  // (5) top-level aggregations, and a PER-AGG cap of 50 long-key entries produced ~21.5k chars —
-  // capDigest then silently deleted whole trailing aggregations behind a note claiming a top-50
-  // list. FAILS ON BASE (500 entries ride through into capDigest's silent pop) and against the
-  // per-agg-flat-cap variant of this fix.
+  // The GLOBAL-budget pin: guardrails allows MAX_TOP_LEVEL_AGGS (5) top-level aggregations, and a
+  // PER-AGG cap of 50 long-key entries produces ~21.5k chars — capDigest must not silently delete
+  // whole trailing aggregations behind a note claiming a top-50 list.
   const def = buildToolDef();
   const aggregations: Record<string, unknown> = {};
   const aggNames = ['by_rule', 'by_agent', 'by_level', 'by_cat', 'by_tech'];
@@ -1894,7 +1891,7 @@ test('buildDigest: a synthetic breakdown with every dimension at or under BREAKD
   assert.ok(!('breakdownNote' in digest));
 });
 
-// --- issue #8935 Guarantee 2: the digest states what its numbers cover, in BOTH directions --------
+// --- the digest states what its numbers cover, in BOTH directions ---------------------------------
 
 test('buildDigest: a complete real breakdown claims the whole matched set and all distinct values', () => {
   // The point of the claim: OpenSearch computes an aggregation over every matched document, so these
@@ -1954,7 +1951,7 @@ test('buildDigest: a sample that IS the whole set is not described as a sample',
   assert.doesNotMatch(digest.coverage!, /a sample of/);
 });
 
-// --- P-2 (AI/plan/a1a-review.md): getByPath must traverse arrays -------------------------------
+// --- getByPath must traverse arrays -------------------------------------------------------------
 
 test('getByPath: resolves a dotted path through an array instead of stopping at it', () => {
   const row = {

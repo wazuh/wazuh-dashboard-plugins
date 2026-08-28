@@ -7,7 +7,7 @@ import { FIELD_CATALOG, isKnownField } from '../../common/field-catalog';
  * WHY ONE FILE. A state surface is only usable when it is BOTH namable and discoverable: an index
  * `search_wazuh_data`'s enum can name but whose fields `get_field_values` cannot enumerate is
  * unanswerable, and a field that can be enumerated on an index the enum cannot name is unreachable.
- * Those two lists used to be separate, so widening one without the other left the surface broken
+ * Keeping the two lists separate risks widening one without the other, leaving the surface broken
  * either way. The enum (`generic-query-families.ts`), the field-discovery route
  * (`get-field-values.ts`'s `FIELD_LOCATIONS`) and the aggregation allowlist (`guardrails.ts`) all
  * derive from the rows below so they cannot drift apart.

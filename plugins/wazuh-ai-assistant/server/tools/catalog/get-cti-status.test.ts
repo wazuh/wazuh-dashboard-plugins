@@ -47,9 +47,9 @@ test('get_cti_status: an unrecognized feed value is ignored (match_all, no throw
   assert.deepEqual(request.body.query, { match_all: {} });
 });
 
-// CV-078: default body must pass the same guardrail chain the real escape-hatch path already
+// Default body must pass the same guardrail chain the real escape-hatch path already
 // proved reachable for this index (a1a-battery-acceptance.test.ts).
-test('CV-078: default body passes checkIndexAllowlist and lintDsl', () => {
+test('default body passes checkIndexAllowlist and lintDsl', () => {
   const request = build({});
   assert.equal(checkIndexAllowlist(request.index).ok, true);
   const result = lintDsl(request.body, request.index);

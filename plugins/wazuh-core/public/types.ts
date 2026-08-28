@@ -5,7 +5,10 @@ import { SettingsValidator } from '../common/services/settings-validator';
 
 export interface WazuhCorePluginSetup {
   _internal: any;
-  utils: { formatUIDate: (date: Date) => string };
+  utils: {
+    formatUIDate: (date: Date) => string;
+    webDocumentationLink: (urlPath: string, version?: string) => string;
+  };
   API_USER_STATUS_RUN_AS: typeof API_USER_STATUS_RUN_AS;
   configuration: Configuration;
   dashboardSecurity: DashboardSecurity;
@@ -14,7 +17,10 @@ export interface WazuhCorePluginSetup {
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface WazuhCorePluginStart {
   hooks: { useDockedSideNav: () => boolean };
-  utils: { formatUIDate: (date: Date) => string };
+  utils: {
+    formatUIDate: (date: Date) => string;
+    webDocumentationLink: (urlPath: string, version?: string) => string;
+  };
   API_USER_STATUS_RUN_AS: typeof API_USER_STATUS_RUN_AS;
   configuration: Configuration;
   dashboardSecurity: DashboardSecurity;

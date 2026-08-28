@@ -25,7 +25,9 @@ const loggingSettings = [{ field: 'log_format', label: 'Log format' }];
 const helpLinks = [
   {
     text: 'Logging reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/logging.html'),
+    href: webDocumentationLink(
+      'user-manual/manager/logging.html#configuration',
+    ),
   },
 ];
 

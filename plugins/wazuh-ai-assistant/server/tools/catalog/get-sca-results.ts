@@ -24,13 +24,12 @@ import {
  * a real 5.0 stack to be capitalized -- `"Passed"`/`"Failed"`/`"Not applicable"` -- NOT the
  * lowercase 4.14 values; a lowercase `term` filter here silently matches nothing.
  *
- * Population-disclosure note (issue #8920 item 1): unlike get_sca_checks (a plain hits search
- * until this same issue's fix), this tool already satisfies the invariant by construction --
+ * Population-disclosure note: this tool already satisfies the invariant by construction --
  * `size: 0` plus a `terms` aggregation on `policy.id` means every per-policy passed/failed/
  * not_applicable count digest.ts's `buildBreakdown` surfaces is computed by OpenSearch over the
- * FULL matched set, never a truncated page. No functional change needed here; see
- * `population-disclosure-coverage.test.ts`, which recognizes this size:0-plus-terms-agg shape as
- * satisfying the invariant by construction.
+ * FULL matched set, never a truncated page (unlike a plain hits search, where a `limit`-truncated
+ * page would not reflect the full result). See `population-disclosure-coverage.test.ts`, which
+ * recognizes this size:0-plus-terms-agg shape as satisfying the invariant by construction.
  */
 export const getScaResultsTool: ToolDefinition = {
   spec: {
@@ -63,10 +62,10 @@ export const getScaResultsTool: ToolDefinition = {
   },
   target: 'indexer',
   tier: 'T1',
-  // Issue: generic sole-candidate parameter resolution (template: #8913's
-  // resolveDeicticAgentParams in get-agent-inventory.ts). A strictly-required `agent_id` measured
-  // 0/40 invocations on deictic SCA/compliance questions ("my auditor wants proof of SSH
-  // hardening") -- registry.ts attaches the generic resolver (param-resolution.ts) for this
+  // Issue: generic sole-candidate parameter resolution (template:
+  // resolveDeicticAgentParams in get-agent-inventory.ts). A strictly-required `agent_id` would
+  // reject deictic SCA/compliance questions ("my auditor wants proof of SSH hardening") that never
+  // name an agent -- registry.ts attaches the generic resolver (param-resolution.ts) for this
   // entry, resolving `agent_id` against the Manager API's active-agent list when omitted.
   soleCandidateParams: [
     { param: 'agent_id', source: { kind: 'manager-agents' } },
