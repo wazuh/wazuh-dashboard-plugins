@@ -18,7 +18,6 @@ const initialState = {
   stats: false,
   nodeInfo: false,
   agentInfo: false,
-  clusterEnabled: true,
 };
 
 const statusReducers = (state = initialState, action) => {
@@ -62,12 +61,6 @@ const statusReducers = (state = initialState, action) => {
     return {
       ...state,
       agentInfo: action.agentInfo,
-    };
-  }
-  if (action.type === 'UPDATE_CLUSTER_ENABLED') {
-    return {
-      ...state,
-      clusterEnabled: action.clusterEnabled,
     };
   }
   if (action.type === 'CLEAN_INFO') {
