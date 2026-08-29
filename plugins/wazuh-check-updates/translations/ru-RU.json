@@ -1,0 +1,99 @@
+{
+  "formats": {
+    "number": {
+      "currency": {
+        "style": "currency"
+      },
+      "percent": {
+        "style": "percent"
+      }
+    },
+    "date": {
+      "short": {
+        "month": "numeric",
+        "day": "numeric",
+        "year": "2-digit"
+      },
+      "medium": {
+        "month": "short",
+        "day": "numeric",
+        "year": "numeric"
+      },
+      "long": {
+        "month": "long",
+        "day": "numeric",
+        "year": "numeric"
+      },
+      "full": {
+        "weekday": "long",
+        "month": "long",
+        "day": "numeric",
+        "year": "numeric"
+      }
+    },
+    "time": {
+      "short": {
+        "hour": "numeric",
+        "minute": "numeric"
+      },
+      "medium": {
+        "hour": "numeric",
+        "minute": "numeric",
+        "second": "numeric"
+      },
+      "long": {
+        "hour": "numeric",
+        "minute": "numeric",
+        "second": "numeric",
+        "timeZoneName": "short"
+      },
+      "full": {
+        "hour": "numeric",
+        "minute": "numeric",
+        "second": "numeric",
+        "timeZoneName": "short"
+      }
+    },
+    "relative": {
+      "years": {
+        "units": "year"
+      },
+      "months": {
+        "units": "month"
+      },
+      "days": {
+        "units": "day"
+      },
+      "hours": {
+        "units": "hour"
+      },
+      "minutes": {
+        "units": "minute"
+      },
+      "seconds": {
+        "units": "second"
+      }
+    }
+  },
+  "messages": {
+    "wazuhCheckUpdates.updatesNotification.message": "Доступна новая версия!",
+    "wazuhCheckUpdates.updatesNotification.linkText": "Подробности — на странице конфигурации API",
+    "wazuhCheckUpdates.updatesNotification.dismissCheckText": "Отключить уведомления об обновлениях",
+    "wazuhCheckUpdates.updatesNotification.closeButtonText": "Закрыть",
+    "wazuhCheckUpdates.apisUpdateStatus.upToDate": "Актуально",
+    "wazuhCheckUpdates.apisUpdateStatus.availableUpdates": "Доступны обновления",
+    "wazuhCheckUpdates.apisUpdateStatus.error": "Ошибка проверки обновлений",
+    "wazuhCheckUpdates.apisUpdateStatus.disabled": "Проверка обновлений отключена",
+    "wazuhCheckUpdates.apisUpdateStatus.lastCheck": "Последняя проверка",
+    "wazuhCheckUpdates.apisUpdateStatus.buttonText": "Проверить обновления",
+    "wazuhCheckUpdates.apisUpdateStatus.onClickButtonError": "Не удалось получить обновления",
+    "wazuhCheckUpdates.apisUpdateStatus.tableTitle": "Версии API",
+    "wazuhCheckUpdates.apisUpdateStatus.errorCallOut": "Не удалось получить версии API и доступные обновления",
+    "wazuhCheckUpdates.dismissNotificationCheck.checkText": "Отключить уведомления об обновлениях",
+    "wazuhCheckUpdates.dismissNotificationCheck.checkHelp": "Этот параметр определяет, будет ли появляться уведомление при каждом выпуске обновления",
+    "wazuhCheckUpdates.updateModal.closeModal": "Закрыть",
+    "wazuhCheckUpdates.updateModal.publishedDate": "Опубликовано",
+    "wazuhCheckUpdates.updateModal.releaseNotesLink": "Заметки о выпуске",
+    "wazuhCheckUpdates.updateModal.upgradeGuideLink": "Руководство по обновлению"
+  }
+}

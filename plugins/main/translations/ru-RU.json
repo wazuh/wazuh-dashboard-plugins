@@ -1,0 +1,220 @@
+{
+  "formats": {
+    "number": {
+      "currency": {
+        "style": "currency"
+      },
+      "percent": {
+        "style": "percent"
+      }
+    },
+    "date": {
+      "short": {
+        "month": "numeric",
+        "day": "numeric",
+        "year": "2-digit"
+      },
+      "medium": {
+        "month": "short",
+        "day": "numeric",
+        "year": "numeric"
+      },
+      "long": {
+        "month": "long",
+        "day": "numeric",
+        "year": "numeric"
+      },
+      "full": {
+        "weekday": "long",
+        "month": "long",
+        "day": "numeric",
+        "year": "numeric"
+      }
+    },
+    "time": {
+      "short": {
+        "hour": "numeric",
+        "minute": "numeric"
+      },
+      "medium": {
+        "hour": "numeric",
+        "minute": "numeric",
+        "second": "numeric"
+      },
+      "long": {
+        "hour": "numeric",
+        "minute": "numeric",
+        "second": "numeric",
+        "timeZoneName": "short"
+      },
+      "full": {
+        "hour": "numeric",
+        "minute": "numeric",
+        "second": "numeric",
+        "timeZoneName": "short"
+      }
+    },
+    "relative": {
+      "years": {
+        "units": "year"
+      },
+      "months": {
+        "units": "month"
+      },
+      "days": {
+        "units": "day"
+      },
+      "hours": {
+        "units": "hour"
+      },
+      "minutes": {
+        "units": "minute"
+      },
+      "seconds": {
+        "units": "second"
+      }
+    }
+  },
+  "messages": {
+    "wazuh.navCategory.endpointSecurity": "Безопасность конечных устройств",
+    "wazuh.navCategory.threatIntelligence": "Аналитика угроз",
+    "wazuh.navCategory.securityOperations": "Операции безопасности",
+    "wazuh.navCategory.cloudSecurity": "Облачная безопасность",
+    "wazuh.navCategory.agentsManagement": "Управление агентами",
+    "wazuh.navCategory.serverManagement": "Управление сервером",
+    "wz-app-home-title": "Обзор",
+    "wz-app-home-breadcrumbLabel": "Обзор",
+    "wz-app-overview-description": "Обзор приложений и событий безопасности.",
+    "wz-app-configuration-assessment-title": "Оценка конфигурации",
+    "wz-app-configuration-assessment-breadcrumbLabel": "Оценка конфигурации",
+    "wz-app-configuration-assessment-description": "Проверка ресурсов в рамках аудита безопасности конфигурации.",
+    "wz-app-malware-detection-title": "Обнаружение вредоносного ПО",
+    "wz-app-malware-detection-breadcrumbLabel": "Обнаружение вредоносного ПО",
+    "wz-app-malware-detection-description": "Проверка признаков компрометации, вызванной вредоносным ПО или кибератаками.",
+    "wz-app-file-integrity-monitoring-title": "Контроль целостности файлов",
+    "wz-app-file-integrity-monitoring-breadcrumbLabel": "Контроль целостности файлов",
+    "wz-app-file-integrity-monitoring-description": "Оповещения об изменениях файлов, включая права доступа, содержимое, владельца и атрибуты.",
+    "wz-app-threat-hunting-title": "Поиск угроз",
+    "wz-app-threat-hunting-breadcrumbLabel": "Поиск угроз",
+    "wz-app-threat-hunting-description": "Анализ оповещений безопасности для выявления проблем и угроз.",
+    "wz-app-vulnerability-detection-title": "Обнаружение уязвимостей",
+    "wz-app-vulnerability-detection-breadcrumbLabel": "Обнаружение уязвимостей",
+    "wz-app-vulnerability-detection-description": "Выявление приложений, затронутых известными уязвимостями.",
+    "wz-app-mitre-attack-title": "Техники атак (MITRE ATT&CK)",
+    "wz-app-mitre-attack-breadcrumbLabel": "Техники атак (MITRE ATT&CK)",
+    "wz-app-mitre-attack-description": "Показывает, на какие известные техники атак похожи обнаруженные события.",
+    "wz-app-case-management-title": "Управление кейсами",
+    "wz-app-case-management-breadcrumbLabel": "Управление кейсами",
+    "wz-app-case-management-description": "Отслеживание, разбор и ведение кейсов по находкам безопасности в вашей среде.",
+    "wz-app-it-hygiene-title": "ИТ-гигиена",
+    "wz-app-it-hygiene-breadcrumbLabel": "ИТ-гигиена",
+    "wz-app-it-hygiene-description": "Оценка систем, программного обеспечения и процессов для выявления рисков.",
+    "wz-app-active-response-title": "Реагирование на инциденты",
+    "wz-app-active-response-breadcrumbLabel": "Реагирование на инциденты",
+    "wz-app-active-response-description": "Анализ действий активного ответа, сработавших в вашей среде.",
+    "wz-app-regulatory-compliance-title": "Нормативное соответствие",
+    "wz-app-regulatory-compliance-breadcrumbLabel": "Нормативное соответствие",
+    "wz-app-regulatory-compliance-description": "Оценка соответствия нормативным требованиям, включая PCI DSS, GDPR, HIPAA, NIST 800-53, TSC, CMMC, FedRAMP, ISO 27001, NIST2 и NIST 800-171.",
+    "wz-app-docker-title": "Docker",
+    "wz-app-docker-breadcrumbLabel": "Docker",
+    "wz-app-docker-description": "Мониторинг и сбор событий контейнеров Docker: создание, запуск, работа, остановка и приостановка.",
+    "wz-app-amazon-web-services-title": "Amazon Web Services",
+    "wz-app-amazon-web-services-breadcrumbLabel": "Amazon Web Services",
+    "wz-app-amazon-web-services-description": "События безопасности сервисов Amazon AWS, собранные напрямую через AWS API.",
+    "wz-app-google-cloud-title": "Google Cloud",
+    "wz-app-google-cloud-breadcrumbLabel": "Google Cloud",
+    "wz-app-google-cloud-description": "События безопасности сервисов Google Cloud Platform, собранные напрямую через GCP API.",
+    "wz-app-github-title": "GitHub",
+    "wz-app-github-breadcrumbLabel": "GitHub",
+    "wz-app-github-description": "Мониторинг событий из журналов аудита организаций GitHub.",
+    "wz-app-office365-title": "Office 365",
+    "wz-app-office365-breadcrumbLabel": "Office 365",
+    "wz-app-office365-description": "События безопасности, связанные с сервисами Office 365.",
+    "wz-app-microsoft-graph-api-title": "Microsoft Graph API",
+    "wz-app-microsoft-graph-api-breadcrumbLabel": "Microsoft Graph API",
+    "wz-app-microsoft-graph-api-description": "События безопасности Microsoft Graph, собранные напрямую через Microsoft Graph API.",
+    "wz-app-endpoints-summary-title": "Сводка",
+    "wz-app-endpoints-summary-breadcrumbLabel": "Конечные устройства",
+    "wz-app-endpoints-summary-description": "Сводка по агентам и их состоянию.",
+    "wz-app-endpoint-groups-title": "Группы",
+    "wz-app-endpoint-groups-breadcrumbLabel": "Группы",
+    "wz-app-endpoint-groups-description": "Управление группами агентов.",
+    "wz-app-status-title": "Состояние",
+    "wz-app-server-status-breadcrumbLabel": "Состояние",
+    "wz-app-server-status-description": "Управление состоянием кластера.",
+    "wz-app-cluster-title": "Кластер",
+    "wz-app-cluster-breadcrumbLabel": "Кластер",
+    "wz-app-cluster-description": "Управление кластером.",
+    "wz-app-statistics-title": "Статистика",
+    "wz-app-statistics-breadcrumbLabel": "Статистика",
+    "wz-app-statistics-description": "Сведения о среде.",
+    "wz-app-logs-title": "Журналы",
+    "wz-app-logs-breadcrumbLabel": "Журналы",
+    "wz-app-logs-description": "Журналы кластера.",
+    "wz-app-settings-title": "Настройки",
+    "wz-app-settings-breadcrumbLabel": "Настройки",
+    "wz-app-settings-description": "Управление конфигурацией кластера.",
+    "wz-app-dev-tools-title": "Инструменты разработчика",
+    "wz-app-dev-tools-breadcrumbLabel": "Инструменты разработчика",
+    "wz-app-dev-tools-description": "Проверка конечных точек API.",
+    "wz-app-security-title": "Безопасность",
+    "wz-app-security-breadcrumbLabel": "Безопасность",
+    "wz-app-security-description": "Управление правами к системным ресурсам на основе ролей и политик.",
+    "wz-app-sample-data-title": "Примеры данных",
+    "wz-app-sample-data-breadcrumbLabel": "Примеры данных",
+    "wz-app-sample-data-description": "Добавление примеров событий в модули.",
+    "wz-app-indexer-settings-title": "Настройки",
+    "wz-app-indexer-settings-breadcrumbLabel": "Настройки",
+    "wz-app-indexer-settings-description": "Настройка параметров индексатора.",
+    "wz-app-server-apis-title": "API сервера",
+    "wz-app-server-apis-breadcrumbLabel": "API сервера",
+    "wz-app-server-apis-description": "Управление и настройка подключений к API.",
+    "wz-app-about-title": "О программе",
+    "wz-app-about-breadcrumbLabel": "О программе",
+    "wz-app-about-description": "Сведения о версиях компонентов и ссылки на сообщество.",
+    "wz-app-category-home": "Главная",
+    "wz-app-category-endpoint-security": "Безопасность конечных устройств",
+    "wz-app-category-threat-intelligence": "Аналитика угроз",
+    "wz-app-category-security-operations": "Операции безопасности",
+    "wz-app-category-cloud-security": "Облачная безопасность",
+    "wz-app-category-agents-management": "Управление агентами",
+    "wz-app-category-system-inventory": "Инвентаризация системы",
+    "wz-app-category-server-management": "Управление сервером",
+    "wz-app-category-dashboard-management": "Управление панелями",
+    "dev-tools.exportTabLabel": "Экспорт",
+    "dev-tools.exportTabDescription": "Экспорт",
+    "dev-tools.apiReferenceTabLabel": "Справка API",
+    "dev-tools.apiReferenceTabDescription": "Справка API",
+    "discover.fieldLinkTooltip.mitreTechnique": "Перейти к MITRE ATT&CK — Intelligence и открыть сведения о технике",
+    "discover.fieldLinkTooltip.agent": "Перейти к сведениям об агенте",
+    "discover.fieldLinkTooltip.vulnerabilityScannerReference": "Перейти к справочнику CTI по уязвимости",
+    "discover.docViews.table.filterForFieldPresentButtonAriaLabel": "Фильтровать по наличию поля",
+    "discover.docViews.table.filterOutValueButtonAriaLabel": "Исключить значение",
+    "discover.fieldNameIcons.booleanAriaLabel": "Логическое поле",
+    "discover.fieldNameIcons.conflictFieldAriaLabel": "Конфликтующее поле",
+    "discover.fieldNameIcons.dateFieldAriaLabel": "Поле даты",
+    "discover.fieldNameIcons.geoPointFieldAriaLabel": "Географическая точка",
+    "discover.fieldNameIcons.geoShapeFieldAriaLabel": "Географическая фигура",
+    "discover.fieldNameIcons.ipAddressFieldAriaLabel": "Поле IP-адреса",
+    "discover.fieldNameIcons.murmur3FieldAriaLabel": "Поле Murmur3",
+    "discover.fieldNameIcons.numberFieldAriaLabel": "Числовое поле",
+    "discover.fieldNameIcons.sourceFieldAriaLabel": "Поле источника",
+    "discover.fieldNameIcons.stringFieldAriaLabel": "Текстовое поле",
+    "discover.fieldNameIcons.nestedFieldAriaLabel": "Вложенное поле",
+    "discover.fieldNameIcons.unknownFieldAriaLabel": "Неизвестное поле",
+    "discover.docViews.table.filterForValueButtonAriaLabel": "Фильтровать по значению",
+    "wazuh.homeOverview.quickAccess.aiAssistant": "ИИ-ассистент",
+    "wazuh.homeOverview.aiAssistantCard.title": "ИИ-ассистент",
+    "wazuh.homeOverview.aiAssistantCard.description": "Задавайте вопросы о парке агентов, находках и активности MITRE ATT&CK на естественном языке.",
+    "discover.filterForValue": "Фильтровать по значению",
+    "discover.filterForValueLabel": "Фильтр по значению: {value}",
+    "discover.filterOutValue": "Исключить значение",
+    "discover.filterOutValueLabel": "Исключить значение: {value}",
+    "discover.reloadSavedSearchButton": "Сбросить поиск",
+    "opensearch_dashboards_legacy.notify.fatalError.unavailableServerErrorMessage": "Не удалось установить HTTP-соединение. ",
+    "opensearch_dashboards_legacy.notify.fatalError.errorStatusMessage": "Ошибка {errStatus} {errStatusText}: {errMessage}",
+    "opensearch_dashboards_legacy.notify.toaster.unavailableServerErrorMessage": "Не удалось установить HTTP-соединение. ",
+    "opensearch_dashboards_legacy.notify.toaster.errorStatusMessage": "Ошибка {errStatus} {errStatusText}: {errMessage}",
+    "opensearch_dashboards_legacy.notify.toaster.errorMessage": "Ошибка: {errorMessage}\n      {errorStack}"
+  }
+}
