@@ -6,25 +6,27 @@ import WindowsLightIcon from '../../../../../public/assets/images/themes/light/w
 import MacDarkIcon from '../../../../../public/assets/images/themes/dark/mac-icon.svg';
 import MacLightIcon from '../../../../../public/assets/images/themes/light/mac-icon.svg';
 import { getUiSettings } from '../../../../kibana-services';
+import { endpointsSummaryI18n } from '../../i18n';
 
 const darkMode = getUiSettings()?.get('theme:darkMode');
+const dw = endpointsSummaryI18n.deployWizard;
 
 export const OPERATING_SYSTEMS_OPTIONS: RegisterAgentData[] = [
   {
     icon: darkMode ? LinuxDarkIcon : LinuxLightIcon,
-    title: 'LINUX',
+    title: dw.osLinux,
     hr: true,
     architecture: ['RPM amd64', 'RPM aarch64', 'DEB amd64', 'DEB aarch64'],
   },
   {
     icon: darkMode ? WindowsDarkIcon : WindowsLightIcon,
-    title: 'WINDOWS',
+    title: dw.osWindows,
     hr: true,
     architecture: ['MSI 32/64 bits'],
   },
   {
     icon: darkMode ? MacDarkIcon : MacLightIcon,
-    title: 'macOS',
+    title: dw.osMacos,
     hr: true,
     architecture: ['Intel', 'Apple silicon'],
   },
@@ -32,16 +34,12 @@ export const OPERATING_SYSTEMS_OPTIONS: RegisterAgentData[] = [
 
 export const SERVER_ADDRESS_TEXTS = [
   {
-    title: 'Server address',
-    subtitle:
-      'This is the address the agent uses to communicate with the server. Enter an IP address or a fully qualified domain name (FQDN).',
+    subtitle: dw.serverAddressSubtitle,
   },
 ];
 
 export const OPTIONAL_PARAMETERS_TEXT = [
   {
-    title: 'Optional settings',
-    subtitle:
-      'By default, the deployment uses the hostname as the agent name. Optionally, you can use a different agent name in the field below.',
+    subtitle: dw.optionalSettingsSubtitle,
   },
 ];

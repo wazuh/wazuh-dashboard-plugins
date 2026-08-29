@@ -32,10 +32,10 @@ import {
   IndexPattern,
 } from '../../../../../../../../../../../src/plugins/data/public/';
 import {
-  TAB_VIEW_NAME_DASHBOARD,
-  TAB_VIEW_NAME_EVENTS,
   UI_LOGGER_LEVELS,
 } from '../../../../../../../../../common/constants';
+import { moduleTabsI18n } from '../../../../../../../../utils/module-tabs-i18n';
+import { mitreI18n } from '../../../../../../i18n';
 import { UI_ERROR_SEVERITIES } from '../../../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../../../react-services/common-services';
 import { WzFlyout } from '../../../../../../../../components/common/flyouts';
@@ -181,7 +181,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error obtaining the requested technique`,
+          title: mitreI18n.errorTechniqueNotObtained,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -285,11 +285,11 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
     const { techniqueData } = state;
     const data = [
       {
-        title: 'ID',
+        title: mitreI18n.id,
         description: (
           <EuiToolTip
             position='top'
-            content={`Open ${currentTechnique} details in the Intelligence section`}
+            content={mitreI18n.openTechniqueInIntelligence(currentTechnique)}
           >
             <EuiLink
               onClick={e => {
@@ -303,14 +303,14 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
         ),
       },
       {
-        title: 'Tactics',
+        title: mitreI18n.tactics,
         description: techniqueData.tactics
           ? techniqueData.tactics.map(tactic => {
               return (
                 <Fragment key={tactic.id}>
                   <EuiToolTip
                     position='top'
-                    content={`Open ${tactic.name} details in the Intelligence section`}
+                    content={mitreI18n.openTacticInIntelligence(tactic.name)}
                   >
                     <EuiLink
                       onClick={e => {
@@ -328,7 +328,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
           : '',
       },
       {
-        title: 'Version',
+        title: mitreI18n.version,
         description: techniqueData.mitre_version,
       },
     ];
@@ -339,7 +339,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
           initialIsOpen={true}
           buttonContent={
             <EuiTitle size='s'>
-              <h3>Technique details</h3>
+              <h3>{mitreI18n.techniqueDetails}</h3>
             </EuiTitle>
           }
         >
@@ -367,12 +367,12 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
           buttonContent={
             <EuiTitle size='s'>
               <h3>
-                Recent events
+                {mitreI18n.recentEvents}
                 <span style={{ marginLeft: 16 }}>
                   <span>
                     <EuiToolTip
                       position='top'
-                      content={`Show ${currentTechnique} in ${TAB_VIEW_NAME_DASHBOARD}`}
+                      content={moduleTabsI18n.showInDashboard(currentTechnique)}
                     >
                       <EuiIcon
                         onMouseDown={e => {
@@ -386,7 +386,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
                     </EuiToolTip>
                     <EuiToolTip
                       position='top'
-                      content={`Inspect ${currentTechnique} in ${TAB_VIEW_NAME_EVENTS}`}
+                      content={moduleTabsI18n.inspectInFindings(currentTechnique)}
                     >
                       <EuiIcon
                         onMouseDown={e => {

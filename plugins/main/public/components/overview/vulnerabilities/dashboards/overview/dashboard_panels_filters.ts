@@ -1,5 +1,6 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
+import { vulnerabilitiesI18n } from '../../i18n';
 
 const getVisStateFilter = (
   id: string,
@@ -52,7 +53,7 @@ const getVisStateFilter = (
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'Count',
+            customLabel: vulnerabilitiesI18n.count,
           },
           schema: 'metric',
         },
@@ -66,9 +67,9 @@ const getVisStateFilter = (
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: vulnerabilitiesI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: vulnerabilitiesI18n.missing,
             customLabel: label,
           },
           schema: 'bucket',
@@ -100,8 +101,8 @@ export const getDashboardFilters = (
         savedVis: getVisStateFilter(
           'topVulnerabilities',
           indexPatternId,
-          'Top vulnerabilities',
-          'Top 5 vulnerabilities',
+          vulnerabilitiesI18n.topVulnerabilities,
+          vulnerabilitiesI18n.top5Vulnerabilities,
           'vulnerability.id',
         ),
       },
@@ -120,8 +121,8 @@ export const getDashboardFilters = (
         savedVis: getVisStateFilter(
           'topOSVulnerabilities',
           indexPatternId,
-          'Top operating system vulnerabilities',
-          'Top 5 OS',
+          vulnerabilitiesI18n.topOsVulnerabilities,
+          vulnerabilitiesI18n.top5Os,
           'host.os.full',
         ),
       },
@@ -140,8 +141,8 @@ export const getDashboardFilters = (
         savedVis: getVisStateFilter(
           'topAgentVulnerabilities',
           indexPatternId,
-          'Agent filter',
-          'Top 5 agents',
+          vulnerabilitiesI18n.agentFilter,
+          vulnerabilitiesI18n.top5Agents,
           'wazuh.agent.name',
         ),
       },
@@ -160,8 +161,8 @@ export const getDashboardFilters = (
         savedVis: getVisStateFilter(
           'topPackageSelector',
           indexPatternId,
-          'Top packages vulnerabilities',
-          'Top 5 packages',
+          vulnerabilitiesI18n.topPackagesVulnerabilities,
+          vulnerabilitiesI18n.top5Packages,
           'package.name',
         ),
       },

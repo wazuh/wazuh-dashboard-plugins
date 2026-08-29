@@ -171,6 +171,71 @@ export const homeOverviewI18n = {
   ),
   couldNotLoadData: t('widget.couldNotLoadData', 'Could not load data'),
   notAvailable: t('widget.notAvailable', 'Not available'),
+  findingsCountEvolution: t(
+    'findings.countEvolution',
+    'Findings count evolution',
+  ),
+  findingsCountEvolutionDescription: t(
+    'findings.countEvolutionDescription',
+    'Dashboard of Findings count evolution',
+  ),
+  noResults: t('empty.noResults', 'No results'),
+  noMitreResultsInRange: t(
+    'mitre.emptyInRange',
+    'No MITRE ATT&CK results were found in the selected time range.',
+  ),
+  topTactics: t('mitre.topTacticsShort', 'Top Tactics'),
+  backTopTactics: t('mitre.backTopTactics', 'Back Top Tactics'),
+  fimRecentFiles: t('fim.recentFiles', 'FIM: Recent files'),
+  openFim: t('fim.open', 'Open FIM'),
+  top5Packages: t('vulnerabilities.top5Packages', 'Top 5 Packages'),
+  noPackagesFound: t('vulnerabilities.emptyPackages', 'No packages found'),
+  checksByPolicies: t('sca.checksByPolicies', 'Checks by policies'),
+  topN: (n: number) =>
+    i18n.translate('wazuh.homeOverview.sca.topN', {
+      defaultMessage: '(top {n})',
+      values: { n },
+    }),
+  noScaScansAgent: t(
+    'sca.emptyScansAgent',
+    "You don't have SCA scans in this agent.",
+  ),
+  checkAgentSettingsScans: t(
+    'sca.checkAgentSettings',
+    'Check your agent settings to generate scans.',
+  ),
+  vulnerabilityDetection: t(
+    'vulnerabilities.title',
+    'Vulnerability Detection',
+  ),
+  openVulnerabilityDetection: t(
+    'vulnerabilities.open',
+    'Open Vulnerability Detection',
+  ),
+  noRequirementResultsInRange: (requirement: string) =>
+    i18n.translate('wazuh.homeOverview.compliance.emptyInRange', {
+      defaultMessage:
+        'No {requirement} results were found in the selected time range.',
+      values: { requirement },
+    }),
+  complianceTitle: t('compliance.title', 'Compliance'),
+  configurationAssessment: t(
+    'sca.configurationAssessment',
+    'Security Configuration Assessment',
+  ),
+  openScaScans: t('sca.openScans', 'Open SCA Scans'),
+  scaPolicy: t('sca.policy', 'Policy'),
+  scaScore: t('sca.score', 'Score'),
+  tablePackage: t('table.package', 'Package'),
+  fimNoRecentDocuments: t('fim.noRecentDocuments', 'No recent documents'),
+  fimModifiedTime: t('fim.modifiedTime', 'Modified time'),
+  fimFilePath: t('fim.filePath', 'File path'),
+  fimFileOwner: t('fim.fileOwner', 'File owner'),
+  fimFileUserId: t('fim.fileUserId', 'File user ID'),
+  cloudFindingsLast24h: t(
+    'cloudSecurity.findingsLast24h',
+    'Findings, last 24h',
+  ),
 };
 
 export const agentStatusLabel = (status: string): string => {

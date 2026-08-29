@@ -13,6 +13,7 @@ import store from '../redux/store';
 import { updateWazuhNotReadyYet } from '../redux/actions/appStateActions';
 import { WzRequest } from './wz-request';
 import { delayAsPromise } from '../../common/utils';
+import { wzMenuI18n } from '../components/wz-menu/i18n';
 
 let busy = false;
 
@@ -39,7 +40,7 @@ export class CheckDaemonsStatus {
         throw new Error('Not recovered');
       }
     } catch (error) {
-      store.dispatch(updateWazuhNotReadyYet('Server could not be recovered.'));
+      store.dispatch(updateWazuhNotReadyYet(wzMenuI18n.serverCouldNotRecover));
       throw error;
     }
     busy = false;

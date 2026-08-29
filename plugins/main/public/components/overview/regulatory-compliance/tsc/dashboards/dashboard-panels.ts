@@ -1,10 +1,11 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
+import { complianceI18n } from '../../i18n';
 
 const getVisStateRequirements = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-gTSC-requirements',
-    title: 'TSC requirements',
+    title: complianceI18n.tscRequirements,
     type: 'line',
     params: {
       type: 'line',
@@ -31,7 +32,7 @@ const getVisStateRequirements = (indexPatternId: string) => {
           style: {},
           scale: { type: 'linear', mode: 'normal' },
           labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-          title: { text: 'Count' },
+          title: { text: complianceI18n.count },
         },
       ],
       seriesParams: [
@@ -39,7 +40,7 @@ const getVisStateRequirements = (indexPatternId: string) => {
           show: 'true',
           type: 'line',
           mode: 'normal',
-          data: { label: 'Count', id: '1' },
+          data: { label: complianceI18n.count, id: '1' },
           valueAxis: 'ValueAxis-1',
           drawLinesBetweenPoints: false,
           showCircles: true,
@@ -80,8 +81,8 @@ const getVisStateRequirements = (indexPatternId: string) => {
               id: 'terms',
               params: {
                 id: 'string',
-                otherBucketLabel: 'Other',
-                missingBucketLabel: 'Missing',
+                otherBucketLabel: complianceI18n.other,
+                missingBucketLabel: complianceI18n.missing,
               },
             },
             params: {},
@@ -127,9 +128,9 @@ const getVisStateRequirements = (indexPatternId: string) => {
             order: 'desc',
             size: 10,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: complianceI18n.missing,
           },
         },
         {
@@ -216,7 +217,7 @@ const getVisStateTopAgentsByAlertsCount = (indexPatternId: string) => {
 const getVisStateTopRequirementsOverTime = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-TSC-Requirements-over-time',
-    title: 'Top requirements over time',
+    title: complianceI18n.topRequirementsOverTime,
     type: 'area',
     params: {
       type: 'area',
@@ -247,7 +248,7 @@ const getVisStateTopRequirementsOverTime = (indexPatternId: string) => {
           style: {},
           scale: { type: 'linear', mode: 'normal' },
           labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-          title: { text: 'Count' },
+          title: { text: complianceI18n.count },
         },
       ],
       seriesParams: [
@@ -255,7 +256,7 @@ const getVisStateTopRequirementsOverTime = (indexPatternId: string) => {
           show: 'true',
           type: 'area',
           mode: 'stacked',
-          data: { label: 'Count', id: '1' },
+          data: { label: complianceI18n.count, id: '1' },
           drawLinesBetweenPoints: true,
           showCircles: true,
           interpolate: 'cardinal',
@@ -304,9 +305,9 @@ const getVisStateTopRequirementsOverTime = (indexPatternId: string) => {
             order: 'desc',
             orderBy: '1',
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: complianceI18n.missing,
           },
         },
         {
@@ -334,7 +335,7 @@ const getVisStateTopRequirementsOverTime = (indexPatternId: string) => {
 const getVisStateRequirementsAgentsHeatmap = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-TSC-Requirements-Agents-heatmap',
-    title: 'Last alerts',
+    title: complianceI18n.lastAlerts,
     type: 'heatmap',
     params: {
       type: 'heatmap',
@@ -415,10 +416,10 @@ const getVisStateRequirementsAgentsHeatmap = (indexPatternId: string) => {
             order: 'desc',
             orderBy: '1',
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Requirements',
+            missingBucketLabel: complianceI18n.missing,
+            customLabel: complianceI18n.requirements,
           },
         },
         {
@@ -432,10 +433,10 @@ const getVisStateRequirementsAgentsHeatmap = (indexPatternId: string) => {
             order: 'desc',
             orderBy: '1',
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Agents',
+            missingBucketLabel: complianceI18n.missing,
+            customLabel: complianceI18n.agents,
           },
         },
       ],
@@ -446,7 +447,7 @@ const getVisStateRequirementsAgentsHeatmap = (indexPatternId: string) => {
 const getVisStateRequirementsByAgent = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-TSC-Requirements-by-agent',
-    title: 'Requirements by agent',
+    title: complianceI18n.requirementsByAgent,
     type: 'histogram',
     params: {
       type: 'histogram',
@@ -473,7 +474,7 @@ const getVisStateRequirementsByAgent = (indexPatternId: string) => {
           style: {},
           scale: { type: 'linear', mode: 'normal' },
           labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-          title: { text: 'Count' },
+          title: { text: complianceI18n.count },
         },
       ],
       seriesParams: [
@@ -481,7 +482,7 @@ const getVisStateRequirementsByAgent = (indexPatternId: string) => {
           show: 'true',
           type: 'histogram',
           mode: 'stacked',
-          data: { label: 'Count', id: '1' },
+          data: { label: complianceI18n.count, id: '1' },
           valueAxis: 'ValueAxis-1',
           drawLinesBetweenPoints: true,
           showCircles: true,
@@ -529,7 +530,7 @@ const getVisStateRequirementsByAgent = (indexPatternId: string) => {
             size: 5,
             order: 'desc',
             orderBy: '1',
-            customLabel: 'Requirements',
+            customLabel: complianceI18n.requirements,
           },
         },
         {
@@ -552,7 +553,7 @@ const getVisStateRequirementsByAgent = (indexPatternId: string) => {
 const getVisStateAgentTopRuleGroups = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Agents-TSC-Groups',
-    title: 'Top 5 rule groups',
+    title: complianceI18n.top5RuleGroups,
     type: 'pie',
     params: {
       type: 'pie',
@@ -600,7 +601,7 @@ const getVisStateAgentTopRuleGroups = (indexPatternId: string) => {
 const getVisStateAgentTopRuleDescription = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Agents-TSC-Rule',
-    title: 'Top 5 rules',
+    title: complianceI18n.top5Rules,
     type: 'pie',
     params: {
       type: 'pie',
@@ -691,7 +692,7 @@ const getVisStateAgentTopRequirements = (indexPatternId: string) => {
 const getVisStateAgentRequirements = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Agents-TSC-Requirements',
-    title: 'TSC Requirements',
+    title: complianceI18n.tscRequirementsLabel,
     type: 'histogram',
     params: {
       type: 'histogram',
@@ -718,7 +719,7 @@ const getVisStateAgentRequirements = (indexPatternId: string) => {
           style: {},
           scale: { type: 'linear', mode: 'normal' },
           labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-          title: { text: 'Count' },
+          title: { text: complianceI18n.count },
         },
       ],
       seriesParams: [
@@ -726,7 +727,7 @@ const getVisStateAgentRequirements = (indexPatternId: string) => {
           show: 'true',
           type: 'histogram',
           mode: 'stacked',
-          data: { label: 'Count', id: '1' },
+          data: { label: complianceI18n.count, id: '1' },
           valueAxis: 'ValueAxis-1',
           drawLinesBetweenPoints: true,
           showCircles: true,
@@ -780,7 +781,7 @@ const getVisStateAgentRequirements = (indexPatternId: string) => {
             size: 10,
             order: 'desc',
             orderBy: '1',
-            customLabel: 'TSC Requirements',
+            customLabel: complianceI18n.tscRequirementsLabel,
           },
         },
       ],
@@ -791,7 +792,7 @@ const getVisStateAgentRequirements = (indexPatternId: string) => {
 const getVisStateAgentRuleLevelDistribution = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Agents-TSC-Rule-level-distribution',
-    title: 'Rule level distribution',
+    title: complianceI18n.ruleLevelDistribution,
     type: 'pie',
     params: {
       type: 'pie',
@@ -831,9 +832,9 @@ const getVisStateAgentRuleLevelDistribution = (indexPatternId: string) => {
             order: 'desc',
             orderBy: '1',
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: complianceI18n.missing,
           },
         },
       ],

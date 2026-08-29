@@ -5,6 +5,7 @@ import { endpointSummary, mitreAttack } from '../../../utils/applications';
 import { WzLink } from '../../wz-link/wz-link';
 import { i18n } from '@osd/i18n';
 import { CTI_CVE_LINK_BASE_PATH } from '../../../../common/constants';
+import { wzDiscoverI18n } from './i18n';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
@@ -26,7 +27,7 @@ const renderLinksReference = (value: string) => {
           {!!index && ', '}
           <EuiToolTip
             position='top'
-            content='Navigate to the vulnerability reference'
+            content={wzDiscoverI18n.navigateVulnerabilityReference}
           >
             <EuiLink
               href={link}

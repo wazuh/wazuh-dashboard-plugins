@@ -7,10 +7,10 @@ import { ReportingService } from '../../../../react-services';
 import {
   TAB_VIEW_ID_DASHBOARD,
   TAB_VIEW_ID_EVENTS,
-  TAB_VIEW_NAME_DASHBOARD,
-  TAB_VIEW_NAME_EVENTS,
   WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
 } from '../../../../../common/constants';
+import { moduleTabsI18n } from '../../../../utils/module-tabs-i18n';
+import { complianceI18n } from '../i18n';
 
 const ButtonModuleGenerateReport = {
   condition: () => new ReportingService().reportDashboardPluginExist(),
@@ -35,13 +35,13 @@ export const buildStandardComplianceTabs = ({
   return [
     {
       id: TAB_VIEW_ID_DASHBOARD,
-      name: TAB_VIEW_NAME_DASHBOARD,
+      name: moduleTabsI18n.dashboard,
       buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
       component: DashboardComponent,
     },
     {
       id: 'controls',
-      name: 'Controls',
+      name: complianceI18n.controls,
       buttons: [ButtonExploreAgent],
       component: (props: any) => (
         <ComplianceTable {...props} section={section} DataSource={dataSource} />
@@ -49,7 +49,7 @@ export const buildStandardComplianceTabs = ({
     },
     {
       id: TAB_VIEW_ID_EVENTS,
-      name: TAB_VIEW_NAME_EVENTS,
+      name: moduleTabsI18n.findings,
       buttons: [ButtonExploreAgent],
       component: () => (
         <WazuhDiscover

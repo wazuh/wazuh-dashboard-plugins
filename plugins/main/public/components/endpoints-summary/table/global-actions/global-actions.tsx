@@ -12,6 +12,7 @@ import { Agent } from '../../types';
 import { EditAgentsGroupsModal } from './edit-groups/edit-groups-modal';
 import { UpgradeAgentsModal } from './upgrade/upgrade-modal';
 import { RemoveAgentsModal } from './remove/remove-modal';
+import { endpointsSummaryI18n } from '../../i18n';
 
 export interface AgentsTableGlobalActionsProps {
   selectedAgents: Agent[];
@@ -51,7 +52,7 @@ export const AgentsTableGlobalActions = ({
       iconSide='right'
       onClick={onButtonClick}
     >
-      More
+      {endpointsSummaryI18n.more}
     </EuiButtonEmpty>
   );
 
@@ -60,16 +61,16 @@ export const AgentsTableGlobalActions = ({
     : selectedAgents.length;
 
   const selectAgentsTooltip = (content: React.ReactNode) => (
-    <EuiToolTip content='Select agents to perfom the action'>
+    <EuiToolTip content={endpointsSummaryI18n.selectAgentsToPerform}>
       <span>{content}</span>
     </EuiToolTip>
   );
 
   const actions = {
-    addGroups: 'Add groups to agents',
-    removeGroups: 'Remove groups from agents',
-    upgrade: 'Upgrade agents',
-    remove: 'Remove agents',
+    addGroups: endpointsSummaryI18n.addGroupsToAgents,
+    removeGroups: endpointsSummaryI18n.removeGroupsFromAgents,
+    upgrade: endpointsSummaryI18n.upgradeAgents,
+    remove: endpointsSummaryI18n.removeAgents,
   };
 
   return (

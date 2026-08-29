@@ -8,6 +8,7 @@ import {
   Filter,
 } from '../../../../../../../../../../../src/plugins/data/common';
 import { WzRequest } from '../../../../../../../../react-services/wz-request';
+import { mitreI18n } from '../../../../../../i18n';
 
 type TechniqueRowDetailsProps = {
   doc: any;
@@ -59,7 +60,7 @@ const TechniqueRowDetails = ({
         tabs={[
           {
             id: 'table',
-            name: 'Table',
+            name: mitreI18n.tabTable,
             content: (
               <>
                 <DocViewer
@@ -72,10 +73,10 @@ const TechniqueRowDetails = ({
           },
           {
             id: 'json',
-            name: 'JSON',
+            name: mitreI18n.tabJson,
             content: (
               <EuiCodeBlock
-                aria-label={'Document details'}
+                aria-label={mitreI18n.documentDetailsAria}
                 language='json'
                 isCopyable
                 paddingSize='s'

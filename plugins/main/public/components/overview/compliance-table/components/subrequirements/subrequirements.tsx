@@ -28,6 +28,7 @@ import {
 } from '@elastic/eui';
 import { AppState } from '../../../../../react-services/app-state';
 import { RequirementFlyout } from '../requirement-flyout';
+import { complianceI18n } from '../../../regulatory-compliance/i18n';
 import { getDataPlugin } from '../../../../../kibana-services';
 import {
   TAB_VIEW_ID_DASHBOARD,
@@ -270,7 +271,7 @@ export class ComplianceSubrequirements extends Component {
     } else {
       return (
         <EuiCallOut
-          title='There are no results.'
+          title={complianceI18n.noResults}
           iconType='help'
           color='warning'
         ></EuiCallOut>
@@ -322,11 +323,11 @@ export class ComplianceSubrequirements extends Component {
 
         <EuiFieldSearch
           fullWidth={true}
-          placeholder='Filter requirements'
+          placeholder={complianceI18n.filterRequirements}
           value={this.state.searchValue}
           onChange={e => this.onSearchValueChange(e)}
           isClearable={true}
-          aria-label='Use aria labels when no actual label is in use'
+          aria-label={complianceI18n.filterRequirementsAria}
         />
         <EuiSpacer size='s' />
 

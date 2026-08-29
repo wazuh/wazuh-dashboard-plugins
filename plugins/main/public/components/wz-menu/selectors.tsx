@@ -1,5 +1,6 @@
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiIconTip } from '@elastic/eui';
+import { wzMenuI18n } from './i18n';
 
 /**
  * Container component for selectors in the menu.
@@ -41,7 +42,7 @@ export const SelectorLabel = ({
         <EuiFlexItem grow={false}>
           <EuiIconTip
             anchorClassName='wz-agent-icon-tip'
-            aria-label='Error'
+            aria-label={wzMenuI18n.error}
             size='m'
             type='alert'
             color='danger'

@@ -7,6 +7,7 @@ import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { useUserPermissionsRequirements } from '../../../../common/hooks';
+import { vulnerabilitiesI18n } from '../../i18n';
 
 async function checkVDIsEnabledCluster() {
   // Get nodes
@@ -51,7 +52,7 @@ export const ModuleEnabledCheck = () => {
         error: {
           error: error,
           message: error.message || error,
-          title: 'Error checking if the module is enabled',
+          title: vulnerabilitiesI18n.errorCheckingModule,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -67,10 +68,9 @@ export const ModuleEnabledCheck = () => {
   }, [userPermissionRequirements]);
 
   return data?.enabled === false ? (
-    <EuiCallOut title='Warning' color='warning' iconType='alert'>
+    <EuiCallOut title={vulnerabilitiesI18n.warning} color='warning' iconType='alert'>
       <p>
-        Vulnerabilies detection module is not enabled. You can learn to how to
-        configure following the{' '}
+        {vulnerabilitiesI18n.moduleNotEnabled}{' '}
         <EuiLink
           href={webDocumentationLink(
             'user-manual/capabilities/vulnerability-detection/configuring-scans.html#configuring-vulnerability-detection',
@@ -79,7 +79,7 @@ export const ModuleEnabledCheck = () => {
           target='_blank'
           rel='noopener noreferrer'
         >
-          documentation
+          {vulnerabilitiesI18n.documentation}
         </EuiLink>
         .
       </p>

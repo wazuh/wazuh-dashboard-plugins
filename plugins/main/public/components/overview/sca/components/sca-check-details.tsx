@@ -1,4 +1,5 @@
 import React from 'react';
+import { scaI18n } from '../../i18n';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -42,7 +43,7 @@ export const CheckDetails: React.FC<CheckDetailsProps> = ({ check }) => {
     <EuiFlexGroup direction='column' gutterSize='m' style={{ padding: 16 }}>
       <EuiFlexItem>
         <EuiTitle size='s'>
-          <h3>Description</h3>
+          <h3>{scaI18n.description}</h3>
         </EuiTitle>
         <EuiSpacer size='s' />
         <EuiText>
@@ -52,7 +53,7 @@ export const CheckDetails: React.FC<CheckDetailsProps> = ({ check }) => {
 
       <EuiFlexItem>
         <EuiTitle size='s'>
-          <h3>Rationale</h3>
+          <h3>{scaI18n.rationale}</h3>
         </EuiTitle>
         <EuiSpacer size='s' />
         <EuiText>
@@ -62,7 +63,7 @@ export const CheckDetails: React.FC<CheckDetailsProps> = ({ check }) => {
 
       <EuiFlexItem>
         <EuiTitle size='s'>
-          <h3>Remediation</h3>
+          <h3>{scaI18n.remediation}</h3>
         </EuiTitle>
         <EuiSpacer size='s' />
         <EuiText>
@@ -72,7 +73,7 @@ export const CheckDetails: React.FC<CheckDetailsProps> = ({ check }) => {
 
       <EuiFlexItem>
         <EuiTitle size='s'>
-          <h3>Check (Condition: {check.condition})</h3>
+          <h3>{scaI18n.checkWithCondition(check.condition)}</h3>
         </EuiTitle>
         <EuiSpacer size='s' />
         <EuiText>
@@ -86,7 +87,7 @@ export const CheckDetails: React.FC<CheckDetailsProps> = ({ check }) => {
 
       <EuiFlexItem>
         <EuiTitle size='s'>
-          <h3>Compliance</h3>
+          <h3>{scaI18n.compliance}</h3>
         </EuiTitle>
         <EuiSpacer size='s' />
         <EuiText>
@@ -103,7 +104,7 @@ export const CheckDetails: React.FC<CheckDetailsProps> = ({ check }) => {
 
       <EuiFlexItem>
         <EuiTitle size='s'>
-          <h3>Mitre</h3>
+          <h3>{scaI18n.mitre}</h3>
         </EuiTitle>
         <EuiSpacer size='s' />
         <EuiText>

@@ -1,10 +1,11 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
+import { complianceI18n } from '../../i18n';
 
 const getVisStateAlertsVolumeByAgent = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-HIPAA-Heatmap',
-    title: 'Alerts volume by agent',
+    title: complianceI18n.alertsVolumeByAgent,
     type: 'heatmap',
     params: {
       type: 'heatmap',
@@ -40,8 +41,8 @@ const getVisStateAlertsVolumeByAgent = (indexPatternId: string) => {
             id: 'terms',
             params: {
               id: 'string',
-              otherBucketLabel: 'Other',
-              missingBucketLabel: 'Missing',
+              otherBucketLabel: complianceI18n.other,
+              missingBucketLabel: complianceI18n.missing,
             },
           },
           params: {},
@@ -62,8 +63,8 @@ const getVisStateAlertsVolumeByAgent = (indexPatternId: string) => {
               id: 'terms',
               params: {
                 id: 'string',
-                otherBucketLabel: 'Other',
-                missingBucketLabel: 'Missing',
+                otherBucketLabel: complianceI18n.other,
+                missingBucketLabel: complianceI18n.missing,
               },
             },
             params: {},
@@ -118,10 +119,10 @@ const getVisStateAlertsVolumeByAgent = (indexPatternId: string) => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Agent ID',
+            missingBucketLabel: complianceI18n.missing,
+            customLabel: complianceI18n.agentId,
           },
         },
         {
@@ -135,10 +136,10 @@ const getVisStateAlertsVolumeByAgent = (indexPatternId: string) => {
             order: 'desc',
             size: 10,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Requirement',
+            missingBucketLabel: complianceI18n.missing,
+            customLabel: complianceI18n.requirement,
           },
         },
       ],
@@ -149,7 +150,7 @@ const getVisStateAlertsVolumeByAgent = (indexPatternId: string) => {
 const getVisStateTagsCloud = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-HIPAA-Tag-cloud',
-    title: 'Most common alerts',
+    title: complianceI18n.mostCommonAlerts,
     type: 'tagcloud',
     params: {
       scale: 'linear',
@@ -193,10 +194,10 @@ const getVisStateTagsCloud = (indexPatternId: string) => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Requirement',
+            missingBucketLabel: complianceI18n.missing,
+            customLabel: complianceI18n.requirement,
           },
         },
       ],
@@ -230,8 +231,8 @@ const getVisStateTopRequirements = (indexPatternId: string) => {
               id: 'terms',
               params: {
                 id: 'string',
-                otherBucketLabel: 'Other',
-                missingBucketLabel: 'Missing',
+                otherBucketLabel: complianceI18n.other,
+                missingBucketLabel: complianceI18n.missing,
               },
             },
             params: {},
@@ -270,9 +271,9 @@ const getVisStateTopRequirements = (indexPatternId: string) => {
             order: 'desc',
             size: 10,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: complianceI18n.missing,
           },
         },
       ],
@@ -283,7 +284,7 @@ const getVisStateTopRequirements = (indexPatternId: string) => {
 const getVisStateMostActiveAgents = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-HIPAA-Top-10-agents',
-    title: 'Most active agents',
+    title: complianceI18n.mostActiveAgents,
     type: 'pie',
     params: {
       type: 'pie',
@@ -306,8 +307,8 @@ const getVisStateMostActiveAgents = (indexPatternId: string) => {
               id: 'terms',
               params: {
                 id: 'string',
-                otherBucketLabel: 'Other',
-                missingBucketLabel: 'Missing',
+                otherBucketLabel: complianceI18n.other,
+                missingBucketLabel: complianceI18n.missing,
               },
             },
             params: {},
@@ -342,14 +343,14 @@ const getVisStateMostActiveAgents = (indexPatternId: string) => {
           schema: 'segment',
           params: {
             field: 'wazuh.agent.name',
-            customLabel: 'Agent',
+            customLabel: complianceI18n.agent,
             orderBy: '1',
             order: 'desc',
             size: 10,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: complianceI18n.missing,
           },
         },
       ],
@@ -360,7 +361,7 @@ const getVisStateMostActiveAgents = (indexPatternId: string) => {
 const getVisStateStats = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-HIPAA-Metrics',
-    title: 'Stats',
+    title: complianceI18n.stats,
     type: 'metric',
     params: {
       metric: {
@@ -431,7 +432,7 @@ const getVisStateStats = (indexPatternId: string) => {
           enabled: true,
           type: 'count',
           schema: 'metric',
-          params: { customLabel: 'Total alerts' },
+          params: { customLabel: complianceI18n.totalAlerts },
         },
         {
           id: '2',
@@ -440,7 +441,7 @@ const getVisStateStats = (indexPatternId: string) => {
           schema: 'metric',
           params: {
             field: 'rule.level',
-            customLabel: 'Max rule level detected',
+            customLabel: complianceI18n.maxRuleLevelDetected,
           },
         },
       ],
@@ -451,7 +452,7 @@ const getVisStateStats = (indexPatternId: string) => {
 const getVisStateRequirementsOverTime2 = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-HIPAA-Top-requirements-over-time',
-    title: 'Requirements evolution over time',
+    title: complianceI18n.requirementsEvolutionOverTime,
     type: 'histogram',
     params: {
       type: 'histogram',
@@ -478,7 +479,7 @@ const getVisStateRequirementsOverTime2 = (indexPatternId: string) => {
           style: {},
           scale: { type: 'linear', mode: 'normal' },
           labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-          title: { text: 'Count' },
+          title: { text: complianceI18n.count },
         },
       ],
       seriesParams: [
@@ -486,7 +487,7 @@ const getVisStateRequirementsOverTime2 = (indexPatternId: string) => {
           show: 'true',
           type: 'histogram',
           mode: 'stacked',
-          data: { label: 'Count', id: '1' },
+          data: { label: complianceI18n.count, id: '1' },
           valueAxis: 'ValueAxis-1',
           drawLinesBetweenPoints: true,
           showCircles: true,
@@ -528,8 +529,8 @@ const getVisStateRequirementsOverTime2 = (indexPatternId: string) => {
               id: 'terms',
               params: {
                 id: 'string',
-                otherBucketLabel: 'Other',
-                missingBucketLabel: 'Missing',
+                otherBucketLabel: complianceI18n.other,
+                missingBucketLabel: complianceI18n.missing,
               },
             },
             params: {},
@@ -583,9 +584,9 @@ const getVisStateRequirementsOverTime2 = (indexPatternId: string) => {
             order: 'desc',
             size: 10,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: complianceI18n.missing,
           },
         },
       ],
@@ -596,7 +597,7 @@ const getVisStateRequirementsOverTime2 = (indexPatternId: string) => {
 const getVisStateRequirementDistributionByAgent = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-HIPAA-Top-10-requirements-over-time-by-agent',
-    title: 'Requirements distribution by agent',
+    title: complianceI18n.requirementsDistributionByAgent,
     type: 'histogram',
     params: {
       type: 'histogram',
@@ -623,7 +624,7 @@ const getVisStateRequirementDistributionByAgent = (indexPatternId: string) => {
           style: {},
           scale: { type: 'linear', mode: 'normal' },
           labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-          title: { text: 'Count' },
+          title: { text: complianceI18n.count },
         },
       ],
       seriesParams: [
@@ -631,7 +632,7 @@ const getVisStateRequirementDistributionByAgent = (indexPatternId: string) => {
           show: 'true',
           type: 'histogram',
           mode: 'stacked',
-          data: { label: 'Count', id: '1' },
+          data: { label: complianceI18n.count, id: '1' },
           valueAxis: 'ValueAxis-1',
           drawLinesBetweenPoints: true,
           showCircles: true,
@@ -673,8 +674,8 @@ const getVisStateRequirementDistributionByAgent = (indexPatternId: string) => {
               id: 'terms',
               params: {
                 id: 'string',
-                otherBucketLabel: 'Other',
-                missingBucketLabel: 'Missing',
+                otherBucketLabel: complianceI18n.other,
+                missingBucketLabel: complianceI18n.missing,
               },
             },
             params: {},
@@ -713,9 +714,9 @@ const getVisStateRequirementDistributionByAgent = (indexPatternId: string) => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: complianceI18n.missing,
           },
         },
         {
@@ -729,9 +730,9 @@ const getVisStateRequirementDistributionByAgent = (indexPatternId: string) => {
             order: 'desc',
             size: 10,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: complianceI18n.missing,
           },
         },
       ],
@@ -742,7 +743,7 @@ const getVisStateRequirementDistributionByAgent = (indexPatternId: string) => {
 const getVisStateAgentRequirementsOvertime = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Agents-HIPAA-Requirements-Stacked-Overtime',
-    title: 'Requirements over time',
+    title: complianceI18n.requirementsOverTime,
     type: 'histogram',
     params: {
       type: 'histogram',
@@ -769,7 +770,7 @@ const getVisStateAgentRequirementsOvertime = (indexPatternId: string) => {
           style: {},
           scale: { type: 'linear', mode: 'normal' },
           labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-          title: { text: 'Count' },
+          title: { text: complianceI18n.count },
         },
       ],
       seriesParams: [
@@ -777,7 +778,7 @@ const getVisStateAgentRequirementsOvertime = (indexPatternId: string) => {
           show: 'true',
           type: 'histogram',
           mode: 'stacked',
-          data: { label: 'Count', id: '1' },
+          data: { label: complianceI18n.count, id: '1' },
           valueAxis: 'ValueAxis-1',
           drawLinesBetweenPoints: true,
           showCircles: true,
@@ -850,10 +851,10 @@ const getVisStateAgentRequirementsOvertime = (indexPatternId: string) => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Requirement',
+            missingBucketLabel: complianceI18n.missing,
+            customLabel: complianceI18n.requirement,
           },
         },
         {
@@ -869,7 +870,7 @@ const getVisStateAgentRequirementsOvertime = (indexPatternId: string) => {
             drop_partials: false,
             min_doc_count: 1,
             extended_bounds: {},
-            customLabel: 'Timestampt',
+            customLabel: complianceI18n.timestamp,
           },
         },
       ],
@@ -908,8 +909,8 @@ const getVisStateAgentTopRequirements = (indexPatternId: string) => {
               id: 'terms',
               params: {
                 id: 'string',
-                otherBucketLabel: 'Other',
-                missingBucketLabel: 'Missing',
+                otherBucketLabel: complianceI18n.other,
+                missingBucketLabel: complianceI18n.missing,
               },
             },
             params: {},
@@ -954,10 +955,10 @@ const getVisStateAgentTopRequirements = (indexPatternId: string) => {
             order: 'desc',
             size: 10,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Requirement',
+            missingBucketLabel: complianceI18n.missing,
+            customLabel: complianceI18n.requirement,
           },
         },
       ],
@@ -968,7 +969,7 @@ const getVisStateAgentTopRequirements = (indexPatternId: string) => {
 const getVisStateAgentRequirements = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Agents-HIPAA-Bubbles',
-    title: 'HIPAA requirements',
+    title: complianceI18n.hipaaRequirements,
     type: 'line',
     params: {
       type: 'line',
@@ -995,7 +996,7 @@ const getVisStateAgentRequirements = (indexPatternId: string) => {
           style: {},
           scale: { type: 'linear', mode: 'normal' },
           labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-          title: { text: 'Count' },
+          title: { text: complianceI18n.count },
         },
       ],
       seriesParams: [
@@ -1003,7 +1004,7 @@ const getVisStateAgentRequirements = (indexPatternId: string) => {
           show: 'true',
           type: 'line',
           mode: 'normal',
-          data: { label: 'Count', id: '1' },
+          data: { label: complianceI18n.count, id: '1' },
           valueAxis: 'ValueAxis-1',
           drawLinesBetweenPoints: false,
           showCircles: true,
@@ -1052,8 +1053,8 @@ const getVisStateAgentRequirements = (indexPatternId: string) => {
               id: 'terms',
               params: {
                 id: 'string',
-                otherBucketLabel: 'Other',
-                missingBucketLabel: 'Missing',
+                otherBucketLabel: complianceI18n.other,
+                missingBucketLabel: complianceI18n.missing,
               },
             },
             params: {},
@@ -1099,10 +1100,10 @@ const getVisStateAgentRequirements = (indexPatternId: string) => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Requirement',
+            missingBucketLabel: complianceI18n.missing,
+            customLabel: complianceI18n.requirement,
           },
         },
         {
@@ -1118,7 +1119,7 @@ const getVisStateAgentRequirements = (indexPatternId: string) => {
             drop_partials: false,
             min_doc_count: 1,
             extended_bounds: {},
-            customLabel: 'Timestampt',
+            customLabel: complianceI18n.timestamp,
           },
         },
         {
@@ -1136,7 +1137,7 @@ const getVisStateAgentRequirements = (indexPatternId: string) => {
 const getVisStateAgentRuleLevelDistribution = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Agents-HIPAA-Distributed-By-Level',
-    title: 'Requirements distribution by level',
+    title: complianceI18n.requirementsDistributionByLevel,
     type: 'histogram',
     params: {
       type: 'histogram',
@@ -1163,7 +1164,7 @@ const getVisStateAgentRuleLevelDistribution = (indexPatternId: string) => {
           style: {},
           scale: { type: 'linear', mode: 'normal' },
           labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-          title: { text: 'Count' },
+          title: { text: complianceI18n.count },
         },
       ],
       seriesParams: [
@@ -1171,7 +1172,7 @@ const getVisStateAgentRuleLevelDistribution = (indexPatternId: string) => {
           show: 'true',
           type: 'histogram',
           mode: 'stacked',
-          data: { label: 'Count', id: '1' },
+          data: { label: complianceI18n.count, id: '1' },
           valueAxis: 'ValueAxis-1',
           drawLinesBetweenPoints: true,
           showCircles: true,
@@ -1190,8 +1191,8 @@ const getVisStateAgentRuleLevelDistribution = (indexPatternId: string) => {
             id: 'terms',
             params: {
               id: 'string',
-              otherBucketLabel: 'Other',
-              missingBucketLabel: 'Missing',
+              otherBucketLabel: complianceI18n.other,
+              missingBucketLabel: complianceI18n.missing,
             },
           },
           params: {},
@@ -1212,8 +1213,8 @@ const getVisStateAgentRuleLevelDistribution = (indexPatternId: string) => {
               id: 'terms',
               params: {
                 id: 'number',
-                otherBucketLabel: 'Other',
-                missingBucketLabel: 'Missing',
+                otherBucketLabel: complianceI18n.other,
+                missingBucketLabel: complianceI18n.missing,
               },
             },
             params: {},
@@ -1259,10 +1260,10 @@ const getVisStateAgentRuleLevelDistribution = (indexPatternId: string) => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Requirement',
+            missingBucketLabel: complianceI18n.missing,
+            customLabel: complianceI18n.requirement,
           },
         },
         {
@@ -1276,10 +1277,10 @@ const getVisStateAgentRuleLevelDistribution = (indexPatternId: string) => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Level',
+            missingBucketLabel: complianceI18n.missing,
+            customLabel: complianceI18n.level,
           },
         },
       ],
@@ -1290,7 +1291,7 @@ const getVisStateAgentRuleLevelDistribution = (indexPatternId: string) => {
 const getVisStateAgentCommonAlerts = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Agents-HIPAA-Most-Common',
-    title: 'Most common alerts',
+    title: complianceI18n.mostCommonAlerts,
     type: 'tagcloud',
     params: {
       scale: 'linear',
@@ -1310,8 +1311,8 @@ const getVisStateAgentCommonAlerts = (indexPatternId: string) => {
           id: 'terms',
           params: {
             id: 'string',
-            otherBucketLabel: 'Other',
-            missingBucketLabel: 'Missing',
+            otherBucketLabel: complianceI18n.other,
+            missingBucketLabel: complianceI18n.missing,
           },
         },
       },
@@ -1352,10 +1353,10 @@ const getVisStateAgentCommonAlerts = (indexPatternId: string) => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Requirement',
+            missingBucketLabel: complianceI18n.missing,
+            customLabel: complianceI18n.requirement,
           },
         },
       ],

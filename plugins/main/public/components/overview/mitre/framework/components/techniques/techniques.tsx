@@ -44,6 +44,7 @@ import { getErrorOrchestrator } from '../../../../../../react-services/common-se
 import { tFilter, tSearchParams } from '../../../../../common/data-source';
 import { tFilterParams } from '../../mitre';
 import { getDataPlugin } from '../../../../../../kibana-services';
+import { mitreI18n } from '../../../i18n';
 
 const MITRE_ATTACK = 'mitre-attack';
 
@@ -179,7 +180,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
         error: {
           error: error,
           message: error.message || error,
-          title: `Mitre alerts could not be fetched`,
+          title: mitreI18n.errorAlertsNotFetched,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -191,24 +192,24 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
     return [
       {
         id: 0,
-        title: 'Actions',
+        title: mitreI18n.actions,
         items: [
           {
-            name: 'Filter for value',
+            name: mitreI18n.filterForValue,
             icon: <EuiIcon type='magnifyWithPlus' size='m' />,
             onClick: () => {
               closeActionsMenu();
             },
           },
           {
-            name: 'Filter out value',
+            name: mitreI18n.filterOutValue,
             icon: <EuiIcon type='magnifyWithMinus' size='m' />,
             onClick: () => {
               closeActionsMenu();
             },
           },
           {
-            name: 'View technique details',
+            name: mitreI18n.viewTechniqueDetails,
             icon: <EuiIcon type='filebeatApp' size='m' />,
             onClick: () => {
               closeActionsMenu();
@@ -245,7 +246,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
         error: {
           error: error,
           message: error.message || error,
-          title: `Mitre techniques could not be fetched`,
+          title: mitreI18n.errorTechniquesNotFetched,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -499,7 +500,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
     } else {
       return (
         <EuiCallOut
-          title='There are no results.'
+          title={mitreI18n.noResults}
           iconType='help'
           color='warning'
         ></EuiCallOut>
@@ -583,7 +584,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
       <EuiFlexGroup>
         <EuiFlexItem grow={true}>
           <EuiTitle size='m'>
-            <h1>Techniques</h1>
+            <h1>{mitreI18n.techniques}</h1>
           </EuiTitle>
         </EuiFlexItem>
 
@@ -591,7 +592,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
               <EuiText grow={false}>
-                <span>Hide techniques with no findings </span> &nbsp;
+                <span>{mitreI18n.hideTechniquesNoFindings} </span> &nbsp;
                 <EuiSwitch
                   label=''
                   checked={state.hideAlerts}
@@ -606,11 +607,11 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
 
       <WzFieldSearchDelay
         fullWidth={true}
-        placeholder='Filter techniques of selected tactic/s'
+        placeholder={mitreI18n.filterTechniquesPlaceholder}
         onChange={onChange}
         onSearch={onSearch}
         isClearable={true}
-        aria-label='Use aria labels when no actual label is in use'
+        aria-label={mitreI18n.filterTechniquesAria}
       />
       <EuiSpacer size='s' />
 

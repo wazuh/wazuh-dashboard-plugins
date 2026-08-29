@@ -66,6 +66,10 @@ import {
 import { compose } from 'redux';
 import { omit } from 'lodash';
 import { useEffectEnsureComponentMounted } from '../hooks';
+import {
+  getQueryResultsExceededTableTooltip,
+  wzDiscoverI18n,
+} from './i18n';
 import RestoreStateColumnsButton from './components/restore-state-columns';
 
 export interface TableDataGridBasicProps<K> {
@@ -139,7 +143,7 @@ export const TableDataGridBasic: React.FunctionComponent<TableDataGridBasicProps
         } catch (error) {
           const searchError = ErrorFactory.create(HttpError, {
             error,
-            message: 'Error downloading csv report',
+            message: wzDiscoverI18n.errorDownloadingCsv,
           });
           ErrorHandler.handleError(searchError);
         } finally {
@@ -162,12 +166,10 @@ export const TableDataGridBasic: React.FunctionComponent<TableDataGridBasicProps
                     results?.hits?.total &&
                     results?.hits?.total > MAX_ENTRIES_PER_QUERY
                       ? {
-                          ariaLabel: 'Info',
-                          content: `The query results has exceeded the limit of ${formatNumWithCommas(
-                            MAX_ENTRIES_PER_QUERY,
-                          )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                            MAX_ENTRIES_PER_QUERY,
-                          )} hits.`,
+                          ariaLabel: wzDiscoverI18n.info,
+                          content: getQueryResultsExceededTableTooltip(
+                            formatNumWithCommas(MAX_ENTRIES_PER_QUERY),
+                          ),
                           iconType: 'iInCircle',
                           position: 'top',
                         }
@@ -186,7 +188,7 @@ export const TableDataGridBasic: React.FunctionComponent<TableDataGridBasicProps
                   className='euiDataGrid__controlBtn'
                   onClick={onClickExportResults}
                 >
-                  Export Formatted
+                  {wzDiscoverI18n.exportFormatted}
                 </EuiButtonEmpty>
 
                 <RestoreStateColumnsButton
@@ -324,7 +326,7 @@ export const useTableDataGridFetch = ({
   const DocViewInspectButton = ({
     rowIndex,
   }: EuiDataGridCellValueElementProps) => {
-    const inspectHintMsg = 'Inspect details';
+    const inspectHintMsg = wzDiscoverI18n.inspectDetails;
     return (
       <EuiToolTip content={inspectHintMsg}>
         <EuiButtonIcon
@@ -338,7 +340,7 @@ export const useTableDataGridFetch = ({
 
   const dataGridProps = useDataGrid({
     moduleId: tableId,
-    ariaLabelledBy: 'Table',
+    ariaLabelledBy: wzDiscoverI18n.tableAriaLabel,
     defaultColumns: tableDefaultColumns,
     renderColumns: wzDiscoverRenderColumns,
     results,
@@ -372,7 +374,7 @@ export const useTableDataGridFetch = ({
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching data',
+          message: wzDiscoverI18n.errorFetchingData,
         });
         ErrorHandler.handleError(searchError);
       });
@@ -461,7 +463,7 @@ export const TableDataGridWithSearchBarInspectedHit: React.FunctionComponent<
     searchBarProps,
     isDataSourceLoading,
     tableDefaultColumns,
-    inspectDetailsTitle = 'Details',
+    inspectDetailsTitle = wzDiscoverI18n.details,
     additionalDocumentDetailsTabs = [],
     displayOnlyNoResultsCalloutOnNoResults,
     title,
@@ -554,7 +556,7 @@ export const TableDataGridWithSearchBarInspectedHitFetchData: React.FunctionComp
     fingerprint,
     autoRefreshFingerprint,
     tableDefaultColumns,
-    inspectDetailsTitle = 'Details',
+    inspectDetailsTitle = wzDiscoverI18n.details,
     additionalDocumentDetailsTabs = [],
     displayOnlyNoResultsCalloutOnNoResults,
     title,
@@ -643,7 +645,7 @@ export const DocumentDetails = withWrapComponent(({ children }) => (
 );
 
 export const FlyoutDocumentDetails = ({
-  title = 'Details',
+  title = wzDiscoverI18n.details,
   children,
   onClose,
 }) => (

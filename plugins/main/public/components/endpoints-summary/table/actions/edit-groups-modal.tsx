@@ -29,6 +29,7 @@ import {
 } from '../../services';
 import { Agent } from '../../types';
 import { getToasts } from '../../../../kibana-services';
+import { endpointsSummaryI18n } from '../../i18n';
 
 interface EditAgentGroupsModalProps {
   agent: Agent;
@@ -58,7 +59,7 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
         error: {
           error: errorGroups,
           message: errorGroups.message || errorGroups,
-          title: `Could not get groups`,
+          title: endpointsSummaryI18n.couldNotGetGroups,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -80,10 +81,10 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
 
     const getEditGroupsErrorMessage = (error: any) => {
       const apiMessage = error?.response?.data?.message;
-      const message = apiMessage || error?.message || 'Unknown error';
+      const message = apiMessage || error?.message || endpointsSummaryI18n.unknownError;
 
       if (/permission denied/i.test(message)) {
-        return `No permissions to edit this agent groups. ${message}`;
+        return endpointsSummaryI18n.noPermissionEditGroups(message);
       }
 
       return message;
@@ -116,7 +117,11 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
             agentId: agent.id,
             groupIds: removedGroups,
           }));
-        showToast('success', 'Edit agent groups', 'Groups saved successfully');
+        showToast(
+          'success',
+          endpointsSummaryI18n.editAgentGroupsTitle,
+          endpointsSummaryI18n.groupsSavedSuccess,
+        );
         reloadAgents();
       } catch (error: any) {
         const errorMessage = getEditGroupsErrorMessage(error);
@@ -128,7 +133,7 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
           error: {
             error,
             message: errorMessage,
-            title: `Could not save agent groups`,
+            title: endpointsSummaryI18n.couldNotSaveAgentGroups,
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -145,7 +150,9 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
             <EuiFlexGroup gutterSize='m'>
               <EuiFlexItem>
                 <EuiDescriptionList compressed>
-                  <EuiDescriptionListTitle>Agent ID</EuiDescriptionListTitle>
+                  <EuiDescriptionListTitle>
+                    {endpointsSummaryI18n.agentId}
+                  </EuiDescriptionListTitle>
                   <EuiDescriptionListDescription>
                     {agent.id}
                   </EuiDescriptionListDescription>
@@ -153,7 +160,9 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
               </EuiFlexItem>
               <EuiFlexItem>
                 <EuiDescriptionList compressed>
-                  <EuiDescriptionListTitle>Agent name</EuiDescriptionListTitle>
+                  <EuiDescriptionListTitle>
+                    {endpointsSummaryI18n.agentName}
+                  </EuiDescriptionListTitle>
                   <EuiDescriptionListDescription>
                     {agent.name}
                   </EuiDescriptionListDescription>
@@ -163,12 +172,12 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
           </EuiFlexItem>
           <EuiFlexItem>
             <EuiFormRow
-              label='Groups'
+              label={endpointsSummaryI18n.groups}
               isInvalid={!selectedGroups?.length}
-              error={['You must add at least one group']}
+              error={[endpointsSummaryI18n.mustAddOneGroup]}
             >
               <EuiComboBox
-                placeholder='Select groups'
+                placeholder={endpointsSummaryI18n.selectGroups}
                 options={groups?.map(group => ({ label: group })) || []}
                 selectedOptions={selectedGroups}
                 onChange={selectedGroups => setSelectedGroups(selectedGroups)}
@@ -180,13 +189,13 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
               <EuiCallOut
                 color='danger'
                 iconType='alert'
-                title='Could not load groups. Check your permissions.'
+                title={endpointsSummaryI18n.couldNotLoadGroups}
               />
             ) : !isGroupsLoading && !groups?.length ? (
               <EuiCallOut
                 color='warning'
                 iconType='iInCircle'
-                title='No groups available.'
+                title={endpointsSummaryI18n.noGroupsAvailable}
               />
             ) : null}
           </EuiFlexItem>
@@ -202,20 +211,24 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
         }}
       >
         <EuiModalHeader>
-          <EuiModalHeaderTitle>Edit agent groups</EuiModalHeaderTitle>
+          <EuiModalHeaderTitle>
+            {endpointsSummaryI18n.editAgentGroupsTitle}
+          </EuiModalHeaderTitle>
         </EuiModalHeader>
 
         <EuiModalBody>{form}</EuiModalBody>
 
         <EuiModalFooter>
-          <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
+          <EuiButtonEmpty onClick={onClose}>
+            {endpointsSummaryI18n.cancel}
+          </EuiButtonEmpty>
           <EuiButton
             onClick={handleOnSave}
             fill
             isLoading={isSaving}
             disabled={isGroupsLoading || !selectedGroups?.length}
           >
-            Save
+            {endpointsSummaryI18n.save}
           </EuiButton>
         </EuiModalFooter>
       </EuiModal>

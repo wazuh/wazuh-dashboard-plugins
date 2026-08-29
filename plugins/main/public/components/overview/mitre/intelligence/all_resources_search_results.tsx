@@ -23,6 +23,7 @@ import {
 } from '@elastic/eui';
 
 import { withGuard } from '../../../../components/common/hocs';
+import { mitreI18n } from '../i18n';
 
 const LoadingProgress = () => <EuiProgress color='primary' size='s' />;
 
@@ -42,7 +43,7 @@ export const ModuleMitreAttackIntelligenceAllResourcesSearchResults = withGuard(
             extraAction={
               item.loadMoreResults ? (
                 <EuiButton onClick={item.loadMoreResults} size='s'>
-                  See more results
+                  {mitreI18n.seeMoreResults}
                 </EuiButton>
               ) : undefined
             }
@@ -68,6 +69,6 @@ export const ModuleMitreAttackIntelligenceAllResourcesSearchResults = withGuard(
       )
       .reduce((accum, cur) => [accum, <EuiSpacer size='m' />, cur])
   ) : (
-    <EuiCallOut title='No results found' color='warning' />
+    <EuiCallOut title={mitreI18n.noResultsFound} color='warning' />
   );
 });

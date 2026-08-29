@@ -11,10 +11,13 @@ import {
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { PLUGIN_VERSION_SHORT } from '../../../../../../common/constants';
 import './group-input.scss';
+import { endpointsSummaryI18n } from '../../../i18n';
+
+const dw = endpointsSummaryI18n.deployWizard;
 
 const popoverAgentGroup = (
   <span>
-    Learn about{' '}
+    {dw.learnAbout}{' '}
     <EuiLink
       href={webDocumentationLink(
         'user-manual/reference/ossec-conf/client.html#groups',
@@ -23,7 +26,7 @@ const popoverAgentGroup = (
       target='_blank'
       rel='noopener noreferrer'
     >
-      Select a group.
+      {dw.selectGroupLink}
     </EuiLink>
   </span>
 );
@@ -44,9 +47,7 @@ const GroupInput = ({ value, options, onChange }) => {
         gutterSize='s'
       >
         <EuiFlexItem grow={false}>
-          <p className='registerAgentLabels'>
-            Select one or more existing groups:
-          </p>
+          <p className='registerAgentLabels'>{dw.selectExistingGroups}</p>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiPopover
@@ -71,7 +72,9 @@ const GroupInput = ({ value, options, onChange }) => {
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiComboBox
-        placeholder={!value?.length ? 'Default' : 'Select group'}
+        placeholder={
+          !value?.length ? dw.defaultGroupPlaceholder : dw.selectGroupPlaceholder
+        }
         options={options?.groups}
         selectedOptions={value}
         onChange={group => {
@@ -89,7 +92,7 @@ const GroupInput = ({ value, options, onChange }) => {
           <EuiCallOut
             style={{ marginTop: '1.5rem' }}
             color='warning'
-            title='No groups available. Groups may not exist yet or there was an issue loading them.'
+            title={dw.noGroupsInWizard}
             iconType='iInCircle'
             data-testid='group-input-callout'
           />

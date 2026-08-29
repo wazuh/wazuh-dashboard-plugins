@@ -3,11 +3,12 @@ import { EuiFlexGroup, EuiFlexItem, EuiTitle, EuiLink } from '@elastic/eui';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { getCore } from '../../../../kibana-services';
 import NavigationService from '../../../../react-services/navigation-service';
+import { wzDiscoverI18n } from '../i18n';
 
 const DocDetailsHeader = ({
   doc,
   indexPattern,
-  title = 'Document Details',
+  title = wzDiscoverI18n.documentDetails,
 }) => {
   return (
     <EuiFlexGroup>
@@ -28,7 +29,7 @@ const DocDetailsHeader = ({
                 rel='noopener noreferrer'
                 external
               >
-                View surrounding documents
+                {wzDiscoverI18n.viewSurroundingDocuments}
               </EuiLink>
             </RedirectAppLinks>
           </EuiFlexItem>
@@ -42,7 +43,7 @@ const DocDetailsHeader = ({
                 rel='noopener noreferrer'
                 external
               >
-                View single document
+                {wzDiscoverI18n.viewSingleDocument}
               </EuiLink>
             </RedirectAppLinks>
           </EuiFlexItem>

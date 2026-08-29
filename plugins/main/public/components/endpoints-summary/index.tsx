@@ -20,6 +20,7 @@ import { WzButtonPermissions } from '../common/permissions/button';
 import { nestedResolve } from '../../services/resolves';
 import NavigationService from '../../react-services/navigation-service';
 import { getAgentsService } from './services';
+import { endpointsSummaryI18n } from './i18n';
 
 async function fetchTotalAgents() {
   const { total_affected_items } = await getAgentsService({
@@ -69,8 +70,8 @@ export const MainEndpointsSummary = compose(
     () => (
       <EuiEmptyPrompt
         iconType='watchesApp'
-        title={<h2>No agents were added to the manager</h2>}
-        body={<p>Add agents to fleet to start monitoring</p>}
+        title={<h2>{endpointsSummaryI18n.noAgentsTitle}</h2>}
+        body={<p>{endpointsSummaryI18n.noAgentsBody}</p>}
         actions={
           <WzButtonPermissions
             color='primary'
@@ -84,7 +85,7 @@ export const MainEndpointsSummary = compose(
               },
             )}
           >
-            Deploy new agent
+            {endpointsSummaryI18n.deployNewAgent}
           </WzButtonPermissions>
         }
       />

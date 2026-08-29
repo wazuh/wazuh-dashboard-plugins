@@ -14,6 +14,10 @@ import { OPTIONAL_PARAMETERS_TEXT } from '../../utils/register-agent-data';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { PLUGIN_VERSION_SHORT } from '../../../../../../common/constants';
 import '../group-input/group-input.scss';
+import { endpointsSummaryI18n } from '../../../i18n';
+
+const dw = endpointsSummaryI18n.deployWizard;
+
 interface OptionalsInputsProps {
   formFields: UseFormReturn['fields'];
 }
@@ -30,19 +34,18 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
   );
   const popoverAgentName = (
     <span>
-      Learn about{' '}
+      {dw.learnAbout}{' '}
       <EuiLink
         href={agentNameDocLink}
         target='_blank'
         rel='noopener noreferrer'
       >
-        Assigning an agent name.
+        {dw.assigningAgentNameLink}
       </EuiLink>
     </span>
   );
 
-  const warningForAgentName =
-    'The agent name must be unique. It can’t be changed once the agent has been enrolled.';
+  const warningForAgentName = dw.agentNameUniqueWarning;
   return (
     <Fragment>
       <EuiFlexGroup gutterSize='s' wrap>
@@ -64,7 +67,7 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
               gutterSize='s'
             >
               <EuiFlexItem grow={false}>
-                <p className='registerAgentLabels'>Assign an agent name:</p>
+                <p className='registerAgentLabels'>{dw.assignAgentName}</p>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiPopover
@@ -90,7 +93,7 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
             </EuiFlexGroup>
           </>
         }
-        placeholder='Agent name'
+        placeholder={dw.agentNamePlaceholder}
       />
       <EuiCallOut
         color='warning'

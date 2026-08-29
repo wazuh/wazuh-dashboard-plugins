@@ -28,12 +28,13 @@ import {
   FILTER_OPERATOR,
 } from '../../../data-source';
 import { WzLink } from '../../../../../components/wz-link/wz-link';
+import { homeOverviewI18n } from '../../home-overview/i18n';
 
 export function VulsTopPackageTable({ agentId, items, indexPatternId }) {
   const columns = [
     {
       field: 'key',
-      name: 'Package',
+      name: homeOverviewI18n.tablePackage,
       sortable: true,
       render: field => (
         <WzLink
@@ -55,7 +56,7 @@ export function VulsTopPackageTable({ agentId, items, indexPatternId }) {
     },
     {
       field: 'doc_count',
-      name: 'Count',
+      name: homeOverviewI18n.count,
       sortable: true,
       truncateText: true,
       width: '100px',
@@ -66,7 +67,7 @@ export function VulsTopPackageTable({ agentId, items, indexPatternId }) {
     <EuiPanel paddingSize='m'>
       <EuiFlexGroup>
         <EuiFlexItem>
-          <Typography level='card'>Top 5 Packages</Typography>
+          <Typography level='card'>{homeOverviewI18n.top5Packages}</Typography>
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiSpacer size='s' />
@@ -74,7 +75,7 @@ export function VulsTopPackageTable({ agentId, items, indexPatternId }) {
         items={items}
         columns={columns}
         sorting={true}
-        noItemsMessage='No packages found'
+        noItemsMessage={homeOverviewI18n.noPackagesFound}
       ></EuiInMemoryTable>
     </EuiPanel>
   );

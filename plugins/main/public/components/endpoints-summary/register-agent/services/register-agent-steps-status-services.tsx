@@ -4,6 +4,9 @@ import {
   FormStepsDependencies,
   RegisterAgentFormStatusManager,
 } from './form-status-manager';
+import { endpointsSummaryI18n } from '../../i18n';
+
+const dw = endpointsSummaryI18n.deployWizard;
 
 const fieldsHaveErrors = (
   fieldsToCheck: string[],
@@ -165,36 +168,46 @@ export const getPasswordStepStatus = (
 };
 
 export enum tFormStepsLabel {
-  operatingSystemSelection = 'operating system',
-  serverAddress = 'server address',
+  operatingSystemSelection = 'operatingSystemSelection',
+  serverAddress = 'serverAddress',
 }
+
+const stepLabelMap: Record<tFormStepsLabel, string> = {
+  [tFormStepsLabel.operatingSystemSelection]: dw.stepFieldOperatingSystem,
+  [tFormStepsLabel.serverAddress]: dw.stepFieldServerAddress,
+};
 
 export const getIncompleteSteps = (
   formFields: UseFormReturn['fields'],
-): tFormStepsLabel[] => {
+): string[] => {
   const steps: FormStepsDependencies = {
     operatingSystemSelection: ['operatingSystemSelection'],
     serverAddress: ['serverAddress'],
   };
   const statusManager = new RegisterAgentFormStatusManager(formFields, steps);
-  // replace fields array using label names
   return statusManager.getIncompleteSteps().map(field => {
-    return tFormStepsLabel[field] || field;
+    return stepLabelMap[field as tFormStepsLabel] || field;
   });
 };
 
 export enum tFormFieldsLabel {
-  agentName = 'agent name',
-  agentGroups = 'agent groups',
-  serverAddress = 'server address',
+  agentName = 'agentName',
+  agentGroups = 'agentGroups',
+  serverAddress = 'serverAddress',
 }
+
+const fieldLabelMap: Record<tFormFieldsLabel, string> = {
+  [tFormFieldsLabel.agentName]: dw.fieldAgentName,
+  [tFormFieldsLabel.agentGroups]: dw.fieldAgentGroups,
+  [tFormFieldsLabel.serverAddress]: dw.fieldServerAddress,
+};
 
 export const getInvalidFields = (
   formFields: UseFormReturn['fields'],
-): tFormFieldsLabel[] => {
+): string[] => {
   const statusManager = new RegisterAgentFormStatusManager(formFields);
 
   return statusManager.getInvalidFields().map(field => {
-    return tFormFieldsLabel[field] || field;
+    return fieldLabelMap[field as tFormFieldsLabel] || field;
   });
 };

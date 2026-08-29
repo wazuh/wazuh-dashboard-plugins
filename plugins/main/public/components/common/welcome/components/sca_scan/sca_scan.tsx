@@ -38,6 +38,7 @@ import { LoadingSearchbarProgress } from '../../../loading-searchbar-progress/lo
 import { CheckResult } from '../../../../overview/sca/utils/constants';
 import { groupBy } from 'lodash';
 import { decimalFormat } from '../../utils/helpers';
+import { homeOverviewI18n } from '../../home-overview/i18n';
 
 type ScaScanProps = {
   agent: { [key in string]: any };
@@ -51,13 +52,13 @@ const ScaScanHeader = ({ agent }) => {
       <EuiFlexItem grow={false}>
         <RedirectAppLinks application={getCore().application}>
           <Typography level='card'>
-            Security Configuration Assessment
+            {homeOverviewI18n.configurationAssessment}
           </Typography>
         </RedirectAppLinks>
       </EuiFlexItem>
       <EuiFlexItem grow={false}>
         <RedirectAppLinks application={getCore().application}>
-          <EuiToolTip position='top' content='Open SCA Scans'>
+          <EuiToolTip position='top' content={homeOverviewI18n.openScaScans}>
             <EuiButtonIcon
               iconType='popout'
               color='primary'
@@ -68,7 +69,7 @@ const ScaScanHeader = ({ agent }) => {
               href={NavigationService.getInstance().getAppURL(
                 configurationAssessment.id,
               )}
-              aria-label='Open SCA Scans'
+              aria-label={homeOverviewI18n.openScaScans}
             />
           </EuiToolTip>
         </RedirectAppLinks>
@@ -99,25 +100,25 @@ const ScaScanTable = ({ dataSourceAction }) => {
   const columnsPolicies = [
     {
       field: 'name',
-      name: 'Policy',
+      name: homeOverviewI18n.scaPolicy,
       width: '40%',
       sortable: true,
     },
     {
       field: 'pass',
-      name: CheckResult.Passed,
+      name: homeOverviewI18n.passed,
       width: '10%',
       sortable: true,
     },
     {
       field: 'fail',
-      name: CheckResult.Failed,
+      name: homeOverviewI18n.failed,
       width: '10%',
       sortable: true,
     },
     {
       field: 'score',
-      name: 'Score',
+      name: homeOverviewI18n.scaScore,
       width: '10%',
       sortable: true,
       render: score => {
@@ -131,10 +132,10 @@ const ScaScanTable = ({ dataSourceAction }) => {
     <>
       <EuiFlexGroup alignItems='center' gutterSize='s'>
         <EuiFlexItem grow={false} responsive={false}>
-          <Typography level='metric'>Checks by policies</Typography>
+          <Typography level='metric'>{homeOverviewI18n.checksByPolicies}</Typography>
         </EuiFlexItem>
         <EuiFlexItem grow={false} responsive={false}>
-          <Typography level='metric'>(top {TOP_POLICIES_SIZE})</Typography>
+          <Typography level='metric'>{homeOverviewI18n.topN(TOP_POLICIES_SIZE)}</Typography>
         </EuiFlexItem>
       </EuiFlexGroup>
 
@@ -167,11 +168,11 @@ const ScaScanNoData = () => {
     <>
       <EuiEmptyPrompt
         iconType='visVega'
-        title={<h4>You don't have SCA scans in this agent.</h4>}
+        title={<h4>{homeOverviewI18n.noScaScansAgent}</h4>}
         titleSize={TypographySize({ level: 'prompt' })}
         body={
           <>
-            <p>Check your agent settings to generate scans.</p>
+            <p>{homeOverviewI18n.checkAgentSettingsScans}</p>
           </>
         }
       />

@@ -36,13 +36,14 @@ import {
   FindingsDataSourceRepository,
   MitreAttackDataSource,
 } from '../../../data-source';
+import { homeOverviewI18n } from '../../home-overview/i18n';
 
 const PromptNoData = () => (
   <EuiEmptyPrompt
     iconType='stats'
-    title={<Typography level='prompt'>No results</Typography>}
+    title={<Typography level='prompt'>{homeOverviewI18n.noResults}</Typography>}
     titleSize={TypographySize({ level: 'prompt' })}
-    body={<p>No MITRE ATT&CK results were found in the selected time range.</p>}
+    body={<p>{homeOverviewI18n.noMitreResultsInRange}</p>}
   />
 );
 
@@ -91,7 +92,7 @@ const MitreTopTacticsTactics = compose(
       <div className='wz-agents-mitre'>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <Typography level='card'>Top Tactics</Typography>
+            <Typography level='card'>{homeOverviewI18n.topTactics}</Typography>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
@@ -127,7 +128,7 @@ const MitreTopTacticsTechniquesHeader = ({ selectedTactic, setView }) => (
             setView('tactics');
           }}
           iconType='sortLeft'
-          aria-label='Back Top Tactics'
+          aria-label={homeOverviewI18n.backTopTactics}
         />
       </EuiFlexItem>
       <EuiFlexItem>

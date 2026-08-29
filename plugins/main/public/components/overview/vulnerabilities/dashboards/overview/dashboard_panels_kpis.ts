@@ -1,10 +1,11 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
+import { vulnerabilitiesI18n } from '../../i18n';
 
 const getVisStateSeverityCritical = (indexPatternId: string) => {
   return {
     id: 'severity_critical_vulnerabilities',
-    title: 'Critical',
+    title: vulnerabilitiesI18n.severityCritical,
     type: 'metric',
     params: {
       addTooltip: true,
@@ -60,7 +61,7 @@ const getVisStateSeverityCritical = (indexPatternId: string) => {
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'Severity',
+            customLabel: vulnerabilitiesI18n.severityLabel,
           },
           schema: 'metric',
         },
@@ -75,7 +76,7 @@ const getVisStateSeverityCritical = (indexPatternId: string) => {
                   query: 'vulnerability.severity:"Critical"',
                   language: 'kuery',
                 },
-                label: 'Critical',
+                label: vulnerabilitiesI18n.severityCritical,
               },
             ],
           },
@@ -89,7 +90,7 @@ const getVisStateSeverityCritical = (indexPatternId: string) => {
 const getVisStateSeverityHigh = (indexPatternId: string) => {
   return {
     id: 'severity_high_vulnerabilities',
-    title: 'High',
+    title: vulnerabilitiesI18n.severityHigh,
     type: 'metric',
     params: {
       addTooltip: true,
@@ -145,7 +146,7 @@ const getVisStateSeverityHigh = (indexPatternId: string) => {
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'Severity',
+            customLabel: vulnerabilitiesI18n.severityLabel,
           },
           schema: 'metric',
         },
@@ -160,7 +161,7 @@ const getVisStateSeverityHigh = (indexPatternId: string) => {
                   query: 'vulnerability.severity:"High"',
                   language: 'kuery',
                 },
-                label: 'High',
+                label: vulnerabilitiesI18n.severityHigh,
               },
             ],
           },
@@ -174,7 +175,7 @@ const getVisStateSeverityHigh = (indexPatternId: string) => {
 const getVisStateSeverityMedium = (indexPatternId: string) => {
   return {
     id: 'severity_medium_vulnerabilities',
-    title: 'Medium',
+    title: vulnerabilitiesI18n.severityMedium,
     type: 'metric',
     params: {
       addTooltip: true,
@@ -230,7 +231,7 @@ const getVisStateSeverityMedium = (indexPatternId: string) => {
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'Severity',
+            customLabel: vulnerabilitiesI18n.severityLabel,
           },
           schema: 'metric',
         },
@@ -245,7 +246,7 @@ const getVisStateSeverityMedium = (indexPatternId: string) => {
                   query: 'vulnerability.severity:"Medium"',
                   language: 'kuery',
                 },
-                label: 'Medium',
+                label: vulnerabilitiesI18n.severityMedium,
               },
             ],
           },
@@ -259,7 +260,7 @@ const getVisStateSeverityMedium = (indexPatternId: string) => {
 const getVisStateSeverityLow = (indexPatternId: string) => {
   return {
     id: 'severity_low_vulnerabilities',
-    title: 'Low',
+    title: vulnerabilitiesI18n.severityLow,
     type: 'metric',
     params: {
       addTooltip: true,
@@ -315,7 +316,7 @@ const getVisStateSeverityLow = (indexPatternId: string) => {
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'Severity',
+            customLabel: vulnerabilitiesI18n.severityLabel,
           },
           schema: 'metric',
         },
@@ -330,7 +331,7 @@ const getVisStateSeverityLow = (indexPatternId: string) => {
                   query: 'vulnerability.severity:"Low"',
                   language: 'kuery',
                 },
-                label: 'Low',
+                label: vulnerabilitiesI18n.severityLow,
               },
             ],
           },
@@ -344,7 +345,7 @@ const getVisStateSeverityLow = (indexPatternId: string) => {
 const getVisStateEvaluatedEvaluationPending = (indexPatternId: string) => {
   return {
     id: 'vulnerabilities_evaluation_count',
-    title: 'Evaluation',
+    title: vulnerabilitiesI18n.evaluation,
     type: 'metric',
     params: {
       addLegend: false,
@@ -396,7 +397,7 @@ const getVisStateEvaluatedEvaluationPending = (indexPatternId: string) => {
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'Evaluation',
+            customLabel: vulnerabilitiesI18n.evaluation,
           },
           schema: 'metric',
         },
@@ -411,7 +412,7 @@ const getVisStateEvaluatedEvaluationPending = (indexPatternId: string) => {
                   language: 'kuery',
                   query: 'vulnerability.under_evaluation:true',
                 },
-                label: 'Pending',
+                label: vulnerabilitiesI18n.pending,
               },
             ],
           },

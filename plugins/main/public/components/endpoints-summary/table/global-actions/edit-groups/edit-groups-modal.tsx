@@ -27,6 +27,7 @@ import {
 import { Agent } from '../../../types';
 import { EditAgentsGroupsModalResult } from './result';
 import { ErrorAgent } from '../../../services/paginated-agents-group';
+import { endpointsSummaryI18n } from '../../../i18n';
 
 export enum RESULT_TYPE {
   SUCCESS = 'success',
@@ -66,10 +67,10 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
   }: EditAgentsGroupsModalProps) => {
     const getEditGroupsErrorMessage = (error: any) => {
       const apiMessage = error?.response?.data?.message;
-      const message = apiMessage || error?.message || 'Unknown error';
+      const message = apiMessage || error?.message || endpointsSummaryI18n.unknownError;
 
       if (/permission denied/i.test(message)) {
-        return `No permissions to modify groups for one or more selected agents. ${message}`;
+        return endpointsSummaryI18n.noPermissionModifyGroups(message);
       }
 
       return message;
@@ -233,8 +234,8 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
 
     const groupsText =
       addOrRemove === 'add'
-        ? 'Select groups to add'
-        : 'Select groups to remove';
+        ? endpointsSummaryI18n.selectGroupsToAdd
+        : endpointsSummaryI18n.selectGroupsToRemove;
 
     const handleOnChangeGroupsSelect = (selectedGroups: Option[]) => {
       setSelectedGroups(selectedGroups);
@@ -247,11 +248,11 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
             <EuiCallOut
               color='warning'
               iconType='alert'
-              title='The changes will be applied to all agents that match the filters set in the list'
+              title={endpointsSummaryI18n.changesApplyToFiltered}
             />
           </EuiFormRow>
         ) : (
-          <EuiFormRow label='Selected agents'>
+          <EuiFormRow label={endpointsSummaryI18n.selectedAgents}>
             <EuiText>{selectedAgents.length}</EuiText>
           </EuiFormRow>
         )}
@@ -271,7 +272,7 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
             <EuiCallOut
               color='danger'
               iconType='alert'
-              title='Could not load groups. Check your permissions.'
+              title={endpointsSummaryI18n.couldNotLoadGroups}
             />
           </EuiFormRow>
         ) : !isGroupsLoading && !groups?.length ? (
@@ -279,7 +280,7 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
             <EuiCallOut
               color='warning'
               iconType='iInCircle'
-              title='No groups available for your permissions.'
+              title={endpointsSummaryI18n.noGroupsForPermissions}
             />
           </EuiFormRow>
         ) : null}
@@ -291,8 +292,8 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
         <EuiModalHeader>
           <EuiModalHeaderTitle>
             {addOrRemove === 'add'
-              ? 'Add groups to agents'
-              : 'Remove groups from agents'}
+              ? endpointsSummaryI18n.addGroupsToAgents
+              : endpointsSummaryI18n.removeGroupsFromAgents}
           </EuiModalHeaderTitle>
         </EuiModalHeader>
         <EuiModalBody>
@@ -313,13 +314,15 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
         <EuiModalFooter>
           {!isResultVisible ? (
             <>
-              <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
+              <EuiButtonEmpty onClick={onClose}>
+                {endpointsSummaryI18n.cancel}
+              </EuiButtonEmpty>
               <EuiButton
                 onClick={handleOnSave}
                 fill
                 disabled={isGroupsLoading || !selectedGroups?.length}
               >
-                Save
+                {endpointsSummaryI18n.save}
               </EuiButton>
             </>
           ) : (
@@ -330,7 +333,7 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
                 getAgentsStatus === 'loading' || saveChangesStatus === 'loading'
               }
             >
-              Close
+              {endpointsSummaryI18n.close}
             </EuiButton>
           )}
         </EuiModalFooter>

@@ -46,6 +46,7 @@ import { I18nProvider } from '@osd/i18n/react';
 import { useAsyncAction } from '../../common/hooks';
 import { WzSearchBar } from '../../common/search-bar';
 import { compose } from 'redux';
+import { complianceI18n } from '../regulatory-compliance/i18n';
 
 function buildComplianceRequirements(
   requirements: { [key: string]: string },
@@ -180,7 +181,7 @@ function buildComplianceObject({ section }) {
       error: {
         error: error,
         message: error.message || error,
-        title: `Compliance (${section}) data could not be fetched`,
+        title: complianceI18n.errorComplianceData(section),
       },
     };
     getErrorOrchestrator().handleError(options);
@@ -296,7 +297,7 @@ export const ComplianceTable = compose(
         error: {
           error: error,
           message: error.message || error,
-          title: `Alerts could not be fetched:`,
+          title: complianceI18n.errorAlertsNotFetched,
         },
       };
       getErrorOrchestrator().handleError(options);

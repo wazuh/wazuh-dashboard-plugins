@@ -14,6 +14,7 @@ import store from '../redux/store';
 import { updateWazuhNotReadyYet } from '../redux/actions/appStateActions';
 import { WzMisc } from '../factories/misc';
 import { CheckDaemonsStatus } from './check-daemons-status';
+import { wzMenuI18n } from '../components/wz-menu/i18n';
 
 interface IHistoryItem {
   text: string;
@@ -150,7 +151,7 @@ export class ErrorHandler {
     const message = ErrorHandler.extractMessage(error);
     const messageIsString = typeof message === 'string';
     if (messageIsString && message.includes('ERROR3099')) {
-      const updateNotReadyYet = updateWazuhNotReadyYet('Server not ready yet.');
+      const updateNotReadyYet = updateWazuhNotReadyYet(wzMenuI18n.serverNotReady);
       store.dispatch(updateNotReadyYet);
       CheckDaemonsStatus.makePing().catch(error => {});
       return;

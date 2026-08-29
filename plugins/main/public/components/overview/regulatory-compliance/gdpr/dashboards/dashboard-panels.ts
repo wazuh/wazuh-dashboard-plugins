@@ -1,5 +1,6 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
+import { complianceI18n } from '../../i18n';
 
 const getVisStateTopAgentsByAlertsCount = (indexPatternId: string) => {
   return {
@@ -58,7 +59,7 @@ const getVisStateTopAgentsByAlertsCount = (indexPatternId: string) => {
 const getVisStateRequirements = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-GDPR-requirements',
-    title: 'GDPR requirements',
+    title: complianceI18n.gdprRequirements,
     type: 'line',
     params: {
       type: 'line',
@@ -85,7 +86,7 @@ const getVisStateRequirements = (indexPatternId: string) => {
           style: {},
           scale: { type: 'linear', mode: 'normal' },
           labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-          title: { text: 'Count' },
+          title: { text: complianceI18n.count },
         },
       ],
       seriesParams: [
@@ -93,7 +94,7 @@ const getVisStateRequirements = (indexPatternId: string) => {
           show: 'true',
           type: 'line',
           mode: 'normal',
-          data: { label: 'Count', id: '1' },
+          data: { label: complianceI18n.count, id: '1' },
           valueAxis: 'ValueAxis-1',
           drawLinesBetweenPoints: false,
           showCircles: true,
@@ -134,8 +135,8 @@ const getVisStateRequirements = (indexPatternId: string) => {
               id: 'terms',
               params: {
                 id: 'string',
-                otherBucketLabel: 'Other',
-                missingBucketLabel: 'Missing',
+                otherBucketLabel: complianceI18n.other,
+                missingBucketLabel: complianceI18n.missing,
               },
             },
             params: {},
@@ -181,9 +182,9 @@ const getVisStateRequirements = (indexPatternId: string) => {
             order: 'desc',
             size: 10,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: complianceI18n.missing,
           },
         },
         {
@@ -216,7 +217,7 @@ const getVisStateRequirements = (indexPatternId: string) => {
 const getVisStateRequirementsOverTime = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-GDPR-Requirements-heatmap',
-    title: 'Top requirements over time',
+    title: complianceI18n.topRequirementsOverTime,
     type: 'area',
     params: {
       type: 'area',
@@ -247,7 +248,7 @@ const getVisStateRequirementsOverTime = (indexPatternId: string) => {
           style: {},
           scale: { type: 'linear', mode: 'normal' },
           labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-          title: { text: 'Count' },
+          title: { text: complianceI18n.count },
         },
       ],
       seriesParams: [
@@ -255,7 +256,7 @@ const getVisStateRequirementsOverTime = (indexPatternId: string) => {
           show: 'true',
           type: 'area',
           mode: 'stacked',
-          data: { label: 'Count', id: '1' },
+          data: { label: complianceI18n.count, id: '1' },
           drawLinesBetweenPoints: true,
           showCircles: true,
           interpolate: 'cardinal',
@@ -304,9 +305,9 @@ const getVisStateRequirementsOverTime = (indexPatternId: string) => {
             order: 'desc',
             orderBy: '1',
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: complianceI18n.missing,
           },
         },
         {
@@ -334,7 +335,7 @@ const getVisStateRequirementsOverTime = (indexPatternId: string) => {
 const getVisStateRequirementsHeatmap = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-GDPR-Requirements-Agents-heatmap',
-    title: 'Last alerts',
+    title: complianceI18n.lastAlerts,
     type: 'heatmap',
     params: {
       type: 'heatmap',
@@ -415,10 +416,10 @@ const getVisStateRequirementsHeatmap = (indexPatternId: string) => {
             order: 'desc',
             orderBy: '1',
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Requirements',
+            missingBucketLabel: complianceI18n.missing,
+            customLabel: complianceI18n.requirements,
           },
         },
         {
@@ -432,10 +433,10 @@ const getVisStateRequirementsHeatmap = (indexPatternId: string) => {
             order: 'desc',
             orderBy: '1',
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Agents',
+            missingBucketLabel: complianceI18n.missing,
+            customLabel: complianceI18n.agents,
           },
         },
       ],
@@ -446,7 +447,7 @@ const getVisStateRequirementsHeatmap = (indexPatternId: string) => {
 const getVisStateRequirementsByAgent = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-GDPR-Requirements-by-agent',
-    title: 'Requirements by agent',
+    title: complianceI18n.requirementsByAgent,
     type: 'histogram',
     params: {
       type: 'histogram',
@@ -473,7 +474,7 @@ const getVisStateRequirementsByAgent = (indexPatternId: string) => {
           style: {},
           scale: { type: 'linear', mode: 'normal' },
           labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-          title: { text: 'Count' },
+          title: { text: complianceI18n.count },
         },
       ],
       seriesParams: [
@@ -481,7 +482,7 @@ const getVisStateRequirementsByAgent = (indexPatternId: string) => {
           show: 'true',
           type: 'histogram',
           mode: 'stacked',
-          data: { label: 'Count', id: '1' },
+          data: { label: complianceI18n.count, id: '1' },
           valueAxis: 'ValueAxis-1',
           drawLinesBetweenPoints: true,
           showCircles: true,
@@ -529,7 +530,7 @@ const getVisStateRequirementsByAgent = (indexPatternId: string) => {
             size: 5,
             order: 'desc',
             orderBy: '1',
-            customLabel: 'GDPR Requirements',
+            customLabel: complianceI18n.gdprRequirementsLabel,
           },
         },
         {
@@ -552,7 +553,7 @@ const getVisStateRequirementsByAgent = (indexPatternId: string) => {
 const getVisStateTopRuleGroups = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Agents-GDPR-Groups',
-    title: 'Top 5 rule groups',
+    title: complianceI18n.top5RuleGroups,
     type: 'pie',
     params: {
       type: 'pie',
@@ -600,7 +601,7 @@ const getVisStateTopRuleGroups = (indexPatternId: string) => {
 const getVisStateTopRules = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Agents-GDPR-Rule',
-    title: 'Top 5 rules',
+    title: complianceI18n.top5Rules,
     type: 'pie',
     params: {
       type: 'pie',
@@ -691,7 +692,7 @@ const getVisStateAgentTopRequirements = (indexPatternId: string) => {
 const getVisStateAgentTopRequirementsCount = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Agents-GDPR-Requirements',
-    title: 'GDPR Requirements',
+    title: complianceI18n.gdprRequirementsLabel,
     type: 'histogram',
     params: {
       type: 'histogram',
@@ -718,7 +719,7 @@ const getVisStateAgentTopRequirementsCount = (indexPatternId: string) => {
           style: {},
           scale: { type: 'linear', mode: 'normal' },
           labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-          title: { text: 'Count' },
+          title: { text: complianceI18n.count },
         },
       ],
       seriesParams: [
@@ -726,7 +727,7 @@ const getVisStateAgentTopRequirementsCount = (indexPatternId: string) => {
           show: 'true',
           type: 'histogram',
           mode: 'stacked',
-          data: { label: 'Count', id: '1' },
+          data: { label: complianceI18n.count, id: '1' },
           valueAxis: 'ValueAxis-1',
           drawLinesBetweenPoints: true,
           showCircles: true,
@@ -780,7 +781,7 @@ const getVisStateAgentTopRequirementsCount = (indexPatternId: string) => {
             size: 10,
             order: 'desc',
             orderBy: '1',
-            customLabel: 'GDPR requirements',
+            customLabel: complianceI18n.gdprRequirementsLower,
           },
         },
       ],
@@ -791,7 +792,7 @@ const getVisStateAgentTopRequirementsCount = (indexPatternId: string) => {
 const getVisStateAgentRuleLevelDistribution = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Agents-GDPR-Rule-level-distribution',
-    title: 'Rule level distribution',
+    title: complianceI18n.ruleLevelDistribution,
     type: 'pie',
     params: {
       type: 'pie',
@@ -831,9 +832,9 @@ const getVisStateAgentRuleLevelDistribution = (indexPatternId: string) => {
             order: 'desc',
             orderBy: '1',
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: complianceI18n.missing,
           },
         },
       ],

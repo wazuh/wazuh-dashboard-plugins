@@ -16,6 +16,9 @@ import { PLUGIN_VERSION_SHORT } from '../../../../../../common/constants';
 import '../group-input/group-input.scss';
 import { ErrorHandler } from '../../../../../react-services/error-management/error-handler/error-handler';
 import { getUiSettings } from '../../../../../kibana-services';
+import { endpointsSummaryI18n } from '../../../i18n';
+
+const dw = endpointsSummaryI18n.deployWizard;
 
 interface ServerAddressInputProps {
   formField: EnhancedFieldConfiguration;
@@ -23,7 +26,7 @@ interface ServerAddressInputProps {
 
 const popoverServerAddress = (
   <span>
-    Learn about{' '}
+    {dw.learnAbout}{' '}
     <EuiLink
       href={webDocumentationLink(
         'user-manual/reference/ossec-conf/client.html#manager-address',
@@ -32,7 +35,7 @@ const popoverServerAddress = (
       target='_blank'
       rel='noopener noreferrer'
     >
-      Server address.
+      {dw.serverAddressLink}
     </EuiLink>
   </span>
 );
@@ -65,7 +68,7 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
     } catch (error) {
       ErrorHandler.handleError(error, {
         message: error.message,
-        title: 'Error saving server address configuration',
+        title: dw.errorSavingServerAddress,
       });
       setRememberServerAddress(false);
     }
@@ -112,7 +115,7 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
                 >
                   <EuiFlexItem grow={false}>
                     <span className='registerAgentLabels'>
-                      Assign a server address
+                      {dw.assignServerAddress}
                     </span>
                   </EuiFlexItem>
                   <EuiFlexItem grow={false}>
@@ -140,7 +143,7 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
               </>
             }
             fullWidth={false}
-            placeholder='Server address'
+            placeholder={dw.serverAddressPlaceholder}
           />
         </EuiFlexItem>
       </EuiFlexGroup>
@@ -148,7 +151,7 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
         <EuiFlexItem grow={false}>
           <EuiSwitch
             disabled={rememberToggleIsDisabled()}
-            label='Remember server address'
+            label={dw.rememberServerAddress}
             checked={rememberServerAddress}
             onChange={e => handleToggleRememberAddress(e)}
           />

@@ -42,6 +42,7 @@ import { nestedResolve } from '../../../../../services/resolves';
 import NavigationService from '../../../../../react-services/navigation-service';
 import { SECTIONS } from '../../../../../sections';
 import { getWazuhAPIVersion } from '../../../services';
+import { endpointsSummaryI18n } from '../../../i18n';
 
 export const RegisterAgent = compose(
   withErrorBoundary,
@@ -51,7 +52,7 @@ export const RegisterAgent = compose(
       text: endpointSummary.breadcrumbLabel,
       href: `#${endpointSummary.redirectTo()}`,
     },
-    { text: 'Deploy new agent' },
+    { text: endpointsSummaryI18n.deployNewAgent },
   ]),
   withUserAuthorizationPrompt([
     [{ action: 'agent:create', resource: '*:*:*' }],
@@ -202,10 +203,12 @@ export const RegisterAgent = compose(
                       <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
                         <EuiToolTip
                           position='right'
-                          content={`Back to Endpoints`}
+                          content={endpointsSummaryI18n.deployWizard.backToEndpoints}
                         >
                           <EuiButtonIcon
-                            aria-label='Back'
+                            aria-label={
+                              endpointsSummaryI18n.deployWizard.backAriaLabel
+                            }
                             style={{ marginTop: 4 }}
                             color='primary'
                             iconSize='l'
@@ -216,7 +219,7 @@ export const RegisterAgent = compose(
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
                         <EuiTitle size='s'>
-                          <h1>Deploy new agent</h1>
+                          <h1>{endpointsSummaryI18n.deployNewAgent}</h1>
                         </EuiTitle>
                       </EuiFlexItem>
                     </EuiFlexGroup>

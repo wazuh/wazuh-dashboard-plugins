@@ -3,6 +3,7 @@ import { getAgentsInfo } from '../services/get-agents-info';
 import DonutCard from './components/donut-card';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { useService } from '../../common/hooks/use-service';
+import { endpointsSummaryI18n } from '../i18n';
 
 interface EndpointsSummaryDashboardProps {
   filterAgentByStatus: (data: any) => void;
@@ -27,7 +28,7 @@ export const EndpointsSummaryDashboard: FC<EndpointsSummaryDashboardProps> = ({
     <EuiFlexGroup gutterSize='m' responsive={false} wrap>
       <EuiFlexItem>
         <DonutCard
-          betaBadgeLabel='Agents by Status'
+          betaBadgeLabel={endpointsSummaryI18n.agentsByStatus}
           onClickLabel={filterAgentByStatus}
           data={data?.statusData}
           isLoading={isLoading}
@@ -35,7 +36,7 @@ export const EndpointsSummaryDashboard: FC<EndpointsSummaryDashboardProps> = ({
       </EuiFlexItem>
       <EuiFlexItem>
         <DonutCard
-          betaBadgeLabel='Top 5 OS'
+          betaBadgeLabel={endpointsSummaryI18n.top5Os}
           onClickLabel={filterAgentByOS}
           data={data?.osData}
           isLoading={isLoading}
@@ -43,7 +44,7 @@ export const EndpointsSummaryDashboard: FC<EndpointsSummaryDashboardProps> = ({
       </EuiFlexItem>
       <EuiFlexItem>
         <DonutCard
-          betaBadgeLabel='Top 5 groups'
+          betaBadgeLabel={endpointsSummaryI18n.top5Groups}
           onClickLabel={filterAgentByGroup}
           data={data?.groupsData}
           isLoading={isLoading}

@@ -29,6 +29,7 @@ import { compose } from 'redux';
 import { withVulnerabilitiesStateDataSource } from '../../../../../components/overview/vulnerabilities/common/hocs/validate-vulnerabilities-states-index-pattern';
 import { formatUINumber } from '../../../../../react-services/format-number';
 import { Typography } from '../../../typography/typography';
+import { homeOverviewI18n } from '../../home-overview/i18n';
 
 const VulsPanelContentInitiation = compose(
   withDataSourceFetch({
@@ -140,11 +141,11 @@ const VulsPanel = ({ agent }) => {
     <EuiPanel paddingSize='m'>
       <EuiFlexGroup className='wz-section-sca-euiFlexGroup' responsive={false}>
         <EuiFlexItem grow={false}>
-          <Typography level='section'>Vulnerability Detection</Typography>
+          <Typography level='section'>{homeOverviewI18n.vulnerabilityDetection}</Typography>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <RedirectAppLinks application={getCore().application}>
-            <EuiToolTip position='top' content='Open Vulnerability Detection'>
+            <EuiToolTip position='top' content={homeOverviewI18n.openVulnerabilityDetection}>
               <EuiButtonIcon
                 iconType='popout'
                 color='primary'
@@ -152,7 +153,7 @@ const VulsPanel = ({ agent }) => {
                 href={NavigationService.getInstance().getAppURL(
                   vulnerabilityDetection.id,
                 )}
-                aria-label='Open Vulnerability Detection'
+                aria-label={homeOverviewI18n.openVulnerabilityDetection}
               />
             </EuiToolTip>
           </RedirectAppLinks>

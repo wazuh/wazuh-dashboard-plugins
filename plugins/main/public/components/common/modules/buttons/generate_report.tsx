@@ -15,6 +15,7 @@ import { useAsyncAction } from '../../hooks';
 import { ReportingService } from '../../../../react-services';
 import { WzButton } from '../../../common/buttons';
 import { connect } from 'react-redux';
+import { wzDiscoverI18n } from '../../wazuh-discover/i18n';
 
 const mapStateToProps = state => ({
   dataSourceSearchContext: state.reportingReducers.dataSourceSearchContext,
@@ -43,12 +44,12 @@ export const ButtonModuleGenerateReport = connect(mapStateToProps)(
           disabledReport && totalResults === 0
             ? {
                 position: 'top',
-                content: 'No results match for this search criteria.',
+                content: wzDiscoverI18n.noResultsForCriteria,
               }
             : undefined
         }
       >
-        Generate report
+        {wzDiscoverI18n.generateReport}
       </WzButton>
     );
   },

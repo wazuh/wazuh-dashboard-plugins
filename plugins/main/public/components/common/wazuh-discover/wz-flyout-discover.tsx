@@ -43,6 +43,10 @@ import DocDetails from './components/doc-details';
 import { WzSearchBar } from '../search-bar/search-bar';
 import { transformDateRange } from '../search-bar/search-bar-service';
 import { MAX_ENTRIES_PER_QUERY } from '../data-grid/data-grid-service';
+import {
+  getQueryResultsExceededTooltip,
+  wzDiscoverI18n,
+} from './i18n';
 export const DEFAULT_PAGE_SIZE_OPTIONS = [20, 50, 100];
 export const DEFAULT_PAGE_SIZE = 20;
 const INDEX_FIELD_NAME = '_id';
@@ -151,10 +155,10 @@ const WazuhFlyoutDiscoverComponentRender = compose(
                     results?.hits?.total &&
                     results?.hits?.total > MAX_ENTRIES_PER_QUERY
                       ? {
-                          ariaLabel: 'Info',
-                          content: `The query results exceeded the limit of ${formatNumWithCommas(
-                            MAX_ENTRIES_PER_QUERY,
-                          )} hits. Please refine your search.`,
+                          ariaLabel: wzDiscoverI18n.info,
+                          content: getQueryResultsExceededTooltip(
+                            formatNumWithCommas(MAX_ENTRIES_PER_QUERY),
+                          ),
                           iconType: 'iInCircle',
                           position: 'top',
                         }
@@ -311,7 +315,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching data',
+          message: wzDiscoverI18n.errorFetchingData,
         });
         ErrorHandler.handleError(searchError);
       });

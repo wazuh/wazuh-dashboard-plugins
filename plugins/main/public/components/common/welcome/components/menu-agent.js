@@ -25,6 +25,7 @@ import { Applications, Categories } from '../../../../utils/applications';
 import NavigationService from '../../../../react-services/navigation-service';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector-service';
+import { wzMenuI18n } from '../../../wz-menu/i18n';
 
 class WzMenuAgent extends Component {
   constructor(props) {
@@ -134,8 +135,7 @@ class WzMenuAgent extends Component {
                       ]);
                     } else {
                       this.addToast({
-                        title:
-                          'The limit of pinned applications has been reached',
+                        title: wzMenuI18n.pinnedApplicationsLimit,
                         color: 'danger',
                       });
                     }
@@ -146,7 +146,7 @@ class WzMenuAgent extends Component {
                       ? 'pinFilled'
                       : 'pin'
                   }
-                  aria-label='Next'
+                  aria-label={wzMenuI18n.togglePinApplication}
                   style={{ cursor: 'pointer' }}
                 />
               </EuiFlexItem>

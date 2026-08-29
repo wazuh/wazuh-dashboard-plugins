@@ -1,11 +1,12 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
 import { UI_COLOR_STATUS } from '../../../../../../common/constants';
+import { vulnerabilitiesI18n } from '../../i18n';
 
 const getVisStateTopVulnerabilitiesScore = (indexPatternId: string) => {
   return {
     id: 'most_detected_vulnerabilities',
-    title: 'Most common vulnerability score',
+    title: vulnerabilitiesI18n.mostCommonScore,
     type: 'horizontal_bar',
     params: {
       addLegend: false,
@@ -42,7 +43,7 @@ const getVisStateTopVulnerabilitiesScore = (indexPatternId: string) => {
         {
           data: {
             id: '1',
-            label: 'Count',
+            label: vulnerabilitiesI18n.count,
           },
           drawLinesBetweenPoints: true,
           lineWidth: 2,
@@ -80,7 +81,7 @@ const getVisStateTopVulnerabilitiesScore = (indexPatternId: string) => {
           show: true,
           style: {},
           title: {
-            text: 'Count',
+            text: vulnerabilitiesI18n.count,
           },
           type: 'value',
         },
@@ -120,10 +121,10 @@ const getVisStateTopVulnerabilitiesScore = (indexPatternId: string) => {
             order: 'desc',
             size: 10,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: vulnerabilitiesI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Vulnerability base score',
+            missingBucketLabel: vulnerabilitiesI18n.missing,
+            customLabel: vulnerabilitiesI18n.vulnerabilityBaseScore,
           },
           schema: 'segment',
         },
@@ -135,7 +136,7 @@ const getVisStateTopVulnerabilitiesScore = (indexPatternId: string) => {
 const getVisStateTopVulnerableOSTypes = (indexPatternId: string) => {
   return {
     id: 'most_vulnerable_endpoints_vulnerabilities',
-    title: 'Most vulnerable OS types',
+    title: vulnerabilitiesI18n.mostVulnerableOsTypes,
     type: 'horizontal_bar',
     params: {
       type: 'histogram',
@@ -180,7 +181,7 @@ const getVisStateTopVulnerableOSTypes = (indexPatternId: string) => {
             truncate: 100,
           },
           title: {
-            text: 'Count',
+            text: vulnerabilitiesI18n.count,
           },
         },
       ],
@@ -190,7 +191,7 @@ const getVisStateTopVulnerableOSTypes = (indexPatternId: string) => {
           type: 'histogram',
           mode: 'stacked',
           data: {
-            label: 'Count',
+            label: vulnerabilitiesI18n.count,
             id: '1',
           },
           valueAxis: 'ValueAxis-1',
@@ -240,7 +241,7 @@ const getVisStateTopVulnerableOSTypes = (indexPatternId: string) => {
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'Count',
+            customLabel: vulnerabilitiesI18n.count,
           },
           schema: 'metric',
         },
@@ -254,10 +255,10 @@ const getVisStateTopVulnerableOSTypes = (indexPatternId: string) => {
             order: 'desc',
             size: 10,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: vulnerabilitiesI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Host OS type',
+            missingBucketLabel: vulnerabilitiesI18n.missing,
+            customLabel: vulnerabilitiesI18n.hostOsType,
           },
           schema: 'segment',
         },
@@ -271,7 +272,7 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
 ) => {
   return {
     id: 'vulnerabilities_by_year_of_publication',
-    title: 'Vulnerabilities by year of publication',
+    title: vulnerabilitiesI18n.vulnerabilitiesByYear,
     type: 'histogram',
     params: {
       type: 'histogram',
@@ -316,7 +317,7 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
             truncate: 100,
           },
           title: {
-            text: 'Count',
+            text: vulnerabilitiesI18n.count,
           },
         },
       ],
@@ -326,7 +327,7 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
           type: 'histogram',
           mode: 'stacked',
           data: {
-            label: 'Count',
+            label: vulnerabilitiesI18n.count,
             id: '1',
           },
           valueAxis: 'ValueAxis-1',
@@ -404,7 +405,7 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
             drop_partials: false,
             min_doc_count: 1,
             extended_bounds: {},
-            customLabel: 'Year published',
+            customLabel: vulnerabilitiesI18n.yearPublished,
           },
           schema: 'segment',
         },
@@ -418,9 +419,9 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: vulnerabilitiesI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: vulnerabilitiesI18n.missing,
           },
           schema: 'group',
         },

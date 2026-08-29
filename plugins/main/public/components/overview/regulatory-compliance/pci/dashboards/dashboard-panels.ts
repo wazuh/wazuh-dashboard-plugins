@@ -1,10 +1,11 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
+import { complianceI18n } from '../../i18n';
 
 const getVisStateTopRequirements = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-PCI-DSS-requirements',
-    title: 'Top 10 PCI DSS requirements',
+    title: complianceI18n.pciTop10Requirements,
     type: 'line',
     params: {
       type: 'line',
@@ -31,7 +32,7 @@ const getVisStateTopRequirements = (indexPatternId: string) => {
           style: {},
           scale: { type: 'linear', mode: 'normal' },
           labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-          title: { text: 'Count' },
+          title: { text: complianceI18n.count },
         },
       ],
       seriesParams: [
@@ -39,7 +40,7 @@ const getVisStateTopRequirements = (indexPatternId: string) => {
           show: 'true',
           type: 'line',
           mode: 'normal',
-          data: { label: 'Count', id: '1' },
+          data: { label: complianceI18n.count, id: '1' },
           valueAxis: 'ValueAxis-1',
           drawLinesBetweenPoints: false,
           showCircles: true,
@@ -80,8 +81,8 @@ const getVisStateTopRequirements = (indexPatternId: string) => {
               id: 'terms',
               params: {
                 id: 'string',
-                otherBucketLabel: 'Other',
-                missingBucketLabel: 'Missing',
+                otherBucketLabel: complianceI18n.other,
+                missingBucketLabel: complianceI18n.missing,
               },
             },
             params: {},
@@ -142,9 +143,9 @@ const getVisStateTopRequirements = (indexPatternId: string) => {
             order: 'desc',
             size: 10,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: complianceI18n.missing,
           },
         },
         {
@@ -162,7 +163,7 @@ const getVisStateTopRequirements = (indexPatternId: string) => {
 const getVisStateTopAgentsByCount = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-PCI-DSS-Agents',
-    title: 'Top 10 agents by alerts count',
+    title: complianceI18n.top10AgentsByAlerts,
     type: 'pie',
     params: {
       type: 'pie',
@@ -216,7 +217,7 @@ const getVisStateTopAgentsByCount = (indexPatternId: string) => {
 const getVisStateRequirementsHeatmap = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-PCI-DSS-Requirements-Agents-heatmap',
-    title: 'Last alerts',
+    title: complianceI18n.lastAlerts,
     type: 'heatmap',
     params: {
       type: 'heatmap',
@@ -297,10 +298,10 @@ const getVisStateRequirementsHeatmap = (indexPatternId: string) => {
             order: 'desc',
             orderBy: '1',
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Requirements',
+            missingBucketLabel: complianceI18n.missing,
+            customLabel: complianceI18n.requirements,
           },
         },
         {
@@ -314,10 +315,10 @@ const getVisStateRequirementsHeatmap = (indexPatternId: string) => {
             order: 'desc',
             orderBy: '1',
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Agents',
+            missingBucketLabel: complianceI18n.missing,
+            customLabel: complianceI18n.agents,
           },
         },
       ],
@@ -328,7 +329,7 @@ const getVisStateRequirementsHeatmap = (indexPatternId: string) => {
 const getVisStateRequirementsByAgent = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-PCI-DSS-Requirements-by-agent',
-    title: 'Requirements by agent',
+    title: complianceI18n.requirementsByAgent,
     type: 'histogram',
     params: {
       type: 'histogram',
@@ -376,7 +377,7 @@ const getVisStateRequirementsByAgent = (indexPatternId: string) => {
             truncate: 100,
           },
           title: {
-            text: 'Count',
+            text: complianceI18n.count,
           },
         },
       ],
@@ -386,7 +387,7 @@ const getVisStateRequirementsByAgent = (indexPatternId: string) => {
           type: 'histogram',
           mode: 'stacked',
           data: {
-            label: 'Count',
+            label: complianceI18n.count,
             id: '1',
           },
           valueAxis: 'ValueAxis-1',
@@ -446,9 +447,9 @@ const getVisStateRequirementsByAgent = (indexPatternId: string) => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: complianceI18n.missing,
           },
           schema: 'group',
         },
@@ -462,10 +463,10 @@ const getVisStateRequirementsByAgent = (indexPatternId: string) => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Requirements',
+            missingBucketLabel: complianceI18n.missing,
+            customLabel: complianceI18n.requirements,
           },
           schema: 'segment',
         },
@@ -477,7 +478,7 @@ const getVisStateRequirementsByAgent = (indexPatternId: string) => {
 const getVisStateAgentTopRuleGroups = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Agents-PCI-Groups',
-    title: 'Top 5 rule groups',
+    title: complianceI18n.top5RuleGroups,
     type: 'pie',
     params: {
       type: 'pie',
@@ -525,7 +526,7 @@ const getVisStateAgentTopRuleGroups = (indexPatternId: string) => {
 const getVisStateAgentTopRules = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Agents-PCI-Rule',
-    title: 'Top 5 rules',
+    title: complianceI18n.top5Rules,
     type: 'pie',
     params: {
       type: 'pie',
@@ -573,7 +574,7 @@ const getVisStateAgentTopRules = (indexPatternId: string) => {
 const getVisStateAgentTopRequirements = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Agents-PCI-Requirement',
-    title: 'Top 5 PCI DSS requirements',
+    title: complianceI18n.pciTop5Requirements,
     type: 'pie',
     params: {
       type: 'pie',
@@ -621,7 +622,7 @@ const getVisStateAgentTopRequirements = (indexPatternId: string) => {
 const getVisStateAgentTopRequirementsCount = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Agents-PCI-Requirements',
-    title: 'PCI DSS requirements',
+    title: complianceI18n.pciRequirements,
     type: 'histogram',
     params: {
       type: 'histogram',
@@ -648,7 +649,7 @@ const getVisStateAgentTopRequirementsCount = (indexPatternId: string) => {
           style: {},
           scale: { type: 'linear', mode: 'normal' },
           labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-          title: { text: 'Count' },
+          title: { text: complianceI18n.count },
         },
       ],
       seriesParams: [
@@ -656,7 +657,7 @@ const getVisStateAgentTopRequirementsCount = (indexPatternId: string) => {
           show: 'true',
           type: 'histogram',
           mode: 'stacked',
-          data: { label: 'Count', id: '1' },
+          data: { label: complianceI18n.count, id: '1' },
           valueAxis: 'ValueAxis-1',
           drawLinesBetweenPoints: true,
           showCircles: true,
@@ -710,7 +711,7 @@ const getVisStateAgentTopRequirementsCount = (indexPatternId: string) => {
             size: 10,
             order: 'desc',
             orderBy: '1',
-            customLabel: 'PCI DSS Requirements',
+            customLabel: complianceI18n.pciRequirementsLabel,
           },
         },
       ],
@@ -721,7 +722,7 @@ const getVisStateAgentTopRequirementsCount = (indexPatternId: string) => {
 const getVisStateAgentRuleLevelDistribution = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Agents-PCI-Rule-level-distribution',
-    title: 'Rule level distribution',
+    title: complianceI18n.ruleLevelDistribution,
     type: 'pie',
     params: {
       type: 'pie',
@@ -761,9 +762,9 @@ const getVisStateAgentRuleLevelDistribution = (indexPatternId: string) => {
             order: 'desc',
             orderBy: '1',
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: complianceI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: complianceI18n.missing,
           },
         },
       ],

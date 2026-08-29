@@ -4,7 +4,6 @@ import {
   EuiLink,
   EuiSteps,
   EuiButton,
-  EuiCode,
 } from '@elastic/eui';
 import './steps.scss';
 import { OPERATING_SYSTEMS_OPTIONS } from '../../utils/register-agent-data';
@@ -35,14 +34,15 @@ import {
   getPasswordStepStatus,
   getIncompleteSteps,
   getInvalidFields,
-  tFormFieldsLabel,
-  tFormStepsLabel,
 } from '../../services/register-agent-steps-status-services';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import OsCommandWarning from '../../components/command-output/os-warning';
 import { endpointSummary } from '../../../../../utils/applications';
 import { SECTIONS } from '../../../../../sections';
 import NavigationService from '../../../../../react-services/navigation-service';
+import { endpointsSummaryI18n } from '../../../i18n';
+
+const dw = endpointsSummaryI18n.deployWizard;
 
 interface IStepsProps {
   needsPassword: boolean;
@@ -77,16 +77,12 @@ export const Steps = ({
       protocol: connection.isUDP ? 'UDP' : '',
     },
   } as IParseRegisterFormValues;
-  const [missingStepsName, setMissingStepsName] = useState<tFormStepsLabel[]>(
-    [],
-  );
-  const [invalidFieldsName, setInvalidFieldsName] = useState<
-    tFormFieldsLabel[]
-  >([]);
+  const [missingStepsName, setMissingStepsName] = useState<string[]>([]);
+  const [invalidFieldsName, setInvalidFieldsName] = useState<string[]>([]);
   const [registerAgentFormValues, setRegisterAgentFormValues] =
     useState<IParseRegisterFormValues>(initialParsedFormValues);
 
-  const FORM_MESSAGE_CONJUNTION = ' and ';
+  const FORM_MESSAGE_CONJUNCTION = dw.stepConjunction;
 
   useEffect(() => {
     // get form values and parse them divided in OS and optional params
@@ -149,26 +145,25 @@ export const Steps = ({
 
   const registerAgentFormSteps = [
     {
-      title: 'Select the package to download and install on your system:',
+      title: dw.stepSelectPackage,
       children: osCard,
       status: getOSSelectorStepStatus(form.fields),
     },
     {
-      title: 'Server address:',
+      title: dw.stepServerAddressTitle,
       children: <ServerAddress formField={form.fields.serverAddress} />,
       status: getServerAddressStepStatus(form.fields),
     },
     ...(needsPassword && !wazuhPassword
       ? [
           {
-            title: 'Password',
+            title: dw.stepPassword,
             children: (
               <EuiCallOut
                 color='warning'
                 title={
                   <span>
-                    The password is required but wasn't defined. Please check
-                    our{' '}
+                    {dw.passwordRequiredPrefix}{' '}
                     <EuiLink
                       target='_blank'
                       href={webDocumentationLink(
@@ -176,7 +171,7 @@ export const Steps = ({
                       )}
                       rel='noopener noreferrer'
                     >
-                      documentation
+                      {dw.documentation}
                     </EuiLink>
                   </span>
                 }
@@ -191,16 +186,16 @@ export const Steps = ({
     ...(passwordPermissionMissing
       ? [
           {
-            title: 'Password',
+            title: dw.stepPassword,
             children: (
               <EuiCallOut
                 color='warning'
-                title='Missing permission to read the registration password'
+                title={dw.missingPasswordPermissionTitle}
                 iconType='iInCircle'
                 className='warningForAgentName'
               >
                 <p>
-                  Require <EuiCode>cluster:update_config</EuiCode> permission.
+                  {dw.missingPasswordPermissionBody('cluster:update_config')}
                 </p>
               </EuiCallOut>
             ),
@@ -209,7 +204,7 @@ export const Steps = ({
         ]
       : []),
     {
-      title: 'Optional settings:',
+      title: dw.stepOptionalSettingsTitle,
       children: <OptionalsInputs formFields={form.fields} />,
       status: getOptionalParameterStepStatus(
         form.fields,
@@ -217,35 +212,32 @@ export const Steps = ({
       ),
     },
     {
-      title: 'Run the following commands to download and install the agent:',
+      title: dw.stepInstallCommands,
       children: passwordPermissionMissing ? (
         <EuiCallOut
           color='warning'
-          title='Deployment commands hidden'
+          title={dw.deploymentCommandsHiddenTitle}
           iconType='iInCircle'
         >
-          <p>
-            Missing permissions to read the manager configuration required to
-            view the deployment commands.
-          </p>
+          <p>{dw.deploymentCommandsHiddenBody}</p>
         </EuiCallOut>
       ) : (
         <>
           {missingStepsName?.length ? (
             <EuiCallOut
               color='warning'
-              title={`Please select the ${missingStepsName?.join(
-                FORM_MESSAGE_CONJUNTION,
-              )}.`}
+              title={dw.pleaseSelectSteps(
+                missingStepsName?.join(FORM_MESSAGE_CONJUNCTION),
+              )}
               iconType='iInCircle'
             />
           ) : null}
           {invalidFieldsName?.length ? (
             <EuiCallOut
               color='danger'
-              title={`There are fields with errors. Please verify them: ${invalidFieldsName?.join(
-                FORM_MESSAGE_CONJUNTION,
-              )}.`}
+              title={dw.fieldsWithErrors(
+                invalidFieldsName?.join(FORM_MESSAGE_CONJUNCTION),
+              )}
               iconType='iInCircle'
               style={{ marginTop: '1rem' }}
             />
@@ -269,35 +261,32 @@ export const Steps = ({
       status: installCommandStepStatus,
     },
     {
-      title: 'Start the agent:',
+      title: dw.stepStartAgent,
       children: passwordPermissionMissing ? (
         <EuiCallOut
           color='warning'
-          title='Start command hidden'
+          title={dw.startCommandHiddenTitle}
           iconType='iInCircle'
         >
-          <p>
-            Missing permissions to read the manager configuration required to
-            view the start command.
-          </p>
+          <p>{dw.startCommandHiddenBody}</p>
         </EuiCallOut>
       ) : (
         <>
           {missingStepsName?.length ? (
             <EuiCallOut
               color='warning'
-              title={`Please select the ${missingStepsName?.join(
-                FORM_MESSAGE_CONJUNTION,
-              )}.`}
+              title={dw.pleaseSelectSteps(
+                missingStepsName?.join(FORM_MESSAGE_CONJUNCTION),
+              )}
               iconType='iInCircle'
             />
           ) : null}
           {invalidFieldsName?.length ? (
             <EuiCallOut
               color='danger'
-              title={`There are fields with errors. Please verify them: ${invalidFieldsName?.join(
-                FORM_MESSAGE_CONJUNTION,
-              )}.`}
+              title={dw.fieldsWithErrors(
+                invalidFieldsName?.join(FORM_MESSAGE_CONJUNCTION),
+              )}
               iconType='iInCircle'
               style={{ marginTop: '1rem' }}
             />
@@ -315,7 +304,7 @@ export const Steps = ({
       status: startCommandStepStatus,
     },
     {
-      title: 'Go to endpoints to verify the agent connection:',
+      title: dw.stepVerifyConnection,
       children: (
         <EuiButton
           color='primary'
@@ -326,14 +315,13 @@ export const Steps = ({
               `/${SECTIONS.AGENTS_PREVIEW}`,
             );
           }}
-          // This shows the link preview on hover,
           href={NavigationService.getInstance().getUrlForApp(
             endpointSummary.id,
             { path: `#/${SECTIONS.AGENTS_PREVIEW}` },
           )}
-          aria-label={`Open ${endpointSummary.breadcrumbLabel}`}
+          aria-label={dw.openBreadcrumb(endpointSummary.breadcrumbLabel)}
         >
-          Back to agent list
+          {dw.backToAgentList}
         </EuiButton>
       ),
       status: startCommandStepStatus === 'complete' ? 'current' : 'disabled',

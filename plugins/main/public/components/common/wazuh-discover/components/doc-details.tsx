@@ -6,6 +6,7 @@ import {
   IndexPattern,
 } from '../../../../../../../src/plugins/data/common';
 import { EuiCodeBlock, EuiFlexGroup, EuiTabbedContent } from '@elastic/eui';
+import { wzDiscoverI18n } from '../i18n';
 
 interface DocDetailsProps {
   doc: any;
@@ -33,7 +34,7 @@ const DocDetails = ({
         tabs={[
           {
             id: 'table',
-            name: 'Table',
+            name: wzDiscoverI18n.tableTab,
             content: (
               <>
                 <DocViewer
@@ -46,10 +47,10 @@ const DocDetails = ({
           },
           {
             id: 'json',
-            name: 'JSON',
+            name: wzDiscoverI18n.jsonTab,
             content: (
               <EuiCodeBlock
-                aria-label={'Document details'}
+                aria-label={wzDiscoverI18n.documentDetailsAria}
                 language='json'
                 isCopyable
                 paddingSize='s'

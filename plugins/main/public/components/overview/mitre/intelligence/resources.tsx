@@ -23,6 +23,7 @@ import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrat
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 import { mitreAttack } from '../../../../utils/applications';
 import { WzLink } from '../../../wz-link/wz-link';
+import { mitreI18n, mitreResourceLabels } from '../i18n';
 
 const getMitreAttackIntelligenceSuggestions = async (
   endpoint: string,
@@ -51,7 +52,7 @@ const getMitreAttackIntelligenceSuggestions = async (
       error: {
         error: error,
         message: error.message || error,
-        title: `Error getting suggestions`,
+        title: mitreI18n.errorGettingSuggestions,
       },
     };
     getErrorOrchestrator().handleError(options);
@@ -59,13 +60,14 @@ const getMitreAttackIntelligenceSuggestions = async (
   }
 };
 
-function buildResource(label: string) {
-  const id = label.toLowerCase();
+function buildResource(resourceKey: keyof typeof mitreResourceLabels) {
+  const label = mitreResourceLabels[resourceKey];
+  const id = resourceKey;
   const endpoint: string = `/mitre/${id}`;
   const fieldsMitreAttactResource = [
-    { field: 'description', name: 'description' },
-    { field: 'external_id', name: 'external ID' },
-    { field: 'name', name: 'name' },
+    { field: 'description', name: mitreI18n.fieldDescription },
+    { field: 'external_id', name: mitreI18n.fieldExternalId },
+    { field: 'name', name: mitreI18n.fieldName },
   ];
   return {
     label: label,
@@ -79,7 +81,7 @@ function buildResource(label: string) {
           field(currentValue) {
             return fieldsMitreAttactResource.map(({ field, name }) => ({
               label: field,
-              description: `filter by ${name}`,
+              description: mitreI18n.filterByField(name),
             }));
           },
           value: async (currentValue, { field }) => {
@@ -102,7 +104,7 @@ function buildResource(label: string) {
     tableColumnsCreator: () => [
       {
         field: 'external_id',
-        name: 'ID',
+        name: mitreI18n.id,
         width: '12%',
         render: value => (
           <WzLink
@@ -115,7 +117,7 @@ function buildResource(label: string) {
       },
       {
         field: 'name',
-        name: 'Name',
+        name: mitreI18n.name,
         sortable: true,
         width: '30%',
         render: (value, item) => (
@@ -129,7 +131,7 @@ function buildResource(label: string) {
       },
       {
         field: 'description',
-        name: 'Description',
+        name: mitreI18n.description,
         sortable: true,
         render: value => (value ? <Markdown markdown={value} /> : ''),
         truncateText: true,
@@ -137,25 +139,25 @@ function buildResource(label: string) {
     ],
     mitreFlyoutHeaderProperties: [
       {
-        label: 'ID',
+        label: mitreI18n.id,
         id: 'external_id',
       },
       {
-        label: 'Name',
+        label: mitreI18n.name,
         id: 'name',
       },
       {
-        label: 'Created Time',
+        label: mitreI18n.createdTime,
         id: 'created_time',
         render: value => (value ? formatUIDate(value) : ''),
       },
       {
-        label: 'Modified Time',
+        label: mitreI18n.modifiedTime,
         id: 'modified_time',
         render: value => (value ? formatUIDate(value) : ''),
       },
       {
-        label: 'Version',
+        label: mitreI18n.version,
         id: 'mitre_version',
       },
     ],
@@ -163,9 +165,9 @@ function buildResource(label: string) {
 }
 
 export const MitreAttackResources = [
-  buildResource('Groups'),
-  buildResource('Mitigations'),
-  buildResource('Software'),
-  buildResource('Tactics'),
-  buildResource('Techniques'),
+  buildResource('groups'),
+  buildResource('mitigations'),
+  buildResource('software'),
+  buildResource('tactics'),
+  buildResource('techniques'),
 ];
