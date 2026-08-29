@@ -8,6 +8,7 @@ import {
 import { DataGroupResult } from '../../interfaces/data-group';
 import { TopItem } from '../../interfaces/types';
 import { formatUINumber } from '../../../../../../react-services/format-number';
+import { homeOverviewI18n } from '../../i18n';
 
 export interface ThreatTypeCompositionProps {
   /** Top threat types in the catalog (`document.software.type`), by indicator count. */
@@ -58,8 +59,12 @@ export const ThreatTypeComposition: React.FC<ThreatTypeCompositionProps> = ({
     >
       <DistributionBar
         segments={segments}
-        headline={segments.length > 0 ? 'Top IOCs by threat type' : undefined}
-        emptyMessage='No threat types in the catalog'
+        headline={
+          segments.length > 0
+            ? homeOverviewI18n.topIocsByThreatType
+            : undefined
+        }
+        emptyMessage={homeOverviewI18n.noThreatTypes}
         data-test-subj='threat-catalog-threat-types'
       />
     </WidgetGroupBody>

@@ -1,9 +1,10 @@
 import { createTopNTable } from '../common';
+import { homeOverviewI18n } from '../../i18n';
 
 export const FimTopFilesTable = createTopNTable({
-  keyColumnName: 'Top 5 modified files',
+  keyColumnName: homeOverviewI18n.top5ModifiedFiles,
   // Rows rank by `file.mtime`; the count is the agents monitoring that path.
-  countColumnName: 'Count',
-  noItemsMessage: 'No files or registry objects found',
+  countColumnName: homeOverviewI18n.count,
+  noItemsMessage: homeOverviewI18n.noFilesOrRegistry,
   'data-test-subj': 'fim-top-files-table',
 });

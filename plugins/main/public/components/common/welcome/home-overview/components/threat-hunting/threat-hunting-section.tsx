@@ -22,9 +22,12 @@ import {
   getMitreIntelligenceResourceUrl,
   getMitreUrl,
   getThreatHuntingUrl,
+import {
   getVulnerabilityDetectionBySeverityUrl,
   getVulnerabilityDetectionUrl,
 } from '../../utils/navigation';
+import { mitreAttack, threatHunting, vulnerabilityDetection } from '../../../../../../utils/applications';
+import { homeOverviewI18n } from '../../i18n';
 
 export interface ThreatHuntingSectionProps {
   /** Reuses the Overview on-mount findings search. */
@@ -40,8 +43,8 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
   return (
     <div>
       <SectionHeader
-        title='Threat hunting'
-        description='Hunt for threats, map activity to MITRE ATT&CK, and detect known vulnerabilities.'
+        title={homeOverviewI18n.threatHunting}
+        description={homeOverviewI18n.threatHuntingDescription}
       />
       <EuiFlexGroup wrap responsive={false}>
         <EuiFlexItem>
@@ -54,10 +57,10 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
             isPermissionDenied={findings.error?.kind === 'permission-denied'}
             title={
               <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={getMitreUrl()}>MITRE ATT&amp;CK</EuiLink>
+                <EuiLink href={getMitreUrl()}>{mitreAttack.title}</EuiLink>
               </RedirectAppLinks>
             }
-            caption='Last 24 hours'
+            caption={homeOverviewI18n.last24Hours}
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-techniques'
           >
@@ -67,14 +70,14 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
                   textAlign='center'
                   reverse
                   value={<TabNumber value={findings.data.techniquesCount} />}
-                  label='Techniques observed'
+                  label={homeOverviewI18n.techniquesObserved}
                   data-test-subj='techniques-hero'
                 />
                 <EuiSpacer size='s' />
                 <BarList
-                  title='Top 5 techniques'
+                  title={homeOverviewI18n.top5Techniques}
                   items={findings.data.topTechniques}
-                  emptyMessage='No techniques observed'
+                  emptyMessage={homeOverviewI18n.noTechniques}
                   getHref={item =>
                     getMitreIntelligenceResourceUrl('techniques', item)
                   }
@@ -94,10 +97,12 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
             isPermissionDenied={findings.error?.kind === 'permission-denied'}
             title={
               <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={getThreatHuntingUrl()}>Threat Hunting</EuiLink>
+                <EuiLink href={getThreatHuntingUrl()}>
+                  {threatHunting.title}
+                </EuiLink>
               </RedirectAppLinks>
             }
-            caption='Last 24 hours'
+            caption={homeOverviewI18n.last24Hours}
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-threat-hunting-findings'
           >
@@ -118,7 +123,7 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
                       </EuiLink>
                     </RedirectAppLinks>
                   }
-                  label='Total findings'
+                  label={homeOverviewI18n.totalFindings}
                   data-test-subj='total-findings-hero'
                 />
                 <EuiSpacer size='s' />
@@ -140,11 +145,11 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
             title={
               <RedirectAppLinks application={getCore().application}>
                 <EuiLink href={getVulnerabilityDetectionUrl()}>
-                  Vulnerability Detection
+                  {vulnerabilityDetection.title}
                 </EuiLink>
               </RedirectAppLinks>
             }
-            caption='Current state'
+            caption={homeOverviewI18n.currentState}
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-vulnerabilities'
           >
@@ -159,7 +164,12 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
                       vulnerabilities.indexPatternId,
                     )
                   }
-                  getTooltip={band => `Click to see vulnerabilities: ${band}`}
+                  getTooltip={band =>
+                    homeOverviewI18n.clickToSeeField(
+                      'vulnerabilities',
+                      band,
+                    )
+                  }
                 />
                 <EuiSpacer size='s' />
                 <TopPackagesTable items={vulnerabilities.data.byPackage} />

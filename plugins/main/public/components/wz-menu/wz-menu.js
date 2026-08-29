@@ -41,6 +41,7 @@ import { Selector, SelectorContainer, SelectorLabel } from './selectors';
 import { isEqual } from 'lodash';
 import { WzAuthentication } from '../../react-services/wz-authentication';
 import { fetchManagerApiHostsList } from '../../react-services/manager-api-session-sync';
+import { i18n } from '@osd/i18n';
 
 // =============================================================================
 // Header: Server API selector (only rendered when isCCS)
@@ -229,14 +230,21 @@ export const WzMenu = withWindowSize(
 
     render() {
       const openSelectorsButton = (
-        <EuiToolTip position='bottom' content='Show selectors'>
+        <EuiToolTip
+          position='bottom'
+          content={i18n.translate('wz-menu.showSelectors', {
+            defaultMessage: 'Show selectors',
+          })}
+        >
           <EuiButtonEmpty
             iconType='boxesVertical'
             iconSide='right'
             style={{ position: 'relative', right: 0 }}
             onClick={() => this.switchSelectorsPopOver()}
             size='s'
-            aria-label='Open selectors'
+            aria-label={i18n.translate('wz-menu.openSelectors', {
+              defaultMessage: 'Open selectors',
+            })}
           ></EuiButtonEmpty>
         </EuiToolTip>
       );

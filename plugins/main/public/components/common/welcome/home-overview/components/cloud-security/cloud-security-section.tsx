@@ -5,6 +5,7 @@ import {
   CloudSecurityCards,
   CloudSecurityCardsProps,
 } from './cloud-security-cards';
+import { homeOverviewI18n } from '../../i18n';
 
 export type CloudSecuritySectionProps = CloudSecurityCardsProps;
 
@@ -14,8 +15,8 @@ const CloudSecuritySectionComponent: React.FC<CloudSecuritySectionProps> = ({
 }) => (
   <div>
     <SectionHeader
-      title='Cloud security'
-      description='Reach your cloud and SaaS integrations from the Overview.'
+      title={homeOverviewI18n.cloudSecurity}
+      description={homeOverviewI18n.cloudSecurityDescription}
     />
     <CloudSecurityCards findings={findings} />
   </div>

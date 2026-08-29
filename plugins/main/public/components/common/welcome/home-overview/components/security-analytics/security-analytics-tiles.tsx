@@ -9,6 +9,7 @@ import {
   getKvdbsUrl,
   getRulesUrl,
 } from '../../utils/navigation';
+import { homeOverviewI18n } from '../../i18n';
 
 export interface SecurityAnalyticsTilesProps {
   rules: DataGroupResult<number>;
@@ -22,37 +23,37 @@ export interface SecurityAnalyticsTilesProps {
 const TILES: ReadonlyArray<StatTileSpec<keyof SecurityAnalyticsTilesProps>> = [
   {
     key: 'rules',
-    label: 'Rules',
+    label: homeOverviewI18n.rules,
     testSubj: 'security-analytics-tile-rules',
     onSelect: getRulesUrl,
   },
   {
     key: 'decoders',
-    label: 'Decoders',
+    label: homeOverviewI18n.decoders,
     testSubj: 'security-analytics-tile-decoders',
     onSelect: getDecodersUrl,
   },
   {
     key: 'detectors',
-    label: 'Detectors',
+    label: homeOverviewI18n.detectors,
     testSubj: 'security-analytics-tile-detectors',
     onSelect: getDetectorsUrl,
   },
   {
     key: 'integrations',
-    label: 'Integrations',
+    label: homeOverviewI18n.integrations,
     testSubj: 'security-analytics-tile-integrations',
     onSelect: getIntegrationsUrl,
   },
   {
     key: 'kvdbs',
-    label: 'KVDBs',
+    label: homeOverviewI18n.kvdbs,
     testSubj: 'security-analytics-tile-kvdbs',
     onSelect: getKvdbsUrl,
   },
   {
     key: 'filters',
-    label: 'Filters',
+    label: homeOverviewI18n.filters,
     testSubj: 'security-analytics-tile-filters',
     onSelect: getFiltersUrl,
   },

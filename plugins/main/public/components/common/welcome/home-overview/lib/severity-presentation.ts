@@ -1,4 +1,5 @@
 import { SeverityBand } from '../interfaces/types';
+import { i18n } from '@osd/i18n';
 import { HOME_OVERVIEW_COLOR, HOME_OVERVIEW_TEXT_COLOR } from './theme-colors';
 
 export interface SeverityPresentation {
@@ -15,15 +16,37 @@ export interface SeverityPresentation {
 export const SEVERITY_PRESENTATION: SeverityPresentation[] = [
   {
     band: 'critical',
-    label: 'Critical',
+    label: i18n.translate('wazuh.homeOverview.severity.critical', {
+      defaultMessage: 'Critical',
+    }),
     color: HOME_OVERVIEW_COLOR.danger,
   },
-  { band: 'high', label: 'High', color: HOME_OVERVIEW_COLOR.warning },
-  { band: 'medium', label: 'Medium', color: HOME_OVERVIEW_COLOR.info },
-  { band: 'low', label: 'Low', color: HOME_OVERVIEW_COLOR.success },
+  {
+    band: 'high',
+    label: i18n.translate('wazuh.homeOverview.severity.high', {
+      defaultMessage: 'High',
+    }),
+    color: HOME_OVERVIEW_COLOR.warning,
+  },
+  {
+    band: 'medium',
+    label: i18n.translate('wazuh.homeOverview.severity.medium', {
+      defaultMessage: 'Medium',
+    }),
+    color: HOME_OVERVIEW_COLOR.info,
+  },
+  {
+    band: 'low',
+    label: i18n.translate('wazuh.homeOverview.severity.low', {
+      defaultMessage: 'Low',
+    }),
+    color: HOME_OVERVIEW_COLOR.success,
+  },
   {
     band: 'informational',
-    label: 'Informational',
+    label: i18n.translate('wazuh.homeOverview.severity.informational', {
+      defaultMessage: 'Informational',
+    }),
     color: HOME_OVERVIEW_TEXT_COLOR.text,
   },
 ];

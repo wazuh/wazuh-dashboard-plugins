@@ -17,6 +17,7 @@ import {
 import { useInViewport } from '../../hooks';
 import { withErrorBoundary, withGlobalBreadcrumb } from '../../hocs';
 import { overview } from '../../../../utils/applications';
+import { homeOverviewI18n } from './i18n';
 
 /**
  * Searches feeding more than one section run once here: findings on mount, the
@@ -37,8 +38,8 @@ const HomeOverviewBody: React.FC = () => {
   return (
     <>
       <SectionHeader
-        title='Overview'
-        description='Fleet health, findings, and MITRE ATT&CK activity across your environment.'
+        title={homeOverviewI18n.overviewTitle}
+        description={homeOverviewI18n.overviewDescription}
         actions={<QuickAccessMenu />}
       />
       <OverviewSection findings={findings} />

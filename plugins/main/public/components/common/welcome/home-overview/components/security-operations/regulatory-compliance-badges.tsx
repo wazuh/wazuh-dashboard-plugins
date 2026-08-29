@@ -16,6 +16,7 @@ import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensea
 import { formatValueSafely } from '../common';
 import { DataGroupResult } from '../../interfaces/data-group';
 import { CountsByKey } from '../../interfaces/types';
+import { homeOverviewI18n } from '../../i18n';
 
 const FRAMEWORK_IDS = Object.keys(
   COMPLIANCE_FRAMEWORK_FIELDS,
@@ -67,7 +68,7 @@ export const RegulatoryComplianceBadges: React.FC<
                     <EuiFlexItem grow={false}>
                       <EuiToolTip
                         position='top'
-                        content='Distinct controls implicated, last 24 hours'
+                        content={homeOverviewI18n.controlsImplicatedTooltip}
                       >
                         <EuiNotificationBadge
                           color={count ? 'accent' : 'subdued'}

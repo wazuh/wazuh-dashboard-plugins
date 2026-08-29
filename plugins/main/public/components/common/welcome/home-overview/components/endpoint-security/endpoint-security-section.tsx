@@ -28,6 +28,8 @@ import { DataGroupResult } from '../../interfaces/data-group';
 import { ThreatIntelEnrichments, TopItem } from '../../interfaces/types';
 import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { configurationAssessment, fileIntegrityMonitoring } from '../../../../../../utils/applications';
+import { homeOverviewI18n } from '../../i18n';
 
 export interface EndpointSecuritySectionProps {
   /** Malware Detection's IOC-match hero rides the shared findings search. */
@@ -58,8 +60,8 @@ const EndpointSecuritySectionComponent: React.FC<
   return (
     <div ref={sectionRef}>
       <SectionHeader
-        title='Endpoint security'
-        description='Harden configurations, detect malware, and monitor file integrity across your fleet.'
+        title={homeOverviewI18n.endpointSecurity}
+        description={homeOverviewI18n.endpointSecurityDescription}
       />
       <EuiFlexGroup wrap responsive={false}>
         <EuiFlexItem>
@@ -73,11 +75,11 @@ const EndpointSecuritySectionComponent: React.FC<
             title={
               <RedirectAppLinks application={getCore().application}>
                 <EuiLink href={getConfigurationAssessmentUrl()}>
-                  Configuration Assessment
+                  {configurationAssessment.title}
                 </EuiLink>
               </RedirectAppLinks>
             }
-            caption='Current state'
+            caption={homeOverviewI18n.currentState}
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-sca'
           >
@@ -89,13 +91,13 @@ const EndpointSecuritySectionComponent: React.FC<
                 />
                 <EuiSpacer size='m' />
                 <ScoreGauge
-                  title='Overall score'
+                  title={homeOverviewI18n.overallScore}
                   score={sca.data.tiles.score}
                   data-test-subj='sca-score-gauge'
                 />
                 <EuiSpacer size='m' />
                 <DualBarList
-                  title='Top 5 benchmarks'
+                  title={homeOverviewI18n.top5Benchmarks}
                   items={sca.data.benchmarks.map(benchmark => ({
                     key: benchmark.name,
                     label: benchmark.name,
@@ -103,7 +105,7 @@ const EndpointSecuritySectionComponent: React.FC<
                     failed: benchmark.failed,
                     score: benchmark.score,
                   }))}
-                  emptyMessage='No SCA benchmarks found'
+                  emptyMessage={homeOverviewI18n.noScaBenchmarks}
                   data-test-subj='sca-benchmarks'
                 />
               </>
@@ -121,11 +123,11 @@ const EndpointSecuritySectionComponent: React.FC<
             title={
               <RedirectAppLinks application={getCore().application}>
                 <EuiLink href={getFileIntegrityMonitoringUrl()}>
-                  File Integrity Monitoring
+                  {fileIntegrityMonitoring.title}
                 </EuiLink>
               </RedirectAppLinks>
             }
-            caption='Current state'
+            caption={homeOverviewI18n.currentState}
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-fim'
           >
@@ -144,7 +146,7 @@ const EndpointSecuritySectionComponent: React.FC<
                       </EuiLink>
                     </RedirectAppLinks>
                   }
-                  label='File integrity baselined fleet-wide'
+                  label={homeOverviewI18n.fileIntegrityBaselined}
                   reverse
                   textAlign='center'
                   data-test-subj='fim-hero'

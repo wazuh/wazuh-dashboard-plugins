@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { i18n } from '@osd/i18n';
 import { getCore } from '../../../../kibana-services';
 import { PatternDataSourceFilterManager } from '../../data-source';
 import { withWrapComponent } from '../../hocs';
@@ -70,7 +71,9 @@ export const WazuhFlyoutDiscoverNewFilterManagerRecentEvents =
                 target='_blank'
                 rel='noopener noreferrer'
               >
-                Explore events
+                {i18n.translate('wz-recent-events.exploreEvents', {
+                  defaultMessage: 'Explore events',
+                })}
               </EuiLink>
             </EuiFlexItem>
           </EuiFlexGroup>

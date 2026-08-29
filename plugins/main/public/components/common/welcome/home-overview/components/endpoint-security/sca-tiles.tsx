@@ -7,6 +7,7 @@ import { ScaTilesData } from '../../interfaces/types';
 import { HOME_OVERVIEW_COLOR } from '../../lib/theme-colors';
 import { getConfigurationAssessmentByStatusUrl } from '../../utils/navigation';
 import { CheckResult } from '../../../../../overview/sca/utils/constants';
+import { homeOverviewI18n } from '../../i18n';
 
 export interface ScaTilesProps {
   tiles: ScaTilesData;
@@ -25,14 +26,14 @@ interface ScaTileDef {
 const TILES: ScaTileDef[] = [
   {
     key: 'passed',
-    label: 'Passed',
+    label: homeOverviewI18n.passed,
     color: HOME_OVERVIEW_COLOR.success,
     status: CheckResult.Passed,
     testSubj: 'sca-tile-passed',
   },
   {
     key: 'failed',
-    label: 'Failed',
+    label: homeOverviewI18n.failed,
     color: HOME_OVERVIEW_COLOR.failed,
     status: CheckResult.Failed,
     testSubj: 'sca-tile-failed',

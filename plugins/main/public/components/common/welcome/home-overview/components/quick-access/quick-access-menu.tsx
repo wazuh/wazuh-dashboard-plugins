@@ -26,6 +26,7 @@ import {
   getFiltersUrl,
   getAiAssistantUrl,
 } from '../../utils/navigation';
+import { homeOverviewI18n } from '../../i18n';
 
 interface QuickAccessItem {
   id: string;
@@ -79,16 +80,16 @@ const getDataDrivenGroups = (): QuickAccessGroup[] =>
  */
 const SECURITY_ANALYTICS_GROUP: QuickAccessGroup = {
   id: 'security-analytics',
-  label: 'Security analytics',
+  label: homeOverviewI18n.securityAnalytics,
   icon: 'securityAnalyticsApp',
   order: 550,
   items: [
-    { id: 'rules', title: 'Rules', getHref: getRulesUrl },
-    { id: 'decoders', title: 'Decoders', getHref: getDecodersUrl },
-    { id: 'detectors', title: 'Detectors', getHref: getDetectorsUrl },
-    { id: 'integrations', title: 'Integrations', getHref: getIntegrationsUrl },
-    { id: 'kvdbs', title: 'KVDBs', getHref: getKvdbsUrl },
-    { id: 'filters', title: 'Filters', getHref: getFiltersUrl },
+    { id: 'rules', title: homeOverviewI18n.rules, getHref: getRulesUrl },
+    { id: 'decoders', title: homeOverviewI18n.decoders, getHref: getDecodersUrl },
+    { id: 'detectors', title: homeOverviewI18n.detectors, getHref: getDetectorsUrl },
+    { id: 'integrations', title: homeOverviewI18n.integrations, getHref: getIntegrationsUrl },
+    { id: 'kvdbs', title: homeOverviewI18n.kvdbs, getHref: getKvdbsUrl },
+    { id: 'filters', title: homeOverviewI18n.filters, getHref: getFiltersUrl },
   ],
 };
 
@@ -112,7 +113,7 @@ export const QuickAccessMenu: React.FC = () => {
           onClick={() => setIsOpen(open => !open)}
           data-test-subj='quick-access-menu-button'
         >
-          Quick access
+          {homeOverviewI18n.quickAccess}
         </EuiButtonEmpty>
       }
       isOpen={isOpen}
@@ -131,7 +132,7 @@ export const QuickAccessMenu: React.FC = () => {
               justifyContent='spaceBetween'
               responsive={false}
             >
-              <EuiFlexItem grow={false}>Quick access</EuiFlexItem>
+              <EuiFlexItem grow={false}>{homeOverviewI18n.quickAccess}</EuiFlexItem>
               <EuiFlexItem grow={false}>
                 {/*
                  * Home's entry point to the AI Assistant, which lives in the separate
