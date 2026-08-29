@@ -1,11 +1,12 @@
 import { DashboardPanelState } from '../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../src/plugins/embeddable/public';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
+import { wzDiscoverI18n } from '../i18n';
 
 const hitsHistogram = (indexPatternId: string) => {
   return {
     id: 'events_histogram',
-    title: 'Events histogram',
+    title: wzDiscoverI18n.eventsHistogram,
     type: 'horizontal_bar',
     params: {
       type: 'histogram',
@@ -34,7 +35,7 @@ const hitsHistogram = (indexPatternId: string) => {
           style: {},
           scale: { type: 'linear', mode: 'normal' },
           labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-          title: { text: 'Count' },
+          title: { text: wzDiscoverI18n.count },
         },
       ],
       seriesParams: [
@@ -43,7 +44,7 @@ const hitsHistogram = (indexPatternId: string) => {
           type: 'histogram',
           mode: 'stacked',
           data: {
-            label: 'Count',
+            label: wzDiscoverI18n.count,
             id: '1',
           },
           valueAxis: 'ValueAxis-1',
@@ -147,8 +148,8 @@ export const histogramChartInput = (
     from: dateRangeFrom,
     to: dateRangeTo,
   },
-  title: 'Discover Events Histogram',
-  description: 'Histogram of events by date',
+  title: wzDiscoverI18n.discoverEventsHistogram,
+  description: wzDiscoverI18n.histogramDescription,
   query: query,
   refreshConfig: {
     pause: false,

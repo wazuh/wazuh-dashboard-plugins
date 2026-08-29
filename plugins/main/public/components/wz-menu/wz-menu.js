@@ -41,6 +41,8 @@ import { Selector, SelectorContainer, SelectorLabel } from './selectors';
 import { isEqual } from 'lodash';
 import { WzAuthentication } from '../../react-services/wz-authentication';
 import { fetchManagerApiHostsList } from '../../react-services/manager-api-session-sync';
+import { i18n } from '@osd/i18n';
+import { wzMenuI18n } from './i18n';
 
 // =============================================================================
 // Header: Server API selector (only rendered when isCCS)
@@ -59,7 +61,7 @@ const ServerAPISelector = ({ showSelectorsInPopover }) => {
   const notSelected = !Boolean(currentAPI);
   const actionError =
     action.error?.message ||
-    (!action.running && notSelected && 'Server API is not selected');
+    (!action.running && notSelected && wzMenuI18n.serverApiNotSelected);
 
   const isInvalid = Boolean(actionError);
 
@@ -107,7 +109,7 @@ const ServerAPISelector = ({ showSelectorsInPopover }) => {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error changing the selected API`,
+          title: wzMenuI18n.errorChangingApi,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -121,7 +123,7 @@ const ServerAPISelector = ({ showSelectorsInPopover }) => {
           actionError={actionError}
           showSelectorsInPopover={showSelectorsInPopover}
         >
-          Manager API
+          {wzMenuI18n.managerApi}
         </SelectorLabel>
         <Selector showSelectorsInPopover={showSelectorsInPopover}>
           <div style={style}>
@@ -135,7 +137,7 @@ const ServerAPISelector = ({ showSelectorsInPopover }) => {
               }
               value={currentAPI?.id}
               onChange={changeAPI}
-              aria-label='API selector'
+              aria-label={wzMenuI18n.apiSelector}
               hasNoInitialSelection={notSelected}
               isInvalid={isInvalid}
               append={
@@ -200,7 +202,9 @@ export const WzMenu = withWindowSize(
               <p></p>
             </EuiFlexItem>
             {typeof this.props.state.wazuhNotReadyYet === 'string' &&
-              this.props.state.wazuhNotReadyYet.includes('Restarting') && (
+              this.props.state.wazuhNotReadyYet.startsWith(
+                wzMenuI18n.restartingPrefix,
+              ) && (
                 <EuiFlexItem grow={false}>
                   <p>
                     {' '}
@@ -209,15 +213,15 @@ export const WzMenu = withWindowSize(
                 </EuiFlexItem>
               )}
             {this.props.state.wazuhNotReadyYet ===
-              'Server could not be recovered.' && (
+              wzMenuI18n.serverCouldNotRecover && (
               <EuiFlexItem grow={false}>
                 <EuiButtonEmpty
                   grow={false}
                   onClick={() => NavigationService.getInstance().reload()}
                   className='WzNotReadyButton'
-                  aria-label='Reload'
+                  aria-label={wzMenuI18n.reload}
                 >
-                  <span> Reload </span>
+                  <span> {wzMenuI18n.reload} </span>
                 </EuiButtonEmpty>
               </EuiFlexItem>
             )}
@@ -229,14 +233,21 @@ export const WzMenu = withWindowSize(
 
     render() {
       const openSelectorsButton = (
-        <EuiToolTip position='bottom' content='Show selectors'>
+        <EuiToolTip
+          position='bottom'
+          content={i18n.translate('wz-menu.showSelectors', {
+            defaultMessage: 'Show selectors',
+          })}
+        >
           <EuiButtonEmpty
             iconType='boxesVertical'
             iconSide='right'
             style={{ position: 'relative', right: 0 }}
             onClick={() => this.switchSelectorsPopOver()}
             size='s'
-            aria-label='Open selectors'
+            aria-label={i18n.translate('wz-menu.openSelectors', {
+              defaultMessage: 'Open selectors',
+            })}
           ></EuiButtonEmpty>
         </EuiToolTip>
       );

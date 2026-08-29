@@ -5,6 +5,7 @@ import {
   PatternDataSourceFilterManager,
 } from '../../../../common/data-source';
 import { Filter } from '../../../../../../../../src/plugins/data/common';
+import { vulnerabilitiesI18n } from '../../i18n';
 
 type VulsEvaluatedFilterProps = {
   setValue: (underEvaluation: boolean | null) => void;
@@ -42,12 +43,12 @@ const VulsEvaluationFilter = ({
   const toggleButtons = [
     {
       id: 'evaluated',
-      label: 'Evaluated',
+      label: vulnerabilitiesI18n.evaluated,
       className: 'keep-for-report',
     },
     {
       id: 'underEvaluation',
-      label: 'Under evaluation',
+      label: vulnerabilitiesI18n.underEvaluation,
       className: 'keep-for-report',
     },
   ];

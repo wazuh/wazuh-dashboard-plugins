@@ -5,5 +5,7 @@
     "exclude": [
     ],
     "translations": [
+      "translations/en-US.json",
+      "translations/ru-RU.json"
     ]
   }

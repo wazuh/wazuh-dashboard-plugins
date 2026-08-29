@@ -31,6 +31,7 @@ import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selec
 import { withDataSourceFetch } from '../../../hocs';
 import { FIMDataSourceRepository, FIMDataSource } from '../../../data-source';
 import { formatUIDate } from '../../../../../react-services';
+import { homeOverviewI18n } from '../../home-overview/i18n';
 
 export function FimEventsTable({ agent }) {
   return (
@@ -39,10 +40,10 @@ export function FimEventsTable({ agent }) {
         <EuiFlexItem>
           <EuiFlexGroup responsive={false}>
             <EuiFlexItem>
-              <Typography level='section'>FIM: Recent files</Typography>
+              <Typography level='section'>{homeOverviewI18n.fimRecentFiles}</Typography>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
-              <EuiToolTip position='top' content='Open FIM'>
+              <EuiToolTip position='top' content={homeOverviewI18n.openFim}>
                 <RedirectAppLinks application={getCore().application}>
                   <EuiButtonIcon
                     iconType='popout'
@@ -51,7 +52,7 @@ export function FimEventsTable({ agent }) {
                     href={NavigationService.getInstance().getAppURL(
                       fileIntegrityMonitoring.id,
                     )}
-                    aria-label='Open FIM'
+                    aria-label={homeOverviewI18n.openFim}
                   />
                 </RedirectAppLinks>
               </EuiToolTip>
@@ -118,7 +119,7 @@ const FimTableDataSource = withDataSourceFetch({
       sorting={{ sort }}
       onChange={e => setSort(e.sort)}
       itemId='fim-alerts'
-      noItemsMessage='No recent documents'
+      noItemsMessage={homeOverviewI18n.fimNoRecentDocuments}
     />
   );
 });
@@ -148,25 +149,25 @@ function navigateToFim(agent) {
 const columns = [
   {
     field: '_source.file.mtime',
-    name: 'Modified time',
+    name: homeOverviewI18n.fimModifiedTime,
     sortable: true,
     width: '300px',
     render: formatUIDate,
   },
   {
     field: '_source.file.path',
-    name: 'File path',
+    name: homeOverviewI18n.fimFilePath,
     sortable: true,
     truncateText: true,
   },
   {
     field: '_source.file.owner',
-    name: 'File owner',
+    name: homeOverviewI18n.fimFileOwner,
     sortable: true,
   },
   {
     field: '_source.file.uid',
-    name: 'File user ID',
+    name: homeOverviewI18n.fimFileUserId,
     sortable: true,
     truncateText: true,
   },

@@ -8,11 +8,12 @@ import {
 } from '../common';
 import {
   API_NAME_AGENT_STATUS,
-  UI_LABEL_NAME_AGENT_STATUS,
   UI_ORDER_AGENT_STATUS,
 } from '../../../../../../../common/constants';
 import { WzButtonPermissions } from '../../../../permissions/button';
 import { HOME_OVERVIEW_AGENT_STATUS_COLOR } from '../../lib/theme-colors';
+import { agentStatusLabel, homeOverviewI18n } from '../../i18n';
+import { FormattedMessage } from '@osd/i18n/react';
 
 type AgentStatusName =
   (typeof API_NAME_AGENT_STATUS)[keyof typeof API_NAME_AGENT_STATUS];
@@ -42,9 +43,9 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
       <EuiEmptyPrompt
         body={
           <p>
-            This instance has no agents registered.
+            {homeOverviewI18n.noAgentsBody}
             <br />
-            Please deploy agents to begin monitoring your endpoints.
+            {homeOverviewI18n.noAgentsHint}
           </p>
         }
         actions={
@@ -56,7 +57,7 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
             href={deployAgentUrl}
             data-test-subj='agents-by-status-deploy'
           >
-            Deploy new agent
+            {homeOverviewI18n.deployNewAgent}
           </WzButtonPermissions>
         }
       />
@@ -66,7 +67,7 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
   const segments: DistributionBarSegment[] = UI_ORDER_AGENT_STATUS.map(
     status => ({
       key: status,
-      label: UI_LABEL_NAME_AGENT_STATUS[status],
+      label: agentStatusLabel(status),
       count: data[COUNT_BY_STATUS[status]] ?? 0,
       color: HOME_OVERVIEW_AGENT_STATUS_COLOR[status],
       onClick: onStatusSelect ? () => onStatusSelect(status) : undefined,
@@ -78,10 +79,22 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
       segments={segments}
       headline={
         <EuiText size='s'>
-          <strong className='tab-num'>{formatValueSafely(data.active)}</strong>{' '}
-          of{' '}
-          <strong className='tab-num'>{formatValueSafely(data.total)}</strong>{' '}
-          agents active
+          <FormattedMessage
+            id='wazuh.homeOverview.agentsByStatus.activeHeadline'
+            defaultMessage='{active} of {total} agents active'
+            values={{
+              active: (
+                <strong className='tab-num'>
+                  {formatValueSafely(data.active)}
+                </strong>
+              ),
+              total: (
+                <strong className='tab-num'>
+                  {formatValueSafely(data.total)}
+                </strong>
+              ),
+            }}
+          />
         </EuiText>
       }
       data-test-subj='agents-by-status'

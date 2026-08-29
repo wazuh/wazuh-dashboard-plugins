@@ -11,6 +11,9 @@ import { OPERATING_SYSTEMS_OPTIONS } from '../../../utils/register-agent-data';
 import { CheckboxGroupComponent } from '../checkbox-group/checkbox-group';
 import './os-card.scss';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { endpointsSummaryI18n } from '../../../../i18n';
+
+const dw = endpointsSummaryI18n.deployWizard;
 
 interface Props {
   setStatusCheck: string;
@@ -54,7 +57,7 @@ export const OsCard = ({ onChange, value }: Props) => {
         iconType='iInCircle'
         title={
           <span>
-            For additional systems and architectures, please check our{' '}
+            {dw.additionalSystemsPrefix}{' '}
             <EuiLink
               target='_blank'
               href={webDocumentationLink(
@@ -62,7 +65,7 @@ export const OsCard = ({ onChange, value }: Props) => {
               )}
               rel='noopener noreferrer'
             >
-              documentation
+              {dw.documentation}
             </EuiLink>
             .
           </span>

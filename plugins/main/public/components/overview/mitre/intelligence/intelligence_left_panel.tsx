@@ -15,6 +15,7 @@ import React from 'react';
 import { WzFieldSearchDelay } from '../../../../components/common/search';
 import { MitreAttackResources } from './resources';
 import { ModuleMitreAttackIntelligenceResourceButton } from './resource_button';
+import { mitreI18n } from '../i18n';
 
 export const ModuleMitreAttackIntelligenceLeftPanel = ({
   onSelectResource,
@@ -28,11 +29,11 @@ export const ModuleMitreAttackIntelligenceLeftPanel = ({
         <WzFieldSearchDelay
           delay={1000}
           fullWidth
-          placeholder='Search in all resources'
+          placeholder={mitreI18n.searchAllResources}
           onChange={onSearchTermAllResourcesChange}
           onSearch={onSearchTermAllResourcesSearch}
           isClearable
-          aria-label='Search in all resources'
+          aria-label={mitreI18n.searchAllResources}
         />
       </div>
       {MitreAttackResources.map(resource => (

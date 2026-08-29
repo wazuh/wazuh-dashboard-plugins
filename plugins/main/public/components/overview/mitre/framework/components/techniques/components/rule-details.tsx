@@ -14,6 +14,7 @@ import WzTextWithTooltipTruncated from '../../../../../../common/wz-text-with-to
 import { RedirectAppLinks } from '../../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { getCore } from '../../../../../../../kibana-services';
 import { rules } from '../../../../../../../utils/applications';
+import { mitreI18n } from '../../../../../i18n';
 
 type Props = {
   data: any;
@@ -252,16 +253,16 @@ const RuleDetails = (props: Props) => {
     return (
       <EuiFlexGrid columns={4}>
         <EuiFlexItem key='id' grow={1}>
-          <b style={{ paddingBottom: 6 }}>ID</b>
-          <EuiToolTip position='top' content={`Filter by this rule ID: ${id}`}>
+          <b style={{ paddingBottom: 6 }}>{mitreI18n.id}</b>
+          <EuiToolTip position='top' content={mitreI18n.filterByRuleId(id)}>
             <EuiLink onClick={() => addFilter({ 'wazuh.rule.id': id })}>
               {id}
             </EuiLink>
           </EuiToolTip>
         </EuiFlexItem>
         <EuiFlexItem key='level' grow={1}>
-          <b style={{ paddingBottom: 6 }}>Level</b>
-          <EuiToolTip position='top' content={`Filter by this level: ${level}`}>
+          <b style={{ paddingBottom: 6 }}>{mitreI18n.columnLevel}</b>
+          <EuiToolTip position='top' content={mitreI18n.filterByLevel(level)}>
             <EuiLink
               onClick={async () => addFilter({ 'wazuh.rule.level': level })}
             >
@@ -270,15 +271,15 @@ const RuleDetails = (props: Props) => {
           </EuiToolTip>
         </EuiFlexItem>
         <EuiFlexItem key='file' grow={1}>
-          <b style={{ paddingBottom: 6 }}>File</b>
+          <b style={{ paddingBottom: 6 }}>{mitreI18n.file}</b>
           {file}
         </EuiFlexItem>
         <EuiFlexItem key='path' grow={1}>
-          <b style={{ paddingBottom: 6 }}>Path</b>
+          <b style={{ paddingBottom: 6 }}>{mitreI18n.path}</b>
           {path}
         </EuiFlexItem>
         <EuiFlexItem key='Groups' grow={1}>
-          <b style={{ paddingBottom: 6 }}>Groups</b>
+          <b style={{ paddingBottom: 6 }}>{mitreI18n.groups}</b>
           {renderGroups(groups)}
         </EuiFlexItem>
       </EuiFlexGrid>
@@ -292,7 +293,7 @@ const RuleDetails = (props: Props) => {
           id='Info'
           buttonContent={
             <EuiTitle size='s'>
-              <h3>Information</h3>
+              <h3>{mitreI18n.information}</h3>
             </EuiTitle>
           }
           extraAction={
@@ -304,7 +305,7 @@ const RuleDetails = (props: Props) => {
                 href={`${rules.id}#/manager/?tab=rules&redirectRule=${id}`}
               >
                 <EuiIcon type='popout' color='primary' />
-                &nbsp; View in Rules
+                &nbsp; {mitreI18n.viewInRules}
               </EuiLink>
             </RedirectAppLinks>
           }
@@ -320,7 +321,7 @@ const RuleDetails = (props: Props) => {
           id='Details'
           buttonContent={
             <EuiTitle size='s'>
-              <h3>Details</h3>
+              <h3>{mitreI18n.details}</h3>
             </EuiTitle>
           }
           initialIsOpen={true}
@@ -333,7 +334,7 @@ const RuleDetails = (props: Props) => {
           id='Compliance'
           buttonContent={
             <EuiTitle size='s'>
-              <h3>Compliance</h3>
+              <h3>{mitreI18n.compliance}</h3>
             </EuiTitle>
           }
           initialIsOpen={true}

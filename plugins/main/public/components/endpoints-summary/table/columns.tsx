@@ -15,6 +15,7 @@ import { Agent } from '../types';
 import WzIconSVG from '../../common/icons/wz-icon-svg';
 import { getAgentOSType } from '../../../react-services';
 import { isVersionLower } from './utils';
+import { endpointsSummaryI18n } from '../i18n';
 
 type SetModalIsVisible = (visible: boolean) => void;
 
@@ -37,28 +38,28 @@ export const agentsTableColumns = (
 ) => [
   {
     field: 'id',
-    name: 'ID',
+    name: endpointsSummaryI18n.columnId,
     sortable: true,
     show: true,
     searchable: true,
   },
   {
     field: 'name',
-    name: 'Name',
+    name: endpointsSummaryI18n.columnName,
     sortable: true,
     show: true,
     searchable: true,
   },
   {
     field: 'ip',
-    name: 'IP address',
+    name: endpointsSummaryI18n.columnIpAddress,
     sortable: true,
     show: true,
     searchable: true,
   },
   {
     field: 'group',
-    name: 'Group(s)',
+    name: endpointsSummaryI18n.columnGroups,
     sortable: true,
     show: true,
     render: groups => renderGroups(groups, setFilters),
@@ -67,7 +68,7 @@ export const agentsTableColumns = (
   {
     field: 'os.name,os.version',
     composeField: ['os.name', 'os.version'],
-    name: 'Operating system',
+    name: endpointsSummaryI18n.columnOperatingSystem,
     sortable: true,
     show: true,
     render: (field: any, agentData: Agent) => addIconPlatformRender(agentData),
@@ -75,7 +76,7 @@ export const agentsTableColumns = (
   },
   {
     field: 'version',
-    name: 'Version',
+    name: endpointsSummaryI18n.columnVersion,
     sortable: true,
     show: true,
     searchable: true,
@@ -92,7 +93,7 @@ export const agentsTableColumns = (
           <EuiFlexItem grow={false}>{version}</EuiFlexItem>
           {isOutdated ? (
             <EuiFlexItem grow={false}>
-              <EuiToolTip content={<p>Outdated</p>}>
+              <EuiToolTip content={<p>{endpointsSummaryI18n.outdated}</p>}>
                 <EuiHealth className='wz-flex' color='danger'></EuiHealth>
               </EuiToolTip>
             </EuiFlexItem>
@@ -105,9 +106,9 @@ export const agentsTableColumns = (
     field: 'dateAdd',
     name: (
       <span>
-        Registration date{' '}
+        {endpointsSummaryI18n.columnRegistrationDate}{' '}
         <EuiIconTip
-          content='This is not searchable through a search term.'
+          content={endpointsSummaryI18n.notSearchableTip}
           size='s'
           color='subdued'
           type='alert'
@@ -123,9 +124,9 @@ export const agentsTableColumns = (
     field: 'lastKeepAlive',
     name: (
       <span>
-        Last keep alive{' '}
+        {endpointsSummaryI18n.columnLastKeepAlive}{' '}
         <EuiIconTip
-          content='This is not searchable through a search term.'
+          content={endpointsSummaryI18n.notSearchableTip}
           size='s'
           color='subdued'
           type='alert'
@@ -139,7 +140,7 @@ export const agentsTableColumns = (
   },
   {
     field: 'status',
-    name: 'Status',
+    name: endpointsSummaryI18n.columnStatus,
     truncateText: true,
     sortable: true,
     show: true,
@@ -156,11 +157,9 @@ export const agentsTableColumns = (
         {pendingUpgradeAgentIds.has(agent.id) ? (
           <EuiFlexItem grow={false}>
             <EuiToolTip
-              content={
-                <p>Upgrade request sent. This may take a few minutes.</p>
-              }
+              content={<p>{endpointsSummaryI18n.upgradePendingTip}</p>}
             >
-              <EuiBadge color='primary'>Upgrading</EuiBadge>
+              <EuiBadge color='primary'>{endpointsSummaryI18n.upgrading}</EuiBadge>
             </EuiToolTip>
           </EuiFlexItem>
         ) : null}
@@ -169,7 +168,7 @@ export const agentsTableColumns = (
   },
   {
     field: 'actions',
-    name: 'Actions',
+    name: endpointsSummaryI18n.columnActions,
     show: true,
     actions: agentsTableActions(
       setAgent,
@@ -206,7 +205,7 @@ const renderGroups = (groups: string[], setFilters: any) => {
     <GroupTruncate
       groups={groups}
       length={25}
-      label={'more'}
+      label={endpointsSummaryI18n.moreGroups}
       action={'filter'}
       filterAction={group => filterGroupBadge(group, setFilters)}
     />

@@ -10,20 +10,17 @@ import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
 import { HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES } from '../../../../../common/constants';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
 import { withHealthCheckChecks } from '../../../common/hocs';
+import { scaI18n } from '../../i18n';
 
 export const PromptSCAIndexPatternMissing = ({ refresh }) => (
   <EuiEmptyPrompt
     iconType='alert'
-    title={<h2>Configuration Assessment could be disabled or has a problem</h2>}
+    title={<h2>{scaI18n.indexPatternMissingTitle}</h2>}
     body={
       <>
+        <p>{scaI18n.indexPatternMissingBody}</p>
         <p>
-          If this is enabled, then this could be caused by an error in: server
-          side, server-indexer connection or indexer side. Review the server and
-          indexer logs.
-        </p>
-        <p>
-          Also, you can check the{' '}
+          {scaI18n.indexPatternMissingDocsIntro}{' '}
           <EuiLink
             href={webDocumentationLink(
               'user-manual/capabilities/sec-config-assessment/index.html',
@@ -32,14 +29,14 @@ export const PromptSCAIndexPatternMissing = ({ refresh }) => (
             rel='noopener noreferrer'
             external
           >
-            configuration assessment documentation.
+            {scaI18n.indexPatternMissingDocs}
           </EuiLink>
         </p>
       </>
     }
     actions={
       <EuiButton color='primary' fill onClick={refresh}>
-        Refresh
+        {scaI18n.refresh}
       </EuiButton>
     }
   />

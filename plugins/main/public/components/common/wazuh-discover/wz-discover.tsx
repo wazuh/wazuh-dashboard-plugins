@@ -55,6 +55,7 @@ import { useDocumentMutationSync } from './use-document-mutation-sync';
 import { tDataGridColumn } from '../data-grid/types';
 import { SampleDataWarning } from '../../visualize/components';
 import { UnsavedChangesGuardedFlyout } from '../unsaved-changes-guard';
+import { wzDiscoverI18n } from './i18n';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
@@ -125,7 +126,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   const DocViewInspectButton = ({
     rowIndex,
   }: EuiDataGridCellValueElementProps) => {
-    const inspectHintMsg = 'Inspect document details';
+    const inspectHintMsg = wzDiscoverI18n.inspectDocumentDetails;
     return (
       <EuiToolTip content={inspectHintMsg}>
         <EuiButtonIcon
@@ -149,7 +150,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   );
   const dataGridProps = useDataGrid({
     moduleId,
-    ariaLabelledBy: 'Discover events table',
+    ariaLabelledBy: wzDiscoverI18n.discoverEventsTable,
     defaultColumns: defaultTableColumns,
     renderColumns: wzDiscoverRenderColumns,
     results,
@@ -179,7 +180,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching data',
+          message: wzDiscoverI18n.errorFetchingData,
         });
         ErrorHandler.handleError(searchError);
       });
@@ -229,7 +230,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     } catch (error) {
       const searchError = ErrorFactory.create(HttpError, {
         error,
-        message: 'Error downloading csv report',
+        message: wzDiscoverI18n.errorDownloadingCsv,
       });
       ErrorHandler.handleError(searchError);
     } finally {

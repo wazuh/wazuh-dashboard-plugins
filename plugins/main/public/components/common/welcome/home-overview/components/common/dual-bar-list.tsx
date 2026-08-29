@@ -1,6 +1,7 @@
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiText } from '@elastic/eui';
 import { HOME_OVERVIEW_COLOR } from '../../lib/theme-colors';
+import { homeOverviewI18n } from '../../i18n';
 import { decimalFormat } from '../../../utils/helpers';
 import { BarTrack, LegendItem } from './bar-track';
 import { EmptyState } from './empty-state';
@@ -58,10 +59,10 @@ export const DualBarList: React.FC<DualBarListProps> = ({
         style={{ marginBottom: 10 }}
       >
         <EuiFlexItem grow={false}>
-          <LegendItem color={HOME_OVERVIEW_COLOR.success} label='Passed' />
+          <LegendItem color={HOME_OVERVIEW_COLOR.success} label={homeOverviewI18n.passed} />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <LegendItem color={HOME_OVERVIEW_COLOR.failed} label='Failed' />
+          <LegendItem color={HOME_OVERVIEW_COLOR.failed} label={homeOverviewI18n.failed} />
         </EuiFlexItem>
       </EuiFlexGroup>
       <div

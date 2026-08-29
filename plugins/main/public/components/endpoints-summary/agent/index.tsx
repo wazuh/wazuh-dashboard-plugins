@@ -25,6 +25,7 @@ import { withAgentSync } from '../../common/hocs/withAgentSync';
 import { AgentTabs } from './agent-tabs';
 import { SECTIONS } from '../../../sections';
 import { useEffectEnsureComponentMounted } from '../../common/hooks';
+import { endpointsSummaryI18n } from '../i18n';
 
 const mapStateToProps = state => ({
   agent: state.appStateReducers?.currentAgentData,
@@ -52,11 +53,11 @@ export const AgentView = compose(
         <PromptNoSelectedAgent
           body={
             <>
-              You need to select an agent or return to
+              {endpointsSummaryI18n.selectAgentOrReturn}{' '}
               <RedirectAppLinks application={getCore().application}>
                 <EuiLink
                   className='eui-textCenter'
-                  aria-label='go to Endpoint summary'
+                  aria-label={endpointsSummaryI18n.goToEndpointSummary}
                   href={`${endpointSummary.id}#${SECTIONS.AGENTS_PREVIEW}`}
                   onClick={() =>
                     NavigationService.getInstance().navigate(
@@ -64,7 +65,7 @@ export const AgentView = compose(
                     )
                   }
                 >
-                  Endpoint summary
+                  {endpointsSummaryI18n.endpointSummaryLink}
                 </EuiLink>
               </RedirectAppLinks>
             </>

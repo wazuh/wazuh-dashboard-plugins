@@ -14,6 +14,7 @@ import {
 } from '../../hocs';
 import { compose } from 'redux';
 import { EventsCountDataSource } from '../../data-source/pattern/events/events-count';
+import { homeOverviewI18n } from '../home-overview/i18n';
 
 const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
@@ -48,8 +49,8 @@ const FindingsDashboard = compose(
           from: timeFilter.from,
           to: timeFilter.to,
         },
-        title: 'Findings count evolution',
-        description: 'Dashboard of Findings count evolution',
+        title: homeOverviewI18n.findingsCountEvolution,
+        description: homeOverviewI18n.findingsCountEvolutionDescription,
         refreshConfig: {
           pause: false,
           value: 15,
@@ -67,7 +68,7 @@ export const FindingsCount = () => {
     <EuiPanel paddingSize='m'>
       <EuiFlexGroup gutterSize='none'>
         <EuiFlexItem grow={false}>
-          <Typography level='section'>Findings count evolution</Typography>
+          <Typography level='section'>{homeOverviewI18n.findingsCountEvolution}</Typography>
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiSpacer size='m' />

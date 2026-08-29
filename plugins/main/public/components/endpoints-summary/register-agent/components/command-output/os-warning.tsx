@@ -1,6 +1,9 @@
 import React from 'react';
 import { EuiCallOut } from '@elastic/eui';
 import { tOperatingSystem } from '../../core/config/os-commands-definitions';
+import { endpointsSummaryI18n } from '../../../i18n';
+
+const dw = endpointsSummaryI18n.deployWizard;
 
 interface OsWarningProps {
   os?: tOperatingSystem['name'];
@@ -9,58 +12,42 @@ interface OsWarningProps {
 export default function OsCommandWarning(props: OsWarningProps) {
   const osSelector = {
     WINDOWS: (
-      <EuiCallOut title='Requirements' iconType='iInCircle'>
+      <EuiCallOut title={dw.requirements} iconType='iInCircle'>
         <ul className='wz-callout-list'>
           <li>
-            <span>
-              You will need administrator privileges to perform this
-              installation.
-            </span>
+            <span>{dw.adminPrivileges}</span>
           </li>
           <li>
-            <span>PowerShell 3.0 or greater is required.</span>
+            <span>{dw.powershellRequired}</span>
           </li>
         </ul>
-        <p>
-          Keep in mind you need to run this command in a Windows PowerShell
-          terminal.
-        </p>
+        <p>{dw.runInPowerShell}</p>
       </EuiCallOut>
     ),
     LINUX: (
-      <EuiCallOut title='Requirements' iconType='iInCircle'>
+      <EuiCallOut title={dw.requirements} iconType='iInCircle'>
         <ul className='wz-callout-list'>
           <li>
-            <span>
-              You will need administrator privileges to perform this
-              installation.
-            </span>
+            <span>{dw.adminPrivileges}</span>
           </li>
           <li>
-            <span>Shell Bash is required.</span>
+            <span>{dw.bashRequired}</span>
           </li>
         </ul>
-        <p>
-          Keep in mind you need to run this command in a Shell Bash terminal.
-        </p>
+        <p>{dw.runInBash}</p>
       </EuiCallOut>
     ),
     macOS: (
-      <EuiCallOut title='Requirements' iconType='iInCircle'>
+      <EuiCallOut title={dw.requirements} iconType='iInCircle'>
         <ul className='wz-callout-list'>
           <li>
-            <span>
-              You will need administrator privileges to perform this
-              installation.
-            </span>
+            <span>{dw.adminPrivileges}</span>
           </li>
           <li>
-            <span>Shell Bash is required.</span>
+            <span>{dw.bashRequired}</span>
           </li>
         </ul>
-        <p>
-          Keep in mind you need to run this command in a Shell Bash terminal.
-        </p>
+        <p>{dw.runInBash}</p>
       </EuiCallOut>
     ),
   };

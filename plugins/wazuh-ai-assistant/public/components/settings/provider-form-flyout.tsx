@@ -1141,8 +1141,14 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                         values={{
                           header:
                             urlGuidance.examples.length > 1
-                              ? 'Examples'
-                              : 'Example',
+                              ? i18n.translate(
+                                  'wazuhAiAssistant.settings.form.baseUrlExamples',
+                                  { defaultMessage: 'Examples' },
+                                )
+                              : i18n.translate(
+                                  'wazuhAiAssistant.settings.form.baseUrlExampleSingular',
+                                  { defaultMessage: 'Example' },
+                                ),
                         }}
                       />
                     </div>

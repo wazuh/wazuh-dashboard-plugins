@@ -14,6 +14,7 @@ import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensea
 import { formatValueSafely } from '../common';
 import { DataGroupResult } from '../../interfaces/data-group';
 import { CountsByKey } from '../../interfaces/types';
+import { homeOverviewI18n } from '../../i18n';
 
 export interface CloudSecurityCardsProps {
   /** Findings per module (app id) for the badges; cards navigate regardless. */
@@ -42,7 +43,7 @@ export const CloudSecurityCards: React.FC<CloudSecurityCardsProps> = ({
               <span
                 style={{ position: 'absolute', top: 12, right: 12, zIndex: 1 }}
               >
-                <EuiToolTip position='top' content='Findings, last 24h'>
+                <EuiToolTip position='top' content={homeOverviewI18n.cloudFindingsLast24h}>
                   <EuiNotificationBadge
                     size='m'
                     color={count ? 'accent' : 'subdued'}

@@ -23,6 +23,7 @@ import {
 } from '../../utils/navigation';
 import { FINDING_SEVERITY_FIELD } from '../../lib/fields';
 import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
+import { homeOverviewI18n } from '../../i18n';
 
 export interface OverviewSectionProps {
   /** Owned by the page shell so Threat Hunting reuses the same on-mount search. */
@@ -42,8 +43,11 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             status={agents.status}
             errorLabel={agents.error?.message}
             isPermissionDenied={agents.error?.kind === 'permission-denied'}
-            title='Agents by status'
-            headerLink={{ label: 'Agents', href: getAgentsUrl() }}
+            title={homeOverviewI18n.agentsByStatus}
+            headerLink={{
+              label: homeOverviewI18n.agents,
+              href: getAgentsUrl(),
+            }}
             centerBody
             data-test-subj='home-overview-agents'
           >
@@ -61,10 +65,10 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             status={findings.status}
             errorLabel={findings.error?.message}
             isPermissionDenied={findings.error?.kind === 'permission-denied'}
-            title='Findings'
-            caption='Last 24 hours'
+            title={homeOverviewI18n.findings}
+            caption={homeOverviewI18n.last24Hours}
             headerLink={{
-              label: 'Threat Hunting',
+              label: homeOverviewI18n.threatHunting,
               href: getThreatHuntingUrl(),
             }}
             centerBody
@@ -80,7 +84,10 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
                   )
                 }
                 getTooltip={band =>
-                  `Click to see ${FINDING_SEVERITY_FIELD}: ${band}`
+                  homeOverviewI18n.clickToSeeField(
+                    FINDING_SEVERITY_FIELD,
+                    band,
+                  )
                 }
               />
             )}
@@ -99,16 +106,19 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
               findings.error?.kind === 'index-pattern-missing'
             }
             isPermissionDenied={findings.error?.kind === 'permission-denied'}
-            title='MITRE ATT&CK top tactics'
-            caption='Last 24 hours'
-            headerLink={{ label: 'MITRE ATT&CK', href: getMitreUrl() }}
+            title={homeOverviewI18n.mitreTopTactics}
+            caption={homeOverviewI18n.last24Hours}
+            headerLink={{
+              label: homeOverviewI18n.mitreAttack,
+              href: getMitreUrl(),
+            }}
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
             data-test-subj='home-overview-mitre-tactics'
           >
             {findings.data && (
               <BarList
                 items={findings.data.topTactics}
-                emptyMessage='No MITRE ATT&CK tactics observed'
+                emptyMessage={homeOverviewI18n.noMitreTactics}
                 getHref={item =>
                   getMitreIntelligenceResourceUrl('tactics', item)
                 }

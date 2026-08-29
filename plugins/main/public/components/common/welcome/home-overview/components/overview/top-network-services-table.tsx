@@ -1,9 +1,10 @@
 import { createTopNTable } from '../common';
+import { homeOverviewI18n } from '../../i18n';
 
 export const TopNetworkServicesTable = createTopNTable({
-  keyColumnName: 'Process name',
-  noItemsMessage: 'No network services found',
+  keyColumnName: homeOverviewI18n.processName,
+  noItemsMessage: homeOverviewI18n.noNetworkServices,
   totalSlots: 5,
-  moreItemsMessage: 'No more network services detected',
+  moreItemsMessage: homeOverviewI18n.noMoreNetworkServices,
   'data-test-subj': 'top-network-services-table',
 });

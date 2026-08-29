@@ -24,6 +24,7 @@ import {
 } from '@elastic/eui';
 import { requirementsName } from '../../requirement-name';
 import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
+import { complianceI18n } from '../../../regulatory-compliance/i18n';
 
 export class ComplianceRequirements extends Component {
   _isMount = false;
@@ -90,7 +91,8 @@ export class ComplianceRequirements extends Component {
           .map(facet => {
             let iconNode;
             const name =
-              requirementsName[facet.label] || `Requirement ${facet.label}`;
+              requirementsName[facet.label] ||
+              complianceI18n.requirementLabel(facet.label);
             return (
               <EuiFacetButton
                 key={'Requirement ' + facet.id}
@@ -116,7 +118,7 @@ export class ComplianceRequirements extends Component {
                       textOverflow: 'ellipsis',
                     }}
                   >
-                    Requirement {facet.label}
+                    {complianceI18n.requirementLabel(facet.label)}
                   </span>
                 </EuiToolTip>
               </EuiFacetButton>
@@ -146,10 +148,10 @@ export class ComplianceRequirements extends Component {
     const panels = [
       {
         id: 0,
-        title: 'Options',
+        title: complianceI18n.options,
         items: [
           {
-            name: 'Select all',
+            name: complianceI18n.selectAll,
             icon: <EuiIcon type='check' size='m' />,
             onClick: () => {
               this.closePopover();
@@ -157,7 +159,7 @@ export class ComplianceRequirements extends Component {
             },
           },
           {
-            name: 'Unselect all',
+            name: complianceI18n.unselectAll,
             icon: <EuiIcon type='cross' size='m' />,
             onClick: () => {
               this.closePopover();

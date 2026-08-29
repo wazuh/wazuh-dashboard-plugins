@@ -7,6 +7,7 @@ import {
 import DocViewer from '../../doc-viewer/doc-viewer';
 import { useDocViewer } from '../../doc-viewer';
 import { useUnsavedChangesGuard } from '../../unsaved-changes-guard';
+import { wzDiscoverI18n } from '../i18n';
 
 interface DocumentViewTableAndJsonPropsDoc {
   document: any;
@@ -80,7 +81,7 @@ export const DocumentViewTableAndJson = ({
     const baseTabs: DocumentViewTableAndJsonPropsAdditionalTabsObject = [
       {
         id: 'table',
-        name: 'Table',
+        name: wzDiscoverI18n.tableTab,
         content: (
           <DocViewer
             {...docViewerProps}
@@ -94,10 +95,10 @@ export const DocumentViewTableAndJson = ({
       },
       {
         id: 'json',
-        name: 'JSON',
+        name: wzDiscoverI18n.jsonTab,
         content: (
           <EuiCodeBlock
-            aria-label={'Document details'}
+            aria-label={wzDiscoverI18n.documentDetailsAria}
             language='json'
             isCopyable
             paddingSize='s'

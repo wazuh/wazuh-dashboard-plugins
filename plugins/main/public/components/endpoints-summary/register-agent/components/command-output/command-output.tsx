@@ -10,6 +10,9 @@ import {
 import React, { Fragment, useEffect, useState } from 'react';
 import { tOperatingSystem } from '../../core/config/os-commands-definitions';
 import { osdfucatePasswordInCommand } from '../../services/wazuh-password-service';
+import { endpointsSummaryI18n } from '../../../i18n';
+
+const dw = endpointsSummaryI18n.deployWizard;
 
 interface ICommandSectionProps {
   commandText: string;
@@ -77,7 +80,7 @@ export default function CommandOutput(props: ICommandSectionProps) {
                   onClick={() => onHandleCopy(copy())}
                 >
                   <p>
-                    <EuiIcon type='copy' /> Copy command
+                    <EuiIcon type='copy' /> {dw.copyCommand}
                   </p>
                 </div>
               )}
@@ -88,7 +91,7 @@ export default function CommandOutput(props: ICommandSectionProps) {
           <>
             <EuiSwitch
               checked={showPassword}
-              label='Show password'
+              label={dw.showPassword}
               onChange={onChangeShowPassword}
             />
             <EuiSpacer size='l' />

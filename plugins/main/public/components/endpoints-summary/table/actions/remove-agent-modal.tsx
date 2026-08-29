@@ -24,6 +24,7 @@ import { Agent } from '../../types';
 import { getToasts } from '../../../../kibana-services';
 import { removeAgentService } from '../../services/remove-agent';
 import { useAsyncAction } from '../../../common/hooks';
+import { endpointsSummaryI18n } from '../../i18n';
 
 interface RemoveAgentModalProps {
   agent: Agent;
@@ -35,10 +36,10 @@ export const RemoveAgentModal = compose(withErrorBoundary)(
   ({ agent, onClose, reloadAgents }: RemoveAgentModalProps) => {
     const getDeleteErrorMessage = (error: any) => {
       const apiMessage = error?.response?.data?.message;
-      const message = apiMessage || error?.message || 'Unknown error';
+      const message = apiMessage || error?.message || endpointsSummaryI18n.unknownError;
 
       if (/permission denied/i.test(message)) {
-        return `No permissions to remove this agent. ${message}`;
+        return endpointsSummaryI18n.noPermissionRemoveAgent(message);
       }
 
       return message;
@@ -51,8 +52,8 @@ export const RemoveAgentModal = compose(withErrorBoundary)(
         if (response?.data?.data?.affected_items.includes(agent.id)) {
           getToasts().add({
             color: 'success',
-            title: 'Remove agent',
-            text: `Removed agent: ${agent.name} (${agent.id})`,
+            title: endpointsSummaryI18n.removeAgentSuccess,
+            text: endpointsSummaryI18n.removedAgent(agent.name, agent.id),
             toastLifeTimeMs: 3000,
           });
         }
@@ -68,7 +69,7 @@ export const RemoveAgentModal = compose(withErrorBoundary)(
           error: {
             error,
             message: errorMessage,
-            title: `Could not remove agent`,
+            title: endpointsSummaryI18n.couldNotRemoveAgent,
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -85,7 +86,9 @@ export const RemoveAgentModal = compose(withErrorBoundary)(
         }}
       >
         <EuiModalHeader>
-          <EuiModalHeaderTitle>Remove agent</EuiModalHeaderTitle>
+          <EuiModalHeaderTitle>
+            {endpointsSummaryI18n.removeAgentTitle}
+          </EuiModalHeaderTitle>
         </EuiModalHeader>
 
         <EuiModalBody>
@@ -94,7 +97,9 @@ export const RemoveAgentModal = compose(withErrorBoundary)(
               <EuiFlexGroup gutterSize='m'>
                 <EuiFlexItem>
                   <EuiDescriptionList compressed>
-                    <EuiDescriptionListTitle>Agent ID</EuiDescriptionListTitle>
+                    <EuiDescriptionListTitle>
+                      {endpointsSummaryI18n.agentId}
+                    </EuiDescriptionListTitle>
                     <EuiDescriptionListDescription>
                       {agent.id}
                     </EuiDescriptionListDescription>
@@ -103,7 +108,7 @@ export const RemoveAgentModal = compose(withErrorBoundary)(
                 <EuiFlexItem>
                   <EuiDescriptionList compressed>
                     <EuiDescriptionListTitle>
-                      Agent name
+                      {endpointsSummaryI18n.agentName}
                     </EuiDescriptionListTitle>
                     <EuiDescriptionListDescription>
                       {agent.name}
@@ -115,20 +120,21 @@ export const RemoveAgentModal = compose(withErrorBoundary)(
           </EuiFlexGroup>
           <EuiSpacer />
           <EuiCallOut color='warning'>
-            If the selected agent is still active and auto-enrollment is
-            enabled, they will automatically register again after deletion.
+            {endpointsSummaryI18n.removeAgentWarning}
           </EuiCallOut>
         </EuiModalBody>
 
         <EuiModalFooter>
-          <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
+          <EuiButtonEmpty onClick={onClose}>
+            {endpointsSummaryI18n.cancel}
+          </EuiButtonEmpty>
           <EuiButton
             onClick={() => action.run(agent)}
             fill
             isLoading={action.running}
             color='danger'
           >
-            Remove
+            {endpointsSummaryI18n.remove}
           </EuiButton>
         </EuiModalFooter>
       </EuiModal>

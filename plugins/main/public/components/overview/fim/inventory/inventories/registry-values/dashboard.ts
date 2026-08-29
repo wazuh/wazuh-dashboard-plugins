@@ -3,6 +3,7 @@ import {
   getVisStateTable,
 } from '../../../../../../services/visualizations';
 import { buildDashboardKPIPanels } from '../../../../it-hygiene/common/create-dashboard-panels-kpis';
+import { fimI18n } from '../../../../i18n';
 
 export const getDashboard = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
@@ -13,7 +14,7 @@ export const getDashboard = (indexPatternId: string) => {
       'registry-values-inventory',
       {
         size: 5,
-        fieldCustomLabel: 'Top 5 registry paths',
+        fieldCustomLabel: fimI18n.top5RegistryPaths,
       },
     ),
     getVisStateTable(
@@ -23,21 +24,21 @@ export const getDashboard = (indexPatternId: string) => {
       'registry-values-inventory',
       {
         size: 5,
-        fieldCustomLabel: 'Top 5 registry values',
+        fieldCustomLabel: fimI18n.top5RegistryValues,
       },
     ),
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'registry.data.type',
-      'Data types',
+      fimI18n.dataTypes,
       'registry-values-inventory',
       {
         fieldSize: 4,
-        otherBucket: 'Others',
-        metricCustomLabel: 'Registry data type count',
+        otherBucket: fimI18n.others,
+        metricCustomLabel: fimI18n.registryDataTypeCount,
         valueAxesTitleText: ' ',
-        fieldCustomLabel: 'Registry data type',
-        seriesLabel: 'Registry data type',
+        fieldCustomLabel: fimI18n.registryDataType,
+        seriesLabel: fimI18n.registryDataType,
       },
     ),
   ]);

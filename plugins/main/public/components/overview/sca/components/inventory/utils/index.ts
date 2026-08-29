@@ -1,4 +1,5 @@
 import { commonColumns } from '../../../../common/data-grid-columns';
+import { scaI18n } from '../../../i18n';
 
 export const tableColumns = [
   commonColumns['wazuh.agent.name'],
@@ -12,11 +13,11 @@ export const managedFilters = [
   {
     type: 'multiSelect',
     key: 'policy.name',
-    placeholder: 'Policy',
+    placeholder: scaI18n.filterPolicy,
   },
   {
     type: 'multiSelect',
     key: 'check.name',
-    placeholder: 'Check',
+    placeholder: scaI18n.filterCheck,
   },
 ];

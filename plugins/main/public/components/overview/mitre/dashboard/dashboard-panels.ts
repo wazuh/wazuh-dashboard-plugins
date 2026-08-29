@@ -1,10 +1,11 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
+import { mitreI18n } from '../i18n';
 
 const getVisStateAlertsEvolution = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-MITRE-Alerts-Evolution',
-    title: 'Alerts evolution over time',
+    title: mitreI18n.alertsEvolution,
     type: 'line',
     params: {
       type: 'line',
@@ -31,7 +32,7 @@ const getVisStateAlertsEvolution = (indexPatternId: string) => {
           style: {},
           scale: { type: 'linear', mode: 'normal' },
           labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-          title: { text: 'Count' },
+          title: { text: mitreI18n.count },
         },
       ],
       seriesParams: [
@@ -39,7 +40,7 @@ const getVisStateAlertsEvolution = (indexPatternId: string) => {
           show: 'true',
           type: 'line',
           mode: 'normal',
-          data: { label: 'Count', id: '1' },
+          data: { label: mitreI18n.count, id: '1' },
           valueAxis: 'ValueAxis-1',
           drawLinesBetweenPoints: true,
           showCircles: true,
@@ -89,8 +90,8 @@ const getVisStateAlertsEvolution = (indexPatternId: string) => {
               id: 'terms',
               params: {
                 id: 'string',
-                otherBucketLabel: 'Other',
-                missingBucketLabel: 'Missing',
+                otherBucketLabel: mitreI18n.other,
+                missingBucketLabel: mitreI18n.missing,
               },
             },
             params: {},
@@ -130,14 +131,14 @@ const getVisStateAlertsEvolution = (indexPatternId: string) => {
           schema: 'group',
           params: {
             field: 'wazuh.rule.mitre.technique.name',
-            customLabel: 'Technique Name',
+            customLabel: mitreI18n.techniqueName,
             orderBy: '1',
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: mitreI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: mitreI18n.missing,
           },
         },
         {
@@ -163,7 +164,7 @@ const getVisStateAlertsEvolution = (indexPatternId: string) => {
 const getVisStateTopTactics = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-MITRE-Top-Tactics',
-    title: 'Top tactics',
+    title: mitreI18n.topTactics,
     type: 'pie',
     params: {
       type: 'pie',
@@ -191,8 +192,8 @@ const getVisStateTopTactics = (indexPatternId: string) => {
               id: 'terms',
               params: {
                 id: 'string',
-                otherBucketLabel: 'Other',
-                missingBucketLabel: 'Missing',
+                otherBucketLabel: mitreI18n.other,
+                missingBucketLabel: mitreI18n.missing,
               },
             },
             params: {},
@@ -236,9 +237,9 @@ const getVisStateTopTactics = (indexPatternId: string) => {
             order: 'desc',
             size: 10,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: mitreI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: mitreI18n.missing,
           },
         },
       ],
@@ -249,7 +250,7 @@ const getVisStateTopTactics = (indexPatternId: string) => {
 const getVisStateAttacksByTechnique = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-MITRE-Attacks-By-Technique',
-    title: 'Attacks by technique',
+    title: mitreI18n.attacksByTechnique,
     type: 'histogram',
     params: {
       type: 'histogram',
@@ -276,7 +277,7 @@ const getVisStateAttacksByTechnique = (indexPatternId: string) => {
           style: {},
           scale: { type: 'linear', mode: 'normal' },
           labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-          title: { text: 'Count' },
+          title: { text: mitreI18n.count },
         },
       ],
       seriesParams: [
@@ -284,7 +285,7 @@ const getVisStateAttacksByTechnique = (indexPatternId: string) => {
           show: 'true',
           type: 'histogram',
           mode: 'stacked',
-          data: { label: 'Count', id: '1' },
+          data: { label: mitreI18n.count, id: '1' },
           valueAxis: 'ValueAxis-1',
           drawLinesBetweenPoints: true,
           showCircles: true,
@@ -320,8 +321,8 @@ const getVisStateAttacksByTechnique = (indexPatternId: string) => {
               id: 'terms',
               params: {
                 id: 'string',
-                otherBucketLabel: 'Other',
-                missingBucketLabel: 'Missing',
+                otherBucketLabel: mitreI18n.other,
+                missingBucketLabel: mitreI18n.missing,
               },
             },
             params: {},
@@ -365,9 +366,9 @@ const getVisStateAttacksByTechnique = (indexPatternId: string) => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: mitreI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: mitreI18n.missing,
           },
         },
         {
@@ -381,9 +382,9 @@ const getVisStateAttacksByTechnique = (indexPatternId: string) => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: mitreI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: mitreI18n.missing,
           },
         },
       ],
@@ -394,7 +395,7 @@ const getVisStateAttacksByTechnique = (indexPatternId: string) => {
 const getVisStateTopTacticsByAgent = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-MITRE-Top-Tactics-By-Agent',
-    title: 'Top tactics by agent',
+    title: mitreI18n.topTacticsByAgent,
     type: 'area',
     params: {
       addLegend: true,
@@ -419,8 +420,8 @@ const getVisStateTopTacticsByAgent = (indexPatternId: string) => {
             id: 'terms',
             params: {
               id: 'string',
-              otherBucketLabel: 'Other',
-              missingBucketLabel: 'Missing',
+              otherBucketLabel: mitreI18n.other,
+              missingBucketLabel: mitreI18n.missing,
             },
           },
           params: {},
@@ -441,8 +442,8 @@ const getVisStateTopTacticsByAgent = (indexPatternId: string) => {
               id: 'terms',
               params: {
                 id: 'string',
-                otherBucketLabel: 'Other',
-                missingBucketLabel: 'Missing',
+                otherBucketLabel: mitreI18n.other,
+                missingBucketLabel: mitreI18n.missing,
               },
             },
             params: {},
@@ -455,7 +456,7 @@ const getVisStateTopTacticsByAgent = (indexPatternId: string) => {
       legendPosition: 'right',
       seriesParams: [
         {
-          data: { id: '1', label: 'Count' },
+          data: { id: '1', label: mitreI18n.count },
           drawLinesBetweenPoints: true,
           interpolate: 'linear',
           mode: 'normal',
@@ -483,7 +484,7 @@ const getVisStateTopTacticsByAgent = (indexPatternId: string) => {
           scale: { mode: 'normal', type: 'linear' },
           show: true,
           style: {},
-          title: { text: 'Count' },
+          title: { text: mitreI18n.count },
           type: 'value',
         },
       ],
@@ -523,9 +524,9 @@ const getVisStateTopTacticsByAgent = (indexPatternId: string) => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: mitreI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: mitreI18n.missing,
           },
         },
         {
@@ -539,9 +540,9 @@ const getVisStateTopTacticsByAgent = (indexPatternId: string) => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: mitreI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: mitreI18n.missing,
           },
         },
       ],
@@ -552,7 +553,7 @@ const getVisStateTopTacticsByAgent = (indexPatternId: string) => {
 const getVisStateTechniqueByAgent = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-MITRE-Attacks-By-Agent',
-    title: 'Mitre techniques by agent',
+    title: mitreI18n.techniquesByAgent,
     type: 'pie',
     params: {
       type: 'pie',
@@ -610,9 +611,9 @@ const getVisStateTechniqueByAgent = (indexPatternId: string) => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: mitreI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: mitreI18n.missing,
           },
         },
         {
@@ -626,9 +627,9 @@ const getVisStateTechniqueByAgent = (indexPatternId: string) => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: mitreI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: mitreI18n.missing,
           },
         },
       ],
@@ -639,7 +640,7 @@ const getVisStateTechniqueByAgent = (indexPatternId: string) => {
 const getVisStateAlertsLevelByAttack = indexPatternId => {
   return {
     id: 'Wazuh-App-Agents-MITRE-Level-By-Attack',
-    title: 'Rule level by attack',
+    title: mitreI18n.ruleLevelByAttack,
     type: 'pie',
     params: {
       type: 'pie',
@@ -667,8 +668,8 @@ const getVisStateAlertsLevelByAttack = indexPatternId => {
               id: 'terms',
               params: {
                 id: 'string',
-                otherBucketLabel: 'Other',
-                missingBucketLabel: 'Missing',
+                otherBucketLabel: mitreI18n.other,
+                missingBucketLabel: mitreI18n.missing,
               },
             },
             params: {},
@@ -680,8 +681,8 @@ const getVisStateAlertsLevelByAttack = indexPatternId => {
               id: 'terms',
               params: {
                 id: 'string',
-                otherBucketLabel: 'Other',
-                missingBucketLabel: 'Missing',
+                otherBucketLabel: mitreI18n.other,
+                missingBucketLabel: mitreI18n.missing,
               },
             },
             params: {},
@@ -693,8 +694,8 @@ const getVisStateAlertsLevelByAttack = indexPatternId => {
               id: 'terms',
               params: {
                 id: 'number',
-                otherBucketLabel: 'Other',
-                missingBucketLabel: 'Missing',
+                otherBucketLabel: mitreI18n.other,
+                missingBucketLabel: mitreI18n.missing,
               },
             },
             params: {},
@@ -738,10 +739,10 @@ const getVisStateAlertsLevelByAttack = indexPatternId => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: mitreI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Technique Name',
+            missingBucketLabel: mitreI18n.missing,
+            customLabel: mitreI18n.techniqueName,
           },
         },
         {
@@ -755,10 +756,10 @@ const getVisStateAlertsLevelByAttack = indexPatternId => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: mitreI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Rule level',
+            missingBucketLabel: mitreI18n.missing,
+            customLabel: mitreI18n.ruleLevel,
           },
         },
       ],
@@ -769,7 +770,7 @@ const getVisStateAlertsLevelByAttack = indexPatternId => {
 const getVisStateMitreAttacksByTactic = indexPatternId => {
   return {
     id: 'Wazuh-App-Agents-MITRE-Attacks-By-Tactic',
-    title: 'MITRE attacks by tactic',
+    title: mitreI18n.mitreAttacksByTactic,
     type: 'histogram',
     params: {
       type: 'histogram',
@@ -796,7 +797,7 @@ const getVisStateMitreAttacksByTactic = indexPatternId => {
           style: {},
           scale: { type: 'linear', mode: 'normal' },
           labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-          title: { text: 'Count' },
+          title: { text: mitreI18n.count },
         },
       ],
       seriesParams: [
@@ -804,7 +805,7 @@ const getVisStateMitreAttacksByTactic = indexPatternId => {
           show: 'true',
           type: 'histogram',
           mode: 'stacked',
-          data: { label: 'Count', id: '1' },
+          data: { label: mitreI18n.count, id: '1' },
           valueAxis: 'ValueAxis-1',
           drawLinesBetweenPoints: true,
           showCircles: true,
@@ -840,8 +841,8 @@ const getVisStateMitreAttacksByTactic = indexPatternId => {
               id: 'terms',
               params: {
                 id: 'string',
-                otherBucketLabel: 'Other',
-                missingBucketLabel: 'Missing',
+                otherBucketLabel: mitreI18n.other,
+                missingBucketLabel: mitreI18n.missing,
               },
             },
             params: {},
@@ -885,9 +886,9 @@ const getVisStateMitreAttacksByTactic = indexPatternId => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: mitreI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: mitreI18n.missing,
           },
         },
         {
@@ -901,9 +902,9 @@ const getVisStateMitreAttacksByTactic = indexPatternId => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: mitreI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: mitreI18n.missing,
           },
         },
       ],
@@ -914,7 +915,7 @@ const getVisStateMitreAttacksByTactic = indexPatternId => {
 const getVisStateAlertsLevelByTactic = indexPatternId => {
   return {
     id: 'Wazuh-App-Agents-MITRE-Level-By-Tactic',
-    title: 'Rule level by tactic',
+    title: mitreI18n.ruleLevelByTactic,
     type: 'pie',
     params: {
       type: 'pie',
@@ -942,8 +943,8 @@ const getVisStateAlertsLevelByTactic = indexPatternId => {
               id: 'terms',
               params: {
                 id: 'string',
-                otherBucketLabel: 'Other',
-                missingBucketLabel: 'Missing',
+                otherBucketLabel: mitreI18n.other,
+                missingBucketLabel: mitreI18n.missing,
               },
             },
             params: {},
@@ -955,8 +956,8 @@ const getVisStateAlertsLevelByTactic = indexPatternId => {
               id: 'terms',
               params: {
                 id: 'number',
-                otherBucketLabel: 'Other',
-                missingBucketLabel: 'Missing',
+                otherBucketLabel: mitreI18n.other,
+                missingBucketLabel: mitreI18n.missing,
               },
             },
             params: {},
@@ -1000,10 +1001,10 @@ const getVisStateAlertsLevelByTactic = indexPatternId => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: mitreI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Tactic Name',
+            missingBucketLabel: mitreI18n.missing,
+            customLabel: mitreI18n.tacticName,
           },
         },
         {
@@ -1017,10 +1018,10 @@ const getVisStateAlertsLevelByTactic = indexPatternId => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: mitreI18n.other,
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Rule level',
+            missingBucketLabel: mitreI18n.missing,
+            customLabel: mitreI18n.ruleLevel,
           },
         },
       ],

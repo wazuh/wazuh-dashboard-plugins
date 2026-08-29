@@ -1,17 +1,19 @@
+import { fimI18n } from '../../../i18n';
+
 export default [
   {
     type: 'multiSelect',
     key: 'registry.path',
-    placeholder: 'Path',
+    placeholder: fimI18n.filterPath,
   },
   {
     type: 'multiSelect',
     key: 'registry.value',
-    placeholder: 'Value',
+    placeholder: fimI18n.filterValue,
   },
   {
     type: 'multiSelect',
     key: 'registry.data.type',
-    placeholder: 'Data type',
+    placeholder: fimI18n.filterDataType,
   },
 ];

@@ -20,6 +20,7 @@ import { AgentStatus } from '../../../../components/agents/agent-status';
 import { TableWzAPI } from '../../../../components/common/tables';
 import { PinnedAgentManager } from '../../../../components/wz-agent-selector/wz-agent-selector-service';
 import WzIconSVG from '../../../../components/common/icons/wz-icon-svg';
+import { i18n } from '@osd/i18n';
 import { getAgentOSType } from '../../../../react-services';
 
 export class AgentSelectionTable extends Component {
@@ -179,12 +180,19 @@ export class AgentSelectionTable extends Component {
                 grow={false}
                 style={{ marginTop: 10, marginLeft: 4 }}
               >
-                <EuiToolTip position='top' content='Unpin agent'>
+                <EuiToolTip
+                  position='top'
+                  content={i18n.translate('wz-explore-agent.unpin', {
+                    defaultMessage: 'Unpin agent',
+                  })}
+                >
                   <EuiButtonIcon
                     color='danger'
                     onClick={() => this.unselectAgents()}
                     iconType='pinFilled'
-                    aria-label='unpin agent'
+                    aria-label={i18n.translate('wz-explore-agent.unpin', {
+                      defaultMessage: 'Unpin agent',
+                    })}
                   />
                 </EuiToolTip>
               </EuiFlexItem>

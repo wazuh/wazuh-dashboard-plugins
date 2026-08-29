@@ -13,6 +13,7 @@
 import { WzRequest } from '../../../../../../react-services/wz-request';
 import { getAgentReportedConfiguration } from './agent-config-service';
 import { replaceIllegalXML } from './xml';
+import { wzMenuI18n } from '../../../../../../components/wz-menu/i18n';
 import { delayAsPromise } from '../../../../../../../common/utils';
 
 /**
@@ -202,7 +203,7 @@ export const handleError = async (
   const messageIsString = typeof message === 'string';
   try {
     if (messageIsString && message.includes('ERROR3099')) {
-      updateWazuhNotReadyYet('Server not ready yet.');
+      updateWazuhNotReadyYet(wzMenuI18n.serverNotReady);
       await makePing(updateWazuhNotReadyYet);
       return;
     }
@@ -293,7 +294,7 @@ export const makePing = async (updateWazuhNotReadyYet, tries = 30) => {
     }
     return Promise.resolve('Wazuh is ready');
   } catch (error) {
-    throw new Error('Server could not be recovered.');
+    throw new Error(wzMenuI18n.serverCouldNotRecover);
   }
 };
 
@@ -336,7 +337,7 @@ export const restartNodeSelected = async (
   updateWazuhNotReadyYet,
 ) => {
   try {
-    updateWazuhNotReadyYet(`Restarting ${selectedNode}, please wait.`);
+    updateWazuhNotReadyYet(wzMenuI18n.restartingNode(selectedNode));
     await restartNode(selectedNode);
     return await makePing(updateWazuhNotReadyYet);
   } catch (error) {

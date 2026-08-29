@@ -7,22 +7,17 @@ import {
 } from '../../../../../../common/constants';
 import { withHealthCheckChecks } from '../../../../common/hocs';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
+import { fimI18n } from '../../i18n';
 
 export const PromptFIMIndexPatternMissing = ({ refresh }) => (
   <EuiEmptyPrompt
     iconType='alert'
-    title={
-      <h2>File integrity monitoring could be disabled or has a problem</h2>
-    }
+    title={<h2>{fimI18n.indexPatternMissingTitle}</h2>}
     body={
       <>
+        <p>{fimI18n.indexPatternMissingBody}</p>
         <p>
-          If this is enabled, then this could be caused by an error in: server
-          side, server-indexer connection or indexer side. Review the server and
-          indexer logs.
-        </p>
-        <p>
-          Also, you can check the{' '}
+          {fimI18n.indexPatternMissingDocsIntro}{' '}
           <EuiLink
             href={webDocumentationLink(
               'user-manual/capabilities/file-integrity/index.html',
@@ -31,14 +26,14 @@ export const PromptFIMIndexPatternMissing = ({ refresh }) => (
             rel='noopener noreferrer'
             external
           >
-            file integrity monitoring documentation.
+            {fimI18n.indexPatternMissingDocs}
           </EuiLink>
         </p>
       </>
     }
     actions={
       <EuiButton color='primary' fill onClick={refresh}>
-        Refresh
+        {fimI18n.refresh}
       </EuiButton>
     }
   />

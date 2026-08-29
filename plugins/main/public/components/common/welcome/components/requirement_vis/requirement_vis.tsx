@@ -40,6 +40,7 @@ import { LoadingSearchbarProgress } from '../../../loading-searchbar-progress/lo
 import { compose } from 'redux';
 import { regulatoryCompliance } from '../../../../../utils/applications';
 import { WAZUH_MODULES_ID } from '../../../../../../common/constants';
+import { homeOverviewI18n } from '../../home-overview/i18n';
 
 const selectionOptionsCompliance = [
   { value: 'cmmc', text: 'CMMC' },
@@ -76,7 +77,7 @@ export const RequirementVis = withPanel({ paddingSize: 'm' })(props => {
   return (
     <>
       <VisualizationBasicWidgetSelectorHeader
-        title='Compliance'
+        title={homeOverviewI18n.complianceTitle}
         selectorOptions={selectionOptionsCompliance}
         selectedOption={selectedOption}
         onChange={onChange}
@@ -181,9 +182,9 @@ const RequirementVisBody = compose(
       selectorOptions={selectionOptionsCompliance}
       onFetch={fetchData}
       onFetchExtraDependencies={[timeFilter, props.agent]}
-      noDataTitle='No results'
+      noDataTitle={homeOverviewI18n.noResults}
       noDataMessage={(_, optionRequirement) =>
-        `No ${optionRequirement.text} results were found in the selected time range.`
+        homeOverviewI18n.noRequirementResultsInRange(optionRequirement.text)
       }
       selectedOption={props.selectedOption}
       selectorOptions={props.selectorOptions}

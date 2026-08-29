@@ -16,6 +16,7 @@ import {
 import { DataGroupResult } from '../../interfaces/data-group';
 import { ThreatIntelEnrichments, TopItem } from '../../interfaces/types';
 import { getIntegrationsUrl } from '../../utils/navigation';
+import { homeOverviewI18n } from '../../i18n';
 
 export interface ThreatIntelligenceFeedSectionProps {
   /** Shared enrichments catalog: the IOCs tile and the threat-type bar. */
@@ -46,16 +47,19 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
   return (
     <div ref={sectionRef}>
       <SectionHeader
-        title='Threat intelligence feed'
-        description='What the platform is detecting with — detection content and knowledge base.'
+        title={homeOverviewI18n.threatIntelFeed}
+        description={homeOverviewI18n.threatIntelDescription}
       />
       <EuiFlexGroup wrap responsive={false}>
         <EuiFlexItem grow={3}>
           <WidgetGroup
             status='available'
-            title='Security analytics'
-            caption='Current state'
-            headerLink={{ label: 'Manage content', href: getIntegrationsUrl() }}
+            title={homeOverviewI18n.securityAnalytics}
+            caption={homeOverviewI18n.currentState}
+            headerLink={{
+              label: homeOverviewI18n.manageContent,
+              href: getIntegrationsUrl(),
+            }}
             centerBody
             data-test-subj='home-overview-security-analytics'
           >
@@ -72,8 +76,8 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
         <EuiFlexItem grow={2}>
           <WidgetGroup
             status='available'
-            title='Threat catalog'
-            caption='Current state'
+            title={homeOverviewI18n.threatCatalog}
+            caption={homeOverviewI18n.currentState}
             data-test-subj='home-overview-threat-catalog'
           >
             <ThreatCatalogTiles iocs={iocs} />

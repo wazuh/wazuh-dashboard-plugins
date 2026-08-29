@@ -3,22 +3,17 @@ import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
 import { withHealthCheckChecks } from '../../../../common/hocs';
 import { HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES } from '../../../../../../common/constants';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
+import { vulnerabilitiesI18n } from '../../i18n';
 
 export const PromptVulnerabilitiesIndexPatternMissing = ({ refresh }) => (
   <EuiEmptyPrompt
     iconType='alert'
-    title={
-      <h2>Vulnerability detection seems to be disabled or has a problem</h2>
-    }
+    title={<h2>{vulnerabilitiesI18n.indexPatternMissingTitle}</h2>}
     body={
       <>
+        <p>{vulnerabilitiesI18n.indexPatternMissingBody}</p>
         <p>
-          If this is enabled, then this could be caused by an error in: server
-          side, server-indexer connection or indexer side. Review the server and
-          indexer logs.
-        </p>
-        <p>
-          Also, you can check the{' '}
+          {vulnerabilitiesI18n.indexPatternMissingDocsIntro}{' '}
           <EuiLink
             href={webDocumentationLink(
               'user-manual/capabilities/vulnerability-detection/index.html',
@@ -27,14 +22,14 @@ export const PromptVulnerabilitiesIndexPatternMissing = ({ refresh }) => (
             rel='noopener noreferrer'
             external
           >
-            vulnerability detection documentation.
+            {vulnerabilitiesI18n.indexPatternMissingDocs}
           </EuiLink>
         </p>
       </>
     }
     actions={
       <EuiButton color='primary' fill onClick={refresh}>
-        Refresh
+        {vulnerabilitiesI18n.refresh}
       </EuiButton>
     }
   />

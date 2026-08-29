@@ -1,17 +1,19 @@
+import { vulnerabilitiesI18n } from '../../i18n';
+
 export default [
   {
     type: 'multiSelect',
     key: 'vulnerability.id',
-    placeholder: 'CVEs',
+    placeholder: vulnerabilitiesI18n.filterCves,
   },
   {
     type: 'multiSelect',
     key: 'vulnerability.severity',
-    placeholder: 'Severity',
+    placeholder: vulnerabilitiesI18n.filterSeverity,
   },
   {
     type: 'multiSelect',
     key: 'package.name',
-    placeholder: 'Package name',
+    placeholder: vulnerabilitiesI18n.filterPackageName,
   },
 ];

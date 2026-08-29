@@ -3,5 +3,5 @@
   "paths": {
     "wazuhCheckUpdates": "."
   },
-  "translations": ["translations/en-US.json"]
+  "translations": ["translations/en-US.json", "translations/ru-RU.json"]
 }

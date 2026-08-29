@@ -11,6 +11,7 @@
  */
 
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiButton, EuiEmptyPrompt } from '@elastic/eui';
 import { PinnedAgentManager } from '../../wz-agent-selector/wz-agent-selector-service';
 
@@ -36,7 +37,9 @@ export const PromptModuleNotForAgent = ({
       body={body && <p>{body}</p>}
       actions={
         <EuiButton color='primary' fill onClick={unpinAgent}>
-          Unpin agent
+          {i18n.translate('wz-explore-agent.unpin', {
+            defaultMessage: 'Unpin agent',
+          })}
         </EuiButton>
       }
     />

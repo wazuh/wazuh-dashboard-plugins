@@ -16,6 +16,7 @@ import { VALUE_PLACEHOLDER } from '../../lib/constants';
 import { ErrorValuePlaceholder } from './tab-number';
 import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { homeOverviewI18n } from '../../i18n';
 
 export interface WidgetGroupHeaderLink {
   label: string;
@@ -61,7 +62,7 @@ const ManageIndexPatternsLink: React.FC = () => (
         path: MANAGE_INDEX_PATTERNS_PATH,
       })}
     >
-      Manage index patterns
+      {homeOverviewI18n.manageIndexPatterns}
     </EuiLink>
   </RedirectAppLinks>
 );
@@ -100,7 +101,10 @@ export const WidgetGroupBody: React.FC<WidgetGroupBodyProps> = ({
   const isError = status === 'error';
   const testSubj = isError ? 'widget-group-error' : 'widget-group-unavailable';
   const label =
-    errorLabel ?? (isError ? 'Could not load data' : 'Not available');
+    errorLabel ??
+    (isError
+      ? homeOverviewI18n.couldNotLoadData
+      : homeOverviewI18n.notAvailable);
   const errorColor = isPermissionDenied ? 'warning' : 'danger';
   const containerStyle = {
     minHeight: loadingMinHeight,

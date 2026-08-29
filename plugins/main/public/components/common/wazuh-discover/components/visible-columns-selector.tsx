@@ -1,6 +1,7 @@
 import React, { useState, ChangeEvent } from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
 import classNames from 'classnames';
+import { wzDiscoverI18n } from '../i18n';
 import {
   EuiPopover,
   EuiPopoverTitle,
@@ -85,7 +86,7 @@ export const DataGridVisibleColumnsSelector = ({
               <EuiIcon
                 className='wz-margin-left-4'
                 type='iInCircle'
-                aria-label='Info'
+                aria-label={wzDiscoverI18n.info}
               />
             </EuiToolTip>
           )}
@@ -96,8 +97,8 @@ export const DataGridVisibleColumnsSelector = ({
         <EuiFieldText
           fullWidth
           compressed
-          placeholder='Search'
-          aria-label='Search columns'
+          placeholder={wzDiscoverI18n.searchPlaceholder}
+          aria-label={wzDiscoverI18n.searchColumns}
           value={searchValue}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setSearchValue(e.currentTarget.value)

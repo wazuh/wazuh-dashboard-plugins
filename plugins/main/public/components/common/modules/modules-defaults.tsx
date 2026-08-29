@@ -40,9 +40,6 @@ import {
   TAB_VIEW_ID_DASHBOARD,
   TAB_VIEW_ID_EVENTS,
   TAB_VIEW_ID_RESPONSES,
-  TAB_VIEW_NAME_DASHBOARD,
-  TAB_VIEW_NAME_EVENTS,
-  TAB_VIEW_NAME_RESPONSES,
   WAZUH_MODULES_ID,
   WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
   WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
@@ -119,6 +116,12 @@ import { InventoryFIM } from '../../overview/fim';
 import { SCAInventory, SCADashboard } from '../../overview/sca';
 import { ReportingService } from '../../../react-services';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
+import { moduleTabsI18n } from '../../../utils/module-tabs-i18n';
+import { vulnerabilitiesI18n } from '../../overview/vulnerabilities/i18n';
+import { scaI18n } from '../../overview/sca/i18n';
+import { fimI18n } from '../../overview/fim/i18n';
+import { mitreI18n } from '../../overview/mitre/i18n';
+import { complianceI18n } from '../../overview/regulatory-compliance/i18n';
 
 const ButtonModuleGenerateReport = {
   condition: () => new ReportingService().reportDashboardPluginExist(),
@@ -128,7 +131,7 @@ const ButtonModuleGenerateReport = {
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
   return {
     id: TAB_VIEW_ID_EVENTS,
-    name: TAB_VIEW_NAME_EVENTS,
+    name: moduleTabsI18n.findings,
     buttons: [ButtonExploreAgent],
     component: () => <WazuhDiscover {...props} />,
   };
@@ -154,7 +157,7 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
+        name: moduleTabsI18n.dashboard,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardThreatHunting,
       },
@@ -176,7 +179,7 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
+        name: moduleTabsI18n.dashboard,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardCaseManagement,
       },
@@ -194,13 +197,13 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
+        name: moduleTabsI18n.dashboard,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardFIM,
       },
       {
         id: 'inventory',
-        name: 'Inventory',
+        name: fimI18n.inventory,
         buttons: [ButtonExploreAgent],
         component: InventoryFIM,
       },
@@ -218,7 +221,7 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
+        name: moduleTabsI18n.dashboard,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardAzure,
       },
@@ -236,7 +239,7 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
+        name: moduleTabsI18n.dashboard,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardAWS,
       },
@@ -254,7 +257,7 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
+        name: moduleTabsI18n.dashboard,
         component: DashboardGoogleCloud,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
       },
@@ -273,7 +276,7 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
+        name: moduleTabsI18n.dashboard,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardMalwareDetection,
       },
@@ -293,13 +296,13 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
+        name: moduleTabsI18n.dashboard,
         buttons: [ButtonExploreAgent],
         component: SCADashboard,
       },
       {
         id: 'inventory',
-        name: 'Inventory',
+        name: scaI18n.inventory,
         buttons: [ButtonExploreAgent],
         component: SCAInventory,
       },
@@ -318,7 +321,7 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
+        name: moduleTabsI18n.dashboard,
         component: DashboardOffice365,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
       },
@@ -342,7 +345,7 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
+        name: moduleTabsI18n.dashboard,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardGitHub,
       },
@@ -366,7 +369,7 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
+        name: moduleTabsI18n.dashboard,
         component: DashboardVuls,
         /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index pattern wazuh-events-v5* */
         buttons: [
@@ -381,7 +384,7 @@ export const ModulesDefaults = {
       },
       {
         id: 'inventory',
-        name: 'Inventory',
+        name: vulnerabilitiesI18n.inventory,
         component: InventoryVuls,
         /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index pattern wazuh-events-v5* */
         buttons: [
@@ -408,18 +411,18 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
+        name: moduleTabsI18n.dashboard,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardMITRE,
       },
       {
         id: 'intelligence',
-        name: 'Intelligence',
+        name: mitreI18n.intelligence,
         component: ModuleMitreAttackIntelligence,
       },
       {
         id: 'inventory',
-        name: 'Framework',
+        name: mitreI18n.framework,
         buttons: [ButtonExploreAgent],
         component: MainMitre,
       },
@@ -440,7 +443,7 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
+        name: moduleTabsI18n.dashboard,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardDocker,
       },
@@ -458,13 +461,13 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
+        name: moduleTabsI18n.dashboard,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardPCIDSS,
       },
       {
         id: 'inventory',
-        name: 'Controls',
+        name: complianceI18n.controls,
         buttons: [ButtonExploreAgent],
         component: (props: any) => (
           <ComplianceTable {...props} DataSource={PCIDSSDataSource} />
@@ -487,13 +490,13 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
+        name: moduleTabsI18n.dashboard,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardHIPAA,
       },
       {
         id: 'inventory',
-        name: 'Controls',
+        name: complianceI18n.controls,
         buttons: [ButtonExploreAgent],
         component: (props: any) => (
           <ComplianceTable {...props} DataSource={HIPAADataSource} />
@@ -515,13 +518,13 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
+        name: moduleTabsI18n.dashboard,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardNIST80053,
       },
       {
         id: 'inventory',
-        name: 'Controls',
+        name: complianceI18n.controls,
         buttons: [ButtonExploreAgent],
         component: (props: any) => (
           <ComplianceTable {...props} DataSource={NIST80053DataSource} />
@@ -544,13 +547,13 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
+        name: moduleTabsI18n.dashboard,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardGDPR,
       },
       {
         id: 'inventory',
-        name: 'Controls',
+        name: complianceI18n.controls,
         buttons: [ButtonExploreAgent],
         component: (props: any) => (
           <ComplianceTable {...props} DataSource={GDPRDataSource} />
@@ -572,13 +575,13 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
+        name: moduleTabsI18n.dashboard,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardTSC,
       },
       {
         id: 'inventory',
-        name: 'Controls',
+        name: complianceI18n.controls,
         buttons: [ButtonExploreAgent],
         component: (props: any) => (
           <ComplianceTable {...props} DataSource={TSCDataSource} />
@@ -601,7 +604,7 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
+        name: moduleTabsI18n.dashboard,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardITHygiene,
       },
@@ -649,7 +652,7 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
+        name: moduleTabsI18n.dashboard,
         buttons: [
           ({ ...props }) => (
             <ButtonExploreAgent
@@ -663,7 +666,7 @@ export const ModulesDefaults = {
       },
       {
         id: TAB_VIEW_ID_RESPONSES,
-        name: TAB_VIEW_NAME_RESPONSES,
+        name: moduleTabsI18n.responses,
         buttons: [
           ({ ...props }) => (
             <ButtonExploreAgent

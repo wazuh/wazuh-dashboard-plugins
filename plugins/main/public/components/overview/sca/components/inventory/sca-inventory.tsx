@@ -14,6 +14,7 @@ import { managedFilters, tableColumns } from './utils/index';
 import { withSCADataSource } from '../../hocs/validate-sca-states-index-pattern';
 import { withErrorBoundary } from '../../../../common/hocs';
 import { compose } from 'redux';
+import { scaI18n } from '../../i18n';
 
 /**
  * @fileoverview SCA Inventory component for Wazuh Dashboard
@@ -55,9 +56,9 @@ export const SCAInventory: React.FC<{}> = compose(
       additionalDocumentDetailsTabs={({ document }) => [
         {
           id: 'sca-dashboard-tab',
-          title: 'Security Configuration Assessment dashboard',
-          description: 'Dashboard of the Security Configuration Assessment',
-          name: 'Check Details',
+          title: scaI18n.dashboardTabTitle,
+          description: scaI18n.dashboardTabDescription,
+          name: scaI18n.checkDetails,
           content: <CheckDetails check={document?._source?.check} />,
         },
       ]}

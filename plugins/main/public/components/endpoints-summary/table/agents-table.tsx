@@ -40,6 +40,7 @@ import { getWazuhAPIVersion } from '../services';
 import { RemoveAgentModal } from './actions/remove-agent-modal';
 import { getAgentVersion } from '../../../../common/services/wz-agent';
 import { useUpgradeStatus, usePendingUpgradeAgents } from '../hooks';
+import { endpointsSummaryI18n } from '../i18n';
 
 type AgentList = {
   items: Agent[];
@@ -171,9 +172,7 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
             <EuiFlexItem grow={false}>
               <EuiCallOut
                 size='s'
-                title={`${totalSelected} ${
-                  totalSelected === 1 ? 'agent' : 'agents'
-                } selected`}
+                title={endpointsSummaryI18n.agentsSelected(totalSelected)}
               />
             </EuiFlexItem>
             {showSelectAllItems ? (
@@ -184,8 +183,10 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                   color={!allAgentsSelected ? 'primary' : 'danger'}
                 >
                   {!allAgentsSelected
-                    ? `Select all ${agentList.totalItems} agents`
-                    : `Clear ${agentList.totalItems} agents selected`}
+                    ? endpointsSummaryI18n.selectAllAgents(agentList.totalItems)
+                    : endpointsSummaryI18n.clearAgentsSelected(
+                        agentList.totalItems,
+                      )}
                 </EuiButton>
               </EuiFlexItem>
             ) : null}
@@ -203,7 +204,7 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
       <EuiFlexGroup className='wz-overflow-auto'>
         <EuiFlexItem>
           <TableWzAPI
-            title='Agents'
+            title={endpointsSummaryI18n.agents}
             addOnTitle={selectedtemsRenderer}
             actionButtons={
               <EuiFlexItem grow={false}>
@@ -218,7 +219,7 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                     },
                   )}
                 >
-                  Deploy new agent
+                  {endpointsSummaryI18n.deployNewAgent}
                 </WzButtonPermissions>
               </EuiFlexItem>
             }
@@ -276,31 +277,31 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                   return [
                     {
                       label: 'dateAdd',
-                      description: 'filter by registration date',
+                      description: endpointsSummaryI18n.filterByRegistrationDate,
                     },
-                    { label: 'id', description: 'filter by ID' },
-                    { label: 'ip', description: 'filter by IP address' },
-                    { label: 'group', description: 'filter by group' },
+                    { label: 'id', description: endpointsSummaryI18n.filterById },
+                    { label: 'ip', description: endpointsSummaryI18n.filterByIp },
+                    { label: 'group', description: endpointsSummaryI18n.filterByGroup },
                     {
                       label: 'lastKeepAlive',
-                      description: 'filter by last keep alive',
+                      description: endpointsSummaryI18n.filterByLastKeepAlive,
                     },
-                    { label: 'manager', description: 'filter by manager' },
-                    { label: 'name', description: 'filter by name' },
+                    { label: 'manager', description: endpointsSummaryI18n.filterByManager },
+                    { label: 'name', description: endpointsSummaryI18n.filterByName },
                     {
                       label: 'os.name',
-                      description: 'filter by operating system name',
+                      description: endpointsSummaryI18n.filterByOsName,
                     },
                     {
                       label: 'os.platform',
-                      description: 'filter by operating platform',
+                      description: endpointsSummaryI18n.filterByOsPlatform,
                     },
                     {
                       label: 'os.version',
-                      description: 'filter by operating system version',
+                      description: endpointsSummaryI18n.filterByOsVersion,
                     },
-                    { label: 'status', description: 'filter by status' },
-                    { label: 'version', description: 'filter by version' },
+                    { label: 'status', description: endpointsSummaryI18n.filterByStatus },
+                    { label: 'version', description: endpointsSummaryI18n.filterByVersion },
                   ];
                 },
                 value: async (currentValue, { field }) => {
@@ -373,7 +374,7 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                         value,
                       )
                         ? undefined
-                        : `"${value}" is not a expected format. Valid formats: YYYY-MM-DD, YYYY-MM-DD HH:mm:ss, YYYY-MM-DDTHH:mm:ss, YYYY-MM-DDTHH:mm:ssZ.`;
+                        : endpointsSummaryI18n.invalidDateFormat(value);
                     }
                   }
                 },
@@ -404,16 +405,13 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
       {pendingUpgradeAgents.length ? (
         <>
           <EuiCallOut
-            title={`${pendingUpgradeAgents.length} ${
-              pendingUpgradeAgents.length === 1 ? 'agent is' : 'agents are'
-            } being upgraded`}
+            title={endpointsSummaryI18n.agentsBeingUpgraded(
+              pendingUpgradeAgents.length,
+            )}
             color='primary'
             iconType='iInCircle'
           >
-            <p>
-              The upgrade request was sent. This list will refresh automatically
-              once each agent reports the new version.
-            </p>
+            <p>{endpointsSummaryI18n.upgradeRefreshHint}</p>
           </EuiCallOut>
           <EuiSpacer size='m' />
         </>

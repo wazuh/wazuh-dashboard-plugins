@@ -14,6 +14,10 @@ import { formatUIDate } from '../../../../react-services/time-service';
 import { DataGridVisibleColumnsSelector } from './visible-columns-selector';
 import RestoreStateColumnsButton from './restore-state-columns';
 import useDataGridStatePersistenceManager from '../../data-grid/data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
+import {
+  getQueryResultsExceededTooltip,
+  wzDiscoverI18n,
+} from '../i18n';
 
 type tDiscoverDataGridAdditionalControlsProps = {
   totalHits: number;
@@ -53,10 +57,10 @@ const DiscoverDataGridAdditionalControls = (
         tooltip={
           totalHits && totalHits > maxEntriesPerQuery
             ? {
-                ariaLabel: 'Info',
-                content: `The query results exceeded the limit of ${formatNumWithCommas(
-                  maxEntriesPerQuery,
-                )} hits. Please refine your search.`,
+                ariaLabel: wzDiscoverI18n.info,
+                content: getQueryResultsExceededTooltip(
+                  formatNumWithCommas(maxEntriesPerQuery),
+                ),
                 iconType: 'iInCircle',
                 position: 'top',
               }
@@ -86,7 +90,7 @@ const DiscoverDataGridAdditionalControls = (
         className='euiDataGrid__controlBtn'
         onClick={onHandleExportResults}
       >
-        Export Formatted
+        {wzDiscoverI18n.exportFormatted}
       </EuiButtonEmpty>
 
       <RestoreStateColumnsButton

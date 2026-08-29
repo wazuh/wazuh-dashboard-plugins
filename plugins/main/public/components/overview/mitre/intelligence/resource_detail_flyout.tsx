@@ -26,6 +26,7 @@ import {
 } from '@elastic/eui';
 import { Markdown } from '../../../common/util';
 import { WzFlyout } from '../../../common/flyouts';
+import { mitreI18n } from '../i18n';
 
 interface DetailFlyoutType {
   details: any;
@@ -47,7 +48,7 @@ export const ModuleMitreAttackIntelligenceFlyout = ({
     >
       <EuiFlyoutHeader hasBorder>
         <EuiTitle size='m'>
-          <h2 id='flyoutTitle'>Details</h2>
+          <h2 id='flyoutTitle'>{mitreI18n.details}</h2>
         </EuiTitle>
       </EuiFlyoutHeader>
       <EuiFlyoutBody>
@@ -74,7 +75,7 @@ export const ModuleMitreAttackIntelligenceFlyout = ({
         <EuiFlexGroup>
           <EuiFlexItem>
             <div>
-              <strong>Description</strong>
+              <strong>{mitreI18n.description}</strong>
             </div>
             <EuiText>
               {details.description ? (

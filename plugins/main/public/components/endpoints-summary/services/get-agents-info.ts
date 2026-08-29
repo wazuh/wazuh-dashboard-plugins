@@ -7,6 +7,7 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { WzRequest } from '../../../react-services/wz-request';
 import { getColorPaletteByIndex } from './get-color-palette-by-index';
+import { endpointsSummaryI18n } from '../i18n';
 import { agentStatusLabelByAgentStatus } from '../../../../common/services/wz_agent_status';
 import { HOME_OVERVIEW_AGENT_STATUS_COLOR } from '../../common/welcome/home-overview/lib/theme-colors';
 
@@ -105,7 +106,7 @@ export const getAgentsInfo = async (): Promise<AgentsInfoResult> => {
       error: {
         error: error,
         message: error?.message || error,
-        title: 'Could not get agents info',
+        title: endpointsSummaryI18n.couldNotGetAgentsInfo,
       },
     };
     getErrorOrchestrator().handleError(options);

@@ -32,8 +32,11 @@ import {
   getActiveResponseUrl,
   getItHygieneSystemOsUrl,
   getItHygieneUrl,
+import {
   getRegulatoryComplianceUrlHome,
 } from '../../utils/navigation';
+import { activeResponses, ITHygiene, regulatoryCompliance } from '../../../../../../utils/applications';
+import { homeOverviewI18n } from '../../i18n';
 
 export interface SecurityOperationsSectionProps {
   complianceControls: RegulatoryComplianceBadgesProps['controls'];
@@ -55,8 +58,8 @@ const SecurityOperationsSectionComponent: React.FC<
   return (
     <div ref={sectionRef}>
       <SectionHeader
-        title='Security operations'
-        description='Fleet inventory scale, automated response activity, and the regulatory frameworks you can jump to.'
+        title={homeOverviewI18n.securityOperations}
+        description={homeOverviewI18n.securityOperationsDescription}
       />
       <EuiFlexGroup wrap responsive={false}>
         <EuiFlexItem>
@@ -64,10 +67,10 @@ const SecurityOperationsSectionComponent: React.FC<
             status='available'
             title={
               <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={getItHygieneUrl()}>IT Hygiene</EuiLink>
+                <EuiLink href={getItHygieneUrl()}>{ITHygiene.title}</EuiLink>
               </RedirectAppLinks>
             }
-            caption='Current state'
+            caption={homeOverviewI18n.currentState}
             centerBody
             data-test-subj='home-overview-it-hygiene'
           >
@@ -92,11 +95,11 @@ const SecurityOperationsSectionComponent: React.FC<
             title={
               <RedirectAppLinks application={getCore().application}>
                 <EuiLink href={getActiveResponseUrl()}>
-                  Incident Response
+                  {activeResponses.title}
                 </EuiLink>
               </RedirectAppLinks>
             }
-            caption='Last 24 hours'
+            caption={homeOverviewI18n.last24Hours}
             centerBody
             data-test-subj='home-overview-active-response'
           >
@@ -115,7 +118,7 @@ const SecurityOperationsSectionComponent: React.FC<
                   </EuiLink>
                 </RedirectAppLinks>
               }
-              label='Actions triggered, last 24 hours'
+              label={homeOverviewI18n.actionsTriggered24h}
               data-test-subj='active-response-stat'
             />
           </WidgetGroup>
@@ -126,11 +129,11 @@ const SecurityOperationsSectionComponent: React.FC<
             title={
               <RedirectAppLinks application={getCore().application}>
                 <EuiLink href={getRegulatoryComplianceUrlHome()}>
-                  Regulatory Compliance
+                  {regulatoryCompliance.title}
                 </EuiLink>
               </RedirectAppLinks>
             }
-            caption='Controls implicated, last 24 hours'
+            caption={homeOverviewI18n.controlsImplicated24h}
             centerBody
             data-test-subj='home-overview-regulatory-compliance'
           >
@@ -150,9 +153,12 @@ const SecurityOperationsSectionComponent: React.FC<
               topOs.error?.kind === 'index-pattern-missing'
             }
             isPermissionDenied={topOs.error?.kind === 'permission-denied'}
-            title='Top 5 operating systems'
-            caption='Current state'
-            headerLink={{ label: 'IT Hygiene', href: getItHygieneUrl() }}
+            title={homeOverviewI18n.top5OperatingSystems}
+            caption={homeOverviewI18n.currentState}
+            headerLink={{
+              label: homeOverviewI18n.itHygiene,
+              href: getItHygieneUrl(),
+            }}
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
             centerBody
             data-test-subj='home-overview-top-os'
@@ -160,10 +166,10 @@ const SecurityOperationsSectionComponent: React.FC<
             {topOs.data && (
               <BarList
                 items={topOs.data}
-                emptyMessage='No operating systems found'
-                title='OS name'
+                emptyMessage={homeOverviewI18n.noOperatingSystems}
+                title={homeOverviewI18n.osName}
                 totalSlots={5}
-                moreItemsMessage='No more operating systems to display'
+                moreItemsMessage={homeOverviewI18n.noMoreOperatingSystems}
                 getHref={item =>
                   getItHygieneSystemOsUrl(item.key, topOs.indexPatternId)
                 }
@@ -180,9 +186,12 @@ const SecurityOperationsSectionComponent: React.FC<
               topServices.error?.kind === 'index-pattern-missing'
             }
             isPermissionDenied={topServices.error?.kind === 'permission-denied'}
-            title='Top 5 network services'
-            caption='Current state'
-            headerLink={{ label: 'IT Hygiene', href: getItHygieneUrl() }}
+            title={homeOverviewI18n.top5NetworkServices}
+            caption={homeOverviewI18n.currentState}
+            headerLink={{
+              label: homeOverviewI18n.itHygiene,
+              href: getItHygieneUrl(),
+            }}
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
             data-test-subj='home-overview-top-network-services'
           >

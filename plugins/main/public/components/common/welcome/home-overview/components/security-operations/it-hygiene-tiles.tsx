@@ -7,6 +7,7 @@ import {
   getItHygieneSystemOsUrl,
   getItHygieneUsersTabUrl,
 } from '../../utils/navigation';
+import { homeOverviewI18n } from '../../i18n';
 
 export interface ItHygieneTilesProps {
   operatingSystems: DataGroupResult<number>;
@@ -18,25 +19,25 @@ export interface ItHygieneTilesProps {
 const TILES: ReadonlyArray<StatTileSpec<keyof ItHygieneTilesProps>> = [
   {
     key: 'operatingSystems',
-    label: 'Operating systems',
+    label: homeOverviewI18n.operatingSystems,
     testSubj: 'it-hygiene-tile-operating-systems',
     onSelect: () => getItHygieneSystemOsUrl(),
   },
   {
     key: 'packages',
-    label: 'Packages',
+    label: homeOverviewI18n.packages,
     testSubj: 'it-hygiene-tile-packages',
     onSelect: getItHygieneSoftwareUrl,
   },
   {
     key: 'users',
-    label: 'Users',
+    label: homeOverviewI18n.users,
     testSubj: 'it-hygiene-tile-users',
     onSelect: getItHygieneUsersTabUrl,
   },
   {
     key: 'services',
-    label: 'Services',
+    label: homeOverviewI18n.services,
     testSubj: 'it-hygiene-tile-services',
     onSelect: getItHygieneServicesTabUrl,
   },

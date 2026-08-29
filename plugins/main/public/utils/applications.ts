@@ -840,7 +840,9 @@ export const Categories = [
   },
   {
     id: 'management',
-    label: 'Indexer management',
+    label: i18n.translate('wz-app-category-indexer-management', {
+      defaultMessage: 'Indexer management',
+    }),
     order: 5e3,
     euiIconType: 'managementApp',
   },

@@ -25,6 +25,7 @@ import {
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
+import { mitreI18n } from '../../../i18n';
 import { tSearchParams } from '../../../../../common/data-source';
 import { tFilterParams } from '../../mitre';
 
@@ -116,7 +117,7 @@ export const Tactics = (props: tTacticsProps) => {
         error: {
           error: error,
           message: error.message || error,
-          title: `Mitre alerts could not be fetched`,
+          title: mitreI18n.errorAlertsNotFetched,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -191,10 +192,10 @@ export const Tactics = (props: tTacticsProps) => {
   const panels = [
     {
       id: 0,
-      title: 'Options',
+      title: mitreI18n.options,
       items: [
         {
-          name: 'Select all',
+          name: mitreI18n.selectAll,
           icon: <EuiIcon type='check' size='m' />,
           onClick: () => {
             closePopover();
@@ -202,7 +203,7 @@ export const Tactics = (props: tTacticsProps) => {
           },
         },
         {
-          name: 'Unselect all',
+          name: mitreI18n.unselectAll,
           icon: <EuiIcon type='cross' size='m' />,
           onClick: () => {
             closePopover();
@@ -223,7 +224,7 @@ export const Tactics = (props: tTacticsProps) => {
       <EuiFlexGroup>
         <EuiFlexItem>
           <EuiTitle size='m'>
-            <h1>Tactics</h1>
+            <h1>{mitreI18n.tactics}</h1>
           </EuiTitle>
         </EuiFlexItem>
 
@@ -233,7 +234,7 @@ export const Tactics = (props: tTacticsProps) => {
               <EuiButtonIcon
                 iconType='gear'
                 onClick={() => onGearButtonClick()}
-                aria-label={'tactics options'}
+                aria-label={mitreI18n.tacticsOptionsAria}
               ></EuiButtonIcon>
             }
             isOpen={isPopoverOpen}

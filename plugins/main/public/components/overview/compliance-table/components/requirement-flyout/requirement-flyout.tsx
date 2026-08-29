@@ -44,9 +44,9 @@ import { wzDiscoverRenderColumns } from '../../../../common/wazuh-discover/rende
 import { setFilters } from '../../../../common/search-bar/set-filters';
 import {
   TAB_VIEW_ID_EVENTS,
-  TAB_VIEW_NAME_DASHBOARD,
-  TAB_VIEW_NAME_EVENTS,
 } from '../../../../../../common/constants';
+import { moduleTabsI18n } from '../../../../../utils/module-tabs-i18n';
+import { complianceI18n } from '../../../regulatory-compliance/i18n';
 
 const mapStateToProps = state => ({
   currentAgentData: state.appStateReducers.currentAgentData,
@@ -89,15 +89,15 @@ export const RequirementFlyout = connect(mapStateToProps)(
           id: '@timestamp',
           isSortable: true,
           defaultSortDirection: 'desc',
-          displayAsText: 'Time',
+          displayAsText: complianceI18n.columnTime,
           render: value => formatUIDate(value),
         },
         {
           id: this.props.getRequirementKey(),
-          displayAsText: 'Requirement(s)',
+          displayAsText: complianceI18n.columnRequirements,
         },
-        { id: 'wazuh.integration.name', displayAsText: 'Integration' },
-        { id: 'wazuh.integration.decoders', displayAsText: 'Decoders' },
+        { id: 'wazuh.integration.name', displayAsText: complianceI18n.columnIntegration },
+        { id: 'wazuh.integration.decoders', displayAsText: complianceI18n.columnDecoders },
       ];
 
       const columnsWithoutAgent = [
@@ -105,25 +105,25 @@ export const RequirementFlyout = connect(mapStateToProps)(
           id: '@timestamp',
           isSortable: true,
           defaultSortDirection: 'desc',
-          displayAsText: 'Time',
+          displayAsText: complianceI18n.columnTime,
           width: 140,
           render: value => formatUIDate(value),
         },
         {
           id: 'wazuh.agent.id',
-          displayAsText: 'Agent',
+          displayAsText: complianceI18n.columnAgent,
           width: 70,
         },
         {
           id: 'wazuh.agent.name',
-          displayAsText: 'Agent name',
+          displayAsText: complianceI18n.columnAgentName,
         },
         {
           id: this.props.getRequirementKey(),
-          displayAsText: 'Requirement',
+          displayAsText: complianceI18n.columnRequirement,
         },
-        { id: 'wazuh.integration.name', displayAsText: 'Integration' },
-        { id: 'wazuh.rule.title', displayAsText: 'Rule title' },
+        { id: 'wazuh.integration.name', displayAsText: complianceI18n.columnIntegration },
+        { id: 'wazuh.rule.title', displayAsText: complianceI18n.columnRuleTitle },
       ];
       const agentId = this.props.currentAgentData?.id;
       return agentId
@@ -141,7 +141,7 @@ export const RequirementFlyout = connect(mapStateToProps)(
             </div>
           )) || (
             <EuiTitle size='m'>
-              <h2 id='flyoutSmallTitle'>Requirement {currentRequirement}</h2>
+              <h2 id='flyoutSmallTitle'>{complianceI18n.requirementLabel(currentRequirement)}</h2>
             </EuiTitle>
           )}
         </EuiFlyoutHeader>
@@ -205,7 +205,7 @@ export const RequirementFlyout = connect(mapStateToProps)(
             id={'details'}
             buttonContent={
               <EuiTitle size='s'>
-                <h3>Details</h3>
+                <h3>{complianceI18n.details}</h3>
               </EuiTitle>
             }
             paddingSize='xs'
@@ -225,7 +225,7 @@ export const RequirementFlyout = connect(mapStateToProps)(
                   </EuiFlexItem>
                   <EuiFlexItem style={{ marginLeft: 2 }} grow={true}>
                     <EuiText style={{ marginLeft: 8, fontSize: 14 }}>
-                      <p style={{ fontWeight: 500, marginBottom: 2 }}>Goals</p>
+                      <p style={{ fontWeight: 500, marginBottom: 2 }}>{complianceI18n.goals}</p>
 
                       <p>{requirementGoal[currentReq]}</p>
                     </EuiText>
@@ -245,7 +245,7 @@ export const RequirementFlyout = connect(mapStateToProps)(
                 <EuiFlexItem style={{ marginLeft: 2 }} grow={true}>
                   <EuiText style={{ marginLeft: 8, fontSize: 14 }}>
                     <p style={{ fontWeight: 500, marginBottom: 2 }}>
-                      Requirement description
+                      {complianceI18n.requirementDescription}
                     </p>
 
                     <p>{this.props.description}</p>
@@ -264,13 +264,15 @@ export const RequirementFlyout = connect(mapStateToProps)(
             buttonContent={
               <EuiTitle size='s'>
                 <h3>
-                  Recent events
+                  {complianceI18n.recentEvents}
                   {this.props.view !== TAB_VIEW_ID_EVENTS && (
                     <span style={{ marginLeft: 16 }}>
                       <span>
                         <EuiToolTip
                           position='top'
-                          content={`Show ${currentRequirement} in ${TAB_VIEW_NAME_DASHBOARD}`}
+                          content={moduleTabsI18n.showInDashboard(
+                            currentRequirement,
+                          )}
                         >
                           <EuiIcon
                             onMouseDown={e => {
@@ -284,7 +286,9 @@ export const RequirementFlyout = connect(mapStateToProps)(
                         </EuiToolTip>
                         <EuiToolTip
                           position='top'
-                          content={`Inspect ${currentRequirement} in ${TAB_VIEW_NAME_EVENTS}`}
+                          content={moduleTabsI18n.inspectInFindings(
+                            currentRequirement,
+                          )}
                         >
                           <EuiIcon
                             onMouseDown={e => {

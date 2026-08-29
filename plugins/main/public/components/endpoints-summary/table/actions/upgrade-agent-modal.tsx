@@ -26,6 +26,7 @@ import { upgradeAgentService } from '../../services';
 import { Agent } from '../../types';
 import { getToasts } from '../../../../kibana-services';
 import { upgradeStatusState } from '../../services/upgrade-status-state';
+import { endpointsSummaryI18n } from '../../i18n';
 
 const supportedPlatforms = [
   'debian',
@@ -55,10 +56,10 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
 
     const getUpgradeErrorMessage = (error: any) => {
       const apiMessage = error?.response?.data?.message;
-      const message = apiMessage || error?.message || 'Unknown error';
+      const message = apiMessage || error?.message || endpointsSummaryI18n.unknownError;
 
       if (/permission denied/i.test(message)) {
-        return `No permissions to upgrade this agent. ${message}`;
+        return endpointsSummaryI18n.noPermissionUpgradeAgent(message);
       }
 
       return message;
@@ -90,8 +91,8 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
         }
         showToast(
           'success',
-          'Upgrade agent',
-          'Upgrade request sent successfully',
+          endpointsSummaryI18n.upgradeAgentTitle,
+          endpointsSummaryI18n.upgradeRequestSent,
         );
         reloadAgents();
       } catch (error: any) {
@@ -104,7 +105,7 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
           error: {
             error,
             message: errorMessage,
-            title: `Could not upgrade agent`,
+            title: endpointsSummaryI18n.couldNotUpgradeAgent,
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -125,7 +126,9 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
             <EuiFlexGroup gutterSize='m'>
               <EuiFlexItem>
                 <EuiDescriptionList compressed>
-                  <EuiDescriptionListTitle>Agent ID</EuiDescriptionListTitle>
+                  <EuiDescriptionListTitle>
+                    {endpointsSummaryI18n.agentId}
+                  </EuiDescriptionListTitle>
                   <EuiDescriptionListDescription>
                     {agent.id}
                   </EuiDescriptionListDescription>
@@ -133,7 +136,9 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
               </EuiFlexItem>
               <EuiFlexItem>
                 <EuiDescriptionList compressed>
-                  <EuiDescriptionListTitle>Agent name</EuiDescriptionListTitle>
+                  <EuiDescriptionListTitle>
+                    {endpointsSummaryI18n.agentName}
+                  </EuiDescriptionListTitle>
                   <EuiDescriptionListDescription>
                     {agent.name}
                   </EuiDescriptionListDescription>
@@ -146,7 +151,7 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
               <EuiFlexItem>
                 <EuiDescriptionList compressed>
                   <EuiDescriptionListTitle>
-                    Agent version
+                    {endpointsSummaryI18n.agentVersion}
                   </EuiDescriptionListTitle>
                   <EuiDescriptionListDescription>
                     {agent.version}
@@ -155,7 +160,9 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
               </EuiFlexItem>
               <EuiFlexItem>
                 <EuiDescriptionList compressed>
-                  <EuiDescriptionListTitle>OS</EuiDescriptionListTitle>
+                  <EuiDescriptionListTitle>
+                    {endpointsSummaryI18n.os}
+                  </EuiDescriptionListTitle>
                   <EuiDescriptionListDescription>
                     {agent.os.name}
                   </EuiDescriptionListDescription>
@@ -168,14 +175,14 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
               <EuiFormRow
                 label={
                   <span>
-                    Package type{' '}
-                    <EuiIconTip content="Specify the package type, as the manager can't determine it automatically for the OS platform" />
+                    {endpointsSummaryI18n.packageType}{' '}
+                    <EuiIconTip content={endpointsSummaryI18n.packageTypeTip} />
                   </span>
                 }
                 isInvalid={!packageType}
               >
                 <EuiSelect
-                  placeholder='Packege type'
+                  placeholder={endpointsSummaryI18n.packageTypePlaceholder}
                   value={packageType}
                   options={[
                     { value: 'deb', text: 'DEB' },
@@ -199,20 +206,24 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
         }}
       >
         <EuiModalHeader>
-          <EuiModalHeaderTitle>Upgrade agent</EuiModalHeaderTitle>
+          <EuiModalHeaderTitle>
+            {endpointsSummaryI18n.upgradeAgentTitle}
+          </EuiModalHeaderTitle>
         </EuiModalHeader>
 
         <EuiModalBody>{form}</EuiModalBody>
 
         <EuiModalFooter>
-          <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
+          <EuiButtonEmpty onClick={onClose}>
+            {endpointsSummaryI18n.cancel}
+          </EuiButtonEmpty>
           <EuiButton
             onClick={handleOnSave}
             fill
             isLoading={isLoading}
             disabled={showPackageSelector && !packageType}
           >
-            Upgrade
+            {endpointsSummaryI18n.upgrade}
           </EuiButton>
         </EuiModalFooter>
       </EuiModal>

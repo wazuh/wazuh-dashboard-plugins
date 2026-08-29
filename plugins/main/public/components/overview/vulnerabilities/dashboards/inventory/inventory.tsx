@@ -65,6 +65,8 @@ import { vulnerabilityManagedFilters } from '../../common/vulnerability-managed-
 import RestoreStateColumnsButton from '../../../../common/wazuh-discover/components/restore-state-columns';
 import managedFilters from './managed-filters';
 import DashboardRenderer from '../../../../common/dashboards/dashboard-renderer/dashboard-renderer';
+import { vulnerabilitiesI18n } from '../../i18n';
+import { wzDiscoverI18n } from '../../../../common/wazuh-discover/i18n';
 
 const InventoryVulsComponent = () => {
   const {
@@ -107,7 +109,7 @@ const InventoryVulsComponent = () => {
   const DocViewInspectButton = ({
     rowIndex,
   }: EuiDataGridCellValueElementProps) => {
-    const inspectHintMsg = 'Inspect vulnerability details';
+    const inspectHintMsg = vulnerabilitiesI18n.inspectVulnerabilityDetails;
     return (
       <EuiToolTip content={inspectHintMsg}>
         <EuiButtonIcon
@@ -121,7 +123,7 @@ const InventoryVulsComponent = () => {
 
   const dataGridProps = useDataGrid({
     moduleId: 'vulnerabilities-inventory',
-    ariaLabelledBy: 'Vulnerabilities Inventory Table',
+    ariaLabelledBy: vulnerabilitiesI18n.inventoryTable,
     defaultColumns: inventoryTableDefaultColumns,
     renderColumns: wzDiscoverRenderColumns,
     results,
@@ -151,7 +153,7 @@ const InventoryVulsComponent = () => {
     } catch (error) {
       const searchError = ErrorFactory.create(HttpError, {
         error,
-        message: 'Error downloading csv report',
+        message: wzDiscoverI18n.errorDownloadingCsv,
       });
       ErrorHandler.handleError(searchError);
     } finally {
@@ -171,7 +173,7 @@ const InventoryVulsComponent = () => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching data',
+          message: wzDiscoverI18n.errorFetchingData,
         });
         ErrorHandler.handleError(searchError);
       });
@@ -277,12 +279,12 @@ const InventoryVulsComponent = () => {
                               results?.hits?.total &&
                               results?.hits?.total > MAX_ENTRIES_PER_QUERY
                                 ? {
-                                    ariaLabel: 'Info',
-                                    content: `The query results has exceeded the limit of ${formatNumWithCommas(
-                                      MAX_ENTRIES_PER_QUERY,
-                                    )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                      MAX_ENTRIES_PER_QUERY,
-                                    )} hits.`,
+                                    ariaLabel: wzDiscoverI18n.info,
+                                    content: vulnerabilitiesI18n.queryResultsExceeded(
+                                      formatNumWithCommas(
+                                        MAX_ENTRIES_PER_QUERY,
+                                      ),
+                                    ),
                                     iconType: 'iInCircle',
                                     position: 'top',
                                   }
@@ -301,7 +303,7 @@ const InventoryVulsComponent = () => {
                             className='euiDataGrid__controlBtn'
                             onClick={onClickExportResults}
                           >
-                            Export Formatted
+                            {vulnerabilitiesI18n.exportFormatted}
                           </EuiButtonEmpty>
 
                           <RestoreStateColumnsButton
@@ -325,7 +327,7 @@ const InventoryVulsComponent = () => {
               <EuiFlyout onClose={closeFlyoutHandler} size='m'>
                 <EuiFlyoutHeader>
                   <EuiTitle>
-                    <h2>Vulnerability details</h2>
+                    <h2>{vulnerabilitiesI18n.vulnerabilityDetails}</h2>
                   </EuiTitle>
                 </EuiFlyoutHeader>
                 <EuiFlyoutBody>

@@ -4,13 +4,14 @@ import { API_NAME_AGENT_STATUS } from '../../../../../common/constants';
 import { Agent } from '../../types';
 import NavigationService from '../../../../react-services/navigation-service';
 import { isVersionLower } from '../utils';
+import { endpointsSummaryI18n } from '../../i18n';
 
 type SetModalIsVisible = (visible: boolean) => void;
 
 export const agentsTableActions = (
   setAgent: (agent: Agent) => void,
-  setIsEditGroupsVisible: (visible: boolean) => void,
-  setIsUpgradeModalVisible: (visible: boolean) => void,
+  setIsEditGroupsVisible: SetModalIsVisible,
+  setIsUpgradeModalVisible: SetModalIsVisible,
   apiVersion: string,
   {
     // TODO: consider moving the positional arguments to this to avoid bug related to position and allow to extend easily.
@@ -19,19 +20,19 @@ export const agentsTableActions = (
 ) => [
   {
     name: (agent: Agent) => {
-      const name = 'View agent details';
+      const name = endpointsSummaryI18n.viewAgentDetails;
 
       if (agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
         return name;
       }
 
       return (
-        <EuiToolTip content='Since the agent never connected, it is not possible to access its details'>
+        <EuiToolTip content={endpointsSummaryI18n.neverConnectedDetailsTip}>
           <span>{name}</span>
         </EuiToolTip>
       );
     },
-    description: 'View agent details',
+    description: endpointsSummaryI18n.viewAgentDetails,
     icon: 'eye',
     type: 'icon',
     isPrimary: true,
@@ -45,19 +46,19 @@ export const agentsTableActions = (
   },
   {
     name: (agent: Agent) => {
-      const name = 'Agent configuration';
+      const name = endpointsSummaryI18n.agentConfiguration;
 
       if (agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
         return name;
       }
 
       return (
-        <EuiToolTip content='Since the agent never connected, it is not possible to access its configuration'>
+        <EuiToolTip content={endpointsSummaryI18n.neverConnectedConfigTip}>
           <span>{name}</span>
         </EuiToolTip>
       );
     },
-    description: 'Agent configuration',
+    description: endpointsSummaryI18n.agentConfiguration,
     icon: 'wrench',
     type: 'icon',
     onClick: (agent: Agent) =>
@@ -69,8 +70,8 @@ export const agentsTableActions = (
     'data-test-subj': 'action-configuration',
   },
   {
-    name: 'Edit groups',
-    description: 'Edit groups',
+    name: endpointsSummaryI18n.editGroups,
+    description: endpointsSummaryI18n.editGroups,
     icon: 'pencil',
     type: 'icon',
     onClick: (agent: Agent) => {
@@ -85,22 +86,22 @@ export const agentsTableActions = (
       const isOutdated = isVersionLower(agent.version, apiVersion);
 
       if (agent.status === API_NAME_AGENT_STATUS.ACTIVE && isOutdated) {
-        return 'Upgrade';
+        return endpointsSummaryI18n.upgrade;
       }
 
       return (
         <EuiToolTip
           content={
             agent.status !== API_NAME_AGENT_STATUS.ACTIVE
-              ? 'Agent is not active'
-              : 'Agent is up to date'
+              ? endpointsSummaryI18n.agentNotActive
+              : endpointsSummaryI18n.agentUpToDate
           }
         >
-          <span>Upgrade</span>
+          <span>{endpointsSummaryI18n.upgrade}</span>
         </EuiToolTip>
       );
     },
-    description: 'Upgrade',
+    description: endpointsSummaryI18n.upgrade,
     icon: 'package',
     type: 'icon',
     onClick: (agent: Agent) => {
@@ -114,8 +115,8 @@ export const agentsTableActions = (
     },
   },
   {
-    name: 'Remove',
-    description: 'Remove',
+    name: endpointsSummaryI18n.remove,
+    description: endpointsSummaryI18n.remove,
     icon: 'trash',
     type: 'icon',
     onClick: (agent: Agent) => {

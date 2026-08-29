@@ -18,6 +18,7 @@ import {
   EuiModalBody,
   EuiModalHeaderTitle,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { connect } from 'react-redux';
 import { showExploreAgentModalGlobal } from '../../redux/actions/appStateActions';
 import store from '../../redux/store';
@@ -36,7 +37,11 @@ const WzAgentSelector = props => {
           initialFocus='[name=popswitch]'
         >
           <EuiModalHeader>
-            <EuiModalHeaderTitle>Explore agent</EuiModalHeaderTitle>
+            <EuiModalHeaderTitle>
+              {i18n.translate('wz-explore-agent.modalTitle', {
+                defaultMessage: 'Explore agent',
+              })}
+            </EuiModalHeaderTitle>
           </EuiModalHeader>
           <EuiModalBody>
             <AgentSelectionTable closeAgentModal={closeAgentModal} />
