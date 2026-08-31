@@ -34,7 +34,7 @@ export const SERVER_ADDRESS_TEXTS = [
   {
     title: 'Server address',
     subtitle:
-      'This is the address the agent uses to communicate with the server. Enter an IP address or a fully qualified domain name (FQDN).',
+      'The agent reaches the server at a single endpoint built from an address, a port, and a path prefix. Only the address is required: leave the other two empty and the agent falls back to its own defaults.',
   },
 ];
 

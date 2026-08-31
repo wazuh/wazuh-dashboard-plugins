@@ -14,7 +14,7 @@ type ResolveParamsRequest = Parameters<
   NonNullable<typeof getAgentInventoryTool.resolveParams>
 >[2];
 
-/** Minimal `context` stub for `resolveParams` (issue #8913's `resolveDeicticAgentParams`), same
+/** Minimal `context` stub for `resolveParams` (`resolveDeicticAgentParams`), same
  * pattern as api-host.test.ts's own `fakeContext`: only the two members that function actually
  * reads (`wazuh_core.manageHosts.get` -- via `resolveApiHostId` -- and
  * `wazuh_core.api.client.asCurrentUser.request`) are stubbed. `agents` becomes the Manager API's
@@ -104,7 +104,7 @@ test('get_agent_inventory: an unrecognized kind is rejected', () => {
   );
 });
 
-// --- issue #8913 (diagnostic follow-up): a live diagnostic run (branch diag/8913-router-logging)
+// --- A live diagnostic run
 // proved stage-1 routing correctly offered this tool every time for a deictic inventory question,
 // but the tool's OWN description (and the system prompt) told the model to "call get_agents
 // first" -- a tool the router does not also offer for a lone 'inventory' route -- so the model
@@ -152,7 +152,7 @@ test('get_agent_inventory: an invalid agent_id is rejected (delegates to validat
   );
 });
 
-// --- issue #8873: agent_id is no longer the only way to identify the agent. A 40-question live
+// --- agent_id is not the only way to identify the agent. A 40-question live
 // run invoked this tool 0/40 times, including on 3 questions statically targeting it, because
 // `agent_id` was strictly required and numeric while the target personas ask deictically ("this
 // server") with no id the model can infer. ---
@@ -243,8 +243,8 @@ test('get_agent_inventory: kind="packages" matches get_agent_packages\'s origina
 });
 
 test('get_agent_inventory: kind="ports" matches get_agent_ports\'s original body, field CONTENTS unchanged, order intentionally reordered', () => {
-  // The original assertion pinned get_agent_ports's order; issue #8921's column-budget item
-  // deliberately re-ordered `_source` (its order drives digest.ts's deriveResultColumns, which
+  // The original assertion pinned get_agent_ports's order; this tool's column budget
+  // deliberately re-orders `_source` (its order drives digest.ts's deriveResultColumns, which
   // decides which 6 of these 8 fields the client's visible-column budget shows without a
   // row-expander click). NOTE: assert.deepEqual on an array is still ORDER-SENSITIVE — this
   // test pins the NEW exact order (contents unchanged from the original set), it has not been
@@ -410,7 +410,7 @@ test('get_agent_inventory: deriveColumns is set (no static tableSpec/digest for 
   assert.deepEqual(getAgentInventoryTool.digest.sampleColumns, []);
 });
 
-// --- issue #8913: a live-verified N=5 run of "What software does this box have installed?" found
+// --- A live-verified N=5 run of "What software does this box have installed?" found
 // the system prompt's "call get_agents first" instruction was followed 0/5 times even though the
 // deployed prompt text carried it (4/5 asked the user to name an agent; 1/5 called the wrong tool
 // and found nothing). resolveDeicticAgentParams (this tool's `resolveParams` hook) makes
@@ -448,7 +448,7 @@ test('get_agent_inventory resolveParams: no identifier + zero active agents retu
   }
   assert.match(result.reason, /agent_id.*agent_name|agent_name.*agent_id/);
   assert.match(result.reason, /no active agent/i);
-  // Follow-up audit fix (same bug class as #8913's main fix): this LIVE tool_result error must
+  // This LIVE tool_result error must
   // never tell the model to call get_agents -- stage-1 routing offered get_agent_inventory (its
   // own 'inventory' category) for this call to have happened at all, but nothing guarantees
   // 'agents' was ALSO routed this turn, so naming that tool here can be just as unreachable as it
@@ -567,7 +567,7 @@ test('get_agent_inventory resolveParams: agent_name supplied is returned unchang
   assert.equal(result.resolved.note, undefined);
 });
 
-// Issue #8917: `failClosedFieldPolicy` must be set explicitly and independently of
+// `failClosedFieldPolicy` must be set explicitly and independently of
 // `deriveColumns` -- see that flag's doc comment in types.ts. This tool needs `deriveColumns` for
 // column derivation across its 5 kinds, and separately opts into fail-closed field policy because
 // every field any kind can surface still needs its own explicit FIELD_POLICY_DEFAULTS entry.
@@ -575,7 +575,7 @@ test('get_agent_inventory: failClosedFieldPolicy is explicitly true, independent
   assert.equal(getAgentInventoryTool.failClosedFieldPolicy, true);
 });
 
-// --- issue #8910: an optional "filter" narrows results on the kind's primary name field, so
+// --- An optional "filter" narrows results on the kind's primary name field, so
 // presence questions ("is openssl installed?", "what's on port 9200?") no longer depend on the
 // answer sorting into the first `limit` rows of a possibly much larger inventory. ---
 
@@ -712,7 +712,7 @@ test('get_agent_inventory: kind="os" filter matches either host.hostname or host
   });
 });
 
-// #8914: a numeric ports filter matched EITHER side of the socket with no state narrowing, so
+// A numeric ports filter matched EITHER side of the socket with no state narrowing, so
 // "what's listening on port 9200" returned every connection touching 9200 instead of just the
 // listener(s). The outer clause narrowed here: still a port match on EITHER side (`bool.filter`
 // unchanged in spirit), AND (via a nested `bool.should`/`minimum_should_match: 1`) either
@@ -721,7 +721,7 @@ test('get_agent_inventory: kind="os" filter matches either host.hostname or host
 // gets the plain port match back instead of the query going silently empty.
 //
 // The exact clause shape (`term` with `{value, case_insensitive: true}`, not a bare string) is
-// pinned here on purpose: a live query against a real wazuh-indexer deployment (issue #8914)
+// pinned here on purpose: a live query against a real wazuh-indexer deployment
 // found the actual `interface.state` vocabulary is lowercase full words ("listening",
 // "established", "time_wait", "close_wait") -- NOT the "LISTEN"/"ESTABLISHED" short forms
 // plugins/main's synthetic sample-data generator uses. An exact-cased `term: {'interface.state':
@@ -778,7 +778,7 @@ test('get_agent_inventory: kind="ports" numeric filter matches the port on eithe
   });
 });
 
-// Pins the case-insensitivity specifically (issue #8914's live-verified defect): the live
+// Pins the case-insensitivity specifically: the live
 // `wazuh-states-inventory-ports*` vocabulary is lowercase ("listening"), so a `term` clause
 // without `case_insensitive: true` -- or one restored to an exact-cased literal like "LISTEN" or
 // "Listening" -- must fail this assertion loudly rather than silently reintroducing the bug.

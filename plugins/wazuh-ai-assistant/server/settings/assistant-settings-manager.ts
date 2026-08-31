@@ -40,12 +40,10 @@ export class AssistantSettingsManager {
 
   /**
    * Fetches every provider's slice, bootstrapping (via `createDefaults`) whichever provider(s)
-   * report `undefined` — i.e. this is the "read, creating on first access" behavior the old
-   * single-store `getOrCreateAssistantSettings` had, just fanned out per provider. Also
-   * default-fills any INDIVIDUAL missing field within a provider's own slice (a document written
-   * before a field existed has that key simply absent from `_source`), the same per-field fallback
-   * `getOrCreateAssistantSettings` used to do inline for every field at once — falling back in both
-   * cases to the provider's OWN `defaults`, never a value supplied by the caller.
+   * report `undefined` — a "read, creating on first access" behavior, fanned out per provider.
+   * Also default-fills any INDIVIDUAL missing field within a provider's own slice (a document
+   * written before a field existed has that key simply absent from `_source`), falling back in
+   * both cases to the provider's OWN `defaults`, never a value supplied by the caller.
    */
   async getOrCreateSettings(
     context: RequestHandlerContext,

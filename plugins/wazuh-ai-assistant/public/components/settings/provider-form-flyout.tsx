@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './provider-form-flyout.scss';
 import {
   EuiButton,
@@ -34,15 +34,14 @@ import { FormattedMessage } from '@osd/i18n/react';
 import { ProviderInput, ProviderSummary } from '../../../common/types';
 import { PROVIDER_TYPES } from '../../../common/constants';
 import { useDirtyFormState } from '../../hooks/use-dirty-form-state';
-import { ProviderTestOutcome } from './provider-status';
+import { ProviderTestOutcome, isEndpointBlockedError } from './provider-status';
 
 /**
  * Provider names in this file are a support claim, not decoration: naming a service here sends an
- * admin off to configure it. Groq and "Bedrock-Mantle" used to appear in the card's description —
- * Groq was measured failing with a 413 across its whole tier, and Bedrock-Mantle is an internal
- * gateway name that does not belong in a product string. The enumeration now lives in the
- * description below (which has room for it) rather than in this label, which was wrapping to two
- * lines inside the card.
+ * admin off to configure it. Groq and "Bedrock-Mantle" do not appear in this label — Groq was
+ * measured failing with a 413 across its whole tier, and Bedrock-Mantle is an internal gateway
+ * name that does not belong in a product string. The enumeration lives in the description below
+ * (which has room for it), not in this label, which would wrap to two lines inside the card.
  */
 const PROVIDER_TYPE_FORM_LABELS: Record<string, string> = {
   openai_compatible: i18n.translate(
@@ -57,8 +56,8 @@ const PROVIDER_TYPE_FORM_LABELS: Record<string, string> = {
 };
 
 /** One-line description shown under the provider type selector so the choice is self-explanatory
- * without opening either form label's parenthetical — CEO feedback was specifically that signing
- * up an Anthropic key was confusing, and part of that was not knowing which type to pick. */
+ * without opening either form label's parenthetical — feedback flagged that signing up an
+ * Anthropic key was confusing, and part of that was not knowing which type to pick. */
 const PROVIDER_TYPE_DESCRIPTIONS: Record<ProviderInput['type'], string> = {
   anthropic: i18n.translate(
     'wazuhAiAssistant.settings.type.anthropicDescription',
@@ -193,9 +192,9 @@ const PROVIDER_URL_GUIDANCE: Record<
      *               admin might paste literally)
      * - Ollama      default port 11434 with its OpenAI-compatibility layer at /v1
      *
-     * Groq's endpoint is deliberately NOT an example any more. Its documentation link below stays:
-     * a link is reference for someone who has already chosen Groq, whereas an example is a
-     * suggestion, and Groq was measured returning 413 across its whole tier.
+     * Groq's endpoint is deliberately NOT an example. Its documentation link below stays: a link is
+     * reference for someone who has already chosen Groq, whereas an example is a suggestion, and
+     * Groq was measured returning 413 across its whole tier.
      */
     examples: [
       'https://api.openai.com/v1',
@@ -450,16 +449,19 @@ function getVendorModelSuggestions(
 
 /**
  * The four steps of the getting-started callout: one i18n message per step, so each is
- * translatable on its own and the numbering comes from the `<ol>` rather than from the copy. They
- * used to be a single message with "1. … 2. … 3. … 4. …" run together in one inline paragraph,
- * which is the shape a sequence should never take — it neither scans nor is announced as a list.
+ * translatable on its own and the numbering comes from the `<ol>` rather than from the copy. A
+ * single message with "1. … 2. … 3. … 4. …" run together in one inline paragraph is the shape a
+ * sequence should never take — it neither scans nor is announced as a list.
  */
 const GETTING_STARTED_STEPS: string[] = [
   i18n.translate('wazuhAiAssistant.settings.form.gettingStartedStepType', {
     defaultMessage: 'Pick a provider type.',
   }),
+  // "(if the endpoint needs one)" is not hedging — it is the difference between the two provider
+  // types this very form offers: an OpenAI-compatible local runtime (Ollama, LM Studio) has no key
+  // at all, and the flat imperative sent those admins hunting for one that does not exist.
   i18n.translate('wazuhAiAssistant.settings.form.gettingStartedStepKey', {
-    defaultMessage: 'Paste its API key.',
+    defaultMessage: 'Paste its API key (if the endpoint needs one).',
   }),
   i18n.translate('wazuhAiAssistant.settings.form.gettingStartedStepModel', {
     defaultMessage: 'Pick a model.',
@@ -470,10 +472,9 @@ const GETTING_STARTED_STEPS: string[] = [
 ];
 
 /**
- * The form's ONE example-value chip. Four inline `EuiBadge` copies used to render this same idiom
- * across the form, which is how they drifted apart in the first place; TWO render sites are left
- * (the endpoint field's examples and the per-vendor model suggestions) now that the Model field's
- * generic per-type examples row is gone.
+ * The form's ONE example-value chip. TWO render sites use it — the endpoint field's examples and
+ * the per-vendor model suggestions — rather than each site rendering its own inline `EuiBadge`
+ * copy of the same idiom, which is how such copies drift apart across a form.
  *
  * Every value it ever shows is a URL or a model id, so it is set in the code face: the chip has to
  * read as a value you can click into the field, not as a label describing one. Clicking fills the
@@ -516,6 +517,123 @@ const emptyForm: ProviderInput = {
 function isValidEndpointUrl(value: string): boolean {
   return /^https?:\/\/.+/i.test(value.trim());
 }
+
+/**
+ * A second scheme GLUED onto the end of a value rather than deliberately placed in a path or query
+ * — the signature of a paste on top of the type-prefilled default. `isValidEndpointUrl` above
+ * happily accepts that: it starts with a scheme and is non-empty, and `new URL()` parses it too,
+ * the whole tail just becoming part of the host or path. So without this check the admin gets no
+ * field error at all and instead waits for an opaque connection-test failure against an endpoint
+ * they never meant to type.
+ *
+ * "Glued" is what separates the accident from the legitimate case, and it is the character in front
+ * of the second scheme that says which:
+ *
+ * - `…anthropic.comhttps://gw/v1`, `…openai.com/v1https://gw/v1` — preceded by a host/path
+ *   character, i.e. the admin typed into a field whose existing value was never cleared. Flagged.
+ *   (Both prefill shapes matter: Anthropic's default is bare, every openai_compatible example ends
+ *   in a path like `/v1`, so the second scheme lands in the PATH there, not in the authority.)
+ * - `…/proxy?upstream=https://api.openai.com`, `…/proxy/https://api.openai.com` — preceded by a
+ *   delimiter (`/ = & ?`), i.e. a gateway or passthrough endpoint naming its upstream on purpose.
+ *   The server's own url-guard accepts exactly these, and refusing them would not only reject such
+ *   a provider but permanently block re-saving one already stored — every `handleSave` path runs
+ *   this check, including an edit that changes nothing about the URL. Left alone.
+ *
+ * `hasRepeatedSchemeInAuthority` composes with this rather than being replaced by it: the two catch
+ * different shapes (a scheme pasted in FRONT of the value — `https://https://gw` — is preceded by a
+ * delimiter, so only the authority check sees it).
+ *
+ * This validation is the WHOLE protection for the prefill-vs-example confusion, deliberately. The
+ * obvious alternative — selecting the prefilled value on focus so the first keystroke replaces it —
+ * was implemented and then removed: measured in Chromium on the deployed build, clicking into the
+ * field left `selectionStart === selectionEnd === 14`, i.e. no selection at all, and typing still
+ * inserted mid-value. Chromium's caret placement spans the whole mousedown→mouseup sequence, so a
+ * `select()` from `focus` is undone by the click that caused it, and the usual workarounds
+ * (`preventDefault` on mouseup, re-selecting from a frame callback) either did not hold or would
+ * fight a deliberate drag-select. Catching the damage is reliable where preventing it was not; do
+ * not re-add select-on-focus without a live measurement showing it sticks.
+ */
+const GLUED_SECOND_SCHEME_PATTERN = /[A-Za-z0-9._~%-]https?:\/\//i;
+
+function hasGluedSecondScheme(value: string): boolean {
+  // The leading scheme is stripped first so it can never be read as the "second" one.
+  const afterFirstScheme = value.trim().replace(/^https?:\/\//i, '');
+  return GLUED_SECOND_SCHEME_PATTERN.test(afterFirstScheme);
+}
+
+/**
+ * A second scheme inside the AUTHORITY — between `https://` and the first `/`, `?` or `#`. Catches
+ * the paste that landed in front of, or in the middle of, the host (`https://https://gw/v1`,
+ * `https://api.anthropic.comhttps://gw`), including the shapes `hasGluedSecondScheme` above leaves
+ * to the delimiter rule.
+ */
+function hasRepeatedSchemeInAuthority(value: string): boolean {
+  const authority = /^\s*https?:\/\/([^/?#]*)/i.exec(value)?.[1];
+  // `https?:` rather than `https?://`: a second scheme's own slashes end the authority, so
+  // requiring them here would match nothing. A real hostname cannot contain a colon-terminated
+  // scheme — the only colon a host may carry is the port separator, followed by digits.
+  return Boolean(authority && /https?:/i.test(authority));
+}
+
+/**
+ * The endpoint field's single source of validation truth, shared by submit AND blur (running it on
+ * blur too means a wrong URL never sits there unmarked until the admin clicks Save & test) and by
+ * the "is it still wrong?" re-check on every keystroke — the error deliberately does NOT clear on
+ * the first keystroke, only once the value actually becomes valid, because clearing it on
+ * keystroke one reads as "fixed" while the field is still just as invalid.
+ *
+ * Returns `null` when the value is acceptable, otherwise the message to show under the field.
+ */
+function getEndpointUrlError(value: string): string | null {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return i18n.translate('wazuhAiAssistant.settings.form.baseUrlRequired', {
+      defaultMessage: 'Enter the endpoint URL for this provider.',
+    });
+  }
+  // "Does it even start with a scheme" comes FIRST: a value like `xhttps://gw` is simply not a URL,
+  // and the doubled-scheme message would send the admin looking for a repetition rather than at the
+  // junk in front. Anything that reaches the checks below is scheme-prefixed, so a second scheme
+  // there really is a second one.
+  if (!isValidEndpointUrl(trimmed)) {
+    return i18n.translate('wazuhAiAssistant.settings.form.baseUrlInvalid', {
+      defaultMessage: 'Enter a valid URL starting with http:// or https://',
+    });
+  }
+  if (hasGluedSecondScheme(trimmed) || hasRepeatedSchemeInAuthority(trimmed)) {
+    return i18n.translate(
+      'wazuhAiAssistant.settings.form.baseUrlRepeatedScheme',
+      {
+        defaultMessage:
+          'This URL contains http:// or https:// more than once. Enter a single endpoint URL.',
+      },
+    );
+  }
+  return null;
+}
+
+/**
+ * The Model `EuiComboBox`'s own stable hook. The combo box's SEARCH INPUT is not reachable through
+ * `EuiFormRow`'s cloned child (the row injects its a11y props into the combo box, and wrapping the
+ * combo box in a div of our own would hand those props to the div instead), so the two things this
+ * form needs to do to that input — mark it `aria-required` and move focus to it when submit finds
+ * it empty — go through this attribute on the combo box's outer element.
+ */
+const MODEL_COMBO_TEST_SUBJ = 'wzProviderModelCombo';
+
+function getModelSearchInput(): HTMLInputElement | null {
+  return document.querySelector<HTMLInputElement>(
+    `[data-test-subj="${MODEL_COMBO_TEST_SUBJ}"] input`,
+  );
+}
+
+/** `EuiFormRow` renders its own error text with the id `<row id>-error-<index>` and pushes that id
+ * into the `describedByIds` it clones onto its child — but the child here is the combo box WRAPPER,
+ * and `EuiComboBox` does not forward `aria-describedby` (or `aria-invalid`) to the search input
+ * inside it. So the field the submit handler just moved focus to would announce nothing at all
+ * about why it was rejected. This is the row's own first error id, wired onto that input by hand. */
+const MODEL_ROW_ID = 'wz-ai-provider-model';
+const MODEL_ERROR_ID = `${MODEL_ROW_ID}-error-0`;
 
 /** Collapses the (potentially multi-service, for openai_compatible) docs links behind a single
  * trigger rather than inlining them all in the help text — inlining every link for every provider
@@ -595,6 +713,12 @@ interface ProviderFormFlyoutProps {
    * no client-side duplicate check at all. */
   existingProviders?: ProviderSummary[];
   apiKeyEncryptionEnabled: boolean | null;
+  /** True when `wazuh_ai_assistant.settingsReadOnly` locks settings/providers
+   * (server/routes/settings.ts's `requireSettingsUnlocked`). Defense in depth: settings-page.tsx
+   * already keeps this flyout from opening in that case, but the flyout can still be showing
+   * from before the lock took effect (e.g. a stale probe), so it self-disables too. Optional —
+   * absent behaves exactly as before this prop existed: never locked. */
+  settingsLocked?: boolean;
   /** True while a save (+ the connection test it triggers) is in flight. Optional/absent behaves
    * exactly as before this prop existed: the Save button is never shown as loading. */
   isSaving?: boolean;
@@ -611,6 +735,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   error,
   existingProviders = [],
   apiKeyEncryptionEnabled,
+  settingsLocked = false,
   isSaving = false,
   testOutcome = null,
   onSubmit,
@@ -633,7 +758,22 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   );
   const [baseUrlError, setBaseUrlError] = useState<string | null>(null);
   const [nameError, setNameError] = useState<string | null>(null);
+  const [modelError, setModelError] = useState<string | null>(null);
+  // What the Model combo box's search input currently holds, i.e. text the admin has typed but not
+  // committed (by picking a suggestion or pressing Enter on the custom-option row). EuiComboBox
+  // keeps that text purely internally, which is how a form could be submitted with the model field
+  // looking filled in on screen while `form.model` was still empty — see `handleSave`.
+  const [modelSearchText, setModelSearchText] = useState('');
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+  // Submit moves focus to the FIRST field it rejected (in the form's own reading order: Name,
+  // Endpoint URL, Model), so a rejected save does not leave a keyboard/screen-reader user at the
+  // footer button hunting for which of the errors above it appeared.
+  const nameInputRef = useRef<HTMLInputElement | null>(null);
+  const baseUrlInputRef = useRef<HTMLInputElement | null>(null);
+  // Whatever the model combo box's search input had in `aria-describedby` before this form added
+  // its own error to it — `''` for "nothing", `null` for "no error has been shown yet". See the
+  // effect that maintains those attributes below.
+  const describedByBeforeErrorRef = useRef<string | null>(null);
   // Tracks whether the admin has typed into the endpoint URL field themselves (see the field's own
   // `onChange` below), so a provider-type switch (`handleTypeChange` above) only ever resets the
   // base URL while the field is still empty or holds one of the OLD type's own known defaults —
@@ -674,14 +814,59 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   );
   // Feeds both the "Suggested models:" chips and the Model EuiComboBox's dropdown `options`.
   //
-  // No deduplication any more: this list used to be filtered against `modelGuidance.examples`,
-  // because an id curated in BOTH tables (Anthropic's claude-sonnet-5 is in each) rendered as two
-  // identical chips under two different headings. With the generic "Examples:" row gone (see the
-  // Model field below) there is nothing left to collide with — and keeping the filter would now do
-  // real damage, silently hiding the vendor's own primary model from the only list that still
-  // offers it.
+  // No deduplication against `modelGuidance.examples`: an id curated in BOTH tables (Anthropic's
+  // claude-sonnet-5 is in each) would otherwise need filtering to avoid two identical chips under
+  // two different headings, but with the generic "Examples:" row gone (see the Model field below)
+  // there is nothing left to collide with — and filtering it out would do real damage, silently
+  // hiding the vendor's own primary model from the only list that still offers it.
   const modelOptions = vendorModelSuggestions.map(model => ({ label: model }));
   const selectedModelOption = form.model ? [{ label: form.model }] : [];
+
+  // `aria-required` on the combo box's own search input: the Model field carries the same red
+  // asterisk as Name and Endpoint URL, but the asterisk is `aria-hidden` decoration (see
+  // `RequiredLabel`), so without this the one required field on this form that is NOT a plain input
+  // was the only one never announced as required. EuiComboBox spreads unknown props onto its outer
+  // element, not onto the search input, so this is set on the input directly — once on mount, since
+  // that input element is created with the combo box and lives for the flyout's lifetime.
+  useEffect(() => {
+    getModelSearchInput()?.setAttribute('aria-required', 'true');
+  }, []);
+
+  // The invalid state and the error text, on the same input, for the same reason (see
+  // `MODEL_ERROR_ID`): submit moves focus here, and a focused input that is silent about its own
+  // rejection is exactly the case a screen-reader user cannot recover from.
+  //
+  // `aria-describedby` is saved and restored rather than simply removed. EUI sets nothing there
+  // today (the test file pins that), but a future EUI could start describing this input itself, and
+  // then a blind `removeAttribute` on the clear path would quietly delete EUI's description
+  // instead of just our error.
+  useEffect(() => {
+    const input = getModelSearchInput();
+    if (!input) {
+      return;
+    }
+    if (modelError) {
+      if (describedByBeforeErrorRef.current === null) {
+        describedByBeforeErrorRef.current =
+          input.getAttribute('aria-describedby') ?? '';
+      }
+      const existing = describedByBeforeErrorRef.current;
+      input.setAttribute('aria-invalid', 'true');
+      input.setAttribute(
+        'aria-describedby',
+        existing ? `${existing} ${MODEL_ERROR_ID}` : MODEL_ERROR_ID,
+      );
+    } else {
+      input.removeAttribute('aria-invalid');
+      const existing = describedByBeforeErrorRef.current;
+      if (existing) {
+        input.setAttribute('aria-describedby', existing);
+      } else {
+        input.removeAttribute('aria-describedby');
+      }
+      describedByBeforeErrorRef.current = null;
+    }
+  }, [modelError]);
 
   // Deliberately does NOT set `baseUrlTouched` — this fills the field from one of the type's own
   // "Examples:" chips, which is still just a suggested value (see `handleTypeChange` above), not
@@ -689,11 +874,19 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   const fillBaseUrl = (value: string) => {
     setForm({ ...form, baseUrl: value });
     if (baseUrlError) {
-      setBaseUrlError(null);
+      setBaseUrlError(getEndpointUrlError(value));
     }
   };
 
-  const fillModel = (value: string) => setForm({ ...form, model: value });
+  const fillModel = (value: string) => {
+    setForm({ ...form, model: value });
+    // Committing a value is exactly what the "you typed something you never committed" error asks
+    // for, so it clears here rather than waiting for the next submit.
+    setModelSearchText('');
+    if (modelError) {
+      setModelError(null);
+    }
+  };
 
   const handleModelChange = (selected: Array<{ label: string }>) => {
     fillModel(selected[0]?.label ?? '');
@@ -725,31 +918,37 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   // `fillBaseUrl` (example-chip selections): picking a suggested example is exactly the kind of
   // "still just a suggestion" value this reset is meant to catch on the next type switch.
   const handleTypeChange = (nextType: ProviderInput['type']) => {
-    setForm(current => {
-      const oldGuidance =
-        PROVIDER_URL_GUIDANCE[current.type] ??
-        PROVIDER_URL_GUIDANCE.openai_compatible;
-      const trimmedBaseUrl = current.baseUrl.trim();
-      const isOldTypeDefault =
-        trimmedBaseUrl === '' ||
-        trimmedBaseUrl === oldGuidance.placeholder ||
-        oldGuidance.examples.includes(trimmedBaseUrl);
-      const shouldReset = !baseUrlTouched && isOldTypeDefault;
-      // Anthropic effectively has one real endpoint, so switching TO it prefills the field with
-      // that value outright. Every other type covers multiple vendors (OpenAI, Gemini, Bedrock,
-      // Ollama, a private gateway...) with no single "the" default to fill in, so clearing the
-      // field and letting its own `placeholder` attribute show the new type's example is the
-      // equivalent behavior there.
-      const resetBaseUrl =
-        nextType === 'anthropic'
-          ? PROVIDER_URL_GUIDANCE.anthropic.placeholder
-          : '';
-      return {
-        ...current,
-        type: nextType,
-        baseUrl: shouldReset ? resetBaseUrl : current.baseUrl,
-      };
-    });
+    const oldGuidance =
+      PROVIDER_URL_GUIDANCE[form.type] ??
+      PROVIDER_URL_GUIDANCE.openai_compatible;
+    const trimmedBaseUrl = form.baseUrl.trim();
+    const isOldTypeDefault =
+      trimmedBaseUrl === '' ||
+      trimmedBaseUrl === oldGuidance.placeholder ||
+      oldGuidance.examples.includes(trimmedBaseUrl);
+    const shouldReset = !baseUrlTouched && isOldTypeDefault;
+    // Anthropic effectively has one real endpoint, so switching TO it prefills the field with
+    // that value outright. Every other type covers multiple vendors (OpenAI, Gemini, Bedrock,
+    // Ollama, a private gateway...) with no single "the" default to fill in, so clearing the
+    // field and letting its own `placeholder` attribute show the new type's example is the
+    // equivalent behavior there.
+    const resetBaseUrl =
+      nextType === 'anthropic'
+        ? PROVIDER_URL_GUIDANCE.anthropic.placeholder
+        : '';
+    const nextBaseUrl = shouldReset ? resetBaseUrl : form.baseUrl;
+    setForm({ ...form, type: nextType, baseUrl: nextBaseUrl });
+    // A displayed error belongs to the value that produced it. When this handler REWRITES the
+    // value, that error no longer describes what is in the field — leaving it there marked a
+    // freshly prefilled, perfectly valid Anthropic endpoint as invalid, and Save would then have
+    // said nothing was wrong. Re-derived rather than blindly cleared, so a rewrite that is still
+    // unusable keeps an accurate message; an emptied field drops back to "no error yet", which is
+    // this field's untouched-and-empty state (required-ness is submit's business).
+    if (baseUrlError && nextBaseUrl !== form.baseUrl) {
+      setBaseUrlError(
+        nextBaseUrl.trim() ? getEndpointUrlError(nextBaseUrl) : null,
+      );
+    }
   };
 
   const handleSave = async () => {
@@ -761,9 +960,12 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
       apiKey: form.apiKey?.trim() ?? '',
     };
 
-    // Both field checks are evaluated BEFORE either returns, so one click surfaces everything that
-    // is wrong. Validating sequentially made a form with a duplicate name and a bad URL take two
-    // clicks to reveal two problems, which reads like the first fix broke something new.
+    // EVERY field check is evaluated before any of them returns, so one click surfaces everything
+    // that is wrong. Validating sequentially made a form with a duplicate name and a bad URL take
+    // two clicks to reveal two problems, which reads like the first fix broke something new — and
+    // until this pass only the endpoint URL had a check at all, so an empty Name or Model produced
+    // a round-trip to the server and a generic red callout instead of an error under the field the
+    // admin actually has to fix.
     //
     // Duplicate name check, mirroring the server's own 409 (`rejectDuplicateProviderName`): same
     // trim + lowercase comparison, and the provider being edited is excluded so re-saving it
@@ -774,22 +976,47 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
         provider.id !== editingProvider?.id &&
         provider.name.trim().toLowerCase() === normalizedName,
     );
-    const nextNameError = nameTaken
+    const nextNameError = !trimmedForm.name
+      ? i18n.translate('wazuhAiAssistant.settings.form.nameRequired', {
+          defaultMessage: 'Enter a name for this provider.',
+        })
+      : nameTaken
       ? i18n.translate('wazuhAiAssistant.settings.form.nameDuplicate', {
           defaultMessage:
             'A provider named "{name}" already exists. Pick a different name.',
           values: { name: trimmedForm.name },
         })
       : null;
-    const nextBaseUrlError = isValidEndpointUrl(trimmedForm.baseUrl)
+    const nextBaseUrlError = getEndpointUrlError(trimmedForm.baseUrl);
+    // Uncommitted search text beats "empty": if the admin typed a model id and never pressed Enter,
+    // telling them the field is empty contradicts what they can see in it — the actionable message
+    // is the one that names the step they missed.
+    const uncommittedModel = modelSearchText.trim();
+    const nextModelError = uncommittedModel
+      ? i18n.translate('wazuhAiAssistant.settings.form.modelUncommitted', {
+          defaultMessage:
+            'Press Enter to use "{model}" as the model, or pick a suggestion.',
+          values: { model: uncommittedModel },
+        })
+      : trimmedForm.model
       ? null
-      : i18n.translate('wazuhAiAssistant.settings.form.baseUrlInvalid', {
-          defaultMessage: 'Enter a valid URL starting with http:// or https://',
+      : i18n.translate('wazuhAiAssistant.settings.form.modelRequired', {
+          defaultMessage:
+            'Pick a suggestion, or type a model id and press Enter.',
         });
 
     setNameError(nextNameError);
     setBaseUrlError(nextBaseUrlError);
-    if (nextNameError || nextBaseUrlError) {
+    setModelError(nextModelError);
+    if (nextNameError || nextBaseUrlError || nextModelError) {
+      // Form reading order, so focus lands on the topmost problem rather than the last one checked.
+      if (nextNameError) {
+        nameInputRef.current?.focus();
+      } else if (nextBaseUrlError) {
+        baseUrlInputRef.current?.focus();
+      } else {
+        getModelSearchInput()?.focus();
+      }
       return;
     }
 
@@ -812,18 +1039,13 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
 
   const keepEditing = () => setShowCloseConfirm(false);
 
-  const discardChanges = (
-    event?: React.SyntheticEvent | React.KeyboardEvent,
-  ) => {
-    const isExplicitYes = Boolean(
-      (event?.target as HTMLElement | undefined)?.closest?.(
-        '[data-test-subj="confirmModalCancelButton"]',
-      ),
-    );
+  // Calls `onClose` directly, with no need to inspect the click's own target. The modal's actions
+  // are wired with the DESTRUCTIVE action on `onConfirm` and keep-editing on `onCancel` —
+  // `EuiConfirmModal` also fires `onCancel` for Escape and for an overlay click, so a dismissal is
+  // inherently the safe path and there is nothing left to disambiguate.
+  const discardChanges = () => {
     setShowCloseConfirm(false);
-    if (isExplicitYes) {
-      onClose();
-    }
+    onClose();
   };
 
   return (
@@ -908,12 +1130,48 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
               <EuiSpacer size='m' />
             </>
           )}
+          {settingsLocked && (
+            <>
+              <EuiCallOut
+                color='warning'
+                iconType='lock'
+                title={i18n.translate(
+                  'wazuhAiAssistant.settings.form.settingsLockedTitle',
+                  { defaultMessage: 'Settings are locked' },
+                )}
+              >
+                <p>
+                  {i18n.translate(
+                    'wazuhAiAssistant.settings.form.settingsLockedBody',
+                    {
+                      defaultMessage:
+                        'AI Assistant settings are locked by your administrator and cannot ' +
+                        'be changed. Contact your administrator if you need a different ' +
+                        'configuration.',
+                    },
+                  )}
+                </p>
+              </EuiCallOut>
+              <EuiSpacer size='m' />
+            </>
+          )}
           {error && (
             <>
               <EuiCallOut
-                title={i18n.translate('wazuhAiAssistant.settings.errorTitle', {
-                  defaultMessage: 'Something went wrong',
-                })}
+                // A URL refused by the SSRF/URL policy is not "something went wrong": the reason
+                // sentence below is already precise, and the generic title made a permanent policy
+                // rejection read as a transient glitch worth retrying. See
+                // `isEndpointBlockedError`.
+                title={
+                  isEndpointBlockedError(error)
+                    ? i18n.translate(
+                        'wazuhAiAssistant.settings.endpointBlockedTitle',
+                        { defaultMessage: 'Endpoint blocked' },
+                      )
+                    : i18n.translate('wazuhAiAssistant.settings.errorTitle', {
+                        defaultMessage: 'Something went wrong',
+                      })
+                }
                 color='danger'
                 iconType='alert'
               >
@@ -923,8 +1181,8 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
             </>
           )}
           {/* Only shown for a brand-new provider — an admin editing an existing one already
-              knows how to fill this form in. CEO feedback was specifically that signing up an
-              Anthropic key was confusing; this is the shortest possible map of the four steps. */}
+              knows how to fill this form in. Feedback flagged that signing up an Anthropic key
+              was confusing; this is the shortest possible map of the four steps. */}
           {!editingProvider && (
             <>
               <EuiCallOut
@@ -938,10 +1196,10 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 {/* A real ordered list, not four sentences run together in one paragraph: the
                     numbers come from the `<ol>`, so they stay correct under translation and the
                     steps scan as a sequence. `EuiCallOut` already wraps its children in `EuiText`,
-                    which is what supplies the list styling. The caveat sentence that used to close
-                    this callout ("a green test confirms connection and key…") is gone: hedging the
-                    Test button before the admin has filled anything in was noise on the one
-                    surface that has to feel simple. */}
+                    which is what supplies the list styling. No caveat sentence closes this callout
+                    ("a green test confirms connection and key…"): hedging the Test button before
+                    the admin has filled anything in is noise on the one surface that has to feel
+                    simple. */}
                 <ol className='wzProviderFlyout__steps'>
                   {GETTING_STARTED_STEPS.map(step => (
                     <li key={step}>{step}</li>
@@ -964,7 +1222,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
               {/* A segmented control, not a pair of huge cards (UX iteration 4 item 1): a binary
                   choice does not need ~450px of card real estate, and the old layout rendered
                   BOTH types' descriptions at once while only one was ever selected — confusing on
-                  the exact surface CEO feedback already flagged as hard to get right. The
+                  the exact surface already flagged as hard to get right. The
                   selection-dependent description now lives in this EuiFormRow's own `helpText`,
                   so only the type actually chosen is ever described. */}
               <EuiFormRow
@@ -1034,11 +1292,16 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     <EuiFieldText
                       value={form.name}
                       aria-required='true'
+                      inputRef={node => {
+                        nameInputRef.current = node;
+                      }}
                       isInvalid={Boolean(nameError)}
                       onChange={event => {
                         setForm({ ...form, name: event.target.value });
-                        // Clear the duplicate-name error as soon as the admin starts fixing it,
-                        // same as `fillBaseUrl` does for `baseUrlError`.
+                        // Clear the duplicate/required-name error as soon as the admin starts
+                        // fixing it — unlike the endpoint URL (whose error must survive the first
+                        // keystroke, since a half-typed URL is still invalid), any keystroke here
+                        // genuinely changes the answer to both name checks.
                         if (nameError) {
                           setNameError(null);
                         }
@@ -1131,9 +1394,9 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 helpText={
                   <>
                     {/* A plain element, so it takes the `helpText` slot's own
-                        `.euiFormHelpText` size and color. It used to be an `EuiText size='xs'`,
-                        which produced the same visual size by a second, independent mechanism —
-                        the kind of near-miss that made this form read as sloppy. */}
+                        `.euiFormHelpText` size and color, rather than an `EuiText size='xs'`
+                        producing the same visual size by a second, independent mechanism — the
+                        kind of near-miss that reads as sloppy. */}
                     <div id='wz-ai-provider-baseurl-examples-label'>
                       <FormattedMessage
                         id='wazuhAiAssistant.settings.form.baseUrlExample'
@@ -1193,11 +1456,29 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                   placeholder={urlGuidance.placeholder}
                   isInvalid={Boolean(baseUrlError)}
                   aria-required='true'
+                  inputRef={node => {
+                    baseUrlInputRef.current = node;
+                  }}
+                  onBlur={() => {
+                    // Validate on blur too, not only on submit: leaving a wrong URL behind is the
+                    // moment the admin can still fix it cheaply.
+                    if (!form.baseUrl.trim()) {
+                      // An empty field raises nothing on blur — required-ness is submit's business
+                      // and nagging on a tab-through is not — but it must not ERASE an error
+                      // either: submit's own "Enter the endpoint URL" has to survive the admin
+                      // clicking into the field and back out again.
+                      return;
+                    }
+                    setBaseUrlError(getEndpointUrlError(form.baseUrl));
+                  }}
                   onChange={event => {
-                    setForm({ ...form, baseUrl: event.target.value });
+                    const { value } = event.target;
+                    setForm({ ...form, baseUrl: value });
                     setBaseUrlTouched(true);
+                    // Re-run the check instead of clearing: a shown error stays until the value is
+                    // actually valid, so "h" after "not-a-url" no longer reads as fixed.
                     if (baseUrlError) {
-                      setBaseUrlError(null);
+                      setBaseUrlError(getEndpointUrlError(value));
                     }
                   }}
                 />
@@ -1228,7 +1509,8 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
               }}
             >
               <EuiFormRow
-                id='wz-ai-provider-model'
+                // Shared with `MODEL_ERROR_ID`, which derives the error text's own id from it.
+                id={MODEL_ROW_ID}
                 fullWidth
                 label={
                   <RequiredLabel
@@ -1238,15 +1520,16 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     )}
                   />
                 }
-                // No generic "Examples:" chip row here any more (Miguel + UX decision, recorded in
-                // the audit's own "additional decided items"): the two ids it offered were
+                // No generic "Examples:" chip row here: the two ids such a row would offer are
                 // Bedrock-gateway model names, i.e. valid for exactly one of the many services this
-                // provider type covers, and they were shown on every endpoint — including one whose
-                // own vendor suggestions were listed 20px below under a second heading. What
-                // remains is everything that is actually keyed to the admin's endpoint: the combo
-                // box's own suggestions, the "Suggested models:" chips, and the vendor's model list
+                // provider type covers, and would be shown on every endpoint — including one whose
+                // own vendor suggestions are listed 20px below under a second heading. What remains
+                // is everything that is actually keyed to the admin's endpoint: the combo box's
+                // own suggestions, the "Suggested models:" chips, and the vendor's model list
                 // behind the link below. The endpoint field keeps its examples, because there an
                 // example is the fastest way to recognise the shape of the value being asked for.
+                isInvalid={Boolean(modelError)}
+                error={modelError}
                 helpText={
                   <DocsPopover
                     triggerLabel={i18n.translate(
@@ -1268,10 +1551,24 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
               >
                 <EuiComboBox
                   fullWidth
+                  data-test-subj={MODEL_COMBO_TEST_SUBJ}
+                  isInvalid={Boolean(modelError)}
+                  onSearchChange={searchValue => {
+                    setModelSearchText(searchValue);
+                    // Typing is the fix for "you never committed this" — don't make the admin
+                    // submit again to see the error go away.
+                    if (modelError) {
+                      setModelError(null);
+                    }
+                  }}
                   placeholder={i18n.translate(
                     'wazuhAiAssistant.settings.form.modelPlaceholder',
                     {
-                      defaultMessage: 'Pick a suggestion or type any model id',
+                      // Says what to DO with typed text. The old wording ("type any model id")
+                      // never mentioned the commit step, so text typed and left sitting in the
+                      // combo box looked like a filled-in field and submitted as an empty one.
+                      defaultMessage:
+                        'Pick a suggestion, or type a model id and press Enter',
                     },
                   )}
                   // `asPlainText` keeps this looking and behaving like the free-text field it
@@ -1378,17 +1675,17 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     'capability.'
                   }
                   values={{
-                    // The example follows the SELECTED provider type. It used to be a hardcoded
-                    // `gpt-4o`, so an admin configuring Claude was shown a GPT model as the
-                    // tool-calling example and one click filled the Model field with a value that
-                    // provider cannot serve. `modelGuidance.examples` is the same per-type list
-                    // the Examples chips two fields above already use.
+                    // The example follows the SELECTED provider type: a hardcoded `gpt-4o` would
+                    // show an admin configuring Claude a GPT model as the tool-calling example, and
+                    // one click would fill the Model field with a value that provider cannot serve.
+                    // `modelGuidance.examples` is the same per-type list the Examples chips two
+                    // fields above already use.
                     //
                     // Rendered as plain inline code, NOT as an `ExampleChip`: this one is
                     // illustrative prose ("a model like this one"), and the very same id is already
-                    // offered as a real fill-on-click chip under the Model field. A chip here looked
-                    // identical to those but sat mid-sentence inside a warning, so it advertised an
-                    // action where the surrounding text was only naming an example.
+                    // offered as a real fill-on-click chip under the Model field. A chip here would
+                    // look identical to those but sit mid-sentence inside a warning, advertising an
+                    // action where the surrounding text is only naming an example.
                     model: (
                       <code className='wzProviderFlyout__inlineValue'>
                         {toolCallingExampleModel}
@@ -1479,7 +1776,9 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
               >
                 <EuiButton
                   onClick={handleSave}
-                  isDisabled={apiKeyBlockedByEncryption || isSaving}
+                  isDisabled={
+                    apiKeyBlockedByEncryption || isSaving || settingsLocked
+                  }
                   isLoading={isSaving}
                   fill
                 >
@@ -1496,32 +1795,38 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
         </EuiFlyoutFooter>
       </EuiFlyout>
       {showCloseConfirm && (
+        // Named actions, not a yes/no pair. "Unsubmitted changes" + "Yes, do it" / "No, don't do
+        // it" asked the admin to work out what "it" was — and the yes/no phrasing made the
+        // destructive option the affirmative one. Both buttons now say what they do, and the
+        // destructive one is the modal's own (danger-coloured) confirm action, so Escape and an
+        // overlay click land on "keep editing" instead of discarding the form.
         <EuiConfirmModal
           title={i18n.translate(
             'wazuhAiAssistant.settings.form.closeConfirmTitle',
             {
-              defaultMessage: 'Unsubmitted changes',
+              defaultMessage: 'Discard this provider?',
             },
           )}
-          onConfirm={keepEditing}
-          onCancel={discardChanges}
-          cancelButtonText={i18n.translate(
+          onConfirm={discardChanges}
+          onCancel={keepEditing}
+          buttonColor='danger'
+          confirmButtonText={i18n.translate(
             'wazuhAiAssistant.settings.form.closeConfirmDiscard',
             {
-              defaultMessage: 'Yes, do it',
+              defaultMessage: 'Discard changes',
             },
           )}
-          confirmButtonText={i18n.translate(
+          cancelButtonText={i18n.translate(
             'wazuhAiAssistant.settings.form.closeConfirmKeep',
             {
-              defaultMessage: "No, don't do it",
+              defaultMessage: 'Keep editing',
             },
           )}
         >
           <p style={{ textAlign: 'center' }}>
             {i18n.translate('wazuhAiAssistant.settings.form.closeConfirmBody', {
               defaultMessage:
-                'There are unsaved changes. Are you sure you want to proceed?',
+                'The details you entered for this provider will be lost.',
             })}
           </p>
         </EuiConfirmModal>

@@ -17,17 +17,15 @@ import IApiResponse from '../../../../react-services/interfaces/api-response.int
 const GetUsersService = async (
   offset = 0,
   limit = 10,
+  sort = '+username',
 ): Promise<{ users: User[]; total: number }> => {
-  const response = (await WzRequest.apiReq(
-    'GET',
-    '/security/users?sort=username',
-    {
-      params: {
-        offset,
-        limit,
-      },
+  const response = (await WzRequest.apiReq('GET', '/security/users', {
+    params: {
+      offset,
+      limit,
+      ...(sort ? { sort } : {}),
     },
-  )) as IApiResponse<User>;
+  })) as IApiResponse<User>;
   const users = ((response.data || {}).data || {}).affected_items || [];
   const total = ((response.data || {}).data || {}).total_affected_items || 0;
 

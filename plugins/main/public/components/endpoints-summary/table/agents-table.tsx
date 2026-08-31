@@ -38,6 +38,7 @@ import { UpgradeAgentModal } from './actions/upgrade-agent-modal';
 import NavigationService from '../../../react-services/navigation-service';
 import { getWazuhAPIVersion } from '../services';
 import { RemoveAgentModal } from './actions/remove-agent-modal';
+import { ScanVulnerabilitiesAgentModal } from './actions/scan-vulnerabilities-agent-modal';
 import { getAgentVersion } from '../../../../common/services/wz-agent';
 import { useUpgradeStatus, usePendingUpgradeAgents } from '../hooks';
 
@@ -68,6 +69,10 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
   const [isEditGroupsVisible, setIsEditGroupsVisible] = useState(false);
   const [isUpgradeModalVisible, setIsUpgradeModalVisible] = useState(false);
   const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
+  const [
+    isScanVulnerabilitiesModalVisible,
+    setIsScanVulnerabilitiesModalVisible,
+  ] = useState(false);
   const [selectedItems, setSelectedItems] = useState<Agent[]>([]);
   const [allAgentsSelected, setAllAgentsSelected] = useState(false);
   const [apiVersion, setApiVersion] = useState('');
@@ -240,7 +245,11 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
               setIsUpgradeModalVisible,
               setFilters,
               apiVersion,
-              { setIsRemoveModalVisible, pendingUpgradeAgentIds },
+              {
+                setIsRemoveModalVisible,
+                setIsScanVulnerabilitiesModalVisible,
+                pendingUpgradeAgentIds,
+              },
             )}
             tableInitialSortingField='id'
             tablePageSizeOptions={[10, 25, 50, 100]}
@@ -435,6 +444,16 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
           reloadAgents={() => reloadAgents()}
           onClose={() => {
             setIsUpgradeModalVisible(false);
+            setAgent(undefined);
+          }}
+        />
+      ) : null}
+      {isScanVulnerabilitiesModalVisible && agent ? (
+        <ScanVulnerabilitiesAgentModal
+          agent={agent}
+          reloadAgents={() => reloadAgents()}
+          onClose={() => {
+            setIsScanVulnerabilitiesModalVisible(false);
             setAgent(undefined);
           }}
         />

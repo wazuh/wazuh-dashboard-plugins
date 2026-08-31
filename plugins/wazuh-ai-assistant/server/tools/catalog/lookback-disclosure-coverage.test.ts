@@ -5,7 +5,7 @@ import { applySafetyValves, clampLookbackWindow, lintDsl } from '../guardrails';
 import { IndexerRequest } from '../types';
 
 /**
- * Class-level guard for issue #8935 item I4 (bound disclosure): every tool that lets a caller
+ * Class-level guard for bound disclosure: every tool that lets a caller
  * request a time-based lookback wider than the 90-day cap must have that request CLAMPED AND
  * DISCLOSED (a successful, capped answer with a "Time window capped" hint in its digest), never
  * silently rejected as if the model had asked for something unfixable.
@@ -24,7 +24,7 @@ import { IndexerRequest } from '../types';
  * `wazuh-states-*` snapshot tools with no event-time axis, the exact-ID lookup tool, and the
  * `search_wazuh_data` escape hatch, whose time range lives inside its free-form `query_dsl` string
  * rather than a flat schema property) are outside this class BY SHAPE, and the exemption tests
- * below make that STRUCTURAL rather than assumed (integration review — a behavioural probe with
+ * below make that STRUCTURAL rather than assumed -- a behavioural probe with
  * benign sample values would have silently exempted a future `days_back`-style parameter):
  *  1. no exempt, non-escape-hatch tool builds ANY `@timestamp` range clause at all;
  *  2. no tool in the WHOLE registry (manager tools included — a future manager tool with a time
@@ -265,9 +265,9 @@ function collectTimestampRangeClauses(node: unknown, found: unknown[]): void {
 }
 
 test('tools with NO time_range_gte/lte parameter build NO @timestamp range at all -- exemption is structural', () => {
-  // Integration review: the first cut probed these tools with BENIGN sample values and asserted
-  // "no disclosure", which a future caller-controlled window under another name (days_back: 10)
-  // passes trivially. Structural form: an exempt typed tool must have no @timestamp range clause
+  // A behavioural probe with BENIGN sample values that asserts "no disclosure" would let a future
+  // caller-controlled window under another name (days_back: 10) pass trivially. Structural form:
+  // an exempt typed tool must have no @timestamp range clause
   // in its built body whatsoever -- if it has a time axis, it must take it through the standard
   // time_range_gte/lte pair and join the sweep above. The escape hatch (jsonString body) is the
   // one shape whose window is model-authored, covered at the chokepoint by executor.test.ts's
@@ -311,17 +311,16 @@ test('tools with NO time_range_gte/lte parameter build NO @timestamp range at al
 
 test('no tool in the WHOLE registry declares a time-like parameter under any other name', () => {
   // The forward fence that makes "a future tool with a time parameter inherits the guarantee
-  // automatically" actually true (integration review: it was only true for the exact
-  // time_range_gte/lte pair): any schema property whose name looks like a time control must BE
-  // that pair. Registry-wide, manager tools included -- a future manager-target tool with a time
-  // axis must not dodge the sweep by target.
+  // automatically" actually true -- otherwise it would only hold for the exact time_range_gte/lte
+  // pair: any schema property whose name looks like a time control must BE that pair. Registry-wide,
+  // manager tools included -- a future manager-target tool with a time axis must not dodge the sweep
+  // by target.
   // SEGMENT-anchored, not a bare substring search: a bare alternation matches
-  // `get_agent_inventory`'s `filter` parameter (added by #8910), because "filter" CONTAINS "lte"
+  // `get_agent_inventory`'s `filter` parameter, because "filter" CONTAINS "lte"
   // (fi-lte-r). A package/port/process filter is not a time control, and a coverage test that cries
   // wolf on an unrelated parameter gets exempted into uselessness. Anchoring each alternative to a
   // name-segment boundary keeps every real offender (`since`, `lookback`, `start_time`, `days_back`,
-  // `time_from`) while dropping the accidental substring hits. Found when this branch was merged with
-  // the eleven open AI-Assistant branches, where that parameter exists.
+  // `time_from`) while dropping the accidental substring hits.
   const TIME_LIKE_PARAM_RE =
     /(^|_)(gte|lte|since|before|after|window|lookback|days|hours|minutes|from|to|time)(_|$)/i;
   const offenders: string[] = [];

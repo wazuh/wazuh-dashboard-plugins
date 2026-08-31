@@ -8,6 +8,7 @@ import {
   buildDigest,
   DIGEST_CHAR_CAP,
 } from '../digest';
+import { CONTEXT_CHAR_BUDGET } from '../../routes/chat';
 
 /**
  * Unit tests for get_sca_checks (SCA per-check drill-down), rewritten for the Wazuh 5.0 port:
@@ -15,10 +16,10 @@ import {
  * `GET /sca/{agent}/checks/{policy}` to an Indexer query against `wazuh-states-sca*`
  * (term wazuh.agent.id + term policy.id + optional term check.result + optional multi_match).
  *
- * #8935 item I2 (scoped-enumeration) additions live in their own section below the original
- * suite: a `matching_*` enumeration aggregation (result scope carried in the agg NAME), the
- * `search` should-clause moving from `query.bool.filter` to `post_filter`, the post_filter-aware
- * zero-row hint, and the `check.name` guardrails allowlist entry that makes the new aggregation
+ * The scoped-enumeration additions live in their own section below the original suite: a
+ * `matching_*` enumeration aggregation (result scope carried in the agg NAME), the `search`
+ * should-clause living in `post_filter` instead of `query.bool.filter`, the post_filter-aware
+ * zero-row hint, and the `check.name` guardrails allowlist entry that makes the aggregation
  * legal in the first place.
  */
 
@@ -50,6 +51,58 @@ test('get_sca_checks: buildRequest targets wazuh-states-sca* with agent+policy t
   assert.equal(req.body.size, 20);
 });
 
+// `check_id` narrows the executed query: `resolveScaCheckParams` reads it to find the owning
+// agent/policy, and `buildRequest` puts a `check.id` term into the request so a single-check
+// question executes against exactly that check, instead of a policy-wide query that returns a
+// `limit`-truncated sample which usually would not contain the requested check at all. These
+// three tests guard that behavior.
+test('get_sca_checks: check_id becomes a term filter on check.id, narrowing the rows to that check', () => {
+  const req = buildIndexer({
+    agent_id: '001',
+    policy_id: 'cis_ubuntu24-04',
+    check_id: '35509',
+  });
+  assert.deepEqual(filters(req), [
+    { term: { 'wazuh.agent.id': '001' } },
+    { term: { 'policy.id': 'cis_ubuntu24-04' } },
+    { term: { 'check.id': '35509' } },
+  ]);
+  // In `query.bool.filter`, NOT `post_filter`: the narrowing has to scope the aggregations too,
+  // or a policy-wide result distribution is reported beside one check's single row.
+  assert.equal(postFilter(req), undefined);
+  // The field a remediation question is about has to be projected on this same call.
+  assert.ok(
+    (req.body._source as string[]).includes('check.remediation'),
+    'check.remediation must be in the projection for a remediation question',
+  );
+});
+
+test('get_sca_checks: check_id is trimmed, and combines with a result filter', () => {
+  const req = buildIndexer({
+    agent_id: '001',
+    policy_id: 'cis_ubuntu24-04',
+    check_id: '  35509  ',
+    result: 'failed',
+  });
+  assert.deepEqual(filters(req), [
+    { term: { 'wazuh.agent.id': '001' } },
+    { term: { 'policy.id': 'cis_ubuntu24-04' } },
+    { term: { 'check.id': '35509' } },
+    { term: { 'check.result': 'Failed' } },
+  ]);
+});
+
+test('get_sca_checks: an absent or whitespace-only check_id adds no filter clause', () => {
+  const bare = buildIndexer({ agent_id: '001', policy_id: 'cis_ubuntu24-04' });
+  assert.equal(filters(bare).length, 2);
+  const blank = buildIndexer({
+    agent_id: '001',
+    policy_id: 'cis_ubuntu24-04',
+    check_id: '   ',
+  });
+  assert.equal(filters(blank).length, 2);
+});
+
 test('get_sca_checks: result becomes a term filter; search becomes exact-OR-prefix in post_filter', () => {
   const req = buildIndexer({
     agent_id: '000',
@@ -59,12 +112,11 @@ test('get_sca_checks: result becomes a term filter; search becomes exact-OR-pref
   });
   const clauses = filters(req);
   assert.deepEqual(clauses[2], { term: { 'check.result': 'Failed' } });
-  // #8935 item I2: `search`'s should-pair moved from `query.bool.filter` to `post_filter` (still
-  // exactly two clauses: agent + policy + result -- no `search` clause in `query.bool.filter` at
-  // all). Its CONTENT is unchanged from before this item: the multi_match (correct for a full
-  // exact value) OR a non-leading prefix on `check.name`, so "Ensure SSH" works too. `check.name`/
-  // `check.description`/`check.rationale` are all `keyword` in 5.0, so an analyzed multi_match on
-  // its own silently returned nothing for any fragment — proven live: search "ssh" -> 0 hits,
+  // `search`'s should-pair lives in `post_filter` (still exactly two clauses: agent + policy +
+  // result -- no `search` clause in `query.bool.filter` at all). Its CONTENT is the multi_match
+  // (correct for a full exact value) OR a non-leading prefix on `check.name`, so "Ensure SSH"
+  // works too. `check.name`/`check.description`/`check.rationale` are all `keyword` in 5.0, so an
+  // analyzed multi_match on its own returns nothing for a fragment -- e.g. search "ssh" -> 0 hits,
   // while the full exact check name -> 1. A true substring search is deliberately NOT attempted
   // on this HITS query (on a keyword field it needs a leading wildcard, which the guardrails
   // reject on purpose) -- the substring/topic case is instead answered by `matching_checks` below.
@@ -85,7 +137,7 @@ test('get_sca_checks: result becomes a term filter; search becomes exact-OR-pref
   });
 });
 
-test('get_sca_checks: no search -> no post_filter at all (byte-identical to before this item)', () => {
+test('get_sca_checks: no search -> no post_filter at all', () => {
   const req = buildIndexer({
     agent_id: '000',
     policy_id: 'cis_ubuntu22-04',
@@ -155,9 +207,8 @@ test('get_sca_checks: limit is clamped to [1, 500]', () => {
   assert.equal(under.body.size, 1);
 });
 
-// --- Issue #8920 item 1 (population-disclosure): a plain hits search gave the model no
-// population-true view of the Passed/Failed/Not-applicable distribution, so a `limit`-truncated
-// page was silently narrated as if it were the whole result ("named 2 of 10 failed checks"). ---
+// --- Population-disclosure: without a population-true breakdown, a `limit`-truncated page would
+// be silently narrated as if it were the whole result ("named 2 of 10 failed checks"). ---
 
 test('get_sca_checks: always attaches a population-true check.result breakdown aggregation', () => {
   const req = buildIndexer({ agent_id: '000', policy_id: 'cis_ubuntu22-04' });
@@ -167,7 +218,7 @@ test('get_sca_checks: always attaches a population-true check.result breakdown a
 });
 
 test('get_sca_checks: the breakdown aggregation rides along with limit alone', () => {
-  // result+search together are covered by the #8935 scoped-enumeration tests below, which
+  // result+search together are covered by the scoped-enumeration tests below, which
   // deliberately replace this agg with a scoped enumeration in that case.
   const withLimitOnly = buildIndexer({
     agent_id: '000',
@@ -179,12 +230,11 @@ test('get_sca_checks: the breakdown aggregation rides along with limit alone', (
   });
 });
 
-// --- #8935 item I2 (scoped-enumeration): "which SSH checks failed" must enumerate the ~10
-// matching check NAMES population-true, instead of competing with 102 failed checks for sample
-// rows. Mechanism: a `matching_*` terms agg on `check.name` (name carries the result scope
-// in-band — see matchingChecksAggName in get-sca-checks.ts), scoped via `terms.include` to the
-// requested fragment when `search` is supplied, attached whenever `result` OR `search` is
-// present. ---
+// --- Scoped-enumeration: "which SSH checks failed" must enumerate the ~10 matching check NAMES
+// population-true, instead of competing with 102 failed checks for sample rows. Mechanism: a
+// `matching_*` terms agg on `check.name` (name carries the result scope in-band — see
+// matchingChecksAggName in get-sca-checks.ts), scoped via `terms.include` to the requested
+// fragment when `search` is supplied, attached whenever `result` OR `search` is present. ---
 
 test('get_sca_checks: result alone attaches an UNSCOPED, result-named enumeration agg', () => {
   const req = buildIndexer({
@@ -214,10 +264,10 @@ test('get_sca_checks: search alone attaches a SCOPED all-results enumeration and
     policy_id: 'cis_ubuntu22-04',
     search: 'ssh',
   });
-  // Scope-mixing fix (integration review): with the search clause in post_filter, `results`
-  // would count the whole policy while the question is about the subject — for a subject call
-  // the enumeration IS the answer, so it is the only aggregation. Its name says the enumerated
-  // checks span ALL results, so "which SSH checks FAILED" cannot silently absorb passed ones.
+  // With the search clause in post_filter, `results` would count the whole policy while the
+  // question is about the subject — for a subject call the enumeration IS the answer, so it is
+  // the only aggregation. Its name says the enumerated checks span ALL results, so "which SSH
+  // checks FAILED" cannot silently absorb passed ones.
   const aggKeys = Object.keys(req.body.aggs as Record<string, unknown>);
   assert.deepEqual(aggKeys, ['matching_checks_all_results']);
   const aggs = req.body.aggs as {
@@ -288,8 +338,8 @@ test('get_sca_checks: the enumeration include is built from the TRIMMED search v
 });
 
 test('get_sca_checks: a whitespace-only search is treated as ABSENT (byte-identical bare call)', () => {
-  // Integration review: '   ' previously produced include '.*\ \ \ .*' (matches nothing) plus a
-  // prefix on the empty string — a silently dead subject. Whitespace-only now means "no subject".
+  // Whitespace-only search means "no subject": '   ' would otherwise produce include
+  // '.*\ \ \ .*' (matches nothing) plus a prefix on the empty string — a silently dead subject.
   const req = buildIndexer({
     agent_id: '000',
     policy_id: 'cis_ubuntu22-04',
@@ -322,9 +372,8 @@ test('get_sca_checks: the search subject is length-capped before it becomes a cl
 });
 
 test('get_sca_checks: include escaping — digits pass through, everything non-alphanumeric is escaped', () => {
-  // Integration review: the digit and backslash-escape branches of buildContainsIncludePattern
-  // were never executed by any test. Each pattern is executed as a REAL anchored regexp against
-  // realistic check-name shapes.
+  // Each pattern (the digit and backslash-escape branches of buildContainsIncludePattern) is
+  // executed as a REAL anchored regexp against realistic check-name shapes.
   const digits = buildIndexer({
     agent_id: '000',
     policy_id: 'cis_ubuntu22-04',
@@ -374,13 +423,12 @@ test('get_sca_checks: include escaping — digits pass through, everything non-a
 });
 
 test('get_sca_checks: a fragment call digest explains the post_filtered 0 total instead of blaming filters', () => {
-  // Integration review BLOCKER on the first cut: a fragment like "ssh" passes 0 rows through the
-  // post_filter (exact-keyword fields), so the digest showed a 0 total right beside a breakdown
-  // proving the query matched — and, when the enumeration was empty too, the zero-row hint blamed
-  // the innocent agent/policy/result filters ("0 rows. Filters applied: ..."). The
-  // post_filter-aware hint (digest.ts) names the real mechanism and points the model at the
-  // population-true aggregations. FAILS ON BASE (no post_filter branch in buildZeroRowHint) and
-  // against this item's own first cut.
+  // A fragment like "ssh" passes 0 rows through the post_filter (exact-keyword fields), so a
+  // fragment call's digest could otherwise show a 0 total right beside a breakdown proving the
+  // query matched — and, when the enumeration is empty too, a zero-row hint that blames the
+  // innocent agent/policy/result filters ("0 rows. Filters applied: ..."). The post_filter-aware
+  // hint (digest.ts) names the real mechanism and points the model at the population-true
+  // aggregations.
   const req = buildIndexer({
     agent_id: '000',
     policy_id: 'cis_ubuntu22-04',
@@ -421,9 +469,8 @@ test('get_sca_checks: a fragment call digest explains the post_filtered 0 total 
 
 test('get_sca_checks: a fragment matching NOTHING still gets the post_filter hint, never the filter blame', () => {
   // Both the post_filter and the include-scoped enumeration miss: the honest reading is "the
-  // subject matched no values", and the hint says exactly that; the base instead emitted
-  // '0 rows. Filters applied: wazuh.agent.id, policy.id, check.result...' — blaming three
-  // filters that all matched. FAILS ON BASE.
+  // subject matched no values", and the hint says exactly that instead of blaming the three
+  // filters that all matched.
   const req = buildIndexer({
     agent_id: '000',
     policy_id: 'cis_ubuntu22-04',
@@ -465,22 +512,23 @@ test('get_sca_checks: the request (with its new aggs clause) passes applySafetyV
 test('get_sca_checks: tableSpec/digest declare the locked 5.0 columns/rowFields/sampleColumns', () => {
   assert.deepEqual(
     getScaChecksTool.tableSpec.columns.map(c => c.field),
-    ['check.id', 'check.name', 'check.result', 'check.reason'],
+    // check.rationale, not check.reason -- the latter is mapped but empty in every document, so
+    // a Reason column keyed on it would be an em-dash on every row.
+    ['check.id', 'check.name', 'check.result', 'check.rationale'],
   );
-  // Workstream D (coverage doc CV-054): rationale/remediation joined the row expander (still
-  // row-only, not a table column -- the browser table itself is unchanged) so the analyst can
-  // read the CIS/benchmark's own WHY/WHAT-to-do text without a second tool call.
+  // Rationale/remediation are row-only (not a table column -- the browser table itself stays
+  // unchanged) so the analyst can read the CIS/benchmark's own WHY/WHAT-to-do text without a
+  // second tool call.
   assert.deepEqual(getScaChecksTool.tableSpec.rowFields, [
     'check.rationale',
     'check.remediation',
     'check.rules',
   ]);
-  // Workstream D: rationale/remediation now ALSO ride in the digest sample rows (previously
-  // row-expander-only, i.e. never sent to the model at all) -- the model cannot lead an
-  // interpreted SCA answer with "why this matters"/"what to do" from a sample that never carried
-  // either field. `check.reason` (the SCA engine's own short pass/fail note, already a table
-  // column) is left out of the sample on purpose -- it duplicates `check.result` for most checks
-  // and adds nothing rationale/remediation don't already cover for synthesis.
+  // Rationale/remediation ride in the digest sample rows (not just the row expander) -- the model
+  // needs both fields in the sample to lead an interpreted SCA answer with "why this
+  // matters"/"what to do". `check.reason` (the SCA engine's own short pass/fail note, already a
+  // table column) is left out of the sample on purpose -- it duplicates `check.result` for most
+  // checks and adds nothing rationale/remediation don't already cover for synthesis.
   assert.deepEqual(getScaChecksTool.digest.sampleColumns, [
     'check.id',
     'check.name',
@@ -489,10 +537,53 @@ test('get_sca_checks: tableSpec/digest declare the locked 5.0 columns/rowFields/
     'check.remediation',
   ]);
   // `check.description` (the benchmark's own restatement of the check's title, not interpretive
-  // content) stays out of the digest — unchanged token-budget decision from 4.14/pre-D.
+  // content) stays out of the digest -- a token-budget decision.
   assert.ok(
     !getScaChecksTool.digest.sampleColumns.includes('check.description'),
   );
+});
+
+// Generic sole-candidate parameter resolution (template: resolveDeicticAgentParams in
+// get-agent-inventory.ts): both agent_id and policy_id are schema-OPTIONAL, each resolving via the
+// generic resolver (param-resolution.ts) that registry.ts attaches automatically. policy_id
+// scopes ITS OWN lookup on whichever agent_id resolves first (declared order) -- see
+// param-resolution.test.ts's scopedBy-cascade tests for the resolution mechanics.
+
+test('get_sca_checks: neither agent_id nor policy_id is schema-required', () => {
+  const schema = getScaChecksTool.spec.parameters as { required?: string[] };
+  assert.ok(
+    !schema.required || schema.required.length === 0,
+    'agent_id/policy_id must not be schema-required -- server-side resolution needs both omittable',
+  );
+});
+
+test('get_sca_checks: agent_id/policy_id descriptions explain server-side resolution on omission', () => {
+  const schema = getScaChecksTool.spec.parameters as {
+    properties: Record<string, { description?: string }>;
+  };
+  assert.match(
+    schema.properties.agent_id.description ?? '',
+    /Optional: omit this.*resolves to the only active agent automatically/s,
+  );
+  assert.match(
+    schema.properties.policy_id.description ?? '',
+    /Optional: omit this when the agent has exactly one SCA policy/,
+  );
+});
+
+test('get_sca_checks: declares agent_id (manager-agents) then policy_id (indexer-terms, scoped by agent_id) in that order', () => {
+  assert.deepEqual(getScaChecksTool.soleCandidateParams, [
+    { param: 'agent_id', source: { kind: 'manager-agents' } },
+    {
+      param: 'policy_id',
+      source: {
+        kind: 'indexer-terms',
+        index: 'wazuh-states-sca*',
+        field: 'policy.id',
+        scopedBy: { param: 'agent_id', field: 'wazuh.agent.id' },
+      },
+    },
+  ]);
 });
 
 test('get_sca_checks: sampleFieldMaxLength caps rationale/remediation tighter than the generic field cap', () => {
@@ -502,13 +593,13 @@ test('get_sca_checks: sampleFieldMaxLength caps rationale/remediation tighter th
   });
 });
 
-test('get_sca_checks: review D1 — a 5-row digest of LIVE-SIZED rationale/remediation text stays under DIGEST_CHAR_CAP, and no sample row is popped', () => {
-  // Review finding D1 (AI/plan/d-review.md): the live wazuh-aio-5 document that surfaced this had
-  // check.rationale at 604 chars and check.remediation at 597 -- both past digest.ts's generic
-  // MAX_FIELD_VALUE_LENGTH (500), which without get-sca-checks.ts's sampleFieldMaxLength cap would
-  // truncate every long row to EXACTLY 500 chars (the cap becomes the typical size), pushing a
-  // 5-row digest to ~5,890 chars -- within capDigest's pop-a-row range of DIGEST_CHAR_CAP (6,000)
-  // -- and popping 1-2 of the 5 rows while samplesNote (computed pre-cap) still claimed 5.
+test('get_sca_checks: a 5-row digest of LIVE-SIZED rationale/remediation text stays under DIGEST_CHAR_CAP, and no sample row is popped', () => {
+  // A document with check.rationale at 604 chars and check.remediation at 597 -- both past
+  // digest.ts's generic MAX_FIELD_VALUE_LENGTH (500), which without get-sca-checks.ts's
+  // sampleFieldMaxLength cap would truncate every long row to EXACTLY 500 chars (the cap becomes
+  // the typical size), pushing a 5-row digest to ~5,890 chars -- within capDigest's pop-a-row
+  // range of DIGEST_CHAR_CAP (6,000) -- and popping 1-2 of the 5 rows while samplesNote (computed
+  // pre-cap) still claims 5.
   const rationale = 'r'.repeat(604);
   const remediation = 'm'.repeat(597);
   const hits = Array.from({ length: 5 }, (_, i) => ({
@@ -546,9 +637,27 @@ test('get_sca_checks: review D1 — a 5-row digest of LIVE-SIZED rationale/remed
     `expected a single get_sca_checks digest (${digestChars} chars) to stay under DIGEST_CHAR_CAP (${DIGEST_CHAR_CAP})`,
   );
 
-  // ADAPTATION (branch 8997): the original commit's second assertion here compared 4 accumulated
-  // digests against chat.ts's CONTEXT_CHAR_BUDGET (workstream C's context-char stop, calibrated
-  // for the CV-069 5-agent sweep). That budget lives on enhancement/8998-ai-assistant-tool-budget,
-  // not this branch, so the assertion is dropped; the per-field cap it was calibrating for is
-  // still fully covered by the DIGEST_CHAR_CAP assertion above.
+  // A 5-agent sweep (chat.ts's CONTEXT_CHAR_BUDGET calibration comment): 4
+  // accumulated single-agent digests must stay under the budget so round 5 is not forced
+  // tools-off.
+  assert.ok(
+    digestChars * 4 < CONTEXT_CHAR_BUDGET,
+    `expected 4 accumulated get_sca_checks digests (${
+      digestChars * 4
+    } chars) to stay under CONTEXT_CHAR_BUDGET (${CONTEXT_CHAR_BUDGET}), preserving the 5-agent sweep`,
+  );
+});
+
+test('get_sca_checks: the agent_id description tells the model to resolve a NAMED host to an id', () => {
+  // A description that only explains when to OMIT agent_id invites a named-host question to be
+  // answered with no agent scope at all -- and omission does not search across agents, it resolves to
+  // one, so the call answers about the wrong host and returns 0 rows.
+  const properties = getScaChecksTool.spec.parameters.properties as Record<
+    string,
+    { description?: string }
+  >;
+  const description = properties.agent_id.description ?? '';
+  assert.match(description, /If the user named a host/);
+  assert.match(description, /resolve that name to its numeric id first/);
+  assert.match(description, /does NOT search across agents/);
 });

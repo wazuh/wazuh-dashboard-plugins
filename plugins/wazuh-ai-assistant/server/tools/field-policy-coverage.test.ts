@@ -34,15 +34,20 @@ const KNOWN_SAFE_STRUCTURAL_FIELDS = new Set<string>([
   'wazuh.rule.title',
   'wazuh.rule.mitre.technique.id',
   'wazuh.rule.mitre.technique.name',
+  // The integration/channel taxonomy word a finding carries -- a visible table column on every
+  // finding-hits tool and one of their model-facing sample columns. A curated Wazuh enum, exactly like
+  // `wazuh.rule.level`, never analyst/attacker free text.
+  'wazuh.integration.category',
   // Aggregation-bucket shape (get_top_rules and the *_summary tools).
   'key',
   'doc_count',
-  // Sampled-label-spread sub-aggs (issue #8921): `cardinality`/`filter` sub-agg counters merged
+  // Sampled-label-spread sub-aggs: `cardinality`/`filter` sub-agg counters merged
   // into a bucket row by digest.ts's existing metric-/filter-sub-agg branches — aggregation
   // counters over already-classified fields (wazuh.rule.title/wazuh.rule.level/
   // wazuh.agent.name), never analyst/attacker-supplied free text themselves.
-  'distinct_titles',
-  'distinct_names',
+  'distinct_title_count',
+  'distinct_name_count',
+  'distinct_level_count',
   'high_or_critical',
   // os.* / architecture / vendor / version: OS/package metadata, not identifiers.
   'wazuh.agent.host.os.name',

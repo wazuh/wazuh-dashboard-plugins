@@ -4,14 +4,14 @@ import {
   SUGGEST_DISCOVER_QUERY_TOOL,
   validateSuggestDiscoverQueryArgs,
 } from './suggest-discover-query';
+import { UNBOUNDED_TIME_RANGE } from '../../common/discover-url';
 
 /**
- * Proves the graceful-failure handoff's server-side seam (issue 13-suggested-query-discover-
- * handoff.md, extended by issue #8920 items 4/9):
+ * Proves the graceful-failure handoff's server-side seam:
  *  - `validateSuggestDiscoverQueryArgs` rejects everything that would otherwise render a broken
  *    or silent callout to the user (empty index/reason, unparseable/non-object query_dsl).
- *  - `resolveSuggestedDsl`'s field-level-filter safety decision, now as a discriminated
- *    `SuggestedDslResolution` instead of bare DSL: field filters only ever survive as `verified`
+ *  - `resolveSuggestedDsl`'s field-level-filter safety decision returns a discriminated
+ *    `SuggestedDslResolution` rather than bare DSL: field filters only ever survive as `verified`
  *    when `_field_caps` confirms every referenced field name exists on the target index; an index
  *    outside the executor's allowlist (or a failed `_field_caps` call) resolves to
  *    `unverifiable_index`; a referenced field _field_caps reports as absent resolves to
@@ -128,6 +128,54 @@ test('resolveSuggestedDsl: a disallowed index resolves unverifiable_index, never
         filter: [{ range: { '@timestamp': { gte: 'now-24h', lte: 'now' } } }],
       },
     });
+  }
+});
+
+test('resolveSuggestedDsl: an lte-only range materializes an unbounded gte, never an inverted window', async () => {
+  // A live path: a model-authored DSL is never run through `checkDateRanges`, so a one-sided range
+  // reaches `buildTimeRangeOnlyDsl` as written. It reads the bound through `extractTimeRange`,
+  // whose missing LOWER edge now fills from the unbounded window rather than `now-24h` — the old
+  // fill emitted `gte: now-24h, lte: <past instant>`, a range matching nothing at all, which the
+  // user would have been handed as a query to run themselves.
+  const { logger } = fakeLogger();
+  const context = fakeContext(() =>
+    Promise.resolve({ body: { fields: { '@timestamp': {} } } }),
+  );
+  const result = await resolveSuggestedDsl(
+    context,
+    'some-other-index-*',
+    { range: { '@timestamp': { lte: '2026-01-01T00:00:00.000Z' } } },
+    logger,
+  );
+  // Disallowed index + nothing field-level to lose: the stripped range-only DSL is emitted with no
+  // strip disclosure (see resolveSuggestedDsl's allowlist branch).
+  assert.equal(result.outcome, 'no_field_filters');
+  if (result.outcome === 'no_field_filters') {
+    assert.deepEqual(result.dsl, {
+      bool: {
+        filter: [
+          {
+            range: {
+              '@timestamp': {
+                gte: UNBOUNDED_TIME_RANGE.from,
+                lte: '2026-01-01T00:00:00.000Z',
+              },
+            },
+          },
+        ],
+      },
+    });
+    const emitted = (
+      result.dsl as {
+        bool: {
+          filter: Array<{ range: Record<string, Record<string, string>> }>;
+        };
+      }
+    ).bool.filter[0].range['@timestamp'];
+    assert.ok(
+      Date.parse(emitted.gte) < Date.parse(emitted.lte),
+      'the emitted range must not be inverted',
+    );
   }
 });
 
@@ -415,10 +463,8 @@ test('resolveSuggestedDsl: a wazuh-states-* index uses state.modified_at for the
   }
 });
 
-// #8915: the tool's own description previously read as one optional capability among several,
-// which measured live traffic showed the model never invoked. Pins the "required final step, not
-// an optional extra" framing and all three trigger conditions so a reword that drops any of them
-// fails loudly.
+// Pins the tool description's "required final step, not an optional extra" framing and all
+// three trigger conditions so a reword that drops any of them fails loudly.
 
 test('SUGGEST_DISCOVER_QUERY_TOOL: description frames the call as the required final step, not an optional extra', () => {
   assert.match(
@@ -427,7 +473,7 @@ test('SUGGEST_DISCOVER_QUERY_TOOL: description frames the call as the required f
   );
 });
 
-test('SUGGEST_DISCOVER_QUERY_TOOL: description names all three #8915 trigger conditions', () => {
+test('SUGGEST_DISCOVER_QUERY_TOOL: description names all three trigger conditions', () => {
   const { description } = SUGGEST_DISCOVER_QUERY_TOOL;
   assert.match(
     description,

@@ -15,7 +15,11 @@ export const agentsTableActions = (
   {
     // TODO: consider moving the positional arguments to this to avoid bug related to position and allow to extend easily.
     setIsRemoveModalVisible,
-  }: { setIsRemoveModalVisible: SetModalIsVisible },
+    setIsScanVulnerabilitiesModalVisible,
+  }: {
+    setIsRemoveModalVisible: SetModalIsVisible;
+    setIsScanVulnerabilitiesModalVisible: SetModalIsVisible;
+  },
 ) => [
   {
     name: (agent: Agent) => {
@@ -112,6 +116,31 @@ export const agentsTableActions = (
       const isOutdated = isVersionLower(agent.version, apiVersion);
       return agent.status === API_NAME_AGENT_STATUS.ACTIVE && isOutdated;
     },
+  },
+  {
+    name: (agent: Agent) => {
+      const name = 'Scan vulnerabilities';
+
+      if (agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
+        return name;
+      }
+
+      return (
+        <EuiToolTip content='Since the agent never connected, there is no inventory to scan'>
+          <span>{name}</span>
+        </EuiToolTip>
+      );
+    },
+    description: 'Scan vulnerabilities',
+    icon: 'search',
+    type: 'icon',
+    onClick: (agent: Agent) => {
+      setAgent(agent);
+      setIsScanVulnerabilitiesModalVisible(true);
+    },
+    'data-test-subj': 'action-scan-vulnerabilities',
+    enabled: (agent: Agent) =>
+      agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED,
   },
   {
     name: 'Remove',

@@ -17,9 +17,9 @@ function spec(overrides: Partial<TableSpec> = {}): TableSpec {
 
 describe('ResultTable', () => {
   it('shows a collapsed accordion for a pathological row count, mounting no table rows until opened', () => {
-    // Above AUTO_EXPAND_ROW_THRESHOLD. The ceiling moved from 10 to 200 once the card gained its
-    // own height cap and internal scroll: length no longer costs the reader anything, and the
-    // design's canonical Screen 2 is a 26-row table shown open.
+    // Above AUTO_EXPAND_ROW_THRESHOLD (200). The card has its own height cap and internal scroll,
+    // so row count costs the reader nothing, and the design's canonical Screen 2 is a 26-row
+    // table shown open.
     const manyRows = Array.from({ length: 201 }, (_unused, i) => ({
       agent: `agent-${i}`,
     }));
@@ -72,7 +72,7 @@ describe('ResultTable', () => {
     expect(screen.getByText('agent-0')).toBeInTheDocument();
   });
 
-  it('paginates: only the first DEFAULT_PAGE_SIZE (5) rows are in the DOM at once', () => {
+  it('paginates: only the first DEFAULT_PAGE_SIZE (10) rows are in the DOM at once', () => {
     const thirtyRows = Array.from({ length: 30 }, (_unused, i) => ({
       agent: `agent-${i}`,
     }));
@@ -84,12 +84,13 @@ describe('ResultTable', () => {
         })}
       />,
     );
-    // 30 rows is over the auto-expand threshold (10), so the accordion starts collapsed.
-    fireEvent.click(screen.getByText('Results (30 rows)'));
+    // 30 rows is well under the auto-expand threshold (200), so the accordion is open immediately
+    // — no click needed to see the rows below.
+    expect(screen.getByText('Results (30 rows)')).toBeInTheDocument();
 
     expect(screen.getByText('agent-0')).toBeInTheDocument();
-    expect(screen.getByText('agent-4')).toBeInTheDocument();
-    expect(screen.queryByText('agent-5')).toBeNull();
+    expect(screen.getByText('agent-9')).toBeInTheDocument();
+    expect(screen.queryByText('agent-10')).toBeNull();
     expect(screen.queryByText('agent-29')).toBeNull();
   });
 
@@ -166,10 +167,9 @@ describe('ResultTable', () => {
     });
 
     it('does not enter the expanded state on its own for a tall transcript, only on a user page-size pick', () => {
-      // A tall transcript (> 900px) bumps the INITIAL page size to 10 (5 -> 10) so a long result
-      // doesn't need instant re-paging — but that alone is not a user action, and used to satisfy
-      // `pageSize > DEFAULT_PAGE_SIZE` on its own, silently switching the card to the 900px
-      // "expanded" ceiling for every long transcript regardless of anything the reader did.
+      // Merely measuring a tall transcript must never, on its own, satisfy
+      // `pageSize > DEFAULT_PAGE_SIZE` and silently switch the card to the 900px "expanded"
+      // ceiling — only a reader EXPLICITLY picking a larger page size counts as opting in.
       const thirtyRows = Array.from({ length: 30 }, (_unused, i) => ({
         agent: `agent-${i}`,
       }));
@@ -209,14 +209,15 @@ describe('ResultTable', () => {
     it('shows a working "next page" control that reveals the next slice of rows', () => {
       render(<ResultTable spec={thirtyRowSpec()} />);
 
-      expect(screen.getByText('Page 1 of 6')).toBeInTheDocument();
+      // 30 rows at the default page size (10) is 3 pages.
+      expect(screen.getByText('Page 1 of 3')).toBeInTheDocument();
       expect(screen.getByText('agent-0')).toBeInTheDocument();
-      expect(screen.queryByText('agent-5')).toBeNull();
+      expect(screen.queryByText('agent-10')).toBeNull();
 
       fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
 
-      expect(screen.getByText('Page 2 of 6')).toBeInTheDocument();
-      expect(screen.getByText('agent-5')).toBeInTheDocument();
+      expect(screen.getByText('Page 2 of 3')).toBeInTheDocument();
+      expect(screen.getByText('agent-10')).toBeInTheDocument();
       expect(screen.queryByText('agent-0')).toBeNull();
     });
 
@@ -230,11 +231,12 @@ describe('ResultTable', () => {
         screen.getByRole('button', { name: 'Next page' }),
       ).not.toBeDisabled();
 
-      for (let clickCount = 0; clickCount < 5; clickCount += 1) {
+      // 30 rows / 10 per page (default) = 3 pages, so 2 clicks reach the last one.
+      for (let clickCount = 0; clickCount < 2; clickCount += 1) {
         fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
       }
 
-      expect(screen.getByText('Page 6 of 6')).toBeInTheDocument();
+      expect(screen.getByText('Page 3 of 3')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Next page' })).toBeDisabled();
     });
 
@@ -242,29 +244,28 @@ describe('ResultTable', () => {
       render(<ResultTable spec={thirtyRowSpec()} />);
 
       fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
-      expect(screen.getByText('Page 2 of 6')).toBeInTheDocument();
+      expect(screen.getByText('Page 2 of 3')).toBeInTheDocument();
 
-      fireEvent.click(screen.getByRole('button', { name: '10' }));
-      expect(screen.getByText('Page 1 of 3')).toBeInTheDocument();
-      expect(screen.getByText('agent-9')).toBeInTheDocument();
-      expect(screen.queryByText('agent-10')).toBeNull();
+      fireEvent.click(screen.getByRole('button', { name: '5' }));
+      expect(screen.getByText('Page 1 of 6')).toBeInTheDocument();
+      expect(screen.getByText('agent-4')).toBeInTheDocument();
+      expect(screen.queryByText('agent-5')).toBeNull();
     });
 
-    // "Card grows" (iteration-4 item 3, F2): picking a page size ABOVE the 5-row default is what
-    // used to be imperceptible — the card stayed height-capped, so 50 rows just added an internal
-    // scrollbar. The approved fix lets the card itself grow past its default cap once the reader
-    // has deliberately asked for more rows than the default shows.
-    it('grows past the default cap once a larger page size is chosen, shrinks back at 5', () => {
+    // Picking a page size ABOVE the 10-row default grows the card past its height cap, once the
+    // reader has deliberately asked for more rows than the default shows — without this, the card
+    // stays height-capped and extra rows just add an internal scrollbar.
+    it('grows past the default cap once a larger page size is chosen, shrinks back at the default', () => {
       const { container } = render(<ResultTable spec={thirtyRowSpec()} />);
       const card = () =>
         container.querySelector('.wzResultsCard') as HTMLElement;
 
       expect(card().classList.contains('wzResultsCard--expanded')).toBe(false);
 
-      fireEvent.click(screen.getByRole('button', { name: '10' }));
+      fireEvent.click(screen.getByRole('button', { name: '25' }));
       expect(card().classList.contains('wzResultsCard--expanded')).toBe(true);
 
-      fireEvent.click(screen.getByRole('button', { name: '5' }));
+      fireEvent.click(screen.getByRole('button', { name: '10' }));
       expect(card().classList.contains('wzResultsCard--expanded')).toBe(false);
     });
 
@@ -274,17 +275,17 @@ describe('ResultTable', () => {
       body.scrollTop = 120;
       expect(body.scrollTop).toBe(120);
 
-      fireEvent.click(screen.getByRole('button', { name: '10' }));
+      fireEvent.click(screen.getByRole('button', { name: '5' }));
 
       expect(body.scrollTop).toBe(0);
     });
 
-    // Re-pin hook (iteration-4 item 3, part A): the card grows downward when a larger page size is
-    // picked, and it lives inside chat-page.tsx's scrolling transcript pane. That pane only re-pins
-    // to its bottom on a `messages` change, so without this notification the freshly-grown
-    // pagination footer slid behind the composer until the reader scrolled by hand. The callback
-    // fires for a page-SIZE pick only — a plain next/previous-page click never grows the card, so it
-    // must not trigger a re-pin.
+    // Re-pin hook: the card grows downward when a larger page size is picked, and it lives inside
+    // chat-page.tsx's scrolling transcript pane. That pane only re-pins to its bottom on a
+    // `messages` change, so without this notification the freshly-grown pagination footer would
+    // slide behind the composer until the reader scrolled by hand. The callback fires for a
+    // page-SIZE pick only — a plain next/previous-page click never grows the card, so it must not
+    // trigger a re-pin.
     it('notifies the host on a rows-per-page change so the transcript can re-pin, but not on paging', () => {
       const onRowsPerPageChange = jest.fn();
       render(
@@ -305,9 +306,10 @@ describe('ResultTable', () => {
     });
 
     it('also scrolls the card body back to the top on a plain next/previous page click', () => {
-      // The reset used to live only in the page-SIZE change handler, so a reader who scrolled
-      // deep into page 1's rows and then clicked "Next page" (no size change at all) landed on
-      // page 2 still scrolled to wherever page 1 left off.
+      // The scroll reset applies to a plain next/previous-page click too, not only a page-SIZE
+      // change — otherwise a reader who scrolled deep into page 1's rows and then clicked "Next
+      // page" (no size change at all) would land on page 2 still scrolled to wherever page 1 left
+      // off.
       const { container } = render(<ResultTable spec={thirtyRowSpec()} />);
       const body = container.querySelector('.wzResultsCardBody') as HTMLElement;
       body.scrollTop = 120;
@@ -319,9 +321,9 @@ describe('ResultTable', () => {
     });
 
     it('renders no pagination footer when every offered page size already fits the result', () => {
-      // A one-row table used to get the full "Rows per page: 5 10 25 50" control plus
-      // "Page 1 of 1" — four controls that cannot change anything on screen, since 5 (the smallest
-      // offered size) already holds the whole result. Reported from the UI as looking broken.
+      // A "Rows per page: 5 10 25 50" control plus "Page 1 of 1" would be four controls that
+      // cannot change anything on screen, since the CURRENT page size (the 10-row default)
+      // already holds the whole one-row result.
       const { container } = render(
         <ResultTable
           spec={spec({
@@ -337,12 +339,14 @@ describe('ResultTable', () => {
       expect(screen.getByText('web-01')).toBeInTheDocument();
     });
 
-    it('renders the footer as soon as a smaller page size would split the result', () => {
-      // Six rows: the current size (5) already pages it, and even if it did not, choosing 5 would.
+    // A 6-row answer fits entirely within the 10-row default page size, so the pager (and every
+    // row) must be visible with NO pagination footer at all — a smaller default would split it
+    // onto a hidden page 2, producing a factually wrong AI prose summary.
+    it('shows every row with no pagination footer for a 6-row result', () => {
       const sixRows = Array.from({ length: 6 }, (_unused, i) => ({
         agent: `agent-${i}`,
       }));
-      render(
+      const { container } = render(
         <ResultTable
           spec={spec({
             columns: [{ id: 'agent', label: 'Agent' }],
@@ -350,12 +354,63 @@ describe('ResultTable', () => {
           })}
         />,
       );
+      expect(container.querySelector('.wzResultsCardFooter')).toBeNull();
+      for (let i = 0; i < 6; i += 1) {
+        expect(screen.getByText(`agent-${i}`)).toBeInTheDocument();
+      }
+    });
+
+    it('renders the footer as soon as the result exceeds the default page size', () => {
+      // Eleven rows: one more than the 10-row default, so the result genuinely needs a second
+      // page and the pager (with the page-size selector) must reappear.
+      const elevenRows = Array.from({ length: 11 }, (_unused, i) => ({
+        agent: `agent-${i}`,
+      }));
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'agent', label: 'Agent' }],
+            rows: elevenRows,
+          })}
+        />,
+      );
       expect(screen.getByText(/rows per page/i)).toBeInTheDocument();
       expect(screen.getByText('Page 1 of 2')).toBeInTheDocument();
     });
 
+    // Review, MAJOR-1: the naive `spec.rows.length > pageSize` check alone falls into a
+    // trapdoor — a reader who explicitly picks a page size >= the row count would unmount the
+    // WHOLE footer, including the size selector itself, with no way back short of a remount.
+    it('keeps the footer (and its size selector) reachable after picking a page size >= the row count', () => {
+      const twentyFiveRows = Array.from({ length: 25 }, (_unused, i) => ({
+        agent: `agent-${i}`,
+      }));
+      const { container } = render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'agent', label: 'Agent' }],
+            rows: twentyFiveRows,
+          })}
+        />,
+      );
+      expect(container.querySelector('.wzResultsCardFooter')).not.toBeNull();
+
+      // 25 rows at page size 25 is exactly one page — the trapdoor the naive check falls into.
+      fireEvent.click(screen.getByRole('button', { name: '25' }));
+      expect(screen.getByText('Page 1 of 1')).toBeInTheDocument();
+      // The footer — and the size selector inside it — must still be there: this is the only way
+      // back to a smaller size.
+      expect(container.querySelector('.wzResultsCardFooter')).not.toBeNull();
+      expect(screen.getByText(/rows per page/i)).toBeInTheDocument();
+
+      // Picking a smaller size again restores real paging, proving the selector still works.
+      fireEvent.click(screen.getByRole('button', { name: '10' }));
+      expect(screen.getByText('Page 1 of 3')).toBeInTheDocument();
+      expect(container.querySelector('.wzResultsCardFooter')).not.toBeNull();
+    });
+
     it('renders no pagination footer for an empty result set', () => {
-      // Kept, with its premise narrowed: as of C4 (CEO item 6) the CHAT SURFACE never hands this
+      // Kept, with its premise narrowed: as of C4 the CHAT SURFACE never hands this
       // component a 0-row spec — message-bubble.tsx suppresses the whole card for one and shows a
       // quiet line instead (covered in message-bubble.test.tsx). This component is still the generic
       // spec renderer, though, so what it does when a call site hands it one directly stays pinned:
@@ -455,6 +510,119 @@ describe('ResultTable', () => {
       const { container } = render(<ResultTable spec={spec()} />);
       expect(container.querySelector('.euiBadge[title]')).toBeNull();
     });
+
+    // The index and resolved time range must be reachable inside the popover itself — not only
+    // through the chip's hover `title`, which a touch/keyboard reader can never open. These assert
+    // the labelled lines render as real popover content.
+    it('shows the index and resolved time range as labelled lines inside the popover', () => {
+      render(
+        <ResultTable
+          spec={spec()}
+          provenanceChips={[
+            chip({
+              index: 'wazuh-findings-v5-*',
+              resolvedRangeLabel: 'Jul 26, 2026 – Oct 24, 2026',
+              windowBadgeLabel: '90d',
+            }),
+          ]}
+        />,
+      );
+
+      fireEvent.click(screen.getByText('Critical findings · 90d'));
+
+      expect(
+        screen.getByText('Index: wazuh-findings-v5-*'),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText('Time range: Jul 26, 2026 – Oct 24, 2026'),
+      ).toBeInTheDocument();
+      expect(screen.getByText('90d')).toBeInTheDocument();
+    });
+
+    it('shows nothing extra when the chip carries no provenance detail (Manager API call)', () => {
+      render(<ResultTable spec={spec()} provenanceChips={[chip()]} />);
+
+      fireEvent.click(screen.getByText('Critical findings · 90d'));
+
+      expect(screen.queryByText(/^Index:/)).toBeNull();
+      expect(screen.queryByText(/^Time range:/)).toBeNull();
+    });
+
+    // ONE badge states both windows, rather than two separate near-identical chips with no
+    // requested-vs-effective concept between them.
+    it('shows one combined badge for a clamped lookback, not two separate labels', () => {
+      render(
+        <ResultTable
+          spec={spec()}
+          provenanceChips={[chip({ windowBadgeLabel: '90d · requested 720d' })]}
+        />,
+      );
+
+      fireEvent.click(screen.getByText('Critical findings · 90d'));
+
+      expect(screen.getByText('90d · requested 720d')).toBeInTheDocument();
+    });
+
+    // This is a belt-and-braces Escape handler on top of EUI's own popover keyboard handling,
+    // which does not reliably close the panel on its own — without it, Escape leaves the panel
+    // open, dismissible only by re-clicking the badge.
+    it('closes the popover on Escape', async () => {
+      render(<ResultTable spec={spec()} provenanceChips={[chip()]} />);
+
+      fireEvent.click(screen.getByText('Critical findings · 90d'));
+      await waitFor(() =>
+        expect(
+          document.querySelector('.euiPopover__panel-isOpen'),
+        ).not.toBeNull(),
+      );
+
+      fireEvent.keyDown(screen.getByText('get_critical_findings'), {
+        key: 'Escape',
+      });
+
+      await waitFor(() =>
+        expect(document.querySelector('.euiPopover__panel-isOpen')).toBeNull(),
+      );
+    });
+
+    // Escape must do something while focus is STILL on the badge (EUI only moves focus into the
+    // panel asynchronously) — this fires the key on the badge itself, not on panel content, to
+    // cover exactly that window.
+    it('closes the popover on Escape fired on the badge anchor itself', async () => {
+      render(<ResultTable spec={spec()} provenanceChips={[chip()]} />);
+
+      const badge = screen.getByText('Critical findings · 90d');
+      fireEvent.click(badge);
+      await waitFor(() =>
+        expect(
+          document.querySelector('.euiPopover__panel-isOpen'),
+        ).not.toBeNull(),
+      );
+
+      fireEvent.keyDown(badge, { key: 'Escape' });
+
+      await waitFor(() =>
+        expect(document.querySelector('.euiPopover__panel-isOpen')).toBeNull(),
+      );
+    });
+
+    // The handler only acts (and only stops propagation) while `isOpen` — a closed chip must let
+    // the event bubble untouched. A guard-less handler that called `stopPropagation`
+    // unconditionally would swallow an Escape meant for an enclosing surface (a docked
+    // sidecar/flyout) even while the popover was already closed.
+    it('does not swallow Escape when the popover is already closed', () => {
+      const ancestorHandler = jest.fn();
+      render(
+        <div onKeyDown={ancestorHandler}>
+          <ResultTable spec={spec()} provenanceChips={[chip()]} />
+        </div>,
+      );
+
+      const badge = screen.getByText('Critical findings · 90d');
+      fireEvent.keyDown(badge, { key: 'Escape' });
+
+      expect(ancestorHandler).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('severity badge rendering', () => {
@@ -518,10 +686,10 @@ describe('ResultTable', () => {
     });
 
     it('renders "informational" and "low" with distinct, non-hollow background colors matching the platform severity palette', () => {
-      // Colors now mirror plugins/main's UI_COLOR_STATUS (see result-table.tsx's SEVERITY_BUCKETS
+      // Colors mirror plugins/main's UI_COLOR_STATUS (see result-table.tsx's SEVERITY_BUCKETS
       // comment): low is UI_COLOR_STATUS.success ('#007871'), informational is
-      // UI_COLOR_STATUS.disabled ('#646A77') — both are real background colors (neither renders
-      // as EUI's outline-only 'hollow' badge any more), and they must never collide.
+      // UI_COLOR_STATUS.disabled ('#646A77') — both are real background colors, not EUI's
+      // outline-only 'hollow' badge, and they must never collide.
       const { unmount } = render(
         <ResultTable
           spec={spec({
@@ -600,6 +768,105 @@ describe('ResultTable', () => {
       fireEvent.click(expandButton);
       expect(screen.queryByText(/"extra": "detail"/)).toBeNull();
     });
+
+    // Both the attribute and the accessible name must flip with the state — otherwise the toggle
+    // would keep the aria-label 'Expand row' after opening and expose no `aria-expanded` at all,
+    // giving a screen-reader/keyboard user no feedback that a row had been opened.
+    it('flips aria-expanded and the accessible name when a row is expanded and collapsed', () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'agent', label: 'Agent' }],
+            rows: [{ agent: 'web-01', extra: 'detail' }],
+          })}
+        />,
+      );
+
+      const expandButton = screen.getByRole('button', { name: 'Expand row' });
+      expect(expandButton).toHaveAttribute('aria-expanded', 'false');
+
+      fireEvent.click(expandButton);
+      expect(
+        screen.getByRole('button', { name: 'Collapse row' }),
+      ).toHaveAttribute('aria-expanded', 'true');
+
+      fireEvent.click(screen.getByRole('button', { name: 'Collapse row' }));
+      expect(
+        screen.getByRole('button', { name: 'Expand row' }),
+      ).toHaveAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // An explicit `tableCaption` always states the total, with proper ICU pluralization, and adds
+  // the page position only when the result actually spans more than one page. This matters
+  // because the component paginates by hand rather than through EuiBasicTable's own `pagination`
+  // prop — so EuiBasicTable's own default caption, built from the CURRENT PAGE's items, would tell
+  // a screen-reader user "This table contains 5 rows" on a 6-row result while the visible header
+  // reads "Results (6 rows)".
+  describe('accessible caption states the total, not the page slice', () => {
+    // EuiBasicTable renders its `tableCaption` inside an `EuiDelayRender` (to avoid a flash for a
+    // caption that never becomes visible on screen), so the `<caption>` element is present but
+    // EMPTY on the very first render and only gets its text a tick later — hence `findByText`
+    // (async) rather than a synchronous `getByText` for every assertion in this block.
+    it('uses a correctly-pluralized singular caption for one row, matching the visible header', async () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'agent', label: 'Agent' }],
+            rows: [{ agent: 'web-01' }],
+          })}
+        />,
+      );
+      expect(screen.getByText('Results (1 row)')).toBeInTheDocument();
+      expect(
+        await screen.findByText('This table contains 1 row.'),
+      ).toBeInTheDocument();
+    });
+
+    it('states the TOTAL (not the page slice) when the result fits on one page', async () => {
+      const sixRows = Array.from({ length: 6 }, (_unused, i) => ({
+        agent: `agent-${i}`,
+      }));
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'agent', label: 'Agent' }],
+            rows: sixRows,
+          })}
+        />,
+      );
+      expect(screen.getByText('Results (6 rows)')).toBeInTheDocument();
+      expect(
+        await screen.findByText('This table contains 6 rows.'),
+      ).toBeInTheDocument();
+    });
+
+    it('adds the total plus the current page position once the result actually paginates', async () => {
+      const elevenRows = Array.from({ length: 11 }, (_unused, i) => ({
+        agent: `agent-${i}`,
+      }));
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'agent', label: 'Agent' }],
+            rows: elevenRows,
+          })}
+        />,
+      );
+      expect(
+        await screen.findByText(
+          'This table contains 11 rows. Showing rows 1-10, page 1 of 2.',
+        ),
+      ).toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+
+      expect(
+        await screen.findByText(
+          'This table contains 11 rows. Showing rows 11-11, page 2 of 2.',
+        ),
+      ).toBeInTheDocument();
+    });
   });
 
   describe('"Open in Discover" affordance', () => {
@@ -631,10 +898,58 @@ describe('ResultTable', () => {
     });
 
     it('renders once the resolver resolves, when the spec has discover info', async () => {
+      // `dsl: { query: {} }` carries no explicit time-range clause and the spec records no
+      // provenance, so the executed query had no time filter at all: the link opens on all of
+      // history (never a substituted last-24h window, which would under-count the answer) and the
+      // label says so. See the next two tests for the bounded cases.
       render(
         <ResultTable
           spec={spec({
             discover: { index: 'wazuh-alerts-*', dsl: { query: {} } },
+          })}
+          resolveDiscoverUrl={() =>
+            Promise.resolve('https://example.test/discover')
+          }
+        />,
+      );
+      expect(
+        await screen.findByRole('link', {
+          name: 'Open in Discover (all time)',
+        }),
+      ).toHaveAttribute('href', 'https://example.test/discover');
+    });
+
+    it('keeps the plain label when the server recorded an effective range, even for a range-less dsl', async () => {
+      // A table restored from history can carry a `provenance.effectiveRange` the server recorded
+      // while the DSL it was read from is not what reaches the client. The recorded range is a
+      // real, bounded window, so this is NOT the unbounded case and must not be labelled as one.
+      render(
+        <ResultTable
+          spec={spec({
+            discover: { index: 'wazuh-alerts-*', dsl: { query: {} } },
+            provenance: {
+              clamped: false,
+              effectiveRange: { gte: 'now-90d', lte: 'now' },
+            },
+          })}
+          resolveDiscoverUrl={() =>
+            Promise.resolve('https://example.test/discover')
+          }
+        />,
+      );
+      expect(
+        await screen.findByRole('link', { name: 'Open in Discover' }),
+      ).toBeInTheDocument();
+    });
+
+    it('keeps the plain label when the query carries its own explicit time range', async () => {
+      render(
+        <ResultTable
+          spec={spec({
+            discover: {
+              index: 'wazuh-alerts-*',
+              dsl: { range: { '@timestamp': { gte: 'now-90d', lte: 'now' } } },
+            },
           })}
           resolveDiscoverUrl={() =>
             Promise.resolve('https://example.test/discover')
@@ -647,7 +962,7 @@ describe('ResultTable', () => {
     });
   });
 
-  describe('column budget (issue #8921: no table may need a horizontal scrollbar)', () => {
+  describe('column budget (no table may need a horizontal scrollbar)', () => {
     function eightColumnSpec(): TableSpec {
       return {
         columns: [
@@ -707,14 +1022,250 @@ describe('ResultTable', () => {
       render(<ResultTable spec={eightColumnSpec()} />);
       expect(
         screen.getByText(
-          'Results (1 rows) (+2 more fields per row. Expand a row to see them.)',
+          'Results (1 row) (+2 more fields per row. Expand a row to see them.)',
         ),
       ).toBeInTheDocument();
     });
 
     it('adds no hidden-columns note when the spec has 6 or fewer columns', () => {
       render(<ResultTable spec={spec()} />);
-      expect(screen.getByText('Results (1 rows)')).toBeInTheDocument();
+      expect(screen.getByText('Results (1 row)')).toBeInTheDocument();
+    });
+
+    it('discloses row-only fields that never had a column to be demoted from', () => {
+      // The note counts row-only fields too, not just spec columns past the visible budget — a
+      // table whose extra fields come from the tool's `tableSpec.rowFields` (server/tools/digest.ts
+      // writes those into every row WITHOUT a matching column) advertises them the same way a
+      // table with more than 6 spec columns advertises "+N more fields", since the same expander
+      // carries extra content in both cases.
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'agent', label: 'Agent' }],
+            rows: [{ agent: 'web-01', 'data.srcip': '10.0.0.1', rule: 'x' }],
+          })}
+        />,
+      );
+      expect(
+        screen.getByText(
+          'Results (1 row) (+2 more fields per row. Expand a row to see them.)',
+        ),
+      ).toBeInTheDocument();
+    });
+
+    it('counts each extra field once per row, not once per occurrence across rows', () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'agent', label: 'Agent' }],
+            rows: [
+              { agent: 'web-01', 'data.srcip': '10.0.0.1' },
+              { agent: 'web-02', 'data.srcip': '10.0.0.2' },
+              { agent: 'web-03' },
+            ],
+          })}
+        />,
+      );
+      expect(
+        screen.getByText(
+          'Results (3 rows) (+1 more field per row. Expand a row to see them.)',
+        ),
+      ).toBeInTheDocument();
+    });
+
+    it('promises no more extra fields than the richest single row actually has', () => {
+      // `rowFields` are written sparsely (digest.ts skips an absent one), so different rows carry
+      // different extras. The label says "per row", so it must report the MAXIMUM any one expander
+      // will show -- not the union across rows, which here would over-promise 3.
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'agent', label: 'Agent' }],
+            rows: [
+              { agent: 'web-01', 'data.srcip': '10.0.0.1' },
+              { agent: 'web-02', 'data.dstport': 443, 'rule.id': '5710' },
+            ],
+          })}
+        />,
+      );
+      expect(
+        screen.getByText(
+          'Results (2 rows) (+2 more fields per row. Expand a row to see them.)',
+        ),
+      ).toBeInTheDocument();
+    });
+  });
+
+  describe('empty columns are dropped and a populated field promoted', () => {
+    /** Seven columns: `description` is empty for every row, so it must lose its `<th>` — which
+     * frees the visible-column budget's 6th slot for `score`, the populated column that would
+     * otherwise have been demoted past it. */
+    function specWithEmptyColumn(): TableSpec {
+      return {
+        columns: [
+          { id: 'c1', label: 'One' },
+          { id: 'c2', label: 'Two' },
+          { id: 'description', label: 'Description' },
+          { id: 'c3', label: 'Three' },
+          { id: 'c4', label: 'Four' },
+          { id: 'c5', label: 'Five' },
+          { id: 'score', label: 'Score' },
+        ],
+        rows: [
+          {
+            c1: 'v1',
+            c2: 'v2',
+            description: '',
+            c3: 'v3',
+            c4: 'v4',
+            c5: 'v5',
+            score: 7.5,
+          },
+        ],
+      };
+    }
+
+    const headerTexts = () =>
+      screen
+        .getAllByRole('columnheader')
+        .map(header => header.textContent ?? '');
+
+    it('drops a column that is empty for every row of the result', () => {
+      render(<ResultTable spec={specWithEmptyColumn()} />);
+      expect(headerTexts()).not.toContain('Description');
+    });
+
+    it('promotes the populated column that the empty one was crowding out', () => {
+      render(<ResultTable spec={specWithEmptyColumn()} />);
+      expect(headerTexts()).toContain('Score');
+      expect(screen.getByText('7.5')).toBeInTheDocument();
+    });
+
+    it('keeps a column whose values are falsy but present (0 / false)', () => {
+      // `isAbsentValue` is undefined/null/'' only: a genuine zero count is data, not absence, and
+      // dropping its column would hide the very answer the reader asked for.
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'agent', label: 'Agent' },
+              { id: 'count', label: 'Count' },
+              { id: 'enabled', label: 'Enabled' },
+            ],
+            rows: [{ agent: 'web-01', count: 0, enabled: false }],
+          })}
+        />,
+      );
+      expect(headerTexts()).toContain('Count');
+      expect(headerTexts()).toContain('Enabled');
+    });
+
+    it('keeps every column when the result is empty (nothing to judge emptiness from)', () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'agent', label: 'Agent' },
+              { id: 'description', label: 'Description' },
+            ],
+            rows: [],
+          })}
+        />,
+      );
+      // A zero-row result renders no table body, but the columns it WOULD show must not be
+      // silently pruned on the strength of a vacuous "every row is empty".
+      expect(screen.getByText('Results (0 rows)')).toBeInTheDocument();
+    });
+
+    it('keeps every column when all of them are empty, rather than rendering a column-less table', () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'a', label: 'Alpha' },
+              { id: 'b', label: 'Beta' },
+            ],
+            rows: [{ a: null, b: '' }],
+          })}
+        />,
+      );
+      expect(headerTexts()).toContain('Alpha');
+      expect(headerTexts()).toContain('Beta');
+    });
+
+    it('leaves a dropped column reachable in the row expander', () => {
+      render(<ResultTable spec={specWithEmptyColumn()} />);
+      fireEvent.click(screen.getByRole('button', { name: 'Expand row' }));
+      expect(screen.getByText(/"description": ""/)).toBeInTheDocument();
+    });
+
+    it('keeps an UNDEFINED-valued dropped column visible in the expander, as null', () => {
+      // `buildTableSpec` writes `undefined` for a field the document lacks, and plain
+      // `JSON.stringify` OMITS such keys -- so dropping the column would have removed the field
+      // from the header and the expander both, leaving no way to tell "empty" from "never asked
+      // for". The serializer emits `null` instead.
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'agent', label: 'Agent' },
+              { id: 'description', label: 'Description' },
+            ],
+            rows: [{ agent: 'web-01', description: undefined }],
+          })}
+        />,
+      );
+      expect(
+        screen.getAllByRole('columnheader').map(h => h.textContent ?? ''),
+      ).not.toContain('Description');
+      fireEvent.click(screen.getByRole('button', { name: 'Expand row' }));
+      expect(screen.getByText(/"description": null/)).toBeInTheDocument();
+    });
+
+    it('drops a column whose every value is an empty array or an empty object', () => {
+      // Neither is "absent", so both survived an absence-only check: `[]` drew a column of blank
+      // cells and `{}` a column of the visible-but-useless literal "{}".
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'agent', label: 'Agent' },
+              { id: 'tags', label: 'Tags' },
+              { id: 'meta', label: 'Meta' },
+            ],
+            rows: [
+              { agent: 'web-01', tags: [], meta: {} },
+              { agent: 'web-02', tags: [], meta: {} },
+            ],
+          })}
+        />,
+      );
+      const headers = screen
+        .getAllByRole('columnheader')
+        .map(h => h.textContent ?? '');
+      expect(headers).toContain('Agent');
+      expect(headers).not.toContain('Tags');
+      expect(headers).not.toContain('Meta');
+    });
+
+    it('keeps a column whose arrays are non-empty on at least one row', () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'agent', label: 'Agent' },
+              { id: 'tags', label: 'Tags' },
+            ],
+            rows: [
+              { agent: 'web-01', tags: [] },
+              { agent: 'web-02', tags: ['pci'] },
+            ],
+          })}
+        />,
+      );
+      expect(
+        screen.getAllByRole('columnheader').map(h => h.textContent ?? ''),
+      ).toContain('Tags');
     });
   });
 
@@ -779,7 +1330,7 @@ describe('ResultTable', () => {
     });
   });
 
-  describe('absent-value placeholder (issue #8921: absent is rendered as absent)', () => {
+  describe('absent-value placeholder (absent is rendered as absent)', () => {
     it('renders undefined/null/empty-string as a subdued "—" in a default (non-severity, non-timestamp) column', () => {
       render(
         <ResultTable
@@ -797,6 +1348,9 @@ describe('ResultTable', () => {
     });
 
     it('renders an absent severity value as "—", not an empty badge', () => {
+      // Two rows, only the second missing its severity: a column absent in EVERY row is dropped
+      // outright now (see "empty columns are dropped" above), and this test is about how an absent
+      // VALUE renders inside a column that does exist.
       render(
         <ResultTable
           spec={spec({
@@ -804,13 +1358,18 @@ describe('ResultTable', () => {
               { id: 'agent', label: 'Agent' },
               { id: 'severity', label: 'Severity' },
             ],
-            rows: [{ agent: 'a', severity: undefined }],
+            rows: [
+              { agent: 'a', severity: 'critical' },
+              { agent: 'b', severity: undefined },
+            ],
             severityColumn: 'severity',
           })}
         />,
       );
       expect(screen.getByText('—')).toBeInTheDocument();
-      expect(document.querySelector('.euiBadge')).toBeNull();
+      // The absent cell renders the placeholder, not a badge — the populated row above it still
+      // gets its own badge, so this counts badges rather than asserting there are none.
+      expect(document.querySelectorAll('.euiBadge')).toHaveLength(1);
     });
 
     it('renders an absent value in an otherwise-timestamp column as "—"', () => {
@@ -870,6 +1429,336 @@ describe('ResultTable', () => {
       expect(
         screen.getByText('informational, wazuh-generic'),
       ).toBeInTheDocument();
+    });
+  });
+
+  /**
+   * At ~480px (the AI Assistant sidecar's width) an untruncated cell wraps onto several lines and
+   * the table becomes unreadable. This detects the CARD'S OWN measured width (not the viewport,
+   * since the same generic renderer mounts both full-page and inside the narrow sidecar) and,
+   * once the card can no longer give every candidate column at least `MIN_COLUMN_WIDTH_PX` (the
+   * adaptive threshold — see that constant's doc comment), shows only the first
+   * `NARROW_MAX_VISIBLE_COLUMNS` columns with truncate-plus-tooltip cells and no horizontal
+   * scroll. Same stub pattern chat-page.test.tsx already uses for its own ResizeObserver-driven
+   * rail-width responsiveness: jsdom has no real ResizeObserver, so the width has to be injected
+   * by hand.
+   */
+  describe('narrow container mode', () => {
+    function stubContainerWidth(width: number) {
+      class ResizeObserverStub {
+        callback: () => void;
+        constructor(callback: () => void) {
+          this.callback = callback;
+        }
+        observe() {
+          this.callback();
+        }
+        disconnect() {}
+      }
+      const original = (window as unknown as { ResizeObserver?: unknown })
+        .ResizeObserver;
+      (window as unknown as { ResizeObserver: unknown }).ResizeObserver =
+        ResizeObserverStub;
+      const widthSpy = jest
+        .spyOn(HTMLElement.prototype, 'offsetWidth', 'get')
+        .mockReturnValue(width);
+      return () => {
+        widthSpy.mockRestore();
+        (window as unknown as { ResizeObserver: unknown }).ResizeObserver =
+          original;
+      };
+    }
+
+    function wideColumnSpec(): TableSpec {
+      return {
+        columns: [
+          { id: 'agent', label: 'Agent' },
+          { id: 'rule', label: 'Rule' },
+          { id: 'category', label: 'Category' },
+          { id: 'timestamp', label: 'Timestamp' },
+        ],
+        rows: [
+          {
+            agent: 'web-01',
+            rule: 'Multiple authentication failures followed by a successful login',
+            category: 'authentication',
+            timestamp: '2026-07-26T05:58:38.000Z',
+          },
+        ],
+      };
+    }
+
+    it('renders the full column set at ordinary widths (no ResizeObserver / not narrow)', () => {
+      render(<ResultTable spec={wideColumnSpec()} />);
+      const headerTexts = screen
+        .getAllByRole('columnheader')
+        .map(header => header.textContent ?? '');
+      expect(headerTexts).toContain('Agent');
+      expect(headerTexts).toContain('Rule');
+      expect(headerTexts).toContain('Category');
+      expect(headerTexts).toContain('Timestamp');
+    });
+
+    it('shows only the first NARROW_MAX_VISIBLE_COLUMNS (3) columns once the container measures narrow', () => {
+      // wideColumnSpec has 4 columns, so its adaptive threshold is 4 * MIN_COLUMN_WIDTH_PX (140)
+      // = 560px — comfortably below it, rather than exactly at it, so this test isn't sitting on
+      // the boundary itself (that's covered separately below).
+      const restore = stubContainerWidth(400);
+      try {
+        render(<ResultTable spec={wideColumnSpec()} />);
+        const headerTexts = screen
+          .getAllByRole('columnheader')
+          .map(header => header.textContent ?? '');
+        expect(headerTexts).toContain('Agent');
+        expect(headerTexts).toContain('Rule');
+        expect(headerTexts).toContain('Category');
+        // The 4th column is demoted, same "demoted, not deleted" contract as the full-width
+        // MAX_VISIBLE_COLUMNS budget.
+        expect(headerTexts).not.toContain('Timestamp');
+      } finally {
+        restore();
+      }
+    });
+
+    it('keeps every column visible when the measured width is at or above the narrow threshold', () => {
+      const restore = stubContainerWidth(900);
+      try {
+        render(<ResultTable spec={wideColumnSpec()} />);
+        const headerTexts = screen
+          .getAllByRole('columnheader')
+          .map(header => header.textContent ?? '');
+        expect(headerTexts).toContain('Timestamp');
+      } finally {
+        restore();
+      }
+    });
+
+    it('truncates long cell text with a tooltip instead of wrapping, in narrow mode', () => {
+      const restore = stubContainerWidth(400);
+      try {
+        render(<ResultTable spec={wideColumnSpec()} />);
+        const cell = screen.getByText(
+          'Multiple authentication failures followed by a successful login',
+        );
+        // Truncated with a tooltip (EuiToolTip), not wrapped: the value itself is unchanged and
+        // still fully present in the DOM (queryable by its exact text), just visually clipped —
+        // nothing is lost, only how it renders.
+        expect(cell).toHaveClass('wzResultsCellTruncate');
+      } finally {
+        restore();
+      }
+    });
+
+    it('does not truncate cell text at ordinary (non-narrow) widths', () => {
+      render(<ResultTable spec={wideColumnSpec()} />);
+      const cell = screen.getByText(
+        'Multiple authentication failures followed by a successful login',
+      );
+      expect(cell).not.toHaveClass('wzResultsCellTruncate');
+    });
+
+    it('keeps every field reachable via the row expander even with columns demoted in narrow mode', () => {
+      const restore = stubContainerWidth(400);
+      try {
+        render(<ResultTable spec={wideColumnSpec()} />);
+        fireEvent.click(screen.getByRole('button', { name: 'Expand row' }));
+        // The demoted 'timestamp' field is still in the row's full JSON, same "demoted, not
+        // deleted" guarantee the full-width column budget already gives.
+        expect(
+          screen.getByText(/"timestamp": "2026-07-26T05:58:38\.000Z"/),
+        ).toBeInTheDocument();
+      } finally {
+        restore();
+      }
+    });
+
+    /**
+     * A 6-column table can still wrap every cell at ~600-800px card widths — a FIXED 560px
+     * threshold would only ever cover a narrower repro's column count. The threshold is adaptive
+     * instead: `isNarrow = width < candidateColumnCount * MIN_COLUMN_WIDTH_PX` (140), where
+     * `candidateColumnCount` is the number of columns full-width mode would actually render for
+     * this spec (capped by `MAX_VISIBLE_COLUMNS`, not the raw field count).
+     *
+     * The per-column width matters at exact boundaries: at 120px-per-column, a ~728px card with 6
+     * columns quantizes to 720, and `720 < 6 * 120 = 720` is false by exactly one quantization
+     * step, so the table would stay full-width and wrap anyway. `MIN_COLUMN_WIDTH_PX` is 140 (real
+     * id/title/timestamp columns need that much to read on one line), which raises the 6-column
+     * threshold to 840 and the 3-column threshold to 420, clearing that case with room to spare.
+     * These tests lock the concrete widths this threshold exists for.
+     */
+    describe('adaptive threshold', () => {
+      function columnsSpec(count: number): TableSpec {
+        return {
+          columns: Array.from({ length: count }, (_, index) => ({
+            id: `field${index}`,
+            label: `Field ${index}`,
+          })),
+          rows: [
+            Object.fromEntries(
+              Array.from({ length: count }, (_, index) => [
+                `field${index}`,
+                `value ${index}`,
+              ]),
+            ),
+          ],
+        };
+      }
+
+      it('goes narrow for a 6-column table at 800px (below its 840px threshold)', () => {
+        const restore = stubContainerWidth(800);
+        try {
+          render(<ResultTable spec={columnsSpec(6)} />);
+          const headerTexts = screen
+            .getAllByRole('columnheader')
+            .map(header => header.textContent ?? '');
+          // Only the first NARROW_MAX_VISIBLE_COLUMNS (3) of the 6 columns render.
+          expect(headerTexts).toContain('Field 0');
+          expect(headerTexts).toContain('Field 1');
+          expect(headerTexts).toContain('Field 2');
+          expect(headerTexts).not.toContain('Field 3');
+        } finally {
+          restore();
+        }
+      });
+
+      it('stays full-width for a 6-column table at 860px (quantizes to 840, at its threshold)', () => {
+        // The live-repro boundary case (see the describe block's doc comment): 860 quantizes down
+        // to 840, exactly the 6-column threshold, so it must stay full rather than narrow.
+        const restore = stubContainerWidth(860);
+        try {
+          render(<ResultTable spec={columnsSpec(6)} />);
+          const headerTexts = screen
+            .getAllByRole('columnheader')
+            .map(header => header.textContent ?? '');
+          expect(headerTexts).toContain('Field 3');
+        } finally {
+          restore();
+        }
+      });
+
+      it('stays full-width (no cell truncation) for a 3-column table at 500px (above its 420px threshold)', () => {
+        const restore = stubContainerWidth(500);
+        try {
+          render(
+            <ResultTable
+              spec={{
+                columns: [
+                  { id: 'field0', label: 'Field 0' },
+                  { id: 'field1', label: 'Field 1' },
+                  { id: 'field2', label: 'Field 2' },
+                ],
+                rows: [
+                  {
+                    field0: 'value 0',
+                    field1: 'value 1',
+                    field2:
+                      'a value long enough to reveal narrow-mode truncation',
+                  },
+                ],
+              }}
+            />,
+          );
+          const cell = screen.getByText(
+            'a value long enough to reveal narrow-mode truncation',
+          );
+          expect(cell).not.toHaveClass('wzResultsCellTruncate');
+        } finally {
+          restore();
+        }
+      });
+
+      it('goes narrow for a 6-column table at the original 480px repro width', () => {
+        const restore = stubContainerWidth(480);
+        try {
+          render(<ResultTable spec={columnsSpec(6)} />);
+          const headerTexts = screen
+            .getAllByRole('columnheader')
+            .map(header => header.textContent ?? '');
+          expect(headerTexts).not.toContain('Field 3');
+        } finally {
+          restore();
+        }
+      });
+
+      it('goes narrow for a 6-column table at the live-repro 700px card width (still below its 840px threshold)', () => {
+        const restore = stubContainerWidth(700);
+        try {
+          render(<ResultTable spec={columnsSpec(6)} />);
+          const headerTexts = screen
+            .getAllByRole('columnheader')
+            .map(header => header.textContent ?? '');
+          expect(headerTexts).not.toContain('Field 3');
+        } finally {
+          restore();
+        }
+      });
+
+      it('a raw column count above MAX_VISIBLE_COLUMNS uses the capped count, not the raw one', () => {
+        // 8 raw columns still only ever render 6 at full width (MAX_VISIBLE_COLUMNS), so the
+        // narrow threshold must be sized off that 6, not the raw 8 — otherwise this table would
+        // wrongly need 1120px (8 * 140) to stay full instead of the correct 840px (6 * 140).
+        const restore = stubContainerWidth(800);
+        try {
+          render(<ResultTable spec={columnsSpec(8)} />);
+          const headerTexts = screen
+            .getAllByRole('columnheader')
+            .map(header => header.textContent ?? '');
+          expect(headerTexts).not.toContain('Field 3');
+        } finally {
+          restore();
+        }
+      });
+
+      // A spec with exactly 3 columns has candidateColumnCount === NARROW_MAX_VISIBLE_COLUMNS, so
+      // narrow mode renders the SAME 3 headers as full-width mode — the column-count signal the
+      // 6-column tests above use can't distinguish narrow from full here. Cell truncation
+      // (`wzResultsCellTruncate`, only applied in narrow mode) is the observable signal instead.
+      function threeColumnSpecWithLongCell(): TableSpec {
+        return {
+          columns: [
+            { id: 'field0', label: 'Field 0' },
+            { id: 'field1', label: 'Field 1' },
+            { id: 'field2', label: 'Field 2' },
+          ],
+          rows: [
+            {
+              field0: 'value 0',
+              field1: 'value 1',
+              field2: 'a value long enough to reveal narrow-mode truncation',
+            },
+          ],
+        };
+      }
+
+      it("boundary sanity: stays full at the first quantization bucket (440px) at/above the 3-column table's 420px threshold", () => {
+        // 420 is not itself a multiple of the 40px quantization bucket, so there is no width that
+        // quantizes to exactly 420 — the real boundary is the bucket edge either side of it: 440
+        // quantizes to 440 (>= 420, stays full), 400 quantizes to 400 (< 420, goes narrow; see the
+        // next case). Strict `<`, not `<=`, on the (already-quantized) width vs. the threshold.
+        const restore = stubContainerWidth(440);
+        try {
+          render(<ResultTable spec={threeColumnSpecWithLongCell()} />);
+          const cell = screen.getByText(
+            'a value long enough to reveal narrow-mode truncation',
+          );
+          expect(cell).not.toHaveClass('wzResultsCellTruncate');
+        } finally {
+          restore();
+        }
+      });
+
+      it('boundary sanity: goes narrow just one quantization bucket below that threshold (400px)', () => {
+        const restore = stubContainerWidth(400);
+        try {
+          render(<ResultTable spec={threeColumnSpecWithLongCell()} />);
+          const cell = screen.getByText(
+            'a value long enough to reveal narrow-mode truncation',
+          );
+          expect(cell).toHaveClass('wzResultsCellTruncate');
+        } finally {
+          restore();
+        }
+      });
     });
   });
 

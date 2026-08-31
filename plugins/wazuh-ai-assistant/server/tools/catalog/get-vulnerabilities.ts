@@ -11,13 +11,11 @@ import {
 } from './common';
 
 /**
- * NEW tool (fixes a reported gap: "all the vulnerabilities" previously had no non-critical-only
- * answer). Same index, `_source`, and table shape as `get_critical_vulnerabilities.ts` — the
+ * Same index, `_source`, and table shape as `get_critical_vulnerabilities.ts` — the
  * `wazuh-states-vulnerabilities` states index holds current vulnerability state (not a time
- * series), so, matching that tool's precedent, there are no time-range params. `severity` is
- * optional: omit it to list every active vulnerability across the fleet; both tools are kept
- * side by side since a weak router model
- * benefits from an explicit "critical" tool separate from this general one.
+ * series), so there are no time-range params. `severity` is optional: omit it to list every
+ * active vulnerability across the fleet. Both tools are kept side by side since a weak router
+ * model benefits from an explicit "critical" tool separate from this general one.
  */
 export const getVulnerabilitiesTool: ToolDefinition = {
   spec: {
@@ -58,14 +56,14 @@ export const getVulnerabilitiesTool: ToolDefinition = {
         _source: VULN_SOURCE_FIELDS,
         sort: ['_doc'],
         size: limit,
-        // Population-true severity/agent breakdown over the FULL matched set (issue #8920 item 1)
+        // Population-true severity/agent breakdown over the FULL matched set
         // -- see VULN_BREAKDOWN_AGGS's doc comment in common.ts.
         aggs: VULN_BREAKDOWN_AGGS,
       },
     };
   },
   tableSpec: {
-    // Column order (issue #8921's budget item): the 6 columns that earn visibility under the
+    // Column order: the 6 columns that earn visibility under the
     // client's MAX_VISIBLE_COLUMNS budget (result-table.tsx) lead; Architecture and CVSS Score are
     // demoted -- NOT deleted, still queried and still in the row expander -- to positions 7-8,
     // since Description carries more decision-relevant information for a fleet-wide listing than

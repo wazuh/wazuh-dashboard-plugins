@@ -64,14 +64,23 @@ const anyFieldIsComplete = (
   return true;
 };
 
+/* The server address step now collects the whole endpoint. The port and the
+path prefix are optional -- left empty the agent applies its own default -- so
+only an invalid value blocks the step, never an empty one. */
+const ENDPOINT_FIELDS = ['serverAddress', 'serverPort', 'serverPath'];
+
+const serverEndpointIsIncomplete = (
+  formFields: UseFormReturn['fields'],
+): boolean =>
+  !formFields.serverAddress.value ||
+  ENDPOINT_FIELDS.some(key => Boolean(formFields[key]?.error));
 
 export const showCommandsSections = (
   formFields: UseFormReturn['fields'],
 ): boolean => {
   if (
     !formFields.operatingSystemSelection.value ||
-    formFields.serverAddress.value === '' ||
-    formFields.serverAddress.error
+    serverEndpointIsIncomplete(formFields)
   ) {
     return false;
   } else if (
@@ -117,10 +126,7 @@ export const getServerAddressStepStatus = (
     formFields.operatingSystemSelection.error
   ) {
     return 'disabled';
-  } else if (
-    !formFields.serverAddress.value ||
-    formFields.serverAddress.error
-  ) {
+  } else if (serverEndpointIsIncomplete(formFields)) {
     return 'current';
   } else {
     return 'complete';
@@ -135,8 +141,7 @@ export const getOptionalParameterStepStatus = (
   if (
     !formFields.operatingSystemSelection.value ||
     formFields.operatingSystemSelection.error ||
-    !formFields.serverAddress.value ||
-    formFields.serverAddress.error
+    serverEndpointIsIncomplete(formFields)
   ) {
     return 'disabled';
   } else if (
@@ -155,8 +160,7 @@ export const getPasswordStepStatus = (
   if (
     !formFields.operatingSystemSelection.value ||
     formFields.operatingSystemSelection.error ||
-    !formFields.serverAddress.value ||
-    formFields.serverAddress.error
+    serverEndpointIsIncomplete(formFields)
   ) {
     return 'disabled';
   } else {
@@ -187,6 +191,8 @@ export enum tFormFieldsLabel {
   agentName = 'agent name',
   agentGroups = 'agent groups',
   serverAddress = 'server address',
+  serverPort = 'server port',
+  serverPath = 'server path prefix',
 }
 
 export const getInvalidFields = (

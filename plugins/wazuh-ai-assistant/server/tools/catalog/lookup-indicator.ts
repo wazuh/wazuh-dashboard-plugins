@@ -7,27 +7,26 @@ import {
 } from './common';
 
 /**
- * IOC (indicator of compromise) lookup against the CTI indicator-enrichment feed (coverage doc
- * CV-049, workstream A1b). `wazuh-threatintel-enrichments-a` is a THIRD-PARTY threat-intel
+ * IOC (indicator of compromise) lookup against the CTI indicator-enrichment feed.
+ * `wazuh-threatintel-enrichments-a` is a THIRD-PARTY threat-intel
  * catalog, not the customer's own observed traffic -- see the privacy.ts entries covering
  * `document.*` on this family for why the indicator VALUE itself is 'allow' (never anonymized): a
  * domain/hash/IP here identifies KNOWN-MALICIOUS PUBLIC INFRASTRUCTURE, not the customer's own
  * network.
  *
- * P-5 (AI/plan/a1a-review.md) is the reason this tool exists at all: the indicator VALUE lives in
+ * This tool exists because the indicator VALUE lives in
  * `document.name`, not `hash.sha256` (that root-level field is the RECORD's own content hash, a
- * sibling of `document`, never the indicator). Live-verified 2026-08-19 on wazuh-aio-5
- * (257k+ docs): a terms agg on `document.type` returns `url_domain` (107,653), `connection`
- * (95,252), `url_full` (28,704), `hash_sha256` (10,734), `hash_md5` (8,167), `hash_sha1` (6,559) --
- * no dedicated "ip" type. IP indicators live under `type: "connection"`, and `document.name` for
- * those is `"<ip>:<port>"` (live sample: `"124.70.213.43:18386"`), never a bare IP -- confirmed by
- * live doc `_id: "1725606"`. A bare-IP query therefore needs a PREFIX match, not just an exact
- * `term`, to reach the connection-type records; hash/url_domain/url_full records (live samples:
- * `"e9a5fd60...4948"` for hash_sha256, `"codespring.purecode.in.net"` for url_domain) are matched
- * by the same clause's exact `term` half. No explicit `indicator_type` parameter: `document.name`
- * is searched directly regardless of the indicator's shape, so the caller never has to pre-guess
- * which of the six `document.type` values applies -- the returned `document.type` field tells the
- * model what kind of match it got.
+ * sibling of `document`, never the indicator). A terms agg on `document.type` returns `url_domain`
+ * (107,653), `connection` (95,252), `url_full` (28,704), `hash_sha256` (10,734), `hash_md5`
+ * (8,167), `hash_sha1` (6,559) -- no dedicated "ip" type. IP indicators live under
+ * `type: "connection"`, and `document.name` for those is `"<ip>:<port>"` (sample:
+ * `"124.70.213.43:18386"`), never a bare IP. A bare-IP query therefore needs a PREFIX match, not
+ * just an exact `term`, to reach the connection-type records; hash/url_domain/url_full records
+ * (samples: `"e9a5fd60...4948"` for hash_sha256, `"codespring.purecode.in.net"` for url_domain)
+ * are matched by the same clause's exact `term` half. No explicit `indicator_type` parameter:
+ * `document.name` is searched directly regardless of the indicator's shape, so the caller never
+ * has to pre-guess which of the six `document.type` values applies -- the returned
+ * `document.type` field tells the model what kind of match it got.
  *
  * Known limitation (documented rather than silently accepted): a domain/hash appearing INSIDE a
  * longer `url_full` value (e.g. a path segment) is not found -- `lintDsl`'s leading-wildcard ban
@@ -35,13 +34,12 @@ import {
  * `nameFilterClause` (catalog/common.ts) already documents for the Security Analytics content
  * tools. A prefix match only ever anchors at the START of `document.name`.
  *
- * A-1 (AI/plan/a1b-review.md): an EARLIER version of this tool ran the prefix clause unanchored
- * and unconditionally (`prefix: { 'document.name': indicator }`), which live-proved a false
- * "known-malicious" verdict for benign values -- `124.70.213.4` returned 55 hits that all belonged
- * to the DIFFERENT ip `124.70.213.43`, and `google.com` returned 2 hits for
+ * A-1: an unanchored, unconditional prefix clause (`prefix: { 'document.name': indicator }`)
+ * would produce a false "known-malicious" verdict for benign values -- `124.70.213.4` would match
+ * 55 hits that all belong to the DIFFERENT ip `124.70.213.43`, and `google.com` would match
  * `google.com-x0*.sslip.io` records, a domain never in the feed. For an IOC tool that must never
  * imply "malicious" any more than it may imply "safe", an unanchored prefix is the worst possible
- * error direction. The prefix clause is now anchored to `` `${indicator}:` `` (the only shape it
+ * error direction. The prefix clause is anchored to `` `${indicator}:` `` (the only shape it
  * exists to serve -- the `"<ip>:<port>"` connection records) and only added when the input parses
  * as a bare IPv4/IPv6 address; every other indicator shape (hash/url/domain) is exact-`term`-only.
  */

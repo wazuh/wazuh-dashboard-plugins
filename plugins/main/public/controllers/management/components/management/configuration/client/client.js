@@ -13,16 +13,12 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
-import { EuiBasicTable, EuiCallOut, EuiSpacer } from '@elastic/eui';
+import { EuiCallOut, EuiSpacer } from '@elastic/eui';
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
-import {
-  isString,
-  renderValueOrDefault,
-  renderValueOrNoValue,
-} from '../utils/utils';
+import { isString, renderValueOrNoValue } from '../utils/utils';
 import withWzConfig from '../util-hocs/wz-config';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
@@ -35,7 +31,9 @@ const helpLinks = [
   },
   {
     text: 'Client reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/client.html'),
+    href: webDocumentationLink(
+      'user-manual/agent/agent-enrollment/enrollment-methods/via-agent-configuration/index.html',
+    ),
   },
 ];
 
@@ -78,14 +76,19 @@ still reports them, but always with their default values. The HTTPS transport
 removed server rotation and the connection-retry loop, so the parser ignores
 whatever the user configures. Showing them would present a setting that has no
 effect as if it were live. */
-const columns = [
-  { field: 'address', name: 'Address', render: renderValueOrNoValue },
-  { field: 'port', name: 'Port', render: renderValueOrDefault('1514') },
+/* The agent reports one `endpoint` carrying the whole connection target -- host
+and, when the agent was given them, port and path prefix -- so it is shown as
+reported rather than split back into the parts the pre-5.0.0 `<address>`/
+`<port>` table rendered. */
+const serverSettings = [
+  { field: 'endpoint', label: 'Endpoint', render: renderValueOrNoValue },
 ];
 
-/* The manager block holds either a single manager or a list of them, depending
-on how the agent is configured. */
-const asArray = value => (Array.isArray(value) ? value : value ? [value] : []);
+/* 5.0.0 allows a single `<manager>` block, so the reported value is read as one
+manager whether it arrives as an object or wrapped in a one-element array. A
+list is never rendered: multiple endpoints are an explicit non-goal of the
+agent-side change. */
+const readManager = value => (Array.isArray(value) ? value[0] : value);
 
 class WzConfigurationClient extends Component {
   constructor(props) {
@@ -94,7 +97,8 @@ class WzConfigurationClient extends Component {
   render() {
     const { currentConfig } = this.props;
     const clientConfig = currentConfig?.agent?.agent;
-    const managers = asArray(clientConfig?.manager);
+    const manager = readManager(clientConfig?.manager);
+    const endpoint = manager?.endpoint;
 
     if (isString(clientConfig)) {
       return <WzNoConfig error={clientConfig} help={helpLinks} />;
@@ -117,14 +121,27 @@ class WzConfigurationClient extends Component {
           />
           <WzConfigurationSettingsHeader
             title='Server settings'
-            description='List of managers to connect'
+            description='Manager the agent connects to'
           />
-          {managers.length ? (
-            <EuiBasicTable
-              items={managers}
-              columns={columns}
-              tableLayout='auto'
+          {endpoint ? (
+            <WzConfigurationSettingsGroup
+              config={{ endpoint }}
+              items={serverSettings}
             />
+          ) : /* A manager reported without an endpoint is not an absent
+          configuration: it is one written in the pre-5.0.0 `<address>`/`<port>`
+          form, which this view cannot render. Saying so points at the agent
+          that has to be upgraded, instead of claiming nothing was configured. */
+          manager ? (
+            <EuiCallOut
+              title='Unsupported manager configuration'
+              color='warning'
+              iconType='alert'
+            >
+              <p>
+                The agent reported a manager configuration without an endpoint.
+              </p>
+            </EuiCallOut>
           ) : (
             <EuiCallOut
               title='Client manager configuration error'

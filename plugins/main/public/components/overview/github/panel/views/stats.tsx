@@ -11,16 +11,20 @@
  */
 
 import React from 'react';
-import { EuiDescriptionList, EuiPanel } from '@elastic/eui';
+import { EuiDescriptionList, EuiText } from '@elastic/eui';
 import { PanelModuleConfiguration } from '../../../../common/modules/panel';
-import { renderValueNoThenEnabled } from '../../../../../controllers/management/components/management/configuration/utils/utils';
+import { renderValueYesThenEnabled } from '../../../../../controllers/management/components/management/configuration/utils/utils';
 import { LogoGitHub } from '../../../../common/logos';
+import {
+  mapModuleContentToRenderProperties,
+  toApiAuthEntries,
+} from '../../../../common/modules/panel/components/module-configuration-mapping';
 
 const settings = [
   {
     field: 'enabled',
     label: 'Service status',
-    render: renderValueNoThenEnabled,
+    render: renderValueYesThenEnabled,
   },
   {
     field: 'only_future_events',
@@ -42,33 +46,25 @@ const settings = [
   { field: 'event_type', label: 'Event type' },
   {
     field: 'api_auth',
-    label: 'Credentials',
-    render: value =>
-      value
-        .map(v => (
-          <EuiPanel
-            paddingSize='s'
-            key={`module_configuration_api_auth_${v.org_name}_${v.client_id}`}
+    label: 'Organizations',
+    render: value => {
+      const organizations = toApiAuthEntries(value)
+        .map(v => v.org_name)
+        .filter(orgName => typeof orgName !== 'undefined');
+      return organizations.length ? (
+        organizations.map(orgName => (
+          <EuiDescriptionList
+            key={`module_configuration_api_auth_org_name_${orgName}`}
+            className='eui-textTruncate'
+            title={String(orgName)}
           >
-            <EuiDescriptionList
-              listItems={[
-                { title: 'Organization', description: v.org_name },
-                { title: 'Token', description: v.api_token },
-              ].filter(item => typeof item.description !== 'undefined')}
-            />
-          </EuiPanel>
+            {String(orgName)}
+          </EuiDescriptionList>
         ))
-        .reduce(
-          (prev, cur) => [
-            prev,
-            <div
-              key={`padding-len-${prev.length}`}
-              style={{ marginTop: '8px' }}
-            />,
-            cur,
-          ],
-          [],
-        ),
+      ) : (
+        <EuiText>No organizations configured</EuiText>
+      );
+    },
   },
 ];
 
@@ -96,10 +92,11 @@ export const ModuleConfiguration = props => (
     moduleIconType={LogoGitHub}
     settings={settings}
     configurationAPIPartialPath='/wmodules/wmodules'
+    documentationPath='cloud-security/github/index.html'
     mapResponseConfiguration={(response, type, params) => {
       return type === 'agent'
-        ? mapWModuleConfigurationToRenderProperties(
-            response.data.data.wmodules,
+        ? mapModuleContentToRenderProperties(
+            response,
             'github',
             'Agent',
             params.name,

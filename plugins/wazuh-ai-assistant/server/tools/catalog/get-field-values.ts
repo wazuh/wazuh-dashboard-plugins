@@ -16,6 +16,7 @@ import {
   FIELD_ALIASES,
   resolveFieldAlias,
 } from '../../../common/field-catalog';
+import { STATE_FAMILIES } from '../state-families';
 import {
   objectSchema,
   optionalStringParam,
@@ -100,14 +101,10 @@ export const FIELD_LOCATIONS: Record<string, FieldLocation[]> = {
   [WAZUH_FIELD.RULE_MITRE_TECHNIQUE_NAME]: [FINDINGS],
   [WAZUH_FIELD.RULE_MITRE_TACTIC_NAME]: [FINDINGS],
   [WAZUH_FIELD.INTEGRATION_CATEGORY]: [FINDINGS, EVENTS],
-  // BLOCKER FIX (empty-answer audit, 2026-08-20, CV-033): `event.category` was added to
-  // `guardrails.ts`'s `AGG_FIELD_ALLOWLIST` (it is events-v5's own finite category taxonomy --
-  // 11 values over 258k live docs, verified) but had NO entry here, so `isAggAllowedField` passed
-  // while `FIELD_LOCATIONS[field] === undefined` still failed the same guard clause -- the call
-  // could only ever hit the "not one of this tool's vetted fields" error branch, an INCORRECT
-  // message for a field that genuinely is allowlisted, and a wasted round trip for the model.
-  // `event.outcome` is added alongside it for the same reason (success/failure/unknown, same
-  // finite-enum class) and the same events-v5 surface.
+  // `event.category` is in `guardrails.ts`'s `AGG_FIELD_ALLOWLIST` (it is events-v5's own finite
+  // category taxonomy, 11 values) and maps here to `EVENTS`, so `isAggAllowedField` and this
+  // field-location lookup agree. `event.outcome` is included alongside it for the same reason
+  // (success/failure/unknown, same finite-enum class) and the same events-v5 surface.
   'event.category': [EVENTS],
   'event.outcome': [EVENTS],
   [WAZUH_FIELD.AGENT_ID]: [FINDINGS, EVENTS, VULNERABILITIES, SCA],
@@ -119,16 +116,15 @@ export const FIELD_LOCATIONS: Record<string, FieldLocation[]> = {
   'interface.state': [INVENTORY_PORTS],
   'network.transport': [INVENTORY_PORTS],
   'package.name': [INVENTORY_PACKAGES],
-  // Code review B1 (AI/plan/b-review.md P1.1): extended from `[INVENTORY_SYSTEM]` alone. Without
-  // `FINDINGS`/`EVENTS` here, the model could never even OBSERVE the empty ECS twin on the surface
-  // the CEO scenario actually asks about (findings/events) -- it would silently get routed to
-  // inventory_system instead, which answers a different question and hides the `missing_count`
-  // this tool exists to surface. See `resolveParams` below for what points the model at the
-  // populated `wazuh.agent.host.os.*` twin once it lands here.
+  // Without `FINDINGS`/`EVENTS` here, the model could never even OBSERVE the empty ECS twin on
+  // the surface the flagship scenario actually asks about (findings/events) -- it would silently
+  // get routed to inventory_system instead, which answers a different question and hides the
+  // `missing_count` this tool exists to surface. See `resolveParams` below for what points the
+  // model at the populated `wazuh.agent.host.os.*` twin once it lands here.
   'host.os.name': [INVENTORY_SYSTEM, FINDINGS, EVENTS],
   'host.os.platform': [INVENTORY_SYSTEM, FINDINGS, EVENTS],
   'source.ip': [FINDINGS, EVENTS],
-  // Code review B1: the populated twins of the two ECS fields above -- see guardrails.ts's
+  // The populated twins of the two ECS fields above -- see guardrails.ts's
   // AGG_FIELD_ALLOWLIST entry for the live cardinality evidence.
   [WAZUH_FIELD.AGENT_OS_NAME]: [FINDINGS, EVENTS],
   [WAZUH_FIELD.AGENT_OS_PLATFORM]: [FINDINGS, EVENTS],
@@ -140,6 +136,37 @@ export const FIELD_LOCATIONS: Record<string, FieldLocation[]> = {
 // needs no change here.
 for (const field of Object.values(COMPLIANCE_FRAMEWORK_FIELDS)) {
   FIELD_LOCATIONS[field] = [FINDINGS];
+}
+
+/**
+ * The state surfaces' field-discovery routes. Derived from `../state-families.ts` rather than
+ * hand-written here, because the SAME rows also produce `search_wazuh_data`'s enum and
+ * `guardrails.ts`'s aggregation allowlist: a field that can be enumerated on an index the enum
+ * cannot name is unreachable, and an index the enum can name whose fields cannot be discovered is
+ * unanswerable. The header comment above still holds for the distinction it makes -- the WCS
+ * catalog says a field EXISTS, not which index carries it for this product -- and
+ * `state-families.ts` is where that second, product-owned fact lives for the state surfaces.
+ *
+ * APPEND-ONLY and de-duplicated by tool family, deliberately: a field's FIRST location is its
+ * default when the caller omits `index_family`, so every pre-existing default above is preserved
+ * exactly (e.g. `host.os.name` still defaults to inventory_system, `package.name` to
+ * inventory_packages, `interface.state` to inventory_ports) and the new families only ever widen
+ * the choice.
+ */
+for (const stateFamily of STATE_FAMILIES) {
+  const { toolFamily } = stateFamily;
+  if (!toolFamily) {
+    continue;
+  }
+  for (const field of stateFamily.aggFields) {
+    if (FIELD_LOCATIONS[field] === undefined) {
+      FIELD_LOCATIONS[field] = [];
+    }
+    const locations = FIELD_LOCATIONS[field];
+    if (!locations.some(location => location.family === toolFamily)) {
+      locations.push({ family: toolFamily, index: stateFamily.pattern });
+    }
+  }
 }
 
 const ALL_FAMILIES = Array.from(
@@ -219,8 +246,8 @@ function buildPrefixIncludePattern(prefix: string): string {
 }
 
 /**
- * Cheap discovery tool (workstream B, `AI/plan/qa-rules-decoders-rootcause.md`'s "verify before
- * filter" gap): returns the actual distinct values of one field, with counts, instead of the
+ * Cheap discovery tool for the "verify before filter" gap: returns the actual distinct values
+ * of one field, with counts, instead of the
  * model guessing a filter value and either matching by luck or silently getting zero rows for a
  * value that was simply spelled/cased differently than it guessed. `field` is restricted to
  * `guardrails.ts`'s `AGG_FIELD_ALLOWLIST` -- the same bounded-cardinality set every other
@@ -274,7 +301,7 @@ export const getFieldValuesTool: ToolDefinition = {
   },
   target: 'indexer',
   tier: 'T1',
-  /** Code review B1 (alias surfacing, AI/plan/b-review.md P1.1): the only production caller of
+  /** The only production caller of
    * `common/field-catalog.ts`'s `FIELD_ALIASES`/`resolveFieldAlias` -- without this, that map had
    * zero runtime consumers and was exercised only by its own unit test. When the resolved
    * `field`/`index_family` combination has a known-unpopulated-on-this-family alias (currently

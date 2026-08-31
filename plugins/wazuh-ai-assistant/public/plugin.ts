@@ -16,6 +16,7 @@ import {
   WazuhAiAssistantPluginStart,
   WazuhAiAssistantPluginStartDependencies,
 } from './types';
+import { setWazuhCore } from './plugin-services';
 
 export class WazuhAiAssistantPlugin
   implements
@@ -32,7 +33,7 @@ export class WazuhAiAssistantPlugin
       title: i18n.translate('wazuhAiAssistant.app.title', {
         defaultMessage: 'AI Assistant',
       }),
-      // `machineLearningApp` rather than a chat glyph (issue #8895): every Wazuh navigation entry
+      // `machineLearningApp` rather than a chat glyph: every Wazuh navigation entry
       // uses an icon from EUI's `*App` family (`monitoringApp`, `lensApp`, `securityApp`,
       // `indexRollupApp`, `graphApp`, `packetbeatApp`, ...), and the previous `chatRight` was a plain
       // UI glyph, leaving the assistant the only visually inconsistent entry. `machineLearningApp`
@@ -40,12 +41,11 @@ export class WazuhAiAssistantPlugin
       euiIconType: 'machineLearningApp',
       // Ordered directly after the main plugin's Overview app (order `1`) within the shared `Home`
       // category — see common/nav-categories.ts's doc comment for why this app joins that category
-      // instead of the top-level `AI` one issue #8895 had given it.
+      // instead of a dedicated top-level `AI` one.
       order: 2,
       // Joins the main `wazuh` plugin's existing `Home` category rather than a dedicated top-level
-      // one (CEO direction supersedes issue #8895: "Meter el AI assistant mejor en la home, no
-      // pongáis una sección AI solo para esto" — put the assistant into Home instead of carving out
-      // an AI-only section for it). See common/nav-categories.ts's doc comment for the full
+      // one, per product direction to put the assistant into Home instead of carving out an
+      // AI-only section for it. See common/nav-categories.ts's doc comment for the full
       // rationale and for why this category is duplicated here rather than imported cross-plugin.
       category: WAZUH_HOME_APP_CATEGORY,
       navLinkStatus: AppNavLinkStatus.default,
@@ -67,7 +67,11 @@ export class WazuhAiAssistantPlugin
     return {};
   }
 
-  public start(core: CoreStart): WazuhAiAssistantPluginStart {
+  public start(
+    core: CoreStart,
+    plugins: WazuhAiAssistantPluginStartDependencies,
+  ): WazuhAiAssistantPluginStart {
+    setWazuhCore(plugins.wazuhCore);
     registerAssistantHeaderButton(core);
 
     return {};

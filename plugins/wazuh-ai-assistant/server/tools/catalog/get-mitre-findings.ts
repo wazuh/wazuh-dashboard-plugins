@@ -22,7 +22,7 @@ const PARENT_TECHNIQUE_ID_RE = /^T\d+$/i;
 const SUB_TECHNIQUE_ID_RE = /^T\d+\.\d+$/i;
 
 /**
- * Sub-technique rollup (issue #8920 item 2): a bare parent id must match its own exact bucket
+ * Sub-technique rollup: a bare parent id must match its own exact bucket
  * AND every "<id>.NNN" sub-technique -- MITRE ATT&CK itself treats a parent technique as
  * covering its children, so a `term`-only filter on "T1059" silently excludes every
  * T1059.001/.002/... finding, undercounting "how many T1059 findings" questions. Expressed as a
@@ -41,8 +41,8 @@ function buildMitreTechniqueFilter(
   // 0-row lie, strictly worse than the undercount this rollup fixes. Case-normalization is
   // GATED ON THE ID SHAPE, though: an input that is not an ATT&CK id is passed through verbatim
   // rather than upper-cased, so a caller's own string is never rewritten on its way into an error
-  // message or a 0-row explanation (same principle as this issue's "preserve user-supplied
-  // identifiers verbatim" rule for agent names).
+  // message or a 0-row explanation (same principle as the "preserve user-supplied identifiers
+  // verbatim" rule for agent names).
   const isAttackId =
     PARENT_TECHNIQUE_ID_RE.test(techniqueId) ||
     SUB_TECHNIQUE_ID_RE.test(techniqueId);
@@ -168,9 +168,8 @@ export const getMitreFindingsTool: ToolDefinition = {
         sort: [{ '@timestamp': { order: 'desc' } }],
         size: limit,
         // Population-true breakdowns over the FULL matched set — BOTH halves are load-bearing:
-        // FINDING_BREAKDOWN_AGGS (issue #8920 item 1 — agent/rule-title distribution, same
-        // mechanism as every other finding-hits tool; this tool was missed when that fix first
-        // landed) AND technique_ids (issue #8920 item 2 — the per-exact-technique-id split the
+        // FINDING_BREAKDOWN_AGGS (agent/rule-title distribution, the same mechanism as every
+        // other finding-hits tool) AND technique_ids (the per-exact-technique-id split the
         // rollup above broadens the match for, so the model can attribute rolled-up rows to
         // their sub-technique). Three top-level aggs total, inside guardrails'
         // MAX_TOP_LEVEL_AGGS.
@@ -200,12 +199,11 @@ export const getMitreFindingsTool: ToolDefinition = {
   },
   tableSpec: {
     columns: [
-      // Column order (issue #8921's budget item): the severity badge MUST sit inside the
-      // client's MAX_VISIBLE_RESULT_COLUMNS budget — the issue lists "missing severity" as a
-      // defect, and a severity column demoted past the budget is invisible (enforced
-      // registry-wide by visible-column-budget-coverage.test.ts). Tactic is the column demoted
-      // to the row expander: it is derivable from the technique and the least
-      // decision-relevant of the seven.
+      // Column order: the severity badge MUST sit inside the client's
+      // MAX_VISIBLE_RESULT_COLUMNS budget — a severity column demoted past the budget is
+      // invisible (enforced registry-wide by visible-column-budget-coverage.test.ts). Tactic is
+      // the column demoted to the row expander: it is derivable from the technique and the
+      // least decision-relevant of the seven.
       { field: '@timestamp', label: 'Time' },
       { field: 'wazuh.agent.name', label: 'Agent' },
       { field: 'wazuh.rule.title', label: 'Title' },

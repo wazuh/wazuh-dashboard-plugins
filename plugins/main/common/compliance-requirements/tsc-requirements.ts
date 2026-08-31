@@ -26,6 +26,8 @@ export const tscRequirementsFile = {
     'The entity authorizes, modifies, or removes access to data, software, functions, and other protected information assets based on roles, responsibilities, or the system design and changes, giving consideration to the concepts of least privilege and segregation of duties, to meet the entity’s objectives.',
   'CC6.4':
     'The entity restricts physical access to facilities and protected information assets (for example, data center facilities, backup media storage, and other sensitive locations) to authorized personnel to meet the entity’s objectives',
+  'CC6.5':
+    'The entity discontinues logical and physical protections over physical assets only after the ability to read or recover data and software from those assets has been diminished and is no longer required to meet the entity’s objectives.',
   'CC6.6':
     'The entity implements logical access security measures to protect against threats from sources outside its system boundaries.',
   'CC6.7':
@@ -40,10 +42,14 @@ export const tscRequirementsFile = {
     'The entity evaluates security events to determine whether they could or have resulted in a failure of the entity to meet its objectives (security incidents) and, if so, takes actions to prevent or address such failures.',
   'CC7.4':
     'The entity responds to identified security incidents by executing a defined incident-response program to understand, contain, remediate, and communicate security incidents, as appropriate.',
+  'CC7.5':
+    'The entity identifies, develops, and implements activities to recover from identified security incidents.',
   'CC8.1':
     'The entity authorizes, designs, develops or acquires, configures, documents, tests, approves, and implements changes to infrastructure, data, software, and procedures to meet its objectives',
+  'CC9.1':
+    'The entity identifies, selects, and develops risk mitigation activities for risks arising from potential business disruptions.',
   'PI1.4':
     'The entity implements policies and procedures to make available or deliver output completely, accurately, and timely in accordance with specifications to meet the entity’s objectives.',
   'PI1.5':
-    'The entity implements policies and procedures to store inputs, items in processing, and outputs completely, accurately, and timely in accordance with system specifications to meet the entity’s objectives.'
+    'The entity implements policies and procedures to store inputs, items in processing, and outputs completely, accurately, and timely in accordance with system specifications to meet the entity’s objectives.',
 };

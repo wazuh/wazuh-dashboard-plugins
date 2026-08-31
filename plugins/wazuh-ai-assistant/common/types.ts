@@ -122,6 +122,30 @@ export interface ChatMessage {
    * never sends message-level extras.
    */
   vendorExtras?: Record<string, unknown>;
+  /**
+   * Wire-proof fix (build 7d822b465's residual, AI/qa/wire-proof-v35/capture.jsonl): replay-history
+   * bookkeeping ONLY, never forwarded to the provider — every adapter's `to*Message` (e.g.
+   * openai-compatible.ts's `toOpenAiMessage`) builds a fresh wire object field-by-field from a known
+   * allowlist, so an extra field here is simply never one of the fields any adapter reads.
+   *
+   * True when the digest/prose this message carries was captured while privacy mode was ON for the
+   * turn that produced it; `false` or ABSENT means it was captured with privacy OFF (a conversation
+   * persisted by a build that predates this field also reads as absent, indistinguishable from
+   * "off"). Set on a `role:'tool'` history message (the digest) and on a `role:'assistant'` PROSE
+   * message (the model's own narration for that turn) — never meaningful on `role:'user'` (the
+   * user's own question is a separate, already-documented residual, not dropped by this mechanism)
+   * or `role:'system'`.
+   *
+   * Consulted by `common/chat-history.ts`'s `excludePrivacyOffHistory`, which BOTH
+   * `buildOutgoingMessages` (client, courtesy/bandwidth) and `server/routes/chat.ts` (server, the
+   * actual authority) call before any privacy-ON turn's history reaches the provider: only
+   * `=== true` is trusted, so a missing/unknown flag fails CLOSED (excluded), never open. This
+   * closes the specific wire-proven leak where a bare (non-dotted) real value with no shape a regex
+   * can single out — most commonly `wazuh.agent.name` — survived the shape-scan-only replay path
+   * because the field policy that would normally anonymize it only ever runs when a digest is
+   * CREATED, not when a client-supplied one is replayed.
+   */
+  privacyEnabled?: boolean;
 }
 
 /** One client-held pseudonym mapping entry: a real value and
@@ -155,14 +179,14 @@ export interface TableColumn {
 }
 
 /**
- * Client-side column-count budget for rendered result tables (issue #8921: no table may need a
- * horizontal scrollbar): only the first MAX_VISIBLE_RESULT_COLUMNS of a `TableSpec.columns` list
+ * Client-side column-count budget for rendered result tables, so no table ever needs a horizontal
+ * scrollbar: only the first MAX_VISIBLE_RESULT_COLUMNS of a `TableSpec.columns` list
  * render as visible table columns; the rest stay reachable through the row expander, since
  * buildTableSpec (server/tools/digest.ts) puts every spec-column field into each row object
  * regardless of visibility. Lives in common/ because BOTH sides consult it: result-table.tsx
  * applies it, and server/tools/catalog/visible-column-budget-coverage.test.ts asserts every
  * tool's severity column sits INSIDE it — a severity badge demoted past the budget is invisible,
- * which is the exact "missing severity" defect the issue lists.
+ * which would be a "missing severity" defect.
  */
 export const MAX_VISIBLE_RESULT_COLUMNS = 6;
 
@@ -197,7 +221,56 @@ export interface TableSpec {
     label: string;
     url: string;
   };
+  /**
+   * Server-recorded provenance FACTS for the evidence popover, the sole
+   * source the client may render index/time-range detail from — the client must never infer or
+   * default any of this itself. Populated in server/tools/executor.ts's `executeIndexerRequest`
+   * from exactly what it observed executing the query (absent entirely for a Manager-API table,
+   * which has no index/DSL concept at all):
+   *  - `index`: the concrete index queried (same value as `discover.index` above).
+   *  - `requestedRange`/`effectiveRange`: the `{gte, lte}` pair read directly off the query DSL,
+   *    before and after the 90-day lookback guardrail (`guardrails.ts`'s `clampLookbackWindow`)
+   *    ran — via `common/discover-url.ts`'s `rangeBoundsFromDsl`, which is where "what window did
+   *    this DSL state" is decided for the whole plugin (the "Open in Discover" link resolves its
+   *    own openable window through `extractTimeRange`, a different entry point over the same one
+   *    clause walk — see that module). `undefined` when the DSL carried no recognizable range
+   *    clause at all, or only one-sided ones (most catalog tools have no time-range concept and
+   *    never will), NOT a default. Where a DSL carries SEVERAL required range clauses these are
+   *    their intersection, which is what the returned rows actually satisfied.
+   *    The CLIENT never re-reads the DSL for any of this: tool-call-label.ts's
+   *    `describeProvenance` renders these recorded fields and nothing else.
+   *  - `clamped`: true only when `clampLookbackWindow` actually narrowed the query.
+   *  - `toolCallId`: attached by server/routes/chat.ts (which is where the streaming tool call's
+   *    id is in scope), not by the executor — it is what lets the client attribute this table to
+   *    the exact one tool call that produced it, rather than to every call in a multi-call turn.
+   *  - `executedAt`: the epoch ms the query actually ran at, recorded by the executor at creation
+   *    time. A date-math bound ("now-90d") only means something
+   *    relative to WHEN it ran -- resolving it against the render-time clock instead would show a
+   *    restored conversation a window the query never ran against. `describeProvenance`
+   *    (tool-call-label.ts) resolves date-math bounds against this stored instant, never against
+   *    `Date.now()`. `undefined` only for a conversation persisted before this field existed --
+   *    a date-math bound then stays unresolved, so the popover's "Time range:" line is simply
+   *    OMITTED (never a fabricated absolute instant); the clamp badge still renders from the
+   *    literal date-math bounds, since that path needs no absolute instant at all.
+   */
+  provenance?: {
+    toolCallId?: string;
+    index?: string;
+    requestedRange?: { gte: string; lte: string };
+    effectiveRange?: { gte: string; lte: string };
+    clamped: boolean;
+    executedAt?: number;
+  };
 }
+
+/**
+ * The three user-facing phases one turn moves through, in order. Deliberately a tiny, closed set
+ * rather than one label per internal round: the reader needs to know WHAT the assistant is doing,
+ * not how many provider round-trips the orchestrator budgeted. `understanding` covers the stage-1
+ * routing call, `querying` each tool execution, `writing` the answer round that follows tool
+ * results.
+ */
+export type TurnStatusStep = 'understanding' | 'querying' | 'writing';
 
 export interface StreamUsage {
   inputTokens?: number;
@@ -206,7 +279,7 @@ export interface StreamUsage {
 
 export type StreamEvent =
   /**
-   * `reasoningFallback` (issue #8935 item I3): set by openai-compatible.ts's reasoning-channel
+   * `reasoningFallback`: set by openai-compatible.ts's reasoning-channel
    * fallback ONLY — the one path where a provider's raw deliberation text is surfaced as the
    * answer because no real `content` ever arrived. The client renders it like any delta;
    * server-side orchestration (chat.ts) uses the flag to keep deliberation text — which routinely
@@ -229,7 +302,26 @@ export type StreamEvent =
   /**
    * Transient progress line (e.g. "querying Wazuh") shown between deltas while the engine works.
    */
-  | { type: 'status'; message: string }
+  | {
+      type: 'status';
+      message: string;
+      /**
+       * Which user-facing STEP of the turn this status belongs to. The `message` above stays the
+       * authoritative, always-present payload (server-authored English, unchanged for every
+       * existing producer and for the eval harness that reads it); `step` is the optional,
+       * translatable classification the browser prefers when it recognizes it — see
+       * `public/components/chat/turn-status.ts`'s `describeTurnStatus`. A producer that emits no
+       * `step` (retry.ts's rate-limit/invalid-tool-call notices) still renders exactly as before.
+       */
+      step?: TurnStatusStep;
+      /**
+       * Free-form subject of a `querying` step — the tool name whose call is executing. Rendered
+       * inside the translated step label ("Querying get_agent_inventory…"); when absent the label
+       * degrades to the generic "Querying your data…". Never a pseudonym-bearing value: a tool
+       * NAME is catalog vocabulary, not customer data.
+       */
+      detail?: string;
+    }
   /**
    * Privacy mode: every NEW pseudonym-map entry minted server-side this turn (not the ones
    * already seeded from the request's `privacy.map`), streamed once per turn before `done` so the
@@ -258,7 +350,7 @@ export type StreamEvent =
    * explanation of what it could not check, shown to the user next to the link — but NOT always
    * verbatim: whenever `dsl` above lost field-level filters relative to what the model asked to
    * show, chat.ts appends a fixed disclosure sentence to `reason` so the two can never silently
-   * diverge (the link would otherwise promise a filter it does not carry — issue #8920 item 9).
+   * diverge (the link would otherwise promise a filter it does not carry).
    */
   | {
       type: 'suggested_query';
@@ -295,6 +387,16 @@ export interface ConversationSummary {
   updatedAt: string;
 }
 
+/** Response shape of the rename (PATCH) route (server/routes/conversations.ts) -- a
+ * `ConversationSummary` plus the WRITE's own fresh optimistic-concurrency token (same
+ * `encodeVersion` opaque string `ConversationRecord.version` carries). chat-page.tsx's
+ * `handleRenameConversation` stamps `version` onto `conversationVersionRef` when the renamed
+ * conversation is the active one, so the next auto-save's PUT does not 409 against a version this
+ * rename just moved past. */
+export interface ConversationRenameResult extends ConversationSummary {
+  version: string;
+}
+
 /**
  * One message as a saved conversation stores it: a `ChatMessage` plus the two presentation fields a
  * resumed conversation needs in order to be the SAME conversation rather than a summary of one.
@@ -321,14 +423,40 @@ export interface PersistedChatMessage extends ChatMessage {
   /** The answer was cut short (Stop, navigation, a dropped connection) rather than completed, so a
    * resumed conversation can label it instead of presenting a partial answer as a finished one. */
   interrupted?: boolean;
+  /**
+   * Why this turn FAILED, as the provider/orchestrator reported it (an `error` stream event's
+   * message). Distinct from `interrupted`, which means "stopped, on purpose or by circumstance":
+   * a failed turn never had a chance to finish at all.
+   *
+   * Persisted so the failure survives more than a dismissible banner above the transcript that the
+   * next `handleSend` clears — without it, a conversation containing a failed turn would read,
+   * both immediately afterwards and forever after a reload, as though the question had simply
+   * never been asked. Set on `role:'assistant'` only.
+   */
+  failureReason?: string;
+  /**
+   * Which provider actually produced this message, stamped at turn start. All three are display
+   * provenance, never re-sent to any provider (`buildOutgoingMessages` builds wire messages
+   * field-by-field and reads none of them).
+   *
+   * `providerId` doubles as the per-conversation provider memory: resuming a conversation restores
+   * the provider of its most recent assistant message that still exists (chat-page.tsx's
+   * `applyLoadedConversation`), instead of silently answering the next follow-up with the default
+   * provider — a different model, on the same thread, with no visible sign of the switch.
+   * `providerName`/`providerModel` are copied rather than looked up, so a turn produced by a
+   * provider that has since been renamed or deleted still reports what really answered it.
+   */
+  providerId?: string;
+  providerName?: string;
+  providerModel?: string;
 }
 
 export interface ConversationRecord extends ConversationSummary {
   createdAt: string;
   messages: PersistedChatMessage[];
   /**
-   * Optimistic-concurrency token (two tabs on the
-   * same conversation previously overwrote each other, last-write-wins). Opaque — encodes
+   * Optimistic-concurrency token (without it, two tabs on the
+   * same conversation would overwrite each other, last-write-wins). Opaque — encodes
    * OpenSearch's `seq_no`/`primary_term` pair (server/conversation-store.ts's `encodeVersion`) —
    * never parsed or compared client-side, only round-tripped: the client remembers the value from
    * the last GET/POST/PUT response it saw for this conversation and sends it back as
@@ -336,7 +464,7 @@ export interface ConversationRecord extends ConversationSummary {
    * since-changed document 409s instead of silently overwriting it. `undefined` only in the
    * defensive case where a version token could not be decoded (does not happen in practice, but
    * the type stays honest about it). Deliberately absent from `ConversationSummary` — the list
-   * route never needed a version before this fix and still doesn't (only single-conversation
+   * route never needs a version and still doesn't (only single-conversation
    * GET/POST/PUT round-trip it).
    */
   version?: string;

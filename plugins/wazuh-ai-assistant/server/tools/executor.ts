@@ -4,6 +4,7 @@ import {
 } from '../../../../src/core/server';
 import { StreamEvent, ToolCall } from '../../common/types';
 import { describeError } from '../../common/errors';
+import { rangeBoundsFromDsl } from '../../common/discover-url';
 import { validate } from './schema-validator';
 import { getToolDefinition } from './registry';
 import {
@@ -17,7 +18,12 @@ import {
 } from './guardrails';
 import { buildDigest, buildTableSpec, capDigest, Digest } from './digest';
 import { validateQueryFields } from './field-validation';
-import { IndexerRequest, ManagerRequest, ToolDefinition } from './types';
+import {
+  IndexerRequest,
+  ManagerRequest,
+  ResolvedToolParams,
+  ToolDefinition,
+} from './types';
 import {
   AggFieldSpec,
   applyFieldPolicy,
@@ -56,19 +62,53 @@ export interface PrivacyContext {
   fieldPolicy: FieldPolicyEntry[];
 }
 
+/**
+ * Pseudonymizes the identifier values a `resolveParams` hook declared inside its assumption note
+ * (types.ts's `ResolvedToolParams.noteEntities` — see that doc comment for the wire-level capture
+ * that motivates this) before the note reaches `buildDigest`. No-op without privacy mode, without
+ * a note, or without declared entities — byte-identical to before this existed in all three
+ * cases. Every occurrence of each entity is replaced (split/join, not a regex — entity values are
+ * data, not patterns), longest value first so a shorter entity that is a substring of a longer
+ * one (the "DB03"/"DB03-PRIMARY" case scrubKnownEntities already documents) cannot corrupt the
+ * longer match. Exported for unit testing only, same convention as the other pure helpers here.
+ */
+export function scrubAssumptionNote(
+  note: string | undefined,
+  noteEntities: ResolvedToolParams['noteEntities'],
+  privacy: PrivacyContext | undefined,
+): string | undefined {
+  if (!note || !privacy || !noteEntities || noteEntities.length === 0) {
+    return note;
+  }
+  let scrubbed = note;
+  const byLengthDesc = [...noteEntities].sort(
+    (a, b) => b.value.length - a.value.length,
+  );
+  for (const entity of byLengthDesc) {
+    if (!entity.value) {
+      continue;
+    }
+    scrubbed = scrubbed
+      .split(entity.value)
+      .join(privacy.pseudonymizer.pseudonymize(entity.value, entity.kind));
+  }
+  return scrubbed;
+}
+
 /** Applies field policy to a digest (when `privacy` is given) immediately before it is
  * serialized, then re-runs the hard cap (pseudonym substitution can change the digest's
  * serialized length — see digest.ts's `capDigest` doc comment). A no-op passthrough when
- * `privacy` is undefined, so privacy-off output is byte-identical to before this existed. */
+ * `privacy` is undefined, so privacy-off output is unaffected by this function. */
 function finalizeDigest(
   digest: Digest,
   privacy: PrivacyContext | undefined,
   toolName: string,
   aggFields?: Record<string, AggFieldSpec | undefined>,
-  // Issue #8917: this used to be the calling tool's `deriveColumns` flag, which conflated "needs
+  // A separate flag from the calling tool's `deriveColumns` flag, which conflates "needs
   // per-response column derivation" with "field surface is uncurated enough to fail closed by
-  // default" — see `ToolDefinition.failClosedFieldPolicy`'s doc comment (types.ts) for why the two
-  // are now separate. A tool whose fields can be ARBITRARY (search_wazuh_data,
+  // default" if reused for this purpose — see `ToolDefinition.failClosedFieldPolicy`'s doc
+  // comment (types.ts) for why the two are kept separate. A tool whose fields can be ARBITRARY
+  // (search_wazuh_data,
   // find_document_by_field) or that folds several kinds' worth of fields into one digest
   // (get_agent_inventory) sets this so its unlisted-field default is fail-closed (anonymize)
   // instead of the curated typed tools' allow-by-omission — see privacy.ts's applyFieldPolicy.
@@ -144,7 +184,7 @@ export function resolveSecurityAnalyticsSpace(hits: unknown): string {
 }
 
 /**
- * Narrowed-window zero-row disclosure (issue #8920 item 3 -- see window-recount.ts's header comment
+ * Narrowed-window zero-row disclosure (see window-recount.ts's header comment
  * for the class-level reasoning). Fires only when the tool call itself returned 0 rows: mutates
  * `digest.hint` in place, appending to whatever `buildZeroRowHint` (digest.ts) already set rather
  * than replacing it, so a 0-row/2+-filter result gets BOTH disclosures rather than one clobbering
@@ -216,7 +256,7 @@ async function appendWindowRecountHint(
 }
 
 /**
- * No-silent-entity-substitution disclosure (issue #8920 item 6 -- see entity-resolution.ts's header
+ * No-silent-entity-substitution disclosure (see entity-resolution.ts's header
  * comment for the class-level reasoning). Fires whenever the validated params named at least one
  * agent (`agent_name`/`agent_names`), REGARDLESS of whether the tool call itself returned rows --
  * unlike `appendWindowRecountHint` above, a near-miss with data is exactly as worth disclosing as a
@@ -251,8 +291,8 @@ const MAX_NEAR_MISS_NAMES = 5;
 const MAX_NEAR_MISS_SENTENCES = 3;
 const MAX_NEAR_MISS_SIBLINGS = 3;
 
-/** REVIEW FIX A1 (groupA-regression-review.md): a purely-numeric token is a Manager agent ID
- * (`agent_identifier`, or the #8913 deictic path's `pickAgentValue(..., 'id-or-name')`), never a
+/** A purely-numeric token is a Manager agent ID
+ * (`agent_identifier`, or the deictic path's `pickAgentValue(..., 'id-or-name')`), never a
  * `wazuh.agent.name` value -- the "unmatched name" disclosure's probe only aggregates
  * `wazuh.agent.name`, so an ID can never appear in its bucket set regardless of whether the agent
  * is real, healthy, and simply has zero rows in this index/window. Tokens matching this are
@@ -265,8 +305,8 @@ const ID_SHAPED_TOKEN_RE = /^\d+$/;
 const SUB_TECHNIQUE_KEY_RE = /^T\d+\.\d+$/;
 
 /**
- * Sub-technique split disclosure, the aggregation-side companion of technique-rollup.ts (issue
- * #8920 item 2): any digest whose breakdown buckets technique ids per EXACT id (get_mitre_summary,
+ * Sub-technique split disclosure, the aggregation-side companion of technique-rollup.ts: any
+ * digest whose breakdown buckets technique ids per EXACT id (get_mitre_summary,
  * get_mitre_findings' technique_ids agg, an escape-hatch terms agg on the same field) presents
  * "T1059: 3" and "T1059.001: 9" as two unrelated rows -- nothing tells the model a parent bucket
  * does NOT include its children, so technique-level totals get under-reported from the parent
@@ -410,7 +450,7 @@ async function appendEntityNearMissHint(
           ),
       );
     }
-    // BLOCKER FIX (CV-028/CV-033, category-word-misread-as-agent-name class): a requested name
+    // This handles the category-word-misread-as-agent-name class of bug: a requested name
     // with no near-miss sibling can still be a token that never named a real agent at all (a
     // category/domain word the model mistook for a host name). Fires independently of the
     // near-miss branch above (a name can have zero near-miss SIBLINGS while still having zero
@@ -421,8 +461,8 @@ async function appendEntityNearMissHint(
     // normalized variant, is reported to the model as unmatched rather than silently presented
     // as an ordinary empty result.
     //
-    // REVIEW FIX A1 (groupA-regression-review.md, HIGH): the earlier wording added "...not
-    // because that agent has no data", an inference this probe cannot support -- an empty
+    // This probe cannot support the inference "...not
+    // because that agent has no data": an empty
     // candidate-bucket set means only "this index/window has no documents whose
     // wazuh.agent.name matches", which is exactly as consistent with a REAL, healthy agent that
     // simply has zero rows here as with a name that matches no agent at all. Two fixes:
@@ -430,7 +470,7 @@ async function appendEntityNearMissHint(
     //      this data, framed as a possible mistaken name -- never a claim about whether the host
     //      itself exists or is clean.
     //   2. Skip this branch entirely for an ID-SHAPED token (`/^\d+$/`) -- `agent_identifier`
-    //      (get_vulnerabilities_by_agent) and the #8913/soleCandidateParams deictic path
+    //      (get_vulnerabilities_by_agent) and the soleCandidateParams deictic path
     //      (`pickAgentValue(..., 'id-or-name')`) both feed a numeric Manager id here, and the
     //      probe only aggregates `wazuh.agent.name`: an id can never match a hostname bucket, so
     //      a clean agent with genuinely zero rows (e.g. "what vulnerabilities does agent 001
@@ -440,18 +480,18 @@ async function appendEntityNearMissHint(
     //      variants) -- that reasoning does NOT extend to this branch, which fires precisely on
     //      NO match, so it is guarded separately here rather than by editing that shared reader.
     //
-    // REVIEW FIX A2 (groupA-regression-review.md, MEDIUM, multi-agent coverage gap): this used to
-    // be gated on `digest.counts.returned === 0` for the WHOLE call, so a multi-name sweep
+    // Deliberately NOT gated on `digest.counts.returned === 0` for the WHOLE call: that would leave
+    // a multi-name sweep
     // (search_findings_by_multiple_agents: "compare web-01 and cloud-services") where ONE name
-    // matched never disclosed the OTHER, unmatched one -- CV-028's exact shape, just with a
+    // matched never disclosing the OTHER, unmatched one -- the same underlying bug shape, just with a
     // sibling that succeeds masking it. `findUnmatchedAgentNames` is already computed PER
     // REQUESTED NAME against the same population probe regardless of the call's aggregate row
-    // count, so removing that outer gate is sufficient to close the gap for every
+    // count, so no outer gate on the aggregate count is needed to close the gap for every
     // `AGENT_NAME_PARAM_KEYS`-bearing tool, single- or multi-name alike: for a single-name call, a
     // non-zero `returned` already proves that one name matched (the query filtered on it and
     // found rows), so it is already absent from `indexedNames`'s complement and this reports
-    // nothing new or false for that shape -- the removed gate was redundant there, never
-    // load-bearing.
+    // nothing new or false for that shape -- a gate on the aggregate count would be redundant
+    // there, never load-bearing.
     {
       const unmatched = findUnmatchedAgentNames(
         requestedNames,
@@ -484,7 +524,7 @@ async function appendEntityNearMissHint(
 }
 
 /**
- * The DSL an "Open in Discover" link carries (#8935 item I2): the guardrail-clamped query that
+ * The DSL an "Open in Discover" link carries: the guardrail-clamped query that
  * actually ran, WITH any `post_filter` folded in as a sibling filter clause. The rendered table's
  * rows come from `hits.hits`, which ARE post-filtered — a Discover link built from `body.query`
  * alone would open a different row set than the table it sits under (get_sca_checks with an
@@ -505,7 +545,7 @@ export function buildDiscoverDsl(
 }
 
 /** Executes a validated, guardrail-passed Indexer search and builds its digest + table.
- * `assumptionNote` (issue #8913) is threaded straight into `buildDigest` -- see that function and
+ * `assumptionNote` is threaded straight into `buildDigest` -- see that function and
  * `ToolDefinition.resolveParams`'s doc comments (types.ts) for where it comes from. */
 async function executeIndexerRequest(
   toolName: string,
@@ -526,18 +566,24 @@ async function executeIndexerRequest(
   // either would become an unhandled rejection, contradicting executeToolCall's documented "never
   // throws" contract. Nothing from the guardrail stage may escape uncaught.
   let body: Record<string, unknown>;
-  // Issue #8935 item I4 (bound disclosure): set inside the try block below when
+  // Bound disclosure: set inside the try block below when
   // `clampLookbackWindow` actually narrows an over-wide time range, then appended to the
   // successful digest's `hint` further down -- see that call site for why this must be the
   // SUCCESSFUL call's own data rather than a rejection the model has to remember to relay.
   let lookbackDisclosure: string | undefined;
+  // The body BEFORE `clampLookbackWindow` runs, captured purely so
+  // `tableSpec.provenance.requestedRange` (below) can read the query's own pre-clamp range
+  // clause — a FACT the DSL itself contained, never a client-side default. Left `undefined` if
+  // the valve rejects the body first (no provenance is ever attached to a rejected call).
+  let requestedRangeBody: Record<string, unknown> | undefined;
   try {
     const valved = applySafetyValves(indexerRequest.body);
     if (!valved.ok) {
       return { toolResultContent: toolErrorContent(valved.reason) };
     }
+    requestedRangeBody = valved.body;
 
-    // Issue #8935 item I4: clamp-and-disclose an over-wide @timestamp span BEFORE lintDsl, so a
+    // Clamp-and-disclose an over-wide @timestamp span BEFORE lintDsl, so a
     // request whose only problem is exceeding the 90-day cap becomes a SUCCESSFUL, capped call
     // instead of a rejection the model must remember to relay in its final answer (the rejection
     // path stays intact below for every other unfixable-by-clamp shape -- see
@@ -550,7 +596,7 @@ async function executeIndexerRequest(
     );
     lookbackDisclosure = disclosure;
 
-    // Issue #8920 item 2, applied at the CHOKEPOINT rather than per tool: a bare parent
+    // Applied at the CHOKEPOINT rather than per tool: a bare parent
     // technique-id `term` filter (typed tool or hand-written escape-hatch DSL alike) is rolled
     // up to include its sub-techniques before execution -- see technique-rollup.ts for the
     // shape, the case normalization, and the safety argument. Runs BEFORE lintDsl so the body
@@ -608,10 +654,10 @@ async function executeIndexerRequest(
     // aggregation fields driving `breakdown` (if any) can be read from — see privacy.ts's
     // `extractAggFields` doc comment — so it is reused for that below when privacy is active.
     const digest = buildDigest(toolName, result, def, body, assumptionNote);
-    // Issue #8935 item I4: appended FIRST, before items 3/6 below, so the capped-window fact
+    // Appended FIRST, before the window-recount/near-miss hints below, so the capped-window fact
     // (when present) precedes any longer window-recount/near-miss probe hint under
     // `MAX_HINT_LENGTH` -- a disclosure that got truncated away by a later, lower-priority hint
-    // would defeat the whole point of this item. Static first-party text plus timestamps only, no
+    // would defeat the whole point of surfacing it. Static first-party text plus timestamps only, no
     // indexed values -- needs no privacy handling (same argument as
     // `appendSubTechniqueSplitHint` below).
     if (lookbackDisclosure) {
@@ -619,8 +665,9 @@ async function executeIndexerRequest(
         ? `${lookbackDisclosure} ${digest.hint}`
         : lookbackDisclosure;
     }
-    // Issue #8920 items 3 and 6: both slot in HERE, between `buildDigest` and `finalizeDigest`,
-    // and both extend `Digest.hint` by concatenation rather than a new field -- deliberately no
+    // The window-recount and near-miss hints both slot in HERE, between `buildDigest` and
+    // `finalizeDigest`, and both extend `Digest.hint` by concatenation rather than a new field --
+    // deliberately no
     // change to digest.ts's `Digest` interface (avoids colliding with sibling in-flight edits to
     // that file). Mutating `digest` before it is handed to `finalizeDigest` means whatever they
     // append is still subject to the same downstream pipeline (capDigest's length cap, the
@@ -680,8 +727,8 @@ async function executeIndexerRequest(
       privacy,
       toolName,
       aggFields,
-      // Issue #8917: was `def.deriveColumns` -- see `ToolDefinition.failClosedFieldPolicy`'s doc
-      // comment (types.ts) for why this must be its own, explicitly-set flag instead.
+      // A separate, explicitly-set flag from `def.deriveColumns` -- see
+      // `ToolDefinition.failClosedFieldPolicy`'s doc comment (types.ts) for why.
       def.failClosedFieldPolicy,
       def.digest.sampleFieldMaxLength,
     );
@@ -692,6 +739,39 @@ async function executeIndexerRequest(
     tableSpec.discover = {
       index: indexerRequest.index,
       dsl: buildDiscoverDsl(body),
+    };
+    // Recorded HERE, at creation time -- a date-math bound
+    // ("now-90d") only means something relative to when the query actually ran, so resolving it
+    // against the render-time clock instead would show a restored conversation a
+    // window the query never ran against. `describeProvenance` (tool-call-label.ts) resolves
+    // date-math against this stored instant, never `Date.now()`. Held in a local first so the two
+    // `rangeBoundsFromDsl` calls below order their bounds against the SAME instant they record.
+    const executedAt = Date.now();
+    // Provenance FACTS for the evidence popover — see `TableSpec.provenance`'s
+    // doc comment (common/types.ts). `requestedRange`/`effectiveRange` read the SAME dsl shape
+    // `discover.dsl` above does (`buildDiscoverDsl`), just off the pre- and post-clamp bodies
+    // respectively. `rangeBoundsFromDsl` and the `extractTimeRange` the "Open in Discover" link is
+    // built with are two views of ONE resolution (common/discover-url.ts's `effectiveRangeClause`:
+    // clauses partitioned by timestamp field, then intersected within it), so given the same body
+    // and the same `executedAt` reference they cannot report different windows — the link and this
+    // record agree by construction, not by two implementations happening to match. That reference
+    // is why `executedAt` is stored on the spec: discover-link.tsx passes it back in.
+    // `toolCallId` is left unset here; server/routes/chat.ts's stream loop attaches it, since
+    // that is where the streaming tool call's own id is in scope.
+    tableSpec.provenance = {
+      index: indexerRequest.index,
+      // `?? body`: unreachable in practice (the try block above always sets `requestedRangeBody`
+      // before it can throw past the point of no return), kept only so this stays a plain
+      // `Record<string, unknown>` for `buildDiscoverDsl` without an unsafe `!` assertion.
+      requestedRange: rangeBoundsFromDsl(
+        buildDiscoverDsl(requestedRangeBody ?? body),
+        executedAt,
+      ),
+      // `tableSpec.discover.dsl` above IS `buildDiscoverDsl(body)`
+      // — reuse it rather than building the same object a second time.
+      effectiveRange: rangeBoundsFromDsl(tableSpec.discover.dsl, executedAt),
+      clamped: lookbackDisclosure !== undefined,
+      executedAt,
     };
     if (def.buildSecurityAnalyticsLink) {
       const space = resolveSecurityAnalyticsSpace(
@@ -706,7 +786,7 @@ async function executeIndexerRequest(
       // The `table` event built from `result` below is deliberately NOT run through field policy:
       // it renders locally in the browser and never reaches the model. That holds for EVERY action,
       // 'never' included — the policy's only boundary is the digest above, and the table shows the
-      // analyst their own data in full (issue #8821; see privacy.ts's module header). The same is
+      // analyst their own data in full (see privacy.ts's module header). The same is
       // true of the executed `body`: no action rewrites its projections, so the field is retrieved
       // and therefore displayable.
       toolResultContent: JSON.stringify(finalDigest),
@@ -721,8 +801,8 @@ async function executeIndexerRequest(
   }
 }
 
-/** Executes a validated Manager API call and builds its digest + table. `assumptionNote` (issue
- * #8913) is threaded straight into `buildDigest` -- see `executeIndexerRequest`'s doc comment. */
+/** Executes a validated Manager API call and builds its digest + table. `assumptionNote`
+ * is threaded straight into `buildDigest` -- see `executeIndexerRequest`'s doc comment. */
 async function executeManagerRequest(
   toolName: string,
   managerRequest: ManagerRequest,
@@ -829,7 +909,7 @@ type ValidateCallResult =
 /**
  * Schema-validates a model-issued tool call's arguments against its `ToolDefinition`, WITHOUT
  * building or executing anything yet. Split out from `buildValidatedRequest` (below) so
- * `executeToolCall` can run a tool's optional async `resolveParams` hook (types.ts; issue #8913)
+ * `executeToolCall` can run a tool's optional async `resolveParams` hook (types.ts)
  * on the validated params BEFORE `buildRequest` ever sees them -- `buildRequest` itself stays
  * synchronous and gets whatever params `resolveParams` (when present) resolved to, not the raw
  * validated ones. A tool with no `resolveParams` is unaffected either way.
@@ -918,11 +998,11 @@ export async function executeToolCall(
   let { params } = validated.validated;
   const { def } = validated.validated;
 
-  // Issue #8913: an opt-in async pre-buildRequest step (originally only get_agent_inventory; code
-  // review B1 added get_field_values, for a different purpose -- surfacing a populated-field-alias
-  // note, not resolving an omitted param) that resolves/annotates params against a live source
-  // instead of relying on the model to have called a lookup tool first -- a live-verified
-  // system-prompt-only instruction to do that was found NOT to work (0/5 runs complied). Wrapped
+  // An opt-in async pre-buildRequest step (get_agent_inventory resolves an omitted param;
+  // get_field_values surfaces a populated-field-alias note, a different purpose) that
+  // resolves/annotates params against a live source
+  // instead of relying on the model to have called a lookup tool first -- a
+  // system-prompt-only instruction to do that measured 0/5 runs complied. Wrapped
   // in try/catch (unlike `buildRequest`'s own try/catch below, `resolveParams` is async and a
   // rejected promise would otherwise become an unhandled rejection, breaking this function's
   // documented "never throws" contract).
@@ -931,10 +1011,31 @@ export async function executeToolCall(
     try {
       const resolved = await def.resolveParams(params, context, request);
       if (!resolved.ok) {
-        return { toolResultContent: toolErrorContent(resolved.reason) };
+        // The FAILURE half must go through the same scrub as the success half below: a resolver that
+        // cannot pick between candidates enumerates them by name in `reason`
+        // (param-resolution.ts's two 'many' branches), and that reason becomes the tool error the
+        // provider reads -- so an unscrubbed one carries real hostnames in the clear under privacy
+        // mode. Same helper, same chokepoint, no-op when the resolver declared no entities.
+        return {
+          toolResultContent: toolErrorContent(
+            scrubAssumptionNote(
+              resolved.reason,
+              resolved.reasonEntities,
+              privacy,
+            ) ?? resolved.reason,
+          ),
+        };
       }
       params = resolved.resolved.params;
-      assumptionNote = resolved.resolved.note;
+      // Scrubbed HERE, at the single choke point every resolver's note passes through, rather
+      // than in each resolver: resolvers have no privacy context, and an unscrubbed note
+      // carries the resolved hostname to the provider in the clear under privacy mode — past
+      // every downstream scan.
+      assumptionNote = scrubAssumptionNote(
+        resolved.resolved.note,
+        resolved.resolved.noteEntities,
+        privacy,
+      );
     } catch (error) {
       return {
         toolResultContent: toolErrorContent(
