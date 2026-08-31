@@ -1,0 +1,166 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ScanVulnerabilitiesAgentModal component should return the component 1`] = `
+<body
+  class="euiBody-hasOverlayMask"
+>
+  <div />
+  <div
+    class="euiOverlayMask euiOverlayMask--aboveHeader"
+  >
+    <div
+      data-eui="EuiFocusTrap"
+    >
+      <div
+        class="euiModal euiModal--maxWidth-default"
+        tabindex="0"
+      >
+        <button
+          aria-label="Closes this modal window"
+          class="euiButtonIcon euiButtonIcon--text euiButtonIcon--empty euiButtonIcon--xSmall euiModal__closeIcon"
+          type="button"
+        >
+          <span
+            aria-hidden="true"
+            class="euiButtonIcon__icon"
+            color="inherit"
+            data-euiicon-type="cross"
+          />
+        </button>
+        <div
+          class="euiModal__flex"
+        >
+          <div
+            class="euiModalHeader"
+          >
+            <div
+              class="euiModalHeader__title"
+            >
+              Scan vulnerabilities
+            </div>
+          </div>
+          <div
+            class="euiModalBody"
+          >
+            <div
+              class="euiModalBody__overflow"
+            >
+              <div
+                class="euiFlexGroup euiFlexGroup--gutterMedium euiFlexGroup--directionColumn euiFlexGroup--responsive"
+              >
+                <div
+                  class="euiFlexItem"
+                >
+                  <div
+                    class="euiFlexGroup euiFlexGroup--gutterMedium euiFlexGroup--directionRow euiFlexGroup--responsive"
+                  >
+                    <div
+                      class="euiFlexItem"
+                    >
+                      <dl
+                        class="euiDescriptionList euiDescriptionList--row euiDescriptionList--compressed"
+                      >
+                        <dt
+                          class="euiDescriptionList__title"
+                        >
+                          Agent ID
+                        </dt>
+                        <dd
+                          class="euiDescriptionList__description"
+                        >
+                          001
+                        </dd>
+                      </dl>
+                    </div>
+                    <div
+                      class="euiFlexItem"
+                    >
+                      <dl
+                        class="euiDescriptionList euiDescriptionList--row euiDescriptionList--compressed"
+                      >
+                        <dt
+                          class="euiDescriptionList__title"
+                        >
+                          Agent name
+                        </dt>
+                        <dd
+                          class="euiDescriptionList__description"
+                        >
+                          agent1
+                        </dd>
+                      </dl>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="euiSpacer euiSpacer--l"
+              />
+              <div
+                class="euiCallOut euiCallOut--primary"
+              >
+                <div
+                  class="euiCallOutHeader"
+                >
+                  <span
+                    aria-hidden="true"
+                    class="euiCallOutHeader__icon"
+                    color="inherit"
+                    data-euiicon-type="iInCircle"
+                  />
+                  <span
+                    class="euiCallOutHeader__title"
+                  >
+                    An on-demand vulnerability scan will be requested for this agent
+                  </span>
+                </div>
+                <div
+                  class="euiText euiText--small"
+                >
+                  <div
+                    class="euiTextColor euiTextColor--default"
+                  >
+                    The scan uses the inventory already synchronized to the indexer, so it does not require the agent to be active. The request can be rejected if the vulnerability detection module is not ready or its queue is full.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="euiModalFooter"
+          >
+            <button
+              class="euiButtonEmpty euiButtonEmpty--primary"
+              type="button"
+            >
+              <span
+                class="euiButtonContent euiButtonEmpty__content"
+              >
+                <span
+                  class="euiButtonEmpty__text"
+                >
+                  Cancel
+                </span>
+              </span>
+            </button>
+            <button
+              class="euiButton euiButton--primary euiButton--fill"
+              type="button"
+            >
+              <span
+                class="euiButtonContent euiButton__content"
+              >
+                <span
+                  class="euiButton__text"
+                >
+                  Scan
+                </span>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;

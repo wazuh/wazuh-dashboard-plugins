@@ -33,9 +33,9 @@ import { PROVIDER_API_KEY_AAD_NAMESPACE } from '../../common/constants';
  *
  * Both `encrypt` and `decrypt` take a mandatory `savedObjectId: string` second parameter — the
  * provider document id the AAD is bound to (see `buildAad`). Required, not optional, so a caller
- * can never forget to pass the real id. Named `savedObjectId` for historical reasons (providers
- * were originally an OSD saved object); it is now an OpenSearch document id, but the AAD-binding
- * role is identical either way, and renaming it would not change any behavior.
+ * can never forget to pass the real id. Named `savedObjectId` even though providers are stored as
+ * an OpenSearch document, not an OSD saved object; the AAD-binding role is identical either way,
+ * and renaming it would not change any behavior.
  *
  * ## No-plaintext contract
  *

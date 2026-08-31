@@ -33,7 +33,7 @@ test('noTextFallbackMessage: roundsExhausted is ignored when there is no table t
   assert.match(message, /no matching results/i);
 });
 
-// N1 fix (AI/plan/qa-battery-v31.md): the canned empty-copy above said nothing about WHAT was
+// The canned empty-copy above said nothing about WHAT was
 // searched — a scoped SCA/vulnerability/agent query and a wide-open one produced the identical
 // sentence. These cover the enriched form, which names the data domain (from the tool name) and
 // any caller-supplied filters/time-window (from its resolved arguments), in user vocabulary,
@@ -92,7 +92,7 @@ test('noTextFallbackMessage: zero-row result strips the get_/search_/lookup_ ver
   assert.match(search, /Searched: wazuh data/);
 });
 
-test('D3 fix (AI/plan/d-review.md): search_wazuh_data\'s query_dsl (raw Elasticsearch DSL, declared type "string") never leaks into user-facing empty copy', () => {
+test('search_wazuh_data\'s query_dsl (raw Elasticsearch DSL, declared type "string") never leaks into user-facing empty copy', () => {
   const rawDsl = JSON.stringify({
     query: {
       bool: {
@@ -117,7 +117,7 @@ test('D3 fix (AI/plan/d-review.md): search_wazuh_data\'s query_dsl (raw Elastics
   assert.doesNotMatch(message, /"query":\{"bool"/);
 });
 
-test('D4 fix (AI/plan/d-review.md): lookup_indicator does not double the word "indicator" (domain and its own filter clause collide)', () => {
+test('lookup_indicator does not double the word "indicator" (domain and its own filter clause collide)', () => {
   const message = noTextFallbackMessage(true, false, false, {
     name: 'lookup_indicator',
     args: { indicator: '124.70.213.43' },
@@ -143,8 +143,8 @@ test('noTextFallbackMessage: omitting lastToolCall (no attempt on record) falls 
   assert.equal(message, 'No matching results were found for that query.');
 });
 
-// --- BLOCKER FIX (empty-answer audit, 2026-08-20, CV-033/CV-066): an errored/rejected call gets --
-// --- its own specific error text surfaced, never the generic "no matching results" sentence -----
+// --- BLOCKER FIX: an errored/rejected call gets its own specific error text surfaced, never ------
+// --- the generic "no matching results" sentence ---------------------------------------------------
 
 test(
   'noTextFallbackMessage: an errored call (unknown field, invalid pairing, ...) surfaces its ' +
@@ -263,10 +263,9 @@ test(
   },
 );
 
-// --- BLOCKER FIX (backlog CV-017 residual, "stale digest after silent mid-turn error"; ported ----
-// --- from deploy commit 872704fd4) -----------------------------------------------------------------
+// --- BLOCKER FIX: "stale digest after silent mid-turn error" --------------------------------------
 //
-// CV-017's live shape: an EARLIER, broader call already rendered a real, non-empty table
+// An EARLIER, broader call already rendered a real, non-empty table
 // (`sawNonEmptyTable === true`), but the actual LAST call this turn attempted -- a narrower,
 // correctly-scoped follow-up the question needed -- errored silently. Before this fix, the
 // `sawNonEmptyTable === true` branch of `noTextFallbackMessage` only ever returned the bare
@@ -275,8 +274,7 @@ test(
 
 test(
   'noTextFallbackMessage: a table already rendered, but the LAST attempted call errored -> ' +
-    'admits the more specific lookup did not complete instead of silently standing in for it ' +
-    '(CV-017 shape)',
+    'admits the more specific lookup did not complete instead of silently standing in for it',
   () => {
     const message = noTextFallbackMessage(true, true, false, {
       name: 'search_wazuh_data',

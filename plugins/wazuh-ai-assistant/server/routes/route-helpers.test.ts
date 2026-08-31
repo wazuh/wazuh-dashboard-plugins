@@ -1,0 +1,347 @@
+import assert from 'node:assert/strict';
+import {
+  isPermissionDeniedError,
+  PERMISSION_DENIED_MESSAGE,
+  permissionDeniedMessage,
+  withInternalErrorHandling,
+  redactSensitiveDetail,
+  RouteHandler,
+} from './route-helpers';
+
+/**
+ * The security cases assert ABSENCE: a body carrying the new message proves nothing
+ * on its own, since the leaked text could still be there alongside it.
+ *
+ * No OSD route-mocking harness exists in this plugin, so the wrapper is driven directly with a
+ * hand-rolled response recorder — same convention as provider-encryption-gate.test.ts.
+ */
+
+type ResponseFactory = Parameters<RouteHandler>[2];
+
+function fakeResponse(): {
+  calls: Array<{ statusCode: number; body: unknown }>;
+  factory: ResponseFactory;
+} {
+  const calls: Array<{ statusCode: number; body: unknown }> = [];
+  const factory = {
+    customError(options: { statusCode: number; body: unknown }) {
+      calls.push(options);
+      return { status: options.statusCode, ...options };
+    },
+  } as unknown as ResponseFactory;
+  return { calls, factory };
+}
+
+function fakeLogger(): {
+  errors: unknown[];
+  logger: { error: (...args: unknown[]) => void };
+} {
+  const errors: unknown[] = [];
+  return {
+    errors,
+    logger: {
+      error: (...args: unknown[]) => {
+        errors.push(args);
+      },
+    },
+  };
+}
+
+// Realistic security_exception: action name, username, and backend roles are all embedded in
+// the free-text `reason`/`message` — exactly what must never reach the client.
+const RBAC_REASON =
+  'no permissions for [cluster:admin/ai_assistant/settings/read] and User [name=qauser, backend_roles=[kibana_user, readall], requestedTenant=null]';
+
+function rbacDeniedError(): unknown {
+  const error = new Error(
+    `security_exception: [security_exception] Reason: ${RBAC_REASON}`,
+  ) as Error & { statusCode: number; meta: unknown };
+  error.statusCode = 403;
+  error.meta = {
+    statusCode: 403,
+    body: {
+      error: {
+        type: 'security_exception',
+        reason: RBAC_REASON,
+      },
+    },
+  };
+  return error;
+}
+
+async function runWrapped(error: unknown): Promise<{
+  calls: Array<{ statusCode: number; body: unknown }>;
+  errors: unknown[];
+}> {
+  const { calls, factory } = fakeResponse();
+  const { errors, logger } = fakeLogger();
+  const handler: RouteHandler = () => Promise.reject(error);
+  const wrapped = withInternalErrorHandling(
+    handler,
+    logger as unknown as Parameters<typeof withInternalErrorHandling>[1],
+  );
+  await wrapped({} as never, {} as never, factory);
+  return { calls, errors };
+}
+
+test('RBAC-denied security_exception (403) is sanitized to a 403 built from the fixed line', async () => {
+  const { calls } = await runWrapped(rbacDeniedError());
+
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].statusCode, 403);
+  assert.ok(
+    calls[0].body.message.startsWith(PERMISSION_DENIED_MESSAGE),
+    'the response must be built from the fixed line, not from the error text',
+  );
+});
+
+test('the sanitized response body never contains the username, roles, or exception type', async () => {
+  const { calls } = await runWrapped(rbacDeniedError());
+
+  const serialized = JSON.stringify(calls[0]);
+  assert.doesNotMatch(serialized, /qauser/);
+  assert.doesNotMatch(serialized, /kibana_user/);
+  assert.doesNotMatch(serialized, /readall/);
+  assert.doesNotMatch(serialized, /security_exception/);
+  assert.doesNotMatch(serialized, /backend_roles/);
+});
+
+// Both settings/providers clients turn an indexer answer whose `meta.body.error` is a bare string
+// into `new Error(thatString, { cause: originalError })`. The wrapper carries no status of its own,
+// so a denial reaching the route in this shape used to be classified as a 500.
+function wrappedRbacDeniedError(): unknown {
+  return new Error(
+    `no permissions for [cluster:admin/ai_assistant/settings/read] and User [name=qauser, backend_roles=[kibana_user, readall], requestedTenant=null]`,
+    { cause: rbacDeniedError() as Error },
+  );
+}
+
+test('a 403 the client rethrew as a bare Error with the original as `cause` is still a 403', async () => {
+  const { calls } = await runWrapped(wrappedRbacDeniedError());
+
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].statusCode, 403);
+  assert.ok(calls[0].body.message.startsWith(PERMISSION_DENIED_MESSAGE));
+});
+
+test('the cause-wrapped denial leaks no identity either, despite carrying it in its own message', async () => {
+  const { calls, errors } = await runWrapped(wrappedRbacDeniedError());
+
+  const serialized = JSON.stringify(calls[0]);
+  assert.doesNotMatch(serialized, /qauser/);
+  assert.doesNotMatch(serialized, /backend_roles/);
+  // The operator still gets the full text server-side.
+  assert.match(JSON.stringify(errors[0]), /qauser/);
+});
+
+test('a non-403 cause does not turn an unrelated failure into a permission denial', async () => {
+  const unavailable = new Error('unavailable') as Error & {
+    statusCode: number;
+  };
+  unavailable.statusCode = 503;
+  const error = new Error('index write failed', { cause: unavailable });
+
+  const { calls } = await runWrapped(error);
+
+  assert.equal(calls[0].statusCode, 500);
+});
+
+// The action name is returned; caller-specific detail is not. These two assert the second half by
+// absence, against a reason that carries the identity block.
+test('the 403 body names the missing indexer action', async () => {
+  const { calls } = await runWrapped(rbacDeniedError());
+
+  assert.match(
+    calls[0].body.message,
+    /Missing indexer permission: cluster:admin\/ai_assistant\/settings\/read\./,
+  );
+});
+
+test('naming the action does not bring the identity block with it', async () => {
+  const { calls } = await runWrapped(rbacDeniedError());
+
+  const serialized = JSON.stringify(calls[0]);
+  assert.doesNotMatch(serialized, /qauser/);
+  assert.doesNotMatch(serialized, /backend_roles/);
+  assert.doesNotMatch(serialized, /requestedTenant/);
+  assert.doesNotMatch(serialized, /security_exception/);
+});
+
+test('permissionDeniedMessage lists every denied action, deduplicated', () => {
+  const error = new Error(
+    'no permissions for [cluster:admin/ai_assistant/settings/read, ' +
+      'cluster:admin/ai_assistant/settings/read, indices:data/read/search] and ' +
+      'User [name=qauser, backend_roles=[readall], requestedTenant=null]',
+  );
+
+  const message = permissionDeniedMessage(error);
+
+  assert.equal(
+    message,
+    `${PERMISSION_DENIED_MESSAGE} Missing indexer permission: ` +
+      'cluster:admin/ai_assistant/settings/read, indices:data/read/search.',
+  );
+});
+
+test('permissionDeniedMessage falls back to the fixed line alone when nothing looks like an action', () => {
+  // An unrecognized reason must contribute nothing rather than pass through.
+  for (const reason of [
+    'unauthorized',
+    '',
+    'no permissions for [] and User [name=qauser]',
+    'no permissions for [name=qauser, backend_roles=[readall]]',
+    'no permissions for [DROP TABLE users]',
+  ]) {
+    assert.equal(
+      permissionDeniedMessage(new Error(reason)),
+      PERMISSION_DENIED_MESSAGE,
+      `leaked or altered for: ${reason}`,
+    );
+  }
+  assert.equal(permissionDeniedMessage(undefined), PERMISSION_DENIED_MESSAGE);
+  assert.equal(permissionDeniedMessage(null), PERMISSION_DENIED_MESSAGE);
+});
+
+test('permissionDeniedMessage never reads past the first bracket group', () => {
+  // The identity tail sits after `]`; a greedy pattern would swallow it.
+  const message = permissionDeniedMessage(
+    new Error(
+      'no permissions for [cluster:admin/opendistro/ism/policy/get] and ' +
+        'User [name=demo-settings, backend_roles=[kibana_user], requestedTenant=null]',
+    ),
+  );
+
+  assert.equal(
+    message,
+    `${PERMISSION_DENIED_MESSAGE} Missing indexer permission: ` +
+      'cluster:admin/opendistro/ism/policy/get.',
+  );
+});
+
+test('a 403 detected only via meta.statusCode (no top-level statusCode) is classified identically', async () => {
+  const error = {
+    message: 'security_exception',
+    meta: { statusCode: 403, body: { error: { type: 'security_exception' } } },
+  };
+
+  const { calls } = await runWrapped(error);
+
+  assert.equal(calls[0].statusCode, 403);
+  assert.deepEqual(calls[0].body, { message: PERMISSION_DENIED_MESSAGE });
+});
+
+test('a 403 whose meta.body.error.type is NOT security_exception (e.g. a DLS/FLS denial) is still sanitized', async () => {
+  const error = {
+    statusCode: 403,
+    meta: { statusCode: 403, body: { error: { type: 'forbidden' } } },
+  };
+
+  const { calls } = await runWrapped(error);
+
+  assert.equal(calls[0].statusCode, 403);
+  assert.deepEqual(calls[0].body, { message: PERMISSION_DENIED_MESSAGE });
+});
+
+test('a non-403 error is unchanged: 500 with describeError(error)', async () => {
+  const { calls } = await runWrapped(new TypeError('boom'));
+
+  assert.equal(calls[0].statusCode, 500);
+  assert.deepEqual(calls[0].body, { message: 'boom' });
+});
+
+test('logger.error is called exactly once on the 403 branch, carrying the full detail', async () => {
+  const { errors } = await runWrapped(rbacDeniedError());
+
+  assert.equal(errors.length, 1);
+  const serialized = JSON.stringify(errors[0]);
+  assert.match(serialized, /cluster:admin\/ai_assistant\/settings\/read/);
+  assert.match(serialized, /qauser/);
+});
+
+test('logger.error is called exactly once on the 500 branch, carrying the full detail', async () => {
+  const { errors } = await runWrapped(new Error('boom'));
+
+  assert.equal(errors.length, 1);
+  const serialized = JSON.stringify(errors[0]);
+  assert.match(serialized, /boom/);
+});
+
+test('a non-403 security_exception (500 path) is redacted: no username/roles/action name in the body', async () => {
+  const error = rbacDeniedError() as Error & { statusCode: number };
+  error.statusCode = 500;
+  const { calls } = await runWrapped(error);
+
+  assert.equal(calls[0].statusCode, 500);
+  const serialized = JSON.stringify(calls[0]);
+  assert.doesNotMatch(serialized, /qauser/);
+  assert.doesNotMatch(serialized, /readall/);
+  assert.doesNotMatch(serialized, /kibana_user/);
+  assert.doesNotMatch(serialized, /backend_roles/);
+  assert.doesNotMatch(
+    serialized,
+    /cluster:admin\/ai_assistant\/settings\/read/,
+  );
+});
+
+test('logger.error still receives the FULL unredacted message on the 500 branch', async () => {
+  const error = rbacDeniedError() as Error & { statusCode: number };
+  error.statusCode = 500;
+  const { errors } = await runWrapped(error);
+
+  assert.equal(errors.length, 1);
+  const serialized = JSON.stringify(errors[0]);
+  assert.match(serialized, /qauser/);
+  assert.match(serialized, /readall/);
+  assert.match(serialized, /cluster:admin\/ai_assistant\/settings\/read/);
+});
+
+test('redactSensitiveDetail strips a nested-bracket User[...] identity block, including backend_roles', () => {
+  const message =
+    'no permissions for [cluster:admin/ai_assistant/settings/read] and User [name=qauser, backend_roles=[readall, kibanauser], requestedTenant=null]';
+  const redacted = redactSensitiveDetail(message);
+
+  assert.doesNotMatch(redacted, /qauser/);
+  assert.doesNotMatch(redacted, /readall/);
+  assert.doesNotMatch(redacted, /kibanauser/);
+  assert.doesNotMatch(redacted, /backend_roles/);
+  assert.match(redacted, /User \[redacted\]/);
+});
+
+test('redactSensitiveDetail replaces internal action names with [action]', () => {
+  const redacted = redactSensitiveDetail(
+    'no permissions for [cluster:admin/ai_assistant/settings/read]',
+  );
+  assert.doesNotMatch(redacted, /cluster:admin\/ai_assistant\/settings\/read/);
+  assert.match(redacted, /\[action\]/);
+});
+
+test('redactSensitiveDetail leaves an ordinary operational message unchanged', () => {
+  const message = 'Policy not found: wazuh-ai-assistant-sessions-policy';
+  assert.equal(redactSensitiveDetail(message), message);
+});
+
+test('redactSensitiveDetail: no match, empty string, and multiple occurrences', () => {
+  assert.equal(redactSensitiveDetail(''), '');
+  assert.equal(
+    redactSensitiveDetail('nothing sensitive here'),
+    'nothing sensitive here',
+  );
+
+  const twoActions =
+    'failed on [cluster:admin/ai_assistant/settings/read] then [indices:data/write/index]';
+  const redacted = redactSensitiveDetail(twoActions);
+  assert.doesNotMatch(redacted, /cluster:admin/);
+  assert.doesNotMatch(redacted, /indices:data\/write\/index/);
+  assert.equal((redacted.match(/\[action\]/g) || []).length, 2);
+});
+
+test('isPermissionDeniedError: only a strict statusCode===403 (top-level or meta) is true', () => {
+  assert.equal(isPermissionDeniedError(undefined), false);
+  assert.equal(isPermissionDeniedError(null), false);
+  assert.equal(isPermissionDeniedError({}), false);
+  assert.equal(isPermissionDeniedError('403'), false);
+  assert.equal(isPermissionDeniedError({ statusCode: '403' }), false);
+  assert.equal(isPermissionDeniedError({ statusCode: 403 }), true);
+  assert.equal(isPermissionDeniedError({ meta: { statusCode: 403 } }), true);
+  assert.equal(isPermissionDeniedError({ statusCode: 500 }), false);
+});

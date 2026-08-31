@@ -85,12 +85,12 @@ const TOOL_ARGS = {
   search_findings_by_multiple_agents: { agent_names: ['wazuh-aio'] },
   search_findings_by_os: { os_name: 'Ubuntu' },
 
-  // Vulnerabilities (get_solved_vulnerabilities retired in the 5.0 port)
+  // Vulnerabilities (get_solved_vulnerabilities does not exist)
   get_vulnerabilities: {},
   get_vulnerabilities_by_agent: { agent_identifier: 'wazuh-aio' },
   get_vulnerability_by_cve: { cve_id: 'CVE-2021-44228' },
 
-  // FIM / SCA / MITRE (get_fim_events replaced by get_fim_files in the 5.0 port)
+  // FIM / SCA / MITRE (use get_fim_files; get_fim_events does not exist)
   get_fim_files: {},
   get_sca_results: { agent_id: '000' },
   get_sca_checks: { agent_id: '000', policy_id: 'cis_ubuntu22-04' },

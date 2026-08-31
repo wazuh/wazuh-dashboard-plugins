@@ -12,10 +12,15 @@
  */
 
 import React from 'react';
-import { EuiDescriptionList, EuiPanel } from '@elastic/eui';
+import { EuiDescriptionList, EuiText } from '@elastic/eui';
 import { PanelModuleConfiguration } from '../../../../common/modules/panel';
 import { LogoOffice365 } from '../../../../common/logos';
 import { renderValueYesThenEnabled } from '../../../../../controllers/management/components/management/configuration/utils/utils';
+import {
+  mapModuleContentToRenderProperties,
+  toApiAuthEntries,
+  toListEntries,
+} from '../../../../common/modules/panel/components/module-configuration-mapping';
 
 const settings = [
   {
@@ -37,46 +42,33 @@ const settings = [
   },
   {
     field: 'api_auth',
-    label: 'Credentials',
-    render: value =>
-      value
-        .map(v => (
-          <EuiPanel
-            paddingSize='s'
-            key={`module_configuration_api_auth_${v.tenant_id}_${v.client_id}`}
+    label: 'Tenant IDs',
+    render: value => {
+      const tenantIDs = toApiAuthEntries(value)
+        .map(v => v.tenant_id)
+        .filter(tenantID => typeof tenantID !== 'undefined');
+      return tenantIDs.length ? (
+        tenantIDs.map(tenantID => (
+          <EuiDescriptionList
+            key={`module_configuration_api_auth_tenant_id_${tenantID}`}
+            className='eui-textTruncate'
+            title={String(tenantID)}
           >
-            <EuiDescriptionList
-              listItems={[
-                { title: 'Tenant ID', description: v.tenant_id },
-                { title: 'Client ID', description: v.client_id },
-                { title: 'Client secret', description: v.client_secret },
-                {
-                  title: 'Path file of client secret',
-                  description: v.client_secret_path,
-                },
-              ].filter(item => typeof item.description !== 'undefined')}
-            />
-          </EuiPanel>
+            {String(tenantID)}
+          </EuiDescriptionList>
         ))
-        .reduce(
-          (prev, cur) => [
-            prev,
-            <div
-              key={`padding-len-${prev.length}`}
-              style={{ marginTop: '8px' }}
-            />,
-            cur,
-          ],
-          [],
-        ),
+      ) : (
+        <EuiText>No tenant IDs configured</EuiText>
+      );
+    },
   },
   {
     field: 'subscriptions',
     label: 'Subscriptions',
     render: value =>
-      value.map(v => (
+      toListEntries(value).map(v => (
         <EuiDescriptionList key={`module_configuration_subscriptions_${v}`}>
-          {v}
+          {String(v)}
         </EuiDescriptionList>
       )),
   },
@@ -106,10 +98,11 @@ export const ModuleConfiguration = props => (
     moduleIconType={() => <LogoOffice365 className='euiIcon--primary' />}
     settings={settings}
     configurationAPIPartialPath='/wmodules/wmodules'
+    documentationPath='cloud-security/office365/index.html'
     mapResponseConfiguration={(response, type, params) => {
       return type === 'agent'
-        ? mapWModuleConfigurationToRenderProperties(
-            response.data.data.wmodules,
+        ? mapModuleContentToRenderProperties(
+            response,
             'office365',
             'Agent',
             params.name,

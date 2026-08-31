@@ -133,7 +133,7 @@ If you're unsure whether your PR qualifies, default to adding an entry, or ask a
 
 **Grouping entries**: if a PR continues or refines a previously merged feature (e.g. another PR for the same module), append to that entry instead of adding a new one, as long as it still matches the entry's description, don't attach unrelated changes to it just because they touch the same module. Existing entries can also be edited later if a subsequent PR changes or removes what they introduced.
 
-**Skipping the changelog check**: A GitHub Action automatically validates that every PR includes an update to `CHANGELOG.md`. If your PR qualifies for the exception above, add the `no changelog` label to the PR — the workflow detects this label and skips the validation step, allowing the PR to pass checks without a changelog entry.
+**Skipping the changelog check**: A GitHub Action automatically validates that every PR includes an update to `CHANGELOG.md`. If your PR qualifies for the exception above, add the `no-changelog` label to the PR — the workflow detects this label and skips the validation step, allowing the PR to pass checks without a changelog entry.
 
 ### Best practices
 

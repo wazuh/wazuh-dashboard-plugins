@@ -25,7 +25,7 @@ const helpLinks = [
   {
     text: 'Command module reference',
     href: webDocumentationLink(
-      'user-manual/reference/ossec-conf/wodle-command.html',
+      'user-manual/capabilities/command-monitoring/configuration.html',
     ),
   },
 ];

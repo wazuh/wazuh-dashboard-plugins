@@ -52,3 +52,138 @@ describe('Validations', () => {
     );
   });
 });
+
+describe('SettingsValidator.serverEndpointPort', () => {
+  it.each([
+    ['an empty value, which means the agent default', ''],
+    ['the lowest port', '1'],
+    ['the default port', '1517'],
+    ['the highest port', '65535'],
+  ])('accepts %s', (_title, value) => {
+    expect(SettingsValidator.serverEndpointPort(value)).toBeUndefined();
+  });
+
+  it.each([
+    ['a non-numeric value', 'https', 'It should be a number.'],
+    ['a decimal', '1517.5', 'It should be a number.'],
+    ['a signed value', '-1', 'It should be a number.'],
+    ['zero', '0', 'It should be a port number between 1 and 65535.'],
+    [
+      'a port above the range',
+      '65536',
+      'It should be a port number between 1 and 65535.',
+    ],
+  ])('rejects %s', (_title, value, message) => {
+    expect(SettingsValidator.serverEndpointPort(value)).toBe(message);
+  });
+});
+
+describe('SettingsValidator.serverEndpointPathPrefix', () => {
+  it.each([
+    ['an empty value, which means the agent default', ''],
+    ['the unprefixed opt-out', '/'],
+    ['the default prefix', '/wazuh-manager/'],
+    ['a prefix without a leading slash', 'wazuh-manager'],
+    ['a nested prefix', '/gateway/wazuh_manager.v5/'],
+    ['a prefix at the maximum length', `/${'a'.repeat(127)}`],
+  ])('accepts %s', (_title, value) => {
+    expect(SettingsValidator.serverEndpointPathPrefix(value)).toBeUndefined();
+  });
+
+  it.each([
+    [
+      'a prefix over the maximum length',
+      `/${'a'.repeat(128)}`,
+      'It should be shorter than 129 characters.',
+    ],
+    [
+      'a character outside the shared charset',
+      '/wazuh~manager/',
+      'It should only contain letters, numbers, and the characters . _ - /',
+    ],
+    [
+      'a relative segment',
+      '/wazuh-manager/../admin/',
+      'It should not contain the segments . or ..',
+    ],
+    [
+      'a current-directory segment',
+      '/./wazuh-manager/',
+      'It should not contain the segments . or ..',
+    ],
+    [
+      'an empty segment',
+      '/wazuh-manager//stateless/',
+      'It should not contain empty segments.',
+    ],
+  ])('rejects %s', (_title, value, message) => {
+    expect(SettingsValidator.serverEndpointPathPrefix(value)).toBe(message);
+  });
+});
+
+describe('SettingsValidator.serverEndpointAddress', () => {
+  it.each([
+    ['an empty value', ''],
+    ['an IPv4 address', '192.168.0.60'],
+    ['a hostname', 'wazuh-manager'],
+    ['an FQDN', 'manager.example.com'],
+    ['an uncompressed IPv6 address', '2001:0db8:85a3:0000:0000:8a2e:0370:7334'],
+    ['a compressed IPv6 address', '2001:db8::1'],
+    ['the IPv6 loopback', '::1'],
+    ['a bracketed IPv6 address', '[2001:db8::1]'],
+    ['a bracketed IPv6 address with a zone id', '[fe80::1%25eth0]'],
+    ['a bare IPv6 address with a zone id', 'fe80::1%25eth0'],
+  ])('accepts %s', (_title, value) => {
+    expect(SettingsValidator.serverEndpointAddress(value)).toBeUndefined();
+  });
+
+  it.each([
+    [
+      'a value over the length limit',
+      'a'.repeat(256),
+      'It should be shorter than 256 characters.',
+    ],
+    [
+      'a malformed IPv6 address',
+      '2001:db8::1::2',
+      'It should be a valid hostname, FQDN, IPv4 or IPv6 address',
+    ],
+    [
+      'an IPv6 group outside the hexadecimal range',
+      '2001:db8::zzzz',
+      'It should be a valid hostname, FQDN, IPv4 or IPv6 address',
+    ],
+    [
+      'an endpoint carrying a port',
+      '192.168.0.60:1517',
+      'It should be a valid hostname, FQDN, IPv4 or IPv6 address',
+    ],
+    [
+      'an endpoint carrying a path',
+      '192.168.0.60/wazuh-manager',
+      'It should be a valid hostname, FQDN, IPv4 or IPv6 address',
+    ],
+    [
+      'embedded credentials',
+      'user:pass@192.168.0.60',
+      'It should be a valid hostname, FQDN, IPv4 or IPv6 address',
+    ],
+    [
+      'a zone id on a hostname',
+      'wazuh-manager%25eth0',
+      'A zone id can only follow an IPv6 address.',
+    ],
+    [
+      'brackets around a hostname',
+      '[wazuh-manager]',
+      'Brackets should only enclose an IPv6 address.',
+    ],
+    [
+      'more than one zone id',
+      '[fe80::1%25eth0%25eth1]',
+      'It should carry at most one zone id, written as %25 followed by the interface name.',
+    ],
+  ])('rejects %s', (_title, value, message) => {
+    expect(SettingsValidator.serverEndpointAddress(value)).toBe(message);
+  });
+});

@@ -107,8 +107,7 @@ const TOOL_CATEGORY = {
 };
 
 /**
- * The 29 CATALOG tools (server/tools/registry.ts:42-82, as of get_sca_checks / the port/5.0
- * branch), each with:
+ * The 29 CATALOG tools (server/tools/registry.ts:42-82), each with:
  *   - `family`: the key into es_discovery.js's `familyCounts` used to tell EMPTY-DATA from
  *     SUSPECT-BROKEN when this tool returns 0 rows (see that file's header comment).
  *   - `argsFn(fixtures)`: returns `{ args }` built from LIVE discovered values, or

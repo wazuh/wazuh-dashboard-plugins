@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { EuiPanel, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 //@ts-ignore
 import { ComplianceRequirements } from './components/requirements';
@@ -26,6 +26,7 @@ import { fedrampRequirementsFile } from '../../../../common/compliance-requireme
 import { nis2RequirementsFile } from '../../../../common/compliance-requirements/nis2-requirements';
 import {
   DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
+  DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_OTHER_REQUIREMENT,
   UI_LOGGER_LEVELS,
   WAZUH_MODULES_ID,
 } from '../../../../common/constants';
@@ -39,6 +40,8 @@ import {
 } from '../../common/hocs';
 import {
   FindingsDataSourceRepository,
+  PatternDataSourceFilterManager,
+  FILTER_OPERATOR,
   tFilter,
 } from '../../common/data-source';
 import { LoadingSearchbarProgress } from '../../common/loading-searchbar-progress/loading-searchbar-progress';
@@ -46,6 +49,11 @@ import { I18nProvider } from '@osd/i18n/react';
 import { useAsyncAction } from '../../common/hooks';
 import { WzSearchBar } from '../../common/search-bar';
 import { compose } from 'redux';
+
+// Generous headroom above every framework's known-catalog size, so the
+// terms aggregation realistically returns every distinct value (known and
+// unknown) instead of silently truncating at the top N by count.
+const COMPLIANCE_REQUIREMENTS_AGGREGATION_SIZE = 1000;
 
 function buildComplianceRequirements(
   requirements: { [key: string]: string },
@@ -74,6 +82,27 @@ function buildComplianceRequirements(
     selectedRequirements,
     complianceRequirements,
   };
+}
+
+// Every aggregation bucket whose key isn't one of the known, documented
+// requirement codes for this framework.
+export function getOthersBuckets(
+  descriptions: { [key: string]: string },
+  buckets: Array<{ key: string; doc_count: number }>,
+) {
+  const knownCodes = new Set(Object.keys(descriptions));
+  return buckets.filter(bucket => !knownCodes.has(bucket.key));
+}
+
+// Sums the doc_count of every "Others" bucket (see getOthersBuckets).
+export function computeOthersCount(
+  descriptions: { [key: string]: string },
+  buckets: Array<{ key: string; doc_count: number }>,
+) {
+  return getOthersBuckets(descriptions, buckets).reduce(
+    (sum, bucket) => sum + bucket.doc_count,
+    0,
+  );
 }
 
 function buildComplianceObject({ section }) {
@@ -274,7 +303,7 @@ export const ComplianceTable = compose(
         tactics: {
           terms: {
             field: mapFieldAgg[section],
-            size: 100,
+            size: COMPLIANCE_REQUIREMENTS_AGGREGATION_SIZE,
           },
         },
       };
@@ -309,6 +338,50 @@ export const ComplianceTable = compose(
     searchBarProps.query,
     { from: dateRangeFrom, to: dateRangeTo },
   ]);
+
+  // Findings whose compliance requirement value includes at least one code
+  // that isn't part of the known, documented list for this framework. Built
+  // from the exact same aggregation buckets that drive `othersCount` below
+  // (see getOthersBuckets), rather than excluding every known code, so a
+  // document holding both a known and an unknown code (e.g.
+  // ["1.1", "some-unknown-code"]) is matched here exactly when it also
+  // contributes to `othersCount` - keeping the flyout table and the tile's
+  // badge count consistent.
+  const getRegulatoryComplianceOtherRequirementsFilter = (key: string) => {
+    const unknownValues = getOthersBuckets(
+      complianceData.descriptions,
+      action.data || [],
+    ).map(bucket => bucket.key);
+    if (!unknownValues.length) {
+      return [];
+    }
+    const indexPatternId = dataSource.dataSource?.indexPattern.id;
+    return [
+      PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS_ONE_OF,
+        key,
+        unknownValues,
+        indexPatternId,
+        DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_OTHER_REQUIREMENT,
+      ),
+    ] as tFilter[];
+  };
+
+  const othersCount = useMemo(
+    () =>
+      Object.keys(complianceData.descriptions).length
+        ? computeOthersCount(complianceData.descriptions, action.data || [])
+        : 0,
+    [action.data, complianceData.descriptions],
+  );
+
+  const othersBuckets = useMemo(
+    () =>
+      Object.keys(complianceData.descriptions).length
+        ? getOthersBuckets(complianceData.descriptions, action.data || [])
+        : [],
+    [action.data, complianceData.descriptions],
+  );
 
   useEffect(() => {
     const { descriptions, complianceObject, selectedRequirements } =
@@ -391,14 +464,17 @@ export const ComplianceTable = compose(
                     <EuiFlexItem style={{ width: '15%' }}>
                       <ComplianceSubrequirements
                         section={props.section}
-                        onSelectedTabChanged={id =>
-                          props.onSelectedTabChanged(id)
-                        }
                         requirementsCount={action.data || []}
                         loadingAlerts={action.running}
                         fetchFilters={dataSource.fetchFilters}
                         getRegulatoryComplianceRequirementFilter={
                           getRegulatoryComplianceRequirementFilter
+                        }
+                        othersCount={othersCount}
+                        othersBuckets={othersBuckets}
+                        indexPatternId={dataSource.dataSource?.indexPattern.id}
+                        getRegulatoryComplianceOtherRequirementsFilter={
+                          getRegulatoryComplianceOtherRequirementsFilter
                         }
                         {...complianceData}
                         filters={dataSource.filters}

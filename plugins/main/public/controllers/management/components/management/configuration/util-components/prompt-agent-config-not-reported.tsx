@@ -18,7 +18,7 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 import { showExploreAgentModalGlobal } from '../../../../../../redux/actions/appStateActions';
 
 const documentationLink = webDocumentationLink(
-  'user-manual/reference/ossec-conf/index.html',
+  'user-manual/manager/reference.html',
 );
 
 /**

@@ -8,7 +8,7 @@ import { describeError } from '../../common/errors';
 import { checkIndexAllowlist } from './guardrails';
 
 /**
- * The graceful-failure handoff (issue 13-suggested-query-discover-handoff.md): when the data a
+ * The graceful-failure handoff: when the data a
  * user asked about is out of the assistant's reach — a blocked index, a filter search_wazuh_data
  * cannot express within its rules, a >90-day range — the model calls this INSTEAD of guessing or
  * silently answering a narrower question. server/routes/chat.ts's orchestrate loop intercepts it
@@ -22,15 +22,15 @@ import { checkIndexAllowlist } from './guardrails';
  * server/tools/registry.ts: the registry is the catalog of DATA tools `resolveStage2Tools`
  * (router.ts) routes by category, and this tool has no data-fetching behavior to route to.
  *
- * #8915 — why there is no DETERMINISTIC (non-model) emission path, only the sharpened prompt/
+ * Why there is no DETERMINISTIC (non-model) emission path, only the sharpened prompt/
  * description guidance above: a deterministic "the turn is ending with nothing useful, auto-emit
  * a suggested_query" backstop was evaluated and declined, for two independent reasons:
  *  1. It already exists, structurally, for the one case where it would be safe to build: every
  *     Indexer-backed tool call (executor.ts's `executeIndexerRequest`) already attaches a
  *     `TableSpec.discover` link to its `table` event UNCONDITIONALLY — rows or not, truncated or
  *     not (common/types.ts's `TableSpec.discover` doc comment). A zero-row or truncated result
- *     from a real tool call this turn is therefore never actually link-less; the gap this issue
- *     reports is that the model's own NARRATION doesn't call it out, which is a prompting problem
+ *     from a real tool call this turn is therefore never actually link-less; the gap here
+ *     is that the model's own NARRATION doesn't call it out, which is a prompting problem
  *     (fixed above), not a missing link.
  *  2. For the two cases that genuinely have no such link, a safe deterministic query cannot be
  *     built without fabricating one: (a) "no tool covers the data at all" means no tool call ever
@@ -52,10 +52,10 @@ import { checkIndexAllowlist } from './guardrails';
  */
 export const SUGGEST_DISCOVER_QUERY_TOOL: ToolSpec = {
   name: 'suggest_discover_query',
-  // #8915: this description previously read as one optional capability among several, and
-  // measured live traffic showed the model never called it — including on the turns it exists
-  // for. It now states plainly that the call is the REQUIRED close-out of an unanswerable turn,
-  // not an extra, and names all three trigger conditions — kept in sync with prompts.ts's
+  // This description states plainly that the call is the REQUIRED close-out of an unanswerable
+  // turn, not an extra — an optional-sounding description measured on live traffic shows the
+  // model never calling it, including on the turns it exists for. It names all three trigger
+  // conditions — kept in sync with prompts.ts's
   // buildSystemPrompt, which states the same three conditions in the system prompt.
   description:
     'The required final step of a turn you cannot fully answer — not an optional extra. Call it ' +
@@ -177,9 +177,30 @@ function timeFieldForIndex(index: string): string {
   return index.startsWith('wazuh-states') ? 'state.modified_at' : '@timestamp';
 }
 
-/** Builds the "index + time range only" fallback clause: everything field-level is dropped, only
- * the time bound survives (falling back to `extractTimeRange`'s own last-24-hours default when the
- * original `dsl` carried no recognizable range at all). */
+/**
+ * Builds the "index + time range only" fallback clause: everything field-level is dropped, only the
+ * time bound survives, read through `extractTimeRange` (common/discover-url.ts).
+ *
+ * What that reader substitutes for a bound the original `dsl` did not state is NOT uniform, and
+ * this function materializes whatever it returns into a real `range` clause the user will run:
+ *  - No recognizable range clause at all -> `extractTimeRange`'s last-24-hours `DEFAULT_TIME_RANGE`.
+ *    (Only this function still defaults that way. The "Open in Discover" LINK no longer does — see
+ *    `resolveDiscoverTimeRange`, which opens a range-less query on all of history instead.)
+ *  - A `gte`-only clause -> the stated lower bound, upper bound filled as `now`.
+ *  - An `lte`-only clause -> the stated upper bound, lower bound filled from the UNBOUNDED window
+ *    (epoch), not from `DEFAULT_TIME_RANGE.from`. Filling it with `now-24h` produced `gte` AFTER
+ *    `lte` for a clause bounded at a past instant — an inverted range matching nothing at all,
+ *    which is worse than a wide one. So an `lte`-only suggestion is emitted as `gte: 1970-01-01…`,
+ *    deliberately: "everything up to the stated instant" is what the clause actually meant.
+ *
+ * That last case also moved the DOWNSTREAM path a re-run suggestion takes. The old inverted clause
+ * was rejected by `lintDsl` ("upper bound before its lower bound"); the epoch-lower clause is
+ * well-formed but very wide, so `clampLookbackWindow` narrows it to the last 90 days before the
+ * stated `lte` and DISCLOSES that, and the re-run succeeds instead of being rejected (`lintDsl`'s
+ * 90-day span rejection is what it meets only on a call site that skips the clamp). Strictly
+ * better — the suggestion now describes a window that can actually be executed — but it is a
+ * different path, not the same one with new text.
+ */
 function buildTimeRangeOnlyDsl(
   index: string,
   dsl: Record<string, unknown>,
@@ -231,11 +252,11 @@ interface QueryClauseAnalysis {
  * DEFAULT-DENY walk over a suggested query's clauses, recursing through
  * `bool.{filter,must,should,must_not}` (each may be a single clause object or an array of them),
  * reading `exists.field` directly and the `FIELD_KEYED_CLAUSES` by their field keys. Any OTHER
- * clause-type key is reported in `unrecognizedClauses` rather than silently skipped: an earlier
- * version of this walk was allowlist-only-with-silent-misses, which meant an invented field
- * inside `query_string`/`multi_match`/`nested`/`constant_score`/... contributed ZERO field names,
- * resolved as fully verified, and shipped to Discover with an unmodified reason — the exact
- * silent-divergence class issue #8920 item 9 is about, through the single most likely clause for
+ * clause-type key is reported in `unrecognizedClauses` rather than silently skipped: an
+ * allowlist-only walk that silently misses unknown clause types would let an invented field
+ * inside `query_string`/`multi_match`/`nested`/`constant_score`/... contribute ZERO field names,
+ * resolve as fully verified, and ship to Discover with an unmodified reason — exactly the
+ * silent-divergence class this walk exists to prevent, through the single most likely clause for
  * a Discover handoff (Discover's own query bar IS a query string). The caller strips-and-
  * discloses (or asks the model to rewrite) on any unrecognized clause; nothing falls through
  * unvalidated.
@@ -303,8 +324,8 @@ function analyzeQueryClauses(clause: unknown): QueryClauseAnalysis {
  * "data.win.eventdata.user") — each segment must start with a letter/underscore (so versions,
  * IPs and "e.g."-style abbreviations under 6 chars never match), and only tokens `_field_caps`
  * then confirms as REAL index fields are treated as promised filters. See `resolveSuggestedDsl`:
- * a reason that names a real field the DSL does not filter on is the issue's literal witness
- * ("the field named in the prose was not filtered on at all"). */
+ * a reason that names a real field the DSL does not filter on is exactly the failure mode this
+ * guards against ("the field named in the prose was not filtered on at all"). */
 const REASON_FIELD_TOKEN_RE = /\b[A-Za-z_@][\w@]*(?:\.[A-Za-z_][\w]*)+\b/g;
 
 function extractReasonFieldTokens(reason: string): string[] {
@@ -314,13 +335,13 @@ function extractReasonFieldTokens(reason: string): string[] {
 
 /**
  * What `resolveSuggestedDsl` found out about a `suggest_discover_query` call's DSL, as a
- * discriminated result rather than bare DSL (issue #8920 items 4/9): the caller (chat.ts) needs to
+ * discriminated result rather than bare DSL: the caller (chat.ts) needs to
  * know WHICH kind of "could not fully verify" happened, because the two are handled differently --
  * `unknown_fields` names field(s) the MODEL chose and can plausibly correct (a bounded
  * self-correction retry, same contract as every other tool), whereas `unverifiable_index` and
  * `no_field_filters` are not the model's fault to fix by retrying with different field names.
  * `strippedDsl` (present on both non-`verified`, non-`no_field_filters` outcomes) is the same
- * index+time-range-only fallback the old bare-DSL return silently produced -- now paired with
+ * index+time-range-only fallback a bare-DSL return would silently produce -- now paired with
  * enough information for the caller to also disclose the strip to the user, per this file's SAFETY
  * DECISION below.
  */
@@ -445,8 +466,8 @@ export async function resolveSuggestedDsl(
 
   try {
     // One `_field_caps` covers both checks: the DSL's own field names AND the reason prose's
-    // candidate tokens (issue #8920 item 9's "validated against its own reason text" half —
-    // only a token that IS a real index field counts as a promised filter).
+    // candidate tokens, validated against its own reason text —
+    // only a token that IS a real index field counts as a promised filter.
     const fieldsToCheck = [
       ...new Set([...analysis.fieldNames, ...reasonTokens]),
     ];

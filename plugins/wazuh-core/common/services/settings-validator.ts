@@ -364,4 +364,152 @@ export class SettingsValidator {
     }
     return undefined;
   }
+
+  /**
+   * Host component of the agent's `<manager><endpoint>` connection target.
+   *
+   * Wider than `serverAddressHostnameFQDNIPv4IPv6`, which predates the
+   * endpoint grammar: IPv6 is accepted compressed as well as uncompressed, and
+   * with or without the brackets the grammar requires, since an operator reads
+   * an address off a console without them. A zone id may follow the address as
+   * `%25<ifname>`, percent-encoded as the agent expects it.
+   *
+   * The endpoint is assembled elsewhere, so the brackets are added there rather
+   * than demanded here -- an unbracketed IPv6 host would make the port
+   * separator ambiguous and the agent rejects it.
+   */
+  static serverEndpointAddress(value: string): string | undefined {
+    if (!value) {
+      return undefined;
+    }
+
+    if (value.length > 255) {
+      return 'It should be shorter than 256 characters.';
+    }
+
+    const isFQDNOrHostname =
+      /^(?!-)(?!.*--)[a-zA-Z0-9áéíóúüñ-]{0,62}[a-zA-Z0-9áéíóúüñ](?:\.[a-zA-Z0-9áéíóúüñ-]{0,62}[a-zA-Z0-9áéíóúüñ]){0,}$/;
+
+    /* Brackets are optional here and stripped before the address is checked;
+    the zone id is split off with them, since it qualifies the address rather
+    than forming part of it. */
+    const bracketed = /^\[(.+)\]$/.exec(value);
+    const host = bracketed ? bracketed[1] : value;
+    const [address, zone, ...extraZones] = host.split('%25');
+
+    if (
+      extraZones.length > 0 ||
+      (zone !== undefined && !/^[\w.-]+$/.test(zone))
+    ) {
+      return 'It should carry at most one zone id, written as %25 followed by the interface name.';
+    }
+
+    if (SettingsValidator.isIPv6(address)) {
+      return undefined;
+    }
+
+    /* A zone id only qualifies an IPv6 address, so anything else carrying one
+    is malformed rather than merely unrecognized. */
+    if (zone !== undefined) {
+      return 'A zone id can only follow an IPv6 address.';
+    }
+
+    if (bracketed) {
+      return 'Brackets should only enclose an IPv6 address.';
+    }
+
+    if (!isFQDNOrHostname.test(address)) {
+      return 'It should be a valid hostname, FQDN, IPv4 or IPv6 address';
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Whether the value is an IPv6 address, compressed (`2001:db8::1`) or
+   * written out in full. Anything with fewer than two colons is not one --
+   * that keeps a bare hostname or an IPv4 address from reaching this check.
+   */
+  private static isIPv6(value: string): boolean {
+    if ((value.match(/:/g) || []).length < 2) {
+      return false;
+    }
+
+    const groups = value.split('::');
+
+    if (groups.length > 2) {
+      return false;
+    }
+
+    const parts = groups.flatMap(group => (group ? group.split(':') : []));
+
+    if (parts.some(part => !/^[0-9a-fA-F]{1,4}$/.test(part))) {
+      return false;
+    }
+
+    /* A compressed address stands for the groups it leaves out, so it must be
+    shorter than the eight an explicit one spells in full. */
+    return groups.length === 2 ? parts.length < 8 : parts.length === 8;
+  }
+
+  /**
+   * Port component of the agent's `<manager><endpoint>` connection target.
+   *
+   * Optional: an empty value means the agent applies its own default
+   * (`AGENT_ENDPOINT_DEFAULT_PORT`), so the component is left out of the
+   * generated endpoint rather than written explicitly.
+   */
+  static serverEndpointPort(value: string): string | undefined {
+    if (!value) {
+      return undefined;
+    }
+
+    if (!/^\d+$/.test(value)) {
+      return 'It should be a number.';
+    }
+
+    const port = Number(value);
+
+    if (port < 1 || port > 65535) {
+      return 'It should be a port number between 1 and 65535.';
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Path prefix component of the agent's `<manager><endpoint>` connection
+   * target, which must route identically on the manager's
+   * `<remote><https><global_prefix>`. The grammar is the one both ends agreed
+   * on: a restricted charset, no empty segments, and no relative segments.
+   *
+   * Optional: an empty value means the agent applies its own default
+   * (`AGENT_ENDPOINT_DEFAULT_PATH`). A lone `/` is the explicit opt-out that
+   * serves unprefixed paths, so it is accepted rather than treated as empty.
+   */
+  static serverEndpointPathPrefix(value: string): string | undefined {
+    if (!value) {
+      return undefined;
+    }
+
+    if (value.length > 128) {
+      return 'It should be shorter than 129 characters.';
+    }
+
+    if (!/^\/?[\w.\-/]*$/.test(value)) {
+      return 'It should only contain letters, numbers, and the characters . _ - /';
+    }
+
+    const segments = value.split('/').filter(segment => segment !== '');
+
+    if (segments.some(segment => segment === '.' || segment === '..')) {
+      return 'It should not contain the segments . or ..';
+    }
+
+    if (/\/{2,}/.test(value)) {
+      return 'It should not contain empty segments.';
+    }
+
+    return undefined;
+  }
 }

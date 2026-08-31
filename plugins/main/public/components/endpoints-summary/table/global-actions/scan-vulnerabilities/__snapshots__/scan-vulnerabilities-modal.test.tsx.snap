@@ -1,0 +1,116 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ScanVulnerabilitiesAgentsModal component should return the component 1`] = `
+<body
+  class="euiBody-hasOverlayMask"
+>
+  <div />
+  <div
+    class="euiOverlayMask euiOverlayMask--aboveHeader"
+  >
+    <div
+      data-eui="EuiFocusTrap"
+    >
+      <div
+        class="euiModal euiModal--maxWidth-default"
+        tabindex="0"
+      >
+        <button
+          aria-label="Closes this modal window"
+          class="euiButtonIcon euiButtonIcon--text euiButtonIcon--empty euiButtonIcon--xSmall euiModal__closeIcon"
+          type="button"
+        >
+          <span
+            aria-hidden="true"
+            class="euiButtonIcon__icon"
+            color="inherit"
+            data-euiicon-type="cross"
+          />
+        </button>
+        <div
+          class="euiModal__flex"
+        >
+          <div
+            class="euiModalHeader"
+          >
+            <div
+              class="euiModalHeader__title"
+            >
+              Scan vulnerabilities of agents
+            </div>
+          </div>
+          <div
+            class="euiModalBody"
+          >
+            <div
+              class="euiModalBody__overflow"
+            >
+              <form
+                class="euiForm"
+              >
+                <div
+                  class="euiFormRow"
+                  id="generated-id-row"
+                >
+                  <div
+                    class="euiFormRow__labelWrapper"
+                  >
+                    <label
+                      class="euiFormLabel euiFormRow__label"
+                      for="generated-id"
+                    >
+                      Selected agents
+                    </label>
+                  </div>
+                  <div
+                    class="euiFormRow__fieldWrapper"
+                  >
+                    <div
+                      class="euiText euiText--medium"
+                      id="generated-id"
+                    >
+                      2
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div
+            class="euiModalFooter"
+          >
+            <button
+              class="euiButtonEmpty euiButtonEmpty--primary"
+              type="button"
+            >
+              <span
+                class="euiButtonContent euiButtonEmpty__content"
+              >
+                <span
+                  class="euiButtonEmpty__text"
+                >
+                  Cancel
+                </span>
+              </span>
+            </button>
+            <button
+              class="euiButton euiButton--primary euiButton--fill"
+              type="button"
+            >
+              <span
+                class="euiButtonContent euiButton__content"
+              >
+                <span
+                  class="euiButton__text"
+                >
+                  Scan
+                </span>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;

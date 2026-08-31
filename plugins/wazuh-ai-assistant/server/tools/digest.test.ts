@@ -52,6 +52,184 @@ test('buildDigest: bare-string affected_items are normalized to {item} rows', ()
   assert.equal(digest.counts.truncated, false);
 });
 
+// UI run 2026-08-14 (A2): get_sca_checks called with a `search` fragment has ZERO hits by design
+// (the fragment lives in post_filter, #8955) but a populated terms aggregation -- so
+// bucketsToRows supplies {key, doc_count} rows while the tool's FIXED columns describe hit
+// documents (check.id/check.name/...). Every declared column resolved undefined on every row:
+// the client rendered 102 em-dashes and `{}` in the row expander. When NO declared column
+// resolves on ANY row, the table must fall back to the derived projection and render the rows
+// as what they are.
+test('buildTableSpec: bucket rows under a fixed-column tool fall back to derived columns instead of an all-empty grid', () => {
+  const def = buildToolDef({
+    tableSpec: {
+      columns: [
+        { field: 'check.id', label: 'Check ID' },
+        { field: 'check.name', label: 'Check' },
+      ],
+    },
+  });
+  const result = {
+    hits: { total: { value: 0 }, hits: [] },
+    aggregations: {
+      matching_checks: {
+        buckets: [
+          { key: 'Ensure sshd is hardened.', doc_count: 1 },
+          { key: 'Ensure sshd DisableForwarding is enabled.', doc_count: 1 },
+        ],
+      },
+    },
+  };
+  // requestBody present WITH a _source list -- the live shape (first deploy caught this: the
+  // fallback derived the _source columns and reproduced the empty grid under new headers).
+  const table = buildTableSpec(result, def, {
+    _source: ['check.id', 'check.name', 'check.result'],
+    size: 50,
+  });
+  assert.equal(table.rows.length, 2);
+  // Derived FROM THE ROWS, never from the request's _source list.
+  const ids = table.columns.map(c => c.id);
+  assert.ok(
+    ids.includes('key'),
+    `derived columns must include "key", got ${ids.join(',')}`,
+  );
+  assert.ok(!ids.includes('check.id'));
+  assert.ok(
+    !ids.includes('check.result'),
+    '_source must not drive the fallback columns',
+  );
+  // The rows carry real values -- the em-dash grid is the regression.
+  assert.equal(table.rows[0].key, 'Ensure sshd is hardened.');
+  assert.equal(table.rows[0].doc_count, 1);
+});
+
+test('buildTableSpec: one resolving declared column keeps the declared shape (no fallback)', () => {
+  const def = buildToolDef({
+    tableSpec: {
+      columns: [
+        { field: 'check.id', label: 'Check ID' },
+        { field: 'check.missing', label: 'Never populated' },
+      ],
+    },
+  });
+  const result = {
+    hits: {
+      total: { value: 1 },
+      hits: [{ _id: 'a', _source: { check: { id: '28500' } } }],
+    },
+  };
+  const table = buildTableSpec(result, def);
+  assert.deepEqual(
+    table.columns.map(c => c.id),
+    ['check.id', 'check.missing'],
+  );
+  assert.equal(table.rows[0]['check.id'], '28500');
+});
+
+// UI run 2026-08-14 (finding 7): get_mitre_summary buckets on technique id and samples a
+// document whose id/name/tactic arrays are parallel. bucketsToRows merged them whole, so T1190
+// and T1068 both displayed the identical name pair and a seven-technique document showed all
+// seven names against one id. The tool's own design comment says a consumer should zip the
+// arrays and pick the index matching the bucket key -- nothing did. `_source` is NESTED (the
+// shape getByPath walks), which is why the alignment recurses.
+test('bucketsToRows: a bucket key inside a parallel array picks the matching element from its siblings', () => {
+  const def = buildToolDef({
+    tableSpec: {
+      columns: [
+        { field: 'key', label: 'Technique ID' },
+        { field: 'wazuh.rule.mitre.technique.name', label: 'Technique' },
+      ],
+    },
+  });
+  const result = {
+    aggregations: {
+      technique_ids: {
+        buckets: [
+          {
+            key: 'T1068',
+            doc_count: 796,
+            sample: {
+              hits: {
+                hits: [
+                  {
+                    _source: {
+                      wazuh: {
+                        rule: {
+                          mitre: {
+                            technique: {
+                              id: ['T1190', 'T1068'],
+                              name: [
+                                'Exploit Public-Facing Application',
+                                'Exploitation for Privilege Escalation',
+                              ],
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      },
+    },
+  };
+  const table = buildTableSpec(result, def);
+  assert.equal(
+    table.rows[0]['wazuh.rule.mitre.technique.name'],
+    'Exploitation for Privilege Escalation',
+    'the name at the SAME index as the bucket key, not the whole array',
+  );
+});
+
+test('bucketsToRows: arrays of a different length are left whole, never guessed at', () => {
+  const def = buildToolDef({
+    tableSpec: {
+      columns: [
+        { field: 'key', label: 'ID' },
+        { field: 'wazuh.rule.mitre.tactic.name', label: 'Tactic' },
+      ],
+    },
+  });
+  const result = {
+    aggregations: {
+      ids: {
+        buckets: [
+          {
+            key: 'T1078',
+            doc_count: 3,
+            sample: {
+              hits: {
+                hits: [
+                  {
+                    _source: {
+                      wazuh: {
+                        rule: {
+                          mitre: {
+                            technique: { id: ['T1078'] },
+                            // A technique can belong to two tactics: NOT parallel to the id.
+                            tactic: { name: ['Persistence', 'Initial Access'] },
+                          },
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      },
+    },
+  };
+  const table = buildTableSpec(result, def);
+  assert.deepEqual(table.rows[0]['wazuh.rule.mitre.tactic.name'], [
+    'Persistence',
+    'Initial Access',
+  ]);
+});
+
 test('buildTableSpec: bare-string affected_items also normalize to {item} rows in the table', () => {
   const def = buildToolDef({
     tableSpec: { columns: [{ field: 'item', label: 'Item' }] },
@@ -297,6 +475,47 @@ test("buildTableSpec: deriveColumns tools prefer the request body's explicit _so
     table.columns.map(c => c.id),
     ['a', 'c'],
   );
+});
+
+// Issue #8921's inconsistent-labels item: get_agent_inventory's `ports` kind derives its columns
+// from its `_source` list (byte-for-byte, get-agent-inventory.ts's own doc comment) -- "source.port"
+// and "destination.port" collide on last segment ("port"), same as "destination.ip"/"source.ip"
+// colliding on "ip". Before this fix both members of a collision fell back to the RAW dot-path
+// label, sitting inconsistently next to non-colliding columns' friendly labels ("State"/"Name"/
+// "Transport" in the same header row). Now every column gets a real label -- a collision is
+// disambiguated with its parent segment instead of degrading to the raw path.
+test('buildTableSpec: deriveColumns tools disambiguate a colliding last segment with the parent segment, never the raw path', () => {
+  const def = buildToolDef({ deriveColumns: true });
+  const result = { hits: { hits: [{ _source: {} }] } };
+  const requestBody = {
+    _source: [
+      'source.port',
+      'interface.state',
+      'process.name',
+      'network.transport',
+      'destination.ip',
+      'source.ip',
+      'destination.port',
+      'process.pid',
+    ],
+  };
+  const table = buildTableSpec(result, def, requestBody);
+  assert.deepEqual(
+    Object.fromEntries(table.columns.map(c => [c.id, c.label])),
+    {
+      'source.port': 'Source Port',
+      'interface.state': 'State',
+      'process.name': 'Name',
+      'network.transport': 'Transport',
+      'destination.ip': 'Destination IP',
+      'source.ip': 'Source IP',
+      'destination.port': 'Destination Port',
+      'process.pid': 'PID',
+    },
+  );
+  // Neither colliding label is ever the bare raw dot-path -- the exact regression this fixes.
+  assert.ok(!table.columns.map(c => c.label).includes('source.port'));
+  assert.ok(!table.columns.map(c => c.label).includes('destination.ip'));
 });
 
 // --- capDigest -------------------------------------------------------------------------------------
@@ -855,7 +1074,7 @@ test('capDigest: an oversized "columns" list forces the Manager message to be dr
   );
 });
 
-// --- #8920 item 5: top-level metric aggregations are no longer dropped -------------------------
+// --- top-level metric aggregations are not dropped -----------------------------------------------
 
 test('isMetricAggValue: accepts {value: number|null}, rejects buckets/hits/non-object shapes', () => {
   assert.equal(isMetricAggValue({ value: 6 }), true);
@@ -1079,8 +1298,8 @@ test('buildDigest: a metric-only response carries metrics AND the synthesized ro
 });
 
 test('buildDigest: a metric agg BEFORE a bucket agg in key order no longer masks the bucket rows', () => {
-  // Reproduces the exact pre-fix defect: Object.keys(aggregations)[0] was "distinct_agents" (no
-  // .buckets), so bucketsToRows used to bail out to `undefined` before ever looking at "by_rule".
+  // Object.keys(aggregations)[0] is "distinct_agents" (no .buckets); bucketsToRows must keep
+  // looking rather than bail out to `undefined` before reaching "by_rule".
   const def = buildToolDef({
     tableSpec: {
       columns: [
@@ -1385,10 +1604,9 @@ test('buildDigest: a 100-bucket long-key aggregation is carried up to the char b
 });
 
 test('buildDigest: a 100-bucket SHORT-key enumeration that fits the budget is carried WHOLE, no note', () => {
-  // Regression pin for the char-budget design itself (issue #8935 integration review): a flat
-  // 50-bucket count cap trimmed a ~2.8k-char rule-id enumeration that demonstrably fit — cutting
-  // by a number when the information fits is the exact class this issue exists to remove. Passes
-  // on base too (base is unbounded); it exists to fail against any future flat count cap.
+  // Regression pin for the char-budget design: a flat 50-bucket count cap would trim a ~2.8k-char
+  // rule-id enumeration that fits the budget — cutting by bucket count when the content fits is
+  // the class of bug this guards against. Exists to fail against any future flat count cap.
   const def = buildToolDef({ digest: { sampleColumns: ['key'] } });
   const result = {
     aggregations: {
@@ -1492,11 +1710,9 @@ test('buildDigest: a multi-agg carry trim attributes hidden buckets to the RIGHT
 });
 
 test('buildDigest: five 100-bucket aggregations stay inside DIGEST_CHAR_CAP with every agg represented', () => {
-  // The GLOBAL-budget pin (issue #8935 integration review): guardrails allows MAX_TOP_LEVEL_AGGS
-  // (5) top-level aggregations, and a PER-AGG cap of 50 long-key entries produced ~21.5k chars —
-  // capDigest then silently deleted whole trailing aggregations behind a note claiming a top-50
-  // list. FAILS ON BASE (500 entries ride through into capDigest's silent pop) and against the
-  // per-agg-flat-cap variant of this fix.
+  // The GLOBAL-budget pin: guardrails allows MAX_TOP_LEVEL_AGGS (5) top-level aggregations, and a
+  // PER-AGG cap of 50 long-key entries produces ~21.5k chars — capDigest must not silently delete
+  // whole trailing aggregations behind a note claiming a top-50 list.
   const def = buildToolDef();
   const aggregations: Record<string, unknown> = {};
   const aggNames = ['by_rule', 'by_agent', 'by_level', 'by_cat', 'by_tech'];
@@ -1675,7 +1891,7 @@ test('buildDigest: a synthetic breakdown with every dimension at or under BREAKD
   assert.ok(!('breakdownNote' in digest));
 });
 
-// --- issue #8935 Guarantee 2: the digest states what its numbers cover, in BOTH directions --------
+// --- the digest states what its numbers cover, in BOTH directions ---------------------------------
 
 test('buildDigest: a complete real breakdown claims the whole matched set and all distinct values', () => {
   // The point of the claim: OpenSearch computes an aggregation over every matched document, so these
@@ -1735,7 +1951,7 @@ test('buildDigest: a sample that IS the whole set is not described as a sample',
   assert.doesNotMatch(digest.coverage!, /a sample of/);
 });
 
-// --- P-2 (AI/plan/a1a-review.md): getByPath must traverse arrays -------------------------------
+// --- getByPath must traverse arrays -------------------------------------------------------------
 
 test('getByPath: resolves a dotted path through an array instead of stopping at it', () => {
   const row = {
@@ -1760,4 +1976,98 @@ test('getByPath: unchanged behavior for a plain object/scalar path (no array on 
   const row = { wazuh: { rule: { title: 'x' } } };
   assert.equal(getByPath(row, 'wazuh.rule.title'), 'x');
   assert.equal(getByPath(row, 'wazuh.rule.missing'), undefined);
+});
+
+// --- DIGEST_FIELD_MAX_LENGTH_DEFAULTS: cross-tool per-field caps ------------------------------
+// `wazuh.rule.description` and `process.command_line` are free prose in finding/event digest
+// samples. They are capped tighter than MAX_FIELD_VALUE_LENGTH here rather than in each of the
+// eleven finding tools, so a twelfth one cannot add the columns and forget the cap. The tool's own
+// `sampleFieldMaxLength` (SCA's precedent) still wins.
+
+/** `getByPath` (digest.ts) splits a dotted column on '.', so a sample source must be NESTED --
+ * a flat `{'wazuh.rule.description': ...}` key would never be found. */
+function ruleDescription(text: string): Record<string, unknown> {
+  return { wazuh: { rule: { description: text } } };
+}
+
+function digestWithSample(
+  sample: Record<string, unknown>,
+  def: ToolDefinition,
+): Digest {
+  return buildDigest(
+    'test_tool',
+    { data: { affected_items: [sample], total_affected_items: 1 } },
+    def,
+  );
+}
+
+test('buildDigest: wazuh.rule.description is capped at 240 chars, not the generic 500', () => {
+  const def = buildToolDef({
+    digest: { sampleColumns: ['wazuh.rule.description'] },
+  });
+  const digest = digestWithSample(ruleDescription('d'.repeat(400)), def);
+  const value = digest.samples[0]['wazuh.rule.description'] as string;
+  // 240 characters plus the one-character ellipsis the truncation appends.
+  assert.equal(value.length, 241);
+  assert.ok(value.endsWith('…'));
+});
+
+test('buildDigest: process.command_line is capped at 200 chars', () => {
+  const def = buildToolDef({
+    digest: { sampleColumns: ['process.command_line'] },
+  });
+  const digest = digestWithSample(
+    { process: { command_line: `/bin/sh -c ${'x'.repeat(400)}` } },
+    def,
+  );
+  const value = digest.samples[0]['process.command_line'] as string;
+  assert.equal(value.length, 201);
+});
+
+test('buildDigest: a short real description is left untouched', () => {
+  const real =
+    'Detects execution of a command via sudo privilege escalation on Linux/macOS. While common in ' +
+    'legitimate administration, sudo usage by unexpected users, at unusual hours, or for sensitive ' +
+    'commands warrants investigation.';
+  const def = buildToolDef({
+    digest: { sampleColumns: ['wazuh.rule.description'] },
+  });
+  const digest = digestWithSample(ruleDescription(real), def);
+  assert.equal(digest.samples[0]['wazuh.rule.description'], real);
+});
+
+test("buildDigest: a tool's OWN sampleFieldMaxLength still overrides the shared default", () => {
+  const def = buildToolDef({
+    digest: {
+      sampleColumns: ['wazuh.rule.description'],
+      sampleFieldMaxLength: { 'wazuh.rule.description': 20 },
+    },
+  });
+  const digest = digestWithSample(ruleDescription('d'.repeat(400)), def);
+  assert.equal(
+    (digest.samples[0]['wazuh.rule.description'] as string).length,
+    21,
+  );
+});
+
+// `vulnerability.description` is on the same shared cap layer for the same reason: it is a digest
+// sample column on every vulnerability tool (catalog/common.ts's VULN_DIGEST_SAMPLE_COLUMNS) and it
+// is third-party CNA/NVD prose that can run long.
+test('buildDigest: vulnerability.description is capped at 240 chars, not the generic 500', () => {
+  const def = buildToolDef({
+    digest: { sampleColumns: ['vulnerability.description'] },
+  });
+  const digest = digestWithSample(
+    { vulnerability: { description: 'v'.repeat(900) } },
+    def,
+  );
+  const value = digest.samples[0]['vulnerability.description'] as string;
+  assert.equal(value.length, 241);
+  assert.ok(value.endsWith('…'));
+});
+
+test('buildDigest: an unlisted field still falls back to the generic 500-char cap', () => {
+  const def = buildToolDef({ digest: { sampleColumns: ['other'] } });
+  const digest = digestWithSample({ other: 'z'.repeat(900) }, def);
+  assert.equal((digest.samples[0].other as string).length, 501);
 });

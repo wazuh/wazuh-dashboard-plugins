@@ -14,9 +14,9 @@ import {
  * `generic-query-families.ts` is this tool's own single source of truth for which families that
  * is, kept in lockstep with `guardrails.ts`'s `checkIndexAllowlist`.
  *
- * Workstream A1a (AI/plan/coverage-validation-design.md): the product decision is ONE tool that
- * grows to cover every family with real data, not a new one-off typed tool per family — see that
- * file's mission statement. The families a typed tool already owns (findings-v5/events-v5's ~30
+ * The product decision is ONE tool that
+ * grows to cover every family with real data, not a new one-off typed tool per family. The
+ * families a typed tool already owns (findings-v5/events-v5's ~30
  * curated tools, the threatintel rules/decoders/integrations/policies/filters/kvdbs sub-families,
  * `.opensearch-sap-detectors-config`) are deliberately NOT re-listed in this tool's own enum: this
  * escape hatch only ever grows into a gap a typed tool leaves open, never competes with one for
@@ -30,9 +30,9 @@ import {
  * true` (below) opts this tool into `field-validation.ts`'s LIVE `_field_caps` check, which
  * already generalizes to every index pattern this tool can ever target with no per-family code —
  * a real mapping check (not a schema guess) with the same "closest known field" suggestion
- * mechanism workstream B built for `get_field_values` (`findNearMisses` there / `suggestCloseFields`
- * here — same shape, same intent: never make the model spend its bounded retry on a bare "zero
- * rows" with no hint of what it actually should have asked for).
+ * mechanism `get_field_values` uses (`findNearMisses` there / `suggestCloseFields` here — same
+ * shape, same intent: never make the model spend its bounded retry on a bare "zero rows" with no
+ * hint of what it actually should have asked for).
  *
  * This tool does NOT lint or clamp anything itself beyond that. `executeIndexerRequest` in
  * executor.ts runs `checkIndexAllowlist` + `applySafetyValves` + `lintDsl` on every indexer
@@ -48,7 +48,7 @@ import {
  * so this is the one call site where a made-up field name (e.g. "agent.name.keyword") is actually
  * reachable.
  *
- * CHAINING (mission item 5): the model's own bounded-retry loop is this codebase's "declared
+ * CHAINING: the model's own bounded-retry loop is this codebase's "declared
  * chain" mechanism (there is no separate registry-level chain graph — see e.g. guardrails.ts's
  * `VULN_FIELD_ON_FINDINGS_REASON`, which redirects a misrouted query to the right tool BY NAME in
  * its rejection text). This tool's own description below names `get_field_values` explicitly for
@@ -76,7 +76,12 @@ export const searchWazuhDataTool: ToolDefinition = {
       'parameter below for every family this can reach: findings, events, current-state ' +
       '(vulnerabilities/FIM/SCA/inventory), operational metrics, CTI feed status, Security ' +
       'Analytics findings/rule catalog, and the raw threat-intel CVE/IOC feeds). Prefer a typed ' +
-      'tool first when one matches the question — this tool never overrides one. Executes a ' +
+      'tool first when one matches the question — this tool never overrides one. Use it ONLY ' +
+      'when no dedicated tool covers the surface the question is about: a typed tool returns ' +
+      'curated, labelled columns and population-true totals this tool cannot, so reaching here ' +
+      'while a named tool covers the ask produces a worse answer even when both find the same ' +
+      "rows. In particular, never pick this tool merely to avoid a typed tool's parameters. " +
+      'Executes a ' +
       'read-only _search; nothing is written or modified. All constraints below are re-checked ' +
       'and clamped server-side, and a violation is returned to you as an error you can correct ' +
       'and retry once: use filter context (bool.filter; "must" is accepted but ' +
@@ -163,9 +168,9 @@ export const searchWazuhDataTool: ToolDefinition = {
   digest: { sampleColumns: [] },
   deriveColumns: true,
   // The genuine escape hatch: the model's own DSL can put ANY finding/event/state field into the
-  // digest, so an unlisted field must fail closed (issue #8917 -- see
-  // `ToolDefinition.failClosedFieldPolicy`'s doc comment, types.ts; this used to be inherited from
-  // `deriveColumns` above, now explicit). Do not set this to `false` -- that would remove the
+  // digest, so an unlisted field must fail closed (see
+  // `ToolDefinition.failClosedFieldPolicy`'s doc comment, types.ts -- set explicitly here rather
+  // than inherited from `deriveColumns` above). Do not set this to `false` -- that would remove the
   // fail-closed protection this tool has always had.
   failClosedFieldPolicy: true,
   validateFieldNames: true,

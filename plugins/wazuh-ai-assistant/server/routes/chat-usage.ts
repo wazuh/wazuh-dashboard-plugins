@@ -47,9 +47,8 @@ export function addUsage(
 /**
  * Converts accumulated totals into the `StreamEvent['done']['usage']` shape the client expects.
  * Returns `undefined` (rather than `{inputTokens: 0, outputTokens: 0}`) when nothing was ever
- * accumulated, so a turn where no call reported usage looks the same on the wire as it did before
- * this accumulator existed — an adapter/provider that never reports usage must not start claiming
- * "0 tokens" where it previously claimed nothing.
+ * accumulated, so a turn where no call reported usage carries no usage field at all — an
+ * adapter/provider that never reports usage must not appear to claim "0 tokens".
  */
 export function toStreamUsage(totals: UsageTotals): StreamUsage | undefined {
   if (totals.inputTokens === 0 && totals.outputTokens === 0) {

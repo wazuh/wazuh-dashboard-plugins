@@ -19,3 +19,21 @@ export function setApiKeyCipher(cipher: ApiKeyCipher): void {
 export function getApiKeyCipher(): ApiKeyCipher {
   return apiKeyCipher;
 }
+
+/**
+ * Getter/setter singleton for the settings/providers admin lock
+ * (`wazuh_ai_assistant.settingsReadOnly`, server/config.ts). Defaults to `false` (not locked) —
+ * the same safe-default reasoning as `apiKeyCipher` above: a route handler that somehow runs
+ * before plugin.ts's setup() resolves the config observable must never wrongly block a write.
+ * plugin.ts's setup() always calls `setSettingsReadOnly` with the real, config-derived value
+ * before routes are registered/served.
+ */
+let settingsReadOnly = false;
+
+export function setSettingsReadOnly(value: boolean): void {
+  settingsReadOnly = value;
+}
+
+export function isSettingsReadOnly(): boolean {
+  return settingsReadOnly;
+}

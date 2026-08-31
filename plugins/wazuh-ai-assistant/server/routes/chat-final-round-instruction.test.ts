@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { ChatMessage } from '../../common/types';
 import {
   FINAL_ROUND_ANSWER_INSTRUCTION,
+  ROUND_TEXT_SEPARATOR,
   MAX_TOOL_ROUNDS,
   shouldEnterFinalRoundEarly,
   willBeFinalRound,
@@ -9,12 +10,11 @@ import {
 } from './chat';
 
 /**
- * Issue #8893: a turn that exhausted the tool-round budget ended with no model-written text at all.
- * Dropping `tools` on the final round terminates the tool loop but never ASKS for a conclusion, so
- * the model rationally produced nothing and the user got the `!sawAnyDelta` fallback copy sitting
- * above a populated results table (4 of 6 such turns in a 40-question persona bank).
- * `withFinalRoundAnswerInstruction` is chat.ts's fix, kept pure so the decision is testable without
- * standing up a fake `orchestrate` run.
+ * A turn that exhausts the tool-round budget can end with no model-written text at all: dropping
+ * `tools` on the final round terminates the tool loop but never ASKS for a conclusion, so the
+ * model rationally produces nothing and the user gets the `!roundSawAnyDelta` fallback copy
+ * sitting above a populated results table. `withFinalRoundAnswerInstruction` addresses this, kept
+ * pure so the decision is testable without standing up a fake `orchestrate` run.
  *
  * NOTE (needs the OSD tree to actually run): server/routes/chat.ts imports
  * `../../../../src/core/server` and `@osd/config-schema`, which only resolve inside the full
@@ -47,9 +47,31 @@ test('withFinalRoundAnswerInstruction: appends the instruction on the final roun
     'exactly one message is added, never more',
   );
   assert.deepEqual(out[out.length - 1], {
-    role: 'system',
+    role: 'user',
     content: FINAL_ROUND_ANSWER_INSTRUCTION,
   });
+});
+
+// The role is the mechanism, not a detail: a `system`-role message is NOT at the conversation tail
+// on the Anthropic Messages API -- providers/anthropic.ts filters every system message out of
+// `messages` and joins them into the request's top-level `system` field, so the instruction lands in
+// the prompt PREFIX while the last thing the model reads stays a `tool_result` it may treat as a
+// finished turn. This test pins the wire position so a "tidy the roles up" edit cannot hoist it back
+// into the system field.
+test('withFinalRoundAnswerInstruction: the instruction is delivered as a trailing USER message, never a system one', () => {
+  const out = withFinalRoundAnswerInstruction(conversation(), true, true);
+  assert.equal(
+    out[out.length - 1].role,
+    'user',
+    'a system-role message is hoisted out of the conversation by anthropic.ts and never reaches the tail',
+  );
+  assert.ok(
+    !out.some(
+      message =>
+        message.role === 'system' &&
+        message.content === FINAL_ROUND_ANSWER_INSTRUCTION,
+    ),
+  );
 });
 
 test('withFinalRoundAnswerInstruction: the instruction goes LAST, after the tool results', () => {
@@ -94,7 +116,7 @@ test('withFinalRoundAnswerInstruction: never mutates the caller array', () => {
   );
 });
 
-// --- shouldEnterFinalRoundEarly (issue #8911) --------------------------------------------------
+// --- shouldEnterFinalRoundEarly ------------------------------------------------------------------
 //
 // A tool round with only rejected/errored calls burns the same round budget as a productive one.
 // `shouldEnterFinalRoundEarly` decides whether the round that just finished should make the NEXT
@@ -148,7 +170,7 @@ test('shouldEnterFinalRoundEarly: a round with no tool calls at all never forces
   );
 });
 
-// --- willBeFinalRound (review fix F2, AI/plan/c-review.md): the single predicate shared by
+// --- willBeFinalRound: the single predicate shared by
 // `isFinalRound` and the `suggest_discover_query` round-aware retry gate ------------------------
 
 test('willBeFinalRound: true once round reaches the structural MAX_TOOL_ROUNDS cap', () => {
@@ -156,7 +178,7 @@ test('willBeFinalRound: true once round reaches the structural MAX_TOOL_ROUNDS c
   assert.equal(willBeFinalRound(MAX_TOOL_ROUNDS - 1, false, false), false);
 });
 
-test('willBeFinalRound: true whenever #8911/F3 already latched forceFinalRoundEarly, regardless of round index', () => {
+test('willBeFinalRound: true whenever forceFinalRoundEarly is already latched, regardless of round index', () => {
   assert.equal(willBeFinalRound(0, true, false), true);
 });
 
@@ -168,17 +190,102 @@ test('willBeFinalRound: false when neither latch is set and the structural cap h
   assert.equal(willBeFinalRound(1, false, false), false);
 });
 
-test('FINAL_ROUND_ANSWER_INSTRUCTION: constrains the model to the gathered results', () => {
+test('FINAL_ROUND_ANSWER_INSTRUCTION: constrains every FACT to the gathered results', () => {
   // Guards the anti-fabrication property against a well-meaning future reword. Asking a model for
   // an answer it cannot support is how invented counts and agent names appear — the instruction has
   // to buy analysis WITHOUT buying invention, and has to leave the honest "I can't answer" reachable.
+  // The grounding clause is scoped to "every FACT about this environment", not to "only the tool
+  // results" (which also bans interpretation), so this assertion pins the DATA scope explicitly --
+  // see the advisory test below for the other half.
   assert.match(
     FINAL_ROUND_ANSWER_INSTRUCTION,
-    /only the tool results already gathered/i,
+    /Every FACT about this environment/,
   );
   assert.match(
     FINAL_ROUND_ANSWER_INSTRUCTION,
-    /do not state anything the results do not show/i,
+    /must come from the tool results already gathered/i,
+  );
+  // The enumeration must stay OPEN. A closed list ("counts, names, ids, entities, timestamps,
+  // statuses") would be narrower than a blanket ban: CVSS scores, package versions, IPs, ports,
+  // file paths and SCA control numbers would all fall outside it, and a model reads a closed list
+  // as the boundary of the rule. Pin the non-exhaustiveness and the catch-all, not the examples.
+  assert.match(FINAL_ROUND_ANSWER_INSTRUCTION, /including but not limited to/i);
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /any other data point describing what is in this deployment/i,
+  );
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /never state a data point the results do not show/i,
   );
   assert.match(FINAL_ROUND_ANSWER_INSTRUCTION, /say so plainly/i);
+  // On the forced final round the model can answer AND announce further work -- e.g. "Let me
+  // pull the same window broken down over time" -- and then the turn ends, because no round is
+  // left to keep that promise, unless the instruction explicitly forbids announcing further work.
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /do\s+not announce further data pulls/i,
+  );
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /no\s+more tool calls will run/i,
+  );
+});
+
+// This instruction lands on the round where an "explain this event / how do we protect against it"
+// answer has to be written, and a blanket grounding rule forbids exactly the knowledge such an
+// answer needs (what a technique is, what mitigates it) -- knowledge no tool in this product
+// returns. The two properties below must hold TOGETHER: advisory content is unlocked, and it is
+// fenced so it can never be read as observed data. A reword that drops either one breaks a whole
+// question class or opens a fabrication path.
+test('FINAL_ROUND_ANSWER_INSTRUCTION: permits general security knowledge for the explanatory half', () => {
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /MAY use your general security knowledge/,
+  );
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /why it matters, how that class of activity is typically detected, or how to protect against it/i,
+  );
+  // Detection provenance is NOT on the advisory side. "How it is detected" as a licensed knowledge
+  // topic invites an invented rule id or detector name when only get_mitre_findings ran, so the
+  // generic case is knowledge and the deployment-specific one stays a grounded fact.
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /What detected something HERE \(rule ids, rule titles, detectors\) is one of those facts, not general knowledge/,
+  );
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /if the results do not name it, say so instead of guessing/i,
+  );
+});
+
+test('FINAL_ROUND_ANSWER_INSTRUCTION: fences that knowledge off from observed data', () => {
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /clearly separate part of the answer/i,
+  );
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /framed as guidance rather than as something observed in the data/i,
+  );
+  // Mirrors the shipped Group E how-to policy in prompts.ts (answer from general knowledge, but
+  // say it needs verifying) rather than inventing a second, divergent disclaimer rule.
+  assert.match(FINAL_ROUND_ANSWER_INSTRUCTION, /verified before acting on it/i);
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /Never present general knowledge as an environment fact/i,
+  );
+  assert.match(
+    FINAL_ROUND_ANSWER_INSTRUCTION,
+    /never invent data to support it/i,
+  );
+});
+
+// Every round's text lands in ONE client bubble, so a round that narrates before calling a tool
+// can run straight into the next round's answer -- e.g. "...for it.The most frequent finding...",
+// fused mid-word, with one bubble restating itself with two different counts. A markdown
+// paragraph break is the minimum separation; a single newline would not render as one.
+test('ROUND_TEXT_SEPARATOR: a markdown paragraph break, not a bare newline', () => {
+  assert.equal(ROUND_TEXT_SEPARATOR, '\n\n');
 });
