@@ -10,6 +10,7 @@ import {
   prescanAndMintToolContent,
   scrubKnownEntities,
   scrubFieldValue,
+  dropNeverFields,
   FieldPolicyEntry,
   FIELD_POLICY_DEFAULTS,
   IDENTIFIER_BEARING_FREE_TEXT_FIELDS,
@@ -3341,4 +3342,165 @@ test('scrubKnownEntities: a genuine identifier is still masked after the stop-li
       `${value} was NOT masked`,
     );
   }
+});
+
+// --- dropNeverFields (privacy-off egress deny) -------------------------------------------------
+
+/**
+ * `never` is a categorical egress deny, not a pseudonymization refinement, so it is enforced
+ * whether or not privacy mode is on. These cover the privacy-OFF pass: only 'never' acts, and
+ * every other action is left alone (no pseudonymizer exists on that path).
+ */
+test('dropNeverFields: drops a "never" field and leaves every other value in clear', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: WAZUH_FIELD.AGENT_NAME, action: 'never' },
+    { field: 'source.ip', action: 'anonymize', kind: 'IP' },
+  ];
+  const out = dropNeverFields(
+    baseDigest({
+      samples: [
+        {
+          [WAZUH_FIELD.AGENT_NAME]: 'node1-agent',
+          'source.ip': '198.51.100.10',
+          'rule.id': '5710',
+        },
+      ],
+      columns: [WAZUH_FIELD.AGENT_NAME, 'source.ip', 'rule.id'],
+    }),
+    policy,
+  );
+  // The 'never' field is gone; the 'anonymize' one keeps its REAL value — with privacy off there
+  // is no pseudonymizer, and anonymize is scoped to privacy mode by design.
+  assert.deepEqual(out.samples, [
+    { 'source.ip': '198.51.100.10', 'rule.id': '5710' },
+  ]);
+  // 'never' hides the field's EXISTENCE too, same contract as under privacy mode.
+  assert.deepEqual(out.columns, ['source.ip', 'rule.id']);
+});
+
+test('dropNeverFields: a policy with no "never" entry returns the digest untouched', () => {
+  // The load-bearing regression guard: FIELD_POLICY_DEFAULTS carries no 'never' entry, so this
+  // pass must be a no-op for a default installation's privacy-off digest.
+  const digest = baseDigest({
+    samples: [{ [WAZUH_FIELD.AGENT_NAME]: 'node1-agent', 'rule.id': '5710' }],
+    columns: [WAZUH_FIELD.AGENT_NAME, 'rule.id'],
+    breakdown: [{ key: 'node1-agent', count: 12 }],
+    message: 'raw message from 10.0.2.15',
+  });
+  const out = dropNeverFields(digest, FIELD_POLICY_DEFAULTS, {
+    top_agents: scalarSpec(WAZUH_FIELD.AGENT_NAME),
+  });
+  assert.deepEqual(out, digest);
+});
+
+test('dropNeverFields: resolves entries tool-scoped, like applyFieldPolicy', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'get_agents/name', action: 'never' },
+  ];
+  const digest = baseDigest({
+    samples: [{ name: 'node1-agent', id: '007' }],
+    columns: ['name', 'id'],
+  });
+  const scoped = dropNeverFields(digest, policy, undefined, 'get_agents');
+  assert.deepEqual(scoped.samples, [{ id: '007' }]);
+  assert.deepEqual(scoped.columns, ['id']);
+  // Another tool's identically-named field is untouched by that scoped entry.
+  const other = dropNeverFields(
+    digest,
+    policy,
+    undefined,
+    'get_agent_packages',
+  );
+  assert.deepEqual(other.samples, [{ name: 'node1-agent', id: '007' }]);
+});
+
+test('dropNeverFields: drops the "key" sample of an aggregation over a "never" field', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: WAZUH_FIELD.AGENT_NAME, action: 'never' },
+  ];
+  const out = dropNeverFields(
+    baseDigest({ samples: [{ key: 'node1-agent', doc_count: 42 }] }),
+    policy,
+    { top_agents: scalarSpec(WAZUH_FIELD.AGENT_NAME) },
+  );
+  assert.deepEqual(out.samples, [{ doc_count: 42 }]);
+});
+
+test('dropNeverFields: a scalar "never" agg drops its buckets, and the note with them', () => {
+  const policy: FieldPolicyEntry[] = [{ field: 'data.srcip', action: 'never' }];
+  const out = dropNeverFields(
+    baseDigest({
+      breakdown: [
+        { key: '198.51.100.10', count: 12 },
+        { key: '198.51.100.11', count: 3 },
+      ],
+      breakdownNote: 'showing top 2 of 40',
+    }),
+    policy,
+    { by_ip: scalarSpec('data.srcip') },
+  );
+  // Every bucket dropped means NO breakdown at all — and a note asserting counts about a list
+  // that is no longer in the payload must go with it (same invariant applyFieldPolicy keeps).
+  assert.equal(out.breakdown, undefined);
+  assert.equal(out.breakdownNote, undefined);
+});
+
+test('dropNeverFields: multi_terms drops the WHOLE bucket when any component is "never"', () => {
+  // Positional array: omitting one slot would misalign the rest with their own fields.
+  const policy: FieldPolicyEntry[] = [
+    { field: 'source.ip', action: 'never' },
+    { field: 'wazuh.agent.id', action: 'allow' },
+  ];
+  const out = dropNeverFields(
+    baseDigest({
+      breakdown: [
+        { key: ['198.51.100.10', '007'], count: 12 },
+        { key: ['198.51.100.11', '008'], count: 3 },
+      ],
+    }),
+    policy,
+    {
+      by_ip_and_agent: {
+        kind: 'multi' as const,
+        fields: ['source.ip', 'wazuh.agent.id'],
+      },
+    },
+  );
+  assert.equal(out.breakdown, undefined);
+});
+
+test('dropNeverFields: composite omits only the "never" named component', () => {
+  // Each property is independently labeled, so dropping one leaves the rest attributable.
+  const policy: FieldPolicyEntry[] = [
+    { field: 'source.ip', action: 'never' },
+    { field: 'wazuh.agent.id', action: 'allow' },
+  ];
+  const out = dropNeverFields(
+    baseDigest({
+      breakdown: [{ key: { ip: '198.51.100.10', agent: '007' }, count: 12 }],
+    }),
+    policy,
+    {
+      by_ip_and_agent: {
+        kind: 'composite' as const,
+        fields: { ip: 'source.ip', agent: 'wazuh.agent.id' },
+      },
+    },
+  );
+  assert.ok(out.breakdown);
+  assert.deepEqual(out.breakdown![0].key, { agent: '007' });
+});
+
+test('dropNeverFields: a fieldless date_histogram breakdown passes through untouched', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: WAZUH_FIELD.AGENT_NAME, action: 'never' },
+  ];
+  const out = dropNeverFields(
+    baseDigest({ breakdown: [{ key: '2026-07-31T00:00:00.000Z', count: 42 }] }),
+    policy,
+    { over_time: undefined },
+  );
+  assert.deepEqual(out.breakdown, [
+    { key: '2026-07-31T00:00:00.000Z', count: 42 },
+  ]);
 });
