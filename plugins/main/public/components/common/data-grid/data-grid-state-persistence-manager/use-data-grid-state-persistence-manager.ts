@@ -66,6 +66,42 @@ export const useDataGridStatePersistenceManager = ({
     [indexPatternExists],
   );
 
+  const sanitizeColumns = (
+    columnIds: DataGridState['columns'],
+  ): DataGridState['columns'] => {
+    if (!columnIds || !Array.isArray(columnIds)) {
+      return [];
+    }
+
+    const canCheckExistence = Boolean(
+      indexPatternExists &&
+        columnSchemaDefinitionsMap &&
+        Object.keys(columnSchemaDefinitionsMap).length > 0,
+    );
+    const seenColumnIds = new Set<string>();
+
+    return columnIds.filter(columnId => {
+      if (typeof columnId !== 'string' || columnId.length === 0) {
+        return false;
+      }
+
+      if (seenColumnIds.has(columnId)) {
+        return false;
+      }
+
+      if (
+        canCheckExistence &&
+        columnSchemaDefinitionsMap[columnId] === undefined
+      ) {
+        return false;
+      }
+
+      seenColumnIds.add(columnId);
+
+      return true;
+    });
+  };
+
   const validateColumnsState = (columnIds: DataGridState['columns']) => {
     // Validate that the state is an array
     if (!Array.isArray(columnIds)) {
@@ -183,9 +219,11 @@ export const useDataGridStatePersistenceManager = ({
     try {
       validateColumnsState(state.columns ?? []);
     } catch {
-      state.columns = [];
-      updateState({ columns: [] });
-      console.warn('Columns state was invalid, resetting to default.');
+      const sanitizedColumns = sanitizeColumns(state.columns ?? []);
+
+      state.columns = sanitizedColumns;
+      updateState({ columns: sanitizedColumns });
+      console.warn('Columns state was invalid, removed the invalid columns.');
     }
 
     try {

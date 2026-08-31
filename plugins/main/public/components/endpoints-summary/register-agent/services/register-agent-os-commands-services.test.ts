@@ -20,7 +20,7 @@ beforeEach(() => {
     optionals: {
       agentGroups: "WAZUH_AGENT_GROUP='default'",
       agentName: "WAZUH_AGENT_NAME='test'",
-      serverAddress: "WAZUH_MANAGER='1.1.1.1'",
+      serverAddress: "WAZUH_MANAGER_ENDPOINT='1.1.1.1:1517/wazuh-manager/'",
       wazuhPassword: "WAZUH_REGISTRATION_PASSWORD='<CUSTOM_PASSWORD>'",
     },
     urlPackage: 'https://test.com/agent.deb',
@@ -40,10 +40,9 @@ describe('getAllOptionals', () => {
       wazuhPassword: 'password',
       agentGroups: 'group1',
       agentName: 'agent1',
-      protocol: 'http',
     };
     const result = getAllOptionals(optionals, 'linux');
-    expect(result).toBe('localhost password group1 agent1 http ');
+    expect(result).toBe('localhost password group1 agent1 ');
   });
 });
 
@@ -55,7 +54,6 @@ describe('getDEBAMD64InstallCommand', () => {
         wazuhPassword: 'password',
         agentGroups: 'group1',
         agentName: 'agent1',
-        protocol: 'http',
       },
       urlPackage: 'https://example.com/package.deb',
       packageName: 'wazuh-agent_4.0.0-beta2_amd64.deb',
@@ -63,7 +61,7 @@ describe('getDEBAMD64InstallCommand', () => {
     };
     const result = getDEBAMD64InstallCommand(props);
     expect(result).toBe(
-      'wget https://example.com/package.deb && sudo localhost password group1 agent1 http dpkg -i ./wazuh-agent_4.0.0-beta2_amd64.deb',
+      'wget https://example.com/package.deb && sudo localhost password group1 agent1 dpkg -i ./wazuh-agent_4.0.0-beta2_amd64.deb',
     );
   });
 });
@@ -190,21 +188,20 @@ describe('getAllOptionalsMacos', () => {
       serverAddress: 'localhost',
       agentGroups: 'group1',
       agentName: 'agent1',
-      protocol: 'http',
       wazuhPassword: 'password',
     };
     const result = getAllOptionalsMacos(optionals);
-    expect(result).toBe('localhost && group1 && agent1 && http && password');
+    expect(result).toBe('localhost && group1 && agent1 && password');
   });
 });
 
 describe('transformOptionalsParamatersMacOSCommand', () => {
   it('should transform the command correctly', () => {
     const command =
-      "' serverAddress && agentGroups && agentName && protocol && wazuhPassword";
+      "' serverAddress && agentGroups && agentName && wazuhPassword";
     const result = transformOptionalsParamatersMacOSCommand(command);
     expect(result).toBe(
-      "' && serverAddress && agentGroups && agentName && protocol && wazuhPassword",
+      "' && serverAddress && agentGroups && agentName && wazuhPassword",
     );
   });
 });

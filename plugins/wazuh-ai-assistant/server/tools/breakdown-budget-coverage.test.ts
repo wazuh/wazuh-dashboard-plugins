@@ -11,7 +11,7 @@ import {
 import { IndexerRequest, ToolDefinition } from './types';
 
 /**
- * Class-level guard for issue #8935 item 1: NO tool may build a top-level BUCKET aggregation
+ * Class-level guard: NO tool may build a top-level BUCKET aggregation
  * larger than the side-disclosure budget (`BREAKDOWN_BUCKET_CAP`, 5 — i.e. an aggregation that IS
  * the answer, not a side note attached to a hits-shaped result) whose response the digest cannot
  * carry up to its char budget (`BREAKDOWN_CHAR_BUDGET`) with every trim disclosed, inside
@@ -25,11 +25,9 @@ import { IndexerRequest, ToolDefinition } from './types';
  * happens to be large enough in bytes. A future tool that requests any enumeration-sized
  * aggregation inherits the same silent-overrun risk unless this sweep catches it first.
  *
- * SHAPE COVERAGE (issue #8935 integration review — the first cut of this sweep matched only a
- * literal `terms` object with a string `field`, which structurally exempted every shape
- * `capBreakdownCarry` actually handles): `buildBreakdown` carries buckets from ANY top-level agg
- * with a `buckets` array, so this sweep must recognize every bucket-producing aggregation type the
- * guardrails allow through — sized (`terms`, `multi_terms`, `composite`) AND unsized
+ * SHAPE COVERAGE: `buildBreakdown` carries buckets from ANY top-level agg with a `buckets` array,
+ * so this sweep must recognize every bucket-producing aggregation type the guardrails allow
+ * through — sized (`terms`, `multi_terms`, `composite`) AND unsized
  * (`date_histogram`, `histogram`, `range`, which guardrails caps by interval/shape but never by
  * bucket COUNT; a 1-minute `date_histogram` over 7 days returns 10,080 buckets). Unsized shapes
  * are exercised at `UNSIZED_SYNTHETIC_BUCKETS` buckets. The escape hatch's `query_dsl` sample
@@ -153,7 +151,7 @@ function carryCost(entries: Array<Record<string, unknown>>): number {
  * self-test below can feed it a fabricated violation directly (see that test) — proving this check
  * is capable of failing, not merely capable of passing every real tool in the registry today.
  *
- * Beyond "capped and disclosed", this asserts (issue #8935 integration review):
+ * Beyond "capped and disclosed", this asserts:
  *  - CARRY MAXIMALITY: when anything was hidden, one more bucket would not have fit the budget —
  *    so a regression that trimmed an enumeration back to 5 buckets behind a note cannot pass;
  *  - NOTE EXACTNESS: the disclosed remainder equals the summed hidden doc_counts and the hidden

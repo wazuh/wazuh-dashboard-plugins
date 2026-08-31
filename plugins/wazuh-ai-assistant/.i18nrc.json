@@ -1,5 +1,5 @@
 {
   "prefix": "wazuhAiAssistant",
   "paths": { "wazuhAiAssistant": "." },
-  "translations": ["translations/en-US.json", "translations/es-ES.json"]
+  "translations": []
 }

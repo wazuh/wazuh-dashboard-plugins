@@ -333,6 +333,21 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
               !!commentKey && editingCommentKey === commentKey;
             const wasEdited =
               comment.updated_at && comment.updated_at !== comment.created_at;
+            const timestamp = comment.created_at ? (
+              <>
+                {formatUIDate(comment.created_at)}
+                {wasEdited && (
+                  <>
+                    {' - '}
+                    <EuiToolTip
+                      content={formatUIDate(comment.updated_at as string)}
+                    >
+                      <em>Edited</em>
+                    </EuiToolTip>
+                  </>
+                )}
+              </>
+            ) : undefined;
 
             return (
               <EuiComment
@@ -341,12 +356,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                 timelineIcon={
                   <EuiAvatar size='l' name={comment.author ?? '—'} />
                 }
-                timestamp={
-                  comment.created_at
-                    ? formatUIDate(comment.created_at)
-                    : undefined
-                }
-                event={wasEdited ? 'edited' : undefined}
+                timestamp={timestamp}
                 actions={
                   isOwn && !isEditingThis ? (
                     <EuiFlexGroup

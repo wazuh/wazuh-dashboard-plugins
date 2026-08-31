@@ -338,7 +338,7 @@ export const RuleEditor = ({
               <span>Assign roles to users who match these rules. </span>
               <EuiLink
                 href={webDocumentationLink(
-                  'user-manual/api/rbac/auth-context.html',
+                  'user-manual/user-administration/rbac.html',
                 )}
                 external
                 target='_blank'

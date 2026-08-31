@@ -129,8 +129,8 @@ export const findDocumentByFieldTool: ToolDefinition = {
   // This tool has no `_source` clause at all -- it returns whichever document matched, whole, so
   // `deriveResultColumns` (digest.ts) falls back to a union of the returned rows' own flattened
   // dot-paths. That is exactly as uncurated a field surface as `search_wazuh_data`'s arbitrary DSL
-  // (issue #8917 -- see `ToolDefinition.failClosedFieldPolicy`'s doc comment, types.ts), so it
-  // must fail closed the same way; it must NOT silently default to allow-by-omission just because
-  // it happens not to set this explicitly.
+  // (see `ToolDefinition.failClosedFieldPolicy`'s doc comment, types.ts), so it must fail closed
+  // the same way; it must NOT silently default to allow-by-omission just because it happens not
+  // to set this explicitly.
   failClosedFieldPolicy: true,
 };

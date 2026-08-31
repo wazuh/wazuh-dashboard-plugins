@@ -30,6 +30,11 @@ export interface RegulatoryComplianceBadgesProps {
  * Chips show distinct controls implicated, not findings: one finding can
  * implicate several frameworks, so every framework's finding count ties.
  * `EuiPanel` has no link support, hence the wrapping `<a href>`.
+ *
+ * The grid reflows on the card's own width, so the chips repack (2 to 6 per
+ * row) as the card shares or takes a row. The 130px floor fits the longest
+ * framework name next to its badge; below it the label truncates, with the full
+ * name in `title`, rather than overflowing the chip.
  */
 export const RegulatoryComplianceBadges: React.FC<
   RegulatoryComplianceBadgesProps
@@ -41,7 +46,7 @@ export const RegulatoryComplianceBadges: React.FC<
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))',
           rowGap: '8px',
           columnGap: '8px',
         }}
@@ -58,9 +63,20 @@ export const RegulatoryComplianceBadges: React.FC<
                 data-test-subj={`regulatory-compliance-badge-${id}`}
               >
                 <EuiPanel paddingSize='s' hasBorder>
-                  <EuiFlexGroup gutterSize='s' alignItems='center'>
+                  <EuiFlexGroup
+                    gutterSize='s'
+                    alignItems='center'
+                    responsive={false}
+                  >
                     <EuiFlexItem style={{ minWidth: 0 }}>
-                      <EuiText size='xs' style={{ whiteSpace: 'nowrap' }}>
+                      <EuiText
+                        size='xs'
+                        style={{
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
                         <strong>{label}</strong>
                       </EuiText>
                     </EuiFlexItem>

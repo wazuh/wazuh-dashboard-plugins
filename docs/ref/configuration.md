@@ -70,6 +70,21 @@ wazuh_core.hosts:
     ca: '/etc/wazuh-dashboard/certs/root-ca.pem'
 ```
 
+## Session cookies
+
+The Wazuh dashboard sets two groups of session cookies:
+
+- `security_authentication` — the platform session, set by the security plugin.
+- `wz-token`, `wz-user`, `wz-api` — the Wazuh server API session, set by the `wazuh` plugin.
+
+All of them are `HttpOnly`, and all of them get the `Secure` flag when the dashboard serves HTTPS. The flag is derived from the protocol the server listens on, so no setting is needed. Set `opensearch_security.cookie.secure` explicitly only when a reverse proxy terminates TLS in front of the dashboard: there the dashboard itself speaks plain HTTP and cannot detect that the browser connection is encrypted. That setting applies to both groups of cookies — the Wazuh server API cookies read the same value, so one setting keeps them consistent.
+
+None of these cookies sets a `SameSite` attribute. Cross-site request forgery is already blocked by the mandatory `osd-xsrf` header on every state-changing request, combined with `server.cors` being disabled, and the SAML HTTP-POST callback requires cross-site POSTs to carry the session cookie — a `SameSite` value of `Lax` or `Strict` breaks SAML login. If you enable `server.cors` or add routes to `server.xsrf.allowlist`, you weaken that protection and should consider setting `opensearch_security.cookie.isSameSite` (which applies to the platform cookie only), accepting that SAML deployments cannot use it.
+
+### Response headers
+
+The dashboard sends `X-Frame-Options: sameorigin` and `X-Content-Type-Options: nosniff` on every response, and `Strict-Transport-Security: max-age=31536000` when it serves HTTPS. A deployment behind a TLS-terminating proxy must send `Strict-Transport-Security` from the proxy instead.
+
 ## SSL/TLS client certificate configuration
 
 When the Wazuh server API is configured to require client certificate authentication (via `use_ca: True` in the server `api.yaml`), the dashboard must present a valid client certificate on each connection. The `key`, `cert`, and `ca` fields on each host entry control this behavior.

@@ -31,7 +31,11 @@ export const Policies = withUserAuthorizationPrompt([
     getData,
     refreshCurrentPage,
     onTableChange: handleTableChange,
-  } = usePagination(GetPoliciesService);
+    sorting,
+  } = usePagination(GetPoliciesService, undefined, {
+    field: 'id',
+    direction: 'asc',
+  });
 
   useEffect(() => {
     getData();
@@ -105,6 +109,7 @@ export const Policies = withUserAuthorizationPrompt([
           pageSize={pageSize}
           totalItems={totalItems}
           onTableChange={handleTableChange}
+          sorting={sorting}
         ></PoliciesTable>
       </EuiPageContentBody>
     </EuiPageContent>

@@ -198,7 +198,7 @@ function findNearMisses(
 }
 
 /**
- * Appended to every field-validation rejection (issue #8911). Left alone, the reason above tells
+ * Appended to every field-validation rejection. Left alone, the reason above tells
  * the model WHAT was wrong but not what to do next — and a rejected field-existence check consumes
  * a tool round exactly like a productive one, so nothing stops the model from spending its whole
  * bounded round budget on cosmetic variations of a field name that will never exist. Every clause

@@ -16,6 +16,7 @@ test('get_rules: defaults to enabled=true, no other filters, size 20', () => {
   assert.equal(request.body.size, 20);
   assert.deepEqual(request.body.sort, ['_doc']);
   assert.deepEqual(request.body._source, [
+    'document.id',
     'document.metadata.title',
     'document.metadata.description',
     'document.level',
@@ -27,6 +28,79 @@ test('get_rules: defaults to enabled=true, no other filters, size 20', () => {
     'document.logsource.category',
     'space.name',
   ]);
+});
+
+// The reported false negative: the tool's own description says these rules are identified by a
+// UUID and directs the model here for "what does rule X detect", but there was no parameter that
+// could match a UUID -- `name` matches the human title, so `get_rules {name: "<uuid>"}` returned
+// 0 rows and the assistant reported the rule does not exist.
+test('get_rules: id matches the UUID against _id OR the business-level id field', () => {
+  const uuid = 'ad97a19d-24a5-43c4-a749-1f8f0a9172bc';
+  const request = build({ id: uuid, enabled: 'any' });
+  assert.deepEqual(request.body.query, {
+    bool: {
+      filter: [
+        {
+          bool: {
+            minimum_should_match: 1,
+            should: [
+              { ids: { values: [uuid] } },
+              { term: { 'document.id': uuid } },
+            ],
+          },
+        },
+      ],
+    },
+  });
+});
+
+test('get_rules: id is trimmed', () => {
+  const uuid = 'ad97a19d-24a5-43c4-a749-1f8f0a9172bc';
+  const request = build({ id: `  ${uuid}  `, enabled: 'any' });
+  const clauses = (
+    request.body.query as { bool: { filter: Record<string, unknown>[] } }
+  ).bool.filter;
+  assert.deepEqual(clauses[0], {
+    bool: {
+      minimum_should_match: 1,
+      should: [{ ids: { values: [uuid] } }, { term: { 'document.id': uuid } }],
+    },
+  });
+});
+
+// An id lookup names ONE specific document, so the `enabled` default must not hide it -- letting
+// it apply would reproduce the same "the rule does not exist" false negative for every disabled
+// rule, which is exactly what this parameter exists to remove.
+test('get_rules: id suppresses the enabled default, so a disabled rule is still found', () => {
+  const request = build({ id: 'ad97a19d-24a5-43c4-a749-1f8f0a9172bc' });
+  const clauses = (
+    request.body.query as { bool: { filter: Record<string, unknown>[] } }
+  ).bool.filter;
+  assert.ok(
+    !clauses.some(clause =>
+      JSON.stringify(clause).includes('document.enabled'),
+    ),
+    'an id lookup must not carry the enabled default',
+  );
+});
+
+test('get_rules: an EXPLICIT enabled alongside id is still honored', () => {
+  const request = build({
+    id: 'ad97a19d-24a5-43c4-a749-1f8f0a9172bc',
+    enabled: 'enabled',
+  });
+  const clauses = (
+    request.body.query as { bool: { filter: Record<string, unknown>[] } }
+  ).bool.filter;
+  assert.deepEqual(clauses[0], { term: { 'document.enabled': true } });
+});
+
+// The id was missing from the returned columns as well as from the filters, so the assistant
+// correctly reported it had no UUID field to report when asked to list rules with their UUIDs.
+test('get_rules: the rule UUID is projected and sampled into the digest so it can be cited', () => {
+  assert.ok((build({}).body._source as string[]).includes('document.id'));
+  assert.ok(getRulesTool.digest?.sampleColumns?.includes('document.id'));
+  assert.ok(getRulesTool.tableSpec?.rowFields?.includes('document.id'));
 });
 
 test('get_rules: buildSecurityAnalyticsLink points to the rules app with the resolved space', () => {
@@ -73,7 +147,7 @@ test('get_rules: status/level/tag/logsource_product/space each add exactly one f
   });
 });
 
-// Defect #2 (AI/plan/qa-rules-decoders-rootcause.md): `document.mitre.technique.id` is absent
+// `document.mitre.technique.id` is absent
 // from the live mapping (`dynamic: false`, confirmed live), so a `term` filter against it could
 // only ever return 0 rows. There is no separate `document.threat.technique.id` fix either: that
 // path IS mapped but is populated on 0 documents on this dataset (live-confirmed), so a filter on
@@ -106,9 +180,8 @@ test('get_rules: technique lookups go through tag as "attack.<id>", per the tag 
   );
 });
 
-// Review finding F2: the description's example previously mapped "attack.t1190" to "T1110" --
-// a mismatched id that invites the model to invent its own transformation. The example id must
-// be internally consistent (T1190 -> attack.t1190).
+// The description's example id must be internally consistent (T1190 -> attack.t1190); a
+// mismatched id invites the model to invent its own transformation.
 test('get_rules: the tag description example maps attack.t1190 to T1190, not T1110', () => {
   const description = getRulesTool.spec.parameters.properties.tag
     .description as string;
@@ -116,9 +189,9 @@ test('get_rules: the tag description example maps attack.t1190 to T1190, not T11
   assert.doesNotMatch(description, /T1110/);
 });
 
-// Review finding F3: `document.tags` is a case-sensitive keyword whose live vocabulary is
-// entirely lowercase, while ATT&CK ids are conventionally written uppercase -- an "attack.*" tag
-// must be lowercased before it reaches the term filter, or an uppercase id silently returns 0.
+// `document.tags` is a case-sensitive keyword whose vocabulary is entirely lowercase, while
+// ATT&CK ids are conventionally written uppercase -- an "attack.*" tag must be lowercased before
+// it reaches the term filter, or an uppercase id silently returns 0.
 test('get_rules: an uppercase "attack.*" tag is lowercased before filtering', () => {
   const request = build({ enabled: 'any', tag: 'attack.T1190' });
   assert.deepEqual(request.body.query, {
@@ -190,10 +263,10 @@ test('get_rules: name builds a should-clause on title (term+prefix) and descript
   assert.equal(result.ok, true, result.ok ? '' : result.reason);
 });
 
-// Review finding F1: the description `match` must use `operator: 'and'`, not the default `or`.
-// Live-verified: with `or` (as originally shipped), `name="decoder/apache-access/0"` returned
-// 330 of 345 decoders (any one token matched) inside a non-scoring `bool.filter` sorted by
-// `_doc`, so the wanted row never appeared in the visible page; with `and` it returns exactly 1.
+// The description `match` must use `operator: 'and'`, not the default `or`. With `or`,
+// `name="decoder/apache-access/0"` returns 330 of 345 decoders (any one token matched) inside a
+// non-scoring `bool.filter` sorted by `_doc`, so the wanted row never appears in the visible
+// page; with `and` it returns exactly 1.
 test('get_rules: the description match uses operator "and" so multi-token names stay precise', () => {
   const request = build({
     enabled: 'any',

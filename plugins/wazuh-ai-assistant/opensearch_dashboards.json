@@ -6,7 +6,8 @@
     "navigation",
     "savedObjects",
     "opensearchDashboardsReact",
-    "wazuhCore"
+    "wazuhCore",
+    "opensearchDashboardsUtils"
   ],
   "optionalPlugins": ["wazuh"],
   "server": true,

@@ -17,7 +17,7 @@ const popoverAgentGroup = (
     Learn about{' '}
     <EuiLink
       href={webDocumentationLink(
-        'user-manual/reference/ossec-conf/client.html#groups',
+        'user-manual/agent/agent-management/grouping-agents.html',
         PLUGIN_VERSION_SHORT,
       )}
       target='_blank'

@@ -59,6 +59,22 @@ export function providerIdleTimeoutMs(): number {
 export const PROVIDER_STALL_MESSAGE = 'The AI provider stopped responding.';
 
 /**
+ * User-facing message for a stream that ended MID-ANSWER: content deltas arrived, then the
+ * connection closed with no `[DONE]`, no terminal usage frame and no `finish_reason`. Distinct copy
+ * from `PROVIDER_STALL_MESSAGE` on purpose -- a stall produces no answer at all, whereas this case
+ * leaves partial text on screen, and the one thing the reader needs to be told is that the text
+ * above it is incomplete. Without this the turn terminated with a bare `done`, making a truncated
+ * answer indistinguishable from a finished one: strictly worse than a visible empty, because an
+ * answer that simply stops reads as "that is the answer" rather than as a failure.
+ *
+ * Same constraint as `PROVIDER_STALL_MESSAGE`: contains none of `describeConnectionError`'s
+ * `isNetworkFailure` trigger words, so it survives verbatim if it is ever routed through there.
+ */
+export const PROVIDER_STREAM_TRUNCATED_MESSAGE =
+  'The connection to the AI provider closed before the answer was finished, so the response ' +
+  'above is incomplete. Try again.';
+
+/**
  * Distinguishable error type for a stall-timeout firing (as opposed to a genuine read/network
  * failure) -- thrown by `readWithStallTimeout` below and by `retry.ts`'s `fetchWithHeaderTimeout`.
  * Both adapters' existing `catch (error) { yield {type:'error', message: describeConnectionError(

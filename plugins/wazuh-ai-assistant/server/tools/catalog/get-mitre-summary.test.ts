@@ -29,7 +29,7 @@ test('get_mitre_summary: buildRequest targets wazuh-findings-v5* with an exists 
 // Issue #8921: technique/tactic names are MULTI-VALUE arrays, so the bucket key (one technique
 // id) does not by itself say which array element is "its" name. Sampling `technique.id`
 // alongside the names restores a positional match (the arrays are parallel on any one document).
-// A distinct_names cardinality guard is deliberately ABSENT — see get-mitre-summary.ts's doc
+// A distinct_name_count cardinality guard is deliberately ABSENT — see get-mitre-summary.ts's doc
 // comment: within a bucket it would count co-tagged techniques' names, reporting a spread > 1
 // for a technique that has exactly one ATT&CK name (a new falsehood, not a disclosure).
 test('get_mitre_summary: aggregates by technique.id with a sample doc including the parallel id array', () => {

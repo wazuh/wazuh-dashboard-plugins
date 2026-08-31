@@ -17,13 +17,13 @@ export interface ChatInputHandle {
 }
 
 /**
- * Composer floor and ceiling (redesign-v2-spec.md layout contract §2): the field autogrows past its
- * one-line floor (`rows={1}` below) up to `WZ_COMPOSER_MAX_ROWS`, then scrolls internally instead of growing
- * further. Kept as a plain numeric constant rather than read from `$wzComposerMaxRows`
- * (public/components/_redesign.scss) — there is no SCSS-to-TS bridge in this build, so the two have
- * to be kept equal by hand. This is a SEPARATE, smaller ceiling than `.wzComposerRow`'s own
- * `max-height: $wzComposerMaxHeight` (chat-page.scss), which caps the WHOLE composer (field +
- * controls + disclaimer), not just the field.
+ * Composer floor and ceiling: the field autogrows past its one-line floor (`rows={1}` below) up
+ * to `WZ_COMPOSER_MAX_ROWS`, then scrolls internally instead of growing further. Kept as a plain
+ * numeric constant rather than read from `$wzComposerMaxRows` (public/components/_redesign.scss)
+ * — there is no SCSS-to-TS bridge in this build, so the two have to be kept equal by hand. This is
+ * a SEPARATE, smaller ceiling than `.wzComposerRow`'s own `max-height: $wzComposerMaxHeight`
+ * (chat-page.scss), which caps the WHOLE composer (field + controls + disclaimer), not just the
+ * field.
  */
 /** Fallback line height (px) for the rare case `getComputedStyle` reports something
  * `parseFloat` can't read (e.g. a unitless/`normal` line-height, which is what jsdom's computed
@@ -62,18 +62,29 @@ export const ChatInput = React.forwardRef<ChatInputHandle, ChatInputProps>(
       [],
     );
 
-    // autoFocus only fires on mount; also focus when the input becomes enabled after providers
-    // finish loading (e.g. the Chat tab is opened before the provider list has resolved).
+    // The single source of truth for whether the field is actually inert. Both the rendered
+    // `disabled` attribute below and the re-focus effect must read THIS, never `disabled` alone:
+    // if the effect depended on `[disabled]` while the attribute applied `disabled ||
+    // isGenerating`, it would never re-run when a stream ends and `isGenerating` flips back to
+    // false. Disabling a focused element blurs it, so that blur would never be undone and the
+    // caret would be lost on every turn — the parent's imperative `focus()` on turn completion
+    // lands in the same render pass, while the element is still disabled, and cannot fix it
+    // either.
+    const isInert = disabled || isGenerating;
+
+    // autoFocus only fires on mount; also focus when the field becomes editable again — after
+    // providers finish loading (e.g. the Chat tab is opened before the provider list has
+    // resolved), and after a streaming turn completes.
     useEffect(() => {
-      if (!disabled) {
+      if (!isInert) {
         textAreaRef.current?.focus();
       }
-    }, [disabled]);
+    }, [isInert]);
 
-    // Autogrow, capped at WZ_COMPOSER_MAX_ROWS then scrolling internally (contract §2: "autogrow to 5 rows then
-    // internal scroll"). `lineHeight`/padding are read from the field's OWN computed style rather
-    // than assumed, so the cap tracks whatever EUI's own type scale renders at instead of a guessed
-    // pixel figure that could drift from it.
+    // Autogrow, capped at WZ_COMPOSER_MAX_ROWS then scrolling internally ("autogrow to 5 rows
+    // then internal scroll"). `lineHeight`/padding are read from the field's OWN computed style
+    // rather than assumed, so the cap tracks whatever EUI's own type scale renders at instead of a
+    // guessed pixel figure that could drift from it.
     useEffect(() => {
       const el = textAreaRef.current;
       if (!el) {
@@ -126,17 +137,17 @@ export const ChatInput = React.forwardRef<ChatInputHandle, ChatInputProps>(
           textAreaRef.current = node;
         }}
         fullWidth
-        // One full line box is the floor (contract §2) — autogrow only ever adds height from here.
+        // One full line box is the floor — autogrow only ever adds height from here.
         rows={1}
         // Height transition (reduced-motion-guarded, chat-page.scss) lives on this class; the
         // overflow toggle above still applies inline since it depends on this field's own measured
-        // content, not something a stylesheet can express. The two-row floor (iteration-4 item A)
+        // content, not something a stylesheet can express. The two-row floor
         // is scoped from the OUTSIDE, via the ancestor `.wzComposerRow--roomy` modifier ChatPage
         // applies from its own `enableWelcomeComposer` prop — see
         // `.wzComposerRow--roomy .wzComposerTextarea` (chat-page.scss) for why the 600-900px
         // sidecar must not get it. Nothing here needs to know about that prop.
         className='wzComposerTextarea'
-        disabled={disabled || isGenerating}
+        disabled={isInert}
         value={value}
         style={{
           border: 'none',

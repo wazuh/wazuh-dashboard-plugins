@@ -59,7 +59,9 @@ const sslSettings = [
 const helpLinks = [
   {
     text: 'Indexer configuration',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/indexer.html'),
+    href: webDocumentationLink(
+      'user-manual/manager/wazuh-indexer-connector.html',
+    ),
   },
 ];
 

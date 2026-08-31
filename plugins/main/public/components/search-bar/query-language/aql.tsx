@@ -14,7 +14,7 @@ type ITokens = IToken[];
 /* API Query Language
 Define the API Query Language to use in the search bar.
 It is based in the language used by the q query parameter.
-https://documentation.wazuh.com/current/user-manual/api/queries.html
+https://documentation.wazuh.com/current/user-manual/wazuh-dashboard/global-queries.html
 
 Use the regular expression of API with some modifications to allow the decomposition of
 input in entities that doesn't compose a valid query. It allows get not-completed queries.
@@ -438,7 +438,9 @@ export const AQL = {
   id: 'aql',
   label: 'AQL',
   description: 'API Query Language (AQL) allows to do queries.',
-  documentationLink: webDocumentationLink('user-manual/api/queries.html'),
+  documentationLink: webDocumentationLink(
+    'user-manual/wazuh-dashboard/global-queries.html',
+  ),
   getConfiguration() {
     return {
       isOpenPopoverImplicitFilter: false,

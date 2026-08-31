@@ -103,12 +103,12 @@ export function stashDraft(
     return;
   }
   // ENFORCE the "at most one draft is ever waiting" invariant this module documents, rather than
-  // assuming it. It previously held only because `handleSessionExpired` was expected to fire once
-  // before the reload. If it fired twice for two DIFFERENT conversations (the user keeps working
-  // while the callout is up, switches conversation, hits a second 401), the first key was never
-  // cleared — and `restoreAndClearDraft`'s fallback scan returns whichever key storage enumerates
-  // FIRST, i.e. the STALE one. That restored an old draft into the wrong conversation and orphaned
-  // the current one. Clearing first makes the newest stash authoritative.
+  // relying on `handleSessionExpired` firing only once before the reload. If it fires twice for
+  // two DIFFERENT conversations (the user keeps working while the callout is up, switches
+  // conversation, hits a second 401), leaving the first key uncleared would make
+  // `restoreAndClearDraft`'s fallback scan return whichever key storage enumerates FIRST, i.e.
+  // the STALE one — restoring an old draft into the wrong conversation and orphaning the current
+  // one. Clearing first makes the newest stash authoritative.
   clearAllDraftKeys(storage);
   storage.setItem(key, draft);
   storage.setItem(RELOAD_EXPECTED_KEY, '1');

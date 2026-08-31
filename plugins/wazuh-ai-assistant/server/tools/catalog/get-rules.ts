@@ -54,10 +54,27 @@ export const getRulesTool: ToolDefinition = {
       'numeric-id question is almost always about a finding, not this catalog: use the finding ' +
       'tools (which read `wazuh.rule.id` on findings/alerts) for "what does rule 5710 do", and ' +
       'use this tool for "what does the SSTI/SSH/... rule detect" or "which rules are ' +
-      'active/enabled" questions asked by name or topic. Not for findings/alerts that a rule ' +
-      'matched -- use the finding tools for that.',
+      'active/enabled" questions asked by name or topic. When the question names a rule by its ' +
+      'UUID, pass that UUID as `id`, NOT as `name` -- `name` matches the human title only. Not ' +
+      'for findings/alerts that a rule matched -- use the finding tools for that.',
     parameters: objectSchema({
       name: nameFilterProperty('rule'),
+      // The reported failure: the description above says these rules are "identified by a UUID
+      // and a title" and directs the model here for "what does rule X detect", but there used to
+      // be no parameter that could match a UUID. A model following the description landed on
+      // `get_rules {name: "<uuid>"}`, `name` matches the human title, and the tool returned 0
+      // rows -- so the assistant stated, confidently and wrongly, that the rule does not exist.
+      // The recovery path (an escape-hatch `search_wazuh_data` on the rules index) fired most of
+      // the time, which is why this read as intermittent; the branch that produced the false
+      // negative was fully deterministic once taken.
+      id: {
+        type: 'string',
+        description:
+          'Exact rule UUID to look up (e.g. "ad97a19d-24a5-43c4-a749-1f8f0a9172bc"). Use this -- ' +
+          'NOT name -- whenever the question names a rule by its UUID: name matches the human ' +
+          'title, so a UUID passed there can never match and the call returns 0 rows. The ' +
+          'returned rows carry the UUID as well, so it can be cited back in the answer.',
+      },
       enabled: {
         type: 'string',
         description:
@@ -85,8 +102,7 @@ export const getRulesTool: ToolDefinition = {
           'this field actually holds (confirmed live). There is deliberately no separate ' +
           '`technique_id` parameter: the tool used to expose one against ' +
           "`document.mitre.technique.id`, but that path is absent from this index's mapping " +
-          'and can only ever return 0 rows (see ' +
-          'AI/plan/qa-rules-decoders-rootcause.md, defect #2) -- removed rather than fixed onto ' +
+          'and can only ever return 0 rows -- removed rather than fixed onto ' +
           'this field, because `technique.id` here is a real MAPPED keyword that is simply ' +
           'unpopulated (0 docs), so a filter on it would be silently, permanently empty too. ' +
           '`document.mitre.technique.id` stays queryable via the "Technique" table column (a ' +
@@ -115,11 +131,21 @@ export const getRulesTool: ToolDefinition = {
   buildRequest(params) {
     const name =
       typeof params.name === 'string' ? params.name.trim() : undefined;
-    const enabled =
+    const id = typeof params.id === 'string' ? params.id.trim() : undefined;
+    const enabledSupplied =
       typeof params.enabled === 'string' &&
-      (ENABLED_VALUES as readonly string[]).includes(params.enabled)
-        ? params.enabled
-        : 'enabled';
+      (ENABLED_VALUES as readonly string[]).includes(params.enabled);
+    // The `enabled` default must NOT apply to an id lookup. `id` names one specific rule
+    // document, so the honest answer to "what does rule <uuid> detect" is that rule's content
+    // whether or not it is currently enabled -- defaulting to `enabled` here would reproduce the
+    // very false negative this parameter exists to remove, just for the disabled half of the
+    // ruleset ("the rule does not exist" when it does and is merely off). An EXPLICIT `enabled`
+    // alongside `id` is still honored, so "is rule <uuid> enabled" stays askable as a filter.
+    const enabled = enabledSupplied
+      ? (params.enabled as string)
+      : id
+      ? 'any'
+      : 'enabled';
     const status =
       typeof params.status === 'string' ? params.status.trim() : undefined;
     const level =
@@ -167,6 +193,21 @@ export const getRulesTool: ToolDefinition = {
         ),
       );
     }
+    // Matched WITHOUT asking the model which field carries the UUID -- the same
+    // "OR every id field that could hold it" shape `find_document_by_field` builds, and for the
+    // same reason: the UUID is the OpenSearch `_id` of the rule document, and it is also carried
+    // as a business-level field, so ORing an `ids` query with a `term` on that field matches
+    // whichever one the value really is instead of betting on one path. Both clauses are
+    // exact-match only (never full-text), and `isExactIdLookupQuery` (guardrails.ts) already
+    // accepts a `bool.should` of `term`/`ids` clauses, so this needs no guardrail change.
+    if (id) {
+      filter.push({
+        bool: {
+          minimum_should_match: 1,
+          should: [{ ids: { values: [id] } }, { term: { 'document.id': id } }],
+        },
+      });
+    }
 
     return {
       target: 'indexer',
@@ -180,6 +221,11 @@ export const getRulesTool: ToolDefinition = {
         // kept out of `tableSpec.columns` (too wide for a table cell) and surfaced via `rowFields`/
         // `digest.sampleColumns` instead, same treatment as the vulnerability tools' description.
         _source: [
+          // The rule UUID. Projected so an answer can CITE the id it was asked about, and so a
+          // "list the rules with their UUIDs" question is answerable at all -- the id was
+          // previously missing from the returned columns as well as from the filters, so the
+          // assistant correctly reported it had no UUID field to report.
+          'document.id',
           'document.metadata.title',
           'document.metadata.description',
           'document.level',
@@ -217,7 +263,7 @@ export const getRulesTool: ToolDefinition = {
       // Content is namespaced across draft/test/custom/standard spaces (confirmed live) -- shown
       // as its own column so a mixed-space result set is visibly mixed, which matters directly
       // for `buildSecurityAnalyticsLink`'s single-space-per-table link. Under the client's
-      // MAX_VISIBLE_RESULT_COLUMNS budget (issue #8921) Space must therefore sit INSIDE the
+      // MAX_VISIBLE_RESULT_COLUMNS budget, Space must therefore sit INSIDE the
       // visible 6; Tags — a long multi-value array better read in the row expander anyway — is
       // the column demoted to position 7 (not deleted: still queried, still in every row).
       { field: 'space.name', label: 'Space' },
@@ -229,6 +275,7 @@ export const getRulesTool: ToolDefinition = {
     // Rule-authoring metadata (falsepositives/fields/related/taxonomy/scope/license/sigma_id/id)
     // is likewise excluded: not analyst-facing.
     rowFields: [
+      'document.id',
       'document.logsource.product',
       'document.logsource.category',
       'document.metadata.description',
@@ -236,6 +283,7 @@ export const getRulesTool: ToolDefinition = {
   },
   digest: {
     sampleColumns: [
+      'document.id',
       'document.metadata.title',
       'document.metadata.description',
       'document.level',
@@ -247,9 +295,9 @@ export const getRulesTool: ToolDefinition = {
       'document.logsource.category',
       'space.name',
     ],
-    // Synthetic fallback (issue #8920 item 1): the ruleset is thousands of docs against a default
-    // limit of 20, so "what log sources / rule levels does the ruleset cover" was being answered
-    // from 5 sample rows. Both fields are already returned in `_source` (getByPath groups the
+    // Synthetic fallback: the ruleset is thousands of docs against a default limit of 20, so
+    // "what log sources / rule levels does the ruleset cover" would otherwise be answered from
+    // 5 sample rows. Both fields are already returned in `_source` (getByPath groups the
     // RETURNED rows — no AGG_FIELD_ALLOWLIST entry or live mapping verification is needed for the
     // digest-level grouping, unlike a real terms aggregation) and both are vendor-curated enums,
     // structurally safe under privacy (field-policy-coverage.test.ts's

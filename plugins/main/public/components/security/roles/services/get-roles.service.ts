@@ -14,12 +14,15 @@ import IApiResponse from '../../../../react-services/interfaces/api-response.int
 import { WzRequest } from '../../../../react-services/wz-request';
 import { Role } from '../types/role.type';
 
-const GetRolesService = async (): Promise<Role[]> => {
-  const response = (await WzRequest.apiReq(
-    'GET',
-    '/security/roles?sort=name',
-    {}
-  )) as IApiResponse<Role>;
+const GetRolesService = async (
+  options: { sort?: string } = {},
+): Promise<Role[]> => {
+  const { sort = '+name' } = options ?? {};
+  const response = (await WzRequest.apiReq('GET', '/security/roles', {
+    params: {
+      ...(sort ? { sort } : {}),
+    },
+  })) as IApiResponse<Role>;
   const roles = ((response.data || {}).data || {}).affected_items || [];
   return roles;
 };

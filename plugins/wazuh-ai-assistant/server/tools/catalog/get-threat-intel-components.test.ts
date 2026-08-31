@@ -74,13 +74,11 @@ test('get_threat_intel_components: space adds an exact term filter', () => {
   );
 });
 
-// Defect #1: neither tool had ANY name/keyword filter before this fix -- the largest failure
-// class in the QA report (Q2/Q9/Q12: "what decoders exist for ssh?"/"which decoder parses sshd
-// logs?"/"is there a decoder for apache?" all returned all 345 rows unfiltered). `name` builds a
-// should-clause with no leading wildcard (guardrails.ts's lintDsl bans that outright): exact/
-// prefix on document.name and document.metadata.title, plus a word match on the analyzed
-// document.metadata.description -- live-verified to find the same 5 Apache decoders and the 1
-// SSH decoder the QA report's raw wildcard probe found.
+// `name` builds a should-clause with no leading wildcard (guardrails.ts's lintDsl bans that
+// outright): exact/prefix on document.name and document.metadata.title, plus a word match on the
+// analyzed document.metadata.description -- this finds the same Apache and SSH decoders a raw
+// wildcard probe would, without a query-time wildcard scan (without this filter, a query like
+// "what decoders exist for ssh?" would return all 345 rows unfiltered).
 test('get_threat_intel_components: name builds a should-clause on name/title (term+prefix) and description (match), no wildcard', () => {
   const request = build({ component_type: 'decoders', name: 'apache' });
   assert.deepEqual(request.body.query, {
@@ -134,9 +132,9 @@ test('get_threat_intel_components: name builds a should-clause on name/title (te
   assert.equal(result.ok, true, result.ok ? '' : result.reason);
 });
 
-// Review finding F1: the description match must use operator "and" so a multi-token name (e.g.
-// a decoder's full identifier) does not match on any single token inside a non-scoring,
-// `_doc`-sorted `bool.filter` -- live-verified 330 -> 1 hit for "decoder/apache-access/0".
+// The description match must use operator "and" so a multi-token name (e.g. a decoder's full
+// identifier) does not match on any single token inside a non-scoring, `_doc`-sorted
+// `bool.filter` -- with `and`, "decoder/apache-access/0" returns exactly 1 hit instead of 330.
 test('get_threat_intel_components: the description match uses operator "and" for multi-token names', () => {
   const request = build({
     component_type: 'decoders',
@@ -244,7 +242,7 @@ test('get_threat_intel_components: buildSecurityAnalyticsLink maps each componen
   });
 });
 
-// Cross-category tool audit (same bug shape as issue #8913): this tool's own category is
+// Cross-category tool audit: this tool's own category is
 // `security_analytics` (server/tools/router.ts), while get_sca_results -- named here for the
 // "you actually want an SCA benchmark" case -- is the separate `sca` category, not guaranteed
 // offered on the same turn. Pins the conditional wording so a future edit cannot silently

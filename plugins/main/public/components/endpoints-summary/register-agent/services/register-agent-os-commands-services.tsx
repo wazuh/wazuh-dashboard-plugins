@@ -12,7 +12,7 @@ export const getAllOptionals = (
 ) => {
   // create paramNameOrderList, which is an array of the keys of optionals add interface
   const paramNameOrderList: (keyof IOptionalParameters<tOptionalParameters>)[] =
-    ['serverAddress', 'wazuhPassword', 'agentGroups', 'agentName', 'protocol'];
+    ['serverAddress', 'wazuhPassword', 'agentGroups', 'agentName'];
 
   if (!optionals) return '';
   let paramsText = Object.entries(paramNameOrderList).reduce(
@@ -33,7 +33,7 @@ export const getAllOptionalsMacos = (
 ) => {
   // create paramNameOrderList, which is an array of the keys of optionals add interface
   const paramNameOrderList: (keyof IOptionalParameters<tOptionalParameters>)[] =
-    ['serverAddress', 'agentGroups', 'agentName', 'protocol', 'wazuhPassword'];
+    ['serverAddress', 'agentGroups', 'agentName', 'wazuhPassword'];
 
   if (!optionals) return '';
 

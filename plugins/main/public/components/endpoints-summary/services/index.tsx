@@ -6,5 +6,6 @@ export { addAgentsToGroupService } from './add-agents-to-group';
 export { getGroupsService } from './get-groups';
 export { upgradeAgentService } from './upgrade-agent';
 export { upgradeAgentsService } from './upgrade-agents';
+export { scanAgentsVulnerabilitiesService } from './scan-agents-vulnerabilities';
 export { getAgentsInfo } from './get-agents-info';
 export { getWazuhAPIVersion } from './get-api-version';

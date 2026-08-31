@@ -75,111 +75,6 @@ describe('Register agent service', () => {
       expect(res.name).toBe(nodeName);
       expect(res.haveSecureConnection).toBe(false);
     });
-
-    it('should return protocols UDP when is the only connection protocol available', async () => {
-      const remoteWithSecureAndNoSecure = [
-        {
-          connection: 'syslog',
-          ipv6: 'no',
-          protocol: ['UDP'],
-          port: '514',
-          'allowed-ips': ['0.0.0.0/0'],
-        },
-        {
-          connection: 'secure',
-          ipv6: 'no',
-          protocol: ['UDP'],
-          port: '1514',
-          queue_size: '131072',
-        },
-      ];
-      const mockedResponse = {
-        data: {
-          data: {
-            affected_items: [
-              {
-                remote: remoteWithSecureAndNoSecure,
-              },
-            ],
-          },
-        },
-      };
-      WzRequest.apiReq = jest.fn().mockResolvedValueOnce(mockedResponse);
-      const nodeName = 'example-node';
-      const res = await RegisterAgentService.getRemoteConfiguration(nodeName);
-      expect(res.name).toBe(nodeName);
-      expect(res.isUdp).toEqual(true);
-    });
-
-    it('should return protocols TCP when is the only connection protocol available', async () => {
-      const remoteWithSecureAndNoSecure = [
-        {
-          connection: 'syslog',
-          ipv6: 'no',
-          protocol: ['TCP'],
-          port: '514',
-          'allowed-ips': ['0.0.0.0/0'],
-        },
-        {
-          connection: 'secure',
-          ipv6: 'no',
-          protocol: ['TCP'],
-          port: '1514',
-          queue_size: '131072',
-        },
-      ];
-      const mockedResponse = {
-        data: {
-          data: {
-            affected_items: [
-              {
-                remote: remoteWithSecureAndNoSecure,
-              },
-            ],
-          },
-        },
-      };
-      WzRequest.apiReq = jest.fn().mockResolvedValueOnce(mockedResponse);
-      const nodeName = 'example-node';
-      const res = await RegisterAgentService.getRemoteConfiguration(nodeName);
-      expect(res.name).toBe(nodeName);
-      expect(res.isUdp).toEqual(false);
-    });
-
-    it('should return is not UDP when have UDP and TCP protocols available', async () => {
-      const remoteWithSecureAndNoSecure = [
-        {
-          connection: 'syslog',
-          ipv6: 'no',
-          protocol: ['TCP'],
-          port: '514',
-          'allowed-ips': ['0.0.0.0/0'],
-        },
-        {
-          connection: 'secure',
-          ipv6: 'no',
-          protocol: ['UDP'],
-          port: '1514',
-          queue_size: '131072',
-        },
-      ];
-      const mockedResponse = {
-        data: {
-          data: {
-            affected_items: [
-              {
-                remote: remoteWithSecureAndNoSecure,
-              },
-            ],
-          },
-        },
-      };
-      WzRequest.apiReq = jest.fn().mockResolvedValueOnce(mockedResponse);
-      const nodeName = 'example-node';
-      const res = await RegisterAgentService.getRemoteConfiguration(nodeName);
-      expect(res.name).toBe(nodeName);
-      expect(res.isUdp).toEqual(false);
-    });
   });
 
   describe('getConnectionConfig', () => {
@@ -227,7 +122,6 @@ describe('Register agent service', () => {
         nodeSelected,
         'default-dns-address',
       );
-      expect(config.udpProtocol).toEqual(false);
       expect(config.serverAddress).toBe('default-dns-address');
     });
 
@@ -271,7 +165,6 @@ describe('Register agent service', () => {
         nodeSelected,
         'custom-server-address',
       );
-      expect(config.udpProtocol).toEqual(false);
     });
   });
 });

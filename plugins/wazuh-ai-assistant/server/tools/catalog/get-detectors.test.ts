@@ -114,7 +114,7 @@ test('get_detectors: resolveParams skips findings-count enrichment with no singl
   assert.equal(search.mock.calls.length, 0);
 });
 
-// CV-017-adjacent, live-verified 2026-08-19: .opensearch-sap-wazuh-generic-findings had 161 real
+// Live-verified 2026-08-19: .opensearch-sap-wazuh-generic-findings had 161 real
 // findings at verification time -- a positive count must be reported plainly, no guidance needed.
 test('get_detectors: resolveParams reports a positive findings count without persistence guidance', async () => {
   const search = jest
@@ -224,7 +224,7 @@ test('get_detectors: resolveParams degrades honestly when the findings-index loo
   }
 });
 
-// A-2 (AI/plan/a1b-review.md), live-proven 2026-08-19 on wazuh-aio-5: BEFORE this fix,
+// A-2, live-proven 2026-08-19 on wazuh-aio-5: BEFORE this fix,
 // detector_type = "*,.wazuh-cti-consumers,*" built the index string
 // ".opensearch-sap-*,.wazuh-cti-consumers,*-findings" and issued a real search against it (526
 // hits, reaching a DELIBERATELY EXCLUDED index) with no allowlist check at all. The fix rejects
@@ -281,7 +281,7 @@ test('A-2: a well-formed detector_type still issues the findings-count search', 
   );
 });
 
-// A-4 (AI/plan/a1b-review.md): a `filter_path` response that resolves NONE of the four candidate
+// A-4: a `filter_path` response that resolves NONE of the four candidate
 // keys (live-verified on wazuh-aio-5: only two of the four requested keys come back; a `200` with
 // `{}` never throws) must degrade to the honest "could not verify" guidance, never collapse via
 // `??` into the affirmative, fabricated "findings persistence appears disabled" claim the OLD
@@ -306,7 +306,7 @@ test('A-4 regression: an all-absent cluster-settings response yields honest "cou
   }
 });
 
-// A-4b (AI/plan/a1b-review.md): when the verdict is driven by the security_analytics key (not the
+// A-4b: when the verdict is driven by the security_analytics key (not the
 // alerting one), the advice must name THAT key, not a hardcoded different one.
 test('A-4b regression: disabled-persistence advice names the key that actually resolved', async () => {
   const search = jest

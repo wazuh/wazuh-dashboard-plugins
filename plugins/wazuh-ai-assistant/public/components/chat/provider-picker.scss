@@ -1,7 +1,7 @@
 @import '../redesign';
 
 /**
- * Provider selector, option A2 (iteration-4 item 2). The trigger's label needs an EXPLICIT
+ * Provider selector. The trigger's label needs an EXPLICIT
  * max-width for the ellipsis to have something to clip against — a flex/inline-block child with
  * no width constraint of its own never triggers `text-overflow`, it just grows to fit its
  * content. The full provider name still reaches the reader through `title`/aria on the button.
@@ -29,8 +29,8 @@
   }
 }
 
-/* The menu item's content used to be an EuiFlexGroup/EuiFlexItem (div) layout; it is span-based
- * now (button content model), so the flex layout that grouping used to provide for free has to
+/* The menu item's content is span-based (button content model), not an EuiFlexGroup/EuiFlexItem
+ * (div) layout, so the flex layout that grouping would otherwise provide for free has to
  * be declared here instead. */
 .wzProviderPickerItem {
   display: flex;
@@ -106,7 +106,7 @@
   }
 
   /**
-   * Footer rhythm (iteration-4 audit item 2 / measured live on 2026-08-18): provider items are
+   * Footer rhythm: provider items are
    * two-line content (name+badge row, then the model line) and measured ~52px tall; this
    * single-line "Manage providers" action inherited the same 8px top/bottom padding as those and
    * measured only 33px — a ~19px drop that, sitting directly under the list with no visual
