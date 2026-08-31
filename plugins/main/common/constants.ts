@@ -651,6 +651,10 @@ export const DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT = 'pinned-agent';
 export const DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER = 'cluster-manager';
 export const DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT =
   'hidden-regulatory-compliance-requirement';
+export const DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_OTHER_REQUIREMENT =
+  'hidden-regulatory-compliance-other-requirement';
+export const DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_OTHER_REQUIREMENT_VALUE =
+  'regulatory-compliance-other-requirement-value';
 export const DATA_SOURCE_FILTER_CONTROLLED_PCI_DSS_EXIST = 'pci-dss-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_FEDRAMP_EXIST = 'fedramp-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_VULNERABILITIES_RULE_GROUP =
@@ -742,7 +746,7 @@ export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_UPGRADE_PLATFORM =
 export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING =
   'user-manual/wazuh-dashboard/troubleshooting.html';
 export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_APP_CONFIGURATION =
-  'user-manual/wazuh-dashboard/settings.html';
+  'user-manual/wazuh-dashboard/wazuh-dashboard-configurations.html';
 
 export const PLUGIN_PLATFORM_REQUEST_HEADERS = {
   'osd-xsrf': 'kibana',

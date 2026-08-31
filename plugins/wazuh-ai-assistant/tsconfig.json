@@ -15,8 +15,7 @@
     "common/**/*.ts",
     "public/**/*.ts",
     "public/**/*.tsx",
-    "server/**/*.ts",
-    "translations/**/*.json"
+    "server/**/*.ts"
   ],
   "exclude": ["target/**/*"]
 }

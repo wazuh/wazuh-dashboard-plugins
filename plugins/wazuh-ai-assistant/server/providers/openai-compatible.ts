@@ -15,7 +15,10 @@ import {
   trimTrailingSlash,
 } from './types';
 import { widenNumericTypes } from './wire-schema';
-import { iterateSseLines } from './sse-utils';
+import {
+  iterateSseLines,
+  PROVIDER_STREAM_TRUNCATED_MESSAGE,
+} from './sse-utils';
 import {
   fetchProviderWithRetry,
   describeToolUseFailedStreamMessage,
@@ -181,9 +184,9 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
     // not call-scoped, so a stage-1/multi-round call must not let round 2 inherit round 1's extras.
     let messageExtras: Record<string, unknown> = {};
 
-    // Reasoning-channel fallback (see the `parsed` type below and issue
-    // 02-read-reasoning-delta.md): some reasoning models (gpt-oss, qwen3.x) stream their entire
-    // answer on `delta.reasoning` instead of `delta.content` — confirmed on a `general`-routed
+    // Reasoning-channel fallback (see the `parsed` type below): some reasoning models (gpt-oss,
+    // qwen3.x) stream their entire answer on `delta.reasoning` instead of `delta.content` —
+    // confirmed on a `general`-routed
     // (no-tool) turn, where 636 output tokens were billed and 0 characters reached the user.
     // `content` is always the answer when it arrives; `reasoningBuffer` only exists to be shown
     // as a LAST-RESORT stand-in, and only once the whole call is known to have produced no
@@ -196,16 +199,22 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
     // `toolCalls`: (a) don't call `finalizeToolCalls` again -- it was already drained and its
     // events already yielded, so a second call would either emit nothing (fine) or, if the map
     // wasn't cleared, re-emit duplicates; and (b) `reasoningFallback` below must still be suppressed
-    // there, even though the map they'd otherwise check is now empty. Previously the
-    // `finish_reason === 'tool_calls'` branch yielded its own bare `done` and returned immediately,
-    // which is the bug (issue 8875): a tool_calls-terminated stream still has one more chunk to read
-    // -- the empty-`choices` usage frame `stream_options.include_usage` unlocks -- and returning
-    // early skipped it, so EVERY tool-bearing round (and the stage-1 router call, which always ends
-    // in a tool call by design) reported `usage: undefined` right up to the round loop's accumulator,
-    // leaving only the last, tool-free round's usage to sum.
+    // there, even though the map they'd otherwise check is now empty. The
+    // `finish_reason === 'tool_calls'` branch must NOT yield its own bare `done` and return
+    // immediately: a tool_calls-terminated stream still has one more chunk to read -- the
+    // empty-`choices` usage frame `stream_options.include_usage` unlocks -- and returning early
+    // would skip it, so EVERY tool-bearing round (and the stage-1 router call, which always ends
+    // in a tool call by design) would report `usage: undefined` right up to the round loop's
+    // accumulator, leaving only the last, tool-free round's usage to sum.
     let toolCallsFinalized = false;
-    // Inline-markup filter (issue 18-strip-inline-reasoning-markup.md): some reasoning models
-    // (qwen3.x, measured 6/8 leaked answers) put their `<think>...</think>` deliberation, and
+    // Set the moment any choice carries a non-null `finish_reason` (see where it is assigned
+    // below). The loop-end tail reads it to tell a stream the provider ENDED from a stream that
+    // was CUT: `[DONE]` and the terminal usage frame both `return` from inside the loop, so
+    // reaching the tail means neither arrived, and a `finish_reason` is then the only remaining
+    // evidence that the provider meant to stop.
+    let sawFinishReason = false;
+    // Inline-markup filter: some reasoning models (qwen3.x, measured 6/8 leaked answers) put
+    // their `<think>...</think>` deliberation, and
     // sometimes `<tool_call>`/`<function=...>`/`<parameter=...>` text standing in for a real tool
     // call, straight into `delta.content` instead of the separate `reasoning` channel above. One
     // instance per call, fed every `content` delta below and drained at every exit path (mirrors
@@ -247,11 +256,11 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
      *    `content`): `content` still wins whenever it survives stripping with real text — this
      *    fallback only ever runs when `sawContent` is false, i.e. inline `content` fully evaporated
      *    (or never arrived). At that point `reasoningBuffer` is the better — indeed only — answer
-     *    source available, so it is used exactly as it already was pre-issue-18. */
+     *    source available, so it is used as-is. */
     function* reasoningFallback(hadToolCalls: boolean): Generator<StreamEvent> {
       if (!sawContent && !hadToolCalls && reasoningBuffer) {
-        // Flagged so chat.ts can tell this delta apart from real answer content (issue #8935
-        // item I3): the buffer is raw deliberation, and deliberation routinely names a tool the
+        // Flagged so chat.ts can tell this delta apart from real answer content: the buffer is
+        // raw deliberation, and deliberation routinely names a tool the
         // model decided AGAINST -- the deferred-offer interception must never read it as an
         // offer. Display behaviour is unchanged; the flag is additive.
         yield {
@@ -324,8 +333,8 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
         const delta = choice?.delta?.content;
         if (delta) {
           // Run every content delta through the inline-markup filter BEFORE it ever reaches the
-          // client (issue 18) — `sawContent` is set from the FILTERED result, not `delta`'s mere
-          // presence, so a delta that was entirely `<think>`/`<tool_call>` markup and got fully
+          // client — `sawContent` is set from the FILTERED result, not `delta`'s mere presence,
+          // so a delta that was entirely `<think>`/`<tool_call>` markup and got fully
           // stripped never lies about having produced an answer (see `reasoningFallback`'s
           // precedence note above).
           const filtered = inlineMarkupFilter.push(delta);
@@ -351,6 +360,18 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
           ),
         );
         accumulateToolCallDeltas(toolCalls, choice?.delta?.tool_calls);
+
+        // ANY non-null `finish_reason` means the provider deliberately ended this choice --
+        // 'stop', 'length', 'tool_calls', 'content_filter'. Recorded (not just the 'tool_calls'
+        // value the branch below reads) because it is the only per-choice evidence that the
+        // stream's end was intentional, which is what the loop-end tail has to decide on. See the
+        // dropped-stream guard on that tail.
+        if (
+          typeof choice?.finish_reason === 'string' &&
+          choice.finish_reason !== ''
+        ) {
+          sawFinishReason = true;
+        }
 
         if (choice?.finish_reason === 'tool_calls' && !toolCallsFinalized) {
           // Flush before finalizing the tool call, same ordering rule chat.ts's own
@@ -393,6 +414,33 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
           };
           return;
         }
+      }
+      // DROPPED-STREAM GUARD. Falling out of the `for await` means the socket closed without
+      // `[DONE]` and without a terminal usage frame -- both of those exits `return` from inside the
+      // loop above. Reaching here after the provider streamed ANSWER TEXT but never sent a
+      // `finish_reason` is not a completed answer: it is a connection that was cut mid-sentence.
+      // This tail must not yield a bare `{ type: 'done' }` here, or the client would commit the
+      // partial text and render it as final -- no error, no retry, nothing to tell the reader
+      // the answer stops mid-thought. The `catch` below cannot cover it either: a clean socket
+      // close throws nothing.
+      //
+      // Deliberately NARROW, so the paths that already recover are untouched:
+      //  - `sawContent` gates it to the mid-ANSWER window. A stream that drops BEFORE the first
+      //    delta still falls through to `done` with no text, which is what lets chat.ts's
+      //    `synthesizeNoTextFallback` no-tools retry fire -- a recovery that works today and must
+      //    keep working.
+      //  - `toolCallsFinalized` excludes a round that produced a tool call: that round's answer is
+      //    still to come on a LATER round, so its text is not the truncated thing here.
+      //  - a `finish_reason` on any choice means the provider deliberately ended the choice
+      //    ('stop'/'length'/...), so a provider that ends that way and simply omits `[DONE]` is
+      //    still treated as complete -- no new failure mode for well-behaved endpoints.
+      //
+      // The partial text is KEPT (it is already on screen) and the error is emitted BESIDE it, so
+      // the UI can mark the answer incomplete rather than final.
+      if (sawContent && !sawFinishReason && !toolCallsFinalized) {
+        yield* flushInlineMarkupFilter();
+        yield { type: 'error', message: PROVIDER_STREAM_TRUNCATED_MESSAGE };
+        return;
       }
       if (!toolCallsFinalized) {
         yield* flushInlineMarkupFilter();

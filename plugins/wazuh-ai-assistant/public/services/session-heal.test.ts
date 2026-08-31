@@ -16,6 +16,7 @@ function access(overrides: Partial<SettingsAccess> = {}): SettingsAccess {
     message: null,
     defaultApiHostId: 'default',
     apiKeyEncryptionEnabled: true,
+    settingsLocked: false,
     ...overrides,
   };
 }

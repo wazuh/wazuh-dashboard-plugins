@@ -20,10 +20,9 @@ export default [
     ),
   },
   {
-    text: 'Monitoring security policies',
+    text: 'Security Configuration Assessment',
     href: webDocumentationLink(
-      'user-manual/capabilities/policy-monitoring/index.html',
-      '4.8',
+      'user-manual/capabilities/sec-config-assessment/how-to-configure.html',
     ),
   },
   {

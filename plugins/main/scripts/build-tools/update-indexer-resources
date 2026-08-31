@@ -61,6 +61,18 @@ get_candidate_ref(){
       CANDIDATE_GIT_REFS+=("$version" "v$version")
   fi
 
+  local branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)
+
+  if [ -n "$branch" ] && [ "$branch" != "HEAD" ]; then
+      CANDIDATE_GIT_REFS+=("$branch")
+  fi
+
+  if [ -n "$GITHUB_BASE_REF" ]; then
+      CANDIDATE_GIT_REFS+=("$GITHUB_BASE_REF")
+  fi
+
+  CANDIDATE_GIT_REFS+=("main")
+
   echo "Candidate git references: ${CANDIDATE_GIT_REFS[*]}"
   for ref in "${CANDIDATE_GIT_REFS[@]}"; do
       if git ls-remote --exit-code --heads "$RESOURCE_REPO_URL" "$ref" >/dev/null 2>&1 || git ls-remote --exit-code --tags "$RESOURCE_REPO_URL" "$ref" >/dev/null 2>&1; then
@@ -69,7 +81,7 @@ get_candidate_ref(){
       fi
   done
 
-  echo 'Reference candidate not found'
+  echo "Reference candidate not found. Branch: [$INPUT_CANDIDATE_REF]. Tried: ${CANDIDATE_GIT_REFS[*]}"
   exit 1
 }
 

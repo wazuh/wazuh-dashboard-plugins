@@ -7,10 +7,10 @@
  *
  * Only Indexed=true fields are included (Indexed=false can never be filtered/aggregated, so is
  * out of scope for a "does this field exist and is it queryable" catalog). Keys match the index
- * families the catalog tools query -- see AI/plan/phase0-ground-truth.md's Tool catalog section.
+ * families the catalog tools query.
  * PATHS ONLY (no type/descriptions), to keep this file's footprint small: the only production
  * consumer is a boolean existence lookup (`isKnownField`, `field-drift-canary.ts`'s live-mapping
- * diff) -- code review footprint gate, see AI/plan/b-review.md P1.2.
+ * diff).
  */
 
 export const FIELD_CATALOG: Record<string, ReadonlyArray<string>> = {
@@ -5445,11 +5445,10 @@ export const FIELD_CATALOG: Record<string, ReadonlyArray<string>> = {
 };
 
 /**
- * KNOWN PLATFORM GAP (see AI/plan/phase0-ground-truth.md "Surprises" #1 and
- * AI/plan/qa-rules-decoders-rootcause.md): ECS `host.os.*`/`host.name` are mapped on
- * `wazuh-events-v5*`/`wazuh-findings-v5*` but LARGELY UNPOPULATED (AI/plan/b-review.md P1.1:
- * `host.os.platform` was only 7% populated on one live environment -- corrected from an earlier
- * "zero buckets" claim, which was stale). The POPULATED twin is `wazuh.agent.host.os.*` (and
+ * KNOWN PLATFORM GAP: ECS `host.os.*`/`host.name` are mapped on
+ * `wazuh-events-v5*`/`wazuh-findings-v5*` but LARGELY UNPOPULATED (`host.os.platform` was only 7%
+ * populated on one live environment -- corrected from an earlier "zero buckets" claim, which was
+ * stale). The POPULATED twin is `wazuh.agent.host.os.*` (and
  * `wazuh.agent.host.name`) -- `wazuh.integration.category`/`.name` are fully populated on the same
  * documents, so this is a field-population gap, not a data gap.
  *

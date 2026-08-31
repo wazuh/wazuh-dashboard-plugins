@@ -5,7 +5,7 @@ import { IndexerRequest } from '../types';
 import { rollUpTechniqueIdFilters } from '../technique-rollup';
 
 /**
- * Class-level guard for issue #8920 item 2 (sub-technique rollup): ANY catalog tool that accepts a
+ * Class-level guard for sub-technique rollup: ANY catalog tool that accepts a
  * technique-id parameter must roll a bare parent id ("T1059") up to include its sub-techniques
  * (an exact `term` PLUS a sibling `prefix` on "T1059."), never match only the parent's own exact
  * bucket -- MITRE ATT&CK itself treats a parent technique as covering its children, so a

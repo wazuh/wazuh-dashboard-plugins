@@ -260,6 +260,44 @@ describe('CaseManagementTab standalone comments', () => {
     expect(screen.getByText('a note')).toBeInTheDocument();
   });
 
+  it('shows the creation date, and an "Edited" tooltip with the edit date, only for edited comments', async () => {
+    const notEdited = {
+      author: 'admin',
+      comment: 'not edited',
+      created_at: '2026-06-30T09:00:00.000Z',
+      updated_at: '2026-06-30T09:00:00.000Z',
+    };
+    const edited = {
+      author: 'admin',
+      comment: 'edited comment',
+      created_at: '2026-06-30T10:00:00.000Z',
+      updated_at: '2026-07-01T12:00:00.000Z',
+    };
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: { ...fullCase, comments: [notEdited, edited] },
+      username: 'admin',
+    });
+
+    render(<CaseManagementTab document={documentRef} />);
+
+    expect(await screen.findByText('not edited')).toBeInTheDocument();
+    expect(screen.getByText(notEdited.created_at)).toBeInTheDocument();
+
+    // Only the edited comment shows the "Edited" indicator, and it always
+    // displays the creation date, not the edit date. The date text node is
+    // followed by a sibling " - Edited" node, so match as a substring.
+    expect(
+      screen.getByText(edited.created_at, { exact: false }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(edited.updated_at)).not.toBeInTheDocument();
+
+    const editedLabel = screen.getByText('Edited');
+    expect(editedLabel.tagName.toLowerCase()).toBe('em');
+
+    fireEvent.mouseOver(editedLabel);
+    expect(await screen.findByText(edited.updated_at)).toBeInTheDocument();
+  });
+
   it('shows the edit pencil only for own comments and persists the edit', async () => {
     const mine = {
       author: 'admin',

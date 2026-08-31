@@ -84,3 +84,45 @@ function checkSchemaAcceptsVendorExtras(
 
 checkSchemaAcceptsVendorExtras('chat.ts', chatRequestMessageSchema);
 checkSchemaAcceptsVendorExtras('conversations.ts', chatMessageSchema);
+
+/**
+ * Same drift risk, new field: the wire-proof fix (common/types.ts's `ChatMessage.privacyEnabled`
+ * doc comment) has the client replay `privacyEnabled` on every historical `role:'tool'` digest and
+ * `role:'assistant'` prose message, so `excludePrivacyOffHistory` (common/chat-history.ts) can
+ * fail-closed-exclude a privacy-off turn once privacy is on. Both request-body schemas below must
+ * accept it or every replayed privacy-flagged message 400s the very next turn / conversation save.
+ */
+function checkSchemaAcceptsPrivacyEnabled(
+  label: string,
+  targetSchema: ValidatableSchema,
+): void {
+  test(`${label}: accepts a role:'tool' message carrying privacyEnabled`, () => {
+    assert.doesNotThrow(() =>
+      targetSchema.validate({
+        role: 'tool',
+        content: 'digest',
+        toolCallId: 'call-1',
+        privacyEnabled: false,
+      }),
+    );
+  });
+
+  test(`${label}: accepts a role:'assistant' prose message carrying privacyEnabled`, () => {
+    assert.doesNotThrow(() =>
+      targetSchema.validate({
+        role: 'assistant',
+        content: 'answer',
+        privacyEnabled: true,
+      }),
+    );
+  });
+
+  test(`${label}: still accepts a message with no privacyEnabled at all (pre-fix conversations)`, () => {
+    assert.doesNotThrow(() =>
+      targetSchema.validate({ role: 'assistant', content: 'answer' }),
+    );
+  });
+}
+
+checkSchemaAcceptsPrivacyEnabled('chat.ts', chatRequestMessageSchema);
+checkSchemaAcceptsPrivacyEnabled('conversations.ts', chatMessageSchema);

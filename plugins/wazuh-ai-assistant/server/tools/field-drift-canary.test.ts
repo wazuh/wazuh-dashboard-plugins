@@ -160,34 +160,34 @@ test('checkFieldDrift: warns, prefixed "[field-drift]", for a TOOL-FACING field 
   assert.equal(logger.warnMessages.length, 1);
 });
 
-test(
-  'checkFieldDrift: warns for a CATALOG-ONLY field are demoted to debug, never warn -- code ' +
-    'review B2/B3 (AI/plan/b-review.md)',
-  async () => {
-    // "check.id" is a FIELD_CATALOG.sca entry with no get-field-values.ts tool field of its own
-    // (fieldsForFamily('sca') covers policy.id/check.result/check.name, not check.id) -- simulate
-    // it as dropped/renamed while every tool-facing field stays present.
-    const properties = await buildScaProperties(['check.id']);
-    const client = clientReturning({
-      'wazuh-states-sca*': {
-        'wazuh-states-sca-000001': { mappings: { properties } },
-      },
-      ...OTHER_EMPTY_FAMILY_INDICES,
-    });
-    const logger = fakeLogger();
-    await checkFieldDrift(client, logger as never);
-    assert.deepEqual(logger.warnMessages, []);
-    assert.ok(
-      logger.debugMessages.some(message => message.includes('"check.id"')),
-      'expected a DEBUG line naming the missing catalog-only "check.id" field',
-    );
-  },
-);
+test('checkFieldDrift: warns for a CATALOG-ONLY field are demoted to debug, never warn', async () => {
+  // "check.rationale" is a FIELD_CATALOG.sca entry with no get-field-values.ts tool field of its
+  // own -- simulate it as dropped/renamed while every tool-facing field stays present.
+  //
+  // The fixture needs a field that is catalog-only and NOT tool-facing; "check.id" and
+  // "policy.name" no longer qualify, because `state-families.ts` opened the sca family's state
+  // schema to get_field_values. The test's subject is the warn/debug DEMOTION, not which particular
+  // field happens to be untooled.
+  const properties = await buildScaProperties(['check.rationale']);
+  const client = clientReturning({
+    'wazuh-states-sca*': {
+      'wazuh-states-sca-000001': { mappings: { properties } },
+    },
+    ...OTHER_EMPTY_FAMILY_INDICES,
+  });
+  const logger = fakeLogger();
+  await checkFieldDrift(client, logger as never);
+  assert.deepEqual(logger.warnMessages, []);
+  assert.ok(
+    logger.debugMessages.some(message => message.includes('"check.rationale"')),
+    'expected a DEBUG line naming the missing catalog-only "check.rationale" field',
+  );
+});
 
 test(
   'checkFieldDrift: a live mapping missing MOST of the WCS catalog for a family, but every ' +
     'tool-facing field present, produces no warnings -- fixture is independent of FIELD_CATALOG ' +
-    '(code review B3, AI/plan/b-review.md: the old mirror-test fixture was BUILT FROM ' +
+    '(the old mirror-test fixture was BUILT FROM ' +
     'FIELD_CATALOG.sca itself, so "logs nothing when everything is present" was true by ' +
     'construction and could never observe the real bug (B2): the live index TEMPLATE maps far ' +
     'fewer fields than the WCS schema defines. This fixture hand-lists only a handful of real ' +

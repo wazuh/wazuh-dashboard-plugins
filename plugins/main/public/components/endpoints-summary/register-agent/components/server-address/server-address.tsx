@@ -13,20 +13,46 @@ import { EnhancedFieldConfiguration } from '../../../../common/form/types';
 import { InputForm } from '../../../../common/form';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { PLUGIN_VERSION_SHORT } from '../../../../../../common/constants';
+import {
+  AGENT_ENDPOINT_DEFAULT_PATH,
+  AGENT_ENDPOINT_DEFAULT_PORT,
+} from '../../../../../../common/services/agent-endpoint';
 import '../group-input/group-input.scss';
 import { ErrorHandler } from '../../../../../react-services/error-management/error-handler/error-handler';
 import { getUiSettings } from '../../../../../kibana-services';
 
 interface ServerAddressInputProps {
-  formField: EnhancedFieldConfiguration;
+  formFields: {
+    serverAddress: EnhancedFieldConfiguration;
+    serverPort: EnhancedFieldConfiguration;
+    serverPath: EnhancedFieldConfiguration;
+  };
 }
+
+/* The agent takes the address, the port and the path prefix as a single
+endpoint, but the wizard asks for them separately so each keeps the validation
+that fits it -- a combined string could no longer be checked as a hostname. The
+generated command joins them back together. */
+const SERVER_ADDRESS_SETTINGS = [
+  { field: 'serverAddress', setting: 'enrollment.dns' },
+  { field: 'serverPort', setting: 'enrollment.port' },
+  { field: 'serverPath', setting: 'enrollment.path' },
+] as const;
+
+/* `InputForm` forwards unknown props to the input itself, so the hint is
+rendered through its footer rather than the form row's `helpText`. */
+const EndpointDefaultHint = ({ children }: { children: React.ReactNode }) => (
+  <EuiText size='xs' color='subdued'>
+    {children}
+  </EuiText>
+);
 
 const popoverServerAddress = (
   <span>
     Learn about{' '}
     <EuiLink
       href={webDocumentationLink(
-        'user-manual/reference/ossec-conf/client.html#manager-address',
+        'user-manual/agent/agent-enrollment/enrollment-methods/via-agent-configuration/index.html',
         PLUGIN_VERSION_SHORT,
       )}
       target='_blank'
@@ -38,7 +64,8 @@ const popoverServerAddress = (
 );
 
 const ServerAddressInput = (props: ServerAddressInputProps) => {
-  const { formField } = props;
+  const { formFields } = props;
+  const { serverAddress, serverPort, serverPath } = formFields;
   const [isPopoverServerAddress, setIsPopoverServerAddress] = useState(false);
   const onButtonServerAddress = () =>
     setIsPopoverServerAddress(
@@ -46,46 +73,56 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
     );
   const closeServerAddress = () => setIsPopoverServerAddress(false);
   const [rememberServerAddress, setRememberServerAddress] = useState(false);
-  const [defaultServerAddress, setDefaultServerAddress] = useState(
-    formField?.initialValue ? formField?.initialValue : '',
+  /* What was last saved, so returning to the wizard shows the switch already
+  on for the endpoint it is prefilled with. */
+  const [savedEndpoint, setSavedEndpoint] = useState(() =>
+    SERVER_ADDRESS_SETTINGS.map(
+      ({ field }) => formFields[field]?.initialValue ?? '',
+    ),
   );
 
-  const handleToggleRememberAddress = async event => {
-    setRememberServerAddress(event.target.checked);
-    if (event.target.checked) {
-      await saveServerAddress();
-      setDefaultServerAddress(formField.value);
-    }
-  };
+  const currentEndpoint = SERVER_ADDRESS_SETTINGS.map(
+    ({ field }) => formFields[field].value,
+  );
 
   const saveServerAddress = async () => {
     try {
       // WORKAROUND: this could be done through the getWazuhCorePlugin().configuration but it requires the addition of a setter method
-      await getUiSettings().set('enrollment.dns', formField.value);
+      /* The three are saved together: a remembered address whose port or
+      prefix was dropped would prefill an endpoint the operator never used. */
+      await Promise.all(
+        SERVER_ADDRESS_SETTINGS.map(({ field, setting }) =>
+          getUiSettings().set(setting, formFields[field].value),
+        ),
+      );
     } catch (error) {
       ErrorHandler.handleError(error, {
         message: error.message,
-        title: 'Error saving server address configuration',
+        title: 'Error saving the server endpoint configuration',
       });
       setRememberServerAddress(false);
     }
   };
 
-  const rememberToggleIsDisabled = () => {
-    return !formField.value || !!formField.error;
-  };
-
-  const handleInputChange = value => {
-    if (value === defaultServerAddress) {
-      setRememberServerAddress(true);
-    } else {
-      setRememberServerAddress(false);
+  const handleToggleRememberAddress = async event => {
+    setRememberServerAddress(event.target.checked);
+    if (event.target.checked) {
+      await saveServerAddress();
+      setSavedEndpoint(currentEndpoint);
     }
   };
 
+  const rememberToggleIsDisabled = () =>
+    !serverAddress.value ||
+    SERVER_ADDRESS_SETTINGS.some(({ field }) => !!formFields[field].error);
+
   useEffect(() => {
-    handleInputChange(formField.value);
-  }, [formField.value]);
+    setRememberServerAddress(
+      [serverAddress.value, serverPort.value, serverPath.value].every(
+        (value, index) => value === savedEndpoint[index],
+      ),
+    );
+  }, [serverAddress.value, serverPort.value, serverPath.value, savedEndpoint]);
 
   return (
     <Fragment>
@@ -101,7 +138,7 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
       <EuiFlexGroup wrap>
         <EuiFlexItem grow={true}>
           <InputForm
-            {...formField}
+            {...serverAddress}
             label={
               <>
                 <EuiFlexGroup
@@ -111,9 +148,7 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
                   gutterSize='s'
                 >
                   <EuiFlexItem grow={false}>
-                    <span className='registerAgentLabels'>
-                      Assign a server address
-                    </span>
+                    <span className='registerAgentLabels'>Server address</span>
                   </EuiFlexItem>
                   <EuiFlexItem grow={false}>
                     <EuiPopover
@@ -140,7 +175,45 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
               </>
             }
             fullWidth={false}
-            placeholder='Server address'
+            placeholder='IP address or FQDN'
+          />
+        </EuiFlexItem>
+      </EuiFlexGroup>
+      <EuiFlexGroup wrap>
+        <EuiFlexItem grow={true}>
+          <InputForm
+            {...serverPort}
+            label={
+              <span className='registerAgentLabels'>
+                {`Port - `}
+                <em>optional</em>
+              </span>
+            }
+            footer={
+              <EndpointDefaultHint>
+                {`If left empty, ${AGENT_ENDPOINT_DEFAULT_PORT} default will be used`}
+              </EndpointDefaultHint>
+            }
+            fullWidth={false}
+            placeholder={AGENT_ENDPOINT_DEFAULT_PORT}
+          />
+        </EuiFlexItem>
+        <EuiFlexItem grow={true}>
+          <InputForm
+            {...serverPath}
+            label={
+              <span className='registerAgentLabels'>
+                {`Path prefix - `}
+                <em>optional</em>
+              </span>
+            }
+            footer={
+              <EndpointDefaultHint>
+                {`If left empty, ${AGENT_ENDPOINT_DEFAULT_PATH} default will be used`}
+              </EndpointDefaultHint>
+            }
+            fullWidth={false}
+            placeholder={AGENT_ENDPOINT_DEFAULT_PATH}
           />
         </EuiFlexItem>
       </EuiFlexGroup>
@@ -148,7 +221,7 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
         <EuiFlexItem grow={false}>
           <EuiSwitch
             disabled={rememberToggleIsDisabled()}
-            label='Remember server address'
+            label='Remember address, port, and path prefix'
             checked={rememberServerAddress}
             onChange={e => handleToggleRememberAddress(e)}
           />

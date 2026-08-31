@@ -470,7 +470,7 @@ Test new agent enrollment:
 # Use updated enrollment command with 5.x manager
 curl -so wazuh-agent-5.0.0-1.deb \
   https://packages.wazuh.com/5.x/apt/pool/main/w/wazuh-agent/wazuh-agent_5.0.0-1_amd64.deb \
-  && WAZUH_MANAGER='your-manager-ip' dpkg -i ./wazuh-agent-5.0.0-1.deb
+  && WAZUH_MANAGER_ENDPOINT='your-manager-ip' dpkg -i ./wazuh-agent-5.0.0-1.deb
 
 sudo systemctl daemon-reload
 sudo systemctl enable wazuh-agent

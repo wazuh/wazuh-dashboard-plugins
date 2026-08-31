@@ -86,11 +86,10 @@ function toWireRequest(
  * Privacy defaults/override/field policy, sourced from — and, on write, pushed back into — the
  * Wazuh indexer's `/_plugins/_setup/ai_assistant/settings` endpoint (see
  * `WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH`'s doc comment, common/constants.ts, for the OpenAPI
- * spec link). That endpoint's `PUT` is a documented UPSERT — unlike the raw index/document access
- * this provider used before it existed, there is no longer a "must not auto-create the underlying
- * index" concern for this plugin to guard against with its own existence check: the indexer plugin
- * owns provisioning behind this endpoint, and calling it to persist defaults on first access is the
- * intended usage, not a workaround.
+ * spec link). That endpoint's `PUT` is a documented UPSERT, so there is no "must not auto-create
+ * the underlying index" concern for this plugin to guard against with its own existence check:
+ * the indexer plugin owns provisioning behind this endpoint, and calling it to persist defaults
+ * on first access is the intended usage, not a workaround.
  *
  * `conversationRetentionDays` deliberately never appears in the wire shape this provider reads or
  * writes — it moved to `IsmSettingsProvider`, which is the sole owner of that field and reaches an

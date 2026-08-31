@@ -18,10 +18,12 @@ import { describeError } from '../../common/errors';
 import { getProviderAdapter } from '../providers/registry';
 import { assertProviderUrlAllowed } from '../providers/url-guard';
 import { StoredProviderAttributes } from '../settings/ai-providers-client';
-import { getApiKeyCipher } from '../plugin-services';
+import { getApiKeyCipher, isSettingsReadOnly } from '../plugin-services';
 import { isEncrypted } from '../crypto/api-key-cipher';
 import { resolveApiHostId } from '../tools/api-host';
 import {
+  isPermissionDeniedError,
+  redactSensitiveDetail,
   paginationQuerySchema,
   resolvePagination,
   withInternalErrorHandling,
@@ -270,6 +272,28 @@ export function requireApiKeyEncryption(
   });
 }
 
+/** Backstop for direct API calls — the UI blocks these writes first (see the access probe's
+ * `settingsLocked`). Keep short; never reference repo files. */
+export const SETTINGS_LOCKED_MESSAGE =
+  'AI Assistant settings are locked by your administrator and cannot be changed from this ' +
+  'page. Contact your administrator if you need a different configuration.';
+
+/**
+ * Refuses every settings/provider WRITE with 403 when `wazuh_ai_assistant.settingsReadOnly` is
+ * set (server/plugin-services.ts's `isSettingsReadOnly`) — checked first, before any other gate
+ * (encryption, name uniqueness, existence). See docs/ref/modules/ai-assistant/configuration.md.
+ * Deliberately does NOT gate POST /providers/{id}/test (it persists nothing) or any GET route.
+ * Exported for unit testing only — the routes below call it directly.
+ */
+export function requireSettingsUnlocked(
+  response: OpenSearchDashboardsResponseFactory,
+): IOpenSearchDashboardsResponse | null {
+  if (!isSettingsReadOnly()) {
+    return null;
+  }
+  return response.forbidden({ body: { message: SETTINGS_LOCKED_MESSAGE } });
+}
+
 export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
   // List all configured providers. API keys never leave the server. Paginated:
   // `page`/`perPage` query params, response carries `total`/`page`/`perPage` alongside `providers` —
@@ -294,7 +318,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
           perPage,
         },
       });
-    }),
+    }, logger),
   );
 
   // Create a provider. The first provider ever created automatically becomes the default;
@@ -314,6 +338,10 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       },
     },
     withInternalErrorHandling(async (context, request, response) => {
+      const lockGate = requireSettingsUnlocked(response);
+      if (lockGate) {
+        return lockGate;
+      }
       // SSRF fail-fast. The fetch-time guard inside each adapter remains the security-critical
       // check — it re-validates on every request, including configs saved by an earlier version —
       // but rejecting an obviously-bad baseUrl at save time gives the admin an immediate,
@@ -388,7 +416,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
         await clearOtherDefaults(context, providerId);
       }
       return response.ok({ body: toSummary(providerId, attributes) });
-    }),
+    }, logger),
   );
 
   // Update a provider. Sending an empty/absent apiKey keeps the previously stored one.
@@ -409,6 +437,10 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       },
     },
     withInternalErrorHandling(async (context, request, response) => {
+      const lockGate = requireSettingsUnlocked(response);
+      if (lockGate) {
+        return lockGate;
+      }
       // This is the most sensitive mutation on the route: omitting `apiKey` from the body keeps
       // the stored key, so a caller without the indexer's own write permission on this endpoint —
       // rejected by `aiProviders.update`'s `asCurrentUser` call below — could otherwise redirect
@@ -504,7 +536,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       return response.ok({
         body: toSummary(request.params.id, nextAttributes),
       });
-    }),
+    }, logger),
   );
 
   // Set a provider as the default, clearing the flag on every other provider.
@@ -513,7 +545,11 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       path: API_PATHS.PROVIDER_SET_DEFAULT(`{id}`),
       validate: { params: schema.object({ id: schema.string() }) },
     },
-    async (context, request, response) => {
+    withInternalErrorHandling(async (context, request, response) => {
+      const lockGate = requireSettingsUnlocked(response);
+      if (lockGate) {
+        return lockGate;
+      }
       const { aiProviders } = context.wazuh_ai_assistant;
       const existing = await aiProviders.get(context, request.params.id);
       if (!existing) {
@@ -531,7 +567,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       return response.ok({
         body: toSummary(request.params.id, nextAttributes),
       });
-    },
+    }, logger),
   );
 
   // Delete a provider.
@@ -541,12 +577,16 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       validate: { params: schema.object({ id: schema.string() }) },
     },
     withInternalErrorHandling(async (context, request, response) => {
+      const lockGate = requireSettingsUnlocked(response);
+      if (lockGate) {
+        return lockGate;
+      }
       await context.wazuh_ai_assistant.aiProviders.delete(
         context,
         request.params.id,
       );
       return response.ok({ body: { deleted: true } });
-    }),
+    }, logger),
   );
 
   // Minimal connectivity test: send a one-line "say ok" prompt through the real adapter and
@@ -556,7 +596,10 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       path: API_PATHS.PROVIDER_TEST(`{id}`),
       validate: { params: schema.object({ id: schema.string() }) },
     },
-    async (context, request, response) => {
+    // Wrapped like every other provider route: the `aiProviders.get` below reads the index as the
+    // calling user, so an RBAC denial here must map to the same sanitized 403 instead of reaching
+    // the platform uncaught and surfacing as a generic 500.
+    withInternalErrorHandling(async (context, request, response) => {
       // This route returns the provider's own response to the caller, which makes it a
       // read-capable SSRF primitive on top of the url-guard's network restrictions — the
       // indexer's own write permission on this endpoint is what actually authorizes it.
@@ -648,7 +691,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       return response.ok({
         body: { success, latencyMs, message: success ? undefined : message },
       });
-    },
+    }, logger),
   );
 
   // Plugin-wide settings singleton: privacy defaults/override/field policy. GET creates the
@@ -664,7 +707,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
           context,
         );
       return response.ok({ body: settings });
-    }),
+    }, logger),
   );
 
   // Manager-session liveness probe, called on app mount and before Manager-path work
@@ -695,6 +738,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
           message: sessionCheck.ok ? null : sessionCheck.message,
           defaultApiHostId,
           apiKeyEncryptionEnabled: getApiKeyCipher().enabled,
+          settingsLocked: isSettingsReadOnly(),
         },
       });
     },
@@ -702,7 +746,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
 
   const fieldPolicyActionSchema = schema.oneOf([
     schema.literal('allow'),
-    // #8912: value passes, but is first run through the shape scan (IPs/FQDNs) AND a
+    // Value passes, but is first run through the shape scan (IPs/FQDNs) AND a
     // known-entity dictionary scan (already-minted real values) — see privacy.ts's
     // `FieldPolicyAction` doc comment and `scrubKnownEntities`.
     schema.literal('allow-scan'),
@@ -754,11 +798,15 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
         }),
       },
     },
-    async (context, request, response) => {
+    withInternalErrorHandling(async (context, request, response) => {
+      const lockGate = requireSettingsUnlocked(response);
+      if (lockGate) {
+        return lockGate;
+      }
       // Ensures every provider's backend exists (first-ever PUT with no prior GET) before
       // updating it. The actual write goes through the CURRENT user for every provider, unlike
       // the read above (`getOrCreateSettings`) — see server/settings/opensearch-user.ts's doc
-      // comment.
+      // comment. Wrapped so a denial here is sanitized too, not just one from `updateSettings`.
       const { assistantSettings } = context.wazuh_ai_assistant;
       await assistantSettings.getOrCreateSettings(context);
       try {
@@ -768,15 +816,19 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
         );
         return response.ok({ body: updated });
       } catch (error) {
+        // Rethrow so the wrapper sanitizes it, instead of falling into the 503 below.
+        if (isPermissionDeniedError(error)) {
+          throw error;
+        }
         // Surfaces `IsmSettingsProvider`'s "policy not found"/"no delete transition" failures
         // (expected on any deployment where `CONVERSATION_SESSIONS_ISM_POLICY_ID` — see
         // common/constants.ts — hasn't been provisioned indexer-side yet) as an actionable 503
         // instead of a bare 500.
         return response.customError({
           statusCode: 503,
-          body: { message: describeError(error) },
+          body: { message: redactSensitiveDetail(describeError(error)) },
         });
       }
-    },
+    }, logger),
   );
 }

@@ -18,6 +18,7 @@ Copy this checklist and track progress:
 - [ ] 3. Fill the chosen .github/ISSUE_TEMPLATE/*.md verbatim
 - [ ] 4. Apply the real Wazuh label for the intent (`type/bug` / `type/enhancement` / `level/task`) + `untriaged`; ignore stale frontmatter labels
 - [ ] 5. Emit the ready-to-file body + report (default stop; gh issue create only if asked)
+- [ ] 6. Add to a project board (team board, not the release board) if asked, or ask first if the issue has no linked project
 ```
 
 ### 1. Classify intent → choose template
@@ -107,3 +108,32 @@ Issue pre-flight
 
 Only run `gh issue create` when the user explicitly asks you to open the
 issue.
+
+### 6. Optional: add the issue to a project board
+
+Only do this if the user explicitly asks — like step 5, this skill does not
+touch project boards by default. The one proactive exception: if you check
+the issue's existing project links (e.g. via `gh issue view <url> --json
+projectItems`) as part of this or a related workflow and find it linked to
+**zero** projects, ask the user whether to add it (and to which project)
+instead of silently skipping — don't assume no project was ever intended.
+Resolve the ids fresh each time (they are not portable across projects):
+
+```bash
+gh project list --owner <org> --format json                    # title → project number, id
+gh project item-add <number> --owner <org> --url <issue-url>    # add the issue, get the item id
+gh project field-list <number> --owner <org> --format json      # "Status" field id + option ids
+
+gh project item-edit --id <item-id> --field-id <status-field-id> \
+  --project-id <project-id> --single-select-option-id <option-id>
+```
+
+> **repo-specific (wazuh-dashboard-plugins):** a Wazuh dashboard issue is
+> commonly linked to two different _kinds_ of GitHub Project: a **team
+> board** (e.g. `XDR+SIEM/Dashboard team`) that tracks day-to-day work
+> status, and a **release-tracking board** (e.g. `XDR+SIEM/Release 5.0.0`)
+> that tracks the issue against a shipping version. When an issue is (or
+> will be) linked to both, drive status on the **team board** — the release
+> board reflects release-wide scope, not one person's work, and should be
+> left alone unless the user explicitly asks for it. If more than one team
+> board is linked, list the project titles and ask which one.

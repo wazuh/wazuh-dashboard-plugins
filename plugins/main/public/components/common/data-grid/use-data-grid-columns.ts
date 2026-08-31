@@ -139,7 +139,7 @@ function useDataGridColumns({
 
     const currentState = dataGridStatePersistenceManager.retrieveState();
 
-    if (!currentState.columns) {
+    if (!currentState.columns || currentState.columns.length === 0) {
       return;
     }
 
@@ -177,10 +177,25 @@ function useDataGridColumns({
     }
   };
 
+  const canFilterInvalidColumns =
+    indexPatternExists &&
+    Boolean(columnSchemaDefinitionsMap) &&
+    Object.keys(columnSchemaDefinitionsMap).length > 0;
+
+  const isKnownColumnId = (columnId: string): boolean =>
+    columnSchemaDefinitionsMap?.[columnId] !== undefined;
+
   // Don't use `useMemo` here because otherwise the DataGrid cell filter doesn't work
-  const retrieveVisibleDataGridColumns = visibleColumns.map(
-    (columnId: string) => {
-      let column = { ...columnSchemaDefinitionsMap[columnId] };
+  const effectiveVisibleColumns: string[] = canFilterInvalidColumns
+    ? visibleColumns.filter(isKnownColumnId)
+    : visibleColumns;
+
+  const retrieveVisibleDataGridColumns: tDataGridColumn[] =
+    effectiveVisibleColumns.map((columnId: string) => {
+      const definition = columnSchemaDefinitionsMap?.[columnId];
+      const column: tDataGridColumn = definition
+        ? { ...definition }
+        : { id: columnId };
       const savedColumnWidth =
         dataGridStatePersistenceManager.retrieveState().columnWidths?.[
           columnId
@@ -191,18 +206,17 @@ function useDataGridColumns({
       }
 
       return column;
-    },
-  );
+    });
 
   return {
     // This is a custom property used by the Available fields and is not part of EuiDataGrid component specification
     columnsAvailable: orderFirstMatchedColumns(
       Object.values(columnSchemaDefinitionsMap),
-      visibleColumns,
+      effectiveVisibleColumns,
     ),
     columns: retrieveVisibleDataGridColumns,
     columnVisibility: {
-      visibleColumns,
+      visibleColumns: effectiveVisibleColumns,
       setVisibleColumns: setVisibleColumnsHandler,
     },
     onColumnResize,

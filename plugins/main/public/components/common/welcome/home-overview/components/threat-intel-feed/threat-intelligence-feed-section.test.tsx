@@ -71,13 +71,13 @@ describe('ThreatIntelligenceFeedSection', () => {
     expect(screen.getByText('482')).toBeInTheDocument();
   });
 
-  it('navigates to the Security Analytics tiles on click, and to "Manage content" from the card header', () => {
+  it('navigates to the Security Analytics tiles on click, and to the module from the card title', () => {
     render(
       <ThreatIntelligenceFeedSection threatIntel={threatIntelAvailable} />,
     );
     fireEvent.click(screen.getByText('Rules'));
     expect(navigation.getRulesUrl).toHaveBeenCalled();
-    fireEvent.click(screen.getByText('Manage content'));
+    fireEvent.click(screen.getByText('Security analytics'));
     expect(navigation.getIntegrationsUrl).toHaveBeenCalled();
   });
 

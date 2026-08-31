@@ -60,7 +60,7 @@ const helpLinks = [
   {
     text: 'Syscollector module reference',
     href: webDocumentationLink(
-      'user-manual/reference/ossec-conf/wodle-syscollector.html',
+      'user-manual/capabilities/system-inventory/configuration.html#wazuh-agent-configuration',
     ),
   },
 ];

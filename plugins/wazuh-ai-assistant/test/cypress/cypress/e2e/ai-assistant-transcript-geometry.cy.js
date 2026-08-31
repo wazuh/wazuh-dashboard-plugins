@@ -1,13 +1,11 @@
 /**
- * Chat transcript geometry — durable regression guard for the class of spacing/alignment defects
- * found by the iteration-4 spacing audit and (partially) fixed on
- * `enhancement/ai-assistant-ux-iteration-4` (see chat-page.scss's "iteration-4 audit" comments
- * around `.wzMessageRow`, `.wzMessageRow--wide .wzProseMeasure`, `.wzStatusCallouts`, etc.).
+ * Chat transcript geometry — durable regression guard for spacing/alignment defects in the
+ * message transcript (see chat-page.scss's comments around `.wzMessageRow`,
+ * `.wzMessageRow--wide .wzProseMeasure`, `.wzStatusCallouts`, etc.).
  *
- * Encodes the numeric layout spec handed down for that fix as plain
- * `getBoundingClientRect()` / `getComputedStyle()` arithmetic, so a future change that
- * reintroduces any of these defects fails a specific, named assertion instead of only showing up
- * as a "looks a bit off" screenshot in a design review.
+ * Encodes the numeric layout spec as plain `getBoundingClientRect()` / `getComputedStyle()`
+ * arithmetic, so a future change that reintroduces any of these defects fails a specific, named
+ * assertion instead of only showing up as a "looks a bit off" screenshot in a design review.
  *
  * ── How to run ──────────────────────────────────────────
  *   cd plugins/wazuh-ai-assistant/test/cypress
@@ -41,32 +39,25 @@
  * against a live instance at https://localhost:8444 using a real browser +
  * `getBoundingClientRect`/`getComputedStyle`, before being encoded here.
  *
- * The wide-row alignment (assertion 4) was RED on the earlier build `50645f4ef`: a table-bearing
- * turn centred its wider row 120px further left and then used per-element `calc()` corrections that
- * left the avatar (and card) short of the prose rail, so the avatar drifted ~120px left of where a
- * prose-only turn's avatar sits and the prose/meta landed 22px short of the normal rail. The
- * ux-iteration-4 fix removed that scheme: `.wzMessageRow--wide` now anchors its own inline-start
- * edge at the normal row's, so avatar/prose/meta all keep their normal x. A SECOND ux-iteration-4
- * revision (owner's "bound the table by the chat box" call) then capped the wide row at the shared
- * content measure ($wzContentMaxWidth) instead of a wider table-only $wzTableMaxWidth: the results
- * card now fills the content column to its right edge — which lands on the COMPOSER's own right edge
- * — and never overshoots it, at every viewport. Assertion 4 encodes that fixed spec (do not "fix" a
- * regression by loosening it; the tolerances are the ~2px noise floor a correct fix lands on, plus a
- * small scrollbar-gutter allowance on the card→composer right-edge match, confirmed by live-patching
- * the rule and re-measuring at both 1920px and 1280px).
+ * Assertion 4 guards the wide-row alignment: `.wzMessageRow--wide` anchors its own inline-start
+ * edge at the normal row's, so avatar/prose/meta all keep their normal x instead of a
+ * table-bearing turn dragging them left. The wide row is capped at the shared content measure
+ * ($wzContentMaxWidth) rather than a wider table-only $wzTableMaxWidth, so the results card fills
+ * the content column to its right edge — which lands on the COMPOSER's own right edge — and never
+ * overshoots it, at every viewport. Do not "fix" a failure of this assertion by loosening its
+ * tolerance: the tolerances are the ~2px noise floor a correct implementation lands on, plus a
+ * small scrollbar-gutter allowance on the card→composer right-edge match, confirmed at both
+ * 1920px and 1280px.
  *
- * Two other candidates flagged in an earlier pass through this suite — a "24px not 32px" turn
- * gap, and a "6px not 8px" card/prose→footer gap — turned out, after the same
- * live-patch-and-re-measure treatment, to be measurement artifacts rather than real defects: both
  * `.wzMsgRow` and `.wzMsgMetaRow` are themselves `EuiFlexGroup`s, and EUI's gutter compensation
  * gives each of them a `margin: -Npx` on every side that is exactly cancelled by a `+Npx` margin
  * on their own flex item(s) — leaving the GROUP's own box N px larger than its visible content on
  * every side, but with nothing painted in that margin (no background/border/box-shadow) and the
  * actual avatar/prose/timestamp exactly where they'd be without any of it. Measuring those two
  * wrapper elements' own rects (rather than the avatar/timestamp elements actually inside them)
- * undercounted both gaps by exactly that cancelled-out margin. Assertions 7, 8 and 11 below
- * measure the correct (visible-content) element for this reason; assertion 11's comment has the
- * full live-patch evidence for anyone re-deriving this.
+ * would undercount gaps like the turn gap and the card/prose→footer gap by exactly that
+ * cancelled-out margin. Assertions 7, 8 and 11 below measure the correct (visible-content)
+ * element for this reason.
  */
 
 const QUESTIONS = {
@@ -250,11 +241,9 @@ describe('AI Assistant — transcript geometry', () => {
             const wideProse = rectOf($wideRow.find('.wzProseMeasure').first());
             const wideMeta = rectOf($wideRow.find('.wzMsgMetaRow').first());
 
-            // The owner's fix (ux-iteration-4): a table-bearing turn must never pull the avatar (or the
-            // prose, or the meta row) leftward. All three keep the exact x they hold on a prose-only
-            // turn, so avatars line up turn-to-turn instead of drifting left on table answers. This is
-            // the assertion that was RED before the fix — the avatar used to break out ~120px further
-            // left than the prose-only row's avatar.
+            // A table-bearing turn must never pull the avatar (or the prose, or the meta row)
+            // leftward. All three keep the exact x they hold on a prose-only turn, so avatars
+            // line up turn-to-turn instead of drifting left on table answers.
             expect(
               wideAvatar.left,
               'wide row: avatar.left == normal row avatar.left (no left drift)',
@@ -279,8 +268,8 @@ describe('AI Assistant — transcript geometry', () => {
               wideRow.left,
               'wide row left edge == normal row left edge',
             ).to.be.closeTo(normalRow.left, WIDE_ROW_PROSE_TOLERANCE_PX);
-            // Bounded, not breaking out: the wide row no longer extends past a normal row — both cap at
-            // $wzContentMaxWidth now that the table-only breakout is gone.
+            // Bounded, not breaking out: the wide row never extends past a normal row — both cap
+            // at $wzContentMaxWidth.
             expect(
               wideRow.right,
               'wide row right edge == normal row right edge (both at the content measure)',
@@ -288,10 +277,9 @@ describe('AI Assistant — transcript geometry', () => {
 
             cy.get('.wzComposerMeasure').then($composer => {
               const composer = rectOf($composer);
-              // The owner's "bound the table by the chat box" call: the card's right edge sits AT the
-              // composer's right edge and NEVER overshoots it (the earlier ~1300px table cap stuck out
-              // ~235px past the composer on a 1920px window). It may land a few px inside — the
-              // transcript reserves a scrollbar gutter the composer does not — but never outside.
+              // The card's right edge sits AT the composer's right edge and NEVER overshoots it.
+              // It may land a few px inside — the transcript reserves a scrollbar gutter the
+              // composer does not — but never outside.
               expect(
                 wideCard.right,
                 'card.right never overshoots composer.right',

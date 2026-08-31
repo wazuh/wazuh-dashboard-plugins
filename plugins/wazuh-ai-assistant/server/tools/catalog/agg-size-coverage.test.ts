@@ -5,7 +5,7 @@ import { applySafetyValves, lintDsl, MAX_AGG_SIZE } from '../guardrails';
 import { IndexerRequest } from '../types';
 
 /**
- * Class-level guard for issue #8894: NO catalog tool may be able to build an indexer request that
+ * Class-level guard: NO catalog tool may be able to build an indexer request that
  * the guardrails then reject.
  *
  * The defect this exists to prevent: `get_sca_results` clamped its `limit` parameter to a maximum of

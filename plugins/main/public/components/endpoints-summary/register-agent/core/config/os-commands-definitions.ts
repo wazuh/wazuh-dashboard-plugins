@@ -75,8 +75,7 @@ export type tOptionalParameters =
   | 'serverAddress'
   | 'agentName'
   | 'agentGroups'
-  | 'wazuhPassword'
-  | 'protocol';
+  | 'wazuhPassword';
 
 ///////////////////////////////////////////////////////////////////
 /// Package repository helpers (evaluated lazily at call time)
@@ -210,8 +209,12 @@ export const osCommandsDefinitions = [
 ///////////////////////////////////////////////////////////////////
 
 export const optionalParamsDefinitions: tOptionalParams<tOptionalParameters> = {
+  /* The installer takes the whole connection target -- host, optional port and
+  optional path prefix -- in one variable, which is what the agent writes into
+  its `<manager><endpoint>`. The wizard composes the value from its three
+  inputs before it gets here. */
   serverAddress: {
-    property: 'WAZUH_MANAGER',
+    property: 'WAZUH_MANAGER_ENDPOINT',
     getParamCommand: (props, selectedOS) => {
       const { property, value } = props;
       return value !== '' ? `${property}='${value}'` : '';
@@ -233,13 +236,6 @@ export const optionalParamsDefinitions: tOptionalParams<tOptionalParameters> = {
         parsedValue = value.length > 0 ? value.join(',') : '';
       }
       return parsedValue ? `${property}='${parsedValue}'` : '';
-    },
-  },
-  protocol: {
-    property: 'WAZUH_PROTOCOL',
-    getParamCommand: (props, selectedOS) => {
-      const { property, value } = props;
-      return value !== '' ? `${property}='${value}'` : '';
     },
   },
   wazuhPassword: {
