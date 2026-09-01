@@ -125,6 +125,12 @@ function isOutOfCreditsBody(status: number, bodyText: string): boolean {
  * an override is configured. Returns `defaultMessage` unchanged in every other case, so an
  * unconfigured deployment sees exactly the original text. Shared with wazuh-brain.ts so both
  * provider paths apply the same detection and precedence.
+ *
+ * A blank override counts as unconfigured. Nullish coalescing alone would let an empty or
+ * whitespace-only YAML value through and leave the user staring at an error with no text at all,
+ * which is strictly worse than the provider's own message. That value is reachable by accident:
+ * an operator clearing the setting by emptying it instead of commenting the line out, or a
+ * provisioning template rendering an unresolved variable.
  */
 export function describeOutOfCreditsMessage(
   status: number,
@@ -134,7 +140,8 @@ export function describeOutOfCreditsMessage(
   if (!isOutOfCreditsBody(status, bodyText)) {
     return defaultMessage;
   }
-  return getOutOfCreditsMessage() ?? defaultMessage;
+  const configured = getOutOfCreditsMessage()?.trim();
+  return configured ? configured : defaultMessage;
 }
 
 /** Builds the terminal-message text for a rejected response: the 429-friendly copy, or the raw

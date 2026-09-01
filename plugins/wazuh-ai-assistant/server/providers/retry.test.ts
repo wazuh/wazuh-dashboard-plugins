@@ -696,3 +696,48 @@ test('fetchProviderWithRetry: a 402 with no override configured keeps the raw-bo
   assert.match(message, /Provider responded with HTTP 402/);
   assert.match(message, /Insufficient Balance/i);
 });
+
+// --- A blank override counts as unconfigured. `??` alone would pass an empty YAML value straight
+// --- through and render an error bubble with no text, which is worse than the provider's own
+// --- message -- see describeOutOfCreditsMessage's doc comment.
+
+test('describeOutOfCreditsMessage: an empty override falls back to the default instead of rendering a blank error', () => {
+  setOutOfCreditsMessage('');
+  assert.equal(
+    describeOutOfCreditsMessage(402, 'Payment Required', 'default text'),
+    'default text',
+  );
+});
+
+test('describeOutOfCreditsMessage: a whitespace-only override falls back to the default', () => {
+  setOutOfCreditsMessage('   \n\t  ');
+  assert.equal(
+    describeOutOfCreditsMessage(402, 'Payment Required', 'default text'),
+    'default text',
+  );
+});
+
+test('describeOutOfCreditsMessage: a configured message is trimmed of surrounding whitespace', () => {
+  setOutOfCreditsMessage('  Out of credits.  ');
+  assert.equal(
+    describeOutOfCreditsMessage(402, 'Payment Required', 'default text'),
+    'Out of credits.',
+  );
+});
+
+test('fetchProviderWithRetry: an empty override still shows the provider text rather than an empty error', async () => {
+  setOutOfCreditsMessage('');
+  const doFetch = () =>
+    Promise.resolve(
+      fakeResponse(402, '{"error":{"message":"Insufficient Balance"}}'),
+    );
+  const controller = new AbortController();
+  const { events } = await drain(
+    fetchProviderWithRetry(doFetch, controller.signal),
+  );
+
+  assert.equal(events.length, 1);
+  const message = (events[0] as { message: string }).message;
+  assert.notEqual(message.trim(), '', 'the user must never get a blank error');
+  assert.match(message, /Provider responded with HTTP 402/);
+});
