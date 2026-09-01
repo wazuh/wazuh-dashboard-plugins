@@ -885,3 +885,64 @@ test('fetchProviderWithRetry: an out-of-credits 429 with no override does not cl
   assert.match(message, /Provider responded with HTTP 429/);
   assert.match(message, /no credits remaining/i);
 });
+
+/**
+ * The out-of-credits branch sits on the shared rejection path, so every other failure must reach
+ * the reader exactly as it did before: the provider's own text, never the configured override. An
+ * override is configured throughout, since that is the state in which a leak would happen.
+ */
+describe('unrelated failures keep their own text with an override configured', () => {
+  const CASES: [string, number, string][] = [
+    [
+      'invalid api key',
+      401,
+      '{"error":{"code":"invalid_api_key","message":"Incorrect API key provided."}}',
+    ],
+    [
+      'forbidden',
+      403,
+      '{"error":{"message":"You do not have access to this model."}}',
+    ],
+    [
+      'model not found',
+      404,
+      '{"error":{"message":"The model does not exist."}}',
+    ],
+    [
+      'context length exceeded',
+      400,
+      '{"error":{"code":"context_length_exceeded","message":"Maximum context length is 128000 tokens."}}',
+    ],
+    [
+      'unprocessable',
+      422,
+      '{"error":{"message":"Invalid value for messages[0].role"}}',
+    ],
+  ];
+
+  for (const [label, status, body] of CASES) {
+    test(`${label} (${status}) keeps the provider text and is not retried`, async () => {
+      setOutOfCreditsMessage('OVERRIDE');
+      let calls = 0;
+      const doFetch = () => {
+        calls += 1;
+        return Promise.resolve(fakeResponse(status, body));
+      };
+      const { events } = await drain(
+        fetchProviderWithRetry(doFetch, new AbortController().signal),
+      );
+
+      assert.equal(
+        calls,
+        1,
+        `${status} is terminal, so it must not be retried`,
+      );
+      const message = (events.at(-1) as { message: string }).message;
+      assert.notEqual(message, 'OVERRIDE');
+      assert.match(
+        message,
+        new RegExp(`Provider responded with HTTP ${status}`),
+      );
+    });
+  }
+});
