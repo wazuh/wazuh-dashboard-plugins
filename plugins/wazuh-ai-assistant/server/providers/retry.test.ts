@@ -524,7 +524,11 @@ test('fetchProviderWithRetry: an out-of-credits marker on a normally-retryable 4
 
 test('describeOutOfCreditsMessage: a matching body with nothing configured returns the default message unchanged', () => {
   assert.equal(
-    describeOutOfCreditsMessage(ANTHROPIC_LOW_BALANCE_BODY, 'default text'),
+    describeOutOfCreditsMessage(
+      400,
+      ANTHROPIC_LOW_BALANCE_BODY,
+      'default text',
+    ),
     'default text',
   );
 });
@@ -532,7 +536,11 @@ test('describeOutOfCreditsMessage: a matching body with nothing configured retur
 test('describeOutOfCreditsMessage: a matching body with an override configured returns the override', () => {
   setOutOfCreditsMessage('custom text');
   assert.equal(
-    describeOutOfCreditsMessage(ANTHROPIC_LOW_BALANCE_BODY, 'default text'),
+    describeOutOfCreditsMessage(
+      400,
+      ANTHROPIC_LOW_BALANCE_BODY,
+      'default text',
+    ),
     'custom text',
   );
 });
@@ -541,6 +549,7 @@ test('describeOutOfCreditsMessage: a non-matching body returns the default messa
   setOutOfCreditsMessage('custom text');
   assert.equal(
     describeOutOfCreditsMessage(
+      400,
       '{"error":{"message":"bad request"}}',
       'default text',
     ),
@@ -552,9 +561,138 @@ test('describeOutOfCreditsMessage: detects the OpenAI-compatible insufficient_qu
   setOutOfCreditsMessage('custom text');
   assert.equal(
     describeOutOfCreditsMessage(
+      429,
       '{"error":{"code":"INSUFFICIENT_QUOTA","message":"You exceeded your current quota."}}',
       'default text',
     ),
     'custom text',
   );
+});
+
+// --- Detection across the providers this plugin can be pointed at. Each body below is the shape
+// --- that provider actually returns; the two transient cases at the end guard the boundary that
+// --- matters most -- a recoverable throttle must never be reframed as a terminal billing error.
+
+test('describeOutOfCreditsMessage: a 402 is treated as out-of-credits on status alone, whatever the body says', () => {
+  setOutOfCreditsMessage('custom text');
+  assert.equal(
+    describeOutOfCreditsMessage(402, 'Payment Required', 'default text'),
+    'custom text',
+    '402 is the status HTTP defines for this, so it needs no marker in the body',
+  );
+});
+
+test('describeOutOfCreditsMessage: detects DeepSeek’s 402 "Insufficient Balance"', () => {
+  setOutOfCreditsMessage('custom text');
+  assert.equal(
+    describeOutOfCreditsMessage(
+      402,
+      '{"error":{"message":"Insufficient Balance","type":"unknown_error","code":"invalid_request_error"}}',
+      'default text',
+    ),
+    'custom text',
+  );
+});
+
+test('describeOutOfCreditsMessage: detects OpenRouter’s 402 "Insufficient credits"', () => {
+  setOutOfCreditsMessage('custom text');
+  assert.equal(
+    describeOutOfCreditsMessage(
+      402,
+      '{"error":{"code":402,"message":"Insufficient credits. This account never purchased credits."}}',
+      'default text',
+    ),
+    'custom text',
+  );
+});
+
+test('describeOutOfCreditsMessage: detects the Vercel AI Gateway "Insufficient funds" wording', () => {
+  setOutOfCreditsMessage('custom text');
+  assert.equal(
+    describeOutOfCreditsMessage(
+      402,
+      '{"error":{"message":"Insufficient funds. Add credits to your account to continue using AI services."}}',
+      'default text',
+    ),
+    'custom text',
+  );
+});
+
+test('describeOutOfCreditsMessage: detects an "insufficient balance" body even when the provider does not use 402', () => {
+  setOutOfCreditsMessage('custom text');
+  assert.equal(
+    describeOutOfCreditsMessage(
+      400,
+      '{"error":{"message":"Insufficient Balance"}}',
+      'default text',
+    ),
+    'custom text',
+    'the text markers must still cover providers that report the condition on another status',
+  );
+});
+
+test('describeOutOfCreditsMessage: a Groq rate-limit 429 is NOT out-of-credits', () => {
+  setOutOfCreditsMessage('custom text');
+  assert.equal(
+    describeOutOfCreditsMessage(
+      429,
+      '{"error":{"message":"Rate limit reached for model llama-3.3-70b-versatile on tokens per minute (TPM): Limit 6000, Used 5800.","type":"tokens","code":"rate_limit_exceeded"}}',
+      'default text',
+    ),
+    'default text',
+  );
+});
+
+test('describeOutOfCreditsMessage: a Gemini RESOURCE_EXHAUSTED 429 is NOT out-of-credits despite carrying the same "exceeded your current quota" text as OpenAI', () => {
+  setOutOfCreditsMessage('custom text');
+  assert.equal(
+    describeOutOfCreditsMessage(
+      429,
+      '{"error":{"code":429,"message":"You exceeded your current quota, please check your plan and billing details.","status":"RESOURCE_EXHAUSTED"}}',
+      'default text',
+    ),
+    'default text',
+    'Gemini reuses OpenAI’s wording for a per-minute limit that resets on its own; only the underscored insufficient_quota code marks a real billing failure',
+  );
+});
+
+test('fetchProviderWithRetry: a 402 is never retried and yields the configured message', async () => {
+  setOutOfCreditsMessage(
+    'Out of credits. [Top up](https://example.com/billing).',
+  );
+  let calls = 0;
+  const doFetch = () => {
+    calls += 1;
+    return Promise.resolve(
+      fakeResponse(402, '{"error":{"message":"Insufficient Balance"}}'),
+    );
+  };
+  const controller = new AbortController();
+  const { events } = await drain(
+    fetchProviderWithRetry(doFetch, controller.signal),
+  );
+
+  assert.equal(calls, 1, '402 is terminal, so it must not be retried');
+  assert.equal(events.length, 1);
+  assert.equal(events[0].type, 'error');
+  assert.equal(
+    (events[0] as { message: string }).message,
+    'Out of credits. [Top up](https://example.com/billing).',
+  );
+});
+
+test('fetchProviderWithRetry: a 402 with no override configured keeps the raw-body message shape', async () => {
+  const doFetch = () =>
+    Promise.resolve(
+      fakeResponse(402, '{"error":{"message":"Insufficient Balance"}}'),
+    );
+  const controller = new AbortController();
+  const { events } = await drain(
+    fetchProviderWithRetry(doFetch, controller.signal),
+  );
+
+  assert.equal(events.length, 1);
+  const message = (events[0] as { message: string }).message;
+  assert.match(message, /Provider responded with HTTP 402/);
+  assert.match(message, /Insufficient Balance/i);
 });

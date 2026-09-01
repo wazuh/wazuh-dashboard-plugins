@@ -114,7 +114,11 @@ export class WazuhBrainAdapter implements ProviderAdapter {
         type: 'error',
         // Out-of-credits override, same detection/precedence as retry.ts's SSE adapters — see
         // describeOutOfCreditsMessage's doc comment.
-        message: describeOutOfCreditsMessage(bodyText, defaultMessage),
+        message: describeOutOfCreditsMessage(
+          response.status,
+          bodyText,
+          defaultMessage,
+        ),
       };
       return;
     }

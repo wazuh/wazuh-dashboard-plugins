@@ -80,20 +80,41 @@ function isToolUseFailedBody(status: number, bodyText: string): boolean {
 
 /**
  * Substrings real providers use to report an out-of-credits condition — a billing failure, not
- * the transient rate limiting RETRYABLE_STATUSES handles. Deliberately specific phrases rather
- * than the bare word "quota", which a genuine transient rate-limit message can also use.
+ * the transient rate limiting RETRYABLE_STATUSES handles. Only for providers that do NOT use the
+ * 402 status handled below: Anthropic reports it on a 400 ("credit balance is too low…purchase
+ * credits"), OpenAI on a 429 carrying the `insufficient_quota` code.
+ *
+ * Deliberately specific phrases rather than the bare word "quota". Gemini's transient 429
+ * (`RESOURCE_EXHAUSTED`, a per-minute/per-day limit that resets on its own) carries the exact
+ * same "You exceeded your current quota, please check your plan and billing details" text OpenAI
+ * uses for a billing failure — matching "quota" alone would turn that recoverable throttle into
+ * a terminal error. OpenAI's underscored `insufficient_quota` code is what separates the two.
  */
 const OUT_OF_CREDITS_MARKERS = [
   'credit balance',
   'insufficient_quota',
   'insufficient credit',
+  'insufficient balance',
+  'insufficient funds',
   'out of credit',
   'purchase credits',
 ];
 
-/** True when a rejected response's body reports an out-of-credits condition. No status gate:
- * different providers report it at different HTTP statuses. */
-function isOutOfCreditsBody(bodyText: string): boolean {
+/**
+ * True when a rejected response reports an out-of-credits condition.
+ *
+ * `402 Payment Required` is authoritative on its own: it is the status HTTP defines for this, and
+ * the one DeepSeek, OpenRouter, Vercel AI Gateway, and Together AI all use. It is protocol
+ * semantics rather than prose a provider can reword, and it is absent from RETRYABLE_STATUSES, so
+ * treating it as terminal costs no legitimate retry.
+ *
+ * Providers that report the condition on some other status are matched by body text instead. That
+ * check is deliberately not status-gated, since they disagree on which status to use.
+ */
+function isOutOfCreditsBody(status: number, bodyText: string): boolean {
+  if (status === 402) {
+    return true;
+  }
   const lowered = bodyText.toLowerCase();
   return OUT_OF_CREDITS_MARKERS.some(marker => lowered.includes(marker));
 }
@@ -106,10 +127,11 @@ function isOutOfCreditsBody(bodyText: string): boolean {
  * provider paths apply the same detection and precedence.
  */
 export function describeOutOfCreditsMessage(
+  status: number,
   bodyText: string,
   defaultMessage: string,
 ): string {
-  if (!isOutOfCreditsBody(bodyText)) {
+  if (!isOutOfCreditsBody(status, bodyText)) {
     return defaultMessage;
   }
   return getOutOfCreditsMessage() ?? defaultMessage;
@@ -493,10 +515,11 @@ export async function* fetchProviderWithRetry(
     // Out-of-credits is never transient, so it is checked before the retry decision below and
     // regardless of status: a provider reporting it on an otherwise-retryable status (e.g.
     // `insufficient_quota` on a 429) must not be pointlessly retried.
-    if (isOutOfCreditsBody(bodyText)) {
+    if (isOutOfCreditsBody(response.status, bodyText)) {
       yield {
         type: 'error',
         message: describeOutOfCreditsMessage(
+          response.status,
           bodyText,
           buildTerminalMessage(response.status, bodyText, secret),
         ),
