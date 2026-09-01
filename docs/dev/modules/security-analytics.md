@@ -1,4 +1,4 @@
-# Security Analytics
+# Ruleset Management
 
 This module allows to manage the analysis of the security events logs and generate alerts based on the defined rules. It provides a set of tools to create, edit, and manage decoders, integrations, filters, KVDBs, detectors and rules, and test the logs against the defined integrations in logtest.
 
@@ -184,9 +184,9 @@ The promotion process allows to move the integrations and filters between the di
 
 # Architecture
 
-The plugin registers multiple apps in the **Security Analytics** category of the Wazuh dashboard sidebar:
+The plugin registers multiple apps in the **Ruleset Management** category of the Wazuh dashboard sidebar:
 
-- **Overview**: Provides a general overview of the security analytics, including the number of integrations and filters.
+- **Overview**: Provides a general overview of the ruleset management content, including the number of integrations and filters.
 - **Decoders**: Allows to create, edit, and manage the decoders that will be used to parse the security events logs.
 - **KVDBs**: Allows to create, edit, and manage the KVDBs that will be used to store the information of the security events logs. TODO:
 - **Detectors**: Allows to create, edit, and manage the detectors that will be used to analyze the security events logs and generate findings.
@@ -195,7 +195,7 @@ The plugin registers multiple apps in the **Security Analytics** category of the
 
 ## Overview
 
-This is the main app of the Security Analytics plugin. It provides a general overview of the space details, including the integrations and filters. The space can be switched using the space selector in the top right corner.
+This is the main app of the Ruleset Management plugin. It provides a general overview of the space details, including the integrations and filters. The space can be switched using the space selector in the top right corner.
 
 There are three set of actions that can be performed in this app:
 

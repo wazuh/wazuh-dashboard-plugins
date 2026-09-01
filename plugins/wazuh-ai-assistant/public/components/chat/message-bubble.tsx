@@ -218,7 +218,7 @@ interface MessageBubbleProps {
   message: UiChatMessage;
   /** Threaded down to ResultTable's "Open in Discover" link; see discover-link.tsx. */
   resolveDiscoverUrl: ResolveDiscoverUrl;
-  /** Threaded down to ResultTable's "Open in Security Analytics" link; see
+  /** Threaded down to ResultTable's "Open in Ruleset Management" link; see
    * security-analytics-link.tsx. */
   resolveSecurityAnalyticsUrl: ResolveSecurityAnalyticsUrl;
   /**

@@ -4,7 +4,7 @@
 - [Notifications and Alerting](./notifications-alerting.md)
 - [Indexer Management Settings](./indexer-settings.md)
 - [Saved Objects for Dashboards and Visualizations](./saved-objects-dashboards.md)
-- [Security Analytics](./security-analytics/README.md)
+- [Ruleset Management](./security-analytics/README.md)
   - [Normalization](./security-analytics/normalization.md)
   - [Detection](./security-analytics/detection.md)
 - [AI Assistant](./ai-assistant/README.md)

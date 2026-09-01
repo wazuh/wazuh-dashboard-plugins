@@ -208,7 +208,7 @@ test('the "inventory" category description covers "software" and vague host phra
  * never appears in any category's text.
  */
 test(
-  'the "security_analytics" category description covers Security Analytics "spaces" ' +
+  'the "security_analytics" category description covers Ruleset Management "spaces" ' +
     '(content grouping), disambiguated from an RBAC/dashboard permission space',
   () => {
     const prompt = buildRoutingPrompt('2026-01-01T00:00:00.000Z');

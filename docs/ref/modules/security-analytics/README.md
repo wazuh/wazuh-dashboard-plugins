@@ -1,6 +1,6 @@
-# Security Analytics
+# Ruleset Management
 
-**Security Analytics** is a core section of the Wazuh Dashboard that provides the tools required to manage the full lifecycle of log normalization and event-based detection. It brings together the configuration of integrations, decoders, key-value databases, and detection rules under a unified interface backed by the Wazuh Engine.
+**Ruleset Management** is a core section of the Wazuh Dashboard that provides the tools required to manage the full lifecycle of log normalization and event-based detection. It brings together the configuration of integrations, decoders, key-value databases, and detection rules under a unified interface backed by the Wazuh Engine.
 
 ## Modules
 
@@ -9,7 +9,7 @@
 
 ## Spaces
 
-Security Analytics organizes content across four **spaces**. Three of them — Draft, Test, and Custom — are user-managed and represent the stages of the content lifecycle. The fourth, Standard, is read-only and contains the built-in content shipped with Wazuh.
+Ruleset Management organizes content across four **spaces**. Three of them — Draft, Test, and Custom — are user-managed and represent the stages of the content lifecycle. The fourth, Standard, is read-only and contains the built-in content shipped with Wazuh.
 
 | Space        | Managed by | Purpose                                                                                                                                                                           |
 | ------------ | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

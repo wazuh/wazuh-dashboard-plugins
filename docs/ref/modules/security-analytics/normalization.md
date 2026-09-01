@@ -1,6 +1,6 @@
 # Normalization
 
-The **Normalization** module is part of the **Security Analytics** section in the Wazuh Dashboard. It provides visibility and management over the components that govern how raw log data is parsed, enriched, and structured before it is used for detection and analysis.
+The **Normalization** module is part of the **Ruleset Management** section in the Wazuh Dashboard. It provides visibility and management over the components that govern how raw log data is parsed, enriched, and structured before it is used for detection and analysis.
 
 This module exposes the following sections:
 
@@ -15,7 +15,7 @@ This module exposes the following sections:
 
 ### Integrations
 
-An **integration** is the top-level organizational unit in Security Analytics. It groups a set of related decoders and rules that together implement support for a specific log source or use case.
+An **integration** is the top-level organizational unit in Ruleset Management. It groups a set of related decoders and rules that together implement support for a specific log source or use case.
 
 In each space, the integration is configured through a **space policy**. That policy must be **enabled** before the integration can move forward in the promotion workflow for that space, and it defines the **root decoder**—the decoder the normalization engine uses as the entry point when processing events for this integration (in **Test** and **Custom**, where content is loaded into the engine).
 
@@ -54,7 +54,7 @@ Create Integration → Add Decoder → Enable policy → Promote to Test → Tes
 
 ### Step 1: Create a Custom Integration
 
-Navigate to **Security Analytics → Overview** (space **Draft**), open the **Integrations** tab, and select **Actions → Create** to open the **Create integration** form. Complete it:
+Navigate to **Ruleset Management → Overview** (space **Draft**), open the **Integrations** tab, and select **Actions → Create** to open the **Create integration** form. Complete it:
 
 - **Title** _(required)_ — the integration identifier, e.g. `custom-ssh-auth`. Must be 2–50 characters using only lowercase letters, digits, hyphens, and underscores (no spaces or uppercase).
 - **Category** _(required)_ — routes classified events to the `wazuh-events-v5-<category>` index.
@@ -79,7 +79,7 @@ Once created, the new integration appears in the integrations list within the **
 
 ### Step 2: Create a Custom Decoder
 
-Navigate to **Security Analytics → Normalization → Decoders**, then select **Actions → Create**. In the creation form, choose the integration created in the previous step (`custom-ssh-auth`), and provide the decoder definition.
+Navigate to **Ruleset Management → Normalization → Decoders**, then select **Actions → Create**. In the creation form, choose the integration created in the previous step (`custom-ssh-auth`), and provide the decoder definition.
 
 <!-- IMAGE: Decoder creation form with integration chosen -->
 <!-- Suggested filename: images/normalization/03-create-decoder-yaml-editor.png -->
@@ -127,7 +127,7 @@ Once valid, the decoder is created and appears under **Normalization → Decoder
 
 The space's **space policy** defines the **root decoder** — the decoder the engine uses as the entry point for event processing — and whether the space is active (the **Status** toggle). A root decoder must be set before the space's content can be promoted.
 
-1. Navigate to **Security Analytics → Overview** and ensure the **Draft** space is selected (top-right space selector).
+1. Navigate to **Ruleset Management → Overview** and ensure the **Draft** space is selected (top-right space selector).
 2. Open the space **Actions** menu (top-right) and select **Edit** to open the **Edit Draft** flyout.
 
 <!-- IMAGE: Integration actions menu in the Draft space, Edit option highlighted -->
@@ -174,7 +174,7 @@ A _Successfully promoted [draft] space_ toast confirms it, and the integration i
 
 With the integration promoted to the **Test** space, use **Log test** to verify that events are parsed correctly.
 
-Navigate to **Security Analytics → Log test** and select the **Test** space (header space selector). Under **Normalization**, set **Location** to `/var/log/auth.log` _(optional)_ and paste a representative event in **Log event**:
+Navigate to **Ruleset Management → Log test** and select the **Test** space (header space selector). Under **Normalization**, set **Location** to `/var/log/auth.log` _(optional)_ and paste a representative event in **Log event**:
 
 ```
 Dec 19 12:00:00 host sshd[123]: Failed password for root from 10.0.0.1 port 12345 ssh2
@@ -218,7 +218,7 @@ Once promoted, the integration is active in the **Custom** space and the engine 
 
 ## Space policy settings
 
-Every space has a **space policy**. Its current values are shown read-only on the **Settings** and **Details** tabs of the policy card in **Security Analytics → Overview** (in any space). To change them, select the space (top-right space selector) and choose **Actions → Edit** to open the **Edit &lt;space&gt;** flyout (titled, for example, **Edit Draft**).
+Every space has a **space policy**. Its current values are shown read-only on the **Settings** and **Details** tabs of the policy card in **Ruleset Management → Overview** (in any space). To change them, select the space (top-right space selector) and choose **Actions → Edit** to open the **Edit &lt;space&gt;** flyout (titled, for example, **Edit Draft**).
 
 **Where editing is available.** The **Actions → Edit** item is enabled only in **Draft** and **Standard**; in **Test** and **Custom** it is disabled. Which fields are editable also depends on the space:
 
@@ -262,7 +262,7 @@ Both toggles live in the space policy's **Settings** group (shown in the **Edit 
 
 **Enable or disable unclassified / discarded events indexing — exact UI steps:**
 
-1. Go to **Security Analytics → Overview**.
+1. Go to **Ruleset Management → Overview**.
 2. Select the space (top-right space selector). These toggles are editable in **Draft** and **Standard** only (see [Space policy settings](#space-policy-settings)).
 3. Open the space **Actions** menu and select **Edit** to open the **Edit &lt;space&gt;** flyout.
 4. Under **Settings**, toggle **Index unclassified events** and/or **Index discarded events**.

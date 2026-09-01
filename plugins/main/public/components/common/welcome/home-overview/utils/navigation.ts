@@ -214,7 +214,7 @@ export const getRegulatoryComplianceUrl = (tabView: string): string =>
 export const getModuleUrl = (appId: string): string => getUrlForApp(appId);
 
 /**
- * App ids registered by the Security Analytics dashboards plugin. Absent when
+ * App ids registered by the Ruleset Management dashboards plugin. Absent when
  * it isn't installed, but by then the tile is already hidden via its 404.
  */
 const SECURITY_ANALYTICS_APP_IDS = {

@@ -592,7 +592,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
     const [resolveDiscoverUrl] = useState(() =>
       createDiscoverUrlResolver(core),
     );
-    // "Open in Security Analytics" (security-analytics-link.tsx): same rationale as above.
+    // "Open in Ruleset Management" (security-analytics-link.tsx): same rationale as above.
     const [resolveSecurityAnalyticsUrl] = useState(() =>
       createSecurityAnalyticsUrlResolver(core),
     );

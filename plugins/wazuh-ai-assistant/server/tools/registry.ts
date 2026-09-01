@@ -99,13 +99,13 @@ const CATALOG: ToolDefinition[] = [
   // were consolidated into this one tool -- see get-agent-inventory.ts's doc comment)
   getAgentInventoryTool,
 
-  // Security Analytics content: ruleset + pipeline components + detector definitions
+  // Ruleset Management content: ruleset + pipeline components + detector definitions
   getRulesTool,
   getThreatIntelComponentsTool,
   getDetectorsTool,
 
   // IOC/indicator lookup against the CTI enrichment feed -- filed adjacent to the Security
-  // Analytics content tools above since it is the same "Security Analytics / threat-intel
+  // Analytics content tools above since it is the same "Ruleset Management / threat-intel
   // pipeline knowledge" domain, not the customer's own observed data.
   lookupIndicatorTool,
   // CTI content freshness -- same domain as above.

@@ -1,6 +1,6 @@
 # Detection
 
-The **Detection** module is part of the **Security Analytics** section in the Wazuh Dashboard. It provides visibility and management over the rules that govern finding generation based on normalized events processed by the Wazuh Engine.
+The **Detection** module is part of the **Ruleset Management** section in the Wazuh Dashboard. It provides visibility and management over the rules that govern finding generation based on normalized events processed by the Wazuh Engine.
 
 This module exposes the following sections:
 
@@ -62,7 +62,7 @@ The following walkthrough demonstrates how to create a detection rule for SSH br
 
 ### Step 1: Navigate to the Rules List
 
-Navigate to **Security Analytics → Detection → Rules** and ensure the **Draft** space is selected using the space selector (top right).
+Navigate to **Ruleset Management → Detection → Rules** and ensure the **Draft** space is selected using the space selector (top right).
 
 ---
 
@@ -143,7 +143,7 @@ After creation, the rule appears in the **Rules** list under the **Draft** space
 
 ### Step 4: Promote Draft → Test → Custom
 
-The promotion flow is identical to the one described in [Normalization — Step 4](./normalization.md#step-4-promote-draft--test). Navigate to **Security Analytics → Overview**, ensure the **Draft** space is selected, and click **Actions → Promote**.
+The promotion flow is identical to the one described in [Normalization — Step 4](./normalization.md#step-4-promote-draft--test). Navigate to **Ruleset Management → Overview**, ensure the **Draft** space is selected, and click **Actions → Promote**.
 
 The **Promote** page lists each entity with the operation that will be applied. Because the integration already exists in **Test** and the rule is new, they are tagged **`custom-ssh-auth (update)`** and **`SSH Failed Password Detection (add)`**. Click **Promote**, then type `promote` in the confirmation dialog (**Promote to Test space?**) to confirm — the action is irreversible.
 
@@ -167,7 +167,7 @@ A **detector** connects detection rules to a specific data source (an index or a
 
 ### Step 1: Open the Detector Creation Form
 
-Navigate to **Security Analytics → Detection → Detectors**.
+Navigate to **Ruleset Management → Detection → Detectors**.
 
 <!-- IMAGE: Detectors list with Create detector button -->
 <!-- Suggested filename: images/detection/05-detectors-list.png -->
