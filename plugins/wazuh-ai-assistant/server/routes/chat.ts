@@ -30,6 +30,7 @@ import {
 import { validate } from '../tools/schema-validator';
 import {
   deepMapStrings,
+  FieldPolicyEntry,
   prescanAndMint,
   prescanAndMintToolContent,
   Pseudonymizer,
@@ -2360,6 +2361,7 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
           request,
           logger,
           privacyCtx,
+          assistantSettings.fieldPolicy,
         );
         nodeStream = Readable.from(
           releaseStreamSlotWhenDone(
@@ -2581,6 +2583,10 @@ export async function* orchestrate(
   request: OpenSearchDashboardsRequest,
   logger: Logger,
   privacyCtx: PrivacyContext | undefined,
+  // The admin-configured field policy. Threaded on its own rather than through `privacyCtx`, which
+  // is undefined whenever privacy mode is off for the turn, since the 'never' action denies egress
+  // on every turn. See `dropNeverFields` in server/tools/privacy.ts.
+  fieldPolicy?: FieldPolicyEntry[],
 ): AsyncGenerator<StreamEvent> {
   let tools: ToolSpec[] | undefined = listToolSpecs();
   let messages = initialMessages;
@@ -3354,6 +3360,7 @@ export async function* orchestrate(
             context,
             request,
             privacyCtx,
+            fieldPolicy,
           );
         } catch (error) {
           // executeToolCall is designed to never throw; this is a last-resort safety net so a
