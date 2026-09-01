@@ -2735,16 +2735,20 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       if (isGenerating || !last) {
         return;
       }
-      // Two shapes of unfinished turn. An interrupted ASSISTANT message is the one this tab marked
-      // itself (Stop, or leaving while the page stayed alive). A trailing USER message is the harder
-      // case: a reload or a navigation killed the page mid-answer, so nothing was left running to mark
-      // anything — the question was saved before generating started and that is all there is.
-      const isInterruptedAnswer =
-        last.role === 'assistant' && last.interrupted === true;
-      if (!isInterruptedAnswer && last.role !== 'user') {
+      // Two shapes of unfinished turn. An ASSISTANT message this tab marked itself: interrupted
+      // (Stop, or leaving while the page stayed alive) or failed (an `error` stream event) — a turn
+      // is one or the other, never both, and both are equally re-askable, so checking only
+      // `interrupted` left the button rendered but inert on every failed turn. A trailing USER
+      // message is the harder case: a reload or a navigation killed the page mid-answer, so nothing
+      // was left running to mark anything — the question was saved before generating started and
+      // that is all there is.
+      const isUnfinishedAnswer =
+        last.role === 'assistant' &&
+        (last.interrupted === true || Boolean(last.failureReason));
+      if (!isUnfinishedAnswer && last.role !== 'user') {
         return;
       }
-      const history = isInterruptedAnswer ? messages.slice(0, -1) : messages;
+      const history = isUnfinishedAnswer ? messages.slice(0, -1) : messages;
       if (history[history.length - 1]?.role !== 'user') {
         return;
       }

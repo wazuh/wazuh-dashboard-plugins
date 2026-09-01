@@ -1022,6 +1022,50 @@ describe('ChatPage — interrupted turns and failed saves', () => {
     expect(resentRoles).toEqual(['user']);
   });
 
+  /**
+   * A turn that FAILED is marked `failureReason`, never `interrupted` (message-bubble.tsx), but the
+   * last turn is offered the same in-place "Retry" either way. Checking only `interrupted` left
+   * that button rendered and inert — worst of all on an out-of-credits failure, where the reader
+   * clicks it precisely because they have just topped up.
+   */
+  it('retrying a FAILED last turn re-sends the question instead of doing nothing', async () => {
+    const first = createControllableStream();
+    const second = createControllableStream();
+    mockStreamChat
+      .mockImplementationOnce((_p, _m, signal: AbortSignal) =>
+        first.generate(signal),
+      )
+      .mockImplementationOnce((_p, _m, signal: AbortSignal) =>
+        second.generate(signal),
+      );
+
+    renderChatPage();
+    await sendMessage('any agents down?');
+    first.push({ type: 'error', message: 'Your credit balance is too low.' });
+    first.end();
+
+    await waitFor(() =>
+      expect(screen.getByText('This turn failed')).toBeInTheDocument(),
+    );
+
+    fireEvent.click(screen.getByText('Retry'));
+    await waitFor(() => expect(mockStreamChat).toHaveBeenCalledTimes(2));
+    second.push({ type: 'delta', content: 'Two agents are down.' });
+    second.push({ type: 'done' });
+    second.end();
+
+    await waitFor(() =>
+      expect(screen.getByText('Two agents are down.')).toBeInTheDocument(),
+    );
+    // The failed turn was replaced in place, not appended alongside a second copy of the question.
+    expect(screen.queryByText('This turn failed')).not.toBeInTheDocument();
+    expect(screen.getAllByText('any agents down?')).toHaveLength(1);
+    const resentRoles = (
+      mockStreamChat.mock.calls[1][1] as PersistedChatMessage[]
+    ).map(message => message.role);
+    expect(resentRoles).toEqual(['user']);
+  });
+
   it('tells the user when the conversation could not be saved, and stops once a save succeeds', async () => {
     const stream = createControllableStream();
     mockStreamChat.mockImplementation(
