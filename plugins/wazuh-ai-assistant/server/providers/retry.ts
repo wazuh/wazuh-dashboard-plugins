@@ -84,18 +84,23 @@ function isToolUseFailedBody(status: number, bodyText: string): boolean {
  * 402 status handled below: Anthropic reports it on a 400 ("credit balance is too low…purchase
  * credits"), OpenAI on a 429 carrying the `insufficient_quota` code.
  *
- * Deliberately specific phrases rather than the bare word "quota". Gemini's transient 429
- * (`RESOURCE_EXHAUSTED`, a per-minute/per-day limit that resets on its own) carries the exact
- * same "You exceeded your current quota, please check your plan and billing details" text OpenAI
- * uses for a billing failure — matching "quota" alone would turn that recoverable throttle into
- * a terminal error. OpenAI's underscored `insufficient_quota` code is what separates the two.
+ * Specific phrases, never the bare word "quota". Gemini's transient 429 (`RESOURCE_EXHAUSTED`, a
+ * per-minute limit that resets on its own) carries the same "You exceeded your current quota,
+ * please check your plan and billing details" text OpenAI uses for a billing failure, so matching
+ * "quota" alone turns a recoverable throttle into a terminal error.
+ *
+ * Providers reword their messages, so match an error code wherever one exists and treat the prose
+ * as a fallback. Codes are listed in their own right: `credit_balance_exhausted` is underscored
+ * and does not match the spaced `credit balance` entry.
  */
 const OUT_OF_CREDITS_MARKERS = [
   'credit balance',
+  'credit_balance_exhausted',
   'insufficient_quota',
   'insufficient credit',
   'insufficient balance',
   'insufficient funds',
+  'no credits remaining',
   'out of credit',
   'purchase credits',
 ];
@@ -126,11 +131,10 @@ function isOutOfCreditsBody(status: number, bodyText: string): boolean {
  * unconfigured deployment sees exactly the original text. Shared with wazuh-brain.ts so both
  * provider paths apply the same detection and precedence.
  *
- * A blank override counts as unconfigured. Nullish coalescing alone would let an empty or
- * whitespace-only YAML value through and leave the user staring at an error with no text at all,
- * which is strictly worse than the provider's own message. That value is reachable by accident:
- * an operator clearing the setting by emptying it instead of commenting the line out, or a
- * provisioning template rendering an unresolved variable.
+ * A blank override counts as unconfigured. An empty or whitespace-only YAML value passes nullish
+ * coalescing and renders an error with no text, which is worse than the provider's own message.
+ * Emptying the value instead of commenting the line out, and templates that render an unresolved
+ * variable, both produce it.
  */
 export function describeOutOfCreditsMessage(
   status: number,

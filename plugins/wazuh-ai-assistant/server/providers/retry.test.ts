@@ -741,3 +741,126 @@ test('fetchProviderWithRetry: an empty override still shows the provider text ra
   assert.notEqual(message.trim(), '', 'the user must never get a blank error');
   assert.match(message, /Provider responded with HTTP 402/);
 });
+
+/** An OpenAI account with no balance left: `insufficient_quota` type, `credit_balance_exhausted`
+ * code, and prose that differs from the wording OpenAI's error docs describe. The code and type
+ * are what the detection relies on. */
+const OPENAI_NO_BALANCE_BODY = JSON.stringify({
+  error: {
+    message:
+      'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.',
+    type: 'insufficient_quota',
+    param: null,
+    code: 'credit_balance_exhausted',
+  },
+});
+
+test('describeOutOfCreditsMessage: detects an OpenAI account with no balance left', () => {
+  setOutOfCreditsMessage('custom text');
+  assert.equal(
+    describeOutOfCreditsMessage(429, OPENAI_NO_BALANCE_BODY, 'default text'),
+    'custom text',
+  );
+});
+
+test('describeOutOfCreditsMessage: detects the credit_balance_exhausted code on its own', () => {
+  setOutOfCreditsMessage('custom text');
+  assert.equal(
+    describeOutOfCreditsMessage(
+      400,
+      '{"error":{"code":"credit_balance_exhausted"}}',
+      'default text',
+    ),
+    'custom text',
+    'the underscored code must be matched in its own right — the spaced "credit balance" entry does not cover it',
+  );
+});
+
+test('describeOutOfCreditsMessage: detects the "no credits remaining" wording on its own', () => {
+  setOutOfCreditsMessage('custom text');
+  assert.equal(
+    describeOutOfCreditsMessage(
+      400,
+      '{"error":{"message":"You have no credits remaining."}}',
+      'default text',
+    ),
+    'custom text',
+  );
+});
+
+test('fetchProviderWithRetry: an OpenAI no-balance 429 is not retried', async () => {
+  let calls = 0;
+  const doFetch = () => {
+    calls += 1;
+    return Promise.resolve(fakeResponse(429, OPENAI_NO_BALANCE_BODY));
+  };
+  const controller = new AbortController();
+  const { events } = await drain(
+    fetchProviderWithRetry(doFetch, controller.signal),
+  );
+
+  assert.equal(
+    calls,
+    1,
+    'no balance is terminal, so it must not consume the retry budget',
+  );
+  assert.equal(events.length, 1);
+  assert.equal(events[0].type, 'error');
+});
+
+/** Anthropic's `402 billing_error`. The status rule alone catches it; the body carries no
+ * marker. */
+test('describeOutOfCreditsMessage: detects Anthropic’s 402 billing_error', () => {
+  setOutOfCreditsMessage('custom text');
+  assert.equal(
+    describeOutOfCreditsMessage(
+      402,
+      JSON.stringify({
+        type: 'error',
+        error: {
+          type: 'billing_error',
+          message:
+            "There's an issue with your billing or payment information. Check your payment details in the Claude Console.",
+        },
+        request_id: 'req_011CSHoEeqs5C35K2UUqR7Fy',
+      }),
+      'default text',
+    ),
+    'custom text',
+  );
+});
+
+/** `413 request_too_large` is a size limit. Keeping the provider's own text keeps the advice on
+ * shortening the request instead of buying credits. */
+test('describeOutOfCreditsMessage: a 413 request_too_large is NOT out-of-credits', () => {
+  setOutOfCreditsMessage('custom text');
+  assert.equal(
+    describeOutOfCreditsMessage(
+      413,
+      JSON.stringify({
+        type: 'error',
+        error: {
+          type: 'request_too_large',
+          message: 'Request exceeds the maximum allowed number of bytes.',
+        },
+      }),
+      'default text',
+    ),
+    'default text',
+  );
+});
+
+/** A 413 whose text reads like an upsell ("Need more tokens? Upgrade to Dev Tier") while the
+ * cause is a per-minute token ceiling. Treating it as out-of-credits sends the reader to pay for
+ * something a shorter question fixes. */
+test('describeOutOfCreditsMessage: a Groq TPM 413 that reads like an upsell is NOT out-of-credits', () => {
+  setOutOfCreditsMessage('custom text');
+  assert.equal(
+    describeOutOfCreditsMessage(
+      413,
+      'Request too large for model `openai/gpt-oss-120b` on tokens per minute (TPM): Limit 8000, Requested 14666, please reduce your message size and try again. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing',
+      'default text',
+    ),
+    'default text',
+  );
+});

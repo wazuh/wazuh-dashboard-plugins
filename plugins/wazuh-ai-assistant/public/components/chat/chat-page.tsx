@@ -2736,12 +2736,12 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
         return;
       }
       // Two shapes of unfinished turn. An ASSISTANT message this tab marked itself: interrupted
-      // (Stop, or leaving while the page stayed alive) or failed (an `error` stream event) — a turn
-      // is one or the other, never both, and both are equally re-askable, so checking only
-      // `interrupted` left the button rendered but inert on every failed turn. A trailing USER
-      // message is the harder case: a reload or a navigation killed the page mid-answer, so nothing
-      // was left running to mark anything — the question was saved before generating started and
-      // that is all there is.
+      // (Stop, or leaving while the page stayed alive) or failed (an `error` stream event). A turn
+      // carries one marker or the other, never both, and both are re-askable, so accepting only
+      // `interrupted` renders the button on a failed turn and does nothing on click. A trailing
+      // USER message is the harder case: a reload or a navigation killed the page mid-answer, so
+      // nothing was left running to mark anything, and the question saved before generating
+      // started is all there is.
       const isUnfinishedAnswer =
         last.role === 'assistant' &&
         (last.interrupted === true || Boolean(last.failureReason));
