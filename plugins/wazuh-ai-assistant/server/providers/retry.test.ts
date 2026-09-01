@@ -1,10 +1,12 @@
 import assert from 'node:assert/strict';
 import {
+  describeOutOfCreditsMessage,
   extractProviderErrorMessage,
   fetchProviderWithRetry,
   sanitizeProviderErrorBody,
   describeToolUseFailedStreamMessage,
 } from './retry';
+import { setOutOfCreditsMessage } from '../plugin-services';
 import { StreamEvent } from '../../common/types';
 
 /** Minimal fake fetch Response covering everything retry.ts touches: `.ok`, `.status`, `.body`,
@@ -415,4 +417,144 @@ test('extractProviderErrorMessage: an extracted JSON message is still redacted d
   );
   assert.doesNotMatch(sanitized, /sk-abc123def456ghi789/);
   assert.match(sanitized, /\[redacted\]/);
+});
+
+// --- Out-of-credits override: a detected out-of-credits provider response gets --------------
+// --- server/config.ts's `outOfCreditsMessage` substituted for its terminal text when one is ----
+// --- configured, and keeps its normal text otherwise -- see describeOutOfCreditsMessage's -------
+// --- doc comment in retry.ts. ---------------------------------------------------------------
+
+afterEach(() => {
+  setOutOfCreditsMessage(undefined);
+});
+
+const ANTHROPIC_LOW_BALANCE_BODY = JSON.stringify({
+  type: 'error',
+  error: {
+    type: 'invalid_request_error',
+    message: 'Your credit balance is too low to access the Claude API.',
+  },
+});
+
+test('fetchProviderWithRetry: an out-of-credits 400 with no override configured keeps the existing raw-body message shape (no behavior change)', async () => {
+  const doFetch = () =>
+    Promise.resolve(fakeResponse(400, ANTHROPIC_LOW_BALANCE_BODY));
+  const controller = new AbortController();
+  const { events } = await drain(
+    fetchProviderWithRetry(doFetch, controller.signal),
+  );
+
+  assert.equal(events.length, 1);
+  assert.equal(events[0].type, 'error');
+  const message = (events[0] as { message: string }).message;
+  assert.match(message, /Provider responded with HTTP 400/);
+  assert.match(message, /credit balance is too low/i);
+});
+
+test('fetchProviderWithRetry: an out-of-credits 400 with an override configured yields the configured message instead of the raw provider text', async () => {
+  setOutOfCreditsMessage(
+    'Your organization is out of credits. [Add credits](https://example.com/billing).',
+  );
+  const doFetch = () =>
+    Promise.resolve(fakeResponse(400, ANTHROPIC_LOW_BALANCE_BODY));
+  const controller = new AbortController();
+  const { events } = await drain(
+    fetchProviderWithRetry(doFetch, controller.signal),
+  );
+
+  assert.equal(events.length, 1);
+  assert.equal(events[0].type, 'error');
+  const message = (events[0] as { message: string }).message;
+  assert.equal(
+    message,
+    'Your organization is out of credits. [Add credits](https://example.com/billing).',
+  );
+  assert.doesNotMatch(
+    message,
+    /credit balance is too low/i,
+    'must not leak the raw provider text once an override is configured',
+  );
+});
+
+test('fetchProviderWithRetry: an override configured but the failure is NOT out-of-credits leaves the normal error text untouched', async () => {
+  setOutOfCreditsMessage('Your organization is out of credits.');
+  const doFetch = () =>
+    Promise.resolve(
+      fakeResponse(400, '{"error":{"message":"bad request: missing field"}}'),
+    );
+  const controller = new AbortController();
+  const { events } = await drain(
+    fetchProviderWithRetry(doFetch, controller.signal),
+  );
+
+  assert.equal(events.length, 1);
+  const message = (events[0] as { message: string }).message;
+  assert.match(message, /Provider responded with HTTP 400/);
+  assert.doesNotMatch(
+    message,
+    /out of credits/i,
+    'an unrelated failure must never be reframed as an out-of-credits one',
+  );
+});
+
+test('fetchProviderWithRetry: an out-of-credits marker on a normally-retryable 429 is not retried', async () => {
+  let calls = 0;
+  const doFetch = () => {
+    calls += 1;
+    return Promise.resolve(
+      fakeResponse(
+        429,
+        '{"error":{"code":"insufficient_quota","message":"You exceeded your current quota."}}',
+      ),
+    );
+  };
+  const controller = new AbortController();
+  const { events } = await drain(
+    fetchProviderWithRetry(doFetch, controller.signal),
+  );
+
+  assert.equal(
+    calls,
+    1,
+    'an out-of-credits condition can never be fixed by retrying, so it must not consume the 429 retry budget',
+  );
+  assert.equal(events.length, 1);
+  assert.equal(events[0].type, 'error');
+});
+
+test('describeOutOfCreditsMessage: a matching body with nothing configured returns the default message unchanged', () => {
+  assert.equal(
+    describeOutOfCreditsMessage(ANTHROPIC_LOW_BALANCE_BODY, 'default text'),
+    'default text',
+  );
+});
+
+test('describeOutOfCreditsMessage: a matching body with an override configured returns the override', () => {
+  setOutOfCreditsMessage('custom text');
+  assert.equal(
+    describeOutOfCreditsMessage(ANTHROPIC_LOW_BALANCE_BODY, 'default text'),
+    'custom text',
+  );
+});
+
+test('describeOutOfCreditsMessage: a non-matching body returns the default message even with an override configured', () => {
+  setOutOfCreditsMessage('custom text');
+  assert.equal(
+    describeOutOfCreditsMessage(
+      '{"error":{"message":"bad request"}}',
+      'default text',
+    ),
+    'default text',
+  );
+});
+
+test('describeOutOfCreditsMessage: detects the OpenAI-compatible insufficient_quota marker case-insensitively', () => {
+  setOutOfCreditsMessage('custom text');
+  assert.equal(
+    describeOutOfCreditsMessage(
+      '{"error":{"code":"INSUFFICIENT_QUOTA","message":"You exceeded your current quota."}}',
+      'default text',
+    ),
+    'custom text',
+  );
 });

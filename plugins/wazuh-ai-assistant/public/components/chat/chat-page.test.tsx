@@ -3685,6 +3685,24 @@ describe('ChatPage — a failed turn stays visible after the next question', () 
   });
 });
 
+describe('ChatPage — error banner markdown link', () => {
+  it('renders a link inside the top error banner as a clickable, new-tab anchor', async () => {
+    renderChatPage({
+      providersError:
+        'Your organization is out of credits. [Add credits](https://example.com/billing) to continue.',
+    });
+
+    expect(await screen.findByText('Something went wrong')).toBeInTheDocument();
+    // Regex, not an exact string: EuiLink appends its own "External link" icon aria-label and
+    // "(opens in a new tab or window)" screen-reader text onto the accessible name whenever
+    // target="_blank".
+    const link = screen.getByRole('link', { name: /Add credits/ });
+    expect(link).toHaveAttribute('href', 'https://example.com/billing');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+});
+
 /**
  * Backward compatibility with every conversation already stored: `messages` is an opaque, unindexed
  * blob, so there is no migration and a pre-existing record simply lacks the new fields. This drives

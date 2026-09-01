@@ -909,6 +909,55 @@ describe('MessageBubble — failed turn honesty', () => {
 
     expect(screen.queryByText('This turn failed')).toBeNull();
   });
+
+  it('renders a markdown link inside the expanded failure reason as a clickable, new-tab anchor', () => {
+    const { container } = render(
+      <MessageBubble
+        message={baseMessage({
+          role: 'assistant',
+          content: '',
+          failureReason:
+            'Your organization is out of credits. [Add credits](https://example.com/billing) to continue.',
+        })}
+        resolveDiscoverUrl={noopResolveDiscoverUrl}
+        resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+      />,
+    );
+
+    fireEvent.click(screen.getByText('Show reason'));
+    // Regex, not an exact string: EuiLink appends its own "External link" icon aria-label and
+    // "(opens in a new tab or window)" screen-reader text onto the accessible name whenever
+    // target="_blank".
+    const link = screen.getByRole('link', { name: /Add credits/ });
+    expect(link).toHaveAttribute('href', 'https://example.com/billing');
+    // Must open in a new tab, never navigate the dashboard tab itself away.
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(container.textContent).toContain(
+      'Your organization is out of credits.',
+    );
+  });
+
+  it('strips raw HTML from the expanded failure reason instead of rendering it live', () => {
+    const { container } = render(
+      <MessageBubble
+        message={baseMessage({
+          role: 'assistant',
+          content: '',
+          failureReason:
+            'Upstream said: <img src=x onerror=alert(1)> and <script>alert(2)</script> too.',
+        })}
+        resolveDiscoverUrl={noopResolveDiscoverUrl}
+        resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+      />,
+    );
+
+    fireEvent.click(screen.getByText('Show reason'));
+    expect(container.querySelector('img')).toBeNull();
+    expect(container.querySelector('script')).toBeNull();
+    expect(container.innerHTML).not.toContain('onerror');
+    expect(container.textContent).toContain('Upstream said:');
+  });
 });
 
 /**

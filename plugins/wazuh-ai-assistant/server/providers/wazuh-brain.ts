@@ -9,6 +9,7 @@ import {
 // Raw HTTP error bodies can echo a credential from a misbehaving gateway; reuse retry.ts's
 // truncate+redact helper rather than forwarding the body verbatim (see its doc comment).
 import {
+  describeOutOfCreditsMessage,
   extractProviderErrorMessage,
   fetchWithHeaderTimeout,
   safeReadText,
@@ -103,17 +104,17 @@ export class WazuhBrainAdapter implements ProviderAdapter {
 
     if (!response.ok) {
       const bodyText = await safeReadText(response);
+      const defaultMessage = `Provider responded with HTTP ${
+        response.status
+      }: ${sanitizeProviderErrorBody(
+        extractProviderErrorMessage(bodyText),
+        config.apiKey,
+      )}`;
       yield {
         type: 'error',
-        // Pass the configured key so an exact-value redaction
-        // catches it even if the body doesn't match one of sanitizeProviderErrorBody's known
-        // credential shapes.
-        message: `Provider responded with HTTP ${
-          response.status
-        }: ${sanitizeProviderErrorBody(
-          extractProviderErrorMessage(bodyText),
-          config.apiKey,
-        )}`,
+        // Out-of-credits override, same detection/precedence as retry.ts's SSE adapters — see
+        // describeOutOfCreditsMessage's doc comment.
+        message: describeOutOfCreditsMessage(bodyText, defaultMessage),
       };
       return;
     }

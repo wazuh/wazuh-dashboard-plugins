@@ -1,6 +1,7 @@
 import { StreamEvent } from '../../common/types';
 import { describeConnectionError } from './types';
 import { ProviderStallError, providerFirstByteTimeoutMs } from './sse-utils';
+import { getOutOfCreditsMessage } from '../plugin-services';
 
 /**
  * Transient-failure retry for the initial provider request (the "adapters are pure transport"
@@ -75,6 +76,59 @@ function isToolUseFailedBody(status: number, bodyText: string): boolean {
     status === 400 &&
     TOOL_USE_FAILED_MARKERS.some(marker => bodyText.includes(marker))
   );
+}
+
+/**
+ * Substrings real providers use to report an out-of-credits condition — a billing failure, not
+ * the transient rate limiting RETRYABLE_STATUSES handles. Deliberately specific phrases rather
+ * than the bare word "quota", which a genuine transient rate-limit message can also use.
+ */
+const OUT_OF_CREDITS_MARKERS = [
+  'credit balance',
+  'insufficient_quota',
+  'insufficient credit',
+  'out of credit',
+  'purchase credits',
+];
+
+/** True when a rejected response's body reports an out-of-credits condition. No status gate:
+ * different providers report it at different HTTP statuses. */
+function isOutOfCreditsBody(bodyText: string): boolean {
+  const lowered = bodyText.toLowerCase();
+  return OUT_OF_CREDITS_MARKERS.some(marker => lowered.includes(marker));
+}
+
+/**
+ * Swaps a terminal provider-error message for the operator-configured
+ * `wazuh_ai_assistant.outOfCreditsMessage` when the body reports an out-of-credits condition and
+ * an override is configured. Returns `defaultMessage` unchanged in every other case, so an
+ * unconfigured deployment sees exactly the original text. Shared with wazuh-brain.ts so both
+ * provider paths apply the same detection and precedence.
+ */
+export function describeOutOfCreditsMessage(
+  bodyText: string,
+  defaultMessage: string,
+): string {
+  if (!isOutOfCreditsBody(bodyText)) {
+    return defaultMessage;
+  }
+  return getOutOfCreditsMessage() ?? defaultMessage;
+}
+
+/** Builds the terminal-message text for a rejected response: the 429-friendly copy, or the raw
+ * sanitized body for every other status. Factored out so the retry-skipping short-circuit below
+ * and the normal exhausted-retries branch compute it identically instead of drifting apart. */
+function buildTerminalMessage(
+  status: number,
+  bodyText: string,
+  secret?: string,
+): string {
+  return status === 429
+    ? 'The AI provider rejected this request due to rate limits — try again in a moment.'
+    : `Provider responded with HTTP ${status}: ${sanitizeProviderErrorBody(
+        extractProviderErrorMessage(bodyText),
+        secret,
+      )}`;
 }
 
 /** Pulls the `failed_generation` field out of a tool_use_failed error body, if present and the
@@ -436,6 +490,20 @@ export async function* fetchProviderWithRetry(
       return undefined;
     }
 
+    // Out-of-credits is never transient, so it is checked before the retry decision below and
+    // regardless of status: a provider reporting it on an otherwise-retryable status (e.g.
+    // `insufficient_quota` on a 429) must not be pointlessly retried.
+    if (isOutOfCreditsBody(bodyText)) {
+      yield {
+        type: 'error',
+        message: describeOutOfCreditsMessage(
+          bodyText,
+          buildTerminalMessage(response.status, bodyText, secret),
+        ),
+      };
+      return undefined;
+    }
+
     if (!RETRYABLE_STATUSES.has(response.status) || attempt >= MAX_RETRIES) {
       // Every retry attempt already yields an honest, provider-attributed, mechanism-free STATUS
       // line for a 429 ("Provider rate limit reached — retrying in Ns…", above). Once the retry
@@ -445,17 +513,14 @@ export async function* fetchProviderWithRetry(
       // condition worth retrying rather than a bare status dump. Every OTHER retryable status
       // (500/502/503/504/529) uses the generic "Provider responded with HTTP {status}: {raw
       // sanitized body}" message — this framing is scoped to 429 specifically.
+      const defaultMessage = buildTerminalMessage(
+        response.status,
+        bodyText,
+        secret,
+      );
       yield {
         type: 'error',
-        message:
-          response.status === 429
-            ? 'The AI provider rejected this request due to rate limits — try again in a moment.'
-            : `Provider responded with HTTP ${
-                response.status
-              }: ${sanitizeProviderErrorBody(
-                extractProviderErrorMessage(bodyText),
-                secret,
-              )}`,
+        message: defaultMessage,
       };
       return undefined;
     }
