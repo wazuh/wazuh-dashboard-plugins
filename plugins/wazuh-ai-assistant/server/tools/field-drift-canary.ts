@@ -10,9 +10,10 @@ import { fieldsForFamily } from './catalog/get-field-values';
  * renames or drops a field the tools still reference -- the failure mode is silent: a filter on a
  * renamed field returns zero rows forever, indistinguishable from "no matching data" (exactly the
  * class of bug that affects the ruleset tools too). This
- * module runs ONE bounded live `_mapping` check per process start and logs a warning for every
- * catalog/allowlist field that is no longer mapped, so that drift shows up in the server log on
- * the day it happens instead of months later in a QA report.
+ * module runs ONE bounded live `_mapping` check per process start (per family: the pattern's
+ * `properties`, plus one index's `dynamic_templates` declarations -- see `checkFamily`) and logs a
+ * warning for every catalog/allowlist field that is neither mapped nor declared, so that drift
+ * shows up in the server log on the day it happens instead of months later in a QA report.
  *
  * Deliberately NOT a scheduled job: no timer, no interval, no retry loop. `runFieldDriftCanary`
  * fires once from `server/plugin.ts`'s `start()`, races against a fixed timeout, and swallows
@@ -91,14 +92,28 @@ const QUERIED_FAMILIES: ReadonlyArray<{
   },
 ];
 
+/** One `mappings.dynamic_templates` entry as OpenSearch returns it: a single-key object whose key
+ * is the template NAME (e.g. `wcs_host_os_name`) and whose value carries the matching rules. Only
+ * `path_match` is modelled -- it is the one rule that names a concrete field PATH, which is what
+ * `buildDeclaredFieldMatcher` needs; the other rules (`match`, `match_mapping_type`, and their
+ * negated forms) describe a field's name fragment or datatype, never a full path, so they can
+ * never establish that a specific catalog path is declared. */
+export interface DynamicTemplateEntry {
+  [templateName: string]: {
+    path_match?: string | string[];
+  };
+}
+
 /** Minimal shape of the OpenSearch `_mapping` response this canary needs -- one entry per
  * concrete index behind the pattern, each with a (possibly absent, on a brand-new/empty pattern)
- * `mappings.properties` tree. Kept narrow and structural rather than importing a full client
- * response type, so a mock in tests needs no more than this shape. */
+ * `mappings.properties` tree and the index's `mappings.dynamic_templates` list. Kept narrow and
+ * structural rather than importing a full client response type, so a mock in tests needs no more
+ * than this shape. */
 export interface MappingsResponseBody {
   [indexName: string]: {
     mappings?: {
       properties?: Record<string, unknown>;
+      dynamic_templates?: DynamicTemplateEntry[];
     };
   };
 }
@@ -121,6 +136,114 @@ export interface MappingClient {
  * per index cuts that payload (and the `JSON.parse` cost) down to just what
  * `flattenMappedFieldPaths` actually walks, across all `QUERIED_FAMILIES` on every process start. */
 const MAPPING_FILTER_PATH = '*.mappings.properties';
+
+/** Second, narrower request: only the `path_match` rule of every `dynamic_templates` entry -- see
+ * `checkFamily` for why the declared-but-not-yet-materialized fields matter and
+ * `DYNAMIC_TEMPLATES_SOURCE_COUNT` for why this is asked of ONE index rather than the pattern.
+ * Measured live on 5.0.0, one findings backing index: 311 KB for the whole `dynamic_templates`
+ * list, 209 KB filtered down to `path_match` alone. The deeper-looking `*.mappings
+ * .dynamic_templates.*.*.path_match` returns NOTHING -- `filter_path` already walks the array
+ * transparently, so the single `*` after `dynamic_templates` is the template-name wildcard. */
+const DYNAMIC_TEMPLATES_FILTER_PATH =
+  '*.mappings.dynamic_templates.*.path_match';
+
+/** How many of a family's concrete indices are asked for their `dynamic_templates` list.
+ *
+ * ONE, deliberately. Every backing index behind a family pattern is created from the same
+ * composable index template, so their `dynamic_templates` lists are identical -- asking the
+ * pattern would just return the same ~2,300-entry list once per backing index. Measured live on a
+ * populated 5.0.0 cluster (8 backing indices), for `wazuh-findings-v5*`: 1.78 MB for the pattern
+ * vs. 209 KB for a single index, per family, on every process start. The index picked is the
+ * first in sorted order, so the same one is read on every restart and the check stays reproducible
+ * rather than depending on the order the cluster happens to enumerate indices in.
+ *
+ * The cost of the shortcut: an index still backed by a SUPERSEDED template version (an upgrade
+ * that has not rolled its data streams over yet) declares that older field set, which can hide a
+ * genuine removal for one generation. That is the same direction this whole canary already errs
+ * in -- toward silence rather than a false alarm -- and it is bounded by the next rollover. */
+const DYNAMIC_TEMPLATES_SOURCE_COUNT = 1;
+
+/** Turns one `path_match` rule into a matcher. OpenSearch matches `path_match` with simple glob
+ * semantics -- `*` is the only metacharacter -- so every other regexp-special character is
+ * escaped and `*` alone becomes `.*`, anchored at both ends. */
+function pathMatchToRegExp(pattern: string): RegExp {
+  const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, character =>
+    character === '*' ? '.*' : `\\${character}`,
+  );
+  return new RegExp(`^${escaped}$`);
+}
+
+/** Builds "is this field path DECLARED by a dynamic template?" from one index's
+ * `dynamic_templates` list.
+ *
+ * This is the whole point of the second request: on Wazuh 5.0.0 the events/findings templates are
+ * `"dynamic": "strict_allow_templates"` and declare each WCS field as its own exact-`path_match`
+ * template (2,345 of them on findings, 2,299 on events) rather than as a `properties` entry. A
+ * leaf therefore only appears under `mappings.properties` once a document carrying it has been
+ * indexed -- so on a deployment with no agents, or on any index category that has simply not seen
+ * that field yet, `properties` legitimately lacks it while the mapping still fully declares it.
+ * Reading `properties` alone reports those as drift (the false positives this matcher removes),
+ * and it stays a real check: under `strict_allow_templates` a field in neither `properties` nor
+ * `dynamic_templates` cannot be indexed at all, so a genuinely dropped or renamed field is still
+ * missing from BOTH sources and still warns.
+ *
+ * Returns a predicate rather than a Set because `path_match` may contain a glob; an index with no
+ * `dynamic_templates` at all (every `wazuh-states-*` index today) yields a predicate that is
+ * always false, leaving that family's check exactly as it was. */
+export function buildDeclaredFieldMatcher(
+  entries: readonly DynamicTemplateEntry[] | undefined,
+): (path: string) => boolean {
+  const exactPaths = new Set<string>();
+  const globs: RegExp[] = [];
+  for (const entry of entries ?? []) {
+    for (const definition of Object.values(entry ?? {})) {
+      const pathMatch = definition?.path_match;
+      if (!pathMatch) {
+        continue;
+      }
+      for (const rule of Array.isArray(pathMatch) ? pathMatch : [pathMatch]) {
+        if (rule.includes('*')) {
+          globs.push(pathMatchToRegExp(rule));
+        } else {
+          exactPaths.add(rule);
+        }
+      }
+    }
+  }
+  if (exactPaths.size === 0 && globs.length === 0) {
+    return () => false;
+  }
+  return path => exactPaths.has(path) || globs.some(glob => glob.test(path));
+}
+
+/** Fetches `DYNAMIC_TEMPLATES_SOURCE_COUNT` index's dynamic templates and returns the matcher for
+ * them. Any failure PROPAGATES to `checkFieldDrift`'s per-family catch, which skips the family
+ * with a DEBUG line: without the declared-field side, this canary cannot tell a not-yet-
+ * materialized field from a removed one, and guessing would mean re-emitting exactly the false
+ * warnings this request exists to suppress. Skipping one startup's check for one family is the
+ * cheaper failure -- the same trade-off the properties request already makes. */
+async function fetchDeclaredFieldMatcher(
+  client: MappingClient,
+  indexNames: string[],
+): Promise<(path: string) => boolean> {
+  const sources = [...indexNames]
+    .sort()
+    .slice(0, DYNAMIC_TEMPLATES_SOURCE_COUNT);
+  const entries: DynamicTemplateEntry[] = [];
+  for (const source of sources) {
+    // At most DYNAMIC_TEMPLATES_SOURCE_COUNT (currently one) request; the loop exists so the
+    // constant, not the code shape, decides how many indices are consulted.
+    // eslint-disable-next-line no-await-in-loop
+    const response = await client.indices.getMapping({
+      index: source,
+      filter_path: DYNAMIC_TEMPLATES_FILTER_PATH,
+    });
+    for (const indexBody of Object.values(response.body ?? {})) {
+      entries.push(...(indexBody.mappings?.dynamic_templates ?? []));
+    }
+  }
+  return buildDeclaredFieldMatcher(entries);
+}
 
 /** Flattens one index's `mappings.properties` tree into the set of dot-path field names it maps --
  * the same shape `common/field-catalog.ts`'s `path` entries use. Recurses into nested
@@ -168,6 +291,12 @@ interface FamilyDriftResult {
  * the pattern currently resolves to zero indices -- an empty environment/family is not drift, it
  * is simply nothing to check yet.
  *
+ * A field is "present" if it is materialized under `mappings.properties` on any backing index OR
+ * declared by a `dynamic_templates` `path_match` -- see `buildDeclaredFieldMatcher` for why the
+ * second source is required (on 5.0.0's `strict_allow_templates` events/findings templates almost
+ * every field is declared that way and only materializes once a document carries it, so
+ * `properties` alone reports every tool-facing field of an unpopulated deployment as drift).
+ *
  * WCS is the schema, not what the live index TEMPLATE actually maps -- measured live,
  * `events.main` alone has 2,121 WCS fields the template never maps, none of which any tool
  * touches. Treating those as drift would produce ~2,100 false "drift" warnings on a perfectly
@@ -203,10 +332,16 @@ async function checkFamily(
     // No backing index yet (pattern matched nothing) -- nothing to compare against, not drift.
     return { toolMissing: [], catalogMissing: [] };
   }
+  const isDeclared = await fetchDeclaredFieldMatcher(
+    client,
+    Object.keys(response.body ?? {}),
+  );
+  const isPresent = (path: string): boolean =>
+    mapped.has(path) || isDeclared(path);
   const toolFilterFieldSet = new Set(toolFilterFields);
-  const toolMissing = toolFilterFields.filter(path => !mapped.has(path)).sort();
+  const toolMissing = toolFilterFields.filter(path => !isPresent(path)).sort();
   const catalogMissing = catalogFields
-    .filter(path => !toolFilterFieldSet.has(path) && !mapped.has(path))
+    .filter(path => !toolFilterFieldSet.has(path) && !isPresent(path))
     .sort();
   return { toolMissing, catalogMissing };
 }
