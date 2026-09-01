@@ -175,7 +175,7 @@ A _Successfully promoted [draft] space_ toast confirms it, and the integration i
 
 With the integration promoted to the **Test** space, use **Log test** to verify that events are parsed correctly.
 
-Navigate to **Ruleset Management → Log test** and select the **Test** space (header space selector). Under **Normalization**, set **Location** to `/var/log/auth.log` _(optional)_ and paste a representative event in **Log event**:
+Navigate to **Ruleset Management → Log test** and select the **Test** space (header space selector). Under **Normalization**, set **Location** to `/var/log/auth.log` _(optional)_; under **Detection**, set **Integration** to `custom-ssh-auth` (without it the Detection tab reports _Detection skipped — 'integration' field not provided_). Paste a representative event in **Log event**:
 
 ```
 Dec 19 12:00:00 host sshd[123]: Failed password for root from 10.0.0.1 port 12345 ssh2
@@ -185,11 +185,11 @@ Click **Test**.
 
 ![Log test - Input](images/normalization/10-log-test-form.png)
 
-The **Test Result** panel shows a summary of the outcome (for example, _Parsed into 27 fields, detection logic skipped_) and two tabs. The **Normalization** tab shows the normalized event — including `wazuh.integration.decoders` (the decoder that matched, `decoder/custom-ssh-auth/0`), `wazuh.integration.name` (`custom-ssh-auth`), and `wazuh.integration.category` (`access-management`, from the integration's **Category**).
+The **Test Result** panel shows a summary of the outcome (for example, _Parsed into 9 fields, no rules matched_) and two tabs. The **Normalization** tab shows the normalized event — including `wazuh.integration.decoders` (the decoder that matched, `decoder/custom-ssh-auth/0`), `wazuh.integration.name` (`custom-ssh-auth`), and `wazuh.integration.category` (`access-management`, from the integration's **Category**).
 
 ![Log test - Result](images/normalization/11-log-test-result.png)
 
-The **Detection** tab evaluates the rules of the integration selected under the form's **Detection** section. Until rules exist for `custom-ssh-auth`, it reports _0 rules evaluated_ — revisit it after creating a rule in [Detection](./detection.md).
+The **Detection** tab evaluates the rules of the integration selected under the form's **Detection** section. Until rules exist for `custom-ssh-auth`, it reports _No rules were evaluated_ — revisit it after creating a rule in [Detection](./detection.md).
 
 ![Log test - Detection tab](images/normalization/11b-log-test-detection.png)
 
