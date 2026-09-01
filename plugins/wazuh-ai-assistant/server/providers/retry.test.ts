@@ -864,3 +864,24 @@ test('describeOutOfCreditsMessage: a Groq TPM 413 that reads like an upsell is N
     'default text',
   );
 });
+
+/**
+ * With no override configured, an out-of-credits 429 must fall back to the provider's own text, not
+ * to the rate-limit copy. Naming a drained balance a rate limit and telling the reader to try again
+ * in a moment points at the wrong cause and gives advice that can never work.
+ */
+test('fetchProviderWithRetry: an out-of-credits 429 with no override does not claim a rate limit', async () => {
+  const doFetch = () =>
+    Promise.resolve(fakeResponse(429, OPENAI_NO_BALANCE_BODY));
+  const controller = new AbortController();
+  const { events } = await drain(
+    fetchProviderWithRetry(doFetch, controller.signal),
+  );
+
+  assert.equal(events.length, 1);
+  const message = (events[0] as { message: string }).message;
+  assert.doesNotMatch(message, /rate limits/i);
+  assert.doesNotMatch(message, /try again in a moment/i);
+  assert.match(message, /Provider responded with HTTP 429/);
+  assert.match(message, /no credits remaining/i);
+});

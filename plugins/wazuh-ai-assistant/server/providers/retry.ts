@@ -151,6 +151,18 @@ export function describeOutOfCreditsMessage(
 /** Builds the terminal-message text for a rejected response: the 429-friendly copy, or the raw
  * sanitized body for every other status. Factored out so the retry-skipping short-circuit below
  * and the normal exhausted-retries branch compute it identically instead of drifting apart. */
+/** The provider's own rejection, sanitized: status plus whatever the body said. */
+function rawProviderMessage(
+  status: number,
+  bodyText: string,
+  secret?: string,
+): string {
+  return `Provider responded with HTTP ${status}: ${sanitizeProviderErrorBody(
+    extractProviderErrorMessage(bodyText),
+    secret,
+  )}`;
+}
+
 function buildTerminalMessage(
   status: number,
   bodyText: string,
@@ -158,10 +170,7 @@ function buildTerminalMessage(
 ): string {
   return status === 429
     ? 'The AI provider rejected this request due to rate limits — try again in a moment.'
-    : `Provider responded with HTTP ${status}: ${sanitizeProviderErrorBody(
-        extractProviderErrorMessage(bodyText),
-        secret,
-      )}`;
+    : rawProviderMessage(status, bodyText, secret);
 }
 
 /** Pulls the `failed_generation` field out of a tool_use_failed error body, if present and the
@@ -529,10 +538,15 @@ export async function* fetchProviderWithRetry(
     if (isOutOfCreditsBody(response.status, bodyText)) {
       yield {
         type: 'error',
+        // `rawProviderMessage`, not `buildTerminalMessage`: the 429 branch of the latter frames
+        // the rejection as a rate limit and tells the reader to try again in a moment. OpenAI
+        // reports a drained balance on a 429, so that framing would name the wrong cause and give
+        // advice that can never work. With no override configured the provider's own text is the
+        // honest fallback whatever the status.
         message: describeOutOfCreditsMessage(
           response.status,
           bodyText,
-          buildTerminalMessage(response.status, bodyText, secret),
+          rawProviderMessage(response.status, bodyText, secret),
         ),
       };
       return undefined;
