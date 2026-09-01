@@ -107,9 +107,15 @@ detection:
     event.action: authentication_failed
 mitre:
   tactic:
-    - TA0006
+    id:
+      - TA0006
+    name:
+      - Credential Access
   technique:
-    - T1110
+    id:
+      - T1110
+    name:
+      - Brute Force
 compliance:
   pci_dss:
     - '6.5.10'
@@ -120,6 +126,8 @@ compliance:
 </details>
 
 > **Important:** The `logsource.product` value must match the integration title exactly, using lowercase and hyphens (e.g., `custom-ssh-auth`). A mismatch will prevent the rule from being associated with the correct integration.
+
+> **Important:** `mitre.tactic` and `mitre.technique` must each be an object holding an `id` list and a `name` list. Passing a plain list of identifiers is rejected with _'mitre.tactic' must be an object with 'id' and 'name' lists_.
 
 <!-- IMAGE: YAML editor with the rule definition filled in -->
 <!-- Suggested filename: images/detection/02-create-rule-yaml-filled.png -->

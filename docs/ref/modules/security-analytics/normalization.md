@@ -59,6 +59,7 @@ Navigate to **Ruleset Management → Overview** (space **Draft**), open the **In
 - **Title** _(required)_ — the integration identifier, e.g. `custom-ssh-auth`. Must be 2–50 characters using only lowercase letters, digits, hyphens, and underscores (no spaces or uppercase).
 - **Category** _(required)_ — routes classified events to the `wazuh-events-v5-<category>` index.
 - **Author** _(required)_.
+- **Mode** — read-only; user-created integrations are always `user-managed`.
 - **Description**, **Documentation**, **References**, **Supports** — optional.
 
 Leave **Enabled** on, then click **Create integration**.
@@ -112,7 +113,7 @@ normalize:
 
 The `check` block defines the condition that must be satisfied for this decoder to apply. The `normalize` block defines the field mappings applied when the condition matches.
 
-Click **Create decoder**. The definition is validated against the decoder schema before it is saved — unrecognized keys or wrong types are rejected (for example, `compatibility` must be a list, and `metadata.module` is not a valid field). The form opens pre-filled with a placeholder decoder that must be replaced.
+Click **Create decoder**. The definition is validated by the engine before it is saved — a decoder missing a required field is rejected (for example, omitting `name` fails with _'name' is required_). The form opens pre-filled with a placeholder decoder that must be replaced.
 
 <!-- IMAGE: Schema validation rejecting an invalid decoder -->
 <!-- Suggested filename: images/normalization/04-decoder-validation.png -->
@@ -128,7 +129,7 @@ Once valid, the decoder is created and appears under **Normalization → Decoder
 The space's **space policy** defines the **root decoder** — the decoder the engine uses as the entry point for event processing — and whether the space is active (the **Status** toggle). A root decoder must be set before the space's content can be promoted.
 
 1. Navigate to **Ruleset Management → Overview** and ensure the **Draft** space is selected (top-right space selector).
-2. Open the space **Actions** menu (top-right) and select **Edit** to open the **Edit Draft** flyout.
+2. Open the space **Actions** menu (top-right) — it offers **Edit**, **Clear space** and **Promote** — and select **Edit** to open the **Edit Draft** flyout.
 
 <!-- IMAGE: Integration actions menu in the Draft space, Edit option highlighted -->
 <!-- Suggested filename: images/normalization/05-enable-integration-edit.png -->
@@ -184,7 +185,7 @@ Click **Test**.
 
 ![Log test - Input](images/normalization/10-log-test-form.png)
 
-The **Test Result** panel shows a status badge (**200** on success) and two tabs. The **Normalization** tab shows the normalized event — including `wazuh.integration.decoders` (the decoder that matched, `decoder/custom-ssh-auth/0`), `wazuh.integration.name` (`custom-ssh-auth`), and `wazuh.integration.category` (`access-management`, from the integration's **Category**).
+The **Test Result** panel shows a summary of the outcome (for example, _Parsed into 27 fields, detection logic skipped_) and two tabs. The **Normalization** tab shows the normalized event — including `wazuh.integration.decoders` (the decoder that matched, `decoder/custom-ssh-auth/0`), `wazuh.integration.name` (`custom-ssh-auth`), and `wazuh.integration.category` (`access-management`, from the integration's **Category**).
 
 ![Log test - Result](images/normalization/11-log-test-result.png)
 
