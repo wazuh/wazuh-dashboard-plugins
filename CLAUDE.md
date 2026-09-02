@@ -78,7 +78,8 @@ because Jest needs OSD's `setup_node_env`. See
 [`docs/dev/run-tests.md`](docs/dev/run-tests.md).
 
 ```bash
-# 1) Bring up the environment (from repo root)
+# 1) Bring up the environment (from repo root) if is not running already.
+docker ps # find the osd-dev-* container
 cd docker/osd-dev && ./dev.sh up
 
 # 2) Attach to the OSD container
