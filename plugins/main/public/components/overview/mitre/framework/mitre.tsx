@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { I18nProvider } from '@osd/i18n/react';
 import { Tactics, Techniques } from './components';
 import { EuiPanel, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
@@ -32,6 +32,10 @@ import {
 } from '../../../common/data-source';
 import { WzSearchBar } from '../../../common/search-bar';
 import { compose } from 'redux';
+import {
+  getTacticNamesFromFilters,
+  resolveSelectedTactics,
+} from './lib/tactic-selection';
 
 export interface ITactic {
   [key: string]: string[];
@@ -83,6 +87,7 @@ const MitreComponent = compose(
   });
 
   const [isLoading, setIsLoading] = useState(true);
+  const tacticSelectionSignatureRef = useRef<string | null>(null);
 
   const initialize = async () => {
     let filterParams = {
@@ -118,7 +123,19 @@ const MitreComponent = compose(
         result.forEach(item => {
           tacticsObject[item.name] = item;
         });
-      setMitreState({ ...mitreState, tacticsObject });
+      const incomingTacticNames = getTacticNamesFromFilters(dataSource.filters);
+      // The updater form is required: this runs in an async callback that can
+      // resolve more than once, so the enclosing `mitreState` may be stale.
+      setMitreState(previousState => {
+        const { selectedTactics, signature } = resolveSelectedTactics({
+          previousSelectedTactics: previousState.selectedTactics,
+          tacticsObject,
+          incomingTacticNames,
+          previousSignature: tacticSelectionSignatureRef.current,
+        });
+        tacticSelectionSignatureRef.current = signature;
+        return { ...previousState, tacticsObject, selectedTactics };
+      });
       setIsLoading(false);
     } catch (error) {
       setMitreState({ ...mitreState });
