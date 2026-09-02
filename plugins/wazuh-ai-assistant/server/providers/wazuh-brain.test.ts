@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { WazuhBrainAdapter, deriveSessionId } from './wazuh-brain';
 import { ChatMessage, ProviderConfig, StreamEvent } from '../../common/types';
+import { setOutOfCreditsMessage } from '../plugin-services';
 
 // Covers sessionId collision, response
 // size cap, and runtime shape validation for the hosted-brain adapter.
@@ -277,4 +278,73 @@ test('WazuhBrainAdapter.chatStream: an HTTP error response redacts the configure
   const message = (events[0] as { message: string }).message;
   assert.doesNotMatch(message, new RegExp(BASE_CONFIG.apiKey as string));
   assert.match(message, /\[redacted\]/);
+});
+
+// --- Out-of-credits override: same detection/precedence as retry.ts's SSE adapters -- reuses ----
+// --- describeOutOfCreditsMessage's plugin-services singleton, not a per-call option. -------------
+
+function outOfCreditsResponse(): Response {
+  return new Response(
+    JSON.stringify({
+      error: 'invalid_request_error',
+      message: 'Your credit balance is too low to access the API.',
+    }),
+    { status: 400, headers: { 'Content-Type': 'application/json' } },
+  );
+}
+
+afterEach(() => {
+  setOutOfCreditsMessage(undefined);
+});
+
+test('WazuhBrainAdapter.chatStream: an out-of-credits response with no override configured keeps the raw provider text (no behavior change)', async () => {
+  const events = await withFakeFetch(
+    (() => Promise.resolve(outOfCreditsResponse())) as unknown as typeof fetch,
+    () => {
+      const adapter = new WazuhBrainAdapter();
+      const controller = new AbortController();
+      return drain(
+        adapter.chatStream(
+          BASE_CONFIG,
+          [userMessage('status?')],
+          controller.signal,
+        ),
+      );
+    },
+  );
+  assert.equal(events.length, 1);
+  const message = (events[0] as { message: string }).message;
+  assert.match(message, /Provider responded with HTTP 400/);
+  assert.match(message, /credit balance is too low/i);
+});
+
+test('WazuhBrainAdapter.chatStream: an out-of-credits response with an override configured yields the configured message', async () => {
+  setOutOfCreditsMessage(
+    'Your organization is out of credits. [Add credits](https://example.com/billing).',
+  );
+  const events = await withFakeFetch(
+    (() => Promise.resolve(outOfCreditsResponse())) as unknown as typeof fetch,
+    () => {
+      const adapter = new WazuhBrainAdapter();
+      const controller = new AbortController();
+      return drain(
+        adapter.chatStream(
+          BASE_CONFIG,
+          [userMessage('status?')],
+          controller.signal,
+        ),
+      );
+    },
+  );
+  assert.equal(events.length, 1);
+  const message = (events[0] as { message: string }).message;
+  assert.equal(
+    message,
+    'Your organization is out of credits. [Add credits](https://example.com/billing).',
+  );
+  assert.doesNotMatch(
+    message,
+    /credit balance is too low/i,
+    'must not leak the raw provider text once an override is configured',
+  );
 });

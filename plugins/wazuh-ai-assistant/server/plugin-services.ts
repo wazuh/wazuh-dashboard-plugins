@@ -37,3 +37,18 @@ export function setSettingsReadOnly(value: boolean): void {
 export function isSettingsReadOnly(): boolean {
   return settingsReadOnly;
 }
+
+/**
+ * Configured out-of-credits override message (`wazuh_ai_assistant.outOfCreditsMessage`).
+ * `undefined` until plugin.ts's setup() resolves the config, so a provider call that somehow runs
+ * earlier behaves exactly like an unconfigured deployment rather than throwing.
+ */
+let outOfCreditsMessage: string | undefined;
+
+export function setOutOfCreditsMessage(value: string | undefined): void {
+  outOfCreditsMessage = value;
+}
+
+export function getOutOfCreditsMessage(): string | undefined {
+  return outOfCreditsMessage;
+}
