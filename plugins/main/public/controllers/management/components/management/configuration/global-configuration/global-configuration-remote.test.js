@@ -112,6 +112,36 @@ const missingRemoteConfig = {
   'request-remote': {},
 };
 
+// Shape a current manager reports: `remote` is an
+// object keyed by dialect, not an array wrapping a single object.
+const objectShapeRemoteConfig = {
+  'request-remote': {
+    remote: {
+      https: {
+        port: 1517,
+        bind_addr: '0.0.0.0',
+        global_prefix: '/wazuh-manager/',
+        certificate: 'etc/certs/remoted.pem',
+        key: 'etc/certs/remoted-key.pem',
+        ca: '',
+      },
+      legacy: {
+        enabled: true,
+        port: 1514,
+        protocol: ['tcp'],
+        local_ip: '127.0.0.1',
+        queue_size: 131072,
+        ipv6: false,
+        rids_closing_time: '5m',
+        connection_overtake_time: 60,
+      },
+      agents: {
+        allow_higher_versions: false,
+      },
+    },
+  },
+};
+
 describe('Global configuration remote settings', () => {
   it('should render all three groups with correct values when fully present', () => {
     const { getByText, getByDisplayValue, getAllByDisplayValue } = render(
@@ -307,5 +337,25 @@ describe('Global configuration remote settings', () => {
 
     expect(getByText('Configuration not available')).toBeInTheDocument();
     expect(queryByText('HTTPS settings')).toBeFalsy();
+  });
+
+  it('should render all three groups when remote is the object shape', () => {
+    const { getByText, getByDisplayValue, getAllByDisplayValue } = render(
+      <WzConfigurationGlobalConfigurationRemote
+        currentConfig={objectShapeRemoteConfig}
+      />,
+    );
+
+    expect(getByText('HTTPS settings')).toBeInTheDocument();
+    expect(getByText('Legacy settings')).toBeInTheDocument();
+    expect(getByText('Agents settings')).toBeInTheDocument();
+
+    expect(getByDisplayValue('1517')).toBeInTheDocument();
+    expect(getByDisplayValue('0.0.0.0')).toBeInTheDocument();
+    expect(getByDisplayValue('1514')).toBeInTheDocument();
+    expect(getByDisplayValue('tcp')).toBeInTheDocument();
+    // 'false' from agents.allow_higher_versions and legacy.ipv6 renders as
+    // the plain string, not blank.
+    expect(getAllByDisplayValue('false').length).toBeGreaterThanOrEqual(2);
   });
 });

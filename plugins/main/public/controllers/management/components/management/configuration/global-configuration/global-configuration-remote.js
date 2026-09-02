@@ -95,7 +95,7 @@ class WzConfigurationGlobalConfigurationRemote extends Component {
     const remoteConfig = currentConfig['request-remote'];
     const remoteSettings = Array.isArray(remoteConfig?.remote)
       ? remoteConfig.remote[0]
-      : undefined;
+      : remoteConfig?.remote;
     const hasHTTPSSettings = Boolean(hasSize(remoteSettings?.https));
     const hasLegacySettings = Boolean(hasSize(remoteSettings?.legacy));
     const hasAgentsSettings = Boolean(hasSize(remoteSettings?.agents));
