@@ -106,7 +106,7 @@ test('get_rules: the rule UUID is projected and sampled into the digest so it ca
 test('get_rules: buildSecurityAnalyticsLink points to the rules app with the resolved space', () => {
   const link = getRulesTool.buildSecurityAnalyticsLink?.({}, 'standard');
   assert.deepEqual(link, {
-    label: 'Open in Security Analytics',
+    label: 'Open in Ruleset Management',
     url: '/app/rules#/rules?space=standard',
   });
   const draftLink = getRulesTool.buildSecurityAnalyticsLink?.({}, 'draft');

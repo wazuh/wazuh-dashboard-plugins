@@ -135,7 +135,7 @@ function createNavLinksFromApplications(
 
 /**
  * Register Wazuh applications in OpenSearch nav groups.
- * This integrates Wazuh apps into the Security Analytics use case.
+ * This integrates Wazuh apps into the "All" use case.
  */
 export function registerWazuhNavLinks(
   addNavLinksToGroup: (

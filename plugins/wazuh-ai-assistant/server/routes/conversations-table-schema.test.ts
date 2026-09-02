@@ -32,12 +32,12 @@ test('tableSpecSchema: accepts a table carrying discover (Open in Discover)', ()
   );
 });
 
-test('tableSpecSchema: accepts a table carrying securityAnalyticsLink (Open in Security Analytics)', () => {
+test('tableSpecSchema: accepts a table carrying securityAnalyticsLink (Open in Ruleset Management)', () => {
   assert.doesNotThrow(() =>
     tableSpecSchema.validate({
       ...MINIMAL_TABLE,
       securityAnalyticsLink: {
-        label: 'Open in Security Analytics',
+        label: 'Open in Ruleset Management',
         url: '/app/rules#/rules?space=standard',
       },
     }),
@@ -50,7 +50,7 @@ test('tableSpecSchema: accepts a table carrying both discover and securityAnalyt
       ...MINIMAL_TABLE,
       discover: { index: 'wazuh-findings-v5*', dsl: { match_all: {} } },
       securityAnalyticsLink: {
-        label: 'Open in Security Analytics',
+        label: 'Open in Ruleset Management',
         url: '/app/rules#/rules?space=standard',
       },
     }),
@@ -61,7 +61,7 @@ test('tableSpecSchema: rejects a securityAnalyticsLink missing its url', () => {
   assert.throws(() =>
     tableSpecSchema.validate({
       ...MINIMAL_TABLE,
-      securityAnalyticsLink: { label: 'Open in Security Analytics' },
+      securityAnalyticsLink: { label: 'Open in Ruleset Management' },
     }),
   );
 });

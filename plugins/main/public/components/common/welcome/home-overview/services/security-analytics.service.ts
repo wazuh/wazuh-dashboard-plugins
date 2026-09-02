@@ -3,7 +3,7 @@ import { getHttp } from '../../../../../kibana-services';
 import { ErrorDataSourceNotFound } from '../../../../../utils/errors';
 
 /**
- * Count client for the Security Analytics Rules/Decoders/Integrations/Detectors
+ * Count client for the Ruleset Management Rules/Decoders/Integrations/Detectors
  * `_search` routes. Each replies via `core.http` with an
  * `{ ok, response, error }` response.
  */
@@ -46,10 +46,10 @@ function isUnhandledUri(errorMessage: string | undefined): boolean {
 function throwIfCapabilityAbsent(error: string | undefined): never {
   if (isUnhandledUri(error)) {
     throw new ErrorDataSourceNotFound(
-      error ?? 'Security Analytics endpoint not found',
+      error ?? 'Ruleset Management endpoint not found',
     );
   }
-  throw new Error(error ?? 'Security Analytics returned an error');
+  throw new Error(error ?? 'Ruleset Management returned an error');
 }
 
 interface SecurityAnalyticsSearchRequest {

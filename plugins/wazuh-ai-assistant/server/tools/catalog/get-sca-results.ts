@@ -38,7 +38,7 @@ export const getScaResultsTool: ToolDefinition = {
       'Lists Security Configuration Assessment (SCA) benchmark results for one agent — total/' +
       'passed/failed check counts per compliance benchmark (e.g. CIS Ubuntu). Use for "SCA"/' +
       '"configuration assessment"/"compliance policy score" questions about a specific agent. ' +
-      'The compliance ratio is passed/(passed+failed). NOT for Security Analytics pipeline ' +
+      'The compliance ratio is passed/(passed+failed). NOT for Ruleset Management pipeline ' +
       'policies -- SCA is a per-agent scan result, unrelated to that pipeline configuration; if ' +
       'the question is actually about pipeline policies and get_threat_intel_components (with ' +
       'component_type="policies") is available to you this turn, use that one instead. ' +

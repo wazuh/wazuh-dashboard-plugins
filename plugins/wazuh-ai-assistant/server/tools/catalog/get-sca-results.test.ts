@@ -96,7 +96,7 @@ test('get_sca_results: still passes lintDsl at its maximum advertised limit', ()
 
 // Cross-category tool audit: this tool's own category is `sca`
 // (server/tools/router.ts), while get_threat_intel_components -- named here for the "you actually
-// want a Security Analytics pipeline policy" case -- is the separate `security_analytics`
+// want a Ruleset Management pipeline policy" case -- is the separate `security_analytics`
 // category, not guaranteed offered on the same turn. Pins the conditional wording so a future edit
 // cannot silently reintroduce an unconditional "use get_threat_intel_components instead" naming a
 // tool that may not be offered.
