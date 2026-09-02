@@ -96,11 +96,11 @@ describe('getCurrentConfig', () => {
 
       const result = await getCurrentConfig(
         'node01',
-        [{ component: 'monitor', configuration: 'global' }],
+        [{ component: 'request', configuration: 'remote' }],
         'node01',
       );
 
-      expect(result).toEqual({ 'monitor-global': {} });
+      expect(result).toEqual({ 'request-remote': {} });
     });
 
     it('rejects a request without sections', async () => {
