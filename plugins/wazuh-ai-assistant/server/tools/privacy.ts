@@ -504,7 +504,7 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // fail-closed (anonymized) rather than guessed -- the CTI-specific need ("what type of consumer
   // is this") is already answerable from `name`/`context` above without it.
 
-  // .opensearch-sap-*-findings (per-log-type Security Analytics findings):
+  // .opensearch-sap-*-findings (per-log-type Ruleset Management findings):
   // detector/finding bookkeeping -- monitor identity and cross-references to the underlying
   // event/finding docs.
   //
@@ -1680,7 +1680,7 @@ export const IDENTIFIER_BEARING_FREE_TEXT_FIELDS = new Set<string>([
   'document.metadata.description',
   'document.name',
   'rule.metadata.title',
-  // Security Analytics detector/monitor identity and stored Sigma-derived query bodies: a monitor
+  // Ruleset Management detector/monitor identity and stored Sigma-derived query bodies: a monitor
   // name is typed by whoever created the detector, and a query body embeds literal field VALUES
   // ("source.user.name: jsmith", "host.hostname: dbprod07") the author pasted in.
   'monitor_name',

@@ -231,9 +231,9 @@ export interface ToolDefinition {
     breakdownDimensions?: string[];
   };
   /**
-   * Opt-in hook for Security Analytics catalog tools (get_rules, get_threat_intel_components):
+   * Opt-in hook for Ruleset Management catalog tools (get_rules, get_threat_intel_components):
    * given the validated params and the `space` value executor.ts resolved from the executed
-   * result's own `space.name` values, returns the "Open in Security Analytics" deep link for this
+   * result's own `space.name` values, returns the "Open in Ruleset Management" deep link for this
    * specific call (e.g. varying by `component_type` for get_threat_intel_components). `undefined`
    * (every non-Security-Analytics tool) means no such link is ever attached -- see common/types.ts's
    * `TableSpec.securityAnalyticsLink` doc comment.

@@ -165,7 +165,7 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
     'and Windows registry keys/values (e.g. Run-key writes).',
   sca:
     'Security Configuration Assessment (SCA): per-agent compliance benchmark results (e.g. CIS ' +
-    'Ubuntu), NOT Security Analytics pipeline policies.',
+    'Ubuntu), NOT Ruleset Management pipeline policies.',
   mitre:
     'MITRE ATT&CK technique/tactic findings and technique-frequency summaries.',
   inventory:
@@ -176,18 +176,18 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
     'Compliance findings/summaries for any of 10 frameworks (PCI DSS, HIPAA, GDPR, ISO 27001, ' +
     'NIS2, NIST 800-171/800-53, FedRAMP, CMMC, TSC).',
   security_analytics:
-    'The Security Analytics ruleset and pipeline content itself — rules (name/level/status/' +
+    'The Ruleset Management content itself — rules (name/level/status/' +
     'technique), components (decoders, integrations, policies, filters, KVDBs), detector ' +
     'definitions (which detectors exist, enabled state, monitored indices, findings counts), ' +
     'whether a specific IP/hash/URL/domain is a known indicator (IOC) per the threat-intel feed, ' +
-    'and whether the CTI content feeds are up to date. Also covers Security Analytics SPACES -- ' +
+    'and whether the CTI content feeds are up to date. Also covers Ruleset Management SPACES -- ' +
     'the content-grouping/tenancy concept for this pipeline content (e.g. "what spaces exist and ' +
     'what does each contain") -- this is a different "space" than an RBAC/dashboard permission ' +
     'space. Pipeline/threat-intel-catalog content, NOT findings that fired and NOT SCA compliance ' +
     'benchmarks.',
   free_search:
     'Anything else about Wazuh finding/vulnerability/state data, PLUS operational metrics, ' +
-    'Security Analytics detector findings, and browsing/counting the raw CVE/IOC threat-intel ' +
+    'Ruleset Management detector findings, and browsing/counting the raw CVE/IOC threat-intel ' +
     'feeds (last resort — always offered regardless of which category is picked, so this ' +
     'rarely needs to be picked for its own sake). For IOC lookup, CTI feed freshness, or CVE ' +
     'feed knowledge about ONE specific indicator/CVE, prefer lookup_indicator/get_cti_status/' +
@@ -322,7 +322,7 @@ export const CHAIN_PAIRS: Record<string, readonly string[]> = {
   // category (see its doc comment), so without these edges an "explain this MITRE incident" turn
   // can list technique rows but never pivot to the document behind one. get_rules is the
   // detection-side companion -- the only tool that returns a rule DESCRIPTION
-  // (document.metadata.description). It reads the Security Analytics catalog, NOT the Wazuh Manager
+  // (document.metadata.description). It reads the Ruleset Management catalog, NOT the Wazuh Manager
   // ruleset; the prompt already requires the model to say so, so this edge widens reach without
   // implying coverage the product does not have.
   get_mitre_findings: ['find_document_by_field', 'get_rules'],

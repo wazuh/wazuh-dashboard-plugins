@@ -19,7 +19,7 @@ const DATE_MATH_OR_ISO_RE =
 export const DEFAULT_TIME_RANGE_GTE = 'now-90d';
 export const DEFAULT_TIME_RANGE_LTE = 'now';
 
-/** Security Analytics content (get_rules, get_threat_intel_components) is namespaced across these
+/** Ruleset Management content (get_rules, get_threat_intel_components) is namespaced across these
  * four spaces (confirmed live via each index's own `space.name` field) -- shared here so both
  * tools' `space` parameter and executor.ts's `resolveSecurityAnalyticsSpace` fallback agree on the
  * same vocabulary. */
@@ -671,7 +671,7 @@ export function validateAgentId(value: unknown): string {
 }
 
 /**
- * Shared "name" filter for the two Security Analytics catalog tools (get_rules,
+ * Shared "name" filter for the two Ruleset Management catalog tools (get_rules,
  * get_threat_intel_components): neither tool exposed ANY keyword filter, so a
  * QUALIFIED question ("is there a decoder for apache?", "the rule about SSTI") always fell back
  * to reading the full unfiltered page and admitting defeat, even though the underlying data

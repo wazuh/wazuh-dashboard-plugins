@@ -175,7 +175,7 @@ const DEFAULT_SECURITY_ANALYTICS_SPACE = 'standard';
 
 /**
  * Resolves the single `space` value to use for a `buildSecurityAnalyticsLink` deep link, from the
- * `space.name` field on each returned hit (Security Analytics content is namespaced across
+ * `space.name` field on each returned hit (Ruleset Management content is namespaced across
  * draft/test/custom/standard, confirmed live). A tool call's rows can span more than one space --
  * there is no per-row link in this UI, only one per table -- so this only trusts a SINGLE distinct
  * value found across all hits; zero or multiple distinct values (no hits, or a genuinely mixed

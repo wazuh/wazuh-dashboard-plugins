@@ -220,24 +220,24 @@ test('get_threat_intel_components: table/digest columns stay within the declared
 test('get_threat_intel_components: buildSecurityAnalyticsLink maps each component_type to its real app route', () => {
   const build_ = getThreatIntelComponentsTool.buildSecurityAnalyticsLink;
   assert.deepEqual(build_?.({ component_type: 'decoders' }, 'standard'), {
-    label: 'Open in Security Analytics',
+    label: 'Open in Ruleset Management',
     url: '/app/decoders#/decoders?space=standard',
   });
   assert.deepEqual(build_?.({ component_type: 'integrations' }, 'standard'), {
-    label: 'Open in Security Analytics',
+    label: 'Open in Ruleset Management',
     url: '/app/sa-integrations#/integrations?space=standard',
   });
   // policies has no dedicated list view -- it reuses the integrations app's Overview tab.
   assert.deepEqual(build_?.({ component_type: 'policies' }, 'custom'), {
-    label: 'Open in Security Analytics',
+    label: 'Open in Ruleset Management',
     url: '/app/sa-integrations#/integrations?space=custom',
   });
   assert.deepEqual(build_?.({ component_type: 'filters' }, 'standard'), {
-    label: 'Open in Security Analytics',
+    label: 'Open in Ruleset Management',
     url: '/app/sa-integrations#/filters?space=standard&dataSourceId=',
   });
   assert.deepEqual(build_?.({ component_type: 'kvdbs' }, 'test'), {
-    label: 'Open in Security Analytics',
+    label: 'Open in Ruleset Management',
     url: '/app/kvdbs#/kvdbs?space=test',
   });
 });
