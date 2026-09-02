@@ -20,6 +20,7 @@ import {
 import {
   FINDING_SEVERITY_FIELD,
   HOST_OS_NAME_FIELD,
+  MITRE_TECHNIQUE_NAME_FIELD,
   SCA_CHECK_RESULT_FIELD,
   VULNERABILITY_SEVERITY_FIELD,
   VULNERABILITY_SEVERITY_VALUES,
@@ -94,6 +95,35 @@ export const getMitreIntelligenceResourceUrl = (
       item.key,
     )}`,
   });
+
+/**
+ * MITRE ATT&CK > Findings, filtered to one technique. Filters by name rather
+ * than `item.id`, matching `getMitreIntelligenceResourceUrl`: the id
+ * sub-aggregation only captures one value and is unreliable for multi-valued
+ * docs, while the name is the safe, reliable key.
+ */
+export const getMitreFindingsByTechniqueUrl = (
+  item: TopItem,
+  indexPatternId?: string,
+): string => {
+  if (!indexPatternId) {
+    return getUrlForApp(mitreAttack.id);
+  }
+  const queryState = rison.encode({
+    filters: [
+      PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS,
+        MITRE_TECHNIQUE_NAME_FIELD,
+        item.key,
+        indexPatternId,
+      ),
+    ],
+    query: { language: 'kuery', query: '' },
+  });
+  return getUrlForApp(mitreAttack.id, {
+    path: `#overview/?tab=mitre&tabView=findings&_a=${queryState}&_g=${DISCOVER_G_STATE}`,
+  });
+};
 export const getItHygieneUrl = () => getUrlForApp(ITHygiene.id);
 
 /** IT Hygiene > System > OS tab, optionally filtered to one `host.os.name`. */

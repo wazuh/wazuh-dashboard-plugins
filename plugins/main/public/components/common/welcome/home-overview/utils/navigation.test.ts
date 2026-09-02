@@ -1,5 +1,6 @@
 import {
   getAiAssistantUrl,
+  getMitreFindingsByTechniqueUrl,
   getMitreIntelligenceResourceUrl,
 } from './navigation';
 
@@ -14,7 +15,14 @@ jest.mock('../../../../../react-services/navigation-service', () => ({
 }));
 jest.mock('../../../data-source', () => ({
   FILTER_OPERATOR: { IS: 'is' },
-  PatternDataSourceFilterManager: { createFilter: jest.fn() },
+  PatternDataSourceFilterManager: {
+    createFilter: jest.fn((operator, key, value, indexPatternId) => ({
+      operator,
+      key,
+      value,
+      indexPatternId,
+    })),
+  },
 }));
 // applications.ts pulls the redux store; only the app ids are needed here
 jest.mock('../../../../../utils/applications', () => {
@@ -55,6 +63,28 @@ describe('getMitreIntelligenceResourceUrl', () => {
     ).toBe(
       '/app/mitre-attack#/overview?tab=mitre&tabView=intelligence&tabRedirect=tactics&nameToRedirect=Initial%20Access',
     );
+  });
+});
+
+describe('getMitreFindingsByTechniqueUrl', () => {
+  it('links to MITRE ATT&CK > Findings filtered by the technique name', () => {
+    expect(
+      getMitreFindingsByTechniqueUrl(
+        { key: 'Exploit Public-Facing Application', count: 1, id: 'T1190' },
+        'idx-1',
+      ),
+    ).toBe(
+      "/app/mitre-attack#overview/?tab=mitre&tabView=findings&_a=(filters:!((indexPatternId:idx-1,key:wazuh.rule.mitre.technique.name,operator:is,value:'Exploit Public-Facing Application')),query:(language:kuery,query:''))&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-24h,to:now))",
+    );
+  });
+
+  it('falls back to the plain MITRE ATT&CK app url without an index pattern', () => {
+    expect(
+      getMitreFindingsByTechniqueUrl({
+        key: 'Exploit Public-Facing Application',
+        count: 1,
+      }),
+    ).toBe('/app/mitre-attack');
   });
 });
 
