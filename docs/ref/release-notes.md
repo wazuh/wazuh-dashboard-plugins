@@ -2,7 +2,7 @@
 
 ## Highlights
 
-- New "[Security Analytics][security-analytics-module]" module [#7608](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7608). [[1][fork-security-analytics]]
+- New "[Ruleset Management][ruleset-management-module]" module [#7608](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7608). [[1][fork-security-analytics]]
   - Full lifecycle management for log normalization and event-based threat detection under a unified interface.
   - Normalization module: manage decoders and KVDBs across four content spaces (**Standard**, **Draft**, **Test**, **Custom**). **Draft**, **Test**, and **Custom** are user-managed spaces for authoring, validation, and production content; **Standard** holds built-in Wazuh content and is read-only [wazuh/wazuh-dashboard-security-analytics#22](https://github.com/wazuh/wazuh-dashboard-security-analytics/issues/22).
     - **Overview** section: unified entry point for integrations and **space policies** across all spaces. Create and edit integrations and configure space policies (enable status, root decoder) in **Draft**; **Test** and **Custom** display promoted content for validation and production [wazuh/wazuh-dashboard-security-analytics#32](https://github.com/wazuh/wazuh-dashboard-security-analytics/issues/32).
@@ -86,7 +86,7 @@
 
 <!-- Links -->
 
-[security-analytics-module]: ./modules/ruleset-management/README.md
+[ruleset-management-module]: ./modules/ruleset-management/README.md
 [active-response-module]: ./modules/active-response/index.md
 [healthcheck-module]: ./modules/healthcheck.md
 [healthcheck-lifecycle]: ./modules/healthcheck.md#lifecycle
