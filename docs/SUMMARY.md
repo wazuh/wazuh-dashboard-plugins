@@ -16,7 +16,7 @@
 - [Repository Bumper](dev/bumper-repository.md)
 - [Modules](dev/modules/index.md)
   - [Active responses](dev/modules/active-responses.md)
-  - [Ruleset management](dev/modules/security-analytics.md)
+  - [Ruleset management](dev/modules/ruleset-management.md)
 
 # Reference Manual
 
@@ -41,9 +41,9 @@
     - [Attach to an Alerting trigger](ref/modules/active-response/alerting-integration.md)
     - [Monitor executions](ref/modules/active-response/monitor-executions.md)
     - [Troubleshooting](ref/modules/active-response/troubleshooting.md)
-  - [Ruleset Management](ref/modules/security-analytics/README.md)
-    - [Normalization](ref/modules/security-analytics/normalization.md)
-    - [Detection](ref/modules/security-analytics/detection.md)
+  - [Ruleset Management](ref/modules/ruleset-management/README.md)
+    - [Normalization](ref/modules/ruleset-management/normalization.md)
+    - [Detection](ref/modules/ruleset-management/detection.md)
   - [AI Assistant](ref/modules/ai-assistant/README.md)
     - [Architecture](ref/modules/ai-assistant/architecture.md)
     - [Tool catalog](ref/modules/ai-assistant/tool-catalog.md)

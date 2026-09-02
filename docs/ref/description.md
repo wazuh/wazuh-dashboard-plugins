@@ -50,7 +50,7 @@ For administrators deploying the plugins:
 ### Modules
 
 - [Health Check](modules/healthcheck.md) - System health monitoring
-- [Normalization](modules/normalization.md) - Data standardization
+- [Normalization](modules/ruleset-management/normalization.md) - Data standardization
 - [Notifications and Alerting](modules/notifications-alerting.md) - Alert channels and workflows
 
 ### Integration and Operations
