@@ -153,7 +153,6 @@
 | [#9023](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9023) | Fixed sorting not working in the Server management > Security tables (Roles, Policies, Users and Roles mapping), and removed the sort affordance from columns the server API cannot sort                                                                                              |
 | [#9037](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9037) | Fixed the Findings data grid crashing and losing every column when a configured column's field does not exist in the index pattern                                                                                                                                                    |
 | [#9048](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9048) | Fixed the Server API proxy reporting rejected requests as server errors: `POST /api/request` now answers with the status the Server API returned instead of turning every 400 or 404 into a 500                                                                                       |
-| [#9101](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9101) | Fixed the agent Configuration view reading another cluster's agent report when agent IDs collide across clusters, by filtering the reported configuration by cluster name in addition to agent ID                                                                                     |
 
 ### Removed
 
