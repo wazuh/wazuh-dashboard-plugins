@@ -5,9 +5,14 @@ import {
   getAgentReportedConfiguration,
 } from './agent-config-service';
 import { getDataPlugin } from '../../../../../../kibana-services';
+import { AppState } from '../../../../../../react-services/app-state';
 
 jest.mock('../../../../../../kibana-services', () => ({
   getDataPlugin: jest.fn(),
+}));
+
+jest.mock('../../../../../../react-services/app-state', () => ({
+  AppState: { getClusterInfo: jest.fn() },
 }));
 
 /* The chainable setters return the search source itself, so it needs an
@@ -42,6 +47,9 @@ const mockDataPlugin = (fetchResult: unknown) => {
 describe('getAgentReportedConfiguration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    (AppState.getClusterInfo as jest.Mock).mockReturnValue({
+      cluster: 'test-cluster',
+    });
     /* The cache outlives a test, so each one starts from an unread report. */
     clearAgentReportedConfigurationCache();
   });
@@ -83,14 +91,21 @@ describe('getAgentReportedConfiguration', () => {
     });
   });
 
-  it('queries the index by agent id', async () => {
+  it('queries the index by agent id and cluster name', async () => {
     const { searchSource } = mockDataPlugin({ hits: { hits: [] } });
 
     await getAgentReportedConfiguration('002');
 
     expect(searchSource.setField).toHaveBeenCalledWith('query', {
       language: 'lucene',
-      query: { term: { 'wazuh.agent.id': '002' } },
+      query: {
+        bool: {
+          must: [
+            { term: { 'wazuh.agent.id': '002' } },
+            { term: { 'wazuh.cluster.name': 'test-cluster' } },
+          ],
+        },
+      },
     });
   });
 
@@ -191,7 +206,14 @@ describe('getAgentReportedConfiguration', () => {
       expect(searchSource.fetch).toHaveBeenCalledTimes(2);
       expect(searchSource.setField).toHaveBeenLastCalledWith('query', {
         language: 'lucene',
-        query: { term: { 'wazuh.agent.id': '002' } },
+        query: {
+          bool: {
+            must: [
+              { term: { 'wazuh.agent.id': '002' } },
+              { term: { 'wazuh.cluster.name': 'test-cluster' } },
+            ],
+          },
+        },
       });
     });
 

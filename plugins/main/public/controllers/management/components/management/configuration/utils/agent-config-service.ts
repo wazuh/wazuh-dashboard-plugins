@@ -11,6 +11,7 @@
  */
 
 import { getDataPlugin } from '../../../../../../kibana-services';
+import { AppState } from '../../../../../../react-services/app-state';
 import { WAZUH_AGENT_CONFIG_PATTERN } from '../../../../../../../common/constants';
 
 /**
@@ -49,17 +50,28 @@ const readAgentReportedConfiguration = async (
     WAZUH_AGENT_CONFIG_PATTERN,
   );
   const searchSource = await getDataPlugin().search.searchSource.create();
+  const clusterName = AppState.getClusterInfo().cluster;
 
   /* The whole document is read instead of trimming _source to the
   configuration subtree: it is a single configuration report, not a result set,
   and reading it whole keeps this independent of how the fields are mapped. */
+  // TODO: filter via the PatternDataSource/PatternDataSourceFilterManager
+  // cluster-filter helper (see other wazuh.agent.* indices) instead of a
+  // raw term here, if this read is ever migrated onto that framework.
   const response = await searchSource
     .setParent(undefined)
     .setField('index', indexPattern)
     .setField('size', 1)
     .setField('query', {
       language: 'lucene',
-      query: { term: { 'wazuh.agent.id': agentId } },
+      query: {
+        bool: {
+          must: [
+            { term: { 'wazuh.agent.id': agentId } },
+            { term: { 'wazuh.cluster.name': clusterName } },
+          ],
+        },
+      },
     })
     .fetch();
 
