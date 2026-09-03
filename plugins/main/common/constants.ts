@@ -16,6 +16,10 @@ export const PLUGIN_VERSION = version;
 export const PLUGIN_VERSION_SHORT = version.split('.').splice(0, 2).join('.');
 export const PLUGIN_MAJOR_VERSION = version.split('.')[0];
 
+// MITRE ATT&CK
+/** Tactic name field on a findings/events document. Selection keys on the tactic name, never its id. */
+export const MITRE_TACTIC_NAME_FIELD = 'wazuh.rule.mitre.tactic.name';
+
 // Index - Wazuh engine/indexer settings located in Indexer management > Settings
 export const WAZUH_ENGINE_SETTINGS_INDEX = '.wazuh-settings';
 export const WAZUH_DISABLED_SETTING_INDEX_RAW_EVENTS = 'index-raw-events';
