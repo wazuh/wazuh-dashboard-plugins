@@ -37,12 +37,12 @@ Key properties:
 | MITRE ATT&CK                 | `get_mitre_findings`, `get_mitre_summary`                                                                                                                                                                                                                                                           |
 | Inventory (syscollector)     | `get_agent_os`, `get_agent_packages`, `get_agent_ports`, `get_agent_processes`                                                                                                                                                                                                                      |
 | Compliance                   | `get_compliance_alerts`, `get_compliance_summary` (one or more of 10 frameworks — CMMC, FedRAMP, GDPR, HIPAA, ISO 27001, NIS2, NIST 800-171/800-53, PCI DSS, TSC — plus an optional `exclude_framework`)                                                                                            |
-| Security Analytics           | `get_rules` (correlation ruleset), `get_threat_intel_components` (decoders/integrations/policies/filters/KVDBs), `get_detectors` (detector definitions)                                                                                                                                             |
+| Ruleset Management           | `get_rules` (correlation ruleset), `get_threat_intel_components` (decoders/integrations/policies/filters/KVDBs), `get_detectors` (detector definitions)                                                                                                                                             |
 | Generic lookup / free search | `find_document_by_field` (exact-ID lookup across every applicable field), `search_wazuh_data` (the escape hatch)                                                                                                                                                                                    |
 
 On Wazuh 5.0 the tools read from the 5.0 data layer: the `wazuh-events-v5-*` event indices,
 `wazuh-findings-v5-*`, the `wazuh-states-*` state indices (vulnerabilities, FIM, SCA, inventory),
-the `wazuh-threatintel-{rules,decoders,integrations,policies,filters,kvdbs}-*` Security Analytics
+the `wazuh-threatintel-{rules,decoders,integrations,policies,filters,kvdbs}-*` Ruleset Management
 pipeline content, and the single fixed `.opensearch-sap-detectors-config` index (detector
 definitions). Each tool's module in `server/tools/catalog/` documents which index or Server API
 endpoint it queries on 5.0 and why.
@@ -138,7 +138,7 @@ the relevant OSD app, resolved by `server/tools/executor.ts` from the request ac
 - **Open in Discover**: attached to every Indexer-backed tool's result — the executed index and
   query DSL, rison-encoded into a `/app/data-explorer/discover` URL against the matching saved
   index-pattern. Resolves to nothing (silently) if no matching index-pattern exists.
-- **Open in Security Analytics**: `get_rules` and `get_threat_intel_components`'s equivalent for
+- **Open in Ruleset Management**: `get_rules` and `get_threat_intel_components`'s equivalent for
   content that has no OSD index-pattern to resolve — the `wazuh-threatintel-*` families are
   namespaced across `draft`/`test`/`custom`/`standard` spaces (surfaced as their own "Space" table
   column), and the link is built for the space the result set actually shares; when a result spans

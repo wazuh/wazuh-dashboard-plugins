@@ -53,11 +53,11 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
         <EuiFlexItem grow={3}>
           <WidgetGroup
             status='available'
-            title='Security analytics'
+            title='Ruleset management'
             caption='Current state'
             titleLink={{
               href: getIntegrationsUrl(),
-              destination: 'Security Analytics',
+              destination: 'Ruleset Management',
             }}
             centerBody
             data-test-subj='home-overview-security-analytics'
