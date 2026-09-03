@@ -49,7 +49,10 @@ export const CTI_REGISTRATION_SUCCESS_STATUS_MESSAGE =
 /** Wazuh Cloud portal / product URL. Uses `#` in the UI until set. */
 export const WAZUH_CLOUD_PORTAL_HREF = '';
 
-/** Base URL of the Wazuh Cloud CTI Console API (server-side OAuth device flow). */
+/**
+ * Default base URL of the Wazuh Cloud CTI Console API (server-side OAuth device
+ * flow). Overridable with the `wazuh_check_updates.ctiApiUrl` setting.
+ */
 export const WAZUH_CTI_CONSOLE_BASE_URL = 'https://api.pre.cloud.wazuh.com';
 
 /**
