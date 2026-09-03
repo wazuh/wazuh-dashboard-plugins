@@ -12,19 +12,6 @@
 const parser = new DOMParser();
 
 /**
- * Validate the manager configuration XML for well-formedness.
- *
- * Unlike `validateXML`, used by the agent Group configuration editor, this does
- * not rewrite the input: stray ampersands, multiple roots and legacy `<! !>`
- * comments are reported instead of repaired.
- *
- * Schema violations are out of scope. The manager owns the schema and reports
- * them through the Server API.
- *
- * @param {string} xml
- * @returns {string|boolean} An error message, or `false` when well-formed.
- */
-/**
  * Where the parser stopped, read from the `parsererror` text. Every engine
  * words it differently — `error on line 9 at column 19`, `Line Number 9,
  * Column 19` and `9:19: unclosed tag` — so this reads the numbers rather than
@@ -45,6 +32,19 @@ const readErrorPosition = text => {
   return prefixed ? `line ${prefixed[1]}, column ${prefixed[2]}` : undefined;
 };
 
+/**
+ * Validate the manager configuration XML for well-formedness.
+ *
+ * Unlike `validateXML`, used by the agent Group configuration editor, this does
+ * not rewrite the input: stray ampersands, multiple roots and legacy `<! !>`
+ * comments are reported instead of repaired.
+ *
+ * Schema violations are out of scope. The manager owns the schema and reports
+ * them through the Server API.
+ *
+ * @param {string} xml
+ * @returns {string|boolean} An error message, or `false` when well-formed.
+ */
 export const validateManagerXML = xml => {
   const xmlDoc = parser.parseFromString(xml, 'text/xml');
   const parsererror = xmlDoc.getElementsByTagName('parsererror');

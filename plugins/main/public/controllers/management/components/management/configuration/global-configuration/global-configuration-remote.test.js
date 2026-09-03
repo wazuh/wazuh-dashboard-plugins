@@ -10,10 +10,10 @@ const fullRemoteConfig = {
     remote: [
       {
         legacy: {
-          enabled: 'yes',
+          enabled: true,
           port: '1514',
           protocol: ['TCP'],
-          ipv6: 'no',
+          ipv6: false,
           local_ip: '127.0.0.1',
           queue_size: '131072',
           rids_closing_time: '300',
@@ -27,7 +27,7 @@ const fullRemoteConfig = {
           key: 'etc/certs/remoted-key.pem',
         },
         agents: {
-          allow_higher_versions: 'no',
+          allow_higher_versions: false,
         },
       },
     ],
@@ -144,7 +144,12 @@ const objectShapeRemoteConfig = {
 
 describe('Global configuration remote settings', () => {
   it('should render all three groups with correct values when fully present', () => {
-    const { getByText, getByDisplayValue, getAllByDisplayValue } = render(
+    const {
+      getByText,
+      getByDisplayValue,
+      getAllByDisplayValue,
+      queryByDisplayValue,
+    } = render(
       <WzConfigurationGlobalConfigurationRemote
         currentConfig={fullRemoteConfig}
       />,
@@ -184,9 +189,13 @@ describe('Global configuration remote settings', () => {
     expect(getByDisplayValue('300')).toBeInTheDocument();
     expect(getByDisplayValue('60')).toBeInTheDocument();
 
-    // 'yes' appears for legacy.enabled and 'no' for agents.allow_higher_versions and legacy.ipv6
-    expect(getAllByDisplayValue('yes').length).toBeGreaterThanOrEqual(1);
-    expect(getAllByDisplayValue('no').length).toBeGreaterThanOrEqual(2);
+    /* The manager reports these three as native booleans. They must read in the
+    same 'yes'/'no' vocabulary as the rest of the configuration views, never as
+    'true'/'false'. */
+    expect(getAllByDisplayValue('yes').length).toBe(1);
+    expect(getAllByDisplayValue('no').length).toBe(2);
+    expect(queryByDisplayValue('true')).not.toBeInTheDocument();
+    expect(queryByDisplayValue('false')).not.toBeInTheDocument();
 
     // 'Port' label appears twice (HTTPS group + Legacy group)
     expect(getAllByDisplayValue('1517').length).toBe(1);
@@ -340,7 +349,12 @@ describe('Global configuration remote settings', () => {
   });
 
   it('should render all three groups when remote is the object shape', () => {
-    const { getByText, getByDisplayValue, getAllByDisplayValue } = render(
+    const {
+      getByText,
+      getByDisplayValue,
+      getAllByDisplayValue,
+      queryByDisplayValue,
+    } = render(
       <WzConfigurationGlobalConfigurationRemote
         currentConfig={objectShapeRemoteConfig}
       />,
@@ -354,8 +368,9 @@ describe('Global configuration remote settings', () => {
     expect(getByDisplayValue('0.0.0.0')).toBeInTheDocument();
     expect(getByDisplayValue('1514')).toBeInTheDocument();
     expect(getByDisplayValue('tcp')).toBeInTheDocument();
-    // 'false' from agents.allow_higher_versions and legacy.ipv6 renders as
-    // the plain string, not blank.
-    expect(getAllByDisplayValue('false').length).toBeGreaterThanOrEqual(2);
+    /* agents.allow_higher_versions and legacy.ipv6 arrive as native booleans
+    and read in the 'yes'/'no' vocabulary, not as 'true'/'false'. */
+    expect(getAllByDisplayValue('no').length).toBe(2);
+    expect(queryByDisplayValue('false')).not.toBeInTheDocument();
   });
 });

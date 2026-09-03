@@ -15,7 +15,12 @@ import React, { Component, Fragment } from 'react';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
-import { hasSize, isString, renderValueOrNoValue } from '../utils/utils';
+import {
+  hasSize,
+  isString,
+  renderValueBooleanYesNo,
+  renderValueOrNoValue,
+} from '../utils/utils';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const httpsSettings = [
@@ -39,10 +44,14 @@ const httpsSettings = [
 ];
 
 const legacySettings = [
-  { field: 'legacy.enabled', label: 'Enabled', render: renderValueOrNoValue },
+  {
+    field: 'legacy.enabled',
+    label: 'Enabled',
+    render: renderValueBooleanYesNo,
+  },
   { field: 'legacy.port', label: 'Port', render: renderValueOrNoValue },
   { field: 'legacy.protocol', label: 'Protocol', render: renderValueOrNoValue },
-  { field: 'legacy.ipv6', label: 'IPv6', render: renderValueOrNoValue },
+  { field: 'legacy.ipv6', label: 'IPv6', render: renderValueBooleanYesNo },
   {
     field: 'legacy.local_ip',
     label: 'Local IP address',
@@ -69,7 +78,7 @@ const agentsSettings = [
   {
     field: 'agents.allow_higher_versions',
     label: 'Allow higher versions',
-    render: renderValueOrNoValue,
+    render: renderValueBooleanYesNo,
   },
 ];
 
