@@ -23,7 +23,7 @@ import 'brace/snippets/json';
 import 'brace/mode/javascript';
 import 'brace/snippets/javascript';
 import 'brace/ext/language_tools';
-import "brace/ext/searchbox";
+import 'brace/ext/searchbox';
 
 class WzCodeEditor extends Component {
   constructor(props) {
@@ -39,22 +39,22 @@ class WzCodeEditor extends Component {
       isReadOnly,
       height,
       minusHeight,
-      setOptions
+      setOptions,
     } = this.props;
     return (
       <Fragment>
         {(titleComponent && (
           <Fragment>
             {titleComponent}
-            <EuiSpacer size="s" />
+            <EuiSpacer size='s' />
           </Fragment>
         )) ||
           (title && <div>{title}</div>)}
-        <div className="codeEditorWrapper">
+        <div className='codeEditorWrapper'>
           <EuiCodeEditor
-            theme="textmate"
+            theme='textmate'
             mode={mode}
-            width="100%"
+            width='100%'
             height={height || `calc(100vh - ${minusHeight || 400}px)`} // Groups section has -250px
             value={value}
             wrapEnabled
@@ -62,11 +62,14 @@ class WzCodeEditor extends Component {
             highlightActiveLine={false}
             onChange={onChange}
             isReadOnly={isReadOnly}
-            setOptions={setOptions || {
-              fontSize: '14px',
-              enableSnippets: true
-            }}
-            aria-label="Code Editor"
+            setOptions={
+              setOptions || {
+                fontSize: '14px',
+                enableSnippets: true,
+                behavioursEnabled: false,
+              }
+            }
+            aria-label='Code Editor'
           />
         </div>
       </Fragment>
@@ -79,7 +82,7 @@ WzCodeEditor.propTypes = {
   mode: PropTypes.string,
   value: PropTypes.string,
   height: PropTypes.string,
-  minusHeight: PropTypes.number
+  minusHeight: PropTypes.number,
 };
 
 export default WzCodeEditor;
