@@ -633,7 +633,7 @@ interface ResultTableProps {
    * means no link renders — see discover-link.tsx. Optional so any other/future ResultTable call
    * site never has to supply it. */
   resolveDiscoverUrl?: ResolveDiscoverUrl;
-  /** Builds the "Open in Security Analytics" URL for this spec; omitted (or resolving to `null`)
+  /** Builds the "Open in Ruleset Management" URL for this spec; omitted (or resolving to `null`)
    * simply means no link renders — see security-analytics-link.tsx. Optional for the same reason
    * as `resolveDiscoverUrl` above. */
   resolveSecurityAnalyticsUrl?: ResolveSecurityAnalyticsUrl;

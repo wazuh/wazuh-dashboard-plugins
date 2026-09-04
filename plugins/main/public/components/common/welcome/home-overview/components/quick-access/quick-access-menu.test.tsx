@@ -43,7 +43,7 @@ describe('QuickAccessMenu', () => {
     expect(screen.getByText('Threat intelligence')).toBeInTheDocument();
     expect(screen.getByText('Security operations')).toBeInTheDocument();
     expect(screen.getByText('Cloud security')).toBeInTheDocument();
-    expect(screen.getByText('Security analytics')).toBeInTheDocument();
+    expect(screen.getByText('Ruleset management')).toBeInTheDocument();
   });
 
   it('links a Wazuh app to its module url', () => {
@@ -52,8 +52,8 @@ describe('QuickAccessMenu', () => {
     expect(getModuleUrl).toHaveBeenCalledWith('malware-detection');
   });
 
-  // Same content types as the Security analytics tiles on this page.
-  it('links every Security analytics content type', () => {
+  // Same content types as the Ruleset management tiles on this page.
+  it('links every Ruleset management content type', () => {
     openMenu();
     for (const label of [
       'Rules',

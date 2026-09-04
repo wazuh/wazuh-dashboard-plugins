@@ -33,7 +33,7 @@ const COMPONENT_INDEX: Record<ComponentType, string> = {
 
 const ENABLED_VALUES = ['enabled', 'disabled', 'any'] as const;
 
-/** "Open in Security Analytics" deep link per component type (app path + hash route confirmed
+/** "Open in Ruleset Management" deep link per component type (app path + hash route confirmed
  * live against a real 5.0 stack) -- `space` is filled in by executor.ts's
  * `resolveSecurityAnalyticsSpace`. `policies` has no dedicated list view of its own: it is only
  * ever shown on the integrations app's Overview tab, so it reuses that same route. */
@@ -50,7 +50,7 @@ const COMPONENT_SECURITY_ANALYTICS_PATH: Record<
 };
 
 /**
- * Security Analytics pipeline/config content -- decoders, integrations, policies, filters, and
+ * Ruleset Management pipeline/config content -- decoders, integrations, policies, filters, and
  * KVDBs -- grouped into one parametrized tool rather than five near-identical ones: all five share
  * the same envelope and the same question shape ("what is configured/active?"), unlike
  * `get_rules` (rules carry level/status/tags/MITRE technique fields none of these five
@@ -84,10 +84,10 @@ export const getThreatIntelComponentsTool: ToolDefinition = {
   spec: {
     name: 'get_threat_intel_components',
     description:
-      'Lists Security Analytics pipeline components: decoders, integrations, policies, filters, ' +
+      'Lists Ruleset Management pipeline components: decoders, integrations, policies, filters, ' +
       'or KVDBs (key-value databases). Use for "which decoders/integrations/policies are ' +
       'active" and "is there a decoder/integration for <topic>" questions. ' +
-      '`component_type="policies"` here means a Security Analytics pipeline policy (config ' +
+      '`component_type="policies"` here means a Ruleset Management pipeline policy (config ' +
       'content), NOT a Security Configuration Assessment (SCA) compliance benchmark like CIS ' +
       'Ubuntu -- if that is what the question needs and get_sca_results is available to you ' +
       'this turn, use that one instead. Not for rules (use get_rules) or threat intel ' +
@@ -109,7 +109,7 @@ export const getThreatIntelComponentsTool: ToolDefinition = {
         space: {
           type: 'string',
           description:
-            'Filter by Security Analytics space. Omit to search across every space (the default).',
+            'Filter by Ruleset Management space. Omit to search across every space (the default).',
           enum: [...SECURITY_ANALYTICS_SPACES],
         },
         limit: limitProperty(
@@ -203,7 +203,7 @@ export const getThreatIntelComponentsTool: ToolDefinition = {
   buildSecurityAnalyticsLink(params, space) {
     const componentType = params.component_type as ComponentType;
     return {
-      label: 'Open in Security Analytics',
+      label: 'Open in Ruleset Management',
       url: COMPONENT_SECURITY_ANALYTICS_PATH[componentType](space),
     };
   },

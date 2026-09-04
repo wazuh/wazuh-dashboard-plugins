@@ -13,7 +13,10 @@ import {
   EuiCodeBlock,
   EuiLoadingContent,
   EuiLoadingSpinner,
+  EuiLink,
   EuiMarkdownFormat,
+  EuiMarkdownFormatProps,
+  getDefaultEuiMarkdownProcessingPlugins,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { ChatRole, TableSpec, ToolCall } from '../../../common/types';
@@ -21,6 +24,48 @@ import { ResultTable, ResultTableProvenanceChip } from './result-table';
 import { DiscoverLink, ResolveDiscoverUrl } from './discover-link';
 import { ResolveSecurityAnalyticsUrl } from './security-analytics-link';
 import { describeProvenance, describeToolCall } from './tool-call-label';
+
+const ErrorMarkdownLink: React.FC<{
+  href?: string;
+  children?: React.ReactNode;
+}> = ({ href, children }) => (
+  <EuiLink href={href} target='_blank' rel='noopener noreferrer'>
+    {children}
+  </EuiLink>
+);
+
+const [
+  remarkRehypePlugin,
+  rehypeSlugPlugin,
+  [rehype2react, rehype2reactOptions],
+] = getDefaultEuiMarkdownProcessingPlugins();
+
+/**
+ * `processingPluginList` for error text only — an expanded failure reason and chat-page.tsx's
+ * error banner, both of which may carry the operator-configured out-of-credits link
+ * (`wazuh_ai_assistant.outOfCreditsMessage`, server/config.ts). The only change from EUI's
+ * default is the `a` renderer, which sets no `target` and would navigate the dashboard tab
+ * itself away to a third-party billing page.
+ *
+ * Deliberately NOT applied to a finished assistant answer: that surface is model output built
+ * from tool results, so it keeps EUI's stock renderers plus the `sanitizeAssistantMarkdown`
+ * string defense below.
+ */
+export const errorMarkdownProcessingPlugins: EuiMarkdownFormatProps['processingPluginList'] =
+  [
+    remarkRehypePlugin,
+    rehypeSlugPlugin,
+    [
+      rehype2react,
+      {
+        ...rehype2reactOptions,
+        components: {
+          ...rehype2reactOptions.components,
+          a: ErrorMarkdownLink,
+        },
+      },
+    ],
+  ];
 
 /**
  * "This turn was cut short" affordance, rendered in two places: inside an interrupted assistant
@@ -145,11 +190,16 @@ export const FailedTurnNotice: React.FC<{
         )}
       </EuiFlexGroup>
       {isOpen && (
-        <div id={detailsId}>
+        <div id={detailsId} style={{ margin: '4px 0 0' }}>
           <EuiText size='xs' color='subdued'>
-            <p style={{ margin: '4px 0 0', whiteSpace: 'pre-wrap' }}>
-              {reason}
-            </p>
+            {/* `reason` is either the operator-configured out-of-credits message (which may
+                  carry a markdown link to a credits/plan page) or raw upstream provider error
+                  text — sanitized before rendering, since neither is safe as raw HTML. */}
+            <EuiMarkdownFormat
+              processingPluginList={errorMarkdownProcessingPlugins}
+            >
+              {sanitizeAssistantMarkdown(reason)}
+            </EuiMarkdownFormat>
           </EuiText>
         </div>
       )}
@@ -218,7 +268,7 @@ interface MessageBubbleProps {
   message: UiChatMessage;
   /** Threaded down to ResultTable's "Open in Discover" link; see discover-link.tsx. */
   resolveDiscoverUrl: ResolveDiscoverUrl;
-  /** Threaded down to ResultTable's "Open in Security Analytics" link; see
+  /** Threaded down to ResultTable's "Open in Ruleset Management" link; see
    * security-analytics-link.tsx. */
   resolveSecurityAnalyticsUrl: ResolveSecurityAnalyticsUrl;
   /**

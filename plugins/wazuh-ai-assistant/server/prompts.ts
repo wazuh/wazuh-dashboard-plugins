@@ -165,7 +165,7 @@ export function buildSystemPrompt(nowIso: string): string {
       'check with the available tools — never silently answer a narrower question than the one ' +
       'asked. The tools offered to you on any given turn are a routed subset of this full ' +
       `catalog: ${CAPABILITY_INVENTORY}.`,
-    // A real answer once wrote "which get_rules (Security Analytics correlation rules) doesn't
+    // A real answer once wrote "which get_rules (Ruleset Management correlation rules) doesn't
     // index..." -- a raw tool id from CAPABILITY_INVENTORY leaking straight into user-facing
     // prose, in an EXPLANATION, not an offer. Tool ids are internal plumbing named for this
     // catalog, not vocabulary the user shares; the fix is a plain-language description of the
@@ -237,7 +237,7 @@ export function buildSystemPrompt(nowIso: string): string {
     // tool first.
     'Beyond the typed tools, search_wazuh_data can also answer questions about: operational ' +
       'metrics (agent connection/registration counts, communication throughput, log-' +
-      'normalization counters — index_pattern "wazuh-metrics-*"); Security Analytics detector ' +
+      'normalization counters — index_pattern "wazuh-metrics-*"); Ruleset Management detector ' +
       'findings and its pre-packaged rule catalog (".opensearch-sap-*-findings", ' +
       '".opensearch-sap-pre-packaged-rules-config"); and the raw CVE/IOC threat-intel feeds for ' +
       'BROWSING OR COUNTING them (".wazuh-threatintel-vulnerabilities-a", ' +
@@ -289,7 +289,7 @@ export function buildSystemPrompt(nowIso: string): string {
       'assistant at the moment. Check your access with an administrator, or review it under ' +
       'Server management > Security > Roles." NOTE: the word space/spaces is ' +
       'overloaded -- this decline is ONLY for an access/permission problem (a role, who can see ' +
-      'what). A question about a Security Analytics space as a CONTENT grouping, e.g. what ' +
+      'what). A question about a Ruleset Management space as a CONTENT grouping, e.g. what ' +
       'spaces exist and what each one contains, is a different, answerable question: call ' +
       'get_threat_intel_components with component_type set to policies (grouped by space.name) ' +
       'and answer from that -- never apply this decline to a content-listing question just ' +
@@ -343,10 +343,10 @@ export function buildSystemPrompt(nowIso: string): string {
       "\"I don't have a way to list configured notification channels yet — that's not available " +
       'in the AI assistant at the moment. You can review configured channels under Server ' +
       'management > Settings > Notifications."\n' +
-      '  - Security Analytics detector ALERTS specifically (".opensearch-sap-*-alerts" — still ' +
+      '  - Ruleset Management detector ALERTS specifically (".opensearch-sap-*-alerts" — still ' +
       'blocked, distinct from the detector findings/rule-catalog indices you CAN query): "I ' +
       "don't have alert data for that detector — that's not available in the AI assistant at " +
-      'the moment. You can review detector configuration under Security Analytics > Detectors."\n' +
+      'the moment. You can review detector configuration under Ruleset Management > Detectors."\n' +
       "  - Changing a rule's alert threshold or level (you may report which rule fires most, " +
       'but not adjust it): "I can show you which rule is generating the most alerts, but I ' +
       "can't change a rule's threshold or level for you — that's not available in the AI " +
@@ -634,17 +634,17 @@ export function buildSystemPrompt(nowIso: string): string {
       'wrong outcome whenever the escape hatch can reach the data.',
     // BLOCKER FIX: a "rules from the Manager API" question
     // routes to get_rules, the only rule-listing tool -- but get_rules reads a completely different
-    // corpus (the Security Analytics Sigma/UUID rule catalog, wazuh-threatintel-rules-a), never the
+    // corpus (the Ruleset Management Sigma/UUID rule catalog, wazuh-threatintel-rules-a), never the
     // Wazuh Manager's own ruleset endpoint. The prior answer surfaced correct data with neither half
     // of the required disclosure: it never named the corpus it actually read, and never said the
     // Manager API itself was not what was queried -- silently substituting one source for another
     // without saying so, the same class of gap the "verbatim identifier"/"assumption note" rules
     // above exist to close for other kinds of substitution.
-    'get_rules reads the Security Analytics Sigma/UUID-shaped rule catalog (index ' +
+    'get_rules reads the Ruleset Management Sigma/UUID-shaped rule catalog (index ' +
       "wazuh-threatintel-rules-a) -- a DIFFERENT corpus from the Wazuh Manager's own ruleset API, " +
       'which this product does not query at all. Whenever a rules question names, or could be read ' +
       'as asking about, the Manager API or Manager-side ruleset specifically, state plainly which ' +
-      'corpus you actually searched (the Security Analytics rule catalog) and that the Manager API ' +
+      'corpus you actually searched (the Ruleset Management rule catalog) and that the Manager API ' +
       'ruleset itself was not queried -- never let the answer read as if it came from the Manager.',
     'Never guess rule ids: if you do not know the exact wazuh.rule.id for a kind of finding, use ' +
       'search_findings_by_rule_tag with a wazuh.rule.tags value, or aggregate by rule first with ' +

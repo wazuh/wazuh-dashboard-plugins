@@ -107,20 +107,20 @@ const A1A_FAMILIES: GenericQueryFamily[] = [
   {
     pattern: '.opensearch-sap-*-findings',
     label:
-      'Security Analytics detector findings, one index per log type (e.g. wazuh-generic, ' +
+      'Ruleset Management detector findings, one index per log type (e.g. wazuh-generic, ' +
       'suricata, apache-http) — distinct from wazuh-findings-v5-*',
   },
   {
     pattern: '.opensearch-sap-pre-packaged-rules-config',
     label:
-      'the pre-packaged Sigma detection-rule catalog Security Analytics ships with — fields are ' +
+      'the pre-packaged Sigma detection-rule catalog Ruleset Management ships with — fields are ' +
       'nested under rule.* (rule.metadata.title/author, rule.category, rule.level, rule.status, ' +
       'rule.queries.value), NOT document.*',
   },
   {
     pattern: '.opensearch-sap-correlation-metadata',
     label:
-      'Security Analytics correlation-engine bookkeeping (root/counter/score state)',
+      'Ruleset Management correlation-engine bookkeeping (root/counter/score state)',
   },
   {
     pattern: '.wazuh-threatintel-vulnerabilities-a',

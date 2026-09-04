@@ -504,7 +504,7 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // fail-closed (anonymized) rather than guessed -- the CTI-specific need ("what type of consumer
   // is this") is already answerable from `name`/`context` above without it.
 
-  // .opensearch-sap-*-findings (per-log-type Security Analytics findings):
+  // .opensearch-sap-*-findings (per-log-type Ruleset Management findings):
   // detector/finding bookkeeping -- monitor identity and cross-references to the underlying
   // event/finding docs.
   //
@@ -1680,7 +1680,7 @@ export const IDENTIFIER_BEARING_FREE_TEXT_FIELDS = new Set<string>([
   'document.metadata.description',
   'document.name',
   'rule.metadata.title',
-  // Security Analytics detector/monitor identity and stored Sigma-derived query bodies: a monitor
+  // Ruleset Management detector/monitor identity and stored Sigma-derived query bodies: a monitor
   // name is typed by whoever created the detector, and a query body embeds literal field VALUES
   // ("source.user.name: jsmith", "host.hostname: dbprod07") the author pasted in.
   'monitor_name',
@@ -2837,4 +2837,155 @@ export function applyFieldPolicy(
   }
 
   return scrubbedDigest;
+}
+
+/** Resolves whether `field` carries a 'never' entry, tool-scoped exactly like every other
+ * policy lookup in this file. */
+function isNeverField(
+  field: string,
+  policy: FieldPolicyEntry[],
+  toolName: string | undefined,
+): boolean {
+  return resolveFieldEntry(field, policy, toolName)?.action === 'never';
+}
+
+/** Whether an aggregation bucket keyed by `spec` must be dropped whole, and (for `composite`) what
+ * is left of its key once the 'never' components are omitted. Mirrors `scrubAggKey`'s per-shape
+ * drop semantics and nothing else: this function rewrites no component.
+ *
+ * A spec-less bucket (date_histogram and friends) passes through, since no field resolves and so no
+ * 'never' entry can apply. `scrubAggKey`'s fail-closed escape-hatch branch has no counterpart here
+ * on purpose: that branch pseudonymizes, which is privacy-mode work. */
+function dropNeverAggKey(
+  rawKey: unknown,
+  spec: AggFieldSpec | undefined,
+  policy: FieldPolicyEntry[],
+  toolName: string | undefined,
+): { drop: boolean; value?: unknown } {
+  if (!spec) {
+    return { drop: false, value: rawKey };
+  }
+
+  if (spec.kind === 'scalar') {
+    // Every bucket key IS a value of that one field, so there is nothing left to keep.
+    return isNeverField(spec.field, policy, toolName)
+      ? { drop: true }
+      : { drop: false, value: rawKey };
+  }
+
+  if (spec.kind === 'multi') {
+    if (!Array.isArray(rawKey) || rawKey.length !== spec.fields.length) {
+      // Shape mismatch: pass through. `scrubAggKey` drops here because it cannot component-scrub
+      // an unrecognized shape. This pass only removes 'never' fields, and a key whose components
+      // map to no field carries no resolvable 'never' entry.
+      return { drop: false, value: rawKey };
+    }
+    // Positional array: omitting one slot would silently shift the remaining values out of
+    // alignment with their own fields, so any 'never' component drops the whole bucket.
+    return spec.fields.some(field => isNeverField(field, policy, toolName))
+      ? { drop: true }
+      : { drop: false, value: rawKey };
+  }
+
+  // composite: each property carries its own source name, so omitting a 'never' component leaves
+  // the rest correctly attributable.
+  if (!rawKey || typeof rawKey !== 'object' || Array.isArray(rawKey)) {
+    return { drop: false, value: rawKey };
+  }
+  const out: Record<string, unknown> = {};
+  for (const [sourceName, componentValue] of Object.entries(
+    rawKey as Record<string, unknown>,
+  )) {
+    const field = spec.fields[sourceName];
+    if (field && isNeverField(field, policy, toolName)) {
+      continue;
+    }
+    out[sourceName] = componentValue;
+  }
+  return { drop: Object.keys(out).length === 0, value: out };
+}
+
+/**
+ * Enforces only the 'never' action, with no pseudonymizer. `finalizeDigest` (executor.ts) runs it
+ * on the privacy-off path, where `applyFieldPolicy` never runs and the action would otherwise do
+ * nothing in the default configuration. `anonymize`/`allow-scan` stay scoped to privacy mode:
+ * both need the pseudonymizer.
+ *
+ * DO NOT replace this with `applyFieldPolicy` over a policy filtered to its 'never' entries. Every
+ * remaining field would then resolve to allow-by-omission, whose branch in `scrubFieldValue` runs
+ * `prescanAndMint` and rewrites IPs/FQDNs that privacy-off output has always sent in clear.
+ *
+ * Same three surfaces `never` covers under privacy mode: `samples` values, `breakdown` buckets
+ * (with `breakdownNote`), and the field name in `columns`. `message` needs no pass here, since
+ * `applyFieldPolicy` only runs the pseudonymizer's whole-text scrub over it.
+ */
+export function dropNeverFields(
+  digest: Digest,
+  policy: FieldPolicyEntry[],
+  aggFields?: Record<string, AggFieldSpec | undefined>,
+  toolName?: string,
+): Digest {
+  // Same resolution as `applyFieldPolicy`'s samples loop: a bucket row's `key` holds values OF the
+  // first agg with an extractable bucket field, not of a field literally called "key".
+  const firstAggField = aggFields
+    ? Object.values(aggFields).find(field => field !== undefined)
+    : undefined;
+  const isAggDigest = aggFields !== undefined;
+
+  const samples = digest.samples.map(sample => {
+    const out: Record<string, unknown> = {};
+    for (const [sampleKey, value] of Object.entries(sample)) {
+      if (sampleKey === 'key' && isAggDigest) {
+        // `drop` at sample granularity means "omit the 'key' entry", leaving `doc_count` and any
+        // sibling field in place. `applyFieldPolicy` documents the same asymmetry with the
+        // `breakdown` loop below.
+        if (!dropNeverAggKey(value, firstAggField, policy, toolName).drop) {
+          out[sampleKey] = value;
+        }
+        continue;
+      }
+      if (!isNeverField(sampleKey, policy, toolName)) {
+        out[sampleKey] = value;
+      }
+    }
+    return out;
+  });
+
+  let breakdown = digest.breakdown;
+  if (breakdown && aggFields) {
+    const firstAggName = Object.keys(aggFields)[0];
+    const kept: NonNullable<Digest['breakdown']> = [];
+    for (const bucket of breakdown) {
+      const result = dropNeverAggKey(
+        bucket.key,
+        aggFields[bucket.agg ?? firstAggName],
+        policy,
+        toolName,
+      );
+      if (result.drop) {
+        continue;
+      }
+      kept.push({ ...bucket, key: result.value });
+    }
+    breakdown = kept;
+  }
+
+  const filtered: Digest = {
+    ...digest,
+    columns: digest.columns.filter(
+      field => !isNeverField(field, policy, toolName),
+    ),
+    samples,
+  };
+
+  if (breakdown && breakdown.length > 0) {
+    filtered.breakdown = breakdown;
+  } else if (digest.breakdown) {
+    // A `breakdownNote` reports concrete figures about the bucket list it rides with, so it goes
+    // when a 'never' entry drops every bucket. `applyFieldPolicy` keeps the same invariant.
+    delete filtered.breakdown;
+    delete filtered.breakdownNote;
+  }
+
+  return filtered;
 }

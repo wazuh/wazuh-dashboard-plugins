@@ -26,6 +26,7 @@ import {
   EuiIcon,
   EuiFlyout,
   EuiFlyoutBody,
+  EuiMarkdownFormat,
   htmlIdGenerator,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
@@ -72,7 +73,11 @@ import {
   toPersistedMessages,
 } from '../../../common/chat-history';
 import { MessageList } from './message-list';
-import { UiChatMessage } from './message-bubble';
+import {
+  errorMarkdownProcessingPlugins,
+  sanitizeAssistantMarkdown,
+  UiChatMessage,
+} from './message-bubble';
 import { createDiscoverUrlResolver } from './discover-link';
 import { createSecurityAnalyticsUrlResolver } from './security-analytics-link';
 import { ChatInput, ChatInputHandle } from './chat-input';
@@ -592,7 +597,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
     const [resolveDiscoverUrl] = useState(() =>
       createDiscoverUrlResolver(core),
     );
-    // "Open in Security Analytics" (security-analytics-link.tsx): same rationale as above.
+    // "Open in Ruleset Management" (security-analytics-link.tsx): same rationale as above.
     const [resolveSecurityAnalyticsUrl] = useState(() =>
       createSecurityAnalyticsUrlResolver(core),
     );
@@ -2730,16 +2735,20 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       if (isGenerating || !last) {
         return;
       }
-      // Two shapes of unfinished turn. An interrupted ASSISTANT message is the one this tab marked
-      // itself (Stop, or leaving while the page stayed alive). A trailing USER message is the harder
-      // case: a reload or a navigation killed the page mid-answer, so nothing was left running to mark
-      // anything — the question was saved before generating started and that is all there is.
-      const isInterruptedAnswer =
-        last.role === 'assistant' && last.interrupted === true;
-      if (!isInterruptedAnswer && last.role !== 'user') {
+      // Two shapes of unfinished turn. An ASSISTANT message this tab marked itself: interrupted
+      // (Stop, or leaving while the page stayed alive) or failed (an `error` stream event). A turn
+      // carries one marker or the other, never both, and both are re-askable, so accepting only
+      // `interrupted` renders the button on a failed turn and does nothing on click. A trailing
+      // USER message is the harder case: a reload or a navigation killed the page mid-answer, so
+      // nothing was left running to mark anything, and the question saved before generating
+      // started is all there is.
+      const isUnfinishedAnswer =
+        last.role === 'assistant' &&
+        (last.interrupted === true || Boolean(last.failureReason));
+      if (!isUnfinishedAnswer && last.role !== 'user') {
         return;
       }
-      const history = isInterruptedAnswer ? messages.slice(0, -1) : messages;
+      const history = isUnfinishedAnswer ? messages.slice(0, -1) : messages;
       if (history[history.length - 1]?.role !== 'user') {
         return;
       }
@@ -3271,7 +3280,18 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                           )}
                           color='danger'
                           iconType='alert'
-                          body={activeError}
+                          // `activeError` is the same class of text as a failed turn's
+                          // `failureReason`, so it renders through the same sanitizer and
+                          // plugin list as FailedTurnNotice (message-bubble.tsx).
+                          body={
+                            <EuiMarkdownFormat
+                              processingPluginList={
+                                errorMarkdownProcessingPlugins
+                              }
+                            >
+                              {sanitizeAssistantMarkdown(activeError ?? '')}
+                            </EuiMarkdownFormat>
+                          }
                           onDismiss={() => setDismissedError(activeError)}
                         />
                       )}

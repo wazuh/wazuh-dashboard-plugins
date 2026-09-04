@@ -20,6 +20,8 @@ import {
 import {
   FINDING_SEVERITY_FIELD,
   HOST_OS_NAME_FIELD,
+  MITRE_TACTIC_NAME_FIELD,
+  MITRE_TECHNIQUE_NAME_FIELD,
   SCA_CHECK_RESULT_FIELD,
   VULNERABILITY_SEVERITY_FIELD,
   VULNERABILITY_SEVERITY_VALUES,
@@ -94,6 +96,61 @@ export const getMitreIntelligenceResourceUrl = (
       item.key,
     )}`,
   });
+
+/**
+ * MITRE ATT&CK > Findings, filtered to one technique. Filters by name rather
+ * than `item.id`, matching `getMitreIntelligenceResourceUrl`: the id
+ * sub-aggregation only captures one value and is unreliable for multi-valued
+ * docs, while the name is the safe, reliable key.
+ */
+export const getMitreFindingsByTechniqueUrl = (
+  item: TopItem,
+  indexPatternId?: string,
+): string => {
+  if (!indexPatternId) {
+    return getUrlForApp(mitreAttack.id);
+  }
+  const queryState = rison.encode({
+    filters: [
+      PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS,
+        MITRE_TECHNIQUE_NAME_FIELD,
+        item.key,
+        indexPatternId,
+      ),
+    ],
+    query: { language: 'kuery', query: '' },
+  });
+  return getUrlForApp(mitreAttack.id, {
+    path: `#overview/?tab=mitre&tabView=findings&_a=${queryState}&_g=${DISCOVER_G_STATE}`,
+  });
+};
+
+/** MITRE ATT&CK > Framework tab, filtered to one `wazuh.rule.mitre.tactic.name`. */
+export const getMitreFrameworkTacticUrl = (
+  item: TopItem,
+  indexPatternId?: string,
+): string => {
+  const path = '#overview/?tab=mitre&tabView=inventory';
+  if (!indexPatternId) {
+    return getUrlForApp(mitreAttack.id, { path });
+  }
+  const queryState = rison.encode({
+    filters: [
+      PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS,
+        MITRE_TACTIC_NAME_FIELD,
+        item.key,
+        indexPatternId,
+      ),
+    ],
+    query: { language: 'kuery', query: '' },
+  });
+  return getUrlForApp(mitreAttack.id, {
+    path: `${path}&_a=${queryState}&_g=${DISCOVER_G_STATE}`,
+  });
+};
+
 export const getItHygieneUrl = () => getUrlForApp(ITHygiene.id);
 
 /** IT Hygiene > System > OS tab, optionally filtered to one `host.os.name`. */
@@ -214,7 +271,7 @@ export const getRegulatoryComplianceUrl = (tabView: string): string =>
 export const getModuleUrl = (appId: string): string => getUrlForApp(appId);
 
 /**
- * App ids registered by the Security Analytics dashboards plugin. Absent when
+ * App ids registered by the Ruleset Management dashboards plugin. Absent when
  * it isn't installed, but by then the tile is already hidden via its 404.
  */
 const SECURITY_ANALYTICS_APP_IDS = {

@@ -292,7 +292,7 @@ test('buildSystemPrompt: the deliberate vulnerability-history limitation is NOT 
 });
 
 test('buildSystemPrompt: instructs the model to never name internal tool ids in explanatory prose', () => {
-  // A real answer once wrote "which get_rules (Security Analytics correlation rules) doesn't
+  // A real answer once wrote "which get_rules (Ruleset Management correlation rules) doesn't
   // index..." -- a raw tool id from CAPABILITY_INVENTORY leaking into the user-visible answer,
   // inside an EXPLANATION rather than an offer. The model has no other source for these ids
   // than the catalog clause, so the rule must name at least one example id and require
@@ -458,7 +458,7 @@ test('buildSystemPrompt: keeps "field is unpopulated" and "no documents match" a
 test('buildSystemPrompt: names the newly-reachable data families in user vocabulary', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(prompt, /operational metrics/);
-  assert.match(prompt, /Security\s+Analytics detector findings/);
+  assert.match(prompt, /Ruleset\s+Management detector findings/);
 });
 
 // Three of the families earlier pointed at search_wazuh_data now have their own typed tool,
@@ -772,7 +772,7 @@ test(
     const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
     assert.match(
       prompt,
-      /get_rules reads the Security Analytics Sigma\/UUID-shaped rule catalog/,
+      /get_rules reads the Ruleset Management Sigma\/UUID-shaped rule catalog/,
     );
     assert.match(
       prompt,
@@ -784,7 +784,7 @@ test(
 // --- Group C: decline-copy mapping fixes --------------------------------
 
 test(
-  'the RBAC/spaces decline is scoped away from a Security Analytics ' +
+  'the RBAC/spaces decline is scoped away from a Ruleset Management ' +
     'content-listing question, and points it at get_threat_intel_components instead',
   () => {
     const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');

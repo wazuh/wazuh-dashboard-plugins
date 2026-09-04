@@ -70,16 +70,16 @@ const getDataDrivenGroups = (): QuickAccessGroup[] =>
   );
 
 /**
- * The Security Analytics plugin is external to Wazuh's app registry, so its
+ * The Ruleset Management plugin is external to Wazuh's app registry, so its
  * group is declared here — nothing in `Applications` describes it. The entries
- * mirror the Security analytics tiles on this page (see
+ * mirror the Ruleset management tiles on this page (see
  * `security-analytics-tiles.tsx`), so both surfaces expose the same content
  * types. `order` mirrors that plugin's own nav category, which sits between
  * Cloud security (500) and Agents management (600).
  */
 const SECURITY_ANALYTICS_GROUP: QuickAccessGroup = {
   id: 'security-analytics',
-  label: 'Security analytics',
+  label: 'Ruleset management',
   icon: 'securityAnalyticsApp',
   order: 550,
   items: [

@@ -7,6 +7,11 @@ import { getWazuhCheckUpdatesServices } from '../../plugin-services';
 import { CtiConfigurationError, getCtiConsoleBaseUrl } from './cti-console-url';
 import { fetchClusterUuid } from './cluster-uuid';
 
+const CTI_CONSOLE_REQUEST_HEADERS = {
+  'Content-Type': 'application/x-www-form-urlencoded',
+  'Accept-Encoding': 'gzip, br',
+};
+
 /**
  * OAuth `client_id` (environment UID): optional body override, then
  * `WAZUH_CTI_CLIENT_ID`, otherwise cluster `cluster_uuid` from `GET /`.
@@ -46,9 +51,7 @@ export const getCtiToken = async (clientId: string): Promise<any> => {
     const body = new URLSearchParams({ client_id: clientId }).toString();
 
     const response = await axios.post(url, body, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
+      headers: CTI_CONSOLE_REQUEST_HEADERS,
     });
 
     return response.data;
@@ -87,9 +90,7 @@ export const pollCtiToken = async (
     }).toString();
 
     const response = await axios.post<Record<string, unknown>>(url, body, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
+      headers: CTI_CONSOLE_REQUEST_HEADERS,
       validateStatus: status =>
         (status >= 200 && status < 300) || status === 400,
     });

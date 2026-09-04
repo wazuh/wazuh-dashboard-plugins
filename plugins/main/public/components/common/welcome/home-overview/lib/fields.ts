@@ -1,5 +1,10 @@
 import { SeverityBand } from '../interfaces/types';
-import { WAZUH_MODULES_ID } from '../../../../../../common/constants';
+import {
+  WAZUH_MODULES_ID,
+  MITRE_TACTIC_NAME_FIELD,
+} from '../../../../../../common/constants';
+
+export { MITRE_TACTIC_NAME_FIELD };
 
 /** Field-name constants shared by the query builders, mappers and navigation. */
 
@@ -19,7 +24,6 @@ export const VULNERABILITY_SEVERITY_BANDS: SeverityBand[] = [
 ];
 
 export const FINDING_SEVERITY_FIELD = 'wazuh.rule.level';
-export const MITRE_TACTIC_NAME_FIELD = 'wazuh.rule.mitre.tactic.name';
 export const MITRE_TACTIC_ID_FIELD = 'wazuh.rule.mitre.tactic.id';
 export const MITRE_TECHNIQUE_ID_FIELD = 'wazuh.rule.mitre.technique.id';
 export const MITRE_TECHNIQUE_NAME_FIELD = 'wazuh.rule.mitre.technique.name';

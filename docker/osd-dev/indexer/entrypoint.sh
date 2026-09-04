@@ -14,7 +14,7 @@ if [ -x "$INDEXER_HOME/engine/run_engine.sh" ]; then
   nohup "$INDEXER_HOME/engine/run_engine.sh" > /dev/null 2>&1 &
   echo $! > /run/wazuh-indexer/wazuh-engine.pid
 
-  ENGINE_API_SOCK="$INDEXER_HOME/engine/sockets/engine-api.sock"
+  ENGINE_API_SOCK="$INDEXER_HOME/engine/sockets/engine-api-http.sock"
   (
     while [ ! -S "$ENGINE_API_SOCK" ]; do
       sleep 3

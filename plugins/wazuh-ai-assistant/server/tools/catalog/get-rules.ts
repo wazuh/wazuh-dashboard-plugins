@@ -29,7 +29,7 @@ const RULE_STATUSES = ['stable', 'experimental', 'test'] as const;
 const ENABLED_VALUES = ['enabled', 'disabled', 'any'] as const;
 
 /**
- * Security Analytics correlation rules (Sigma-shaped documents: `sigma_id`, `logsource`,
+ * Ruleset Management correlation rules (Sigma-shaped documents: `sigma_id`, `logsource`,
  * `mitre.{tactic,technique,subtechnique}`) -- distinct from findings-v5's rule taxonomy, and from
  * `wazuh-threatintel-{decoders,integrations,policies,filters,kvdbs}` (see
  * get-threat-intel-components.ts), which are pipeline/config content with no rule-level fields of
@@ -47,7 +47,7 @@ export const getRulesTool: ToolDefinition = {
   spec: {
     name: 'get_rules',
     description:
-      'Lists Security Analytics correlation rules (the ruleset content itself -- ' +
+      'Lists Ruleset Management correlation rules (the ruleset content itself -- ' +
       'NOT findings that fired). These are Sigma-shaped rules identified by a UUID and a title ' +
       '(e.g. "Server side template injection strings") -- a DIFFERENT namespace from the ' +
       'classic numeric rule id (e.g. "rule 5710") an analyst sees on a finding/alert. A ' +
@@ -118,7 +118,7 @@ export const getRulesTool: ToolDefinition = {
       space: {
         type: 'string',
         description:
-          'Filter by Security Analytics space. Omit to search across every space (the default).',
+          'Filter by Ruleset Management space. Omit to search across every space (the default).',
         enum: [...SECURITY_ANALYTICS_SPACES],
       },
       limit: limitProperty(
@@ -242,12 +242,12 @@ export const getRulesTool: ToolDefinition = {
       },
     };
   },
-  // "Open in Security Analytics" deep link -- `space` is resolved by executor.ts from the
+  // "Open in Ruleset Management" deep link -- `space` is resolved by executor.ts from the
   // executed result's own `space.name` values (see resolveSecurityAnalyticsSpace's doc comment);
   // this tool has only one destination page, unlike get-threat-intel-components.ts's per-type map.
   buildSecurityAnalyticsLink(_params, space) {
     return {
-      label: 'Open in Security Analytics',
+      label: 'Open in Ruleset Management',
       url: `/app/rules#/rules?space=${space}`,
     };
   },
