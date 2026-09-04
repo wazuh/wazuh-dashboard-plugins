@@ -192,6 +192,7 @@
 | [#9037](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9037)                          | Fixed the Findings data grid crashing and losing every column when a configured column's field does not exist in the index pattern                                                                                                                                                    |
 | [#9048](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9048)                          | Fixed the Server API proxy reporting rejected requests as server errors: `POST /api/request` now answers with the status the Server API returned instead of turning every 400 or 404 into a 500                                                                                       |
 | [#9116](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9116)                          | Fixed the API console's request and RBAC action catalogues drifting from the Server API                                                                                                                                                                                               |
+| [#9108](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9108)                          | Fixed the PCI DSS compliance requirement descriptions being a stale mix of v3.2.1 and v4.0 wording by rewriting them against PCI DSS v4.0 and adding a checked-in coverage check against the ruleset's emitted codes                                                                  |
 
 ## Prior versions
 
