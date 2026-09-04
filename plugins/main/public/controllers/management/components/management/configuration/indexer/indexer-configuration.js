@@ -25,15 +25,31 @@ import { compose } from 'redux';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 import { withUserAuthorizationPrompt } from '../../../../../../components/common/hocs';
 
+/* `certificate_authorities` arrives as a flat array of paths. Older managers
+send the nested `[{ ca: [...] }]` shape instead. */
 const renderCertificateAuthorities = value => {
-  if (!value || !Array.isArray(value)) return '-';
-  const cas = value.flatMap(item => (item?.ca ? item.ca : []));
+  if (!value || !Array.isArray(value)) {
+    return '-';
+  }
+  const cas = value.flatMap(item =>
+    typeof item === 'string' ? item : item?.ca ? item.ca : [],
+  );
   return cas.length ? cas.join(', ') : '-';
 };
 
+/* `certificate` and `key` arrive as plain strings. Older managers send a
+single-element array instead. */
 const renderArrayValue = value => {
-  if (!value || !Array.isArray(value)) return '-';
-  return value.join(', ');
+  if (!value) {
+    return '-';
+  }
+  if (Array.isArray(value)) {
+    return value.join(', ');
+  }
+  if (typeof value === 'string') {
+    return value;
+  }
+  return '-';
 };
 
 const connectionSettings = [{ field: 'hosts', label: 'Hosts' }];

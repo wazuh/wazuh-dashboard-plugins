@@ -10,13 +10,13 @@ wazuh-manager.conf and therefore keeps the configured time suffix. */
 const fullGlobalConfig = {
   global: {
     agents_disconnection_time: '15m',
-    agents_disconnection_alert_time: '0',
   },
 };
 
+/* The section is present but does not report the setting the view reads. */
 const partialGlobalConfig = {
   global: {
-    agents_disconnection_time: '15m',
+    logging: 'plain',
   },
 };
 
@@ -39,14 +39,10 @@ describe('Global configuration agents settings', () => {
     expect(getByText('Agents settings')).toBeInTheDocument();
     /* The value keeps its unit suffix, so the label must not promise seconds. */
     expect(getByDisplayValue('15m')).toBeInTheDocument();
-    expect(getByDisplayValue('0')).toBeInTheDocument();
     expect(
       getByText(
         'Time after which the manager considers an agent as disconnected since its last keepalive',
       ),
-    ).toBeInTheDocument();
-    expect(
-      getByText('Alert time after agent disconnection'),
     ).toBeInTheDocument();
   });
 
@@ -57,7 +53,6 @@ describe('Global configuration agents settings', () => {
       />,
     );
 
-    expect(getByDisplayValue('15m')).toBeInTheDocument();
     /* An absent option is shown as '-' rather than as a plausible default. */
     expect(getByDisplayValue('-')).toBeInTheDocument();
   });

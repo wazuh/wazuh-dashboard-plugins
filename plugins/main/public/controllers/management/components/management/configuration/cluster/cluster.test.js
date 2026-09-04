@@ -40,6 +40,21 @@ const clusterConfigWithHaproxyHelper = {
   },
 };
 
+// Shape a current manager reports: `hidden` is a native
+// boolean and `haproxy_helper` is absent (single-node dev cluster).
+const liveClusterConfig = {
+  cluster: {
+    name: 'wazuh',
+    node_name: 'node01',
+    node_type: 'master',
+    key: 'b5f5a069a76dd61319a6867478da7b06',
+    port: 1516,
+    bind_addr: '0.0.0.0',
+    nodes: ['127.0.0.1'],
+    hidden: false,
+  },
+};
+
 describe('Cluster settings', () => {
   it('should render the cluster settings', () => {
     const { container, getByText, queryByText, getByTestId } = render(
@@ -65,6 +80,23 @@ describe('Cluster settings', () => {
     expect(getByTestId('user').value).toBe(
       clusterConfigWithHaproxyHelper.cluster.haproxy_helper.haproxy_user,
     );
+  });
+
+  it('should render a visible value for hidden as a native boolean and no HAProxy group when haproxy_helper is absent', () => {
+    const { getByTestId, queryByText } = render(
+      <WzCluster currentConfig={liveClusterConfig} />,
+    );
+
+    expect(getByTestId('hide-cluster-information-in-alerts').value).toBe('no');
+    expect(queryByText('HAProxy settings')).toBeFalsy();
+  });
+
+  it('should render the nodes array as a readable list', () => {
+    const { getByDisplayValue } = render(
+      <WzCluster currentConfig={liveClusterConfig} />,
+    );
+
+    expect(getByDisplayValue('127.0.0.1')).toBeInTheDocument();
   });
 
   it('should render the error message when cluster config is empty', () => {
