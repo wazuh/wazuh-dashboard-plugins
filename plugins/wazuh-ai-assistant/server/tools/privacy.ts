@@ -1032,12 +1032,25 @@ const IPV4_TOKEN_RE =
 
 /** Matches one IPv6 address in any of its standard textual forms (full 8-group, `::`-compressed at
  * any position, or a lone `::`). Every alternative requires at least two colons, so it can never
- * match a single `key:value`-shaped token. Known limitation (kept simple/conservative, same spirit
- * as the FQDN note below): an IPv4-mapped IPv6 literal (`::ffff:192.168.1.1`) is not matched as one
- * token — its embedded IPv4 suffix is still caught by `IPV4_TOKEN_RE` above, just not the `::ffff:`
- * prefix around it. */
+ * match a single `key:value`-shaped token.
+ *
+ * Anchored with colon-aware lookarounds rather than `\b`, and the reason is the whole point of
+ * this pattern. `\b` is defined over `[A-Za-z0-9_]`, so a colon does not close a word: against
+ * `fe80::a00:27ff:fe4e:66a1` a `\b` after the alternatives lets `(?:g:){1,7}:` match the `fe80::`
+ * prefix alone and stop there (alternation takes the FIRST match, never the longest), leaving the
+ * interface identifier — for a link-local SLAAC address, the EUI-64 form of the host MAC — in the
+ * clear next to the pseudonym, and unrecoverable by `reverseText` besides. The same `\b` cannot
+ * open a match on a leading `::` either, so `::1` and `2001:db8::` were not matched at all.
+ * Excluding `:` on both sides forces the match to span a maximal colon-run token: the trailing
+ * lookaround rejects any alternative that stops mid-address, so the engine backtracks into the one
+ * that consumes the whole thing. `Pseudonymizer.applyToText` anchors its own replacements the same
+ * way, for the same reason.
+ *
+ * Known limitation (kept simple/conservative, same spirit as the FQDN note below): an IPv4-mapped
+ * IPv6 literal (`::ffff:192.168.1.1`) is not matched as one token — its embedded IPv4 suffix is
+ * still caught by `IPV4_TOKEN_RE` above, just not the `::ffff:` prefix around it. */
 const IPV6_TOKEN_RE = new RegExp(
-  '\\b(?:' +
+  '(?<![A-Za-z0-9:])(?:' +
     '(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|' +
     '(?:[A-Fa-f0-9]{1,4}:){1,7}:|' +
     '(?:[A-Fa-f0-9]{1,4}:){1,6}:[A-Fa-f0-9]{1,4}|' +
@@ -1047,7 +1060,7 @@ const IPV6_TOKEN_RE = new RegExp(
     '(?:[A-Fa-f0-9]{1,4}:){1,2}(?::[A-Fa-f0-9]{1,4}){1,5}|' +
     '[A-Fa-f0-9]{1,4}:(?:(?::[A-Fa-f0-9]{1,4}){1,6})|' +
     ':(?:(?::[A-Fa-f0-9]{1,4}){1,7}|:)' +
-    ')\\b',
+    ')(?![A-Za-z0-9:])',
   'g',
 );
 
