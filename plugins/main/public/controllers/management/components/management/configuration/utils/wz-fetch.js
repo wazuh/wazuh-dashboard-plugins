@@ -12,7 +12,6 @@
 
 import { WzRequest } from '../../../../../../react-services/wz-request';
 import { getAgentReportedConfiguration } from './agent-config-service';
-import { replaceIllegalXML } from './xml';
 import { delayAsPromise } from '../../../../../../../common/utils';
 
 /**
@@ -400,35 +399,6 @@ export const restartNode = async node => {
       { delay: 15000 },
     );
 
-    return result;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const saveConfiguration = async (selectedNode, xml) => {
-  try {
-    await saveFileCluster(xml, selectedNode);
-  } catch (error) {
-    throw error;
-  }
-};
-
-/**
- * Send wazuh-manager.conf content for a cluster node
- * @param {*} node Node name
- * @param {*} content XML raw content for wazuh-manager.conf file
- */
-export const saveNodeConfiguration = async (node, content) => {
-  try {
-    const result = await WzRequest.apiReq(
-      'PUT',
-      `/cluster/${node}/configuration?overwrite=true`,
-      {
-        content,
-        origin: 'xmleditor',
-      },
-    );
     return result;
   } catch (error) {
     throw error;

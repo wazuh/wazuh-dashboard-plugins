@@ -21,6 +21,7 @@ import WzNoConfig from '../util-components/no-config';
 import {
   isString,
   renderValueNoThenEnabled,
+  renderValueBooleanYesNo,
   reportedEnabled,
 } from '../utils/utils';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
@@ -46,9 +47,21 @@ const mainSettings = [
     render: renderValueNoThenEnabled,
   },
   { field: 'port', label: 'Listen to connections at port' },
-  { field: 'use_source_ip', label: "Use client's source IP address" },
-  { field: 'use_password', label: 'Use a password to register agents' },
-  { field: 'purge', label: 'Purge agents list on removal' },
+  {
+    field: 'use_source_ip',
+    label: "Use client's source IP address",
+    render: renderValueBooleanYesNo,
+  },
+  {
+    field: 'use_password',
+    label: 'Use a password to register agents',
+    render: renderValueBooleanYesNo,
+  },
+  {
+    field: 'purge',
+    label: 'Purge agents list on removal',
+    render: renderValueBooleanYesNo,
+  },
   {
     field: 'limit_maxagents',
     label: 'Limit registration to max agents',
@@ -56,6 +69,7 @@ const mainSettings = [
   {
     field: 'force.enabled',
     label: 'Force registration on existing IP',
+    render: renderValueBooleanYesNo,
   },
   {
     field: 'force.after_registration_time',
@@ -66,11 +80,13 @@ const mainSettings = [
     field: 'force.key_mismatch',
     label: 'Re-register only on key mismatch',
     info: 'Avoid re-registering agents that already have valid keys.',
+    render: renderValueBooleanYesNo,
   },
   {
     field: 'force.disconnected_time.enabled',
     label: 'Replace only disconnected agents',
     info: 'Agent replacement only applies to agents disconnected for longer than the configured duration.',
+    render: renderValueBooleanYesNo,
   },
   {
     field: 'force.disconnected_time.value',
@@ -83,6 +99,7 @@ const sslSettings = [
   {
     field: 'ssl_verify_host',
     label: 'Verify host when a CA certificate is specified',
+    render: renderValueBooleanYesNo,
   },
   {
     field: 'ssl_agent_ca',
@@ -91,6 +108,7 @@ const sslSettings = [
   {
     field: 'ssl_auto_negotiate',
     label: 'Auto-select the SSL negotiation method',
+    render: renderValueBooleanYesNo,
   },
   { field: 'ssl_manager_ca', label: 'CA certificate location' },
   { field: 'ssl_manager_cert', label: 'Server SSL certificate location' },
@@ -98,7 +116,7 @@ const sslSettings = [
   { field: 'ciphers', label: 'Use the following SSL ciphers' },
 ];
 
-class WzRegistrationService extends Component {
+export class WzRegistrationService extends Component {
   constructor(props) {
     super(props);
   }
