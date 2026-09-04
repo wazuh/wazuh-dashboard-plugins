@@ -87,7 +87,6 @@
     "related_endpoints": [
       "PUT /agents/{agent_id}/restart",
       "PUT /agents/group/{group_id}/restart",
-      "PUT /agents/node/{node_id}/restart",
       "PUT /agents/restart"
     ]
   },
@@ -102,7 +101,6 @@
     "related_endpoints": [
       "PUT /agents/{agent_id}/reload",
       "PUT /agents/group/{group_id}/reload",
-      "PUT /agents/node/{node_id}/reload",
       "PUT /agents/reload"
     ]
   },
@@ -126,32 +124,15 @@
     },
     "related_endpoints": ["GET /agents/uninstall"]
   },
-  "cluster:read": {
-    "description": "Read Wazuh's cluster nodes configuration",
-    "resources": ["node:id"],
+  "agent:scan_vulnerability": {
+    "description": "Trigger an on-demand vulnerability scan on agents",
+    "resources": ["agent:id", "agent:group"],
     "example": {
-      "actions": ["cluster:read"],
-      "resources": ["node:id:worker1", "node:id:worker3"],
+      "actions": ["agent:scan_vulnerability"],
+      "resources": ["agent:id:050", "agent:id:049"],
       "effect": "deny"
     },
-    "related_endpoints": [
-      "PUT /agents/node/{node_id}/restart",
-      "PUT /agents/node/{node_id}/reload",
-      "GET /cluster/local/info",
-      "GET /cluster/local/config",
-      "GET /cluster/nodes",
-      "GET /cluster/healthcheck",
-      "GET /cluster/{node_id}/status",
-      "GET /cluster/{node_id}/info",
-      "GET /cluster/{node_id}/configuration",
-      "GET /cluster/{node_id}/daemons/stats",
-      "GET /cluster/{node_id}/logs",
-      "GET /cluster/{node_id}/logs/summary",
-      "PUT /cluster/restart",
-      "PUT /cluster/reload",
-      "GET /cluster/configuration/validation",
-      "GET /cluster/{node_id}/configuration/{component}/{configuration}"
-    ]
+    "related_endpoints": ["PUT /agents/scan/vulnerability"]
   },
   "group:delete": {
     "description": "Delete agent groups",
@@ -199,6 +180,31 @@
       "effect": "deny"
     },
     "related_endpoints": ["PUT /groups/{group_id}/configuration"]
+  },
+  "cluster:read": {
+    "description": "Read Wazuh's cluster nodes configuration",
+    "resources": ["node:id"],
+    "example": {
+      "actions": ["cluster:read"],
+      "resources": ["node:id:worker1", "node:id:worker3"],
+      "effect": "deny"
+    },
+    "related_endpoints": [
+      "GET /cluster/local/info",
+      "GET /cluster/local/config",
+      "GET /cluster/nodes",
+      "GET /cluster/healthcheck",
+      "GET /cluster/{node_id}/status",
+      "GET /cluster/{node_id}/info",
+      "GET /cluster/{node_id}/configuration",
+      "GET /cluster/{node_id}/daemons/stats",
+      "GET /cluster/{node_id}/logs",
+      "GET /cluster/{node_id}/logs/summary",
+      "PUT /cluster/restart",
+      "PUT /cluster/reload",
+      "GET /cluster/configuration/validation",
+      "GET /cluster/{node_id}/configuration/{component}/{configuration}"
+    ]
   },
   "cluster:status": {
     "description": "Check Wazuh's cluster general status",

@@ -185,7 +185,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -323,7 +324,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -403,7 +405,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -494,7 +497,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -581,7 +585,7 @@
       {
         "name": "/agents/summary/status",
         "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_agent_summary_status",
-        "description": "Return a summary of the connection statuses of available agents",
+        "description": "Return a summary of the connection and groups configuration synchronization statuses of available agents",
         "summary": "Summarize agents status",
         "tags": ["Agents"],
         "query": [
@@ -631,7 +635,7 @@
       {
         "name": "/cluster/:node_id/configuration",
         "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_configuration_node",
-        "description": "Return wazuh configuration used in node {node_id}. The 'section' and 'field' parameters will be ignored if 'raw' parameter is provided.",
+        "description": "Return the manager configuration (etc/wazuh-manager.conf) used in node {node_id}: the effective document (schema defaults applied) as JSON, or the file as XML text with 'raw'. The 'section' and 'field' parameters will be ignored if 'raw' parameter is provided.",
         "summary": "Get node config",
         "tags": ["Cluster"],
         "args": [
@@ -672,25 +676,20 @@
           },
           {
             "name": "section",
-            "description": "Indicates the wazuh configuration section",
+            "description": "Indicates the manager configuration section (a top-level key of etc/wazuh-manager.conf)",
             "schema": {
               "type": "string",
               "enum": [
-                "active-response",
-                "alerts",
-                "auth",
-                "client",
-                "client_buffer",
-                "cluster",
-                "command",
                 "global",
                 "logging",
                 "remote",
-                "reports",
-                "socket",
+                "auth",
+                "wdb",
                 "vulnerability-detection",
                 "indexer",
-                "syscollector"
+                "agent-upgrade",
+                "task-manager",
+                "cluster"
               ]
             }
           },
@@ -717,18 +716,12 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": [
-                "auth",
-                "monitor",
-                "request",
-                "wazuh-manager-db",
-                "wmodules"
-              ]
+              "enum": ["auth", "request", "wazuh-manager-db", "wmodules"]
             }
           },
           {
             "name": ":configuration",
-            "description": "<p>Selected manager's configuration to read. The configuration to read depends on the selected component.\nThe following table shows all available combinations of component and configuration values:</p>\n<table class=\"table table-striped table-bordered\">\n<thead>\n<tr>\n<th>Component</th>\n<th>Configuration</th>\n<th>Tag</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>auth</td>\n<td>auth</td>\n<td><code>&lt;auth&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td><code>&lt;monitord&gt;</code></td>\n</tr>\n<td>request</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>remote</td>\n<td><code>&lt;remote&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>internal</td>\n<td><code>&lt;remoted&gt;</code></td>\n</tr>\n<tr>\n<td>wazuh-manager-db</td>\n<td>internal</td>\n<td><code>&lt;wazuh_db&gt;</code></td>\n</tr>\n<tr>\n<td>wazuh-manager-db</td>\n<td>wdb</td>\n<td><code>&lt;wdb&gt;</code></td>\n</tr>\n<tr>\n<td>wmodules</td>\n<td>wmodules</td>\n<td><code>&lt;wodle&gt;</code></td>\n</tr>\n</tbody>\n</table>\n",
+            "description": "<p>Selected manager's configuration to read. The configuration to read depends on the selected component.\nThe following table shows all available combinations of component and configuration values:</p>\n<table class=\"table table-striped table-bordered\">\n<thead>\n<tr>\n<th>Component</th>\n<th>Configuration</th>\n<th>Source</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>auth</td>\n<td>auth</td>\n<td><code>auth</code> section of <code>etc/wazuh-manager.conf</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>global</td>\n<td><code>global</code> section of <code>etc/wazuh-manager.conf</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>remote</td>\n<td><code>remote</code> section of <code>etc/wazuh-manager.conf</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>internal</td>\n<td><code>remoted.*</code> keys of <code>etc/wazuh-manager-internal-options.conf</code></td>\n</tr>\n<tr>\n<td>wazuh-manager-db</td>\n<td>internal</td>\n<td><code>wazuh_db.*</code> keys of <code>etc/wazuh-manager-internal-options.conf</code></td>\n</tr>\n<tr>\n<td>wazuh-manager-db</td>\n<td>wdb</td>\n<td><code>wdb</code> section of <code>etc/wazuh-manager.conf</code></td>\n</tr>\n<tr>\n<td>wmodules</td>\n<td>wmodules</td>\n<td>module configuration reported by wazuh-manager-modulesd (<code>vulnerability-detection</code>, <code>agent-upgrade</code>, <code>task-manager</code>)</td>\n</tr>\n</tbody>\n</table>\n",
             "required": true,
             "schema": {
               "type": "string",
@@ -940,7 +933,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -1019,7 +1013,7 @@
       {
         "name": "/cluster/:node_id/status",
         "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_status_node",
-        "description": "Return whether the node is ready to process events. Each daemon reports running (PID check) and ready; analysisd embeds the engine resources (spaces/IOC/geo) and modulesd embeds vulnerability-detector. The node-level ready is true only when every daemon is ready.",
+        "description": "Return whether the node is ready to process events. Each daemon reports running (PID check) and ready; analysisd embeds the engine resources (spaces/IOC/geo) and modulesd embeds vulnerability-detector. remoted embeds enrollment_password/keystore readiness, and reports a reason: \"admin socket unreachable\" field instead of ready: false when its own admin socket cannot be reached while the daemon itself keeps running. The node-level ready is true only when every daemon is ready. wazuh-manager-apid is only reported on the master node, as it does not run on workers.",
         "summary": "Get node readiness",
         "tags": ["Cluster"],
         "args": [
@@ -1125,7 +1119,7 @@
       {
         "name": "/cluster/healthcheck",
         "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_healthcheck",
-        "description": "Return cluster healthcheck information for all nodes or a list of them. Such information includes last keep alive, last synchronization time and number of agents reporting on each node",
+        "description": "Return cluster healthcheck information for all nodes or a list of them. Such information includes last keep alive and last synchronization time",
         "summary": "Get nodes healthcheck",
         "tags": ["Cluster"],
         "query": [
@@ -1273,7 +1267,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -1427,7 +1422,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -1527,7 +1523,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -1718,7 +1715,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -1882,7 +1880,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -2006,7 +2005,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -2097,7 +2097,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -2185,7 +2186,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -2284,7 +2286,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -2383,7 +2386,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -2568,7 +2572,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -2702,7 +2707,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -2802,7 +2808,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -2890,7 +2897,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -3242,78 +3250,6 @@
         ]
       },
       {
-        "name": "/agents/node/:node_id/reload",
-        "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.agent_controller.reload_agents_by_node",
-        "description": "Reload all agents which belong to a specific given node",
-        "summary": "Reload agents in node",
-        "tags": ["Agents"],
-        "args": [
-          {
-            "name": ":node_id",
-            "description": "Cluster node name",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "names"
-            }
-          }
-        ],
-        "query": [
-          {
-            "name": "pretty",
-            "description": "Show results in human-readable format",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "name": "wait_for_complete",
-            "description": "Disable timeout response",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
-        ]
-      },
-      {
-        "name": "/agents/node/:node_id/restart",
-        "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.agent_controller.restart_agents_by_node",
-        "description": "Restart all agents which belong to a specific given node",
-        "summary": "Restart agents in node",
-        "tags": ["Agents"],
-        "args": [
-          {
-            "name": ":node_id",
-            "description": "Cluster node name",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "names"
-            }
-          }
-        ],
-        "query": [
-          {
-            "name": "pretty",
-            "description": "Show results in human-readable format",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "name": "wait_for_complete",
-            "description": "Disable timeout response",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
-        ]
-      },
-      {
         "name": "/agents/reload",
         "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.agent_controller.reload_agents",
         "description": "Reload all agents or a list of them",
@@ -3356,6 +3292,44 @@
         "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.agent_controller.restart_agents",
         "description": "Restart all agents or a list of them",
         "summary": "Restart agents",
+        "tags": ["Agents"],
+        "query": [
+          {
+            "name": "agents_list",
+            "description": "List of agent IDs (separated by comma), all agents selected by default if not specified",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 3,
+                "description": "Agent ID",
+                "format": "numbers"
+              }
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/agents/scan/vulnerability",
+        "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.agent_controller.scan_agents",
+        "description": "Request an on-demand vulnerability scan for all agents or a list of them",
+        "summary": "Scan agents for vulnerabilities",
         "tags": ["Agents"],
         "query": [
           {
@@ -3735,7 +3709,7 @@
       {
         "name": "/cluster/:node_id/configuration",
         "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.cluster_controller.update_configuration",
-        "description": "Replace wazuh configuration for the given node with the data contained in the API request",
+        "description": "Replace the manager configuration (etc/wazuh-manager.conf) of the given node with the XML text contained in the API request. The text is validated (syntax, schema, protected sections) before the file is written.",
         "summary": "Update node configuration",
         "tags": ["Cluster"],
         "args": [
@@ -4235,7 +4209,7 @@
       {
         "name": "/agents/insert",
         "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.agent_controller.insert_agent",
-        "description": "Add an agent specifying its name, ID and IP. If an agent with the same name, the same ID or the same IP already exists, replace it using the `force` parameter",
+        "description": "Add an agent specifying its name, ID and IP. If an agent with the same name or the same IP already exists, replace it using the `force` parameter. The agent ID is never replaced: an ID that belongs to an existing agent is rejected with error 1708, and an ID whose previous owner still has documents pending deletion in the indexer is rejected with error 1763 - delete the agent and let its deletion complete before reusing its ID. An explicit ID outside `[1, 2147483647]`, or `0`, is rejected with error 1765",
         "summary": "Add agent full",
         "tags": ["Agents"],
         "query": [
@@ -4263,8 +4237,8 @@
               "id": {
                 "type": "string",
                 "minLength": 3,
-                "description": "Agent ID",
-                "format": "numbers"
+                "description": "Agent ID. Must be a positive integer no greater than 2147483647 (2^31-1), and other than 0, which is reserved for the manager",
+                "format": "agent_id"
               },
               "key": {
                 "type": "string",
@@ -4797,7 +4771,7 @@
       {
         "name": "/agents",
         "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.agent_controller.delete_agents",
-        "description": "Delete all agents or a list of them based on optional criteria",
+        "description": "Delete all agents or a list of them based on optional criteria. An agent whose deletion cannot be admitted because too many earlier deletions are still being applied to the indexer is reported with error 1766 and is left untouched - retry it once the backlog drains",
         "summary": "Delete agents",
         "tags": ["Agents"],
         "query": [
