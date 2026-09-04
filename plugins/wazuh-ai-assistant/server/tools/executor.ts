@@ -27,6 +27,7 @@ import {
 import {
   AggFieldSpec,
   applyFieldPolicy,
+  dropNeverFields,
   extractAggFields,
   FieldPolicyEntry,
   Pseudonymizer,
@@ -98,10 +99,17 @@ export function scrubAssumptionNote(
 /** Applies field policy to a digest (when `privacy` is given) immediately before it is
  * serialized, then re-runs the hard cap (pseudonym substitution can change the digest's
  * serialized length — see digest.ts's `capDigest` doc comment). A no-op passthrough when
- * `privacy` is undefined, so privacy-off output is unaffected by this function. */
+ * `privacy` is undefined, except for the 'never' action: that one is enforced on both branches,
+ * since it denies egress outright rather than refining pseudonymization. See `dropNeverFields`
+ * (privacy.ts). A policy carrying no 'never' entry leaves the privacy-off digest untouched. */
 function finalizeDigest(
   digest: Digest,
   privacy: PrivacyContext | undefined,
+  // The admin-configured policy. Threaded on its own rather than through `privacy`, since the
+  // 'never' action holds regardless of the privacy-mode toggle. See `dropNeverFields` (privacy.ts)
+  // for why anonymize/allow-scan stay scoped to privacy mode and 'never' does not. Undefined only
+  // where the turn resolved no settings.
+  fieldPolicy: FieldPolicyEntry[] | undefined,
   toolName: string,
   aggFields?: Record<string, AggFieldSpec | undefined>,
   // A separate flag from the calling tool's `deriveColumns` flag, which conflates "needs
@@ -119,7 +127,13 @@ function finalizeDigest(
   sampleFieldMaxLength?: Record<string, number>,
 ): Digest {
   if (!privacy) {
-    return digest;
+    // Privacy off: 'never' still applies, since it denies egress rather than refining
+    // pseudonymization. `capDigest` stays unrun here on purpose. This pass only removes fields, so
+    // the digest cannot have outgrown the cap `buildDigest` already applied, and a policy with no
+    // 'never' entry (every default installation) returns it untouched.
+    return fieldPolicy
+      ? dropNeverFields(digest, fieldPolicy, aggFields, toolName)
+      : digest;
   }
   return capDigest(
     applyFieldPolicy(
@@ -161,7 +175,7 @@ const DEFAULT_SECURITY_ANALYTICS_SPACE = 'standard';
 
 /**
  * Resolves the single `space` value to use for a `buildSecurityAnalyticsLink` deep link, from the
- * `space.name` field on each returned hit (Security Analytics content is namespaced across
+ * `space.name` field on each returned hit (Ruleset Management content is namespaced across
  * draft/test/custom/standard, confirmed live). A tool call's rows can span more than one space --
  * there is no per-row link in this UI, only one per table -- so this only trusts a SINGLE distinct
  * value found across all hits; zero or multiple distinct values (no hits, or a genuinely mixed
@@ -553,6 +567,7 @@ async function executeIndexerRequest(
   params: Record<string, unknown>,
   context: RequestHandlerContext,
   privacy?: PrivacyContext,
+  fieldPolicy?: FieldPolicyEntry[],
   assumptionNote?: string,
 ): Promise<ToolExecutionOutcome> {
   const allowlistCheck = checkIndexAllowlist(indexerRequest.index);
@@ -725,6 +740,7 @@ async function executeIndexerRequest(
     const finalDigest = finalizeDigest(
       digest,
       privacy,
+      fieldPolicy,
       toolName,
       aggFields,
       // A separate, explicitly-set flag from `def.deriveColumns` -- see
@@ -809,6 +825,7 @@ async function executeManagerRequest(
   context: RequestHandlerContext,
   request: OpenSearchDashboardsRequest,
   privacy?: PrivacyContext,
+  fieldPolicy?: FieldPolicyEntry[],
   assumptionNote?: string,
 ): Promise<ToolExecutionOutcome> {
   const def = getToolDefinition(toolName);
@@ -848,6 +865,7 @@ async function executeManagerRequest(
     const finalDigest = finalizeDigest(
       digest,
       privacy,
+      fieldPolicy,
       toolName,
       undefined,
       undefined,
@@ -990,6 +1008,9 @@ export async function executeToolCall(
   context: RequestHandlerContext,
   request: OpenSearchDashboardsRequest,
   privacy?: PrivacyContext,
+  // Passed separately from `privacy`, which is undefined whenever privacy mode is off, since the
+  // 'never' action holds on every turn. See `finalizeDigest`.
+  fieldPolicy?: FieldPolicyEntry[],
 ): Promise<ToolExecutionOutcome> {
   const validated = validateCall(call);
   if (!validated.ok) {
@@ -1058,6 +1079,7 @@ export async function executeToolCall(
       finalParams,
       context,
       privacy,
+      fieldPolicy,
       assumptionNote,
     );
   }
@@ -1067,6 +1089,7 @@ export async function executeToolCall(
     context,
     request,
     privacy,
+    fieldPolicy,
     assumptionNote,
   );
 }

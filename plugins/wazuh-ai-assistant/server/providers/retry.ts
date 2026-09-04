@@ -1,6 +1,7 @@
 import { StreamEvent } from '../../common/types';
 import { describeConnectionError } from './types';
 import { ProviderStallError, providerFirstByteTimeoutMs } from './sse-utils';
+import { getOutOfCreditsMessage } from '../plugin-services';
 
 /**
  * Transient-failure retry for the initial provider request (the "adapters are pure transport"
@@ -75,6 +76,101 @@ function isToolUseFailedBody(status: number, bodyText: string): boolean {
     status === 400 &&
     TOOL_USE_FAILED_MARKERS.some(marker => bodyText.includes(marker))
   );
+}
+
+/**
+ * Substrings real providers use to report an out-of-credits condition — a billing failure, not
+ * the transient rate limiting RETRYABLE_STATUSES handles. Only for providers that do NOT use the
+ * 402 status handled below: Anthropic reports it on a 400 ("credit balance is too low…purchase
+ * credits"), OpenAI on a 429 carrying the `insufficient_quota` code.
+ *
+ * Specific phrases, never the bare word "quota". Gemini's transient 429 (`RESOURCE_EXHAUSTED`, a
+ * per-minute limit that resets on its own) carries the same "You exceeded your current quota,
+ * please check your plan and billing details" text OpenAI uses for a billing failure, so matching
+ * "quota" alone turns a recoverable throttle into a terminal error.
+ *
+ * Providers reword their messages, so match an error code wherever one exists and treat the prose
+ * as a fallback. Codes are listed in their own right: `credit_balance_exhausted` is underscored
+ * and does not match the spaced `credit balance` entry.
+ */
+const OUT_OF_CREDITS_MARKERS = [
+  'credit balance',
+  'credit_balance_exhausted',
+  'insufficient_quota',
+  'insufficient credit',
+  'insufficient balance',
+  'insufficient funds',
+  'no credits remaining',
+  'out of credit',
+  'purchase credits',
+];
+
+/**
+ * True when a rejected response reports an out-of-credits condition.
+ *
+ * `402 Payment Required` is authoritative on its own: it is the status HTTP defines for this, and
+ * the one DeepSeek, OpenRouter, Vercel AI Gateway, and Together AI all use. It is protocol
+ * semantics rather than prose a provider can reword, and it is absent from RETRYABLE_STATUSES, so
+ * treating it as terminal costs no legitimate retry.
+ *
+ * Providers that report the condition on some other status are matched by body text instead. That
+ * check is deliberately not status-gated, since they disagree on which status to use.
+ */
+function isOutOfCreditsBody(status: number, bodyText: string): boolean {
+  if (status === 402) {
+    return true;
+  }
+  const lowered = bodyText.toLowerCase();
+  return OUT_OF_CREDITS_MARKERS.some(marker => lowered.includes(marker));
+}
+
+/**
+ * Swaps a terminal provider-error message for the operator-configured
+ * `wazuh_ai_assistant.outOfCreditsMessage` when the body reports an out-of-credits condition and
+ * an override is configured. Returns `defaultMessage` unchanged in every other case, so an
+ * unconfigured deployment sees exactly the original text. Shared with wazuh-brain.ts so both
+ * provider paths apply the same detection and precedence.
+ *
+ * A blank override counts as unconfigured. An empty or whitespace-only YAML value passes nullish
+ * coalescing and renders an error with no text, which is worse than the provider's own message.
+ * Emptying the value instead of commenting the line out, and templates that render an unresolved
+ * variable, both produce it.
+ */
+export function describeOutOfCreditsMessage(
+  status: number,
+  bodyText: string,
+  defaultMessage: string,
+): string {
+  if (!isOutOfCreditsBody(status, bodyText)) {
+    return defaultMessage;
+  }
+  const configured = getOutOfCreditsMessage()?.trim();
+  return configured ? configured : defaultMessage;
+}
+
+/** Builds the terminal-message text for a rejected response: the 429-friendly copy, or the raw
+ * sanitized body for every other status. Factored out so the retry-skipping short-circuit below
+ * and the normal exhausted-retries branch compute it identically instead of drifting apart. */
+/** The provider's own rejection, sanitized: status plus whatever the body said. */
+function rawProviderMessage(
+  status: number,
+  bodyText: string,
+  secret?: string,
+): string {
+  return `Provider responded with HTTP ${status}: ${sanitizeProviderErrorBody(
+    extractProviderErrorMessage(bodyText),
+    secret,
+  )}`;
+}
+
+function buildTerminalMessage(
+  status: number,
+  bodyText: string,
+  secret?: string,
+): string {
+  return status === 429
+    ? 'The AI provider rejected this request due to rate limits — try again in a moment.'
+    : rawProviderMessage(status, bodyText, secret);
 }
 
 /** Pulls the `failed_generation` field out of a tool_use_failed error body, if present and the
@@ -436,6 +532,26 @@ export async function* fetchProviderWithRetry(
       return undefined;
     }
 
+    // Out-of-credits is never transient, so it is checked before the retry decision below and
+    // regardless of status: a provider reporting it on an otherwise-retryable status (e.g.
+    // `insufficient_quota` on a 429) must not be pointlessly retried.
+    if (isOutOfCreditsBody(response.status, bodyText)) {
+      yield {
+        type: 'error',
+        // `rawProviderMessage`, not `buildTerminalMessage`: the 429 branch of the latter frames
+        // the rejection as a rate limit and tells the reader to try again in a moment. OpenAI
+        // reports a drained balance on a 429, so that framing would name the wrong cause and give
+        // advice that can never work. With no override configured the provider's own text is the
+        // honest fallback whatever the status.
+        message: describeOutOfCreditsMessage(
+          response.status,
+          bodyText,
+          rawProviderMessage(response.status, bodyText, secret),
+        ),
+      };
+      return undefined;
+    }
+
     if (!RETRYABLE_STATUSES.has(response.status) || attempt >= MAX_RETRIES) {
       // Every retry attempt already yields an honest, provider-attributed, mechanism-free STATUS
       // line for a 429 ("Provider rate limit reached — retrying in Ns…", above). Once the retry
@@ -445,17 +561,14 @@ export async function* fetchProviderWithRetry(
       // condition worth retrying rather than a bare status dump. Every OTHER retryable status
       // (500/502/503/504/529) uses the generic "Provider responded with HTTP {status}: {raw
       // sanitized body}" message — this framing is scoped to 429 specifically.
+      const defaultMessage = buildTerminalMessage(
+        response.status,
+        bodyText,
+        secret,
+      );
       yield {
         type: 'error',
-        message:
-          response.status === 429
-            ? 'The AI provider rejected this request due to rate limits — try again in a moment.'
-            : `Provider responded with HTTP ${
-                response.status
-              }: ${sanitizeProviderErrorBody(
-                extractProviderErrorMessage(bodyText),
-                secret,
-              )}`,
+        message: defaultMessage,
       };
       return undefined;
     }

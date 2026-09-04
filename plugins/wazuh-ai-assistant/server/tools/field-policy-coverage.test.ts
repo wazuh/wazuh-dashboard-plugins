@@ -112,7 +112,7 @@ const KNOWN_SAFE_STRUCTURAL_FIELDS = new Set<string>([
   'file.path',
   'file.mtime',
   'file.size',
-  // Security Analytics content (get_rules, get_threat_intel_components): vendor-curated
+  // Ruleset Management content (get_rules, get_threat_intel_components): vendor-curated
   // rule/pipeline configuration metadata, not analyst- or attacker-supplied data.
   'document.name',
   'document.level',
@@ -130,7 +130,7 @@ const KNOWN_SAFE_STRUCTURAL_FIELDS = new Set<string>([
   'document.index_discarded_events',
   'document.index_unclassified_events',
   'space.name',
-  // Security Analytics detector config (get_detectors): admin/vendor-configured metadata.
+  // Ruleset Management detector config (get_detectors): admin/vendor-configured metadata.
   'detector.name',
   'detector.detector_type',
   'detector.enabled',

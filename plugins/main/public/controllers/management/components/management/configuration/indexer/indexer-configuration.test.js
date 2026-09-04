@@ -29,6 +29,20 @@ const multiHostIndexerConfig = {
   },
 };
 
+// Shape a current manager reports: `certificate_authorities`
+// is a flat array of strings, `certificate`/`key` are plain strings (not
+// single-element arrays).
+const liveIndexerConfig = {
+  indexer: {
+    hosts: ['https://wazuh.indexer:9200'],
+    ssl: {
+      certificate_authorities: ['/etc/server_certs/root-ca.pem'],
+      certificate: '/etc/server_certs/server.pem',
+      key: '/etc/server_certs/server-key.pem',
+    },
+  },
+};
+
 describe('Indexer settings', () => {
   it('should render the indexer settings', () => {
     const { getByText } = render(
@@ -49,6 +63,16 @@ describe('Indexer settings', () => {
 
     expect(getByText('Hosts')).toBeInTheDocument();
     expect(getByText('SSL settings')).toBeInTheDocument();
+  });
+
+  it('should render the certificate authorities from the flat-array shape', () => {
+    const { getByDisplayValue } = render(
+      <WzIndexer currentConfig={liveIndexerConfig} />,
+    );
+
+    expect(
+      getByDisplayValue('/etc/server_certs/root-ca.pem'),
+    ).toBeInTheDocument();
   });
 
   it('should render error when indexer config is empty', () => {

@@ -31,7 +31,7 @@ import {
  * Known limitation (documented rather than silently accepted): a domain/hash appearing INSIDE a
  * longer `url_full` value (e.g. a path segment) is not found -- `lintDsl`'s leading-wildcard ban
  * (guardrails.ts) makes a "contains" search on a keyword field impossible here, same constraint
- * `nameFilterClause` (catalog/common.ts) already documents for the Security Analytics content
+ * `nameFilterClause` (catalog/common.ts) already documents for the Ruleset Management content
  * tools. A prefix match only ever anchors at the START of `document.name`.
  *
  * A-1: an unanchored, unconditional prefix clause (`prefix: { 'document.name': indicator }`)

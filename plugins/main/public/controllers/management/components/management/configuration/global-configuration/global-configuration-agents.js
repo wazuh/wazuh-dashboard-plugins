@@ -17,7 +17,7 @@ import WzConfigurationSettingsGroup from '../util-components/configuration-setti
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
 
-import { isString } from '../utils/utils';
+import { isString, renderValueOrNoValue } from '../utils/utils';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const helpLinks = [
@@ -29,61 +29,50 @@ const helpLinks = [
   },
 ];
 
+/* The values come from wazuh-manager.conf as written by the user, so they keep
+their configured time suffix (for example `15m`) instead of being resolved to
+seconds. The labels are therefore unit-agnostic. */
 const agentsSettings = [
   {
     field: 'agents_disconnection_time',
     label:
-      'Seconds after which the manager considers an agent as disconnected since its last keepalive',
-  },
-  {
-    field: 'agents_disconnection_alert_time',
-    label: 'Alert time in seconds after agent disconnection',
+      'Time after which the manager considers an agent as disconnected since its last keepalive',
+    render: renderValueOrNoValue,
   },
 ];
-
-const buildHelpLinks = agent => [helpLinks[0]];
 
 class WzConfigurationAgentsConfigurationGlobal extends Component {
   constructor(props) {
     super(props);
   }
   render() {
-    const { currentConfig, agent, wazuhNotReadyYet } = this.props;
-    const helpLinks = buildHelpLinks(agent);
-    const agentsSettingsConfig = currentConfig?.['monitor-global']?.monitord;
-    const agentsSettingsConfigMinutes =
-      agentsSettingsConfig?.agents_disconnection_time
-        ? {
-            ...agentsSettingsConfig,
-          }
-        : agentsSettingsConfig;
+    const { currentConfig, wazuhNotReadyYet } = this.props;
+    const agentsSettingsConfig = currentConfig?.['global'];
+
+    if (agentsSettingsConfig && isString(agentsSettingsConfig)) {
+      return <WzNoConfig error={agentsSettingsConfig} help={helpLinks} />;
+    }
+
+    if (wazuhNotReadyYet && (!currentConfig || !agentsSettingsConfig)) {
+      return <WzNoConfig error='Server not ready yet' help={helpLinks} />;
+    }
+
+    if (!agentsSettingsConfig || !Object.keys(agentsSettingsConfig).length) {
+      return <WzNoConfig error='not-present' help={helpLinks} />;
+    }
+
     return (
       <Fragment>
-        {currentConfig['monitor-global'] &&
-          isString(currentConfig['monitor-global']) && (
-            <WzNoConfig
-              error={currentConfig['monitor-global']}
-              help={helpLinks}
-            />
-          )}
-        {currentConfig['monitor-global'] &&
-          !isString(currentConfig['monitor-global']) &&
-          !currentConfig['monitor-global'].monitord && (
-            <WzNoConfig error='not-present' help={helpLinks} />
-          )}
-        {currentConfig['monitor-global'] &&
-          currentConfig['monitor-global'].monitord && (
-            <WzConfigurationSettingsHeader
-              title='Agents settings'
-              description='Time alert agents settings'
-              help={helpLinks}
-            >
-              <WzConfigurationSettingsGroup
-                config={agentsSettingsConfigMinutes}
-                items={agentsSettings}
-              />
-            </WzConfigurationSettingsHeader>
-          )}
+        <WzConfigurationSettingsHeader
+          title='Agents settings'
+          description='Time alert agents settings'
+          help={helpLinks}
+        >
+          <WzConfigurationSettingsGroup
+            config={agentsSettingsConfig}
+            items={agentsSettings}
+          />
+        </WzConfigurationSettingsHeader>
       </Fragment>
     );
   }

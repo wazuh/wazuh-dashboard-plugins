@@ -57,12 +57,12 @@ beforeEach(() => {
 });
 
 describe('ThreatIntelligenceFeedSection', () => {
-  it('renders one section with both the Security analytics and Threat catalog cards', () => {
+  it('renders one section with both the Ruleset management and Threat catalog cards', () => {
     render(
       <ThreatIntelligenceFeedSection threatIntel={threatIntelAvailable} />,
     );
     expect(screen.getByText('Threat intelligence feed')).toBeInTheDocument();
-    expect(screen.getByText('Security analytics')).toBeInTheDocument();
+    expect(screen.getByText('Ruleset management')).toBeInTheDocument();
     expect(screen.getByText('Threat catalog')).toBeInTheDocument();
     expect(screen.getByText('Rules')).toBeInTheDocument();
     expect(screen.getByText('KVDBs')).toBeInTheDocument();
@@ -71,13 +71,13 @@ describe('ThreatIntelligenceFeedSection', () => {
     expect(screen.getByText('482')).toBeInTheDocument();
   });
 
-  it('navigates to the Security Analytics tiles on click, and to the module from the card title', () => {
+  it('navigates to the Ruleset Management tiles on click, and to the module from the card title', () => {
     render(
       <ThreatIntelligenceFeedSection threatIntel={threatIntelAvailable} />,
     );
     fireEvent.click(screen.getByText('Rules'));
     expect(navigation.getRulesUrl).toHaveBeenCalled();
-    fireEvent.click(screen.getByText('Security analytics'));
+    fireEvent.click(screen.getByText('Ruleset management'));
     expect(navigation.getIntegrationsUrl).toHaveBeenCalled();
   });
 
@@ -95,12 +95,12 @@ describe('ThreatIntelligenceFeedSection', () => {
     render(
       <ThreatIntelligenceFeedSection threatIntel={{ status: 'unavailable' }} />,
     );
-    expect(screen.getByText('Security analytics')).toBeInTheDocument();
+    expect(screen.getByText('Ruleset management')).toBeInTheDocument();
     expect(screen.getByText('Threat catalog')).toBeInTheDocument();
     expect(screen.getByText('IOCs')).toBeInTheDocument();
   });
 
-  it('fetches the Security Analytics tiles lazily once the section enters the viewport', () => {
+  it('fetches the Ruleset Management tiles lazily once the section enters the viewport', () => {
     asMock(useInViewport).mockReturnValue([{ current: null }, false]);
     render(
       <ThreatIntelligenceFeedSection threatIntel={threatIntelAvailable} />,

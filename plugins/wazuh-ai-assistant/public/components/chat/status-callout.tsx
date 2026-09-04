@@ -64,7 +64,11 @@ export const StatusCallout: React.FC<StatusCalloutProps> = ({
           data-test-subj='wzAiStatusCalloutDismiss'
         />
       )}
-      <p>{body}</p>
+      {/* A plain-string body (every existing caller today) keeps the original `<p>` wrapper for
+          identical DOM/typography. A richer node (e.g. chat-page.tsx's `activeError` rendered
+          through `EuiMarkdownFormat`) is block-level content of its own and would produce invalid
+          nested `<p>` markup if wrapped again here, so it renders bare instead. */}
+      {typeof body === 'string' ? <p>{body}</p> : body}
       {action}
     </EuiCallOut>
     {spaced && <EuiSpacer size='m' />}

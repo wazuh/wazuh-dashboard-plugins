@@ -29,6 +29,15 @@ export const configSchema = schema.object({
    * /providers/{id}/test — it persists nothing), and conversation CRUD are never affected.
    */
   settingsReadOnly: schema.boolean({ defaultValue: false }),
+  /**
+   * Overrides the terminal chat error message shown when a provider reports an out-of-credits
+   * condition. A single environment-level value, deliberately not part of the customer-editable
+   * indexer-backed settings (server/settings/): it is set by whoever provisions
+   * opensearch_dashboards.yml. Accepts a markdown link to a credits/plan flow.
+   *
+   * Unset by default, which keeps the provider's own text unchanged.
+   */
+  outOfCreditsMessage: schema.maybe(schema.string()),
 });
 
 export type WazuhAiAssistantConfigType = TypeOf<typeof configSchema>;

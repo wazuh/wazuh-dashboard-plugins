@@ -19,7 +19,7 @@ import {
   useVulnerabilityOverview,
 } from '../../hooks/use-overview-data';
 import {
-  getMitreIntelligenceResourceUrl,
+  getMitreFindingsByTechniqueUrl,
   getMitreUrl,
   getThreatHuntingUrl,
   getVulnerabilityDetectionBySeverityUrl,
@@ -73,7 +73,10 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
                   items={findings.data.topTechniques}
                   emptyMessage='No techniques observed'
                   getHref={item =>
-                    getMitreIntelligenceResourceUrl('techniques', item)
+                    getMitreFindingsByTechniqueUrl(
+                      item,
+                      findings.indexPatternId,
+                    )
                   }
                   data-test-subj='top-techniques'
                 />

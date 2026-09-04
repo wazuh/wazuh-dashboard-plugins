@@ -20,7 +20,7 @@ export interface SecurityAnalyticsTilesProps {
 }
 
 /**
- * Ordered by the Security Analytics side menu: Overview (Integrations, with
+ * Ordered by the Ruleset Management side menu: Overview (Integrations, with
  * Filters as its second tab), then Normalization (Decoders, KVDBs), then
  * Detection (Detectors, Rules).
  */
