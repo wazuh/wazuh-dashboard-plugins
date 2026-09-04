@@ -22,13 +22,12 @@ export const pciRequirementsFile = {
   '1.3.4':
     'Do not allow unauthorized outbound traffic from the cardholder data environment to the Internet.',
   '1.4':
-    'Connections between trusted internal networks and untrusted external networks are controlled and monitored.',
+    'Network connections between trusted and untrusted networks are controlled.',
   '1.5':
     'Risks introduced by devices that connect to both untrusted networks and the CDE are identified and mitigated.',
   '2.1':
     'A documented process governs how secure configurations are applied to all system components.',
-  '2.2':
-    'Every system component is configured and managed according to secure, industry-accepted hardening standards.',
+  '2.2': 'Every system component is configured and managed securely.',
   '2.2.2':
     'Vendor-supplied default accounts are inventoried, and any still in use have their default password changed.',
   '2.2.3':
