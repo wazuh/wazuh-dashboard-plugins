@@ -426,7 +426,7 @@ export function useFIMOverview(enabled: boolean): DataGroupResult<FimOverview> {
   });
 }
 
-/** Security Analytics count: a gated core.http call, no index pattern. */
+/** Ruleset Management count: a gated core.http call, no index pattern. */
 function useSecurityAnalyticsFetch<T>(
   enabled: boolean,
   fetcher: () => Promise<T>,

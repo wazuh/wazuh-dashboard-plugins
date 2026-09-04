@@ -32,12 +32,12 @@ test('tableSpecSchema: accepts a table carrying discover (Open in Discover)', ()
   );
 });
 
-test('tableSpecSchema: accepts a table carrying securityAnalyticsLink (Open in Security Analytics)', () => {
+test('tableSpecSchema: accepts a table carrying securityAnalyticsLink (Open in Ruleset Management)', () => {
   assert.doesNotThrow(() =>
     tableSpecSchema.validate({
       ...MINIMAL_TABLE,
       securityAnalyticsLink: {
-        label: 'Open in Security Analytics',
+        label: 'Open in Ruleset Management',
         url: '/app/rules#/rules?space=standard',
       },
     }),
@@ -50,7 +50,7 @@ test('tableSpecSchema: accepts a table carrying both discover and securityAnalyt
       ...MINIMAL_TABLE,
       discover: { index: 'wazuh-findings-v5*', dsl: { match_all: {} } },
       securityAnalyticsLink: {
-        label: 'Open in Security Analytics',
+        label: 'Open in Ruleset Management',
         url: '/app/rules#/rules?space=standard',
       },
     }),
@@ -61,7 +61,32 @@ test('tableSpecSchema: rejects a securityAnalyticsLink missing its url', () => {
   assert.throws(() =>
     tableSpecSchema.validate({
       ...MINIMAL_TABLE,
-      securityAnalyticsLink: { label: 'Open in Security Analytics' },
+      securityAnalyticsLink: { label: 'Open in Ruleset Management' },
+    }),
+  );
+});
+
+test('tableSpecSchema: accepts a table carrying provenance', () => {
+  assert.doesNotThrow(() =>
+    tableSpecSchema.validate({
+      ...MINIMAL_TABLE,
+      provenance: {
+        toolCallId: 'call-1',
+        index: 'wazuh-findings-v5*',
+        requestedRange: { gte: 'now-720d', lte: 'now' },
+        effectiveRange: { gte: '2026-05-23T00:00:00.000Z', lte: 'now' },
+        clamped: true,
+        executedAt: Date.now(),
+      },
+    }),
+  );
+});
+
+test('tableSpecSchema: accepts provenance with only `clamped` set (no range/index known)', () => {
+  assert.doesNotThrow(() =>
+    tableSpecSchema.validate({
+      ...MINIMAL_TABLE,
+      provenance: { clamped: false },
     }),
   );
 });

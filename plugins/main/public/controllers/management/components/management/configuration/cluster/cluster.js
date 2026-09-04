@@ -17,7 +17,11 @@ import WzConfigurationSettingsGroup from '../util-components/configuration-setti
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
 import withWzConfig from '../util-hocs/wz-config';
-import { isString, renderValueOrNoValue } from '../utils/utils';
+import {
+  isString,
+  renderValueOrNoValue,
+  renderValueBooleanYesNo,
+} from '../utils/utils';
 
 import { connect } from 'react-redux';
 import { compose } from 'redux';
@@ -35,7 +39,11 @@ const mainSettings = [
     field: 'bind_addr',
     label: 'IP address to listen to cluster communications',
   },
-  { field: 'hidden', label: 'Hide cluster information in alerts' },
+  {
+    field: 'hidden',
+    label: 'Hide cluster information in alerts',
+    render: renderValueBooleanYesNo,
+  },
 ];
 
 const haproxySettings = [
@@ -104,10 +112,7 @@ export class WzCluster extends Component {
       return <WzNoConfig error='not-present' help={helpLinks} />;
     }
 
-    let mainSettingsConfig = {
-      ...clusterConfig,
-      disabled: clusterConfig.disabled === true ? 'disabled' : 'enabled',
-    };
+    let mainSettingsConfig = { ...clusterConfig };
 
     if (clusterConfig.haproxy_helper) {
       mainSettingsConfig = {

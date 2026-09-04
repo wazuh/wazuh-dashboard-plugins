@@ -35,7 +35,7 @@ interface SecurityAnalyticsLinkProps {
 }
 
 /**
- * Small "Open in Security Analytics" action rendered in a result card's header (result-table.tsx)
+ * Small "Open in Ruleset Management" action rendered in a result card's header (result-table.tsx)
  * when its spec carries `securityAnalyticsLink` -- the wazuh-threatintel-*
  * tools' equivalent of discover-link.tsx's DiscoverLink, for content that has no OSD index-pattern
  * and so never resolves a Discover link. Renders nothing if the spec carries no such link.

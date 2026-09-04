@@ -7,7 +7,11 @@ import {
   Logger,
 } from '../../../src/core/server';
 import { registerRoutes } from './routes';
-import { setApiKeyCipher, setSettingsReadOnly } from './plugin-services';
+import {
+  setApiKeyCipher,
+  setOutOfCreditsMessage,
+  setSettingsReadOnly,
+} from './plugin-services';
 import { ApiKeyCipher, parseEncryptionKey } from './crypto/api-key-cipher';
 import { WazuhAiAssistantConfigType } from './config';
 import { createAssistantSettingsManager } from './settings/route-handler-context';
@@ -89,6 +93,10 @@ export class WazuhAiAssistantPlugin
           '— provider and settings writes will be rejected with 403.',
       );
     }
+
+    // Same read-config-once-in-setup pattern as above; `undefined` keeps the provider's own
+    // out-of-credits text unchanged.
+    setOutOfCreditsMessage(pluginConfig.outOfCreditsMessage);
 
     // This plugin registers no saved object types: persisted conversations live in the
     // `wazuh-ai-assistant-sessions` index alias (server/conversation-store.ts); AI provider
