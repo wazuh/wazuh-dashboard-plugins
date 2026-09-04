@@ -23,10 +23,6 @@ export const pciRequirementsFile = {
     'Do not allow unauthorized outbound traffic from the cardholder data environment to the Internet.',
   '1.4':
     'Network connections between trusted and untrusted networks are controlled.',
-  '1.5':
-    'Risks introduced by devices that connect to both untrusted networks and the CDE are identified and mitigated.',
-  '2.1':
-    'A documented process governs how secure configurations are applied to all system components.',
   '2.2': 'Every system component is configured and managed securely.',
   '2.2.2':
     'Vendor-supplied default accounts are inventoried, and any still in use have their default password changed.',
@@ -36,16 +32,9 @@ export const pciRequirementsFile = {
     'Only the services, protocols, daemons, and functions a system needs are enabled; everything else is removed or disabled.',
   '2.2.7':
     'All non-console administrative access uses strong cryptography for encryption.',
-  '2.3':
-    'Wireless environments connected to or part of the CDE are configured and managed securely.',
   // PCI DSS v4.0 does not define this code; kept for rules still emitting v3.2.1 subrequirement numbering.
-  '2.4':
-    'Maintain an inventory of system components that are in scope for PCI DSS.',
-  '3.1': 'A documented process governs how stored account data is protected.',
   '3.2':
     'Account data is retained only for as long as, and to the extent that, it is actually needed.',
-  '3.3':
-    'Sensitive authentication data is not retained after the authorization process completes.',
   '3.4':
     'Access to full PAN displays and the ability to copy cardholder data are restricted to those with a business need.',
   '3.5':
@@ -54,18 +43,12 @@ export const pciRequirementsFile = {
     'Cryptographic keys that protect stored account data are themselves secured against disclosure or misuse.',
   '4.1':
     'A documented process governs how cardholder data is protected with strong cryptography while transmitted over open, public networks.',
-  '4.2':
-    'The primary account number is protected with strong cryptography whenever it is transmitted.',
   '5.1':
     'A documented process governs how all systems and networks are protected from malicious software.',
   '5.2':
     'Malicious software is actively prevented from running, or is detected and remediated when found.',
   '5.3':
     'Anti-malware mechanisms remain active, are kept up to date, and are monitored for tampering or being disabled.',
-  '5.4':
-    'Anti-phishing mechanisms are in place to protect personnel against phishing attacks.',
-  '6.1':
-    'A documented process governs how systems and software are developed and maintained securely.',
   '6.2':
     'Custom and bespoke software is built using secure development practices from the outset.',
   '6.3':
@@ -100,8 +83,6 @@ export const pciRequirementsFile = {
     "Access to system components and data is granted deliberately, matching each user's defined role.",
   '7.2.5':
     'Application and system accounts, and the privileges tied to them, are assigned based on least privilege for the role.',
-  '7.3':
-    'Access to system components and data is enforced through a formal access control system.',
   '8.1':
     'A documented process governs how users are identified and how their access to system components is authenticated.',
   '8.1.1':
@@ -144,16 +125,6 @@ export const pciRequirementsFile = {
   // PCI DSS v4.0 does not define this code; kept for rules still emitting v3.2.1 subrequirement numbering.
   '8.7':
     'All access to any database containing cardholder data (including access by applications, administrators, and all other users) is restricted as follows:All user access to, user queries of, and user actions on databases are through programmatic methods. Only database administrators have the ability to directly access or query databases. Application IDs for database applications can only be used by the applications (and not by individual users or other non-application processes).',
-  '9.1':
-    'A documented process governs how physical access to cardholder data is restricted.',
-  '9.2':
-    'Physical access controls govern entry into facilities and systems that hold cardholder data.',
-  '9.3':
-    'Physical access granted to personnel and visitors is authorized and actively managed.',
-  '9.4':
-    'Media containing cardholder data is stored, accessed, distributed, and destroyed securely.',
-  '9.5':
-    'Point-of-interaction devices are protected against tampering and unauthorized substitution.',
   '10.1':
     'A documented process governs how access to system components and cardholder data is logged and monitored.',
   '10.2':
@@ -190,10 +161,6 @@ export const pciRequirementsFile = {
     'Time-synchronization mechanisms keep clocks consistent across all in-scope systems.',
   '10.6.1':
     'System clocks are synchronized using dedicated time-synchronization technology.',
-  '10.7':
-    'Failures in critical security control systems are detected, reported, and responded to promptly.',
-  '11.1':
-    'A documented process governs how the security of systems and networks is regularly tested.',
   '11.2':
     'Wireless access points are inventoried and monitored, and any unauthorized ones are identified and addressed.',
   '11.2.1':
@@ -209,10 +176,30 @@ export const pciRequirementsFile = {
     'Network intrusions and unexpected changes to critical files are detected and responded to.',
   '12.3':
     'Risks to the cardholder data environment are formally assessed, evaluated, and actively managed.',
-  '12.5':
-    'The scope of applicability for PCI DSS controls is documented and confirmed to be accurate.',
   '12.10':
     'Suspected or confirmed security incidents affecting the CDE trigger an immediate response.',
   '12.10.5':
     'The incident response plan covers monitoring and acting on alerts from intrusion detection/prevention, network security controls, and file/change-detection systems.',
+  '8.3.2':
+    'Strong cryptography renders every authentication factor unreadable during transmission and storage on all system components.',
+  '10.2.1.1':
+    'Audit logs capture all individual user access to cardholder data.',
+  '10.2.1.2':
+    'Audit logs capture all actions taken by any individual with administrative access, including interactive use of application or system accounts.',
+  '10.2.1.6':
+    'Audit logs capture the initialization of new audit logs and the starting, stopping or pausing of existing ones.',
+  '10.2.1.7':
+    'Audit logs capture all creation and deletion of system-level objects.',
+  '10.3.2':
+    'Audit log files are protected to prevent modifications by individuals.',
+  '10.4.1':
+    'Security events and the logs of the system components handling cardholder data are reviewed at least once daily.',
+  '11.3.1':
+    'Internal vulnerability scans run at least once every three months, and the high-risk and critical findings are resolved and confirmed by a rescan.',
+  '11.4.1':
+    'A penetration testing methodology is defined, documented and implemented, covering the whole cardholder data environment perimeter and its critical systems.',
+  '11.5.1':
+    'Intrusion-detection or intrusion-prevention techniques monitor all traffic at the perimeter and at critical points of the cardholder data environment.',
+  '11.5.2':
+    'A change-detection mechanism alerts on unauthorized modification of critical files and compares them at least once weekly.',
 };
