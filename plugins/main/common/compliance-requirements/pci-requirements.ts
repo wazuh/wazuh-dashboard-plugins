@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module for PCI requirements
- * Copyright (C) 2015-2022 Wazuh, Inc.
+ * Copyright (C) 2015-2026 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,145 +11,209 @@
  */
 export const pciRequirementsFile = {
   '1.1':
-    'Establish and implement firewall and router configuration standards that include a formal process for approving and testing all network connections and changes to firewall and router configurations.',
+    'A documented, formal process governs how network security controls are installed and maintained.',
   '1.1.1':
-    'A formal process for approving and testing all network connections and changes to the firewall and router configurations',
+    'Every security policy and operating procedure covering network security controls is documented and kept current.',
   '1.2':
-    'Build firewall and router configurations that restrict connections between untrusted networks and any system components in the cardholder data environment.',
+    'Network security controls, such as firewalls and routers, are properly configured and kept up to date.',
   '1.3':
-    'Prohibit direct public access between the Internet and any system component in the cardholder data environment.',
+    'Network access into and out of the cardholder data environment is limited to what is explicitly required.',
+  // PCI DSS v4.0 does not define this code; kept for rules still emitting v3.2.1 subrequirement numbering.
   '1.3.4':
     'Do not allow unauthorized outbound traffic from the cardholder data environment to the Internet.',
   '1.4':
-    'Install personal firewall software or equivalent functionality on any portable computing devices (including company and/or employee-owned) that connect to the Internet when outside the network (for example, laptops used by employees), and which are also used to access the CDE. Firewall (or equivalent) configurations include:Specific configuration settings are defined. Personal firewall (or equivalent functionality) is actively running. Personal firewall (or equivalent functionality) is not alterable by users of the portable computing devices. ',
+    'Connections between trusted internal networks and untrusted external networks are controlled and monitored.',
+  '1.5':
+    'Risks introduced by devices that connect to both untrusted networks and the CDE are identified and mitigated.',
+  '2.1':
+    'A documented process governs how secure configurations are applied to all system components.',
   '2.2':
-    'Develop configuration standards for all system components. Assure that these standards address all known security vulnerabilities and are consistent with industry accepted system hardening standards (CIS, ISO, SANS, NIST).',
+    'Every system component is configured and managed according to secure, industry-accepted hardening standards.',
   '2.2.2':
-    'Enable only necessary services, protocols, daemons, etc., as required for the function of the system. ',
+    'Vendor-supplied default accounts are inventoried, and any still in use have their default password changed.',
   '2.2.3':
-    'Implement additional security features for any required services, protocols, or daemons that are considered to be insecure',
-  '2.2.4': 'Configure system security parameters to prevent misuse.',
+    'Functions that require different security levels run on separate systems or are otherwise isolated from each other.',
+  '2.2.4':
+    'Only the services, protocols, daemons, and functions a system needs are enabled; everything else is removed or disabled.',
   '2.2.7':
-    'All non-console administrative access is encrypted using strong cryptography.',
-  '3.2': 'Storage of account data is kept to a minimum.',
+    'All non-console administrative access uses strong cryptography for encryption.',
+  '2.3':
+    'Wireless environments connected to or part of the CDE are configured and managed securely.',
+  // PCI DSS v4.0 does not define this code; kept for rules still emitting v3.2.1 subrequirement numbering.
+  '2.4':
+    'Maintain an inventory of system components that are in scope for PCI DSS.',
+  '3.1': 'A documented process governs how stored account data is protected.',
+  '3.2':
+    'Account data is retained only for as long as, and to the extent that, it is actually needed.',
+  '3.3':
+    'Sensitive authentication data is not retained after the authorization process completes.',
   '3.4':
-    'Access to displays of full PAN and the ability to copy PAN are restricted.',
-  '3.5': 'Primary account number (PAN) is secured wherever it is stored.',
-  '3.6': 'Cryptographic keys used to protect stored account data are secured.',
+    'Access to full PAN displays and the ability to copy cardholder data are restricted to those with a business need.',
+  '3.5':
+    'The primary account number is protected using strong measures wherever it is stored.',
+  '3.6':
+    'Cryptographic keys that protect stored account data are themselves secured against disclosure or misuse.',
   '4.1':
-    'Use strong cryptography and security protocols (for example, SSL/TLS, IPSEC, SSH, etc.) to safeguard sensitive cardholder data during transmission over open, public networks, including the following:Only trusted keys and certificates are accepted. The protocol in use only supports secure versions or configurations. The encryption strength is appropriate for the encryption methodology in use. ',
+    'A documented process governs how cardholder data is protected with strong cryptography while transmitted over open, public networks.',
+  '4.2':
+    'The primary account number is protected with strong cryptography whenever it is transmitted.',
   '5.1':
-    'Deploy anti-virus software on all systems commonly affected by malicious software (particularly personal computers and servers).',
+    'A documented process governs how all systems and networks are protected from malicious software.',
   '5.2':
-    'Ensure that all anti-virus mechanisms are maintained as follows:Are kept current. Perform periodic scans. Generate audit logs which are retained per PCI DSS Requirement 10.7. ',
+    'Malicious software is actively prevented from running, or is detected and remediated when found.',
   '5.3':
-    'Ensure that anti-virus mechanisms are actively running and cannot be disabled or altered by users, unless specifically authorized by management on a case-by-case basis for a limited time period.',
+    'Anti-malware mechanisms remain active, are kept up to date, and are monitored for tampering or being disabled.',
+  '5.4':
+    'Anti-phishing mechanisms are in place to protect personnel against phishing attacks.',
+  '6.1':
+    'A documented process governs how systems and software are developed and maintained securely.',
   '6.2':
-    'Ensure that all system components and software are protected from known vulnerabilities by installing applicable vendor-supplied security patches. Install critical security patches within one month of release.',
+    'Custom and bespoke software is built using secure development practices from the outset.',
   '6.3':
-    'Develop internal and external software applications (including web-based administrative access to applications) securely, in accordance with PCI DSS and based on industry standards, incorporating information security throughout the software-development life cycle.',
+    'Security vulnerabilities in software and systems are identified, ranked, and remediated.',
   '6.3.3':
-    'All system components are protected from known vulnerabilities by installing applicable security patches/updates within an identified time frame from release of the patches/updates.',
+    'Applicable security patches are installed within a defined time frame based on the risk the vulnerability presents.',
   '6.4':
-    'Follow change control processes and procedures for all changes to system components.',
+    'Public-facing web applications are actively protected against known and emerging attacks.',
   '6.4.2':
-    'Separation of duties between development/test and production environments.',
+    'An automated technical control continuously monitors public-facing web applications and blocks web-based attacks.',
   '6.5':
-    'Address common coding vulnerabilities in software development processes as follows:Train developers in secure coding techniques, including how to avoid common coding vulnerabilities, and understanding how sensitive data is handled in memory. Develop applications based on secure coding guidelines. ',
+    'Changes to system components follow a controlled, documented change-management process.',
   '6.5.1':
-    'Injection flaws, particularly SQL injection. Also consider Operating System Command Injection, LDAP and XPath injection flaws as well as other injection flaws.',
-  '6.5.2': 'Buffer overflows',
-  '6.5.5': 'Improper error handling',
+    'Each change to a production system component is documented, including its reason and a description of what changed.',
+  '6.5.2':
+    'After a significant change, applicable PCI DSS controls are re-verified as being in place and documentation is updated.',
+  '6.5.5':
+    'Live primary account numbers are kept out of pre-production and test environments unless those environments meet CDE-level protection.',
+  // PCI DSS v4.0 does not define this code; kept for rules still emitting v3.2.1 subrequirement numbering.
   '6.5.7': 'Cross-site scripting (XSS)',
+  // PCI DSS v4.0 does not define this code; kept for rules still emitting v3.2.1 subrequirement numbering.
   '6.5.8':
     'Improper access control (such an insecure direct object references, failure to restrict URL access, directory traversal, and failure to restrict user access to functions).',
+  // PCI DSS v4.0 does not define this code; kept for rules still emitting v3.2.1 subrequirement numbering.
   '6.5.10': 'Broken authentication and session management.',
+  // PCI DSS v4.0 does not define this code; kept for rules still emitting v3.2.1 subrequirement numbering.
   '6.6':
     'For public-facing web applications, address new threats and vulnerabilities on an ongoing basis and ensure these applications are protected against known attacks by either of the following methods:Reviewing public-facing web applications via manual or automated application vulnerability security assessment tools or methods, at least annually and after any changes. Installing an automated technical solution that detects and prevents web-based attacks (for example, a web-application firewall) in front of public-facing web applications, to continually check all traffic. ',
   '7.1':
-    'Processes and mechanisms for restricting access to system components and cardholder data by business need to know are defined and understood.',
+    'A documented process defines how access to system components and cardholder data is restricted by business need to know.',
   '7.2':
-    'Access to system components and data is appropriately defined and assigned.',
+    "Access to system components and data is granted deliberately, matching each user's defined role.",
   '7.2.5':
-    'All application and system accounts and related access privileges are assigned and managed based on the least privileges necessary for the role.',
+    'Application and system accounts, and the privileges tied to them, are assigned based on least privilege for the role.',
+  '7.3':
+    'Access to system components and data is enforced through a formal access control system.',
   '8.1':
-    'Define and implement policies and procedures to ensure proper user identification management for non-consumer users and administrators on all system components.',
+    'A documented process governs how users are identified and how their access to system components is authenticated.',
   '8.1.1':
-    'Assign all users a unique ID before allowing them to access system components or cardholder data.',
+    'Every security policy and operating procedure covering identification and authentication is documented and kept current.',
   '8.1.2':
-    'Control addition, deletion, and modification of user IDs, credentials, and other identifier objects.',
+    'Roles and responsibilities for identity and authentication activities are documented, assigned, and understood.',
+  // PCI DSS v4.0 does not define this code; kept for rules still emitting v3.2.1 subrequirement numbering.
   '8.1.4': 'Remove/disable inactive user accounts within 90 days.',
+  // PCI DSS v4.0 does not define this code; kept for rules still emitting v3.2.1 subrequirement numbering.
   '8.1.5':
     'Manage IDs used by third parties to access, support, or maintain system components via remote access as follows:Enabled only during the time period needed and disabled when not in use. Monitored when in use. ',
+  // PCI DSS v4.0 does not define this code; kept for rules still emitting v3.2.1 subrequirement numbering.
   '8.1.6':
     'Limit repeated access attempts by locking out the user ID after not more than six attempts.',
+  // PCI DSS v4.0 does not define this code; kept for rules still emitting v3.2.1 subrequirement numbering.
   '8.1.8':
     'If a session has been idle for more than 15 minutes, require the user to reauthenticate to re-activate the terminal or session.',
   '8.2':
-    'In addition to assigning a unique ID, ensure proper user-authentication management for non-consumer users and administrators on all system components.',
+    'Each account is tracked and managed through its full lifecycle, from creation to removal.',
   '8.2.1':
-    'Using strong cryptography, render all authentication credentials (such as passwords/phrases) unreadable during transmission and storage on all system components.',
-  '8.2.4': 'Change user passwords/passphrases at least once every 90 days.',
+    'Every user is assigned a unique ID before being granted access to system components or cardholder data.',
+  '8.2.4':
+    'Adding, removing, or modifying a user ID or authentication factor requires prior authorization.',
   '8.3':
-    'Secure all individual non-console administrative access and all remote access to the cardholder data environment using multi-factor authentication.',
+    'Strong, multi-factor authentication is required for users and administrators accessing the environment.',
   '8.3.1':
-    'Incorporate multi-factor authentication for all non-console access into the CDE for personnel with administrative access.',
+    'Access for users and administrators is authenticated using at least one recognized authentication factor, such as a password.',
   '8.3.4':
-    'Invalid authentication attempts are limited by locking out the user ID after not more than 10 attempts, with the lockout duration lasting a minimum of 30 minutes or until an administrator resets the account or the user’s identity is confirmed.',
+    'An account is locked out after no more than ten consecutive invalid authentication attempts.',
   '8.3.6':
-    'If passwords/passphrases are used as an authentication factor, they meet the minimum level of complexity: a minimum length of 12 characters (or 8 if the system does not support 12) and contain both numeric and alphabetic characters.',
+    'Passwords used to satisfy authentication requirements are at least 12 characters (8 if the system cannot support 12) and mix letters with numbers.',
   '8.4':
-    'Document and communicate authentication policies and procedures to all users, including guidance on selecting strong authentication credentials, protecting credentials, and not reusing previously used passwords.',
+    'Multi-factor authentication secures every path of access into the cardholder data environment.',
   '8.5':
-    'Do not use group, shared, or generic IDs, passwords, or other authentication methods.',
+    'Multi-factor authentication systems are configured so they cannot be bypassed or misused.',
   '8.5.1':
-    'Additional requirement for service providers: Service providers with remote access to customer premises (for example, for support of POS systems or servers) must use a unique authentication credential (such as a password/phrase) for each customer.',
+    'Multi-factor authentication implementations resist replay attacks and cannot be bypassed with a single factor.',
   '8.6':
-    'Where other authentication mechanisms are used (for example, physical or logical security tokens, smart cards, or certificates), assign use of these mechanisms to an individual account and ensure physical and/or logical controls guarantee only the intended account can use that mechanism to gain access.',
+    'Application and system accounts, and their authentication factors, are tightly controlled and monitored for misuse.',
+  // PCI DSS v4.0 does not define this code; kept for rules still emitting v3.2.1 subrequirement numbering.
   '8.7':
     'All access to any database containing cardholder data (including access by applications, administrators, and all other users) is restricted as follows:All user access to, user queries of, and user actions on databases are through programmatic methods. Only database administrators have the ability to directly access or query databases. Application IDs for database applications can only be used by the applications (and not by individual users or other non-application processes).',
+  '9.1':
+    'A documented process governs how physical access to cardholder data is restricted.',
+  '9.2':
+    'Physical access controls govern entry into facilities and systems that hold cardholder data.',
+  '9.3':
+    'Physical access granted to personnel and visitors is authorized and actively managed.',
+  '9.4':
+    'Media containing cardholder data is stored, accessed, distributed, and destroyed securely.',
+  '9.5':
+    'Point-of-interaction devices are protected against tampering and unauthorized substitution.',
   '10.1':
-    'Implement audit trails to link all access to system components to each individual user.',
+    'A documented process governs how access to system components and cardholder data is logged and monitored.',
   '10.2':
-    'Implement automated audit trails for all system components to reconstruct events.',
-  '10.2.1': 'All individual user accesses to cardholder data',
+    'Audit logs capture enough detail to detect anomalies, investigate suspicious activity, and support forensic analysis.',
+  '10.2.1':
+    'Audit logging is enabled and actively running for every system component that touches cardholder data.',
   '10.2.2':
-    'All actions taken by any individual with root or administrative privileges.',
+    'Each logged event records who performed it, along with the other details needed to reconstruct what happened.',
+  // PCI DSS v4.0 does not define this code; kept for rules still emitting v3.2.1 subrequirement numbering.
   '10.2.3': 'Access to all audit trails.',
+  // PCI DSS v4.0 does not define this code; kept for rules still emitting v3.2.1 subrequirement numbering.
   '10.2.4': 'Invalid logical access attempts',
+  // PCI DSS v4.0 does not define this code; kept for rules still emitting v3.2.1 subrequirement numbering.
   '10.2.5':
     'Use of and changes to identification and authentication mechanisms including but not limited to creation of new accounts and elevation of privileges and all changes, additions, or deletions to accounts with root or administrative privileges.',
+  // PCI DSS v4.0 does not define this code; kept for rules still emitting v3.2.1 subrequirement numbering.
   '10.2.6': 'Initialization, stopping, or pausing of the audit logs',
+  // PCI DSS v4.0 does not define this code; kept for rules still emitting v3.2.1 subrequirement numbering.
   '10.2.7': 'Creation and deletion of system level objects',
   '10.3':
-    'Record at least the following audit trail entries for all system components for each event: user identification, type of event, date and time, success or failure indication, origination of event, and identity or name of affected data, system component, or resource.',
+    'Audit logs are protected against deletion and unauthorized alteration.',
   '10.4':
-    'Using time-synchronization technology, synchronize all critical system clocks and times and ensure that the following is implemented for acquiring, distributing, and storing time.',
-  '10.5': 'Secure audit trails so they cannot be altered.',
-  '10.5.1': 'Limit viewing of audit trails to those with a job-related need.',
+    'Audit logs are reviewed on a regular basis to catch anomalies or suspicious activity.',
+  '10.5':
+    'Audit log history is retained long enough, and kept accessible enough, to support later analysis.',
+  '10.5.1':
+    'At least twelve months of audit log history is retained, with the most recent three months readily available.',
+  // PCI DSS v4.0 does not define this code; kept for rules still emitting v3.2.1 subrequirement numbering.
   '10.5.2': 'Protect audit trail files from unauthorized modifications',
+  // PCI DSS v4.0 does not define this code; kept for rules still emitting v3.2.1 subrequirement numbering.
   '10.5.5':
     'Use file integrity monitoring or change detection software on logs to ensure that existing log data cannot be changed without generating alerts (although new data being added should not cause an alert).',
   '10.6':
-    'Review logs and security events for all system components to identify anomalies or suspicious activity',
+    'Time-synchronization mechanisms keep clocks consistent across all in-scope systems.',
   '10.6.1':
-    'Review the following at least daily: All security events. Logs of all system components that store, process, or transmit CHD and/or SAD, or that could. impact the security of CHD and/or SAD. Logs of all critical system components. Logs of all servers and system components that perform security functions (for example, firewalls, intrusion detection systems/intrusion prevention systems (IDS/IPS), authentication servers, ecommerce redirection servers, etc.). ',
+    'System clocks are synchronized using dedicated time-synchronization technology.',
+  '10.7':
+    'Failures in critical security control systems are detected, reported, and responded to promptly.',
+  '11.1':
+    'A documented process governs how the security of systems and networks is regularly tested.',
   '11.2':
-    'Run internal and external network vulnerability scans at least quarterly and after any significant change in the network.',
+    'Wireless access points are inventoried and monitored, and any unauthorized ones are identified and addressed.',
   '11.2.1':
-    'Perform quarterly internal vulnerability scans. Address vulnerabilities and perform rescans to verify all “high risk” vulnerabilities are resolved in accordance with the entity’s vulnerability ranking. Scans must be performed by qualified personnel.',
+    'Wireless access points are periodically tested for, and both authorized and unauthorized access points are actively managed.',
+  // PCI DSS v4.0 does not define this code; kept for rules still emitting v3.2.1 subrequirement numbering.
   '11.2.3':
     'Perform internal and external scans, and rescans as needed, after any significant change. Scans must be performed by qualified personnel.',
   '11.3':
-    'Implement a methodology for penetration testing that includes industry-accepted approaches, coverage for the entire CDE perimeter and critical systems, and testing from both inside and outside the network.',
+    'Internal and external vulnerabilities are identified on a regular basis, prioritized by risk, and addressed.',
   '11.4':
-    'Use intrusion detection and/or intrusion prevention techniques to detect and/or prevent intrusions into the network.Monitor all traffic at the perimeter of the cardholder data environment as well as at critical points in the cardholder data environment, and alert personnel to suspected compromises. Keep all intrusion detection and prevention engines, baselines, and signatures up to date.',
+    'Internal and external penetration testing is performed regularly, and any exploitable weakness found is corrected.',
   '11.5':
-    'Deploy a change detection mechanism (for example, file integrity monitoring tools) to alert personnel to unauthorized modification of critical system files, configuration files, or content files; and configure the software to perform critical file comparisons at least weekly.',
+    'Network intrusions and unexpected changes to critical files are detected and responded to.',
   '12.3':
-    'Develop usage policies for critical technologies and define proper use of these technologies for all personnel.',
+    'Risks to the cardholder data environment are formally assessed, evaluated, and actively managed.',
+  '12.5':
+    'The scope of applicability for PCI DSS controls is documented and confirmed to be accurate.',
   '12.10':
-    'Implement an incident response plan. Be prepared to respond immediately to a system breach.',
+    'Suspected or confirmed security incidents affecting the CDE trigger an immediate response.',
   '12.10.5':
-    'Include alerts from security monitoring systems, including but not limited to intrusion-detection, intrusion-prevention, firewalls, and file-integrity monitoring systems.',
+    'The incident response plan covers monitoring and acting on alerts from intrusion detection/prevention, network security controls, and file/change-detection systems.',
 };
