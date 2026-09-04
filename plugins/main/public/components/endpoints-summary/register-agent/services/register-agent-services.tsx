@@ -254,5 +254,13 @@ export const parseRegisterAgentFormValues = (
     path: endpointComponents.serverPath,
   });
 
+  /* A CA pins the certificate the agent checks, so it means nothing once
+  verification is off -- and the agent would still write it to the config,
+  leaving a command that both supplies a CA and refuses to use it. The field
+  keeps its value in the form so toggling verification back on restores it. */
+  if (parsedForm.optionalParams.sslVerification === false) {
+    parsedForm.optionalParams.managerCa = '';
+  }
+
   return parsedForm;
 };

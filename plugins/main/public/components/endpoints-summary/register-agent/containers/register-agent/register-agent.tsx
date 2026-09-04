@@ -33,7 +33,10 @@ import {
 import { useUserPermissionsRequirements } from '../../../../common/hooks/useUserPermissions';
 import GroupInput from '../../components/group-input/group-input';
 import { OsCard } from '../../components/os-selector/os-card/os-card';
-import { validateAgentName } from '../../utils/validations';
+import {
+  validateAgentName,
+  validateManagerCaPath,
+} from '../../utils/validations';
 import { compose } from 'redux';
 import { endpointSummary } from '../../../../../utils/applications';
 import { getWazuhCorePlugin } from '../../../../../kibana-services';
@@ -103,6 +106,33 @@ export const RegisterAgent = compose(
       type: 'text',
       initialValue: '',
       validate: validateAgentName,
+    },
+    /* Enrollment authenticates one way, agent to manager, so the manager is
+    authenticated solely by TLS. The agent verifies by default -- against the
+    endpoint's system CA store, or against the CA below when one is given -- and
+    turning this off generates an explicit SSL_VERIFICATION=none opt-out. */
+    sslVerification: {
+      type: 'switch',
+      initialValue: true,
+      options: {
+        switch: {
+          values: {
+            enabled: {
+              label: 'Verify the manager certificate',
+              value: true,
+            },
+            disabled: {
+              label: 'Verify the manager certificate',
+              value: false,
+            },
+          },
+        },
+      },
+    },
+    managerCa: {
+      type: 'text',
+      initialValue: '',
+      validate: validateManagerCaPath,
     },
 
     agentGroups: {
