@@ -39,11 +39,6 @@ const agentsSettings = [
       'Time after which the manager considers an agent as disconnected since its last keepalive',
     render: renderValueOrNoValue,
   },
-  {
-    field: 'agents_disconnection_alert_time',
-    label: 'Alert time after agent disconnection',
-    render: renderValueOrNoValue,
-  },
 ];
 
 class WzConfigurationAgentsConfigurationGlobal extends Component {

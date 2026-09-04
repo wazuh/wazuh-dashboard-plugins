@@ -41,7 +41,7 @@ import {
   saveFileCluster,
   clusterNodes,
 } from '../utils/wz-fetch';
-import { validateXML } from '../utils/xml';
+import { validateManagerXML } from '../utils/xml-manager';
 import { getToasts } from '../../../../../..//kibana-services';
 
 import { connect } from 'react-redux';
@@ -241,7 +241,7 @@ class WzEditConfiguration extends Component {
       disableSaveRestartButtons,
     } = this.state;
     const { clusterNodeSelected, agent } = this.props;
-    const xmlError = editorValue && validateXML(editorValue);
+    const xmlError = editorValue && validateManagerXML(editorValue);
     return (
       <Fragment>
         <WzConfigurationPath

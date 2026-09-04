@@ -10,10 +10,10 @@ const fullRemoteConfig = {
     remote: [
       {
         legacy: {
-          enabled: 'yes',
+          enabled: true,
           port: '1514',
           protocol: ['TCP'],
-          ipv6: 'no',
+          ipv6: false,
           local_ip: '127.0.0.1',
           queue_size: '131072',
           rids_closing_time: '300',
@@ -27,7 +27,7 @@ const fullRemoteConfig = {
           key: 'etc/certs/remoted-key.pem',
         },
         agents: {
-          allow_higher_versions: 'no',
+          allow_higher_versions: false,
         },
       },
     ],
@@ -112,9 +112,44 @@ const missingRemoteConfig = {
   'request-remote': {},
 };
 
+// Shape a current manager reports: `remote` is an
+// object keyed by dialect, not an array wrapping a single object.
+const objectShapeRemoteConfig = {
+  'request-remote': {
+    remote: {
+      https: {
+        port: 1517,
+        bind_addr: '0.0.0.0',
+        global_prefix: '/wazuh-manager/',
+        certificate: 'etc/certs/remoted.pem',
+        key: 'etc/certs/remoted-key.pem',
+        ca: '',
+      },
+      legacy: {
+        enabled: true,
+        port: 1514,
+        protocol: ['tcp'],
+        local_ip: '127.0.0.1',
+        queue_size: 131072,
+        ipv6: false,
+        rids_closing_time: '5m',
+        connection_overtake_time: 60,
+      },
+      agents: {
+        allow_higher_versions: false,
+      },
+    },
+  },
+};
+
 describe('Global configuration remote settings', () => {
   it('should render all three groups with correct values when fully present', () => {
-    const { getByText, getByDisplayValue, getAllByDisplayValue } = render(
+    const {
+      getByText,
+      getByDisplayValue,
+      getAllByDisplayValue,
+      queryByDisplayValue,
+    } = render(
       <WzConfigurationGlobalConfigurationRemote
         currentConfig={fullRemoteConfig}
       />,
@@ -154,9 +189,13 @@ describe('Global configuration remote settings', () => {
     expect(getByDisplayValue('300')).toBeInTheDocument();
     expect(getByDisplayValue('60')).toBeInTheDocument();
 
-    // 'yes' appears for legacy.enabled and 'no' for agents.allow_higher_versions and legacy.ipv6
-    expect(getAllByDisplayValue('yes').length).toBeGreaterThanOrEqual(1);
-    expect(getAllByDisplayValue('no').length).toBeGreaterThanOrEqual(2);
+    /* The manager reports these three as native booleans. They must read in the
+    same 'yes'/'no' vocabulary as the rest of the configuration views, never as
+    'true'/'false'. */
+    expect(getAllByDisplayValue('yes').length).toBe(1);
+    expect(getAllByDisplayValue('no').length).toBe(2);
+    expect(queryByDisplayValue('true')).not.toBeInTheDocument();
+    expect(queryByDisplayValue('false')).not.toBeInTheDocument();
 
     // 'Port' label appears twice (HTTPS group + Legacy group)
     expect(getAllByDisplayValue('1517').length).toBe(1);
@@ -307,5 +346,31 @@ describe('Global configuration remote settings', () => {
 
     expect(getByText('Configuration not available')).toBeInTheDocument();
     expect(queryByText('HTTPS settings')).toBeFalsy();
+  });
+
+  it('should render all three groups when remote is the object shape', () => {
+    const {
+      getByText,
+      getByDisplayValue,
+      getAllByDisplayValue,
+      queryByDisplayValue,
+    } = render(
+      <WzConfigurationGlobalConfigurationRemote
+        currentConfig={objectShapeRemoteConfig}
+      />,
+    );
+
+    expect(getByText('HTTPS settings')).toBeInTheDocument();
+    expect(getByText('Legacy settings')).toBeInTheDocument();
+    expect(getByText('Agents settings')).toBeInTheDocument();
+
+    expect(getByDisplayValue('1517')).toBeInTheDocument();
+    expect(getByDisplayValue('0.0.0.0')).toBeInTheDocument();
+    expect(getByDisplayValue('1514')).toBeInTheDocument();
+    expect(getByDisplayValue('tcp')).toBeInTheDocument();
+    /* agents.allow_higher_versions and legacy.ipv6 arrive as native booleans
+    and read in the 'yes'/'no' vocabulary, not as 'true'/'false'. */
+    expect(getAllByDisplayValue('no').length).toBe(2);
+    expect(queryByDisplayValue('false')).not.toBeInTheDocument();
   });
 });

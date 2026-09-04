@@ -10,9 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { parse } from 'js2xmlparser';
-import XMLBeautifier from './xml-beautifier';
-
 /**
  * Capitalize a string
  * @param {string} str String to capitalize
@@ -21,40 +18,44 @@ import XMLBeautifier from './xml-beautifier';
 export const capitalize = str => str[0].toUpperCase() + str.slice(1);
 
 /**
- * Get XML from a JSON adapting to Wazuh view of current configuration
- * @param {object} currentConfig Current config in JSON
- * @returns {string}
- */
-export const getXML = currentConfig => {
-  const config = {};
-  Object.assign(config, currentConfig);
-  const cleaned = objectWithoutProperties(config);
-  const XMLContent = XMLBeautifier(parse('configuration', cleaned));
-  return XMLContent;
-};
-
-/**
- * Get JSON stringified of current configuration
- * @param {object} currentConfig Current config in JSON
- * @returns {string}
- */
-export const getJSON = currentConfig => {
-  const config = {};
-  Object.assign(config, currentConfig);
-  const cleaned = objectWithoutProperties(config);
-  const JSONContent = JSON.stringify(cleaned, null, 2);
-  return JSONContent;
-};
-
-/**
  * Check if a value is a string
  * @param {string} value Value to check
  * @returns {boolean}
  */
 export const isString = value => typeof value === 'string';
 
-export const reportedEnabled = (value, enabledValue) =>
-  value === undefined || value === null ? undefined : value === enabledValue;
+/**
+ * Normalize a manager configuration boolean field into a real boolean.
+ * Accepts either the legacy 'yes'/'no' string dialect (agent reports, older
+ * agent fields) or a native boolean (manager fields).
+ * Anything else is not a boolean value at all and resolves to `undefined`,
+ * so callers keep their existing wrong-type/missing-value fallback.
+ * @param {*} value Value to normalize
+ * @returns {boolean|undefined}
+ */
+export const normalizeConfigBoolean = value =>
+  typeof value === 'boolean'
+    ? value
+    : value === 'yes'
+    ? true
+    : value === 'no'
+    ? false
+    : undefined;
+
+export const reportedEnabled = (value, enabledValue) => {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+  if (
+    typeof value === 'boolean' &&
+    (enabledValue === 'yes' || enabledValue === 'no')
+  ) {
+    return (
+      normalizeConfigBoolean(value) === normalizeConfigBoolean(enabledValue)
+    );
+  }
+  return value === enabledValue;
+};
 
 /**
  * Check if a value is an array
@@ -137,14 +138,29 @@ export const renderValueOrYes = renderValueOrDefault('yes');
  * @param {value} value Value
  */
 export const renderValueNoThenEnabled = value =>
-  value === 'no' ? 'enabled' : 'disabled';
+  normalizeConfigBoolean(value) === false ? 'enabled' : 'disabled';
 
 /**
  * Return 'enabled' if value = 'yes', or 'disabled'
  * @param {value} value Value
  */
 export const renderValueYesThenEnabled = value =>
-  value === 'yes' ? 'enabled' : 'disabled';
+  normalizeConfigBoolean(value) === true ? 'enabled' : 'disabled';
+
+/**
+ * Render a boolean-ish configuration value as the UI's 'yes'/'no' vocabulary.
+ * Accepts a native boolean or the legacy 'yes'/'no' string dialect; anything
+ * else falls back to the default placeholder.
+ * @param {*} value Value to render
+ */
+export const renderValueBooleanYesNo = value => {
+  const normalized = normalizeConfigBoolean(value);
+  return normalized === undefined
+    ? renderValueOrNoValue(value)
+    : normalized
+    ? 'yes'
+    : 'no';
+};
 
 /**
  * Return value if isn't falsy or 'all'
