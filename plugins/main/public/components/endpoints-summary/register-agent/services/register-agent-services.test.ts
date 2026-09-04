@@ -168,3 +168,97 @@ describe('Register agent service', () => {
     });
   });
 });
+
+describe('parseRegisterAgentFormValues', () => {
+  const osOptions = [
+    {
+      icon: '',
+      title: 'LINUX',
+      hr: true,
+      architecture: ['DEB amd64'],
+    },
+  ] as any;
+
+  const formValues = [
+    { name: 'operatingSystemSelection', value: 'DEB amd64' },
+    { name: 'serverAddress', value: '1.1.1.1' },
+    { name: 'serverPort', value: '' },
+    { name: 'serverPath', value: '' },
+    { name: 'agentName', value: 'agent1' },
+    { name: 'agentGroups', value: [] },
+  ] as any;
+
+  /* The switch and the CA path are ordinary optional parameters, so they reach
+  the command generator through the same passthrough as the other fields. */
+  it('forwards the SSL verification switch as a boolean', () => {
+    const result = RegisterAgentService.parseRegisterAgentFormValues(
+      [...formValues, { name: 'sslVerification', value: false }],
+      osOptions,
+    );
+    expect(result.optionalParams.sslVerification).toBe(false);
+  });
+
+  it('forwards the manager CA path', () => {
+    const result = RegisterAgentService.parseRegisterAgentFormValues(
+      [
+        ...formValues,
+        { name: 'sslVerification', value: true },
+        { name: 'managerCa', value: '/var/ossec/etc/manager-ca.pem' },
+      ],
+      osOptions,
+    );
+    expect(result.optionalParams.sslVerification).toBe(true);
+    expect(result.optionalParams.managerCa).toBe(
+      '/var/ossec/etc/manager-ca.pem',
+    );
+  });
+});
+
+describe('parseRegisterAgentFormValues - CA and verification interaction', () => {
+  const osOptions = [
+    {
+      icon: '',
+      title: 'LINUX',
+      hr: true,
+      architecture: ['DEB amd64'],
+    },
+  ] as any;
+
+  const baseValues = [
+    { name: 'operatingSystemSelection', value: 'DEB amd64' },
+    { name: 'serverAddress', value: '1.1.1.1' },
+    { name: 'serverPort', value: '' },
+    { name: 'serverPath', value: '' },
+    { name: 'agentName', value: '' },
+    { name: 'agentGroups', value: [] },
+  ] as any;
+
+  /* Otherwise turning the switch off after typing a path would emit both
+  SSL_VERIFICATION='none' and the CA, a command that supplies a CA and then
+  refuses to use it. */
+  it('drops the CA when verification is disabled', () => {
+    const result = RegisterAgentService.parseRegisterAgentFormValues(
+      [
+        ...baseValues,
+        { name: 'sslVerification', value: false },
+        { name: 'managerCa', value: '/var/ossec/etc/manager-ca.pem' },
+      ],
+      osOptions,
+    );
+    expect(result.optionalParams.managerCa).toBe('');
+  });
+
+  it('keeps the CA when verification is enabled', () => {
+    const result = RegisterAgentService.parseRegisterAgentFormValues(
+      [
+        ...baseValues,
+        { name: 'sslVerification', value: true },
+        { name: 'managerCa', value: '/var/ossec/etc/manager-ca.pem' },
+      ],
+      osOptions,
+    );
+    expect(result.optionalParams.managerCa).toBe(
+      '/var/ossec/etc/manager-ca.pem',
+    );
+  });
+});

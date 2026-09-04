@@ -70,6 +70,8 @@ export const Steps = ({
       agentName: '',
       serverAddress: '',
       wazuhPassword,
+      sslVerification: true,
+      managerCa: '',
     },
   } as IParseRegisterFormValues;
   const [missingStepsName, setMissingStepsName] = useState<tFormStepsLabel[]>(

@@ -193,6 +193,7 @@ export enum tFormFieldsLabel {
   serverAddress = 'server address',
   serverPort = 'server port',
   serverPath = 'server path prefix',
+  managerCa = 'manager CA file path',
 }
 
 export const getInvalidFields = (
