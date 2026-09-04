@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import {
+  buildDeclaredFieldMatcher,
   checkFieldDrift,
+  DynamicTemplateEntry,
   flattenMappedFieldPaths,
   MappingClient,
   MappingsResponseBody,
@@ -19,12 +21,46 @@ function fakeLogger() {
   };
 }
 
+/** Records every `getMapping` call the canary makes, so a test can assert HOW the mapping was
+ * read (which index the dynamic-template request targeted, how many of them there were) and not
+ * only what the canary concluded from it. */
+interface RecordedCall {
+  index: string;
+  filterPath?: string;
+}
+
+/** Fake client serving two distinct request shapes, matching `field-drift-canary.ts`:
+ * - the PATTERN request for `mappings.properties`, answered from `bodyByIndexPattern`;
+ * - the single-CONCRETE-INDEX request for `mappings.dynamic_templates`, recognised by its
+ *   `filter_path` and answered from `dynamicTemplatesByIndex` (defaulting to none, which is what
+ *   every `wazuh-states-*` index looks like live and keeps the pre-existing fixtures meaningful).
+ */
 function clientReturning(
   bodyByIndexPattern: Record<string, MappingsResponseBody>,
+  dynamicTemplatesByIndex: Record<string, DynamicTemplateEntry[]> = {},
+  calls: RecordedCall[] = [],
 ): MappingClient {
   return {
     indices: {
-      getMapping({ index }: { index: string }) {
+      getMapping({
+        index,
+        filter_path: filterPath,
+      }: {
+        index: string;
+        filter_path?: string;
+      }) {
+        calls.push({ index, filterPath });
+        if (filterPath?.includes('dynamic_templates')) {
+          return Promise.resolve({
+            body: {
+              [index]: {
+                mappings: {
+                  dynamic_templates: dynamicTemplatesByIndex[index] ?? [],
+                },
+              },
+            },
+          });
+        }
         const body = bodyByIndexPattern[index];
         if (!body) {
           return Promise.reject(
@@ -35,6 +71,15 @@ function clientReturning(
       },
     },
   };
+}
+
+/** One exact-`path_match` dynamic template per path, the shape Wazuh 5.0.0's WCS index templates
+ * actually use (`"dynamic": "strict_allow_templates"`, one template per declared field). Carries
+ * no `mapping` block, matching what the canary's `filter_path` leaves of each entry. */
+function exactPathTemplates(...paths: string[]): DynamicTemplateEntry[] {
+  return paths.map(path => ({
+    [`wcs_${path.replace(/\./g, '_')}`]: { path_match: path },
+  }));
 }
 
 /** Every OTHER queried family's index pattern resolving to "no backing index" (empty body) --
@@ -246,6 +291,161 @@ test('checkFieldDrift: never throws when the client itself errors for a family -
       message =>
         message.includes('[field-drift]') &&
         message.includes('simulated indexer unreachable'),
+    ),
+  );
+});
+
+test('buildDeclaredFieldMatcher: matches exact path_match rules and simple globs, and matches nothing when there are no templates', () => {
+  const matcher = buildDeclaredFieldMatcher([
+    ...exactPathTemplates('host.os.name', 'source.ip'),
+    { wcs_wazuh_rule_compliance: { path_match: 'wazuh.rule.compliance.*' } },
+    { wcs_multi_rule: { path_match: ['event.category', 'event.outcome'] } },
+    // No path_match at all: a datatype-only template declares no specific field path.
+    { wcs_strings: { match_mapping_type: 'string' } } as never,
+  ]);
+  assert.equal(matcher('host.os.name'), true);
+  assert.equal(matcher('source.ip'), true);
+  assert.equal(matcher('wazuh.rule.compliance.pci_dss'), true);
+  assert.equal(matcher('event.category'), true);
+  assert.equal(matcher('event.outcome'), true);
+  // A glob is anchored: "wazuh.rule.compliance.*" must not swallow a sibling namespace.
+  assert.equal(matcher('wazuh.rule.level'), false);
+  assert.equal(matcher('host.os.platform'), false);
+  assert.equal(buildDeclaredFieldMatcher([])('host.os.name'), false);
+  assert.equal(buildDeclaredFieldMatcher(undefined)('host.os.name'), false);
+});
+
+test('buildDeclaredFieldMatcher: a path_match is matched as a glob, never as a regexp', () => {
+  // "." is a regexp metacharacter; treating the rule as a regexp would make it match any
+  // separator, so "check.id" would wrongly declare "check-id".
+  const matcher = buildDeclaredFieldMatcher(exactPathTemplates('check.id'));
+  assert.equal(matcher('check.id'), true);
+  assert.equal(matcher('check-id'), false);
+});
+
+test('checkFieldDrift: a field DECLARED by a dynamic template but not yet materialized in properties is not drift', async () => {
+  // Reproduces the 5.0.0 report: on a deployment with no documents, an events/findings mapping
+  // declares each WCS field as an exact-path_match dynamic template and materializes none of them
+  // under `properties`. Reading `properties` alone warned on every tool-facing field of the family.
+  const { fieldsForFamily } = await import('./catalog/get-field-values');
+  const scaFields = fieldsForFamily('sca');
+  const properties: Record<string, unknown> = {};
+  // Only "@timestamp" has ever been written, exactly like a data stream with no ingested data.
+  setMappingLeaf(properties, '@timestamp', 'date');
+  const calls: RecordedCall[] = [];
+  const client = clientReturning(
+    {
+      'wazuh-states-sca*': {
+        'wazuh-states-sca-000001': { mappings: { properties } },
+      },
+      ...OTHER_EMPTY_FAMILY_INDICES,
+    },
+    { 'wazuh-states-sca-000001': exactPathTemplates(...scaFields) },
+    calls,
+  );
+  const logger = fakeLogger();
+  await checkFieldDrift(client, logger as never);
+  assert.deepEqual(logger.warnMessages, []);
+  // The declarations were read from the concrete backing index, not from the family pattern:
+  // asking the pattern would repeat the identical template list once per backing index.
+  const dynamicTemplateCalls = calls.filter(call =>
+    call.filterPath?.includes('dynamic_templates'),
+  );
+  assert.deepEqual(
+    dynamicTemplateCalls.map(call => call.index),
+    ['wazuh-states-sca-000001'],
+  );
+});
+
+test('checkFieldDrift: reads dynamic templates from ONE index even when the family pattern resolves to many', async () => {
+  const properties = await buildScaProperties();
+  const calls: RecordedCall[] = [];
+  const client = clientReturning(
+    {
+      'wazuh-states-sca*': {
+        'wazuh-states-sca-000003': { mappings: { properties } },
+        'wazuh-states-sca-000001': { mappings: { properties } },
+        'wazuh-states-sca-000002': { mappings: { properties } },
+      },
+      ...OTHER_EMPTY_FAMILY_INDICES,
+    },
+    {},
+    calls,
+  );
+  const logger = fakeLogger();
+  await checkFieldDrift(client, logger as never);
+  const dynamicTemplateCalls = calls.filter(call =>
+    call.filterPath?.includes('dynamic_templates'),
+  );
+  assert.equal(dynamicTemplateCalls.length, 1);
+  // Sorted-first, so the same index is consulted on every restart rather than whichever one the
+  // cluster happened to enumerate first.
+  assert.equal(dynamicTemplateCalls[0].index, 'wazuh-states-sca-000001');
+});
+
+test('checkFieldDrift: a field in neither properties nor dynamic templates is still real drift', async () => {
+  // The other side of the fix: dynamic templates must not turn the canary off. "policy.id" is
+  // dropped from BOTH sources -- under "strict_allow_templates" that field could not be indexed at
+  // all, which is exactly the removal/rename this canary exists to catch.
+  const scaFields = (
+    await import('./catalog/get-field-values')
+  ).fieldsForFamily('sca');
+  const properties = await buildScaProperties(['policy.id']);
+  const client = clientReturning(
+    {
+      'wazuh-states-sca*': {
+        'wazuh-states-sca-000001': { mappings: { properties } },
+      },
+      ...OTHER_EMPTY_FAMILY_INDICES,
+    },
+    {
+      'wazuh-states-sca-000001': exactPathTemplates(
+        ...scaFields.filter(field => field !== 'policy.id'),
+      ),
+    },
+  );
+  const logger = fakeLogger();
+  await checkFieldDrift(client, logger as never);
+  assert.equal(logger.warnMessages.length, 1);
+  assert.ok(logger.warnMessages[0].includes('"policy.id"'));
+});
+
+test('checkFieldDrift: a failing dynamic-templates request skips the family at debug rather than warning on every field', async () => {
+  // Without the declared-field side there is no way to tell "not materialized yet" from "removed",
+  // and guessing would re-emit exactly the false warnings this second request removes.
+  const properties: Record<string, unknown> = {};
+  setMappingLeaf(properties, '@timestamp', 'date');
+  const client: MappingClient = {
+    indices: {
+      getMapping({
+        index,
+        filter_path: filterPath,
+      }: {
+        index: string;
+        filter_path?: string;
+      }) {
+        if (filterPath?.includes('dynamic_templates')) {
+          return Promise.reject(new Error('simulated mapping read failure'));
+        }
+        if (index === 'wazuh-states-sca*') {
+          return Promise.resolve({
+            body: {
+              'wazuh-states-sca-000001': { mappings: { properties } },
+            },
+          });
+        }
+        return Promise.resolve({ body: {} });
+      },
+    },
+  };
+  const logger = fakeLogger();
+  await assert.doesNotReject(checkFieldDrift(client, logger as never));
+  assert.deepEqual(logger.warnMessages, []);
+  assert.ok(
+    logger.debugMessages.some(
+      message =>
+        message.includes('could not check "sca"') &&
+        message.includes('simulated mapping read failure'),
     ),
   );
 });

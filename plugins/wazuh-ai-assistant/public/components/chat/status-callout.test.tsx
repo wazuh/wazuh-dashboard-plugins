@@ -82,4 +82,26 @@ describe('StatusCallout', () => {
 
     expect(container.querySelector('.euiSpacer')).toBeNull();
   });
+
+  it('renders a ReactNode body directly, without wrapping it in a <p> (avoids invalid nested block markup)', () => {
+    const { container } = render(
+      <StatusCallout
+        title='Something went wrong'
+        body={
+          <div data-test-subj='wzRichBody'>
+            <a href='https://example.com/billing'>Add credits</a>
+          </div>
+        }
+        color='danger'
+        iconType='alert'
+      />,
+    );
+
+    const rich = container.querySelector('[data-test-subj="wzRichBody"]');
+    expect(rich).toBeInTheDocument();
+    expect(rich.closest('p')).toBeNull();
+    expect(
+      container.querySelector('a[href="https://example.com/billing"]'),
+    ).not.toBeNull();
+  });
 });

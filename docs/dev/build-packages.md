@@ -117,7 +117,7 @@ yarn build
 5. Clone the [wazuh-dashboard-security-analytics](https://github.com/wazuh/wazuh-dashboard-security-analytics.git) repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-security-analytics/` folder, and build the plugin:
 
 > The yarn build command requires an entry specifying the OpenSearch Dashboard version. This version can be obtained from the `package.json` file of the plugin.
-> Replace the `GIT_REF` by the branch or tag for the Wazuh security analytics plugin, e.g. `v5.0.0`.
+> Replace the `GIT_REF` by the branch or tag for the Wazuh Ruleset Management plugin, e.g. `v5.0.0`.
 
 ```bash
 GIT_REF=<REPLACE_PLACEHOLDER>
@@ -282,7 +282,7 @@ cd wazuh-dashboard/dev-tools/build-packages/base-packages-to-base/
    - `WAZUH_DASHBOARDS_PLUGINS`: Branch of the Wazuh dashboards Plugins repository.
    - `WAZUH_SECURITY_DASHBOARDS_PLUGIN_BRANCH`: Branch of the Wazuh Security Dashboards Plugin repository.
    - `WAZUH_REPORTING_DASHBOARDS_PLUGIN_BRANCH`: Branch of the Wazuh reporting plugin repository.
-   - `WAZUH_SECURITY_ANALYTICS_DASHBOARDS_PLUGIN_BRANCH`: Branch of the Wazuh Security Analytics plugin repository.
+   - `WAZUH_SECURITY_ANALYTICS_DASHBOARDS_PLUGIN_BRANCH`: Branch of the Wazuh Ruleset Management plugin repository.
    - `WAZUH_DASHBOARD_ALERTING_BRANCH`: Branch of the Wazuh alerting plugin repository.
    - `WAZUH_DASHBOARD_NOTIFICATIONS_BRANCH`: Branch of the Wazuh notifications plugin repository.
    - `OPENSEARCH_DASHBOARDS_VERSION`: Version of the OpenSearch Dashboards. You can find the version in the `package.json` file of the Wazuh dashboards repository.

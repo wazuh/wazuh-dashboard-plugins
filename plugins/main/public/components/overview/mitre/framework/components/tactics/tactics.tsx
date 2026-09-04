@@ -33,7 +33,6 @@ type tTacticsState = {
   tacticsCount: { key: string; doc_count: number }[];
   allSelected: boolean;
   isPopoverOpen: boolean;
-  firstTime: boolean;
 };
 
 type tTacticsProps = {
@@ -58,19 +57,10 @@ export const Tactics = (props: tTacticsProps) => {
     tacticsCount: [],
     allSelected: false,
     isPopoverOpen: false,
-    firstTime: true,
   });
   const [isLoadingAlerts, setIsLoadingAlerts] = useState(true);
 
   const { tacticsCount, isPopoverOpen } = state;
-  const initTactics = () => {
-    const tacticsIds = Object.keys(tacticsObject);
-    const selectedTactics = {};
-    tacticsIds.forEach((item, id) => {
-      selectedTactics[item] = true;
-    });
-    onChangeSelectedTactics(selectedTactics);
-  };
 
   useEffect(() => {
     if (isLoading) {
@@ -81,7 +71,6 @@ export const Tactics = (props: tTacticsProps) => {
 
   const getTacticsCount = async () => {
     setIsLoadingAlerts(true);
-    const { firstTime } = state;
     try {
       const { filterParams } = props;
       const aggs = {
@@ -101,10 +90,7 @@ export const Tactics = (props: tTacticsProps) => {
         aggs,
       });
       const buckets = results.aggregations?.tactics?.buckets || [];
-      if (firstTime) {
-        initTactics(); // top tactics are checked on component mount
-      }
-      setState({ ...state, tacticsCount: buckets, firstTime: false });
+      setState({ ...state, tacticsCount: buckets });
       setIsLoadingAlerts(false);
     } catch (error) {
       const options = {

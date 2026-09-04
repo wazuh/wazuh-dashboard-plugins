@@ -1,6 +1,6 @@
 /* eslint-disable camelcase -- the fixtures reproduce the index and
 Server API field names verbatim. */
-import { getCurrentConfig } from './wz-fetch';
+import { getCurrentConfig, saveFileCluster } from './wz-fetch';
 import { getAgentReportedConfiguration } from './agent-config-service';
 import { WzRequest } from '../../../../../../react-services/wz-request';
 
@@ -96,11 +96,11 @@ describe('getCurrentConfig', () => {
 
       const result = await getCurrentConfig(
         'node01',
-        [{ component: 'monitor', configuration: 'global' }],
+        [{ component: 'request', configuration: 'remote' }],
         'node01',
       );
 
-      expect(result).toEqual({ 'monitor-global': {} });
+      expect(result).toEqual({ 'request-remote': {} });
     });
 
     it('rejects a request without sections', async () => {
@@ -120,5 +120,57 @@ describe('getCurrentConfig', () => {
     await expect(getCurrentConfig(undefined, [], false)).rejects.toThrow(
       'Invalid parameters',
     );
+  });
+});
+
+/* Characterization of the only live manager-save path, before removing the
+dead `saveNodeConfiguration`/`saveConfiguration`/`getXML`/`getJSON` exports. */
+describe('saveFileCluster', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('sends the raw text with origin=raw, then validates', async () => {
+    WzRequest.apiReq
+      .mockResolvedValueOnce({}) // PUT .../configuration
+      .mockResolvedValueOnce({ data: { data: { status: 'OK' } } }); // GET validation
+
+    await saveFileCluster('<wazuh_config></wazuh_config>', 'node01');
+
+    expect(WzRequest.apiReq).toHaveBeenNthCalledWith(
+      1,
+      'PUT',
+      '/cluster/node01/configuration',
+      { body: '<wazuh_config></wazuh_config>', origin: 'raw' },
+    );
+    expect(WzRequest.apiReq).toHaveBeenNthCalledWith(
+      2,
+      'GET',
+      '/cluster/configuration/validation',
+      {},
+    );
+  });
+
+  it('rejects with the validation error details when the manager reports invalid config', async () => {
+    WzRequest.apiReq.mockResolvedValueOnce({}).mockResolvedValueOnce({
+      data: {
+        data: { status: 'FAIL', details: [{ path: 'wazuh_config' }] },
+      },
+    });
+
+    await expect(
+      saveFileCluster('<wazuh_config></wazuh_config>', 'node01'),
+    ).rejects.toEqual({
+      status: 'FAIL',
+      details: [{ path: 'wazuh_config' }],
+    });
+  });
+
+  it('propagates a failure from the PUT request', async () => {
+    WzRequest.apiReq.mockRejectedValueOnce(new Error('network error'));
+
+    await expect(
+      saveFileCluster('<wazuh_config></wazuh_config>', 'node01'),
+    ).rejects.toThrow('network error');
   });
 });

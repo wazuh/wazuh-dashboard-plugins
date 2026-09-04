@@ -20,7 +20,7 @@ const ENABLED_VALUES = ['enabled', 'disabled', 'any'] as const;
 const DETECTOR_SOURCES = ['custom', 'standard'] as const;
 
 /**
- * OpenSearch Security Analytics detector definitions -- which detectors exist, what they monitor,
+ * Ruleset Management detector definitions -- which detectors exist, what they monitor,
  * and where their generated alerts/findings live. `.opensearch-sap-detectors-config` is a single
  * fixed index (not a `wazuh-*` family), indexer-reachable, with the whole document nested under a
  * `detector` object (mapped `type: nested`) -- filtering requires a `nested` query wrapper, not a
@@ -64,7 +64,7 @@ export const getDetectorsTool: ToolDefinition = {
   spec: {
     name: 'get_detectors',
     description:
-      'Lists Security Analytics detector definitions (which detectors exist, what indices they ' +
+      'Lists Ruleset Management detector definitions (which detectors exist, what indices they ' +
       'monitor, whether they are enabled). Use for "which detectors are configured/active" ' +
       'questions. When filtered to one detector_type, also reports how many findings that ' +
       'detector has actually produced and, if that count is zero, machine-checked guidance on ' +

@@ -238,7 +238,7 @@ export const tableSpecSchema = schema.object({
       dsl: schema.recordOf(schema.string(), schema.any()),
     }),
   ),
-  /** "Open in Security Analytics" (common/types.ts's `TableSpec.securityAnalyticsLink`) --
+  /** "Open in Ruleset Management" (common/types.ts's `TableSpec.securityAnalyticsLink`) --
    * `discover`'s sibling for wazuh-threatintel-* content with no OSD index-pattern. `url` is
    * already fully built (app path + hash route + resolved space) by the time it reaches here. */
   securityAnalyticsLink: schema.maybe(

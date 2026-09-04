@@ -119,6 +119,62 @@ test('executeToolCall: privacy off leaves get_agent_inventory digest completely 
   assert.equal(digest.samples[0]['package.version'], '3.118ubuntu5');
 });
 
+/**
+ * `never` denies egress outright, so it holds whether or not privacy mode is on for the turn.
+ * Privacy mode ships off, which makes the privacy-off branch the one an admin's "Never send"
+ * actually depends on.
+ */
+test('executeToolCall: privacy off still enforces a "never" field policy', async () => {
+  const context = fakeSearchContext([
+    { package: { name: 'adduser', version: '3.118ubuntu5' } },
+  ]);
+  const outcome = await executeToolCall(
+    {
+      id: 'call-1',
+      name: 'get_agent_inventory',
+      arguments: { agent_id: '001', kind: 'packages' },
+    },
+    context,
+    fakeRequest,
+    undefined,
+    [{ field: 'package.name', action: 'never' }],
+  );
+  const digest = JSON.parse(outcome.toolResultContent) as {
+    samples: Array<Record<string, unknown>>;
+    columns: string[];
+  };
+  assert.equal(digest.samples[0]['package.name'], undefined);
+  // Not even the field's NAME is sent -- same contract the action has under privacy mode.
+  assert.ok(!digest.columns.includes('package.name'));
+  // Every other field is untouched: this pass removes, it never rewrites.
+  assert.equal(digest.samples[0]['package.version'], '3.118ubuntu5');
+});
+
+test('executeToolCall: privacy off with no "never" entry is byte-identical to no policy', async () => {
+  // The regression guard for every default installation: FIELD_POLICY_DEFAULTS holds no 'never'
+  // entry, so threading it through the privacy-off path must change nothing at all.
+  const rows = [{ package: { name: 'adduser', version: '3.118ubuntu5' } }];
+  const call = {
+    id: 'call-1',
+    name: 'get_agent_inventory',
+    arguments: { agent_id: '001', kind: 'packages' },
+  };
+  const withPolicy = await executeToolCall(
+    call,
+    fakeSearchContext(rows),
+    fakeRequest,
+    undefined,
+    FIELD_POLICY_DEFAULTS,
+  );
+  const withoutPolicy = await executeToolCall(
+    call,
+    fakeSearchContext(rows),
+    fakeRequest,
+    undefined,
+  );
+  assert.equal(withPolicy.toolResultContent, withoutPolicy.toolResultContent);
+});
+
 // --- `TableSpec.provenance` must carry only FACTS the executor actually observed -- never a
 // client-invented default, and never attributed to the wrong call. These exercise the real
 // `executeToolCall` -> `executeIndexerRequest`/`executeManagerRequest` wiring, not a helper that

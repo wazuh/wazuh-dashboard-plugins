@@ -41,7 +41,7 @@ the filter portion. Field/agg names come from [`fields.ts`](./fields.ts) and
 | Threat-intel enrichments (`useThreatIntelEnrichments`) | `wazuh-threatintel-enrichments*`                           | current  |
 | IT Hygiene counts ×4 (`useItHygiene*Count`)            | `wazuh-states-inventory-{system,packages,users,services}*` | current  |
 | Active Response (`useActiveResponseOverview`)          | `wazuh-active-responses*`                                  | last 24h |
-| Rules/Decoders/Integrations/Detectors                  | Security Analytics `_search` (HTTP)                        | current  |
+| Rules/Decoders/Integrations/Detectors                  | Ruleset Management `_search` (HTTP)                        | current  |
 | Agents by status (`useAgentStatus`)                    | Wazuh Server API (not OpenSearch)                          | current  |
 
 ---
@@ -351,9 +351,9 @@ DQL (filter part): `*` over the last 24h.
 
 ---
 
-## 10–13. Threat Intelligence Feed counts — Security Analytics (HTTP)
+## 10–13. Threat Intelligence Feed counts — Ruleset Management (HTTP)
 
-Not OpenSearch data-source searches: these hit the Security Analytics dashboards
+Not OpenSearch data-source searches: these hit the Ruleset Management dashboards
 plugin over `core.http` at `../_plugins/_security_analytics/<type>/_search`
 (`services/security-analytics.service.ts`). Each is `size: 0`; the count is read
 from `hits.total` (decoders also accept `response.total`). If the plugin is

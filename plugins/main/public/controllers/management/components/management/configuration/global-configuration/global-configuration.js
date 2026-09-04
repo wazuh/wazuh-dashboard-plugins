@@ -55,7 +55,7 @@ class WzConfigurationGlobalConfiguration extends Component {
 }
 const sectionsManager = [
   { component: 'request', configuration: 'remote' },
-  { component: 'monitor', configuration: 'global' },
+  { useFullEndpoint: true, key: 'global' },
   { useFullEndpoint: true, key: 'logging' },
 ];
 

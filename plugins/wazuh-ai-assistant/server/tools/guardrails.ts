@@ -144,7 +144,7 @@ const MAX_TREE_DEPTH = 100;
 //  - `\.wazuh-cti-consumers` / `\.wazuh-content-manager-jobs` -- CTI freshness status: per-feed
 //    `status`/`local_offset`/`remote_offset` documents and sync-schedule metadata -- config/status
 //    documents written by the content-manager service itself, never analyst/attacker-supplied.
-//  - `\.opensearch-sap-[^,\s]*-findings` -- the per-log-type Security Analytics findings indices,
+//  - `\.opensearch-sap-[^,\s]*-findings` -- the per-log-type Ruleset Management findings indices,
 //    reachable via their aliases (`.opensearch-sap-wazuh-generic-findings` etc., `_cat/aliases`
 //    confirms one alias per family, no ambiguity with the sibling
 //    `-detectors-queries-optimized-<uuid>` internal artifact indices, which end in a UUID suffix
@@ -185,7 +185,7 @@ const MAX_TREE_DEPTH = 100;
 //  - `.opendistro-alerting-config` / `.opensearch-notifications-config` -- open product-decision
 //    gaps with no ownership assigned; left closed pending that decision.
 // `.opensearch-sap-detectors-config` (get_detectors.ts) is an exact single index, not a wildcard
-// family -- OpenSearch Security Analytics' own config store for detector definitions, confirmed
+// family -- Ruleset Management's own config store for detector definitions, confirmed
 // live to be indexer-reachable and to hold no analyst/attacker-supplied data (name/type/schedule/
 // enabled/source, all vendor- or admin-configured).
 // The wildcard suffix was `[^,\s]*`, which excludes only a comma or

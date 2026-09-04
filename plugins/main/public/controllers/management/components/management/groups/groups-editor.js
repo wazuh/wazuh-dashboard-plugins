@@ -56,6 +56,7 @@ class WzGroupsEditor extends Component {
       enableBasicAutocompletion: true,
       enableSnippets: true,
       enableLiveAutocompletion: true,
+      behavioursEnabled: false,
     };
     this.groupsHandler = GroupsHandler;
     const { fileContent } = this.props.state;

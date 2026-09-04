@@ -17,7 +17,7 @@ import {
   getAgentsUrl,
   goToAgentsByStatus,
   getThreatHuntingUrl,
-  getMitreIntelligenceResourceUrl,
+  getMitreFrameworkTacticUrl,
   getMitreUrl,
   getDiscoverFindingsBySeverityUrl,
 } from '../../utils/navigation';
@@ -110,7 +110,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
                 items={findings.data.topTactics}
                 emptyMessage='No MITRE ATT&CK tactics observed'
                 getHref={item =>
-                  getMitreIntelligenceResourceUrl('tactics', item)
+                  getMitreFrameworkTacticUrl(item, findings.indexPatternId)
                 }
                 data-test-subj='mitre-top-tactics'
                 barColor={UI_COLOR_STATUS.success}
