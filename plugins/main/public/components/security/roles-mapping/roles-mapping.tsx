@@ -176,7 +176,7 @@ export const RolesMapping = withUserAuthorizationPrompt([
             <h2>Roles mapping</h2>
           </EuiTitle>
           <EuiText size='s' color='subdued'>
-            Map roles of the Wazuh manager API to authentication contexts.
+            Map roles of the manager API to authentication contexts.
           </EuiText>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>

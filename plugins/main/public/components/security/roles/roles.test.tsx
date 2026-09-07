@@ -76,7 +76,7 @@ describe('Roles', () => {
     render(<Roles />);
 
     expect(
-      screen.getByText(/Manage the roles of the Wazuh manager API/),
+      screen.getByText(/Manage the roles of the manager API/),
     ).toBeTruthy();
   });
 

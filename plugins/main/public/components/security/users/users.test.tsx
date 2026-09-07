@@ -50,7 +50,7 @@ describe('Users', () => {
     render(<Users />);
 
     expect(
-      screen.getByText(/Manage the users of the Wazuh manager API/),
+      screen.getByText(/Manage the users of the manager API/),
     ).toBeTruthy();
   });
 });
