@@ -196,12 +196,23 @@ export enum tFormFieldsLabel {
   managerCa = 'manager CA file path',
 }
 
+/* Fields the form is still holding a value for but that the wizard is no
+longer asking about. Their input is not rendered, so an error on them cannot be
+seen or corrected -- reporting it would block the commands with no way out. */
+const fieldIsNotApplicable = (
+  fieldName: string,
+  formFields: UseFormReturn['fields'],
+): boolean => fieldName === 'managerCa' && !formFields.sslVerification?.value;
+
 export const getInvalidFields = (
   formFields: UseFormReturn['fields'],
 ): tFormFieldsLabel[] => {
   const statusManager = new RegisterAgentFormStatusManager(formFields);
 
-  return statusManager.getInvalidFields().map(field => {
-    return tFormFieldsLabel[field] || field;
-  });
+  return statusManager
+    .getInvalidFields()
+    .filter(field => !fieldIsNotApplicable(field, formFields))
+    .map(field => {
+      return tFormFieldsLabel[field] || field;
+    });
 };
