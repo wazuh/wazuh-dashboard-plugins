@@ -76,7 +76,7 @@ describe('Roles', () => {
     render(<Roles />);
 
     expect(
-      screen.getByText(/These are separate from the roles managed in/),
+      screen.getByText(/Manage the roles of the Wazuh manager API/),
     ).toBeTruthy();
   });
 

@@ -64,8 +64,6 @@ describe('RolesMapping', () => {
   it('shows a description clarifying these mappings belong to the Wazuh manager API', () => {
     render(<RolesMapping />);
 
-    expect(
-      screen.getByText(/These are separate from the mappings managed in/),
-    ).toBeTruthy();
+    expect(screen.getByText(/Map roles of the Wazuh manager API/)).toBeTruthy();
   });
 });

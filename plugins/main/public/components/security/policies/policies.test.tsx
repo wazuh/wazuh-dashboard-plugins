@@ -49,7 +49,7 @@ describe('Policies', () => {
     render(<Policies />);
 
     expect(
-      screen.getByText(/These are separate from the policies managed in/),
+      screen.getByText(/Manage the policies of the Wazuh manager API/),
     ).toBeTruthy();
   });
 });

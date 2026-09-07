@@ -84,8 +84,7 @@ export const Policies = withUserAuthorizationPrompt([
             <h2>Policies</h2>
           </EuiTitle>
           <EuiText size='s' color='subdued'>
-            Manage the policies of the Wazuh manager API. These are separate
-            from the policies managed in Indexer management &gt; Security.
+            Manage the policies of the Wazuh manager API.
           </EuiText>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>

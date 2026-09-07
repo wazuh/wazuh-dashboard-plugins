@@ -137,8 +137,7 @@ export const Users = withUserAuthorizationPrompt([
             <h2>Users</h2>
           </EuiTitle>
           <EuiText size='s' color='subdued'>
-            Manage the users of the Wazuh manager API. These are separate from
-            the users managed in Indexer management &gt; Security.
+            Manage the users of the Wazuh manager API.
           </EuiText>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>

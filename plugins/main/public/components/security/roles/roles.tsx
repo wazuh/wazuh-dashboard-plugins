@@ -122,8 +122,7 @@ export const Roles = withUserAuthorizationPrompt([
             <h2>Roles</h2>
           </EuiTitle>
           <EuiText size='s' color='subdued'>
-            Manage the roles of the Wazuh manager API. These are separate from
-            the roles managed in Indexer management &gt; Security.
+            Manage the roles of the Wazuh manager API.
           </EuiText>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
