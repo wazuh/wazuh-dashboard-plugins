@@ -17,7 +17,8 @@ import { getErrorOrchestrator } from '../../react-services/common-services';
 import { getWzCurrentAppID } from '../../kibana-services';
 import { ApiTable } from '../settings/api/api-table';
 import { WzConfigurationSettings } from '../settings/configuration';
-import { WzSampleDataWrapper } from '../add-modules-data/WzSampleDataWrapper';
+// TODO: re-import when the sample data app is enabled again (#8213, #9114).
+// import { WzSampleDataWrapper } from '../add-modules-data/WzSampleDataWrapper';
 import { WzIndexerSettings } from '../indexer-settings';
 import { SettingsAbout } from '../settings/about/index';
 import { Applications, serverApis } from '../../utils/applications';
@@ -105,11 +106,16 @@ class SettingsComponent extends React.Component<SettingsComponentProps> {
             <WzIndexerSettings />
           </div>
         </Route>
-        <Route path='?tab=sample_data'>
+        {
+          // TODO: re-enable when the sample data app is enabled again.
+          // Uncomment `sampleData` in ../../utils/applications.ts and this
+          // route (disabled for #8213, re-tracked in #9114).
+        }
+        {/* <Route path='?tab=sample_data'>
           <div>
             <WzSampleDataWrapper />
           </div>
-        </Route>
+        </Route> */}
       </Switch>
     );
   }
