@@ -21,7 +21,11 @@ import { WzConfigurationSettings } from '../settings/configuration';
 // import { WzSampleDataWrapper } from '../add-modules-data/WzSampleDataWrapper';
 import { WzIndexerSettings } from '../indexer-settings';
 import { SettingsAbout } from '../settings/about/index';
-import { Applications, serverApis } from '../../utils/applications';
+import {
+  Applications,
+  getCurrentAppDefaultTabSearch,
+  serverApis,
+} from '../../utils/applications';
 import { compose } from 'redux';
 import { withErrorBoundary, withRouteResolvers } from '../common/hocs';
 import { connect } from 'react-redux';
@@ -86,23 +90,6 @@ class SettingsComponent extends React.Component<SettingsComponentProps> {
     }
   }
 
-  getDefaultTabSearch(): string {
-    const currentApp = Applications.find(
-      ({ id }) => getWzCurrentAppID() === id,
-    );
-    const redirectPath = currentApp?.redirectTo();
-
-    if (redirectPath) {
-      const queryIndex = redirectPath.indexOf('?');
-
-      if (queryIndex !== -1) {
-        return redirectPath.slice(queryIndex);
-      }
-    }
-
-    return '?tab=api';
-  }
-
   render() {
     return (
       <Switch>
@@ -133,7 +120,7 @@ class SettingsComponent extends React.Component<SettingsComponentProps> {
             <WzSampleDataWrapper />
           </div>
         </Route> */}
-        <Redirect to={this.getDefaultTabSearch()}></Redirect>
+        <Redirect to={getCurrentAppDefaultTabSearch('?tab=api')}></Redirect>
       </Switch>
     );
   }
