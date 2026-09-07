@@ -6,8 +6,11 @@ export interface IOperationSystem {
   architecture: string;
 }
 
+/* Holds both the raw form values on the way in and the rendered `PROP='value'`
+tokens on the way out. Booleans are allowed because a parameter can be driven by
+a switch, whose off state is what produces a token. */
 export type IOptionalParameters<Params extends string> = {
-  [key in Params]: string;
+  [key in Params]: string | boolean;
 };
 
 ///////////////////////////////////////////////////////////////////
